@@ -84,9 +84,7 @@ class CountryValidatorTest extends ConstraintValidatorTestCase
      */
     public function testInvalidCountries($country)
     {
-        $constraint = new Country([
-            'message' => 'myMessage',
-        ]);
+        $constraint = new Country(message: 'myMessage');
 
         $this->validator->validate($country, $constraint);
 
@@ -109,9 +107,7 @@ class CountryValidatorTest extends ConstraintValidatorTestCase
      */
     public function testValidAlpha3Countries($country)
     {
-        $this->validator->validate($country, new Country([
-            'alpha3' => true,
-        ]));
+        $this->validator->validate($country, new Country(alpha3: true));
 
         $this->assertNoViolation();
     }
@@ -130,10 +126,10 @@ class CountryValidatorTest extends ConstraintValidatorTestCase
      */
     public function testInvalidAlpha3Countries($country)
     {
-        $constraint = new Country([
-            'alpha3' => true,
-            'message' => 'myMessage',
-        ]);
+        $constraint = new Country(
+            alpha3: true,
+            message: 'myMessage',
+        );
 
         $this->validator->validate($country, $constraint);
 

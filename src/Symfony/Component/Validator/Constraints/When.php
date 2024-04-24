@@ -13,6 +13,7 @@ namespace Symfony\Component\Validator\Constraints;
 
 use Symfony\Component\ExpressionLanguage\Expression;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
+use Symfony\Component\Validator\Attribute\HasNamedArguments;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Exception\LogicException;
 
@@ -33,17 +34,26 @@ class When extends Composite
      * @param Constraint[]|Constraint|null          $constraints One or multiple constraints that are applied if the expression returns true
      * @param array<string,mixed>|null              $values      The values of the custom variables used in the expression (defaults to [])
      * @param string[]|null                         $groups
-     * @param array<string,mixed>                   $options
+     * @param array<string,mixed>|null              $options
      */
-    public function __construct(string|Expression|array $expression, array|Constraint|null $constraints = null, ?array $values = null, ?array $groups = null, $payload = null, array $options = [])
+    #[HasNamedArguments]
+    public function __construct(string|Expression|array $expression, array|Constraint|null $constraints = null, ?array $values = null, ?array $groups = null, $payload = null, ?array $options = null)
     {
         if (!class_exists(ExpressionLanguage::class)) {
             throw new LogicException(\sprintf('The "symfony/expression-language" component is required to use the "%s" constraint. Try running "composer require symfony/expression-language".', __CLASS__));
         }
 
         if (\is_array($expression)) {
-            $options = array_merge($expression, $options);
+            trigger_deprecation('symfony/validator', '7.2', 'Passing an array of options to configure the "%s" constraint is deprecated, use named arguments instead.', static::class);
+
+            $options = array_merge($expression, $options ?? []);
         } else {
+            if (\is_array($options)) {
+                trigger_deprecation('symfony/validator', '7.2', 'Passing an array of options to configure the "%s" constraint is deprecated, use named arguments instead.', static::class);
+            } else {
+                $options = [];
+            }
+
             $options['expression'] = $expression;
             $options['constraints'] = $constraints;
         }

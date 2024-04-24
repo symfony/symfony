@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Validator\Constraints;
 
+use Symfony\Component\Validator\Attribute\HasNamedArguments;
 use Symfony\Component\Validator\Constraint;
 
 /**
@@ -28,8 +29,13 @@ class All extends Composite
      * @param array<Constraint>|array<string,mixed>|null $constraints
      * @param string[]|null                              $groups
      */
+    #[HasNamedArguments]
     public function __construct(mixed $constraints = null, ?array $groups = null, mixed $payload = null)
     {
+        if (\is_array($constraints) && !array_is_list($constraints)) {
+            trigger_deprecation('symfony/validator', '7.2', 'Passing an array of options to configure the "%s" constraint is deprecated, use named arguments instead.', static::class);
+        }
+
         parent::__construct($constraints ?? [], $groups, $payload);
     }
 

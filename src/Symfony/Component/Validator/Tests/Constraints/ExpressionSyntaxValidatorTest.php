@@ -40,49 +40,47 @@ class ExpressionSyntaxValidatorTest extends ConstraintValidatorTestCase
 
     public function testExpressionValid()
     {
-        $this->validator->validate('1 + 1', new ExpressionSyntax([
-            'message' => 'myMessage',
-            'allowedVariables' => [],
-        ]));
+        $this->validator->validate('1 + 1', new ExpressionSyntax(
+            message: 'myMessage',
+            allowedVariables: [],
+        ));
 
         $this->assertNoViolation();
     }
 
     public function testStringableExpressionValid()
     {
-        $this->validator->validate(new StringableValue('1 + 1'), new ExpressionSyntax([
-            'message' => 'myMessage',
-            'allowedVariables' => [],
-        ]));
+        $this->validator->validate(new StringableValue('1 + 1'), new ExpressionSyntax(
+            message: 'myMessage',
+            allowedVariables: [],
+        ));
 
         $this->assertNoViolation();
     }
 
     public function testExpressionWithoutNames()
     {
-        $this->validator->validate('1 + 1', new ExpressionSyntax([
-            'message' => 'myMessage',
-        ], null, null, []));
+        $this->validator->validate('1 + 1', new ExpressionSyntax(null, 'myMessage', null, []));
 
         $this->assertNoViolation();
     }
 
     public function testExpressionWithAllowedVariableName()
     {
-        $this->validator->validate('a + 1', new ExpressionSyntax([
-            'message' => 'myMessage',
-            'allowedVariables' => ['a'],
-        ]));
+        $this->validator->validate('a + 1', new ExpressionSyntax(
+            message: 'myMessage',
+            allowedVariables: ['a'],
+        ));
 
         $this->assertNoViolation();
     }
 
     public function testExpressionIsNotValid()
     {
-        $this->validator->validate('a + 1', new ExpressionSyntax([
-            'message' => 'myMessage',
-            'allowedVariables' => [],
-        ]));
+        $this->validator->validate('a + 1', new ExpressionSyntax(
+            message: 'myMessage',
+            allowedVariables: [],
+        ));
 
         $this->buildViolation('myMessage')
             ->setParameter('{{ syntax_error }}', '"Variable "a" is not valid around position 1 for expression `a + 1`."')
@@ -93,10 +91,10 @@ class ExpressionSyntaxValidatorTest extends ConstraintValidatorTestCase
 
     public function testStringableExpressionIsNotValid()
     {
-        $this->validator->validate(new StringableValue('a + 1'), new ExpressionSyntax([
-            'message' => 'myMessage',
-            'allowedVariables' => [],
-        ]));
+        $this->validator->validate(new StringableValue('a + 1'), new ExpressionSyntax(
+            message: 'myMessage',
+            allowedVariables: [],
+        ));
 
         $this->buildViolation('myMessage')
             ->setParameter('{{ syntax_error }}', '"Variable "a" is not valid around position 1 for expression `a + 1`."')

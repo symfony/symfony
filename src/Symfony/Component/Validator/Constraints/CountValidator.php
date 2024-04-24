@@ -70,10 +70,10 @@ class CountValidator extends ConstraintValidator
                 ->getValidator()
                 ->inContext($this->context)
                 ->validate($count, [
-                    new DivisibleBy([
-                        'value' => $constraint->divisibleBy,
-                        'message' => $constraint->divisibleByMessage,
-                    ]),
+                    new DivisibleBy(
+                        value: $constraint->divisibleBy,
+                        message: $constraint->divisibleByMessage,
+                    ),
                 ], $this->context->getGroup());
         }
     }

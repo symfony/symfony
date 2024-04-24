@@ -41,9 +41,9 @@ class BlankValidatorTest extends ConstraintValidatorTestCase
      */
     public function testInvalidValues($value, $valueAsString)
     {
-        $constraint = new Blank([
-            'message' => 'myMessage',
-        ]);
+        $constraint = new Blank(
+            message: 'myMessage',
+        );
 
         $this->validator->validate($value, $constraint);
 

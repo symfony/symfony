@@ -34,7 +34,11 @@ class IdenticalToValidatorTest extends AbstractComparisonValidatorTestCase
 
     protected static function createConstraint(?array $options = null): Constraint
     {
-        return new IdenticalTo($options);
+        if (null !== $options) {
+            return new IdenticalTo(...$options);
+        }
+
+        return new IdenticalTo();
     }
 
     protected function getErrorCode(): ?string

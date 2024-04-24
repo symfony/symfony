@@ -87,7 +87,7 @@ class NotCompromisedPasswordValidatorTest extends ConstraintValidatorTestCase
 
     public function testThresholdReached()
     {
-        $constraint = new NotCompromisedPassword(['threshold' => 3]);
+        $constraint = new NotCompromisedPassword(threshold: 3);
         $this->validator->validate(self::PASSWORD_LEAKED, $constraint);
 
         $this->buildViolation($constraint->message)
@@ -95,20 +95,21 @@ class NotCompromisedPasswordValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    /**
-     * @dataProvider provideConstraintsWithThreshold
-     */
-    public function testThresholdNotReached(NotCompromisedPassword $constraint)
+    public function testThresholdNotReached()
     {
-        $this->validator->validate(self::PASSWORD_LEAKED, $constraint);
+        $this->validator->validate(self::PASSWORD_LEAKED, new NotCompromisedPassword(threshold: 10));
 
         $this->assertNoViolation();
     }
 
-    public static function provideConstraintsWithThreshold(): iterable
+    /**
+     * @group legacy
+     */
+    public function testThresholdNotReachedDoctrineStyle()
     {
-        yield 'Doctrine style' => [new NotCompromisedPassword(['threshold' => 10])];
-        yield 'named arguments' => [new NotCompromisedPassword(threshold: 10)];
+        $this->validator->validate(self::PASSWORD_LEAKED, new NotCompromisedPassword(['threshold' => 10]));
+
+        $this->assertNoViolation();
     }
 
     public function testValidPassword()
@@ -208,20 +209,21 @@ class NotCompromisedPasswordValidatorTest extends ConstraintValidatorTestCase
         $this->validator->validate(self::PASSWORD_TRIGGERING_AN_ERROR, new NotCompromisedPassword());
     }
 
-    /**
-     * @dataProvider provideErrorSkippingConstraints
-     */
-    public function testApiErrorSkipped(NotCompromisedPassword $constraint)
+    public function testApiErrorSkipped()
     {
         $this->expectNotToPerformAssertions();
 
-        $this->validator->validate(self::PASSWORD_TRIGGERING_AN_ERROR, $constraint);
+        $this->validator->validate(self::PASSWORD_TRIGGERING_AN_ERROR, new NotCompromisedPassword(skipOnError: true));
     }
 
-    public static function provideErrorSkippingConstraints(): iterable
+    /**
+     * @group legacy
+     */
+    public function testApiErrorSkippedDoctrineStyle()
     {
-        yield 'Doctrine style' => [new NotCompromisedPassword(['skipOnError' => true])];
-        yield 'named arguments' => [new NotCompromisedPassword(skipOnError: true)];
+        $this->expectNotToPerformAssertions();
+
+        $this->validator->validate(self::PASSWORD_TRIGGERING_AN_ERROR, new NotCompromisedPassword(['skipOnError' => true]));
     }
 
     private function createHttpClientStub(?string $returnValue = null): HttpClientInterface

@@ -44,7 +44,7 @@ class BicValidatorTest extends ConstraintValidatorTestCase
 
     public function testValidComparisonToPropertyPath()
     {
-        $constraint = new Bic(['ibanPropertyPath' => 'value']);
+        $constraint = new Bic(ibanPropertyPath: 'value');
 
         $object = new BicComparisonTestClass('FR14 2004 1010 0505 0001 3M02 606');
 
@@ -57,7 +57,7 @@ class BicValidatorTest extends ConstraintValidatorTestCase
 
     public function testInvalidComparisonToPropertyPath()
     {
-        $constraint = new Bic(['ibanPropertyPath' => 'value']);
+        $constraint = new Bic(ibanPropertyPath: 'value');
         $constraint->ibanMessage = 'Constraint Message';
 
         $object = new BicComparisonTestClass('FR14 2004 1010 0505 0001 3M02 606');
@@ -95,14 +95,14 @@ class BicValidatorTest extends ConstraintValidatorTestCase
     {
         $this->setObject(new BicTypedDummy());
 
-        $this->validator->validate('UNCRIT2B912', new Bic(['ibanPropertyPath' => 'iban']));
+        $this->validator->validate('UNCRIT2B912', new Bic(ibanPropertyPath: 'iban'));
 
         $this->assertNoViolation();
     }
 
     public function testValidComparisonToValue()
     {
-        $constraint = new Bic(['iban' => 'FR14 2004 1010 0505 0001 3M02 606']);
+        $constraint = new Bic(iban: 'FR14 2004 1010 0505 0001 3M02 606');
         $constraint->ibanMessage = 'Constraint Message';
 
         $this->validator->validate('SOGEFRPP', $constraint);
@@ -112,7 +112,7 @@ class BicValidatorTest extends ConstraintValidatorTestCase
 
     public function testInvalidComparisonToValue()
     {
-        $constraint = new Bic(['iban' => 'FR14 2004 1010 0505 0001 3M02 606']);
+        $constraint = new Bic(iban: 'FR14 2004 1010 0505 0001 3M02 606');
         $constraint->ibanMessage = 'Constraint Message';
 
         $this->validator->validate('UNCRIT2B912', $constraint);
@@ -142,7 +142,7 @@ class BicValidatorTest extends ConstraintValidatorTestCase
 
     public function testNoViolationOnNullObjectWithPropertyPath()
     {
-        $constraint = new Bic(['ibanPropertyPath' => 'propertyPath']);
+        $constraint = new Bic(ibanPropertyPath: 'propertyPath');
 
         $this->setObject(null);
 
@@ -155,10 +155,10 @@ class BicValidatorTest extends ConstraintValidatorTestCase
     {
         $this->expectException(ConstraintDefinitionException::class);
         $this->expectExceptionMessage('The "iban" and "ibanPropertyPath" options of the Iban constraint cannot be used at the same time');
-        new Bic([
-            'iban' => 'value',
-            'ibanPropertyPath' => 'propertyPath',
-        ]);
+        new Bic(
+            iban: 'value',
+            ibanPropertyPath: 'propertyPath',
+        );
     }
 
     public function testThrowsConstraintExceptionIfBothValueAndPropertyPathNamed()
@@ -171,7 +171,7 @@ class BicValidatorTest extends ConstraintValidatorTestCase
 
     public function testInvalidValuePath()
     {
-        $constraint = new Bic(['ibanPropertyPath' => 'foo']);
+        $constraint = new Bic(ibanPropertyPath: 'foo');
 
         $this->expectException(ConstraintDefinitionException::class);
         $this->expectExceptionMessage(\sprintf('Invalid property path "foo" provided to "%s" constraint', $constraint::class));
@@ -217,9 +217,9 @@ class BicValidatorTest extends ConstraintValidatorTestCase
      */
     public function testInvalidBics($bic, $code)
     {
-        $constraint = new Bic([
-            'message' => 'myMessage',
-        ]);
+        $constraint = new Bic(
+            message: 'myMessage',
+        );
 
         $this->validator->validate($bic, $constraint);
 
@@ -277,7 +277,7 @@ class BicValidatorTest extends ConstraintValidatorTestCase
      */
     public function testValidBicSpecialCases(string $bic, string $iban)
     {
-        $constraint = new Bic(['iban' => $iban]);
+        $constraint = new Bic(iban: $iban);
         $this->validator->validate($bic, $constraint);
 
         $this->assertNoViolation();

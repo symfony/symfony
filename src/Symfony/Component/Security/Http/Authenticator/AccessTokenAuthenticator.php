@@ -84,6 +84,9 @@ class AccessTokenAuthenticator implements AuthenticatorInterface
 
         if (null !== $this->translator) {
             $errorMessage = $this->translator->trans($exception->getMessageKey(), $exception->getMessageData(), 'security');
+            if (false === mb_check_encoding($errorMessage, 'ASCII')) {
+                $errorMessage = strtr($exception->getMessageKey(), $exception->getMessageData());
+            }
         } else {
             $errorMessage = strtr($exception->getMessageKey(), $exception->getMessageData());
         }

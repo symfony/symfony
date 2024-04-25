@@ -417,7 +417,7 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
         return $this;
     }
 
-    public function isSubmittedRequestValid(Request $request): bool
+    public function isSubmittedRequestValid(?Request $request = null): bool
     {
         $this->handleRequest($request);
 

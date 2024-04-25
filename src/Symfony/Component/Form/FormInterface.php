@@ -21,7 +21,7 @@ use Symfony\Component\PropertyAccess\PropertyPathInterface;
  * @extends \ArrayAccess<string, FormInterface>
  * @extends \Traversable<string, FormInterface>
  * 
- * @method bool isSubmittedRequestValid(Request $request) Call {@link handleRequest()} and return the result of the condition {@link isSubmitted()} and {@link isValid()}
+ * @method bool isSubmittedRequestValid(?Request $request = null) Call {@link handleRequest()} and return the result of the condition {@link isSubmitted()} and {@link isValid()}
  */
 interface FormInterface extends \ArrayAccess, \Traversable, \Countable
 {

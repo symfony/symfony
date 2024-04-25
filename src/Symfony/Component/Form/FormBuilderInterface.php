@@ -15,7 +15,6 @@ namespace Symfony\Component\Form;
  * @author Bernhard Schussek <bschussek@gmail.com>
  *
  * @extends \Traversable<string, FormBuilderInterface>
- * 
  */
 interface FormBuilderInterface extends \Traversable, \Countable, FormConfigBuilderInterface
 {

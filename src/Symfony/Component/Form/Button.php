@@ -312,7 +312,7 @@ class Button implements \IteratorAggregate, FormInterface
      *
      * @throws BadMethodCallException
      */
-    public function isSubmittedRequestValid(Request $request): bool
+    public function isSubmittedRequestValid(?Request $request = null): bool
     {
         throw new BadMethodCallException('Buttons cannot handle requests. Call isSubmittedRequestValid() on the root form instead.');
     }

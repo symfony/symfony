@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Validator\Constraints;
 
+use Symfony\Component\Validator\Attribute\HasNamedArguments;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 
@@ -26,6 +27,7 @@ final class Charset extends Constraint
         self::BAD_ENCODING_ERROR => 'BAD_ENCODING_ERROR',
     ];
 
+    #[HasNamedArguments]
     public function __construct(
         public array|string $encodings = [],
         public string $message = 'The detected character encoding is invalid ({{ detected }}). Allowed encodings are {{ encodings }}.',

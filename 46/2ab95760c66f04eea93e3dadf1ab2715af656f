@@ -1,0 +1,146 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-12-26T13:43:03Z
+
+Hi, thanks for working on this topic.
+Would there be a way to put that concern in Doctrine itself, by decorating the Connection object?
+I'm concerned that the current approach will trigger one DB call per HTTP request while not all HTTP entpoints might use Doctrine, and also by the fact this only works for HTTP while recovering from stalled DB connections is also a concern for CLI workers.
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2023-12-26T21:19:08Z
+
+Just reading the code, it adds a lot new stuff which looks like a new feature instead of a bugfix to me
+
+---------------------------------------------------------------------------
+
+by dunglas at 2023-12-27T06:20:21Z
+
+I agree that a decorator would be better. Also, would it be possible to catch errors and reconnect only in this case instead of triggering a ping? This would remove the performance hit in most cases.
+
+@OskarStark the code probably needs to be simplified, but the underlying bug is annoying because it makes Symfony apps unstable when using FrankenPHP, RoadRunner (without the bundle), Swoole etc. The fix should be made at least in the current stable version.
+
+---------------------------------------------------------------------------
+
+by alli83 at 2023-12-27T06:40:28Z
+
+@nicolas-grekas @dunglas ok I'll update it and try to decorate the Connection object
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2023-12-27T08:50:30Z
+
+> @OskarStark the code probably needs to be simplified, but the underlying bug is annoying because it makes Symfony apps unstable when using FrankenPHP, RoadRunner (without the bundle), Swoole etc. The fix should be made at least in the current stable version.
+
+Thanks for the explanation Kevin 👍
+
+---------------------------------------------------------------------------
+
+by alli83 at 2024-01-02T03:04:41Z
+
+> I don't like the approach, because as @nicolas-grekas mentioned, this will keep pinging the DB every request, even if normally request wouldn't need connection. Can't we make this DBAL middleware instead? Middleware would check if any query fails with "DB went away..." error, if so, reset everything and retry.
+>
+> Also, bear in mind counterpart for messenger is at https://github.com/symfony/symfony/blob/412ea7afcb533b8a7a95e248d741b70fea505350/src/Symfony/Bridge/Doctrine/Messenger/DoctrinePingConnectionMiddleware.php, so this would be a good opportunity to extract common parts into bridge
+
+Ok, I'll update then
+
+---------------------------------------------------------------------------
+
+by alli83 at 2024-01-03T06:20:17Z
+
+@ostrolucky
+Before refactoring (taking into account `DoctrinePingConnectionMiddleware`), I'm not entirely sure I grasp the specific middleware you're referring to. Are you referring to those related to `Doctrine\DBAL\Driver`
+`Doctrine\DBAL\Driver\Connection`
+
+---------------------------------------------------------------------------
+
+by ostrolucky at 2024-01-03T08:20:26Z
+
+I was referring to middlewares that implement `Doctrine\DBAL\Driver\Middleware`. This is how Symfony does stuff like logging
+
+---------------------------------------------------------------------------
+
+by KDederichs at 2024-02-07T20:39:44Z
+
+Any news on this/what's preventing it from being merged?
+
+---------------------------------------------------------------------------
+
+by alli83 at 2024-03-20T03:19:02Z
+
+> Are you planning to add some tests?
+
+in https://github.com/doctrine/DoctrineBundle/pull/1739 PR
+
+---------------------------------------------------------------------------
+
+by stof at 2024-03-20T17:33:18Z
+
+Please share more details about the kind of use cases you have for that.
+
+I see 3 different kinds of long running runtimes here:
+
+- the messenger consumer. For that case, we already have a solution for it with the messenger middleware which checks the state of the DBAL connection between the handling of messenger messages (which is a moment where we know it is safe to disconnect and reconnect as we are not in the middle of the handling of a task, and the handling of each message is meant to be independent)
+- application servers like roadrunner. A similar implementation should be done by checking the state of the connection between requests (and also the state of the ORM entity manager to reset it if it is closed, but that should be separate from the DBAL logic to allow using DBAL without the ORM)
+- a single command that takes a long time to run to execute its single task (note that this does not include commands corresponding to alternative queue consumers implementations than messenger. Those should be solved in the same way than messenger). For this one, I don't have a solution, and I don't think we can have a generic solution (imagine the case where the command decides to wrap its logic in a single long-running transaction: there is no way to recover from connection loss in such case as you would not return in the previous transaction)
+
+---------------------------------------------------------------------------
+
+by alli83 at 2024-04-11T13:04:13Z
+
+closing the PR : see https://github.com/doctrine/dbal/pull/6351 and https://github.com/doctrine/DoctrineBundle/pull/1739
+
+---------------------------------------------------------------------------
+
+by alli83 at 2024-04-15T14:53:39Z
+
+Would it be preferable to define a timing for each connection in case multiple connections are set in the configuration? If so, in the listener, it would be necessary to be able to identify the connection and avoid looping over all defined connections. Otherwise, we can define a timing globally
+
+---------------------------------------------------------------------------
+
+by alli83 at 2024-04-16T13:57:17Z
+
+I pushed a second commit to implement timing per connection type defined in the config file. However, I believe I could further improve it by ensuring that this check is only done if the request contains an SQL query. I'm working on it.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-04-16T14:02:07Z
+
+> further improve it by ensuring that this check is only done if the request contains an SQL query
+
+This might complicate things a lot, isn't it?
+Personally, I'd be fine with pinging the connection without caring if the response needs access to the DB, provided:
+- we skip errors silently
+- we lazy-load everything in the listener so that we don't load anything from Doctrine if not needed.
+
+---------------------------------------------------------------------------
+
+by greg0ire at 2024-04-18T10:28:05Z
+
+Is "timing" the right word here? This is IMO more like a time to live / an expiration time.
+
+---------------------------------------------------------------------------
+
+by alli83 at 2024-04-19T12:39:47Z
+
+So should I move the middleware to the bridge rather than the bundle
+
+---------------------------------------------------------------------------
+
+by alli83 at 2024-04-19T12:43:50Z
+
+@nicolas-grekas rebase 7.1?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-04-19T13:09:48Z
+
+> So should I move the middleware to the bridge rather than the bundle
+
+That's not possible without first moving ConnectionNameAwareInterface to the bridge, but I'm not sure it's worth it. Good as is to me.
+
+---------------------------------------------------------------------------
+
+by alli83 at 2024-04-19T14:43:14Z
+
+I'm working on the tests :)

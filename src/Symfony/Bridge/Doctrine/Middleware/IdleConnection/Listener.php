@@ -49,7 +49,7 @@ final class Listener implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            KernelEvents::REQUEST => 'onKernelRequest',
+            KernelEvents::REQUEST => ['onKernelRequest', 192], // before session listeners since they could use the DB
         ];
     }
 }

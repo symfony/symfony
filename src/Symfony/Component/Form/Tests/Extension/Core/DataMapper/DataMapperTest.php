@@ -17,6 +17,8 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\Extension\Core\DataAccessor\PropertyPathAccessor;
 use Symfony\Component\Form\Extension\Core\DataMapper\DataMapper;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
+use Symfony\Component\Form\Extension\Core\Type\FormType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormConfigBuilder;
 use Symfony\Component\Form\FormFactoryBuilder;
@@ -419,6 +421,25 @@ class DataMapperTest extends TestCase
 
         $this->assertEquals(['date' => new \DateTime('2022-08-04', new \DateTimeZone('UTC'))], $form->getData());
     }
+
+    public function testMapFormToDataWithOnlyGetterConfigured()
+    {
+        $person = new DummyPerson('foo');
+        $form = (new FormFactoryBuilder())
+            ->getFormFactory()
+            ->createBuilder(FormType::class, $person)
+            ->add('name', TextType::class, [
+                'getter' => function (DummyPerson $person) {
+                    return $person->myName();
+                },
+            ])
+            ->getForm();
+        $form->submit([
+            'name' => 'bar',
+        ]);
+
+        $this->assertSame('bar', $person->myName());
+    }
 }
 
 class SubmittedForm extends Form
@@ -452,6 +473,11 @@ class DummyPerson
     }
 
     public function rename($name): void
+    {
+        $this->name = $name;
+    }
+
+    public function setName($name): void
     {
         $this->name = $name;
     }

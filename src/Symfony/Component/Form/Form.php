@@ -416,6 +416,13 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
         return $this;
     }
 
+    public function isSubmittedRequestValid(mixed $request = null): bool
+    {
+        $this->handleRequest($request);
+
+        return $this->isSubmitted() && $this->isValid();
+    }
+
     public function submit(mixed $submittedData, bool $clearMissing = true): static
     {
         if ($this->submitted) {

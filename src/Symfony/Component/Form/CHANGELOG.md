@@ -8,6 +8,7 @@ CHANGELOG
  * Deprecate not configuring the `default_protocol` option of the `UrlType`, it will default to `null` in 8.0 (the current default is `'http'`)
  * Add a `keep_as_list` option to `CollectionType`
  * Add a new `model_type` option to `MoneyType`, to be able to cast the transformed value to `integer`
+ * Add new `isSubmittedRequestValid` method to `Form/FormInterface` make a shortcut of the three functions `handleRequest()`, `isSubmitted()` and `isValid()`
 
 7.0
 ---

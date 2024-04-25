@@ -15,6 +15,8 @@ namespace Symfony\Component\Form;
  * @author Bernhard Schussek <bschussek@gmail.com>
  *
  * @extends \Traversable<string, FormBuilderInterface>
+ * 
+ * @method bool isSubmittedRequestValid(Request $request) Call {@link handleRequest()} and return the result of the condition {@link isSubmitted()} and {@link isValid()}
  */
 interface FormBuilderInterface extends \Traversable, \Countable, FormConfigBuilderInterface
 {

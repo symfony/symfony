@@ -261,11 +261,6 @@ interface FormInterface extends \ArrayAccess, \Traversable, \Countable
     public function handleRequest(mixed $request = null): static;
 
     /**
-     * Call {@link handleRequest()} and return the result of the condition {@link isSubmitted()} and {@link isValid()}
-     */
-    public function isSubmittedRequestValid(mixed $request = null): bool;
-
-    /**
      * Submits data to the form.
      *
      * @param string|array|null $submittedData The submitted data

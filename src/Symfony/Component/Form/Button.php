@@ -14,6 +14,7 @@ namespace Symfony\Component\Form;
 use Symfony\Component\Form\Exception\AlreadySubmittedException;
 use Symfony\Component\Form\Exception\BadMethodCallException;
 use Symfony\Component\Form\Exception\TransformationFailedException;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\PropertyAccess\PropertyPathInterface;
 
 /**
@@ -311,7 +312,7 @@ class Button implements \IteratorAggregate, FormInterface
      *
      * @throws BadMethodCallException
      */
-    public function isSubmittedRequestValid(mixed $request = null): bool
+    public function isSubmittedRequestValid(Request $request): bool
     {
         throw new BadMethodCallException('Buttons cannot handle requests. Call isSubmittedRequestValid() on the root form instead.');
     }

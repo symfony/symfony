@@ -25,6 +25,7 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Util\FormUtil;
 use Symfony\Component\Form\Util\InheritDataAwareIterator;
 use Symfony\Component\Form\Util\OrderedHashMap;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\PropertyAccess\PropertyPath;
 use Symfony\Component\PropertyAccess\PropertyPathInterface;
 
@@ -416,7 +417,7 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
         return $this;
     }
 
-    public function isSubmittedRequestValid(mixed $request = null): bool
+    public function isSubmittedRequestValid(Request $request): bool
     {
         $this->handleRequest($request);
 

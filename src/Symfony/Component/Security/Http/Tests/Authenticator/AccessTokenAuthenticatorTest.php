@@ -89,7 +89,7 @@ class AccessTokenAuthenticatorTest extends TestCase
             $this->userProvider,
         );
 
-        $nonAsciiString = "Credenciales inválidas.";
+        $nonAsciiString = 'Credenciales inválidas.';
         $translator = $this->createMock(TranslatorInterface::class);
         $translator
             ->expects($this->once())

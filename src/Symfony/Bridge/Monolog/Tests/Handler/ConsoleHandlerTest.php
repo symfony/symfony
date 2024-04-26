@@ -117,10 +117,7 @@ class ConsoleHandlerTest extends TestCase
         $output
             ->expects($this->exactly(2))
             ->method('getVerbosity')
-            ->willReturnOnConsecutiveCalls(
-                OutputInterface::VERBOSITY_QUIET,
-                OutputInterface::VERBOSITY_DEBUG
-            )
+            ->willReturn(OutputInterface::VERBOSITY_QUIET, OutputInterface::VERBOSITY_DEBUG)
         ;
         $handler = new ConsoleHandler($output);
         $this->assertFalse($handler->isHandling(['level' => Logger::NOTICE]),

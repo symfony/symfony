@@ -172,10 +172,10 @@ class AbstractObjectNormalizerTest extends TestCase
     {
         $extractor = $this->createMock(PhpDocExtractor::class);
         $extractor->method('getTypes')
-            ->will($this->onConsecutiveCalls(
+            ->willReturn(
                 [new Type('array', false, null, true, new Type('int'), new Type('object', false, DummyChild::class))],
                 null
-            ));
+            );
 
         $denormalizer = new AbstractObjectNormalizerCollectionDummy(null, null, $extractor);
         $arrayDenormalizer = new ArrayDenormalizerDummy();
@@ -227,10 +227,10 @@ class AbstractObjectNormalizerTest extends TestCase
     {
         $extractor = $this->createMock(PhpDocExtractor::class);
         $extractor->method('getTypes')
-            ->will($this->onConsecutiveCalls(
+            ->willReturn(
                 [new Type('array', false, null, true, new Type('int'), new Type('string'))],
                 null
-            ));
+            );
 
         $denormalizer = new AbstractObjectNormalizerCollectionDummy(null, null, $extractor);
         $arrayDenormalizer = new ArrayDenormalizerDummy();
@@ -417,7 +417,7 @@ class AbstractObjectNormalizerTest extends TestCase
     {
         $extractor = $this->createMock(PhpDocExtractor::class);
         $extractor->method('getTypes')
-            ->will($this->onConsecutiveCalls(
+            ->willReturn(
                 [new Type('bool')],
                 [new Type('bool')],
                 [new Type('bool')],
@@ -430,7 +430,7 @@ class AbstractObjectNormalizerTest extends TestCase
                 [new Type('float')],
                 [new Type('float')],
                 [new Type('float')]
-            ));
+            );
 
         $denormalizer = new AbstractObjectNormalizerCollectionDummy(null, null, $extractor);
         $arrayDenormalizer = new ArrayDenormalizerDummy();
@@ -663,8 +663,7 @@ class AbstractObjectNormalizerTest extends TestCase
 
     public function testDenormalizeXmlScalar()
     {
-        $normalizer = new class () extends AbstractObjectNormalizer
-        {
+        $normalizer = new class() extends AbstractObjectNormalizer {
             public function __construct()
             {
                 parent::__construct(null, new MetadataAwareNameConverter(new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()))));

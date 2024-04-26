@@ -102,10 +102,17 @@ class InlineFragmentRendererTest extends TestCase
 
     public function testRenderExceptionIgnoreErrorsWithAlt()
     {
-        $strategy = new InlineFragmentRenderer($this->getKernel($this->onConsecutiveCalls(
-            $this->throwException(new \RuntimeException('foo')),
-            $this->returnValue(new Response('bar'))
-        )));
+        $strategy = new InlineFragmentRenderer($this->getKernel($this->returnCallback(function () {
+            static $firstCall = true;
+
+            if ($firstCall) {
+                $firstCall = false;
+
+                throw new \RuntimeException('foo');
+            }
+
+            return new Response('bar');
+        })));
 
         $this->assertEquals('bar', $strategy->render('/', Request::create('/'), ['ignore_errors' => true, 'alt' => '/foo'])->getContent());
     }

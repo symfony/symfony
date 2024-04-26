@@ -36,7 +36,36 @@ class BaseNodeTest extends TestCase
             }
         }
 
-        $node = $this->getMockForAbstractClass(BaseNode::class, $constructorArgs);
+        $node = new class(...$constructorArgs) extends BaseNode {
+            protected function validateType($value): void
+            {
+            }
+
+            protected function normalizeValue($value)
+            {
+                return null;
+            }
+
+            protected function mergeValues($leftSide, $rightSide)
+            {
+                return null;
+            }
+
+            protected function finalizeValue($value)
+            {
+                return null;
+            }
+
+            public function hasDefaultValue(): bool
+            {
+                return true;
+            }
+
+            public function getDefaultValue()
+            {
+                return null;
+            }
+        };
 
         $this->assertSame($expected, $node->getPath());
     }

@@ -250,6 +250,9 @@ class UserAuthenticationProviderTest extends TestCase
             $userChecker = $this->createMock(UserCheckerInterface::class);
         }
 
-        return $this->getMockForAbstractClass(UserAuthenticationProvider::class, [$userChecker, 'key', $hide]);
+        return $this->getMockBuilder(UserAuthenticationProvider::class)
+            ->setConstructorArgs([$userChecker, 'key', $hide])
+            ->onlyMethods(['retrieveUser', 'checkAuthentication'])
+            ->getMock();
     }
 }

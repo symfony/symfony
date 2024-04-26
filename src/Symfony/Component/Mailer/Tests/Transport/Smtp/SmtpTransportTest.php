@@ -158,7 +158,7 @@ class SmtpTransportTest extends TestCase
 
     private function invokeAssertResponseCode(string $response, array $codes): void
     {
-        $transport = new SmtpTransport($this->getMockForAbstractClass(AbstractStream::class));
+        $transport = new SmtpTransport($this->createStub(AbstractStream::class));
         $m = new \ReflectionMethod($transport, 'assertResponseCode');
         $m->setAccessible(true);
         $m->invoke($transport, $response, $codes);

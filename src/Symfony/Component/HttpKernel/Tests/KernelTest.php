@@ -400,7 +400,7 @@ EOF
         $kernel
             ->expects($this->exactly(2))
             ->method('getBundle')
-            ->willReturn($this->getBundle(__DIR__.'/Fixtures/Bundle1Bundle', null, null, 'Bundle1Bundle'))
+            ->willReturn($this->getBundle(__DIR__.'/Fixtures/Bundle1Bundle', null, 'Bundle1Bundle'))
         ;
 
         $this->assertEquals(
@@ -417,8 +417,8 @@ EOF
     {
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('Trying to register two bundles with the same name "DuplicateName"');
-        $fooBundle = $this->getBundle(__DIR__.'/Fixtures/FooBundle', null, 'FooBundle', 'DuplicateName');
-        $barBundle = $this->getBundle(__DIR__.'/Fixtures/BarBundle', null, 'BarBundle', 'DuplicateName');
+        $fooBundle = $this->getBundle(__DIR__.'/Fixtures/FooBundle', 'FooBundle', 'DuplicateName');
+        $barBundle = $this->getBundle(__DIR__.'/Fixtures/BarBundle', 'BarBundle', 'DuplicateName');
 
         $kernel = $this->getKernel([], [$fooBundle, $barBundle]);
         $kernel->boot();
@@ -628,11 +628,10 @@ EOF
     /**
      * Returns a mock for the BundleInterface.
      */
-    protected function getBundle($dir = null, $parent = null, $className = null, $bundleName = null): BundleInterface
+    protected function getBundle($dir = null, $className = null, $bundleName = null): BundleInterface
     {
         $bundle = $this
             ->getMockBuilder(BundleInterface::class)
-            ->onlyMethods(['getPath', 'getName'])
             ->disableOriginalConstructor()
         ;
 
@@ -640,7 +639,7 @@ EOF
             $bundle->setMockClassName($className);
         }
 
-        $bundle = $bundle->getMockForAbstractClass();
+        $bundle = $bundle->getMock();
 
         $bundle
             ->expects($this->any())

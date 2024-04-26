@@ -76,7 +76,11 @@ class XmlUtilsTest extends TestCase
         }
 
         $mock = $this->createMock(Validator::class);
-        $mock->expects($this->exactly(2))->method('validate')->will($this->onConsecutiveCalls(false, true));
+        $mock->expects($this->exactly(2))->method('validate')->willReturnCallback(function () {
+            static $expected = [false, true];
+
+            return array_shift($expected);
+        });
 
         try {
             XmlUtils::loadFile($fixtures.'valid.xml', [$mock, 'validate']);

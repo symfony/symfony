@@ -57,6 +57,7 @@ class DepthRangeFilterIteratorTest extends RealIteratorTestCase
             'foo/bar.tmp',
             'test.php',
             'toto',
+            'toto/foo',
             'toto/.git',
             '.foo',
             '.foo/.bar',
@@ -77,6 +78,7 @@ class DepthRangeFilterIteratorTest extends RealIteratorTestCase
 
         $graterThanOrEqualTo1 = [
             'toto/.git',
+            'toto/foo',
             'foo/bar.tmp',
             '.foo/.bar',
             '.foo/bar',
@@ -86,6 +88,7 @@ class DepthRangeFilterIteratorTest extends RealIteratorTestCase
 
         $equalTo1 = [
             'toto/.git',
+            'toto/foo',
             'foo/bar.tmp',
             '.foo/.bar',
             '.foo/bar',

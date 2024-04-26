@@ -64,6 +64,7 @@ class ExcludeDirectoryFilterIteratorTest extends RealIteratorTestCase
             'foo/bar.tmp',
             'test.php',
             'toto',
+            'toto/foo',
             'toto/.git',
             'foo bar',
             'qux',
@@ -103,10 +104,63 @@ class ExcludeDirectoryFilterIteratorTest extends RealIteratorTestCase
             'qux_2_0.php',
         ];
 
+        $rootFoo = [
+            '.bar',
+            '.foo',
+            '.foo/.bar',
+            '.foo/bar',
+            '.git',
+            'test.py',
+            'test.php',
+            'toto',
+            'toto/foo',
+            'toto/.git',
+            'foo bar',
+            'qux',
+            'qux/baz_100_1.py',
+            'qux/baz_1_2.py',
+            'qux_0_1.php',
+            'qux_1000_1.php',
+            'qux_1002_0.php',
+            'qux_10_2.php',
+            'qux_12_0.php',
+            'qux_2_0.php',
+            'zebulon.php',
+            'Zephire.php',
+        ];
+
+        $rootTotoFoo = [
+            '.bar',
+            '.foo',
+            '.foo/.bar',
+            '.foo/bar',
+            '.git',
+            'test.py',
+            'test.php',
+            'foo',
+            'foo/bar.tmp',
+            'toto',
+            'toto/.git',
+            'foo bar',
+            'qux',
+            'qux/baz_100_1.py',
+            'qux/baz_1_2.py',
+            'qux_0_1.php',
+            'qux_1000_1.php',
+            'qux_1002_0.php',
+            'qux_10_2.php',
+            'qux_12_0.php',
+            'qux_2_0.php',
+            'zebulon.php',
+            'Zephire.php',
+        ];
+
         return [
             [['foo'], self::toAbsolute($foo)],
             [['fo'], self::toAbsolute($fo)],
             [['toto/'], self::toAbsolute($toto)],
+            [['/foo'], self::toAbsolute($rootFoo)],
+            [['/toto/foo'], self::toAbsolute($rootTotoFoo)],
         ];
     }
 }

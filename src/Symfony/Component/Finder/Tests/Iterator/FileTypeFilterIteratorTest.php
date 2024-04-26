@@ -53,6 +53,7 @@ class FileTypeFilterIteratorTest extends RealIteratorTestCase
             'foo',
             'qux',
             'toto',
+            'toto/foo',
             'toto/.git',
             '.foo',
         ];

@@ -92,6 +92,7 @@ class SortableIteratorTest extends RealIteratorTestCase
             'test.py',
             'toto',
             'toto/.git',
+            'toto/foo',
             'zebulon.php',
         ];
 
@@ -102,6 +103,7 @@ class SortableIteratorTest extends RealIteratorTestCase
             'qux',
             'toto',
             'toto/.git',
+            'toto/foo',
             '.bar',
             '.foo/.bar',
             '.foo/bar',
@@ -134,6 +136,7 @@ class SortableIteratorTest extends RealIteratorTestCase
                 'Zephire.php',
                 'foo',
                 'toto',
+                'toto/foo',
                 'toto/.git',
                 'foo bar',
                 'qux',
@@ -162,6 +165,7 @@ class SortableIteratorTest extends RealIteratorTestCase
                 'foo',
                 'foo/bar.tmp',
                 'toto',
+                'toto/foo',
                 'toto/.git',
                 'foo bar',
                 'qux',
@@ -190,6 +194,7 @@ class SortableIteratorTest extends RealIteratorTestCase
                 'foo',
                 'foo/bar.tmp',
                 'toto',
+                'toto/foo',
                 'toto/.git',
                 'foo bar',
                 'qux',
@@ -230,6 +235,7 @@ class SortableIteratorTest extends RealIteratorTestCase
             'test.py',
             'toto',
             'toto/.git',
+            'toto/foo',
             'zebulon.php',
         ];
 
@@ -256,6 +262,7 @@ class SortableIteratorTest extends RealIteratorTestCase
             'test.py',
             'toto',
             'toto/.git',
+            'toto/foo',
             'zebulon.php',
         ];
 

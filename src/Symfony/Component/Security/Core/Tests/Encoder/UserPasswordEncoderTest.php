@@ -86,7 +86,7 @@ class UserPasswordEncoderTest extends TestCase
         $mockEncoderFactory->expects($this->any())
             ->method('getEncoder')
             ->with($user)
-            ->will($this->onConsecutiveCalls($encoder, $encoder, new NativePasswordEncoder(5, 20000, 5), $encoder));
+            ->willReturn($encoder, $encoder, new NativePasswordEncoder(5, 20000, 5), $encoder);
 
         $passwordEncoder = new UserPasswordEncoder($mockEncoderFactory);
 

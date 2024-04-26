@@ -36,7 +36,7 @@
                     <element key="time-sensitive">
                         <array>
                             <element key="0"><string>Symfony\Bridge\Doctrine\Middleware\Debug</string></element>
-                            <element key="1"><string>Symfony\Bridge\Doctrine\Middleware\Debug</string></element>
+                            <element key="1"><string>Symfony\Bridge\Doctrine\Middleware\IdleConnection</string></element>
                         </array>
                     </element>
                 </array>

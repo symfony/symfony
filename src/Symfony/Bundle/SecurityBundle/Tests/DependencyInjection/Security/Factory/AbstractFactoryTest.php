@@ -145,7 +145,12 @@ class AbstractFactoryTest extends TestCase
 
     protected function callFactory($id, $config, $userProviderId, $defaultEntryPointId)
     {
-        $factory = $this->getMockForAbstractClass(AbstractFactory::class);
+        $factory = $this->getMockBuilder(AbstractFactory::class)->onlyMethods([
+            'createAuthProvider',
+            'getListenerId',
+            'getKey',
+            'getPosition',
+        ])->getMock();
 
         $factory
             ->expects($this->once())

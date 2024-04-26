@@ -298,9 +298,12 @@ class AbstractRememberMeServicesTest extends TestCase
             $userProvider = $this->getProvider();
         }
 
-        return $this->getMockForAbstractClass(AbstractRememberMeServices::class, [
-            [$userProvider], 'foosecret', 'fookey', $options, $logger,
-        ]);
+        return $this->getMockBuilder(AbstractRememberMeServices::class)
+            ->setConstructorArgs([
+                [$userProvider], 'foosecret', 'fookey', $options, $logger,
+            ])
+            ->onlyMethods(['processAutoLoginCookie', 'onLoginSuccess'])
+            ->getMock();
     }
 
     protected function getProvider()

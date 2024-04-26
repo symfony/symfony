@@ -18,6 +18,7 @@ use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
 use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
+use Symfony\Component\DependencyInjection\Argument\TaggedVariadicArgument;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -851,19 +852,25 @@ class YamlFileLoader extends FileLoader
 
                 return new ServiceLocatorArgument($argument);
             }
-            if (\in_array($value->getTag(), ['tagged', 'tagged_iterator', 'tagged_locator'], true)) {
+            if (\in_array($value->getTag(), ['tagged', 'tagged_iterator', 'tagged_locator', 'tagged_variadic'], true)) {
                 $forLocator = 'tagged_locator' === $value->getTag();
+                $isVariadic = 'tagged_variadic' === $value->getTag();
+                $args = [];
 
                 if (\is_array($argument) && isset($argument['tag']) && $argument['tag']) {
                     if ($diff = array_diff(array_keys($argument), $supportedKeys = ['tag', 'index_by', 'default_index_method', 'default_priority_method', 'exclude', 'exclude_self'])) {
                         throw new InvalidArgumentException(sprintf('"!%s" tag contains unsupported key "%s"; supported ones are "%s".', $value->getTag(), implode('", "', $diff), implode('", "', $supportedKeys)));
                     }
 
-                    $argument = new TaggedIteratorArgument($argument['tag'], $argument['index_by'] ?? null, $argument['default_index_method'] ?? null, $forLocator, $argument['default_priority_method'] ?? null, (array) ($argument['exclude'] ?? null), $argument['exclude_self'] ?? true);
+                    $args = [$argument['tag'], $argument['index_by'] ?? null, $argument['default_index_method'] ?? null, $forLocator, $argument['default_priority_method'] ?? null, (array) ($argument['exclude'] ?? null), $argument['exclude_self'] ?? true];
                 } elseif (\is_string($argument) && $argument) {
-                    $argument = new TaggedIteratorArgument($argument, null, null, $forLocator);
+                    $args = [$argument, null, null, $forLocator];
                 } else {
                     throw new InvalidArgumentException(sprintf('"!%s" tags only accept a non empty string or an array with a key "tag" in "%s".', $value->getTag(), $file));
+                }
+
+                if ($args) {
+                    $argument = $isVariadic ? new TaggedVariadicArgument(...$args) : new TaggedIteratorArgument(...$args);
                 }
 
                 if ($forLocator) {

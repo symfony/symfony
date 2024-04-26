@@ -17,6 +17,7 @@ use Symfony\Component\DependencyInjection\Argument\AbstractArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
 use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
+use Symfony\Component\DependencyInjection\Argument\TaggedVariadicArgument;
 use Symfony\Component\DependencyInjection\Compiler\AutowirePass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -136,6 +137,26 @@ class YamlDumperTest extends TestCase
 
         $dumper = new YamlDumper($container);
         $this->assertStringEqualsFile(self::$fixturesPath.'/yaml/services_with_tagged_argument.yml', $dumper->dump());
+    }
+
+    public function testTaggedVariadic()
+    {
+        $taggedVariadic = new TaggedVariadicArgument('variadic_test', 'barfoo', 'foobar', false, 'getPriority');
+        $taggedVariadic2 = new TaggedVariadicArgument('variadic_test', null, null, false, null, ['baz']);
+        $taggedVariadic3 = new TaggedVariadicArgument('variadic_test', null, null, false, null, ['baz', 'qux'], false);
+
+        $container = new ContainerBuilder();
+
+        $container->register('foo_service', 'Foo')->addTag('foo');
+        $container->register('baz_service', 'Baz')->addTag('foo');
+        $container->register('qux_service', 'Qux')->addTag('foo');
+
+        $container->register('foo_service_tagged_variadic', 'Bar')->addArgument($taggedVariadic);
+        $container->register('foo2_service_tagged_variadic', 'Bar')->addArgument($taggedVariadic2);
+        $container->register('foo3_service_tagged_variadic', 'Bar')->addArgument($taggedVariadic3);
+
+        $dumper = new YamlDumper($container);
+        $this->assertStringEqualsFile(self::$fixturesPath.'/yaml/services_with_tagged_variadic_argument.yml', $dumper->dump());
     }
 
     public function testServiceClosure()

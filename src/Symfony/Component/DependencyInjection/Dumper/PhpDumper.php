@@ -20,6 +20,7 @@ use Symfony\Component\DependencyInjection\Argument\LazyClosure;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceLocator;
 use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
+use Symfony\Component\DependencyInjection\Argument\TaggedVariadicArgument;
 use Symfony\Component\DependencyInjection\Compiler\AnalyzeServiceReferencesPass;
 use Symfony\Component\DependencyInjection\Compiler\CheckCircularReferencesPass;
 use Symfony\Component\DependencyInjection\Compiler\ServiceReferenceGraphNode;
@@ -1853,7 +1854,7 @@ EOF;
                     }
 
                     $code = [];
-                    $code[] = 'new RewindableGenerator(function () use ($container) {';
+                    $code[] = ($value instanceof TaggedVariadicArgument ? '...' : '').'new RewindableGenerator(function () use ($container) {';
 
                     $operands = [0];
                     foreach ($values as $k => $v) {

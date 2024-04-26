@@ -18,6 +18,7 @@ use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
 use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
+use Symfony\Component\DependencyInjection\Argument\TaggedVariadicArgument;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\LogicException;
@@ -282,7 +283,14 @@ class YamlDumper extends Dumper
                     $content['exclude_self'] = false;
                 }
 
-                return new TaggedValue($value instanceof TaggedIteratorArgument ? 'tagged_iterator' : 'tagged_locator', $content);
+                $tag = match (true) {
+                    $value instanceof TaggedVariadicArgument => 'tagged_variadic',
+                    $value instanceof TaggedIteratorArgument => 'tagged_iterator',
+                    $value instanceof ServiceLocatorArgument => 'tagged_locator',
+                    default => throw new RuntimeException(sprintf('Unspecified Yaml tag for type "%s".', get_debug_type($value))),
+                };
+
+                return new TaggedValue($tag, $content);
             }
 
             if ($value instanceof IteratorArgument) {

@@ -25,6 +25,7 @@ use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
 use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
+use Symfony\Component\DependencyInjection\Argument\TaggedVariadicArgument;
 use Symfony\Component\DependencyInjection\Compiler\ResolveBindingsPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -423,6 +424,23 @@ class XmlFileLoaderTest extends TestCase
         $this->assertEquals(new ServiceLocatorArgument($taggedIterator2), $container->getDefinition('foo2_tagged_locator')->getArgument(0));
         $taggedIterator3 = new TaggedIteratorArgument('foo_tag', 'foo_tag', 'getDefaultFooTagName', true, 'getDefaultFooTagPriority', ['baz', 'qux'], false);
         $this->assertEquals(new ServiceLocatorArgument($taggedIterator3), $container->getDefinition('foo3_tagged_locator')->getArgument(0));
+    }
+
+    public function testParseTaggedVariadicArgumentsWithIndexBy()
+    {
+        $container = new ContainerBuilder();
+        $loader = new XmlFileLoader($container, new FileLocator(self::$fixturesPath.'/xml'));
+        $loader->load('services_with_tagged_variadic_arguments.xml');
+
+        $this->assertCount(1, $container->getDefinition('foo')->getTag('variadic_tag'));
+        $this->assertCount(1, $container->getDefinition('foo_tagged_variadic')->getArguments());
+
+        $taggedVariadic = new TaggedVariadicArgument('variadic_tag', 'barfoo', 'foobar', false, 'getPriority');
+        $this->assertEquals($taggedVariadic, $container->getDefinition('foo_tagged_variadic')->getArgument(0));
+        $taggedVariadic2 = new TaggedVariadicArgument('variadic_tag', null, null, false, null, ['baz']);
+        $this->assertEquals($taggedVariadic2, $container->getDefinition('foo2_tagged_variadic')->getArgument(0));
+        $taggedVariadic3 = new TaggedVariadicArgument('variadic_tag', null, null, false, null, ['baz', 'qux'], false);
+        $this->assertEquals($taggedVariadic3, $container->getDefinition('foo3_tagged_variadic')->getArgument(0));
     }
 
     public function testServiceWithServiceLocatorArgument()
@@ -1224,14 +1242,14 @@ class XmlFileLoaderTest extends TestCase
     public static function dataForBindingsAndInnerCollections()
     {
         return [
-           ['bar1', ['item.1', 'item.2']],
-           ['bar2', ['item.1', 'item.2']],
-           ['bar3', ['item.1', 'item.2', 'item.3', 'item.4']],
-           ['bar4', ['item.1', 'item.3', 'item.4']],
-           ['bar5', ['item.1', 'item.2', ['item.3.1', 'item.3.2']]],
-           ['bar6', ['item.1', ['item.2.1', 'item.2.2'], 'item.3']],
-           ['bar7', new IteratorArgument(['item.1', 'item.2'])],
-           ['bar8', new IteratorArgument(['item.1', 'item.2', ['item.3.1', 'item.3.2']])],
+            ['bar1', ['item.1', 'item.2']],
+            ['bar2', ['item.1', 'item.2']],
+            ['bar3', ['item.1', 'item.2', 'item.3', 'item.4']],
+            ['bar4', ['item.1', 'item.3', 'item.4']],
+            ['bar5', ['item.1', 'item.2', ['item.3.1', 'item.3.2']]],
+            ['bar6', ['item.1', ['item.2.1', 'item.2.2'], 'item.3']],
+            ['bar7', new IteratorArgument(['item.1', 'item.2'])],
+            ['bar8', new IteratorArgument(['item.1', 'item.2', ['item.3.1', 'item.3.2']])],
         ];
     }
 

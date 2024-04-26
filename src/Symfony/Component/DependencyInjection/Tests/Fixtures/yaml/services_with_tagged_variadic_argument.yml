@@ -1,0 +1,27 @@
+
+services:
+    service_container:
+        class: Symfony\Component\DependencyInjection\ContainerInterface
+        public: true
+        synthetic: true
+    foo_service:
+        class: Foo
+        tags:
+            - foo
+    baz_service:
+        class: Baz
+        tags:
+            - foo
+    qux_service:
+        class: Qux
+        tags:
+            - foo
+    foo_service_tagged_variadic:
+        class: Bar
+        arguments: [!tagged_variadic { tag: variadic_test, index_by: barfoo, default_index_method: foobar, default_priority_method: getPriority }]
+    foo2_service_tagged_variadic:
+        class: Bar
+        arguments: [!tagged_variadic { tag: variadic_test, exclude: baz }]
+    foo3_service_tagged_variadic:
+        class: Bar
+        arguments: [!tagged_variadic { tag: variadic_test, exclude: [baz, qux], exclude_self: false }]

@@ -19,6 +19,7 @@ use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
 use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
+use Symfony\Component\DependencyInjection\Argument\TaggedVariadicArgument;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -587,8 +588,11 @@ class XmlFileLoader extends FileLoader
                     break;
                 case 'tagged':
                 case 'tagged_iterator':
+                case 'tagged_variadic':
                 case 'tagged_locator':
                     $forLocator = 'tagged_locator' === $type;
+                    $isVariadic = 'tagged_variadic' === $type;
+                    $args = [];
 
                     if (!$arg->getAttribute('tag')) {
                         throw new InvalidArgumentException(sprintf('Tag "<%s>" with type="%s" has no or empty "tag" attribute in "%s".', $name, $type, $file));
@@ -602,7 +606,9 @@ class XmlFileLoader extends FileLoader
                         $excludes = [$arg->getAttribute('exclude')];
                     }
 
-                    $arguments[$key] = new TaggedIteratorArgument($arg->getAttribute('tag'), $arg->getAttribute('index-by') ?: null, $arg->getAttribute('default-index-method') ?: null, $forLocator, $arg->getAttribute('default-priority-method') ?: null, $excludes, !$arg->hasAttribute('exclude-self') || XmlUtils::phpize($arg->getAttribute('exclude-self')));
+                    $args = [$arg->getAttribute('tag'), $arg->getAttribute('index-by') ?: null, $arg->getAttribute('default-index-method') ?: null, $forLocator, $arg->getAttribute('default-priority-method') ?: null, $excludes, !$arg->hasAttribute('exclude-self') || XmlUtils::phpize($arg->getAttribute('exclude-self'))];
+
+                    $arguments[$key] = $isVariadic ? new TaggedVariadicArgument(...$args) : new TaggedIteratorArgument(...$args);
 
                     if ($forLocator) {
                         $arguments[$key] = new ServiceLocatorArgument($arguments[$key]);

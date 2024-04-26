@@ -1,6 +1,10 @@
 CHANGELOG
 =========
 
+7.2
+---
+ * Add `!tagged_variadic` attribute to autowire with a variadic constructor
+
 7.1
 ---
 

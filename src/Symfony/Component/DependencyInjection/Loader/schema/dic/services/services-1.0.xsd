@@ -362,6 +362,7 @@
       <xsd:enumeration value="tagged" />
       <xsd:enumeration value="tagged_iterator" />
       <xsd:enumeration value="tagged_locator" />
+      <xsd:enumeration value="tagged_variadic" />
     </xsd:restriction>
   </xsd:simpleType>
 

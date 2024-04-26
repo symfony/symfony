@@ -17,6 +17,7 @@ use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
 use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
+use Symfony\Component\DependencyInjection\Argument\TaggedVariadicArgument;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
@@ -303,7 +304,13 @@ class XmlDumper extends Dumper
                 $element->setAttribute('type', 'collection');
                 $this->convertParameters($value, $type, $element, 'key');
             } elseif ($value instanceof TaggedIteratorArgument || ($value instanceof ServiceLocatorArgument && $tag = $value->getTaggedIteratorArgument())) {
-                $element->setAttribute('type', $value instanceof TaggedIteratorArgument ? 'tagged_iterator' : 'tagged_locator');
+                $elementType = match (true) {
+                    $value instanceof TaggedVariadicArgument => 'tagged_variadic',
+                    $value instanceof TaggedIteratorArgument => 'tagged_iterator',
+                    $value instanceof ServiceLocatorArgument => 'tagged_locator',
+                };
+
+                $element->setAttribute('type', $elementType);
                 $element->setAttribute('tag', $tag->getTag());
 
                 if (null !== $tag->getIndexAttribute()) {

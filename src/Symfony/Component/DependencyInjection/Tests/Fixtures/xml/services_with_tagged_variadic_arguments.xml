@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<container xmlns="http://symfony.com/schema/dic/services" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://symfony.com/schema/dic/services https://symfony.com/schema/dic/services/services-1.0.xsd">
+  <services>
+    <service id="service_container" class="Symfony\Component\DependencyInjection\ContainerInterface" public="true" synthetic="true"/>
+    <service id="foo" class="Foo">
+      <tag name="variadic_tag"/>
+    </service>
+    <service id="baz" class="Baz">
+      <tag name="variadic_tag"/>
+    </service>
+    <service id="qux" class="Qux">
+      <tag name="variadic_tag"/>
+    </service>
+    <service id="foo_tagged_variadic" class="Bar" public="true">
+      <argument type="tagged_variadic" tag="variadic_tag" index-by="barfoo" default-index-method="foobar" default-priority-method="getPriority"/>
+    </service>
+    <service id="foo2_tagged_variadic" class="Bar" public="true">
+      <argument type="tagged_variadic" tag="variadic_tag" exclude="baz"/>
+    </service>
+    <service id="foo3_tagged_variadic" class="Bar" public="true">
+      <argument type="tagged_variadic" tag="variadic_tag" exclude-self="false">
+        <exclude>baz</exclude>
+        <exclude>qux</exclude>
+      </argument>
+    </service>
+  </services>
+</container>

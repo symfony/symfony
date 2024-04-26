@@ -23,6 +23,7 @@ use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
 use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
+use Symfony\Component\DependencyInjection\Argument\TaggedVariadicArgument;
 use Symfony\Component\DependencyInjection\Compiler\ResolveBindingsPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -432,6 +433,25 @@ class YamlFileLoaderTest extends TestCase
 
         $taggedIterator = new TaggedIteratorArgument('foo', null, null, true);
         $this->assertEquals(new ServiceLocatorArgument($taggedIterator), $container->getDefinition('bar_service_tagged_locator')->getArgument(0));
+    }
+
+    public function testTaggedVariadicArgumentsWithIndex()
+    {
+        $container = new ContainerBuilder();
+        $loader = new YamlFileLoader($container, new FileLocator(self::$fixturesPath.'/yaml'));
+        $loader->load('services_with_tagged_variadic_argument.yml');
+
+        $this->assertCount(1, $container->getDefinition('foo_service')->getTag('foo'));
+        $this->assertCount(1, $container->getDefinition('foo_service_tagged_variadic')->getArguments());
+
+        $taggedIterator = new TaggedVariadicArgument('variadic_test', 'barfoo', 'foobar', false, 'getPriority');
+        $this->assertEquals($taggedIterator, $container->getDefinition('foo_service_tagged_variadic')->getArgument(0));
+        $taggedIterator2 = new TaggedVariadicArgument('variadic_test', null, null, false, null, ['baz']);
+        $this->assertEquals($taggedIterator2, $container->getDefinition('foo2_service_tagged_variadic')->getArgument(0));
+        $taggedIterator3 = new TaggedVariadicArgument('variadic_test', null, null, false, null, ['baz', 'qux'], false);
+        $this->assertEquals($taggedIterator3, $container->getDefinition('foo3_service_tagged_variadic')->getArgument(0));
+
+        $taggedIterator = new TaggedVariadicArgument('foo', null, null, true);
     }
 
     public function testServiceWithServiceLocatorArgument()

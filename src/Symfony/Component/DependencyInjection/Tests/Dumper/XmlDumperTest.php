@@ -17,6 +17,7 @@ use Symfony\Component\DependencyInjection\Argument\AbstractArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
 use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
+use Symfony\Component\DependencyInjection\Argument\TaggedVariadicArgument;
 use Symfony\Component\DependencyInjection\Compiler\AutowirePass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -244,6 +245,32 @@ class XmlDumperTest extends TestCase
 
         $dumper = new XmlDumper($container);
         $this->assertStringEqualsFile(self::$fixturesPath.'/xml/services_with_tagged_arguments.xml', $dumper->dump());
+    }
+
+    public function testTaggedVariadicArguments()
+    {
+        $taggedIterator = new TaggedVariadicArgument('variadic_tag', 'barfoo', 'foobar', false, 'getPriority');
+        $taggedIterator2 = new TaggedVariadicArgument('variadic_tag', null, null, false, null, ['baz']);
+        $taggedIterator3 = new TaggedVariadicArgument('variadic_tag', null, null, false, null, ['baz', 'qux'], false);
+
+        $container = new ContainerBuilder();
+
+        $container->register('foo', 'Foo')->addTag('variadic_tag');
+        $container->register('baz', 'Baz')->addTag('variadic_tag');
+        $container->register('qux', 'Qux')->addTag('variadic_tag');
+
+        $container->register('foo_tagged_variadic', 'Bar')
+        ->setPublic(true)
+            ->addArgument($taggedIterator);
+        $container->register('foo2_tagged_variadic', 'Bar')
+        ->setPublic(true)
+            ->addArgument($taggedIterator2);
+        $container->register('foo3_tagged_variadic', 'Bar')
+        ->setPublic(true)
+            ->addArgument($taggedIterator3);
+
+        $dumper = new XmlDumper($container);
+        $this->assertStringEqualsFile(self::$fixturesPath.'/xml/services_with_tagged_variadic_arguments.xml', $dumper->dump());
     }
 
     public function testServiceClosure()

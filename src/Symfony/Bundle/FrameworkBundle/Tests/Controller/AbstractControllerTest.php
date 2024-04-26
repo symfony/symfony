@@ -653,10 +653,16 @@ class AbstractControllerTest extends TestCase
         $form->method('isValid')->willReturn(true);
 
         $request = new Request();
+        $requestStack = new RequestStack();
+        $requestStack->push($request);
+
+        $container = new Container();
+        $container->set('request_stack', $requestStack);
 
         $controller = $this->createController();
+        $controller->setContainer($container);
 
-        $this->assertTrue($controller->isSubmittedFormValid($form, $request));
+        $this->assertTrue($controller->isSubmittedFormValid($form));
     }
 
     public function testIsSubmittedFormValidReturnfalse()
@@ -667,9 +673,15 @@ class AbstractControllerTest extends TestCase
         $form->method('isValid')->willReturn(false);
 
         $request = new Request();
+        $requestStack = new RequestStack();
+        $requestStack->push($request);
+
+        $container = new Container();
+        $container->set('request_stack', $requestStack);
 
         $controller = $this->createController();
+        $controller->setContainer($container);
 
-        $this->assertFalse($controller->isSubmittedFormValid($form, $request));
+        $this->assertFalse($controller->isSubmittedFormValid($form));
     }
 }

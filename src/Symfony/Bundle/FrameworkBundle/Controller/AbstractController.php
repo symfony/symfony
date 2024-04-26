@@ -415,8 +415,9 @@ abstract class AbstractController implements ServiceSubscriberInterface
     /**
      * Call FormInterface::handleRequest() and return the result of the condition FormInterface::isSubmitted() and FormInterface::isValid().
      */
-    protected function isSubmittedFormValid(FormInterface $form, Request $request): bool
+    protected function isSubmittedFormValid(FormInterface $form): bool
     {
+        $request = $this->container->get('request_stack')->getCurrentRequest();
         $form->handleRequest($request);
 
         return $form->isSubmitted() && $form->isValid();

@@ -87,6 +87,7 @@ return static function (ContainerConfigurator $container) {
         'orange-sms' => Bridge\OrangeSms\OrangeSmsTransportFactory::class,
         'ovh-cloud' => Bridge\OvhCloud\OvhCloudTransportFactory::class,
         'plivo' => Bridge\Plivo\PlivoTransportFactory::class,
+        'primotexto' => Bridge\Primotexto\PrimotextoTransportFactory::class,
         'pushover' => Bridge\Pushover\PushoverTransportFactory::class,
         'pushy' => Bridge\Pushy\PushyTransportFactory::class,
         'redlink' => Bridge\Redlink\RedlinkTransportFactory::class,

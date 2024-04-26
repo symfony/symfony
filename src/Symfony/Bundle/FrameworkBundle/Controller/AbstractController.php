@@ -412,6 +412,16 @@ abstract class AbstractController implements ServiceSubscriberInterface
         return $response;
     }
 
+    /**
+     * Call FormInterface::handleRequest() and return the result of the condition FormInterface::isSubmitted() and FormInterface::isValid().
+     */
+    protected function isSubmittedFormValid(FormInterface $form, Request $request): bool
+    {
+        $form->handleRequest($request);
+
+        return $form->isSubmitted() && $form->isValid();
+    }
+
     private function doRenderView(string $view, ?string $block, array $parameters, string $method): string
     {
         if (!$this->container->has('twig')) {

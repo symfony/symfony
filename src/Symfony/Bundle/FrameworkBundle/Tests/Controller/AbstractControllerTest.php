@@ -644,4 +644,32 @@ class AbstractControllerTest extends TestCase
 
         $this->assertSame('</style.css>; rel="preload"; as="stylesheet",</script.js>; rel="preload"; as="script"', $response->headers->get('Link'));
     }
+
+    public function testIsSubmittedFormValidReturnTrue()
+    {
+        $form = $this->getMockBuilder(FormInterface::class)->getMock();
+        $form->expects($this->once())->method('handleRequest');
+        $form->method('isSubmitted')->willReturn(true);
+        $form->method('isValid')->willReturn(true);
+
+        $request = new Request();
+
+        $controller = $this->createController();
+
+        $this->assertTrue($controller->isSubmittedFormValid($form, $request));
+    }
+
+    public function testIsSubmittedFormValidReturnfalse()
+    {
+        $form = $this->getMockBuilder(FormInterface::class)->getMock();
+        $form->expects($this->once())->method('handleRequest');
+        $form->method('isSubmitted')->willReturn(true);
+        $form->method('isValid')->willReturn(false);
+
+        $request = new Request();
+
+        $controller = $this->createController();
+
+        $this->assertFalse($controller->isSubmittedFormValid($form, $request));
+    }
 }

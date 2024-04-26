@@ -15,6 +15,7 @@ CHANGELOG
  * Attach the workflow's configuration to the `workflow` tag
  * Add the `allowed_recipients` option for mailer to allow some users to receive
    emails even if `recipients` is defined.
+ * Add `isSubmittedFormValid` method into `AbstractController` make a shortcut of the `FormInterface`'s three functions `handleRequest()`, `isSubmitted()` and `isValid()`
 
 7.0
 ---

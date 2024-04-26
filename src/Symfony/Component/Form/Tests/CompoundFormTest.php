@@ -1103,49 +1103,6 @@ class CompoundFormTest extends TestCase
         $this->assertEquals(['date' => new \DateTime('2022-08-04', new \DateTimeZone('UTC'))], $form->getData());
     }
 
-    public function testIsSubmittedRequestValid()
-    {
-        $form = $this->getBuilder('author')
-            ->setMethod(Request::METHOD_POST)
-            ->setCompound(true)
-            ->setDataMapper(new DataMapper())
-            ->setRequestHandler(new HttpFoundationRequestHandler())
-            ->getForm();
-
-        $form->add($this->getBuilder('firstName')->getForm());
-        $form->add($this->getBuilder('lastName')->getForm());
-
-        $values = [
-            'author' => [
-                'firstName' => 'Loïc',
-                'lastName' => 'Ovigne',
-            ],
-        ];
-
-        $request = new Request([], $values, [], [], [], [
-            'REQUEST_METHOD' => Request::METHOD_POST,
-        ]);
-
-        $this->assertTrue($form->isSubmittedRequestValid($request));
-    }
-
-    public function testIsSubmittedRequestUnvalid()
-    {
-        $form = $this->getBuilder('author')
-            ->setMethod(Request::METHOD_POST)
-            ->setCompound(true)
-            ->setDataMapper(new DataMapper())
-            ->setRequestHandler(new HttpFoundationRequestHandler())
-            ->getForm();
-
-        $form->add($this->getBuilder('firstName')->getForm());
-        $form->add($this->getBuilder('lastName')->getForm());
-
-        $request = new Request();
-
-        $this->assertFalse($form->isSubmittedRequestValid($request));
-    }
-
     private function createForm(string $name = 'name', bool $compound = true): FormInterface
     {
         $builder = $this->getBuilder($name);

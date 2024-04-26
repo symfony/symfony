@@ -147,6 +147,12 @@ class ObjectNormalizer extends AbstractObjectNormalizer
      */
     protected function setAttributeValue(object $object, string $attribute, mixed $value, ?string $format = null, array $context = [])
     {
+        if (\stdClass::class === $object::class) {
+            $object->{$attribute} = $value;
+
+            return;
+        }
+
         try {
             $this->propertyAccessor->setValue($object, $attribute, $value);
         } catch (NoSuchPropertyException) {

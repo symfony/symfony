@@ -12,6 +12,7 @@
 namespace Symfony\Component\Cache\Adapter;
 
 use Psr\SimpleCache\CacheInterface;
+use Symfony\Component\Cache\CacheItem;
 use Symfony\Component\Cache\PruneableInterface;
 use Symfony\Component\Cache\ResettableInterface;
 use Symfony\Component\Cache\Traits\ProxyTrait;
@@ -40,6 +41,20 @@ class Psr16Adapter extends AbstractAdapter implements PruneableInterface, Resett
         $this->miss = new \stdClass();
     }
 
+    public function getItem(mixed $key): CacheItem
+    {
+        CacheItem::validateKey($key);
+
+        return parent::getItem($key);
+    }
+
+    public function getItems(array $keys = []): iterable
+    {
+        CacheItem::validateKeys($keys);
+
+        return parent::getItems($keys);
+    }
+
     protected function doFetch(array $ids): iterable
     {
         foreach ($this->pool->getMultiple($ids, $this->miss) as $key => $value) {
@@ -62,6 +77,13 @@ class Psr16Adapter extends AbstractAdapter implements PruneableInterface, Resett
     protected function doDelete(array $ids): bool
     {
         return $this->pool->deleteMultiple($ids);
+    }
+
+    public function deleteItems(array $keys): bool
+    {
+        CacheItem::validateKeys($keys);
+
+        return parent::deleteItems($keys);
     }
 
     protected function doSave(array $values, int $lifetime): array|bool

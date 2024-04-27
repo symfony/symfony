@@ -144,6 +144,16 @@ final class CacheItem implements ItemInterface
     }
 
     /**
+     * @param mixed[] $keys The keys to validate
+     */
+    public static function validateKeys(array $keys): void
+    {
+        foreach ($keys as $key) {
+            self::validateKey($key);
+        }
+    }
+
+    /**
      * Internal logging helper.
      *
      * @internal

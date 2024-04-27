@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2024-04-24T09:31:12Z
+
+Are we still missing some fixtures? I still see failures in the related AppVeyor job. :)
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2024-04-24T09:55:53Z
+
+That's really weird, I'm investigating. 🕵️
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2024-04-24T10:50:19Z
+
+Got it. Fixing this bug actually highlighted another one in the remote event payload conversion. That's fixed as well 🙂

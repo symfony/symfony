@@ -379,6 +379,32 @@ class FinderTest extends Iterator\RealIteratorTestCase
         ]), $finder->in(self::$tmpDir)->getIterator());
     }
 
+    public function testExcludeTopLevelOnly()
+    {
+        $finder = $this->buildFinder();
+        $this->assertSame($finder, $finder->exclude('/foo'));
+        $this->assertIterator($this->toAbsolute([
+            'test.php',
+            'test.py',
+            'top',
+            'top/foo',
+            'top/foo/file.tmp',
+            'toto',
+            'foo bar',
+            'qux',
+            'qux/baz_100_1.py',
+            'zebulon.php',
+            'Zephire.php',
+            'qux/baz_1_2.py',
+            'qux_0_1.php',
+            'qux_1000_1.php',
+            'qux_1002_0.php',
+            'qux_10_2.php',
+            'qux_12_0.php',
+            'qux_2_0.php',
+        ]), $finder->in(self::$tmpDir)->getIterator());
+    }
+
     public function testIgnoreVCS()
     {
         $finder = $this->buildFinder();

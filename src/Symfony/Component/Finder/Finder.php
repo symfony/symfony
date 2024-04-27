@@ -320,6 +320,10 @@ class Finder implements \IteratorAggregate, \Countable
      *
      *     $finder->in(__DIR__)->exclude('ruby');
      *
+     * If the directory is preceded by '/' then it is only excluded at the top level. For example:
+     *
+     *     $finder->in(__DIR__)->exclude('/vendor');
+     *
      * @param string|array $dirs A directory path or an array of directories
      *
      * @return $this

@@ -62,6 +62,10 @@ class Email extends Constraint
             throw new InvalidArgumentException('The "mode" parameter value is not valid.');
         }
 
+        if (null !== $mode && !\in_array($mode, self::$validationModes, true)) {
+            throw new InvalidArgumentException('The "mode" parameter value is not valid.');
+        }
+
         parent::__construct($options, $groups, $payload);
 
         $this->message = $message ?? $this->message;

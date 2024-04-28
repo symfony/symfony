@@ -433,6 +433,7 @@ class ExpressionLanguageTest extends TestCase
             }
         };
 
+        yield ['bar ?? "default"', null];
         yield ['foo.bar ?? "default"', null];
         yield ['foo.bar.baz ?? "default"', (object) ['bar' => null]];
         yield ['foo.bar ?? foo.baz ?? "default"', null];

@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+7.2
+---
+
+ * Add support for null-coalescing unknown variables
+
 7.1
 ---
 

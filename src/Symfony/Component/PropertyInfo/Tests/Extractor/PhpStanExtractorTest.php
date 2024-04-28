@@ -29,6 +29,7 @@ use Symfony\Component\PropertyInfo\Tests\Fixtures\Php80Dummy;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\Php80PromotedDummy;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\PhpStanPseudoTypesDummy;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\RootDummy\RootDummyItem;
+use Symfony\Component\PropertyInfo\Tests\Fixtures\TraitUsage\AnotherNamespace\DummyInAnotherNamespace;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\TraitUsage\DummyUsedInTrait;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\TraitUsage\DummyUsingTrait;
 use Symfony\Component\PropertyInfo\Type as LegacyType;
@@ -333,6 +334,7 @@ class PhpStanExtractorTest extends TestCase
             ['propertyInTraitPrimitiveType', new LegacyType(LegacyType::BUILTIN_TYPE_STRING)],
             ['propertyInTraitObjectSameNamespace', new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, false, DummyUsedInTrait::class)],
             ['propertyInTraitObjectDifferentNamespace', new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, false, Dummy::class)],
+            ['dummyInAnotherNamespace', new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, false, DummyInAnotherNamespace::class)],
         ];
     }
 
@@ -758,6 +760,7 @@ class PhpStanExtractorTest extends TestCase
         yield ['propertyInTraitPrimitiveType', Type::string()];
         yield ['propertyInTraitObjectSameNamespace', Type::object(DummyUsedInTrait::class)];
         yield ['propertyInTraitObjectDifferentNamespace', Type::object(Dummy::class)];
+        yield ['dummyInAnotherNamespace', Type::object(DummyInAnotherNamespace::class)];
     }
 
     /**

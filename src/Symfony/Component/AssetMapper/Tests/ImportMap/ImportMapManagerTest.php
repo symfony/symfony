@@ -201,15 +201,15 @@ class ImportMapManagerTest extends TestCase
         ];
 
         yield 'single_package_with_a_path' => [
-        'packages' => [new PackageRequireOptions('some/module', path: self::$writableRoot.'/assets/some_file.js')],
-        'expectedProviderPackageArgumentCount' => 0,
-        'resolvedPackages' => [],
-        'expectedImportMap' => [
-            'some/module' => [
-                // converted to relative path
-                'path' => './assets/some_file.js',
+            'packages' => [new PackageRequireOptions('some/module', path: self::$writableRoot.'/assets/some_file.js')],
+            'expectedProviderPackageArgumentCount' => 0,
+            'resolvedPackages' => [],
+            'expectedImportMap' => [
+                'some/module' => [
+                    // converted to relative path
+                    'path' => './assets/some_file.js',
+                ],
             ],
-        ],
         ];
     }
 

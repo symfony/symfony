@@ -11,7 +11,10 @@
 
 namespace Symfony\Component\PropertyInfo\Tests\Fixtures\TraitUsage;
 
+use Symfony\Component\PropertyInfo\Tests\Fixtures\TraitUsage\AnotherNamespace\DummyTraitInAnotherNamespace;
+
 class DummyUsingTrait
 {
     use DummyTrait;
+    use DummyTraitInAnotherNamespace;
 }

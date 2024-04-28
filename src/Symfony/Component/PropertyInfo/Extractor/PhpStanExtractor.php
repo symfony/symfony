@@ -232,6 +232,14 @@ final class PhpStanExtractor implements PropertyTypeExtractorInterface, Construc
             return null;
         }
 
+        $reflector = $reflectionProperty->getDeclaringClass();
+
+        foreach ($reflector->getTraits() as $trait) {
+            if ($trait->hasProperty($property)) {
+                return $this->getDocBlockFromProperty($trait->getName(), $property);
+            }
+        }
+
         // Type can be inside property docblock as `@var`
         $rawDocNode = $reflectionProperty->getDocComment();
         $phpDocNode = $rawDocNode ? $this->getPhpDocNode($rawDocNode) : null;

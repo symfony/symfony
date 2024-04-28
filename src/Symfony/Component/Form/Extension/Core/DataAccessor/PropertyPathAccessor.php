@@ -12,7 +12,9 @@
 namespace Symfony\Component\Form\Extension\Core\DataAccessor;
 
 use Symfony\Component\Form\DataAccessorInterface;
+use Symfony\Component\Form\DataMapperInterface;
 use Symfony\Component\Form\Exception\AccessException;
+use Symfony\Component\Form\Extension\Core\DataMapper\DataMapper;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\PropertyAccess\Exception\AccessException as PropertyAccessException;
 use Symfony\Component\PropertyAccess\Exception\NoSuchIndexException;
@@ -51,15 +53,25 @@ class PropertyPathAccessor implements DataAccessorInterface
             throw new AccessException('Unable to write the given value as no property path is defined.');
         }
 
+        $getValue = function () use ($data, $form, $propertyPath) {
+            $dataMapper = $this->getDataMapper($form);
+
+            if ($dataMapper instanceof DataMapper && null !== $dataAccessor = $dataMapper->getDataAccessor()) {
+                return $dataAccessor->getValue($data, $form);
+            }
+
+            return $this->getPropertyValue($data, $propertyPath);
+        };
+
         // If the field is of type DateTimeInterface and the data is the same skip the update to
         // keep the original object hash
-        if ($value instanceof \DateTimeInterface && $value == $this->getPropertyValue($data, $propertyPath)) {
+        if ($value instanceof \DateTimeInterface && $value == $getValue()) {
             return;
         }
 
         // If the data is identical to the value in $data, we are
         // dealing with a reference
-        if (!\is_object($data) || !$form->getConfig()->getByReference() || $value !== $this->getPropertyValue($data, $propertyPath)) {
+        if (!\is_object($data) || !$form->getConfig()->getByReference() || $value !== $getValue()) {
             $this->propertyAccessor->setValue($data, $propertyPath, $value);
         }
     }
@@ -92,5 +104,14 @@ class PropertyPathAccessor implements DataAccessorInterface
 
             return null;
         }
+    }
+
+    private function getDataMapper(FormInterface $form): ?DataMapperInterface
+    {
+        do {
+            $dataMapper = $form->getConfig()->getDataMapper();
+        } while (null === $dataMapper && null !== $form = $form->getParent());
+
+        return $dataMapper;
     }
 }

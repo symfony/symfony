@@ -79,9 +79,11 @@ class ExcludeDirectoryFilterIterator extends \FilterIterator implements \Recursi
             $path = $this->isDir() ? $this->current()->getRelativePathname() : $this->current()->getRelativePath();
             $path = str_replace('\\', '/', $path);
         }
+        
         if ($this->excludedPattern && preg_match($this->excludedPattern, $path)) {
             return false;
         }
+
         if ($this->excludedPatternAbsolute && preg_match($this->excludedPatternAbsolute, $path)) {
             return false;
         }

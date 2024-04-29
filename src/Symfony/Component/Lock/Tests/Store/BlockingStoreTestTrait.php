@@ -47,20 +47,26 @@ trait BlockingStoreTestTrait
 
         $key = new Key(uniqid(__METHOD__, true));
         $parentPID = posix_getpid();
+        var_dump(__METHOD__);
+        var_dump($parentPID);
 
         // Block SIGHUP signal
         pcntl_sigprocmask(\SIG_BLOCK, [\SIGHUP]);
 
         if ($childPID = pcntl_fork()) {
+            var_dump($childPID);
             // Wait the start of the child
             pcntl_sigwaitinfo([\SIGHUP], $info);
+            print_r($info);
 
             $store = $this->getStore();
+            var_dump(get_class($store));
             try {
-                // This call should failed given the lock should already by acquired by the child
+                // This call should fail given the lock should already be acquired by the child
                 $store->save($key);
                 $this->fail('The store saves a locked key.');
             } catch (LockConflictedException $e) {
+                var_dump($e->getMessage());
             } finally {
                 // send the ready signal to the child
                 posix_kill($childPID, \SIGHUP);
@@ -73,12 +79,26 @@ trait BlockingStoreTestTrait
 
             // Now, assert the child process worked well
             pcntl_waitpid($childPID, $status1);
+            var_dump($status1);
+            var_dump('pcntl_wifexited');
+            var_dump(pcntl_wifexited($status1));
+            var_dump('pcntl_wifstopped');
+            var_dump(pcntl_wifstopped($status1));
+            var_dump('pcntl_wifsignaled');
+            var_dump(pcntl_wifsignaled($status1));
+            var_dump('pcntl_wexitstatus');
+            var_dump(pcntl_wexitstatus($status1));
+            var_dump('pcntl_wtermsig');
+            var_dump(pcntl_wtermsig($status1));
+            var_dump('pcntl_wstopsig');
+            var_dump(pcntl_wstopsig($status1));
             $this->assertSame(0, pcntl_wexitstatus($status1), 'The child process couldn\'t lock the resource');
         } else {
             // Block SIGHUP signal
             pcntl_sigprocmask(\SIG_BLOCK, [\SIGHUP]);
 
             try {
+                var_dump('child process');
                 $store = $this->getStore();
                 $store->save($key);
                 // send the ready signal to the parent
@@ -90,10 +110,12 @@ trait BlockingStoreTestTrait
                 // Wait ClockDelay to let parent assert to finish
                 usleep($clockDelay);
                 $store->delete($key);
-                exit(0);
+                var_dump('terminate gracefully');
+                exit(3);
             } catch (\Throwable $e) {
                 posix_kill($parentPID, \SIGHUP);
-                exit(1);
+                var_dump('kill');
+                exit(5);
             }
         }
     }

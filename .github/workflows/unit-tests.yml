@@ -26,12 +26,6 @@ jobs:
     strategy:
       matrix:
         include:
-          - php: '7.2'
-          - php: '7.4'
-          - php: '8.2'
-            mode: high-deps
-          - php: '8.2'
-            mode: low-deps
           - php: '8.3'
           - php: '8.4'
             extensions: amqp,apcu,igbinary,intl,mbstring,memcached,redis
@@ -66,7 +60,7 @@ jobs:
           ([ -d "$COMPOSER_HOME" ] || mkdir "$COMPOSER_HOME") && cp .github/composer-config.json "$COMPOSER_HOME/config.json"
 
           echo COLUMNS=120 >> $GITHUB_ENV
-          echo PHPUNIT="$(pwd)/phpunit --exclude-group tty,benchmark,intl-data,integration" >> $GITHUB_ENV
+          echo PHPUNIT="$(pwd)/phpunit --exclude-group tty,benchmark,intl-data,integration --filter=testBlockingLocks" >> $GITHUB_ENV
           echo COMPOSER_UP='composer update --no-progress --ansi'$([[ "${{ matrix.mode }}" != low-deps ]] && echo ' --ignore-platform-req=php+') >> $GITHUB_ENV
           echo SYMFONY_DEPRECATIONS_HELPER="baselineFile=$(pwd)/.github/deprecations-baseline.json" >> $GITHUB_ENV
 
@@ -176,7 +170,7 @@ jobs:
           export -f _run_tests
 
           if [[ ! "${{ matrix.mode }}" = *-deps ]]; then
-            echo "$COMPONENTS" | xargs -n1 | parallel -j +3 "_run_tests {} '$PHPUNIT {}'"
+            echo src/Symfony/Component/Lock | xargs -n1 | parallel -j +3 "_run_tests {} '$PHPUNIT {}'"
 
             exit 0
           fi

@@ -25,6 +25,8 @@ use Symfony\Component\Validator\Tests\Fixtures\Annotation\Entity;
 use Symfony\Component\Validator\Tests\Fixtures\Annotation\EntityParent;
 use Symfony\Component\Validator\Tests\Fixtures\Annotation\GroupSequenceProviderEntity;
 use Symfony\Component\Validator\Tests\Fixtures\CascadingEntity;
+use Symfony\Component\Validator\Tests\Fixtures\CascadingEntityIntersection;
+use Symfony\Component\Validator\Tests\Fixtures\CascadingEntityUnion;
 use Symfony\Component\Validator\Tests\Fixtures\ClassConstraint;
 use Symfony\Component\Validator\Tests\Fixtures\ConstraintA;
 use Symfony\Component\Validator\Tests\Fixtures\ConstraintB;
@@ -359,6 +361,40 @@ class ClassMetadataTest extends TestCase
             'optionalChild',
             'staticChild',
             'children',
+        ], $metadata->getConstrainedProperties());
+    }
+
+    /**
+     * @requires PHP 8.0
+     */
+    public function testCascadeConstraintWithUnionTypeProperties()
+    {
+        $metadata = new ClassMetadata(CascadingEntityUnion::class);
+        $metadata->addConstraint(new Cascade());
+
+        $this->assertSame(CascadingStrategy::CASCADE, $metadata->getCascadingStrategy());
+        $this->assertCount(5, $metadata->properties);
+        $this->assertSame([
+            'classes',
+            'classAndArray',
+            'classAndNull',
+            'arrayAndNull',
+            'classAndArrayAndNull',
+        ], $metadata->getConstrainedProperties());
+    }
+
+    /**
+     * @requires PHP 8.1
+     */
+    public function testCascadeConstraintWithIntersectionTypeProperties()
+    {
+        $metadata = new ClassMetadata(CascadingEntityIntersection::class);
+        $metadata->addConstraint(new Cascade());
+
+        $this->assertSame(CascadingStrategy::CASCADE, $metadata->getCascadingStrategy());
+        $this->assertCount(1, $metadata->properties);
+        $this->assertSame([
+            'classes',
         ], $metadata->getConstrainedProperties());
     }
 }

@@ -7,6 +7,33 @@ in 5.4 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v5.4.0...v5.4.1
 
+* 5.4.39 (2024-04-29)
+
+ * bug #54751 [Validator]  detect wrong e-mail validation modes (xabbuh)
+ * bug #54723 [Form] read form values using the chain data accessor (xabbuh)
+ * bug #54706 [Yaml] call substr() with integer offsets (xabbuh)
+ * bug #54675 [PropertyInfo] Fix PHPStan properties type in trait (mtarld)
+ * bug #54635 [Serializer] Revert "Fix object normalizer when properties has the same name as their accessor" - it was a BC Break (NeilPeyssard)
+ * bug #54625 [Intl] Remove resources data from classmap generation (shyim)
+ * bug #54598 [TwigBridge]  implement NodeVisitorInterface instead of extending AbstractNodeVisitor (xabbuh)
+ * bug #54072 [HttpKernel] Fix datacollector caster for reference object property (ebuildy)
+ * bug #54564 [Translation] Skip state=needs-translation entries only when source == target (nicolas-grekas)
+ * bug #54579 [Cache] Always select database for persistent redis connections (uncaught)
+ * bug #54059 [Security] Validate that CSRF token in form login is string similar to username/password (glaubinix)
+ * bug #54547 [HttpKernel] Force non lazy controller services (smnandre)
+ * bug #54517 [HttpClient] Let curl handle transfer encoding (michaelhue)
+ * bug #52917 [Serializer] Fix unexpected allowed attributes (mtarld)
+ * bug #54063 [FrameworkBundle] Fix registration of the bundle path to translation (FlyingDR)
+ * bug #54392 [Messenger] Make Doctrine connection ignore unrelated tables on setup (MatTheCat)
+ * bug #54506 [HttpFoundation] Set content-type header in RedirectResponse (smnandre)
+ * bug #52698 [Serializer] Fix XML scalar to object denormalization (mtarld)
+ * bug #54485 [Serializer] Ignore when using #[Ignore] on a non-accessor (nicolas-grekas)
+ * bug #54242 [HttpClient] [EventSourceHttpClient] Fix consuming SSEs with \r\n separator (fancyweb)
+ * bug #54456 [DomCrawler] Encode html entities only if nessecary (ausi)
+ * bug #54471 [Filesystem] Strengthen the check of file permissions in `dumpFile` (alexandre-daubois)
+ * bug #54403 [FrameworkBundle] [Command] Fix #54402: Suppress PHP warning when is_readable() tries to access dirs outside of open_basedir restrictions (Jeldrik Geraedts)
+ * bug #54440 [Console] return null when message with name is not set (xabbuh)
+
 * 5.4.38 (2024-04-02)
 
  * bug #54400 [HttpClient] stop all server processes after tests have run (xabbuh)

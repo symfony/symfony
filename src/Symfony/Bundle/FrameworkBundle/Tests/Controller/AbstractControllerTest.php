@@ -647,7 +647,7 @@ class AbstractControllerTest extends TestCase
 
     public function testIsSubmittedFormValidReturnTrue()
     {
-        $form = $this->getMockBuilder(FormInterface::class)->getMock();
+        $form = $this->createMock(FormInterface::class);
         $form->expects($this->once())->method('handleRequest');
         $form->method('isSubmitted')->willReturn(true);
         $form->method('isValid')->willReturn(true);
@@ -667,7 +667,7 @@ class AbstractControllerTest extends TestCase
 
     public function testIsSubmittedFormValidReturnfalse()
     {
-        $form = $this->getMockBuilder(FormInterface::class)->getMock();
+        $form = $this->createMock(FormInterface::class);
         $form->expects($this->once())->method('handleRequest');
         $form->method('isSubmitted')->willReturn(true);
         $form->method('isValid')->willReturn(false);

@@ -30,6 +30,7 @@ use Symfony\Component\HttpKernel\HttpKernel;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\Kernel;
 use Symfony\Component\HttpKernel\Tests\Fixtures\KernelForTest;
+use Symfony\Component\HttpKernel\Tests\Fixtures\KernelForTestWithLoadClassCache;
 use Symfony\Component\HttpKernel\Tests\Fixtures\KernelWithoutBundles;
 use Symfony\Component\HttpKernel\Tests\Fixtures\ResettableService;
 
@@ -148,7 +149,7 @@ class KernelTest extends TestCase
 
     public function testClassCacheIsNotLoadedByDefault()
     {
-        $kernel = $this->getKernel(['initializeBundles'], [], false, ['doLoadClassCache']);
+        $kernel = $this->getKernel(['initializeBundles', 'doLoadClassCache'], [], false, KernelForTestWithLoadClassCache::class);
         $kernel->expects($this->never())
             ->method('doLoadClassCache');
 
@@ -663,19 +664,15 @@ EOF
      * @param array $methods Additional methods to mock (besides the abstract ones)
      * @param array $bundles Bundles to register
      */
-    protected function getKernel(array $methods = [], array $bundles = [], bool $debug = false, array $methodsToAdd = []): Kernel
+    protected function getKernel(array $methods = [], array $bundles = [], bool $debug = false, string $kernelClass = KernelForTest::class): Kernel
     {
         $methods[] = 'registerBundles';
 
         $kernelMockBuilder = $this
-            ->getMockBuilder(KernelForTest::class)
+            ->getMockBuilder($kernelClass)
             ->onlyMethods($methods)
             ->setConstructorArgs(['test', $debug])
         ;
-
-        if (0 !== \count($methodsToAdd)) {
-            $kernelMockBuilder->addMethods($methodsToAdd);
-        }
 
         $kernel = $kernelMockBuilder->getMock();
         $kernel->expects($this->any())

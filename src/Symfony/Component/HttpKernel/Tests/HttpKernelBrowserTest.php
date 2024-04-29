@@ -18,6 +18,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\HttpKernel\HttpKernelBrowser;
+use Symfony\Component\HttpKernel\Tests\Fixtures\MockableUploadFileWithClientSize;
 use Symfony\Component\HttpKernel\Tests\Fixtures\TestClient;
 
 /**
@@ -153,10 +154,9 @@ class HttpKernelBrowserTest extends TestCase
         $client = new HttpKernelBrowser($kernel);
 
         $file = $this
-            ->getMockBuilder(UploadedFile::class)
+            ->getMockBuilder(MockableUploadFileWithClientSize::class)
             ->setConstructorArgs([$source, 'original', 'mime/original', \UPLOAD_ERR_OK, true])
-            ->onlyMethods(['getSize'])
-            ->addMethods(['getClientSize'])
+            ->onlyMethods(['getSize', 'getClientSize'])
             ->getMock()
         ;
         /* should be modified when the getClientSize will be removed */

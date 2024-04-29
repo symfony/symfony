@@ -28,6 +28,7 @@ use Symfony\Bridge\Doctrine\Tests\Fixtures\CompositeObjectNoToStringIdEntity;
 use Symfony\Bridge\Doctrine\Tests\Fixtures\DoubleNameEntity;
 use Symfony\Bridge\Doctrine\Tests\Fixtures\DoubleNullableNameEntity;
 use Symfony\Bridge\Doctrine\Tests\Fixtures\Employee;
+use Symfony\Bridge\Doctrine\Tests\Fixtures\MockableRepository;
 use Symfony\Bridge\Doctrine\Tests\Fixtures\Person;
 use Symfony\Bridge\Doctrine\Tests\Fixtures\SingleIntIdEntity;
 use Symfony\Bridge\Doctrine\Tests\Fixtures\SingleIntIdNoToStringEntity;
@@ -97,14 +98,10 @@ class UniqueEntityValidatorTest extends ConstraintValidatorTestCase
 
     protected function createRepositoryMock()
     {
-        $repository = $this->getMockBuilder(EntityRepository::class)
+        return $this->getMockBuilder(MockableRepository::class)
             ->disableOriginalConstructor()
-            ->onlyMethods(['find', 'findAll', 'findOneBy', 'findBy', 'getClassName'])
-            ->addMethods(['findByCustom'])
-            ->getMock()
-        ;
-
-        return $repository;
+            ->onlyMethods(['find', 'findAll', 'findOneBy', 'findBy', 'getClassName', 'findByCustom'])
+            ->getMock();
     }
 
     protected function createEntityManagerMock($repositoryMock)

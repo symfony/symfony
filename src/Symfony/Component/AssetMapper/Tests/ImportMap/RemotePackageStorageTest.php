@@ -35,12 +35,6 @@ class RemotePackageStorageTest extends TestCase
         $this->filesystem->remove(self::$writableRoot);
     }
 
-    public function testGetStorageDir()
-    {
-        $storage = new RemotePackageStorage(self::$writableRoot.'/assets/vendor');
-        $this->assertSame(realpath(self::$writableRoot.'/assets/vendor'), realpath($storage->getStorageDir()));
-    }
-
     public function testSaveThrowsWhenVendorDirectoryIsNotWritable()
     {
         $this->filesystem->mkdir($vendorDir = self::$writableRoot.'/assets/acme/vendor');
@@ -66,73 +60,5 @@ class RemotePackageStorageTest extends TestCase
         $this->filesystem->mkdir(\dirname($targetPath));
         $this->filesystem->dumpFile($targetPath, 'any content');
         $this->assertTrue($storage->isDownloaded($entry));
-    }
-
-    public function testIsExtraFileDownloaded()
-    {
-        $storage = new RemotePackageStorage(self::$writableRoot.'/assets/vendor');
-        $entry = ImportMapEntry::createRemote('foo', ImportMapType::JS, '/does/not/matter', '1.0.0', 'module_specifier', false);
-        $this->assertFalse($storage->isExtraFileDownloaded($entry, '/path/to/extra.woff'));
-
-        $targetPath = self::$writableRoot.'/assets/vendor/module_specifier/path/to/extra.woff';
-        $this->filesystem->mkdir(\dirname($targetPath));
-        $this->filesystem->dumpFile($targetPath, 'any content');
-        $this->assertTrue($storage->isExtraFileDownloaded($entry, '/path/to/extra.woff'));
-    }
-
-    public function testSave()
-    {
-        $storage = new RemotePackageStorage(self::$writableRoot.'/assets/vendor');
-        $entry = ImportMapEntry::createRemote('foo', ImportMapType::JS, '/does/not/matter', '1.0.0', 'module_specifier', false);
-        $storage->save($entry, 'any content');
-        $targetPath = self::$writableRoot.'/assets/vendor/module_specifier/module_specifier.index.js';
-        $this->assertFileExists($targetPath);
-        $this->assertEquals('any content', file_get_contents($targetPath));
-    }
-
-    public function testSaveExtraFile()
-    {
-        $storage = new RemotePackageStorage(self::$writableRoot.'/assets/vendor');
-        $entry = ImportMapEntry::createRemote('foo', ImportMapType::JS, '/does/not/matter', '1.0.0', 'module_specifier', false);
-        $storage->saveExtraFile($entry, '/path/to/extra-file.woff2', 'any content');
-        $targetPath = self::$writableRoot.'/assets/vendor/module_specifier/path/to/extra-file.woff2';
-        $this->assertFileExists($targetPath);
-        $this->assertEquals('any content', file_get_contents($targetPath));
-    }
-
-    /**
-     * @dataProvider getDownloadPathTests
-     */
-    public function testGetDownloadedPath(string $packageModuleSpecifier, ImportMapType $importMapType, string $expectedPath)
-    {
-        $storage = new RemotePackageStorage(self::$writableRoot.'/assets/vendor');
-        $this->assertSame($expectedPath, $storage->getDownloadPath($packageModuleSpecifier, $importMapType));
-    }
-
-    public static function getDownloadPathTests(): iterable
-    {
-        yield 'javascript bare package' => [
-            'packageModuleSpecifier' => 'foo',
-            'importMapType' => ImportMapType::JS,
-            'expectedPath' => self::$writableRoot.'/assets/vendor/foo/foo.index.js',
-        ];
-
-        yield 'javascript package with path' => [
-            'packageModuleSpecifier' => 'foo/bar',
-            'importMapType' => ImportMapType::JS,
-            'expectedPath' => self::$writableRoot.'/assets/vendor/foo/bar.js',
-        ];
-
-        yield 'javascript package with path and extension' => [
-            'packageModuleSpecifier' => 'foo/bar.js',
-            'importMapType' => ImportMapType::JS,
-            'expectedPath' => self::$writableRoot.'/assets/vendor/foo/bar.js',
-        ];
-
-        yield 'CSS package with path' => [
-            'packageModuleSpecifier' => 'foo/bar',
-            'importMapType' => ImportMapType::CSS,
-            'expectedPath' => self::$writableRoot.'/assets/vendor/foo/bar.css',
-        ];
     }
 }

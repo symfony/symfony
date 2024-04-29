@@ -74,6 +74,7 @@ class AccessTokenAuthenticatorTest extends TestCase
     }
 
     /**
+     * @group legacy
      * @expectedDeprecation Since symfony/security-http 6.4: Using non-ASCII characters in the error message is deprecated. Use ASCII characters only.
      */
     public function testOnAuthenticationFailureWithTranslatorThrowsDeprecationWhenTranslatedMessageContainsNonAscii()

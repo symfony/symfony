@@ -2178,10 +2178,9 @@ class FrameworkExtension extends Extension
                 ->setFactory([new Reference('messenger.transport_factory'), 'createTransport'])
                 ->setArguments([$transport['dsn'], $transport['options'] + ['transport_name' => $name], new Reference($serializerId)])
                 ->addTag('messenger.receiver', [
-                        'alias' => $name,
-                        'is_failure_transport' => \in_array($name, $failureTransports),
-                    ]
-                )
+                    'alias' => $name,
+                    'is_failure_transport' => \in_array($name, $failureTransports),
+                ])
             ;
             $container->setDefinition($transportId = 'messenger.transport.'.$name, $transportDefinition);
             $senderAliases[$name] = $transportId;

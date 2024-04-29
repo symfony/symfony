@@ -54,6 +54,9 @@ class DebugCommandTest extends TestCase
  ---------- ------- ------------ ------%S
   Variable   Value   .env.local   .env%S
  ---------- ------- ------------ ------%S
+  FOO                baz          bar%S
+  TEST123            n/a          true%S
+ ---------- ------- ------------ ------%S
 
  // Note that values might be different between web and CLI.%S
 %a

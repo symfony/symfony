@@ -31,14 +31,14 @@ class HttpKernelExtensionTest extends TestCase
     public function testFragmentWithError()
     {
         $this->expectException(\Twig\Error\RuntimeError::class);
-        $renderer = $this->getFragmentHandler($this->throwException(new \Exception('foo')));
+        $renderer = $this->getFragmentHandler(new \Exception('foo'));
 
         $this->renderTemplate($renderer);
     }
 
     public function testRenderFragment()
     {
-        $renderer = $this->getFragmentHandler($this->returnValue(new Response('html')));
+        $renderer = $this->getFragmentHandler(new Response('html'));
 
         $response = $this->renderTemplate($renderer);
 
@@ -87,11 +87,17 @@ TWIG
         $this->assertSame('/_fragment?_hash=PP8%2FeEbn1pr27I9wmag%2FM6jYGVwUZ0l2h0vhh2OJ6CI%3D&amp;_path=template%3Dfoo.html.twig%26_format%3Dhtml%26_locale%3Den%26_controller%3DSymfonyBundleFrameworkBundleControllerTemplateController%253A%253AtemplateAction', $twig->render('index'));
     }
 
-    protected function getFragmentHandler($return)
+    protected function getFragmentHandler($returnOrException): FragmentHandler
     {
         $strategy = $this->createMock(FragmentRendererInterface::class);
         $strategy->expects($this->once())->method('getName')->willReturn('inline');
-        $strategy->expects($this->once())->method('render')->will($return);
+
+        $mocker = $strategy->expects($this->once())->method('render');
+        if ($returnOrException instanceof \Exception) {
+            $mocker->willThrowException($returnOrException);
+        } else {
+            $mocker->willReturn($returnOrException);
+        }
 
         $context = $this->createMock(RequestStack::class);
 

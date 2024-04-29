@@ -22,6 +22,7 @@ use Symfony\Component\Security\Core\Exception\AuthenticationServiceException;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 use Symfony\Component\Security\Core\Exception\CredentialsExpiredException;
 use Symfony\Component\Security\Core\Exception\UserNotFoundException;
+use Symfony\Component\Security\Core\Tests\Fixtures\MockableUsernamePasswordTokenWithRoles;
 use Symfony\Component\Security\Core\User\InMemoryUser;
 use Symfony\Component\Security\Core\User\UserCheckerInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -232,7 +233,9 @@ class UserAuthenticationProviderTest extends TestCase
 
     protected function getSupportedToken()
     {
-        $mock = $this->getMockBuilder(UsernamePasswordToken::class)->onlyMethods(['getCredentials', 'getFirewallName'])->addMethods(['getRoles'])->disableOriginalConstructor()->getMock();
+        $mock = $this->getMockBuilder(MockableUsernamePasswordTokenWithRoles::class)
+            ->onlyMethods(['getCredentials', 'getFirewallName', 'getRoles'])
+            ->disableOriginalConstructor()->getMock();
         $mock
             ->expects($this->any())
             ->method('getFirewallName')

@@ -159,12 +159,11 @@ class GuardAuthenticatorHandlerTest extends TestCase
 
     public function testSessionIsNotInstantiatedOnStatelessFirewall()
     {
-        $sessionFactory = $this->getMockBuilder(\stdClass::class)
-            ->addMethods(['__invoke'])
-            ->getMock();
+        $this->expectNotToPerformAssertions();
 
-        $sessionFactory->expects($this->never())
-            ->method('__invoke');
+        $sessionFactory = static function (): void {
+            throw new \LogicException('This should not be called');
+        };
 
         $this->request->setSessionFactory($sessionFactory);
 

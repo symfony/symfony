@@ -96,6 +96,7 @@ class ExcludeDirectoryFilterIterator extends \FilterIterator implements \Recursi
         if ($this->excludedPattern && preg_match($this->excludedPattern, $path)) {
             return false;
         }
+
         if ($this->excludedPatternAbsolute && preg_match($this->excludedPatternAbsolute, $path)) {
             return false;
         }

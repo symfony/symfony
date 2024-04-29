@@ -66,3 +66,22 @@ if (!function_exists('dd')) {
         exit(1);
     }
 }
+
+if (!function_exists('jd')) {
+    function jd(mixed ...$vars): never
+    {
+        if (!\in_array(\PHP_SAPI, ['cli', 'phpdbg', 'embed'], true) && !headers_sent()) {
+            header('HTTP/1.1 500 Internal Server Error');
+        }
+
+        if (array_key_exists(0, $vars) && 1 === count($vars)) {
+            var_dump($vars[0]);
+        } else {
+            foreach ($vars as $var) {
+                 var_dump($var);
+            }
+        }
+
+        exit(1);
+    }
+}

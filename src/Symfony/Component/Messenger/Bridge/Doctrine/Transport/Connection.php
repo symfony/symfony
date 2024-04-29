@@ -21,6 +21,7 @@ use Doctrine\DBAL\Platforms\MySQLPlatform;
 use Doctrine\DBAL\Platforms\OraclePlatform;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\DBAL\Result;
+use Doctrine\DBAL\Schema\AbstractAsset;
 use Doctrine\DBAL\Schema\AbstractSchemaManager;
 use Doctrine\DBAL\Schema\Comparator;
 use Doctrine\DBAL\Schema\Schema;
@@ -289,7 +290,17 @@ class Connection implements ResetInterface
     {
         $configuration = $this->driverConnection->getConfiguration();
         $assetFilter = $configuration->getSchemaAssetsFilter();
-        $configuration->setSchemaAssetsFilter(function (string $tableName) { return $tableName === $this->configuration['table_name']; });
+        $configuration->setSchemaAssetsFilter(function ($tableName) {
+            if ($tableName instanceof AbstractAsset) {
+                $tableName = $tableName->getName();
+            }
+
+            if (!\is_string($tableName)) {
+                throw new \TypeError(sprintf('The table name must be an instance of "%s" or a string ("%s" given).', AbstractAsset::class, get_debug_type($tableName)));
+            }
+
+            return $tableName === $this->configuration['table_name'];
+        });
         $this->updateSchema();
         $configuration->setSchemaAssetsFilter($assetFilter);
         $this->autoSetup = false;

@@ -70,10 +70,13 @@ class AccessTokenAuthenticatorTest extends TestCase
             $response = $authenticator->onAuthenticationFailure($request, $e);
         }
         $this->assertInstanceOf(Response::class, $response);
-        $this->assertEquals('Bearer error="invalid_token",error_description="Credenciales invalidas."', $response->headers->get('WWW-Authenticate'));
+        $this->assertSame('Bearer error="invalid_token",error_description="Credenciales invalidas."', $response->headers->get('WWW-Authenticate'));
     }
 
-    public function testOnAuthenticationFailureWithTranslatorRevertsTranslationWhenTranslatedMessageContainsNonAscii()
+    /**
+     * @expectedDeprecation Since symfony/security-http 6.4: Using non-ASCII characters in the error message is deprecated. Use ASCII characters only.
+     */
+    public function testOnAuthenticationFailureWithTranslatorThrowsDeprecationWhenTranslatedMessageContainsNonAscii()
     {
         $request = Request::create('/test');
 
@@ -106,7 +109,7 @@ class AccessTokenAuthenticatorTest extends TestCase
             $response = $authenticator->onAuthenticationFailure($request, $e);
         }
         $this->assertInstanceOf(Response::class, $response);
-        $this->assertEquals('Bearer error="invalid_token",error_description="Invalid credentials."', $response->headers->get('WWW-Authenticate'));
+        $this->assertSame('Bearer error="invalid_token",error_description="Credenciales inválidas."', $response->headers->get('WWW-Authenticate'));
     }
 
     public function testAuthenticateWithoutAccessToken()

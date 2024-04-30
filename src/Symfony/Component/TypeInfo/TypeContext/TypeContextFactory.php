@@ -50,11 +50,11 @@ final class TypeContextFactory
         $calledClassPath = explode('\\', $calledClassName);
         $declaringClassPath = explode('\\', $declaringClassName);
 
-        $declaringClassReflection = (self::$reflectionClassCache[$declaringClassName] ??= new \ReflectionClass($declaringClassName));
+        $declaringClassReflection = self::$reflectionClassCache[$declaringClassName] ??= new \ReflectionClass($declaringClassName);
 
         $typeContext = new TypeContext(
-            array_pop($calledClassPath),
-            array_pop($declaringClassPath),
+            end($calledClassPath),
+            end($declaringClassPath),
             trim($declaringClassReflection->getNamespaceName(), '\\'),
             $this->collectUses($declaringClassReflection),
         );

@@ -81,45 +81,6 @@ Mailer
 
  * Postmark's "406 - Inactive recipient" API error code now results in a `PostmarkDeliveryEvent` instead of throwing a `HttpTransportException`
 
-PropertyInfo
-------------
-
- * Deprecate the `Type` class, use `Symfony\Component\TypeInfo\Type` class of `symfony/type-info` component instead
-
-   *Before*
-   ```php
-   use Symfony\Component\PropertyInfo\Type;
-
-   // bool
-   $boolType = new Type(LegacyType::BUILTIN_TYPE_BOOL);
-   // bool|null
-   $nullableType = new Type(LegacyType::BUILTIN_TYPE_BOOL, nullable: true);
-   // array<int, string|null>
-   $arrayType = new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, new Type(Type::BUILTIN_TYPE_INT), new Type(Type::BUILTIN_TYPE_STRING, true));
-
-   $arrayType->getBuiltinType(); // returns "array"
-   $arrayType->getCollectionKeyTypes(); // returns an array with an "int" Type instance
-   $arrayType->getCollectionValueTypes()[0]->isNullable(); // returns true
-   ```
-
-   *After*
-   ```php
-   use Symfony\Component\TypeInfo\Type;
-
-   // bool
-   $boolType = Type::bool();
-   // bool|null
-   $nullableType = Type::nullable(Type::bool());
-   // array<int, string|null>
-   $arrayType = Type::array(Type::nullable(Type::string()), Type::int());
-
-   (string) $arrayType->getBaseType(); // returns "array"
-   $arrayType->getCollectionKeyType(); // returns an "int" Type instance
-   $arrayType->getCollectionValueType()->isNullable(); // returns true
-   ```
-
- * Deprecate `PropertyTypeExtractorInterface::getTypes()`, use `PropertyTypeExtractorInterface::getType()` instead
-
 HttpKernel
 ----------
 

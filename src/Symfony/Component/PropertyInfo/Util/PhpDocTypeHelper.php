@@ -41,14 +41,10 @@ final class PhpDocTypeHelper
     /**
      * Creates a {@see LegacyType} from a PHPDoc type.
      *
-     * @deprecated since Symfony 7.1, use "getType" instead
-     *
      * @return LegacyType[]
      */
     public function getTypes(DocType $varType): array
     {
-        trigger_deprecation('symfony/property-info', '7.1', 'The "%s()" method is deprecated, use "%s::getType()" instead.', __METHOD__, self::class);
-
         if ($varType instanceof ConstExpression) {
             // It's safer to fall back to other extractors here, as resolving const types correctly is not easy at the moment
             return [];
@@ -110,6 +106,8 @@ final class PhpDocTypeHelper
 
     /**
      * Creates a {@see Type} from a PHPDoc type.
+     *
+     * @experimental
      */
     public function getType(DocType $varType): ?Type
     {

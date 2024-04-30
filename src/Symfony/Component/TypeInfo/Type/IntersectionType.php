@@ -19,6 +19,8 @@ use Symfony\Component\TypeInfo\Type;
  * @author Baptiste Leduc <baptiste.leduc@gmail.com>
  *
  * @template T of Type
+ *
+ * @experimental
  */
 final class IntersectionType extends Type
 {

@@ -1,0 +1,61 @@
+---------------------------------------------------------------------------
+
+by Ahummeling at 2024-04-29T21:29:27Z
+
+The changes proposed by the failing fabbot.io job are completely unrelated to my changes.
+
+```shell
+curl https://fabbot.io/patch/symfony/symfony/54776/3d174a96ff253a877f81fe7216e1e72eae9d1d0e/cs.diff | patch -p0
+```
+
+Perhaps this check was added after this file was last edited?
+I am unsure whether my PR should include the suggested fabbot.io changes or not. If they should be included, I'll happily do so.
+
+```
+diff --git a/src/Symfony/Component/Cache/Traits/RedisTrait.php b/src/Symfony/Component/Cache/Traits/RedisTrait.php
+index 33f37d828e..0512f75cf0 100644
+--- a/src/Symfony/Component/Cache/Traits/RedisTrait.php
++++ b/src/Symfony/Component/Cache/Traits/RedisTrait.php
+@@ -310,8 +310,10 @@ trait RedisTrait
+         } elseif (is_a($class, \RedisArray::class, true)) {
+             foreach ($hosts as $i => $host) {
+                 switch ($host['scheme']) {
+-                    case 'tcp': $hosts[$i] = $host['host'].':'.$host['port']; break;
+-                    case 'tls': $hosts[$i] = 'tls://'.$host['host'].':'.$host['port']; break;
++                    case 'tcp': $hosts[$i] = $host['host'].':'.$host['port'];
++                        break;
++                    case 'tls': $hosts[$i] = 'tls://'.$host['host'].':'.$host['port'];
++                        break;
+                     default: $hosts[$i] = $host['path'];
+                 }
+             }
+@@ -331,8 +333,10 @@ trait RedisTrait
+             $initializer = static function () use ($class, $params, $hosts) {
+                 foreach ($hosts as $i => $host) {
+                     switch ($host['scheme']) {
+-                        case 'tcp': $hosts[$i] = $host['host'].':'.$host['port']; break;
+-                        case 'tls': $hosts[$i] = 'tls://'.$host['host'].':'.$host['port']; break;
++                        case 'tcp': $hosts[$i] = $host['host'].':'.$host['port'];
++                            break;
++                        case 'tls': $hosts[$i] = 'tls://'.$host['host'].':'.$host['port'];
++                            break;
+                         default: $hosts[$i] = $host['path'];
+                     }
+                 }
+@@ -347,9 +351,12 @@ trait RedisTrait
+                     $redis->setOption(\Redis::OPT_TCP_KEEPALIVE, $params['tcp_keepalive']);
+                 }
+                 switch ($params['failover']) {
+-                    case 'error': $redis->setOption(\RedisCluster::OPT_SLAVE_FAILOVER, \RedisCluster::FAILOVER_ERROR); break;
+-                    case 'distribute': $redis->setOption(\RedisCluster::OPT_SLAVE_FAILOVER, \RedisCluster::FAILOVER_DISTRIBUTE); break;
+-                    case 'slaves': $redis->setOption(\RedisCluster::OPT_SLAVE_FAILOVER, \RedisCluster::FAILOVER_DISTRIBUTE_SLAVES); break;
++                    case 'error': $redis->setOption(\RedisCluster::OPT_SLAVE_FAILOVER, \RedisCluster::FAILOVER_ERROR);
++                        break;
++                    case 'distribute': $redis->setOption(\RedisCluster::OPT_SLAVE_FAILOVER, \RedisCluster::FAILOVER_DISTRIBUTE);
++                        break;
++                    case 'slaves': $redis->setOption(\RedisCluster::OPT_SLAVE_FAILOVER, \RedisCluster::FAILOVER_DISTRIBUTE_SLAVES);
++                        break;
+                 }
+
+                 return $redis;
+```

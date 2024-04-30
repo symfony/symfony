@@ -128,7 +128,7 @@ EOT
                 continue;
             }
 
-            $realValue = $_SERVER[$var];
+            $realValue = $_SERVER[$var] ?? '';
             $varDetails = [$var, '<fg=green>'.OutputFormatter::escape($realValue).'</>'];
             $varSeen = !isset($dotenvVars[$var]);
 

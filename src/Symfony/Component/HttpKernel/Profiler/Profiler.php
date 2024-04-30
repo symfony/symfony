@@ -140,7 +140,7 @@ class Profiler implements ResetInterface
             return null;
         }
 
-        $profile = new Profile(substr(hash('sha256', uniqid(mt_rand(), true)), 0, 6));
+        $profile = new Profile(substr(hash('sha256', uniqid((string) mt_rand(), true)), 0, 6));
         $profile->setTime(time());
         $profile->setUrl($request->getUri());
         $profile->setMethod($request->getMethod());

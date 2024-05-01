@@ -1854,18 +1854,19 @@ class FrameworkExtension extends Extension
             $container->setParameter('serializer.default_context', $defaultContext);
         }
 
+        $arguments = $container->getDefinition('serializer.normalizer.object')->getArguments();
+        $context = [];
+
         if (isset($config['circular_reference_handler']) && $config['circular_reference_handler']) {
-            $arguments = $container->getDefinition('serializer.normalizer.object')->getArguments();
-            $context = ($arguments[6] ?? $defaultContext) + ['circular_reference_handler' => new Reference($config['circular_reference_handler'])];
+            $context += ($arguments[6] ?? $defaultContext) + ['circular_reference_handler' => new Reference($config['circular_reference_handler'])];
             $container->getDefinition('serializer.normalizer.object')->setArgument(5, null);
-            $container->getDefinition('serializer.normalizer.object')->setArgument(6, $context);
         }
 
         if ($config['max_depth_handler'] ?? false) {
-            $arguments = $container->getDefinition('serializer.normalizer.object')->getArguments();
-            $context = ($arguments[6] ?? $defaultContext) + ['max_depth_handler' => new Reference($config['max_depth_handler'])];
-            $container->getDefinition('serializer.normalizer.object')->setArgument(6, $context);
+            $context += ($arguments[6] ?? $defaultContext) + ['max_depth_handler' => new Reference($config['max_depth_handler'])];
         }
+
+        $container->getDefinition('serializer.normalizer.object')->setArgument(6, $context);
     }
 
     private function registerPropertyInfoConfiguration(ContainerBuilder $container, PhpFileLoader $loader)

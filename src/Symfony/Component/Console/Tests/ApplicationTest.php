@@ -1303,7 +1303,7 @@ class ApplicationTest extends TestCase
     public static function getAddingAlreadySetDefinitionElementData(): array
     {
         return [
-            [new InputArgument('command', InputArgument::REQUIRED)],
+            [new InputArgument('command', InputArgument::REQUIRED, 'The command to execute')],
             [new InputOption('quiet', '', InputOption::VALUE_NONE)],
             [new InputOption('query', 'q', InputOption::VALUE_NONE)],
         ];

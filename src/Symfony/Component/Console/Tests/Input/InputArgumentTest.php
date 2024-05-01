@@ -27,7 +27,7 @@ class InputArgumentTest extends TestCase
         $this->assertEquals('foo', $argument->getName(), '__construct() takes a name as its first argument');
     }
 
-    public function testReservedArgumentName(): void
+    public function testReservedArgumentName()
     {
         self::expectException(InvalidArgumentException::class);
         self::expectExceptionMessage('Reserved keyword "command" was used as argument name.');

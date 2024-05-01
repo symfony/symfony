@@ -316,7 +316,7 @@ class ArgvInputTest extends TestCase
             ],
             [
                 ['cli.php', 'acme:foo', 'bar'],
-                new InputDefinition([new InputArgument('command', InputArgument::REQUIRED)]),
+                new InputDefinition([new InputArgument('command', InputArgument::REQUIRED, 'The command to execute')]),
                 'No arguments expected for "acme:foo" command, got "bar"',
             ],
             [

@@ -15,6 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Completion\CompletionInput;
 use Symfony\Component\Console\Completion\CompletionSuggestions;
 use Symfony\Component\Console\Completion\Suggestion;
+use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Symfony\Component\Console\Exception\LogicException;
 use Symfony\Component\Console\Input\InputArgument;
 
@@ -24,6 +25,13 @@ class InputArgumentTest extends TestCase
     {
         $argument = new InputArgument('foo');
         $this->assertEquals('foo', $argument->getName(), '__construct() takes a name as its first argument');
+    }
+
+    public function testReservedArgumentName(): void
+    {
+        self::expectException(InvalidArgumentException::class);
+        self::expectExceptionMessage('Reserved keyword "command" was used as argument name.');
+        new InputArgument('command');
     }
 
     public function testModes()

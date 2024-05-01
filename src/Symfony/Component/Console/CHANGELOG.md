@@ -5,6 +5,7 @@ CHANGELOG
 ---
 
  * Add `ArgvInput::getRawTokens()`
+ * Throws `InvalidArgumentException` if an argument was created with the reserved keyword `command` as name and is not the `command name` argument.
 
 7.0
 ---

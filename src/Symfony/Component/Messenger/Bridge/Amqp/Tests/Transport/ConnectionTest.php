@@ -297,7 +297,10 @@ class ConnectionTest extends TestCase
         $factory->method('createConnection')->willReturn($amqpConnection);
         $factory->method('createChannel')->willReturn($amqpChannel);
         $factory->method('createExchange')->willReturn($amqpExchange);
-        $factory->method('createQueue')->will($this->onConsecutiveCalls($amqpQueue0, $amqpQueue1));
+
+        $factory
+            ->method('createQueue')
+            ->willReturn($amqpQueue0, $amqpQueue1);
 
         $amqpExchange->expects($this->once())->method('declareExchange');
         $amqpExchange->expects($this->once())->method('publish')->with('body', 'routing_key', \AMQP_NOPARAM, ['headers' => [], 'delivery_mode' => 2, 'timestamp' => time()]);
@@ -349,7 +352,9 @@ class ConnectionTest extends TestCase
         $factory->method('createConnection')->willReturn($amqpConnection);
         $factory->method('createChannel')->willReturn($amqpChannel);
         $factory->method('createExchange')->willReturn($amqpExchange);
-        $factory->method('createQueue')->will($this->onConsecutiveCalls($amqpQueue0, $amqpQueue1));
+        $factory
+            ->method('createQueue')
+            ->willReturn($amqpQueue0, $amqpQueue1);
 
         $amqpExchange->expects($this->once())->method('declareExchange');
         $amqpExchange->expects($this->once())->method('publish')->with('body', 'routing_key', \AMQP_NOPARAM, ['headers' => [], 'delivery_mode' => 2, 'timestamp' => time()]);
@@ -464,14 +469,15 @@ class ConnectionTest extends TestCase
         $factory = $this->createMock(AmqpFactory::class);
         $factory->method('createConnection')->willReturn($amqpConnection);
         $factory->method('createChannel')->willReturn($amqpChannel);
-        $factory->method('createQueue')->will($this->onConsecutiveCalls(
-            $amqpQueue = $this->createMock(\AMQPQueue::class),
-            $delayQueue = $this->createMock(\AMQPQueue::class)
-        ));
-        $factory->method('createExchange')->will($this->onConsecutiveCalls(
-            $amqpExchange = $this->createMock(\AMQPExchange::class),
-            $delayExchange = $this->createMock(\AMQPExchange::class)
-        ));
+
+        $amqpQueue = $this->createMock(\AMQPQueue::class);
+        $factory
+            ->method('createQueue')
+            ->willReturn($amqpQueue, $this->createMock(\AMQPQueue::class));
+
+        $amqpExchange = $this->createMock(\AMQPExchange::class);
+        $delayExchange = $this->createMock(\AMQPExchange::class);
+        $factory->method('createExchange')->willReturn($amqpExchange, $delayExchange);
 
         $amqpExchange->expects($this->once())->method('setName')->with(self::DEFAULT_EXCHANGE_NAME);
         $amqpExchange->expects($this->once())->method('declareExchange');
@@ -522,14 +528,12 @@ class ConnectionTest extends TestCase
         $factory = $this->createMock(AmqpFactory::class);
         $factory->method('createConnection')->willReturn($amqpConnection);
         $factory->method('createChannel')->willReturn($amqpChannel);
-        $factory->method('createQueue')->will($this->onConsecutiveCalls(
-            $this->createMock(\AMQPQueue::class),
-            $delayQueue = $this->createMock(\AMQPQueue::class)
-        ));
-        $factory->method('createExchange')->will($this->onConsecutiveCalls(
-            $this->createMock(\AMQPExchange::class),
-            $delayExchange = $this->createMock(\AMQPExchange::class)
-        ));
+
+        $delayQueue = $this->createMock(\AMQPQueue::class);
+        $factory->method('createQueue')->willReturn($this->createMock(\AMQPQueue::class), $delayQueue);
+
+        $delayExchange = $this->createMock(\AMQPExchange::class);
+        $factory->method('createExchange')->willReturn($this->createMock(\AMQPExchange::class), $delayExchange);
 
         $connectionOptions = [
             'retry' => [
@@ -662,14 +666,12 @@ class ConnectionTest extends TestCase
         $factory = $this->createMock(AmqpFactory::class);
         $factory->method('createConnection')->willReturn($amqpConnection);
         $factory->method('createChannel')->willReturn($amqpChannel);
-        $factory->method('createQueue')->will($this->onConsecutiveCalls(
-            $this->createMock(\AMQPQueue::class),
-            $delayQueue = $this->createMock(\AMQPQueue::class)
-        ));
-        $factory->method('createExchange')->will($this->onConsecutiveCalls(
-            $this->createMock(\AMQPExchange::class),
-            $delayExchange = $this->createMock(\AMQPExchange::class)
-        ));
+
+        $delayQueue = $this->createMock(\AMQPQueue::class);
+        $factory->method('createQueue')->willReturn($this->createMock(\AMQPQueue::class), $delayQueue);
+
+        $delayExchange = $this->createMock(\AMQPExchange::class);
+        $factory->method('createExchange')->willReturn($this->createMock(\AMQPExchange::class), $delayExchange);
 
         $connectionOptions = [
             'retry' => [
@@ -855,14 +857,10 @@ class ConnectionTest extends TestCase
         $factory = $this->createMock(AmqpFactory::class);
         $factory->method('createConnection')->willReturn($amqpConnection);
         $factory->method('createChannel')->willReturn($amqpChannel);
-        $factory->method('createQueue')->will($this->onConsecutiveCalls(
-            $this->createMock(\AMQPQueue::class),
-            $delayQueue = $this->createMock(\AMQPQueue::class)
-        ));
-        $factory->method('createExchange')->will($this->onConsecutiveCalls(
-            $this->createMock(\AMQPExchange::class),
-            $delayExchange
-        ));
+
+        $delayQueue = $this->createMock(\AMQPQueue::class);
+        $factory->method('createQueue')->willReturn($this->createMock(\AMQPQueue::class), $delayQueue);
+        $factory->method('createExchange')->willReturn($this->createMock(\AMQPExchange::class), $delayExchange);
 
         $delayQueue->expects($this->once())->method('setName')->with($delayQueueName);
         $delayQueue->expects($this->once())->method('setArguments')->with([

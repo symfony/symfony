@@ -437,16 +437,16 @@ class AbstractObjectNormalizerTest extends TestCase
 
         if (method_exists(PhpDocExtractor::class, 'getType')) {
             $extractor->method('getType')
-                ->will($this->onConsecutiveCalls(
+                ->willReturn(
                     Type::list(Type::object(DummyChild::class)),
                     null,
-                ));
+                );
         } else {
             $extractor->method('getTypes')
-                ->will($this->onConsecutiveCalls(
+                ->willReturn(
                     [new LegacyType('array', false, null, true, new LegacyType('int'), new LegacyType('object', false, DummyChild::class))],
                     null
-                ));
+                );
         }
 
         $denormalizer = new AbstractObjectNormalizerCollectionDummy(null, null, $extractor);
@@ -501,16 +501,16 @@ class AbstractObjectNormalizerTest extends TestCase
 
         if (method_exists(PhpDocExtractor::class, 'getType')) {
             $extractor->method('getType')
-                ->will($this->onConsecutiveCalls(
+                ->willReturn(
                     Type::list(Type::string()),
                     null,
-                ));
+                );
         } else {
             $extractor->method('getTypes')
-                ->will($this->onConsecutiveCalls(
+                ->willReturn(
                     [new LegacyType('array', false, null, true, new LegacyType('int'), new LegacyType('string'))],
                     null
-                ));
+                );
         }
 
         $denormalizer = new AbstractObjectNormalizerCollectionDummy(null, null, $extractor);
@@ -697,7 +697,7 @@ class AbstractObjectNormalizerTest extends TestCase
 
         if (method_exists(PhpDocExtractor::class, 'getType')) {
             $extractor->method('getType')
-                ->will($this->onConsecutiveCalls(
+                ->willReturn(
                     Type::bool(),
                     Type::bool(),
                     Type::bool(),
@@ -710,10 +710,10 @@ class AbstractObjectNormalizerTest extends TestCase
                     Type::float(),
                     Type::float(),
                     Type::float(),
-                ));
+                );
         } else {
             $extractor->method('getTypes')
-                ->will($this->onConsecutiveCalls(
+                ->willReturn(
                     [new LegacyType('bool')],
                     [new LegacyType('bool')],
                     [new LegacyType('bool')],
@@ -726,7 +726,7 @@ class AbstractObjectNormalizerTest extends TestCase
                     [new LegacyType('float')],
                     [new LegacyType('float')],
                     [new LegacyType('float')]
-                ));
+                );
         }
 
         $denormalizer = new AbstractObjectNormalizerCollectionDummy(null, null, $extractor);
@@ -1086,8 +1086,7 @@ class AbstractObjectNormalizerTest extends TestCase
 
     public function testDenormalizeXmlScalar()
     {
-        $normalizer = new class () extends AbstractObjectNormalizer
-        {
+        $normalizer = new class() extends AbstractObjectNormalizer {
             public function __construct()
             {
                 parent::__construct(null, new MetadataAwareNameConverter(new ClassMetadataFactory(new AttributeLoader())));

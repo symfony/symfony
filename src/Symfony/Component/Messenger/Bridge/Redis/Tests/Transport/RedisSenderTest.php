@@ -30,7 +30,7 @@ class RedisSenderTest extends TestCase
         $connection->expects($this->once())->method('add')->with($encoded['body'], $encoded['headers'])->willReturn('THE_MESSAGE_ID');
 
         $serializer = $this->createMock(SerializerInterface::class);
-        $serializer->method('encode')->with($envelope)->willReturnOnConsecutiveCalls($encoded);
+        $serializer->method('encode')->with($envelope)->willReturn($encoded);
 
         $sender = new RedisSender($connection, $serializer);
 

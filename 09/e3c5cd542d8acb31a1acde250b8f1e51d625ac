@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by mtarld at 2024-04-30T13:04:56Z
+
+I should mark the new `getType` methods as experimental as well, and remove the deprecations on `getTypes` (they've been introduced in https://github.com/symfony/symfony/pull/53160). Also, the README has to be updated
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2024-04-30T13:06:09Z
+
+@mtarld see #54789

@@ -52,6 +52,7 @@ class Connection implements ResetInterface
     protected ?float $queueEmptiedAt = null;
 
     private bool $autoSetup;
+    private bool $doMysqlCleanup = false;
 
     /**
      * Constructor.
@@ -75,6 +76,7 @@ class Connection implements ResetInterface
     public function reset(): void
     {
         $this->queueEmptiedAt = null;
+        $this->doMysqlCleanup = false;
     }
 
     public function getConfiguration(): array
@@ -152,9 +154,10 @@ class Connection implements ResetInterface
 
     public function get(): ?array
     {
-        if ($this->driverConnection->getDatabasePlatform() instanceof AbstractMySQLPlatform) {
+        if ($this->doMysqlCleanup && $this->driverConnection->getDatabasePlatform() instanceof AbstractMySQLPlatform) {
             try {
                 $this->driverConnection->delete($this->configuration['table_name'], ['delivered_at' => '9999-12-31 23:59:59']);
+                $this->doMysqlCleanup = false;
             } catch (DriverException $e) {
                 // Ignore the exception
             } catch (TableNotFoundException $e) {
@@ -252,7 +255,11 @@ class Connection implements ResetInterface
     {
         try {
             if ($this->driverConnection->getDatabasePlatform() instanceof AbstractMySQLPlatform) {
-                return $this->driverConnection->update($this->configuration['table_name'], ['delivered_at' => '9999-12-31 23:59:59'], ['id' => $id]) > 0;
+                if ($updated = $this->driverConnection->update($this->configuration['table_name'], ['delivered_at' => '9999-12-31 23:59:59'], ['id' => $id]) > 0) {
+                    $this->doMysqlCleanup = true;
+                }
+
+                return $updated;
             }
 
             return $this->driverConnection->delete($this->configuration['table_name'], ['id' => $id]) > 0;
@@ -265,7 +272,11 @@ class Connection implements ResetInterface
     {
         try {
             if ($this->driverConnection->getDatabasePlatform() instanceof AbstractMySQLPlatform) {
-                return $this->driverConnection->update($this->configuration['table_name'], ['delivered_at' => '9999-12-31 23:59:59'], ['id' => $id]) > 0;
+                if ($updated = $this->driverConnection->update($this->configuration['table_name'], ['delivered_at' => '9999-12-31 23:59:59'], ['id' => $id]) > 0) {
+                    $this->doMysqlCleanup = true;
+                }
+
+                return $updated;
             }
 
             return $this->driverConnection->delete($this->configuration['table_name'], ['id' => $id]) > 0;

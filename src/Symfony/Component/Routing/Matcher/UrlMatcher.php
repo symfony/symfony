@@ -197,6 +197,10 @@ class UrlMatcher implements UrlMatcherInterface, RequestMatcherInterface
         }
         $attributes['_route'] = $name;
 
+        if ($mapping = $route->getOption('mapping')) {
+            $attributes['_route_mapping'] = $mapping;
+        }
+
         return $this->mergeDefaults($attributes, $defaults);
     }
 

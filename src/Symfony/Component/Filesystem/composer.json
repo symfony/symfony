@@ -21,7 +21,7 @@
         "symfony/polyfill-mbstring": "~1.8"
     },
     "require-dev": {
-        "symfony/process": "^5.4|^6.4"
+        "symfony/process": "^5.4|^6.4|^7.0"
     },
     "autoload": {
         "psr-4": { "Symfony\\Component\\Filesystem\\": "" },

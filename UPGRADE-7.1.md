@@ -29,6 +29,7 @@ Components
  * [ExpressionLanguage](#ExpressionLanguage)
  * [Form](#Form)
  * [Intl](#Intl)
+ * [HttpClient](#HttpClient)
  * [PropertyInfo](#PropertyInfo)
  * [Translation](#Translation)
  * [Workflow](#Workflow)
@@ -71,6 +72,11 @@ FrameworkBundle
  * Mark classes `ConfigBuilderCacheWarmer`, `Router`, `SerializerCacheWarmer`, `TranslationsCacheWarmer`, `Translator` and `ValidatorCacheWarmer` as `final`
  * Deprecate the `router.cache_dir` config option, the Router will always use the `kernel.build_dir` parameter
  * Reset env vars when resetting the container
+
+HttpClient
+----------
+
+ * Deprecate the `setLogger()` methods of the `NoPrivateNetworkHttpClient`, `TraceableHttpClient` and `ScopingHttpClient` classes, configure the logger of the wrapped clients directly instead
 
 Intl
 ----

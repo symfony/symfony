@@ -70,6 +70,7 @@ FrameworkBundle
 
  * Mark classes `ConfigBuilderCacheWarmer`, `Router`, `SerializerCacheWarmer`, `TranslationsCacheWarmer`, `Translator` and `ValidatorCacheWarmer` as `final`
  * Deprecate the `router.cache_dir` config option, the Router will always use the `kernel.build_dir` parameter
+ * Reset env vars when resetting the container
 
 Intl
 ----

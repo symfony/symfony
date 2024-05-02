@@ -14,6 +14,7 @@ CHANGELOG
  * [BC BREAK] When used in the `prependExtension()` method, the `ContainerConfigurator::import()` method now prepends the configuration instead of appending it
  * Cast env vars to null or bool when referencing them using `#[Autowire(env: '...')]` depending on the signature of the corresponding parameter
  * Add `#[AutowireInline]` attribute to allow service definition at the class level
+ * Add `StaticEnvVarLoader`
 
 7.0
 ---

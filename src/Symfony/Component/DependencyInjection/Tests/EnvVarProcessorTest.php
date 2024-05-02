@@ -136,6 +136,68 @@ class EnvVarProcessorTest extends TestCase
         $this->assertSame($processed, $result);
     }
 
+    public function testGetEnvCachesEnv()
+    {
+        $_ENV['FOO'] = '';
+
+        $GLOBALS['ENV_FOO'] = 'value';
+
+        $loaders = function () {
+            yield new class() implements EnvVarLoaderInterface {
+                public function loadEnvVars(): array
+                {
+                    return ['FOO' => $GLOBALS['ENV_FOO']];
+                }
+            };
+        };
+
+        $processor = new EnvVarProcessor(new Container(), new RewindableGenerator($loaders, 1));
+
+        $noop = function () {};
+
+        $result = $processor->getEnv('string', 'FOO', $noop);
+        $this->assertSame('value', $result);
+
+        $GLOBALS['ENV_FOO'] = 'new value';
+
+        $result = $processor->getEnv('string', 'FOO', $noop);
+        $this->assertSame('value', $result);
+
+        unset($_ENV['FOO'], $GLOBALS['ENV_FOO']);
+    }
+
+    public function testReset()
+    {
+        $_ENV['FOO'] = '';
+
+        $GLOBALS['ENV_FOO'] = 'value';
+
+        $loaders = function () {
+            yield new class() implements EnvVarLoaderInterface {
+                public function loadEnvVars(): array
+                {
+                    return ['FOO' => $GLOBALS['ENV_FOO']];
+                }
+            };
+        };
+
+        $processor = new EnvVarProcessor(new Container(), new RewindableGenerator($loaders, 1));
+
+        $noop = function () {};
+
+        $result = $processor->getEnv('string', 'FOO', $noop);
+        $this->assertSame('value', $result);
+
+        $GLOBALS['ENV_FOO'] = 'new value';
+
+        $processor->reset();
+
+        $result = $processor->getEnv('string', 'FOO', $noop);
+        $this->assertSame('new value', $result);
+
+        unset($_ENV['FOO'], $GLOBALS['ENV_FOO']);
+    }
+
     /**
      * @dataProvider validBools
      */
@@ -625,7 +687,7 @@ class EnvVarProcessorTest extends TestCase
             ['null', 'null'],
             ['Null', 'Null'],
             ['NULL', 'NULL'],
-         ];
+        ];
     }
 
     public function testRequireMissingFile()

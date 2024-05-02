@@ -1,0 +1,162 @@
+---------------------------------------------------------------------------
+
+by smnandre at 2024-04-18T21:20:55Z
+
+So all env vars would be reset ? Without option / configuration ? Or am i reading this wrong ?
+
+---------------------------------------------------------------------------
+
+by faizanakram99 at 2024-04-19T04:39:26Z
+
+> So all env vars would be reset ? Without option / configuration ? Or am i reading this wrong ?
+
+Yes (for now), I wasn't sure how to best make it opt-in (config based). Do you think it should be opt in?
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2024-04-19T07:15:12Z
+
+I'm all for the feature.
+
+> We could even consider this as a bugfix IMHO.
+
+This will a have a negative impact on performances for messenger applications that uses a slow custom env-var loader or processor.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-04-19T07:18:01Z
+
+> a slow custom env-var loader or processor.
+
+env loaders/processors are used on web requests, so they have to be fast anyway.
+and messenger is not on the hotpath, UX-wise.
+
+---------------------------------------------------------------------------
+
+by smnandre at 2024-04-19T07:33:51Z
+
+> > So all env vars would be reset ? Without option / configuration ? Or am i reading this wrong ?
+>
+> Yes (for now), I wasn't sure how to best make it opt-in (config based). Do you think it should be opt in?
+
+No, but that would probably need some doc on messenger page afterward :)
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2024-04-19T07:46:07Z
+
+If they process messages at high throughput, they are going to see a rapid impact on their infrastructure, with congested queues. I've been in that situation, I know it's the kind of change I would want to be notified about.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-04-19T08:30:23Z
+
+I'm not sure I understand your concern. As I wrote, env loaders/processors are used on web requests, so they have to be fast anyway. Fast enough for high-throughput.
+Note that reading env vars from `$_SERVER` is already really fast so we're talking about loading them from e.g. consult or similar.
+Are you talking about a real-life app where this could have impact?
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2024-04-19T14:04:39Z
+
+> I'm not sure I understand your concern. As I wrote, env loaders/processors are used on web requests, so they have to be fast anyway. Fast enough for high-throughput. Note that reading env vars from `$_SERVER` is already really fast so we're talking about loading them from e.g. consult or similar. Are you talking about a real-life app where this could have impact?
+
+Yes, I'm talking about an application that fetches certain variables from Hashicorp Vault, without using caches. As these variables were not used for the web, there were no problem. I wrote [an article about how I solved this issue](https://dev.to/gromnan/store-secrets-in-vault-with-symfony-51ai) and having resetable env var loader is a very great feature for this use-case, but I just wanted to warn that it's a change in behavior that I think is too important to be released as a bugfix.
+
+---------------------------------------------------------------------------
+
+by faizanakram99 at 2024-04-19T18:45:08Z
+
+fabbot errors are unrelated.
+
+---------------------------------------------------------------------------
+
+by faizanakram99 at 2024-04-22T13:12:34Z
+
+> fabbot errors are unrelated.
+
+~~fixed fabbot too~~
+
+reverted as per review
+
+---------------------------------------------------------------------------
+
+by faizanakram99 at 2024-04-26T21:18:44Z
+
+> This makes sense to me. Maybe we could also add a StaticEnvVarLoader that'd be a decorator of EnvVarLoaderInterface and that'd we use to decorate SodiumVault?
+
+What would `StaticEnvVarLoader` do? cache the env vars of internal EnvVarLoader (SodiumVault) so that subsequent calls to loadEnvVars won't require decrypting secrets again?
+
+---------------------------------------------------------------------------
+
+by faizanakram99 at 2024-04-26T21:30:47Z
+
+```diff
+Index: src/Symfony/Bundle/FrameworkBundle/Secrets/StaticEnvVarLoader.php
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/Symfony/Bundle/FrameworkBundle/Secrets/StaticEnvVarLoader.php b/src/Symfony/Bundle/FrameworkBundle/Secrets/StaticEnvVarLoader.php
+new file mode 100644
+--- /dev/null	(date 1714166958969)
++++ b/src/Symfony/Bundle/FrameworkBundle/Secrets/StaticEnvVarLoader.php	(date 1714166958969)
+@@ -0,0 +1,40 @@
++<?php
++
++/*
++ * This file is part of the Symfony package.
++ *
++ * (c) Fabien Potencier <fabien@symfony.com>
++ *
++ * For the full copyright and license information, please view the LICENSE
++ * file that was distributed with this source code.
++ */
++
++namespace Symfony\Bundle\FrameworkBundle\Secrets;
++
++use Symfony\Component\DependencyInjection\Attribute\AsDecorator;
++use Symfony\Component\DependencyInjection\Attribute\Autowire;
++use Symfony\Component\DependencyInjection\Attribute\AutowireDecorated;
++use Symfony\Component\DependencyInjection\EnvVarLoaderInterface;
++
++/**
++ * @internal
++ */
++#[AsDecorator('secrets.vault')]
++class StaticEnvVarLoader implements EnvVarLoaderInterface
++{
++    private array $envCache = [];
++
++    public function __construct(
++        #[AutowireDecorated]
++        private EnvVarLoaderInterface $envVarLoader,
++    ) {
++    }
++
++    public function loadEnvVars(): array
++    {
++        if ([] !== $this->envCache) {
++            return $this->envCache;
++        }
++
++        return $this->envCache = $this->envVarLoader->loadEnvVars();
++    }
++}
+```
+
+Like this?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-04-27T07:47:15Z
+
+Yes!
+
+---------------------------------------------------------------------------
+
+by faizanakram99 at 2024-04-29T11:05:42Z
+
+> This makes sense to me. Maybe we could also add a StaticEnvVarLoader that'd be a decorator of EnvVarLoaderInterface and that'd we use to decorate SodiumVault?
+
+Done https://github.com/symfony/symfony/pull/54666/commits/a88882039aba0e3089f15ce4dc5b2de3def7d0c5

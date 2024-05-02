@@ -1,0 +1,41 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2024-04-17T09:16:49Z
+
+As this is a new feature, this should target 7.1.
+
+---------------------------------------------------------------------------
+
+by giosh94mhz at 2024-04-17T10:52:17Z
+
+Thank you for your reply, @fabpot . I don't understand why you see this as a feature, maybe my explanation is a bit confusing.
+
+I try to explain it with an example. Suppose you have a consumer running and today you only sent a single message to it. The current implementation, will send 86400 DELETE statement to MySQL, while only 1 DELETE statement is expected after the job is handled.
+
+My change only ignores the 85399 useless DELETE, while keeping the only rightful DELETE that is right after the condition  `if ($this->doMysqlCleanup && ...)`.
+
+This is important especially in cluster replication, where the fix is not only a connection optimization. With replication, all statements are also written to the binary log and auditing log (wasting I/O) and transferred on all replica nodes (wasting network). Galera cluster likely have similar issues (bottleneck on the primary node for DELETE)
+
+In my use case I have 3 consumer and 2 backup nodes, that's account for 320k useless DELETEs while 100-200 per day are expected.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-04-23T09:36:44Z
+
+The number of DELETE is big, but it's not higher than the number of SELECT, so the DB can handle the load without much issues, isn't it? If confirmed, I'd also consider this as an optimization, not a bugfix.
+
+---------------------------------------------------------------------------
+
+by giosh94mhz at 2024-04-24T07:08:16Z
+
+> The number of DELETE is big, but it's not higher than the number of SELECT, so the DB can handle the load without much issues, isn't it?
+
+The database is handling the DELETEs without much issues, and yes for many LAMP-like server out there there won't be much difference. The fact that no one noticed this before, it's a clear hint for this fact.
+
+>  If confirmed, I'd also consider this as an optimization, not a bugfix.
+
+I don't want to appear selfish, but I'm not totally comfortable in calling this only a performance issue. A select is just READ LOCK + data fetch, while a DELETE it's at the very least a WRITE LOCK + data fetch, but for anyone using any form of mysql backup/cluster, also a Audit/Log write and multiple data transfer. The patch is not "optimizing" some query, but it's trimming away a huge amount of unjustified query, that was in the top 10 query of all servers.
+
+If you don't feel safe in applying this to branch 5.4 I do understand, just wanted to explain this issue well.
+
+PS: thank you for all your hard work with Symfony!

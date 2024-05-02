@@ -194,6 +194,8 @@ class PhpFileLoaderTest extends TestCase
      */
     public function testWhenEnv()
     {
+        $this->expectNotToPerformAssertions();
+
         $fixtures = realpath(__DIR__.'/../Fixtures');
         $container = new ContainerBuilder();
         $loader = new PhpFileLoader($container, new FileLocator(), 'dev', new ConfigBuilderGenerator(sys_get_temp_dir()));

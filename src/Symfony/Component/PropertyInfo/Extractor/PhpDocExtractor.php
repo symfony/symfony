@@ -118,13 +118,8 @@ class PhpDocExtractor implements PropertyDescriptionExtractorInterface, Property
         return '' === $contents ? null : $contents;
     }
 
-    /**
-     * @deprecated since Symfony 7.1, use "getType" instead
-     */
     public function getTypes(string $class, string $property, array $context = []): ?array
     {
-        trigger_deprecation('symfony/property-info', '7.1', 'The "%s()" method is deprecated, use "%s::getType()" instead.', __METHOD__, self::class);
-
         /** @var $docBlock DocBlock */
         [$docBlock, $source, $prefix] = $this->findDocBlock($class, $property);
         if (!$docBlock) {
@@ -176,13 +171,8 @@ class PhpDocExtractor implements PropertyDescriptionExtractorInterface, Property
         return [new LegacyType(LegacyType::BUILTIN_TYPE_ARRAY, false, null, true, new LegacyType(LegacyType::BUILTIN_TYPE_INT), $types[0])];
     }
 
-    /**
-     * @deprecated since Symfony 7.1, use "getTypeFromConstructor" instead
-     */
     public function getTypesFromConstructor(string $class, string $property): ?array
     {
-        trigger_deprecation('symfony/property-info', '7.1', 'The "%s()" method is deprecated, use "%s::getTypeFromConstructor()" instead.', __METHOD__, self::class);
-
         $docBlock = $this->getDocBlockFromConstructor($class, $property);
 
         if (!$docBlock) {
@@ -204,6 +194,9 @@ class PhpDocExtractor implements PropertyDescriptionExtractorInterface, Property
         return array_merge([], ...$types);
     }
 
+    /**
+     * @experimental
+     */
     public function getType(string $class, string $property, array $context = []): ?Type
     {
         /** @var $docBlock DocBlock */
@@ -263,6 +256,9 @@ class PhpDocExtractor implements PropertyDescriptionExtractorInterface, Property
         return Type::list($type);
     }
 
+    /**
+     * @experimental
+     */
     public function getTypeFromConstructor(string $class, string $property): ?Type
     {
         if (!$docBlock = $this->getDocBlockFromConstructor($class, $property)) {

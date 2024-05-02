@@ -29,6 +29,9 @@ final class ConstructorExtractor implements PropertyTypeExtractorInterface
     ) {
     }
 
+    /**
+     * @experimental
+     */
     public function getType(string $class, string $property, array $context = []): ?Type
     {
         foreach ($this->extractors as $extractor) {
@@ -40,13 +43,8 @@ final class ConstructorExtractor implements PropertyTypeExtractorInterface
         return null;
     }
 
-    /**
-     * @deprecated since Symfony 7.1, use "getType" instead
-     */
     public function getTypes(string $class, string $property, array $context = []): ?array
     {
-        trigger_deprecation('symfony/property-info', '7.1', 'The "%s()" method is deprecated, use "%s::getType()" instead.', __METHOD__, self::class);
-
         foreach ($this->extractors as $extractor) {
             $value = $extractor->getTypesFromConstructor($class, $property);
             if (null !== $value) {

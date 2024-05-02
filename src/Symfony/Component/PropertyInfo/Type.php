@@ -11,14 +11,10 @@
 
 namespace Symfony\Component\PropertyInfo;
 
-trigger_deprecation('symfony/property-info', '7.1', 'The "%s" class is deprecated. Use "%s" from the "symfony/type-info" component instead.', Type::class, \Symfony\Component\TypeInfo\Type::class);
-
 /**
  * Type value object (immutable).
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
- *
- * @deprecated since Symfony 7.1, use "Symfony\Component\TypeInfo\Type" from the "symfony/type-info" component instead
  *
  * @final
  */

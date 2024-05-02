@@ -1,0 +1,221 @@
+---------------------------------------------------------------------------
+
+by wkania at 2020-11-01T20:40:40Z
+
+The only not successful check is about the PHP attributes code syntax. I can't fix it.
+@derrabus Hi, should I do anything else?
+
+---------------------------------------------------------------------------
+
+by wkania at 2021-03-21T12:22:10Z
+
+Hi @derrabus, after reading the [conversation](https://github.com/symfony/symfony/pull/40291), I'm not sure should I fix those Psalm errors.
+UniqueEntity is not the only constraint affected by this.
+
+If it should be fixed, should it be part of this PR or should be fixed in all affected constraints? Also, should it be applied to branch 5.2, if we want branch 4.4 to remain stable?
+
+P.S.
+Waiting for the fabbot to use PHP-CS-Fixer 2.18.4, so it wouldn't report coding standards problems.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2021-03-21T12:45:49Z
+
+> Hi @derrabus, after reading the [conversation](https://github.com/symfony/symfony/pull/40291), I'm not sure should I fix those Psalm errors.
+
+Psalm's complaint is valid: we should not change the name of a parameter declared by an interface when implementing that interface. Yet, we do this already and this of course is not your fault. However I don't think we should now pick another name that differs from the upstream declared one.
+
+* Option A) We do not rename the parameter and live with the fact that `$entity` is not a 100% accurate variable name in your context.
+* Option B) We rename the parameter to `$value` as declared by `ConstraintValidatorInterface`.
+
+> Waiting for the fabbot to use PHP-CS-Fixer 2.18.4, so it wouldn't report coding standards problems.
+
+Fabbot currently reports two problems. One of them is valid. 😉
+
+---------------------------------------------------------------------------
+
+by wkania at 2021-03-21T13:08:39Z
+
+> We do not rename the parameter and live with the fact that $entity is not a 100% accurate variable name in your context.
+
+This PR changed it from the `$entity` to the `$object`. I can go with option B, but should it be part of another PR that would affect also branch 4.4 and not only 5.x?
+
+>   Fabbot currently reports two problems. One of them is valid. wink
+
+Ye, I only added the blank line to trigger Travis and see if Fabbot already uses the new version of PHP-CS-Fixer. I don't see any button (in Github UI) to run the tests again or info what version of PHP-CS-Fixer, Fabbot use.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2021-03-21T15:30:10Z
+
+> I can go with option B, but should it be part of another PR that would affect also branch 4.4 and not only 5.x?
+
+No, I wouldn't backport the parameter name change.
+
+> I only added the blank line to trigger Travis and see if Fabbot already uses the new version of PHP-CS-Fixer.
+
+Just remove that extra line again and don't mind the `\Attribute` issue. We are aware of the false positive and can ignore Fabbot when merging.
+
+---------------------------------------------------------------------------
+
+by wkania at 2021-03-21T20:19:49Z
+
+@derrabus Thx for the info. Fixed
+
+---------------------------------------------------------------------------
+
+by YaFou at 2021-06-22T13:14:19Z
+
+Any news here, may I help?
+
+---------------------------------------------------------------------------
+
+by wkania at 2021-08-06T12:14:38Z
+
+> Any news here, may I help?
+
+I finished the work with the code last year. Now I only rebase when there are conflicts with the main branch. The PR is waiting for the review/merge. It's targeted for the 5.4 milestone, so maybe.
+
+You could look at the documentation of this feature and maybe improve it.
+
+---------------------------------------------------------------------------
+
+by MikePolyakovsky at 2021-10-29T09:05:12Z
+
+Hi everyone, are there any updates on this?
+
+@derrabus @xabbuh can we have it reviewed & merged till 5.4 release?
+
+---------------------------------------------------------------------------
+
+by wkania at 2021-12-01T18:17:09Z
+
+I rebased. AppVeyor is not related.
+
+---------------------------------------------------------------------------
+
+by 1ed at 2022-03-26T17:53:50Z
+
+Hello, thank you for working on this. What do you think, could this be squeezed into 6.1?
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2022-08-09T07:35:59Z
+
+@wkania there seems to be some interest around this PR. So, could you please rebase it to Symfony 6.2? Thanks!
+
+---------------------------------------------------------------------------
+
+by wkania at 2022-08-14T08:52:15Z
+
+> @wkania there seems to be some interest around this PR. So, could you please rebase it to Symfony 6.2? Thanks!
+
+@javiereguiluz I rebased. Failing checks are not related.
+
+---------------------------------------------------------------------------
+
+by webda2l at 2023-04-05T09:09:52Z
+
+:crossed_fingers: 6.3 It's useful in APIP with DTO use by example.
+cc @dunglas maybe to give an approval :)
+
+---------------------------------------------------------------------------
+
+by Amunak at 2023-06-23T11:25:25Z
+
+Why is this stalled? Seems like such a logical extension to the validator, especially when Symfony is moving towards using DTOs more and more.
+
+I'd love to be able to use this; as it stands one has to do all validation manually and write custom validators (if you want it done properly) or have one-off code in controllers that adds validation errors when necessary.
+
+---------------------------------------------------------------------------
+
+by wkania at 2023-09-20T17:21:45Z
+
+Rebased, adapted to Coding Standards, and updated changelog.
+Failing tests are not related to the code.
+
+---------------------------------------------------------------------------
+
+by norkunas at 2023-10-20T12:42:36Z
+
+I do not understand the removal of "Feature freeze" label. This PR is going to be 4 years old already, but nobody cares to merge it while @wkania must rebase all the time. Just want to understand the reasons..
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2023-10-20T18:53:33Z
+
+We're just out of time for Symfony 6.4. But I totally hear the frustration of users waiting for a review... only to get that review so close to the feature freeze deadline that it's hard to update it. We all do our best with that process - but it's not easy. Also, smart people in the community can help review also ;)
+
+I'll see if I can give this another review this weekend, however. Even if it doesn't land in 6.4, I'll do my best to prep it for 7.1. It's a really nice idea.
+
+---------------------------------------------------------------------------
+
+by wkania at 2023-10-21T21:24:55Z
+
+Today PR is 3 years old. If it is accepted for the Symfony 7.1 application, that's good too.
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2023-10-23T12:52:42Z
+
+Happy birthday to your PR ;). I'll do my best to walk with you the rest of the way
+
+---------------------------------------------------------------------------
+
+by wkania at 2023-12-18T22:13:00Z
+
+@weaverryan I have rebased the code with branch 7.1, answered all questions and the diff is now smaller.
+Please review.
+
+---------------------------------------------------------------------------
+
+by wkania at 2023-12-27T17:20:11Z
+
+In 2021 carsonbot removed [Validator] from the title. Now we are back to the original title :).
+
+---------------------------------------------------------------------------
+
+by wkania at 2024-02-11T13:05:17Z
+
+Fixed merge conflict. [Commit](https://github.com/symfony/symfony/commit/f4118e110a46de3ffb799e7d79bf15128d1646ea) was the reason
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-02-11T13:09:07Z
+
+Can you please rebase (and squash while doing so)? We don't merge PRs with merge commits in them.
+
+---------------------------------------------------------------------------
+
+by wkania at 2024-02-12T08:27:06Z
+
+@nicolas-grekas So that there are no misunderstandings.
+So I shouldn't have used github UI to resolve merge conflict?
+I can squash all 38 commits into one?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-02-12T08:42:09Z
+
+I guess the UI doesn't help, I never use it myself.
+Yes, please squash all commits into one.
+
+---------------------------------------------------------------------------
+
+by wkania at 2024-02-12T08:46:05Z
+
+ok, I'll do it later today
+
+---------------------------------------------------------------------------
+
+by wkania at 2024-02-12T20:38:57Z
+
+Done
+
+---------------------------------------------------------------------------
+
+by flohw at 2024-04-15T07:06:20Z
+
+@nicolas-grekas @kbond
+Any update for this PR? End of may can be shortly in sight! :slightly_smiling_face:
+I doubt that @wkania will keep the pr up to date indefinitely. :grimacing:

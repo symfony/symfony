@@ -1,0 +1,162 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-11-30T19:14:37Z
+
+Thanks for proposing and for submitting!
+
+I'm wondering if we couldn't get rid of the interface and rename the proposed argument to e.g. `AutowireInline`?
+To remove the interface, we could maybe make AutowireCallable extend AutowireInline.
+Also, instead of a dedicated attribute for services built by factory, can't we add a `factory` argument to the AutowireInline attribute?
+
+---------------------------------------------------------------------------
+
+by DaDeather at 2023-12-01T07:11:57Z
+
+> Thanks for proposing and for submitting!
+>
+> I'm wondering if we couldn't get rid of the interface and rename the proposed argument to e.g. `AutowireInline`? To remove the interface, we could maybe make AutowireCallable extend AutowireInline. Also, instead of a dedicated attribute for services built by factory, can't we add a `factory` argument to the AutowireInline attribute?
+
+Sure I was unsure about the naming anyway though :see_no_evil:.
+
+About the interface:
+Wouldn't it rather make sense to keep it to allow extending / allowing custom Attributes that may create definitions that could be used for the Autowiring to be handled?
+
+I'd rather see it as a benefit there allowing one to implement the interface and go for it instead of extending the base classes like the `AutowireInline` (after renaming). Unless this may be undesired anyway :shrug:. Just being curious here.
+
+Combining the factory thing into the `AutowireInline` seems fine as well since both are inlined :+1:.
+
+I made the adjustments according to your comment unless the one with the Interface. Just let me know if I still should remove it / rename it or whatever :+1:.
+
+And thanks for your fast feedback on this!
+
+---------------------------------------------------------------------------
+
+by DaDeather at 2023-12-01T09:19:59Z
+
+> I'm not convinced by the interface, I'd prefer removing it. I'm generally not convinced by interfaces for value objects and attributes are value objects. Extending the class makes sense to me in this case.
+
+Alright :+1: I have removed the interface and based the `AutowireCallable` on the new `AutowireInline` as you proposed before.
+
+---------------------------------------------------------------------------
+
+by stof at 2023-12-01T09:40:30Z
+
+Please update the PR description to show usages of the feature. This makes it a lot easier for the documentation team (and also for reviewers)
+
+---------------------------------------------------------------------------
+
+by DaDeather at 2023-12-01T10:43:47Z
+
+> Please update the PR description to show usages of the feature. This makes it a lot easier for the documentation team (and also for reviewers)
+
+Done. Hope that fits your needs :smiley:
+
+---------------------------------------------------------------------------
+
+by DaDeather at 2023-12-04T12:59:47Z
+
+@nicolas-grekas is there anything left to do here for me :-)?
+
+Besides that I wasn't sure about the process:
+Do I resolve the threads or do you once you check if it's done?
+
+---------------------------------------------------------------------------
+
+by DaDeather at 2023-12-15T05:28:03Z
+
+> @nicolas-grekas is there anything left to do here for me :-)?
+>
+> Besides that I wasn't sure about the process: Do I resolve the threads or do you once you check if it's done?
+
+bump :shrug:
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-12-30T16:44:50Z
+
+> All my remaining concerns are related to the compilation process: discovering new service definitions in AutowirePass means we won't execute previously ran compiler passes on them.
+
+We could register those definitions found in attributes in loaders: when a service is declared as autowired, we scan its class attributes in the loader for extra services, using some naming convention that can easily be matched by AutowirePass at its turn.
+
+Thinking loud :)
+
+---------------------------------------------------------------------------
+
+by DaDeather at 2024-01-03T10:52:20Z
+
+> > All my remaining concerns are related to the compilation process: discovering new service definitions in AutowirePass means we won't execute previously ran compiler passes on them.
+>
+> We could register those definitions found in attributes in loaders: when a service is declared as autowired, we scan its class attributes in the loader for extra services, using some naming convention that can easily be matched by AutowirePass at its turn.
+>
+> Thinking loud :)
+
+I don't have that much knowledge in the compilation process of the dependency injection yet but if you'd point me in the direction I can do what's necessary to get this feature done / complete though :+1:.
+
+Looking at your previous comments it seems to me that we may have to make some adjustments to the way the `AutowireInline` attribute is being processed.
+
+So could you probably summarize for me if and what there is to do here so I can take over?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-02-27T15:34:56Z
+
+About my remaining concerns (`ResolveNamedArgumentsPass`, `ResolveChildDefinitionPass` and other pass not running), I'm wondering if we shouldn't add a new `ResolveAutowireInlineAttributesPass` that would scan autowired services for this attribute and would register definitions for each of them. Then, based on some naming convention (likely built on `Container::hash($definition)`), `AutowirePass` would just reference these definitions instead of calling `AutowireInline::buildDefinition()`.
+
+WDYT? Up to give it a try?
+
+---------------------------------------------------------------------------
+
+by DaDeather at 2024-03-06T09:14:44Z
+
+> About my remaining concerns (`ResolveNamedArgumentsPass`, `ResolveChildDefinitionPass` and other pass not running), I'm wondering if we shouldn't add a new `ResolveAutowireInlineAttributesPass` that would scan autowired services for this attribute and would register definitions for each of them. Then, based on some naming convention (likely built on `Container::hash($definition)`), `AutowirePass` would just reference these definitions instead of calling `AutowireInline::buildDefinition()`.
+>
+> WDYT? Up to give it a try?
+
+Sure!
+Could you maybe give a few hints how / where to implement this correctly?
+I'm struggling a bit with the input style and the expected outcome here and therefore maybe didn't understand what's really expected here.
+
+Would you expect a definition be like this:
+```php
+class AutowireInlineAttributesBar {
+    public function __construct(Foo $foo, string $someString)
+    {
+    }
+}
+
+class AutowireInlineAttributes
+{
+    public function __construct(
+        #[AutowireInline(AutowireInlineAttributesBar::class, [
+            '$foo' => Foo::class,
+            '$someString' => 'testString',
+        ])]
+        public AutowireInlineAttributesBar $inlined,
+    ) {
+    }
+}
+```
+
+Where the class `Foo` then would be a autowired as the provided service name and the `someString` injected as a string or what would you rather expect here to happen?
+
+Besides that if I got you right I would have to create a class called `ResolveAutowireInlineAttributesPass` which then checks for a passed `Definition` to be `$definition->isAutowired() === true` and check for it to have any `AutowireInline` attributes to be processed (calling `->buildDefinition(...)` and registering those via `$this->container->setDefinition(ContainerBuilder::hash($autowireInlineAttributeInstance), $definition);`.
+
+Is this assumption correct?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-03-06T11:19:39Z
+
+You've got it right I think :)
+
+---------------------------------------------------------------------------
+
+by DaDeather at 2024-03-07T07:05:44Z
+
+> You've got it right I think :)
+
+I've prepared something that doesn't quite work :shrug: as mentioned before maybe I'm missing something here. Could you maybe take a look so that we may correct the issues there or my misunderstanding :see_no_evil:?
+
+I would be grateful :+1: https://github.com/symfony/symfony/pull/52820/commits/dd16390a5290a9a08b2c997fa9d959296bb6f0e0
+
+@nicolas-grekas

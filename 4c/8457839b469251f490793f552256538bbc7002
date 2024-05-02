@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2024-04-18T09:13:53Z
+
+The deprecation should be documented in `UPRADE-7.1.md` and in the changelog file of TwigBundle though.
+
+---------------------------------------------------------------------------
+
+by Steveb-p at 2024-04-18T09:15:13Z
+
+> The deprecation should be documented in `UPRADE-7.1.md` and in the changelog file of TwigBundle though.
+
+I will follow up with this shortly :sweat_smile: I just need to check how they are usually done :)

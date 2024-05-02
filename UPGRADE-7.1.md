@@ -47,6 +47,7 @@ DependencyInjection
 -------------------
 
  * [BC BREAK] When used in the `prependExtension()` method, the `ContainerConfigurator::import()` method now prepends the configuration instead of appending it
+ * Deprecate `#[TaggedIterator]` and `#[TaggedLocator]` attributes, use `#[AutowireIterator]` and `#[AutowireLocator]` instead
 
 DoctrineBridge
 --------------

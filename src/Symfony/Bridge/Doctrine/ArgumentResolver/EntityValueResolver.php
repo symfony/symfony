@@ -157,7 +157,7 @@ final class EntityValueResolver implements ValueResolverInterface
             return $id ?? ($options->stripNull ? false : null);
         }
         if ($request->attributes->has('id')) {
-            trigger_deprecation('symfony/doctrine-bridge', '7.2', 'Relying on auto-mapping for Doctrine entities is deprecated for argument $%s of "%s": declare the mapping using either the #[MapEntity] attribute or mapped route parameters.', $argument->getName(), $argument->getControllerName());
+            trigger_deprecation('symfony/doctrine-bridge', '7.1', 'Relying on auto-mapping for Doctrine entities is deprecated for argument $%s of "%s": declare the mapping using either the #[MapEntity] attribute or mapped route parameters.', $argument->getName(), method_exists($argument, 'getControllerName') ? $argument->getControllerName() : 'n/a');
 
             return $request->attributes->get('id') ?? ($options->stripNull ? false : null);
         }
@@ -178,7 +178,7 @@ final class EntityValueResolver implements ValueResolverInterface
 
             return $criteria;
         } elseif (null === $mapping) {
-            trigger_deprecation('symfony/doctrine-bridge', '7.2', 'Relying on auto-mapping for Doctrine entities is deprecated for argument $%s of "%s": declare the identifier using either the #[MapEntity] attribute or mapped route parameters.', $argument->getName(), $argument->getControllerName());
+            trigger_deprecation('symfony/doctrine-bridge', '7.1', 'Relying on auto-mapping for Doctrine entities is deprecated for argument $%s of "%s": declare the identifier using either the #[MapEntity] attribute or mapped route parameters.', $argument->getName(), method_exists($argument, 'getControllerName') ? $argument->getControllerName() : 'n/a');
             $mapping = $request->attributes->keys();
         }
 

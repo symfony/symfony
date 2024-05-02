@@ -11,6 +11,7 @@ CHANGELOG
  * Add `$type` argument to `#[MapRequestPayload]` that allows mapping a list of items
  * Deprecate `Extension::addAnnotatedClassesToCompile()` and related code infrastructure
  * Add `#[MapUploadedFile]` attribute to fetch, validate, and inject uploaded files into controller arguments
+ * Support variadic argument with `#[MapRequestPayload]`
 
 7.0
 ---

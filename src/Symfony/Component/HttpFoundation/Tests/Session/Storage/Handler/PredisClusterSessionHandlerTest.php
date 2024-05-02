@@ -23,6 +23,9 @@ class PredisClusterSessionHandlerTest extends AbstractRedisSessionHandlerTestCas
      */
     protected function createRedisClient(string $host): object
     {
-        return new Client([array_combine(['host', 'port'], explode(':', getenv('REDIS_HOST')) + [1 => 6379])]);
+        return new Client(
+            [array_combine(['host', 'port'], explode(':', getenv('REDIS_HOST')) + [1 => 6379])],
+            ['cluster' => 'redis']
+        );
     }
 }

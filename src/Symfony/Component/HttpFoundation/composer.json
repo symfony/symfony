@@ -22,7 +22,7 @@
         "symfony/polyfill-php80": "^1.16"
     },
     "require-dev": {
-        "predis/predis": "~1.0",
+        "predis/predis": "^1.0|^2.0",
         "symfony/cache": "^4.4|^5.0|^6.0",
         "symfony/dependency-injection": "^5.4|^6.0",
         "symfony/http-kernel": "^5.4.12|^6.0.12|^6.1.4",

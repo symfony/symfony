@@ -184,7 +184,7 @@ class ArgumentResolverTest extends TestCase
         $controller = (new ArgumentResolverTestController())->controllerWithFoo(...);
 
         $this->expectException(\RuntimeException::class);
-        $this->expectExceptionMessage('Controller "Closure" requires the "$foo" argument that could not be resolved. Either the argument is nullable and no null value has been provided, no default value has been provided or there is a non-optional argument after this one.');
+        $this->expectExceptionMessage('Controller "'.ArgumentResolverTestController::class.'::controllerWithFoo" requires the "$foo" argument that could not be resolved. Either the argument is nullable and no null value has been provided, no default value has been provided or there is a non-optional argument after this one.');
         self::getResolver()->getArguments($request, $controller);
     }
 

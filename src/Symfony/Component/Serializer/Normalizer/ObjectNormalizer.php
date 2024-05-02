@@ -38,6 +38,7 @@ class ObjectNormalizer extends AbstractObjectNormalizer
 
     protected $propertyAccessor;
     protected $propertyInfoExtractor;
+    private $writeInfoExtractor;
 
     private readonly \Closure $objectClassResolver;
 
@@ -53,6 +54,7 @@ class ObjectNormalizer extends AbstractObjectNormalizer
 
         $this->objectClassResolver = ($objectClassResolver ?? static fn ($class) => \is_object($class) ? $class::class : $class)(...);
         $this->propertyInfoExtractor = $propertyInfoExtractor ?: new ReflectionExtractor();
+        $this->writeInfoExtractor = new ReflectionExtractor();
     }
 
     public function getSupportedTypes(?string $format): array
@@ -189,8 +191,15 @@ class ObjectNormalizer extends AbstractObjectNormalizer
             return $this->propertyInfoExtractor->isReadable($class, $attribute) || $this->hasAttributeAccessorMethod($class, $attribute);
         }
 
-        return $this->propertyInfoExtractor->isWritable($class, $attribute)
-            || ($writeInfo = $this->propertyInfoExtractor->getWriteInfo($class, $attribute)) && PropertyWriteInfo::TYPE_NONE !== $writeInfo->getType();
+        if ($this->propertyInfoExtractor->isWritable($class, $attribute)) {
+            return true;
+        }
+
+        if (($writeInfo = $this->writeInfoExtractor->getWriteInfo($class, $attribute)) && PropertyWriteInfo::TYPE_NONE !== $writeInfo->getType()) {
+            return true;
+        }
+
+        return false;
     }
 
     private function hasAttributeAccessorMethod(string $class, string $attribute): bool

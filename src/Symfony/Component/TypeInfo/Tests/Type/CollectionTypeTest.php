@@ -100,5 +100,12 @@ class CollectionTypeTest extends TestCase
         $this->assertTrue($type->isA(TypeIdentifier::ARRAY));
         $this->assertFalse($type->isA(TypeIdentifier::STRING));
         $this->assertFalse($type->isA(TypeIdentifier::INT));
+        $this->assertFalse($type->isA(self::class));
+
+        $type = new CollectionType(new GenericType(Type::object(self::class), Type::string(), Type::bool()));
+
+        $this->assertFalse($type->isA(TypeIdentifier::ARRAY));
+        $this->assertTrue($type->isA(TypeIdentifier::OBJECT));
+        $this->assertTrue($type->isA(self::class));
     }
 }

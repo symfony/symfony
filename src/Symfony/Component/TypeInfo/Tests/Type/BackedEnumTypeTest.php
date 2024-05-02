@@ -45,5 +45,9 @@ class BackedEnumTypeTest extends TestCase
     {
         $this->assertFalse((new BackedEnumType(DummyBackedEnum::class, Type::int()))->isA(TypeIdentifier::ARRAY));
         $this->assertTrue((new BackedEnumType(DummyBackedEnum::class, Type::int()))->isA(TypeIdentifier::OBJECT));
+        $this->assertFalse((new BackedEnumType(DummyBackedEnum::class, Type::int()))->isA(self::class));
+        $this->assertTrue((new BackedEnumType(DummyBackedEnum::class, Type::int()))->isA(DummyBackedEnum::class));
+        $this->assertTrue((new BackedEnumType(DummyBackedEnum::class, Type::int()))->isA(\BackedEnum::class));
+        $this->assertTrue((new BackedEnumType(DummyBackedEnum::class, Type::int()))->isA(\UnitEnum::class));
     }
 }

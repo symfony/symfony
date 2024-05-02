@@ -44,5 +44,8 @@ class EnumTypeTest extends TestCase
     {
         $this->assertFalse((new EnumType(DummyEnum::class))->isA(TypeIdentifier::ARRAY));
         $this->assertTrue((new EnumType(DummyEnum::class))->isA(TypeIdentifier::OBJECT));
+        $this->assertTrue((new EnumType(DummyEnum::class))->isA(DummyEnum::class));
+        $this->assertTrue((new EnumType(DummyEnum::class))->isA(\UnitEnum::class));
+        $this->assertFalse((new EnumType(DummyEnum::class))->isA(\BackedEnum::class));
     }
 }

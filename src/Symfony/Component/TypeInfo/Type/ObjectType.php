@@ -42,6 +42,15 @@ class ObjectType extends Type
         return TypeIdentifier::OBJECT;
     }
 
+    public function isA(TypeIdentifier|string $subject): bool
+    {
+        if ($subject instanceof TypeIdentifier) {
+            return $this->getTypeIdentifier() === $subject;
+        }
+
+        return is_a($this->getClassName(), $subject, allow_string: true);
+    }
+
     /**
      * @return T
      */

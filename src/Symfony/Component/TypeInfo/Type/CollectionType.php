@@ -58,6 +58,11 @@ final class CollectionType extends Type
         return $this->type;
     }
 
+    public function isA(TypeIdentifier|string $subject): bool
+    {
+        return $this->getType()->isA($subject);
+    }
+
     public function isList(): bool
     {
         return $this->isList;

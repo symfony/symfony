@@ -1,0 +1,81 @@
+---------------------------------------------------------------------------
+
+by stof at 2024-03-21T17:51:49Z
+
+Tests covering those 2 attributes must be updated to be marked as `@group legacy` (and we need to ensure that tests covering those deprecated attributes are not used to also cover other parts that should remain tested after their removal, to avoid loosing coverage, splitting such tests in a legacy test and a non-legacy one instead)
+
+---------------------------------------------------------------------------
+
+by smnandre at 2024-03-22T14:49:09Z
+
+Should this be more general...  i fear this could feel a bit of a half seated DX too, with
+
+```php
+
+return function (ContainerConfigurator $container): void {
+
+    $services->set(Two::class)
+        ->tag('app.handler', ['key' => 'handler_two']);
+
+    $services->set(App\HandlerCollection::class)
+        ->args([
+            // 2nd argument is the index attribute name
+            tagged_iterator('app.handler', 'key'),
+        ])
+    ;
+};
+```
+
+Versus
+
+```php
+class HandlerCollection
+{
+    public function __construct(
+        #[AutowireIterator('app.handler', indexAttribute: 'key')]
+        iterable $handlers
+    ) {
+    }
+}
+
+// ...
+
+#[AsTaggedItem(index: 'handler_one', priority: 10)]
+class One
+{
+    // ...
+}
+```
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2024-03-22T17:50:48Z
+
+You mean `tagged_iterator` is closer to `#[TaggedIterator]` than `#[AutowireIterator]`.
+
+But `#[AutowireIterator]` is part of the `#[Autowire]` attribute.
+
+In terms of DX, we currently have 2 attributes that does the exact same thing.
+
+---------------------------------------------------------------------------
+
+by smnandre at 2024-03-22T18:22:01Z
+
+I totally understand your motive here :)
+
+What i feel is a lack of consistency / predictability here, that could be difficult to explain / document / etc.
+
+| **Config** | **Locator** | **Item** |
+| - | - | - |
+| Attribute | AutowireLocator |  AsTaggedItem |
+| Config | tagged_locator |  tag |
+
+So maybe we could rename `AsTaggedItem` too (as it's only used for tagged locator / iterator) ?
+
+`AutowiredItem` ?
+
+---------------------------------------------------------------------------
+
+by stof at 2024-03-25T09:32:42Z
+
+The name `AsAutowiredItem` would be misleading, because `AsTaggedItem` is unrelated to autowiring. It is autoconfiguration that applies the tag on the item with those properties, not autowiring. And this `As*` naming convention is the one followed by autoconfiguration attributes.

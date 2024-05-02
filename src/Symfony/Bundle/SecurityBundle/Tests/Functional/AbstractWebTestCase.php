@@ -33,7 +33,7 @@ abstract class AbstractWebTestCase extends BaseWebTestCase
         static::deleteTmpDir();
     }
 
-    public function provideSecuritySystems()
+    public static function provideSecuritySystems()
     {
         yield [['enable_authenticator_manager' => true]];
         yield [['enable_authenticator_manager' => false]];

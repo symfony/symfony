@@ -1,0 +1,151 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-04-22T14:11:01Z
+
+Looking at your comments here, I wonder if we should keep #54668 or not?
+Maybe @yann-eugone can tell use how he wires the client so that we understant why adding LoggerAwareInterface helps?
+I'm not keen on the bump in composer.json, it'd prefer not doing it.
+
+---------------------------------------------------------------------------
+
+by yann-eugone at 2024-04-22T14:29:33Z
+
+Sure,
+
+On that project, constructing an `HttpClientInterface` is a thing that is done at runtime, because it all depend on configuration (what service you are trying to call)
+
+```php
+final class HttpClientFactory
+{
+    public function __construct(
+        private readonly HttpClientInterface $http,
+    ) {
+    }
+
+    public function create(Config $config, LoggerInterface $logger): HttpClientInterface
+    {
+        $client = match (...) {
+            Config::A => $this->clientA(),
+            Config::B => $this->clientB(),
+        };
+        if ($client instanceof LoggerAwareInterface) {
+            $client->setLogger($logger);
+        }
+
+        return $client;
+    }
+
+    private function clientA(): HttpClientInterface
+    {
+        return $this->http->withOptions([
+            ...
+        ]);
+    }
+
+    private function clientB(): HttpClientInterface
+    {
+        return $this->http->withOptions([
+            ...
+        ]);
+    }
+}
+```
+
+I'm using `Symfony\Contracts\HttpClient\HttpClientInterface::withOptions` because it's way safer for unit testing to clone a client provided from a constructor than having to build from the ground.
+
+As you can see, the `$logger` is provided in the factory method, because each feature has it's own logger instance, but they all share dependency on `HttpClientFactory`
+
+```php
+#[WithMonologChannel('feature1')]
+final class Feature1
+{
+    public function __construct(
+        private readonly HttpClientFactory $httpClientFactory,
+        private readonly LoggerInterface $logger,
+    ) {
+    }
+
+    public function method(Config $config): void
+    {
+        $http = $this->httpClientFactory->create($config, $this->logger);
+        ...
+    }
+}
+
+#[WithMonologChannel('feature2')]
+final class Feature2
+{
+    public function __construct(
+        private readonly HttpClientFactory $httpClientFactory,
+        private readonly LoggerInterface $logger,
+    ) {
+    }
+
+    public function method(Config $config): void
+    {
+        $http = $this->httpClientFactory->create($config, $this->logger);
+        ...
+    }
+}
+```
+
+I've only proposed adding `LoggerAwareInterface` because I saw that actual clients already implemented it, so I believed it was just about someone forgetting to add it everywhere.
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2024-04-22T19:36:28Z
+
+![CleanShot 2024-04-22 at 21 35 59@2x](https://github.com/symfony/symfony/assets/995707/0c1b2e19-d06b-4b78-93a4-79abeadc6275)
+create() ?
+
+---------------------------------------------------------------------------
+
+by yann-eugone at 2024-04-23T06:28:16Z
+
+@OskarStark yes, my bad. Just edited my comment.
+(I believe this is a reminder of why we are using IDE ^^)
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2024-04-24T07:03:51Z
+
+What about supporting passing the logger to `withOptions()` instead? This could look something like this in your factory then:
+
+```php
+private function clientA(LoggerInterface $logger): HttpClientInterface
+{
+    return $this->http->withOptions([
+        'extra' => [
+            'logger' => $logger,
+        ],
+        // ...
+    ]);
+}
+```
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-04-29T10:31:42Z
+
+I wonder if we need this PR at all: to me, the actual http client that does log should already have the logger wired. Did you check this aspect?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2024-04-30T09:11:47Z
+
+> to me, the actual http client that does log should already have the logger wired
+
+I agree with this reasoning. That's why I suggest to revert implementing the `LoggerAwareInterface` in HTTP client decorators.
+
+---------------------------------------------------------------------------
+
+by yann-eugone at 2024-04-30T10:11:25Z
+
+I don't have any opinion on this honestly
+But why removing `setLogger` on decorated clients, but not on actual ones ?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2024-04-30T10:24:09Z
+
+The actual clients do use the logger themselves. They do not use this property to configure another client. We can argue if using the interface was the right decision back when we introduced it, but that’s a different topic.

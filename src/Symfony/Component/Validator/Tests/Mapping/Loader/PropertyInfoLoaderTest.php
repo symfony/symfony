@@ -54,9 +54,10 @@ class PropertyInfoLoaderTest extends TestCase
                 'noAutoMapping',
             ])
         ;
+
         $propertyInfoStub
             ->method('getTypes')
-            ->will($this->onConsecutiveCalls(
+            ->willReturn(
                 [new Type(Type::BUILTIN_TYPE_STRING, true)],
                 [new Type(Type::BUILTIN_TYPE_STRING)],
                 [new Type(Type::BUILTIN_TYPE_STRING, true), new Type(Type::BUILTIN_TYPE_INT), new Type(Type::BUILTIN_TYPE_BOOL)],
@@ -69,11 +70,12 @@ class PropertyInfoLoaderTest extends TestCase
                 [new Type(Type::BUILTIN_TYPE_ARRAY, true, null, true, null, new Type(Type::BUILTIN_TYPE_FLOAT))],
                 [new Type(Type::BUILTIN_TYPE_STRING)],
                 [new Type(Type::BUILTIN_TYPE_STRING)]
-            ))
+            )
         ;
+
         $propertyInfoStub
             ->method('isWritable')
-            ->will($this->onConsecutiveCalls(
+            ->willReturn(
                 true,
                 true,
                 true,
@@ -86,7 +88,7 @@ class PropertyInfoLoaderTest extends TestCase
                 true,
                 false,
                 true
-            ))
+            )
         ;
 
         $propertyInfoLoader = new PropertyInfoLoader($propertyInfoStub, $propertyInfoStub, $propertyInfoStub, '{.*}');
@@ -221,9 +223,10 @@ class PropertyInfoLoaderTest extends TestCase
             ->method('getProperties')
             ->willReturn(['string', 'autoMappingExplicitlyEnabled'])
         ;
+
         $propertyInfoStub
             ->method('getTypes')
-            ->willReturnOnConsecutiveCalls(
+            ->willReturn(
                 [new Type(Type::BUILTIN_TYPE_STRING)],
                 [new Type(Type::BUILTIN_TYPE_BOOL)]
             );

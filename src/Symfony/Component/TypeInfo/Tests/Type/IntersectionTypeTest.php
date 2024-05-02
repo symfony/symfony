@@ -56,6 +56,12 @@ class IntersectionTypeTest extends TestCase
         $this->assertFalse($type->everyTypeIs(fn (Type $t) => $t instanceof BuiltinType));
     }
 
+    public function testGetBaseType()
+    {
+        $this->expectException(LogicException::class);
+        (new IntersectionType(Type::string(), Type::int()))->getBaseType();
+    }
+
     public function testToString()
     {
         $type = new IntersectionType(Type::int(), Type::string(), Type::float());

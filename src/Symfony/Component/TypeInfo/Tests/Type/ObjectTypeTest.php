@@ -27,6 +27,11 @@ class ObjectTypeTest extends TestCase
         $this->assertFalse((new ObjectType(self::class))->isNullable());
     }
 
+    public function testGetBaseType()
+    {
+        $this->assertEquals(new ObjectType(self::class), (new ObjectType(self::class))->getBaseType());
+    }
+
     public function testIsA()
     {
         $this->assertFalse((new ObjectType(self::class))->isA(TypeIdentifier::ARRAY));

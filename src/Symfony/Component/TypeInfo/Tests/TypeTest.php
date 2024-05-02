@@ -57,15 +57,6 @@ class TypeTest extends TestCase
         $this->assertFalse(Type::generic(Type::int(), Type::mixed())->isNullable());
     }
 
-    public function testGetBaseType()
-    {
-        $this->assertEquals(Type::string(), Type::string()->getBaseType());
-        $this->assertEquals(Type::object(self::class), Type::object(self::class)->getBaseType());
-        $this->assertEquals(Type::object(), Type::generic(Type::object(), Type::int())->getBaseType());
-        $this->assertEquals(Type::builtin(TypeIdentifier::ARRAY), Type::list()->getBaseType());
-        $this->assertEquals(Type::int(), Type::collection(Type::generic(Type::int(), Type::string()))->getBaseType());
-    }
-
     public function testCannotGetBaseTypeOnCompoundType()
     {
         $this->expectException(LogicException::class);

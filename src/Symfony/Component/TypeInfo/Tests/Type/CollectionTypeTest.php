@@ -74,6 +74,11 @@ class CollectionTypeTest extends TestCase
         $this->assertEquals('array<string,bool>', (string) $type);
     }
 
+    public function testGetBaseType()
+    {
+        $this->assertEquals(Type::int(), Type::collection(Type::generic(Type::int(), Type::string()))->getBaseType());
+    }
+
     public function testIsNullable()
     {
         $this->assertFalse((new CollectionType(Type::generic(Type::builtin(TypeIdentifier::ARRAY), Type::int())))->isNullable());

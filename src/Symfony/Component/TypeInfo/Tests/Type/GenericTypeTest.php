@@ -30,6 +30,11 @@ class GenericTypeTest extends TestCase
         $this->assertEquals(sprintf('%s<bool|string,int,float>', self::class), (string) $type);
     }
 
+    public function testGetBaseType()
+    {
+        $this->assertEquals(Type::object(), Type::generic(Type::object(), Type::int())->getBaseType());
+    }
+
     public function testIsNullable()
     {
         $this->assertFalse((new GenericType(Type::builtin(TypeIdentifier::ARRAY), Type::int()))->isNullable());

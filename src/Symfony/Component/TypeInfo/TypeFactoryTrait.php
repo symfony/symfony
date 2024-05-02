@@ -26,6 +26,8 @@ use Symfony\Component\TypeInfo\Type\UnionType;
  *
  * @author Mathias Arlaud <mathias.arlaud@gmail.com>
  * @author Baptiste Leduc <baptiste.leduc@gmail.com>
+ *
+ * @experimental
  */
 trait TypeFactoryTrait
 {

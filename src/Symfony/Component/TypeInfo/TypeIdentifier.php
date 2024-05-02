@@ -16,6 +16,8 @@ namespace Symfony\Component\TypeInfo;
  *
  * @author Mathias Arlaud <mathias.arlaud@gmail.com>
  * @author Baptiste Leduc <baptiste.leduc@gmail.com>
+ *
+ * @experimental
  */
 enum TypeIdentifier: string
 {

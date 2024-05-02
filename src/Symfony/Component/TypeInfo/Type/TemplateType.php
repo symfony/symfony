@@ -19,6 +19,8 @@ use Symfony\Component\TypeInfo\Type;
  *
  * @author Mathias Arlaud <mathias.arlaud@gmail.com>
  * @author Baptiste Leduc <baptiste.leduc@gmail.com>
+ *
+ * @experimental
  */
 final class TemplateType extends Type
 {

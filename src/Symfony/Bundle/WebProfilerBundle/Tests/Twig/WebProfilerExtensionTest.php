@@ -15,6 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\WebProfilerBundle\Twig\WebProfilerExtension;
 use Symfony\Component\VarDumper\Cloner\VarCloner;
 use Twig\Environment;
+use Twig\Loader\ArrayLoader;
 
 class WebProfilerExtensionTest extends TestCase
 {
@@ -23,7 +24,7 @@ class WebProfilerExtensionTest extends TestCase
      */
     public function testDumpHeaderIsDisplayed(string $message, array $context, bool $dump1HasHeader, bool $dump2HasHeader)
     {
-        $twigEnvironment = $this->mockTwigEnvironment();
+        $twigEnvironment = new Environment(new ArrayLoader());
         $varCloner = new VarCloner();
 
         $webProfilerExtension = new WebProfilerExtension();
@@ -43,14 +44,5 @@ class WebProfilerExtensionTest extends TestCase
         yield ['Some message {@see some text}', ['foo' => 'foo', 'bar' => 'bar'], false, true];
         yield ['Some message {foo}', ['foo' => 'foo', 'bar' => 'bar'], true, false];
         yield ['Some message {foo}', ['bar' => 'bar'], false, true];
-    }
-
-    private function mockTwigEnvironment()
-    {
-        $twigEnvironment = $this->createMock(Environment::class);
-
-        $twigEnvironment->expects($this->any())->method('getCharset')->willReturn('UTF-8');
-
-        return $twigEnvironment;
     }
 }

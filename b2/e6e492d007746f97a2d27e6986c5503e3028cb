@@ -1,0 +1,195 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-04-04T12:39:56Z
+
+I just confirmed on a real app that this solves all ambiguities while providing nice DX.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2024-04-06T13:13:27Z
+
+rebase needed and 👍
+
+---------------------------------------------------------------------------
+
+by bobvandevijver at 2024-04-08T16:17:50Z
+
+I believe this indeed solves an issue with automapping, but I am not really charmed that some automapping logic is still being executed when explicitly disabled. There is no convenient way to disable that behaviour as of now (expect for replacing the complete `EntityValueResolver`), which is an unexpected result when choose to disable the auto mapping feature. Maybe an additional property in the `MapEntity` attribute can solve this (where the default can be configured with DoctrineBundle).
+
+Note that this change can introduces unwanted behaviour (which is caused by already existing improper validation): when you explicitly configure a mapping yourself for a specific parameter which does not exist on your entity, that parameter is silently ignored and therefor also not added to the used attributes. However, it will now be used to resolve the next entity, which wasn't the case before this change when auto mapping was disabled. A smaller footgun, but still one nevertheless, and possibly harder to debug. But, can be solved by validating the mapping when set before applying auto mapping logic.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-04-08T19:45:00Z
+
+> automapping logic is still being executed when explicitly disabled
+
+Actually it's not. There's a "disabled" option if you really want to disable any mapping.
+
+---------------------------------------------------------------------------
+
+by bobvandevijver at 2024-04-09T07:16:40Z
+
+> Actually it's not. There's a "disabled" option if you really want to disable any mapping.
+
+Disabling any mapping is on a complete other level than disabling the auto mapping functionality, and you acknowledge this in your description as well:
+
+> In this PR, I'm proposing that when auto-mapping is disabled (aka when $mapping === []), we do map entities, but only by one single field.
+
+My main issue on auto mapping is with the implicit link between route parameters and entity properties. This PR makes it impossible to disable that implicit link. This implicit link is a DX issue on itself (which is why it is disabled by default), because it cannot be validated fully, in contrast with the name based autowiring which is validated at compile time.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-04-10T08:13:38Z
+
+PR rebased and ready to me.
+
+> There is no convenient way to disable that behaviour as of now
+
+There is to me: either provide an explicit mapping, or use disabled: true. If you mean fully disable by default, there's no real use case for listing an entity on a controller but not mapping it in any way so there must be an explicit mapping in existing apps when this is used today (or the route and the controller parameters match by name), which means one is always in control.
+
+> mapping yourself for a specific parameter which does not exist on your entity
+
+This looks like an edge case with no real life application. ~I don't know why we silently ignore such mappings. Maybe we should deprecate this behavior and throw in 8.0. That's for another PR though.~
+
+> My main issue on auto mapping is with the implicit link between route parameters and entity properties
+
+This ship has sailed: there are many apps that rely on this pattern and this is a DX-wanted behavior.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-04-10T08:31:12Z
+
+>> mapping yourself for a specific parameter which does not exist on your entity
+>
+> This looks like an edge case with no real life application. ~I don't know why we silently ignore such mappings. Maybe we should deprecate this behavior and throw in 8.0. That's for another PR though.~
+
+Got it! The reason why we ignore those is because we use the same code when explicit vs auto mapping is used.
+But when explicit mapping is used, this is certainly a mistake in the mapping. I'm therefor reversing my opinion on the topic and I added an exception in the case of an explicit mapping that leads to no field nor association.
+
+---------------------------------------------------------------------------
+
+by bobvandevijver at 2024-04-10T09:36:10Z
+
+> There is to me: either provide an explicit mapping, or use disabled: true.
+>
+> there must be an explicit mapping in existing apps when this is used today (or the route and the controller parameters match by name), which means one is always in control.
+
+If you have been providing an explicit mapping of `[]` which is used to disable automapping part of the resolver only (which is the full `getCriteria` method), with this change that is no longer respected and the new single key automapping is executed anyways. Note that I do not consider expr/id/name part of the auto mapping behaviour.
+
+The change proposed here introduces a new footgun in certain situations, as the resolving order now matters. Swap the controller arguments, be unlucky that you first entity also has a property equal to the name of the second one, and now the same argument is used to resolve both.
+
+```php
+#[Route('/category/{category}/product/{slug}')
+public function show(Product $product, Category $category): Response {
+  // category will be used to resolve Product entity, and again for the Category entity. slug is ignored.
+}
+```
+
+Is this something we would see in real world applications? Probably not. But is it easy to add something to disable automapping completely: I believe so.
+
+I just want having a way to only have the expr/id/name simple mapping by default, as is currenlty possible. I do not mind adding the explicit `#[MapEntity(mapping:['slug'])]` (note that `['slug' => 'slug']` is not needed) to those minority routes where simple mapping doesn't work (I actually have none over all my projects). The disable option disables the expr/id/name simple mapping as well. Extending the EntityValueResolve to just let the getCriteria method return directly isn't possible.
+
+A possible solution: introducing an entity resolver mode switch: simple/singlekey/all. Would fully resolve the ambiguity in my opinion.
+
+> But when explicit mapping is used, this is certainly a mistake in the mapping. I'm therefor reversing my opinion on the topic and I added an exception in the case of an explicit mapping that leads to no field nor association
+
+Great, love this addition! :+1:
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-04-10T09:43:43Z
+
+> If you have been providing an explicit mapping of `[]`
+
+yep, this will indeed behave differently if the only outcome you wanted from this mapping was to disable entity-mapping altogether. But if one wants that, they should use `disabled:true`, not this empty mapping.
+
+---------------------------------------------------------------------------
+
+by bobvandevijver at 2024-04-10T09:59:26Z
+
+> yep, this will indeed behave differently if the only outcome you wanted from this mapping was to disable entity-mapping altogether.
+
+No, this will behave differently if the only outcome you wanted is to disable _auto mapping_, which is what you can configure globally using the Doctrine Bundle.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-04-10T10:45:26Z
+
+Well, we circle back to https://github.com/symfony/symfony/pull/54455#issuecomment-2046855506: if you disabled automapping by default, then you must have added explicit mappings. And if you added an attribute with `mapping: []` explicitly, then you should use `disabled:true` instead.
+
+---------------------------------------------------------------------------
+
+by bobvandevijver at 2024-04-10T10:55:48Z
+
+> Well, we circle back to [#54455 (comment)](https://github.com/symfony/symfony/pull/54455#issuecomment-2046855506): if you disabled automapping by default, then you must have added explicit mappings. And if you added an attribute with `mapping: []` explicitly, then you should use `disabled:true` instead.
+
+That is because that statement is wrong. Explicit mappings are **not** required when auto mapping is disabled: the literal "id" and exact entity argument name match still work with auto mapping disabled. And that would not work when `disabled:true` has been set.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-04-10T10:57:38Z
+
+When there's an id or a match by name, the mapping behavior doesn't change with this PR.
+What's your point in the end?
+Do we have a consensus here?
+
+---------------------------------------------------------------------------
+
+by bobvandevijver at 2024-04-10T11:01:35Z
+
+The point is that I do not want any auto mapping enabled at all, I only want to allow id or name match. That was configurable, it isn't anymore with this change.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-04-10T12:06:16Z
+
+OK, but what's the side effect of this statement in practice? If you don't want any auto-mapping at all, just declare the mappings explicitly, which is already what you do, isn't it? If your point about people in your team which should be forbidden from using any kind of non-explicit mapping, then maybe a static analysis rule is more appropriate?
+
+I'm trying to find the sweet spot between DX and BC. I think this PR achieves this. We could make it more complex to configure the behavior, but in the end, it would be adding complexity, nothing more.
+
+---------------------------------------------------------------------------
+
+by bobvandevijver at 2024-04-10T14:29:55Z
+
+>  If you don't want any auto-mapping at all, just declare the mappings explicitly, which is already what you do, isn't it?
+
+No, there is not a single `MapEntity` attribute in my controller definitions. I do not need them as auto mapping has been disabled globally (`doctrine.orm.controller_resolver.auto_mapping: false`), and exact name matching is not part of auto mapping. That is also what I try to make clear in my documentation PR https://github.com/symfony/symfony-docs/pull/19671.
+
+The side effect is that any route parameter can still be used to resolve an entity if by some reason it has the same name as a property. This does not necessarily need to be one that is defined in the route attribute on your controller: it can come from anywhere (an actor putting adding one with a listener, from a parent route definition, ...). I do not want the resolver to even try accessing anything else except for the matching name (similar to the BackedEnumValueResolver).
+
+(Side note: depending on your route definition even the "id" parameter can be used multiple times for different entities, which is why I never use that in the routes either.)
+
+The change here only prevent parameter reuse in the same resolver, making it harder to trigger the footgun in a specific scenario (which can be largest one, I do not any statistics 🤷🏻‍♂️), but meanwhile it removes the option to disable parameter <> property matching completely. If you combine this with another resolver (lets keep a BackedEnum as example, which relies on the exact name), that same parameter can still be used by auto mapping and with this change even when auto mapping is disabled, but then for the single key auto mapping! Auto mapping will remain a potential foot gun, and with this change it becomes one that can no longer be explicitly disabled.
+
+Example:
+
+```php
+#[Route('/type/{type}/group/{group}')]
+public function search(LocationTypeEnum $type, ItemEntity $item): Response{}
+```
+
+`type` will now be used to resolve $item if ItemEntity also has some type property (not related to the intended LocationTypeEnum at all).
+
+To solve it, you will still need to define the explicit mapping here, which you would not expect:
+
+```php
+#[Route('/type/{type}/group/{group}')]
+public function search(LocationTypeEnum $type, [MapEntity(mapping: ['group'])] ItemEntity $item): Response{}
+```
+
+In conclusion: the proposal here is not the magic bullet that fully jams the foot gun I'm afraid.
+
+> I'm trying to find the sweet spot between DX and BC.
+
+And I absolutely agree with that sentiment, but for me that would be introducing a mode selector (if we want to keep single key auto mapping) so you can actually control its behaviour, and keep the current auto mapping disabled behaviour to not force it onto people that disabled it with good reason :+1:
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-04-24T16:21:53Z
+
+Thanks for the discussion. I came back after a few days of pause on the topic to keep an open mind and I'm happy to propose a new approach, based on #54720, which adds support for mapped route parameters.
+
+This PR is based on it (see 1st commit) and allows deprecating auto-mapping altogether.
+
+If we go this way, people that use auto-mapping to e.g. load a `$conference` based on its `{slug}` will have to declare the mapping by using `{slug:conference}` instead. That makes everything explicit and keeps a nice DX IMHO, by not forcing a `#[MapEntity]` attribute for simple cases.

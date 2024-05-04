@@ -266,6 +266,23 @@ class LdapManagerTest extends LdapTestCase
         $entryManager->addAttributeValues($entry, 'mail', $entry->getAttribute('mail'));
     }
 
+    public function testLdapApplyOperationsRemoveAll()
+    {
+        $entryManager = $this->adapter->getEntryManager();
+
+        $result = $this->executeSearchQuery(1);
+        $entry = $result[0];
+
+        $entryManager->applyOperations($entry->getDn(), [new UpdateOperation(\LDAP_MODIFY_BATCH_REMOVE_ALL, 'mail', null)]);
+
+        $result = $this->executeSearchQuery(1);
+        $entry = $result[0];
+
+        $this->assertNull($entry->getAttribute('mail'));
+
+        $entryManager->addAttributeValues($entry, 'mail', ['fabpot@symfony.com', 'fabien@potencier.com']);
+    }
+
     public function testLdapApplyOperationsRemoveAllWithArrayError()
     {
         $entryManager = $this->adapter->getEntryManager();

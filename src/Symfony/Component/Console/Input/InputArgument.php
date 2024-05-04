@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Console\Input;
 
+use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Completion\CompletionInput;
 use Symfony\Component\Console\Completion\CompletionSuggestions;
@@ -59,7 +60,7 @@ class InputArgument
         string|bool|int|float|array|null $default = null,
         private \Closure|array $suggestedValues = [],
     ) {
-        if ('command' === $name && 'The command to execute' !== $description) {
+        if ('command' === $name && Application::COMMAND_ARGUMENT_DESCRIPTION !== $description) {
             throw new InvalidArgumentException('The "command" keyword cannot be used as the argument name of a command.');
         }
         if (null === $mode) {

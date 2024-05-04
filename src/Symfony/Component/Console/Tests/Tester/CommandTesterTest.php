@@ -31,7 +31,7 @@ class CommandTesterTest extends TestCase
     protected function setUp(): void
     {
         $this->command = new Command('foo');
-        $this->command->addArgument('command', InputArgument::REQUIRED, 'The command to execute');
+        $this->command->addArgument('command', InputArgument::REQUIRED, Application::COMMAND_ARGUMENT_DESCRIPTION);
         $this->command->addArgument('foo');
         $this->command->setCode(function ($input, $output) { $output->writeln('foo'); });
 
@@ -232,7 +232,7 @@ class CommandTesterTest extends TestCase
     public function testErrorOutput()
     {
         $command = new Command('foo');
-        $command->addArgument('command', InputArgument::REQUIRED, 'The command to execute');
+        $command->addArgument('command', InputArgument::REQUIRED, Application::COMMAND_ARGUMENT_DESCRIPTION);
         $command->addArgument('foo');
         $command->setCode(function ($input, $output) {
             $output->getErrorOutput()->write('foo');

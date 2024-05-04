@@ -50,7 +50,7 @@ class InputArgument
      * @param string|bool|int|float|array|null                                              $default         The default value (for self::OPTIONAL mode only)
      * @param array|\Closure(CompletionInput,CompletionSuggestions):list<string|Suggestion> $suggestedValues The values used for input completion
      *
-     * @throws InvalidArgumentException When argument name is 'command' or mode is not valid
+     * @throws InvalidArgumentException When argument name is "command" or mode is not valid
      */
     public function __construct(
         private string $name,
@@ -60,7 +60,7 @@ class InputArgument
         private \Closure|array $suggestedValues = [],
     ) {
         if ('command' === $name && 'The command to execute' !== $description) {
-            throw new InvalidArgumentException('Reserved keyword "command" was used as argument name.');
+            throw new InvalidArgumentException('The "command" keyword cannot be used as the argument name of a command.');
         }
         if (null === $mode) {
             $mode = self::OPTIONAL;

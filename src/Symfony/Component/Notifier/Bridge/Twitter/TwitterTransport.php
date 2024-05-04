@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Notifier\Bridge\Twitter;
 
+use Symfony\Component\BrowserKit\Exception\LogicException;
 use Symfony\Component\Mime\Part\DataPart;
 use Symfony\Component\Mime\Part\File;
 use Symfony\Component\Mime\Part\Multipart\FormDataPart;
@@ -121,6 +122,10 @@ final class TwitterTransport extends AbstractTransport
 
         try {
             if (isset($options['attach'])) {
+                if (!class_exists(\Symfony\Component\Mime\Part\File::class)) {
+                    throw new LogicException('Unable to handle attachments as the Symfony Mime Component is not installed. Try running "composer require symfony/mime".');
+                }
+
                 $options['media']['media_ids'] = $this->uploadMedia($options['attach']);
                 unset($options['attach']);
             }

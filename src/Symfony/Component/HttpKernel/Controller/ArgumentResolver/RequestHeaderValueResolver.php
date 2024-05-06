@@ -13,6 +13,7 @@ namespace Symfony\Component\HttpKernel\Controller\ArgumentResolver;
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Attribute\MapRequestHeader;
+use Symfony\Component\HttpKernel\Attribute\MapRequestHeaders;
 use Symfony\Component\HttpKernel\Controller\ValueResolverInterface;
 use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
 use Symfony\Component\HttpKernel\Exception\HttpException;
@@ -40,7 +41,11 @@ class RequestHeaderValueResolver implements ValueResolverInterface
 
     public function resolve(Request $request, ArgumentMetadata $argument): iterable
     {
-        if (!$attribute = $argument->getAttributesOfType(MapRequestHeader::class)[0] ?? null) {
+        $attribute = $argument->getAttributesOfType(MapRequestHeader::class, ArgumentMetadata::IS_INSTANCEOF)[0]
+            ?? $argument->getAttributesOfType(MapRequestHeaders::class, ArgumentMetadata::IS_INSTANCEOF)[0]
+            ?? null;
+
+        if (!$attribute) {
             return [];
         }
 
@@ -51,6 +56,15 @@ class RequestHeaderValueResolver implements ValueResolverInterface
             $headers[$key] = implode(',', $value);
         });
 
+        if ($attribute instanceof MapRequestHeader) {
+            return $this->mapHeaderValues($headers, $argument, $attribute);
+        }
+
+        return $this->mapHeaderValuesToObject($headers, $argument, $attribute);
+    }
+
+    private function mapHeaderValues(array $headers, ArgumentMetadata $argument, MapRequestHeader $attribute): array
+    {
         $type = $argument->getType();
 
         if ('string' === $type || 'array' === $type) {
@@ -67,6 +81,11 @@ class RequestHeaderValueResolver implements ValueResolverInterface
             return [explode(',', $headers[$name])];
         }
 
+        throw new \LogicException(sprintf('Could not resolve the argument typed "%s". Valid values types are "array" or "string".', $type));
+    }
+
+    private function mapHeaderValuesToObject(array $headers, ArgumentMetadata $argument, MapRequestHeaders $attribute): array
+    {
         try {
             $payload = $this->serializer->denormalize($headers, $argument->getType(), null, self::CONTEXT_DESERIALIZE + $attribute->serializationContext);
         } catch (PartialDenormalizationException $e) {

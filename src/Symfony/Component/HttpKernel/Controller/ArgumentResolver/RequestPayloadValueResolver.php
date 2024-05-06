@@ -95,7 +95,6 @@ class RequestPayloadValueResolver implements ValueResolverInterface, EventSubscr
             } else {
                 continue;
             }
-
             $request = $event->getRequest();
 
             if (!$type = $argument->metadata->getType()) {

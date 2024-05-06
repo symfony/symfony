@@ -17,12 +17,13 @@ use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
 use Symfony\Component\Validator\Constraints\GroupSequence;
 
 #[\Attribute(\Attribute::TARGET_PARAMETER)]
-class MapRequestHeader extends ValueResolver
+class MapRequestHeaders extends ValueResolver
 {
     public ArgumentMetadata $metadata;
 
     public function __construct(
-        public readonly string|array|null $name = null,
+        public readonly array $serializationContext = [],
+        public readonly string|GroupSequence|array|null $validationGroups = null,
         string $resolver = RequestHeaderValueResolver::class,
         public readonly int $validationFailedStatusCode = Response::HTTP_UNPROCESSABLE_ENTITY,
     ) {

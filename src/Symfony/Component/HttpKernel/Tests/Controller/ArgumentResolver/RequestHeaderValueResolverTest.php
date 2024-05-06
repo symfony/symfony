@@ -14,6 +14,7 @@ namespace Symfony\Component\HttpKernel\Tests\Controller\ArgumentResolver;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Attribute\MapRequestHeader;
+use Symfony\Component\HttpKernel\Attribute\MapRequestHeaders;
 use Symfony\Component\HttpKernel\Controller\ArgumentResolver\RequestHeaderValueResolver;
 use Symfony\Component\HttpKernel\Controller\ValueResolverInterface;
 use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
@@ -38,7 +39,7 @@ class RequestHeaderValueResolverTest extends TestCase
     protected function setUp(): void
     {
         $serializer = new Serializer([new ObjectNormalizer()]);
-        $validator = (new ValidatorBuilder())->enableAnnotationMapping()->getValidator();
+        $validator = (new ValidatorBuilder())->enableAttributeMapping()->getValidator();
         $this->resolver = new RequestHeaderValueResolver($serializer, $validator);
     }
 
@@ -84,7 +85,7 @@ class RequestHeaderValueResolverTest extends TestCase
         $request = Request::create('/');
 
         $argument = new ArgumentMetadata('HeaderPayload', HeaderPayloadDto::class, false, false, null, false, [
-            MapRequestHeader::class => new MapRequestHeader(validationGroups: ['strict']),
+            MapRequestHeaders::class => new MapRequestHeaders(validationGroups: ['strict']),
         ]);
 
         try {
@@ -110,7 +111,7 @@ class RequestHeaderValueResolverTest extends TestCase
         $request = Request::create('/');
 
         $argument = new ArgumentMetadata('HeaderPayload', HeaderPayloadDto::class, false, false, null, false, [
-            MapRequestHeader::class => new MapRequestHeader(),
+            MapRequestHeaders::class => new MapRequestHeaders(),
         ]);
 
         $arguments = $this->resolver->resolve($request, $argument);

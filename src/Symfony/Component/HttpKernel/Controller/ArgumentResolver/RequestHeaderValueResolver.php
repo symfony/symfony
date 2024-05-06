@@ -105,7 +105,7 @@ class RequestHeaderValueResolver implements ValueResolverInterface
             $payload = match (true) {
                 $argument->hasDefaultValue() => $argument->getDefaultValue(),
                 $argument->isNullable() => null,
-                default => throw new HttpException($attribute->validationFailedStatusCode)
+                default => throw new HttpException($attribute->validationFailedStatusCode),
             };
         }
 

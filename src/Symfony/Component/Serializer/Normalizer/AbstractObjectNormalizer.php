@@ -462,7 +462,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
                 $builtinType = $type->getBuiltinType();
                 if (\is_string($data) && (XmlEncoder::FORMAT === $format || CsvEncoder::FORMAT === $format)) {
                     if ('' === $data) {
-                        if (LegacyLegacyType::BUILTIN_TYPE_ARRAY === $builtinType) {
+                        if (LegacyType::BUILTIN_TYPE_ARRAY === $builtinType) {
                             return [];
                         }
 

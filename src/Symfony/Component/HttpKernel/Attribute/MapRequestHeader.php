@@ -14,7 +14,6 @@ namespace Symfony\Component\HttpKernel\Attribute;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Controller\ArgumentResolver\RequestHeaderValueResolver;
 use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
-use Symfony\Component\Validator\Constraints\GroupSequence;
 
 #[\Attribute(\Attribute::TARGET_PARAMETER)]
 class MapRequestHeader extends ValueResolver

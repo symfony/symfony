@@ -37,10 +37,7 @@ final class CachePoolClearerCacheWarmer implements CacheWarmerInterface
         $this->pools = $pools;
     }
 
-    /**
-     * @return string[]
-     */
-    public function warmUp(string $cacheDirectory): array
+    public function warmUp(string $cacheDir, ?string $buildDir = null): array
     {
         foreach ($this->pools as $pool) {
             if ($this->poolClearer->hasPool($pool)) {

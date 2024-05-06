@@ -26,19 +26,11 @@ class MetadataBag implements SessionBagInterface
     public const UPDATED = 'u';
     public const LIFETIME = 'l';
 
+    protected array $meta = [self::CREATED => 0, self::UPDATED => 0, self::LIFETIME => 0];
+
     private string $name = '__metadata';
     private string $storageKey;
-
-    /**
-     * @var array
-     */
-    protected $meta = [self::CREATED => 0, self::UPDATED => 0, self::LIFETIME => 0];
-
-    /**
-     * Unix timestamp.
-     */
     private int $lastUsed;
-
     private int $updateThreshold;
 
     /**
@@ -51,10 +43,7 @@ class MetadataBag implements SessionBagInterface
         $this->updateThreshold = $updateThreshold;
     }
 
-    /**
-     * @return void
-     */
-    public function initialize(array &$array)
+    public function initialize(array &$array): void
     {
         $this->meta = &$array;
 
@@ -85,10 +74,8 @@ class MetadataBag implements SessionBagInterface
      *                           will leave the system settings unchanged, 0 sets the cookie
      *                           to expire with browser session. Time is in seconds, and is
      *                           not a Unix timestamp.
-     *
-     * @return void
      */
-    public function stampNew(int $lifetime = null)
+    public function stampNew(?int $lifetime = null): void
     {
         $this->stampCreated($lifetime);
     }
@@ -131,15 +118,13 @@ class MetadataBag implements SessionBagInterface
 
     /**
      * Sets name.
-     *
-     * @return void
      */
-    public function setName(string $name)
+    public function setName(string $name): void
     {
         $this->name = $name;
     }
 
-    private function stampCreated(int $lifetime = null): void
+    private function stampCreated(?int $lifetime = null): void
     {
         $timeStamp = time();
         $this->meta[self::CREATED] = $this->meta[self::UPDATED] = $this->lastUsed = $timeStamp;

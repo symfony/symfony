@@ -48,7 +48,7 @@ class Translator implements TranslatorInterface
     private array $pseudoClassTranslators = [];
     private array $attributeMatchingTranslators = [];
 
-    public function __construct(ParserInterface $parser = null)
+    public function __construct(?ParserInterface $parser = null)
     {
         $this->mainParser = $parser ?? new Parser();
 

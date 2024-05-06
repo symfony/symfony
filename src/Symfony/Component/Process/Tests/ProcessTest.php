@@ -16,6 +16,7 @@ use Symfony\Component\Process\Exception\InvalidArgumentException;
 use Symfony\Component\Process\Exception\LogicException;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 use Symfony\Component\Process\Exception\ProcessSignaledException;
+use Symfony\Component\Process\Exception\ProcessStartFailedException;
 use Symfony\Component\Process\Exception\ProcessTimedOutException;
 use Symfony\Component\Process\Exception\RuntimeException;
 use Symfony\Component\Process\InputStream;
@@ -64,6 +65,28 @@ class ProcessTest extends TestCase
 
         $cmd = new Process(['echo', 'test'], __DIR__.'/notfound/');
         $cmd->run();
+    }
+
+    /**
+     * @dataProvider invalidProcessProvider
+     */
+    public function testInvalidCommand(Process $process)
+    {
+        try {
+            $this->assertSame('\\' === \DIRECTORY_SEPARATOR ? 1 : 127, $process->run());
+        } catch (ProcessStartFailedException $e) {
+            // An invalid command might already fail during start since PHP 8.3 for platforms
+            // supporting posix_spawn(), see https://github.com/php/php-src/issues/12589
+            $this->assertStringContainsString('No such file or directory', $e->getMessage());
+        }
+    }
+
+    public function invalidProcessProvider()
+    {
+        return [
+            [new Process(['invalid'])],
+            [Process::fromShellCommandline('invalid')],
+        ];
     }
 
     /**
@@ -200,6 +223,20 @@ class ProcessTest extends TestCase
         $this->assertSame('foo'.\PHP_EOL, $data);
     }
 
+    public function testReadSupportIsDisabledWithoutCallback()
+    {
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('Pass the callback to the "Process::start" method or call enableOutput to use a callback with "Process::wait".');
+
+        $process = $this->getProcess('echo foo');
+        // disabling output + not passing a callback to start() => read support disabled
+        $process->disableOutput();
+        $process->start();
+        $process->wait(function ($type, $buffer) use (&$data) {
+            $data .= $buffer;
+        });
+    }
+
     /**
      * tests results from sub processes.
      *
@@ -291,11 +328,13 @@ class ProcessTest extends TestCase
     /**
      * @dataProvider provideInvalidInputValues
      */
-    public function testInvalidInput($value)
+    public function testInvalidInput(array|object $value)
     {
+        $process = $this->getProcess('foo');
+
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('"Symfony\Component\Process\Process::setInput" only accepts strings, Traversable objects or stream resources.');
-        $process = $this->getProcess('foo');
+
         $process->setInput($value);
     }
 
@@ -310,7 +349,7 @@ class ProcessTest extends TestCase
     /**
      * @dataProvider provideInputValues
      */
-    public function testValidInput($expected, $value)
+    public function testValidInput(?string $expected, float|string|null $value)
     {
         $process = $this->getProcess('foo');
         $process->setInput($value);
@@ -556,8 +595,10 @@ class ProcessTest extends TestCase
 
     public function testMustRunThrowsException()
     {
-        $this->expectException(ProcessFailedException::class);
         $process = $this->getProcess('exit 1');
+
+        $this->expectException(ProcessFailedException::class);
+
         $process->mustRun();
     }
 
@@ -935,9 +976,11 @@ class ProcessTest extends TestCase
 
     public function testSignalProcessNotRunning()
     {
+        $process = $this->getProcess('foo');
+
         $this->expectException(LogicException::class);
         $this->expectExceptionMessage('Cannot send signal on a non running process.');
-        $process = $this->getProcess('foo');
+
         $process->signal(1); // SIGHUP
     }
 
@@ -1025,20 +1068,24 @@ class ProcessTest extends TestCase
 
     public function testDisableOutputWhileRunningThrowsException()
     {
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Disabling output while the process is running is not possible.');
         $p = $this->getProcessForCode('sleep(39);');
         $p->start();
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Disabling output while the process is running is not possible.');
+
         $p->disableOutput();
     }
 
     public function testEnableOutputWhileRunningThrowsException()
     {
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Enabling output while the process is running is not possible.');
         $p = $this->getProcessForCode('sleep(40);');
         $p->disableOutput();
         $p->start();
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Enabling output while the process is running is not possible.');
+
         $p->enableOutput();
     }
 
@@ -1054,19 +1101,23 @@ class ProcessTest extends TestCase
 
     public function testDisableOutputWhileIdleTimeoutIsSet()
     {
-        $this->expectException(LogicException::class);
-        $this->expectExceptionMessage('Output cannot be disabled while an idle timeout is set.');
         $process = $this->getProcess('foo');
         $process->setIdleTimeout(1);
+
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('Output cannot be disabled while an idle timeout is set.');
+
         $process->disableOutput();
     }
 
     public function testSetIdleTimeoutWhileOutputIsDisabled()
     {
-        $this->expectException(LogicException::class);
-        $this->expectExceptionMessage('timeout cannot be set while the output is disabled.');
         $process = $this->getProcess('foo');
         $process->disableOutput();
+
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('timeout cannot be set while the output is disabled.');
+
         $process->setIdleTimeout(1);
     }
 
@@ -1082,11 +1133,13 @@ class ProcessTest extends TestCase
      */
     public function testGetOutputWhileDisabled($fetchMethod)
     {
-        $this->expectException(LogicException::class);
-        $this->expectExceptionMessage('Output has been disabled.');
         $p = $this->getProcessForCode('sleep(41);');
         $p->disableOutput();
         $p->start();
+
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('Output has been disabled.');
+
         $p->{$fetchMethod}();
     }
 
@@ -1486,17 +1539,21 @@ class ProcessTest extends TestCase
 
     public function testPreparedCommandWithMissingValue()
     {
+        $p = Process::fromShellCommandline('echo "${:abc}"');
+
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Command line is missing a value for parameter "abc": echo "${:abc}"');
-        $p = Process::fromShellCommandline('echo "${:abc}"');
+
         $p->run(null, ['bcd' => 'BCD']);
     }
 
     public function testPreparedCommandWithNoValues()
     {
+        $p = Process::fromShellCommandline('echo "${:abc}"');
+
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Command line is missing a value for parameter "abc": echo "${:abc}"');
-        $p = Process::fromShellCommandline('echo "${:abc}"');
+
         $p->run(null, []);
     }
 
@@ -1539,6 +1596,60 @@ class ProcessTest extends TestCase
         }
     }
 
+    public function testMultipleCallsToProcGetStatus()
+    {
+        $process = $this->getProcess('echo foo');
+        $process->start(static function () use ($process) {
+            return $process->isRunning();
+        });
+        while ($process->isRunning()) {
+            usleep(1000);
+        }
+        $this->assertSame(0, $process->getExitCode());
+    }
+
+    public function testFailingProcessWithMultipleCallsToProcGetStatus()
+    {
+        $process = $this->getProcess('exit 123');
+        $process->start(static function () use ($process) {
+            return $process->isRunning();
+        });
+        while ($process->isRunning()) {
+            usleep(1000);
+        }
+        $this->assertSame(123, $process->getExitCode());
+    }
+
+    /**
+     * @group slow
+     */
+    public function testLongRunningProcessWithMultipleCallsToProcGetStatus()
+    {
+        $process = $this->getProcess('sleep 1 && echo "done" && php -r "exit(0);"');
+        $process->start(static function () use ($process) {
+            return $process->isRunning();
+        });
+        while ($process->isRunning()) {
+            usleep(1000);
+        }
+        $this->assertSame(0, $process->getExitCode());
+    }
+
+    /**
+     * @group slow
+     */
+    public function testLongRunningProcessWithMultipleCallsToProcGetStatusError()
+    {
+        $process = $this->getProcess('sleep 1 && echo "failure" && php -r "exit(123);"');
+        $process->start(static function () use ($process) {
+            return $process->isRunning();
+        });
+        while ($process->isRunning()) {
+            usleep(1000);
+        }
+        $this->assertSame(123, $process->getExitCode());
+    }
+
     /**
      * @group transient-on-windows
      */
@@ -1552,7 +1663,37 @@ class ProcessTest extends TestCase
         $this->assertFalse($process->isRunning());
     }
 
-    private function getProcess(string|array $commandline, string $cwd = null, array $env = null, mixed $input = null, ?int $timeout = 60): Process
+    public function testIgnoringSignal()
+    {
+        if (!\function_exists('pcntl_signal')) {
+            $this->markTestSkipped('pnctl extension is required.');
+        }
+
+        $process = $this->getProcess('sleep 10');
+        $process->setIgnoredSignals([\SIGTERM]);
+
+        $process->start();
+        $process->stop(timeout: 0.2);
+
+        $this->assertNotSame(\SIGTERM, $process->getTermSignal());
+    }
+
+    // This test ensure that the previous test is reliable, in case of the sleep command ignoring the SIGTERM signal
+    public function testNotIgnoringSignal()
+    {
+        if (!\function_exists('pcntl_signal')) {
+            $this->markTestSkipped('pnctl extension is required.');
+        }
+
+        $process = $this->getProcess('sleep 10');
+
+        $process->start();
+        $process->stop(timeout: 0.2);
+
+        $this->assertSame(\SIGTERM, $process->getTermSignal());
+    }
+
+    private function getProcess(string|array $commandline, ?string $cwd = null, ?array $env = null, mixed $input = null, ?int $timeout = 60): Process
     {
         if (\is_string($commandline)) {
             $process = Process::fromShellCommandline($commandline, $cwd, $env, $input, $timeout);
@@ -1565,7 +1706,7 @@ class ProcessTest extends TestCase
         return self::$process = $process;
     }
 
-    private function getProcessForCode(string $code, string $cwd = null, array $env = null, $input = null, ?int $timeout = 60): Process
+    private function getProcessForCode(string $code, ?string $cwd = null, ?array $env = null, $input = null, ?int $timeout = 60): Process
     {
         return $this->getProcess([self::$phpBin, '-r', $code], $cwd, $env, $input, $timeout);
     }

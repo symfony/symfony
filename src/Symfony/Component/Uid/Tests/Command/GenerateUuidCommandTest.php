@@ -132,7 +132,7 @@ final class GenerateUuidCommandTest extends TestCase
         $this->assertStringContainsString('Only one of "--time-based", "--name-based" or "--random-based"', $commandTester->getDisplay());
     }
 
-    public static function provideInvalidCombinationOfBasedOptions()
+    public static function provideInvalidCombinationOfBasedOptions(): array
     {
         return [
             [['--time-based' => 'now', '--name-based' => 'foo']],
@@ -153,7 +153,7 @@ final class GenerateUuidCommandTest extends TestCase
         $this->assertStringContainsString('Option "--node" can only be used with "--time-based"', $commandTester->getDisplay());
     }
 
-    public static function provideExtraNodeOption()
+    public static function provideExtraNodeOption(): array
     {
         return [
             [['--node' => 'foo']],
@@ -173,7 +173,7 @@ final class GenerateUuidCommandTest extends TestCase
         $this->assertStringContainsString('Option "--namespace" can only be used with "--name-based"', $commandTester->getDisplay());
     }
 
-    public static function provideExtraNamespaceOption()
+    public static function provideExtraNamespaceOption(): array
     {
         return [
             [['--namespace' => 'foo']],

@@ -42,8 +42,6 @@ class FormErrorIterator implements \RecursiveIterator, \SeekableIterator, \Array
      */
     public const INDENTATION = '    ';
 
-    private FormInterface $form;
-
     /**
      * @var list<T>
      */
@@ -54,15 +52,16 @@ class FormErrorIterator implements \RecursiveIterator, \SeekableIterator, \Array
      *
      * @throws InvalidArgumentException If the errors are invalid
      */
-    public function __construct(FormInterface $form, array $errors)
-    {
+    public function __construct(
+        private FormInterface $form,
+        array $errors,
+    ) {
         foreach ($errors as $error) {
             if (!($error instanceof FormError || $error instanceof self)) {
                 throw new InvalidArgumentException(sprintf('The errors must be instances of "Symfony\Component\Form\FormError" or "%s". Got: "%s".', __CLASS__, get_debug_type($error)));
             }
         }
 
-        $this->form = $form;
         $this->errors = $errors;
     }
 

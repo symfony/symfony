@@ -40,5 +40,6 @@
             </framework:default-context>
         </framework:serializer>
         <framework:property-info />
+        <framework:type-info />
     </framework:config>
 </container>

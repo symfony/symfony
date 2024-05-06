@@ -219,17 +219,22 @@ class RouteCollectionTest extends TestCase
     public function testRemove()
     {
         $collection = new RouteCollection();
-        $collection->add('foo', $foo = new Route('/foo'));
+        $collection->add('foo', new Route('/foo'));
 
         $collection1 = new RouteCollection();
         $collection1->add('bar', $bar = new Route('/bar'));
         $collection->addCollection($collection1);
         $collection->add('last', $last = new Route('/last'));
+        $collection->addAlias('alias_removed_when_removing_route_foo', 'foo');
+        $collection->addAlias('alias_directly_removed', 'bar');
 
         $collection->remove('foo');
         $this->assertSame(['bar' => $bar, 'last' => $last], $collection->all(), '->remove() can remove a single route');
+        $collection->remove('alias_directly_removed');
+        $this->assertNull($collection->getAlias('alias_directly_removed'));
         $collection->remove(['bar', 'last']);
         $this->assertSame([], $collection->all(), '->remove() accepts an array and can remove multiple routes at once');
+        $this->assertNull($collection->getAlias('alias_removed_when_removing_route_foo'));
     }
 
     public function testSetHost()

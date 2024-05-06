@@ -23,11 +23,9 @@ use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
  */
 class UserPasswordHasher implements UserPasswordHasherInterface
 {
-    private PasswordHasherFactoryInterface $hasherFactory;
-
-    public function __construct(PasswordHasherFactoryInterface $hasherFactory)
-    {
-        $this->hasherFactory = $hasherFactory;
+    public function __construct(
+        private PasswordHasherFactoryInterface $hasherFactory,
+    ) {
     }
 
     public function hashPassword(PasswordAuthenticatedUserInterface $user, #[\SensitiveParameter] string $plainPassword): string

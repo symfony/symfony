@@ -174,9 +174,13 @@ return [
             'SHP',
             'St Helena Pɔn',
         ],
+        'SLE' => [
+            'SLE',
+            'Leone',
+        ],
         'SLL' => [
             'SLL',
-            'Leone',
+            'Leone (1964—2022)',
         ],
         'SOS' => [
             'SOS',

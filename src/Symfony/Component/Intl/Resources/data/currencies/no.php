@@ -220,7 +220,7 @@ return [
         ],
         'BYN' => [
             'BYN',
-            'nye hviterussiske rubler',
+            'nye belarusiske rubler',
         ],
         'BYR' => [
             'BYR',
@@ -898,9 +898,13 @@ return [
             'SKK',
             'slovakiske koruna',
         ],
+        'SLE' => [
+            'SLE',
+            'sierraleonske leone',
+        ],
         'SLL' => [
             'SLL',
-            'sierraleonske leone',
+            'sierraleonske leone (1964—2022)',
         ],
         'SOS' => [
             'SOS',

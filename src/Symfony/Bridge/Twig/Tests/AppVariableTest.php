@@ -41,7 +41,7 @@ class AppVariableTest extends TestCase
         $this->assertEquals($debugFlag, $this->appVariable->getDebug());
     }
 
-    public static function debugDataProvider()
+    public static function debugDataProvider(): array
     {
         return [
             'debug on' => [true],
@@ -291,12 +291,15 @@ class AppVariableTest extends TestCase
         $this->appVariable->getCurrent_route_parameters();
     }
 
-    protected function setRequestStack($request)
+    protected function setRequestStack(?Request $request)
     {
-        $requestStackMock = $this->createMock(RequestStack::class);
-        $requestStackMock->method('getCurrentRequest')->willReturn($request);
+        $requestStack = new RequestStack();
 
-        $this->appVariable->setRequestStack($requestStackMock);
+        if (null !== $request) {
+            $requestStack->push($request);
+        }
+
+        $this->appVariable->setRequestStack($requestStack);
     }
 
     protected function setTokenStorage($user)

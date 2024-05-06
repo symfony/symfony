@@ -13,6 +13,7 @@ namespace Symfony\Component\Cache\Tests\Adapter;
 
 use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
+use Symfony\Component\Cache\Tests\Fixtures\TestEnum;
 
 /**
  * @group time-sensitive
@@ -90,5 +91,15 @@ class ArrayAdapterTest extends AdapterTestCase
         $this->assertFalse($cache->hasItem('bar'));
         $this->assertTrue($cache->hasItem('buz'));
         $this->assertTrue($cache->hasItem('foo'));
+    }
+
+    public function testEnum()
+    {
+        $cache = new ArrayAdapter();
+        $item = $cache->getItem('foo');
+        $item->set(TestEnum::Foo);
+        $cache->save($item);
+
+        $this->assertSame(TestEnum::Foo, $cache->getItem('foo')->get());
     }
 }

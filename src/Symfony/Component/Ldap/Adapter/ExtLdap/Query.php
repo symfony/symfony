@@ -35,10 +35,7 @@ class Query extends AbstractQuery
         throw new \BadMethodCallException('Cannot serialize '.__CLASS__);
     }
 
-    /**
-     * @return void
-     */
-    public function __wakeup()
+    public function __wakeup(): void
     {
         throw new \BadMethodCallException('Cannot unserialize '.__CLASS__);
     }
@@ -110,7 +107,7 @@ class Query extends AbstractQuery
                         $this->resetPagination();
                     }
 
-                    throw new LdapException(sprintf('Could not complete search with dn "%s", query "%s" and filters "%s".%s.', $this->dn, $this->query, implode(',', $this->options['filter']), $ldapError));
+                    throw new LdapException(sprintf('Could not complete search with dn "%s", query "%s" and filters "%s".%s.', $this->dn, $this->query, implode(',', $this->options['filter']), $ldapError), $errno);
                 }
 
                 $this->results[] = $search;
@@ -178,7 +175,7 @@ class Query extends AbstractQuery
         // This is not supported in PHP < 7.2, so these versions will remain broken.
         $ctl = [];
         ldap_get_option($con, \LDAP_OPT_SERVER_CONTROLS, $ctl);
-        if (!empty($ctl)) {
+        if ($ctl) {
             foreach ($ctl as $idx => $info) {
                 if (static::PAGINATION_OID == $info['oid']) {
                     unset($ctl[$idx]);

@@ -13,13 +13,13 @@ PHRASE_DSN=phrase://PROJECT_ID:API_TOKEN@default?userAgent=myProject
 
 **DSN elements**
 
-- `PROJECT_ID`: can be retrieved in Phrase from `project settings > API > Project ID`
-- `API_TOKEN`: can be created in your [Phrase profile settings](https://app.phrase.com/settings/oauth_access_tokens)
-- `default`: endpoint, defaults to `api.phrase.com`
+ - `PROJECT_ID`: can be retrieved in Phrase from `project settings > API > Project ID`
+ - `API_TOKEN`: can be created in your [Phrase profile settings](https://app.phrase.com/settings/oauth_access_tokens)
+ - `default`: endpoint, defaults to `api.phrase.com`
 
 **Required DSN query parameters**
 
-- `userAgent`: please read [this](https://developers.phrase.com/api/#overview--identification-via-user-agent) for some examples.
+ - `userAgent`: please read [this](https://developers.phrase.com/api/#overview--identification-via-user-agent) for some examples.
 
 See [fine tuning your Phrase api calls](#fine-tuning-your-phrase-api-calls) for additional DSN options.
 
@@ -83,8 +83,8 @@ This provider uses the following default values for read and write requests. All
 Resources
 ---------
 
-* [Phrase strings API documentation](https://developers.phrase.com/api/#overview)
-* [Contributing](https://symfony.com/doc/current/contributing/index.html)
-* [Report issues](https://github.com/symfony/symfony/issues) and
-  [send Pull Requests](https://github.com/symfony/symfony/pulls)
-  in the [main Symfony repository](https://github.com/symfony/symfony)
+ * [Phrase strings API documentation](https://developers.phrase.com/api/#overview)
+ * [Contributing](https://symfony.com/doc/current/contributing/index.html)
+ * [Report issues](https://github.com/symfony/symfony/issues) and
+   [send Pull Requests](https://github.com/symfony/symfony/pulls)
+   in the [main Symfony repository](https://github.com/symfony/symfony)

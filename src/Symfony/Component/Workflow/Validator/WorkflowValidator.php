@@ -27,16 +27,13 @@ class WorkflowValidator implements DefinitionValidatorInterface
         $this->singlePlace = $singlePlace;
     }
 
-    /**
-     * @return void
-     */
-    public function validate(Definition $definition, string $name)
+    public function validate(Definition $definition, string $name): void
     {
         // Make sure all transitions for one place has unique name.
         $places = array_fill_keys($definition->getPlaces(), []);
         foreach ($definition->getTransitions() as $transition) {
             foreach ($transition->getFroms() as $from) {
-                if (\in_array($transition->getName(), $places[$from])) {
+                if (\in_array($transition->getName(), $places[$from], true)) {
                     throw new InvalidDefinitionException(sprintf('All transitions for a place must have an unique name. Multiple transitions named "%s" where found for place "%s" in workflow "%s".', $transition->getName(), $from, $name));
                 }
                 $places[$from][] = $transition->getName();

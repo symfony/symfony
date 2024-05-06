@@ -125,8 +125,7 @@ class SecurityRoutingIntegrationTest extends AbstractWebTestCase
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('The given value "256.357.458.559" in the "security.access_control" config option is not a valid IP address.');
 
-        $client = $this->createClient(['test_case' => 'StandardFormLogin', 'root_config' => 'invalid_ip_access_control.yml']);
-        $client->request('GET', '/unprotected_resource');
+        $this->createClient(['test_case' => 'StandardFormLogin', 'root_config' => 'invalid_ip_access_control.yml']);
     }
 
     public function testPublicHomepage()
@@ -151,7 +150,19 @@ class SecurityRoutingIntegrationTest extends AbstractWebTestCase
         $this->assertEquals(302, $client->getResponse()->getStatusCode());
     }
 
-    public static function provideConfigs()
+    public static function provideClientOptions(): iterable
+    {
+        yield [['test_case' => 'StandardFormLogin', 'root_config' => 'base_config.yml', 'enable_authenticator_manager' => true]];
+        yield [['test_case' => 'StandardFormLogin', 'root_config' => 'routes_as_path.yml', 'enable_authenticator_manager' => true]];
+    }
+
+    public static function provideLegacyClientOptions()
+    {
+        yield [['test_case' => 'StandardFormLogin', 'root_config' => 'base_config.yml', 'enable_authenticator_manager' => true]];
+        yield [['test_case' => 'StandardFormLogin', 'root_config' => 'routes_as_path.yml', 'enable_authenticator_manager' => true]];
+    }
+
+    public static function provideConfigs(): iterable
     {
         yield [['test_case' => 'StandardFormLogin', 'root_config' => 'base_config.yml']];
         yield [['test_case' => 'StandardFormLogin', 'root_config' => 'routes_as_path.yml']];

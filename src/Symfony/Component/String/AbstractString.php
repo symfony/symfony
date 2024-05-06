@@ -39,8 +39,8 @@ abstract class AbstractString implements \Stringable, \JsonSerializable
     public const PREG_SPLIT_DELIM_CAPTURE = \PREG_SPLIT_DELIM_CAPTURE;
     public const PREG_SPLIT_OFFSET_CAPTURE = \PREG_SPLIT_OFFSET_CAPTURE;
 
-    protected $string = '';
-    protected $ignoreCase = false;
+    protected string $string = '';
+    protected ?bool $ignoreCase = false;
 
     abstract public function __construct(string $string = '');
 
@@ -383,7 +383,7 @@ abstract class AbstractString implements \Stringable, \JsonSerializable
         return '' === $this->string;
     }
 
-    abstract public function join(array $strings, string $lastGlue = null): static;
+    abstract public function join(array $strings, ?string $lastGlue = null): static;
 
     public function jsonSerialize(): string
     {
@@ -429,16 +429,16 @@ abstract class AbstractString implements \Stringable, \JsonSerializable
 
     abstract public function reverse(): static;
 
-    abstract public function slice(int $start = 0, int $length = null): static;
+    abstract public function slice(int $start = 0, ?int $length = null): static;
 
     abstract public function snake(): static;
 
-    abstract public function splice(string $replacement, int $start = 0, int $length = null): static;
+    abstract public function splice(string $replacement, int $start = 0, ?int $length = null): static;
 
     /**
      * @return static[]
      */
-    public function split(string $delimiter, int $limit = null, int $flags = null): array
+    public function split(string $delimiter, ?int $limit = null, ?int $flags = null): array
     {
         if (null === $flags) {
             throw new \TypeError('Split behavior when $flags is null must be implemented by child classes.');
@@ -495,7 +495,7 @@ abstract class AbstractString implements \Stringable, \JsonSerializable
 
     abstract public function title(bool $allWords = false): static;
 
-    public function toByteString(string $toEncoding = null): ByteString
+    public function toByteString(?string $toEncoding = null): ByteString
     {
         $b = new ByteString();
 
@@ -507,20 +507,14 @@ abstract class AbstractString implements \Stringable, \JsonSerializable
             return $b;
         }
 
-        set_error_handler(static fn ($t, $m) => throw new InvalidArgumentException($m));
-
         try {
-            try {
-                $b->string = mb_convert_encoding($this->string, $toEncoding, 'UTF-8');
-            } catch (InvalidArgumentException $e) {
-                if (!\function_exists('iconv')) {
-                    throw $e;
-                }
-
-                $b->string = iconv('UTF-8', $toEncoding, $this->string);
+            $b->string = mb_convert_encoding($this->string, $toEncoding, 'UTF-8');
+        } catch (\ValueError $e) {
+            if (!\function_exists('iconv')) {
+                throw new InvalidArgumentException($e->getMessage(), $e->getCode(), $e);
             }
-        } finally {
-            restore_error_handler();
+
+            $b->string = iconv('UTF-8', $toEncoding, $this->string);
         }
 
         return $b;

@@ -18,7 +18,6 @@ use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Http\Authenticator\AuthenticatorInterface;
 use Symfony\Component\Security\Http\Authenticator\InteractiveAuthenticatorInterface;
 use Symfony\Component\Security\Http\Authenticator\Passport\Passport;
-use Symfony\Component\Security\Http\Authenticator\Passport\PassportInterface;
 use Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface;
 use Symfony\Component\Security\Http\EntryPoint\Exception\NotAnEntryPointException;
 
@@ -65,14 +64,6 @@ class LdapAuthenticator implements AuthenticationEntryPointInterface, Interactiv
         return $passport;
     }
 
-    /**
-     * @internal
-     */
-    public function createAuthenticatedToken(PassportInterface $passport, string $firewallName): TokenInterface
-    {
-        throw new \BadMethodCallException(sprintf('The "%s()" method cannot be called.', __METHOD__));
-    }
-
     public function createToken(Passport $passport, string $firewallName): TokenInterface
     {
         return $this->authenticator->createToken($passport, $firewallName);
@@ -88,7 +79,7 @@ class LdapAuthenticator implements AuthenticationEntryPointInterface, Interactiv
         return $this->authenticator->onAuthenticationFailure($request, $exception);
     }
 
-    public function start(Request $request, AuthenticationException $authException = null): Response
+    public function start(Request $request, ?AuthenticationException $authException = null): Response
     {
         if (!$this->authenticator instanceof AuthenticationEntryPointInterface) {
             throw new NotAnEntryPointException(sprintf('Decorated authenticator "%s" does not implement interface "%s".', get_debug_type($this->authenticator), AuthenticationEntryPointInterface::class));

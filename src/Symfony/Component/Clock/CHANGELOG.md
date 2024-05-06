@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+7.1
+---
+
+ * Add `DatePoint::getMicrosecond()` and `DatePoint::setMicrosecond()`
+
 6.4
 ---
 

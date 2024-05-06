@@ -18,11 +18,9 @@ namespace Symfony\Component\Config\Loader;
  */
 class ParamConfigurator
 {
-    private string $name;
-
-    public function __construct(string $name)
-    {
-        $this->name = $name;
+    public function __construct(
+        private string $name,
+    ) {
     }
 
     public function __toString(): string

@@ -16,15 +16,9 @@ namespace Symfony\Component\Serializer\Normalizer;
  */
 trait NormalizerAwareTrait
 {
-    /**
-     * @var NormalizerInterface
-     */
-    protected $normalizer;
+    protected NormalizerInterface $normalizer;
 
-    /**
-     * @return void
-     */
-    public function setNormalizer(NormalizerInterface $normalizer)
+    public function setNormalizer(NormalizerInterface $normalizer): void
     {
         $this->normalizer = $normalizer;
     }

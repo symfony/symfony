@@ -134,9 +134,10 @@ final class DomVisitor
             if ('#text' === $child->nodeName) {
                 // Add text directly for performance
                 $cursor->node->addChild(new TextNode($cursor->node, $child->nodeValue));
-            } elseif (!$child instanceof \DOMText) {
+            } elseif (!$child instanceof \DOMText && !$child instanceof \DOMProcessingInstruction) {
                 // Otherwise continue the visit recursively
                 // Ignore comments for security reasons (interpreted differently by browsers)
+                // Ignore processing instructions (treated as comments)
                 $this->visitNode($child, $cursor);
             }
         }

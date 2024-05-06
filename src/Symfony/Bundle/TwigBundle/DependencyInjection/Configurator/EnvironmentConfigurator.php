@@ -15,9 +15,6 @@ use Symfony\Bridge\Twig\UndefinedCallableHandler;
 use Twig\Environment;
 use Twig\Extension\CoreExtension;
 
-// BC/FC with namespaced Twig
-class_exists(Environment::class);
-
 /**
  * Twig environment configurator.
  *
@@ -42,10 +39,7 @@ class EnvironmentConfigurator
         $this->thousandsSeparator = $thousandsSeparator;
     }
 
-    /**
-     * @return void
-     */
-    public function configure(Environment $environment)
+    public function configure(Environment $environment): void
     {
         $environment->getExtension(CoreExtension::class)->setDateFormat($this->dateFormat, $this->intervalFormat);
 

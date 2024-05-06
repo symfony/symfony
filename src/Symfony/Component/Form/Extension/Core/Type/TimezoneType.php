@@ -25,10 +25,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class TimezoneType extends AbstractType
 {
-    /**
-     * @return void
-     */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         if ('datetimezone' === $options['input']) {
             $builder->addModelTransformer(new DateTimeZoneToStringTransformer($options['multiple']));
@@ -37,10 +34,7 @@ class TimezoneType extends AbstractType
         }
     }
 
-    /**
-     * @return void
-     */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
             'intl' => false,
@@ -112,7 +106,7 @@ class TimezoneType extends AbstractType
         return $timezones;
     }
 
-    private static function getIntlTimezones(string $input, string $locale = null): array
+    private static function getIntlTimezones(string $input, ?string $locale = null): array
     {
         $timezones = array_flip(Timezones::getNames($locale));
 

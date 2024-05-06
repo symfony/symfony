@@ -1,6 +1,17 @@
 CHANGELOG
 =========
 
+7.1
+---
+
+ * Allow custom meta location in `ResourceCheckerConfigCache`
+ * Allow custom meta location in `ConfigCache`
+
+7.0
+---
+
+ * Require explicit argument when calling `NodeBuilder::setParent()`
+
 6.3
 ---
 

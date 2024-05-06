@@ -108,6 +108,24 @@ final class OneSignalOptions implements MessageOptionsInterface
         return $this;
     }
 
+    /**
+     * Indicates that the passed recipient is an external user id.
+     *
+     * For more information on how to set an external user id in OneSignal please see:
+     * https://documentation.onesignal.com/docs/aliases-external-id
+     *
+     * For more information on how targeting based on external user id works please see:
+     * https://documentation.onesignal.com/reference/create-notification
+     *
+     * @return $this
+     */
+    public function isExternalUserId(bool $flag = true): static
+    {
+        $this->options['is_external_user_id'] = $flag;
+
+        return $this;
+    }
+
     public function getRecipientId(): ?string
     {
         return $this->options['recipient_id'] ?? null;

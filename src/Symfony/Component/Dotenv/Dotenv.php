@@ -25,7 +25,7 @@ use Symfony\Component\Process\Process;
  */
 final class Dotenv
 {
-    public const VARNAME_REGEX = '(?i:[A-Z][A-Z0-9_]*+)';
+    public const VARNAME_REGEX = '(?i:_?[A-Z][A-Z0-9_]*+)';
     public const STATE_VARNAME = 0;
     public const STATE_VALUE = 1;
 
@@ -35,15 +35,13 @@ final class Dotenv
     private string $data;
     private int $end;
     private array $values = [];
-    private string $envKey;
-    private string $debugKey;
     private array $prodEnvs = ['prod'];
     private bool $usePutenv = false;
 
-    public function __construct(string $envKey = 'APP_ENV', string $debugKey = 'APP_DEBUG')
-    {
-        $this->envKey = $envKey;
-        $this->debugKey = $debugKey;
+    public function __construct(
+        private string $envKey = 'APP_ENV',
+        private string $debugKey = 'APP_DEBUG',
+    ) {
     }
 
     /**
@@ -89,16 +87,19 @@ final class Dotenv
      * .env.local is always ignored in test env because tests should produce the same results for everyone.
      * .env.dist is loaded when it exists and .env is not found.
      *
-     * @param string      $path       A file to load
-     * @param string|null $envKey     The name of the env vars that defines the app env
-     * @param string      $defaultEnv The app env to use when none is defined
-     * @param array       $testEnvs   A list of app envs for which .env.local should be ignored
+     * @param string      $path                 A file to load
+     * @param string|null $envKey               The name of the env vars that defines the app env
+     * @param string      $defaultEnv           The app env to use when none is defined
+     * @param array       $testEnvs             A list of app envs for which .env.local should be ignored
+     * @param bool        $overrideExistingVars Whether existing environment variables set by the system should be overridden
      *
      * @throws FormatException when a file has a syntax error
      * @throws PathException   when a file does not exist or is not readable
      */
-    public function loadEnv(string $path, string $envKey = null, string $defaultEnv = 'dev', array $testEnvs = ['test'], bool $overrideExistingVars = false): void
+    public function loadEnv(string $path, ?string $envKey = null, string $defaultEnv = 'dev', array $testEnvs = ['test'], bool $overrideExistingVars = false): void
     {
+        $this->populatePath($path);
+
         $k = $envKey ?? $this->envKey;
 
         if (is_file($path) || !is_file($p = "$path.dist")) {
@@ -143,6 +144,7 @@ final class Dotenv
         $k = $this->envKey;
 
         if (\is_array($env) && ($overrideExistingVars || !isset($env[$k]) || ($_SERVER[$k] ?? $_ENV[$k] ?? $env[$k]) === $env[$k])) {
+            $this->populatePath($path);
             $this->populate($env, $overrideExistingVars);
         } else {
             $this->loadEnv($path, $k, $defaultEnv, $testEnvs, $overrideExistingVars);
@@ -173,7 +175,7 @@ final class Dotenv
      * Sets values as environment variables (via putenv, $_ENV, and $_SERVER).
      *
      * @param array $values               An array of env variables
-     * @param bool  $overrideExistingVars true when existing environment variables must be overridden
+     * @param bool  $overrideExistingVars Whether existing environment variables set by the system should be overridden
      */
     public function populate(array $values, bool $overrideExistingVars = false): void
     {
@@ -340,8 +342,8 @@ final class Dotenv
                 ++$this->cursor;
                 $value = str_replace(['\\"', '\r', '\n'], ['"', "\r", "\n"], $value);
                 $resolvedValue = $value;
-                $resolvedValue = $this->resolveVariables($resolvedValue, $loadedVars);
                 $resolvedValue = $this->resolveCommands($resolvedValue, $loadedVars);
+                $resolvedValue = $this->resolveVariables($resolvedValue, $loadedVars);
                 $resolvedValue = str_replace('\\\\', '\\', $resolvedValue);
                 $v .= $resolvedValue;
             } else {
@@ -363,8 +365,8 @@ final class Dotenv
                 }
                 $value = rtrim($value);
                 $resolvedValue = $value;
-                $resolvedValue = $this->resolveVariables($resolvedValue, $loadedVars);
                 $resolvedValue = $this->resolveCommands($resolvedValue, $loadedVars);
+                $resolvedValue = $this->resolveVariables($resolvedValue, $loadedVars);
                 $resolvedValue = str_replace('\\\\', '\\', $resolvedValue);
 
                 if ($resolvedValue === $value && preg_match('/\s+/', $value)) {
@@ -462,7 +464,7 @@ final class Dotenv
                 throw $this->createFormatException(sprintf('Issue expanding a command (%s)', $process->getErrorOutput()));
             }
 
-            return preg_replace('/[\r\n]+$/', '', $process->getOutput());
+            return rtrim($process->getOutput(), "\n\r");
         }, $value);
     }
 
@@ -553,6 +555,15 @@ final class Dotenv
             }
 
             $this->populate($this->parse(file_get_contents($path), $path), $overrideExistingVars);
+        }
+    }
+
+    private function populatePath(string $path): void
+    {
+        $_ENV['SYMFONY_DOTENV_PATH'] = $_SERVER['SYMFONY_DOTENV_PATH'] = $path;
+
+        if ($this->usePutenv) {
+            putenv('SYMFONY_DOTENV_PATH='.$path);
         }
     }
 }

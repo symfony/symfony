@@ -9,11 +9,11 @@
  * file that was distributed with this source code.
  */
 
-namespace Command;
+namespace Symfony\Component\AssetMapper\Tests\Command;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
-use Symfony\Component\AssetMapper\Tests\fixtures\AssetMapperTestAppKernel;
+use Symfony\Component\AssetMapper\Tests\Fixtures\AssetMapperTestAppKernel;
 use Symfony\Component\Console\Tester\CommandTester;
 
 class DebugAssetsMapperCommandTest extends TestCase

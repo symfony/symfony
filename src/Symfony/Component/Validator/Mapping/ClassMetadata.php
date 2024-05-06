@@ -87,6 +87,13 @@ class ClassMetadata extends GenericMetadata implements ClassMetadataInterface
     public bool $groupSequenceProvider = false;
 
     /**
+     * @internal This property is public in order to reduce the size of the
+     *           class' serialized representation. Do not access it. Use
+     *           {@link getGroupProvider()} instead.
+     */
+    public ?string $groupProvider = null;
+
+    /**
      * The strategy for traversing traversable objects.
      *
      * By default, only instances of {@link \Traversable} are traversed.
@@ -123,6 +130,7 @@ class ClassMetadata extends GenericMetadata implements ClassMetadataInterface
             'getters',
             'groupSequence',
             'groupSequenceProvider',
+            'groupProvider',
             'members',
             'name',
             'properties',
@@ -190,7 +198,7 @@ class ClassMetadata extends GenericMetadata implements ClassMetadataInterface
                     continue;
                 }
 
-                if ($property->hasType() && (('array' === $type = $property->getType()->getName()) || class_exists($type))) {
+                if ($this->canCascade($property->getType())) {
                     $this->addPropertyConstraint($property->getName(), new Valid());
                 }
             }
@@ -313,12 +321,11 @@ class ClassMetadata extends GenericMetadata implements ClassMetadataInterface
 
     /**
      * Merges the constraints of the given metadata into this object.
-     *
-     * @return void
      */
-    public function mergeConstraints(self $source)
+    public function mergeConstraints(self $source): void
     {
         if ($source->isGroupSequenceProvider()) {
+            $this->setGroupProvider($source->getGroupProvider());
             $this->setGroupSequenceProvider(true);
         }
 
@@ -422,17 +429,15 @@ class ClassMetadata extends GenericMetadata implements ClassMetadataInterface
     /**
      * Sets whether a group sequence provider should be used.
      *
-     * @return void
-     *
      * @throws GroupDefinitionException
      */
-    public function setGroupSequenceProvider(bool $active)
+    public function setGroupSequenceProvider(bool $active): void
     {
         if ($this->hasGroupSequence()) {
             throw new GroupDefinitionException('Defining a group sequence provider is not allowed with a static group sequence.');
         }
 
-        if (!$this->getReflectionClass()->implementsInterface(GroupSequenceProviderInterface::class)) {
+        if (null === $this->groupProvider && !$this->getReflectionClass()->implementsInterface(GroupSequenceProviderInterface::class)) {
             throw new GroupDefinitionException(sprintf('Class "%s" must implement GroupSequenceProviderInterface.', $this->name));
         }
 
@@ -442,6 +447,16 @@ class ClassMetadata extends GenericMetadata implements ClassMetadataInterface
     public function isGroupSequenceProvider(): bool
     {
         return $this->groupSequenceProvider;
+    }
+
+    public function setGroupProvider(?string $provider): void
+    {
+        $this->groupProvider = $provider;
+    }
+
+    public function getGroupProvider(): ?string
+    {
+        return $this->groupProvider;
     }
 
     public function getCascadingStrategy(): int
@@ -467,5 +482,34 @@ class ClassMetadata extends GenericMetadata implements ClassMetadataInterface
                 $this->checkConstraint($nestedConstraint);
             }
         }
+    }
+
+    private function canCascade(?\ReflectionType $type = null): bool
+    {
+        if (null === $type) {
+            return false;
+        }
+
+        if ($type instanceof \ReflectionIntersectionType) {
+            foreach ($type->getTypes() as $nestedType) {
+                if ($this->canCascade($nestedType)) {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        if ($type instanceof \ReflectionUnionType) {
+            foreach ($type->getTypes() as $nestedType) {
+                if (!$this->canCascade($nestedType)) {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        return $type instanceof \ReflectionNamedType && (\in_array($type->getName(), ['array', 'null'], true) || class_exists($type->getName()));
     }
 }

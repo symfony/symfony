@@ -59,10 +59,7 @@ class PdoCaster
         ],
     ];
 
-    /**
-     * @return array
-     */
-    public static function castPdo(\PDO $c, array $a, Stub $stub, bool $isNested)
+    public static function castPdo(\PDO $c, array $a, Stub $stub, bool $isNested): array
     {
         $attr = [];
         $errmode = $c->getAttribute(\PDO::ATTR_ERRMODE);
@@ -111,10 +108,7 @@ class PdoCaster
         return $a;
     }
 
-    /**
-     * @return array
-     */
-    public static function castPdoStatement(\PDOStatement $c, array $a, Stub $stub, bool $isNested)
+    public static function castPdoStatement(\PDOStatement $c, array $a, Stub $stub, bool $isNested): array
     {
         $prefix = Caster::PREFIX_VIRTUAL;
         $a[$prefix.'errorInfo'] = $c->errorInfo();

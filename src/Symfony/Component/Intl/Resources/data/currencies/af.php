@@ -534,9 +534,13 @@ return [
             'SHP',
             'Sint Helena-pond',
         ],
+        'SLE' => [
+            'SLE',
+            'Sierra Leoniese leone',
+        ],
         'SLL' => [
             'SLL',
-            'Sierra Leoniese leone',
+            'Sierra Leoniese leone (1964—2022)',
         ],
         'SOS' => [
             'SOS',

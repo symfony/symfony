@@ -27,10 +27,7 @@ use Symfony\Component\Config\Definition\Exception\InvalidTypeException;
  */
 class ScalarNode extends VariableNode
 {
-    /**
-     * @return void
-     */
-    protected function validateType(mixed $value)
+    protected function validateType(mixed $value): void
     {
         if (!\is_scalar($value) && null !== $value) {
             $ex = new InvalidTypeException(sprintf('Invalid type for path "%s". Expected "scalar", but got "%s".', $this->getPath(), get_debug_type($value)));

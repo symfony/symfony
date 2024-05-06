@@ -22,7 +22,7 @@ use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 abstract class Compound extends Composite
 {
     /** @var Constraint[] */
-    public $constraints = [];
+    public array $constraints = [];
 
     public function __construct(mixed $options = null)
     {
@@ -46,6 +46,8 @@ abstract class Compound extends Composite
     }
 
     /**
+     * @param array<string, mixed> $options
+     *
      * @return Constraint[]
      */
     abstract protected function getConstraints(array $options): array;

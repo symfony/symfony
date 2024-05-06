@@ -16,10 +16,9 @@ namespace Symfony\Bundle\FrameworkBundle\Secrets;
  */
 class DotenvVault extends AbstractVault
 {
-    private string $dotenvFile;
-
-    public function __construct(string $dotenvFile)
-    {
+    public function __construct(
+        private string $dotenvFile,
+    ) {
         $this->dotenvFile = strtr($dotenvFile, '/', \DIRECTORY_SEPARATOR);
     }
 

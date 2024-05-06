@@ -18,16 +18,13 @@ use Symfony\Component\AssetMapper\ImportMap\ImportMapRenderer;
  */
 class ImportMapRuntime
 {
-    public function __construct(private readonly ImportMapRenderer $importMapRenderer)
-    {
+    public function __construct(
+        private readonly ImportMapRenderer $importMapRenderer,
+    ) {
     }
 
-    public function importmap(string|array|null $entryPoint = 'app', array $attributes = []): string
+    public function importmap(string|array $entryPoint = 'app', array $attributes = []): string
     {
-        if (null === $entryPoint) {
-            trigger_deprecation('symfony/twig-bridge', '6.4', 'Passing null as the first argument of the "importmap" Twig function is deprecated, pass an empty array if no entrypoints are desired.');
-        }
-
         return $this->importMapRenderer->render($entryPoint, $attributes);
     }
 }

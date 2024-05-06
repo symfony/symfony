@@ -11,9 +11,13 @@
         <service id="project.service.foo" class="BAR" public="true"/>
     </services>
 
-    <project:bar babar="babar">
+    <project:bar foo="ping">
         <another />
         <another2>%project.parameter.foo%</another2>
     </project:bar>
 
+    <when env="test">
+        <project:bar foo="zaa">
+        </project:bar>
+    </when>
 </container>

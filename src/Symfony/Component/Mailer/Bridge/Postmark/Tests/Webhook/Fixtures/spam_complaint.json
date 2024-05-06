@@ -16,7 +16,7 @@
     "Details": "Test spam complaint details",
     "Email": "john@example.com",
     "From": "sender@example.com",
-    "BouncedAt": "2022-09-02T14:29:57Z",
+    "BouncedAt": "2022-09-02T14:29:57.123456Z",
     "DumpAvailable": true,
     "Inactive": true,
     "CanActivate": false,

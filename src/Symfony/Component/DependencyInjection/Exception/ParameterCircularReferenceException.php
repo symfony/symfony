@@ -20,17 +20,14 @@ class ParameterCircularReferenceException extends RuntimeException
 {
     private array $parameters;
 
-    public function __construct(array $parameters, \Throwable $previous = null)
+    public function __construct(array $parameters, ?\Throwable $previous = null)
     {
         parent::__construct(sprintf('Circular reference detected for parameter "%s" ("%s" > "%s").', $parameters[0], implode('" > "', $parameters), $parameters[0]), 0, $previous);
 
         $this->parameters = $parameters;
     }
 
-    /**
-     * @return array
-     */
-    public function getParameters()
+    public function getParameters(): array
     {
         return $this->parameters;
     }

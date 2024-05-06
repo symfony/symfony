@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\PropertyInfo;
 
+use Symfony\Component\TypeInfo\Type;
+
 /**
  * Default {@see PropertyInfoExtractorInterface} implementation.
  *
@@ -49,6 +51,14 @@ class PropertyInfoExtractor implements PropertyInfoExtractorInterface, PropertyI
     public function getLongDescription(string $class, string $property, array $context = []): ?string
     {
         return $this->extract($this->descriptionExtractors, 'getLongDescription', [$class, $property, $context]);
+    }
+
+    /**
+     * @experimental
+     */
+    public function getType(string $class, string $property, array $context = []): ?Type
+    {
+        return $this->extract($this->typeExtractors, 'getType', [$class, $property, $context]);
     }
 
     public function getTypes(string $class, string $property, array $context = []): ?array

@@ -707,7 +707,7 @@ class FormValidatorTest extends ConstraintValidatorTestCase
         return new FormValidator();
     }
 
-    private function getBuilder(string $name = 'name', string $dataClass = null, array $options = []): FormBuilder
+    private function getBuilder(string $name = 'name', ?string $dataClass = null, array $options = []): FormBuilder
     {
         $options = array_replace([
             'constraints' => [],

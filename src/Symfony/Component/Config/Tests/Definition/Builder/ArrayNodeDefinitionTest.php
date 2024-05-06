@@ -239,7 +239,7 @@ class ArrayNodeDefinitionTest extends TestCase
             ->children()
                 ->scalarNode('value')
                     ->beforeNormalization()
-                        ->ifTrue(fn ($value) => empty($value))
+                        ->ifTrue(fn ($value) => !$value)
                         ->thenUnset()
                     ->end()
                 ->end()

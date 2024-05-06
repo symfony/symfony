@@ -471,11 +471,21 @@ class MockHttpClientTest extends HttpClientTestCase
 
             case 'testNonBlockingStream':
             case 'testSeekAsyncStream':
-                $responses[] = new MockResponse((function () { yield '<1>'; yield ''; yield '<2>'; })(), ['response_headers' => $headers]);
+                $responses[] = new MockResponse(
+                    (function () {
+                        yield '<1>';
+                        yield '';
+                        yield '<2>';
+                    })(),
+                    ['response_headers' => $headers]
+                );
                 break;
 
             case 'testMaxDuration':
-                $responses[] = new MockResponse('', ['error' => 'Max duration was reached.']);
+                $responses[] = new MockResponse(
+                    '',
+                    ['error' => 'Max duration was reached.']
+                );
                 break;
         }
 
@@ -572,5 +582,15 @@ class MockHttpClientTest extends HttpClientTestCase
         $client = new MockHttpClient([new MockResponse()]);
         $client->request('GET', 'https://example.com');
         $client->request('GET', 'https://example.com');
+    }
+
+    public function testMockStartTimeInfo()
+    {
+        $client = new MockHttpClient(new MockResponse('foobarccc', [
+            'start_time' => 1701187598.313123,
+        ]));
+
+        $response = $client->request('GET', 'https://example.com');
+        $this->assertSame(1701187598.313123, $response->getInfo('start_time'));
     }
 }

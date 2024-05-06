@@ -92,12 +92,13 @@ class AbstractControllerTest extends TestCase
 
     public function testMissingParameterBag()
     {
-        $this->expectException(ServiceNotFoundException::class);
-        $this->expectExceptionMessage('TestAbstractController::getParameter()" method is missing a parameter bag');
         $container = new Container();
 
         $controller = $this->createController();
         $controller->setContainer($container);
+
+        $this->expectException(ServiceNotFoundException::class);
+        $this->expectExceptionMessage('TestAbstractController::getParameter()" method is missing a parameter bag');
 
         $controller->getParameter('foo');
     }
@@ -146,11 +147,11 @@ class AbstractControllerTest extends TestCase
 
     public function testGetUserWithEmptyContainer()
     {
-        $this->expectException(\LogicException::class);
-        $this->expectExceptionMessage('The SecurityBundle is not registered in your application.');
-
         $controller = $this->createController();
         $controller->setContainer(new Container());
+
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('The SecurityBundle is not registered in your application.');
 
         $controller->getUser();
     }
@@ -327,9 +328,9 @@ class AbstractControllerTest extends TestCase
 
     public function testFileWhichDoesNotExist()
     {
-        $this->expectException(FileNotFoundException::class);
-
         $controller = $this->createController();
+
+        $this->expectException(FileNotFoundException::class);
 
         $controller->file('some-file.txt', 'test.php');
     }
@@ -350,8 +351,6 @@ class AbstractControllerTest extends TestCase
 
     public function testdenyAccessUnlessGranted()
     {
-        $this->expectException(AccessDeniedException::class);
-
         $authorizationChecker = $this->createMock(AuthorizationCheckerInterface::class);
         $authorizationChecker->expects($this->once())->method('isGranted')->willReturn(false);
 
@@ -360,6 +359,8 @@ class AbstractControllerTest extends TestCase
 
         $controller = $this->createController();
         $controller->setContainer($container);
+
+        $this->expectException(AccessDeniedException::class);
 
         $controller->denyAccessUnlessGranted('foo');
     }
@@ -386,7 +387,7 @@ class AbstractControllerTest extends TestCase
         }
     }
 
-    public static function provideDenyAccessUnlessGrantedSetsAttributesAsArray()
+    public static function provideDenyAccessUnlessGrantedSetsAttributesAsArray(): array
     {
         $obj = new \stdClass();
         $obj->foo = 'bar';
@@ -466,58 +467,6 @@ class AbstractControllerTest extends TestCase
         $controller->setContainer($container);
 
         $response = $controller->render('foo', ['bar' => $form]);
-
-        $this->assertSame(422, $response->getStatusCode());
-        $this->assertSame('bar', $response->getContent());
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testRenderForm()
-    {
-        $formView = new FormView();
-
-        $form = $this->getMockBuilder(FormInterface::class)->getMock();
-        $form->expects($this->once())->method('createView')->willReturn($formView);
-
-        $twig = $this->getMockBuilder(Environment::class)->disableOriginalConstructor()->getMock();
-        $twig->expects($this->once())->method('render')->with('foo', ['bar' => $formView])->willReturn('bar');
-
-        $container = new Container();
-        $container->set('twig', $twig);
-
-        $controller = $this->createController();
-        $controller->setContainer($container);
-
-        $response = $controller->renderForm('foo', ['bar' => $form]);
-
-        $this->assertTrue($response->isSuccessful());
-        $this->assertSame('bar', $response->getContent());
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testRenderFormSubmittedAndInvalid()
-    {
-        $formView = new FormView();
-
-        $form = $this->getMockBuilder(FormInterface::class)->getMock();
-        $form->expects($this->once())->method('createView')->willReturn($formView);
-        $form->expects($this->once())->method('isSubmitted')->willReturn(true);
-        $form->expects($this->once())->method('isValid')->willReturn(false);
-
-        $twig = $this->getMockBuilder(Environment::class)->disableOriginalConstructor()->getMock();
-        $twig->expects($this->once())->method('render')->with('foo', ['bar' => $formView])->willReturn('bar');
-
-        $container = new Container();
-        $container->set('twig', $twig);
-
-        $controller = $this->createController();
-        $controller->setContainer($container);
-
-        $response = $controller->renderForm('foo', ['bar' => $form]);
 
         $this->assertSame(422, $response->getStatusCode());
         $this->assertSame('bar', $response->getContent());

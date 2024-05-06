@@ -19,6 +19,8 @@ use Symfony\Component\Workflow\Metadata\MetadataStoreInterface;
  * Describes a workflow instance.
  *
  * @author Amrouche Hamza <hamza.simperfit@gmail.com>
+ *
+ * @method Transition|null getEnabledTransition(object $subject, string $name)
  */
 interface WorkflowInterface
 {

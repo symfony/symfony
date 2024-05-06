@@ -24,6 +24,7 @@ class EnglishInflectorTest extends TestCase
             ['accesses', 'access'],
             ['addresses', 'address'],
             ['agendas', 'agenda'],
+            ['albums', 'album'],
             ['alumnae', 'alumna'],
             ['alumni', 'alumnus'],
             ['analyses', ['analys', 'analyse', 'analysis']],
@@ -178,6 +179,8 @@ class EnglishInflectorTest extends TestCase
             ['access', 'accesses'],
             ['address', 'addresses'],
             ['agenda', 'agendas'],
+            ['aircraft', 'aircraft'],
+            ['album', 'albums'],
             ['alumnus', 'alumni'],
             ['analysis', 'analyses'],
             ['antenna', 'antennas'], // antennae
@@ -185,6 +188,7 @@ class EnglishInflectorTest extends TestCase
             ['arch', 'arches'],
             ['atlas', 'atlases'],
             ['axe', 'axes'],
+            ['axis', 'axes'],
             ['baby', 'babies'],
             ['bacterium', 'bacteria'],
             ['base', 'bases'],
@@ -295,6 +299,9 @@ class EnglishInflectorTest extends TestCase
             ['tree', 'trees'],
             ['waltz', 'waltzes'],
             ['wife', 'wives'],
+            ['icon', 'icons'],
+            ['hippocampus', 'hippocampi'],
+            ['campus', 'campuses'],
 
             // test casing: if the first letter was uppercase, it should remain so
             ['Man', 'Men'],

@@ -11,8 +11,12 @@
 
 namespace Symfony\Component\Scheduler;
 
+use Psr\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Clock\Clock;
 use Symfony\Component\Clock\ClockInterface;
+use Symfony\Component\Scheduler\Event\FailureEvent;
+use Symfony\Component\Scheduler\Event\PostRunEvent;
+use Symfony\Component\Scheduler\Event\PreRunEvent;
 use Symfony\Component\Scheduler\Generator\MessageGenerator;
 
 final class Scheduler
@@ -31,6 +35,7 @@ final class Scheduler
         private readonly array $handlers,
         array $schedules,
         private readonly ClockInterface $clock = new Clock(),
+        private readonly ?EventDispatcherInterface $dispatcher = null,
     ) {
         foreach ($schedules as $schedule) {
             $this->addSchedule($schedule);
@@ -62,9 +67,34 @@ final class Scheduler
 
             $ran = false;
             foreach ($this->generators as $generator) {
-                foreach ($generator->getMessages() as $message) {
-                    $this->handlers[$message::class]($message);
-                    $ran = true;
+                foreach ($generator->getMessages() as $context => $message) {
+                    if (!$this->dispatcher) {
+                        $this->handlers[$message::class]($message);
+                        $ran = true;
+
+                        continue;
+                    }
+
+                    $preRunEvent = new PreRunEvent($generator->getSchedule(), $context, $message);
+                    $this->dispatcher->dispatch($preRunEvent);
+
+                    if ($preRunEvent->shouldCancel()) {
+                        continue;
+                    }
+
+                    try {
+                        $this->handlers[$message::class]($message);
+                        $ran = true;
+
+                        $this->dispatcher->dispatch(new PostRunEvent($generator->getSchedule(), $context, $message));
+                    } catch (\Throwable $error) {
+                        $failureEvent = new FailureEvent($generator->getSchedule(), $context, $message, $error);
+                        $this->dispatcher->dispatch($failureEvent);
+
+                        if (!$failureEvent->shouldIgnore()) {
+                            throw $error;
+                        }
+                    }
                 }
             }
 

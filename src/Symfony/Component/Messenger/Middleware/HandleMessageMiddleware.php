@@ -64,9 +64,9 @@ class HandleMessageMiddleware implements MiddlewareInterface
 
                 /** @var AckStamp $ackStamp */
                 if ($batchHandler && $ackStamp = $envelope->last(AckStamp::class)) {
-                    $ack = new Acknowledger(get_debug_type($batchHandler), static function (\Throwable $e = null, $result = null) use ($envelope, $ackStamp, $handlerDescriptor) {
+                    $ack = new Acknowledger(get_debug_type($batchHandler), static function (?\Throwable $e = null, $result = null) use ($envelope, $ackStamp, $handlerDescriptor) {
                         if (null !== $e) {
-                            $e = new HandlerFailedException($envelope, [$e]);
+                            $e = new HandlerFailedException($envelope, [$handlerDescriptor->getName() => $e]);
                         } else {
                             $envelope = $envelope->with(HandledStamp::fromDescriptor($handlerDescriptor, $result));
                         }
@@ -95,7 +95,7 @@ class HandleMessageMiddleware implements MiddlewareInterface
                 $envelope = $envelope->with($handledStamp);
                 $this->logger?->info('Message {class} handled by {handler}', $context + ['handler' => $handledStamp->getHandlerName()]);
             } catch (\Throwable $e) {
-                $exceptions[] = $e;
+                $exceptions[$handlerDescriptor->getName()] = $e;
             }
         }
 
@@ -107,7 +107,7 @@ class HandleMessageMiddleware implements MiddlewareInterface
                     $handler = $stamp->getHandlerDescriptor()->getBatchHandler();
                     $handler->flush($flushStamp->force());
                 } catch (\Throwable $e) {
-                    $exceptions[] = $e;
+                    $exceptions[$stamp->getHandlerDescriptor()->getName()] = $e;
                 }
             }
         }

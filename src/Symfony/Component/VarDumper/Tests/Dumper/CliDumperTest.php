@@ -12,6 +12,8 @@
 namespace Symfony\Component\VarDumper\Tests\Dumper;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\ErrorHandler\ErrorRenderer\FileLinkFormatter;
+use Symfony\Component\VarDumper\Caster\ClassStub;
 use Symfony\Component\VarDumper\Caster\CutStub;
 use Symfony\Component\VarDumper\Cloner\Data;
 use Symfony\Component\VarDumper\Cloner\Stub;
@@ -88,7 +90,7 @@ array:25 [
     +foo: ""…3
     +"bar": "bar"
   }
-  "closure" => Closure(\$a, PDO &\$b = null) {#%d
+  "closure" => Closure(\$a, ?PDO &\$b = null) {#%d
     class: "Symfony\Component\VarDumper\Tests\Dumper\CliDumperTest"
     this: Symfony\Component\VarDumper\Tests\Dumper\CliDumperTest {#%d …}
     file: "%s%eTests%eFixtures%edumb-var.php"
@@ -346,9 +348,7 @@ stream resource {@{$ref}
         ›   twig source
         › 
       }
-      %s%eTemplate.php:%d { …}
-      %s%eTemplate.php:%d { …}
-      %s%eTemplate.php:%d { …}
+      %A%eTemplate.php:%d { …}
       %s%eTests%eDumper%eCliDumperTest.php:%d { …}
 %A  }
   }
@@ -479,7 +479,7 @@ EOTXT
             ],
             [
                 'bar' => 123,
-            ]
+            ],
         ]);
 
         $dumper = new CliDumper();
@@ -498,5 +498,35 @@ EOTXT
             ,
             $dump
         );
+    }
+
+    public function testFileLinkFormat()
+    {
+        if (!class_exists(FileLinkFormatter::class)) {
+            $this->markTestSkipped(sprintf('Class "%s" is required to run this test.', FileLinkFormatter::class));
+        }
+
+        $data = new Data([
+            [
+                new ClassStub(self::class),
+            ],
+        ]);
+
+        $ide = $_ENV['SYMFONY_IDE'] ?? null;
+        $_ENV['SYMFONY_IDE'] = 'vscode';
+
+        try {
+            $dumper = new CliDumper();
+            $dumper->setColors(true);
+            $dump = $dumper->dump($data, true);
+
+            $this->assertStringMatchesFormat('%svscode:%sCliDumperTest%s', $dump);
+        } finally {
+            if (null === $ide) {
+                unset($_ENV['SYMFONY_IDE']);
+            } else {
+                $_ENV['SYMFONY_IDE'] = $ide;
+            }
+        }
     }
 }

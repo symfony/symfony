@@ -30,7 +30,7 @@ class RangeTest extends TestCase
 
     public function testThrowsConstraintExceptionIfBothMinLimitAndPropertyPathNamed()
     {
-        $this->expectException(\Symfony\Component\Validator\Exception\ConstraintDefinitionException::class);
+        $this->expectException(ConstraintDefinitionException::class);
         $this->expectExceptionMessage('requires only one of the "min" or "minPropertyPath" options to be set, not both.');
         new Range(min: 'min', minPropertyPath: 'minPropertyPath');
     }
@@ -47,7 +47,7 @@ class RangeTest extends TestCase
 
     public function testThrowsConstraintExceptionIfBothMaxLimitAndPropertyPathNamed()
     {
-        $this->expectException(\Symfony\Component\Validator\Exception\ConstraintDefinitionException::class);
+        $this->expectException(ConstraintDefinitionException::class);
         $this->expectExceptionMessage('requires only one of the "max" or "maxPropertyPath" options to be set, not both.');
         new Range(max: 'max', maxPropertyPath: 'maxPropertyPath');
     }
@@ -65,10 +65,58 @@ class RangeTest extends TestCase
         new Range('value');
     }
 
-    public function testThrowsConstraintDefinitionExceptionIfBothMinAndMaxAndMinMessageOrMaxMessage()
+    public function testThrowsConstraintDefinitionExceptionIfBothMinAndMaxAndMinMessageAndMaxMessage()
     {
-        $this->expectException(\Symfony\Component\Validator\Exception\ConstraintDefinitionException::class);
+        $this->expectException(ConstraintDefinitionException::class);
         $this->expectExceptionMessage('can not use "minMessage" and "maxMessage" when the "min" and "max" options are both set. Use "notInRangeMessage" instead.');
         new Range(min: 'min', max: 'max', minMessage: 'minMessage', maxMessage: 'maxMessage');
+    }
+
+    public function testThrowsConstraintDefinitionExceptionIfBothMinAndMaxAndMinMessage()
+    {
+        $this->expectException(ConstraintDefinitionException::class);
+        $this->expectExceptionMessage('can not use "minMessage" and "maxMessage" when the "min" and "max" options are both set. Use "notInRangeMessage" instead.');
+        new Range(min: 'min', max: 'max', minMessage: 'minMessage');
+    }
+
+    public function testThrowsConstraintDefinitionExceptionIfBothMinAndMaxAndMaxMessage()
+    {
+        $this->expectException(ConstraintDefinitionException::class);
+        $this->expectExceptionMessage('can not use "minMessage" and "maxMessage" when the "min" and "max" options are both set. Use "notInRangeMessage" instead.');
+        new Range(min: 'min', max: 'max', maxMessage: 'maxMessage');
+    }
+
+    public function testThrowsConstraintDefinitionExceptionIfBothMinAndMaxAndMinMessageAndMaxMessageOptions()
+    {
+        $this->expectException(ConstraintDefinitionException::class);
+        $this->expectExceptionMessage('can not use "minMessage" and "maxMessage" when the "min" and "max" options are both set. Use "notInRangeMessage" instead.');
+        new Range([
+            'min' => 'min',
+            'minMessage' => 'minMessage',
+            'max' => 'max',
+            'maxMessage' => 'maxMessage',
+        ]);
+    }
+
+    public function testThrowsConstraintDefinitionExceptionIfBothMinAndMaxAndMinMessageOptions()
+    {
+        $this->expectException(ConstraintDefinitionException::class);
+        $this->expectExceptionMessage('can not use "minMessage" and "maxMessage" when the "min" and "max" options are both set. Use "notInRangeMessage" instead.');
+        new Range([
+            'min' => 'min',
+            'minMessage' => 'minMessage',
+            'max' => 'max',
+        ]);
+    }
+
+    public function testThrowsConstraintDefinitionExceptionIfBothMinAndMaxAndMaxMessageOptions()
+    {
+        $this->expectException(ConstraintDefinitionException::class);
+        $this->expectExceptionMessage('can not use "minMessage" and "maxMessage" when the "min" and "max" options are both set. Use "notInRangeMessage" instead.');
+        new Range([
+            'min' => 'min',
+            'max' => 'max',
+            'maxMessage' => 'maxMessage',
+        ]);
     }
 }

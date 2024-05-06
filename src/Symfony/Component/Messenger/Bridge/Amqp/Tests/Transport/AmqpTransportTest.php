@@ -52,7 +52,7 @@ class AmqpTransportTest extends TestCase
         $this->assertSame($decodedMessage, $envelopes[0]->getMessage());
     }
 
-    private function getTransport(SerializerInterface $serializer = null, Connection $connection = null): AmqpTransport
+    private function getTransport(?SerializerInterface $serializer = null, ?Connection $connection = null): AmqpTransport
     {
         $serializer ??= $this->createMock(SerializerInterface::class);
         $connection ??= $this->createMock(Connection::class);

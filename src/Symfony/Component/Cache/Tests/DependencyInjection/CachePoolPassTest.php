@@ -20,8 +20,10 @@ use Symfony\Component\Cache\Adapter\RedisAdapter;
 use Symfony\Component\Cache\DependencyInjection\CachePoolPass;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\HttpKernel\CacheClearer\Psr6CacheClearer;
 
 class CachePoolPassTest extends TestCase
 {
@@ -49,7 +51,7 @@ class CachePoolPassTest extends TestCase
 
         $this->cachePoolPass->process($container);
 
-        $this->assertSame('z3X945Jbf5', $cachePool->getArgument(0));
+        $this->assertSame('cKLcR15Llk', $cachePool->getArgument(0));
     }
 
     public function testNamespaceArgumentIsSeededWithAdapterClassName()
@@ -70,7 +72,7 @@ class CachePoolPassTest extends TestCase
 
         $this->cachePoolPass->process($container);
 
-        $this->assertSame('xmOJ8gqF-Y', $cachePool->getArgument(0));
+        $this->assertSame('mVXLns1cYU', $cachePool->getArgument(0));
     }
 
     public function testNamespaceArgumentIsSeededWithAdapterClassNameWithoutAffectingOtherCachePools()
@@ -97,7 +99,7 @@ class CachePoolPassTest extends TestCase
 
         $this->cachePoolPass->process($container);
 
-        $this->assertSame('xmOJ8gqF-Y', $cachePool->getArgument(0));
+        $this->assertSame('mVXLns1cYU', $cachePool->getArgument(0));
     }
 
     public function testNamespaceArgumentIsNotReplacedIfArrayAdapterIsUsed()
@@ -153,7 +155,7 @@ class CachePoolPassTest extends TestCase
 
         $this->assertInstanceOf(Reference::class, $cachePool->getArgument(0));
         $this->assertSame('foobar', (string) $cachePool->getArgument(0));
-        $this->assertSame('6Ridbw4aMn', $cachePool->getArgument(1));
+        $this->assertSame('ZmalVIjCbI', $cachePool->getArgument(1));
         $this->assertSame(3, $cachePool->getArgument(2));
     }
 
@@ -174,13 +176,11 @@ class CachePoolPassTest extends TestCase
 
         $this->cachePoolPass->process($container);
 
-        $this->assertSame('PeXBWSl6ca', $cachePool->getArgument(1));
+        $this->assertSame('5SvqAqqNBH', $cachePool->getArgument(1));
     }
 
     public function testThrowsExceptionWhenCachePoolTagHasUnknownAttributes()
     {
-        $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('Invalid "cache.pool" tag for service "app.cache_pool": accepted attributes are');
         $container = new ContainerBuilder();
         $container->setParameter('kernel.container_class', 'app');
         $container->setParameter('kernel.project_dir', 'foo');
@@ -191,6 +191,9 @@ class CachePoolPassTest extends TestCase
         $cachePool = new ChildDefinition('app.cache_adapter');
         $cachePool->addTag('cache.pool', ['foobar' => 123]);
         $container->setDefinition('app.cache_pool', $cachePool);
+
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Invalid "cache.pool" tag for service "app.cache_pool": accepted attributes are');
 
         $this->cachePoolPass->process($container);
     }
@@ -231,5 +234,34 @@ class CachePoolPassTest extends TestCase
         $doctrineCachePool = $container->getDefinition('doctrine.result_cache_pool');
         $this->assertInstanceOf(ChildDefinition::class, $doctrineCachePool);
         $this->assertSame('cache.app', $doctrineCachePool->getParent());
+    }
+
+    public function testGlobalClearerAlias()
+    {
+        $container = new ContainerBuilder();
+        $container->setParameter('kernel.container_class', 'app');
+        $container->setParameter('kernel.project_dir', 'foo');
+
+        $container->register('cache.default_clearer', Psr6CacheClearer::class);
+
+        $container->setDefinition('cache.system_clearer', new ChildDefinition('cache.default_clearer'));
+
+        $container->setDefinition('cache.foo_bar_clearer', new ChildDefinition('cache.default_clearer'));
+        $container->setAlias('cache.global_clearer', 'cache.foo_bar_clearer');
+
+        $container->register('cache.adapter.array', ArrayAdapter::class)
+            ->setAbstract(true)
+            ->addTag('cache.pool');
+
+        $cachePool = new ChildDefinition('cache.adapter.array');
+        $cachePool->addTag('cache.pool', ['clearer' => 'cache.system_clearer']);
+        $container->setDefinition('app.cache_pool', $cachePool);
+
+        $this->cachePoolPass->process($container);
+
+        $definition = $container->getDefinition('cache.foo_bar_clearer');
+
+        $this->assertTrue($definition->hasTag('cache.pool.clearer'));
+        $this->assertEquals(['app.cache_pool' => new Reference('app.cache_pool', ContainerInterface::IGNORE_ON_UNINITIALIZED_REFERENCE)], $definition->getArgument(0));
     }
 }

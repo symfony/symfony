@@ -11,12 +11,17 @@
 
 namespace Symfony\Component\Webhook;
 
+use Symfony\Component\Webhook\Exception\InvalidArgumentException;
+
 class Subscriber
 {
     public function __construct(
         private readonly string $url,
         #[\SensitiveParameter] private readonly string $secret,
     ) {
+        if (!$secret) {
+            throw new InvalidArgumentException('A non-empty secret is required.');
+        }
     }
 
     public function getUrl(): string

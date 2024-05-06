@@ -31,10 +31,7 @@ class RoleHierarchyVoter extends RoleVoter
         parent::__construct($prefix);
     }
 
-    /**
-     * @return array
-     */
-    protected function extractRoles(TokenInterface $token)
+    protected function extractRoles(TokenInterface $token): array
     {
         return $this->roleHierarchy->getReachableRoleNames($token->getRoleNames());
     }

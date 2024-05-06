@@ -29,12 +29,10 @@ class NovuTransport extends AbstractTransport
     protected const HOST = 'web.novu.co';
 
     public function __construct(
-        #[\SensitiveParameter]
-        protected string $apiKey,
-        HttpClientInterface $client = null,
-        EventDispatcherInterface $dispatcher = null
+        #[\SensitiveParameter] protected string $apiKey,
+        ?HttpClientInterface $client = null,
+        ?EventDispatcherInterface $dispatcher = null,
     ) {
-        $this->apiKey = $apiKey;
         parent::__construct($client, $dispatcher);
     }
 
@@ -68,6 +66,7 @@ class NovuTransport extends AbstractTransport
                 'locale' => $options['locale'],
             ],
             'payload' => json_decode($message->getContent()),
+            'overrides' => $options['overrides'] ?? [],
         ];
 
         $endpoint = sprintf('https://%s/v1/events/trigger', $this->getEndpoint());

@@ -36,7 +36,6 @@ class GenericRetryStrategy implements RetryStrategyInterface
         510 => self::IDEMPOTENT_METHODS,
     ];
 
-    private array $statusCodes;
     private int $delayMs;
     private float $multiplier;
     private int $maxDelayMs;
@@ -49,10 +48,13 @@ class GenericRetryStrategy implements RetryStrategyInterface
      * @param int   $maxDelayMs  Maximum delay to allow (0 means no maximum)
      * @param float $jitter      Probability of randomness int delay (0 = none, 1 = 100% random)
      */
-    public function __construct(array $statusCodes = self::DEFAULT_RETRY_STATUS_CODES, int $delayMs = 1000, float $multiplier = 2.0, int $maxDelayMs = 0, float $jitter = 0.1)
-    {
-        $this->statusCodes = $statusCodes;
-
+    public function __construct(
+        private array $statusCodes = self::DEFAULT_RETRY_STATUS_CODES,
+        int $delayMs = 1000,
+        float $multiplier = 2.0,
+        int $maxDelayMs = 0,
+        float $jitter = 0.1,
+    ) {
         if ($delayMs < 0) {
             throw new InvalidArgumentException(sprintf('Delay must be greater than or equal to zero: "%s" given.', $delayMs));
         }

@@ -42,7 +42,6 @@ use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\FormErrorNormalizer;
 use Symfony\Component\Serializer\Normalizer\JsonSerializableNormalizer;
 use Symfony\Component\Serializer\Normalizer\MimeMessageNormalizer;
-use Symfony\Component\Serializer\Normalizer\NormalizerAwareInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\Serializer\Normalizer\ProblemNormalizer;
@@ -116,7 +115,7 @@ return static function (ContainerConfigurator $container) {
 
         ->set('serializer.normalizer.translatable', TranslatableNormalizer::class)
             ->args(['$translator' => service('translator')])
-            ->tag('serializer.normalizer', ['priority' => -890])
+            ->tag('serializer.normalizer', ['priority' => -920])
 
         ->set('serializer.normalizer.form_error', FormErrorNormalizer::class)
             ->tag('serializer.normalizer', ['priority' => -915])
@@ -129,11 +128,10 @@ return static function (ContainerConfigurator $container) {
                 service('property_info')->ignoreOnInvalid(),
                 service('serializer.mapping.class_discriminator_resolver')->ignoreOnInvalid(),
                 null,
+                null,
+                service('property_info')->ignoreOnInvalid(),
             ])
             ->tag('serializer.normalizer', ['priority' => -1000])
-
-        ->alias(ObjectNormalizer::class, 'serializer.normalizer.object')
-            ->deprecate('symfony/serializer', '6.2', 'The "%alias_id%" service alias is deprecated, type-hint against "'.NormalizerInterface::class.'" or implement "'.NormalizerAwareInterface::class.'" instead.')
 
         ->set('serializer.normalizer.property', PropertyNormalizer::class)
             ->args([
@@ -142,10 +140,8 @@ return static function (ContainerConfigurator $container) {
                 service('property_info')->ignoreOnInvalid(),
                 service('serializer.mapping.class_discriminator_resolver')->ignoreOnInvalid(),
                 null,
+                [],
             ])
-
-        ->alias(PropertyNormalizer::class, 'serializer.normalizer.property')
-            ->deprecate('symfony/serializer', '6.2', 'The "%alias_id%" service alias is deprecated, type-hint against "'.NormalizerInterface::class.'" or implement "'.NormalizerAwareInterface::class.'" instead.')
 
         ->set('serializer.denormalizer.array', ArrayDenormalizer::class)
             ->tag('serializer.normalizer', ['priority' => -990])

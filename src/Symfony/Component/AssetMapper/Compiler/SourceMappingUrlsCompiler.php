@@ -13,6 +13,7 @@ namespace Symfony\Component\AssetMapper\Compiler;
 
 use Symfony\Component\AssetMapper\AssetMapperInterface;
 use Symfony\Component\AssetMapper\MappedAsset;
+use Symfony\Component\Filesystem\Path;
 
 /**
  * Rewrites already-existing source map URLs to their final digested path.
@@ -21,8 +22,6 @@ use Symfony\Component\AssetMapper\MappedAsset;
  */
 final class SourceMappingUrlsCompiler implements AssetCompilerInterface
 {
-    use AssetCompilerPathResolverTrait;
-
     private const SOURCE_MAPPING_PATTERN = '/^(\/\/|\/\*)# sourceMappingURL=(.+\.map)/m';
 
     public function supports(MappedAsset $asset): bool
@@ -33,16 +32,16 @@ final class SourceMappingUrlsCompiler implements AssetCompilerInterface
     public function compile(string $content, MappedAsset $asset, AssetMapperInterface $assetMapper): string
     {
         return preg_replace_callback(self::SOURCE_MAPPING_PATTERN, function ($matches) use ($asset, $assetMapper) {
-            $resolvedPath = $this->resolvePath(\dirname($asset->logicalPath), $matches[2]);
+            $resolvedPath = Path::join(\dirname($asset->sourcePath), $matches[2]);
 
-            $dependentAsset = $assetMapper->getAsset($resolvedPath);
+            $dependentAsset = $assetMapper->getAssetFromSourcePath($resolvedPath);
             if (!$dependentAsset) {
                 // return original, unchanged path
                 return $matches[0];
             }
 
             $asset->addDependency($dependentAsset);
-            $relativePath = $this->createRelativePath($asset->publicPathWithoutDigest, $dependentAsset->publicPath);
+            $relativePath = Path::makeRelative($dependentAsset->publicPath, \dirname($asset->publicPathWithoutDigest));
 
             return $matches[1].'# sourceMappingURL='.$relativePath;
         }, $content);

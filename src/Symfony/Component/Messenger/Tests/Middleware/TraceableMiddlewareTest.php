@@ -53,7 +53,7 @@ class TraceableMiddlewareTest extends MiddlewareTestCase
 
         $stopwatch->expects($this->exactly(2))
             ->method('start')
-            ->willReturnCallback(function (string $name, string $category = null) use (&$series) {
+            ->willReturnCallback(function (string $name, ?string $category = null) use (&$series) {
                 [$constraint, $expectedCategory] = array_shift($series);
 
                 $constraint->evaluate($name);
@@ -119,11 +119,10 @@ class TraceableMiddlewareTest extends MiddlewareTestCase
 
         $middleware = new class($stopwatch) implements MiddlewareInterface {
             public int $calls = 0;
-            private Stopwatch $stopwatch;
 
-            public function __construct(Stopwatch $stopwatch)
-            {
-                $this->stopwatch = $stopwatch;
+            public function __construct(
+                private Stopwatch $stopwatch,
+            ) {
             }
 
             public function handle(Envelope $envelope, StackInterface $stack): Envelope
@@ -195,7 +194,7 @@ class TraceableMiddlewareTest extends MiddlewareTestCase
         ];
         $stopwatch->expects($this->exactly(4))
             ->method('start')
-            ->willReturnCallback(function (string $name, string $category = null) use (&$startSeries) {
+            ->willReturnCallback(function (string $name, ?string $category = null) use (&$startSeries) {
                 [$constraint, $expectedCategory] = array_shift($startSeries);
 
                 $constraint->evaluate($name);

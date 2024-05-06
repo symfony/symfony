@@ -58,8 +58,7 @@ class DefaultMarshallerTest extends TestCase
     {
         $this->expectException(\DomainException::class);
         $this->expectExceptionMessage('Class not found: NotExistingClass');
-        $marshaller = new DefaultMarshaller();
-        $marshaller->unmarshall('O:16:"NotExistingClass":0:{}');
+        (new DefaultMarshaller())->unmarshall('O:16:"NotExistingClass":0:{}');
     }
 
     /**

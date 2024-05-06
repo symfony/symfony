@@ -24,11 +24,21 @@ final class MappedAsset
     public readonly string $publicPath;
     public readonly string $publicPathWithoutDigest;
     public readonly string $publicExtension;
-    public readonly string $content;
-    public readonly string $digest;
-    public readonly bool $isPredigested;
 
     /**
+     * The final content of this asset if different from the sourcePath.
+     *
+     * If null, the content should be read from the sourcePath.
+     */
+    public readonly ?string $content;
+
+    public readonly string $digest;
+    public readonly bool $isPredigested;
+    public readonly bool $isVendor;
+
+    /**
+     * Assets whose content affects the content of this asset.
+     *
      * @var MappedAsset[]
      */
     private array $dependencies = [];
@@ -49,12 +59,13 @@ final class MappedAsset
      */
     public function __construct(
         public readonly string $logicalPath,
-        string $sourcePath = null,
-        string $publicPathWithoutDigest = null,
-        string $publicPath = null,
-        string $content = null,
-        string $digest = null,
-        bool $isPredigested = null,
+        ?string $sourcePath = null,
+        ?string $publicPathWithoutDigest = null,
+        ?string $publicPath = null,
+        ?string $content = null,
+        ?string $digest = null,
+        ?bool $isPredigested = null,
+        bool $isVendor = false,
         array $dependencies = [],
         array $fileDependencies = [],
         array $javaScriptImports = [],
@@ -69,21 +80,22 @@ final class MappedAsset
             $this->publicPathWithoutDigest = $publicPathWithoutDigest;
             $this->publicExtension = pathinfo($publicPathWithoutDigest, \PATHINFO_EXTENSION);
         }
-        if (null !== $content) {
-            $this->content = $content;
-        }
+        $this->content = $content;
         if (null !== $digest) {
             $this->digest = $digest;
         }
         if (null !== $isPredigested) {
             $this->isPredigested = $isPredigested;
         }
+        $this->isVendor = $isVendor;
         $this->dependencies = $dependencies;
         $this->fileDependencies = $fileDependencies;
         $this->javaScriptImports = $javaScriptImports;
     }
 
     /**
+     * Assets that the content of this asset depends on - for internal caching.
+     *
      * @return MappedAsset[]
      */
     public function getDependencies(): array

@@ -360,7 +360,7 @@ class ConnectionTest extends TestCase
         $redis->expects($this->once())->method('xadd')->willReturn('0');
         $redis->expects($this->once())->method('xack')->willReturn(0);
 
-        $redis->method('getLastError')->willReturnOnConsecutiveCalls('xadd error', 'xack error');
+        $redis->method('getLastError')->willReturn('xadd error', 'xack error');
         $redis->expects($this->exactly(2))->method('clearLastError');
 
         $connection = Connection::fromDsn('redis://localhost/messenger-clearlasterror', ['auto_setup' => false], $redis);

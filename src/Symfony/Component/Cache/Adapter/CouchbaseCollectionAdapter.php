@@ -29,18 +29,19 @@ class CouchbaseCollectionAdapter extends AbstractAdapter
 {
     private const MAX_KEY_LENGTH = 250;
 
-    private Collection $connection;
     private MarshallerInterface $marshaller;
 
-    public function __construct(Collection $connection, string $namespace = '', int $defaultLifetime = 0, MarshallerInterface $marshaller = null)
-    {
+    public function __construct(
+        private Collection $connection,
+        string $namespace = '',
+        int $defaultLifetime = 0,
+        ?MarshallerInterface $marshaller = null,
+    ) {
         if (!static::isSupported()) {
-            throw new CacheException('Couchbase >= 3.0.0 < 4.0.0 is required.');
+            throw new CacheException('Couchbase >= 3.0.5 < 4.0.0 is required.');
         }
 
         $this->maxIdLength = static::MAX_KEY_LENGTH;
-
-        $this->connection = $connection;
 
         parent::__construct($namespace, $defaultLifetime);
         $this->enableVersioning();
@@ -54,15 +55,12 @@ class CouchbaseCollectionAdapter extends AbstractAdapter
         }
 
         if (!static::isSupported()) {
-            throw new CacheException('Couchbase >= 3.0.0 < 4.0.0 is required.');
+            throw new CacheException('Couchbase >= 3.0.5 < 4.0.0 is required.');
         }
 
         set_error_handler(static fn ($type, $msg, $file, $line) => throw new \ErrorException($msg, 0, $type, $file, $line));
 
-        $dsnPattern = '/^(?<protocol>couchbase(?:s)?)\:\/\/(?:(?<username>[^\:]+)\:(?<password>[^\@]{6,})@)?'
-            .'(?<host>[^\:]+(?:\:\d+)?)(?:\/(?<bucketName>[^\/\?]+))(?:(?:\/(?<scopeName>[^\/]+))'
-            .'(?:\/(?<collectionName>[^\/\?]+)))?(?:\/)?(?:\?(?<options>.*))?$/i';
-
+        $pathPattern = '/^(?:\/(?<bucketName>[^\/\?]+))(?:(?:\/(?<scopeName>[^\/]+))(?:\/(?<collectionName>[^\/\?]+)))?(?:\/)?$/';
         $newServers = [];
         $protocol = 'couchbase';
         try {
@@ -74,24 +72,24 @@ class CouchbaseCollectionAdapter extends AbstractAdapter
                     throw new InvalidArgumentException('Invalid Couchbase DSN: it does not start with "couchbase:".');
                 }
 
-                preg_match($dsnPattern, $server, $matches);
+                $params = parse_url($server);
 
-                $username = $matches['username'] ?: $username;
-                $password = $matches['password'] ?: $password;
-                $protocol = $matches['protocol'] ?: $protocol;
+                $username = isset($params['user']) ? rawurldecode($params['user']) : $username;
+                $password = isset($params['pass']) ? rawurldecode($params['pass']) : $password;
+                $protocol = $params['scheme'] ?? $protocol;
 
-                if (isset($matches['options'])) {
-                    $optionsInDsn = self::getOptions($matches['options']);
+                if (isset($params['query'])) {
+                    $optionsInDsn = self::getOptions($params['query']);
 
                     foreach ($optionsInDsn as $parameter => $value) {
                         $options[$parameter] = $value;
                     }
                 }
 
-                $newServers[] = $matches['host'];
+                $newServers[] = $params['host'];
             }
 
-            $option = isset($matches['options']) ? '?'.$matches['options'] : '';
+            $option = isset($params['query']) ? '?'.$params['query'] : '';
             $connectionString = $protocol.'://'.implode(',', $newServers).$option;
 
             $clusterOptions = new ClusterOptions();
@@ -99,6 +97,7 @@ class CouchbaseCollectionAdapter extends AbstractAdapter
 
             $client = new Cluster($connectionString, $clusterOptions);
 
+            preg_match($pathPattern, $params['path'] ?? '', $matches);
             $bucket = $client->bucket($matches['bucketName']);
             $collection = $bucket->defaultCollection();
             if (!empty($matches['scopeName'])) {

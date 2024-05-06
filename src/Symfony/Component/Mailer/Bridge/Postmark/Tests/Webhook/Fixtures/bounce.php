@@ -7,6 +7,6 @@ $wh->setRecipientEmail('john@example.com');
 $wh->setTags(['Test']);
 $wh->setMetadata(['example' => 'value', 'example_2' => 'value']);
 $wh->setReason('The server was unable to deliver your message (ex: unknown user, mailbox not found).');
-$wh->setDate(\DateTimeImmutable::createFromFormat('Y-m-d\TH:i:sT', '2022-09-02T14:29:19Z'));
+$wh->setDate(\DateTimeImmutable::createFromFormat('Y-m-d\TH:i:s.uP', '2022-09-02T14:29:19.123456Z'));
 
 return $wh;

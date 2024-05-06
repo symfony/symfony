@@ -17,18 +17,25 @@ use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Exception\LogicException;
 
 /**
- * @Annotation
+ * Conditionally apply validation constraints based on an expression using the ExpressionLanguage syntax.
  *
- * @Target({"CLASS", "PROPERTY", "METHOD", "ANNOTATION"})
+ * @see https://symfony.com/doc/current/components/expression_language.html
  */
 #[\Attribute(\Attribute::TARGET_CLASS | \Attribute::TARGET_PROPERTY | \Attribute::TARGET_METHOD | \Attribute::IS_REPEATABLE)]
 class When extends Composite
 {
-    public $expression;
-    public $constraints = [];
-    public $values = [];
+    public string|Expression $expression;
+    public array|Constraint $constraints = [];
+    public array $values = [];
 
-    public function __construct(string|Expression|array $expression, array|Constraint $constraints = null, array $values = null, array $groups = null, $payload = null, array $options = [])
+    /**
+     * @param string|Expression|array<string,mixed> $expression  The condition to evaluate, written with the ExpressionLanguage syntax
+     * @param Constraint[]|Constraint|null          $constraints One or multiple constraints that are applied if the expression returns true
+     * @param array<string,mixed>|null              $values      The values of the custom variables used in the expression (defaults to [])
+     * @param string[]|null                         $groups
+     * @param array<string,mixed>                   $options
+     */
+    public function __construct(string|Expression|array $expression, array|Constraint|null $constraints = null, ?array $values = null, ?array $groups = null, $payload = null, array $options = [])
     {
         if (!class_exists(ExpressionLanguage::class)) {
             throw new LogicException(sprintf('The "symfony/expression-language" component is required to use the "%s" constraint. Try running "composer require symfony/expression-language".', __CLASS__));

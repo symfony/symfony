@@ -38,10 +38,8 @@ class RoleVoter implements CacheableVoterInterface
             }
 
             $result = VoterInterface::ACCESS_DENIED;
-            foreach ($roles as $role) {
-                if ($attribute === $role) {
-                    return VoterInterface::ACCESS_GRANTED;
-                }
+            if (\in_array($attribute, $roles, true)) {
+                return VoterInterface::ACCESS_GRANTED;
             }
         }
 
@@ -58,10 +56,7 @@ class RoleVoter implements CacheableVoterInterface
         return true;
     }
 
-    /**
-     * @return array
-     */
-    protected function extractRoles(TokenInterface $token)
+    protected function extractRoles(TokenInterface $token): array
     {
         return $token->getRoleNames();
     }

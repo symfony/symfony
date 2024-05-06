@@ -12,7 +12,7 @@ return [
         'BL' => 'Ìlú Bátílɛ́mì',
         'BN' => 'Búrúnɛ́lì',
         'BO' => 'Bɔ̀lífíyà',
-        'BQ' => 'Káríbíánì ti Nɛ́dálándì',
+        'BQ' => 'Kàríbíánì ti Nɛ́dálándì',
         'BW' => 'Bɔ̀tìsúwánà',
         'BZ' => 'Bèlísɛ̀',
         'CH' => 'switishilandi',

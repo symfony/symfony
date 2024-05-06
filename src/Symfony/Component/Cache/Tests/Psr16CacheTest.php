@@ -176,7 +176,7 @@ class Psr16CacheTest extends SimpleCacheTest
 
 class NotUnserializable
 {
-    public function __wakeup()
+    public function __wakeup(): void
     {
         throw new \Exception(__CLASS__);
     }

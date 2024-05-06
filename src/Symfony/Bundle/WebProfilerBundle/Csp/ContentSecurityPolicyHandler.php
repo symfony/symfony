@@ -23,12 +23,11 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class ContentSecurityPolicyHandler
 {
-    private NonceGenerator $nonceGenerator;
     private bool $cspDisabled = false;
 
-    public function __construct(NonceGenerator $nonceGenerator)
-    {
-        $this->nonceGenerator = $nonceGenerator;
+    public function __construct(
+        private NonceGenerator $nonceGenerator,
+    ) {
     }
 
     /**
@@ -124,10 +123,10 @@ class ContentSecurityPolicyHandler
         $headers = $this->getCspHeaders($response);
 
         $types = [
-          'script-src' => 'csp_script_nonce',
-          'script-src-elem' => 'csp_script_nonce',
-          'style-src' => 'csp_style_nonce',
-          'style-src-elem' => 'csp_style_nonce',
+            'script-src' => 'csp_script_nonce',
+            'script-src-elem' => 'csp_script_nonce',
+            'style-src' => 'csp_style_nonce',
+            'style-src-elem' => 'csp_style_nonce',
         ];
 
         foreach ($headers as $header => $directives) {

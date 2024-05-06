@@ -20,7 +20,6 @@ namespace Symfony\Component\Config\Builder;
  */
 class ClassBuilder
 {
-    private string $namespace;
     private string $name;
 
     /** @var Property[] */
@@ -33,9 +32,10 @@ class ClassBuilder
     private array $implements = [];
     private bool $allowExtraKeys = false;
 
-    public function __construct(string $namespace, string $name)
-    {
-        $this->namespace = $namespace;
+    public function __construct(
+        private string $namespace,
+        string $name,
+    ) {
         $this->name = ucfirst($this->camelCase($name)).'Config';
     }
 
@@ -119,7 +119,7 @@ BODY
         $this->methods[] = new Method(strtr($body, ['NAME' => $this->camelCase($name)] + $params));
     }
 
-    public function addProperty(string $name, string $classType = null, string $defaultValue = null): Property
+    public function addProperty(string $name, ?string $classType = null, ?string $defaultValue = null): Property
     {
         $property = new Property($name, '_' !== $name[0] ? $this->camelCase($name) : $name);
         if (null !== $classType) {

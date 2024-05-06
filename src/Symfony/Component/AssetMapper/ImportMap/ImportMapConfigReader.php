@@ -12,6 +12,7 @@
 namespace Symfony\Component\AssetMapper\ImportMap;
 
 use Symfony\Component\AssetMapper\Exception\RuntimeException;
+use Symfony\Component\Filesystem\Path;
 use Symfony\Component\VarExporter\VarExporter;
 
 /**
@@ -23,8 +24,10 @@ class ImportMapConfigReader
 {
     private ImportMapEntries $rootImportMapEntries;
 
-    public function __construct(private readonly string $importMapConfigPath)
-    {
+    public function __construct(
+        private readonly string $importMapConfigPath,
+        private readonly RemotePackageStorage $remotePackageStorage,
+    ) {
     }
 
     public function getEntries(): ImportMapEntries
@@ -38,27 +41,35 @@ class ImportMapConfigReader
 
         $entries = new ImportMapEntries();
         foreach ($importMapConfig ?? [] as $importName => $data) {
-            $validKeys = ['path', 'url', 'downloaded_to', 'type', 'entrypoint', 'version'];
+            $validKeys = ['path', 'version', 'type', 'entrypoint', 'package_specifier'];
             if ($invalidKeys = array_diff(array_keys($data), $validKeys)) {
                 throw new \InvalidArgumentException(sprintf('The following keys are not valid for the importmap entry "%s": "%s". Valid keys are: "%s".', $importName, implode('", "', $invalidKeys), implode('", "', $validKeys)));
             }
 
             $type = isset($data['type']) ? ImportMapType::tryFrom($data['type']) : ImportMapType::JS;
-            $isEntry = $data['entrypoint'] ?? false;
+            $isEntrypoint = $data['entrypoint'] ?? false;
 
-            if ($isEntry && ImportMapType::JS !== $type) {
-                throw new RuntimeException(sprintf('The "entrypoint" option can only be used with the "js" type. Found "%s" in importmap.php for key "%s".', $importName, $type->value));
+            if (isset($data['path'])) {
+                if (isset($data['version'])) {
+                    throw new RuntimeException(sprintf('The importmap entry "%s" cannot have both a "path" and "version" option.', $importName));
+                }
+                if (isset($data['package_specifier'])) {
+                    throw new RuntimeException(sprintf('The importmap entry "%s" cannot have both a "path" and "package_specifier" option.', $importName));
+                }
+
+                $entries->add(ImportMapEntry::createLocal($importName, $type, $data['path'], $isEntrypoint));
+
+                continue;
             }
 
-            $entries->add(new ImportMapEntry(
-                $importName,
-                path: $data['path'] ?? $data['downloaded_to'] ?? null,
-                url: $data['url'] ?? null,
-                isDownloaded: isset($data['downloaded_to']),
-                type: $type,
-                isEntrypoint: $isEntry,
-                version: $data['version'] ?? null,
-            ));
+            $version = $data['version'] ?? null;
+
+            if (null === $version) {
+                throw new RuntimeException(sprintf('The importmap entry "%s" must have either a "path" or "version" option.', $importName));
+            }
+
+            $packageModuleSpecifier = $data['package_specifier'] ?? $importName;
+            $entries->add($this->createRemoteEntry($importName, $type, $version, $packageModuleSpecifier, $isEntrypoint));
         }
 
         return $this->rootImportMapEntries = $entries;
@@ -71,12 +82,13 @@ class ImportMapConfigReader
         $importMapConfig = [];
         foreach ($entries as $entry) {
             $config = [];
-            if ($entry->path) {
-                $path = $entry->path;
-                $config[$entry->isDownloaded ? 'downloaded_to' : 'path'] = $path;
-            }
-            if ($entry->url) {
-                $config['url'] = $entry->url;
+            if ($entry->isRemotePackage()) {
+                $config['version'] = $entry->version;
+                if ($entry->packageModuleSpecifier !== $entry->importName) {
+                    $config['package_specifier'] = $entry->packageModuleSpecifier;
+                }
+            } else {
+                $config['path'] = $entry->path;
             }
             if (ImportMapType::JS !== $entry->type) {
                 $config['type'] = $entry->type->value;
@@ -84,9 +96,7 @@ class ImportMapConfigReader
             if ($entry->isEntrypoint) {
                 $config['entrypoint'] = true;
             }
-            if ($entry->version) {
-                $config['version'] = $entry->version;
-            }
+
             $importMapConfig[$entry->importName] = $config;
         }
 
@@ -101,19 +111,83 @@ class ImportMapConfigReader
          *     "debug:asset-map" command to see the full list of paths.
          *
          * - "entrypoint" (JavaScript only) set to true for any module that will
-         *     be used as an the "entrypoint" (and passed to the importmap() Twig function).
+         *     be used as an "entrypoint" (and passed to the importmap() Twig function).
          *
          * The "importmap:require" command can be used to add new entries to this file.
-         *
-         * This file has been auto-generated by the importmap commands.
          */
         return $map;
 
         EOF);
     }
 
-    public function getRootDirectory(): string
+    public function findRootImportMapEntry(string $moduleName): ?ImportMapEntry
+    {
+        $entries = $this->getEntries();
+
+        return $entries->has($moduleName) ? $entries->get($moduleName) : null;
+    }
+
+    public function createRemoteEntry(string $importName, ImportMapType $type, string $version, string $packageModuleSpecifier, bool $isEntrypoint): ImportMapEntry
+    {
+        $path = $this->remotePackageStorage->getDownloadPath($packageModuleSpecifier, $type);
+
+        return ImportMapEntry::createRemote($importName, $type, $path, $version, $packageModuleSpecifier, $isEntrypoint);
+    }
+
+    /**
+     * Converts the "path" string from an importmap entry to the filesystem path.
+     *
+     * The path may already be a filesystem path. But if it starts with ".",
+     * then the path is relative and the root directory is prepended.
+     */
+    public function convertPathToFilesystemPath(string $path): string
+    {
+        if (!str_starts_with($path, '.')) {
+            return $path;
+        }
+
+        return Path::join($this->getRootDirectory(), $path);
+    }
+
+    /**
+     * Converts a filesystem path to a relative path that can be used in the importmap.
+     *
+     * If no relative path could be created - e.g. because the path is not in
+     * the same directory/subdirectory as the root importmap.php file - null is returned.
+     */
+    public function convertFilesystemPathToPath(string $filesystemPath): ?string
+    {
+        $rootImportMapDir = realpath($this->getRootDirectory());
+        $filesystemPath = realpath($filesystemPath);
+        if (!str_starts_with($filesystemPath, $rootImportMapDir)) {
+            return null;
+        }
+
+        // remove the root directory, prepend "./" & normalize slashes
+        return './'.str_replace('\\', '/', substr($filesystemPath, \strlen($rootImportMapDir) + 1));
+    }
+
+    private function getRootDirectory(): string
     {
         return \dirname($this->importMapConfigPath);
+    }
+
+    /**
+     * @deprecated since Symfony 7.1, use ImportMapEntry::splitPackageNameAndFilePath() instead
+     */
+    public static function splitPackageNameAndFilePath(string $packageName): array
+    {
+        trigger_deprecation('symfony/asset-mapper', '7.1', 'The method "%s()" is deprecated and will be removed in 8.0. Use ImportMapEntry::splitPackageNameAndFilePath() instead.', __METHOD__);
+
+        $filePath = '';
+        $i = strpos($packageName, '/');
+
+        if ($i && (!str_starts_with($packageName, '@') || $i = strpos($packageName, '/', $i + 1))) {
+            // @vendor/package/filepath or package/filepath
+            $filePath = substr($packageName, $i);
+            $packageName = substr($packageName, 0, $i);
+        }
+
+        return [$packageName, $filePath];
     }
 }

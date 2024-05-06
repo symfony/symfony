@@ -28,6 +28,7 @@ use Symfony\Component\Notifier\Notifier;
 use Symfony\Component\RateLimiter\Policy\TokenBucketLimiter;
 use Symfony\Component\Scheduler\Messenger\SchedulerTransportFactory;
 use Symfony\Component\Serializer\Encoder\JsonDecode;
+use Symfony\Component\TypeInfo\Type;
 use Symfony\Component\Uid\Factory\UuidFactory;
 
 class ConfigurationTest extends TestCase
@@ -61,8 +62,10 @@ class ConfigurationTest extends TestCase
      */
     public function testInvalidSessionName($sessionName)
     {
-        $this->expectException(InvalidConfigurationException::class);
         $processor = new Processor();
+
+        $this->expectException(InvalidConfigurationException::class);
+
         $processor->processConfiguration(
             new Configuration(true),
             [[
@@ -132,13 +135,49 @@ class ConfigurationTest extends TestCase
             'missing_import_mode' => 'warn',
             'extensions' => [],
             'importmap_path' => '%kernel.project_dir%/importmap.php',
-            'importmap_polyfill' => null,
+            'importmap_polyfill' => 'es-module-shims',
             'vendor_dir' => '%kernel.project_dir%/assets/vendor',
-            'provider' => 'jsdelivr.esm',
             'importmap_script_attributes' => [],
+            'exclude_dotfiles' => true,
         ];
 
         $this->assertEquals($defaultConfig, $config['asset_mapper']);
+    }
+
+    /**
+     * @dataProvider provideImportmapPolyfillTests
+     */
+    public function testAssetMapperPolyfillValue(mixed $polyfillValue, bool $isValid, mixed $expected)
+    {
+        $processor = new Processor();
+        $configuration = new Configuration(true);
+
+        if (!$isValid) {
+            $this->expectException(InvalidConfigurationException::class);
+            $this->expectExceptionMessage($expected);
+        }
+
+        $config = $processor->processConfiguration($configuration, [[
+            'http_method_override' => false,
+            'handle_all_throwables' => true,
+            'php_errors' => ['log' => true],
+            'asset_mapper' => null === $polyfillValue ? [] : [
+                'importmap_polyfill' => $polyfillValue,
+            ],
+        ]]);
+
+        if ($isValid) {
+            $this->assertEquals($expected, $config['asset_mapper']['importmap_polyfill']);
+        }
+    }
+
+    public static function provideImportmapPolyfillTests()
+    {
+        yield [true, false, 'Must be either an importmap name or false.'];
+        yield [null, true, 'es-module-shims'];
+        yield ['es-module-shims', true, 'es-module-shims'];
+        yield ['foo', true, 'foo'];
+        yield [false, true, false];
     }
 
     /**
@@ -164,7 +203,7 @@ class ConfigurationTest extends TestCase
         $this->assertArrayHasKey($packageName, $config['assets']['packages']);
     }
 
-    public static function provideValidAssetsPackageNameConfigurationTests()
+    public static function provideValidAssetsPackageNameConfigurationTests(): array
     {
         return [
             ['foobar'],
@@ -178,11 +217,12 @@ class ConfigurationTest extends TestCase
      */
     public function testInvalidAssetsConfiguration(array $assetConfig, $expectedMessage)
     {
+        $processor = new Processor();
+        $configuration = new Configuration(true);
+
         $this->expectException(InvalidConfigurationException::class);
         $this->expectExceptionMessage($expectedMessage);
 
-        $processor = new Processor();
-        $configuration = new Configuration(true);
         $processor->processConfiguration($configuration, [
                 [
                     'http_method_override' => false,
@@ -193,7 +233,7 @@ class ConfigurationTest extends TestCase
             ]);
     }
 
-    public static function provideInvalidAssetConfigurationTests()
+    public static function provideInvalidAssetConfigurationTests(): iterable
     {
         // helper to turn config into embedded package config
         $createPackageConfig = fn (array $packageConfig) => [
@@ -247,7 +287,7 @@ class ConfigurationTest extends TestCase
         $this->assertEquals($processedConfig, $config['lock']);
     }
 
-    public static function provideValidLockConfigurationTests()
+    public static function provideValidLockConfigurationTests(): iterable
     {
         yield [null, ['enabled' => true, 'resources' => ['default' => [class_exists(SemaphoreStore::class) && SemaphoreStore::isSupported() ? 'semaphore' : 'flock']]]];
 
@@ -527,6 +567,46 @@ class ConfigurationTest extends TestCase
         ]);
     }
 
+    public function testScopedHttpClientsInheritRateLimiterAndRetryFailedConfiguration()
+    {
+        $processor = new Processor();
+        $configuration = new Configuration(true);
+
+        $config = $processor->processConfiguration($configuration, [[
+            'http_client' => [
+                'default_options' => ['rate_limiter' => 'default_limiter', 'retry_failed' => ['max_retries' => 77]],
+                'scoped_clients' => [
+                    'foo' => ['base_uri' => 'http://example.com'],
+                    'bar' => ['base_uri' => 'http://example.com', 'rate_limiter' => true, 'retry_failed' => true],
+                    'baz' => ['base_uri' => 'http://example.com', 'rate_limiter' => false, 'retry_failed' => false],
+                    'qux' => ['base_uri' => 'http://example.com', 'rate_limiter' => 'foo_limiter', 'retry_failed' => ['max_retries' => 88, 'delay' => 999]],
+                ],
+            ],
+        ]]);
+
+        $scopedClients = $config['http_client']['scoped_clients'];
+
+        $this->assertSame('default_limiter', $scopedClients['foo']['rate_limiter']);
+        $this->assertTrue($scopedClients['foo']['retry_failed']['enabled']);
+        $this->assertSame(77, $scopedClients['foo']['retry_failed']['max_retries']);
+        $this->assertSame(1000, $scopedClients['foo']['retry_failed']['delay']);
+
+        $this->assertSame('default_limiter', $scopedClients['bar']['rate_limiter']);
+        $this->assertTrue($scopedClients['bar']['retry_failed']['enabled']);
+        $this->assertSame(77, $scopedClients['bar']['retry_failed']['max_retries']);
+        $this->assertSame(1000, $scopedClients['bar']['retry_failed']['delay']);
+
+        $this->assertNull($scopedClients['baz']['rate_limiter']);
+        $this->assertFalse($scopedClients['baz']['retry_failed']['enabled']);
+        $this->assertSame(3, $scopedClients['baz']['retry_failed']['max_retries']);
+        $this->assertSame(1000, $scopedClients['baz']['retry_failed']['delay']);
+
+        $this->assertSame('foo_limiter', $scopedClients['qux']['rate_limiter']);
+        $this->assertTrue($scopedClients['qux']['retry_failed']['enabled']);
+        $this->assertSame(88, $scopedClients['qux']['retry_failed']['max_retries']);
+        $this->assertSame(999, $scopedClients['qux']['retry_failed']['delay']);
+    }
+
     protected static function getBundleDefaultConfig()
     {
         return [
@@ -602,12 +682,10 @@ class ConfigurationTest extends TestCase
                     'enabled' => true,
                     'endpoint' => null,
                 ],
+                'email_validation_mode' => 'html5',
             ],
             'annotations' => [
-                'cache' => 'php_array',
-                'file_cache_dir' => '%kernel.cache_dir%/annotations',
-                'debug' => true,
-                'enabled' => true,
+                'enabled' => false,
             ],
             'serializer' => [
                 'default_context' => ['foo' => 'bar', JsonDecode::DETAILED_ERROR_MESSAGES => true],
@@ -623,6 +701,9 @@ class ConfigurationTest extends TestCase
                 'throw_exception_on_invalid_index' => false,
                 'throw_exception_on_invalid_property_path' => true,
             ],
+            'type_info' => [
+                'enabled' => !class_exists(FullStack::class) && class_exists(Type::class),
+            ],
             'property_info' => [
                 'enabled' => !class_exists(FullStack::class),
             ],
@@ -633,16 +714,15 @@ class ConfigurationTest extends TestCase
                 'https_port' => 443,
                 'strict_requirements' => true,
                 'utf8' => true,
-                'cache_dir' => '%kernel.cache_dir%',
+                'cache_dir' => '%kernel.build_dir%',
             ],
             'session' => [
                 'enabled' => false,
                 'storage_factory_id' => 'session.storage.factory.native',
-                'handler_id' => 'session.handler.native_file',
                 'cookie_httponly' => true,
-                'cookie_samesite' => null,
+                'cookie_samesite' => 'lax',
+                'cookie_secure' => 'auto',
                 'gc_probability' => 1,
-                'save_path' => '%kernel.cache_dir%/sessions',
                 'metadata_update_threshold' => 0,
             ],
             'request' => [
@@ -669,10 +749,10 @@ class ConfigurationTest extends TestCase
                 'missing_import_mode' => 'warn',
                 'extensions' => [],
                 'importmap_path' => '%kernel.project_dir%/importmap.php',
-                'importmap_polyfill' => null,
+                'importmap_polyfill' => 'es-module-shims',
                 'vendor_dir' => '%kernel.project_dir%/assets/vendor',
-                'provider' => 'jsdelivr.esm',
                 'importmap_script_attributes' => [],
+                'exclude_dotfiles' => true,
             ],
             'cache' => [
                 'pools' => [],
@@ -723,7 +803,6 @@ class ConfigurationTest extends TestCase
                 ],
                 'default_bus' => null,
                 'buses' => ['messenger.bus.default' => ['default_middleware' => ['enabled' => true, 'allow_no_handlers' => false, 'allow_no_senders' => true], 'middleware' => []]],
-                'reset_on_message' => true,
                 'stop_worker_on_signals' => [],
             ],
             'disallow_search_engine_index' => true,
@@ -766,9 +845,9 @@ class ConfigurationTest extends TestCase
             ],
             'uid' => [
                 'enabled' => !class_exists(FullStack::class) && class_exists(UuidFactory::class),
-                'default_uuid_version' => 6,
+                'default_uuid_version' => 7,
                 'name_based_uuid_version' => 5,
-                'time_based_uuid_version' => 6,
+                'time_based_uuid_version' => 7,
             ],
             'html_sanitizer' => [
                 'enabled' => !class_exists(FullStack::class) && class_exists(HtmlSanitizer::class),

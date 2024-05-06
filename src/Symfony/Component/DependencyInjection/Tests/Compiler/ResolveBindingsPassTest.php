@@ -12,7 +12,6 @@
 namespace Symfony\Component\DependencyInjection\Tests\Compiler;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\DependencyInjection\Argument\BoundArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
 use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
@@ -38,8 +37,6 @@ require_once __DIR__.'/../Fixtures/includes/autowiring_classes.php';
 
 class ResolveBindingsPassTest extends TestCase
 {
-    use ExpectDeprecationTrait;
-
     public function testProcess()
     {
         $container = new ContainerBuilder();
@@ -144,24 +141,6 @@ class ResolveBindingsPassTest extends TestCase
         $this->assertEquals([$typedRef], $container->getDefinition('def1')->getArguments());
         $this->assertEquals([new Reference('foo')], $container->getDefinition('def2')->getArguments());
         $this->assertEquals([new Reference('bar')], $container->getDefinition('def3')->getArguments());
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testScalarSetterAnnotation()
-    {
-        $this->expectDeprecation('Since symfony/dependency-injection 6.3: Relying on the "@required" annotation on method "Symfony\Component\DependencyInjection\Tests\Compiler\ScalarSetterAnnotation::setDefaultLocale()" is deprecated, use the "Symfony\Contracts\Service\Attribute\Required" attribute instead.');
-
-        $container = new ContainerBuilder();
-
-        $definition = $container->autowire('foo', ScalarSetterAnnotation::class);
-        $definition->setBindings(['$defaultLocale' => 'fr']);
-
-        (new AutowireRequiredMethodsPass())->process($container);
-        (new ResolveBindingsPass())->process($container);
-
-        $this->assertEquals([['setDefaultLocale', ['fr']]], $definition->getMethodCalls());
     }
 
     public function testScalarSetterAttribute()

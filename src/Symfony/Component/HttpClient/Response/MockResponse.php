@@ -64,6 +64,15 @@ class MockResponse implements ResponseInterface, StreamableInterface
         self::addResponseHeaders($responseHeaders, $this->info, $this->headers);
     }
 
+    public static function fromFile(string $path, array $info = []): static
+    {
+        if (!is_file($path)) {
+            throw new \InvalidArgumentException(sprintf('File not found: "%s".', $path));
+        }
+
+        return new static(file_get_contents($path), $info);
+    }
+
     /**
      * Returns the options used when doing the request.
      */
@@ -88,7 +97,7 @@ class MockResponse implements ResponseInterface, StreamableInterface
         return $this->requestMethod;
     }
 
-    public function getInfo(string $type = null): mixed
+    public function getInfo(?string $type = null): mixed
     {
         return null !== $type ? $this->info[$type] ?? null : $this->info;
     }
@@ -217,6 +226,9 @@ class MockResponse implements ResponseInterface, StreamableInterface
     {
         $onProgress = $options['on_progress'] ?? static function () {};
         $response->info += $mock->getInfo() ?: [];
+        if (null !== $mock->getInfo('start_time')) {
+            $response->info['start_time'] = $mock->getInfo('start_time');
+        }
 
         // simulate "size_upload" if it is set
         if (isset($response->info['size_upload'])) {

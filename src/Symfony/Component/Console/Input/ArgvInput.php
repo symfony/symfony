@@ -40,10 +40,12 @@ use Symfony\Component\Console\Exception\RuntimeException;
  */
 class ArgvInput extends Input
 {
+    /** @var list<string> */
     private array $tokens;
     private array $parsed;
 
-    public function __construct(array $argv = null, InputDefinition $definition = null)
+    /** @param list<string>|null $argv */
+    public function __construct(?array $argv = null, ?InputDefinition $definition = null)
     {
         $argv ??= $_SERVER['argv'] ?? [];
 
@@ -55,18 +57,13 @@ class ArgvInput extends Input
         parent::__construct($definition);
     }
 
-    /**
-     * @return void
-     */
-    protected function setTokens(array $tokens)
+    /** @param list<string> $tokens */
+    protected function setTokens(array $tokens): void
     {
         $this->tokens = $tokens;
     }
 
-    /**
-     * @return void
-     */
-    protected function parse()
+    protected function parse(): void
     {
         $parseOptions = true;
         $this->parsed = $this->tokens;
@@ -346,6 +343,35 @@ class ArgvInput extends Input
         }
 
         return $default;
+    }
+
+    /**
+     * Returns un-parsed and not validated tokens.
+     *
+     * @param bool $strip Whether to return the raw parameters (false) or the values after the command name (true)
+     *
+     * @return list<string>
+     */
+    public function getRawTokens(bool $strip = false): array
+    {
+        if (!$strip) {
+            return $this->tokens;
+        }
+
+        $parameters = [];
+        $keep = false;
+        foreach ($this->tokens as $value) {
+            if (!$keep && $value === $this->getFirstArgument()) {
+                $keep = true;
+
+                continue;
+            }
+            if ($keep) {
+                $parameters[] = $value;
+            }
+        }
+
+        return $parameters;
     }
 
     /**

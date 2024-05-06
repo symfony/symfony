@@ -30,9 +30,16 @@ class AddScheduleMessengerPass implements CompilerPassInterface
 {
     public function process(ContainerBuilder $container): void
     {
+        if (!$container->has('event_dispatcher')) {
+            $container->removeDefinition('scheduler.event_listener');
+        }
+
         $receivers = [];
-        foreach ($container->findTaggedServiceIds('messenger.receiver') as $tags) {
-            $receivers[$tags[0]['alias']] = true;
+        foreach ($container->findTaggedServiceIds('messenger.receiver') as $serviceId => $tags) {
+            $receivers[$serviceId] = true;
+            if (isset($tags[0]['alias'])) {
+                $receivers[$tags[0]['alias']] = true;
+            }
         }
 
         $scheduleProviderIds = [];

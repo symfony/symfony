@@ -30,7 +30,7 @@ class StreamWrapper
     private ResponseInterface $response;
 
     /** @var resource|string|null */
-    private $content = null;
+    private $content;
 
     /** @var resource|callable|null */
     private $handle;
@@ -45,7 +45,7 @@ class StreamWrapper
      *
      * @return resource
      */
-    public static function createResource(ResponseInterface $response, HttpClientInterface $client = null)
+    public static function createResource(ResponseInterface $response, ?HttpClientInterface $client = null)
     {
         if ($response instanceof StreamableInterface) {
             $stack = debug_backtrace(\DEBUG_BACKTRACE_PROVIDE_OBJECT | \DEBUG_BACKTRACE_IGNORE_ARGS, 2);

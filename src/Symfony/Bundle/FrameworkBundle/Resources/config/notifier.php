@@ -129,8 +129,5 @@ return static function (ContainerConfigurator $container) {
         ->set('notifier.notification_logger_listener', NotificationLoggerListener::class)
             ->tag('kernel.event_subscriber')
 
-        ->alias('notifier.logger_notification_listener', 'notifier.notification_logger_listener')
-            ->deprecate('symfony/framework-bundle', '6.3', 'The "%alias_id%" service is deprecated, use "notifier.notification_logger_listener" instead.')
-
     ;
 };

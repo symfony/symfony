@@ -136,6 +136,68 @@ class EnvVarProcessorTest extends TestCase
         $this->assertSame($processed, $result);
     }
 
+    public function testGetEnvCachesEnv()
+    {
+        $_ENV['FOO'] = '';
+
+        $GLOBALS['ENV_FOO'] = 'value';
+
+        $loaders = function () {
+            yield new class() implements EnvVarLoaderInterface {
+                public function loadEnvVars(): array
+                {
+                    return ['FOO' => $GLOBALS['ENV_FOO']];
+                }
+            };
+        };
+
+        $processor = new EnvVarProcessor(new Container(), new RewindableGenerator($loaders, 1));
+
+        $noop = function () {};
+
+        $result = $processor->getEnv('string', 'FOO', $noop);
+        $this->assertSame('value', $result);
+
+        $GLOBALS['ENV_FOO'] = 'new value';
+
+        $result = $processor->getEnv('string', 'FOO', $noop);
+        $this->assertSame('value', $result);
+
+        unset($_ENV['FOO'], $GLOBALS['ENV_FOO']);
+    }
+
+    public function testReset()
+    {
+        $_ENV['FOO'] = '';
+
+        $GLOBALS['ENV_FOO'] = 'value';
+
+        $loaders = function () {
+            yield new class() implements EnvVarLoaderInterface {
+                public function loadEnvVars(): array
+                {
+                    return ['FOO' => $GLOBALS['ENV_FOO']];
+                }
+            };
+        };
+
+        $processor = new EnvVarProcessor(new Container(), new RewindableGenerator($loaders, 1));
+
+        $noop = function () {};
+
+        $result = $processor->getEnv('string', 'FOO', $noop);
+        $this->assertSame('value', $result);
+
+        $GLOBALS['ENV_FOO'] = 'new value';
+
+        $processor->reset();
+
+        $result = $processor->getEnv('string', 'FOO', $noop);
+        $this->assertSame('new value', $result);
+
+        unset($_ENV['FOO'], $GLOBALS['ENV_FOO']);
+    }
+
     /**
      * @dataProvider validBools
      */
@@ -196,9 +258,10 @@ class EnvVarProcessorTest extends TestCase
      */
     public function testGetEnvIntInvalid($value)
     {
+        $processor = new EnvVarProcessor(new Container());
+
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('Non-numeric env var');
-        $processor = new EnvVarProcessor(new Container());
 
         $processor->getEnv('int', 'foo', function ($name) use ($value) {
             $this->assertSame('foo', $name);
@@ -246,9 +309,10 @@ class EnvVarProcessorTest extends TestCase
      */
     public function testGetEnvFloatInvalid($value)
     {
+        $processor = new EnvVarProcessor(new Container());
+
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('Non-numeric env var');
-        $processor = new EnvVarProcessor(new Container());
 
         $processor->getEnv('float', 'foo', function ($name) use ($value) {
             $this->assertSame('foo', $name);
@@ -295,9 +359,10 @@ class EnvVarProcessorTest extends TestCase
      */
     public function testGetEnvConstInvalid($value)
     {
+        $processor = new EnvVarProcessor(new Container());
+
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('undefined constant');
-        $processor = new EnvVarProcessor(new Container());
 
         $processor->getEnv('const', 'foo', function ($name) use ($value) {
             $this->assertSame('foo', $name);
@@ -373,9 +438,10 @@ class EnvVarProcessorTest extends TestCase
 
     public function testGetEnvInvalidJson()
     {
+        $processor = new EnvVarProcessor(new Container());
+
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('Syntax error');
-        $processor = new EnvVarProcessor(new Container());
 
         $processor->getEnv('json', 'foo', function ($name) {
             $this->assertSame('foo', $name);
@@ -389,9 +455,10 @@ class EnvVarProcessorTest extends TestCase
      */
     public function testGetEnvJsonOther($value)
     {
+        $processor = new EnvVarProcessor(new Container());
+
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('Invalid JSON env var');
-        $processor = new EnvVarProcessor(new Container());
 
         $processor->getEnv('json', 'foo', function ($name) use ($value) {
             $this->assertSame('foo', $name);
@@ -413,9 +480,10 @@ class EnvVarProcessorTest extends TestCase
 
     public function testGetEnvUnknown()
     {
+        $processor = new EnvVarProcessor(new Container());
+
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('Unsupported env var prefix');
-        $processor = new EnvVarProcessor(new Container());
 
         $processor->getEnv('unknown', 'foo', function ($name) {
             $this->assertSame('foo', $name);
@@ -426,9 +494,10 @@ class EnvVarProcessorTest extends TestCase
 
     public function testGetEnvKeyInvalidKey()
     {
+        $processor = new EnvVarProcessor(new Container());
+
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('Invalid env "key:foo": a key specifier should be provided.');
-        $processor = new EnvVarProcessor(new Container());
 
         $processor->getEnv('key', 'foo', function ($name) {
             $this->fail('Should not get here');
@@ -440,9 +509,10 @@ class EnvVarProcessorTest extends TestCase
      */
     public function testGetEnvKeyNoArrayResult($value)
     {
+        $processor = new EnvVarProcessor(new Container());
+
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('Resolved value of "foo" did not result in an array value.');
-        $processor = new EnvVarProcessor(new Container());
 
         $processor->getEnv('key', 'index:foo', function ($name) use ($value) {
             $this->assertSame('foo', $name);
@@ -466,9 +536,10 @@ class EnvVarProcessorTest extends TestCase
      */
     public function testGetEnvKeyArrayKeyNotFound($value)
     {
+        $processor = new EnvVarProcessor(new Container());
+
         $this->expectException(EnvNotFoundException::class);
         $this->expectExceptionMessage('Key "index" not found in');
-        $processor = new EnvVarProcessor(new Container());
 
         $processor->getEnv('key', 'index:foo', function ($name) use ($value) {
             $this->assertSame('foo', $name);
@@ -616,14 +687,15 @@ class EnvVarProcessorTest extends TestCase
             ['null', 'null'],
             ['Null', 'Null'],
             ['NULL', 'NULL'],
-         ];
+        ];
     }
 
     public function testRequireMissingFile()
     {
+        $processor = new EnvVarProcessor(new Container());
+
         $this->expectException(EnvNotFoundException::class);
         $this->expectExceptionMessage('missing-file');
-        $processor = new EnvVarProcessor(new Container());
 
         $processor->getEnv('require', '/missing-file', fn ($name) => $name);
     }
@@ -684,14 +756,14 @@ class EnvVarProcessorTest extends TestCase
      */
     public function testGetEnvResolveNotScalar($value)
     {
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Parameter "bar" found when resolving env var "foo" must be scalar');
-
         $container = new ContainerBuilder();
         $container->setParameter('bar', $value);
         $container->compile();
 
         $processor = new EnvVarProcessor($container);
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Parameter "bar" found when resolving env var "foo" must be scalar');
 
         $processor->getEnv('resolve', 'foo', fn () => '%bar%');
     }
@@ -798,6 +870,12 @@ CSV;
                     return [
                         'FOO_ENV_LOADER' => '123',
                         'BAZ_ENV_LOADER' => '',
+                        'LAZY_ENV_LOADER' => new class() {
+                            public function __toString()
+                            {
+                                return '';
+                            }
+                        },
                     ];
                 }
             };
@@ -809,6 +887,12 @@ CSV;
                         'FOO_ENV_LOADER' => '234',
                         'BAR_ENV_LOADER' => '456',
                         'BAZ_ENV_LOADER' => '567',
+                        'LAZY_ENV_LOADER' => new class() {
+                            public function __toString()
+                            {
+                                return '678';
+                            }
+                        },
                     ];
                 }
             };
@@ -830,6 +914,9 @@ CSV;
 
         $result = $processor->getEnv('string', 'FOO_ENV_LOADER', function () {});
         $this->assertSame('123', $result); // check twice
+
+        $result = $processor->getEnv('string', 'LAZY_ENV_LOADER', function () {});
+        $this->assertSame('678', $result);
 
         unset($_ENV['BAZ_ENV_LOADER']);
         unset($_ENV['BUZ_ENV_LOADER']);
@@ -877,9 +964,10 @@ CSV;
 
     public function testGetEnvInvalidPrefixWithDefault()
     {
+        $processor = new EnvVarProcessor(new Container());
+
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('Unsupported env var prefix');
-        $processor = new EnvVarProcessor(new Container());
 
         $processor->getEnv('unknown', 'default::FAKE', function ($name) {
             $this->assertSame('default::FAKE', $name);
@@ -946,6 +1034,17 @@ CSV;
     public function testGetEnvDefined(bool $expected, callable $callback)
     {
         $this->assertSame($expected, (new EnvVarProcessor(new Container()))->getEnv('defined', 'NO_SOMETHING', $callback));
+    }
+
+    public function testGetEnvUrlencode()
+    {
+        $processor = new EnvVarProcessor(new Container());
+
+        $result = $processor->getEnv('urlencode', 'URLENCODETEST', function () {
+            return 'foo: Data123!@-_ + bar: Not the same content as Data123!@-_ +';
+        });
+
+        $this->assertSame('foo%3A%20Data123%21%40-_%20%2B%20bar%3A%20Not%20the%20same%20content%20as%20Data123%21%40-_%20%2B', $result);
     }
 
     public static function provideGetEnvDefined(): iterable

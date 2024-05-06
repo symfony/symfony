@@ -874,9 +874,13 @@ return [
             'SKK',
             'Slowaakse koruna',
         ],
+        'SLE' => [
+            'SLE',
+            'Sierraleoonse leone',
+        ],
         'SLL' => [
             'SLL',
-            'Sierraleoonse leone',
+            'Sierraleoonse leone (1964—2022)',
         ],
         'SOS' => [
             'SOS',

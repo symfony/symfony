@@ -123,4 +123,28 @@ class MoneyTypeTest extends BaseTypeTestCase
         $this->assertSame('12345.60', $form->createView()->vars['value']);
         $this->assertSame('number', $form->createView()->vars['type']);
     }
+
+    public function testDefaultInput()
+    {
+        $form = $this->factory->create(static::TESTED_TYPE, null, ['divisor' => 100]);
+        $form->submit('12345.67');
+
+        $this->assertSame(1234567.0, $form->getData());
+    }
+
+    public function testIntegerInput()
+    {
+        $form = $this->factory->create(static::TESTED_TYPE, null, ['divisor' => 100, 'input' => 'integer']);
+        $form->submit('12345.67');
+
+        $this->assertSame(1234567, $form->getData());
+    }
+
+    public function testIntegerInputWithoutDivisor()
+    {
+        $form = $this->factory->create(static::TESTED_TYPE, null, ['input' => 'integer']);
+        $form->submit('1234567');
+
+        $this->assertSame(1234567, $form->getData());
+    }
 }

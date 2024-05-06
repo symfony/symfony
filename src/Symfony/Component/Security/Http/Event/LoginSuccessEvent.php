@@ -40,7 +40,7 @@ class LoginSuccessEvent extends Event
     private ?Response $response;
     private string $firewallName;
 
-    public function __construct(AuthenticatorInterface $authenticator, Passport $passport, TokenInterface $authenticatedToken, Request $request, ?Response $response, string $firewallName, TokenInterface $previousToken = null)
+    public function __construct(AuthenticatorInterface $authenticator, Passport $passport, TokenInterface $authenticatedToken, Request $request, ?Response $response, string $firewallName, ?TokenInterface $previousToken = null)
     {
         $this->authenticator = $authenticator;
         $this->passport = $passport;

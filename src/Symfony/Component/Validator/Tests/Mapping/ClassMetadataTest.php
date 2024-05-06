@@ -22,6 +22,8 @@ use Symfony\Component\Validator\Exception\GroupDefinitionException;
 use Symfony\Component\Validator\Mapping\CascadingStrategy;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Tests\Fixtures\CascadingEntity;
+use Symfony\Component\Validator\Tests\Fixtures\CascadingEntityIntersection;
+use Symfony\Component\Validator\Tests\Fixtures\CascadingEntityUnion;
 use Symfony\Component\Validator\Tests\Fixtures\ClassConstraint;
 use Symfony\Component\Validator\Tests\Fixtures\ConstraintA;
 use Symfony\Component\Validator\Tests\Fixtures\ConstraintB;
@@ -279,17 +281,21 @@ class ClassMetadataTest extends TestCase
 
     public function testGroupSequenceFailsIfGroupSequenceProviderIsSet()
     {
-        $this->expectException(GroupDefinitionException::class);
         $metadata = new ClassMetadata(self::PROVIDERCLASS);
         $metadata->setGroupSequenceProvider(true);
+
+        $this->expectException(GroupDefinitionException::class);
+
         $metadata->setGroupSequence(['GroupSequenceProviderEntity', 'Foo']);
     }
 
     public function testGroupSequenceProviderFailsIfGroupSequenceIsSet()
     {
-        $this->expectException(GroupDefinitionException::class);
         $metadata = new ClassMetadata(self::PROVIDERCLASS);
         $metadata->setGroupSequence(['GroupSequenceProviderEntity', 'Foo']);
+
+        $this->expectException(GroupDefinitionException::class);
+
         $metadata->setGroupSequenceProvider(true);
     }
 
@@ -339,6 +345,34 @@ class ClassMetadataTest extends TestCase
             'optionalChild',
             'staticChild',
             'children',
+        ], $metadata->getConstrainedProperties());
+    }
+
+    public function testCascadeConstraintWithUnionTypeProperties()
+    {
+        $metadata = new ClassMetadata(CascadingEntityUnion::class);
+        $metadata->addConstraint(new Cascade());
+
+        $this->assertSame(CascadingStrategy::CASCADE, $metadata->getCascadingStrategy());
+        $this->assertCount(5, $metadata->properties);
+        $this->assertSame([
+            'classes',
+            'classAndArray',
+            'classAndNull',
+            'arrayAndNull',
+            'classAndArrayAndNull',
+        ], $metadata->getConstrainedProperties());
+    }
+
+    public function testCascadeConstraintWithIntersectionTypeProperties()
+    {
+        $metadata = new ClassMetadata(CascadingEntityIntersection::class);
+        $metadata->addConstraint(new Cascade());
+
+        $this->assertSame(CascadingStrategy::CASCADE, $metadata->getCascadingStrategy());
+        $this->assertCount(1, $metadata->properties);
+        $this->assertSame([
+            'classes',
         ], $metadata->getConstrainedProperties());
     }
 

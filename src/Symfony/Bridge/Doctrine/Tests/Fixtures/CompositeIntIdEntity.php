@@ -18,14 +18,14 @@ use Doctrine\ORM\Mapping\Id;
 #[Entity]
 class CompositeIntIdEntity
 {
-    #[Id, Column(type: 'integer')]
-    protected $id1;
+    #[Id, Column]
+    protected int $id1;
 
-    #[Id, Column(type: 'integer')]
-    protected $id2;
+    #[Id, Column]
+    protected int $id2;
 
-    #[Column(type: 'string')]
-    public $name;
+    #[Column]
+    public string $name;
 
     public function __construct($id1, $id2, $name)
     {

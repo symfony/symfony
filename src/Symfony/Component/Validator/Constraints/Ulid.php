@@ -14,7 +14,9 @@ namespace Symfony\Component\Validator\Constraints;
 use Symfony\Component\Validator\Constraint;
 
 /**
- * @Annotation
+ * Validates that a value is a valid Universally Unique Lexicographically Sortable Identifier (ULID).
+ *
+ * @see https://github.com/ulid/spec
  *
  * @author Laurent Clouet <laurent35240@gmail.com>
  */
@@ -33,18 +35,17 @@ class Ulid extends Constraint
         self::TOO_LARGE_ERROR => 'TOO_LARGE_ERROR',
     ];
 
+    public string $message = 'This is not a valid ULID.';
+
     /**
-     * @deprecated since Symfony 6.1, use const ERROR_NAMES instead
+     * @param array<string,mixed>|null $options
+     * @param string[]|null            $groups
      */
-    protected static $errorNames = self::ERROR_NAMES;
-
-    public $message = 'This is not a valid ULID.';
-
     public function __construct(
-        array $options = null,
-        string $message = null,
-        array $groups = null,
-        mixed $payload = null
+        ?array $options = null,
+        ?string $message = null,
+        ?array $groups = null,
+        mixed $payload = null,
     ) {
         parent::__construct($options, $groups, $payload);
 

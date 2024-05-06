@@ -29,7 +29,7 @@ class TypedReference extends Reference
      * @param string|null $name            The name of the argument targeting the service
      * @param array       $attributes      The attributes to be used
      */
-    public function __construct(string $id, string $type, int $invalidBehavior = ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE, string $name = null, array $attributes = [])
+    public function __construct(string $id, string $type, int $invalidBehavior = ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE, ?string $name = null, array $attributes = [])
     {
         $this->name = $type === $id ? $name : null;
         parent::__construct($id, $invalidBehavior);
@@ -37,10 +37,7 @@ class TypedReference extends Reference
         $this->attributes = $attributes;
     }
 
-    /**
-     * @return string
-     */
-    public function getType()
+    public function getType(): string
     {
         return $this->type;
     }

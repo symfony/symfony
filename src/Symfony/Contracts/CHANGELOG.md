@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+3.5
+---
+
+ * Add `ServiceCollectionInterface`
+ * Deprecate `ServiceSubscriberTrait`, use `ServiceMethodsSubscriberTrait` instead
+
 3.4
 ---
 

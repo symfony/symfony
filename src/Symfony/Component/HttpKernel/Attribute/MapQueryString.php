@@ -26,6 +26,12 @@ class MapQueryString extends ValueResolver
 {
     public ArgumentMetadata $metadata;
 
+    /**
+     * @param array<string, mixed>                    $serializationContext       The serialization context to use when deserializing the query string
+     * @param string|GroupSequence|array<string>|null $validationGroups           The validation groups to use when validating the query string mapping
+     * @param class-string                            $resolver                   The class name of the resolver to use
+     * @param int                                     $validationFailedStatusCode The HTTP code to return if the validation fails
+     */
     public function __construct(
         public readonly array $serializationContext = [],
         public readonly string|GroupSequence|array|null $validationGroups = null,

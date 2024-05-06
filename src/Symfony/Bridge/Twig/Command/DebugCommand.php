@@ -22,8 +22,8 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
+use Symfony\Component\ErrorHandler\ErrorRenderer\FileLinkFormatter;
 use Symfony\Component\Finder\Finder;
-use Symfony\Component\HttpKernel\Debug\FileLinkFormatter;
 use Twig\Environment;
 use Twig\Loader\ChainLoader;
 use Twig\Loader\FilesystemLoader;
@@ -36,33 +36,22 @@ use Twig\Loader\FilesystemLoader;
 #[AsCommand(name: 'debug:twig', description: 'Show a list of twig functions, filters, globals and tests')]
 class DebugCommand extends Command
 {
-    private Environment $twig;
-    private ?string $projectDir;
-    private array $bundlesMetadata;
-    private ?string $twigDefaultPath;
-
     /**
      * @var FilesystemLoader[]
      */
     private array $filesystemLoaders;
 
-    private ?FileLinkFormatter $fileLinkFormatter;
-
-    public function __construct(Environment $twig, string $projectDir = null, array $bundlesMetadata = [], string $twigDefaultPath = null, FileLinkFormatter $fileLinkFormatter = null)
-    {
+    public function __construct(
+        private Environment $twig,
+        private ?string $projectDir = null,
+        private array $bundlesMetadata = [],
+        private ?string $twigDefaultPath = null,
+        private ?FileLinkFormatter $fileLinkFormatter = null,
+    ) {
         parent::__construct();
-
-        $this->twig = $twig;
-        $this->projectDir = $projectDir;
-        $this->bundlesMetadata = $bundlesMetadata;
-        $this->twigDefaultPath = $twigDefaultPath;
-        $this->fileLinkFormatter = $fileLinkFormatter;
     }
 
-    /**
-     * @return void
-     */
-    protected function configure()
+    protected function configure(): void
     {
         $this
             ->setDefinition([
@@ -217,7 +206,7 @@ EOF
         $io->writeln(json_encode($data));
     }
 
-    private function displayGeneralText(SymfonyStyle $io, string $filter = null): void
+    private function displayGeneralText(SymfonyStyle $io, ?string $filter = null): void
     {
         $decorated = $io->isDecorated();
         $types = ['functions', 'filters', 'tests', 'globals'];
@@ -279,7 +268,7 @@ EOF
         $io->writeln($decorated ? OutputFormatter::escape($data) : $data);
     }
 
-    private function getLoaderPaths(string $name = null): array
+    private function getLoaderPaths(?string $name = null): array
     {
         $loaderPaths = [];
         foreach ($this->getFilesystemLoaders() as $loader) {
@@ -590,11 +579,7 @@ EOF
 
     private function getFileLink(string $absolutePath): string
     {
-        if (null === $this->fileLinkFormatter) {
-            return '';
-        }
-
-        return (string) $this->fileLinkFormatter->format($absolutePath, 1);
+        return (string) $this->fileLinkFormatter?->format($absolutePath, 1);
     }
 
     private function getAvailableFormatOptions(): array

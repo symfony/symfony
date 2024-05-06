@@ -16,6 +16,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestMatcher\IsJsonRequestMatcher;
 use Symfony\Component\HttpFoundation\RequestMatcher\MethodRequestMatcher;
 use Symfony\Component\HttpFoundation\RequestMatcherInterface;
+use Symfony\Component\Notifier\Exception\InvalidArgumentException;
 use Symfony\Component\RemoteEvent\Event\Sms\SmsEvent;
 use Symfony\Component\Webhook\Client\AbstractRequestParser;
 use Symfony\Component\Webhook\Exception\RejectWebhookException;
@@ -30,8 +31,12 @@ final class VonageRequestParser extends AbstractRequestParser
         ]);
     }
 
-    protected function doParse(Request $request, string $secret): ?SmsEvent
+    protected function doParse(Request $request, #[\SensitiveParameter] string $secret): ?SmsEvent
     {
+        if (!$secret) {
+            throw new InvalidArgumentException('A non-empty secret is required.');
+        }
+
         // Signed webhooks: https://developer.vonage.com/en/getting-started/concepts/webhooks#validating-signed-webhooks
         if (!$request->headers->has('Authorization')) {
             throw new RejectWebhookException(406, 'Missing "Authorization" header.');
@@ -70,7 +75,7 @@ final class VonageRequestParser extends AbstractRequestParser
         return $event;
     }
 
-    private function validateSignature(string $jwt, string $secret): void
+    private function validateSignature(string $jwt, #[\SensitiveParameter] string $secret): void
     {
         $tokenParts = explode('.', $jwt);
         if (3 !== \count($tokenParts)) {

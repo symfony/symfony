@@ -159,6 +159,7 @@ abstract class ResourceBundleTestCase extends TestCase
         'en_GU',
         'en_GY',
         'en_HK',
+        'en_ID',
         'en_IE',
         'en_IL',
         'en_IM',
@@ -383,6 +384,8 @@ abstract class ResourceBundleTestCase extends TestCase
         'ia_001',
         'id',
         'id_ID',
+        'ie',
+        'ie_EE',
         'ig',
         'ig_NG',
         'ii',
@@ -416,6 +419,7 @@ abstract class ResourceBundleTestCase extends TestCase
         'kn',
         'kn_IN',
         'ko',
+        'ko_CN',
         'ko_KP',
         'ko_KR',
         'ks',
@@ -490,6 +494,9 @@ abstract class ResourceBundleTestCase extends TestCase
         'no',
         'no_NO',
         'no_NO_NY',
+        'oc',
+        'oc_ES',
+        'oc_FR',
         'om',
         'om_ET',
         'om_KE',
@@ -664,10 +671,12 @@ abstract class ResourceBundleTestCase extends TestCase
         'xh',
         'xh_ZA',
         'yi',
-        'yi_001',
+        'yi_UA',
         'yo',
         'yo_BJ',
         'yo_NG',
+        'za',
+        'za_CN',
         'zh',
         'zh_CN',
         'zh_HK',
@@ -749,46 +758,46 @@ abstract class ResourceBundleTestCase extends TestCase
         \Locale::setDefault($this->defaultLocale);
     }
 
-    public function provideLocales()
+    public static function provideLocales()
     {
         return array_map(
             fn ($locale) => [$locale],
-            $this->getLocales()
+            self::getLocales()
         );
     }
 
-    public function provideLocaleAliases()
+    public static function provideLocaleAliases()
     {
         return array_map(
             fn ($alias, $ofLocale) => [$alias, $ofLocale],
-            array_keys($this->getLocaleAliases()),
-            $this->getLocaleAliases()
+            array_keys(self::getLocaleAliases()),
+            self::getLocaleAliases()
         );
     }
 
-    public function provideRootLocales()
+    public static function provideRootLocales()
     {
         return array_map(
             fn ($locale) => [$locale],
-            $this->getRootLocales()
+            self::getRootLocales()
         );
     }
 
-    protected function getLocales()
+    protected static function getLocales()
     {
         return self::LOCALES;
     }
 
-    protected function getLocaleAliases()
+    protected static function getLocaleAliases()
     {
         return self::LOCALE_ALIASES;
     }
 
-    protected function getRootLocales()
+    protected static function getRootLocales()
     {
         if (null === self::$rootLocales) {
-            self::$rootLocales = array_filter($this->getLocales(), fn ($locale) => // no locales for which fallback is possible (e.g "en_GB")
-!str_contains($locale, '_'));
+            // ignore locales for which fallback is possible (e.g "en_GB")
+            self::$rootLocales = array_filter(self::getLocales(), fn ($locale) => !str_contains($locale, '_'));
         }
 
         return self::$rootLocales;

@@ -394,7 +394,7 @@ final class W3CReference
         'vlink' => false,
         'vspace' => true,
         'webkitdirectory' => true,
-        'width' => false,
+        'width' => true,
         'wrap' => true,
     ];
 }

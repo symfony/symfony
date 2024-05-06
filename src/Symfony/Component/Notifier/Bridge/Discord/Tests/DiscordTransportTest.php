@@ -24,7 +24,7 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
 
 final class DiscordTransportTest extends TransportTestCase
 {
-    public static function createTransport(HttpClientInterface $client = null): DiscordTransport
+    public static function createTransport(?HttpClientInterface $client = null): DiscordTransport
     {
         return (new DiscordTransport('testToken', 'testWebhookId', $client ?? new MockHttpClient()))->setHost('host.test');
     }

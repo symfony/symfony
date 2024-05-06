@@ -22,43 +22,68 @@ class Marking
     private ?array $context = null;
 
     /**
-     * @param int[] $representation Keys are the place name and values should be 1
+     * @param int[] $representation Keys are the place name and values should be superior or equals to 1
      */
     public function __construct(array $representation = [])
     {
         foreach ($representation as $place => $nbToken) {
-            $this->mark($place);
+            $this->mark($place, $nbToken);
         }
     }
 
     /**
-     * @return void
+     * @param int $nbToken
+     *
+     * @psalm-param int<1, max> $nbToken
      */
-    public function mark(string $place)
+    public function mark(string $place /* , int $nbToken = 1 */): void
     {
-        $this->places[$place] = 1;
+        $nbToken = 1 < \func_num_args() ? func_get_arg(1) : 1;
+
+        if ($nbToken < 1) {
+            throw new \InvalidArgumentException(sprintf('The number of tokens must be greater than 0, "%s" given.', $nbToken));
+        }
+
+        $this->places[$place] ??= 0;
+        $this->places[$place] += $nbToken;
     }
 
     /**
-     * @return void
+     * @param int $nbToken
+     *
+     * @psalm-param int<1, max> $nbToken
      */
-    public function unmark(string $place)
+    public function unmark(string $place /* , int $nbToken = 1 */): void
     {
-        unset($this->places[$place]);
+        $nbToken = 1 < \func_num_args() ? func_get_arg(1) : 1;
+
+        if ($nbToken < 1) {
+            throw new \InvalidArgumentException(sprintf('The number of tokens must be greater than 0, "%s" given.', $nbToken));
+        }
+
+        if (!$this->has($place)) {
+            throw new \InvalidArgumentException(sprintf('The place "%s" is not marked.', $place));
+        }
+
+        $tokenCount = $this->places[$place] - $nbToken;
+
+        if (0 > $tokenCount) {
+            throw new \InvalidArgumentException(sprintf('The place "%s" could not contain a negative token number: "%s" (initial) - "%s" (nbToken) = "%s".', $place, $this->places[$place], $nbToken, $tokenCount));
+        }
+
+        if (0 === $tokenCount) {
+            unset($this->places[$place]);
+        } else {
+            $this->places[$place] = $tokenCount;
+        }
     }
 
-    /**
-     * @return bool
-     */
-    public function has(string $place)
+    public function has(string $place): bool
     {
         return isset($this->places[$place]);
     }
 
-    /**
-     * @return array
-     */
-    public function getPlaces()
+    public function getPlaces(): array
     {
         return $this->places;
     }

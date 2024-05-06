@@ -1,14 +1,39 @@
 CHANGELOG
 =========
 
+7.1
+---
+
+ * Deprecate the `DoctrineExtractor::getTypes()` method, use `DoctrineExtractor::getType()` instead
+ * Allow `EntityValueResolver` to return a list of entities
+ * Add support for auto-closing idle connections
+ * Allow validating every class against `UniqueEntity` constraint
+ * Deprecate auto-mapping of entities in favor of mapped route parameters
+
+7.0
+---
+
+ * Remove `DoctrineDbalCacheAdapterSchemaSubscriber`, use `DoctrineDbalCacheAdapterSchemaListener` instead
+ * Remove `MessengerTransportDoctrineSchemaSubscriber`, use `MessengerTransportDoctrineSchemaListener` instead
+ * Remove `RememberMeTokenProviderDoctrineSchemaSubscriber`, use `RememberMeTokenProviderDoctrineSchemaListener` instead
+ * Remove `DbalLogger`, use a middleware instead
+ * Remove `DoctrineDataCollector::addLogger()`, use a `DebugDataHolder` instead
+ * Remove `ContainerAwareLoader`, use dependency injection in your fixtures instead
+ * `ContainerAwareEventManager::getListeners()` must be called with an event name
+ * DoctrineBridge now requires `doctrine/event-manager:^2`
+ * Add parameter `$isSameDatabase` to `DoctrineTokenProvider::configureSchema()`
+
 6.4
 ---
 
+ * [BC BREAK] Add argument `$buildDir` to `ProxyCacheWarmer::warmUp()`
+ * [BC BREAK] Add return type-hints to `EntityFactory`
  * Deprecate `DbalLogger`, use a middleware instead
  * Deprecate not constructing `DoctrineDataCollector` with an instance of `DebugDataHolder`
  * Deprecate `DoctrineDataCollector::addLogger()`, use a `DebugDataHolder` instead
  * Deprecate `ContainerAwareLoader`, use dependency injection in your fixtures instead
  * Always pass the `Request` object to `EntityValueResolver`'s expression
+ * [BC BREAK] Change argument `$lastUsed` of `DoctrineTokenProvider::updateToken()` to accept `DateTimeInterface`
 
 6.3
 ---

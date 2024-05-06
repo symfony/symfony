@@ -18,11 +18,11 @@ use Symfony\Component\Mime\Exception\LogicException;
  */
 class RawMessage
 {
-    private iterable|string|null $message = null;
+    private bool $isGeneratorClosed;
 
-    public function __construct(iterable|string $message)
-    {
-        $this->message = $message;
+    public function __construct(
+        private iterable|string $message,
+    ) {
     }
 
     public function toString(): string
@@ -30,35 +30,48 @@ class RawMessage
         if (\is_string($this->message)) {
             return $this->message;
         }
-        if ($this->message instanceof \Traversable) {
-            $this->message = iterator_to_array($this->message, false);
+
+        $message = '';
+        foreach ($this->message as $chunk) {
+            $message .= $chunk;
         }
 
-        return $this->message = implode('', $this->message);
+        return $this->message = $message;
     }
 
     public function toIterable(): iterable
     {
+        if ($this->isGeneratorClosed ?? false) {
+            throw new LogicException('Unable to send the email as its generator is already closed.');
+        }
+
         if (\is_string($this->message)) {
             yield $this->message;
 
             return;
         }
 
-        $message = '';
+        if ($this->message instanceof \Generator) {
+            $message = '';
+            foreach ($this->message as $chunk) {
+                $message .= $chunk;
+                yield $chunk;
+            }
+            $this->isGeneratorClosed = !$this->message->valid();
+            $this->message = $message;
+
+            return;
+        }
+
         foreach ($this->message as $chunk) {
-            $message .= $chunk;
             yield $chunk;
         }
-        $this->message = $message;
     }
 
     /**
-     * @return void
-     *
      * @throws LogicException if the message is not valid
      */
-    public function ensureValidity()
+    public function ensureValidity(): void
     {
     }
 

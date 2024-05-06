@@ -47,6 +47,36 @@ class HandleMessageMiddlewareTest extends MiddlewareTestCase
         $middleware->handle($envelope, $this->getStackMock());
     }
 
+    public function testItKeysTheHandlerFailedNestedExceptionsByHandlerDescription()
+    {
+        $message = new DummyMessage('Hey');
+        $envelope = new Envelope($message);
+        $handler = new class() {
+            public function __invoke()
+            {
+                throw new \Exception('failed');
+            }
+        };
+
+        $middleware = new HandleMessageMiddleware(new HandlersLocator([
+            DummyMessage::class => [$handler],
+        ]));
+
+        try {
+            $middleware->handle($envelope, $this->getStackMock(false));
+        } catch (HandlerFailedException $e) {
+            $key = (new HandlerDescriptor($handler))->getName();
+
+            $this->assertCount(1, $e->getWrappedExceptions());
+            $this->assertArrayHasKey($key, $e->getWrappedExceptions());
+            $this->assertSame('failed', $e->getWrappedExceptions()[$key]->getMessage());
+
+            return;
+        }
+
+        $this->fail('Exception not thrown.');
+    }
+
     /**
      * @dataProvider itAddsHandledStampsProvider
      */
@@ -174,7 +204,7 @@ class HandleMessageMiddlewareTest extends MiddlewareTestCase
 
             use BatchHandlerTrait;
 
-            public function __invoke(DummyMessage $message, Acknowledger $ack = null)
+            public function __invoke(DummyMessage $message, ?Acknowledger $ack = null)
             {
                 return $this->handle($message, $ack);
             }
@@ -199,7 +229,7 @@ class HandleMessageMiddlewareTest extends MiddlewareTestCase
         ]));
 
         $ackedMessages = [];
-        $ack = static function (Envelope $envelope, \Throwable $e = null) use (&$ackedMessages) {
+        $ack = static function (Envelope $envelope, ?\Throwable $e = null) use (&$ackedMessages) {
             if (null !== $e) {
                 throw $e;
             }
@@ -228,7 +258,7 @@ class HandleMessageMiddlewareTest extends MiddlewareTestCase
         $handler = new class() implements BatchHandlerInterface {
             use BatchHandlerTrait;
 
-            public function __invoke(DummyMessage $message, Acknowledger $ack = null)
+            public function __invoke(DummyMessage $message, ?Acknowledger $ack = null)
             {
                 return $this->handle($message, $ack);
             }
@@ -248,7 +278,7 @@ class HandleMessageMiddlewareTest extends MiddlewareTestCase
         ]));
 
         $error = null;
-        $ack = static function (Envelope $envelope, \Throwable $e = null) use (&$error) {
+        $ack = static function (Envelope $envelope, ?\Throwable $e = null) use (&$error) {
             $error = $e;
         };
 
@@ -265,7 +295,7 @@ class HandleMessageMiddlewareTest extends MiddlewareTestCase
 
             use BatchHandlerTrait;
 
-            public function __invoke(DummyMessage $message, Acknowledger $ack = null)
+            public function __invoke(DummyMessage $message, ?Acknowledger $ack = null)
             {
                 return $this->handle($message, $ack);
             }

@@ -43,10 +43,6 @@ class ProjectServiceContainer extends Container
     public function getRemovedIds(): array
     {
         return [
-            '.service_locator.0H1ht0q' => true,
-            '.service_locator.0H1ht0q.foo_service' => true,
-            '.service_locator.2hyyc9y' => true,
-            '.service_locator.KGUGnmw' => true,
             'Symfony\\Component\\DependencyInjection\\Tests\\Fixtures\\CustomDefinition' => true,
         ];
     }

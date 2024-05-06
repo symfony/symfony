@@ -377,6 +377,14 @@ class FileProfilerStorageTest extends TestCase
             '0',
         ];
 
+        yield 'One unexpired profile with virtual type' => [
+            <<<CSV
+            token0,127.0.0.0,,http://foo.bar/0,{$oneHourAgo->getTimestamp()},,virtual
+
+            CSV,
+            '0',
+        ];
+
         $threeDaysAgo = new \DateTimeImmutable('-3 days');
 
         yield 'One expired profile' => [
@@ -385,6 +393,14 @@ class FileProfilerStorageTest extends TestCase
 
             CSV,
             '48',
+        ];
+
+        yield 'One expired profile with virtual type' => [
+            <<<CSV
+            token0,127.0.0.0,,http://foo.bar/0,{$threeDaysAgo->getTimestamp()},,virtual
+
+            CSV,
+            '55',
         ];
 
         $fourDaysAgo = new \DateTimeImmutable('-4 days');
@@ -399,6 +415,16 @@ class FileProfilerStorageTest extends TestCase
 
             CSV,
             '96',
+        ];
+
+        yield 'Multiple expired profiles with virtual type' => [
+            <<<CSV
+            token0,127.0.0.0,,http://foo.bar/0,{$fourDaysAgo->getTimestamp()},,virtual
+            token1,127.0.0.1,,http://foo.bar/1,{$threeDaysAgo->getTimestamp()},,virtual
+            token2,127.0.0.2,,http://foo.bar/2,{$oneHourAgo->getTimestamp()},,virtual
+
+            CSV,
+            '110',
         ];
     }
 

@@ -223,7 +223,7 @@ class NotCompromisedPasswordValidatorTest extends ConstraintValidatorTestCase
         yield 'named arguments' => [new NotCompromisedPassword(skipOnError: true)];
     }
 
-    private function createHttpClientStub(string $returnValue = null): HttpClientInterface
+    private function createHttpClientStub(?string $returnValue = null): HttpClientInterface
     {
         $httpClientStub = $this->createMock(HttpClientInterface::class);
         $httpClientStub->method('request')->willReturnCallback(

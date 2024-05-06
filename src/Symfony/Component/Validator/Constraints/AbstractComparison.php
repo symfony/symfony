@@ -24,11 +24,11 @@ use Symfony\Component\Validator\Exception\LogicException;
  */
 abstract class AbstractComparison extends Constraint
 {
-    public $message;
-    public $value;
-    public $propertyPath;
+    public string $message;
+    public mixed $value = null;
+    public ?string $propertyPath = null;
 
-    public function __construct(mixed $value = null, string $propertyPath = null, string $message = null, array $groups = null, mixed $payload = null, array $options = [])
+    public function __construct(mixed $value = null, ?string $propertyPath = null, ?string $message = null, ?array $groups = null, mixed $payload = null, array $options = [])
     {
         if (\is_array($value)) {
             $options = array_merge($value, $options);

@@ -29,19 +29,13 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 #[AsCommand(name: 'debug:messenger', description: 'List messages you can dispatch using the message buses')]
 class DebugCommand extends Command
 {
-    private array $mapping;
-
-    public function __construct(array $mapping)
-    {
-        $this->mapping = $mapping;
-
+    public function __construct(
+        private array $mapping,
+    ) {
         parent::__construct();
     }
 
-    /**
-     * @return void
-     */
-    protected function configure()
+    protected function configure(): void
     {
         $this
             ->addArgument('bus', InputArgument::OPTIONAL, sprintf('The bus id (one of "%s")', implode('", "', array_keys($this->mapping))))

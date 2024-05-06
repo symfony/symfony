@@ -1,6 +1,16 @@
 CHANGELOG
 =========
 
+7.1
+---
+
+ * Add `emojify` Twig filter
+
+7.0
+---
+
+ * Drop support for Twig 2
+
 6.4
 ---
 

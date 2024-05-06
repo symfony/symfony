@@ -33,8 +33,7 @@ class FormRegistry implements FormRegistryInterface
      */
     private array $types = [];
 
-    private FormTypeGuesserInterface|null|false $guesser = false;
-    private ResolvedFormTypeFactoryInterface $resolvedTypeFactory;
+    private FormTypeGuesserInterface|false|null $guesser = false;
     private array $checkedTypes = [];
 
     /**
@@ -42,8 +41,10 @@ class FormRegistry implements FormRegistryInterface
      *
      * @throws UnexpectedTypeException if any extension does not implement FormExtensionInterface
      */
-    public function __construct(array $extensions, ResolvedFormTypeFactoryInterface $resolvedTypeFactory)
-    {
+    public function __construct(
+        array $extensions,
+        private ResolvedFormTypeFactoryInterface $resolvedTypeFactory,
+    ) {
         foreach ($extensions as $extension) {
             if (!$extension instanceof FormExtensionInterface) {
                 throw new UnexpectedTypeException($extension, FormExtensionInterface::class);
@@ -51,7 +52,6 @@ class FormRegistry implements FormRegistryInterface
         }
 
         $this->extensions = $extensions;
-        $this->resolvedTypeFactory = $resolvedTypeFactory;
     }
 
     public function getType(string $name): ResolvedFormTypeInterface

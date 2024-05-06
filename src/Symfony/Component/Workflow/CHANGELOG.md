@@ -1,6 +1,21 @@
 CHANGELOG
 =========
 
+7.1
+---
+
+ * Add method `getEnabledTransition()` to `WorkflowInterface`
+ * Automatically register places from transitions
+ * Add support for workflows that need to store many tokens in the marking
+ * Add method `getName()` in event classes to build event names in subscribers 
+
+7.0
+---
+
+ * Require explicit argument when calling `Definition::setInitialPlaces()`
+ * `GuardEvent::getContext()` method has been removed. Method was not supposed to be called within guard event listeners as it always returned an empty array anyway.
+ * Remove `GuardEvent::getContext()` method without replacement
+
 6.4
 ---
 
@@ -11,6 +26,8 @@ CHANGELOG
  * Add support for multiline descriptions in PlantUML diagrams
  * Add PHP attributes to register listeners and guards
  * Deprecate `GuardEvent::getContext()` method that will be removed in 7.0
+ * Revert: Mark `Symfony\Component\Workflow\Registry` as internal
+ * Add `WorkflowGuardListenerPass` (moved from `FrameworkBundle`)
 
 6.2
 ---

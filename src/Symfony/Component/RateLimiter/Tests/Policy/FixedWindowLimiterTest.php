@@ -123,7 +123,21 @@ class FixedWindowLimiterTest extends TestCase
             $rateLimit = $limiter->consume(0);
             $this->assertSame(10, $rateLimit->getLimit());
             $this->assertTrue($rateLimit->isAccepted());
+            $this->assertEquals(
+                \DateTimeImmutable::createFromFormat('U', (string) floor(microtime(true))),
+                $rateLimit->getRetryAfter()
+            );
         }
+
+        $limiter->consume();
+
+        $rateLimit = $limiter->consume(0);
+        $this->assertEquals(0, $rateLimit->getRemainingTokens());
+        $this->assertTrue($rateLimit->isAccepted());
+        $this->assertEquals(
+            \DateTimeImmutable::createFromFormat('U', (string) floor(microtime(true) + 60)),
+            $rateLimit->getRetryAfter()
+        );
     }
 
     public static function provideConsumeOutsideInterval(): \Generator

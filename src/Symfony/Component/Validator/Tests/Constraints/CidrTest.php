@@ -49,7 +49,15 @@ class CidrTest extends TestCase
 
     public function testWithInvalidVersion()
     {
-        $availableVersions = [Ip::ALL, Ip::V4, Ip::V6];
+        $availableVersions = [
+            Ip::V4, Ip::V6, Ip::ALL,
+            Ip::V4_NO_PUBLIC, Ip::V6_NO_PUBLIC, Ip::ALL_NO_PUBLIC,
+            Ip::V4_NO_PRIVATE, Ip::V6_NO_PRIVATE, Ip::ALL_NO_PRIVATE,
+            Ip::V4_NO_RESERVED, Ip::V6_NO_RESERVED, Ip::ALL_NO_RESERVED,
+            Ip::V4_ONLY_PUBLIC, Ip::V6_ONLY_PUBLIC, Ip::ALL_ONLY_PUBLIC,
+            Ip::V4_ONLY_PRIVATE, Ip::V6_ONLY_PRIVATE, Ip::ALL_ONLY_PRIVATE,
+            Ip::V4_ONLY_RESERVED, Ip::V6_ONLY_RESERVED, Ip::ALL_ONLY_RESERVED,
+        ];
 
         self::expectException(ConstraintDefinitionException::class);
         self::expectExceptionMessage(sprintf('The option "version" must be one of "%s".', implode('", "', $availableVersions)));

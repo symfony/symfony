@@ -28,29 +28,20 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class FormTypeCsrfExtension extends AbstractTypeExtension
 {
-    private CsrfTokenManagerInterface $defaultTokenManager;
-    private bool $defaultEnabled;
-    private string $defaultFieldName;
-    private ?TranslatorInterface $translator;
-    private ?string $translationDomain;
-    private ?ServerParams $serverParams;
-
-    public function __construct(CsrfTokenManagerInterface $defaultTokenManager, bool $defaultEnabled = true, string $defaultFieldName = '_token', TranslatorInterface $translator = null, string $translationDomain = null, ServerParams $serverParams = null)
-    {
-        $this->defaultTokenManager = $defaultTokenManager;
-        $this->defaultEnabled = $defaultEnabled;
-        $this->defaultFieldName = $defaultFieldName;
-        $this->translator = $translator;
-        $this->translationDomain = $translationDomain;
-        $this->serverParams = $serverParams;
+    public function __construct(
+        private CsrfTokenManagerInterface $defaultTokenManager,
+        private bool $defaultEnabled = true,
+        private string $defaultFieldName = '_token',
+        private ?TranslatorInterface $translator = null,
+        private ?string $translationDomain = null,
+        private ?ServerParams $serverParams = null,
+    ) {
     }
 
     /**
      * Adds a CSRF field to the form when the CSRF protection is enabled.
-     *
-     * @return void
      */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         if (!$options['csrf_protection']) {
             return;
@@ -71,10 +62,8 @@ class FormTypeCsrfExtension extends AbstractTypeExtension
 
     /**
      * Adds a CSRF field to the root form view.
-     *
-     * @return void
      */
-    public function finishView(FormView $view, FormInterface $form, array $options)
+    public function finishView(FormView $view, FormInterface $form, array $options): void
     {
         if ($options['csrf_protection'] && !$view->parent && $options['compound']) {
             $factory = $form->getConfig()->getFormFactory();
@@ -90,10 +79,7 @@ class FormTypeCsrfExtension extends AbstractTypeExtension
         }
     }
 
-    /**
-     * @return void
-     */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
             'csrf_protection' => $this->defaultEnabled,

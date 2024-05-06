@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+6.4
+---
+
+ * Allow setting the locale using `SYMFONY_PHPUNIT_LOCALE` env var
+
 6.3
 ---
 

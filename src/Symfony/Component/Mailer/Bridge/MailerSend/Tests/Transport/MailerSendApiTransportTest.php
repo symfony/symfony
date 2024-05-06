@@ -13,6 +13,7 @@ namespace Symfony\Component\Mailer\Bridge\MailerSend\Tests\Transport;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpClient\MockHttpClient;
+use Symfony\Component\HttpClient\Response\JsonMockResponse;
 use Symfony\Component\HttpClient\Response\MockResponse;
 use Symfony\Component\Mailer\Bridge\MailerSend\Transport\MailerSendApiTransport;
 use Symfony\Component\Mailer\Exception\HttpTransportException;
@@ -129,7 +130,7 @@ class MailerSendApiTransportTest extends TestCase
     public function testSendThrowsForErrorResponse()
     {
         $client = new MockHttpClient(function (string $method, string $url, array $options): ResponseInterface {
-            return new MockResponse(json_encode(['message' => 'i\'m a teapot']), [
+            return new JsonMockResponse(['message' => 'i\'m a teapot'], [
                 'http_code' => 418,
             ]);
         });
@@ -150,14 +151,14 @@ class MailerSendApiTransportTest extends TestCase
     public function testSendThrowsForAllSuppressed()
     {
         $client = new MockHttpClient(function (string $method, string $url, array $options): ResponseInterface {
-            return new MockResponse(json_encode([
+            return new JsonMockResponse([
                 'message' => 'There are some warnings for your request.',
                 'warnings' => [
                     [
                         'type' => 'ALL_SUPPRESSED',
                     ],
                 ],
-            ], \JSON_THROW_ON_ERROR), [
+            ], [
                 'http_code' => 202,
             ]);
         });

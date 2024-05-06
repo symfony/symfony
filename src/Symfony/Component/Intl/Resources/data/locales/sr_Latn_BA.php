@@ -56,7 +56,6 @@ return [
         'se_SE' => 'sjeverni sami (Švedska)',
         'sq_MK' => 'albanski (Sjeverna Makedonija)',
         'sv_AX' => 'švedski (Olandska ostrva)',
-        'yi_001' => 'jidiš (svijet)',
         'zh_HK' => 'kineski (Hongkong [SAO Kine])',
         'zh_Hans_HK' => 'kineski (pojednostavljeno kinesko pismo, Hongkong [SAO Kine])',
         'zh_Hant_HK' => 'kineski (tradicionalno kinesko pismo, Hongkong [SAO Kine])',

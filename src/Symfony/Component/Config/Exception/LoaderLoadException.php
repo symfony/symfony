@@ -25,7 +25,7 @@ class LoaderLoadException extends \Exception
      * @param \Throwable|null $previous       A previous exception
      * @param string|null     $type           The type of resource
      */
-    public function __construct(mixed $resource, string $sourceResource = null, int $code = 0, \Throwable $previous = null, string $type = null)
+    public function __construct(mixed $resource, ?string $sourceResource = null, int $code = 0, ?\Throwable $previous = null, ?string $type = null)
     {
         if (!\is_string($resource)) {
             try {
@@ -76,10 +76,7 @@ class LoaderLoadException extends \Exception
         parent::__construct($message, $code, $previous);
     }
 
-    /**
-     * @return string
-     */
-    protected function varToString(mixed $var)
+    protected function varToString(mixed $var): string
     {
         if (\is_object($var)) {
             return sprintf('Object(%s)', $var::class);

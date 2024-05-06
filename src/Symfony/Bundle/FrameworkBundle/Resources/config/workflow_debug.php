@@ -22,6 +22,8 @@ return static function (ContainerConfigurator $container) {
             ])
             ->args([
                 tagged_iterator('workflow', 'name'),
+                service('event_dispatcher'),
+                service('debug.file_link_formatter'),
             ])
     ;
 };

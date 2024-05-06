@@ -146,7 +146,7 @@ class LintCommandTest extends TestCase
         $this->assertSame($expectedSuggestions, $tester->complete($input));
     }
 
-    public static function provideCompletionSuggestions()
+    public static function provideCompletionSuggestions(): iterable
     {
         yield 'option' => [['--format', ''], ['txt', 'json', 'github']];
     }

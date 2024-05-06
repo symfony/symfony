@@ -14,7 +14,6 @@ namespace Symfony\Component\HttpKernel\DependencyInjection;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Log\Logger;
@@ -26,10 +25,7 @@ use Symfony\Component\HttpKernel\Log\Logger;
  */
 class LoggerPass implements CompilerPassInterface
 {
-    /**
-     * @return void
-     */
-    public function process(ContainerBuilder $container)
+    public function process(ContainerBuilder $container): void
     {
         $container->setAlias(LoggerInterface::class, 'logger');
 
@@ -38,16 +34,9 @@ class LoggerPass implements CompilerPassInterface
         }
 
         if ($debug = $container->getParameter('kernel.debug')) {
-            // Build an expression that will be equivalent to `!in_array(PHP_SAPI, ['cli', 'phpdbg'])`
-            $debug = (new Definition('bool'))
-                ->setFactory('in_array')
-                ->setArguments([
-                    (new Definition('string'))->setFactory('constant')->setArguments(['PHP_SAPI']),
-                    ['cli', 'phpdbg'],
-                ]);
-            $debug = (new Definition('bool'))
-                ->setFactory('in_array')
-                ->setArguments([$debug, [false]]);
+            $debug = $container->hasParameter('kernel.runtime_mode.web')
+                ? $container->getParameter('kernel.runtime_mode.web')
+                : !\in_array(\PHP_SAPI, ['cli', 'phpdbg', 'embed'], true);
         }
 
         $container->register('logger', Logger::class)

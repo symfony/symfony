@@ -27,7 +27,7 @@ class YamlFileDumperTest extends TestCase
 
         $dumper = new YamlFileDumper();
 
-        $this->assertStringEqualsFile(__DIR__.'/../fixtures/messages.yml', $dumper->formatCatalogue($catalogue, 'messages', ['as_tree' => true, 'inline' => 999]));
+        $this->assertStringEqualsFile(__DIR__.'/../Fixtures/messages.yml', $dumper->formatCatalogue($catalogue, 'messages', ['as_tree' => true, 'inline' => 999]));
     }
 
     public function testLinearFormatCatalogue()
@@ -40,6 +40,6 @@ class YamlFileDumperTest extends TestCase
 
         $dumper = new YamlFileDumper();
 
-        $this->assertStringEqualsFile(__DIR__.'/../fixtures/messages_linear.yml', $dumper->formatCatalogue($catalogue, 'messages'));
+        $this->assertStringEqualsFile(__DIR__.'/../Fixtures/messages_linear.yml', $dumper->formatCatalogue($catalogue, 'messages'));
     }
 }

@@ -16,7 +16,7 @@ use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\Serializer\Command\DebugCommand;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactory;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
-use Symfony\Component\Serializer\Mapping\Loader\AnnotationLoader;
+use Symfony\Component\Serializer\Mapping\Loader\AttributeLoader;
 use Symfony\Component\Serializer\Tests\Dummy\DummyClassOne;
 
 /**
@@ -26,7 +26,7 @@ class DebugCommandTest extends TestCase
 {
     public function testOutputWithClassArgument()
     {
-        $command = new DebugCommand(new ClassMetadataFactory(new AnnotationLoader()));
+        $command = new DebugCommand(new ClassMetadataFactory(new AttributeLoader()));
 
         $tester = new CommandTester($command);
         $tester->execute(['class' => DummyClassOne::class], ['decorated' => false]);
@@ -36,41 +36,43 @@ class DebugCommandTest extends TestCase
             Symfony\Component\Serializer\Tests\Dummy\DummyClassOne
             ------------------------------------------------------
 
-            +----------+-------------------------------------+
-            | Property | Options                             |
-            +----------+-------------------------------------+
-            | code     | [                                   |
-            |          |   "groups" => [                     |
-            |          |     "book:read",                    |
-            |          |     "book:write"                    |
-            |          |   ],                                |
-            |          |   "maxDepth" => 1,                  |
-            |          |   "serializedName" => "identifier", |
-            |          |   "ignore" => true,                 |
-            |          |   "normalizationContexts" => [      |
-            |          |     "*" => [                        |
-            |          |       "groups" => [                 |
-            |          |         "book:read"                 |
-            |          |       ]                             |
-            |          |     ]                               |
-            |          |   ],                                |
-            |          |   "denormalizationContexts" => [    |
-            |          |     "*" => [                        |
-            |          |       "groups" => [                 |
-            |          |         "book:write"                |
-            |          |       ]                             |
-            |          |     ]                               |
-            |          |   ]                                 |
-            |          | ]                                   |
-            | name     | [                                   |
-            |          |   "groups" => [],                   |
-            |          |   "maxDepth" => null,               |
-            |          |   "serializedName" => null,         |
-            |          |   "ignore" => false,                |
-            |          |   "normalizationContexts" => [],    |
-            |          |   "denormalizationContexts" => []   |
-            |          | ]                                   |
-            +----------+-------------------------------------+
+            +----------+---------------------------------------+
+            | Property | Options                               |
+            +----------+---------------------------------------+
+            | code     | [                                     |
+            |          |   "groups" => [                       |
+            |          |     "book:read",                      |
+            |          |     "book:write"                      |
+            |          |   ],                                  |
+            |          |   "maxDepth" => 1,                    |
+            |          |   "serializedName" => "identifier",   |
+            |          |   "serializedPath" => null,           |
+            |          |   "ignore" => true,                   |
+            |          |   "normalizationContexts" => [        |
+            |          |     "*" => [                          |
+            |          |       "groups" => [                   |
+            |          |         "book:read"                   |
+            |          |       ]                               |
+            |          |     ]                                 |
+            |          |   ],                                  |
+            |          |   "denormalizationContexts" => [      |
+            |          |     "*" => [                          |
+            |          |       "groups" => [                   |
+            |          |         "book:write"                  |
+            |          |       ]                               |
+            |          |     ]                                 |
+            |          |   ]                                   |
+            |          | ]                                     |
+            | name     | [                                     |
+            |          |   "groups" => [],                     |
+            |          |   "maxDepth" => null,                 |
+            |          |   "serializedName" => null,           |
+            |          |   "serializedPath" => "[data][name]", |
+            |          |   "ignore" => false,                  |
+            |          |   "normalizationContexts" => [],      |
+            |          |   "denormalizationContexts" => []     |
+            |          | ]                                     |
+            +----------+---------------------------------------+
 
             TXT,
             $tester->getDisplay(true),

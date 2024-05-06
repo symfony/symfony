@@ -39,7 +39,7 @@ use Symfony\Component\Translation\Writer\TranslationWriterInterface;
  *
  * @final
  */
-#[AsCommand(name: 'translation:extract', description: 'Extract missing translations keys from code to translation files.')]
+#[AsCommand(name: 'translation:extract', description: 'Extract missing translations keys from code to translation files')]
 class TranslationUpdateCommand extends Command
 {
     private const ASC = 'asc';
@@ -50,29 +50,18 @@ class TranslationUpdateCommand extends Command
         'xlf20' => ['xlf', '2.0'],
     ];
 
-    private TranslationWriterInterface $writer;
-    private TranslationReaderInterface $reader;
-    private ExtractorInterface $extractor;
-    private string $defaultLocale;
-    private ?string $defaultTransPath;
-    private ?string $defaultViewsPath;
-    private array $transPaths;
-    private array $codePaths;
-    private array $enabledLocales;
-
-    public function __construct(TranslationWriterInterface $writer, TranslationReaderInterface $reader, ExtractorInterface $extractor, string $defaultLocale, string $defaultTransPath = null, string $defaultViewsPath = null, array $transPaths = [], array $codePaths = [], array $enabledLocales = [])
-    {
+    public function __construct(
+        private TranslationWriterInterface $writer,
+        private TranslationReaderInterface $reader,
+        private ExtractorInterface $extractor,
+        private string $defaultLocale,
+        private ?string $defaultTransPath = null,
+        private ?string $defaultViewsPath = null,
+        private array $transPaths = [],
+        private array $codePaths = [],
+        private array $enabledLocales = [],
+    ) {
         parent::__construct();
-
-        $this->writer = $writer;
-        $this->reader = $reader;
-        $this->extractor = $extractor;
-        $this->defaultLocale = $defaultLocale;
-        $this->defaultTransPath = $defaultTransPath;
-        $this->defaultViewsPath = $defaultViewsPath;
-        $this->transPaths = $transPaths;
-        $this->codePaths = $codePaths;
-        $this->enabledLocales = $enabledLocales;
     }
 
     protected function configure(): void
@@ -126,10 +115,6 @@ EOF
     {
         $io = new SymfonyStyle($input, $output);
         $errorIo = $output instanceof ConsoleOutputInterface ? new SymfonyStyle($input, $output->getErrorOutput()) : $io;
-
-        if ('translation:update' === $input->getFirstArgument()) {
-            $errorIo->caution('Command "translation:update" is deprecated since version 5.4 and will be removed in Symfony 6.0. Use "translation:extract" instead.');
-        }
 
         $io = new SymfonyStyle($input, $output);
         $errorIo = $io->getErrorStyle();

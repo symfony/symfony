@@ -12,7 +12,7 @@
 namespace Symfony\Component\Routing\Tests\Fixtures\Psr4Controllers\SubNamespace;
 
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 
 abstract class MyAbstractController
 {

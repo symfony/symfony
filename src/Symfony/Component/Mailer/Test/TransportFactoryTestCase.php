@@ -31,9 +31,9 @@ abstract class TransportFactoryTestCase extends TestCase
     protected const USER = 'u$er';
     protected const PASSWORD = 'pa$s';
 
-    protected $dispatcher;
-    protected $client;
-    protected $logger;
+    protected EventDispatcherInterface $dispatcher;
+    protected HttpClientInterface $client;
+    protected LoggerInterface $logger;
 
     abstract public function getFactory(): TransportFactoryInterface;
 
@@ -77,7 +77,7 @@ abstract class TransportFactoryTestCase extends TestCase
     /**
      * @dataProvider unsupportedSchemeProvider
      */
-    public function testUnsupportedSchemeException(Dsn $dsn, string $message = null)
+    public function testUnsupportedSchemeException(Dsn $dsn, ?string $message = null)
     {
         $factory = $this->getFactory();
 

@@ -52,7 +52,7 @@ class LoginLinkHandlerTest extends TestCase
      *
      * @dataProvider provideCreateLoginLinkData
      */
-    public function testCreateLoginLink($user, array $extraProperties, Request $request = null)
+    public function testCreateLoginLink($user, array $extraProperties, ?Request $request = null)
     {
         $this->router->expects($this->once())
             ->method('generate')
@@ -287,11 +287,6 @@ class TestLoginLinkHandlerUser implements UserInterface
     public function getSalt(): string
     {
         return '';
-    }
-
-    public function getUsername(): string
-    {
-        return $this->username;
     }
 
     public function getUserIdentifier(): string

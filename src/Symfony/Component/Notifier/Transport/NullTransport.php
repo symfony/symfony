@@ -25,7 +25,7 @@ class NullTransport implements TransportInterface
 {
     private ?EventDispatcherInterface $dispatcher;
 
-    public function __construct(EventDispatcherInterface $dispatcher = null)
+    public function __construct(?EventDispatcherInterface $dispatcher = null)
     {
         $this->dispatcher = $dispatcher;
     }

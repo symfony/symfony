@@ -45,10 +45,7 @@ class UrlValidator extends ConstraintValidator
             (?:\# (?:[\pL\pN\-._\~!$&\'()*+,;=:@/?]|%%[0-9A-Fa-f]{2})* )?       # a fragment (optional)
         $~ixu';
 
-    /**
-     * @return void
-     */
-    public function validate(mixed $value, Constraint $constraint)
+    public function validate(mixed $value, Constraint $constraint): void
     {
         if (!$constraint instanceof Url) {
             throw new UnexpectedTypeException($constraint, Url::class);
@@ -81,6 +78,19 @@ class UrlValidator extends ConstraintValidator
                 ->addViolation();
 
             return;
+        }
+
+        if ($constraint->requireTld) {
+            $urlHost = parse_url($value, \PHP_URL_HOST);
+            // the host of URLs with a TLD must include at least a '.' (but it can't be an IP address like '127.0.0.1')
+            if (!str_contains($urlHost, '.') || filter_var($urlHost, \FILTER_VALIDATE_IP)) {
+                $this->context->buildViolation($constraint->tldMessage)
+                    ->setParameter('{{ value }}', $this->formatValue($value))
+                    ->setCode(Url::MISSING_TLD_ERROR)
+                    ->addViolation();
+
+                return;
+            }
         }
     }
 }

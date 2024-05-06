@@ -234,7 +234,7 @@ abstract class AdapterTestCase extends CachePoolTest
         /** @var PruneableInterface|CacheItemPoolInterface $cache */
         $cache = $this->createCachePool();
 
-        $doSet = function ($name, $value, \DateInterval $expiresAfter = null) use ($cache) {
+        $doSet = function ($name, $value, ?\DateInterval $expiresAfter = null) use ($cache) {
             $item = $cache->getItem($name);
             $item->set($value);
 
@@ -356,7 +356,7 @@ abstract class AdapterTestCase extends CachePoolTest
 
 class NotUnserializable
 {
-    public function __wakeup()
+    public function __wakeup(): void
     {
         throw new \Exception(__CLASS__);
     }

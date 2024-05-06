@@ -46,7 +46,7 @@ class_exists(ClosureResolver::class);
  */
 class GenericRuntime implements RuntimeInterface
 {
-    protected $options;
+    protected array $options;
 
     /**
      * @param array {
@@ -83,7 +83,7 @@ class GenericRuntime implements RuntimeInterface
         $this->options = $options;
     }
 
-    public function getResolver(callable $callable, \ReflectionFunction $reflector = null): ResolverInterface
+    public function getResolver(callable $callable, ?\ReflectionFunction $reflector = null): ResolverInterface
     {
         $callable = $callable(...);
         $parameters = ($reflector ?? new \ReflectionFunction($callable))->getParameters();

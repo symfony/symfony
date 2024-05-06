@@ -16,9 +16,7 @@ class PublicAssetsPathResolver implements PublicAssetsPathResolverInterface
     private readonly string $publicPrefix;
 
     public function __construct(
-        private readonly string $projectRootDir,
         string $publicPrefix = '/assets/',
-        private readonly string $publicDirName = 'public',
     ) {
         // ensure that the public prefix always ends with a single slash
         $this->publicPrefix = rtrim($publicPrefix, '/').'/';
@@ -27,10 +25,5 @@ class PublicAssetsPathResolver implements PublicAssetsPathResolverInterface
     public function resolvePublicPath(string $logicalPath): string
     {
         return $this->publicPrefix.ltrim($logicalPath, '/');
-    }
-
-    public function getPublicFilesystemPath(): string
-    {
-        return rtrim(rtrim($this->projectRootDir, '/').'/'.$this->publicDirName.$this->publicPrefix, '/');
     }
 }

@@ -19,10 +19,10 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 abstract class AbstractQuery implements QueryInterface
 {
-    protected $connection;
-    protected $dn;
-    protected $query;
-    protected $options;
+    protected ConnectionInterface $connection;
+    protected string $dn;
+    protected string $query;
+    protected array $options;
 
     public function __construct(ConnectionInterface $connection, string $dn, string $query, array $options = [])
     {

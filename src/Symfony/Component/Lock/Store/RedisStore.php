@@ -44,10 +44,7 @@ class RedisStore implements SharedLockStoreInterface
         }
     }
 
-    /**
-     * @return void
-     */
-    public function save(Key $key)
+    public function save(Key $key): void
     {
         $script = '
             local key = KEYS[1]
@@ -92,10 +89,7 @@ class RedisStore implements SharedLockStoreInterface
         $this->checkNotExpired($key);
     }
 
-    /**
-     * @return void
-     */
-    public function saveRead(Key $key)
+    public function saveRead(Key $key): void
     {
         $script = '
             local key = KEYS[1]
@@ -135,10 +129,7 @@ class RedisStore implements SharedLockStoreInterface
         $this->checkNotExpired($key);
     }
 
-    /**
-     * @return void
-     */
-    public function putOffExpiration(Key $key, float $ttl)
+    public function putOffExpiration(Key $key, float $ttl): void
     {
         $script = '
             local key = KEYS[1]
@@ -178,10 +169,7 @@ class RedisStore implements SharedLockStoreInterface
         $this->checkNotExpired($key);
     }
 
-    /**
-     * @return void
-     */
-    public function delete(Key $key)
+    public function delete(Key $key): void
     {
         $script = '
             local key = KEYS[1]
@@ -294,7 +282,9 @@ class RedisStore implements SharedLockStoreInterface
             try {
                 $this->supportTime = 1 === $this->evaluate($script, 'symfony_check_support_time', []);
             } catch (LockStorageException $e) {
-                if (!str_contains($e->getMessage(), 'commands not allowed after non deterministic')) {
+                if (!str_contains($e->getMessage(), 'commands not allowed after non deterministic')
+                    && !str_contains($e->getMessage(), 'is not allowed from script script')
+                ) {
                     throw $e;
                 }
                 $this->supportTime = false;

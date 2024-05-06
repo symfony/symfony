@@ -11,7 +11,8 @@
 
 namespace Symfony\Component\Serializer\Normalizer;
 
-use Symfony\Component\Serializer\Annotation\Ignore;
+use Symfony\Component\Serializer\Annotation\Ignore as LegacyIgnore;
+use Symfony\Component\Serializer\Attribute\Ignore;
 
 /**
  * Converts between objects with getter and setter methods and arrays.
@@ -33,53 +34,44 @@ use Symfony\Component\Serializer\Annotation\Ignore;
  *
  * @author Nils Adermann <naderman@naderman.de>
  * @author Kévin Dunglas <dunglas@gmail.com>
- *
- * @final since Symfony 6.3
  */
-class GetSetMethodNormalizer extends AbstractObjectNormalizer
+final class GetSetMethodNormalizer extends AbstractObjectNormalizer
 {
+    private static $reflectionCache = [];
     private static array $setterAccessibleCache = [];
 
     public function getSupportedTypes(?string $format): array
     {
-        return ['object' => __CLASS__ === static::class || $this->hasCacheableSupportsMethod()];
+        return ['object' => true];
+    }
+
+    public function supportsNormalization(mixed $data, ?string $format = null, array $context = []): bool
+    {
+        return parent::supportsNormalization($data, $format) && $this->supports($data::class, true);
+    }
+
+    public function supportsDenormalization(mixed $data, string $type, ?string $format = null, array $context = []): bool
+    {
+        return parent::supportsDenormalization($data, $type, $format) && $this->supports($type, false);
     }
 
     /**
-     * @param array $context
+     * Checks if the given class has any getter or setter method.
      */
-    public function supportsNormalization(mixed $data, string $format = null /* , array $context = [] */): bool
+    private function supports(string $class, bool $readAttributes): bool
     {
-        return parent::supportsNormalization($data, $format) && $this->supports($data::class);
-    }
+        if ($this->classDiscriminatorResolver?->getMappingForClass($class)) {
+            return true;
+        }
 
-    /**
-     * @param array $context
-     */
-    public function supportsDenormalization(mixed $data, string $type, string $format = null /* , array $context = [] */): bool
-    {
-        return parent::supportsDenormalization($data, $type, $format) && $this->supports($type);
-    }
+        if (!isset(self::$reflectionCache[$class])) {
+            self::$reflectionCache[$class] = new \ReflectionClass($class);
+        }
 
-    /**
-     * @deprecated since Symfony 6.3, use "getSupportedTypes()" instead
-     */
-    public function hasCacheableSupportsMethod(): bool
-    {
-        trigger_deprecation('symfony/serializer', '6.3', 'The "%s()" method is deprecated, implement "%s::getSupportedTypes()" instead.', __METHOD__, get_debug_type($this));
+        $reflection = self::$reflectionCache[$class];
 
-        return __CLASS__ === static::class;
-    }
-
-    /**
-     * Checks if the given class has any getter method.
-     */
-    private function supports(string $class): bool
-    {
-        $class = new \ReflectionClass($class);
-        $methods = $class->getMethods(\ReflectionMethod::IS_PUBLIC);
-        foreach ($methods as $method) {
-            if ($this->isGetMethod($method)) {
+        foreach ($reflection->getMethods(\ReflectionMethod::IS_PUBLIC) as $reflectionMethod) {
+            if ($readAttributes ? $this->isGetMethod($reflectionMethod) : $this->isSetMethod($reflectionMethod)) {
                 return true;
             }
         }
@@ -93,14 +85,25 @@ class GetSetMethodNormalizer extends AbstractObjectNormalizer
     private function isGetMethod(\ReflectionMethod $method): bool
     {
         return !$method->isStatic()
-            && !$method->getAttributes(Ignore::class)
+            && !($method->getAttributes(Ignore::class) || $method->getAttributes(LegacyIgnore::class))
             && !$method->getNumberOfRequiredParameters()
             && ((2 < ($methodLength = \strlen($method->name)) && str_starts_with($method->name, 'is'))
                 || (3 < $methodLength && (str_starts_with($method->name, 'has') || str_starts_with($method->name, 'get')))
             );
     }
 
-    protected function extractAttributes(object $object, string $format = null, array $context = []): array
+    /**
+     * Checks if a method's name matches /^set.+$/ and can be called non-statically with one parameter.
+     */
+    private function isSetMethod(\ReflectionMethod $method): bool
+    {
+        return !$method->isStatic()
+            && !$method->getAttributes(Ignore::class)
+            && 0 < $method->getNumberOfParameters()
+            && str_starts_with($method->name, 'set');
+    }
+
+    protected function extractAttributes(object $object, ?string $format = null, array $context = []): array
     {
         $reflectionObject = new \ReflectionObject($object);
         $reflectionMethods = $reflectionObject->getMethods(\ReflectionMethod::IS_PUBLIC);
@@ -121,21 +124,19 @@ class GetSetMethodNormalizer extends AbstractObjectNormalizer
         return $attributes;
     }
 
-    protected function getAttributeValue(object $object, string $attribute, string $format = null, array $context = []): mixed
+    protected function getAttributeValue(object $object, string $attribute, ?string $format = null, array $context = []): mixed
     {
-        $ucfirsted = ucfirst($attribute);
-
-        $getter = 'get'.$ucfirsted;
+        $getter = 'get'.$attribute;
         if (method_exists($object, $getter) && \is_callable([$object, $getter])) {
             return $object->$getter();
         }
 
-        $isser = 'is'.$ucfirsted;
+        $isser = 'is'.$attribute;
         if (method_exists($object, $isser) && \is_callable([$object, $isser])) {
             return $object->$isser();
         }
 
-        $haser = 'has'.$ucfirsted;
+        $haser = 'has'.$attribute;
         if (method_exists($object, $haser) && \is_callable([$object, $haser])) {
             return $object->$haser();
         }
@@ -143,12 +144,9 @@ class GetSetMethodNormalizer extends AbstractObjectNormalizer
         return null;
     }
 
-    /**
-     * @return void
-     */
-    protected function setAttributeValue(object $object, string $attribute, mixed $value, string $format = null, array $context = [])
+    protected function setAttributeValue(object $object, string $attribute, mixed $value, ?string $format = null, array $context = []): void
     {
-        $setter = 'set'.ucfirst($attribute);
+        $setter = 'set'.$attribute;
         $key = $object::class.':'.$setter;
 
         if (!isset(self::$setterAccessibleCache[$key])) {
@@ -158,5 +156,49 @@ class GetSetMethodNormalizer extends AbstractObjectNormalizer
         if (self::$setterAccessibleCache[$key]) {
             $object->$setter($value);
         }
+    }
+
+    protected function isAllowedAttribute($classOrObject, string $attribute, ?string $format = null, array $context = []): bool
+    {
+        if (!parent::isAllowedAttribute($classOrObject, $attribute, $format, $context)) {
+            return false;
+        }
+
+        $class = \is_object($classOrObject) ? \get_class($classOrObject) : $classOrObject;
+
+        if (!isset(self::$reflectionCache[$class])) {
+            self::$reflectionCache[$class] = new \ReflectionClass($class);
+        }
+
+        $reflection = self::$reflectionCache[$class];
+
+        if ($context['_read_attributes'] ?? true) {
+            foreach (['get', 'is', 'has'] as $getterPrefix) {
+                $getter = $getterPrefix.$attribute;
+                $reflectionMethod = $reflection->hasMethod($getter) ? $reflection->getMethod($getter) : null;
+                if ($reflectionMethod && $this->isGetMethod($reflectionMethod)) {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        $setter = 'set'.$attribute;
+        if ($reflection->hasMethod($setter) && $this->isSetMethod($reflection->getMethod($setter))) {
+            return true;
+        }
+
+        $constructor = $reflection->getConstructor();
+
+        if ($constructor && $constructor->isPublic()) {
+            foreach ($constructor->getParameters() as $parameter) {
+                if ($parameter->getName() === $attribute) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 }

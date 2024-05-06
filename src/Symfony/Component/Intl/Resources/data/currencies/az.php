@@ -814,9 +814,13 @@ return [
             'SKK',
             'Slovak Korunası',
         ],
+        'SLE' => [
+            'SLE',
+            'Sierra Leon Leonu',
+        ],
         'SLL' => [
             'SLL',
-            'Sierra Leon Leonu',
+            'Sierra Leon Leonu (1964—2022)',
         ],
         'SOS' => [
             'SOS',

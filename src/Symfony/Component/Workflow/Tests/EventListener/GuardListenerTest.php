@@ -137,7 +137,7 @@ class GuardListenerTest extends TestCase
         $this->assertTrue($event->isBlocked());
     }
 
-    private function createEvent(Transition $transition = null): GuardEvent
+    private function createEvent(?Transition $transition = null): GuardEvent
     {
         $subject = new Subject();
         $transition ??= new Transition('name', 'from', 'to');

@@ -76,7 +76,7 @@ class PoFileLoader extends FileLoader
 
             if ('' === $line) {
                 // Whitespace indicated current item is done
-                if (!\in_array('fuzzy', $flags)) {
+                if (!\in_array('fuzzy', $flags, true)) {
                     $this->addMessage($messages, $item);
                 }
                 $item = $defaults;
@@ -108,7 +108,7 @@ class PoFileLoader extends FileLoader
             }
         }
         // save last item
-        if (!\in_array('fuzzy', $flags)) {
+        if (!\in_array('fuzzy', $flags, true)) {
             $this->addMessage($messages, $item);
         }
         fclose($stream);

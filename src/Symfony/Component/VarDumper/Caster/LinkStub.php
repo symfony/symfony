@@ -18,12 +18,12 @@ namespace Symfony\Component\VarDumper\Caster;
  */
 class LinkStub extends ConstStub
 {
-    public $inVendor = false;
+    public bool $inVendor = false;
 
     private static array $vendorRoots;
     private static array $composerRoots = [];
 
-    public function __construct(string $label, int $line = 0, string $href = null)
+    public function __construct(string $label, int $line = 0, ?string $href = null)
     {
         $this->value = $label;
 

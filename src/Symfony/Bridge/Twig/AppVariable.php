@@ -13,6 +13,7 @@ namespace Symfony\Bridge\Twig;
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Session\FlashBagAwareSessionInterface;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
@@ -33,34 +34,22 @@ class AppVariable
     private LocaleSwitcher $localeSwitcher;
     private array $enabledLocales;
 
-    /**
-     * @return void
-     */
-    public function setTokenStorage(TokenStorageInterface $tokenStorage)
+    public function setTokenStorage(TokenStorageInterface $tokenStorage): void
     {
         $this->tokenStorage = $tokenStorage;
     }
 
-    /**
-     * @return void
-     */
-    public function setRequestStack(RequestStack $requestStack)
+    public function setRequestStack(RequestStack $requestStack): void
     {
         $this->requestStack = $requestStack;
     }
 
-    /**
-     * @return void
-     */
-    public function setEnvironment(string $environment)
+    public function setEnvironment(string $environment): void
     {
         $this->environment = $environment;
     }
 
-    /**
-     * @return void
-     */
-    public function setDebug(bool $debug)
+    public function setDebug(bool $debug): void
     {
         $this->debug = $debug;
     }
@@ -176,19 +165,15 @@ class AppVariable
      *  * getFlashes('notice') returns a simple array with flash messages of that type
      *  * getFlashes(['notice', 'error']) returns a nested array of type => messages.
      */
-    public function getFlashes(string|array $types = null): array
+    public function getFlashes(string|array|null $types = null): array
     {
         try {
-            if (null === $session = $this->getSession()) {
-                return [];
-            }
+            $session = $this->getSession();
         } catch (\RuntimeException) {
             return [];
         }
 
-        // In 7.0 (when symfony/http-foundation: 6.4 is required) this can be updated to
-        // check if the session is an instance of FlashBagAwareSessionInterface
-        if (!method_exists($session, 'getFlashBag')) {
+        if (!$session instanceof FlashBagAwareSessionInterface) {
             return [];
         }
 

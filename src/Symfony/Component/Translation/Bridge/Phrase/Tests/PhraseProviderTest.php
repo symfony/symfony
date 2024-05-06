@@ -18,6 +18,7 @@ use Psr\Cache\CacheItemPoolInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpClient\HttpClientTrait;
 use Symfony\Component\HttpClient\MockHttpClient;
+use Symfony\Component\HttpClient\Response\JsonMockResponse;
 use Symfony\Component\HttpClient\Response\MockResponse;
 use Symfony\Component\Translation\Bridge\Phrase\PhraseProvider;
 use Symfony\Component\Translation\Dumper\XliffFileDumper;
@@ -378,10 +379,6 @@ class PhraseProviderTest extends TestCase
      */
     public function testReadProviderExceptions(int $statusCode, string $expectedExceptionMessage, string $expectedLoggerMessage)
     {
-        $this->expectException(ProviderExceptionInterface::class);
-        $this->expectExceptionCode(0);
-        $this->expectExceptionMessage($expectedExceptionMessage);
-
         $this->getLogger()
             ->expects(self::once())
             ->method('error')
@@ -406,6 +403,10 @@ class PhraseProviderTest extends TestCase
             ],
         ]), endpoint: 'api.phrase.com/api/v2');
 
+        $this->expectException(ProviderExceptionInterface::class);
+        $this->expectExceptionCode(0);
+        $this->expectExceptionMessage($expectedExceptionMessage);
+
         $provider->read(['messages'], ['en_GB']);
     }
 
@@ -414,10 +415,6 @@ class PhraseProviderTest extends TestCase
      */
     public function testInitLocalesExceptions(int $statusCode, string $expectedExceptionMessage, string $expectedLoggerMessage)
     {
-        $this->expectException(ProviderExceptionInterface::class);
-        $this->expectExceptionCode(0);
-        $this->expectExceptionMessage($expectedExceptionMessage);
-
         $this->getLogger()
             ->expects(self::once())
             ->method('error')
@@ -441,6 +438,10 @@ class PhraseProviderTest extends TestCase
             ],
         ]), endpoint: 'api.phrase.com/api/v2');
 
+        $this->expectException(ProviderExceptionInterface::class);
+        $this->expectExceptionCode(0);
+        $this->expectExceptionMessage($expectedExceptionMessage);
+
         $provider->read(['messages'], ['en_GB']);
     }
 
@@ -453,14 +454,14 @@ class PhraseProviderTest extends TestCase
                 $this->assertSame('GET', $method);
                 $this->assertSame('https://api.phrase.com/api/v2/projects/1/locales?per_page=100&page=1', $url);
 
-                return new MockResponse(json_encode([
+                return new JsonMockResponse([
                     [
                         'id' => '5fea6ed5c21767730918a9400e420832',
                         'name' => 'de',
                         'code' => 'de',
                         'fallback_locale' => null,
                     ],
-                ], \JSON_THROW_ON_ERROR), [
+                ], [
                     'http_code' => 200,
                     'response_headers' => [
                         'pagination' => '{"total_count":31,"current_page":1,"current_per_page":25,"previous_page":null,"next_page":2}',
@@ -471,14 +472,14 @@ class PhraseProviderTest extends TestCase
                 $this->assertSame('GET', $method);
                 $this->assertSame('https://api.phrase.com/api/v2/projects/1/locales?per_page=100&page=2', $url);
 
-                return new MockResponse(json_encode([
+                return new JsonMockResponse([
                     [
                         'id' => '5fea6ed5c21767730918a9400e420832',
                         'name' => 'de',
                         'code' => 'de',
                         'fallback_locale' => null,
                     ],
-                ], \JSON_THROW_ON_ERROR), [
+                ], [
                     'http_code' => 200,
                     'response_headers' => [
                         'pagination' => '{"total_count":31,"current_page":2,"current_per_page":25,"previous_page":null,"next_page":null}',
@@ -512,12 +513,12 @@ class PhraseProviderTest extends TestCase
                 $this->assertArrayHasKey('body', $options);
                 $this->assertSame('name=nl-NL&code=nl-NL&default=0', $options['body']);
 
-                return new MockResponse(json_encode([
+                return new JsonMockResponse([
                     'id' => 'zWlsCvkeSK0EBgBVmGpZ4cySWbQ0s1Dk4',
                     'name' => 'nl-NL',
                     'code' => 'nl-NL',
                     'fallback_locale' => null,
-                ], \JSON_THROW_ON_ERROR), ['http_code' => 201]);
+                ], ['http_code' => 201]);
             },
             'download locale' => $this->getDownloadLocaleResponseMock('messages', 'zWlsCvkeSK0EBgBVmGpZ4cySWbQ0s1Dk4', ''),
         ];
@@ -538,10 +539,6 @@ class PhraseProviderTest extends TestCase
      */
     public function testCreateLocaleExceptions(int $statusCode, string $expectedExceptionMessage, string $expectedLoggerMessage)
     {
-        $this->expectException(ProviderExceptionInterface::class);
-        $this->expectExceptionCode(0);
-        $this->expectExceptionMessage($expectedExceptionMessage);
-
         $this->getLogger()
             ->expects(self::once())
             ->method('error')
@@ -565,6 +562,10 @@ class PhraseProviderTest extends TestCase
                 'User-Agent' => 'myProject',
             ],
         ]), endpoint: 'api.phrase.com/api/v2');
+
+        $this->expectException(ProviderExceptionInterface::class);
+        $this->expectExceptionCode(0);
+        $this->expectExceptionMessage($expectedExceptionMessage);
 
         $provider->read(['messages'], ['nl_NL']);
     }
@@ -626,10 +627,6 @@ class PhraseProviderTest extends TestCase
      */
     public function testDeleteProviderExceptions(int $statusCode, string $expectedExceptionMessage, string $expectedLoggerMessage)
     {
-        $this->expectException(ProviderExceptionInterface::class);
-        $this->expectExceptionCode(0);
-        $this->expectExceptionMessage($expectedExceptionMessage);
-
         $this->getLogger()
             ->expects(self::once())
             ->method('error')
@@ -659,6 +656,10 @@ class PhraseProviderTest extends TestCase
                 'key.to.delete' => 'translated value',
             ],
         ]));
+
+        $this->expectException(ProviderExceptionInterface::class);
+        $this->expectExceptionCode(0);
+        $this->expectExceptionMessage($expectedExceptionMessage);
 
         $provider->delete($bag);
     }
@@ -692,7 +693,7 @@ class PhraseProviderTest extends TestCase
                     }
 
                     if (str_starts_with($part, '<?xml')) {
-                        $this->assertSame($content, $part);
+                        $this->assertStringMatchesFormat($content, $part);
                         $testedContent = true;
                     }
 
@@ -744,10 +745,6 @@ class PhraseProviderTest extends TestCase
      */
     public function testWriteProviderExceptions(int $statusCode, string $expectedExceptionMessage, string $expectedLoggerMessage)
     {
-        $this->expectException(ProviderExceptionInterface::class);
-        $this->expectExceptionCode(0);
-        $this->expectExceptionMessage($expectedExceptionMessage);
-
         $this->getLogger()
             ->expects(self::once())
             ->method('error')
@@ -783,6 +780,10 @@ class PhraseProviderTest extends TestCase
             ],
         ]));
 
+        $this->expectException(ProviderExceptionInterface::class);
+        $this->expectExceptionCode(0);
+        $this->expectExceptionMessage($expectedExceptionMessage);
+
         $provider->write($bag);
     }
 
@@ -796,11 +797,11 @@ class PhraseProviderTest extends TestCase
       <tool tool-id="symfony" tool-name="Symfony"/>
     </header>
     <body>
-      <trans-unit id="qdGDk9Z" resname="general.back">
+      <trans-unit id="%s" resname="general.back">
         <source>general.back</source>
         <target><![CDATA[back &!]]></target>
       </trans-unit>
-      <trans-unit id="0ESGki9" resname="general.cancel">
+      <trans-unit id="%s" resname="general.cancel">
         <source>general.cancel</source>
         <target>Cancel</target>
       </trans-unit>
@@ -836,11 +837,11 @@ XLIFF;
       <tool tool-id="symfony" tool-name="Symfony"/>
     </header>
     <body>
-      <trans-unit id="qdGDk9Z" resname="general.back">
+      <trans-unit id="%s" resname="general.back">
         <source>general.back</source>
         <target>zurück</target>
       </trans-unit>
-      <trans-unit id="0ESGki9" resname="general.cancel">
+      <trans-unit id="%s" resname="general.cancel">
         <source>general.cancel</source>
         <target>Abbrechen</target>
       </trans-unit>
@@ -1097,7 +1098,7 @@ XLIFF,
             $this->assertSame('GET', $method);
             $this->assertSame('https://api.phrase.com/api/v2/projects/1/locales?per_page=100&page=1', $url);
 
-            return new MockResponse(json_encode([
+            return new JsonMockResponse([
                 [
                     'id' => '5fea6ed5c21767730918a9400e420832',
                     'name' => 'de',
@@ -1114,11 +1115,11 @@ XLIFF,
                         'code' => 'de',
                     ],
                 ],
-            ], \JSON_THROW_ON_ERROR));
+            ]);
         };
     }
 
-    private function createProvider(MockHttpClient $httpClient = null, string $endpoint = null, XliffFileDumper $dumper = null, bool $isFallbackLocaleEnabled = false): ProviderInterface
+    private function createProvider(?MockHttpClient $httpClient = null, ?string $endpoint = null, ?XliffFileDumper $dumper = null, bool $isFallbackLocaleEnabled = false): ProviderInterface
     {
         return new PhraseProvider(
             $httpClient ?? $this->getHttpClient(),

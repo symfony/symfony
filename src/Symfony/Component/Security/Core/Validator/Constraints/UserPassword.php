@@ -13,10 +13,6 @@ namespace Symfony\Component\Security\Core\Validator\Constraints;
 
 use Symfony\Component\Validator\Constraint;
 
-/**
- * @Annotation
- * @Target({"PROPERTY", "METHOD", "ANNOTATION"})
- */
 #[\Attribute(\Attribute::TARGET_PROPERTY | \Attribute::TARGET_METHOD | \Attribute::IS_REPEATABLE)]
 class UserPassword extends Constraint
 {
@@ -26,10 +22,10 @@ class UserPassword extends Constraint
         self::INVALID_PASSWORD_ERROR => 'INVALID_PASSWORD_ERROR',
     ];
 
-    public $message = 'This value should be the user\'s current password.';
-    public $service = 'security.validator.user_password';
+    public string $message = 'This value should be the user\'s current password.';
+    public string $service = 'security.validator.user_password';
 
-    public function __construct(array $options = null, string $message = null, string $service = null, array $groups = null, mixed $payload = null)
+    public function __construct(?array $options = null, ?string $message = null, ?string $service = null, ?array $groups = null, mixed $payload = null)
     {
         parent::__construct($options, $groups, $payload);
 

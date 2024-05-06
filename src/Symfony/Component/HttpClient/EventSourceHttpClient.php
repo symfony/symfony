@@ -33,7 +33,7 @@ final class EventSourceHttpClient implements HttpClientInterface, ResetInterface
 
     private float $reconnectionTime;
 
-    public function __construct(HttpClientInterface $client = null, float $reconnectionTime = 10.0)
+    public function __construct(?HttpClientInterface $client = null, float $reconnectionTime = 10.0)
     {
         $this->client = $client ?? HttpClient::create();
         $this->reconnectionTime = $reconnectionTime;
@@ -121,7 +121,7 @@ final class EventSourceHttpClient implements HttpClientInterface, ResetInterface
                 return;
             }
 
-            $rx = '/((?:\r\n|[\r\n]){2,})/';
+            $rx = '/((?:\r\n){2,}|\r{2,}|\n{2,})/';
             $content = $state->buffer.$chunk->getContent();
 
             if ($chunk->isLast()) {

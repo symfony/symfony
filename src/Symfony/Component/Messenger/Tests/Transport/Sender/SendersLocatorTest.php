@@ -13,6 +13,7 @@ namespace Symfony\Component\Messenger\Tests\Transport\Sender;
 
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
+use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Stamp\TransportNamesStamp;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
@@ -73,13 +74,11 @@ class SendersLocatorTest extends TestCase
 
     private function createContainer(array $senders): ContainerInterface
     {
-        $container = $this->createMock(ContainerInterface::class);
-        $container->expects($this->any())
-            ->method('has')
-            ->willReturnCallback(fn ($id) => isset($senders[$id]));
-        $container->expects($this->any())
-            ->method('get')
-            ->willReturnCallback(fn ($id) => $senders[$id]);
+        $container = new Container();
+
+        foreach ($senders as $id => $sender) {
+            $container->set($id, $sender);
+        }
 
         return $container;
     }

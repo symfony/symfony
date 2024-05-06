@@ -24,7 +24,7 @@ class PeriodicalTrigger implements StatefulTriggerInterface
 
     public function __construct(
         string|int|float|\DateInterval $interval,
-        string|\DateTimeImmutable $from = null,
+        string|\DateTimeImmutable|null $from = null,
         string|\DateTimeImmutable $until = new \DateTimeImmutable('3000-01-01'),
     ) {
         $this->from = \is_string($from) ? new \DateTimeImmutable($from) : $from;
@@ -55,7 +55,7 @@ class PeriodicalTrigger implements StatefulTriggerInterface
                 $i = \DateInterval::createFromDateString($interval);
             } else {
                 $a = (array) $interval;
-                $this->description = \PHP_VERSION_ID >= 80200 && $a['from_string'] ? $a['date_string'] : 'DateInterval';
+                $this->description = $a['from_string'] ? $a['date_string'] : 'DateInterval';
             }
 
             if ($this->canBeConvertedToSeconds($i)) {
@@ -119,12 +119,8 @@ class PeriodicalTrigger implements StatefulTriggerInterface
     private function canBeConvertedToSeconds(\DateInterval $interval): bool
     {
         $a = (array) $interval;
-        if (\PHP_VERSION_ID >= 80200) {
-            if ($a['from_string']) {
-                return preg_match('#^\s*\d+\s*(sec|second|min|minute|hour)s?\s*$#', $a['date_string']);
-            }
-        } elseif ($a['weekday'] || $a['weekday_behavior'] || $a['first_last_day_of'] || $a['days'] || $a['special_type'] || $a['special_amount'] || $a['have_weekday_relative'] || $a['have_special_relative']) {
-            return false;
+        if ($a['from_string']) {
+            return preg_match('#^\s*\d+\s*(sec|second|min|minute|hour)s?\s*$#', $a['date_string']);
         }
 
         return !$interval->y && !$interval->m && !$interval->d;

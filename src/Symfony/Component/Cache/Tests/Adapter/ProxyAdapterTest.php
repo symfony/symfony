@@ -29,7 +29,7 @@ class ProxyAdapterTest extends AdapterTestCase
         'testPrune' => 'ProxyAdapter just proxies',
     ];
 
-    public function createCachePool(int $defaultLifetime = 0, string $testMethod = null): CacheItemPoolInterface
+    public function createCachePool(int $defaultLifetime = 0, ?string $testMethod = null): CacheItemPoolInterface
     {
         if ('testGetMetadata' === $testMethod) {
             return new ProxyAdapter(new FilesystemAdapter(), '', $defaultLifetime);
@@ -40,14 +40,16 @@ class ProxyAdapterTest extends AdapterTestCase
 
     public function testProxyfiedItem()
     {
-        $this->expectException(\Exception::class);
-        $this->expectExceptionMessage('OK bar');
         $item = new CacheItem();
         $pool = new ProxyAdapter(new TestingArrayAdapter($item));
 
         $proxyItem = $pool->getItem('foo');
 
         $this->assertNotSame($item, $proxyItem);
+
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('OK bar');
+
         $pool->save($proxyItem->set('bar'));
     }
 }

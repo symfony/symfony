@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\AssetMapper\ImportMap\Resolver;
 
+use Symfony\Component\AssetMapper\ImportMap\ImportMapEntry;
 use Symfony\Component\AssetMapper\ImportMap\PackageRequireOptions;
 
 interface PackageResolverInterface
@@ -28,7 +29,15 @@ interface PackageResolverInterface
     public function resolvePackages(array $packagesToRequire): array;
 
     /**
-     * Tries to extract the package's version from its URL.
+     * Downloads the contents of the given packages.
+     *
+     * The returned array should be a map using the same keys as $importMapEntries.
+     *
+     * The dependencies are an array of module names that are imported by the package.
+     *
+     * @param array<string, ImportMapEntry> $importMapEntries
+     *
+     * @return array<string, array{content: string, dependencies: string[], extraFiles: array<string, string>}>
      */
-    public function getPackageVersion(string $url): ?string;
+    public function downloadPackages(array $importMapEntries, ?callable $progressCallback = null): array;
 }

@@ -11,7 +11,13 @@
 
 namespace Symfony\Component\AssetMapper\ImportMap;
 
+use Psr\Link\EvolvableLinkProviderInterface;
 use Symfony\Component\Asset\Packages;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\WebLink\EventListener\AddLinkHeaderListener;
+use Symfony\Component\WebLink\GenericLinkProvider;
+use Symfony\Component\WebLink\Link;
 
 /**
  * @author Kévin Dunglas <kevin@dunglas.dev>
@@ -21,12 +27,17 @@ use Symfony\Component\Asset\Packages;
  */
 class ImportMapRenderer
 {
+    // https://generator.jspm.io/#S2NnYGAIzSvJLMlJTWEAAMYOgCAOAA
+    private const DEFAULT_ES_MODULE_SHIMS_POLYFILL_URL = 'https://ga.jspm.io/npm:es-module-shims@1.8.2/dist/es-module-shims.js';
+    private const DEFAULT_ES_MODULE_SHIMS_POLYFILL_INTEGRITY = 'sha384-+dzlBT6NPToF0UZu7ZUA6ehxHY8h/TxJOZxzNXKhFD+5He5Hbex+0AIOiSsEaokw';
+
     public function __construct(
-        private readonly ImportMapManager $importMapManager,
+        private readonly ImportMapGenerator $importMapGenerator,
         private readonly ?Packages $assetPackages = null,
         private readonly string $charset = 'UTF-8',
-        private readonly string|false $polyfillUrl = ImportMapManager::POLYFILL_URL,
+        private readonly string|false $polyfillImportName = false,
         private readonly array $scriptAttributes = [],
+        private readonly ?RequestStack $requestStack = null,
     ) {
     }
 
@@ -34,16 +45,28 @@ class ImportMapRenderer
     {
         $entryPoint = (array) $entryPoint;
 
-        $importMapData = $this->importMapManager->getImportMapData($entryPoint);
+        $importMapData = $this->importMapGenerator->getImportMapData($entryPoint);
         $importMap = [];
         $modulePreloads = [];
         $cssLinks = [];
+        $polyfillPath = null;
         foreach ($importMapData as $importName => $data) {
             $path = $data['path'];
 
             if ($this->assetPackages) {
                 // ltrim so the subdirectory (if needed) can be prepended
                 $path = $this->assetPackages->getUrl(ltrim($path, '/'));
+            }
+
+            // if this represents the polyfill, hide it from the import map
+            if ($importName === $this->polyfillImportName) {
+                $polyfillPath = $path;
+                continue;
+            }
+
+            // for subdirectories or CDNs, the import name needs to be the full URL
+            if (str_starts_with($importName, '/') && $this->assetPackages) {
+                $importName = $this->assetPackages->getUrl(ltrim($importName, '/'));
             }
 
             $preload = $data['preload'] ?? false;
@@ -57,7 +80,7 @@ class ImportMapRenderer
                 // importmap entry is a noop
                 $importMap[$importName] = 'data:application/javascript,';
             } else {
-                $importMap[$importName] = 'data:application/javascript,'.rawurlencode(sprintf('const d=document,l=d.createElement("link");l.rel="stylesheet",l.href="%s",(d.head||d.getElementsByTagName("head")[0]).appendChild(l)', $path));
+                $importMap[$importName] = 'data:application/javascript,'.rawurlencode(sprintf('document.head.appendChild(Object.assign(document.createElement("link"),{rel:"stylesheet",href:"%s"}))', addslashes($path)));
             }
         }
 
@@ -68,21 +91,44 @@ class ImportMapRenderer
             $output .= "\n<link rel=\"stylesheet\" href=\"$url\">";
         }
 
+        if (class_exists(AddLinkHeaderListener::class) && $request = $this->requestStack?->getCurrentRequest()) {
+            $this->addWebLinkPreloads($request, $cssLinks);
+        }
+
         $scriptAttributes = $this->createAttributesString($attributes);
         $importMapJson = json_encode(['imports' => $importMap], \JSON_THROW_ON_ERROR | \JSON_PRETTY_PRINT | \JSON_UNESCAPED_SLASHES | \JSON_HEX_TAG);
         $output .= <<<HTML
+
             <script type="importmap"$scriptAttributes>
             $importMapJson
             </script>
             HTML;
 
-        if ($this->polyfillUrl) {
-            $url = $this->escapeAttributeValue($this->polyfillUrl);
+        if (false !== $this->polyfillImportName && null === $polyfillPath) {
+            if ('es-module-shims' !== $this->polyfillImportName) {
+                throw new \InvalidArgumentException(sprintf('The JavaScript module polyfill was not found in your import map. Either disable the polyfill or run "php bin/console importmap:require "%s"" to install it.', $this->polyfillImportName));
+            }
+
+            // a fallback for the default polyfill in case it's not in the importmap
+            $polyfillPath = self::DEFAULT_ES_MODULE_SHIMS_POLYFILL_URL;
+        }
+
+        if ($polyfillPath) {
+            $url = $this->escapeAttributeValue($polyfillPath);
+            $polyfillAttributes = $scriptAttributes;
+
+            // Add security attributes for the default polyfill hosted on jspm.io
+            if (self::DEFAULT_ES_MODULE_SHIMS_POLYFILL_URL === $polyfillPath) {
+                $polyfillAttributes = $this->createAttributesString([
+                    'crossorigin' => 'anonymous',
+                    'integrity' => self::DEFAULT_ES_MODULE_SHIMS_POLYFILL_INTEGRITY,
+                ] + $attributes);
+            }
 
             $output .= <<<HTML
 
                 <!-- ES Module Shims: Import maps polyfill for modules browsers without import maps support -->
-                <script async src="$url"$scriptAttributes></script>
+                <script async src="$url"$polyfillAttributes></script>
                 HTML;
         }
 
@@ -130,5 +176,26 @@ class ImportMapRenderer
         }
 
         return $attributeString;
+    }
+
+    private function addWebLinkPreloads(Request $request, array $cssLinks): void
+    {
+        $cssPreloadLinks = array_map(fn ($url) => (new Link('preload', $url))->withAttribute('as', 'style'), $cssLinks);
+
+        if (null === $linkProvider = $request->attributes->get('_links')) {
+            $request->attributes->set('_links', new GenericLinkProvider($cssPreloadLinks));
+
+            return;
+        }
+
+        if (!$linkProvider instanceof EvolvableLinkProviderInterface) {
+            return;
+        }
+
+        foreach ($cssPreloadLinks as $link) {
+            $linkProvider = $linkProvider->withLink($link);
+        }
+
+        $request->attributes->set('_links', $linkProvider);
     }
 }

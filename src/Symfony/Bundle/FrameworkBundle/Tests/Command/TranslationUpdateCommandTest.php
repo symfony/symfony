@@ -29,14 +29,6 @@ class TranslationUpdateCommandTest extends TestCase
     private Filesystem $fs;
     private string $translationDir;
 
-    public function testDumpMessagesAndCleanWithDeprecatedCommandName()
-    {
-        $tester = $this->createCommandTester(['messages' => ['foo' => 'foo']]);
-        $tester->execute(['command' => 'translation:update', 'locale' => 'en', 'bundle' => 'foo', '--dump-messages' => true, '--clean' => true]);
-        $this->assertMatchesRegularExpression('/foo/', $tester->getDisplay());
-        $this->assertMatchesRegularExpression('/1 message was successfully extracted/', $tester->getDisplay());
-    }
-
     public function testDumpMessagesAndClean()
     {
         $tester = $this->createCommandTester(['messages' => ['foo' => 'foo']]);
@@ -192,7 +184,7 @@ class TranslationUpdateCommandTest extends TestCase
         $this->fs->remove($this->translationDir);
     }
 
-    private function createCommandTester($extractedMessages = [], $loadedMessages = [], KernelInterface $kernel = null, array $transPaths = [], array $codePaths = []): CommandTester
+    private function createCommandTester($extractedMessages = [], $loadedMessages = [], ?KernelInterface $kernel = null, array $transPaths = [], array $codePaths = []): CommandTester
     {
         $translator = $this->createMock(Translator::class);
         $translator

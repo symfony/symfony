@@ -31,10 +31,7 @@ class UserPasswordValidator extends ConstraintValidator
         $this->hasherFactory = $hasherFactory;
     }
 
-    /**
-     * @return void
-     */
-    public function validate(mixed $password, Constraint $constraint)
+    public function validate(mixed $password, Constraint $constraint): void
     {
         if (!$constraint instanceof UserPassword) {
             throw new UnexpectedTypeException($constraint, UserPassword::class);

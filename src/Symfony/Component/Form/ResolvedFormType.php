@@ -23,31 +23,28 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class ResolvedFormType implements ResolvedFormTypeInterface
 {
-    private FormTypeInterface $innerType;
-
     /**
      * @var FormTypeExtensionInterface[]
      */
     private array $typeExtensions;
-
-    private ?ResolvedFormTypeInterface $parent;
 
     private OptionsResolver $optionsResolver;
 
     /**
      * @param FormTypeExtensionInterface[] $typeExtensions
      */
-    public function __construct(FormTypeInterface $innerType, array $typeExtensions = [], ResolvedFormTypeInterface $parent = null)
-    {
+    public function __construct(
+        private FormTypeInterface $innerType,
+        array $typeExtensions = [],
+        private ?ResolvedFormTypeInterface $parent = null,
+    ) {
         foreach ($typeExtensions as $extension) {
             if (!$extension instanceof FormTypeExtensionInterface) {
                 throw new UnexpectedTypeException($extension, FormTypeExtensionInterface::class);
             }
         }
 
-        $this->innerType = $innerType;
         $this->typeExtensions = $typeExtensions;
-        $this->parent = $parent;
     }
 
     public function getBlockPrefix(): string
@@ -87,15 +84,12 @@ class ResolvedFormType implements ResolvedFormTypeInterface
         return $builder;
     }
 
-    public function createView(FormInterface $form, FormView $parent = null): FormView
+    public function createView(FormInterface $form, ?FormView $parent = null): FormView
     {
         return $this->newView($parent);
     }
 
-    /**
-     * @return void
-     */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $this->parent?->buildForm($builder, $options);
 
@@ -106,10 +100,7 @@ class ResolvedFormType implements ResolvedFormTypeInterface
         }
     }
 
-    /**
-     * @return void
-     */
-    public function buildView(FormView $view, FormInterface $form, array $options)
+    public function buildView(FormView $view, FormInterface $form, array $options): void
     {
         $this->parent?->buildView($view, $form, $options);
 
@@ -120,10 +111,7 @@ class ResolvedFormType implements ResolvedFormTypeInterface
         }
     }
 
-    /**
-     * @return void
-     */
-    public function finishView(FormView $view, FormInterface $form, array $options)
+    public function finishView(FormView $view, FormInterface $form, array $options): void
     {
         $this->parent?->finishView($view, $form, $options);
 
@@ -177,7 +165,7 @@ class ResolvedFormType implements ResolvedFormTypeInterface
      *
      * Override this method if you want to customize the view class.
      */
-    protected function newView(FormView $parent = null): FormView
+    protected function newView(?FormView $parent = null): FormView
     {
         return new FormView($parent);
     }

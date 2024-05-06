@@ -21,13 +21,11 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
  */
 final class WcswidthDataGenerator
 {
-    private string $outDir;
     private HttpClientInterface $client;
 
-    public function __construct(string $outDir)
-    {
-        $this->outDir = $outDir;
-
+    public function __construct(
+        private string $outDir,
+    ) {
         $this->client = HttpClient::createForBaseUri('https://www.unicode.org/Public/UNIDATA/');
     }
 

@@ -12,6 +12,7 @@
 namespace Symfony\Component\PropertyInfo;
 
 use Psr\Cache\CacheItemPoolInterface;
+use Symfony\Component\TypeInfo\Type;
 
 /**
  * Adds a PSR-6 cache layer on top of an extractor.
@@ -55,6 +56,17 @@ class PropertyInfoCacheExtractor implements PropertyInfoExtractorInterface, Prop
         return $this->extract('getProperties', [$class, $context]);
     }
 
+    /**
+     * @experimental
+     */
+    public function getType(string $class, string $property, array $context = []): ?Type
+    {
+        return $this->extract('getType', [$class, $property, $context]);
+    }
+
+    /**
+     * @deprecated since Symfony 7.1, use "getType" instead
+     */
     public function getTypes(string $class, string $property, array $context = []): ?array
     {
         return $this->extract('getTypes', [$class, $property, $context]);

@@ -29,16 +29,13 @@ final class OneSignalTransport extends AbstractTransport
 {
     protected const HOST = 'onesignal.com';
 
-    private string $appId;
-    private string $apiKey;
-    private ?string $defaultRecipientId;
-
-    public function __construct(string $appId, #[\SensitiveParameter] string $apiKey, string $defaultRecipientId = null, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
-    {
-        $this->appId = $appId;
-        $this->apiKey = $apiKey;
-        $this->defaultRecipientId = $defaultRecipientId;
-
+    public function __construct(
+        private string $appId,
+        #[\SensitiveParameter] private string $apiKey,
+        private ?string $defaultRecipientId = null,
+        ?HttpClientInterface $client = null,
+        ?EventDispatcherInterface $dispatcher = null,
+    ) {
         parent::__construct($client, $dispatcher);
     }
 
@@ -77,7 +74,15 @@ final class OneSignalTransport extends AbstractTransport
 
         $options = $options?->toArray() ?? [];
         $options['app_id'] = $this->appId;
-        $options['include_player_ids'] = [$recipientId];
+        if ($options['is_external_user_id'] ?? false) {
+            $options['include_aliases'] = [
+                'external_id' => [$recipientId],
+            ];
+            $options['target_channel'] = 'push';
+            unset($options['is_external_user_id']);
+        } else {
+            $options['include_subscription_ids'] = [$recipientId];
+        }
         $options['headings'] ??= ['en' => $message->getSubject()];
         $options['contents'] ??= ['en' => $message->getContent()];
 

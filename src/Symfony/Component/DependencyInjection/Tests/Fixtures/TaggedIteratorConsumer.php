@@ -11,12 +11,12 @@
 
 namespace Symfony\Component\DependencyInjection\Tests\Fixtures;
 
-use Symfony\Component\DependencyInjection\Attribute\TaggedIterator;
+use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 
 final class TaggedIteratorConsumer
 {
     public function __construct(
-        #[TaggedIterator('foo_bar', indexAttribute: 'foo')]
+        #[AutowireIterator('foo_bar', indexAttribute: 'foo')]
         private iterable $param,
     ) {
     }

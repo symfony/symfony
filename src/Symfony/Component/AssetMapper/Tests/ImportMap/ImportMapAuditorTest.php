@@ -19,29 +19,28 @@ use Symfony\Component\AssetMapper\ImportMap\ImportMapEntries;
 use Symfony\Component\AssetMapper\ImportMap\ImportMapEntry;
 use Symfony\Component\AssetMapper\ImportMap\ImportMapPackageAudit;
 use Symfony\Component\AssetMapper\ImportMap\ImportMapPackageAuditVulnerability;
-use Symfony\Component\AssetMapper\ImportMap\Resolver\PackageResolverInterface;
+use Symfony\Component\AssetMapper\ImportMap\ImportMapType;
 use Symfony\Component\HttpClient\MockHttpClient;
+use Symfony\Component\HttpClient\Response\JsonMockResponse;
 use Symfony\Component\HttpClient\Response\MockResponse;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 class ImportMapAuditorTest extends TestCase
 {
     private ImportMapConfigReader $importMapConfigReader;
-    private PackageResolverInterface $packageResolver;
     private HttpClientInterface $httpClient;
     private ImportMapAuditor $importMapAuditor;
 
     protected function setUp(): void
     {
         $this->importMapConfigReader = $this->createMock(ImportMapConfigReader::class);
-        $this->packageResolver = $this->createMock(PackageResolverInterface::class);
         $this->httpClient = new MockHttpClient();
-        $this->importMapAuditor = new ImportMapAuditor($this->importMapConfigReader, $this->packageResolver, $this->httpClient);
+        $this->importMapAuditor = new ImportMapAuditor($this->importMapConfigReader, $this->httpClient);
     }
 
     public function testAudit()
     {
-        $this->httpClient->setResponseFactory(new MockResponse(json_encode([
+        $this->httpClient->setResponseFactory(new JsonMockResponse([
             [
                 'ghsa_id' => 'GHSA-abcd-1234-efgh',
                 'cve_id' => 'CVE-2050-00000',
@@ -66,23 +65,11 @@ class ImportMapAuditorTest extends TestCase
                     ],
                 ],
             ],
-        ])));
+        ]));
         $this->importMapConfigReader->method('getEntries')->willReturn(new ImportMapEntries([
-            '@hotwired/stimulus' => new ImportMapEntry(
-                importName: '@hotwired/stimulus',
-                url: 'https://unpkg.com/@hotwired/stimulus@3.2.1/dist/stimulus.js',
-                version: '3.2.1',
-            ),
-            'json5' => new ImportMapEntry(
-                importName: 'json5',
-                url: 'https://cdn.jsdelivr.net/npm/json5@1.0.0/+esm',
-                version: '1.0.0',
-            ),
-            'lodash' => new ImportMapEntry(
-                importName: 'lodash',
-                url: 'https://ga.jspm.io/npm:lodash@4.17.21/lodash.js',
-                version: '4.17.21',
-            ),
+            self::createRemoteEntry('@hotwired/stimulus', '3.2.1'),
+            self::createRemoteEntry('json5/some/file', '1.0.0'),
+            self::createRemoteEntry('lodash', '4.17.21'),
         ]));
 
         $audit = $this->importMapAuditor->audit();
@@ -107,7 +94,7 @@ class ImportMapAuditorTest extends TestCase
      */
     public function testAuditWithVersionRange(bool $expectMatch, string $version, ?string $versionRange)
     {
-        $this->httpClient->setResponseFactory(new MockResponse(json_encode([
+        $this->httpClient->setResponseFactory(new JsonMockResponse([
             [
                 'ghsa_id' => 'GHSA-abcd-1234-efgh',
                 'cve_id' => 'CVE-2050-00000',
@@ -122,13 +109,9 @@ class ImportMapAuditorTest extends TestCase
                     ],
                 ],
             ],
-        ])));
+        ]));
         $this->importMapConfigReader->method('getEntries')->willReturn(new ImportMapEntries([
-            'json5' => new ImportMapEntry(
-                importName: 'json5',
-                url: "https://cdn.jsdelivr.net/npm/json5@$version/+esm",
-                version: $version,
-            ),
+            self::createRemoteEntry('json5', $version),
         ]));
 
         $audit = $this->importMapAuditor->audit();
@@ -149,47 +132,28 @@ class ImportMapAuditorTest extends TestCase
         yield [false, '1.2.0', '> 1.0.0, < 1.2.0'];
     }
 
-    public function testAuditWithVersionResolving()
-    {
-        $this->httpClient->setResponseFactory(new MockResponse('[]'));
-        $this->importMapConfigReader->method('getEntries')->willReturn(new ImportMapEntries([
-            '@hotwired/stimulus' => new ImportMapEntry(
-                importName: '@hotwired/stimulus',
-                url: 'https://unpkg.com/@hotwired/stimulus/dist/stimulus.js',
-                version: '3.2.1',
-            ),
-            'json5' => new ImportMapEntry(
-                importName: 'json5',
-                url: 'https://cdn.jsdelivr.net/npm/json5/+esm',
-            ),
-            'lodash' => new ImportMapEntry(
-                importName: 'lodash',
-                url: 'https://ga.jspm.io/npm:lodash@4.17.21/lodash.js',
-            ),
-        ]));
-        $this->packageResolver->method('getPackageVersion')->willReturn('1.2.3');
-
-        $audit = $this->importMapAuditor->audit();
-
-        $this->assertSame('3.2.1', $audit[0]->version);
-        $this->assertSame('1.2.3', $audit[1]->version);
-        $this->assertSame('1.2.3', $audit[2]->version);
-    }
-
     public function testAuditError()
     {
         $this->httpClient->setResponseFactory(new MockResponse('Server error', ['http_code' => 500]));
         $this->importMapConfigReader->method('getEntries')->willReturn(new ImportMapEntries([
-            'json5' => new ImportMapEntry(
-                importName: 'json5',
-                url: 'https://cdn.jsdelivr.net/npm/json5@1.0.0/+esm',
-                version: '1.0.0',
-            ),
+            self::createRemoteEntry('json5', '1.0.0'),
         ]));
 
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('Error 500 auditing packages. Response: Server error');
 
         $this->importMapAuditor->audit();
+    }
+
+    private static function createRemoteEntry(string $packageSpecifier, string $version): ImportMapEntry
+    {
+        return ImportMapEntry::createRemote(
+            'could_by_anything'.md5($packageSpecifier.$version),
+            ImportMapType::JS,
+            '/any/path',
+            $version,
+            $packageSpecifier,
+            false
+        );
     }
 }

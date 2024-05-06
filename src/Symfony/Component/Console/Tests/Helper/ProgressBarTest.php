@@ -1005,6 +1005,18 @@ And, as in uffish thought he stood, The Jabberwock, with eyes of flame, Came whi
         );
     }
 
+    public function testSetFormatWithTimes()
+    {
+        $bar = new ProgressBar($output = $this->getOutputStream(), 15, 0);
+        $bar->setFormat('%current%/%max% [%bar%] %percent:3s%% %elapsed:6s%/%estimated:-6s%/%remaining:-6s%');
+        $bar->start();
+        rewind($output->getStream());
+        $this->assertEquals(
+            ' 0/15 [>---------------------------]   0% < 1 sec/< 1 sec/< 1 sec',
+            stream_get_contents($output->getStream())
+        );
+    }
+
     public function testUnicode()
     {
         $bar = new ProgressBar($output = $this->getOutputStream(), 10, 0);
@@ -1076,6 +1088,20 @@ And, as in uffish thought he stood, The Jabberwock, with eyes of flame, Came whi
             $this->generateOutput('    1 [->--------------------------]').
             $this->generateOutput('    2 [-->-------------------------]').
             $this->generateOutput('    2 [============================]'),
+            stream_get_contents($output->getStream())
+        );
+    }
+
+    public function testEmptyInputWithDebugFormat()
+    {
+        $bar = new ProgressBar($output = $this->getOutputStream());
+        $bar->setFormat('%current%/%max% [%bar%] %percent:3s%% %elapsed:6s%/%estimated:-6s%');
+
+        $this->assertEquals([], iterator_to_array($bar->iterate([])));
+
+        rewind($output->getStream());
+        $this->assertEquals(
+            ' 0/0 [============================] 100% < 1 sec/< 1 sec',
             stream_get_contents($output->getStream())
         );
     }
@@ -1251,8 +1277,15 @@ And, as in uffish thought he stood, The Jabberwock, with eyes of flame, Came whi
             'Foo!'.\PHP_EOL.
             $this->generateOutput('[--->------------------------]').
             "\nProcessing \"foobar\"...".
-            $this->generateOutput("[----->----------------------]\nProcessing \"foobar\"..."),
+            $this->generateOutput("[============================]\nProcessing \"foobar\"..."),
             stream_get_contents($output->getStream())
         );
+    }
+
+    public function testGetNotSetMessage()
+    {
+        $progressBar = new ProgressBar($this->getOutputStream());
+
+        $this->assertNull($progressBar->getMessage());
     }
 }

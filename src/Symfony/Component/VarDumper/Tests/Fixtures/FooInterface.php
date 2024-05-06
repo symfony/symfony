@@ -7,5 +7,5 @@ interface FooInterface
     /**
      * Hello.
      */
-    public function foo(?\stdClass $a, \stdClass $b = null);
+    public function foo(?\stdClass $a, ?\stdClass $b = null);
 }

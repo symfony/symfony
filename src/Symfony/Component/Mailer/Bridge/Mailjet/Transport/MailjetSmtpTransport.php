@@ -17,9 +17,9 @@ use Symfony\Component\Mailer\Transport\Smtp\EsmtpTransport;
 
 class MailjetSmtpTransport extends EsmtpTransport
 {
-    public function __construct(string $username, #[\SensitiveParameter] string $password, EventDispatcherInterface $dispatcher = null, LoggerInterface $logger = null)
+    public function __construct(string $username, #[\SensitiveParameter] string $password, ?EventDispatcherInterface $dispatcher = null, ?LoggerInterface $logger = null)
     {
-        parent::__construct('in-v3.mailjet.com', 465, true, $dispatcher, $logger);
+        parent::__construct('in-v3.mailjet.com', 587, false, $dispatcher, $logger);
 
         $this->setUsername($username);
         $this->setPassword($password);

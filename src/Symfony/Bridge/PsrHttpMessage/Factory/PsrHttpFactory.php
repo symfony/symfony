@@ -41,10 +41,10 @@ class PsrHttpFactory implements HttpMessageFactoryInterface
     private readonly ResponseFactoryInterface $responseFactory;
 
     public function __construct(
-        ServerRequestFactoryInterface $serverRequestFactory = null,
-        StreamFactoryInterface $streamFactory = null,
-        UploadedFileFactoryInterface $uploadedFileFactory = null,
-        ResponseFactoryInterface $responseFactory = null,
+        ?ServerRequestFactoryInterface $serverRequestFactory = null,
+        ?StreamFactoryInterface $streamFactory = null,
+        ?UploadedFileFactoryInterface $uploadedFileFactory = null,
+        ?ResponseFactoryInterface $responseFactory = null,
     ) {
         if (null === $serverRequestFactory || null === $streamFactory || null === $uploadedFileFactory || null === $responseFactory) {
             $psr17Factory = match (true) {
@@ -85,12 +85,7 @@ class PsrHttpFactory implements HttpMessageFactoryInterface
         }
 
         $body = $this->streamFactory->createStreamFromResource($symfonyRequest->getContent(true));
-
-        if (method_exists(Request::class, 'getContentTypeFormat')) {
-            $format = $symfonyRequest->getContentTypeFormat();
-        } else {
-            $format = $symfonyRequest->getContentType();
-        }
+        $format = $symfonyRequest->getContentTypeFormat();
 
         if ('json' === $format) {
             $parsedBody = json_decode($symfonyRequest->getContent(), true, 512, \JSON_BIGINT_AS_STRING);
@@ -183,7 +178,7 @@ class PsrHttpFactory implements HttpMessageFactoryInterface
 
         $headers = $symfonyResponse->headers->all();
         $cookies = $symfonyResponse->headers->getCookies();
-        if (!empty($cookies)) {
+        if ($cookies) {
             $headers['Set-Cookie'] = [];
 
             foreach ($cookies as $cookie) {

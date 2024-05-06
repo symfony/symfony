@@ -57,8 +57,7 @@ class MappedAssetTest extends TestCase
     {
         $mainAsset = new MappedAsset('file.js');
 
-        $assetFoo = new MappedAsset('foo.js');
-        $javaScriptImport = new JavaScriptImport('/the_import', isLazy: true, asset: $assetFoo);
+        $javaScriptImport = new JavaScriptImport('/the_import', assetLogicalPath: 'foo.js', assetSourcePath: '/path/to/foo.js', isLazy: true);
         $mainAsset->addJavaScriptImport($javaScriptImport);
 
         $this->assertSame([$javaScriptImport], $mainAsset->getJavaScriptImports());

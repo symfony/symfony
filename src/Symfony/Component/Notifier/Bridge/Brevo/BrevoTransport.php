@@ -31,8 +31,8 @@ final class BrevoTransport extends AbstractTransport
     public function __construct(
         #[\SensitiveParameter] private readonly string $apiKey,
         private readonly string $sender,
-        HttpClientInterface $client = null,
-        EventDispatcherInterface $dispatcher = null
+        ?HttpClientInterface $client = null,
+        ?EventDispatcherInterface $dispatcher = null,
     ) {
         parent::__construct($client, $dispatcher);
     }
@@ -75,7 +75,7 @@ final class BrevoTransport extends AbstractTransport
         if (201 !== $statusCode) {
             $error = $response->toArray(false);
 
-            throw new TransportException('Unable to send the SMS: '.$error['message'], $response);
+            throw new TransportException('Unable to send the SMS: '.($error['message'] ?? $response->getContent(false)), $response);
         }
 
         $success = $response->toArray(false);

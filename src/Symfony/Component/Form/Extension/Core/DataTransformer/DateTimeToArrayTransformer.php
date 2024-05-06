@@ -23,7 +23,6 @@ use Symfony\Component\Form\Exception\TransformationFailedException;
  */
 class DateTimeToArrayTransformer extends BaseDateTimeTransformer
 {
-    private bool $pad;
     private array $fields;
     private \DateTimeInterface $referenceDate;
 
@@ -33,12 +32,16 @@ class DateTimeToArrayTransformer extends BaseDateTimeTransformer
      * @param string[]|null $fields         The date fields
      * @param bool          $pad            Whether to use padding
      */
-    public function __construct(string $inputTimezone = null, string $outputTimezone = null, array $fields = null, bool $pad = false, \DateTimeInterface $referenceDate = null)
-    {
+    public function __construct(
+        ?string $inputTimezone = null,
+        ?string $outputTimezone = null,
+        ?array $fields = null,
+        private bool $pad = false,
+        ?\DateTimeInterface $referenceDate = null,
+    ) {
         parent::__construct($inputTimezone, $outputTimezone);
 
         $this->fields = $fields ?? ['year', 'month', 'day', 'hour', 'minute', 'second'];
-        $this->pad = $pad;
         $this->referenceDate = $referenceDate ?? new \DateTimeImmutable('1970-01-01 00:00:00');
     }
 

@@ -1,6 +1,19 @@
 CHANGELOG
 =========
 
+7.1
+---
+
+ * Add `ArgvInput::getRawTokens()`
+
+7.0
+---
+
+ * Add method `__toString()` to `InputInterface`
+ * Remove `Command::$defaultName` and `Command::$defaultDescription`, use the `AsCommand` attribute instead
+ * Require explicit argument when calling `*Command::setApplication()`, `*FormatterStyle::setForeground/setBackground()`, `Helper::setHelpSet()`, `Input*::setDefault()` and `Question::setAutocompleterCallback/setValidator()`
+ * Remove `StringInput::REGEX_STRING`
+
 6.4
 ---
 
@@ -8,6 +21,7 @@ CHANGELOG
  * Multi-line text in vertical tables is aligned properly
  * The application can also catch errors with `Application::setCatchErrors(true)`
  * Add `RunCommandMessage` and `RunCommandMessageHandler`
+ * Dispatch `ConsoleTerminateEvent` after an exit on signal handling and add `ConsoleTerminateEvent::getInterruptingSignal()`
 
 6.3
 ---

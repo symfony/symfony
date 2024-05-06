@@ -15,7 +15,7 @@ use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
 final class FooInterfaceDummyDenormalizer implements DenormalizerInterface
 {
-    public function denormalize(mixed $data, string $type, string $format = null, array $context = []): array
+    public function denormalize(mixed $data, string $type, ?string $format = null, array $context = []): array
     {
         $result = [];
         foreach ($data as $foo) {
@@ -27,7 +27,7 @@ final class FooInterfaceDummyDenormalizer implements DenormalizerInterface
         return $result;
     }
 
-    public function supportsDenormalization(mixed $data, string $type, string $format = null, array $context = []): bool
+    public function supportsDenormalization(mixed $data, string $type, ?string $format = null, array $context = []): bool
     {
         if (str_ends_with($type, '[]')) {
             $className = substr($type, 0, -2);

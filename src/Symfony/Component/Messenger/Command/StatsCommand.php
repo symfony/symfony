@@ -27,21 +27,14 @@ use Symfony\Component\Messenger\Transport\Receiver\MessageCountAwareInterface;
 #[AsCommand(name: 'messenger:stats', description: 'Show the message count for one or more transports')]
 class StatsCommand extends Command
 {
-    private ContainerInterface $transportLocator;
-    private array $transportNames;
-
-    public function __construct(ContainerInterface $transportLocator, array $transportNames = [])
-    {
-        $this->transportLocator = $transportLocator;
-        $this->transportNames = $transportNames;
-
+    public function __construct(
+        private ContainerInterface $transportLocator,
+        private array $transportNames = [],
+    ) {
         parent::__construct();
     }
 
-    /**
-     * @return void
-     */
-    protected function configure()
+    protected function configure(): void
     {
         $this
             ->addArgument('transport_names', InputArgument::IS_ARRAY | InputArgument::OPTIONAL, 'List of transports\' names')

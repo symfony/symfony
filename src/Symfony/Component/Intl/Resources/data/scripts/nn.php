@@ -10,7 +10,7 @@ return [
         'Hanb' => 'hanb',
         'Hans' => 'forenkla',
         'Hmng' => 'pahawk hmong',
-        'Hrkt' => 'japansk stavingsskrifter',
+        'Hrkt' => 'japanske stavingsskrifter',
         'Hung' => 'gammalungarsk',
         'Ital' => 'gammalitalisk',
         'Latf' => 'latinsk (frakturvariant)',

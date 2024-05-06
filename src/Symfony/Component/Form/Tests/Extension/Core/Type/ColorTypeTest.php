@@ -33,7 +33,7 @@ final class ColorTypeTest extends BaseTypeTestCase
         $this->assertEmpty($form->getErrors());
     }
 
-    public static function validationShouldPassProvider()
+    public static function validationShouldPassProvider(): array
     {
         return [
             [false, 'foo'],
@@ -71,7 +71,7 @@ final class ColorTypeTest extends BaseTypeTestCase
         $this->assertEquals([$expectedFormError], iterator_to_array($form->getErrors()));
     }
 
-    public static function validationShouldFailProvider()
+    public static function validationShouldFailProvider(): array
     {
         return [
             ['foo', 'foo'],

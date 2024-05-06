@@ -26,15 +26,13 @@ class ExprBuilder
     public const TYPE_NULL = 'null';
     public const TYPE_ARRAY = 'array';
 
-    protected $node;
+    public string $allowedTypes;
+    public ?\Closure $ifPart = null;
+    public ?\Closure $thenPart = null;
 
-    public $allowedTypes;
-    public $ifPart;
-    public $thenPart;
-
-    public function __construct(NodeDefinition $node)
-    {
-        $this->node = $node;
+    public function __construct(
+        protected NodeDefinition $node,
+    ) {
     }
 
     /**
@@ -42,7 +40,7 @@ class ExprBuilder
      *
      * @return $this
      */
-    public function always(\Closure $then = null): static
+    public function always(?\Closure $then = null): static
     {
         $this->ifPart = static fn () => true;
         $this->allowedTypes = self::TYPE_ANY;
@@ -61,7 +59,7 @@ class ExprBuilder
      *
      * @return $this
      */
-    public function ifTrue(\Closure $closure = null): static
+    public function ifTrue(?\Closure $closure = null): static
     {
         $this->ifPart = $closure ?? static fn ($v) => true === $v;
         $this->allowedTypes = self::TYPE_ANY;
@@ -102,7 +100,7 @@ class ExprBuilder
      */
     public function ifEmpty(): static
     {
-        $this->ifPart = static fn ($v) => empty($v);
+        $this->ifPart = static fn ($v) => !$v;
         $this->allowedTypes = self::TYPE_ANY;
 
         return $this;

@@ -44,7 +44,7 @@ class SessionListenerTest extends TestCase
     public function testSessionCookieOptions(array $phpSessionOptions, array $sessionOptions, array $expectedSessionOptions)
     {
         $session = $this->createMock(Session::class);
-        $session->method('getUsageIndex')->will($this->onConsecutiveCalls(0, 1));
+        $session->method('getUsageIndex')->willReturn(0, 1);
         $session->method('getId')->willReturn('123456');
         $session->method('getName')->willReturn('PHPSESSID');
         $session->method('save');
@@ -351,14 +351,12 @@ class SessionListenerTest extends TestCase
         $sessionFactory = $this->createMock(SessionFactory::class);
         $sessionFactory->expects($this->once())->method('createSession')->willReturn($session);
 
-        $requestStack = $this->createMock(RequestStack::class);
-
         $sessionStorage = $this->createMock(NativeSessionStorage::class);
         $sessionStorage->expects($this->never())->method('setOptions')->with(['cookie_secure' => true]);
 
         $container = new Container();
         $container->set('session_factory', $sessionFactory);
-        $container->set('request_stack', $requestStack);
+        $container->set('request_stack', new RequestStack());
 
         $request = new Request();
         $listener = new SessionListener($container);
@@ -493,7 +491,7 @@ class SessionListenerTest extends TestCase
     public function testSessionSaveAndResponseHasSessionCookie()
     {
         $session = $this->getMockBuilder(Session::class)->disableOriginalConstructor()->getMock();
-        $session->expects($this->exactly(1))->method('getUsageIndex')->will($this->onConsecutiveCalls(0, 1));
+        $session->expects($this->exactly(1))->method('getUsageIndex')->willReturn(0);
         $session->expects($this->exactly(1))->method('getId')->willReturn('123456');
         $session->expects($this->exactly(1))->method('getName')->willReturn('PHPSESSID');
         $session->expects($this->exactly(1))->method('save');
@@ -646,7 +644,7 @@ class SessionListenerTest extends TestCase
     {
         $session = $this->createMock(Session::class);
         $session->expects($this->exactly(1))->method('getName')->willReturn('PHPSESSID');
-        $session->expects($this->exactly(2))->method('getUsageIndex')->will($this->onConsecutiveCalls(0, 1));
+        $session->expects($this->exactly(2))->method('getUsageIndex')->willReturn(0, 1);
         $sessionFactory = $this->createMock(SessionFactory::class);
         $sessionFactory->expects($this->once())->method('createSession')->willReturn($session);
 

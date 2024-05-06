@@ -38,6 +38,7 @@ class DateTimeNormalizerContextBuilderTest extends TestCase
         $context = $this->contextBuilder
             ->withFormat($values[DateTimeNormalizer::FORMAT_KEY])
             ->withTimezone($values[DateTimeNormalizer::TIMEZONE_KEY])
+            ->withCast($values[DateTimeNormalizer::CAST_KEY])
             ->toArray();
 
         $this->assertEquals($values, $context);
@@ -51,11 +52,13 @@ class DateTimeNormalizerContextBuilderTest extends TestCase
         yield 'With values' => [[
             DateTimeNormalizer::FORMAT_KEY => 'format',
             DateTimeNormalizer::TIMEZONE_KEY => new \DateTimeZone('GMT'),
+            DateTimeNormalizer::CAST_KEY => 'int',
         ]];
 
         yield 'With null values' => [[
             DateTimeNormalizer::FORMAT_KEY => null,
             DateTimeNormalizer::TIMEZONE_KEY => null,
+            DateTimeNormalizer::CAST_KEY => null,
         ]];
     }
 

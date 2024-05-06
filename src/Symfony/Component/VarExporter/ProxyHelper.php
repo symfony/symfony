@@ -311,7 +311,7 @@ final class ProxyHelper
             return '';
         }
         if (null === $glue) {
-            return (!$noBuiltin && $type->allowsNull() && 'mixed' !== $name ? '?' : '').$types[0];
+            return (!$noBuiltin && $type->allowsNull() && $type->getName() !== 'null' && 'mixed' !== $name ? '?' : '').$types[0];
         }
         sort($types);
 

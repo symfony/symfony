@@ -94,6 +94,15 @@ class ProxyHelperTest extends TestCase
 
                 return throw new \BadMethodCallException('Cannot forward abstract method "Symfony\Component\VarExporter\Tests\TestForProxyHelper::foo7()".');
             }
+
+            public function foo10(): null
+            {
+                if (isset($this->lazyObjectState)) {
+                    return ($this->lazyObjectState->realInstance ??= ($this->lazyObjectState->initializer)())->foo10(...\func_get_args());
+                }
+        
+                return parent::foo10(...\func_get_args());
+            }
         }
 
         // Help opcache.preload discover always-needed symbols
@@ -224,6 +233,11 @@ abstract class TestForProxyHelper
 
     public function foo9($a = self::BOB, $b = ['$a', '$a\n', "\$a\n"], $c = ['$a', '$a\n', "\$a\n", new \stdClass()])
     {
+    }
+
+    public function foo10(): null
+    {
+        return null;
     }
 }
 

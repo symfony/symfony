@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2024-05-07T11:11:32Z
+
+Do we also want to remove the `@internal` tag for `EnvelopeAwareExceptionTrait`?
+
+---------------------------------------------------------------------------
+
+by valtzu at 2024-05-07T12:06:20Z
+
+> Do we also want to remove the `@internal` tag for `EnvelopeAwareExceptionTrait`?
+
+Either way, I don't mind – but f.e. `WrappedExceptionsTrait` is internal while `WrappedExceptionsInterface` is not

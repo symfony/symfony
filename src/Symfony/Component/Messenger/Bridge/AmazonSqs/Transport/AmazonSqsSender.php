@@ -38,6 +38,7 @@ class AmazonSqsSender implements SenderInterface
     public function send(Envelope $envelope): Envelope
     {
         $encodedMessage = $this->serializer->encode($envelope);
+        $encodedMessage = $this->complyWithAmazonSqsRequirements($encodedMessage);
 
         /** @var DelayStamp|null $delayStamp */
         $delayStamp = $envelope->last(DelayStamp::class);
@@ -74,5 +75,21 @@ class AmazonSqsSender implements SenderInterface
         }
 
         return $envelope;
+    }
+
+    /**
+     * @see https://docs.aws.amazon.com/AWSSimpleQueueService/latest/APIReference/API_SendMessage.html
+     *
+     * @param array{body: string, headers?: array<string>} $encodedMessage
+     *
+     * @return array{body: string, headers?: array<string>}
+     */
+    private function complyWithAmazonSqsRequirements(array $encodedMessage): array
+    {
+        if (preg_match('/[^\x20-\x{D7FF}\xA\xD\x9\x{E000}-\x{FFFD}\x{10000}-\x{10FFFF}]/u', $encodedMessage['body'])) {
+            $encodedMessage['body'] = base64_encode($encodedMessage['body']);
+        }
+
+        return $encodedMessage;
     }
 }

@@ -9,6 +9,7 @@ CHANGELOG
  * Add `--all` option to the `messenger:consume` command
  * Add parameter `$jitter` to `MultiplierRetryStrategy` in order to randomize delay and prevent the thundering herd effect
  * Add `SIGQUIT` signal among list of signals that gracefully shut down `messenger:consume` and `messenger:failed:retry` commands
+ * Add `EnvelopeAwareExceptionInterface` for exceptions thrown from middlewares to prevent stamps added by previous middlewares being dropped
 
 7.0
 ---

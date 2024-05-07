@@ -11,17 +11,23 @@
 
 namespace Symfony\Component\Messenger\Exception;
 
+use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Validator\ConstraintViolationListInterface;
 
 /**
  * @author Tobias Nyholm <tobias.nyholm@gmail.com>
  */
-class ValidationFailedException extends RuntimeException
+class ValidationFailedException extends RuntimeException implements EnvelopeAwareExceptionInterface
 {
+    use EnvelopeAwareExceptionTrait;
+
     public function __construct(
         private object $violatingMessage,
         private ConstraintViolationListInterface $violations,
+        ?Envelope $envelope = null,
     ) {
+        $this->envelope = $envelope;
+
         parent::__construct(sprintf('Message of type "%s" failed validation.', $this->violatingMessage::class));
     }
 

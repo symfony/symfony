@@ -433,22 +433,13 @@ class FailureIntegrationTest extends TestCase
             'transport1' => $transport1,
         ];
 
-        $locator = $this->createMock(ContainerInterface::class);
-        $locator->expects($this->any())
-            ->method('has')
-            ->willReturn(true);
-        $locator->expects($this->any())
-            ->method('get')
-            ->willReturnCallback(fn ($transportName) => $transports[$transportName]);
+        $locator = new Container();
+        $locator->set('transport1', $transport1);
+
         $senderLocator = new SendersLocator([], $locator);
 
-        $retryStrategyLocator = $this->createMock(ContainerInterface::class);
-        $retryStrategyLocator->expects($this->any())
-            ->method('has')
-            ->willReturn(true);
-        $retryStrategyLocator->expects($this->any())
-            ->method('get')
-            ->willReturn(new MultiplierRetryStrategy(1));
+        $retryStrategyLocator = new Container();
+        $retryStrategyLocator->set('transport1', new MultiplierRetryStrategy(1));
 
         $violationList = new ConstraintViolationList([new ConstraintViolation('validation failed', null, [], null, null, null)]);
         $validator = $this->createMock(ValidatorInterface::class);

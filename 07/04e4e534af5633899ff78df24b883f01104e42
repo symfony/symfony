@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-05-07T07:13:11Z
+
+Can you also please update src/Symfony/Component/VarDumper/Caster/ReflectionCaster.php? It has the same issue (two times)

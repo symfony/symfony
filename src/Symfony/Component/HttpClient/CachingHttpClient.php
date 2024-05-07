@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\HttpClient;
 
+use Psr\Log\LoggerAwareInterface;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpClient\Response\MockResponse;
 use Symfony\Component\HttpClient\Response\ResponseStream;
 use Symfony\Component\HttpFoundation\Request;
@@ -31,7 +33,7 @@ use Symfony\Contracts\Service\ResetInterface;
  *
  * @author Nicolas Grekas <p@tchwork.com>
  */
-class CachingHttpClient implements HttpClientInterface, ResetInterface
+class CachingHttpClient implements HttpClientInterface, LoggerAwareInterface, ResetInterface
 {
     use HttpClientTrait;
 
@@ -140,6 +142,13 @@ class CachingHttpClient implements HttpClientInterface, ResetInterface
     {
         if ($this->client instanceof ResetInterface) {
             $this->client->reset();
+        }
+    }
+
+    public function setLogger(LoggerInterface $logger): void
+    {
+        if ($this->client instanceof LoggerAwareInterface) {
+            $this->client->setLogger($logger);
         }
     }
 }

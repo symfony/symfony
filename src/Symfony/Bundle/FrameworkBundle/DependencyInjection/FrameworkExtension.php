@@ -1900,19 +1900,18 @@ class FrameworkExtension extends Extension
             $container->setParameter('serializer.default_context', $defaultContext);
         }
 
-        $arguments = $container->getDefinition('serializer.normalizer.object')->getArguments();
-        $context = [];
-
         if (isset($config['circular_reference_handler']) && $config['circular_reference_handler']) {
-            $context += ($arguments[6] ?? $defaultContext) + ['circular_reference_handler' => new Reference($config['circular_reference_handler'])];
+            $arguments = $container->getDefinition('serializer.normalizer.object')->getArguments();
+            $context = ($arguments[6] ?? $defaultContext) + ['circular_reference_handler' => new Reference($config['circular_reference_handler'])];
             $container->getDefinition('serializer.normalizer.object')->setArgument(5, null);
+            $container->getDefinition('serializer.normalizer.object')->setArgument(6, $context);
         }
 
         if ($config['max_depth_handler'] ?? false) {
-            $context += ($arguments[6] ?? $defaultContext) + ['max_depth_handler' => new Reference($config['max_depth_handler'])];
+            $arguments = $container->getDefinition('serializer.normalizer.object')->getArguments();
+            $context = ($arguments[6] ?? $defaultContext) + ['max_depth_handler' => new Reference($config['max_depth_handler'])];
+            $container->getDefinition('serializer.normalizer.object')->setArgument(6, $context);
         }
-
-        $container->getDefinition('serializer.normalizer.object')->setArgument(6, $context);
     }
 
     private function registerPropertyInfoConfiguration(ContainerBuilder $container, PhpFileLoader $loader): void
@@ -2186,9 +2185,10 @@ class FrameworkExtension extends Extension
                 ->setFactory([new Reference('messenger.transport_factory'), 'createTransport'])
                 ->setArguments([$transport['dsn'], $transport['options'] + ['transport_name' => $name], new Reference($serializerId)])
                 ->addTag('messenger.receiver', [
-                    'alias' => $name,
-                    'is_failure_transport' => \in_array($name, $failureTransports, true),
-                ])
+                        'alias' => $name,
+                        'is_failure_transport' => \in_array($name, $failureTransports, true),
+                    ]
+                )
             ;
             $container->setDefinition($transportId = 'messenger.transport.'.$name, $transportDefinition);
             $senderAliases[$name] = $transportId;

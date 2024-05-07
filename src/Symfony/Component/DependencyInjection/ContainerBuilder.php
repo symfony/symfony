@@ -494,9 +494,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     {
         if (isset($this->definitions[$id])) {
             unset($this->definitions[$id]);
-            if ('.' !== ($id[0] ?? '-')) {
-                $this->removedIds[$id] = true;
-            }
+            $this->removedIds[$id] = true;
         }
     }
 
@@ -770,9 +768,6 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
         parent::compile();
 
         foreach ($this->definitions + $this->aliasDefinitions as $id => $definition) {
-            if ('.' === ($id[0] ?? '-')) {
-                continue;
-            }
             if (!$definition->isPublic() || $definition->isPrivate()) {
                 $this->removedIds[$id] = true;
             }
@@ -846,9 +841,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     {
         if (isset($this->aliasDefinitions[$alias])) {
             unset($this->aliasDefinitions[$alias]);
-            if ('.' !== ($alias[0] ?? '-')) {
-                $this->removedIds[$alias] = true;
-            }
+            $this->removedIds[$alias] = true;
         }
     }
 

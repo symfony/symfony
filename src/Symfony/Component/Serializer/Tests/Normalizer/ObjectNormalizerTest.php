@@ -269,22 +269,6 @@ class ObjectNormalizerTest extends TestCase
         $this->assertEquals('bar', $obj->bar);
     }
 
-    public function testConstructorWithObjectDenormalizeUsingPropertyInfoExtractor()
-    {
-        $serializer = $this->createMock(ObjectSerializerNormalizer::class);
-        $normalizer = new ObjectNormalizer(null, null, null, null, null, null, [], new PropertyInfoExtractor());
-        $normalizer->setSerializer($serializer);
-
-        $data = new \stdClass();
-        $data->foo = 'foo';
-        $data->bar = 'bar';
-        $data->baz = true;
-        $data->fooBar = 'foobar';
-        $obj = $normalizer->denormalize($data, ObjectConstructorDummy::class, 'any');
-        $this->assertEquals('foo', $obj->getFoo());
-        $this->assertEquals('bar', $obj->bar);
-    }
-
     public function testConstructorWithObjectTypeHintDenormalize()
     {
         $data = [

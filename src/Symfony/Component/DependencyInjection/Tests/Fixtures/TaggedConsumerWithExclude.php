@@ -12,15 +12,15 @@
 namespace Symfony\Component\DependencyInjection\Tests\Fixtures;
 
 use Psr\Container\ContainerInterface;
-use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
-use Symfony\Component\DependencyInjection\Attribute\AutowireLocator;
+use Symfony\Component\DependencyInjection\Attribute\TaggedIterator;
+use Symfony\Component\DependencyInjection\Attribute\TaggedLocator;
 
 final class TaggedConsumerWithExclude implements AutoconfiguredInterface2
 {
     public function __construct(
-        #[AutowireIterator(AutoconfiguredInterface2::class, exclude: self::class)]
+        #[TaggedIterator(AutoconfiguredInterface2::class, exclude: self::class)]
         public iterable $items,
-        #[AutowireLocator(AutoconfiguredInterface2::class, exclude: self::class)]
+        #[TaggedLocator(AutoconfiguredInterface2::class, exclude: self::class)]
         public ContainerInterface $locator,
     ) {
     }

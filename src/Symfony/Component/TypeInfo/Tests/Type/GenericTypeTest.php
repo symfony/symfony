@@ -30,11 +30,6 @@ class GenericTypeTest extends TestCase
         $this->assertEquals(sprintf('%s<bool|string,int,float>', self::class), (string) $type);
     }
 
-    public function testGetBaseType()
-    {
-        $this->assertEquals(Type::object(), Type::generic(Type::object(), Type::int())->getBaseType());
-    }
-
     public function testIsNullable()
     {
         $this->assertFalse((new GenericType(Type::builtin(TypeIdentifier::ARRAY), Type::int()))->isNullable());
@@ -54,12 +49,10 @@ class GenericTypeTest extends TestCase
         $type = new GenericType(Type::builtin(TypeIdentifier::ARRAY), Type::string(), Type::bool());
         $this->assertTrue($type->isA(TypeIdentifier::ARRAY));
         $this->assertFalse($type->isA(TypeIdentifier::STRING));
-        $this->assertFalse($type->isA(self::class));
 
         $type = new GenericType(Type::object(self::class), Type::union(Type::bool(), Type::string()), Type::int(), Type::float());
         $this->assertTrue($type->isA(TypeIdentifier::OBJECT));
         $this->assertFalse($type->isA(TypeIdentifier::INT));
         $this->assertFalse($type->isA(TypeIdentifier::STRING));
-        $this->assertTrue($type->isA(self::class));
     }
 }

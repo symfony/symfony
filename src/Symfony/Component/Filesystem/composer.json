@@ -18,9 +18,7 @@
     "require": {
         "php": ">=8.2",
         "symfony/polyfill-ctype": "~1.8",
-        "symfony/polyfill-mbstring": "~1.8"
-    },
-    "require-dev": {
+        "symfony/polyfill-mbstring": "~1.8",
         "symfony/process": "^6.4|^7.0"
     },
     "autoload": {

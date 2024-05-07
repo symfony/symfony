@@ -128,8 +128,6 @@ return static function (ContainerConfigurator $container) {
                 service('property_info')->ignoreOnInvalid(),
                 service('serializer.mapping.class_discriminator_resolver')->ignoreOnInvalid(),
                 null,
-                null,
-                service('property_info')->ignoreOnInvalid(),
             ])
             ->tag('serializer.normalizer', ['priority' => -1000])
 
@@ -141,6 +139,7 @@ return static function (ContainerConfigurator $container) {
                 service('serializer.mapping.class_discriminator_resolver')->ignoreOnInvalid(),
                 null,
                 [],
+                service('property_info')->ignoreOnInvalid(),
             ])
 
         ->set('serializer.denormalizer.array', ArrayDenormalizer::class)

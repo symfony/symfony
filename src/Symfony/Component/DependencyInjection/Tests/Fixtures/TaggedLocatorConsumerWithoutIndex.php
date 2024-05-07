@@ -12,12 +12,12 @@
 namespace Symfony\Component\DependencyInjection\Tests\Fixtures;
 
 use Psr\Container\ContainerInterface;
-use Symfony\Component\DependencyInjection\Attribute\AutowireLocator;
+use Symfony\Component\DependencyInjection\Attribute\TaggedLocator;
 
 final class TaggedLocatorConsumerWithoutIndex
 {
     public function __construct(
-        #[AutowireLocator('foo_bar')]
+        #[TaggedLocator('foo_bar')]
         private ContainerInterface $locator,
     ) {
     }

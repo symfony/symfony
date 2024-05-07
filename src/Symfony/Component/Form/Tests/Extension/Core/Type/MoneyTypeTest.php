@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Form\Tests\Extension\Core\Type;
 
+use Symfony\Component\Form\Exception\LogicException;
 use Symfony\Component\Intl\Util\IntlTestHelper;
 
 class MoneyTypeTest extends BaseTypeTestCase
@@ -124,7 +125,7 @@ class MoneyTypeTest extends BaseTypeTestCase
         $this->assertSame('number', $form->createView()->vars['type']);
     }
 
-    public function testDefaultInput()
+    public function testDefaultModelType()
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, ['divisor' => 100]);
         $form->submit('12345.67');
@@ -132,19 +133,18 @@ class MoneyTypeTest extends BaseTypeTestCase
         $this->assertSame(1234567.0, $form->getData());
     }
 
-    public function testIntegerInput()
+    public function testIntegerModelType()
     {
-        $form = $this->factory->create(static::TESTED_TYPE, null, ['divisor' => 100, 'input' => 'integer']);
+        $form = $this->factory->create(static::TESTED_TYPE, null, ['divisor' => 100, 'model_type' => 'integer']);
         $form->submit('12345.67');
 
         $this->assertSame(1234567, $form->getData());
     }
 
-    public function testIntegerInputWithoutDivisor()
+    public function testIntegerModelTypeExpectsDivisorNotEqualToOne()
     {
-        $form = $this->factory->create(static::TESTED_TYPE, null, ['input' => 'integer']);
-        $form->submit('1234567');
+        $this->expectException(LogicException::class);
 
-        $this->assertSame(1234567, $form->getData());
+        $form = $this->factory->create(static::TESTED_TYPE, null, ['divisor' => 1, 'model_type' => 'integer']);
     }
 }

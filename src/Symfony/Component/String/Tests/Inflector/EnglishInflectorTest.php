@@ -24,7 +24,6 @@ class EnglishInflectorTest extends TestCase
             ['accesses', 'access'],
             ['addresses', 'address'],
             ['agendas', 'agenda'],
-            ['albums', 'album'],
             ['alumnae', 'alumna'],
             ['alumni', 'alumnus'],
             ['analyses', ['analys', 'analyse', 'analysis']],
@@ -180,7 +179,6 @@ class EnglishInflectorTest extends TestCase
             ['address', 'addresses'],
             ['agenda', 'agendas'],
             ['aircraft', 'aircraft'],
-            ['album', 'albums'],
             ['alumnus', 'alumni'],
             ['analysis', 'analyses'],
             ['antenna', 'antennas'], // antennae

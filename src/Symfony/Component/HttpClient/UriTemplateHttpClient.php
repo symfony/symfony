@@ -11,11 +11,13 @@
 
 namespace Symfony\Component\HttpClient;
 
+use Psr\Log\LoggerAwareInterface;
+use Psr\Log\LoggerInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 use Symfony\Contracts\Service\ResetInterface;
 
-class UriTemplateHttpClient implements HttpClientInterface, ResetInterface
+class UriTemplateHttpClient implements HttpClientInterface, LoggerAwareInterface, ResetInterface
 {
     use DecoratorTrait;
 
@@ -60,6 +62,13 @@ class UriTemplateHttpClient implements HttpClientInterface, ResetInterface
         $clone->client = $this->client->withOptions($options);
 
         return $clone;
+    }
+
+    public function setLogger(LoggerInterface $logger): void
+    {
+        if ($this->client instanceof LoggerAwareInterface) {
+            $this->client->setLogger($logger);
+        }
     }
 
     /**

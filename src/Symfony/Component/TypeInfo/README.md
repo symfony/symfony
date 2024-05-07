@@ -3,11 +3,6 @@ TypeInfo Component
 
 The TypeInfo component extracts PHP types information.
 
-**This Component is experimental**.
-[Experimental features](https://symfony.com/doc/current/contributing/code/experimental.html)
-are not covered by Symfony's
-[Backward Compatibility Promise](https://symfony.com/doc/current/contributing/code/bc.html).
-
 Getting Started
 ---------------
 

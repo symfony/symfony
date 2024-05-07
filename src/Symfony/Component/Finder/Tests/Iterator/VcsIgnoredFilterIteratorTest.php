@@ -34,7 +34,7 @@ class VcsIgnoredFilterIteratorTest extends IteratorTestCase
      *
      * @dataProvider getAcceptData
      */
-    public function testAccept(array $gitIgnoreFiles, array $otherFileNames, array $expectedResult, string $baseDir = '')
+    public function testAccept(array $gitIgnoreFiles, array $otherFileNames, array $expectedResult)
     {
         $otherFileNames = $this->toAbsolute($otherFileNames);
         foreach ($otherFileNames as $path) {
@@ -51,8 +51,7 @@ class VcsIgnoredFilterIteratorTest extends IteratorTestCase
 
         $inner = new InnerNameIterator($otherFileNames);
 
-        $baseDir = $this->tmpDir.('' !== $baseDir ? '/'.$baseDir : '');
-        $iterator = new VcsIgnoredFilterIterator($inner, $baseDir);
+        $iterator = new VcsIgnoredFilterIterator($inner, $this->tmpDir);
 
         $this->assertIterator($this->toAbsolute($expectedResult), $iterator);
     }
@@ -73,55 +72,6 @@ class VcsIgnoredFilterIteratorTest extends IteratorTestCase
                 'b.txt',
                 'dir',
             ],
-        ];
-
-        yield 'simple file - .gitignore and in() from repository root' => [
-            [
-                '.gitignore' => 'a.txt',
-            ],
-            [
-                '.git',
-                'a.txt',
-                'b.txt',
-                'dir/',
-                'dir/a.txt',
-            ],
-            [
-                '.git',
-                'b.txt',
-                'dir',
-            ],
-        ];
-
-        yield 'nested git repositories only consider .gitignore files of the most inner repository' => [
-            [
-                '.gitignore' => "nested/*\na.txt",
-                'nested/.gitignore' => 'c.txt',
-                'nested/dir/.gitignore' => 'f.txt',
-            ],
-            [
-                '.git',
-                'a.txt',
-                'b.txt',
-                'nested/',
-                'nested/.git',
-                'nested/c.txt',
-                'nested/d.txt',
-                'nested/dir/',
-                'nested/dir/e.txt',
-                'nested/dir/f.txt',
-            ],
-            [
-                '.git',
-                'a.txt',
-                'b.txt',
-                'nested',
-                'nested/.git',
-                'nested/d.txt',
-                'nested/dir',
-                'nested/dir/e.txt',
-            ],
-            'nested',
         ];
 
         yield 'simple file at root' => [

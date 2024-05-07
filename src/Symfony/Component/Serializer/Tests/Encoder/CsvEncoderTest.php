@@ -209,13 +209,7 @@ CSV
     {
         $data = $this->encoder->decode("\n\n", 'csv');
 
-        $this->assertSame([[0 => null]], $data);
-    }
-
-    public function testMultipleEmptyHeaderNamesWithSeparator()
-    {
-        $this->assertSame([['', [1 => '']]], $this->encoder->decode(',.
-,', 'csv'));
+        $this->assertSame([['' => null]], $data);
     }
 
     public function testEncodeVariableStructure()

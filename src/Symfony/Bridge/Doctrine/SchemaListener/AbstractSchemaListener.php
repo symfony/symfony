@@ -13,8 +13,6 @@ namespace Symfony\Bridge\Doctrine\SchemaListener;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Exception\TableNotFoundException;
-use Doctrine\DBAL\Schema\Table;
-use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Tools\Event\GenerateSchemaEventArgs;
 
 abstract class AbstractSchemaListener
@@ -24,16 +22,8 @@ abstract class AbstractSchemaListener
     protected function getIsSameDatabaseChecker(Connection $connection): \Closure
     {
         return static function (\Closure $exec) use ($connection): bool {
-            $schemaManager = $connection->createSchemaManager();
-
             $checkTable = 'schema_subscriber_check_'.bin2hex(random_bytes(7));
-            $table = new Table($checkTable);
-            $table->addColumn('id', Types::INTEGER)
-                ->setAutoincrement(true)
-                ->setNotnull(true);
-            $table->setPrimaryKey(['id']);
-
-            $schemaManager->createTable($table);
+            $connection->executeStatement(sprintf('CREATE TABLE %s (id INTEGER NOT NULL)', $checkTable));
 
             try {
                 $exec(sprintf('DROP TABLE %s', $checkTable));
@@ -42,7 +32,7 @@ abstract class AbstractSchemaListener
             }
 
             try {
-                $schemaManager->dropTable($checkTable);
+                $connection->executeStatement(sprintf('DROP TABLE %s', $checkTable));
 
                 return false;
             } catch (TableNotFoundException) {

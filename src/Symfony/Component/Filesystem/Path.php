@@ -365,7 +365,7 @@ final class Path
         }
 
         // Strip scheme
-        if (false !== ($schemeSeparatorPosition = strpos($path, '://')) && 1 !== $schemeSeparatorPosition) {
+        if (false !== $schemeSeparatorPosition = strpos($path, '://')) {
             $path = substr($path, $schemeSeparatorPosition + 3);
         }
 

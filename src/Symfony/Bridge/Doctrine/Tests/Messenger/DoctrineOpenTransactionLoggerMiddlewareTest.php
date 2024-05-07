@@ -53,7 +53,7 @@ class DoctrineOpenTransactionLoggerMiddlewareTest extends MiddlewareTestCase
     {
         $this->connection->expects($this->exactly(1))
             ->method('isTransactionActive')
-            ->willReturn(true, true, false)
+            ->will($this->onConsecutiveCalls(true, true, false))
         ;
 
         $this->middleware->handle(new Envelope(new \stdClass()), $this->getStackMock());

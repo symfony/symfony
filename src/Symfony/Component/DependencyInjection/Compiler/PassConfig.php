@@ -55,7 +55,6 @@ class PassConfig
             new AutoAliasServicePass(),
             new ValidateEnvPlaceholdersPass(),
             new ResolveDecoratorStackPass(),
-            new ResolveAutowireInlineAttributesPass(),
             new ResolveChildDefinitionsPass(),
             new RegisterServiceSubscribersPass(),
             new ResolveParameterPlaceHoldersPass(false, false),

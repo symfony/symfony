@@ -37,6 +37,12 @@ class ProjectServiceContainer extends Container
         return true;
     }
 
+    public function getRemovedIds(): array
+    {
+        return [
+        ];
+    }
+
     /**
      * Gets the public 'tsantos_serializer' shared service.
      *

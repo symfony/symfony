@@ -99,7 +99,7 @@ final class GetSetMethodNormalizer extends AbstractObjectNormalizer
     {
         return !$method->isStatic()
             && !$method->getAttributes(Ignore::class)
-            && 0 < $method->getNumberOfParameters()
+            && 1 === $method->getNumberOfRequiredParameters()
             && str_starts_with($method->name, 'set');
     }
 

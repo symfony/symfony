@@ -13,8 +13,6 @@ namespace Symfony\Component\DependencyInjection\Attribute;
 
 /**
  * Autowires an iterator of services based on a tag name.
- *
- * @deprecated since Symfony 7.1, use {@see AutowireIterator} instead.
  */
 #[\Attribute(\Attribute::TARGET_PARAMETER)]
 class TaggedIterator extends AutowireIterator
@@ -35,8 +33,6 @@ class TaggedIterator extends AutowireIterator
         public string|array $exclude = [],
         public bool $excludeSelf = true,
     ) {
-        trigger_deprecation('symfony/dependency-injection', '7.1', 'The "%s" attribute is deprecated, use "%s" instead.', self::class, AutowireIterator::class);
-
         parent::__construct($tag, $indexAttribute, $defaultIndexMethod, $defaultPriorityMethod, $exclude, $excludeSelf);
     }
 }

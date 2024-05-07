@@ -27,8 +27,6 @@ use Symfony\Component\TypeInfo\TypeResolver\StringTypeResolver;
  *
  * @author Mathias Arlaud <mathias.arlaud@gmail.com>
  * @author Baptiste Leduc <baptiste.leduc@gmail.com>
- *
- * @experimental
  */
 final class TypeContextFactory
 {
@@ -52,11 +50,11 @@ final class TypeContextFactory
         $calledClassPath = explode('\\', $calledClassName);
         $declaringClassPath = explode('\\', $declaringClassName);
 
-        $declaringClassReflection = self::$reflectionClassCache[$declaringClassName] ??= new \ReflectionClass($declaringClassName);
+        $declaringClassReflection = (self::$reflectionClassCache[$declaringClassName] ??= new \ReflectionClass($declaringClassName));
 
         $typeContext = new TypeContext(
-            end($calledClassPath),
-            end($declaringClassPath),
+            array_pop($calledClassPath),
+            array_pop($declaringClassPath),
             trim($declaringClassReflection->getNamespaceName(), '\\'),
             $this->collectUses($declaringClassReflection),
         );

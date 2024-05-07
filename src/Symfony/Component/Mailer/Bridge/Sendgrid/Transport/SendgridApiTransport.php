@@ -179,7 +179,7 @@ class SendgridApiTransport extends AbstractApiTransport
             ];
 
             if ('inline' === $disposition) {
-                $att['content_id'] = $attachment->hasContentId() ? $attachment->getContentId() : $filename;
+                $att['content_id'] = $filename;
             }
 
             $attachments[] = $att;

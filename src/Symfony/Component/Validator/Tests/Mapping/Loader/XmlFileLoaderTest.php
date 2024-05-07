@@ -32,8 +32,6 @@ use Symfony\Component\Validator\Tests\Fixtures\ConstraintWithRequiredArgument;
 use Symfony\Component\Validator\Tests\Fixtures\Entity_81;
 use Symfony\Component\Validator\Tests\Fixtures\NestedAttribute\Entity;
 use Symfony\Component\Validator\Tests\Fixtures\NestedAttribute\GroupSequenceProviderEntity;
-use Symfony\Component\Validator\Tests\Mapping\Loader\Fixtures\ConstraintWithNamedArguments;
-use Symfony\Component\Validator\Tests\Mapping\Loader\Fixtures\ConstraintWithoutValueWithNamedArguments;
 
 class XmlFileLoaderTest extends TestCase
 {
@@ -68,9 +66,6 @@ class XmlFileLoaderTest extends TestCase
         $expected->addConstraint(new Callback('validateMeStatic'));
         $expected->addConstraint(new Callback(['Symfony\Component\Validator\Tests\Fixtures\CallbackClass', 'callback']));
         $expected->addConstraint(new Traverse(false));
-        $expected->addConstraint(new ConstraintWithNamedArguments('foo'));
-        $expected->addConstraint(new ConstraintWithNamedArguments(['foo', 'bar']));
-        $expected->addConstraint(new ConstraintWithoutValueWithNamedArguments(['foo']));
         $expected->addPropertyConstraint('firstName', new NotNull());
         $expected->addPropertyConstraint('firstName', new Range(['min' => 3]));
         $expected->addPropertyConstraint('firstName', new Choice(['A', 'B']));

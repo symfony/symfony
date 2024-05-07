@@ -257,7 +257,7 @@ EOF;
             $preloadedFiles = [];
             $ids = $this->container->getRemovedIds();
             foreach ($this->container->getDefinitions() as $id => $definition) {
-                if (!$definition->isPublic() && '.' !== ($id[0] ?? '-')) {
+                if (!$definition->isPublic()) {
                     $ids[$id] = true;
                 }
             }
@@ -1380,7 +1380,7 @@ EOF;
     {
         $ids = $this->container->getRemovedIds();
         foreach ($this->container->getDefinitions() as $id => $definition) {
-            if (!$definition->isPublic() && '.' !== ($id[0] ?? '-')) {
+            if (!$definition->isPublic()) {
                 $ids[$id] = true;
             }
         }

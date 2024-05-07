@@ -29,7 +29,6 @@ Components
  * [ExpressionLanguage](#ExpressionLanguage)
  * [Form](#Form)
  * [Intl](#Intl)
- * [HttpClient](#HttpClient)
  * [PropertyInfo](#PropertyInfo)
  * [Translation](#Translation)
  * [Workflow](#Workflow)
@@ -48,7 +47,6 @@ DependencyInjection
 -------------------
 
  * [BC BREAK] When used in the `prependExtension()` method, the `ContainerConfigurator::import()` method now prepends the configuration instead of appending it
- * Deprecate `#[TaggedIterator]` and `#[TaggedLocator]` attributes, use `#[AutowireIterator]` and `#[AutowireLocator]` instead
 
 DoctrineBridge
 --------------
@@ -71,12 +69,6 @@ FrameworkBundle
 
  * Mark classes `ConfigBuilderCacheWarmer`, `Router`, `SerializerCacheWarmer`, `TranslationsCacheWarmer`, `Translator` and `ValidatorCacheWarmer` as `final`
  * Deprecate the `router.cache_dir` config option, the Router will always use the `kernel.build_dir` parameter
- * Reset env vars when resetting the container
-
-HttpClient
-----------
-
- * Deprecate the `setLogger()` methods of the `NoPrivateNetworkHttpClient`, `TraceableHttpClient` and `ScopingHttpClient` classes, configure the logger of the wrapped clients directly instead
 
 Intl
 ----
@@ -88,6 +80,45 @@ Mailer
 ------
 
  * Postmark's "406 - Inactive recipient" API error code now results in a `PostmarkDeliveryEvent` instead of throwing a `HttpTransportException`
+
+PropertyInfo
+------------
+
+ * Deprecate the `Type` class, use `Symfony\Component\TypeInfo\Type` class of `symfony/type-info` component instead
+
+   *Before*
+   ```php
+   use Symfony\Component\PropertyInfo\Type;
+
+   // bool
+   $boolType = new Type(LegacyType::BUILTIN_TYPE_BOOL);
+   // bool|null
+   $nullableType = new Type(LegacyType::BUILTIN_TYPE_BOOL, nullable: true);
+   // array<int, string|null>
+   $arrayType = new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, new Type(Type::BUILTIN_TYPE_INT), new Type(Type::BUILTIN_TYPE_STRING, true));
+
+   $arrayType->getBuiltinType(); // returns "array"
+   $arrayType->getCollectionKeyTypes(); // returns an array with an "int" Type instance
+   $arrayType->getCollectionValueTypes()[0]->isNullable(); // returns true
+   ```
+
+   *After*
+   ```php
+   use Symfony\Component\TypeInfo\Type;
+
+   // bool
+   $boolType = Type::bool();
+   // bool|null
+   $nullableType = Type::nullable(Type::bool());
+   // array<int, string|null>
+   $arrayType = Type::array(Type::nullable(Type::string()), Type::int());
+
+   (string) $arrayType->getBaseType(); // returns "array"
+   $arrayType->getCollectionKeyType(); // returns an "int" Type instance
+   $arrayType->getCollectionValueType()->isNullable(); // returns true
+   ```
+
+ * Deprecate `PropertyTypeExtractorInterface::getTypes()`, use `PropertyTypeExtractorInterface::getType()` instead
 
 HttpKernel
 ----------

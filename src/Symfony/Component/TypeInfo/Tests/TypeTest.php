@@ -31,6 +31,17 @@ class TypeTest extends TestCase
         $this->assertFalse(Type::generic(Type::string(), Type::int())->is($isInt));
     }
 
+    public function testIsA()
+    {
+        $this->assertTrue(Type::int()->isA(TypeIdentifier::INT));
+        $this->assertTrue(Type::union(Type::string(), Type::int())->isA(TypeIdentifier::INT));
+        $this->assertTrue(Type::generic(Type::int(), Type::string())->isA(TypeIdentifier::INT));
+
+        $this->assertFalse(Type::string()->isA(TypeIdentifier::INT));
+        $this->assertFalse(Type::union(Type::string(), Type::float())->isA(TypeIdentifier::INT));
+        $this->assertFalse(Type::generic(Type::string(), Type::int())->isA(TypeIdentifier::INT));
+    }
+
     public function testIsNullable()
     {
         $this->assertTrue(Type::null()->isNullable());
@@ -44,6 +55,15 @@ class TypeTest extends TestCase
         $this->assertFalse(Type::union(Type::int(), Type::string())->isNullable());
         $this->assertFalse(Type::generic(Type::int(), Type::nullable(Type::string()))->isNullable());
         $this->assertFalse(Type::generic(Type::int(), Type::mixed())->isNullable());
+    }
+
+    public function testGetBaseType()
+    {
+        $this->assertEquals(Type::string(), Type::string()->getBaseType());
+        $this->assertEquals(Type::object(self::class), Type::object(self::class)->getBaseType());
+        $this->assertEquals(Type::object(), Type::generic(Type::object(), Type::int())->getBaseType());
+        $this->assertEquals(Type::builtin(TypeIdentifier::ARRAY), Type::list()->getBaseType());
+        $this->assertEquals(Type::int(), Type::collection(Type::generic(Type::int(), Type::string()))->getBaseType());
     }
 
     public function testCannotGetBaseTypeOnCompoundType()

@@ -30,10 +30,10 @@ class SetupTransportsCommandTest extends TestCase
         // get method must be call twice and will return consecutively a setup-able transport and a non setup-able transport
         $serviceLocator->expects($this->exactly(2))
             ->method('get')
-            ->willReturn(
+            ->will($this->onConsecutiveCalls(
                 $this->createMock(SetupableTransportInterface::class),
                 $this->createMock(TransportInterface::class)
-            );
+            ));
         $serviceLocator
             ->method('has')
             ->willReturn(true);
@@ -53,10 +53,12 @@ class SetupTransportsCommandTest extends TestCase
         /** @var MockObject&ServiceLocator $serviceLocator */
         $serviceLocator = $this->createMock(ServiceLocator::class);
         // get method must be call twice and will return consecutively a setup-able transport and a non setup-able transport
-        $serviceLocator->expects($this->once())
+        $serviceLocator->expects($this->exactly(1))
             ->method('get')
-            ->willReturn($this->createMock(SetupableTransportInterface::class));
-        $serviceLocator->expects($this->once())
+            ->will($this->onConsecutiveCalls(
+                $this->createMock(SetupableTransportInterface::class)
+            ));
+        $serviceLocator->expects($this->exactly(1))
             ->method('has')
             ->willReturn(true);
 

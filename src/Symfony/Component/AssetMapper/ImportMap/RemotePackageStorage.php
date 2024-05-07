@@ -11,8 +11,6 @@
 
 namespace Symfony\Component\AssetMapper\ImportMap;
 
-use Symfony\Component\AssetMapper\Exception\RuntimeException;
-
 /**
  * Manages the local storage of remote/vendor importmap packages.
  */
@@ -54,9 +52,7 @@ class RemotePackageStorage
         $vendorPath = $this->getDownloadPath($entry->packageModuleSpecifier, $entry->type);
 
         @mkdir(\dirname($vendorPath), 0777, true);
-        if (false === @file_put_contents($vendorPath, $contents)) {
-            throw new RuntimeException(error_get_last()['message'] ?? sprintf('Failed to write file "%s".', $vendorPath));
-        }
+        file_put_contents($vendorPath, $contents);
     }
 
     public function saveExtraFile(ImportMapEntry $entry, string $extraFilename, string $contents): void
@@ -68,9 +64,7 @@ class RemotePackageStorage
         $vendorPath = $this->getExtraFileDownloadPath($entry, $extraFilename);
 
         @mkdir(\dirname($vendorPath), 0777, true);
-        if (false === @file_put_contents($vendorPath, $contents)) {
-            throw new RuntimeException(error_get_last()['message'] ?? sprintf('Failed to write file "%s".', $vendorPath));
-        }
+        file_put_contents($vendorPath, $contents);
     }
 
     /**

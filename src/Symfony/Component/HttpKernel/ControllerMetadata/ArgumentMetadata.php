@@ -31,7 +31,6 @@ class ArgumentMetadata
         private mixed $defaultValue,
         private bool $isNullable = false,
         private array $attributes = [],
-        private string $controllerName = 'n/a',
     ) {
         $this->isNullable = $isNullable || null === $type || ($hasDefaultValue && null === $defaultValue);
     }
@@ -135,10 +134,5 @@ class ArgumentMetadata
         }
 
         return $attributes;
-    }
-
-    public function getControllerName(): string
-    {
-        return $this->controllerName;
     }
 }

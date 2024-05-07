@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\TypeInfo\Type;
 
-use Symfony\Component\TypeInfo\Exception\LogicException;
 use Symfony\Component\TypeInfo\Type;
 use Symfony\Component\TypeInfo\TypeIdentifier;
 
@@ -20,8 +19,6 @@ use Symfony\Component\TypeInfo\TypeIdentifier;
  * @author Baptiste Leduc <baptiste.leduc@gmail.com>
  *
  * @template T of Type
- *
- * @experimental
  */
 final class UnionType extends Type
 {
@@ -33,19 +30,6 @@ final class UnionType extends Type
     public function is(callable $callable): bool
     {
         return $this->atLeastOneTypeIs($callable);
-    }
-
-    /**
-     * @throws LogicException
-     */
-    public function getBaseType(): BuiltinType|ObjectType
-    {
-        $nonNullableType = $this->asNonNullable();
-        if (!$nonNullableType instanceof self) {
-            return $nonNullableType->getBaseType();
-        }
-
-        throw new LogicException(sprintf('Cannot get base type on "%s" compound type.', $this));
     }
 
     public function asNonNullable(): Type

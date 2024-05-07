@@ -11,7 +11,6 @@
 
 namespace Symfony\Bundle\TwigBundle\Tests\DependencyInjection;
 
-use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Bundle\TwigBundle\DependencyInjection\Compiler\RuntimeLoaderPass;
 use Symfony\Bundle\TwigBundle\DependencyInjection\TwigExtension;
 use Symfony\Bundle\TwigBundle\Tests\DependencyInjection\AcmeBundle\AcmeBundle;
@@ -32,8 +31,6 @@ use Twig\Environment;
 
 class TwigExtensionTest extends TestCase
 {
-    use ExpectDeprecationTrait;
-
     public function testLoadEmptyConfiguration()
     {
         $container = $this->createContainer();
@@ -59,7 +56,7 @@ class TwigExtensionTest extends TestCase
     /**
      * @dataProvider getFormats
      */
-    public function testLoadFullConfiguration(string $format)
+    public function testLoadFullConfiguration($format)
     {
         $container = $this->createContainer();
         $container->registerExtension(new TwigExtension());
@@ -94,7 +91,7 @@ class TwigExtensionTest extends TestCase
         $options = $container->getDefinition('twig')->getArgument(1);
         $this->assertTrue($options['auto_reload'], '->load() sets the auto_reload option');
         $this->assertSame('name', $options['autoescape'], '->load() sets the autoescape option');
-        $this->assertArrayNotHasKey('base_template_class', $options, '->load() does not set the base_template_class if none is provided');
+        $this->assertEquals('stdClass', $options['base_template_class'], '->load() sets the base_template_class option');
         $this->assertEquals('/tmp', $options['cache'], '->load() sets the cache option');
         $this->assertEquals('ISO-8859-1', $options['charset'], '->load() sets the charset option');
         $this->assertTrue($options['debug'], '->load() sets the debug option');
@@ -102,28 +99,9 @@ class TwigExtensionTest extends TestCase
     }
 
     /**
-     * @group legacy
-     *
      * @dataProvider getFormats
      */
-    public function testLoadCustomBaseTemplateClassConfiguration(string $format)
-    {
-        $container = $this->createContainer();
-        $container->registerExtension(new TwigExtension());
-
-        $this->expectDeprecation('Since symfony/twig-bundle 7.1: The child node "base_template_class" at path "twig" is deprecated.');
-
-        $this->loadFromFile($container, 'templateClass', $format);
-        $this->compileContainer($container);
-
-        $options = $container->getDefinition('twig')->getArgument(1);
-        $this->assertEquals('stdClass', $options['base_template_class'], '->load() sets the base_template_class option');
-    }
-
-    /**
-     * @dataProvider getFormats
-     */
-    public function testLoadCustomTemplateEscapingGuesserConfiguration(string $format)
+    public function testLoadCustomTemplateEscapingGuesserConfiguration($format)
     {
         $container = $this->createContainer();
         $container->registerExtension(new TwigExtension());
@@ -137,7 +115,7 @@ class TwigExtensionTest extends TestCase
     /**
      * @dataProvider getFormats
      */
-    public function testLoadDefaultTemplateEscapingGuesserConfiguration(string $format)
+    public function testLoadDefaultTemplateEscapingGuesserConfiguration($format)
     {
         $container = $this->createContainer();
         $container->registerExtension(new TwigExtension());
@@ -151,7 +129,7 @@ class TwigExtensionTest extends TestCase
     /**
      * @dataProvider getFormats
      */
-    public function testLoadCustomDateFormats(string $fileFormat)
+    public function testLoadCustomDateFormats($fileFormat)
     {
         $container = $this->createContainer();
         $container->registerExtension(new TwigExtension());
@@ -200,7 +178,7 @@ class TwigExtensionTest extends TestCase
     /**
      * @dataProvider getFormats
      */
-    public function testTwigLoaderPaths(string $format)
+    public function testTwigLoaderPaths($format)
     {
         $container = $this->createContainer();
         $container->registerExtension(new TwigExtension());
@@ -229,7 +207,7 @@ class TwigExtensionTest extends TestCase
         ], $paths);
     }
 
-    public static function getFormats(): array
+    public static function getFormats()
     {
         return [
             ['php'],
@@ -241,7 +219,7 @@ class TwigExtensionTest extends TestCase
     /**
      * @dataProvider stopwatchExtensionAvailabilityProvider
      */
-    public function testStopwatchExtensionAvailability(bool $debug, bool $stopwatchEnabled, bool $expected)
+    public function testStopwatchExtensionAvailability($debug, $stopwatchEnabled, $expected)
     {
         $container = $this->createContainer();
         $container->setParameter('kernel.debug', $debug);
@@ -312,7 +290,7 @@ class TwigExtensionTest extends TestCase
         $this->assertEquals(new Reference('my_converter'), $bodyRenderer->getArgument('$converter'));
     }
 
-    private function createContainer(): ContainerBuilder
+    private function createContainer()
     {
         $container = new ContainerBuilder(new ParameterBag([
             'kernel.cache_dir' => __DIR__,
@@ -333,7 +311,7 @@ class TwigExtensionTest extends TestCase
         return $container;
     }
 
-    private function compileContainer(ContainerBuilder $container): void
+    private function compileContainer(ContainerBuilder $container)
     {
         $container->getCompilerPassConfig()->setOptimizationPasses([]);
         $container->getCompilerPassConfig()->setRemovingPasses([]);
@@ -341,7 +319,7 @@ class TwigExtensionTest extends TestCase
         $container->compile();
     }
 
-    private function loadFromFile(ContainerBuilder $container, string $file, string $format): void
+    private function loadFromFile(ContainerBuilder $container, $file, $format)
     {
         $locator = new FileLocator(__DIR__.'/Fixtures/'.$format);
 

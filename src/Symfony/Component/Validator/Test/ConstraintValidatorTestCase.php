@@ -82,10 +82,8 @@ abstract class ConstraintValidatorTestCase extends TestCase
         $this->validator = $this->createValidator();
         $this->validator->initialize($this->context);
 
-        if (class_exists(\Locale::class)) {
-            $this->defaultLocale = \Locale::getDefault();
-            \Locale::setDefault('en');
-        }
+        $this->defaultLocale = \Locale::getDefault();
+        \Locale::setDefault('en');
 
         $this->expectedViolations = [];
         $this->call = 0;
@@ -97,9 +95,7 @@ abstract class ConstraintValidatorTestCase extends TestCase
     {
         $this->restoreDefaultTimezone();
 
-        if (class_exists(\Locale::class)) {
-            \Locale::setDefault($this->defaultLocale);
-        }
+        \Locale::setDefault($this->defaultLocale);
     }
 
     protected function setDefaultTimezone(?string $defaultTimezone)

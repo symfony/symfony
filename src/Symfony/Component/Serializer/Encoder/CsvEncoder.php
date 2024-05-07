@@ -168,24 +168,18 @@ class CsvEncoder implements EncoderInterface, DecoderInterface
                 $depth = $headerCount[$i];
                 $arr = &$item;
                 for ($j = 0; $j < $depth; ++$j) {
-                    $headerName = $headers[$i][$j];
-
-                    if ('' === $headerName) {
-                        $headerName = $i;
-                    }
-
                     // Handle nested arrays
                     if ($j === ($depth - 1)) {
-                        $arr[$headerName] = $cols[$i];
+                        $arr[$headers[$i][$j]] = $cols[$i];
 
                         continue;
                     }
 
-                    if (!isset($arr[$headerName])) {
-                        $arr[$headerName] = [];
+                    if (!isset($arr[$headers[$i][$j]])) {
+                        $arr[$headers[$i][$j]] = [];
                     }
 
-                    $arr = &$arr[$headerName];
+                    $arr = &$arr[$headers[$i][$j]];
                 }
             }
 

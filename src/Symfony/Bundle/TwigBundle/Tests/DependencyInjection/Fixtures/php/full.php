@@ -11,6 +11,7 @@ $container->loadFromExtension('twig', [
         'bad' => ['key' => 'foo'],
     ],
     'auto_reload' => true,
+    'base_template_class' => 'stdClass',
     'cache' => '/tmp',
     'charset' => 'ISO-8859-1',
     'debug' => true,

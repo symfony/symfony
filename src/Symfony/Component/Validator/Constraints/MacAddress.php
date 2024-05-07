@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Validator\Constraints;
 
-use Symfony\Component\Validator\Attribute\HasNamedArguments;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 
@@ -66,7 +65,6 @@ class MacAddress extends Constraint
     /**
      * @param self::ALL*|self::LOCAL_*|self::UNIVERSAL_*|self::UNICAST_*|self::MULTICAST_*|self::BROADCAST $type A mac address type to validate (defaults to {@see self::ALL})
      */
-    #[HasNamedArguments]
     public function __construct(
         public string $message = 'This value is not a valid MAC address.',
         public string $type = self::ALL,

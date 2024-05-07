@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\HttpClient;
 
+use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpClient\Response\AsyncContext;
 use Symfony\Component\HttpClient\Response\AsyncResponse;
@@ -27,7 +28,7 @@ use Symfony\Contracts\Service\ResetInterface;
  *
  * @author Jérémy Derussé <jeremy@derusse.com>
  */
-class RetryableHttpClient implements HttpClientInterface, ResetInterface
+class RetryableHttpClient implements HttpClientInterface, LoggerAwareInterface, ResetInterface
 {
     use AsyncDecoratorTrait;
 
@@ -161,6 +162,14 @@ class RetryableHttpClient implements HttpClientInterface, ResetInterface
                 $context->passthru();
             }
         });
+    }
+
+    public function setLogger(LoggerInterface $logger): void
+    {
+        $this->logger = $logger;
+        if ($this->client instanceof LoggerAwareInterface) {
+            $this->client->setLogger($logger);
+        }
     }
 
     private function getDelayFromHeader(array $headers): ?int

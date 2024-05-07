@@ -13,7 +13,7 @@ namespace Symfony\Component\Messenger\Exception;
 
 use Symfony\Component\Messenger\Envelope;
 
-class HandlerFailedException extends RuntimeException implements WrappedExceptionsInterface, EnvelopeAwareExceptionInterface
+class HandlerFailedException extends RuntimeException implements WrappedExceptionsInterface
 {
     use WrappedExceptionsTrait;
 

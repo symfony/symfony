@@ -523,7 +523,7 @@ trait RedisTrait
                     }
                     $this->doDelete($keys);
                 }
-            } while ($cursor);
+            } while ($cursor = (int) $cursor);
         }
 
         return $cleared;

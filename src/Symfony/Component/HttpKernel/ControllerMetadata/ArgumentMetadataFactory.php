@@ -22,7 +22,6 @@ final class ArgumentMetadataFactory implements ArgumentMetadataFactoryInterface
     {
         $arguments = [];
         $reflector ??= new \ReflectionFunction($controller(...));
-        $controllerName = $this->getPrettyName($reflector);
 
         foreach ($reflector->getParameters() as $param) {
             $attributes = [];
@@ -32,7 +31,7 @@ final class ArgumentMetadataFactory implements ArgumentMetadataFactoryInterface
                 }
             }
 
-            $arguments[] = new ArgumentMetadata($param->getName(), $this->getType($param), $param->isVariadic(), $param->isDefaultValueAvailable(), $param->isDefaultValueAvailable() ? $param->getDefaultValue() : null, $param->allowsNull(), $attributes, $controllerName);
+            $arguments[] = new ArgumentMetadata($param->getName(), $this->getType($param), $param->isVariadic(), $param->isDefaultValueAvailable(), $param->isDefaultValueAvailable() ? $param->getDefaultValue() : null, $param->allowsNull(), $attributes);
         }
 
         return $arguments;
@@ -53,20 +52,5 @@ final class ArgumentMetadataFactory implements ArgumentMetadataFactoryInterface
             'parent' => get_parent_class($parameter->getDeclaringClass()?->name ?? '') ?: null,
             default => $name,
         };
-    }
-
-    private function getPrettyName(\ReflectionFunctionAbstract $r): string
-    {
-        $name = $r->name;
-
-        if ($r instanceof \ReflectionMethod) {
-            return $r->class.'::'.$name;
-        }
-
-        if ($r->isAnonymous() || !$class = $r->getClosureCalledClass()) {
-            return $name;
-        }
-
-        return $class->name.'::'.$name;
     }
 }

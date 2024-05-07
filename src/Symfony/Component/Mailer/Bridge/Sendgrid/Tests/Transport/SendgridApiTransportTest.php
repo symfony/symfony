@@ -245,4 +245,45 @@ class SendgridApiTransportTest extends TestCase
         $this->assertSame('blue', $payload['personalizations'][0]['custom_args']['Color']);
         $this->assertSame('12345', $payload['personalizations'][0]['custom_args']['Client-ID']);
     }
+
+    public function testInlineWithCustomContentId()
+    {
+        $imagePart = (new DataPart('text-contents', 'text.txt'));
+        $imagePart->asInline();
+        $imagePart->setContentId('content-identifier@symfony');
+
+        $email = new Email();
+        $email->addPart($imagePart);
+        $envelope = new Envelope(new Address('alice@system.com'), [new Address('bob@system.com')]);
+
+        $transport = new SendgridApiTransport('ACCESS_KEY');
+        $method = new \ReflectionMethod(SendgridApiTransport::class, 'getPayload');
+        $payload = $method->invoke($transport, $email, $envelope);
+
+        $this->assertArrayHasKey('attachments', $payload);
+        $this->assertCount(1, $payload['attachments']);
+        $this->assertArrayHasKey('content_id', $payload['attachments'][0]);
+
+        $this->assertSame('content-identifier@symfony', $payload['attachments'][0]['content_id']);
+    }
+
+    public function testInlineWithoutCustomContentId()
+    {
+        $imagePart = (new DataPart('text-contents', 'text.txt'));
+        $imagePart->asInline();
+
+        $email = new Email();
+        $email->addPart($imagePart);
+        $envelope = new Envelope(new Address('alice@system.com'), [new Address('bob@system.com')]);
+
+        $transport = new SendgridApiTransport('ACCESS_KEY');
+        $method = new \ReflectionMethod(SendgridApiTransport::class, 'getPayload');
+        $payload = $method->invoke($transport, $email, $envelope);
+
+        $this->assertArrayHasKey('attachments', $payload);
+        $this->assertCount(1, $payload['attachments']);
+        $this->assertArrayHasKey('content_id', $payload['attachments'][0]);
+
+        $this->assertSame('text.txt', $payload['attachments'][0]['content_id']);
+    }
 }

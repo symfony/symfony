@@ -19,12 +19,12 @@ use Symfony\Component\Messenger\Envelope;
  *
  * @author Tobias Nyholm <tobias.nyholm@gmail.com>
  */
-class DelayedMessageHandlingException extends RuntimeException implements WrappedExceptionsInterface
+class DelayedMessageHandlingException extends RuntimeException implements WrappedExceptionsInterface, EnvelopeAwareExceptionInterface
 {
+    use EnvelopeAwareExceptionTrait;
     use WrappedExceptionsTrait;
 
     private array $exceptions;
-    private ?Envelope $envelope;
 
     public function __construct(array $exceptions, ?Envelope $envelope = null)
     {
@@ -54,10 +54,5 @@ class DelayedMessageHandlingException extends RuntimeException implements Wrappe
         trigger_deprecation('symfony/messenger', '6.4', 'The "%s()" method is deprecated, use "%s::getWrappedExceptions()" instead.', __METHOD__, self::class);
 
         return $this->exceptions;
-    }
-
-    public function getEnvelope(): ?Envelope
-    {
-        return $this->envelope;
     }
 }

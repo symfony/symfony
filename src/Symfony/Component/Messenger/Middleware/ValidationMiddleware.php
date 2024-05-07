@@ -39,7 +39,7 @@ class ValidationMiddleware implements MiddlewareInterface
 
         $violations = $this->validator->validate($message, null, $groups);
         if (\count($violations)) {
-            throw new ValidationFailedException($message, $violations);
+            throw new ValidationFailedException($message, $violations, $envelope);
         }
 
         return $stack->next()->handle($envelope, $stack);

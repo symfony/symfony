@@ -174,6 +174,10 @@ final class CurlResponse implements ResponseInterface, StreamableInterface
             curl_multi_remove_handle($multi->handle, $ch);
             curl_setopt_array($ch, [
                 \CURLOPT_NOPROGRESS => true,
+                \CURLOPT_PROGRESSFUNCTION => null,
+                \CURLOPT_HEADERFUNCTION => null,
+                \CURLOPT_WRITEFUNCTION => null,
+                \CURLOPT_READFUNCTION => null,
                 \CURLOPT_INFILE => null,
             ]);
 

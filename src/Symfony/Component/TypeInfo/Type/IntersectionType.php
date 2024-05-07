@@ -19,6 +19,8 @@ use Symfony\Component\TypeInfo\Type;
  * @author Baptiste Leduc <baptiste.leduc@gmail.com>
  *
  * @template T of Type
+ *
+ * @experimental
  */
 final class IntersectionType extends Type
 {
@@ -45,6 +47,17 @@ final class IntersectionType extends Type
         return $string;
     }
 
+    /**
+     * @throws LogicException
+     */
+    public function getBaseType(): BuiltinType|ObjectType
+    {
+        throw new LogicException(sprintf('Cannot get base type on "%s" compound type.', $this));
+    }
+
+    /**
+     * @throws LogicException
+     */
     public function asNonNullable(): self
     {
         if ($this->isNullable()) {

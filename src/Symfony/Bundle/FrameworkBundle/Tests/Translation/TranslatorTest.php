@@ -260,7 +260,7 @@ class TranslatorTest extends TestCase
         $loader
             ->expects($this->exactly(7))
             ->method('load')
-            ->willReturnOnConsecutiveCalls(
+            ->willReturn(
                 $this->getCatalogue('fr', [
                     'foo' => 'foo (FR)',
                 ]),

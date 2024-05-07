@@ -24,6 +24,8 @@ use Symfony\Component\TypeInfo\TypeIdentifier;
  * @author Baptiste Leduc <baptiste.leduc@gmail.com>
  *
  * @template T of BuiltinType<TypeIdentifier::ARRAY>|BuiltinType<TypeIdentifier::ITERABLE>|ObjectType|GenericType
+ *
+ * @experimental
  */
 final class CollectionType extends Type
 {
@@ -54,6 +56,11 @@ final class CollectionType extends Type
     public function getType(): BuiltinType|ObjectType|GenericType
     {
         return $this->type;
+    }
+
+    public function isA(TypeIdentifier|string $subject): bool
+    {
+        return $this->getType()->isA($subject);
     }
 
     public function isList(): bool

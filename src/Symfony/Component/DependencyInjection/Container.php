@@ -287,6 +287,8 @@ class Container implements ContainerInterface, ResetInterface
                 continue;
             }
         }
+
+        $this->envCache = [];
     }
 
     /**

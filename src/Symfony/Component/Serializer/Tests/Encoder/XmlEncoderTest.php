@@ -231,16 +231,56 @@ XML;
         $this->assertEquals($expected, $this->encoder->encode($array, 'xml'));
     }
 
-    public function testEncodeCdataWrapping()
+    /**
+     * @dataProvider encodeCdataWrappingWithDefaultPattern
+     */
+    public function testEncodeCdataWrappingWithDefaultPattern($input, $expected)
     {
-        $array = [
-            'firstname' => 'Paul & Martha <or Me>',
+        $this->assertEquals($expected, $this->encoder->encode($input, 'xml'));
+    }
+
+    public static function encodeCdataWrappingWithDefaultPattern()
+    {
+        return [
+            [
+                ['firstname' => 'Paul and Martha'],
+                '<?xml version="1.0"?>'."\n".'<response><firstname>Paul and Martha</firstname></response>'."\n",
+            ],
+            [
+                ['lastname' => 'O\'Donnel'],
+                '<?xml version="1.0"?>'."\n".'<response><lastname>O\'Donnel</lastname></response>'."\n",
+            ],
+            [
+                ['firstname' => 'Paul & Martha <or Me>'],
+                '<?xml version="1.0"?>'."\n".'<response><firstname><![CDATA[Paul & Martha <or Me>]]></firstname></response>'."\n",
+            ],
         ];
+    }
 
-        $expected = '<?xml version="1.0"?>'."\n".
-            '<response><firstname><![CDATA[Paul & Martha <or Me>]]></firstname></response>'."\n";
+    /**
+     * @dataProvider encodeCdataWrappingWithCustomPattern
+     */
+    public function testEncodeCdataWrappingWithCustomPattern($input, $expected)
+    {
+        $this->assertEquals($expected, $this->encoder->encode($input, 'xml', ['cdata_wrapping_pattern' => '/[<>&"\']/']));
+    }
 
-        $this->assertEquals($expected, $this->encoder->encode($array, 'xml'));
+    public static function encodeCdataWrappingWithCustomPattern()
+    {
+        return [
+            [
+                ['firstname' => 'Paul and Martha'],
+                '<?xml version="1.0"?>'."\n".'<response><firstname>Paul and Martha</firstname></response>'."\n",
+            ],
+            [
+                ['lastname' => 'O\'Donnel'],
+                '<?xml version="1.0"?>'."\n".'<response><lastname><![CDATA[O\'Donnel]]></lastname></response>'."\n",
+            ],
+            [
+                ['firstname' => 'Paul & Martha <or Me>'],
+                '<?xml version="1.0"?>'."\n".'<response><firstname><![CDATA[Paul & Martha <or Me>]]></firstname></response>'."\n",
+            ],
+        ];
     }
 
     public function testEnableCdataWrapping()

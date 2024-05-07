@@ -23,6 +23,8 @@ use Symfony\Component\TypeInfo\TypeContext\TypeContextFactory;
  *
  * @author Mathias Arlaud <mathias.arlaud@gmail.com>
  * @author Baptiste Leduc <baptiste.leduc@gmail.com>
+ *
+ * @experimental
  */
 final readonly class TypeResolver implements TypeResolverInterface
 {

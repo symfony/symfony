@@ -15,9 +15,6 @@ use Symfony\Bridge\Twig\UndefinedCallableHandler;
 use Twig\Environment;
 use Twig\Extension\CoreExtension;
 
-// BC/FC with namespaced Twig
-class_exists(Environment::class);
-
 /**
  * Twig environment configurator.
  *

@@ -13,6 +13,7 @@ namespace Symfony\Component\TypeInfo\Tests\Type;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\TypeInfo\Exception\InvalidArgumentException;
+use Symfony\Component\TypeInfo\Exception\LogicException;
 use Symfony\Component\TypeInfo\Type;
 use Symfony\Component\TypeInfo\Type\BuiltinType;
 use Symfony\Component\TypeInfo\Type\UnionType;
@@ -64,6 +65,14 @@ class UnionTypeTest extends TestCase
             Type::object(\stdClass::class),
             Type::string(),
         ], $type->asNonNullable()->getTypes());
+    }
+
+    public function testGetBaseType()
+    {
+        $this->assertEquals(Type::string(), (new UnionType(Type::string(), Type::null()))->getBaseType());
+
+        $this->expectException(LogicException::class);
+        (new UnionType(Type::string(), Type::int(), Type::null()))->getBaseType();
     }
 
     public function testAtLeastOneTypeIs()

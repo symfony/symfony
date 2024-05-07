@@ -12,7 +12,6 @@
 namespace Symfony\Component\TypeInfo\Type;
 
 use Symfony\Component\TypeInfo\Exception\InvalidArgumentException;
-use Symfony\Component\TypeInfo\Exception\LogicException;
 use Symfony\Component\TypeInfo\Type;
 use Symfony\Component\TypeInfo\TypeIdentifier;
 
@@ -50,19 +49,9 @@ trait CompositeTypeTrait
         $this->types = array_values(array_unique($types));
     }
 
-    public function getBaseType(): BuiltinType|ObjectType
+    public function isA(TypeIdentifier|string $subject): bool
     {
-        throw new LogicException(sprintf('Cannot get base type on "%s" compound type.', $this));
-    }
-
-    public function isA(TypeIdentifier $typeIdentifier): bool
-    {
-        return $this->is(fn (Type $type) => $type->isA($typeIdentifier));
-    }
-
-    public function isNullable(): bool
-    {
-        return $this->is(fn (Type $type) => $type->isNullable());
+        return $this->is(fn (Type $type) => $type->isA($subject));
     }
 
     /**

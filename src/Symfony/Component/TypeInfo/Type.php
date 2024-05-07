@@ -17,12 +17,21 @@ use Symfony\Component\TypeInfo\Type\ObjectType;
 /**
  * @author Mathias Arlaud <mathias.arlaud@gmail.com>
  * @author Baptiste Leduc <baptiste.leduc@gmail.com>
+ *
+ * @experimental
  */
 abstract class Type implements \Stringable
 {
     use TypeFactoryTrait;
 
     abstract public function getBaseType(): BuiltinType|ObjectType;
+
+    /**
+     * @param TypeIdentifier|class-string $subject
+     */
+    abstract public function isA(TypeIdentifier|string $subject): bool;
+
+    abstract public function asNonNullable(): self;
 
     /**
      * @param callable(Type): bool $callable
@@ -32,15 +41,8 @@ abstract class Type implements \Stringable
         return $callable($this);
     }
 
-    public function isA(TypeIdentifier $typeIdentifier): bool
-    {
-        return $this->getBaseType()->getTypeIdentifier() === $typeIdentifier;
-    }
-
     public function isNullable(): bool
     {
-        return \in_array($this->getBaseType()->getTypeIdentifier(), [TypeIdentifier::NULL, TypeIdentifier::MIXED], true);
+        return $this->is(fn (Type $t): bool => $t->isA(TypeIdentifier::NULL) || $t->isA(TypeIdentifier::MIXED));
     }
-
-    abstract public function asNonNullable(): self;
 }

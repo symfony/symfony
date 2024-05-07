@@ -12,7 +12,7 @@
 namespace Symfony\Component\DependencyInjection\Tests\Fixtures;
 
 use Psr\Container\ContainerInterface;
-use Symfony\Component\DependencyInjection\Attribute\TaggedLocator;
+use Symfony\Component\DependencyInjection\Attribute\AutowireLocator;
 use Symfony\Contracts\Service\Attribute\Required;
 use Symfony\Contracts\Service\ServiceSubscriberInterface;
 
@@ -21,7 +21,7 @@ final class TaggedLocatorConsumerWithServiceSubscriber implements ServiceSubscri
     private ?ContainerInterface $container = null;
 
     public function __construct(
-        #[TaggedLocator('foo_bar', indexAttribute: 'key')]
+        #[AutowireLocator('foo_bar', indexAttribute: 'key')]
         private ContainerInterface $locator,
     ) {
     }

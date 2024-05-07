@@ -29,7 +29,7 @@ class MoneyToLocalizedStringTransformer extends NumberToLocalizedStringTransform
         ?int $roundingMode = \NumberFormatter::ROUND_HALFUP,
         ?int $divisor = 1,
         ?string $locale = null,
-        private string $modelType = 'float',
+        private readonly string $input = 'float',
     ) {
         parent::__construct($scale ?? 2, $grouping ?? true, $roundingMode, $locale);
 
@@ -67,15 +67,15 @@ class MoneyToLocalizedStringTransformer extends NumberToLocalizedStringTransform
     public function reverseTransform(mixed $value): int|float|null
     {
         $value = parent::reverseTransform($value);
-        if (null !== $value && 1 !== $this->divisor) {
+        if (null !== $value) {
             $value = (string) ($value * $this->divisor);
 
-            if ('float' === $this->modelType) {
+            if ('float' === $this->input) {
                 return (float) $value;
             }
 
             if ($value > \PHP_INT_MAX || $value < \PHP_INT_MIN) {
-                throw new TransformationFailedException(sprintf("The value '%d' is too large you should pass the 'model_type' to 'float'.", $value));
+                throw new TransformationFailedException(sprintf('Cannot cast "%s" to an integer. Try setting the input to "float" instead.', $value));
             }
 
             $value = (int) $value;

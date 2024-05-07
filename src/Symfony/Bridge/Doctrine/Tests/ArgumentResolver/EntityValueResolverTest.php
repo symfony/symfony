@@ -63,6 +63,9 @@ class EntityValueResolverTest extends TestCase
         $this->assertSame([], $resolver->resolve($request, $argument));
     }
 
+    /**
+     * @group legacy
+     */
     public function testResolveWithNoIdAndDataOptional()
     {
         $manager = $this->getMockBuilder(ObjectManager::class)->getMock();
@@ -83,18 +86,10 @@ class EntityValueResolverTest extends TestCase
 
         $request = new Request();
         $request->attributes->set('arg', null);
-        $argument = $this->createArgument('stdClass', new MapEntity(stripNull: true), 'arg', true);
+        $argument = $this->createArgument('stdClass', new MapEntity(mapping: ['arg'], stripNull: true), 'arg', true);
 
-        $metadata = $this->getMockBuilder(ClassMetadata::class)->getMock();
-        $metadata->expects($this->once())
-            ->method('hasField')
-            ->with('arg')
-            ->willReturn(true);
-
-        $manager->expects($this->once())
-            ->method('getClassMetadata')
-            ->with('stdClass')
-            ->willReturn($metadata);
+        $manager->expects($this->never())
+            ->method('getClassMetadata');
 
         $manager->expects($this->never())
             ->method('getRepository');
@@ -139,7 +134,7 @@ class EntityValueResolverTest extends TestCase
         $request = new Request();
         $request->attributes->set('id', null);
 
-        $argument = $this->createArgument(isNullable: true);
+        $argument = $this->createArgument(isNullable: true, entity: new MapEntity(id: 'id'));
 
         $this->assertSame([null], $resolver->resolve($request, $argument));
     }
@@ -195,6 +190,9 @@ class EntityValueResolverTest extends TestCase
         yield ['foo'];
     }
 
+    /**
+     * @group legacy
+     */
     public function testResolveGuessOptional()
     {
         $manager = $this->getMockBuilder(ObjectManager::class)->getMock();
@@ -232,16 +230,8 @@ class EntityValueResolverTest extends TestCase
             new MapEntity(mapping: ['foo' => 'Foo'], exclude: ['bar'])
         );
 
-        $metadata = $this->getMockBuilder(ClassMetadata::class)->getMock();
-        $metadata->expects($this->once())
-            ->method('hasField')
-            ->with('Foo')
-            ->willReturn(true);
-
-        $manager->expects($this->once())
-            ->method('getClassMetadata')
-            ->with('stdClass')
-            ->willReturn($metadata);
+        $manager->expects($this->never())
+            ->method('getClassMetadata');
 
         $repository = $this->getMockBuilder(ObjectRepository::class)->getMock();
         $repository->expects($this->once())
@@ -255,6 +245,42 @@ class EntityValueResolverTest extends TestCase
             ->willReturn($repository);
 
         $this->assertSame([$object], $resolver->resolve($request, $argument));
+    }
+
+    public function testResolveWithRouteMapping()
+    {
+        $manager = $this->getMockBuilder(ObjectManager::class)->getMock();
+        $registry = $this->createRegistry($manager);
+        $resolver = new EntityValueResolver($registry);
+
+        $request = new Request();
+        $request->attributes->set('conference', 'vienna-2024');
+        $request->attributes->set('article', ['title' => 'foo']);
+        $request->attributes->set('_route_mapping', ['slug' => 'conference']);
+
+        $argument1 = $this->createArgument('Conference', new MapEntity('Conference'), 'conference');
+        $argument2 = $this->createArgument('Article', new MapEntity('Article'), 'article');
+
+        $manager->expects($this->never())
+            ->method('getClassMetadata');
+
+        $conference = new \stdClass();
+        $article = new \stdClass();
+
+        $repository = $this->getMockBuilder(ObjectRepository::class)->getMock();
+        $repository->expects($this->any())
+            ->method('findOneBy')
+            ->willReturnCallback(static fn ($v) => match ($v) {
+                ['slug' => 'vienna-2024'] => $conference,
+                ['title' => 'foo'] => $article,
+            });
+
+        $manager->expects($this->any())
+            ->method('getRepository')
+            ->willReturn($repository);
+
+        $this->assertSame([$conference], $resolver->resolve($request, $argument1));
+        $this->assertSame([$article], $resolver->resolve($request, $argument2));
     }
 
     public function testExceptionWithExpressionIfNoLanguageAvailable()

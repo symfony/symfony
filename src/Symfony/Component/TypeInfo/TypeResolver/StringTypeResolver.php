@@ -53,8 +53,6 @@ use Symfony\Component\TypeInfo\TypeIdentifier;
  */
 final class StringTypeResolver implements TypeResolverInterface
 {
-    private const COLLECTION_CLASS_NAMES = [\Traversable::class, \Iterator::class, \IteratorAggregate::class, \ArrayAccess::class, \Generator::class];
-
     /**
      * @var array<string, bool>
      */
@@ -71,7 +69,9 @@ final class StringTypeResolver implements TypeResolverInterface
 
     public function resolve(mixed $subject, ?TypeContext $typeContext = null): Type
     {
-        if (!\is_string($subject)) {
+        if ($subject instanceof \Stringable) {
+            $subject = (string) $subject;
+        } elseif (!\is_string($subject)) {
             throw new UnsupportedException(sprintf('Expected subject to be a "string", "%s" given.', get_debug_type($subject)), $subject);
         }
 
@@ -164,7 +164,7 @@ final class StringTypeResolver implements TypeResolverInterface
                 default => $this->resolveCustomIdentifier($node->name, $typeContext),
             };
 
-            if ($type instanceof ObjectType && \in_array($type->getClassName(), self::COLLECTION_CLASS_NAMES, true)) {
+            if ($type instanceof ObjectType && (is_a($type->getClassName(), \Traversable::class, true) || is_a($type->getClassName(), \ArrayAccess::class, true))) {
                 return Type::collection($type);
             }
 
@@ -201,7 +201,7 @@ final class StringTypeResolver implements TypeResolverInterface
                 }
             }
 
-            if ($type instanceof ObjectType && \in_array($type->getClassName(), self::COLLECTION_CLASS_NAMES, true)) {
+            if ($type instanceof ObjectType && (is_a($type->getClassName(), \Traversable::class, true) || is_a($type->getClassName(), \ArrayAccess::class, true))) {
                 return match (\count($variableTypes)) {
                     1 => Type::collection($type, $variableTypes[0]),
                     2 => Type::collection($type, $variableTypes[1], $variableTypes[0]),

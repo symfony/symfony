@@ -16,6 +16,7 @@ use Symfony\Component\TypeInfo\Exception\InvalidArgumentException;
 use Symfony\Component\TypeInfo\Exception\UnsupportedException;
 use Symfony\Component\TypeInfo\Tests\Fixtures\AbstractDummy;
 use Symfony\Component\TypeInfo\Tests\Fixtures\Dummy;
+use Symfony\Component\TypeInfo\Tests\Fixtures\DummyCollection;
 use Symfony\Component\TypeInfo\Tests\Fixtures\DummyWithTemplates;
 use Symfony\Component\TypeInfo\Type;
 use Symfony\Component\TypeInfo\TypeContext\TypeContext;
@@ -37,6 +38,23 @@ class StringTypeResolverTest extends TestCase
     public function testResolve(Type $expectedType, string $string, ?TypeContext $typeContext = null)
     {
         $this->assertEquals($expectedType, $this->resolver->resolve($string, $typeContext));
+    }
+
+    /**
+     * @dataProvider resolveDataProvider
+     */
+    public function testResolveStringable(Type $expectedType, string $string, ?TypeContext $typeContext = null)
+    {
+        $this->assertEquals($expectedType, $this->resolver->resolve(new class($string) implements \Stringable {
+            public function __construct(private string $value)
+            {
+            }
+
+            public function __toString(): string
+            {
+                return $this->value;
+            }
+        }, $typeContext));
     }
 
     /**
@@ -150,6 +168,7 @@ class StringTypeResolverTest extends TestCase
         yield [Type::collection(Type::object(\IteratorAggregate::class)), \IteratorAggregate::class];
         yield [Type::collection(Type::object(\IteratorAggregate::class), Type::string()), \IteratorAggregate::class.'<string>'];
         yield [Type::collection(Type::object(\IteratorAggregate::class), Type::bool(), Type::string()), \IteratorAggregate::class.'<string, bool>'];
+        yield [Type::collection(Type::object(DummyCollection::class), Type::bool(), Type::string()), DummyCollection::class.'<string, bool>'];
     }
 
     public function testCannotResolveNonStringType()

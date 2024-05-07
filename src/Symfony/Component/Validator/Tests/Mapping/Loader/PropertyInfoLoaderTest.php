@@ -114,7 +114,7 @@ class PropertyInfoLoaderTest extends TestCase
         $propertyAccessExtractor = $this->createMock(PropertyAccessExtractorInterface::class);
         $propertyAccessExtractor
             ->method('isWritable')
-            ->will($this->onConsecutiveCalls(
+            ->willReturn(
                 true,
                 true,
                 true,
@@ -127,7 +127,7 @@ class PropertyInfoLoaderTest extends TestCase
                 true,
                 false,
                 true
-            ))
+            )
         ;
 
         $propertyInfoLoader = new PropertyInfoLoader($propertyListExtractor, $propertyTypeExtractor, $propertyAccessExtractor, '{.*}');

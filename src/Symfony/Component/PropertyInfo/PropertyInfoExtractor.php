@@ -53,18 +53,16 @@ class PropertyInfoExtractor implements PropertyInfoExtractorInterface, PropertyI
         return $this->extract($this->descriptionExtractors, 'getLongDescription', [$class, $property, $context]);
     }
 
+    /**
+     * @experimental
+     */
     public function getType(string $class, string $property, array $context = []): ?Type
     {
         return $this->extract($this->typeExtractors, 'getType', [$class, $property, $context]);
     }
 
-    /**
-     * @deprecated since Symfony 7.1, use "getType" instead
-     */
     public function getTypes(string $class, string $property, array $context = []): ?array
     {
-        trigger_deprecation('symfony/property-info', '7.1', 'The "%s()" method is deprecated, use "%s::getType()" instead.', __METHOD__, self::class);
-
         return $this->extract($this->typeExtractors, 'getTypes', [$class, $property, $context]);
     }
 

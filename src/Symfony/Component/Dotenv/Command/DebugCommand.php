@@ -15,6 +15,7 @@ use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Completion\CompletionInput;
 use Symfony\Component\Console\Completion\CompletionSuggestions;
+use Symfony\Component\Console\Formatter\OutputFormatter;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -29,10 +30,24 @@ use Symfony\Component\Dotenv\Dotenv;
 #[AsCommand(name: 'debug:dotenv', description: 'List all dotenv files with variables and values')]
 final class DebugCommand extends Command
 {
-    public function __construct(
-        private string $kernelEnvironment,
-        private string $projectDirectory,
-    ) {
+    /**
+     * @deprecated since Symfony 6.1
+     */
+    protected static $defaultName = 'debug:dotenv';
+
+    /**
+     * @deprecated since Symfony 6.1
+     */
+    protected static $defaultDescription = 'List all dotenv files with variables and values';
+
+    private string $kernelEnvironment;
+    private string $projectDirectory;
+
+    public function __construct(string $kernelEnvironment, string $projectDirectory)
+    {
+        $this->kernelEnvironment = $kernelEnvironment;
+        $this->projectDirectory = $projectDirectory;
+
         parent::__construct();
     }
 
@@ -69,7 +84,7 @@ EOT
         $filePath = $_SERVER['SYMFONY_DOTENV_PATH'] ?? $this->projectDirectory.\DIRECTORY_SEPARATOR.'.env';
 
         $envFiles = $this->getEnvFiles($filePath);
-        $availableFiles = array_filter($envFiles, fn (string $file) => is_file($file));
+        $availableFiles = array_filter($envFiles, 'is_file');
 
         if (\in_array(sprintf('%s.local.php', $filePath), $availableFiles, true)) {
             $io->warning(sprintf('Due to existing dump file (%s.local.php) all other dotenv files are skipped.', $this->getRelativeName($filePath)));
@@ -92,7 +107,7 @@ EOT
         if ($variables || null === $nameFilter) {
             $io->table(
                 array_merge(['Variable', 'Value'], array_map($this->getRelativeName(...), $availableFiles)),
-                $this->getVariables($availableFiles, $nameFilter)
+                $variables
             );
 
             $io->comment('Note that values might be different between web and CLI.');
@@ -112,43 +127,50 @@ EOT
 
     private function getVariables(array $envFiles, ?string $nameFilter): array
     {
-        $vars = $this->getAvailableVars();
-
-        $output = [];
+        $variables = [];
         $fileValues = [];
-        foreach ($vars as $var) {
+        $dotenvVars = array_flip(explode(',', $_SERVER['SYMFONY_DOTENV_VARS'] ?? ''));
+
+        foreach ($envFiles as $envFile) {
+            $fileValues[$envFile] = $this->loadValues($envFile);
+            $variables += $fileValues[$envFile];
+        }
+
+        foreach ($variables as $var => $varDetails) {
             if (null !== $nameFilter && 0 !== stripos($var, $nameFilter)) {
+                unset($variables[$var]);
                 continue;
             }
 
-            $realValue = $_SERVER[$var];
-            $varDetails = [$var, $realValue];
-            foreach ($envFiles as $envFile) {
-                $values = $fileValues[$envFile] ??= $this->loadValues($envFile);
+            $realValue = $_SERVER[$var] ?? '';
+            $varDetails = [$var, '<fg=green>'.OutputFormatter::escape($realValue).'</>'];
+            $varSeen = !isset($dotenvVars[$var]);
 
-                $varString = $values[$var] ?? '<fg=yellow>n/a</>';
-                $shortenedVar = $this->getHelper('formatter')->truncate($varString, 30);
-                $varDetails[] = $varString === $realValue ? '<fg=green>'.$shortenedVar.'</>' : $shortenedVar;
+            foreach ($envFiles as $envFile) {
+                if (null === $value = $fileValues[$envFile][$var] ?? null) {
+                    $varDetails[] = '<fg=yellow>n/a</>';
+                    continue;
+                }
+
+                $shortenedValue = OutputFormatter::escape($this->getHelper('formatter')->truncate($value, 30));
+                $varDetails[] = $value === $realValue && !$varSeen ? '<fg=green>'.$shortenedValue.'</>' : $shortenedValue;
+                $varSeen = $varSeen || $value === $realValue;
             }
 
-            $output[] = $varDetails;
+            $variables[$var] = $varDetails;
         }
 
-        return $output;
+        ksort($variables);
+
+        return $variables;
     }
 
     private function getAvailableVars(): array
     {
-        $dotenvVars = $_SERVER['SYMFONY_DOTENV_VARS'] ?? '';
+        $filePath = $_SERVER['SYMFONY_DOTENV_PATH'] ?? $this->projectDirectory.\DIRECTORY_SEPARATOR.'.env';
+        $envFiles = $this->getEnvFiles($filePath);
 
-        if ('' === $dotenvVars) {
-            return [];
-        }
-
-        $vars = explode(',', $dotenvVars);
-        sort($vars);
-
-        return $vars;
+        return array_keys($this->getVariables(array_filter($envFiles, 'is_file'), null));
     }
 
     private function getEnvFiles(string $filePath): array

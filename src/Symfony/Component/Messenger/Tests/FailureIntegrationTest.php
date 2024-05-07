@@ -24,6 +24,7 @@ use Symfony\Component\Messenger\EventListener\SendFailedMessageToFailureTranspor
 use Symfony\Component\Messenger\EventListener\StopWorkerOnMessageLimitListener;
 use Symfony\Component\Messenger\Exception\DelayedMessageHandlingException;
 use Symfony\Component\Messenger\Exception\HandlerFailedException;
+use Symfony\Component\Messenger\Exception\ValidationFailedException;
 use Symfony\Component\Messenger\Handler\HandlerDescriptor;
 use Symfony\Component\Messenger\Handler\HandlersLocator;
 use Symfony\Component\Messenger\MessageBus;
@@ -32,6 +33,7 @@ use Symfony\Component\Messenger\Middleware\DispatchAfterCurrentBusMiddleware;
 use Symfony\Component\Messenger\Middleware\FailedMessageProcessingMiddleware;
 use Symfony\Component\Messenger\Middleware\HandleMessageMiddleware;
 use Symfony\Component\Messenger\Middleware\SendMessageMiddleware;
+use Symfony\Component\Messenger\Middleware\ValidationMiddleware;
 use Symfony\Component\Messenger\Retry\MultiplierRetryStrategy;
 use Symfony\Component\Messenger\Stamp\BusNameStamp;
 use Symfony\Component\Messenger\Stamp\DispatchAfterCurrentBusStamp;
@@ -42,6 +44,9 @@ use Symfony\Component\Messenger\Transport\Receiver\ReceiverInterface;
 use Symfony\Component\Messenger\Transport\Sender\SenderInterface;
 use Symfony\Component\Messenger\Transport\Sender\SendersLocator;
 use Symfony\Component\Messenger\Worker;
+use Symfony\Component\Validator\ConstraintViolation;
+use Symfony\Component\Validator\ConstraintViolationList;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class FailureIntegrationTest extends TestCase
 {
@@ -412,6 +417,78 @@ class FailureIntegrationTest extends TestCase
 
         $this->assertInstanceOf(DelayedMessageHandlingException::class, $throwable, $throwable->getMessage());
         $this->assertSame(1, $syncHandlerThatFails->getTimesCalled());
+
+        $messagesWaiting = $transport1->getMessagesWaitingToBeReceived();
+
+        // Stamps should not be dropped on message that's queued for retry
+        $this->assertCount(1, $messagesWaiting);
+        $this->assertSame('some.bus', $messagesWaiting[0]->last(BusNameStamp::class)?->getBusName());
+    }
+
+    public function testStampsAddedByMiddlewaresDontDisappearWhenValidationFails()
+    {
+        $transport1 = new DummyFailureTestSenderAndReceiver();
+
+        $transports = [
+            'transport1' => $transport1,
+        ];
+
+        $locator = new Container();
+        $locator->set('transport1', $transport1);
+
+        $senderLocator = new SendersLocator([], $locator);
+
+        $retryStrategyLocator = new Container();
+        $retryStrategyLocator->set('transport1', new MultiplierRetryStrategy(1));
+
+        $violationList = new ConstraintViolationList([new ConstraintViolation('validation failed', null, [], null, null, null)]);
+        $validator = $this->createMock(ValidatorInterface::class);
+        $validator->expects($this->once())->method('validate')->willReturn($violationList);
+
+        $middlewareStack = new \ArrayIterator([
+            new AddBusNameStampMiddleware('some.bus'),
+            new ValidationMiddleware($validator),
+            new SendMessageMiddleware($senderLocator),
+        ]);
+
+        $bus = new MessageBus($middlewareStack);
+
+        $transport1Handler = fn () => $bus->dispatch(new \stdClass(), [new DispatchAfterCurrentBusStamp()]);
+
+        $handlerLocator = new HandlersLocator([
+            DummyMessage::class => [new HandlerDescriptor($transport1Handler)],
+        ]);
+
+        $middlewareStack->append(new HandleMessageMiddleware($handlerLocator));
+
+        $dispatcher = new EventDispatcher();
+
+        $dispatcher->addSubscriber(new SendFailedMessageForRetryListener($locator, $retryStrategyLocator));
+        $dispatcher->addSubscriber(new StopWorkerOnMessageLimitListener(1));
+
+        $runWorker = function (string $transportName) use ($transports, $bus, $dispatcher): ?\Throwable {
+            $throwable = null;
+            $failedListener = function (WorkerMessageFailedEvent $event) use (&$throwable) {
+                $throwable = $event->getThrowable();
+            };
+            $dispatcher->addListener(WorkerMessageFailedEvent::class, $failedListener);
+
+            $worker = new Worker([$transportName => $transports[$transportName]], $bus, $dispatcher);
+
+            $worker->run();
+
+            $dispatcher->removeListener(WorkerMessageFailedEvent::class, $failedListener);
+
+            return $throwable;
+        };
+
+        // Simulate receive from external source
+        $transport1->send(new Envelope(new DummyMessage('API')));
+
+        // Receive the message from "transport1"
+        $throwable = $runWorker('transport1');
+
+        $this->assertInstanceOf(ValidationFailedException::class, $throwable, $throwable->getMessage());
 
         $messagesWaiting = $transport1->getMessagesWaitingToBeReceived();
 

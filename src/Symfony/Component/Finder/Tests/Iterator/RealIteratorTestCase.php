@@ -31,6 +31,7 @@ abstract class RealIteratorTestCase extends IteratorTestCase
             'foo/bar.tmp',
             'test.php',
             'toto/',
+            'toto/foo/',
             'toto/.git/',
             'foo bar',
             'qux_0_1.php',

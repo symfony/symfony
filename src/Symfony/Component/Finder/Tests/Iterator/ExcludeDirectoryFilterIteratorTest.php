@@ -120,6 +120,30 @@ class ExcludeDirectoryFilterIteratorTest extends RealIteratorTestCase
             'qux_10_2.php',
             'qux_12_0.php',
             'qux_2_0.php',
+	];
+
+        $foo_toto_subdir_absolute_root = [
+            '.bar',
+            '.foo',
+            '.foo/.bar',
+            '.foo/bar',
+            '.git',
+            'test.py',
+            'test.php',
+            'foo',
+            'foo/bar.tmp',
+            'toto',
+            'toto/.git',
+            'foo bar',
+            'qux',
+            'qux/baz_100_1.py',
+            'qux/baz_1_2.py',
+            'qux_0_1.php',
+            'qux_1000_1.php',
+            'qux_1002_0.php',
+            'qux_10_2.php',
+            'qux_12_0.php',
+            'qux_2_0.php',
         ];
 
         return [
@@ -127,6 +151,7 @@ class ExcludeDirectoryFilterIteratorTest extends RealIteratorTestCase
             [['fo'], self::toAbsolute($fo)],
             [['toto/'], self::toAbsolute($toto)],
             [['/foo'], self::toAbsolute($foo_absolute_root)],
+            [['/toto/foo'], self::toAbsolute($foo_toto_subdir_absolute_root)],
         ];
     }
 }

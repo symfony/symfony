@@ -7,7 +7,7 @@ use Symfony\Component\Validator\Constraints\PasswordStrength;
 
 class PasswordStrengthEstimator implements PasswordStrengthEstimatorInterface
 {
-    public static function estimateStrength(#[\SensitiveParameter] string|Stringable $password): int
+    public function estimateStrength(#[\SensitiveParameter] string|Stringable $password): int
     {
         if (!$length = \strlen($password)) {
             return PasswordStrength::STRENGTH_VERY_WEAK;

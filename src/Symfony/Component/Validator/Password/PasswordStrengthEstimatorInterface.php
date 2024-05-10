@@ -13,5 +13,5 @@ interface PasswordStrengthEstimatorInterface
      *
      * @return PasswordStrength::STRENGTH_*
      */
-    public static function estimateStrength(#[\SensitiveParameter] string|Stringable $password): int;
+    public function estimateStrength(#[\SensitiveParameter] string|Stringable $password): int;
 }

@@ -4,13 +4,15 @@
     xmlns:framework="http://symfony.com/schema/dic/symfony"
     xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd
         http://symfony.com/schema/dic/symfony http://symfony.com/schema/dic/symfony/symfony-1.0.xsd">
+
     <framework:config http-method-override="false" handle-all-throwables="true">
         <framework:annotations enabled="false" />
         <framework:php-errors log="true" />
-        <framework:http-client mock-response-factory="my_response_factory">
+        <framework:http-client mock-client="true">
             <framework:default-options />
-            <framework:scoped-client name="notMocked" base-uri="https://symfony.com" />
-            <framework:scoped-client name="mocked" base-uri="https://symfony.com" mock_response_factory="my_response_factory" />
+            <framework:scoped-client name="notMocked" base-uri="https://symfony.com"  mock-client="false"/>
+            <framework:scoped-client name="mocked" base-uri="https://symfony.com" />
+            <framework:scoped-client name="mocked_with_factory" base-uri="https://symfony.com" mock-response-factory="my_response_factory" />
         </framework:http-client>
     </framework:config>
 </container>

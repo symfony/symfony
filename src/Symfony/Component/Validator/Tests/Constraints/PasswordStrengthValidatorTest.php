@@ -13,6 +13,7 @@ namespace Symfony\Component\Validator\Tests\Constraints;
 
 use Symfony\Component\Validator\Constraints\PasswordStrength;
 use Symfony\Component\Validator\Constraints\PasswordStrengthValidator;
+use Symfony\Component\Validator\Password\PasswordStrengthEstimator;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 use Symfony\Component\Validator\Tests\Constraints\Fixtures\StringableValue;
 
@@ -20,7 +21,7 @@ class PasswordStrengthValidatorTest extends ConstraintValidatorTestCase
 {
     protected function createValidator(): PasswordStrengthValidator
     {
-        return new PasswordStrengthValidator();
+        return new PasswordStrengthValidator(new PasswordStrengthEstimator());
     }
 
     /**

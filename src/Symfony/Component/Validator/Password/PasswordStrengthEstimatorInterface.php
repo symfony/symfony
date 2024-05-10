@@ -3,6 +3,7 @@
 namespace Symfony\Component\Validator\Password;
 
 use Stringable;
+use Symfony\Component\Validator\Constraints\PasswordStrength;
 
 interface PasswordStrengthEstimatorInterface
 {

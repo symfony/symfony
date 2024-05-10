@@ -574,7 +574,7 @@ class ConfigurationTest extends TestCase
 
         $config = $processor->processConfiguration($configuration, [[
             'http_client' => [
-                'default_options' => ['rate_limiter' => 'default_limiter', 'retry_failed' => ['max_retries' => 77]],
+                'default_options' => ['rate_limiter' => 'default_limiter', 'retry_failed' => ['max_retries' => 77], 'mock_response_factory' => null, 'mock_client' => false],
                 'scoped_clients' => [
                     'foo' => ['base_uri' => 'http://example.com'],
                     'bar' => ['base_uri' => 'http://example.com', 'rate_limiter' => true, 'retry_failed' => true],

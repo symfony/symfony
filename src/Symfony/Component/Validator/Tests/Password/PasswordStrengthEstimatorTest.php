@@ -13,7 +13,7 @@ class PasswordStrengthEstimatorTest extends TestCase
     /** @dataProvider getPasswords */
     public function testEstimateStrength(string|Stringable $password, int $expectedStrength): void
     {
-        self::assertEquals($expectedStrength, (new PasswordStrengthEstimator())->estimateStrength($password));
+        self::assertSame($expectedStrength, (new PasswordStrengthEstimator())->estimateStrength($password));
     }
 
     /** @return array<string, array<string, int>> */

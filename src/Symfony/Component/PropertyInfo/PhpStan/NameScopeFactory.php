@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\PropertyInfo\PhpStan;
 
+use phpDocumentor\Reflection\Types\Context;
 use phpDocumentor\Reflection\Types\ContextFactory;
 
 /**
@@ -20,6 +21,9 @@ use phpDocumentor\Reflection\Types\ContextFactory;
  */
 final class NameScopeFactory
 {
+    /** @var array<string, Context> */
+    private array $contexts = [];
+
     public function create(string $calledClassName, ?string $declaringClassName = null): NameScope
     {
         $declaringClassName ??= $calledClassName;
@@ -60,7 +64,7 @@ final class NameScopeFactory
             }
 
             $factory = new ContextFactory();
-            $context = $factory->createForNamespace($namespace, $contents);
+            $context = $this->contexts[$namespace.$fileName] ??= $factory->createForNamespace($namespace, $contents);
 
             return [$namespace, $context->getNamespaceAliases()];
         }

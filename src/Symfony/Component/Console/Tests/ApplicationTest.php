@@ -1957,6 +1957,10 @@ class ApplicationTest extends TestCase
      */
     public function testSignalListenerNotCalledByDefault()
     {
+        if (!function_exists('posix_kill')) {
+            $this->markTestSkipped('posix_kill not available');
+        }
+
         $command = new SignableCommand(false);
 
         $dispatcherCalled = false;
@@ -1977,6 +1981,10 @@ class ApplicationTest extends TestCase
      */
     public function testSignalListener()
     {
+        if (!function_exists('posix_kill')) {
+            $this->markTestSkipped('posix_kill not available');
+        }
+
         $command = new SignableCommand();
 
         $dispatcherCalled = false;
@@ -1998,6 +2006,10 @@ class ApplicationTest extends TestCase
      */
     public function testSignalSubscriberNotCalledByDefault()
     {
+        if (!function_exists('posix_kill')) {
+            $this->markTestSkipped('posix_kill not available');
+        }
+
         $command = new BaseSignableCommand(false);
 
         $subscriber = new SignalEventSubscriber();
@@ -2015,6 +2027,10 @@ class ApplicationTest extends TestCase
      */
     public function testSignalSubscriber()
     {
+        if (!function_exists('posix_kill')) {
+            $this->markTestSkipped('posix_kill not available');
+        }
+
         $command = new BaseSignableCommand();
 
         $subscriber1 = new SignalEventSubscriber();
@@ -2036,6 +2052,10 @@ class ApplicationTest extends TestCase
      */
     public function testSignalDispatchWithoutEventToDispatch()
     {
+        if (!function_exists('posix_kill')) {
+            $this->markTestSkipped('posix_kill not available');
+        }
+
         $command = new SignableCommand();
 
         $application = $this->createSignalableApplication($command, null);
@@ -2050,6 +2070,10 @@ class ApplicationTest extends TestCase
      */
     public function testSignalDispatchWithoutEventDispatcher()
     {
+        if (!function_exists('posix_kill')) {
+            $this->markTestSkipped('posix_kill not available');
+        }
+
         $command = new SignableCommand();
 
         $application = $this->createSignalableApplication($command, null);
@@ -2066,6 +2090,10 @@ class ApplicationTest extends TestCase
     {
         if (!\defined('SIGUSR1')) {
             $this->markTestSkipped('SIGUSR1 not available');
+        }
+
+        if (!function_exists('posix_kill')) {
+            $this->markTestSkipped('posix_kill not available');
         }
 
         $command = new BaseSignableCommand();
@@ -2115,6 +2143,10 @@ class ApplicationTest extends TestCase
             $this->markTestSkipped('SIGUSR1 not available');
         }
 
+        if (!function_exists('posix_kill')) {
+            $this->markTestSkipped('posix_kill not available');
+        }
+
         $command = new SignableCommand(false);
 
         $dispatcher = new EventDispatcher();
@@ -2129,6 +2161,10 @@ class ApplicationTest extends TestCase
     {
         if (!\defined('SIGUSR1')) {
             $this->markTestSkipped('SIGUSR1 not available');
+        }
+
+        if (!function_exists('posix_kill')) {
+            $this->markTestSkipped('posix_kill not available');
         }
 
         $command = new SignableCommand();
@@ -2150,6 +2186,10 @@ class ApplicationTest extends TestCase
             $this->markTestSkipped('SIGINT not available');
         }
 
+        if (!function_exists('posix_kill')) {
+            $this->markTestSkipped('posix_kill not available');
+        }
+
         $command = new TerminatableCommand(true, \SIGINT);
         $command->exitCode = 129;
 
@@ -2166,6 +2206,10 @@ class ApplicationTest extends TestCase
     {
         if (!\defined('SIGINT')) {
             $this->markTestSkipped('SIGINT not available');
+        }
+
+        if (!function_exists('posix_kill')) {
+            $this->markTestSkipped('posix_kill not available');
         }
 
         $command = new TerminatableWithEventCommand();

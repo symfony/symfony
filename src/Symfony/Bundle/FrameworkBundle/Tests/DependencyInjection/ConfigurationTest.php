@@ -574,7 +574,7 @@ class ConfigurationTest extends TestCase
 
         $config = $processor->processConfiguration($configuration, [[
             'http_client' => [
-                'default_options' => ['rate_limiter' => 'default_limiter', 'retry_failed' => ['max_retries' => 77], 'mock_response_factory' => null, 'mock_client' => false],
+                'default_options' => ['rate_limiter' => 'default_limiter', 'retry_failed' => ['max_retries' => 77]],
                 'scoped_clients' => [
                     'foo' => ['base_uri' => 'http://example.com'],
                     'bar' => ['base_uri' => 'http://example.com', 'rate_limiter' => true, 'retry_failed' => true],
@@ -808,6 +808,8 @@ class ConfigurationTest extends TestCase
             'disallow_search_engine_index' => true,
             'http_client' => [
                 'enabled' => !class_exists(FullStack::class) && class_exists(HttpClient::class),
+                'mock_client' => false,
+                'mock_response_factory' => null,
                 'scoped_clients' => [],
             ],
             'mailer' => [

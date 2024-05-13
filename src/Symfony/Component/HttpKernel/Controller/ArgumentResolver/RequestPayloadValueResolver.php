@@ -170,7 +170,11 @@ class RequestPayloadValueResolver implements ValueResolverInterface, EventSubscr
                 };
             }
 
-            $arguments[$i] = $payload;
+            if ($argument->metadata->isVariadic() && \is_array($payload)) {
+                array_splice($arguments, $i, 1, $payload);
+            } else {
+                $arguments[$i] = $payload;
+            }
         }
 
         $event->setArguments($arguments);

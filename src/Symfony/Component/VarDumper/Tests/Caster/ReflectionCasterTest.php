@@ -18,6 +18,7 @@ use Symfony\Component\VarDumper\Tests\Fixtures\ExtendsReflectionTypeFixture;
 use Symfony\Component\VarDumper\Tests\Fixtures\GeneratorDemo;
 use Symfony\Component\VarDumper\Tests\Fixtures\LotsOfAttributes;
 use Symfony\Component\VarDumper\Tests\Fixtures\NotLoadableClass;
+use Symfony\Component\VarDumper\Tests\Fixtures\Php82NullStandaloneReturnType;
 use Symfony\Component\VarDumper\Tests\Fixtures\ReflectionIntersectionTypeFixture;
 use Symfony\Component\VarDumper\Tests\Fixtures\ReflectionNamedTypeFixture;
 use Symfony\Component\VarDumper\Tests\Fixtures\ReflectionUnionTypeFixture;
@@ -95,7 +96,7 @@ Closure($x) {
     $b: & 123
   }
   file: "%sReflectionCasterTest.php"
-  line: "88 to 88"
+  line: "%s"
 }
 EOTXT
             , $var
@@ -400,6 +401,26 @@ Closure(): mixed {
 }
 EOTXT
             , $f
+        );
+    }
+
+    /**
+     * @requires PHP 8.2
+     */
+    public function testNullReturnType()
+    {
+        $className = Php82NullStandaloneReturnType::class;
+
+        $this->assertDumpMatchesFormat(
+            <<<EOTXT
+{$className}::foo(null \$bar): null {
+  returnType: "null"
+  this: {$className} { …}
+  file: "%s"
+  line: "%s"
+}
+EOTXT
+            , (new Php82NullStandaloneReturnType())->foo(...)
         );
     }
 

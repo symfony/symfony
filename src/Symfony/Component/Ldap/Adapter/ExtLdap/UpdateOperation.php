@@ -48,10 +48,15 @@ class UpdateOperation
 
     public function toArray(): array
     {
-        return [
+        $op = [
             'attrib' => $this->attribute,
             'modtype' => $this->operationType,
-            'values' => $this->values,
         ];
+
+        if (\LDAP_MODIFY_BATCH_REMOVE_ALL !== $this->operationType) {
+            $op['values'] = $this->values;
+        }
+
+        return $op;
     }
 }

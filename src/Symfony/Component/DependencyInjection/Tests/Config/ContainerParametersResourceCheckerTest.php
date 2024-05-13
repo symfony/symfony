@@ -39,7 +39,7 @@ class ContainerParametersResourceCheckerTest extends TestCase
      */
     public function testIsFresh(callable $mockContainer, $expected)
     {
-        $mockContainer($this->container);
+        $mockContainer($this->container, $this);
 
         $this->assertSame($expected, $this->resourceChecker->isFresh($this->resource, time()));
     }

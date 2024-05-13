@@ -42,7 +42,7 @@ trait SkipUninitializedValuesTestTrait
         $this->assertSame('value', $objectToPopulate->getUninitialized());
     }
 
-    public function skipUninitializedValuesFlagProvider(): iterable
+    public static function skipUninitializedValuesFlagProvider(): iterable
     {
         yield 'passed manually' => [['skip_uninitialized_values' => true, 'groups' => ['foo']]];
         yield 'using default context value' => [['groups' => ['foo']]];

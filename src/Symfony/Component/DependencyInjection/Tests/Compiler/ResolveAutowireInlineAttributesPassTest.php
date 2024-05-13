@@ -12,6 +12,7 @@
 namespace Symfony\Component\DependencyInjection\Tests\Compiler;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Compiler\AutowirePass;
 use Symfony\Component\DependencyInjection\Compiler\ResolveAutowireInlineAttributesPass;
 use Symfony\Component\DependencyInjection\Compiler\ResolveChildDefinitionsPass;
@@ -52,5 +53,17 @@ class ResolveAutowireInlineAttributesPassTest extends TestCase
         $a = $container->get('autowire_inline3');
         self::assertInstanceOf(AutowireInlineAttributes2::class, $a->inlined);
         self::assertSame(345, $a->inlined->bar);
+    }
+
+    public function testChildDefinition()
+    {
+        $container = new ContainerBuilder();
+
+        $container->setDefinition('autowire_inline1', (new ChildDefinition('parent'))->setClass(AutowireInlineAttributes1::class))
+            ->setAutowired(true);
+
+        (new ResolveAutowireInlineAttributesPass())->process($container);
+
+        $this->assertSame(['$inlined'], array_keys($container->getDefinition('autowire_inline1')->getArguments()));
     }
 }

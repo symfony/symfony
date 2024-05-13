@@ -23,7 +23,7 @@ trait CircularReferenceTestTrait
 
     abstract protected function getSelfReferencingModel();
 
-    public function provideUnableToNormalizeCircularReference(): array
+    public static function provideUnableToNormalizeCircularReference(): array
     {
         return [
             [[], [], 1],

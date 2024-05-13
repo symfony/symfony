@@ -40,7 +40,7 @@ class ContainerParametersResourceCheckerTest extends TestCase
      */
     public function testIsFresh(callable $mockContainer, $expected)
     {
-        $mockContainer($this->container);
+        $mockContainer($this->container, $this);
 
         $this->assertSame($expected, $this->resourceChecker->isFresh($this->resource, time()));
     }
@@ -55,9 +55,9 @@ class ContainerParametersResourceCheckerTest extends TestCase
             $container->method('getParameter')->with('locales')->willReturn(['nl', 'es']);
         }, false];
 
-        yield 'fresh on every identical parameters' => [function (MockObject $container) {
-            $container->expects(self::exactly(2))->method('hasParameter')->willReturn(true);
-            $container->expects(self::exactly(2))->method('getParameter')
+        yield 'fresh on every identical parameters' => [function (MockObject $container, TestCase $testCase) {
+            $container->expects($testCase->exactly(2))->method('hasParameter')->willReturn(true);
+            $container->expects($testCase->exactly(2))->method('getParameter')
                 ->willReturnCallback(function (...$args) {
                     static $series = [
                         [['locales'], ['fr', 'en']],

@@ -95,7 +95,7 @@ class SodiumPasswordHasherTest extends TestCase
             throw $throwable;
         }
 
-        if (null === $hash) {
+        if (!$hash) {
             // we also skip the test in case password_hash() returns null as
             // implemented in security patches backports
             //

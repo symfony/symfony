@@ -120,7 +120,7 @@ class NativePasswordHasherTest extends TestCase
             throw $throwable;
         }
 
-        if (null === $hash) {
+        if (!$hash) {
             // we also skip the test in case password_hash() returns null as
             // implemented in security patches backports
             //
@@ -128,6 +128,7 @@ class NativePasswordHasherTest extends TestCase
             $this->markTestSkipped('password_hash() does not accept passwords containing NUL bytes.');
         }
 
+        dump($hash, $plainPassword);
         $this->assertTrue($hasher->verify($hash, $plainPassword));
     }
 

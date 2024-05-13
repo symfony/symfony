@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+7.2
+---
+
+ * Add method `getLastPeriod()` to `StopwatchEvent`
+
 5.2
 ---
 

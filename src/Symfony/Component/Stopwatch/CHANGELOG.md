@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+7.2
+---
+
+ * Add `getRootSectionEvents()` method and `ROOT` constant to `Stopwatch`
+
 5.2
 ---
 

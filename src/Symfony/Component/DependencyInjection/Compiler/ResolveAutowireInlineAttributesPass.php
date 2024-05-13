@@ -52,18 +52,13 @@ class ResolveAutowireInlineAttributesPass extends AbstractRecursivePass
             }
         }
 
-        $dummy = $value;
-        while (null === $dummy->getClass() && $dummy instanceof ChildDefinition) {
-            $dummy = $this->container->findDefinition($dummy->getParent());
-        }
-
         $methodCalls = $value->getMethodCalls();
 
         foreach ($methodCalls as $i => $call) {
             [$method, $arguments] = $call;
 
             try {
-                $method = $this->getReflectionMethod($dummy, $method);
+                $method = $this->getReflectionMethod($value, $method);
             } catch (RuntimeException) {
                 continue;
             }
@@ -89,19 +84,14 @@ class ResolveAutowireInlineAttributesPass extends AbstractRecursivePass
         if ($method->isVariadic()) {
             array_pop($parameters);
         }
-        $dummyContainer = new ContainerBuilder($this->container->getParameterBag());
+        $paramResolverContainer = new ContainerBuilder($this->container->getParameterBag());
 
         foreach ($parameters as $index => $parameter) {
             if ($isChildDefinition) {
                 $index = 'index_'.$index;
             }
 
-            $name = '$'.$parameter->name;
-            if (\array_key_exists($name, $arguments)) {
-                $arguments[$index] = $arguments[$name];
-                unset($arguments[$name]);
-            }
-            if (\array_key_exists($index, $arguments) && '' !== $arguments[$index]) {
+            if (\array_key_exists('$'.$parameter->name, $arguments) || (\array_key_exists($index, $arguments) && '' !== $arguments[$index])) {
                 continue;
             }
             if (!$attribute = $parameter->getAttributes(AutowireInline::class, \ReflectionAttribute::IS_INSTANCEOF)[0] ?? null) {
@@ -117,13 +107,13 @@ class ResolveAutowireInlineAttributesPass extends AbstractRecursivePass
             $attribute = $attribute->newInstance();
             $definition = $attribute->buildDefinition($attribute->value, $type, $parameter);
 
-            $dummyContainer->setDefinition('.autowire_inline', $definition);
-            (new ResolveParameterPlaceHoldersPass(false, false))->process($dummyContainer);
+            $paramResolverContainer->setDefinition('.autowire_inline', $definition);
+            (new ResolveParameterPlaceHoldersPass(false, false))->process($paramResolverContainer);
 
             $id = '.autowire_inline.'.ContainerBuilder::hash([$this->currentId, $method->class ?? null, $method->name, (string) $parameter]);
 
             $this->container->setDefinition($id, $definition);
-            $arguments[$index] = new Reference($id);
+            $arguments[$isChildDefinition ? '$'.$parameter->name : $index] = new Reference($id);
 
             if ($definition->isAutowired()) {
                 $currentId = $this->currentId;

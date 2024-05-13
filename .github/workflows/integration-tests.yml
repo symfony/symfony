@@ -99,9 +99,9 @@ jobs:
         ports:
           - 4566:4566
       zookeeper:
-        image: wurstmeister/zookeeper:3.4.6
+        image: zookeeper
       kafka:
-        image: wurstmeister/kafka:2.12-2.0.1
+        image: bitnami/kafka:3.7
         ports:
           - 9092:9092
         env:

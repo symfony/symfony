@@ -6,6 +6,7 @@ CHANGELOG
 
  * Pass the current token to the `checkPostAuth()` method of user checkers
  * Deprecate argument `$secret` of `RememberMeAuthenticator`
+ * Add discovery support to `OidcTokenHandler` and `OidcUserInfoTokenHandler`
 
 7.1
 ---

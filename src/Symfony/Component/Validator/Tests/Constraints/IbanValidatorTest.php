@@ -401,6 +401,12 @@ class IbanValidatorTest extends ConstraintValidatorTestCase
             ['UA213223130000026007233566002'], // Ukraine
             ['AE260211000000230064017'], // United Arab Emirates
             ['VA59001123000012345671'], // Vatican City State
+
+            // Checksum digits not between 02 and 98
+            ['FO00 5432 0388 8999 44'], // Faroe Islands
+            ['NL01INGB0001393698'], // Netherlands
+            ['NL01RABO0331811235'], // Netherlands
+            ['RU99 0445 2560 0407 0281 0412 3456 7890 1'], // Russia
         ];
     }
 

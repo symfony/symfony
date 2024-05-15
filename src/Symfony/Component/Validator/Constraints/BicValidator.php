@@ -100,6 +100,9 @@ class BicValidator extends ConstraintValidator
         }
 
         $bicCountryCode = substr($canonicalize, 4, 2);
+        if (Bic::VALIDATION_MODE_CASE_INSENSITIVE === $constraint->mode) {
+            $bicCountryCode = strtoupper($bicCountryCode);
+        }
         if (!isset(self::BIC_COUNTRY_TO_IBAN_COUNTRY_MAP[$bicCountryCode]) && !Countries::exists($bicCountryCode)) {
             $this->context->buildViolation($constraint->message)
                 ->setParameter('{{ value }}', $this->formatValue($value))
@@ -109,8 +112,8 @@ class BicValidator extends ConstraintValidator
             return;
         }
 
-        // should contain uppercase characters only
-        if (strtoupper($canonicalize) !== $canonicalize) {
+        // should contain uppercase characters only in strict mode
+        if (Bic::VALIDATION_MODE_STRICT === $constraint->mode && strtoupper($canonicalize) !== $canonicalize) {
             $this->context->buildViolation($constraint->message)
                 ->setParameter('{{ value }}', $this->formatValue($value))
                 ->setCode(Bic::INVALID_CASE_ERROR)

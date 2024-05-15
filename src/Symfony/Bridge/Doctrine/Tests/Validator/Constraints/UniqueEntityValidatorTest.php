@@ -952,6 +952,40 @@ class UniqueEntityValidatorTest extends ConstraintValidatorTestCase
 
     public function testValidateDTOUniqueness()
     {
+        $constraint = new UniqueEntity(
+            message: 'myMessage',
+            fields: ['name'],
+            em: self::EM_NAME,
+            entityClass: Person::class,
+        );
+
+        $entity = new Person(1, 'Foo');
+        $dto = new HireAnEmployee('Foo');
+
+        $this->validator->validate($entity, $constraint);
+
+        $this->assertNoViolation();
+
+        $this->em->persist($entity);
+        $this->em->flush();
+
+        $this->validator->validate($entity, $constraint);
+
+        $this->assertNoViolation();
+
+        $this->validator->validate($dto, $constraint);
+
+        $this->buildViolation('myMessage')
+            ->atPath('property.path.name')
+            ->setInvalidValue('Foo')
+            ->setCode(UniqueEntity::NOT_UNIQUE_ERROR)
+            ->setCause([$entity])
+            ->setParameters(['{{ value }}' => '"Foo"'])
+            ->assertRaised();
+    }
+
+    public function testValidateDTOUniquenessDoctrineStyle()
+    {
         $constraint = new UniqueEntity([
             'message' => 'myMessage',
             'fields' => ['name'],
@@ -986,6 +1020,32 @@ class UniqueEntityValidatorTest extends ConstraintValidatorTestCase
 
     public function testValidateMappingOfFieldNames()
     {
+        $constraint = new UniqueEntity(
+            message: 'myMessage',
+            fields: ['primaryName' => 'name', 'secondaryName' => 'name2'],
+            em: self::EM_NAME,
+            entityClass: DoubleNameEntity::class,
+        );
+
+        $entity = new DoubleNameEntity(1, 'Foo', 'Bar');
+        $dto = new CreateDoubleNameEntity('Foo', 'Bar');
+
+        $this->em->persist($entity);
+        $this->em->flush();
+
+        $this->validator->validate($dto, $constraint);
+
+        $this->buildViolation('myMessage')
+            ->atPath('property.path.name')
+            ->setParameter('{{ value }}', '"Foo"')
+            ->setInvalidValue('Foo')
+            ->setCause([$entity])
+            ->setCode(UniqueEntity::NOT_UNIQUE_ERROR)
+            ->assertRaised();
+    }
+
+    public function testValidateMappingOfFieldNamesDoctrineStyle()
+    {
         $constraint = new UniqueEntity([
             'message' => 'myMessage',
             'fields' => ['primaryName' => 'name', 'secondaryName' => 'name2'],
@@ -1014,6 +1074,21 @@ class UniqueEntityValidatorTest extends ConstraintValidatorTestCase
     {
         $this->expectException(ConstraintDefinitionException::class);
         $this->expectExceptionMessage('The field "primaryName" is not a property of class "Symfony\Bridge\Doctrine\Tests\Fixtures\HireAnEmployee".');
+        $constraint = new UniqueEntity(
+            message: 'myMessage',
+            fields: ['primaryName' => 'name'],
+            em: self::EM_NAME,
+            entityClass: SingleStringIdEntity::class,
+        );
+
+        $dto = new HireAnEmployee('Foo');
+        $this->validator->validate($dto, $constraint);
+    }
+
+    public function testInvalidateDTOFieldNameDoctrineStyle()
+    {
+        $this->expectException(ConstraintDefinitionException::class);
+        $this->expectExceptionMessage('The field "primaryName" is not a property of class "Symfony\Bridge\Doctrine\Tests\Fixtures\HireAnEmployee".');
         $constraint = new UniqueEntity([
             'message' => 'myMessage',
             'fields' => ['primaryName' => 'name'],
@@ -1029,6 +1104,21 @@ class UniqueEntityValidatorTest extends ConstraintValidatorTestCase
     {
         $this->expectException(ConstraintDefinitionException::class);
         $this->expectExceptionMessage('The field "name2" is not mapped by Doctrine, so it cannot be validated for uniqueness.');
+        $constraint = new UniqueEntity(
+            message: 'myMessage',
+            fields: ['name2'],
+            em: self::EM_NAME,
+            entityClass: SingleStringIdEntity::class,
+        );
+
+        $dto = new HireAnEmployee('Foo');
+        $this->validator->validate($dto, $constraint);
+    }
+
+    public function testInvalidateEntityFieldNameDoctrineStyle()
+    {
+        $this->expectException(ConstraintDefinitionException::class);
+        $this->expectExceptionMessage('The field "name2" is not mapped by Doctrine, so it cannot be validated for uniqueness.');
         $constraint = new UniqueEntity([
             'message' => 'myMessage',
             'fields' => ['name2'],
@@ -1041,6 +1131,36 @@ class UniqueEntityValidatorTest extends ConstraintValidatorTestCase
     }
 
     public function testValidateDTOUniquenessWhenUpdatingEntity()
+    {
+        $constraint = new UniqueEntity(
+            message: 'myMessage',
+            fields: ['name'],
+            em: self::EM_NAME,
+            entityClass: Person::class,
+            identifierFieldNames: ['id'],
+        );
+
+        $entity1 = new Person(1, 'Foo');
+        $entity2 = new Person(2, 'Bar');
+
+        $this->em->persist($entity1);
+        $this->em->persist($entity2);
+        $this->em->flush();
+
+        $dto = new UpdateEmployeeProfile(2, 'Foo');
+
+        $this->validator->validate($dto, $constraint);
+
+        $this->buildViolation('myMessage')
+            ->atPath('property.path.name')
+            ->setInvalidValue('Foo')
+            ->setCode(UniqueEntity::NOT_UNIQUE_ERROR)
+            ->setCause([$entity1])
+            ->setParameters(['{{ value }}' => '"Foo"'])
+            ->assertRaised();
+    }
+
+    public function testValidateDTOUniquenessWhenUpdatingEntityDoctrineStyle()
     {
         $constraint = new UniqueEntity([
             'message' => 'myMessage',
@@ -1072,6 +1192,28 @@ class UniqueEntityValidatorTest extends ConstraintValidatorTestCase
 
     public function testValidateDTOUniquenessWhenUpdatingEntityWithTheSameValue()
     {
+        $constraint = new UniqueEntity(
+            message: 'myMessage',
+            fields: ['name'],
+            em: self::EM_NAME,
+            entityClass: CompositeIntIdEntity::class,
+            identifierFieldNames: ['id1', 'id2'],
+        );
+
+        $entity = new CompositeIntIdEntity(1, 2, 'Foo');
+
+        $this->em->persist($entity);
+        $this->em->flush();
+
+        $dto = new UpdateCompositeIntIdEntity(1, 2, 'Foo');
+
+        $this->validator->validate($dto, $constraint);
+
+        $this->assertNoViolation();
+    }
+
+    public function testValidateDTOUniquenessWhenUpdatingEntityWithTheSameValueDoctrineStyle()
+    {
         $constraint = new UniqueEntity([
             'message' => 'myMessage',
             'fields' => ['name'],
@@ -1093,6 +1235,35 @@ class UniqueEntityValidatorTest extends ConstraintValidatorTestCase
     }
 
     public function testValidateIdentifierMappingOfFieldNames()
+    {
+        $constraint = new UniqueEntity(
+            message: 'myMessage',
+            fields: ['object1' => 'objectOne', 'object2' => 'objectTwo'],
+            em: self::EM_NAME,
+            entityClass: CompositeObjectNoToStringIdEntity::class,
+            identifierFieldNames: ['object1' => 'objectOne', 'object2' => 'objectTwo'],
+        );
+
+        $objectOne = new SingleIntIdNoToStringEntity(1, 'foo');
+        $objectTwo = new SingleIntIdNoToStringEntity(2, 'bar');
+
+        $this->em->persist($objectOne);
+        $this->em->persist($objectTwo);
+        $this->em->flush();
+
+        $entity = new CompositeObjectNoToStringIdEntity($objectOne, $objectTwo);
+
+        $this->em->persist($entity);
+        $this->em->flush();
+
+        $dto = new UpdateCompositeObjectNoToStringIdEntity($objectOne, $objectTwo, 'Foo');
+
+        $this->validator->validate($dto, $constraint);
+
+        $this->assertNoViolation();
+    }
+
+    public function testValidateIdentifierMappingOfFieldNamesDoctrineStyle()
     {
         $constraint = new UniqueEntity([
             'message' => 'myMessage',
@@ -1125,6 +1296,34 @@ class UniqueEntityValidatorTest extends ConstraintValidatorTestCase
     {
         $this->expectException(ConstraintDefinitionException::class);
         $this->expectExceptionMessage('The "Symfony\Bridge\Doctrine\Tests\Fixtures\CompositeObjectNoToStringIdEntity" entity identifier field names should be "objectOne, objectTwo", not "objectTwo".');
+        $constraint = new UniqueEntity(
+            message: 'myMessage',
+            fields: ['object1' => 'objectOne', 'object2' => 'objectTwo'],
+            em: self::EM_NAME,
+            entityClass: CompositeObjectNoToStringIdEntity::class,
+            identifierFieldNames: ['object2' => 'objectTwo'],
+        );
+
+        $objectOne = new SingleIntIdNoToStringEntity(1, 'foo');
+        $objectTwo = new SingleIntIdNoToStringEntity(2, 'bar');
+
+        $this->em->persist($objectOne);
+        $this->em->persist($objectTwo);
+        $this->em->flush();
+
+        $entity = new CompositeObjectNoToStringIdEntity($objectOne, $objectTwo);
+
+        $this->em->persist($entity);
+        $this->em->flush();
+
+        $dto = new UpdateCompositeObjectNoToStringIdEntity($objectOne, $objectTwo, 'Foo');
+        $this->validator->validate($dto, $constraint);
+    }
+
+    public function testInvalidateMissingIdentifierFieldNameDoctrineStyle()
+    {
+        $this->expectException(ConstraintDefinitionException::class);
+        $this->expectExceptionMessage('The "Symfony\Bridge\Doctrine\Tests\Fixtures\CompositeObjectNoToStringIdEntity" entity identifier field names should be "objectOne, objectTwo", not "objectTwo".');
         $constraint = new UniqueEntity([
             'message' => 'myMessage',
             'fields' => ['object1' => 'objectOne', 'object2' => 'objectTwo'],
@@ -1152,6 +1351,25 @@ class UniqueEntityValidatorTest extends ConstraintValidatorTestCase
     public function testUninitializedValueThrowException()
     {
         $this->expectExceptionMessage('Typed property Symfony\Bridge\Doctrine\Tests\Fixtures\Dto::$foo must not be accessed before initialization');
+        $constraint = new UniqueEntity(
+            message: 'myMessage',
+            fields: ['foo' => 'name'],
+            em: self::EM_NAME,
+            entityClass: DoubleNameEntity::class,
+        );
+
+        $entity = new DoubleNameEntity(1, 'Foo', 'Bar');
+        $dto = new Dto();
+
+        $this->em->persist($entity);
+        $this->em->flush();
+
+        $this->validator->validate($dto, $constraint);
+    }
+
+    public function testUninitializedValueThrowExceptionDoctrineStyle()
+    {
+        $this->expectExceptionMessage('Typed property Symfony\Bridge\Doctrine\Tests\Fixtures\Dto::$foo must not be accessed before initialization');
         $constraint = new UniqueEntity([
             'message' => 'myMessage',
             'fields' => ['foo' => 'name'],
@@ -1169,6 +1387,27 @@ class UniqueEntityValidatorTest extends ConstraintValidatorTestCase
     }
 
     public function testEntityManagerNullObjectWhenDTO()
+    {
+        $this->expectException(ConstraintDefinitionException::class);
+        $this->expectExceptionMessage('Unable to find the object manager associated with an entity of class "Symfony\Bridge\Doctrine\Tests\Fixtures\Person"');
+        $constraint = new UniqueEntity(
+            message: 'myMessage',
+            fields: ['name'],
+            entityClass: Person::class,
+            // no "em" option set
+        );
+
+        $this->em = null;
+        $this->registry = $this->createRegistryMock($this->em);
+        $this->validator = $this->createValidator();
+        $this->validator->initialize($this->context);
+
+        $dto = new HireAnEmployee('Foo');
+
+        $this->validator->validate($dto, $constraint);
+    }
+
+    public function testEntityManagerNullObjectWhenDTODoctrineStyle()
     {
         $this->expectException(ConstraintDefinitionException::class);
         $this->expectExceptionMessage('Unable to find the object manager associated with an entity of class "Symfony\Bridge\Doctrine\Tests\Fixtures\Person"');

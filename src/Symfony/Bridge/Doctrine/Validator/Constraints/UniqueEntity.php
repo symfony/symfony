@@ -60,9 +60,9 @@ class UniqueEntity extends Constraint
         $payload = null,
         array $options = [],
     ) {
-        if (\is_array($fields) && \is_string(key($fields))) {
+        if (\is_array($fields) && \is_string(key($fields)) && [] === array_diff(array_keys($fields), array_keys(get_class_vars(static::class)))) {
             $options = array_merge($fields, $options);
-        } elseif (null !== $fields) {
+        } else {
             $options['fields'] = $fields;
         }
 

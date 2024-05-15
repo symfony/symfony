@@ -45,11 +45,21 @@ class TestSessionListenerTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->listener = $this->getMockForAbstractClass(AbstractTestSessionListener::class);
         $this->session = $this->getSession();
-        $this->listener->expects($this->any())
-             ->method('getSession')
-             ->willReturn($this->session);
+        $this->listener = new class($this->session) extends AbstractTestSessionListener {
+            private $session;
+
+            public function __construct($session)
+            {
+                parent::__construct();
+                $this->session = $session;
+            }
+
+            public function getSession(): ?SessionInterface
+            {
+                return $this->session;
+            }
+        };
     }
 
     public function testShouldSaveMainRequestSession()

@@ -56,11 +56,15 @@ class AbstractPreAuthenticatedListenerTest extends TestCase
             ->willReturn($token)
         ;
 
-        $listener = $this->getMockForAbstractClass(AbstractPreAuthenticatedListener::class, [
-            $tokenStorage,
-            $authenticationManager,
-            'TheProviderKey',
-        ]);
+        $listener = $this->getMockBuilder(AbstractPreAuthenticatedListener::class)
+            ->setConstructorArgs([
+                $tokenStorage,
+                $authenticationManager,
+                'TheProviderKey',
+            ])
+            ->onlyMethods(['getPreAuthenticatedData'])
+            ->getMock();
+
         $listener
             ->expects($this->once())
             ->method('getPreAuthenticatedData')
@@ -95,12 +99,15 @@ class AbstractPreAuthenticatedListenerTest extends TestCase
             ->willThrowException($exception)
         ;
 
-        $listener = $this->getMockForAbstractClass(
-            AbstractPreAuthenticatedListener::class, [
-            $tokenStorage,
-            $authenticationManager,
-            'TheProviderKey',
-        ]);
+        $listener = $this->getMockBuilder(AbstractPreAuthenticatedListener::class)
+            ->setConstructorArgs([
+                $tokenStorage,
+                $authenticationManager,
+                'TheProviderKey',
+            ])
+            ->onlyMethods(['getPreAuthenticatedData'])
+            ->getMock();
+
         $listener
             ->expects($this->once())
             ->method('getPreAuthenticatedData')
@@ -137,12 +144,15 @@ class AbstractPreAuthenticatedListenerTest extends TestCase
             ->willThrowException($exception)
         ;
 
-        $listener = $this->getMockForAbstractClass(
-            AbstractPreAuthenticatedListener::class, [
-            $tokenStorage,
-            $authenticationManager,
-            'TheProviderKey',
-        ]);
+        $listener = $this->getMockBuilder(AbstractPreAuthenticatedListener::class)
+            ->setConstructorArgs([
+                $tokenStorage,
+                $authenticationManager,
+                'TheProviderKey',
+            ])
+            ->onlyMethods(['getPreAuthenticatedData'])
+            ->getMock();
+
         $listener
             ->expects($this->once())
             ->method('getPreAuthenticatedData')
@@ -174,12 +184,15 @@ class AbstractPreAuthenticatedListenerTest extends TestCase
             ->method('authenticate')
         ;
 
-        $listener = $this->getMockForAbstractClass(
-            AbstractPreAuthenticatedListener::class, [
-            $tokenStorage,
-            $authenticationManager,
-            'TheProviderKey',
-        ]);
+        $listener = $this->getMockBuilder(AbstractPreAuthenticatedListener::class)
+            ->setConstructorArgs([
+                $tokenStorage,
+                $authenticationManager,
+                'TheProviderKey',
+            ])
+            ->onlyMethods(['getPreAuthenticatedData'])
+            ->getMock();
+
         $listener
             ->expects($this->once())
             ->method('getPreAuthenticatedData')
@@ -217,12 +230,15 @@ class AbstractPreAuthenticatedListenerTest extends TestCase
             ->willThrowException($exception)
         ;
 
-        $listener = $this->getMockForAbstractClass(
-            AbstractPreAuthenticatedListener::class, [
-            $tokenStorage,
-            $authenticationManager,
-            'TheProviderKey',
-        ]);
+        $listener = $this->getMockBuilder(AbstractPreAuthenticatedListener::class)
+            ->setConstructorArgs([
+                $tokenStorage,
+                $authenticationManager,
+                'TheProviderKey',
+            ])
+            ->onlyMethods(['getPreAuthenticatedData'])
+            ->getMock();
+
         $listener
             ->expects($this->once())
             ->method('getPreAuthenticatedData')

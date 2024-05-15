@@ -74,6 +74,10 @@
                 <source>Too many failed login attempts, please try again in %minutes% minute.</source>
                 <target>Zu vill fehlgeschloen Loginversich, w. e. g. probéiert nach am %minutes% Minutt.</target>
             </trans-unit>
+            <trans-unit id="20">
+                <source>Too many failed login attempts, please try again in %minutes% minutes.</source>
+                <target state="needs-translation">Too many failed login attempts, please try again in %minutes% minutes.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

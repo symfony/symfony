@@ -37,10 +37,10 @@ class DOMCasterTest extends TestCase
      */
     public function testCastModernImplementation()
     {
-        $implementation = new \DOM\Implementation();
+        $implementation = new \Dom\Implementation();
 
         $this->assertDumpEquals(<<<'EODUMP'
-            DOM\Implementation {
+            Dom\Implementation {
               Core: "1.0"
               XML: "2.0"
             }
@@ -72,14 +72,14 @@ class DOMCasterTest extends TestCase
      */
     public function testCastModernNode()
     {
-        $doc = \DOM\XMLDocument::createFromString('<foo><bar/></foo>');
+        $doc = \Dom\XMLDocument::createFromString('<foo><bar/></foo>');
         $node = $doc->documentElement->firstChild;
 
         $this->assertDumpMatchesFormat(<<<'EODUMP'
-            DOM\Element {%A
+            Dom\Element {%A
               +baseURI: ? string
               +isConnected: ? bool
-              +ownerDocument: ? ?DOM\Document
+              +ownerDocument: ? ?Dom\Document
             %A}
             EODUMP,
             $node
@@ -110,10 +110,10 @@ class DOMCasterTest extends TestCase
      */
     public function testCastXMLDocument()
     {
-        $doc = \DOM\XMLDocument::createFromString('<foo><bar/></foo>');
+        $doc = \Dom\XMLDocument::createFromString('<foo><bar/></foo>');
 
         $this->assertDumpMatchesFormat(<<<'EODUMP'
-            DOM\XMLDocument {%A
+            Dom\XMLDocument {%A
               xml: """
                 <?xml version="1.0" encoding="UTF-8"?>\n
                 <foo>\n
@@ -131,10 +131,10 @@ class DOMCasterTest extends TestCase
      */
     public function testCastHTMLDocument()
     {
-        $doc = \DOM\HTMLDocument::createFromString('<!DOCTYPE html><html><body><p>foo</p></body></html>');
+        $doc = \Dom\HTMLDocument::createFromString('<!DOCTYPE html><html><body><p>foo</p></body></html>');
 
         $this->assertDumpMatchesFormat(<<<'EODUMP'
-            DOM\HTMLDocument {%A
+            Dom\HTMLDocument {%A
               html: "<!DOCTYPE html><html><head></head><body><p>foo</p></body></html>"
             }
             EODUMP,
@@ -160,9 +160,9 @@ class DOMCasterTest extends TestCase
      */
     public function testCastModernText()
     {
-        $text = \DOM\HTMLDocument::createEmpty()->createTextNode('foo');
+        $text = \Dom\HTMLDocument::createEmpty()->createTextNode('foo');
         $this->assertDumpMatchesFormat(<<<'EODUMP'
-            DOM\Text {%A
+            Dom\Text {%A
               +wholeText: ? string
             }
             EODUMP,
@@ -192,13 +192,13 @@ class DOMCasterTest extends TestCase
      */
     public function testCastModernAttr()
     {
-        $attr = \DOM\HTMLDocument::createEmpty()->createAttribute('attr');
+        $attr = \Dom\HTMLDocument::createEmpty()->createAttribute('attr');
 
         $this->assertDumpMatchesFormat(<<<'EODUMP'
-            DOM\Attr {%A
+            Dom\Attr {%A
               +name: ? string
               +value: ? string
-              +ownerElement: ? ?DOM\Element
+              +ownerElement: ? ?Dom\Element
               +specified: true
             }
             EODUMP,
@@ -224,10 +224,10 @@ class DOMCasterTest extends TestCase
      */
     public function testCastModernElement()
     {
-        $attr = \DOM\HTMLDocument::createEmpty()->createElement('foo');
+        $attr = \Dom\HTMLDocument::createEmpty()->createElement('foo');
 
         $this->assertDumpMatchesFormat(<<<'EODUMP'
-            DOM\Element {%A
+            Dom\Element {%A
               +tagName: ? string
             %A}
             EODUMP,
@@ -259,14 +259,14 @@ class DOMCasterTest extends TestCase
      */
     public function testCastModernDocumentType()
     {
-        $implementation = new \DOM\Implementation();
+        $implementation = new \Dom\Implementation();
         $type = $implementation->createDocumentType('html', 'publicId', 'systemId');
 
         $this->assertDumpMatchesFormat(<<<'EODUMP'
-            DOM\DocumentType {%A
+            Dom\DocumentType {%A
               +name: ? string
-              +entities: ? DOM\DTDNamedNodeMap
-              +notations: ? DOM\DTDNamedNodeMap
+              +entities: ? Dom\DtdNamedNodeMap
+              +notations: ? Dom\DtdNamedNodeMap
               +publicId: ? string
               +systemId: ? string
               +internalSubset: ? ?string
@@ -295,10 +295,10 @@ class DOMCasterTest extends TestCase
      */
     public function testCastModernProcessingInstruction()
     {
-        $entity = \DOM\HTMLDocument::createEmpty()->createProcessingInstruction('target', 'data');
+        $entity = \Dom\HTMLDocument::createEmpty()->createProcessingInstruction('target', 'data');
 
         $this->assertDumpMatchesFormat(<<<'EODUMP'
-            DOM\ProcessingInstruction {%A
+            Dom\ProcessingInstruction {%A
               +data: ? string
               +length: ? int
               +target: ? string
@@ -327,11 +327,11 @@ class DOMCasterTest extends TestCase
      */
     public function testCastModernXPath()
     {
-        $entity = new \DOM\XPath(\DOM\HTMLDocument::createEmpty());
+        $entity = new \Dom\XPath(\Dom\HTMLDocument::createEmpty());
 
         $this->assertDumpEquals(<<<'EODUMP'
-            DOM\XPath {
-              +document: ? DOM\Document
+            Dom\XPath {
+              +document: ? Dom\Document
               +registerNodeNamespaces: ? bool
             }
             EODUMP,

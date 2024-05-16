@@ -24,10 +24,10 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
  */
 abstract class Voter implements VoterInterface, CacheableVoterInterface
 {
-    public function vote(TokenInterface $token, mixed $subject, array $attributes): int
+    public function getVote(TokenInterface $token, mixed $subject, array $attributes): Vote
     {
         // abstain vote by default in case none of the attributes are supported
-        $vote = self::ACCESS_ABSTAIN;
+        $vote = $this->abstain();
 
         foreach ($attributes as $attribute) {
             try {
@@ -43,15 +43,64 @@ abstract class Voter implements VoterInterface, CacheableVoterInterface
             }
 
             // as soon as at least one attribute is supported, default is to deny access
-            $vote = self::ACCESS_DENIED;
+            if (!$vote->isDenied()) {
+                $vote = $this->deny();
+            }
 
-            if ($this->voteOnAttribute($attribute, $subject, $token)) {
+            $decision = $this->voteOnAttribute($attribute, $subject, $token);
+            if (\is_bool($decision)) {
+                trigger_deprecation('symfony/security-core', '7.1', 'Returning a boolean in "%s::voteOnAttribute()" is deprecated, return an instance of "%s" instead.', static::class, Vote::class);
+                $decision = $decision ? $this->grant() : $this->deny();
+            }
+
+            if ($decision->isGranted()) {
                 // grant access as soon as at least one attribute returns a positive response
-                return self::ACCESS_GRANTED;
+                return $decision;
+            }
+
+            if ('' !== $decisionMessage = $decision->getMessage()) {
+                $vote->addMessage($decisionMessage);
             }
         }
 
         return $vote;
+    }
+
+    public function vote(TokenInterface $token, mixed $subject, array $attributes): int
+    {
+        trigger_deprecation('symfony/security-core', '7.1', 'Method "%s::vote()" has been deprecated, use "%s::getVote()" instead.', __CLASS__, __CLASS__);
+
+        return $this->getVote($token, $subject, $attributes)->getAccess();
+    }
+
+    /**
+     * Creates a granted vote.
+     *
+     * @param string|string[] $messages
+     */
+    protected function grant(string|array $messages = [], array $context = []): Vote
+    {
+        return Vote::createGranted($messages, $context);
+    }
+
+    /**
+     * Creates an abstained vote.
+     *
+     * @param string|string[] $messages
+     */
+    protected function abstain(string|array $messages = [], array $context = []): Vote
+    {
+        return Vote::createAbstain($messages, $context);
+    }
+
+    /**
+     * Creates a denied vote.
+     *
+     * @param string|string[] $messages
+     */
+    protected function deny(string|array $messages = [], array $context = []): Vote
+    {
+        return Vote::createDenied($messages, $context);
     }
 
     /**
@@ -90,6 +139,8 @@ abstract class Voter implements VoterInterface, CacheableVoterInterface
      *
      * @param TAttribute $attribute
      * @param TSubject   $subject
+     *
+     * @return Vote|bool Returning a boolean is deprecated since Symfony 7.1. Return a Vote object instead.
      */
-    abstract protected function voteOnAttribute(string $attribute, mixed $subject, TokenInterface $token): bool;
+    abstract protected function voteOnAttribute(string $attribute, mixed $subject, TokenInterface $token): Vote|bool;
 }

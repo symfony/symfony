@@ -43,6 +43,7 @@
         "symfony/event-dispatcher": "<6.4",
         "symfony/http-client-contracts": "<3.0",
         "symfony/security-bundle": "<6.4",
+        "symfony/security-core": "<7.1",
         "symfony/security-csrf": "<6.4"
     },
     "autoload": {

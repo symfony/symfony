@@ -17,6 +17,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Core\Authorization\AccessDecision;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Security\Core\Exception\LogicException;
 use Symfony\Component\Security\Core\Exception\LogoutException;
@@ -59,8 +60,20 @@ class Security implements AuthorizationCheckerInterface
      */
     public function isGranted(mixed $attributes, mixed $subject = null): bool
     {
-        return $this->container->get('security.authorization_checker')
-            ->isGranted($attributes, $subject);
+        return $this->getDecision($attributes, $subject)->isGranted();
+    }
+
+    /**
+     * Get the access decision against the current authentication token and optionally supplied subject.
+     */
+    public function getDecision(mixed $attribute, mixed $subject = null): AccessDecision
+    {
+        $checker = $this->container->get('security.authorization_checker');
+        if (method_exists($checker, 'getDecision')) {
+            return $checker->getDecision($attribute, $subject);
+        }
+
+        return $checker->isGranted($attribute, $subject) ? AccessDecision::createGranted() : AccessDecision::createDenied();
     }
 
     public function getToken(): ?TokenInterface

@@ -59,6 +59,7 @@
         "symfony/framework-bundle": "<6.4",
         "symfony/http-client": "<6.4",
         "symfony/ldap": "<6.4",
+        "symfony/security-core": "<7.1",
         "symfony/serializer": "<6.4",
         "symfony/twig-bundle": "<6.4",
         "symfony/validator": "<6.4"

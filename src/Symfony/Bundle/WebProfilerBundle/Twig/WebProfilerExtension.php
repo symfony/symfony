@@ -14,7 +14,6 @@ namespace Symfony\Bundle\WebProfilerBundle\Twig;
 use Symfony\Component\VarDumper\Cloner\Data;
 use Symfony\Component\VarDumper\Dumper\HtmlDumper;
 use Twig\Environment;
-use Twig\Extension\EscaperExtension;
 use Twig\Extension\ProfilerExtension;
 use Twig\Profiler\Profile;
 use Twig\Runtime\EscaperRuntime;
@@ -109,17 +108,6 @@ class WebProfilerExtension extends ProfilerExtension
 
     private static function escape(Environment $env, string $s): string
     {
-        // Twig 3.10 and above
-        if (class_exists(EscaperRuntime::class)) {
-            return $env->getRuntime(EscaperRuntime::class)->escape($s);
-        }
-
-        // Twig 3.9
-        if (method_exists(EscaperExtension::class, 'escape')) {
-            return EscaperExtension::escape($env, $s);
-        }
-
-        // to be removed when support for Twig 3 is dropped
-        return twig_escape_filter($env, $s);
+        return $env->getRuntime(EscaperRuntime::class)->escape($s);
     }
 }

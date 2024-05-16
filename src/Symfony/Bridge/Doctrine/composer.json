@@ -22,7 +22,8 @@
         "symfony/deprecation-contracts": "^2.5|^3",
         "symfony/polyfill-ctype": "~1.8",
         "symfony/polyfill-mbstring": "~1.0",
-        "symfony/service-contracts": "^2.5|^3"
+        "symfony/service-contracts": "^2.5|^3",
+        "symfony/validator": "^6.4|^7.0"
     },
     "require-dev": {
         "symfony/cache": "^5.4|^6.0|^7.0",
@@ -41,7 +42,6 @@
         "symfony/stopwatch": "^5.4|^6.0|^7.0",
         "symfony/translation": "^5.4|^6.0|^7.0",
         "symfony/uid": "^5.4|^6.0|^7.0",
-        "symfony/validator": "^6.4|^7.0",
         "symfony/var-dumper": "^5.4|^6.0|^7.0",
         "doctrine/collections": "^1.0|^2.0",
         "doctrine/data-fixtures": "^1.1",

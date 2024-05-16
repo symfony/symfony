@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by acoulton at 2024-05-10T09:10:21Z
+
+As far as I can see the coding standards and test failures are unrelated to the change in this branch - but please let me know if you want any changes.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2024-05-10T19:51:25Z
+
+The proposed solution works for me but:
+
+> However, the error is still passed to any custom handler that the application has registered, and can therefore cause exceptions or spurious logging depending on the implementation of the handler.
+
+This is still an error in the custom error handler if it doesn't respect the silencing of errors and should be fixed nonetheless as an error handler throwing no matter if the error was silenced can still throw too eagerly.
+
+---------------------------------------------------------------------------
+
+by acoulton at 2024-05-13T08:13:54Z
+
+> This is still an error in the custom error handler if it doesn't respect the silencing of errors and should be fixed nonetheless as an error handler throwing no matter if the error was silenced can still throw too eagerly.
+
+That's probably true. At the same time, I don't think a library should be relying on the silencing operator to suppress errors that are emitted during expected usage of a method - in particular if it hasn't done so in the past, since this might break existing applications where the over-eager throw has not historically caused any problems.

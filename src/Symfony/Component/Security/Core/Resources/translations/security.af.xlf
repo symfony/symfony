@@ -74,6 +74,10 @@
                 <source>Too many failed login attempts, please try again in %minutes% minute.</source>
                 <target state="needs-review-translation">Te veel mislukte aanmeldpogings, probeer asseblief weer oor %minutes% minuut.</target>
             </trans-unit>
+            <trans-unit id="20">
+                <source>Too many failed login attempts, please try again in %minutes% minutes.</source>
+                <target state="needs-review-translation">Te veel mislukte aanmeldpogings, probeer asseblief weer oor %minutes% minute.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

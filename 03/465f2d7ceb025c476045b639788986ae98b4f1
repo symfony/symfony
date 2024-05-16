@@ -1,0 +1,18 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-05-15T18:55:47Z
+
+The CI is supposed to detect when a translation is missing from a file and to suggest running the sync-translations.php script to invite doing so to update the PR. Can you please check why this didn't run?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-05-16T06:11:07Z
+
+This makes me realize that this handling of plural translations is wrong. Plurals are way more complex as we know. We should instead use a translation key that will allow the translator to select the most appropriate plural.
+Up to have a look?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-05-16T08:50:14Z
+
+I figured out the code does already define the "%count%" parameter so that we can use plural forms in the translation. I used GPT to add a 2nd commit here that leverages that.

@@ -76,7 +76,7 @@
             </trans-unit>
             <trans-unit id="20">
                 <source>Too many failed login attempts, please try again in %minutes% minutes.</source>
-                <target state="needs-translation">Too many failed login attempts, please try again in %minutes% minutes.</target>
+                <target state="needs-review-translation">Prea multe încercări eșuate de autentificare, vă rugăm să încercați din nou peste %minutes% minut.|Prea multe încercări eșuate de autentificare, vă rugăm să încercați din nou peste %minutes% minute.</target>
             </trans-unit>
         </body>
     </file>

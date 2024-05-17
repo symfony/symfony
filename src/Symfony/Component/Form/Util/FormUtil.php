@@ -32,8 +32,6 @@ class FormUtil
      * a form and needs to be consistent. PHP keyword `empty` cannot
      * be used as it also considers 0 and "0" to be empty.
      *
-     * @param mixed $data
-     *
      * @return bool
      */
     public static function isEmpty($data)
@@ -67,7 +65,7 @@ class FormUtil
 
         if (\is_array($paramsValue) && \is_array($filesValue)) {
             // if both are lists and both does not contain array, then merge them and return
-            if (array_is_list($paramsValue) && FormUtil::doesNotContainNonFileUploadArray($paramsValue) && array_is_list($filesValue) && FormUtil::doesNotContainNonFileUploadArray($filesValue)) {
+            if (array_is_list($paramsValue) && self::doesNotContainNonFileUploadArray($paramsValue) && array_is_list($filesValue) && self::doesNotContainNonFileUploadArray($filesValue)) {
                 return array_merge($paramsValue, $filesValue);
             }
 

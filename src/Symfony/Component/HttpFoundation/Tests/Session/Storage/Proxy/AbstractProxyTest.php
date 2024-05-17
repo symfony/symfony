@@ -23,7 +23,7 @@ use Symfony\Component\HttpFoundation\Session\Storage\Proxy\SessionHandlerProxy;
  */
 class AbstractProxyTest extends TestCase
 {
-    protected MockObject&AbstractProxy $proxy;
+    protected AbstractProxy $proxy;
 
     protected function setUp(): void
     {

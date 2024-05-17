@@ -51,7 +51,6 @@ class PhpBridgeSessionStorageTest extends TestCase
             @rmdir($this->savePath);
         }
 
-        $this->savePath = null;
         ini_set('session.save_handler', $this->initialSessionSaveHandler);
         ini_set('session.save_path', $this->initialSessionSavePath);
     }

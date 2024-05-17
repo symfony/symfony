@@ -1,0 +1,7 @@
+---------------------------------------------------------------------------
+
+by alexislefebvre at 2023-02-27T19:32:14Z
+
+It looks like this line wasn't tested so far.
+
+If you have time, you can add a test that check this exception.

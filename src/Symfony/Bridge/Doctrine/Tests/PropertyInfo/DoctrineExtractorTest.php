@@ -15,6 +15,7 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\EventManager;
 use Doctrine\DBAL\DriverManager;
 use Doctrine\DBAL\Schema\DefaultSchemaManagerFactory;
+use Doctrine\DBAL\Types\BigIntType;
 use Doctrine\DBAL\Types\Type as DBALType;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\Driver\AttributeDriver;
@@ -153,10 +154,17 @@ class DoctrineExtractorTest extends TestCase
      */
     public static function legacyTypesProvider(): array
     {
+        // DBAL 4 has a special fallback strategy for BINGINT (int -> string)
+        if (!method_exists(BigIntType::class, 'getName')) {
+            $expectedBingIntType = [new LegacyType(LegacyType::BUILTIN_TYPE_INT), new Type(LegacyType::BUILTIN_TYPE_STRING)];
+        } else {
+            $expectedBingIntType = [new LegacyType(LegacyType::BUILTIN_TYPE_STRING)];
+        }
+
         return [
             ['id', [new LegacyType(LegacyType::BUILTIN_TYPE_INT)]],
             ['guid', [new LegacyType(LegacyType::BUILTIN_TYPE_STRING)]],
-            ['bigint', [new LegacyType(LegacyType::BUILTIN_TYPE_STRING)]],
+            ['bigint', $expectedBingIntType],
             ['time', [new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, false, 'DateTime')]],
             ['timeImmutable', [new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, false, 'DateTimeImmutable')]],
             ['dateInterval', [new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, false, 'DateInterval')]],

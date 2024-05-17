@@ -192,6 +192,18 @@ jobs:
           ./phpunit install
           echo "::endgroup::"
 
+      - name: Check for changes in translation files
+        id: changed-translation-files
+        run: |
+          echo 'changed='$((git diff --quiet HEAD~1 HEAD -- 'src/**/Resources/translations/*.xlf' || (echo 'true' && exit 1)) && echo 'false') >> $GITHUB_OUTPUT
+
+      - name: Check Translation Status
+        if: steps.changed-translation-files.outputs.changed == 'true'
+        run: |
+          php src/Symfony/Component/Translation/Resources/bin/translation-status.php -v
+          php .github/sync-translations.php
+          git diff --exit-code src/ || (echo '::error::Run "php .github/sync-translations.php" to fix XLIFF files.' && exit 1)
+
       - name: Run tests
         run: ./phpunit --group integration -v
         env:
@@ -216,15 +228,3 @@ jobs:
       #    docker run --rm -e COMPOSER_ROOT_VERSION -v $(pwd):/app -v $(which composer):/usr/local/bin/composer -v $(which vulcain):/usr/local/bin/vulcain -w /app php:8.1-alpine ./phpunit src/Symfony/Component/HttpClient/Tests/CurlHttpClientTest.php --filter testHttp2Push
       #    sudo rm -rf .phpunit
       #    [ -d .phpunit.bak ] && mv .phpunit.bak .phpunit
-
-      - name: Check for changes in translation files
-        id: changed-translation-files
-        run: |
-          echo 'changed='$((git diff --quiet HEAD~1 HEAD -- 'src/**/Resources/translations/*.xlf' || (echo 'true' && exit 1)) && echo 'false') >> $GITHUB_OUTPUT
-
-      - name: Check Translation Status
-        if: steps.changed-translation-files.outputs.changed == 'true'
-        run: |
-          php src/Symfony/Component/Translation/Resources/bin/translation-status.php -v
-          php .github/sync-translations.php
-          git diff --exit-code src/ || (echo '::error::Run "php .github/sync-translations.php" to fix XLIFF files.' && exit 1)

@@ -74,6 +74,10 @@
                 <source>Too many failed login attempts, please try again in %minutes% minute.</source>
                 <target>ログイン試行回数が多すぎます。%minutes%分後に再度お試しください。</target>
             </trans-unit>
+            <trans-unit id="20">
+                <source>Too many failed login attempts, please try again in %minutes% minutes.</source>
+                <target state="needs-review-translation">ログイン試行の失敗が多すぎます。%minutes% 分後に再試行してください。|ログイン試行の失敗が多すぎます。%minutes% 分後に再試行してください。</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

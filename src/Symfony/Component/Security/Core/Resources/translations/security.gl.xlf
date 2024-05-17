@@ -74,6 +74,10 @@
                 <source>Too many failed login attempts, please try again in %minutes% minute.</source>
                 <target>Demasiados intentos de inicio de sesión errados, por favor, ténteo de novo en %minutes% minuto.</target>
             </trans-unit>
+            <trans-unit id="20">
+                <source>Too many failed login attempts, please try again in %minutes% minutes.</source>
+                <target state="needs-review-translation">Demasiados intentos fallidos de inicio de sesión, inténtao de novo en %minutes% minutos.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

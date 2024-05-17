@@ -130,6 +130,12 @@ class DoctrineExtractor implements PropertyListExtractorInterface, PropertyTypeE
         }
 
         $nullable = $metadata instanceof ClassMetadata && $metadata->isNullable($property);
+
+        // DBAL 4 has a special fallback strategy for BINGINT (int -> string)
+        if (Types::BIGINT === $typeOfField && !method_exists(BigIntType::class, 'getName')) {
+            return Type::collection(Type::int(), Type::string());
+        }
+
         $enumType = null;
 
         if (null !== $enumClass = self::getMappingValue($metadata->getFieldMapping($property), 'enumType') ?? null) {
@@ -241,8 +247,8 @@ class DoctrineExtractor implements PropertyListExtractorInterface, PropertyTypeE
             // DBAL 4 has a special fallback strategy for BINGINT (int -> string)
             if (Types::BIGINT === $typeOfField && !method_exists(BigIntType::class, 'getName')) {
                 return [
-                    new Type(Type::BUILTIN_TYPE_INT, $nullable),
-                    new Type(Type::BUILTIN_TYPE_STRING, $nullable),
+                    new LegacyType(LegacyType::BUILTIN_TYPE_INT, $nullable),
+                    new LegacyType(LegacyType::BUILTIN_TYPE_STRING, $nullable),
                 ];
             }
 

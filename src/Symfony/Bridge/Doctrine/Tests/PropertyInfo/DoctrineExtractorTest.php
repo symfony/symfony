@@ -156,7 +156,7 @@ class DoctrineExtractorTest extends TestCase
     {
         // DBAL 4 has a special fallback strategy for BINGINT (int -> string)
         if (!method_exists(BigIntType::class, 'getName')) {
-            $expectedBingIntType = [new LegacyType(LegacyType::BUILTIN_TYPE_INT), new Type(LegacyType::BUILTIN_TYPE_STRING)];
+            $expectedBingIntType = [new LegacyType(LegacyType::BUILTIN_TYPE_INT), new LegacyType(LegacyType::BUILTIN_TYPE_STRING)];
         } else {
             $expectedBingIntType = [new LegacyType(LegacyType::BUILTIN_TYPE_STRING)];
         }
@@ -298,9 +298,16 @@ class DoctrineExtractorTest extends TestCase
      */
     public static function typeProvider(): iterable
     {
+        // DBAL 4 has a special fallback strategy for BINGINT (int -> string)
+        if (!method_exists(BigIntType::class, 'getName')) {
+            $expectedBigIntType = Type::collection(Type::int(), Type::string());
+        } else {
+            $expectedBigIntType = Type::string();
+        }
+
         yield ['id', Type::int()];
         yield ['guid', Type::string()];
-        yield ['bigint', Type::string()];
+        yield ['bigint', $expectedBigIntType];
         yield ['time', Type::object(\DateTime::class)];
         yield ['timeImmutable', Type::object(\DateTimeImmutable::class)];
         yield ['dateInterval', Type::object(\DateInterval::class)];

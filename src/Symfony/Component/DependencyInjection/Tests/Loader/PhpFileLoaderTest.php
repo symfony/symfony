@@ -243,4 +243,14 @@ class PhpFileLoaderTest extends TestCase
         $values = ['foo' => new Definition(\stdClass::class), 'bar' => new Definition(\stdClass::class)];
         $this->assertEquals([new ServiceLocatorArgument($values)], $container->getDefinition('locator_dependent_inline_service')->getArguments());
     }
+
+    public function testConfigBuilderEnvConfigurator()
+    {
+        $container = new ContainerBuilder();
+        $container->registerExtension(new \AcmeExtension());
+        $loader = new PhpFileLoader($container, new FileLocator(\dirname(__DIR__).'/Fixtures'), 'prod', new ConfigBuilderGenerator(sys_get_temp_dir()), true);
+        $loader->load('config/config_builder_env_configurator.php');
+
+        $this->assertIsString($container->getExtensionConfig('acme')[0]['color']);
+    }
 }

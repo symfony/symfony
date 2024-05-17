@@ -151,6 +151,34 @@ class LexerTest extends TestCase
                 ],
                 '-.7_189e+10',
             ],
+            [
+                [
+                    new Token('number', 65536, 1),
+                ],
+                '65536 /* this is 2^16 */',
+            ],
+            [
+                [
+                    new Token('number', 2, 1),
+                    new Token('operator', '*', 21),
+                    new Token('number', 4, 23),
+                ],
+                '2 /* /* comment1 */ * 4',
+            ],
+            [
+                [
+                    new Token('string', '/* this is', 1),
+                    new Token('operator', '~', 14),
+                    new Token('string', 'not a comment */', 16),
+                ],
+                '"/* this is" ~ "not a comment */"',
+            ],
+            [
+                [
+                    new Token('string', '/* this is not a comment */', 1),
+                ],
+                '"/* this is not a comment */"',
+            ],
         ];
     }
 }

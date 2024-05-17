@@ -120,7 +120,6 @@ final class MercureTransportTest extends TransportTestCase
             $this->assertSame(1, $update->getRetry());
             $this->assertTrue($update->isPrivate());
 
-
             return 'id';
         });
 

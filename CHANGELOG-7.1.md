@@ -7,6 +7,36 @@ in 7.1 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v7.1.0...v7.1.1
 
+* 7.1.0-RC1 (2024-05-17)
+
+ * bug #54970 [DependencyInjection] Process PHP configs using the ContainerConfigurator (MatTheCat)
+ * bug #49186 [Serializer] Improve exception message in UnwrappingDenormalizer (andersonamuller)
+ * bug #54694 [PropertyInfo] Update DoctrineExtractor for new DBAL 4 BIGINT type (llupa)
+ * bug #54851 [Serializer] Fixed "Warning: Attempt to read property "value" on string" (michaljusiega, xabbuh)
+ * bug #54913 [Serializer] Fix CurrentType for missing property (ElisDN)
+ * feature #54941 Les-Tilleuls.coop is sponsoring Symfony 7.1, thanks to them! \o/ (nicolas-grekas)
+ * bug #54797 [PhpUnitBridge] Fix `DeprecationErrorHandler` with PhpUnit 10 (HypeMC)
+ * bug #54878 [Filesystem] Fix dumpFile `stat failed` error hitting custom handler (acoulton)
+ * bug #54924 [Validator] IBAN Check digits should always between 2 and 98 (karstennilsen)
+ * bug #54919 [ErrorHandler] Do not call xdebug_get_function_stack() with xdebug >= 3.0 when not in develop mode (fmata)
+ * bug #54910 [HttpFoundation]  filter out empty HTTP header parts (xabbuh)
+ * bug #54888 [String] Fix folded in compat mode (smnandre)
+ * bug #54925 [VarDumper]  adapt namespace changes for new DOM extension classes (xabbuh)
+ * bug #54835 [DoctrineBridge]  fix setting validated fields not using the options array (xabbuh)
+ * bug #54863 [Process] Return `false` when `open_basedir` prevents access to `/dev/tty` (mjauvin)
+ * bug #54908 [DependencyInjection] Fix "Cannot replace arguments" errors caused by ResolveAutowireInlineAttributesPass (nicolas-grekas)
+ * bug #54860 [HttpClient] Revert fixing curl default options (alexandre-daubois)
+ * feature #54859 [Messenger] Don't mark `EnvelopeAwareExceptionInterface` internal (valtzu)
+ * bug #54850 [VarExporter] fix `ProxyHelper::generateLazyProxy()` when a method returns null (nikophil)
+ * bug #54842 [Messenger] Don't drop stamps when message validation fails (valtzu)
+ * bug #54838 [WebProfilerBundle] Fix assignment to constant variable (HypeMC)
+ * bug #54837 [Mailer] [Sendgrid] Use `DataPart::getContentId()` when `DataPart::setContentId()` is used (SherinBloemendaal)
+ * bug #54839 Fix exception thrown during `LDAP_MODIFY_BATCH_REMOVE_ALL` batch operations (phasdev)
+ * bug #54834 [Validator] Check `Locale` class existence before using it (alexandre-daubois)
+ * bug #54830 [HttpClient] Fix cURL default options for PHP 8.4 (alexandre-daubois)
+ * bug #54828 [Serializer] Fix `GetSetMethodNormalizer` not working with setters with optional args (HypeMC)
+ * bug #54816 [Cache] Fix support for predis/predis:^2.0 (mfettig)
+
 * 7.1.0-BETA1 (2024-05-02)
 
  * feature #54818 [Translation] Crowdin is backing its translation bridge, thanks to them! \o/ (nicolas-grekas)

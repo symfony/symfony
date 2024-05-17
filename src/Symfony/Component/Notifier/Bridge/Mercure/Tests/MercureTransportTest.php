@@ -114,11 +114,12 @@ final class MercureTransportTest extends TransportTestCase
     {
         $hub = new MockHub('https://foo.com/.well-known/mercure', new StaticTokenProvider('foo'), function (Update $update): string {
             $this->assertSame(['/topic/1', '/topic/2'], $update->getTopics());
-            $this->assertSame('{"@context":"https:\/\/www.w3.org\/ns\/activitystreams","type":"Announce","summary":"subject"}', $update->getData());
+            $this->assertSame('{"@context":"https:\/\/www.w3.org\/ns\/activitystreams","type":"Announce","summary":"subject","body":null,"icon":null,"tag":null,"renotify":false}', $update->getData());
             $this->assertSame('id', $update->getId());
             $this->assertSame('type', $update->getType());
             $this->assertSame(1, $update->getRetry());
             $this->assertTrue($update->isPrivate());
+
 
             return 'id';
         });
@@ -130,7 +131,7 @@ final class MercureTransportTest extends TransportTestCase
     {
         $hub = new MockHub('https://foo.com/.well-known/mercure', new StaticTokenProvider('foo'), function (Update $update): string {
             $this->assertSame(['https://symfony.com/notifier'], $update->getTopics());
-            $this->assertSame('{"@context":"https:\/\/www.w3.org\/ns\/activitystreams","type":"Announce","summary":"subject"}', $update->getData());
+            $this->assertSame('{"@context":"https:\/\/www.w3.org\/ns\/activitystreams","type":"Announce","summary":"subject","body":null,"icon":null,"tag":null,"renotify":false}', $update->getData());
             $this->assertSame('id', $update->getId());
             $this->assertSame('type', $update->getType());
             $this->assertSame(1, $update->getRetry());
@@ -146,7 +147,7 @@ final class MercureTransportTest extends TransportTestCase
     {
         $hub = new MockHub('https://foo.com/.well-known/mercure', new StaticTokenProvider('foo'), function (Update $update): string {
             $this->assertSame(['https://symfony.com/notifier'], $update->getTopics());
-            $this->assertSame('{"@context":"https:\/\/www.w3.org\/ns\/activitystreams","type":"Announce","summary":"subject"}', $update->getData());
+            $this->assertSame('{"@context":"https:\/\/www.w3.org\/ns\/activitystreams","type":"Announce","summary":"subject","body":null,"icon":null,"tag":null,"renotify":false}', $update->getData());
             $this->assertFalse($update->isPrivate());
 
             return 'id';

@@ -24,6 +24,10 @@ final class MercureOptionsTest extends TestCase
             'id' => null,
             'type' => null,
             'retry' => null,
+            'body' => null,
+            'icon' => null,
+            'tag' => null,
+            'renotify' => false,
         ]);
     }
 
@@ -37,6 +41,10 @@ final class MercureOptionsTest extends TestCase
             'id' => 'id',
             'type' => 'type',
             'retry' => 1,
+            'body' => null,
+            'icon' => null,
+            'tag' => null,
+            'renotify' => false,
         ]);
     }
 

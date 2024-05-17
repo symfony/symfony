@@ -41,17 +41,17 @@ class BaseNodeTest extends TestCase
             {
             }
 
-            protected function normalizeValue($value)
+            protected function normalizeValue($value): mixed
             {
                 return null;
             }
 
-            protected function mergeValues($leftSide, $rightSide)
+            protected function mergeValues($leftSide, $rightSide): mixed
             {
                 return null;
             }
 
-            protected function finalizeValue($value)
+            protected function finalizeValue($value): mixed
             {
                 return null;
             }
@@ -61,7 +61,7 @@ class BaseNodeTest extends TestCase
                 return true;
             }
 
-            public function getDefaultValue()
+            public function getDefaultValue(): mixed
             {
                 return null;
             }

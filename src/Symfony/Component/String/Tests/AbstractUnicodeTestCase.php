@@ -468,10 +468,10 @@ END'],
         );
     }
 
-    public static function provideToFoldedCase(): array
+    public static function provideFolded(): array
     {
         return array_merge(
-            parent::provideToFoldedCase(),
+            parent::provideFolded(),
             [
                 ['déjà', 'DéjÀ'],
                 ['σσσ', 'Σσς'],

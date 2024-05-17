@@ -15,6 +15,7 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\EventManager;
 use Doctrine\DBAL\DriverManager;
 use Doctrine\DBAL\Schema\DefaultSchemaManagerFactory;
+use Doctrine\DBAL\Types\BigIntType;
 use Doctrine\DBAL\Types\Type as DBALType;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\Driver\AttributeDriver;
@@ -141,10 +142,17 @@ class DoctrineExtractorTest extends TestCase
 
     public static function typesProvider(): array
     {
+        // DBAL 4 has a special fallback strategy for BINGINT (int -> string)
+        if (!method_exists(BigIntType::class, 'getName')) {
+            $expectedBingIntType = [new Type(Type::BUILTIN_TYPE_INT), new Type(Type::BUILTIN_TYPE_STRING)];
+        } else {
+            $expectedBingIntType = [new Type(Type::BUILTIN_TYPE_STRING)];
+        }
+
         return [
             ['id', [new Type(Type::BUILTIN_TYPE_INT)]],
             ['guid', [new Type(Type::BUILTIN_TYPE_STRING)]],
-            ['bigint', [new Type(Type::BUILTIN_TYPE_STRING)]],
+            ['bigint', $expectedBingIntType],
             ['time', [new Type(Type::BUILTIN_TYPE_OBJECT, false, 'DateTime')]],
             ['timeImmutable', [new Type(Type::BUILTIN_TYPE_OBJECT, false, 'DateTimeImmutable')]],
             ['dateInterval', [new Type(Type::BUILTIN_TYPE_OBJECT, false, 'DateInterval')]],

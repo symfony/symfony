@@ -45,7 +45,7 @@ class UuidValidatorTest extends ConstraintValidatorTestCase
     public function testExpectsUuidConstraintCompatibleType()
     {
         $this->expectException(UnexpectedTypeException::class);
-        $constraint = $this->getMockForAbstractClass(Constraint::class);
+        $constraint = $this->createStub(Constraint::class);
 
         $this->validator->validate('216fff40-98d9-11e3-a5e2-0800200c9a66', $constraint);
     }

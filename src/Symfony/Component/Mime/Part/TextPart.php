@@ -23,6 +23,8 @@ use Symfony\Component\Mime\Header\Headers;
  */
 class TextPart extends AbstractPart
 {
+    private const DEFAULT_ENCODERS = ['quoted-printable', 'base64', '8bit'];
+
     /** @internal */
     protected Headers $_headers;
 
@@ -63,8 +65,8 @@ class TextPart extends AbstractPart
         if (null === $encoding) {
             $this->encoding = $this->chooseEncoding();
         } else {
-            if ('quoted-printable' !== $encoding && 'base64' !== $encoding && '8bit' !== $encoding) {
-                throw new InvalidArgumentException(sprintf('The encoding must be one of "quoted-printable", "base64", or "8bit" ("%s" given).', $encoding));
+            if (!\in_array($encoding, self::DEFAULT_ENCODERS, true) && !\array_key_exists($encoding, self::$encoders)) {
+                throw new InvalidArgumentException(sprintf('The encoding must be one of "%s" ("%s" given).', implode('", "', array_unique(array_merge(self::DEFAULT_ENCODERS, array_keys(self::$encoders)))), $encoding));
             }
             $this->encoding = $encoding;
         }
@@ -207,7 +209,20 @@ class TextPart extends AbstractPart
             return self::$encoders[$this->encoding] ??= new QpContentEncoder();
         }
 
-        return self::$encoders[$this->encoding] ??= new Base64ContentEncoder();
+        if ('base64' === $this->encoding) {
+            return self::$encoders[$this->encoding] ??= new Base64ContentEncoder();
+        }
+
+        return self::$encoders[$this->encoding];
+    }
+
+    public static function addEncoder(string $name, ContentEncoderInterface $encoder): void
+    {
+        if (\in_array($name, self::DEFAULT_ENCODERS, true)) {
+            throw new InvalidArgumentException('You are not allowed to change the default encoders ("quoted-printable","base64","8bit"). If you want to modify their behaviour please register and use a new encoder.');
+        }
+
+        self::$encoders[$name] = $encoder;
     }
 
     private function chooseEncoding(): string

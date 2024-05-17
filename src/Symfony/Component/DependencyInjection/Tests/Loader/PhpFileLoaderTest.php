@@ -56,6 +56,7 @@ class PhpFileLoaderTest extends TestCase
         $loader->load('config/config_builder.php');
 
         $expected = [
+            ['color' => 'red'],
             ['color' => 'blue'],
             ['foo' => 'bar'],
         ];

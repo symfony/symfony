@@ -102,7 +102,7 @@ class InlineFragmentRendererTest extends TestCase
 
     public function testRenderExceptionIgnoreErrorsWithAlt()
     {
-        $strategy = new InlineFragmentRenderer($this->getKernel($this->returnCallback(function () {
+        $strategy = new InlineFragmentRenderer($this->getKernel(function () {
             static $firstCall = true;
 
             if ($firstCall) {
@@ -112,7 +112,7 @@ class InlineFragmentRendererTest extends TestCase
             }
 
             return new Response('bar');
-        })));
+        }));
 
         $this->assertEquals('bar', $strategy->render('/', Request::create('/'), ['ignore_errors' => true, 'alt' => '/foo'])->getContent());
     }
@@ -127,6 +127,8 @@ class InlineFragmentRendererTest extends TestCase
 
         if ($returnValue instanceof \Exception) {
             $mocker->willThrowException($returnValue);
+        } elseif ($returnValue instanceof \Closure) {
+            $mocker->willReturnCallback($returnValue);
         } else {
             $mocker->willReturn(...(\is_array($returnValue) ? $returnValue : [$returnValue]));
         }

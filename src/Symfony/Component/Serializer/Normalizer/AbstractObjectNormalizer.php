@@ -730,7 +730,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
                                 $typeIdentifier = TypeIdentifier::OBJECT;
                                 $class = $t->getClassName();
                             } else {
-                                $typeIdentifier = $t->getTypeIdentifier()->value;
+                                $typeIdentifier = $t->getTypeIdentifier();
                                 $class = null;
                             }
                         }

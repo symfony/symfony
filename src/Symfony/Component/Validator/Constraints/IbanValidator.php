@@ -228,6 +228,18 @@ class IbanValidator extends ConstraintValidator
             return;
         }
 
+        // Check digits should always between 2 and 98
+        // A ECBS document (https://www.ecbs.org/Download/EBS204_V3.PDF) replicates part of the ISO/IEC 7064:2003 standard as a method for generating check digits in the range 02 to 98.
+        $checkDigits = (int) substr($canonicalized, 2, 2);
+        if ($checkDigits < 2 || $checkDigits > 98) {
+            $this->context->buildViolation($constraint->message)
+                ->setParameter('{{ value }}', $this->formatValue($value))
+                ->setCode(Iban::CHECKSUM_FAILED_ERROR)
+                ->addViolation();
+
+            return;
+        }
+
         // Move the first four characters to the end
         // e.g. CH93 0076 2011 6238 5295 7
         //   -> 0076 2011 6238 5295 7 CH93

@@ -34,6 +34,7 @@ use Symfony\Component\HttpKernel\HttpKernel;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\Kernel;
 use Symfony\Component\HttpKernel\Tests\Fixtures\KernelForTest;
+use Symfony\Component\HttpKernel\Tests\Fixtures\KernelForTestWithLoadClassCache;
 use Symfony\Component\HttpKernel\Tests\Fixtures\KernelWithoutBundles;
 use Symfony\Component\HttpKernel\Tests\Fixtures\ResettableService;
 
@@ -154,7 +155,7 @@ class KernelTest extends TestCase
 
     public function testClassCacheIsNotLoadedByDefault()
     {
-        $kernel = $this->getKernel(['initializeBundles'], [], false, ['doLoadClassCache']);
+        $kernel = $this->getKernel(['initializeBundles', 'doLoadClassCache'], [], false, KernelForTestWithLoadClassCache::class);
         $kernel->expects($this->never())
             ->method('doLoadClassCache');
 
@@ -410,7 +411,7 @@ EOF
         $kernel
             ->expects($this->exactly(2))
             ->method('getBundle')
-            ->willReturn($this->getBundle(__DIR__.'/Fixtures/Bundle1Bundle', null, null, 'Bundle1Bundle'))
+            ->willReturn($this->getBundle(__DIR__.'/Fixtures/Bundle1Bundle', null, 'Bundle1Bundle'))
         ;
 
         $this->assertEquals(
@@ -427,8 +428,8 @@ EOF
     {
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('Trying to register two bundles with the same name "DuplicateName"');
-        $fooBundle = $this->getBundle(__DIR__.'/Fixtures/FooBundle', null, 'FooBundle', 'DuplicateName');
-        $barBundle = $this->getBundle(__DIR__.'/Fixtures/BarBundle', null, 'BarBundle', 'DuplicateName');
+        $fooBundle = $this->getBundle(__DIR__.'/Fixtures/FooBundle', 'FooBundle', 'DuplicateName');
+        $barBundle = $this->getBundle(__DIR__.'/Fixtures/BarBundle', 'BarBundle', 'DuplicateName');
 
         $kernel = $this->getKernel([], [$fooBundle, $barBundle]);
         $kernel->boot();
@@ -675,11 +676,10 @@ EOF
     /**
      * Returns a mock for the BundleInterface.
      */
-    protected function getBundle($dir = null, $parent = null, $className = null, $bundleName = null): BundleInterface
+    protected function getBundle($dir = null, $className = null, $bundleName = null): BundleInterface
     {
         $bundle = $this
             ->getMockBuilder(BundleInterface::class)
-            ->onlyMethods(['getPath', 'getName'])
             ->disableOriginalConstructor()
         ;
 
@@ -687,7 +687,7 @@ EOF
             $bundle->setMockClassName($className);
         }
 
-        $bundle = $bundle->getMockForAbstractClass();
+        $bundle = $bundle->getMock();
 
         $bundle
             ->expects($this->any())
@@ -710,19 +710,15 @@ EOF
      * @param array $methods Additional methods to mock (besides the abstract ones)
      * @param array $bundles Bundles to register
      */
-    protected function getKernel(array $methods = [], array $bundles = [], bool $debug = false, array $methodsToAdd = []): Kernel
+    protected function getKernel(array $methods = [], array $bundles = [], bool $debug = false, string $kernelClass = KernelForTest::class): Kernel
     {
         $methods[] = 'registerBundles';
 
         $kernelMockBuilder = $this
-            ->getMockBuilder(KernelForTest::class)
+            ->getMockBuilder($kernelClass)
             ->onlyMethods($methods)
             ->setConstructorArgs(['test', $debug])
         ;
-
-        if (0 !== \count($methodsToAdd)) {
-            $kernelMockBuilder->addMethods($methodsToAdd);
-        }
 
         $kernel = $kernelMockBuilder->getMock();
         $kernel->expects($this->any())

@@ -376,6 +376,12 @@ class DeprecationErrorHandler
 
         if ('PHPUnit\Util\ErrorHandler::handleError' === $eh) {
             return $eh;
+        } elseif (ErrorHandler::class === $eh) {
+            return function (int $errorNumber, string $errorString, string $errorFile, int $errorLine) {
+                ErrorHandler::instance()($errorNumber, $errorString, $errorFile, $errorLine);
+
+                return true;
+            };
         }
 
         foreach (debug_backtrace(\DEBUG_BACKTRACE_PROVIDE_OBJECT | \DEBUG_BACKTRACE_IGNORE_ARGS) as $frame) {

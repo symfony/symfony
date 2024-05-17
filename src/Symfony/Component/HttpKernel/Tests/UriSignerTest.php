@@ -46,14 +46,19 @@ class UriSignerTest extends TestCase
 
     public function testCheckWithDifferentArgSeparator()
     {
-        $this->iniSet('arg_separator.output', '&amp;');
-        $signer = new UriSigner('foobar');
+        $initialSeparatorOutput = ini_set('arg_separator.output', '&amp;');
 
-        $this->assertSame(
-            'http://example.com/foo?_hash=rIOcC%2FF3DoEGo%2FvnESjSp7uU9zA9S%2F%2BOLhxgMexoPUM%3D&baz=bay&foo=bar',
-            $signer->sign('http://example.com/foo?foo=bar&baz=bay')
-        );
-        $this->assertTrue($signer->check($signer->sign('http://example.com/foo?foo=bar&baz=bay')));
+        try {
+            $signer = new UriSigner('foobar');
+
+            $this->assertSame(
+                'http://example.com/foo?_hash=rIOcC%2FF3DoEGo%2FvnESjSp7uU9zA9S%2F%2BOLhxgMexoPUM%3D&baz=bay&foo=bar',
+                $signer->sign('http://example.com/foo?foo=bar&baz=bay')
+            );
+            $this->assertTrue($signer->check($signer->sign('http://example.com/foo?foo=bar&baz=bay')));
+        } finally {
+            ini_set('arg_separator.output', $initialSeparatorOutput);
+        }
     }
 
     public function testCheckWithRequest()

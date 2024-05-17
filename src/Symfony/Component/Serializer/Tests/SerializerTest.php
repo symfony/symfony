@@ -1059,7 +1059,7 @@ class SerializerTest extends TestCase
                 'message' => 'The type of the "string" attribute for class "Symfony\Component\Serializer\Tests\Fixtures\Php74Full" must be one of "string" ("null" given).',
             ],
             [
-                'currentType' => 'array',
+                'currentType' => 'null',
                 'expectedTypes' => [
                     'unknown',
                 ],
@@ -1307,7 +1307,7 @@ class SerializerTest extends TestCase
                 'message' => 'The type of the "bool" attribute for class "Symfony\\Component\\Serializer\\Tests\\Fixtures\\Php80WithPromotedTypedConstructor" must be one of "bool" ("string" given).',
             ],
             [
-                'currentType' => 'array',
+                'currentType' => 'null',
                 'expectedTypes' => [
                     'string',
                 ],
@@ -1316,7 +1316,7 @@ class SerializerTest extends TestCase
                 'message' => 'Failed to create object because the class misses the "string" property.',
             ],
             [
-                'currentType' => 'array',
+                'currentType' => 'null',
                 'expectedTypes' => [
                     'int',
                 ],
@@ -1416,7 +1416,7 @@ class SerializerTest extends TestCase
 
         $expected = [
             [
-                'currentType' => 'array',
+                'currentType' => 'null',
                 'useMessageForUser' => true,
                 'message' => 'Failed to create object because the class misses the "get" property.',
             ],
@@ -1625,7 +1625,7 @@ class SerializerTest extends TestCase
 
         $expected = [
             [
-                'currentType' => 'array',
+                'currentType' => 'null',
                 'expectedTypes' => [
                     'string',
                 ],

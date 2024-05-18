@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+7.2
+---
+
+* Add headers label support for `CsvEncoder` using `csv_headers`
+
 7.1
 ---
 

@@ -86,11 +86,13 @@ class CsvEncoder implements EncoderInterface, DecoderInterface
         }
         unset($value);
 
+        $labels = array_flip($headers);
         $headers = array_merge(array_values($headers), array_diff($this->extractHeaders($data), $headers));
         $endOfLine = $context[self::END_OF_LINE] ?? $this->defaultContext[self::END_OF_LINE];
 
         if (!($context[self::NO_HEADERS_KEY] ?? $this->defaultContext[self::NO_HEADERS_KEY])) {
-            fputcsv($handle, $headers, $delimiter, $enclosure, $escapeChar);
+            $labels = array_map(fn ($header) => \is_string($labels[$header] ?? null) ? $labels[$header] : $header, $headers);
+            fputcsv($handle, $labels, $delimiter, $enclosure, $escapeChar);
             if ("\n" !== $endOfLine && 0 === fseek($handle, -1, \SEEK_CUR)) {
                 fwrite($handle, $endOfLine);
             }

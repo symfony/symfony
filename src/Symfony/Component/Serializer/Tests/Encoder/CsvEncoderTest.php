@@ -242,14 +242,38 @@ CSV;
             CsvEncoder::HEADERS_KEY => [
                 'b',
                 'c',
+                'n.0',
+                'n.k',
             ],
         ];
         $value = [
-            ['a' => 'foo', 'b' => 'bar'],
+            ['a' => 'foo', 'b' => 'bar', 'n' => ['nested_index', 'k' => 'nested_key']],
         ];
         $csv = <<<CSV
-b,c,a
-bar,,foo
+b,c,n.0,n.k,a
+bar,,nested_index,nested_key,foo
+
+CSV;
+
+        $this->assertEquals($csv, $this->encoder->encode($value, 'csv', $context));
+    }
+
+    public function testEncodeCustomHeadersWithLabels()
+    {
+        $context = [
+            CsvEncoder::HEADERS_KEY => [
+                'Label_B' => 'b',
+                'c', // No label = use header key as label
+                'Label_N_index' => 'n.0',
+                'Label_N_key' => 'n.k',
+            ],
+        ];
+        $value = [
+            ['a' => 'foo', 'b' => 'bar', 'n' => ['nested_index', 'k' => 'nested_key']],
+        ];
+        $csv = <<<CSV
+Label_B,c,Label_N_index,Label_N_key,a
+bar,,nested_index,nested_key,foo
 
 CSV;
 

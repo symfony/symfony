@@ -631,7 +631,7 @@ class AutowirePass extends AbstractRecursivePass
             }
 
             if ($r->isInterface() && !$alternatives) {
-                $message .= ' Did you create a class that implements this interface?';
+                $message .= ' Did you create an instantiable class that implements this interface?';
             }
         }
 

@@ -76,7 +76,7 @@ class LoginThrottlingFactory implements AuthenticatorFactoryInterface
             $container->register($config['limiter'] = 'security.login_throttling.'.$firewallName.'.limiter', DefaultLoginRateLimiter::class)
                 ->addArgument(new Reference('limiter.'.$globalId))
                 ->addArgument(new Reference('limiter.'.$localId))
-                ->addArgument('%kernel.secret%')
+                ->addArgument('%container.build_hash%')
             ;
         }
 

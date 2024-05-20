@@ -99,12 +99,16 @@ class ExecutableFinderTest extends TestCase
         }
 
         putenv('PATH='.\dirname(\PHP_BINARY));
-        $this->iniSet('open_basedir', \dirname(\PHP_BINARY).\PATH_SEPARATOR.'/');
+        $initialOpenBaseDir = ini_set('open_basedir', \dirname(\PHP_BINARY).\PATH_SEPARATOR.'/');
 
-        $finder = new ExecutableFinder();
-        $result = $finder->find($this->getPhpBinaryName());
+        try {
+            $finder = new ExecutableFinder();
+            $result = $finder->find($this->getPhpBinaryName());
 
-        $this->assertSamePath(\PHP_BINARY, $result);
+            $this->assertSamePath(\PHP_BINARY, $result);
+        } finally {
+            ini_set('open_basedir', $initialOpenBaseDir);
+        }
     }
 
     public function testFindBatchExecutableOnWindows()

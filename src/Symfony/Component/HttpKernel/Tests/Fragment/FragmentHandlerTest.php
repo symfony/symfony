@@ -39,14 +39,14 @@ class FragmentHandlerTest extends TestCase
     public function testRenderWithUnknownRenderer()
     {
         $this->expectException(\InvalidArgumentException::class);
-        $handler = $this->getHandler($this->returnValue(new Response('foo')));
+        $handler = $this->getHandler(new Response('foo'));
 
         $handler->render('/', 'bar');
     }
 
     public function testDeliverWithUnsuccessfulResponse()
     {
-        $handler = $this->getHandler($this->returnValue(new Response('foo', 404)));
+        $handler = $this->getHandler(new Response('foo', 404));
         try {
             $handler->render('/', 'foo');
             $this->fail('->render() throws a \RuntimeException exception if response is not successful');
@@ -66,7 +66,7 @@ class FragmentHandlerTest extends TestCase
     {
         $expectedRequest = Request::create('/');
         $handler = $this->getHandler(
-            $this->returnValue(new Response('foo')),
+            new Response('foo'),
             [
                 '/',
                 $this->callback(function (Request $request) use ($expectedRequest) {
@@ -93,7 +93,7 @@ class FragmentHandlerTest extends TestCase
         $e = $renderer
             ->expects($this->any())
             ->method('render')
-            ->will($returnValue)
+            ->willReturn($returnValue)
         ;
 
         if ($arguments) {

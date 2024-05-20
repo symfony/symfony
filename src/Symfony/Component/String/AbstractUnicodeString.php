@@ -190,7 +190,7 @@ abstract class AbstractUnicodeString extends AbstractString
 
         if (!$compat || !\defined('Normalizer::NFKC_CF')) {
             $str->string = normalizer_normalize($str->string, $compat ? \Normalizer::NFKC : \Normalizer::NFC);
-            $str->string = mb_strtolower(str_replace(self::FOLD_FROM, self::FOLD_TO, $this->string), 'UTF-8');
+            $str->string = mb_strtolower(str_replace(self::FOLD_FROM, self::FOLD_TO, $str->string), 'UTF-8');
         } else {
             $str->string = normalizer_normalize($str->string, \Normalizer::NFKC_CF);
         }

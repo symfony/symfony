@@ -145,16 +145,8 @@ class PhpFileLoader extends FileLoader
 
         $callback(...$arguments);
 
-        $this->loadFromExtensions($configBuilders);
-    }
-
-    /**
-     * @param iterable<ConfigBuilderInterface> $configBuilders
-     */
-    private function loadFromExtensions(iterable $configBuilders): void
-    {
         foreach ($configBuilders as $configBuilder) {
-            $this->loadExtensionConfig($configBuilder->getExtensionAlias(), $configBuilder->toArray());
+            $containerConfigurator->extension($configBuilder->getExtensionAlias(), $configBuilder->toArray(), $this->prepend);
         }
 
         $this->loadExtensionConfigs();

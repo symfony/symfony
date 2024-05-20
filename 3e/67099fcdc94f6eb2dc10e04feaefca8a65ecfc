@@ -1,0 +1,68 @@
+---------------------------------------------------------------------------
+
+by kylekatarnls at 2024-05-19T18:01:46Z
+
+AFAIU looking at the current state of tests https://github.com/symfony/symfony/tree/5.4 it sounds like failures here are not related to the current change.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-05-19T20:00:49Z
+
+Hi thanks for the PR. I'm surprised this change is in VarDumper and not in VarExporter. Does this really fix the issue you have?
+Can you please share a small reproducing app just to be sure I get what we're talking about?
+
+---------------------------------------------------------------------------
+
+by kylekatarnls at 2024-05-19T20:22:51Z
+
+I guess both should be consistent and support what PHP natively support. For my use case, I'm looking for what is generating proxy-classes.php.
+
+---------------------------------------------------------------------------
+
+by kylekatarnls at 2024-05-20T08:04:18Z
+
+Basically, I think Symfony may need to use this logic anywhere it's calling `getDefaultValueConstantName` because the actual behavior of PHP is to try both local namesapce and global namespace but this reflection method will always only return the local namespace.
+
+---------------------------------------------------------------------------
+
+by kylekatarnls at 2024-05-20T10:00:08Z
+
+@nicolas-grekas You're right. It's not only applying to `getDefaultValueConstantName()` it also happens when doing `(string) $param` of a `\ReflectionParameter`, this precise case we hit is there in `ProxyHelper::exportDefault`:
+https://github.com/symfony/symfony/blob/7.1/src/Symfony/Component/VarExporter/ProxyHelper.php#L338
+
+When having in the constructor of a service:
+```php
+__construct(
+  #[Autowire(lazy: true)]
+  private Foo $foo,
+)
+```
+And `Foo` definition being:
+```php
+namespace Bar;
+
+class Foo
+{
+  public function byPi(float $number, float $pi = M_PI): float
+  {
+    return $number * $pi;
+  }
+}
+```
+Then casting to string the `ReflectionParameter` for `float $pi = M_PI` will give:
+```
+Parameter #1 [ <optional> int $pi = Bar\M_PI]
+```
+And then using this string, Symfony will assume `Bar\M_PI` is the correct and only way to export this default value.
+
+Is it enough so you see what issue we face or still want me to provide a mini-repo?
+
+I will try to make a PR to handle consistently both `getDefaultValueConstantName()` and `(string)` casts in various places I can find where it's used, but I'm open to any suggestion.
+
+---------------------------------------------------------------------------
+
+by kylekatarnls at 2024-05-20T12:52:29Z
+
+Updated the PR to handle only the case of `ProxyHelper` in `VarExporter` (6.4 fix)
+
+A next (but independent) step could be #56824 so global constants can be resolved without the `\` the same way in the other places.

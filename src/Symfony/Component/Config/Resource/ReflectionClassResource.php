@@ -13,6 +13,7 @@ namespace Symfony\Component\Config\Resource;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Messenger\Handler\MessageSubscriberInterface;
+use Symfony\Component\VarDumper\Caster\ConstCaster;
 use Symfony\Contracts\Service\ServiceSubscriberInterface;
 
 /**
@@ -197,13 +198,21 @@ class ReflectionClassResource implements SelfCheckingResourceInterface
                     continue;
                 }
 
-                if (!$p->isDefaultValueConstant() || $defined($p->getDefaultValueConstantName())) {
+                if (!$p->isDefaultValueConstant()) {
                     $defaults[$p->name] = $p->getDefaultValue();
 
                     continue;
                 }
 
-                $defaults[$p->name] = $p->getDefaultValueConstantName();
+                $constantName = ConstCaster::castParameterDefaultValue($p);
+
+                if ($defined($constantName)) {
+                    $defaults[$p->name] = $p->getDefaultValue();
+
+                    continue;
+                }
+
+                $defaults[$p->name] = $constantName;
                 $parametersWithUndefinedConstants[$p->name] = true;
             }
 

@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\DependencyInjection\Dumper;
 
+use Symfony\Component\VarDumper\Caster\ConstCaster;
+
 /**
  * @author Nicolas Grekas <p@tchwork.com>
  */
@@ -99,7 +101,7 @@ final class Preloader
             foreach ($r->getMethods(\ReflectionMethod::IS_PUBLIC) as $m) {
                 foreach ($m->getParameters() as $p) {
                     if ($p->isDefaultValueAvailable() && $p->isDefaultValueConstant()) {
-                        $c = $p->getDefaultValueConstantName();
+                        $c = ConstCaster::castParameterDefaultValue($p);
 
                         if ($i = strpos($c, '::')) {
                             self::doPreload(substr($c, 0, $i), $preloaded);

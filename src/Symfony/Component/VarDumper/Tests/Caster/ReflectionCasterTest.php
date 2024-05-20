@@ -13,6 +13,9 @@ namespace Symfony\Component\VarDumper\Tests\Caster;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\VarDumper\Caster\Caster;
+use Symfony\Component\VarDumper\Caster\ConstStub;
+use Symfony\Component\VarDumper\Caster\ReflectionCaster;
+use Symfony\Component\VarDumper\Cloner\Stub;
 use Symfony\Component\VarDumper\Test\VarDumperTestTrait;
 use Symfony\Component\VarDumper\Tests\Fixtures\ExtendsReflectionTypeFixture;
 use Symfony\Component\VarDumper\Tests\Fixtures\GeneratorDemo;
@@ -95,7 +98,7 @@ Closure($x) {
     $b: & 123
   }
   file: "%sReflectionCasterTest.php"
-  line: "88 to 88"
+  line: "91 to 91"
 }
 EOTXT
             , $var
@@ -699,6 +702,24 @@ ReflectionClassConstant {
 }
 EOTXT
             , $var);
+    }
+
+    public function testGlobalConstantAsDefaultValue()
+    {
+        $class = new class() {
+            public function foo(float $value = M_PI)
+            {
+                // Dummy content
+            }
+        };
+        $method = new \ReflectionMethod($class, 'foo');
+        $parameter = $method->getParameters()[0];
+        $cast = ReflectionCaster::castParameter($parameter, [], new Stub(), false);
+        /** @var ConstStub $defaultStub */
+        $defaultStub = $cast["\0~\0default"];
+
+        $this->assertInstanceOf(ConstStub::class, $defaultStub);
+        $this->assertSame('\\'.\M_PI::class, $defaultStub->class);
     }
 
     /**

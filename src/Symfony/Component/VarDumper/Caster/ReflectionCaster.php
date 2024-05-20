@@ -299,7 +299,7 @@ class ReflectionCaster
             try {
                 $a[$prefix.'default'] = $v = $c->getDefaultValue();
                 if ($c->isDefaultValueConstant() && !\is_object($v)) {
-                    $a[$prefix.'default'] = new ConstStub($c->getDefaultValueConstantName(), $v);
+                    $a[$prefix.'default'] = new ConstStub(ConstCaster::castParameterDefaultValue($c), $v);
                 }
                 if (null === $v) {
                     unset($a[$prefix.'allowsNull']);
@@ -383,7 +383,7 @@ class ReflectionCaster
                 $signature .= ' = ';
 
                 if ($param->isDefaultValueConstant()) {
-                    $signature .= substr(strrchr('\\'.$param->getDefaultValueConstantName(), '\\'), 1);
+                    $signature .= substr(strrchr('\\'.ConstCaster::castParameterDefaultValue($param), '\\'), 1);
                 } elseif (null === $v) {
                     $signature .= 'null';
                 } elseif (\is_array($v)) {

@@ -41,4 +41,9 @@ class FooClass
     {
         $this->bar = $value;
     }
+
+    public function byPi(float $pi = M_PI): float
+    {
+        return $this->bar * $pi;
+    }
 }

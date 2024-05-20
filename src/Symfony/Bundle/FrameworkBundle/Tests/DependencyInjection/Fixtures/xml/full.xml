@@ -38,6 +38,11 @@
             <framework:default-context>
                 <framework:enable_max_depth>true</framework:enable_max_depth>
             </framework:default-context>
+            <framework:named-serializer name="api" include-built-in-normalizers="true" include-built-in-encoders="true">
+                <framework:default-context>
+                    <framework:enable_max_depth>false</framework:enable_max_depth>
+                </framework:default-context>
+            </framework:named-serializer>
         </framework:serializer>
         <framework:property-info />
         <framework:type-info />

@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+7.2
+---
+
+ * Add support for displaying profiles of multiple serializer instances
+
 7.1
 ---
 

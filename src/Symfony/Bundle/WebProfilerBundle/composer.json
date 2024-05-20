@@ -33,7 +33,8 @@
     "conflict": {
         "symfony/form": "<6.4",
         "symfony/mailer": "<6.4",
-        "symfony/messenger": "<6.4"
+        "symfony/messenger": "<6.4",
+        "symfony/serializer": "<7.2"
     },
     "autoload": {
         "psr-4": { "Symfony\\Bundle\\WebProfilerBundle\\": "" },

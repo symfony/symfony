@@ -38,12 +38,14 @@ class TraceableNormalizerTest extends TestCase
             ->with('data', 'type', 'format', $this->isType('array'))
             ->willReturn('denormalized');
 
-        $this->assertSame('normalized', (new TraceableNormalizer($normalizer, new SerializerDataCollector()))->normalize('data', 'format'));
-        $this->assertSame('denormalized', (new TraceableNormalizer($denormalizer, new SerializerDataCollector()))->denormalize('data', 'type', 'format'));
+        $this->assertSame('normalized', (new TraceableNormalizer($normalizer, new SerializerDataCollector(), 'default'))->normalize('data', 'format'));
+        $this->assertSame('denormalized', (new TraceableNormalizer($denormalizer, new SerializerDataCollector(), 'default'))->denormalize('data', 'type', 'format'));
     }
 
     public function testCollectNormalizationData()
     {
+        $serializerName = uniqid('name', true);
+
         $normalizer = $this->createMock(NormalizerInterface::class);
         $normalizer->method('getSupportedTypes')->willReturn(['*' => false]);
         $denormalizer = $this->createMock(DenormalizerInterface::class);
@@ -53,14 +55,14 @@ class TraceableNormalizerTest extends TestCase
         $dataCollector
             ->expects($this->once())
             ->method('collectNormalization')
-            ->with($this->isType('string'), $normalizer::class, $this->isType('float'));
+            ->with($this->isType('string'), $normalizer::class, $this->isType('float'), $serializerName);
         $dataCollector
             ->expects($this->once())
             ->method('collectDenormalization')
-            ->with($this->isType('string'), $denormalizer::class, $this->isType('float'));
+            ->with($this->isType('string'), $denormalizer::class, $this->isType('float'), $serializerName);
 
-        (new TraceableNormalizer($normalizer, $dataCollector))->normalize('data', 'format', [TraceableSerializer::DEBUG_TRACE_ID => 'debug']);
-        (new TraceableNormalizer($denormalizer, $dataCollector))->denormalize('data', 'type', 'format', [TraceableSerializer::DEBUG_TRACE_ID => 'debug']);
+        (new TraceableNormalizer($normalizer, $dataCollector, $serializerName))->normalize('data', 'format', [TraceableSerializer::DEBUG_TRACE_ID => 'debug']);
+        (new TraceableNormalizer($denormalizer, $dataCollector, $serializerName))->denormalize('data', 'type', 'format', [TraceableSerializer::DEBUG_TRACE_ID => 'debug']);
     }
 
     public function testNotCollectNormalizationDataIfNoDebugTraceId()
@@ -74,22 +76,22 @@ class TraceableNormalizerTest extends TestCase
         $dataCollector->expects($this->never())->method('collectNormalization');
         $dataCollector->expects($this->never())->method('collectDenormalization');
 
-        (new TraceableNormalizer($normalizer, $dataCollector))->normalize('data', 'format');
-        (new TraceableNormalizer($denormalizer, $dataCollector))->denormalize('data', 'type', 'format');
+        (new TraceableNormalizer($normalizer, $dataCollector, 'default'))->normalize('data', 'format');
+        (new TraceableNormalizer($denormalizer, $dataCollector, 'default'))->denormalize('data', 'type', 'format');
     }
 
     public function testCannotNormalizeIfNotNormalizer()
     {
         $this->expectException(\BadMethodCallException::class);
 
-        (new TraceableNormalizer($this->createMock(DenormalizerInterface::class), new SerializerDataCollector()))->normalize('data');
+        (new TraceableNormalizer($this->createMock(DenormalizerInterface::class), new SerializerDataCollector(), 'default'))->normalize('data');
     }
 
     public function testCannotDenormalizeIfNotDenormalizer()
     {
         $this->expectException(\BadMethodCallException::class);
 
-        (new TraceableNormalizer($this->createMock(NormalizerInterface::class), new SerializerDataCollector()))->denormalize('data', 'type');
+        (new TraceableNormalizer($this->createMock(NormalizerInterface::class), new SerializerDataCollector(), 'default'))->denormalize('data', 'type');
     }
 
     public function testSupports()
@@ -102,8 +104,8 @@ class TraceableNormalizerTest extends TestCase
         $denormalizer->method('getSupportedTypes')->willReturn(['*' => false]);
         $denormalizer->method('supportsDenormalization')->willReturn(true);
 
-        $traceableNormalizer = new TraceableNormalizer($normalizer, new SerializerDataCollector());
-        $traceableDenormalizer = new TraceableNormalizer($denormalizer, new SerializerDataCollector());
+        $traceableNormalizer = new TraceableNormalizer($normalizer, new SerializerDataCollector(), 'default');
+        $traceableDenormalizer = new TraceableNormalizer($denormalizer, new SerializerDataCollector(), 'default');
 
         $this->assertTrue($traceableNormalizer->supportsNormalization('data'));
         $this->assertTrue($traceableDenormalizer->supportsDenormalization('data', 'type'));

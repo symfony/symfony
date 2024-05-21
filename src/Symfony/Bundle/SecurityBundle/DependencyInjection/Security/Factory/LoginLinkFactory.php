@@ -69,6 +69,10 @@ class LoginLinkFactory extends AbstractFactory
             ->scalarNode('provider')
                 ->info('The user provider to load users from.')
             ->end()
+            ->scalarNode('secret')
+                ->cannotBeEmpty()
+                ->defaultValue('%kernel.secret%')
+            ->end()
         ;
 
         foreach (array_merge($this->defaultSuccessHandlerOptions, $this->defaultFailureHandlerOptions) as $name => $default) {
@@ -113,6 +117,7 @@ class LoginLinkFactory extends AbstractFactory
         $container
             ->setDefinition($signatureHasherId, new ChildDefinition('security.authenticator.abstract_login_link_signature_hasher'))
             ->replaceArgument(1, $config['signature_properties'])
+            ->replaceArgument(2, $config['secret'])
             ->replaceArgument(3, $expiredStorageId ? new Reference($expiredStorageId) : null)
             ->replaceArgument(4, $config['max_uses'] ?? null)
         ;

@@ -50,7 +50,7 @@ class ExpressionLanguageTest extends TestCase
         $user = new InMemoryUser('username', 'password', $roles);
 
         $noToken = null;
-        $rememberMeToken = new RememberMeToken($user, 'firewall-name', 'firewall');
+        $rememberMeToken = new RememberMeToken($user, 'firewall-name');
         $usernamePasswordToken = new UsernamePasswordToken($user, 'firewall-name', $roles);
 
         return [

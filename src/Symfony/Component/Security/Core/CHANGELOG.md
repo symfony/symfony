@@ -1,6 +1,10 @@
 CHANGELOG
 =========
 
+7.2
+---
+
+ * Deprecate argument `$secret` of `RememberMeToken`
 
 7.0
 ---

@@ -107,7 +107,7 @@ class RememberMeFactory implements AuthenticatorFactoryInterface, PrependExtensi
         $container
             ->setDefinition($authenticatorId, new ChildDefinition('security.authenticator.remember_me'))
             ->replaceArgument(0, new Reference($rememberMeHandlerId))
-            ->replaceArgument(3, $config['name'] ?? $this->options['name'])
+            ->replaceArgument(2, $config['name'] ?? $this->options['name'])
         ;
 
         return $authenticatorId;

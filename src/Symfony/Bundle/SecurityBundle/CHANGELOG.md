@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+7.2
+---
+
+ * Allow configuring the secret used to sign login links
+
 7.1
 ---
 

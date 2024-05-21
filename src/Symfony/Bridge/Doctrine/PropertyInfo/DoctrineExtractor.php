@@ -161,13 +161,8 @@ class DoctrineExtractor implements PropertyListExtractorInterface, PropertyTypeE
         };
     }
 
-    /**
-     * @deprecated since Symfony 7.1, use "getType" instead
-     */
     public function getTypes(string $class, string $property, array $context = []): ?array
     {
-        trigger_deprecation('symfony/property-info', '7.1', 'The "%s()" method is deprecated, use "%s::getType()" instead.', __METHOD__, self::class);
-
         if (null === $metadata = $this->getMetadata($class)) {
             return null;
         }

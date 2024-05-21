@@ -57,7 +57,7 @@ final class PasswordStrengthValidator extends ConstraintValidator
      *
      * @return PasswordStrength::STRENGTH_*
      */
-    private static function estimateStrength(#[\SensitiveParameter] string $password): int
+    public static function estimateStrength(#[\SensitiveParameter] string $password): int
     {
         if (!$length = \strlen($password)) {
             return PasswordStrength::STRENGTH_VERY_WEAK;

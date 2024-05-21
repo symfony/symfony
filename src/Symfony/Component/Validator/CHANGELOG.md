@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+7.2
+---
+
+ * Make `PasswordStrengthValidator::estimateStrength()` public
+
 7.1
 ---
 

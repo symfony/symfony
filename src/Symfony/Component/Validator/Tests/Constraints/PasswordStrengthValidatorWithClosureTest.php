@@ -16,11 +16,21 @@ use Symfony\Component\Validator\Constraints\PasswordStrengthValidator;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 use Symfony\Component\Validator\Tests\Constraints\Fixtures\StringableValue;
 
-class PasswordStrengthValidatorTest extends ConstraintValidatorTestCase
+class PasswordStrengthValidatorWithClosureTest extends ConstraintValidatorTestCase
 {
     protected function createValidator(): PasswordStrengthValidator
     {
-        return new PasswordStrengthValidator();
+        return new PasswordStrengthValidator(static function (string $value) {
+            $length = \strlen($value);
+
+            return match (true) {
+                $length < 6 => PasswordStrength::STRENGTH_VERY_WEAK,
+                $length < 10 => PasswordStrength::STRENGTH_WEAK,
+                $length < 15 => PasswordStrength::STRENGTH_MEDIUM,
+                $length < 20 => PasswordStrength::STRENGTH_STRONG,
+                default => PasswordStrength::STRENGTH_VERY_STRONG,
+            };
+        });
     }
 
     /**
@@ -46,11 +56,10 @@ class PasswordStrengthValidatorTest extends ConstraintValidatorTestCase
 
     public static function getValidValues(): iterable
     {
-        yield ['How-is-this', PasswordStrength::STRENGTH_WEAK];
-        yield ['Reasonable-pwd', PasswordStrength::STRENGTH_MEDIUM];
-        yield ['This 1s a very g00d Pa55word! ;-)', PasswordStrength::STRENGTH_VERY_STRONG];
-        yield ['pudding-smack-👌🏼-fox-😎', PasswordStrength::STRENGTH_VERY_STRONG];
-        yield [new StringableValue('How-is-this'), PasswordStrength::STRENGTH_WEAK];
+        yield ['az34tyu', PasswordStrength::STRENGTH_WEAK];
+        yield ['A med1um one', PasswordStrength::STRENGTH_MEDIUM];
+        yield ['a str0ng3r one doh', PasswordStrength::STRENGTH_STRONG];
+        yield [new StringableValue('HeloW0rld'), PasswordStrength::STRENGTH_WEAK];
     }
 
     /**
@@ -75,37 +84,21 @@ class PasswordStrengthValidatorTest extends ConstraintValidatorTestCase
             'password',
             'The password strength is too low. Please use a stronger password.',
             PasswordStrength::PASSWORD_STRENGTH_ERROR,
-            '0',
+            (string) PasswordStrength::STRENGTH_WEAK,
         ];
         yield [
             new PasswordStrength(minScore: PasswordStrength::STRENGTH_VERY_STRONG),
             'Good password?',
             'The password strength is too low. Please use a stronger password.',
             PasswordStrength::PASSWORD_STRENGTH_ERROR,
-            '1',
+            (string) PasswordStrength::STRENGTH_MEDIUM,
         ];
         yield [
             new PasswordStrength(message: 'This password should be strong.'),
             'password',
             'This password should be strong.',
             PasswordStrength::PASSWORD_STRENGTH_ERROR,
-            '0',
+            (string) PasswordStrength::STRENGTH_WEAK,
         ];
-    }
-
-    /**
-     * @dataProvider getPasswordValues
-     */
-    public function testStrengthEstimator(string $password, int $expectedStrength)
-    {
-        self::assertSame($expectedStrength, PasswordStrengthValidator::estimateStrength((string) $password));
-    }
-
-    public static function getPasswordValues(): iterable
-    {
-        yield ['How-is-this', PasswordStrength::STRENGTH_WEAK];
-        yield ['Reasonable-pwd', PasswordStrength::STRENGTH_MEDIUM];
-        yield ['This 1s a very g00d Pa55word! ;-)', PasswordStrength::STRENGTH_VERY_STRONG];
-        yield ['pudding-smack-👌🏼-fox-😎', PasswordStrength::STRENGTH_VERY_STRONG];
     }
 }

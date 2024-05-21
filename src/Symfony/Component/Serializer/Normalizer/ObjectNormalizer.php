@@ -33,6 +33,8 @@ use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 final class ObjectNormalizer extends AbstractObjectNormalizer
 {
     private static $reflectionCache = [];
+    private static $isReadableCache = [];
+    private static $isWritableCache = [];
 
     protected PropertyAccessorInterface $propertyAccessor;
     protected $propertyInfoExtractor;
@@ -170,21 +172,23 @@ final class ObjectNormalizer extends AbstractObjectNormalizer
         if (!parent::isAllowedAttribute($classOrObject, $attribute, $format, $context)) {
             return false;
         }
+
         $class = \is_object($classOrObject) ? \get_class($classOrObject) : $classOrObject;
 
         if ($context['_read_attributes'] ?? true) {
-            return $this->propertyInfoExtractor->isReadable($class, $attribute) || $this->hasAttributeAccessorMethod($class, $attribute);
+            if (!isset(self::$isReadableCache[$class.$attribute])) {
+                self::$isReadableCache[$class.$attribute] = $this->propertyInfoExtractor->isReadable($class, $attribute) || $this->hasAttributeAccessorMethod($class, $attribute);
+            }
+
+            return self::$isReadableCache[$class.$attribute];
         }
 
-        if ($this->propertyInfoExtractor->isWritable($class, $attribute)) {
-            return true;
+        if (!isset(self::$isWritableCache[$class.$attribute])) {
+            self::$isWritableCache[$class.$attribute] = $this->propertyInfoExtractor->isWritable($class, $attribute)
+                || (($writeInfo = $this->writeInfoExtractor->getWriteInfo($class, $attribute)) && PropertyWriteInfo::TYPE_NONE !== $writeInfo->getType());
         }
 
-        if (($writeInfo = $this->writeInfoExtractor->getWriteInfo($class, $attribute)) && PropertyWriteInfo::TYPE_NONE !== $writeInfo->getType()) {
-            return true;
-        }
-
-        return false;
+        return self::$isWritableCache[$class.$attribute];
     }
 
     private function hasAttributeAccessorMethod(string $class, string $attribute): bool

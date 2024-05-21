@@ -1,0 +1,16 @@
+---------------------------------------------------------------------------
+
+by GromNaN at 2024-05-21T12:31:03Z
+
+In short, [it's a change of `use`](https://github.com/jolicode/automapper/pull/132/files).
+
+```diff
+- use Symfony\Component\HttpKernel\DependencyInjection\Extension;
++ use Symfony\Component\DependencyInjection\Extension\Extension;
+```
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2024-05-21T13:59:04Z
+
+Luckily the new class is available in 5.4 too (https://github.com/symfony/symfony/blob/5.4/src/Symfony/Component/DependencyInjection/Extension/Extension.php) so bundles that support a lot of different Symfony versions can safely switch to the new class and keep the same compatibility. Thanks!

@@ -1,0 +1,34 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2024-05-07T04:17:49Z
+
+Hey!
+
+Thanks for your PR. You are targeting branch "7.1" but it seems your PR description refers to branch "7.1 for features".
+Could you update the PR description or change target branch? This helps core maintainers a lot.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by carsonbot at 2024-05-07T04:17:51Z
+
+It looks like you unchecked the "Allow edits from maintainer" box. That is fine, but please note that if you have multiple commits, you'll need to squash your commits into one before this can be merged. Or, you can check the "Allow edits from maintainers" box and the maintainer can squash for you.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2024-05-13T07:13:21Z
+
+What about if we also add a method named `getRootSectionEvents()`?
+
+---------------------------------------------------------------------------
+
+by hacfi at 2024-05-13T08:19:56Z
+
+@xabbuh Updated as requested.

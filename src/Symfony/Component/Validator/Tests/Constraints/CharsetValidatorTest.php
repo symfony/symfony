@@ -37,13 +37,13 @@ class CharsetValidatorTest extends ConstraintValidatorTestCase
     /**
      * @dataProvider provideInvalidValues
      */
-    public function testInvalidValues(string $value, array $encodings)
+    public function testInvalidValues(string $value, array|string $encodings)
     {
         $this->validator->validate($value, new Charset(encodings: $encodings));
 
         $this->buildViolation('The detected character encoding is invalid ({{ detected }}). Allowed encodings are {{ encodings }}.')
             ->setParameter('{{ detected }}', 'UTF-8')
-            ->setParameter('{{ encodings }}', implode(', ', $encodings))
+            ->setParameter('{{ encodings }}', implode(', ', (array) $encodings))
             ->setCode(Charset::BAD_ENCODING_ERROR)
             ->assertRaised();
     }
@@ -73,6 +73,7 @@ class CharsetValidatorTest extends ConstraintValidatorTestCase
 
     public static function provideInvalidValues()
     {
+        yield ['my non-Äscîi string', 'ASCII'];
         yield ['my non-Äscîi string', ['ASCII']];
         yield ['😊', ['7bit']];
     }

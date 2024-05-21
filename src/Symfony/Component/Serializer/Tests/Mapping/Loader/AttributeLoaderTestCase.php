@@ -21,6 +21,7 @@ use Symfony\Component\Serializer\Mapping\ClassMetadata;
 use Symfony\Component\Serializer\Mapping\Loader\AnnotationLoader;
 use Symfony\Component\Serializer\Mapping\Loader\AttributeLoader;
 use Symfony\Component\Serializer\Mapping\Loader\LoaderInterface;
+use Symfony\Component\Serializer\Tests\Fixtures\Attributes\AccessorishGetters;
 use Symfony\Component\Serializer\Tests\Mapping\Loader\Features\ContextMappingTestTrait;
 use Symfony\Component\Serializer\Tests\Mapping\TestClassMetadataFactory;
 
@@ -210,6 +211,22 @@ abstract class AttributeLoaderTestCase extends TestCase
         self::assertSame(['a', 'b'], $attributesMetadata['foo']->getGroups());
         self::assertSame(['a', 'c', 'd'], $attributesMetadata['bar']->getGroups());
         self::assertSame(['a'], $attributesMetadata['baz']->getGroups());
+    }
+
+    public function testIgnoresAccessorishGetters()
+    {
+        $classMetadata = new ClassMetadata(AccessorishGetters::class);
+        $this->loader->loadClassMetadata($classMetadata);
+
+        $attributesMetadata = $classMetadata->getAttributesMetadata();
+
+        self::assertCount(4, $classMetadata->getAttributesMetadata());
+
+        self::assertArrayHasKey('field1', $attributesMetadata);
+        self::assertArrayHasKey('field2', $attributesMetadata);
+        self::assertArrayHasKey('field3', $attributesMetadata);
+        self::assertArrayHasKey('field4', $attributesMetadata);
+        self::assertArrayNotHasKey('h', $attributesMetadata);
     }
 
     /**

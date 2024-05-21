@@ -515,6 +515,14 @@ class GetSetMethodNormalizerTest extends TestCase
         $this->assertSame(['type' => 'one', 'url' => 'URL_ONE'], $normalizer->normalize(new GetSetMethodDiscriminatedDummyOne()));
     }
 
+    public function testNormalizeWithMethodNamesSimilarToAccessors()
+    {
+        $classMetadataFactory = new ClassMetadataFactory(new AttributeLoader());
+        $normalizer = new GetSetMethodNormalizer($classMetadataFactory);
+
+        $this->assertSame(['class' => 'class', 123 => 123], $normalizer->normalize(new GetSetWithAccessorishMethod()));
+    }
+
     public function testDenormalizeWithDiscriminator()
     {
         $classMetadataFactory = new ClassMetadataFactory(new AttributeLoader());
@@ -900,5 +908,48 @@ class GetSetDummyWithOptionalAndMultipleSetterArgs
     public function setBar($bar = null, $other = true)
     {
         $this->bar = $bar;
+    }
+}
+
+class GetSetWithAccessorishMethod
+{
+    public function cancel()
+    {
+        return 'cancel';
+    }
+
+    public function hash()
+    {
+        return 'hash';
+    }
+
+    public function getClass()
+    {
+        return 'class';
+    }
+
+    public function setClass()
+    {
+    }
+
+    public function get123()
+    {
+        return 123;
+    }
+
+    public function set123()
+    {
+    }
+
+    public function gettings()
+    {
+    }
+
+    public function settings()
+    {
+    }
+
+    public function isolate()
+    {
     }
 }

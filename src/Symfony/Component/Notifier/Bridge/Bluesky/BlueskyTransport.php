@@ -12,6 +12,7 @@
 namespace Symfony\Component\Notifier\Bridge\Bluesky;
 
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Mime\Part\File;
 use Symfony\Component\Notifier\Exception\TransportException;
 use Symfony\Component\Notifier\Exception\UnsupportedMessageTypeException;
 use Symfony\Component\Notifier\Message\ChatMessage;
@@ -65,19 +66,28 @@ final class BlueskyTransport extends AbstractTransport
         $post = [
             '$type' => 'app.bsky.feed.post',
             'text' => $message->getSubject(),
-            'createdAt' => (new \DateTimeImmutable())->format('Y-m-d\\TH:i:s.u\\Z'),
+            'createdAt' => \DateTimeImmutable::createFromFormat('U', time())->format('Y-m-d\\TH:i:s.u\\Z'),
         ];
         if ([] !== $facets = $this->parseFacets($post['text'])) {
             $post['facets'] = $facets;
         }
 
+        $options = $message->getOptions()?->toArray() ?? [];
+        $options['repo'] = $this->authSession['did'] ?? null;
+        $options['collection'] = 'app.bsky.feed.post';
+        $options['record'] = $post;
+
+        if (isset($options['attach'])) {
+            $options['record']['embed'] = [
+                '$type' => 'app.bsky.embed.images',
+                'images' => $this->uploadMedia($options['attach']),
+            ];
+            unset($options['attach']);
+        }
+
         $response = $this->client->request('POST', sprintf('https://%s/xrpc/com.atproto.repo.createRecord', $this->getEndpoint()), [
             'auth_bearer' => $this->authSession['accessJwt'] ?? null,
-            'json' => [
-                'repo' => $this->authSession['did'] ?? null,
-                'collection' => 'app.bsky.feed.post',
-                'record' => $post,
-            ],
+            'json' => $options,
         ]);
 
         try {
@@ -221,5 +231,52 @@ final class BlueskyTransport extends AbstractTransport
         }
 
         return $output;
+    }
+
+    /**
+     * @param array<array{file: File, description: string}> $media
+     *
+     * @return array<array{alt: string, image: array{$type: string, ref: array{$link: string}, mimeType: string, size: int}}>
+     */
+    private function uploadMedia(array $media): array
+    {
+        $pool = [];
+
+        foreach ($media as ['file' => $file, 'description' => $description]) {
+            $pool[] = [
+                'description' => $description,
+                'response' => $this->client->request('POST', sprintf('https://%s/xrpc/com.atproto.repo.uploadBlob', $this->getEndpoint()), [
+                    'auth_bearer' => $this->authSession['accessJwt'] ?? null,
+                    'headers' => [
+                        'Content-Type: '.$file->getContentType(),
+                    ],
+                    'body' => fopen($file->getPath(), 'r'),
+                ]),
+            ];
+        }
+
+        $embeds = [];
+
+        try {
+            foreach ($pool as $i => ['description' => $description, 'response' => $response]) {
+                unset($pool[$i]);
+                $result = $response->toArray(false);
+
+                if (300 <= $response->getStatusCode()) {
+                    throw new TransportException('Unable to embed medias.', $response);
+                }
+
+                $embeds[] = [
+                    'alt' => $description,
+                    'image' => $result['blob'],
+                ];
+            }
+        } finally {
+            foreach ($pool as ['response' => $response]) {
+                $response->cancel();
+            }
+        }
+
+        return $embeds;
     }
 }

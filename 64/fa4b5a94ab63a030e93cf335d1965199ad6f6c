@@ -1,0 +1,136 @@
+---------------------------------------------------------------------------
+
+by smnandre at 2024-05-11T22:21:11Z
+
+What about:
+
+In the component
+* dont change a thing in this class, except...
+* add a deprecation when no callable is passed in the constructor
+* create the new class (+ interface if you need to - not obvious to me)
+
+In the framework bundle
+* in the DI extension: inject a closure of your extracted class in the validator service
+
+---------------------------------------------------------------------------
+
+by yalit at 2024-05-12T06:01:29Z
+
+Thanks for the proposition and ideas.
+
+I didn't thought about the deprecation but if you add the service a a Closure in the DI as well, wouldn't the deprecation not kick in.
+
+And building on your proposition:
+- update the constructor to accept both a Closure and the interface
+- in case of a Closure is passed to the constructor, add a deprecation
+- inject the service directly into the DI in the Framework Bundle (instead of the Closure) => only the users that are passing a custom Closure will get the deprecation warning
+
+The idea of the interface is for, in the future, to be able to pass in the constructor another implementation of that interface if a custom strength estimation is needed while using by default the one of the component
+
+EDIT : I pushed the proposal above
+
+---------------------------------------------------------------------------
+
+by chalasr at 2024-05-12T23:39:48Z
+
+Thanks for the PR.
+
+As the the proposed service is not about validation per se, should it be located elsewhere than in the Validator component? PasswordHasher or its own component maybe?
+
+If we feel like it's not worth it, then it's probably not worth making it a first-class service either and we don't need to change anything at all given the use case can already be solved using dependency injection (the validator service can be decorated or replaced to be given a different closure for strength estimation)
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2024-05-13T08:33:16Z
+
+Reading the code changes I am not sure that we need the deprecation of being able to pass a closure. Do we win anything in the future when being able to pass a closure wouldn't be possible anymore?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2024-05-13T08:37:08Z
+
+> The idea of the interface is for, in the future, to be able to pass in the constructor another implementation of that interface if a custom strength estimation is needed while using by default the one of the component
+
+Do you have a real use case for this or is being able to get the strength enough for the moment?
+
+---------------------------------------------------------------------------
+
+by yalit at 2024-05-13T13:45:59Z
+
+@xabbuh the Use case is to get the score of any string (the target would be to display a sort of score visualization when the user fills the password on the frontend using the exact same definition as the backend while not re-developing the alrgorithm in the frontend)
+
+Hence the proposal of extracting that into a dedicated class.
+
+The replacement of the Closure by the interface was to align on the way the DI is made in Symfony based on services but it can be avoided if found not pertinent.
+
+@chalasr Originally I thought adding that service into the Security component as it felt more linked to the security level of a Password but it felt too much changes in different places and so kept it inside the Validator Component. I have no problem for it to find another place as this one in the Symfony ecosystem and for me to update the PR to match the need. (wouldn't it create an unwanted dependency in the Validator component?)
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2024-05-13T14:02:36Z
+
+> the Use case is to get the score of any string (the target would be to display a sort of score visualization when the user fills the password on the frontend using the exact same definition as the backend while not re-developing the alrgorithm in the frontend)
+
+But are we talking about being able to get the strength before the validation is performed or should the information be provided to users in advance?
+
+---------------------------------------------------------------------------
+
+by yalit at 2024-05-13T14:35:42Z
+
+the idea is to provide the information before the validation is performed (while they are typing) but using the same algo/checks that will be done during the validation
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2024-05-13T14:40:15Z
+
+> the idea is to provide the information before the validation is performed (while they are typing) but using the same algo/checks that will be done during the validation
+
+Thank you for the clarification. To fulfill this feature request extracting the method into a separate class indeed makes sense to me.
+
+---------------------------------------------------------------------------
+
+by Pierstoval at 2024-05-16T08:02:58Z
+
+There is another reason I find in making a new service based on a new interface: custom password strength.
+
+I had the case in the past, we were using another version of Symfony, and password strength was expected to be really specific, and the current implementation in Symfony, even though it's good, didn't fit the specs we had, so we developed our own validator for that.
+
+Just being able to override one service with our own "password strength calculator" would have been great back then, because it would still have triggered the whole Symfony Validation system, while allowing us to also use the exact same service to display the <progress> HTML tag in the frontend displaying the strength. Double effect on this.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-05-16T08:17:22Z
+
+@Pierstoval this use case is already supported: just pass a closure to the constructor.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2024-05-16T08:25:45Z
+
+Extracting that interface would result in a more formal contract however. But what makes this weird is that the _validator_ component would expose a service that estimates password strength. I would expect to find this kind of service in security-core maybe or the password-hasher component.
+
+That being said, the use-case might be just too much of a niche to justify exposing a service for it. Making that method public (and documenting how to have that closure injected) would indeed cover all use-cases.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-05-16T12:45:46Z
+
+> what makes this weird is that the validator component would expose a service that estimates password strength
+
+I wouldn't expose a service, just a public static method. If ppl want to change the estimator, they would just have to redefine the PasswordStrengthValidator service.
+
+> That being said, the use-case might be just too much of a niche to justify exposing a service for it. Making that method public (and documenting how to have that closure injected) would indeed cover all use-cases.
+
+Yes, that's my point. We provide full flexibility by just making the method public and nothing else.
+
+---------------------------------------------------------------------------
+
+by yalit at 2024-05-21T10:19:53Z
+
+I've rollback-ed the changes to make only the function estimateStrength public in the Validator.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2024-05-21T12:29:52Z
+
+Please apply the patch suggested by fabbot and eliminate all merge commits by rebasing your PR onto the 7.2 branch.

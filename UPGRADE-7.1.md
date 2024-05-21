@@ -92,7 +92,10 @@ Mailer
 HttpKernel
 ----------
 
- * Deprecate `Extension::addAnnotatedClassesToCompile()` and related code infrastructure
+ * The `Extension` class is marked as internal, extend the `Extension` class from the DependencyInjection component instead
+ * Deprecate `Extension::addAnnotatedClassesToCompile()`
+ * Deprecate `AddAnnotatedClassesToCachePass`
+ * Deprecate the `setAnnotatedClassCache()` and `getAnnotatedClassesToCompile()` methods of the `Kernel` class
 
 SecurityBundle
 --------------

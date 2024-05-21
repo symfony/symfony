@@ -5,6 +5,7 @@ CHANGELOG
 ---
 
  * Add method `getLastPeriod()` to `StopwatchEvent`
+ * Add `getRootSectionEvents()` method and `ROOT` constant to `Stopwatch`
 
 5.2
 ---

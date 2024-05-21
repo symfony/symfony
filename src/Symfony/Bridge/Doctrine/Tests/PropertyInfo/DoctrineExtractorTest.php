@@ -108,8 +108,6 @@ class DoctrineExtractorTest extends TestCase
     }
 
     /**
-     * @group legacy
-     *
      * @dataProvider legacyTypesProvider
      */
     public function testExtractLegacy(string $property, ?array $type = null)
@@ -117,9 +115,6 @@ class DoctrineExtractorTest extends TestCase
         $this->assertEquals($type, $this->createExtractor()->getTypes(DoctrineDummy::class, $property, []));
     }
 
-    /**
-     * @group legacy
-     */
     public function testExtractWithEmbeddedLegacy()
     {
         $expectedTypes = [new LegacyType(
@@ -137,9 +132,6 @@ class DoctrineExtractorTest extends TestCase
         $this->assertEquals($expectedTypes, $actualTypes);
     }
 
-    /**
-     * @group legacy
-     */
     public function testExtractEnumLegacy()
     {
         $this->assertEquals([new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, false, EnumString::class)], $this->createExtractor()->getTypes(DoctrineEnum::class, 'enumString', []));
@@ -149,9 +141,6 @@ class DoctrineExtractorTest extends TestCase
         $this->assertNull($this->createExtractor()->getTypes(DoctrineEnum::class, 'enumCustom', []));
     }
 
-    /**
-     * @group legacy
-     */
     public static function legacyTypesProvider(): array
     {
         // DBAL 4 has a special fallback strategy for BINGINT (int -> string)
@@ -251,9 +240,6 @@ class DoctrineExtractorTest extends TestCase
         $this->assertNull($this->createExtractor()->getProperties('Not\Exist'));
     }
 
-    /**
-     * @group legacy
-     */
     public function testGetTypesCatchExceptionLegacy()
     {
         $this->assertNull($this->createExtractor()->getTypes('Not\Exist', 'baz'));

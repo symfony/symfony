@@ -72,7 +72,7 @@ class AuthenticationTrustResolverTest extends TestCase
     {
         $user = new InMemoryUser('wouter', '', ['ROLE_USER']);
 
-        return new RememberMeToken($user, 'main', 'secret');
+        return new RememberMeToken($user, 'main');
     }
 }
 

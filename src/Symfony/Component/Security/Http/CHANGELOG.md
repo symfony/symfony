@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+7.2
+---
+
+ * Deprecate argument `$secret` of `RememberMeAuthenticator`
+
 7.1
 ---
 

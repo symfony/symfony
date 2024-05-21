@@ -880,7 +880,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     /**
      * Registers a service definition.
      *
-     * This methods allows for simple registration of service definition
+     * This method allows for simple registration of service definition
      * with a fluid interface.
      */
     public function register(string $id, ?string $class = null): Definition

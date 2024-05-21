@@ -1,0 +1,21 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2024-05-07T04:25:56Z
+
+It looks like you unchecked the "Allow edits from maintainer" box. That is fine, but please note that if you have multiple commits, you'll need to squash your commits into one before this can be merged. Or, you can check the "Allow edits from maintainers" box and the maintainer can squash for you.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2024-05-13T07:16:09Z
+
+the new method should also be documented in the changelog file of the Stopwatch component
+
+---------------------------------------------------------------------------
+
+by hacfi at 2024-05-13T07:56:31Z
+
+@xabbuh Updated as requested! Anything else left to do?

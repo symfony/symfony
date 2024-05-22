@@ -61,6 +61,10 @@ class LazyObjectState
             $this->status = self::STATUS_UNINITIALIZED_FULL;
             $this->reset($instance);
 
+            if ($e instanceof \Error && 1 === preg_match('#^Cannot modify readonly property (.+)$#', $e->getMessage(), $matches)) {
+                throw new LogicException(sprintf('Lazy ghost cannot reinitialize readonly property "%s", remove the readonly modifier or ensure the ghost is never reinitialized', $matches[1]));
+            }
+            
             throw $e;
         }
 

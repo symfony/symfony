@@ -37,7 +37,7 @@ class ProxyHelperTest extends TestCase
             $expected = str_replace(['.', ' .  .  . ', '\'$a\', \'$a\n\', "\$a\n"'], [' . ', '...', '\'$a\', "\$a\\\n", "\$a\n"'], $expected);
             $expected = str_replace('Bar', '\\'.Bar::class, $expected);
             $expected = str_replace('self', '\\'.TestForProxyHelper::class, $expected);
-            $expected = str_replace('= [namespace\\M_PI, new M_PI]', '= [\M_PI, new \Symfony\Component\VarExporter\Tests\M_PI()]', $expected);
+            $expected = str_replace('= [namespace\M_PI, new M_PI()]', '= [\M_PI, new \Symfony\Component\VarExporter\Tests\M_PI()]', $expected);
 
             yield [$expected, $method];
         }

@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Tests\Functional;
 
+use Symfony\Bundle\FrameworkBundle\Tests\Fixtures\JsonSerializableBackedEnum;
 use Symfony\Bundle\FrameworkBundle\Tests\Fixtures\TranslatableBackedEnum;
 
 /**
@@ -77,6 +78,15 @@ class SerializerTest extends AbstractWebTestCase
         $serializer = static::getContainer()->get('serializer.alias');
 
         $this->assertEquals('GET', $serializer->serialize(TranslatableBackedEnum::Get, 'yaml'));
+    }
+
+    public function testSerializeJsonSerializableBackedEnum()
+    {
+        static::bootKernel(['test_case' => 'Serializer']);
+
+        $serializer = static::getContainer()->get('serializer.alias');
+
+        $this->assertEquals('custom_get_string', $serializer->serialize(JsonSerializableBackedEnum::Get, 'yaml'));
     }
 }
 

@@ -40,6 +40,10 @@ final class BackedEnumNormalizer implements NormalizerInterface, DenormalizerInt
             throw new InvalidArgumentException('The data must belong to a backed enumeration.');
         }
 
+        if ($object instanceof \JsonSerializable) {
+            return $object->jsonSerialize();
+        }
+
         return $object->value;
     }
 

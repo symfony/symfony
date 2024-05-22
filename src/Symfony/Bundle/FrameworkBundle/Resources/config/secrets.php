@@ -21,6 +21,7 @@ return static function (ContainerConfigurator $container) {
             ->args([
                 abstract_arg('Secret dir, set in FrameworkExtension'),
                 service('secrets.decryption_key')->ignoreOnInvalid(),
+                abstract_arg('Secret env var, set in FrameworkExtension'),
             ])
 
         ->set('secrets.env_var_loader', StaticEnvVarLoader::class)

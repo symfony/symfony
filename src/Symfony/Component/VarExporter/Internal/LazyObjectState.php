@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\VarExporter\Internal;
 
+use Symfony\Component\VarExporter\Exception\LogicException;
 use Symfony\Component\VarExporter\Hydrator as PublicHydrator;
 
 /**
@@ -62,7 +63,7 @@ class LazyObjectState
             $this->reset($instance);
 
             if ($e instanceof \Error && 1 === preg_match('#^Cannot modify readonly property (.+)$#', $e->getMessage(), $matches)) {
-                throw new LogicException(sprintf('Lazy ghost cannot reinitialize readonly property "%s", remove the readonly modifier or ensure the ghost is never reinitialized', $matches[1]));
+                throw new LogicException(sprintf('Lazy ghost cannot reinitialize readonly property "%s", remove the readonly modifier on that property and/or its containing class, or ensure the ghost will never be reinitialized', $matches[1]));
             }
             
             throw $e;

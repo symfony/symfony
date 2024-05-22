@@ -23,25 +23,19 @@ final class MercureOptions implements MessageOptionsInterface
     private ?string $id;
     private ?string $type;
     private ?int $retry;
-    private ?string $body;
-    private ?string $icon;
-    private ?string $tag;
-    private bool $renotify;
+    private ?array $content;
 
     /**
      * @param string|string[]|null $topics
      */
-    public function __construct(string|array|null $topics = null, bool $private = false, ?string $id = null, ?string $type = null, ?int $retry = null, ?string $body = null, ?string $icon = null, ?string $tag = null, ?bool $renotify = false)
+    public function __construct(string|array|null $topics = null, bool $private = false, ?string $id = null, ?string $type = null, ?int $retry = null, ?array $content = null)
     {
         $this->topics = null !== $topics ? (array) $topics : null;
         $this->private = $private;
         $this->id = $id;
         $this->type = $type;
         $this->retry = $retry;
-        $this->body = $body;
-        $this->icon = $icon;
-        $this->tag = $tag;
-        $this->renotify = $renotify;
+        $this->content = $content;
     }
 
     /**
@@ -72,25 +66,11 @@ final class MercureOptions implements MessageOptionsInterface
         return $this->retry;
     }
 
-    public function getBody(): ?string
+    public function getContent(): ?array
     {
-        return $this->body;
+        return $this->content;
     }
 
-    public function getIcon(): ?string
-    {
-        return $this->icon;
-    }
-
-    public function getTag(): ?string
-    {
-        return $this->tag;
-    }
-
-    public function isRenotify(): bool
-    {
-        return $this->renotify;
-    }
 
     public function toArray(): array
     {
@@ -100,10 +80,7 @@ final class MercureOptions implements MessageOptionsInterface
             'id' => $this->id,
             'type' => $this->type,
             'retry' => $this->retry,
-            'body' => $this->body,
-            'icon' => $this->icon,
-            'tag' => $this->tag,
-            'renotify' => $this->renotify,
+            'content' => $this->content,
         ];
     }
 
@@ -111,4 +88,6 @@ final class MercureOptions implements MessageOptionsInterface
     {
         return null;
     }
+
+
 }

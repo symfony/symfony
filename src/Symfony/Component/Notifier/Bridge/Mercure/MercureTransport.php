@@ -30,18 +30,17 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
  */
 final class MercureTransport extends AbstractTransport
 {
+    private HubInterface $hub;
+    private string $hubId;
     private string|array $topics;
 
     /**
      * @param string|string[]|null $topics
      */
-    public function __construct(
-        private HubInterface $hub,
-        private string $hubId,
-        string|array|null $topics = null,
-        ?HttpClientInterface $client = null,
-        ?EventDispatcherInterface $dispatcher = null,
-    ) {
+    public function __construct(HubInterface $hub, string $hubId, string|array|null $topics = null, ?HttpClientInterface $client = null, ?EventDispatcherInterface $dispatcher = null)
+    {
+        $this->hub = $hub;
+        $this->hubId = $hubId;
         $this->topics = $topics ?? 'https://symfony.com/notifier';
 
         parent::__construct($client, $dispatcher);
@@ -49,7 +48,7 @@ final class MercureTransport extends AbstractTransport
 
     public function __toString(): string
     {
-        return sprintf('mercure://%s%s', $this->hubId, '?'.http_build_query(['topic' => $this->topics], '', '&'));
+        return sprintf('mercure://%s%s', $this->hubId, null !== $this->topics ? '?'.http_build_query(['topic' => $this->topics], '', '&') : '');
     }
 
     public function supports(MessageInterface $message): bool
@@ -77,10 +76,8 @@ final class MercureTransport extends AbstractTransport
             '@context' => 'https://www.w3.org/ns/activitystreams',
             'type' => 'Announce',
             'summary' => $message->getSubject(),
-            'body' => $options->getBody(),
-            'icon' => $options->getIcon(),
-            'tag' => $options->getTag(),
-            'renotify' => $options->isRenotify(),
+            "mediaType" => "application/json",
+            'content' => $options->getContent(),
         ]), $options->isPrivate(), $options->getId(), $options->getType(), $options->getRetry());
 
         try {

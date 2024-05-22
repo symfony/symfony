@@ -1,7 +1,8 @@
 CHANGELOG
 =========
 
- * Add body, icon, tag ,renotify to MercureOptions.php and MercureTransport.php for Symfony UX Notify
+ * Add content to MercureOptions.php for Symfony UX Notify
+ * Add "mediaType" => "application/json" to MercureOptions.php
 
 5.3
 ---

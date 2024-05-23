@@ -13,6 +13,7 @@ namespace Symfony\Component\Config\Tests\Loader;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\Exception\LoaderLoadException;
+use Symfony\Component\Config\Exception\LogicException;
 use Symfony\Component\Config\Loader\Loader;
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\Config\Loader\LoaderResolverInterface;
@@ -27,6 +28,14 @@ class LoaderTest extends TestCase
         $loader->setResolver($resolver);
 
         $this->assertSame($resolver, $loader->getResolver(), '->setResolver() sets the resolver loader');
+    }
+
+    public function testGetResolverWithoutSetResolver()
+    {
+        $this->expectException(LogicException::class);
+
+        $loader = new ProjectLoader1();
+        $loader->getResolver();
     }
 
     public function testResolve()
@@ -44,6 +53,14 @@ class LoaderTest extends TestCase
 
         $this->assertSame($loader, $loader->resolve('foo.foo'), '->resolve() finds a loader');
         $this->assertSame($resolvedLoader, $loader->resolve('foo.xml'), '->resolve() finds a loader');
+    }
+
+    public function testResolveWithoutSetResolver()
+    {
+        $this->expectException(LoaderLoadException::class);
+
+        $loader = new ProjectLoader1();
+        $loader->resolve('foo.xml');
     }
 
     public function testResolveWhenResolverCannotFindLoader()

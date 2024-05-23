@@ -232,26 +232,43 @@ class MockHttpClientTest extends HttpClientTestCase
         $this->assertFalse(isset($requestOptions['normalized_headers']['content-length']));
     }
 
-    public function testThrowExceptionInBodyGenerator()
+    public function testThrowExceptionInBodyGeneratorWhenAccessingContent()
     {
         $mockHttpClient = new MockHttpClient([
-            new MockResponse((static function (): \Generator {
-                yield 'foo';
-                throw new TransportException('foo ccc');
-            })()),
-            new MockResponse((static function (): \Generator {
-                yield 'bar';
-                throw new \RuntimeException('bar ccc');
-            })()),
+            new MockResponse(
+                (static function (): \Generator {
+                    // We _must_ yield a first chunk here...
+                    yield 'first chunk';
+                    // otherwise the exception would be thrown already when setting up the test.
+                    throw new TransportException('foo ccc');
+                })()
+            ),
         ]);
 
+        $response = $mockHttpClient->request('GET', 'https://symfony.com', []);
+
+        // Since the exception is not thrown unless the first chunk has been processed,
+        // the status code is 200 (depends on the first chunk).
+        self::assertSame(200, $response->getStatusCode());
+
         try {
-            $mockHttpClient->request('GET', 'https://symfony.com', [])->getContent();
+            // Accessing the content has to fail, since we now hit the exception throwing code in the generator
+            $response->getContent();
             $this->fail();
         } catch (TransportException $e) {
             $this->assertEquals(new TransportException('foo ccc'), $e->getPrevious());
             $this->assertSame('foo ccc', $e->getMessage());
         }
+    }
+
+    public function testThrowExceptionInBodyGeneratorWhenStreaming()
+    {
+        $mockHttpClient = new MockHttpClient([
+            new MockResponse((static function (): \Generator {
+                yield 'bar';
+                throw new \RuntimeException('bar ccc');
+            })()),
+        ]);
 
         $chunks = [];
         try {
@@ -272,6 +289,42 @@ class MockHttpClientTest extends HttpClientTestCase
         $this->assertSame('bar ccc', $chunks[2]->getError());
     }
 
+    public function testYieldExceptionFromBodyGeneratorWhenAccessingStatusCode()
+    {
+        $exception = new \RuntimeException('Something went wrong at the transport level');
+        $mockHttpClient = new MockHttpClient([
+            new MockResponse(
+                (static function () use ($exception): \Generator {
+                    yield $exception;
+                })()
+            ),
+        ]);
+
+        try {
+            $mockHttpClient->request('GET', 'https://symfony.com', [])->getStatusCode();
+            $this->fail();
+        } catch (TransportException $e) {
+            $this->assertSame('Something went wrong at the transport level', $e->getMessage());
+            $this->assertSame($exception, $e->getPrevious());
+        }
+    }
+
+    public function testExceptionInBodyPartArrayWhenAccessingStatusCode()
+    {
+        $exception = new \RuntimeException('Something went wrong at the transport level');
+        $mockHttpClient = new MockHttpClient([
+            new MockResponse([$exception]),
+        ]);
+
+        try {
+            $mockHttpClient->request('GET', 'https://symfony.com', [])->getStatusCode();
+            $this->fail();
+        } catch (TransportException $e) {
+            $this->assertSame('Something went wrong at the transport level', $e->getMessage());
+            $this->assertSame($exception, $e->getPrevious());
+        }
+    }
+
     public function testMergeDefaultOptions()
     {
         $mockHttpClient = new MockHttpClient(null, 'https://example.com');
@@ -281,23 +334,59 @@ class MockHttpClientTest extends HttpClientTestCase
         $mockHttpClient->request('GET', '/foo', ['base_uri' => null]);
     }
 
-    public function testExceptionDirectlyInBody()
+    public function testExceptionInBodyPartArrayWhenAccessingContent()
     {
         $mockHttpClient = new MockHttpClient([
             new MockResponse(['foo', new \RuntimeException('foo ccc')]),
-            new MockResponse((static function (): \Generator {
-                yield 'bar';
-                yield new TransportException('bar ccc');
-            })()),
         ]);
 
+        $response = $mockHttpClient->request('GET', 'https://symfony.com', []);
+
+        // Since the exception is not thrown unless the first chunk has been processed,
+        // the status code is 200 (depends on the first chunk).
+        self::assertSame(200, $response->getStatusCode());
+
         try {
-            $mockHttpClient->request('GET', 'https://symfony.com', [])->getContent();
+            $response->getContent();
             $this->fail();
         } catch (TransportException $e) {
             $this->assertEquals(new \RuntimeException('foo ccc'), $e->getPrevious());
             $this->assertSame('foo ccc', $e->getMessage());
         }
+    }
+
+    public function testExceptionYieldedFromBodyPartGeneratorWhenAccessingContent()
+    {
+        $mockHttpClient = new MockHttpClient([
+            new MockResponse((static function (): \Generator {
+                yield 'foo';
+                yield new \RuntimeException('foo ccc');
+            })()),
+        ]);
+
+        $response = $mockHttpClient->request('GET', 'https://symfony.com', []);
+
+        // Since the exception is not thrown unless the first chunk has been processed,
+        // the status code is 200 (depends on the first chunk).
+        self::assertSame(200, $response->getStatusCode());
+
+        try {
+            $response->getContent();
+            $this->fail();
+        } catch (TransportException $e) {
+            $this->assertEquals(new \RuntimeException('foo ccc'), $e->getPrevious());
+            $this->assertSame('foo ccc', $e->getMessage());
+        }
+    }
+
+    public function testExceptionDirectlyInBody()
+    {
+        $mockHttpClient = new MockHttpClient([
+            new MockResponse((static function (): \Generator {
+                yield 'bar';
+                yield new TransportException('bar ccc');
+            })()),
+        ]);
 
         $chunks = [];
         try {

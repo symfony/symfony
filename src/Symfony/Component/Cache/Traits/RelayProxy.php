@@ -276,6 +276,11 @@ class RelayProxy extends \Relay\Relay implements ResetInterface, LazyObjectInter
         return ($this->lazyObjectState->realInstance ??= ($this->lazyObjectState->initializer)())->replicaof(...\func_get_args());
     }
 
+    public function waitaof($numlocal, $numremote, $timeout): \Relay\Relay|array|false
+    {
+        return ($this->lazyObjectState->realInstance ??= ($this->lazyObjectState->initializer)())->waitaof(...\func_get_args());
+    }
+
     public function restore($key, $ttl, $value, $options = null): \Relay\Relay|bool
     {
         return ($this->lazyObjectState->realInstance ??= ($this->lazyObjectState->initializer)())->restore(...\func_get_args());

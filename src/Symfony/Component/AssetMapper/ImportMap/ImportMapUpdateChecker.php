@@ -11,16 +11,20 @@
 
 namespace Symfony\Component\AssetMapper\ImportMap;
 
+use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 class ImportMapUpdateChecker
 {
     private const URL_PACKAGE_METADATA = 'https://registry.npmjs.org/%s';
 
+    private readonly HttpClientInterface $httpClient;
+
     public function __construct(
         private readonly ImportMapConfigReader $importMapConfigReader,
-        private readonly HttpClientInterface $httpClient,
+        ?HttpClientInterface $httpClient = null,
     ) {
+        $this->httpClient = $httpClient ?? HttpClient::create();
     }
 
     /**

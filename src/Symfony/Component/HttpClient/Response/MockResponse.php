@@ -291,10 +291,8 @@ class MockResponse implements ResponseInterface, StreamableInterface
             try {
                 foreach ($body as $chunk) {
                     if ($chunk instanceof \Throwable) {
-                        throw $chunk;
-                    }
-
-                    if ('' === $chunk = (string) $chunk) {
+                        $response->body[] = new ErrorChunk($offset, $chunk);
+                    } else if ('' === $chunk = (string) $chunk) {
                         // simulate an idle timeout
                         $response->body[] = new ErrorChunk($offset, sprintf('Idle timeout reached for "%s".', $response->info['url']));
                     } else {
@@ -305,7 +303,7 @@ class MockResponse implements ResponseInterface, StreamableInterface
                     }
                 }
             } catch (\Throwable $e) {
-                $response->body[] = $e;
+                $response->body[] = new ErrorChunk($offset, $e);
             }
         } elseif ('' !== $body) {
             $response->body[] = $body;

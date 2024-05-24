@@ -88,6 +88,4 @@ final class MercureOptions implements MessageOptionsInterface
     {
         return null;
     }
-
-
 }

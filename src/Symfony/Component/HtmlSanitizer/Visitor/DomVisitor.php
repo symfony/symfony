@@ -33,19 +33,6 @@ use Symfony\Component\HtmlSanitizer\Visitor\Node\TextNode;
  */
 final class DomVisitor
 {
-    private HtmlSanitizerConfig $config;
-
-    /**
-     * Registry of allowed/blocked elements:
-     * * If an element is present as a key and contains an array, the element should be allowed
-     *   and the array is the list of allowed attributes.
-     * * If an element is present as a key and contains "false", the element should be blocked.
-     * * If an element is not present as a key, the element should be dropped.
-     *
-     * @var array<string, false|array<string, bool>>
-     */
-    private array $elementsConfig;
-
     /**
      * Registry of attributes to forcefully set on nodes, index by element and attribute.
      *
@@ -62,12 +49,16 @@ final class DomVisitor
     private array $attributeSanitizers = [];
 
     /**
-     * @param array<string, false|array<string, bool>> $elementsConfig
+     * @param array<string, false|array<string, bool>> $elementsConfig Registry of allowed/blocked elements:
+     *                                                                 * If an element is present as a key and contains an array, the element should be allowed
+     *                                                                   and the array is the list of allowed attributes.
+     *                                                                 * If an element is present as a key and contains "false", the element should be blocked.
+     *                                                                 * If an element is not present as a key, the element should be dropped.
      */
-    public function __construct(HtmlSanitizerConfig $config, array $elementsConfig)
-    {
-        $this->config = $config;
-        $this->elementsConfig = $elementsConfig;
+    public function __construct(
+        private HtmlSanitizerConfig $config,
+        private array $elementsConfig,
+    ) {
         $this->forcedAttributes = $config->getForcedAttributes();
 
         foreach ($config->getAttributeSanitizers() as $attributeSanitizer) {

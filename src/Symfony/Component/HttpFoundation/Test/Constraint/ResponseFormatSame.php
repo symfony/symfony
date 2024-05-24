@@ -22,16 +22,11 @@ use Symfony\Component\HttpFoundation\Response;
  */
 final class ResponseFormatSame extends Constraint
 {
-    private Request $request;
-    private ?string $format;
-
     public function __construct(
-        Request $request,
-        ?string $format,
+        private Request $request,
+        private ?string $format,
         private readonly bool $verbose = true,
     ) {
-        $this->request = $request;
-        $this->format = $format;
     }
 
     public function toString(): string

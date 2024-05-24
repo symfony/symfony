@@ -18,14 +18,14 @@ namespace Symfony\Component\HttpFoundation;
  */
 class AcceptHeaderItem
 {
-    private string $value;
     private float $quality = 1.0;
     private int $index = 0;
     private array $attributes = [];
 
-    public function __construct(string $value, array $attributes = [])
-    {
-        $this->value = $value;
+    public function __construct(
+        private string $value,
+        array $attributes = [],
+    ) {
         foreach ($attributes as $name => $value) {
             $this->setAttribute($name, $value);
         }

@@ -58,7 +58,6 @@ class MongoDbStore implements PersistingStoreInterface
     private string $namespace;
     private string $uri;
     private array $options;
-    private float $initialTtl;
 
     /**
      * @param Collection|Client|Manager|string $mongo      An instance of a Collection or Client or URI @see https://docs.mongodb.com/manual/reference/connection-string/
@@ -93,8 +92,11 @@ class MongoDbStore implements PersistingStoreInterface
      * readPreference is primary for all queries.
      * @see https://docs.mongodb.com/manual/applications/replication/
      */
-    public function __construct(Collection|Database|Client|Manager|string $mongo, array $options = [], float $initialTtl = 300.0)
-    {
+    public function __construct(
+        Collection|Database|Client|Manager|string $mongo,
+        array $options = [],
+        private float $initialTtl = 300.0,
+    ) {
         $this->options = array_merge([
             'gcProbability' => 0.001,
             'database' => null,
@@ -102,8 +104,6 @@ class MongoDbStore implements PersistingStoreInterface
             'uriOptions' => [],
             'driverOptions' => [],
         ], $options);
-
-        $this->initialTtl = $initialTtl;
 
         if ($mongo instanceof Collection) {
             $this->options['database'] ??= $mongo->getDatabaseName();

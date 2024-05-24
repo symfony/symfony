@@ -63,10 +63,6 @@ class Type
         self::BUILTIN_TYPE_ITERABLE,
     ];
 
-    private string $builtinType;
-    private bool $nullable;
-    private ?string $class;
-    private bool $collection;
     private array $collectionKeyType;
     private array $collectionValueType;
 
@@ -76,16 +72,18 @@ class Type
      *
      * @throws \InvalidArgumentException
      */
-    public function __construct(string $builtinType, bool $nullable = false, ?string $class = null, bool $collection = false, array|self|null $collectionKeyType = null, array|self|null $collectionValueType = null)
-    {
+    public function __construct(
+        private string $builtinType,
+        private bool $nullable = false,
+        private ?string $class = null,
+        private bool $collection = false,
+        array|self|null $collectionKeyType = null,
+        array|self|null $collectionValueType = null,
+    ) {
         if (!\in_array($builtinType, self::$builtinTypes, true)) {
             throw new \InvalidArgumentException(sprintf('"%s" is not a valid PHP type.', $builtinType));
         }
 
-        $this->builtinType = $builtinType;
-        $this->nullable = $nullable;
-        $this->class = $class;
-        $this->collection = $collection;
         $this->collectionKeyType = $this->validateCollectionArgument($collectionKeyType, 5, '$collectionKeyType') ?? [];
         $this->collectionValueType = $this->validateCollectionArgument($collectionValueType, 6, '$collectionValueType') ?? [];
     }

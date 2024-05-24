@@ -71,7 +71,6 @@ final class MercureOptions implements MessageOptionsInterface
         return $this->content;
     }
 
-
     public function toArray(): array
     {
         return [

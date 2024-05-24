@@ -105,11 +105,12 @@ jobs:
         ports:
           - 9092:9092
         env:
-          KAFKA_AUTO_CREATE_TOPICS_ENABLE: false
-          KAFKA_CREATE_TOPICS: 'test-topic:1:1:compact'
-          KAFKA_ADVERTISED_HOST_NAME: 127.0.0.1
-          KAFKA_ZOOKEEPER_CONNECT: 'zookeeper:2181'
-          KAFKA_ADVERTISED_PORT: 9092
+          KAFKA_CFG_AUTO_CREATE_TOPICS_ENABLE: false
+          ALLOW_PLAINTEXT_LISTENER: 'yes'
+          KAFKA_CFG_ADVERTISED_LISTENERS: 'PLAINTEXT://127.0.0.1:9092'
+          KAFKA_CFG_LISTENERS: 'PLAINTEXT://:9092'
+          KAFKA_CFG_ZOOKEEPER_CONNECT: 'zookeeper:2181'
+        options: --name=kafka
       frankenphp:
         image: dunglas/frankenphp:1.1.0
         ports:
@@ -126,6 +127,10 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+
+      - name: Init Kafka topics
+        run: |
+          docker exec kafka /opt/bitnami/kafka/bin/kafka-topics.sh --create --topic test-topic --bootstrap-server kafka:9092
 
       - name: Install system dependencies
         run: |

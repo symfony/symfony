@@ -31,8 +31,6 @@ use Symfony\Contracts\Service\ResetInterface;
 
 abstract class DoctrineType extends AbstractType implements ResetInterface
 {
-    protected ManagerRegistry $registry;
-
     /**
      * @var IdReader[]
      */
@@ -89,9 +87,9 @@ abstract class DoctrineType extends AbstractType implements ResetInterface
         return null;
     }
 
-    public function __construct(ManagerRegistry $registry)
-    {
-        $this->registry = $registry;
+    public function __construct(
+        protected ManagerRegistry $registry,
+    ) {
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void

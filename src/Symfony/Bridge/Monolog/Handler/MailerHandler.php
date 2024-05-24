@@ -25,14 +25,16 @@ use Symfony\Component\Mime\Email;
  */
 final class MailerHandler extends AbstractProcessingHandler
 {
-    private MailerInterface $mailer;
     private \Closure|Email $messageTemplate;
 
-    public function __construct(MailerInterface $mailer, callable|Email $messageTemplate, string|int|Level $level = Level::Debug, bool $bubble = true)
-    {
+    public function __construct(
+        private MailerInterface $mailer,
+        callable|Email $messageTemplate,
+        string|int|Level $level = Level::Debug,
+        bool $bubble = true,
+    ) {
         parent::__construct($level, $bubble);
 
-        $this->mailer = $mailer;
         $this->messageTemplate = $messageTemplate instanceof Email ? $messageTemplate : $messageTemplate(...);
     }
 

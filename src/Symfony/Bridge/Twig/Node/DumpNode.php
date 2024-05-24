@@ -33,7 +33,6 @@ final class DumpNode extends Node
         }
 
         parent::__construct($nodes, [], $lineno, $tag);
-        $this->varPrefix = $varPrefix;
     }
 
     public function compile(Compiler $compiler): void

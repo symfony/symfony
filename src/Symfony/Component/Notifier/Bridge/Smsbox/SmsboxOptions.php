@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Notifier\Bridge\Smsbox;
 
+use Symfony\Component\Clock\Clock;
+use Symfony\Component\Clock\ClockInterface;
 use Symfony\Component\Intl\Countries;
 use Symfony\Component\Notifier\Bridge\Smsbox\Enum\Charset;
 use Symfony\Component\Notifier\Bridge\Smsbox\Enum\Day;
@@ -28,9 +30,13 @@ use Symfony\Component\Notifier\Message\MessageOptionsInterface;
  */
 final class SmsboxOptions implements MessageOptionsInterface
 {
+    private ClockInterface $clock;
+
     public function __construct(
         private array $options = [],
+        ?ClockInterface $clock = null,
     ) {
+        $this->clock = $clock ?? Clock::get();
     }
 
     public function getRecipientId(): null
@@ -103,7 +109,7 @@ final class SmsboxOptions implements MessageOptionsInterface
             throw new InvalidArgumentException(sprintf('Either %1$s::dateTime() or %1$s::date() and %1$s::hour() must be called, but not both.', self::class));
         }
 
-        if ($dateTime < new \DateTimeImmutable('now')) {
+        if ($dateTime < $this->clock->now()) {
             throw new InvalidArgumentException('The given DateTime must be greater to the current date.');
         }
 

@@ -12,6 +12,8 @@
 namespace Symfony\Component\Notifier\Bridge\Bluesky;
 
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Clock\Clock;
+use Symfony\Component\Clock\ClockInterface;
 use Symfony\Component\Mime\Part\File;
 use Symfony\Component\Notifier\Exception\TransportException;
 use Symfony\Component\Notifier\Exception\UnsupportedMessageTypeException;
@@ -32,6 +34,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 final class BlueskyTransport extends AbstractTransport
 {
     private array $authSession = [];
+    private ClockInterface $clock;
 
     public function __construct(
         #[\SensitiveParameter] private string $user,
@@ -39,8 +42,11 @@ final class BlueskyTransport extends AbstractTransport
         private LoggerInterface $logger,
         ?HttpClientInterface $client = null,
         ?EventDispatcherInterface $dispatcher = null,
+        ?ClockInterface $clock = null,
     ) {
         parent::__construct($client, $dispatcher);
+
+        $this->clock = $clock ?? Clock::get();
     }
 
     public function __toString(): string
@@ -66,7 +72,7 @@ final class BlueskyTransport extends AbstractTransport
         $post = [
             '$type' => 'app.bsky.feed.post',
             'text' => $message->getSubject(),
-            'createdAt' => \DateTimeImmutable::createFromFormat('U', time())->format('Y-m-d\\TH:i:s.u\\Z'),
+            'createdAt' => $this->clock->now()->format('Y-m-d\\TH:i:s.u\\Z'),
         ];
         if ([] !== $facets = $this->parseFacets($post['text'])) {
             $post['facets'] = $facets;

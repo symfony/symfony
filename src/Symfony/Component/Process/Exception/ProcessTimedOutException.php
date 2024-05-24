@@ -23,14 +23,10 @@ class ProcessTimedOutException extends RuntimeException
     public const TYPE_GENERAL = 1;
     public const TYPE_IDLE = 2;
 
-    private Process $process;
-    private int $timeoutType;
-
-    public function __construct(Process $process, int $timeoutType)
-    {
-        $this->process = $process;
-        $this->timeoutType = $timeoutType;
-
+    public function __construct(
+        private Process $process,
+        private int $timeoutType,
+    ) {
         parent::__construct(sprintf(
             'The process "%s" exceeded the timeout of %s seconds.',
             $process->getCommandLine(),

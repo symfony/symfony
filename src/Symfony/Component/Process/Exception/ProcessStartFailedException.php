@@ -18,10 +18,10 @@ use Symfony\Component\Process\Process;
  */
 class ProcessStartFailedException extends ProcessFailedException
 {
-    private Process $process;
-
-    public function __construct(Process $process, ?string $message)
-    {
+    public function __construct(
+        private Process $process,
+        ?string $message,
+    ) {
         if ($process->isStarted()) {
             throw new InvalidArgumentException('Expected a process that failed during startup, but the given process was started successfully.');
         }
@@ -34,8 +34,6 @@ class ProcessStartFailedException extends ProcessFailedException
 
         // Skip parent constructor
         RuntimeException::__construct($error);
-
-        $this->process = $process;
     }
 
     public function getProcess(): Process

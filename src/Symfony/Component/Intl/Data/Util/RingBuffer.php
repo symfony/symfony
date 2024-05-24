@@ -36,11 +36,10 @@ class RingBuffer implements \ArrayAccess
     /** @var array<TKey, int> */
     private array $indices = [];
     private int $cursor = 0;
-    private int $size;
 
-    public function __construct(int $size)
-    {
-        $this->size = $size;
+    public function __construct(
+        private int $size,
+    ) {
     }
 
     public function offsetExists(mixed $key): bool

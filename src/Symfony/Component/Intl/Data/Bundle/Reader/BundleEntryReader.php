@@ -28,8 +28,6 @@ use Symfony\Component\Intl\Locale;
  */
 class BundleEntryReader implements BundleEntryReaderInterface
 {
-    private BundleReaderInterface $reader;
-
     /**
      * A mapping of locale aliases to locales.
      */
@@ -38,9 +36,9 @@ class BundleEntryReader implements BundleEntryReaderInterface
     /**
      * Creates an entry reader based on the given resource bundle reader.
      */
-    public function __construct(BundleReaderInterface $reader)
-    {
-        $this->reader = $reader;
+    public function __construct(
+        private BundleReaderInterface $reader,
+    ) {
     }
 
     /**

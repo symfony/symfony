@@ -23,11 +23,9 @@ use Symfony\Component\Yaml\Yaml;
  */
 class YamlFileDumper extends FileDumper
 {
-    private string $extension;
-
-    public function __construct(string $extension = 'yml')
-    {
-        $this->extension = $extension;
+    public function __construct(
+        private string $extension = 'yml',
+    ) {
     }
 
     public function formatCatalogue(MessageCatalogue $messages, string $domain, array $options = []): string

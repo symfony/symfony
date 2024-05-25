@@ -1,0 +1,30 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2024-05-23T11:25:37Z
+
+Hey!
+
+Thanks for your PR. You are targeting branch "7.2" but it seems your PR description refers to branch "6.4".
+Could you update the PR description or change target branch? This helps core maintainers a lot.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by ruudk at 2024-05-23T11:28:17Z
+
+@carsonbot done
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-05-23T12:39:34Z
+
+Ah: why do you consider this as a bugfix? To me it's for 7.2
+
+---------------------------------------------------------------------------
+
+by ruudk at 2024-05-23T13:44:04Z
+
+To me it's a bug and not a feature? It's not working without the service defined.

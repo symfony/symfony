@@ -22,21 +22,14 @@ use Twig\Extension\CoreExtension;
  */
 class EnvironmentConfigurator
 {
-    private string $dateFormat;
-    private string $intervalFormat;
-    private ?string $timezone;
-    private int $decimals;
-    private string $decimalPoint;
-    private string $thousandsSeparator;
-
-    public function __construct(string $dateFormat, string $intervalFormat, ?string $timezone, int $decimals, string $decimalPoint, string $thousandsSeparator)
-    {
-        $this->dateFormat = $dateFormat;
-        $this->intervalFormat = $intervalFormat;
-        $this->timezone = $timezone;
-        $this->decimals = $decimals;
-        $this->decimalPoint = $decimalPoint;
-        $this->thousandsSeparator = $thousandsSeparator;
+    public function __construct(
+        private string $dateFormat,
+        private string $intervalFormat,
+        private ?string $timezone,
+        private int $decimals,
+        private string $decimalPoint,
+        private string $thousandsSeparator,
+    ) {
     }
 
     public function configure(Environment $environment): void

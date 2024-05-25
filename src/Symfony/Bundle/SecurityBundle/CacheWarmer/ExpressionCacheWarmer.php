@@ -20,16 +20,13 @@ use Symfony\Component\Security\Core\Authorization\ExpressionLanguage;
  */
 class ExpressionCacheWarmer implements CacheWarmerInterface
 {
-    private iterable $expressions;
-    private ExpressionLanguage $expressionLanguage;
-
     /**
      * @param iterable<mixed, Expression|string> $expressions
      */
-    public function __construct(iterable $expressions, ExpressionLanguage $expressionLanguage)
-    {
-        $this->expressions = $expressions;
-        $this->expressionLanguage = $expressionLanguage;
+    public function __construct(
+        private iterable $expressions,
+        private ExpressionLanguage $expressionLanguage,
+    ) {
     }
 
     public function isOptional(): bool

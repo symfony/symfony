@@ -26,15 +26,15 @@ use Twig\Error\Error;
  */
 class TemplateCacheWarmer implements CacheWarmerInterface, ServiceSubscriberInterface
 {
-    private ContainerInterface $container;
     private Environment $twig;
-    private iterable $iterator;
 
-    public function __construct(ContainerInterface $container, iterable $iterator)
-    {
-        // As this cache warmer is optional, dependencies should be lazy-loaded, that's why a container should be injected.
-        $this->container = $container;
-        $this->iterator = $iterator;
+    /**
+     * As this cache warmer is optional, dependencies should be lazy-loaded, that's why a container should be injected.
+     */
+    public function __construct(
+        private ContainerInterface $container,
+        private iterable $iterator,
+    ) {
     }
 
     public function warmUp(string $cacheDir, ?string $buildDir = null): array

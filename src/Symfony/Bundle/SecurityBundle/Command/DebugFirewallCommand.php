@@ -32,22 +32,16 @@ use Symfony\Component\Security\Http\Authenticator\AuthenticatorInterface;
 #[AsCommand(name: 'debug:firewall', description: 'Display information about your security firewall(s)')]
 final class DebugFirewallCommand extends Command
 {
-    private array $firewallNames;
-    private ContainerInterface $contexts;
-    private ContainerInterface $eventDispatchers;
-    private array $authenticators;
-
     /**
      * @param string[]                   $firewallNames
      * @param AuthenticatorInterface[][] $authenticators
      */
-    public function __construct(array $firewallNames, ContainerInterface $contexts, ContainerInterface $eventDispatchers, array $authenticators)
-    {
-        $this->firewallNames = $firewallNames;
-        $this->contexts = $contexts;
-        $this->eventDispatchers = $eventDispatchers;
-        $this->authenticators = $authenticators;
-
+    public function __construct(
+        private array $firewallNames,
+        private ContainerInterface $contexts,
+        private ContainerInterface $eventDispatchers,
+        private array $authenticators,
+    ) {
         parent::__construct();
     }
 

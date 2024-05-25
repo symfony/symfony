@@ -75,4 +75,13 @@ class SodiumVaultTest extends TestCase
 
         $this->assertSame([], $vault->list());
     }
+
+    public function testDerivedSecretEnvVar()
+    {
+        $vault = new SodiumVault($this->secretsDir, null, 'MY_SECRET');
+        $vault->generateKeys();
+        $vault->seal('FOO', 'bar');
+
+        $this->assertSame(['FOO', 'MY_SECRET'], array_keys($vault->loadEnvVars()));
+    }
 }

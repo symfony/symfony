@@ -372,7 +372,7 @@ class FrameworkExtension extends Extension
         $this->registerDebugConfiguration($config['php_errors'], $container, $loader);
         $this->registerRouterConfiguration($config['router'], $container, $loader, $config['enabled_locales']);
         $this->registerPropertyAccessConfiguration($config['property_access'], $container, $loader);
-        $this->registerSecretsConfiguration($config['secrets'], $container, $loader);
+        $this->registerSecretsConfiguration($config['secrets'], $container, $loader, $config['secret'] ?? null);
 
         $container->getDefinition('exception_listener')->replaceArgument(3, $config['exceptions']);
 
@@ -1755,7 +1755,7 @@ class FrameworkExtension extends Extension
         ;
     }
 
-    private function registerSecretsConfiguration(array $config, ContainerBuilder $container, PhpFileLoader $loader): void
+    private function registerSecretsConfiguration(array $config, ContainerBuilder $container, PhpFileLoader $loader, ?string $secret): void
     {
         if (!$this->readConfigEnabled('secrets', $container, $config)) {
             $container->removeDefinition('console.command.secrets_set');
@@ -1771,6 +1771,9 @@ class FrameworkExtension extends Extension
 
         $loader->load('secrets.php');
 
+        $container->resolveEnvPlaceholders($secret, null, $usedEnvs);
+        $secretEnvVar = 1 === \count($usedEnvs ?? []) ? substr(key($usedEnvs), 1 + (strrpos(key($usedEnvs), ':') ?: -1)) : null;
+        $container->getDefinition('secrets.vault')->replaceArgument(2, $secretEnvVar);
         $container->getDefinition('secrets.vault')->replaceArgument(0, $config['vault_directory']);
 
         if ($config['local_dotenv_file']) {

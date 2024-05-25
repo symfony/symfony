@@ -12,7 +12,7 @@
 namespace Symfony\Component\Notifier\Bridge\Bluesky\Tests;
 
 use Psr\Log\NullLogger;
-use Symfony\Bridge\PhpUnit\ClockMock;
+use Symfony\Component\Clock\MockClock;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\Response\JsonMockResponse;
 use Symfony\Component\Mime\Part\File;
@@ -28,15 +28,16 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 final class BlueskyTransportTest extends TransportTestCase
 {
+    private static $clock;
+
     protected function setUp(): void
     {
-        ClockMock::register(self::class);
-        ClockMock::withClockMock(1714293617);
+        self::$clock = new MockClock(new \DateTimeImmutable('@1714293617'));
     }
 
     public static function createTransport(?HttpClientInterface $client = null): BlueskyTransport
     {
-        $blueskyTransport = new BlueskyTransport('username', 'password', new NullLogger(), $client ?? new MockHttpClient());
+        $blueskyTransport = new BlueskyTransport('username', 'password', new NullLogger(), $client ?? new MockHttpClient(), null, self::$clock);
         $blueskyTransport->setHost('bsky.social');
 
         return $blueskyTransport;

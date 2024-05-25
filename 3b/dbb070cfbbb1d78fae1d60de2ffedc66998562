@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2024-05-24T09:00:39Z
+
+https://github.com/symfony/symfony/pull/54756#discussion_r1591002660 made me think that we should rather use a clock to be able to properly mock the time in tests. If we agree on this approach, I'll update the other Notifier bridges as well.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2024-05-24T20:02:11Z
+
+I updated all places in the Notifier component where we could use a clock.

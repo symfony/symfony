@@ -13,6 +13,7 @@ namespace Symfony\Component\Routing\Tests\Loader;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Routing\Alias;
+use Symfony\Component\Routing\Exception\LogicException;
 use Symfony\Component\Routing\Tests\Fixtures\AttributeFixtures\AbstractClassController;
 use Symfony\Component\Routing\Tests\Fixtures\AttributeFixtures\ActionPathController;
 use Symfony\Component\Routing\Tests\Fixtures\AttributeFixtures\BazClass;
@@ -52,6 +53,14 @@ class AttributeClassLoaderTest extends TestCase
         parent::setUp();
 
         $this->loader = new TraceableAttributeClassLoader($env);
+    }
+
+    public function testGetResolver()
+    {
+        $this->expectException(LogicException::class);
+
+        $loader = new TraceableAttributeClassLoader();
+        $loader->getResolver();
     }
 
     /**

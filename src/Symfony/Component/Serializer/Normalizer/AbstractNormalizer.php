@@ -248,13 +248,13 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
                 !$ignore
                 && (!$groupsHasBeenDefined || array_intersect(array_merge($attributeMetadata->getGroups(), ['*']), $groups))
                 && $this->isAllowedAttribute($classOrObject, $name = $attributeMetadata->getName(), null, $context)
-                && count(array_intersect($attributeMetadata->getGroups(), $ignoredGroups)) === 0
+                && 0 === \count(array_intersect($attributeMetadata->getGroups(), $ignoredGroups))
             ) {
                 $allowedAttributes[] = $attributesAsString ? $name : $attributeMetadata;
             }
         }
 
-        if (!$ignoreUsed && !$groupsHasBeenDefined &&!$ignoreGroupsHasBeenDefined && $allowExtraAttributes) {
+        if (!$ignoreUsed && !$groupsHasBeenDefined && !$ignoreGroupsHasBeenDefined && $allowExtraAttributes) {
             // Backward Compatibility with the code using this method written before the introduction of @Ignore
             return false;
         }

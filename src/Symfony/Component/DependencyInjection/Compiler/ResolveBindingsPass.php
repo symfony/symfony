@@ -182,10 +182,11 @@ class ResolveBindingsPass extends AbstractRecursivePass
             foreach ($reflectionMethod->getParameters() as $key => $parameter) {
                 $names[$key] = $parameter->name;
 
-                if (\array_key_exists($key, $arguments) && '' !== $arguments[$key]) {
-                    continue;
+                if (\array_key_exists($parameter->name, $arguments)) {
+                    $key = $parameter->name;
                 }
-                if (\array_key_exists($parameter->name, $arguments) && '' !== $arguments[$parameter->name]) {
+
+                if (\array_key_exists($key, $arguments) && !\in_array($arguments[$key], ['', null, []], true)) {
                     continue;
                 }
 

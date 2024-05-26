@@ -213,6 +213,32 @@ class ResolveBindingsPassTest extends TestCase
         $pass->process($container);
     }
 
+    /**
+     * @testWith [1, ""]
+     *           [1, null]
+     *           [1, []]
+     *           ["apiKey", ""]
+     *           ["apiKey", null]
+     *           ["apiKey", []]
+     */
+    public function testEmptyBindingWithEmptyDefaultValue($key, $value)
+    {
+        $container = new ContainerBuilder();
+
+        $bindings = [
+            '$apiKey' => new BoundArgument('foo'),
+        ];
+
+        $definition = $container->register(NamedArgumentsDummy::class, NamedArgumentsDummy::class);
+        $definition->setArguments([$key => $value]);
+        $definition->setBindings($bindings);
+
+        $pass = new ResolveBindingsPass();
+        $pass->process($container);
+
+        $this->assertEquals([$key => 'foo'], $definition->getArguments());
+    }
+
     public function testIterableBindingTypehint()
     {
         $autoloader = static function ($class) {

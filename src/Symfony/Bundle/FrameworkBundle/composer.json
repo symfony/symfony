@@ -43,7 +43,7 @@
         "symfony/clock": "^6.4|^7.0",
         "symfony/css-selector": "^6.4|^7.0",
         "symfony/dom-crawler": "^6.4|^7.0",
-        "symfony/dotenv": "^6.4|^7.0",
+        "symfony/dotenv": "^7.1",
         "symfony/polyfill-intl-icu": "~1.0",
         "symfony/form": "^6.4|^7.0",
         "symfony/expression-language": "^6.4|^7.0",

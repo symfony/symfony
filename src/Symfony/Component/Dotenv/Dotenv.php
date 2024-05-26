@@ -44,7 +44,7 @@ final class Dotenv
         private readonly bool $preferPhpFilesAndChangeDumpName = false,
     ) {
         if (!$this->preferPhpFilesAndChangeDumpName) {
-            \trigger_deprecation('symfony/dotenv', '7.2', 'Setting $preferPhpFilesAndChangeDumpName to false is deprecated.');
+            trigger_deprecation('symfony/dotenv', '7.2', 'Setting $preferPhpFilesAndChangeDumpName to false is deprecated.');
         }
     }
 

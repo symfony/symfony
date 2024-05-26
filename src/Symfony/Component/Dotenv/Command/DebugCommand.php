@@ -76,7 +76,7 @@ EOT
     {
         $preferPhpFilesAndChangeDumpName = $input->getOption('preferPhpFilesAndChangeDumpName');
         if (!$preferPhpFilesAndChangeDumpName) {
-            \trigger_deprecation('symfony/dotenv', '7.2', 'Not using --preferPhpFilesAndChangeDumpName is deprecated.');
+            trigger_deprecation('symfony/dotenv', '7.2', 'Not using --preferPhpFilesAndChangeDumpName is deprecated.');
         }
 
         $io = new SymfonyStyle($input, $output);
@@ -91,7 +91,7 @@ EOT
         $filePath = $_SERVER['SYMFONY_DOTENV_PATH'] ?? $this->projectDirectory.\DIRECTORY_SEPARATOR.'.env';
 
         $envFileSets = $this->getEnvFileSets($filePath, $preferPhpFilesAndChangeDumpName);
-        $availableFiles = array_filter(\array_merge(...$envFileSets), \is_file(...));
+        $availableFiles = array_filter(array_merge(...$envFileSets), \is_file(...));
 
         if (
             $preferPhpFilesAndChangeDumpName
@@ -117,7 +117,8 @@ EOT
                         : sprintf('<fg=red>⨯</> %s', $this->getRelativeName($envFile)),
                     $envFileSet
                 );
-                return \implode(', ', $formattedFiles);
+
+                return implode(', ', $formattedFiles);
             },
             $envFileSets,
         ));
@@ -193,7 +194,7 @@ EOT
         $filePath = $_SERVER['SYMFONY_DOTENV_PATH'] ?? $this->projectDirectory.\DIRECTORY_SEPARATOR.'.env';
         $envFileSets = $this->getEnvFileSets($filePath, true);
 
-        return array_keys($this->getVariables(array_filter(\array_merge(...$envFileSets), is_file(...)), null));
+        return array_keys($this->getVariables(array_filter(array_merge(...$envFileSets), is_file(...)), null));
     }
 
     /**

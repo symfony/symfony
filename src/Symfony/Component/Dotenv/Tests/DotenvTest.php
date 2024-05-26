@@ -361,7 +361,7 @@ class DotenvTest extends TestCase
     public function testLoadEnvWithPhpFiles()
     {
         $makePhpEnvFile = static function (array $values): string {
-            return sprintf('<?php return %s;', \var_export($values, true));
+            return sprintf('<?php return %s;', var_export($values, true));
         };
         $resetContext = static function (): void {
             unset($_ENV['SYMFONY_DOTENV_VARS']);

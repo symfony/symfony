@@ -16,7 +16,6 @@ use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\Dotenv\Command\DotenvDumpCommand;
-use Symfony\Component\Dotenv\Dotenv;
 
 class DotenvDumpCommandTest extends TestCase
 {

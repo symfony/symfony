@@ -57,7 +57,7 @@ EOT
     {
         $preferPhpFilesAndChangeDumpName = $input->getOption('preferPhpFilesAndChangeDumpName');
         if (!$preferPhpFilesAndChangeDumpName) {
-            \trigger_deprecation('symfony/dotenv', '7.2', 'Not using --preferPhpFilesAndChangeDumpName is deprecated.');
+            trigger_deprecation('symfony/dotenv', '7.2', 'Not using --preferPhpFilesAndChangeDumpName is deprecated.');
         }
 
         $config = [];

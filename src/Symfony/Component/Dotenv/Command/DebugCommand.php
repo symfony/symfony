@@ -18,6 +18,7 @@ use Symfony\Component\Console\Completion\CompletionSuggestions;
 use Symfony\Component\Console\Formatter\OutputFormatter;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Dotenv\Dotenv;
@@ -56,6 +57,7 @@ final class DebugCommand extends Command
         $this
             ->setDefinition([
                 new InputArgument('filter', InputArgument::OPTIONAL, 'The name of an environment variable or a filter.', null, $this->getAvailableVars(...)),
+                new InputOption('preferPhpFilesAndChangeDumpName', mode: InputOption::VALUE_NONE, description: 'Sets DotEnv::$preferPhpFilesAndChangeDumpName to true'),
             ])
             ->setHelp(<<<'EOT'
 The <info>%command.full_name%</info> command displays all the environment variables configured by dotenv:
@@ -72,6 +74,11 @@ EOT
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
+        $preferPhpFilesAndChangeDumpName = $input->getOption('preferPhpFilesAndChangeDumpName');
+        if (!$preferPhpFilesAndChangeDumpName) {
+            \trigger_deprecation('symfony/dotenv', '7.2', 'Not using --preferPhpFilesAndChangeDumpName is deprecated.');
+        }
+
         $io = new SymfonyStyle($input, $output);
         $io->title('Dotenv Variables & Files');
 
@@ -83,11 +90,15 @@ EOT
 
         $filePath = $_SERVER['SYMFONY_DOTENV_PATH'] ?? $this->projectDirectory.\DIRECTORY_SEPARATOR.'.env';
 
-        $envFiles = $this->getEnvFiles($filePath);
-        $availableFiles = array_filter($envFiles, 'is_file');
+        $envFileSets = $this->getEnvFileSets($filePath, $preferPhpFilesAndChangeDumpName);
+        $availableFiles = array_filter(\array_merge(...$envFileSets), \is_file(...));
 
-        if (\in_array(sprintf('%s.local.php', $filePath), $availableFiles, true)) {
-            $io->warning(sprintf('Due to existing dump file (%s.local.php) all other dotenv files are skipped.', $this->getRelativeName($filePath)));
+        if (
+            $preferPhpFilesAndChangeDumpName
+                ? \in_array(sprintf('%s.dumped.php', $filePath), $availableFiles, true)
+                : \in_array(sprintf('%s.local.php', $filePath), $availableFiles, true)
+        ) {
+            $io->warning(sprintf('Due to existing dump file (%s.%s.php) all other dotenv files are skipped.', $this->getRelativeName($filePath), $preferPhpFilesAndChangeDumpName ? 'dumped' : 'local'));
         }
 
         if (is_file($filePath) && is_file(sprintf('%s.dist', $filePath))) {
@@ -95,9 +106,21 @@ EOT
         }
 
         $io->section('Scanned Files (in descending priority)');
-        $io->listing(array_map(fn (string $envFile) => \in_array($envFile, $availableFiles, true)
-            ? sprintf('<fg=green>✓</> %s', $this->getRelativeName($envFile))
-            : sprintf('<fg=red>⨯</> %s', $this->getRelativeName($envFile)), $envFiles));
+        $io->listing(array_map(
+            /**
+             * @param list<string> $envFileSet
+             */
+            function (array $envFileSet) use ($availableFiles): string {
+                $formattedFiles = array_map(
+                    fn (string $envFile): string => \in_array($envFile, $availableFiles, true)
+                        ? sprintf('<fg=green>✓</> %s', $this->getRelativeName($envFile))
+                        : sprintf('<fg=red>⨯</> %s', $this->getRelativeName($envFile)),
+                    $envFileSet
+                );
+                return \implode(', ', $formattedFiles);
+            },
+            $envFileSets,
+        ));
 
         $nameFilter = $input->getArgument('filter');
         $variables = $this->getVariables($availableFiles, $nameFilter);
@@ -168,30 +191,36 @@ EOT
     private function getAvailableVars(): array
     {
         $filePath = $_SERVER['SYMFONY_DOTENV_PATH'] ?? $this->projectDirectory.\DIRECTORY_SEPARATOR.'.env';
-        $envFiles = $this->getEnvFiles($filePath);
+        $envFileSets = $this->getEnvFileSets($filePath, true);
 
-        return array_keys($this->getVariables(array_filter($envFiles, 'is_file'), null));
+        return array_keys($this->getVariables(array_filter(\array_merge(...$envFileSets), is_file(...)), null));
     }
 
-    private function getEnvFiles(string $filePath): array
+    /**
+     * @return list<list<string>>
+     */
+    private function getEnvFileSets(string $filePath, bool $preferPhpFilesAndChangeDumpName): array
     {
-        $files = [
-            sprintf('%s.local.php', $filePath),
-            sprintf('%s.%s.local', $filePath, $this->kernelEnvironment),
-            sprintf('%s.%s', $filePath, $this->kernelEnvironment),
+        $fileSets = [
+            [$preferPhpFilesAndChangeDumpName ? "$filePath.dumped.php" : "$filePath.local.php"],
+            [...$preferPhpFilesAndChangeDumpName ? ["$filePath.$this->kernelEnvironment.local.php"] : [], "$filePath.$this->kernelEnvironment.local"],
+            [...$preferPhpFilesAndChangeDumpName ? ["$filePath.$this->kernelEnvironment.php"] : [], "$filePath.$this->kernelEnvironment"],
         ];
 
         if ('test' !== $this->kernelEnvironment) {
-            $files[] = sprintf('%s.local', $filePath);
+            $fileSets[] = [...$preferPhpFilesAndChangeDumpName ? ["$filePath.local.php"] : [], "$filePath.local"];
         }
 
-        if (!is_file($filePath) && is_file(sprintf('%s.dist', $filePath))) {
-            $files[] = sprintf('%s.dist', $filePath);
+        if (
+            !is_file($filePath)
+            && (is_file("$filePath.dist.php") || is_file("$filePath.dist"))
+        ) {
+            $fileSets[] = [...$preferPhpFilesAndChangeDumpName ? ["$filePath.dist.php"] : [], "$filePath.dist"];
         } else {
-            $files[] = $filePath;
+            $fileSets[] = [...$preferPhpFilesAndChangeDumpName ? ["$filePath.php"] : [], "$filePath"];
         }
 
-        return $files;
+        return $fileSets;
     }
 
     private function getRelativeName(string $filePath): string
@@ -209,6 +238,6 @@ EOT
             return include $filePath;
         }
 
-        return (new Dotenv())->parse(file_get_contents($filePath));
+        return (new Dotenv(preferPhpFilesAndChangeDumpName: true))->parse(file_get_contents($filePath));
     }
 }

@@ -12,18 +12,21 @@
 namespace Symfony\Component\Dotenv\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\Dotenv\Dotenv;
 use Symfony\Component\Dotenv\Exception\FormatException;
 use Symfony\Component\Dotenv\Exception\PathException;
 
 class DotenvTest extends TestCase
 {
+    use ExpectDeprecationTrait;
+
     /**
      * @dataProvider getEnvDataWithFormatErrors
      */
     public function testParseWithFormatError($data, $error)
     {
-        $dotenv = new Dotenv();
+        $dotenv = new Dotenv(preferPhpFilesAndChangeDumpName: true);
 
         try {
             $dotenv->parse($data);
@@ -68,7 +71,7 @@ class DotenvTest extends TestCase
      */
     public function testParse($data, $expected)
     {
-        $dotenv = new Dotenv();
+        $dotenv = new Dotenv(preferPhpFilesAndChangeDumpName: true);
         $this->assertSame($expected, $dotenv->parse($data));
     }
 
@@ -206,7 +209,7 @@ class DotenvTest extends TestCase
         putenv('FOO');
         putenv('BAR');
 
-        @mkdir($tmpdir = sys_get_temp_dir().'/dotenv');
+        @mkdir($tmpdir = sys_get_temp_dir().'/'.rawurlencode(__METHOD__).microtime(true));
 
         $path1 = tempnam($tmpdir, 'sf-');
         $path2 = tempnam($tmpdir, 'sf-');
@@ -214,7 +217,7 @@ class DotenvTest extends TestCase
         file_put_contents($path1, 'FOO=BAR');
         file_put_contents($path2, 'BAR=BAZ');
 
-        (new Dotenv())->usePutenv()->load($path1, $path2);
+        (new Dotenv(preferPhpFilesAndChangeDumpName: true))->usePutenv()->load($path1, $path2);
 
         $foo = getenv('FOO');
         $bar = getenv('BAR');
@@ -246,7 +249,7 @@ class DotenvTest extends TestCase
             putenv('EXISTING_KEY=EXISTING_VALUE');
         };
 
-        @mkdir($tmpdir = sys_get_temp_dir().'/dotenv');
+        @mkdir($tmpdir = sys_get_temp_dir().'/'.rawurlencode(__METHOD__).microtime(true));
 
         $path = tempnam($tmpdir, 'sf-');
 
@@ -254,14 +257,14 @@ class DotenvTest extends TestCase
         file_put_contents($path, "FOO=BAR\nEXISTING_KEY=NEW_VALUE");
 
         $resetContext();
-        (new Dotenv())->usePutenv()->loadEnv($path, 'TEST_APP_ENV');
+        (new Dotenv(preferPhpFilesAndChangeDumpName: true))->usePutenv()->loadEnv($path, 'TEST_APP_ENV');
         $this->assertSame('BAR', getenv('FOO'));
         $this->assertSame('dev', getenv('TEST_APP_ENV'));
         $this->assertSame('EXISTING_VALUE', getenv('EXISTING_KEY'));
         $this->assertSame('EXISTING_VALUE', $_ENV['EXISTING_KEY']);
 
         $resetContext();
-        (new Dotenv())->usePutenv()->loadEnv($path, 'TEST_APP_ENV', 'dev', ['test'], true);
+        (new Dotenv(preferPhpFilesAndChangeDumpName: true))->usePutenv()->loadEnv($path, 'TEST_APP_ENV', 'dev', ['test'], true);
         $this->assertSame('BAR', getenv('FOO'));
         $this->assertSame('dev', getenv('TEST_APP_ENV'));
         $this->assertSame('NEW_VALUE', getenv('EXISTING_KEY'));
@@ -272,14 +275,14 @@ class DotenvTest extends TestCase
 
         $resetContext();
         $_SERVER['TEST_APP_ENV'] = 'local';
-        (new Dotenv())->usePutenv()->loadEnv($path, 'TEST_APP_ENV');
+        (new Dotenv(preferPhpFilesAndChangeDumpName: true))->usePutenv()->loadEnv($path, 'TEST_APP_ENV');
         $this->assertSame('localBAR', getenv('FOO'));
         $this->assertSame('EXISTING_VALUE', getenv('EXISTING_KEY'));
         $this->assertSame('EXISTING_VALUE', $_ENV['EXISTING_KEY']);
 
         $resetContext();
         $_SERVER['TEST_APP_ENV'] = 'local';
-        (new Dotenv())->usePutenv()->loadEnv($path, 'TEST_APP_ENV', 'dev', ['test'], true);
+        (new Dotenv(preferPhpFilesAndChangeDumpName: true))->usePutenv()->loadEnv($path, 'TEST_APP_ENV', 'dev', ['test'], true);
         $this->assertSame('localBAR', getenv('FOO'));
         $this->assertSame('localNEW_VALUE', getenv('EXISTING_KEY'));
         $this->assertSame('localNEW_VALUE', $_ENV['EXISTING_KEY']);
@@ -287,14 +290,14 @@ class DotenvTest extends TestCase
         // special case for test
         $resetContext();
         $_SERVER['TEST_APP_ENV'] = 'test';
-        (new Dotenv())->usePutenv()->loadEnv($path, 'TEST_APP_ENV');
+        (new Dotenv(preferPhpFilesAndChangeDumpName: true))->usePutenv()->loadEnv($path, 'TEST_APP_ENV');
         $this->assertSame('BAR', getenv('FOO'));
         $this->assertSame('EXISTING_VALUE', getenv('EXISTING_KEY'));
         $this->assertSame('EXISTING_VALUE', $_ENV['EXISTING_KEY']);
 
         $resetContext();
         $_SERVER['TEST_APP_ENV'] = 'test';
-        (new Dotenv())->usePutenv()->loadEnv($path, 'TEST_APP_ENV', 'dev', ['test'], true);
+        (new Dotenv(preferPhpFilesAndChangeDumpName: true))->usePutenv()->loadEnv($path, 'TEST_APP_ENV', 'dev', ['test'], true);
         $this->assertSame('BAR', getenv('FOO'));
         $this->assertSame('NEW_VALUE', getenv('EXISTING_KEY'));
         $this->assertSame('NEW_VALUE', $_ENV['EXISTING_KEY']);
@@ -303,13 +306,13 @@ class DotenvTest extends TestCase
         file_put_contents("$path.dev", "FOO=devBAR\nEXISTING_KEY=devNEW_VALUE");
 
         $resetContext();
-        (new Dotenv())->usePutenv()->loadEnv($path, 'TEST_APP_ENV');
+        (new Dotenv(preferPhpFilesAndChangeDumpName: true))->usePutenv()->loadEnv($path, 'TEST_APP_ENV');
         $this->assertSame('devBAR', getenv('FOO'));
         $this->assertSame('EXISTING_VALUE', getenv('EXISTING_KEY'));
         $this->assertSame('EXISTING_VALUE', $_ENV['EXISTING_KEY']);
 
         $resetContext();
-        (new Dotenv())->usePutenv()->loadEnv($path, 'TEST_APP_ENV', 'dev', ['test'], true);
+        (new Dotenv(preferPhpFilesAndChangeDumpName: true))->usePutenv()->loadEnv($path, 'TEST_APP_ENV', 'dev', ['test'], true);
         $this->assertSame('devBAR', getenv('FOO'));
         $this->assertSame('devNEW_VALUE', getenv('EXISTING_KEY'));
         $this->assertSame('devNEW_VALUE', $_ENV['EXISTING_KEY']);
@@ -318,13 +321,13 @@ class DotenvTest extends TestCase
         file_put_contents("$path.dev.local", "FOO=devlocalBAR\nEXISTING_KEY=devlocalNEW_VALUE");
 
         $resetContext();
-        (new Dotenv())->usePutenv()->loadEnv($path, 'TEST_APP_ENV');
+        (new Dotenv(preferPhpFilesAndChangeDumpName: true))->usePutenv()->loadEnv($path, 'TEST_APP_ENV');
         $this->assertSame('devlocalBAR', getenv('FOO'));
         $this->assertSame('EXISTING_VALUE', getenv('EXISTING_KEY'));
         $this->assertSame('EXISTING_VALUE', $_ENV['EXISTING_KEY']);
 
         $resetContext();
-        (new Dotenv())->usePutenv()->loadEnv($path, 'TEST_APP_ENV', 'dev', ['test'], true);
+        (new Dotenv(preferPhpFilesAndChangeDumpName: true))->usePutenv()->loadEnv($path, 'TEST_APP_ENV', 'dev', ['test'], true);
         $this->assertSame('devlocalBAR', getenv('FOO'));
         $this->assertSame('devlocalNEW_VALUE', getenv('EXISTING_KEY'));
         $this->assertSame('devlocalNEW_VALUE', $_ENV['EXISTING_KEY']);
@@ -337,13 +340,13 @@ class DotenvTest extends TestCase
 
         $resetContext();
         unlink($path);
-        (new Dotenv())->usePutenv()->loadEnv($path, 'TEST_APP_ENV');
+        (new Dotenv(preferPhpFilesAndChangeDumpName: true))->usePutenv()->loadEnv($path, 'TEST_APP_ENV');
         $this->assertSame('distBAR', getenv('FOO'));
         $this->assertSame('EXISTING_VALUE', getenv('EXISTING_KEY'));
         $this->assertSame('EXISTING_VALUE', $_ENV['EXISTING_KEY']);
 
         $resetContext();
-        (new Dotenv())->usePutenv()->loadEnv($path, 'TEST_APP_ENV', 'dev', ['test'], true);
+        (new Dotenv(preferPhpFilesAndChangeDumpName: true))->usePutenv()->loadEnv($path, 'TEST_APP_ENV', 'dev', ['test'], true);
         $this->assertSame('distBAR', getenv('FOO'));
         $this->assertSame('distNEW_VALUE', getenv('EXISTING_KEY'));
         $this->assertSame('distNEW_VALUE', $_ENV['EXISTING_KEY']);
@@ -353,6 +356,154 @@ class DotenvTest extends TestCase
         unset($_ENV['EXISTING_KEY'], $_SERVER['EXISTING_KEY']);
         putenv('EXISTING_KEY');
         rmdir($tmpdir);
+    }
+
+    public function testLoadEnvWithPhpFiles()
+    {
+        $makePhpEnvFile = static function (array $values): string {
+            return sprintf('<?php return %s;', \var_export($values, true));
+        };
+        $resetContext = static function (): void {
+            unset($_ENV['SYMFONY_DOTENV_VARS']);
+            unset($_ENV['FOO']);
+            unset($_ENV['TEST_APP_ENV']);
+            unset($_SERVER['SYMFONY_DOTENV_VARS']);
+            unset($_SERVER['FOO']);
+            unset($_SERVER['TEST_APP_ENV']);
+            putenv('SYMFONY_DOTENV_VARS');
+            putenv('FOO');
+            putenv('TEST_APP_ENV');
+
+            $_ENV['EXISTING_KEY'] = $_SERVER['EXISTING_KEY'] = 'EXISTING_VALUE';
+            putenv('EXISTING_KEY=EXISTING_VALUE');
+        };
+
+        @mkdir($tmpdir = sys_get_temp_dir().'/'.rawurlencode(__METHOD__).microtime(true));
+
+        $path = tempnam($tmpdir, 'sf-');
+
+        // .env
+        file_put_contents($path, "FOO=BAR\nEXISTING_KEY=NEW_VALUE");
+        file_put_contents("$path.php", $makePhpEnvFile(['FOO' => 'phpBAR', 'EXISTING_KEY' => 'phpNEW_VALUE']));
+
+        $resetContext();
+        (new Dotenv(preferPhpFilesAndChangeDumpName: true))->usePutenv()->loadEnv($path, 'TEST_APP_ENV');
+        $this->assertSame('phpBAR', getenv('FOO'));
+        $this->assertSame('dev', getenv('TEST_APP_ENV'));
+        $this->assertSame('EXISTING_VALUE', getenv('EXISTING_KEY'));
+        $this->assertSame('EXISTING_VALUE', $_ENV['EXISTING_KEY']);
+
+        $resetContext();
+        (new Dotenv(preferPhpFilesAndChangeDumpName: true))->usePutenv()->loadEnv($path, 'TEST_APP_ENV', 'dev', ['test'], true);
+        $this->assertSame('phpBAR', getenv('FOO'));
+        $this->assertSame('dev', getenv('TEST_APP_ENV'));
+        $this->assertSame('phpNEW_VALUE', getenv('EXISTING_KEY'));
+        $this->assertSame('phpNEW_VALUE', $_ENV['EXISTING_KEY']);
+
+        // .env.local
+        file_put_contents("$path.local", "FOO=localBAR\nEXISTING_KEY=localNEW_VALUE");
+        file_put_contents("$path.local.php", $makePhpEnvFile(['FOO' => 'localphpBAR', 'EXISTING_KEY' => 'localphpNEW_VALUE']));
+
+        $resetContext();
+        $_SERVER['TEST_APP_ENV'] = 'local';
+        (new Dotenv(preferPhpFilesAndChangeDumpName: true))->usePutenv()->loadEnv($path, 'TEST_APP_ENV');
+        $this->assertSame('localphpBAR', getenv('FOO'));
+        $this->assertSame('EXISTING_VALUE', getenv('EXISTING_KEY'));
+        $this->assertSame('EXISTING_VALUE', $_ENV['EXISTING_KEY']);
+
+        $resetContext();
+        $_SERVER['TEST_APP_ENV'] = 'local';
+        (new Dotenv(preferPhpFilesAndChangeDumpName: true))->usePutenv()->loadEnv($path, 'TEST_APP_ENV', 'dev', ['test'], true);
+        $this->assertSame('localphpBAR', getenv('FOO'));
+        $this->assertSame('localphpNEW_VALUE', getenv('EXISTING_KEY'));
+        $this->assertSame('localphpNEW_VALUE', $_ENV['EXISTING_KEY']);
+
+        // special case for test
+        $resetContext();
+        $_SERVER['TEST_APP_ENV'] = 'test';
+        (new Dotenv(preferPhpFilesAndChangeDumpName: true))->usePutenv()->loadEnv($path, 'TEST_APP_ENV');
+        $this->assertSame('phpBAR', getenv('FOO'));
+        $this->assertSame('EXISTING_VALUE', getenv('EXISTING_KEY'));
+        $this->assertSame('EXISTING_VALUE', $_ENV['EXISTING_KEY']);
+
+        $resetContext();
+        $_SERVER['TEST_APP_ENV'] = 'test';
+        (new Dotenv(preferPhpFilesAndChangeDumpName: true))->usePutenv()->loadEnv($path, 'TEST_APP_ENV', 'dev', ['test'], true);
+        $this->assertSame('phpBAR', getenv('FOO'));
+        $this->assertSame('phpNEW_VALUE', getenv('EXISTING_KEY'));
+        $this->assertSame('phpNEW_VALUE', $_ENV['EXISTING_KEY']);
+
+        // .env.dev
+        file_put_contents("$path.dev", "FOO=devBAR\nEXISTING_KEY=devNEW_VALUE");
+        file_put_contents("$path.dev.php", $makePhpEnvFile(['FOO' => 'devphpBAR', 'EXISTING_KEY' => 'devphpNEW_VALUE']));
+
+        $resetContext();
+        (new Dotenv(preferPhpFilesAndChangeDumpName: true))->usePutenv()->loadEnv($path, 'TEST_APP_ENV');
+        $this->assertSame('devphpBAR', getenv('FOO'));
+        $this->assertSame('EXISTING_VALUE', getenv('EXISTING_KEY'));
+        $this->assertSame('EXISTING_VALUE', $_ENV['EXISTING_KEY']);
+
+        $resetContext();
+        (new Dotenv(preferPhpFilesAndChangeDumpName: true))->usePutenv()->loadEnv($path, 'TEST_APP_ENV', 'dev', ['test'], true);
+        $this->assertSame('devphpBAR', getenv('FOO'));
+        $this->assertSame('devphpNEW_VALUE', getenv('EXISTING_KEY'));
+        $this->assertSame('devphpNEW_VALUE', $_ENV['EXISTING_KEY']);
+
+        // .env.dev.local
+        file_put_contents("$path.dev.local", "FOO=devlocalBAR\nEXISTING_KEY=devlocalNEW_VALUE");
+        file_put_contents("$path.dev.local.php", $makePhpEnvFile(['FOO' => 'devlocalphpBAR', 'EXISTING_KEY' => 'devlocalphpNEW_VALUE']));
+
+        $resetContext();
+        (new Dotenv(preferPhpFilesAndChangeDumpName: true))->usePutenv()->loadEnv($path, 'TEST_APP_ENV');
+        $this->assertSame('devlocalphpBAR', getenv('FOO'));
+        $this->assertSame('EXISTING_VALUE', getenv('EXISTING_KEY'));
+        $this->assertSame('EXISTING_VALUE', $_ENV['EXISTING_KEY']);
+
+        $resetContext();
+        (new Dotenv(preferPhpFilesAndChangeDumpName: true))->usePutenv()->loadEnv($path, 'TEST_APP_ENV', 'dev', ['test'], true);
+        $this->assertSame('devlocalphpBAR', getenv('FOO'));
+        $this->assertSame('devlocalphpNEW_VALUE', getenv('EXISTING_KEY'));
+        $this->assertSame('devlocalphpNEW_VALUE', $_ENV['EXISTING_KEY']);
+        unlink("$path.local");
+        unlink("$path.local.php");
+        unlink("$path.dev");
+        unlink("$path.dev.php");
+        unlink("$path.dev.local");
+        unlink("$path.dev.local.php");
+
+        // .env.dist
+        file_put_contents("$path.dist", "FOO=distBAR\nEXISTING_KEY=distNEW_VALUE");
+        file_put_contents("$path.dist.php", $makePhpEnvFile(['FOO' => 'distphpBAR', 'EXISTING_KEY' => 'distphpNEW_VALUE']));
+
+        $resetContext();
+        unlink($path);
+        unlink("$path.php");
+        (new Dotenv(preferPhpFilesAndChangeDumpName: true))->usePutenv()->loadEnv($path, 'TEST_APP_ENV');
+        $this->assertSame('distphpBAR', getenv('FOO'));
+        $this->assertSame('EXISTING_VALUE', getenv('EXISTING_KEY'));
+        $this->assertSame('EXISTING_VALUE', $_ENV['EXISTING_KEY']);
+
+        $resetContext();
+        (new Dotenv(preferPhpFilesAndChangeDumpName: true))->usePutenv()->loadEnv($path, 'TEST_APP_ENV', 'dev', ['test'], true);
+        $this->assertSame('distphpBAR', getenv('FOO'));
+        $this->assertSame('distphpNEW_VALUE', getenv('EXISTING_KEY'));
+        $this->assertSame('distphpNEW_VALUE', $_ENV['EXISTING_KEY']);
+        unlink("$path.dist");
+        unlink("$path.dist.php");
+
+        $resetContext();
+        unset($_ENV['EXISTING_KEY'], $_SERVER['EXISTING_KEY']);
+        putenv('EXISTING_KEY');
+        rmdir($tmpdir);
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testDeprecationForNotPreferringPhpFiles()
+    {
+        $this->expectDeprecation('Since symfony/dotenv 7.2: Setting $preferPhpFilesAndChangeDumpName to false is deprecated.');
+        new Dotenv(preferPhpFilesAndChangeDumpName: false);
     }
 
     public function testOverload()
@@ -367,7 +518,7 @@ class DotenvTest extends TestCase
         $_ENV['FOO'] = 'initial_foo_value';
         $_ENV['BAR'] = 'initial_bar_value';
 
-        @mkdir($tmpdir = sys_get_temp_dir().'/dotenv');
+        @mkdir($tmpdir = sys_get_temp_dir().'/'.rawurlencode(__METHOD__).microtime(true));
 
         $path1 = tempnam($tmpdir, 'sf-');
         $path2 = tempnam($tmpdir, 'sf-');
@@ -375,7 +526,7 @@ class DotenvTest extends TestCase
         file_put_contents($path1, 'FOO=BAR');
         file_put_contents($path2, 'BAR=BAZ');
 
-        (new Dotenv())->usePutenv()->overload($path1, $path2);
+        (new Dotenv(preferPhpFilesAndChangeDumpName: true))->usePutenv()->overload($path1, $path2);
 
         $foo = getenv('FOO');
         $bar = getenv('BAR');
@@ -393,7 +544,7 @@ class DotenvTest extends TestCase
     public function testLoadDirectory()
     {
         $this->expectException(PathException::class);
-        $dotenv = new Dotenv();
+        $dotenv = new Dotenv(preferPhpFilesAndChangeDumpName: true);
         $dotenv->load(__DIR__);
     }
 
@@ -401,7 +552,7 @@ class DotenvTest extends TestCase
     {
         $originalValue = $_SERVER['argc'];
 
-        $dotenv = new Dotenv();
+        $dotenv = new Dotenv(preferPhpFilesAndChangeDumpName: true);
         $dotenv->populate(['argc' => 'new_value']);
 
         $this->assertSame($originalValue, $_SERVER['argc']);
@@ -412,7 +563,7 @@ class DotenvTest extends TestCase
         putenv('TEST_ENV_VAR=original_value');
         $_SERVER['TEST_ENV_VAR'] = 'original_value';
 
-        $dotenv = (new Dotenv())->usePutenv();
+        $dotenv = (new Dotenv(preferPhpFilesAndChangeDumpName: true))->usePutenv();
         $dotenv->populate(['TEST_ENV_VAR' => 'new_value']);
 
         $this->assertSame('original_value', getenv('TEST_ENV_VAR'));
@@ -422,7 +573,7 @@ class DotenvTest extends TestCase
     {
         $_SERVER['HTTP_TEST_ENV_VAR'] = 'http_value';
 
-        $dotenv = (new Dotenv())->usePutenv();
+        $dotenv = (new Dotenv(preferPhpFilesAndChangeDumpName: true))->usePutenv();
         $dotenv->populate(['HTTP_TEST_ENV_VAR' => 'env_value']);
 
         $this->assertSame('env_value', getenv('HTTP_TEST_ENV_VAR'));
@@ -434,7 +585,7 @@ class DotenvTest extends TestCase
     {
         putenv('TEST_ENV_VAR_OVERRIDEN=original_value');
 
-        $dotenv = (new Dotenv())->usePutenv();
+        $dotenv = (new Dotenv(preferPhpFilesAndChangeDumpName: true))->usePutenv();
         $dotenv->populate(['TEST_ENV_VAR_OVERRIDEN' => 'new_value'], true);
 
         $this->assertSame('new_value', getenv('TEST_ENV_VAR_OVERRIDEN'));
@@ -456,7 +607,7 @@ class DotenvTest extends TestCase
         unset($_SERVER['DATABASE_URL']);
         putenv('DATABASE_URL');
 
-        $dotenv = (new Dotenv())->usePutenv();
+        $dotenv = (new Dotenv(preferPhpFilesAndChangeDumpName: true))->usePutenv();
         $dotenv->populate(['APP_DEBUG' => '1', 'DATABASE_URL' => 'mysql://root@localhost/db']);
 
         $this->assertSame('APP_DEBUG,DATABASE_URL', getenv('SYMFONY_DOTENV_VARS'));
@@ -473,7 +624,7 @@ class DotenvTest extends TestCase
         unset($_SERVER['DATABASE_URL']);
         putenv('DATABASE_URL');
 
-        $dotenv = (new Dotenv())->usePutenv();
+        $dotenv = (new Dotenv(preferPhpFilesAndChangeDumpName: true))->usePutenv();
         $dotenv->populate(['APP_DEBUG' => '0', 'DATABASE_URL' => 'mysql://root@localhost/db']);
         $dotenv->populate(['DATABASE_URL' => 'sqlite:///somedb.sqlite']);
 
@@ -489,7 +640,7 @@ class DotenvTest extends TestCase
         putenv('BAZ=baz');
         putenv('DOCUMENT_ROOT=/var/www');
 
-        $dotenv = (new Dotenv())->usePutenv();
+        $dotenv = (new Dotenv(preferPhpFilesAndChangeDumpName: true))->usePutenv();
         $dotenv->populate(['FOO' => 'foo1', 'BAR' => 'bar1', 'BAZ' => 'baz1', 'DOCUMENT_ROOT' => '/boot']);
 
         $this->assertSame('foo1', getenv('FOO'));
@@ -501,7 +652,7 @@ class DotenvTest extends TestCase
     public function testGetVariablesValueFromEnvFirst()
     {
         $_ENV['APP_ENV'] = 'prod';
-        $dotenv = new Dotenv();
+        $dotenv = new Dotenv(preferPhpFilesAndChangeDumpName: true);
 
         $test = "APP_ENV=dev\nTEST1=foo1_\${APP_ENV}";
         $values = $dotenv->parse($test);
@@ -518,7 +669,7 @@ class DotenvTest extends TestCase
     {
         putenv('Foo=Bar');
 
-        $dotenv = new Dotenv();
+        $dotenv = new Dotenv(preferPhpFilesAndChangeDumpName: true);
 
         try {
             $values = $dotenv->parse('Foo=${Foo}');
@@ -530,13 +681,13 @@ class DotenvTest extends TestCase
 
     public function testNoDeprecationWarning()
     {
-        $dotenv = new Dotenv();
+        $dotenv = new Dotenv(preferPhpFilesAndChangeDumpName: true);
         $this->assertInstanceOf(Dotenv::class, $dotenv);
     }
 
     public function testDoNotUsePutenv()
     {
-        $dotenv = new Dotenv();
+        $dotenv = new Dotenv(preferPhpFilesAndChangeDumpName: true);
         $dotenv->populate(['TEST_USE_PUTENV' => 'no']);
 
         $this->assertSame('no', $_SERVER['TEST_USE_PUTENV']);
@@ -549,7 +700,7 @@ class DotenvTest extends TestCase
         unset($_ENV['SYMFONY_DOTENV_VARS'], $_SERVER['SYMFONY_DOTENV_VARS'], $_ENV['FOO']);
         $_SERVER['FOO'] = 'CCC';
 
-        (new Dotenv())->populate(['FOO' => 'BAR']);
+        (new Dotenv(preferPhpFilesAndChangeDumpName: true))->populate(['FOO' => 'BAR']);
 
         $this->assertSame('CCC', $_ENV['FOO']);
     }
@@ -565,41 +716,41 @@ class DotenvTest extends TestCase
             $_ENV['EXISTING_KEY'] = $_SERVER['EXISTING_KEY'] = 'EXISTING_VALUE';
         };
 
-        @mkdir($tmpdir = sys_get_temp_dir().'/dotenv');
+        @mkdir($tmpdir = sys_get_temp_dir().'/'.rawurlencode(__METHOD__).microtime(true));
         $path = tempnam($tmpdir, 'sf-');
 
         file_put_contents($path, "FOO=BAR\nEXISTING_KEY=NEW_VALUE");
         $resetContext();
-        (new Dotenv('TEST_APP_ENV', 'TEST_APP_DEBUG'))->bootEnv($path);
+        (new Dotenv('TEST_APP_ENV', 'TEST_APP_DEBUG', preferPhpFilesAndChangeDumpName: true))->bootEnv($path);
         $this->assertSame('BAR', $_SERVER['FOO']);
         $this->assertSame('EXISTING_VALUE', $_SERVER['EXISTING_KEY']);
 
         $resetContext();
-        (new Dotenv('TEST_APP_ENV', 'TEST_APP_DEBUG'))->bootEnv($path, 'dev', ['test'], true);
+        (new Dotenv('TEST_APP_ENV', 'TEST_APP_DEBUG', preferPhpFilesAndChangeDumpName: true))->bootEnv($path, 'dev', ['test'], true);
         $this->assertSame('BAR', $_SERVER['FOO']);
         $this->assertSame('NEW_VALUE', $_SERVER['EXISTING_KEY']);
         unlink($path);
 
-        file_put_contents($path.'.local.php', '<?php return ["TEST_APP_ENV" => "dev", "FOO" => "BAR", "EXISTING_KEY" => "localphpNEW_VALUE"];');
+        file_put_contents($path.'.dumped.php', '<?php return ["TEST_APP_ENV" => "dev", "FOO" => "BAR", "EXISTING_KEY" => "localphpNEW_VALUE"];');
         $resetContext();
-        (new Dotenv('TEST_APP_ENV', 'TEST_APP_DEBUG'))->bootEnv($path);
+        (new Dotenv('TEST_APP_ENV', 'TEST_APP_DEBUG', preferPhpFilesAndChangeDumpName: true))->bootEnv($path);
         $this->assertSame('BAR', $_SERVER['FOO']);
         $this->assertSame('1', $_SERVER['TEST_APP_DEBUG']);
         $this->assertSame('EXISTING_VALUE', $_SERVER['EXISTING_KEY']);
 
         $resetContext();
-        (new Dotenv('TEST_APP_ENV', 'TEST_APP_DEBUG'))->bootEnv($path, 'dev', ['test'], true);
+        (new Dotenv('TEST_APP_ENV', 'TEST_APP_DEBUG', preferPhpFilesAndChangeDumpName: true))->bootEnv($path, 'dev', ['test'], true);
         $this->assertSame('BAR', $_SERVER['FOO']);
         $this->assertSame('1', $_SERVER['TEST_APP_DEBUG']);
         $this->assertSame('localphpNEW_VALUE', $_SERVER['EXISTING_KEY']);
 
         $resetContext();
         $_SERVER['TEST_APP_ENV'] = 'ccc';
-        (new Dotenv('TEST_APP_ENV', 'TEST_APP_DEBUG'))->bootEnv($path, 'dev', ['test'], true);
+        (new Dotenv('TEST_APP_ENV', 'TEST_APP_DEBUG', preferPhpFilesAndChangeDumpName: true))->bootEnv($path, 'dev', ['test'], true);
         $this->assertSame('BAR', $_SERVER['FOO']);
         $this->assertSame('1', $_SERVER['TEST_APP_DEBUG']);
         $this->assertSame('localphpNEW_VALUE', $_SERVER['EXISTING_KEY']);
-        unlink($path.'.local.php');
+        unlink($path.'.dumped.php');
 
         $resetContext();
         rmdir($tmpdir);

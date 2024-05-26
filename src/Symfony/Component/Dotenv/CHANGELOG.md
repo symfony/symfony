@@ -1,5 +1,10 @@
 CHANGELOG
 =========
+7.2
+---
+* Add `Dotenv::$preferPhpFilesAndChangeDumpName` to prioritizes loading .php files over their
+  respective .env file. The default value of false is deprecated as this
+  parameter will be removed
 
 7.1
 ---

@@ -43,6 +43,7 @@ final class DotenvDumpCommand extends Command
                 new InputArgument('env', null === $this->defaultEnv ? InputArgument::REQUIRED : InputArgument::OPTIONAL, 'The application environment to dump .env files for - e.g. "prod".'),
             ])
             ->addOption('empty', null, InputOption::VALUE_NONE, 'Ignore the content of .env files')
+            ->addOption('preferPhpFilesAndChangeDumpName', null, InputOption::VALUE_NONE, 'Sets DotEnv::$preferPhpFilesAndChangeDumpName to true')
             ->setHelp(<<<'EOT'
 The <info>%command.name%</info> command compiles .env files into a PHP-optimized file called .env.local.php.
 
@@ -54,6 +55,11 @@ EOT
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
+        $preferPhpFilesAndChangeDumpName = $input->getOption('preferPhpFilesAndChangeDumpName');
+        if (!$preferPhpFilesAndChangeDumpName) {
+            \trigger_deprecation('symfony/dotenv', '7.2', 'Not using --preferPhpFilesAndChangeDumpName is deprecated.');
+        }
+
         $config = [];
         if (is_file($projectDir = $this->projectDir)) {
             $config = ['dotenv_path' => basename($projectDir)];
@@ -69,7 +75,7 @@ EOT
         if ($input->getOption('empty')) {
             $vars = [$envKey => $env];
         } else {
-            $vars = $this->loadEnv($dotenvPath, $env, $config);
+            $vars = $this->loadEnv($dotenvPath, $env, $config, $preferPhpFilesAndChangeDumpName);
             $env = $vars[$envKey];
         }
 
@@ -82,19 +88,19 @@ EOT
 return $vars;
 
 EOF;
-        file_put_contents($dotenvPath.'.local.php', $vars, \LOCK_EX);
+        file_put_contents($preferPhpFilesAndChangeDumpName ? "$dotenvPath.dumped.php" : "$dotenvPath.local.php", $vars, \LOCK_EX);
 
         $output->writeln(sprintf('Successfully dumped .env files in <info>.env.local.php</> for the <info>%s</> environment.', $env));
 
         return 0;
     }
 
-    private function loadEnv(string $dotenvPath, string $env, array $config): array
+    private function loadEnv(string $dotenvPath, string $env, array $config, bool $preferPhpFilesAndChangeDumpName): array
     {
         $envKey = $config['env_var_name'] ?? 'APP_ENV';
         $testEnvs = $config['test_envs'] ?? ['test'];
 
-        $dotenv = new Dotenv($envKey);
+        $dotenv = new Dotenv($envKey, preferPhpFilesAndChangeDumpName: $preferPhpFilesAndChangeDumpName);
 
         $globalsBackup = [$_SERVER, $_ENV];
         unset($_SERVER[$envKey]);

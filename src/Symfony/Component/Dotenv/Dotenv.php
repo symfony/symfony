@@ -41,7 +41,11 @@ final class Dotenv
     public function __construct(
         private string $envKey = 'APP_ENV',
         private string $debugKey = 'APP_DEBUG',
+        private readonly bool $preferPhpFilesAndChangeDumpName = false,
     ) {
+        if (!$this->preferPhpFilesAndChangeDumpName) {
+            \trigger_deprecation('symfony/dotenv', '7.2', 'Setting $preferPhpFilesAndChangeDumpName to false is deprecated.');
+        }
     }
 
     /**
@@ -102,30 +106,45 @@ final class Dotenv
 
         $k = $envKey ?? $this->envKey;
 
-        if (is_file($path) || !is_file($p = "$path.dist")) {
+        if ($this->preferPhpFilesAndChangeDumpName && is_file("$path.php") && \is_array($values = require "$path.php")) {
+            $this->populate($values, $overrideExistingVars);
+        } elseif (is_file($path)) {
             $this->doLoad($overrideExistingVars, [$path]);
-        } else {
+        } elseif ($this->preferPhpFilesAndChangeDumpName && is_file("$path.dist.php") && \is_array($values = require "$path.dist.php")) {
+            $this->populate($values, $overrideExistingVars);
+        } elseif (is_file($p = "$path.dist")) {
             $this->doLoad($overrideExistingVars, [$p]);
+        } else {
+            throw new PathException($p);
         }
 
         if (null === $env = $_SERVER[$k] ?? $_ENV[$k] ?? null) {
             $this->populate([$k => $env = $defaultEnv], $overrideExistingVars);
         }
 
-        if (!\in_array($env, $testEnvs, true) && is_file($p = "$path.local")) {
-            $this->doLoad($overrideExistingVars, [$p]);
-            $env = $_SERVER[$k] ?? $_ENV[$k] ?? $env;
+        if (!\in_array($env, $testEnvs, true)) {
+            if ($this->preferPhpFilesAndChangeDumpName && is_file("$path.local.php") && \is_array($values = require "$path.local.php")) {
+                $this->populate($values, $overrideExistingVars);
+                $env = $_SERVER[$k] ?? $_ENV[$k] ?? $env;
+            } elseif (is_file($p = "$path.local")) {
+                $this->doLoad($overrideExistingVars, [$p]);
+                $env = $_SERVER[$k] ?? $_ENV[$k] ?? $env;
+            }
         }
 
         if ('local' === $env) {
             return;
         }
 
-        if (is_file($p = "$path.$env")) {
+        if ($this->preferPhpFilesAndChangeDumpName && is_file("$path.$env.php") && \is_array($values = require "$path.$env.php")) {
+            $this->populate($values, $overrideExistingVars);
+        } elseif (is_file($p = "$path.$env")) {
             $this->doLoad($overrideExistingVars, [$p]);
         }
 
-        if (is_file($p = "$path.$env.local")) {
+        if ($this->preferPhpFilesAndChangeDumpName && is_file("$path.$env.local.php") && \is_array($values = require "$path.$env.local.php")) {
+            $this->populate($values, $overrideExistingVars);
+        } elseif (is_file($p = "$path.$env.local")) {
             $this->doLoad($overrideExistingVars, [$p]);
         }
     }
@@ -139,7 +158,7 @@ final class Dotenv
      */
     public function bootEnv(string $path, string $defaultEnv = 'dev', array $testEnvs = ['test'], bool $overrideExistingVars = false): void
     {
-        $p = $path.'.local.php';
+        $p = $this->preferPhpFilesAndChangeDumpName ? "$path.dumped.php" : "$path.local.php";
         $env = is_file($p) ? include $p : null;
         $k = $this->envKey;
 

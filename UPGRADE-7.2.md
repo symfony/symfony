@@ -12,3 +12,8 @@ Security
 --------
 
  * Deprecate argument `$secret` of `RememberMeToken` and `RememberMeAuthenticator`
+
+DotEnv
+------
+
+ * Deprecate setting argument `Dotenv::$preferPhpFilesAndChangeDumpName` to false

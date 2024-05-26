@@ -32,7 +32,7 @@ class DebugCommandTest extends TestCase
         $command = new DebugCommand('dev', __DIR__.'/Fixtures/Scenario1');
         $command->setHelperSet(new HelperSet([new FormatterHelper()]));
         $tester = new CommandTester($command);
-        $tester->execute([]);
+        $tester->execute(['--preferPhpFilesAndChangeDumpName' => null]);
         $output = $tester->getDisplay();
 
         $this->assertStringContainsString('[ERROR] Dotenv component is not initialized', $output);
@@ -48,7 +48,7 @@ class DebugCommandTest extends TestCase
         $command = new DebugCommand('dev', __DIR__.'/Fixtures/Scenario1');
         $command->setHelperSet(new HelperSet([new FormatterHelper()]));
         $tester = new CommandTester($command);
-        $tester->execute([]);
+        $tester->execute(['--preferPhpFilesAndChangeDumpName' => null]);
         $expectedFormat = <<<'OUTPUT'
 %a
  ---------- ------- ------------ ------%S
@@ -70,7 +70,7 @@ OUTPUT;
         $output = $this->executeCommand(__DIR__.'/Fixtures/Scenario1', 'dev');
 
         // Scanned Files
-        $this->assertStringContainsString('⨯ .env.local.php', $output);
+        $this->assertStringContainsString('⨯ .env.dumped.php', $output);
         $this->assertStringContainsString('⨯ .env.dev.local', $output);
         $this->assertStringContainsString('⨯ .env.dev', $output);
         $this->assertStringContainsString('✓ .env.local', $output);
@@ -92,7 +92,7 @@ OUTPUT;
         $output = $this->executeCommand(__DIR__.'/Fixtures/Scenario1', 'test');
 
         // Scanned Files
-        $this->assertStringContainsString('⨯ .env.local.php', $output);
+        $this->assertStringContainsString('⨯ .env.dumped.php', $output);
         $this->assertStringContainsString('⨯ .env.test.local', $output);
         $this->assertStringContainsString('✓ .env.test', $output);
         $this->assertStringContainsString('✓ .env'.\PHP_EOL, $output);
@@ -113,7 +113,7 @@ OUTPUT;
         $output = $this->executeCommand(__DIR__.'/Fixtures/Scenario1', 'prod');
 
         // Scanned Files
-        $this->assertStringContainsString('⨯ .env.local.php', $output);
+        $this->assertStringContainsString('⨯ .env.dumped.php', $output);
         $this->assertStringContainsString('✓ .env.prod.local', $output);
         $this->assertStringContainsString('⨯ .env.prod', $output);
         $this->assertStringContainsString('✓ .env.local', $output);
@@ -136,7 +136,7 @@ OUTPUT;
         $output = $this->executeCommand(__DIR__.'/Fixtures/Scenario2', 'prod');
 
         // Scanned Files
-        $this->assertStringContainsString('✓ .env.local.php', $output);
+        $this->assertStringContainsString('✓ .env.dumped.php', $output);
         $this->assertStringContainsString('⨯ .env.prod.local', $output);
         $this->assertStringContainsString('✓ .env.prod', $output);
         $this->assertStringContainsString('⨯ .env.local', $output);
@@ -148,9 +148,9 @@ OUTPUT;
         $this->assertStringNotContainsString('.env.test', $output);
 
         // Variables
-        $this->assertStringContainsString('Variable   Value   .env.local.php   .env.prod   .env.dist', $output);
-        $this->assertStringContainsString('FOO        BaR     BaR              BaR         n/a', $output);
-        $this->assertStringContainsString('TEST       1234    1234             1234        0000', $output);
+        $this->assertStringContainsString('Variable   Value   .env.dumped.php   .env.prod   .env.dist', $output);
+        $this->assertStringContainsString('FOO        BaR     BaR               BaR         n/a', $output);
+        $this->assertStringContainsString('TEST       1234    1234              1234        0000', $output);
     }
 
     public function testScenario2WithCustomPath()
@@ -158,7 +158,7 @@ OUTPUT;
         $output = $this->executeCommand(__DIR__.'/Fixtures', 'prod', [], __DIR__.'/Fixtures/Scenario2/.env');
 
         // Scanned Files
-        $this->assertStringContainsString('✓ Scenario2/.env.local.php', $output);
+        $this->assertStringContainsString('✓ Scenario2/.env.dumped.php', $output);
         $this->assertStringContainsString('⨯ Scenario2/.env.prod.local', $output);
         $this->assertStringContainsString('✓ Scenario2/.env.prod', $output);
         $this->assertStringContainsString('⨯ Scenario2/.env.local', $output);
@@ -170,9 +170,9 @@ OUTPUT;
         $this->assertStringNotContainsString('.env.test', $output);
 
         // Variables
-        $this->assertStringContainsString('Variable   Value   Scenario2/.env.local.php   Scenario2/.env.prod   Scenario2/.env.dist', $output);
-        $this->assertStringContainsString('FOO        BaR     BaR                        BaR                   n/a', $output);
-        $this->assertStringContainsString('TEST       1234    1234                       1234                  0000', $output);
+        $this->assertStringContainsString('Variable   Value   Scenario2/.env.dumped.php   Scenario2/.env.prod   Scenario2/.env.dist', $output);
+        $this->assertStringContainsString('FOO        BaR     BaR                         BaR                   n/a', $output);
+        $this->assertStringContainsString('TEST       1234    1234                        1234                  0000', $output);
     }
 
     public function testWarningOnEnvAndEnvDistFile()
@@ -196,7 +196,7 @@ OUTPUT;
         $output = $this->executeCommand(__DIR__.'/Fixtures/Scenario2', 'prod');
 
         // Warning
-        $this->assertStringContainsString('[WARNING] Due to existing dump file (.env.local.php)', $output);
+        $this->assertStringContainsString('[WARNING] Due to existing dump file (.env.dumped.php)', $output);
     }
 
     public function testWarningOnPhpEnvFileWithCustomPath()
@@ -204,7 +204,7 @@ OUTPUT;
         $output = $this->executeCommand(__DIR__.'/Fixtures', 'prod', dotenvPath: __DIR__.'/Fixtures/Scenario2/.env');
 
         // Warning
-        $this->assertStringContainsString('[WARNING] Due to existing dump file (Scenario2/.env.local.php)', $output);
+        $this->assertStringContainsString('[WARNING] Due to existing dump file (Scenario2/.env.dumped.php)', $output);
     }
 
     public function testScenario1InDevEnvWithNameFilter()
@@ -212,7 +212,7 @@ OUTPUT;
         $output = $this->executeCommand(__DIR__.'/Fixtures/Scenario1', 'dev', ['filter' => 'FoO']);
 
         // Scanned Files
-        $this->assertStringContainsString('⨯ .env.local.php', $output);
+        $this->assertStringContainsString('⨯ .env.dumped.php', $output);
         $this->assertStringContainsString('⨯ .env.dev.local', $output);
         $this->assertStringContainsString('⨯ .env.dev', $output);
         $this->assertStringContainsString('✓ .env.local', $output);
@@ -234,7 +234,7 @@ OUTPUT;
         $output = $this->executeCommand(__DIR__.'/Fixtures/Scenario1', 'prod', ['filter' => 'unknown']);
 
         // Scanned Files
-        $this->assertStringContainsString('⨯ .env.local.php', $output);
+        $this->assertStringContainsString('⨯ .env.dumped.php', $output);
         $this->assertStringContainsString('✓ .env.prod.local', $output);
         $this->assertStringContainsString('⨯ .env.prod', $output);
         $this->assertStringContainsString('✓ .env.local', $output);
@@ -258,7 +258,7 @@ OUTPUT;
         $output = $this->executeCommand(__DIR__.'/Fixtures/Scenario2', 'prod', ['filter' => 'tes']);
 
         // Scanned Files
-        $this->assertStringContainsString('✓ .env.local.php', $output);
+        $this->assertStringContainsString('✓ .env.dumped.php', $output);
         $this->assertStringContainsString('⨯ .env.prod.local', $output);
         $this->assertStringContainsString('✓ .env.prod', $output);
         $this->assertStringContainsString('⨯ .env.local', $output);
@@ -270,9 +270,9 @@ OUTPUT;
         $this->assertStringNotContainsString('.env.test', $output);
 
         // Variables
-        $this->assertStringContainsString('Variable   Value   .env.local.php   .env.prod   .env.dist', $output);
-        $this->assertStringNotContainsString('FOO        BaR     BaR              BaR         n/a', $output);
-        $this->assertStringContainsString('TEST       1234    1234             1234        0000', $output);
+        $this->assertStringContainsString('Variable   Value   .env.dumped.php   .env.prod   .env.dist', $output);
+        $this->assertStringNotContainsString('FOO        BaR     BaR               BaR         n/a', $output);
+        $this->assertStringContainsString('TEST       1234    1234              1234        0000', $output);
     }
 
     /**
@@ -284,7 +284,7 @@ OUTPUT;
         $projectDirectory = __DIR__.'/Fixtures/Scenario2';
 
         $_SERVER['TEST_ENV_KEY'] = $env;
-        (new Dotenv('TEST_ENV_KEY'))->bootEnv($projectDirectory.'/.env');
+        (new Dotenv('TEST_ENV_KEY', preferPhpFilesAndChangeDumpName: true))->bootEnv($projectDirectory.'/.env');
 
         $command = new DebugCommand($env, $projectDirectory);
         $application = new Application();
@@ -296,12 +296,12 @@ OUTPUT;
     private function executeCommand(string $projectDirectory, string $env, array $input = [], ?string $dotenvPath = null): string
     {
         $_SERVER['TEST_ENV_KEY'] = $env;
-        (new Dotenv('TEST_ENV_KEY'))->bootEnv($dotenvPath ?? $projectDirectory.'/.env');
+        (new Dotenv('TEST_ENV_KEY', preferPhpFilesAndChangeDumpName: true))->bootEnv($dotenvPath ?? $projectDirectory.'/.env');
 
         $command = new DebugCommand($env, $projectDirectory);
         $command->setHelperSet(new HelperSet([new FormatterHelper()]));
         $tester = new CommandTester($command);
-        $tester->execute($input);
+        $tester->execute(['--preferPhpFilesAndChangeDumpName' => null] + $input);
 
         return $tester->getDisplay();
     }

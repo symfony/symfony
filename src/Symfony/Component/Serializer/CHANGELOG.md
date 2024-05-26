@@ -11,6 +11,7 @@ CHANGELOG
  * Add `CamelCaseToSnakeCaseNameConverter::REQUIRE_SNAKE_CASE_PROPERTIES` context option
  * Deprecate `AbstractNormalizerContextBuilder::withDefaultContructorArguments(?array $defaultContructorArguments)`, use `withDefaultConstructorArguments(?array $defaultConstructorArguments)` instead (note the missing `s` character in Contructor word in deprecated method)
  * Add `XmlEncoder::CDATA_WRAPPING_PATTERN` context option
+ * Add `AbstractNormalizer::IGNORED_GROUPS` to make it possible to ignore groups during serialization
 
 7.0
 ---

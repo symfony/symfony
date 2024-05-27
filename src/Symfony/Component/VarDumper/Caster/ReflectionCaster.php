@@ -83,13 +83,13 @@ class ReflectionCaster
         // Cannot create ReflectionGenerator based on a terminated Generator
         try {
             $reflectionGenerator = new \ReflectionGenerator($c);
+
+            return self::castReflectionGenerator($reflectionGenerator, $a, $stub, $isNested);
         } catch (\Exception $e) {
             $a[Caster::PREFIX_VIRTUAL.'closed'] = true;
 
             return $a;
         }
-
-        return self::castReflectionGenerator($reflectionGenerator, $a, $stub, $isNested);
     }
 
     public static function castType(\ReflectionType $c, array $a, Stub $stub, bool $isNested)

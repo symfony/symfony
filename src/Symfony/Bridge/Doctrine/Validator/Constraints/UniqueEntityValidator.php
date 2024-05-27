@@ -287,7 +287,9 @@ class UniqueEntityValidator extends ConstraintValidator
                 throw new ConstraintDefinitionException(sprintf('The field "%s" is not a property of class "%s".', $fieldName, $objectClass));
             }
 
-            $fieldValues[$entityFieldName] = $this->getPropertyValue($objectClass, $fieldName, $object);
+            $fieldValues[$entityFieldName] = $isValueEntity && $object instanceof ($class->getName())
+                ? $class->reflFields[$fieldName]->getValue($object)
+                : $this->getPropertyValue($objectClass, $fieldName, $object);
         }
 
         return $fieldValues;

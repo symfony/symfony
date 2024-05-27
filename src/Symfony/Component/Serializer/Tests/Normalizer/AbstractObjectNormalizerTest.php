@@ -1147,6 +1147,25 @@ class AbstractObjectNormalizerTest extends TestCase
 
         $this->assertEquals($expected, $normalizer->denormalize($data, ScalarCollectionDocBlockDummy::class));
     }
+
+    public function testDenormalizeCollectionOfUnionTypesPropertyWithPhpDocExtractor()
+    {
+        $normalizer = new AbstractObjectNormalizerWithMetadataAndPhpDocExtractor();
+        $data = [
+            'values1' => [
+                'foo' => 'foo',
+                'bar' => 222,
+            ],
+            'values2' => [
+                'baz' => 'baz',
+                'qux' => 333,
+            ],
+        ];
+        $expected = new UnionCollectionDocBlockDummy($data['values1']);
+        $expected->values2 = $data['values2'];
+
+        $this->assertEquals($expected, $normalizer->denormalize($data, UnionCollectionDocBlockDummy::class));
+    }
 }
 
 class AbstractObjectNormalizerDummy extends AbstractObjectNormalizer
@@ -1577,6 +1596,22 @@ class ScalarCollectionDocBlockDummy
     }
 }
 
+class UnionCollectionDocBlockDummy
+{
+    /**
+     * @param array<string, string|int> $values1
+     */
+    public function __construct(
+        public array $values1,
+    ) {
+    }
+
+    /**
+     * @var array<string, string|int>
+     */
+    public array $values2;
+}
+
 class AbstractObjectNormalizerWithMetadataAndPhpDocExtractor extends AbstractObjectNormalizer
 {
     public function __construct()
@@ -1596,6 +1631,9 @@ class AbstractObjectNormalizerWithMetadataAndPhpDocExtractor extends AbstractObj
 
     protected function setAttributeValue(object $object, string $attribute, mixed $value, ?string $format = null, array $context = []): void
     {
+        if (property_exists($object, $attribute)) {
+            $object->$attribute = $value;
+        }
     }
 
     public function getSupportedTypes(?string $format): array

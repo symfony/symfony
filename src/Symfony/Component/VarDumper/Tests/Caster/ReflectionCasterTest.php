@@ -463,7 +463,10 @@ EOTXT
         );
     }
 
-    public function testGenerator()
+    /**
+     * @requires PHP < 8.4
+     */
+    public function testGeneratorPriorTo84()
     {
         if (\extension_loaded('xdebug')) {
             $this->markTestSkipped('xdebug is active');
@@ -513,7 +516,7 @@ array:2 [
         Symfony\Component\VarDumper\Tests\Fixtures\GeneratorDemo::foo()
         ›     yield 1;
         › }
-        › 
+        ›
       }
 %A  }
     closed: false
@@ -529,6 +532,85 @@ EODUMP;
 
         $expectedDump = <<<'EODUMP'
 Generator {
+  closed: true
+}
+EODUMP;
+        $this->assertDumpMatchesFormat($expectedDump, $generator);
+    }
+
+    /**
+     * @requires PHP 8.4
+     */
+    public function testGenerator()
+    {
+        if (\extension_loaded('xdebug')) {
+            $this->markTestSkipped('xdebug is active');
+        }
+
+        $generator = new GeneratorDemo();
+        $generator = $generator->baz();
+
+        $expectedDump = <<<'EODUMP'
+Generator {
+  function: "Symfony\Component\VarDumper\Tests\Fixtures\GeneratorDemo::baz"
+  this: Symfony\Component\VarDumper\Tests\Fixtures\GeneratorDemo { …}
+  %s: {
+    %sGeneratorDemo.php:14 {
+      Symfony\Component\VarDumper\Tests\Fixtures\GeneratorDemo->baz()
+      › {
+      ›     yield from bar();
+      › }
+    }
+    Symfony\Component\VarDumper\Tests\Fixtures\GeneratorDemo->baz() {}
+%A}
+  closed: false
+}
+EODUMP;
+
+        $this->assertDumpMatchesFormat($expectedDump, $generator);
+
+        foreach ($generator as $v) {
+            break;
+        }
+
+        $expectedDump = <<<'EODUMP'
+array:2 [
+  0 => ReflectionGenerator {
+    this: Symfony\Component\VarDumper\Tests\Fixtures\GeneratorDemo { …}
+    %s: {
+      %s%eTests%eFixtures%eGeneratorDemo.php:%d {
+        Symfony\Component\VarDumper\Tests\Fixtures\GeneratorDemo::foo()
+%A      ›     yield 1;
+%A    }
+      %s%eTests%eFixtures%eGeneratorDemo.php:20 { …}
+      %s%eTests%eFixtures%eGeneratorDemo.php:14 { …}
+%A  }
+    closed: false
+  }
+  1 => Generator {
+    function: "Symfony\Component\VarDumper\Tests\Fixtures\GeneratorDemo::foo"
+    %s: {
+      %s%eTests%eFixtures%eGeneratorDemo.php:%d {
+        Symfony\Component\VarDumper\Tests\Fixtures\GeneratorDemo::foo()
+        ›     yield 1;
+        › }
+        ›
+      }
+%A  }
+    closed: false
+  }
+]
+EODUMP;
+
+        $r = new \ReflectionGenerator($generator);
+        $this->assertDumpMatchesFormat($expectedDump, [$r, $r->getExecutingGenerator()]);
+
+        foreach ($generator as $v) {
+        }
+
+        $expectedDump = <<<'EODUMP'
+Generator {
+  function: "Symfony\Component\VarDumper\Tests\Fixtures\GeneratorDemo::baz"
   closed: true
 }
 EODUMP;

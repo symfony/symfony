@@ -184,7 +184,7 @@ final class SlackTransportTest extends TransportTestCase
 
         $response->expects($this->once())
             ->method('getContent')
-            ->willReturn(json_encode(['ok' => true, 'ts' => '1503435956.000247']));
+            ->willReturn(json_encode(['ok' => true, 'ts' => '1503435956.000247', 'channel' => 'C123456']));
 
         $options = new SlackOptions();
         $options->asUser($value);

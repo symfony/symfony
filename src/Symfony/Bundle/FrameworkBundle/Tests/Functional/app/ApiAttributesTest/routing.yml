@@ -1,7 +1,23 @@
-map_query_string:
-    path: /map-query-string.{_format}
-    controller: Symfony\Bundle\FrameworkBundle\Tests\Functional\WithMapQueryStringController
+map_query_string_to_nullable_attribute:
+    path: /map-query-string-to-nullable-attribute.{_format}
+    controller: Symfony\Bundle\FrameworkBundle\Tests\Functional\WithMapQueryStringToNullableAttributeController
 
-map_request_body:
-    path: /map-request-body.{_format}
-    controller: Symfony\Bundle\FrameworkBundle\Tests\Functional\WithMapRequestPayloadController
+map_query_string_to_attribute_with_default_value:
+    path: /map-query-string-to-attribute-with-default-value.{_format}
+    controller: Symfony\Bundle\FrameworkBundle\Tests\Functional\WithMapQueryStringToAttributeWithDefaultValueController
+
+map_query_string_to_non_nullable_attribute_without_default_value:
+    path: /map-query-string-to-non-nullable-attribute-without-default-value.{_format}
+    controller: Symfony\Bundle\FrameworkBundle\Tests\Functional\WithMapQueryStringToNonNullableAttributeWithoutDefaultValueController
+
+map_request_to_nullable_attribute:
+    path: /map-request-to-nullable-attribute.{_format}
+    controller: Symfony\Bundle\FrameworkBundle\Tests\Functional\WithMapRequestToNullableAttributeController
+
+map_request_to_attribute_with_default_value:
+    path: /map-request-to-attribute-with-default-value.{_format}
+    controller: Symfony\Bundle\FrameworkBundle\Tests\Functional\WithMapRequestToAttributeWithDefaultValueController
+
+map_request_to_non_nullable_attribute_without_default_value:
+    path: /map-request-to-non-nullable-attribute-without-default-value.{_format}
+    controller: Symfony\Bundle\FrameworkBundle\Tests\Functional\WithMapRequestToNonNullableAttributeWithoutDefaultValueController

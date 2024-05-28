@@ -26,16 +26,18 @@ use Symfony\Component\DependencyInjection\Reference;
 class HttpBasicFactory implements AuthenticatorFactoryInterface
 {
     public const PRIORITY = -50;
+    protected string $baseAuthenticatorId = 'security.authenticator.http_basic';
+    protected string $authenticatorId = '';
 
     public function createAuthenticator(ContainerBuilder $container, string $firewallName, array $config, string $userProviderId): string
     {
-        $authenticatorId = 'security.authenticator.http_basic.'.$firewallName;
+        $this->setAuthenticatorId($firewallName);
         $container
-            ->setDefinition($authenticatorId, new ChildDefinition('security.authenticator.http_basic'))
+            ->setDefinition($this->authenticatorId, new ChildDefinition($this->baseAuthenticatorId))
             ->replaceArgument(0, $config['realm'])
             ->replaceArgument(1, new Reference($userProviderId));
 
-        return $authenticatorId;
+        return $this->authenticatorId;
     }
 
     public function getPriority(): int
@@ -56,5 +58,10 @@ class HttpBasicFactory implements AuthenticatorFactoryInterface
                 ->scalarNode('realm')->defaultValue('Secured Area')->end()
             ->end()
         ;
+    }
+
+    protected function setAuthenticatorId(string $firewallName): void
+    {
+        $this->authenticatorId = $this->baseAuthenticatorId . '.' . $firewallName;
     }
 }

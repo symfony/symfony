@@ -727,6 +727,67 @@ class SecurityExtensionTest extends TestCase
         ];
     }
 
+    public function testUsingLdapAndNormalVariant()
+    {
+        $container = $this->getRawContainer();
+        $container->loadFromExtension('security', [
+            'providers' => [
+                'first' => ['id' => 'basic'],
+                'second' => ['id' => 'basic_ldap'],
+            ],
+            'firewalls' => [
+                'main' => [
+                    'entry_point' => 'form_login_ldap',
+                    'json_login' => ['check_path' => 'login', 'provider' => 'first'],
+                    'json_login_ldap' => ['check_path' => 'login_ldap', 'provider' => 'second'],
+                    'form_login' => ['check_path' => 'login', 'provider' => 'first'],
+                    'form_login_ldap' => ['check_path' => 'login_ldap', 'provider' => 'second'],
+                    'http_basic' => ['provider' => 'first'],
+                    'http_basic_ldap' => ['provider' => 'second'],
+                ],
+            ],
+        ]);
+
+        $container->compile();
+
+        $authenticators = $container->getDefinition('security.authenticator.manager.main')->getArgument(0);
+        foreach ($authenticators as $authenticator) {
+            $authenticatorId = (string) $authenticator;
+            $authenticatorDefinition = $container->getDefinition($authenticatorId);
+
+            $values = $this->getExpectedAndActualValuesFromAuthenticator($container, $authenticatorDefinition, $authenticatorId);
+
+            $this->assertEquals($values['expectedValue'], $values['actualValue']);
+        }
+    }
+
+    private function getExpectedAndActualValuesFromAuthenticator($container, $authenticatorDefinition, $authenticatorId): array
+    {
+        if (in_array($authenticatorId, ['security.authenticator.form_login.main', 'security.authenticator.json_login.main'])) {
+            return [
+                'expectedValue' => 'login',
+                'actualValue' => $authenticatorDefinition->getArgument(4)['check_path']
+            ];
+        } elseif (in_array($authenticatorId,['security.authenticator.form_login_ldap.main', 'security.authenticator.json_login_ldap.main'])) {
+            return [
+                'expectedValue' => 'login_ldap',
+                'actualValue' => $container->getDefinition($authenticatorDefinition->getArgument(0))->getArgument(4)['check_path']
+            ];
+        } elseif (in_array($authenticatorId, ['security.authenticator.http_basic.main'])) {
+            return [
+                'expectedValue' => 'basic',
+                'actualValue' => $authenticatorDefinition->getArgument(1)
+            ];
+        } elseif (in_array($authenticatorId, ['security.authenticator.http_basic_ldap.main'])) {
+            return [
+                'expectedValue' => 'basic_ldap',
+                'actualValue' => $container->getDefinition($authenticatorDefinition->getArgument(0))->getArgument(1)
+            ];
+        } else {
+            $this->fail('Unexpected authenticator service found: '. $authenticatorId);
+        }
+    }
+
     public function testCompilesWithoutSessionListenerWithStatelessFirewallWithAuthenticatorManager()
     {
         $container = $this->getRawContainer();

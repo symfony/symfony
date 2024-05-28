@@ -25,6 +25,8 @@ use Symfony\Component\DependencyInjection\Reference;
 class JsonLoginFactory extends AbstractFactory
 {
     public const PRIORITY = -40;
+    protected string $baseAuthenticatorId = 'security.authenticator.json_login';
+    protected string $authenticatorId = '';
 
     public function __construct()
     {
@@ -46,15 +48,20 @@ class JsonLoginFactory extends AbstractFactory
 
     public function createAuthenticator(ContainerBuilder $container, string $firewallName, array $config, string $userProviderId): string
     {
-        $authenticatorId = 'security.authenticator.json_login.'.$firewallName;
+        $this->setAuthenticatorId($firewallName);
         $options = array_intersect_key($config, $this->options);
         $container
-            ->setDefinition($authenticatorId, new ChildDefinition('security.authenticator.json_login'))
+            ->setDefinition($this->authenticatorId, new ChildDefinition($this->baseAuthenticatorId))
             ->replaceArgument(1, new Reference($userProviderId))
             ->replaceArgument(2, isset($config['success_handler']) ? new Reference($this->createAuthenticationSuccessHandler($container, $firewallName, $config)) : null)
             ->replaceArgument(3, isset($config['failure_handler']) ? new Reference($this->createAuthenticationFailureHandler($container, $firewallName, $config)) : null)
             ->replaceArgument(4, $options);
 
-        return $authenticatorId;
+        return $this->authenticatorId;
+    }
+
+    protected function setAuthenticatorId(string $firewallName): void
+    {
+        $this->authenticatorId = $this->baseAuthenticatorId . '.' . $firewallName;
     }
 }

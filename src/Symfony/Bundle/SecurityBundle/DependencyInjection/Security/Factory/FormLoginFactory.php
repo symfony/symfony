@@ -26,6 +26,8 @@ use Symfony\Component\DependencyInjection\Reference;
 class FormLoginFactory extends AbstractFactory
 {
     public const PRIORITY = -30;
+    protected string $baseAuthenticatorId = 'security.authenticator.form_login';
+    protected string $authenticatorId = '';
 
     public function __construct()
     {
@@ -50,10 +52,10 @@ class FormLoginFactory extends AbstractFactory
 
     public function createAuthenticator(ContainerBuilder $container, string $firewallName, array $config, string $userProviderId): string
     {
-        $authenticatorId = 'security.authenticator.form_login.'.$firewallName;
+        $this->setAuthenticatorId($firewallName);
         $options = array_intersect_key($config, $this->options);
         $authenticator = $container
-            ->setDefinition($authenticatorId, new ChildDefinition('security.authenticator.form_login'))
+            ->setDefinition($this->authenticatorId, new ChildDefinition($this->baseAuthenticatorId))
             ->replaceArgument(1, new Reference($userProviderId))
             ->replaceArgument(2, new Reference($this->createAuthenticationSuccessHandler($container, $firewallName, $config)))
             ->replaceArgument(3, new Reference($this->createAuthenticationFailureHandler($container, $firewallName, $config)))
@@ -63,6 +65,11 @@ class FormLoginFactory extends AbstractFactory
             $authenticator->addMethodCall('setHttpKernel', [new Reference('http_kernel')]);
         }
 
-        return $authenticatorId;
+        return $this->authenticatorId;
+    }
+
+    protected function setAuthenticatorId(string $firewallName): void
+    {
+        $this->authenticatorId = $this->baseAuthenticatorId . '.' . $firewallName;
     }
 }

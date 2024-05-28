@@ -62,4 +62,9 @@ trait LdapFactoryTrait
 
         return $ldapAuthenticatorId;
     }
+
+    protected function setAuthenticatorId(string $firewallName): void
+    {
+        $this->authenticatorId = $this->baseAuthenticatorId .  '.' . $firewallName . '_ldap';
+    }
 }

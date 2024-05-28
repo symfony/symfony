@@ -78,7 +78,7 @@ final class SlackTransport extends AbstractTransport
         }
 
         $response = $this->client->request('POST', 'https://'.$this->getEndpoint().'/api/'.$apiMethod, [
-            'json' => array_filter($options),
+            'json' => array_filter($options, function ($value): bool { return !\in_array($value, ['', [], null], true); }),
             'auth_bearer' => $this->accessToken,
             'headers' => [
                 'Content-Type' => 'application/json; charset=utf-8',

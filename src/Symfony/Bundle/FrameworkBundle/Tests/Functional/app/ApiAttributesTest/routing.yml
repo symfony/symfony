@@ -1,7 +1,15 @@
-map_query_string:
-    path: /map-query-string.{_format}
-    controller: Symfony\Bundle\FrameworkBundle\Tests\Functional\WithMapQueryStringController
+map_nullable_query_string:
+    path: /map-nullable-query-string.{_format}
+    controller: Symfony\Bundle\FrameworkBundle\Tests\Functional\WithMapNullableQueryStringController
 
-map_request_body:
-    path: /map-request-body.{_format}
-    controller: Symfony\Bundle\FrameworkBundle\Tests\Functional\WithMapRequestPayloadController
+map_query_string_with_default_value:
+    path: /map-query-string-with-default-value.{_format}
+    controller: Symfony\Bundle\FrameworkBundle\Tests\Functional\WithMapQueryStringWithDefaultValueController
+
+map_nullable_request_body:
+    path: /map-nullable-request-body.{_format}
+    controller: Symfony\Bundle\FrameworkBundle\Tests\Functional\WithMapNullableRequestPayloadController
+
+map_request_body_with_default_value:
+    path: /map-request-body-with-default-value.{_format}
+    controller: Symfony\Bundle\FrameworkBundle\Tests\Functional\WithMapRequestPayloadWithDefaultValueController

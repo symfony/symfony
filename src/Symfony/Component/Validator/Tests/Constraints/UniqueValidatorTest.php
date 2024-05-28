@@ -59,7 +59,7 @@ class UniqueValidatorTest extends ConstraintValidatorTestCase
     /**
      * @dataProvider getInvalidValues
      */
-    public function testInvalidValues($value)
+    public function testInvalidValues($value, $expectedMessageParam)
     {
         $constraint = new Unique([
             'message' => 'myMessage',
@@ -67,7 +67,7 @@ class UniqueValidatorTest extends ConstraintValidatorTestCase
         $this->validator->validate($value, $constraint);
 
         $this->buildViolation('myMessage')
-             ->setParameter('{{ value }}', 'array')
+             ->setParameter('{{ value }}', $expectedMessageParam)
              ->setCode(Unique::IS_NOT_UNIQUE)
              ->assertRaised();
     }
@@ -77,12 +77,12 @@ class UniqueValidatorTest extends ConstraintValidatorTestCase
         $object = new \stdClass();
 
         return [
-            yield 'not unique booleans' => [[true, true]],
-            yield 'not unique integers' => [[1, 2, 3, 3]],
-            yield 'not unique floats' => [[0.1, 0.2, 0.1]],
-            yield 'not unique string' => [['a', 'b', 'a']],
-            yield 'not unique arrays' => [[[1, 1], [2, 3], [1, 1]]],
-            yield 'not unique objects' => [[$object, $object]],
+            yield 'not unique booleans' => [[true, true], 'true'],
+            yield 'not unique integers' => [[1, 2, 3, 3], 3],
+            yield 'not unique floats' => [[0.1, 0.2, 0.1], 0.1],
+            yield 'not unique string' => [['a', 'b', 'a'], '"a"'],
+            yield 'not unique arrays' => [[[1, 1], [2, 3], [1, 1]], 'array'],
+            yield 'not unique objects' => [[$object, $object], 'object'],
         ];
     }
 
@@ -95,7 +95,7 @@ class UniqueValidatorTest extends ConstraintValidatorTestCase
         $this->validator->validate([1, 2, 3, 3], $constraint);
 
         $this->buildViolation('myMessage')
-            ->setParameter('{{ value }}', 'array')
+            ->setParameter('{{ value }}', '3')
             ->setCode(Unique::IS_NOT_UNIQUE)
             ->assertRaised();
     }
@@ -176,7 +176,7 @@ class UniqueValidatorTest extends ConstraintValidatorTestCase
         ]));
 
         $this->buildViolation('myMessage')
-            ->setParameter('{{ value }}', 'array')
+            ->setParameter('{{ value }}', '1')
             ->setCode(Unique::IS_NOT_UNIQUE)
             ->assertRaised();
     }
@@ -206,7 +206,7 @@ class UniqueValidatorTest extends ConstraintValidatorTestCase
         ]));
 
         $this->buildViolation('myMessage')
-            ->setParameter('{{ value }}', 'array')
+            ->setParameter('{{ value }}', '"hello"')
             ->setCode(Unique::IS_NOT_UNIQUE)
             ->assertRaised();
     }

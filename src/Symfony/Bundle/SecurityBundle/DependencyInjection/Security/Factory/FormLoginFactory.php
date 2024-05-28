@@ -70,6 +70,6 @@ class FormLoginFactory extends AbstractFactory
 
     protected function setAuthenticatorId(string $firewallName): void
     {
-        $this->authenticatorId = $this->baseAuthenticatorId . '.' . $firewallName;
+        $this->authenticatorId = $this->baseAuthenticatorId.'.'.$firewallName;
     }
 }

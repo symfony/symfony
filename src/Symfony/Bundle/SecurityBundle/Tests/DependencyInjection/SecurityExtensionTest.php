@@ -763,28 +763,28 @@ class SecurityExtensionTest extends TestCase
 
     private function getExpectedAndActualValuesFromAuthenticator($container, $authenticatorDefinition, $authenticatorId): array
     {
-        if (in_array($authenticatorId, ['security.authenticator.form_login.main', 'security.authenticator.json_login.main'])) {
+        if (\in_array($authenticatorId, ['security.authenticator.form_login.main', 'security.authenticator.json_login.main'])) {
             return [
                 'expectedValue' => 'login',
-                'actualValue' => $authenticatorDefinition->getArgument(4)['check_path']
+                'actualValue' => $authenticatorDefinition->getArgument(4)['check_path'],
             ];
-        } elseif (in_array($authenticatorId,['security.authenticator.form_login_ldap.main', 'security.authenticator.json_login_ldap.main'])) {
+        } elseif (\in_array($authenticatorId, ['security.authenticator.form_login_ldap.main', 'security.authenticator.json_login_ldap.main'])) {
             return [
                 'expectedValue' => 'login_ldap',
-                'actualValue' => $container->getDefinition($authenticatorDefinition->getArgument(0))->getArgument(4)['check_path']
+                'actualValue' => $container->getDefinition($authenticatorDefinition->getArgument(0))->getArgument(4)['check_path'],
             ];
-        } elseif (in_array($authenticatorId, ['security.authenticator.http_basic.main'])) {
+        } elseif (\in_array($authenticatorId, ['security.authenticator.http_basic.main'])) {
             return [
                 'expectedValue' => 'basic',
-                'actualValue' => $authenticatorDefinition->getArgument(1)
+                'actualValue' => $authenticatorDefinition->getArgument(1),
             ];
-        } elseif (in_array($authenticatorId, ['security.authenticator.http_basic_ldap.main'])) {
+        } elseif (\in_array($authenticatorId, ['security.authenticator.http_basic_ldap.main'])) {
             return [
                 'expectedValue' => 'basic_ldap',
-                'actualValue' => $container->getDefinition($authenticatorDefinition->getArgument(0))->getArgument(1)
+                'actualValue' => $container->getDefinition($authenticatorDefinition->getArgument(0))->getArgument(1),
             ];
         } else {
-            $this->fail('Unexpected authenticator service found: '. $authenticatorId);
+            $this->fail('Unexpected authenticator service found: '.$authenticatorId);
         }
     }
 

@@ -25,17 +25,20 @@ class CollectionType extends AbstractType
     {
         $resizePrototypeOptions = null;
         if ($options['allow_add'] && $options['prototype']) {
+            $prototypeName = \is_callable($options['prototype_name']) ? $options['prototype_name']($options) : $options['prototype_name'];
+            $builder->setAttribute('resolved_prototype_name', $prototypeName);
+
             $resizePrototypeOptions = array_replace($options['entry_options'], $options['prototype_options']);
             $prototypeOptions = array_replace([
                 'required' => $options['required'],
-                'label' => $options['prototype_name'].'label__',
+                'label' => $prototypeName.'label__',
             ], $resizePrototypeOptions);
 
             if (null !== $options['prototype_data']) {
                 $prototypeOptions['data'] = $options['prototype_data'];
             }
 
-            $prototype = $builder->create($options['prototype_name'], $options['entry_type'], $prototypeOptions);
+            $prototype = $builder->create($prototypeName, $options['entry_type'], $prototypeOptions);
             $builder->setAttribute('prototype', $prototype->getForm());
         }
 
@@ -121,6 +124,7 @@ class CollectionType extends AbstractType
         $resolver->setNormalizer('entry_options', $entryOptionsNormalizer);
 
         $resolver->setAllowedTypes('delete_empty', ['bool', 'callable']);
+        $resolver->setAllowedTypes('prototype_name', ['string', 'callable']);
         $resolver->setAllowedTypes('prototype_options', 'array');
         $resolver->setAllowedTypes('keep_as_list', ['bool']);
     }

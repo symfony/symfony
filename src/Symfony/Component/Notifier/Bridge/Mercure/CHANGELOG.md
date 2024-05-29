@@ -1,8 +1,9 @@
 CHANGELOG
 =========
 
- * Add content to MercureOptions.php for Symfony UX Notify
- * Add "mediaType" => "application/json" to MercureOptions.php
+7.2
+---
+ * Add `content` option
 
 5.3
 ---

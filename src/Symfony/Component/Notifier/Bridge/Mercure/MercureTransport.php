@@ -79,7 +79,7 @@ final class MercureTransport extends AbstractTransport
             '@context' => 'https://www.w3.org/ns/activitystreams',
             'type' => 'Announce',
             'summary' => $message->getSubject(),
-            "mediaType" => "application/json",
+            'mediaType' => 'application/json',
             'content' => $options->getContent(),
         ]), $options->isPrivate(), $options->getId(), $options->getType(), $options->getRetry());
 

@@ -19,9 +19,8 @@ use Symfony\Component\Notifier\Message\MessageOptionsInterface;
  */
 final class AmazonSnsOptions implements MessageOptionsInterface
 {
-    private $options = [];
-
-    private $recipient;
+    private array $options = [];
+    private string $recipient;
 
     public function __construct(string $recipient, array $options = [])
     {
@@ -44,7 +43,7 @@ final class AmazonSnsOptions implements MessageOptionsInterface
      *
      * @return $this
      */
-    public function recipient(string $topic): self
+    public function recipient(string $topic): static
     {
         $this->recipient = $topic;
 
@@ -56,7 +55,7 @@ final class AmazonSnsOptions implements MessageOptionsInterface
      *
      * @return $this
      */
-    public function subject(string $subject): self
+    public function subject(string $subject): static
     {
         $this->options['Subject'] = $subject;
 
@@ -68,7 +67,7 @@ final class AmazonSnsOptions implements MessageOptionsInterface
      *
      * @return $this
      */
-    public function messageStructure(string $messageStructure): self
+    public function messageStructure(string $messageStructure): static
     {
         $this->options['MessageStructure'] = $messageStructure;
 

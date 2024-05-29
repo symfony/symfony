@@ -25,12 +25,6 @@ interface HttpKernelInterface
     public const SUB_REQUEST = 2;
 
     /**
-     * @deprecated since symfony/http-kernel 5.3, use MAIN_REQUEST instead.
-     *             To ease the migration, this constant won't be removed until Symfony 7.0.
-     */
-    public const MASTER_REQUEST = self::MAIN_REQUEST;
-
-    /**
      * Handles a Request to convert it to a Response.
      *
      * When $catch is true, the implementation must catch all exceptions
@@ -40,9 +34,7 @@ interface HttpKernelInterface
      *                    (one of HttpKernelInterface::MAIN_REQUEST or HttpKernelInterface::SUB_REQUEST)
      * @param bool $catch Whether to catch exceptions or not
      *
-     * @return Response
-     *
      * @throws \Exception When an Exception occurs during processing
      */
-    public function handle(Request $request, int $type = self::MAIN_REQUEST, bool $catch = true);
+    public function handle(Request $request, int $type = self::MAIN_REQUEST, bool $catch = true): Response;
 }

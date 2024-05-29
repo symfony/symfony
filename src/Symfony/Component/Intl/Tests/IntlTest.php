@@ -16,7 +16,7 @@ use Symfony\Component\Intl\Intl;
 
 class IntlTest extends TestCase
 {
-    private $defaultLocale;
+    private string $defaultLocale;
 
     protected function setUp(): void
     {

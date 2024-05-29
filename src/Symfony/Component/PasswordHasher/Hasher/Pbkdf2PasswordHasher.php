@@ -32,11 +32,7 @@ final class Pbkdf2PasswordHasher implements LegacyPasswordHasherInterface
 {
     use CheckPasswordLengthTrait;
 
-    private $algorithm;
-    private $encodeHashAsBase64;
-    private $iterations = 1;
-    private $length;
-    private $encodedLength = -1;
+    private int $encodedLength = -1;
 
     /**
      * @param string $algorithm          The digest algorithm to use
@@ -44,22 +40,20 @@ final class Pbkdf2PasswordHasher implements LegacyPasswordHasherInterface
      * @param int    $iterations         The number of iterations to use to stretch the password hash
      * @param int    $length             Length of derived key to create
      */
-    public function __construct(string $algorithm = 'sha512', bool $encodeHashAsBase64 = true, int $iterations = 1000, int $length = 40)
-    {
-        $this->algorithm = $algorithm;
-        $this->encodeHashAsBase64 = $encodeHashAsBase64;
-        $this->length = $length;
-
+    public function __construct(
+        private string $algorithm = 'sha512',
+        private bool $encodeHashAsBase64 = true,
+        private int $iterations = 1000,
+        private int $length = 40,
+    ) {
         try {
             $this->encodedLength = \strlen($this->hash('', 'salt'));
-        } catch (\LogicException $e) {
+        } catch (\LogicException) {
             // ignore unsupported algorithm
         }
-
-        $this->iterations = $iterations;
     }
 
-    public function hash(string $plainPassword, ?string $salt = null): string
+    public function hash(#[\SensitiveParameter] string $plainPassword, ?string $salt = null): string
     {
         if ($this->isPasswordTooLong($plainPassword)) {
             throw new InvalidPasswordException();
@@ -74,9 +68,9 @@ final class Pbkdf2PasswordHasher implements LegacyPasswordHasherInterface
         return $this->encodeHashAsBase64 ? base64_encode($digest) : bin2hex($digest);
     }
 
-    public function verify(string $hashedPassword, string $plainPassword, ?string $salt = null): bool
+    public function verify(string $hashedPassword, #[\SensitiveParameter] string $plainPassword, ?string $salt = null): bool
     {
-        if (\strlen($hashedPassword) !== $this->encodedLength || false !== strpos($hashedPassword, '$')) {
+        if (\strlen($hashedPassword) !== $this->encodedLength || str_contains($hashedPassword, '$')) {
             return false;
         }
 

@@ -15,7 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Validator\Constraints\File;
 use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
-use Symfony\Component\Validator\Mapping\Loader\AnnotationLoader;
+use Symfony\Component\Validator\Mapping\Loader\AttributeLoader;
 
 class FileTest extends TestCase
 {
@@ -57,8 +57,10 @@ class FileTest extends TestCase
      */
     public function testInvalidValueForMaxSizeThrowsExceptionAfterInitialization($maxSize)
     {
-        $this->expectException(ConstraintDefinitionException::class);
         $file = new File(['maxSize' => 1000]);
+
+        $this->expectException(ConstraintDefinitionException::class);
+
         $file->maxSize = $maxSize;
     }
 
@@ -103,8 +105,8 @@ class FileTest extends TestCase
             ['1GI', 1073741824, true],
             ['2g', 2000000000, false],
             ['2G', 2000000000, false],
-            ['4g', 4 === \PHP_INT_SIZE ? 4000000000.0 : 4000000000, false],
-            ['4G', 4 === \PHP_INT_SIZE ? 4000000000.0 : 4000000000, false],
+            ['4g', 4 === \PHP_INT_SIZE ? '4000000000' : 4000000000, false],
+            ['4G', 4 === \PHP_INT_SIZE ? '4000000000' : 4000000000, false],
         ];
     }
 
@@ -143,13 +145,10 @@ class FileTest extends TestCase
         ];
     }
 
-    /**
-     * @requires PHP 8
-     */
     public function testAttributes()
     {
         $metadata = new ClassMetadata(FileDummy::class);
-        self::assertTrue((new AnnotationLoader())->loadClassMetadata($metadata));
+        self::assertTrue((new AttributeLoader())->loadClassMetadata($metadata));
 
         [$aConstraint] = $metadata->properties['a']->getConstraints();
         self::assertNull($aConstraint->maxSize);

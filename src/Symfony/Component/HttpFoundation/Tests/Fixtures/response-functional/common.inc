@@ -22,7 +22,7 @@ error_reporting(-1);
 ini_set('html_errors', 0);
 ini_set('display_errors', 1);
 
-if (filter_var(ini_get('xdebug.default_enable'), FILTER_VALIDATE_BOOLEAN)) {
+if (filter_var(ini_get('xdebug.default_enable'), FILTER_VALIDATE_BOOL)) {
     xdebug_disable();
 }
 

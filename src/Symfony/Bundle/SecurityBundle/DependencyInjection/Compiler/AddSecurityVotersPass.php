@@ -29,10 +29,7 @@ class AddSecurityVotersPass implements CompilerPassInterface
 {
     use PriorityTaggedServiceTrait;
 
-    /**
-     * {@inheritdoc}
-     */
-    public function process(ContainerBuilder $container)
+    public function process(ContainerBuilder $container): void
     {
         if (!$container->hasDefinition('security.access.decision_manager')) {
             return;
@@ -56,7 +53,7 @@ class AddSecurityVotersPass implements CompilerPassInterface
             }
 
             if ($debug) {
-                $voterServices[] = new Reference($debugVoterServiceId = 'debug.security.voter.'.$voterServiceId);
+                $voterServices[] = new Reference($debugVoterServiceId = '.debug.security.voter.'.$voterServiceId);
 
                 $container
                     ->register($debugVoterServiceId, TraceableVoter::class)

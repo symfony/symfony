@@ -69,9 +69,7 @@ class Processor
      */
     public static function normalizeConfig(array $config, string $key, ?string $plural = null): array
     {
-        if (null === $plural) {
-            $plural = $key.'s';
-        }
+        $plural ??= $key.'s';
 
         if (isset($config[$plural])) {
             return $config[$plural];

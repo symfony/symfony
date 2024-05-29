@@ -1,6 +1,80 @@
 CHANGELOG
 =========
 
+7.1
+---
+
+ * `InMemoryTransportFactory` creates the `InMemoryTransport` with a clock (if configured in the factory)
+ * Add option `redis_sentinel` as an alias for `sentinel_master`
+ * Add `--all` option to the `messenger:consume` command
+ * Add parameter `$jitter` to `MultiplierRetryStrategy` in order to randomize delay and prevent the thundering herd effect
+ * Add `SIGQUIT` signal among list of signals that gracefully shut down `messenger:consume` and `messenger:failed:retry` commands
+ * Add `EnvelopeAwareExceptionInterface` for exceptions thrown from middlewares to prevent stamps added by previous middlewares being dropped
+
+7.0
+---
+
+ * Add parameter `$isSameDatabase` to `DoctrineTransport::configureSchema()`
+ * Remove `MessageHandlerInterface` and `MessageSubscriberInterface`, use `#[AsMessageHandler]` instead
+ * Remove `StopWorkerOnSigtermSignalListener` in favor of using the `SignalableCommandInterface`
+ * Remove `StopWorkerOnSignalsListener` in favor of using the `SignalableCommandInterface`
+ * Remove `Symfony\Component\Messenger\Transport\InMemoryTransport` and
+   `Symfony\Component\Messenger\Transport\InMemoryTransportFactory` in favor of
+   `Symfony\Component\Messenger\Transport\InMemory\InMemoryTransport` and
+   `Symfony\Component\Messenger\Transport\InMemory\InMemoryTransportFactory`
+ * Remove `HandlerFailedException::getNestedExceptions()`, `HandlerFailedException::getNestedExceptionsOfClass()`
+   and `DelayedMessageHandlingException::getExceptions()` which are replaced by a new `getWrappedExceptions()` method
+
+6.4
+---
+
+ * Deprecate `StopWorkerOnSignalsListener` in favor of using the `SignalableCommandInterface`
+ * Add `HandlerDescriptor::getOptions`
+ * Add support for multiple Redis Sentinel hosts
+ * Add `--all` option to the `messenger:failed:remove` command
+ * Add `WrappedExceptionsInterface` interface for exceptions that hold multiple individual exceptions
+ * Deprecate `HandlerFailedException::getNestedExceptions()`, `HandlerFailedException::getNestedExceptionsOfClass()`
+   and `DelayedMessageHandlingException::getExceptions()` which are replaced by a new `getWrappedExceptions()` method
+
+6.3
+---
+
+ * Add support for namespace wildcards in the HandlersLocator to allow routing multiple messages within the same namespace
+ * Deprecate `Symfony\Component\Messenger\Transport\InMemoryTransport` and
+   `Symfony\Component\Messenger\Transport\InMemoryTransportFactory` in favor of
+   `Symfony\Component\Messenger\Transport\InMemory\InMemoryTransport` and
+   `Symfony\Component\Messenger\Transport\InMemory\InMemoryTransportFactory`
+ * Allow passing a string instead of an array in `TransportNamesStamp`
+ * Allow to define batch size when using `BatchHandlerTrait` with `getBatchSize()`
+ * Deprecate `StopWorkerOnSigtermSignalListener` in favor of
+   `StopWorkerOnSignalsListener` and make it configurable with SIGINT and
+   SIGTERM by default
+ * Add `RedispatchMessage` and `RedispatchMessageHandler`
+ * Add optional parameter `$isSameDatabase` to `DoctrineTransport::configureSchema()`
+
+6.2
+---
+
+ * Add new `messenger:stats` command that returns a list of transports with their "to be processed" message count
+ * Add `TransportNamesStamp` to change the transport while dispatching a message
+ * Add support for rate limited transports by using the RateLimiter component.
+ * Deprecate `MessageHandlerInterface` and `MessageSubscriberInterface`, use `#[AsMessageHandler]` instead
+ * Add new parameter `allowNoSenders` to `SendMessageMiddleware` to enable throwing when a message doesn't have a sender
+
+6.1
+---
+
+ * Add `SerializedMessageStamp` to avoid serializing a message when a retry occurs
+ * Automatically resolve handled message type when method different from `__invoke` is used as handler
+ * Allow `#[AsMessageHandler]` attribute on methods
+
+6.0
+---
+
+ * Remove deprecated classes `Symfony/Component/Messenger/Transport/AmqpExt`, `Symfony/Component/Messenger/Transport/Doctrine` and `Symfony/Component/Messenger/Transport/Redis`.
+ * Class `MessengerPass` cannot be configured with constructor arguments
+ * Remove constructor arguments and getters for `RedeliveryStamp`'s properties `exceptionMessage` and `flattenException`
+
 5.4
 ---
 
@@ -13,6 +87,7 @@ CHANGELOG
  * Deprecate not setting the `reset_on_message` config option, its default value will change to `true` in 6.0
  * Add log when worker should stop.
  * Add log when `SIGTERM` is received.
+ * Add `--stats` and `--class-filter` options to `FailedMessagesShowCommand`
 
 5.3
 ---

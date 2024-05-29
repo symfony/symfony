@@ -11,6 +11,8 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Tests\Functional;
 
+use Symfony\Bundle\FrameworkBundle\Tests\Fixtures\TranslatableBackedEnum;
+
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
@@ -44,7 +46,6 @@ class SerializerTest extends AbstractWebTestCase
 
         $reflectionObject = new \ReflectionObject($normalizer);
         $property = $reflectionObject->getProperty('defaultContext');
-        $property->setAccessible(true);
 
         $defaultContext = $property->getValue($normalizer);
 
@@ -61,11 +62,21 @@ class SerializerTest extends AbstractWebTestCase
             ['serializer.normalizer.json_serializable.alias'],
             ['serializer.normalizer.problem.alias'],
             ['serializer.normalizer.uid.alias'],
+            ['serializer.normalizer.translatable.alias'],
             ['serializer.normalizer.object.alias'],
             ['serializer.encoder.xml.alias'],
             ['serializer.encoder.yaml.alias'],
             ['serializer.encoder.csv.alias'],
         ];
+    }
+
+    public function testSerializeTranslatableBackedEnum()
+    {
+        static::bootKernel(['test_case' => 'Serializer']);
+
+        $serializer = static::getContainer()->get('serializer.alias');
+
+        $this->assertEquals('GET', $serializer->serialize(TranslatableBackedEnum::Get, 'yaml'));
     }
 }
 

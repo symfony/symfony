@@ -15,28 +15,20 @@ use Doctrine\ORM\Mapping\Column;
 use Doctrine\ORM\Mapping\Entity;
 use Doctrine\ORM\Mapping\Id;
 
-/**
- * @Entity
- */
 #[Entity]
 class Person
 {
-    /** @Id @Column(type="integer") */
-    #[Id, Column(type: 'integer')]
-    protected $id;
+    public function __construct(
+        #[Id, Column]
+        protected int $id,
 
-    /** @Column(type="string") */
-    #[Column(type: 'string')]
-    public $name;
-
-    public function __construct($id, $name)
-    {
-        $this->id = $id;
-        $this->name = $name;
+        #[Column]
+        public string $name,
+    ) {
     }
 
     public function __toString(): string
     {
-        return (string) $this->name;
+        return $this->name;
     }
 }

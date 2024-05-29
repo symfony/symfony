@@ -25,15 +25,6 @@ class EnumNodeDefinitionTest extends TestCase
         $this->assertEquals(['foo'], $node->getValues());
     }
 
-    public function testWithOneDistinctValue()
-    {
-        $def = new EnumNodeDefinition('foo');
-        $def->values(['foo', 'foo']);
-
-        $node = $def->getNode();
-        $this->assertEquals(['foo'], $node->getValues());
-    }
-
     public function testNoValuesPassed()
     {
         $this->expectException(\RuntimeException::class);
@@ -72,5 +63,13 @@ class EnumNodeDefinitionTest extends TestCase
         $this->assertSame('The "foo" node is deprecated.', $deprecation['message']);
         $this->assertSame('vendor/package', $deprecation['package']);
         $this->assertSame('1.1', $deprecation['version']);
+    }
+
+    public function testSameStringCoercedValuesAreDifferent()
+    {
+        $def = new EnumNodeDefinition('ccc');
+        $def->values(['', false, null]);
+
+        $this->assertSame(['', false, null], $def->getNode()->getValues());
     }
 }

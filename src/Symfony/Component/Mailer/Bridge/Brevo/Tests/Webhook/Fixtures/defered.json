@@ -1,0 +1,16 @@
+{
+    "event":"deferred",
+    "email": "example@domain.com",
+    "id": 814119,
+    "date": "2020-10-09 00:00:00",
+    "ts": 1604933619,
+    "message-id": "<202305311400.29297141656@smtp-relay.mailin.fr>",
+    "ts_event": 1604933654,
+    "subject": "My first Transactional",
+    "X-Mailin-custom": "some_custom_header",
+    "sending_ip": "127.0.0.1",
+    "ts_epoch": 1604933654,
+    "template_id": 22,
+    "tags": ["transac_messages"],
+    "reason": "spam"
+}

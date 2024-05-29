@@ -18,20 +18,17 @@ use Symfony\Component\Form\Exception\TransformationFailedException;
  * Transforms between a timezone identifier string and a IntlTimeZone object.
  *
  * @author Roland Franssen <franssen.roland@gmail.com>
+ *
+ * @implements DataTransformerInterface<\IntlTimeZone|array<\IntlTimeZone>, string|array<string>>
  */
 class IntlTimeZoneToStringTransformer implements DataTransformerInterface
 {
-    private $multiple;
-
-    public function __construct(bool $multiple = false)
-    {
-        $this->multiple = $multiple;
+    public function __construct(
+        private bool $multiple = false,
+    ) {
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function transform($intlTimeZone)
+    public function transform(mixed $intlTimeZone): mixed
     {
         if (null === $intlTimeZone) {
             return null;
@@ -52,13 +49,10 @@ class IntlTimeZoneToStringTransformer implements DataTransformerInterface
         return $intlTimeZone->getID();
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function reverseTransform($value)
+    public function reverseTransform(mixed $value): mixed
     {
         if (null === $value) {
-            return;
+            return null;
         }
 
         if ($this->multiple) {

@@ -18,6 +18,8 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * @author Abdellatif Ait boudad <a.aitboudad@gmail.com>
+ *
+ * @final since Symfony 7.1
  */
 class DataCollectorTranslator implements TranslatorInterface, TranslatorBagInterface, LocaleAwareInterface, WarmableInterface
 {
@@ -25,8 +27,8 @@ class DataCollectorTranslator implements TranslatorInterface, TranslatorBagInter
     public const MESSAGE_MISSING = 1;
     public const MESSAGE_EQUALS_FALLBACK = 2;
 
-    private $translator;
-    private $messages = [];
+    private TranslatorInterface $translator;
+    private array $messages = [];
 
     /**
      * @param TranslatorInterface&TranslatorBagInterface&LocaleAwareInterface $translator
@@ -40,10 +42,7 @@ class DataCollectorTranslator implements TranslatorInterface, TranslatorBagInter
         $this->translator = $translator;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function trans(?string $id, array $parameters = [], ?string $domain = null, ?string $locale = null)
+    public function trans(?string $id, array $parameters = [], ?string $domain = null, ?string $locale = null): string
     {
         $trans = $this->translator->trans($id = (string) $id, $parameters, $domain, $locale);
         $this->collectMessage($locale, $domain, $id, $trans, $parameters);
@@ -51,47 +50,30 @@ class DataCollectorTranslator implements TranslatorInterface, TranslatorBagInter
         return $trans;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function setLocale(string $locale)
+    public function setLocale(string $locale): void
     {
         $this->translator->setLocale($locale);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getLocale()
+    public function getLocale(): string
     {
         return $this->translator->getLocale();
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getCatalogue(?string $locale = null)
+    public function getCatalogue(?string $locale = null): MessageCatalogueInterface
     {
         return $this->translator->getCatalogue($locale);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getCatalogues(): array
     {
         return $this->translator->getCatalogues();
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * @return string[]
-     */
-    public function warmUp(string $cacheDir)
+    public function warmUp(string $cacheDir, ?string $buildDir = null): array
     {
         if ($this->translator instanceof WarmableInterface) {
-            return (array) $this->translator->warmUp($cacheDir);
+            return (array) $this->translator->warmUp($cacheDir, $buildDir);
         }
 
         return [];
@@ -99,10 +81,8 @@ class DataCollectorTranslator implements TranslatorInterface, TranslatorBagInter
 
     /**
      * Gets the fallback locales.
-     *
-     * @return array
      */
-    public function getFallbackLocales()
+    public function getFallbackLocales(): array
     {
         if ($this->translator instanceof Translator || method_exists($this->translator, 'getFallbackLocales')) {
             return $this->translator->getFallbackLocales();
@@ -111,27 +91,19 @@ class DataCollectorTranslator implements TranslatorInterface, TranslatorBagInter
         return [];
     }
 
-    /**
-     * Passes through all unknown calls onto the translator object.
-     */
-    public function __call(string $method, array $args)
+    public function __call(string $method, array $args): mixed
     {
         return $this->translator->{$method}(...$args);
     }
 
-    /**
-     * @return array
-     */
-    public function getCollectedMessages()
+    public function getCollectedMessages(): array
     {
         return $this->messages;
     }
 
-    private function collectMessage(?string $locale, ?string $domain, string $id, string $translation, ?array $parameters = [])
+    private function collectMessage(?string $locale, ?string $domain, string $id, string $translation, ?array $parameters = []): void
     {
-        if (null === $domain) {
-            $domain = 'messages';
-        }
+        $domain ??= 'messages';
 
         $catalogue = $this->translator->getCatalogue($locale);
         $locale = $catalogue->getLocale();

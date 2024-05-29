@@ -399,9 +399,7 @@ EOTXT;
     public function testCaster()
     {
         $cloner = new VarCloner([
-            '*' => function ($obj, $array) {
-                return ['foo' => 123];
-            },
+            '*' => fn ($obj, $array) => ['foo' => 123],
             __CLASS__ => function ($obj, $array) {
                 ++$array['foo'];
 
@@ -458,9 +456,6 @@ EOTXT;
         $this->assertStringMatchesFormat($expected, print_r($clone, true));
     }
 
-    /**
-     * @requires PHP 7.4
-     */
     public function testPhp74()
     {
         $data = new Php74();
@@ -574,9 +569,6 @@ EOTXT;
         $this->assertStringMatchesFormat($expected, print_r($clone, true));
     }
 
-    /**
-     * @requires PHP 8.1
-     */
     public function testPhp81Enums()
     {
         $data = new Php81Enums();

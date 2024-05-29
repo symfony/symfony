@@ -29,12 +29,8 @@ use Symfony\Component\Serializer\Tests\Fixtures\ScalarDummy;
 
 class XmlEncoderTest extends TestCase
 {
-    /**
-     * @var XmlEncoder
-     */
-    private $encoder;
-
-    private $exampleDateTimeString = '2017-02-19T15:16:08+0300';
+    private XmlEncoder $encoder;
+    private string $exampleDateTimeString = '2017-02-19T15:16:08+0300';
 
     protected function setUp(): void
     {
@@ -189,12 +185,13 @@ class XmlEncoderTest extends TestCase
 
     public function testContext()
     {
-        $array = ['person' => ['name' => 'George Abitbol']];
+        $array = ['person' => ['name' => 'George Abitbol', 'age' => null]];
         $expected = <<<'XML'
 <?xml version="1.0"?>
 <response>
   <person>
     <name>George Abitbol</name>
+    <age></age>
   </person>
 </response>
 
@@ -202,6 +199,7 @@ XML;
 
         $context = [
             'xml_format_output' => true,
+            'save_options' => \LIBXML_NOEMPTYTAG,
         ];
 
         $this->assertSame($expected, $this->encoder->encode($array, 'xml', $context));
@@ -233,16 +231,80 @@ XML;
         $this->assertEquals($expected, $this->encoder->encode($array, 'xml'));
     }
 
-    public function testEncodeCdataWrapping()
+    /**
+     * @dataProvider encodeCdataWrappingWithDefaultPattern
+     */
+    public function testEncodeCdataWrappingWithDefaultPattern($input, $expected)
+    {
+        $this->assertEquals($expected, $this->encoder->encode($input, 'xml'));
+    }
+
+    public static function encodeCdataWrappingWithDefaultPattern()
+    {
+        return [
+            [
+                ['firstname' => 'Paul and Martha'],
+                '<?xml version="1.0"?>'."\n".'<response><firstname>Paul and Martha</firstname></response>'."\n",
+            ],
+            [
+                ['lastname' => 'O\'Donnel'],
+                '<?xml version="1.0"?>'."\n".'<response><lastname>O\'Donnel</lastname></response>'."\n",
+            ],
+            [
+                ['firstname' => 'Paul & Martha <or Me>'],
+                '<?xml version="1.0"?>'."\n".'<response><firstname><![CDATA[Paul & Martha <or Me>]]></firstname></response>'."\n",
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider encodeCdataWrappingWithCustomPattern
+     */
+    public function testEncodeCdataWrappingWithCustomPattern($input, $expected)
+    {
+        $this->assertEquals($expected, $this->encoder->encode($input, 'xml', ['cdata_wrapping_pattern' => '/[<>&"\']/']));
+    }
+
+    public static function encodeCdataWrappingWithCustomPattern()
+    {
+        return [
+            [
+                ['firstname' => 'Paul and Martha'],
+                '<?xml version="1.0"?>'."\n".'<response><firstname>Paul and Martha</firstname></response>'."\n",
+            ],
+            [
+                ['lastname' => 'O\'Donnel'],
+                '<?xml version="1.0"?>'."\n".'<response><lastname><![CDATA[O\'Donnel]]></lastname></response>'."\n",
+            ],
+            [
+                ['firstname' => 'Paul & Martha <or Me>'],
+                '<?xml version="1.0"?>'."\n".'<response><firstname><![CDATA[Paul & Martha <or Me>]]></firstname></response>'."\n",
+            ],
+        ];
+    }
+
+    public function testEnableCdataWrapping()
     {
         $array = [
-            'firstname' => 'Paul <or Me>',
+            'firstname' => 'Paul & Martha <or Me>',
         ];
 
         $expected = '<?xml version="1.0"?>'."\n".
-            '<response><firstname><![CDATA[Paul <or Me>]]></firstname></response>'."\n";
+            '<response><firstname><![CDATA[Paul & Martha <or Me>]]></firstname></response>'."\n";
 
-        $this->assertEquals($expected, $this->encoder->encode($array, 'xml'));
+        $this->assertEquals($expected, $this->encoder->encode($array, 'xml', ['cdata_wrapping' => true]));
+    }
+
+    public function testDisableCdataWrapping()
+    {
+        $array = [
+            'firstname' => 'Paul & Martha <or Me>',
+        ];
+
+        $expected = '<?xml version="1.0"?>'."\n".
+            '<response><firstname>Paul &amp; Martha &lt;or Me&gt;</firstname></response>'."\n";
+
+        $this->assertEquals($expected, $this->encoder->encode($array, 'xml', ['cdata_wrapping' => false]));
     }
 
     public function testEncodeScalarWithAttribute()
@@ -409,6 +471,12 @@ XML;
 XML;
 
         $this->assertEquals($expected, $serializer->serialize(new NormalizableTraversableDummy(), 'xml'));
+    }
+
+    public function testEncodeException()
+    {
+        $this->expectException(NotEncodableValueException::class);
+        $this->encoder->encode('Invalid character: '.\chr(7), 'xml');
     }
 
     public function testDecode()
@@ -850,7 +918,7 @@ XML;
     {
         $xmlEncoder = $this->createXmlEncoderWithDateTimeNormalizer();
 
-        $actualXml = $xmlEncoder->encode(['dateTime' => new \DateTime($this->exampleDateTimeString)], 'xml');
+        $actualXml = $xmlEncoder->encode(['dateTime' => new \DateTimeImmutable($this->exampleDateTimeString)], 'xml');
 
         $this->assertEquals($this->createXmlWithDateTime(), $actualXml);
     }
@@ -859,7 +927,7 @@ XML;
     {
         $xmlEncoder = $this->createXmlEncoderWithDateTimeNormalizer();
 
-        $actualXml = $xmlEncoder->encode(['foo' => ['@dateTime' => new \DateTime($this->exampleDateTimeString)]], 'xml');
+        $actualXml = $xmlEncoder->encode(['foo' => ['@dateTime' => new \DateTimeImmutable($this->exampleDateTimeString)]], 'xml');
 
         $this->assertEquals($this->createXmlWithDateTimeField(), $actualXml);
     }
@@ -956,23 +1024,25 @@ XML;
         return $encoder;
     }
 
-    /**
-     * @return MockObject&NormalizerInterface
-     */
-    private function createMockDateTimeNormalizer(): NormalizerInterface
+    private function createMockDateTimeNormalizer(): MockObject&NormalizerInterface
     {
-        $mock = $this->createMock(CustomNormalizer::class);
+        $mock = $this->createMock(NormalizerInterface::class);
 
         $mock
             ->expects($this->once())
             ->method('normalize')
-            ->with(new \DateTime($this->exampleDateTimeString), 'xml', [])
+            ->with(new \DateTimeImmutable($this->exampleDateTimeString), 'xml', [])
             ->willReturn($this->exampleDateTimeString);
 
         $mock
             ->expects($this->once())
+            ->method('getSupportedTypes')
+            ->willReturn([\DateTimeImmutable::class => true]);
+
+        $mock
+            ->expects($this->once())
             ->method('supportsNormalization')
-            ->with(new \DateTime($this->exampleDateTimeString), 'xml')
+            ->with(new \DateTimeImmutable($this->exampleDateTimeString), 'xml')
             ->willReturn(true);
 
         return $mock;

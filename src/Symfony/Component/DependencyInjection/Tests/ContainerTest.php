@@ -223,8 +223,8 @@ class ContainerTest extends TestCase
         $sc->set('Foo', $foo2 = new \stdClass());
 
         $this->assertSame(['service_container', 'foo', 'Foo'], $sc->getServiceIds());
-        $this->assertSame($foo1, $sc->get('foo'), '->get() returns the service for the given id, case sensitively');
-        $this->assertSame($foo2, $sc->get('Foo'), '->get() returns the service for the given id, case sensitively');
+        $this->assertSame($foo1, $sc->get('foo'), '->get() returns the service for the given id, case-sensitively');
+        $this->assertSame($foo2, $sc->get('Foo'), '->get() returns the service for the given id, case-sensitively');
     }
 
     public function testGetThrowServiceNotFoundException()
@@ -264,21 +264,25 @@ class ContainerTest extends TestCase
 
     public function testGetSyntheticServiceThrows()
     {
-        $this->expectException(ServiceNotFoundException::class);
-        $this->expectExceptionMessage('The "request" service is synthetic, it needs to be set at boot time before it can be used.');
         require_once __DIR__.'/Fixtures/php/services9_compiled.php';
 
         $container = new \ProjectServiceContainer();
+
+        $this->expectException(ServiceNotFoundException::class);
+        $this->expectExceptionMessage('The "request" service is synthetic, it needs to be set at boot time before it can be used.');
+
         $container->get('request');
     }
 
     public function testGetRemovedServiceThrows()
     {
-        $this->expectException(ServiceNotFoundException::class);
-        $this->expectExceptionMessage('The "inlined" service or alias has been removed or inlined when the container was compiled. You should either make it public, or stop using the container directly and use dependency injection instead.');
         require_once __DIR__.'/Fixtures/php/services9_compiled.php';
 
         $container = new \ProjectServiceContainer();
+
+        $this->expectException(ServiceNotFoundException::class);
+        $this->expectExceptionMessage('The "inlined" service or alias has been removed or inlined when the container was compiled. You should either make it public, or stop using the container directly and use dependency injection instead.');
+
         $container->get('inlined');
     }
 
@@ -317,7 +321,7 @@ class ContainerTest extends TestCase
     {
         $c = new Container();
         $c->set('bar', $bar = new class() implements ResetInterface {
-            public $resetCounter = 0;
+            public int $resetCounter = 0;
 
             public function reset(): void
             {
@@ -371,7 +375,6 @@ class ContainerTest extends TestCase
     protected function getField($obj, $field)
     {
         $reflection = new \ReflectionProperty($obj, $field);
-        $reflection->setAccessible(true);
 
         return $reflection->getValue($obj);
     }
@@ -401,10 +404,12 @@ class ContainerTest extends TestCase
 
     public function testRequestAnInternalSharedPrivateService()
     {
-        $this->expectException(ServiceNotFoundException::class);
-        $this->expectExceptionMessage('You have requested a non-existent service "internal".');
         $c = new ProjectServiceContainer();
         $c->get('internal_dependency');
+
+        $this->expectException(ServiceNotFoundException::class);
+        $this->expectExceptionMessage('You have requested a non-existent service "internal".');
+
         $c->get('internal');
     }
 
@@ -415,7 +420,6 @@ class ContainerTest extends TestCase
         $container->compile();
 
         $r = new \ReflectionMethod($container, 'getEnv');
-        $r->setAccessible(true);
         $this->assertNull($r->invoke($container, 'FOO'));
     }
 
@@ -431,7 +435,6 @@ class ContainerTest extends TestCase
         $container->compile();
 
         $r = new \ReflectionMethod($container, 'getEnv');
-        $r->setAccessible(true);
         $this->assertNull($r->invoke($container, 'FOO'));
     }
 }
@@ -442,16 +445,6 @@ class ProjectServiceContainer extends Container
     public $__foo_bar;
     public $__foo_baz;
     public $__internal;
-    protected $privates;
-    protected $methodMap = [
-        'bar' => 'getBarService',
-        'foo_bar' => 'getFooBarService',
-        'foo.baz' => 'getFoo_BazService',
-        'circular' => 'getCircularService',
-        'throw_exception' => 'getThrowExceptionService',
-        'throws_exception_on_service_configuration' => 'getThrowsExceptionOnServiceConfigurationService',
-        'internal_dependency' => 'getInternalDependencyService',
-    ];
 
     public function __construct()
     {
@@ -463,6 +456,15 @@ class ProjectServiceContainer extends Container
         $this->__internal = new \stdClass();
         $this->privates = [];
         $this->aliases = ['alias' => 'bar'];
+        $this->methodMap = [
+            'bar' => 'getBarService',
+            'foo_bar' => 'getFooBarService',
+            'foo.baz' => 'getFoo_BazService',
+            'circular' => 'getCircularService',
+            'throw_exception' => 'getThrowExceptionService',
+            'throws_exception_on_service_configuration' => 'getThrowsExceptionOnServiceConfigurationService',
+            'internal_dependency' => 'getInternalDependencyService',
+        ];
     }
 
     protected function getInternalService()

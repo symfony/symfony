@@ -28,10 +28,7 @@ use Symfony\Component\Translation\Util\XliffUtils;
  */
 class XliffFileLoader implements LoaderInterface
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function load($resource, string $locale, string $domain = 'messages')
+    public function load(mixed $resource, string $locale, string $domain = 'messages'): MessageCatalogue
     {
         if (!class_exists(XmlUtils::class)) {
             throw new RuntimeException('Loading translations from the Xliff format requires the Symfony Config component.');
@@ -75,7 +72,7 @@ class XliffFileLoader implements LoaderInterface
         return $catalogue;
     }
 
-    private function extract(\DOMDocument $dom, MessageCatalogue $catalogue, string $domain)
+    private function extract(\DOMDocument $dom, MessageCatalogue $catalogue, string $domain): void
     {
         $xliffVersion = XliffUtils::getVersionNumber($dom);
 
@@ -91,7 +88,7 @@ class XliffFileLoader implements LoaderInterface
     /**
      * Extract messages and metadata from DOMDocument into a MessageCatalogue.
      */
-    private function extractXliff1(\DOMDocument $dom, MessageCatalogue $catalogue, string $domain)
+    private function extractXliff1(\DOMDocument $dom, MessageCatalogue $catalogue, string $domain): void
     {
         $xml = simplexml_import_dom($dom);
         $encoding = $dom->encoding ? strtoupper($dom->encoding) : null;
@@ -104,6 +101,10 @@ class XliffFileLoader implements LoaderInterface
 
             $file->registerXPathNamespace('xliff', $namespace);
 
+            foreach ($file->xpath('.//xliff:prop') as $prop) {
+                $catalogue->setCatalogueMetadata($prop->attributes()['prop-type'], (string) $prop, $domain);
+            }
+
             foreach ($file->xpath('.//xliff:trans-unit') as $translation) {
                 $attributes = $translation->attributes();
 
@@ -111,16 +112,20 @@ class XliffFileLoader implements LoaderInterface
                     continue;
                 }
 
-                if (isset($translation->target) && 'needs-translation' === (string) $translation->target->attributes()['state']) {
+                $source = (string) (isset($attributes['resname']) && $attributes['resname'] ? $attributes['resname'] : $translation->source);
+
+                if (isset($translation->target)
+                    && 'needs-translation' === (string) $translation->target->attributes()['state']
+                    && \in_array((string) $translation->target, [$source, (string) $translation->source], true)
+                ) {
                     continue;
                 }
 
-                $source = isset($attributes['resname']) && $attributes['resname'] ? $attributes['resname'] : $translation->source;
                 // If the xlf file has another encoding specified, try to convert it because
                 // simple_xml will always return utf-8 encoded values
                 $target = $this->utf8ToCharset((string) ($translation->target ?? $translation->source), $encoding);
 
-                $catalogue->set((string) $source, $target, $domain);
+                $catalogue->set($source, $target, $domain);
 
                 $metadata = [
                     'source' => (string) $translation->source,
@@ -143,12 +148,12 @@ class XliffFileLoader implements LoaderInterface
                     $metadata['id'] = (string) $attributes['id'];
                 }
 
-                $catalogue->setMetadata((string) $source, $metadata, $domain);
+                $catalogue->setMetadata($source, $metadata, $domain);
             }
         }
     }
 
-    private function extractXliff2(\DOMDocument $dom, MessageCatalogue $catalogue, string $domain)
+    private function extractXliff2(\DOMDocument $dom, MessageCatalogue $catalogue, string $domain): void
     {
         $xml = simplexml_import_dom($dom);
         $encoding = $dom->encoding ? strtoupper($dom->encoding) : null;
@@ -196,7 +201,7 @@ class XliffFileLoader implements LoaderInterface
      */
     private function utf8ToCharset(string $content, ?string $encoding = null): string
     {
-        if ('UTF-8' !== $encoding && !empty($encoding)) {
+        if ('UTF-8' !== $encoding && $encoding) {
             return mb_convert_encoding($content, $encoding, 'UTF-8');
         }
 
@@ -231,6 +236,6 @@ class XliffFileLoader implements LoaderInterface
 
     private function isXmlString(string $resource): bool
     {
-        return 0 === strpos($resource, '<?xml');
+        return str_starts_with($resource, '<?xml');
     }
 }

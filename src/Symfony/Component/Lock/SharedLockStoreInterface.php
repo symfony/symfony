@@ -23,5 +23,5 @@ interface SharedLockStoreInterface extends PersistingStoreInterface
      *
      * @throws LockConflictedException
      */
-    public function saveRead(Key $key);
+    public function saveRead(Key $key): void;
 }

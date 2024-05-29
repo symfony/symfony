@@ -31,6 +31,10 @@ class ClassExistsMockTest extends TestCase
             ExistingTrait::class => false,
             'NonExistingTrait' => true,
         ]);
+
+        ClassExistsMock::withMockedEnums([
+            'NonExistingEnum' => true,
+        ]);
     }
 
     public function testClassExists()
@@ -51,6 +55,26 @@ class ClassExistsMockTest extends TestCase
         $this->assertFalse(class_exists('NonExistingClassReal', false));
         $this->assertFalse(class_exists('\\NonExistingClassReal'));
         $this->assertFalse(class_exists('\\NonExistingClassReal', false));
+    }
+
+    public function testEnumExistsOnClasses()
+    {
+        $this->assertFalse(enum_exists(ExistingClass::class));
+        $this->assertFalse(enum_exists(ExistingClass::class, false));
+        $this->assertFalse(enum_exists('\\'.ExistingClass::class));
+        $this->assertFalse(enum_exists('\\'.ExistingClass::class, false));
+        $this->assertFalse(enum_exists('NonExistingClass'));
+        $this->assertFalse(enum_exists('NonExistingClass', false));
+        $this->assertFalse(enum_exists('\\NonExistingClass'));
+        $this->assertFalse(enum_exists('\\NonExistingClass', false));
+        $this->assertFalse(enum_exists(ExistingClassReal::class));
+        $this->assertFalse(enum_exists(ExistingClassReal::class, false));
+        $this->assertFalse(enum_exists('\\'.ExistingClassReal::class));
+        $this->assertFalse(enum_exists('\\'.ExistingClassReal::class, false));
+        $this->assertFalse(enum_exists('NonExistingClassReal'));
+        $this->assertFalse(enum_exists('NonExistingClassReal', false));
+        $this->assertFalse(enum_exists('\\NonExistingClassReal'));
+        $this->assertFalse(enum_exists('\\NonExistingClassReal', false));
     }
 
     public function testInterfaceExists()
@@ -91,6 +115,28 @@ class ClassExistsMockTest extends TestCase
         $this->assertFalse(trait_exists('NonExistingClassReal', false));
         $this->assertFalse(trait_exists('\\NonExistingTraitReal'));
         $this->assertFalse(trait_exists('\\NonExistingTraitReal', false));
+    }
+
+    public function testEnumExists()
+    {
+        $this->assertTrue(enum_exists('NonExistingEnum'));
+        $this->assertTrue(enum_exists('NonExistingEnum', false));
+        $this->assertTrue(enum_exists('\\NonExistingEnum'));
+        $this->assertTrue(enum_exists('\\NonExistingEnum', false));
+        $this->assertFalse(enum_exists('NonExistingClassReal'));
+        $this->assertFalse(enum_exists('NonExistingClassReal', false));
+        $this->assertFalse(enum_exists('\\NonExistingEnumReal'));
+        $this->assertFalse(enum_exists('\\NonExistingEnumReal', false));
+    }
+
+    public function testClassExistsOnEnums()
+    {
+        $this->assertTrue(class_exists('NonExistingEnum'));
+        $this->assertTrue(class_exists('NonExistingEnum', false));
+        $this->assertTrue(class_exists('\\NonExistingEnum'));
+        $this->assertTrue(class_exists('\\NonExistingEnum', false));
+        $this->assertFalse(class_exists('\\NonExistingEnumReal'));
+        $this->assertFalse(class_exists('\\NonExistingEnumReal', false));
     }
 }
 

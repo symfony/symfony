@@ -19,5 +19,5 @@ interface NormalizerAwareInterface
     /**
      * Sets the owning Normalizer object.
      */
-    public function setNormalizer(NormalizerInterface $normalizer);
+    public function setNormalizer(NormalizerInterface $normalizer): void;
 }

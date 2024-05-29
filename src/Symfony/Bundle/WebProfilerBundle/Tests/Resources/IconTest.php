@@ -20,11 +20,20 @@ class IconTest extends TestCase
      */
     public function testIconFileContents($iconFilePath)
     {
-        $this->assertMatchesRegularExpression('~<svg xmlns="http://www.w3.org/2000/svg" width="\d+" height="\d+" viewBox="0 0 \d+ \d+">.*</svg>~s', file_get_contents($iconFilePath), sprintf('The SVG metadata of the %s icon is different than expected (use the same as the other icons).', $iconFilePath));
+        $iconFilePath = realpath($iconFilePath);
+        $svgFileContents = file_get_contents($iconFilePath);
+
+        $this->assertStringContainsString('xmlns="http://www.w3.org/2000/svg"', $svgFileContents, sprintf('The SVG metadata of the "%s" icon must use "http://www.w3.org/2000/svg" as its "xmlns" value.', $iconFilePath));
+
+        $this->assertMatchesRegularExpression('~<svg .* width="\d+".+>.*</svg>~s', file_get_contents($iconFilePath), sprintf('The SVG file of the "%s" icon must include a "width" attribute.', $iconFilePath));
+
+        $this->assertMatchesRegularExpression('~<svg .* height="\d+".+>.*</svg>~s', file_get_contents($iconFilePath), sprintf('The SVG file of the "%s" icon must include a "height" attribute.', $iconFilePath));
+
+        $this->assertMatchesRegularExpression('~<svg .* viewBox="0 0 \d+ \d+".+>.*</svg>~s', file_get_contents($iconFilePath), sprintf('The SVG file of the "%s" icon must include a "viewBox" attribute.', $iconFilePath));
     }
 
     public static function provideIconFilePaths(): array
     {
-        return array_map(function ($filePath) { return (array) $filePath; }, glob(__DIR__.'/../../Resources/views/Icon/*.svg'));
+        return array_map(fn ($filePath) => (array) $filePath, glob(__DIR__.'/../../Resources/views/Icon/*.svg'));
     }
 }

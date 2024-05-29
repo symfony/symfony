@@ -25,8 +25,8 @@ use Symfony\Component\Messenger\Middleware\StackInterface;
  */
 abstract class AbstractDoctrineMiddleware implements MiddlewareInterface
 {
-    protected $managerRegistry;
-    protected $entityManagerName;
+    protected ManagerRegistry $managerRegistry;
+    protected ?string $entityManagerName;
 
     public function __construct(ManagerRegistry $managerRegistry, ?string $entityManagerName = null)
     {

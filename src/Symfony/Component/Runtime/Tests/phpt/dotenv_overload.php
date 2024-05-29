@@ -19,6 +19,4 @@ $_SERVER['APP_RUNTIME_OPTIONS'] = [
 
 require __DIR__.'/autoload.php';
 
-return function (Request $request, array $context) {
-    return new Response('OK Request '.$context['SOME_VAR']);
-};
+return fn (Request $request, array $context) => new Response('OK Request '.$context['SOME_VAR']);

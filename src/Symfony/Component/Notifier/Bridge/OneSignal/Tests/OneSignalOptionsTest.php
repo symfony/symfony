@@ -24,7 +24,8 @@ final class OneSignalOptionsTest extends TestCase
             ->url('https://example.com')
             ->data(['foo' => 'bar'])
             ->sendAfter(new \DateTimeImmutable('Thu Sep 24 2015 14:00:00 GMT-0700 (PDT)'))
-            ->externalId('d637f30d-f709-4bed-9e2c-63637cb91894');
+            ->externalId('d637f30d-f709-4bed-9e2c-63637cb91894')
+            ->isExternalUserId();
 
         $this->assertSame([
             'headings' => ['en' => 'English Heading', 'fr' => 'French Heading'],
@@ -33,6 +34,7 @@ final class OneSignalOptionsTest extends TestCase
             'data' => ['foo' => 'bar'],
             'send_after' => '2015-09-24 14:00:00-0700',
             'external_id' => 'd637f30d-f709-4bed-9e2c-63637cb91894',
+            'is_external_user_id' => true,
         ], $oneSignalOptions->toArray());
     }
 }

@@ -19,7 +19,7 @@ use Symfony\Component\Form\NativeRequestHandler;
  */
 class NativeRequestHandlerTest extends AbstractRequestHandlerTestCase
 {
-    private static $serverBackup;
+    private static array $serverBackup;
 
     public static function setUpBeforeClass(): void
     {
@@ -99,6 +99,9 @@ class NativeRequestHandlerTest extends AbstractRequestHandlerTestCase
             'name' => [
                 'field' => 'upload.txt',
             ],
+            'full_path' => [
+                'field' => 'path/to/file/upload.txt',
+            ],
             'type' => [
                 'field' => 'text/plain',
             ],
@@ -118,6 +121,7 @@ class NativeRequestHandlerTest extends AbstractRequestHandlerTestCase
         $this->assertTrue($form->isSubmitted());
         $this->assertEquals([
             'name' => 'upload.txt',
+            'full_path' => 'path/to/file/upload.txt',
             'type' => 'text/plain',
             'tmp_name' => 'owfdskjasdfsa',
             'error' => \UPLOAD_ERR_OK,

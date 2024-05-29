@@ -20,12 +20,11 @@ use Symfony\Component\Notifier\Test\TransportTestCase;
 use Symfony\Component\Notifier\Tests\Fixtures\TestOptions;
 use Symfony\Component\Notifier\Tests\Mailer\DummyMailer;
 use Symfony\Component\Notifier\Tests\Transport\DummyMessage;
-use Symfony\Component\Notifier\Transport\TransportInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 final class FakeChatEmailTransportTest extends TransportTestCase
 {
-    public static function createTransport(?HttpClientInterface $client = null, ?string $transportName = null): TransportInterface
+    public static function createTransport(?HttpClientInterface $client = null, ?string $transportName = null): FakeChatEmailTransport
     {
         $transport = (new FakeChatEmailTransport(new DummyMailer(), 'recipient@email.net', 'sender@email.net', $client ?? new MockHttpClient()));
 

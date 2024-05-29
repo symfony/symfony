@@ -13,17 +13,18 @@ namespace Symfony\Bridge\Monolog\Tests\Handler;
 
 use Monolog\Formatter\HtmlFormatter;
 use Monolog\Formatter\LineFormatter;
+use Monolog\Level;
+use Monolog\LogRecord;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Monolog\Handler\MailerHandler;
-use Symfony\Bridge\Monolog\Logger;
+use Symfony\Bridge\Monolog\Tests\RecordFactory;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Email;
 
 class MailerHandlerTest extends TestCase
 {
-    /** @var MockObject|MailerInterface */
-    private $mailer = null;
+    private MockObject&MailerInterface $mailer;
 
     protected function setUp(): void
     {
@@ -37,11 +38,9 @@ class MailerHandlerTest extends TestCase
         $this->mailer
             ->expects($this->once())
             ->method('send')
-            ->with($this->callback(function (Email $email) {
-                return 'Alert: WARNING message' === $email->getSubject() && null === $email->getHtmlBody();
-            }))
+            ->with($this->callback(fn (Email $email) => 'Alert: WARNING message' === $email->getSubject() && null === $email->getHtmlBody()))
         ;
-        $handler->handle($this->getRecord(Logger::WARNING, 'message'));
+        $handler->handle($this->getRecord(Level::Warning, 'message'));
     }
 
     public function testHandleBatch()
@@ -51,9 +50,7 @@ class MailerHandlerTest extends TestCase
         $this->mailer
             ->expects($this->once())
             ->method('send')
-            ->with($this->callback(function (Email $email) {
-                return 'Alert: ERROR error' === $email->getSubject() && null === $email->getHtmlBody();
-            }))
+            ->with($this->callback(fn (Email $email) => 'Alert: ERROR error' === $email->getSubject() && null === $email->getHtmlBody()))
         ;
         $handler->handleBatch($this->getMultipleRecords());
     }
@@ -68,11 +65,11 @@ class MailerHandlerTest extends TestCase
         $callback = function () {
             throw new \RuntimeException('Email creation callback should not have been called in this test');
         };
-        $handler = new MailerHandler($this->mailer, $callback, Logger::ALERT);
+        $handler = new MailerHandler($this->mailer, $callback, Level::Alert);
 
         $records = [
-            $this->getRecord(Logger::DEBUG),
-            $this->getRecord(Logger::INFO),
+            $this->getRecord(Level::Debug),
+            $this->getRecord(Level::Info),
         ];
         $handler->handleBatch($records);
     }
@@ -84,34 +81,24 @@ class MailerHandlerTest extends TestCase
         $this->mailer
             ->expects($this->once())
             ->method('send')
-            ->with($this->callback(function (Email $email) {
-                return 'Alert: WARNING message' === $email->getSubject() && null === $email->getTextBody();
-            }))
+            ->with($this->callback(fn (Email $email) => 'Alert: WARNING message' === $email->getSubject() && null === $email->getTextBody()))
         ;
-        $handler->handle($this->getRecord(Logger::WARNING, 'message'));
+        $handler->handle($this->getRecord(Level::Warning, 'message'));
     }
 
-    protected function getRecord($level = Logger::WARNING, $message = 'test', $context = []): array
+    protected function getRecord($level = Level::Warning, $message = 'test', $context = []): array|LogRecord
     {
-        return [
-            'message' => $message,
-            'context' => $context,
-            'level' => $level,
-            'level_name' => Logger::getLevelName($level),
-            'channel' => 'test',
-            'datetime' => \DateTime::createFromFormat('U.u', sprintf('%.6F', microtime(true))),
-            'extra' => [],
-        ];
+        return RecordFactory::create($level, $message, context: $context);
     }
 
     protected function getMultipleRecords(): array
     {
         return [
-            $this->getRecord(Logger::DEBUG, 'debug message 1'),
-            $this->getRecord(Logger::DEBUG, 'debug message 2'),
-            $this->getRecord(Logger::INFO, 'information'),
-            $this->getRecord(Logger::WARNING, 'warning'),
-            $this->getRecord(Logger::ERROR, 'error'),
+            $this->getRecord(Level::Debug, 'debug message 1'),
+            $this->getRecord(Level::Debug, 'debug message 2'),
+            $this->getRecord(Level::Info, 'information'),
+            $this->getRecord(Level::Warning, 'warning'),
+            $this->getRecord(Level::Error, 'error'),
         ];
     }
 }

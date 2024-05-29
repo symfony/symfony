@@ -20,18 +20,16 @@ use Symfony\Component\ExpressionLanguage\Compiler;
  */
 class ArrayNode extends Node
 {
-    protected $index;
+    protected int $index;
 
     public function __construct()
     {
         $this->index = -1;
     }
 
-    public function addElement(Node $value, ?Node $key = null)
+    public function addElement(Node $value, ?Node $key = null): void
     {
-        if (null === $key) {
-            $key = new ConstantNode(++$this->index);
-        }
+        $key ??= new ConstantNode(++$this->index);
 
         array_push($this->nodes, $key, $value);
     }
@@ -39,14 +37,14 @@ class ArrayNode extends Node
     /**
      * Compiles the node to PHP.
      */
-    public function compile(Compiler $compiler)
+    public function compile(Compiler $compiler): void
     {
         $compiler->raw('[');
         $this->compileArguments($compiler);
         $compiler->raw(']');
     }
 
-    public function evaluate(array $functions, array $values)
+    public function evaluate(array $functions, array $values): array
     {
         $result = [];
         foreach ($this->getKeyValuePairs() as $pair) {
@@ -56,7 +54,7 @@ class ArrayNode extends Node
         return $result;
     }
 
-    public function toArray()
+    public function toArray(): array
     {
         $value = [];
         foreach ($this->getKeyValuePairs() as $pair) {
@@ -86,7 +84,7 @@ class ArrayNode extends Node
         return $array;
     }
 
-    protected function getKeyValuePairs()
+    protected function getKeyValuePairs(): array
     {
         $pairs = [];
         foreach (array_chunk($this->nodes, 2) as $pair) {
@@ -96,7 +94,7 @@ class ArrayNode extends Node
         return $pairs;
     }
 
-    protected function compileArguments(Compiler $compiler, bool $withKeys = true)
+    protected function compileArguments(Compiler $compiler, bool $withKeys = true): void
     {
         $first = true;
         foreach ($this->getKeyValuePairs() as $pair) {

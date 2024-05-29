@@ -20,10 +20,7 @@ use Symfony\Component\Serializer\Exception\UnexpectedValueException;
  */
 class CsvEncoderTest extends TestCase
 {
-    /**
-     * @var CsvEncoder
-     */
-    private $encoder;
+    private CsvEncoder $encoder;
 
     protected function setUp(): void
     {
@@ -59,9 +56,6 @@ CSV
         ], $this->encoder->decode($csv, 'csv', [CsvEncoder::AS_COLLECTION_KEY => false]));
     }
 
-    /**
-     * @requires PHP 7.4
-     */
     public function testDoubleQuotesAndSlashes()
     {
         $this->assertSame($csv = <<<'CSV'
@@ -74,9 +68,6 @@ CSV
         $this->assertSame($data, $this->encoder->decode($csv, 'csv', [CsvEncoder::AS_COLLECTION_KEY => false]));
     }
 
-    /**
-     * @requires PHP 7.4
-     */
     public function testSingleSlash()
     {
         $this->assertSame($csv = "0\n\\\n", $this->encoder->encode($data = ['\\'], 'csv'));
@@ -218,7 +209,13 @@ CSV
     {
         $data = $this->encoder->decode("\n\n", 'csv');
 
-        $this->assertSame([['' => null]], $data);
+        $this->assertSame([[0 => null]], $data);
+    }
+
+    public function testMultipleEmptyHeaderNamesWithSeparator()
+    {
+        $this->assertSame([['', [1 => '']]], $this->encoder->decode(',.
+,', 'csv'));
     }
 
     public function testEncodeVariableStructure()

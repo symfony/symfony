@@ -15,8 +15,7 @@ use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 
 /**
- * @Annotation
- * @Target({"PROPERTY", "METHOD", "ANNOTATION"})
+ * Validates that a value is a valid timezone identifier.
  *
  * @author Javier Spagnoletti <phansys@gmail.com>
  * @author Hugo Hamon <hugohamon@neuf.fr>
@@ -29,12 +28,12 @@ class Timezone extends Constraint
     public const TIMEZONE_IDENTIFIER_IN_COUNTRY_ERROR = 'c4a22222-dc92-4fc0-abb0-d95b268c7d0b';
     public const TIMEZONE_IDENTIFIER_INTL_ERROR = '45863c26-88dc-41ba-bf53-c73bd1f7e90d';
 
-    public $zone = \DateTimeZone::ALL;
-    public $countryCode;
-    public $intlCompatible = false;
-    public $message = 'This value is not a valid timezone.';
+    public int $zone = \DateTimeZone::ALL;
+    public ?string $countryCode = null;
+    public bool $intlCompatible = false;
+    public string $message = 'This value is not a valid timezone.';
 
-    protected static $errorNames = [
+    protected const ERROR_NAMES = [
         self::TIMEZONE_IDENTIFIER_ERROR => 'TIMEZONE_IDENTIFIER_ERROR',
         self::TIMEZONE_IDENTIFIER_IN_ZONE_ERROR => 'TIMEZONE_IDENTIFIER_IN_ZONE_ERROR',
         self::TIMEZONE_IDENTIFIER_IN_COUNTRY_ERROR => 'TIMEZONE_IDENTIFIER_IN_COUNTRY_ERROR',
@@ -42,18 +41,22 @@ class Timezone extends Constraint
     ];
 
     /**
-     * {@inheritdoc}
+     * @param int|array<string,mixed>|null $zone           Restrict valid timezones to this geographical zone (defaults to {@see \DateTimeZone::ALL})
+     * @param string|null                  $countryCode    Restrict the valid timezones to this country if the zone option is {@see \DateTimeZone::PER_COUNTRY}
+     * @param bool|null                    $intlCompatible Whether to restrict valid timezones to ones available in PHP's intl (defaults to false)
+     * @param string[]|null                $groups
+     * @param array<string,mixed>          $options
      *
-     * @param int|array|null $zone A combination of {@see \DateTimeZone} class constants or a set of options
+     * @see \DateTimeZone
      */
     public function __construct(
-        $zone = null,
+        int|array|null $zone = null,
         ?string $message = null,
         ?string $countryCode = null,
         ?bool $intlCompatible = null,
         ?array $groups = null,
-        $payload = null,
-        array $options = []
+        mixed $payload = null,
+        array $options = [],
     ) {
         if (\is_array($zone)) {
             $options = array_merge($zone, $options);
@@ -79,10 +82,7 @@ class Timezone extends Constraint
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getDefaultOption()
+    public function getDefaultOption(): ?string
     {
         return 'zone';
     }

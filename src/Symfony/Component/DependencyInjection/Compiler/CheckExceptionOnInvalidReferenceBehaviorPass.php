@@ -23,12 +23,11 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 class CheckExceptionOnInvalidReferenceBehaviorPass extends AbstractRecursivePass
 {
-    private $serviceLocatorContextIds = [];
+    protected bool $skipScalars = true;
 
-    /**
-     * {@inheritdoc}
-     */
-    public function process(ContainerBuilder $container)
+    private array $serviceLocatorContextIds = [];
+
+    public function process(ContainerBuilder $container): void
     {
         $this->serviceLocatorContextIds = [];
         foreach ($container->findTaggedServiceIds('container.service_locator_context') as $id => $tags) {
@@ -37,18 +36,18 @@ class CheckExceptionOnInvalidReferenceBehaviorPass extends AbstractRecursivePass
         }
 
         try {
-            return parent::process($container);
+            parent::process($container);
         } finally {
             $this->serviceLocatorContextIds = [];
         }
     }
 
-    protected function processValue($value, bool $isRoot = false)
+    protected function processValue(mixed $value, bool $isRoot = false): mixed
     {
         if (!$value instanceof Reference) {
             return parent::processValue($value, $isRoot);
         }
-        if (ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE < $value->getInvalidBehavior() || $this->container->has($id = (string) $value)) {
+        if (ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE < $value->getInvalidBehavior() || $this->container->has((string) $value)) {
             return $value;
         }
 
@@ -58,15 +57,7 @@ class CheckExceptionOnInvalidReferenceBehaviorPass extends AbstractRecursivePass
         if (isset($this->serviceLocatorContextIds[$currentId])) {
             $currentId = $this->serviceLocatorContextIds[$currentId];
             $locator = $this->container->getDefinition($this->currentId)->getFactory()[0];
-
-            foreach ($locator->getArgument(0) as $k => $v) {
-                if ($v->getValues()[0] === $value) {
-                    if ($k !== $id) {
-                        $currentId = $k.'" in the container provided to "'.$currentId;
-                    }
-                    throw new ServiceNotFoundException($id, $currentId, null, $this->getAlternatives($id));
-                }
-            }
+            $this->throwServiceNotFoundException($value, $currentId, $locator->getArgument(0));
         }
 
         if ('.' === $currentId[0] && $graph->hasNode($currentId)) {
@@ -80,26 +71,55 @@ class CheckExceptionOnInvalidReferenceBehaviorPass extends AbstractRecursivePass
                     $currentId = $sourceId;
                     break;
                 }
+
+                if (isset($this->serviceLocatorContextIds[$sourceId])) {
+                    $currentId = $this->serviceLocatorContextIds[$sourceId];
+                    $locator = $this->container->getDefinition($this->currentId);
+                    $this->throwServiceNotFoundException($value, $currentId, $locator->getArgument(0));
+                }
             }
         }
 
-        throw new ServiceNotFoundException($id, $currentId, null, $this->getAlternatives($id));
+        $this->throwServiceNotFoundException($value, $currentId, $value);
     }
 
-    private function getAlternatives(string $id): array
+    private function throwServiceNotFoundException(Reference $ref, string $sourceId, mixed $value): void
     {
+        $id = (string) $ref;
         $alternatives = [];
         foreach ($this->container->getServiceIds() as $knownId) {
-            if ('' === $knownId || '.' === $knownId[0]) {
+            if ('' === $knownId || '.' === $knownId[0] || $knownId === $this->currentId) {
                 continue;
             }
 
             $lev = levenshtein($id, $knownId);
-            if ($lev <= \strlen($id) / 3 || false !== strpos($knownId, $id)) {
+            if ($lev <= \strlen($id) / 3 || str_contains($knownId, $id)) {
                 $alternatives[] = $knownId;
             }
         }
 
-        return $alternatives;
+        $pass = new class() extends AbstractRecursivePass {
+            public Reference $ref;
+            public string $sourceId;
+            public array $alternatives;
+
+            public function processValue(mixed $value, bool $isRoot = false): mixed
+            {
+                if ($this->ref !== $value) {
+                    return parent::processValue($value, $isRoot);
+                }
+                $sourceId = $this->sourceId;
+                if (null !== $this->currentId && $this->currentId !== (string) $value) {
+                    $sourceId = $this->currentId.'" in the container provided to "'.$sourceId;
+                }
+
+                throw new ServiceNotFoundException((string) $value, $sourceId, null, $this->alternatives);
+            }
+        };
+        $pass->ref = $ref;
+        $pass->sourceId = $sourceId;
+        $pass->alternatives = $alternatives;
+
+        $pass->processValue($value, true);
     }
 }

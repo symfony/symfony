@@ -90,12 +90,22 @@ _MSG_;
         ];
     }
 
-    public function testPercentsAndBracketsAreTrimmed()
+    /**
+     * @dataProvider percentAndBracketsAreTrimmedProvider
+     */
+    public function testPercentsAndBracketsAreTrimmed(string $expected, string $message, array $paramters)
     {
         $formatter = new IntlFormatter();
         $this->assertInstanceof(IntlFormatterInterface::class, $formatter);
-        $this->assertSame('Hello Fab', $formatter->formatIntl('Hello {name}', 'en', ['name' => 'Fab']));
-        $this->assertSame('Hello Fab', $formatter->formatIntl('Hello {name}', 'en', ['%name%' => 'Fab']));
-        $this->assertSame('Hello Fab', $formatter->formatIntl('Hello {name}', 'en', ['{{ name }}' => 'Fab']));
+        $this->assertSame($expected, $formatter->formatIntl($message, 'en', $paramters));
+    }
+
+    public static function percentAndBracketsAreTrimmedProvider(): array
+    {
+        return [
+            ['Hello Fab', 'Hello {name}', ['name' => 'Fab']],
+            ['Hello Fab', 'Hello {name}', ['%name%' => 'Fab']],
+            ['Hello Fab', 'Hello {name}', ['{{ name }}' => 'Fab']],
+        ];
     }
 }

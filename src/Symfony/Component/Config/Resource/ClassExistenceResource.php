@@ -23,20 +23,20 @@ namespace Symfony\Component\Config\Resource;
  */
 class ClassExistenceResource implements SelfCheckingResourceInterface
 {
-    private $resource;
-    private $exists;
+    private ?array $exists = null;
 
-    private static $autoloadLevel = 0;
-    private static $autoloadedClass;
-    private static $existsCache = [];
+    private static int $autoloadLevel = 0;
+    private static ?string $autoloadedClass = null;
+    private static array $existsCache = [];
 
     /**
      * @param string    $resource The fully-qualified class name
      * @param bool|null $exists   Boolean when the existence check has already been done
      */
-    public function __construct(string $resource, ?bool $exists = null)
-    {
-        $this->resource = $resource;
+    public function __construct(
+        private string $resource,
+        ?bool $exists = null,
+    ) {
         if (null !== $exists) {
             $this->exists = [$exists, null];
         }
@@ -53,8 +53,6 @@ class ClassExistenceResource implements SelfCheckingResourceInterface
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @throws \ReflectionException when a parent class/interface/trait is not found
      */
     public function isFresh(int $timestamp): bool
@@ -98,9 +96,7 @@ class ClassExistenceResource implements SelfCheckingResourceInterface
             }
         }
 
-        if (null === $this->exists) {
-            $this->exists = $exists;
-        }
+        $this->exists ??= $exists;
 
         return $this->exists[0] xor !$exists[0];
     }
@@ -120,7 +116,7 @@ class ClassExistenceResource implements SelfCheckingResourceInterface
     /**
      * @internal
      */
-    public function __wakeup()
+    public function __wakeup(): void
     {
         if (\is_bool($this->exists)) {
             $this->exists = [$this->exists, null];
@@ -143,7 +139,7 @@ class ClassExistenceResource implements SelfCheckingResourceInterface
      *
      * @internal
      */
-    public static function throwOnRequiredClass(string $class, ?\Exception $previous = null)
+    public static function throwOnRequiredClass(string $class, ?\Exception $previous = null): void
     {
         // If the passed class is the resource being checked, we shouldn't throw.
         if (null === $previous && self::$autoloadedClass === $class) {
@@ -164,7 +160,7 @@ class ClassExistenceResource implements SelfCheckingResourceInterface
 
         $message = sprintf('Class "%s" not found.', $class);
 
-        if (self::$autoloadedClass !== $class) {
+        if ($class !== (self::$autoloadedClass ?? $class)) {
             $message = substr_replace($message, sprintf(' while loading "%s"', self::$autoloadedClass), -1, 0);
         }
 
@@ -184,7 +180,7 @@ class ClassExistenceResource implements SelfCheckingResourceInterface
             'args' => [$class],
         ];
 
-        if (\PHP_VERSION_ID >= 80000 && isset($trace[1])) {
+        if (isset($trace[1])) {
             $callerFrame = $trace[1];
             $i = 2;
         } elseif (false !== $i = array_search($autoloadFrame, $trace, true)) {
@@ -221,7 +217,6 @@ class ClassExistenceResource implements SelfCheckingResourceInterface
             foreach ($props as $p => $v) {
                 if (null !== $v) {
                     $r = new \ReflectionProperty(\Exception::class, $p);
-                    $r->setAccessible(true);
                     $r->setValue($e, $v);
                 }
             }

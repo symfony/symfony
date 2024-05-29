@@ -25,8 +25,8 @@ class NativeSessionTokenStorage implements ClearableTokenStorageInterface
      */
     public const SESSION_NAMESPACE = '_csrf';
 
-    private $sessionStarted = false;
-    private $namespace;
+    private bool $sessionStarted = false;
+    private string $namespace;
 
     /**
      * Initializes the storage with a session namespace.
@@ -38,10 +38,7 @@ class NativeSessionTokenStorage implements ClearableTokenStorageInterface
         $this->namespace = $namespace;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getToken(string $tokenId)
+    public function getToken(string $tokenId): string
     {
         if (!$this->sessionStarted) {
             $this->startSession();
@@ -54,10 +51,7 @@ class NativeSessionTokenStorage implements ClearableTokenStorageInterface
         return (string) $_SESSION[$this->namespace][$tokenId];
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function setToken(string $tokenId, string $token)
+    public function setToken(string $tokenId, #[\SensitiveParameter] string $token): void
     {
         if (!$this->sessionStarted) {
             $this->startSession();
@@ -66,10 +60,7 @@ class NativeSessionTokenStorage implements ClearableTokenStorageInterface
         $_SESSION[$this->namespace][$tokenId] = $token;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function hasToken(string $tokenId)
+    public function hasToken(string $tokenId): bool
     {
         if (!$this->sessionStarted) {
             $this->startSession();
@@ -78,10 +69,7 @@ class NativeSessionTokenStorage implements ClearableTokenStorageInterface
         return isset($_SESSION[$this->namespace][$tokenId]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function removeToken(string $tokenId)
+    public function removeToken(string $tokenId): ?string
     {
         if (!$this->sessionStarted) {
             $this->startSession();
@@ -102,15 +90,12 @@ class NativeSessionTokenStorage implements ClearableTokenStorageInterface
         return $token;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function clear()
+    public function clear(): void
     {
         unset($_SESSION[$this->namespace]);
     }
 
-    private function startSession()
+    private function startSession(): void
     {
         if (\PHP_SESSION_NONE === session_status()) {
             session_start();

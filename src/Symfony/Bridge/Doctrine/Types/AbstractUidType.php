@@ -25,9 +25,6 @@ abstract class AbstractUidType extends Type
      */
     abstract protected function getUidClass(): string;
 
-    /**
-     * {@inheritdoc}
-     */
     public function getSQLDeclaration(array $column, AbstractPlatform $platform): string
     {
         if ($this->hasNativeGuidType($platform)) {
@@ -41,11 +38,9 @@ abstract class AbstractUidType extends Type
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @throws ConversionException
      */
-    public function convertToPHPValue($value, AbstractPlatform $platform): ?AbstractUid
+    public function convertToPHPValue(mixed $value, AbstractPlatform $platform): ?AbstractUid
     {
         if ($value instanceof AbstractUid || null === $value) {
             return $value;
@@ -63,8 +58,6 @@ abstract class AbstractUidType extends Type
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @throws ConversionException
      */
     public function convertToDatabaseValue($value, AbstractPlatform $platform): ?string
@@ -90,9 +83,6 @@ abstract class AbstractUidType extends Type
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function requiresSQLCommentHint(AbstractPlatform $platform): bool
     {
         return true;
@@ -100,20 +90,10 @@ abstract class AbstractUidType extends Type
 
     private function hasNativeGuidType(AbstractPlatform $platform): bool
     {
-        // Compatibility with DBAL < 3.4
-        $method = method_exists($platform, 'getStringTypeDeclarationSQL')
-            ? 'getStringTypeDeclarationSQL'
-            : 'getVarcharTypeDeclarationSQL';
-
-        return $platform->getGuidTypeDeclarationSQL([]) !== $platform->$method(['fixed' => true, 'length' => 36]);
+        return $platform->getGuidTypeDeclarationSQL([]) !== $platform->getStringTypeDeclarationSQL(['fixed' => true, 'length' => 36]);
     }
 
-    /**
-     * @param mixed $value
-     *
-     * @return never
-     */
-    private function throwInvalidType($value): void
+    private function throwInvalidType(mixed $value): never
     {
         if (!class_exists(InvalidType::class)) {
             throw ConversionException::conversionFailedInvalidType($value, $this->getName(), ['null', 'string', AbstractUid::class]);
@@ -122,12 +102,7 @@ abstract class AbstractUidType extends Type
         throw InvalidType::new($value, $this->getName(), ['null', 'string', AbstractUid::class]);
     }
 
-    /**
-     * @param mixed $value
-     *
-     * @return never
-     */
-    private function throwValueNotConvertible($value, \Throwable $previous): void
+    private function throwValueNotConvertible(mixed $value, \Throwable $previous): never
     {
         if (!class_exists(ValueNotConvertible::class)) {
             throw ConversionException::conversionFailed($value, $this->getName(), $previous);

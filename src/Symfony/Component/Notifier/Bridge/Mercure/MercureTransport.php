@@ -30,21 +30,18 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
  */
 final class MercureTransport extends AbstractTransport
 {
-    private $hub;
-    private $hubId;
-    private $topics;
+    private string|array $topics;
 
     /**
      * @param string|string[]|null $topics
      */
-    public function __construct(HubInterface $hub, string $hubId, $topics = null, ?HttpClientInterface $client = null, ?EventDispatcherInterface $dispatcher = null)
-    {
-        if (null !== $topics && !\is_array($topics) && !\is_string($topics)) {
-            throw new \TypeError(sprintf('"%s()" expects parameter 3 to be an array of strings, a string or null, "%s" given.', __METHOD__, get_debug_type($topics)));
-        }
-
-        $this->hub = $hub;
-        $this->hubId = $hubId;
+    public function __construct(
+        private HubInterface $hub,
+        private string $hubId,
+        string|array|null $topics = null,
+        ?HttpClientInterface $client = null,
+        ?EventDispatcherInterface $dispatcher = null,
+    ) {
         $this->topics = $topics ?? 'https://symfony.com/notifier';
 
         parent::__construct($client, $dispatcher);
@@ -52,7 +49,7 @@ final class MercureTransport extends AbstractTransport
 
     public function __toString(): string
     {
-        return sprintf('mercure://%s?%s', $this->hubId, http_build_query(['topic' => $this->topics], '', '&'));
+        return sprintf('mercure://%s%s', $this->hubId, '?'.http_build_query(['topic' => $this->topics], '', '&'));
     }
 
     public function supports(MessageInterface $message): bool
@@ -73,9 +70,7 @@ final class MercureTransport extends AbstractTransport
             throw new LogicException(sprintf('The "%s" transport only supports instances of "%s" for options.', __CLASS__, MercureOptions::class));
         }
 
-        if (null === $options) {
-            $options = new MercureOptions($this->topics);
-        }
+        $options ??= new MercureOptions($this->topics);
 
         // @see https://www.w3.org/TR/activitystreams-core/#jsonld
         $update = new Update($options->getTopics() ?? $this->topics, json_encode([

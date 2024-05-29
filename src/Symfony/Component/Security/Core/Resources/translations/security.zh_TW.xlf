@@ -74,6 +74,10 @@
                 <source>Too many failed login attempts, please try again in %minutes% minute.</source>
                 <target>登錄失敗的次數過多，請在%minutes%分鐘後再試。</target>
             </trans-unit>
+            <trans-unit id="20">
+                <source>Too many failed login attempts, please try again in %minutes% minutes.</source>
+                <target state="needs-review-translation">嘗試登入失敗次數過多，請 %minutes% 分鐘後再試。|嘗試登入失敗次數過多，請 %minutes% 分鐘後再試。</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

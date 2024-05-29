@@ -5,7 +5,7 @@
 
     {% if events.messages|length %}
         {% set icon %}
-            {% include('@WebProfiler/Icon/notifier.svg') %}
+            {{ source('@WebProfiler/Icon/notifier.svg') }}
             <span class="sf-toolbar-value">{{ events.messages|length }}</span>
         {% endset %}
 
@@ -29,7 +29,7 @@
 
 {% block head %}
     {{ parent() }}
-    <style type="text/css">
+    <style>
         /* utility classes */
         .m-t-0 { margin-top: 0 !important; }
         .m-t-10 { margin-top: 10px !important; }
@@ -68,7 +68,7 @@
     {% set events = collector.events %}
 
     <span class="label {{ events.messages|length ? '' : 'disabled' }}">
-        <span class="icon">{{ include('@WebProfiler/Icon/notifier.svg') }}</span>
+        <span class="icon">{{ source('@WebProfiler/Icon/notifier.svg') }}</span>
 
         <strong>Notifications</strong>
         {% if events.messages|length > 0 %}
@@ -85,7 +85,7 @@
     <h2>Notifications</h2>
 
     {% if not events.messages|length %}
-        <div class="empty">
+        <div class="empty empty-panel">
             <p>No notifications were sent.</p>
         </div>
     {% endif %}

@@ -22,13 +22,10 @@ use Twig\TwigFunction;
  */
 final class ExpressionExtension extends AbstractExtension
 {
-    /**
-     * {@inheritdoc}
-     */
     public function getFunctions(): array
     {
         return [
-            new TwigFunction('expression', [$this, 'createExpression']),
+            new TwigFunction('expression', $this->createExpression(...)),
         ];
     }
 

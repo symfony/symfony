@@ -11,7 +11,6 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Tests\Controller;
 
-use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
 use Symfony\Component\DependencyInjection\Container;
@@ -39,7 +38,6 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\Routing\RouterInterface;
-use Symfony\Component\Security\Core\Authentication\Token\AnonymousToken;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
@@ -47,6 +45,7 @@ use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\Security\Core\User\InMemoryUser;
 use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 use Symfony\Component\Serializer\SerializerInterface;
+use Symfony\Component\WebLink\HttpHeaderSerializer;
 use Symfony\Component\WebLink\Link;
 use Twig\Environment;
 
@@ -68,16 +67,13 @@ class AbstractControllerTest extends TestCase
             'request_stack' => '?Symfony\\Component\\HttpFoundation\\RequestStack',
             'http_kernel' => '?Symfony\\Component\\HttpKernel\\HttpKernelInterface',
             'serializer' => '?Symfony\\Component\\Serializer\\SerializerInterface',
-            'session' => '?Symfony\\Component\\HttpFoundation\\Session\\SessionInterface',
             'security.authorization_checker' => '?Symfony\\Component\\Security\\Core\\Authorization\\AuthorizationCheckerInterface',
             'twig' => '?Twig\\Environment',
-            'doctrine' => '?Doctrine\\Persistence\\ManagerRegistry',
             'form.factory' => '?Symfony\\Component\\Form\\FormFactoryInterface',
             'parameter_bag' => '?Symfony\\Component\\DependencyInjection\\ParameterBag\\ContainerBagInterface',
-            'message_bus' => '?Symfony\\Component\\Messenger\\MessageBusInterface',
-            'messenger.default_bus' => '?Symfony\\Component\\Messenger\\MessageBusInterface',
             'security.token_storage' => '?Symfony\\Component\\Security\\Core\\Authentication\\Token\\Storage\\TokenStorageInterface',
             'security.csrf.token_manager' => '?Symfony\\Component\\Security\\Csrf\\CsrfTokenManagerInterface',
+            'web_link.http_header_serializer' => '?Symfony\\Component\\WebLink\\HttpHeaderSerializer',
         ];
 
         $this->assertEquals($expectedServices, $subscribed, 'Subscribed core services in AbstractController have changed');
@@ -85,10 +81,6 @@ class AbstractControllerTest extends TestCase
 
     public function testGetParameter()
     {
-        if (!class_exists(ContainerBag::class)) {
-            $this->markTestSkipped('ContainerBag class does not exist');
-        }
-
         $container = new Container(new FrozenParameterBag(['foo' => 'bar']));
         $container->set('parameter_bag', new ContainerBag($container));
 
@@ -100,12 +92,13 @@ class AbstractControllerTest extends TestCase
 
     public function testMissingParameterBag()
     {
-        $this->expectException(ServiceNotFoundException::class);
-        $this->expectExceptionMessage('TestAbstractController::getParameter()" method is missing a parameter bag');
         $container = new Container();
 
         $controller = $this->createController();
         $controller->setContainer($container);
+
+        $this->expectException(ServiceNotFoundException::class);
+        $this->expectExceptionMessage('TestAbstractController::getParameter()" method is missing a parameter bag');
 
         $controller->getParameter('foo');
     }
@@ -120,9 +113,7 @@ class AbstractControllerTest extends TestCase
         $requestStack->push($request);
 
         $kernel = $this->createMock(HttpKernelInterface::class);
-        $kernel->expects($this->once())->method('handle')->willReturnCallback(function (Request $request) {
-            return new Response($request->getRequestFormat().'--'.$request->getLocale());
-        });
+        $kernel->expects($this->once())->method('handle')->willReturnCallback(fn (Request $request) => new Response($request->getRequestFormat().'--'.$request->getLocale()));
 
         $container = new Container();
         $container->set('request_stack', $requestStack);
@@ -146,19 +137,6 @@ class AbstractControllerTest extends TestCase
         $this->assertSame($controller->getUser(), $user);
     }
 
-    /**
-     * @group legacy
-     */
-    public function testGetUserAnonymousUserConvertedToNull()
-    {
-        $token = new AnonymousToken('default', 'anon.');
-
-        $controller = $this->createController();
-        $controller->setContainer($this->getContainerWithTokenStorage($token));
-
-        $this->assertNull($controller->getUser());
-    }
-
     public function testGetUserWithEmptyTokenStorage()
     {
         $controller = $this->createController();
@@ -169,11 +147,11 @@ class AbstractControllerTest extends TestCase
 
     public function testGetUserWithEmptyContainer()
     {
-        $this->expectException(\LogicException::class);
-        $this->expectExceptionMessage('The SecurityBundle is not registered in your application.');
-
         $controller = $this->createController();
         $controller->setContainer(new Container());
+
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('The SecurityBundle is not registered in your application.');
 
         $controller->getUser();
     }
@@ -350,9 +328,9 @@ class AbstractControllerTest extends TestCase
 
     public function testFileWhichDoesNotExist()
     {
-        $this->expectException(FileNotFoundException::class);
-
         $controller = $this->createController();
+
+        $this->expectException(FileNotFoundException::class);
 
         $controller->file('some-file.txt', 'test.php');
     }
@@ -373,8 +351,6 @@ class AbstractControllerTest extends TestCase
 
     public function testdenyAccessUnlessGranted()
     {
-        $this->expectException(AccessDeniedException::class);
-
         $authorizationChecker = $this->createMock(AuthorizationCheckerInterface::class);
         $authorizationChecker->expects($this->once())->method('isGranted')->willReturn(false);
 
@@ -383,6 +359,8 @@ class AbstractControllerTest extends TestCase
 
         $controller = $this->createController();
         $controller->setContainer($container);
+
+        $this->expectException(AccessDeniedException::class);
 
         $controller->denyAccessUnlessGranted('foo');
     }
@@ -449,7 +427,7 @@ class AbstractControllerTest extends TestCase
         $this->assertEquals('bar', $controller->render('foo')->getContent());
     }
 
-    public function testRenderFormNew()
+    public function testRenderViewWithForm()
     {
         $formView = new FormView();
 
@@ -465,13 +443,12 @@ class AbstractControllerTest extends TestCase
         $controller = $this->createController();
         $controller->setContainer($container);
 
-        $response = $controller->renderForm('foo', ['bar' => $form]);
+        $content = $controller->renderView('foo', ['bar' => $form]);
 
-        $this->assertTrue($response->isSuccessful());
-        $this->assertSame('bar', $response->getContent());
+        $this->assertSame('bar', $content);
     }
 
-    public function testRenderFormSubmittedAndInvalid()
+    public function testRenderWithFormSubmittedAndInvalid()
     {
         $formView = new FormView();
 
@@ -489,7 +466,7 @@ class AbstractControllerTest extends TestCase
         $controller = $this->createController();
         $controller->setContainer($container);
 
-        $response = $controller->renderForm('foo', ['bar' => $form]);
+        $response = $controller->render('foo', ['bar' => $form]);
 
         $this->assertSame(422, $response->getStatusCode());
         $this->assertSame('bar', $response->getContent());
@@ -540,7 +517,6 @@ class AbstractControllerTest extends TestCase
         $requestStack->push($request);
 
         $container = new Container();
-        $container->set('session', $session);
         $container->set('request_stack', $requestStack);
 
         $controller = $this->createController();
@@ -638,22 +614,6 @@ class AbstractControllerTest extends TestCase
         $this->assertEquals($formBuilder, $controller->createFormBuilder('foo'));
     }
 
-    /**
-     * @group legacy
-     */
-    public function testGetDoctrine()
-    {
-        $doctrine = $this->createMock(ManagerRegistry::class);
-
-        $container = new Container();
-        $container->set('doctrine', $doctrine);
-
-        $controller = $this->createController();
-        $controller->setContainer($container);
-
-        $this->assertEquals($doctrine, $controller->getDoctrine());
-    }
-
     public function testAddLink()
     {
         $request = new Request();
@@ -667,5 +627,21 @@ class AbstractControllerTest extends TestCase
         $links = $request->attributes->get('_links')->getLinks();
         $this->assertContains($link1, $links);
         $this->assertContains($link2, $links);
+    }
+
+    public function testSendEarlyHints()
+    {
+        $container = new Container();
+        $container->set('web_link.http_header_serializer', new HttpHeaderSerializer());
+
+        $controller = $this->createController();
+        $controller->setContainer($container);
+
+        $response = $controller->sendEarlyHints([
+            (new Link(href: '/style.css'))->withAttribute('as', 'stylesheet'),
+            (new Link(href: '/script.js'))->withAttribute('as', 'script'),
+        ]);
+
+        $this->assertSame('</style.css>; rel="preload"; as="stylesheet",</script.js>; rel="preload"; as="script"', $response->headers->get('Link'));
     }
 }

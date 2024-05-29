@@ -20,12 +20,6 @@ use Psr\Container\NotFoundExceptionInterface;
  */
 class ParameterNotFoundException extends InvalidArgumentException implements NotFoundExceptionInterface
 {
-    private $key;
-    private $sourceId;
-    private $sourceKey;
-    private $alternatives;
-    private $nonNestedAlternative;
-
     /**
      * @param string          $key                  The requested parameter key
      * @param string|null     $sourceId             The service id that references the non-existent parameter
@@ -34,25 +28,30 @@ class ParameterNotFoundException extends InvalidArgumentException implements Not
      * @param string[]        $alternatives         Some parameter name alternatives
      * @param string|null     $nonNestedAlternative The alternative parameter name when the user expected dot notation for nested parameters
      */
-    public function __construct(string $key, ?string $sourceId = null, ?string $sourceKey = null, ?\Throwable $previous = null, array $alternatives = [], ?string $nonNestedAlternative = null)
-    {
-        $this->key = $key;
-        $this->sourceId = $sourceId;
-        $this->sourceKey = $sourceKey;
-        $this->alternatives = $alternatives;
-        $this->nonNestedAlternative = $nonNestedAlternative;
-
+    public function __construct(
+        private string $key,
+        private ?string $sourceId = null,
+        private ?string $sourceKey = null,
+        ?\Throwable $previous = null,
+        private array $alternatives = [],
+        private ?string $nonNestedAlternative = null,
+        private ?string $sourceExtensionName = null,
+    ) {
         parent::__construct('', 0, $previous);
 
         $this->updateRepr();
     }
 
-    public function updateRepr()
+    public function updateRepr(): void
     {
         if (null !== $this->sourceId) {
             $this->message = sprintf('The service "%s" has a dependency on a non-existent parameter "%s".', $this->sourceId, $this->key);
         } elseif (null !== $this->sourceKey) {
             $this->message = sprintf('The parameter "%s" has a dependency on a non-existent parameter "%s".', $this->sourceKey, $this->key);
+        } elseif (null !== $this->sourceExtensionName) {
+            $this->message = sprintf('You have requested a non-existent parameter "%s" while loading extension "%s".', $this->key, $this->sourceExtensionName);
+        } elseif ('.' === ($this->key[0] ?? '')) {
+            $this->message = sprintf('Parameter "%s" not found. It was probably deleted during the compilation of the container.', $this->key);
         } else {
             $this->message = sprintf('You have requested a non-existent parameter "%s".', $this->key);
         }
@@ -69,31 +68,38 @@ class ParameterNotFoundException extends InvalidArgumentException implements Not
         }
     }
 
-    public function getKey()
+    public function getKey(): string
     {
         return $this->key;
     }
 
-    public function getSourceId()
+    public function getSourceId(): ?string
     {
         return $this->sourceId;
     }
 
-    public function getSourceKey()
+    public function getSourceKey(): ?string
     {
         return $this->sourceKey;
     }
 
-    public function setSourceId(?string $sourceId)
+    public function setSourceId(?string $sourceId): void
     {
         $this->sourceId = $sourceId;
 
         $this->updateRepr();
     }
 
-    public function setSourceKey(?string $sourceKey)
+    public function setSourceKey(?string $sourceKey): void
     {
         $this->sourceKey = $sourceKey;
+
+        $this->updateRepr();
+    }
+
+    public function setSourceExtensionName(?string $sourceExtensionName): void
+    {
+        $this->sourceExtensionName = $sourceExtensionName;
 
         $this->updateRepr();
     }

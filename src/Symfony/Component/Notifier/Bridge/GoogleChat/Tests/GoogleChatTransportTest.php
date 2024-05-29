@@ -22,16 +22,12 @@ use Symfony\Component\Notifier\Message\SmsMessage;
 use Symfony\Component\Notifier\Notification\Notification;
 use Symfony\Component\Notifier\Test\TransportTestCase;
 use Symfony\Component\Notifier\Tests\Transport\DummyMessage;
-use Symfony\Component\Notifier\Transport\TransportInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 
 final class GoogleChatTransportTest extends TransportTestCase
 {
-    /**
-     * @return GoogleChatTransport
-     */
-    public static function createTransport(?HttpClientInterface $client = null, ?string $threadKey = null): TransportInterface
+    public static function createTransport(?HttpClientInterface $client = null, ?string $threadKey = null): GoogleChatTransport
     {
         return new GoogleChatTransport('My-Space', 'theAccessKey', 'theAccessToken=', $threadKey, $client ?? new MockHttpClient());
     }
@@ -67,9 +63,7 @@ final class GoogleChatTransportTest extends TransportTestCase
             ->method('getContent')
             ->willReturn('[]');
 
-        $client = new MockHttpClient(function () use ($response): ResponseInterface {
-            return $response;
-        });
+        $client = new MockHttpClient(fn (): ResponseInterface => $response);
 
         $transport = self::createTransport($client);
 
@@ -91,9 +85,7 @@ final class GoogleChatTransportTest extends TransportTestCase
             ->method('getContent')
             ->willReturn('{"error":{"code":400,"message":"API key not valid. Please pass a valid API key.","status":"INVALID_ARGUMENT"}}');
 
-        $client = new MockHttpClient(function () use ($response): ResponseInterface {
-            return $response;
-        });
+        $client = new MockHttpClient(fn (): ResponseInterface => $response);
 
         $transport = self::createTransport($client);
 
@@ -170,9 +162,7 @@ final class GoogleChatTransportTest extends TransportTestCase
         $this->expectException(LogicException::class);
         $this->expectExceptionMessage('The "'.GoogleChatTransport::class.'" transport only supports instances of "'.GoogleChatOptions::class.'" for options.');
 
-        $client = new MockHttpClient(function (string $method, string $url, array $options = []): ResponseInterface {
-            return $this->createMock(ResponseInterface::class);
-        });
+        $client = new MockHttpClient(fn (string $method, string $url, array $options = []): ResponseInterface => $this->createMock(ResponseInterface::class));
 
         $transport = self::createTransport($client);
 

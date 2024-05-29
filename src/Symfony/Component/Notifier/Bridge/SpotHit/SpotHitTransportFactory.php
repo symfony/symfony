@@ -14,17 +14,13 @@ namespace Symfony\Component\Notifier\Bridge\SpotHit;
 use Symfony\Component\Notifier\Exception\UnsupportedSchemeException;
 use Symfony\Component\Notifier\Transport\AbstractTransportFactory;
 use Symfony\Component\Notifier\Transport\Dsn;
-use Symfony\Component\Notifier\Transport\TransportInterface;
 
 /**
  * @author James Hemery <james@yieldstudio.fr>
  */
 final class SpotHitTransportFactory extends AbstractTransportFactory
 {
-    /**
-     * @return SpotHitTransport
-     */
-    public function create(Dsn $dsn): TransportInterface
+    public function create(Dsn $dsn): SpotHitTransport
     {
         $scheme = $dsn->getScheme();
 
@@ -34,10 +30,12 @@ final class SpotHitTransportFactory extends AbstractTransportFactory
 
         $token = $this->getUser($dsn);
         $from = $dsn->getOption('from');
+        $smsLong = $dsn->getOption('smslong');
+        $smsLongNBr = $dsn->getOption('smslongnbr');
         $host = 'default' === $dsn->getHost() ? null : $dsn->getHost();
         $port = $dsn->getPort();
 
-        return (new SpotHitTransport($token, $from, $this->client, $this->dispatcher))->setHost($host)->setPort($port);
+        return (new SpotHitTransport($token, $from, $this->client, $this->dispatcher))->setHost($host)->setPort($port)->setSmsLong($smsLong)->setLongNBr($smsLongNBr);
     }
 
     protected function getSupportedSchemes(): array

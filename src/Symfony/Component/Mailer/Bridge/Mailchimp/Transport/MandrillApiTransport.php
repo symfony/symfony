@@ -32,12 +32,12 @@ class MandrillApiTransport extends AbstractApiTransport
 {
     private const HOST = 'mandrillapp.com';
 
-    private $key;
-
-    public function __construct(string $key, ?HttpClientInterface $client = null, ?EventDispatcherInterface $dispatcher = null, ?LoggerInterface $logger = null)
-    {
-        $this->key = $key;
-
+    public function __construct(
+        #[\SensitiveParameter] private string $key,
+        ?HttpClientInterface $client = null,
+        ?EventDispatcherInterface $dispatcher = null,
+        ?LoggerInterface $logger = null,
+    ) {
         parent::__construct($client, $dispatcher, $logger);
     }
 
@@ -55,7 +55,7 @@ class MandrillApiTransport extends AbstractApiTransport
         try {
             $statusCode = $response->getStatusCode();
             $result = $response->toArray(false);
-        } catch (DecodingExceptionInterface $e) {
+        } catch (DecodingExceptionInterface) {
             throw new HttpTransportException('Unable to send an email: '.$response->getContent(false).sprintf(' (code %d).', $statusCode), $response);
         } catch (TransportExceptionInterface $e) {
             throw new HttpTransportException('Could not reach the remote Mandrill server.', $response, 0, $e);
@@ -89,7 +89,7 @@ class MandrillApiTransport extends AbstractApiTransport
                 'text' => $email->getTextBody(),
                 'subject' => $email->getSubject(),
                 'from_email' => $envelope->getSender()->getAddress(),
-                'to' => $this->getRecipients($email, $envelope),
+                'to' => $this->getRecipientsPayload($email, $envelope),
             ],
         ];
 
@@ -144,7 +144,7 @@ class MandrillApiTransport extends AbstractApiTransport
         return $payload;
     }
 
-    protected function getRecipients(Email $email, Envelope $envelope): array
+    private function getRecipientsPayload(Email $email, Envelope $envelope): array
     {
         $recipients = [];
         foreach ($envelope->getRecipients() as $recipient) {

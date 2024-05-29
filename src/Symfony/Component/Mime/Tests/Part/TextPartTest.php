@@ -15,6 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Mime\Header\Headers;
 use Symfony\Component\Mime\Header\ParameterizedHeader;
 use Symfony\Component\Mime\Header\UnstructuredHeader;
+use Symfony\Component\Mime\Part\File;
 use Symfony\Component\Mime\Part\TextPart;
 
 class TextPartTest extends TestCase
@@ -44,6 +45,14 @@ class TextPartTest extends TestCase
         $this->assertEquals('content', $p->bodyToString());
         $this->assertEquals('content', implode('', iterator_to_array($p->bodyToIterable())));
         fclose($f);
+    }
+
+    public function testConstructorWithFile()
+    {
+        $p = new TextPart(new File(\dirname(__DIR__).'/Fixtures/content.txt'));
+        $this->assertSame('content', $p->getBody());
+        $this->assertSame('content', $p->bodyToString());
+        $this->assertSame('content', implode('', iterator_to_array($p->bodyToIterable())));
     }
 
     public function testConstructorWithNonStringOrResource()

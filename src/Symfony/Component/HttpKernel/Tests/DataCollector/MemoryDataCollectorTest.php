@@ -33,7 +33,6 @@ class MemoryDataCollectorTest extends TestCase
     {
         $collector = new MemoryDataCollector();
         $method = new \ReflectionMethod($collector, 'convertToBytes');
-        $method->setAccessible(true);
         $this->assertEquals($bytes, $method->invoke($collector, $limit));
     }
 

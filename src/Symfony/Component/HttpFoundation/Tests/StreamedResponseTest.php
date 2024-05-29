@@ -101,17 +101,6 @@ class StreamedResponseTest extends TestCase
         $this->assertFalse($response->getContent());
     }
 
-    /**
-     * @group legacy
-     */
-    public function testCreate()
-    {
-        $response = StreamedResponse::create(function () {}, 204);
-
-        $this->assertInstanceOf(StreamedResponse::class, $response);
-        $this->assertEquals(204, $response->getStatusCode());
-    }
-
     public function testReturnThis()
     {
         $response = new StreamedResponse(function () {});
@@ -134,5 +123,16 @@ class StreamedResponseTest extends TestCase
         $modified->sendContent();
         $string = ob_get_clean();
         $this->assertEmpty($string);
+    }
+
+    public function testSendInformationalResponse()
+    {
+        $response = new StreamedResponse();
+        $response->sendHeaders(103);
+
+        // Informational responses must not override the main status code
+        $this->assertSame(200, $response->getStatusCode());
+
+        $response->sendHeaders();
     }
 }

@@ -12,6 +12,7 @@
 namespace Symfony\Component\Messenger\Command;
 
 use Psr\Container\ContainerInterface;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Completion\CompletionInput;
 use Symfony\Component\Console\Completion\CompletionSuggestions;
@@ -24,27 +25,20 @@ use Symfony\Component\Messenger\Transport\SetupableTransportInterface;
 /**
  * @author Vincent Touzet <vincent.touzet@gmail.com>
  */
+#[AsCommand(name: 'messenger:setup-transports', description: 'Prepare the required infrastructure for the transport')]
 class SetupTransportsCommand extends Command
 {
-    protected static $defaultName = 'messenger:setup-transports';
-    protected static $defaultDescription = 'Prepare the required infrastructure for the transport';
-
-    private $transportLocator;
-    private $transportNames;
-
-    public function __construct(ContainerInterface $transportLocator, array $transportNames = [])
-    {
-        $this->transportLocator = $transportLocator;
-        $this->transportNames = $transportNames;
-
+    public function __construct(
+        private ContainerInterface $transportLocator,
+        private array $transportNames = [],
+    ) {
         parent::__construct();
     }
 
-    protected function configure()
+    protected function configure(): void
     {
         $this
             ->addArgument('transport', InputArgument::OPTIONAL, 'Name of the transport to setup', null)
-            ->setDescription(self::$defaultDescription)
             ->setHelp(<<<EOF
 The <info>%command.name%</info> command setups the transports:
 
@@ -58,7 +52,7 @@ EOF
         ;
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);
 
@@ -73,11 +67,16 @@ EOF
 
         foreach ($transportNames as $id => $transportName) {
             $transport = $this->transportLocator->get($transportName);
-            if ($transport instanceof SetupableTransportInterface) {
+            if (!$transport instanceof SetupableTransportInterface) {
+                $io->note(sprintf('The "%s" transport does not support setup.', $transportName));
+                continue;
+            }
+
+            try {
                 $transport->setup();
                 $io->success(sprintf('The "%s" transport was set up successfully.', $transportName));
-            } else {
-                $io->note(sprintf('The "%s" transport does not support setup.', $transportName));
+            } catch (\Exception $e) {
+                throw new \RuntimeException(sprintf('An error occurred while setting up the "%s" transport: ', $transportName).$e->getMessage(), 0, $e);
             }
         }
 

@@ -37,13 +37,6 @@ use Symfony\Component\Routing\RequestContext;
 
 class RouterListenerTest extends TestCase
 {
-    private $requestStack;
-
-    protected function setUp(): void
-    {
-        $this->requestStack = $this->createMock(RequestStack::class);
-    }
-
     /**
      * @dataProvider getPortData
      */
@@ -58,7 +51,7 @@ class RouterListenerTest extends TestCase
             ->method('getContext')
             ->willReturn($context);
 
-        $listener = new RouterListener($urlMatcher, $this->requestStack);
+        $listener = new RouterListener($urlMatcher, new RequestStack());
         $event = $this->createRequestEventForUri($uri);
         $listener->onKernelRequest($event);
 
@@ -86,12 +79,6 @@ class RouterListenerTest extends TestCase
         return new RequestEvent($kernel, $request, HttpKernelInterface::MAIN_REQUEST);
     }
 
-    public function testInvalidMatcher()
-    {
-        $this->expectException(\InvalidArgumentException::class);
-        new RouterListener(new \stdClass(), $this->requestStack);
-    }
-
     public function testRequestMatcher()
     {
         $kernel = $this->createMock(HttpKernelInterface::class);
@@ -104,7 +91,7 @@ class RouterListenerTest extends TestCase
                        ->with($this->isInstanceOf(Request::class))
                        ->willReturn([]);
 
-        $listener = new RouterListener($requestMatcher, $this->requestStack, new RequestContext());
+        $listener = new RouterListener($requestMatcher, new RequestStack(), new RequestContext());
         $listener->onKernelRequest($event);
     }
 
@@ -122,7 +109,7 @@ class RouterListenerTest extends TestCase
 
         $context = new RequestContext();
 
-        $listener = new RouterListener($requestMatcher, $this->requestStack, new RequestContext());
+        $listener = new RouterListener($requestMatcher, new RequestStack(), new RequestContext());
         $listener->onKernelRequest($event);
 
         // sub-request with another HTTP method
@@ -153,7 +140,7 @@ class RouterListenerTest extends TestCase
         $kernel = $this->createMock(HttpKernelInterface::class);
         $request = Request::create('http://localhost/');
 
-        $listener = new RouterListener($requestMatcher, $this->requestStack, new RequestContext(), $logger);
+        $listener = new RouterListener($requestMatcher, new RequestStack(), new RequestContext(), $logger);
         $listener->onKernelRequest(new RequestEvent($kernel, $request, HttpKernelInterface::MAIN_REQUEST));
     }
 
@@ -175,9 +162,7 @@ class RouterListenerTest extends TestCase
         $dispatcher = new EventDispatcher();
         $dispatcher->addSubscriber(new ValidateRequestListener());
         $dispatcher->addSubscriber(new RouterListener($requestMatcher, $requestStack, new RequestContext()));
-        $dispatcher->addSubscriber(new ErrorListener(function () {
-            return new Response('Exception handled', 400);
-        }));
+        $dispatcher->addSubscriber(new ErrorListener(fn () => new Response('Exception handled', 400)));
 
         $kernel = new HttpKernel($dispatcher, new ControllerResolver(), $requestStack, new ArgumentResolver());
 
@@ -193,7 +178,7 @@ class RouterListenerTest extends TestCase
 
         $requestMatcher = $this->createMock(RequestMatcherInterface::class);
         $requestMatcher
-            ->expects($this->once())
+            ->expects($this->exactly(2))
             ->method('matchRequest')
             ->willThrowException(new NoConfigurationException())
         ;
@@ -204,6 +189,11 @@ class RouterListenerTest extends TestCase
         $kernel = new HttpKernel($dispatcher, new ControllerResolver(), $requestStack, new ArgumentResolver());
 
         $request = Request::create('http://localhost/');
+
+        $response = $kernel->handle($request);
+        $this->assertSame(404, $response->getStatusCode());
+        $this->assertStringContainsString('Welcome', $response->getContent());
+
         $response = $kernel->handle($request);
         $this->assertSame(404, $response->getStatusCode());
         $this->assertStringContainsString('Welcome', $response->getContent());
@@ -218,7 +208,7 @@ class RouterListenerTest extends TestCase
 
         $requestMatcher = $this->createMock(RequestMatcherInterface::class);
 
-        $listener = new RouterListener($requestMatcher, $this->requestStack, new RequestContext());
+        $listener = new RouterListener($requestMatcher, new RequestStack(), new RequestContext());
         $listener->onKernelRequest($event);
     }
 
@@ -245,7 +235,7 @@ class RouterListenerTest extends TestCase
 
         $event = new RequestEvent($kernel, $request, HttpKernelInterface::MAIN_REQUEST);
 
-        $listener = new RouterListener($urlMatcher, $this->requestStack);
+        $listener = new RouterListener($urlMatcher, new RequestStack());
         $listener->onKernelRequest($event);
     }
 
@@ -271,7 +261,67 @@ class RouterListenerTest extends TestCase
 
         $event = new RequestEvent($kernel, $request, HttpKernelInterface::MAIN_REQUEST);
 
-        $listener = new RouterListener($urlMatcher, $this->requestStack);
+        $listener = new RouterListener($urlMatcher, new RequestStack());
         $listener->onKernelRequest($event);
+    }
+
+    /**
+     * @dataProvider provideRouteMapping
+     */
+    public function testRouteMapping(array $expected, array $parameters)
+    {
+        $kernel = $this->createMock(HttpKernelInterface::class);
+        $request = Request::create('http://localhost/');
+        $event = new RequestEvent($kernel, $request, HttpKernelInterface::MAIN_REQUEST);
+
+        $requestMatcher = $this->createMock(RequestMatcherInterface::class);
+        $requestMatcher->expects($this->any())
+                       ->method('matchRequest')
+                       ->with($this->isInstanceOf(Request::class))
+                       ->willReturn($parameters);
+
+        $listener = new RouterListener($requestMatcher, new RequestStack(), new RequestContext());
+        $listener->onKernelRequest($event);
+
+        $expected['_route_mapping'] = $parameters['_route_mapping'];
+        unset($parameters['_route_mapping']);
+        $expected['_route_params'] = $parameters;
+
+        $this->assertEquals($expected, $request->attributes->all());
+    }
+
+    public static function provideRouteMapping(): iterable
+    {
+        yield [
+            [
+                'conference' => 'vienna-2024',
+            ],
+            [
+                'slug' => 'vienna-2024',
+                '_route_mapping' => [
+                    'slug' => 'conference',
+                ],
+            ],
+        ];
+
+        yield [
+            [
+                'article' => [
+                    'id' => 'abc123',
+                    'date' => '2024-04-24',
+                    'slug' => 'symfony-rocks',
+                ],
+            ],
+            [
+                'id' => 'abc123',
+                'date' => '2024-04-24',
+                'slug' => 'symfony-rocks',
+                '_route_mapping' => [
+                    'id' => 'article',
+                    'date' => 'article',
+                    'slug' => 'article',
+                ],
+            ],
+        ];
     }
 }

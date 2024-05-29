@@ -21,10 +21,7 @@ use Symfony\Component\Intl\Exception\RuntimeException;
  */
 class JsonBundleReaderTest extends TestCase
 {
-    /**
-     * @var JsonBundleReader
-     */
-    private $reader;
+    private JsonBundleReader $reader;
 
     protected function setUp(): void
     {

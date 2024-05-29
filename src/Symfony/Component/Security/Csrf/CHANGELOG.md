@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+6.0
+---
+
+ * Remove the `SessionInterface $session` constructor argument of `SessionTokenStorage`, inject a `\Symfony\Component\HttpFoundation\RequestStack $requestStack` instead
+ * Using `SessionTokenStorage` outside a request context throws a `SessionNotFoundException`
+
 5.3
 ---
 

@@ -22,7 +22,7 @@ use Symfony\Component\Intl\Exception\RuntimeException;
  */
 class GenrbCompiler implements BundleCompilerInterface
 {
-    private $genrb;
+    private string $genrb;
 
     /**
      * Creates a new compiler based on the "genrb" executable.
@@ -43,10 +43,7 @@ class GenrbCompiler implements BundleCompilerInterface
         $this->genrb = ($envVars ? $envVars.' ' : '').$genrb;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function compile(string $sourcePath, string $targetDir)
+    public function compile(string $sourcePath, string $targetDir): void
     {
         if (is_dir($sourcePath)) {
             $sourcePath .= '/*.txt';

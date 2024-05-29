@@ -11,38 +11,42 @@
 
 namespace Symfony\Component\Serializer\NameConverter;
 
+use Symfony\Component\Serializer\Exception\LogicException;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 
 /**
  * @author Fabien Bourigault <bourigaultfabien@gmail.com>
  */
-final class MetadataAwareNameConverter implements AdvancedNameConverterInterface
+final class MetadataAwareNameConverter implements NameConverterInterface
 {
-    private $metadataFactory;
+    /**
+     * @var array<string, array<string, string|null>>
+     */
+    private static array $normalizeCache = [];
 
     /**
-     * @var NameConverterInterface|AdvancedNameConverterInterface|null
+     * @var array<string, array<string, string|null>>
      */
-    private $fallbackNameConverter;
+    private static array $denormalizeCache = [];
 
-    private static $normalizeCache = [];
+    /**
+     * @var array<string, array<string, string>>
+     */
+    private static array $attributesMetadataCache = [];
 
-    private static $denormalizeCache = [];
-
-    private static $attributesMetadataCache = [];
-
-    public function __construct(ClassMetadataFactoryInterface $metadataFactory, ?NameConverterInterface $fallbackNameConverter = null)
-    {
-        $this->metadataFactory = $metadataFactory;
-        $this->fallbackNameConverter = $fallbackNameConverter;
+    public function __construct(
+        private readonly ClassMetadataFactoryInterface $metadataFactory,
+        private readonly ?NameConverterInterface $fallbackNameConverter = null,
+    ) {
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function normalize(string $propertyName, ?string $class = null, ?string $format = null, array $context = []): string
     {
+        $class = 1 < \func_num_args() ? func_get_arg(1) : null;
+        $format = 2 < \func_num_args() ? func_get_arg(2) : null;
+        $context = 3 < \func_num_args() ? func_get_arg(3) : [];
+
         if (null === $class) {
             return $this->normalizeFallback($propertyName, $class, $format, $context);
         }
@@ -54,11 +58,12 @@ final class MetadataAwareNameConverter implements AdvancedNameConverterInterface
         return self::$normalizeCache[$class][$propertyName] ?? $this->normalizeFallback($propertyName, $class, $format, $context);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function denormalize(string $propertyName, ?string $class = null, ?string $format = null, array $context = []): string
     {
+        $class = 1 < \func_num_args() ? func_get_arg(1) : null;
+        $format = 2 < \func_num_args() ? func_get_arg(2) : null;
+        $context = 3 < \func_num_args() ? func_get_arg(3) : [];
+
         if (null === $class) {
             return $this->denormalizeFallback($propertyName, $class, $format, $context);
         }
@@ -80,6 +85,10 @@ final class MetadataAwareNameConverter implements AdvancedNameConverterInterface
         $attributesMetadata = $this->metadataFactory->getMetadataFor($class)->getAttributesMetadata();
         if (!\array_key_exists($propertyName, $attributesMetadata)) {
             return null;
+        }
+
+        if (null !== $attributesMetadata[$propertyName]->getSerializedName() && null !== $attributesMetadata[$propertyName]->getSerializedPath()) {
+            throw new LogicException(sprintf('Found SerializedName and SerializedPath attributes on property "%s" of class "%s".', $propertyName, $class));
         }
 
         return $attributesMetadata[$propertyName]->getSerializedName() ?? null;
@@ -105,6 +114,9 @@ final class MetadataAwareNameConverter implements AdvancedNameConverterInterface
         return $this->fallbackNameConverter ? $this->fallbackNameConverter->denormalize($propertyName, $class, $format, $context) : $propertyName;
     }
 
+    /**
+     * @return array<string, string>
+     */
     private function getCacheValueForAttributesMetadata(string $class, array $context): array
     {
         if (!$this->metadataFactory->hasMetadataFor($class)) {
@@ -119,11 +131,21 @@ final class MetadataAwareNameConverter implements AdvancedNameConverterInterface
                 continue;
             }
 
-            $groups = $metadata->getGroups();
-            if (!$groups && ($context[AbstractNormalizer::GROUPS] ?? [])) {
+            if (null !== $metadata->getSerializedName() && null !== $metadata->getSerializedPath()) {
+                throw new LogicException(sprintf('Found SerializedName and SerializedPath attributes on property "%s" of class "%s".', $name, $class));
+            }
+
+            $metadataGroups = $metadata->getGroups();
+
+            $contextGroups = (array) ($context[AbstractNormalizer::GROUPS] ?? []);
+            $contextGroupsHasBeenDefined = [] !== $contextGroups;
+            $contextGroups = array_merge($contextGroups, ['Default', (false !== $nsSep = strrpos($class, '\\')) ? substr($class, $nsSep + 1) : $class]);
+
+            if ($contextGroupsHasBeenDefined && !$metadataGroups) {
                 continue;
             }
-            if ($groups && !array_intersect($groups, (array) ($context[AbstractNormalizer::GROUPS] ?? []))) {
+
+            if ($metadataGroups && !array_intersect(array_merge($metadataGroups, ['*']), $contextGroups)) {
                 continue;
             }
 
@@ -139,6 +161,6 @@ final class MetadataAwareNameConverter implements AdvancedNameConverterInterface
             return $class.'-'.$context['cache_key'];
         }
 
-        return $class.md5(serialize($context[AbstractNormalizer::GROUPS] ?? []));
+        return $class.hash('xxh128', serialize($context[AbstractNormalizer::GROUPS] ?? []));
     }
 }

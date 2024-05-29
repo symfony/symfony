@@ -29,15 +29,11 @@ class Specificity
     public const B_FACTOR = 10;
     public const C_FACTOR = 1;
 
-    private $a;
-    private $b;
-    private $c;
-
-    public function __construct(int $a, int $b, int $c)
-    {
-        $this->a = $a;
-        $this->b = $b;
-        $this->c = $c;
+    public function __construct(
+        private int $a,
+        private int $b,
+        private int $c,
+    ) {
     }
 
     public function plus(self $specificity): self

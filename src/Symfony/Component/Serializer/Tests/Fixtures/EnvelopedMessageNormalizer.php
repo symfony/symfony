@@ -18,14 +18,21 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
  */
 class EnvelopedMessageNormalizer implements NormalizerInterface
 {
-    public function normalize($message, string $format = null, array $context = []): array
+    public function normalize($message, ?string $format = null, array $context = []): array
     {
         return [
             'text' => $message->text,
         ];
     }
 
-    public function supportsNormalization($data, string $format = null, array $context = []): bool
+    public function getSupportedTypes(?string $format): array
+    {
+        return [
+            EnvelopedMessage::class => true,
+        ];
+    }
+
+    public function supportsNormalization($data, ?string $format = null, array $context = []): bool
     {
         return $data instanceof EnvelopedMessage;
     }

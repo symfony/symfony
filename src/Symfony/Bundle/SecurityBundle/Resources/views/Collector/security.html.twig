@@ -2,11 +2,58 @@
 
 {% block page_title 'Security' %}
 
+{% block head %}
+    {{ parent() }}
+
+    <style>
+        #collector-content .decision-log .voter_result td {
+            border-top-width: 1px;
+            border-bottom-width: 0;
+            padding-bottom: 0;
+        }
+
+        #collector-content .decision-log .voter_details td {
+            border-top-width: 0;
+            border-bottom-width: 1px;
+            padding-bottom: 0;
+        }
+
+        #collector-content .decision-log .voter_details table {
+            border: 0;
+            margin: 0;
+            box-shadow: unset;
+        }
+
+        #collector-content .decision-log .voter_details table td {
+            border: 0;
+            padding: 0 0 8px 0;
+        }
+
+        #collector-content .authenticators .badge {
+            color: var(--white);
+            display: inline-block;
+            text-align: center;
+        }
+        #collector-content .authenticators .badge.badge-resolved {
+            background-color: var(--green-500);
+        }
+        #collector-content .authenticators .badge.badge-not_resolved {
+            background-color: var(--yellow-500);
+        }
+
+        #collector-content .authenticators svg[data-icon-name="icon-tabler-check"] {
+            color: var(--green-500);
+        }
+        #collector-content .authenticators svg[data-icon-name="icon-tabler-x"] {
+            color: var(--red-500);
+        }
+    </style>
+{% endblock %}
+
 {% block toolbar %}
     {% if collector.firewall %}
-        {% set color_code = collector.enabled and not collector.authenticatorManagerEnabled ? 'yellow' %}
         {% set icon %}
-            {{ include('@Security/Collector/icon.svg') }}
+            {{ source('@Security/Collector/icon.svg') }}
             <span class="sf-toolbar-value">{{ collector.user|default('n/a') }}</span>
         {% endset %}
 
@@ -47,6 +94,26 @@
                             </span>
                         </div>
 
+                        {% if collector.supportsRoleHierarchy %}
+                            <div class="sf-toolbar-info-piece">
+                                <b>Inherited Roles</b>
+                                <span>
+                                    {% if collector.inheritedRoles is empty %}
+                                        none
+                                    {% else %}
+                                        {% set remainingRoles = collector.inheritedRoles|slice(1) %}
+                                        {{ collector.inheritedRoles|first }}
+                                        {% if remainingRoles is not empty %}
+                                            +
+                                            <abbr title="{{ remainingRoles|join(', ') }}">
+                                                {{ remainingRoles|length }} more
+                                            </abbr>
+                                        {% endif %}
+                                    {% endif %}
+                                </span>
+                            </div>
+                        {% endif %}
+
                         <div class="sf-toolbar-info-piece">
                             <b>Token class</b>
                             <span>{{ collector.tokenClass|abbr_class }}</span>
@@ -84,13 +151,13 @@
             </div>
         {% endset %}
 
-        {{ include('@WebProfiler/Profiler/toolbar_item.html.twig', { link: profiler_url, status: color_code }) }}
+        {{ include('@WebProfiler/Profiler/toolbar_item.html.twig', { link: profiler_url }) }}
     {% endif %}
 {% endblock %}
 
 {% block menu %}
     <span class="label {{ not collector.firewall or not collector.token ? 'disabled' }}">
-        <span class="icon">{{ include('@Security/Collector/icon.svg') }}</span>
+        <span class="icon">{{ source('@Security/Collector/icon.svg') }}</span>
         <strong>Security</strong>
     </span>
 {% endblock %}
@@ -106,12 +173,12 @@
                     {% if collector.token %}
                         <div class="metrics">
                             <div class="metric">
-                                <span class="value">{{ collector.user == 'anon.' ? 'Anonymous' : collector.user }}</span>
+                                <span class="value">{{ collector.user }}</span>
                                 <span class="label">Username</span>
                             </div>
 
                             <div class="metric">
-                                <span class="value">{{ include('@WebProfiler/Icon/' ~ (collector.authenticated ? 'yes' : 'no') ~ '.svg') }}</span>
+                                <span class="value">{{ source('@WebProfiler/Icon/' ~ (collector.authenticated ? 'yes' : 'no') ~ '.svg') }}</span>
                                 <span class="label">Authenticated</span>
                             </div>
                         </div>
@@ -158,7 +225,7 @@
                 </div>
             </div>
 
-            <div class="tab {{ collector.firewall.security_enabled is empty ? 'disabled' }}">
+            <div class="tab {{ (not collector.firewall or collector.firewall.security_enabled is empty) ? 'disabled' }}">
                 <h3 class="tab-title">Firewall</h3>
                 <div class="tab-content">
                     {% if collector.firewall %}
@@ -168,19 +235,13 @@
                                 <span class="label">Name</span>
                             </div>
                             <div class="metric">
-                                <span class="value">{{ include('@WebProfiler/Icon/' ~ (collector.firewall.security_enabled ? 'yes' : 'no') ~ '.svg') }}</span>
+                                <span class="value">{{ source('@WebProfiler/Icon/' ~ (collector.firewall.security_enabled ? 'yes' : 'no') ~ '.svg') }}</span>
                                 <span class="label">Security enabled</span>
                             </div>
                             <div class="metric">
-                                <span class="value">{{ include('@WebProfiler/Icon/' ~ (collector.firewall.stateless ? 'yes' : 'no') ~ '.svg') }}</span>
+                                <span class="value">{{ source('@WebProfiler/Icon/' ~ (collector.firewall.stateless ? 'yes' : 'no') ~ '.svg') }}</span>
                                 <span class="label">Stateless</span>
                             </div>
-                            {% if collector.authenticatorManagerEnabled == false %}
-                                <div class="metric">
-                                    <span class="value">{{ include('@WebProfiler/Icon/' ~ (collector.firewall.allows_anonymous ? 'yes' : 'no') ~ '.svg') }}</span>
-                                    <span class="label">Allows anonymous</span>
-                                </div>
-                            {% endif %}
                         </div>
 
                         {% if collector.firewall.security_enabled %}
@@ -217,17 +278,10 @@
                                         <th>access_denied_url</th>
                                         <td>{{ collector.firewall.access_denied_url ?: '(none)' }}</td>
                                     </tr>
-                                    {% if collector.authenticatorManagerEnabled %}
-                                        <tr>
-                                            <th>authenticators</th>
-                                            <td>{{ collector.firewall.authenticators is empty ? '(none)' : profiler_dump(collector.firewall.authenticators, maxDepth=1) }}</td>
-                                        </tr>
-                                    {% else %}
-                                        <tr>
-                                            <th>listeners</th>
-                                            <td>{{ collector.firewall.listeners is empty ? '(none)' : profiler_dump(collector.firewall.listeners, maxDepth=1) }}</td>
-                                        </tr>
-                                    {% endif %}
+                                    <tr>
+                                        <th>authenticators</th>
+                                        <td>{{ collector.firewall.authenticators is empty ? '(none)' : profiler_dump(collector.firewall.authenticators, maxDepth=1) }}</td>
+                                    </tr>
                                 </tbody>
                             </table>
                         {% endif %}
@@ -258,7 +312,6 @@
                                     {% if not loop.first %}
                                         </tbody>
                                     {% endif %}
-
                                     <tbody>
                                     {% set previous_event = listener %}
                                 {% endif %}
@@ -282,13 +335,15 @@
                 <h3 class="tab-title">Authenticators</h3>
                 <div class="tab-content">
                     {% if collector.authenticators|default([]) is not empty %}
-                        <table>
+                        <table class="authenticators">
                             <thead>
                             <tr>
                                 <th>Authenticator</th>
                                 <th>Supports</th>
+                                <th>Authenticated</th>
                                 <th>Duration</th>
                                 <th>Passport</th>
+                                <th>Badges</th>
                             </tr>
                             </thead>
 
@@ -305,9 +360,19 @@
 
                                 <tr>
                                     <td class="font-normal">{{ profiler_dump(authenticator.stub) }}</td>
-                                    <td class="no-wrap">{{ include('@WebProfiler/Icon/' ~ (authenticator.supports ? 'yes' : 'no') ~ '.svg') }}</td>
+                                    <td class="no-wrap">{{ source('@WebProfiler/Icon/' ~ (authenticator.supports ? 'yes' : 'no') ~ '.svg') }}</td>
+                                    <td class="no-wrap">{{ authenticator.authenticated is not null ? source('@WebProfiler/Icon/' ~ (authenticator.authenticated ? 'yes' : 'no') ~ '.svg') : '' }}</td>
                                     <td class="no-wrap">{{ '%0.2f'|format(authenticator.duration * 1000) }} ms</td>
                                     <td class="font-normal">{{ authenticator.passport ? profiler_dump(authenticator.passport) : '(none)' }}</td>
+                                    <td class="font-normal">
+                                        {% for badge in authenticator.badges ?? [] %}
+                                            <span class="badge badge-{{ badge.resolved ? 'resolved' : 'not_resolved' }}">
+                                            {{ badge.stub|abbr_class }}
+                                            </span>
+                                        {% else %}
+                                            (none)
+                                        {% endfor %}
+                                    </td>
                                 </tr>
 
                                 {% if loop.last %}

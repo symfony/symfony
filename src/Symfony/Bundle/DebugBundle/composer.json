@@ -16,25 +16,20 @@
         }
     ],
     "require": {
-        "php": ">=7.2.5",
+        "php": ">=8.2",
         "ext-xml": "*",
-        "symfony/http-kernel": "^4.4|^5.0|^6.0",
-        "symfony/polyfill-php80": "^1.16",
-        "symfony/twig-bridge": "^4.4|^5.0|^6.0",
-        "symfony/var-dumper": "^4.4|^5.0|^6.0"
+        "symfony/dependency-injection": "^6.4|^7.0",
+        "symfony/http-kernel": "^6.4|^7.0",
+        "symfony/twig-bridge": "^6.4|^7.0",
+        "symfony/var-dumper": "^6.4|^7.0"
     },
     "require-dev": {
-        "symfony/config": "^4.4|^5.0|^6.0",
-        "symfony/dependency-injection": "^4.4|^5.0|^6.0",
-        "symfony/web-profiler-bundle": "^4.4|^5.0|^6.0"
+        "symfony/config": "^6.4|^7.0",
+        "symfony/web-profiler-bundle": "^6.4|^7.0"
     },
     "conflict": {
-        "symfony/config": "<4.4",
-        "symfony/dependency-injection": "<5.2"
-    },
-    "suggest": {
-        "symfony/config": "For service container configuration",
-        "symfony/dependency-injection": "For using as a service from the container"
+        "symfony/config": "<6.4",
+        "symfony/dependency-injection": "<6.4"
     },
     "autoload": {
         "psr-4": { "Symfony\\Bundle\\DebugBundle\\": "" },

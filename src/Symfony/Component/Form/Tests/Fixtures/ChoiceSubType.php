@@ -20,23 +20,15 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class ChoiceSubType extends AbstractType
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults(['expanded' => true]);
-        $resolver->setNormalizer('choices', function () {
-            return [
-                'attr1' => 'Attribute 1',
-                'attr2' => 'Attribute 2',
-            ];
-        });
+        $resolver->setNormalizer('choices', fn () => [
+            'attr1' => 'Attribute 1',
+            'attr2' => 'Attribute 2',
+        ]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getParent(): ?string
     {
         return ChoiceType::class;

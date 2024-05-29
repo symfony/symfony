@@ -47,13 +47,13 @@ final class AliasDeprecatedPublicServicesPassTest extends TestCase
      */
     public function testProcessWithMissingAttribute(string $attribute, array $attributes)
     {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage(sprintf('The "%s" attribute is mandatory for the "container.private" tag on the "foo" service.', $attribute));
-
         $container = new ContainerBuilder();
         $container
             ->register('foo')
             ->addTag('container.private', $attributes);
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage(sprintf('The "%s" attribute is mandatory for the "container.private" tag on the "foo" service.', $attribute));
 
         (new AliasDeprecatedPublicServicesPass())->process($container);
     }

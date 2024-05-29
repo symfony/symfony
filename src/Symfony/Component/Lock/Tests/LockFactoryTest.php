@@ -35,8 +35,7 @@ class LockFactoryTest extends TestCase
                 $keys[] = $key;
 
                 return true;
-            }))
-            ->willReturn(true);
+            }));
 
         $logger = $this->createMock(LoggerInterface::class);
         $factory = new LockFactory($store);
@@ -65,8 +64,7 @@ class LockFactoryTest extends TestCase
                 $keys[] = $key;
 
                 return true;
-            }))
-            ->willReturn(true);
+            }));
 
         $logger = $this->createMock(LoggerInterface::class);
         $factory = new LockFactory($store);

@@ -167,18 +167,6 @@ class LoggerDataCollectorTest extends TestCase
         }
     }
 
-    public function testReset()
-    {
-        $logger = $this
-            ->getMockBuilder(DebugLoggerInterface::class)
-            ->onlyMethods(['countErrors', 'getLogs', 'clear'])
-            ->getMock();
-        $logger->expects($this->once())->method('clear');
-
-        $c = new LoggerDataCollector($logger);
-        $c->reset();
-    }
-
     public static function getCollectTestData()
     {
         yield 'simple log' => [

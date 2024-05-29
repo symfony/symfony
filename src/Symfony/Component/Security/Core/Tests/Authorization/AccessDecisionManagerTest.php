@@ -13,7 +13,6 @@ namespace Symfony\Component\Security\Core\Tests\Authorization;
 
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\AccessDecisionManager;
 use Symfony\Component\Security\Core\Authorization\Strategy\AccessDecisionStrategyInterface;
@@ -22,57 +21,7 @@ use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 
 class AccessDecisionManagerTest extends TestCase
 {
-    use ExpectDeprecationTrait;
-
-    /**
-     * @group legacy
-     */
-    public function testSetUnsupportedStrategy()
-    {
-        $this->expectException(\InvalidArgumentException::class);
-        new AccessDecisionManager([$this->getVoter(VoterInterface::ACCESS_GRANTED)], 'fooBar');
-    }
-
-    /**
-     * @group legacy
-     *
-     * @dataProvider getStrategyTests
-     */
-    public function testStrategies($strategy, $voters, $allowIfAllAbstainDecisions, $allowIfEqualGrantedDeniedDecisions, $expected)
-    {
-        $token = $this->createMock(TokenInterface::class);
-
-        $this->expectDeprecation('Since symfony/security-core 5.4: Passing the access decision strategy as a string is deprecated, pass an instance of "Symfony\Component\Security\Core\Authorization\Strategy\AccessDecisionStrategyInterface" instead.');
-        $manager = new AccessDecisionManager($voters, $strategy, $allowIfAllAbstainDecisions, $allowIfEqualGrantedDeniedDecisions);
-
-        $this->assertSame($expected, $manager->decide($token, ['ROLE_FOO']));
-    }
-
-    /**
-     * @dataProvider provideBadVoterResults
-     *
-     * @group legacy
-     */
-    public function testDeprecatedVoter()
-    {
-        $token = $this->createMock(TokenInterface::class);
-        $strategy = new class() implements AccessDecisionStrategyInterface {
-            public function decide(\Traversable $results): bool
-            {
-                iterator_to_array($results);
-
-                return true;
-            }
-        };
-
-        $manager = new AccessDecisionManager([$this->getVoter(3)], $strategy);
-
-        $this->expectDeprecation('Since symfony/security-core 5.3: Returning "%s" in "%s::vote()" is deprecated, return one of "Symfony\Component\Security\Core\Authorization\Voter\VoterInterface" constants: "ACCESS_GRANTED", "ACCESS_DENIED" or "ACCESS_ABSTAIN".');
-
-        $manager->decide($token, ['ROLE_FOO']);
-    }
-
-    public static function provideBadVoterResults(): array
+    public function provideBadVoterResults(): array
     {
         return [
             [3],
@@ -116,70 +65,11 @@ class AccessDecisionManagerTest extends TestCase
         $this->assertTrue($manager->decide($token, ['ROLE_FOO']));
     }
 
-    public static function getStrategyTests(): array
-    {
-        return [
-            // affirmative
-            [AccessDecisionManager::STRATEGY_AFFIRMATIVE, self::getVoters(1, 0, 0), false, true, true],
-            [AccessDecisionManager::STRATEGY_AFFIRMATIVE, self::getVoters(1, 2, 0), false, true, true],
-            [AccessDecisionManager::STRATEGY_AFFIRMATIVE, self::getVoters(0, 1, 0), false, true, false],
-            [AccessDecisionManager::STRATEGY_AFFIRMATIVE, self::getVoters(0, 0, 1), false, true, false],
-            [AccessDecisionManager::STRATEGY_AFFIRMATIVE, self::getVoters(0, 0, 1), true, true, true],
-
-            // consensus
-            [AccessDecisionManager::STRATEGY_CONSENSUS, self::getVoters(1, 0, 0), false, true, true],
-            [AccessDecisionManager::STRATEGY_CONSENSUS, self::getVoters(1, 2, 0), false, true, false],
-            [AccessDecisionManager::STRATEGY_CONSENSUS, self::getVoters(2, 1, 0), false, true, true],
-
-            [AccessDecisionManager::STRATEGY_CONSENSUS, self::getVoters(0, 0, 1), false, true, false],
-
-            [AccessDecisionManager::STRATEGY_CONSENSUS, self::getVoters(0, 0, 1), true, true, true],
-
-            [AccessDecisionManager::STRATEGY_CONSENSUS, self::getVoters(2, 2, 0), false, true, true],
-            [AccessDecisionManager::STRATEGY_CONSENSUS, self::getVoters(2, 2, 1), false, true, true],
-
-            [AccessDecisionManager::STRATEGY_CONSENSUS, self::getVoters(2, 2, 0), false, false, false],
-            [AccessDecisionManager::STRATEGY_CONSENSUS, self::getVoters(2, 2, 1), false, false, false],
-
-            // unanimous
-            [AccessDecisionManager::STRATEGY_UNANIMOUS, self::getVoters(1, 0, 0), false, true, true],
-            [AccessDecisionManager::STRATEGY_UNANIMOUS, self::getVoters(1, 0, 1), false, true, true],
-            [AccessDecisionManager::STRATEGY_UNANIMOUS, self::getVoters(1, 1, 0), false, true, false],
-
-            [AccessDecisionManager::STRATEGY_UNANIMOUS, self::getVoters(0, 0, 2), false, true, false],
-            [AccessDecisionManager::STRATEGY_UNANIMOUS, self::getVoters(0, 0, 2), true, true, true],
-
-            // priority
-            [AccessDecisionManager::STRATEGY_PRIORITY, [
-                self::getVoter(VoterInterface::ACCESS_ABSTAIN),
-                self::getVoter(VoterInterface::ACCESS_GRANTED),
-                self::getVoter(VoterInterface::ACCESS_DENIED),
-                self::getVoter(VoterInterface::ACCESS_DENIED),
-            ], true, true, true],
-
-            [AccessDecisionManager::STRATEGY_PRIORITY, [
-                self::getVoter(VoterInterface::ACCESS_ABSTAIN),
-                self::getVoter(VoterInterface::ACCESS_DENIED),
-                self::getVoter(VoterInterface::ACCESS_GRANTED),
-                self::getVoter(VoterInterface::ACCESS_GRANTED),
-            ], true, true, false],
-
-            [AccessDecisionManager::STRATEGY_PRIORITY, [
-                self::getVoter(VoterInterface::ACCESS_ABSTAIN),
-                self::getVoter(VoterInterface::ACCESS_ABSTAIN),
-            ], false, true, false],
-
-            [AccessDecisionManager::STRATEGY_PRIORITY, [
-                self::getVoter(VoterInterface::ACCESS_ABSTAIN),
-                self::getVoter(VoterInterface::ACCESS_ABSTAIN),
-            ], true, true, true],
-        ];
-    }
-
     public function testCacheableVoters()
     {
         $token = $this->createMock(TokenInterface::class);
-        $voter = $this->getMockBuilder(CacheableVoterInterface::class)->getMockForAbstractClass();
+        $voter = $this->createMock(CacheableVoterInterface::class);
+
         $voter
             ->expects($this->once())
             ->method('supportsAttribute')
@@ -203,7 +93,7 @@ class AccessDecisionManagerTest extends TestCase
     public function testCacheableVotersIgnoresNonStringAttributes()
     {
         $token = $this->createMock(TokenInterface::class);
-        $voter = $this->getMockBuilder(CacheableVoterInterface::class)->getMockForAbstractClass();
+        $voter = $this->createMock(CacheableVoterInterface::class);
         $voter
             ->expects($this->never())
             ->method('supportsAttribute');
@@ -225,7 +115,7 @@ class AccessDecisionManagerTest extends TestCase
     public function testCacheableVotersWithMultipleAttributes()
     {
         $token = $this->createMock(TokenInterface::class);
-        $voter = $this->getMockBuilder(CacheableVoterInterface::class)->getMockForAbstractClass();
+        $voter = $this->createMock(CacheableVoterInterface::class);
         $voter
             ->expects($this->exactly(2))
             ->method('supportsAttribute')
@@ -258,7 +148,7 @@ class AccessDecisionManagerTest extends TestCase
     public function testCacheableVotersWithEmptyAttributes()
     {
         $token = $this->createMock(TokenInterface::class);
-        $voter = $this->getMockBuilder(CacheableVoterInterface::class)->getMockForAbstractClass();
+        $voter = $this->createMock(CacheableVoterInterface::class);
         $voter
             ->expects($this->never())
             ->method('supportsAttribute');
@@ -280,7 +170,7 @@ class AccessDecisionManagerTest extends TestCase
     public function testCacheableVotersSupportsMethodsCalledOnce()
     {
         $token = $this->createMock(TokenInterface::class);
-        $voter = $this->getMockBuilder(CacheableVoterInterface::class)->getMockForAbstractClass();
+        $voter = $this->createMock(CacheableVoterInterface::class);
         $voter
             ->expects($this->once())
             ->method('supportsAttribute')
@@ -305,7 +195,7 @@ class AccessDecisionManagerTest extends TestCase
     public function testCacheableVotersNotCalled()
     {
         $token = $this->createMock(TokenInterface::class);
-        $voter = $this->getMockBuilder(CacheableVoterInterface::class)->getMockForAbstractClass();
+        $voter = $this->createMock(CacheableVoterInterface::class);
         $voter
             ->expects($this->once())
             ->method('supportsAttribute')
@@ -325,7 +215,7 @@ class AccessDecisionManagerTest extends TestCase
     public function testCacheableVotersWithMultipleAttributesAndNonString()
     {
         $token = $this->createMock(TokenInterface::class);
-        $voter = $this->getMockBuilder(CacheableVoterInterface::class)->getMockForAbstractClass();
+        $voter = $this->createMock(CacheableVoterInterface::class);
         $voter
             ->expects($this->once())
             ->method('supportsAttribute')
@@ -366,7 +256,7 @@ class AccessDecisionManagerTest extends TestCase
     protected static function getVoter($vote)
     {
         return new class($vote) implements VoterInterface {
-            private $vote;
+            private int $vote;
 
             public function __construct(int $vote)
             {

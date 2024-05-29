@@ -21,7 +21,7 @@ use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
  */
 class IssnValidatorTest extends ConstraintValidatorTestCase
 {
-    protected function createValidator()
+    protected function createValidator(): IssnValidator
     {
         return new IssnValidator();
     }
@@ -179,14 +179,11 @@ class IssnValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    /**
-     * @requires PHP 8
-     */
     public function testNamedArguments()
     {
         $this->validator->validate(
             '2162321x',
-            eval('return new \Symfony\Component\Validator\Constraints\Issn(message: "myMessage", caseSensitive: true, requireHyphen: true);')
+            new Issn(message: 'myMessage', caseSensitive: true, requireHyphen: true)
         );
 
         $this->buildViolation('myMessage')

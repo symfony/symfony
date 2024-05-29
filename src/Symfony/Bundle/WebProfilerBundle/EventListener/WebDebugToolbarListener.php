@@ -40,23 +40,15 @@ class WebDebugToolbarListener implements EventSubscriberInterface
     public const DISABLED = 1;
     public const ENABLED = 2;
 
-    protected $twig;
-    protected $urlGenerator;
-    protected $interceptRedirects;
-    protected $mode;
-    protected $excludedAjaxPaths;
-    private $cspHandler;
-    private $dumpDataCollector;
-
-    public function __construct(Environment $twig, bool $interceptRedirects = false, int $mode = self::ENABLED, ?UrlGeneratorInterface $urlGenerator = null, string $excludedAjaxPaths = '^/bundles|^/_wdt', ?ContentSecurityPolicyHandler $cspHandler = null, ?DumpDataCollector $dumpDataCollector = null)
-    {
-        $this->twig = $twig;
-        $this->urlGenerator = $urlGenerator;
-        $this->interceptRedirects = $interceptRedirects;
-        $this->mode = $mode;
-        $this->excludedAjaxPaths = $excludedAjaxPaths;
-        $this->cspHandler = $cspHandler;
-        $this->dumpDataCollector = $dumpDataCollector;
+    public function __construct(
+        private Environment $twig,
+        private bool $interceptRedirects = false,
+        private int $mode = self::ENABLED,
+        private ?UrlGeneratorInterface $urlGenerator = null,
+        private string $excludedAjaxPaths = '^/bundles|^/_wdt',
+        private ?ContentSecurityPolicyHandler $cspHandler = null,
+        private ?DumpDataCollector $dumpDataCollector = null,
+    ) {
     }
 
     public function isEnabled(): bool
@@ -73,7 +65,7 @@ class WebDebugToolbarListener implements EventSubscriberInterface
         $this->mode = $mode;
     }
 
-    public function onKernelResponse(ResponseEvent $event)
+    public function onKernelResponse(ResponseEvent $event): void
     {
         $response = $event->getResponse();
         $request = $event->getRequest();
@@ -85,7 +77,7 @@ class WebDebugToolbarListener implements EventSubscriberInterface
                     $this->urlGenerator->generate('_profiler', ['token' => $response->headers->get('X-Debug-Token')], UrlGeneratorInterface::ABSOLUTE_URL)
                 );
             } catch (\Exception $e) {
-                $response->headers->set('X-Debug-Error', \get_class($e).': '.preg_replace('/\s+/', ' ', $e->getMessage()));
+                $response->headers->set('X-Debug-Error', $e::class.': '.preg_replace('/\s+/', ' ', $e->getMessage()));
             }
         }
 
@@ -95,7 +87,7 @@ class WebDebugToolbarListener implements EventSubscriberInterface
 
         $nonces = [];
         if ($this->cspHandler) {
-            if ($this->dumpDataCollector && $this->dumpDataCollector->getDumpsCount() > 0) {
+            if ($this->dumpDataCollector?->getDumpsCount() > 0) {
                 $this->cspHandler->disableCsp();
             }
 
@@ -113,7 +105,7 @@ class WebDebugToolbarListener implements EventSubscriberInterface
                 $session->getFlashBag()->setAll($session->getFlashBag()->peekAll());
             }
 
-            $response->setContent($this->twig->render('@WebProfiler/Profiler/toolbar_redirect.html.twig', ['location' => $response->headers->get('Location')]));
+            $response->setContent($this->twig->render('@WebProfiler/Profiler/toolbar_redirect.html.twig', ['location' => $response->headers->get('Location'), 'host' => $request->getSchemeAndHttpHost()]));
             $response->setStatusCode(200);
             $response->headers->remove('Location');
         }
@@ -134,7 +126,7 @@ class WebDebugToolbarListener implements EventSubscriberInterface
     /**
      * Injects the web debug toolbar into the given Response.
      */
-    protected function injectToolbar(Response $response, Request $request, array $nonces)
+    protected function injectToolbar(Response $response, Request $request, array $nonces): void
     {
         $content = $response->getContent();
         $pos = strripos($content, '</body>');

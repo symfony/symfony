@@ -13,7 +13,6 @@ namespace Symfony\Component\Form\Tests\Extension\Validator\EventListener;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\Extension\Core\DataMapper\DataMapper;
 use Symfony\Component\Form\Extension\Validator\Constraints\Form as FormConstraint;
 use Symfony\Component\Form\Extension\Validator\EventListener\ValidationListener;
@@ -23,7 +22,6 @@ use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Form\FormConfigBuilder;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormFactoryBuilder;
-use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\Validator\ConstraintViolationInterface;
 use Symfony\Component\Validator\ConstraintViolationList;
@@ -36,36 +34,14 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class ValidationListenerTest extends TestCase
 {
-    /**
-     * @var EventDispatcherInterface
-     */
-    private $dispatcher;
-
-    /**
-     * @var FormFactoryInterface
-     */
-    private $factory;
-
-    /**
-     * @var ValidatorInterface
-     */
-    private $validator;
-
-    /**
-     * @var ValidationListener
-     */
-    private $listener;
-
-    private $message;
-
-    private $messageTemplate;
-
-    private $params;
+    private ValidatorInterface $validator;
+    private ValidationListener $listener;
+    private string $message;
+    private string $messageTemplate;
+    private array $params;
 
     protected function setUp(): void
     {
-        $this->dispatcher = new EventDispatcher();
-        $this->factory = (new FormFactoryBuilder())->getFormFactory();
         $this->validator = Validation::createValidator();
         $this->listener = new ValidationListener($this->validator, new ViolationMapper());
         $this->message = 'Message';
@@ -153,7 +129,7 @@ class SubmittedNotSynchronizedForm extends Form
 
 class DummyValidator implements ValidatorInterface
 {
-    private $violation;
+    private ConstraintViolationInterface $violation;
 
     public function __construct(ConstraintViolationInterface $violation)
     {

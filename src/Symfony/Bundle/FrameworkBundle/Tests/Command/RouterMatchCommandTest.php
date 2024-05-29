@@ -16,7 +16,7 @@ use Symfony\Bundle\FrameworkBundle\Command\RouterDebugCommand;
 use Symfony\Bundle\FrameworkBundle\Command\RouterMatchCommand;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Tester\CommandTester;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\Routing\Route;
@@ -72,26 +72,11 @@ class RouterMatchCommandTest extends TestCase
 
     private function getKernel()
     {
-        $container = $this->createMock(ContainerInterface::class);
-        $container
-            ->expects($this->atLeastOnce())
-            ->method('has')
-            ->willReturnCallback(function ($id) {
-                return 'console.command_loader' !== $id;
-            })
-        ;
-        $container
-            ->expects($this->any())
-            ->method('get')
-            ->with('router')
-            ->willReturn($this->getRouter())
-        ;
-
         $kernel = $this->createMock(KernelInterface::class);
         $kernel
             ->expects($this->any())
             ->method('getContainer')
-            ->willReturn($container)
+            ->willReturn(new Container())
         ;
         $kernel
             ->expects($this->once())

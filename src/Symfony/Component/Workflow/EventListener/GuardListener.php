@@ -24,13 +24,13 @@ use Symfony\Component\Workflow\TransitionBlocker;
  */
 class GuardListener
 {
-    private $configuration;
-    private $expressionLanguage;
-    private $tokenStorage;
-    private $authorizationChecker;
-    private $trustResolver;
-    private $roleHierarchy;
-    private $validator;
+    private array $configuration;
+    private ExpressionLanguage $expressionLanguage;
+    private TokenStorageInterface $tokenStorage;
+    private AuthorizationCheckerInterface $authorizationChecker;
+    private AuthenticationTrustResolverInterface $trustResolver;
+    private ?RoleHierarchyInterface $roleHierarchy;
+    private ?ValidatorInterface $validator;
 
     public function __construct(array $configuration, ExpressionLanguage $expressionLanguage, TokenStorageInterface $tokenStorage, AuthorizationCheckerInterface $authorizationChecker, AuthenticationTrustResolverInterface $trustResolver, ?RoleHierarchyInterface $roleHierarchy = null, ?ValidatorInterface $validator = null)
     {
@@ -43,7 +43,7 @@ class GuardListener
         $this->validator = $validator;
     }
 
-    public function onTransition(GuardEvent $event, string $eventName)
+    public function onTransition(GuardEvent $event, string $eventName): void
     {
         if (!isset($this->configuration[$eventName])) {
             return;
@@ -62,7 +62,7 @@ class GuardListener
         }
     }
 
-    private function validateGuardExpression(GuardEvent $event, string $expression)
+    private function validateGuardExpression(GuardEvent $event, string $expression): void
     {
         if (!$this->expressionLanguage->evaluate($expression, $this->getVariables($event))) {
             $blocker = TransitionBlocker::createBlockedByExpressionGuardListener($expression);

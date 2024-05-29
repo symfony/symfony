@@ -1,0 +1,14 @@
+{
+    "event": "proxy_open",
+    "email": "example@gmail.com",
+    "id": 1,
+    "date": "2020-10-09 00:00:00",
+    "message-id": "<201798300811.5787683@relay.domain.com>",
+    "subject": "My first Transactional",
+    "tags": ["transactionalTag"],
+    "sending_ip": "127.0.0.1",
+    "s_epoch": 1534486682000,
+    "template_id": 1,
+    "ts": 1604933654,
+    "ts_event": 1604933654
+}

@@ -28,11 +28,6 @@ final class SmsBiurasTransport extends AbstractTransport
 {
     protected const HOST = 'savitarna.smsbiuras.lt';
 
-    private $uid;
-    private $apiKey;
-    private $from;
-    private $testMode;
-
     private const ERROR_CODES = [
         1 => 'The message was processed and sent to the mobile operator. But delivery confirmations have not yet been returned.',
         2 => 'SMS not delivered.',
@@ -47,23 +42,20 @@ final class SmsBiurasTransport extends AbstractTransport
         999 => 'Unknown Error',
     ];
 
-    public function __construct(string $uid, string $apiKey, string $from, bool $testMode, ?HttpClientInterface $client = null, ?EventDispatcherInterface $dispatcher = null)
-    {
-        $this->uid = $uid;
-        $this->apiKey = $apiKey;
-        $this->from = $from;
-        $this->testMode = $testMode;
-
+    public function __construct(
+        private string $uid,
+        #[\SensitiveParameter] private string $apiKey,
+        private string $from,
+        private bool $testMode,
+        ?HttpClientInterface $client = null,
+        ?EventDispatcherInterface $dispatcher = null,
+    ) {
         parent::__construct($client, $dispatcher);
     }
 
     public function __toString(): string
     {
-        if ($this->testMode) {
-            return sprintf('smsbiuras://%s?from=%s&test_mode=%s', $this->getEndpoint(), $this->from, $this->testMode);
-        }
-
-        return sprintf('smsbiuras://%s?from=%s', $this->getEndpoint(), $this->from);
+        return sprintf('smsbiuras://%s?from=%s%s', $this->getEndpoint(), $this->from, $this->testMode ? '&test_mode=1' : '');
     }
 
     public function supports(MessageInterface $message): bool
@@ -84,8 +76,8 @@ final class SmsBiurasTransport extends AbstractTransport
                 'uid' => $this->uid,
                 'apikey' => $this->apiKey,
                 'message' => $message->getSubject(),
-                'from' => $this->from,
-                'test' => $this->testMode ? 1 : 0,
+                'from' => $message->getFrom() ?: $this->from,
+                'test' => (int) $this->testMode,
                 'to' => $message->getPhone(),
             ],
         ]);

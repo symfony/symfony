@@ -52,10 +52,7 @@ class RegisterGlobalSecurityEventListenersPass implements CompilerPassInterface
         SecurityEvents::INTERACTIVE_LOGIN,
     ];
 
-    /**
-     * {@inheritdoc}
-     */
-    public function process(ContainerBuilder $container)
+    public function process(ContainerBuilder $container): void
     {
         if (!$container->has('event_dispatcher') || !$container->hasParameter('security.firewalls')) {
             return;

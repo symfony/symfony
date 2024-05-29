@@ -7,7 +7,7 @@ use Symfony\Component\DependencyInjection\Extension\Extension as BaseExtension;
 
 class SemiValidConfigExtension extends BaseExtension
 {
-    public function load(array $configs, ContainerBuilder $container)
+    public function load(array $configs, ContainerBuilder $container): void
     {
     }
 }

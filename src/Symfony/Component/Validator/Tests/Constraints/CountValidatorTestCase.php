@@ -22,7 +22,7 @@ use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
  */
 abstract class CountValidatorTestCase extends ConstraintValidatorTestCase
 {
-    protected function createValidator()
+    protected function createValidator(): CountValidator
     {
         return new CountValidator();
     }
@@ -81,13 +81,11 @@ abstract class CountValidatorTestCase extends ConstraintValidatorTestCase
     }
 
     /**
-     * @requires PHP 8
-     *
      * @dataProvider getThreeOrLessElements
      */
     public function testValidValuesMaxNamed($value)
     {
-        $constraint = eval('return new \Symfony\Component\Validator\Constraints\Count(max: 3);');
+        $constraint = new Count(max: 3);
         $this->validator->validate($value, $constraint);
 
         $this->assertNoViolation();
@@ -105,13 +103,11 @@ abstract class CountValidatorTestCase extends ConstraintValidatorTestCase
     }
 
     /**
-     * @requires PHP 8
-     *
      * @dataProvider getFiveOrMoreElements
      */
     public function testValidValuesMinNamed($value)
     {
-        $constraint = eval('return new \Symfony\Component\Validator\Constraints\Count(min: 5);');
+        $constraint = new Count(min: 5);
         $this->validator->validate($value, $constraint);
 
         $this->assertNoViolation();
@@ -129,13 +125,11 @@ abstract class CountValidatorTestCase extends ConstraintValidatorTestCase
     }
 
     /**
-     * @requires PHP 8
-     *
      * @dataProvider getFourElements
      */
     public function testValidValuesExactNamed($value)
     {
-        $constraint = eval('return new \Symfony\Component\Validator\Constraints\Count(exactly: 4);');
+        $constraint = new Count(exactly: 4);
         $this->validator->validate($value, $constraint);
 
         $this->assertNoViolation();
@@ -163,13 +157,11 @@ abstract class CountValidatorTestCase extends ConstraintValidatorTestCase
     }
 
     /**
-     * @requires PHP 8
-     *
      * @dataProvider getFiveOrMoreElements
      */
     public function testTooManyValuesNamed($value)
     {
-        $constraint = eval('return new \Symfony\Component\Validator\Constraints\Count(max: 4, maxMessage: "myMessage");');
+        $constraint = new Count(max: 4, maxMessage: 'myMessage');
 
         $this->validator->validate($value, $constraint);
 
@@ -204,13 +196,11 @@ abstract class CountValidatorTestCase extends ConstraintValidatorTestCase
     }
 
     /**
-     * @requires PHP 8
-     *
      * @dataProvider getThreeOrLessElements
      */
     public function testTooFewValuesNamed($value)
     {
-        $constraint = eval('return new \Symfony\Component\Validator\Constraints\Count(min: 4, minMessage: "myMessage");');
+        $constraint = new Count(min: 4, minMessage: 'myMessage');
 
         $this->validator->validate($value, $constraint);
 
@@ -246,13 +236,11 @@ abstract class CountValidatorTestCase extends ConstraintValidatorTestCase
     }
 
     /**
-     * @requires PHP 8
-     *
      * @dataProvider getFiveOrMoreElements
      */
     public function testTooManyValuesExactNamed($value)
     {
-        $constraint = eval('return new \Symfony\Component\Validator\Constraints\Count(exactly: 4, exactMessage: "myMessage");');
+        $constraint = new Count(exactly: 4, exactMessage: 'myMessage');
 
         $this->validator->validate($value, $constraint);
 
@@ -295,7 +283,7 @@ abstract class CountValidatorTestCase extends ConstraintValidatorTestCase
         $this->assertEquals(5, $constraint->max);
     }
 
-    public function testConstraintAnnotationDefaultOption()
+    public function testConstraintAttributeDefaultOption()
     {
         $constraint = new Count(['value' => 5, 'exactMessage' => 'message']);
 

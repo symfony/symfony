@@ -74,6 +74,10 @@
                 <source>Too many failed login attempts, please try again in %minutes% minute.</source>
                 <target>Login ၀င်ရန်ကြိုးစားမှုများလွန်းပါသည်၊ ကျေးဇူးပြု၍ နောက် %minutes% မှထပ်မံကြိုးစားပါ။</target>
             </trans-unit>
+            <trans-unit id="20">
+                <source>Too many failed login attempts, please try again in %minutes% minutes.</source>
+                <target state="needs-review-translation">ဝင်ရောက်မှု မအောင်မြင်သော ကြိုးပမ်းမှုများအတွက် တစ်ခါတည်း ပြန်လုပ်မည်။ ထပ်မံကြိုးစားကြည့်ပါ။ %minutes% မိနစ်အတွင်း|ဝင်ရောက်မှု မအောင်မြင်သော ကြိုးပမ်းမှုများအတွက် တစ်ခါတည်း ပြန်လုပ်မည်။ ထပ်မံကြိုးစားကြည့်ပါ။ %minutes% မိနစ်အတွင်း</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

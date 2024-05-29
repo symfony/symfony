@@ -14,17 +14,14 @@ namespace Symfony\Bridge\Doctrine\Tests\Fixtures;
 use Doctrine\ORM\Mapping\Column;
 use Doctrine\ORM\Mapping\Entity;
 use Doctrine\ORM\Mapping\Id;
+use Symfony\Component\Uid\Uuid;
 
-/** @Entity */
 #[Entity]
 class UuidIdEntity
 {
-    /** @Id @Column(type="uuid") */
-    #[Id, Column(type: 'uuid')]
-    protected $id;
-
-    public function __construct($id)
-    {
-        $this->id = $id;
+    public function __construct(
+        #[Id, Column(type: 'uuid')]
+        protected Uuid $id,
+    ) {
     }
 }

@@ -51,7 +51,7 @@ class OrderedHashMapTest extends TestCase
         $map['foo'] = 2;
         $map[] = 3;
 
-        $this->assertSame([0 => 1, 'foo' => 2, 1 => 3], iterator_to_array($map));
+        $this->assertSame(['0' => 1, 'foo' => 2, '1' => 3], iterator_to_array($map));
     }
 
     public function testInsertLooselyEqualKeys()
@@ -496,12 +496,30 @@ class OrderedHashMapTest extends TestCase
         $this->assertNull($it1->current());
     }
 
+    public function testKeysAreString()
+    {
+        $map = new OrderedHashMap(['1' => 1]);
+        $map['2'] = 2;
+
+        $it = $map->getIterator();
+
+        $it->rewind();
+        $this->assertTrue($it->valid());
+        $this->assertSame('1', $it->key());
+        $this->assertSame(1, $it->current());
+
+        $it->next();
+        $this->assertTrue($it->valid());
+        $this->assertSame('2', $it->key());
+        $this->assertSame(2, $it->current());
+    }
+
     public function testCount()
     {
         $map = new OrderedHashMap();
         $map[] = 1;
         $map['foo'] = 2;
-        unset($map[0]);
+        unset($map['0']);
         $map[] = 3;
 
         $this->assertCount(2, $map);

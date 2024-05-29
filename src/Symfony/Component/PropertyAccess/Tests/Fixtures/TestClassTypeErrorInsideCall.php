@@ -13,7 +13,7 @@ namespace Symfony\Component\PropertyAccess\Tests\Fixtures;
 
 class TestClassTypeErrorInsideCall
 {
-    public function expectsDateTime(\DateTime $date)
+    public function expectsDateTime(\DateTimeImmutable $date)
     {
     }
 

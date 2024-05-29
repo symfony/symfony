@@ -17,7 +17,7 @@ class IntegerTypeTest extends BaseTypeTestCase
 {
     public const TESTED_TYPE = 'Symfony\Component\Form\Extension\Core\Type\IntegerType';
 
-    private $previousLocale;
+    private string $previousLocale;
 
     protected function setUp(): void
     {

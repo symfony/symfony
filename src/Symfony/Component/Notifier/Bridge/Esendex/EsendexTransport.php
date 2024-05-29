@@ -12,7 +12,6 @@
 namespace Symfony\Component\Notifier\Bridge\Esendex;
 
 use Symfony\Component\HttpClient\Exception\JsonException;
-use Symfony\Component\HttpClient\Exception\TransportException as HttpClientTransportException;
 use Symfony\Component\Notifier\Exception\TransportException;
 use Symfony\Component\Notifier\Exception\UnsupportedMessageTypeException;
 use Symfony\Component\Notifier\Message\MessageInterface;
@@ -27,18 +26,14 @@ final class EsendexTransport extends AbstractTransport
 {
     protected const HOST = 'api.esendex.com';
 
-    private $email;
-    private $password;
-    private $accountReference;
-    private $from;
-
-    public function __construct(string $email, string $password, string $accountReference, string $from, ?HttpClientInterface $client = null, ?EventDispatcherInterface $dispatcher = null)
-    {
-        $this->email = $email;
-        $this->password = $password;
-        $this->accountReference = $accountReference;
-        $this->from = $from;
-
+    public function __construct(
+        private string $email,
+        #[\SensitiveParameter] private string $password,
+        private string $accountReference,
+        private string $from,
+        ?HttpClientInterface $client = null,
+        ?EventDispatcherInterface $dispatcher = null,
+    ) {
         parent::__construct($client, $dispatcher);
     }
 
@@ -49,7 +44,7 @@ final class EsendexTransport extends AbstractTransport
 
     public function supports(MessageInterface $message): bool
     {
-        return $message instanceof SmsMessage;
+        return $message instanceof SmsMessage && (null === $message->getOptions() || $message->getOptions() instanceof EsendexOptions);
     }
 
     protected function doSend(MessageInterface $message): SentMessage
@@ -58,24 +53,22 @@ final class EsendexTransport extends AbstractTransport
             throw new UnsupportedMessageTypeException(__CLASS__, SmsMessage::class, $message);
         }
 
-        $messageData = [
-            'to' => $message->getPhone(),
-            'body' => $message->getSubject(),
+        $options = $message->getOptions()?->toArray() ?? [];
+        $options['from'] = $message->getFrom() ?: $this->from;
+        $options['messages'] = [
+            [
+                'to' => $message->getPhone(),
+                'body' => $message->getSubject(),
+            ],
         ];
-
-        if (null !== $this->from) {
-            $messageData['from'] = $this->from;
-        }
+        $options['accountreference'] ??= $this->accountReference;
 
         $response = $this->client->request('POST', 'https://'.$this->getEndpoint().'/v1.0/messagedispatcher', [
-            'auth_basic' => sprintf('%s:%s', $this->email, $this->password),
+            'auth_basic' => [$this->email, $this->password],
             'headers' => [
                 'Accept' => 'application/json',
             ],
-            'json' => [
-                'accountreference' => $this->accountReference,
-                'messages' => [$messageData],
-            ],
+            'json' => array_filter($options),
         ]);
 
         try {
@@ -105,10 +98,7 @@ final class EsendexTransport extends AbstractTransport
 
                 $message .= sprintf(' Details from Esendex: %s: "%s".', $error['code'], $error['description']);
             }
-        } catch (HttpClientTransportException $e) {
-            // Catching this exception is useful to keep compatibility, with symfony/http-client < 4.4.10
-            // See https://github.com/symfony/symfony/pull/37065
-        } catch (JsonException $e) {
+        } catch (JsonException) {
         }
 
         throw new TransportException($message, $response);

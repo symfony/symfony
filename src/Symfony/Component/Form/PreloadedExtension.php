@@ -20,9 +20,7 @@ use Symfony\Component\Form\Exception\InvalidArgumentException;
  */
 class PreloadedExtension implements FormExtensionInterface
 {
-    private $types = [];
-    private $typeExtensions = [];
-    private $typeGuesser;
+    private array $types = [];
 
     /**
      * Creates a new preloaded extension.
@@ -30,20 +28,17 @@ class PreloadedExtension implements FormExtensionInterface
      * @param FormTypeInterface[]            $types          The types that the extension should support
      * @param FormTypeExtensionInterface[][] $typeExtensions The type extensions that the extension should support
      */
-    public function __construct(array $types, array $typeExtensions, ?FormTypeGuesserInterface $typeGuesser = null)
-    {
-        $this->typeExtensions = $typeExtensions;
-        $this->typeGuesser = $typeGuesser;
-
+    public function __construct(
+        array $types,
+        private array $typeExtensions,
+        private ?FormTypeGuesserInterface $typeGuesser = null,
+    ) {
         foreach ($types as $type) {
-            $this->types[\get_class($type)] = $type;
+            $this->types[$type::class] = $type;
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getType(string $name)
+    public function getType(string $name): FormTypeInterface
     {
         if (!isset($this->types[$name])) {
             throw new InvalidArgumentException(sprintf('The type "%s" cannot be loaded by this extension.', $name));
@@ -52,35 +47,23 @@ class PreloadedExtension implements FormExtensionInterface
         return $this->types[$name];
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function hasType(string $name)
+    public function hasType(string $name): bool
     {
         return isset($this->types[$name]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getTypeExtensions(string $name)
+    public function getTypeExtensions(string $name): array
     {
         return $this->typeExtensions[$name]
             ?? [];
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function hasTypeExtensions(string $name)
+    public function hasTypeExtensions(string $name): bool
     {
         return !empty($this->typeExtensions[$name]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getTypeGuesser()
+    public function getTypeGuesser(): ?FormTypeGuesserInterface
     {
         return $this->typeGuesser;
     }

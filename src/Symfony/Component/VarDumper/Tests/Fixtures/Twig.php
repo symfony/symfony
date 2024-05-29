@@ -18,7 +18,7 @@ class __TwigTemplate_VarDumperFixture_u75a09 extends AbstractTwigTemplate
 {
     private $path;
 
-    public function __construct(Twig\Environment $env = null, $path = null)
+    public function __construct(?Twig\Environment $env = null, $path = null)
     {
         if (null !== $env) {
             parent::__construct($env);

@@ -1,0 +1,32 @@
+{
+    "name": "symfony/kaz-info-teh-notifier",
+    "type": "symfony-bridge",
+    "description": "Symfony KazInfoTeh Notifier Bridge",
+    "keywords": ["kaz-info-teh", "notifier", "symfony", "sms"],
+    "homepage": "https://symfony.com",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Egor Taranov",
+            "email": "dev@taranovegor.com",
+            "homepage": "https://taranovegor.com/contribution"
+        },
+        {
+            "name": "Symfony Community",
+            "homepage": "https://symfony.com/contributors"
+        }
+    ],
+    "require": {
+        "php": ">=8.2",
+        "ext-simplexml": "*",
+        "symfony/http-client": "^6.4|^7.0",
+        "symfony/notifier": "^6.4|^7.0"
+    },
+    "autoload": {
+        "psr-4": { "Symfony\\Component\\Notifier\\Bridge\\KazInfoTeh\\": "" },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
+    },
+    "minimum-stability": "dev"
+}

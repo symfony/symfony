@@ -23,18 +23,18 @@ use Symfony\Component\Mailer\Exception\TransportException;
  */
 final class SocketStream extends AbstractStream
 {
-    private $url;
-    private $host = 'localhost';
-    private $port = 465;
-    private $timeout;
-    private $tls = true;
-    private $sourceIp;
-    private $streamContextOptions = [];
+    private string $url;
+    private string $host = 'localhost';
+    private int $port = 465;
+    private float $timeout;
+    private bool $tls = true;
+    private ?string $sourceIp = null;
+    private array $streamContextOptions = [];
 
     /**
      * @return $this
      */
-    public function setTimeout(float $timeout): self
+    public function setTimeout(float $timeout): static
     {
         $this->timeout = $timeout;
 
@@ -51,7 +51,7 @@ final class SocketStream extends AbstractStream
      *
      * @return $this
      */
-    public function setHost(string $host): self
+    public function setHost(string $host): static
     {
         $this->host = $host;
 
@@ -66,7 +66,7 @@ final class SocketStream extends AbstractStream
     /**
      * @return $this
      */
-    public function setPort(int $port): self
+    public function setPort(int $port): static
     {
         $this->port = $port;
 
@@ -83,7 +83,7 @@ final class SocketStream extends AbstractStream
      *
      * @return $this
      */
-    public function disableTls(): self
+    public function disableTls(): static
     {
         $this->tls = false;
 
@@ -98,7 +98,7 @@ final class SocketStream extends AbstractStream
     /**
      * @return $this
      */
-    public function setStreamOptions(array $options): self
+    public function setStreamOptions(array $options): static
     {
         $this->streamContextOptions = $options;
 
@@ -117,7 +117,7 @@ final class SocketStream extends AbstractStream
      *
      * @return $this
      */
-    public function setSourceIp(string $ip): self
+    public function setSourceIp(string $ip): static
     {
         $this->sourceIp = $ip;
 
@@ -146,7 +146,7 @@ final class SocketStream extends AbstractStream
             $options = array_merge($options, $this->streamContextOptions);
         }
         // do it unconditionally as it will be used by STARTTLS as well if supported
-        $options['ssl']['crypto_method'] = $options['ssl']['crypto_method'] ?? \STREAM_CRYPTO_METHOD_TLS_CLIENT | \STREAM_CRYPTO_METHOD_TLSv1_2_CLIENT | \STREAM_CRYPTO_METHOD_TLSv1_1_CLIENT;
+        $options['ssl']['crypto_method'] ??= \STREAM_CRYPTO_METHOD_TLS_CLIENT | \STREAM_CRYPTO_METHOD_TLSv1_2_CLIENT | \STREAM_CRYPTO_METHOD_TLSv1_1_CLIENT;
         $streamContext = stream_context_create($options);
 
         $timeout = $this->getTimeout();

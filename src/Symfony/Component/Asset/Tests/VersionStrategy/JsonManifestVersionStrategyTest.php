@@ -100,7 +100,7 @@ class JsonManifestVersionStrategyTest extends TestCase
     public static function provideStrategies(string $manifestPath): \Generator
     {
         $httpClient = new MockHttpClient(function ($method, $url, $options) {
-            $filename = __DIR__.'/../fixtures/'.basename($url);
+            $filename = __DIR__.'/../Fixtures/'.basename($url);
 
             if (file_exists($filename)) {
                 return new MockResponse(file_get_contents($filename), ['http_headers' => ['content-type' => 'application/json']]);
@@ -111,12 +111,12 @@ class JsonManifestVersionStrategyTest extends TestCase
 
         yield [new JsonManifestVersionStrategy('https://cdn.example.com/'.$manifestPath, $httpClient)];
 
-        yield [new JsonManifestVersionStrategy(__DIR__.'/../fixtures/'.$manifestPath)];
+        yield [new JsonManifestVersionStrategy(__DIR__.'/../Fixtures/'.$manifestPath)];
     }
 
     public static function provideStrictStrategies(): \Generator
     {
-        $strategy = new JsonManifestVersionStrategy(__DIR__.'/../fixtures/manifest-valid.json', null, true);
+        $strategy = new JsonManifestVersionStrategy(__DIR__.'/../Fixtures/manifest-valid.json', null, true);
 
         yield [
             $strategy,

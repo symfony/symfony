@@ -171,7 +171,6 @@ class OutputFormatterTest extends TestCase
         $styleString = substr($tag, 1, -1);
         $formatter = new OutputFormatter(true);
         $method = new \ReflectionMethod($formatter, 'createStyleFromString');
-        $method->setAccessible(true);
         $result = $method->invoke($formatter, $styleString);
         if (null === $expected) {
             $this->assertNull($result);
@@ -245,12 +244,8 @@ class OutputFormatterTest extends TestCase
     /**
      * @dataProvider provideDecoratedAndNonDecoratedOutput
      */
-    public function testNotDecoratedFormatterOnJediTermEmulator(
-        string $input,
-        string $expectedNonDecoratedOutput,
-        string $expectedDecoratedOutput,
-        bool $shouldBeJediTerm = false
-    ) {
+    public function testNotDecoratedFormatterOnJediTermEmulator(string $input, string $expectedNonDecoratedOutput, string $expectedDecoratedOutput, bool $shouldBeJediTerm = false)
+    {
         $terminalEmulator = $shouldBeJediTerm ? 'JetBrains-JediTerm' : 'Unknown';
 
         $prevTerminalEmulator = getenv('TERMINAL_EMULATOR');
@@ -267,12 +262,8 @@ class OutputFormatterTest extends TestCase
     /**
      * @dataProvider provideDecoratedAndNonDecoratedOutput
      */
-    public function testNotDecoratedFormatterOnIDEALikeEnvironment(
-        string $input,
-        string $expectedNonDecoratedOutput,
-        string $expectedDecoratedOutput,
-        bool $expectsIDEALikeTerminal = false
-    ) {
+    public function testNotDecoratedFormatterOnIDEALikeEnvironment(string $input, string $expectedNonDecoratedOutput, string $expectedDecoratedOutput, bool $expectsIDEALikeTerminal = false)
+    {
         // Backup previous env variable
         $previousValue = $_SERVER['IDEA_INITIAL_DIRECTORY'] ?? null;
         $hasPreviousValue = \array_key_exists('IDEA_INITIAL_DIRECTORY', $_SERVER);

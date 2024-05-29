@@ -18,15 +18,17 @@ use Symfony\Component\Form\Extension\Csrf\EventListener\CsrfValidationListener;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormFactoryBuilder;
+use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\Util\ServerParams;
 use Symfony\Component\Security\Csrf\CsrfTokenManager;
 
 class CsrfValidationListenerTest extends TestCase
 {
-    protected $dispatcher;
-    protected $factory;
-    protected $tokenManager;
-    protected $form;
+    protected EventDispatcher $dispatcher;
+    protected FormFactoryInterface $factory;
+    protected CsrfTokenManager $tokenManager;
+    protected FormInterface $form;
 
     protected function setUp(): void
     {
@@ -36,14 +38,6 @@ class CsrfValidationListenerTest extends TestCase
         $this->form = $this->getBuilder()
             ->setDataMapper(new DataMapper())
             ->getForm();
-    }
-
-    protected function tearDown(): void
-    {
-        $this->dispatcher = null;
-        $this->factory = null;
-        $this->tokenManager = null;
-        $this->form = null;
     }
 
     protected function getBuilder()

@@ -438,6 +438,10 @@
                 <source>This value is not a valid MAC address.</source>
                 <target state="needs-review-translation">Оваа вредност не е валидна MAC адреса.</target>
             </trans-unit>
+            <trans-unit id="113">
+                <source>This URL is missing a top-level domain.</source>
+                <target state="needs-review-translation">На овој URL недостасува домен од највисоко ниво.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

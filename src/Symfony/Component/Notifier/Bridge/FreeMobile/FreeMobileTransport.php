@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Notifier\Bridge\FreeMobile;
 
+use Symfony\Component\Notifier\Exception\InvalidArgumentException;
 use Symfony\Component\Notifier\Exception\TransportException;
 use Symfony\Component\Notifier\Exception\UnsupportedMessageTypeException;
 use Symfony\Component\Notifier\Message\MessageInterface;
@@ -28,14 +29,13 @@ final class FreeMobileTransport extends AbstractTransport
 {
     protected const HOST = 'smsapi.free-mobile.fr/sendmsg';
 
-    private $login;
-    private $password;
-    private $phone;
-
-    public function __construct(string $login, string $password, string $phone, ?HttpClientInterface $client = null, ?EventDispatcherInterface $dispatcher = null)
-    {
-        $this->login = $login;
-        $this->password = $password;
+    public function __construct(
+        private string $login,
+        #[\SensitiveParameter] private string $password,
+        private string $phone,
+        ?HttpClientInterface $client = null,
+        ?EventDispatcherInterface $dispatcher = null,
+    ) {
         $this->phone = str_replace('+33', '0', $phone);
 
         parent::__construct($client, $dispatcher);
@@ -55,6 +55,11 @@ final class FreeMobileTransport extends AbstractTransport
     {
         if (!$this->supports($message)) {
             throw new UnsupportedMessageTypeException(__CLASS__, SmsMessage::class, $message);
+        }
+
+        /** @var SmsMessage $message */
+        if ('' !== $message->getFrom()) {
+            throw new InvalidArgumentException(sprintf('The "%s" transport does not support "from" in "%s".', __CLASS__, SmsMessage::class));
         }
 
         $endpoint = sprintf('https://%s', $this->getEndpoint());

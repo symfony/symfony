@@ -12,7 +12,9 @@
 namespace Symfony\Component\HttpKernel\Controller;
 
 use Psr\Log\LoggerInterface;
+use Symfony\Component\HttpFoundation\Exception\BadRequestException;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\Attribute\AsController;
 
 /**
  * This implementation uses the '_controller' request attribute to determine
@@ -23,22 +25,36 @@ use Symfony\Component\HttpFoundation\Request;
  */
 class ControllerResolver implements ControllerResolverInterface
 {
-    private $logger;
+    private array $allowedControllerTypes = [];
+    private array $allowedControllerAttributes = [AsController::class => AsController::class];
 
-    public function __construct(?LoggerInterface $logger = null)
-    {
-        $this->logger = $logger;
+    public function __construct(
+        private ?LoggerInterface $logger = null,
+    ) {
     }
 
     /**
-     * {@inheritdoc}
+     * @param array<class-string> $types
+     * @param array<class-string> $attributes
      */
-    public function getController(Request $request)
+    public function allowControllers(array $types = [], array $attributes = []): void
+    {
+        foreach ($types as $type) {
+            $this->allowedControllerTypes[$type] = $type;
+        }
+
+        foreach ($attributes as $attribute) {
+            $this->allowedControllerAttributes[$attribute] = $attribute;
+        }
+    }
+
+    /**
+     * @throws BadRequestException when the request has attribute "_check_controller_is_allowed" set to true and the controller is not allowed
+     */
+    public function getController(Request $request): callable|false
     {
         if (!$controller = $request->attributes->get('_controller')) {
-            if (null !== $this->logger) {
-                $this->logger->warning('Unable to look for the controller as the "_controller" parameter is missing.');
-            }
+            $this->logger?->warning('Unable to look for the controller as the "_controller" parameter is missing.');
 
             return false;
         }
@@ -48,15 +64,8 @@ class ControllerResolver implements ControllerResolverInterface
                 try {
                     $controller[0] = $this->instantiateController($controller[0]);
                 } catch (\Error|\LogicException $e) {
-                    try {
-                        // We cannot just check is_callable but have to use reflection because a non-static method
-                        // can still be called statically in PHP but we don't want that. This is deprecated in PHP 7, so we
-                        // could simplify this with PHP 8.
-                        if ((new \ReflectionMethod($controller[0], $controller[1]))->isStatic()) {
-                            return $controller;
-                        }
-                    } catch (\ReflectionException $reflectionException) {
-                        throw $e;
+                    if (\is_callable($controller)) {
+                        return $this->checkController($request, $controller);
                     }
 
                     throw $e;
@@ -67,7 +76,7 @@ class ControllerResolver implements ControllerResolverInterface
                 throw new \InvalidArgumentException(sprintf('The controller for URI "%s" is not callable: ', $request->getPathInfo()).$this->getControllerError($controller));
             }
 
-            return $controller;
+            return $this->checkController($request, $controller);
         }
 
         if (\is_object($controller)) {
@@ -75,11 +84,11 @@ class ControllerResolver implements ControllerResolverInterface
                 throw new \InvalidArgumentException(sprintf('The controller for URI "%s" is not callable: ', $request->getPathInfo()).$this->getControllerError($controller));
             }
 
-            return $controller;
+            return $this->checkController($request, $controller);
         }
 
         if (\function_exists($controller)) {
-            return $controller;
+            return $this->checkController($request, $controller);
         }
 
         try {
@@ -92,17 +101,15 @@ class ControllerResolver implements ControllerResolverInterface
             throw new \InvalidArgumentException(sprintf('The controller for URI "%s" is not callable: ', $request->getPathInfo()).$this->getControllerError($callable));
         }
 
-        return $callable;
+        return $this->checkController($request, $callable);
     }
 
     /**
      * Returns a callable for the given controller.
      *
-     * @return callable
-     *
      * @throws \InvalidArgumentException When the controller cannot be created
      */
-    protected function createController(string $controller)
+    protected function createController(string $controller): callable
     {
         if (!str_contains($controller, '::')) {
             $controller = $this->instantiateController($controller);
@@ -123,7 +130,7 @@ class ControllerResolver implements ControllerResolverInterface
                 if ((new \ReflectionMethod($class, $method))->isStatic()) {
                     return $class.'::'.$method;
                 }
-            } catch (\ReflectionException $reflectionException) {
+            } catch (\ReflectionException) {
                 throw $e;
             }
 
@@ -139,15 +146,13 @@ class ControllerResolver implements ControllerResolverInterface
 
     /**
      * Returns an instantiated controller.
-     *
-     * @return object
      */
-    protected function instantiateController(string $class)
+    protected function instantiateController(string $class): object
     {
         return new $class();
     }
 
-    private function getControllerError($callable): string
+    private function getControllerError(mixed $callable): string
     {
         if (\is_string($callable)) {
             if (str_contains($callable, '::')) {
@@ -213,8 +218,55 @@ class ControllerResolver implements ControllerResolverInterface
     {
         $methods = get_class_methods($classOrObject);
 
-        return array_filter($methods, function (string $method) {
-            return 0 !== strncmp($method, '__', 2);
-        });
+        return array_filter($methods, fn (string $method) => 0 !== strncmp($method, '__', 2));
+    }
+
+    private function checkController(Request $request, callable $controller): callable
+    {
+        if (!$request->attributes->get('_check_controller_is_allowed', false)) {
+            return $controller;
+        }
+
+        $r = null;
+
+        if (\is_array($controller)) {
+            [$class, $name] = $controller;
+            $name = (\is_string($class) ? $class : $class::class).'::'.$name;
+        } elseif (\is_object($controller) && !$controller instanceof \Closure) {
+            $class = $controller;
+            $name = $class::class.'::__invoke';
+        } else {
+            $r = new \ReflectionFunction($controller);
+            $name = $r->name;
+
+            if ($r->isAnonymous()) {
+                $name = $class = \Closure::class;
+            } elseif ($class = $r->getClosureCalledClass()) {
+                $class = $class->name;
+                $name = $class.'::'.$name;
+            }
+        }
+
+        if ($class) {
+            foreach ($this->allowedControllerTypes as $type) {
+                if (is_a($class, $type, true)) {
+                    return $controller;
+                }
+            }
+        }
+
+        $r ??= new \ReflectionClass($class);
+
+        foreach ($r->getAttributes() as $attribute) {
+            if (isset($this->allowedControllerAttributes[$attribute->getName()])) {
+                return $controller;
+            }
+        }
+
+        if (str_contains($name, '@anonymous')) {
+            $name = preg_replace_callback('/[a-zA-Z_\x7f-\xff][\\\\a-zA-Z0-9_\x7f-\xff]*+@anonymous\x00.*?\.php(?:0x?|:[0-9]++\$)[0-9a-fA-F]++/', fn ($m) => class_exists($m[0], false) ? (get_parent_class($m[0]) ?: key(class_implements($m[0])) ?: 'class').'@anonymous' : $m[0], $name);
+        }
+
+        throw new BadRequestException(sprintf('Callable "%s()" is not allowed as a controller. Did you miss tagging it with "#[AsController]" or registering its type with "%s::allowControllers()"?', $name, self::class));
     }
 }

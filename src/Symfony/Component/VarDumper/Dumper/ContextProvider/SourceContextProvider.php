@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\VarDumper\Dumper\ContextProvider;
 
-use Symfony\Component\HttpKernel\Debug\FileLinkFormatter;
+use Symfony\Component\ErrorHandler\ErrorRenderer\FileLinkFormatter;
 use Symfony\Component\VarDumper\Cloner\VarCloner;
 use Symfony\Component\VarDumper\Dumper\HtmlDumper;
 use Symfony\Component\VarDumper\VarDumper;
@@ -25,10 +25,10 @@ use Twig\Template;
  */
 final class SourceContextProvider implements ContextProviderInterface
 {
-    private $limit;
-    private $charset;
-    private $projectDir;
-    private $fileLinkFormatter;
+    private int $limit;
+    private ?string $charset;
+    private ?string $projectDir;
+    private ?FileLinkFormatter $fileLinkFormatter;
 
     public function __construct(?string $charset = null, ?string $projectDir = null, ?FileLinkFormatter $fileLinkFormatter = null, int $limit = 9)
     {

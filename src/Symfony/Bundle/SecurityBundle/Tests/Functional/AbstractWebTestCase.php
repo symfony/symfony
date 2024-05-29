@@ -12,6 +12,7 @@
 namespace Symfony\Bundle\SecurityBundle\Tests\Functional;
 
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase as BaseWebTestCase;
+use Symfony\Bundle\SecurityBundle\Tests\Functional\app\AppKernel;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpKernel\KernelInterface;
 
@@ -19,7 +20,7 @@ abstract class AbstractWebTestCase extends BaseWebTestCase
 {
     public static function assertRedirect($response, $location)
     {
-        self::assertTrue($response->isRedirect(), 'Response is not a redirect, got status code: '.substr($response, 0, 2000));
+        self::assertTrue($response->isRedirect(), "Response is not a redirect, got:\n".(($p = strpos($response, '-->')) ? substr($response, 0, $p + 3) : $response));
         self::assertEquals('http://localhost'.$location, $response->headers->get('Location'));
     }
 
@@ -31,12 +32,6 @@ abstract class AbstractWebTestCase extends BaseWebTestCase
     public static function tearDownAfterClass(): void
     {
         static::deleteTmpDir();
-    }
-
-    public function provideSecuritySystems()
-    {
-        yield [['enable_authenticator_manager' => true]];
-        yield [['enable_authenticator_manager' => false]];
     }
 
     protected static function deleteTmpDir()
@@ -53,7 +48,7 @@ abstract class AbstractWebTestCase extends BaseWebTestCase
     {
         require_once __DIR__.'/app/AppKernel.php';
 
-        return 'Symfony\Bundle\SecurityBundle\Tests\Functional\app\AppKernel';
+        return AppKernel::class;
     }
 
     protected static function createKernel(array $options = []): KernelInterface
@@ -70,7 +65,6 @@ abstract class AbstractWebTestCase extends BaseWebTestCase
             $options['root_config'] ?? 'config.yml',
             $options['environment'] ?? strtolower(static::getVarDir().$options['test_case']),
             $options['debug'] ?? false,
-            $options['enable_authenticator_manager'] ?? false
         );
     }
 

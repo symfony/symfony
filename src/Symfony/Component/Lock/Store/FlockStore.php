@@ -30,7 +30,7 @@ use Symfony\Component\Lock\SharedLockStoreInterface;
  */
 class FlockStore implements BlockingStoreInterface, SharedLockStoreInterface
 {
-    private $lockPath;
+    private ?string $lockPath;
 
     /**
      * @param string|null $lockPath the directory to store the lock, defaults to the system's temporary directory
@@ -39,10 +39,7 @@ class FlockStore implements BlockingStoreInterface, SharedLockStoreInterface
      */
     public function __construct(?string $lockPath = null)
     {
-        if (null === $lockPath) {
-            $lockPath = sys_get_temp_dir();
-        }
-        if (!is_dir($lockPath)) {
+        if (!is_dir($lockPath ??= sys_get_temp_dir())) {
             if (false === @mkdir($lockPath, 0777, true) && !is_dir($lockPath)) {
                 throw new InvalidArgumentException(sprintf('The FlockStore directory "%s" does not exists and cannot be created.', $lockPath));
             }
@@ -53,39 +50,27 @@ class FlockStore implements BlockingStoreInterface, SharedLockStoreInterface
         $this->lockPath = $lockPath;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function save(Key $key)
+    public function save(Key $key): void
     {
         $this->lock($key, false, false);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function saveRead(Key $key)
+    public function saveRead(Key $key): void
     {
         $this->lock($key, true, false);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function waitAndSave(Key $key)
+    public function waitAndSave(Key $key): void
     {
         $this->lock($key, false, true);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function waitAndSaveRead(Key $key)
+    public function waitAndSaveRead(Key $key): void
     {
         $this->lock($key, true, true);
     }
 
-    private function lock(Key $key, bool $read, bool $blocking)
+    private function lock(Key $key, bool $read, bool $blocking): void
     {
         $handle = null;
         // The lock is maybe already acquired.
@@ -135,18 +120,12 @@ class FlockStore implements BlockingStoreInterface, SharedLockStoreInterface
         $key->markUnserializable();
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function putOffExpiration(Key $key, float $ttl)
+    public function putOffExpiration(Key $key, float $ttl): void
     {
         // do nothing, the flock locks forever.
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function delete(Key $key)
+    public function delete(Key $key): void
     {
         // The lock is maybe not acquired.
         if (!$key->hasState(__CLASS__)) {
@@ -161,10 +140,7 @@ class FlockStore implements BlockingStoreInterface, SharedLockStoreInterface
         $key->removeState(__CLASS__);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function exists(Key $key)
+    public function exists(Key $key): bool
     {
         return $key->hasState(__CLASS__);
     }

@@ -18,13 +18,12 @@ namespace Symfony\Component\Config\Definition\Builder;
  */
 class MergeBuilder
 {
-    protected $node;
-    public $allowFalse = false;
-    public $allowOverwrite = true;
+    public bool $allowFalse = false;
+    public bool $allowOverwrite = true;
 
-    public function __construct(NodeDefinition $node)
-    {
-        $this->node = $node;
+    public function __construct(
+        protected NodeDefinition $node,
+    ) {
     }
 
     /**
@@ -32,7 +31,7 @@ class MergeBuilder
      *
      * @return $this
      */
-    public function allowUnset(bool $allow = true)
+    public function allowUnset(bool $allow = true): static
     {
         $this->allowFalse = $allow;
 
@@ -44,7 +43,7 @@ class MergeBuilder
      *
      * @return $this
      */
-    public function denyOverwrite(bool $deny = true)
+    public function denyOverwrite(bool $deny = true): static
     {
         $this->allowOverwrite = !$deny;
 
@@ -53,10 +52,8 @@ class MergeBuilder
 
     /**
      * Returns the related node.
-     *
-     * @return NodeDefinition|ArrayNodeDefinition|VariableNodeDefinition
      */
-    public function end()
+    public function end(): NodeDefinition|ArrayNodeDefinition|VariableNodeDefinition
     {
         return $this->node;
     }

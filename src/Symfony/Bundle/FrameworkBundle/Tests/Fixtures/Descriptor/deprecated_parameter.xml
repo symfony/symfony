@@ -1,0 +1,2 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<parameter key="deprecated_foo" deprecated="Since symfony/framework-bundle 6.4: The parameter &quot;deprecated_foo&quot; is deprecated.">bar</parameter>

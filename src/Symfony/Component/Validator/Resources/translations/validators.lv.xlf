@@ -438,6 +438,10 @@
                 <source>This value is not a valid MAC address.</source>
                 <target>Šī vērtība nav derīga MAC adrese.</target>
             </trans-unit>
+            <trans-unit id="113">
+                <source>This URL is missing a top-level domain.</source>
+                <target>Šim URL trūkst augšējā līmeņa domēna.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

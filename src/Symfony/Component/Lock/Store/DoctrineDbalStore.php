@@ -31,7 +31,7 @@ use Symfony\Component\Lock\PersistingStoreInterface;
  *
  * Lock metadata are stored in a table. You can use createTable() to initialize
  * a correctly defined table.
-
+ *
  * CAUTION: This store relies on all client and server nodes to have
  * synchronized clocks for lock expiry to occur at the correct time.
  * To ensure locks don't expire prematurely; the TTLs should be set with enough
@@ -44,7 +44,7 @@ class DoctrineDbalStore implements PersistingStoreInterface
     use DatabaseTableTrait;
     use ExpiringStoreTrait;
 
-    private $conn;
+    private Connection $conn;
 
     /**
      * List of available options:
@@ -61,47 +61,36 @@ class DoctrineDbalStore implements PersistingStoreInterface
      * @throws InvalidArgumentException When namespace contains invalid characters
      * @throws InvalidArgumentException When the initial ttl is not valid
      */
-    public function __construct($connOrUrl, array $options = [], float $gcProbability = 0.01, int $initialTtl = 300)
+    public function __construct(Connection|string $connOrUrl, array $options = [], float $gcProbability = 0.01, int $initialTtl = 300)
     {
         $this->init($options, $gcProbability, $initialTtl);
 
         if ($connOrUrl instanceof Connection) {
             $this->conn = $connOrUrl;
-        } elseif (\is_string($connOrUrl)) {
+        } else {
             if (!class_exists(DriverManager::class)) {
                 throw new InvalidArgumentException('Failed to parse the DSN. Try running "composer require doctrine/dbal".');
             }
-            if (class_exists(DsnParser::class)) {
-                $params = (new DsnParser([
-                    'db2' => 'ibm_db2',
-                    'mssql' => 'pdo_sqlsrv',
-                    'mysql' => 'pdo_mysql',
-                    'mysql2' => 'pdo_mysql',
-                    'postgres' => 'pdo_pgsql',
-                    'postgresql' => 'pdo_pgsql',
-                    'pgsql' => 'pdo_pgsql',
-                    'sqlite' => 'pdo_sqlite',
-                    'sqlite3' => 'pdo_sqlite',
-                ]))->parse($connOrUrl);
-            } else {
-                $params = ['url' => $connOrUrl];
-            }
+            $params = (new DsnParser([
+                'db2' => 'ibm_db2',
+                'mssql' => 'pdo_sqlsrv',
+                'mysql' => 'pdo_mysql',
+                'mysql2' => 'pdo_mysql',
+                'postgres' => 'pdo_pgsql',
+                'postgresql' => 'pdo_pgsql',
+                'pgsql' => 'pdo_pgsql',
+                'sqlite' => 'pdo_sqlite',
+                'sqlite3' => 'pdo_sqlite',
+            ]))->parse($connOrUrl);
 
             $config = new Configuration();
-            if (class_exists(DefaultSchemaManagerFactory::class)) {
-                $config->setSchemaManagerFactory(new DefaultSchemaManagerFactory());
-            }
+            $config->setSchemaManagerFactory(new DefaultSchemaManagerFactory());
 
             $this->conn = DriverManager::getConnection($params, $config);
-        } else {
-            throw new \TypeError(sprintf('Argument 1 passed to "%s()" must be "%s" or string, "%s" given.', Connection::class, __METHOD__, get_debug_type($connOrUrl)));
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function save(Key $key)
+    public function save(Key $key): void
     {
         $key->reduceLifetime($this->initialTtl);
 
@@ -115,7 +104,7 @@ class DoctrineDbalStore implements PersistingStoreInterface
                 ParameterType::STRING,
                 ParameterType::STRING,
             ]);
-        } catch (TableNotFoundException $e) {
+        } catch (TableNotFoundException) {
             if (!$this->conn->isTransactionActive() || $this->platformSupportsTableCreationInTransaction()) {
                 $this->createTable();
             }
@@ -128,10 +117,10 @@ class DoctrineDbalStore implements PersistingStoreInterface
                     ParameterType::STRING,
                     ParameterType::STRING,
                 ]);
-            } catch (DBALException $e) {
+            } catch (DBALException) {
                 $this->putOffExpiration($key, $this->initialTtl);
             }
-        } catch (DBALException $e) {
+        } catch (DBALException) {
             // the lock is already acquired. It could be us. Let's try to put off.
             $this->putOffExpiration($key, $this->initialTtl);
         }
@@ -140,10 +129,7 @@ class DoctrineDbalStore implements PersistingStoreInterface
         $this->checkNotExpired($key);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function putOffExpiration(Key $key, $ttl)
+    public function putOffExpiration(Key $key, $ttl): void
     {
         if ($ttl < 1) {
             throw new InvalidTtlException(sprintf('"%s()" expects a TTL greater or equals to 1 second. Got "%s".', __METHOD__, $ttl));
@@ -174,10 +160,7 @@ class DoctrineDbalStore implements PersistingStoreInterface
         $this->checkNotExpired($key);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function delete(Key $key)
+    public function delete(Key $key): void
     {
         $this->conn->delete($this->table, [
             $this->idCol => $this->getHashedKey($key),
@@ -185,10 +168,7 @@ class DoctrineDbalStore implements PersistingStoreInterface
         ]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function exists(Key $key)
+    public function exists(Key $key): bool
     {
         $sql = "SELECT 1 FROM $this->table WHERE $this->idCol = ? AND $this->tokenCol = ? AND $this->expirationCol > {$this->getCurrentTimestampStatement()}";
         $result = $this->conn->fetchOne($sql, [
@@ -210,7 +190,7 @@ class DoctrineDbalStore implements PersistingStoreInterface
     public function createTable(): void
     {
         $schema = new Schema();
-        $this->configureSchema($schema);
+        $this->configureSchema($schema, static fn () => true);
 
         foreach ($schema->toSql($this->conn->getDatabasePlatform()) as $sql) {
             $this->conn->executeStatement($sql);
@@ -220,9 +200,13 @@ class DoctrineDbalStore implements PersistingStoreInterface
     /**
      * Adds the Table to the Schema if it doesn't exist.
      */
-    public function configureSchema(Schema $schema): void
+    public function configureSchema(Schema $schema, \Closure $isSameDatabase): void
     {
         if ($schema->hasTable($this->table)) {
+            return;
+        }
+
+        if (!$isSameDatabase($this->conn->executeStatement(...))) {
             return;
         }
 
@@ -249,28 +233,15 @@ class DoctrineDbalStore implements PersistingStoreInterface
     private function getCurrentTimestampStatement(): string
     {
         $platform = $this->conn->getDatabasePlatform();
-        switch (true) {
-            case $platform instanceof \Doctrine\DBAL\Platforms\MySQLPlatform:
-            case $platform instanceof \Doctrine\DBAL\Platforms\MySQL57Platform:
-                return 'UNIX_TIMESTAMP()';
 
-            case $platform instanceof \Doctrine\DBAL\Platforms\SqlitePlatform:
-                return 'strftime(\'%s\',\'now\')';
-
-            case $platform instanceof \Doctrine\DBAL\Platforms\PostgreSQLPlatform:
-            case $platform instanceof \Doctrine\DBAL\Platforms\PostgreSQL94Platform:
-                return 'CAST(EXTRACT(epoch FROM NOW()) AS INT)';
-
-            case $platform instanceof \Doctrine\DBAL\Platforms\OraclePlatform:
-                return '(SYSDATE - TO_DATE(\'19700101\',\'yyyymmdd\'))*86400 - TO_NUMBER(SUBSTR(TZ_OFFSET(sessiontimezone), 1, 3))*3600';
-
-            case $platform instanceof \Doctrine\DBAL\Platforms\SQLServerPlatform:
-            case $platform instanceof \Doctrine\DBAL\Platforms\SQLServer2012Platform:
-                return 'DATEDIFF(s, \'1970-01-01\', GETUTCDATE())';
-
-            default:
-                return (string) time();
-        }
+        return match (true) {
+            $platform instanceof \Doctrine\DBAL\Platforms\AbstractMySQLPlatform => 'UNIX_TIMESTAMP()',
+            $platform instanceof \Doctrine\DBAL\Platforms\SqlitePlatform => 'strftime(\'%s\',\'now\')',
+            $platform instanceof \Doctrine\DBAL\Platforms\PostgreSQLPlatform => 'CAST(EXTRACT(epoch FROM NOW()) AS INT)',
+            $platform instanceof \Doctrine\DBAL\Platforms\OraclePlatform => '(SYSDATE - TO_DATE(\'19700101\',\'yyyymmdd\'))*86400 - TO_NUMBER(SUBSTR(TZ_OFFSET(sessiontimezone), 1, 3))*3600',
+            $platform instanceof \Doctrine\DBAL\Platforms\SQLServerPlatform => 'DATEDIFF(s, \'1970-01-01\', GETUTCDATE())',
+            default => (string) time(),
+        };
     }
 
     /**
@@ -280,15 +251,11 @@ class DoctrineDbalStore implements PersistingStoreInterface
     {
         $platform = $this->conn->getDatabasePlatform();
 
-        switch (true) {
-            case $platform instanceof \Doctrine\DBAL\Platforms\PostgreSQLPlatform:
-            case $platform instanceof \Doctrine\DBAL\Platforms\PostgreSQL94Platform:
-            case $platform instanceof \Doctrine\DBAL\Platforms\SqlitePlatform:
-            case $platform instanceof \Doctrine\DBAL\Platforms\SQLServerPlatform:
-            case $platform instanceof \Doctrine\DBAL\Platforms\SQLServer2012Platform:
-                return true;
-            default:
-                return false;
-        }
+        return match (true) {
+            $platform instanceof \Doctrine\DBAL\Platforms\PostgreSQLPlatform,
+            $platform instanceof \Doctrine\DBAL\Platforms\SqlitePlatform,
+            $platform instanceof \Doctrine\DBAL\Platforms\SQLServerPlatform => true,
+            default => false,
+        };
     }
 }

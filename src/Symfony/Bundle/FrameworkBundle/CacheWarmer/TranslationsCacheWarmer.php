@@ -21,11 +21,13 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  * Generates the catalogues for translations.
  *
  * @author Xavier Leune <xavier.leune@gmail.com>
+ *
+ * @final since Symfony 7.1
  */
 class TranslationsCacheWarmer implements CacheWarmerInterface, ServiceSubscriberInterface
 {
-    private $container;
-    private $translator;
+    private ContainerInterface $container;
+    private TranslatorInterface $translator;
 
     public function __construct(ContainerInterface $container)
     {
@@ -33,36 +35,23 @@ class TranslationsCacheWarmer implements CacheWarmerInterface, ServiceSubscriber
         $this->container = $container;
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * @return string[]
-     */
-    public function warmUp(string $cacheDir)
+    public function warmUp(string $cacheDir, ?string $buildDir = null): array
     {
-        if (null === $this->translator) {
-            $this->translator = $this->container->get('translator');
-        }
+        $this->translator ??= $this->container->get('translator');
 
         if ($this->translator instanceof WarmableInterface) {
-            return (array) $this->translator->warmUp($cacheDir);
+            return (array) $this->translator->warmUp($cacheDir, $buildDir);
         }
 
         return [];
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function isOptional()
+    public function isOptional(): bool
     {
         return true;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public static function getSubscribedServices()
+    public static function getSubscribedServices(): array
     {
         return [
             'translator' => TranslatorInterface::class,

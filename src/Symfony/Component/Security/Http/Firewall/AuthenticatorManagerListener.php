@@ -22,7 +22,7 @@ use Symfony\Component\Security\Http\Authentication\AuthenticatorManagerInterface
  */
 class AuthenticatorManagerListener extends AbstractListener
 {
-    private $authenticatorManager;
+    private AuthenticatorManagerInterface $authenticatorManager;
 
     public function __construct(AuthenticatorManagerInterface $authenticationManager)
     {

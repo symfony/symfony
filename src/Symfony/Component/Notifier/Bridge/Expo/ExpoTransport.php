@@ -29,14 +29,11 @@ final class ExpoTransport extends AbstractTransport
 {
     protected const HOST = 'exp.host/--/api/v2/push/send';
 
-    /** @var string|null */
-    private $token;
-
-    public function __construct(?string $token = null, ?HttpClientInterface $client = null, ?EventDispatcherInterface $dispatcher = null)
-    {
-        $this->token = $token;
-        $this->client = $client;
-
+    public function __construct(
+        #[\SensitiveParameter] private ?string $token = null,
+        ?HttpClientInterface $client = null,
+        ?EventDispatcherInterface $dispatcher = null,
+    ) {
         parent::__construct($client, $dispatcher);
     }
 
@@ -60,17 +57,16 @@ final class ExpoTransport extends AbstractTransport
         }
 
         $endpoint = sprintf('https://%s', $this->getEndpoint());
-        $options = ($opts = $message->getOptions()) ? $opts->toArray() : [];
-        if (!isset($options['to'])) {
-            $options['to'] = $message->getRecipientId();
-        }
-        if (null === $options['to']) {
+        $options = $message->getOptions()?->toArray() ?? [];
+        $options['to'] ??= $message->getRecipientId();
+
+        if (!$options['to']) {
             throw new InvalidArgumentException(sprintf('The "%s" transport required the "to" option to be set.', __CLASS__));
         }
 
         $options['title'] = $message->getSubject();
         $options['body'] = $message->getContent();
-        $options['data'] = $options['data'] ?? [];
+        $options['data'] ??= [];
 
         $response = $this->client->request('POST', $endpoint, [
             'headers' => [
@@ -86,15 +82,15 @@ final class ExpoTransport extends AbstractTransport
         }
 
         $contentType = $response->getHeaders(false)['content-type'][0] ?? '';
-        $jsonContents = 0 === strpos($contentType, 'application/json') ? $response->toArray(false) : null;
+        $result = str_starts_with($contentType, 'application/json') ? $response->toArray(false) : null;
 
         if (200 !== $statusCode) {
-            $errorMessage = $jsonContents['error']['message'] ?? $response->getContent(false);
+            $errorMessage = $result['error']['message'] ?? $response->getContent(false);
 
             throw new TransportException('Unable to post the Expo message: '.$errorMessage, $response);
         }
 
-        $result = $response->toArray(false);
+        $result ??= $response->toArray(false);
 
         if ('error' === $result['data']['status']) {
             throw new TransportException(sprintf('Unable to post the Expo message: "%s" (%s)', $result['data']['message'], $result['data']['details']['error']), $response);

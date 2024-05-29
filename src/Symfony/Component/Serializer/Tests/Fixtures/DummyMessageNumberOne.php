@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Serializer\Tests\Fixtures;
 
-use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Serializer\Attribute\Groups;
 
 /**
  * @author Samuel Roze <samuel.roze@gmail.com>
@@ -20,8 +20,6 @@ class DummyMessageNumberOne implements DummyMessageInterface
 {
     public $one;
 
-    /**
-     * @Groups({"two"})
-     */
+    #[Groups(['two'])]
     public $two;
 }

@@ -6,7 +6,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class Foo2Command extends Command
 {
-    protected function configure()
+    protected function configure(): void
     {
         $this
             ->setName('foo1:bar')

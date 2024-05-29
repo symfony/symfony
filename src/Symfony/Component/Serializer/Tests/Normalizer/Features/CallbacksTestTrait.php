@@ -107,8 +107,8 @@ trait CallbacksTestTrait
             }
         };
 
-        $obj = $normalizer->denormalize(['foo' => $valueBar], \get_class($objWithNoConstructorArgument), 'any', ['callbacks' => $callbacks]);
-        $this->assertInstanceof(\get_class($objWithNoConstructorArgument), $obj);
+        $obj = $normalizer->denormalize(['foo' => $valueBar], $objWithNoConstructorArgument::class, 'any', ['callbacks' => $callbacks]);
+        $this->assertInstanceof($objWithNoConstructorArgument::class, $obj);
         $this->assertEquals($result->getBar(), $obj->getBar());
     }
 
@@ -126,13 +126,13 @@ trait CallbacksTestTrait
         $normalizer->normalize($obj, null, ['callbacks' => $callbacks]);
     }
 
-    public function provideNormalizeCallbacks()
+    public static function provideNormalizeCallbacks()
     {
         return [
             'Change a string' => [
                 [
                     'bar' => function ($bar) {
-                        $this->assertEquals('baz', $bar);
+                        static::assertEquals('baz', $bar);
 
                         return 'baz';
                     },
@@ -143,11 +143,11 @@ trait CallbacksTestTrait
             'Null an item' => [
                 [
                     'bar' => function ($value, $object, $attributeName, $format, $context) {
-                        $this->assertSame('baz', $value);
-                        $this->assertInstanceOf(CallbacksObject::class, $object);
-                        $this->assertSame('bar', $attributeName);
-                        $this->assertSame('any', $format);
-                        $this->assertArrayHasKey('circular_reference_limit_counters', $context);
+                        static::assertSame('baz', $value);
+                        static::assertInstanceOf(CallbacksObject::class, $object);
+                        static::assertSame('bar', $attributeName);
+                        static::assertSame('any', $format);
+                        static::assertArrayHasKey('circular_reference_limit_counters', $context);
                     },
                 ],
                 'baz',
@@ -156,12 +156,12 @@ trait CallbacksTestTrait
             'Format a date' => [
                 [
                     'bar' => function ($bar) {
-                        $this->assertInstanceOf(\DateTime::class, $bar);
+                        static::assertInstanceOf(\DateTimeImmutable::class, $bar);
 
                         return $bar->format('d-m-Y H:i:s');
                     },
                 ],
-                new \DateTime('2011-09-10 06:30:00'),
+                new \DateTimeImmutable('2011-09-10 06:30:00'),
                 ['bar' => '10-09-2011 06:30:00', 'foo' => null],
             ],
             'Collect a property' => [
@@ -180,9 +180,7 @@ trait CallbacksTestTrait
             ],
             'Count a property' => [
                 [
-                    'bar' => function (array $bars) {
-                        return \count($bars);
-                    },
+                    'bar' => fn (array $bars) => \count($bars),
                 ],
                 [new CallbacksObject(), new CallbacksObject()],
                 ['bar' => 2, 'foo' => null],
@@ -190,13 +188,13 @@ trait CallbacksTestTrait
         ];
     }
 
-    public function provideDenormalizeCallbacks(): array
+    public static function provideDenormalizeCallbacks(): array
     {
         return [
             'Change a string' => [
                 [
                     'bar' => function ($bar) {
-                        $this->assertEquals('bar', $bar);
+                        static::assertEquals('bar', $bar);
 
                         return $bar;
                     },
@@ -207,11 +205,11 @@ trait CallbacksTestTrait
             'Null an item' => [
                 [
                     'bar' => function ($value, $object, $attributeName, $format, $context) {
-                        $this->assertSame('baz', $value);
-                        $this->assertTrue(is_a($object, CallbacksObject::class, true));
-                        $this->assertSame('bar', $attributeName);
-                        $this->assertSame('any', $format);
-                        $this->assertIsArray($context);
+                        static::assertSame('baz', $value);
+                        static::assertTrue(is_a($object, CallbacksObject::class, true));
+                        static::assertSame('bar', $attributeName);
+                        static::assertSame('any', $format);
+                        static::assertIsArray($context);
                     },
                 ],
                 'baz',
@@ -220,13 +218,13 @@ trait CallbacksTestTrait
             'Format a date' => [
                 [
                     'bar' => function ($bar) {
-                        $this->assertIsString($bar);
+                        static::assertIsString($bar);
 
-                        return \DateTime::createFromFormat('d-m-Y H:i:s', $bar);
+                        return \DateTimeImmutable::createFromFormat('d-m-Y H:i:s', $bar);
                     },
                 ],
                 '10-09-2011 06:30:00',
-                new CallbacksObject(new \DateTime('2011-09-10 06:30:00')),
+                new CallbacksObject(new \DateTimeImmutable('2011-09-10 06:30:00')),
             ],
             'Collect a property' => [
                 [
@@ -244,9 +242,7 @@ trait CallbacksTestTrait
             ],
             'Count a property' => [
                 [
-                    'bar' => function (array $bars) {
-                        return \count($bars);
-                    },
+                    'bar' => fn (array $bars) => \count($bars),
                 ],
                 [new CallbacksObject(), new CallbacksObject()],
                 new CallbacksObject(2),
@@ -254,13 +250,13 @@ trait CallbacksTestTrait
         ];
     }
 
-    public function providerDenormalizeCallbacksWithTypedProperty(): array
+    public static function providerDenormalizeCallbacksWithTypedProperty(): array
     {
         return [
             'Change a typed string' => [
                 [
                     'foo' => function ($foo) {
-                        $this->assertEquals('foo', $foo);
+                        static::assertEquals('foo', $foo);
 
                         return $foo;
                     },
@@ -271,11 +267,11 @@ trait CallbacksTestTrait
             'Null an typed item' => [
                 [
                     'foo' => function ($value, $object, $attributeName, $format, $context) {
-                        $this->assertSame('fool', $value);
-                        $this->assertTrue(is_a($object, CallbacksObject::class, true));
-                        $this->assertSame('foo', $attributeName);
-                        $this->assertSame('any', $format);
-                        $this->assertIsArray($context);
+                        static::assertSame('fool', $value);
+                        static::assertTrue(is_a($object, CallbacksObject::class, true));
+                        static::assertSame('foo', $attributeName);
+                        static::assertSame('any', $format);
+                        static::assertIsArray($context);
                     },
                 ],
                 'fool',
@@ -284,7 +280,7 @@ trait CallbacksTestTrait
         ];
     }
 
-    public function provideInvalidCallbacks()
+    public static function provideInvalidCallbacks()
     {
         return [
             [['bar' => null]],

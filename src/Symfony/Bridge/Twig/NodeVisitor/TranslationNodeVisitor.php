@@ -18,19 +18,19 @@ use Twig\Node\Expression\ConstantExpression;
 use Twig\Node\Expression\FilterExpression;
 use Twig\Node\Expression\FunctionExpression;
 use Twig\Node\Node;
-use Twig\NodeVisitor\AbstractNodeVisitor;
+use Twig\NodeVisitor\NodeVisitorInterface;
 
 /**
  * TranslationNodeVisitor extracts translation messages.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-final class TranslationNodeVisitor extends AbstractNodeVisitor
+final class TranslationNodeVisitor implements NodeVisitorInterface
 {
     public const UNDEFINED_DOMAIN = '_undefined';
 
-    private $enabled = false;
-    private $messages = [];
+    private bool $enabled = false;
+    private array $messages = [];
 
     public function enable(): void
     {
@@ -49,19 +49,16 @@ final class TranslationNodeVisitor extends AbstractNodeVisitor
         return $this->messages;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function doEnterNode(Node $node, Environment $env): Node
+    public function enterNode(Node $node, Environment $env): Node
     {
         if (!$this->enabled) {
             return $node;
         }
 
         if (
-            $node instanceof FilterExpression &&
-            'trans' === $node->getNode('filter')->getAttribute('value') &&
-            $node->getNode('node') instanceof ConstantExpression
+            $node instanceof FilterExpression
+            && 'trans' === $node->getNode('filter')->getAttribute('value')
+            && $node->getNode('node') instanceof ConstantExpression
         ) {
             // extract constant nodes with a trans filter
             $this->messages[] = [
@@ -69,8 +66,8 @@ final class TranslationNodeVisitor extends AbstractNodeVisitor
                 $this->getReadDomainFromArguments($node->getNode('arguments'), 1),
             ];
         } elseif (
-            $node instanceof FunctionExpression &&
-            't' === $node->getAttribute('name')
+            $node instanceof FunctionExpression
+            && 't' === $node->getAttribute('name')
         ) {
             $nodeArguments = $node->getNode('arguments');
 
@@ -87,10 +84,10 @@ final class TranslationNodeVisitor extends AbstractNodeVisitor
                 $node->hasNode('domain') ? $this->getReadDomainFromNode($node->getNode('domain')) : null,
             ];
         } elseif (
-            $node instanceof FilterExpression &&
-            'trans' === $node->getNode('filter')->getAttribute('value') &&
-            $node->getNode('node') instanceof ConcatBinary &&
-            $message = $this->getConcatValueFromNode($node->getNode('node'), null)
+            $node instanceof FilterExpression
+            && 'trans' === $node->getNode('filter')->getAttribute('value')
+            && $node->getNode('node') instanceof ConcatBinary
+            && $message = $this->getConcatValueFromNode($node->getNode('node'), null)
         ) {
             $this->messages[] = [
                 $message,
@@ -101,17 +98,11 @@ final class TranslationNodeVisitor extends AbstractNodeVisitor
         return $node;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function doLeaveNode(Node $node, Environment $env): ?Node
+    public function leaveNode(Node $node, Environment $env): ?Node
     {
         return $node;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getPriority(): int
     {
         return 0;

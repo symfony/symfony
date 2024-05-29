@@ -13,6 +13,7 @@ namespace Symfony\Bundle\FrameworkBundle\Tests\Functional;
 
 use Symfony\Bundle\FrameworkBundle\Command\ConfigDebugCommand;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
+use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Tester\CommandCompletionTester;
@@ -87,6 +88,36 @@ class ConfigDebugCommandTest extends AbstractWebTestCase
      * @testWith [true]
      *           [false]
      */
+    public function testDumpWithoutTitleIsValidJson(bool $debug)
+    {
+        $tester = $this->createCommandTester($debug);
+        $ret = $tester->execute(['name' => 'TestBundle', '--format' => 'json']);
+
+        $this->assertSame(0, $ret, 'Returns 0 in case of success');
+        $this->assertJson($tester->getDisplay());
+    }
+
+    /**
+     * @testWith [true]
+     *           [false]
+     */
+    public function testDumpWithUnsupportedFormat(bool $debug)
+    {
+        $tester = $this->createCommandTester($debug);
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Supported formats are "txt", "yaml", "json"');
+
+        $tester->execute([
+            'name' => 'test',
+            '--format' => 'xml',
+        ]);
+    }
+
+    /**
+     * @testWith [true]
+     *           [false]
+     */
     public function testParametersValuesAreResolved(bool $debug)
     {
         $tester = $this->createCommandTester($debug);
@@ -95,6 +126,22 @@ class ConfigDebugCommandTest extends AbstractWebTestCase
         $this->assertSame(0, $ret, 'Returns 0 in case of success');
         $this->assertStringContainsString("locale: '%env(LOCALE)%'", $tester->getDisplay());
         $this->assertStringContainsString('secret: test', $tester->getDisplay());
+    }
+
+    /**
+     * @testWith [true]
+     *           [false]
+     */
+    public function testParametersValuesAreFullyResolved(bool $debug)
+    {
+        $tester = $this->createCommandTester($debug);
+        $ret = $tester->execute(['name' => 'framework', '--resolve-env' => true]);
+
+        $this->assertSame(0, $ret, 'Returns 0 in case of success');
+        $this->assertStringContainsString('locale: en', $tester->getDisplay());
+        $this->assertStringContainsString('secret: test', $tester->getDisplay());
+        $this->assertStringContainsString('cookie_httponly: true', $tester->getDisplay());
+        $this->assertStringContainsString('ide: '.$debug ? ($_ENV['SYMFONY_IDE'] ?? $_SERVER['SYMFONY_IDE'] ?? 'null') : 'null', $tester->getDisplay());
     }
 
     /**
@@ -212,6 +259,9 @@ class ConfigDebugCommandTest extends AbstractWebTestCase
         $nameWithPath = ['secret', 'router.resource', 'router.utf8', 'router.enabled', 'validation.enabled', 'default_locale'];
         yield 'name with existing path, no debug' => [false, ['framework', ''], $nameWithPath];
         yield 'name with existing path, debug' => [true, ['framework', ''], $nameWithPath];
+
+        yield 'option --format, no debug' => [false, ['--format', ''], ['yaml', 'json']];
+        yield 'option --format, debug' => [true, ['--format', ''], ['yaml', 'json']];
     }
 
     private function createCommandTester(bool $debug): CommandTester

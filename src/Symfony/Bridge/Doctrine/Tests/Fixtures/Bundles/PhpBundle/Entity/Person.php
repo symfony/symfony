@@ -13,18 +13,14 @@ namespace Fixtures\Bundles\PhpBundle\Entity;
 
 class Person
 {
-    protected $id;
-
-    public $name;
-
-    public function __construct($id, $name)
-    {
-        $this->id = $id;
-        $this->name = $name;
+    public function __construct(
+        protected int $id,
+        public string $name,
+    ) {
     }
 
     public function __toString(): string
     {
-        return (string) $this->name;
+        return $this->name;
     }
 }

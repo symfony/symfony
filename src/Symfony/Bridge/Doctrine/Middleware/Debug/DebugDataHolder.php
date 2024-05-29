@@ -16,7 +16,7 @@ namespace Symfony\Bridge\Doctrine\Middleware\Debug;
  */
 class DebugDataHolder
 {
-    private $data = [];
+    private array $data = [];
 
     public function addQuery(string $connectionName, Query $query): void
     {
@@ -24,7 +24,7 @@ class DebugDataHolder
             'sql' => $query->getSql(),
             'params' => $query->getParams(),
             'types' => $query->getTypes(),
-            'executionMS' => [$query, 'getDuration'],  // stop() may not be called at this point
+            'executionMS' => $query->getDuration(...),  // stop() may not be called at this point
         ];
     }
 

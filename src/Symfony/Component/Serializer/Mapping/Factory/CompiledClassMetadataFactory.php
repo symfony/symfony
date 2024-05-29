@@ -21,14 +21,14 @@ use Symfony\Component\Serializer\Mapping\ClassMetadataInterface;
  */
 final class CompiledClassMetadataFactory implements ClassMetadataFactoryInterface
 {
-    private $compiledClassMetadata = [];
+    private array $compiledClassMetadata = [];
 
-    private $loadedClasses = [];
+    private array $loadedClasses = [];
 
-    private $classMetadataFactory;
-
-    public function __construct(string $compiledClassMetadataFile, ClassMetadataFactoryInterface $classMetadataFactory)
-    {
+    public function __construct(
+        string $compiledClassMetadataFile,
+        private readonly ClassMetadataFactoryInterface $classMetadataFactory,
+    ) {
         if (!file_exists($compiledClassMetadataFile)) {
             throw new \RuntimeException("File \"{$compiledClassMetadataFile}\" could not be found.");
         }
@@ -39,15 +39,11 @@ final class CompiledClassMetadataFactory implements ClassMetadataFactoryInterfac
         }
 
         $this->compiledClassMetadata = $compiledClassMetadata;
-        $this->classMetadataFactory = $classMetadataFactory;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getMetadataFor($value): ClassMetadataInterface
+    public function getMetadataFor(string|object $value): ClassMetadataInterface
     {
-        $className = \is_object($value) ? \get_class($value) : $value;
+        $className = \is_object($value) ? $value::class : $value;
 
         if (!isset($this->compiledClassMetadata[$className])) {
             return $this->classMetadataFactory->getMetadataFor($value);
@@ -70,12 +66,9 @@ final class CompiledClassMetadataFactory implements ClassMetadataFactoryInterfac
         return $this->loadedClasses[$className];
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function hasMetadataFor($value): bool
+    public function hasMetadataFor(mixed $value): bool
     {
-        $className = \is_object($value) ? \get_class($value) : $value;
+        $className = \is_object($value) ? $value::class : $value;
 
         return isset($this->compiledClassMetadata[$className]) || $this->classMetadataFactory->hasMetadataFor($value);
     }

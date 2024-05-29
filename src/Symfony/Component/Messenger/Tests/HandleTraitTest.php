@@ -25,7 +25,7 @@ class HandleTraitTest extends TestCase
     public function testItThrowsOnNoMessageBusInstance()
     {
         $this->expectException(LogicException::class);
-        $this->expectExceptionMessage('You must provide a "Symfony\Component\Messenger\MessageBusInterface" instance in the "Symfony\Component\Messenger\Tests\TestQueryBus::$messageBus" property, "null" given.');
+        $this->expectExceptionMessage('You must provide a "Symfony\Component\Messenger\MessageBusInterface" instance in the "Symfony\Component\Messenger\Tests\TestQueryBus::$messageBus" property, but that property has not been initialized yet.');
         $queryBus = new TestQueryBus(null);
         $query = new DummyMessage('Hello');
 

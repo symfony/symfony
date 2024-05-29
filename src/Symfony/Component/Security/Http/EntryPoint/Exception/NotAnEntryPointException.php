@@ -11,12 +11,15 @@
 
 namespace Symfony\Component\Security\Http\EntryPoint\Exception;
 
+use Symfony\Component\HttpKernel\Attribute\WithHttpStatus;
+
 /**
  * Thrown by generic decorators when a decorated authenticator does not implement
  * {@see AuthenticationEntryPointInterface}.
  *
  * @author Robin Chalas <robin.chalas@gmail.com>
  */
+#[WithHttpStatus(401)]
 class NotAnEntryPointException extends \RuntimeException
 {
 }

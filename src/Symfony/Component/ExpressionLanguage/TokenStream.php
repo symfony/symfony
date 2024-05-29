@@ -18,11 +18,11 @@ namespace Symfony\Component\ExpressionLanguage;
  */
 class TokenStream
 {
-    public $current;
+    public Token $current;
 
-    private $tokens;
-    private $position = 0;
-    private $expression;
+    private array $tokens;
+    private int $position = 0;
+    private string $expression;
 
     public function __construct(array $tokens, string $expression = '')
     {
@@ -33,10 +33,8 @@ class TokenStream
 
     /**
      * Returns a string representation of the token stream.
-     *
-     * @return string
      */
-    public function __toString()
+    public function __toString(): string
     {
         return implode("\n", $this->tokens);
     }
@@ -44,7 +42,7 @@ class TokenStream
     /**
      * Sets the pointer to the next token and returns the old one.
      */
-    public function next()
+    public function next(): void
     {
         ++$this->position;
 
@@ -58,7 +56,7 @@ class TokenStream
     /**
      * @param string|null $message The syntax error message
      */
-    public function expect(string $type, ?string $value = null, ?string $message = null)
+    public function expect(string $type, ?string $value = null, ?string $message = null): void
     {
         $token = $this->current;
         if (!$token->test($type, $value)) {
@@ -69,10 +67,8 @@ class TokenStream
 
     /**
      * Checks if end of stream was reached.
-     *
-     * @return bool
      */
-    public function isEOF()
+    public function isEOF(): bool
     {
         return Token::EOF_TYPE === $this->current->type;
     }

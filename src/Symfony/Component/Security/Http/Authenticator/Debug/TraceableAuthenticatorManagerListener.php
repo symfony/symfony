@@ -25,9 +25,9 @@ use Symfony\Contracts\Service\ResetInterface;
  */
 final class TraceableAuthenticatorManagerListener extends AbstractListener implements ResetInterface
 {
-    private $authenticationManagerListener;
-    private $authenticatorsInfo = [];
-    private $hasVardumper;
+    private AuthenticatorManagerListener $authenticationManagerListener;
+    private array $authenticatorsInfo = [];
+    private bool $hasVardumper;
 
     public function __construct(AuthenticatorManagerListener $authenticationManagerListener)
     {
@@ -51,9 +51,11 @@ final class TraceableAuthenticatorManagerListener extends AbstractListener imple
         foreach ($request->attributes->get('_security_skipped_authenticators') as $skippedAuthenticator) {
             $this->authenticatorsInfo[] = [
                 'supports' => false,
-                'stub' => $this->hasVardumper ? new ClassStub(\get_class($skippedAuthenticator)) : \get_class($skippedAuthenticator),
+                'stub' => $this->hasVardumper ? new ClassStub($skippedAuthenticator::class) : $skippedAuthenticator::class,
                 'passport' => null,
                 'duration' => 0,
+                'authenticated' => null,
+                'badges' => [],
             ];
         }
 

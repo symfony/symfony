@@ -24,7 +24,7 @@ use Twig\TwigFilter;
 
 class LintCommandTest extends TestCase
 {
-    private $files;
+    private array $files;
 
     public function testLintCorrectFile()
     {
@@ -141,10 +141,6 @@ class LintCommandTest extends TestCase
      */
     public function testComplete(array $input, array $expectedSuggestions)
     {
-        if (!class_exists(CommandCompletionTester::class)) {
-            $this->markTestSkipped('Test command completion requires symfony/console 5.4+.');
-        }
-
         $tester = new CommandCompletionTester($this->createCommand());
 
         $this->assertSame($expectedSuggestions, $tester->complete($input));
@@ -163,9 +159,7 @@ class LintCommandTest extends TestCase
     private function createCommand(): Command
     {
         $environment = new Environment(new FilesystemLoader(\dirname(__DIR__).'/Fixtures/templates/'));
-        $environment->addFilter(new TwigFilter('deprecated_filter', function ($v) {
-            return $v;
-        }, ['deprecated' => true]));
+        $environment->addFilter(new TwigFilter('deprecated_filter', fn ($v) => $v, ['deprecated' => true]));
 
         $command = new LintCommand($environment);
 

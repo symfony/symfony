@@ -136,7 +136,7 @@
             </trans-unit>
             <trans-unit id="37" resname="This is not a valid IP address.">
                 <source>This value is not a valid IP address.</source>
-                <target state="needs-review-translation">Este valor no es una dirección IP válida.</target>
+                <target>Este valor no es una dirección IP válida.</target>
             </trans-unit>
             <trans-unit id="38">
                 <source>This value is not a valid language.</source>
@@ -224,7 +224,7 @@
             </trans-unit>
             <trans-unit id="59" resname="This is not a valid International Bank Account Number (IBAN).">
                 <source>This value is not a valid International Bank Account Number (IBAN).</source>
-                <target state="needs-review-translation">Este valor no es un Número de Cuenta Bancaria Internacional (IBAN) válido.</target>
+                <target>Este valor no es un Número de Cuenta Bancaria Internacional (IBAN) válido.</target>
             </trans-unit>
             <trans-unit id="60">
                 <source>This value is not a valid ISBN-10.</source>
@@ -312,7 +312,7 @@
             </trans-unit>
             <trans-unit id="81" resname="This is not a valid Business Identifier Code (BIC).">
                 <source>This value is not a valid Business Identifier Code (BIC).</source>
-                <target state="needs-review-translation">Este valor no es un Código de Identificación de Negocios (BIC) válido.</target>
+                <target>Este valor no es un Código de Identificación de Negocios (BIC) válido.</target>
             </trans-unit>
             <trans-unit id="82">
                 <source>Error</source>
@@ -320,7 +320,7 @@
             </trans-unit>
             <trans-unit id="83" resname="This is not a valid UUID.">
                 <source>This value is not a valid UUID.</source>
-                <target state="needs-review-translation">Este valor no es un UUID válido.</target>
+                <target>Este valor no es un UUID válido.</target>
             </trans-unit>
             <trans-unit id="84">
                 <source>This value should be a multiple of {{ compared_value }}.</source>
@@ -404,7 +404,7 @@
             </trans-unit>
             <trans-unit id="104">
                 <source>The filename is too long. It should have {{ filename_max_length }} character or less.|The filename is too long. It should have {{ filename_max_length }} characters or less.</source>
-                <target>El nombre del archivo es demasido largo. Debe tener {{ filename_max_length }} carácter o menos.|El nombre del archivo es demasido largo. Debe tener {{ filename_max_length }} caracteres o menos.</target>
+                <target>El nombre del archivo es demasiado largo. Debe tener {{ filename_max_length }} carácter o menos.|El nombre del archivo es demasiado largo. Debe tener {{ filename_max_length }} caracteres o menos.</target>
             </trans-unit>
             <trans-unit id="105">
                 <source>The password strength is too low. Please use a stronger password.</source>
@@ -436,7 +436,11 @@
             </trans-unit>
             <trans-unit id="112">
                 <source>This value is not a valid MAC address.</source>
-                <target state="needs-review-translation">Este valor no es una dirección MAC válida.</target>
+                <target>Este valor no es una dirección MAC válida.</target>
+            </trans-unit>
+            <trans-unit id="113">
+                <source>This URL is missing a top-level domain.</source>
+                <target>Esta URL no contiene una extensión de dominio (TLD).</target>
             </trans-unit>
         </body>
     </file>

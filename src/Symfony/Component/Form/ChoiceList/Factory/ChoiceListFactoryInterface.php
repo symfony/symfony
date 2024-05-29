@@ -32,10 +32,8 @@ interface ChoiceListFactoryInterface
      * Null may be passed when the choice list contains the empty value.
      *
      * @param callable|null $filter The callable filtering the choices
-     *
-     * @return ChoiceListInterface
      */
-    public function createListFromChoices(iterable $choices, ?callable $value = null/* , callable $filter = null */);
+    public function createListFromChoices(iterable $choices, ?callable $value = null, ?callable $filter = null): ChoiceListInterface;
 
     /**
      * Creates a choice list that is loaded with the given loader.
@@ -45,10 +43,8 @@ interface ChoiceListFactoryInterface
      * Null may be passed when the choice list contains the empty value.
      *
      * @param callable|null $filter The callable filtering the choices
-     *
-     * @return ChoiceListInterface
      */
-    public function createListFromLoader(ChoiceLoaderInterface $loader, ?callable $value = null/* , callable $filter = null */);
+    public function createListFromLoader(ChoiceLoaderInterface $loader, ?callable $value = null, ?callable $filter = null): ChoiceListInterface;
 
     /**
      * Creates a view for the given choice list.
@@ -81,8 +77,9 @@ interface ChoiceListFactoryInterface
      *                                                        pass false to discard the label
      * @param array|callable|null $attr                       The callable generating the HTML attributes
      * @param array|callable      $labelTranslationParameters The parameters used to translate the choice labels
-     *
-     * @return ChoiceListView
+     * @param bool                $duplicatePreferredChoices  Whether the preferred choices should be duplicated
+     *                                                        on top of the list and in their original position
+     *                                                        or only in the top of the list
      */
-    public function createView(ChoiceListInterface $list, $preferredChoices = null, $label = null, ?callable $index = null, ?callable $groupBy = null, $attr = null/* , $labelTranslationParameters = [] */);
+    public function createView(ChoiceListInterface $list, array|callable|null $preferredChoices = null, callable|false|null $label = null, ?callable $index = null, ?callable $groupBy = null, array|callable|null $attr = null, array|callable $labelTranslationParameters = [], bool $duplicatePreferredChoices = true): ChoiceListView;
 }

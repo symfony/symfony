@@ -26,9 +26,6 @@ final class ReplaceDecoratedRememberMeHandlerPass implements CompilerPassInterfa
 {
     private const HANDLER_TAG = 'security.remember_me_handler';
 
-    /**
-     * {@inheritdoc}
-     */
     public function process(ContainerBuilder $container): void
     {
         $handledFirewalls = [];

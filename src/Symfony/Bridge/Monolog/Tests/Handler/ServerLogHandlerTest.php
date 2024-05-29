@@ -12,11 +12,12 @@
 namespace Symfony\Bridge\Monolog\Tests\Handler;
 
 use Monolog\Formatter\JsonFormatter;
-use Monolog\Logger;
+use Monolog\Level;
 use Monolog\Processor\ProcessIdProcessor;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Monolog\Formatter\VarDumperFormatter;
 use Symfony\Bridge\Monolog\Handler\ServerLogHandler;
+use Symfony\Bridge\Monolog\Tests\RecordFactory;
 use Symfony\Component\VarDumper\Cloner\Data;
 
 /**
@@ -36,8 +37,8 @@ class ServerLogHandlerTest extends TestCase
 
     public function testIsHandling()
     {
-        $handler = new ServerLogHandler('tcp://127.0.0.1:9999', Logger::INFO);
-        $this->assertFalse($handler->isHandling(['level' => Logger::DEBUG]), '->isHandling returns false when no output is set');
+        $handler = new ServerLogHandler('tcp://127.0.0.1:9999', Level::Info);
+        $this->assertFalse($handler->isHandling(RecordFactory::create(Level::Debug)), '->isHandling returns false when no output is set');
     }
 
     public function testGetFormatter()
@@ -51,18 +52,10 @@ class ServerLogHandlerTest extends TestCase
     public function testWritingAndFormatting()
     {
         $host = 'tcp://127.0.0.1:9999';
-        $handler = new ServerLogHandler($host, Logger::INFO, false);
+        $handler = new ServerLogHandler($host, Level::Info, false);
         $handler->pushProcessor(new ProcessIdProcessor());
 
-        $infoRecord = [
-            'message' => 'My info message',
-            'context' => [],
-            'level' => Logger::INFO,
-            'level_name' => Logger::getLevelName(Logger::INFO),
-            'channel' => 'app',
-            'datetime' => new \DateTime('2013-05-29 16:21:54'),
-            'extra' => [],
-        ];
+        $infoRecord = RecordFactory::create(Level::Info, 'My info message', 'app', datetime: new \DateTimeImmutable('2013-05-29 16:21:54'));
 
         $socket = stream_socket_server($host, $errno, $errstr);
         $this->assertIsResource($socket, sprintf('Server start failed on "%s": %s %s.', $host, $errstr, $errno));

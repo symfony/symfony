@@ -17,9 +17,13 @@ class NestedConfig
     private $_usedProperties = [];
 
     /**
+     * @template TValue
+     * @param TValue $value
+     * @default {"enabled":null}
      * @return \Symfony\Config\ScalarNormalizedTypes\Nested\NestedObjectConfig|$this
+     * @psalm-return (TValue is array ? \Symfony\Config\ScalarNormalizedTypes\Nested\NestedObjectConfig : static)
      */
-    public function nestedObject($value = [])
+    public function nestedObject(mixed $value = []): \Symfony\Config\ScalarNormalizedTypes\Nested\NestedObjectConfig|static
     {
         if (!\is_array($value)) {
             $this->_usedProperties['nestedObject'] = true;
@@ -39,9 +43,12 @@ class NestedConfig
     }
 
     /**
+     * @template TValue
+     * @param TValue $value
      * @return \Symfony\Config\ScalarNormalizedTypes\Nested\NestedListObjectConfig|$this
+     * @psalm-return (TValue is array ? \Symfony\Config\ScalarNormalizedTypes\Nested\NestedListObjectConfig : static)
      */
-    public function nestedListObject($value = [])
+    public function nestedListObject(mixed $value = []): \Symfony\Config\ScalarNormalizedTypes\Nested\NestedListObjectConfig|static
     {
         $this->_usedProperties['nestedListObject'] = true;
         if (!\is_array($value)) {
@@ -63,7 +70,7 @@ class NestedConfig
 
         if (array_key_exists('nested_list_object', $value)) {
             $this->_usedProperties['nestedListObject'] = true;
-            $this->nestedListObject = array_map(function ($v) { return \is_array($v) ? new \Symfony\Config\ScalarNormalizedTypes\Nested\NestedListObjectConfig($v) : $v; }, $value['nested_list_object']);
+            $this->nestedListObject = array_map(fn ($v) => \is_array($v) ? new \Symfony\Config\ScalarNormalizedTypes\Nested\NestedListObjectConfig($v) : $v, $value['nested_list_object']);
             unset($value['nested_list_object']);
         }
 
@@ -79,7 +86,7 @@ class NestedConfig
             $output['nested_object'] = $this->nestedObject instanceof \Symfony\Config\ScalarNormalizedTypes\Nested\NestedObjectConfig ? $this->nestedObject->toArray() : $this->nestedObject;
         }
         if (isset($this->_usedProperties['nestedListObject'])) {
-            $output['nested_list_object'] = array_map(function ($v) { return $v instanceof \Symfony\Config\ScalarNormalizedTypes\Nested\NestedListObjectConfig ? $v->toArray() : $v; }, $this->nestedListObject);
+            $output['nested_list_object'] = array_map(fn ($v) => $v instanceof \Symfony\Config\ScalarNormalizedTypes\Nested\NestedListObjectConfig ? $v->toArray() : $v, $this->nestedListObject);
         }
 
         return $output;

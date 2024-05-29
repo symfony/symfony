@@ -18,10 +18,8 @@ trait ExpectDeprecationTraitBeforeV8_4
 {
     /**
      * @param string $message
-     *
-     * @return void
      */
-    protected function expectDeprecation($message)
+    protected function expectDeprecation($message): void
     {
         // Expected deprecations set by isolated tests need to be written to a file
         // so that the test running process can take account of them.

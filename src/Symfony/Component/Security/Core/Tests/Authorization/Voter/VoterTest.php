@@ -18,7 +18,7 @@ use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 
 class VoterTest extends TestCase
 {
-    protected $token;
+    protected TokenInterface $token;
 
     protected function setUp(): void
     {
@@ -67,8 +67,7 @@ class VoterTest extends TestCase
     {
         $this->expectException(\TypeError::class);
         $this->expectExceptionMessage('Should error');
-        $voter = new TypeErrorVoterTest_Voter();
-        $voter->vote($this->token, new \stdClass(), ['EDIT']);
+        (new TypeErrorVoterTest_Voter())->vote($this->token, new \stdClass(), ['EDIT']);
     }
 }
 

@@ -44,6 +44,13 @@ class RedirectResponseTest extends TestCase
         $this->assertEquals('foo.bar', $response->headers->get('Location'));
     }
 
+    public function testGenerateContentTypeHeader()
+    {
+        $response = new RedirectResponse('foo.bar');
+
+        $this->assertSame('text/html; charset=utf-8', $response->headers->get('Content-Type'));
+    }
+
     public function testGetTargetUrl()
     {
         $response = new RedirectResponse('foo.bar');
@@ -57,17 +64,6 @@ class RedirectResponseTest extends TestCase
         $response->setTargetUrl('baz.beep');
 
         $this->assertEquals('baz.beep', $response->getTargetUrl());
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testCreate()
-    {
-        $response = RedirectResponse::create('foo', 301);
-
-        $this->assertInstanceOf(RedirectResponse::class, $response);
-        $this->assertEquals(301, $response->getStatusCode());
     }
 
     public function testCacheHeaders()

@@ -29,24 +29,26 @@ class PhpFilesAdapter extends AbstractAdapter implements PruneableInterface
         doDelete as private doCommonDelete;
     }
 
-    private $includeHandler;
-    private $appendOnly;
-    private $values = [];
-    private $files = [];
+    private \Closure $includeHandler;
+    private array $values = [];
+    private array $files = [];
 
-    private static $startTime;
-    private static $valuesCache = [];
+    private static int $startTime;
+    private static array $valuesCache = [];
 
     /**
-     * @param $appendOnly Set to `true` to gain extra performance when the items stored in this pool never expire.
-     *                    Doing so is encouraged because it fits perfectly OPcache's memory model.
+     * @param bool $appendOnly Set to `true` to gain extra performance when the items stored in this pool never expire.
+     *                         Doing so is encouraged because it fits perfectly OPcache's memory model.
      *
      * @throws CacheException if OPcache is not enabled
      */
-    public function __construct(string $namespace = '', int $defaultLifetime = 0, ?string $directory = null, bool $appendOnly = false)
-    {
-        $this->appendOnly = $appendOnly;
-        self::$startTime = self::$startTime ?? $_SERVER['REQUEST_TIME'] ?? time();
+    public function __construct(
+        string $namespace = '',
+        int $defaultLifetime = 0,
+        ?string $directory = null,
+        private bool $appendOnly = false,
+    ) {
+        self::$startTime ??= $_SERVER['REQUEST_TIME'] ?? time();
         parent::__construct('', $defaultLifetime);
         $this->init($namespace, $directory);
         $this->includeHandler = static function ($type, $msg, $file, $line) {
@@ -54,17 +56,14 @@ class PhpFilesAdapter extends AbstractAdapter implements PruneableInterface
         };
     }
 
-    public static function isSupported()
+    public static function isSupported(): bool
     {
-        self::$startTime = self::$startTime ?? $_SERVER['REQUEST_TIME'] ?? time();
+        self::$startTime ??= $_SERVER['REQUEST_TIME'] ?? time();
 
-        return \function_exists('opcache_invalidate') && filter_var(\ini_get('opcache.enable'), \FILTER_VALIDATE_BOOLEAN) && (!\in_array(\PHP_SAPI, ['cli', 'phpdbg'], true) || filter_var(\ini_get('opcache.enable_cli'), \FILTER_VALIDATE_BOOLEAN));
+        return \function_exists('opcache_invalidate') && filter_var(\ini_get('opcache.enable'), \FILTER_VALIDATE_BOOL) && (!\in_array(\PHP_SAPI, ['cli', 'phpdbg', 'embed'], true) || filter_var(\ini_get('opcache.enable_cli'), \FILTER_VALIDATE_BOOL));
     }
 
-    /**
-     * @return bool
-     */
-    public function prune()
+    public function prune(): bool
     {
         $time = time();
         $pruned = true;
@@ -92,10 +91,7 @@ class PhpFilesAdapter extends AbstractAdapter implements PruneableInterface
         return $pruned;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function doFetch(array $ids)
+    protected function doFetch(array $ids): iterable
     {
         if ($this->appendOnly) {
             $now = 0;
@@ -138,7 +134,7 @@ class PhpFilesAdapter extends AbstractAdapter implements PruneableInterface
 
             foreach ($missingIds as $k => $id) {
                 try {
-                    $file = $this->files[$id] ?? $this->files[$id] = $this->getFile($id);
+                    $file = $this->files[$id] ??= $this->getFile($id);
 
                     if (isset(self::$valuesCache[$file])) {
                         [$expiresAt, $this->values[$id]] = self::$valuesCache[$file];
@@ -168,10 +164,7 @@ class PhpFilesAdapter extends AbstractAdapter implements PruneableInterface
         goto begin;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function doHave(string $id)
+    protected function doHave(string $id): bool
     {
         if ($this->appendOnly && isset($this->values[$id])) {
             return true;
@@ -179,7 +172,7 @@ class PhpFilesAdapter extends AbstractAdapter implements PruneableInterface
 
         set_error_handler($this->includeHandler);
         try {
-            $file = $this->files[$id] ?? $this->files[$id] = $this->getFile($id);
+            $file = $this->files[$id] ??= $this->getFile($id);
             $getExpiry = true;
 
             if (isset(self::$valuesCache[$file])) {
@@ -193,7 +186,7 @@ class PhpFilesAdapter extends AbstractAdapter implements PruneableInterface
             } elseif ($this->appendOnly) {
                 $value = new LazyValue($file);
             }
-        } catch (\ErrorException $e) {
+        } catch (\ErrorException) {
             return false;
         } finally {
             restore_error_handler();
@@ -208,10 +201,7 @@ class PhpFilesAdapter extends AbstractAdapter implements PruneableInterface
         return $now < $expiresAt;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function doSave(array $values, int $lifetime)
+    protected function doSave(array $values, int $lifetime): array|bool
     {
         $ok = true;
         $expiry = $lifetime ? time() + $lifetime : 'PHP_INT_MAX';
@@ -245,7 +235,7 @@ class PhpFilesAdapter extends AbstractAdapter implements PruneableInterface
             if ($isStaticValue) {
                 $value = "return [{$expiry}, {$value}];";
             } elseif ($this->appendOnly) {
-                $value = "return [{$expiry}, static function () { return {$value}; }];";
+                $value = "return [{$expiry}, static fn () => {$value}];";
             } else {
                 // We cannot use a closure here because of https://bugs.php.net/76982
                 $value = str_replace('\Symfony\Component\VarExporter\Internal\\', '', $value);
@@ -270,20 +260,14 @@ class PhpFilesAdapter extends AbstractAdapter implements PruneableInterface
         return $ok;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function doClear(string $namespace)
+    protected function doClear(string $namespace): bool
     {
         $this->values = [];
 
         return $this->doCommonClear($namespace);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function doDelete(array $ids)
+    protected function doDelete(array $ids): bool
     {
         foreach ($ids as $id) {
             unset($this->values[$id]);
@@ -292,7 +276,7 @@ class PhpFilesAdapter extends AbstractAdapter implements PruneableInterface
         return $this->doCommonDelete($ids);
     }
 
-    protected function doUnlink(string $file)
+    protected function doUnlink(string $file): bool
     {
         unset(self::$valuesCache[$file]);
 
@@ -321,7 +305,7 @@ class PhpFilesAdapter extends AbstractAdapter implements PruneableInterface
  */
 class LazyValue
 {
-    public $file;
+    public string $file;
 
     public function __construct(string $file)
     {

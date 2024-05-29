@@ -19,10 +19,7 @@ use Symfony\Component\Form\Extension\DataCollector\Type\DataCollectorTypeExtensi
 
 class DataCollectorExtensionTest extends TestCase
 {
-    /**
-     * @var DataCollectorExtension
-     */
-    private $extension;
+    private DataCollectorExtension $extension;
 
     protected function setUp(): void
     {

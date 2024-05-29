@@ -32,19 +32,13 @@ final class LokaliseProvider implements ProviderInterface
 {
     private const LOKALISE_GET_KEYS_LIMIT = 5000;
 
-    private $client;
-    private $loader;
-    private $logger;
-    private $defaultLocale;
-    private $endpoint;
-
-    public function __construct(HttpClientInterface $client, LoaderInterface $loader, LoggerInterface $logger, string $defaultLocale, string $endpoint)
-    {
-        $this->client = $client;
-        $this->loader = $loader;
-        $this->logger = $logger;
-        $this->defaultLocale = $defaultLocale;
-        $this->endpoint = $endpoint;
+    public function __construct(
+        private HttpClientInterface $client,
+        private LoaderInterface $loader,
+        private LoggerInterface $logger,
+        private string $defaultLocale,
+        private string $endpoint,
+    ) {
     }
 
     public function __toString(): string
@@ -53,8 +47,6 @@ final class LokaliseProvider implements ProviderInterface
     }
 
     /**
-     * {@inheritdoc}
-     *
      * Lokalise API recommends sending payload in chunks of up to 500 keys per request.
      *
      * @see https://app.lokalise.com/api2docs/curl/#transition-create-keys-post
@@ -62,10 +54,6 @@ final class LokaliseProvider implements ProviderInterface
     public function write(TranslatorBagInterface $translatorBag): void
     {
         $defaultCatalogue = $translatorBag->getCatalogue($this->defaultLocale);
-
-        if (!$defaultCatalogue) {
-            $defaultCatalogue = $translatorBag->getCatalogues()[0];
-        }
 
         $this->ensureAllLocalesAreCreated($translatorBag);
         $existingKeysByDomain = [];
@@ -113,10 +101,6 @@ final class LokaliseProvider implements ProviderInterface
     {
         $catalogue = $translatorBag->getCatalogue($this->defaultLocale);
 
-        if (!$catalogue) {
-            $catalogue = $translatorBag->getCatalogues()[0];
-        }
-
         $keysIds = [];
 
         foreach ($catalogue->getDomains() as $domain) {
@@ -148,7 +132,7 @@ final class LokaliseProvider implements ProviderInterface
                 'format' => 'symfony_xliff',
                 'original_filenames' => true,
                 'filter_langs' => array_values($locales),
-                'filter_filenames' => array_map([$this, 'getLokaliseFilenameFromDomain'], $domains),
+                'filter_filenames' => array_map($this->getLokaliseFilenameFromDomain(...), $domains),
                 'export_empty_as' => 'skip',
                 'replace_breaks' => false,
             ],
@@ -362,9 +346,7 @@ final class LokaliseProvider implements ProviderInterface
     {
         $response = $this->client->request('POST', 'languages', [
             'json' => [
-                'languages' => array_map(static function ($language) {
-                    return ['lang_iso' => $language];
-                }, $languages),
+                'languages' => array_map(static fn ($language) => ['lang_iso' => $language], $languages),
             ],
         ]);
 

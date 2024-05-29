@@ -11,16 +11,15 @@
 
 namespace Symfony\Component\Serializer\Tests\Normalizer;
 
-use Doctrine\Common\Annotations\AnnotationReader;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor;
 use Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor;
 use Symfony\Component\PropertyInfo\PropertyInfoExtractor;
-use Symfony\Component\Serializer\Annotation\DiscriminatorMap;
+use Symfony\Component\Serializer\Attribute\DiscriminatorMap;
 use Symfony\Component\Serializer\Exception\LogicException;
 use Symfony\Component\Serializer\Mapping\ClassDiscriminatorFromClassMetadata;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactory;
-use Symfony\Component\Serializer\Mapping\Loader\AnnotationLoader;
+use Symfony\Component\Serializer\Mapping\Loader\AttributeLoader;
 use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter;
 use Symfony\Component\Serializer\NameConverter\MetadataAwareNameConverter;
 use Symfony\Component\Serializer\Normalizer\AbstractObjectNormalizer;
@@ -29,8 +28,8 @@ use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\PropertyNormalizer;
 use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Serializer\SerializerInterface;
-use Symfony\Component\Serializer\Tests\Fixtures\Annotations\GroupDummy;
-use Symfony\Component\Serializer\Tests\Fixtures\Annotations\GroupDummyChild;
+use Symfony\Component\Serializer\Tests\Fixtures\Attributes\GroupDummy;
+use Symfony\Component\Serializer\Tests\Fixtures\Attributes\GroupDummyChild;
 use Symfony\Component\Serializer\Tests\Fixtures\Dummy;
 use Symfony\Component\Serializer\Tests\Fixtures\Php74Dummy;
 use Symfony\Component\Serializer\Tests\Fixtures\PropertyCircularReferenceDummy;
@@ -39,6 +38,7 @@ use Symfony\Component\Serializer\Tests\Normalizer\Features\CacheableObjectAttrib
 use Symfony\Component\Serializer\Tests\Normalizer\Features\CallbacksTestTrait;
 use Symfony\Component\Serializer\Tests\Normalizer\Features\CircularReferenceTestTrait;
 use Symfony\Component\Serializer\Tests\Normalizer\Features\ConstructorArgumentsTestTrait;
+use Symfony\Component\Serializer\Tests\Normalizer\Features\FilterBoolTestTrait;
 use Symfony\Component\Serializer\Tests\Normalizer\Features\GroupsTestTrait;
 use Symfony\Component\Serializer\Tests\Normalizer\Features\IgnoredAttributesTestTrait;
 use Symfony\Component\Serializer\Tests\Normalizer\Features\MaxDepthTestTrait;
@@ -53,6 +53,7 @@ class PropertyNormalizerTest extends TestCase
     use CallbacksTestTrait;
     use CircularReferenceTestTrait;
     use ConstructorArgumentsTestTrait;
+    use FilterBoolTestTrait;
     use GroupsTestTrait;
     use IgnoredAttributesTestTrait;
     use MaxDepthTestTrait;
@@ -60,22 +61,15 @@ class PropertyNormalizerTest extends TestCase
     use SkipUninitializedValuesTestTrait;
     use TypeEnforcementTestTrait;
 
-    /**
-     * @var PropertyNormalizer
-     */
-    private $normalizer;
-
-    /**
-     * @var SerializerInterface
-     */
-    private $serializer;
+    private PropertyNormalizer $normalizer;
+    private SerializerInterface $serializer;
 
     protected function setUp(): void
     {
         $this->createNormalizer();
     }
 
-    private function createNormalizer(array $defaultContext = [])
+    private function createNormalizer(array $defaultContext = []): void
     {
         $this->serializer = $this->createMock(SerializerInterface::class);
         $this->normalizer = new PropertyNormalizer(null, null, null, null, null, $defaultContext);
@@ -94,9 +88,6 @@ class PropertyNormalizerTest extends TestCase
         );
     }
 
-    /**
-     * @requires PHP 7.4
-     */
     public function testNormalizeObjectWithUninitializedProperties()
     {
         $obj = new Php74Dummy();
@@ -126,6 +117,54 @@ class PropertyNormalizerTest extends TestCase
         );
     }
 
+    public function testNormalizeOnlyPublic()
+    {
+        $obj = new PropertyDummy();
+        $obj->foo = 'foo';
+        $obj->setBar('bar');
+        $obj->setCamelCase('camelcase');
+        $this->assertEquals(
+            ['foo' => 'foo'],
+            $this->normalizer->normalize($obj, 'any', ['normalize_visibility' => PropertyNormalizer::NORMALIZE_PUBLIC])
+        );
+    }
+
+    public function testNormalizeOnlyProtected()
+    {
+        $obj = new PropertyDummy();
+        $obj->foo = 'foo';
+        $obj->setBar('bar');
+        $obj->setCamelCase('camelcase');
+        $this->assertEquals(
+            ['camelCase' => 'camelcase'],
+            $this->normalizer->normalize($obj, 'any', ['normalize_visibility' => PropertyNormalizer::NORMALIZE_PROTECTED])
+        );
+    }
+
+    public function testNormalizeOnlyPrivate()
+    {
+        $obj = new PropertyDummy();
+        $obj->foo = 'foo';
+        $obj->setBar('bar');
+        $obj->setCamelCase('camelcase');
+        $this->assertEquals(
+            ['bar' => 'bar'],
+            $this->normalizer->normalize($obj, 'any', ['normalize_visibility' => PropertyNormalizer::NORMALIZE_PRIVATE])
+        );
+    }
+
+    public function testNormalizePublicAndProtected()
+    {
+        $obj = new PropertyDummy();
+        $obj->foo = 'foo';
+        $obj->setBar('bar');
+        $obj->setCamelCase('camelcase');
+        $this->assertEquals(
+            ['foo' => 'foo', 'camelCase' => 'camelcase'],
+            $this->normalizer->normalize($obj, 'any', ['normalize_visibility' => PropertyNormalizer::NORMALIZE_PUBLIC | PropertyNormalizer::NORMALIZE_PROTECTED])
+        );
+    }
+
     public function testDenormalize()
     {
         $obj = $this->normalizer->denormalize(
@@ -147,7 +186,18 @@ class PropertyNormalizerTest extends TestCase
         $group->setKevin('Kevin');
         $group->setCoopTilleuls('coop');
         $this->assertEquals(
-            ['foo' => 'foo', 'bar' => 'bar', 'quux' => 'quux', 'kevin' => 'Kevin', 'coopTilleuls' => 'coop', 'fooBar' => null, 'symfony' => null, 'baz' => 'baz'],
+            [
+                'foo' => 'foo',
+                'bar' => 'bar',
+                'quux' => 'quux',
+                'kevin' => 'Kevin',
+                'coopTilleuls' => 'coop',
+                'fooBar' => null,
+                'symfony' => null,
+                'baz' => 'baz',
+                'default' => null,
+                'className' => null,
+            ],
             $this->normalizer->normalize($group, 'any')
         );
     }
@@ -211,6 +261,11 @@ class PropertyNormalizerTest extends TestCase
         return new PropertyCircularReferenceDummy();
     }
 
+    protected function getNormalizerForFilterBool(): PropertyNormalizer
+    {
+        return new PropertyNormalizer();
+    }
+
     public function testSiblingReference()
     {
         $serializer = new Serializer([$this->normalizer]);
@@ -228,7 +283,7 @@ class PropertyNormalizerTest extends TestCase
 
     protected function getDenormalizerForConstructArguments(): PropertyNormalizer
     {
-        $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
+        $classMetadataFactory = new ClassMetadataFactory(new AttributeLoader());
         $denormalizer = new PropertyNormalizer($classMetadataFactory, new MetadataAwareNameConverter($classMetadataFactory));
         $serializer = new Serializer([$denormalizer]);
         $denormalizer->setSerializer($serializer);
@@ -238,21 +293,21 @@ class PropertyNormalizerTest extends TestCase
 
     protected function getNormalizerForGroups(): PropertyNormalizer
     {
-        $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
+        $classMetadataFactory = new ClassMetadataFactory(new AttributeLoader());
 
         return new PropertyNormalizer($classMetadataFactory);
     }
 
     protected function getDenormalizerForGroups(): PropertyNormalizer
     {
-        $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
+        $classMetadataFactory = new ClassMetadataFactory(new AttributeLoader());
 
         return new PropertyNormalizer($classMetadataFactory);
     }
 
     public function testGroupsNormalizeWithNameConverter()
     {
-        $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
+        $classMetadataFactory = new ClassMetadataFactory(new AttributeLoader());
         $this->normalizer = new PropertyNormalizer($classMetadataFactory, new CamelCaseToSnakeCaseNameConverter());
         $this->normalizer->setSerializer($this->serializer);
 
@@ -266,6 +321,8 @@ class PropertyNormalizerTest extends TestCase
                 'bar' => null,
                 'foo_bar' => '@dunglas',
                 'symfony' => '@coopTilleuls',
+                'default' => null,
+                'class_name' => null,
             ],
             $this->normalizer->normalize($obj, null, [PropertyNormalizer::GROUPS => ['name_converter']])
         );
@@ -273,7 +330,7 @@ class PropertyNormalizerTest extends TestCase
 
     public function testGroupsDenormalizeWithNameConverter()
     {
-        $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
+        $classMetadataFactory = new ClassMetadataFactory(new AttributeLoader());
         $this->normalizer = new PropertyNormalizer($classMetadataFactory, new CamelCaseToSnakeCaseNameConverter());
         $this->normalizer->setSerializer($this->serializer);
 
@@ -288,7 +345,7 @@ class PropertyNormalizerTest extends TestCase
                 'foo_bar' => '@dunglas',
                 'symfony' => '@coopTilleuls',
                 'coop_tilleuls' => 'les-tilleuls.coop',
-            ], 'Symfony\Component\Serializer\Tests\Fixtures\Annotations\GroupDummy', null, [PropertyNormalizer::GROUPS => ['name_converter']])
+            ], GroupDummy::class, null, [PropertyNormalizer::GROUPS => ['name_converter']])
         );
     }
 
@@ -317,7 +374,7 @@ class PropertyNormalizerTest extends TestCase
 
     protected function getNormalizerForMaxDepth(): PropertyNormalizer
     {
-        $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
+        $classMetadataFactory = new ClassMetadataFactory(new AttributeLoader());
         $normalizer = new PropertyNormalizer($classMetadataFactory);
         $serializer = new Serializer([$normalizer]);
         $normalizer->setSerializer($serializer);
@@ -327,7 +384,7 @@ class PropertyNormalizerTest extends TestCase
 
     protected function getDenormalizerForObjectToPopulate(): PropertyNormalizer
     {
-        $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
+        $classMetadataFactory = new ClassMetadataFactory(new AttributeLoader());
         $normalizer = new PropertyNormalizer($classMetadataFactory, null, new PhpDocExtractor());
         new Serializer([$normalizer]);
 
@@ -362,14 +419,15 @@ class PropertyNormalizerTest extends TestCase
 
     public function testUnableToNormalizeObjectAttribute()
     {
-        $this->expectException(LogicException::class);
-        $this->expectExceptionMessage('Cannot normalize attribute "bar" because the injected serializer is not a normalizer');
         $serializer = $this->createMock(SerializerInterface::class);
         $this->normalizer->setSerializer($serializer);
 
         $obj = new PropertyDummy();
         $object = new \stdClass();
         $obj->setBar($object);
+
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('Cannot normalize attribute "bar" because the injected serializer is not a normalizer');
 
         $this->normalizer->normalize($obj, 'any');
     }
@@ -409,7 +467,7 @@ class PropertyNormalizerTest extends TestCase
             RootDummy::class,
             'any'
         );
-        $this->assertEquals(\get_class($root), RootDummy::class);
+        $this->assertEquals($root::class, RootDummy::class);
 
         // children (two dimension array)
         $this->assertCount(1, $root->children);
@@ -456,12 +514,12 @@ class PropertyNormalizerTest extends TestCase
 
     protected function getNormalizerForSkipUninitializedValues(): PropertyNormalizer
     {
-        return new PropertyNormalizer(new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader())));
+        return new PropertyNormalizer(new ClassMetadataFactory(new AttributeLoader()));
     }
 
     public function testNormalizeWithDiscriminator()
     {
-        $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
+        $classMetadataFactory = new ClassMetadataFactory(new AttributeLoader());
         $discriminator = new ClassDiscriminatorFromClassMetadata($classMetadataFactory);
         $normalizer = new PropertyNormalizer($classMetadataFactory, null, null, $discriminator);
 
@@ -470,7 +528,7 @@ class PropertyNormalizerTest extends TestCase
 
     public function testDenormalizeWithDiscriminator()
     {
-        $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
+        $classMetadataFactory = new ClassMetadataFactory(new AttributeLoader());
         $discriminator = new ClassDiscriminatorFromClassMetadata($classMetadataFactory);
         $normalizer = new PropertyNormalizer($classMetadataFactory, null, null, $discriminator);
 
@@ -583,12 +641,10 @@ class RootDummy
     }
 }
 
-/**
- * @DiscriminatorMap(typeProperty="type", mapping={
- *     "one" = PropertyDiscriminatedDummyOne::class,
- *     "two" = PropertyDiscriminatedDummyTwo::class,
- * })
- */
+#[DiscriminatorMap(typeProperty: 'type', mapping: [
+    'one' => PropertyDiscriminatedDummyOne::class,
+    'two' => PropertyDiscriminatedDummyTwo::class,
+])]
 interface PropertyDummyInterface
 {
 }

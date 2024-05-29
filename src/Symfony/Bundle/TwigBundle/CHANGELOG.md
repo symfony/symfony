@@ -1,6 +1,47 @@
 CHANGELOG
 =========
 
+7.1
+---
+
+ * Mark class `TemplateCacheWarmer` as `final`
+
+7.0
+---
+
+ * Remove the `Twig_Environment` autowiring alias, use `Twig\Environment` instead
+ * Remove option `twig.autoescape`; create a class that implements your escaping strategy
+   (check `FileExtensionEscapingStrategy::guess()` for inspiration) and reference it using
+   the `twig.autoescape_service` option instead
+ * Drop support for Twig 2
+
+6.4
+---
+
+ * Allow omitting the `autoescape_service_method` option when `autoescape_service` is set to an invokable service id
+
+6.3
+---
+
+ * Deprecate the `Twig_Environment` autowiring alias, use `Twig\Environment` instead
+
+6.2
+---
+
+ * Add the `twig.mailer.html_to_text_converter` option to allow configuring custom `HtmlToTextConverterInterface`
+   implementations to be used by the `twig.mime_body_renderer` service
+
+6.1
+---
+
+ * Add option `twig.file_name_pattern` to restrict which files are compiled by cache warmer and linter
+ * Deprecate option `twig.autoescape`, use `twig.autoescape_service[_method]` instead
+
+6.0
+---
+
+ * The `twig` service is now private
+
 5.3
 ---
 

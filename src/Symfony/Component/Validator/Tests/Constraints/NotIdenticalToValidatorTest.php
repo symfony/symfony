@@ -23,7 +23,7 @@ class NotIdenticalToValidatorTest extends AbstractComparisonValidatorTestCase
 {
     use IcuCompatibilityTrait;
 
-    protected function createValidator()
+    protected function createValidator(): NotIdenticalToValidator
     {
         return new NotIdenticalToValidator();
     }
@@ -38,9 +38,6 @@ class NotIdenticalToValidatorTest extends AbstractComparisonValidatorTestCase
         return NotIdenticalTo::IS_IDENTICAL_ERROR;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public static function provideValidComparisons(): array
     {
         return [
@@ -57,9 +54,6 @@ class NotIdenticalToValidatorTest extends AbstractComparisonValidatorTestCase
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public static function provideValidComparisonsToPropertyPath(): array
     {
         return [
@@ -81,9 +75,6 @@ class NotIdenticalToValidatorTest extends AbstractComparisonValidatorTestCase
         return $comparisons;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public static function provideInvalidComparisons(): array
     {
         $date = new \DateTime('2000-01-01');

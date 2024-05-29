@@ -25,9 +25,9 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 class RegisterEnvVarProcessorsPass implements CompilerPassInterface
 {
-    private const ALLOWED_TYPES = ['array', 'bool', 'float', 'int', 'string'];
+    private const ALLOWED_TYPES = ['array', 'bool', 'float', 'int', 'string', \BackedEnum::class];
 
-    public function process(ContainerBuilder $container)
+    public function process(ContainerBuilder $container): void
     {
         $bag = $container->getParameterBag();
         $types = [];
@@ -65,7 +65,7 @@ class RegisterEnvVarProcessorsPass implements CompilerPassInterface
         $types = explode('|', $types);
 
         foreach ($types as $type) {
-            if (!\in_array($type, self::ALLOWED_TYPES)) {
+            if (!\in_array($type, self::ALLOWED_TYPES, true)) {
                 throw new InvalidArgumentException(sprintf('Invalid type "%s" returned by "%s::getProvidedTypes()", expected one of "%s".', $type, $class, implode('", "', self::ALLOWED_TYPES)));
             }
         }

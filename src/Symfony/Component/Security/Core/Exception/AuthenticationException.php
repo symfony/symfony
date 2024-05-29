@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Security\Core\Exception;
 
+use Symfony\Component\HttpKernel\Attribute\WithHttpStatus;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
 /**
@@ -19,28 +20,17 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Alexander <iam.asm89@gmail.com>
  */
+#[WithHttpStatus(401)]
 class AuthenticationException extends RuntimeException
 {
-    /** @internal */
-    protected $serialized;
+    private ?TokenInterface $token = null;
 
-    private $token;
-
-    public function __construct(string $message = '', int $code = 0, ?\Throwable $previous = null)
-    {
-        unset($this->serialized);
-        parent::__construct($message, $code, $previous);
-    }
-
-    /**
-     * @return TokenInterface|null
-     */
-    public function getToken()
+    public function getToken(): ?TokenInterface
     {
         return $this->token;
     }
 
-    public function setToken(TokenInterface $token)
+    public function setToken(TokenInterface $token): void
     {
         $this->token = $token;
     }
@@ -88,40 +78,17 @@ class AuthenticationException extends RuntimeException
 
     /**
      * Message key to be used by the translation component.
-     *
-     * @return string
      */
-    public function getMessageKey()
+    public function getMessageKey(): string
     {
         return 'An authentication exception occurred.';
     }
 
     /**
      * Message data to be used by the translation component.
-     *
-     * @return array
      */
-    public function getMessageData()
+    public function getMessageData(): array
     {
         return [];
-    }
-
-    /**
-     * @internal
-     */
-    public function __sleep(): array
-    {
-        $this->serialized = $this->__serialize();
-
-        return ['serialized'];
-    }
-
-    /**
-     * @internal
-     */
-    public function __wakeup(): void
-    {
-        $this->__unserialize($this->serialized);
-        unset($this->serialized);
     }
 }

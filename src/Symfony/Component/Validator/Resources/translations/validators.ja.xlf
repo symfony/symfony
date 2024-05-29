@@ -136,7 +136,7 @@
             </trans-unit>
             <trans-unit id="37" resname="This is not a valid IP address.">
                 <source>This value is not a valid IP address.</source>
-                <target state="needs-review-translation">この値は有効なIPアドレスではありません。</target>
+                <target>有効なIPアドレスではありません。</target>
             </trans-unit>
             <trans-unit id="38">
                 <source>This value is not a valid language.</source>
@@ -192,7 +192,7 @@
             </trans-unit>
             <trans-unit id="51" resname="No temporary folder was configured in php.ini.">
                 <source>No temporary folder was configured in php.ini, or the configured folder does not exist.</source>
-                <target state="needs-review-translation">php.iniに一時フォルダが設定されていないか、設定されたフォルダが存在しません。</target>
+                <target>php.iniに一時フォルダが設定されていないか、設定されたフォルダが存在しません。</target>
             </trans-unit>
             <trans-unit id="52">
                 <source>Cannot write temporary file to disk.</source>
@@ -224,7 +224,7 @@
             </trans-unit>
             <trans-unit id="59" resname="This is not a valid International Bank Account Number (IBAN).">
                 <source>This value is not a valid International Bank Account Number (IBAN).</source>
-                <target state="needs-review-translation">この値は有効な国際銀行口座番号（IBAN）ではありません。</target>
+                <target>有効な国際銀行勘定番号（IBAN）ではありません。</target>
             </trans-unit>
             <trans-unit id="60">
                 <source>This value is not a valid ISBN-10.</source>
@@ -312,7 +312,7 @@
             </trans-unit>
             <trans-unit id="81" resname="This is not a valid Business Identifier Code (BIC).">
                 <source>This value is not a valid Business Identifier Code (BIC).</source>
-                <target state="needs-review-translation">この値は有効なビジネス識別コード（BIC）ではありません。</target>
+                <target>有効なSWIFTコードではありません。</target>
             </trans-unit>
             <trans-unit id="82">
                 <source>Error</source>
@@ -320,7 +320,7 @@
             </trans-unit>
             <trans-unit id="83" resname="This is not a valid UUID.">
                 <source>This value is not a valid UUID.</source>
-                <target state="needs-review-translation">この値は有効なUUIDではありません。</target>
+                <target>有効なUUIDではありません。</target>
             </trans-unit>
             <trans-unit id="84">
                 <source>This value should be a multiple of {{ compared_value }}.</source>
@@ -436,7 +436,11 @@
             </trans-unit>
             <trans-unit id="112">
                 <source>This value is not a valid MAC address.</source>
-                <target state="needs-review-translation">この値は有効なMACアドレスではありません。</target>
+                <target>有効なMACアドレスではありません。</target>
+            </trans-unit>
+            <trans-unit id="113">
+                <source>This URL is missing a top-level domain.</source>
+                <target>このURLはトップレベルドメインがありません。</target>
             </trans-unit>
         </body>
     </file>

@@ -12,39 +12,32 @@
 namespace Symfony\Bridge\Monolog\Formatter;
 
 use Monolog\Formatter\FormatterInterface;
+use Monolog\LogRecord;
 use Symfony\Component\VarDumper\Cloner\VarCloner;
 
 /**
  * @author Grégoire Pineau <lyrixx@lyrixx.info>
  */
-class VarDumperFormatter implements FormatterInterface
+final class VarDumperFormatter implements FormatterInterface
 {
-    private $cloner;
+    private VarCloner $cloner;
 
     public function __construct(?VarCloner $cloner = null)
     {
         $this->cloner = $cloner ?? new VarCloner();
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * @return mixed
-     */
-    public function format(array $record)
+    public function format(LogRecord $record): mixed
     {
+        $record = $record->toArray();
+
         $record['context'] = $this->cloner->cloneVar($record['context']);
         $record['extra'] = $this->cloner->cloneVar($record['extra']);
 
         return $record;
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * @return mixed
-     */
-    public function formatBatch(array $records)
+    public function formatBatch(array $records): mixed
     {
         foreach ($records as $k => $record) {
             $record[$k] = $this->format($record);

@@ -12,13 +12,14 @@
 namespace Symfony\Component\Messenger\Event;
 
 use Symfony\Component\Messenger\Envelope;
+use Symfony\Component\Messenger\Transport\Sender\SenderInterface;
 
 /**
  * Event is dispatched before a message is sent to the transport.
  *
  * The event is *only* dispatched if the message will actually
  * be sent to at least one transport. If the message is sent
- * to multiple transports, the message is dispatched only one time.
+ * to multiple transports, the message is dispatched only once.
  * This message is only dispatched the first time a message
  * is sent to a transport, not also if it is retried.
  *
@@ -26,11 +27,13 @@ use Symfony\Component\Messenger\Envelope;
  */
 final class SendMessageToTransportsEvent
 {
-    private $envelope;
-
-    public function __construct(Envelope $envelope)
-    {
-        $this->envelope = $envelope;
+    /**
+     * @param array<string, SenderInterface> $senders
+     */
+    public function __construct(
+        private Envelope $envelope,
+        private array $senders,
+    ) {
     }
 
     public function getEnvelope(): Envelope
@@ -38,8 +41,16 @@ final class SendMessageToTransportsEvent
         return $this->envelope;
     }
 
-    public function setEnvelope(Envelope $envelope)
+    public function setEnvelope(Envelope $envelope): void
     {
         $this->envelope = $envelope;
+    }
+
+    /**
+     * @return array<string, SenderInterface>
+     */
+    public function getSenders(): array
+    {
+        return $this->senders;
     }
 }

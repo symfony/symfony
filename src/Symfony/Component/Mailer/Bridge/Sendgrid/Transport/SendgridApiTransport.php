@@ -34,12 +34,12 @@ class SendgridApiTransport extends AbstractApiTransport
 {
     private const HOST = 'api.sendgrid.com';
 
-    private $key;
-
-    public function __construct(string $key, ?HttpClientInterface $client = null, ?EventDispatcherInterface $dispatcher = null, ?LoggerInterface $logger = null)
-    {
-        $this->key = $key;
-
+    public function __construct(
+        #[\SensitiveParameter] private string $key,
+        ?HttpClientInterface $client = null,
+        ?EventDispatcherInterface $dispatcher = null,
+        ?LoggerInterface $logger = null,
+    ) {
         parent::__construct($client, $dispatcher, $logger);
     }
 
@@ -179,7 +179,7 @@ class SendgridApiTransport extends AbstractApiTransport
             ];
 
             if ('inline' === $disposition) {
-                $att['content_id'] = $filename;
+                $att['content_id'] = $attachment->hasContentId() ? $attachment->getContentId() : $filename;
             }
 
             $attachments[] = $att;

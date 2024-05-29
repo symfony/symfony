@@ -102,7 +102,7 @@ acme_root:
     scalar_deprecated_with_message: ~ # Deprecated (Since vendor/package 1.1: Deprecation custom message for "scalar_deprecated_with_message" at "acme_root")
     node_with_a_looong_name: ~
     enum_with_default:    this # One of "this"; "that"
-    enum:                 ~ # One of "this"; "that"
+    enum:                 ~ # One of "this"; "that"; Symfony\Component\Config\Tests\Fixtures\TestEnum::Ccc
 
     # some info
     array:
@@ -114,11 +114,11 @@ acme_root:
         # which should be indented
         child3:               ~ # Example: 'example setting'
     scalar_prototyped:    []
-    variable:
+    variable:             ~
 
         # Examples:
-        - foo
-        - bar
+        # - foo
+        # - bar
     parameters:
 
         # Prototype: Parameter name
@@ -142,6 +142,11 @@ acme_root:
 
         # Prototype
         name:                 []
+    array_with_array_example_and_no_default_value: []
+
+        # Examples:
+        # - foo
+        # - bar
     custom_node:          true
 
 EOL;

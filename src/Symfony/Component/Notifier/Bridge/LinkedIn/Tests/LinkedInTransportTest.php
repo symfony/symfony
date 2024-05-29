@@ -21,16 +21,12 @@ use Symfony\Component\Notifier\Message\SmsMessage;
 use Symfony\Component\Notifier\Notification\Notification;
 use Symfony\Component\Notifier\Test\TransportTestCase;
 use Symfony\Component\Notifier\Tests\Transport\DummyMessage;
-use Symfony\Component\Notifier\Transport\TransportInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 
 final class LinkedInTransportTest extends TransportTestCase
 {
-    /**
-     * @return LinkedInTransport
-     */
-    public static function createTransport(?HttpClientInterface $client = null): TransportInterface
+    public static function createTransport(?HttpClientInterface $client = null): LinkedInTransport
     {
         return (new LinkedInTransport('AuthToken', 'AccountId', $client ?? new MockHttpClient()))->setHost('host.test');
     }
@@ -61,9 +57,7 @@ final class LinkedInTransportTest extends TransportTestCase
             ->method('getContent')
             ->willReturn('[]');
 
-        $client = new MockHttpClient(static function () use ($response): ResponseInterface {
-            return $response;
-        });
+        $client = new MockHttpClient(static fn (): ResponseInterface => $response);
 
         $transport = self::createTransport($client);
 
@@ -86,9 +80,7 @@ final class LinkedInTransportTest extends TransportTestCase
             ->method('getContent')
             ->willReturn('testErrorCode');
 
-        $client = new MockHttpClient(static function () use ($response): ResponseInterface {
-            return $response;
-        });
+        $client = new MockHttpClient(static fn (): ResponseInterface => $response);
 
         $transport = self::createTransport($client);
 
@@ -191,9 +183,7 @@ final class LinkedInTransportTest extends TransportTestCase
     {
         $this->expectException(LogicException::class);
 
-        $client = new MockHttpClient(function (string $method, string $url, array $options = []): ResponseInterface {
-            return $this->createMock(ResponseInterface::class);
-        });
+        $client = new MockHttpClient(fn (string $method, string $url, array $options = []): ResponseInterface => $this->createMock(ResponseInterface::class));
 
         $transport = self::createTransport($client);
 

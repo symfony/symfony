@@ -29,16 +29,13 @@ final class VonageTransport extends AbstractTransport
     // see https://developer.vonage.com/messaging/sms/overview
     protected const HOST = 'rest.nexmo.com';
 
-    private $apiKey;
-    private $apiSecret;
-    private $from;
-
-    public function __construct(string $apiKey, string $apiSecret, string $from, ?HttpClientInterface $client = null, ?EventDispatcherInterface $dispatcher = null)
-    {
-        $this->apiKey = $apiKey;
-        $this->apiSecret = $apiSecret;
-        $this->from = $from;
-
+    public function __construct(
+        #[\SensitiveParameter] private string $apiKey,
+        #[\SensitiveParameter] private string $apiSecret,
+        private string $from,
+        ?HttpClientInterface $client = null,
+        ?EventDispatcherInterface $dispatcher = null,
+    ) {
         parent::__construct($client, $dispatcher);
     }
 
@@ -60,7 +57,7 @@ final class VonageTransport extends AbstractTransport
 
         $response = $this->client->request('POST', 'https://'.$this->getEndpoint().'/sms/json', [
             'body' => [
-                'from' => $this->from,
+                'from' => $message->getFrom() ?: $this->from,
                 'to' => $message->getPhone(),
                 'text' => $message->getSubject(),
                 'api_key' => $this->apiKey,

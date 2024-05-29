@@ -22,19 +22,14 @@ use Symfony\Component\Messenger\Stamp\ReceivedStamp;
  */
 class HandlersLocator implements HandlersLocatorInterface
 {
-    private $handlers;
-
     /**
      * @param HandlerDescriptor[][]|callable[][] $handlers
      */
-    public function __construct(array $handlers)
-    {
-        $this->handlers = $handlers;
+    public function __construct(
+        private array $handlers,
+    ) {
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getHandlers(Envelope $envelope): iterable
     {
         $seen = [];
@@ -50,7 +45,7 @@ class HandlersLocator implements HandlersLocatorInterface
                 }
 
                 $name = $handlerDescriptor->getName();
-                if (\in_array($name, $seen)) {
+                if (\in_array($name, $seen, true)) {
                     continue;
                 }
 
@@ -66,12 +61,25 @@ class HandlersLocator implements HandlersLocatorInterface
      */
     public static function listTypes(Envelope $envelope): array
     {
-        $class = \get_class($envelope->getMessage());
+        $class = $envelope->getMessage()::class;
 
         return [$class => $class]
             + class_parents($class)
             + class_implements($class)
+            + self::listWildcards($class)
             + ['*' => '*'];
+    }
+
+    private static function listWildcards(string $type): array
+    {
+        $type .= '\*';
+        $wildcards = [];
+        while ($i = strrpos($type, '\\', -3)) {
+            $type = substr_replace($type, '\*', $i);
+            $wildcards[$type] = $type;
+        }
+
+        return $wildcards;
     }
 
     private function shouldHandle(Envelope $envelope, HandlerDescriptor $handlerDescriptor): bool

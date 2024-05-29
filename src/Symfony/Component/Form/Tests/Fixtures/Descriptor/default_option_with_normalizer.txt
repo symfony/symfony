@@ -20,7 +20,6 @@ Symfony\Component\Form\Extension\Core\Type\ChoiceType (choice_translation_domain
   Normalizers      [         %s
                      Closure(%s
                        class:%s
-                       this: %s
                        file: %s
                        line: %s
                      }       %s

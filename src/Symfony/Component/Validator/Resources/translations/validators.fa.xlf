@@ -438,6 +438,10 @@
                 <source>This value is not a valid MAC address.</source>
                 <target state="needs-review-translation">این مقدار یک آدرس MAC معتبر نیست.</target>
             </trans-unit>
+            <trans-unit id="113">
+                <source>This URL is missing a top-level domain.</source>
+                <target state="needs-review-translation">این URL فاقد دامنه سطح بالا است.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

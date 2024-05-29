@@ -13,7 +13,6 @@ namespace Symfony\Component\OptionsResolver\Tests;
 
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\OptionsResolver\Debug\OptionsResolverIntrospector;
 use Symfony\Component\OptionsResolver\Exception\AccessException;
 use Symfony\Component\OptionsResolver\Exception\InvalidArgumentException;
@@ -27,16 +26,33 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class OptionsResolverTest extends TestCase
 {
-    use ExpectDeprecationTrait;
-
-    /**
-     * @var OptionsResolver
-     */
-    private $resolver;
+    private OptionsResolver $resolver;
 
     protected function setUp(): void
     {
         $this->resolver = new OptionsResolver();
+    }
+
+    /**
+     * @dataProvider provideResolveWithIgnoreUndefined
+     */
+    public function testResolveWithIgnoreUndefined(array $defaults, array $options, array $expected)
+    {
+        $this->resolver
+            ->setDefaults($defaults)
+            ->setIgnoreUndefined();
+
+        $this->assertSame($expected, $this->resolver->resolve($options));
+    }
+
+    public static function provideResolveWithIgnoreUndefined(): array
+    {
+        return [
+            'no defaults options, undefined resolves empty' => [[], ['c' => 4, 'd' => 5], []],
+            'empty options resolves defaults' => [['a' => '1', 'b' => '2'], [], ['a' => '1', 'b' => '2']],
+            'undefined options resolves defaults' => [['a' => '1', 'b' => '2'], ['c' => 3, 'd' => 4], ['a' => '1', 'b' => '2']],
+            'resolves defined' => [['a' => '1', 'b' => '2'], ['a' => '10', 'c' => '3'], ['b' => '2', 'a' => '10']],
+        ];
     }
 
     public function testResolveFailsIfNonExistingOption()
@@ -116,9 +132,7 @@ class OptionsResolverTest extends TestCase
 
     public function testSetLazyClosure()
     {
-        $this->resolver->setDefault('foo', function (Options $options) {
-            return 'lazy';
-        });
+        $this->resolver->setDefault('foo', fn (Options $options) => 'lazy');
 
         $this->assertEquals(['foo' => 'lazy'], $this->resolver->resolve());
     }
@@ -163,9 +177,7 @@ class OptionsResolverTest extends TestCase
     public function testAccessPreviousLazyDefaultValue()
     {
         // defined by superclass
-        $this->resolver->setDefault('foo', function (Options $options) {
-            return 'bar';
-        });
+        $this->resolver->setDefault('foo', fn (Options $options) => 'bar');
 
         // defined by subclass
         $this->resolver->setDefault('foo', function (Options $options, $previousValue) {
@@ -185,9 +197,7 @@ class OptionsResolverTest extends TestCase
         });
 
         // defined by subclass, no $previousValue argument defined!
-        $this->resolver->setDefault('foo', function (Options $options) {
-            return 'lazy';
-        });
+        $this->resolver->setDefault('foo', fn (Options $options) => 'lazy');
 
         $this->assertEquals(['foo' => 'lazy'], $this->resolver->resolve());
     }
@@ -452,7 +462,7 @@ class OptionsResolverTest extends TestCase
         $this->resolver
             ->setDefault('bar', 'baz')
             ->setDefault('foo', function (Options $options) {
-                $options->setDeprecated('bar');
+                $options->setDeprecated('bar', 'vendor/package', '1.1');
             })
             ->resolve()
         ;
@@ -461,17 +471,7 @@ class OptionsResolverTest extends TestCase
     public function testSetDeprecatedFailsIfUnknownOption()
     {
         $this->expectException(UndefinedOptionsException::class);
-        $this->resolver->setDeprecated('foo');
-    }
-
-    public function testSetDeprecatedFailsIfInvalidDeprecationMessageType()
-    {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Invalid type for deprecation message argument, expected string or \Closure, but got "bool".');
-        $this->resolver
-            ->setDefined('foo')
-            ->setDeprecated('foo', 'vendor/package', '1.1', true)
-        ;
+        $this->resolver->setDeprecated('foo', 'vendor/package', '1.1');
     }
 
     public function testLazyDeprecationFailsIfInvalidDeprecationMessageType()
@@ -480,9 +480,7 @@ class OptionsResolverTest extends TestCase
         $this->expectExceptionMessage('Invalid type for deprecation message, expected string but got "bool", return an empty string to ignore.');
         $this->resolver
             ->setDefined('foo')
-            ->setDeprecated('foo', 'vendor/package', '1.1', function (Options $options, $value) {
-                return false;
-            })
+            ->setDeprecated('foo', 'vendor/package', '1.1', fn (Options $options, $value) => false)
         ;
         $this->resolver->resolve(['foo' => null]);
     }
@@ -573,9 +571,7 @@ class OptionsResolverTest extends TestCase
             function (OptionsResolver $resolver) {
                 $resolver
                     ->setDefined('foo')
-                    ->setDefault('bar', function (Options $options) {
-                        return $options['foo'];
-                    })
+                    ->setDefault('bar', fn (Options $options) => $options['foo'])
                     ->setDeprecated('foo', 'vendor/package', '1.1', 'The option "foo" is deprecated, use "bar" option instead.')
                 ;
             },
@@ -669,9 +665,7 @@ class OptionsResolverTest extends TestCase
             function (OptionsResolver $resolver) {
                 $resolver
                     ->setDefault('foo', null)
-                    ->setDeprecated('foo', 'vendor/package', '1.1', function (Options $options, $value) {
-                        return '';
-                    })
+                    ->setDeprecated('foo', 'vendor/package', '1.1', fn (Options $options, $value) => '')
                 ;
             },
             ['foo' => Bar::class],
@@ -744,14 +738,10 @@ class OptionsResolverTest extends TestCase
         yield 'It explicitly ignores a deprecation' => [
             function (OptionsResolver $resolver) {
                 $resolver
-                    ->setDefault('baz', function (Options $options) {
-                        return $options->offsetGet('foo', false);
-                    })
+                    ->setDefault('baz', fn (Options $options) => $options->offsetGet('foo', false))
                     ->setDefault('foo', null)
                     ->setDeprecated('foo', 'vendor/package', '1.1', 'The option "%name%" is deprecated.')
-                    ->setDefault('bar', function (Options $options) {
-                        return $options->offsetGet('foo', false);
-                    })
+                    ->setDefault('bar', fn (Options $options) => $options->offsetGet('foo', false))
                 ;
             },
             [],
@@ -790,11 +780,11 @@ class OptionsResolverTest extends TestCase
     public function testResolveFailsIfInvalidTypedArray()
     {
         $this->expectException(InvalidOptionsException::class);
-        $this->expectExceptionMessage('The option "foo" with value array is expected to be of type "int[]", but one of the elements is of type "DateTime".');
+        $this->expectExceptionMessage('The option "foo" with value array is expected to be of type "int[]", but one of the elements is of type "DateTimeImmutable".');
         $this->resolver->setDefined('foo');
         $this->resolver->setAllowedTypes('foo', 'int[]');
 
-        $this->resolver->resolve(['foo' => [new \DateTime()]]);
+        $this->resolver->resolve(['foo' => [new \DateTimeImmutable()]]);
     }
 
     public function testResolveFailsWithNonArray()
@@ -810,13 +800,13 @@ class OptionsResolverTest extends TestCase
     public function testResolveFailsIfTypedArrayContainsInvalidTypes()
     {
         $this->expectException(InvalidOptionsException::class);
-        $this->expectExceptionMessage('The option "foo" with value array is expected to be of type "int[]", but one of the elements is of type "stdClass|array|DateTime".');
+        $this->expectExceptionMessage('The option "foo" with value array is expected to be of type "int[]", but one of the elements is of type "stdClass|array|DateTimeImmutable".');
         $this->resolver->setDefined('foo');
         $this->resolver->setAllowedTypes('foo', 'int[]');
         $values = range(1, 5);
         $values[] = new \stdClass();
         $values[] = [];
-        $values[] = new \DateTime();
+        $values[] = new \DateTimeImmutable();
         $values[] = 123;
 
         $this->resolver->resolve(['foo' => $values]);
@@ -906,12 +896,12 @@ class OptionsResolverTest extends TestCase
     public function testResolveSucceedsIfTypedArray()
     {
         $this->resolver->setDefault('foo', null);
-        $this->resolver->setAllowedTypes('foo', ['null', 'DateTime[]']);
+        $this->resolver->setAllowedTypes('foo', ['null', 'DateTimeImmutable[]']);
 
         $data = [
             'foo' => [
-                new \DateTime(),
-                new \DateTime(),
+                new \DateTimeImmutable(),
+                new \DateTimeImmutable(),
             ],
         ];
         $result = $this->resolver->resolve($data);
@@ -1019,6 +1009,32 @@ class OptionsResolverTest extends TestCase
         $this->resolver->resolve();
     }
 
+    public function testResolveFailsIfInvalidValueFromNestedOption()
+    {
+        $this->expectException(InvalidOptionsException::class);
+        $this->expectExceptionMessage('The option "foo[bar]" with value "invalid value" is invalid. Accepted values are: "valid value".');
+        $this->resolver->setDefault('foo', function (OptionsResolver $resolver) {
+            $resolver
+                ->setDefined('bar')
+                ->setAllowedValues('bar', 'valid value');
+        });
+
+        $this->resolver->resolve(['foo' => ['bar' => 'invalid value']]);
+    }
+
+    public function testResolveFailsIfInvalidTypeFromNestedOption()
+    {
+        $this->expectException(InvalidOptionsException::class);
+        $this->expectExceptionMessage('The option "foo[bar]" with value 1 is expected to be of type "string", but is of type "int".');
+        $this->resolver->setDefault('foo', function (OptionsResolver $resolver) {
+            $resolver
+                ->setDefined('bar')
+                ->setAllowedTypes('bar', 'string');
+        });
+
+        $this->resolver->resolve(['foo' => ['bar' => 1]]);
+    }
+
     public function testResolveFailsIfInvalidValue()
     {
         $this->expectException(InvalidOptionsException::class);
@@ -1118,9 +1134,9 @@ class OptionsResolverTest extends TestCase
         $this->expectException(InvalidOptionsException::class);
         $this->resolver->setDefault('foo', 42);
         $this->resolver->setAllowedValues('foo', [
-            function () { return false; },
-            function () { return false; },
-            function () { return false; },
+            fn () => false,
+            fn () => false,
+            fn () => false,
         ]);
 
         $this->resolver->resolve();
@@ -1130,9 +1146,9 @@ class OptionsResolverTest extends TestCase
     {
         $this->resolver->setDefault('foo', 'bar');
         $this->resolver->setAllowedValues('foo', [
-            function () { return false; },
-            function () { return true; },
-            function () { return false; },
+            fn () => false,
+            fn () => true,
+            fn () => false,
         ]);
 
         $this->assertEquals(['foo' => 'bar'], $this->resolver->resolve());
@@ -1220,8 +1236,8 @@ class OptionsResolverTest extends TestCase
     {
         $this->expectException(InvalidOptionsException::class);
         $this->resolver->setDefault('foo', 42);
-        $this->resolver->setAllowedValues('foo', function () { return false; });
-        $this->resolver->addAllowedValues('foo', function () { return false; });
+        $this->resolver->setAllowedValues('foo', fn () => false);
+        $this->resolver->addAllowedValues('foo', fn () => false);
 
         $this->resolver->resolve();
     }
@@ -1229,8 +1245,8 @@ class OptionsResolverTest extends TestCase
     public function testResolveSucceedsIfAnyAddedClosureReturnsTrue()
     {
         $this->resolver->setDefault('foo', 'bar');
-        $this->resolver->setAllowedValues('foo', function () { return false; });
-        $this->resolver->addAllowedValues('foo', function () { return true; });
+        $this->resolver->setAllowedValues('foo', fn () => false);
+        $this->resolver->addAllowedValues('foo', fn () => true);
 
         $this->assertEquals(['foo' => 'bar'], $this->resolver->resolve());
     }
@@ -1238,8 +1254,8 @@ class OptionsResolverTest extends TestCase
     public function testResolveSucceedsIfAnyAddedClosureReturnsTrue2()
     {
         $this->resolver->setDefault('foo', 'bar');
-        $this->resolver->setAllowedValues('foo', function () { return true; });
-        $this->resolver->addAllowedValues('foo', function () { return false; });
+        $this->resolver->setAllowedValues('foo', fn () => true);
+        $this->resolver->addAllowedValues('foo', fn () => false);
 
         $this->assertEquals(['foo' => 'bar'], $this->resolver->resolve());
     }
@@ -1253,9 +1269,7 @@ class OptionsResolverTest extends TestCase
     public function testSetNormalizerClosure()
     {
         $this->resolver->setDefault('foo', 'bar');
-        $this->resolver->setNormalizer('foo', function () {
-            return 'normalized';
-        });
+        $this->resolver->setNormalizer('foo', fn () => 'normalized');
 
         $this->assertEquals(['foo' => 'normalized'], $this->resolver->resolve());
     }
@@ -1282,9 +1296,7 @@ class OptionsResolverTest extends TestCase
     {
         $this->resolver->setDefault('foo', 'bar');
 
-        $this->resolver->setNormalizer('foo', function (Options $options, $value) {
-            return 'normalized['.$value.']';
-        });
+        $this->resolver->setNormalizer('foo', fn (Options $options, $value) => 'normalized['.$value.']');
 
         $this->assertEquals(['foo' => 'normalized[bar]'], $this->resolver->resolve());
     }
@@ -1293,9 +1305,7 @@ class OptionsResolverTest extends TestCase
     {
         $this->resolver->setDefault('foo', 'bar');
 
-        $this->resolver->setNormalizer('foo', function (Options $options, $value) {
-            return 'normalized['.$value.']';
-        });
+        $this->resolver->setNormalizer('foo', fn (Options $options, $value) => 'normalized['.$value.']');
 
         $resolved = $this->resolver->resolve(['foo' => 'baz']);
 
@@ -1350,9 +1360,7 @@ class OptionsResolverTest extends TestCase
 
     public function testNormalizerCanAccessLazyOptions()
     {
-        $this->resolver->setDefault('lazy', function (Options $options) {
-            return 'bar';
-        });
+        $this->resolver->setDefault('lazy', fn (Options $options) => 'bar');
         $this->resolver->setDefault('norm', 'baz');
 
         $this->resolver->setNormalizer('norm', function (Options $options) {
@@ -1494,13 +1502,9 @@ class OptionsResolverTest extends TestCase
     {
         // defined by superclass
         $this->resolver->setDefault('foo', 'bar');
-        $this->resolver->setNormalizer('foo', function (Options $options, $value) {
-            return '1st-normalized-'.$value;
-        });
+        $this->resolver->setNormalizer('foo', fn (Options $options, $value) => '1st-normalized-'.$value);
         // defined by subclass
-        $this->resolver->addNormalizer('foo', function (Options $options, $value) {
-            return '2nd-normalized-'.$value;
-        });
+        $this->resolver->addNormalizer('foo', fn (Options $options, $value) => '2nd-normalized-'.$value);
 
         $this->assertEquals(['foo' => '2nd-normalized-1st-normalized-bar'], $this->resolver->resolve());
     }
@@ -1509,13 +1513,9 @@ class OptionsResolverTest extends TestCase
     {
         // defined by superclass
         $this->resolver->setDefault('foo', 'bar');
-        $this->resolver->setNormalizer('foo', function (Options $options, $value) {
-            return '2nd-normalized-'.$value;
-        });
+        $this->resolver->setNormalizer('foo', fn (Options $options, $value) => '2nd-normalized-'.$value);
         // defined by subclass
-        $this->resolver->addNormalizer('foo', function (Options $options, $value) {
-            return '1st-normalized-'.$value;
-        }, true);
+        $this->resolver->addNormalizer('foo', fn (Options $options, $value) => '1st-normalized-'.$value, true);
 
         $this->assertEquals(['foo' => '2nd-normalized-1st-normalized-bar'], $this->resolver->resolve());
     }
@@ -1524,9 +1524,7 @@ class OptionsResolverTest extends TestCase
     {
         // defined by superclass
         $this->resolver->setDefault('foo', 'bar');
-        $this->resolver->addNormalizer('foo', function (Options $options, $value) {
-            return '1st-normalized-'.$value;
-        }, true);
+        $this->resolver->addNormalizer('foo', fn (Options $options, $value) => '1st-normalized-'.$value, true);
 
         $this->assertEquals(['foo' => '1st-normalized-bar'], $this->resolver->resolve());
     }
@@ -1608,9 +1606,7 @@ class OptionsResolverTest extends TestCase
 
     public function testRemoveLazyOption()
     {
-        $this->resolver->setDefault('foo', function (Options $options) {
-            return 'lazy';
-        });
+        $this->resolver->setDefault('foo', fn (Options $options) => 'lazy');
         $this->resolver->remove('foo');
 
         $this->assertSame([], $this->resolver->resolve());
@@ -1619,9 +1615,7 @@ class OptionsResolverTest extends TestCase
     public function testRemoveNormalizer()
     {
         $this->resolver->setDefault('foo', 'bar');
-        $this->resolver->setNormalizer('foo', function (Options $options, $value) {
-            return 'normalized';
-        });
+        $this->resolver->setNormalizer('foo', fn (Options $options, $value) => 'normalized');
         $this->resolver->remove('foo');
         $this->resolver->setDefault('foo', 'bar');
 
@@ -1682,9 +1676,7 @@ class OptionsResolverTest extends TestCase
 
     public function testClearLazyOption()
     {
-        $this->resolver->setDefault('foo', function (Options $options) {
-            return 'lazy';
-        });
+        $this->resolver->setDefault('foo', fn (Options $options) => 'lazy');
         $this->resolver->clear();
 
         $this->assertSame([], $this->resolver->resolve());
@@ -1693,9 +1685,7 @@ class OptionsResolverTest extends TestCase
     public function testClearNormalizer()
     {
         $this->resolver->setDefault('foo', 'bar');
-        $this->resolver->setNormalizer('foo', function (Options $options, $value) {
-            return 'normalized';
-        });
+        $this->resolver->setNormalizer('foo', fn (Options $options, $value) => 'normalized');
         $this->resolver->clear();
         $this->resolver->setDefault('foo', 'bar');
 
@@ -1737,13 +1727,9 @@ class OptionsResolverTest extends TestCase
     public function testClearOptionAndNormalizer()
     {
         $this->resolver->setDefault('foo1', 'bar');
-        $this->resolver->setNormalizer('foo1', function (Options $options) {
-            return '';
-        });
+        $this->resolver->setNormalizer('foo1', fn (Options $options) => '');
         $this->resolver->setDefault('foo2', 'bar');
-        $this->resolver->setNormalizer('foo2', function (Options $options) {
-            return '';
-        });
+        $this->resolver->setNormalizer('foo2', fn (Options $options) => '');
 
         $this->resolver->clear();
         $this->assertEmpty($this->resolver->resolve());
@@ -1755,9 +1741,7 @@ class OptionsResolverTest extends TestCase
         $this->resolver->setDefault('default2', 1);
         $this->resolver->setRequired('required');
         $this->resolver->setDefined('defined');
-        $this->resolver->setDefault('lazy1', function (Options $options) {
-            return 'lazy';
-        });
+        $this->resolver->setDefault('lazy1', fn (Options $options) => 'lazy');
 
         $this->resolver->setDefault('lazy2', function (Options $options) {
             Assert::assertArrayHasKey('default1', $options);
@@ -2162,9 +2146,7 @@ class OptionsResolverTest extends TestCase
     public function testResolveLazyOptionUsingNestedOption()
     {
         $this->resolver->setDefaults([
-            'version' => function (Options $options) {
-                return $options['database']['server_version'];
-            },
+            'version' => fn (Options $options) => $options['database']['server_version'],
             'database' => function (OptionsResolver $resolver) {
                 $resolver->setDefault('server_version', '3.15');
             },
@@ -2210,9 +2192,7 @@ class OptionsResolverTest extends TestCase
             Assert::fail('Should not be called');
         });
         // defined by subclass
-        $this->resolver->setDefault('foo', function (Options $options) {
-            return 'lazy';
-        });
+        $this->resolver->setDefault('foo', fn (Options $options) => 'lazy');
         $this->assertSame(['foo' => 'lazy'], $this->resolver->resolve());
     }
 
@@ -2265,9 +2245,7 @@ class OptionsResolverTest extends TestCase
         });
         // defined by subclass
         $this->resolver->setNormalizer('foo', function (Options $options, $resolvedValue) {
-            if (null === $resolvedValue['bar']) {
-                $resolvedValue['bar'] = 'baz';
-            }
+            $resolvedValue['bar'] ??= 'baz';
 
             return $resolvedValue;
         });
@@ -2287,9 +2265,7 @@ class OptionsResolverTest extends TestCase
     {
         $this->expectException(OptionDefinitionException::class);
         $this->resolver->setDefaults([
-            'version' => function (Options $options) {
-                return $options['database']['server_version'];
-            },
+            'version' => fn (Options $options) => $options['database']['server_version'],
             'database' => function (OptionsResolver $resolver, Options $parent) {
                 $resolver->setDefault('server_version', $parent['version']);
             },
@@ -2362,9 +2338,7 @@ class OptionsResolverTest extends TestCase
                     $resolver->setDefault('host', $parent['host']);
                 });
             },
-            'secondary_replica' => function (Options $options) {
-                return $options['database']['primary_replica']['host'];
-            },
+            'secondary_replica' => fn (Options $options) => $options['database']['primary_replica']['host'],
         ]);
         $actualOptions = $this->resolver->resolve(['ip' => '127.0.0.1']);
         $expectedOptions = [
@@ -2385,12 +2359,8 @@ class OptionsResolverTest extends TestCase
             'database' => function (OptionsResolver $resolver, Options $parent) {
                 $resolver
                     ->setDefined('logging')
-                    ->setDefault('profiling', function (Options $options) use ($parent) {
-                        return $parent['debug'];
-                    })
-                    ->setNormalizer('logging', function (Options $options, $value) use ($parent) {
-                        return false === $parent['debug'] ? true : $value;
-                    });
+                    ->setDefault('profiling', fn (Options $options) => $parent['debug'])
+                    ->setNormalizer('logging', fn (Options $options, $value) => false === $parent['debug'] ? true : $value);
             },
         ]);
         $actualOptions = $this->resolver->resolve([
@@ -2420,9 +2390,7 @@ class OptionsResolverTest extends TestCase
             ->default('bar')
             ->allowedTypes('string', 'bool')
             ->allowedValues('bar', 'zab')
-            ->normalize(static function (Options $options, $value) {
-                return $value;
-            })
+            ->normalize(static fn (Options $options, $value) => $value)
             ->info('info message')
         ;
         $introspector = new OptionsResolverIntrospector($this->resolver);
@@ -2480,31 +2448,16 @@ class OptionsResolverTest extends TestCase
     public function testInfoOnInvalidValue()
     {
         $this->expectException(InvalidOptionsException::class);
-        $this->expectExceptionMessage('The option "expires" with value DateTime is invalid. Info: A future date time.');
+        $this->expectExceptionMessage('The option "expires" with value DateTimeImmutable is invalid. Info: A future date time.');
 
         $this->resolver
             ->setRequired('expires')
             ->setInfo('expires', 'A future date time')
-            ->setAllowedTypes('expires', \DateTime::class)
-            ->setAllowedValues('expires', static function ($value) {
-                return $value >= new \DateTime('now');
-            })
+            ->setAllowedTypes('expires', \DateTimeImmutable::class)
+            ->setAllowedValues('expires', static fn ($value) => $value >= new \DateTimeImmutable('now'))
         ;
 
-        $this->resolver->resolve(['expires' => new \DateTime('-1 hour')]);
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testSetDeprecatedWithoutPackageAndVersion()
-    {
-        $this->expectDeprecation('Since symfony/options-resolver 5.1: The signature of method "Symfony\Component\OptionsResolver\OptionsResolver::setDeprecated()" requires 2 new arguments: "string $package, string $version", not defining them is deprecated.');
-
-        $this->resolver
-            ->setDefined('foo')
-            ->setDeprecated('foo')
-        ;
+        $this->resolver->resolve(['expires' => new \DateTimeImmutable('-1 hour')]);
     }
 
     public function testInvalidValueForPrototypeDefinition()

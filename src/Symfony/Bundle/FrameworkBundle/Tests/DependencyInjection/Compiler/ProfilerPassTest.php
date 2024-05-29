@@ -34,13 +34,15 @@ class ProfilerPassTest extends TestCase
      */
     public function testTemplateNoIdThrowsException()
     {
-        $this->expectException(\InvalidArgumentException::class);
         $builder = new ContainerBuilder();
         $builder->register('profiler', 'ProfilerClass');
         $builder->register('my_collector_service')
             ->addTag('data_collector', ['template' => 'foo']);
 
         $profilerPass = new ProfilerPass();
+
+        $this->expectException(\InvalidArgumentException::class);
+
         $profilerPass->process($builder);
     }
 
@@ -65,7 +67,7 @@ class ProfilerPassTest extends TestCase
     public static function provideValidCollectorWithTemplateUsingAutoconfigure(): \Generator
     {
         yield [new class() implements TemplateAwareDataCollectorInterface {
-            public function collect(Request $request, Response $response, ?\Throwable $exception = null)
+            public function collect(Request $request, Response $response, ?\Throwable $exception = null): void
             {
             }
 
@@ -74,7 +76,7 @@ class ProfilerPassTest extends TestCase
                 return static::class;
             }
 
-            public function reset()
+            public function reset(): void
             {
             }
 
@@ -85,7 +87,7 @@ class ProfilerPassTest extends TestCase
         }];
 
         yield [new class() extends AbstractDataCollector {
-            public function collect(Request $request, Response $response, ?\Throwable $exception = null)
+            public function collect(Request $request, Response $response, ?\Throwable $exception = null): void
             {
             }
 
@@ -105,12 +107,12 @@ class ProfilerPassTest extends TestCase
         $profilerDefinition = $container->register('profiler', 'ProfilerClass');
 
         $container->registerForAutoconfiguration(DataCollectorInterface::class)->addTag('data_collector');
-        $container->register('mydatacollector', \get_class($dataCollector))->setAutoconfigured(true);
+        $container->register('mydatacollector', $dataCollector::class)->setAutoconfigured(true);
 
         (new ResolveInstanceofConditionalsPass())->process($container);
         (new ProfilerPass())->process($container);
 
-        $idForTemplate = \get_class($dataCollector);
+        $idForTemplate = $dataCollector::class;
         $this->assertSame(['mydatacollector' => [$idForTemplate, 'foo']], $container->getParameter('data_collector.templates'));
 
         // grab the method calls off of the "profiler" definition

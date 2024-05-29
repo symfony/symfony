@@ -18,9 +18,6 @@ namespace Symfony\Component\HttpClient\Chunk;
  */
 class FirstChunk extends DataChunk
 {
-    /**
-     * {@inheritdoc}
-     */
     public function isFirst(): bool
     {
         return true;

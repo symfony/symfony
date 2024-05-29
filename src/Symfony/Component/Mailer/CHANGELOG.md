@@ -1,11 +1,54 @@
 CHANGELOG
 =========
 
-5.4.21
-------
+7.1
+---
+
+ * Dispatch Postmark's "406 - Inactive recipient" API error code as a `PostmarkDeliveryEvent` instead of throwing an exception
+ * Add DSN param `auto_tls` to disable automatic STARTTLS
+ * Add support for allowing some users even if `recipients` is defined in `EnvelopeListener`
+
+7.0
+---
+
+ * Remove the OhMySmtp bridge in favor of the MailPace bridge
+
+6.4
+---
+
+ * Add DSN parameter `peer_fingerprint` to verify TLS certificate fingerprint
+ * Change the default port for the `mailjet+smtp` transport from 465 to 587
+
+6.3
+---
+
+ * Add `MessageEvent::reject()` to allow rejecting an email before sending it
+ * Change the default port for the `mailgun+smtp` transport from 465 to 587
+ * Add `$authenticators` parameter in `EsmtpTransport` constructor and `EsmtpTransport::setAuthenticators()`
+  to allow overriding of default eSMTP authenticators
+
+6.2.7
+-----
 
  * [BC BREAK] The following data providers for `TransportFactoryTestCase` are now static:
   `supportsProvider()`, `createProvider()`, `unsupportedSchemeProvider()`and `incompleteDsnProvider()`
+
+6.2
+---
+
+ * Add a `mailer:test` command
+ * Add `SentMessageEvent` and `FailedMessageEvent` events
+
+6.1
+---
+
+ * Make `start()` and `stop()` methods public on `SmtpTransport`
+ * Improve extensibility of `EsmtpTransport`
+
+6.0
+---
+
+ * The `HttpTransportException` class takes a string at first argument
 
 5.4
 ---

@@ -1,0 +1,30 @@
+{
+    "name": "symfony/novu-notifier",
+    "type": "symfony-notifier-bridge",
+    "description": "Provides Novu integration for Symfony Notifier.",
+    "keywords": ["novu", "notifier"],
+    "homepage": "https://symfony.com",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Wouter van der Loop",
+            "email": "woutervdl@toppy.nl"
+        },
+        {
+            "name": "Symfony Community",
+            "homepage": "https://symfony.com/contributors"
+        }
+    ],
+    "require": {
+        "php": ">=8.1",
+        "symfony/http-client": "^5.4|^6.0|^7.0",
+        "symfony/notifier": "^6.4"
+    },
+    "autoload": {
+        "psr-4": { "Symfony\\Component\\Notifier\\Bridge\\Novu\\": "" },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
+    },
+    "minimum-stability": "dev"
+}

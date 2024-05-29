@@ -14,17 +14,13 @@ namespace Symfony\Component\Notifier\Bridge\Mailjet;
 use Symfony\Component\Notifier\Exception\UnsupportedSchemeException;
 use Symfony\Component\Notifier\Transport\AbstractTransportFactory;
 use Symfony\Component\Notifier\Transport\Dsn;
-use Symfony\Component\Notifier\Transport\TransportInterface;
 
 /**
  * @author Jérôme Nadaud <jerome@nadaud.io>
  */
 final class MailjetTransportFactory extends AbstractTransportFactory
 {
-    /**
-     * @return MailjetTransport
-     */
-    public function create(Dsn $dsn): TransportInterface
+    public function create(Dsn $dsn): MailjetTransport
     {
         $scheme = $dsn->getScheme();
 

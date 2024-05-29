@@ -12,13 +12,12 @@
 namespace Symfony\Component\HttpClient\Tests\Response;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\HttpClient\Exception\InvalidArgumentException;
 use Symfony\Component\HttpClient\Exception\JsonException;
 use Symfony\Component\HttpClient\Exception\TransportException;
+use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\Response\MockResponse;
 
-/**
- * Test methods from Symfony\Component\HttpClient\Response\*ResponseTrait.
- */
 class MockResponseTest extends TestCase
 {
     public function testTotalTimeShouldBeSimulatedWhenNotProvided()
@@ -123,5 +122,21 @@ class MockResponseTest extends TestCase
         $mockResponse->cancel();
 
         $this->assertTrue($mockResponse->getInfo('canceled'));
+    }
+
+    public function testMustBeIssuedByMockHttpClient()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('MockResponse instances must be issued by MockHttpClient before processing.');
+
+        (new MockResponse())->getContent();
+    }
+
+    public function testFromFile()
+    {
+        $client = new MockHttpClient(MockResponse::fromFile(__DIR__.'/Fixtures/response.txt'));
+        $response = $client->request('GET', 'https://symfony.com');
+
+        $this->assertSame('foo bar ccc', $response->getContent());
     }
 }

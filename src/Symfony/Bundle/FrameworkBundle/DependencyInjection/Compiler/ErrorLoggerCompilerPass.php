@@ -22,16 +22,16 @@ class ErrorLoggerCompilerPass implements CompilerPassInterface
 {
     public function process(ContainerBuilder $container): void
     {
-        if (!$container->hasDefinition('debug.debug_handlers_listener')) {
+        if (!$container->hasDefinition('debug.error_handler_configurator')) {
             return;
         }
 
-        $definition = $container->getDefinition('debug.debug_handlers_listener');
+        $definition = $container->getDefinition('debug.error_handler_configurator');
         if ($container->hasDefinition('monolog.logger.php')) {
-            $definition->replaceArgument(1, new Reference('monolog.logger.php'));
+            $definition->replaceArgument(0, new Reference('monolog.logger.php'));
         }
         if ($container->hasDefinition('monolog.logger.deprecation')) {
-            $definition->replaceArgument(6, new Reference('monolog.logger.deprecation'));
+            $definition->replaceArgument(5, new Reference('monolog.logger.deprecation'));
         }
     }
 }

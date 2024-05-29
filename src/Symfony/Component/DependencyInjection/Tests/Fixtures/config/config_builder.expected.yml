@@ -1,5 +1,5 @@
 parameters:
-    acme.configs: [{ color: blue }]
+    acme.configs: [{ color: red }, { color: blue }]
 
 services:
     service_container:

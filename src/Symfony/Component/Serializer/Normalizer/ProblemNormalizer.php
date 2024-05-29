@@ -12,7 +12,14 @@
 namespace Symfony\Component\Serializer\Normalizer;
 
 use Symfony\Component\ErrorHandler\Exception\FlattenException;
+use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
+use Symfony\Component\Messenger\Exception\ValidationFailedException as MessageValidationFailedException;
 use Symfony\Component\Serializer\Exception\InvalidArgumentException;
+use Symfony\Component\Serializer\Exception\PartialDenormalizationException;
+use Symfony\Component\Serializer\SerializerAwareInterface;
+use Symfony\Component\Serializer\SerializerAwareTrait;
+use Symfony\Component\Validator\Exception\ValidationFailedException;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Normalizes errors according to the API Problem spec (RFC 7807).
@@ -22,40 +29,76 @@ use Symfony\Component\Serializer\Exception\InvalidArgumentException;
  * @author Kévin Dunglas <dunglas@gmail.com>
  * @author Yonel Ceruto <yonelceruto@gmail.com>
  */
-class ProblemNormalizer implements NormalizerInterface, CacheableSupportsMethodInterface
+class ProblemNormalizer implements NormalizerInterface, SerializerAwareInterface
 {
-    private $debug;
-    private $defaultContext = [
-        'type' => 'https://tools.ietf.org/html/rfc2616#section-10',
-        'title' => 'An error occurred',
-    ];
+    use SerializerAwareTrait;
 
-    public function __construct(bool $debug = false, array $defaultContext = [])
-    {
-        $this->debug = $debug;
-        $this->defaultContext = $defaultContext + $this->defaultContext;
+    public const TITLE = 'title';
+    public const TYPE = 'type';
+    public const STATUS = 'status';
+
+    public function __construct(
+        private bool $debug = false,
+        private array $defaultContext = [],
+        private ?TranslatorInterface $translator = null,
+    ) {
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * @return array
-     */
-    public function normalize($object, ?string $format = null, array $context = [])
+    public function getSupportedTypes(?string $format): array
+    {
+        return [
+            FlattenException::class => __CLASS__ === self::class,
+        ];
+    }
+
+    public function normalize(mixed $object, ?string $format = null, array $context = []): array
     {
         if (!$object instanceof FlattenException) {
             throw new InvalidArgumentException(sprintf('The object must implement "%s".', FlattenException::class));
         }
 
+        $data = [];
         $context += $this->defaultContext;
         $debug = $this->debug && ($context['debug'] ?? true);
+        $exception = $context['exception'] ?? null;
+        if ($exception instanceof HttpExceptionInterface) {
+            $exception = $exception->getPrevious();
+
+            if ($exception instanceof PartialDenormalizationException) {
+                $trans = $this->translator ? $this->translator->trans(...) : fn ($m, $p) => strtr($m, $p);
+                $template = 'This value should be of type {{ type }}.';
+                $data = [
+                    self::TYPE => 'https://symfony.com/errors/validation',
+                    self::TITLE => 'Validation Failed',
+                    'violations' => array_map(
+                        fn ($e) => [
+                            'propertyPath' => $e->getPath(),
+                            'title' => $trans($template, [
+                                '{{ type }}' => implode('|', $e->getExpectedTypes() ?? ['?']),
+                            ], 'validators'),
+                            'template' => $template,
+                            'parameters' => [
+                                '{{ type }}' => implode('|', $e->getExpectedTypes() ?? ['?']),
+                            ],
+                        ] + ($debug || $e->canUseMessageForUser() ? ['hint' => $e->getMessage()] : []),
+                        $exception->getErrors()
+                    ),
+                ];
+                $data['detail'] = implode("\n", array_map(fn ($e) => $e['propertyPath'].': '.$e['title'], $data['violations']));
+            } elseif (($exception instanceof ValidationFailedException || $exception instanceof MessageValidationFailedException)
+                && $this->serializer instanceof NormalizerInterface
+                && $this->serializer->supportsNormalization($exception->getViolations(), $format, $context)
+            ) {
+                $data = $this->serializer->normalize($exception->getViolations(), $format, $context);
+            }
+        }
 
         $data = [
-            'type' => $context['type'],
-            'title' => $context['title'],
-            'status' => $context['status'] ?? $object->getStatusCode(),
-            'detail' => $debug ? $object->getMessage() : $object->getStatusText(),
-        ];
+            self::TYPE => $data[self::TYPE] ?? $context[self::TYPE] ?? 'https://tools.ietf.org/html/rfc2616#section-10',
+            self::TITLE => $data[self::TITLE] ?? $context[self::TITLE] ?? 'An error occurred',
+            self::STATUS => $context[self::STATUS] ?? $object->getStatusCode(),
+            'detail' => $data['detail'] ?? ($debug ? $object->getMessage() : $object->getStatusText()),
+        ] + $data;
         if ($debug) {
             $data['class'] = $object->getClass();
             $data['trace'] = $object->getTrace();
@@ -64,19 +107,8 @@ class ProblemNormalizer implements NormalizerInterface, CacheableSupportsMethodI
         return $data;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function supportsNormalization($data, ?string $format = null): bool
+    public function supportsNormalization(mixed $data, ?string $format = null, array $context = []): bool
     {
         return $data instanceof FlattenException;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function hasCacheableSupportsMethod(): bool
-    {
-        return true;
     }
 }

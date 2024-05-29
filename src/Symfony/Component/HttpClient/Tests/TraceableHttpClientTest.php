@@ -29,6 +29,11 @@ class TraceableHttpClientTest extends TestCase
         TestHttpServer::start();
     }
 
+    public static function tearDownAfterClass(): void
+    {
+        TestHttpServer::stop();
+    }
+
     public function testItTracesRequest()
     {
         $httpClient = $this->createMock(HttpClientInterface::class);
@@ -123,9 +128,7 @@ class TraceableHttpClientTest extends TestCase
     {
         $this->expectException(ClientExceptionInterface::class);
 
-        $sut = new TraceableHttpClient(new MockHttpClient($responseFactory = function (): MockResponse {
-            return new MockResponse('Errored.', ['http_code' => 400]);
-        }));
+        $sut = new TraceableHttpClient(new MockHttpClient($responseFactory = fn (): MockResponse => new MockResponse('Errored.', ['http_code' => 400])));
 
         $response = $sut->request('GET', 'https://example.com/foo/bar');
         $response->toArray();

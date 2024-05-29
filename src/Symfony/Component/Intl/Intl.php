@@ -54,15 +54,8 @@ final class Intl
      */
     public const TIMEZONE_DIR = 'timezones';
 
-    /**
-     * @var string|bool|null
-     */
-    private static $icuVersion = false;
-
-    /**
-     * @var string
-     */
-    private static $icuDataVersion = false;
+    private static string|false|null $icuVersion = false;
+    private static string $icuDataVersion;
 
     /**
      * Returns whether the intl extension is installed.
@@ -91,7 +84,7 @@ final class Intl
                     preg_match('/^ICU version (?:=>)?(.*)$/m', $output, $matches);
 
                     self::$icuVersion = trim($matches[1]);
-                } catch (\ReflectionException $e) {
+                } catch (\ReflectionException) {
                     self::$icuVersion = null;
                 }
             }
@@ -105,11 +98,7 @@ final class Intl
      */
     public static function getIcuDataVersion(): string
     {
-        if (false === self::$icuDataVersion) {
-            self::$icuDataVersion = trim(file_get_contents(self::getDataDirectory().'/version.txt'));
-        }
-
-        return self::$icuDataVersion;
+        return self::$icuDataVersion ??= trim(file_get_contents(self::getDataDirectory().'/version.txt'));
     }
 
     /**

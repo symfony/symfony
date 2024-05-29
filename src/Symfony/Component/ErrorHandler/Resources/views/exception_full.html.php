@@ -6,7 +6,7 @@
         <meta name="robots" content="noindex,nofollow" />
         <meta name="viewport" content="width=device-width,initial-scale=1" />
         <title><?= $_message; ?></title>
-        <link rel="icon" type="image/png" href="<?= $this->include('assets/images/favicon.png.base64'); ?>">
+        <link rel="icon" type="image/png" href="<?= $this->include('assets/images/favicon.png.base64'); ?>" />
         <style><?= $this->include('assets/css/exception.css'); ?></style>
         <style><?= $this->include('assets/css/exception_full.css'); ?></style>
     </head>

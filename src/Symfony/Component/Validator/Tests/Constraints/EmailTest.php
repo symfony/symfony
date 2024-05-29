@@ -15,7 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Validator\Constraints\Email;
 use Symfony\Component\Validator\Exception\InvalidArgumentException;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
-use Symfony\Component\Validator\Mapping\Loader\AnnotationLoader;
+use Symfony\Component\Validator\Mapping\Loader\AttributeLoader;
 
 class EmailTest extends TestCase
 {
@@ -26,11 +26,25 @@ class EmailTest extends TestCase
         $this->assertEquals(Email::VALIDATION_MODE_STRICT, $subject->mode);
     }
 
+    public function testConstructorHtml5AllowNoTld()
+    {
+        $subject = new Email(['mode' => Email::VALIDATION_MODE_HTML5_ALLOW_NO_TLD]);
+
+        $this->assertEquals(Email::VALIDATION_MODE_HTML5_ALLOW_NO_TLD, $subject->mode);
+    }
+
     public function testUnknownModesTriggerException()
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('The "mode" parameter value is not valid.');
         new Email(['mode' => 'Unknown Mode']);
+    }
+
+    public function testUnknownModeArgumentsTriggerException()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('The "mode" parameter value is not valid.');
+        new Email(null, null, 'Unknown Mode');
     }
 
     public function testNormalizerCanBeSet()
@@ -54,13 +68,10 @@ class EmailTest extends TestCase
         new Email(['normalizer' => new \stdClass()]);
     }
 
-    /**
-     * @requires PHP 8
-     */
     public function testAttribute()
     {
         $metadata = new ClassMetadata(EmailDummy::class);
-        (new AnnotationLoader())->loadClassMetadata($metadata);
+        (new AttributeLoader())->loadClassMetadata($metadata);
 
         [$aConstraint] = $metadata->properties['a']->constraints;
         self::assertNull($aConstraint->mode);

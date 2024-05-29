@@ -29,12 +29,12 @@ interface PasswordHasherInterface
      *
      * @throws InvalidPasswordException When the plain password is invalid, e.g. excessively long
      */
-    public function hash(string $plainPassword): string;
+    public function hash(#[\SensitiveParameter] string $plainPassword): string;
 
     /**
      * Verifies a plain password against a hash.
      */
-    public function verify(string $hashedPassword, string $plainPassword): bool;
+    public function verify(string $hashedPassword, #[\SensitiveParameter] string $plainPassword): bool;
 
     /**
      * Checks if a password hash would benefit from rehashing.

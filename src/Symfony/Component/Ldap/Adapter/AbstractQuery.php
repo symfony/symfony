@@ -19,10 +19,10 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 abstract class AbstractQuery implements QueryInterface
 {
-    protected $connection;
-    protected $dn;
-    protected $query;
-    protected $options;
+    protected ConnectionInterface $connection;
+    protected string $dn;
+    protected string $query;
+    protected array $options;
 
     public function __construct(ConnectionInterface $connection, string $dn, string $query, array $options = [])
     {
@@ -40,9 +40,7 @@ abstract class AbstractQuery implements QueryInterface
         $resolver->setAllowedValues('deref', [static::DEREF_ALWAYS, static::DEREF_NEVER, static::DEREF_FINDING, static::DEREF_SEARCHING]);
         $resolver->setAllowedValues('scope', [static::SCOPE_BASE, static::SCOPE_ONE, static::SCOPE_SUB]);
 
-        $resolver->setNormalizer('filter', function (Options $options, $value) {
-            return \is_array($value) ? $value : [$value];
-        });
+        $resolver->setNormalizer('filter', fn (Options $options, $value) => \is_array($value) ? $value : [$value]);
 
         $this->connection = $connection;
         $this->dn = $dn;

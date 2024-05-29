@@ -19,90 +19,23 @@ use Symfony\Component\Form\ChoiceList\ChoiceListInterface;
  */
 abstract class AbstractChoiceListTestCase extends TestCase
 {
-    /**
-     * @var ChoiceListInterface
-     */
-    protected $list;
-
-    /**
-     * @var array
-     */
-    protected $choices;
-
-    /**
-     * @var array
-     */
-    protected $values;
-
-    /**
-     * @var array
-     */
-    protected $structuredValues;
-
-    /**
-     * @var array
-     */
-    protected $keys;
-
-    /**
-     * @var mixed
-     */
-    protected $choice1;
-
-    /**
-     * @var mixed
-     */
-    protected $choice2;
-
-    /**
-     * @var mixed
-     */
-    protected $choice3;
-
-    /**
-     * @var mixed
-     */
-    protected $choice4;
-
-    /**
-     * @var string
-     */
-    protected $value1;
-
-    /**
-     * @var string
-     */
-    protected $value2;
-
-    /**
-     * @var string
-     */
-    protected $value3;
-
-    /**
-     * @var string
-     */
-    protected $value4;
-
-    /**
-     * @var string
-     */
-    protected $key1;
-
-    /**
-     * @var string
-     */
-    protected $key2;
-
-    /**
-     * @var string
-     */
-    protected $key3;
-
-    /**
-     * @var string
-     */
-    protected $key4;
+    protected ChoiceListInterface $list;
+    protected array $choices;
+    protected array $values;
+    protected array $structuredValues;
+    protected array $keys;
+    protected mixed $choice1;
+    protected mixed $choice2;
+    protected mixed $choice3;
+    protected mixed $choice4;
+    protected string $value1;
+    protected string $value2;
+    protected string $value3;
+    protected string $value4;
+    protected string $key1;
+    protected string $key2;
+    protected string $key3;
+    protected string $key4;
 
     protected function setUp(): void
     {

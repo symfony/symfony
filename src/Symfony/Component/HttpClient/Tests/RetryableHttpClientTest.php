@@ -13,19 +13,25 @@ namespace Symfony\Component\HttpClient\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpClient\Exception\ServerException;
-use Symfony\Component\HttpClient\Exception\TimeoutException;
+use Symfony\Component\HttpClient\Exception\TransportException;
 use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\NativeHttpClient;
 use Symfony\Component\HttpClient\Response\AsyncContext;
 use Symfony\Component\HttpClient\Response\MockResponse;
 use Symfony\Component\HttpClient\Retry\GenericRetryStrategy;
+use Symfony\Component\HttpClient\Retry\RetryStrategyInterface;
 use Symfony\Component\HttpClient\RetryableHttpClient;
 use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\Test\TestHttpServer;
 
 class RetryableHttpClientTest extends TestCase
 {
+    public static function tearDownAfterClass(): void
+    {
+        TestHttpServer::stop();
+    }
+
     public function testRetryOnError()
     {
         $client = new RetryableHttpClient(
@@ -210,7 +216,7 @@ class RetryableHttpClientTest extends TestCase
             new GenericRetryStrategy(),
             1,
             $logger = new class() extends TestLogger {
-                public $context = [];
+                public array $context = [];
 
                 public function log($level, $message, array $context = []): void
                 {
@@ -247,32 +253,177 @@ class RetryableHttpClientTest extends TestCase
         self::assertSame('Test out content', $response->getContent(), 'Content should be buffered');
     }
 
-    /**
-     * @testWith ["GET"]
-     *           ["POST"]
-     *           ["PUT"]
-     *           ["PATCH"]
-     *           ["DELETE"]
-     */
-    public function testRetryOnHeaderTimeout(string $method)
+    public function testRetryOnTimeout()
     {
         $client = HttpClient::create();
 
-        if ($client instanceof NativeHttpClient) {
-            $this->markTestSkipped('NativeHttpClient cannot timeout before receiving headers');
-        }
-
         TestHttpServer::start();
 
-        $client = new RetryableHttpClient($client);
-        $response = $client->request($method, 'http://localhost:8057/timeout-header', ['timeout' => 0.1]);
+        $strategy = new class() implements RetryStrategyInterface {
+            public $isCalled = false;
+
+            public function shouldRetry(AsyncContext $context, ?string $responseContent, ?TransportExceptionInterface $exception): ?bool
+            {
+                $this->isCalled = true;
+
+                return false;
+            }
+
+            public function getDelay(AsyncContext $context, ?string $responseContent, ?TransportExceptionInterface $exception): int
+            {
+                return 0;
+            }
+        };
+        $client = new RetryableHttpClient($client, $strategy);
+        $response = $client->request('GET', 'http://localhost:8057/timeout-header', ['timeout' => 0.1]);
 
         try {
             $response->getStatusCode();
-            $this->fail(TimeoutException::class.' expected');
-        } catch (TimeoutException $e) {
+            $this->fail(TransportException::class.' expected');
+        } catch (TransportException $e) {
         }
 
-        $this->assertSame('Idle timeout reached for "http://localhost:8057/timeout-header".', $response->getInfo('error'));
+        $this->assertTrue($strategy->isCalled, 'The HTTP retry strategy should be called');
+    }
+
+    public function testRetryWithMultipleBaseUris()
+    {
+        $client = new RetryableHttpClient(
+            new MockHttpClient([
+                new MockResponse('', ['http_code' => 500]),
+                new MockResponse('Hit on second uri', ['http_code' => 200]),
+            ]),
+            new GenericRetryStrategy([500], 0),
+            1
+        );
+
+        $response = $client->request('GET', 'foo-bar', [
+            'base_uri' => [
+                'http://example.com/a/',
+                'http://example.com/b/',
+            ],
+        ]);
+
+        self::assertSame(200, $response->getStatusCode());
+        self::assertSame('http://example.com/b/foo-bar', $response->getInfo('url'));
+    }
+
+    public function testMultipleBaseUrisAsOptions()
+    {
+        $client = new RetryableHttpClient(
+            new MockHttpClient([
+                new MockResponse('', ['http_code' => 500]),
+                new MockResponse('Hit on second uri', ['http_code' => 200]),
+            ]),
+            new GenericRetryStrategy([500], 0),
+            1
+        );
+
+        $client = $client->withOptions([
+            'base_uri' => [
+                'http://example.com/a/',
+                'http://example.com/b/',
+            ],
+        ]);
+
+        $response = $client->request('GET', 'foo-bar');
+
+        self::assertSame(200, $response->getStatusCode());
+        self::assertSame('http://example.com/b/foo-bar', $response->getInfo('url'));
+    }
+
+    public function testRetryWithMultipleBaseUrisShufflesNestedArray()
+    {
+        $client = new RetryableHttpClient(
+            new MockHttpClient([
+                new MockResponse('', ['http_code' => 500]),
+                new MockResponse('Hit on second uri', ['http_code' => 200]),
+            ]),
+            new GenericRetryStrategy([500], 0),
+            1
+        );
+
+        $response = $client->request('GET', 'foo-bar', [
+            'base_uri' => [
+                'http://example.com/a/',
+                [
+                    'http://example.com/b/',
+                    'http://example.com/c/',
+                ],
+                'http://example.com/d/',
+            ],
+        ]);
+
+        self::assertSame(200, $response->getStatusCode());
+        self::assertMatchesRegularExpression('#^http://example.com/(b|c)/foo-bar$#', $response->getInfo('url'));
+    }
+
+    public function testRetryWithMultipleBaseUrisPreservesNonNestedOrder()
+    {
+        $client = new RetryableHttpClient(
+            new MockHttpClient([
+                new MockResponse('', ['http_code' => 500]),
+                new MockResponse('', ['http_code' => 500]),
+                new MockResponse('', ['http_code' => 500]),
+                new MockResponse('Hit on second uri', ['http_code' => 200]),
+            ]),
+            new GenericRetryStrategy([500], 0),
+            3
+        );
+
+        $response = $client->request('GET', 'foo-bar', [
+            'base_uri' => [
+                'http://example.com/a/',
+                [
+                    'http://example.com/b/',
+                    'http://example.com/c/',
+                ],
+                'http://example.com/d/',
+            ],
+        ]);
+
+        self::assertSame(200, $response->getStatusCode());
+        self::assertSame('http://example.com/d/foo-bar', $response->getInfo('url'));
+    }
+
+    public function testMaxRetriesOption()
+    {
+        $client = new RetryableHttpClient(
+            new MockHttpClient([
+                new MockResponse('', ['http_code' => 500]),
+                new MockResponse('', ['http_code' => 502]),
+                new MockResponse('', ['http_code' => 200]),
+            ]),
+            new GenericRetryStrategy([500, 502], 0),
+            3
+        );
+
+        $response = $client->request('GET', 'http://example.com/foo-bar', [
+            'max_retries' => 1,
+        ]);
+
+        self::assertSame(502, $response->getStatusCode());
+    }
+
+    public function testMaxRetriesWithOptions()
+    {
+        $client = new RetryableHttpClient(
+            new MockHttpClient([
+                new MockResponse('', ['http_code' => 500]),
+                new MockResponse('', ['http_code' => 502]),
+                new MockResponse('', ['http_code' => 504]),
+                new MockResponse('', ['http_code' => 200]),
+            ]),
+            new GenericRetryStrategy([500, 502, 504], 0),
+            3
+        );
+
+        $client = $client->withOptions([
+            'max_retries' => 2,
+        ]);
+
+        $response = $client->request('GET', 'http://example.com/foo-bar');
+
+        self::assertSame(504, $response->getStatusCode());
     }
 }

@@ -13,9 +13,9 @@ namespace Symfony\Component\HttpKernel\Fragment;
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\UriSigner;
 use Symfony\Component\HttpKernel\Controller\ControllerReference;
 use Symfony\Component\HttpKernel\HttpCache\SurrogateInterface;
-use Symfony\Component\HttpKernel\UriSigner;
 
 /**
  * Implements Surrogate rendering strategy.
@@ -24,26 +24,20 @@ use Symfony\Component\HttpKernel\UriSigner;
  */
 abstract class AbstractSurrogateFragmentRenderer extends RoutableFragmentRenderer
 {
-    private $surrogate;
-    private $inlineStrategy;
-    private $signer;
-
     /**
      * The "fallback" strategy when surrogate is not available should always be an
      * instance of InlineFragmentRenderer.
      *
      * @param FragmentRendererInterface $inlineStrategy The inline strategy to use when the surrogate is not supported
      */
-    public function __construct(?SurrogateInterface $surrogate, FragmentRendererInterface $inlineStrategy, ?UriSigner $signer = null)
-    {
-        $this->surrogate = $surrogate;
-        $this->inlineStrategy = $inlineStrategy;
-        $this->signer = $signer;
+    public function __construct(
+        private ?SurrogateInterface $surrogate,
+        private FragmentRendererInterface $inlineStrategy,
+        private ?UriSigner $signer = null,
+    ) {
     }
 
     /**
-     * {@inheritdoc}
-     *
      * Note that if the current Request has no surrogate capability, this method
      * falls back to use the inline rendering strategy.
      *
@@ -51,15 +45,18 @@ abstract class AbstractSurrogateFragmentRenderer extends RoutableFragmentRendere
      *
      *  * alt: an alternative URI to render in case of an error
      *  * comment: a comment to add when returning the surrogate tag
+     *  * absolute_uri: whether to generate an absolute URI or not. Default is false
      *
      * Note, that not all surrogate strategies support all options. For now
      * 'alt' and 'comment' are only supported by ESI.
      *
      * @see Symfony\Component\HttpKernel\HttpCache\SurrogateInterface
      */
-    public function render($uri, Request $request, array $options = [])
+    public function render(string|ControllerReference $uri, Request $request, array $options = []): Response
     {
         if (!$this->surrogate || !$this->surrogate->hasSurrogateCapability($request)) {
+            $request->attributes->set('_check_controller_is_allowed', true);
+
             if ($uri instanceof ControllerReference && $this->containsNonScalars($uri->attributes)) {
                 throw new \InvalidArgumentException('Passing non-scalar values as part of URI attributes to the ESI and SSI rendering strategies is not supported. Use a different rendering strategy or pass scalar values.');
             }
@@ -67,13 +64,15 @@ abstract class AbstractSurrogateFragmentRenderer extends RoutableFragmentRendere
             return $this->inlineStrategy->render($uri, $request, $options);
         }
 
+        $absolute = $options['absolute_uri'] ?? false;
+
         if ($uri instanceof ControllerReference) {
-            $uri = $this->generateSignedFragmentUri($uri, $request);
+            $uri = $this->generateSignedFragmentUri($uri, $request, $absolute);
         }
 
         $alt = $options['alt'] ?? null;
         if ($alt instanceof ControllerReference) {
-            $alt = $this->generateSignedFragmentUri($alt, $request);
+            $alt = $this->generateSignedFragmentUri($alt, $request, $absolute);
         }
 
         $tag = $this->surrogate->renderIncludeTag($uri, $alt, $options['ignore_errors'] ?? false, $options['comment'] ?? '');
@@ -81,9 +80,9 @@ abstract class AbstractSurrogateFragmentRenderer extends RoutableFragmentRendere
         return new Response($tag);
     }
 
-    private function generateSignedFragmentUri(ControllerReference $uri, Request $request): string
+    private function generateSignedFragmentUri(ControllerReference $uri, Request $request, bool $absolute): string
     {
-        return (new FragmentUriGenerator($this->fragmentPath, $this->signer))->generate($uri, $request);
+        return (new FragmentUriGenerator($this->fragmentPath, $this->signer))->generate($uri, $request, $absolute);
     }
 
     private function containsNonScalars(array $values): bool

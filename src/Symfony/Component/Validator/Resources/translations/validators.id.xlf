@@ -192,7 +192,7 @@
             </trans-unit>
             <trans-unit id="51" resname="No temporary folder was configured in php.ini.">
                 <source>No temporary folder was configured in php.ini, or the configured folder does not exist.</source>
-                <target state="needs-review-translation">Tidak ada folder sementara yang dikonfigurasi di php.ini, atau folder yang dikonfigurasi tidak ada.</target>
+                <target>Tidak ada folder sementara yang dikonfigurasi di php.ini, atau folder yang dikonfigurasi tidak ada.</target>
             </trans-unit>
             <trans-unit id="52">
                 <source>Cannot write temporary file to disk.</source>
@@ -437,6 +437,10 @@
             <trans-unit id="112">
                 <source>This value is not a valid MAC address.</source>
                 <target>Nilai ini bukan alamat MAC yang valid.</target>
+            </trans-unit>
+            <trans-unit id="113">
+                <source>This URL is missing a top-level domain.</source>
+                <target>URL ini tidak memiliki domain tingkat atas.</target>
             </trans-unit>
         </body>
     </file>

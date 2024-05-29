@@ -21,9 +21,9 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
  */
 abstract class AbstractTransportFactory implements TransportFactoryInterface
 {
-    protected $dispatcher;
-    protected $client;
-    protected $logger;
+    protected ?EventDispatcherInterface $dispatcher;
+    protected ?HttpClientInterface $client;
+    protected ?LoggerInterface $logger;
 
     public function __construct(?EventDispatcherInterface $dispatcher = null, ?HttpClientInterface $client = null, ?LoggerInterface $logger = null)
     {
@@ -34,28 +34,18 @@ abstract class AbstractTransportFactory implements TransportFactoryInterface
 
     public function supports(Dsn $dsn): bool
     {
-        return \in_array($dsn->getScheme(), $this->getSupportedSchemes());
+        return \in_array($dsn->getScheme(), $this->getSupportedSchemes(), true);
     }
 
     abstract protected function getSupportedSchemes(): array;
 
     protected function getUser(Dsn $dsn): string
     {
-        $user = $dsn->getUser();
-        if (null === $user) {
-            throw new IncompleteDsnException('User is not set.');
-        }
-
-        return $user;
+        return $dsn->getUser() ?? throw new IncompleteDsnException('User is not set.');
     }
 
     protected function getPassword(Dsn $dsn): string
     {
-        $password = $dsn->getPassword();
-        if (null === $password) {
-            throw new IncompleteDsnException('Password is not set.');
-        }
-
-        return $password;
+        return $dsn->getPassword() ?? throw new IncompleteDsnException('Password is not set.');
     }
 }

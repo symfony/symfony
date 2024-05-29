@@ -12,19 +12,13 @@
 namespace Symfony\Component\Translation\Tests\DataCollector;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\HttpKernel\DataCollector\DataCollector;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Translation\DataCollector\TranslationDataCollector;
 use Symfony\Component\Translation\DataCollectorTranslator;
 
 class TranslationDataCollectorTest extends TestCase
 {
-    protected function setUp(): void
-    {
-        if (!class_exists(DataCollector::class)) {
-            $this->markTestSkipped('The "DataCollector" is not available');
-        }
-    }
-
     public function testCollectEmptyMessages()
     {
         $translator = $this->getTranslator();
@@ -136,6 +130,24 @@ class TranslationDataCollectorTest extends TestCase
         $this->assertEquals(1, $dataCollector->getCountDefines());
 
         $this->assertEquals($expectedMessages, array_values($dataCollector->getMessages()->getValue(true)));
+    }
+
+    public function testCollectAndReset()
+    {
+        $translator = $this->getTranslator();
+        $translator->method('getLocale')->willReturn('fr');
+        $translator->method('getFallbackLocales')->willReturn(['en']);
+
+        $dataCollector = new TranslationDataCollector($translator);
+        $dataCollector->collect($this->createMock(Request::class), $this->createMock(Response::class));
+
+        $this->assertSame('fr', $dataCollector->getLocale());
+        $this->assertSame(['en'], $dataCollector->getFallbackLocales());
+
+        $dataCollector->reset();
+
+        $this->assertNull($dataCollector->getLocale());
+        $this->assertEmpty($dataCollector->getFallbackLocales());
     }
 
     private function getTranslator()

@@ -65,11 +65,9 @@ class StopwatchTest extends TestCase
         $stopwatch = new Stopwatch();
 
         $sections = new \ReflectionProperty(Stopwatch::class, 'sections');
-        $sections->setAccessible(true);
         $section = $sections->getValue($stopwatch);
 
         $events = new \ReflectionProperty(Section::class, 'events');
-        $events->setAccessible(true);
 
         $events->setValue(end($section), ['foo' => new StopwatchEvent(microtime(true) * 1000)]);
 
@@ -90,15 +88,15 @@ class StopwatchTest extends TestCase
     public function testUnknownEvent()
     {
         $this->expectException(\LogicException::class);
-        $stopwatch = new Stopwatch();
-        $stopwatch->getEvent('foo');
+
+        (new Stopwatch())->getEvent('foo');
     }
 
     public function testStopWithoutStart()
     {
         $this->expectException(\LogicException::class);
-        $stopwatch = new Stopwatch();
-        $stopwatch->stop('foo');
+
+        (new Stopwatch())->stop('foo');
     }
 
     public function testMorePrecision()
@@ -158,11 +156,24 @@ class StopwatchTest extends TestCase
         $this->assertCount(2, $events['__section__']->getPeriods());
     }
 
+    public function testLap()
+    {
+        $stopwatch = new Stopwatch();
+
+        $stopwatch->start('foo');
+        $stopwatch->lap('foo');
+        $stopwatch->stop('foo');
+
+        $event = $stopwatch->getEvent('foo');
+
+        $this->assertCount(2, $event->getPeriods());
+    }
+
     public function testReopenANewSectionShouldThrowAnException()
     {
         $this->expectException(\LogicException::class);
-        $stopwatch = new Stopwatch();
-        $stopwatch->openSection('section');
+
+        (new Stopwatch())->openSection('section');
     }
 
     public function testReset()

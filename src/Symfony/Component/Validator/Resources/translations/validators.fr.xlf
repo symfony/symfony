@@ -438,6 +438,10 @@
                 <source>This value is not a valid MAC address.</source>
                 <target>Cette valeur n'est pas une adresse MAC valide.</target>
             </trans-unit>
+            <trans-unit id="113">
+                <source>This URL is missing a top-level domain.</source>
+                <target>Cette URL doit contenir un domaine de premier niveau.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

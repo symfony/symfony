@@ -25,10 +25,8 @@ use Symfony\Component\Finder\Finder;
 
 class CacheClearCommandTest extends TestCase
 {
-    /** @var TestAppKernel */
-    private $kernel;
-    /** @var Filesystem */
-    private $fs;
+    private TestAppKernel $kernel;
+    private Filesystem $fs;
 
     protected function setUp(): void
     {
@@ -77,7 +75,7 @@ class CacheClearCommandTest extends TestCase
         $kernelRef = new \ReflectionObject($this->kernel);
         $kernelFile = $kernelRef->getFileName();
         /** @var ResourceInterface[] $meta */
-        $meta = unserialize(file_get_contents($containerMetaFile));
+        $meta = unserialize($this->fs->readFile($containerMetaFile));
         $found = false;
         foreach ($meta as $resource) {
             if ((string) $resource === $kernelFile) {
@@ -95,7 +93,7 @@ class CacheClearCommandTest extends TestCase
         );
         $this->assertMatchesRegularExpression(
             sprintf('/\'kernel.container_class\'\s*=>\s*\'%s\'/', $containerClass),
-            file_get_contents($containerFile),
+            $this->fs->readFile($containerFile),
             'kernel.container_class is properly set on the dumped container'
         );
     }
@@ -112,7 +110,7 @@ class CacheClearCommandTest extends TestCase
         $application->setCatchExceptions(false);
         $application->doRun($input, new NullOutput());
 
-        $this->assertTrue(is_file($this->kernel->getCacheDir().'/annotations.php'));
+        $this->assertTrue(is_file($this->kernel->getCacheDir().'/dummy.txt'));
     }
 
     public function testCacheIsWarmedWithOldContainer()
@@ -126,7 +124,7 @@ class CacheClearCommandTest extends TestCase
         \Closure::bind(function (Container $class) {
             unset($class->loadedDynamicParameters['kernel.build_dir']);
             unset($class->parameters['kernel.build_dir']);
-        }, null, \get_class($container))($container);
+        }, null, $container::class)($container);
 
         $input = new ArrayInput(['cache:clear']);
         $application = new Application($kernel);

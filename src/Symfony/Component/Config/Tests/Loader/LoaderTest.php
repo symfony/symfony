@@ -13,6 +13,7 @@ namespace Symfony\Component\Config\Tests\Loader;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\Exception\LoaderLoadException;
+use Symfony\Component\Config\Exception\LogicException;
 use Symfony\Component\Config\Loader\Loader;
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\Config\Loader\LoaderResolverInterface;
@@ -27,6 +28,14 @@ class LoaderTest extends TestCase
         $loader->setResolver($resolver);
 
         $this->assertSame($resolver, $loader->getResolver(), '->setResolver() sets the resolver loader');
+    }
+
+    public function testGetResolverWithoutSetResolver()
+    {
+        $this->expectException(LogicException::class);
+
+        $loader = new ProjectLoader1();
+        $loader->getResolver();
     }
 
     public function testResolve()
@@ -46,9 +55,16 @@ class LoaderTest extends TestCase
         $this->assertSame($resolvedLoader, $loader->resolve('foo.xml'), '->resolve() finds a loader');
     }
 
-    public function testResolveWhenResolverCannotFindLoader()
+    public function testResolveWithoutSetResolver()
     {
         $this->expectException(LoaderLoadException::class);
+
+        $loader = new ProjectLoader1();
+        $loader->resolve('foo.xml');
+    }
+
+    public function testResolveWhenResolverCannotFindLoader()
+    {
         $resolver = $this->createMock(LoaderResolverInterface::class);
         $resolver->expects($this->once())
             ->method('resolve')
@@ -57,6 +73,8 @@ class LoaderTest extends TestCase
 
         $loader = new ProjectLoader1();
         $loader->setResolver($resolver);
+
+        $this->expectException(LoaderLoadException::class);
 
         $loader->resolve('FOOBAR');
     }
@@ -104,11 +122,11 @@ class LoaderTest extends TestCase
 
 class ProjectLoader1 extends Loader
 {
-    public function load($resource, ?string $type = null)
+    public function load(mixed $resource, ?string $type = null): mixed
     {
     }
 
-    public function supports($resource, ?string $type = null): bool
+    public function supports(mixed $resource, ?string $type = null): bool
     {
         return \is_string($resource) && 'foo' === pathinfo($resource, \PATHINFO_EXTENSION);
     }

@@ -45,6 +45,14 @@ class HandleDescriptorTest extends TestCase
             }
         }, 'class@anonymous%sHandleDescriptorTest.php%s::__invoke'];
     }
+
+    public function testGetOptions()
+    {
+        $options = ['option1' => 'value1', 'option2' => 'value2'];
+        $descriptor = new HandlerDescriptor(function () {}, $options);
+
+        $this->assertSame($options, $descriptor->getOptions());
+    }
 }
 
 class DummyCommandHandlerWithSpecificMethod

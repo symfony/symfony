@@ -19,16 +19,12 @@ use Symfony\Component\Notifier\Message\ChatMessage;
 use Symfony\Component\Notifier\Message\SmsMessage;
 use Symfony\Component\Notifier\Test\TransportTestCase;
 use Symfony\Component\Notifier\Tests\Transport\DummyMessage;
-use Symfony\Component\Notifier\Transport\TransportInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 
 final class DiscordTransportTest extends TransportTestCase
 {
-    /**
-     * @return DiscordTransport
-     */
-    public static function createTransport(?HttpClientInterface $client = null): TransportInterface
+    public static function createTransport(?HttpClientInterface $client = null): DiscordTransport
     {
         return (new DiscordTransport('testToken', 'testWebhookId', $client ?? new MockHttpClient()))->setHost('host.test');
     }
@@ -69,9 +65,7 @@ final class DiscordTransportTest extends TransportTestCase
             ->method('getContent')
             ->willReturn(json_encode(['message' => 'testDescription', 'code' => 'testErrorCode']));
 
-        $client = new MockHttpClient(static function () use ($response): ResponseInterface {
-            return $response;
-        });
+        $client = new MockHttpClient(static fn (): ResponseInterface => $response);
 
         $transport = self::createTransport($client);
 

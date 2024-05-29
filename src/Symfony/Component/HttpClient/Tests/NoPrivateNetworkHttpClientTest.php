@@ -119,14 +119,6 @@ class NoPrivateNetworkHttpClientTest extends TestCase
         $client->request('GET', $url, ['on_progress' => $customCallback]);
     }
 
-    public function testConstructor()
-    {
-        $this->expectException(\TypeError::class);
-        $this->expectExceptionMessage('Argument 2 passed to "Symfony\Component\HttpClient\NoPrivateNetworkHttpClient::__construct()" must be of the type array, string or null. "int" given.');
-
-        new NoPrivateNetworkHttpClient(new MockHttpClient(), 3);
-    }
-
     private function getHttpClientMock(string $url, string $ipAddr, string $content)
     {
         $previousHttpClient = $this

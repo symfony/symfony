@@ -43,10 +43,7 @@ class MultiplePcreFilterIteratorTest extends TestCase
         yield ['<foo>', true, '"<,>" is a valid delimiter pair'];
         yield ['*foo.*', false, '"*" is not considered as a valid delimiter'];
         yield ['?foo.?', false, '"?" is not considered as a valid delimiter'];
-
-        if (\PHP_VERSION_ID >= 80200) {
-            yield ['/foo/n', true, 'valid regex with the no-capture modifier'];
-        }
+        yield ['/foo/n', true, 'valid regex with the no-capture modifier'];
     }
 }
 

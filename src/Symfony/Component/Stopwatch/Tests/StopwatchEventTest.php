@@ -122,8 +122,10 @@ class StopwatchEventTest extends TestCase
 
     public function testStopWithoutStart()
     {
-        $this->expectException(\LogicException::class);
         $event = new StopwatchEvent(microtime(true) * 1000);
+
+        $this->expectException(\LogicException::class);
+
         $event->stop();
     }
 

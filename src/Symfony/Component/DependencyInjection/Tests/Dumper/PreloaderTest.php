@@ -27,13 +27,9 @@ use Symfony\Component\DependencyInjection\Tests\Fixtures\Preload\UnionDummy;
 
 class PreloaderTest extends TestCase
 {
-    /**
-     * @requires PHP 7.4
-     */
     public function testPreload()
     {
         $r = new \ReflectionMethod(Preloader::class, 'doPreload');
-        $r->setAccessible(true);
 
         $preloaded = [];
 
@@ -45,13 +41,9 @@ class PreloaderTest extends TestCase
         self::assertTrue(class_exists(C::class, false));
     }
 
-    /**
-     * @requires PHP 7.4
-     */
     public function testPreloadSkipsNonExistingInterface()
     {
         $r = new \ReflectionMethod(Preloader::class, 'doPreload');
-        $r->setAccessible(true);
 
         $preloaded = [];
 
@@ -59,13 +51,9 @@ class PreloaderTest extends TestCase
         self::assertFalse(class_exists(DummyWithInterface::class, false));
     }
 
-    /**
-     * @requires PHP 8
-     */
     public function testPreloadUnion()
     {
         $r = new \ReflectionMethod(Preloader::class, 'doPreload');
-        $r->setAccessible(true);
 
         $preloaded = [];
 
@@ -76,9 +64,6 @@ class PreloaderTest extends TestCase
         self::assertTrue(class_exists(E::class, false));
     }
 
-    /**
-     * @requires PHP 8.1
-     */
     public function testPreloadIntersection()
     {
         $r = new \ReflectionMethod(Preloader::class, 'doPreload');

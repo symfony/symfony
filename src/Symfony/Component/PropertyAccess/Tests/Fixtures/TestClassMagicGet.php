@@ -22,7 +22,7 @@ class TestClassMagicGet
         $this->magicProperty = $value;
     }
 
-    public function __set(string $property, $value)
+    public function __set(string $property, $value): void
     {
         if ('magicProperty' === $property) {
             $this->magicProperty = $value;
@@ -38,5 +38,10 @@ class TestClassMagicGet
         if ('constantMagicProperty' === $property) {
             return 'constant value';
         }
+    }
+
+    public function __isset(string $property): bool
+    {
+        return \in_array($property, ['magicProperty', 'constantMagicProperty'], true);
     }
 }

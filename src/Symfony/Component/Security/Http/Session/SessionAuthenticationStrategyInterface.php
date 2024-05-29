@@ -30,5 +30,5 @@ interface SessionAuthenticationStrategyInterface
      * This method should be called before the TokenStorage is populated with a
      * Token. It should be used by authentication listeners when a session is used.
      */
-    public function onAuthentication(Request $request, TokenInterface $token);
+    public function onAuthentication(Request $request, TokenInterface $token): void;
 }

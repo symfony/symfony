@@ -19,7 +19,7 @@ use Symfony\Component\DependencyInjection\Reference;
 
 class GraphvizDumperTest extends TestCase
 {
-    protected static $fixturesPath;
+    protected static string $fixturesPath;
 
     public static function setUpBeforeClass(): void
     {

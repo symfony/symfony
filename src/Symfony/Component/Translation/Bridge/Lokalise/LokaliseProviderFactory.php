@@ -16,7 +16,6 @@ use Symfony\Component\Translation\Exception\UnsupportedSchemeException;
 use Symfony\Component\Translation\Loader\LoaderInterface;
 use Symfony\Component\Translation\Provider\AbstractProviderFactory;
 use Symfony\Component\Translation\Provider\Dsn;
-use Symfony\Component\Translation\Provider\ProviderInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
@@ -26,23 +25,15 @@ final class LokaliseProviderFactory extends AbstractProviderFactory
 {
     private const HOST = 'api.lokalise.com';
 
-    private $client;
-    private $logger;
-    private $defaultLocale;
-    private $loader;
-
-    public function __construct(HttpClientInterface $client, LoggerInterface $logger, string $defaultLocale, LoaderInterface $loader)
-    {
-        $this->client = $client;
-        $this->logger = $logger;
-        $this->defaultLocale = $defaultLocale;
-        $this->loader = $loader;
+    public function __construct(
+        private HttpClientInterface $client,
+        private LoggerInterface $logger,
+        private string $defaultLocale,
+        private LoaderInterface $loader,
+    ) {
     }
 
-    /**
-     * @return LokaliseProvider
-     */
-    public function create(Dsn $dsn): ProviderInterface
+    public function create(Dsn $dsn): LokaliseProvider
     {
         if ('lokalise' !== $dsn->getScheme()) {
             throw new UnsupportedSchemeException($dsn, 'lokalise', $this->getSupportedSchemes());

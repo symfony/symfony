@@ -22,8 +22,8 @@ use Symfony\Component\VarDumper\Server\Connection;
  */
 class ServerDumper implements DataDumperInterface
 {
-    private $connection;
-    private $wrappedDumper;
+    private Connection $connection;
+    private ?DataDumperInterface $wrappedDumper;
 
     /**
      * @param string                     $host             The server host
@@ -41,13 +41,12 @@ class ServerDumper implements DataDumperInterface
         return $this->connection->getContextProviders();
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function dump(Data $data)
+    public function dump(Data $data): ?string
     {
         if (!$this->connection->write($data) && $this->wrappedDumper) {
-            $this->wrappedDumper->dump($data);
+            return $this->wrappedDumper->dump($data);
         }
+
+        return null;
     }
 }

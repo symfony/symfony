@@ -30,10 +30,7 @@ class NullMessageTest extends TestCase
         $this->assertSame($message->getSubject(), $nullMessage->getSubject());
         $this->assertSame($message->getRecipientId(), $nullMessage->getRecipientId());
         $this->assertSame($message->getOptions(), $nullMessage->getOptions());
-
-        (null === $message->getTransport())
-            ? $this->assertSame('null', $nullMessage->getTransport())
-            : $this->assertSame($message->getTransport(), $nullMessage->getTransport());
+        $this->assertSame($message->getTransport(), $nullMessage->getTransport());
     }
 
     public static function messageDataProvider(): \Generator

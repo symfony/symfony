@@ -1,7 +1,7 @@
 namespaces:
   custom: Symfony\Component\Validator\Tests\Fixtures\
 
-Symfony\Component\Validator\Tests\Fixtures\Annotation\Entity:
+Symfony\Component\Validator\Tests\Fixtures\NestedAttribute\Entity:
   group_sequence:
     - Foo
     - Entity
@@ -15,6 +15,12 @@ Symfony\Component\Validator\Tests\Fixtures\Annotation\Entity:
     - Callback: validateMe
     - Callback: validateMeStatic
     - Callback: [Symfony\Component\Validator\Tests\Fixtures\CallbackClass, callback]
+    # Constraint with named arguments support without value
+    - Symfony\Component\Validator\Tests\Mapping\Loader\Fixtures\ConstraintWithoutValueWithNamedArguments: ~
+    # Constraint with named arguments support with scalar value
+    - Symfony\Component\Validator\Tests\Mapping\Loader\Fixtures\ConstraintWithNamedArguments: foo
+    # Constraint with named arguments support with array value
+    - Symfony\Component\Validator\Tests\Mapping\Loader\Fixtures\ConstraintWithNamedArguments: [foo, bar]
 
   properties:
     firstName:
@@ -58,5 +64,8 @@ Symfony\Component\Validator\Tests\Fixtures\Annotation\Entity:
     permissions:
       - "IsTrue": ~
 
-Symfony\Component\Validator\Tests\Fixtures\Annotation\GroupSequenceProviderEntity:
+Symfony\Component\Validator\Tests\Fixtures\NestedAttribute\GroupSequenceProviderEntity:
   group_sequence_provider: true
+
+Symfony\Component\Validator\Tests\Fixtures\Attribute\GroupProviderDto:
+  group_sequence_provider: Symfony\Component\Validator\Tests\Dummy\DummyGroupProvider

@@ -60,11 +60,12 @@ class DelegatingLoaderTest extends TestCase
 
     public function testLoadThrowsAnExceptionIfTheResourceCannotBeLoaded()
     {
-        $this->expectException(LoaderLoadException::class);
         $loader = $this->createMock(LoaderInterface::class);
         $loader->expects($this->once())->method('supports')->willReturn(false);
         $resolver = new LoaderResolver([$loader]);
         $loader = new DelegatingLoader($resolver);
+
+        $this->expectException(LoaderLoadException::class);
 
         $loader->load('foo');
     }

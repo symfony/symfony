@@ -12,6 +12,7 @@
 namespace Symfony\Component\Notifier\Bridge\AmazonSns;
 
 use AsyncAws\Sns\SnsClient;
+use Symfony\Component\Notifier\Exception\InvalidArgumentException;
 use Symfony\Component\Notifier\Exception\TransportException;
 use Symfony\Component\Notifier\Exception\UnsupportedMessageTypeException;
 use Symfony\Component\Notifier\Message\ChatMessage;
@@ -27,11 +28,11 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
  */
 final class AmazonSnsTransport extends AbstractTransport
 {
-    private $snsClient;
-
-    public function __construct(SnsClient $snsClient, ?HttpClientInterface $client = null, ?EventDispatcherInterface $dispatcher = null)
-    {
-        $this->snsClient = $snsClient;
+    public function __construct(
+        private SnsClient $snsClient,
+        ?HttpClientInterface $client = null,
+        ?EventDispatcherInterface $dispatcher = null,
+    ) {
         parent::__construct($client, $dispatcher);
     }
 
@@ -53,18 +54,29 @@ final class AmazonSnsTransport extends AbstractTransport
             throw new UnsupportedMessageTypeException(__CLASS__, sprintf('"%s" or "%s"', SmsMessage::class, ChatMessage::class), $message);
         }
 
+        if ($message instanceof SmsMessage && '' !== $message->getFrom()) {
+            throw new InvalidArgumentException(sprintf('The "%s" transport does not support "from" in "%s".', __CLASS__, SmsMessage::class));
+        }
+
         if ($message instanceof ChatMessage && $message->getOptions() instanceof AmazonSnsOptions) {
             $options = $message->getOptions()->toArray();
+        } else {
+            $options = [];
         }
         $options['Message'] = $message->getSubject();
-        $options[($message instanceof ChatMessage) ? 'TopicArn' : 'PhoneNumber'] = $message->getRecipientId();
+
+        if ($message instanceof SmsMessage) {
+            $options['PhoneNumber'] = $message->getPhone();
+        } else {
+            $options['TopicArn'] = $message->getRecipientId();
+        }
 
         try {
             $response = $this->snsClient->publish($options);
             $message = new SentMessage($message, (string) $this);
             $message->setMessageId($response->getMessageId());
         } catch (\Exception $exception) {
-            $info = isset($response) ? $response->info() : [];
+            $info = $response?->info() ?? [];
             throw new TransportException('Unable to send the message.', $info['response'] ?? null, $info['status'] ?? 0, $exception);
         }
 

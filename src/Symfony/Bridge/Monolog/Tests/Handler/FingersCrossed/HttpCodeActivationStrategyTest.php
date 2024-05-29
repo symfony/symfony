@@ -12,67 +12,26 @@
 namespace Symfony\Bridge\Monolog\Tests\Handler\FingersCrossed;
 
 use Monolog\Handler\FingersCrossed\ErrorLevelActivationStrategy;
-use Monolog\Logger;
+use Monolog\Level;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Monolog\Handler\FingersCrossed\HttpCodeActivationStrategy;
+use Symfony\Bridge\Monolog\Tests\RecordFactory;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class HttpCodeActivationStrategyTest extends TestCase
 {
-    /**
-     * @group legacy
-     */
-    public function testExclusionsWithoutCodeLegacy()
-    {
-        $this->expectException(\LogicException::class);
-        new HttpCodeActivationStrategy(new RequestStack(), [['urls' => []]], Logger::WARNING);
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testExclusionsWithoutUrlsLegacy()
-    {
-        $this->expectException(\LogicException::class);
-        new HttpCodeActivationStrategy(new RequestStack(), [['code' => 404]], Logger::WARNING);
-    }
-
-    /**
-     * @dataProvider isActivatedProvider
-     *
-     * @group legacy
-     */
-    public function testIsActivatedLegacy($url, $record, $expected)
-    {
-        $requestStack = new RequestStack();
-        $requestStack->push(Request::create($url));
-
-        $strategy = new HttpCodeActivationStrategy(
-            $requestStack,
-            [
-                ['code' => 403, 'urls' => []],
-                ['code' => 404, 'urls' => []],
-                ['code' => 405, 'urls' => []],
-                ['code' => 400, 'urls' => ['^/400/a', '^/400/b']],
-            ],
-            Logger::WARNING
-        );
-
-        self::assertEquals($expected, $strategy->isHandlerActivated($record));
-    }
-
     public function testExclusionsWithoutCode()
     {
         $this->expectException(\LogicException::class);
-        new HttpCodeActivationStrategy(new RequestStack(), [['urls' => []]], new ErrorLevelActivationStrategy(Logger::WARNING));
+        new HttpCodeActivationStrategy(new RequestStack(), [['urls' => []]], new ErrorLevelActivationStrategy(Level::Warning));
     }
 
     public function testExclusionsWithoutUrls()
     {
         $this->expectException(\LogicException::class);
-        new HttpCodeActivationStrategy(new RequestStack(), [['code' => 404]], new ErrorLevelActivationStrategy(Logger::WARNING));
+        new HttpCodeActivationStrategy(new RequestStack(), [['code' => 404]], new ErrorLevelActivationStrategy(Level::Warning));
     }
 
     /**
@@ -91,7 +50,7 @@ class HttpCodeActivationStrategyTest extends TestCase
                 ['code' => 405, 'urls' => []],
                 ['code' => 400, 'urls' => ['^/400/a', '^/400/b']],
             ],
-            new ErrorLevelActivationStrategy(Logger::WARNING)
+            new ErrorLevelActivationStrategy(Level::Warning)
         );
 
         self::assertEquals($expected, $strategy->isHandlerActivated($record));
@@ -100,16 +59,16 @@ class HttpCodeActivationStrategyTest extends TestCase
     public static function isActivatedProvider(): array
     {
         return [
-            ['/test',  ['level' => Logger::ERROR], true],
-            ['/400',   ['level' => Logger::ERROR, 'context' => self::getContextException(400)], true],
-            ['/400/a', ['level' => Logger::ERROR, 'context' => self::getContextException(400)], false],
-            ['/400/b', ['level' => Logger::ERROR, 'context' => self::getContextException(400)], false],
-            ['/400/c', ['level' => Logger::ERROR, 'context' => self::getContextException(400)], true],
-            ['/401',   ['level' => Logger::ERROR, 'context' => self::getContextException(401)], true],
-            ['/403',   ['level' => Logger::ERROR, 'context' => self::getContextException(403)], false],
-            ['/404',   ['level' => Logger::ERROR, 'context' => self::getContextException(404)], false],
-            ['/405',   ['level' => Logger::ERROR, 'context' => self::getContextException(405)], false],
-            ['/500',   ['level' => Logger::ERROR, 'context' => self::getContextException(500)], true],
+            ['/test',  RecordFactory::create(Level::Error), true],
+            ['/400',   RecordFactory::create(Level::Error, context: self::getContextException(400)), true],
+            ['/400/a', RecordFactory::create(Level::Error, context: self::getContextException(400)), false],
+            ['/400/b', RecordFactory::create(Level::Error, context: self::getContextException(400)), false],
+            ['/400/c', RecordFactory::create(Level::Error, context: self::getContextException(400)), true],
+            ['/401',   RecordFactory::create(Level::Error, context: self::getContextException(401)), true],
+            ['/403',   RecordFactory::create(Level::Error, context: self::getContextException(403)), false],
+            ['/404',   RecordFactory::create(Level::Error, context: self::getContextException(404)), false],
+            ['/405',   RecordFactory::create(Level::Error, context: self::getContextException(405)), false],
+            ['/500',   RecordFactory::create(Level::Error, context: self::getContextException(500)), true],
         ];
     }
 

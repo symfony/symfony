@@ -11,7 +11,6 @@
 
 namespace Symfony\Bridge\Doctrine\Tests\Middleware\Debug;
 
-use Doctrine\DBAL\Configuration;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Driver\Middleware as MiddlewareInterface;
 use Doctrine\DBAL\DriverManager;
@@ -19,6 +18,7 @@ use Doctrine\DBAL\ParameterType;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\DBAL\Result;
 use Doctrine\DBAL\Schema\DefaultSchemaManagerFactory;
+use Doctrine\DBAL\Statement;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\ORMSetup;
 use PHPUnit\Framework\TestCase;
@@ -32,9 +32,9 @@ use Symfony\Component\Stopwatch\Stopwatch;
  */
 class MiddlewareTest extends TestCase
 {
-    private $debugDataHolder;
-    private $conn;
-    private $stopwatch;
+    private DebugDataHolder $debugDataHolder;
+    private Connection $conn;
+    private ?Stopwatch $stopwatch;
 
     protected function setUp(): void
     {
@@ -51,10 +51,9 @@ class MiddlewareTest extends TestCase
     {
         $this->stopwatch = $withStopwatch ? new Stopwatch() : null;
 
-        $config = class_exists(ORMSetup::class) ? ORMSetup::createConfiguration(true) : new Configuration();
-        if (class_exists(DefaultSchemaManagerFactory::class)) {
-            $config->setSchemaManagerFactory(new DefaultSchemaManagerFactory());
-        }
+        $config = ORMSetup::createConfiguration(true);
+        $config->setSchemaManagerFactory(new DefaultSchemaManagerFactory());
+        $config->setLazyGhostObjectEnabled(true);
         $this->debugDataHolder = new DebugDataHolder();
         $config->setMiddlewares([new Middleware($this->debugDataHolder, $this->stopwatch)]);
 
@@ -73,8 +72,7 @@ CREATE TABLE products (
 	tags TEXT NULL,
 	created_at TEXT NULL
 );
-EOT
-        );
+EOT);
     }
 
     private function getResourceFromString(string $str)
@@ -89,14 +87,10 @@ EOT
     {
         return [
             'executeStatement' => [
-                static function (object $target, ...$args) {
-                    return $target->executeStatement(...$args);
-                },
+                static fn (Statement|Connection $target, mixed ...$args) => $target->executeStatement(...$args),
             ],
             'executeQuery' => [
-                static function (object $target, ...$args): Result {
-                    return $target->executeQuery(...$args);
-                },
+                static fn (Statement|Connection $target, mixed ...$args) => $target->executeQuery(...$args),
             ],
         ];
     }
@@ -136,7 +130,7 @@ EOT;
         $stmt->bindValue(3, 5, ParameterType::INTEGER);
         $stmt->bindValue(4, $res = $this->getResourceFromString('mydata'), ParameterType::BINARY);
         $stmt->bindValue(5, ['foo', 'bar'], Types::SIMPLE_ARRAY);
-        $stmt->bindValue(6, new \DateTime('2022-06-12 11:00:00'), Types::DATETIME_MUTABLE);
+        $stmt->bindValue(6, new \DateTimeImmutable('2022-06-12 11:00:00'), Types::DATETIME_IMMUTABLE);
 
         $executeMethod($stmt);
 
@@ -155,41 +149,35 @@ EOT;
     {
         $this->init();
 
-        $product = 'product1';
-        $price = '12.5';
-        $stock = 5;
+        $sql = <<<EOT
+INSERT INTO products(name, price, stock, picture, tags)
+VALUES (?, ?, ?, ?, ?)
+EOT;
 
-        $stmt = $this->conn->prepare('INSERT INTO products(name, price, stock) VALUES (?, ?, ?)');
-        $stmt->bindValue(1, $product);
-        $stmt->bindValue(2, $price);
-        $stmt->bindValue(3, $stock, ParameterType::INTEGER);
+        $expectedRes = $res = $this->getResourceFromString('mydata');
+
+        $stmt = $this->conn->prepare($sql);
+        $stmt->bindValue(1, 'product1');
+        $stmt->bindValue(2, '12.5');
+        $stmt->bindValue(3, 5, ParameterType::INTEGER);
+        $stmt->bindValue(4, $res, ParameterType::BINARY);
 
         $executeMethod($stmt);
 
         // Debug data should not be affected by these changes
         $debug = $this->debugDataHolder->getData()['default'] ?? [];
         $this->assertCount(2, $debug);
-        $this->assertSame('INSERT INTO products(name, price, stock) VALUES (?, ?, ?)', $debug[1]['sql']);
-        $this->assertSame(['product1', '12.5', 5], $debug[1]['params']);
-        $this->assertSame([ParameterType::STRING, ParameterType::STRING, ParameterType::INTEGER], $debug[1]['types']);
+        $this->assertSame($sql, $debug[1]['sql']);
+        $this->assertSame(['product1', '12.5', 5, $expectedRes], $debug[1]['params']);
+        $this->assertSame([ParameterType::STRING, ParameterType::STRING, ParameterType::INTEGER, ParameterType::BINARY], $debug[1]['types']);
         $this->assertGreaterThan(0, $debug[1]['executionMS']);
     }
 
     public static function provideEndTransactionMethod(): array
     {
         return [
-            'commit' => [
-                static function (Connection $conn): ?bool {
-                    return $conn->commit();
-                },
-                '"COMMIT"',
-            ],
-            'rollback' => [
-                static function (Connection $conn): ?bool {
-                    return $conn->rollBack();
-                },
-                '"ROLLBACK"',
-            ],
+            'commit' => [static fn (Connection $conn) => $conn->commit(), '"COMMIT"'],
+            'rollback' => [static fn (Connection $conn) => $conn->rollBack(), '"ROLLBACK"'],
         ];
     }
 
@@ -200,7 +188,10 @@ EOT;
     {
         $this->init();
 
-        $this->conn->setNestTransactionsWithSavepoints(true);
+        if (\defined('Doctrine\DBAL\Connection::PARAM_STR_ARRAY')) {
+            // DBAL < 4
+            $this->conn->setNestTransactionsWithSavepoints(true);
+        }
         $this->conn->beginTransaction();
         $this->conn->beginTransaction();
         $this->conn->executeStatement('INSERT INTO products(name, price, stock) VALUES ("product1", 12.5, 5)');
@@ -234,28 +225,16 @@ EOT;
     {
         return [
             'commit and exec' => [
-                static function (Connection $conn, string $sql) {
-                    return $conn->executeStatement($sql);
-                },
-                static function (Connection $conn): ?bool {
-                    return $conn->commit();
-                },
+                static fn (Connection $conn, string $sql): int|string => $conn->executeStatement($sql),
+                static fn (Connection $conn): ?bool => $conn->commit(),
             ],
             'rollback and query' => [
-                static function (Connection $conn, string $sql): Result {
-                    return $conn->executeQuery($sql);
-                },
-                static function (Connection $conn): ?bool {
-                    return $conn->rollBack();
-                },
+                static fn (Connection $conn, string $sql): Result => $conn->executeQuery($sql),
+                static fn (Connection $conn): ?bool => $conn->rollBack(),
             ],
             'prepared statement' => [
-                static function (Connection $conn, string $sql): Result {
-                    return $conn->prepare($sql)->executeQuery();
-                },
-                static function (Connection $conn): ?bool {
-                    return $conn->commit();
-                },
+                static fn (Connection $conn, string $sql): Result => $conn->prepare($sql)->executeQuery(),
+                static fn (Connection $conn): ?bool => $conn->commit(),
             ],
         ];
     }
@@ -296,5 +275,7 @@ EOT;
         $this->conn->beginTransaction();
         $sqlMethod($this->conn, 'SELECT * FROM products');
         $endTransactionMethod($this->conn);
+
+        $this->addToAssertionCount(1);
     }
 }

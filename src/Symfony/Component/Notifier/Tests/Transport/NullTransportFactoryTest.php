@@ -24,10 +24,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
  */
 class NullTransportFactoryTest extends TestCase
 {
-    /**
-     * @var NullTransportFactory
-     */
-    private $nullTransportFactory;
+    private NullTransportFactory $nullTransportFactory;
 
     protected function setUp(): void
     {

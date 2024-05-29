@@ -18,16 +18,13 @@ namespace Symfony\Component\HttpClient\Chunk;
  */
 class InformationalChunk extends DataChunk
 {
-    private $status;
+    private array $status;
 
     public function __construct(int $statusCode, array $headers)
     {
         $this->status = [$statusCode, $headers];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getInformationalStatus(): ?array
     {
         return $this->status;

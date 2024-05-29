@@ -12,7 +12,7 @@
         <import resource="merge_import.xml"/>
     </imports>
 
-    <sec:config enable-authenticator-manager="true">
+    <sec:config>
         <sec:provider name="default" id="foo" />
 
         <sec:firewall name="main" form-login="false">

@@ -40,7 +40,7 @@ class DoctrinePingConnectionMiddleware extends AbstractDoctrineMiddleware
 
         try {
             $this->executeDummySql($connection);
-        } catch (DBALException $e) {
+        } catch (DBALException) {
             $connection->close();
             // Attempt to reestablish the lazy connection by sending another query.
             $this->executeDummySql($connection);

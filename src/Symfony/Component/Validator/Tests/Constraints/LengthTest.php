@@ -12,19 +12,16 @@
 namespace Symfony\Component\Validator\Tests\Constraints;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Exception\InvalidArgumentException;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
-use Symfony\Component\Validator\Mapping\Loader\AnnotationLoader;
+use Symfony\Component\Validator\Mapping\Loader\AttributeLoader;
 
 /**
  * @author Renan Taranto <renantaranto@gmail.com>
  */
 class LengthTest extends TestCase
 {
-    use ExpectDeprecationTrait;
-
     public function testNormalizerCanBeSet()
     {
         $length = new Length(['min' => 0, 'max' => 10, 'normalizer' => 'trim']);
@@ -46,24 +43,23 @@ class LengthTest extends TestCase
         new Length(['min' => 0, 'max' => 10, 'normalizer' => new \stdClass()]);
     }
 
-    /**
-     * @group legacy
-     *
-     * @dataProvider allowEmptyStringOptionData
-     */
-    public function testDeprecatedAllowEmptyStringOption(bool $value)
+    public function testDefaultCountUnitIsUsed()
     {
-        $this->expectDeprecation('Since symfony/validator 5.2: The "allowEmptyString" option of the "Symfony\Component\Validator\Constraints\Length" constraint is deprecated.');
-
-        new Length(['allowEmptyString' => $value, 'max' => 5]);
+        $length = new Length(['min' => 0, 'max' => 10]);
+        $this->assertSame(Length::COUNT_CODEPOINTS, $length->countUnit);
     }
 
-    public static function allowEmptyStringOptionData()
+    public function testNonDefaultCountUnitCanBeSet()
     {
-        return [
-            [true],
-            [false],
-        ];
+        $length = new Length(['min' => 0, 'max' => 10, 'countUnit' => Length::COUNT_GRAPHEMES]);
+        $this->assertSame(Length::COUNT_GRAPHEMES, $length->countUnit);
+    }
+
+    public function testInvalidCountUnitThrowsException()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage(sprintf('The "countUnit" option must be one of the "%s"::COUNT_* constants ("%s" given).', Length::class, 'nonExistentCountUnit'));
+        new Length(['min' => 0, 'max' => 10, 'countUnit' => 'nonExistentCountUnit']);
     }
 
     public function testConstraintDefaultOption()
@@ -74,7 +70,7 @@ class LengthTest extends TestCase
         self::assertEquals(5, $constraint->max);
     }
 
-    public function testConstraintAnnotationDefaultOption()
+    public function testConstraintAttributeDefaultOption()
     {
         $constraint = new Length(['value' => 5, 'exactMessage' => 'message']);
 
@@ -83,13 +79,10 @@ class LengthTest extends TestCase
         self::assertEquals('message', $constraint->exactMessage);
     }
 
-    /**
-     * @requires PHP 8
-     */
     public function testAttributes()
     {
         $metadata = new ClassMetadata(LengthDummy::class);
-        $loader = new AnnotationLoader();
+        $loader = new AttributeLoader();
         self::assertTrue($loader->loadClassMetadata($metadata));
 
         [$aConstraint] = $metadata->properties['a']->getConstraints();

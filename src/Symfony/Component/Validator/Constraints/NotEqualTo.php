@@ -12,8 +12,7 @@
 namespace Symfony\Component\Validator\Constraints;
 
 /**
- * @Annotation
- * @Target({"PROPERTY", "METHOD", "ANNOTATION"})
+ * Validates that a value is not equal to another value.
  *
  * @author Daniel Holmes <daniel@danielholmes.org>
  * @author Bernhard Schussek <bschussek@gmail.com>
@@ -23,9 +22,9 @@ class NotEqualTo extends AbstractComparison
 {
     public const IS_EQUAL_ERROR = 'aa2e33da-25c8-4d76-8c6c-812f02ea89dd';
 
-    protected static $errorNames = [
+    protected const ERROR_NAMES = [
         self::IS_EQUAL_ERROR => 'IS_EQUAL_ERROR',
     ];
 
-    public $message = 'This value should not be equal to {{ compared_value }}.';
+    public string $message = 'This value should not be equal to {{ compared_value }}.';
 }

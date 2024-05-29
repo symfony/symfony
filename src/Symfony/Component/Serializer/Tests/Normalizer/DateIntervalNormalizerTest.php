@@ -21,10 +21,7 @@ use Symfony\Component\Serializer\Normalizer\DateIntervalNormalizer;
  */
 class DateIntervalNormalizerTest extends TestCase
 {
-    /**
-     * @var DateIntervalNormalizer
-     */
-    private $normalizer;
+    private DateIntervalNormalizer $normalizer;
 
     protected function setUp(): void
     {
@@ -119,11 +116,6 @@ class DateIntervalNormalizerTest extends TestCase
         $this->assertDateIntervalEquals($this->getInterval('P0Y0M0DT12H34M0S'), $normalizer->denormalize('PT12H34M', \DateInterval::class));
     }
 
-    /**
-     * Since PHP 8.0 DateInterval::construct supports periods containing both D and W period designators.
-     *
-     * @requires PHP 8
-     */
     public function testDenormalizeIntervalWithBothWeeksAndDays()
     {
         $input = 'P1W1D';

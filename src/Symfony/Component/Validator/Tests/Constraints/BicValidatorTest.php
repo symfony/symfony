@@ -16,12 +16,12 @@ use Symfony\Component\Validator\Constraints\BicValidator;
 use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 use Symfony\Component\Validator\Exception\UnexpectedValueException;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
-use Symfony\Component\Validator\Mapping\Loader\AnnotationLoader;
+use Symfony\Component\Validator\Mapping\Loader\AttributeLoader;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
 class BicValidatorTest extends ConstraintValidatorTestCase
 {
-    protected function createValidator()
+    protected function createValidator(): BicValidator
     {
         return new BicValidator();
     }
@@ -71,13 +71,10 @@ class BicValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    /**
-     * @requires PHP 8
-     */
     public function testInvalidComparisonToPropertyPathFromAttribute()
     {
         $classMetadata = new ClassMetadata(BicDummy::class);
-        (new AnnotationLoader())->loadClassMetadata($classMetadata);
+        (new AttributeLoader())->loadClassMetadata($classMetadata);
 
         [$constraint] = $classMetadata->properties['bic1']->constraints;
 
@@ -116,13 +113,10 @@ class BicValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    /**
-     * @requires PHP 8
-     */
     public function testInvalidComparisonToValueFromAttribute()
     {
         $classMetadata = new ClassMetadata(BicDummy::class);
-        (new AnnotationLoader())->loadClassMetadata($classMetadata);
+        (new AttributeLoader())->loadClassMetadata($classMetadata);
 
         [$constraint] = $classMetadata->properties['bic1']->constraints;
 
@@ -156,9 +150,6 @@ class BicValidatorTest extends ConstraintValidatorTestCase
         ]);
     }
 
-    /**
-     * @requires PHP 8
-     */
     public function testThrowsConstraintExceptionIfBothValueAndPropertyPathNamed()
     {
         $this->expectException(ConstraintDefinitionException::class);
@@ -172,7 +163,7 @@ class BicValidatorTest extends ConstraintValidatorTestCase
         $constraint = new Bic(['ibanPropertyPath' => 'foo']);
 
         $this->expectException(ConstraintDefinitionException::class);
-        $this->expectExceptionMessage(sprintf('Invalid property path "foo" provided to "%s" constraint', \get_class($constraint)));
+        $this->expectExceptionMessage(sprintf('Invalid property path "foo" provided to "%s" constraint', $constraint::class));
 
         $object = new BicComparisonTestClass(5);
 
@@ -199,7 +190,6 @@ class BicValidatorTest extends ConstraintValidatorTestCase
 
     public static function getValidBics()
     {
-        // http://formvalidation.io/validators/bic/
         return [
             ['ASPKAT2LXXX'],
             ['ASPKAT2L'],
@@ -207,6 +197,7 @@ class BicValidatorTest extends ConstraintValidatorTestCase
             ['UNCRIT2B912'],
             ['DABADKKK'],
             ['RZOOAT2L303'],
+            ['1SBACNBXSHA'],
         ];
     }
 
@@ -228,13 +219,11 @@ class BicValidatorTest extends ConstraintValidatorTestCase
     }
 
     /**
-     * @requires PHP 8
-     *
      * @dataProvider getInvalidBics
      */
     public function testInvalidBicsNamed($bic, $code)
     {
-        $constraint = eval('return new \Symfony\Component\Validator\Constraints\Bic(message: "myMessage");');
+        $constraint = new Bic(message: 'myMessage');
 
         $this->validator->validate($bic, $constraint);
 
@@ -252,11 +241,6 @@ class BicValidatorTest extends ConstraintValidatorTestCase
             ['ASPKAT2LX', Bic::INVALID_LENGTH_ERROR],
             ['ASPKAT2LXXX1', Bic::INVALID_LENGTH_ERROR],
             ['DABADKK', Bic::INVALID_LENGTH_ERROR],
-            ['1SBACNBXSHA', Bic::INVALID_BANK_CODE_ERROR],
-            ['RZ00AT2L303', Bic::INVALID_BANK_CODE_ERROR],
-            ['D2BACNBXSHA', Bic::INVALID_BANK_CODE_ERROR],
-            ['DS3ACNBXSHA', Bic::INVALID_BANK_CODE_ERROR],
-            ['DSB4CNBXSHA', Bic::INVALID_BANK_CODE_ERROR],
             ['DEUT12HH', Bic::INVALID_COUNTRY_CODE_ERROR],
             ['DSBAC6BXSHA', Bic::INVALID_COUNTRY_CODE_ERROR],
             ['DSBA5NBXSHA', Bic::INVALID_COUNTRY_CODE_ERROR],

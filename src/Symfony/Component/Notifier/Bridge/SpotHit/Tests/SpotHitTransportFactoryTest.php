@@ -13,14 +13,10 @@ namespace Symfony\Component\Notifier\Bridge\SpotHit\Tests;
 
 use Symfony\Component\Notifier\Bridge\SpotHit\SpotHitTransportFactory;
 use Symfony\Component\Notifier\Test\TransportFactoryTestCase;
-use Symfony\Component\Notifier\Transport\TransportFactoryInterface;
 
 final class SpotHitTransportFactoryTest extends TransportFactoryTestCase
 {
-    /**
-     * @return SpotHitTransportFactory
-     */
-    public function createFactory(): TransportFactoryInterface
+    public function createFactory(): SpotHitTransportFactory
     {
         return new SpotHitTransportFactory();
     }
@@ -35,11 +31,17 @@ final class SpotHitTransportFactoryTest extends TransportFactoryTestCase
             'spothit://spot-hit.fr?from=MyCompany',
             'spothit://api_token@default?from=MyCompany',
         ];
+        yield [
+            'spothit://spot-hit.fr?from=MyCompany&smslong=1',
+            'spothit://api_token@default?from=MyCompany&smslong=1',
+        ];
     }
 
     public static function supportsProvider(): iterable
     {
         yield [true, 'spothit://api_token@default?from=MyCompany'];
+        yield [true, 'spothit://api_token@default?from=MyCompany&smslong=1'];
+        yield [true, 'spothit://api_token@default?from=MyCompany&smslongnbr=1'];
         yield [false, 'somethingElse://api_token@default?from=MyCompany'];
     }
 

@@ -157,6 +157,16 @@ class SesTransportFactoryTest extends TransportFactoryTestCase
             new Dsn('ses+smtps', 'default', self::USER, self::PASSWORD, null, ['region' => 'eu-west-1', 'ping_threshold' => '10']),
             (new SesSmtpTransport(self::USER, self::PASSWORD, 'eu-west-1', null, $logger))->setPingThreshold(10),
         ];
+
+        yield [
+            new Dsn('ses+smtp', 'custom.vpc.endpoint', self::USER, self::PASSWORD, null, ['region' => 'eu-west-1']),
+            new SesSmtpTransport(self::USER, self::PASSWORD, 'eu-west-1', null, $logger, 'custom.vpc.endpoint'),
+        ];
+
+        yield [
+            new Dsn('ses+smtps', 'custom.vpc.endpoint', self::USER, self::PASSWORD, null, ['region' => 'eu-west-1']),
+            new SesSmtpTransport(self::USER, self::PASSWORD, 'eu-west-1', null, $logger, 'custom.vpc.endpoint'),
+        ];
     }
 
     public static function unsupportedSchemeProvider(): iterable

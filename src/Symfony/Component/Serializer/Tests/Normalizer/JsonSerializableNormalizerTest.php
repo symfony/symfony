@@ -30,15 +30,8 @@ class JsonSerializableNormalizerTest extends TestCase
 {
     use CircularReferenceTestTrait;
 
-    /**
-     * @var JsonSerializableNormalizer
-     */
-    private $normalizer;
-
-    /**
-     * @var MockObject&JsonSerializerNormalizer
-     */
-    private $serializer;
+    private JsonSerializableNormalizer $normalizer;
+    private MockObject&JsonSerializerNormalizer $serializer;
 
     protected function setUp(): void
     {
@@ -75,8 +68,9 @@ class JsonSerializableNormalizerTest extends TestCase
 
     public function testCircularNormalize()
     {
-        $this->expectException(CircularReferenceException::class);
         $this->createNormalizer([JsonSerializableNormalizer::CIRCULAR_REFERENCE_LIMIT => 1]);
+
+        $this->expectException(CircularReferenceException::class);
 
         $this->serializer
             ->expects($this->once())

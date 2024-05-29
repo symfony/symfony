@@ -18,8 +18,8 @@ namespace Symfony\Component\Form\Exception;
  */
 class TransformationFailedException extends RuntimeException
 {
-    private $invalidMessage;
-    private $invalidMessageParameters;
+    private ?string $invalidMessage;
+    private array $invalidMessageParameters;
 
     public function __construct(string $message = '', int $code = 0, ?\Throwable $previous = null, ?string $invalidMessage = null, array $invalidMessageParameters = [])
     {
@@ -34,7 +34,7 @@ class TransformationFailedException extends RuntimeException
      * @param string|null $invalidMessage           The message or message key
      * @param array       $invalidMessageParameters Data to be passed into the translator
      */
-    public function setInvalidMessage(?string $invalidMessage = null, array $invalidMessageParameters = []): void
+    public function setInvalidMessage(?string $invalidMessage, array $invalidMessageParameters = []): void
     {
         $this->invalidMessage = $invalidMessage;
         $this->invalidMessageParameters = $invalidMessageParameters;

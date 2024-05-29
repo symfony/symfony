@@ -8,8 +8,6 @@ services:
             - container.service_subscriber
 
 security:
-    enable_authenticator_manager: true
-
     providers:
         main:
             memory:

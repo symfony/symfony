@@ -24,10 +24,7 @@ use Symfony\Component\Form\ResolvedFormTypeFactory;
 
 class DataCollectorTypeExtensionTest extends TestCase
 {
-    /**
-     * @var DataCollectorTypeExtension
-     */
-    private $extension;
+    private DataCollectorTypeExtension $extension;
 
     protected function setUp(): void
     {

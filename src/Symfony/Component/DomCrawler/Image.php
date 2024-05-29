@@ -21,12 +21,12 @@ class Image extends AbstractUriElement
         parent::__construct($node, $currentUri, 'GET');
     }
 
-    protected function getRawUri()
+    protected function getRawUri(): string
     {
         return $this->node->getAttribute('src');
     }
 
-    protected function setNode(\DOMElement $node)
+    protected function setNode(\DOMElement $node): void
     {
         if ('img' !== $node->nodeName) {
             throw new \LogicException(sprintf('Unable to visualize a "%s" tag.', $node->nodeName));

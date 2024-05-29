@@ -24,11 +24,11 @@ class DateCaster
 {
     private const PERIOD_LIMIT = 3;
 
-    public static function castDateTime(\DateTimeInterface $d, array $a, Stub $stub, bool $isNested, int $filter)
+    public static function castDateTime(\DateTimeInterface $d, array $a, Stub $stub, bool $isNested, int $filter): array
     {
         $prefix = Caster::PREFIX_VIRTUAL;
         $location = $d->getTimezone() ? $d->getTimezone()->getLocation() : null;
-        $fromNow = (new \DateTime())->diff($d);
+        $fromNow = (new \DateTimeImmutable())->diff($d);
 
         $title = $d->format('l, F j, Y')
             ."\n".self::formatInterval($fromNow).' from now'
@@ -47,7 +47,7 @@ class DateCaster
         return $a;
     }
 
-    public static function castInterval(\DateInterval $interval, array $a, Stub $stub, bool $isNested, int $filter)
+    public static function castInterval(\DateInterval $interval, array $a, Stub $stub, bool $isNested, int $filter): array
     {
         $now = new \DateTimeImmutable('@0', new \DateTimeZone('UTC'));
         $numberOfSeconds = $now->add($interval)->getTimestamp() - $now->getTimestamp();
@@ -76,10 +76,10 @@ class DateCaster
         return $i->format(rtrim($format));
     }
 
-    public static function castTimeZone(\DateTimeZone $timeZone, array $a, Stub $stub, bool $isNested, int $filter)
+    public static function castTimeZone(\DateTimeZone $timeZone, array $a, Stub $stub, bool $isNested, int $filter): array
     {
         $location = $timeZone->getLocation();
-        $formatted = (new \DateTime('now', $timeZone))->format($location ? 'e (P)' : 'P');
+        $formatted = (new \DateTimeImmutable('now', $timeZone))->format($location ? 'e (P)' : 'P');
         $title = $location && \extension_loaded('intl') ? \Locale::getDisplayRegion('-'.$location['country_code']) : '';
 
         $z = [Caster::PREFIX_VIRTUAL.'timezone' => new ConstStub($formatted, $title)];
@@ -87,7 +87,7 @@ class DateCaster
         return $filter & Caster::EXCLUDE_VERBOSE ? $z : $z + $a;
     }
 
-    public static function castPeriod(\DatePeriod $p, array $a, Stub $stub, bool $isNested, int $filter)
+    public static function castPeriod(\DatePeriod $p, array $a, Stub $stub, bool $isNested, int $filter): array
     {
         $dates = [];
         foreach (clone $p as $i => $d) {
@@ -107,7 +107,7 @@ class DateCaster
             self::formatInterval($p->getDateInterval()),
             $p->include_start_date ? '[' : ']',
             self::formatDateTime($p->getStartDate()),
-            ($end = $p->getEndDate()) ? 'to '.self::formatDateTime($end).(\PHP_VERSION_ID >= 80200 && $p->include_end_date ? ']' : '[') : 'recurring '.$p->recurrences.' time/s'
+            ($end = $p->getEndDate()) ? 'to '.self::formatDateTime($end).($p->include_end_date ? ']' : '[') : 'recurring '.$p->recurrences.' time/s'
         );
 
         $p = [Caster::PREFIX_VIRTUAL.'period' => new ConstStub($period, implode("\n", $dates))];

@@ -19,9 +19,9 @@ use Symfony\Component\Security\Core\User\UserProviderInterface;
 
 class UserChangingUserProvider implements UserProviderInterface
 {
-    private $inner;
+    private InMemoryUserProvider $inner;
 
-    public static $changePassword = false;
+    public static bool $changePassword = false;
 
     public function __construct(InMemoryUserProvider $inner)
     {

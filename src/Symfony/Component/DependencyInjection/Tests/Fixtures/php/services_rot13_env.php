@@ -3,8 +3,8 @@
 use Symfony\Component\DependencyInjection\Argument\RewindableGenerator;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Container;
-use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Exception\LogicException;
+use Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\ParameterBag\FrozenParameterBag;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
@@ -15,11 +15,10 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 class Symfony_DI_PhpDumper_Test_Rot13Parameters extends Container
 {
     protected $parameters = [];
-    protected $getService;
+    protected \Closure $getService;
 
     public function __construct()
     {
-        $this->getService = \Closure::fromCallable([$this, 'getService']);
         $this->parameters = $this->getDefaultParameters();
 
         $this->services = $this->privates = [];
@@ -41,23 +40,14 @@ class Symfony_DI_PhpDumper_Test_Rot13Parameters extends Container
         return true;
     }
 
-    public function getRemovedIds(): array
-    {
-        return [
-            '.service_locator.PWbaRiJ' => true,
-            'Psr\\Container\\ContainerInterface' => true,
-            'Symfony\\Component\\DependencyInjection\\ContainerInterface' => true,
-        ];
-    }
-
     /**
      * Gets the public 'Symfony\Component\DependencyInjection\Tests\Dumper\Rot13EnvVarProcessor' shared service.
      *
      * @return \Symfony\Component\DependencyInjection\Tests\Dumper\Rot13EnvVarProcessor
      */
-    protected function getRot13EnvVarProcessorService()
+    protected static function getRot13EnvVarProcessorService($container)
     {
-        return $this->services['Symfony\\Component\\DependencyInjection\\Tests\\Dumper\\Rot13EnvVarProcessor'] = new \Symfony\Component\DependencyInjection\Tests\Dumper\Rot13EnvVarProcessor();
+        return $container->services['Symfony\\Component\\DependencyInjection\\Tests\\Dumper\\Rot13EnvVarProcessor'] = new \Symfony\Component\DependencyInjection\Tests\Dumper\Rot13EnvVarProcessor();
     }
 
     /**
@@ -65,22 +55,19 @@ class Symfony_DI_PhpDumper_Test_Rot13Parameters extends Container
      *
      * @return \Symfony\Component\DependencyInjection\ServiceLocator
      */
-    protected function getContainer_EnvVarProcessorsLocatorService()
+    protected static function getContainer_EnvVarProcessorsLocatorService($container)
     {
-        return $this->services['container.env_var_processors_locator'] = new \Symfony\Component\DependencyInjection\Argument\ServiceLocator($this->getService, [
+        return $container->services['container.env_var_processors_locator'] = new \Symfony\Component\DependencyInjection\Argument\ServiceLocator($container->getService ??= $container->getService(...), [
             'rot13' => ['services', 'Symfony\\Component\\DependencyInjection\\Tests\\Dumper\\Rot13EnvVarProcessor', 'getRot13EnvVarProcessorService', false],
         ], [
             'rot13' => '?',
         ]);
     }
 
-    /**
-     * @return array|bool|float|int|string|\UnitEnum|null
-     */
-    public function getParameter(string $name)
+    public function getParameter(string $name): array|bool|string|int|float|\UnitEnum|null
     {
         if (!(isset($this->parameters[$name]) || isset($this->loadedDynamicParameters[$name]) || \array_key_exists($name, $this->parameters))) {
-            throw new InvalidArgumentException(sprintf('The parameter "%s" must be defined.', $name));
+            throw new ParameterNotFoundException($name);
         }
         if (isset($this->loadedDynamicParameters[$name])) {
             return $this->loadedDynamicParameters[$name] ? $this->dynamicParameters[$name] : $this->getDynamicParameter($name);
@@ -101,7 +88,7 @@ class Symfony_DI_PhpDumper_Test_Rot13Parameters extends Container
 
     public function getParameterBag(): ParameterBagInterface
     {
-        if (null === $this->parameterBag) {
+        if (!isset($this->parameterBag)) {
             $parameters = $this->parameters;
             foreach ($this->loadedDynamicParameters as $name => $loaded) {
                 $parameters[$name] = $loaded ? $this->dynamicParameters[$name] : $this->getDynamicParameter($name);
@@ -119,10 +106,11 @@ class Symfony_DI_PhpDumper_Test_Rot13Parameters extends Container
 
     private function getDynamicParameter(string $name)
     {
-        switch ($name) {
-            case 'hello': $value = $this->getEnv('rot13:foo'); break;
-            default: throw new InvalidArgumentException(sprintf('The dynamic parameter "%s" must be defined.', $name));
-        }
+        $container = $this;
+        $value = match ($name) {
+            'hello' => $container->getEnv('rot13:foo'),
+            default => throw new ParameterNotFoundException($name),
+        };
         $this->loadedDynamicParameters[$name] = true;
 
         return $this->dynamicParameters[$name] = $value;

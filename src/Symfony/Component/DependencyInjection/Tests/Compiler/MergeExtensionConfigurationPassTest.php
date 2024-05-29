@@ -12,13 +12,13 @@
 namespace Symfony\Component\DependencyInjection\Tests\Compiler;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Config\Definition\BaseNode;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\DependencyInjection\Compiler\MergeExtensionConfigurationContainerBuilder;
 use Symfony\Component\DependencyInjection\Compiler\MergeExtensionConfigurationPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\Extension\Extension;
 use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
@@ -128,17 +128,34 @@ class MergeExtensionConfigurationPassTest extends TestCase
             $pass->process($container);
             $this->fail('An exception should have been thrown.');
         } catch (\Exception $e) {
+            $this->assertSame('here', $e->getMessage());
         }
 
         $this->assertSame(['FOO'], array_keys($container->getParameterBag()->getEnvPlaceholders()));
     }
 
-    public function testReuseEnvPlaceholderGeneratedByPreviousExtension()
+    public function testMissingParameterIncludesExtension()
     {
-        if (!property_exists(BaseNode::class, 'placeholderUniquePrefixes')) {
-            $this->markTestSkipped('This test requires symfony/config ^4.4.11|^5.0.11|^5.1.3');
+        $container = new ContainerBuilder();
+        $container->registerExtension(new FooExtension());
+        $container->prependExtensionConfig('foo', [
+            'foo' => '%missing_parameter%',
+        ]);
+
+        $pass = new MergeExtensionConfigurationPass();
+        try {
+            $pass = new MergeExtensionConfigurationPass();
+            $pass->process($container);
+            $this->fail('An exception should have been thrown.');
+        } catch (\Exception $e) {
+            $this->assertInstanceOf(ParameterNotFoundException::class, $e);
+            $this->assertSame('You have requested a non-existent parameter "missing_parameter" while loading extension "foo".', $e->getMessage());
         }
 
+    }
+
+    public function testReuseEnvPlaceholderGeneratedByPreviousExtension()
+    {
         $container = new ContainerBuilder();
         $container->registerExtension(new FooExtension());
         $container->registerExtension(new TestCccExtension());
@@ -179,7 +196,7 @@ class FooExtension extends Extension
         return new FooConfiguration();
     }
 
-    public function load(array $configs, ContainerBuilder $container)
+    public function load(array $configs, ContainerBuilder $container): void
     {
         $configuration = $this->getConfiguration($configs, $container);
         $config = $this->processConfiguration($configuration, $configs);
@@ -195,7 +212,7 @@ class FooExtension extends Extension
 
 class BarExtension extends Extension
 {
-    public function load(array $configs, ContainerBuilder $container)
+    public function load(array $configs, ContainerBuilder $container): void
     {
         $container->resolveEnvPlaceholders('%env(int:FOO)%', true);
     }
@@ -213,9 +230,9 @@ class ThrowingExtension extends Extension
         return new FooConfiguration();
     }
 
-    public function load(array $configs, ContainerBuilder $container)
+    public function load(array $configs, ContainerBuilder $container): void
     {
-        throw new \Exception();
+        throw new \Exception('here');
     }
 }
 
@@ -245,7 +262,7 @@ final class TestCccExtension extends Extension
         return new TestCccConfiguration();
     }
 
-    public function load(array $configs, ContainerBuilder $container)
+    public function load(array $configs, ContainerBuilder $container): void
     {
         $configuration = $this->getConfiguration($configs, $container);
         $this->processConfiguration($configuration, $configs);

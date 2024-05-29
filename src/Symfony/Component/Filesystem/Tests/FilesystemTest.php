@@ -14,6 +14,8 @@ namespace Symfony\Component\Filesystem\Tests;
 use Symfony\Component\Filesystem\Exception\InvalidArgumentException;
 use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Filesystem\Path;
+use Symfony\Component\Process\PhpExecutableFinder;
+use Symfony\Component\Process\Process;
 
 /**
  * Test class for Filesystem.
@@ -162,23 +164,32 @@ class FilesystemTest extends FilesystemTestCase
         $this->assertStringEqualsFile($targetFilePath, 'SOURCE FILE');
     }
 
-    /**
-     * @group network
-     */
     public function testCopyForOriginUrlsAndExistingLocalFileDefaultsToCopy()
     {
-        if (!\in_array('https', stream_get_wrappers())) {
-            $this->markTestSkipped('"https" stream wrapper is not enabled.');
+        if (!\in_array('http', stream_get_wrappers(), true)) {
+            $this->markTestSkipped('"http" stream wrapper is not enabled.');
         }
-        $sourceFilePath = 'https://symfony.com/images/common/logo/logo_symfony_header.png';
-        $targetFilePath = $this->workspace.\DIRECTORY_SEPARATOR.'copy_target_file';
 
-        file_put_contents($targetFilePath, 'TARGET FILE');
+        $finder = new PhpExecutableFinder();
+        $process = new Process(array_merge([$finder->find(false)], $finder->findArguments(), ['-dopcache.enable=0', '-dvariables_order=EGPCS', '-S', 'localhost:8057']));
+        $process->setWorkingDirectory(__DIR__.'/Fixtures/web');
 
-        $this->filesystem->copy($sourceFilePath, $targetFilePath, false);
+        $process->start();
 
-        $this->assertFileExists($targetFilePath);
-        $this->assertEquals(file_get_contents($sourceFilePath), file_get_contents($targetFilePath));
+        do {
+            usleep(50000);
+        } while (!@fopen('http://localhost:8057', 'r'));
+
+        try {
+            $sourceFilePath = 'http://localhost:8057/logo_symfony_header.png';
+            $targetFilePath = $this->workspace.\DIRECTORY_SEPARATOR.'copy_target_file';
+            file_put_contents($targetFilePath, 'TARGET FILE');
+            $this->filesystem->copy($sourceFilePath, $targetFilePath, false);
+            $this->assertFileExists($targetFilePath);
+            $this->assertEquals(file_get_contents($sourceFilePath), file_get_contents($targetFilePath));
+        } finally {
+            $process->stop();
+        }
     }
 
     public function testMkdirCreatesDirectoriesRecursively()
@@ -377,7 +388,7 @@ class FilesystemTest extends FilesystemTestCase
 
         // create symlink to nonexistent dir
         rmdir($basePath.'dir');
-        $this->assertFalse('\\' === \DIRECTORY_SEPARATOR && \PHP_VERSION_ID < 70400 ? @readlink($basePath.'dir-link') : is_dir($basePath.'dir-link'));
+        $this->assertDirectoryDoesNotExist($basePath.'dir-link');
 
         $this->filesystem->remove($basePath);
 
@@ -1078,11 +1089,7 @@ class FilesystemTest extends FilesystemTestCase
 
         $this->assertEquals($file, $this->filesystem->readlink($link1));
 
-        if (!('\\' == \DIRECTORY_SEPARATOR && \PHP_MAJOR_VERSION === 7 && \PHP_MINOR_VERSION === 3)) {
-            // Skip for Windows with PHP 7.3.*
-            $this->assertEquals($link1, $this->filesystem->readlink($link2));
-        }
-
+        $this->assertEquals($link1, $this->filesystem->readlink($link2));
         $this->assertEquals($file, $this->filesystem->readlink($link1, true));
         $this->assertEquals($file, $this->filesystem->readlink($link2, true));
         $this->assertEquals($file, $this->filesystem->readlink($file, true));
@@ -1091,10 +1098,6 @@ class FilesystemTest extends FilesystemTestCase
     public function testReadBrokenLink()
     {
         $this->markAsSkippedIfSymlinkIsMissing();
-
-        if ('\\' === \DIRECTORY_SEPARATOR && \PHP_VERSION_ID < 70400) {
-            $this->markTestSkipped('Windows does not support reading "broken" symlinks in PHP < 7.4.0');
-        }
 
         $file = Path::join($this->workspace, 'file');
         $link = Path::join($this->workspace, 'link');
@@ -1626,11 +1629,6 @@ class FilesystemTest extends FilesystemTestCase
         $this->assertStringEqualsFile($linknameA, 'bar');
         $this->assertStringEqualsFile($linknameB, 'bar');
 
-        // Windows does not support reading "broken" symlinks in PHP < 7.4.0
-        if ('\\' === \DIRECTORY_SEPARATOR && \PHP_VERSION_ID < 70400) {
-            return;
-        }
-
         $this->filesystem->remove($filename);
         $this->filesystem->dumpFile($linknameB, 'baz');
 
@@ -1815,6 +1813,43 @@ class FilesystemTest extends FilesystemTestCase
         $this->assertFilePermissions(745, $filename);
     }
 
+    public function testReadFile()
+    {
+        $licenseFile = \dirname(__DIR__).'/LICENSE';
+
+        $this->assertStringEqualsFile($licenseFile, $this->filesystem->readFile($licenseFile));
+    }
+
+    public function testReadNonExistentFile()
+    {
+        $this->expectException(IOException::class);
+        $this->expectExceptionMessageMatches(sprintf('#^Failed to read file ".+%1$sTests/invalid"\\: file_get_contents\\(.+%1$sTests/invalid\\)\\: Failed to open stream\\: No such file or directory$#', preg_quote(\DIRECTORY_SEPARATOR)));
+
+        $this->filesystem->readFile(__DIR__.'/invalid');
+    }
+
+    public function testReadDirectory()
+    {
+        $this->expectException(IOException::class);
+        $this->expectExceptionMessageMatches(sprintf('#^Failed to read file ".+%sTests"\\: File is a directory\\.$#', preg_quote(\DIRECTORY_SEPARATOR)));
+
+        $this->filesystem->readFile(__DIR__);
+    }
+
+    public function testReadUnreadableFile()
+    {
+        $this->markAsSkippedIfChmodIsMissing();
+
+        $filename = $this->workspace.'/unreadable.txt';
+        file_put_contents($filename, 'Hello World');
+        chmod($filename, 0o000);
+
+        $this->expectException(IOException::class);
+        $this->expectExceptionMessageMatches('#^Failed to read file ".+/unreadable.txt"\\: file_get_contents\\(.+/unreadable.txt\\)\\: Failed to open stream\\: Permission denied$#');
+
+        $this->filesystem->readFile($filename);
+    }
+
     public function testCopyShouldKeepExecutionPermission()
     {
         $this->markAsSkippedIfChmodIsMissing();
@@ -1836,7 +1871,7 @@ class FilesystemTest extends FilesystemTestCase
             $this->markTestSkipped('This test is specific to Windows.');
         }
 
-        if (($userProfilePath = getenv('USERPROFILE')) === false || !is_dir($userProfilePath)) {
+        if (false === ($userProfilePath = getenv('USERPROFILE')) || !is_dir($userProfilePath)) {
             throw new \RuntimeException('Failed to retrieve user profile path.');
         }
 

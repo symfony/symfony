@@ -14,12 +14,12 @@ namespace Symfony\Component\Validator\Tests\Constraints;
 use Symfony\Component\Validator\Constraints\Iban;
 use Symfony\Component\Validator\Constraints\IbanValidator;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
-use Symfony\Component\Validator\Mapping\Loader\AnnotationLoader;
+use Symfony\Component\Validator\Mapping\Loader\AttributeLoader;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
 class IbanValidatorTest extends ConstraintValidatorTestCase
 {
-    protected function createValidator()
+    protected function createValidator(): IbanValidator
     {
         return new IbanValidator();
     }
@@ -401,6 +401,12 @@ class IbanValidatorTest extends ConstraintValidatorTestCase
             ['UA213223130000026007233566002'], // Ukraine
             ['AE260211000000230064017'], // United Arab Emirates
             ['VA59001123000012345671'], // Vatican City State
+
+            // Checksum digits not between 02 and 98
+            ['FO00 5432 0388 8999 44'], // Faroe Islands
+            ['NL01INGB0001393698'], // Netherlands
+            ['NL01RABO0331811235'], // Netherlands
+            ['RU99 0445 2560 0407 0281 0412 3456 7890 1'], // Russia
         ];
     }
 
@@ -436,13 +442,10 @@ class IbanValidatorTest extends ConstraintValidatorTestCase
         $this->assertViolationRaised($iban, Iban::INVALID_COUNTRY_CODE_ERROR);
     }
 
-    /**
-     * @requires PHP 8
-     */
     public function testLoadFromAttribute()
     {
         $classMetadata = new ClassMetadata(IbanDummy::class);
-        (new AnnotationLoader())->loadClassMetadata($classMetadata);
+        (new AttributeLoader())->loadClassMetadata($classMetadata);
 
         [$constraint] = $classMetadata->properties['iban']->constraints;
 

@@ -23,16 +23,11 @@ use Symfony\Bridge\Doctrine\Types\UuidType;
 use Symfony\Component\Uid\AbstractUid;
 use Symfony\Component\Uid\Uuid;
 
-// DBAL 2 compatibility
-class_exists('Doctrine\DBAL\Platforms\MySqlPlatform');
-class_exists('Doctrine\DBAL\Platforms\PostgreSqlPlatform');
-
 final class UuidTypeTest extends TestCase
 {
     private const DUMMY_UUID = '9f755235-5a2d-4aba-9605-e9962b312e50';
 
-    /** @var UuidType */
-    private $type;
+    private UuidType $type;
 
     public static function setUpBeforeClass(): void
     {
@@ -158,10 +153,7 @@ final class UuidTypeTest extends TestCase
         yield [new PostgreSQLPlatform(), 'UUID'];
         yield [new SqlitePlatform(), 'BLOB'];
         yield [new MySQLPlatform(), 'BINARY(16)'];
-
-        if (class_exists(MariaDBPlatform::class)) {
-            yield [new MariaDBPlatform(), 'BINARY(16)'];
-        }
+        yield [new MariaDBPlatform(), 'BINARY(16)'];
     }
 
     public function testRequiresSQLCommentHint()

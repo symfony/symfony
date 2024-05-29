@@ -16,7 +16,7 @@ use Symfony\Component\Validator\Constraints\DisableAutoMapping;
 use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 use Symfony\Component\Validator\Mapping\AutoMappingStrategy;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
-use Symfony\Component\Validator\Mapping\Loader\AnnotationLoader;
+use Symfony\Component\Validator\Mapping\Loader\AttributeLoader;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
@@ -31,13 +31,10 @@ class DisableAutoMappingTest extends TestCase
         new DisableAutoMapping(['groups' => 'foo']);
     }
 
-    /**
-     * @requires PHP 8
-     */
     public function testDisableAutoMappingAttribute()
     {
         $metadata = new ClassMetadata(DisableAutoMappingDummy::class);
-        $loader = new AnnotationLoader();
+        $loader = new AttributeLoader();
         self::assertSame(AutoMappingStrategy::NONE, $metadata->getAutoMappingStrategy());
         self::assertTrue($loader->loadClassMetadata($metadata));
         self::assertSame(AutoMappingStrategy::DISABLED, $metadata->getAutoMappingStrategy());

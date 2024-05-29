@@ -37,6 +37,7 @@ final class InspectUlidCommandTest extends TestCase
   toBase32 (canonical)   01E439TP9XJZ9RPFH3T1PYBCR8            
   toBase58               1BKocMc5BnrVcuq2ti4Eqm                
   toRfc4122              0171069d-593d-97d3-8b3e-23d06de5b308  
+  toHex                  0x0171069d593d97d38b3e23d06de5b308    
  ---------------------- -------------------------------------- 
   Time                   2020-03-23 08:58:27.517 UTC           
  ---------------------- -------------------------------------- 

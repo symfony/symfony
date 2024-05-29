@@ -12,6 +12,7 @@
 namespace Symfony\Bundle\SecurityBundle\Tests\Functional\Bundle\CsrfFormLoginBundle\Controller;
 
 use Psr\Container\ContainerInterface;
+use Symfony\Bundle\SecurityBundle\Tests\Functional\Bundle\CsrfFormLoginBundle\Form\UserLoginType;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
@@ -20,7 +21,7 @@ use Twig\Environment;
 
 class LoginController implements ServiceSubscriberInterface
 {
-    private $container;
+    private ContainerInterface $container;
 
     public function __construct(ContainerInterface $container)
     {
@@ -29,7 +30,7 @@ class LoginController implements ServiceSubscriberInterface
 
     public function loginAction()
     {
-        $form = $this->container->get('form.factory')->create('Symfony\Bundle\SecurityBundle\Tests\Functional\Bundle\CsrfFormLoginBundle\Form\UserLoginType');
+        $form = $this->container->get('form.factory')->create(UserLoginType::class);
 
         return new Response($this->container->get('twig')->render('@CsrfFormLogin/Login/login.html.twig', [
             'form' => $form->createView(),
@@ -51,9 +52,6 @@ class LoginController implements ServiceSubscriberInterface
         throw new \Exception('Wrapper', 0, new \Exception('Another Wrapper', 0, new AccessDeniedException()));
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public static function getSubscribedServices(): array
     {
         return [

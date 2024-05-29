@@ -12,6 +12,7 @@
 namespace Symfony\Component\VarDumper\Tests\Caster;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\ErrorHandler\Exception\FlattenException;
 use Symfony\Component\ErrorHandler\Exception\SilencedErrorContext;
 use Symfony\Component\VarDumper\Caster\Caster;
 use Symfony\Component\VarDumper\Caster\ExceptionCaster;
@@ -273,9 +274,6 @@ EODUMP;
         $this->assertStringMatchesFormat($expectedDump, $dump);
     }
 
-    /**
-     * @requires function Twig\Template::getSourceContext
-     */
     public function testFrameWithTwig()
     {
         require_once \dirname(__DIR__).'/Fixtures/Twig.php';
@@ -343,8 +341,8 @@ EODUMP;
 
     public function testAnonymous()
     {
-        $e = new \Exception(sprintf('Boo "%s" ba.', \get_class(new class('Foo') extends \Exception {
-        })));
+        $e = new \Exception(sprintf('Boo "%s" ba.', (new class('Foo') extends \Exception {
+        })::class));
 
         $expectedDump = <<<'EODUMP'
 Exception {
@@ -356,5 +354,35 @@ Exception {
 EODUMP;
 
         $this->assertDumpMatchesFormat($expectedDump, $e, Caster::EXCLUDE_VERBOSE);
+    }
+
+    /**
+     * @requires function \Symfony\Component\ErrorHandler\Exception\FlattenException::create
+     */
+    public function testFlattenException()
+    {
+        $f = FlattenException::createFromThrowable(new \Exception('Hello'));
+
+        $expectedDump = <<<'EODUMP'
+array:1 [
+  0 => Symfony\Component\ErrorHandler\Exception\FlattenException {
+    -message: "Hello"
+    -code: 0
+    -previous: null
+    -trace: array:%d %a
+    -traceAsString: ""…%d
+    -class: "Exception"
+    -statusCode: 500
+    -statusText: "Internal Server Error"
+    -headers: []
+    -file: "%sExceptionCasterTest.php"
+    -line: %d
+    -asString: null
+    -dataRepresentation: ? Symfony\Component\VarDumper\Cloner\Data
+  }
+]
+EODUMP;
+
+        $this->assertDumpMatchesFormat($expectedDump, [$f], Caster::EXCLUDE_VERBOSE);
     }
 }

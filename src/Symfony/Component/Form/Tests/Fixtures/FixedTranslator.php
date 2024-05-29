@@ -15,14 +15,14 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class FixedTranslator implements TranslatorInterface
 {
-    private $translations;
+    private array $translations;
 
     public function __construct(array $translations)
     {
         $this->translations = $translations;
     }
 
-    public function trans(string $id, array $parameters = [], string $domain = null, string $locale = null): string
+    public function trans(string $id, array $parameters = [], ?string $domain = null, ?string $locale = null): string
     {
         return $this->translations[$id] ?? $id;
     }

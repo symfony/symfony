@@ -18,13 +18,11 @@ namespace Symfony\Component\VarExporter\Internal;
  */
 class Reference
 {
-    public $id;
-    public $value;
-    public $count = 0;
+    public int $count = 0;
 
-    public function __construct(int $id, $value = null)
-    {
-        $this->id = $id;
-        $this->value = $value;
+    public function __construct(
+        public readonly int $id,
+        public readonly mixed $value = null,
+    ) {
     }
 }

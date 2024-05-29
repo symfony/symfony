@@ -1,11 +1,199 @@
 {% extends '@WebProfiler/Profiler/layout.html.twig' %}
 
+{% block stylesheets %}
+    {{  parent() }}
+
+    <style>
+        :root {
+            --mailer-email-table-wrapper-background: var(--gray-100);
+            --mailer-email-table-active-row-background: #dbeafe;
+            --mailer-email-table-active-row-color: var(--color-text);
+        }
+        .theme-dark {
+            --mailer-email-table-wrapper-background: var(--gray-900);
+            --mailer-email-table-active-row-background: var(--gray-300);
+            --mailer-email-table-active-row-color: var(--gray-800);
+        }
+
+        .mailer-email-summary-table-wrapper {
+            background: var(--mailer-email-table-wrapper-background);
+            border-bottom: 4px double var(--table-border-color);
+            border-radius: inherit;
+            border-bottom-left-radius: 0;
+            border-bottom-right-radius: 0;
+            margin: 0 -9px 10px -9px;
+            padding-bottom: 10px;
+            transform: translateY(-9px);
+            max-height: 265px;
+            overflow-y: auto;
+        }
+        .mailer-email-summary-table,
+        .mailer-email-summary-table tr,
+        .mailer-email-summary-table td {
+            border: 0;
+            border-radius: inherit;
+            border-bottom-left-radius: 0;
+            border-bottom-right-radius: 0;
+            box-shadow: none;
+        }
+        .mailer-email-summary-table th {
+            color: var(--color-muted);
+            font-size: 13px;
+            padding: 4px 10px;
+        }
+        .mailer-email-summary-table tr td,
+        .mailer-email-summary-table tr:last-of-type td {
+            border: solid var(--table-border-color);
+            border-width: 1px 0;
+        }
+        .mailer-email-summary-table-row {
+            margin: 5px 0;
+        }
+        .mailer-email-summary-table-row:hover {
+            cursor: pointer;
+        }
+        .mailer-email-summary-table-row.active {
+            background: var(--mailer-email-table-active-row-background);
+            color: var(--mailer-email-table-active-row-color);
+        }
+        .mailer-email-summary-table-row td {
+            font-family: var(--font-family-system);
+            font-size: inherit;
+        }
+        .mailer-email-details {
+            display: none;
+        }
+        .mailer-email-details.active {
+            display: block;
+        }
+        .mailer-transport-information {
+            border-bottom: 1px solid var(--form-input-border-color);
+            padding-bottom: 5px;
+            font-size: var(--font-size-body);
+            margin: 5px 0 10px 5px;
+        }
+        .mailer-transport-information .badge {
+            font-size: inherit;
+            font-weight: inherit;
+        }
+        .mailer-message-subject {
+            font-size: 21px;
+            font-weight: bold;
+            margin: 5px;
+        }
+        .mailer-message-headers {
+            margin-bottom: 10px;
+        }
+        .mailer-message-headers p {
+            font-size: var(--font-size-body);
+            margin: 2px 5px;
+        }
+        .mailer-message-header-secondary {
+            color: var(--color-muted);
+        }
+        .mailer-message-attachments-title {
+            align-items: center;
+            display: flex;
+            font-size: var(--font-size-body);
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+        .mailer-message-attachments-title svg {
+            color: var(--color-muted);
+            margin-right: 5px;
+            height: 18px;
+            width: 18px;
+        }
+        .mailer-message-attachments-title span {
+            font-weight: normal;
+            margin-left: 4px;
+        }
+        .mailer-message-attachments-list {
+            list-style: none;
+            margin: 0 0 5px 20px;
+            padding: 0;
+        }
+        .mailer-message-attachments-list li {
+            align-items: center;
+            display: flex;
+        }
+        .mailer-message-attachments-list li svg {
+            margin-right: 5px;
+            height: 18px;
+            width: 18px;
+        }
+        .mailer-message-attachments-list li a {
+            margin-left: 5px;
+        }
+        .mailer-email-body {
+            margin: 0;
+            padding: 6px 8px;
+        }
+        .mailer-empty-email-body {
+            background-image: url("data:image/svg+xml,%3csvg width='100%25' height='100%25' xmlns='http://www.w3.org/2000/svg'%3e%3crect width='100%25' height='100%25' fill='none' stroke='%23e5e5e5' stroke-width='4' stroke-dasharray='6%2c 14' stroke-dashoffset='0' stroke-linecap='square'/%3e%3c/svg%3e");
+            border-radius: 6px;
+            color: var(--color-muted);
+            margin: 1em 0 0;
+            padding: .5em 1em;
+        }
+        .theme-dark .mailer-empty-email-body {
+            background-image: url("data:image/svg+xml,%3csvg width='100%25' height='100%25' xmlns='http://www.w3.org/2000/svg'%3e%3crect width='100%25' height='100%25' fill='none' stroke='%23737373' stroke-width='4' stroke-dasharray='6%2c 14' stroke-dashoffset='0' stroke-linecap='square'/%3e%3c/svg%3e");
+        }
+        .mailer-empty-email-body p {
+            font-size: var(--font-size-body);
+            margin: 0;
+            padding: 0.5em 0;
+        }
+
+        .mailer-message-download-raw {
+            align-items: center;
+            display: flex;
+            padding: 5px 0 0 5px;
+        }
+        .mailer-message-download-raw svg {
+            height: 18px;
+            width: 18px;
+            margin-right: 3px;
+        }
+    </style>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+
+    <script>
+        window.addEventListener('DOMContentLoaded', () => {
+            new SymfonyProfilerMailerPanel();
+        });
+
+        class SymfonyProfilerMailerPanel {
+            constructor() {
+                this.#initializeEmailsTable();
+            }
+
+            #initializeEmailsTable() {
+                const emailRows = document.querySelectorAll('.mailer-email-summary-table-row');
+
+                emailRows.forEach((emailRow) => {
+                    emailRow.addEventListener('click', () => {
+                        emailRows.forEach((row) => row.classList.remove('active'));
+                        emailRow.classList.add('active');
+
+                        document.querySelectorAll('.mailer-email-details').forEach((emailDetails) => emailDetails.style.display = 'none');
+                        document.querySelector(emailRow.getAttribute('data-target')).style.display = 'block';
+                    });
+                });
+            }
+        }
+    </script>
+{% endblock %}
+
 {% block toolbar %}
     {% set events = collector.events %}
 
     {% if events.messages|length %}
         {% set icon %}
-            {% include('@WebProfiler/Icon/mailer.svg') %}
+            {{ source('@WebProfiler/Icon/mailer.svg') }}
             <span class="sf-toolbar-value">{{ events.messages|length }}</span>
         {% endset %}
 
@@ -24,50 +212,13 @@
     {% endif %}
 {% endblock %}
 
-{% block head %}
-    {{ parent() }}
-    <style type="text/css">
-        /* utility classes */
-        .m-t-0 { margin-top: 0 !important; }
-        .m-t-10 { margin-top: 10px !important; }
-
-        /* basic grid */
-        .row {
-            display: flex;
-            flex-wrap: wrap;
-            margin-right: -15px;
-            margin-left: -15px;
-        }
-        .col {
-            flex-basis: 0;
-            flex-grow: 1;
-            max-width: 100%;
-            position: relative;
-            width: 100%;
-            min-height: 1px;
-            padding-right: 15px;
-            padding-left: 15px;
-        }
-        .col-4 {
-            flex: 0 0 33.333333%;
-            max-width: 33.333333%;
-        }
-
-        /* small tabs */
-        .sf-tabs-sm .tab-navigation li {
-            font-size: 14px;
-            padding: .3em .5em;
-        }
-    </style>
-{% endblock %}
-
 {% block menu %}
     {% set events = collector.events %}
 
     <span class="label {{ events.messages is empty ? 'disabled' }}">
-        <span class="icon">{{ include('@WebProfiler/Icon/mailer.svg') }}</span>
+        <span class="icon">{{ source('@WebProfiler/Icon/mailer.svg') }}</span>
 
-        <strong>E-mails</strong>
+        <strong>Emails</strong>
         {% if events.messages|length > 0 %}
             <span class="count">
                 <span>{{ events.messages|length }}</span>
@@ -78,140 +229,283 @@
 
 {% block panel %}
     {% set events = collector.events %}
-
     <h2>Emails</h2>
 
     {% if not events.messages|length %}
-        <div class="empty">
+        <div class="empty empty-panel">
             <p>No emails were sent.</p>
+        </div>
+    {% else %}
+        <div class="metrics">
+            <div class="metric-group">
+                <div class="metric">
+                    <span class="value">{{ events.events|filter(e => e.isQueued())|length }}</span>
+                    <span class="label">Queued</span>
+                </div>
+
+                <div class="metric">
+                    <span class="value">{{ events.events|filter(e => not e.isQueued())|length }}</span>
+                    <span class="label">Sent</span>
+                </div>
+            </div>
         </div>
     {% endif %}
 
-    <div class="metrics">
-        <div class="metric">
-            <span class="value">{{ events.events|filter(e => e.isQueued())|length }}</span>
-            <span class="label">Queued</span>
-        </div>
+    {% if events.transports|length > 1 %}
+        {% for transport in events.transports %}
+            <h2><code>{{ transport }}</code> transport</h2>
+            {{ _self.render_transport_details(collector, transport) }}
+        {% endfor %}
+    {% elseif events.transports is not empty %}
+        {{ _self.render_transport_details(collector, events.transports|first, true) }}
+    {% endif %}
 
-        <div class="metric">
-            <span class="value">{{ events.events|filter(e => not e.isQueued())|length }}</span>
-            <span class="label">Sent</span>
-        </div>
-    </div>
+    {% macro render_transport_details(collector, transport, show_transport_name = false) %}
+        <div class="card">
+            {% set num_emails = collector.events.events(transport)|length %}
+            {% if num_emails > 1 %}
+                <div class="mailer-email-summary-table-wrapper">
+                    <table class="mailer-email-summary-table">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Subject</th>
+                                <th>To</th>
+                                <th class="visually-hidden">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for event in collector.events.events(transport) %}
+                                <tr class="mailer-email-summary-table-row {{ loop.first ? 'active' }}" data-target="#email-{{ loop.index }}">
+                                    <td>{{ loop.index }}</td>
+                                    <td>
+                                        {% if event.message.subject is defined %}
+                                            {{ event.message.getSubject() ?? '(No subject)' }}
+                                        {% elseif event.message.headers.has('subject') %}
+                                            {{ event.message.headers.get('subject').bodyAsString()|default('(No subject)') }}
+                                        {% else %}
+                                            (No subject)
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if event.message.to is defined %}
+                                            {{ event.message.getTo()|map(addr => addr.toString())|join(', ')|default('(empty)') }}
+                                        {% elseif event.message.headers.has('to') %}
+                                            {{ event.message.headers.get('to').bodyAsString()|default('(empty)') }}
+                                        {% else %}
+                                            (empty)
+                                        {% endif %}
+                                    </td>
+                                    <td class="visually-hidden"><button class="mailer-email-summary-table-row-button" data-target="#email-{{ loop.index }}">View email details</button></td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
 
-    {% for transport in events.transports %}
-        <div class="card-block">
-            <div class="sf-tabs sf-tabs-sm">
-                {% for event in events.events(transport) %}
-                    {% set message = event.message %}
-                    <div class="tab">
-                        <h3 class="tab-title">Email {{ event.isQueued() ? 'queued' : 'sent via ' ~ transport }}</h3>
-                        <div class="tab-content">
-                            <div class="card">
-                                {% if message.headers is not defined %}
-                                    {# RawMessage instance #}
-                                    <div class="card-block">
-                                        <pre class="prewrap" style="max-height: 600px">{{ message.toString() }}</pre>
-                                    </div>
+                {% for event in collector.events.events(transport) %}
+                    <div class="mailer-email-details {{ loop.first ? 'active' }}" id="email-{{ loop.index }}">
+                        {{ _self.render_email_details(collector, transport, event.message, event.isQueued, show_transport_name) }}
+                    </div>
+                {% endfor %}
+            {% else %}
+                {% set event = (collector.events.events(transport)|first) %}
+                {{ _self.render_email_details(collector, transport, event.message, event.isQueued, show_transport_name) }}
+            {% endif %}
+        </div>
+    {% endmacro %}
+
+    {% macro render_email_details(collector, transport, message, message_is_queued, show_transport_name = false) %}
+        {% if show_transport_name %}
+            <p class="mailer-transport-information">
+                <strong>Status:</strong> <span class="badge badge-{{ message_is_queued ? 'warning' : 'success' }}">{{ message_is_queued ? 'Queued' : 'Sent' }}</span>
+                &bull;
+                <strong>Transport:</strong> <code>{{ transport }}</code>
+            </p>
+        {% endif %}
+
+        {% if message.headers is not defined %}
+            {# render the raw message contents #}
+            <a class="mailer-message-download-raw" href="data:application/octet-stream;base64,{{ collector.base64Encode(message.toString()) }}" download="email.eml">
+                {{ source('@WebProfiler/Icon/download.svg') }}
+                Download as EML file
+            </a>
+
+            <pre class="prewrap" style="max-height: 600px; margin-left: 5px">{{ message.toString() }}</pre>
+        {% else %}
+            <div class="sf-tabs">
+                <div class="tab">
+                    <h3 class="tab-title">Email contents</h3>
+                    <div class="tab-content">
+                        <div class="card-block">
+                            <p class="mailer-message-subject">
+                                {% if message.subject is defined %}
+                                    {{ message.getSubject() ?? '(No subject)' }}
+                                {% elseif message.headers.has('subject') %}
+                                    {{ message.headers.get('subject').bodyAsString()|default('(No subject)') }}
                                 {% else %}
-                                    {# Message instance #}
-                                    <div class="card-block">
-                                        <div class="sf-tabs sf-tabs-sm">
-                                            <div class="tab">
-                                                <h3 class="tab-title">Headers</h3>
-                                                <div class="tab-content">
-                                                    <span class="label">Subject</span>
-                                                    <h2 class="m-t-10">{{ message.getSubject() ?? '(empty)' }}</h2>
-                                                    <div class="row">
-                                                        <div class="col col-4">
-                                                            <span class="label">From</span>
-                                                            <pre class="prewrap">{{ message.getFrom()|map(addr => addr.toString())|join(', ')|default('(empty)') }}</pre>
+                                    (No subject)
+                                {% endif %}
+                            </p>
+                            <div class="mailer-message-headers">
+                                <p>
+                                    <strong>From:</strong>
+                                    {% if message.from is defined %}
+                                        {{ message.getFrom()|map(addr => addr.toString())|join(', ')|default('(empty)') }}
+                                    {% elseif message.headers.has('from') %}
+                                        {{ message.headers.get('from').bodyAsString()|default('(empty)') }}
+                                    {% else %}
+                                        (empty)
+                                    {% endif %}
+                                </p>
+                                <p>
+                                    <strong>To:</strong>
+                                    {% if message.to is defined %}
+                                        {{ message.getTo()|map(addr => addr.toString())|join(', ')|default('(empty)') }}
+                                    {% elseif message.headers.has('to') %}
+                                        {{ message.headers.get('to').bodyAsString()|default('(empty)') }}
+                                    {% else %}
+                                        (empty)
+                                    {% endif %}
+                                </p>
+                                {% for header in message.headers.all|filter(header => (header.name ?? '')|lower not in ['subject', 'from', 'to']) %}
+                                    <p class="mailer-message-header-secondary">{{ header.toString }}</p>
+                                {% endfor %}
+                            </div>
+                        </div>
 
-                                                            <span class="label">To</span>
-                                                            <pre class="prewrap">{{ message.getTo()|map(addr => addr.toString())|join(', ')|default('(empty)') }}</pre>
-                                                        </div>
-                                                        <div class="col">
-                                                            <span class="label">Headers</span>
-                                                            <pre class="prewrap">{% for header in message.headers.all|filter(header => (header.name ?? '')|lower not in ['subject', 'from', 'to']) %}
-                                                                {{- header.toString }}
-                                                            {%~ endfor %}</pre>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            {% if message.htmlBody is defined %}
-                                                {# Email instance #}
-                                                {% set htmlBody = message.htmlBody() %}
-                                                {% if htmlBody is not null %}
-                                                    <div class="tab">
-                                                        <h3 class="tab-title">HTML Preview</h3>
-                                                        <div class="tab-content">
-                                                            <pre class="prewrap" style="max-height: 600px">
-                                                                <iframe
-                                                                    src="data:text/html;charset=utf-8;base64,{{ collector.base64Encode(htmlBody) }}"
-                                                                    style="height: 80vh;width: 100%;"
-                                                                >
-                                                                </iframe>
-                                                            </pre>
-                                                        </div>
-                                                    </div>
-                                                    <div class="tab">
-                                                        <h3 class="tab-title">HTML Content</h3>
-                                                        <div class="tab-content">
-                                                            <pre class="prewrap" style="max-height: 600px">
-                                                                {%- if message.htmlCharset() %}
-                                                                    {{- htmlBody|convert_encoding('UTF-8', message.htmlCharset()) }}
-                                                                {%- else %}
-                                                                    {{- htmlBody }}
-                                                                {%- endif -%}
-                                                            </pre>
-                                                        </div>
-                                                    </div>
-                                                {% endif %}
-                                                {% set textBody = message.textBody() %}
-                                                {% if textBody is not null %}
-                                                    <div class="tab">
-                                                        <h3 class="tab-title">Text Content</h3>
-                                                        <div class="tab-content">
-                                                            <pre class="prewrap" style="max-height: 600px">
-                                                                {%- if message.textCharset() %}
-                                                                    {{- textBody|convert_encoding('UTF-8', message.textCharset()) }}
-                                                                {%- else %}
-                                                                    {{- textBody }}
-                                                                {%- endif -%}
-                                                            </pre>
-                                                        </div>
-                                                    </div>
-                                                {% endif %}
-                                                {% for attachment in message.attachments %}
-                                                    <div class="tab">
-                                                        <h3 class="tab-title">Attachment #{{ loop.index }}</h3>
-                                                        <div class="tab-content">
-                                                            <pre class="prewrap" style="max-height: 600px">{{ attachment.toString() }}</pre>
-                                                        </div>
-                                                    </div>
-                                                {% endfor %}
+                        {% if message.attachments is defined and message.attachments %}
+                            <div class="card-block">
+                                {% set num_of_attachments = message.attachments|length %}
+                                {% set total_attachments_size_in_bytes = message.attachments|reduce((total_size, attachment) => total_size + attachment.body|length, 0) %}
+                                <p class="mailer-message-attachments-title">
+                                    {{ source('@WebProfiler/Icon/attachment.svg') }}
+                                    Attachments <span>({{ num_of_attachments }} file{{ num_of_attachments > 1 ? 's' }} / {{ _self.render_file_size_humanized(total_attachments_size_in_bytes) }})</span>
+                                </p>
+
+                                <ul class="mailer-message-attachments-list">
+                                    {% for attachment in message.attachments %}
+                                        <li>
+                                            {{ source('@WebProfiler/Icon/file.svg') }}
+
+                                            {% if attachment.filename|default %}
+                                                {{ attachment.filename }}
+                                            {% else %}
+                                                <em>(no filename)</em>
                                             {% endif %}
-                                            <div class="tab">
-                                                <h3 class="tab-title">Parts Hierarchy</h3>
-                                                <div class="tab-content">
-                                                    <pre class="prewrap" style="max-height: 600px">{{ message.body().asDebugString() }}</pre>
-                                                </div>
+
+                                            ({{ _self.render_file_size_humanized(attachment.body|length) }})
+
+                                            <a href="data:{{ attachment.contentType|default('application/octet-stream') }};base64,{{ collector.base64Encode(attachment.body) }}" download="{{ attachment.filename|default('attachment') }}">Download</a>
+                                        </li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        {% endif %}
+
+                        <div class="card-block">
+                            <div class="sf-tabs sf-tabs-sm">
+                            {% if message.htmlBody is defined %}
+                                {% set textBody = message.textBody %}
+                                {% set htmlBody = message.htmlBody %}
+                                <div class="tab {{ not textBody ? 'disabled' }} {{ textBody ? 'active' }}">
+                                    <h3 class="tab-title">Text content</h3>
+                                    <div class="tab-content">
+                                        {% if textBody %}
+                                            <pre class="mailer-email-body prewrap" style="max-height: 600px">
+                                                {%- if message.textCharset() %}
+                                                    {{- textBody|convert_encoding('UTF-8', message.textCharset()) }}
+                                                {%- else %}
+                                                    {{- textBody }}
+                                                {%- endif -%}
+                                            </pre>
+                                        {% else %}
+                                            <div class="mailer-empty-email-body">
+                                                <p>The text body is empty.</p>
                                             </div>
-                                            <div class="tab">
-                                                <h3 class="tab-title">Raw</h3>
-                                                <div class="tab-content">
-                                                    <pre class="prewrap" style="max-height: 600px">{{ message.toString() }}</pre>
-                                                </div>
-                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+
+                                {% if htmlBody %}
+                                    <div class="tab">
+                                        <h3 class="tab-title">HTML preview</h3>
+                                        <div class="tab-content">
+                                            <pre class="prewrap" style="max-height: 600px"><iframe src="data:text/html;charset=utf-8;base64,{{ collector.base64Encode(htmlBody) }}" style="height: 80vh;width: 100%;"></iframe>
+                                            </pre>
                                         </div>
                                     </div>
                                 {% endif %}
+
+                                <div class="tab {{ not htmlBody ? 'disabled' }} {{ not textBody and htmlBody ? 'active' }}">
+                                    <h3 class="tab-title">HTML content</h3>
+                                    <div class="tab-content">
+                                        {% if htmlBody %}
+                                            <pre class="mailer-email-body prewrap" style="max-height: 600px">
+                                                {%- if message.htmlCharset() %}
+                                                    {{- htmlBody|convert_encoding('UTF-8', message.htmlCharset()) }}
+                                                {%- else %}
+                                                    {{- htmlBody }}
+                                                {%- endif -%}
+                                            </pre>
+                                        {% else %}
+                                            <div class="mailer-empty-email-body">
+                                                <p>The HTML body is empty.</p>
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            {% else %}
+                                {% set body = message.body ? message.body.toString() : null %}
+                                <div class="tab {{ not body ? 'disabled' }} {{ body ? 'active' }}">
+                                    <h3 class="tab-title">Content</h3>
+                                    <div class="tab-content">
+                                        {% if body %}
+                                            <pre class="mailer-email-body prewrap" style="max-height: 600px">
+                                                {{- body }}
+                                            </pre>
+                                        {% else %}
+                                            <div class="mailer-empty-email-body">
+                                                <p>The body is empty.</p>
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            {% endif %}
                             </div>
                         </div>
                     </div>
-                {% endfor %}
+                </div>
+
+                <div class="tab">
+                    <h3 class="tab-title">MIME parts</h3>
+                    <div class="tab-content">
+                        <pre class="prewrap" style="max-height: 600px; margin-left: 5px">{{ message.body().asDebugString() }}</pre>
+                    </div>
+                </div>
+
+                <div class="tab">
+                    <h3 class="tab-title">Raw Message</h3>
+                    <div class="tab-content">
+                        <a class="mailer-message-download-raw" href="data:application/octet-stream;base64,{{ collector.base64Encode(message.toString()) }}" download="email.eml">
+                            {{ source('@WebProfiler/Icon/download.svg') }}
+                            Download as EML file
+                        </a>
+
+                        <pre class="prewrap" style="max-height: 600px; margin-left: 5px">{{ message.toString() }}</pre>
+                    </div>
+                </div>
             </div>
-        </div>
-    {% endfor %}
+        {% endif %}
+    {% endmacro %}
+
+    {% macro render_file_size_humanized(bytes) %}
+        {%- if bytes < 1000 -%}
+            {{- bytes ~ ' bytes' -}}
+        {%- elseif bytes < 1000 ** 2 -%}
+            {{- (bytes / 1000)|number_format(2) ~ ' kB' -}}
+        {%- else -%}
+            {{- (bytes / 1000 ** 2)|number_format(2) ~ ' MB' -}}
+        {%- endif -%}
+    {% endmacro %}
 {% endblock %}

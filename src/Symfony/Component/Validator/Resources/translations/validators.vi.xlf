@@ -438,6 +438,10 @@
                 <source>This value is not a valid MAC address.</source>
                 <target state="needs-review-translation">Giá trị này không phải là địa chỉ MAC hợp lệ.</target>
             </trans-unit>
+            <trans-unit id="113">
+                <source>This URL is missing a top-level domain.</source>
+                <target state="needs-review-translation">URL này thiếu miền cấp cao.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

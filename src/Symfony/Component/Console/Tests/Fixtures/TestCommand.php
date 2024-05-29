@@ -6,7 +6,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class TestCommand extends Command
 {
-    protected function configure()
+    protected function configure(): void
     {
         $this
             ->setName('namespace:name')
@@ -23,7 +23,7 @@ class TestCommand extends Command
         return 0;
     }
 
-    protected function interact(InputInterface $input, OutputInterface $output)
+    protected function interact(InputInterface $input, OutputInterface $output): void
     {
         $output->writeln('interact called');
     }

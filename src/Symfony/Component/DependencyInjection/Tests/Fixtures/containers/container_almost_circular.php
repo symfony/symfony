@@ -12,7 +12,7 @@ $container = new ContainerBuilder();
 
 // factory with lazy injection
 
-$container->register('doctrine.config', 'stdClass')->setPublic(false)
+$container->register('doctrine.config', 'stdClass')
     ->setProperty('resolver', new Reference('doctrine.entity_listener_resolver'))
     ->setProperty('flag', 'ok');
 
@@ -62,7 +62,7 @@ $container->register('monolog.logger_2', 'stdClass')->setPublic($public)
 $container->register('monolog_inline.logger', 'stdClass')->setPublic(true)
     ->setProperty('handler', new Reference('mailer_inline.mailer'));
 
-$container->register('mailer_inline.mailer', 'stdClass')->setPublic(false)
+$container->register('mailer_inline.mailer', 'stdClass')
     ->addArgument(
         (new Definition('stdClass'))
             ->setFactory([new Reference('mailer_inline.transport_factory'), 'create'])
@@ -138,7 +138,7 @@ $container->register('connection', 'stdClass')->setPublic(true)
     ->addArgument(new Reference('dispatcher'))
     ->addArgument(new Reference('config'));
 
-$container->register('config', 'stdClass')->setPublic(false)
+$container->register('config', 'stdClass')
     ->setProperty('logger', new Reference('logger'));
 
 $container->register('dispatcher', 'stdClass')->setPublic($public)
@@ -153,7 +153,7 @@ $container->register('subscriber', 'stdClass')->setPublic(true)
 $container->register('manager2', 'stdClass')->setPublic(true)
     ->addArgument(new Reference('connection2'));
 
-$container->register('logger2', 'stdClass')->setPublic(false)
+$container->register('logger2', 'stdClass')
     ->addArgument(new Reference('connection2'))
     ->setProperty('handler2', (new Definition('stdClass'))->addArgument(new Reference('manager2')))
 ;
@@ -161,14 +161,14 @@ $container->register('connection2', 'stdClass')->setPublic(true)
     ->addArgument(new Reference('dispatcher2'))
     ->addArgument(new Reference('config2'));
 
-$container->register('config2', 'stdClass')->setPublic(false)
+$container->register('config2', 'stdClass')
     ->setProperty('logger2', new Reference('logger2'));
 
 $container->register('dispatcher2', 'stdClass')->setPublic($public)
     ->setLazy($public)
     ->setProperty('subscriber2', new Reference('subscriber2'));
 
-$container->register('subscriber2', 'stdClass')->setPublic(false)
+$container->register('subscriber2', 'stdClass')
     ->addArgument(new Reference('manager2'));
 
 // doctrine-like event system with listener
@@ -207,7 +207,6 @@ $container->register('foo6', 'stdClass')
     ->setProperty('bar6', new Reference('bar6'));
 
 $container->register('bar6', 'stdClass')
-    ->setPublic(false)
     ->addArgument(new Reference('foo6'));
 
 $container->register('baz6', 'stdClass')

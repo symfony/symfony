@@ -17,8 +17,6 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 return static function (ContainerConfigurator $container) {
     $container->services()
         ->set('translator', IdentityTranslator::class)
-            ->public()
-            ->tag('container.private', ['package' => 'symfony/framework-bundle', 'version' => '5.2'])
         ->alias(TranslatorInterface::class, 'translator')
 
         ->set('identity_translator', IdentityTranslator::class)

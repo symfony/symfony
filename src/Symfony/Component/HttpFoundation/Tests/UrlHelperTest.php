@@ -82,19 +82,17 @@ class UrlHelperTest extends TestCase
 
         $requestContext = new RequestContext($baseUrl, 'GET', $host, $scheme, $httpPort, $httpsPort, $path);
         $contextAware = new class($requestContext) implements RequestContextAwareInterface {
-            private $requestContext;
-
-            public function __construct($requestContext)
-            {
-                $this->requestContext = $requestContext;
+            public function __construct(
+                private RequestContext $requestContext,
+            ) {
             }
 
-            public function setContext(RequestContext $context)
+            public function setContext(RequestContext $context): void
             {
                 $this->requestContext = $context;
             }
 
-            public function getContext()
+            public function getContext(): RequestContext
             {
                 return $this->requestContext;
             }
@@ -153,10 +151,6 @@ class UrlHelperTest extends TestCase
      */
     public function testGenerateRelativePath($expected, $path, $pathinfo)
     {
-        if (!method_exists(Request::class, 'getRelativeUriForPath')) {
-            $this->markTestSkipped('Your version of Symfony HttpFoundation is too old.');
-        }
-
         $stack = new RequestStack();
         $stack->push(Request::create($pathinfo));
         $urlHelper = new UrlHelper($stack);

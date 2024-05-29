@@ -165,6 +165,17 @@ class ResolveInvalidReferencesPassTest extends TestCase
         $this->assertEquals($unknownArgument, $decoratorDefinition->getArguments()[1]);
     }
 
+    public function testProcessExcludedServiceAndNullOnInvalid()
+    {
+        $container = new ContainerBuilder();
+        $container->register('foo', \stdClass::class)->addTag('container.excluded');
+        $container->register('bar', \stdClass::class)->addArgument(new Reference('foo', $container::NULL_ON_INVALID_REFERENCE));
+
+        $this->process($container);
+
+        $this->assertSame([null], $container->getDefinition('bar')->getArguments());
+    }
+
     protected function process(ContainerBuilder $container)
     {
         $pass = new ResolveInvalidReferencesPass();

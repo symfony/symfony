@@ -22,7 +22,7 @@ class CasterTest extends TestCase
 {
     use VarDumperTestTrait;
 
-    private static $referenceArray = [
+    private static array $referenceArray = [
         'null' => null,
         'empty' => false,
         'public' => 'pub',
@@ -185,4 +185,32 @@ EOTXT
             }
         });
     }
+
+    public function testClassHierarchy()
+    {
+        $this->assertDumpMatchesFormat(<<<'DUMP'
+            Symfony\Component\VarDumper\Tests\Caster\B {
+              +a: "a"
+              #b: "b"
+              -c: "c"
+              +d: "d"
+              #e: "e"
+              -f: "f"
+            }
+            DUMP, new B());
+    }
+}
+
+class A
+{
+    public $a = 'a';
+    protected $b = 'b';
+    private $c = 'c';
+}
+
+class B extends A
+{
+    public $d = 'd';
+    protected $e = 'e';
+    private $f = 'f';
 }

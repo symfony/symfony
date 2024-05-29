@@ -41,7 +41,7 @@ class GlobResourceTest extends TestCase
 
         $paths = iterator_to_array($resource);
 
-        $file = $dir.\DIRECTORY_SEPARATOR.'Resource'.\DIRECTORY_SEPARATOR.'ConditionalClass.php';
+        $file = $dir.'/Resource'.\DIRECTORY_SEPARATOR.'ConditionalClass.php';
         $this->assertEquals([$file => $file], $paths);
         $this->assertInstanceOf(\SplFileInfo::class, current($paths));
         $this->assertSame($dir, $resource->getPrefix());
@@ -172,7 +172,6 @@ class GlobResourceTest extends TestCase
         $resource = new GlobResource($dir, '/*{/*/*.txt,.x{m,n}l}', true);
 
         $p = new \ReflectionProperty($resource, 'globBrace');
-        $p->setAccessible(true);
         $p->setValue($resource, 0);
 
         $expected = [
@@ -190,7 +189,6 @@ class GlobResourceTest extends TestCase
         $resource = new GlobResource($dir, '/*{/*/*.txt,.x{m,nl}', true);
 
         $p = new \ReflectionProperty($resource, 'globBrace');
-        $p->setAccessible(true);
         $p->setValue($resource, 0);
 
         $this->assertSame([], array_keys(iterator_to_array($resource)));
@@ -204,7 +202,6 @@ class GlobResourceTest extends TestCase
         $newResource = unserialize(serialize($resource));
 
         $p = new \ReflectionProperty($resource, 'globBrace');
-        $p->setAccessible(true);
 
         $this->assertEquals($p->getValue($resource), $p->getValue($newResource));
     }

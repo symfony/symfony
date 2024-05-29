@@ -14,8 +14,10 @@ Definitions
 - Abstract: yes
 - Autowired: no
 - Autoconfigured: no
+- Deprecated: no
 - Factory Class: `Full\Qualified\FactoryClass`
 - Factory Method: `get`
+- Usages: none
 
 ### definition_without_class
 
@@ -27,6 +29,8 @@ Definitions
 - Abstract: no
 - Autowired: no
 - Autoconfigured: no
+- Deprecated: no
+- Usages: none
 
 ### service_container
 
@@ -39,6 +43,8 @@ Definitions
 - Abstract: no
 - Autowired: no
 - Autoconfigured: no
+- Deprecated: no
+- Usages: none
 
 
 Aliases

@@ -22,7 +22,7 @@ trait AutoconfigureTrait
      *
      * @throws InvalidArgumentException when a parent is already set
      */
-    final public function autoconfigure(bool $autoconfigured = true): self
+    final public function autoconfigure(bool $autoconfigured = true): static
     {
         $this->definition->setAutoconfigured($autoconfigured);
 

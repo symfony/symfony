@@ -110,10 +110,35 @@ class EsmtpTransportFactoryTest extends TransportFactoryTestCase
         ];
 
         $transport = new EsmtpTransport('example.com', 465, true, null, $logger);
+        /** @var SocketStream $stream */
+        $stream = $transport->getStream();
+        $streamOptions = $stream->getStreamOptions();
+        $streamOptions['ssl']['peer_fingerprint'] = '6A1CF3B08D175A284C30BC10DE19162307C7286E';
+        $stream->setStreamOptions($streamOptions);
+
+        yield [
+            new Dsn('smtps', 'example.com', '', '', 465, ['peer_fingerprint' => '6A1CF3B08D175A284C30BC10DE19162307C7286E']),
+            $transport,
+        ];
+
+        yield [
+            Dsn::fromString('smtps://:@example.com?peer_fingerprint=6A1CF3B08D175A284C30BC10DE19162307C7286E'),
+            $transport,
+        ];
+
+        $transport = new EsmtpTransport('example.com', 465, true, null, $logger);
         $transport->setLocalDomain('example.com');
 
         yield [
             new Dsn('smtps', 'example.com', '', '', 465, ['local_domain' => 'example.com']),
+            $transport,
+        ];
+
+        $transport = new EsmtpTransport('example.com', 465, true, null, $logger);
+        $transport->setMaxPerSecond(2.0);
+
+        yield [
+            new Dsn('smtps', 'example.com', '', '', 465, ['max_per_second' => '2']),
             $transport,
         ];
 
@@ -130,6 +155,29 @@ class EsmtpTransportFactoryTest extends TransportFactoryTestCase
 
         yield [
             new Dsn('smtps', 'example.com', '', '', 465, ['ping_threshold' => '10']),
+            $transport,
+        ];
+
+        $transport = new EsmtpTransport('example.com', 25, false, null, $logger);
+        $transport->setAutoTls(false);
+
+        yield [
+            new Dsn('smtp', 'example.com', '', '', 25, ['auto_tls' => false]),
+            $transport,
+        ];
+        yield [
+            new Dsn('smtp', 'example.com', '', '', 0, ['auto_tls' => false]),
+            $transport,
+        ];
+        yield [
+            Dsn::fromString('smtp://:@example.com?auto_tls=false'),
+            $transport,
+        ];
+
+        $transport = new EsmtpTransport('example.com', 465, false, null, $logger);
+        $transport->setAutoTls(false);
+        yield [
+            Dsn::fromString('smtp://:@example.com:465?auto_tls=false'),
             $transport,
         ];
     }

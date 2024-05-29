@@ -20,7 +20,7 @@ use Symfony\Component\Console\Tester\CommandTester;
  */
 class RouterDebugCommandTest extends AbstractWebTestCase
 {
-    private $application;
+    private Application $application;
 
     protected function setUp(): void
     {
@@ -81,9 +81,11 @@ class RouterDebugCommandTest extends AbstractWebTestCase
 
     public function testSearchWithThrow()
     {
+        $tester = $this->createCommandTester();
+
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('The route "gerard" does not exist.');
-        $tester = $this->createCommandTester();
+
         $tester->execute(['name' => 'gerard'], ['interactive' => true]);
     }
 
@@ -92,12 +94,22 @@ class RouterDebugCommandTest extends AbstractWebTestCase
      */
     public function testComplete(array $input, array $expectedSuggestions)
     {
-        if (!class_exists(CommandCompletionTester::class)) {
-            $this->markTestSkipped('Test command completion requires symfony/console 5.4+.');
-        }
-
         $tester = new CommandCompletionTester($this->application->get('debug:router'));
         $this->assertSame($expectedSuggestions, $tester->complete($input));
+    }
+
+    /**
+     * @testWith    ["txt"]
+     *              ["xml"]
+     *              ["json"]
+     *              ["md"]
+     */
+    public function testShowAliases(string $format)
+    {
+        $tester = $this->createCommandTester();
+
+        $this->assertSame(0, $tester->execute(['--show-aliases' => true, '--format' => $format]));
+        $this->assertStringContainsString('my_custom_alias', $tester->getDisplay());
     }
 
     public static function provideCompletionSuggestions(): iterable

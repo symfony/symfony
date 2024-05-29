@@ -12,14 +12,15 @@
 namespace Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\Controller;
 
 use Psr\Log\LoggerInterface;
-use Symfony\Component\DependencyInjection\ContainerAwareInterface;
-use Symfony\Component\DependencyInjection\ContainerAwareTrait;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 
-class SubRequestServiceResolutionController implements ContainerAwareInterface
+class SubRequestServiceResolutionController
 {
-    use ContainerAwareTrait;
+    public function __construct(private ContainerInterface $container)
+    {
+    }
 
     public function indexAction()
     {

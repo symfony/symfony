@@ -32,13 +32,13 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
  */
 class Firewall implements EventSubscriberInterface
 {
-    private $map;
-    private $dispatcher;
+    private FirewallMapInterface $map;
+    private EventDispatcherInterface $dispatcher;
 
     /**
      * @var \SplObjectStorage<Request, ExceptionListener>
      */
-    private $exceptionListeners;
+    private \SplObjectStorage $exceptionListeners;
 
     public function __construct(FirewallMapInterface $map, EventDispatcherInterface $dispatcher)
     {
@@ -47,6 +47,9 @@ class Firewall implements EventSubscriberInterface
         $this->exceptionListeners = new \SplObjectStorage();
     }
 
+    /**
+     * @return void
+     */
     public function onKernelRequest(RequestEvent $event)
     {
         if (!$event->isMainRequest()) {
@@ -92,6 +95,9 @@ class Firewall implements EventSubscriberInterface
         $this->callListeners($event, $authenticationListeners());
     }
 
+    /**
+     * @return void
+     */
     public function onKernelFinishRequest(FinishRequestEvent $event)
     {
         $request = $event->getRequest();
@@ -103,7 +109,7 @@ class Firewall implements EventSubscriberInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @return array
      */
     public static function getSubscribedEvents()
     {
@@ -113,6 +119,9 @@ class Firewall implements EventSubscriberInterface
         ];
     }
 
+    /**
+     * @return void
+     */
     protected function callListeners(RequestEvent $event, iterable $listeners)
     {
         foreach ($listeners as $listener) {

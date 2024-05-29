@@ -1,6 +1,101 @@
 CHANGELOG
 =========
 
+7.1
+---
+
+ * Add method `isKernelTerminating()` to `ExceptionEvent` that allows to check if an exception was thrown while the kernel is being terminated
+ * Add `HttpException::fromStatusCode()`
+ * Add `$validationFailedStatusCode` argument to `#[MapQueryParameter]` that allows setting a custom HTTP status code when validation fails
+ * Add `NearMissValueResolverException` to let value resolvers report when an argument could be under their watch but failed to be resolved
+ * Add `$type` argument to `#[MapRequestPayload]` that allows mapping a list of items
+ * The `Extension` class is marked as internal, extend the `Extension` class from the DependencyInjection component instead
+ * Deprecate `Extension::addAnnotatedClassesToCompile()`
+ * Deprecate `AddAnnotatedClassesToCachePass`
+ * Deprecate the `setAnnotatedClassCache()` and `getAnnotatedClassesToCompile()` methods of the `Kernel` class
+ * Add `#[MapUploadedFile]` attribute to fetch, validate, and inject uploaded files into controller arguments
+
+7.0
+---
+
+ * Add argument `$reflector` to `ArgumentResolverInterface::getArguments()` and `ArgumentMetadataFactoryInterface::createArgumentMetadata()`
+ * Remove `ArgumentValueResolverInterface`, use `ValueResolverInterface` instead
+ * Remove `StreamedResponseListener`
+ * Remove `AbstractSurrogate::$phpEscapeMap`
+ * Remove `HttpKernelInterface::MASTER_REQUEST`
+ * Remove `terminate_on_cache_hit` option from `HttpCache`
+ * Require explicit argument when calling `ConfigDataCollector::setKernel()`, `RouterListener::setCurrentRequest()`
+ * Remove `Kernel::stripComments()`
+ * Remove `FileLinkFormatter`, use `FileLinkFormatter` from the ErrorHandler component instead
+ * Remove `UriSigner`, use `UriSigner` from the HttpFoundation component instead
+ * Add argument `$buildDir` to `WarmableInterface`
+ * Add argument `$filter` to `Profiler::find()` and `FileProfilerStorage::find()`
+
+6.4
+---
+
+ * Support backed enums in #[MapQueryParameter]
+ * `BundleInterface` no longer extends `ContainerAwareInterface`
+ * Add optional `$className` parameter to `ControllerEvent::getAttributes()`
+ * Add native return types to `TraceableEventDispatcher` and to `MergeExtensionConfigurationPass`
+ * Add argument `$validationFailedStatusCode` to `#[MapQueryString]` and `#[MapRequestPayload]`
+ * Add argument `$debug` to `Logger`
+ * Add class `DebugLoggerConfigurator`
+ * Add parameters `kernel.runtime_mode` and `kernel.runtime_mode.*`, all set from env var `APP_RUNTIME_MODE`
+ * Deprecate `Kernel::stripComments()`
+ * Support the `!` character at the beginning of a string as a negation operator in the url filter of the profiler
+ * Deprecate `UriSigner`, use `UriSigner` from the HttpFoundation component instead
+ * Deprecate `FileLinkFormatter`, use `FileLinkFormatter` from the ErrorHandler component instead
+ * Add argument `$buildDir` to `WarmableInterface`
+ * Add argument `$filter` to `Profiler::find()` and `FileProfilerStorage::find()`
+ * Add `ControllerResolver::allowControllers()` to define which callables are legit controllers when the `_check_controller_is_allowed` request attribute is set
+
+6.3
+---
+
+ * Deprecate parameters `container.dumper.inline_factories` and `container.dumper.inline_class_loader`, use `.container.dumper.inline_factories` and `.container.dumper.inline_class_loader` instead
+ * `FileProfilerStorage` removes profiles automatically after two days
+ * Add `#[WithHttpStatus]` for defining status codes for exceptions
+ * Use an instance of `Psr\Clock\ClockInterface` to generate the current date time in `DateTimeValueResolver`
+ * Add `#[WithLogLevel]` for defining log levels for exceptions
+ * Add `skip_response_headers` to the `HttpCache` options
+ * Introduce targeted value resolvers with `#[ValueResolver]` and `#[AsTargetedValueResolver]`
+ * Add `#[MapRequestPayload]` to map and validate request payload from `Request::getContent()` or `Request::$request->all()` to typed objects
+ * Add `#[MapQueryString]` to map and validate request query string from `Request::$query->all()` to typed objects
+ * Add `#[MapQueryParameter]` to map and validate individual query parameters to controller arguments
+ * Collect data from every event dispatcher
+
+6.2
+---
+
+ * Add constructor argument `bool $handleAllThrowable` to `HttpKernel`
+ * Add `ControllerEvent::getAttributes()` to handle attributes on controllers
+ * Add `#[Cache]` to describe the default HTTP cache headers on controllers
+ * Add `absolute_uri` option to surrogate fragment renderers
+ * Add `ValueResolverInterface` and deprecate `ArgumentValueResolverInterface`
+ * Add argument `$reflector` to `ArgumentResolverInterface` and `ArgumentMetadataFactoryInterface`
+ * Deprecate calling `ConfigDataCollector::setKernel()`, `RouterListener::setCurrentRequest()` without arguments
+
+6.1
+---
+
+ * Add `BackedEnumValueResolver` to resolve backed enum cases from request attributes in controller arguments
+ * Add `DateTimeValueResolver` to resolve request attributes into DateTime objects in controller arguments
+ * Deprecate StreamedResponseListener, it's not needed anymore
+ * Add `Profiler::isEnabled()` so collaborating collector services may elect to omit themselves
+ * Add the `UidValueResolver` argument value resolver
+ * Add `AbstractBundle` class for DI configuration/definition on a single file
+ * Update the path of a bundle placed in the `src/` directory to the parent directory when `AbstractBundle` is used
+
+6.0
+---
+
+ * Remove `ArgumentInterface`
+ * Remove `ArgumentMetadata::getAttribute()`, use `getAttributes()` instead
+ * Remove support for returning a `ContainerBuilder` from `KernelInterface::registerContainerConfiguration()`
+ * Remove `KernelEvent::isMasterRequest()`, use `isMainRequest()` instead
+ * Remove support for `service:action` syntax to reference controllers, use `serviceOrFqcn::method` instead
+
 5.4
 ---
 

@@ -1,0 +1,24 @@
+imports:
+    - { resource: ../config/default.yml }
+
+services:
+    Symfony\Bundle\FrameworkBundle\Tests\Functional\TestEntityValueResolver:
+        tags:
+            - { name: controller.argument_value_resolver, priority: 110 }
+
+    Symfony\Bundle\FrameworkBundle\Tests\Functional\WithAttributesController:
+        public: true
+
+security:
+    providers:
+        main:
+            memory:
+                users:
+                    the-username: { password: the-password, roles: [ 'ROLE_USER' ] }
+
+    firewalls:
+        main:
+            pattern: ^/
+            form_login:
+                login_path: /login
+            provider: main

@@ -22,19 +22,21 @@ use Symfony\Component\DependencyInjection\Exception\RuntimeException;
  */
 final class AttributeAutoconfigurationPass extends AbstractRecursivePass
 {
-    private $classAttributeConfigurators = [];
-    private $methodAttributeConfigurators = [];
-    private $propertyAttributeConfigurators = [];
-    private $parameterAttributeConfigurators = [];
+    protected bool $skipScalars = true;
+
+    private array $classAttributeConfigurators = [];
+    private array $methodAttributeConfigurators = [];
+    private array $propertyAttributeConfigurators = [];
+    private array $parameterAttributeConfigurators = [];
 
     public function process(ContainerBuilder $container): void
     {
-        if (80000 > \PHP_VERSION_ID || !$container->getAutoconfiguredAttributes()) {
+        if (!$container->getAutoconfiguredAttributes()) {
             return;
         }
 
         foreach ($container->getAutoconfiguredAttributes() as $attributeName => $callable) {
-            $callableReflector = new \ReflectionFunction(\Closure::fromCallable($callable));
+            $callableReflector = new \ReflectionFunction($callable(...));
             if ($callableReflector->getNumberOfParameters() <= 2) {
                 $this->classAttributeConfigurators[$attributeName] = $callable;
                 continue;
@@ -55,7 +57,7 @@ final class AttributeAutoconfigurationPass extends AbstractRecursivePass
 
             try {
                 $attributeReflector = new \ReflectionClass($attributeName);
-            } catch (\ReflectionException $e) {
+            } catch (\ReflectionException) {
                 continue;
             }
 
@@ -78,7 +80,7 @@ final class AttributeAutoconfigurationPass extends AbstractRecursivePass
         parent::process($container);
     }
 
-    protected function processValue($value, bool $isRoot = false)
+    protected function processValue(mixed $value, bool $isRoot = false): mixed
     {
         if (!$value instanceof Definition
             || !$value->isAutoconfigured()
@@ -94,7 +96,7 @@ final class AttributeAutoconfigurationPass extends AbstractRecursivePass
 
         if ($this->classAttributeConfigurators) {
             foreach ($classReflector->getAttributes() as $attribute) {
-                if ($configurator = $this->classAttributeConfigurators[$attribute->getName()] ?? null) {
+                if ($configurator = $this->findConfigurator($this->classAttributeConfigurators, $attribute->getName())) {
                     $configurator($conditionals, $attribute->newInstance(), $classReflector);
                 }
             }
@@ -103,14 +105,14 @@ final class AttributeAutoconfigurationPass extends AbstractRecursivePass
         if ($this->parameterAttributeConfigurators) {
             try {
                 $constructorReflector = $this->getConstructor($value, false);
-            } catch (RuntimeException $e) {
+            } catch (RuntimeException) {
                 $constructorReflector = null;
             }
 
             if ($constructorReflector) {
                 foreach ($constructorReflector->getParameters() as $parameterReflector) {
                     foreach ($parameterReflector->getAttributes() as $attribute) {
-                        if ($configurator = $this->parameterAttributeConfigurators[$attribute->getName()] ?? null) {
+                        if ($configurator = $this->findConfigurator($this->parameterAttributeConfigurators, $attribute->getName())) {
                             $configurator($conditionals, $attribute->newInstance(), $parameterReflector);
                         }
                     }
@@ -120,13 +122,13 @@ final class AttributeAutoconfigurationPass extends AbstractRecursivePass
 
         if ($this->methodAttributeConfigurators || $this->parameterAttributeConfigurators) {
             foreach ($classReflector->getMethods(\ReflectionMethod::IS_PUBLIC) as $methodReflector) {
-                if ($methodReflector->isStatic() || $methodReflector->isConstructor() || $methodReflector->isDestructor()) {
+                if ($methodReflector->isConstructor() || $methodReflector->isDestructor()) {
                     continue;
                 }
 
                 if ($this->methodAttributeConfigurators) {
                     foreach ($methodReflector->getAttributes() as $attribute) {
-                        if ($configurator = $this->methodAttributeConfigurators[$attribute->getName()] ?? null) {
+                        if ($configurator = $this->findConfigurator($this->methodAttributeConfigurators, $attribute->getName())) {
                             $configurator($conditionals, $attribute->newInstance(), $methodReflector);
                         }
                     }
@@ -135,7 +137,7 @@ final class AttributeAutoconfigurationPass extends AbstractRecursivePass
                 if ($this->parameterAttributeConfigurators) {
                     foreach ($methodReflector->getParameters() as $parameterReflector) {
                         foreach ($parameterReflector->getAttributes() as $attribute) {
-                            if ($configurator = $this->parameterAttributeConfigurators[$attribute->getName()] ?? null) {
+                            if ($configurator = $this->findConfigurator($this->parameterAttributeConfigurators, $attribute->getName())) {
                                 $configurator($conditionals, $attribute->newInstance(), $parameterReflector);
                             }
                         }
@@ -151,7 +153,7 @@ final class AttributeAutoconfigurationPass extends AbstractRecursivePass
                 }
 
                 foreach ($propertyReflector->getAttributes() as $attribute) {
-                    if ($configurator = $this->propertyAttributeConfigurators[$attribute->getName()] ?? null) {
+                    if ($configurator = $this->findConfigurator($this->propertyAttributeConfigurators, $attribute->getName())) {
                         $configurator($conditionals, $attribute->newInstance(), $propertyReflector);
                     }
                 }
@@ -164,5 +166,21 @@ final class AttributeAutoconfigurationPass extends AbstractRecursivePass
         }
 
         return parent::processValue($value, $isRoot);
+    }
+
+    /**
+     * Find the first configurator for the given attribute name, looking up the class hierarchy.
+     */
+    private function findConfigurator(array &$configurators, string $attributeName): ?callable
+    {
+        if (\array_key_exists($attributeName, $configurators)) {
+            return $configurators[$attributeName];
+        }
+
+        if (class_exists($attributeName) && $parent = get_parent_class($attributeName)) {
+            return $configurators[$attributeName] = self::findConfigurator($configurators, $parent);
+        }
+
+        return $configurators[$attributeName] = null;
     }
 }

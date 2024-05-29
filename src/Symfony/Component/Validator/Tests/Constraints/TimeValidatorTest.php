@@ -18,7 +18,7 @@ use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
 class TimeValidatorTest extends ConstraintValidatorTestCase
 {
-    protected function createValidator()
+    protected function createValidator(): TimeValidator
     {
         return new TimeValidator();
     }
@@ -26,6 +26,13 @@ class TimeValidatorTest extends ConstraintValidatorTestCase
     public function testNullIsValid()
     {
         $this->validator->validate(null, new Time());
+
+        $this->assertNoViolation();
+    }
+
+    public function testDefaultWithSeconds()
+    {
+        $this->validator->validate('10:15:25', new Time());
 
         $this->assertNoViolation();
     }
@@ -59,6 +66,49 @@ class TimeValidatorTest extends ConstraintValidatorTestCase
             ['01:02:03'],
             ['00:00:00'],
             ['23:59:59'],
+        ];
+    }
+
+    /**
+     * @dataProvider getValidTimesWithoutSeconds
+     */
+    public function testValidTimesWithoutSeconds(string $time)
+    {
+        $this->validator->validate($time, new Time([
+            'withSeconds' => false,
+        ]));
+
+        $this->assertNoViolation();
+    }
+
+    public static function getValidTimesWithoutSeconds()
+    {
+        return [
+            ['01:02'],
+            ['00:00'],
+            ['23:59'],
+        ];
+    }
+
+    /**
+     * @dataProvider getInvalidTimesWithoutSeconds
+     */
+    public function testInvalidTimesWithoutSeconds(string $time)
+    {
+        $this->validator->validate($time, $constraint = new Time());
+
+        $this->buildViolation($constraint->message)
+            ->setParameter('{{ value }}', '"'.$time.'"')
+            ->setCode(Time::INVALID_FORMAT_ERROR)
+            ->assertRaised();
+    }
+
+    public static function getInvalidTimesWithoutSeconds()
+    {
+        return [
+            ['01:02'],
+            ['00:00'],
+            ['23:59'],
         ];
     }
 

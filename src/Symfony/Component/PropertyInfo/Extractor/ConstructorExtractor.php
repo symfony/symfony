@@ -12,6 +12,7 @@
 namespace Symfony\Component\PropertyInfo\Extractor;
 
 use Symfony\Component\PropertyInfo\PropertyTypeExtractorInterface;
+use Symfony\Component\TypeInfo\Type;
 
 /**
  * Extracts the constructor argument type using ConstructorArgumentTypeExtractorInterface implementations.
@@ -20,19 +21,28 @@ use Symfony\Component\PropertyInfo\PropertyTypeExtractorInterface;
  */
 final class ConstructorExtractor implements PropertyTypeExtractorInterface
 {
-    private $extractors;
-
     /**
      * @param iterable<int, ConstructorArgumentTypeExtractorInterface> $extractors
      */
-    public function __construct(iterable $extractors = [])
-    {
-        $this->extractors = $extractors;
+    public function __construct(
+        private readonly iterable $extractors = [],
+    ) {
     }
 
     /**
-     * {@inheritdoc}
+     * @experimental
      */
+    public function getType(string $class, string $property, array $context = []): ?Type
+    {
+        foreach ($this->extractors as $extractor) {
+            if (null !== $value = $extractor->getTypeFromConstructor($class, $property)) {
+                return $value;
+            }
+        }
+
+        return null;
+    }
+
     public function getTypes(string $class, string $property, array $context = []): ?array
     {
         foreach ($this->extractors as $extractor) {

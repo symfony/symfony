@@ -12,7 +12,6 @@ services:
                     protocol_version: 3
                     referrals: false
 security:
-    enable_authenticator_manager: true
     providers:
         ldap:
             ldap:
@@ -30,7 +29,6 @@ security:
             stateless: true
             json_login_ldap:
                 check_path: /login
-                require_previous_session: false
                 service: Symfony\Component\Ldap\Ldap
                 dn_string: ''
                 username_path: user.login

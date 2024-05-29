@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Serializer\Tests\Normalizer;
 
-use Doctrine\Common\Annotations\AnnotationReader;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor;
 use Symfony\Component\Serializer\Exception\InvalidArgumentException;
@@ -22,7 +21,7 @@ use Symfony\Component\Serializer\Mapping\ClassMetadata;
 use Symfony\Component\Serializer\Mapping\ClassMetadataInterface;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactory;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
-use Symfony\Component\Serializer\Mapping\Loader\AnnotationLoader;
+use Symfony\Component\Serializer\Mapping\Loader\AttributeLoader;
 use Symfony\Component\Serializer\Normalizer\ArrayDenormalizer;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\Serializer\Serializer;
@@ -210,7 +209,7 @@ class MapDenormalizationTest extends TestCase
             }
         };
 
-        $factory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
+        $factory = new ClassMetadataFactory(new AttributeLoader());
         $normalizer = new ObjectNormalizer($factory, null, null, new PhpDocExtractor(), new ClassDiscriminatorFromClassMetadata($loaderMock));
         $serializer = new Serializer([$normalizer, new ArrayDenormalizer()]);
         $normalizer->setSerializer($serializer);

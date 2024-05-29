@@ -24,37 +24,35 @@ use Symfony\Component\Form\Exception\RuntimeException;
  */
 class IdReader
 {
-    private $om;
-    private $classMetadata;
-    private $singleId;
-    private $intId;
-    private $idField;
+    private readonly bool $singleId;
+    private readonly bool $intId;
+    private readonly string $idField;
+    private readonly ?self $associationIdReader;
 
-    /**
-     * @var IdReader|null
-     */
-    private $associationIdReader;
-
-    public function __construct(ObjectManager $om, ClassMetadata $classMetadata)
-    {
+    public function __construct(
+        private readonly ObjectManager $om,
+        private readonly ClassMetadata $classMetadata,
+    ) {
         $ids = $classMetadata->getIdentifierFieldNames();
         $idType = $classMetadata->getTypeOfField(current($ids));
 
-        $this->om = $om;
-        $this->classMetadata = $classMetadata;
-        $this->singleId = 1 === \count($ids);
-        $this->intId = $this->singleId && \in_array($idType, ['integer', 'smallint', 'bigint']);
+        $singleId = 1 === \count($ids);
         $this->idField = current($ids);
 
         // single field association are resolved, since the schema column could be an int
-        if ($this->singleId && $classMetadata->hasAssociation($this->idField)) {
+        if ($singleId && $classMetadata->hasAssociation($this->idField)) {
             $this->associationIdReader = new self($om, $om->getClassMetadata(
                 $classMetadata->getAssociationTargetClass($this->idField)
             ));
 
-            $this->singleId = $this->associationIdReader->isSingleId();
+            $singleId = $this->associationIdReader->isSingleId();
             $this->intId = $this->associationIdReader->isIntId();
+        } else {
+            $this->intId = $singleId && \in_array($idType, ['integer', 'smallint', 'bigint']);
+            $this->associationIdReader = null;
         }
+
+        $this->singleId = $singleId;
     }
 
     /**

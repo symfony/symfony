@@ -15,7 +15,10 @@ use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Exception\InvalidArgumentException;
 
 /**
- * @Annotation
+ * Validates that a value is a valid Universally unique identifier (UUID).
+ *
+ * @see https://en.wikipedia.org/wiki/Universally_unique_identifier
+ * @see https://datatracker.ietf.org/doc/html/rfc4122
  *
  * @author Colin O'Dell <colinodell@gmail.com>
  * @author Bernhard Schussek <bschussek@gmail.com>
@@ -28,9 +31,10 @@ class Uuid extends Constraint
     public const INVALID_CHARACTERS_ERROR = '51120b12-a2bc-41bf-aa53-cd73daf330d0';
     public const INVALID_HYPHEN_PLACEMENT_ERROR = '98469c83-0309-4f5d-bf95-a496dcaa869c';
     public const INVALID_VERSION_ERROR = '21ba13b4-b185-4882-ac6f-d147355987eb';
+    public const INVALID_TIME_BASED_VERSION_ERROR = '484081ca-6fbd-11ed-ade8-a3bdfd0fcf2f';
     public const INVALID_VARIANT_ERROR = '164ef693-2b9d-46de-ad7f-836201f0c2db';
 
-    protected static $errorNames = [
+    protected const ERROR_NAMES = [
         self::TOO_SHORT_ERROR => 'TOO_SHORT_ERROR',
         self::TOO_LONG_ERROR => 'TOO_LONG_ERROR',
         self::INVALID_CHARACTERS_ERROR => 'INVALID_CHARACTERS_ERROR',
@@ -46,6 +50,8 @@ class Uuid extends Constraint
     public const V4_RANDOM = 4;
     public const V5_SHA1 = 5;
     public const V6_SORTABLE = 6;
+    public const V7_MONOTONIC = 7;
+    public const V8_CUSTOM = 8;
 
     public const ALL_VERSIONS = [
         self::V1_MAC,
@@ -54,23 +60,27 @@ class Uuid extends Constraint
         self::V4_RANDOM,
         self::V5_SHA1,
         self::V6_SORTABLE,
+        self::V7_MONOTONIC,
+        self::V8_CUSTOM,
+    ];
+
+    public const TIME_BASED_VERSIONS = [
+        self::V1_MAC,
+        self::V6_SORTABLE,
+        self::V7_MONOTONIC,
     ];
 
     /**
      * Message to display when validation fails.
-     *
-     * @var string
      */
-    public $message = 'This is not a valid UUID.';
+    public string $message = 'This is not a valid UUID.';
 
     /**
      * Strict mode only allows UUIDs that meet the formal definition and formatting per RFC 4122.
      *
      * Set this to `false` to allow legacy formats with different dash positioning or wrapping characters
-     *
-     * @var bool
      */
-    public $strict = true;
+    public bool $strict = true;
 
     /**
      * Array of allowed versions (see version constants above).
@@ -79,28 +89,30 @@ class Uuid extends Constraint
      *
      * @var int[]
      */
-    public $versions = self::ALL_VERSIONS;
+    public array $versions = self::ALL_VERSIONS;
 
+    /** @var callable|null */
     public $normalizer;
 
     /**
-     * {@inheritdoc}
-     *
-     * @param int[]|null $versions
+     * @param array<string,mixed>|null $options
+     * @param self::V*[]|self::V*|null $versions Specific UUID versions (defaults to {@see Uuid::ALL_VERSIONS})
+     * @param bool|null                $strict   Whether to force the value to follow the RFC's input format rules; pass false to allow alternate formats (defaults to true)
+     * @param string[]|null            $groups
      */
     public function __construct(
         ?array $options = null,
         ?string $message = null,
-        ?array $versions = null,
+        array|int|null $versions = null,
         ?bool $strict = null,
         ?callable $normalizer = null,
         ?array $groups = null,
-        $payload = null
+        mixed $payload = null,
     ) {
         parent::__construct($options, $groups, $payload);
 
         $this->message = $message ?? $this->message;
-        $this->versions = $versions ?? $this->versions;
+        $this->versions = (array) ($versions ?? $this->versions);
         $this->strict = $strict ?? $this->strict;
         $this->normalizer = $normalizer ?? $this->normalizer;
 

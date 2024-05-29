@@ -19,7 +19,7 @@ class NumberTypeTest extends BaseTypeTestCase
 {
     public const TESTED_TYPE = 'Symfony\Component\Form\Extension\Core\Type\NumberType';
 
-    private $defaultLocale;
+    private string $defaultLocale;
 
     protected function setUp(): void
     {
@@ -201,5 +201,37 @@ class NumberTypeTest extends BaseTypeTestCase
             'grouping' => true,
             'html5' => true,
         ]);
+    }
+
+    public function testNumericInputmode()
+    {
+        $form = $this->factory->create(static::TESTED_TYPE, null, [
+            'scale' => 0,
+            'html5' => false,
+        ]);
+        $form->setData(12345.54321);
+
+        $this->assertSame('numeric', $form->createView()->vars['attr']['inputmode']);
+    }
+
+    public function testDecimalInputmode()
+    {
+        $form = $this->factory->create(static::TESTED_TYPE, null, [
+            'scale' => 2,
+            'html5' => false,
+        ]);
+        $form->setData(12345.54321);
+
+        $this->assertSame('decimal', $form->createView()->vars['attr']['inputmode']);
+    }
+
+    public function testNoInputmodeWithHtml5Widget()
+    {
+        $form = $this->factory->create(static::TESTED_TYPE, null, [
+            'html5' => true,
+        ]);
+        $form->setData(12345.54321);
+
+        $this->assertArrayNotHasKey('inputmode', $form->createView()->vars['attr']);
     }
 }

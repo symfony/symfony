@@ -20,8 +20,6 @@ use Symfony\Component\HttpFoundation\File\File;
  */
 class FileTest extends TestCase
 {
-    protected $file;
-
     public function testGetMimeTypeUsesMimeTypeGuessers()
     {
         $file = new File(__DIR__.'/Fixtures/test.gif');

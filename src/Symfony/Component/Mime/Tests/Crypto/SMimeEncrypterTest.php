@@ -24,7 +24,7 @@ class SMimeEncrypterTest extends SMimeTestCase
     public function testEncryptMessage()
     {
         $message = (new Email())
-            ->date(new \DateTime('2019-04-07 10:36:30', new \DateTimeZone('Europe/Paris')))
+            ->date(new \DateTimeImmutable('2019-04-07 10:36:30', new \DateTimeZone('Europe/Paris')))
             ->to('fabien@symfony.com')
             ->subject('Testing')
             ->from('noreply@example.com')
@@ -41,7 +41,7 @@ class SMimeEncrypterTest extends SMimeTestCase
     public function testEncryptSignedMessage()
     {
         $message = (new Email())
-            ->date(new \DateTime('2019-04-07 10:36:30', new \DateTimeZone('Europe/Paris')))
+            ->date(new \DateTimeImmutable('2019-04-07 10:36:30', new \DateTimeZone('Europe/Paris')))
             ->to('fabien@symfony.com')
             ->bcc('luna@symfony.com')
             ->subject('Testing')
@@ -62,14 +62,14 @@ class SMimeEncrypterTest extends SMimeTestCase
     public function testEncryptMessageWithMultipleCerts()
     {
         $message = (new Email())
-            ->date(new \DateTime('2019-04-07 10:36:30', new \DateTimeZone('Europe/Paris')))
+            ->date(new \DateTimeImmutable('2019-04-07 10:36:30', new \DateTimeZone('Europe/Paris')))
             ->to('fabien@symfony.com')
             ->subject('Testing')
             ->from('noreply@example.com')
             ->text('El Barto was not here');
 
         $message2 = (new Email())
-            ->date(new \DateTime('2019-04-07 10:36:30', new \DateTimeZone('Europe/Paris')))
+            ->date(new \DateTimeImmutable('2019-04-07 10:36:30', new \DateTimeZone('Europe/Paris')))
             ->to('luna@symfony.com')
             ->subject('Testing')
             ->from('noreply@example.com')

@@ -66,8 +66,8 @@ class RateLimiterFactoryTest extends TestCase
     public function testInvalidConfig(string $exceptionClass, array $config)
     {
         $this->expectException($exceptionClass);
+
         $factory = new RateLimiterFactory($config, new InMemoryStorage());
-        $factory->create('key');
     }
 
     public static function invalidConfigProvider()

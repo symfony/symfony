@@ -35,8 +35,8 @@ use Symfony\Component\Security\Http\ParameterBagUtils;
  */
 class CheckRememberMeConditionsListener implements EventSubscriberInterface
 {
-    private $options;
-    private $logger;
+    private array $options;
+    private ?LoggerInterface $logger;
 
     public function __construct(array $options = [], ?LoggerInterface $logger = null)
     {
@@ -54,11 +54,9 @@ class CheckRememberMeConditionsListener implements EventSubscriberInterface
         /** @var RememberMeBadge $badge */
         $badge = $passport->getBadge(RememberMeBadge::class);
         if (!$this->options['always_remember_me']) {
-            $parameter = ParameterBagUtils::getRequestParameterValue($event->getRequest(), $this->options['remember_me_parameter']);
-            if (!('true' === $parameter || 'on' === $parameter || '1' === $parameter || 'yes' === $parameter || true === $parameter)) {
-                if (null !== $this->logger) {
-                    $this->logger->debug('Remember me disabled; request does not contain remember me parameter ("{parameter}").', ['parameter' => $this->options['remember_me_parameter']]);
-                }
+            $parameter = ParameterBagUtils::getRequestParameterValue($event->getRequest(), $this->options['remember_me_parameter'], $badge->parameters);
+            if (!filter_var($parameter, \FILTER_VALIDATE_BOOL)) {
+                $this->logger?->debug('Remember me disabled; request does not contain remember me parameter ("{parameter}").', ['parameter' => $this->options['remember_me_parameter']]);
 
                 return;
             }

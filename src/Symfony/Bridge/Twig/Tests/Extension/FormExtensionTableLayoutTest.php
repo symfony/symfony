@@ -13,46 +13,10 @@ namespace Symfony\Bridge\Twig\Tests\Extension;
 
 use Symfony\Bridge\Twig\Extension\FormExtension;
 use Symfony\Bridge\Twig\Extension\TranslationExtension;
-use Symfony\Bridge\Twig\Form\TwigRendererEngine;
 use Symfony\Bridge\Twig\Tests\Extension\Fixtures\StubTranslator;
-use Symfony\Component\Form\FormRenderer;
-use Symfony\Component\Form\FormView;
-use Symfony\Component\Form\Tests\AbstractTableLayoutTestCase;
-use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
-use Twig\Environment;
-use Twig\Loader\FilesystemLoader;
 
 class FormExtensionTableLayoutTest extends AbstractTableLayoutTestCase
 {
-    use RuntimeLoaderProvider;
-
-    /**
-     * @var FormRenderer
-     */
-    private $renderer;
-
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        $loader = new FilesystemLoader([
-            __DIR__.'/../../Resources/views/Form',
-            __DIR__.'/Fixtures/templates/form',
-        ]);
-
-        $environment = new Environment($loader, ['strict_variables' => true]);
-        $environment->addExtension(new TranslationExtension(new StubTranslator()));
-        $environment->addGlobal('global', '');
-        $environment->addExtension(new FormExtension());
-
-        $rendererEngine = new TwigRendererEngine([
-            'form_table_layout.html.twig',
-            'custom_widgets.html.twig',
-        ], $environment);
-        $this->renderer = new FormRenderer($rendererEngine, $this->createMock(CsrfTokenManagerInterface::class));
-        $this->registerTwigRuntimeLoader($environment, $this->renderer);
-    }
-
     public function testStartTagHasNoActionAttributeWhenActionIsEmpty()
     {
         $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\FormType', null, [
@@ -89,7 +53,7 @@ class FormExtensionTableLayoutTest extends AbstractTableLayoutTestCase
         $html = $this->renderHelp($view);
 
         $this->assertMatchesXpath($html,
-            '/p
+            '/div
     [@id="name_help"]
     [@class="class-test help-text"]
     [.="[trans]Help text test![/trans]"]
@@ -107,7 +71,7 @@ class FormExtensionTableLayoutTest extends AbstractTableLayoutTestCase
         $html = $this->renderHelp($view);
 
         $this->assertMatchesXpath($html,
-            '/p
+            '/div
     [@id="name_help"]
     [@class="help-text"]
     [.="[trans]Help <b>text</b> test![/trans]"]
@@ -115,7 +79,7 @@ class FormExtensionTableLayoutTest extends AbstractTableLayoutTestCase
         );
 
         $this->assertMatchesXpath($html,
-            '/p
+            '/div
     [@id="name_help"]
     [@class="help-text"]
     /b
@@ -135,7 +99,7 @@ class FormExtensionTableLayoutTest extends AbstractTableLayoutTestCase
         $html = $this->renderHelp($view);
 
         $this->assertMatchesXpath($html,
-            '/p
+            '/div
     [@id="name_help"]
     [@class="help-text"]
     [.="[trans]Help <b>text</b> test![/trans]"]
@@ -143,7 +107,7 @@ class FormExtensionTableLayoutTest extends AbstractTableLayoutTestCase
         );
 
         $this->assertMatchesXpath($html,
-            '/p
+            '/div
     [@id="name_help"]
     [@class="help-text"]
     /b
@@ -163,7 +127,7 @@ class FormExtensionTableLayoutTest extends AbstractTableLayoutTestCase
         $html = $this->renderHelp($view);
 
         $this->assertMatchesXpath($html,
-            '/p
+            '/div
     [@id="name_help"]
     [@class="help-text"]
     [.="[trans]Help <b>text</b> test![/trans]"]
@@ -171,7 +135,7 @@ class FormExtensionTableLayoutTest extends AbstractTableLayoutTestCase
         );
 
         $this->assertMatchesXpath($html,
-            '/p
+            '/div
     [@id="name_help"]
     [@class="help-text"]
     /b
@@ -213,57 +177,34 @@ class FormExtensionTableLayoutTest extends AbstractTableLayoutTestCase
         $this->assertMatchesXpath($html, '/label[@for="name"][@class="my&class required"]/b[.="Bolded label"]');
     }
 
-    protected function renderForm(FormView $view, array $vars = [])
+    protected function getTemplatePaths(): array
     {
-        return $this->renderer->renderBlock($view, 'form', $vars);
+        return [
+            __DIR__.'/../../Resources/views/Form',
+            __DIR__.'/Fixtures/templates/form',
+        ];
     }
 
-    protected function renderLabel(FormView $view, $label = null, array $vars = [])
+    protected function getTwigExtensions(): array
     {
-        if (null !== $label) {
-            $vars += ['label' => $label];
-        }
-
-        return $this->renderer->searchAndRenderBlock($view, 'label', $vars);
+        return [
+            new TranslationExtension(new StubTranslator()),
+            new FormExtension(),
+        ];
     }
 
-    protected function renderHelp(FormView $view)
+    protected function getTwigGlobals(): array
     {
-        return $this->renderer->searchAndRenderBlock($view, 'help');
+        return [
+            'global' => '',
+        ];
     }
 
-    protected function renderErrors(FormView $view)
+    protected function getThemes(): array
     {
-        return $this->renderer->searchAndRenderBlock($view, 'errors');
-    }
-
-    protected function renderWidget(FormView $view, array $vars = [])
-    {
-        return $this->renderer->searchAndRenderBlock($view, 'widget', $vars);
-    }
-
-    protected function renderRow(FormView $view, array $vars = [])
-    {
-        return $this->renderer->searchAndRenderBlock($view, 'row', $vars);
-    }
-
-    protected function renderRest(FormView $view, array $vars = [])
-    {
-        return $this->renderer->searchAndRenderBlock($view, 'rest', $vars);
-    }
-
-    protected function renderStart(FormView $view, array $vars = [])
-    {
-        return $this->renderer->renderBlock($view, 'form_start', $vars);
-    }
-
-    protected function renderEnd(FormView $view, array $vars = [])
-    {
-        return $this->renderer->renderBlock($view, 'form_end', $vars);
-    }
-
-    protected function setTheme(FormView $view, array $themes, $useDefaultThemes = true)
-    {
-        $this->renderer->setTheme($view, $themes, $useDefaultThemes);
+        return [
+            'form_table_layout.html.twig',
+            'custom_widgets.html.twig',
+        ];
     }
 }

@@ -20,16 +20,12 @@ use Symfony\Component\Notifier\Message\SentMessage;
 use Symfony\Component\Notifier\Message\SmsMessage;
 use Symfony\Component\Notifier\Test\TransportTestCase;
 use Symfony\Component\Notifier\Tests\Transport\DummyMessage;
-use Symfony\Component\Notifier\Transport\TransportInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 
 final class TurboSmsTransportTest extends TransportTestCase
 {
-    /**
-     * @return TurboSmsTransport
-     */
-    public static function createTransport(?HttpClientInterface $client = null): TransportInterface
+    public static function createTransport(?HttpClientInterface $client = null): TurboSmsTransport
     {
         return new TurboSmsTransport('authToken', 'sender', $client ?? new MockHttpClient());
     }
@@ -75,7 +71,16 @@ final class TurboSmsTransportTest extends TransportTestCase
             ]))
         ;
 
-        $client = new MockHttpClient(static function () use ($response): ResponseInterface {
+        $client = new MockHttpClient(static function (string $method, string $url, array $options) use ($response): ResponseInterface {
+            $body = json_decode($options['body'], true);
+            self::assertSame([
+                'sms' => [
+                    'sender' => 'sender',
+                    'recipients' => ['380931234567'],
+                    'text' => 'Тест/Test',
+                ],
+            ], $body);
+
             return $response;
         });
 
@@ -106,9 +111,7 @@ final class TurboSmsTransportTest extends TransportTestCase
             ]))
         ;
 
-        $client = new MockHttpClient(static function () use ($response): ResponseInterface {
-            return $response;
-        });
+        $client = new MockHttpClient(static fn (): ResponseInterface => $response);
 
         $message = new SmsMessage('380931234567', 'Тест/Test');
 
@@ -151,5 +154,15 @@ final class TurboSmsTransportTest extends TransportTestCase
         $this->expectExceptionMessage('The subject length for "cyrillic" symbols of a TurboSMS message must not exceed 661 characters.');
 
         $transport->send($message);
+    }
+
+    public function testSmsMessageWithInvalidFrom()
+    {
+        $transport = $this->createTransport();
+
+        $this->expectException(LengthException::class);
+        $this->expectExceptionMessage('The sender length of a TurboSMS message must not exceed 20 characters.');
+
+        $transport->send(new SmsMessage('380931234567', 'test', 'abcdefghijklmnopqrstu'));
     }
 }

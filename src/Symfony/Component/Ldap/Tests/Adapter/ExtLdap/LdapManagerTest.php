@@ -27,8 +27,7 @@ use Symfony\Component\Ldap\Tests\LdapTestCase;
  */
 class LdapManagerTest extends LdapTestCase
 {
-    /** @var Adapter */
-    private $adapter;
+    private Adapter $adapter;
 
     protected function setUp(): void
     {
@@ -264,6 +263,23 @@ class LdapManagerTest extends LdapTestCase
         $this->expectException(LdapException::class);
 
         $entryManager->addAttributeValues($entry, 'mail', $entry->getAttribute('mail'));
+    }
+
+    public function testLdapApplyOperationsRemoveAll()
+    {
+        $entryManager = $this->adapter->getEntryManager();
+
+        $result = $this->executeSearchQuery(1);
+        $entry = $result[0];
+
+        $entryManager->applyOperations($entry->getDn(), [new UpdateOperation(\LDAP_MODIFY_BATCH_REMOVE_ALL, 'mail', null)]);
+
+        $result = $this->executeSearchQuery(1);
+        $entry = $result[0];
+
+        $this->assertNull($entry->getAttribute('mail'));
+
+        $entryManager->addAttributeValues($entry, 'mail', ['fabpot@symfony.com', 'fabien@potencier.com']);
     }
 
     public function testLdapApplyOperationsRemoveAllWithArrayError()

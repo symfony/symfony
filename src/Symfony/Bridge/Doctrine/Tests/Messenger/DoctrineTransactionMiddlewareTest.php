@@ -14,6 +14,7 @@ namespace Symfony\Bridge\Doctrine\Tests\Messenger;
 use Doctrine\DBAL\Connection;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Bridge\Doctrine\Messenger\DoctrineTransactionMiddleware;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\UnrecoverableMessageHandlingException;
@@ -21,9 +22,9 @@ use Symfony\Component\Messenger\Test\Middleware\MiddlewareTestCase;
 
 class DoctrineTransactionMiddlewareTest extends MiddlewareTestCase
 {
-    private $connection;
-    private $entityManager;
-    private $middleware;
+    private MockObject&Connection $connection;
+    private MockObject&EntityManagerInterface $entityManager;
+    private DoctrineTransactionMiddleware $middleware;
 
     protected function setUp(): void
     {
@@ -55,14 +56,15 @@ class DoctrineTransactionMiddlewareTest extends MiddlewareTestCase
 
     public function testTransactionIsRolledBackOnException()
     {
-        $this->expectException(\RuntimeException::class);
-        $this->expectExceptionMessage('Thrown from next middleware.');
         $this->connection->expects($this->once())
             ->method('beginTransaction')
         ;
         $this->connection->expects($this->once())
             ->method('rollBack')
         ;
+
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('Thrown from next middleware.');
 
         $this->middleware->handle(new Envelope(new \stdClass()), $this->getThrowingStackMock());
     }

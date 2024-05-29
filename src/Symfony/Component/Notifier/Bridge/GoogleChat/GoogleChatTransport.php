@@ -30,11 +30,6 @@ final class GoogleChatTransport extends AbstractTransport
 {
     protected const HOST = 'chat.googleapis.com';
 
-    private $space;
-    private $accessKey;
-    private $accessToken;
-    private $threadKey;
-
     /**
      * @param string      $space       The space name of the webhook url "/v1/spaces/<space>/messages"
      * @param string      $accessKey   The "key" parameter of the webhook url
@@ -44,13 +39,14 @@ final class GoogleChatTransport extends AbstractTransport
      *                                 Subsequent messages with the same thread identifier will be posted into the same thread.
      *                                 {@see https://developers.google.com/hangouts/chat/reference/rest/v1/spaces.messages/create#query-parameters}
      */
-    public function __construct(string $space, string $accessKey, string $accessToken, ?string $threadKey = null, ?HttpClientInterface $client = null, ?EventDispatcherInterface $dispatcher = null)
-    {
-        $this->space = $space;
-        $this->accessKey = $accessKey;
-        $this->accessToken = $accessToken;
-        $this->threadKey = $threadKey;
-
+    public function __construct(
+        private string $space,
+        #[\SensitiveParameter] private string $accessKey,
+        #[\SensitiveParameter] private string $accessToken,
+        private ?string $threadKey = null,
+        ?HttpClientInterface $client = null,
+        ?EventDispatcherInterface $dispatcher = null,
+    ) {
         parent::__construct($client, $dispatcher);
     }
 
@@ -77,26 +73,20 @@ final class GoogleChatTransport extends AbstractTransport
             throw new UnsupportedMessageTypeException(__CLASS__, ChatMessage::class, $message);
         }
 
-        if ($message->getOptions() && !$message->getOptions() instanceof GoogleChatOptions) {
+        if (($options = $message->getOptions()) && !$options instanceof GoogleChatOptions) {
             throw new LogicException(sprintf('The "%s" transport only supports instances of "%s" for options.', __CLASS__, GoogleChatOptions::class));
         }
 
-        $opts = $message->getOptions();
-        if (!$opts) {
+        if (!$options) {
             if ($notification = $message->getNotification()) {
-                $opts = GoogleChatOptions::fromNotification($notification);
+                $options = GoogleChatOptions::fromNotification($notification);
             } else {
-                $opts = GoogleChatOptions::fromMessage($message);
+                $options = GoogleChatOptions::fromMessage($message);
             }
         }
 
-        if (null !== $this->threadKey && null === $opts->getThreadKey()) {
-            $opts->setThreadKey($this->threadKey);
-        }
+        $threadKey = $options->getThreadKey() ?: $this->threadKey;
 
-        $threadKey = $opts->getThreadKey() ?: $this->threadKey;
-
-        $options = $opts->toArray();
         $url = sprintf('https://%s/v1/spaces/%s/messages?key=%s&token=%s%s',
             $this->getEndpoint(),
             $this->space,
@@ -105,7 +95,7 @@ final class GoogleChatTransport extends AbstractTransport
             $threadKey ? '&threadKey='.urlencode($threadKey) : ''
         );
         $response = $this->client->request('POST', $url, [
-            'json' => array_filter($options),
+            'json' => array_filter($options->toArray()),
         ]);
 
         try {

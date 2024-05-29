@@ -245,7 +245,7 @@ class ConstraintTest extends TestCase
         $this->assertEquals('foo', $constraint->property1);
     }
 
-    public function testAnnotationSetUndefinedDefaultOption()
+    public function testAttributeSetUndefinedDefaultOption()
     {
         $this->expectException(ConstraintDefinitionException::class);
         $this->expectExceptionMessage('No default option is configured for constraint "Symfony\Component\Validator\Tests\Fixtures\ConstraintB".');
@@ -261,9 +261,6 @@ class ConstraintTest extends TestCase
         ]);
     }
 
-    /**
-     * @requires PHP 7.4
-     */
     public function testSetTypedProperty()
     {
         $constraint = new ConstraintWithTypedProperty([

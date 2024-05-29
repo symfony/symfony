@@ -28,16 +28,13 @@ final class IqsmsTransport extends AbstractTransport
 {
     protected const HOST = 'api.iqsms.ru';
 
-    private $login;
-    private $password;
-    private $from;
-
-    public function __construct(string $login, string $password, string $from, ?HttpClientInterface $client = null, ?EventDispatcherInterface $dispatcher = null)
-    {
-        $this->login = $login;
-        $this->password = $password;
-        $this->from = $from;
-
+    public function __construct(
+        private string $login,
+        #[\SensitiveParameter] private string $password,
+        private string $from,
+        ?HttpClientInterface $client = null,
+        ?EventDispatcherInterface $dispatcher = null,
+    ) {
         parent::__construct($client, $dispatcher);
     }
 
@@ -63,7 +60,7 @@ final class IqsmsTransport extends AbstractTransport
                     [
                         'phone' => $message->getPhone(),
                         'text' => $message->getSubject(),
-                        'sender' => $this->from,
+                        'sender' => $message->getFrom() ?: $this->from,
                         'clientId' => uniqid(),
                     ],
                 ],

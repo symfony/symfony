@@ -25,20 +25,13 @@ use Twig\TwigFunction;
  */
 final class SecurityExtension extends AbstractExtension
 {
-    private $securityChecker;
-
-    private $impersonateUrlGenerator;
-
-    public function __construct(?AuthorizationCheckerInterface $securityChecker = null, ?ImpersonateUrlGenerator $impersonateUrlGenerator = null)
-    {
-        $this->securityChecker = $securityChecker;
-        $this->impersonateUrlGenerator = $impersonateUrlGenerator;
+    public function __construct(
+        private ?AuthorizationCheckerInterface $securityChecker = null,
+        private ?ImpersonateUrlGenerator $impersonateUrlGenerator = null,
+    ) {
     }
 
-    /**
-     * @param mixed $object
-     */
-    public function isGranted($role, $object = null, ?string $field = null): bool
+    public function isGranted(mixed $role, mixed $object = null, ?string $field = null): bool
     {
         if (null === $this->securityChecker) {
             return false;
@@ -50,7 +43,7 @@ final class SecurityExtension extends AbstractExtension
 
         try {
             return $this->securityChecker->isGranted($role, $object);
-        } catch (AuthenticationCredentialsNotFoundException $e) {
+        } catch (AuthenticationCredentialsNotFoundException) {
             return false;
         }
     }
@@ -73,15 +66,32 @@ final class SecurityExtension extends AbstractExtension
         return $this->impersonateUrlGenerator->generateExitPath($exitTo);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    public function getImpersonateUrl(string $identifier): string
+    {
+        if (null === $this->impersonateUrlGenerator) {
+            return '';
+        }
+
+        return $this->impersonateUrlGenerator->generateImpersonationUrl($identifier);
+    }
+
+    public function getImpersonatePath(string $identifier): string
+    {
+        if (null === $this->impersonateUrlGenerator) {
+            return '';
+        }
+
+        return $this->impersonateUrlGenerator->generateImpersonationPath($identifier);
+    }
+
     public function getFunctions(): array
     {
         return [
-            new TwigFunction('is_granted', [$this, 'isGranted']),
-            new TwigFunction('impersonation_exit_url', [$this, 'getImpersonateExitUrl']),
-            new TwigFunction('impersonation_exit_path', [$this, 'getImpersonateExitPath']),
+            new TwigFunction('is_granted', $this->isGranted(...)),
+            new TwigFunction('impersonation_exit_url', $this->getImpersonateExitUrl(...)),
+            new TwigFunction('impersonation_exit_path', $this->getImpersonateExitPath(...)),
+            new TwigFunction('impersonation_url', $this->getImpersonateUrl(...)),
+            new TwigFunction('impersonation_path', $this->getImpersonatePath(...)),
         ];
     }
 }

@@ -13,21 +13,12 @@ namespace Symfony\Bridge\Doctrine\Tests\Fixtures;
 
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * @ORM\MappedSuperclass
- */
 #[ORM\MappedSuperclass]
 class DoctrineLoaderParentEntity
 {
-    /**
-     * @ORM\Column(length=35)
-     */
     #[ORM\Column(length: 35)]
     public $publicParentMaxLength;
 
-    /**
-     * @ORM\Column(length=30)
-     */
     #[ORM\Column(length: 30)]
     private $privateParentMaxLength;
 

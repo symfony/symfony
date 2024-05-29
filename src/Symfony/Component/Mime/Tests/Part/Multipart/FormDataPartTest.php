@@ -22,7 +22,6 @@ class FormDataPartTest extends TestCase
     public function testConstructor()
     {
         $r = new \ReflectionProperty(TextPart::class, 'encoding');
-        $r->setAccessible(true);
 
         $b = new TextPart('content');
         $c = DataPart::fromPath($file = __DIR__.'/../../Fixtures/mimetypes/test.gif');
@@ -197,6 +196,22 @@ class FormDataPartTest extends TestCase
 
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Form field values with integer keys can only have one array element, the key being the field name and the value being the field value, 2 provided.');
+        $f->getParts();
+    }
+
+    public function testExceptionOnFormFieldsWithDisallowedTypesInsideArray()
+    {
+        $f = new FormDataPart([
+            'foo' => [
+                'bar' => 'baz',
+                'qux' => [
+                    'quux' => 1,
+                ],
+            ],
+        ]);
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('The value of the form field "foo[qux][quux]" can only be a string, an array, or an instance of TextPart, "int" given.');
         $f->getParts();
     }
 

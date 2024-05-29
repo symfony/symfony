@@ -15,7 +15,6 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\AccessDecisionManager;
 use Symfony\Component\Security\Core\Authorization\AccessDecisionManagerInterface;
-use Symfony\Component\Security\Core\Authorization\DebugAccessDecisionManager;
 use Symfony\Component\Security\Core\Authorization\TraceableAccessDecisionManager;
 use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 use Symfony\Component\Security\Core\Tests\Fixtures\DummyVoter;
@@ -172,13 +171,6 @@ class TraceableAccessDecisionManagerTest extends TestCase
         ];
     }
 
-    public function testDebugAccessDecisionManagerAliasExistsForBC()
-    {
-        $adm = new TraceableAccessDecisionManager(new AccessDecisionManager());
-
-        $this->assertInstanceOf(DebugAccessDecisionManager::class, $adm, 'For BC, TraceableAccessDecisionManager must be an instance of DebugAccessDecisionManager');
-    }
-
     /**
      * Tests decision log returned when a voter call decide method of AccessDecisionManager.
      */
@@ -205,7 +197,7 @@ class TraceableAccessDecisionManagerTest extends TestCase
             ->expects($this->any())
             ->method('vote')
             ->willReturnCallback(function (TokenInterface $token, $subject, array $attributes) use ($sut, $voter1) {
-                $vote = \in_array('attr1', $attributes) ? VoterInterface::ACCESS_GRANTED : VoterInterface::ACCESS_ABSTAIN;
+                $vote = \in_array('attr1', $attributes, true) ? VoterInterface::ACCESS_GRANTED : VoterInterface::ACCESS_ABSTAIN;
                 $sut->addVoterVote($voter1, $attributes, $vote);
 
                 return $vote;
@@ -215,7 +207,7 @@ class TraceableAccessDecisionManagerTest extends TestCase
             ->expects($this->any())
             ->method('vote')
             ->willReturnCallback(function (TokenInterface $token, $subject, array $attributes) use ($sut, $voter2) {
-                if (\in_array('attr2', $attributes)) {
+                if (\in_array('attr2', $attributes, true)) {
                     $vote = null == $subject ? VoterInterface::ACCESS_GRANTED : VoterInterface::ACCESS_DENIED;
                 } else {
                     $vote = VoterInterface::ACCESS_ABSTAIN;
@@ -230,7 +222,7 @@ class TraceableAccessDecisionManagerTest extends TestCase
             ->expects($this->any())
             ->method('vote')
             ->willReturnCallback(function (TokenInterface $token, $subject, array $attributes) use ($sut, $voter3) {
-                if (\in_array('attr2', $attributes) && $subject) {
+                if (\in_array('attr2', $attributes, true) && $subject) {
                     $vote = $sut->decide($token, $attributes) ? VoterInterface::ACCESS_GRANTED : VoterInterface::ACCESS_DENIED;
                 } else {
                     $vote = VoterInterface::ACCESS_ABSTAIN;
@@ -274,5 +266,14 @@ class TraceableAccessDecisionManagerTest extends TestCase
                 'result' => true,
             ],
         ], $sut->getDecisionLog());
+    }
+
+    public function testCustomAccessDecisionManagerReturnsEmptyStrategy()
+    {
+        $admMock = $this->createMock(AccessDecisionManagerInterface::class);
+
+        $adm = new TraceableAccessDecisionManager($admMock);
+
+        $this->assertEquals('-', $adm->getStrategy());
     }
 }

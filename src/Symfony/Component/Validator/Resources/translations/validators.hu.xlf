@@ -438,6 +438,10 @@
                 <source>This value is not a valid MAC address.</source>
                 <target>Ez az érték nem érvényes MAC-cím.</target>
             </trans-unit>
+            <trans-unit id="113">
+                <source>This URL is missing a top-level domain.</source>
+                <target>Az URL-ből hiányzik a legfelső szintű tartomány (top-level domain).</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

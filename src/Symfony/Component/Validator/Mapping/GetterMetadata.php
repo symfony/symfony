@@ -62,18 +62,12 @@ class GetterMetadata extends MemberMetadata
         parent::__construct($class, $method, $property);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getPropertyValue($object)
+    public function getPropertyValue(mixed $object): mixed
     {
         return $this->newReflectionMember($object)->invoke($object);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function newReflectionMember($objectOrClassName)
+    protected function newReflectionMember(object|string $objectOrClassName): \ReflectionMethod|\ReflectionProperty
     {
         return new \ReflectionMethod($objectOrClassName, $this->getName());
     }

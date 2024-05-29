@@ -20,10 +20,9 @@ class RememberMeTokenTest extends TestCase
     public function testConstructor()
     {
         $user = $this->getUser();
-        $token = new RememberMeToken($user, 'fookey', 'foo');
+        $token = new RememberMeToken($user, 'fookey');
 
         $this->assertEquals('fookey', $token->getFirewallName());
-        $this->assertEquals('foo', $token->getSecret());
         $this->assertEquals(['ROLE_FOO'], $token->getRoleNames());
         $this->assertSame($user, $token->getUser());
     }
@@ -31,21 +30,12 @@ class RememberMeTokenTest extends TestCase
     /**
      * @group legacy
      */
-    public function testIsAuthenticated()
+    public function testSecret()
     {
         $user = $this->getUser();
         $token = new RememberMeToken($user, 'fookey', 'foo');
-        $this->assertTrue($token->isAuthenticated());
-    }
 
-    public function testConstructorSecretCannotBeEmptyString()
-    {
-        $this->expectException(\InvalidArgumentException::class);
-        new RememberMeToken(
-            $this->getUser(),
-            '',
-            ''
-        );
+        $this->assertEquals('foo', $token->getSecret());
     }
 
     protected function getUser($roles = ['ROLE_FOO'])

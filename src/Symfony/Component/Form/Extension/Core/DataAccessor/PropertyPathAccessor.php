@@ -12,10 +12,13 @@
 namespace Symfony\Component\Form\Extension\Core\DataAccessor;
 
 use Symfony\Component\Form\DataAccessorInterface;
+use Symfony\Component\Form\DataMapperInterface;
 use Symfony\Component\Form\Exception\AccessException;
+use Symfony\Component\Form\Extension\Core\DataMapper\DataMapper;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\PropertyAccess\Exception\AccessException as PropertyAccessException;
 use Symfony\Component\PropertyAccess\Exception\NoSuchIndexException;
+use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
 use Symfony\Component\PropertyAccess\Exception\UninitializedPropertyException;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
@@ -29,17 +32,14 @@ use Symfony\Component\PropertyAccess\PropertyPathInterface;
  */
 class PropertyPathAccessor implements DataAccessorInterface
 {
-    private $propertyAccessor;
+    private PropertyAccessorInterface $propertyAccessor;
 
     public function __construct(?PropertyAccessorInterface $propertyAccessor = null)
     {
         $this->propertyAccessor = $propertyAccessor ?? PropertyAccess::createPropertyAccessor();
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getValue($data, FormInterface $form)
+    public function getValue(object|array $data, FormInterface $form): mixed
     {
         if (null === $propertyPath = $form->getPropertyPath()) {
             throw new AccessException('Unable to read from the given form data as no property path is defined.');
@@ -48,45 +48,50 @@ class PropertyPathAccessor implements DataAccessorInterface
         return $this->getPropertyValue($data, $propertyPath);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function setValue(&$data, $propertyValue, FormInterface $form): void
+    public function setValue(object|array &$data, mixed $value, FormInterface $form): void
     {
         if (null === $propertyPath = $form->getPropertyPath()) {
             throw new AccessException('Unable to write the given value as no property path is defined.');
         }
 
+        $getValue = function () use ($data, $form, $propertyPath) {
+            $dataMapper = $this->getDataMapper($form);
+
+            if ($dataMapper instanceof DataMapper && null !== $dataAccessor = $dataMapper->getDataAccessor()) {
+                return $dataAccessor->getValue($data, $form);
+            }
+
+            return $this->getPropertyValue($data, $propertyPath);
+        };
+
         // If the field is of type DateTimeInterface and the data is the same skip the update to
         // keep the original object hash
-        if ($propertyValue instanceof \DateTimeInterface && $propertyValue == $this->getPropertyValue($data, $propertyPath)) {
+        if ($value instanceof \DateTimeInterface && $value == $getValue()) {
             return;
         }
 
         // If the data is identical to the value in $data, we are
         // dealing with a reference
-        if (!\is_object($data) || !$form->getConfig()->getByReference() || $propertyValue !== $this->getPropertyValue($data, $propertyPath)) {
-            $this->propertyAccessor->setValue($data, $propertyPath, $propertyValue);
+        if (!\is_object($data) || !$form->getConfig()->getByReference() || $value !== $getValue()) {
+            try {
+                $this->propertyAccessor->setValue($data, $propertyPath, $value);
+            } catch (NoSuchPropertyException $e) {
+                throw new NoSuchPropertyException($e->getMessage().' Make the property public, add a setter, or set the "mapped" field option in the form type to be false.', 0, $e);
+            }
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function isReadable($data, FormInterface $form): bool
+    public function isReadable(object|array $data, FormInterface $form): bool
     {
         return null !== $form->getPropertyPath();
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function isWritable($data, FormInterface $form): bool
+    public function isWritable(object|array $data, FormInterface $form): bool
     {
         return null !== $form->getPropertyPath();
     }
 
-    private function getPropertyValue($data, PropertyPathInterface $propertyPath)
+    private function getPropertyValue(object|array $data, PropertyPathInterface $propertyPath): mixed
     {
         try {
             return $this->propertyAccessor->getValue($data, $propertyPath);
@@ -97,12 +102,21 @@ class PropertyPathAccessor implements DataAccessorInterface
 
             if (!$e instanceof UninitializedPropertyException
                 // For versions without UninitializedPropertyException check the exception message
-                && (class_exists(UninitializedPropertyException::class) || false === strpos($e->getMessage(), 'You should initialize it'))
+                && (class_exists(UninitializedPropertyException::class) || !str_contains($e->getMessage(), 'You should initialize it'))
             ) {
                 throw $e;
             }
 
             return null;
         }
+    }
+
+    private function getDataMapper(FormInterface $form): ?DataMapperInterface
+    {
+        do {
+            $dataMapper = $form->getConfig()->getDataMapper();
+        } while (null === $dataMapper && null !== $form = $form->getParent());
+
+        return $dataMapper;
     }
 }

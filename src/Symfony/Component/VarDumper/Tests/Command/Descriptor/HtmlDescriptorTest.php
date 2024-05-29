@@ -19,7 +19,7 @@ use Symfony\Component\VarDumper\Dumper\HtmlDumper;
 
 class HtmlDescriptorTest extends TestCase
 {
-    private static $timezone;
+    private static string $timezone;
 
     public static function setUpBeforeClass(): void
     {
@@ -45,7 +45,7 @@ class HtmlDescriptorTest extends TestCase
 
         $descriptor->describe($output, new Data([[123]]), ['timestamp' => 1544804268.3668], 1);
 
-        $this->assertStringNotMatchesFormat('<style>%A</style><script>%A</script>%A', $output->fetch(), 'styles & scripts are output only once');
+        $this->assertDoesNotMatchRegularExpression('#<style>(.*?)</style><script>(.*?)</script>(.*)#', $output->fetch(), 'styles & scripts are output only once');
     }
 
     /**

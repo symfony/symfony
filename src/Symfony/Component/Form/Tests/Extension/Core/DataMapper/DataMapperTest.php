@@ -13,10 +13,11 @@ namespace Symfony\Component\Form\Tests\Extension\Core\DataMapper;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\Extension\Core\DataAccessor\PropertyPathAccessor;
 use Symfony\Component\Form\Extension\Core\DataMapper\DataMapper;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
+use Symfony\Component\Form\Extension\Core\Type\FormType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormConfigBuilder;
 use Symfony\Component\Form\FormFactoryBuilder;
@@ -26,15 +27,8 @@ use Symfony\Component\PropertyAccess\PropertyPath;
 
 class DataMapperTest extends TestCase
 {
-    /**
-     * @var DataMapper
-     */
-    private $mapper;
-
-    /**
-     * @var EventDispatcherInterface
-     */
-    private $dispatcher;
+    private DataMapper $mapper;
+    private EventDispatcher $dispatcher;
 
     protected function setUp(): void
     {
@@ -110,9 +104,6 @@ class DataMapperTest extends TestCase
         self::assertNull($form->getData());
     }
 
-    /**
-     * @requires PHP 7.4
-     */
     public function testMapDataToFormsIgnoresUninitializedProperties()
     {
         $engineForm = new Form(new FormConfigBuilder('engine', null, $this->dispatcher));
@@ -314,9 +305,6 @@ class DataMapperTest extends TestCase
         self::assertSame($initialEngine, $car->engine);
     }
 
-    /**
-     * @requires PHP 7.4
-     */
     public function testMapFormsToUninitializedProperties()
     {
         $car = new TypehintedPropertiesCar();
@@ -340,7 +328,7 @@ class DataMapperTest extends TestCase
         $article['publishedAt'] = $publishedAtValue;
         $propertyPath = new PropertyPath('[publishedAt]');
 
-        $config = new FormConfigBuilder('publishedAt', \get_class($publishedAt), $this->dispatcher);
+        $config = new FormConfigBuilder('publishedAt', $publishedAt::class, $this->dispatcher);
         $config->setByReference(false);
         $config->setPropertyPath($propertyPath);
         $config->setData($publishedAt);
@@ -365,9 +353,7 @@ class DataMapperTest extends TestCase
         $person = new DummyPerson($initialName);
 
         $config = new FormConfigBuilder('name', null, $this->dispatcher, [
-            'getter' => static function (DummyPerson $person) {
-                return $person->myName();
-            },
+            'getter' => static fn (DummyPerson $person) => $person->myName(),
         ]);
         $form = new Form($config);
 
@@ -419,6 +405,25 @@ class DataMapperTest extends TestCase
 
         $this->assertEquals(['date' => new \DateTime('2022-08-04', new \DateTimeZone('UTC'))], $form->getData());
     }
+
+    public function testMapFormToDataWithOnlyGetterConfigured()
+    {
+        $person = new DummyPerson('foo');
+        $form = (new FormFactoryBuilder())
+            ->getFormFactory()
+            ->createBuilder(FormType::class, $person)
+            ->add('name', TextType::class, [
+                'getter' => function (DummyPerson $person) {
+                    return $person->myName();
+                },
+            ])
+            ->getForm();
+        $form->submit([
+            'name' => 'bar',
+        ]);
+
+        $this->assertSame('bar', $person->myName());
+    }
 }
 
 class SubmittedForm extends Form
@@ -439,7 +444,7 @@ class NotSynchronizedForm extends SubmittedForm
 
 class DummyPerson
 {
-    private $name;
+    private string $name;
 
     public function __construct(string $name)
     {
@@ -452,6 +457,11 @@ class DummyPerson
     }
 
     public function rename($name): void
+    {
+        $this->name = $name;
+    }
+
+    public function setName($name): void
     {
         $this->name = $name;
     }

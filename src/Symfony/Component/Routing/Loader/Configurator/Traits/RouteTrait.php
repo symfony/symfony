@@ -16,17 +16,14 @@ use Symfony\Component\Routing\RouteCollection;
 
 trait RouteTrait
 {
-    /**
-     * @var RouteCollection|Route
-     */
-    protected $route;
+    protected RouteCollection|Route $route;
 
     /**
      * Adds defaults.
      *
      * @return $this
      */
-    final public function defaults(array $defaults): self
+    final public function defaults(array $defaults): static
     {
         $this->route->addDefaults($defaults);
 
@@ -38,7 +35,7 @@ trait RouteTrait
      *
      * @return $this
      */
-    final public function requirements(array $requirements): self
+    final public function requirements(array $requirements): static
     {
         $this->route->addRequirements($requirements);
 
@@ -50,7 +47,7 @@ trait RouteTrait
      *
      * @return $this
      */
-    final public function options(array $options): self
+    final public function options(array $options): static
     {
         $this->route->addOptions($options);
 
@@ -62,7 +59,7 @@ trait RouteTrait
      *
      * @return $this
      */
-    final public function utf8(bool $utf8 = true): self
+    final public function utf8(bool $utf8 = true): static
     {
         $this->route->addOptions(['utf8' => $utf8]);
 
@@ -74,7 +71,7 @@ trait RouteTrait
      *
      * @return $this
      */
-    final public function condition(string $condition): self
+    final public function condition(string $condition): static
     {
         $this->route->setCondition($condition);
 
@@ -86,7 +83,7 @@ trait RouteTrait
      *
      * @return $this
      */
-    final public function host(string $pattern): self
+    final public function host(string $pattern): static
     {
         $this->route->setHost($pattern);
 
@@ -101,7 +98,7 @@ trait RouteTrait
      *
      * @return $this
      */
-    final public function schemes(array $schemes): self
+    final public function schemes(array $schemes): static
     {
         $this->route->setSchemes($schemes);
 
@@ -116,7 +113,7 @@ trait RouteTrait
      *
      * @return $this
      */
-    final public function methods(array $methods): self
+    final public function methods(array $methods): static
     {
         $this->route->setMethods($methods);
 
@@ -130,7 +127,7 @@ trait RouteTrait
      *
      * @return $this
      */
-    final public function controller($controller): self
+    final public function controller(callable|string|array $controller): static
     {
         $this->route->addDefaults(['_controller' => $controller]);
 
@@ -142,7 +139,7 @@ trait RouteTrait
      *
      * @return $this
      */
-    final public function locale(string $locale): self
+    final public function locale(string $locale): static
     {
         $this->route->addDefaults(['_locale' => $locale]);
 
@@ -154,7 +151,7 @@ trait RouteTrait
      *
      * @return $this
      */
-    final public function format(string $format): self
+    final public function format(string $format): static
     {
         $this->route->addDefaults(['_format' => $format]);
 
@@ -166,7 +163,7 @@ trait RouteTrait
      *
      * @return $this
      */
-    final public function stateless(bool $stateless = true): self
+    final public function stateless(bool $stateless = true): static
     {
         $this->route->addDefaults(['_stateless' => $stateless]);
 

@@ -27,5 +27,5 @@ interface AccessMapInterface
      *
      * @return array{0: array|null, 1: string|null} A tuple of security attributes and the required channel
      */
-    public function getPatterns(Request $request);
+    public function getPatterns(Request $request): array;
 }

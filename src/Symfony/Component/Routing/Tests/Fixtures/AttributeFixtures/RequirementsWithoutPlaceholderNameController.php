@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Routing\Tests\Fixtures\AttributeFixtures;
 
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 
 #[Route(path: '/', requirements: ['foo', '\d+'])]
 class RequirementsWithoutPlaceholderNameController

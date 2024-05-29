@@ -74,6 +74,10 @@
                 <source>Too many failed login attempts, please try again in %minutes% minute.</source>
                 <target>Kirish uchun muvaffaqiyatsiz urinishlar, %minutes% daqiqadan so'ng qayta urinib ko'ring.</target>
             </trans-unit>
+            <trans-unit id="20">
+                <source>Too many failed login attempts, please try again in %minutes% minutes.</source>
+                <target state="needs-review-translation">Koʻplab muvaffaqiyatsiz kirish urinishlari, iltimos, %minutes% daqiqadan so'ng qayta urinib koʻring.|Koʻplab muvaffaqiyatsiz kirish urinishlari, iltimos, %minutes% daqiqadan so'ng qayta urinib koʻring.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

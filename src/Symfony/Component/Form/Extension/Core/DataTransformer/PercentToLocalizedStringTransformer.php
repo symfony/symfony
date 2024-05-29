@@ -20,39 +20,37 @@ use Symfony\Component\Form\Exception\UnexpectedTypeException;
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  * @author Florian Eckerstorfer <florian@eckerstorfer.org>
+ *
+ * @implements DataTransformerInterface<int|float, string>
  */
 class PercentToLocalizedStringTransformer implements DataTransformerInterface
 {
     public const FRACTIONAL = 'fractional';
     public const INTEGER = 'integer';
 
-    protected static $types = [
+    protected static array $types = [
         self::FRACTIONAL,
         self::INTEGER,
     ];
 
-    private $roundingMode;
-    private $type;
-    private $scale;
-    private $html5Format;
+    private string $type;
+    private int $scale;
 
     /**
      * @see self::$types for a list of supported types
      *
-     * @param int|null $roundingMode A value from \NumberFormatter, such as \NumberFormatter::ROUND_HALFUP
-     * @param bool     $html5Format  Use an HTML5 specific format, see https://www.w3.org/TR/html51/sec-forms.html#date-time-and-number-formats
+     * @param int  $roundingMode A value from \NumberFormatter, such as \NumberFormatter::ROUND_HALFUP
+     * @param bool $html5Format  Use an HTML5 specific format, see https://www.w3.org/TR/html51/sec-forms.html#date-time-and-number-formats
      *
      * @throws UnexpectedTypeException if the given value of type is unknown
      */
-    public function __construct(?int $scale = null, ?string $type = null, ?int $roundingMode = null, bool $html5Format = false)
-    {
-        if (null === $type) {
-            $type = self::FRACTIONAL;
-        }
-
-        if (null === $roundingMode && (\func_num_args() < 4 || func_get_arg(3))) {
-            trigger_deprecation('symfony/form', '5.1', 'Not passing a rounding mode to "%s()" is deprecated. Starting with Symfony 6.0 it will default to "\NumberFormatter::ROUND_HALFUP".', __METHOD__);
-        }
+    public function __construct(
+        ?int $scale = null,
+        ?string $type = null,
+        private int $roundingMode = \NumberFormatter::ROUND_HALFUP,
+        private bool $html5Format = false,
+    ) {
+        $type ??= self::FRACTIONAL;
 
         if (!\in_array($type, self::$types, true)) {
             throw new UnexpectedTypeException($type, implode('", "', self::$types));
@@ -60,8 +58,6 @@ class PercentToLocalizedStringTransformer implements DataTransformerInterface
 
         $this->type = $type;
         $this->scale = $scale ?? 0;
-        $this->roundingMode = $roundingMode;
-        $this->html5Format = $html5Format;
     }
 
     /**
@@ -69,12 +65,10 @@ class PercentToLocalizedStringTransformer implements DataTransformerInterface
      *
      * @param int|float $value Normalized value
      *
-     * @return string
-     *
      * @throws TransformationFailedException if the given value is not numeric or
      *                                       if the value could not be transformed
      */
-    public function transform($value)
+    public function transform(mixed $value): string
     {
         if (null === $value) {
             return '';
@@ -104,12 +98,10 @@ class PercentToLocalizedStringTransformer implements DataTransformerInterface
      *
      * @param string $value Percentage value
      *
-     * @return int|float|null
-     *
      * @throws TransformationFailedException if the given value is not a string or
      *                                       if the value could not be transformed
      */
-    public function reverseTransform($value)
+    public function reverseTransform(mixed $value): int|float|null
     {
         if (!\is_string($value)) {
             throw new TransformationFailedException('Expected a string.');
@@ -175,10 +167,8 @@ class PercentToLocalizedStringTransformer implements DataTransformerInterface
 
     /**
      * Returns a preconfigured \NumberFormatter instance.
-     *
-     * @return \NumberFormatter
      */
-    protected function getNumberFormatter()
+    protected function getNumberFormatter(): \NumberFormatter
     {
         // Values used in HTML5 number inputs should be formatted as in "1234.5", ie. 'en' format without grouping,
         // according to https://www.w3.org/TR/html51/sec-forms.html#date-time-and-number-formats
@@ -190,59 +180,37 @@ class PercentToLocalizedStringTransformer implements DataTransformerInterface
 
         $formatter->setAttribute(\NumberFormatter::FRACTION_DIGITS, $this->scale);
 
-        if (null !== $this->roundingMode) {
-            $formatter->setAttribute(\NumberFormatter::ROUNDING_MODE, $this->roundingMode);
-        }
+        $formatter->setAttribute(\NumberFormatter::ROUNDING_MODE, $this->roundingMode);
 
         return $formatter;
     }
 
     /**
      * Rounds a number according to the configured scale and rounding mode.
-     *
-     * @param int|float $number A number
-     *
-     * @return int|float
      */
-    private function round($number)
+    private function round(int|float $number): int|float
     {
-        if (null !== $this->scale && null !== $this->roundingMode) {
-            // shift number to maintain the correct scale during rounding
-            $roundingCoef = 10 ** $this->scale;
+        // shift number to maintain the correct scale during rounding
+        $roundingCoef = 10 ** $this->scale;
 
-            if (self::FRACTIONAL == $this->type) {
-                $roundingCoef *= 100;
-            }
-
-            // string representation to avoid rounding errors, similar to bcmul()
-            $number = (string) ($number * $roundingCoef);
-
-            switch ($this->roundingMode) {
-                case \NumberFormatter::ROUND_CEILING:
-                    $number = ceil($number);
-                    break;
-                case \NumberFormatter::ROUND_FLOOR:
-                    $number = floor($number);
-                    break;
-                case \NumberFormatter::ROUND_UP:
-                    $number = $number > 0 ? ceil($number) : floor($number);
-                    break;
-                case \NumberFormatter::ROUND_DOWN:
-                    $number = $number > 0 ? floor($number) : ceil($number);
-                    break;
-                case \NumberFormatter::ROUND_HALFEVEN:
-                    $number = round($number, 0, \PHP_ROUND_HALF_EVEN);
-                    break;
-                case \NumberFormatter::ROUND_HALFUP:
-                    $number = round($number, 0, \PHP_ROUND_HALF_UP);
-                    break;
-                case \NumberFormatter::ROUND_HALFDOWN:
-                    $number = round($number, 0, \PHP_ROUND_HALF_DOWN);
-                    break;
-            }
-
-            $number = 1 === $roundingCoef ? (int) $number : $number / $roundingCoef;
+        if (self::FRACTIONAL === $this->type) {
+            $roundingCoef *= 100;
         }
+
+        // string representation to avoid rounding errors, similar to bcmul()
+        $number = (string) ($number * $roundingCoef);
+
+        $number = match ($this->roundingMode) {
+            \NumberFormatter::ROUND_CEILING => ceil($number),
+            \NumberFormatter::ROUND_FLOOR => floor($number),
+            \NumberFormatter::ROUND_UP => $number > 0 ? ceil($number) : floor($number),
+            \NumberFormatter::ROUND_DOWN => $number > 0 ? floor($number) : ceil($number),
+            \NumberFormatter::ROUND_HALFEVEN => round($number, 0, \PHP_ROUND_HALF_EVEN),
+            \NumberFormatter::ROUND_HALFUP => round($number, 0, \PHP_ROUND_HALF_UP),
+            \NumberFormatter::ROUND_HALFDOWN => round($number, 0, \PHP_ROUND_HALF_DOWN),
+        };
+
+        $number = 1 === $roundingCoef ? (int) $number : $number / $roundingCoef;
 
         return $number;
     }

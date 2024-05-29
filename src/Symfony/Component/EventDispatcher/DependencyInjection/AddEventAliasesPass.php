@@ -21,25 +21,17 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
  */
 class AddEventAliasesPass implements CompilerPassInterface
 {
-    private $eventAliases;
-    private $eventAliasesParameter;
-
-    public function __construct(array $eventAliases, string $eventAliasesParameter = 'event_dispatcher.event_aliases')
-    {
-        if (1 < \func_num_args()) {
-            trigger_deprecation('symfony/event-dispatcher', '5.3', 'Configuring "%s" is deprecated.', __CLASS__);
-        }
-
-        $this->eventAliases = $eventAliases;
-        $this->eventAliasesParameter = $eventAliasesParameter;
+    public function __construct(
+        private array $eventAliases,
+    ) {
     }
 
     public function process(ContainerBuilder $container): void
     {
-        $eventAliases = $container->hasParameter($this->eventAliasesParameter) ? $container->getParameter($this->eventAliasesParameter) : [];
+        $eventAliases = $container->hasParameter('event_dispatcher.event_aliases') ? $container->getParameter('event_dispatcher.event_aliases') : [];
 
         $container->setParameter(
-            $this->eventAliasesParameter,
+            'event_dispatcher.event_aliases',
             array_merge($eventAliases, $this->eventAliases)
         );
     }

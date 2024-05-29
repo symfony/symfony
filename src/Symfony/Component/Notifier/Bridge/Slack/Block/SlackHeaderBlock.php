@@ -39,7 +39,7 @@ final class SlackHeaderBlock extends AbstractSlackBlock
     /**
      * @return $this
      */
-    public function id(string $id): self
+    public function id(string $id): static
     {
         if (\strlen($id) > self::ID_LIMIT) {
             throw new LengthException(sprintf('Maximum length for the block id is %d characters.', self::ID_LIMIT));

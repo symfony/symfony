@@ -35,8 +35,7 @@ class SemaphoreFactoryTest extends TestCase
                 $keys[] = $key;
 
                 return true;
-            }))
-            ->willReturn(true);
+            }));
 
         $logger = $this->createMock(LoggerInterface::class);
         $factory = new SemaphoreFactory($store);
@@ -64,8 +63,7 @@ class SemaphoreFactoryTest extends TestCase
                 $keys[] = $key;
 
                 return true;
-            }))
-            ->willReturn(true);
+            }));
 
         $logger = $this->createMock(LoggerInterface::class);
         $factory = new SemaphoreFactory($store);

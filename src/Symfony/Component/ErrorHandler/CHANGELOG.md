@@ -1,6 +1,27 @@
 CHANGELOG
 =========
 
+7.1
+---
+
+ * Increase log level to "error" at least for all PHP errors
+
+6.4
+---
+
+ * `FlattenExceptionNormalizer` no longer implements `ContextAwareNormalizerInterface`
+
+6.3
+---
+
+ * Display exception properties in the HTML error page
+
+6.1
+---
+
+ * Report overridden `@final` constants and properties
+ * Read environment variable `SYMFONY_IDE` to configure file link format
+
 5.4
 ---
 

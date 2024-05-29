@@ -32,25 +32,16 @@ use Symfony\Component\Form\Util\ServerParams;
  */
 abstract class AbstractRequestHandlerTestCase extends TestCase
 {
-    /**
-     * @var RequestHandlerInterface
-     */
-    protected $requestHandler;
-
-    /**
-     * @var FormFactory
-     */
-    protected $factory;
-
-    protected $request;
-
-    protected $serverParams;
+    protected RequestHandlerInterface $requestHandler;
+    protected FormFactory $factory;
+    protected mixed $request = null;
+    protected ServerParams $serverParams;
 
     protected function setUp(): void
     {
         $this->serverParams = new class() extends ServerParams {
-            public $contentLength;
-            public $postMaxSize = '';
+            public ?int $contentLength = null;
+            public string $postMaxSize = '';
 
             public function getContentLength(): ?int
             {

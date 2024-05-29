@@ -13,14 +13,10 @@ namespace Symfony\Component\Notifier\Bridge\Smsc\Tests;
 
 use Symfony\Component\Notifier\Bridge\Smsc\SmscTransportFactory;
 use Symfony\Component\Notifier\Test\TransportFactoryTestCase;
-use Symfony\Component\Notifier\Transport\TransportFactoryInterface;
 
 final class SmscTransportFactoryTest extends TransportFactoryTestCase
 {
-    /**
-     * @return SmscTransportFactory
-     */
-    public function createFactory(): TransportFactoryInterface
+    public function createFactory(): SmscTransportFactory
     {
         return new SmscTransportFactory();
     }

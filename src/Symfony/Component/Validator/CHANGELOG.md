@@ -1,6 +1,102 @@
 CHANGELOG
 =========
 
+7.2
+---
+
+ * Make `PasswordStrengthValidator::estimateStrength()` public
+
+7.1
+---
+
+ * Deprecate not passing a value for the `requireTld` option to the `Url` constraint (the default value will become `true` in 8.0)
+ * Add the calculated strength to violations in `PasswordStrengthValidator`
+ * Add support for `Stringable` values when using the `Cidr`, `CssColor`, `ExpressionSyntax` and `PasswordStrength` constraints
+ * Add `MacAddress` constraint
+ * Add `*_NO_PUBLIC`, `*_ONLY_PRIVATE` and `*_ONLY_RESERVED` versions to `Ip` constraint
+ * Possibility to use all `Ip` constraint versions for `Cidr` constraint
+ * Add `list` and `associative_array` types to `Type` constraint
+ * Add the `Charset` constraint
+ * Add the `requireTld` option to the `Url` constraint
+ * Deprecate `Bic::INVALID_BANK_CODE_ERROR`
+
+7.0
+---
+
+ * Add methods `getConstraint()`, `getCause()` and `__toString()` to `ConstraintViolationInterface`
+ * Add method `__toString()` to `ConstraintViolationListInterface`
+ * Add method `disableTranslation()` to `ConstraintViolationBuilderInterface`
+ * Remove static property `$errorNames` from all constraints, use const `ERROR_NAMES` instead
+ * Remove static property `$versions` from the `Ip` constraint, use the `VERSIONS` constant instead
+ * Remove `VALIDATION_MODE_LOOSE` from `Email` constraint, use `VALIDATION_MODE_HTML5` instead
+ * Remove constraint `ExpressionLanguageSyntax`, use `ExpressionSyntax` instead
+ * Remove Doctrine annotations support in favor of native attributes
+ * Remove the annotation reader parameter from the constructor signature of `AnnotationLoader`
+ * Remove `ValidatorBuilder::setDoctrineAnnotationReader()`
+ * Remove `ValidatorBuilder::addDefaultDoctrineAnnotationReader()`
+ * Remove `ValidatorBuilder::enableAnnotationMapping()`, use `ValidatorBuilder::enableAttributeMapping()` instead
+ * Remove `ValidatorBuilder::disableAnnotationMapping()`, use `ValidatorBuilder::disableAttributeMapping()` instead
+ * Remove `AnnotationLoader`, use `AttributeLoader` instead
+
+6.4
+---
+
+ * Add `is_valid` function to the `Expression` constraint, its behavior is the same as `ValidatorInterface::validate`
+ * Allow single integer for the `versions` option of the `Uuid` constraint
+ * Allow single constraint to be passed to the `constraints` option of the `When` constraint
+ * Deprecate Doctrine annotations support in favor of native attributes
+ * Deprecate `ValidatorBuilder::setDoctrineAnnotationReader()`
+ * Deprecate `ValidatorBuilder::addDefaultDoctrineAnnotationReader()`
+ * Add `number`, `finite-number` and `finite-float` types to `Type` constraint
+ * Add the `withSeconds` option to the `Time` constraint that allows to pass time without seconds
+ * Deprecate `ValidatorBuilder::enableAnnotationMapping()`, use `ValidatorBuilder::enableAttributeMapping()` instead
+ * Deprecate `ValidatorBuilder::disableAnnotationMapping()`, use `ValidatorBuilder::disableAttributeMapping()` instead
+ * Deprecate `AnnotationLoader`, use `AttributeLoader` instead
+ * Add `GroupProviderInterface` to implement validation group providers outside the underlying class
+
+6.3
+---
+
+ * Add method `getConstraint()` to `ConstraintViolationInterface`
+ * Add `Uuid::TIME_BASED_VERSIONS` to match that a UUID being validated embeds a timestamp
+ * Add the `pattern` parameter in violations of the `Regex` constraint
+ * Add a `NoSuspiciousCharacters` constraint to validate a string is not a spoofing attempt
+ * Add a `PasswordStrength` constraint to check the strength of a password
+ * Add the `countUnit` option to the `Length` constraint to allow counting the string length either by code points (like before, now the default setting `Length::COUNT_CODEPOINTS`), bytes (`Length::COUNT_BYTES`) or graphemes (`Length::COUNT_GRAPHEMES`)
+ * Add the `filenameMaxLength` option to the `File` constraint
+ * Add the `exclude` option to the `Cascade` constraint
+ * Add the `value_length` parameter to `Length` constraint
+ * Allow to disable the translation domain for `ConstraintViolationInterface` messages
+
+6.2
+---
+
+ * Add option `Email::VALIDATION_MODE_HTML5_ALLOW_NO_TLD` with "html5-allow-no-tld" e-mail validation mode, to match with the W3C official specification
+ * Add method `getCause()` to `ConstraintViolationInterface`
+ * Add the `When` constraint and validator
+ * Deprecate the "loose" e-mail validation mode, use "html5" instead
+ * Add the `negate` option to the `Expression` constraint, to inverse the logic of the violation's creation
+ * Add the `extensions` option to the `File` constraint as an alternative to `mimeTypes` which checks the mime type of the file, its extension, and the consistency between them
+ * Add padding for enhanced privacy to the `NotCompromisedPasswordValidator`
+
+6.1
+---
+
+ * Add the `fields` option to the `Unique` constraint, to define which collection keys should be checked for uniqueness
+ * Deprecate `Constraint::$errorNames`, use `Constraint::ERROR_NAMES` instead
+ * Deprecate constraint `ExpressionLanguageSyntax`, use `ExpressionSyntax` instead
+ * Add method `__toString()` to `ConstraintViolationInterface` & `ConstraintViolationListInterface`
+ * Allow creating constraints with required arguments
+ * Add the `match` option to the `Choice` constraint
+
+6.0
+---
+
+ * Remove the `allowEmptyString` option from the `Length` constraint
+ * Remove the `NumberConstraintTrait` trait
+ * `ValidatorBuilder::enableAnnotationMapping()` does not accept a Doctrine annotation reader anymore
+ * `ValidatorBuilder::enableAnnotationMapping()` won't automatically setup a Doctrine annotation reader anymore
+
 5.4
 ---
 

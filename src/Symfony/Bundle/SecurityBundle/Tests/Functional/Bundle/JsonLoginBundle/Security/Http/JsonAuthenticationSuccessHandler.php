@@ -19,7 +19,7 @@ use Symfony\Component\Security\Http\Authentication\AuthenticationSuccessHandlerI
 
 class JsonAuthenticationSuccessHandler implements AuthenticationSuccessHandlerInterface
 {
-    public function onAuthenticationSuccess(Request $request, TokenInterface $token): Response
+    public function onAuthenticationSuccess(Request $request, TokenInterface $token): ?Response
     {
         return new JsonResponse(['message' => sprintf('Good game @%s!', $token->getUserIdentifier())]);
     }

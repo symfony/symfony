@@ -11,7 +11,9 @@
 
 namespace Symfony\Component\Serializer\Tests\Encoder;
 
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Serializer\Debug\TraceableEncoder;
 use Symfony\Component\Serializer\Encoder\ChainEncoder;
 use Symfony\Component\Serializer\Encoder\ContextAwareEncoderInterface;
 use Symfony\Component\Serializer\Encoder\EncoderInterface;
@@ -24,9 +26,9 @@ class ChainEncoderTest extends TestCase
     private const FORMAT_2 = 'format2';
     private const FORMAT_3 = 'format3';
 
-    private $chainEncoder;
-    private $encoder1;
-    private $encoder2;
+    private ChainEncoder $chainEncoder;
+    private MockObject&ContextAwareEncoderInterface $encoder1;
+    private MockObject&EncoderInterface $encoder2;
 
     protected function setUp(): void
     {
@@ -105,6 +107,21 @@ class ChainEncoderTest extends TestCase
         $sut = new ChainEncoder([$encoder]);
 
         $this->assertFalse($sut->needsNormalization(self::FORMAT_1));
+    }
+
+    public function testNeedsNormalizationTraceableEncoder()
+    {
+        $traceableEncoder = $this->createMock(TraceableEncoder::class);
+        $traceableEncoder->method('needsNormalization')->willReturn(true);
+        $traceableEncoder->method('supportsEncoding')->willReturn(true);
+
+        $this->assertTrue((new ChainEncoder([$traceableEncoder]))->needsNormalization('format'));
+
+        $traceableEncoder = $this->createMock(TraceableEncoder::class);
+        $traceableEncoder->method('needsNormalization')->willReturn(false);
+        $traceableEncoder->method('supportsEncoding')->willReturn(true);
+
+        $this->assertFalse((new ChainEncoder([$traceableEncoder]))->needsNormalization('format'));
     }
 }
 

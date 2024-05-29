@@ -32,35 +32,35 @@ use Symfony\Component\Messenger\Stamp\RedeliveryStamp;
  */
 class MultiplierRetryStrategy implements RetryStrategyInterface
 {
-    private $maxRetries;
-    private $delayMilliseconds;
-    private $multiplier;
-    private $maxDelayMilliseconds;
-
     /**
      * @param int   $maxRetries           The maximum number of times to retry
      * @param int   $delayMilliseconds    Amount of time to delay (or the initial value when multiplier is used)
      * @param float $multiplier           Multiplier to apply to the delay each time a retry occurs
      * @param int   $maxDelayMilliseconds Maximum delay to allow (0 means no maximum)
+     * @param float $jitter               Randomness to apply to the delay (between 0 and 1)
      */
-    public function __construct(int $maxRetries = 3, int $delayMilliseconds = 1000, float $multiplier = 1, int $maxDelayMilliseconds = 0)
-    {
-        $this->maxRetries = $maxRetries;
-
+    public function __construct(
+        private int $maxRetries = 3,
+        private int $delayMilliseconds = 1000,
+        private float $multiplier = 1,
+        private int $maxDelayMilliseconds = 0,
+        private float $jitter = 0.1,
+    ) {
         if ($delayMilliseconds < 0) {
             throw new InvalidArgumentException(sprintf('Delay must be greater than or equal to zero: "%s" given.', $delayMilliseconds));
         }
-        $this->delayMilliseconds = $delayMilliseconds;
 
         if ($multiplier < 1) {
             throw new InvalidArgumentException(sprintf('Multiplier must be greater than zero: "%s" given.', $multiplier));
         }
-        $this->multiplier = $multiplier;
 
         if ($maxDelayMilliseconds < 0) {
             throw new InvalidArgumentException(sprintf('Max delay must be greater than or equal to zero: "%s" given.', $maxDelayMilliseconds));
         }
-        $this->maxDelayMilliseconds = $maxDelayMilliseconds;
+
+        if ($jitter < 0 || $jitter > 1) {
+            throw new InvalidArgumentException(sprintf('Jitter must be between 0 and 1: "%s" given.', $jitter));
+        }
     }
 
     /**
@@ -81,6 +81,11 @@ class MultiplierRetryStrategy implements RetryStrategyInterface
         $retries = RedeliveryStamp::getRetryCountFromEnvelope($message);
 
         $delay = $this->delayMilliseconds * $this->multiplier ** $retries;
+
+        if ($this->jitter > 0) {
+            $randomness = (int) ($delay * $this->jitter);
+            $delay += random_int(-$randomness, +$randomness);
+        }
 
         if ($delay > $this->maxDelayMilliseconds && 0 !== $this->maxDelayMilliseconds) {
             return $this->maxDelayMilliseconds;

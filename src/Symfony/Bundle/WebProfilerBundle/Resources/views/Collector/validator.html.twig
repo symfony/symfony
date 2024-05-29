@@ -1,10 +1,39 @@
 {% extends '@WebProfiler/Profiler/layout.html.twig' %}
 
+{% block head %}
+    {{ parent() }}
+
+    <style>
+        #collector-content .sf-validator {
+            margin-bottom: 2em;
+        }
+
+        #collector-content .sf-validator .sf-validator-context,
+        #collector-content .sf-validator .trace {
+            border: var(--border);
+            background: var(--base-0);
+            padding: 10px;
+            margin: 0.5em 0;
+            overflow: auto;
+        }
+        #collector-content .sf-validator .trace {
+            font-size: 12px;
+        }
+        #collector-content .sf-validator .trace li {
+            margin-bottom: 0;
+            padding: 0;
+        }
+        #collector-content .sf-validator .trace li.selected {
+            background: var(--highlight-selected-line);
+        }
+    </style>
+{% endblock %}
+
 {% block toolbar %}
     {% if collector.violationsCount > 0 or collector.calls|length %}
         {% set status_color = collector.violationsCount ? 'red' %}
         {% set icon %}
-            {{ include('@WebProfiler/Icon/validator.svg') }}
+            {{ source('@WebProfiler/Icon/validator.svg') }}
             <span class="sf-toolbar-value">
                 {{ collector.violationsCount ?: collector.calls|length }}
             </span>
@@ -27,7 +56,7 @@
 
 {% block menu %}
     <span class="label {{- collector.violationsCount ? ' label-status-error' }} {{ collector.calls is empty ? 'disabled' }}">
-        <span class="icon">{{ include('@WebProfiler/Icon/validator.svg') }}</span>
+        <span class="icon">{{ source('@WebProfiler/Icon/validator.svg') }}</span>
         <strong>Validator</strong>
         {% if collector.violationsCount > 0 %}
             <span class="count">
@@ -54,7 +83,7 @@
                 {% else %}
                     {{ caller.name }}
                 {% endif %}
-                line <a class="text-small sf-toggle" data-toggle-selector="#sf-trace-{{ loop.index0 }}">{{ caller.line }}</a> (<a class="text-small sf-toggle" data-toggle-selector="#sf-context-{{ loop.index0 }}">context</a>):
+                line <button type="button" class="btn-link text-small sf-toggle" data-toggle-selector="#sf-trace-{{ loop.index0 }}">{{ caller.line }}</button> (<button type="button" class="btn-link text-small sf-toggle" data-toggle-selector="#sf-context-{{ loop.index0 }}">context</button>):
             </span>
 
             <div class="sf-validator-compact hidden" id="sf-trace-{{ loop.index0 }}">
@@ -96,8 +125,8 @@
             {% endif %}
         </div>
     {% else %}
-        <div class="empty">
-            <p>No calls to the validator were collected during this request.</p>
+        <div class="empty empty-panel">
+            <p>No calls to the validator were collected.</p>
         </div>
     {% endfor %}
 {% endblock %}

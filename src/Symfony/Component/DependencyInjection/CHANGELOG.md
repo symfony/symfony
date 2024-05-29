@@ -1,6 +1,105 @@
 CHANGELOG
 =========
 
+7.1
+---
+
+ * Add `CheckAliasValidityPass` to check service compatibility with aliased interface
+ * Add argument `$prepend` to `ContainerConfigurator::extension()` to prepend the configuration instead of appending it
+ * Have `ServiceLocator` implement `ServiceCollectionInterface`
+ * Add `#[Lazy]` attribute as shortcut for `#[Autowire(lazy: [bool|string])]` and `#[Autoconfigure(lazy: [bool|string])]`
+ * Add `#[AutowireMethodOf]` attribute to autowire a method of a service as a callable
+ * Make `ContainerBuilder::registerAttributeForAutoconfiguration()` propagate to attribute classes that extend the registered class
+ * Add argument `$prepend` to `FileLoader::construct()` to prepend loaded configuration instead of appending it
+ * [BC BREAK] When used in the `prependExtension()` method, the `ContainerConfigurator::import()` method now prepends the configuration instead of appending it
+ * Cast env vars to null or bool when referencing them using `#[Autowire(env: '...')]` depending on the signature of the corresponding parameter
+ * Add `#[AutowireInline]` attribute to allow service definition at the class level
+ * Add `StaticEnvVarLoader`
+
+7.0
+---
+
+ * Remove `#[MapDecorated]`, use `#[AutowireDecorated]` instead
+ * Remove `ProxyHelper`, use `Symfony\Component\VarExporter\ProxyHelper` instead
+ * Remove `ReferenceSetArgumentTrait`
+ * Remove support of `@required` annotation, use the `Symfony\Contracts\Service\Attribute\Required` attribute instead
+ * Require explicit argument when calling `ContainerAwareTrait::setContainer()`
+ * Remove `PhpDumper` options `inline_factories_parameter` and `inline_class_loader_parameter`, use options `inline_factories` and `inline_class_loader` instead
+ * Parameter names of `ParameterBag` cannot be numerics
+ * Remove `ContainerAwareInterface` and `ContainerAwareTrait`, use dependency injection instead
+ * Add argument `$id` and `$asGhostObject` to `DumperInterface::isProxyCandidate()` and `getProxyCode()`
+ * Add argument `$source` to `FileLoader::registerClasses()`
+
+6.4
+---
+
+ * Allow using `#[Target]` with no arguments to state that a parameter must match a named autowiring alias
+ * Deprecate `ContainerAwareInterface` and `ContainerAwareTrait`, use dependency injection instead
+ * Add `defined` env var processor that returns `true` for defined and neither null nor empty env vars
+ * Add `#[AutowireLocator]` and `#[AutowireIterator]` attributes
+ * Add `urlencode` env var processor that url encodes a string value
+
+6.3
+---
+
+ * Add options `inline_factories` and `inline_class_loader` to `PhpDumper::dump()`
+ * Deprecate `PhpDumper` options `inline_factories_parameter` and `inline_class_loader_parameter`
+ * Add `RemoveBuildParametersPass`, which removes parameters starting with a dot during compilation
+ * Add support for nesting autowiring-related attributes into `#[Autowire(...)]`
+ * Deprecate undefined and numeric keys with `service_locator` config
+ * Fail if Target attribute does not exist during compilation
+ * Enable deprecating parameters with `ContainerBuilder::deprecateParameter()`
+ * Add `#[AsAlias]` attribute to tell under which alias a service should be registered or to use the implemented interface if no parameter is given
+ * Allow to trim XML service parameters value by using `trim="true"` attribute
+ * Allow extending the `Autowire` attribute
+ * Add `#[Exclude]` to skip autoregistering a class
+ * Add support for generating lazy closures
+ * Add support for autowiring services as closures using `#[AutowireCallable]` or `#[AutowireServiceClosure]`
+ * Add support for `#[Autowire(lazy: true|class-string)]`
+ * Make it possible to cast callables into single-method interfaces
+ * Deprecate `#[MapDecorated]`, use `#[AutowireDecorated]` instead
+ * Deprecate the `@required` annotation, use the `Symfony\Contracts\Service\Attribute\Required` attribute instead
+ * Add `constructor` option to services declaration and to `#[Autoconfigure]`
+
+6.2
+---
+
+ * Use lazy-loading ghost objects and virtual proxies out of the box
+ * Add arguments `&$asGhostObject` and `$id` to LazyProxy's `DumperInterface` to allow using ghost objects for lazy loading services
+ * Add `enum` env var processor
+ * Add `shuffle` env var processor
+ * Allow #[When] to be extended
+ * Change the signature of `ContainerAwareInterface::setContainer()` to `setContainer(?ContainerInterface)`
+ * Deprecate calling `ContainerAwareTrait::setContainer()` without arguments
+ * Deprecate using numeric parameter names
+ * Add support for tagged iterators/locators `exclude` option to the xml and yaml loaders/dumpers
+ * Allow injecting `string $env` into php config closures
+ * Add `excludeSelf` parameter to `TaggedIteratorArgument` with default value to `true`
+   to control whether the referencing service should be automatically excluded from the iterator
+
+6.1
+---
+
+ * Add `#[MapDecorated]` attribute telling to which parameter the decorated service should be mapped in a decorator
+ * Add `#[AsDecorator]` attribute to make a service decorates another
+ * Add `$exclude` to `TaggedIterator` and `TaggedLocator` attributes
+ * Add `$exclude` to `tagged_iterator` and `tagged_locator` configurator
+ * Add an `env` function to the expression language provider
+ * Add an `Autowire` attribute to tell a parameter how to be autowired
+ * Allow using expressions as service factories
+ * Add argument type `closure` to help passing closures to services
+ * Deprecate `ReferenceSetArgumentTrait`
+ * Add `AbstractExtension` class for DI configuration/definition on a single file
+
+6.0
+---
+
+ * Remove `Definition::setPrivate()` and `Alias::setPrivate()`, use `setPublic()` instead
+ * Remove `inline()` in favor of `inline_service()` and `ref()` in favor of `service()` when using the PHP-DSL
+ * Remove `Definition::getDeprecationMessage()`, use `Definition::getDeprecation()` instead
+ * Remove `Alias::getDeprecationMessage()`, use `Alias::getDeprecation()` instead
+ * Remove the `Psr\Container\ContainerInterface` and `Symfony\Component\DependencyInjection\ContainerInterface` aliases of the `service_container` service
+
 5.4
 ---
  * Add `$defaultIndexMethod` and `$defaultPriorityMethod` to `TaggedIterator` and `TaggedLocator` attributes
@@ -89,7 +188,7 @@ CHANGELOG
 
  * added `%env(trim:...)%` processor to trim a string value
  * added `%env(default:param_name:...)%` processor to fallback to a parameter or to null when using `%env(default::...)%`
- * added `%env(url:...)%` processor to convert an URL or DNS into an array of components
+ * added `%env(url:...)%` processor to convert a URL or DNS into an array of components
  * added `%env(query_string:...)%` processor to convert a query string into an array of key values
  * added support for deprecating aliases
  * made `ContainerParametersResource` final and not implement `Serializable` anymore

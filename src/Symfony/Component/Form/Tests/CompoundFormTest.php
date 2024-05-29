@@ -16,7 +16,6 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Form\Exception\AlreadySubmittedException;
 use Symfony\Component\Form\Extension\Core\DataAccessor\PropertyPathAccessor;
 use Symfony\Component\Form\Extension\Core\DataMapper\DataMapper;
-use Symfony\Component\Form\Extension\Core\DataMapper\PropertyPathMapper;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -27,7 +26,6 @@ use Symfony\Component\Form\FormErrorIterator;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormFactory;
-use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormRegistry;
 use Symfony\Component\Form\Forms;
@@ -43,15 +41,8 @@ use Symfony\Component\PropertyAccess\PropertyAccess;
 
 class CompoundFormTest extends TestCase
 {
-    /**
-     * @var FormFactoryInterface
-     */
-    private $factory;
-
-    /**
-     * @var FormInterface
-     */
-    private $form;
+    private FormFactory $factory;
+    private FormInterface $form;
 
     protected function setUp(): void
     {
@@ -335,6 +326,16 @@ class CompoundFormTest extends TestCase
         $this->form->add($this->getBuilder('bar')->getForm());
 
         $this->assertSame($this->form->all(), iterator_to_array($this->form));
+    }
+
+    public function testIteratorKeys()
+    {
+        $this->form->add($this->getBuilder('0')->getForm());
+        $this->form->add($this->getBuilder('1')->getForm());
+
+        foreach ($this->form as $key => $value) {
+            $this->assertIsString($key);
+        }
     }
 
     public function testAddMapsViewDataToFormIfInitialized()
@@ -946,10 +947,8 @@ class CompoundFormTest extends TestCase
         $this->form->add($field1);
         $this->form->add($field2);
 
-        $assertChildViewsEqual = function (array $childViews) {
-            return function (FormView $view) use ($childViews) {
-                $this->assertSame($childViews, $view->children);
-            };
+        $assertChildViewsEqual = fn (array $childViews) => function (FormView $view) use ($childViews) {
+            $this->assertSame($childViews, $view->children);
         };
 
         // First create the view
@@ -1078,33 +1077,6 @@ class CompoundFormTest extends TestCase
 
         $this->assertSame('Submitted data was expected to be text or number, file upload given.', $this->form->get('bar')->getTransformationFailure()->getMessage());
         $this->assertNull($this->form->get('bar')->getData());
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testMapDateTimeObjectsWithEmptyArrayDataUsingPropertyPathMapper()
-    {
-        $propertyAccessor = PropertyAccess::createPropertyAccessorBuilder()
-            ->enableExceptionOnInvalidIndex()
-            ->getPropertyAccessor();
-        $form = $this->factory->createBuilder()
-            ->setDataMapper(new PropertyPathMapper($propertyAccessor))
-            ->add('date', DateType::class, [
-                'auto_initialize' => false,
-                'format' => 'dd/MM/yyyy',
-                'html5' => false,
-                'model_timezone' => 'UTC',
-                'view_timezone' => 'UTC',
-                'widget' => 'single_text',
-            ])
-            ->getForm();
-
-        $form->submit([
-            'date' => '04/08/2022',
-        ]);
-
-        $this->assertEquals(['date' => new \DateTime('2022-08-04', new \DateTimeZone('UTC'))], $form->getData());
     }
 
     public function testMapDateTimeObjectsWithEmptyArrayDataUsingDataMapper()

@@ -11,26 +11,27 @@
 
 namespace Symfony\Component\ExpressionLanguage;
 
+use Symfony\Component\ExpressionLanguage\Node\Node;
+
 /**
- * Represents an already parsed expression.
+ * Represents an already serialized parsed expression.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class SerializedParsedExpression extends ParsedExpression
 {
-    private $nodes;
-
     /**
      * @param string $expression An expression
      * @param string $nodes      The serialized nodes for the expression
      */
-    public function __construct(string $expression, string $nodes)
-    {
+    public function __construct(
+        string $expression,
+        private string $nodes,
+    ) {
         $this->expression = $expression;
-        $this->nodes = $nodes;
     }
 
-    public function getNodes()
+    public function getNodes(): Node
     {
         return unserialize($this->nodes);
     }

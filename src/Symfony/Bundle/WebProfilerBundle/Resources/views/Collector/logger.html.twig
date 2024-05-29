@@ -1,12 +1,330 @@
 {% extends '@WebProfiler/Profiler/layout.html.twig' %}
 
-{% import _self as helper %}
+{% block stylesheets %}
+    {{ parent() }}
+
+    <style>
+        :root {
+            --log-filter-active-num-color: #2563EB;
+            --log-timestamp-color: #555;
+        }
+        .theme-dark {
+            --log-filter-active-num-color: #2563EB;
+            --log-timestamp-color: #ccc;
+        }
+
+        .log-filters {
+            display: flex;
+            flex-wrap: wrap;
+        }
+        .log-filters .log-filter {
+            flex-shrink: 0;
+            margin-right: 15px;
+            position: relative;
+        }
+        .log-filters .log-filter summary {
+            align-items: center;
+            background: var(--button-background);
+            border-radius: 6px;
+            border: 1px solid var(--button-border-color);
+            box-shadow: var(--button-box-shadow);
+            color: var(--button-color);
+            cursor: pointer;
+            display: flex;
+            font-size: 13px;
+            font-weight: 500;
+            padding: 4px 8px;
+            white-space: nowrap;
+        }
+        .log-filters .log-filter summary:active {
+            box-shadow: none;
+            transform: translateY(1px);
+        }
+        .log-filters .log-filter summary .icon {
+            height: 18px;
+            width: 18px;
+            margin: 0 7px 0 0;
+        }
+        .log-filters .log-filter summary svg {
+            height: 18px;
+            width: 18px;
+            opacity: 0.7;
+        }
+        .log-filters .log-filter summary svg {
+            stroke-width: 2;
+        }
+        .log-filters .log-filter summary .filter-active-num {
+            color: var(--log-filter-active-num-color);
+            font-weight: bold;
+            padding: 0 1px;
+        }
+        .log-filter .tab-navigation {
+            position: relative;
+        }
+        .log-filter .tab-navigation input[type="radio"] {
+            position: absolute;
+            pointer-events: none;
+            opacity: 0;
+        }
+        .tab-navigation input[type="radio"]:checked + .tab-control {
+            background-color: var(--tab-active-background);
+            border-radius: 6px;
+            box-shadow: inset 0 0 0 1.5px var(--tab-active-border-color);
+            color: var(--tab-active-color);
+            position: relative;
+            z-index: 1;
+        }
+        .theme-dark .tab-navigation input[type="radio"]:checked + .tab-control {
+            box-shadow: inset 0 0 0 1px var(--tab-border-color);
+        }
+        .tab-navigation input[type="radio"]:focus-visible + .tab-control {
+            outline: 1px solid var(--color-link);
+        }
+        .tab-navigation input[type="radio"]:checked + .tab-control + input[type="radio"] + .tab-control:before{
+            width: 0;
+        }
+
+        .log-filters .log-filter .log-filter-content {
+            background: var(--base-0);
+            border: 1px solid var(--table-border-color);
+            border-radius: 6px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            padding: 15px;
+            position: absolute;
+            left: 0;
+            top: 32px;
+            max-width: 400px;
+            min-width: 200px;
+            z-index: 9999;
+        }
+        .log-filters .log-filter .log-filter-content .log-filter-option {
+            align-items: center;
+            display: flex;
+        }
+        .log-filter .filter-select-all-or-none {
+            margin-bottom: 10px;
+        }
+        .log-filter .filter-select-all-or-none button + button {
+            margin-left: 15px;
+        }
+        .log-filters .log-filter .log-filter-content .log-filter-option + .log-filter-option {
+            margin: 7px 0 0;
+        }
+        .log-filters .log-filter .log-filter-content .log-filter-option label {
+            cursor: pointer;
+            flex: 1;
+            padding-left: 10px;
+        }
+
+        table.logs {
+            border-bottom-width: 0;
+            border-collapse: collapse;
+        }
+        table.logs tr + tr td {
+            border-width: 1px 0 0;
+        }
+        table.logs .metadata {
+            display: block;
+            font-size: 12px;
+        }
+        .theme-dark tr.status-error td,
+        .theme-dark tr.status-warning td { border-bottom: unset; border-top: unset; }
+
+        table.logs .log-timestamp {
+            color: var(--log-timestamp-color);
+        }
+        table.logs .log-metadata {
+            margin: 8px 0 0;
+        }
+        table.logs .log-metadata > span {
+            display: inline-block;
+        }
+        table.logs .log-metadata > span + span {
+            margin-left: 10px;
+        }
+        table.logs .log-metadata .log-channel {
+            color: var(--base-1);
+            font-size: 13px;
+            font-weight: bold;
+        }
+        table.logs .log-metadata .badge {
+            background: var(--badge-light-background);
+            color: var(--badge-light-color);
+        }
+        table.logs .log-metadata .log-num-occurrences {
+            color: var(--color-muted);
+            font-size: 13px;
+        }
+        table.logs .log-metadata .context {
+            background: var(--code-block-background);
+            border-radius: 4px;
+            padding: 5px;
+        }
+        table.logs .log-metadata .context + .context {
+            margin-top: 10px;
+        }
+        .log-type-badge {
+            background: var(--badge-light-background);
+            box-shadow: none;
+            color: var(--badge-light-color);
+            display: inline-block;
+            font-family: var(--font-family-system);
+            margin-top: 5px;
+        }
+        .log-type-badge.badge-deprecation,
+        .log-type-badge.badge-warning {
+            background: var(--badge-warning-background);
+            color: var(--badge-warning-color);
+        }
+        .log-type-badge.badge-error {
+            background: var(--badge-danger-background);
+            color: var(--badge-danger-color);
+        }
+        .log-type-badge.badge-silenced {
+            background: #EDE9FE;
+            color: #6D28D9;
+        }
+        .theme-dark .log-type-badge.badge-silenced {
+            background: #5B21B6;
+            color: #EDE9FE;
+        }
+
+        tr.log-status-warning > td:first-child,
+        tr.log-status-error > td:first-child,
+        tr.log-status-silenced > td:first-child {
+            position: relative;
+        }
+        tr.log-status-warning > td:first-child:before,
+        tr.log-status-error > td:first-child:before,
+        tr.log-status-silenced > td:first-child:before {
+            background: transparent;
+            border-radius: 0;
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+        }
+        tr.log-status-warning > td:first-child:before {
+            background: var(--yellow-400);
+        }
+        tr.log-status-error > td:first-child:before {
+            background: var(--red-400);
+        }
+        tr.log-status-silenced > td:first-child:before {
+            background: #a78bfa;
+        }
+
+        .container-compilation-logs {
+            background: var(--table-background);
+            border: 1px solid var(--base-2);
+            border-radius: 6px;
+            margin-top: 30px;
+            padding: 15px;
+        }
+        .container-compilation-logs summary {
+            cursor: pointer;
+        }
+        .container-compilation-logs summary h4 {
+            margin: 0 0 5px;
+        }
+        .container-compilation-logs summary p {
+            margin: 0;
+        }
+    </style>
+{% endblock %}
+
+{% block javascripts %}
+    <script>
+        window.addEventListener('DOMContentLoaded', () => {
+            new SymfonyProfilerLoggerPanel();
+        });
+
+        class SymfonyProfilerLoggerPanel {
+            constructor() {
+                this.#initializeLogsTable();
+            }
+
+            #initializeLogsTable() {
+                this.#updateLogsTable();
+
+                document.querySelectorAll('.log-filter input').forEach((input) => {
+                    input.addEventListener('change', () => { this.#updateLogsTable(); });
+                });
+
+                document.querySelectorAll('.filter-select-all-or-none button').forEach((link) => {
+                    link.addEventListener('click', () => {
+                        const selectAll = link.classList.contains('select-all');
+                        link.closest('.log-filter-content').querySelectorAll('input').forEach((input) => {
+                            input.checked = selectAll;
+                        });
+
+                        this.#updateLogsTable();
+                    });
+                });
+
+                document.body.addEventListener('click', (event) => {
+                    document.querySelectorAll('details.log-filter').forEach((filterElement) => {
+                        if (!filterElement.contains(event.target) && filterElement.open) {
+                            filterElement.open = false;
+                        }
+                    });
+                });
+            }
+
+            #updateLogsTable() {
+                const logs = document.querySelector('table.logs');
+                if (null === logs) {
+                    return;
+                }
+
+                const selectedType = document.querySelector('#log-filter-type input:checked').value;
+                const priorities = document.querySelectorAll('#log-filter-priority input');
+                const allPriorities = Array.from(priorities).map((input) => input.value);
+                const selectedPriorities = Array.from(priorities).filter((input) => input.checked).map((input) => input.value);
+                const channels = document.querySelectorAll('#log-filter-channel input');
+                const selectedChannels = Array.from(channels).filter((input) => input.checked).map((input) => input.value);
+
+                /* hide rows that don't match the current filters */
+                let numVisibleRows = 0;
+                logs.querySelectorAll('tbody tr').forEach((row) => {
+                    if ('all' !== selectedType && selectedType !== row.getAttribute('data-type')) {
+                        row.style.display = 'none';
+                        return;
+                    }
+
+                    const priority = row.getAttribute('data-priority');
+                    if (false === selectedPriorities.includes(priority) && true === allPriorities.includes(priority)) {
+                        row.style.display = 'none';
+                        return;
+                    }
+
+                    if ('' !== row.getAttribute('data-channel') && false === selectedChannels.includes(row.getAttribute('data-channel'))) {
+                        row.style.display = 'none';
+                        return;
+                    }
+
+                    row.style.display = 'table-row';
+                    numVisibleRows++;
+                });
+
+                document.querySelector('table.logs').style.display = 0 === numVisibleRows ? 'none' : 'table';
+                document.querySelector('.no-logs-message').style.display = 0 === numVisibleRows ? 'block' : 'none';
+
+                /* update the selected totals of all filters */
+                document.querySelector('#log-filter-priority .filter-active-num').innerText = (priorities.length === selectedPriorities.length) ? 'All' : selectedPriorities.length;
+                document.querySelector('#log-filter-channel .filter-active-num').innerText = (channels.length === selectedChannels.length) ? 'All' : selectedChannels.length;
+            }
+        }
+    </script>
+{% endblock %}
 
 {% block toolbar %}
     {% if collector.counterrors or collector.countdeprecations or collector.countwarnings %}
         {% set icon %}
             {% set status_color = collector.counterrors ? 'red' : collector.countwarnings ? 'yellow' : 'none' %}
-            {{ include('@WebProfiler/Icon/logger.svg') }}
+            {{ source('@WebProfiler/Icon/logger.svg') }}
             <span class="sf-toolbar-value">{{ collector.counterrors ?: (collector.countdeprecations + collector.countwarnings) }}</span>
         {% endset %}
 
@@ -33,7 +351,7 @@
 
 {% block menu %}
     <span class="label label-status-{{ collector.counterrors ? 'error' : collector.countwarnings ? 'warning' : 'none' }} {{ collector.logs is empty ? 'disabled' }}">
-        <span class="icon">{{ include('@WebProfiler/Icon/logger.svg') }}</span>
+        <span class="icon">{{ source('@WebProfiler/Icon/logger.svg') }}</span>
         <strong>Logs</strong>
         {% if collector.counterrors or collector.countdeprecations or collector.countwarnings %}
             <span class="count">
@@ -47,7 +365,7 @@
     <h2>Log Messages</h2>
 
     {% if collector.processedLogs is empty %}
-        <div class="empty">
+        <div class="empty empty-panel">
             <p>No log messages available.</p>
         </div>
     {% else %}
@@ -57,33 +375,30 @@
         {% set filters = collector.filters %}
         <div class="log-filters">
             <div id="log-filter-type" class="log-filter">
-                <ul class="tab-navigation">
-                    <li class="{{ not has_error_logs and not has_deprecation_logs ? 'active' }}">
-                        <input {{ not has_error_logs and not has_deprecation_logs ? 'checked' }} type="radio" id="filter-log-type-all" name="filter-log-type" value="all">
-                        <label for="filter-log-type-all">All messages</label>
-                    </li>
+                <div class="tab-navigation">
+                    {% set initially_active_tab = has_error_logs ? 'error' : has_deprecation_logs ? 'deprecation' : 'all' %}
+                    <input type="radio" id="filter-log-type-all" name="filter-log-type" value="all" {{ 'all' == initially_active_tab ? 'checked' }}>
+                    <label for="filter-log-type-all" class="tab-control">
+                        All messages
+                    </label>
 
-                    <li class="{{ has_error_logs ? 'active' }}">
-                        <input {{ has_error_logs ? 'checked' }} type="radio" id="filter-log-type-error" name="filter-log-type" value="error">
-                        <label for="filter-log-type-error">
-                            Errors
-                            <span class="badge status-{{ collector.counterrors ? 'error' }}">{{ collector.counterrors|default(0) }}</span>
-                        </label>
-                    </li>
+                    <input type="radio" id="filter-log-type-error" name="filter-log-type" value="error" {{ 'error' == initially_active_tab ? 'checked' }}>
+                    <label for="filter-log-type-error" class="tab-control">
+                        Errors
+                        <span class="badge status-{{ collector.counterrors ? 'error' }}">{{ collector.counterrors|default(0) }}</span>
+                    </label>
 
-                    <li class="{{ not has_error_logs and has_deprecation_logs ? 'active' }}">
-                        <input {{ not has_error_logs and has_deprecation_logs ? 'checked' }} type="radio" id="filter-log-type-deprecation" name="filter-log-type" value="deprecation">
-                        <label for="filter-log-type-deprecation">
-                            Deprecations
-                            <span class="badge status-{{ collector.countdeprecations ? 'warning' }}">{{ collector.countdeprecations|default(0) }}</span>
-                        </label>
-                    </li>
-                </ul>
+                    <input type="radio" id="filter-log-type-deprecation" name="filter-log-type" value="deprecation" {{ 'deprecation' == initially_active_tab ? 'checked' }}>
+                    <label for="filter-log-type-deprecation" class="tab-control">
+                        Deprecations
+                        <span class="badge status-{{ collector.countdeprecations ? 'warning' }}">{{ collector.countdeprecations|default(0) }}</span>
+                    </label>
+                </div>
             </div>
 
             <details id="log-filter-priority" class="log-filter">
                 <summary>
-                    <span class="icon">{{ include('@WebProfiler/Icon/filter.svg') }}</span>
+                    <span class="icon">{{ source('@WebProfiler/Icon/filter.svg') }}</span>
                     Level (<span class="filter-active-num">{{ filters.priority|length - 1 }}</span>)
                 </summary>
 
@@ -104,7 +419,7 @@
 
             <details id="log-filter-channel" class="log-filter">
                 <summary>
-                    <span class="icon">{{ include('@WebProfiler/Icon/filter.svg') }}</span>
+                    <span class="icon">{{ source('@WebProfiler/Icon/filter.svg') }}</span>
                     Channel (<span class="filter-active-num">{{ filters.channel|length - 1 }}</span>)
                 </summary>
 
@@ -126,7 +441,7 @@
 
         <table class="logs">
             <colgroup>
-                <col width="140px">
+                <col style="width: 140px">
                 <col>
             </colgroup>
 
@@ -145,7 +460,7 @@
                     %}
                     <tr class="log-status-{{ css_class }}" data-type="{{ log.type }}" data-priority="{{ log.priority }}" data-channel="{{ log.channel }}" style="{{ 'event' == log.channel or 'DEBUG' == log.priorityName ? 'display: none' }}">
                         <td class="log-timestamp">
-                            <time title="{{ log.timestamp|date('r') }}" datetime="{{ log.timestamp|date('c') }}">
+                            <time class="newline" title="{{ log.timestamp|date('r') }}" datetime="{{ log.timestamp|date(constant('DateTimeInterface::RFC3339_EXTENDED')) }}" data-convert-to-user-timezone data-render-as-time data-render-with-millisecond-precision>
                                 {{ log.timestamp|date('H:i:s.v') }}
                             </time>
 
@@ -165,7 +480,7 @@
                         </td>
 
                         <td class="font-normal">
-                            {{ helper.render_log_message('debug', loop.index, log) }}
+                            {{ _self.render_log_message('debug', loop.index, log) }}
                         </td>
                     </tr>
                 {% endfor %}
@@ -175,15 +490,9 @@
         <div class="no-logs-message empty">
             <p>There are no log messages.</p>
         </div>
-
-        <script>Sfjs.initializeLogsTable();</script>
     {% endif %}
 
-    {% set compilerLogTotal = 0 %}
-    {% for logs in collector.compilerLogs %}
-        {% set compilerLogTotal = compilerLogTotal + logs|length %}
-    {% endfor %}
-
+    {% set compilerLogTotal = collector.compilerLogs|reduce((total, logs) => total + logs|length, 0) %}
     <details class="container-compilation-logs">
         <summary>
             <h4>Container Compilation Logs <span class="text-muted">({{ compilerLogTotal }})</span></h4>

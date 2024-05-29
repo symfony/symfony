@@ -11,6 +11,10 @@
             other-option="lorem"
             an_other-option="ipsum"
         />
+        <tag some-option="cat"
+            some_option="ciz"
+            other-option="lorem"
+            an_other-option="ipsum">bar_tag</tag>
     </service>
   </services>
 </container>

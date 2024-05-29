@@ -19,8 +19,7 @@ use Symfony\Component\Lock\Strategy\ConsensusStrategy;
  */
 class ConsensusStrategyTest extends TestCase
 {
-    /** @var ConsensusStrategy */
-    private $strategy;
+    private ConsensusStrategy $strategy;
 
     protected function setUp(): void
     {

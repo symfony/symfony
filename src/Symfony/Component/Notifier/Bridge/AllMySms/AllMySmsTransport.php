@@ -28,31 +28,24 @@ final class AllMySmsTransport extends AbstractTransport
 {
     protected const HOST = 'api.allmysms.com';
 
-    private $login;
-    private $apiKey;
-    private $from;
-
-    public function __construct(string $login, string $apiKey, ?string $from = null, ?HttpClientInterface $client = null, ?EventDispatcherInterface $dispatcher = null)
-    {
-        $this->login = $login;
-        $this->apiKey = $apiKey;
-        $this->from = $from;
-
+    public function __construct(
+        private string $login,
+        #[\SensitiveParameter] private string $apiKey,
+        private ?string $from = null,
+        ?HttpClientInterface $client = null,
+        ?EventDispatcherInterface $dispatcher = null,
+    ) {
         parent::__construct($client, $dispatcher);
     }
 
     public function __toString(): string
     {
-        if (null !== $this->from) {
-            return sprintf('allmysms://%s?from=%s', $this->getEndpoint(), $this->from);
-        }
-
-        return sprintf('allmysms://%s', $this->getEndpoint());
+        return sprintf('allmysms://%s%s', $this->getEndpoint(), null !== $this->from ? '?from='.$this->from : '');
     }
 
     public function supports(MessageInterface $message): bool
     {
-        return $message instanceof SmsMessage;
+        return $message instanceof SmsMessage && (null === $message->getOptions() || $message->getOptions() instanceof AllMySmsOptions);
     }
 
     protected function doSend(MessageInterface $message): SentMessage
@@ -61,14 +54,15 @@ final class AllMySmsTransport extends AbstractTransport
             throw new UnsupportedMessageTypeException(__CLASS__, SmsMessage::class, $message);
         }
 
+        $options = $message->getOptions()?->toArray() ?? [];
+        $options['from'] = $message->getFrom() ?: $this->from;
+        $options['to'] = $message->getPhone();
+        $options['text'] = $message->getSubject();
+
         $endpoint = sprintf('https://%s/sms/send/', $this->getEndpoint());
         $response = $this->client->request('POST', $endpoint, [
-            'auth_basic' => $this->login.':'.$this->apiKey,
-            'json' => [
-                'from' => $this->from,
-                'to' => $message->getPhone(),
-                'text' => $message->getSubject(),
-            ],
+            'auth_basic' => [$this->login, $this->apiKey],
+            'json' => array_filter($options),
         ]);
 
         try {

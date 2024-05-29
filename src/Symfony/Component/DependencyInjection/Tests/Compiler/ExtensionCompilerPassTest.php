@@ -22,8 +22,8 @@ use Symfony\Component\DependencyInjection\Extension\Extension;
  */
 class ExtensionCompilerPassTest extends TestCase
 {
-    private $container;
-    private $pass;
+    private ContainerBuilder $container;
+    private ExtensionCompilerPass $pass;
 
     protected function setUp(): void
     {
@@ -54,11 +54,8 @@ class ExtensionCompilerPassTest extends TestCase
 
 class DummyExtension extends Extension
 {
-    private $alias;
-
-    public function __construct($alias)
+    public function __construct(private readonly string $alias)
     {
-        $this->alias = $alias;
     }
 
     public function getAlias(): string
@@ -66,11 +63,11 @@ class DummyExtension extends Extension
         return $this->alias;
     }
 
-    public function load(array $configs, ContainerBuilder $container)
+    public function load(array $configs, ContainerBuilder $container): void
     {
     }
 
-    public function process(ContainerBuilder $container)
+    public function process(ContainerBuilder $container): void
     {
         $container->register($this->alias);
     }

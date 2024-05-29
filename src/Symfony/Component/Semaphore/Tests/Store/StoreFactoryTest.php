@@ -51,4 +51,15 @@ class StoreFactoryTest extends TestCase
 
         $this->assertInstanceOf(RedisStore::class, $store);
     }
+
+    public function testCreatePredisStore()
+    {
+        if (!class_exists(\Predis\Client::class)) {
+            $this->markTestSkipped();
+        }
+
+        $store = StoreFactory::createStore(new \Predis\Client());
+
+        $this->assertInstanceOf(RedisStore::class, $store);
+    }
 }

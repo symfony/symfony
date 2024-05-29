@@ -12,7 +12,6 @@
 namespace Symfony\Bridge\Doctrine\Form\ChoiceList;
 
 use Doctrine\DBAL\ArrayParameterType;
-use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Types\ConversionException;
 use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\QueryBuilder;
@@ -26,33 +25,17 @@ use Symfony\Component\Form\Exception\TransformationFailedException;
  */
 class ORMQueryBuilderLoader implements EntityLoaderInterface
 {
-    /**
-     * Contains the query builder that builds the query for fetching the
-     * entities.
-     *
-     * This property should only be accessed through queryBuilder.
-     *
-     * @var QueryBuilder
-     */
-    private $queryBuilder;
-
-    public function __construct(QueryBuilder $queryBuilder)
-    {
-        $this->queryBuilder = $queryBuilder;
+    public function __construct(
+        private readonly QueryBuilder $queryBuilder,
+    ) {
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getEntities()
+    public function getEntities(): array
     {
         return $this->queryBuilder->getQuery()->execute();
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getEntitiesByIds(string $identifier, array $values)
+    public function getEntitiesByIds(string $identifier, array $values): array
     {
         if (null !== $this->queryBuilder->getMaxResults() || 0 < (int) $this->queryBuilder->getFirstResult()) {
             // an offset or a limit would apply on results including the where clause with submitted id values
@@ -79,20 +62,16 @@ class ORMQueryBuilderLoader implements EntityLoaderInterface
         $entity = current($qb->getRootEntities());
         $metadata = $qb->getEntityManager()->getClassMetadata($entity);
         if (\in_array($type = $metadata->getTypeOfField($identifier), ['integer', 'bigint', 'smallint'])) {
-            $parameterType = class_exists(ArrayParameterType::class) ? ArrayParameterType::INTEGER : Connection::PARAM_INT_ARRAY;
+            $parameterType = ArrayParameterType::INTEGER;
 
             // Filter out non-integer values (e.g. ""). If we don't, some
             // databases such as PostgreSQL fail.
-            $values = array_values(array_filter($values, function ($v) {
-                return (string) $v === (string) (int) $v || ctype_digit($v);
-            }));
+            $values = array_values(array_filter($values, fn ($v) => (string) $v === (string) (int) $v || ctype_digit($v)));
         } elseif (\in_array($type, ['ulid', 'uuid', 'guid'])) {
-            $parameterType = class_exists(ArrayParameterType::class) ? ArrayParameterType::STRING : Connection::PARAM_STR_ARRAY;
+            $parameterType = ArrayParameterType::STRING;
 
             // Like above, but we just filter out empty strings.
-            $values = array_values(array_filter($values, function ($v) {
-                return '' !== (string) $v;
-            }));
+            $values = array_values(array_filter($values, fn ($v) => '' !== (string) $v));
 
             // Convert values into right type
             if (Type::hasType($type)) {
@@ -108,7 +87,7 @@ class ORMQueryBuilderLoader implements EntityLoaderInterface
                 unset($value);
             }
         } else {
-            $parameterType = class_exists(ArrayParameterType::class) ? ArrayParameterType::STRING : Connection::PARAM_STR_ARRAY;
+            $parameterType = ArrayParameterType::STRING;
         }
         if (!$values) {
             return [];

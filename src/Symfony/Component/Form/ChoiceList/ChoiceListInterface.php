@@ -30,7 +30,7 @@ interface ChoiceListInterface
      *
      * @return array The selectable choices indexed by the corresponding values
      */
-    public function getChoices();
+    public function getChoices(): array;
 
     /**
      * Returns the values for the choices.
@@ -57,7 +57,7 @@ interface ChoiceListInterface
      *
      * @return string[]
      */
-    public function getValues();
+    public function getValues(): array;
 
     /**
      * Returns the values in the structure originally passed to the list.
@@ -88,7 +88,7 @@ interface ChoiceListInterface
      *
      * @return string[]
      */
-    public function getStructuredValues();
+    public function getStructuredValues(): array;
 
     /**
      * Returns the original keys of the choices.
@@ -110,7 +110,7 @@ interface ChoiceListInterface
      * @return int[]|string[] The original choice keys indexed by the
      *                        corresponding choice values
      */
-    public function getOriginalKeys();
+    public function getOriginalKeys(): array;
 
     /**
      * Returns the choices corresponding to the given values.
@@ -120,10 +120,8 @@ interface ChoiceListInterface
      *
      * @param string[] $values An array of choice values. Non-existing values in
      *                         this array are ignored
-     *
-     * @return array
      */
-    public function getChoicesForValues(array $values);
+    public function getChoicesForValues(array $values): array;
 
     /**
      * Returns the values corresponding to the given choices.
@@ -136,5 +134,5 @@ interface ChoiceListInterface
      *
      * @return string[]
      */
-    public function getValuesForChoices(array $choices);
+    public function getValuesForChoices(array $choices): array;
 }

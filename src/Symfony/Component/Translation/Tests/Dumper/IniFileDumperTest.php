@@ -24,6 +24,6 @@ class IniFileDumperTest extends TestCase
 
         $dumper = new IniFileDumper();
 
-        $this->assertStringEqualsFile(__DIR__.'/../fixtures/resources.ini', $dumper->formatCatalogue($catalogue, 'messages'));
+        $this->assertStringEqualsFile(__DIR__.'/../Fixtures/resources.ini', $dumper->formatCatalogue($catalogue, 'messages'));
     }
 }

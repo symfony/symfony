@@ -14,8 +14,8 @@ namespace Symfony\Component\Serializer\Tests\Mapping\Loader\Features;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\Serializer\Mapping\ClassMetadata;
 use Symfony\Component\Serializer\Mapping\Loader\LoaderInterface;
-use Symfony\Component\Serializer\Tests\Fixtures\Annotations\ContextDummy;
-use Symfony\Component\Serializer\Tests\Fixtures\Annotations\ContextDummyParent;
+use Symfony\Component\Serializer\Tests\Fixtures\Attributes\ContextDummy;
+use Symfony\Component\Serializer\Tests\Fixtures\Attributes\ContextDummyParent;
 
 /**
  * @author Maxime Steinhausser <maxime.steinhausser@gmail.com>
@@ -29,7 +29,7 @@ trait ContextMappingTestTrait
         $this->assertLoadedContexts();
     }
 
-    public function assertLoadedContexts(string $dummyClass = ContextDummy::class, string $parentClass = ContextDummyParent::class)
+    public function assertLoadedContexts(string $dummyClass = ContextDummy::class, string $parentClass = ContextDummyParent::class): void
     {
         $loader = $this->getLoaderForContextMapping();
 

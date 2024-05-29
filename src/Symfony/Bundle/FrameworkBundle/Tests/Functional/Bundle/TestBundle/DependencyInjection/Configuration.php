@@ -11,14 +11,15 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\DependencyInjection;
 
+use Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\DependencyInjection\Config\CustomConfig;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 
 class Configuration implements ConfigurationInterface
 {
-    private $customConfig;
+    private ?CustomConfig $customConfig;
 
-    public function __construct($customConfig = null)
+    public function __construct(?CustomConfig $customConfig = null)
     {
         $this->customConfig = $customConfig;
     }
@@ -27,9 +28,7 @@ class Configuration implements ConfigurationInterface
     {
         $treeBuilder = new TreeBuilder('test');
 
-        if ($this->customConfig) {
-            $this->customConfig->addConfiguration($treeBuilder->getRootNode());
-        }
+        $this->customConfig?->addConfiguration($treeBuilder->getRootNode());
 
         return $treeBuilder;
     }

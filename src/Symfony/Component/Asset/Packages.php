@@ -22,27 +22,26 @@ use Symfony\Component\Asset\Exception\LogicException;
  */
 class Packages
 {
-    private $defaultPackage;
-    private $packages = [];
+    private array $packages = [];
 
     /**
      * @param PackageInterface[] $packages Additional packages indexed by name
      */
-    public function __construct(?PackageInterface $defaultPackage = null, iterable $packages = [])
-    {
-        $this->defaultPackage = $defaultPackage;
-
+    public function __construct(
+        private ?PackageInterface $defaultPackage = null,
+        iterable $packages = [],
+    ) {
         foreach ($packages as $name => $package) {
             $this->addPackage($name, $package);
         }
     }
 
-    public function setDefaultPackage(PackageInterface $defaultPackage)
+    public function setDefaultPackage(PackageInterface $defaultPackage): void
     {
         $this->defaultPackage = $defaultPackage;
     }
 
-    public function addPackage(string $name, PackageInterface $package)
+    public function addPackage(string $name, PackageInterface $package): void
     {
         $this->packages[$name] = $package;
     }
@@ -50,14 +49,12 @@ class Packages
     /**
      * Returns an asset package.
      *
-     * @param string $name The name of the package or null for the default package
-     *
-     * @return PackageInterface
+     * @param string|null $name The name of the package or null for the default package
      *
      * @throws InvalidArgumentException If there is no package by that name
      * @throws LogicException           If no default package is defined
      */
-    public function getPackage(?string $name = null)
+    public function getPackage(?string $name = null): PackageInterface
     {
         if (null === $name) {
             if (null === $this->defaultPackage) {
@@ -77,12 +74,10 @@ class Packages
     /**
      * Gets the version to add to public URL.
      *
-     * @param string $path        A public path
-     * @param string $packageName A package name
-     *
-     * @return string
+     * @param string      $path        A public path
+     * @param string|null $packageName A package name
      */
-    public function getVersion(string $path, ?string $packageName = null)
+    public function getVersion(string $path, ?string $packageName = null): string
     {
         return $this->getPackage($packageName)->getVersion($path);
     }
@@ -92,12 +87,12 @@ class Packages
      *
      * Absolute paths (i.e. http://...) are returned unmodified.
      *
-     * @param string $path        A public path
-     * @param string $packageName The name of the asset package to use
+     * @param string      $path        A public path
+     * @param string|null $packageName The name of the asset package to use
      *
      * @return string A public path which takes into account the base path and URL path
      */
-    public function getUrl(string $path, ?string $packageName = null)
+    public function getUrl(string $path, ?string $packageName = null): string
     {
         return $this->getPackage($packageName)->getUrl($path);
     }

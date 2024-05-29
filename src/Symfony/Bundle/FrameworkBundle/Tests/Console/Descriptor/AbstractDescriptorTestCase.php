@@ -26,7 +26,7 @@ use Symfony\Component\Routing\RouteCollection;
 
 abstract class AbstractDescriptorTestCase extends TestCase
 {
-    private $colSize;
+    private string|false $colSize;
 
     protected function setUp(): void
     {
@@ -122,9 +122,7 @@ abstract class AbstractDescriptorTestCase extends TestCase
             $definitionsWithArgs[str_replace('definition_', 'definition_arguments_', $key)] = $definition;
         }
 
-        if (\PHP_VERSION_ID >= 80100) {
-            $definitionsWithArgs['definition_arguments_with_enum'] = (new Definition('definition_with_enum'))->setArgument(0, FooUnitEnum::FOO);
-        }
+        $definitionsWithArgs['definition_arguments_with_enum'] = (new Definition('definition_with_enum'))->setArgument(0, FooUnitEnum::FOO);
 
         return static::getDescriptionTestData($definitionsWithArgs);
     }
@@ -171,7 +169,13 @@ abstract class AbstractDescriptorTestCase extends TestCase
         return $data;
     }
 
-    /** @dataProvider getDescribeContainerParameterTestData */
+    /**
+     * The legacy group must be kept as deprecations will always be raised.
+     *
+     * @group legacy
+     *
+     * @dataProvider getDescribeContainerParameterTestData
+     */
     public function testDescribeContainerParameter($parameter, $expectedDescription, array $options)
     {
         $this->assertDescription($expectedDescription, $parameter, $options);
@@ -187,6 +191,9 @@ abstract class AbstractDescriptorTestCase extends TestCase
         $file = array_pop($data[1]);
         $data[1][] = ['parameter' => 'twig.form.resources'];
         $data[1][] = $file;
+        $file = array_pop($data[2]);
+        $data[2][] = ['parameter' => 'deprecated_foo'];
+        $data[2][] = $file;
 
         return $data;
     }

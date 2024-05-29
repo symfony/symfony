@@ -18,32 +18,7 @@ Dump the shell completion script
 
 * `completion [--debug] [--] [<shell>]`
 
-The completion command dumps the shell completion script required
-to use shell autocompletion (currently only bash completion is supported).
-
-Static installation
--------------------
-
-Dump the script to a global completion file and restart your shell:
-
-    %%PHP_SELF%% completion bash | sudo tee /etc/bash_completion.d/%%COMMAND_NAME%%
-
-Or dump the script to a local file and source it:
-
-    %%PHP_SELF%% completion bash > completion.sh
-
-    # source the file whenever you use the project
-    source completion.sh
-
-    # or add this line at the end of your "~/.bashrc" file:
-    source /path/to/completion.sh
-
-Dynamic installation
---------------------
-
-Add this to the end of your shell configuration file (e.g. "~/.bashrc"):
-
-    eval "$(%%PHP_SELF_FULL%% completion bash)"
+Dump the shell completion script
 
 ### Arguments
 

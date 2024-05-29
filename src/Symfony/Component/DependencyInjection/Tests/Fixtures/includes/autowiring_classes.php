@@ -3,27 +3,34 @@
 namespace Symfony\Component\DependencyInjection\Tests\Compiler;
 
 use Psr\Log\LoggerInterface;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
+use Symfony\Contracts\Service\Attribute\Required;
 
-if (\PHP_VERSION_ID >= 80000) {
-    require __DIR__.'/uniontype_classes.php';
-    require __DIR__.'/autowiring_classes_80.php';
-}
-if (\PHP_VERSION_ID >= 80100) {
-    require __DIR__.'/intersectiontype_classes.php';
-}
-if (\PHP_VERSION_ID >= 80200) {
-    require __DIR__.'/compositetype_classes.php';
-}
+require __DIR__.'/uniontype_classes.php';
+require __DIR__.'/autowiring_classes_80.php';
+require __DIR__.'/intersectiontype_classes.php';
+require __DIR__.'/compositetype_classes.php';
 
 class Foo
 {
-    /**
-     * @required
-     * @return static
-     */
-    public function cloneFoo()
+    public static int $counter = 0;
+
+    #[Required]
+    public function cloneFoo(?\stdClass $bar = null): static
     {
+        ++self::$counter;
+
         return clone $this;
+    }
+}
+
+class FooVoid
+{
+    public static int $counter = 0;
+
+    public function __invoke(string $name): void
+    {
+        ++self::$counter;
     }
 }
 
@@ -99,7 +106,7 @@ class D
 
 class E
 {
-    public function __construct(D $d = null)
+    public function __construct(?D $d = null)
     {
     }
 }
@@ -155,13 +162,6 @@ class LesTilleuls
     }
 }
 
-class OptionalParameter
-{
-    public function __construct(CollisionInterface $c = null, A $a, Foo $f = null)
-    {
-    }
-}
-
 class BadTypeHintedArgument
 {
     public function __construct(Dunglas $k, NotARealClass $r)
@@ -195,7 +195,7 @@ class MultipleArguments
 
 class MultipleArgumentsOptionalScalar
 {
-    public function __construct(A $a, $foo = 'default_val', Lille $lille = null)
+    public function __construct(A $a, $foo = 'default_val', ?Lille $lille = null)
     {
     }
 }
@@ -206,12 +206,20 @@ class MultipleArgumentsOptionalScalarLast
     }
 }
 
+class UnderscoreNamedArgument
+{
+    public function __construct(
+        public \DateTimeImmutable $now_datetime,
+    ) {
+    }
+}
+
 /*
  * Classes used for testing createResourceForClass
  */
 class ClassForResource
 {
-    public function __construct($foo, Bar $bar = null)
+    public function __construct($foo, ?Bar $bar = null)
     {
     }
 
@@ -232,9 +240,7 @@ class ClassChangedConstructorArgs extends ClassForResource
 
 class SetterInjectionCollision
 {
-    /**
-     * @required
-     */
+    #[Required]
     public function setMultipleInstancesForOneArg(CollisionInterface $collision)
     {
         // The CollisionInterface cannot be autowired - there are multiple
@@ -243,67 +249,23 @@ class SetterInjectionCollision
     }
 }
 
-class SetterInjection extends SetterInjectionParent
-{
-    /**
-     * @required
-     */
-    public function setFoo(Foo $foo)
-    {
-        // should be called
-    }
-
-    /** @inheritdoc*/ // <- brackets are missing on purpose
-    public function setDependencies(Foo $foo, A $a)
-    {
-        // should be called
-    }
-
-    /** {@inheritdoc} */
-    public function setWithCallsConfigured(A $a)
-    {
-        // this method has a calls configured on it
-    }
-
-    public function notASetter(A $a)
-    {
-        // should be called only when explicitly specified
-    }
-
-    /**
-     * @required*/
-    public function setChildMethodWithoutDocBlock(A $a)
-    {
-    }
-}
-
 class Wither
 {
     public $foo;
 
-    /**
-     * @required
-     */
+    #[Required]
     public function setFoo(Foo $foo)
     {
     }
 
-    /**
-     * @required
-     *
-     * @return static
-     */
-    public function withFoo1(Foo $foo): self
+    #[Required]
+    public function withFoo1(Foo $foo): static
     {
         return $this->withFoo2($foo);
     }
 
-    /**
-     * @required
-     *
-     * @return static
-     */
-    public function withFoo2(Foo $foo): self
+    #[Required]
+    public function withFoo2(Foo $foo): static
     {
         $new = clone $this;
         $new->foo = $foo;
@@ -314,7 +276,7 @@ class Wither
 
 class SetterInjectionParent
 {
-    /** @required*/
+    #[Required]
     public function setDependencies(Foo $foo, A $a)
     {
         // should be called
@@ -322,17 +284,43 @@ class SetterInjectionParent
 
     public function notASetter(A $a)
     {
-        // @required should be ignored when the child does not add @inheritdoc
+        // #[Required] should be ignored when the child does not also add #[Required]
     }
 
-    /**	@required <tab> prefix is on purpose */
+    #[Required]
     public function setWithCallsConfigured(A $a)
     {
     }
 
-    /** @required */
+    #[Required]
     public function setChildMethodWithoutDocBlock(A $a)
     {
+    }
+}
+
+
+class SetterInjection extends SetterInjectionParent
+{
+    #[Required]
+    public function setFoo(Foo $foo)
+    {
+        // should be called
+    }
+
+    #[Required]
+    public function setDependencies(Foo $foo, A $a)
+    {
+        // should be called
+    }
+
+    public function setWithCallsConfigured(A $a)
+    {
+        // this method has a calls configured on it
+    }
+
+    public function notASetter(A $a)
+    {
+        // should be called only when explicitly specified
     }
 }
 
@@ -350,7 +338,7 @@ class NotWireable
     {
     }
 
-    public function setOptionalNotAutowireable(NotARealClass $n = null)
+    public function setOptionalNotAutowireable(?NotARealClass $n = null)
     {
     }
 
@@ -366,7 +354,7 @@ class NotWireable
     {
     }
 
-    /** @required */
+    #[Required]
     protected function setProtectedMethod(A $a)
     {
     }
@@ -381,9 +369,7 @@ class PrivateConstructor
 
 class ScalarSetter
 {
-    /**
-     * @required
-     */
+    #[Required]
     public function setDefaultLocale($defaultLocale)
     {
     }
@@ -399,7 +385,7 @@ class DecoratorImpl implements DecoratorInterface
 
 class Decorated implements DecoratorInterface
 {
-    public function __construct($quz = null, \NonExistent $nonExistent = null, DecoratorInterface $decorated = null, array $foo = [])
+    public function __construct($quz = null, ?\NonExistent $nonExistent = null, ?DecoratorInterface $decorated = null, array $foo = [])
     {
     }
 }
@@ -436,5 +422,99 @@ class ParametersLikeDefaultValue
 {
     public function __construct(string $parameterLike = '%not%one%parameter%here%', string $willBeSetToKeepFirstArgumentDefaultValue = 'ok')
     {
+    }
+}
+
+class StaticConstructor
+{
+    public function __construct(private string $bar)
+    {
+    }
+
+    public function getBar(): string
+    {
+        return $this->bar;
+    }
+
+    public static function create(string $foo): static
+    {
+        return new self($foo);
+    }
+}
+
+class AAndIInterfaceConsumer
+{
+    public function __construct(
+        #[Autowire(service: 'foo', lazy: true)]
+        AInterface&IInterface $logger,
+    ) {
+    }
+}
+
+interface SingleMethodInterface
+{
+    public function theMethod();
+}
+
+class MyCallable
+{
+    public function __invoke(): void
+    {
+    }
+}
+
+class MyInlineService
+{
+    public function __construct(private readonly ?string $someParam = null)
+    {
+    }
+
+    public function someMethod(): void
+    {
+    }
+
+    public function someMethod1(): void
+    {
+    }
+
+    public function someMethod2(): void
+    {
+    }
+
+    public function getSomeParam(): ?string
+    {
+        return $this->someParam;
+    }
+}
+
+class MyFactory
+{
+    public function __construct()
+    {
+    }
+
+    public function __invoke(mixed $someParam = null): MyInlineService
+    {
+        return new MyInlineService($someParam ?? 'someString');
+    }
+
+    public function createFoo(): MyInlineService
+    {
+        return new MyInlineService('someString');
+    }
+
+    public function createFooWithParam(mixed $someParam): MyInlineService
+    {
+        return new MyInlineService($someParam);
+    }
+
+    public static function staticCreateFoo(): MyInlineService
+    {
+        return new MyInlineService('someString');
+    }
+
+    public static function staticCreateFooWithParam(mixed $someParam): MyInlineService
+    {
+        return new MyInlineService($someParam);
     }
 }

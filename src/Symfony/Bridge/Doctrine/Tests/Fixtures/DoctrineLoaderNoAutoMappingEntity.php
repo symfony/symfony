@@ -15,31 +15,17 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
- * @ORM\Entity
- * @Assert\DisableAutoMapping
- *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
 #[ORM\Entity, Assert\DisableAutoMapping]
 class DoctrineLoaderNoAutoMappingEntity
 {
-    /**
-     * @ORM\Id
-     * @ORM\Column
-     */
     #[ORM\Id, ORM\Column]
     public $id;
 
-    /**
-     * @ORM\Column(length=20, unique=true)
-     */
     #[ORM\Column(length: 20, unique: true)]
     public $maxLength;
 
-    /**
-     * @Assert\EnableAutoMapping
-     * @ORM\Column(length=20)
-     */
     #[Assert\EnableAutoMapping, ORM\Column(length: 20)]
     public $autoMappingExplicitlyEnabled;
 }

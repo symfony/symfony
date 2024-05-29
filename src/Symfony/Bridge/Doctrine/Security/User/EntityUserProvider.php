@@ -30,31 +30,21 @@ use Symfony\Component\Security\Core\User\UserProviderInterface;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+ *
+ * @template TUser of UserInterface
+ *
+ * @template-implements UserProviderInterface<TUser>
  */
 class EntityUserProvider implements UserProviderInterface, PasswordUpgraderInterface
 {
-    private $registry;
-    private $managerName;
-    private $classOrAlias;
-    private $class;
-    private $property;
+    private string $class;
 
-    public function __construct(ManagerRegistry $registry, string $classOrAlias, ?string $property = null, ?string $managerName = null)
-    {
-        $this->registry = $registry;
-        $this->managerName = $managerName;
-        $this->classOrAlias = $classOrAlias;
-        $this->property = $property;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function loadUserByUsername(string $username)
-    {
-        trigger_deprecation('symfony/doctrine-bridge', '5.3', 'Method "%s()" is deprecated, use loadUserByIdentifier() instead.', __METHOD__);
-
-        return $this->loadUserByIdentifier($username);
+    public function __construct(
+        private readonly ManagerRegistry $registry,
+        private readonly string $classOrAlias,
+        private readonly ?string $property = null,
+        private readonly ?string $managerName = null,
+    ) {
     }
 
     public function loadUserByIdentifier(string $identifier): UserInterface
@@ -67,14 +57,7 @@ class EntityUserProvider implements UserProviderInterface, PasswordUpgraderInter
                 throw new \InvalidArgumentException(sprintf('You must either make the "%s" entity Doctrine Repository ("%s") implement "Symfony\Bridge\Doctrine\Security\User\UserLoaderInterface" or set the "property" option in the corresponding entity provider configuration.', $this->classOrAlias, get_debug_type($repository)));
             }
 
-            // @deprecated since Symfony 5.3, change to $repository->loadUserByIdentifier() in 6.0
-            if (method_exists($repository, 'loadUserByIdentifier')) {
-                $user = $repository->loadUserByIdentifier($identifier);
-            } else {
-                trigger_deprecation('symfony/doctrine-bridge', '5.3', 'Not implementing method "loadUserByIdentifier()" in user loader "%s" is deprecated. This method will replace "loadUserByUsername()" in Symfony 6.0.', get_debug_type($repository));
-
-                $user = $repository->loadUserByUsername($identifier);
-            }
+            $user = $repository->loadUserByIdentifier($identifier);
         }
 
         if (null === $user) {
@@ -87,10 +70,7 @@ class EntityUserProvider implements UserProviderInterface, PasswordUpgraderInter
         return $user;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function refreshUser(UserInterface $user)
+    public function refreshUser(UserInterface $user): UserInterface
     {
         $class = $this->getClass();
         if (!$user instanceof $class) {
@@ -125,36 +105,23 @@ class EntityUserProvider implements UserProviderInterface, PasswordUpgraderInter
         return $refreshedUser;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function supportsClass(string $class)
+    public function supportsClass(string $class): bool
     {
         return $class === $this->getClass() || is_subclass_of($class, $this->getClass());
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @final
      */
-    public function upgradePassword($user, string $newHashedPassword): void
+    public function upgradePassword(PasswordAuthenticatedUserInterface $user, string $newHashedPassword): void
     {
-        if (!$user instanceof PasswordAuthenticatedUserInterface) {
-            trigger_deprecation('symfony/doctrine-bridge', '5.3', 'The "%s::upgradePassword()" method expects an instance of "%s" as first argument, the "%s" class should implement it.', PasswordUpgraderInterface::class, PasswordAuthenticatedUserInterface::class, get_debug_type($user));
-
-            if (!$user instanceof UserInterface) {
-                throw new \TypeError(sprintf('The "%s()" method expects an instance of "%s" as first argument, "%s" given.', __METHOD__, PasswordAuthenticatedUserInterface::class, get_debug_type($user)));
-            }
-        }
-
         $class = $this->getClass();
         if (!$user instanceof $class) {
             throw new UnsupportedUserException(sprintf('Instances of "%s" are not supported.', get_debug_type($user)));
         }
 
         $repository = $this->getRepository();
-        if ($repository instanceof PasswordUpgraderInterface) {
+        if ($user instanceof PasswordAuthenticatedUserInterface && $repository instanceof PasswordUpgraderInterface) {
             $repository->upgradePassword($user, $newHashedPassword);
         }
     }
@@ -171,7 +138,7 @@ class EntityUserProvider implements UserProviderInterface, PasswordUpgraderInter
 
     private function getClass(): string
     {
-        if (null === $this->class) {
+        if (!isset($this->class)) {
             $class = $this->classOrAlias;
 
             if (str_contains($class, ':')) {

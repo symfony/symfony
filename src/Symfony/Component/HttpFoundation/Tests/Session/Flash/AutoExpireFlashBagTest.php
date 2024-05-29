@@ -21,12 +21,9 @@ use Symfony\Component\HttpFoundation\Session\Flash\AutoExpireFlashBag as FlashBa
  */
 class AutoExpireFlashBagTest extends TestCase
 {
-    /**
-     * @var \Symfony\Component\HttpFoundation\Session\Flash\AutoExpireFlashBag
-     */
-    private $bag;
+    protected array $array = [];
 
-    protected $array = [];
+    private FlashBag $bag;
 
     protected function setUp(): void
     {
@@ -38,7 +35,7 @@ class AutoExpireFlashBagTest extends TestCase
 
     protected function tearDown(): void
     {
-        $this->bag = null;
+        unset($this->bag);
         parent::tearDown();
     }
 

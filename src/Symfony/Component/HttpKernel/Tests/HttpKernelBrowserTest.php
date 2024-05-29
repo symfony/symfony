@@ -18,6 +18,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\HttpKernel\HttpKernelBrowser;
+use Symfony\Component\HttpKernel\Tests\Fixtures\MockableUploadFileWithClientSize;
 use Symfony\Component\HttpKernel\Tests\Fixtures\TestClient;
 
 /**
@@ -59,16 +60,15 @@ class HttpKernelBrowserTest extends TestCase
 
         $r = new \ReflectionObject($client);
         $m = $r->getMethod('filterResponse');
-        $m->setAccessible(true);
 
         $response = new Response();
-        $response->headers->setCookie($cookie1 = new Cookie('foo', 'bar', \DateTime::createFromFormat('j-M-Y H:i:s T', '15-Feb-2009 20:00:00 GMT')->format('U'), '/foo', 'http://example.com', true, true, false, null));
+        $response->headers->setCookie($cookie1 = new Cookie('foo', 'bar', \DateTimeImmutable::createFromFormat('j-M-Y H:i:s T', '15-Feb-2009 20:00:00 GMT')->format('U'), '/foo', 'http://example.com', true, true, false, null));
         $domResponse = $m->invoke($client, $response);
         $this->assertSame((string) $cookie1, $domResponse->getHeader('Set-Cookie'));
 
         $response = new Response();
-        $response->headers->setCookie($cookie1 = new Cookie('foo', 'bar', \DateTime::createFromFormat('j-M-Y H:i:s T', '15-Feb-2009 20:00:00 GMT')->format('U'), '/foo', 'http://example.com', true, true, false, null));
-        $response->headers->setCookie($cookie2 = new Cookie('foo1', 'bar1', \DateTime::createFromFormat('j-M-Y H:i:s T', '15-Feb-2009 20:00:00 GMT')->format('U'), '/foo', 'http://example.com', true, true, false, null));
+        $response->headers->setCookie($cookie1 = new Cookie('foo', 'bar', \DateTimeImmutable::createFromFormat('j-M-Y H:i:s T', '15-Feb-2009 20:00:00 GMT')->format('U'), '/foo', 'http://example.com', true, true, false, null));
+        $response->headers->setCookie($cookie2 = new Cookie('foo1', 'bar1', \DateTimeImmutable::createFromFormat('j-M-Y H:i:s T', '15-Feb-2009 20:00:00 GMT')->format('U'), '/foo', 'http://example.com', true, true, false, null));
         $domResponse = $m->invoke($client, $response);
         $this->assertSame((string) $cookie1, $domResponse->getHeader('Set-Cookie'));
         $this->assertSame([(string) $cookie1, (string) $cookie2], $domResponse->getHeader('Set-Cookie', false));
@@ -80,7 +80,6 @@ class HttpKernelBrowserTest extends TestCase
 
         $r = new \ReflectionObject($client);
         $m = $r->getMethod('filterResponse');
-        $m->setAccessible(true);
 
         $response = new StreamedResponse(function () {
             echo 'foo';
@@ -153,10 +152,9 @@ class HttpKernelBrowserTest extends TestCase
         $client = new HttpKernelBrowser($kernel);
 
         $file = $this
-            ->getMockBuilder(UploadedFile::class)
+            ->getMockBuilder(MockableUploadFileWithClientSize::class)
             ->setConstructorArgs([$source, 'original', 'mime/original', \UPLOAD_ERR_OK, true])
-            ->onlyMethods(['getSize'])
-            ->addMethods(['getClientSize'])
+            ->onlyMethods(['getSize', 'getClientSize'])
             ->getMock()
         ;
         /* should be modified when the getClientSize will be removed */

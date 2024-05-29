@@ -24,5 +24,5 @@ interface CollectionInterface extends \Countable, \IteratorAggregate, \ArrayAcce
     /**
      * @return list<Entry>
      */
-    public function toArray();
+    public function toArray(): array;
 }

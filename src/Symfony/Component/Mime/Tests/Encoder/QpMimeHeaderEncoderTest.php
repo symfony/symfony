@@ -99,7 +99,7 @@ class QpMimeHeaderEncoderTest extends TestCase
         foreach (range(0x00, 0xFF) as $byte) {
             $char = pack('C', $byte);
             $encodedChar = $encoder->encodeString($char, 'iso-8859-1');
-            if (\in_array($byte, $allowedBytes)) {
+            if (\in_array($byte, $allowedBytes, true)) {
                 $this->assertEquals($char, $encodedChar, 'Character '.$char.' should not be encoded.');
             } elseif (0x20 == $byte) {
                 // special case

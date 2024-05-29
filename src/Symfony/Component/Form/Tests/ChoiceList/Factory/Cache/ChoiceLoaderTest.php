@@ -26,9 +26,7 @@ class ChoiceLoaderTest extends TestCase
         $choiceList = new ArrayChoiceList($choices);
 
         $type = new FormType();
-        $decorated = new CallbackChoiceLoader(static function () use ($choices) {
-            return $choices;
-        });
+        $decorated = new CallbackChoiceLoader(static fn () => $choices);
         $loader1 = new ChoiceLoader($type, $decorated);
         $loader2 = new ChoiceLoader($type, new ArrayChoiceLoader());
 

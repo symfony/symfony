@@ -28,14 +28,12 @@ final class MailjetTransport extends AbstractTransport
 {
     protected const HOST = 'api.mailjet.com';
 
-    private $authToken;
-    private $from;
-
-    public function __construct(string $authToken, string $from, ?HttpClientInterface $client = null, ?EventDispatcherInterface $dispatcher = null)
-    {
-        $this->authToken = $authToken;
-        $this->from = $from;
-
+    public function __construct(
+        #[\SensitiveParameter] private string $authToken,
+        private string $from,
+        ?HttpClientInterface $client = null,
+        ?EventDispatcherInterface $dispatcher = null,
+    ) {
         parent::__construct($client, $dispatcher);
     }
 
@@ -60,7 +58,7 @@ final class MailjetTransport extends AbstractTransport
         $response = $this->client->request('POST', $endpoint, [
             'auth_bearer' => $this->authToken,
             'json' => [
-                'From' => $this->from,
+                'From' => $message->getFrom() ?: $this->from,
                 'To' => $message->getPhone(),
                 'Text' => $message->getSubject(),
             ],

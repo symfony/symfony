@@ -22,7 +22,7 @@ class ParametersConfigurator extends AbstractConfigurator
 {
     public const FACTORY = 'parameters';
 
-    private $container;
+    private ContainerBuilder $container;
 
     public function __construct(ContainerBuilder $container)
     {
@@ -30,11 +30,9 @@ class ParametersConfigurator extends AbstractConfigurator
     }
 
     /**
-     * Creates a parameter.
-     *
      * @return $this
      */
-    final public function set(string $name, $value): self
+    final public function set(string $name, mixed $value): static
     {
         if ($value instanceof Expression) {
             throw new InvalidArgumentException(sprintf('Using an expression in parameter "%s" is not allowed.', $name));
@@ -46,11 +44,9 @@ class ParametersConfigurator extends AbstractConfigurator
     }
 
     /**
-     * Creates a parameter.
-     *
      * @return $this
      */
-    final public function __invoke(string $name, $value): self
+    final public function __invoke(string $name, mixed $value): static
     {
         return $this->set($name, $value);
     }

@@ -29,17 +29,13 @@ interface ResourceCheckerInterface
     /**
      * Queries the ResourceChecker whether it can validate a given
      * resource or not.
-     *
-     * @return bool
      */
-    public function supports(ResourceInterface $metadata);
+    public function supports(ResourceInterface $metadata): bool;
 
     /**
      * Validates the resource.
      *
      * @param int $timestamp The timestamp at which the cache associated with this resource was created
-     *
-     * @return bool
      */
-    public function isFresh(ResourceInterface $resource, int $timestamp);
+    public function isFresh(ResourceInterface $resource, int $timestamp): bool;
 }

@@ -16,7 +16,7 @@ use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmer;
 
 class CacheWarmerTest extends TestCase
 {
-    protected static $cacheFile;
+    protected static string $cacheFile;
 
     public static function setUpBeforeClass(): void
     {
@@ -47,17 +47,14 @@ class CacheWarmerTest extends TestCase
 
 class TestCacheWarmer extends CacheWarmer
 {
-    protected $file;
+    protected string $file;
 
     public function __construct(string $file)
     {
         $this->file = $file;
     }
 
-    /**
-     * @return string[]
-     */
-    public function warmUp(string $cacheDir): array
+    public function warmUp(string $cacheDir, ?string $buildDir = null): array
     {
         $this->writeCacheFile($this->file, 'content');
 

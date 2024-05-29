@@ -18,8 +18,8 @@ use Symfony\Component\Cache\Marshaller\MarshallerInterface;
  */
 class MarshallingSessionHandler implements \SessionHandlerInterface, \SessionUpdateTimestampHandlerInterface
 {
-    private $handler;
-    private $marshaller;
+    private AbstractSessionHandler $handler;
+    private MarshallerInterface $marshaller;
 
     public function __construct(AbstractSessionHandler $handler, MarshallerInterface $marshaller)
     {
@@ -27,56 +27,32 @@ class MarshallingSessionHandler implements \SessionHandlerInterface, \SessionUpd
         $this->marshaller = $marshaller;
     }
 
-    /**
-     * @return bool
-     */
-    #[\ReturnTypeWillChange]
-    public function open($savePath, $name)
+    public function open(string $savePath, string $name): bool
     {
         return $this->handler->open($savePath, $name);
     }
 
-    /**
-     * @return bool
-     */
-    #[\ReturnTypeWillChange]
-    public function close()
+    public function close(): bool
     {
         return $this->handler->close();
     }
 
-    /**
-     * @return bool
-     */
-    #[\ReturnTypeWillChange]
-    public function destroy($sessionId)
+    public function destroy(#[\SensitiveParameter] string $sessionId): bool
     {
         return $this->handler->destroy($sessionId);
     }
 
-    /**
-     * @return int|false
-     */
-    #[\ReturnTypeWillChange]
-    public function gc($maxlifetime)
+    public function gc(int $maxlifetime): int|false
     {
         return $this->handler->gc($maxlifetime);
     }
 
-    /**
-     * @return string
-     */
-    #[\ReturnTypeWillChange]
-    public function read($sessionId)
+    public function read(#[\SensitiveParameter] string $sessionId): string
     {
         return $this->marshaller->unmarshall($this->handler->read($sessionId));
     }
 
-    /**
-     * @return bool
-     */
-    #[\ReturnTypeWillChange]
-    public function write($sessionId, $data)
+    public function write(#[\SensitiveParameter] string $sessionId, string $data): bool
     {
         $failed = [];
         $marshalledData = $this->marshaller->marshall(['data' => $data], $failed);
@@ -88,20 +64,12 @@ class MarshallingSessionHandler implements \SessionHandlerInterface, \SessionUpd
         return $this->handler->write($sessionId, $marshalledData['data']);
     }
 
-    /**
-     * @return bool
-     */
-    #[\ReturnTypeWillChange]
-    public function validateId($sessionId)
+    public function validateId(#[\SensitiveParameter] string $sessionId): bool
     {
         return $this->handler->validateId($sessionId);
     }
 
-    /**
-     * @return bool
-     */
-    #[\ReturnTypeWillChange]
-    public function updateTimestamp($sessionId, $data)
+    public function updateTimestamp(#[\SensitiveParameter] string $sessionId, string $data): bool
     {
         return $this->handler->updateTimestamp($sessionId, $data);
     }

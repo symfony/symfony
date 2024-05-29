@@ -16,12 +16,9 @@ namespace Symfony\Component\Serializer\Normalizer;
  */
 trait DenormalizerAwareTrait
 {
-    /**
-     * @var DenormalizerInterface
-     */
-    protected $denormalizer;
+    protected DenormalizerInterface $denormalizer;
 
-    public function setDenormalizer(DenormalizerInterface $denormalizer)
+    public function setDenormalizer(DenormalizerInterface $denormalizer): void
     {
         $this->denormalizer = $denormalizer;
     }

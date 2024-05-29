@@ -16,9 +16,9 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
-use Symfony\Component\Security\Core\Security;
 use Symfony\Component\Security\Core\User\InMemoryUserProvider;
 use Symfony\Component\Security\Http\Authenticator\JsonLoginAuthenticator;
+use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
 use Symfony\Component\Security\Http\Authenticator\Passport\Credentials\PasswordCredentials;
 use Symfony\Component\Security\Http\HttpUtils;
 use Symfony\Component\Translation\Loader\ArrayLoader;
@@ -26,9 +26,8 @@ use Symfony\Component\Translation\Translator;
 
 class JsonLoginAuthenticatorTest extends TestCase
 {
-    private $userProvider;
-    /** @var JsonLoginAuthenticator */
-    private $authenticator;
+    private InMemoryUserProvider $userProvider;
+    private JsonLoginAuthenticator $authenticator;
 
     protected function setUp(): void
     {
@@ -94,12 +93,12 @@ class JsonLoginAuthenticatorTest extends TestCase
     /**
      * @dataProvider provideInvalidAuthenticateData
      */
-    public function testAuthenticateInvalid($request, $errorMessage, $exceptionType = BadRequestHttpException::class)
+    public function testAuthenticateInvalid(Request $request, string $errorMessage, string $exceptionType = BadRequestHttpException::class)
     {
+        $this->setUpAuthenticator();
+
         $this->expectException($exceptionType);
         $this->expectExceptionMessage($errorMessage);
-
-        $this->setUpAuthenticator();
 
         $this->authenticator->authenticate($request);
     }
@@ -116,14 +115,20 @@ class JsonLoginAuthenticatorTest extends TestCase
         yield [$request, 'The key "password" must be provided'];
 
         $request = new Request([], [], [], [], [], ['HTTP_CONTENT_TYPE' => 'application/json'], '{"username": 1, "password": "foo"}');
-        yield [$request, 'The key "username" must be a string.'];
+        yield [$request, 'The key "username" must be a non-empty string.'];
+
+        $request = new Request([], [], [], [], [], ['HTTP_CONTENT_TYPE' => 'application/json'], '{"username": "", "password": "foo"}');
+        yield [$request, 'The key "username" must be a non-empty string.'];
 
         $request = new Request([], [], [], [], [], ['HTTP_CONTENT_TYPE' => 'application/json'], '{"username": "dunglas", "password": 1}');
-        yield [$request, 'The key "password" must be a string.'];
+        yield [$request, 'The key "password" must be a non-empty string.'];
 
-        $username = str_repeat('x', Security::MAX_USERNAME_LENGTH + 1);
-        $request = new Request([], [], [], [], [], ['HTTP_CONTENT_TYPE' => 'application/json'], sprintf('{"username": "%s", "password": 1}', $username));
-        yield [$request, 'Invalid username.', BadCredentialsException::class];
+        $request = new Request([], [], [], [], [], ['HTTP_CONTENT_TYPE' => 'application/json'], '{"username": "dunglas", "password": ""}');
+        yield [$request, 'The key "password" must be a non-empty string.'];
+
+        $username = str_repeat('x', UserBadge::MAX_USERNAME_LENGTH + 1);
+        $request = new Request([], [], [], [], [], ['HTTP_CONTENT_TYPE' => 'application/json'], sprintf('{"username": "%s", "password": "foo"}', $username));
+        yield [$request, 'Username too long.', BadCredentialsException::class];
     }
 
     public function testAuthenticationFailureWithoutTranslator()

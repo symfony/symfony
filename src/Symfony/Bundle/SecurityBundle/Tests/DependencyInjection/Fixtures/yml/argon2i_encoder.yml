@@ -1,9 +1,0 @@
-imports:
-    - { resource: legacy_encoders.yml }
-
-security:
-    encoders:
-        JMS\FooBundle\Entity\User7:
-            algorithm: argon2i
-            memory_cost: 256
-            time_cost: 1

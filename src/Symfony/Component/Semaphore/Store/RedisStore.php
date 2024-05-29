@@ -11,8 +11,7 @@
 
 namespace Symfony\Component\Semaphore\Store;
 
-use Symfony\Component\Cache\Traits\RedisClusterProxy;
-use Symfony\Component\Cache\Traits\RedisProxy;
+use Relay\Relay;
 use Symfony\Component\Semaphore\Exception\InvalidArgumentException;
 use Symfony\Component\Semaphore\Exception\SemaphoreAcquiringException;
 use Symfony\Component\Semaphore\Exception\SemaphoreExpiredException;
@@ -27,24 +26,12 @@ use Symfony\Component\Semaphore\PersistingStoreInterface;
  */
 class RedisStore implements PersistingStoreInterface
 {
-    private $redis;
-
-    /**
-     * @param \Redis|\RedisArray|\RedisCluster|\RedisClusterProxy|\Predis\ClientInterface|RedisProxy|RedisClusterProxy $redis
-     */
-    public function __construct($redis)
-    {
-        if (!$redis instanceof \Redis && !$redis instanceof \RedisArray && !$redis instanceof \RedisCluster && !$redis instanceof \Predis\ClientInterface && !$redis instanceof RedisProxy && !$redis instanceof RedisClusterProxy) {
-            throw new InvalidArgumentException(sprintf('"%s()" expects parameter 1 to be Redis, RedisArray, RedisCluster, RedisProxy, RedisClusterProxy or Predis\ClientInterface, "%s" given.', __METHOD__, get_debug_type($redis)));
-        }
-
-        $this->redis = $redis;
+    public function __construct(
+        private \Redis|Relay|\RedisArray|\RedisCluster|\Predis\ClientInterface $redis,
+    ) {
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function save(Key $key, float $ttlInSecond)
+    public function save(Key $key, float $ttlInSecond): void
     {
         if (0 > $ttlInSecond) {
             throw new InvalidArgumentException("The TTL should be greater than 0, '$ttlInSecond' given.");
@@ -107,10 +94,7 @@ class RedisStore implements PersistingStoreInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function putOffExpiration(Key $key, float $ttlInSecond)
+    public function putOffExpiration(Key $key, float $ttlInSecond): void
     {
         if (0 > $ttlInSecond) {
             throw new InvalidArgumentException("The TTL should be greater than 0, '$ttlInSecond' given.");
@@ -152,10 +136,7 @@ class RedisStore implements PersistingStoreInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function delete(Key $key)
+    public function delete(Key $key): void
     {
         $script = '
             local key = KEYS[1]
@@ -170,27 +151,14 @@ class RedisStore implements PersistingStoreInterface
         $this->evaluate($script, sprintf('{%s}', $key), [$this->getUniqueToken($key)]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function exists(Key $key): bool
     {
         return (bool) $this->redis->zScore(sprintf('{%s}:weight', $key), $this->getUniqueToken($key));
     }
 
-    /**
-     * Evaluates a script in the corresponding redis client.
-     *
-     * @return mixed
-     */
-    private function evaluate(string $script, string $resource, array $args)
+    private function evaluate(string $script, string $resource, array $args): mixed
     {
-        if (
-            $this->redis instanceof \Redis ||
-            $this->redis instanceof \RedisCluster ||
-            $this->redis instanceof RedisProxy ||
-            $this->redis instanceof RedisClusterProxy
-        ) {
+        if ($this->redis instanceof \Redis || $this->redis instanceof Relay || $this->redis instanceof \RedisCluster) {
             return $this->redis->eval($script, array_merge([$resource], $args), 1);
         }
 
@@ -202,7 +170,7 @@ class RedisStore implements PersistingStoreInterface
             return $this->redis->eval(...array_merge([$script, 1, $resource], $args));
         }
 
-        throw new InvalidArgumentException(sprintf('"%s()" expects being initialized with a Redis, RedisArray, RedisCluster or Predis\ClientInterface, "%s" given.', __METHOD__, \is_object($this->redis) ? \get_class($this->redis) : \gettype($this->redis)));
+        throw new InvalidArgumentException(sprintf('"%s()" expects being initialized with a Redis, RedisArray, RedisCluster or Predis\ClientInterface, "%s" given.', __METHOD__, get_debug_type($this->redis)));
     }
 
     private function getUniqueToken(Key $key): string

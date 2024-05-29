@@ -20,7 +20,7 @@ use Symfony\Component\VarDumper\Cloner\Stub;
  */
 class EnumStub extends Stub
 {
-    public $dumpKeys = true;
+    public bool $dumpKeys = true;
 
     public function __construct(array $values, bool $dumpKeys = true)
     {

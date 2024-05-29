@@ -3,14 +3,13 @@
 namespace Symfony\Component\DependencyInjection\Tests\Fixtures;
 
 use Symfony\Component\DependencyInjection\Tests\Compiler\Foo;
+use Symfony\Contracts\Service\Attribute\Required;
 
 class WitherStaticReturnType
 {
     public $foo;
 
-    /**
-     * @required
-     */
+    #[Required]
     public function withFoo(Foo $foo): static
     {
         $new = clone $this;
@@ -20,9 +19,9 @@ class WitherStaticReturnType
     }
 
     /**
-     * @required
      * @return $this
      */
+    #[Required]
     public function setFoo(Foo $foo): static
     {
         $this->foo = $foo;

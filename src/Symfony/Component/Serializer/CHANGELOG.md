@@ -1,6 +1,96 @@
 CHANGELOG
 =========
 
+7.1
+---
+
+ * Add arguments `$class`, `$format` and `$context` to `NameConverterInterface::normalize()` and `NameConverterInterface::denormalize()`
+ * Add `DateTimeNormalizer::CAST_KEY` context option
+ * Add `Default` and "class name" default groups
+ * Add `AbstractNormalizer::FILTER_BOOL` context option
+ * Add `CamelCaseToSnakeCaseNameConverter::REQUIRE_SNAKE_CASE_PROPERTIES` context option
+ * Deprecate `AbstractNormalizerContextBuilder::withDefaultContructorArguments(?array $defaultContructorArguments)`, use `withDefaultConstructorArguments(?array $defaultConstructorArguments)` instead (note the missing `s` character in Contructor word in deprecated method)
+ * Add `XmlEncoder::CDATA_WRAPPING_PATTERN` context option
+
+7.0
+---
+
+ * Add method `getSupportedTypes()` to `DenormalizerInterface` and `NormalizerInterface`
+ * Remove denormalization support for `AbstractUid` in `UidNormalizer`, use one of `AbstractUid` child class instead
+ * Denormalizing to an abstract class in `UidNormalizer` now throws an `\Error`
+ * Remove `ContextAwareDenormalizerInterface`, use `DenormalizerInterface` instead
+ * Remove `ContextAwareNormalizerInterface`, use `NormalizerInterface` instead
+ * Remove `CacheableSupportsMethodInterface`, use `NormalizerInterface` and `DenormalizerInterface` instead
+ * Require explicit argument when calling `AttributeMetadata::setSerializedName()` and `ClassMetadata::setClassDiscriminatorMapping()`
+ * Add argument `$context` to `NormalizerInterface::supportsNormalization()` and `DenormalizerInterface::supportsDenormalization()`
+ * Remove Doctrine annotations support in favor of native attributes
+ * Remove `AnnotationLoader`, use `AttributeLoader` instead
+
+6.4
+---
+
+ * Add `TranslatableNormalizer`
+ * Allow `Context` attribute to target classes
+ * Deprecate Doctrine annotations support in favor of native attributes
+ * Allow the `Groups` attribute/annotation on classes
+ * JsonDecode: Add `json_decode_detailed_errors` option
+ * Make `ProblemNormalizer` give details about Messenger's `ValidationFailedException`
+ * Add `XmlEncoder::CDATA_WRAPPING` context option
+ * Deprecate `AnnotationLoader`, use `AttributeLoader` instead
+ * Add aliases for all classes in the `Annotation` namespace to `Attribute`
+
+6.3
+---
+
+ * Add `AbstractNormalizer::REQUIRE_ALL_PROPERTIES` context flag to require all properties to be listed in the input instead of falling back to null for nullable ones
+ * Add `XmlEncoder::SAVE_OPTIONS` context option
+ * Add `BackedEnumNormalizer::ALLOW_INVALID_VALUES` context option
+ * Add `UnsupportedFormatException` which is thrown when there is no decoder for a given format
+ * Add method `getSupportedTypes(?string $format)` to `NormalizerInterface` and `DenormalizerInterface`
+ * Make `ProblemNormalizer` give details about `ValidationFailedException` and `PartialDenormalizationException`
+ * Deprecate `CacheableSupportsMethodInterface` in favor of the new `getSupportedTypes(?string $format)` methods
+ * The following Normalizer classes will become final in 7.0:
+   * `ConstraintViolationListNormalizer`
+   * `CustomNormalizer`
+   * `DataUriNormalizer`
+   * `DateIntervalNormalizer`
+   * `DateTimeNormalizer`
+   * `DateTimeZoneNormalizer`
+   * `GetSetMethodNormalizer`
+   * `JsonSerializableNormalizer`
+   * `ObjectNormalizer`
+   * `PropertyNormalizer`
+
+6.2
+---
+
+ * Add support for constructor promoted properties to `Context` attribute
+ * Add context option `PropertyNormalizer::NORMALIZE_VISIBILITY` with bitmask flags `PropertyNormalizer::NORMALIZE_PUBLIC`, `PropertyNormalizer::NORMALIZE_PROTECTED`, `PropertyNormalizer::NORMALIZE_PRIVATE`
+ * Add method `withNormalizeVisibility` to `PropertyNormalizerContextBuilder`
+ * Deprecate calling `AttributeMetadata::setSerializedName()`, `ClassMetadata::setClassDiscriminatorMapping()` without arguments
+ * Change the signature of `AttributeMetadataInterface::setSerializedName()` to `setSerializedName(?string)`
+ * Change the signature of `ClassMetadataInterface::setClassDiscriminatorMapping()` to `setClassDiscriminatorMapping(?ClassDiscriminatorMapping)`
+ * Add option YamlEncoder::YAML_INDENTATION to YamlEncoder constructor options to configure additional indentation for each level of nesting. This allows configuring indentation in the service configuration.
+ * Add `SerializedPath` annotation to flatten nested attributes
+
+6.1
+---
+
+ * Add `TraceableSerializer`, `TraceableNormalizer`, `TraceableEncoder` and `SerializerDataCollector` to integrate with the web profiler
+ * Add the ability to create contexts using context builders
+ * Set `Context` annotation as not final
+ * Deprecate `ContextAwareNormalizerInterface`, use `NormalizerInterface` instead
+ * Deprecate `ContextAwareDenormalizerInterface`, use `DenormalizerInterface` instead
+ * Deprecate supporting denormalization for `AbstractUid` in `UidNormalizer`, use one of `AbstractUid` child class instead
+ * Deprecate denormalizing to an abstract class in `UidNormalizer`
+ * Add support for `can*()` methods to `ObjectNormalizer`
+
+6.0
+---
+
+ * Remove `ArrayDenormalizer::setSerializer()`, call `setDenormalizer()` instead
+ * Remove the ability to create instances of the annotation classes by passing an array of parameters, use named arguments instead
+
 5.4
 ---
 

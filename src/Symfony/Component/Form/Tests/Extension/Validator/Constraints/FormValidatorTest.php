@@ -12,7 +12,6 @@
 namespace Symfony\Component\Form\Tests\Extension\Validator\Constraints;
 
 use Symfony\Component\EventDispatcher\EventDispatcher;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\CallbackTransformer;
 use Symfony\Component\Form\Exception\TransformationFailedException;
 use Symfony\Component\Form\Extension\Core\DataMapper\DataMapper;
@@ -39,15 +38,8 @@ use Symfony\Component\Validator\Validation;
  */
 class FormValidatorTest extends ConstraintValidatorTestCase
 {
-    /**
-     * @var EventDispatcherInterface
-     */
-    private $dispatcher;
-
-    /**
-     * @var FormFactoryInterface
-     */
-    private $factory;
+    private EventDispatcher $dispatcher;
+    private FormFactoryInterface $factory;
 
     protected function setUp(): void
     {
@@ -272,8 +264,8 @@ class FormValidatorTest extends ConstraintValidatorTestCase
             ])
             ->setData($object)
             ->addViewTransformer(new CallbackTransformer(
-                function ($data) { return $data; },
-                function () { throw new TransformationFailedException(); }
+                static fn ($data) => $data,
+                static fn () => throw new TransformationFailedException()
             ))
             ->getForm();
 
@@ -309,8 +301,8 @@ class FormValidatorTest extends ConstraintValidatorTestCase
             ])
             ->setData($object)
             ->addViewTransformer(new CallbackTransformer(
-                function ($data) { return $data; },
-                function () { throw new TransformationFailedException(); }
+                static fn ($data) => $data,
+                static fn () => throw new TransformationFailedException()
             ))
             ->getForm();
 
@@ -344,8 +336,8 @@ class FormValidatorTest extends ConstraintValidatorTestCase
         $form = $this->getBuilder('name', '\stdClass', $options)
             ->setData($object)
             ->addViewTransformer(new CallbackTransformer(
-                function ($data) { return $data; },
-                function () { throw new TransformationFailedException(); }
+                static fn ($data) => $data,
+                static fn () => throw new TransformationFailedException()
             ))
             ->getForm();
 
@@ -375,8 +367,8 @@ class FormValidatorTest extends ConstraintValidatorTestCase
             ])
             ->setData($object)
             ->addViewTransformer(new CallbackTransformer(
-                function ($data) { return $data; },
-                function () {
+                static fn ($data) => $data,
+                static function () {
                     $failure = new TransformationFailedException();
                     $failure->setInvalidMessage('safe message to be used', ['{{ bar }}' => 'bar']);
 
@@ -423,7 +415,7 @@ class FormValidatorTest extends ConstraintValidatorTestCase
     public function testHandleCallbackValidationGroups()
     {
         $object = new \stdClass();
-        $options = ['validation_groups' => [$this, 'getValidationGroups']];
+        $options = ['validation_groups' => $this->getValidationGroups(...)];
         $form = $this->getCompoundForm($object, $options);
         $form->submit([]);
 
@@ -451,9 +443,7 @@ class FormValidatorTest extends ConstraintValidatorTestCase
     public function testHandleClosureValidationGroups()
     {
         $object = new \stdClass();
-        $options = ['validation_groups' => function (FormInterface $form) {
-            return ['group1', 'group2'];
-        }];
+        $options = ['validation_groups' => fn (FormInterface $form) => ['group1', 'group2']];
         $form = $this->getCompoundForm($object, $options);
         $form->submit([]);
 
@@ -543,7 +533,7 @@ class FormValidatorTest extends ConstraintValidatorTestCase
     {
         $object = new \stdClass();
 
-        $parentOptions = ['validation_groups' => [$this, 'getValidationGroups']];
+        $parentOptions = ['validation_groups' => $this->getValidationGroups(...)];
         $parent = $this->getBuilder('parent', null, $parentOptions)
             ->setCompound(true)
             ->setDataMapper(new DataMapper())
@@ -565,9 +555,7 @@ class FormValidatorTest extends ConstraintValidatorTestCase
         $object = new \stdClass();
 
         $parentOptions = [
-            'validation_groups' => function () {
-                return ['group1', 'group2'];
-            },
+            'validation_groups' => fn () => ['group1', 'group2'],
         ];
         $parent = $this->getBuilder('parent', null, $parentOptions)
             ->setCompound(true)
@@ -714,7 +702,7 @@ class FormValidatorTest extends ConstraintValidatorTestCase
         $this->assertSame($constraint, $context->getViolations()->get(0)->getConstraint());
     }
 
-    protected function createValidator()
+    protected function createValidator(): FormValidator
     {
         return new FormValidator();
     }
@@ -736,7 +724,7 @@ class FormValidatorTest extends ConstraintValidatorTestCase
 
     private function getCompoundForm($data, array $options = [])
     {
-        return $this->getBuilder('name', \is_object($data) ? \get_class($data) : null, $options)
+        return $this->getBuilder('name', \is_object($data) ? $data::class : null, $options)
             ->setData($data)
             ->setCompound(true)
             ->setDataMapper(new DataMapper())

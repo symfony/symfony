@@ -22,10 +22,7 @@ use Symfony\Component\VarExporter\VarExporter;
  */
 class PhpBundleWriter implements BundleWriterInterface
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function write(string $path, string $locale, $data)
+    public function write(string $path, string $locale, mixed $data): void
     {
         $template = <<<'TEMPLATE'
 <?php

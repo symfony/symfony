@@ -23,24 +23,21 @@ use Twig\Node\Expression\NameExpression;
 use Twig\Node\ModuleNode;
 use Twig\Node\Node;
 use Twig\Node\SetNode;
-use Twig\NodeVisitor\AbstractNodeVisitor;
+use Twig\NodeVisitor\NodeVisitorInterface;
 
 /**
  * @author Fabien Potencier <fabien@symfony.com>
  */
-final class TranslationDefaultDomainNodeVisitor extends AbstractNodeVisitor
+final class TranslationDefaultDomainNodeVisitor implements NodeVisitorInterface
 {
-    private $scope;
+    private Scope $scope;
 
     public function __construct()
     {
         $this->scope = new Scope();
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function doEnterNode(Node $node, Environment $env): Node
+    public function enterNode(Node $node, Environment $env): Node
     {
         if ($node instanceof BlockNode || $node instanceof ModuleNode) {
             $this->scope = $this->scope->enter();
@@ -86,10 +83,7 @@ final class TranslationDefaultDomainNodeVisitor extends AbstractNodeVisitor
         return $node;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function doLeaveNode(Node $node, Environment $env): ?Node
+    public function leaveNode(Node $node, Environment $env): ?Node
     {
         if ($node instanceof TransDefaultDomainNode) {
             return null;
@@ -102,9 +96,6 @@ final class TranslationDefaultDomainNodeVisitor extends AbstractNodeVisitor
         return $node;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getPriority(): int
     {
         return -10;
@@ -123,6 +114,6 @@ final class TranslationDefaultDomainNodeVisitor extends AbstractNodeVisitor
 
     private function getVarName(): string
     {
-        return sprintf('__internal_%s', hash('sha256', uniqid(mt_rand(), true), false));
+        return sprintf('__internal_%s', hash('xxh128', uniqid(mt_rand(), true)));
     }
 }

@@ -21,14 +21,14 @@ use Symfony\Component\Semaphore\Exception\InvalidArgumentException;
  */
 final class Key
 {
-    private $resource;
-    private $limit;
-    private $weight;
-    private $expiringTime;
-    private $state = [];
+    private ?float $expiringTime = null;
+    private array $state = [];
 
-    public function __construct(string $resource, int $limit, int $weight = 1)
-    {
+    public function __construct(
+        private string $resource,
+        private int $limit,
+        private int $weight = 1,
+    ) {
         if (1 > $limit) {
             throw new InvalidArgumentException("The limit ($limit) should be greater than 0.");
         }
@@ -38,9 +38,6 @@ final class Key
         if ($weight > $limit) {
             throw new InvalidArgumentException("The weight ($weight) should be lower or equals to the limit ($limit).");
         }
-        $this->resource = $resource;
-        $this->limit = $limit;
-        $this->weight = $weight;
     }
 
     public function __toString(): string
@@ -63,7 +60,7 @@ final class Key
         return isset($this->state[$stateKey]);
     }
 
-    public function setState(string $stateKey, $state): void
+    public function setState(string $stateKey, mixed $state): void
     {
         $this->state[$stateKey] = $state;
     }
@@ -73,7 +70,7 @@ final class Key
         unset($this->state[$stateKey]);
     }
 
-    public function getState(string $stateKey)
+    public function getState(string $stateKey): mixed
     {
         return $this->state[$stateKey];
     }
@@ -83,7 +80,7 @@ final class Key
         $this->expiringTime = null;
     }
 
-    public function reduceLifetime(float $ttlInSeconds)
+    public function reduceLifetime(float $ttlInSeconds): void
     {
         $newTime = microtime(true) + $ttlInSeconds;
 

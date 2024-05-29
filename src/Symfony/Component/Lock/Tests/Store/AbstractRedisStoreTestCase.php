@@ -11,8 +11,7 @@
 
 namespace Symfony\Component\Lock\Tests\Store;
 
-use Symfony\Component\Cache\Traits\RedisClusterProxy;
-use Symfony\Component\Cache\Traits\RedisProxy;
+use Relay\Relay;
 use Symfony\Component\Lock\Exception\InvalidArgumentException;
 use Symfony\Component\Lock\Exception\LockConflictedException;
 use Symfony\Component\Lock\Key;
@@ -26,24 +25,13 @@ abstract class AbstractRedisStoreTestCase extends AbstractStoreTestCase
 {
     use ExpiringStoreTestTrait;
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function getClockDelay()
+    protected function getClockDelay(): int
     {
         return 250000;
     }
 
-    /**
-     * Return a RedisConnection.
-     *
-     * @return \Redis|\RedisArray|\RedisCluster|\Predis\ClientInterface
-     */
-    abstract protected function getRedisConnection(): object;
+    abstract protected function getRedisConnection(): \Redis|Relay|\RedisArray|\RedisCluster|\Predis\ClientInterface;
 
-    /**
-     * {@inheritdoc}
-     */
     public function getStore(): PersistingStoreInterface
     {
         return new RedisStore($this->getRedisConnection());
@@ -68,7 +56,7 @@ abstract class AbstractRedisStoreTestCase extends AbstractStoreTestCase
 
 class Symfony51Store
 {
-    private $redis;
+    private \Redis|Relay|\RedisCluster|\RedisArray|\Predis\ClientInterface $redis;
 
     public function __construct($redis)
     {
@@ -98,12 +86,7 @@ class Symfony51Store
 
     private function evaluate(string $script, string $resource, array $args)
     {
-        if (
-            $this->redis instanceof \Redis ||
-            $this->redis instanceof \RedisCluster ||
-            $this->redis instanceof RedisProxy ||
-            $this->redis instanceof RedisClusterProxy
-        ) {
+        if ($this->redis instanceof \Redis || $this->redis instanceof Relay || $this->redis instanceof \RedisCluster) {
             return $this->redis->eval($script, array_merge([$resource], $args), 1);
         }
 
@@ -115,7 +98,7 @@ class Symfony51Store
             return $this->redis->eval(...array_merge([$script, 1, $resource], $args));
         }
 
-        throw new InvalidArgumentException(sprintf('"%s()" expects being initialized with a Redis, RedisArray, RedisCluster or Predis\ClientInterface, "%s" given.', __METHOD__, get_debug_type($this->redis)));
+        throw new InvalidArgumentException(sprintf('"%s()" expects being initialized with a Redis, Relay, RedisArray, RedisCluster or Predis\ClientInterface, "%s" given.', __METHOD__, get_debug_type($this->redis)));
     }
 
     private function getUniqueToken(Key $key): string

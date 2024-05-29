@@ -21,8 +21,7 @@ use Symfony\Component\Filesystem\Filesystem;
 
 class AboutCommandTest extends TestCase
 {
-    /** @var Filesystem */
-    private $fs;
+    private Filesystem $fs;
 
     protected function setUp(): void
     {

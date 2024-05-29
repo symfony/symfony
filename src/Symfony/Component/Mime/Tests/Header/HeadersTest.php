@@ -69,6 +69,7 @@ class HeadersTest extends TestCase
     {
         $headers = new Headers();
         $headers->addHeader('from', ['from@example.com']);
+        $headers->addHeader('reply-to', 'reply@example.com');
         $headers->addHeader('return-path', 'return@example.com');
         $headers->addHeader('foo', 'bar');
         $headers->addHeader('date', $now = new \DateTimeImmutable());
@@ -77,6 +78,9 @@ class HeadersTest extends TestCase
         $this->assertInstanceOf(MailboxListHeader::class, $headers->get('from'));
         $this->assertEquals([new Address('from@example.com')], $headers->get('from')->getBody());
 
+        $this->assertInstanceOf(MailboxListHeader::class, $headers->get('reply-to'));
+        $this->assertEquals([new Address('reply@example.com')], $headers->get('reply-to')->getBody());
+
         $this->assertInstanceOf(PathHeader::class, $headers->get('return-path'));
         $this->assertEquals(new Address('return@example.com'), $headers->get('return-path')->getBody());
 
@@ -84,7 +88,7 @@ class HeadersTest extends TestCase
         $this->assertSame('bar', $headers->get('foo')->getBody());
 
         $this->assertInstanceOf(DateHeader::class, $headers->get('date'));
-        $this->assertSame($now, $headers->get('date')->getBody());
+        $this->assertEquals($now, $headers->get('date')->getBody());
 
         $this->assertInstanceOf(IdentificationHeader::class, $headers->get('message-id'));
         $this->assertSame(['id@id'], $headers->get('message-id')->getBody());
@@ -287,11 +291,25 @@ class HeadersTest extends TestCase
         $this->assertEquals('foobar', $headers->get('In-Reply-To')->getBody());
     }
 
+    public function testInReplyToAcceptsIdentifierValues()
+    {
+        $headers = new Headers();
+        $headers->addIdHeader('In-Reply-To', 'foo@bar.com');
+        $this->assertEquals('<foo@bar.com>', $headers->get('In-Reply-To')->getBodyAsString());
+    }
+
     public function testReferencesAcceptsNonIdentifierValues()
     {
         $headers = new Headers();
         $headers->addTextHeader('References', 'foobar');
         $this->assertEquals('foobar', $headers->get('References')->getBody());
+    }
+
+    public function testReferencesAcceptsIdentifierValues()
+    {
+        $headers = new Headers();
+        $headers->addIdHeader('References', 'foo@bar.com');
+        $this->assertEquals('<foo@bar.com>', $headers->get('References')->getBodyAsString());
     }
 
     public function testHeaderBody()

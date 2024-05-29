@@ -13,6 +13,7 @@ namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
 use Symfony\Bundle\FrameworkBundle\Secrets\DotenvVault;
 use Symfony\Bundle\FrameworkBundle\Secrets\SodiumVault;
+use Symfony\Component\DependencyInjection\StaticEnvVarLoader;
 
 return static function (ContainerConfigurator $container) {
     $container->services()
@@ -20,7 +21,11 @@ return static function (ContainerConfigurator $container) {
             ->args([
                 abstract_arg('Secret dir, set in FrameworkExtension'),
                 service('secrets.decryption_key')->ignoreOnInvalid(),
+                abstract_arg('Secret env var, set in FrameworkExtension'),
             ])
+
+        ->set('secrets.env_var_loader', StaticEnvVarLoader::class)
+            ->args([service('secrets.vault')])
             ->tag('container.env_var_loader')
 
         ->set('secrets.decryption_key')

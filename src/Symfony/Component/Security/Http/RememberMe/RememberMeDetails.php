@@ -21,10 +21,10 @@ class RememberMeDetails
 {
     public const COOKIE_DELIMITER = ':';
 
-    private $userFqcn;
-    private $userIdentifier;
-    private $expires;
-    private $value;
+    private string $userFqcn;
+    private string $userIdentifier;
+    private int $expires;
+    private string $value;
 
     public function __construct(string $userFqcn, string $userIdentifier, int $expires, string $value)
     {

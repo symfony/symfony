@@ -1,6 +1,33 @@
 CHANGELOG
 =========
 
+7.1
+---
+
+ * Improve error reporting during LDAP bind
+
+7.0
+---
+
+ * Remove `{username}` parameter, use `{user_identifier}` instead
+
+6.2
+---
+
+ * Deprecate `{username}` parameter use in favour of `{user_identifier}`
+
+6.1
+---
+
+ * Return a 500 Internal Server Error if LDAP server in unavailable during user enumeration / authentication
+ * Introduce `InvalidSearchCredentialsException` to differentiate between cases where user-provided credentials are invalid and cases where the configured search credentials are invalid
+
+6.0
+---
+
+ * Removed `LdapUser::getUsername()` method, use `getUserIdentifier()` instead
+ * Removed `LdapUserProvider::loadUserByUsername()` method, use `loadUserByIdentifier()` instead
+
 5.3
 ---
 

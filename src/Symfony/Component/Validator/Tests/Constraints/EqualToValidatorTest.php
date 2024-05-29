@@ -23,7 +23,7 @@ class EqualToValidatorTest extends AbstractComparisonValidatorTestCase
 {
     use IcuCompatibilityTrait;
 
-    protected function createValidator()
+    protected function createValidator(): EqualToValidator
     {
         return new EqualToValidator();
     }
@@ -38,9 +38,6 @@ class EqualToValidatorTest extends AbstractComparisonValidatorTestCase
         return EqualTo::NOT_EQUAL_ERROR;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public static function provideValidComparisons(): array
     {
         return [
@@ -55,9 +52,6 @@ class EqualToValidatorTest extends AbstractComparisonValidatorTestCase
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public static function provideValidComparisonsToPropertyPath(): array
     {
         return [
@@ -65,9 +59,6 @@ class EqualToValidatorTest extends AbstractComparisonValidatorTestCase
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public static function provideInvalidComparisons(): array
     {
         return [

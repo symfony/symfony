@@ -19,18 +19,9 @@ use Symfony\Component\DependencyInjection\Exception\LogicException;
 
 class TwigLoaderPassTest extends TestCase
 {
-    /**
-     * @var ContainerBuilder
-     */
-    private $builder;
-    /**
-     * @var Definition
-     */
-    private $chainLoader;
-    /**
-     * @var TwigLoaderPass
-     */
-    private $pass;
+    private ContainerBuilder $builder;
+    private Definition $chainLoader;
+    private TwigLoaderPass $pass;
 
     protected function setUp(): void
     {

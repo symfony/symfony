@@ -28,8 +28,8 @@ use Symfony\Component\Translation\Translator;
 
 class TranslationDebugCommandTest extends TestCase
 {
-    private $fs;
-    private $translationDir;
+    private Filesystem $fs;
+    private string $translationDir;
 
     public function testDebugMissingMessages()
     {
@@ -118,7 +118,6 @@ class TranslationDebugCommandTest extends TestCase
 
     public function testDebugInvalidDirectory()
     {
-        $this->expectException(\InvalidArgumentException::class);
         $kernel = $this->createMock(KernelInterface::class);
         $kernel->expects($this->once())
             ->method('getBundle')
@@ -126,6 +125,9 @@ class TranslationDebugCommandTest extends TestCase
             ->willThrowException(new \InvalidArgumentException());
 
         $tester = $this->createCommandTester([], [], $kernel);
+
+        $this->expectException(\InvalidArgumentException::class);
+
         $tester->execute(['locale' => 'en', 'bundle' => 'dir']);
     }
 

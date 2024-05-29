@@ -12,13 +12,13 @@
 namespace Symfony\Component\Notifier\Bridge\GatewayApi\Tests;
 
 use Symfony\Component\HttpClient\MockHttpClient;
+use Symfony\Component\Notifier\Bridge\GatewayApi\GatewayApiOptions;
 use Symfony\Component\Notifier\Bridge\GatewayApi\GatewayApiTransport;
 use Symfony\Component\Notifier\Message\ChatMessage;
 use Symfony\Component\Notifier\Message\SentMessage;
 use Symfony\Component\Notifier\Message\SmsMessage;
 use Symfony\Component\Notifier\Test\TransportTestCase;
 use Symfony\Component\Notifier\Tests\Transport\DummyMessage;
-use Symfony\Component\Notifier\Transport\TransportInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 
@@ -28,10 +28,7 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
  */
 final class GatewayApiTransportTest extends TransportTestCase
 {
-    /**
-     * @return GatewayApiTransport
-     */
-    public static function createTransport(?HttpClientInterface $client = null): TransportInterface
+    public static function createTransport(?HttpClientInterface $client = null): GatewayApiTransport
     {
         return new GatewayApiTransport('authtoken', 'Symfony', $client ?? new MockHttpClient());
     }
@@ -44,6 +41,7 @@ final class GatewayApiTransportTest extends TransportTestCase
     public static function supportedMessagesProvider(): iterable
     {
         yield [new SmsMessage('0611223344', 'Hello!')];
+        yield [new SmsMessage('0611223344', 'Hello!', 'from', new GatewayApiOptions(['from' => 'foo']))];
     }
 
     public static function unsupportedMessagesProvider(): iterable
@@ -62,9 +60,7 @@ final class GatewayApiTransportTest extends TransportTestCase
             ->method('getContent')
             ->willReturn(json_encode(['ids' => [42]]));
 
-        $client = new MockHttpClient(static function () use ($response): ResponseInterface {
-            return $response;
-        });
+        $client = new MockHttpClient(static fn (): ResponseInterface => $response);
 
         $message = new SmsMessage('3333333333', 'Hello!');
 

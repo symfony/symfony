@@ -13,11 +13,9 @@ namespace Symfony\Bridge\Doctrine\Tests\Fixtures\Type;
 
 class StringWrapper
 {
-    private $string;
-
-    public function __construct(string $string = null)
-    {
-        $this->string = $string;
+    public function __construct(
+        private readonly ?string $string = null
+    ) {
     }
 
     public function getString(): string

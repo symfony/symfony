@@ -18,9 +18,7 @@ use Symfony\Component\AssetMapper\AssetMapperInterface;
 use Symfony\Component\AssetMapper\AssetMapperRepository;
 use Symfony\Component\AssetMapper\Command\AssetMapperCompileCommand;
 use Symfony\Component\AssetMapper\Command\DebugAssetMapperCommand;
-use Symfony\Component\AssetMapper\Command\ImportMapAuditCommand;
 use Symfony\Component\AssetMapper\Command\ImportMapInstallCommand;
-use Symfony\Component\AssetMapper\Command\ImportMapOutdatedCommand;
 use Symfony\Component\AssetMapper\Command\ImportMapRemoveCommand;
 use Symfony\Component\AssetMapper\Command\ImportMapRequireCommand;
 use Symfony\Component\AssetMapper\Command\ImportMapUpdateCommand;
@@ -30,16 +28,11 @@ use Symfony\Component\AssetMapper\Compiler\JavaScriptImportPathCompiler;
 use Symfony\Component\AssetMapper\Compiler\SourceMappingUrlsCompiler;
 use Symfony\Component\AssetMapper\Factory\CachedMappedAssetFactory;
 use Symfony\Component\AssetMapper\Factory\MappedAssetFactory;
-use Symfony\Component\AssetMapper\ImportMap\ImportMapAuditor;
 use Symfony\Component\AssetMapper\ImportMap\ImportMapConfigReader;
 use Symfony\Component\AssetMapper\ImportMap\ImportMapGenerator;
-use Symfony\Component\AssetMapper\ImportMap\ImportMapManager;
 use Symfony\Component\AssetMapper\ImportMap\ImportMapRenderer;
-use Symfony\Component\AssetMapper\ImportMap\ImportMapUpdateChecker;
 use Symfony\Component\AssetMapper\ImportMap\ImportMapVersionChecker;
-use Symfony\Component\AssetMapper\ImportMap\RemotePackageDownloader;
 use Symfony\Component\AssetMapper\ImportMap\RemotePackageStorage;
-use Symfony\Component\AssetMapper\ImportMap\Resolver\JsDelivrEsmResolver;
 use Symfony\Component\AssetMapper\MapperAwareAssetPackage;
 use Symfony\Component\AssetMapper\Path\LocalPublicAssetsFilesystem;
 use Symfony\Component\AssetMapper\Path\PublicAssetsPathResolver;
@@ -162,15 +155,6 @@ return static function (ContainerConfigurator $container) {
                 service('asset_mapper.importmap.remote_package_storage'),
             ])
 
-        ->set('asset_mapper.importmap.manager', ImportMapManager::class)
-            ->args([
-                service('asset_mapper'),
-                service('asset_mapper.importmap.config_reader'),
-                service('asset_mapper.importmap.remote_package_downloader'),
-                service('asset_mapper.importmap.resolver'),
-            ])
-        ->alias(ImportMapManager::class, 'asset_mapper.importmap.manager')
-
         ->set('asset_mapper.importmap.generator', ImportMapGenerator::class)
             ->args([
                 service('asset_mapper'),
@@ -183,21 +167,11 @@ return static function (ContainerConfigurator $container) {
                 abstract_arg('vendor directory'),
             ])
 
-        ->set('asset_mapper.importmap.remote_package_downloader', RemotePackageDownloader::class)
-            ->args([
-                service('asset_mapper.importmap.remote_package_storage'),
-                service('asset_mapper.importmap.config_reader'),
-                service('asset_mapper.importmap.resolver'),
-            ])
-
         ->set('asset_mapper.importmap.version_checker', ImportMapVersionChecker::class)
             ->args([
                 service('asset_mapper.importmap.config_reader'),
                 service('asset_mapper.importmap.remote_package_downloader'),
             ])
-
-        ->set('asset_mapper.importmap.resolver', JsDelivrEsmResolver::class)
-            ->args([service('http_client')])
 
         ->set('asset_mapper.importmap.renderer', ImportMapRenderer::class)
             ->args([
@@ -208,17 +182,6 @@ return static function (ContainerConfigurator $container) {
                 abstract_arg('script HTML attributes'),
                 service('request_stack'),
             ])
-
-        ->set('asset_mapper.importmap.auditor', ImportMapAuditor::class)
-        ->args([
-            service('asset_mapper.importmap.config_reader'),
-            service('http_client'),
-        ])
-        ->set('asset_mapper.importmap.update_checker', ImportMapUpdateChecker::class)
-        ->args([
-            service('asset_mapper.importmap.config_reader'),
-            service('http_client'),
-        ])
 
         ->set('asset_mapper.importmap.command.require', ImportMapRequireCommand::class)
             ->args([
@@ -243,14 +206,6 @@ return static function (ContainerConfigurator $container) {
                 service('asset_mapper.importmap.remote_package_downloader'),
                 param('kernel.project_dir'),
             ])
-            ->tag('console.command')
-
-        ->set('asset_mapper.importmap.command.audit', ImportMapAuditCommand::class)
-            ->args([service('asset_mapper.importmap.auditor')])
-            ->tag('console.command')
-
-        ->set('asset_mapper.importmap.command.outdated', ImportMapOutdatedCommand::class)
-            ->args([service('asset_mapper.importmap.update_checker')])
             ->tag('console.command')
     ;
 };

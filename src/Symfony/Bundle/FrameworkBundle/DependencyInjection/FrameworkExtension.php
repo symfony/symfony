@@ -349,7 +349,7 @@ class FrameworkExtension extends Extension
                 throw new LogicException('AssetMapper support cannot be enabled as the AssetMapper component is not installed. Try running "composer require symfony/asset-mapper".');
             }
 
-            $this->registerAssetMapperConfiguration($config['asset_mapper'], $container, $loader, $this->readConfigEnabled('assets', $container, $config['assets']));
+            $this->registerAssetMapperConfiguration($config['asset_mapper'], $container, $loader, $this->readConfigEnabled('assets', $container, $config['assets']), $this->readConfigEnabled('http_client', $container, $config['http_client']));
         } else {
             $container->removeDefinition('cache.asset_mapper');
         }
@@ -1330,7 +1330,7 @@ class FrameworkExtension extends Extension
         }
     }
 
-    private function registerAssetMapperConfiguration(array $config, ContainerBuilder $container, PhpFileLoader $loader, bool $assetEnabled): void
+    private function registerAssetMapperConfiguration(array $config, ContainerBuilder $container, PhpFileLoader $loader, bool $assetEnabled, bool $httpClientEnabled): void
     {
         $loader->load('asset_mapper.php');
 
@@ -1399,6 +1399,10 @@ class FrameworkExtension extends Extension
             ->replaceArgument(3, $config['importmap_polyfill'])
             ->replaceArgument(4, $config['importmap_script_attributes'])
         ;
+
+        if ($httpClientEnabled) {
+            $loader->load('asset_mapper_http_client.php');
+        }
     }
 
     /**

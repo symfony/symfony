@@ -170,9 +170,15 @@ class FilesystemTest extends FilesystemTestCase
             $this->markTestSkipped('"http" stream wrapper is not enabled.');
         }
 
+        var_dump('already running before?');
+        var_dump(!@fopen('http://localhost:8057', 'r'));
+
         $finder = new PhpExecutableFinder();
         $process = new Process(array_merge([$finder->find(false)], $finder->findArguments(), ['-dopcache.enable=0', '-dvariables_order=EGPCS', '-S', 'localhost:8057']));
         $process->setWorkingDirectory(__DIR__.'/Fixtures/web');
+
+        var_dump('file exists?');
+        var_dump(file_exists(__DIR__.'/Fixtures/web/logo_symfony_header.png'));
 
         $process->start();
 
@@ -184,6 +190,12 @@ class FilesystemTest extends FilesystemTestCase
             $sourceFilePath = 'http://localhost:8057/logo_symfony_header.png';
             $targetFilePath = $this->workspace.\DIRECTORY_SEPARATOR.'copy_target_file';
             file_put_contents($targetFilePath, 'TARGET FILE');
+            var_dump('started?');
+            var_dump($process->isStarted());
+            var_dump('running?');
+            var_dump($process->isRunning());
+            var_dump('file exists?');
+            var_dump(file_exists(__DIR__.'/Fixtures/web/logo_symfony_header.png'));
             $this->filesystem->copy($sourceFilePath, $targetFilePath, false);
             $this->assertFileExists($targetFilePath);
             $this->assertEquals(file_get_contents($sourceFilePath), file_get_contents($targetFilePath));

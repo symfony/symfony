@@ -379,7 +379,23 @@ class FrameworkExtension extends Extension
         $this->registerPropertyAccessConfiguration($config['property_access'], $container, $loader);
         $this->registerSecretsConfiguration($config['secrets'], $container, $loader, $config['secret'] ?? null);
 
-        $container->getDefinition('exception_listener')->replaceArgument(3, $config['exceptions']);
+        $exceptionListener = $container->getDefinition('exception_listener');
+
+        $loggers = [];
+        foreach ($config['exceptions'] as $exception) {
+            if (!isset($exception['log_channel'])) {
+                continue;
+            }
+            $loggers[$exception['log_channel']] = new Reference(sprintf('monolog.logger.%s', $exception['log_channel']));
+        }
+
+
+        $loggers[null] = new Reference('monolog.logger');
+        
+        $exceptionListener
+            ->replaceArgument(3, $config['exceptions'])
+            ->replaceArgument(1, $loggers)
+        ;
 
         if ($this->readConfigEnabled('serializer', $container, $config['serializer'])) {
             if (!class_exists(Serializer::class)) {

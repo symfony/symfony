@@ -38,7 +38,7 @@ class ErrorListener implements EventSubscriberInterface
      */
     public function __construct(
         protected string|object|array|null $controller,
-        protected ?LoggerInterface $logger = null,
+        protected array $loggers,
         protected bool $debug = false,
         protected array $exceptionsMapping = [],
     ) {
@@ -162,13 +162,15 @@ class ErrorListener implements EventSubscriberInterface
      */
     protected function logException(\Throwable $exception, string $message, ?string $logLevel = null): void
     {
-        if (null === $this->logger) {
+        $logger = $this->getLogger($exception);
+
+        if (null === $logger) {
             return;
         }
 
         $logLevel ??= $this->resolveLogLevel($exception);
 
-        $this->logger->log($logLevel, $message, ['exception' => $exception]);
+        $this->getLogger($exception)->log($logLevel, $message, ['exception' => $exception]);
     }
 
     /**
@@ -201,7 +203,7 @@ class ErrorListener implements EventSubscriberInterface
         $attributes = [
             '_controller' => $this->controller,
             'exception' => $exception,
-            'logger' => DebugLoggerConfigurator::getDebugLogger($this->logger),
+            'logger' => DebugLoggerConfigurator::getDebugLogger($this->getLogger($exception)),
         ];
         $request = $request->duplicate(null, null, $attributes);
         $request->setMethod('GET');
@@ -248,5 +250,18 @@ class ErrorListener implements EventSubscriberInterface
         }
 
         return $attributeReflector?->newInstance();
+    }
+
+    private function getLogger(\Throwable $exception): ?LoggerInterface
+    {
+        if ($exception->getPrevious() === null) {
+            return null;
+        }
+
+        $exceptionMapping = $this->exceptionsMapping[$exception->getPrevious()::class];
+
+        $logChannel = $exceptionMapping['log_channel'] ?? null;
+
+        return $this->loggers[$logChannel];
     }
 }

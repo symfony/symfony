@@ -124,18 +124,11 @@ class Message extends RawMessage
 
     public function ensureValidity(): void
     {
-        $to = (null !== $header = $this->headers->get('To')) ? $header->getBody() : null;
-        $cc = (null !== $header = $this->headers->get('Cc')) ? $header->getBody() : null;
-        $bcc = (null !== $header = $this->headers->get('Bcc')) ? $header->getBody() : null;
-
-        if (!$to && !$cc && !$bcc) {
+        if (!$this->headers->get('To')?->getBody() && !$this->headers->get('Cc')?->getBody() && !$this->headers->get('Bcc')?->getBody()) {
             throw new LogicException('An email must have a "To", "Cc", or "Bcc" header.');
         }
 
-        $from = (null !== $header = $this->headers->get('From')) ? $header->getBody() : null;
-        $sender = (null !== $header = $this->headers->get('Sender')) ? $header->getBody() : null;
-
-        if (!$from && !$sender) {
+        if (!$this->headers->get('From')?->getBody() && !$this->headers->get('Sender')?->getBody()) {
             throw new LogicException('An email must have a "From" or a "Sender" header.');
         }
 

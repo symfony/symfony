@@ -40,10 +40,8 @@ final class MercureTransport extends AbstractTransport
         private string $hubId,
         string|array|null $topics = null,
         ?HttpClientInterface $client = null,
-        ?EventDispatcherInterface $dispatcher = null
+        ?EventDispatcherInterface $dispatcher = null,
     ) {
-        $this->hub = $hub;
-        $this->hubId = $hubId;
         $this->topics = $topics ?? 'https://symfony.com/notifier';
 
         parent::__construct($client, $dispatcher);

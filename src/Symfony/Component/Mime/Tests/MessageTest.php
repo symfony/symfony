@@ -276,4 +276,71 @@ EOF;
         $serialized = $serializer->serialize($e, 'json');
         $this->assertStringMatchesFormat($expectedJson, json_encode(json_decode($serialized), \JSON_PRETTY_PRINT | \JSON_UNESCAPED_SLASHES));
     }
+
+    /**
+     * @dataProvider ensureValidityProvider
+     */
+    public function testEnsureValidity(array $headers, ?string $exceptionClass, ?string $exceptionMessage)
+    {
+        if ($exceptionClass) {
+            $this->expectException($exceptionClass);
+            $this->expectExceptionMessage($exceptionMessage);
+        } else {
+            $this->expectNotToPerformAssertions();
+        }
+
+        $m = new Message();
+        foreach ($headers as $headerName => $headerValue) {
+            $m->getHeaders()->addMailboxListHeader($headerName, $headerValue);
+        }
+        $m->ensureValidity();
+    }
+
+    public function ensureValidityProvider()
+    {
+        return [
+            'Valid address fields' => [
+                [
+                    'To' => ['dummy@symfony.com'],
+                    'From' => ['test@symfony.com'],
+                ],
+                null,
+                null,
+            ],
+
+            'No destination address fields' => [
+                [
+                    'From' => ['test@symfony.com'],
+                ],
+                LogicException::class,
+                'An email must have a "To", "Cc", or "Bcc" header.',
+            ],
+
+            'Empty destination address fields' => [
+                [
+                    'To' => [],
+                    'From' => ['test@symfony.com'],
+                ],
+                LogicException::class,
+                'An email must have a "To", "Cc", or "Bcc" header.',
+            ],
+
+            'No originator fields' => [
+                [
+                    'To' => ['dummy@symfony.com'],
+                ],
+                LogicException::class,
+                'An email must have a "From" or a "Sender" header.',
+            ],
+
+            'Empty originator fields' => [
+                [
+                    'To' => ['dummy@symfony.com'],
+                    'From' => [],
+                ],
+                LogicException::class,
+                'An email must have a "From" or a "Sender" header.',
+            ],
+        ];
+    }
 }

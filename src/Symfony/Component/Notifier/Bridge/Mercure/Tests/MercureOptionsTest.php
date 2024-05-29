@@ -38,7 +38,7 @@ final class MercureOptionsTest extends TestCase
             'id' => 'id',
             'type' => 'type',
             'retry' => 1,
-            'content' => ['tag' => '1234','body' => 'TEST']
+            'content' => ['tag' => '1234', 'body' => 'TEST'],
         ]);
     }
 

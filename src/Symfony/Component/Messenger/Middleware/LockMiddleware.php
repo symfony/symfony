@@ -18,11 +18,8 @@ use Symfony\Component\Messenger\Stamp\ReceivedStamp;
 
 final class LockMiddleware implements MiddlewareInterface
 {
-    private LockFactory $lockFactory;
-
-    public function __construct(LockFactory $lockFactory)
+    public function __construct(private LockFactory $lockFactory)
     {
-        $this->lockFactory = $lockFactory;
     }
 
     public function handle(Envelope $envelope, StackInterface $stack): Envelope

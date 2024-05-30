@@ -388,13 +388,10 @@ class FrameworkExtension extends Extension
             }
             $loggers[$exception['log_channel']] = new Reference(sprintf('monolog.logger.%s', $exception['log_channel']));
         }
-
-
-        $loggers[null] = new Reference('monolog.logger');
         
         $exceptionListener
             ->replaceArgument(3, $config['exceptions'])
-            ->replaceArgument(1, $loggers)
+            ->replaceArgument(4, $loggers)
         ;
 
         if ($this->readConfigEnabled('serializer', $container, $config['serializer'])) {

@@ -38,9 +38,10 @@ class ErrorListener implements EventSubscriberInterface
      */
     public function __construct(
         protected string|object|array|null $controller,
-        protected array $loggers,
+        protected ?LoggerInterface $logger = null,
         protected bool $debug = false,
         protected array $exceptionsMapping = [],
+        protected array $loggers = [],
     ) {
     }
 
@@ -252,8 +253,12 @@ class ErrorListener implements EventSubscriberInterface
         return $attributeReflector?->newInstance();
     }
 
-    private function getLogger(\Throwable $exception): ?LoggerInterface
+    private function getLogger(\Throwable $exception): LoggerInterface
     {
+        if ([] === $this->loggers) {
+            return $this->logger;
+        }
+
         if ($exception->getPrevious() === null) {
             return null;
         }
@@ -261,6 +266,10 @@ class ErrorListener implements EventSubscriberInterface
         $exceptionMapping = $this->exceptionsMapping[$exception->getPrevious()::class];
 
         $logChannel = $exceptionMapping['log_channel'] ?? null;
+
+        if ($logChannel === null) {
+            return $this->logger;
+        }
 
         return $this->loggers[$logChannel];
     }

@@ -474,6 +474,18 @@ class CommandTest extends TestCase
         $this->assertTrue($command->getDefinition()->hasArgument('target'));
         $this->assertTrue($command->getDefinition()->hasOption('symlink'));
     }
+
+    public function testCommandWithDefinitionObjectAttribute()
+    {
+        $this->assertSame('my:command:with-definition-object', CommandWithDefinitionObject::getDefaultName());
+
+        $command = new CommandWithDefinitionObject();
+
+        $this->assertSame('my:command:with-definition-object', $command->getName());
+
+        $this->assertTrue($command->getDefinition()->hasArgument('target'));
+        $this->assertTrue($command->getDefinition()->hasOption('symlink'));
+    }
 }
 
 // In order to get an unbound closure, we should create it outside a class
@@ -505,11 +517,21 @@ class MyAnnotatedCommand extends Command
 
 #[AsCommand(
     name: 'my:command:with-definition',
-    definition: [
+    inputDefinition: [
         new InputArgument('target', InputArgument::OPTIONAL, 'The target directory', null),
         new InputOption('symlink', null, InputOption::VALUE_NONE),
     ]
 )]
 class CommandWithDefinition extends Command
+{
+}
+#[AsCommand(
+    name: 'my:command:with-definition-object',
+    inputDefinition: new InputDefinition([
+        new InputArgument('target', InputArgument::OPTIONAL, 'The target directory', null),
+        new InputOption('symlink', null, InputOption::VALUE_NONE),
+    ])
+)]
+class CommandWithDefinitionObject extends Command
 {
 }

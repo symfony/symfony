@@ -13,6 +13,7 @@ namespace Symfony\Component\Console\Attribute;
 
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputDefinition;
+use Symfony\Component\Console\Input\InputOption;
 
 /**
  * Service tag to autoconfigure commands.
@@ -21,18 +22,18 @@ use Symfony\Component\Console\Input\InputDefinition;
 class AsCommand
 {
     /**
-     * @param string                                             $name        The name of the command, used when calling it (i.e. "cache:clear")
-     * @param string|null                                        $description The description of the command, displayed with the help page
-     * @param string[]                                           $aliases     The list of aliases of the command. The command will be executed when using one of them (i.e. "cache:clean")
-     * @param bool                                               $hidden      If true, the command won't be shown when listing all the available commands, but it can still be run as any other command
-     * @param array<InputArgument|InputArgument>|InputDefinition $definition  The list of argument and option instances
+     * @param string                                           $name            The name of the command, used when calling it (i.e. "cache:clear")
+     * @param string|null                                      $description     The description of the command, displayed with the help page
+     * @param string[]                                         $aliases         The list of aliases of the command. The command will be executed when using one of them (i.e. "cache:clean")
+     * @param bool                                             $hidden          If true, the command won't be shown when listing all the available commands, but it can still be run as any other command
+     * @param array<InputArgument|InputOption>|InputDefinition $inputDefinition The list of argument and option instances
      */
     public function __construct(
         public string $name,
         public ?string $description = null,
         array $aliases = [],
         bool $hidden = false,
-        public array|InputDefinition $definition = [],
+        public array|InputDefinition $inputDefinition = [],
     ) {
         if (!$hidden && !$aliases) {
             return;

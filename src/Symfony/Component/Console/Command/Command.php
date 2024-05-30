@@ -101,7 +101,7 @@ class Command
         }
 
         if ($attribute = (new \ReflectionClass(static::class))->getAttributes(AsCommand::class)) {
-            $this->setDefinition($attribute[0]->newInstance()->definition);
+            $this->setDefinition($attribute[0]->newInstance()->inputDefinition);
         }
 
         $this->configure();

@@ -4,7 +4,7 @@ CHANGELOG
 7.2
 ---
 
- * Add the `definition` option to configure arguments and options in the `AsCommand` attribute
+ * Add the `inputDefinition` option to configure arguments and options in the `AsCommand` attribute
 
 7.1
 ---

@@ -399,6 +399,9 @@ final class EnglishInflector implements InflectorInterface
 
         // aircraft
         'tfarcria',
+
+        // hardware
+        'erawdrah',
     ];
 
     /**

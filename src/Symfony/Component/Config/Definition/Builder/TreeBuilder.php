@@ -43,6 +43,7 @@ class TreeBuilder implements NodeParentInterface
 
     /**
      * @return NodeDefinition|ArrayNodeDefinition The root node (as an ArrayNodeDefinition when the type is 'array')
+     *
      * @psalm-return (T is 'array' ? ArrayNodeDefinition : NodeDefinition)
      */
     public function getRootNode(): NodeDefinition|ArrayNodeDefinition

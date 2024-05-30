@@ -46,6 +46,7 @@
         "symfony/security-http": "^6.4|^7.0",
         "symfony/serializer": "^6.4.3|^7.0.3",
         "symfony/stopwatch": "^6.4|^7.0",
+        "symfony/string": "^7.2",
         "symfony/console": "^6.4|^7.0",
         "symfony/expression-language": "^6.4|^7.0",
         "symfony/web-link": "^6.4|^7.0",

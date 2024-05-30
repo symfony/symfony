@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+7.2
+---
+
+ * Add `pluralize` Twig filter
+ * Add `singularize` Twig filter
+
 7.1
 ---
 

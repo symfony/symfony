@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Config\Definition;
 
-use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Configurator\DefinitionConfigurator;
 
 /**
@@ -22,7 +21,7 @@ interface ConfigurableInterface
     /**
      * Generates the configuration tree builder.
      *
-     * @psalm-param DefinitionConfigurator<ArrayNodeDefinition> $definition
+     * @psalm-param DefinitionConfigurator<'array'> $definition
      */
     public function configure(DefinitionConfigurator $definition): void;
 }

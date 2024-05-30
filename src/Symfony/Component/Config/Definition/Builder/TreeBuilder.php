@@ -17,6 +17,8 @@ use Symfony\Component\Config\Definition\NodeInterface;
  * This is the entry class for building a config tree.
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+ *
+ * @template T of 'array'|'scalar'|'variable'|'float'|'int'|'boolean'|'enum'
  */
 class TreeBuilder implements NodeParentInterface
 {
@@ -30,6 +32,9 @@ class TreeBuilder implements NodeParentInterface
      */
     protected $root;
 
+    /**
+     * @psalm-param T $type
+     */
     public function __construct(string $name, string $type = 'array', ?NodeBuilder $builder = null)
     {
         $builder ??= new NodeBuilder();
@@ -38,6 +43,7 @@ class TreeBuilder implements NodeParentInterface
 
     /**
      * @return NodeDefinition|ArrayNodeDefinition The root node (as an ArrayNodeDefinition when the type is 'array')
+     * @psalm-return (T is 'array' ? ArrayNodeDefinition : NodeDefinition)
      */
     public function getRootNode(): NodeDefinition|ArrayNodeDefinition
     {

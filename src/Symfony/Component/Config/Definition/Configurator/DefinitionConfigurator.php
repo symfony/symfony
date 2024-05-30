@@ -19,11 +19,12 @@ use Symfony\Component\Config\Definition\Loader\DefinitionFileLoader;
 /**
  * @author Yonel Ceruto <yonelceruto@gmail.com>
  *
- * @template T of NodeDefinition
+ * @template T of 'array'|'scalar'|'variable'|'float'|'int'|'boolean'|'enum'
  */
 class DefinitionConfigurator
 {
     public function __construct(
+        /** @psalm-var TreeBuilder<T> */
         private TreeBuilder $treeBuilder,
         private DefinitionFileLoader $loader,
         private string $path,
@@ -38,11 +39,10 @@ class DefinitionConfigurator
     }
 
     /**
-     * @psalm-return T
+     * @psalm-return (T is 'array' ? ArrayNodeDefinition : NodeDefinition)
      */
     public function rootNode(): NodeDefinition|ArrayNodeDefinition
     {
-        /** @psalm-var T */
         return $this->treeBuilder->getRootNode();
     }
 

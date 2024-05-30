@@ -4,7 +4,7 @@ CHANGELOG
 7.2
 ---
 
- * Allow specifying `prototype_name` option of `CollectionType` as a `callable` (resolved value stored as `resolved_prototype_name` config attribute)
+ * Allow specifying `prototype_name` option of `CollectionType` as a `callable`
 
 7.1
 ---

@@ -101,7 +101,7 @@ class ExpressionLanguage
     public function lint(Expression|string $expression, ?array $names, int $flags = 0): void
     {
         if (null === $names) {
-            trigger_deprecation('symfony/expression-language', '7.1', 'Passing "null" as the second argument of "%s()" is deprecated, pass "self::IGNORE_UNKNOWN_VARIABLES" instead as a third argument.', __METHOD__);
+            trigger_deprecation('symfony/expression-language', '7.1', 'Passing "null" as the second argument of "%s()" is deprecated, pass "%s\Parser::IGNORE_UNKNOWN_VARIABLES" instead as a third argument.', __METHOD__, __NAMESPACE__);
 
             $flags |= Parser::IGNORE_UNKNOWN_VARIABLES;
             $names = [];

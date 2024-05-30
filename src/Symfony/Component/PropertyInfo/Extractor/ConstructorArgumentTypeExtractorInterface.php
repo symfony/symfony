@@ -28,8 +28,6 @@ interface ConstructorArgumentTypeExtractorInterface
      *
      * @return LegacyType[]|null
      *
-     * @deprecated since Symfony 7.1, use "getTypeFromConstructor" instead
-     *
      * @internal
      */
     public function getTypesFromConstructor(string $class, string $property): ?array;

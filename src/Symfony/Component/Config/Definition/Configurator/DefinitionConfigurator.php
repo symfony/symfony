@@ -18,6 +18,8 @@ use Symfony\Component\Config\Definition\Loader\DefinitionFileLoader;
 
 /**
  * @author Yonel Ceruto <yonelceruto@gmail.com>
+ *
+ * @template T of NodeDefinition
  */
 class DefinitionConfigurator
 {
@@ -35,8 +37,12 @@ class DefinitionConfigurator
         $this->loader->import($resource, $type, $ignoreErrors, $this->file);
     }
 
+    /**
+     * @psalm-return T
+     */
     public function rootNode(): NodeDefinition|ArrayNodeDefinition
     {
+        /** @psalm-var T */
         return $this->treeBuilder->getRootNode();
     }
 

@@ -156,9 +156,8 @@ final class EntityValueResolver implements ValueResolverInterface
 
             return $id ?? ($options->stripNull ? false : null);
         }
-        if ($request->attributes->has('id')) {
-            trigger_deprecation('symfony/doctrine-bridge', '7.1', 'Relying on auto-mapping for Doctrine entities is deprecated for argument $%s of "%s": declare the mapping using either the #[MapEntity] attribute or mapped route parameters.', $argument->getName(), method_exists($argument, 'getControllerName') ? $argument->getControllerName() : 'n/a');
 
+        if ($request->attributes->has('id')) {
             return $request->attributes->get('id') ?? ($options->stripNull ? false : null);
         }
 

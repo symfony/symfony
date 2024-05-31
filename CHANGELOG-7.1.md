@@ -7,6 +7,21 @@ in 7.1 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v7.1.0...v7.1.1
 
+* 7.1.0 (2024-05-31)
+
+ * bug #57248 [DoctrineBridge] Revert deprecating by-{id} mapping of entities (nicolas-grekas)
+ * bug #54572 [Mailer] Fix sendmail transport failure handling and interactive mode (bobvandevijver)
+ * bug #57228 [Mime] fix PHP 7 compatibility (xabbuh)
+ * bug #57065 [Mime] Fixed `Mime\Message::ensureValidity()` when a required header is set, but has an empty body (rhertogh)
+ * bug #57069 [Config] gracefully handle cases when no resolver is set (xabbuh)
+ * bug #57109 [Notifier] keep boolean options when their value is false (xabbuh)
+ * bug #56848 [DoctrineBridge] Undeprecate DoctrineExtractor::getTypes() (derrabus)
+ * bug #54971 [Serializer] Cache readability/writability computation (mtarld)
+ * bug #54979 [Cache] Fix irrelevant deprecation when connecting to Couchbase (derrabus)
+ * bug #56827 Fix CharsetValidator with string encoding (alamirault)
+ * bug #54977 [DependencyInjection] Fix prepending strategy for php config loader (yceruto)
+ * bug #56488 [VarExporter] Fix exporting default values involving global constants (kylekatarnls)
+
 * 7.1.0-RC1 (2024-05-17)
 
  * bug #54970 [DependencyInjection] Process PHP configs using the ContainerConfigurator (MatTheCat)

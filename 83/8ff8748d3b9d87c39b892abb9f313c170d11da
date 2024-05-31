@@ -1,0 +1,31 @@
+---------------------------------------------------------------------------
+
+by KDederichs at 2024-05-17T15:24:41Z
+
+Dunno, those test failures look not related and kind of random?
+
+---------------------------------------------------------------------------
+
+by KDederichs at 2024-05-17T15:51:51Z
+
+Also can this still be squeezed into 7.1 or do we have feature freeze since we got RC1 now? (I kind of really need this :D)
+
+---------------------------------------------------------------------------
+
+by derrabus at 2024-05-17T17:26:24Z
+
+We have feature freeze for over two weeks already. I see no reason to make an exception here, sorry.
+
+---------------------------------------------------------------------------
+
+by KDederichs at 2024-05-17T17:49:28Z
+
+Ah too bad, guess I'll copy stuff around till 7.2 then
+
+---------------------------------------------------------------------------
+
+by derrabus at 2024-05-17T18:02:02Z
+
+> Ah too bad, guess I'll copy stuff around till 7.2 then
+
+Yeah, too bad that Composer cannot install dev snapshots. Oh wait.

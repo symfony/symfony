@@ -12,6 +12,9 @@
 namespace Symfony\Component\Mime\Tests\Part;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Mime\Encoder\ContentEncoderInterface;
+use Symfony\Component\Mime\Exception\InvalidArgumentException;
+use Symfony\Component\Mime\Exception\RuntimeException;
 use Symfony\Component\Mime\Header\Headers;
 use Symfony\Component\Mime\Header\ParameterizedHeader;
 use Symfony\Component\Mime\Header\UnstructuredHeader;
@@ -84,6 +87,57 @@ class TextPartTest extends TestCase
         $this->assertEquals(new Headers(
             new ParameterizedHeader('Content-Type', 'text/plain', ['charset' => 'utf-8']),
             new UnstructuredHeader('Content-Transfer-Encoding', 'base64')
+        ), $p->getPreparedHeaders());
+    }
+
+    public function testCustomEncoderNeedsToRegisterFirst()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('The encoding must be one of "quoted-printable", "base64", "8bit", "exception_test" ("upper_encoder" given).');
+        TextPart::addEncoder('exception_test', $this->createMock(ContentEncoderInterface::class));
+        new TextPart('content', 'utf-8', 'plain', 'upper_encoder');
+    }
+
+    public function testOverwriteDefaultEncoder()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('You are not allowed to change the default encoders ("quoted-printable","base64","8bit"). If you want to modify their behaviour please register and use a new encoder.');
+        TextPart::addEncoder('8bit', $this->createMock(ContentEncoderInterface::class));
+    }
+
+    public function testCustomEncoding()
+    {
+        TextPart::addEncoder('upper_encoder', new class() implements ContentEncoderInterface {
+            public function encodeByteStream($stream, int $maxLineLength = 0): iterable
+            {
+                $filter = stream_filter_append($stream, 'string.toupper', \STREAM_FILTER_READ);
+                if (!\is_resource($filter)) {
+                    throw new RuntimeException('Unable to set the upper content encoder to the filter.');
+                }
+
+                while (!feof($stream)) {
+                    yield fread($stream, 16372);
+                }
+                stream_filter_remove($filter);
+            }
+
+            public function getName(): string
+            {
+                return 'upper_encoder';
+            }
+
+            public function encodeString(string $string, ?string $charset = 'utf-8', int $firstLineOffset = 0, int $maxLineLength = 0): string
+            {
+                return strtoupper($string);
+            }
+        });
+
+        $p = new TextPart('content', 'utf-8', 'plain', 'upper_encoder');
+        $this->assertEquals('CONTENT', $p->bodyToString());
+        $this->assertEquals('CONTENT', implode('', iterator_to_array($p->bodyToIterable())));
+        $this->assertEquals(new Headers(
+            new ParameterizedHeader('Content-Type', 'text/plain', ['charset' => 'utf-8']),
+            new UnstructuredHeader('Content-Transfer-Encoding', 'upper_encoder')
         ), $p->getPreparedHeaders());
     }
 

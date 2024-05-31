@@ -200,6 +200,10 @@ class UnsupportedSchemeException extends LogicException
             'class' => Bridge\Plivo\PlivoTransportFactory::class,
             'package' => 'symfony/plivo-notifier',
         ],
+        'primotexto' => [
+            'class' => Bridge\Primotexto\PrimotextoTransportFactory::class,
+            'package' => 'symfony/primotexto-notifier',
+        ],
         'pushover' => [
             'class' => Bridge\Pushover\PushoverTransportFactory::class,
             'package' => 'symfony/pushover-notifier',

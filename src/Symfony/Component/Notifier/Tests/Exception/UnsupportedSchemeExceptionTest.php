@@ -72,6 +72,7 @@ final class UnsupportedSchemeExceptionTest extends TestCase
             Bridge\OvhCloud\OvhCloudTransportFactory::class => false,
             Bridge\PagerDuty\PagerDutyTransportFactory::class => false,
             Bridge\Plivo\PlivoTransportFactory::class => false,
+            Bridge\Primotexto\PrimotextoTransportFactory::class => false,
             Bridge\Pushover\PushoverTransportFactory::class => false,
             Bridge\Pushy\PushyTransportFactory::class => false,
             Bridge\Redlink\RedlinkTransportFactory::class => false,
@@ -159,6 +160,7 @@ final class UnsupportedSchemeExceptionTest extends TestCase
         yield ['onesignal', 'symfony/one-signal-notifier'];
         yield ['ovhcloud', 'symfony/ovh-cloud-notifier'];
         yield ['plivo', 'symfony/plivo-notifier'];
+        yield ['primotexto', 'symfony/primotexto-notifier'];
         yield ['redlink', 'symfony/redlink-notifier'];
         yield ['ringcentral', 'symfony/ring-central-notifier'];
         yield ['rocketchat', 'symfony/rocket-chat-notifier'];

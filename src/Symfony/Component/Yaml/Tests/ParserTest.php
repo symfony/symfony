@@ -1026,6 +1026,14 @@ parent:
 EOD;
         $tests[] = [$yaml, 'child_sequence', 6];
 
+        $yaml = <<<EOD
+parent:
+  child:
+  child2:
+  child:
+EOD;
+        $tests[] = [$yaml, 'child', 4];
+
         return $tests;
     }
 

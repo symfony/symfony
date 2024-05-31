@@ -101,7 +101,7 @@ class TextPartTest extends TestCase
     public function testOverwriteDefaultEncoder()
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('You are not allowed to change the default encoders ("quoted-printable","base64","8bit"). If you want to modify their behaviour please register and use a new encoder.');
+        $this->expectExceptionMessage('You are not allowed to change the default encoders ("quoted-printable", "base64", and "8bit").');
         TextPart::addEncoder('8bit', $this->createMock(ContentEncoderInterface::class));
     }
 

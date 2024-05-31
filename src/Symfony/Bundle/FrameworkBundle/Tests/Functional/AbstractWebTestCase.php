@@ -52,7 +52,7 @@ abstract class AbstractWebTestCase extends BaseWebTestCase
 
     protected static function createKernel(array $options = []): KernelInterface
     {
-        $class = self::getKernelClass();
+        $class = static::getKernelClass();
 
         if (!isset($options['test_case'])) {
             throw new \InvalidArgumentException('The option "test_case" must be set.');

@@ -74,6 +74,46 @@ $chatMessage->options($slackOptions);
 $chatter->send($chatMessage);
 ```
 
+Alternatively, a single button can be added to a section using the `accessory()` method and the `SlackButtonBlockElement` class.
+
+```php
+use Symfony\Component\Notifier\Bridge\Slack\Block\SlackButtonBlockElement;
+use Symfony\Component\Notifier\Bridge\Slack\Block\SlackDividerBlock;
+use Symfony\Component\Notifier\Bridge\Slack\Block\SlackSectionBlock;
+use Symfony\Component\Notifier\Bridge\Slack\SlackOptions;
+use Symfony\Component\Notifier\Message\ChatMessage;
+
+$chatMessage = new ChatMessage('Contribute To Symfony');
+
+$slackOptions = (new SlackOptions())
+    ->block((new SlackSectionBlock())
+        ->text('Symfony Framework')
+        ->accessory(
+            new SlackButtonBlockElement(
+                'Report bugs',
+                'https://symfony.com/doc/current/contributing/code/bugs.html',
+                'danger'
+            )
+        )
+    )
+    ->block(new SlackDividerBlock())
+    ->block((new SlackSectionBlock())
+        ->text('Symfony Documentation')
+        ->accessory(
+            new SlackButtonBlockElement(
+                'Improve Documentation',
+                'https://symfony.com/doc/current/contributing/documentation/standards.html',
+                'primary'
+            )
+        )
+    );
+
+// Add the custom options to the chat message and send the message
+$chatMessage->options($slackOptions);
+
+$chatter->send($chatMessage);
+```
+
 Adding Fields and Values to a Message
 -------------------------------------
 
@@ -103,6 +143,34 @@ $chatMessage->options($options);
 
 $chatter->send($chatMessage);
 ```
+
+Define text objects properties
+------------------------------
+
+[Text objects properties](https://api.slack.com/reference/block-kit/composition-objects#text) can be set on any `text()` or `field()` method :
+
+```php
+use Symfony\Component\Notifier\Bridge\Slack\Block\SlackSectionBlock;
+use Symfony\Component\Notifier\Bridge\Slack\SlackOptions;
+use Symfony\Component\Notifier\Message\ChatMessage;
+
+$chatMessage = new ChatMessage('Slack Notifier');
+
+$options = (new SlackOptions())
+    ->block(
+        (new SlackSectionBlock())
+            ->field('My **Markdown** content with clickable URL : symfony.com') // Markdown content (default)
+            ->field('*Plain text content*', markdown: false) // Plain text content
+            ->field('Not clickable URL : symfony.com', verbatim: true) // Only for markdown content
+            ->field('Thumbs up emoji code is :thumbsup: ', emoji: false) // Only for plain text content
+    );
+
+// Add the custom options to the chat message and send the message
+$chatMessage->options($options);
+
+$chatter->send($chatMessage);
+```
+
 
 Adding a Header to a Message
 ----------------------------

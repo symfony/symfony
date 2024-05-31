@@ -49,6 +49,11 @@ class AppKernel extends Kernel implements ExtensionInterface, ConfigurationInter
         parent::__construct($environment, $debug);
     }
 
+    protected function getContainerClass(): string
+    {
+        return parent::getContainerClass().substr(md5($this->rootConfig), -16);
+    }
+
     public function registerBundles(): iterable
     {
         if (!file_exists($filename = $this->getProjectDir().'/'.$this->testCase.'/bundles.php')) {

@@ -16,6 +16,7 @@ use Symfony\Component\Config\Definition\Builder\NodeDefinition;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Exception\LogicException;
+use Symfony\Component\DependencyInjection\Parameter;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\HttpFoundation\RateLimiter\RequestRateLimiterInterface;
 use Symfony\Component\Lock\LockInterface;
@@ -76,7 +77,7 @@ class LoginThrottlingFactory implements AuthenticatorFactoryInterface
             $container->register($config['limiter'] = 'security.login_throttling.'.$firewallName.'.limiter', DefaultLoginRateLimiter::class)
                 ->addArgument(new Reference('limiter.'.$globalId))
                 ->addArgument(new Reference('limiter.'.$localId))
-                ->addArgument('%container.build_hash%')
+                ->addArgument(new Parameter('container.build_hash'))
             ;
         }
 

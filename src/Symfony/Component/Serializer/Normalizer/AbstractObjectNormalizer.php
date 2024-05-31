@@ -32,6 +32,7 @@ use Symfony\Component\Serializer\Mapping\ClassDiscriminatorResolverInterface;
 use Symfony\Component\Serializer\Mapping\ClassMetadataInterface;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
+use Symfony\Component\TypeInfo\Exception\LogicException as TypeInfoLogicException;
 use Symfony\Component\TypeInfo\Type;
 use Symfony\Component\TypeInfo\Type\CollectionType;
 use Symfony\Component\TypeInfo\Type\IntersectionType;
@@ -702,7 +703,11 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
                 }
 
                 if ($collectionValueType) {
-                    $collectionValueBaseType = $collectionValueType instanceof UnionType ? $collectionValueType->asNonNullable()->getBaseType() : $collectionValueType->getBaseType();
+                    try {
+                        $collectionValueBaseType = $collectionValueType->getBaseType();
+                    } catch (TypeInfoLogicException) {
+                        $collectionValueBaseType = Type::mixed();
+                    }
 
                     if ($collectionValueBaseType instanceof ObjectType) {
                         $typeIdentifier = TypeIdentifier::OBJECT;

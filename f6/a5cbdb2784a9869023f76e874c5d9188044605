@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by Kocal at 2024-05-24T12:48:50Z
+
+Fabbot has some issues with the license header in tests files, if I keep it then `Coding Standard` fails, but if I remove it then `License Headers` fails. :/
+
+**EDIT:** ok that's fine now, I guess that was due to the `declare(strict_types=1)` that I've removed.
+
+---------------------------------------------------------------------------
+
+by Zombaya at 2024-05-29T11:49:56Z
+
+As a symfony-user, not a symfony-contributor, this looks very useful to me and something we would like to use ourselves. There can never be too many lint-commands to be used in CI :slightly_smiling_face:

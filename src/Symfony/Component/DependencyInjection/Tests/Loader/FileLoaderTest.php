@@ -229,6 +229,17 @@ class FileLoaderTest extends TestCase
         $loader->registerClasses(new Definition(), 'Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype\\', 'Prototype/Sub/*');
     }
 
+    public function testRegisterClassesWithPrivateConstructor()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Invalid service "Symfony\Component\DependencyInjection\Tests\Fixtures\PrivateConstructor\ClassWithPrivateConstructor": constructor of class "Symfony\Component\DependencyInjection\Tests\Fixtures\PrivateConstructor\ClassWithPrivateConstructor" must be public');
+
+        $container = new ContainerBuilder();
+        $loader = new TestFileLoader($container, new FileLocator(self::$fixturesPath.'/Fixtures'));
+
+        $loader->registerClasses(new Definition(), 'Symfony\Component\DependencyInjection\Tests\Fixtures\PrivateConstructor\\', 'PrivateConstructor/*');
+    }
+
     public function testRegisterClassesWithIncompatibleExclude()
     {
         $this->expectException(InvalidArgumentException::class);

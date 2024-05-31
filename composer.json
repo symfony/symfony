@@ -176,7 +176,8 @@
             "Symfony\\Bridge\\ProxyManager\\": "src/Symfony/Bridge/ProxyManager/",
             "Symfony\\Bridge\\Twig\\": "src/Symfony/Bridge/Twig/",
             "Symfony\\Bundle\\": "src/Symfony/Bundle/",
-            "Symfony\\Component\\": "src/Symfony/Component/"
+            "Symfony\\Component\\": "src/Symfony/Component/",
+            "Symfony\\Runtime\\Symfony\\Component\\": "src/Symfony/Component/Runtime/Internal/"
         },
         "files": [
             "src/Symfony/Component/String/Resources/functions.php"
@@ -185,7 +186,8 @@
             "src/Symfony/Component/Intl/Resources/stubs"
         ],
         "exclude-from-classmap": [
-            "**/Tests/"
+            "**/Tests/",
+            "**/bin/"
         ]
     },
     "autoload-dev": {

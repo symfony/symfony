@@ -1,0 +1,27 @@
+---------------------------------------------------------------------------
+
+by derrabus at 2024-05-13T06:01:01Z
+
+Please target 7.1. We usually don't merge performance improvements into LTS branches.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2024-05-15T06:51:49Z
+
+Shouldn't we now also implement the `ResetInterface` to prevent memory leaks?
+
+---------------------------------------------------------------------------
+
+by mvhirsch at 2024-05-15T15:54:20Z
+
+> Shouldn't we now also implement the `ResetInterface` to prevent memory leaks?
+
+If so, the `PhpDocExtractor` should implement it too, I guess.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-05-17T07:40:53Z
+
+> implement the ResetInterface to prevent memory leaks?
+
+If all we store is class metadata, we don't need a reset IMHO as the leak is upper bounded, and resetting might effect performance of long running kernels for little memory savings in the end.

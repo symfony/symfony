@@ -146,6 +146,7 @@ final class SlackOptionsTest extends TestCase
                         'text' => [
                             'type' => 'mrkdwn',
                             'text' => $subject,
+                            'verbatim' => false,
                         ],
                     ],
                 ],
@@ -162,6 +163,7 @@ final class SlackOptionsTest extends TestCase
                         'text' => [
                             'type' => 'mrkdwn',
                             'text' => $subject,
+                            'verbatim' => false,
                         ],
                     ],
                     [
@@ -169,6 +171,7 @@ final class SlackOptionsTest extends TestCase
                         'text' => [
                             'type' => 'mrkdwn',
                             'text' => $content,
+                            'verbatim' => false,
                         ],
                     ],
                 ],

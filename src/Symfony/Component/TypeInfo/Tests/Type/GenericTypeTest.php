@@ -62,4 +62,10 @@ class GenericTypeTest extends TestCase
         $this->assertFalse($type->isA(TypeIdentifier::STRING));
         $this->assertTrue($type->isA(self::class));
     }
+
+    public function testProxiesMethodsToBaseType()
+    {
+        $type = new GenericType(Type::object(self::class), Type::float());
+        $this->assertSame(self::class, $type->getClassName());
+    }
 }

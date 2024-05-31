@@ -51,4 +51,10 @@ class TypeTest extends TestCase
         $this->expectException(LogicException::class);
         Type::union(Type::int(), Type::string())->getBaseType();
     }
+
+    public function testThrowsOnUnexistingMethod()
+    {
+        $this->expectException(LogicException::class);
+        Type::int()->unexistingMethod();
+    }
 }

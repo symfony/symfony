@@ -17,8 +17,8 @@ use Symfony\Component\Mailer\Envelope;
 use Symfony\Component\Mailer\Exception\TransportException;
 use Symfony\Component\Mailer\SentMessage;
 use Symfony\Component\Mailer\Transport\SendmailTransport;
+use Symfony\Component\Mailer\Transport\Smtp\SmtpTransport;
 use Symfony\Component\Mailer\Transport\Smtp\Stream\ProcessStream;
-use Symfony\Component\Mailer\Transport\TransportInterface;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Email;
 use Symfony\Component\Mime\RawMessage;
@@ -130,7 +130,7 @@ class SendmailTransportTest extends TestCase
         $transportProperty->setAccessible(true);
 
         // Replace the transport with an anonymous consumer that trigger the stream methods
-        $transportProperty->setValue($sendmailTransport, new class($transportProperty->getValue($sendmailTransport)->getStream()) implements TransportInterface {
+        $transportProperty->setValue($sendmailTransport, new class($transportProperty->getValue($sendmailTransport)->getStream()) extends SmtpTransport {
             private $stream;
 
             public function __construct(ProcessStream $stream)

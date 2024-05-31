@@ -31,7 +31,7 @@ final class ProcessStream extends AbstractStream
         $this->command = $command;
     }
 
-    public function setInteractive(bool $interactive)
+    public function setInteractive(bool $interactive): void
     {
         $this->interactive = $interactive;
     }

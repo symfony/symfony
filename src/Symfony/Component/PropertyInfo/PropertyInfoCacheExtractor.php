@@ -64,9 +64,6 @@ class PropertyInfoCacheExtractor implements PropertyInfoExtractorInterface, Prop
         return $this->extract('getType', [$class, $property, $context]);
     }
 
-    /**
-     * @deprecated since Symfony 7.1, use "getType" instead
-     */
     public function getTypes(string $class, string $property, array $context = []): ?array
     {
         return $this->extract('getTypes', [$class, $property, $context]);

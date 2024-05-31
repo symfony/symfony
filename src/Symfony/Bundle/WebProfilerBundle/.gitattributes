@@ -1,4 +1,3 @@
 /Tests export-ignore
 /phpunit.xml.dist export-ignore
 /Resources/views/Script/Mermaid/Makefile export-ignore
-/.git* export-ignore

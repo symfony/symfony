@@ -6,4 +6,3 @@
 /Tests export-ignore
 /phpunit.xml.dist export-ignore
 /Resources/emoji export-ignore
-/.git* export-ignore

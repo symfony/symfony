@@ -28,7 +28,8 @@
         "psr-4": { "Symfony\\Component\\Emoji\\": "" },
         "exclude-from-classmap": [
             "/Tests/",
-            "/Resources/data/"
+            "/Resources/data/",
+            "/Resources/bin/"
         ]
     },
     "minimum-stability": "dev"

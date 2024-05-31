@@ -64,8 +64,6 @@ final class Transport
         SesTransportFactory::class,
     ];
 
-    private iterable $factories;
-
     public static function fromDsn(#[\SensitiveParameter] string $dsn, ?EventDispatcherInterface $dispatcher = null, ?HttpClientInterface $client = null, ?LoggerInterface $logger = null): TransportInterface
     {
         $factory = new self(iterator_to_array(self::getDefaultFactories($dispatcher, $client, $logger)));
@@ -83,9 +81,9 @@ final class Transport
     /**
      * @param TransportFactoryInterface[] $factories
      */
-    public function __construct(iterable $factories)
-    {
-        $this->factories = $factories;
+    public function __construct(
+        private iterable $factories,
+    ) {
     }
 
     public function fromStrings(#[\SensitiveParameter] array $dsns): Transports

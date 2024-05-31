@@ -54,12 +54,6 @@ class Translator implements TranslatorInterface, TranslatorBagInterface, LocaleA
 
     private MessageFormatterInterface $formatter;
 
-    private ?string $cacheDir;
-
-    private bool $debug;
-
-    private array $cacheVary;
-
     private ?ConfigCacheFactoryInterface $configCacheFactory;
 
     private array $parentLocales;
@@ -69,14 +63,16 @@ class Translator implements TranslatorInterface, TranslatorBagInterface, LocaleA
     /**
      * @throws InvalidArgumentException If a locale contains invalid characters
      */
-    public function __construct(string $locale, ?MessageFormatterInterface $formatter = null, ?string $cacheDir = null, bool $debug = false, array $cacheVary = [])
-    {
+    public function __construct(
+        string $locale,
+        ?MessageFormatterInterface $formatter = null,
+        private ?string $cacheDir = null,
+        private bool $debug = false,
+        private array $cacheVary = [],
+    ) {
         $this->setLocale($locale);
 
         $this->formatter = $formatter ??= new MessageFormatter();
-        $this->cacheDir = $cacheDir;
-        $this->debug = $debug;
-        $this->cacheVary = $cacheVary;
         $this->hasIntlFormatter = $formatter instanceof IntlFormatterInterface;
     }
 

@@ -27,14 +27,12 @@ use Symfony\Component\RateLimiter\Storage\StorageInterface;
 final class RateLimiterFactory
 {
     private array $config;
-    private StorageInterface $storage;
-    private ?LockFactory $lockFactory;
 
-    public function __construct(array $config, StorageInterface $storage, ?LockFactory $lockFactory = null)
-    {
-        $this->storage = $storage;
-        $this->lockFactory = $lockFactory;
-
+    public function __construct(
+        array $config,
+        private StorageInterface $storage,
+        private ?LockFactory $lockFactory = null,
+    ) {
         $options = new OptionsResolver();
         self::configureOptions($options);
 

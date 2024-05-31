@@ -30,8 +30,6 @@ abstract class AbstractOperation implements OperationInterface
     public const NEW_BATCH = 'new';
     public const ALL_BATCH = 'all';
 
-    protected MessageCatalogueInterface $source;
-    protected MessageCatalogueInterface $target;
     protected MessageCatalogue $result;
 
     /**
@@ -62,14 +60,14 @@ abstract class AbstractOperation implements OperationInterface
     /**
      * @throws LogicException
      */
-    public function __construct(MessageCatalogueInterface $source, MessageCatalogueInterface $target)
-    {
+    public function __construct(
+        protected MessageCatalogueInterface $source,
+        protected MessageCatalogueInterface $target,
+    ) {
         if ($source->getLocale() !== $target->getLocale()) {
             throw new LogicException('Operated catalogues must belong to the same locale.');
         }
 
-        $this->source = $source;
-        $this->target = $target;
         $this->result = new MessageCatalogue($source->getLocale());
         $this->messages = [];
     }

@@ -18,21 +18,14 @@ use Symfony\Component\Mailer\Exception\InvalidArgumentException;
  */
 final class Dsn
 {
-    private string $scheme;
-    private string $host;
-    private ?string $user;
-    private ?string $password;
-    private ?int $port;
-    private array $options;
-
-    public function __construct(string $scheme, string $host, ?string $user = null, #[\SensitiveParameter] ?string $password = null, ?int $port = null, array $options = [])
-    {
-        $this->scheme = $scheme;
-        $this->host = $host;
-        $this->user = $user;
-        $this->password = $password;
-        $this->port = $port;
-        $this->options = $options;
+    public function __construct(
+        private string $scheme,
+        private string $host,
+        private ?string $user = null,
+        #[\SensitiveParameter] private ?string $password = null,
+        private ?int $port = null,
+        private array $options = [],
+    ) {
     }
 
     public static function fromString(#[\SensitiveParameter] string $dsn): self

@@ -34,22 +34,14 @@ final class TranslationPullCommand extends Command
 {
     use TranslationTrait;
 
-    private TranslationProviderCollection $providerCollection;
-    private TranslationWriterInterface $writer;
-    private TranslationReaderInterface $reader;
-    private string $defaultLocale;
-    private array $transPaths;
-    private array $enabledLocales;
-
-    public function __construct(TranslationProviderCollection $providerCollection, TranslationWriterInterface $writer, TranslationReaderInterface $reader, string $defaultLocale, array $transPaths = [], array $enabledLocales = [])
-    {
-        $this->providerCollection = $providerCollection;
-        $this->writer = $writer;
-        $this->reader = $reader;
-        $this->defaultLocale = $defaultLocale;
-        $this->transPaths = $transPaths;
-        $this->enabledLocales = $enabledLocales;
-
+    public function __construct(
+        private TranslationProviderCollection $providerCollection,
+        private TranslationWriterInterface $writer,
+        private TranslationReaderInterface $reader,
+        private string $defaultLocale,
+        private array $transPaths = [],
+        private array $enabledLocales = [],
+    ) {
         parent::__construct();
     }
 

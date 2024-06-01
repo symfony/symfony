@@ -291,14 +291,24 @@ class DebugClassLoader
         try {
             if ($this->isFinder && !isset($this->loaded[$class])) {
                 $this->loaded[$class] = true;
-                if (!$file = $this->classLoader[0]->findFile($class) ?: '') {
-                    // no-op
-                } elseif (\function_exists('opcache_is_script_cached') && @opcache_is_script_cached($file)) {
-                    include $file;
+                
+                $file = '';
 
-                    return;
-                } elseif (false === include $file) {
-                    return;
+                if (isset($this->classLoader[0]) &&
+                    is_object($this->classLoader[0]) &&
+                    method_exists($this->classLoader[0], 'findFile')
+                ) {
+                    $file = $this->classLoader[0]->findFile($class) ?: '';
+                }
+
+                if ($file) {
+                    if (\function_exists('opcache_is_script_cached') && @opcache_is_script_cached($file)) {
+                        include $file;
+
+                        return;
+                    } elseif (false === include $file) {
+                        return;
+                    }
                 }
             } else {
                 ($this->classLoader)($class);

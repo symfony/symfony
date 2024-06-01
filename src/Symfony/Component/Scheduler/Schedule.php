@@ -141,6 +141,10 @@ final class Schedule implements ScheduleProviderInterface
 
     public function before(callable $listener, int $priority = 0): static
     {
+        if (!$this->dispatcher) {
+            throw new LogicException(sprintf('To register a listener with "%s()", you need to set an event dispatcher on the Schedule.', __METHOD__));
+        }
+
         $this->dispatcher->addListener(PreRunEvent::class, $listener, $priority);
 
         return $this;
@@ -148,6 +152,10 @@ final class Schedule implements ScheduleProviderInterface
 
     public function after(callable $listener, int $priority = 0): static
     {
+        if (!$this->dispatcher) {
+            throw new LogicException(sprintf('To register a listener with "%s()", you need to set an event dispatcher on the Schedule.', __METHOD__));
+        }
+
         $this->dispatcher->addListener(PostRunEvent::class, $listener, $priority);
 
         return $this;
@@ -155,6 +163,10 @@ final class Schedule implements ScheduleProviderInterface
 
     public function onFailure(callable $listener, int $priority = 0): static
     {
+        if (!$this->dispatcher) {
+            throw new LogicException(sprintf('To register a listener with "%s()", you need to set an event dispatcher on the Schedule.', __METHOD__));
+        }
+
         $this->dispatcher->addListener(FailureEvent::class, $listener, $priority);
 
         return $this;

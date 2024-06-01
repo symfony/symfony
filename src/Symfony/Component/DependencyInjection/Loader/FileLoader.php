@@ -224,7 +224,7 @@ abstract class FileLoader extends BaseFileLoader
                 throw new InvalidArgumentException(sprintf('Expected to find class "%s" in file "%s" while importing services from resource "%s", but it was not found! Check the namespace prefix used with the resource.', $class, $path, $pattern));
             }
 
-            if (!$r->isInstantiable() && !is_null($r->getConstructor())) {
+            if (!$r->isInstantiable() && null !== $r->getConstructor()) {
                 throw new InvalidArgumentException(sprintf('Invalid service "%s": constructor of class "%s" must be public.', $class, $class));
             }
 

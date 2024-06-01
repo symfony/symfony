@@ -123,7 +123,11 @@ class TextPart extends AbstractPart
     public function getBody(): string
     {
         if ($this->body instanceof File) {
-            return file_get_contents($this->body->getPath());
+            if (false === $ret = @file_get_contents($this->body->getPath())) {
+                throw new InvalidArgumentException(error_get_last()['message']);
+            }
+
+            return $ret;
         }
 
         if (null === $this->seekable) {

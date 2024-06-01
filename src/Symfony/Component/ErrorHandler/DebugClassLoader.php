@@ -301,7 +301,7 @@ class DebugClassLoader
                     $file = $this->classLoader[0]->findFile($class) ?: '';
                 }
 
-                if ($file) {
+                if (!empty($file)) {
                     if (\function_exists('opcache_is_script_cached') && @opcache_is_script_cached($file)) {
                         include $file;
 

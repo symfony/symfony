@@ -7,6 +7,38 @@ in 5.4 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v5.4.0...v5.4.1
 
+* 5.4.40 (2024-06-02)
+
+ * bug #57275 Fix autoload configs to avoid warnings when building optimized autoloaders (Seldaek)
+ * bug #54572 [Mailer] Fix sendmail transport failure handling and interactive mode (bobvandevijver)
+ * bug #57228 [Mime] fix PHP 7 compatibility (xabbuh)
+ * bug #57065 [Mime] Fixed `Mime\Message::ensureValidity()` when a required header is set, but has an empty body (rhertogh)
+ * bug #57109 [Notifier] keep boolean options when their value is false (xabbuh)
+ * bug #54694 [PropertyInfo] Update DoctrineExtractor for new DBAL 4 BIGINT type (llupa)
+ * bug #54913 [Serializer] Fix CurrentType for missing property (ElisDN)
+ * bug #54797 [PhpUnitBridge] Fix `DeprecationErrorHandler` with PhpUnit 10 (HypeMC)
+ * bug #54878 [Filesystem] Fix dumpFile `stat failed` error hitting custom handler (acoulton)
+ * bug #54924 [Validator] IBAN Check digits should always between 2 and 98 (karstennilsen)
+ * bug #54919 [ErrorHandler] Do not call xdebug_get_function_stack() with xdebug >= 3.0 when not in develop mode (fmata)
+ * bug #54910 [HttpFoundation]  filter out empty HTTP header parts (xabbuh)
+ * bug #54888 [String] Fix folded in compat mode (smnandre)
+ * bug #54860 [HttpClient] Revert fixing curl default options (alexandre-daubois)
+ * bug #54839 Fix exception thrown during `LDAP_MODIFY_BATCH_REMOVE_ALL` batch operations (phasdev)
+ * bug #54834 [Validator] Check `Locale` class existence before using it (alexandre-daubois)
+ * bug #54830 [HttpClient] Fix cURL default options for PHP 8.4 (alexandre-daubois)
+ * bug #54828 [Serializer] Fix `GetSetMethodNormalizer` not working with setters with optional args (HypeMC)
+ * bug #54816 [Cache] Fix support for predis/predis:^2.0 (mfettig)
+ * bug #54804 [Serializer] separate the property info and write info extractors (xabbuh)
+ * bug #54800 [WebProfilerBundle] fix compatibility with Twig 3.10 (xabbuh)
+ * bug #54794 [Strings][EnglishInflector] Fix incorrect pluralisation of 'Album' (timporter)
+ * bug #54714 [Serializer] convert empty CSV header names into numeric keys (xabbuh)
+ * bug #54775 [Messenger] accept AbstractAsset instances when filtering schemas (xabbuh)
+ * bug #54759 [Filesystem] better distinguish URL schemes and Windows drive letters (xabbuh)
+ * bug #54791 [FrameworkBundle] move wiring of the property info extractor to the ObjectNormalizer (xabbuh)
+ * bug #54760 [Validator] handle union and intersection types for cascaded validations (xabbuh)
+ * bug #54776 [Cache] fix: remove unwanted cast to int (Arend Hummeling)
+ * bug #54700 [Dotenv] show overridden vars too when running debug:dotenv (HMRDevil)
+
 * 5.4.39 (2024-04-29)
 
  * bug #54751 [Validator]  detect wrong e-mail validation modes (xabbuh)

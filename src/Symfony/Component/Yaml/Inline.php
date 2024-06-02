@@ -381,12 +381,18 @@ class Inline
                     // the value can be an array if a reference has been resolved to an array var
                     if (\is_string($value) && !$isQuoted && false !== strpos($value, ': ')) {
                         // embedded mapping?
-                        try {
-                            $pos = 0;
-                            $value = self::parseMapping('{'.$value.'}', $flags, $pos, $references);
-                        } catch (\InvalidArgumentException $e) {
-                            // no, it's not
-                        }
+                        $j = $i;
+                        $mappingValue = $value;
+                        do {
+                            try {
+                                $pos = 0;
+                                $value = self::parseMapping('{'.$mappingValue.'}', $flags, $pos, $references);
+                                $i = $j;
+                                break;
+                            } catch (ParseException $e) {
+                                $mappingValue .= $sequence[$j++].self::parseScalar($sequence, $flags, [',', ']'], $j, null === $tag, $references);
+                            }
+                        } while ($j < $len);
                     }
 
                     if (!$isQuoted && \is_string($value) && '' !== $value && '&' === $value[0] && Parser::preg_match(Parser::REFERENCE_PATTERN, $value, $matches)) {

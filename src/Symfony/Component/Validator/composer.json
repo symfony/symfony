@@ -56,7 +56,8 @@
     "autoload": {
         "psr-4": { "Symfony\\Component\\Validator\\": "" },
         "exclude-from-classmap": [
-            "/Tests/"
+            "/Tests/",
+            "/Resources/bin/"
         ]
     },
     "minimum-stability": "dev"

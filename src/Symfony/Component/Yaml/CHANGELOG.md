@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+7.2
+---
+
+ * duplicate mapping keys throw a `ParseException` even when such key has a NULL value
+
 7.1
 ---
 

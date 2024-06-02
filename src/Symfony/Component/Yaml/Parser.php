@@ -299,7 +299,7 @@ class Parser
                     if (!$this->isNextLineIndented() && !$this->isNextLineUnIndentedCollection()) {
                         // Spec: Keys MUST be unique; first one wins.
                         // But overwriting is allowed when a merge node is used in current block.
-                        if ($allowOverwrite || !isset($data[$key])) {
+                        if ($allowOverwrite || !\array_key_exists($key, $data)) {
                             if (null !== $subTag) {
                                 $data[$key] = new TaggedValue($subTag, '');
                             } else {
@@ -320,7 +320,7 @@ class Parser
                             }
 
                             $data += $value;
-                        } elseif ($allowOverwrite || !isset($data[$key])) {
+                        } elseif ($allowOverwrite || !\array_key_exists($key, $data)) {
                             // Spec: Keys MUST be unique; first one wins.
                             // But overwriting is allowed when a merge node is used in current block.
                             if (null !== $subTag) {
@@ -336,7 +336,7 @@ class Parser
                     $value = $this->parseValue(rtrim($values['value']), $flags, $context);
                     // Spec: Keys MUST be unique; first one wins.
                     // But overwriting is allowed when a merge node is used in current block.
-                    if ($allowOverwrite || !isset($data[$key])) {
+                    if ($allowOverwrite || !\array_key_exists($key, $data)) {
                         $data[$key] = $value;
                     } else {
                         throw new ParseException(sprintf('Duplicate key "%s" detected.', $key), $this->getRealCurrentLineNb() + 1, $this->currentLine);

@@ -12,6 +12,7 @@
 namespace Symfony\Component\Mime\Tests\Part;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Mime\Exception\InvalidArgumentException;
 use Symfony\Component\Mime\Header\Headers;
 use Symfony\Component\Mime\Header\ParameterizedHeader;
 use Symfony\Component\Mime\Header\UnstructuredHeader;
@@ -53,6 +54,16 @@ class TextPartTest extends TestCase
         $this->assertSame('content', $p->getBody());
         $this->assertSame('content', $p->bodyToString());
         $this->assertSame('content', implode('', iterator_to_array($p->bodyToIterable())));
+    }
+
+    public function testConstructorWithUnknownFile()
+    {
+        $p = new TextPart(new File(\dirname(__DIR__).'/Fixtures/unknown.txt'));
+
+        // Exception should be thrown only when the body is accessed
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessageMatches('{Failed to open stream}');
+        $p->getBody();
     }
 
     public function testConstructorWithNonStringOrResource()

@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2024-06-01T06:18:16Z
+
+IIUC, currently, this file is valid and has the "expected" behavior. So, throwing an exception now is a BC break that we cannot merge in 5.4. I would vote to do it in 7.2 only and add a note in the CHANGELOG file.
+
+---------------------------------------------------------------------------
+
+by olsavmic at 2024-06-02T18:20:20Z
+
+The base was changed to 7.2 and I've updated the changelog file. Thank you!

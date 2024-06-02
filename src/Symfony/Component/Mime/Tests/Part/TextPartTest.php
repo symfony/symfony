@@ -58,6 +58,16 @@ class TextPartTest extends TestCase
         $this->assertSame('content', implode('', iterator_to_array($p->bodyToIterable())));
     }
 
+    public function testConstructorWithUnknownFile()
+    {
+        $p = new TextPart(new File(\dirname(__DIR__).'/Fixtures/unknown.txt'));
+
+        // Exception should be thrown only when the body is accessed
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessageMatches('{Failed to open stream}');
+        $p->getBody();
+    }
+
     public function testConstructorWithNonStringOrResource()
     {
         $this->expectException(\TypeError::class);

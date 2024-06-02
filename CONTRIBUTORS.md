@@ -13,8 +13,8 @@ The Symfony Connect username in parenthesis allows to get more information
  - Tobias Schultze (tobion)
  - Grégoire Pineau (lyrixx)
  - Thomas Calvet (fancyweb)
- - Christophe Coevoet (stof)
  - Alexandre Daubois (alexandre-daubois)
+ - Christophe Coevoet (stof)
  - Wouter de Jong (wouterj)
  - Jordi Boggiano (seldaek)
  - Maxime Steinhausser (ogizanagi)
@@ -35,9 +35,9 @@ The Symfony Connect username in parenthesis allows to get more information
  - Jérôme Tamarelle (gromnan)
  - Samuel ROZE (sroze)
  - Antoine Lamirault (alamirault)
+ - HypeMC (hypemc)
  - Pascal Borreli (pborreli)
  - Romain Neutron
- - HypeMC (hypemc)
  - Joseph Bielawski (stloyd)
  - Drak (drak)
  - Abdellatif Ait boudad (aitboudad)
@@ -61,6 +61,7 @@ The Symfony Connect username in parenthesis allows to get more information
  - William DURAND
  - ornicar
  - Dany Maillard (maidmaid)
+ - Simon André (simonandre)
  - Eriksen Costa
  - Diego Saint Esteben (dosten)
  - stealth35 ‏ (stealth35)
@@ -69,20 +70,19 @@ The Symfony Connect username in parenthesis allows to get more information
  - Francis Besset (francisbesset)
  - Titouan Galopin (tgalopin)
  - Pierre du Plessis (pierredup)
- - Simon André (simonandre)
  - David Maicher (dmaicher)
  - Bulat Shakirzyanov (avalanche123)
  - Iltar van der Berg
  - Miha Vrhovnik (mvrhov)
+ - Tomasz Kowalczyk (thunderer)
  - Gary PEGEOT (gary-p)
+ - Mathias Arlaud (mtarld)
  - Saša Stamenković (umpirsky)
  - Allison Guilhem (a_guilhem)
  - Mathieu Piot (mpiot)
  - Mathieu Santostefano (welcomattic)
  - Alexander Schranz (alexander-schranz)
  - Vasilij Duško (staff)
- - Tomasz Kowalczyk (thunderer)
- - Mathias Arlaud (mtarld)
  - Sarah Khalil (saro0h)
  - Laurent VOULLEMIER (lvo)
  - Konstantin Kudryashov (everzet)
@@ -95,8 +95,8 @@ The Symfony Connect username in parenthesis allows to get more information
  - Dariusz Ruminski
  - Henrik Bjørnskov (henrikbjorn)
  - David Buchmann (dbu)
- - Andrej Hudec (pulzarraider)
  - Ruud Kamphuis (ruudk)
+ - Andrej Hudec (pulzarraider)
  - Jáchym Toušek (enumag)
  - Christian Raue
  - Eric Clemmons (ericclemmons)
@@ -162,9 +162,9 @@ The Symfony Connect username in parenthesis allows to get more information
  - Teoh Han Hui (teohhanhui)
  - Przemysław Bogusz (przemyslaw-bogusz)
  - Colin Frei
+ - Nicolas Philippe (nikophil)
  - excelwebzone
  - Paráda József (paradajozsef)
- - Nicolas Philippe (nikophil)
  - Baptiste Clavié (talus)
  - Alexander Schwenn (xelaris)
  - Fabien Pennequin (fabienpennequin)
@@ -181,24 +181,27 @@ The Symfony Connect username in parenthesis allows to get more information
  - François-Xavier de Guillebon (de-gui_f)
  - Maximilian Beckers (maxbeckers)
  - noniagriconomie
+ - Valtteri R (valtzu)
  - Eric GELOEN (gelo)
  - Gabriel Caruso
  - Stefano Sala (stefano.sala)
  - Ion Bazan (ionbazan)
+ - Niels Keurentjes (curry684)
  - OGAWA Katsuhiro (fivestar)
  - Jhonny Lidfors (jhonne)
+ - Dāvis Zālītis (k0d3r1s)
  - Juti Noppornpitak (shiroyuki)
  - Gregor Harlan (gharlan)
+ - Hugo Alliaume (kocal)
  - Anthony MARTIN
  - Andreas Schempp (aschempp)
  - Sebastian Hörl (blogsh)
  - Tigran Azatyan (tigranazatyan)
+ - Florent Mata (fmata)
  - Christopher Hertel (chertel)
  - Jonathan Scheiber (jmsche)
  - Daniel Gomes (danielcsgomes)
  - Hidenori Goto (hidenorigoto)
- - Niels Keurentjes (curry684)
- - Dāvis Zālītis (k0d3r1s)
  - Arnaud Kleinpeter (nanocom)
  - Guilherme Blanco (guilhermeblanco)
  - Saif Eddin Gmati (azjezz)
@@ -207,10 +210,7 @@ The Symfony Connect username in parenthesis allows to get more information
  - SpacePossum
  - Richard van Laak (rvanlaak)
  - Andreas Braun
- - Hugo Alliaume (kocal)
- - Valtteri R (valtzu)
  - Pablo Godel (pgodel)
- - Florent Mata (fmata)
  - Alessandro Chitolina (alekitto)
  - Rafael Dohms (rdohms)
  - Roman Martinuk (a2a4)
@@ -220,6 +220,7 @@ The Symfony Connect username in parenthesis allows to get more information
  - Jérôme Parmentier (lctrs)
  - Ahmed TAILOULOUTE (ahmedtai)
  - Simon Berger
+ - soyuka
  - Jérémy Derussé
  - Matthieu Napoli (mnapoli)
  - Tomas Votruba (tomas_votruba)
@@ -240,6 +241,7 @@ The Symfony Connect username in parenthesis allows to get more information
  - Fabien Bourigault (fbourigault)
  - Olivier Dolbeau (odolbeau)
  - Rouven Weßling (realityking)
+ - Bob van de Vijver (bobvandevijver)
  - Daniel Burger
  - Ben Davies (bendavies)
  - YaFou
@@ -254,6 +256,7 @@ The Symfony Connect username in parenthesis allows to get more information
  - Matthieu Ouellette-Vachon (maoueh)
  - Michał Pipa (michal.pipa)
  - Dawid Nowak
+ - Philipp Wahala (hifi)
  - Jannik Zschiesche
  - Amal Raghav (kertz)
  - Jonathan Ingram
@@ -270,7 +273,6 @@ The Symfony Connect username in parenthesis allows to get more information
  - Sébastien Alfaiate (seb33300)
  - James Halsall (jaitsu)
  - Christian Scheb
- - Bob van de Vijver (bobvandevijver)
  - Guillaume (guill)
  - Mikael Pajunen
  - Warnar Boekkooi (boekkooi)
@@ -298,7 +300,7 @@ The Symfony Connect username in parenthesis allows to get more information
  - Baptiste Leduc (korbeil)
  - Karoly Gossler (connorhu)
  - Timo Bakx (timobakx)
- - soyuka
+ - Giorgio Premi
  - Ruben Gonzalez (rubenrua)
  - Benjamin Dulau (dbenjamin)
  - Markus Fasselt (digilist)
@@ -317,9 +319,9 @@ The Symfony Connect username in parenthesis allows to get more information
  - sun (sun)
  - Larry Garfield (crell)
  - Leo Feyer
- - Philipp Wahala (hifi)
  - Victor Bocharsky (bocharsky_bw)
  - Nikolay Labinskiy (e-moe)
+ - Asis Pattisahusiwa
  - Martin Schuhfuß (usefulthink)
  - apetitpa
  - Guilliam Xavier
@@ -334,7 +336,7 @@ The Symfony Connect username in parenthesis allows to get more information
  - Nate Wiebe (natewiebe13)
  - Joe Bennett (kralos)
  - Leszek Prabucki (l3l0)
- - Giorgio Premi
+ - Wojciech Kania
  - Thomas Lallement (raziel057)
  - Yassine Guedidi (yguedidi)
  - François Zaninotto (fzaninotto)
@@ -399,16 +401,17 @@ The Symfony Connect username in parenthesis allows to get more information
  - Artem Lopata
  - Patrick McDougle (patrick-mcdougle)
  - Marc Weistroff (futurecat)
+ - Michał (bambucha15)
  - Danny Berger (dpb587)
  - Alif Rachmawadi
  - Anton Chernikov (anton_ch1989)
  - Pierre-Yves Lebecq (pylebecq)
  - Benjamin Leveque (benji07)
  - Jordan Samouh (jordansamouh)
- - Wojciech Kania
  - Sullivan SENECHAL (soullivaneuh)
  - Loick Piera (pyrech)
  - Uwe Jäger (uwej711)
+ - javaDeveloperKid
  - W0rma
  - Lynn van der Berg (kjarli)
  - Michaël Perrin (michael.perrin)
@@ -418,11 +421,11 @@ The Symfony Connect username in parenthesis allows to get more information
  - Marvin Petker
  - GordonsLondon
  - Ray
- - Asis Pattisahusiwa
  - Philipp Cordes (corphi)
  - Chekote
  - Thomas Adam
  - Evert Harmeling (evertharmeling)
+ - Anderson Müller
  - jdhoek
  - Jurica Vlahoviček (vjurica)
  - Bob den Otter (bopp)
@@ -467,9 +470,9 @@ The Symfony Connect username in parenthesis allows to get more information
  - Iker Ibarguren (ikerib)
  - Michael Holm (hollo)
  - Blanchon Vincent (blanchonvincent)
- - Michał (bambucha15)
  - Christian Schmidt
  - Ben Hakim
+ - Stiven Llupa (sllupa)
  - Marco Petersen (ocrampete16)
  - Bohan Yang (brentybh)
  - Vilius Grigaliūnas
@@ -478,7 +481,6 @@ The Symfony Connect username in parenthesis allows to get more information
  - Thomas Bisignani (toma)
  - Florian Klein (docteurklein)
  - Damien Alexandre (damienalexandre)
- - javaDeveloperKid
  - Manuel Kießling (manuelkiessling)
  - Alexey Kopytko (sanmai)
  - Warxcell (warxcell)
@@ -504,7 +506,6 @@ The Symfony Connect username in parenthesis allows to get more information
  - Jan Decavele (jandc)
  - Gustavo Piltcher
  - Lee Rowlands
- - Anderson Müller
  - Stepan Tanasiychuk (stfalcon)
  - Ivan Kurnosov
  - Tiago Ribeiro (fixe)
@@ -540,6 +541,7 @@ The Symfony Connect username in parenthesis allows to get more information
  - Francesco Levorato
  - Vitaliy Zakharov (zakharovvi)
  - Tobias Sjösten (tobiassjosten)
+ - Michael Hirschler (mvhirsch)
  - Gyula Sallai (salla)
  - Hendrik Luup (hluup)
  - Inal DJAFAR (inalgnu)
@@ -547,6 +549,7 @@ The Symfony Connect username in parenthesis allows to get more information
  - Martin Herndl (herndlm)
  - Dmytro Borysovskyi (dmytr0)
  - Johann Pardanaud
+ - Kai Dederichs
  - Pavel Kirpitsov (pavel-kirpichyov)
  - Robert Meijers
  - Artur Eshenbrener
@@ -561,7 +564,6 @@ The Symfony Connect username in parenthesis allows to get more information
  - FORT Pierre-Louis (plfort)
  - Terje Bråten
  - Gonzalo Vilaseca (gonzalovilaseca)
- - Stiven Llupa (sllupa)
  - Tarmo Leppänen (tarlepp)
  - Jakub Kucharovic (jkucharovic)
  - Daniel STANCU
@@ -692,7 +694,6 @@ The Symfony Connect username in parenthesis allows to get more information
  - Desjardins Jérôme (jewome62)
  - Arturs Vonda
  - Matthew Smeets
- - Michael Hirschler (mvhirsch)
  - Toni Rudolf (toooni)
  - Stefan Gehrig (sgehrig)
  - vagrant
@@ -705,6 +706,7 @@ The Symfony Connect username in parenthesis allows to get more information
  - Restless-ET
  - Vlad Gregurco (vgregurco)
  - Artem Stepin (astepin)
+ - Jérémy DECOOL (jdecool)
  - Boris Vujicic (boris.vujicic)
  - Dries Vints
  - Judicaël RUFFIEUX (axanagor)
@@ -722,7 +724,6 @@ The Symfony Connect username in parenthesis allows to get more information
  - Vitaliy Tverdokhlib (vitaliytv)
  - Ariel Ferrandini (aferrandini)
  - BASAK Semih (itsemih)
- - Kai Dederichs
  - Dirk Pahl (dirkaholic)
  - Cédric Lombardot (cedriclombardot)
  - Jérémy REYNAUD (babeuloula)
@@ -749,6 +750,7 @@ The Symfony Connect username in parenthesis allows to get more information
  - Roberto Espinoza (respinoza)
  - Pierre Rineau
  - Soufian EZ ZANTAR (soezz)
+ - Ivan Mezinov
  - Marek Zajac
  - Adam Harvey
  - ilyes kooli (skafandri)
@@ -770,6 +772,7 @@ The Symfony Connect username in parenthesis allows to get more information
  - Andrey Astakhov (aast)
  - ReenExe
  - Fabian Lange (codingfabian)
+ - kylekatarnls (kylekatarnls)
  - Yoshio HANAWA
  - Jan van Thoor (janvt)
  - Joshua Nye
@@ -1012,6 +1015,7 @@ The Symfony Connect username in parenthesis allows to get more information
  - Martins Sipenko
  - Guilherme Augusto Henschel
  - Rostyslav Kinash
+ - Christophe V. (cvergne)
  - Mardari Dorel (dorumd)
  - Daisuke Ohata
  - Vincent Simonin
@@ -1021,6 +1025,7 @@ The Symfony Connect username in parenthesis allows to get more information
  - Andy Palmer (andyexeter)
  - Andrew Neil Forster (krciga22)
  - Stefan Warman (warmans)
+ - Faizan Akram Dar (faizanakram)
  - Tristan Maindron (tmaindron)
  - Behnoush Norouzali (behnoush)
  - Marko H. Tamminen (gzumba)
@@ -1054,6 +1059,7 @@ The Symfony Connect username in parenthesis allows to get more information
  - Kevin SCHNEKENBURGER
  - Fabien Salles (blacked)
  - Andreas Erhard (andaris)
+ - alexpozzi
  - Michael Devery (mickadoo)
  - Gregor Nathanael Meyer (spackmat)
  - Antoine Corcy
@@ -1171,15 +1177,16 @@ The Symfony Connect username in parenthesis allows to get more information
  - Alex Xandra Albert Sim
  - Sergey Yastrebov
  - Carson Full (carsonfull)
- - kylekatarnls (kylekatarnls)
  - Steve Grunwell
  - Yuen-Chi Lian
  - Mathias Brodala (mbrodala)
  - Robert Fischer (sandoba)
  - Tarjei Huse (tarjei)
+ - mfettig
  - Besnik Br
  - Issam Raouf (iraouf)
  - Simon Mönch
+ - Sherin Bloemendaal
  - Jose Gonzalez
  - Jonathan (jlslew)
  - Claudio Zizza
@@ -1188,6 +1195,7 @@ The Symfony Connect username in parenthesis allows to get more information
  - Christian Stoller (naitsirch)
  - Dave Marshall (davedevelopment)
  - Jakub Kulhan (jakubkulhan)
+ - Paweł Niedzielski (steveb)
  - Shaharia Azam
  - avorobiev
  - Gerben Oolbekkink
@@ -1226,7 +1234,6 @@ The Symfony Connect username in parenthesis allows to get more information
  - Edvin Hultberg
  - shubhalgupta
  - Felds Liscia (felds)
- - Jérémy DECOOL (jdecool)
  - Sergey Panteleev
  - Alexander Grimalovsky (flying)
  - Andrew Hilobok (hilobok)
@@ -1276,6 +1283,7 @@ The Symfony Connect username in parenthesis allows to get more information
  - Cyril Pascal (paxal)
  - Pedro Casado (pdr33n)
  - Jayson Xu (superjavason)
+ - acoulton
  - DemigodCode
  - fago
  - Jan Prieser
@@ -1453,6 +1461,7 @@ The Symfony Connect username in parenthesis allows to get more information
  - Robert Gruendler (pulse00)
  - Sebastian Paczkowski (sebpacz)
  - Simon Terrien (sterrien)
+ - Stephan Vierkant (svierkant)
  - Benoît Merlet (trompette)
  - Brad Jones
  - datibbaw
@@ -1470,6 +1479,7 @@ The Symfony Connect username in parenthesis allows to get more information
  - Baptiste Leduc (bleduc)
  - soyuka
  - Patrick Kaufmann
+ - Ismail Özgün Turan (dadeather)
  - Mickael Perraud
  - Anton Dyshkant
  - Rafael Villa Verde
@@ -1488,6 +1498,7 @@ The Symfony Connect username in parenthesis allows to get more information
  - Stewart Malik
  - Renan Taranto (renan-taranto)
  - Ninos Ego
+ - Samael tomas
  - Stefan Graupner (efrane)
  - Gemorroj (gemorroj)
  - Adrien Chinour
@@ -1652,6 +1663,7 @@ The Symfony Connect username in parenthesis allows to get more information
  - Ksaveras Šakys (xawiers)
  - Shaun Simmons
  - Ariel J. Birnbaum
+ - Yannick
  - Patrick Luca Fazzi (ap3ir0n)
  - Danijel Obradović
  - Pablo Borowicz
@@ -1710,6 +1722,7 @@ The Symfony Connect username in parenthesis allows to get more information
  - Łukasz Chruściel (lchrusciel)
  - Jan Vernieuwe (vernija)
  - Antanas Arvasevicius
+ - Adam Kiss
  - Pierre Dudoret
  - Michal Trojanowski
  - Thomas
@@ -1790,6 +1803,7 @@ The Symfony Connect username in parenthesis allows to get more information
  - Eddie Abou-Jaoude (eddiejaoude)
  - Haritz Iturbe (hizai)
  - Nerijus Arlauskas (nercury)
+ - Rutger Hertogh
  - Diego Sapriza
  - Joan Cruz
  - inspiran
@@ -1854,6 +1868,7 @@ The Symfony Connect username in parenthesis allows to get more information
  - Thomason, James
  - Dario Savella
  - Gordienko Vladislav
+ - Joas Schilling
  - Ener-Getick
  - Moza Bogdan (bogdan_moza)
  - johan Vlaar
@@ -1913,6 +1928,7 @@ The Symfony Connect username in parenthesis allows to get more information
  - Takashi Kanemoto (ttskch)
  - Aleksei Lebedev
  - dlorek
+ - Oriol Viñals
  - Stuart Fyfe
  - Jason Schilling (chapterjason)
  - David de Boer (ddeboer)
@@ -1963,7 +1979,6 @@ The Symfony Connect username in parenthesis allows to get more information
  - Ismail Turan
  - error56
  - Felicitus
- - alexpozzi
  - Jorge Vahldick (jvahldick)
  - Krzysztof Przybyszewski (kprzybyszewski)
  - Vladimir Mantulo (mantulo)
@@ -2057,7 +2072,6 @@ The Symfony Connect username in parenthesis allows to get more information
  - Adam Wójs (awojs)
  - Justin Reherman (jreherman)
  - Rubén Calvo (rubencm)
- - Paweł Niedzielski (steveb)
  - Abdul.Mohsen B. A. A
  - Cédric Girard
  - Peter Jaap Blaakmeer
@@ -2242,6 +2256,7 @@ The Symfony Connect username in parenthesis allows to get more information
  - Luis Galeas
  - Bogdan Scordaliu
  - Martin Pärtel
+ - PHAS Developer
  - Daniel Rotter (danrot)
  - Frédéric Bouchery (fbouchery)
  - Jacek Kobus (jackks)
@@ -2260,7 +2275,6 @@ The Symfony Connect username in parenthesis allows to get more information
  - Jeroen de Graaf
  - Ulrik McArdle
  - BiaDd
- - mfettig
  - Oleksii Bulba
  - Ramon Cuñat
  - mboultoureau
@@ -2317,6 +2331,7 @@ The Symfony Connect username in parenthesis allows to get more information
  - Starfox64
  - Ivo Valchev
  - Thomas Hanke
+ - ffd000
  - Daniel Tschinder
  - Thomas Durand
  - Arnaud CHASSEUX
@@ -2330,7 +2345,6 @@ The Symfony Connect username in parenthesis allows to get more information
  - Rafał Muszyński (rafmus90)
  - Sébastien Decrême (sebdec)
  - Timothy Anido (xanido)
- - acoulton
  - Mara Blaga
  - Rick Prent
  - skalpa
@@ -2398,6 +2412,7 @@ The Symfony Connect username in parenthesis allows to get more information
  - Andrea Ruggiero (pupax)
  - Stan Jansen (stanjan)
  - Maxwell Vandervelde
+ - karstennilsen
  - kaywalker
  - Sebastian Ionescu
  - Robert Kopera
@@ -2448,6 +2463,7 @@ The Symfony Connect username in parenthesis allows to get more information
  - tadas
  - Bastien Picharles
  - Kirk Madera
+ - Linas Ramanauskas
  - mamazu
  - Keith Maika
  - izenin
@@ -2460,6 +2476,7 @@ The Symfony Connect username in parenthesis allows to get more information
  - Victor Garcia
  - Juan Mrad
  - Denis Yuzhanin
+ - k-sahara
  - Flavian Sierk
  - Rik van der Heijden
  - knezmilos13
@@ -2520,6 +2537,7 @@ The Symfony Connect username in parenthesis allows to get more information
  - tpetry
  - JustDylan23
  - Juraj Surman
+ - ywisax
  - Martin Eckhardt
  - natechicago
  - Victor
@@ -2572,6 +2590,7 @@ The Symfony Connect username in parenthesis allows to get more information
  - catch
  - aetxebeste
  - Roberto Guido
+ - ElisDN
  - roromix
  - Vitali Tsyrkin
  - Juga Paazmaya
@@ -2953,6 +2972,7 @@ The Symfony Connect username in parenthesis allows to get more information
  - Patrizio Bekerle
  - Tom Maguire
  - Mateusz Lerczak
+ - Tim Porter
  - Richard Quadling
  - Rainrider
  - David Zuelke
@@ -3063,6 +3083,7 @@ The Symfony Connect username in parenthesis allows to get more information
  - dakur
  - florian-michael-mast
  - tourze
+ - sam-bee
  - Vlad Dumitrache
  - wetternest
  - Erik van Wingerden
@@ -3076,6 +3097,7 @@ The Symfony Connect username in parenthesis allows to get more information
  - Matheus Gontijo
  - Gerrit Drost
  - Linnaea Von Lavia
+ - Andrew Brown
  - Javan Eskander
  - Lenar Lõhmus
  - Cristian Gonzalez
@@ -3307,6 +3329,7 @@ The Symfony Connect username in parenthesis allows to get more information
  - Karim Miladi
  - Michael Genereux
  - Greg Korba
+ - Camille Islasse
  - patrick-mcdougle
  - Tyler Stroud
  - Dariusz Czech
@@ -3347,12 +3370,14 @@ The Symfony Connect username in parenthesis allows to get more information
  - wiseguy1394
  - adam-mospan
  - Steve Hyde
+ - AbdelatifAitBara
  - nerdgod
  - Sam Williams
  - Ettore Del Negro
  - Guillaume Aveline
  - Adrian Philipp
  - James Michael DuPont
+ - Simone Ruggieri
  - Markus Tacker
  - Tomáš Votruba
  - Kasperki
@@ -3420,6 +3445,7 @@ The Symfony Connect username in parenthesis allows to get more information
  - Ayke Halder
  - Thorsten Hallwas
  - Brian Freytag
+ - Arend Hummeling
  - Marco Pfeiffer
  - Alex Nostadt
  - Michael Squires
@@ -3502,6 +3528,7 @@ The Symfony Connect username in parenthesis allows to get more information
  - Yendric
  - ADmad
  - Nicolas Roudaire
+ - Marc Jauvin
  - Matthias Meyer
  - Abdouni Karim (abdounikarim)
  - Temuri Takalandze (abgeo)
@@ -3544,7 +3571,6 @@ The Symfony Connect username in parenthesis allows to get more information
  - Elliot Anderson (elliot)
  - Erwan Nader (ernadoo)
  - Fabien D. (fabd)
- - Faizan Akram Dar (faizanakram)
  - Carsten Eilers (fnc)
  - Sorin Gitlan (forapathy)
  - Fraller Balázs (fracsi)
@@ -3626,7 +3652,6 @@ The Symfony Connect username in parenthesis allows to get more information
  - Christopher Georg (sky-chris)
  - Volker (skydiablo)
  - Julien Sanchez (sumbobyboys)
- - Stephan Vierkant (svierkant)
  - Ron Gähler (t-ronx)
  - Guillermo Gisinger (t3chn0r)
  - Tom Newby (tomnewbyau)
@@ -3637,6 +3662,7 @@ The Symfony Connect username in parenthesis allows to get more information
  - Moritz Kraft (userfriendly)
  - Víctor Mateo (victormateo)
  - Vincent MOULENE (vints24)
+ - Verlhac Gaëtan (viviengaetan)
  - David Grüner (vworldat)
  - Eugene Babushkin (warl)
  - Wouter Sioen (wouter_sioen)

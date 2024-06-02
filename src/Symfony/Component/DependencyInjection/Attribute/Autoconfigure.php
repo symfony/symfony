@@ -21,7 +21,7 @@ class Autoconfigure
 {
     /**
      * @param array<array-key, array<array-key, mixed>>|string[]|null $tags         The tags to add to the service
-     * @param array<string, array<array-key, mixed>>|null             $calls        The calls to be made when instantiating the service
+     * @param array<array<mixed>>|null                                $calls        The calls to be made when instantiating the service
      * @param array<string, mixed>|null                               $bind         The bindings to declare for the service
      * @param bool|string|null                                        $lazy         Whether the service is lazy-loaded
      * @param bool|null                                               $public       Whether to declare the service as public

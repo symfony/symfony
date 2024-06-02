@@ -190,7 +190,8 @@
             "Symfony\\Bridge\\PsrHttpMessage\\": "src/Symfony/Bridge/PsrHttpMessage/",
             "Symfony\\Bridge\\Twig\\": "src/Symfony/Bridge/Twig/",
             "Symfony\\Bundle\\": "src/Symfony/Bundle/",
-            "Symfony\\Component\\": "src/Symfony/Component/"
+            "Symfony\\Component\\": "src/Symfony/Component/",
+            "Symfony\\Runtime\\Symfony\\Component\\": "src/Symfony/Component/Runtime/Internal/"
         },
         "files": [
             "src/Symfony/Component/String/Resources/functions.php"
@@ -199,7 +200,8 @@
             "src/Symfony/Component/Cache/Traits/ValueWrapper.php"
         ],
         "exclude-from-classmap": [
-            "**/Tests/"
+            "**/Tests/",
+            "**/bin/"
         ]
     },
     "autoload-dev": {

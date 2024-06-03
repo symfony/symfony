@@ -49,6 +49,12 @@ class ArgvInput extends Input
     {
         $argv ??= $_SERVER['argv'] ?? [];
 
+        foreach ($argv as $arg) {
+            if (!\is_scalar($arg) && !$arg instanceof \Stringable) {
+                throw new RuntimeException(sprintf('Argument values expected to be all scalars, got "%s".', get_debug_type($arg)));
+            }
+        }
+
         // strip the application name
         array_shift($argv);
 

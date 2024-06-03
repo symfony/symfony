@@ -18,7 +18,6 @@ use Symfony\Component\ErrorHandler\Exception\FlattenException;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Attribute\WithHttpStatus;
-use Symfony\Component\HttpKernel\Attribute\WithLogChannel;
 use Symfony\Component\HttpKernel\Attribute\WithLogLevel;
 use Symfony\Component\HttpKernel\Event\ControllerArgumentsEvent;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
@@ -200,10 +199,6 @@ class ErrorListener implements EventSubscriberInterface
             if ($throwable instanceof $class && $config['log_channel']) {
                 return $config['log_channel'];
             }
-        }
-        
-        if ($withLogChannel = $this->getInheritedAttribute($throwable::class, WithLogChannel::class)) {
-            return $withLogChannel->channel;
         }
 
         return null;

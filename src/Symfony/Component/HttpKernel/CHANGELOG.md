@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+7.2
+---
+
+ * Remove `@internal` flag and add `@final` to `ServicesResetter`
+
 7.1
 ---
 

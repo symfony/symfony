@@ -31,7 +31,6 @@ use Symfony\Component\Mime\MimeTypes;
  */
 class UploadedFile extends File
 {
-    private bool $test;
     private string $originalName;
     private string $mimeType;
     private int $error;
@@ -61,13 +60,17 @@ class UploadedFile extends File
      * @throws FileException         If file_uploads is disabled
      * @throws FileNotFoundException If the file does not exist
      */
-    public function __construct(string $path, string $originalName, ?string $mimeType = null, ?int $error = null, bool $test = false)
-    {
+    public function __construct(
+        string $path,
+        string $originalName,
+        ?string $mimeType = null,
+        ?int $error = null,
+        private bool $test = false,
+    ) {
         $this->originalName = $this->getName($originalName);
         $this->originalPath = strtr($originalName, '\\', '/');
         $this->mimeType = $mimeType ?: 'application/octet-stream';
         $this->error = $error ?: \UPLOAD_ERR_OK;
-        $this->test = $test;
 
         parent::__construct($path, \UPLOAD_ERR_OK === $this->error);
     }

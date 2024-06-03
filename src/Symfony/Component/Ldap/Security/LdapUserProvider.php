@@ -35,30 +35,25 @@ use Symfony\Component\Security\Core\User\UserProviderInterface;
  */
 class LdapUserProvider implements UserProviderInterface, PasswordUpgraderInterface
 {
-    private LdapInterface $ldap;
-    private string $baseDn;
-    private ?string $searchDn;
-    private ?string $searchPassword;
-    private array $defaultRoles;
-    private ?string $uidKey;
+    private string $uidKey;
     private string $defaultSearch;
-    private ?string $passwordAttribute;
-    private array $extraFields;
 
-    public function __construct(LdapInterface $ldap, string $baseDn, ?string $searchDn = null, #[\SensitiveParameter] ?string $searchPassword = null, array $defaultRoles = [], ?string $uidKey = null, ?string $filter = null, ?string $passwordAttribute = null, array $extraFields = [])
-    {
+    public function __construct(
+        private LdapInterface $ldap,
+        private string $baseDn,
+        private ?string $searchDn = null,
+        #[\SensitiveParameter] private ?string $searchPassword = null,
+        private array $defaultRoles = [],
+        ?string $uidKey = null,
+        ?string $filter = null,
+        private ?string $passwordAttribute = null,
+        private array $extraFields = [],
+    ) {
         $uidKey ??= 'sAMAccountName';
         $filter ??= '({uid_key}={user_identifier})';
 
-        $this->ldap = $ldap;
-        $this->baseDn = $baseDn;
-        $this->searchDn = $searchDn;
-        $this->searchPassword = $searchPassword;
-        $this->defaultRoles = $defaultRoles;
         $this->uidKey = $uidKey;
         $this->defaultSearch = str_replace('{uid_key}', $uidKey, $filter);
-        $this->passwordAttribute = $passwordAttribute;
-        $this->extraFields = $extraFields;
     }
 
     public function loadUserByIdentifier(string $identifier): UserInterface
@@ -93,9 +88,7 @@ class LdapUserProvider implements UserProviderInterface, PasswordUpgraderInterfa
         $entry = $entries[0];
 
         try {
-            if (null !== $this->uidKey) {
-                $identifier = $this->getAttributeValue($entry, $this->uidKey);
-            }
+            $identifier = $this->getAttributeValue($entry, $this->uidKey);
         } catch (InvalidArgumentException) {
         }
 

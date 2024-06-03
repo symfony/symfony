@@ -75,9 +75,7 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
     private array $mutatorPrefixes;
     private array $accessorPrefixes;
     private array $arrayMutatorPrefixes;
-    private bool $enableConstructorExtraction;
     private int $methodReflectionFlags;
-    private int $magicMethodsFlags;
     private int $propertyReflectionFlags;
     private InflectorInterface $inflector;
     private array $arrayMutatorPrefixesFirst;
@@ -89,15 +87,20 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
      * @param string[]|null $accessorPrefixes
      * @param string[]|null $arrayMutatorPrefixes
      */
-    public function __construct(?array $mutatorPrefixes = null, ?array $accessorPrefixes = null, ?array $arrayMutatorPrefixes = null, bool $enableConstructorExtraction = true, int $accessFlags = self::ALLOW_PUBLIC, ?InflectorInterface $inflector = null, int $magicMethodsFlags = self::ALLOW_MAGIC_GET | self::ALLOW_MAGIC_SET)
-    {
+    public function __construct(
+        ?array $mutatorPrefixes = null,
+        ?array $accessorPrefixes = null,
+        ?array $arrayMutatorPrefixes = null,
+        private bool $enableConstructorExtraction = true,
+        int $accessFlags = self::ALLOW_PUBLIC,
+        ?InflectorInterface $inflector = null,
+        private int $magicMethodsFlags = self::ALLOW_MAGIC_GET | self::ALLOW_MAGIC_SET,
+    ) {
         $this->mutatorPrefixes = $mutatorPrefixes ?? self::$defaultMutatorPrefixes;
         $this->accessorPrefixes = $accessorPrefixes ?? self::$defaultAccessorPrefixes;
         $this->arrayMutatorPrefixes = $arrayMutatorPrefixes ?? self::$defaultArrayMutatorPrefixes;
-        $this->enableConstructorExtraction = $enableConstructorExtraction;
         $this->methodReflectionFlags = $this->getMethodsFlags($accessFlags);
         $this->propertyReflectionFlags = $this->getPropertyFlags($accessFlags);
-        $this->magicMethodsFlags = $magicMethodsFlags;
         $this->inflector = $inflector ?? new EnglishInflector();
         $this->typeResolver = TypeResolver::create();
 

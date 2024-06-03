@@ -22,17 +22,15 @@ use Symfony\Component\Ldap\Exception\LdapException;
  */
 class Adapter implements AdapterInterface
 {
-    private array $config;
     private ConnectionInterface $connection;
     private EntryManagerInterface $entryManager;
 
-    public function __construct(array $config = [])
-    {
+    public function __construct(
+        private array $config = [],
+    ) {
         if (!\extension_loaded('ldap')) {
             throw new LdapException('The LDAP PHP extension is not enabled.');
         }
-
-        $this->config = $config;
     }
 
     public function getConnection(): ConnectionInterface

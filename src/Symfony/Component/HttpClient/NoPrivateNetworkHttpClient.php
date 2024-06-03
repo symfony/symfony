@@ -30,21 +30,17 @@ final class NoPrivateNetworkHttpClient implements HttpClientInterface, LoggerAwa
 {
     use HttpClientTrait;
 
-    private HttpClientInterface $client;
-    private string|array|null $subnets;
-
     /**
      * @param string|array|null $subnets String or array of subnets using CIDR notation that will be used by IpUtils.
      *                                   If null is passed, the standard private subnets will be used.
      */
-    public function __construct(HttpClientInterface $client, string|array|null $subnets = null)
-    {
+    public function __construct(
+        private HttpClientInterface $client,
+        private string|array|null $subnets = null,
+    ) {
         if (!class_exists(IpUtils::class)) {
             throw new \LogicException(sprintf('You cannot use "%s" if the HttpFoundation component is not installed. Try running "composer require symfony/http-foundation".', __CLASS__));
         }
-
-        $this->client = $client;
-        $this->subnets = $subnets;
     }
 
     public function request(string $method, string $url, array $options = []): ResponseInterface

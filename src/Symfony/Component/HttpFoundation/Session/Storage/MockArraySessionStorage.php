@@ -28,7 +28,6 @@ use Symfony\Component\HttpFoundation\Session\SessionBagInterface;
 class MockArraySessionStorage implements SessionStorageInterface
 {
     protected string $id = '';
-    protected string $name;
     protected bool $started = false;
     protected bool $closed = false;
     protected array $data = [];
@@ -39,9 +38,10 @@ class MockArraySessionStorage implements SessionStorageInterface
      */
     protected array $bags = [];
 
-    public function __construct(string $name = 'MOCKSESSID', ?MetadataBag $metaBag = null)
-    {
-        $this->name = $name;
+    public function __construct(
+        protected string $name = 'MOCKSESSID',
+        ?MetadataBag $metaBag = null,
+    ) {
         $this->setMetadataBag($metaBag);
     }
 

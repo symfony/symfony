@@ -22,7 +22,6 @@ use Symfony\Component\HtmlSanitizer\Visitor\DomVisitor;
  */
 final class HtmlSanitizer implements HtmlSanitizerInterface
 {
-    private HtmlSanitizerConfig $config;
     private ParserInterface $parser;
 
     /**
@@ -30,8 +29,10 @@ final class HtmlSanitizer implements HtmlSanitizerInterface
      */
     private array $domVisitors = [];
 
-    public function __construct(HtmlSanitizerConfig $config, ?ParserInterface $parser = null)
-    {
+    public function __construct(
+        private HtmlSanitizerConfig $config,
+        ?ParserInterface $parser = null,
+    ) {
         $this->config = $config;
         $this->parser = $parser ?? new MastermindsParser();
     }

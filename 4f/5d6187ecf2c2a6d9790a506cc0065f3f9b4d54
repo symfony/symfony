@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by OskarStark at 2024-04-13T19:12:54Z
+
+I would consider it a bug if it throws fatal errors on wrong usage 🤔
+
+---------------------------------------------------------------------------
+
+by symfonyaml at 2024-04-19T17:52:38Z
+
+> I would consider it a bug if it throws fatal errors on wrong usage 🤔
+
+@OskarStark the usage is a misuse though
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2024-04-19T18:24:19Z
+
+I understand, but would also vote for a bugfix, even if its most likely gonna be merged as a new feature 👍

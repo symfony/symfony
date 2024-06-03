@@ -30,13 +30,10 @@ use Symfony\Contracts\EventDispatcher\Event;
  */
 final class TokenDeauthenticatedEvent extends Event
 {
-    private TokenInterface $originalToken;
-    private Request $request;
-
-    public function __construct(TokenInterface $originalToken, Request $request)
-    {
-        $this->originalToken = $originalToken;
-        $this->request = $request;
+    public function __construct(
+        private TokenInterface $originalToken,
+        private Request $request,
+    ) {
     }
 
     public function getOriginalToken(): TokenInterface

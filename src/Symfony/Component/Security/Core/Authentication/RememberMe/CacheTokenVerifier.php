@@ -18,21 +18,17 @@ use Psr\Cache\CacheItemPoolInterface;
  */
 class CacheTokenVerifier implements TokenVerifierInterface
 {
-    private CacheItemPoolInterface $cache;
-    private int $outdatedTokenTtl;
-    private string $cacheKeyPrefix;
-
     /**
      * @param int $outdatedTokenTtl How long the outdated token should still be considered valid. Defaults
      *                              to 60, which matches how often the PersistentRememberMeHandler will at
      *                              most refresh tokens. Increasing to more than that is not recommended,
      *                              but you may use a lower value.
      */
-    public function __construct(CacheItemPoolInterface $cache, int $outdatedTokenTtl = 60, string $cacheKeyPrefix = 'rememberme-stale-')
-    {
-        $this->cache = $cache;
-        $this->outdatedTokenTtl = $outdatedTokenTtl;
-        $this->cacheKeyPrefix = $cacheKeyPrefix;
+    public function __construct(
+        private CacheItemPoolInterface $cache,
+        private int $outdatedTokenTtl = 60,
+        private string $cacheKeyPrefix = 'rememberme-stale-',
+    ) {
     }
 
     public function verifyToken(PersistentTokenInterface $token, #[\SensitiveParameter] string $tokenValue): bool

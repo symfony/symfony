@@ -32,18 +32,19 @@ use Symfony\Component\Security\Core\User\UserProviderInterface;
  */
 final class PersistentRememberMeHandler extends AbstractRememberMeHandler
 {
-    private TokenProviderInterface $tokenProvider;
-    private ?TokenVerifierInterface $tokenVerifier;
-
-    public function __construct(TokenProviderInterface $tokenProvider, UserProviderInterface $userProvider, RequestStack $requestStack, array $options, ?LoggerInterface $logger = null, ?TokenVerifierInterface $tokenVerifier = null)
-    {
+    public function __construct(
+        private TokenProviderInterface $tokenProvider,
+        UserProviderInterface $userProvider,
+        RequestStack $requestStack,
+        array $options,
+        ?LoggerInterface $logger = null,
+        private ?TokenVerifierInterface $tokenVerifier = null,
+    ) {
         parent::__construct($userProvider, $requestStack, $options, $logger);
 
         if (!$tokenVerifier && $tokenProvider instanceof TokenVerifierInterface) {
-            $tokenVerifier = $tokenProvider;
+            $this->tokenVerifier = $tokenProvider;
         }
-        $this->tokenProvider = $tokenProvider;
-        $this->tokenVerifier = $tokenVerifier;
     }
 
     public function createRememberMeCookie(UserInterface $user): void

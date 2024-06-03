@@ -26,11 +26,9 @@ use Symfony\Component\Security\Http\Attribute\CurrentUser;
  */
 final class UserValueResolver implements ValueResolverInterface
 {
-    private TokenStorageInterface $tokenStorage;
-
-    public function __construct(TokenStorageInterface $tokenStorage)
-    {
-        $this->tokenStorage = $tokenStorage;
+    public function __construct(
+        private TokenStorageInterface $tokenStorage,
+    ) {
     }
 
     public function resolve(Request $request, ArgumentMetadata $argument): array

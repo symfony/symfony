@@ -18,20 +18,17 @@ namespace Symfony\Component\Security\Csrf\TokenGenerator;
  */
 class UriSafeTokenGenerator implements TokenGeneratorInterface
 {
-    private int $entropy;
-
     /**
      * Generates URI-safe CSRF tokens.
      *
      * @param int $entropy The amount of entropy collected for each token (in bits)
      */
-    public function __construct(int $entropy = 256)
-    {
+    public function __construct(
+        private int $entropy = 256,
+    ) {
         if ($entropy <= 7) {
             throw new \InvalidArgumentException('Entropy should be greater than 7.');
         }
-
-        $this->entropy = $entropy;
     }
 
     public function generateToken(): string

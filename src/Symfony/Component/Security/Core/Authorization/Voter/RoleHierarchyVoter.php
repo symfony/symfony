@@ -22,12 +22,10 @@ use Symfony\Component\Security\Core\Role\RoleHierarchyInterface;
  */
 class RoleHierarchyVoter extends RoleVoter
 {
-    private RoleHierarchyInterface $roleHierarchy;
-
-    public function __construct(RoleHierarchyInterface $roleHierarchy, string $prefix = 'ROLE_')
-    {
-        $this->roleHierarchy = $roleHierarchy;
-
+    public function __construct(
+        private RoleHierarchyInterface $roleHierarchy,
+        string $prefix = 'ROLE_',
+    ) {
         parent::__construct($prefix);
     }
 

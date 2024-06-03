@@ -18,14 +18,15 @@ namespace Symfony\Component\Security\Core\Authentication\RememberMe;
  */
 final class PersistentToken implements PersistentTokenInterface
 {
-    private string $class;
-    private string $userIdentifier;
-    private string $series;
-    private string $tokenValue;
     private \DateTimeImmutable $lastUsed;
 
-    public function __construct(string $class, string $userIdentifier, string $series, #[\SensitiveParameter] string $tokenValue, \DateTimeInterface $lastUsed)
-    {
+    public function __construct(
+        private string $class,
+        private string $userIdentifier,
+        private string $series,
+        #[\SensitiveParameter] private string $tokenValue,
+        \DateTimeInterface $lastUsed,
+    ) {
         if (!$class) {
             throw new \InvalidArgumentException('$class must not be empty.');
         }
@@ -39,10 +40,6 @@ final class PersistentToken implements PersistentTokenInterface
             throw new \InvalidArgumentException('$tokenValue must not be empty.');
         }
 
-        $this->class = $class;
-        $this->userIdentifier = $userIdentifier;
-        $this->series = $series;
-        $this->tokenValue = $tokenValue;
         $this->lastUsed = \DateTimeImmutable::createFromInterface($lastUsed);
     }
 

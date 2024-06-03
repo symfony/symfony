@@ -46,28 +46,19 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
  */
 class AuthenticatorManager implements AuthenticatorManagerInterface, UserAuthenticatorInterface
 {
-    private iterable $authenticators;
-    private TokenStorageInterface $tokenStorage;
-    private EventDispatcherInterface $eventDispatcher;
-    private bool $eraseCredentials;
-    private ?LoggerInterface $logger;
-    private string $firewallName;
-    private bool $hideUserNotFoundExceptions;
-    private array $requiredBadges;
-
     /**
      * @param iterable<mixed, AuthenticatorInterface> $authenticators
      */
-    public function __construct(iterable $authenticators, TokenStorageInterface $tokenStorage, EventDispatcherInterface $eventDispatcher, string $firewallName, ?LoggerInterface $logger = null, bool $eraseCredentials = true, bool $hideUserNotFoundExceptions = true, array $requiredBadges = [])
-    {
-        $this->authenticators = $authenticators;
-        $this->tokenStorage = $tokenStorage;
-        $this->eventDispatcher = $eventDispatcher;
-        $this->firewallName = $firewallName;
-        $this->logger = $logger;
-        $this->eraseCredentials = $eraseCredentials;
-        $this->hideUserNotFoundExceptions = $hideUserNotFoundExceptions;
-        $this->requiredBadges = $requiredBadges;
+    public function __construct(
+        private iterable $authenticators,
+        private TokenStorageInterface $tokenStorage,
+        private EventDispatcherInterface $eventDispatcher,
+        private string $firewallName,
+        private ?LoggerInterface $logger = null,
+        private bool $eraseCredentials = true,
+        private bool $hideUserNotFoundExceptions = true,
+        private array $requiredBadges = [],
+    ) {
     }
 
     /**

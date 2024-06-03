@@ -22,13 +22,14 @@ use Symfony\Component\Security\Core\User\UserInterface;
 class RememberMeToken extends AbstractToken
 {
     private ?string $secret = null;
-    private string $firewallName;
 
     /**
      * @throws \InvalidArgumentException
      */
-    public function __construct(UserInterface $user, string $firewallName)
-    {
+    public function __construct(
+        UserInterface $user,
+        private string $firewallName,
+    ) {
         parent::__construct($user->getRoles());
 
         if (\func_num_args() > 2) {
@@ -39,8 +40,6 @@ class RememberMeToken extends AbstractToken
         if (!$firewallName) {
             throw new InvalidArgumentException('$firewallName must not be empty.');
         }
-
-        $this->firewallName = $firewallName;
 
         $this->setUser($user);
     }

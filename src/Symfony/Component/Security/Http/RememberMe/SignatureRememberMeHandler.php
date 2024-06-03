@@ -32,13 +32,14 @@ use Symfony\Component\Security\Core\User\UserProviderInterface;
  */
 final class SignatureRememberMeHandler extends AbstractRememberMeHandler
 {
-    private SignatureHasher $signatureHasher;
-
-    public function __construct(SignatureHasher $signatureHasher, UserProviderInterface $userProvider, RequestStack $requestStack, array $options, ?LoggerInterface $logger = null)
-    {
+    public function __construct(
+        private SignatureHasher $signatureHasher,
+        UserProviderInterface $userProvider,
+        RequestStack $requestStack,
+        array $options,
+        ?LoggerInterface $logger = null,
+    ) {
         parent::__construct($userProvider, $requestStack, $options, $logger);
-
-        $this->signatureHasher = $signatureHasher;
     }
 
     public function createRememberMeCookie(UserInterface $user): void

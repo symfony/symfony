@@ -27,13 +27,10 @@ use Symfony\Component\Security\Http\SecurityRequestAttributes;
  */
 final class LoginThrottlingListener implements EventSubscriberInterface
 {
-    private RequestStack $requestStack;
-    private RequestRateLimiterInterface $limiter;
-
-    public function __construct(RequestStack $requestStack, RequestRateLimiterInterface $limiter)
-    {
-        $this->requestStack = $requestStack;
-        $this->limiter = $limiter;
+    public function __construct(
+        private RequestStack $requestStack,
+        private RequestRateLimiterInterface $limiter,
+    ) {
     }
 
     public function checkPassport(CheckPassportEvent $event): void

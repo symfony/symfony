@@ -25,13 +25,12 @@ use Symfony\Contracts\Service\ResetInterface;
  */
 final class TraceableAuthenticatorManagerListener extends AbstractListener implements ResetInterface
 {
-    private AuthenticatorManagerListener $authenticationManagerListener;
     private array $authenticatorsInfo = [];
     private bool $hasVardumper;
 
-    public function __construct(AuthenticatorManagerListener $authenticationManagerListener)
-    {
-        $this->authenticationManagerListener = $authenticationManagerListener;
+    public function __construct(
+        private AuthenticatorManagerListener $authenticationManagerListener,
+    ) {
         $this->hasVardumper = class_exists(ClassStub::class);
     }
 

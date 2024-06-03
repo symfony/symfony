@@ -43,11 +43,7 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
  */
 class ContextListener extends AbstractListener
 {
-    private TokenStorageInterface $tokenStorage;
     private string $sessionKey;
-    private ?LoggerInterface $logger;
-    private iterable $userProviders;
-    private ?EventDispatcherInterface $dispatcher;
     private bool $registered = false;
     private AuthenticationTrustResolverInterface $trustResolver;
     private ?\Closure $sessionTrackerEnabler;
@@ -55,18 +51,20 @@ class ContextListener extends AbstractListener
     /**
      * @param iterable<mixed, UserProviderInterface> $userProviders
      */
-    public function __construct(TokenStorageInterface $tokenStorage, iterable $userProviders, string $contextKey, ?LoggerInterface $logger = null, ?EventDispatcherInterface $dispatcher = null, ?AuthenticationTrustResolverInterface $trustResolver = null, ?callable $sessionTrackerEnabler = null)
-    {
+    public function __construct(
+        private TokenStorageInterface $tokenStorage,
+        private iterable $userProviders,
+        string $contextKey,
+        private ?LoggerInterface $logger = null,
+        private ?EventDispatcherInterface $dispatcher = null,
+        ?AuthenticationTrustResolverInterface $trustResolver = null,
+        ?callable $sessionTrackerEnabler = null,
+    ) {
         if (!$contextKey) {
             throw new \InvalidArgumentException('$contextKey must not be empty.');
         }
 
-        $this->tokenStorage = $tokenStorage;
-        $this->userProviders = $userProviders;
         $this->sessionKey = '_security_'.$contextKey;
-        $this->logger = $logger;
-        $this->dispatcher = $dispatcher;
-
         $this->trustResolver = $trustResolver ?? new AuthenticationTrustResolver();
         $this->sessionTrackerEnabler = null === $sessionTrackerEnabler ? null : $sessionTrackerEnabler(...);
     }

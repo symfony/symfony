@@ -18,6 +18,7 @@ use Symfony\Component\ErrorHandler\Exception\FlattenException;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Attribute\WithHttpStatus;
+use Symfony\Component\HttpKernel\Attribute\WithLogChannel;
 use Symfony\Component\HttpKernel\Attribute\WithLogLevel;
 use Symfony\Component\HttpKernel\Event\ControllerArgumentsEvent;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
@@ -49,6 +50,7 @@ class ErrorListener implements EventSubscriberInterface
     {
         $throwable = $event->getThrowable();
         $logLevel = $this->resolveLogLevel($throwable);
+        $logChannel = $this->resolveLogChannel($throwable);
 
         foreach ($this->exceptionsMapping as $class => $config) {
             if (!$throwable instanceof $class || !$config['status_code']) {
@@ -70,7 +72,7 @@ class ErrorListener implements EventSubscriberInterface
 
         $e = FlattenException::createFromThrowable($throwable);
 
-        $this->logException($throwable, \sprintf('Uncaught PHP Exception %s: "%s" at %s line %s', $e->getClass(), $e->getMessage(), basename($e->getFile()), $e->getLine()), $logLevel);
+        $this->logException($throwable, \sprintf('Uncaught PHP Exception %s: "%s" at %s line %s', $e->getClass(), $e->getMessage(), basename($e->getFile()), $e->getLine()), $logLevel, $logChannel);
     }
 
     public function onKernelException(ExceptionEvent $event): void
@@ -161,17 +163,13 @@ class ErrorListener implements EventSubscriberInterface
     /**
      * Logs an exception.
      */
-    protected function logException(\Throwable $exception, string $message, ?string $logLevel = null): void
+    protected function logException(\Throwable $exception, string $message, ?string $logLevel = null, ?string $logChannel = null): void
     {
-        $logger = $this->getLogger($exception);
-
-        if (null === $logger) {
-            return;
-        }
-
         $logLevel ??= $this->resolveLogLevel($exception);
-
-        $this->getLogger($exception)->log($logLevel, $message, ['exception' => $exception]);
+        
+        $logChannel ??= $this->resolveLogChannel($exception);
+        
+        $this->getLogger($logChannel)->log($logLevel, $message, ['exception' => $exception]);
     }
 
     /**
@@ -194,6 +192,21 @@ class ErrorListener implements EventSubscriberInterface
         }
 
         return LogLevel::ERROR;
+    }
+
+    private function resolveLogChannel(\Throwable $throwable): ?string
+    {
+        foreach ($this->exceptionsMapping as $class => $config) {
+            if ($throwable instanceof $class && $config['log_channel']) {
+                return $config['log_channel'];
+            }
+        }
+        
+        if ($withLogChannel = $this->getInheritedAttribute($throwable::class, WithLogChannel::class)) {
+            return $withLogChannel->channel;
+        }
+
+        return null;
     }
 
     /**
@@ -253,24 +266,8 @@ class ErrorListener implements EventSubscriberInterface
         return $attributeReflector?->newInstance();
     }
 
-    private function getLogger(\Throwable $exception): LoggerInterface
-    {
-        if ([] === $this->loggers) {
-            return $this->logger;
-        }
-
-        if ($exception->getPrevious() === null) {
-            return null;
-        }
-
-        $exceptionMapping = $this->exceptionsMapping[$exception->getPrevious()::class];
-
-        $logChannel = $exceptionMapping['log_channel'] ?? null;
-
-        if ($logChannel === null) {
-            return $this->logger;
-        }
-
-        return $this->loggers[$logChannel];
+    private function getLogger(?string $logChannel = null): LoggerInterface
+    {        
+        return $this->loggers[$logChannel] ?? $this->logger;
     }
 }

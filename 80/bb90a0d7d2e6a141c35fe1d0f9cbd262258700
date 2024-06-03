@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2024-05-10T20:08:25Z
+
+What about adding a `normalizer` option like in e.g. the `Email` or `Ip` constraints?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2024-05-25T14:53:34Z
+
+Another way would be to always uppercase the value, right?
+
+---------------------------------------------------------------------------
+
+by maxbeckers at 2024-05-25T19:16:06Z
+
+@fabpot exactly. But this could break other applications when the application trusts,that the input is always validated to be upper case. Or do you mean to always manipulate the input to go ahead with upper case? I would not recommend to change/manipulate the input in a validator at least without having a solution to change the behavior as a developer.

@@ -21,7 +21,6 @@ use Symfony\Contracts\Service\ResetInterface;
  */
 class EnvVarProcessor implements EnvVarProcessorInterface, ResetInterface
 {
-    private ContainerInterface $container;
     /** @var \Traversable<EnvVarLoaderInterface> */
     private \Traversable $loaders;
     /** @var \Traversable<EnvVarLoaderInterface> */
@@ -31,9 +30,10 @@ class EnvVarProcessor implements EnvVarProcessorInterface, ResetInterface
     /**
      * @param \Traversable<EnvVarLoaderInterface>|null $loaders
      */
-    public function __construct(ContainerInterface $container, ?\Traversable $loaders = null)
-    {
-        $this->container = $container;
+    public function __construct(
+        private ContainerInterface $container,
+        ?\Traversable $loaders = null,
+    ) {
         $this->originalLoaders = $this->loaders = $loaders ?? new \ArrayIterator();
     }
 

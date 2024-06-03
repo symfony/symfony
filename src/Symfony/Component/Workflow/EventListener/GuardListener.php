@@ -24,23 +24,15 @@ use Symfony\Component\Workflow\TransitionBlocker;
  */
 class GuardListener
 {
-    private array $configuration;
-    private ExpressionLanguage $expressionLanguage;
-    private TokenStorageInterface $tokenStorage;
-    private AuthorizationCheckerInterface $authorizationChecker;
-    private AuthenticationTrustResolverInterface $trustResolver;
-    private ?RoleHierarchyInterface $roleHierarchy;
-    private ?ValidatorInterface $validator;
-
-    public function __construct(array $configuration, ExpressionLanguage $expressionLanguage, TokenStorageInterface $tokenStorage, AuthorizationCheckerInterface $authorizationChecker, AuthenticationTrustResolverInterface $trustResolver, ?RoleHierarchyInterface $roleHierarchy = null, ?ValidatorInterface $validator = null)
-    {
-        $this->configuration = $configuration;
-        $this->expressionLanguage = $expressionLanguage;
-        $this->tokenStorage = $tokenStorage;
-        $this->authorizationChecker = $authorizationChecker;
-        $this->trustResolver = $trustResolver;
-        $this->roleHierarchy = $roleHierarchy;
-        $this->validator = $validator;
+    public function __construct(
+        private array $configuration,
+        private ExpressionLanguage $expressionLanguage,
+        private TokenStorageInterface $tokenStorage,
+        private AuthorizationCheckerInterface $authorizationChecker,
+        private AuthenticationTrustResolverInterface $trustResolver,
+        private ?RoleHierarchyInterface $roleHierarchy = null,
+        private ?ValidatorInterface $validator = null,
+    ) {
     }
 
     public function onTransition(GuardEvent $event, string $eventName): void

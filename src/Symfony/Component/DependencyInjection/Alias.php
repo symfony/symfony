@@ -17,14 +17,12 @@ class Alias
 {
     private const DEFAULT_DEPRECATION_TEMPLATE = 'The "%alias_id%" service alias is deprecated. You should stop using it, as it will be removed in the future.';
 
-    private string $id;
-    private bool $public;
     private array $deprecation = [];
 
-    public function __construct(string $id, bool $public = false)
-    {
-        $this->id = $id;
-        $this->public = $public;
+    public function __construct(
+        private string $id,
+        private bool $public = false,
+    ) {
     }
 
     /**

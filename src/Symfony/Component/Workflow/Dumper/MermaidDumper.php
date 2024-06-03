@@ -39,22 +39,18 @@ class MermaidDumper implements DumperInterface
         self::TRANSITION_TYPE_WORKFLOW,
     ];
 
-    private string $direction;
-    private string $transitionType;
-
     /**
      * Just tracking the transition id is in some cases inaccurate to
      * get the link's number for styling purposes.
      */
     private int $linkCount = 0;
 
-    public function __construct(string $transitionType, string $direction = self::DIRECTION_LEFT_TO_RIGHT)
-    {
+    public function __construct(
+        private string $transitionType,
+        private string $direction = self::DIRECTION_LEFT_TO_RIGHT,
+    ) {
         $this->validateDirection($direction);
         $this->validateTransitionType($transitionType);
-
-        $this->direction = $direction;
-        $this->transitionType = $transitionType;
     }
 
     public function dump(Definition $definition, ?Marking $marking = null, array $options = []): string

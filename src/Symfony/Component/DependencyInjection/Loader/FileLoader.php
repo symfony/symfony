@@ -37,7 +37,6 @@ abstract class FileLoader extends BaseFileLoader
 {
     public const ANONYMOUS_ID_REGEXP = '/^\.\d+_[^~]*+~[._a-zA-Z\d]{7}$/';
 
-    protected ContainerBuilder $container;
     protected bool $isLoadingInstanceof = false;
     protected array $instanceof = [];
     protected array $interfaces = [];
@@ -45,18 +44,18 @@ abstract class FileLoader extends BaseFileLoader
     /** @var array<string, Alias> */
     protected array $aliases = [];
     protected bool $autoRegisterAliasesForSinglyImplementedInterfaces = true;
-    protected bool $prepend = false;
     protected array $extensionConfigs = [];
     protected int $importing = 0;
 
     /**
      * @param bool $prepend Whether to prepend extension config instead of appending them
      */
-    public function __construct(ContainerBuilder $container, FileLocatorInterface $locator, ?string $env = null, bool $prepend = false)
-    {
-        $this->container = $container;
-        $this->prepend = $prepend;
-
+    public function __construct(
+        protected ContainerBuilder $container,
+        FileLocatorInterface $locator,
+        ?string $env = null,
+        protected bool $prepend = false,
+    ) {
         parent::__construct($locator, $env);
     }
 

@@ -139,16 +139,15 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
         self::CIRCULAR_REFERENCE_LIMIT => 1,
         self::IGNORED_ATTRIBUTES => [],
     ];
-    protected ?ClassMetadataFactoryInterface $classMetadataFactory;
-    protected ?NameConverterInterface $nameConverter;
 
     /**
      * Sets the {@link ClassMetadataFactoryInterface} to use.
      */
-    public function __construct(?ClassMetadataFactoryInterface $classMetadataFactory = null, ?NameConverterInterface $nameConverter = null, array $defaultContext = [])
-    {
-        $this->classMetadataFactory = $classMetadataFactory;
-        $this->nameConverter = $nameConverter;
+    public function __construct(
+        protected ?ClassMetadataFactoryInterface $classMetadataFactory = null,
+        protected ?NameConverterInterface $nameConverter = null,
+        array $defaultContext = [],
+    ) {
         $this->defaultContext = array_merge($this->defaultContext, $defaultContext);
 
         $this->validateCallbackContext($this->defaultContext, 'default');

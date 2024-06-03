@@ -52,28 +52,22 @@ class Workflow implements WorkflowInterface
         WorkflowEvents::ANNOUNCE => self::DISABLE_ANNOUNCE_EVENT,
     ];
 
-    private Definition $definition;
     private MarkingStoreInterface $markingStore;
-    private ?EventDispatcherInterface $dispatcher;
-    private string $name;
 
     /**
-     * When `null` fire all events (the default behaviour).
-     * Setting this to an empty array `[]` means no events are dispatched (except the {@see GuardEvent}).
-     * Passing an array with WorkflowEvents will allow only those events to be dispatched plus
-     * the {@see GuardEvent}.
-     *
-     * @var array|string[]|null
+     * @param array|string[]|null $eventsToDispatch When `null` fire all events (the default behaviour).
+     *                                              Setting this to an empty array `[]` means no events are dispatched (except the {@see GuardEvent}).
+     *                                              Passing an array with WorkflowEvents will allow only those events to be dispatched plus
+     *                                              the {@see GuardEvent}.
      */
-    private ?array $eventsToDispatch = null;
-
-    public function __construct(Definition $definition, ?MarkingStoreInterface $markingStore = null, ?EventDispatcherInterface $dispatcher = null, string $name = 'unnamed', ?array $eventsToDispatch = null)
-    {
-        $this->definition = $definition;
+    public function __construct(
+        private Definition $definition,
+        ?MarkingStoreInterface $markingStore = null,
+        private ?EventDispatcherInterface $dispatcher = null,
+        private string $name = 'unnamed',
+        private ?array $eventsToDispatch = null,
+    ) {
         $this->markingStore = $markingStore ?? new MethodMarkingStore();
-        $this->dispatcher = $dispatcher;
-        $this->name = $name;
-        $this->eventsToDispatch = $eventsToDispatch;
     }
 
     public function getMarking(object $subject, array $context = []): Marking

@@ -23,8 +23,6 @@ use Symfony\Component\CssSelector\CssSelectorConverter;
  */
 class Crawler implements \Countable, \IteratorAggregate
 {
-    protected ?string $uri;
-
     /**
      * The default namespace prefix to be used with XPath and CSS expressions.
      */
@@ -60,9 +58,12 @@ class Crawler implements \Countable, \IteratorAggregate
     /**
      * @param \DOMNodeList|\DOMNode|\DOMNode[]|string|null $node A Node to use as the base for the crawling
      */
-    public function __construct(\DOMNodeList|\DOMNode|array|string|null $node = null, ?string $uri = null, ?string $baseHref = null, bool $useHtml5Parser = true)
-    {
-        $this->uri = $uri;
+    public function __construct(
+        \DOMNodeList|\DOMNode|array|string|null $node = null,
+        protected ?string $uri = null,
+        ?string $baseHref = null,
+        bool $useHtml5Parser = true,
+    ) {
         $this->baseHref = $baseHref ?: $uri;
         $this->html5Parser = $useHtml5Parser ? new HTML5(['disable_html_ns' => true]) : null;
         $this->cachedNamespaces = new \ArrayObject();

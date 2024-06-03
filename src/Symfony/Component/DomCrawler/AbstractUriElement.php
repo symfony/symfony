@@ -20,7 +20,6 @@ abstract class AbstractUriElement
 {
     protected \DOMElement $node;
     protected ?string $method;
-    protected ?string $currentUri;
 
     /**
      * @param \DOMElement $node       A \DOMElement instance
@@ -29,11 +28,13 @@ abstract class AbstractUriElement
      *
      * @throws \InvalidArgumentException if the node is not a link
      */
-    public function __construct(\DOMElement $node, ?string $currentUri = null, ?string $method = 'GET')
-    {
+    public function __construct(
+        \DOMElement $node,
+        protected ?string $currentUri = null,
+        ?string $method = 'GET',
+    ) {
         $this->setNode($node);
         $this->method = $method ? strtoupper($method) : null;
-        $this->currentUri = $currentUri;
 
         $elementUriIsRelative = null === parse_url(trim($this->getRawUri()), \PHP_URL_SCHEME);
         $baseUriIsAbsolute = null !== $this->currentUri && \in_array(strtolower(substr($this->currentUri, 0, 4)), ['http', 'file']);

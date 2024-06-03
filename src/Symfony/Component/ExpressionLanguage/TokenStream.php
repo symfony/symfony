@@ -20,15 +20,13 @@ class TokenStream
 {
     public Token $current;
 
-    private array $tokens;
     private int $position = 0;
-    private string $expression;
 
-    public function __construct(array $tokens, string $expression = '')
-    {
-        $this->tokens = $tokens;
+    public function __construct(
+        private array $tokens,
+        private string $expression = '',
+    ) {
         $this->current = $tokens[0];
-        $this->expression = $expression;
     }
 
     /**

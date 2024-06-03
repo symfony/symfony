@@ -53,6 +53,7 @@ class IbanValidatorTest extends ConstraintValidatorTestCase
         return [
             ['CH9300762011623852957'], // Switzerland without spaces
             ['CH93  0076 2011 6238 5295 7'], // Switzerland with multiple spaces
+            ['ch93 0076 2011 6238 5295 7'], // Switzerland lower case
 
             // Country list
             // http://www.rbs.co.uk/corporate/international/g0/guide-to-international-business/regulatory-information/iban/iban-example.ashx

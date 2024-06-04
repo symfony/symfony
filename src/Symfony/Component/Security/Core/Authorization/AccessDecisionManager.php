@@ -32,7 +32,6 @@ final class AccessDecisionManager implements AccessDecisionManagerInterface
         VoterInterface::ACCESS_ABSTAIN => true,
     ];
 
-    private iterable $voters;
     private array $votersCacheAttributes = [];
     private array $votersCacheObject = [];
     private AccessDecisionStrategyInterface $strategy;
@@ -40,9 +39,10 @@ final class AccessDecisionManager implements AccessDecisionManagerInterface
     /**
      * @param iterable<mixed, VoterInterface> $voters An array or an iterator of VoterInterface instances
      */
-    public function __construct(iterable $voters = [], ?AccessDecisionStrategyInterface $strategy = null)
-    {
-        $this->voters = $voters;
+    public function __construct(
+        private iterable $voters = [],
+        ?AccessDecisionStrategyInterface $strategy = null,
+    ) {
         $this->strategy = $strategy ?? new AffirmativeStrategy();
     }
 

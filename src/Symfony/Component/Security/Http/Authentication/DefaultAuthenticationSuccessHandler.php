@@ -30,9 +30,7 @@ class DefaultAuthenticationSuccessHandler implements AuthenticationSuccessHandle
 {
     use TargetPathTrait;
 
-    protected HttpUtils $httpUtils;
     protected array $options;
-    protected ?LoggerInterface $logger;
     protected ?string $firewallName = null;
     protected array $defaultOptions = [
         'always_use_default_target_path' => false,
@@ -45,10 +43,11 @@ class DefaultAuthenticationSuccessHandler implements AuthenticationSuccessHandle
     /**
      * @param array $options Options for processing a successful authentication attempt
      */
-    public function __construct(HttpUtils $httpUtils, array $options = [], ?LoggerInterface $logger = null)
-    {
-        $this->httpUtils = $httpUtils;
-        $this->logger = $logger;
+    public function __construct(
+        protected HttpUtils $httpUtils,
+        array $options = [],
+        protected ?LoggerInterface $logger = null,
+    ) {
         $this->setOptions($options);
     }
 

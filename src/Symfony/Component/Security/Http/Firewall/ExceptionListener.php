@@ -47,27 +47,17 @@ class ExceptionListener
 {
     use TargetPathTrait;
 
-    private TokenStorageInterface $tokenStorage;
-    private string $firewallName;
-    private ?AccessDeniedHandlerInterface $accessDeniedHandler;
-    private ?AuthenticationEntryPointInterface $authenticationEntryPoint;
-    private AuthenticationTrustResolverInterface $authenticationTrustResolver;
-    private ?string $errorPage;
-    private ?LoggerInterface $logger;
-    private HttpUtils $httpUtils;
-    private bool $stateless;
-
-    public function __construct(TokenStorageInterface $tokenStorage, AuthenticationTrustResolverInterface $trustResolver, HttpUtils $httpUtils, string $firewallName, ?AuthenticationEntryPointInterface $authenticationEntryPoint = null, ?string $errorPage = null, ?AccessDeniedHandlerInterface $accessDeniedHandler = null, ?LoggerInterface $logger = null, bool $stateless = false)
-    {
-        $this->tokenStorage = $tokenStorage;
-        $this->accessDeniedHandler = $accessDeniedHandler;
-        $this->httpUtils = $httpUtils;
-        $this->firewallName = $firewallName;
-        $this->authenticationEntryPoint = $authenticationEntryPoint;
-        $this->authenticationTrustResolver = $trustResolver;
-        $this->errorPage = $errorPage;
-        $this->logger = $logger;
-        $this->stateless = $stateless;
+    public function __construct(
+        private TokenStorageInterface $tokenStorage,
+        private AuthenticationTrustResolverInterface $authenticationTrustResolver,
+        private HttpUtils $httpUtils,
+        private string $firewallName,
+        private ?AuthenticationEntryPointInterface $authenticationEntryPoint = null,
+        private ?string $errorPage = null,
+        private ?AccessDeniedHandlerInterface $accessDeniedHandler = null,
+        private ?LoggerInterface $logger = null,
+        private bool $stateless = false,
+    ) {
     }
 
     /**

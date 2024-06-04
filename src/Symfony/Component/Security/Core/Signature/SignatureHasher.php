@@ -25,28 +25,21 @@ use Symfony\Component\Security\Core\User\UserInterface;
  */
 class SignatureHasher
 {
-    private PropertyAccessorInterface $propertyAccessor;
-    private array $signatureProperties;
-    private string $secret;
-    private ?ExpiredSignatureStorage $expiredSignaturesStorage;
-    private ?int $maxUses;
-
     /**
      * @param array                        $signatureProperties      Properties of the User; the hash is invalidated if these properties change
      * @param ExpiredSignatureStorage|null $expiredSignaturesStorage If provided, secures a sequence of hashes that are expired
      * @param int|null                     $maxUses                  Used together with $expiredSignatureStorage to allow a maximum usage of a hash
      */
-    public function __construct(PropertyAccessorInterface $propertyAccessor, array $signatureProperties, #[\SensitiveParameter] string $secret, ?ExpiredSignatureStorage $expiredSignaturesStorage = null, ?int $maxUses = null)
-    {
+    public function __construct(
+        private PropertyAccessorInterface $propertyAccessor,
+        private array $signatureProperties,
+        #[\SensitiveParameter] private string $secret,
+        private ?ExpiredSignatureStorage $expiredSignaturesStorage = null,
+        private ?int $maxUses = null,
+    ) {
         if (!$secret) {
             throw new InvalidArgumentException('A non-empty secret is required.');
         }
-
-        $this->propertyAccessor = $propertyAccessor;
-        $this->signatureProperties = $signatureProperties;
-        $this->secret = $secret;
-        $this->expiredSignaturesStorage = $expiredSignaturesStorage;
-        $this->maxUses = $maxUses;
     }
 
     /**

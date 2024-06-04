@@ -36,17 +36,12 @@ use Symfony\Component\Security\Http\Authenticator\Passport\SelfValidatingPasspor
  */
 abstract class AbstractPreAuthenticatedAuthenticator implements InteractiveAuthenticatorInterface
 {
-    private UserProviderInterface $userProvider;
-    private TokenStorageInterface $tokenStorage;
-    private string $firewallName;
-    private ?LoggerInterface $logger;
-
-    public function __construct(UserProviderInterface $userProvider, TokenStorageInterface $tokenStorage, string $firewallName, ?LoggerInterface $logger = null)
-    {
-        $this->userProvider = $userProvider;
-        $this->tokenStorage = $tokenStorage;
-        $this->firewallName = $firewallName;
-        $this->logger = $logger;
+    public function __construct(
+        private UserProviderInterface $userProvider,
+        private TokenStorageInterface $tokenStorage,
+        private string $firewallName,
+        private ?LoggerInterface $logger = null
+    ) {
     }
 
     /**

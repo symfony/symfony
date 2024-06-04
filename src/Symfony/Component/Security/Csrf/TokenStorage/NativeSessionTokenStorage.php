@@ -26,16 +26,15 @@ class NativeSessionTokenStorage implements ClearableTokenStorageInterface
     public const SESSION_NAMESPACE = '_csrf';
 
     private bool $sessionStarted = false;
-    private string $namespace;
 
     /**
      * Initializes the storage with a session namespace.
      *
      * @param string $namespace The namespace under which the token is stored in the session
      */
-    public function __construct(string $namespace = self::SESSION_NAMESPACE)
-    {
-        $this->namespace = $namespace;
+    public function __construct(
+        private string $namespace = self::SESSION_NAMESPACE,
+    ) {
     }
 
     public function getToken(string $tokenId): string

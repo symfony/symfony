@@ -22,20 +22,18 @@ namespace Symfony\Component\Security\Core\User;
 final class InMemoryUser implements UserInterface, PasswordAuthenticatedUserInterface, EquatableInterface, \Stringable
 {
     private string $username;
-    private ?string $password;
-    private bool $enabled;
-    private array $roles;
 
-    public function __construct(?string $username, ?string $password, array $roles = [], bool $enabled = true)
-    {
+    public function __construct(
+        ?string $username,
+        private ?string $password,
+        private array $roles = [],
+        private bool $enabled = true,
+    ) {
         if ('' === $username || null === $username) {
             throw new \InvalidArgumentException('The username cannot be empty.');
         }
 
         $this->username = $username;
-        $this->password = $password;
-        $this->enabled = $enabled;
-        $this->roles = $roles;
     }
 
     public function __toString(): string

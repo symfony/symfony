@@ -42,37 +42,23 @@ class SwitchUserListener extends AbstractListener
 {
     public const EXIT_VALUE = '_exit';
 
-    private TokenStorageInterface $tokenStorage;
-    private UserProviderInterface $provider;
-    private UserCheckerInterface $userChecker;
-    private string $firewallName;
-    private AccessDecisionManagerInterface $accessDecisionManager;
-    private string $usernameParameter;
-    private string $role;
-    private ?LoggerInterface $logger;
-    private ?EventDispatcherInterface $dispatcher;
-    private bool $stateless;
-    private ?UrlGeneratorInterface $urlGenerator;
-    private ?string $targetRoute;
-
-    public function __construct(TokenStorageInterface $tokenStorage, UserProviderInterface $provider, UserCheckerInterface $userChecker, string $firewallName, AccessDecisionManagerInterface $accessDecisionManager, ?LoggerInterface $logger = null, string $usernameParameter = '_switch_user', string $role = 'ROLE_ALLOWED_TO_SWITCH', ?EventDispatcherInterface $dispatcher = null, bool $stateless = false, ?UrlGeneratorInterface $urlGenerator = null, ?string $targetRoute = null)
-    {
+    public function __construct(
+        private TokenStorageInterface $tokenStorage,
+        private UserProviderInterface $provider,
+        private UserCheckerInterface $userChecker,
+        private string $firewallName,
+        private AccessDecisionManagerInterface $accessDecisionManager,
+        private ?LoggerInterface $logger = null,
+        private string $usernameParameter = '_switch_user',
+        private string $role = 'ROLE_ALLOWED_TO_SWITCH',
+        private ?EventDispatcherInterface $dispatcher = null,
+        private bool $stateless = false,
+        private ?UrlGeneratorInterface $urlGenerator = null,
+        private ?string $targetRoute = null,
+    ) {
         if ('' === $firewallName) {
             throw new \InvalidArgumentException('$firewallName must not be empty.');
         }
-
-        $this->tokenStorage = $tokenStorage;
-        $this->provider = $provider;
-        $this->userChecker = $userChecker;
-        $this->firewallName = $firewallName;
-        $this->accessDecisionManager = $accessDecisionManager;
-        $this->usernameParameter = $usernameParameter;
-        $this->role = $role;
-        $this->logger = $logger;
-        $this->dispatcher = $dispatcher;
-        $this->stateless = $stateless;
-        $this->urlGenerator = $urlGenerator;
-        $this->targetRoute = $targetRoute;
     }
 
     public function supports(Request $request): ?bool

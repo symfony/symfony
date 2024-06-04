@@ -26,14 +26,12 @@ use Symfony\Component\Security\Core\Exception\UserNotFoundException;
  */
 class ChainUserProvider implements UserProviderInterface, PasswordUpgraderInterface
 {
-    private iterable $providers;
-
     /**
      * @param iterable<array-key, UserProviderInterface> $providers
      */
-    public function __construct(iterable $providers)
-    {
-        $this->providers = $providers;
+    public function __construct(
+        private iterable $providers,
+    ) {
     }
 
     /**

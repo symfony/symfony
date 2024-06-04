@@ -26,23 +26,18 @@ use Symfony\Component\Routing\Matcher\UrlMatcherInterface;
  */
 class HttpUtils
 {
-    private ?UrlGeneratorInterface $urlGenerator;
-    private UrlMatcherInterface|RequestMatcherInterface|null $urlMatcher;
-    private ?string $domainRegexp;
-    private ?string $secureDomainRegexp;
-
     /**
      * @param $domainRegexp       A regexp the target of HTTP redirections must match, scheme included
      * @param $secureDomainRegexp A regexp the target of HTTP redirections must match when the scheme is "https"
      *
      * @throws \InvalidArgumentException
      */
-    public function __construct(?UrlGeneratorInterface $urlGenerator = null, UrlMatcherInterface|RequestMatcherInterface|null $urlMatcher = null, ?string $domainRegexp = null, ?string $secureDomainRegexp = null)
-    {
-        $this->urlGenerator = $urlGenerator;
-        $this->urlMatcher = $urlMatcher;
-        $this->domainRegexp = $domainRegexp;
-        $this->secureDomainRegexp = $secureDomainRegexp;
+    public function __construct(
+        private ?UrlGeneratorInterface $urlGenerator = null,
+        private UrlMatcherInterface|RequestMatcherInterface|null $urlMatcher = null,
+        private ?string $domainRegexp = null,
+        private ?string $secureDomainRegexp = null,
+    ) {
     }
 
     /**

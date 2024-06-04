@@ -43,7 +43,6 @@ use Symfony\Component\Security\Http\RememberMe\ResponseListener;
  */
 class RememberMeAuthenticator implements InteractiveAuthenticatorInterface
 {
-    private RememberMeHandlerInterface $rememberMeHandler;
     private string $secret;
     private TokenStorageInterface $tokenStorage;
     private string $cookieName;
@@ -54,8 +53,12 @@ class RememberMeAuthenticator implements InteractiveAuthenticatorInterface
      * @param string                $cookieName
      * @param ?LoggerInterface      $logger
      */
-    public function __construct(RememberMeHandlerInterface $rememberMeHandler, #[\SensitiveParameter] TokenStorageInterface|string $tokenStorage, string|TokenStorageInterface $cookieName, LoggerInterface|string|null $logger = null)
-    {
+    public function __construct(
+        private RememberMeHandlerInterface $rememberMeHandler,
+        #[\SensitiveParameter] TokenStorageInterface|string $tokenStorage,
+        string|TokenStorageInterface $cookieName,
+        LoggerInterface|string|null $logger = null,
+    ) {
         if (\is_string($tokenStorage)) {
             trigger_deprecation('symfony/security-core', '7.2', 'The "$secret" argument of "%s()" is deprecated.', __METHOD__);
 
@@ -65,7 +68,6 @@ class RememberMeAuthenticator implements InteractiveAuthenticatorInterface
             $logger = \func_num_args() > 4 ? func_get_arg(4) : null;
         }
 
-        $this->rememberMeHandler = $rememberMeHandler;
         $this->tokenStorage = $tokenStorage;
         $this->cookieName = $cookieName;
         $this->logger = $logger;

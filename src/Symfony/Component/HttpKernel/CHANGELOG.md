@@ -3,12 +3,8 @@ CHANGELOG
 7.2
 ---
 
- * Add log_channel in `ErrorListener`
-
-7.2
----
-
  * Remove `@internal` flag and add `@final` to `ServicesResetter`
+ * Add log_channel in `ErrorListener`
 
 7.1
 ---

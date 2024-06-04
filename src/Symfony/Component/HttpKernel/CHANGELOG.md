@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+7.2
+---
+
+ * Add log_channel in `ErrorListener`
 
 7.2
 ---

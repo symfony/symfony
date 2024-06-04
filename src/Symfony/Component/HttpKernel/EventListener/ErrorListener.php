@@ -34,7 +34,7 @@ use Symfony\Component\HttpKernel\Log\DebugLoggerConfigurator;
 class ErrorListener implements EventSubscriberInterface
 {
     /**
-     * @param array<class-string, array{log_level: string|null, status_code: int<100,599>|null}> $exceptionsMapping
+     * @param array<class-string, array{log_level: string|null, status_code: int<100,599>|null}, log_channel: string|null> $exceptionsMapping
      */
     public function __construct(
         protected string|object|array|null $controller,

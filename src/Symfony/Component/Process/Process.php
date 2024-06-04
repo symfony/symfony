@@ -309,7 +309,12 @@ class Process implements \IteratorAggregate
         $env += '\\' === \DIRECTORY_SEPARATOR ? array_diff_ukey($this->getDefaultEnv(), $env, 'strcasecmp') : $this->getDefaultEnv();
 
         if (\is_array($commandline = $this->commandline)) {
-            $commandline = array_values(array_map(strval(...), $commandline));
+            $commandline = implode(' ', array_map($this->escapeArgument(...), $commandline));
+
+            if ('\\' !== \DIRECTORY_SEPARATOR) {
+                // exec is mandatory to deal with sending a signal to the process
+                $commandline = 'exec '.$commandline;
+            }
         } else {
             $commandline = $this->replacePlaceholders($commandline, $env);
         }
@@ -319,11 +324,6 @@ class Process implements \IteratorAggregate
         } elseif ($this->isSigchildEnabled()) {
             // last exit code is output on the fourth pipe and caught to work around --enable-sigchild
             $descriptors[3] = ['pipe', 'w'];
-
-            if (\is_array($commandline)) {
-                // exec is mandatory to deal with sending a signal to the process
-                $commandline = 'exec '.$this->buildShellCommandline($commandline);
-            }
 
             // See https://unix.stackexchange.com/questions/71205/background-process-pipe-input
             $commandline = '{ ('.$commandline.') <&3 3<&- 3>/dev/null & } 3<&0;';

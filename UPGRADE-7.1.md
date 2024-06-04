@@ -91,7 +91,6 @@ DependencyInjection
 DoctrineBridge
 --------------
 
- * Deprecate `DoctrineExtractor::getTypes()`, use `DoctrineExtractor::getType()` instead
  * Mark class `ProxyCacheWarmer` as `final`
 
 ExpressionLanguage

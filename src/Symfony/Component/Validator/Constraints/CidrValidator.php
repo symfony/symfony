@@ -71,11 +71,13 @@ class CidrValidator extends ConstraintValidator
             return;
         }
 
-        if (filter_var($ipAddress, \FILTER_VALIDATE_IP, \FILTER_FLAG_IPV4) && $constraint->netmaskMax > 32) {
-            $constraint->netmaskMax = 32;
+        $netmaskMax = $constraint->netmaskMax;
+
+        if (filter_var($ipAddress, \FILTER_VALIDATE_IP, \FILTER_FLAG_IPV4) && $netmaskMax > 32) {
+            $netmaskMax = 32;
         }
 
-        if ($netmask < $constraint->netmaskMin || $netmask > $constraint->netmaskMax) {
+        if ($netmask < $constraint->netmaskMin || $netmask > $netmaskMax) {
             $this->context
                 ->buildViolation($constraint->netmaskRangeViolationMessage)
                 ->setParameter('{{ min }}', $constraint->netmaskMin)

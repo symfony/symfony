@@ -422,6 +422,17 @@ class ProcessTest extends TestCase
         $this->assertEquals(3, preg_match_all('/ERROR/', $p->getErrorOutput(), $matches));
     }
 
+    public function testErrorOutputRegression()
+    {
+        $p = new Process(['invalid_command']);
+
+        $p->run();
+
+        var_dump($p->getErrorOutput());
+
+        $this->assertMatchesRegularExpression('/^.*invalid_command.*(\r\n|\r|\n)$/', $p->getErrorOutput());
+    }
+
     public function testFlushErrorOutput()
     {
         $p = $this->getProcessForCode('$n = 0; while ($n < 3) { file_put_contents(\'php://stderr\', \'ERROR\'); $n++; }');

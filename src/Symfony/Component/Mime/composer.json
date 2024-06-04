@@ -29,14 +29,14 @@
         "symfony/process": "^5.4|^6.4|^7.0",
         "symfony/property-access": "^5.4|^6.0|^7.0",
         "symfony/property-info": "^5.4|^6.0|^7.0",
-        "symfony/serializer": "^6.3.2|^7.0"
+        "symfony/serializer": "^6.4.3|^7.0.3"
     },
     "conflict": {
         "egulias/email-validator": "~3.0.0",
         "phpdocumentor/reflection-docblock": "<3.2.2",
         "phpdocumentor/type-resolver": "<1.4.0",
         "symfony/mailer": "<5.4",
-        "symfony/serializer": "<6.3.2"
+        "symfony/serializer": "<6.4.3|>7.0,<7.0.3"
     },
     "autoload": {
         "psr-4": { "Symfony\\Component\\Mime\\": "" },

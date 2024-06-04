@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+7.2
+---
+
+ * Make `AbstractUid` implement `Ds\Hashable` if available
+
 7.1
 ---
 

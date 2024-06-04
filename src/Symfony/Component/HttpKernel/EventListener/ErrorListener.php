@@ -168,7 +168,13 @@ class ErrorListener implements EventSubscriberInterface
         
         $logChannel ??= $this->resolveLogChannel($exception);
         
-        $this->getLogger($logChannel)->log($logLevel, $message, ['exception' => $exception]);
+        $logger = $this->getLogger($logChannel);
+        
+        if(null === $logger) {
+            return;
+        }
+
+        $logger->log($logLevel, $message, ['exception' => $exception]);
     }
 
     /**
@@ -196,7 +202,7 @@ class ErrorListener implements EventSubscriberInterface
     private function resolveLogChannel(\Throwable $throwable): ?string
     {
         foreach ($this->exceptionsMapping as $class => $config) {
-            if ($throwable instanceof $class && $config['log_channel']) {
+            if ($throwable instanceof $class && isset($config['log_channel'])) {
                 return $config['log_channel'];
             }
         }
@@ -261,8 +267,8 @@ class ErrorListener implements EventSubscriberInterface
         return $attributeReflector?->newInstance();
     }
 
-    private function getLogger(?string $logChannel = null): LoggerInterface
-    {        
+    private function getLogger(?string $logChannel = null): ?LoggerInterface
+    {
         return $this->loggers[$logChannel] ?? $this->logger;
     }
 }

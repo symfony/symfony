@@ -1900,6 +1900,10 @@ class FrameworkExtension extends Extension
             $container->setParameter('serializer.default_context', $defaultContext);
         }
 
+        if (!$container->hasDefinition('serializer.normalizer.object')) {
+            return;
+        }
+
         $arguments = $container->getDefinition('serializer.normalizer.object')->getArguments();
         $context = [];
 

@@ -1,0 +1,131 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-11-26T13:49:43Z
+
+Can you please check if this bugfix shouldn't be applied to either 5.4 or 6.3 and rebase/retarget if yes?
+
+---------------------------------------------------------------------------
+
+by TravisCarden at 2023-11-27T17:25:07Z
+
+@nicolas-grekas Do you meant you want me to see if the bug already exists in 5.4 or 6.3 and rebase if so? It _does_ already exist in both. I've rebased onto 6.3. Is that what you want? Or do you want me to go _all the way_ back to 5.4? (I thought I understood the bugfix policy on this, but maybe I don't.)
+
+---------------------------------------------------------------------------
+
+by stof at 2023-11-27T17:25:20Z
+
+This option also has no effect on Windows when the `PATH_EXT` environment variable is provided.
+
+As this option has been a no-op for other OS since the creation of the process component, I don't think we should change that as a bugfix.
+
+---------------------------------------------------------------------------
+
+by stof at 2023-11-27T17:26:57Z
+
+Btw, what is your use case for using this on non-Windows systems ? AFAICT, only Windows automatically adds an implicit extension to the executable name when running it.
+
+---------------------------------------------------------------------------
+
+by TravisCarden at 2023-11-27T17:58:18Z
+
+> what is your use case for using this on non-Windows systems ?
+
+I need to look for executables that may end in `.phar`--Composer, in this case.
+
+> AFAICT, only Windows automatically adds an implicit extension to the executable name when running it.
+
+That is, in fact, the current behavior--and that's the problem. The in-code documentation gives no indication that the behavior is conditioned on OS, leaving no reason for a user to suspect otherwise:
+
+https://github.com/symfony/symfony/blob/d625fa0c5cf344198c05ada94a52db62c6a866bd/src/Symfony/Component/Process/ExecutableFinder.php#L34-L39
+
+In other words, unless users are expected to search the code before using _any and every_ function in the codebase to see whether it works to their OS, this doesn't behave as advertised. That seems like a bug to me.
+
+---------------------------------------------------------------------------
+
+by stof at 2023-11-27T17:59:47Z
+
+@TravisCarden if you need to find an executable named `composer.phar`, look for that. Because running `composer` in a shell won't automatically find `composer.phar` either anyway.
+
+---------------------------------------------------------------------------
+
+by stof at 2023-11-27T18:03:32Z
+
+Given that suffixes are totally ignored on non-Windows systems and are ignored on Windows systems that have the `PATH_EXT` environment variable (which is taken as the source of truth instead), I would rather deprecate those methods in PHP 7.1 than suddenly turning them into doing something.
+the current behavior has been implemented in April 2011.
+
+---------------------------------------------------------------------------
+
+by TravisCarden at 2023-11-27T19:02:01Z
+
+> if you need to find an executable named `composer.phar`, look for that.
+
+I can't, because I'm writing a Packagist package, so I don't know that detail about my end users. Isn't that the point of suffixes?
+
+> Because running composer in a shell won't automatically find `composer.phar` either anyway.
+
+Actually, it will, if I understand you. After applying this PR, and adding `composer2.phar` to avoid conflict with my global Composer install, it works for me from start to finish:
+
+```php
+$finder = new ExecutableFinder();
+$finder->addSuffix('.phar');
+$path = $finder->find('composer2');
+var_dump($path);
+
+// string(28) "/usr/local/bin/composer2.phar"
+
+$process = new Process([$path, '--version']);
+$process->run();
+var_dump($process->getOutput());
+
+// string(43) "Composer version 2.6.5 2023-10-06 10:11:52"
+```
+
+> I would rather deprecate those methods in PHP 7.1 than suddenly turning them into doing something.
+
+Obviously, that's up to you. As I see it, that would make sense if you were talking about adding new behavior that was never claimed or advertised in the first place. But as I argued above, this is how it claimed to work in the first place, so this would just be making good on a promise it has always made but never kept.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-12-01T14:53:33Z
+
+@stof do you think we shouldn't merge this PR? To me it does no harm to have this capability so I'm fine merging it.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-02-09T11:11:31Z
+
+@TravisCarden can you please rebase for 7.1? I think it'd be safer and more consensual to consider this as an improvement.
+
+---------------------------------------------------------------------------
+
+by stof at 2024-02-09T11:30:09Z
+
+This is clearly not a bugfix to me.
+
+And if we introduce such new feature, we should then make it work on all systems. This PR still ignores the custom suffixes on Windows when `PATH_EXT` is defined on the system.
+
+---------------------------------------------------------------------------
+
+by TravisCarden at 2024-02-09T16:33:47Z
+
+@nicolas-grekas I'll gladly make any changes requested, as soon as there's consensus on your end on what they should be. I don't want to spend time on work that has no chance of being committed.
+
+---------------------------------------------------------------------------
+
+by TravisCarden at 2024-04-09T20:34:06Z
+
+Rebased, @nicolas-grekas.
+
+I have my opinion as to whether this is a bug or not, but I don't really care about the semantics if this could be committed to _some version_. If we can't commit it as-is, can someone tell me what it take?
+
+---------------------------------------------------------------------------
+
+by TravisCarden at 2024-05-15T22:30:31Z
+
+It doesn't look like the CI failures are from my changes. Requesting re-review.
+
+---------------------------------------------------------------------------
+
+by TravisCarden at 2024-06-03T13:51:30Z
+
+Oh, of course. Because that test asserts on behavior that is now Windows-only. I've just removed it. I'll go ahead and rebase, while I'm at it.

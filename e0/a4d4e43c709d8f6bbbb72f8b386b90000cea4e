@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2024-06-03T06:44:36Z
+
+after the changes in #57224 we also need #53678 for the tests to pass
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2024-06-03T06:50:54Z
+
+ping @nicolas-grekas Removing the type-hint in #57224 does not re-introduce #53664, right?

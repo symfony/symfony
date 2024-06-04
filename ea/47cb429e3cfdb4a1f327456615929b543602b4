@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by dakujem at 2024-06-03T07:25:08Z
+
+Fabien, I still suggest adding a code comment referencing the RFC 2392 (maybe also RFC 822) so that devs know **why** the restriction is in place. Maybe simple
+```
+// CID must contain a @ character to comply with RFC 2392 (RFC 822 syntax for "addr-spec")
+```
+above the exception would do.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2024-06-03T07:29:19Z
+
+> Fabien, I still suggest adding a code comment referencing the RFC 2392 (maybe also RFC 822) so that devs know **why** the restriction is in place. Maybe simple
+>
+> ```
+> // CID must contain a @ character to comply with RFC 2392 (RFC 822 syntax for "addr-spec")
+> ```
+>
+> above the exception would do.
+
+I've not added the reference to the spec as we're not doing it anywhere else in the code base. Having it only for this very specific error message would be weird.

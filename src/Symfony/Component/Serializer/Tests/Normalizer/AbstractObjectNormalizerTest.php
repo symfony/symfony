@@ -1132,7 +1132,7 @@ class AbstractObjectNormalizerTest extends TestCase
 
     public function testDenormalizeCollectionOfScalarTypesPropertyWithPhpDocExtractor()
     {
-        $normalizer = new AbstractObjectNormalizerWithMetadataAndPhpDocExtractor();
+        $normalizer = new AbstractObjectNormalizerWithMetadataAndPropertyTypeExtractors();
         $data = [
             'type' => 'foo',
             'values' => [
@@ -1150,7 +1150,7 @@ class AbstractObjectNormalizerTest extends TestCase
 
     public function testDenormalizeCollectionOfUnionTypesPropertyWithPhpDocExtractor()
     {
-        $normalizer = new AbstractObjectNormalizerWithMetadataAndPhpDocExtractor();
+        $normalizer = new AbstractObjectNormalizerWithMetadataAndPropertyTypeExtractors();
         $data = [
             'values1' => [
                 'foo' => 'foo',
@@ -1165,6 +1165,15 @@ class AbstractObjectNormalizerTest extends TestCase
         $expected->values2 = $data['values2'];
 
         $this->assertEquals($expected, $normalizer->denormalize($data, UnionCollectionDocBlockDummy::class));
+    }
+
+    public function testDenormalizeMixedProperty()
+    {
+        $normalizer = new AbstractObjectNormalizerWithMetadataAndPropertyTypeExtractors();
+        $expected = new MixedPropertyDummy();
+        $expected->foo = 'bar';
+
+        $this->assertEquals($expected, $normalizer->denormalize(['foo' => 'bar'], MixedPropertyDummy::class));
     }
 }
 
@@ -1266,6 +1275,11 @@ class SnakeCaseNestedDummy
 {
     #[SerializedPath('[one][two_three]')]
     public $fooBar;
+}
+
+class MixedPropertyDummy
+{
+    public mixed $foo;
 }
 
 #[DiscriminatorMap(typeProperty: 'type', mapping: [
@@ -1612,11 +1626,11 @@ class UnionCollectionDocBlockDummy
     public array $values2;
 }
 
-class AbstractObjectNormalizerWithMetadataAndPhpDocExtractor extends AbstractObjectNormalizer
+class AbstractObjectNormalizerWithMetadataAndPropertyTypeExtractors extends AbstractObjectNormalizer
 {
     public function __construct()
     {
-        parent::__construct(new ClassMetadataFactory(new AttributeLoader()), null, new PropertyInfoExtractor([], [new PhpDocExtractor()]));
+        parent::__construct(new ClassMetadataFactory(new AttributeLoader()), null, new PropertyInfoExtractor([], [new PhpDocExtractor(), new ReflectionExtractor()]));
     }
 
     protected function extractAttributes(object $object, ?string $format = null, array $context = []): array

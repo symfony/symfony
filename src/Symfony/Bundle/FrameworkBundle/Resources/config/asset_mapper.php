@@ -197,7 +197,7 @@ return static function (ContainerConfigurator $container) {
             ])
 
         ->set('asset_mapper.importmap.resolver', JsDelivrEsmResolver::class)
-            ->args([service('http_client')])
+            ->args([service('http_client')->nullOnInvalid()])
 
         ->set('asset_mapper.importmap.renderer', ImportMapRenderer::class)
             ->args([
@@ -212,12 +212,12 @@ return static function (ContainerConfigurator $container) {
         ->set('asset_mapper.importmap.auditor', ImportMapAuditor::class)
         ->args([
             service('asset_mapper.importmap.config_reader'),
-            service('http_client'),
+            service('http_client')->nullOnInvalid(),
         ])
         ->set('asset_mapper.importmap.update_checker', ImportMapUpdateChecker::class)
         ->args([
             service('asset_mapper.importmap.config_reader'),
-            service('http_client'),
+            service('http_client')->nullOnInvalid(),
         ])
 
         ->set('asset_mapper.importmap.command.require', ImportMapRequireCommand::class)

@@ -773,11 +773,24 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
                     return (float) $data;
                 }
 
-                if ((TypeIdentifier::FALSE === $typeIdentifier && false === $data) || (TypeIdentifier::TRUE === $typeIdentifier && true === $data)) {
-                    return $data;
-                }
+                $dataMatchesExpectedType = match ($typeIdentifier) {
+                    TypeIdentifier::ARRAY => \is_array($data),
+                    TypeIdentifier::BOOL => \is_bool($data),
+                    TypeIdentifier::CALLABLE => \is_callable($data),
+                    TypeIdentifier::FALSE => false === $data,
+                    TypeIdentifier::FLOAT => \is_float($data),
+                    TypeIdentifier::INT => \is_int($data),
+                    TypeIdentifier::ITERABLE => is_iterable($data),
+                    TypeIdentifier::MIXED => true,
+                    TypeIdentifier::NULL => null === $data,
+                    TypeIdentifier::OBJECT => \is_object($data),
+                    TypeIdentifier::RESOURCE => \is_resource($data),
+                    TypeIdentifier::STRING => \is_string($data),
+                    TypeIdentifier::TRUE => true === $data,
+                    default => false,
+                };
 
-                if (('is_'.$typeIdentifier->value)($data)) {
+                if ($dataMatchesExpectedType) {
                     return $data;
                 }
             } catch (NotNormalizableValueException|InvalidArgumentException $e) {

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<container xmlns="http://symfony.com/schema/dic/services" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://symfony.com/schema/dic/services https://symfony.com/schema/dic/services/services-1.0.xsd">
+  <parameters>
+    <parameter key="fixtures_dir">%s</parameter>
+  </parameters>
+  <services>
+    <service id="service_container" class="Symfony\Component\DependencyInjection\ContainerInterface" public="true" synthetic="true"/>
+    <service id="class_map_consumer" class="stdClass" public="true">
+      <argument type="collection">
+        <argument key="0">Symfony\Component\DependencyInjection\Tests\Fixtures\ClassMap\Valid\Bar</argument>
+        <argument key="1">Symfony\Component\DependencyInjection\Tests\Fixtures\ClassMap\Valid\Baz</argument>
+        <argument key="2">Symfony\Component\DependencyInjection\Tests\Fixtures\ClassMap\Valid\Corge</argument>
+        <argument key="foo-attribute">Symfony\Component\DependencyInjection\Tests\Fixtures\ClassMap\Valid\Foo</argument>
+        <argument key="foo-enum-attribute">Symfony\Component\DependencyInjection\Tests\Fixtures\ClassMap\Valid\FooEnum</argument>
+        <argument key="3">Symfony\Component\DependencyInjection\Tests\Fixtures\ClassMap\Valid\Qux</argument>
+      </argument>
+    </service>
+  </services>
+</container>

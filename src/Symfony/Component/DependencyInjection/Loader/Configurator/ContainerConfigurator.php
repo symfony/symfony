@@ -13,6 +13,7 @@ namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
 use Symfony\Component\Config\Loader\ParamConfigurator;
 use Symfony\Component\DependencyInjection\Argument\AbstractArgument;
+use Symfony\Component\DependencyInjection\Argument\ClassMapArgument;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
 use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
@@ -201,4 +202,12 @@ function closure(string|array|ReferenceConfigurator|Expression $callable): Inlin
     return (new InlineServiceConfigurator(new Definition('Closure')))
         ->factory(['Closure', 'fromCallable'])
         ->args([$callable]);
+}
+
+/**
+ * Creates a class map argument.
+ */
+function class_map(string $namespace, string $path, ?string $instanceOf = null, ?string $withAttribute = null, ?string $indexBy = null): ClassMapArgument
+{
+    return new ClassMapArgument($namespace, $path, $instanceOf, $withAttribute, $indexBy);
 }

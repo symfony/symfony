@@ -16,6 +16,7 @@ use Psr\Container\ContainerInterface;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\Argument\BoundArgument;
+use Symfony\Component\DependencyInjection\Argument\ClassMapArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
 use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
 use Symfony\Component\DependencyInjection\ChildDefinition;
@@ -35,6 +36,12 @@ use Symfony\Component\DependencyInjection\Tests\Fixtures\AutoconfiguredService1;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\AutoconfiguredService2;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\AutowireLocatorConsumer;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\BarTagClass;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\ClassMap\Valid\Baz;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\ClassMap\Valid\Corge;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\ClassMap\Valid\Foo;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\ClassMap\Valid\FooEnum;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\ClassMap\Valid\FooInterface;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\ClassMapConsumer;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\FooBarTaggedClass;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\FooBarTaggedForDefaultPriorityClass;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\FooTagClass;
@@ -1185,6 +1192,34 @@ class IntegrationTest extends TestCase
         self::assertNull($s->getContainer());
         self::assertInstanceOf(ContainerInterface::class, $taggedLocator = $s->getLocator());
         self::assertSame($container, $taggedLocator);
+    }
+
+    public function testClassMap()
+    {
+        $container = new ContainerBuilder();
+        $container->setParameter('fixtures_dir', realpath(__DIR__.'/../Fixtures'));
+
+        $container->register('class_map_consumer', ClassMapConsumer::class)
+            ->setPublic('true')
+            ->setArguments([new ClassMapArgument(
+                'Symfony\Component\DependencyInjection\Tests\Fixtures\ClassMap\Valid',
+                '%fixtures_dir%/ClassMap/Valid',
+                instanceOf: FooInterface::class,
+                indexBy: 'key',
+            )]);
+
+        $container->compile();
+
+        /** @var ClassMapConsumer $clasMapConsumer */
+        $clasMapConsumer = $container->get('class_map_consumer');
+
+        self::assertInstanceOf(ClassMapConsumer::class, $clasMapConsumer);
+        self::assertSame([
+            'baz-prop' => Baz::class,
+            'corge-const' => Corge::class,
+            'foo-attribute' => Foo::class,
+            'foo-enum-attribute' => FooEnum::class,
+        ], $clasMapConsumer->classMap);
     }
 }
 

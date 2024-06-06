@@ -14,6 +14,7 @@ namespace Symfony\Component\DependencyInjection\Loader;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\Argument\AbstractArgument;
 use Symfony\Component\DependencyInjection\Argument\BoundArgument;
+use Symfony\Component\DependencyInjection\Argument\ClassMapArgument;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
@@ -898,6 +899,22 @@ class YamlFileLoader extends FileLoader
             }
             if ('abstract' === $value->getTag()) {
                 return new AbstractArgument($value->getValue());
+            }
+            if ('class_map' === $value->getTag()) {
+                if (!\is_array($argument) || !($argument['namespace'] ?? false) || !($argument['path'] ?? false)) {
+                    throw new InvalidArgumentException(sprintf('"!%s" tags only accept an array with non-empty values for the keys "namespace" and "path" in "%s".', $value->getTag(), $file));
+                }
+                if ($diff = array_diff(array_keys($argument), $supportedKeys = ['namespace', 'path', 'instance_of', 'with_attribute', 'index_by'])) {
+                    throw new InvalidArgumentException(sprintf('"!%s" tag contains unsupported key "%s"; supported ones are "%s".', $value->getTag(), implode('", "', $diff), implode('", "', $supportedKeys)));
+                }
+
+                return new ClassMapArgument(
+                    $argument['namespace'],
+                    $argument['path'],
+                    $argument['instance_of'] ?? null,
+                    $argument['with_attribute'] ?? null,
+                    $argument['index_by'] ?? null,
+                );
             }
 
             throw new InvalidArgumentException(sprintf('Unsupported tag "!%s".', $value->getTag()));

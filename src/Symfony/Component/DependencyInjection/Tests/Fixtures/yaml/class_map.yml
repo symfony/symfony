@@ -1,0 +1,10 @@
+
+services:
+    service_container:
+        class: Symfony\Component\DependencyInjection\ContainerInterface
+        public: true
+        synthetic: true
+    class_map_consumer:
+        class: stdClass
+        public: true
+        arguments: [!class_map { namespace: Symfony\Component\DependencyInjection\Tests\Fixtures\ClassMap\Valid\, path: '%fixtures_dir%/ClassMap/Valid', instance_of: null, with_attribute: null, index_by: null }]

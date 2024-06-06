@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+7.2
+---
+
+ * Add the ability to automatically inject a class map as a service argument from a specified directory, following the PSR-4 standard for class discovery.
+
 7.1
 ---
 

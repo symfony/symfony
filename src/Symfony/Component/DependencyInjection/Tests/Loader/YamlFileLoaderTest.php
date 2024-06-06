@@ -19,6 +19,7 @@ use Symfony\Component\Config\Loader\LoaderResolver;
 use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\Config\Resource\GlobResource;
 use Symfony\Component\DependencyInjection\Argument\BoundArgument;
+use Symfony\Component\DependencyInjection\Argument\ClassMapArgument;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
@@ -1197,5 +1198,18 @@ class YamlFileLoaderTest extends TestCase
 
         $definition = $container->getDefinition('static_constructor');
         $this->assertEquals((new Definition('stdClass'))->setFactory([null, 'create']), $definition);
+    }
+
+    public function testClassMap()
+    {
+        $container = new ContainerBuilder();
+        $loader = new YamlFileLoader($container, new FileLocator(self::$fixturesPath.'/yaml'));
+        $loader->load('class_map.yml');
+
+        $definition = $container->getDefinition('class_map_consumer')->getArgument(0);
+        $this->assertEquals(new ClassMapArgument(
+            'Symfony\Component\DependencyInjection\Tests\Fixtures\ClassMap\Valid',
+            '%fixtures_dir%/ClassMap/Valid',
+        ), $definition);
     }
 }

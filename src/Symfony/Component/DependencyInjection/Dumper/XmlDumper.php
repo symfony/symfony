@@ -13,6 +13,7 @@ namespace Symfony\Component\DependencyInjection\Dumper;
 
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\Argument\AbstractArgument;
+use Symfony\Component\DependencyInjection\Argument\ClassMapArgument;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
@@ -370,6 +371,19 @@ class XmlDumper extends Dumper
                 $element->setAttribute('type', 'abstract');
                 $text = $this->document->createTextNode(self::phpToXml($value->getText()));
                 $element->appendChild($text);
+            } elseif ($value instanceof ClassMapArgument) {
+                $element->setAttribute('type', 'class_map');
+                $element->setAttribute('namespace', $value->namespace);
+                $element->setAttribute('path', $value->path);
+                if (null !== $value->instanceOf) {
+                    $element->setAttribute('instance-of', $value->instanceOf);
+                }
+                if (null !== $value->withAttribute) {
+                    $element->setAttribute('with-attribute', $value->withAttribute);
+                }
+                if (null !== $value->indexBy) {
+                    $element->setAttribute('index-by', $value->indexBy);
+                }
             } else {
                 if (\in_array($value, ['null', 'true', 'false'], true)) {
                     $element->setAttribute('type', 'string');

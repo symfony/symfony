@@ -1,0 +1,12 @@
+parameters:
+    fixtures_dir: %s
+
+services:
+    service_container:
+        class: Symfony\Component\DependencyInjection\ContainerInterface
+        public: true
+        synthetic: true
+    class_map_consumer:
+        class: stdClass
+        public: true
+        arguments: [{ 0: Symfony\Component\DependencyInjection\Tests\Fixtures\ClassMap\Valid\Bar, 1: Symfony\Component\DependencyInjection\Tests\Fixtures\ClassMap\Valid\Baz, 2: Symfony\Component\DependencyInjection\Tests\Fixtures\ClassMap\Valid\Corge, foo-attribute: Symfony\Component\DependencyInjection\Tests\Fixtures\ClassMap\Valid\Foo, foo-enum-attribute: Symfony\Component\DependencyInjection\Tests\Fixtures\ClassMap\Valid\FooEnum, 3: Symfony\Component\DependencyInjection\Tests\Fixtures\ClassMap\Valid\Qux }]

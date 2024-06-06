@@ -21,6 +21,7 @@ use Symfony\Component\Config\Resource\GlobResource;
 use Symfony\Component\Config\Util\Exception\XmlParsingException;
 use Symfony\Component\DependencyInjection\Argument\AbstractArgument;
 use Symfony\Component\DependencyInjection\Argument\BoundArgument;
+use Symfony\Component\DependencyInjection\Argument\ClassMapArgument;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
@@ -1273,5 +1274,18 @@ class XmlFileLoaderTest extends TestCase
         $this->expectException(LogicException::class);
         $this->expectExceptionMessage('The "static_constructor" service cannot declare a factory as well as a constructor.');
         $loader->load('static_constructor_and_factory.xml');
+    }
+
+    public function testClassMap()
+    {
+        $container = new ContainerBuilder();
+        $loader = new XmlFileLoader($container, new FileLocator(self::$fixturesPath.'/xml'));
+        $loader->load('class_map.xml');
+
+        $definition = $container->getDefinition('class_map_consumer')->getArgument(0);
+        $this->assertEquals(new ClassMapArgument(
+            'Symfony\Component\DependencyInjection\Tests\Fixtures\ClassMap\Valid',
+            '%fixtures_dir%/ClassMap/Valid',
+        ), $definition);
     }
 }

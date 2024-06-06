@@ -17,6 +17,7 @@ use Symfony\Component\DependencyInjection\Argument\RewindableGenerator;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\DependencyInjection\Attribute\AutowireCallable;
+use Symfony\Component\DependencyInjection\Attribute\AutowireClassMap;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 use Symfony\Component\DependencyInjection\Attribute\AutowireLocator;
 use Symfony\Component\DependencyInjection\Attribute\TaggedIterator;
@@ -31,6 +32,8 @@ use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\DependencyInjection\TypedReference;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\DependencyInjection\RegisterControllerArgumentLocatorsPass;
+use Symfony\Component\HttpKernel\Tests\Fixtures\ClassMap\Foo;
+use Symfony\Component\HttpKernel\Tests\Fixtures\ClassMap\FooEnum;
 use Symfony\Component\HttpKernel\Tests\Fixtures\DataCollector\DummyController;
 use Symfony\Component\HttpKernel\Tests\Fixtures\Suit;
 
@@ -519,6 +522,33 @@ class RegisterControllerArgumentLocatorsPassTest extends TestCase
     }
 
     /**
+     * @requires function \Symfony\Component\DependencyInjection\Attribute\AutowireClassMap::__construct
+     */
+    public function testAutowireAttributeAndClassMap()
+    {
+        $container = new ContainerBuilder();
+        $container->setParameter('fixtures_dir', realpath(__DIR__.'/../Fixtures'));
+        $resolver = $container->register('argument_resolver.service', \stdClass::class)->addArgument([]);
+
+        $container->register('foo', WithAutowireAttributeAndClassMap::class)
+            ->addTag('controller.service_arguments');
+
+        (new RegisterControllerArgumentLocatorsPass())->process($container);
+
+        $locatorId = (string) $resolver->getArgument(0);
+        $container->getDefinition($locatorId)->setPublic(true);
+
+        $container->compile();
+
+        $locator = $container->get($locatorId)->get('foo::fooAction');
+
+        $this->assertSame([
+            'foo-attribute' => Foo::class,
+            'foo-enum-const' => FooEnum::class,
+        ], $locator->get('classMap'));
+    }
+
+    /**
      * @group legacy
      */
     public function testTaggedIteratorAndTaggedLocatorAttributes()
@@ -760,6 +790,19 @@ class WithAutowireAttribute
         FooInterface $autowireCallable,
         #[Autowire(service: 'invalid.id')]
         ?\stdClass $service2 = null,
+    ) {
+    }
+}
+
+class WithAutowireAttributeAndClassMap
+{
+    public function fooAction(
+        #[AutowireClassMap(
+            namespace: 'Symfony\Component\HttpKernel\Tests\Fixtures\ClassMap',
+            path: '%fixtures_dir%/ClassMap',
+            indexBy: 'KEY',
+        )]
+        array $classMap = [],
     ) {
     }
 }

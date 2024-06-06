@@ -14,6 +14,7 @@ namespace Symfony\Component\DependencyInjection\Tests\Dumper;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\Argument\AbstractArgument;
+use Symfony\Component\DependencyInjection\Argument\ClassMapArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
 use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
@@ -213,6 +214,22 @@ class YamlDumperTest extends TestCase
         $dumper = new YamlDumper($container);
 
         $this->assertEquals(file_get_contents(self::$fixturesPath.'/yaml/services_with_array_tags.yml'), $dumper->dump());
+    }
+
+    public function testClassMap()
+    {
+        $container = new ContainerBuilder();
+        $container->setParameter('fixtures_dir', self::$fixturesPath);
+        $container->register('class_map_consumer', \stdClass::class)
+            ->setPublic('true')
+            ->setArguments([new ClassMapArgument(
+                'Symfony\Component\DependencyInjection\Tests\Fixtures\ClassMap\Valid',
+                self::$fixturesPath.'/ClassMap/Valid',
+            )]);
+        $container->compile();
+        $dumper = new YamlDumper($container);
+
+        $this->assertStringMatchesFormatFile(self::$fixturesPath.'/yaml/class_map_dump.yml', $dumper->dump());
     }
 
     private function assertEqualYamlStructure(string $expected, string $yaml, string $message = '')

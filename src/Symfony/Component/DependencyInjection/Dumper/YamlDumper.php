@@ -14,6 +14,7 @@ namespace Symfony\Component\DependencyInjection\Dumper;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\Argument\AbstractArgument;
 use Symfony\Component\DependencyInjection\Argument\ArgumentInterface;
+use Symfony\Component\DependencyInjection\Argument\ClassMapArgument;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
@@ -252,6 +253,9 @@ class YamlDumper extends Dumper
             $value = $value->getValues()[0];
 
             return new TaggedValue('service_closure', $this->dumpValue($value));
+        }
+        if ($value instanceof ClassMapArgument) {
+            return new TaggedValue('class_map', $this->dumpValue($value->getValues()));
         }
         if ($value instanceof ArgumentInterface) {
             $tag = $value;

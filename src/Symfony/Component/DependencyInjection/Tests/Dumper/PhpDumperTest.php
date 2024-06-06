@@ -16,6 +16,7 @@ use Psr\Container\ContainerInterface;
 use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\Argument\AbstractArgument;
+use Symfony\Component\DependencyInjection\Argument\ClassMapArgument;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\Argument\RewindableGenerator;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
@@ -55,6 +56,7 @@ use Symfony\Component\DependencyInjection\Tests\Compiler\MyFactory;
 use Symfony\Component\DependencyInjection\Tests\Compiler\MyInlineService;
 use Symfony\Component\DependencyInjection\Tests\Compiler\SingleMethodInterface;
 use Symfony\Component\DependencyInjection\Tests\Compiler\Wither;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\ClassMapConsumer;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\CustomDefinition;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\FooClassWithEnumAttribute;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\FooUnitEnum;
@@ -2101,6 +2103,35 @@ class TestClass
 EOF
             ],
         ];
+    }
+
+    public function testClassMap()
+    {
+        $container = new ContainerBuilder();
+        $container->setParameter('fixtures_dir', self::$fixturesPath);
+        $container->register('class_map_consumer', ClassMapConsumer::class)
+            ->setPublic('true')
+            ->setArguments([new ClassMapArgument(
+                'Symfony\Component\DependencyInjection\Tests\Fixtures\ClassMap\Valid',
+                '%fixtures_dir%/ClassMap/Valid',
+            )]);
+        $container->compile();
+        $dumper = new PhpDumper($container);
+
+        $this->assertStringMatchesFormatFile(self::$fixturesPath.'/php/class_map.php', $dumper->dump());
+    }
+
+    public function testClassMapInAttribute()
+    {
+        $container = new ContainerBuilder();
+        $container->setParameter('fixtures_dir', self::$fixturesPath);
+        $container->register('class_map_consumer', ClassMapConsumer::class)
+            ->setPublic('true')
+            ->setAutowired(true);
+        $container->compile();
+        $dumper = new PhpDumper($container);
+
+        $this->assertStringMatchesFormatFile(self::$fixturesPath.'/php/class_map.php', $dumper->dump());
     }
 }
 

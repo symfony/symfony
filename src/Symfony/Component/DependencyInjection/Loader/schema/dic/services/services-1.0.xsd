@@ -326,6 +326,10 @@
     <xsd:attribute name="default-priority-method" type="xsd:string" />
     <xsd:attribute name="exclude" type="xsd:string" />
     <xsd:attribute name="exclude-self" type="xsd:boolean" />
+    <xsd:attribute name="namespace" type="xsd:string" />
+    <xsd:attribute name="path" type="xsd:string" />
+    <xsd:attribute name="instance-of" type="xsd:string" />
+    <xsd:attribute name="with-attribute" type="xsd:string" />
   </xsd:complexType>
 
   <xsd:complexType name="call">
@@ -362,6 +366,7 @@
       <xsd:enumeration value="tagged" />
       <xsd:enumeration value="tagged_iterator" />
       <xsd:enumeration value="tagged_locator" />
+      <xsd:enumeration value="class_map" />
     </xsd:restriction>
   </xsd:simpleType>
 

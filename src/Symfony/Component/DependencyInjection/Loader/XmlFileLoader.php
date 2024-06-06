@@ -15,6 +15,7 @@ use Symfony\Component\Config\Util\XmlUtils;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\Argument\AbstractArgument;
 use Symfony\Component\DependencyInjection\Argument\BoundArgument;
+use Symfony\Component\DependencyInjection\Argument\ClassMapArgument;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
@@ -622,6 +623,19 @@ class XmlFileLoader extends FileLoader
                     break;
                 case 'constant':
                     $arguments[$key] = \constant(trim($arg->nodeValue));
+                    break;
+                case 'class_map':
+                    if (!$arg->getAttribute('namespace') || !$arg->getAttribute('path')) {
+                        throw new InvalidArgumentException(sprintf('Tag "<%s>" with type="%s" must contain non-empty values for the "namespace" and "path" attributes in "%s".', $name, $type, $file));
+                    }
+
+                    $arguments[$key] = new ClassMapArgument(
+                        $arg->getAttribute('namespace'),
+                        $arg->getAttribute('path'),
+                        $arg->getAttribute('instance-of') ?: null,
+                        $arg->getAttribute('with-attribute') ?: null,
+                        $arg->getAttribute('index-by') ?: null,
+                    );
                     break;
                 default:
                     $arguments[$key] = XmlUtils::phpize($trim ? trim($arg->nodeValue) : $arg->nodeValue);

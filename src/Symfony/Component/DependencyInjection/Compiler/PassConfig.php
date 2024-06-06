@@ -69,6 +69,7 @@ class PassConfig
             new CheckDefinitionValidityPass(),
             new AutowirePass(false),
             new ServiceLocatorTagPass(),
+            new ResolveClassMapsPass(),
             new ResolveTaggedIteratorArgumentPass(),
             new ResolveServiceSubscribersPass(),
             new ResolveReferencesToAliasesPass(),

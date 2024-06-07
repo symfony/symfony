@@ -13,6 +13,7 @@ namespace Symfony\Component\AssetMapper\Tests\Path;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\AssetMapper\Path\LocalPublicAssetsFilesystem;
+use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Filesystem\Filesystem;
 
 class LocalPublicAssetsFilesystemTest extends TestCase
@@ -30,7 +31,11 @@ class LocalPublicAssetsFilesystemTest extends TestCase
 
     protected function tearDown(): void
     {
-        $this->filesystem->remove(self::$writableRoot);
+        try {
+            $this->filesystem->remove(self::$writableRoot);
+        } catch (IOException) {
+            // no-op
+        }
     }
 
     public function testWrite()

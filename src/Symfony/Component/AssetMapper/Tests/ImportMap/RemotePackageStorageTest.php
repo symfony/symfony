@@ -15,6 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\AssetMapper\ImportMap\ImportMapEntry;
 use Symfony\Component\AssetMapper\ImportMap\ImportMapType;
 use Symfony\Component\AssetMapper\ImportMap\RemotePackageStorage;
+use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Filesystem\Filesystem;
 
 class RemotePackageStorageTest extends TestCase
@@ -32,7 +33,11 @@ class RemotePackageStorageTest extends TestCase
 
     protected function tearDown(): void
     {
-        $this->filesystem->remove(self::$writableRoot);
+        try {
+            $this->filesystem->remove(self::$writableRoot);
+        } catch (IOException) {
+            // no-op
+        }
     }
 
     public function testGetStorageDir()

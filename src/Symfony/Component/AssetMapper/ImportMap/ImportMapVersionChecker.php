@@ -137,7 +137,7 @@ class ImportMapVersionChecker
             if (str_contains($segment, '-') && !preg_match('/-(alpha|beta|rc)\./', $segment)) {
                 // This is a range
                 [$start, $end] = explode('-', $segment);
-                $processedSegments[] = '>='.self::cleanVersionSegment(trim($start)).' <='.self::cleanVersionSegment(trim($end));
+                $processedSegments[] = self::cleanVersionSegment(trim($start)).' - '.self::cleanVersionSegment(trim($end));
             } elseif (preg_match('/^~(\d+\.\d+)$/', $segment, $matches)) {
                 // Handle the tilde when only major.minor specified
                 $baseVersion = $matches[1];

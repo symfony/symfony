@@ -13,6 +13,7 @@ namespace Symfony\Component\Config\Tests\Definition;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\Definition\ArrayNode;
+use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\PrototypedArrayNode;
 use Symfony\Component\Config\Definition\ScalarNode;
 use Symfony\Component\Config\Definition\VariableNode;
@@ -352,6 +353,70 @@ class PrototypedArrayNodeTest extends TestCase
         $result = $node->merge($left, $right);
 
         self::assertSame($result, $expected);
+    }
+
+    public function testOverridingPrototypedArrayNodeWithBangOperator(): void
+    {
+        $treeBuilder = new TreeBuilder('root');
+        $rootNode = $treeBuilder->getRootNode();
+
+        $rootNode
+            ->children()
+                ->arrayNode('workflows')
+                    ->useAttributeAsKey('name')
+                    ->prototype('array')
+                        ->children()
+                            ->arrayNode('from')
+                                ->prototype('scalar')->end()
+                            ->end()
+                        ->end()
+                    ->end()
+                ->end()
+            ->end()
+        ;
+
+        $builtTree = $treeBuilder->buildTree();
+
+        $this->assertSame(
+            [
+                'workflows' => [
+                    'workflow_a' => [
+                        'from' => ['a', 'b'],
+                    ],
+                    'workflow_b' => [
+                        'from' => ['b', 'c'],
+                    ],
+                    'workflow_c' => [
+                        'from' => ['x', 'd'],
+                    ],
+                ],
+            ],
+            $builtTree->merge(
+                [
+                    'workflows' => [
+                        'workflow_a' => [
+                            'from' => ['a', 'b'],
+                        ],
+                        'workflow_b' => [
+                            'from' => ['c', 'd'],
+                        ],
+                        'workflow_c' => [
+                            'from' => ['d', 'e'],
+                        ],
+                    ],
+                ],
+                [
+                    'workflows' => [
+                        '!workflow_b' => [
+                            'from' => ['b', 'c'],
+                        ],
+                        'workflow_c' => [
+                            '!from' => ['x', 'd'],
+                        ],
+                    ],
+                ],
+            ),
+        );
     }
 
     public static function getPrototypedArrayNodeDataToMerge(): array

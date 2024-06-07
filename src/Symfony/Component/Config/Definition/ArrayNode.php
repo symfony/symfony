@@ -22,6 +22,8 @@ use Symfony\Component\Config\Definition\Exception\UnsetKeyException;
  */
 class ArrayNode extends BaseNode implements PrototypeNodeInterface
 {
+    private const OVERRIDE_OPERATOR = '!';
+
     protected array $xmlRemappings = [];
     protected array $children = [];
     protected bool $allowFalse = false;
@@ -344,6 +346,13 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
         }
 
         foreach ($rightSide as $k => $v) {
+            if (str_starts_with($k, self::OVERRIDE_OPERATOR)) {
+                $keyWithoutOverrideOperator = ltrim($k, self::OVERRIDE_OPERATOR);
+
+                $leftSide[$keyWithoutOverrideOperator] = $v;
+                continue;
+            }
+
             // no conflict
             if (!\array_key_exists($k, $leftSide)) {
                 if (!$this->allowNewKeys) {

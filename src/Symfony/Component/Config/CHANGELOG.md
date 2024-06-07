@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+7.2
+---
+
+ * Allow overriding prototyped array nodes with using `!`
+
 7.1
 ---
 

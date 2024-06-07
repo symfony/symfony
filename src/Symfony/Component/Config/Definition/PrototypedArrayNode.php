@@ -23,6 +23,8 @@ use Symfony\Component\Config\Definition\Exception\UnsetKeyException;
  */
 class PrototypedArrayNode extends ArrayNode
 {
+    private const OVERRIDE_OPERATOR = '!';
+
     protected PrototypeNodeInterface $prototype;
     protected ?string $keyAttribute = null;
     protected bool $removeKeyAttribute = false;
@@ -259,6 +261,14 @@ class PrototypedArrayNode extends ArrayNode
 
         $isList = array_is_list($rightSide);
         foreach ($rightSide as $k => $v) {
+            // key starts with the '!' operator, so we override the left side
+            if (str_starts_with($k, self::OVERRIDE_OPERATOR)) {
+                $keyWithoutOverrideOperator = ltrim($k, self::OVERRIDE_OPERATOR);
+
+                $leftSide[$keyWithoutOverrideOperator] = $v;
+                continue;
+            }
+
             // prototype, and key is irrelevant there are no named keys, append the element
             if (null === $this->keyAttribute && $isList) {
                 $leftSide[] = $v;

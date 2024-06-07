@@ -248,6 +248,29 @@ class UuidTest extends TestCase
         yield [new \stdClass()];
     }
 
+    public function testHashable()
+    {
+        $uuid1 = new UuidV4(self::A_UUID_V4);
+        $uuid2 = new UuidV4(self::A_UUID_V4);
+
+        $this->assertSame($uuid1->hash(), $uuid2->hash());
+    }
+
+    /** @requires extension ds */
+    public function testDsCompatibility()
+    {
+        $uuid1 = new UuidV4(self::A_UUID_V4);
+        $uuid2 = new UuidV4(self::A_UUID_V4);
+
+        $set = new \Ds\Set();
+        $set->add($uuid1);
+        $set->add($uuid2);
+
+        $this->assertTrue($set->contains($uuid1));
+        $this->assertTrue($set->contains($uuid2));
+        $this->assertCount(1, $set);
+    }
+
     public function testCompare()
     {
         $uuids = [];

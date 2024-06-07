@@ -14,7 +14,7 @@ namespace Symfony\Component\Uid;
 /**
  * @author Nicolas Grekas <p@tchwork.com>
  */
-abstract class AbstractUid implements \JsonSerializable, \Stringable
+abstract class AbstractUid implements \JsonSerializable, \Stringable, HashableInterface
 {
     /**
      * The identifier in its canonic representation.
@@ -157,6 +157,11 @@ abstract class AbstractUid implements \JsonSerializable, \Stringable
         }
 
         return $this->uid === $other->uid;
+    }
+
+    public function hash(): string
+    {
+        return $this->uid;
     }
 
     public function compare(self $other): int

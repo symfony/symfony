@@ -35,6 +35,11 @@ class RemotePackageStorageTest extends TestCase
         $this->filesystem->remove(self::$writableRoot);
     }
 
+    /**
+     * Windows doesn't support chmod, thus this cannot be tested on this OS.
+     *
+     * @requires OSFAMILY != 'Windows'
+     */
     public function testSaveThrowsWhenVendorDirectoryIsNotWritable()
     {
         $this->filesystem->mkdir($vendorDir = self::$writableRoot.'/assets/acme/vendor');
@@ -58,6 +63,9 @@ class RemotePackageStorageTest extends TestCase
 
         $targetPath = self::$writableRoot.'/assets/vendor/module_specifier/module_specifier.index.js';
         $this->filesystem->mkdir(\dirname($targetPath));
+        var_dump("Removing");
+        $this->filesystem->remove(dirname($targetPath));
+        var_dump("Removed");
         $this->filesystem->dumpFile($targetPath, 'any content');
         $this->assertTrue($storage->isDownloaded($entry));
     }

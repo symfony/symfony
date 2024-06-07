@@ -165,9 +165,7 @@ class Filesystem
     {
         $files = array_reverse($files);
         foreach ($files as $file) {
-            var_dump((string) $file);
-            var_dump(fileowner(...$args));
-            var_dump(fileperms(...$args));
+            var_dump("In array: ".(string) $file);
             if (is_link($file)) {
                 // See https://bugs.php.net/52176
                 if (!(self::box('unlink', $file) || '\\' !== \DIRECTORY_SEPARATOR || self::box('rmdir', $file)) && file_exists($file)) {
@@ -202,7 +200,7 @@ class Filesystem
                         $file = $origFile;
                     }
 
-                    var_dump(glob(sprintf('%s/*', $file)));
+                    var_dump("Glob: ".glob(sprintf('%s/*', $file)));
 
                     throw new IOException(sprintf('Failed to remove directory "%s": ', $file).$lastError);
                 }
@@ -695,6 +693,7 @@ class Filesystem
 
             $this->rename($tmpFile, $filename, true);
         } finally {
+            passthru('del /s '.$tmpFile);
             if (file_exists($tmpFile)) {
                 self::box('unlink', $tmpFile);
             }
@@ -773,7 +772,7 @@ class Filesystem
      */
     public static function handleError(int $type, string $msg): void
     {
-        var_dump($msg);
+        var_dump("Error : ".$msg);
         self::$lastError = $msg;
     }
 }

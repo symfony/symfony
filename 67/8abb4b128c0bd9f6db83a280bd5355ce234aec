@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2024-06-05T17:39:37Z
+
+last round of changes, after this PR all core components, bundles and bridges should use CPP where possible

@@ -24,12 +24,11 @@ use Symfony\Component\VarDumper\Dumper\HtmlDumper;
  */
 class HtmlDescriptor implements DumpDescriptorInterface
 {
-    private HtmlDumper $dumper;
     private bool $initialized = false;
 
-    public function __construct(HtmlDumper $dumper)
-    {
-        $this->dumper = $dumper;
+    public function __construct(
+        private HtmlDumper $dumper,
+    ) {
     }
 
     public function describe(OutputInterface $output, Data $data, array $context, int $clientId): void

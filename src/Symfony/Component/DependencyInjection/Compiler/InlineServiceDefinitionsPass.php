@@ -26,7 +26,6 @@ class InlineServiceDefinitionsPass extends AbstractRecursivePass
 {
     protected bool $skipScalars = true;
 
-    private ?AnalyzeServiceReferencesPass $analyzingPass;
     private array $cloningIds = [];
     private array $connectedIds = [];
     private array $notInlinedIds = [];
@@ -34,9 +33,9 @@ class InlineServiceDefinitionsPass extends AbstractRecursivePass
     private array $notInlinableIds = [];
     private ?ServiceReferenceGraph $graph = null;
 
-    public function __construct(?AnalyzeServiceReferencesPass $analyzingPass = null)
-    {
-        $this->analyzingPass = $analyzingPass;
+    public function __construct(
+        private ?AnalyzeServiceReferencesPass $analyzingPass = null,
+    ) {
     }
 
     public function process(ContainerBuilder $container): void

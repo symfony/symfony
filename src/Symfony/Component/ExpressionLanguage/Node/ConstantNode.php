@@ -20,13 +20,11 @@ use Symfony\Component\ExpressionLanguage\Compiler;
  */
 class ConstantNode extends Node
 {
-    public readonly bool $isNullSafe;
-    private bool $isIdentifier;
-
-    public function __construct(mixed $value, bool $isIdentifier = false, bool $isNullSafe = false)
-    {
-        $this->isIdentifier = $isIdentifier;
-        $this->isNullSafe = $isNullSafe;
+    public function __construct(
+        mixed $value,
+        private bool $isIdentifier = false,
+        public readonly bool $isNullSafe = false,
+    ) {
         parent::__construct(
             [],
             ['value' => $value]

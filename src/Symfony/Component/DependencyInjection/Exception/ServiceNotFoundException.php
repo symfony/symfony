@@ -20,12 +20,13 @@ use Psr\Container\NotFoundExceptionInterface;
  */
 class ServiceNotFoundException extends InvalidArgumentException implements NotFoundExceptionInterface
 {
-    private string $id;
-    private ?string $sourceId;
-    private array $alternatives;
-
-    public function __construct(string $id, ?string $sourceId = null, ?\Throwable $previous = null, array $alternatives = [], ?string $msg = null)
-    {
+    public function __construct(
+        private string $id,
+        private ?string $sourceId = null,
+        ?\Throwable $previous = null,
+        private array $alternatives = [],
+        ?string $msg = null,
+    ) {
         if (null !== $msg) {
             // no-op
         } elseif (null === $sourceId) {
@@ -44,10 +45,6 @@ class ServiceNotFoundException extends InvalidArgumentException implements NotFo
         }
 
         parent::__construct($msg, 0, $previous);
-
-        $this->id = $id;
-        $this->sourceId = $sourceId;
-        $this->alternatives = $alternatives;
     }
 
     public function getId(): string

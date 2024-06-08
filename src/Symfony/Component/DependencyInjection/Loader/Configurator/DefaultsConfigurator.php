@@ -26,13 +26,12 @@ class DefaultsConfigurator extends AbstractServiceConfigurator
 
     public const FACTORY = 'defaults';
 
-    private ?string $path;
-
-    public function __construct(ServicesConfigurator $parent, Definition $definition, ?string $path = null)
-    {
+    public function __construct(
+        ServicesConfigurator $parent,
+        Definition $definition,
+        private ?string $path = null,
+    ) {
         parent::__construct($parent, $definition, null, []);
-
-        $this->path = $path;
     }
 
     /**

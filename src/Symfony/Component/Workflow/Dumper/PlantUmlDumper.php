@@ -51,14 +51,12 @@ class PlantUmlDumper implements DumperInterface
         ],
     ];
 
-    private string $transitionType = self::STATEMACHINE_TRANSITION;
-
-    public function __construct(string $transitionType)
-    {
+    public function __construct(
+        private string $transitionType,
+    ) {
         if (!\in_array($transitionType, self::TRANSITION_TYPES, true)) {
             throw new \InvalidArgumentException("Transition type '$transitionType' does not exist.");
         }
-        $this->transitionType = $transitionType;
     }
 
     public function dump(Definition $definition, ?Marking $marking = null, array $options = []): string

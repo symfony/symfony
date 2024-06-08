@@ -23,17 +23,12 @@ use Symfony\Contracts\EventDispatcher\Event as BaseEvent;
  */
 class Event extends BaseEvent
 {
-    private object $subject;
-    private Marking $marking;
-    private ?Transition $transition;
-    private ?WorkflowInterface $workflow;
-
-    public function __construct(object $subject, Marking $marking, ?Transition $transition = null, ?WorkflowInterface $workflow = null)
-    {
-        $this->subject = $subject;
-        $this->marking = $marking;
-        $this->transition = $transition;
-        $this->workflow = $workflow;
+    public function __construct(
+        private object $subject,
+        private Marking $marking,
+        private ?Transition $transition = null,
+        private ?WorkflowInterface $workflow = null,
+    ) {
     }
 
     public function getMarking(): Marking

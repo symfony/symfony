@@ -24,11 +24,9 @@ class CheckArgumentsValidityPass extends AbstractRecursivePass
 {
     protected bool $skipScalars = true;
 
-    private bool $throwExceptions;
-
-    public function __construct(bool $throwExceptions = true)
-    {
-        $this->throwExceptions = $throwExceptions;
+    public function __construct(
+        private bool $throwExceptions = true,
+    ) {
     }
 
     protected function processValue(mixed $value, bool $isRoot = false): mixed

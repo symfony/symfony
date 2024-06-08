@@ -22,11 +22,9 @@ class ParametersConfigurator extends AbstractConfigurator
 {
     public const FACTORY = 'parameters';
 
-    private ContainerBuilder $container;
-
-    public function __construct(ContainerBuilder $container)
-    {
-        $this->container = $container;
+    public function __construct(
+        private ContainerBuilder $container,
+    ) {
     }
 
     /**

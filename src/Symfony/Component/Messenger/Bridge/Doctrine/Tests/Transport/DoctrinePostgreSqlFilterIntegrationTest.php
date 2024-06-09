@@ -59,7 +59,7 @@ class DoctrinePostgreSqlFilterIntegrationTest extends TestCase
         $this->driverConnection->close();
     }
 
-    public function testFilterAssets(): void
+    public function testFilterAssets()
     {
         $schemaManager = $this->driverConnection->createSchemaManager();
 

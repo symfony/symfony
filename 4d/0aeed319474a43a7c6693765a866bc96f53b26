@@ -1,0 +1,22 @@
+---------------------------------------------------------------------------
+
+by VincentLanglet at 2024-05-14T11:03:02Z
+
+```
+Unit Tests / Unit Tests (8.2)
+```
+are failing because they are using
+```
+Installing symfony/messenger (6.4.x-dev 34b7fd3): Cloning 34b7fd38c9
+```
+and not the PhpSerializer were I added `shouldBeEncoded`.
+
+And fabbot.io is failing with unrelated changes.
+
+---------------------------------------------------------------------------
+
+by VincentLanglet at 2024-05-29T21:16:24Z
+
+Do you have time for a new review @OskarStark @nicolas-grekas ?
+
+Thanks a lot.

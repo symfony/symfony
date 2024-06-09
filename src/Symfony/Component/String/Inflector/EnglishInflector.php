@@ -25,8 +25,32 @@ final class EnglishInflector implements InflectorInterface
         // Fourth entry: Whether the suffix may succeed a consonant
         // Fifth entry: singular suffix, normal
 
-        // bacteria (bacterium), criteria (criterion), phenomena (phenomenon)
-        ['a', 1, true, true, ['on', 'um']],
+        // bacteria (bacterium)
+        ['airetcab', 8, true, true, 'bacterium'],
+
+        // corpora (corpus)
+        ['aroproc', 7, true, true, 'corpus'],
+
+        // criteria (criterion)
+        ['airetirc', 8, true, true, 'criterion'],
+
+        // curricula (curriculum)
+        ['alucirruc', 9, true, true, 'curriculum'],
+
+        // genera (genus)
+        ['areneg', 6, true, true, 'genus'],
+
+        // media (medium)
+        ['aidem', 5, true, true, 'medium'],
+
+        // memoranda (memorandum)
+        ['adnaromem', 9, true, true, 'memorandum'],
+
+        // phenomena (phenomenon)
+        ['anemonehp', 9, true, true, 'phenomenon'],
+
+        // strata (stratum)
+        ['atarts', 6, true, true, 'stratum'],
 
         // nebulae (nebula)
         ['ea', 2, true, true, 'a'],
@@ -141,7 +165,7 @@ final class EnglishInflector implements InflectorInterface
         // shoes (shoe)
         ['se', 2, true, true, ['', 'e']],
 
-         // status (status)
+        // status (status)
         ['sutats', 6, true, true, 'status'],
 
         // tags (tag)
@@ -241,7 +265,7 @@ final class EnglishInflector implements InflectorInterface
         // albums (album)
         ['mubla', 5, true, true, 'albums'],
 
-        // bacteria (bacterium), criteria (criterion), phenomena (phenomenon)
+        // bacteria (bacterium), curricula (curriculum), media (medium), memoranda (memorandum), phenomena (phenomenon), strata (stratum)
         ['mu', 2, true, true, 'a'],
 
         // men (man), women (woman)
@@ -250,20 +274,11 @@ final class EnglishInflector implements InflectorInterface
         // people (person)
         ['nosrep', 6, true, true, ['persons', 'people']],
 
-        // bacteria (bacterium), criteria (criterion), phenomena (phenomenon)
-        ['noi', 3, true, true, 'ions'],
+        // criteria (criterion)
+        ['noiretirc', 9, true, true, 'criteria'],
 
-        // coupon (coupons)
-        ['nop', 3, true, true, 'pons'],
-
-        // seasons (season), treasons (treason), poisons (poison), lessons (lesson)
-        ['nos', 3, true, true, 'sons'],
-
-        // icons (icon)
-        ['noc', 3, true, true, 'cons'],
-
-        // bacteria (bacterium), criteria (criterion), phenomena (phenomenon)
-        ['no', 2, true, true, 'a'],
+        // phenomena (phenomenon)
+        ['nonemonehp', 10, true, true, 'phenomena'],
 
         // echoes (echo)
         ['ohce', 4, true, true, 'echoes'],
@@ -404,9 +419,6 @@ final class EnglishInflector implements InflectorInterface
         'erawdrah',
     ];
 
-    /**
-     * {@inheritdoc}
-     */
     public function singularize(string $plural): array
     {
         $pluralRev = strrev($plural);
@@ -438,7 +450,7 @@ final class EnglishInflector implements InflectorInterface
                 if ($j === $suffixLength) {
                     // Is there any character preceding the suffix in the plural string?
                     if ($j < $pluralLength) {
-                        $nextIsVowel = false !== strpos('aeiou', $lowerPluralRev[$j]);
+                        $nextIsVowel = str_contains('aeiou', $lowerPluralRev[$j]);
 
                         if (!$map[2] && $nextIsVowel) {
                             // suffix may not succeed a vowel but next char is one
@@ -483,9 +495,6 @@ final class EnglishInflector implements InflectorInterface
         return [$plural];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function pluralize(string $singular): array
     {
         $singularRev = strrev($singular);
@@ -518,7 +527,7 @@ final class EnglishInflector implements InflectorInterface
                 if ($j === $suffixLength) {
                     // Is there any character preceding the suffix in the plural string?
                     if ($j < $singularLength) {
-                        $nextIsVowel = false !== strpos('aeiou', $lowerSingularRev[$j]);
+                        $nextIsVowel = str_contains('aeiou', $lowerSingularRev[$j]);
 
                         if (!$map[2] && $nextIsVowel) {
                             // suffix may not succeed a vowel but next char is one

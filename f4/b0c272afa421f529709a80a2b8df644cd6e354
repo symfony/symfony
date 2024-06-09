@@ -1,0 +1,12 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-11-23T17:32:26Z
+
+What about considering this as an improvement and merging into 6.4? Then we can do the BC break in 7.0.
+I'd be fine saying those annotations aren't supported in 5.4 personnally.
+
+---------------------------------------------------------------------------
+
+by mtarld at 2023-11-24T04:52:07Z
+
+It also means that it won't be supported in 6.3 and 7.0 (supposing that the `TypeInfo` will come in 7.1). But I'm fine with that as well, as 6.4 matters the most, being an LTS.

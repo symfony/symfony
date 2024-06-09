@@ -72,4 +72,19 @@ class AmazonSqsSenderTest extends TestCase
         $sender = new AmazonSqsSender($connection, $serializer);
         $sender->send($envelope);
     }
+
+    public function testSendEncodeBodyToRespectAmazonRequirements()
+    {
+        $envelope = new Envelope(new DummyMessage('Oy'));
+        $encoded = ['body' => "\x7", 'headers' => ['type' => DummyMessage::class]];
+
+        $connection = $this->createMock(Connection::class);
+        $connection->expects($this->once())->method('send')->with(base64_encode($encoded['body']), $encoded['headers']);
+
+        $serializer = $this->createMock(SerializerInterface::class);
+        $serializer->method('encode')->with($envelope)->willReturn($encoded);
+
+        $sender = new AmazonSqsSender($connection, $serializer);
+        $sender->send($envelope);
+    }
 }

@@ -1,0 +1,29 @@
+---------------------------------------------------------------------------
+
+by DesLynx at 2024-04-17T17:47:51Z
+
+The common typo issue reported by fabbot.io is not a typo here.
+
+---------------------------------------------------------------------------
+
+by DesLynx at 2024-04-17T17:58:37Z
+
+The `Unit Tests / Unit Tests (8.2, low-deps) (pull_request)` uses the String component v5.3 making the Inflector component test failed. Should I have targetted the 5.3 branch instead of the 5.4?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-04-23T09:44:52Z
+
+(you need to bump the version of the string component in the composer.json file to fix the deps=low tests)
+
+---------------------------------------------------------------------------
+
+by DesLynx at 2024-04-23T11:04:41Z
+
+@nicolas-grekas you lost me on this because I don't know to which version should I bump the string component in the composer file of the inflector component as the PR fixes the string component. I obviously can't use 5.4.x-dev ...
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-04-23T11:20:33Z
+
+The next version is 5.4.39

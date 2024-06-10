@@ -24,7 +24,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Messenger\Bridge\Doctrine\Transport\PostgreSqlConnection;
 
 /**
- * This test checks on a postgres connection whether the doctrine asset filter works as expected
+ * This test checks on a postgres connection whether the doctrine asset filter works as expected.
  *
  * @requires extension pdo_pgsql
  *
@@ -63,8 +63,8 @@ class DoctrinePostgreSqlFilterIntegrationTest extends TestCase
     {
         $schemaManager = $this->driverConnection->createSchemaManager();
 
-        $this->assertFalse($schemaManager->tableExists('queue_table'));
-        $this->assertTrue($schemaManager->tableExists('app_table'));
+        $this->assertFalse($schemaManager->tablesExist(['queue_table']));
+        $this->assertTrue($schemaManager->tablesExist(['app_table']));
         $this->assertTrue($this->hasSequence('app_table_id'));
 
         $connection = new PostgreSqlConnection(['table_name' => 'queue_table'], $this->driverConnection);
@@ -72,8 +72,8 @@ class DoctrinePostgreSqlFilterIntegrationTest extends TestCase
 
         $schemaManager = $this->driverConnection->createSchemaManager();
 
-        $this->assertTrue($schemaManager->tableExists('queue_table'));
-        $this->assertTrue($schemaManager->tableExists('app_table'));
+        $this->assertTrue($schemaManager->tablesExist(['queue_table']));
+        $this->assertTrue($schemaManager->tablesExist(['app_table']));
         $this->assertTrue($this->hasSequence('app_table_id'));
     }
 
@@ -90,11 +90,11 @@ class DoctrinePostgreSqlFilterIntegrationTest extends TestCase
     {
         $schemaManager = $this->driverConnection->createSchemaManager();
 
-        if ($schemaManager->tableExists('queue_table')) {
+        if ($schemaManager->tablesExist(['queue_table'])) {
             $schemaManager->dropTable('queue_table');
         }
 
-        if ($schemaManager->tableExists('app_table')) {
+        if ($schemaManager->tablesExist(['app_table'])) {
             $schemaManager->dropTable('app_table');
         }
 

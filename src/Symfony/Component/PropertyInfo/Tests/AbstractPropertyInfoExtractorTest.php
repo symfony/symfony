@@ -19,6 +19,7 @@ use Symfony\Component\PropertyInfo\PropertyInfoExtractorInterface;
 use Symfony\Component\PropertyInfo\PropertyInitializableExtractorInterface;
 use Symfony\Component\PropertyInfo\PropertyTypeExtractorInterface;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\DummyExtractor;
+use Symfony\Component\PropertyInfo\Tests\Fixtures\DummyLegacyExtractor;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\NullExtractor;
 use Symfony\Component\PropertyInfo\Type as LegacyType;
 use Symfony\Component\TypeInfo\Type;
@@ -57,7 +58,10 @@ class AbstractPropertyInfoExtractorTest extends TestCase
 
     public function testGetType()
     {
-        $this->assertEquals(Type::int(), $this->propertyInfo->getType('Foo', 'bar', []));
+        $extractors = [new NullExtractor(), new DummyLegacyExtractor(), new DummyExtractor()];
+        $propertyInfo = new PropertyInfoExtractor($extractors, $extractors, $extractors, $extractors, $extractors);
+
+        $this->assertEquals(Type::int(), $propertyInfo->getType('Foo', 'bar', []));
     }
 
     /**

@@ -90,6 +90,12 @@ class PropertyInfoExtractor implements PropertyInfoExtractorInterface, PropertyI
     private function extract(iterable $extractors, string $method, array $arguments): mixed
     {
         foreach ($extractors as $extractor) {
+            if (!method_exists($extractor, $method)) {
+                trigger_deprecation('symfony/property-info', '7.1', 'Not implementing the "%s()" method in class "%s" is deprecated."', $method, $extractor::class);
+
+                continue;
+            }
+
             if (null !== $value = $extractor->{$method}(...$arguments)) {
                 return $value;
             }

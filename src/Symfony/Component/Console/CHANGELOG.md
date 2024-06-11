@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+7.2
+---
+
+ * Allow to override the command used to execute the application during autocompletion
+
 7.1
 ---
 

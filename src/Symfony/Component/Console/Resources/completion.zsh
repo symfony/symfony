@@ -33,7 +33,8 @@ _sf_{{ COMMAND_NAME }}() {
     fi
 
     # Prepare the command to obtain completions
-    requestComp="${words[0]} ${words[1]} _complete --no-interaction -szsh -a{{ VERSION }} -c$((CURRENT-1))" i=""
+    # _SF_CMD allows Symfony CLI to tell us to use a different command to run the console
+    requestComp="${words[0]} ${_SF_CMD:-${words[1]}} _complete --no-interaction -szsh -a{{ VERSION }} -c$((CURRENT-1))" i=""
     for w in ${words[@]}; do
         w=$(printf -- '%b' "$w")
         # remove quotes from typed values

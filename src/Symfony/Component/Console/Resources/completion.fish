@@ -9,7 +9,18 @@ function _sf_{{ COMMAND_NAME }}
     set sf_cmd (commandline -o)
     set c (count (commandline -oc))
 
-    set completecmd "$sf_cmd[1]" "_complete" "--no-interaction" "-sfish" "-a{{ VERSION }}"
+    # _SF_CMD allows Symfony CLI to tell us to use a different command to run the console
+    if set -q _SF_CMD; and test -n _SF_CMD
+      for i in $_SF_CMD
+          if [ $i != "" ]
+              set completecmd $completecmd "$i"
+          end
+      end
+    else
+      set completecmd $completecmd $sf_cmd[1]
+    end
+
+    set completecmd $completecmd "_complete" "--no-interaction" "-sfish" "-a{{ VERSION }}"
 
     for i in $sf_cmd
         if [ $i != "" ]

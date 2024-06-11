@@ -1,0 +1,12 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-06-11T12:48:13Z
+
+I wouldn't describe this as a BC break. We consider that a minor update isn't required to not invalidate caches (but we'd prefer when possible). Here, it's too late for reverting IMHO.
+Can you also add a note in the UPGRADE file at the root of the repo? (and remove the "BC Break" prefix)
+
+---------------------------------------------------------------------------
+
+by mbabker at 2024-06-11T13:33:21Z
+
+PR updated

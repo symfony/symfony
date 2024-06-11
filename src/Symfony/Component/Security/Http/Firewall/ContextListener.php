@@ -95,7 +95,7 @@ class ContextListener extends AbstractListener
         }
 
         $request = $event->getRequest();
-        $session = $request->hasPreviousSession() && $request->hasSession() ? $request->getSession() : null;
+        $session = !$request->attributes->getBoolean('_stateless') && $request->hasPreviousSession() && $request->hasSession() ? $request->getSession() : null;
 
         $request->attributes->set('_security_firewall_run', $this->sessionKey);
 

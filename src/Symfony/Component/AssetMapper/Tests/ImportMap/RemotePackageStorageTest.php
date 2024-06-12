@@ -43,6 +43,10 @@ class RemotePackageStorageTest extends TestCase
 
     public function testSaveThrowsWhenVendorDirectoryIsNotWritable()
     {
+        if ('\\' === \DIRECTORY_SEPARATOR) {
+            $this->markTestSkipped('chmod is not supported on Windows');
+        }
+
         $this->filesystem->mkdir($vendorDir = self::$writableRoot.'/assets/acme/vendor');
         $this->filesystem->chmod($vendorDir, 0555);
 

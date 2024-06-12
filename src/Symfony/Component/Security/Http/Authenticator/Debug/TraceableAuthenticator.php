@@ -34,6 +34,8 @@ final class TraceableAuthenticator implements AuthenticatorInterface, Interactiv
     private ?float $duration = null;
     private ClassStub|string $stub;
     private ?bool $authenticated = null;
+    private ?bool $lazy = null;
+    private ?AuthenticationException $exception = null;
 
     public function __construct(private AuthenticatorInterface $authenticator)
     {
@@ -56,12 +58,18 @@ final class TraceableAuthenticator implements AuthenticatorInterface, Interactiv
                 },
                 $this->passport?->getBadges() ?? [],
             ),
+            'lazy' => $this->lazy,
+            'exception' => $this->exception,
         ];
     }
 
     public function supports(Request $request): ?bool
     {
-        return $this->authenticator->supports($request);
+        $supports = $this->authenticator->supports($request);
+
+        $this->lazy = null === $supports;
+
+        return $supports;
     }
 
     public function authenticate(Request $request): Passport
@@ -88,6 +96,7 @@ final class TraceableAuthenticator implements AuthenticatorInterface, Interactiv
     public function onAuthenticationFailure(Request $request, AuthenticationException $exception): ?Response
     {
         $this->authenticated = false;
+        $this->exception = $exception->getPrevious() instanceof AuthenticationException ? $exception->getPrevious() : $exception;
 
         return $this->authenticator->onAuthenticationFailure($request, $exception);
     }

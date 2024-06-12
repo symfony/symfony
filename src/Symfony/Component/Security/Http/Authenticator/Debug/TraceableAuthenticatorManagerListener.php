@@ -55,6 +55,8 @@ final class TraceableAuthenticatorManagerListener extends AbstractListener imple
                 'duration' => 0,
                 'authenticated' => null,
                 'badges' => [],
+                'lazy' => null,
+                'exception' => null,
             ];
         }
 

@@ -12,6 +12,7 @@
 namespace Symfony\Component\VarDumper\Server;
 
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Console\Input\StreamableInputInterface;
 use Symfony\Component\VarDumper\Cloner\Data;
 use Symfony\Component\VarDumper\Cloner\Stub;
 
@@ -49,33 +50,20 @@ class DumpServer
         }
     }
 
-    public function listen(callable $callback): void
+    public function listen(callable $callback, ?StreamableInputInterface $streamInput = null): void
     {
-        if (null === $this->socket) {
+        $inputStream = null;
+
+        if ($streamInput instanceof StreamableInputInterface && $stream = $streamInput->getStream()) {
+            $inputStream = $stream;
+        } elseif (null === $this->socket) {
             $this->start();
         }
 
-        foreach ($this->getMessages() as $clientId => $message) {
+        foreach ($this->getMessages($inputStream) as $clientId => $message) {
             $this->logger?->info('Received a payload from client {clientId}', ['clientId' => $clientId]);
 
-            $payload = @unserialize(base64_decode($message), ['allowed_classes' => [Data::class, Stub::class]]);
-
-            // Impossible to decode the message, give up.
-            if (false === $payload) {
-                $this->logger?->warning('Unable to decode a message from {clientId} client.', ['clientId' => $clientId]);
-
-                continue;
-            }
-
-            if (!\is_array($payload) || \count($payload) < 2 || !$payload[0] instanceof Data || !\is_array($payload[1])) {
-                $this->logger?->warning('Invalid payload from {clientId} client. Expected an array of two elements (Data $data, array $context)', ['clientId' => $clientId]);
-
-                continue;
-            }
-
-            [$data, $context] = $payload;
-
-            $callback($data, $context, $clientId);
+            $callback($clientId, $message);
         }
     }
 
@@ -84,8 +72,20 @@ class DumpServer
         return $this->host;
     }
 
-    private function getMessages(): iterable
+    /**
+     * @param ?resource
+     */
+    private function getMessages($inputStream): iterable
     {
+        if (null !== $inputStream) {
+            while (!feof($inputStream)) {
+                $stream = fgets($inputStream);
+                yield (int) $stream => $stream;
+            }
+
+            return;
+        }
+        
         $sockets = [(int) $this->socket => $this->socket];
         $write = [];
 

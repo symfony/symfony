@@ -179,8 +179,8 @@ class IbanValidator extends ConstraintValidator
 
         $value = (string) $value;
 
-        // Remove spaces and convert to uppercase
-        $canonicalized = str_replace(' ', '', strtoupper($value));
+        // Remove spaces (regular, non-breaking, and narrow non-breaking) and convert to uppercase
+        $canonicalized = str_replace([' ', "\xc2\xa0", "\xe2\x80\xaf"], '', strtoupper($value));
 
         // The IBAN must contain only digits and characters...
         if (!ctype_alnum($canonicalized)) {

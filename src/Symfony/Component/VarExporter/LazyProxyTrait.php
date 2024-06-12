@@ -28,16 +28,16 @@ trait LazyProxyTrait
      * @param \Closure():object $initializer Returns the proxied object
      * @param static|null       $instance
      */
-    public static function createLazyProxy(\Closure $initializer, ?object $instance = null): static
+    public static function createLazyProxy(\Closure $initializer, ?object $instance = null, ?array $skippedProperties = null): static
     {
         if (self::class !== $class = $instance ? $instance::class : static::class) {
-            $skippedProperties = ["\0".self::class."\0lazyObjectState" => true];
+            $skippedProperties["\0".self::class."\0lazyObjectState"] = true;
         } elseif (\defined($class.'::LAZY_OBJECT_PROPERTY_SCOPES')) {
             Hydrator::$propertyScopes[$class] ??= $class::LAZY_OBJECT_PROPERTY_SCOPES;
         }
 
         $instance ??= (Registry::$classReflectors[$class] ??= new \ReflectionClass($class))->newInstanceWithoutConstructor();
-        $instance->lazyObjectState = new LazyObjectState($initializer);
+        $instance->lazyObjectState = new LazyObjectState($initializer, $skippedProperties ??= []);
 
         foreach (Registry::$classResetters[$class] ??= Registry::getClassResetters($class) as $reset) {
             $reset($instance, $skippedProperties ??= []);

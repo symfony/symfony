@@ -22,6 +22,7 @@ use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Dumper\PhpDumper;
 use Symfony\Component\DependencyInjection\Dumper\YamlDumper;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
+use Symfony\Component\DependencyInjection\Exception\LogicException;
 use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\FooClassWithEnumAttribute;
@@ -224,6 +225,29 @@ class PhpFileLoaderTest extends TestCase
         $loader = new PhpFileLoader($container, new FileLocator(), 'dev', new ConfigBuilderGenerator(sys_get_temp_dir()));
 
         $loader->load($fixtures.'/config/when_env.php');
+    }
+
+    public function testNotWhenEnv()
+    {
+        $this->expectNotToPerformAssertions();
+
+        $fixtures = realpath(__DIR__.'/../Fixtures');
+        $container = new ContainerBuilder();
+        $loader = new PhpFileLoader($container, new FileLocator(), 'prod', new ConfigBuilderGenerator(sys_get_temp_dir()));
+
+        $loader->load($fixtures.'/config/not_when_env.php');
+    }
+
+    public function testUsingBothWhenAndNotWhenEnv()
+    {
+        $fixtures = realpath(__DIR__.'/../Fixtures');
+        $container = new ContainerBuilder();
+        $loader = new PhpFileLoader($container, new FileLocator(), 'prod', new ConfigBuilderGenerator(sys_get_temp_dir()));
+
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('Using both #[When] and #[WhenNot] attributes on the same target is not allowed.');
+
+        $loader->load($fixtures.'/config/when_not_when_env.php');
     }
 
     public function testServiceWithServiceLocatorArgument()

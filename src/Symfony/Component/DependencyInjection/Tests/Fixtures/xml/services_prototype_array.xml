@@ -4,6 +4,7 @@
       <prototype namespace="Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype\" resource="../Prototype/*">
           <exclude>../Prototype/OtherDir</exclude>
           <exclude>../Prototype/BadClasses</exclude>
+          <exclude>../Prototype/BadAttributes</exclude>
           <exclude>../Prototype/SinglyImplementedInterface</exclude>
           <exclude>../Prototype/StaticConstructor</exclude>
       </prototype>

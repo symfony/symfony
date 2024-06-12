@@ -29,6 +29,7 @@ use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype\BadClasses\MissingParent;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype\Foo;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype\FooInterface;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype\NotFoo;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype\OtherDir\AnotherSub;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype\OtherDir\AnotherSub\DeeperBaz;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype\OtherDir\Baz;
@@ -196,6 +197,7 @@ class FileLoaderTest extends TestCase
         $this->assertTrue($container->has(Bar::class));
         $this->assertTrue($container->has(Baz::class));
         $this->assertTrue($container->has(Foo::class));
+        $this->assertTrue($container->has(NotFoo::class));
 
         $this->assertEquals([FooInterface::class], array_keys($container->getAliases()));
 
@@ -300,6 +302,47 @@ class FileLoaderTest extends TestCase
         );
 
         $this->assertSame($expected, $container->getDefinition(Foo::class)->hasTag('container.excluded'));
+    }
+
+    /**
+     * @dataProvider provideEnvAndExpectedExclusions
+     */
+    public function testRegisterWithNotWhenAttributes(string $env, bool $expectedNotFooExclusion)
+    {
+        $container = new ContainerBuilder();
+        $loader = new TestFileLoader($container, new FileLocator(self::$fixturesPath.'/Fixtures'), $env);
+
+        $loader->registerClasses(
+            (new Definition())->setAutoconfigured(true),
+            'Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype\\',
+            'Prototype/*',
+            'Prototype/BadAttributes/*'
+        );
+
+        $this->assertTrue($container->has(NotFoo::class));
+        $this->assertSame($expectedNotFooExclusion, $container->getDefinition(NotFoo::class)->hasTag('container.excluded'));
+    }
+
+    public static function provideEnvAndExpectedExclusions(): iterable
+    {
+        yield ['dev', true];
+        yield ['prod', true];
+        yield ['test', false];
+    }
+
+    public function testRegisterThrowsWithBothWhenAndNotWhenAttribute()
+    {
+        $container = new ContainerBuilder();
+        $loader = new TestFileLoader($container, new FileLocator(self::$fixturesPath.'/Fixtures'), 'dev');
+
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('The "Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype\BadAttributes\WhenNotWhenFoo" class cannot have both #[When] and #[WhenNot] attributes.');
+
+        $loader->registerClasses(
+            (new Definition())->setAutoconfigured(true),
+            'Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype\BadAttributes\\',
+            'Prototype/BadAttributes/*',
+        );
     }
 
     /**

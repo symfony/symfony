@@ -3,6 +3,10 @@ imports:
 services:
     Symfony\Component\Ldap\Ldap:
         arguments: ['@Symfony\Component\Ldap\Adapter\ExtLdap\Adapter']
+        tags: [ 'ldap' ]
+
+    test_role_fetcher:
+        class: Symfony\Bundle\SecurityBundle\Tests\Functional\Bundle\JsonLdapLoginBundle\Security\Ldap\DummyRoleFetcher
 
     Symfony\Component\Ldap\Adapter\ExtLdap\Adapter:
         arguments:
@@ -21,7 +25,8 @@ security:
                 search_password: ''
                 default_roles: ROLE_USER
                 uid_key: uid
-                extra_fields: ['email']
+                #extra_fields: ['email']
+                role_fetcher: 'test_role_fetcher'
 
     firewalls:
         main:

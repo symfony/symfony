@@ -67,7 +67,7 @@ class ConstraintViolationListNormalizer implements NormalizerInterface, Cacheabl
             if (null !== $this->nameConverter) {
                 $propertyPath = $this->nameConverter->normalize(
                     $violation->getPropertyPath(),
-                    is_object($violation->getRoot()) ? get_class($violation->getRoot()) : null,
+                    \is_object($violation->getRoot()) ? \get_class($violation->getRoot()) : null,
                     $format,
                     $context
                 );

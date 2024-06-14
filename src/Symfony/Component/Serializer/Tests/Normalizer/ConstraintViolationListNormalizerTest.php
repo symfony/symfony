@@ -55,23 +55,23 @@ class ConstraintViolationListNormalizerTest extends TestCase
             'detail' => 'd: a
 4: 1',
             'violations' => [
-                    [
-                        'propertyPath' => 'd',
-                        'title' => 'a',
-                        'template' => 'b',
-                        'type' => 'urn:uuid:f',
-                        'parameters' => [
-                            'value' => 'foo',
-                        ],
-                    ],
-                    [
-                        'propertyPath' => '4',
-                        'title' => '1',
-                        'template' => '2',
-                        'type' => 'urn:uuid:6',
-                        'parameters' => [],
+                [
+                    'propertyPath' => 'd',
+                    'title' => 'a',
+                    'template' => 'b',
+                    'type' => 'urn:uuid:f',
+                    'parameters' => [
+                        'value' => 'foo',
                     ],
                 ],
+                [
+                    'propertyPath' => '4',
+                    'title' => '1',
+                    'template' => '2',
+                    'type' => 'urn:uuid:6',
+                    'parameters' => [],
+                ],
+            ],
         ];
 
         $this->assertEquals($expected, $this->normalizer->normalize($list));
@@ -140,7 +140,7 @@ error',
                     'title' => 'too long',
                     'template' => 'a',
                     'parameters' => [],
-                ]
+                ],
             ],
         ];
 

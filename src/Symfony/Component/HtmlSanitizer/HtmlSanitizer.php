@@ -103,7 +103,13 @@ final class HtmlSanitizer implements HtmlSanitizerInterface
 
             foreach ($this->config->getBlockedElements() as $blockedElement => $v) {
                 if (\array_key_exists($blockedElement, W3CReference::HEAD_ELEMENTS)) {
-                    $elementsConfig[$blockedElement] = false;
+                    $elementsConfig[$blockedElement] = HtmlSanitizerAction::Block;
+                }
+            }
+
+            foreach ($this->config->getDroppedElements() as $droppedElement => $v) {
+                if (\array_key_exists($droppedElement, W3CReference::HEAD_ELEMENTS)) {
+                    $elementsConfig[$droppedElement] = HtmlSanitizerAction::Drop;
                 }
             }
 
@@ -119,7 +125,13 @@ final class HtmlSanitizer implements HtmlSanitizerInterface
 
         foreach ($this->config->getBlockedElements() as $blockedElement => $v) {
             if (!\array_key_exists($blockedElement, W3CReference::HEAD_ELEMENTS)) {
-                $elementsConfig[$blockedElement] = false;
+                $elementsConfig[$blockedElement] = HtmlSanitizerAction::Block;
+            }
+        }
+
+        foreach ($this->config->getDroppedElements() as $droppedElement => $v) {
+            if (!\array_key_exists($droppedElement, W3CReference::HEAD_ELEMENTS)) {
+                $elementsConfig[$droppedElement] = HtmlSanitizerAction::Drop;
             }
         }
 

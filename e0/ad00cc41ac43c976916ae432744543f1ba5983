@@ -1,0 +1,22 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2024-02-04T09:38:41Z
+
+Can you please rebase your changes onto the latest `7.1` branch? The failures mostly look related to issue we resolved recently.
+
+---------------------------------------------------------------------------
+
+by symfonyaml at 2024-02-04T15:16:46Z
+
+The following [Psalm issue](https://github.com/symfony/symfony/actions/runs/7774950509/job/21200347806?pr=53749#step:7:20) looks like false positive to me 🤔 :
+```
+YamlValidator.php:43:95:
+UndefinedVariable: Cannot find referenced variable $prevErrorHandler
+```
+This [bit of code](https://github.com/symfony/symfony/pull/53749/files#diff-a62b06980a350e37c5a83e9c995a0efdc125ad65167a3ea869c07fc03fd227e8R43) is a copy of the [LintCommand::validate() method](https://github.com/symfony/yaml/blob/7.0/Command/LintCommand.php#L129).
+
+---------------------------------------------------------------------------
+
+by symfonyaml at 2024-04-19T17:46:59Z
+
+@xabbuh All done in commit https://github.com/symfony/symfony/pull/53749/commits/5b95cfdc1b626bf7ed2094fa4ec88984102e63d7 , thanks

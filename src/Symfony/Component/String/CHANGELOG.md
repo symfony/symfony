@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+7.2
+---
+
+ * Add `toNullOrNonEmptyString()` method
+
 7.1
 ---
 

@@ -1,0 +1,15 @@
+---------------------------------------------------------------------------
+
+by ruudk at 2024-06-03T08:07:00Z
+
+@HypeMC I just tested it and it does indeed solve my problem. Thanks!
+
+@fabpot Just a heads up. It would be great to have this fix also in 7.1.1.
+
+---------------------------------------------------------------------------
+
+by dbu at 2024-06-12T06:31:39Z
+
+the ci failures seem unrelated to the changes: fabbot seems to look at the DI extension class because it is touched, but the complaints are not about the changes in this PR, and appveyor fails on something completely unrelated.
+
+if the latest 5.4 branch is green, this PR could be rebased on 5.4 to get them green.

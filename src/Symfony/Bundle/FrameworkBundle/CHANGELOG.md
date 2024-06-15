@@ -6,6 +6,8 @@ CHANGELOG
 
  * Add support for setting `headers` with `Symfony\Bundle\FrameworkBundle\Controller\TemplateController`
  * Derivate `kernel.secret` from the decryption secret when its env var is not defined
+ * Make the `config/` directory optional in `MicroKernelTrait`, add support for service arguments in the
+   invokable Kernel class, and register `FrameworkBundle` by default when the `bundles.php` file is missing
 
 7.1
 ---

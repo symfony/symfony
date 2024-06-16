@@ -194,7 +194,11 @@ class ObjectNormalizer extends AbstractObjectNormalizer
         $class = \is_object($classOrObject) ? \get_class($classOrObject) : $classOrObject;
 
         if ($context['_read_attributes'] ?? true) {
-            return $this->propertyInfoExtractor->isReadable($class, $attribute) || $this->hasAttributeAccessorMethod($class, $attribute);
+            return (\is_object($classOrObject) && $this->propertyAccessor->isReadable($classOrObject, $attribute)) || $this->propertyInfoExtractor->isReadable($class, $attribute) || $this->hasAttributeAccessorMethod($class, $attribute);
+        }
+
+        if (str_contains($attribute, '.')) {
+            return true;
         }
 
         if ($this->propertyInfoExtractor->isWritable($class, $attribute)) {

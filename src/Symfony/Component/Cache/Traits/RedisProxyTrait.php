@@ -11,6 +11,9 @@
 
 namespace Symfony\Component\Cache\Traits;
 
+/**
+ * @internal
+ */
 trait RedisProxyTrait
 {
     private \Closure $initializer;

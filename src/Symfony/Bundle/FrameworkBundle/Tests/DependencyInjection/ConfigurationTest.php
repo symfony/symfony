@@ -224,13 +224,13 @@ class ConfigurationTest extends TestCase
         $this->expectExceptionMessage($expectedMessage);
 
         $processor->processConfiguration($configuration, [
-                [
-                    'http_method_override' => false,
-                    'handle_all_throwables' => true,
-                    'php_errors' => ['log' => true],
-                    'assets' => $assetConfig,
-                ],
-            ]);
+            [
+                'http_method_override' => false,
+                'handle_all_throwables' => true,
+                'php_errors' => ['log' => true],
+                'assets' => $assetConfig,
+            ],
+        ]);
     }
 
     public static function provideInvalidAssetConfigurationTests(): iterable

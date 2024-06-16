@@ -48,7 +48,6 @@ use Symfony\Component\Messenger\Transport\Receiver\ReceiverInterface;
 use Symfony\Component\Messenger\Worker;
 use Symfony\Component\RateLimiter\RateLimiterFactory;
 use Symfony\Component\RateLimiter\Storage\InMemoryStorage;
-use Symfony\Contracts\Service\ResetInterface;
 
 /**
  * @group time-sensitive

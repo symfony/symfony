@@ -87,7 +87,6 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
         private ?SurrogateInterface $surrogate = null,
         array $options = [],
     ) {
-
         // needed in case there is a fatal error because the backend is too slow to respond
         register_shutdown_function($this->store->cleanup(...));
 

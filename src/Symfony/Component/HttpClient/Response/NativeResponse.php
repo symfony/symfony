@@ -42,6 +42,7 @@ final class NativeResponse implements ResponseInterface, StreamableInterface
 
     /**
      * @internal
+     *
      * @param $context resource
      */
     public function __construct(

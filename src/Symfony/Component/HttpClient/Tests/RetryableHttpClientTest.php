@@ -239,8 +239,8 @@ class RetryableHttpClientTest extends TestCase
     {
         $client = new RetryableHttpClient(
             new MockHttpClient([
-               new MockResponse('', ['http_code' => 500]),
-               new MockResponse('Test out content', ['http_code' => 200]),
+                new MockResponse('', ['http_code' => 500]),
+                new MockResponse('Test out content', ['http_code' => 200]),
             ]),
             new GenericRetryStrategy([500], 0),
             1

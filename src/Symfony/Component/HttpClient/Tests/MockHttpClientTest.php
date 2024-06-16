@@ -313,8 +313,8 @@ class MockHttpClientTest extends HttpClientTestCase
         $responses = [];
 
         $headers = [
-          'Host: localhost:8057',
-          'Content-Type: application/json',
+            'Host: localhost:8057',
+            'Content-Type: application/json',
         ];
 
         $body = '{
@@ -387,9 +387,9 @@ class MockHttpClientTest extends HttpClientTestCase
                 $responses[] = new MockResponse($body, ['response_headers' => $headers]);
 
                 $headers = [
-                  'Host: localhost:8057',
-                  'Content-Length: 1000',
-                  'Content-Type: application/json',
+                    'Host: localhost:8057',
+                    'Content-Length: 1000',
+                    'Content-Type: application/json',
                 ];
 
                 $responses[] = new MockResponse($body, ['response_headers' => $headers]);

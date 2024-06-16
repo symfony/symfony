@@ -21,7 +21,6 @@ use Symfony\Component\Messenger\Stamp\SerializerStamp;
 use Symfony\Component\Messenger\Stamp\ValidationStamp;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
 use Symfony\Component\Messenger\Transport\Serialization\Serializer;
-use Symfony\Component\Serializer as SerializerComponent;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\Serializer\SerializerInterface as SerializerComponentInterface;
 

@@ -49,15 +49,15 @@ class SmsenseTransportTest extends TransportTestCase
     public function testSendSuccessfully()
     {
         $response = new JsonMockResponse([
-                'status' => 'created',
-                'direction' => 'outgoing',
-                'from' => '+40702222222',
-                'created' => '2024-02-02T20:35:32.429389',
-                'parts' => 1,
-                'to' => '+40701111111',
-                'cost' => 3900,
-                'message' => 'Symfony test',
-                'message_id' => '63444830-5857-50da-d5f6-69f3719aa916',
+            'status' => 'created',
+            'direction' => 'outgoing',
+            'from' => '+40702222222',
+            'created' => '2024-02-02T20:35:32.429389',
+            'parts' => 1,
+            'to' => '+40701111111',
+            'cost' => 3900,
+            'message' => 'Symfony test',
+            'message_id' => '63444830-5857-50da-d5f6-69f3719aa916',
         ]);
 
         $client = new MockHttpClient($response);

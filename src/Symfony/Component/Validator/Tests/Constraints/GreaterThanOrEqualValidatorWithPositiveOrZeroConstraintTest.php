@@ -69,7 +69,7 @@ class GreaterThanOrEqualValidatorWithPositiveOrZeroConstraintTest extends Greate
      */
     public function testThrowsConstraintExceptionIfNoValueOrPropertyPath($options)
     {
-       $this->markTestSkipped('Value option always set for PositiveOrZero constraint');
+        $this->markTestSkipped('Value option always set for PositiveOrZero constraint');
     }
 
     public function testThrowsConstraintExceptionIfBothValueAndPropertyPath()

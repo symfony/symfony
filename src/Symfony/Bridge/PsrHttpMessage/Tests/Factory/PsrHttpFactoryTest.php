@@ -219,14 +219,14 @@ class PsrHttpFactoryTest extends TestCase
             [],
             [],
             [
-            'f1' => $file,
-            'f2' => ['name' => null, 'type' => null, 'tmp_name' => null, 'error' => \UPLOAD_ERR_NO_FILE, 'size' => 0],
-          ],
+                'f1' => $file,
+                'f2' => ['name' => null, 'type' => null, 'tmp_name' => null, 'error' => \UPLOAD_ERR_NO_FILE, 'size' => 0],
+            ],
             [
-            'REQUEST_METHOD' => 'POST',
-            'HTTP_HOST' => 'dunglas.fr',
-            'HTTP_X_SYMFONY' => '2.8',
-          ],
+                'REQUEST_METHOD' => 'POST',
+                'HTTP_HOST' => 'dunglas.fr',
+                'HTTP_X_SYMFONY' => '2.8',
+            ],
             'Content'
         );
 

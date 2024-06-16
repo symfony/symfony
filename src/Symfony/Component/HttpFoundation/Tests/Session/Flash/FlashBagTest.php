@@ -141,14 +141,14 @@ class FlashBagTest extends TestCase
         $this->assertEquals([
             'notice' => ['Foo'],
             'error' => ['Bar'],
-            ], $this->bag->peekAll()
+        ], $this->bag->peekAll()
         );
         $this->assertTrue($this->bag->has('notice'));
         $this->assertTrue($this->bag->has('error'));
         $this->assertEquals([
             'notice' => ['Foo'],
             'error' => ['Bar'],
-            ], $this->bag->peekAll()
+        ], $this->bag->peekAll()
         );
     }
 }

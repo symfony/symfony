@@ -38,7 +38,7 @@ final class EmojiExtension extends AbstractExtension
     }
 
     /**
-     * Converts emoji short code (:wave:) to real emoji (👋)
+     * Converts emoji short code (:wave:) to real emoji (👋).
      */
     public function emojify(string $string, ?string $catalog = null): string
     {

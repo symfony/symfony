@@ -780,7 +780,7 @@ class EntityTypeTest extends BaseTypeTestCase
         $this->assertEquals([
             'BazGroup/Foo' => new ChoiceView($entity1, 'BazGroup/Foo', 'Foo'),
             'BooGroup/Bar' => new ChoiceView($entity2, 'BooGroup/Bar', 'Bar'),
-            ], $field->createView()->vars['choices']);
+        ], $field->createView()->vars['choices']);
         $this->assertTrue($field->isSynchronized(), 'Field should be synchronized.');
         $this->assertSame($entity2, $field->getData(), 'Entity should be loaded by custom value.');
         $this->assertSame('BooGroup/Bar', $field->getViewData());

@@ -290,9 +290,9 @@ class RouteCompilerTest extends TestCase
     public static function getVariableNamesStartingWithADigit()
     {
         return [
-           ['09'],
-           ['123'],
-           ['1e2'],
+            ['09'],
+            ['123'],
+            ['1e2'],
         ];
     }
 

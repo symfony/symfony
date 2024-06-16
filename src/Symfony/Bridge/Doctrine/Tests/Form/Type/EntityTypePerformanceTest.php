@@ -127,9 +127,9 @@ class EntityTypePerformanceTest extends FormPerformanceTestCase
 
         for ($i = 0; $i < 40; ++$i) {
             $form = $this->factory->create('Symfony\Bridge\Doctrine\Form\Type\EntityType', null, [
-                    'class' => self::ENTITY_CLASS,
-                    'preferred_choices' => $choices,
-                ]);
+                'class' => self::ENTITY_CLASS,
+                'preferred_choices' => $choices,
+            ]);
 
             // force loading of the choice list
             $form->createView();

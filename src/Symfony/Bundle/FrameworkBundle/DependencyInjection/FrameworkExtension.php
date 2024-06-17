@@ -2865,6 +2865,12 @@ class FrameworkExtension extends Extension
                 ->addArgument(new Reference('http_client', ContainerBuilder::NULL_ON_INVALID_REFERENCE));
         }
 
+        if (ContainerBuilder::willBeAvailable('symfony/bluesky-notifier', NotifierBridge\Bluesky\BlueskyTransportFactory::class, ['symfony/framework-bundle', 'symfony/notifier'])) {
+            $container->getDefinition($classToServices[NotifierBridge\Bluesky\BlueskyTransportFactory::class])
+                ->addArgument(new Reference('logger'))
+                ->addArgument(new Reference('clock', ContainerBuilder::NULL_ON_INVALID_REFERENCE));
+        }
+
         if (isset($config['admin_recipients'])) {
             $notifier = $container->getDefinition('notifier');
             foreach ($config['admin_recipients'] as $i => $recipient) {

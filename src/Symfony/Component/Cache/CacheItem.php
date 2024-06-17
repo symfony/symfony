@@ -123,11 +123,12 @@ final class CacheItem implements ItemInterface
     /**
      * Validates a cache key according to PSR-6.
      *
-     * @param mixed $key The key to validate
+     * @param mixed  $key           The key to validate
+     * @param string $reservedChars Can be used to override the list of reserved characters
      *
      * @throws InvalidArgumentException When $key is not valid
      */
-    public static function validateKey($key): string
+    public static function validateKey($key, string $reservedChars = self::RESERVED_CHARACTERS): string
     {
         if (!\is_string($key)) {
             throw new InvalidArgumentException(sprintf('Cache key must be string, "%s" given.', get_debug_type($key)));
@@ -135,11 +136,21 @@ final class CacheItem implements ItemInterface
         if ('' === $key) {
             throw new InvalidArgumentException('Cache key length must be greater than zero.');
         }
-        if (false !== strpbrk($key, self::RESERVED_CHARACTERS)) {
-            throw new InvalidArgumentException(sprintf('Cache key "%s" contains reserved characters "%s".', $key, self::RESERVED_CHARACTERS));
+        if ('' !== $reservedChars && false !== strpbrk($key, $reservedChars)) {
+            throw new InvalidArgumentException(sprintf('Cache key "%s" contains reserved characters "%s".', $key, $reservedChars));
         }
 
         return $key;
+    }
+
+    /**
+     * @param mixed[] $keys The keys to validate
+     */
+    public static function validateKeys(array $keys): void
+    {
+        foreach ($keys as $key) {
+            self::validateKey($key);
+        }
     }
 
     /**

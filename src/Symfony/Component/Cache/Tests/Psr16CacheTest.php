@@ -57,7 +57,7 @@ class Psr16CacheTest extends SimpleCacheTest
 
     public function createSimpleCache(int $defaultLifetime = 0): CacheInterface
     {
-        return new Psr16Cache(new FilesystemAdapter('', $defaultLifetime));
+        return new Psr16Cache(new FilesystemTestAdapter('', $defaultLifetime));
     }
 
     public static function validKeys(): array
@@ -180,4 +180,9 @@ class NotUnserializable
     {
         throw new \Exception(__CLASS__);
     }
+}
+
+class FilesystemTestAdapter extends FilesystemAdapter
+{
+    protected const NS_SEPARATOR = '_';
 }

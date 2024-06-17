@@ -30,6 +30,16 @@ class ArrayAdapter implements AdapterInterface, CacheInterface, LoggerAwareInter
 {
     use LoggerAwareTrait;
 
+    /**
+     * @internal
+     */
+    protected const NS_SEPARATOR = ':';
+
+    /**
+     * @internal
+     */
+    protected static ?string $reservedChars = null;
+
     private array $values = [];
     private array $tags = [];
     private array $expiries = [];
@@ -45,6 +55,10 @@ class ArrayAdapter implements AdapterInterface, CacheInterface, LoggerAwareInter
         private float $maxLifetime = 0,
         private int $maxItems = 0,
     ) {
+        if (null === static::$reservedChars) {
+            static::$reservedChars = str_replace(self::NS_SEPARATOR, '', CacheItem::RESERVED_CHARACTERS);
+        }
+
         if (0 > $maxLifetime) {
             throw new InvalidArgumentException(sprintf('Argument $maxLifetime must be positive, %F passed.', $maxLifetime));
         }
@@ -104,7 +118,7 @@ class ArrayAdapter implements AdapterInterface, CacheInterface, LoggerAwareInter
 
             return true;
         }
-        \assert('' !== CacheItem::validateKey($key));
+        \assert('' !== CacheItem::validateKey($key, static::$reservedChars));
 
         return isset($this->expiries[$key]) && !$this->deleteItem($key);
     }
@@ -134,7 +148,7 @@ class ArrayAdapter implements AdapterInterface, CacheInterface, LoggerAwareInter
 
     public function deleteItem(mixed $key): bool
     {
-        \assert('' !== CacheItem::validateKey($key));
+        \assert('' !== CacheItem::validateKey($key, static::$reservedChars));
         unset($this->values[$key], $this->tags[$key], $this->expiries[$key]);
 
         return true;
@@ -350,7 +364,7 @@ class ArrayAdapter implements AdapterInterface, CacheInterface, LoggerAwareInter
     {
         foreach ($keys as $key) {
             if (!\is_string($key) || !isset($this->expiries[$key])) {
-                CacheItem::validateKey($key);
+                CacheItem::validateKey($key, static::$reservedChars);
             }
         }
 

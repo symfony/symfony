@@ -47,7 +47,7 @@ class Psr16Cache implements CacheInterface, PruneableInterface, ResettableInterf
                 if ($allowInt && \is_int($key)) {
                     $item->key = (string) $key;
                 } else {
-                    \assert('' !== CacheItem::validateKey($key));
+                    CacheItem::validateKey($key);
                     $item->key = $key;
                 }
                 $item->value = $value;
@@ -79,6 +79,7 @@ class Psr16Cache implements CacheInterface, PruneableInterface, ResettableInterf
 
     public function get($key, $default = null): mixed
     {
+        CacheItem::validateKey($key);
         try {
             $item = $this->pool->getItem($key);
         } catch (SimpleCacheException $e) {
@@ -96,6 +97,7 @@ class Psr16Cache implements CacheInterface, PruneableInterface, ResettableInterf
 
     public function set($key, $value, $ttl = null): bool
     {
+        CacheItem::validateKey($key);
         try {
             if (null !== $f = $this->createCacheItem) {
                 $item = $f($key, $value);
@@ -117,6 +119,8 @@ class Psr16Cache implements CacheInterface, PruneableInterface, ResettableInterf
     public function delete($key): bool
     {
         try {
+            CacheItem::validateKey($key);
+
             return $this->pool->deleteItem($key);
         } catch (SimpleCacheException $e) {
             throw $e;
@@ -139,6 +143,7 @@ class Psr16Cache implements CacheInterface, PruneableInterface, ResettableInterf
         }
 
         try {
+            CacheItem::validateKeys($keys);
             $items = $this->pool->getItems($keys);
         } catch (SimpleCacheException $e) {
             throw $e;
@@ -179,7 +184,9 @@ class Psr16Cache implements CacheInterface, PruneableInterface, ResettableInterf
             } elseif ($valuesIsArray) {
                 $items = [];
                 foreach ($values as $key => $value) {
-                    $items[] = (string) $key;
+                    $key = (string) $key;
+                    CacheItem::validateKey($key);
+                    $items[] = $key;
                 }
                 $items = $this->pool->getItems($items);
             } else {
@@ -187,6 +194,7 @@ class Psr16Cache implements CacheInterface, PruneableInterface, ResettableInterf
                     if (\is_int($key)) {
                         $key = (string) $key;
                     }
+                    CacheItem::validateKey($key);
                     $items[$key] = $this->pool->getItem($key)->set($value);
                 }
             }
@@ -198,6 +206,7 @@ class Psr16Cache implements CacheInterface, PruneableInterface, ResettableInterf
         $ok = true;
 
         foreach ($items as $key => $item) {
+            CacheItem::validateKey((string) $key);
             if ($valuesIsArray) {
                 $item->set($values[$key]);
             }
@@ -219,6 +228,8 @@ class Psr16Cache implements CacheInterface, PruneableInterface, ResettableInterf
         }
 
         try {
+            CacheItem::validateKeys($keys);
+
             return $this->pool->deleteItems($keys);
         } catch (SimpleCacheException $e) {
             throw $e;
@@ -230,6 +241,8 @@ class Psr16Cache implements CacheInterface, PruneableInterface, ResettableInterf
     public function has($key): bool
     {
         try {
+            CacheItem::validateKey($key);
+
             return $this->pool->hasItem($key);
         } catch (SimpleCacheException $e) {
             throw $e;

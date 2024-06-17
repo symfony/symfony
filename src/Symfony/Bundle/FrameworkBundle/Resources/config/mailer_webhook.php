@@ -27,6 +27,8 @@ use Symfony\Component\Mailer\Bridge\Resend\RemoteEvent\ResendPayloadConverter;
 use Symfony\Component\Mailer\Bridge\Resend\Webhook\ResendRequestParser;
 use Symfony\Component\Mailer\Bridge\Sendgrid\RemoteEvent\SendgridPayloadConverter;
 use Symfony\Component\Mailer\Bridge\Sendgrid\Webhook\SendgridRequestParser;
+use Symfony\Component\Mailer\Bridge\Sweego\RemoteEvent\SweegoPayloadConverter;
+use Symfony\Component\Mailer\Bridge\Sweego\Webhook\SweegoRequestParser;
 
 return static function (ContainerConfigurator $container) {
     $container->services()
@@ -69,5 +71,10 @@ return static function (ContainerConfigurator $container) {
         ->set('mailer.webhook.request_parser.sendgrid', SendgridRequestParser::class)
             ->args([service('mailer.payload_converter.sendgrid')])
         ->alias(SendgridRequestParser::class, 'mailer.webhook.request_parser.sendgrid')
+
+        ->set('mailer.payload_converter.sweego', SweegoPayloadConverter::class)
+        ->set('mailer.webhook.request_parser.sweego', SweegoRequestParser::class)
+            ->args([service('mailer.payload_converter.sweego')])
+        ->alias(SweegoRequestParser::class, 'mailer.webhook.request_parser.sweego')
     ;
 };

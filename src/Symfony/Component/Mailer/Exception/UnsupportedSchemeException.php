@@ -84,6 +84,10 @@ class UnsupportedSchemeException extends LogicException
             'class' => Bridge\Amazon\Transport\SesTransportFactory::class,
             'package' => 'symfony/amazon-mailer',
         ],
+        'sweego' => [
+            'class' => Bridge\Sweego\Transport\SweegoTransportFactory::class,
+            'package' => 'symfony/sweego-mailer',
+        ],
     ];
 
     public function __construct(Dsn $dsn, ?string $name = null, array $supported = [])

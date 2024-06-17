@@ -39,6 +39,9 @@ final class InfobipApiTransport extends AbstractApiTransport
         'X-Infobip-NotifyContentType' => 'notifyContentType',
         'X-Infobip-MessageId' => 'messageId',
         'X-Infobip-Track' => 'track',
+        'X-Infobip-TrackingUrl' => 'trackingUrl',
+        'X-Infobip-TrackClicks' => 'trackClicks',
+        'X-Infobip-TrackOpens' => 'trackOpens',
     ];
 
     public function __construct(

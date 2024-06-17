@@ -43,6 +43,7 @@
         "symfony/event-dispatcher-contracts": "<2.5",
         "symfony/framework-bundle": "<6.4",
         "symfony/http-kernel": "<6.4",
+        "symfony/lock": "<6.4",
         "symfony/serializer": "<6.4"
     },
     "autoload": {

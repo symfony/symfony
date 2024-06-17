@@ -16,17 +16,13 @@ use Symfony\Component\Lock\Key;
 final class LockStamp implements StampInterface
 {
     private Key $key;
-    private ?float $ttl;
-    private bool $shouldBeReleasedBeforeHandlerCall;
 
     public function __construct(
         string $key,
-        ?float $ttl = 300.0,
-        bool $shouldBeReleasedBeforeHandlerCall = false,
+        private ?float $ttl = 300.0,
+        private bool $shouldBeReleasedBeforeHandlerCall = false,
     ) {
         $this->key = new Key($key);
-        $this->ttl = $ttl;
-        $this->shouldBeReleasedBeforeHandlerCall = $shouldBeReleasedBeforeHandlerCall;
     }
 
     public function getKey(): Key

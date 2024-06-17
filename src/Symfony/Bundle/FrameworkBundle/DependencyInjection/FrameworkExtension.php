@@ -2021,10 +2021,6 @@ class FrameworkExtension extends Extension
     {
         $loader->load('lock.php');
 
-        if (!class_exists(LockMiddleware::class) || !class_exists(LockFactory::class)) {
-            $container->removeDefinition('messenger.middleware.lock_middleware');
-        }
-
         foreach ($config['resources'] as $resourceName => $resourceStores) {
             if (0 === \count($resourceStores)) {
                 continue;
@@ -2179,8 +2175,11 @@ class FrameworkExtension extends Extension
                 ['id' => 'handle_message'],
             ],
         ];
-        if (class_exists(LockMiddleware::class)) {
+
+        if (class_exists(LockMiddleware::class) && class_exists(LockFactory::class)) {
             $defaultMiddleware['before'][] = ['id' => 'lock_middleware'];
+        } else {
+            $container->removeDefinition('messenger.middleware.lock_middleware');
         }
 
         foreach ($config['buses'] as $busId => $bus) {

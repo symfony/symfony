@@ -19,6 +19,7 @@ CHANGELOG
  * Deprecate `AddAnnotatedClassesToCachePass`
  * Deprecate the `setAnnotatedClassCache()` and `getAnnotatedClassesToCompile()` methods of the `Kernel` class
  * Add `#[MapUploadedFile]` attribute to fetch, validate, and inject uploaded files into controller arguments
+ * Support variadic argument with `#[MapRequestPayload]`
 
 7.0
 ---

@@ -498,7 +498,7 @@ class RequestPayloadValueResolverTest extends TestCase
         $resolver = new RequestPayloadValueResolver($serializer, $validator);
 
         $argument = new ArgumentMetadata('variadic', RequestPayload::class, true, false, null, false, [
-            MapRequestPayload::class => new MapRequestPayload(),
+            MapQueryString::class => new MapQueryString(),
         ]);
         $request = Request::create('/', 'POST');
 
@@ -873,6 +873,40 @@ class RequestPayloadValueResolverTest extends TestCase
         $resolver->onKernelControllerArguments($event);
 
         $this->assertTrue($event->getArguments()[0]->value);
+    }
+
+    public function testMapRequestPayloadVariadic()
+    {
+        $input = [
+            ['price' => '50'],
+            ['price' => '23'],
+        ];
+        $payload = [
+            new RequestPayload(50),
+            new RequestPayload(23),
+        ];
+
+        $serializer = new Serializer([new ArrayDenormalizer(), new ObjectNormalizer()], ['json' => new JsonEncoder()]);
+
+        $validator = $this->createMock(ValidatorInterface::class);
+        $validator->expects($this->once())
+            ->method('validate')
+            ->willReturn(new ConstraintViolationList());
+
+        $resolver = new RequestPayloadValueResolver($serializer, $validator);
+
+        $argument = new ArgumentMetadata('prices', RequestPayload::class, true, false, null, false, [
+            MapRequestPayload::class => new MapRequestPayload(),
+        ]);
+        $request = Request::create('/', 'POST', $input);
+
+        $kernel = $this->createMock(HttpKernelInterface::class);
+        $arguments = $resolver->resolve($request, $argument);
+        $event = new ControllerArgumentsEvent($kernel, function () {}, $arguments, $request, HttpKernelInterface::MAIN_REQUEST);
+
+        $resolver->onKernelControllerArguments($event);
+
+        $this->assertEquals($payload, $event->getArguments());
     }
 }
 

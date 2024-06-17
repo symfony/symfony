@@ -79,7 +79,7 @@ class RequestPayloadValueResolver implements ValueResolverInterface, EventSubscr
             return [];
         }
 
-        if (!$attribute instanceof MapUploadedFile && $argument->isVariadic()) {
+        if ($attribute instanceof MapQueryString && $argument->isVariadic()) {
             throw new \LogicException(sprintf('Mapping variadic argument "$%s" is not supported.', $argument->getName()));
         }
 
@@ -170,7 +170,11 @@ class RequestPayloadValueResolver implements ValueResolverInterface, EventSubscr
                 };
             }
 
-            $arguments[$i] = $payload;
+            if ($argument->metadata->isVariadic() && \is_array($payload)) {
+                array_splice($arguments, $i, 1, $payload);
+            } else {
+                $arguments[$i] = $payload;
+            }
         }
 
         $event->setArguments($arguments);
@@ -204,6 +208,8 @@ class RequestPayloadValueResolver implements ValueResolverInterface, EventSubscr
 
         if ('array' === $argument->getType() && null !== $attribute->type) {
             $type = $attribute->type.'[]';
+        } elseif ($argument->isVariadic()) {
+            $type = $argument->getType().'[]';
         } else {
             $type = $argument->getType();
         }

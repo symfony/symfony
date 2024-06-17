@@ -269,7 +269,7 @@ class UploadedFileValueResolverTest extends TestCase
         $resolver->onKernelControllerArguments($event);
 
         /** @var UploadedFile[] $data */
-        $data = $event->getArguments()[0];
+        $data = $event->getArguments();
 
         $this->assertCount(2, $data);
         $this->assertSame('file-small.txt', $data[0]->getFilename());

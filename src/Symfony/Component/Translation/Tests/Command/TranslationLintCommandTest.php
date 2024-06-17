@@ -21,6 +21,9 @@ use Symfony\Component\Translation\Translator;
 
 final class TranslationLintCommandTest extends TestCase
 {
+    /**
+     * @requires extension intl
+     */
     public function testLintCorrectTranslations()
     {
         $translator = new Translator('en');
@@ -59,6 +62,9 @@ final class TranslationLintCommandTest extends TestCase
         $this->assertStringContainsString('[OK] All translations are valid.', $display);
     }
 
+    /**
+     * @requires extension intl
+     */
     public function testLintMalformedIcuTranslations()
     {
         $translator = new Translator('en');

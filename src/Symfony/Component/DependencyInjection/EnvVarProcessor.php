@@ -218,7 +218,19 @@ class EnvVarProcessor implements EnvVarProcessorInterface, ResetInterface
 
             if (false === $env) {
                 if (!$this->container->hasParameter("env($name)")) {
-                    throw new EnvNotFoundException(sprintf('Environment variable not found: "%s".', $name));
+                    $message = sprintf('Environment variable not found: "%s".', $name);
+
+                    // Symfony internal
+                    if ('APP_SECRET' === $name) {
+                        $message = <<<MESSAGE
+Environment variable not found: "APP_SECRET" that is needed for security reason.
+Define it in your .env file via `php -r 'file_put_contents(".env", "\nAPP_SECRET=" . bin2hex(random_bytes(16)), FILE_APPEND);'` or manually as a strong and secure token
+or in your vault via `php bin/console secrets:set APP_SECRET --random`
+Read more at https://symfony.com/doc/current/configuration.html#configuration-based-on-environment-variables
+MESSAGE;
+                    }
+
+                    throw new EnvNotFoundException($message);
                 }
 
                 $env = $this->container->getParameter("env($name)");

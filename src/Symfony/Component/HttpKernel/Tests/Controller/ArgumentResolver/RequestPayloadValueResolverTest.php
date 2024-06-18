@@ -67,7 +67,7 @@ class RequestPayloadValueResolverTest extends TestCase
         $payload = new RequestPayload(50);
 
         $validator = $this->createMock(ValidatorInterface::class);
-        $validator->expects($this->never())
+        $validator->expects($this->once())
            ->method('validate');
 
         $resolver = new RequestPayloadValueResolver(new Serializer(), $validator);
@@ -91,7 +91,7 @@ class RequestPayloadValueResolverTest extends TestCase
         $payload = new RequestPayload(50);
 
         $validator = $this->createMock(ValidatorInterface::class);
-        $validator->expects($this->never())
+        $validator->expects($this->once())
             ->method('validate');
 
         $resolver = new RequestPayloadValueResolver(new Serializer(), $validator);

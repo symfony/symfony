@@ -951,23 +951,13 @@ class Application implements ResetInterface
             $input->setInteractive(false);
         }
 
-        switch ($shellVerbosity = (int) getenv('SHELL_VERBOSITY')) {
-            case -1:
-                $output->setVerbosity(OutputInterface::VERBOSITY_QUIET);
-                break;
-            case 1:
-                $output->setVerbosity(OutputInterface::VERBOSITY_VERBOSE);
-                break;
-            case 2:
-                $output->setVerbosity(OutputInterface::VERBOSITY_VERY_VERBOSE);
-                break;
-            case 3:
-                $output->setVerbosity(OutputInterface::VERBOSITY_DEBUG);
-                break;
-            default:
-                $shellVerbosity = 0;
-                break;
-        }
+        match ($shellVerbosity = (int) getenv('SHELL_VERBOSITY')) {
+            -1 => $output->setVerbosity(OutputInterface::VERBOSITY_QUIET),
+            1 => $output->setVerbosity(OutputInterface::VERBOSITY_VERBOSE),
+            2 => $output->setVerbosity(OutputInterface::VERBOSITY_VERY_VERBOSE),
+            3 => $output->setVerbosity(OutputInterface::VERBOSITY_DEBUG),
+            default => $shellVerbosity = 0,
+        };
 
         if (true === $input->hasParameterOption(['--quiet', '-q'], true)) {
             $output->setVerbosity(OutputInterface::VERBOSITY_QUIET);

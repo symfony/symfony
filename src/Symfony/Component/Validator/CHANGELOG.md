@@ -8,6 +8,7 @@ CHANGELOG
  * Make `PasswordStrengthValidator::estimateStrength()` public
  * Add the `Yaml` constraint for validating YAML content
  * Add `errorPath` to Unique constraint
+ * Add the `format` option to the `Ulid` constraint to allow accepting different ULID formats
 
 7.1
 ---

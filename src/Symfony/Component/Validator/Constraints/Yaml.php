@@ -28,6 +28,10 @@ class Yaml extends Constraint
         self::INVALID_YAML_ERROR => 'INVALID_YAML_ERROR',
     ];
 
+    /**
+     * @param int-mask-of<\Symfony\Component\Yaml\Yaml::PARSE_*> $flags
+     * @param string[]|null                                      $groups
+     */
     #[HasNamedArguments]
     public function __construct(
         public string $message = 'This value is not valid YAML.',

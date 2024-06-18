@@ -1,0 +1,88 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2024-06-17T08:45:49Z
+
+Hey!
+
+To help keep things organized, we don't allow "Draft" pull requests. Could you please click the "ready for review" button or close this PR and open a new one when you are done?
+
+Note that a pull request does not have to be "perfect" or "ready for merge" when you first open it. We just want it to be ready for a first review.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2024-06-18T08:07:21Z
+
+As this is a new feature the PR must target the `7.2` branch.
+
+---------------------------------------------------------------------------
+
+by ndousson at 2024-06-18T08:09:49Z
+
+I updated the target branch and the MR description 👌🏻
+I'll have to rebase as I created my branch from a 7.1
+
+---------------------------------------------------------------------------
+
+by ndousson at 2024-06-18T14:24:37Z
+
+I rebased my branch on 7.2 but I don't really understand why I see commit from 7.1 🤔
+
+Do you have an idea ?
+
+Executed commands (from the doc):
+
+```
+git checkout 7.2
+git fetch upstream
+git merge upstream/7.2
+git checkout feat_mailer_infobip_tracking_headers
+git rebase 7.2
+```
+
+---------------------------------------------------------------------------
+
+by fabpot at 2024-06-18T14:30:08Z
+
+This should be enough:
+
+```shell
+git checkout feat_mailer_infobip_tracking_headers
+git fetch upstream
+git rebase upstream/7.2
+```
+
+---------------------------------------------------------------------------
+
+by ndousson at 2024-06-18T15:11:53Z
+
+> This should be enough:
+>
+> ```shell
+> git checkout feat_mailer_infobip_tracking_headers
+> git fetch upstream
+> git rebase upstream/7.2
+> ```
+
+I tested but it doesn't fix the issue.. I'll keep searching
+
+---------------------------------------------------------------------------
+
+by ndousson at 2024-06-18T15:24:19Z
+
+`git rebase -i upstream/7.2` with a manual removal of unwanted commits fixed the problem 🎉
+
+I think it was due to the fact I first created my branch from `7.1`, it just doesn't explain why the non interactive rebase didn't worked 🤷🏼
+
+An other question, could it be possible to add this behavior in the next `7.1.x` minor version instead of the `7.2` ?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2024-06-18T15:25:51Z
+
+> An other question, could it be possible to add this behavior in the next `7.1.x` minor version instead of the `7.2` ?
+
+No, all new features must be done the next version. Maintained versions only receive bug fixes.

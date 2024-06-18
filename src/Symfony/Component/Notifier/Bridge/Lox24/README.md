@@ -8,7 +8,7 @@ DSN example
 -----------
 
 ```
-LOX24_DSN=lox24://USER:TOKEN@default?from=FROM&type=SERVICE_CODE&voice_lang=VOICE_LANGUAGE&delete_text=DELETE_TEXT&callback_data=CALLBACK_DATA
+LOX24_DSN=lox24://USER:TOKEN@default?from=FROM&type=TYPE&voice_lang=VOICE_LANGUAGE&delete_text=DELETE_TEXT&callback_data=CALLBACK_DATA
 ```
 
 where:

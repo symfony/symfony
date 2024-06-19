@@ -1,0 +1,59 @@
+---------------------------------------------------------------------------
+
+by OskarStark at 2024-06-13T05:04:34Z
+
+Please target 7.2 branch for your PR as this is a new feature. thanks
+
+---------------------------------------------------------------------------
+
+by romain-jacquart at 2024-06-13T07:43:16Z
+
+> Please target 7.2 branch for your PR as this is a new feature. thanks
+
+Hello, thanks for your reply.
+
+This actually is not a new feature, since the thread key in query parameters has no effect now on the new Google Chat API. Shouldn't this qualifies as a bug and the fix be backported to 5.4?
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2024-06-13T16:19:07Z
+
+It introduces new code to handle the new threadKey . So this should go into 7.2 with the deprecation and the deprecation layer be removed in 8.0.
+
+Someone who needs this should upgrade to 7.2 then
+
+---------------------------------------------------------------------------
+
+by fabpot at 2024-06-15T08:02:16Z
+
+I agree that this should go in 7.2.
+
+---------------------------------------------------------------------------
+
+by romain-jacquart at 2024-06-17T21:23:00Z
+
+> > This PR keeps the backward compatibility regarding the threadKey declaration (in DSN) and the GoogleChatOptions::setThreadKey() method.
+>
+> I think this PR does too many things. We could just modify the HTTP request, and leave the options and methods untouched.
+
+Thanks for your time reviewing this change.
+
+I thought this was a good opportunity to update the options, but I guess this made too much noise around the actual fix.
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2024-06-18T15:10:53Z
+
+Thanks for simplifying this PR. I think we can now consider it as a bugfix to guarantee compatibility with the Google API in the future and merge in 5.4 @symfony/mergers?
+
+---------------------------------------------------------------------------
+
+by romain-jacquart at 2024-06-18T22:12:50Z
+
+> Works for me as a bug fix for 5.4. @romain-jacquart Can you remove the CHANGELOG change and rebase on 5.4?
+
+The branch has been rebased on 5.4 and CHANGELOG changes have been removed 👍.
+
+The rebase has introduced a slight change regarding a variable's name (`$options` vs `$opts`). Will it be a problem?
+
+Thanks!

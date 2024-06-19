@@ -580,8 +580,8 @@ EOF;
             $serializer = new Serializer(
                 [],
                 [new JsonEncoder()],
-                new ChainNormalizer([$mimeMessageNormalizer, $objectNormalizer, $propertyNormalizer,]),
-                new ChainDenormalizer([new ArrayDenormalizer(), $mimeMessageNormalizer, $objectNormalizer, $propertyNormalizer,])
+                new ChainNormalizer([$mimeMessageNormalizer, $objectNormalizer, $propertyNormalizer]),
+                new ChainDenormalizer([new ArrayDenormalizer(), $mimeMessageNormalizer, $objectNormalizer, $propertyNormalizer])
             );
         } else {
             $serializer = new Serializer([

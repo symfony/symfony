@@ -83,7 +83,7 @@ class Serializer implements SerializerInterface, NormalizerInterface, Denormaliz
             if ($item instanceof SerializerAwareInterface) {
                 if (!$item instanceof NormalizerAwareInterface) {
                     // We assume they have started to migrate
-                    trigger_deprecation('symfony/serializer', '7.2', 'Interface %s is deprecated, maybe you are interested to use %s instead.', SerializerAwareInterface::class, NormalizerAwareInterface::class);
+                    trigger_deprecation('symfony/serializer', '7.2', 'Interface %s is deprecated, use %s instead.', SerializerAwareInterface::class, NormalizerAwareInterface::class);
                 }
                 $item->setSerializer($this);
             }
@@ -107,7 +107,7 @@ class Serializer implements SerializerInterface, NormalizerInterface, Denormaliz
             if ($encoder instanceof SerializerAwareInterface) {
                 if (!$encoder instanceof NormalizerAwareInterface) {
                     // We assume they have started to migrate
-                    trigger_deprecation('symfony/serializer', '7.2', 'Interface %s is deprecated, maybe you are interested to use %s instead.', SerializerAwareInterface::class, NormalizerAwareInterface::class);
+                    trigger_deprecation('symfony/serializer', '7.2', 'Interface %s is deprecated, use %s instead.', SerializerAwareInterface::class, NormalizerAwareInterface::class);
                 }
                 $encoder->setSerializer($this);
             }

@@ -14,6 +14,7 @@ namespace Symfony\Component\ErrorHandler\Tests\ErrorRenderer;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\ErrorHandler\ErrorRenderer\SerializerErrorRenderer;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
+use Symfony\Component\Serializer\Normalizer\ChainNormalizer;
 use Symfony\Component\Serializer\Normalizer\ProblemNormalizer;
 use Symfony\Component\Serializer\Serializer;
 
@@ -28,9 +29,15 @@ class SerializerErrorRendererTest extends TestCase
 
     public function testSerializerContent()
     {
+        // if Symfony 7.2
+        if (class_exists(ChainNormalizer::class)) {
+            $serializer = new Serializer([], [new JsonEncoder()], new ProblemNormalizer());
+        } else {
+            $serializer = new Serializer([new ProblemNormalizer()], [new JsonEncoder()]);
+        }
         $exception = new \RuntimeException('Foo');
         $errorRenderer = new SerializerErrorRenderer(
-            new Serializer([], [new JsonEncoder()], new ProblemNormalizer()),
+            $serializer,
             fn () => 'json'
         );
 

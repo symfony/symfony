@@ -54,7 +54,7 @@ class StreamedJsonResponse extends StreamedResponse
      */
     public function __construct(
         private readonly iterable $data,
-        int $status = 200,
+        int $status = self::HTTP_OK,
         array $headers = [],
         private int $encodingOptions = JsonResponse::DEFAULT_ENCODING_OPTIONS,
     ) {

@@ -111,7 +111,7 @@ final class ChainDenormalizer implements DenormalizerInterface, SerializerAwareI
      * Returns a matching denormalizer.
      *
      * @param mixed       $data    Data to restore
-     * @param string      $class   The expected class to instantiate
+     * @param string      $class   The expected class to instantiate or type to convert to
      * @param string|null $format  Format name, present to give the option to normalizers to act differently based on formats
      * @param array       $context Options available to the denormalizer
      */

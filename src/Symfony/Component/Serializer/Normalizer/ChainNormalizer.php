@@ -26,7 +26,7 @@ use Symfony\Component\Serializer\SerializerInterface;
 final class ChainNormalizer implements NormalizerInterface, SerializerAwareInterface
 {
     /**
-     * @deprecated since Symfony 7.1
+     * @deprecated since Symfony 7.2
      */
     private ?SerializerInterface $serializer = null;
 

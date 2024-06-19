@@ -25,6 +25,7 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\Kernel;
 use Symfony\Component\Routing\Loader\Configurator\RoutingConfigurator;
 
+require_once __DIR__.'/default/src/DefaultKernel.php';
 require_once __DIR__.'/flex-style/src/FlexStyleMicroKernel.php';
 
 class MicroKernelTraitTest extends TestCase
@@ -149,6 +150,19 @@ class MicroKernelTraitTest extends TestCase
         $response = $kernel->handle($request, HttpKernelInterface::MAIN_REQUEST, false);
 
         $this->assertSame('Hello World!', $response->getContent());
+    }
+
+    public function testDefaultKernel()
+    {
+        $kernel = $this->kernel = new DefaultKernel('test', false);
+        $kernel->boot();
+
+        $this->assertTrue($kernel->getContainer()->has('foo_service'));
+
+        $request = Request::create('/');
+        $response = $kernel->handle($request, HttpKernelInterface::MAIN_REQUEST, false);
+
+        $this->assertSame('OK', $response->getContent());
     }
 }
 

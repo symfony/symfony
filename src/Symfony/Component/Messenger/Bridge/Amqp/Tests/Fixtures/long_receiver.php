@@ -23,11 +23,16 @@ use Symfony\Component\Messenger\Worker;
 use Symfony\Component\Serializer as SerializerComponent;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Normalizer\ArrayDenormalizer;
+use Symfony\Component\Serializer\Normalizer\ChainNormalizer;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 
-$serializer = new Serializer(
-    new SerializerComponent\Serializer([], ['json' => new JsonEncoder()], new ObjectNormalizer(), new SerializerComponent\Normalizer\ChainDenormalizer([new ObjectNormalizer(), new ArrayDenormalizer()]))
-);
+// if Symfony 7.2
+if (class_exists(ChainNormalizer::class)) {
+    $symfonySerializer = new SerializerComponent\Serializer([], ['json' => new JsonEncoder()], new ObjectNormalizer(), new SerializerComponent\Normalizer\ChainDenormalizer([new ObjectNormalizer(), new ArrayDenormalizer()]));
+} else {
+    $symfonySerializer = new SerializerComponent\Serializer([new ObjectNormalizer(), new ArrayDenormalizer()], ['json' => new JsonEncoder()]);
+}
+$serializer = new Serializer($symfonySerializer);
 
 $connection = Connection::fromDsn(getenv('DSN'));
 $receiver = new AmqpReceiver($connection, $serializer);

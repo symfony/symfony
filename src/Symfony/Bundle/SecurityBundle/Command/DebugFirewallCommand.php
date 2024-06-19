@@ -25,6 +25,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Security\Http\Authenticator\AuthenticatorInterface;
+use Symfony\Component\Security\Http\Authenticator\Debug\TraceableAuthenticator;
 
 /**
  * @author Timo Bakx <timobakx@gmail.com>
@@ -210,7 +211,7 @@ EOF
         $io->table(
             ['Classname'],
             array_map(
-                fn ($authenticator) => [$authenticator::class],
+                fn ($authenticator) => [($authenticator instanceof TraceableAuthenticator ? $authenticator->getAuthenticator() : $authenticator)::class],
                 $authenticators
             )
         );

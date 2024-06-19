@@ -30,6 +30,7 @@ use Symfony\Component\VarDumper\Caster\ClassStub;
  */
 final class TraceableAuthenticator implements AuthenticatorInterface, InteractiveAuthenticatorInterface, AuthenticationEntryPointInterface
 {
+    private ?bool $supports = false;
     private ?Passport $passport = null;
     private ?float $duration = null;
     private ClassStub|string $stub;
@@ -42,7 +43,7 @@ final class TraceableAuthenticator implements AuthenticatorInterface, Interactiv
     public function getInfo(): array
     {
         return [
-            'supports' => true,
+            'supports' => $this->supports,
             'passport' => $this->passport,
             'duration' => $this->duration,
             'stub' => $this->stub ??= class_exists(ClassStub::class) ? new ClassStub($this->authenticator::class) : $this->authenticator::class,
@@ -61,14 +62,17 @@ final class TraceableAuthenticator implements AuthenticatorInterface, Interactiv
 
     public function supports(Request $request): ?bool
     {
-        return $this->authenticator->supports($request);
+        return $this->supports = $this->authenticator->supports($request);
     }
 
     public function authenticate(Request $request): Passport
     {
         $startTime = microtime(true);
-        $this->passport = $this->authenticator->authenticate($request);
-        $this->duration = microtime(true) - $startTime;
+        try {
+            $this->passport = $this->authenticator->authenticate($request);
+        } finally {
+            $this->duration = microtime(true) - $startTime;
+        }
 
         return $this->passport;
     }

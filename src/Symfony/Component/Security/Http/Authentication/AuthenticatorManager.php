@@ -108,12 +108,12 @@ class AuthenticatorManager implements AuthenticatorManagerInterface, UserAuthent
             }
         }
 
+        $request->attributes->set('_security_skipped_authenticators', $skippedAuthenticators);
+        $request->attributes->set('_security_authenticators', $authenticators);
+
         if (!$authenticators) {
             return false;
         }
-
-        $request->attributes->set('_security_authenticators', $authenticators);
-        $request->attributes->set('_security_skipped_authenticators', $skippedAuthenticators);
 
         return $lazy ? null : true;
     }

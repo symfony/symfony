@@ -572,21 +572,25 @@ EOF;
 
         $extractor = new PhpDocExtractor();
         $propertyNormalizer = new PropertyNormalizer(null, null, $extractor);
-        $serializer = new Serializer(
-            [],
-            [new JsonEncoder()],
-            new ChainNormalizer([
-                new MimeMessageNormalizer($propertyNormalizer),
-                new ObjectNormalizer(null, null, null, $extractor),
-                $propertyNormalizer,
-            ]),
-            new ChainDenormalizer([
+        $mimeMessageNormalizer = new MimeMessageNormalizer($propertyNormalizer);
+        $objectNormalizer = new ObjectNormalizer(null, null, null, $extractor);
+
+        // if Symfony 7.2
+        if (class_exists(ChainNormalizer::class)) {
+            $serializer = new Serializer(
+                [],
+                [new JsonEncoder()],
+                new ChainNormalizer([$mimeMessageNormalizer, $objectNormalizer, $propertyNormalizer,]),
+                new ChainDenormalizer([new ArrayDenormalizer(), $mimeMessageNormalizer, $objectNormalizer, $propertyNormalizer,])
+            );
+        } else {
+            $serializer = new Serializer([
                 new ArrayDenormalizer(),
-                new MimeMessageNormalizer($propertyNormalizer),
-                new ObjectNormalizer(null, null, null, $extractor),
+                $mimeMessageNormalizer,
+                $objectNormalizer,
                 $propertyNormalizer,
-            ])
-        );
+            ], [new JsonEncoder()]);
+        }
 
         $serialized = $serializer->serialize($e, 'json', [ObjectNormalizer::IGNORED_ATTRIBUTES => ['cachedBody']]);
         $this->assertSame($expectedJson, json_encode(json_decode($serialized), \JSON_PRETTY_PRINT | \JSON_UNESCAPED_SLASHES));

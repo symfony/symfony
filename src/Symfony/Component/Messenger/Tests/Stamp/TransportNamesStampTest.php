@@ -38,16 +38,23 @@ class TransportNamesStampTest extends TestCase
 
     public function testDeserialization()
     {
-        $stamp = new TransportNamesStamp(['foo']);
-        $serializer = new Serializer(
-            new SymfonySerializer(
+        // if Symfony 7.2
+        if (class_exists(ChainNormalizer::class)) {
+            $symfonySerializer = new SymfonySerializer(
                 [],
                 [new JsonEncoder()],
                 new ChainNormalizer([new ObjectNormalizer()]),
                 new ChainDenormalizer([new ArrayDenormalizer(), new ObjectNormalizer()]),
-            )
-        );
+            );
+        } else {
+            $symfonySerializer = new SymfonySerializer(
+                [new ArrayDenormalizer(), new ObjectNormalizer()],
+                [new JsonEncoder()]
+            );
+        }
 
+        $stamp = new TransportNamesStamp(['foo']);
+        $serializer = new Serializer($symfonySerializer);
         $deserializedEnvelope = $serializer->decode($serializer->encode(new Envelope(new \stdClass(), [$stamp])));
 
         $deserializedStamp = $deserializedEnvelope->last(TransportNamesStamp::class);

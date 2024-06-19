@@ -58,14 +58,24 @@ class ErrorDetailsStampTest extends TestCase
     {
         $exception = new \Exception('exception message');
         $stamp = ErrorDetailsStamp::create($exception);
-        $serializer = new Serializer(
-            new SymfonySerializer(
+
+        // if Symfony 7.2
+        if (class_exists(ChainNormalizer::class)) {
+            $symfonySerializer = new SymfonySerializer(
                 [],
                 [new JsonEncoder()],
                 new ChainNormalizer([new FlattenExceptionNormalizer(), new ObjectNormalizer()]),
                 new ChainDenormalizer([new ArrayDenormalizer(), new FlattenExceptionNormalizer(), new ObjectNormalizer()])
-            )
-        );
+            );
+        } else {
+            $symfonySerializer = new SymfonySerializer([
+                new ArrayDenormalizer(),
+                new FlattenExceptionNormalizer(),
+                new ObjectNormalizer(),
+            ], [new JsonEncoder()]);
+        }
+
+        $serializer = new Serializer($symfonySerializer);
 
         $deserializedEnvelope = $serializer->decode($serializer->encode(new Envelope(new \stdClass(), [$stamp])));
 

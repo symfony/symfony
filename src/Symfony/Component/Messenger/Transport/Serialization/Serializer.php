@@ -55,9 +55,15 @@ class Serializer implements SerializerInterface
         }
 
         $encoders = [new XmlEncoder(), new JsonEncoder()];
-        $normalizers = [new DateTimeNormalizer(), new ObjectNormalizer()];
-        $denormalizers = [new DateTimeNormalizer(), new ArrayDenormalizer(), new ObjectNormalizer()];
-        $serializer = new SymfonySerializer([], $encoders, new ChainNormalizer($normalizers), new ChainDenormalizer($denormalizers));
+        // if Symfony 7.2
+        if (class_exists(ChainNormalizer::class)) {
+            $normalizers = [new DateTimeNormalizer(), new ObjectNormalizer()];
+            $denormalizers = [new DateTimeNormalizer(), new ArrayDenormalizer(), new ObjectNormalizer()];
+            $serializer = new SymfonySerializer([], $encoders, new ChainNormalizer($normalizers), new ChainDenormalizer($denormalizers));
+        } else {
+            $normalizers = [new DateTimeNormalizer(), new ArrayDenormalizer(), new ObjectNormalizer()];
+            $serializer = new SymfonySerializer($normalizers, $encoders);
+        }
 
         return new self($serializer);
     }

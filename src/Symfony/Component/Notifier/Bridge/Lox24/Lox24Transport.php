@@ -101,7 +101,7 @@ final class Lox24Transport extends AbstractTransport
                 'Content-Type' => 'application/json',
                 'User-Agent' => 'LOX24 Symfony Notifier',
             ],
-            'body' => $body,
+            'json' => $body,
         ]);
 
         try {

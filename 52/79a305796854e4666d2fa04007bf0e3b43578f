@@ -1,0 +1,91 @@
+---------------------------------------------------------------------------
+
+by yceruto at 2024-06-17T12:46:36Z
+
+Wondering if we could also go with a `SingleAppKernel` class like this:
+
+```php
+abstract class SingleAppKernel extends Kernel
+{
+    use MicroKernelTrait;
+
+    return static function init(): \Closure
+    {
+        return static function (array $context) {
+            return new static($context['APP_ENV'], (bool) $context['APP_DEBUG']);
+        };
+    }
+
+    public function registerBundles(): iterable
+    {
+        yield new FrameworkBundle();
+    }
+}
+```
+and then reduce this use case to:
+```php
+final class App extends SingleAppKernel
+{
+    #[Route('/')]
+    public function __invoke(): Response
+    {
+        return new Response('Hello World!');
+    }
+}
+
+return App::init();
+```
+?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-06-17T13:17:46Z
+
+Not convinced by SingleAppKernel. Could be OK to provide a fallback for registerBundles.
+
+---------------------------------------------------------------------------
+
+by wouterj at 2024-06-17T13:26:11Z
+
+What is the use-case for defining an invokable controller in the kernel? This is a convention for action controllers with a class per controller, I don't think we should apply that convention to other classes. Replacing `__invoke` with `index` or `controller` or whatever is already fully supported.
+
+I'm also not sure about the `SingleAppKernel` class. To me, the simple micro kernel is a nice gimmick but has a very limited use-case (it requires *more* work to create and maintain an application using this than it is to use a normal Symfony app). For this specific niche, the existing (with the fix for optional `config/` directory) solution seems more than good enough to me.
+
+---------------------------------------------------------------------------
+
+by yceruto at 2024-06-17T13:38:24Z
+
+@wouterj, the `__invoke` method is already supported. I'm working on a Cloud worker app that only requires one controller and it's nice because the class name already provides the semantics that I need for this small piece of code. The only thing missing was enabling the service arguments capability (which is being added here).
+
+---------------------------------------------------------------------------
+
+by yceruto at 2024-06-17T15:23:32Z
+
+Well, I'm really happy with how small it is now, even though we still have to set up the closure function ourselves:
+```php
+return static function (array $context) {
+    $kernel = new StripeWebhookEventSubscriber($context['APP_ENV'], (bool) $context['APP_DEBUG']);
+
+    return \in_array(\PHP_SAPI, ['cli', 'phpdbg', 'embed'], true) ? new Application($kernel) : $kernel;
+};
+```
+Any idea to simplify it more? In a nutshell, I'd love to just initialize my kernel/app and run. Random proposals:
+```php
+return fn () => StripeWebhookEventSubscriber::class; // and then the Runtime does the rest new $kernelClass(...)
+
+return StripeWebhookEventSubscriber::init(); // implement a default in `MicroKernelTrait`
+
+return new StripeWebhookEventSubscriber(); // and set up the env and debug vars using setter through the Runtime?
+```
+
+---------------------------------------------------------------------------
+
+by yceruto at 2024-06-17T15:24:08Z
+
+I've updated the PR description to include my use case as code example
+
+---------------------------------------------------------------------------
+
+by yceruto at 2024-06-18T14:01:46Z
+
+It's ready on my side. Thank you all for your reviews!

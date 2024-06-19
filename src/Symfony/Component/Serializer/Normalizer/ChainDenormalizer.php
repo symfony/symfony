@@ -33,7 +33,7 @@ final class ChainDenormalizer implements DenormalizerInterface, SerializerAwareI
     ];
 
     /**
-     * @deprecated since Symfony 7.1
+     * @deprecated since Symfony 7.2
      */
     private ?SerializerInterface $serializer = null;
 

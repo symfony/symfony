@@ -69,21 +69,21 @@ class Serializer implements SerializerInterface, NormalizerInterface, Denormaliz
         ?DenormalizerInterface $denormalizer = null,
     ) {
         if ([] !== $normalizers && (null !== $normalizer || null !== $denormalizer)) {
-            throw new InvalidArgumentException('You cannot use an array of $normalizers with a $normalizer/$denormalizer.');
+            throw new InvalidArgumentException('You cannot use an array of $normalizers with a $normalizer/$denormalizer. Please use the $normalizer/$denormalizer arguments only instead.');
         }
 
         $this->normalizer = $normalizer ?? new ChainNormalizer();
         $this->denormalizer = $denormalizer ?? new ChainDenormalizer();
 
         if ([] !== $normalizers) {
-            trigger_deprecation('symfony/serializer', '7.1', 'Passing normalizers as first argument to "%s" is deprecated, use a chain normalizer/denormalizer instead.', __METHOD__);
+            trigger_deprecation('symfony/serializer', '7.2', 'Passing normalizers as first argument to "%s" is deprecated, use a chain normalizer/denormalizer instead.', __METHOD__);
         }
 
         foreach ($normalizers as $item) {
             if ($item instanceof SerializerAwareInterface) {
                 if (!$item instanceof NormalizerAwareInterface) {
                     // We assume they have started to migrate
-                    trigger_deprecation('symfony/serializer', '7.1', 'Interface %s is deprecated, maybe you are interested to use %s instead.', SerializerAwareInterface::class, NormalizerAwareInterface::class);
+                    trigger_deprecation('symfony/serializer', '7.2', 'Interface %s is deprecated, maybe you are interested to use %s instead.', SerializerAwareInterface::class, NormalizerAwareInterface::class);
                 }
                 $item->setSerializer($this);
             }
@@ -107,7 +107,7 @@ class Serializer implements SerializerInterface, NormalizerInterface, Denormaliz
             if ($encoder instanceof SerializerAwareInterface) {
                 if (!$encoder instanceof NormalizerAwareInterface) {
                     // We assume they have started to migrate
-                    trigger_deprecation('symfony/serializer', '7.1', 'Interface %s is deprecated, maybe you are interested to use %s instead.', SerializerAwareInterface::class, NormalizerAwareInterface::class);
+                    trigger_deprecation('symfony/serializer', '7.2', 'Interface %s is deprecated, maybe you are interested to use %s instead.', SerializerAwareInterface::class, NormalizerAwareInterface::class);
                 }
                 $encoder->setSerializer($this);
             }

@@ -107,23 +107,33 @@ EOF;
 
         $extractor = new PhpDocExtractor();
         $propertyNormalizer = new PropertyNormalizer(null, null, $extractor);
-        $normalizers = [
-            new MimeMessageNormalizer($propertyNormalizer),
-            new ObjectNormalizer(null, null, null, $extractor),
-            $propertyNormalizer,
-        ];
-        $denormalizers = [
-            new ArrayDenormalizer(),
-            new MimeMessageNormalizer($propertyNormalizer),
-            new ObjectNormalizer(null, null, null, $extractor),
-            $propertyNormalizer,
-        ];
-        $serializer = new Serializer(
-            [],
-            [new JsonEncoder()],
-            new ChainNormalizer($normalizers),
-            new ChainDenormalizer($denormalizers),
-        );
+        // if Symfony 7.2
+        if (class_exists(ChainNormalizer::class)) {
+            $normalizers = [
+                new MimeMessageNormalizer($propertyNormalizer),
+                new ObjectNormalizer(null, null, null, $extractor),
+                $propertyNormalizer,
+            ];
+            $denormalizers = [
+                new ArrayDenormalizer(),
+                new MimeMessageNormalizer($propertyNormalizer),
+                new ObjectNormalizer(null, null, null, $extractor),
+                $propertyNormalizer,
+            ];
+            $serializer = new Serializer(
+                [],
+                [new JsonEncoder()],
+                new ChainNormalizer($normalizers),
+                new ChainDenormalizer($denormalizers),
+            );
+        } else {
+            $serializer = new Serializer([
+                new ArrayDenormalizer(),
+                new MimeMessageNormalizer($propertyNormalizer),
+                new ObjectNormalizer(null, null, null, $extractor),
+                $propertyNormalizer,
+            ], [new JsonEncoder()]);
+        }
 
         $serialized = $serializer->serialize($e, 'json', [ObjectNormalizer::IGNORED_ATTRIBUTES => ['cachedBody']]);
         $this->assertStringMatchesFormat($expectedJson, json_encode(json_decode($serialized), \JSON_PRETTY_PRINT | \JSON_UNESCAPED_SLASHES));

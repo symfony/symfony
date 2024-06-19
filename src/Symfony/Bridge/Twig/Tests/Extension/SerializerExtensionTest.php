@@ -19,6 +19,7 @@ use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Encoder\YamlEncoder;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactory;
 use Symfony\Component\Serializer\Mapping\Loader\AttributeLoader;
+use Symfony\Component\Serializer\Normalizer\ChainNormalizer;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\Serializer\Serializer;
 use Twig\Environment;
@@ -50,7 +51,14 @@ class SerializerExtensionTest extends TestCase
     private function getTwig(string $template): Environment
     {
         $meta = new ClassMetadataFactory(new AttributeLoader());
-        $runtime = new SerializerRuntime(new Serializer([], [new JsonEncoder(), new YamlEncoder()], new ObjectNormalizer($meta), new ObjectNormalizer($meta)));
+
+        // if Symfony 7.2
+        if (class_exists(ChainNormalizer::class)) {
+            $serializer = new Serializer([], [new JsonEncoder(), new YamlEncoder()], new ObjectNormalizer($meta), new ObjectNormalizer($meta));
+        } else {
+            $serializer = new Serializer([new ObjectNormalizer($meta)], [new JsonEncoder(), new YamlEncoder()]);
+        }
+        $runtime = new SerializerRuntime($serializer);
 
         $mockRuntimeLoader = $this->createMock(RuntimeLoaderInterface::class);
         $mockRuntimeLoader

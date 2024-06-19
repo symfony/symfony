@@ -13,7 +13,6 @@ namespace Symfony\Bundle\FrameworkBundle\Tests\Kernel;
 
 use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
-use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
 use Symfony\Bundle\FrameworkBundle\Kernel\MicroKernelTrait;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
@@ -140,6 +139,17 @@ class MicroKernelTraitTest extends TestCase
 
         $this->assertSame('Hello World!', $response->getContent());
     }
+
+    public function testSimpleKernel()
+    {
+        $kernel = $this->kernel = new SimpleKernel('simple_kernel');
+        $kernel->boot();
+
+        $request = Request::create('/');
+        $response = $kernel->handle($request, HttpKernelInterface::MAIN_REQUEST, false);
+
+        $this->assertSame('Hello World!', $response->getContent());
+    }
 }
 
 abstract class MinimalKernel extends Kernel
@@ -153,11 +163,6 @@ abstract class MinimalKernel extends Kernel
         parent::__construct('test', false);
 
         $this->cacheDir = sys_get_temp_dir().'/'.$cacheDir;
-    }
-
-    public function registerBundles(): iterable
-    {
-        yield new FrameworkBundle();
     }
 
     public function getCacheDir(): string

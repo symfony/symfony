@@ -9,8 +9,9 @@
  * file that was distributed with this source code.
  */
 
-use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\HttpClient\MockHttpClient;
+use Symfony\Component\HttpClient\Response\JsonMockResponse;
+use Symfony\Component\HttpClient\Response\MockResponse;
 use Symfony\Component\Notifier\Bridge\Lox24\Lox24Options;
 use Symfony\Component\Notifier\Bridge\Lox24\Lox24Transport;
 use Symfony\Component\Notifier\Bridge\Lox24\Type;
@@ -25,7 +26,6 @@ use Symfony\Component\Notifier\Message\PushMessage;
 use Symfony\Component\Notifier\Message\SmsMessage;
 use Symfony\Component\Notifier\Test\TransportTestCase;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
-use Symfony\Contracts\HttpClient\ResponseInterface;
 
 /**
  * @author Andrei Lebedev <andrew.lebedev@gmail.com>
@@ -47,13 +47,6 @@ class Lox24TransportTest extends TransportTestCase
         'delivery_at' => 0,
         'service_code' => 'direct',
     ];
-
-    private MockObject|HttpClientInterface $client;
-
-    protected function setUp(): void
-    {
-        $this->client = $this->createMock(HttpClientInterface::class);
-    }
 
     public static function createTransport(?HttpClientInterface $client = null): Lox24Transport
     {
@@ -102,7 +95,7 @@ class Lox24TransportTest extends TransportTestCase
 
     public function testMessageFromNotEmpty()
     {
-        $this->assertRequestBody([
+        $client = $this->mockHttpClient([
             'sender_id' => 'testFrom2',
             'phone' => '+1411111111',
             'text' => 'test text',
@@ -110,14 +103,15 @@ class Lox24TransportTest extends TransportTestCase
             'delivery_at' => 0,
             'service_code' => 'direct',
         ], [], 201, ['uuid' => '123456']);
-        $transport = new Lox24Transport('user', 'token', 'testFrom', [], $this->client);
+
+        $transport = new Lox24Transport('user', 'token', 'testFrom', [], $client);
         $message = new SmsMessage('+1411111111', 'test text', 'testFrom2');
         $transport->send($message);
     }
 
     public function testMessageFromEmpty()
     {
-        $this->assertRequestBody([
+        $client = $this->mockHttpClient([
             'sender_id' => 'testFrom',
             'phone' => '+1411111111',
             'text' => 'test text',
@@ -125,7 +119,7 @@ class Lox24TransportTest extends TransportTestCase
             'delivery_at' => 0,
             'service_code' => 'direct',
         ], [], 201, ['uuid' => '123456']);
-        $transport = new Lox24Transport('user', 'token', 'testFrom', [], $this->client);
+        $transport = new Lox24Transport('user', 'token', 'testFrom', [], $client);
         $message = new SmsMessage('+1411111111', 'test text');
         $transport->send($message);
     }
@@ -143,7 +137,7 @@ class Lox24TransportTest extends TransportTestCase
 
     public function testOptionIsTextDeleted()
     {
-        $this->assertRequestBody([
+        $client = $this->mockHttpClient([
             'sender_id' => 'testFrom',
             'phone' => '+1411111111',
             'text' => 'test text',
@@ -151,7 +145,7 @@ class Lox24TransportTest extends TransportTestCase
             'delivery_at' => 0,
             'service_code' => 'direct',
         ], [], 201, ['uuid' => '123456']);
-        $transport = new Lox24Transport('user', 'token', 'testFrom', [], $this->client);
+        $transport = new Lox24Transport('user', 'token', 'testFrom', [], $client);
 
         $options = (new Lox24Options())->deleteTextAfterSending(true);
         $message = new SmsMessage('+1411111111', 'test text');
@@ -162,7 +156,7 @@ class Lox24TransportTest extends TransportTestCase
 
     public function testOptionDeliveryAtGreaterThanZero()
     {
-        $this->assertRequestBody([
+        $client = $this->mockHttpClient([
             'sender_id' => 'testFrom',
             'phone' => '+1411111111',
             'text' => 'test text',
@@ -170,7 +164,7 @@ class Lox24TransportTest extends TransportTestCase
             'delivery_at' => 1000000000,
             'service_code' => 'direct',
         ], [], 201, ['uuid' => '123456']);
-        $transport = new Lox24Transport('user', 'token', 'testFrom', [], $this->client);
+        $transport = new Lox24Transport('user', 'token', 'testFrom', [], $client);
 
         $options = (new Lox24Options())->deliveryAt((new DateTimeImmutable())->setTimestamp(1000000000));
         $message = new SmsMessage('+1411111111', 'test text');
@@ -181,7 +175,7 @@ class Lox24TransportTest extends TransportTestCase
 
     public function testOptionVoiceLanguageSpanish()
     {
-        $this->assertRequestBody([
+        $client = $this->mockHttpClient([
             'sender_id' => 'testFrom',
             'phone' => '+1411111111',
             'text' => 'test text',
@@ -190,7 +184,7 @@ class Lox24TransportTest extends TransportTestCase
             'service_code' => 'text2speech',
             'voice_lang' => 'ES',
         ], [], 201, ['uuid' => '123456']);
-        $transport = new Lox24Transport('user', 'token', 'testFrom', [], $this->client);
+        $transport = new Lox24Transport('user', 'token', 'testFrom', [], $client);
 
         $options = (new Lox24Options())
             ->voiceLanguage(VoiceLanguage::Spanish)
@@ -203,7 +197,7 @@ class Lox24TransportTest extends TransportTestCase
 
     public function testOptionVoiceLanguageAuto()
     {
-        $this->assertRequestBody([
+        $client = $this->mockHttpClient([
             'sender_id' => 'testFrom',
             'phone' => '+1411111111',
             'text' => 'test text',
@@ -211,7 +205,7 @@ class Lox24TransportTest extends TransportTestCase
             'delivery_at' => 0,
             'service_code' => 'text2speech',
         ], [], 201, ['uuid' => '123456']);
-        $transport = new Lox24Transport('user', 'token', 'testFrom', [], $this->client);
+        $transport = new Lox24Transport('user', 'token', 'testFrom', [], $client);
 
         $options = (new Lox24Options())
             ->voiceLanguage(VoiceLanguage::Auto)
@@ -224,7 +218,7 @@ class Lox24TransportTest extends TransportTestCase
 
     public function testOptionType()
     {
-        $this->assertRequestBody([
+        $client = $this->mockHttpClient([
             'sender_id' => 'testFrom',
             'phone' => '+1411111111',
             'text' => 'test text',
@@ -233,7 +227,7 @@ class Lox24TransportTest extends TransportTestCase
             'service_code' => 'direct',
         ], [], 201, ['uuid' => '123456']);
 
-        $transport = new Lox24Transport('user', 'token', 'testFrom', ['type' => 'voice'], $this->client);
+        $transport = new Lox24Transport('user', 'token', 'testFrom', ['type' => 'voice'], $client);
 
         $options = (new Lox24Options())->type(Type::Sms);
         $message = new SmsMessage('+1411111111', 'test text');
@@ -244,7 +238,7 @@ class Lox24TransportTest extends TransportTestCase
 
     public function testOptionCallbackData()
     {
-        $this->assertRequestBody([
+        $client = $this->mockHttpClient([
             'sender_id' => 'testFrom',
             'phone' => '+1411111111',
             'text' => 'test text',
@@ -254,7 +248,7 @@ class Lox24TransportTest extends TransportTestCase
             'callback_data' => 'callback_data',
         ], [], 201, ['uuid' => '123456']);
 
-        $transport = new Lox24Transport('user', 'token', 'testFrom', ['type' => 'voice'], $this->client);
+        $transport = new Lox24Transport('user', 'token', 'testFrom', ['type' => 'voice'], $client);
 
         $options = (new Lox24Options())->callbackData('callback_data');
         $message = new SmsMessage('+1411111111', 'test text');
@@ -270,7 +264,7 @@ class Lox24TransportTest extends TransportTestCase
             'Unable to send the SMS: "service_code: Service\'s code is invalid or unavailable.".'
         );
 
-        $this->assertRequestBody([
+        $client = $this->mockHttpClient([
             'sender_id' => 'testFrom',
             'phone' => '+1411111111',
             'text' => 'test text',
@@ -294,28 +288,56 @@ class Lox24TransportTest extends TransportTestCase
             ],
         );
 
-        $transport = new Lox24Transport('user', 'token', 'testFrom', [], $this->client);
+        $transport = new Lox24Transport('user', 'token', 'testFrom', [], $client);
 
         $message = new SmsMessage('+1411111111', 'test text');
         $transport->send($message);
     }
 
-    private function assertRequestBody(
+    public function mockHttpClient(
         array $bodyOverride = [],
         array $headersOverride = [],
         int $responseStatus = 200,
         array $responseContent = [],
-    ): void {
-        $body = array_merge(self::REQUEST_BODY, $bodyOverride);
+    ): MockHttpClient {
+        $body = json_encode(array_merge(self::REQUEST_BODY, $bodyOverride));
         $headers = array_merge(self::REQUEST_HEADERS, $headersOverride);
-        $response = $this->createMock(ResponseInterface::class);
-        $response->expects($this->once())->method('getStatusCode')->willReturn($responseStatus);
-        $response->expects($this->once())->method('toArray')->willReturn($responseContent);
-        $this->client->expects($this->once())
-                     ->method('request')
-                     ->with('POST', 'https://api.lox24.eu/sms', [
-                         'body' => $body,
-                         'headers' => $headers,
-                     ])->willReturn($response);
+
+        $factory = function ($method, $url, $options) use (
+            $body,
+            $headers,
+            $responseStatus,
+            $responseContent
+        ): MockResponse {
+            $this->assertSame('POST', $method);
+            $this->assertSame('https://api.lox24.eu/sms', $url);
+            $this->assertHeaders($headers, $options['headers']);
+            $this->assertJsonStringEqualsJsonString($body, $options['body']);
+
+            return new JsonMockResponse($responseContent, [
+                'http_code' => $responseStatus,
+                'headers' => ['content-type' => 'application/json'],
+            ]);
+        };
+
+        return new MockHttpClient($factory);
+    }
+
+    private function assertHeaders(array $expected, array $headers): void
+    {
+        foreach ($this->normalizeHeaders($expected) as $expectedHeader) {
+            $headerExists = in_array($expectedHeader, $headers, true);
+            $this->assertTrue($headerExists, "Header '$expectedHeader' not found in request's headers");
+        }
+    }
+
+    private function normalizeHeaders(array $headers): array
+    {
+        $normalized = [];
+        foreach ($headers as $key => $value) {
+            $normalized[] = $key.': '.$value;
+        }
+
+        return $normalized;
     }
 }

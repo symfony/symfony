@@ -27,7 +27,6 @@ return static function (ContainerConfigurator $container) {
 
     $chatterFactories = [
         'bluesky' => Bridge\Bluesky\BlueskyTransportFactory::class,
-        'brevo' => Bridge\Brevo\BrevoTransportFactory::class,
         'chatwork' => Bridge\Chatwork\ChatworkTransportFactory::class,
         'discord' => Bridge\Discord\DiscordTransportFactory::class,
         'fake-chat' => Bridge\FakeChat\FakeChatTransportFactory::class,
@@ -59,6 +58,7 @@ return static function (ContainerConfigurator $container) {
     $texterFactories = [
         'all-my-sms' => Bridge\AllMySms\AllMySmsTransportFactory::class,
         'bandwidth' => Bridge\Bandwidth\BandwidthTransportFactory::class,
+        'brevo' => Bridge\Brevo\BrevoTransportFactory::class,
         'click-send' => Bridge\ClickSend\ClickSendTransportFactory::class,
         'clickatell' => Bridge\Clickatell\ClickatellTransportFactory::class,
         'contact-everyone' => Bridge\ContactEveryone\ContactEveryoneTransportFactory::class,

@@ -8,6 +8,7 @@ CHANGELOG
  * Deprecate `CouchbaseBucketAdapter`, use `CouchbaseCollectionAdapter`
  * Add support for URL encoded characters in Couchbase DSN
  * Add support for using DSN with PDOAdapter
+ * The algorithm for the default cache namespace changed from SHA256 to XXH128
 
 7.0
 ---

@@ -45,6 +45,7 @@ Cache
 -----
 
  * Deprecate `CouchbaseBucketAdapter`, use `CouchbaseCollectionAdapter` with Couchbase 3 instead
+ * The algorithm for the default cache namespace changed from SHA256 to XXH128
 
 DependencyInjection
 -------------------

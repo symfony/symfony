@@ -44,7 +44,7 @@ class FormLoginAuthenticatorTest extends TestCase
 
     public function testHandleWhenUsernameEmpty()
     {
-        $this->expectException(BadRequestHttpException::class);
+        $this->expectException(BadCredentialsException::class);
         $this->expectExceptionMessage('The key "_username" must be a non-empty string.');
 
         $request = Request::create('/login_check', 'POST', ['_username' => '', '_password' => 's$cr$t']);
@@ -56,7 +56,7 @@ class FormLoginAuthenticatorTest extends TestCase
 
     public function testHandleWhenPasswordEmpty()
     {
-        $this->expectException(BadRequestHttpException::class);
+        $this->expectException(BadCredentialsException::class);
         $this->expectExceptionMessage('The key "_password" must be a non-empty string.');
 
         $request = Request::create('/login_check', 'POST', ['_username' => 'foo', '_password' => '']);

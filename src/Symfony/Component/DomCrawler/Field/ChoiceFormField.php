@@ -143,14 +143,14 @@ class ChoiceFormField extends FormField
      */
     public function addChoice(\DOMElement $node): void
     {
-        if (!$this->multiple && 'radio' !== $this->type) {
+        if (!$this->multiple && ('radio' !== $this->type && 'select' !== $this->type)) {
             throw new \LogicException(sprintf('Unable to add a choice for "%s" as it is not multiple or is not a radio button.', $this->name));
         }
 
         $option = $this->buildOptionValue($node);
         $this->options[] = $option;
 
-        if ($node->hasAttribute('checked')) {
+        if ($node->hasAttribute('checked') || $node->hasAttribute('selected')) {
             $this->value = $option['value'];
         }
     }

@@ -1,6 +1,10 @@
 CHANGELOG
 =========
 
+7.2
+---
+* Add support for union collection value types in `ArrayDenormalizer`
+
 7.1
 ---
 

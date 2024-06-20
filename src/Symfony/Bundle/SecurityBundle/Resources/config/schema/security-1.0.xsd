@@ -230,6 +230,7 @@
         <xsd:attribute name="check-path" type="xsd:string" />
         <xsd:attribute name="use-forward" type="xsd:boolean" />
         <xsd:attribute name="require-previous-session" type="xsd:boolean" />
+        <xsd:attribute name="provider" type="xsd:string" />
     </xsd:complexType>
 
     <xsd:attributeGroup name="success-handler-options">

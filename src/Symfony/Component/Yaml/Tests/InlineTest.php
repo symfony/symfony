@@ -31,7 +31,7 @@ class InlineTest extends TestCase
      */
     public function testParse(string $yaml, $value, $flags = 0)
     {
-        $this->assertSame($value, Inline::parse($yaml, $flags), sprintf('::parse() converts an inline YAML to a PHP structure (%s)', $yaml));
+        $this->assertSame($value, Inline::parse($yaml, $flags), \sprintf('::parse() converts an inline YAML to a PHP structure (%s)', $yaml));
     }
 
     /**
@@ -124,7 +124,7 @@ class InlineTest extends TestCase
      */
     public function testDump($yaml, $value, $parseFlags = 0)
     {
-        $this->assertEquals($yaml, Inline::dump($value), sprintf('::dump() converts a PHP structure to an inline YAML (%s)', $yaml));
+        $this->assertEquals($yaml, Inline::dump($value), \sprintf('::dump() converts a PHP structure to an inline YAML (%s)', $yaml));
 
         $this->assertSame($value, Inline::parse(Inline::dump($value), $parseFlags), 'check consistency');
     }
@@ -277,9 +277,9 @@ class InlineTest extends TestCase
     public function testParseUnquotedScalarStartingWithReservedIndicator($indicator)
     {
         $this->expectException(ParseException::class);
-        $this->expectExceptionMessage(sprintf('cannot start a plain scalar; you need to quote the scalar at line 1 (near "%sfoo").', $indicator));
+        $this->expectExceptionMessage(\sprintf('cannot start a plain scalar; you need to quote the scalar at line 1 (near "%sfoo").', $indicator));
 
-        Inline::parse(sprintf('{ foo: %sfoo }', $indicator));
+        Inline::parse(\sprintf('{ foo: %sfoo }', $indicator));
     }
 
     public static function getReservedIndicators()
@@ -293,9 +293,9 @@ class InlineTest extends TestCase
     public function testParseUnquotedScalarStartingWithScalarIndicator($indicator)
     {
         $this->expectException(ParseException::class);
-        $this->expectExceptionMessage(sprintf('cannot start a plain scalar; you need to quote the scalar at line 1 (near "%sfoo").', $indicator));
+        $this->expectExceptionMessage(\sprintf('cannot start a plain scalar; you need to quote the scalar at line 1 (near "%sfoo").', $indicator));
 
-        Inline::parse(sprintf('{ foo: %sfoo }', $indicator));
+        Inline::parse(\sprintf('{ foo: %sfoo }', $indicator));
     }
 
     public static function getScalarIndicators()

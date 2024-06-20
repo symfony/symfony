@@ -60,7 +60,7 @@ class RoutableMessageBus implements MessageBusInterface
     public function getMessageBus(string $busName): MessageBusInterface
     {
         if (!$this->busLocator->has($busName)) {
-            throw new InvalidArgumentException(sprintf('Bus named "%s" does not exist.', $busName));
+            throw new InvalidArgumentException(\sprintf('Bus named "%s" does not exist.', $busName));
         }
 
         return $this->busLocator->get($busName);

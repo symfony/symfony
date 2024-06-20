@@ -69,26 +69,26 @@ EOT
         $this->compiledConfigReader->removeConfig(ImportMapGenerator::IMPORT_MAP_CACHE_FILENAME);
         $entrypointFiles = [];
         foreach ($this->importMapGenerator->getEntrypointNames() as $entrypointName) {
-            $path = sprintf(ImportMapGenerator::ENTRYPOINT_CACHE_FILENAME_PATTERN, $entrypointName);
+            $path = \sprintf(ImportMapGenerator::ENTRYPOINT_CACHE_FILENAME_PATTERN, $entrypointName);
             $this->compiledConfigReader->removeConfig($path);
             $entrypointFiles[$entrypointName] = $path;
         }
 
         $manifest = $this->createManifestAndWriteFiles($io);
         $manifestPath = $this->compiledConfigReader->saveConfig(AssetMapper::MANIFEST_FILE_NAME, $manifest);
-        $io->comment(sprintf('Manifest written to <info>%s</info>', $this->shortenPath($manifestPath)));
+        $io->comment(\sprintf('Manifest written to <info>%s</info>', $this->shortenPath($manifestPath)));
 
         $importMapPath = $this->compiledConfigReader->saveConfig(ImportMapGenerator::IMPORT_MAP_CACHE_FILENAME, $this->importMapGenerator->getRawImportMapData());
-        $io->comment(sprintf('Import map data written to <info>%s</info>.', $this->shortenPath($importMapPath)));
+        $io->comment(\sprintf('Import map data written to <info>%s</info>.', $this->shortenPath($importMapPath)));
 
         foreach ($entrypointFiles as $entrypointName => $path) {
             $this->compiledConfigReader->saveConfig($path, $this->importMapGenerator->findEagerEntrypointImports($entrypointName));
         }
-        $styledEntrypointNames = array_map(fn (string $entrypointName) => sprintf('<info>%s</>', $entrypointName), array_keys($entrypointFiles));
-        $io->comment(sprintf('Entrypoint metadata written for <comment>%d</> entrypoints (%s).', \count($entrypointFiles), implode(', ', $styledEntrypointNames)));
+        $styledEntrypointNames = array_map(fn (string $entrypointName) => \sprintf('<info>%s</>', $entrypointName), array_keys($entrypointFiles));
+        $io->comment(\sprintf('Entrypoint metadata written for <comment>%d</> entrypoints (%s).', \count($entrypointFiles), implode(', ', $styledEntrypointNames)));
 
         if ($this->isDebug) {
-            $io->warning(sprintf(
+            $io->warning(\sprintf(
                 'Debug mode is enabled in your project: Symfony will not serve any changed assets until you delete the files in the "%s" directory again.',
                 $this->shortenPath(\dirname($manifestPath))
             ));
@@ -104,7 +104,7 @@ EOT
 
     private function createManifestAndWriteFiles(SymfonyStyle $io): array
     {
-        $io->comment(sprintf('Compiling and writing asset files to <info>%s</info>', $this->shortenPath($this->assetsFilesystem->getDestinationPath())));
+        $io->comment(\sprintf('Compiling and writing asset files to <info>%s</info>', $this->shortenPath($this->assetsFilesystem->getDestinationPath())));
         $manifest = [];
         foreach ($this->assetMapper->allAssets() as $asset) {
             if (null !== $asset->content) {
@@ -117,7 +117,7 @@ EOT
             $manifest[$asset->logicalPath] = $asset->publicPath;
         }
         ksort($manifest);
-        $io->comment(sprintf('Compiled <info>%d</info> assets', \count($manifest)));
+        $io->comment(\sprintf('Compiled <info>%d</info> assets', \count($manifest)));
 
         return $manifest;
     }

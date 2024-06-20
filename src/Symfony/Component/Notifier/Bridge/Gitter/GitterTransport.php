@@ -39,7 +39,7 @@ final class GitterTransport extends AbstractTransport
 
     public function __toString(): string
     {
-        return sprintf('gitter://%s?room_id=%s', $this->getEndpoint(), $this->roomId);
+        return \sprintf('gitter://%s?room_id=%s', $this->getEndpoint(), $this->roomId);
     }
 
     public function supports(MessageInterface $message): bool
@@ -56,7 +56,7 @@ final class GitterTransport extends AbstractTransport
             throw new UnsupportedMessageTypeException(__CLASS__, ChatMessage::class, $message);
         }
 
-        $endpoint = sprintf('https://%s/v1/rooms/%s/chatMessages', $this->getEndpoint(), $this->roomId);
+        $endpoint = \sprintf('https://%s/v1/rooms/%s/chatMessages', $this->getEndpoint(), $this->roomId);
 
         $response = $this->client->request('POST', $endpoint, [
             'auth_bearer' => $this->token,
@@ -72,7 +72,7 @@ final class GitterTransport extends AbstractTransport
         }
 
         if (200 !== $response->getStatusCode()) {
-            throw new TransportException(sprintf('Unable to post the Gitter message: "%s".', $result['error']), $response);
+            throw new TransportException(\sprintf('Unable to post the Gitter message: "%s".', $result['error']), $response);
         }
 
         $sentMessage = new SentMessage($message, (string) $this);

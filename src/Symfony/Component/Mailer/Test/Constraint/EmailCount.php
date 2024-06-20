@@ -25,7 +25,7 @@ final class EmailCount extends Constraint
 
     public function toString(): string
     {
-        return sprintf('%shas %s "%d" emails', $this->transport ? $this->transport.' ' : '', $this->queued ? 'queued' : 'sent', $this->expectedValue);
+        return \sprintf('%shas %s "%d" emails', $this->transport ? $this->transport.' ' : '', $this->queued ? 'queued' : 'sent', $this->expectedValue);
     }
 
     /**
@@ -41,7 +41,7 @@ final class EmailCount extends Constraint
      */
     protected function failureDescription($events): string
     {
-        return sprintf('the Transport %s (%d %s)', $this->toString(), $this->countEmails($events), $this->queued ? 'queued' : 'sent');
+        return \sprintf('the Transport %s (%d %s)', $this->toString(), $this->countEmails($events), $this->queued ? 'queued' : 'sent');
     }
 
     private function countEmails(MessageEvents $events): int

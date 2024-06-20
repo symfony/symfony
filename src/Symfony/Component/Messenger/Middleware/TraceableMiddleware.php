@@ -64,9 +64,9 @@ class TraceableStack implements StackInterface
         if ($this->stack === $nextMiddleware = $this->stack->next()) {
             $this->currentEvent = 'Tail';
         } else {
-            $this->currentEvent = sprintf('"%s"', get_debug_type($nextMiddleware));
+            $this->currentEvent = \sprintf('"%s"', get_debug_type($nextMiddleware));
         }
-        $this->currentEvent .= sprintf(' on "%s"', $this->busName);
+        $this->currentEvent .= \sprintf(' on "%s"', $this->busName);
 
         $this->stopwatch->start($this->currentEvent, $this->eventCategory);
 

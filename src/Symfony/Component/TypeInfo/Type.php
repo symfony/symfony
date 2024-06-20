@@ -54,6 +54,6 @@ abstract class Type implements \Stringable
      */
     public function __call(string $method, array $arguments): mixed
     {
-        throw new LogicException(sprintf('Cannot call "%s" on "%s" type.', $method, $this));
+        throw new LogicException(\sprintf('Cannot call "%s" on "%s" type.', $method, $this));
     }
 }

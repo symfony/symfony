@@ -40,7 +40,7 @@ final class CollectionType extends Type
             $keyType = $this->getCollectionKeyType();
 
             if (!$keyType instanceof BuiltinType || TypeIdentifier::INT !== $keyType->getTypeIdentifier()) {
-                throw new InvalidArgumentException(sprintf('"%s" is not a valid list key type.', (string) $keyType));
+                throw new InvalidArgumentException(\sprintf('"%s" is not a valid list key type.', (string) $keyType));
             }
         }
     }

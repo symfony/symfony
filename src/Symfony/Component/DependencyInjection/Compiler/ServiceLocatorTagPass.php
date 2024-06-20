@@ -61,7 +61,7 @@ final class ServiceLocatorTagPass extends AbstractRecursivePass
         }
 
         if (!\is_array($services)) {
-            throw new InvalidArgumentException(sprintf('Invalid definition for service "%s": an array of references is expected as first argument when the "container.service_locator" tag is set.', $this->currentId));
+            throw new InvalidArgumentException(\sprintf('Invalid definition for service "%s": an array of references is expected as first argument when the "container.service_locator" tag is set.', $this->currentId));
         }
 
         $value->setArgument(0, self::map($services));

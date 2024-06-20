@@ -35,7 +35,7 @@ class ConsoleFormatterTest extends TestCase
         $tests = [
             'record with DateTime object in datetime field' => [
                 'record' => RecordFactory::create(datetime: $currentDateTime),
-                'expectedMessage' => sprintf(
+                'expectedMessage' => \sprintf(
                     "%s <fg=cyan>WARNING  </> <comment>[test]</> test\n",
                     $currentDateTime->format(ConsoleFormatter::SIMPLE_DATE)
                 ),

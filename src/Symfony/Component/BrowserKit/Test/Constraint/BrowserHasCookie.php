@@ -29,12 +29,12 @@ final class BrowserHasCookie extends Constraint
 
     public function toString(): string
     {
-        $str = sprintf('has cookie "%s"', $this->name);
+        $str = \sprintf('has cookie "%s"', $this->name);
         if ('/' !== $this->path) {
-            $str .= sprintf(' with path "%s"', $this->path);
+            $str .= \sprintf(' with path "%s"', $this->path);
         }
         if ($this->domain) {
-            $str .= sprintf(' for domain "%s"', $this->domain);
+            $str .= \sprintf(' for domain "%s"', $this->domain);
         }
 
         return $str;

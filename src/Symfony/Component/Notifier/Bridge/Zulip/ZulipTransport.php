@@ -40,7 +40,7 @@ final class ZulipTransport extends AbstractTransport
 
     public function __toString(): string
     {
-        return sprintf('zulip://%s?channel=%s', $this->getEndpoint(), $this->channel);
+        return \sprintf('zulip://%s?channel=%s', $this->getEndpoint(), $this->channel);
     }
 
     public function supports(MessageInterface $message): bool
@@ -61,7 +61,7 @@ final class ZulipTransport extends AbstractTransport
         $options['content'] = $message->getSubject();
 
         if (null === $message->getRecipientId() && empty($options['topic'])) {
-            throw new LogicException(sprintf('The "%s" transport requires a topic when posting to streams.', __CLASS__));
+            throw new LogicException(\sprintf('The "%s" transport requires a topic when posting to streams.', __CLASS__));
         }
 
         if (null === $message->getRecipientId()) {
@@ -72,7 +72,7 @@ final class ZulipTransport extends AbstractTransport
             $options['to'] = $message->getRecipientId();
         }
 
-        $endpoint = sprintf('https://%s/api/v1/messages', $this->getEndpoint());
+        $endpoint = \sprintf('https://%s/api/v1/messages', $this->getEndpoint());
 
         $response = $this->client->request('POST', $endpoint, [
             'auth_basic' => [$this->email, $this->token],
@@ -88,7 +88,7 @@ final class ZulipTransport extends AbstractTransport
         if (200 !== $statusCode) {
             $result = $response->toArray(false);
 
-            throw new TransportException(sprintf('Unable to post the Zulip message: "%s" (%s).', $result['msg'], $result['code']), $response);
+            throw new TransportException(\sprintf('Unable to post the Zulip message: "%s" (%s).', $result['msg'], $result['code']), $response);
         }
 
         $success = $response->toArray(false);

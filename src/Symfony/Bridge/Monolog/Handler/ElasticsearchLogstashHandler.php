@@ -62,7 +62,7 @@ final class ElasticsearchLogstashHandler extends AbstractHandler
         private string $elasticsearchVersion = '1.0.0',
     ) {
         if (!interface_exists(HttpClientInterface::class)) {
-            throw new \LogicException(sprintf('The "%s" handler needs an HTTP client. Try running "composer require symfony/http-client".', __CLASS__));
+            throw new \LogicException(\sprintf('The "%s" handler needs an HTTP client. Try running "composer require symfony/http-client".', __CLASS__));
         }
 
         parent::__construct($level, $bubble);
@@ -168,7 +168,7 @@ final class ElasticsearchLogstashHandler extends AbstractHandler
                 }
             } catch (ExceptionInterface $e) {
                 $this->responses->detach($response);
-                error_log(sprintf("Could not push logs to Elasticsearch:\n%s", (string) $e));
+                error_log(\sprintf("Could not push logs to Elasticsearch:\n%s", (string) $e));
             }
         }
     }

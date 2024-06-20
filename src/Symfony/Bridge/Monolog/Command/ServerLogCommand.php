@@ -102,7 +102,7 @@ EOF
         }
 
         if (!$socket = stream_socket_server($host, $errno, $errstr)) {
-            throw new RuntimeException(sprintf('Server start failed on "%s": ', $host).$errstr.' '.$errno);
+            throw new RuntimeException(\sprintf('Server start failed on "%s": ', $host).$errstr.' '.$errno);
         }
 
         foreach ($this->getLogs($socket) as $clientId => $message) {
@@ -151,7 +151,7 @@ EOF
         if (isset($record['log_id'])) {
             $clientId = unpack('H*', $record['log_id'])[1];
         }
-        $logBlock = sprintf('<bg=%s> </>', self::BG_COLOR[$clientId % 8]);
+        $logBlock = \sprintf('<bg=%s> </>', self::BG_COLOR[$clientId % 8]);
         $output->write($logBlock);
 
         $record = new LogRecord(

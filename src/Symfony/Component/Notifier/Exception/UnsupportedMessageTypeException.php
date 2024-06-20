@@ -20,7 +20,7 @@ class UnsupportedMessageTypeException extends LogicException
 {
     public function __construct(string $transport, string $supported, MessageInterface $given)
     {
-        $message = sprintf(
+        $message = \sprintf(
             'The "%s" transport only supports instances of "%s" (instance of "%s" given).',
             $transport,
             $supported,

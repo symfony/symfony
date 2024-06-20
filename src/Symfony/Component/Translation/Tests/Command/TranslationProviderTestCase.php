@@ -63,7 +63,7 @@ abstract class TranslationProviderTestCase extends TestCase
         }
         $yamlContent .= "\n";
 
-        $filename = sprintf('%s/%s', $this->translationAppDir.'/translations', str_replace('%locale%', $targetLanguage, $fileNamePattern));
+        $filename = \sprintf('%s/%s', $this->translationAppDir.'/translations', str_replace('%locale%', $targetLanguage, $fileNamePattern));
         file_put_contents($filename, $yamlContent);
 
         $this->files[] = $filename;
@@ -115,7 +115,7 @@ XLIFF;
 XLIFF;
         }
 
-        $filename = sprintf('%s/%s', $this->translationAppDir.'/translations', str_replace('%locale%', $targetLanguage, $fileNamePattern));
+        $filename = \sprintf('%s/%s', $this->translationAppDir.'/translations', str_replace('%locale%', $targetLanguage, $fileNamePattern));
         file_put_contents($filename, $xliffContent);
 
         $this->files[] = $filename;

@@ -41,7 +41,7 @@ class Marking
         $nbToken = 1 < \func_num_args() ? func_get_arg(1) : 1;
 
         if ($nbToken < 1) {
-            throw new \InvalidArgumentException(sprintf('The number of tokens must be greater than 0, "%s" given.', $nbToken));
+            throw new \InvalidArgumentException(\sprintf('The number of tokens must be greater than 0, "%s" given.', $nbToken));
         }
 
         $this->places[$place] ??= 0;
@@ -58,17 +58,17 @@ class Marking
         $nbToken = 1 < \func_num_args() ? func_get_arg(1) : 1;
 
         if ($nbToken < 1) {
-            throw new \InvalidArgumentException(sprintf('The number of tokens must be greater than 0, "%s" given.', $nbToken));
+            throw new \InvalidArgumentException(\sprintf('The number of tokens must be greater than 0, "%s" given.', $nbToken));
         }
 
         if (!$this->has($place)) {
-            throw new \InvalidArgumentException(sprintf('The place "%s" is not marked.', $place));
+            throw new \InvalidArgumentException(\sprintf('The place "%s" is not marked.', $place));
         }
 
         $tokenCount = $this->places[$place] - $nbToken;
 
         if (0 > $tokenCount) {
-            throw new \InvalidArgumentException(sprintf('The place "%s" could not contain a negative token number: "%s" (initial) - "%s" (nbToken) = "%s".', $place, $this->places[$place], $nbToken, $tokenCount));
+            throw new \InvalidArgumentException(\sprintf('The place "%s" could not contain a negative token number: "%s" (initial) - "%s" (nbToken) = "%s".', $place, $this->places[$place], $nbToken, $tokenCount));
         }
 
         if (0 === $tokenCount) {

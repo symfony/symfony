@@ -158,10 +158,10 @@ class ClassExistenceResource implements SelfCheckingResourceInterface
             throw $previous;
         }
 
-        $message = sprintf('Class "%s" not found.', $class);
+        $message = \sprintf('Class "%s" not found.', $class);
 
         if ($class !== (self::$autoloadedClass ?? $class)) {
-            $message = substr_replace($message, sprintf(' while loading "%s"', self::$autoloadedClass), -1, 0);
+            $message = substr_replace($message, \sprintf(' while loading "%s"', self::$autoloadedClass), -1, 0);
         }
 
         if (null !== $previous) {

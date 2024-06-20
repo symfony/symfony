@@ -80,7 +80,7 @@ class ImportMapRenderer
                 // importmap entry is a noop
                 $importMap[$importName] = 'data:application/javascript,';
             } else {
-                $importMap[$importName] = 'data:application/javascript,'.rawurlencode(sprintf('document.head.appendChild(Object.assign(document.createElement("link"),{rel:"stylesheet",href:"%s"}))', addslashes($path)));
+                $importMap[$importName] = 'data:application/javascript,'.rawurlencode(\sprintf('document.head.appendChild(Object.assign(document.createElement("link"),{rel:"stylesheet",href:"%s"}))', addslashes($path)));
             }
         }
 
@@ -106,7 +106,7 @@ class ImportMapRenderer
 
         if (false !== $this->polyfillImportName && null === $polyfillPath) {
             if ('es-module-shims' !== $this->polyfillImportName) {
-                throw new \InvalidArgumentException(sprintf('The JavaScript module polyfill was not found in your import map. Either disable the polyfill or run "php bin/console importmap:require "%s"" to install it.', $this->polyfillImportName));
+                throw new \InvalidArgumentException(\sprintf('The JavaScript module polyfill was not found in your import map. Either disable the polyfill or run "php bin/console importmap:require "%s"" to install it.', $this->polyfillImportName));
             }
 
             // a fallback for the default polyfill in case it's not in the importmap
@@ -162,7 +162,7 @@ class ImportMapRenderer
 
         $attributes += $this->scriptAttributes;
         if (isset($attributes['src']) || isset($attributes['type'])) {
-            throw new \InvalidArgumentException(sprintf('The "src" and "type" attributes are not allowed on the <script> tag rendered by "%s".', self::class));
+            throw new \InvalidArgumentException(\sprintf('The "src" and "type" attributes are not allowed on the <script> tag rendered by "%s".', self::class));
         }
 
         foreach ($attributes as $name => $value) {
@@ -172,7 +172,7 @@ class ImportMapRenderer
 
                 continue;
             }
-            $attributeString .= sprintf('%s="%s"', $name, $this->escapeAttributeValue($value));
+            $attributeString .= \sprintf('%s="%s"', $name, $this->escapeAttributeValue($value));
         }
 
         return $attributeString;

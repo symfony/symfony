@@ -70,7 +70,7 @@ class DefaultAuthenticationFailureHandler implements AuthenticationFailureHandle
         if (\is_string($failureUrl) && (str_starts_with($failureUrl, '/') || str_starts_with($failureUrl, 'http'))) {
             $options['failure_path'] = $failureUrl;
         } elseif ($this->logger && $failureUrl) {
-            $this->logger->debug(sprintf('Ignoring query parameter "%s": not a valid URL.', $options['failure_path_parameter']));
+            $this->logger->debug(\sprintf('Ignoring query parameter "%s": not a valid URL.', $options['failure_path_parameter']));
         }
 
         $options['failure_path'] ??= $options['login_path'];

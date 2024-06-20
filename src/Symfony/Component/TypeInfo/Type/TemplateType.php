@@ -33,7 +33,7 @@ final class TemplateType extends Type
 
     public function getBaseType(): BuiltinType|ObjectType
     {
-        throw new LogicException(sprintf('Cannot get base type on "%s" template type.', $this));
+        throw new LogicException(\sprintf('Cannot get base type on "%s" template type.', $this));
     }
 
     public function isA(TypeIdentifier|string $subject): bool

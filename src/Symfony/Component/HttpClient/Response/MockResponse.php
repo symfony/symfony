@@ -67,7 +67,7 @@ class MockResponse implements ResponseInterface, StreamableInterface
     public static function fromFile(string $path, array $info = []): static
     {
         if (!is_file($path)) {
-            throw new \InvalidArgumentException(sprintf('File not found: "%s".', $path));
+            throw new \InvalidArgumentException(\sprintf('File not found: "%s".', $path));
         }
 
         return new static(file_get_contents($path), $info);
@@ -252,7 +252,7 @@ class MockResponse implements ResponseInterface, StreamableInterface
         } elseif ($body instanceof \Closure) {
             while ('' !== $data = $body(16372)) {
                 if (!\is_string($data)) {
-                    throw new TransportException(sprintf('Return value of the "body" option callback must be string, "%s" returned.', get_debug_type($data)));
+                    throw new TransportException(\sprintf('Return value of the "body" option callback must be string, "%s" returned.', get_debug_type($data)));
                 }
 
                 // "notify" upload progress
@@ -308,7 +308,7 @@ class MockResponse implements ResponseInterface, StreamableInterface
 
                     if ('' === $chunk = (string) $chunk) {
                         // simulate an idle timeout
-                        $response->body[] = new ErrorChunk($offset, sprintf('Idle timeout reached for "%s".', $response->info['url']));
+                        $response->body[] = new ErrorChunk($offset, \sprintf('Idle timeout reached for "%s".', $response->info['url']));
                     } else {
                         $response->body[] = $chunk;
                         $offset += \strlen($chunk);
@@ -332,7 +332,7 @@ class MockResponse implements ResponseInterface, StreamableInterface
         $onProgress($offset, $dlSize, $response->info);
 
         if ($dlSize && $offset !== $dlSize) {
-            throw new TransportException(sprintf('Transfer closed with %d bytes remaining to read.', $dlSize - $offset));
+            throw new TransportException(\sprintf('Transfer closed with %d bytes remaining to read.', $dlSize - $offset));
         }
     }
 }

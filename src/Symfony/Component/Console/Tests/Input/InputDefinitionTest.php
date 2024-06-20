@@ -113,7 +113,7 @@ class InputDefinitionTest extends TestCase
     {
         $this->initializeArguments();
         $this->expectException(\LogicException::class);
-        $this->expectExceptionMessage(sprintf('Cannot add a required argument "%s" after an optional one "%s".', $this->foo2->getName(), $this->foo->getName()));
+        $this->expectExceptionMessage(\sprintf('Cannot add a required argument "%s" after an optional one "%s".', $this->foo2->getName(), $this->foo->getName()));
 
         $definition = new InputDefinition();
         $definition->addArgument($this->foo);

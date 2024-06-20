@@ -46,7 +46,7 @@ class MailgunApiTransport extends AbstractApiTransport
 
     public function __toString(): string
     {
-        return sprintf('mailgun+api://%s?domain=%s', $this->getEndpoint(), $this->domain);
+        return \sprintf('mailgun+api://%s?domain=%s', $this->getEndpoint(), $this->domain);
     }
 
     protected function doSendApi(SentMessage $sentMessage, Email $email, Envelope $envelope): ResponseInterface
@@ -57,7 +57,7 @@ class MailgunApiTransport extends AbstractApiTransport
             $headers[] = $header->toString();
         }
 
-        $endpoint = sprintf('%s/v3/%s/messages', $this->getEndpoint(), urlencode($this->domain));
+        $endpoint = \sprintf('%s/v3/%s/messages', $this->getEndpoint(), urlencode($this->domain));
         $response = $this->client->request('POST', 'https://'.$endpoint, [
             'auth_basic' => 'api:'.$this->key,
             'headers' => $headers,
@@ -68,13 +68,13 @@ class MailgunApiTransport extends AbstractApiTransport
             $statusCode = $response->getStatusCode();
             $result = $response->toArray(false);
         } catch (DecodingExceptionInterface) {
-            throw new HttpTransportException('Unable to send an email: '.$response->getContent(false).sprintf(' (code %d).', $statusCode), $response);
+            throw new HttpTransportException('Unable to send an email: '.$response->getContent(false).\sprintf(' (code %d).', $statusCode), $response);
         } catch (TransportExceptionInterface $e) {
             throw new HttpTransportException('Could not reach the remote Mailgun server.', $response, 0, $e);
         }
 
         if (200 !== $statusCode) {
-            throw new HttpTransportException('Unable to send an email: '.$result['message'].sprintf(' (code %d).', $statusCode), $response);
+            throw new HttpTransportException('Unable to send an email: '.$result['message'].\sprintf(' (code %d).', $statusCode), $response);
         }
 
         $sentMessage->setMessageId($result['id']);

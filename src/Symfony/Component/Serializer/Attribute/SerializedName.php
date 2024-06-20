@@ -25,7 +25,7 @@ class SerializedName
     public function __construct(private readonly string $serializedName)
     {
         if ('' === $serializedName) {
-            throw new InvalidArgumentException(sprintf('Parameter given to "%s" must be a non-empty string.', self::class));
+            throw new InvalidArgumentException(\sprintf('Parameter given to "%s" must be a non-empty string.', self::class));
         }
     }
 

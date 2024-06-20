@@ -59,7 +59,7 @@ final class OutputWrapper
             return $text;
         }
 
-        $tagPattern = sprintf('<(?:(?:%s)|/(?:%s)?)>', self::TAG_OPEN_REGEX_SEGMENT, self::TAG_CLOSE_REGEX_SEGMENT);
+        $tagPattern = \sprintf('<(?:(?:%s)|/(?:%s)?)>', self::TAG_OPEN_REGEX_SEGMENT, self::TAG_CLOSE_REGEX_SEGMENT);
         $limitPattern = "{1,$width}";
         $patternBlocks = [$tagPattern];
         if (!$this->allowCutUrls) {
@@ -68,7 +68,7 @@ final class OutputWrapper
         $patternBlocks[] = '.';
         $blocks = implode('|', $patternBlocks);
         $rowPattern = "(?:$blocks)$limitPattern";
-        $pattern = sprintf('#(?:((?>(%1$s)((?<=[^\S\r\n])[^\S\r\n]?|(?=\r?\n)|$|[^\S\r\n]))|(%1$s))(?:\r?\n)?|(?:\r?\n|$))#imux', $rowPattern);
+        $pattern = \sprintf('#(?:((?>(%1$s)((?<=[^\S\r\n])[^\S\r\n]?|(?=\r?\n)|$|[^\S\r\n]))|(%1$s))(?:\r?\n)?|(?:\r?\n|$))#imux', $rowPattern);
         $output = rtrim(preg_replace($pattern, '\\1'.$break, $text), $break);
 
         return str_replace(' '.$break, $break, $output);

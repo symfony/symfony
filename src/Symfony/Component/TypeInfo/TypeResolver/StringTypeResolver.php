@@ -72,7 +72,7 @@ final class StringTypeResolver implements TypeResolverInterface
         if ($subject instanceof \Stringable) {
             $subject = (string) $subject;
         } elseif (!\is_string($subject)) {
-            throw new UnsupportedException(sprintf('Expected subject to be a "string", "%s" given.', get_debug_type($subject)), $subject);
+            throw new UnsupportedException(\sprintf('Expected subject to be a "string", "%s" given.', get_debug_type($subject)), $subject);
         }
 
         try {
@@ -81,7 +81,7 @@ final class StringTypeResolver implements TypeResolverInterface
 
             return $this->getTypeFromNode($node, $typeContext);
         } catch (\DomainException $e) {
-            throw new UnsupportedException(sprintf('Cannot resolve "%s".', $subject), $subject, previous: $e);
+            throw new UnsupportedException(\sprintf('Cannot resolve "%s".', $subject), $subject, previous: $e);
         }
     }
 
@@ -105,7 +105,7 @@ final class StringTypeResolver implements TypeResolverInterface
 
         if ($node instanceof ThisTypeNode) {
             if (null === $typeContext) {
-                throw new InvalidArgumentException(sprintf('A "%s" must be provided to resolve "$this".', TypeContext::class));
+                throw new InvalidArgumentException(\sprintf('A "%s" must be provided to resolve "$this".', TypeContext::class));
             }
 
             return Type::object($typeContext->getCalledClass());
@@ -120,7 +120,7 @@ final class StringTypeResolver implements TypeResolverInterface
                 ConstExprNullNode::class => Type::null(),
                 ConstExprStringNode::class => Type::string(),
                 ConstExprTrueNode::class => Type::true(),
-                default => throw new \DomainException(sprintf('Unhandled "%s" constant expression.', $node->constExpr::class)),
+                default => throw new \DomainException(\sprintf('Unhandled "%s" constant expression.', $node->constExpr::class)),
             };
         }
 
@@ -156,9 +156,9 @@ final class StringTypeResolver implements TypeResolverInterface
                 'scalar' => Type::union(Type::int(), Type::float(), Type::string(), Type::bool()),
                 'number' => Type::union(Type::int(), Type::float()),
                 'numeric' => Type::union(Type::int(), Type::float(), Type::string()),
-                'self' => $typeContext ? Type::object($typeContext->getDeclaringClass()) : throw new InvalidArgumentException(sprintf('A "%s" must be provided to resolve "self".', TypeContext::class)),
-                'static' => $typeContext ? Type::object($typeContext->getCalledClass()) : throw new InvalidArgumentException(sprintf('A "%s" must be provided to resolve "static".', TypeContext::class)),
-                'parent' => $typeContext ? Type::object($typeContext->getParentClass()) : throw new InvalidArgumentException(sprintf('A "%s" must be provided to resolve "parent".', TypeContext::class)),
+                'self' => $typeContext ? Type::object($typeContext->getDeclaringClass()) : throw new InvalidArgumentException(\sprintf('A "%s" must be provided to resolve "self".', TypeContext::class)),
+                'static' => $typeContext ? Type::object($typeContext->getCalledClass()) : throw new InvalidArgumentException(\sprintf('A "%s" must be provided to resolve "static".', TypeContext::class)),
+                'parent' => $typeContext ? Type::object($typeContext->getParentClass()) : throw new InvalidArgumentException(\sprintf('A "%s" must be provided to resolve "parent".', TypeContext::class)),
                 'void' => Type::void(),
                 'never', 'never-return', 'never-returns', 'no-return' => Type::never(),
                 default => $this->resolveCustomIdentifier($node->name, $typeContext),
@@ -220,7 +220,7 @@ final class StringTypeResolver implements TypeResolverInterface
             return Type::intersection(...array_map(fn (TypeNode $t): Type => $this->getTypeFromNode($t, $typeContext), $node->types));
         }
 
-        throw new \DomainException(sprintf('Unhandled "%s" node.', $node::class));
+        throw new \DomainException(\sprintf('Unhandled "%s" node.', $node::class));
     }
 
     private function resolveCustomIdentifier(string $identifier, ?TypeContext $typeContext): Type
@@ -251,6 +251,6 @@ final class StringTypeResolver implements TypeResolverInterface
             return Type::template($identifier, $typeContext->templates[$identifier]);
         }
 
-        throw new \DomainException(sprintf('Unhandled "%s" identifier.', $identifier));
+        throw new \DomainException(\sprintf('Unhandled "%s" identifier.', $identifier));
     }
 }

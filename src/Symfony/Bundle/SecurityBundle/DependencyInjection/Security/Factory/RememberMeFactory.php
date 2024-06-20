@@ -58,7 +58,7 @@ class RememberMeFactory implements AuthenticatorFactoryInterface, PrependExtensi
         // create remember me handler (which manage the remember-me cookies)
         $rememberMeHandlerId = 'security.authenticator.remember_me_handler.'.$firewallName;
         if (isset($config['service']) && isset($config['token_provider'])) {
-            throw new InvalidConfigurationException(sprintf('You cannot use both "service" and "token_provider" in "security.firewalls.%s.remember_me".', $firewallName));
+            throw new InvalidConfigurationException(\sprintf('You cannot use both "service" and "token_provider" in "security.firewalls.%s.remember_me".', $firewallName));
         }
 
         if (isset($config['service'])) {
@@ -203,7 +203,7 @@ class RememberMeFactory implements AuthenticatorFactoryInterface, PrependExtensi
         }
 
         if (!$tokenProviderId) {
-            throw new InvalidConfigurationException(sprintf('No token provider was set for firewall "%s". Either configure a service ID or set "remember_me.token_provider.doctrine" to true.', $firewallName));
+            throw new InvalidConfigurationException(\sprintf('No token provider was set for firewall "%s". Either configure a service ID or set "remember_me.token_provider.doctrine" to true.', $firewallName));
         }
 
         return $tokenProviderId;

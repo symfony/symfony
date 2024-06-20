@@ -108,7 +108,7 @@ final class EventSourceHttpClient implements HttpClientInterface, ResetInterface
                 if (preg_match('/^text\/event-stream(;|$)/i', $context->getHeaders()['content-type'][0] ?? '')) {
                     $state->buffer = '';
                 } elseif (null !== $lastError || (null !== $state->buffer && 200 === $context->getStatusCode())) {
-                    throw new EventSourceException(sprintf('Response content-type is "%s" while "text/event-stream" was expected for "%s".', $context->getHeaders()['content-type'][0] ?? '', $context->getInfo('url')));
+                    throw new EventSourceException(\sprintf('Response content-type is "%s" while "text/event-stream" was expected for "%s".', $context->getHeaders()['content-type'][0] ?? '', $context->getInfo('url')));
                 } else {
                     $context->passthru();
                 }

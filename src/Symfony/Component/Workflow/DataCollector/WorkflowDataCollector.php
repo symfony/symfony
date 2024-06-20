@@ -94,8 +94,8 @@ final class WorkflowDataCollector extends DataCollector implements LateDataColle
             ...parent::getCasters(),
             TransitionBlocker::class => function ($v, array $a, Stub $s, $isNested) {
                 unset(
-                    $a[sprintf(Caster::PATTERN_PRIVATE, $v::class, 'code')],
-                    $a[sprintf(Caster::PATTERN_PRIVATE, $v::class, 'parameters')],
+                    $a[\sprintf(Caster::PATTERN_PRIVATE, $v::class, 'code')],
+                    $a[\sprintf(Caster::PATTERN_PRIVATE, $v::class, 'parameters')],
                 );
 
                 $s->cut += 2;
@@ -129,9 +129,9 @@ final class WorkflowDataCollector extends DataCollector implements LateDataColle
                 'entered',
             ];
             foreach ($subEventNames as $subEventName) {
-                $eventNames[] = sprintf('workflow.%s', $subEventName);
-                $eventNames[] = sprintf('workflow.%s.%s', $workflow->getName(), $subEventName);
-                $eventNames[] = sprintf('workflow.%s.%s.%s', $workflow->getName(), $subEventName, $place);
+                $eventNames[] = \sprintf('workflow.%s', $subEventName);
+                $eventNames[] = \sprintf('workflow.%s.%s', $workflow->getName(), $subEventName);
+                $eventNames[] = \sprintf('workflow.%s.%s.%s', $workflow->getName(), $subEventName, $place);
             }
             foreach ($eventNames as $eventName) {
                 foreach ($this->eventDispatcher->getListeners($eventName) as $listener) {
@@ -151,9 +151,9 @@ final class WorkflowDataCollector extends DataCollector implements LateDataColle
                 'announce',
             ];
             foreach ($subEventNames as $subEventName) {
-                $eventNames[] = sprintf('workflow.%s', $subEventName);
-                $eventNames[] = sprintf('workflow.%s.%s', $workflow->getName(), $subEventName);
-                $eventNames[] = sprintf('workflow.%s.%s.%s', $workflow->getName(), $subEventName, $transition->getName());
+                $eventNames[] = \sprintf('workflow.%s', $subEventName);
+                $eventNames[] = \sprintf('workflow.%s.%s', $workflow->getName(), $subEventName);
+                $eventNames[] = \sprintf('workflow.%s.%s.%s', $workflow->getName(), $subEventName, $transition->getName());
             }
             foreach ($eventNames as $eventName) {
                 foreach ($this->eventDispatcher->getListeners($eventName) as $listener) {

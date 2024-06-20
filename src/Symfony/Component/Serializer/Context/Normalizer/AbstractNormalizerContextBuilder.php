@@ -87,7 +87,7 @@ abstract class AbstractNormalizerContextBuilder implements ContextBuilderInterfa
 
         foreach ($it as $attribute) {
             if (!\is_string($attribute)) {
-                throw new InvalidArgumentException(sprintf('Each attribute must be a string, "%s" given.', get_debug_type($attribute)));
+                throw new InvalidArgumentException(\sprintf('Each attribute must be a string, "%s" given.', get_debug_type($attribute)));
             }
         }
 

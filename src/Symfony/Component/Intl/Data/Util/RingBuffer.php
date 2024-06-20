@@ -50,7 +50,7 @@ class RingBuffer implements \ArrayAccess
     public function offsetGet(mixed $key): mixed
     {
         if (!isset($this->indices[$key])) {
-            throw new OutOfBoundsException(sprintf('The index "%s" does not exist.', $key));
+            throw new OutOfBoundsException(\sprintf('The index "%s" does not exist.', $key));
         }
 
         return $this->values[$this->indices[$key]];

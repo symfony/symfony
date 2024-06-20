@@ -88,7 +88,7 @@ class DivisibleByValidatorTest extends AbstractComparisonValidatorTestCase
     public function testThrowsOnNonNumericValues(string $expectedGivenType, $value, $comparedValue)
     {
         $this->expectException(UnexpectedValueException::class);
-        $this->expectExceptionMessage(sprintf('Expected argument of type "numeric", "%s" given', $expectedGivenType));
+        $this->expectExceptionMessage(\sprintf('Expected argument of type "numeric", "%s" given', $expectedGivenType));
 
         $this->validator->validate($value, $this->createConstraint([
             'value' => $comparedValue,

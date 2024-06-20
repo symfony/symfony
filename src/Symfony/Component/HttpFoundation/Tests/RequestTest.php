@@ -2652,7 +2652,7 @@ class RequestTest extends TestCase
     public function testReservedFlags()
     {
         foreach ((new \ReflectionClass(Request::class))->getConstants() as $constant => $value) {
-            $this->assertNotSame(0b10000000, $value, sprintf('The constant "%s" should not use the reserved value "0b10000000".', $constant));
+            $this->assertNotSame(0b10000000, $value, \sprintf('The constant "%s" should not use the reserved value "0b10000000".', $constant));
         }
     }
 

@@ -42,13 +42,13 @@ final class BrevoPayloadConverter implements PayloadConverterInterface
                 'opened' => MailerEngagementEvent::OPEN,
                 'proxy_open' => MailerEngagementEvent::OPEN,
                 'complaint' => MailerEngagementEvent::SPAM,
-                default => throw new ParseException(sprintf('Unsupported event "%s".', $payload['event'])),
+                default => throw new ParseException(\sprintf('Unsupported event "%s".', $payload['event'])),
             };
             $event = new MailerEngagementEvent($name, $payload['message-id'], $payload);
         }
 
         if (!$date = \DateTimeImmutable::createFromFormat('U', $payload['ts_event'])) {
-            throw new ParseException(sprintf('Invalid date "%s".', $payload['ts_event']));
+            throw new ParseException(\sprintf('Invalid date "%s".', $payload['ts_event']));
         }
 
         if (

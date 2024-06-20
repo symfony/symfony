@@ -27,6 +27,6 @@ abstract class CacheWarmer implements CacheWarmerInterface
             return;
         }
 
-        throw new \RuntimeException(sprintf('Failed to write cache file "%s".', $file));
+        throw new \RuntimeException(\sprintf('Failed to write cache file "%s".', $file));
     }
 }

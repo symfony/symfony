@@ -66,7 +66,7 @@ class SendersLocator implements SendersLocatorInterface
     private function getSenderFromAlias(string $senderAlias): iterable
     {
         if (!$this->sendersLocator->has($senderAlias)) {
-            throw new RuntimeException(sprintf('Invalid senders configuration: sender "%s" is not in the senders locator.', $senderAlias));
+            throw new RuntimeException(\sprintf('Invalid senders configuration: sender "%s" is not in the senders locator.', $senderAlias));
         }
 
         yield $senderAlias => $this->sendersLocator->get($senderAlias);

@@ -59,7 +59,7 @@ EOF
             $io->writeln($localSecrets[$name]);
         } else {
             if (!\array_key_exists($name, $secrets)) {
-                $io->error(sprintf('The secret "%s" does not exist.', $name));
+                $io->error(\sprintf('The secret "%s" does not exist.', $name));
 
                 return self::INVALID;
             }

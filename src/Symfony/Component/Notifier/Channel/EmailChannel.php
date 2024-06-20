@@ -38,7 +38,7 @@ class EmailChannel implements ChannelInterface
         private ?Envelope $envelope = null,
     ) {
         if (null === $transport && null === $bus) {
-            throw new LogicException(sprintf('"%s" needs a Transport or a Bus but both cannot be "null".', static::class));
+            throw new LogicException(\sprintf('"%s" needs a Transport or a Bus but both cannot be "null".', static::class));
         }
 
         $this->from = $from ?: $envelope?->getSender();
@@ -59,7 +59,7 @@ class EmailChannel implements ChannelInterface
         if ($email instanceof Email) {
             if (!$email->getFrom()) {
                 if (null === $this->from) {
-                    throw new LogicException(sprintf('To send the "%s" notification by email, you must configure a "from" header by either setting a sender in the global "envelope" of the mailer configuration or by setting a "from" header in the "asEmailMessage()" method.', get_debug_type($notification)));
+                    throw new LogicException(\sprintf('To send the "%s" notification by email, you must configure a "from" header by either setting a sender in the global "envelope" of the mailer configuration or by setting a "from" header in the "asEmailMessage()" method.', get_debug_type($notification)));
                 }
 
                 $email->from($this->from);

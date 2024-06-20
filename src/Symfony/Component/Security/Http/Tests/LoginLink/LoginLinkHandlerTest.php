@@ -156,7 +156,7 @@ class LoginLinkHandlerTest extends TestCase
     {
         $expires = time() + 500;
         $signature = $this->createSignatureHash('weaverryan', $expires);
-        $request = Request::create(sprintf('/login/verify?user=weaverryan&hash=%s&expires=%d', $signature, $expires));
+        $request = Request::create(\sprintf('/login/verify?user=weaverryan&hash=%s&expires=%d', $signature, $expires));
 
         $user = new TestLoginLinkHandlerUser('weaverryan', 'ryan@symfonycasts.com', 'pwhash');
         $this->userProvider->createUser($user);
@@ -173,7 +173,7 @@ class LoginLinkHandlerTest extends TestCase
     {
         $expires = time() - 500;
         $signature = $this->createSignatureHash('weaverryan', $expires);
-        $request = Request::create(sprintf('/login/verify?user=weaverryan&hash=%s&expires=%d', $signature, $expires));
+        $request = Request::create(\sprintf('/login/verify?user=weaverryan&hash=%s&expires=%d', $signature, $expires));
 
         $linker = $this->createLinker(['max_uses' => 3]);
         $this->expectException(ExpiredLoginLinkException::class);
@@ -191,7 +191,7 @@ class LoginLinkHandlerTest extends TestCase
 
     public function testConsumeLoginLinkWithDifferentSignature()
     {
-        $request = Request::create(sprintf('/login/verify?user=weaverryan&hash=fake_hash&expires=%d', time() + 500));
+        $request = Request::create(\sprintf('/login/verify?user=weaverryan&hash=fake_hash&expires=%d', time() + 500));
 
         $linker = $this->createLinker();
         $this->expectException(InvalidLoginLinkException::class);
@@ -202,7 +202,7 @@ class LoginLinkHandlerTest extends TestCase
     {
         $expires = time() + 500;
         $signature = $this->createSignatureHash('weaverryan', $expires);
-        $request = Request::create(sprintf('/login/verify?user=weaverryan&hash=%s&expires=%d', $signature, $expires));
+        $request = Request::create(\sprintf('/login/verify?user=weaverryan&hash=%s&expires=%d', $signature, $expires));
 
         $user = new TestLoginLinkHandlerUser('weaverryan', 'ryan@symfonycasts.com', 'pwhash');
         $this->userProvider->createUser($user);

@@ -71,7 +71,7 @@ final class WcswidthDataGenerator
         $content = $this->getHeader($version).'return '.VarExporter::export($this->format($rawData)).";\n";
 
         if (!file_put_contents($this->outDir.'/'.$fileName, $content)) {
-            throw new RuntimeException(sprintf('The "%s" file could not be written.', $fileName));
+            throw new RuntimeException(\sprintf('The "%s" file could not be written.', $fileName));
         }
     }
 

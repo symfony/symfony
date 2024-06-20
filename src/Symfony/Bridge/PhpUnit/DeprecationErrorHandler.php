@@ -300,7 +300,7 @@ class DeprecationErrorHandler
 
         if ($configuration->shouldWriteToLogFile()) {
             if (false === $handle = @fopen($file = $configuration->getLogFile(), 'a')) {
-                throw new \InvalidArgumentException(sprintf('The configured log file "%s" is not writeable.', $file));
+                throw new \InvalidArgumentException(\sprintf('The configured log file "%s" is not writeable.', $file));
             }
         } else {
             $handle = fopen('php://output', 'w');
@@ -308,7 +308,7 @@ class DeprecationErrorHandler
 
         foreach ($groups as $group) {
             if ($this->deprecationGroups[$group]->count()) {
-                $deprecationGroupMessage = sprintf(
+                $deprecationGroupMessage = \sprintf(
                     '%s deprecation notices (%d)',
                     \in_array($group, ['direct', 'indirect', 'self'], true) ? "Remaining $group" : ucfirst($group),
                     $this->deprecationGroups[$group]->count()
@@ -327,7 +327,7 @@ class DeprecationErrorHandler
                 uasort($notices, $cmp);
 
                 foreach ($notices as $msg => $notice) {
-                    fwrite($handle, sprintf("\n  %sx: %s\n", $notice->count(), $msg));
+                    fwrite($handle, \sprintf("\n  %sx: %s\n", $notice->count(), $msg));
 
                     $countsByCaller = $notice->getCountsByCaller();
                     arsort($countsByCaller);
@@ -339,7 +339,7 @@ class DeprecationErrorHandler
                                 fwrite($handle, "    ...\n");
                                 break;
                             }
-                            fwrite($handle, sprintf("    %dx in %s\n", $count, preg_replace('/(.*)\\\\(.*?::.*?)$/', '$2 from $1', $method)));
+                            fwrite($handle, \sprintf("    %dx in %s\n", $count, preg_replace('/(.*)\\\\(.*?::.*?)$/', '$2 from $1', $method)));
                         }
                     }
                 }

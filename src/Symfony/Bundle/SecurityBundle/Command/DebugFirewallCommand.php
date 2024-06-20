@@ -69,7 +69,7 @@ To include all events and event listeners for a specific firewall, use the
 EOF
             )
             ->setDefinition([
-                new InputArgument('name', InputArgument::OPTIONAL, sprintf('A firewall name (for example "%s")', $exampleName)),
+                new InputArgument('name', InputArgument::OPTIONAL, \sprintf('A firewall name (for example "%s")', $exampleName)),
                 new InputOption('events', null, InputOption::VALUE_NONE, 'Include a list of event listeners (only available in combination with the "name" argument)'),
             ]);
     }
@@ -86,10 +86,10 @@ EOF
             return 0;
         }
 
-        $serviceId = sprintf('security.firewall.map.context.%s', $name);
+        $serviceId = \sprintf('security.firewall.map.context.%s', $name);
 
         if (!$this->contexts->has($serviceId)) {
-            $io->error(sprintf('Firewall %s was not found. Available firewalls are: %s', $name, implode(', ', $this->firewallNames)));
+            $io->error(\sprintf('Firewall %s was not found. Available firewalls are: %s', $name, implode(', ', $this->firewallNames)));
 
             return 1;
         }
@@ -97,7 +97,7 @@ EOF
         /** @var FirewallContext $context */
         $context = $this->contexts->get($serviceId);
 
-        $io->title(sprintf('Firewall "%s"', $name));
+        $io->title(\sprintf('Firewall "%s"', $name));
 
         $this->displayFirewallSummary($name, $context, $io);
 
@@ -119,7 +119,7 @@ EOF
 
         $io->listing($this->firewallNames);
 
-        $io->comment(sprintf('To view details of a specific firewall, re-run this command with a firewall name. (e.g. <comment>debug:firewall %s</comment>)', $this->getExampleName()));
+        $io->comment(\sprintf('To view details of a specific firewall, re-run this command with a firewall name. (e.g. <comment>debug:firewall %s</comment>)', $this->getExampleName()));
     }
 
     protected function displayFirewallSummary(string $name, FirewallContext $context, SymfonyStyle $io): void
@@ -163,9 +163,9 @@ EOF
 
     protected function displayEventListeners(string $name, FirewallContext $context, SymfonyStyle $io): void
     {
-        $io->title(sprintf('Event listeners for firewall "%s"', $name));
+        $io->title(\sprintf('Event listeners for firewall "%s"', $name));
 
-        $dispatcherId = sprintf('security.event_dispatcher.%s', $name);
+        $dispatcherId = \sprintf('security.event_dispatcher.%s', $name);
 
         if (!$this->eventDispatchers->has($dispatcherId)) {
             $io->text('No event dispatcher has been registered for this firewall.');
@@ -177,12 +177,12 @@ EOF
         $dispatcher = $this->eventDispatchers->get($dispatcherId);
 
         foreach ($dispatcher->getListeners() as $event => $listeners) {
-            $io->section(sprintf('"%s" event', $event));
+            $io->section(\sprintf('"%s" event', $event));
 
             $rows = [];
             foreach ($listeners as $order => $listener) {
                 $rows[] = [
-                    sprintf('#%d', $order + 1),
+                    \sprintf('#%d', $order + 1),
                     $this->formatCallable($listener),
                     $dispatcher->getListenerPriority($event, $listener),
                 ];
@@ -197,7 +197,7 @@ EOF
 
     private function displayAuthenticators(string $name, SymfonyStyle $io): void
     {
-        $io->title(sprintf('Authenticators for firewall "%s"', $name));
+        $io->title(\sprintf('Authenticators for firewall "%s"', $name));
 
         $authenticators = $this->authenticators[$name] ?? [];
 
@@ -220,14 +220,14 @@ EOF
     {
         if (\is_array($callable)) {
             if (\is_object($callable[0])) {
-                return sprintf('%s::%s()', $callable[0]::class, $callable[1]);
+                return \sprintf('%s::%s()', $callable[0]::class, $callable[1]);
             }
 
-            return sprintf('%s::%s()', $callable[0], $callable[1]);
+            return \sprintf('%s::%s()', $callable[0], $callable[1]);
         }
 
         if (\is_string($callable)) {
-            return sprintf('%s()', $callable);
+            return \sprintf('%s()', $callable);
         }
 
         if ($callable instanceof \Closure) {
@@ -236,14 +236,14 @@ EOF
                 return 'Closure()';
             }
             if ($class = $r->getClosureCalledClass()) {
-                return sprintf('%s::%s()', $class->name, $r->name);
+                return \sprintf('%s::%s()', $class->name, $r->name);
             }
 
             return $r->name.'()';
         }
 
         if (method_exists($callable, '__invoke')) {
-            return sprintf('%s::__invoke()', $callable::class);
+            return \sprintf('%s::__invoke()', $callable::class);
         }
 
         throw new \InvalidArgumentException('Callable is not describable.');

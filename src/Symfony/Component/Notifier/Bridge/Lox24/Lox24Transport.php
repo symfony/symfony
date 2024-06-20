@@ -53,7 +53,7 @@ final class Lox24Transport extends AbstractTransport
 
         $query = $params ? '?'.http_build_query($params) : '';
 
-        return sprintf('lox24://%s%s', $this->getEndpoint(), $query);
+        return \sprintf('lox24://%s%s', $this->getEndpoint(), $query);
     }
 
     public function supports(MessageInterface $message): bool
@@ -78,7 +78,7 @@ final class Lox24Transport extends AbstractTransport
         $from = $message->getFrom() ?: $this->from;
 
         if (!$this->isFromValid($from)) {
-            throw new InvalidArgumentException(sprintf('The "From" number "%s" is not a valid phone number, shortcode, or alphanumeric sender ID.', $from));
+            throw new InvalidArgumentException(\sprintf('The "From" number "%s" is not a valid phone number, shortcode, or alphanumeric sender ID.', $from));
         }
 
         $body = [
@@ -94,9 +94,9 @@ final class Lox24Transport extends AbstractTransport
         $body = $this->setServiceCode($body, $options);
         $body = $this->setVoiceLang($body, $options);
 
-        $response = $this->client->request('POST', sprintf('https://%s/sms', $this->getEndpoint()), [
+        $response = $this->client->request('POST', \sprintf('https://%s/sms', $this->getEndpoint()), [
             'headers' => [
-                'X-LOX24-AUTH-TOKEN' => sprintf('%s:%s', $this->user, $this->token),
+                'X-LOX24-AUTH-TOKEN' => \sprintf('%s:%s', $this->user, $this->token),
                 'Accept' => 'application/json',
                 'Content-Type' => 'application/json',
                 'User-Agent' => 'LOX24 Symfony Notifier',
@@ -113,7 +113,7 @@ final class Lox24Transport extends AbstractTransport
         if (201 !== $statusCode) {
             $error = $response->toArray(false);
 
-            throw new TransportException(sprintf('Unable to send the SMS: "%s".', $error['detail']), $response);
+            throw new TransportException(\sprintf('Unable to send the SMS: "%s".', $error['detail']), $response);
         }
 
         $success = $response->toArray(false);
@@ -159,7 +159,7 @@ final class Lox24Transport extends AbstractTransport
         try {
             $type = Type::from((string) $code);
         } catch (\ValueError) {
-            throw new InvalidArgumentException(sprintf('Invalid type: "%s".', $code));
+            throw new InvalidArgumentException(\sprintf('Invalid type: "%s".', $code));
         }
 
         $body['service_code'] = $type->getServiceCode();
@@ -177,7 +177,7 @@ final class Lox24Transport extends AbstractTransport
             } catch (\ValueError) {
                 $allowed = implode(', ', array_map(static fn ($case) => $case->value, VoiceLanguage::cases()));
                 $str = 'The "voice_lang" option "%s" is not a valid language. Allowed languages are: %s.';
-                throw new InvalidArgumentException(sprintf($str, $voiceLang, $allowed));
+                throw new InvalidArgumentException(\sprintf($str, $voiceLang, $allowed));
             }
 
             if (VoiceLanguage::Auto !== $lang) {

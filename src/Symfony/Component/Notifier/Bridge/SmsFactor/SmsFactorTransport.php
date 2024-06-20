@@ -45,7 +45,7 @@ final class SmsFactorTransport extends AbstractTransport
             'push_type' => $this->pushType?->value,
         ]);
 
-        return sprintf('sms-factor://%s%s', $this->getEndpoint(), $query ? '?'.http_build_query($query, '', '&') : '');
+        return \sprintf('sms-factor://%s%s', $this->getEndpoint(), $query ? '?'.http_build_query($query, '', '&') : '');
     }
 
     public function supports(MessageInterface $message): bool

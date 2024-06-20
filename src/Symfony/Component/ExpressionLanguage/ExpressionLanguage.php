@@ -156,12 +156,12 @@ class ExpressionLanguage
         }
 
         $this->addFunction(new ExpressionFunction('enum',
-            static fn ($str): string => sprintf("(\constant(\$v = (%s))) instanceof \UnitEnum ? \constant(\$v) : throw new \TypeError(\sprintf('The string \"%%s\" is not the name of a valid enum case.', \$v))", $str),
+            static fn ($str): string => \sprintf("(\constant(\$v = (%s))) instanceof \UnitEnum ? \constant(\$v) : throw new \TypeError(\sprintf('The string \"%%s\" is not the name of a valid enum case.', \$v))", $str),
             static function ($arguments, $str): \UnitEnum {
                 $value = \constant($str);
 
                 if (!$value instanceof \UnitEnum) {
-                    throw new \TypeError(sprintf('The string "%s" is not the name of a valid enum case.', $str));
+                    throw new \TypeError(\sprintf('The string "%s" is not the name of a valid enum case.', $str));
                 }
 
                 return $value;

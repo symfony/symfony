@@ -24,7 +24,7 @@ final class CrawlerSelectorTextSame extends Constraint
 
     public function toString(): string
     {
-        return sprintf('has a node matching selector "%s" with content "%s"', $this->selector, $this->expectedText);
+        return \sprintf('has a node matching selector "%s" with content "%s"', $this->selector, $this->expectedText);
     }
 
     /**

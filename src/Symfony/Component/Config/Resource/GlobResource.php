@@ -52,7 +52,7 @@ class GlobResource implements \IteratorAggregate, SelfCheckingResourceInterface
         $this->globBrace = \defined('GLOB_BRACE') ? \GLOB_BRACE : 0;
 
         if (false === $resolvedPrefix) {
-            throw new \InvalidArgumentException(sprintf('The path "%s" does not exist.', $prefix));
+            throw new \InvalidArgumentException(\sprintf('The path "%s" does not exist.', $prefix));
         }
 
         $this->prefix = $resolvedPrefix;

@@ -33,7 +33,7 @@ abstract class NumericNodeDefinition extends ScalarNodeDefinition
     public function max(int|float $max): static
     {
         if (isset($this->min) && $this->min > $max) {
-            throw new \InvalidArgumentException(sprintf('You cannot define a max(%s) as you already have a min(%s).', $max, $this->min));
+            throw new \InvalidArgumentException(\sprintf('You cannot define a max(%s) as you already have a min(%s).', $max, $this->min));
         }
         $this->max = $max;
 
@@ -50,7 +50,7 @@ abstract class NumericNodeDefinition extends ScalarNodeDefinition
     public function min(int|float $min): static
     {
         if (isset($this->max) && $this->max < $min) {
-            throw new \InvalidArgumentException(sprintf('You cannot define a min(%s) as you already have a max(%s).', $min, $this->max));
+            throw new \InvalidArgumentException(\sprintf('You cannot define a min(%s) as you already have a max(%s).', $min, $this->max));
         }
         $this->min = $min;
 

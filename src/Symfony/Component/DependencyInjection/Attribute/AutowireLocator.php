@@ -62,11 +62,11 @@ class AutowireLocator extends Autowire
             if ($type instanceof SubscribedService) {
                 $key = $type->key ?? $key;
                 $attributes = $type->attributes;
-                $type = ($type->nullable ? '?' : '').($type->type ?? throw new InvalidArgumentException(sprintf('When "%s" is used, a type must be set.', SubscribedService::class)));
+                $type = ($type->nullable ? '?' : '').($type->type ?? throw new InvalidArgumentException(\sprintf('When "%s" is used, a type must be set.', SubscribedService::class)));
             }
 
             if (!\is_string($type) || !preg_match('/(?(DEFINE)(?<cn>[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*+))(?(DEFINE)(?<fqcn>(?&cn)(?:\\\\(?&cn))*+))^\??(?&fqcn)(?:(?:\|(?&fqcn))*+|(?:&(?&fqcn))*+)$/', $type)) {
-                throw new InvalidArgumentException(sprintf('"%s" is not a PHP type for key "%s".', \is_string($type) ? $type : get_debug_type($type), $key));
+                throw new InvalidArgumentException(\sprintf('"%s" is not a PHP type for key "%s".', \is_string($type) ? $type : get_debug_type($type), $key));
             }
             $optionalBehavior = ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE;
             if ('?' === $type[0]) {

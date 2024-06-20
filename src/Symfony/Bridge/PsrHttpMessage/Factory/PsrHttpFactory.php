@@ -50,7 +50,7 @@ class PsrHttpFactory implements HttpMessageFactoryInterface
             $psr17Factory = match (true) {
                 class_exists(DiscoveryPsr17Factory::class) => new DiscoveryPsr17Factory(),
                 class_exists(NyholmPsr17Factory::class) => new NyholmPsr17Factory(),
-                default => throw new \LogicException(sprintf('You cannot use the "%s" as no PSR-17 factories have been provided. Try running "composer require php-http/discovery psr/http-factory-implementation:*".', self::class)),
+                default => throw new \LogicException(\sprintf('You cannot use the "%s" as no PSR-17 factories have been provided. Try running "composer require php-http/discovery psr/http-factory-implementation:*".', self::class)),
             };
 
             $serverRequestFactory ??= $psr17Factory;

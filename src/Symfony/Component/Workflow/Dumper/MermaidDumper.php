@@ -138,7 +138,7 @@ class MermaidDumper implements DumperInterface
 
         $placeNodeName = 'place'.$placeId;
         $placeNodeFormat = '%s'.$labelShape;
-        $placeNode = sprintf($placeNodeFormat, $placeNodeName, $placeLabel);
+        $placeNode = \sprintf($placeNodeFormat, $placeNodeName, $placeLabel);
 
         $placeStyle = $this->styleNode($meta, $placeNodeName, $hasMarking);
 
@@ -150,7 +150,7 @@ class MermaidDumper implements DumperInterface
         $nodeStyles = [];
 
         if (\array_key_exists('bg_color', $meta)) {
-            $nodeStyles[] = sprintf(
+            $nodeStyles[] = \sprintf(
                 'fill:%s',
                 $meta['bg_color']
             );
@@ -164,7 +164,7 @@ class MermaidDumper implements DumperInterface
             return '';
         }
 
-        return sprintf('style %s %s', $nodeName, implode(',', $nodeStyles));
+        return \sprintf('style %s %s', $nodeName, implode(',', $nodeStyles));
     }
 
     /**
@@ -175,26 +175,26 @@ class MermaidDumper implements DumperInterface
     {
         $label = str_replace('"', '#quot;', $label);
 
-        return sprintf('"%s"', $label);
+        return \sprintf('"%s"', $label);
     }
 
     public function validateDirection(string $direction): void
     {
         if (!\in_array($direction, self::VALID_DIRECTIONS, true)) {
-            throw new InvalidArgumentException(sprintf('Direction "%s" is not valid, valid directions are: "%s".', $direction, implode(', ', self::VALID_DIRECTIONS)));
+            throw new InvalidArgumentException(\sprintf('Direction "%s" is not valid, valid directions are: "%s".', $direction, implode(', ', self::VALID_DIRECTIONS)));
         }
     }
 
     private function validateTransitionType(string $transitionType): void
     {
         if (!\in_array($transitionType, self::VALID_TRANSITION_TYPES, true)) {
-            throw new InvalidArgumentException(sprintf('Transition type "%s" is not valid, valid types are: "%s".', $transitionType, implode(', ', self::VALID_TRANSITION_TYPES)));
+            throw new InvalidArgumentException(\sprintf('Transition type "%s" is not valid, valid types are: "%s".', $transitionType, implode(', ', self::VALID_TRANSITION_TYPES)));
         }
     }
 
     private function styleStateMachineTransition(string $from, string $to, string $transitionLabel, array $transitionMeta): array
     {
-        $transitionOutput = [sprintf('%s-->|%s|%s', $from, str_replace("\n", ' ', $this->escape($transitionLabel)), $to)];
+        $transitionOutput = [\sprintf('%s-->|%s|%s', $from, str_replace("\n", ' ', $this->escape($transitionLabel)), $to)];
 
         $linkStyle = $this->styleLink($transitionMeta);
         if ('' !== $linkStyle) {
@@ -213,7 +213,7 @@ class MermaidDumper implements DumperInterface
         $transitionLabel = $this->escape($transitionLabel);
         $transitionNodeName = 'transition'.$transitionId;
 
-        $transitionOutput[] = sprintf('%s[%s]', $transitionNodeName, $transitionLabel);
+        $transitionOutput[] = \sprintf('%s[%s]', $transitionNodeName, $transitionLabel);
 
         $transitionNodeStyle = $this->styleNode($transitionMeta, $transitionNodeName);
         if ('' !== $transitionNodeStyle) {
@@ -221,7 +221,7 @@ class MermaidDumper implements DumperInterface
         }
 
         $connectionStyle = '%s-->%s';
-        $transitionOutput[] = sprintf($connectionStyle, $from, $transitionNodeName);
+        $transitionOutput[] = \sprintf($connectionStyle, $from, $transitionNodeName);
 
         $linkStyle = $this->styleLink($transitionMeta);
         if ('' !== $linkStyle) {
@@ -230,7 +230,7 @@ class MermaidDumper implements DumperInterface
 
         ++$this->linkCount;
 
-        $transitionOutput[] = sprintf($connectionStyle, $transitionNodeName, $to);
+        $transitionOutput[] = \sprintf($connectionStyle, $transitionNodeName, $to);
 
         $linkStyle = $this->styleLink($transitionMeta);
         if ('' !== $linkStyle) {
@@ -245,7 +245,7 @@ class MermaidDumper implements DumperInterface
     private function styleLink(array $transitionMeta): string
     {
         if (\array_key_exists('color', $transitionMeta)) {
-            return sprintf('linkStyle %d stroke:%s', $this->linkCount, $transitionMeta['color']);
+            return \sprintf('linkStyle %d stroke:%s', $this->linkCount, $transitionMeta['color']);
         }
 
         return '';

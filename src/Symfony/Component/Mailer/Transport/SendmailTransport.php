@@ -55,7 +55,7 @@ class SendmailTransport extends AbstractTransport
 
         if (null !== $command) {
             if (!str_contains($command, ' -bs') && !str_contains($command, ' -t')) {
-                throw new \InvalidArgumentException(sprintf('Unsupported sendmail command flags "%s"; must be one of "-bs" or "-t" but can include additional flags.', $command));
+                throw new \InvalidArgumentException(\sprintf('Unsupported sendmail command flags "%s"; must be one of "-bs" or "-t" but can include additional flags.', $command));
             }
 
             $this->command = $command;
@@ -89,7 +89,7 @@ class SendmailTransport extends AbstractTransport
 
     protected function doSend(SentMessage $message): void
     {
-        $this->getLogger()->debug(sprintf('Email transport "%s" starting', __CLASS__));
+        $this->getLogger()->debug(\sprintf('Email transport "%s" starting', __CLASS__));
 
         $command = $this->command;
 
@@ -119,6 +119,6 @@ class SendmailTransport extends AbstractTransport
         $this->stream->flush();
         $this->stream->terminate();
 
-        $this->getLogger()->debug(sprintf('Email transport "%s" stopped', __CLASS__));
+        $this->getLogger()->debug(\sprintf('Email transport "%s" stopped', __CLASS__));
     }
 }

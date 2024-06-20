@@ -135,7 +135,7 @@ class TestObjectLoaderRouteService
     public function loadRoutes(TestObjectLoader $loader, ?string $env = null)
     {
         if ($this->env !== $env) {
-            throw new \InvalidArgumentException(sprintf('Expected env "%s", "%s" given.', $this->env, $env));
+            throw new \InvalidArgumentException(\sprintf('Expected env "%s", "%s" given.', $this->env, $env));
         }
 
         return $this->collection;

@@ -54,7 +54,7 @@ class MessageListener implements EventSubscriberInterface
     public function addHeaderRule(string $headerName, int $rule): void
     {
         if ($rule < 1 || $rule > 3) {
-            throw new InvalidArgumentException(sprintf('The "%d" rule is not supported.', $rule));
+            throw new InvalidArgumentException(\sprintf('The "%d" rule is not supported.', $rule));
         }
 
         $this->headerRules[strtolower($headerName)] = $rule;
@@ -104,7 +104,7 @@ class MessageListener implements EventSubscriberInterface
 
                     $h = $headers->get($name);
                     if (!$h instanceof MailboxListHeader) {
-                        throw new RuntimeException(sprintf('Unable to set header "%s".', $name));
+                        throw new RuntimeException(\sprintf('Unable to set header "%s".', $name));
                     }
 
                     Headers::checkHeaderClass($header);

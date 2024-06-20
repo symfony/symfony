@@ -45,7 +45,7 @@ class MemcachedSessionHandler extends AbstractSessionHandler
         array $options = [],
     ) {
         if ($diff = array_diff(array_keys($options), ['prefix', 'expiretime', 'ttl'])) {
-            throw new \InvalidArgumentException(sprintf('The following options are not supported "%s".', implode(', ', $diff)));
+            throw new \InvalidArgumentException(\sprintf('The following options are not supported "%s".', implode(', ', $diff)));
         }
 
         $this->ttl = $options['expiretime'] ?? $options['ttl'] ?? null;

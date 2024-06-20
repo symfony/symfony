@@ -32,12 +32,12 @@ class Groups
         $this->groups = (array) $groups;
 
         if (!$this->groups) {
-            throw new InvalidArgumentException(sprintf('Parameter given to "%s" cannot be empty.', static::class));
+            throw new InvalidArgumentException(\sprintf('Parameter given to "%s" cannot be empty.', static::class));
         }
 
         foreach ($this->groups as $group) {
             if (!\is_string($group) || '' === $group) {
-                throw new InvalidArgumentException(sprintf('Parameter given to "%s" must be a string or an array of non-empty strings.', static::class));
+                throw new InvalidArgumentException(\sprintf('Parameter given to "%s" must be a string or an array of non-empty strings.', static::class));
             }
         }
     }

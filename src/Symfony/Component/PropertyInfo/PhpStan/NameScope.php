@@ -46,10 +46,10 @@ final class NameScope
             }
             array_shift($nameParts);
 
-            return sprintf('%s\\%s', $this->uses[$firstNamePart], implode('\\', $nameParts));
+            return \sprintf('%s\\%s', $this->uses[$firstNamePart], implode('\\', $nameParts));
         }
 
-        return sprintf('%s\\%s', $this->namespace, $name);
+        return \sprintf('%s\\%s', $this->namespace, $name);
     }
 
     public function resolveRootClass(): string

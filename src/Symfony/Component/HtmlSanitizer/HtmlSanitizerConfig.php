@@ -412,7 +412,7 @@ class HtmlSanitizerConfig
     public function withMaxInputLength(int $maxInputLength): static
     {
         if ($maxInputLength < -1) {
-            throw new \InvalidArgumentException(sprintf('The maximum input length must be greater than -1, "%d" given.', $maxInputLength));
+            throw new \InvalidArgumentException(\sprintf('The maximum input length must be greater than -1, "%d" given.', $maxInputLength));
         }
 
         $clone = clone $this;

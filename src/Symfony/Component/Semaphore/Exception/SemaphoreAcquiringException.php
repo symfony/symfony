@@ -23,6 +23,6 @@ class SemaphoreAcquiringException extends \RuntimeException implements Exception
 {
     public function __construct(Key $key, string $message)
     {
-        parent::__construct(sprintf('The semaphore "%s" could not be acquired: %s.', $key, $message));
+        parent::__construct(\sprintf('The semaphore "%s" could not be acquired: %s.', $key, $message));
     }
 }

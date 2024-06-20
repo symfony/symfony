@@ -53,7 +53,7 @@ final class SpotHitTransport extends AbstractTransport
             'smslongnbr' => $this->smsLongNBr,
         ]);
 
-        return sprintf('spothit://%s', $this->getEndpoint()).('' !== $query ? '?'.$query : '');
+        return \sprintf('spothit://%s', $this->getEndpoint()).('' !== $query ? '?'.$query : '');
     }
 
     public function setSmsLong(?bool $smsLong): self
@@ -89,7 +89,7 @@ final class SpotHitTransport extends AbstractTransport
             throw new UnsupportedMessageTypeException(__CLASS__, SmsMessage::class, $message);
         }
 
-        $endpoint = sprintf('https://www.%s/api/envoyer/sms', $this->getEndpoint());
+        $endpoint = \sprintf('https://www.%s/api/envoyer/sms', $this->getEndpoint());
         $response = $this->client->request('POST', $endpoint, [
             'body' => [
                 'key' => $this->token,
@@ -112,7 +112,7 @@ final class SpotHitTransport extends AbstractTransport
 
         if (!$data['resultat']) {
             $errors = \is_array($data['erreurs']) ? implode(',', $data['erreurs']) : $data['erreurs'];
-            throw new TransportException(sprintf('[HTTP %d] Unable to send the SMS: error(s) "%s".', $response->getStatusCode(), $errors), $response);
+            throw new TransportException(\sprintf('[HTTP %d] Unable to send the SMS: error(s) "%s".', $response->getStatusCode(), $errors), $response);
         }
 
         $sentMessage = new SentMessage($message, (string) $this);

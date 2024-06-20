@@ -196,7 +196,7 @@ class XmlUtilsTest extends TestCase
         $file = __DIR__.'/../Fixtures/foo.xml';
 
         $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage(sprintf('File "%s" does not contain valid XML, it is empty.', $file));
+        $this->expectExceptionMessage(\sprintf('File "%s" does not contain valid XML, it is empty.', $file));
 
         XmlUtils::loadFile($file);
     }
@@ -216,7 +216,7 @@ class XmlUtilsTest extends TestCase
                 XmlUtils::loadFile($file);
                 $this->fail('An exception should have been raised');
             } catch (\InvalidArgumentException $e) {
-                $this->assertEquals(sprintf('File "%s" does not contain valid XML, it is empty.', $file), $e->getMessage());
+                $this->assertEquals(\sprintf('File "%s" does not contain valid XML, it is empty.', $file), $e->getMessage());
             }
         } finally {
             restore_error_handler();

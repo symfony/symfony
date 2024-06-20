@@ -115,7 +115,7 @@ class UndefinedCallableHandler
     private static function onUndefined(string $name, string $type, string $component): string
     {
         if (class_exists(FullStack::class) && isset(self::FULL_STACK_ENABLE[$component])) {
-            return sprintf('Did you forget to %s? Unknown %s "%s".', self::FULL_STACK_ENABLE[$component], $type, $name);
+            return \sprintf('Did you forget to %s? Unknown %s "%s".', self::FULL_STACK_ENABLE[$component], $type, $name);
         }
 
         $missingPackage = 'symfony/'.$component;
@@ -124,6 +124,6 @@ class UndefinedCallableHandler
             $missingPackage = 'symfony/twig-bundle';
         }
 
-        return sprintf('Did you forget to run "composer require %s"? Unknown %s "%s".', $missingPackage, $type, $name);
+        return \sprintf('Did you forget to run "composer require %s"? Unknown %s "%s".', $missingPackage, $type, $name);
     }
 }

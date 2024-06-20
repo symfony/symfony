@@ -214,7 +214,7 @@ class AccessTokenFactoryTest extends TestCase
             'index_0' => (new ChildDefinition('security.access_token_handler.oidc.signature'))
                 ->replaceArgument(0, ['RS256']),
             'index_1' => (new ChildDefinition('security.access_token_handler.oidc.jwkset'))
-                ->replaceArgument(0, sprintf('{"keys":[%s]}', $jwk)),
+                ->replaceArgument(0, \sprintf('{"keys":[%s]}', $jwk)),
             'index_2' => 'audience',
             'index_3' => ['https://www.example.com'],
             'index_4' => 'sub',

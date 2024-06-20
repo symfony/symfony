@@ -40,23 +40,23 @@ class CheckDefinitionValidityPass implements CompilerPassInterface
         foreach ($container->getDefinitions() as $id => $definition) {
             // synthetic service is public
             if ($definition->isSynthetic() && !$definition->isPublic()) {
-                throw new RuntimeException(sprintf('A synthetic service ("%s") must be public.', $id));
+                throw new RuntimeException(\sprintf('A synthetic service ("%s") must be public.', $id));
             }
 
             // non-synthetic, non-abstract service has class
             if (!$definition->isAbstract() && !$definition->isSynthetic() && !$definition->getClass() && !$definition->hasTag('container.service_locator') && (!$definition->getFactory() || !preg_match(FileLoader::ANONYMOUS_ID_REGEXP, $id))) {
                 if ($definition->getFactory()) {
-                    throw new RuntimeException(sprintf('Please add the class to service "%s" even if it is constructed by a factory since we might need to add method calls based on compile-time checks.', $id));
+                    throw new RuntimeException(\sprintf('Please add the class to service "%s" even if it is constructed by a factory since we might need to add method calls based on compile-time checks.', $id));
                 }
                 if (class_exists($id) || interface_exists($id, false)) {
                     if (str_starts_with($id, '\\') && 1 < substr_count($id, '\\')) {
-                        throw new RuntimeException(sprintf('The definition for "%s" has no class attribute, and appears to reference a class or interface. Please specify the class attribute explicitly or remove the leading backslash by renaming the service to "%s" to get rid of this error.', $id, substr($id, 1)));
+                        throw new RuntimeException(\sprintf('The definition for "%s" has no class attribute, and appears to reference a class or interface. Please specify the class attribute explicitly or remove the leading backslash by renaming the service to "%s" to get rid of this error.', $id, substr($id, 1)));
                     }
 
-                    throw new RuntimeException(sprintf('The definition for "%s" has no class attribute, and appears to reference a class or interface in the global namespace. Leaving out the "class" attribute is only allowed for namespaced classes. Please specify the class attribute explicitly to get rid of this error.', $id));
+                    throw new RuntimeException(\sprintf('The definition for "%s" has no class attribute, and appears to reference a class or interface in the global namespace. Leaving out the "class" attribute is only allowed for namespaced classes. Please specify the class attribute explicitly to get rid of this error.', $id));
                 }
 
-                throw new RuntimeException(sprintf('The definition for "%s" has no class. If you intend to inject this service dynamically at runtime, please mark it as synthetic=true. If this is an abstract definition solely used by child definitions, please add abstract=true, otherwise specify a class to get rid of this error.', $id));
+                throw new RuntimeException(\sprintf('The definition for "%s" has no class. If you intend to inject this service dynamically at runtime, please mark it as synthetic=true. If this is an abstract definition solely used by child definitions, please add abstract=true, otherwise specify a class to get rid of this error.', $id));
             }
 
             // tag attribute values must be scalars
@@ -91,7 +91,7 @@ class CheckDefinitionValidityPass implements CompilerPassInterface
                 $this->validateAttributes($id, $tag, $value, [...$path, $name]);
             } elseif (!\is_scalar($value) && null !== $value) {
                 $name = implode('.', [...$path, $name]);
-                throw new RuntimeException(sprintf('A "tags" attribute must be of a scalar-type for service "%s", tag "%s", attribute "%s".', $id, $tag, $name));
+                throw new RuntimeException(\sprintf('A "tags" attribute must be of a scalar-type for service "%s", tag "%s", attribute "%s".', $id, $tag, $name));
             }
         }
     }

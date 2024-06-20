@@ -95,28 +95,28 @@ EOF
                 } elseif ($pool instanceof Psr6CacheClearer) {
                     $clearers[$id] = $pool;
                 } else {
-                    throw new InvalidArgumentException(sprintf('"%s" is not a cache pool nor a cache clearer.', $id));
+                    throw new InvalidArgumentException(\sprintf('"%s" is not a cache pool nor a cache clearer.', $id));
                 }
             }
         }
 
         foreach ($clearers as $id => $clearer) {
-            $io->comment(sprintf('Calling cache clearer: <info>%s</info>', $id));
+            $io->comment(\sprintf('Calling cache clearer: <info>%s</info>', $id));
             $clearer->clear($kernel->getContainer()->getParameter('kernel.cache_dir'));
         }
 
         $failure = false;
         foreach ($pools as $id => $pool) {
-            $io->comment(sprintf('Clearing cache pool: <info>%s</info>', $id));
+            $io->comment(\sprintf('Clearing cache pool: <info>%s</info>', $id));
 
             if ($pool instanceof CacheItemPoolInterface) {
                 if (!$pool->clear()) {
-                    $io->warning(sprintf('Cache pool "%s" could not be cleared.', $pool));
+                    $io->warning(\sprintf('Cache pool "%s" could not be cleared.', $pool));
                     $failure = true;
                 }
             } else {
                 if (false === $this->poolClearer->clearPool($id)) {
-                    $io->warning(sprintf('Cache pool "%s" could not be cleared.', $pool));
+                    $io->warning(\sprintf('Cache pool "%s" could not be cleared.', $pool));
                     $failure = true;
                 }
             }

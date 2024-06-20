@@ -32,7 +32,7 @@ final class UidValueResolver implements ValueResolverInterface
         try {
             return [$uidClass::fromString($value)];
         } catch (\InvalidArgumentException $e) {
-            throw new NotFoundHttpException(sprintf('The uid for the "%s" parameter is invalid.', $argument->getName()), $e);
+            throw new NotFoundHttpException(\sprintf('The uid for the "%s" parameter is invalid.', $argument->getName()), $e);
         }
     }
 }

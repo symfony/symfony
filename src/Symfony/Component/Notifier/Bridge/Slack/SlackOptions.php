@@ -32,7 +32,7 @@ class SlackOptions implements MessageOptionsInterface
         $this->options = $options;
 
         if (\count($this->options['blocks'] ?? []) > self::MAX_BLOCKS) {
-            throw new LogicException(sprintf('Maximum number of "blocks" has been reached (%d).', self::MAX_BLOCKS));
+            throw new LogicException(\sprintf('Maximum number of "blocks" has been reached (%d).', self::MAX_BLOCKS));
         }
     }
 
@@ -103,7 +103,7 @@ class SlackOptions implements MessageOptionsInterface
     public function block(SlackBlockInterface $block): static
     {
         if (\count($this->options['blocks'] ?? []) >= self::MAX_BLOCKS) {
-            throw new LogicException(sprintf('Maximum number of "blocks" has been reached (%d).', self::MAX_BLOCKS));
+            throw new LogicException(\sprintf('Maximum number of "blocks" has been reached (%d).', self::MAX_BLOCKS));
         }
 
         $this->options['blocks'][] = $block->toArray();

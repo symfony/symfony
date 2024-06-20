@@ -89,7 +89,7 @@ class AmpListener implements EventListener
         $this->info['primary_ip'] = $host;
         $this->info['primary_port'] = $stream->getRemoteAddress()->getPort();
         $this->info['pretransfer_time'] = microtime(true) - $this->info['start_time'];
-        $this->info['debug'] .= sprintf("* Connected to %s (%s) port %d\n", $request->getUri()->getHost(), $host, $this->info['primary_port']);
+        $this->info['debug'] .= \sprintf("* Connected to %s (%s) port %d\n", $request->getUri()->getHost(), $host, $this->info['primary_port']);
 
         if ((isset($this->info['peer_certificate_chain']) || $this->pinSha256) && null !== $tlsInfo = $stream->getTlsInfo()) {
             foreach ($tlsInfo->getPeerCertificates() as $cert) {
@@ -104,7 +104,7 @@ class AmpListener implements EventListener
                 $pin = base64_encode(hash('sha256', $pin, true));
 
                 if (!\in_array($pin, $this->pinSha256, true)) {
-                    throw new TransportException(sprintf('SSL public key does not match pinned public key for "%s".', $this->info['url']));
+                    throw new TransportException(\sprintf('SSL public key does not match pinned public key for "%s".', $this->info['url']));
                 }
             }
         }
@@ -121,7 +121,7 @@ class AmpListener implements EventListener
             $requestUri = $uri->getHost().': '.($uri->getPort() ?? ('https' === $uri->getScheme() ? 443 : 80));
         }
 
-        $this->info['debug'] .= sprintf("> %s %s HTTP/%s \r\n", $method, $requestUri, $request->getProtocolVersions()[0]);
+        $this->info['debug'] .= \sprintf("> %s %s HTTP/%s \r\n", $method, $requestUri, $request->getProtocolVersions()[0]);
 
         foreach ($request->getRawHeaders() as [$name, $value]) {
             $this->info['debug'] .= $name.': '.$value."\r\n";

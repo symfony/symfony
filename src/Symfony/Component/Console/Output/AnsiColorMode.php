@@ -51,7 +51,7 @@ enum AnsiColorMode
         }
 
         if (6 !== \strlen($hexColor)) {
-            throw new InvalidArgumentException(sprintf('Invalid "#%s" color.', $hexColor));
+            throw new InvalidArgumentException(\sprintf('Invalid "#%s" color.', $hexColor));
         }
 
         $color = hexdec($hexColor);
@@ -63,7 +63,7 @@ enum AnsiColorMode
         return match ($this) {
             self::Ansi4 => (string) $this->convertFromRGB($r, $g, $b),
             self::Ansi8 => '8;5;'.((string) $this->convertFromRGB($r, $g, $b)),
-            self::Ansi24 => sprintf('8;2;%d;%d;%d', $r, $g, $b),
+            self::Ansi24 => \sprintf('8;2;%d;%d;%d', $r, $g, $b),
         };
     }
 

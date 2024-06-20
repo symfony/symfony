@@ -39,7 +39,7 @@ final class EsendexTransport extends AbstractTransport
 
     public function __toString(): string
     {
-        return sprintf('esendex://%s?accountreference=%s&from=%s', $this->getEndpoint(), $this->accountReference, $this->from);
+        return \sprintf('esendex://%s?accountreference=%s&from=%s', $this->getEndpoint(), $this->accountReference, $this->from);
     }
 
     public function supports(MessageInterface $message): bool
@@ -89,14 +89,14 @@ final class EsendexTransport extends AbstractTransport
             return $sentMessage;
         }
 
-        $message = sprintf('Unable to send the SMS: error %d.', $statusCode);
+        $message = \sprintf('Unable to send the SMS: error %d.', $statusCode);
 
         try {
             $result = $response->toArray(false);
             if (!empty($result['errors'])) {
                 $error = $result['errors'][0];
 
-                $message .= sprintf(' Details from Esendex: %s: "%s".', $error['code'], $error['description']);
+                $message .= \sprintf(' Details from Esendex: %s: "%s".', $error['code'], $error['description']);
             }
         } catch (JsonException) {
         }

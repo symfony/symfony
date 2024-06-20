@@ -70,7 +70,7 @@ final class SmsapiTransport extends AbstractTransport
             'test' => (int) $this->test,
         ]);
 
-        return sprintf('smsapi://%s%s', $this->getEndpoint(), $query ? '?'.http_build_query($query, '', '&') : '');
+        return \sprintf('smsapi://%s%s', $this->getEndpoint(), $query ? '?'.http_build_query($query, '', '&') : '');
     }
 
     public function supports(MessageInterface $message): bool
@@ -98,7 +98,7 @@ final class SmsapiTransport extends AbstractTransport
             $body['from'] = $from;
         }
 
-        $endpoint = sprintf('https://%s/sms.do', $this->getEndpoint());
+        $endpoint = \sprintf('https://%s/sms.do', $this->getEndpoint());
         $response = $this->client->request('POST', $endpoint, [
             'auth_bearer' => $this->authToken,
             'body' => $body,
@@ -117,7 +117,7 @@ final class SmsapiTransport extends AbstractTransport
         }
 
         if (isset($content['error']) || 200 !== $statusCode) {
-            throw new TransportException(sprintf('Unable to send the SMS: "%s".', $content['message'] ?? 'unknown error'), $response);
+            throw new TransportException(\sprintf('Unable to send the SMS: "%s".', $content['message'] ?? 'unknown error'), $response);
         }
 
         $sentMessage = new SentMessage($message, (string) $this);

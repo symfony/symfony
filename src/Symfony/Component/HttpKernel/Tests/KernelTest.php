@@ -59,7 +59,7 @@ class KernelTest extends TestCase
     public function testEmptyEnv()
     {
         $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage(sprintf('Invalid environment provided to "%s": the environment cannot be empty.', KernelForTest::class));
+        $this->expectExceptionMessage(\sprintf('Invalid environment provided to "%s": the environment cannot be empty.', KernelForTest::class));
 
         new KernelForTest('', false);
     }

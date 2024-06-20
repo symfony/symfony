@@ -38,7 +38,7 @@ final class MattermostTransport extends AbstractTransport
 
     public function __toString(): string
     {
-        return sprintf('mattermost://%s?channel=%s', $this->getEndpoint(), $this->channel);
+        return \sprintf('mattermost://%s?channel=%s', $this->getEndpoint(), $this->channel);
     }
 
     public function supports(MessageInterface $message): bool
@@ -59,7 +59,7 @@ final class MattermostTransport extends AbstractTransport
         $options['message'] = $message->getSubject();
         $options['channel_id'] ??= $message->getRecipientId() ?: $this->channel;
 
-        $endpoint = sprintf('https://%s/api/v4/posts', $this->getEndpoint());
+        $endpoint = \sprintf('https://%s/api/v4/posts', $this->getEndpoint());
 
         $response = $this->client->request('POST', $endpoint, [
             'auth_bearer' => $this->token,
@@ -75,7 +75,7 @@ final class MattermostTransport extends AbstractTransport
         if (201 !== $statusCode) {
             $result = $response->toArray(false);
 
-            throw new TransportException(sprintf('Unable to post the Mattermost message: %s (%s).', $result['message'], $result['id']), $response);
+            throw new TransportException(\sprintf('Unable to post the Mattermost message: %s (%s).', $result['message'], $result['id']), $response);
         }
 
         $success = $response->toArray(false);

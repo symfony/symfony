@@ -80,16 +80,16 @@ class RequestPayloadValueResolver implements ValueResolverInterface, EventSubscr
         }
 
         if (!$attribute instanceof MapUploadedFile && $argument->isVariadic()) {
-            throw new \LogicException(sprintf('Mapping variadic argument "$%s" is not supported.', $argument->getName()));
+            throw new \LogicException(\sprintf('Mapping variadic argument "$%s" is not supported.', $argument->getName()));
         }
 
         if ($attribute instanceof MapRequestPayload) {
             if ('array' === $argument->getType()) {
                 if (!$attribute->type) {
-                    throw new NearMissValueResolverException(sprintf('Please set the $type argument of the #[%s] attribute to the type of the objects in the expected array.', MapRequestPayload::class));
+                    throw new NearMissValueResolverException(\sprintf('Please set the $type argument of the #[%s] attribute to the type of the objects in the expected array.', MapRequestPayload::class));
                 }
             } elseif ($attribute->type) {
-                throw new NearMissValueResolverException(sprintf('Please set its type to "array" when using argument $type of #[%s].', MapRequestPayload::class));
+                throw new NearMissValueResolverException(\sprintf('Please set its type to "array" when using argument $type of #[%s].', MapRequestPayload::class));
             }
         }
 
@@ -118,7 +118,7 @@ class RequestPayloadValueResolver implements ValueResolverInterface, EventSubscr
             $request = $event->getRequest();
 
             if (!$argument->metadata->getType()) {
-                throw new \LogicException(sprintf('Could not resolve the "$%s" controller argument: argument should be typed.', $argument->metadata->getName()));
+                throw new \LogicException(\sprintf('Could not resolve the "$%s" controller argument: argument should be typed.', $argument->metadata->getName()));
             }
 
             if ($this->validator) {
@@ -199,7 +199,7 @@ class RequestPayloadValueResolver implements ValueResolverInterface, EventSubscr
         }
 
         if ($attribute->acceptFormat && !\in_array($format, (array) $attribute->acceptFormat, true)) {
-            throw new UnsupportedMediaTypeHttpException(sprintf('Unsupported format, expects "%s", but "%s" given.', implode('", "', (array) $attribute->acceptFormat), $format));
+            throw new UnsupportedMediaTypeHttpException(\sprintf('Unsupported format, expects "%s", but "%s" given.', implode('", "', (array) $attribute->acceptFormat), $format));
         }
 
         if ('array' === $argument->getType() && null !== $attribute->type) {
@@ -223,11 +223,11 @@ class RequestPayloadValueResolver implements ValueResolverInterface, EventSubscr
         try {
             return $this->serializer->deserialize($data, $type, $format, self::CONTEXT_DESERIALIZE + $attribute->serializationContext);
         } catch (UnsupportedFormatException $e) {
-            throw new UnsupportedMediaTypeHttpException(sprintf('Unsupported format: "%s".', $format), $e);
+            throw new UnsupportedMediaTypeHttpException(\sprintf('Unsupported format: "%s".', $format), $e);
         } catch (NotEncodableValueException $e) {
-            throw new BadRequestHttpException(sprintf('Request payload contains invalid "%s" data.', $format), $e);
+            throw new BadRequestHttpException(\sprintf('Request payload contains invalid "%s" data.', $format), $e);
         } catch (UnexpectedPropertyException $e) {
-            throw new BadRequestHttpException(sprintf('Request payload contains invalid "%s" property.', $e->property), $e);
+            throw new BadRequestHttpException(\sprintf('Request payload contains invalid "%s" property.', $e->property), $e);
         }
     }
 

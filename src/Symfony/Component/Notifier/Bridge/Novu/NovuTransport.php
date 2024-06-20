@@ -38,7 +38,7 @@ class NovuTransport extends AbstractTransport
 
     public function __toString(): string
     {
-        return sprintf('novu://%s', $this->getEndpoint());
+        return \sprintf('novu://%s', $this->getEndpoint());
     }
 
     public function supports(MessageInterface $message): bool
@@ -69,11 +69,11 @@ class NovuTransport extends AbstractTransport
             'overrides' => $options['overrides'] ?? [],
         ];
 
-        $endpoint = sprintf('https://%s/v1/events/trigger', $this->getEndpoint());
+        $endpoint = \sprintf('https://%s/v1/events/trigger', $this->getEndpoint());
         $response = $this->client->request('POST', $endpoint, [
             'body' => $body,
             'headers' => [
-                'Authorization' => sprintf('ApiKey %s', $this->apiKey),
+                'Authorization' => \sprintf('ApiKey %s', $this->apiKey),
                 'Content-Type' => 'application/json',
             ],
         ]);
@@ -88,7 +88,7 @@ class NovuTransport extends AbstractTransport
             $originalContent = $message->getSubject();
             $result = $response->toArray(false);
             $error = $result['message'];
-            throw new TransportException(sprintf('Unable to post the Novu message: "%s" (%d: "%s").', $originalContent, $statusCode, $error), $response);
+            throw new TransportException(\sprintf('Unable to post the Novu message: "%s" (%d: "%s").', $originalContent, $statusCode, $error), $response);
         }
 
         return new SentMessage($message, (string) $this);

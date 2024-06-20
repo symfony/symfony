@@ -171,7 +171,7 @@ trait BrowserKitAssertionsTrait
         }
 
         if (!$client instanceof AbstractBrowser) {
-            static::fail(sprintf('A client must be set to make assertions on it. Did you forget to call "%s::createClient()"?', __CLASS__));
+            static::fail(\sprintf('A client must be set to make assertions on it. Did you forget to call "%s::createClient()"?', __CLASS__));
         }
 
         return $client;

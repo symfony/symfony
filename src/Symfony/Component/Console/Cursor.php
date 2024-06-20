@@ -36,7 +36,7 @@ final class Cursor
      */
     public function moveUp(int $lines = 1): static
     {
-        $this->output->write(sprintf("\x1b[%dA", $lines));
+        $this->output->write(\sprintf("\x1b[%dA", $lines));
 
         return $this;
     }
@@ -46,7 +46,7 @@ final class Cursor
      */
     public function moveDown(int $lines = 1): static
     {
-        $this->output->write(sprintf("\x1b[%dB", $lines));
+        $this->output->write(\sprintf("\x1b[%dB", $lines));
 
         return $this;
     }
@@ -56,7 +56,7 @@ final class Cursor
      */
     public function moveRight(int $columns = 1): static
     {
-        $this->output->write(sprintf("\x1b[%dC", $columns));
+        $this->output->write(\sprintf("\x1b[%dC", $columns));
 
         return $this;
     }
@@ -66,7 +66,7 @@ final class Cursor
      */
     public function moveLeft(int $columns = 1): static
     {
-        $this->output->write(sprintf("\x1b[%dD", $columns));
+        $this->output->write(\sprintf("\x1b[%dD", $columns));
 
         return $this;
     }
@@ -76,7 +76,7 @@ final class Cursor
      */
     public function moveToColumn(int $column): static
     {
-        $this->output->write(sprintf("\x1b[%dG", $column));
+        $this->output->write(\sprintf("\x1b[%dG", $column));
 
         return $this;
     }
@@ -86,7 +86,7 @@ final class Cursor
      */
     public function moveToPosition(int $column, int $row): static
     {
-        $this->output->write(sprintf("\x1b[%d;%dH", $row + 1, $column));
+        $this->output->write(\sprintf("\x1b[%d;%dH", $row + 1, $column));
 
         return $this;
     }
@@ -195,7 +195,7 @@ final class Cursor
 
         $code = trim(fread($this->input, 1024));
 
-        shell_exec(sprintf('stty %s', $sttyMode));
+        shell_exec(\sprintf('stty %s', $sttyMode));
 
         sscanf($code, "\033[%d;%dR", $row, $col);
 

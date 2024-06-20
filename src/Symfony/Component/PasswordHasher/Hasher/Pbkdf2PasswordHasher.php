@@ -60,7 +60,7 @@ final class Pbkdf2PasswordHasher implements LegacyPasswordHasherInterface
         }
 
         if (!\in_array($this->algorithm, hash_algos(), true)) {
-            throw new LogicException(sprintf('The algorithm "%s" is not supported.', $this->algorithm));
+            throw new LogicException(\sprintf('The algorithm "%s" is not supported.', $this->algorithm));
         }
 
         $digest = hash_pbkdf2($this->algorithm, $plainPassword, $salt ?? '', $this->iterations, $this->length, true);

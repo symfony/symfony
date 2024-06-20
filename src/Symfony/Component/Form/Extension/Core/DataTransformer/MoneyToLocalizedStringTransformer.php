@@ -75,7 +75,7 @@ class MoneyToLocalizedStringTransformer extends NumberToLocalizedStringTransform
             }
 
             if ($value > \PHP_INT_MAX || $value < \PHP_INT_MIN) {
-                throw new TransformationFailedException(sprintf('Cannot cast "%s" to an integer. Try setting the input to "float" instead.', $value));
+                throw new TransformationFailedException(\sprintf('Cannot cast "%s" to an integer. Try setting the input to "float" instead.', $value));
             }
 
             $value = (int) $value;

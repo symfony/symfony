@@ -31,7 +31,7 @@ class ChoiceTypeTranslationTest extends TypeTestCase
     {
         $translator = $this->createMock(TranslatorInterface::class);
         $translator->expects($this->any())->method('trans')
-            ->willReturnCallback(fn ($key, $params) => strtr(sprintf('Translation of: %s', $key), $params)
+            ->willReturnCallback(fn ($key, $params) => strtr(\sprintf('Translation of: %s', $key), $params)
             );
 
         return array_merge(parent::getExtensions(), [new CoreExtension(null, null, $translator)]);

@@ -116,7 +116,7 @@ abstract class AbstractMimeTypeGuesserTestCase extends TestCase
         touch($path);
         @chmod($path, 0333);
 
-        if (str_ends_with(sprintf('%o', fileperms($path)), '0333')) {
+        if (str_ends_with(\sprintf('%o', fileperms($path)), '0333')) {
             $this->expectException(\InvalidArgumentException::class);
             $this->getGuesser()->guessMimeType($path);
         } else {

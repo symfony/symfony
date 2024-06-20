@@ -44,7 +44,7 @@ class ServiceReferenceGraph
     public function getNode(string $id): ServiceReferenceGraphNode
     {
         if (!isset($this->nodes[$id])) {
-            throw new InvalidArgumentException(sprintf('There is no node with id "%s".', $id));
+            throw new InvalidArgumentException(\sprintf('There is no node with id "%s".', $id));
         }
 
         return $this->nodes[$id];

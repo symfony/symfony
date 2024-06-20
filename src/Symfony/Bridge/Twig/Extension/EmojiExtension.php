@@ -47,7 +47,7 @@ final class EmojiExtension extends AbstractExtension
         try {
             $tr = self::$transliterators[$catalog] ??= EmojiTransliterator::create($catalog, EmojiTransliterator::REVERSE);
         } catch (\IntlException $e) {
-            throw new \LogicException(sprintf('The emoji catalog "%s" is not available.', $catalog), previous: $e);
+            throw new \LogicException(\sprintf('The emoji catalog "%s" is not available.', $catalog), previous: $e);
         }
 
         return (string) $tr->transliterate($string);

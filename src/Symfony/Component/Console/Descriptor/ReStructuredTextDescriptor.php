@@ -167,7 +167,7 @@ class ReStructuredTextDescriptor extends Descriptor
             return 'Console Tool';
         }
         if ('UNKNOWN' !== $application->getVersion()) {
-            return sprintf('%s %s', $application->getName(), $application->getVersion());
+            return \sprintf('%s %s', $application->getName(), $application->getVersion());
         }
 
         return $application->getName();
@@ -209,7 +209,7 @@ class ReStructuredTextDescriptor extends Descriptor
             $commands = $this->removeAliasesAndHiddenCommands($commands);
 
             $this->write("\n\n");
-            $this->write(implode("\n", array_map(static fn ($commandName) => sprintf('- `%s`_', $commandName), array_keys($commands))));
+            $this->write(implode("\n", array_map(static fn ($commandName) => \sprintf('- `%s`_', $commandName), array_keys($commands))));
         }
     }
 

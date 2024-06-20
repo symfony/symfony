@@ -41,7 +41,7 @@ final class LineNotifyTransport extends AbstractTransport
             throw new UnsupportedMessageTypeException(__CLASS__, ChatMessage::class, $message);
         }
 
-        $endpoint = sprintf('https://%s/api/notify', $this->getEndpoint());
+        $endpoint = \sprintf('https://%s/api/notify', $this->getEndpoint());
         $response = $this->client->request('POST', $endpoint, [
             'auth_bearer' => $this->token,
             'query' => [
@@ -61,7 +61,7 @@ final class LineNotifyTransport extends AbstractTransport
             $originalContent = $message->getSubject();
             $errorCode = $result['status'];
             $errorMessage = trim($result['message']);
-            throw new TransportException(sprintf('Unable to post the Line message: "%s" (%d: "%s").', $originalContent, $errorCode, $errorMessage), $response);
+            throw new TransportException(\sprintf('Unable to post the Line message: "%s" (%d: "%s").', $originalContent, $errorCode, $errorMessage), $response);
         }
 
         return new SentMessage($message, (string) $this);
@@ -74,6 +74,6 @@ final class LineNotifyTransport extends AbstractTransport
 
     public function __toString(): string
     {
-        return sprintf('linenotify://%s', $this->getEndpoint());
+        return \sprintf('linenotify://%s', $this->getEndpoint());
     }
 }

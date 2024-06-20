@@ -85,7 +85,7 @@ class XmlUtils
             } else {
                 libxml_use_internal_errors($internalErrors);
 
-                throw new XmlParsingException(sprintf('Invalid XSD file: "%s".', $schemaOrCallable));
+                throw new XmlParsingException(\sprintf('Invalid XSD file: "%s".', $schemaOrCallable));
             }
 
             if (!$valid) {
@@ -116,23 +116,23 @@ class XmlUtils
     public static function loadFile(string $file, string|callable|null $schemaOrCallable = null): \DOMDocument
     {
         if (!is_file($file)) {
-            throw new \InvalidArgumentException(sprintf('Resource "%s" is not a file.', $file));
+            throw new \InvalidArgumentException(\sprintf('Resource "%s" is not a file.', $file));
         }
 
         if (!is_readable($file)) {
-            throw new \InvalidArgumentException(sprintf('File "%s" is not readable.', $file));
+            throw new \InvalidArgumentException(\sprintf('File "%s" is not readable.', $file));
         }
 
         $content = (new Filesystem())->readFile($file);
 
         if ('' === trim($content)) {
-            throw new \InvalidArgumentException(sprintf('File "%s" does not contain valid XML, it is empty.', $file));
+            throw new \InvalidArgumentException(\sprintf('File "%s" does not contain valid XML, it is empty.', $file));
         }
 
         try {
             return static::parse($content, $schemaOrCallable);
         } catch (InvalidXmlException $e) {
-            throw new XmlParsingException(sprintf('The XML file "%s" is not valid.', $file), 0, $e->getPrevious());
+            throw new XmlParsingException(\sprintf('The XML file "%s" is not valid.', $file), 0, $e->getPrevious());
         }
     }
 
@@ -243,7 +243,7 @@ class XmlUtils
     {
         $errors = [];
         foreach (libxml_get_errors() as $error) {
-            $errors[] = sprintf('[%s %s] %s (in %s - line %d, column %d)',
+            $errors[] = \sprintf('[%s %s] %s (in %s - line %d, column %d)',
                 \LIBXML_ERR_WARNING == $error->level ? 'WARNING' : 'ERROR',
                 $error->code,
                 trim($error->message),

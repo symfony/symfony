@@ -49,7 +49,7 @@ class LoginThrottlingFactory implements AuthenticatorFactoryInterface
     {
         $builder
             ->children()
-                ->scalarNode('limiter')->info(sprintf('A service id implementing "%s".', RequestRateLimiterInterface::class))->end()
+                ->scalarNode('limiter')->info(\sprintf('A service id implementing "%s".', RequestRateLimiterInterface::class))->end()
                 ->integerNode('max_attempts')->defaultValue(5)->end()
                 ->scalarNode('interval')->defaultValue('1 minute')->end()
                 ->scalarNode('lock_factory')->info('The service ID of the lock factory used by the login rate limiter (or null to disable locking)')->defaultNull()->end()
@@ -98,7 +98,7 @@ class LoginThrottlingFactory implements AuthenticatorFactoryInterface
 
         if (null !== $limiterConfig['lock_factory']) {
             if (!interface_exists(LockInterface::class)) {
-                throw new LogicException(sprintf('Rate limiter "%s" requires the Lock component to be installed. Try running "composer require symfony/lock".', $name));
+                throw new LogicException(\sprintf('Rate limiter "%s" requires the Lock component to be installed. Try running "composer require symfony/lock".', $name));
             }
 
             $limiter->replaceArgument(2, new Reference($limiterConfig['lock_factory']));

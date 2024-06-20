@@ -59,7 +59,7 @@ class UuidV6 extends Uuid implements TimeBasedUidInterface
             $time = substr($time, 1);
         }
 
-        return new UuidV7(substr_replace(sprintf(
+        return new UuidV7(substr_replace(\sprintf(
             '%012s-7%s-%s%s-%s%06s',
             \PHP_INT_SIZE >= 8 ? dechex($ms) : bin2hex(BinaryUtil::fromBase($ms, BinaryUtil::BASE10)),
             substr($uuid, -6, 3),
@@ -85,7 +85,7 @@ class UuidV6 extends Uuid implements TimeBasedUidInterface
         if (!isset(self::$node)) {
             $seed = [random_int(0, 0xFFFFFF), random_int(0, 0xFFFFFF)];
             $node = unpack('N2', hex2bin('00'.substr($uuidV1, 24, 6)).hex2bin('00'.substr($uuidV1, 30)));
-            self::$node = sprintf('%06x%06x', ($seed[0] ^ $node[1]) | 0x010000, $seed[1] ^ $node[2]);
+            self::$node = \sprintf('%06x%06x', ($seed[0] ^ $node[1]) | 0x010000, $seed[1] ^ $node[2]);
         }
 
         return $uuid.self::$node;

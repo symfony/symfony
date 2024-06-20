@@ -44,7 +44,7 @@ class ImportMapAuditCommand extends Command
         $this->addOption(
             name: 'format',
             mode: InputOption::VALUE_REQUIRED,
-            description: sprintf('The output format ("%s")', implode(', ', $this->getAvailableFormatOptions())),
+            description: \sprintf('The output format ("%s")', implode(', ', $this->getAvailableFormatOptions())),
             default: 'txt',
         );
     }
@@ -63,7 +63,7 @@ class ImportMapAuditCommand extends Command
         return match ($format) {
             'txt' => $this->displayTxt($audit),
             'json' => $this->displayJson($audit),
-            default => throw new \InvalidArgumentException(sprintf('Supported formats are "%s".', implode('", "', $this->getAvailableFormatOptions()))),
+            default => throw new \InvalidArgumentException(\sprintf('Supported formats are "%s".', implode('", "', $this->getAvailableFormatOptions()))),
         };
     }
 
@@ -79,7 +79,7 @@ class ImportMapAuditCommand extends Command
             }
             foreach ($packageAudit->vulnerabilities as $vulnerability) {
                 $rows[] = [
-                    sprintf('<fg=%s>%s</>', self::SEVERITY_COLORS[$vulnerability->severity] ?? 'default', ucfirst($vulnerability->severity)),
+                    \sprintf('<fg=%s>%s</>', self::SEVERITY_COLORS[$vulnerability->severity] ?? 'default', ucfirst($vulnerability->severity)),
                     $vulnerability->summary,
                     $packageAudit->package,
                     $packageAudit->version ?? 'n/a',
@@ -113,7 +113,7 @@ class ImportMapAuditCommand extends Command
             $this->io->newLine();
         }
 
-        $this->io->text(sprintf('%d package%s found: %d audited / %d skipped',
+        $this->io->text(\sprintf('%d package%s found: %d audited / %d skipped',
             $packagesCount,
             1 === $packagesCount ? '' : 's',
             $packagesCount - $packagesWithoutVersionCount,
@@ -121,7 +121,7 @@ class ImportMapAuditCommand extends Command
         ));
 
         if (0 < $packagesWithoutVersionCount) {
-            $this->io->warning(sprintf('Unable to retrieve versions for package%s: %s',
+            $this->io->warning(\sprintf('Unable to retrieve versions for package%s: %s',
                 1 === $packagesWithoutVersionCount ? '' : 's',
                 implode(', ', $packagesWithoutVersion)
             ));
@@ -134,10 +134,10 @@ class ImportMapAuditCommand extends Command
                 if (!$count) {
                     continue;
                 }
-                $vulnerabilitySummary[] = sprintf('%d %s', $count, ucfirst($severity));
+                $vulnerabilitySummary[] = \sprintf('%d %s', $count, ucfirst($severity));
                 $vulnerabilityCount += $count;
             }
-            $this->io->text(sprintf('%d vulnerabilit%s found: %s',
+            $this->io->text(\sprintf('%d vulnerabilit%s found: %s',
                 $vulnerabilityCount,
                 1 === $vulnerabilityCount ? 'y' : 'ies',
                 implode(' / ', $vulnerabilitySummary),

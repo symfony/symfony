@@ -621,7 +621,7 @@ final class ProgressBar
             }
 
             if (isset($matches[2])) {
-                $text = sprintf('%'.$matches[2], $text);
+                $text = \sprintf('%'.$matches[2], $text);
             }
 
             return $text;

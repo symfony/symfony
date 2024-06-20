@@ -37,7 +37,7 @@ final class TokenBucket implements LimiterStateInterface
         ?float $timer = null,
     ) {
         if ($initialTokens < 1) {
-            throw new \InvalidArgumentException(sprintf('Cannot set the limit of "%s" to 0, as that would never accept any hit.', TokenBucketLimiter::class));
+            throw new \InvalidArgumentException(\sprintf('Cannot set the limit of "%s" to 0, as that would never accept any hit.', TokenBucketLimiter::class));
         }
 
         $this->id = $id;

@@ -18,6 +18,6 @@ class ReserveNotSupportedException extends \BadMethodCallException
 {
     public function __construct(string $limiterClass, int $code = 0, ?\Throwable $previous = null)
     {
-        parent::__construct(sprintf('Reserving tokens is not supported by "%s".', $limiterClass), $code, $previous);
+        parent::__construct(\sprintf('Reserving tokens is not supported by "%s".', $limiterClass), $code, $previous);
     }
 }

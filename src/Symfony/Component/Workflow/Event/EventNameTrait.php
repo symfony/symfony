@@ -49,13 +49,13 @@ trait EventNameTrait
                 throw new \InvalidArgumentException('Missing workflow name.');
             }
 
-            return sprintf('workflow.%s', $eventName);
+            return \sprintf('workflow.%s', $eventName);
         }
 
         if (null === $transitionOrPlaceName) {
-            return sprintf('workflow.%s.%s', $workflowName, $eventName);
+            return \sprintf('workflow.%s.%s', $workflowName, $eventName);
         }
 
-        return sprintf('workflow.%s.%s.%s', $workflowName, $eventName, $transitionOrPlaceName);
+        return \sprintf('workflow.%s.%s.%s', $workflowName, $eventName, $transitionOrPlaceName);
     }
 }

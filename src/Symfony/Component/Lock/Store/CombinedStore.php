@@ -41,7 +41,7 @@ class CombinedStore implements SharedLockStoreInterface, LoggerAwareInterface
     ) {
         foreach ($stores as $store) {
             if (!$store instanceof PersistingStoreInterface) {
-                throw new InvalidArgumentException(sprintf('The store must implement "%s". Got "%s".', PersistingStoreInterface::class, get_debug_type($store)));
+                throw new InvalidArgumentException(\sprintf('The store must implement "%s". Got "%s".', PersistingStoreInterface::class, get_debug_type($store)));
             }
         }
     }

@@ -22,7 +22,7 @@ class UnexpectedPropertyException extends \UnexpectedValueException implements E
         public readonly string $property,
         ?\Throwable $previous = null,
     ) {
-        $msg = sprintf('Property is not allowed ("%s" is unknown).', $this->property);
+        $msg = \sprintf('Property is not allowed ("%s" is unknown).', $this->property);
 
         parent::__construct($msg, 0, $previous);
     }

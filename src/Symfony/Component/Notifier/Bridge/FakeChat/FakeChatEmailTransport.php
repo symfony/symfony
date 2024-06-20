@@ -44,7 +44,7 @@ final class FakeChatEmailTransport extends AbstractTransport
 
     public function __toString(): string
     {
-        return sprintf('fakechat+email://%s?to=%s&from=%s', $this->getEndpoint(), $this->to, $this->from);
+        return \sprintf('fakechat+email://%s?to=%s&from=%s', $this->getEndpoint(), $this->to, $this->from);
     }
 
     public function supports(MessageInterface $message): bool
@@ -65,7 +65,7 @@ final class FakeChatEmailTransport extends AbstractTransport
 
         $subject = 'New Chat message without specified recipient!';
         if (null !== $message->getRecipientId()) {
-            $subject = sprintf('New Chat message for recipient: %s', $message->getRecipientId());
+            $subject = \sprintf('New Chat message for recipient: %s', $message->getRecipientId());
         }
 
         $email = (new Email())

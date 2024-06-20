@@ -74,7 +74,7 @@ EOF
             }
         } catch (DirectoryNotFoundException) {
             $io = new SymfonyStyle($input, $output);
-            $io->error(sprintf('Neither class nor path were found with "%s" argument.', $input->getArgument('class')));
+            $io->error(\sprintf('Neither class nor path were found with "%s" argument.', $input->getArgument('class')));
 
             return 1;
         }
@@ -85,7 +85,7 @@ EOF
     private function dumpValidatorsForClass(InputInterface $input, OutputInterface $output, string $class): void
     {
         $io = new SymfonyStyle($input, $output);
-        $title = sprintf('<info>%s</info>', $class);
+        $title = \sprintf('<info>%s</info>', $class);
         $rows = [];
         $dump = new Dumper($output);
 

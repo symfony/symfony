@@ -93,7 +93,7 @@ abstract class AbstractUid implements \JsonSerializable, \Stringable, HashableIn
      */
     public function toBase58(): string
     {
-        return strtr(sprintf('%022s', BinaryUtil::toBase($this->toBinary(), BinaryUtil::BASE58)), '0', '1');
+        return strtr(\sprintf('%022s', BinaryUtil::toBase($this->toBinary(), BinaryUtil::BASE58)), '0', '1');
     }
 
     /**
@@ -106,7 +106,7 @@ abstract class AbstractUid implements \JsonSerializable, \Stringable, HashableIn
     public function toBase32(): string
     {
         $uid = bin2hex($this->toBinary());
-        $uid = sprintf('%02s%04s%04s%04s%04s%04s%04s',
+        $uid = \sprintf('%02s%04s%04s%04s%04s%04s%04s',
             base_convert(substr($uid, 0, 2), 16, 32),
             base_convert(substr($uid, 2, 5), 16, 32),
             base_convert(substr($uid, 7, 5), 16, 32),

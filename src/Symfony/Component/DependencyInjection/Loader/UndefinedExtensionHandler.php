@@ -31,15 +31,15 @@ class UndefinedExtensionHandler
     {
         $message = '';
         if (isset(self::BUNDLE_EXTENSIONS[$extensionName])) {
-            $message .= sprintf('Did you forget to install or enable the %s? ', self::BUNDLE_EXTENSIONS[$extensionName]);
+            $message .= \sprintf('Did you forget to install or enable the %s? ', self::BUNDLE_EXTENSIONS[$extensionName]);
         }
 
         $message .= match (true) {
-            \is_string($loadingFilePath) => sprintf('There is no extension able to load the configuration for "%s" (in "%s"). ', $extensionName, $loadingFilePath),
-            default => sprintf('There is no extension able to load the configuration for "%s". ', $extensionName),
+            \is_string($loadingFilePath) => \sprintf('There is no extension able to load the configuration for "%s" (in "%s"). ', $extensionName, $loadingFilePath),
+            default => \sprintf('There is no extension able to load the configuration for "%s". ', $extensionName),
         };
 
-        $message .= sprintf('Looked for namespace "%s", found "%s".', $namespaceOrAlias, $foundExtensionNamespaces ? implode('", "', $foundExtensionNamespaces) : 'none');
+        $message .= \sprintf('Looked for namespace "%s", found "%s".', $namespaceOrAlias, $foundExtensionNamespaces ? implode('", "', $foundExtensionNamespaces) : 'none');
 
         return $message;
     }

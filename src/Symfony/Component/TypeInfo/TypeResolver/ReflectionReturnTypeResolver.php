@@ -35,7 +35,7 @@ final readonly class ReflectionReturnTypeResolver implements TypeResolverInterfa
     public function resolve(mixed $subject, ?TypeContext $typeContext = null): Type
     {
         if (!$subject instanceof \ReflectionFunctionAbstract) {
-            throw new UnsupportedException(sprintf('Expected subject to be a "ReflectionFunctionAbstract", "%s" given.', get_debug_type($subject)), $subject);
+            throw new UnsupportedException(\sprintf('Expected subject to be a "ReflectionFunctionAbstract", "%s" given.', get_debug_type($subject)), $subject);
         }
 
         $typeContext ??= $this->typeContextFactory->createFromReflection($subject);
@@ -44,10 +44,10 @@ final readonly class ReflectionReturnTypeResolver implements TypeResolverInterfa
             return $this->reflectionTypeResolver->resolve($subject->getReturnType(), $typeContext);
         } catch (UnsupportedException $e) {
             $path = null !== $typeContext
-                ? sprintf('%s::%s()', $typeContext->calledClassName, $subject->getName())
-                : sprintf('%s()', $subject->getName());
+                ? \sprintf('%s::%s()', $typeContext->calledClassName, $subject->getName())
+                : \sprintf('%s()', $subject->getName());
 
-            throw new UnsupportedException(sprintf('Cannot resolve type for "%s".', $path), $subject, previous: $e);
+            throw new UnsupportedException(\sprintf('Cannot resolve type for "%s".', $path), $subject, previous: $e);
         }
     }
 }

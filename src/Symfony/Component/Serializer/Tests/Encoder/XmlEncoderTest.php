@@ -1050,14 +1050,14 @@ XML;
 
     private function createXmlWithDateTime(): string
     {
-        return sprintf('<?xml version="1.0"?>
+        return \sprintf('<?xml version="1.0"?>
 <response><dateTime>%s</dateTime></response>
 ', $this->exampleDateTimeString);
     }
 
     private function createXmlWithDateTimeField(): string
     {
-        return sprintf('<?xml version="1.0"?>
+        return \sprintf('<?xml version="1.0"?>
 <response><foo dateTime="%s"/></response>
 ', $this->exampleDateTimeString);
     }

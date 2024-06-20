@@ -79,7 +79,7 @@ class ApcuAdapter extends AbstractAdapter
     protected function doClear(string $namespace): bool
     {
         return isset($namespace[0]) && class_exists(\APCUIterator::class, false) && ('cli' !== \PHP_SAPI || filter_var(\ini_get('apc.enable_cli'), \FILTER_VALIDATE_BOOL))
-            ? apcu_delete(new \APCUIterator(sprintf('/^%s/', preg_quote($namespace, '/')), \APC_ITER_KEY))
+            ? apcu_delete(new \APCUIterator(\sprintf('/^%s/', preg_quote($namespace, '/')), \APC_ITER_KEY))
             : apcu_clear_cache();
     }
 

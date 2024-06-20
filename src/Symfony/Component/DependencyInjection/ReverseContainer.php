@@ -63,7 +63,7 @@ final class ReverseContainer
         }
 
         if (isset($this->serviceContainer->getRemovedIds()[$id])) {
-            throw new ServiceNotFoundException($id, null, null, [], sprintf('The "%s" service is private and cannot be accessed by reference. You should either make it public, or tag it as "%s".', $id, $this->tagName));
+            throw new ServiceNotFoundException($id, null, null, [], \sprintf('The "%s" service is private and cannot be accessed by reference. You should either make it public, or tag it as "%s".', $id, $this->tagName));
         }
 
         return $this->serviceContainer->get($id);

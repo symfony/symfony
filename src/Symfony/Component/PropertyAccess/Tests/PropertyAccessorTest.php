@@ -1031,7 +1031,7 @@ class PropertyAccessorTest extends TestCase
     private function createUninitializedObjectPropertyGhost(): UninitializedObjectProperty
     {
         if (!class_exists(ProxyHelper::class)) {
-            $this->markTestSkipped(sprintf('Class "%s" is required to run this test.', ProxyHelper::class));
+            $this->markTestSkipped(\sprintf('Class "%s" is required to run this test.', ProxyHelper::class));
         }
 
         $class = 'UninitializedObjectPropertyGhost';

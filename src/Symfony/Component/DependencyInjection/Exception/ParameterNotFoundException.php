@@ -45,15 +45,15 @@ class ParameterNotFoundException extends InvalidArgumentException implements Not
     public function updateRepr(): void
     {
         if (null !== $this->sourceId) {
-            $this->message = sprintf('The service "%s" has a dependency on a non-existent parameter "%s".', $this->sourceId, $this->key);
+            $this->message = \sprintf('The service "%s" has a dependency on a non-existent parameter "%s".', $this->sourceId, $this->key);
         } elseif (null !== $this->sourceKey) {
-            $this->message = sprintf('The parameter "%s" has a dependency on a non-existent parameter "%s".', $this->sourceKey, $this->key);
+            $this->message = \sprintf('The parameter "%s" has a dependency on a non-existent parameter "%s".', $this->sourceKey, $this->key);
         } elseif (null !== $this->sourceExtensionName) {
-            $this->message = sprintf('You have requested a non-existent parameter "%s" while loading extension "%s".', $this->key, $this->sourceExtensionName);
+            $this->message = \sprintf('You have requested a non-existent parameter "%s" while loading extension "%s".', $this->key, $this->sourceExtensionName);
         } elseif ('.' === ($this->key[0] ?? '')) {
-            $this->message = sprintf('Parameter "%s" not found. It was probably deleted during the compilation of the container.', $this->key);
+            $this->message = \sprintf('Parameter "%s" not found. It was probably deleted during the compilation of the container.', $this->key);
         } else {
-            $this->message = sprintf('You have requested a non-existent parameter "%s".', $this->key);
+            $this->message = \sprintf('You have requested a non-existent parameter "%s".', $this->key);
         }
 
         if ($this->alternatives) {

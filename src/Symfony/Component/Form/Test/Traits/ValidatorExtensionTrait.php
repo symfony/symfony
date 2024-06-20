@@ -28,7 +28,7 @@ trait ValidatorExtensionTrait
         }
 
         if (!$this instanceof TypeTestCase) {
-            throw new \Exception(sprintf('The trait "ValidatorExtensionTrait" can only be added to a class that extends "%s".', TypeTestCase::class));
+            throw new \Exception(\sprintf('The trait "ValidatorExtensionTrait" can only be added to a class that extends "%s".', TypeTestCase::class));
         }
 
         $this->validator = $this->createMock(ValidatorInterface::class);

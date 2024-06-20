@@ -46,7 +46,7 @@ class SesHttpAsyncAwsTransport extends AbstractTransport
             $host = $configuration->get('region');
         }
 
-        return sprintf('ses+https://%s@%s', $configuration->get('accessKeyId'), $host);
+        return \sprintf('ses+https://%s@%s', $configuration->get('accessKeyId'), $host);
     }
 
     protected function doSend(SentMessage $message): void
@@ -58,7 +58,7 @@ class SesHttpAsyncAwsTransport extends AbstractTransport
             $message->setMessageId($result->getMessageId());
             $message->appendDebug($response->getInfo('debug') ?? '');
         } catch (HttpException $e) {
-            $exception = new HttpTransportException(sprintf('Unable to send an email: %s (code %s).', $e->getAwsMessage() ?: $e->getMessage(), $e->getAwsCode() ?: $e->getCode()), $e->getResponse(), $e->getCode(), $e);
+            $exception = new HttpTransportException(\sprintf('Unable to send an email: %s (code %s).', $e->getAwsMessage() ?: $e->getMessage(), $e->getAwsCode() ?: $e->getCode()), $e->getResponse(), $e->getCode(), $e);
             $exception->appendDebug($e->getResponse()->getInfo('debug') ?? '');
 
             throw $exception;

@@ -51,7 +51,7 @@ final class BlueskyTransport extends AbstractTransport
 
     public function __toString(): string
     {
-        return sprintf('bluesky://%s', $this->getEndpoint());
+        return \sprintf('bluesky://%s', $this->getEndpoint());
     }
 
     public function supports(MessageInterface $message): bool
@@ -91,7 +91,7 @@ final class BlueskyTransport extends AbstractTransport
             unset($options['attach']);
         }
 
-        $response = $this->client->request('POST', sprintf('https://%s/xrpc/com.atproto.repo.createRecord', $this->getEndpoint()), [
+        $response = $this->client->request('POST', \sprintf('https://%s/xrpc/com.atproto.repo.createRecord', $this->getEndpoint()), [
             'auth_bearer' => $this->authSession['accessJwt'] ?? null,
             'json' => $options,
         ]);
@@ -119,12 +119,12 @@ final class BlueskyTransport extends AbstractTransport
         $title = $content['error'] ?? '';
         $errorDescription = $content['message'] ?? '';
 
-        throw new TransportException(sprintf('Unable to send message to Bluesky: Status code %d (%s) with message "%s".', $statusCode, $title, $errorDescription), $response);
+        throw new TransportException(\sprintf('Unable to send message to Bluesky: Status code %d (%s) with message "%s".', $statusCode, $title, $errorDescription), $response);
     }
 
     private function authenticate(): void
     {
-        $response = $this->client->request('POST', sprintf('https://%s/xrpc/com.atproto.server.createSession', $this->getEndpoint()), [
+        $response = $this->client->request('POST', \sprintf('https://%s/xrpc/com.atproto.server.createSession', $this->getEndpoint()), [
             'json' => [
                 'identifier' => $this->user,
                 'password' => $this->password,
@@ -156,7 +156,7 @@ final class BlueskyTransport extends AbstractTransport
         // regex based on: https://bluesky.com/specs/handle#handle-identifier-syntax
         $regex = '#[$|\W](@([a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)#';
         foreach ($this->getMatchAndPosition($text, $regex) as $match) {
-            $response = $this->client->request('GET', sprintf('https://%s/xrpc/com.atproto.identity.resolveHandle', $this->getEndpoint()), [
+            $response = $this->client->request('GET', \sprintf('https://%s/xrpc/com.atproto.identity.resolveHandle', $this->getEndpoint()), [
                 'query' => [
                     'handle' => ltrim($match['match'], '@'),
                 ],
@@ -251,7 +251,7 @@ final class BlueskyTransport extends AbstractTransport
         foreach ($media as ['file' => $file, 'description' => $description]) {
             $pool[] = [
                 'description' => $description,
-                'response' => $this->client->request('POST', sprintf('https://%s/xrpc/com.atproto.repo.uploadBlob', $this->getEndpoint()), [
+                'response' => $this->client->request('POST', \sprintf('https://%s/xrpc/com.atproto.repo.uploadBlob', $this->getEndpoint()), [
                     'auth_bearer' => $this->authSession['accessJwt'] ?? null,
                     'headers' => [
                         'Content-Type: '.$file->getContentType(),

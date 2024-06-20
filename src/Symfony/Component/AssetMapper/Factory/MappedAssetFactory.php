@@ -38,7 +38,7 @@ class MappedAssetFactory implements MappedAssetFactoryInterface
     public function createMappedAsset(string $logicalPath, string $sourcePath): ?MappedAsset
     {
         if (isset($this->assetsBeingCreated[$logicalPath])) {
-            throw new CircularAssetsException($this->assetsCache[$logicalPath], sprintf('Circular reference detected while creating asset for "%s": "%s".', $logicalPath, implode(' -> ', $this->assetsBeingCreated).' -> '.$logicalPath));
+            throw new CircularAssetsException($this->assetsCache[$logicalPath], \sprintf('Circular reference detected while creating asset for "%s": "%s".', $logicalPath, implode(' -> ', $this->assetsBeingCreated).' -> '.$logicalPath));
         }
         $this->assetsBeingCreated[$logicalPath] = $logicalPath;
 
@@ -98,7 +98,7 @@ class MappedAssetFactory implements MappedAssetFactoryInterface
     private function compileContent(MappedAsset $asset): ?string
     {
         if (!is_file($asset->sourcePath)) {
-            throw new RuntimeException(sprintf('Asset source path "%s" could not be found.', $asset->sourcePath));
+            throw new RuntimeException(\sprintf('Asset source path "%s" could not be found.', $asset->sourcePath));
         }
 
         if (!$this->compiler->supports($asset)) {

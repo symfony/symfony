@@ -194,7 +194,7 @@ class ExprBuilder
      */
     public function thenInvalid(string $message): static
     {
-        $this->thenPart = static fn ($v) => throw new \InvalidArgumentException(sprintf($message, json_encode($v)));
+        $this->thenPart = static fn ($v) => throw new \InvalidArgumentException(\sprintf($message, json_encode($v)));
 
         return $this;
     }

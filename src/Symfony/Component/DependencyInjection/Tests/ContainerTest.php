@@ -39,7 +39,7 @@ class ContainerTest extends TestCase
      */
     public function testCamelize($id, $expected)
     {
-        $this->assertEquals($expected, Container::camelize($id), sprintf('Container::camelize("%s")', $id));
+        $this->assertEquals($expected, Container::camelize($id), \sprintf('Container::camelize("%s")', $id));
     }
 
     public static function dataForTestCamelize()
@@ -63,7 +63,7 @@ class ContainerTest extends TestCase
      */
     public function testUnderscore($id, $expected)
     {
-        $this->assertEquals($expected, Container::underscore($id), sprintf('Container::underscore("%s")', $id));
+        $this->assertEquals($expected, Container::underscore($id), \sprintf('Container::underscore("%s")', $id));
     }
 
     public static function dataForTestUnderscore()

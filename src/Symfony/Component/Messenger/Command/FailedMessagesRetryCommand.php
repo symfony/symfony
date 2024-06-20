@@ -107,7 +107,7 @@ EOF
         $receiver = $this->getReceiver($failureTransportName);
         $this->printPendingMessagesMessage($receiver, $io);
 
-        $io->writeln(sprintf('To retry all the messages, run <comment>messenger:consume %s</comment>', $failureTransportName));
+        $io->writeln(\sprintf('To retry all the messages, run <comment>messenger:consume %s</comment>', $failureTransportName));
 
         $shouldForce = $input->getOption('force');
         $ids = $input->getArgument('id');
@@ -199,7 +199,7 @@ EOF
             $this->displaySingleMessage($envelope, $io);
 
             if ($envelope->last(MessageDecodingFailedStamp::class)) {
-                throw new \RuntimeException(sprintf('The message with id "%s" could not decoded, it can only be shown or removed.', $this->getMessageId($envelope) ?? '?'));
+                throw new \RuntimeException(\sprintf('The message with id "%s" could not decoded, it can only be shown or removed.', $this->getMessageId($envelope) ?? '?'));
             }
 
             $this->forceExit = true;
@@ -240,7 +240,7 @@ EOF
         $receiver = $this->getReceiver($failureTransportName);
 
         if (!$receiver instanceof ListableReceiverInterface) {
-            throw new RuntimeException(sprintf('The "%s" receiver does not support retrying messages by id.', $failureTransportName));
+            throw new RuntimeException(\sprintf('The "%s" receiver does not support retrying messages by id.', $failureTransportName));
         }
 
         foreach ($ids as $id) {
@@ -251,7 +251,7 @@ EOF
                 $this->phpSerializer?->rejectPhpIncompleteClass();
             }
             if (null === $envelope) {
-                throw new RuntimeException(sprintf('The message "%s" was not found.', $id));
+                throw new RuntimeException(\sprintf('The message "%s" was not found.', $id));
             }
 
             $singleReceiver = new SingleMessageReceiver($receiver, $envelope);

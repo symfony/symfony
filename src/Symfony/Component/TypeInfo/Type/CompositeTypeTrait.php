@@ -36,12 +36,12 @@ trait CompositeTypeTrait
     public function __construct(Type ...$types)
     {
         if (\count($types) < 2) {
-            throw new InvalidArgumentException(sprintf('"%s" expects at least 2 types.', self::class));
+            throw new InvalidArgumentException(\sprintf('"%s" expects at least 2 types.', self::class));
         }
 
         foreach ($types as $t) {
             if ($t instanceof self) {
-                throw new InvalidArgumentException(sprintf('Cannot set "%s" as a "%1$s" part.', self::class));
+                throw new InvalidArgumentException(\sprintf('Cannot set "%s" as a "%1$s" part.', self::class));
             }
         }
 

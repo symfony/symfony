@@ -234,7 +234,7 @@ class UniqueValidatorTest extends ConstraintValidatorTestCase
     public function testCollectionFieldNamesMustBeString(string $type, mixed $field)
     {
         $this->expectException(UnexpectedTypeException::class);
-        $this->expectExceptionMessage(sprintf('Expected argument of type "string", "%s" given', $type));
+        $this->expectExceptionMessage(\sprintf('Expected argument of type "string", "%s" given', $type));
 
         $this->validator->validate([['value' => 5], ['id' => 1, 'value' => 6]], new Unique(fields: [$field]));
     }

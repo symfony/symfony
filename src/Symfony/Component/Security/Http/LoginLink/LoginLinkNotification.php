@@ -39,7 +39,7 @@ class LoginLinkNotification extends Notification implements EmailNotificationInt
     public function asEmailMessage(EmailRecipientInterface $recipient, ?string $transport = null): ?EmailMessage
     {
         if (!class_exists(NotificationEmail::class)) {
-            throw new \LogicException(sprintf('The "%s" method requires "symfony/twig-bridge:>4.4".', __METHOD__));
+            throw new \LogicException(\sprintf('The "%s" method requires "symfony/twig-bridge:>4.4".', __METHOD__));
         }
 
         $email = NotificationEmail::asPublicEmail()
@@ -65,6 +65,6 @@ class LoginLinkNotification extends Notification implements EmailNotificationInt
             $durationString = floor($hours).' hour'.($hours >= 2 ? 's' : '');
         }
 
-        return sprintf('Click on the %s to confirm you want to sign in. This link will expire in %s.', $target, $durationString);
+        return \sprintf('Click on the %s to confirm you want to sign in. This link will expire in %s.', $target, $durationString);
     }
 }

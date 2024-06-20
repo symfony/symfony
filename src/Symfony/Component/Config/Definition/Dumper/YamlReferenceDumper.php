@@ -40,7 +40,7 @@ class YamlReferenceDumper
 
         foreach (explode('.', $path) as $step) {
             if (!$node instanceof ArrayNode) {
-                throw new \UnexpectedValueException(sprintf('Unable to find node at path "%s.%s".', $rootNode->getName(), $path));
+                throw new \UnexpectedValueException(\sprintf('Unable to find node at path "%s.%s".', $rootNode->getName(), $path));
             }
 
             /** @var NodeInterface[] $children */
@@ -54,7 +54,7 @@ class YamlReferenceDumper
                 }
             }
 
-            throw new \UnexpectedValueException(sprintf('Unable to find node at path "%s.%s".', $rootNode->getName(), $path));
+            throw new \UnexpectedValueException(\sprintf('Unable to find node at path "%s.%s".', $rootNode->getName(), $path));
         }
 
         return $this->dumpNode($node);
@@ -121,7 +121,7 @@ class YamlReferenceDumper
         // deprecated?
         if ($node instanceof BaseNode && $node->isDeprecated()) {
             $deprecation = $node->getDeprecation($node->getName(), $parentNode ? $parentNode->getPath() : $node->getPath());
-            $comments[] = sprintf('Deprecated (%s)', ($deprecation['package'] || $deprecation['version'] ? "Since {$deprecation['package']} {$deprecation['version']}: " : '').$deprecation['message']);
+            $comments[] = \sprintf('Deprecated (%s)', ($deprecation['package'] || $deprecation['version'] ? "Since {$deprecation['package']} {$deprecation['version']}: " : '').$deprecation['message']);
         }
 
         // example
@@ -133,12 +133,12 @@ class YamlReferenceDumper
         $comments = \count($comments) ? '# '.implode(', ', $comments) : '';
 
         $key = $prototypedArray ? '-' : $node->getName().':';
-        $text = rtrim(sprintf('%-21s%s %s', $key, $default, $comments), ' ');
+        $text = rtrim(\sprintf('%-21s%s %s', $key, $default, $comments), ' ');
 
         if ($node instanceof BaseNode && $info = $node->getInfo()) {
             $this->writeLine('');
             // indenting multi-line info
-            $info = str_replace("\n", sprintf("\n%".($depth * 4).'s# ', ' '), $info);
+            $info = str_replace("\n", \sprintf("\n%".($depth * 4).'s# ', ' '), $info);
             $this->writeLine('# '.$info, $depth * 4);
         }
 
@@ -180,7 +180,7 @@ class YamlReferenceDumper
         $indent = \strlen($text) + $indent;
         $format = '%'.$indent.'s';
 
-        $this->reference .= sprintf($format, $text)."\n";
+        $this->reference .= \sprintf($format, $text)."\n";
     }
 
     private function writeArray(array $array, int $depth, bool $asComment = false): void
@@ -200,7 +200,7 @@ class YamlReferenceDumper
             if ($isIndexed) {
                 $this->writeLine($prefix.'- '.$val, $depth * 4);
             } else {
-                $this->writeLine(sprintf('%s%-20s %s', $prefix, $key.':', $val), $depth * 4);
+                $this->writeLine(\sprintf('%s%-20s %s', $prefix, $key.':', $val), $depth * 4);
             }
 
             if (\is_array($value)) {

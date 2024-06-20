@@ -56,17 +56,17 @@ class FileBinaryMimeTypeGuesser implements MimeTypeGuesserInterface
     public function guessMimeType(string $path): ?string
     {
         if (!is_file($path) || !is_readable($path)) {
-            throw new InvalidArgumentException(sprintf('The "%s" file does not exist or is not readable.', $path));
+            throw new InvalidArgumentException(\sprintf('The "%s" file does not exist or is not readable.', $path));
         }
 
         if (!$this->isGuesserSupported()) {
-            throw new LogicException(sprintf('The "%s" guesser is not supported.', __CLASS__));
+            throw new LogicException(\sprintf('The "%s" guesser is not supported.', __CLASS__));
         }
 
         ob_start();
 
         // need to use --mime instead of -i. see #6641
-        passthru(sprintf($this->cmd, escapeshellarg((str_starts_with($path, '-') ? './' : '').$path)), $return);
+        passthru(\sprintf($this->cmd, escapeshellarg((str_starts_with($path, '-') ? './' : '').$path)), $return);
         if ($return > 0) {
             ob_end_clean();
 

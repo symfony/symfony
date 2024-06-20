@@ -40,10 +40,10 @@ final class ClickatellTransport extends AbstractTransport
     public function __toString(): string
     {
         if (null === $this->from) {
-            return sprintf('clickatell://%s', $this->getEndpoint());
+            return \sprintf('clickatell://%s', $this->getEndpoint());
         }
 
-        return sprintf('clickatell://%s%s', $this->getEndpoint(), null !== $this->from ? '?from='.$this->from : '');
+        return \sprintf('clickatell://%s%s', $this->getEndpoint(), null !== $this->from ? '?from='.$this->from : '');
     }
 
     public function supports(MessageInterface $message): bool
@@ -57,7 +57,7 @@ final class ClickatellTransport extends AbstractTransport
             throw new UnsupportedMessageTypeException(__CLASS__, SmsMessage::class, $message);
         }
 
-        $endpoint = sprintf('https://%s/rest/message', $this->getEndpoint());
+        $endpoint = \sprintf('https://%s/rest/message', $this->getEndpoint());
 
         $options = [];
         $options['from'] = $message->getFrom() ?: $this->from;
@@ -93,6 +93,6 @@ final class ClickatellTransport extends AbstractTransport
         $errorInfo = $content['error']['description'] ?? '';
         $errorDocumentation = $content['error']['documentation'] ?? '';
 
-        throw new TransportException(sprintf('Unable to send SMS with Clickatell: Error code %d with message "%s" (%s).', $errorCode, $errorInfo, $errorDocumentation), $response);
+        throw new TransportException(\sprintf('Unable to send SMS with Clickatell: Error code %d with message "%s" (%s).', $errorCode, $errorInfo, $errorDocumentation), $response);
     }
 }

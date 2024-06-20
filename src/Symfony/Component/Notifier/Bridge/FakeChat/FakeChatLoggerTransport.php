@@ -37,7 +37,7 @@ final class FakeChatLoggerTransport extends AbstractTransport
 
     public function __toString(): string
     {
-        return sprintf('fakechat+logger://%s', $this->getEndpoint());
+        return \sprintf('fakechat+logger://%s', $this->getEndpoint());
     }
 
     public function supports(MessageInterface $message): bool
@@ -56,10 +56,10 @@ final class FakeChatLoggerTransport extends AbstractTransport
 
         $subject = 'New Chat message without specified recipient!';
         if (null !== $message->getRecipientId()) {
-            $subject = sprintf('New Chat message for recipient: %s', $message->getRecipientId());
+            $subject = \sprintf('New Chat message for recipient: %s', $message->getRecipientId());
         }
 
-        $this->logger->info(sprintf('%s: %s', $subject, $message->getSubject()));
+        $this->logger->info(\sprintf('%s: %s', $subject, $message->getSubject()));
 
         return new SentMessage($message, (string) $this);
     }

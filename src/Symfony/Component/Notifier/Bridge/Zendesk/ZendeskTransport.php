@@ -37,7 +37,7 @@ final class ZendeskTransport extends AbstractTransport
 
     public function __toString(): string
     {
-        return sprintf('zendesk://%s', $this->getEndpoint());
+        return \sprintf('zendesk://%s', $this->getEndpoint());
     }
 
     public function supports(MessageInterface $message): bool
@@ -51,7 +51,7 @@ final class ZendeskTransport extends AbstractTransport
             throw new UnsupportedMessageTypeException(__CLASS__, ChatMessage::class, $message);
         }
 
-        $endpoint = sprintf('https://%s/api/v2/tickets.json', $this->getEndpoint());
+        $endpoint = \sprintf('https://%s/api/v2/tickets.json', $this->getEndpoint());
 
         $body = [
             'ticket' => [
@@ -86,7 +86,7 @@ final class ZendeskTransport extends AbstractTransport
                 $errorMessage = implode(' | ', array_values($errorMessage));
             }
 
-            throw new TransportException(sprintf('Unable to post the Zendesk message: "%s".', $errorMessage), $response);
+            throw new TransportException(\sprintf('Unable to post the Zendesk message: "%s".', $errorMessage), $response);
         }
 
         return new SentMessage($message, (string) $this);

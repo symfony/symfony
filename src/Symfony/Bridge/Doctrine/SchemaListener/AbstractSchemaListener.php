@@ -36,7 +36,7 @@ abstract class AbstractSchemaListener
             $schemaManager->createTable($table);
 
             try {
-                $exec(sprintf('DROP TABLE %s', $checkTable));
+                $exec(\sprintf('DROP TABLE %s', $checkTable));
             } catch (\Exception) {
                 // ignore
             }

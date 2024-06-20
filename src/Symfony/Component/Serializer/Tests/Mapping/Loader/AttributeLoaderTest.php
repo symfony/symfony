@@ -162,7 +162,7 @@ class AttributeLoaderTest extends TestCase
     public function testThrowsOnContextOnInvalidMethod()
     {
         $this->expectException(MappingException::class);
-        $this->expectExceptionMessage(sprintf('Context on "%s::badMethod()" cannot be added', BadMethodContextDummy::class));
+        $this->expectExceptionMessage(\sprintf('Context on "%s::badMethod()" cannot be added', BadMethodContextDummy::class));
 
         $loader = $this->getLoaderForContextMapping();
 

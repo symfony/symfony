@@ -51,7 +51,7 @@ class IniFileLoaderTest extends TestCase
     public function testTypeConversionsWithNativePhp($key, $value, $supported)
     {
         if (!$supported) {
-            $this->markTestSkipped(sprintf('Converting the value "%s" to "%s" is not supported by the IniFileLoader.', $key, $value));
+            $this->markTestSkipped(\sprintf('Converting the value "%s" to "%s" is not supported by the IniFileLoader.', $key, $value));
         }
 
         $expected = parse_ini_file(__DIR__.'/../Fixtures/ini/types.ini', true, \INI_SCANNER_TYPED);

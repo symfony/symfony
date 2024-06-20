@@ -15,6 +15,8 @@ use Symfony\Component\Serializer\DataCollector\SerializerDataCollector;
 use Symfony\Component\Serializer\Encoder\DecoderInterface;
 use Symfony\Component\Serializer\Encoder\EncoderInterface;
 use Symfony\Component\Serializer\Encoder\NormalizationAwareInterface;
+use Symfony\Component\Serializer\Normalizer\DenormalizerAwareInterface;
+use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerAwareInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\SerializerAwareInterface;
@@ -27,7 +29,7 @@ use Symfony\Component\Serializer\SerializerInterface;
  *
  * @internal
  */
-class TraceableEncoder implements EncoderInterface, DecoderInterface, SerializerAwareInterface, NormalizerAwareInterface
+class TraceableEncoder implements EncoderInterface, DecoderInterface, SerializerAwareInterface, NormalizerAwareInterface, DenormalizerAwareInterface
 {
     public function __construct(
         private EncoderInterface|DecoderInterface $encoder,
@@ -103,6 +105,16 @@ class TraceableEncoder implements EncoderInterface, DecoderInterface, Serializer
         }
 
         $this->encoder->setNormalizer($normalizer);
+    }
+
+
+    public function setDenormalizer(DenormalizerInterface $denormalizer): void
+    {
+        if (!$this->encoder instanceof DenormalizerInterface) {
+            return;
+        }
+
+        $this->encoder->setDenormalizer($denormalizer);
     }
 
     public function needsNormalization(): bool

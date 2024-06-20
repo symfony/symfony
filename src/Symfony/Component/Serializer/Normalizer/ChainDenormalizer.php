@@ -61,7 +61,7 @@ final class ChainDenormalizer implements DenormalizerInterface, SerializerAwareI
         }
     }
 
-    public function addDenormalizer(DenormalizerInterface $denormalizer): void
+    private function addDenormalizer(DenormalizerInterface $denormalizer): void
     {
         if ($denormalizer instanceof DenormalizerAwareInterface) {
             $denormalizer->setDenormalizer($this);
@@ -122,10 +122,6 @@ final class ChainDenormalizer implements DenormalizerInterface, SerializerAwareI
             $genericType = class_exists($class) || interface_exists($class, false) ? 'object' : '*';
 
             foreach ($this->denormalizers as $k => $denormalizer) {
-                if (!$denormalizer instanceof DenormalizerInterface) {
-                    continue;
-                }
-
                 $supportedTypes = $denormalizer->getSupportedTypes($format);
 
                 $doesClassRepresentCollection = str_ends_with($class, '[]');
@@ -180,11 +176,13 @@ final class ChainDenormalizer implements DenormalizerInterface, SerializerAwareI
 
         if (!isset($this->supportedCache[$format])) {
             foreach ($this->denormalizers as $denormalizer) {
-                $this->supportedCache + $denormalizer->getSupportedTypes($format);
+                foreach($denormalizer->getSupportedTypes($format) as $type => $supported) {
+                    $this->supportedCache[$format][$type] = $supported || ($this->supportedCache[$format][$type] ?? false);
+                }
             }
         }
 
-        return $this->supportedCache[$format];
+        return $this->supportedCache[$format] ?? [];
     }
 
     /**

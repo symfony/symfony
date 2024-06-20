@@ -58,7 +58,7 @@ final class ChainNormalizer implements NormalizerInterface, SerializerAwareInter
     /**
      * Add Normalizer last in the line.
      */
-    public function addNormalizer(NormalizerInterface $normalizer): void
+    private function addNormalizer(NormalizerInterface $normalizer): void
     {
         if ($normalizer instanceof NormalizerAwareInterface) {
             $normalizer->setNormalizer($this);
@@ -124,11 +124,13 @@ final class ChainNormalizer implements NormalizerInterface, SerializerAwareInter
 
         if (!isset($this->supportedCache[$format])) {
             foreach ($this->normalizers as $normalizer) {
-                $this->supportedCache + $normalizer->getSupportedTypes($format);
+                foreach($normalizer->getSupportedTypes($format) as $type => $supported) {
+                    $this->supportedCache[$format][$type] = $supported || ($this->supportedCache[$format][$type] ?? false);
+                }
             }
         }
 
-        return $this->supportedCache[$format];
+        return $this->supportedCache[$format] ?? [];
     }
 
     /**
@@ -152,10 +154,6 @@ final class ChainNormalizer implements NormalizerInterface, SerializerAwareInter
             $this->normalizerCache[$format][$type] = [];
 
             foreach ($this->normalizers as $k => $normalizer) {
-                if (!$normalizer instanceof NormalizerInterface) {
-                    continue;
-                }
-
                 $supportedTypes = $normalizer->getSupportedTypes($format);
 
                 foreach ($supportedTypes as $supportedType => $isCacheable) {

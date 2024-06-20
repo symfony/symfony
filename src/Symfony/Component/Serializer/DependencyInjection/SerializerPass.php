@@ -40,17 +40,16 @@ class SerializerPass implements CompilerPassInterface
             return;
         }
 
-        if (!$normalizers = $this->findAndSortTaggedServices('serializer.normalizer', $container)) {
-            throw new RuntimeException('You must tag at least one service as "serializer.normalizer" to use the "serializer" service.');
-        }
-
         if (!$encoders = $this->findAndSortTaggedServices('serializer.encoder', $container)) {
             throw new RuntimeException('You must tag at least one service as "serializer.encoder" to use the "serializer" service.');
         }
 
+        $normalizers = $this->findAndSortTaggedServices('serializer.normalizer', $container);
+        $denormalizers = $this->findAndSortTaggedServices('serializer.denormalizer', $container);
+
         if ($container->hasParameter('serializer.default_context')) {
             $defaultContext = $container->getParameter('serializer.default_context');
-            foreach (array_merge($normalizers, $encoders) as $service) {
+            foreach (array_merge($normalizers, $denormalizers, $encoders) as $service) {
                 $definition = $container->getDefinition($service);
                 $definition->setBindings(['array $defaultContext' => new BoundArgument($defaultContext, false)] + $definition->getBindings());
             }
@@ -64,42 +63,28 @@ class SerializerPass implements CompilerPassInterface
                     ->setArguments([$normalizer, new Reference('serializer.data_collector')]);
             }
 
+            foreach ($denormalizers as $i => $denormalizer ) {
+                $normalizers[$i] = $container->register('.debug.serializer.denormalizer.'.$denormalizer, TraceableNormalizer::class)
+                    ->setArguments([$denormalizer, new Reference('serializer.data_collector')]);
+            }
+
             foreach ($encoders as $i => $encoder) {
                 $encoders[$i] = $container->register('.debug.serializer.encoder.'.$encoder, TraceableEncoder::class)
                     ->setArguments([$encoder, new Reference('serializer.data_collector')]);
             }
         }
 
-        $denormalizers = [];
-        $trueNormalizers = [];
-        /** @var Reference|Definition $definition */
-        foreach ($normalizers as $definition) {
-            $reference = null;
-            if ($definition instanceof Reference) {
-                $reference = $definition;
-                $definition = $container->getDefinition($definition);
-            }
-
-            $class = $definition->getClass();
-            if (null === $class) {
-                continue;
-            }
-            $interfaces = class_implements($class);
-            if (isset($interfaces[NormalizerInterface::class])) {
-                $trueNormalizers[] = $reference ?? $definition;
-            }
-            if (isset($interfaces[DenormalizerInterface::class])) {
-                $denormalizers[] = $reference ?? $definition;
-            }
-        }
-
         $serializerDefinition = $container->getDefinition('serializer');
         $serializerDefinition->replaceArgument(1, $encoders);
 
+        // if FrameworkBundle 7.2 or above
         if ($container->hasDefinition('serializer.normalizer') && $container->hasDefinition('serializer.denormalizer')) {
-            $container->getDefinition('serializer.normalizer')->replaceArgument(0, $trueNormalizers);
+            $container->getDefinition('serializer.normalizer')->replaceArgument(0, $normalizers);
             $container->getDefinition('serializer.denormalizer')->replaceArgument(0, $denormalizers);
         } else {
+            if (!$normalizers) {
+                throw new RuntimeException('You must tag at least one service as "serializer.normalizer" to use the "serializer" service.');
+            }
             $serializerDefinition->replaceArgument(0, $normalizers);
         }
     }

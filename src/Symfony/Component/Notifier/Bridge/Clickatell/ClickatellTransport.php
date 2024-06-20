@@ -61,7 +61,7 @@ final class ClickatellTransport extends AbstractTransport
 
         $options = [];
         $options['from'] = $message->getFrom() ?: $this->from;
-        $options['to'] = $message->getPhone();
+        $options['to'] = [$message->getPhone()];
         $options['text'] = $message->getSubject();
 
         $response = $this->client->request('POST', $endpoint, [

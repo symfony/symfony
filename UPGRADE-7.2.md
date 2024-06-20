@@ -12,3 +12,8 @@ Security
 --------
 
  * Deprecate argument `$secret` of `RememberMeToken` and `RememberMeAuthenticator`
+
+Serializer
+----------
+
+ * Deprecated argument `$normalizers` of `Serializer::__construct()`, use arguments `$normalizer` and `$denormalizer` instead

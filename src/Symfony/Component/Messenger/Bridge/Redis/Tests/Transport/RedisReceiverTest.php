@@ -23,6 +23,7 @@ use Symfony\Component\Messenger\Transport\Serialization\Serializer;
 use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
 use Symfony\Component\Serializer as SerializerComponent;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
+use Symfony\Component\Serializer\Normalizer\ChainNormalizer;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 
 class RedisReceiverTest extends TestCase
@@ -61,6 +62,13 @@ class RedisReceiverTest extends TestCase
 
     public static function redisEnvelopeProvider(): \Generator
     {
+        // if Symfony 7.2
+        if (class_exists(ChainNormalizer::class)) {
+            $symfonySerializer = new SerializerComponent\Serializer([], ['json' => new JsonEncoder()], new ObjectNormalizer(), new ObjectNormalizer());
+        } else {
+            $symfonySerializer = new SerializerComponent\Serializer([new ObjectNormalizer()], ['json' => new JsonEncoder()]);
+        }
+
         yield [
             [
                 'id' => 1,
@@ -74,9 +82,7 @@ class RedisReceiverTest extends TestCase
                 ],
             ],
             new DummyMessage('Hi'),
-            new Serializer(
-                new SerializerComponent\Serializer([new ObjectNormalizer()], ['json' => new JsonEncoder()])
-            ),
+            new Serializer($symfonySerializer),
         ];
 
         yield [

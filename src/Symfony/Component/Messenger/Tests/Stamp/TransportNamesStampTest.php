@@ -17,6 +17,8 @@ use Symfony\Component\Messenger\Stamp\TransportNamesStamp;
 use Symfony\Component\Messenger\Transport\Serialization\Serializer;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Normalizer\ArrayDenormalizer;
+use Symfony\Component\Serializer\Normalizer\ChainDenormalizer;
+use Symfony\Component\Serializer\Normalizer\ChainNormalizer;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\Serializer\Serializer as SymfonySerializer;
 
@@ -36,14 +38,23 @@ class TransportNamesStampTest extends TestCase
 
     public function testDeserialization()
     {
-        $stamp = new TransportNamesStamp(['foo']);
-        $serializer = new Serializer(
-            new SymfonySerializer([
-                new ArrayDenormalizer(),
-                new ObjectNormalizer(),
-            ], [new JsonEncoder()])
-        );
+        // if Symfony 7.2
+        if (class_exists(ChainNormalizer::class)) {
+            $symfonySerializer = new SymfonySerializer(
+                [],
+                [new JsonEncoder()],
+                new ChainNormalizer([new ObjectNormalizer()]),
+                new ChainDenormalizer([new ArrayDenormalizer(), new ObjectNormalizer()]),
+            );
+        } else {
+            $symfonySerializer = new SymfonySerializer(
+                [new ArrayDenormalizer(), new ObjectNormalizer()],
+                [new JsonEncoder()]
+            );
+        }
 
+        $stamp = new TransportNamesStamp(['foo']);
+        $serializer = new Serializer($symfonySerializer);
         $deserializedEnvelope = $serializer->decode($serializer->encode(new Envelope(new \stdClass(), [$stamp])));
 
         $deserializedStamp = $deserializedEnvelope->last(TransportNamesStamp::class);

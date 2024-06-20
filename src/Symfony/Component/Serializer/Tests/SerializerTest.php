@@ -37,6 +37,8 @@ use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\Serializer\Normalizer\AbstractObjectNormalizer;
 use Symfony\Component\Serializer\Normalizer\ArrayDenormalizer;
 use Symfony\Component\Serializer\Normalizer\BackedEnumNormalizer;
+use Symfony\Component\Serializer\Normalizer\ChainDenormalizer;
+use Symfony\Component\Serializer\Normalizer\ChainNormalizer;
 use Symfony\Component\Serializer\Normalizer\CustomNormalizer;
 use Symfony\Component\Serializer\Normalizer\DataUriNormalizer;
 use Symfony\Component\Serializer\Normalizer\DateTimeNormalizer;
@@ -80,6 +82,9 @@ use Symfony\Component\Serializer\Tests\Normalizer\TestNormalizer;
 
 class SerializerTest extends TestCase
 {
+    /**
+     * @group legacy
+     */
     public function testItThrowsExceptionOnInvalidNormalizer()
     {
         $this->expectException(InvalidArgumentException::class);
@@ -98,10 +103,8 @@ class SerializerTest extends TestCase
 
     public function testNormalizeNoMatch()
     {
-        $serializer = new Serializer([$this->createMock(NormalizerInterface::class)]);
-
+        $serializer = new Serializer([], [], new ChainNormalizer([$this->createMock(NormalizerInterface::class)]));
         $this->expectException(UnexpectedValueException::class);
-
         $serializer->normalize(new \stdClass(), 'xml');
     }
 
@@ -114,32 +117,28 @@ class SerializerTest extends TestCase
 
     public function testNormalizeGivesPriorityToInterfaceOverTraversable()
     {
-        $serializer = new Serializer([new CustomNormalizer()], ['json' => new JsonEncoder()]);
+        $serializer = new Serializer([], ['json' => new JsonEncoder()], new ChainNormalizer([new CustomNormalizer()]));
         $result = $serializer->serialize(new NormalizableTraversableDummy(), 'json');
         $this->assertEquals('{"foo":"normalizedFoo","bar":"normalizedBar"}', $result);
     }
 
     public function testNormalizeOnDenormalizer()
     {
-        $serializer = new Serializer([new TestDenormalizer()], []);
-
-        $this->expectException(UnexpectedValueException::class);
-
-        $this->assertTrue($serializer->normalize(new \stdClass(), 'json'));
+        $serializer = new Serializer([], [], null, new ChainDenormalizer([new TestDenormalizer()]));
+        $this->expectException(LogicException::class);
+        $serializer->normalize(new \stdClass(), 'json');
     }
 
     public function testDenormalizeNoMatch()
     {
-        $serializer = new Serializer([$this->createMock(NormalizerInterface::class)]);
-
+        $serializer = new Serializer([], [], null, new ChainDenormalizer([$this->createMock(DenormalizerInterface::class)]));
         $this->expectException(UnexpectedValueException::class);
-
         $serializer->denormalize('foo', 'stdClass');
     }
 
     public function testDenormalizeOnObjectThatOnlySupportsDenormalization()
     {
-        $serializer = new Serializer([new CustomNormalizer()]);
+        $serializer = new Serializer([], [], null, new ChainDenormalizer([new CustomNormalizer()]));
 
         $obj = $serializer->denormalize('foo', (new DenormalizableDummy())::class, 'xml');
         $this->assertInstanceOf(DenormalizableDummy::class, $obj);
@@ -147,17 +146,16 @@ class SerializerTest extends TestCase
 
     public function testDenormalizeOnNormalizer()
     {
-        $serializer = new Serializer([new TestNormalizer()], []);
+        $serializer = new Serializer([], [], new TestNormalizer());
         $data = ['title' => 'foo', 'numbers' => [5, 3]];
 
-        $this->expectException(UnexpectedValueException::class);
-
-        $this->assertTrue($serializer->denormalize(json_encode($data), 'stdClass', 'json'));
+        $this->expectException(LogicException::class);
+        $serializer->denormalize(json_encode($data), 'stdClass', 'json');
     }
 
     public function testCustomNormalizerCanNormalizeCollectionsAndScalar()
     {
-        $serializer = new Serializer([new TestNormalizer()], []);
+        $serializer = new Serializer([], [], new TestNormalizer());
         $this->assertNull($serializer->normalize(['a', 'b']));
         $this->assertNull($serializer->normalize(new \ArrayObject(['c', 'd'])));
         $this->assertNull($serializer->normalize([]));
@@ -178,7 +176,7 @@ class SerializerTest extends TestCase
             ->willReturn(true);
         $normalizer2->method('normalize')->willReturn('test2');
 
-        $serializer = new Serializer([$normalizer1, $normalizer2]);
+        $serializer = new Serializer([], [], new ChainNormalizer([$normalizer1, $normalizer2]));
 
         $data = new \stdClass();
         $data->test = true;
@@ -201,7 +199,7 @@ class SerializerTest extends TestCase
             ->willReturn(true);
         $denormalizer2->method('denormalize')->willReturn('test2');
 
-        $serializer = new Serializer([$denormalizer1, $denormalizer2]);
+        $serializer = new Serializer([], [], null, new ChainDenormalizer([$denormalizer1, $denormalizer2]));
 
         $this->assertEquals('test1', $serializer->denormalize(['test1' => true], 'test'));
 
@@ -210,7 +208,7 @@ class SerializerTest extends TestCase
 
     public function testSerialize()
     {
-        $serializer = new Serializer([new GetSetMethodNormalizer()], ['json' => new JsonEncoder()]);
+        $serializer = new Serializer([], ['json' => new JsonEncoder()], new ChainNormalizer([new GetSetMethodNormalizer()]));
         $data = ['title' => 'foo', 'numbers' => [5, 3]];
         $result = $serializer->serialize(Model::fromArray($data), 'json');
         $this->assertEquals(json_encode($data), $result);
@@ -233,7 +231,7 @@ class SerializerTest extends TestCase
 
     public function testSerializeEmpty()
     {
-        $serializer = new Serializer([new ObjectNormalizer()], ['json' => new JsonEncoder()]);
+        $serializer = new Serializer([], ['json' => new JsonEncoder()], new ChainNormalizer([new ObjectNormalizer()]));
         $data = ['foo' => new \stdClass()];
 
         // Old buggy behaviour
@@ -266,7 +264,7 @@ class SerializerTest extends TestCase
 
     public function testDeserialize()
     {
-        $serializer = new Serializer([new GetSetMethodNormalizer()], ['json' => new JsonEncoder()]);
+        $serializer = new Serializer([], ['json' => new JsonEncoder()], null, new ChainDenormalizer([new GetSetMethodNormalizer()]));
         $data = ['title' => 'foo', 'numbers' => [5, 3]];
         $result = $serializer->deserialize(json_encode($data), Model::class, 'json');
         $this->assertEquals($data, $result->toArray());
@@ -274,7 +272,7 @@ class SerializerTest extends TestCase
 
     public function testDeserializeUseCache()
     {
-        $serializer = new Serializer([new GetSetMethodNormalizer()], ['json' => new JsonEncoder()]);
+        $serializer = new Serializer([], ['json' => new JsonEncoder()], null, new ChainDenormalizer([new GetSetMethodNormalizer()]));
         $data = ['title' => 'foo', 'numbers' => [5, 3]];
         $serializer->deserialize(json_encode($data), Model::class, 'json');
         $data = ['title' => 'bar', 'numbers' => [2, 8]];
@@ -294,11 +292,10 @@ class SerializerTest extends TestCase
 
     public function testDeserializeWrongNormalizer()
     {
-        $serializer = new Serializer([new CustomNormalizer()], ['json' => new JsonEncoder()]);
+        $serializer = new Serializer([], ['json' => new JsonEncoder()], null, new ChainDenormalizer([new CustomNormalizer()]));
         $data = ['title' => 'foo', 'numbers' => [5, 3]];
 
         $this->expectException(UnexpectedValueException::class);
-
         $serializer->deserialize(json_encode($data), Model::class, 'json');
     }
 
@@ -314,14 +311,14 @@ class SerializerTest extends TestCase
 
     public function testDeserializeSupported()
     {
-        $serializer = new Serializer([new GetSetMethodNormalizer()], []);
+        $serializer = new Serializer([], [], null, new ChainDenormalizer([new GetSetMethodNormalizer()]));
         $data = ['title' => 'foo', 'numbers' => [5, 3]];
         $this->assertTrue($serializer->supportsDenormalization(json_encode($data), Model::class, 'json'));
     }
 
     public function testDeserializeNotSupported()
     {
-        $serializer = new Serializer([new GetSetMethodNormalizer()], []);
+        $serializer = new Serializer([], [], null, new ChainDenormalizer([new GetSetMethodNormalizer()]));
         $data = ['title' => 'foo', 'numbers' => [5, 3]];
         $this->assertFalse($serializer->supportsDenormalization(json_encode($data), 'stdClass', 'json'));
     }
@@ -351,18 +348,13 @@ class SerializerTest extends TestCase
 
     public function testSupportsArrayDeserialization()
     {
-        $serializer = new Serializer(
-            [
-                new GetSetMethodNormalizer(),
-                new PropertyNormalizer(),
-                new ObjectNormalizer(),
-                new CustomNormalizer(),
-                new ArrayDenormalizer(),
-            ],
-            [
-                'json' => new JsonEncoder(),
-            ]
-        );
+        $serializer = new Serializer([], ['json' => new JsonEncoder()], null, new ChainDenormalizer([
+            new GetSetMethodNormalizer(),
+            new PropertyNormalizer(),
+            new ObjectNormalizer(),
+            new CustomNormalizer(),
+            new ArrayDenormalizer(),
+        ]));
 
         $this->assertTrue(
             $serializer->supportsDenormalization([], __NAMESPACE__.'\Model[]', 'json')
@@ -378,15 +370,7 @@ class SerializerTest extends TestCase
             Model::fromArray(['title' => 'bar', 'numbers' => [2, 8]]),
         ];
 
-        $serializer = new Serializer(
-            [
-                new GetSetMethodNormalizer(),
-                new ArrayDenormalizer(),
-            ],
-            [
-                'json' => new JsonEncoder(),
-            ]
-        );
+        $serializer = new Serializer([], ['json' => new JsonEncoder()], null, new ChainDenormalizer([new GetSetMethodNormalizer(), new ArrayDenormalizer()]));
 
         $this->assertEquals(
             $expectedData,
@@ -400,7 +384,7 @@ class SerializerTest extends TestCase
         $normalizerAware->expects($this->once())
             ->method('setNormalizer');
 
-        new Serializer([$normalizerAware]);
+        new Serializer([], [], new ChainNormalizer([$normalizerAware]));
     }
 
     public function testDenormalizerAware()
@@ -409,14 +393,14 @@ class SerializerTest extends TestCase
         $denormalizerAware->expects($this->once())
             ->method('setDenormalizer');
 
-        new Serializer([$denormalizerAware]);
+        new Serializer([], [], null, new ChainDenormalizer([$denormalizerAware]));
     }
 
     public function testDeserializeObjectConstructorWithObjectTypeHint()
     {
         $jsonData = '{"bar":{"value":"baz"}}';
 
-        $serializer = new Serializer([new ObjectNormalizer()], ['json' => new JsonEncoder()]);
+        $serializer = new Serializer([], ['json' => new JsonEncoder()], null, new ChainDenormalizer([new ObjectNormalizer()]));
 
         $this->assertEquals(new Foo(new Bar('baz')), $serializer->deserialize($jsonData, Foo::class, 'json'));
     }
@@ -449,7 +433,8 @@ class SerializerTest extends TestCase
         };
 
         $discriminatorResolver = new ClassDiscriminatorFromClassMetadata($loaderMock);
-        $serializer = new Serializer([new ObjectNormalizer(null, null, null, new PhpDocExtractor(), $discriminatorResolver)], ['json' => new JsonEncoder()]);
+        $normalizer = new ObjectNormalizer(null, null, null, new PhpDocExtractor(), $discriminatorResolver);
+        $serializer = new Serializer([], ['json' => new JsonEncoder()], $normalizer, $normalizer);
 
         $jsonData = '{"type":"first","quux":{"value":"quux"},"bar":"bar-value","foo":"foo-value"}';
 
@@ -565,14 +550,17 @@ class SerializerTest extends TestCase
     public function testNormalizeTransformEmptyArrayObjectToArray()
     {
         $serializer = new Serializer(
-            [
+            [],
+            ['json' => new JsonEncoder()],
+            new ChainNormalizer([
+                new PropertyNormalizer(),
+                new ObjectNormalizer(),
+            ]),
+            new ChainDenormalizer([
                 new PropertyNormalizer(),
                 new ObjectNormalizer(),
                 new ArrayDenormalizer(),
-            ],
-            [
-                'json' => new JsonEncoder(),
-            ]
+            ])
         );
 
         $object = [];
@@ -587,16 +575,12 @@ class SerializerTest extends TestCase
 
     public static function provideObjectOrCollectionTests()
     {
-        $serializer = new Serializer(
-            [
-                new PropertyNormalizer(),
-                new ObjectNormalizer(),
-                new ArrayDenormalizer(),
-            ],
-            [
-                'json' => new JsonEncoder(),
-            ]
-        );
+        $normalizer = new ChainNormalizer([
+            new PropertyNormalizer(),
+            new ObjectNormalizer(),
+        ]);
+        $denormalizer = new ChainDenormalizer([new ArrayDenormalizer()]);
+        $serializer = new Serializer([], ['json' => new JsonEncoder()], $normalizer, $denormalizer);
 
         $data = [];
         $data['a1'] = new \ArrayObject();
@@ -744,7 +728,7 @@ class SerializerTest extends TestCase
 
     public function testDeserializeScalarArray()
     {
-        $serializer = new Serializer([new ArrayDenormalizer()], ['json' => new JsonEncoder()]);
+        $serializer = new Serializer([], ['json' => new JsonEncoder()], null, new ChainDenormalizer([new ArrayDenormalizer()]));
 
         $this->assertSame([42], $serializer->deserialize('[42]', 'int[]', 'json'));
         $this->assertSame([true, false], $serializer->deserialize('[true,false]', 'bool[]', 'json'));
@@ -754,16 +738,14 @@ class SerializerTest extends TestCase
 
     public function testDeserializeInconsistentScalarArray()
     {
-        $serializer = new Serializer([new ArrayDenormalizer()], ['json' => new JsonEncoder()]);
-
+        $serializer = new Serializer([], ['json' => new JsonEncoder()], null, new ChainDenormalizer([new ArrayDenormalizer()]));
         $this->expectException(NotNormalizableValueException::class);
-
         $serializer->deserialize('["42"]', 'int[]', 'json');
     }
 
     public function testDeserializeOnObjectWithObjectCollectionProperty()
     {
-        $serializer = new Serializer([new FooInterfaceDummyDenormalizer(), new ObjectNormalizer(null, null, null, new PhpDocExtractor())], [new JsonEncoder()]);
+        $serializer = new Serializer([], [new JsonEncoder()], null, new ChainDenormalizer([new FooInterfaceDummyDenormalizer(), new ObjectNormalizer(null, null, null, new PhpDocExtractor())]));
 
         $obj = $serializer->deserialize('{"foo":[{"name":"bar"}]}', ObjectCollectionPropertyDummy::class, 'json');
         $this->assertInstanceOf(ObjectCollectionPropertyDummy::class, $obj);
@@ -778,7 +760,7 @@ class SerializerTest extends TestCase
 
     public function testDeserializeWrappedScalar()
     {
-        $serializer = new Serializer([new UnwrappingDenormalizer()], ['json' => new JsonEncoder()]);
+        $serializer = new Serializer([], ['json' => new JsonEncoder()], null, new ChainDenormalizer([new UnwrappingDenormalizer()]));
 
         $this->assertSame(42, $serializer->deserialize('{"wrapper": 42}', 'int', 'json', [UnwrappingDenormalizer::UNWRAP_PATH => '[wrapper]']));
     }
@@ -786,7 +768,8 @@ class SerializerTest extends TestCase
     public function testDeserializeNullableIntInXml()
     {
         $extractor = new PropertyInfoExtractor([], [new ReflectionExtractor()]);
-        $serializer = new Serializer([new ObjectNormalizer(null, null, null, $extractor)], ['xml' => new XmlEncoder()]);
+        $normalizer = new ObjectNormalizer(null, null, null, $extractor);
+        $serializer = new Serializer([], ['xml' => new XmlEncoder()], $normalizer, $normalizer);
 
         $obj = $serializer->deserialize('<?xml version="1.0" encoding="UTF-8"?><DummyNullableInt><value/></DummyNullableInt>', DummyNullableInt::class, 'xml');
         $this->assertInstanceOf(DummyNullableInt::class, $obj);
@@ -798,11 +781,13 @@ class SerializerTest extends TestCase
         $classMetadataFactory = new ClassMetadataFactory(new AttributeLoader());
         $extractor = new PropertyInfoExtractor([], [new PhpDocExtractor(), new ReflectionExtractor()]);
         $serializer = new Serializer(
-            [
+            [],
+            ['json' => new JsonEncoder()],
+            null,
+            new ChainDenormalizer([
                 new DateTimeNormalizer(),
                 new ObjectNormalizer($classMetadataFactory, null, null, $extractor, new ClassDiscriminatorFromClassMetadata($classMetadataFactory)),
-            ],
-            ['json' => new JsonEncoder()]
+            ])
         );
 
         $actual = $serializer->deserialize('{ "changed": null }', DummyUnionType::class, 'json', [
@@ -830,10 +815,12 @@ class SerializerTest extends TestCase
         $classMetadataFactory = new ClassMetadataFactory(new AttributeLoader());
         $extractor = new PropertyInfoExtractor([], [new PhpDocExtractor(), new ReflectionExtractor()]);
         $serializer = new Serializer(
-            [
+            [],
+            ['json' => new JsonEncoder()],
+            null,
+            new ChainDenormalizer([
                 new ObjectNormalizer($classMetadataFactory, null, null, $extractor, new ClassDiscriminatorFromClassMetadata($classMetadataFactory)),
-            ],
-            ['json' => new JsonEncoder()]
+            ])
         );
 
         $actual = $serializer->deserialize('{ "v": { "a": 0 }}', DummyUnionWithAAndCAndB::class, 'json', [
@@ -863,7 +850,7 @@ class SerializerTest extends TestCase
     public function testFalseBuiltInTypes()
     {
         $extractor = new PropertyInfoExtractor([], [new ReflectionExtractor()]);
-        $serializer = new Serializer([new ObjectNormalizer(null, null, null, $extractor)], ['json' => new JsonEncoder()]);
+        $serializer = new Serializer([], ['json' => new JsonEncoder()], null, new ChainDenormalizer([new ObjectNormalizer(null, null, null, $extractor)]));
 
         $actual = $serializer->deserialize('{"false":false}', FalseBuiltInDummy::class, 'json');
 
@@ -873,7 +860,7 @@ class SerializerTest extends TestCase
     public function testTrueBuiltInTypes()
     {
         $extractor = new PropertyInfoExtractor([], [new ReflectionExtractor()]);
-        $serializer = new Serializer([new ObjectNormalizer(null, null, null, $extractor)], ['json' => new JsonEncoder()]);
+        $serializer = new Serializer([], ['json' => new JsonEncoder()], null, new ChainDenormalizer([new ObjectNormalizer(null, null, null, $extractor)]));
 
         $actual = $serializer->deserialize('{"true":true}', TrueBuiltInDummy::class, 'json');
 
@@ -882,7 +869,7 @@ class SerializerTest extends TestCase
 
     public function testDeserializeUntypedFormat()
     {
-        $serializer = new Serializer([new ObjectNormalizer(null, null, null, new PropertyInfoExtractor([], [new PhpDocExtractor(), new ReflectionExtractor()]))], ['csv' => new CsvEncoder()]);
+        $serializer = new Serializer([], ['csv' => new CsvEncoder()], null, new ChainDenormalizer([new ObjectNormalizer(null, null, null, new PropertyInfoExtractor([], [new PhpDocExtractor(), new ReflectionExtractor()]))]));
         $actual = $serializer->deserialize('value'.\PHP_EOL.',', DummyWithObjectOrNull::class, 'csv', [CsvEncoder::AS_COLLECTION_KEY => false]);
 
         $this->assertEquals(new DummyWithObjectOrNull(null), $actual);
@@ -892,7 +879,9 @@ class SerializerTest extends TestCase
     {
         $classMetadataFactory = new ClassMetadataFactory(new AttributeLoader());
 
-        return new Serializer([new ObjectNormalizer($classMetadataFactory, null, null, new ReflectionExtractor(), new ClassDiscriminatorFromClassMetadata($classMetadataFactory))], ['json' => new JsonEncoder()]);
+        $normalizers = new ObjectNormalizer($classMetadataFactory, null, null, new ReflectionExtractor(), new ClassDiscriminatorFromClassMetadata($classMetadataFactory));
+
+        return new Serializer([], ['json' => new JsonEncoder()], $normalizers, $normalizers);
     }
 
     public function testDeserializeAndUnwrap()
@@ -901,7 +890,7 @@ class SerializerTest extends TestCase
 
         $expectedData = Model::fromArray(['title' => 'value', 'numbers' => [5, 3]]);
 
-        $serializer = new Serializer([new UnwrappingDenormalizer(new PropertyAccessor()), new ObjectNormalizer()], ['json' => new JsonEncoder()]);
+        $serializer = new Serializer([], ['json' => new JsonEncoder()], null, new ChainDenormalizer([new UnwrappingDenormalizer(new PropertyAccessor()), new ObjectNormalizer()]));
 
         $this->assertEquals(
             $expectedData,
@@ -950,15 +939,17 @@ class SerializerTest extends TestCase
         $extractor = new PropertyInfoExtractor([], [new PhpDocExtractor(), new ReflectionExtractor()]);
 
         $serializer = new Serializer(
-            [
+            [],
+            ['json' => new JsonEncoder()],
+            null,
+            new ChainDenormalizer([
                 new ArrayDenormalizer(),
                 new DateTimeNormalizer(),
                 new DateTimeZoneNormalizer(),
                 new DataUriNormalizer(),
                 new UidNormalizer(),
                 new ObjectNormalizer($classMetadataFactory, null, null, $extractor, $classMetadataFactory ? new ClassDiscriminatorFromClassMetadata($classMetadataFactory) : null),
-            ],
-            ['json' => new JsonEncoder()]
+            ])
         );
 
         try {
@@ -1166,11 +1157,13 @@ class SerializerTest extends TestCase
         $extractor = new PropertyInfoExtractor([], [new PhpDocExtractor(), new ReflectionExtractor()]);
 
         $serializer = new Serializer(
-            [
+            [],
+            ['json' => new JsonEncoder()],
+            null,
+            new ChainDenormalizer([
                 new ArrayDenormalizer(),
                 new ObjectNormalizer($classMetadataFactory, null, null, $extractor, $classMetadataFactory ? new ClassDiscriminatorFromClassMetadata($classMetadataFactory) : null),
-            ],
-            ['json' => new JsonEncoder()]
+            ])
         );
 
         try {
@@ -1228,7 +1221,7 @@ class SerializerTest extends TestCase
             "float": []
         }';
 
-        $serializer = new Serializer([new ObjectNormalizer()], ['json' => new JsonEncoder()]);
+        $serializer = new Serializer([], ['json' => new JsonEncoder()], new ObjectNormalizer(), new ObjectNormalizer());
 
         try {
             $serializer->deserialize($json, Php74Full::class, 'json', [
@@ -1293,10 +1286,12 @@ class SerializerTest extends TestCase
         $extractor = new PropertyInfoExtractor([], [new PhpDocExtractor(), new ReflectionExtractor()]);
 
         $serializer = new Serializer(
-            [
+            [],
+            ['json' => new JsonEncoder()],
+            null,
+            new ChainDenormalizer([
                 new ObjectNormalizer($classMetadataFactory, null, null, $extractor, $classMetadataFactory ? new ClassDiscriminatorFromClassMetadata($classMetadataFactory) : null),
-            ],
-            ['json' => new JsonEncoder()]
+            ])
         );
 
         try {
@@ -1352,6 +1347,58 @@ class SerializerTest extends TestCase
         $this->assertSame($expected, $exceptionsAsArray);
     }
 
+    /**
+     * @group legacy
+     *
+     * If we use the Symfony 7.0 way to create a Serializer, will we still get a PartialDenormalizationException?
+     */
+    public function testDenormalizationCollectErrorsWithLegacy()
+    {
+        $json = '{"string": "some string", "bool": "bool", "int": true}';
+
+        $extractor = new PropertyInfoExtractor([], [new ReflectionExtractor()]);
+        $serializer = new Serializer(
+            [new ObjectNormalizer(null, null, null, $extractor)],
+            ['json' => new JsonEncoder()],
+        );
+
+        try {
+            $serializer->deserialize($json, WithTypedConstructor::class, 'json', [
+                DenormalizerInterface::COLLECT_DENORMALIZATION_ERRORS => true,
+            ]);
+
+            $this->fail();
+        } catch (\Throwable $th) {
+            $this->assertInstanceOf(PartialDenormalizationException::class, $th);
+        }
+    }
+
+    /**
+     * Make sure throwing PartialDenormalizationException is a feature of the serializer, not the ChainNormalizer.
+     */
+    public function testDenormalizationCollectErrorsNoChainDenormalizer()
+    {
+        $json = '{"string": "some string", "bool": "bool", "int": true}';
+
+        $extractor = new PropertyInfoExtractor([], [new ReflectionExtractor()]);
+        $serializer = new Serializer(
+            [],
+            ['json' => new JsonEncoder()],
+            new ObjectNormalizer(null, null, null, $extractor),
+            new ObjectNormalizer(null, null, null, $extractor)
+        );
+
+        try {
+            $serializer->deserialize($json, WithTypedConstructor::class, 'json', [
+                DenormalizerInterface::COLLECT_DENORMALIZATION_ERRORS => true,
+            ]);
+
+            $this->fail();
+        } catch (\Throwable $th) {
+            $this->assertInstanceOf(PartialDenormalizationException::class, $th);
+        }
+    }
+
     public function testCollectDenormalizationErrorsWithInvalidConstructorTypes()
     {
         $json = '{"string": "some string", "bool": "bool", "int": true}';
@@ -1359,8 +1406,10 @@ class SerializerTest extends TestCase
         $extractor = new PropertyInfoExtractor([], [new ReflectionExtractor()]);
 
         $serializer = new Serializer(
-            [new ObjectNormalizer(null, null, null, $extractor)],
-            ['json' => new JsonEncoder()]
+            [],
+            ['json' => new JsonEncoder()],
+            null,
+            new ChainDenormalizer([new ObjectNormalizer(null, null, null, $extractor)])
         );
 
         try {
@@ -1416,11 +1465,13 @@ class SerializerTest extends TestCase
     public function testCollectDenormalizationErrorsWithEnumConstructor()
     {
         $serializer = new Serializer(
-            [
+            [],
+            ['json' => new JsonEncoder()],
+            null,
+            new ChainDenormalizer([
                 new BackedEnumNormalizer(),
                 new ObjectNormalizer(),
-            ],
-            ['json' => new JsonEncoder()]
+            ])
         );
 
         try {
@@ -1455,11 +1506,13 @@ class SerializerTest extends TestCase
         $propertyInfoExtractor = new PropertyInfoExtractor([], [$reflectionExtractor], [], [], []);
 
         $serializer = new Serializer(
-            [
+            [],
+            ['json' => new JsonEncoder()],
+            null,
+            new ChainDenormalizer([
                 new BackedEnumNormalizer(),
                 new ObjectNormalizer($classMetadataFactory, null, null, $propertyInfoExtractor),
-            ],
-            ['json' => new JsonEncoder()]
+            ])
         );
 
         try {
@@ -1492,11 +1545,13 @@ class SerializerTest extends TestCase
     public function testNoCollectDenormalizationErrorsWithWrongEnumOnConstructor()
     {
         $serializer = new Serializer(
-            [
+            [],
+            ['json' => new JsonEncoder()],
+            null,
+            new ChainDenormalizer([
                 new BackedEnumNormalizer(),
                 new ObjectNormalizer(),
-            ],
-            ['json' => new JsonEncoder()]
+            ])
         );
 
         try {
@@ -1517,12 +1572,9 @@ class SerializerTest extends TestCase
         $obj->setBaz('baz');
 
         $serializer = new Serializer(
-            [
-                new ObjectNormalizer(),
-            ],
-            [
-                'json' => new JsonEncoder(),
-            ]
+            [],
+            ['json' => new JsonEncoder()],
+            new ChainNormalizer([new ObjectNormalizer()])
         );
 
         $this->assertSame(
@@ -1560,13 +1612,16 @@ class SerializerTest extends TestCase
                 Model::class => true,
             ]);
 
+        $normalizers = [
+            $neverCalledNormalizer,
+            $supportedAndCachedNormalizer,
+            new ObjectNormalizer(),
+        ];
         $serializer = new Serializer(
-            [
-                $neverCalledNormalizer,
-                $supportedAndCachedNormalizer,
-                new ObjectNormalizer(),
-            ],
-            ['json' => new JsonEncoder()]
+            [],
+            ['json' => new JsonEncoder()],
+            new ChainNormalizer($normalizers),
+            new ChainDenormalizer($normalizers),
         );
 
         // Normalization process
@@ -1615,9 +1670,12 @@ class SerializerTest extends TestCase
 
         $extractor = new PropertyInfoExtractor([], [new ReflectionExtractor()]);
 
+        $objectNormalizer = new ObjectNormalizer(null, null, null, $extractor);
         $serializer = new Serializer(
-            [new ObjectNormalizer(null, null, null, $extractor)],
-            ['json' => new JsonEncoder()]
+            [],
+            ['json' => new JsonEncoder()],
+            $objectNormalizer,
+            $objectNormalizer,
         );
 
         try {

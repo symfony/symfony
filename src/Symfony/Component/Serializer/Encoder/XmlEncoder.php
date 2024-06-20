@@ -13,6 +13,8 @@ namespace Symfony\Component\Serializer\Encoder;
 
 use Symfony\Component\Serializer\Exception\BadMethodCallException;
 use Symfony\Component\Serializer\Exception\NotEncodableValueException;
+use Symfony\Component\Serializer\Normalizer\NormalizerAwareInterface;
+use Symfony\Component\Serializer\Normalizer\NormalizerAwareTrait;
 use Symfony\Component\Serializer\SerializerAwareInterface;
 use Symfony\Component\Serializer\SerializerAwareTrait;
 
@@ -23,8 +25,9 @@ use Symfony\Component\Serializer\SerializerAwareTrait;
  * @author Kévin Dunglas <dunglas@gmail.com>
  * @author Dany Maillard <danymaillard93b@gmail.com>
  */
-class XmlEncoder implements EncoderInterface, DecoderInterface, NormalizationAwareInterface, SerializerAwareInterface
+class XmlEncoder implements EncoderInterface, DecoderInterface, NormalizationAwareInterface, SerializerAwareInterface, NormalizerAwareInterface
 {
+    use NormalizerAwareTrait;
     use SerializerAwareTrait;
 
     public const FORMAT = 'xml';
@@ -346,12 +349,12 @@ class XmlEncoder implements EncoderInterface, DecoderInterface, NormalizationAwa
         $removeEmptyTags = $context[self::REMOVE_EMPTY_TAGS] ?? $this->defaultContext[self::REMOVE_EMPTY_TAGS] ?? false;
         $encoderIgnoredNodeTypes = $context[self::ENCODER_IGNORED_NODE_TYPES] ?? $this->defaultContext[self::ENCODER_IGNORED_NODE_TYPES];
 
-        if (\is_array($data) || ($data instanceof \Traversable && (null === $this->serializer || !$this->serializer->supportsNormalization($data, $format)))) {
+        if (\is_array($data) || ($data instanceof \Traversable && (null === $this->normalizer || !$this->normalizer->supportsNormalization($data, $format)))) {
             foreach ($data as $key => $data) {
                 // Ah this is the magic @ attribute types.
                 if (str_starts_with($key, '@') && $this->isElementNameValid($attributeName = substr($key, 1))) {
                     if (!\is_scalar($data)) {
-                        $data = $this->serializer->normalize($data, $format, $context);
+                        $data = $this->normalizer->normalize($data, $format, $context);
                     }
                     if (\is_bool($data)) {
                         $data = (int) $data;
@@ -388,11 +391,11 @@ class XmlEncoder implements EncoderInterface, DecoderInterface, NormalizationAwa
         }
 
         if (\is_object($data)) {
-            if (null === $this->serializer) {
+            if (null === $this->normalizer) {
                 throw new BadMethodCallException(sprintf('The serializer needs to be set to allow "%s()" to be used with object data.', __METHOD__));
             }
 
-            $data = $this->serializer->normalize($data, $format, $context);
+            $data = $this->normalizer->normalize($data, $format, $context);
             if (null !== $data && !\is_scalar($data)) {
                 return $this->buildXml($parentNode, $data, $format, $context, $xmlRootNodeName);
             }
@@ -456,11 +459,11 @@ class XmlEncoder implements EncoderInterface, DecoderInterface, NormalizationAwa
             $child = $node->ownerDocument->importNode($val, true);
             $node->appendChild($child);
         } elseif (\is_object($val)) {
-            if (null === $this->serializer) {
+            if (null === $this->normalizer) {
                 throw new BadMethodCallException(sprintf('The serializer needs to be set to allow "%s()" to be used with object data.', __METHOD__));
             }
 
-            return $this->selectNodeType($node, $this->serializer->normalize($val, $format, $context), $format, $context);
+            return $this->selectNodeType($node, $this->normalizer->normalize($val, $format, $context), $format, $context);
         } elseif (is_numeric($val)) {
             return $this->appendText($node, (string) $val);
         } elseif (\is_string($val) && $this->needsCdataWrapping($val, $context)) {

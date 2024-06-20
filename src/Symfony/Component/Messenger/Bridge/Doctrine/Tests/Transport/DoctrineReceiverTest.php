@@ -26,6 +26,7 @@ use Symfony\Component\Messenger\Transport\Serialization\PhpSerializer;
 use Symfony\Component\Messenger\Transport\Serialization\Serializer;
 use Symfony\Component\Serializer as SerializerComponent;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
+use Symfony\Component\Serializer\Normalizer\ChainNormalizer;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 
 class DoctrineReceiverTest extends TestCase
@@ -314,10 +315,13 @@ class DoctrineReceiverTest extends TestCase
 
     private function createSerializer(): Serializer
     {
-        $serializer = new Serializer(
-            new SerializerComponent\Serializer([new ObjectNormalizer()], ['json' => new JsonEncoder()])
-        );
+        // if Symfony 7.2
+        if (class_exists(ChainNormalizer::class)) {
+            $symfonySerializer = new SerializerComponent\Serializer([], ['json' => new JsonEncoder()], new ObjectNormalizer(), new ObjectNormalizer());
+        } else {
+            $symfonySerializer = new SerializerComponent\Serializer([new ObjectNormalizer()], ['json' => new JsonEncoder()]);
+        }
 
-        return $serializer;
+        return new Serializer($symfonySerializer);
     }
 }

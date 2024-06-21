@@ -46,7 +46,7 @@ final class ImportMapOutdatedCommand extends Command
             ->addOption(
                 name: 'format',
                 mode: InputOption::VALUE_REQUIRED,
-                description: sprintf('The output format ("%s")', implode(', ', $this->getAvailableFormatOptions())),
+                description: \sprintf('The output format ("%s")', implode(', ', $this->getAvailableFormatOptions())),
                 default: 'txt',
             )
             ->setHelp(<<<'EOT'
@@ -88,9 +88,9 @@ EOT
             foreach ($displayData as $datum) {
                 $color = self::COLOR_MAPPING[$datum['latest-status']] ?? 'default';
                 $table->addRow([
-                    sprintf('<fg=%s>%s</>', $color, $datum['name']),
+                    \sprintf('<fg=%s>%s</>', $color, $datum['name']),
                     $datum['current'],
-                    sprintf('<fg=%s>%s</>', $color, $datum['latest']),
+                    \sprintf('<fg=%s>%s</>', $color, $datum['latest']),
                 ]);
             }
             $table->render();

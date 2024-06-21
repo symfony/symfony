@@ -35,7 +35,7 @@ final readonly class ReflectionParameterTypeResolver implements TypeResolverInte
     public function resolve(mixed $subject, ?TypeContext $typeContext = null): Type
     {
         if (!$subject instanceof \ReflectionParameter) {
-            throw new UnsupportedException(sprintf('Expected subject to be a "ReflectionParameter", "%s" given.', get_debug_type($subject)), $subject);
+            throw new UnsupportedException(\sprintf('Expected subject to be a "ReflectionParameter", "%s" given.', get_debug_type($subject)), $subject);
         }
 
         $typeContext ??= $this->typeContextFactory->createFromReflection($subject);
@@ -44,10 +44,10 @@ final readonly class ReflectionParameterTypeResolver implements TypeResolverInte
             return $this->reflectionTypeResolver->resolve($subject->getType(), $typeContext);
         } catch (UnsupportedException $e) {
             $path = null !== $typeContext
-                ? sprintf('%s::%s($%s)', $typeContext->calledClassName, $subject->getDeclaringFunction()->getName(), $subject->getName())
-                : sprintf('%s($%s)', $subject->getDeclaringFunction()->getName(), $subject->getName());
+                ? \sprintf('%s::%s($%s)', $typeContext->calledClassName, $subject->getDeclaringFunction()->getName(), $subject->getName())
+                : \sprintf('%s($%s)', $subject->getDeclaringFunction()->getName(), $subject->getName());
 
-            throw new UnsupportedException(sprintf('Cannot resolve type for "%s".', $path), $subject, previous: $e);
+            throw new UnsupportedException(\sprintf('Cannot resolve type for "%s".', $path), $subject, previous: $e);
         }
     }
 }

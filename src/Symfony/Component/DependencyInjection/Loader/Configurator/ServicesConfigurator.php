@@ -79,7 +79,7 @@ class ServicesConfigurator extends AbstractConfigurator
                 throw new \LogicException('Anonymous services must have a class name.');
             }
 
-            $id = sprintf('.%d_%s', ++$this->anonymousCount, preg_replace('/^.*\\\\/', '', $class).'~'.$this->anonymousHash);
+            $id = \sprintf('.%d_%s', ++$this->anonymousCount, preg_replace('/^.*\\\\/', '', $class).'~'.$this->anonymousHash);
         } elseif (!$defaults->isPublic() || !$defaults->isPrivate()) {
             $definition->setPublic($defaults->isPublic() && !$defaults->isPrivate());
         }
@@ -162,7 +162,7 @@ class ServicesConfigurator extends AbstractConfigurator
 
                 $services[$i] = $definition;
             } elseif (!$service instanceof ReferenceConfigurator) {
-                throw new InvalidArgumentException(sprintf('"%s()" expects a list of definitions as returned by "%s()" or "%s()", "%s" given at index "%s" for service "%s".', __METHOD__, InlineServiceConfigurator::FACTORY, ReferenceConfigurator::FACTORY, $service instanceof AbstractConfigurator ? $service::FACTORY.'()' : get_debug_type($service), $i, $id));
+                throw new InvalidArgumentException(\sprintf('"%s()" expects a list of definitions as returned by "%s()" or "%s()", "%s" given at index "%s" for service "%s".', __METHOD__, InlineServiceConfigurator::FACTORY, ReferenceConfigurator::FACTORY, $service instanceof AbstractConfigurator ? $service::FACTORY.'()' : get_debug_type($service), $i, $id));
             }
         }
 

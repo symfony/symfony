@@ -121,19 +121,19 @@ class MongoDbStore implements PersistingStoreInterface
         }
 
         if (null === $this->options['database']) {
-            throw new InvalidArgumentException(sprintf('"%s()" requires the "database" in the URI path or option.', __METHOD__));
+            throw new InvalidArgumentException(\sprintf('"%s()" requires the "database" in the URI path or option.', __METHOD__));
         }
         if (null === $this->options['collection']) {
-            throw new InvalidArgumentException(sprintf('"%s()" requires the "collection" in the URI querystring or option.', __METHOD__));
+            throw new InvalidArgumentException(\sprintf('"%s()" requires the "collection" in the URI querystring or option.', __METHOD__));
         }
         $this->namespace = $this->options['database'].'.'.$this->options['collection'];
 
         if ($this->options['gcProbability'] < 0.0 || $this->options['gcProbability'] > 1.0) {
-            throw new InvalidArgumentException(sprintf('"%s()" gcProbability must be a float from 0.0 to 1.0, "%f" given.', __METHOD__, $this->options['gcProbability']));
+            throw new InvalidArgumentException(\sprintf('"%s()" gcProbability must be a float from 0.0 to 1.0, "%f" given.', __METHOD__, $this->options['gcProbability']));
         }
 
         if ($this->initialTtl <= 0) {
-            throw new InvalidTtlException(sprintf('"%s()" expects a strictly positive TTL, got "%d".', __METHOD__, $this->initialTtl));
+            throw new InvalidTtlException(\sprintf('"%s()" expects a strictly positive TTL, got "%d".', __METHOD__, $this->initialTtl));
         }
     }
 
@@ -147,11 +147,11 @@ class MongoDbStore implements PersistingStoreInterface
     private function skimUri(string $uri): string
     {
         if (!str_starts_with($uri, 'mongodb://') && !str_starts_with($uri, 'mongodb+srv://')) {
-            throw new InvalidArgumentException(sprintf('The given MongoDB Connection URI "%s" is invalid. Expecting "mongodb://" or "mongodb+srv://".', $uri));
+            throw new InvalidArgumentException(\sprintf('The given MongoDB Connection URI "%s" is invalid. Expecting "mongodb://" or "mongodb+srv://".', $uri));
         }
 
         if (false === $params = parse_url($uri)) {
-            throw new InvalidArgumentException(sprintf('The given MongoDB Connection URI "%s" is invalid.', $uri));
+            throw new InvalidArgumentException(\sprintf('The given MongoDB Connection URI "%s" is invalid.', $uri));
         }
         $pathDb = ltrim($params['path'] ?? '', '/') ?: null;
         if (null !== $pathDb) {

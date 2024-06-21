@@ -33,7 +33,7 @@ final class Cas2Handler implements AccessTokenHandlerInterface
     ) {
         if (null === $client) {
             if (!class_exists(HttpClient::class)) {
-                throw new \LogicException(sprintf('You cannot use "%s" as the HttpClient component is not installed. Try running "composer require symfony/http-client".', __CLASS__));
+                throw new \LogicException(\sprintf('You cannot use "%s" as the HttpClient component is not installed. Try running "composer require symfony/http-client".', __CLASS__));
             }
 
             $this->client = HttpClient::create();
@@ -76,7 +76,7 @@ final class Cas2Handler implements AccessTokenHandlerInterface
         unset($query['ticket']);
         $queryString = $query ? '?'.http_build_query($query) : '';
 
-        return sprintf('%s?ticket=%s&service=%s',
+        return \sprintf('%s?ticket=%s&service=%s',
             $this->validationUrl,
             urlencode($accessToken),
             urlencode($request->getSchemeAndHttpHost().$request->getBaseUrl().$request->getPathInfo().$queryString)

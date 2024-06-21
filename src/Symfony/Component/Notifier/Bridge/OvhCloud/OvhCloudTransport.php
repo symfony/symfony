@@ -44,7 +44,7 @@ final class OvhCloudTransport extends AbstractTransport
 
     public function __toString(): string
     {
-        return sprintf('ovhcloud://%s?service_name=%s%s', $this->getEndpoint(), $this->serviceName, $this->sender ? '&sender='.$this->sender : '');
+        return \sprintf('ovhcloud://%s?service_name=%s%s', $this->getEndpoint(), $this->serviceName, $this->sender ? '&sender='.$this->sender : '');
     }
 
     /**
@@ -78,7 +78,7 @@ final class OvhCloudTransport extends AbstractTransport
             throw new UnsupportedMessageTypeException(__CLASS__, SmsMessage::class, $message);
         }
 
-        $endpoint = sprintf('https://%s/1.0/sms/%s/jobs', $this->getEndpoint(), $this->serviceName);
+        $endpoint = \sprintf('https://%s/1.0/sms/%s/jobs', $this->getEndpoint(), $this->serviceName);
 
         $content = [
             'charset' => 'UTF-8',
@@ -122,13 +122,13 @@ final class OvhCloudTransport extends AbstractTransport
         if (200 !== $statusCode) {
             $error = $response->toArray(false);
 
-            throw new TransportException(sprintf('Unable to send the SMS: %s.', $error['message']), $response);
+            throw new TransportException(\sprintf('Unable to send the SMS: %s.', $error['message']), $response);
         }
 
         $success = $response->toArray(false);
 
         if (!isset($success['ids'][0])) {
-            throw new TransportException(sprintf('Attempt to send the SMS to invalid receivers: "%s".', implode(',', $success['invalidReceivers'])), $response);
+            throw new TransportException(\sprintf('Attempt to send the SMS to invalid receivers: "%s".', implode(',', $success['invalidReceivers'])), $response);
         }
 
         $sentMessage = new SentMessage($message, (string) $this);
@@ -142,7 +142,7 @@ final class OvhCloudTransport extends AbstractTransport
      */
     private function calculateTimeDelta(): int
     {
-        $endpoint = sprintf('https://%s/1.0/auth/time', $this->getEndpoint());
+        $endpoint = \sprintf('https://%s/1.0/auth/time', $this->getEndpoint());
         $response = $this->client->request('GET', $endpoint);
 
         return $response->getContent() - time();

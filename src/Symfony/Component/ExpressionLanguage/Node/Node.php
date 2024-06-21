@@ -37,7 +37,7 @@ class Node
     {
         $attributes = [];
         foreach ($this->attributes as $name => $value) {
-            $attributes[] = sprintf('%s: %s', $name, str_replace("\n", '', var_export($value, true)));
+            $attributes[] = \sprintf('%s: %s', $name, str_replace("\n", '', var_export($value, true)));
         }
 
         $repr = [str_replace('Symfony\Component\ExpressionLanguage\Node\\', '', static::class).'('.implode(', ', $attributes)];
@@ -79,7 +79,7 @@ class Node
      */
     public function toArray(): array
     {
-        throw new \BadMethodCallException(sprintf('Dumping a "%s" instance is not supported yet.', static::class));
+        throw new \BadMethodCallException(\sprintf('Dumping a "%s" instance is not supported yet.', static::class));
     }
 
     public function dump(): string
@@ -95,7 +95,7 @@ class Node
 
     protected function dumpString(string $value): string
     {
-        return sprintf('"%s"', addcslashes($value, "\0\t\"\\"));
+        return \sprintf('"%s"', addcslashes($value, "\0\t\"\\"));
     }
 
     protected function isHash(array $value): bool

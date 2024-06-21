@@ -41,7 +41,7 @@ final class VonageTransport extends AbstractTransport
 
     public function __toString(): string
     {
-        return sprintf('vonage://%s?from=%s', $this->getEndpoint(), $this->from);
+        return \sprintf('vonage://%s?from=%s', $this->getEndpoint(), $this->from);
     }
 
     public function supports(MessageInterface $message): bool
@@ -73,7 +73,7 @@ final class VonageTransport extends AbstractTransport
 
         foreach ($result['messages'] as $msg) {
             if ($msg['status'] ?? false) {
-                throw new TransportException('Unable to send the SMS: '.$msg['error-text'].sprintf(' (code %s).', $msg['status']), $response);
+                throw new TransportException('Unable to send the SMS: '.$msg['error-text'].\sprintf(' (code %s).', $msg['status']), $response);
             }
         }
 

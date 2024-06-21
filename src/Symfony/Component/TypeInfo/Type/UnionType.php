@@ -45,7 +45,7 @@ final class UnionType extends Type
             return $nonNullableType->getBaseType();
         }
 
-        throw new LogicException(sprintf('Cannot get base type on "%s" compound type.', $this));
+        throw new LogicException(\sprintf('Cannot get base type on "%s" compound type.', $this));
     }
 
     public function asNonNullable(): Type
@@ -90,12 +90,12 @@ final class UnionType extends Type
 
         if (!$nonNullableType instanceof self) {
             if (!method_exists($nonNullableType, $method)) {
-                throw new LogicException(sprintf('Method "%s" doesn\'t exist on "%s" type.', $method, $nonNullableType));
+                throw new LogicException(\sprintf('Method "%s" doesn\'t exist on "%s" type.', $method, $nonNullableType));
             }
 
             return $nonNullableType->{$method}(...$arguments);
         }
 
-        throw new LogicException(sprintf('Cannot call "%s" on "%s" compound type.', $method, $this));
+        throw new LogicException(\sprintf('Cannot call "%s" on "%s" compound type.', $method, $this));
     }
 }

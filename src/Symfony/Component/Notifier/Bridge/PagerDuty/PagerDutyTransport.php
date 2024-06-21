@@ -38,7 +38,7 @@ final class PagerDutyTransport extends AbstractTransport
 
     public function __toString(): string
     {
-        return sprintf('pagerduty://%s', $this->getEndpoint());
+        return \sprintf('pagerduty://%s', $this->getEndpoint());
     }
 
     public function supports(MessageInterface $message): bool
@@ -73,7 +73,7 @@ final class PagerDutyTransport extends AbstractTransport
         $result = $response->toArray(false);
 
         if (202 !== $statusCode) {
-            throw new TransportException(sprintf('Unable to post the PagerDuty message: "%s".', $result['error']['message']), $response);
+            throw new TransportException(\sprintf('Unable to post the PagerDuty message: "%s".', $result['error']['message']), $response);
         }
 
         $sentMessage = new SentMessage($message, (string) $this);

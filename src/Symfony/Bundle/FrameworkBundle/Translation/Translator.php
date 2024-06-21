@@ -81,7 +81,7 @@ class Translator extends BaseTranslator implements WarmableInterface
     ) {
         // check option names
         if ($diff = array_diff(array_keys($options), array_keys($this->options))) {
-            throw new InvalidArgumentException(sprintf('The Translator does not support the following options: \'%s\'.', implode('\', \'', $diff)));
+            throw new InvalidArgumentException(\sprintf('The Translator does not support the following options: \'%s\'.', implode('\', \'', $diff)));
         }
 
         $this->options = array_merge($this->options, $options);

@@ -41,7 +41,7 @@ final class OctopushTransport extends AbstractTransport
 
     public function __toString(): string
     {
-        return sprintf('octopush://%s?from=%s&type=%s', $this->getEndpoint(), $this->from, $this->type);
+        return \sprintf('octopush://%s?from=%s&type=%s', $this->getEndpoint(), $this->from, $this->type);
     }
 
     public function supports(MessageInterface $message): bool
@@ -57,7 +57,7 @@ final class OctopushTransport extends AbstractTransport
 
         $from = $message->getFrom() ?: $this->from;
 
-        $endpoint = sprintf('https://%s/api/sms/json', $this->getEndpoint());
+        $endpoint = \sprintf('https://%s/api/sms/json', $this->getEndpoint());
 
         $response = $this->client->request('POST', $endpoint, [
             'body' => [

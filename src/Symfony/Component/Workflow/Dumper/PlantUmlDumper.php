@@ -226,9 +226,9 @@ class PlantUmlDumper implements DumperInterface
         if (null !== $color) {
             // Close and open <font> before and after every '\n' string,
             // so that the style is applied properly on every line
-            $to = str_replace('\n', sprintf('</font>\n<font color=%1$s>', $color), $to);
+            $to = str_replace('\n', \sprintf('</font>\n<font color=%1$s>', $color), $to);
 
-            $to = sprintf(
+            $to = \sprintf(
                 '<font color=%1$s>%2$s</font>',
                 $color,
                 $to
@@ -245,7 +245,7 @@ class PlantUmlDumper implements DumperInterface
             $color = '#'.$color;
         }
 
-        return sprintf('[%s]', $color);
+        return \sprintf('[%s]', $color);
     }
 
     private function getColorId(string $color): string

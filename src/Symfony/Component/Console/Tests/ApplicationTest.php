@@ -637,7 +637,7 @@ class ApplicationTest extends TestCase
         } catch (\Exception $e) {
             $this->assertInstanceOf(CommandNotFoundException::class, $e, '->find() throws a CommandNotFoundException if command does not exist');
             $this->assertSame([], $e->getAlternatives());
-            $this->assertEquals(sprintf('Command "%s" is not defined.', $commandName), $e->getMessage(), '->find() throws a CommandNotFoundException if command does not exist, without alternatives');
+            $this->assertEquals(\sprintf('Command "%s" is not defined.', $commandName), $e->getMessage(), '->find() throws a CommandNotFoundException if command does not exist, without alternatives');
         }
 
         // Test if "bar1" command throw a "CommandNotFoundException" and does not contain
@@ -648,7 +648,7 @@ class ApplicationTest extends TestCase
         } catch (\Exception $e) {
             $this->assertInstanceOf(CommandNotFoundException::class, $e, '->find() throws a CommandNotFoundException if command does not exist');
             $this->assertSame(['afoobar1', 'foo:bar1'], $e->getAlternatives());
-            $this->assertMatchesRegularExpression(sprintf('/Command "%s" is not defined./', $commandName), $e->getMessage(), '->find() throws a CommandNotFoundException if command does not exist, with alternatives');
+            $this->assertMatchesRegularExpression(\sprintf('/Command "%s" is not defined./', $commandName), $e->getMessage(), '->find() throws a CommandNotFoundException if command does not exist, with alternatives');
             $this->assertMatchesRegularExpression('/afoobar1/', $e->getMessage(), '->find() throws a CommandNotFoundException if command does not exist, with alternative : "afoobar1"');
             $this->assertMatchesRegularExpression('/foo:bar1/', $e->getMessage(), '->find() throws a CommandNotFoundException if command does not exist, with alternative : "foo:bar1"');
             $this->assertDoesNotMatchRegularExpression('/foo:bar(?!1)/', $e->getMessage(), '->find() throws a CommandNotFoundException if command does not exist, without "foo:bar" alternative');
@@ -967,7 +967,7 @@ class ApplicationTest extends TestCase
         $application = new Application();
         $application->setAutoExit(false);
         $application->register('foo')->setCode(function () {
-            throw new \InvalidArgumentException(sprintf('Dummy type "%s" is invalid.', (new class() {})::class));
+            throw new \InvalidArgumentException(\sprintf('Dummy type "%s" is invalid.', (new class() {})::class));
         });
         $tester = new ApplicationTester($application);
 
@@ -993,7 +993,7 @@ class ApplicationTest extends TestCase
         $application = new Application();
         $application->setAutoExit(false);
         $application->register('foo')->setCode(function () {
-            throw new \InvalidArgumentException(sprintf('Dummy type "%s" is invalid.', (new class() {})::class));
+            throw new \InvalidArgumentException(\sprintf('Dummy type "%s" is invalid.', (new class() {})::class));
         });
         $tester = new ApplicationTester($application);
 

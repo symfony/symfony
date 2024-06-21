@@ -53,7 +53,7 @@ class X509Authenticator extends AbstractPreAuthenticatedAuthenticator
         }
 
         if (null === $username) {
-            throw new BadCredentialsException(sprintf('SSL credentials not found: "%s", "%s".', $this->userKey, $this->credentialsKey));
+            throw new BadCredentialsException(\sprintf('SSL credentials not found: "%s", "%s".', $this->userKey, $this->credentialsKey));
         }
 
         return $username;

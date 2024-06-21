@@ -28,7 +28,7 @@ class ValidationFailedException extends RuntimeException implements EnvelopeAwar
     ) {
         $this->envelope = $envelope;
 
-        parent::__construct(sprintf('Message of type "%s" failed validation.', $this->violatingMessage::class));
+        parent::__construct(\sprintf('Message of type "%s" failed validation.', $this->violatingMessage::class));
     }
 
     public function getViolatingMessage(): object

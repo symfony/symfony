@@ -115,7 +115,7 @@ final class JavaScriptImportPathCompiler implements AssetCompilerInterface
             $relativeImportPath = $this->makeRelativeForJavaScript($relativeImportPath);
 
             return str_replace($importedModule, $relativeImportPath, $fullImportString);
-        }, $content, -1, $count, \PREG_OFFSET_CAPTURE) ?? throw new RuntimeException(sprintf('Failed to compile JavaScript import paths in "%s". Error: "%s".', $asset->sourcePath, preg_last_error_msg()));
+        }, $content, -1, $count, \PREG_OFFSET_CAPTURE) ?? throw new RuntimeException(\sprintf('Failed to compile JavaScript import paths in "%s". Error: "%s".', $asset->sourcePath, preg_last_error_msg()));
     }
 
     public function supports(MappedAsset $asset): bool
@@ -194,7 +194,7 @@ final class JavaScriptImportPathCompiler implements AssetCompilerInterface
         } catch (RuntimeException $e) {
             // avoid warning about vendor imports - these are often comments
             if (!$asset->isVendor) {
-                $this->handleMissingImport(sprintf('Error processing import in "%s": ', $asset->sourcePath).$e->getMessage(), $e);
+                $this->handleMissingImport(\sprintf('Error processing import in "%s": ', $asset->sourcePath).$e->getMessage(), $e);
             }
 
             return null;
@@ -215,14 +215,14 @@ final class JavaScriptImportPathCompiler implements AssetCompilerInterface
             return null;
         }
 
-        $message = sprintf('Unable to find asset "%s" imported from "%s".', $importedModule, $asset->sourcePath);
+        $message = \sprintf('Unable to find asset "%s" imported from "%s".', $importedModule, $asset->sourcePath);
 
         if (is_file($resolvedSourcePath)) {
-            $message .= sprintf('The file "%s" exists, but it is not in a mapped asset path. Add it to the "paths" config.', $resolvedSourcePath);
+            $message .= \sprintf('The file "%s" exists, but it is not in a mapped asset path. Add it to the "paths" config.', $resolvedSourcePath);
         } else {
             try {
-                if (null !== $assetMapper->getAssetFromSourcePath(sprintf('%s.js', $resolvedSourcePath))) {
-                    $message .= sprintf(' Try adding ".js" to the end of the import - i.e. "%s.js".', $importedModule);
+                if (null !== $assetMapper->getAssetFromSourcePath(\sprintf('%s.js', $resolvedSourcePath))) {
+                    $message .= \sprintf(' Try adding ".js" to the end of the import - i.e. "%s.js".', $importedModule);
                 }
             } catch (CircularAssetsException) {
                 // avoid circular error if there is self-referencing import comments

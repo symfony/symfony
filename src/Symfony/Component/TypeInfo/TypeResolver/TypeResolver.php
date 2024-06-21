@@ -52,7 +52,7 @@ final readonly class TypeResolver implements TypeResolverInterface
                 throw new UnsupportedException('Cannot find any resolver for "string" type. Try running "composer require phpstan/phpdoc-parser".', $subject);
             }
 
-            throw new UnsupportedException(sprintf('Cannot find any resolver for "%s" type.', $subjectType), $subject);
+            throw new UnsupportedException(\sprintf('Cannot find any resolver for "%s" type.', $subjectType), $subject);
         }
 
         /** @param TypeResolverInterface $resolver */

@@ -97,7 +97,7 @@ final class OidcTokenHandler implements AccessTokenHandlerInterface
             $claimCheckerManager->check($claims);
 
             if (empty($claims[$this->claim])) {
-                throw new MissingClaimException(sprintf('"%s" claim not found.', $this->claim));
+                throw new MissingClaimException(\sprintf('"%s" claim not found.', $this->claim));
             }
 
             // UserLoader argument can be overridden by a UserProvider on AccessTokenAuthenticator::authenticate

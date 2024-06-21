@@ -73,7 +73,7 @@ final class ShareContentShare extends AbstractLinkedInShare
 
         if ($shareMediaCategory) {
             if (!\in_array($shareMediaCategory, self::ALL, true)) {
-                throw new LogicException(sprintf('"%s" is not valid option, available options are "%s".', $shareMediaCategory, implode(', ', self::ALL)));
+                throw new LogicException(\sprintf('"%s" is not valid option, available options are "%s".', $shareMediaCategory, implode(', ', self::ALL)));
             }
 
             $this->options['shareMediaCategory'] = $shareMediaCategory;

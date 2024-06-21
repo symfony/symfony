@@ -37,7 +37,7 @@ class RedisSenderTest extends TestCase
         /** @var TransportMessageIdStamp $stamp */
         $stamp = $sender->send($envelope)->last(TransportMessageIdStamp::class);
 
-        $this->assertNotNull($stamp, sprintf('A "%s" stamp should be added', TransportMessageIdStamp::class));
+        $this->assertNotNull($stamp, \sprintf('A "%s" stamp should be added', TransportMessageIdStamp::class));
         $this->assertSame('THE_MESSAGE_ID', $stamp->getId());
     }
 }

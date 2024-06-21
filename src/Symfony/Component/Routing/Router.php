@@ -107,7 +107,7 @@ class Router implements RouterInterface, RequestMatcherInterface
         }
 
         if ($invalid) {
-            throw new \InvalidArgumentException(sprintf('The Router does not support the following options: "%s".', implode('", "', $invalid)));
+            throw new \InvalidArgumentException(\sprintf('The Router does not support the following options: "%s".', implode('", "', $invalid)));
         }
     }
 
@@ -119,7 +119,7 @@ class Router implements RouterInterface, RequestMatcherInterface
     public function setOption(string $key, mixed $value): void
     {
         if (!\array_key_exists($key, $this->options)) {
-            throw new \InvalidArgumentException(sprintf('The Router does not support the "%s" option.', $key));
+            throw new \InvalidArgumentException(\sprintf('The Router does not support the "%s" option.', $key));
         }
 
         $this->options[$key] = $value;
@@ -133,7 +133,7 @@ class Router implements RouterInterface, RequestMatcherInterface
     public function getOption(string $key): mixed
     {
         if (!\array_key_exists($key, $this->options)) {
-            throw new \InvalidArgumentException(sprintf('The Router does not support the "%s" option.', $key));
+            throw new \InvalidArgumentException(\sprintf('The Router does not support the "%s" option.', $key));
         }
 
         return $this->options[$key];

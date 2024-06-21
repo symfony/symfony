@@ -73,7 +73,7 @@ class Query extends AbstractQuery
                 static::SCOPE_BASE => 'ldap_read',
                 static::SCOPE_ONE => 'ldap_list',
                 static::SCOPE_SUB => 'ldap_search',
-                default => throw new LdapException(sprintf('Could not search in scope "%s".', $this->options['scope'])),
+                default => throw new LdapException(\sprintf('Could not search in scope "%s".', $this->options['scope'])),
             };
 
             $itemsLeft = $maxItems = $this->options['maxItems'];
@@ -101,13 +101,13 @@ class Query extends AbstractQuery
                 if (false === $search) {
                     $ldapError = '';
                     if ($errno = ldap_errno($con)) {
-                        $ldapError = sprintf(' LDAP error was [%d] %s', $errno, ldap_error($con));
+                        $ldapError = \sprintf(' LDAP error was [%d] %s', $errno, ldap_error($con));
                     }
                     if ($pageControl) {
                         $this->resetPagination();
                     }
 
-                    throw new LdapException(sprintf('Could not complete search with dn "%s", query "%s" and filters "%s".%s.', $this->dn, $this->query, implode(',', $this->options['filter']), $ldapError), $errno);
+                    throw new LdapException(\sprintf('Could not complete search with dn "%s", query "%s" and filters "%s".%s.', $this->dn, $this->query, implode(',', $this->options['filter']), $ldapError), $errno);
                 }
 
                 $this->results[] = $search;

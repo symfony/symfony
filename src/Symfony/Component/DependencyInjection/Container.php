@@ -151,12 +151,12 @@ class Container implements ContainerInterface, ResetInterface
             if (isset($this->syntheticIds[$id]) || !isset($this->getRemovedIds()[$id])) {
                 // no-op
             } elseif (null === $service) {
-                throw new InvalidArgumentException(sprintf('The "%s" service is private, you cannot unset it.', $id));
+                throw new InvalidArgumentException(\sprintf('The "%s" service is private, you cannot unset it.', $id));
             } else {
-                throw new InvalidArgumentException(sprintf('The "%s" service is private, you cannot replace it.', $id));
+                throw new InvalidArgumentException(\sprintf('The "%s" service is private, you cannot replace it.', $id));
             }
         } elseif (isset($this->services[$id])) {
-            throw new InvalidArgumentException(sprintf('The "%s" service is already initialized, you cannot replace it.', $id));
+            throw new InvalidArgumentException(\sprintf('The "%s" service is already initialized, you cannot replace it.', $id));
         }
 
         if (isset($this->aliases[$id])) {
@@ -234,10 +234,10 @@ class Container implements ContainerInterface, ResetInterface
                 throw new ServiceNotFoundException($id);
             }
             if (isset($container->syntheticIds[$id])) {
-                throw new ServiceNotFoundException($id, null, null, [], sprintf('The "%s" service is synthetic, it needs to be set at boot time before it can be used.', $id));
+                throw new ServiceNotFoundException($id, null, null, [], \sprintf('The "%s" service is synthetic, it needs to be set at boot time before it can be used.', $id));
             }
             if (isset($container->getRemovedIds()[$id])) {
-                throw new ServiceNotFoundException($id, null, null, [], sprintf('The "%s" service or alias has been removed or inlined when the container was compiled. You should either make it public, or stop using the container directly and use dependency injection instead.', $id));
+                throw new ServiceNotFoundException($id, null, null, [], \sprintf('The "%s" service or alias has been removed or inlined when the container was compiled. You should either make it public, or stop using the container directly and use dependency injection instead.', $id));
             }
 
             $alternatives = [];

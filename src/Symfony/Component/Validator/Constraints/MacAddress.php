@@ -77,7 +77,7 @@ class MacAddress extends Constraint
         parent::__construct(null, $groups, $payload);
 
         if (!\in_array($this->type, self::TYPES, true)) {
-            throw new ConstraintDefinitionException(sprintf('The option "type" must be one of "%s".', implode('", "', self::TYPES)));
+            throw new ConstraintDefinitionException(\sprintf('The option "type" must be one of "%s".', implode('", "', self::TYPES)));
         }
 
         $this->normalizer = null !== $normalizer ? $normalizer(...) : null;

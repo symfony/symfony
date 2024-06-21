@@ -38,7 +38,7 @@ class EnvPlaceholderParameterBagTest extends TestCase
     public function testMergeWillNotDuplicateIdenticalParameters()
     {
         $envVariableName = 'DB_HOST';
-        $parameter = sprintf('env(%s)', $envVariableName);
+        $parameter = \sprintf('env(%s)', $envVariableName);
         $firstBag = new EnvPlaceholderParameterBag();
 
         // initialize placeholders
@@ -59,7 +59,7 @@ class EnvPlaceholderParameterBagTest extends TestCase
     public function testMergeWhereFirstBagIsEmptyWillWork()
     {
         $envVariableName = 'DB_HOST';
-        $parameter = sprintf('env(%s)', $envVariableName);
+        $parameter = \sprintf('env(%s)', $envVariableName);
         $firstBag = new EnvPlaceholderParameterBag();
         $secondBag = new EnvPlaceholderParameterBag();
 
@@ -84,8 +84,8 @@ class EnvPlaceholderParameterBagTest extends TestCase
         $uniqueEnvName = 'DB_HOST';
         $commonEnvName = 'DB_USER';
 
-        $uniqueParamName = sprintf('env(%s)', $uniqueEnvName);
-        $commonParamName = sprintf('env(%s)', $commonEnvName);
+        $uniqueParamName = \sprintf('env(%s)', $uniqueEnvName);
+        $commonParamName = \sprintf('env(%s)', $commonEnvName);
 
         $firstBag = new EnvPlaceholderParameterBag();
         // initialize common placeholder
@@ -106,7 +106,7 @@ class EnvPlaceholderParameterBagTest extends TestCase
     public function testMergeWithDifferentIdentifiersForPlaceholders()
     {
         $envName = 'DB_USER';
-        $paramName = sprintf('env(%s)', $envName);
+        $paramName = \sprintf('env(%s)', $envName);
 
         $firstBag = new EnvPlaceholderParameterBag();
         $secondBag = new EnvPlaceholderParameterBag();

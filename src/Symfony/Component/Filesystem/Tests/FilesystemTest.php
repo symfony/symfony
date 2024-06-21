@@ -1823,7 +1823,7 @@ class FilesystemTest extends FilesystemTestCase
     public function testReadNonExistentFile()
     {
         $this->expectException(IOException::class);
-        $this->expectExceptionMessageMatches(sprintf('#^Failed to read file ".+%1$sTests/invalid"\\: file_get_contents\\(.+%1$sTests/invalid\\)\\: Failed to open stream\\: No such file or directory$#', preg_quote(\DIRECTORY_SEPARATOR)));
+        $this->expectExceptionMessageMatches(\sprintf('#^Failed to read file ".+%1$sTests/invalid"\\: file_get_contents\\(.+%1$sTests/invalid\\)\\: Failed to open stream\\: No such file or directory$#', preg_quote(\DIRECTORY_SEPARATOR)));
 
         $this->filesystem->readFile(__DIR__.'/invalid');
     }
@@ -1831,7 +1831,7 @@ class FilesystemTest extends FilesystemTestCase
     public function testReadDirectory()
     {
         $this->expectException(IOException::class);
-        $this->expectExceptionMessageMatches(sprintf('#^Failed to read file ".+%sTests"\\: File is a directory\\.$#', preg_quote(\DIRECTORY_SEPARATOR)));
+        $this->expectExceptionMessageMatches(\sprintf('#^Failed to read file ".+%sTests"\\: File is a directory\\.$#', preg_quote(\DIRECTORY_SEPARATOR)));
 
         $this->filesystem->readFile(__DIR__);
     }

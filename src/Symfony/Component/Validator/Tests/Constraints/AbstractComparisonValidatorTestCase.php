@@ -155,7 +155,7 @@ abstract class AbstractComparisonValidatorTestCase extends ConstraintValidatorTe
         $constraint = $this->createConstraint(['propertyPath' => 'foo']);
 
         $this->expectException(ConstraintDefinitionException::class);
-        $this->expectExceptionMessage(sprintf('Invalid property path "foo" provided to "%s" constraint', $constraint::class));
+        $this->expectExceptionMessage(\sprintf('Invalid property path "foo" provided to "%s" constraint', $constraint::class));
 
         $object = new ComparisonTest_Class(5);
 
@@ -232,8 +232,8 @@ abstract class AbstractComparisonValidatorTestCase extends ConstraintValidatorTe
         ]);
 
         return [
-            [$constraint, sprintf('The compared value "foo" could not be converted to a "DateTimeImmutable" instance in the "%s" constraint.', $constraint::class), new \DateTimeImmutable()],
-            [$constraint, sprintf('The compared value "foo" could not be converted to a "DateTime" instance in the "%s" constraint.', $constraint::class), new \DateTime()],
+            [$constraint, \sprintf('The compared value "foo" could not be converted to a "DateTimeImmutable" instance in the "%s" constraint.', $constraint::class), new \DateTimeImmutable()],
+            [$constraint, \sprintf('The compared value "foo" could not be converted to a "DateTime" instance in the "%s" constraint.', $constraint::class), new \DateTime()],
         ];
     }
 

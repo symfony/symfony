@@ -108,7 +108,7 @@ abstract class RegisterMappingsPass implements CompilerPassInterface
      */
     protected function getChainDriverServiceName(ContainerBuilder $container): string
     {
-        return sprintf($this->driverPattern, $this->getManagerName($container));
+        return \sprintf($this->driverPattern, $this->getManagerName($container));
     }
 
     /**
@@ -130,7 +130,7 @@ abstract class RegisterMappingsPass implements CompilerPassInterface
      */
     private function getConfigurationServiceName(ContainerBuilder $container): string
     {
-        return sprintf($this->configurationPattern, $this->getManagerName($container));
+        return \sprintf($this->configurationPattern, $this->getManagerName($container));
     }
 
     /**
@@ -152,7 +152,7 @@ abstract class RegisterMappingsPass implements CompilerPassInterface
             }
         }
 
-        throw new InvalidArgumentException(sprintf('Could not find the manager name parameter in the container. Tried the following parameter names: "%s".', implode('", "', $this->managerParameters)));
+        throw new InvalidArgumentException(\sprintf('Could not find the manager name parameter in the container. Tried the following parameter names: "%s".', implode('", "', $this->managerParameters)));
     }
 
     /**

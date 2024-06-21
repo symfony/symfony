@@ -50,7 +50,7 @@ class MessageDigestPasswordHasher implements LegacyPasswordHasherInterface
         }
 
         if (!\in_array($this->algorithm, hash_algos(), true)) {
-            throw new LogicException(sprintf('The algorithm "%s" is not supported.', $this->algorithm));
+            throw new LogicException(\sprintf('The algorithm "%s" is not supported.', $this->algorithm));
         }
 
         $salted = $this->mergePasswordAndSalt($plainPassword, $salt);

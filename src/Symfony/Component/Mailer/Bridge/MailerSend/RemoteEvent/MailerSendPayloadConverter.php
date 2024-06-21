@@ -38,13 +38,13 @@ final class MailerSendPayloadConverter implements PayloadConverterInterface
                 'activity.unsubscribed' => MailerEngagementEvent::UNSUBSCRIBE,
                 'activity.opened', 'activity.opened_unique' => MailerEngagementEvent::OPEN,
                 'activity.spam_complaint' => MailerEngagementEvent::SPAM,
-                default => throw new ParseException(sprintf('Unsupported event "%s".', $payload['type'])),
+                default => throw new ParseException(\sprintf('Unsupported event "%s".', $payload['type'])),
             };
             $event = new MailerEngagementEvent($name, $this->getMessageId($payload), $payload);
         }
 
         if (!$date = \DateTimeImmutable::createFromFormat('Y-m-d\TH:i:s.uP', $payload['created_at'])) {
-            throw new ParseException(sprintf('Invalid date "%s".', $payload['created_at']));
+            throw new ParseException(\sprintf('Invalid date "%s".', $payload['created_at']));
         }
 
         $event->setDate($date);

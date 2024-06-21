@@ -461,7 +461,7 @@ final class Dotenv
             try {
                 $process->mustRun();
             } catch (ProcessException) {
-                throw $this->createFormatException(sprintf('Issue expanding a command (%s)', $process->getErrorOutput()));
+                throw $this->createFormatException(\sprintf('Issue expanding a command (%s)', $process->getErrorOutput()));
             }
 
             return rtrim($process->getOutput(), "\n\r");
@@ -516,7 +516,7 @@ final class Dotenv
             if ('' === $value && isset($matches['default_value']) && '' !== $matches['default_value']) {
                 $unsupportedChars = strpbrk($matches['default_value'], '\'"{$');
                 if (false !== $unsupportedChars) {
-                    throw $this->createFormatException(sprintf('Unsupported character "%s" found in the default value of variable "$%s".', $unsupportedChars[0], $name));
+                    throw $this->createFormatException(\sprintf('Unsupported character "%s" found in the default value of variable "$%s".', $unsupportedChars[0], $name));
                 }
 
                 $value = substr($matches['default_value'], 2);

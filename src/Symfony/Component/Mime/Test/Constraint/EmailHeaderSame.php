@@ -25,7 +25,7 @@ final class EmailHeaderSame extends Constraint
 
     public function toString(): string
     {
-        return sprintf('has header "%s" with value "%s"', $this->headerName, $this->expectedValue);
+        return \sprintf('has header "%s" with value "%s"', $this->headerName, $this->expectedValue);
     }
 
     /**
@@ -45,7 +45,7 @@ final class EmailHeaderSame extends Constraint
      */
     protected function failureDescription($message): string
     {
-        return sprintf('the Email %s (value is %s)', $this->toString(), $this->getHeaderValue($message) ?? 'null');
+        return \sprintf('the Email %s (value is %s)', $this->toString(), $this->getHeaderValue($message) ?? 'null');
     }
 
     private function getHeaderValue($message): ?string

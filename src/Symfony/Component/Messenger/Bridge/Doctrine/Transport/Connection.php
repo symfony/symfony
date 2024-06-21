@@ -103,13 +103,13 @@ class Connection implements ResetInterface
         // check for extra keys in options
         $optionsExtraKeys = array_diff(array_keys($options), array_keys(static::DEFAULT_OPTIONS));
         if (0 < \count($optionsExtraKeys)) {
-            throw new InvalidArgumentException(sprintf('Unknown option found: [%s]. Allowed options are [%s].', implode(', ', $optionsExtraKeys), implode(', ', array_keys(static::DEFAULT_OPTIONS))));
+            throw new InvalidArgumentException(\sprintf('Unknown option found: [%s]. Allowed options are [%s].', implode(', ', $optionsExtraKeys), implode(', ', array_keys(static::DEFAULT_OPTIONS))));
         }
 
         // check for extra keys in options
         $queryExtraKeys = array_diff(array_keys($query), array_keys(static::DEFAULT_OPTIONS));
         if (0 < \count($queryExtraKeys)) {
-            throw new InvalidArgumentException(sprintf('Unknown option found in DSN: [%s]. Allowed options are [%s].', implode(', ', $queryExtraKeys), implode(', ', array_keys(static::DEFAULT_OPTIONS))));
+            throw new InvalidArgumentException(\sprintf('Unknown option found in DSN: [%s]. Allowed options are [%s].', implode(', ', $queryExtraKeys), implode(', ', array_keys(static::DEFAULT_OPTIONS))));
         }
 
         return $configuration;
@@ -125,7 +125,7 @@ class Connection implements ResetInterface
     public function send(string $body, array $headers, int $delay = 0): string
     {
         $now = new \DateTimeImmutable('UTC');
-        $availableAt = $now->modify(sprintf('%+d seconds', $delay / 1000));
+        $availableAt = $now->modify(\sprintf('%+d seconds', $delay / 1000));
 
         $queryBuilder = $this->driverConnection->createQueryBuilder()
             ->insert($this->configuration['table_name'])
@@ -196,8 +196,8 @@ class Connection implements ResetInterface
                 if (preg_match('/FROM (.+) WHERE/', (string) $sql, $matches)) {
                     $fromClause = $matches[1];
                     $sql = str_replace(
-                        sprintf('FROM %s WHERE', $fromClause),
-                        sprintf('FROM %s WHERE', $this->driverConnection->getDatabasePlatform()->appendLockHint($fromClause, LockMode::PESSIMISTIC_WRITE)),
+                        \sprintf('FROM %s WHERE', $fromClause),
+                        \sprintf('FROM %s WHERE', $this->driverConnection->getDatabasePlatform()->appendLockHint($fromClause, LockMode::PESSIMISTIC_WRITE)),
                         $sql
                     );
                 }
@@ -295,7 +295,7 @@ class Connection implements ResetInterface
             }
 
             if (!\is_string($tableName)) {
-                throw new \TypeError(sprintf('The table name must be an instance of "%s" or a string ("%s" given).', AbstractAsset::class, get_debug_type($tableName)));
+                throw new \TypeError(\sprintf('The table name must be an instance of "%s" or a string ("%s" given).', AbstractAsset::class, get_debug_type($tableName)));
             }
 
             return $tableName === $this->configuration['table_name'];
@@ -365,7 +365,7 @@ class Connection implements ResetInterface
     private function createAvailableMessagesQueryBuilder(): QueryBuilder
     {
         $now = new \DateTimeImmutable('UTC');
-        $redeliverLimit = $now->modify(sprintf('-%d seconds', $this->configuration['redeliver_timeout']));
+        $redeliverLimit = $now->modify(\sprintf('-%d seconds', $this->configuration['redeliver_timeout']));
 
         return $this->createQueryBuilder()
             ->where('m.queue_name = ?')

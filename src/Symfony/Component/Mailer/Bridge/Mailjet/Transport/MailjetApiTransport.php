@@ -64,12 +64,12 @@ class MailjetApiTransport extends AbstractApiTransport
 
     public function __toString(): string
     {
-        return sprintf('mailjet+api://%s', $this->getEndpoint().($this->sandbox ? '?sandbox=true' : ''));
+        return \sprintf('mailjet+api://%s', $this->getEndpoint().($this->sandbox ? '?sandbox=true' : ''));
     }
 
     protected function doSendApi(SentMessage $sentMessage, Email $email, Envelope $envelope): ResponseInterface
     {
-        $response = $this->client->request('POST', sprintf('https://%s/v%s/send', $this->getEndpoint(), self::API_VERSION), [
+        $response = $this->client->request('POST', \sprintf('https://%s/v%s/send', $this->getEndpoint(), self::API_VERSION), [
             'headers' => [
                 'Accept' => 'application/json',
             ],
@@ -81,7 +81,7 @@ class MailjetApiTransport extends AbstractApiTransport
             $statusCode = $response->getStatusCode();
             $result = $response->toArray(false);
         } catch (DecodingExceptionInterface) {
-            throw new HttpTransportException(sprintf('Unable to send an email: "%s" (code %d).', $response->getContent(false), $statusCode), $response);
+            throw new HttpTransportException(\sprintf('Unable to send an email: "%s" (code %d).', $response->getContent(false), $statusCode), $response);
         } catch (TransportExceptionInterface $e) {
             throw new HttpTransportException('Could not reach the remote Mailjet server.', $response, 0, $e);
         }
@@ -89,12 +89,12 @@ class MailjetApiTransport extends AbstractApiTransport
         if (200 !== $statusCode) {
             $errorDetails = $result['Messages'][0]['Errors'][0]['ErrorMessage'] ?? $response->getContent(false);
 
-            throw new HttpTransportException(sprintf('Unable to send an email: "%s" (code %d).', $errorDetails, $statusCode), $response);
+            throw new HttpTransportException(\sprintf('Unable to send an email: "%s" (code %d).', $errorDetails, $statusCode), $response);
         }
 
         // The response needs to contains a 'Messages' key that is an array
         if (!\array_key_exists('Messages', $result) || !\is_array($result['Messages']) || 0 === \count($result['Messages'])) {
-            throw new HttpTransportException(sprintf('Unable to send an email: "%s" malformed api response.', $response->getContent(false)), $response);
+            throw new HttpTransportException(\sprintf('Unable to send an email: "%s" malformed api response.', $response->getContent(false)), $response);
         }
 
         $sentMessage->setMessageId($result['Messages'][0]['To'][0]['MessageID'] ?? '');
@@ -128,7 +128,7 @@ class MailjetApiTransport extends AbstractApiTransport
         }
         if ($emails = $email->getReplyTo()) {
             if (1 < $length = \count($emails)) {
-                throw new TransportException(sprintf('Mailjet\'s API only supports one Reply-To email, %d given.', $length));
+                throw new TransportException(\sprintf('Mailjet\'s API only supports one Reply-To email, %d given.', $length));
             }
             $message['ReplyTo'] = $this->formatAddress($emails[0]);
         }

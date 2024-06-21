@@ -91,7 +91,7 @@ class NodeExtension extends AbstractExtension
         $subXpath->addNameTest();
 
         if ($subXpath->getCondition()) {
-            return $xpath->addCondition(sprintf('not(%s)', $subXpath->getCondition()));
+            return $xpath->addCondition(\sprintf('not(%s)', $subXpath->getCondition()));
         }
 
         return $xpath->addCondition('0');
@@ -151,11 +151,11 @@ class NodeExtension extends AbstractExtension
         }
 
         if ($node->getNamespace()) {
-            $name = sprintf('%s:%s', $node->getNamespace(), $name);
+            $name = \sprintf('%s:%s', $node->getNamespace(), $name);
             $safe = $safe && $this->isSafeName($node->getNamespace());
         }
 
-        $attribute = $safe ? '@'.$name : sprintf('attribute::*[name() = %s]', Translator::getXpathLiteral($name));
+        $attribute = $safe ? '@'.$name : \sprintf('attribute::*[name() = %s]', Translator::getXpathLiteral($name));
         $value = $node->getValue();
         $xpath = $translator->nodeToXPath($node->getSelector());
 
@@ -196,7 +196,7 @@ class NodeExtension extends AbstractExtension
         }
 
         if ($node->getNamespace()) {
-            $element = sprintf('%s:%s', $node->getNamespace(), $element);
+            $element = \sprintf('%s:%s', $node->getNamespace(), $element);
             $safe = $safe && $this->isSafeName($node->getNamespace());
         }
 

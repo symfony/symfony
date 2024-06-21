@@ -31,7 +31,7 @@ class CsvFileLoader extends FileLoader
         try {
             $file = new \SplFileObject($resource, 'rb');
         } catch (\RuntimeException $e) {
-            throw new NotFoundResourceException(sprintf('Error opening file "%s".', $resource), 0, $e);
+            throw new NotFoundResourceException(\sprintf('Error opening file "%s".', $resource), 0, $e);
         }
 
         $file->setFlags(\SplFileObject::READ_CSV | \SplFileObject::SKIP_EMPTY);

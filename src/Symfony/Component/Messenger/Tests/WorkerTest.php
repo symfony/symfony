@@ -403,7 +403,7 @@ class WorkerTest extends TestCase
 
         $worker = new Worker(['transport1' => $receiver1, 'transport2' => $receiver2], $bus, clock: new MockClock());
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage(sprintf('Receiver for "transport2" does not implement "%s".', QueueReceiverInterface::class));
+        $this->expectExceptionMessage(\sprintf('Receiver for "transport2" does not implement "%s".', QueueReceiverInterface::class));
         $worker->run(['queues' => ['foo']]);
     }
 

@@ -47,19 +47,19 @@ class MultiplierRetryStrategy implements RetryStrategyInterface
         private float $jitter = 0.1,
     ) {
         if ($delayMilliseconds < 0) {
-            throw new InvalidArgumentException(sprintf('Delay must be greater than or equal to zero: "%s" given.', $delayMilliseconds));
+            throw new InvalidArgumentException(\sprintf('Delay must be greater than or equal to zero: "%s" given.', $delayMilliseconds));
         }
 
         if ($multiplier < 1) {
-            throw new InvalidArgumentException(sprintf('Multiplier must be greater than zero: "%s" given.', $multiplier));
+            throw new InvalidArgumentException(\sprintf('Multiplier must be greater than zero: "%s" given.', $multiplier));
         }
 
         if ($maxDelayMilliseconds < 0) {
-            throw new InvalidArgumentException(sprintf('Max delay must be greater than or equal to zero: "%s" given.', $maxDelayMilliseconds));
+            throw new InvalidArgumentException(\sprintf('Max delay must be greater than or equal to zero: "%s" given.', $maxDelayMilliseconds));
         }
 
         if ($jitter < 0 || $jitter > 1) {
-            throw new InvalidArgumentException(sprintf('Jitter must be between 0 and 1: "%s" given.', $jitter));
+            throw new InvalidArgumentException(\sprintf('Jitter must be between 0 and 1: "%s" given.', $jitter));
         }
     }
 

@@ -87,7 +87,7 @@ class SignatureHasher
 
         if ($this->expiredSignaturesStorage && $this->maxUses) {
             if ($this->expiredSignaturesStorage->countUsages($hash) >= $this->maxUses) {
-                throw new ExpiredSignatureException(sprintf('Signature can only be used "%d" times.', $this->maxUses));
+                throw new ExpiredSignatureException(\sprintf('Signature can only be used "%d" times.', $this->maxUses));
             }
 
             $this->expiredSignaturesStorage->incrementUsages($hash);
@@ -111,7 +111,7 @@ class SignatureHasher
             }
 
             if (!\is_scalar($value) && !$value instanceof \Stringable) {
-                throw new \InvalidArgumentException(sprintf('The property path "%s" on the user object "%s" must return a value that can be cast to a string, but "%s" was returned.', $property, $user::class, get_debug_type($value)));
+                throw new \InvalidArgumentException(\sprintf('The property path "%s" on the user object "%s" must return a value that can be cast to a string, but "%s" was returned.', $property, $user::class, get_debug_type($value)));
             }
             hash_update($fieldsHash, ':'.base64_encode($value));
         }

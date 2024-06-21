@@ -24,7 +24,7 @@ final class RequestAttributeValueSame extends Constraint
 
     public function toString(): string
     {
-        return sprintf('has attribute "%s" with value "%s"', $this->name, $this->value);
+        return \sprintf('has attribute "%s" with value "%s"', $this->name, $this->value);
     }
 
     /**

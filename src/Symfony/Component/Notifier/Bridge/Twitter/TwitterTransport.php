@@ -49,7 +49,7 @@ final class TwitterTransport extends AbstractTransport
 
     public function __toString(): string
     {
-        return sprintf('twitter://%s', $this->getEndpoint());
+        return \sprintf('twitter://%s', $this->getEndpoint());
     }
 
     public function supports(MessageInterface $message): bool

@@ -59,12 +59,12 @@ class YamlFileLoader extends FileLoader
 
                 if (isset($data['groups'])) {
                     if (!\is_array($data['groups'])) {
-                        throw new MappingException(sprintf('The "groups" key must be an array of strings in "%s" for the attribute "%s" of the class "%s".', $this->file, $attribute, $classMetadata->getName()));
+                        throw new MappingException(\sprintf('The "groups" key must be an array of strings in "%s" for the attribute "%s" of the class "%s".', $this->file, $attribute, $classMetadata->getName()));
                     }
 
                     foreach ($data['groups'] as $group) {
                         if (!\is_string($group)) {
-                            throw new MappingException(sprintf('Group names must be strings in "%s" for the attribute "%s" of the class "%s".', $this->file, $attribute, $classMetadata->getName()));
+                            throw new MappingException(\sprintf('Group names must be strings in "%s" for the attribute "%s" of the class "%s".', $this->file, $attribute, $classMetadata->getName()));
                         }
 
                         $attributeMetadata->addGroup($group);
@@ -73,7 +73,7 @@ class YamlFileLoader extends FileLoader
 
                 if (isset($data['max_depth'])) {
                     if (!\is_int($data['max_depth'])) {
-                        throw new MappingException(sprintf('The "max_depth" value must be an integer in "%s" for the attribute "%s" of the class "%s".', $this->file, $attribute, $classMetadata->getName()));
+                        throw new MappingException(\sprintf('The "max_depth" value must be an integer in "%s" for the attribute "%s" of the class "%s".', $this->file, $attribute, $classMetadata->getName()));
                     }
 
                     $attributeMetadata->setMaxDepth($data['max_depth']);
@@ -81,7 +81,7 @@ class YamlFileLoader extends FileLoader
 
                 if (isset($data['serialized_name'])) {
                     if (!\is_string($data['serialized_name']) || '' === $data['serialized_name']) {
-                        throw new MappingException(sprintf('The "serialized_name" value must be a non-empty string in "%s" for the attribute "%s" of the class "%s".', $this->file, $attribute, $classMetadata->getName()));
+                        throw new MappingException(\sprintf('The "serialized_name" value must be a non-empty string in "%s" for the attribute "%s" of the class "%s".', $this->file, $attribute, $classMetadata->getName()));
                     }
 
                     $attributeMetadata->setSerializedName($data['serialized_name']);
@@ -91,13 +91,13 @@ class YamlFileLoader extends FileLoader
                     try {
                         $attributeMetadata->setSerializedPath(new PropertyPath((string) $data['serialized_path']));
                     } catch (InvalidPropertyPathException) {
-                        throw new MappingException(sprintf('The "serialized_path" value must be a valid property path in "%s" for the attribute "%s" of the class "%s".', $this->file, $attribute, $classMetadata->getName()));
+                        throw new MappingException(\sprintf('The "serialized_path" value must be a valid property path in "%s" for the attribute "%s" of the class "%s".', $this->file, $attribute, $classMetadata->getName()));
                     }
                 }
 
                 if (isset($data['ignore'])) {
                     if (!\is_bool($data['ignore'])) {
-                        throw new MappingException(sprintf('The "ignore" value must be a boolean in "%s" for the attribute "%s" of the class "%s".', $this->file, $attribute, $classMetadata->getName()));
+                        throw new MappingException(\sprintf('The "ignore" value must be a boolean in "%s" for the attribute "%s" of the class "%s".', $this->file, $attribute, $classMetadata->getName()));
                     }
 
                     $attributeMetadata->setIgnore($data['ignore']);
@@ -124,11 +124,11 @@ class YamlFileLoader extends FileLoader
 
         if (isset($yaml['discriminator_map'])) {
             if (!isset($yaml['discriminator_map']['type_property'])) {
-                throw new MappingException(sprintf('The "type_property" key must be set for the discriminator map of the class "%s" in "%s".', $classMetadata->getName(), $this->file));
+                throw new MappingException(\sprintf('The "type_property" key must be set for the discriminator map of the class "%s" in "%s".', $classMetadata->getName(), $this->file));
             }
 
             if (!isset($yaml['discriminator_map']['mapping'])) {
-                throw new MappingException(sprintf('The "mapping" key must be set for the discriminator map of the class "%s" in "%s".', $classMetadata->getName(), $this->file));
+                throw new MappingException(\sprintf('The "mapping" key must be set for the discriminator map of the class "%s" in "%s".', $classMetadata->getName(), $this->file));
             }
 
             $classMetadata->setClassDiscriminatorMapping(new ClassDiscriminatorMapping(
@@ -153,7 +153,7 @@ class YamlFileLoader extends FileLoader
     private function getClassesFromYaml(): array
     {
         if (!stream_is_local($this->file)) {
-            throw new MappingException(sprintf('This is not a local file "%s".', $this->file));
+            throw new MappingException(\sprintf('This is not a local file "%s".', $this->file));
         }
 
         $this->yamlParser ??= new Parser();
@@ -165,7 +165,7 @@ class YamlFileLoader extends FileLoader
         }
 
         if (!\is_array($classes)) {
-            throw new MappingException(sprintf('The file "%s" must contain a YAML array.', $this->file));
+            throw new MappingException(\sprintf('The file "%s" must contain a YAML array.', $this->file));
         }
 
         return $classes;

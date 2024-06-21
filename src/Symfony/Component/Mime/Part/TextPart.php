@@ -47,13 +47,13 @@ class TextPart extends AbstractPart
         parent::__construct();
 
         if (!\is_string($body) && !\is_resource($body) && !$body instanceof File) {
-            throw new \TypeError(sprintf('The body of "%s" must be a string, a resource, or an instance of "%s" (got "%s").', self::class, File::class, get_debug_type($body)));
+            throw new \TypeError(\sprintf('The body of "%s" must be a string, a resource, or an instance of "%s" (got "%s").', self::class, File::class, get_debug_type($body)));
         }
 
         if ($body instanceof File) {
             $path = $body->getPath();
             if ((is_file($path) && !is_readable($path)) || is_dir($path)) {
-                throw new InvalidArgumentException(sprintf('Path "%s" is not readable.', $path));
+                throw new InvalidArgumentException(\sprintf('Path "%s" is not readable.', $path));
             }
         }
 
@@ -66,7 +66,7 @@ class TextPart extends AbstractPart
             $this->encoding = $this->chooseEncoding();
         } else {
             if (!\in_array($encoding, self::DEFAULT_ENCODERS, true) && !\array_key_exists($encoding, self::$encoders)) {
-                throw new InvalidArgumentException(sprintf('The encoding must be one of "%s" ("%s" given).', implode('", "', array_unique(array_merge(self::DEFAULT_ENCODERS, array_keys(self::$encoders)))), $encoding));
+                throw new InvalidArgumentException(\sprintf('The encoding must be one of "%s" ("%s" given).', implode('", "', array_unique(array_merge(self::DEFAULT_ENCODERS, array_keys(self::$encoders)))), $encoding));
             }
             $this->encoding = $encoding;
         }
@@ -153,7 +153,7 @@ class TextPart extends AbstractPart
         if ($this->body instanceof File) {
             $path = $this->body->getPath();
             if (false === $handle = @fopen($path, 'r', false)) {
-                throw new InvalidArgumentException(sprintf('Unable to open path "%s".', $path));
+                throw new InvalidArgumentException(\sprintf('Unable to open path "%s".', $path));
             }
 
             yield from $this->getEncoder()->encodeByteStream($handle);

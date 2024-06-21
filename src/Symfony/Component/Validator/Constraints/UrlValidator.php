@@ -69,7 +69,7 @@ class UrlValidator extends ConstraintValidator
         }
 
         $pattern = $constraint->relativeProtocol ? str_replace('(%s):', '(?:(%s):)?', static::PATTERN) : static::PATTERN;
-        $pattern = sprintf($pattern, implode('|', $constraint->protocols));
+        $pattern = \sprintf($pattern, implode('|', $constraint->protocols));
 
         if (!preg_match($pattern, $value)) {
             $this->context->buildViolation($constraint->message)

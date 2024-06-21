@@ -39,7 +39,7 @@ final class NoPrivateNetworkHttpClient implements HttpClientInterface, LoggerAwa
         private string|array|null $subnets = null,
     ) {
         if (!class_exists(IpUtils::class)) {
-            throw new \LogicException(sprintf('You cannot use "%s" if the HttpFoundation component is not installed. Try running "composer require symfony/http-foundation".', __CLASS__));
+            throw new \LogicException(\sprintf('You cannot use "%s" if the HttpFoundation component is not installed. Try running "composer require symfony/http-foundation".', __CLASS__));
         }
     }
 
@@ -47,7 +47,7 @@ final class NoPrivateNetworkHttpClient implements HttpClientInterface, LoggerAwa
     {
         $onProgress = $options['on_progress'] ?? null;
         if (null !== $onProgress && !\is_callable($onProgress)) {
-            throw new InvalidArgumentException(sprintf('Option "on_progress" must be callable, "%s" given.', get_debug_type($onProgress)));
+            throw new InvalidArgumentException(\sprintf('Option "on_progress" must be callable, "%s" given.', get_debug_type($onProgress)));
         }
 
         $subnets = $this->subnets;
@@ -56,7 +56,7 @@ final class NoPrivateNetworkHttpClient implements HttpClientInterface, LoggerAwa
             static $lastPrimaryIp = '';
             if ($info['primary_ip'] !== $lastPrimaryIp) {
                 if ($info['primary_ip'] && IpUtils::checkIp($info['primary_ip'], $subnets ?? IpUtils::PRIVATE_SUBNETS)) {
-                    throw new TransportException(sprintf('IP "%s" is blocked for "%s".', $info['primary_ip'], $info['url']));
+                    throw new TransportException(\sprintf('IP "%s" is blocked for "%s".', $info['primary_ip'], $info['url']));
                 }
 
                 $lastPrimaryIp = $info['primary_ip'];

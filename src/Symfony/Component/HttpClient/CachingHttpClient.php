@@ -44,7 +44,7 @@ class CachingHttpClient implements HttpClientInterface, ResetInterface
         array $defaultOptions = [],
     ) {
         if (!class_exists(HttpClientKernel::class)) {
-            throw new \LogicException(sprintf('Using "%s" requires that the HttpKernel component version 4.3 or higher is installed, try running "composer require symfony/http-kernel:^5.4".', __CLASS__));
+            throw new \LogicException(\sprintf('Using "%s" requires that the HttpKernel component version 4.3 or higher is installed, try running "composer require symfony/http-kernel:^5.4".', __CLASS__));
         }
 
         $kernel = new HttpClientKernel($client);

@@ -93,7 +93,7 @@ final class MailerHandler extends AbstractProcessingHandler
         } elseif (\is_callable($this->messageTemplate)) {
             $message = ($this->messageTemplate)($content, $records);
             if (!$message instanceof Email) {
-                throw new \InvalidArgumentException(sprintf('Could not resolve message from a callable. Instance of "%s" is expected.', Email::class));
+                throw new \InvalidArgumentException(\sprintf('Could not resolve message from a callable. Instance of "%s" is expected.', Email::class));
             }
         } else {
             throw new \InvalidArgumentException('Could not resolve message as instance of Email or a callable returning it.');

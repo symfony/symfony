@@ -41,7 +41,7 @@ final class FFICaster
             $type = \FFI::typeof($data);
         }
 
-        $stub->class = sprintf('%s<%s> size %d align %d', ($data ?? $type)::class, $type->getName(), $type->getSize(), $type->getAlignment());
+        $stub->class = \sprintf('%s<%s> size %d align %d', ($data ?? $type)::class, $type->getName(), $type->getSize(), $type->getAlignment());
 
         return match ($type->getKind()) {
             CType::TYPE_FLOAT,

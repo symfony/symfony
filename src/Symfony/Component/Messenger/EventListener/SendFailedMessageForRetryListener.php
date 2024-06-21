@@ -158,6 +158,6 @@ class SendFailedMessageForRetryListener implements EventSubscriberInterface
             return $this->sendersLocator->get($alias);
         }
 
-        throw new RuntimeException(sprintf('Could not find sender "%s" based on the same receiver to send the failed message to for retry.', $alias));
+        throw new RuntimeException(\sprintf('Could not find sender "%s" based on the same receiver to send the failed message to for retry.', $alias));
     }
 }

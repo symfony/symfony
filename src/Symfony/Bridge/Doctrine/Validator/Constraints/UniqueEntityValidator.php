@@ -72,13 +72,13 @@ class UniqueEntityValidator extends ConstraintValidator
             $em = $this->registry->getManager($constraint->em);
 
             if (!$em) {
-                throw new ConstraintDefinitionException(sprintf('Object manager "%s" does not exist.', $constraint->em));
+                throw new ConstraintDefinitionException(\sprintf('Object manager "%s" does not exist.', $constraint->em));
             }
         } else {
             $em = $this->registry->getManagerForClass($entityClass);
 
             if (!$em) {
-                throw new ConstraintDefinitionException(sprintf('Unable to find the object manager associated with an entity of class "%s".', $entityClass));
+                throw new ConstraintDefinitionException(\sprintf('Unable to find the object manager associated with an entity of class "%s".', $entityClass));
             }
         }
 
@@ -135,7 +135,7 @@ class UniqueEntityValidator extends ConstraintValidator
 
             if ($isValueEntity && !$value instanceof $supportedClass) {
                 $class = $em->getClassMetadata($value::class);
-                throw new ConstraintDefinitionException(sprintf('The "%s" entity repository does not support the "%s" entity. The entity should be an instance of or extend "%s".', $constraint->entityClass, $class->getName(), $supportedClass));
+                throw new ConstraintDefinitionException(\sprintf('The "%s" entity repository does not support the "%s" entity. The entity should be an instance of or extend "%s".', $constraint->entityClass, $class->getName(), $supportedClass));
             }
         } else {
             $repository = $em->getRepository($value::class);
@@ -189,7 +189,7 @@ class UniqueEntityValidator extends ConstraintValidator
         if (!$isValueEntity && !empty($constraint->identifierFieldNames) && 1 === \count($result)) {
             $fieldValues = $this->getFieldValues($value, $class, $constraint->identifierFieldNames);
             if (array_values($class->getIdentifierFieldNames()) != array_values($constraint->identifierFieldNames)) {
-                throw new ConstraintDefinitionException(sprintf('The "%s" entity identifier field names should be "%s", not "%s".', $entityClass, implode(', ', $class->getIdentifierFieldNames()), implode(', ', $constraint->identifierFieldNames)));
+                throw new ConstraintDefinitionException(\sprintf('The "%s" entity identifier field names should be "%s", not "%s".', $entityClass, implode(', ', $class->getIdentifierFieldNames()), implode(', ', $constraint->identifierFieldNames)));
             }
 
             $entityMatched = true;
@@ -252,20 +252,20 @@ class UniqueEntityValidator extends ConstraintValidator
         }
 
         if (!$identifiers) {
-            return sprintf('object("%s")', $idClass);
+            return \sprintf('object("%s")', $idClass);
         }
 
         array_walk($identifiers, function (&$id, $field) {
             if (!\is_object($id) || $id instanceof \DateTimeInterface) {
                 $idAsString = $this->formatValue($id, self::PRETTY_DATE);
             } else {
-                $idAsString = sprintf('object("%s")', $id::class);
+                $idAsString = \sprintf('object("%s")', $id::class);
             }
 
-            $id = sprintf('%s => %s', $field, $idAsString);
+            $id = \sprintf('%s => %s', $field, $idAsString);
         });
 
-        return sprintf('object("%s") identified by (%s)', $idClass, implode(', ', $identifiers));
+        return \sprintf('object("%s") identified by (%s)', $idClass, implode(', ', $identifiers));
     }
 
     private function getFieldValues(mixed $object, ClassMetadata $class, array $fields, bool $isValueEntity = false): array
@@ -279,12 +279,12 @@ class UniqueEntityValidator extends ConstraintValidator
 
         foreach ($fields as $objectFieldName => $entityFieldName) {
             if (!$class->hasField($entityFieldName) && !$class->hasAssociation($entityFieldName)) {
-                throw new ConstraintDefinitionException(sprintf('The field "%s" is not mapped by Doctrine, so it cannot be validated for uniqueness.', $entityFieldName));
+                throw new ConstraintDefinitionException(\sprintf('The field "%s" is not mapped by Doctrine, so it cannot be validated for uniqueness.', $entityFieldName));
             }
 
             $fieldName = \is_int($objectFieldName) ? $entityFieldName : $objectFieldName;
             if (!$isValueEntity && !$reflectionObject->hasProperty($fieldName)) {
-                throw new ConstraintDefinitionException(sprintf('The field "%s" is not a property of class "%s".', $fieldName, $objectClass));
+                throw new ConstraintDefinitionException(\sprintf('The field "%s" is not a property of class "%s".', $fieldName, $objectClass));
             }
 
             $fieldValues[$entityFieldName] = $isValueEntity && $object instanceof ($class->getName())

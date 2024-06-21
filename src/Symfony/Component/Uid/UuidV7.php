@@ -113,7 +113,7 @@ class UuidV7 extends Uuid implements TimeBasedUidInterface
             $time = bin2hex(BinaryUtil::fromBase($time, BinaryUtil::BASE10));
         }
 
-        return substr_replace(sprintf('%012s-%04x-%04x-%04x%04x%04x',
+        return substr_replace(\sprintf('%012s-%04x-%04x-%04x%04x%04x',
             $time,
             0x7000 | (self::$rand[1] << 2) | (self::$rand[2] >> 14),
             0x8000 | (self::$rand[2] & 0x3FFF),

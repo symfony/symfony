@@ -168,7 +168,7 @@ class TraceableResponse implements ResponseInterface, StreamableInterface
 
         foreach ($responses as $r) {
             if (!$r instanceof self) {
-                throw new \TypeError(sprintf('"%s::stream()" expects parameter 1 to be an iterable of TraceableResponse objects, "%s" given.', TraceableHttpClient::class, get_debug_type($r)));
+                throw new \TypeError(\sprintf('"%s::stream()" expects parameter 1 to be an iterable of TraceableResponse objects, "%s" given.', TraceableHttpClient::class, get_debug_type($r)));
             }
 
             $traceableMap[$r->response] = $r;

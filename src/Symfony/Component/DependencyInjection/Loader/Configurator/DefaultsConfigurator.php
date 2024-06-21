@@ -69,7 +69,7 @@ class DefaultsConfigurator extends AbstractServiceConfigurator
                 $this->validateAttributes($tag, $value, [...$path, $name]);
             } elseif (!\is_scalar($value ?? '')) {
                 $name = implode('.', [...$path, $name]);
-                throw new InvalidArgumentException(sprintf('Tag "%s", attribute "%s" in "_defaults" must be of a scalar-type or an array of scalar-type.', $tag, $name));
+                throw new InvalidArgumentException(\sprintf('Tag "%s", attribute "%s" in "_defaults" must be of a scalar-type or an array of scalar-type.', $tag, $name));
             }
         }
     }

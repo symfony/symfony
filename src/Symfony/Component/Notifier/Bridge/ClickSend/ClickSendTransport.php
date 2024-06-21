@@ -51,7 +51,7 @@ final class ClickSendTransport extends AbstractTransport
             'from_email' => $this->fromEmail,
         ]);
 
-        return sprintf('clicksend://%s%s', $this->getEndpoint(), $query ? '?'.http_build_query($query, '', '&') : '');
+        return \sprintf('clicksend://%s%s', $this->getEndpoint(), $query ? '?'.http_build_query($query, '', '&') : '');
     }
 
     public function supports(MessageInterface $message): bool
@@ -68,7 +68,7 @@ final class ClickSendTransport extends AbstractTransport
             throw new UnsupportedMessageTypeException(__CLASS__, SmsMessage::class, $message);
         }
 
-        $endpoint = sprintf('https://%s/v3/sms/send', $this->getEndpoint());
+        $endpoint = \sprintf('https://%s/v3/sms/send', $this->getEndpoint());
 
         $options = $message->getOptions()?->toArray() ?? [];
         $options['body'] = $message->getSubject();
@@ -78,7 +78,7 @@ final class ClickSendTransport extends AbstractTransport
         $options['from_email'] ?? $this->fromEmail;
 
         if (isset($options['from']) && !preg_match('/^[a-zA-Z0-9\s]{3,11}$/', $options['from']) && !preg_match('/^\+[1-9]\d{1,14}$/', $options['from'])) {
-            throw new InvalidArgumentException(sprintf('The "From" number "%s" is not a valid phone number, shortcode, or alphanumeric sender ID.', $options['from']));
+            throw new InvalidArgumentException(\sprintf('The "From" number "%s" is not a valid phone number, shortcode, or alphanumeric sender ID.', $options['from']));
         }
 
         if ($options['list_id'] ?? false) {
@@ -98,7 +98,7 @@ final class ClickSendTransport extends AbstractTransport
 
         if (200 !== $statusCode) {
             $error = $response->getContent(false);
-            throw new TransportException(sprintf('Unable to send the SMS - "%s".', $error ?: 'unknown failure'), $response);
+            throw new TransportException(\sprintf('Unable to send the SMS - "%s".', $error ?: 'unknown failure'), $response);
         }
 
         return new SentMessage($message, (string) $this);

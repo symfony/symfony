@@ -669,7 +669,7 @@ class FrameworkExtension extends Extension
             $tagAttributes = get_object_vars($attribute);
             if ($reflector instanceof \ReflectionMethod) {
                 if (isset($tagAttributes['method'])) {
-                    throw new LogicException(sprintf('AsEventListener attribute cannot declare a method on "%s::%s()".', $reflector->class, $reflector->name));
+                    throw new LogicException(\sprintf('AsEventListener attribute cannot declare a method on "%s::%s()".', $reflector->class, $reflector->name));
                 }
                 $tagAttributes['method'] = $reflector->getName();
             }
@@ -687,7 +687,7 @@ class FrameworkExtension extends Extension
             unset($tagAttributes['fromTransport']);
             if ($reflector instanceof \ReflectionMethod) {
                 if (isset($tagAttributes['method'])) {
-                    throw new LogicException(sprintf('AsMessageHandler attribute cannot declare a method on "%s::%s()".', $reflector->class, $reflector->name));
+                    throw new LogicException(\sprintf('AsMessageHandler attribute cannot declare a method on "%s::%s()".', $reflector->class, $reflector->name));
                 }
                 $tagAttributes['method'] = $reflector->getName();
             }
@@ -711,7 +711,7 @@ class FrameworkExtension extends Extension
                     ];
                     if ($reflector instanceof \ReflectionMethod) {
                         if (isset($tagAttributes['method'])) {
-                            throw new LogicException(sprintf('"%s" attribute cannot declare a method on "%s::%s()".', $attribute::class, $reflector->class, $reflector->name));
+                            throw new LogicException(\sprintf('"%s" attribute cannot declare a method on "%s::%s()".', $attribute::class, $reflector->class, $reflector->name));
                         }
                         $tagAttributes['method'] = $reflector->getName();
                     }
@@ -897,7 +897,7 @@ class FrameworkExtension extends Extension
         // Choose storage class based on the DSN
         [$class] = explode(':', $config['dsn'], 2);
         if ('file' !== $class) {
-            throw new \LogicException(sprintf('Driver "%s" is not supported for the profiler.', $class));
+            throw new \LogicException(\sprintf('Driver "%s" is not supported for the profiler.', $class));
         }
 
         $container->setParameter('profiler.storage.dsn', $config['dsn']);
@@ -936,7 +936,7 @@ class FrameworkExtension extends Extension
 
         foreach ($config['workflows'] as $name => $workflow) {
             $type = $workflow['type'];
-            $workflowId = sprintf('%s.%s', $type, $name);
+            $workflowId = \sprintf('%s.%s', $type, $name);
 
             // Process Metadata (workflow + places (transition is done in the "create transition" block))
             $metadataStoreDefinition = new Definition(Workflow\Metadata\InMemoryMetadataStore::class, [[], [], null]);
@@ -962,14 +962,14 @@ class FrameworkExtension extends Extension
             foreach ($workflow['transitions'] as $transition) {
                 if ('workflow' === $type) {
                     $transitionDefinition = new Definition(Workflow\Transition::class, [$transition['name'], $transition['from'], $transition['to']]);
-                    $transitionId = sprintf('.%s.transition.%s', $workflowId, $transitionCounter++);
+                    $transitionId = \sprintf('.%s.transition.%s', $workflowId, $transitionCounter++);
                     $container->setDefinition($transitionId, $transitionDefinition);
                     $transitions[] = new Reference($transitionId);
                     if (isset($transition['guard'])) {
                         $configuration = new Definition(Workflow\EventListener\GuardExpression::class);
                         $configuration->addArgument(new Reference($transitionId));
                         $configuration->addArgument($transition['guard']);
-                        $eventName = sprintf('workflow.%s.guard.%s', $name, $transition['name']);
+                        $eventName = \sprintf('workflow.%s.guard.%s', $name, $transition['name']);
                         $guardsConfiguration[$eventName][] = $configuration;
                     }
                     if ($transition['metadata']) {
@@ -982,14 +982,14 @@ class FrameworkExtension extends Extension
                     foreach ($transition['from'] as $from) {
                         foreach ($transition['to'] as $to) {
                             $transitionDefinition = new Definition(Workflow\Transition::class, [$transition['name'], $from, $to]);
-                            $transitionId = sprintf('.%s.transition.%s', $workflowId, $transitionCounter++);
+                            $transitionId = \sprintf('.%s.transition.%s', $workflowId, $transitionCounter++);
                             $container->setDefinition($transitionId, $transitionDefinition);
                             $transitions[] = new Reference($transitionId);
                             if (isset($transition['guard'])) {
                                 $configuration = new Definition(Workflow\EventListener\GuardExpression::class);
                                 $configuration->addArgument(new Reference($transitionId));
                                 $configuration->addArgument($transition['guard']);
-                                $eventName = sprintf('workflow.%s.guard.%s', $name, $transition['name']);
+                                $eventName = \sprintf('workflow.%s.guard.%s', $name, $transition['name']);
                                 $guardsConfiguration[$eventName][] = $configuration;
                             }
                             if ($transition['metadata']) {
@@ -1003,7 +1003,7 @@ class FrameworkExtension extends Extension
                 }
             }
             $metadataStoreDefinition->replaceArgument(2, $transitionsMetadataDefinition);
-            $container->setDefinition(sprintf('%s.metadata_store', $workflowId), $metadataStoreDefinition);
+            $container->setDefinition(\sprintf('%s.metadata_store', $workflowId), $metadataStoreDefinition);
 
             // Create places
             $places = array_column($workflow['places'], 'name');
@@ -1014,7 +1014,7 @@ class FrameworkExtension extends Extension
             $definitionDefinition->addArgument($places);
             $definitionDefinition->addArgument($transitions);
             $definitionDefinition->addArgument($initialMarking);
-            $definitionDefinition->addArgument(new Reference(sprintf('%s.metadata_store', $workflowId)));
+            $definitionDefinition->addArgument(new Reference(\sprintf('%s.metadata_store', $workflowId)));
 
             // Create MarkingStore
             $markingStoreDefinition = null;
@@ -1029,8 +1029,8 @@ class FrameworkExtension extends Extension
             }
 
             // Create Workflow
-            $workflowDefinition = new ChildDefinition(sprintf('%s.abstract', $type));
-            $workflowDefinition->replaceArgument(0, new Reference(sprintf('%s.definition', $workflowId)));
+            $workflowDefinition = new ChildDefinition(\sprintf('%s.abstract', $type));
+            $workflowDefinition->replaceArgument(0, new Reference(\sprintf('%s.definition', $workflowId)));
             $workflowDefinition->replaceArgument(1, $markingStoreDefinition);
             $workflowDefinition->replaceArgument(3, $name);
             $workflowDefinition->replaceArgument(4, $workflow['events_to_dispatch']);
@@ -1044,7 +1044,7 @@ class FrameworkExtension extends Extension
 
             // Store to container
             $container->setDefinition($workflowId, $workflowDefinition);
-            $container->setDefinition(sprintf('%s.definition', $workflowId), $definitionDefinition);
+            $container->setDefinition(\sprintf('%s.definition', $workflowId), $definitionDefinition);
             $container->registerAliasForArgument($workflowId, WorkflowInterface::class, $name.'.'.$type);
             $container->registerAliasForArgument($workflowId, WorkflowInterface::class, $name);
 
@@ -1073,11 +1073,11 @@ class FrameworkExtension extends Extension
             if ($workflow['audit_trail']['enabled']) {
                 $listener = new Definition(Workflow\EventListener\AuditTrailListener::class);
                 $listener->addTag('monolog.logger', ['channel' => 'workflow']);
-                $listener->addTag('kernel.event_listener', ['event' => sprintf('workflow.%s.leave', $name), 'method' => 'onLeave']);
-                $listener->addTag('kernel.event_listener', ['event' => sprintf('workflow.%s.transition', $name), 'method' => 'onTransition']);
-                $listener->addTag('kernel.event_listener', ['event' => sprintf('workflow.%s.enter', $name), 'method' => 'onEnter']);
+                $listener->addTag('kernel.event_listener', ['event' => \sprintf('workflow.%s.leave', $name), 'method' => 'onLeave']);
+                $listener->addTag('kernel.event_listener', ['event' => \sprintf('workflow.%s.transition', $name), 'method' => 'onTransition']);
+                $listener->addTag('kernel.event_listener', ['event' => \sprintf('workflow.%s.enter', $name), 'method' => 'onEnter']);
                 $listener->addArgument(new Reference('logger'));
-                $container->setDefinition(sprintf('.%s.listener.audit_trail', $workflowId), $listener);
+                $container->setDefinition(\sprintf('.%s.listener.audit_trail', $workflowId), $listener);
             }
 
             // Add Guard Listener
@@ -1105,7 +1105,7 @@ class FrameworkExtension extends Extension
                     $guard->addTag('kernel.event_listener', ['event' => $eventName, 'method' => 'onTransition']);
                 }
 
-                $container->setDefinition(sprintf('.%s.listener.guard', $workflowId), $guard);
+                $container->setDefinition(\sprintf('.%s.listener.guard', $workflowId), $guard);
                 $container->setParameter('workflow.has_guard_listeners', true);
             }
         }
@@ -1307,7 +1307,7 @@ class FrameworkExtension extends Extension
         $paths = $config['paths'];
         foreach ($container->getParameter('kernel.bundles_metadata') as $name => $bundle) {
             if ($container->fileExists($dir = $bundle['path'].'/Resources/public') || $container->fileExists($dir = $bundle['path'].'/public')) {
-                $paths[$dir] = sprintf('bundles/%s', preg_replace('/bundle$/', '', strtolower($name)));
+                $paths[$dir] = \sprintf('bundles/%s', preg_replace('/bundle$/', '', strtolower($name)));
             }
         }
         $excludedPathPatterns = [];
@@ -1484,7 +1484,7 @@ class FrameworkExtension extends Extension
             if ($container->fileExists($dir)) {
                 $dirs[] = $transPaths[] = $dir;
             } else {
-                throw new \UnexpectedValueException(sprintf('"%s" defined in translator.paths does not exist or is not a directory.', $dir));
+                throw new \UnexpectedValueException(\sprintf('"%s" defined in translator.paths does not exist or is not a directory.', $dir));
             }
         }
 
@@ -1568,7 +1568,7 @@ class FrameworkExtension extends Extension
         foreach ($classToServices as $class => $service) {
             $package = substr($service, \strlen('translation.provider_factory.'));
 
-            if (!$container->hasDefinition('http_client') || !ContainerBuilder::willBeAvailable(sprintf('symfony/%s-translation-provider', $package), $class, $parentPackages)) {
+            if (!$container->hasDefinition('http_client') || !ContainerBuilder::willBeAvailable(\sprintf('symfony/%s-translation-provider', $package), $class, $parentPackages)) {
                 $container->removeDefinition($service);
             }
         }
@@ -1726,11 +1726,11 @@ class FrameworkExtension extends Extension
                 $container->addResource(new DirectoryResource($path, '/^$/'));
             } elseif ($container->fileExists($path, false)) {
                 if (!preg_match('/\.(xml|ya?ml)$/', $path, $matches)) {
-                    throw new \RuntimeException(sprintf('Unsupported mapping type in "%s", supported types are XML & Yaml.', $path));
+                    throw new \RuntimeException(\sprintf('Unsupported mapping type in "%s", supported types are XML & Yaml.', $path));
                 }
                 $fileRecorder($matches[1], $path);
             } else {
-                throw new \RuntimeException(sprintf('Could not open file or directory "%s".', $path));
+                throw new \RuntimeException(\sprintf('Could not open file or directory "%s".', $path));
             }
         }
     }
@@ -1790,7 +1790,7 @@ class FrameworkExtension extends Extension
 
         if ($config['decryption_env_var']) {
             if (!preg_match('/^(?:[-.\w\\\\]*+:)*+\w++$/', $config['decryption_env_var'])) {
-                throw new InvalidArgumentException(sprintf('Invalid value "%s" set as "decryption_env_var": only "word" characters are allowed.', $config['decryption_env_var']));
+                throw new InvalidArgumentException(\sprintf('Invalid value "%s" set as "decryption_env_var": only "word" characters are allowed.', $config['decryption_env_var']));
             }
 
             if (ContainerBuilder::willBeAvailable('symfony/string', LazyString::class, ['symfony/framework-bundle'])) {
@@ -2173,7 +2173,7 @@ class FrameworkExtension extends Extension
         $failureTransports = [];
         if ($config['failure_transport']) {
             if (!isset($config['transports'][$config['failure_transport']])) {
-                throw new LogicException(sprintf('Invalid Messenger configuration: the failure transport "%s" is not a valid transport or service id.', $config['failure_transport']));
+                throw new LogicException(\sprintf('Invalid Messenger configuration: the failure transport "%s" is not a valid transport or service id.', $config['failure_transport']));
             }
 
             $container->setAlias('messenger.failure_transports.default', 'messenger.transport.'.$config['failure_transport']);
@@ -2209,7 +2209,7 @@ class FrameworkExtension extends Extension
             if (null !== $transport['retry_strategy']['service']) {
                 $transportRetryReferences[$name] = new Reference($transport['retry_strategy']['service']);
             } else {
-                $retryServiceId = sprintf('messenger.retry.multiplier_retry_strategy.%s', $name);
+                $retryServiceId = \sprintf('messenger.retry.multiplier_retry_strategy.%s', $name);
                 $retryDefinition = new ChildDefinition('messenger.retry.abstract_multiplier_retry_strategy');
                 $retryDefinition
                     ->replaceArgument(0, $transport['retry_strategy']['max_retries'])
@@ -2244,7 +2244,7 @@ class FrameworkExtension extends Extension
         foreach ($config['transports'] as $name => $transport) {
             if ($transport['failure_transport']) {
                 if (!isset($senderReferences[$transport['failure_transport']])) {
-                    throw new LogicException(sprintf('Invalid Messenger configuration: the failure transport "%s" is not a valid transport or service id.', $transport['failure_transport']));
+                    throw new LogicException(\sprintf('Invalid Messenger configuration: the failure transport "%s" is not a valid transport or service id.', $transport['failure_transport']));
                 }
             }
         }
@@ -2255,16 +2255,16 @@ class FrameworkExtension extends Extension
         foreach ($config['routing'] as $message => $messageConfiguration) {
             if ('*' !== $message && !class_exists($message) && !interface_exists($message, false) && !preg_match('/^(?:[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*+\\\\)++\*$/', $message)) {
                 if (str_contains($message, '*')) {
-                    throw new LogicException(sprintf('Invalid Messenger routing configuration: invalid namespace "%s" wildcard.', $message));
+                    throw new LogicException(\sprintf('Invalid Messenger routing configuration: invalid namespace "%s" wildcard.', $message));
                 }
 
-                throw new LogicException(sprintf('Invalid Messenger routing configuration: class or interface "%s" not found.', $message));
+                throw new LogicException(\sprintf('Invalid Messenger routing configuration: class or interface "%s" not found.', $message));
             }
 
             // make sure senderAliases contains all senders
             foreach ($messageConfiguration['senders'] as $sender) {
                 if (!isset($senderReferences[$sender])) {
-                    throw new LogicException(sprintf('Invalid Messenger routing configuration: the "%s" class is being routed to a sender called "%s". This is not a valid transport or service id.', $message, $sender));
+                    throw new LogicException(\sprintf('Invalid Messenger routing configuration: the "%s" class is being routed to a sender called "%s". This is not a valid transport or service id.', $message, $sender));
                 }
             }
 
@@ -2471,7 +2471,7 @@ class FrameworkExtension extends Extension
 
         foreach ($config['scoped_clients'] as $name => $scopeConfig) {
             if ($container->has($name)) {
-                throw new InvalidArgumentException(sprintf('Invalid scope name: "%s" is reserved.', $name));
+                throw new InvalidArgumentException(\sprintf('Invalid scope name: "%s" is reserved.', $name));
             }
 
             $scope = $scopeConfig['scope'] ?? null;
@@ -2632,7 +2632,7 @@ class FrameworkExtension extends Extension
         foreach ($classToServices as $class => $service) {
             $package = substr($service, \strlen('mailer.transport_factory.'));
 
-            if (!ContainerBuilder::willBeAvailable(sprintf('symfony/%s-mailer', 'gmail' === $package ? 'google' : $package), $class, ['symfony/framework-bundle', 'symfony/mailer'])) {
+            if (!ContainerBuilder::willBeAvailable(\sprintf('symfony/%s-mailer', 'gmail' === $package ? 'google' : $package), $class, ['symfony/framework-bundle', 'symfony/mailer'])) {
                 $container->removeDefinition($service);
             }
         }
@@ -2651,7 +2651,7 @@ class FrameworkExtension extends Extension
             foreach ($webhookRequestParsers as $class => $service) {
                 $package = substr($service, \strlen('mailer.webhook.request_parser.'));
 
-                if (!ContainerBuilder::willBeAvailable(sprintf('symfony/%s-mailer', 'gmail' === $package ? 'google' : $package), $class, ['symfony/framework-bundle', 'symfony/mailer'])) {
+                if (!ContainerBuilder::willBeAvailable(\sprintf('symfony/%s-mailer', 'gmail' === $package ? 'google' : $package), $class, ['symfony/framework-bundle', 'symfony/mailer'])) {
                     $container->removeDefinition($service);
                 }
             }
@@ -2835,7 +2835,7 @@ class FrameworkExtension extends Extension
         foreach ($classToServices as $class => $service) {
             $package = substr($service, \strlen('notifier.transport_factory.'));
 
-            if (!ContainerBuilder::willBeAvailable(sprintf('symfony/%s-notifier', $package), $class, $parentPackages)) {
+            if (!ContainerBuilder::willBeAvailable(\sprintf('symfony/%s-notifier', $package), $class, $parentPackages)) {
                 $container->removeDefinition($service);
             }
         }
@@ -2891,7 +2891,7 @@ class FrameworkExtension extends Extension
             foreach ($webhookRequestParsers as $class => $service) {
                 $package = substr($service, \strlen('notifier.webhook.request_parser.'));
 
-                if (!ContainerBuilder::willBeAvailable(sprintf('symfony/%s-notifier', $package), $class, ['symfony/framework-bundle', 'symfony/notifier'])) {
+                if (!ContainerBuilder::willBeAvailable(\sprintf('symfony/%s-notifier', $package), $class, ['symfony/framework-bundle', 'symfony/notifier'])) {
                     $container->removeDefinition($service);
                 }
             }
@@ -2941,11 +2941,11 @@ class FrameworkExtension extends Extension
 
             if (null !== $limiterConfig['lock_factory']) {
                 if (!interface_exists(LockInterface::class)) {
-                    throw new LogicException(sprintf('Rate limiter "%s" requires the Lock component to be installed. Try running "composer require symfony/lock".', $name));
+                    throw new LogicException(\sprintf('Rate limiter "%s" requires the Lock component to be installed. Try running "composer require symfony/lock".', $name));
                 }
 
                 if (!$this->isInitializedConfigEnabled('lock')) {
-                    throw new LogicException(sprintf('Rate limiter "%s" requires the Lock component to be configured.', $name));
+                    throw new LogicException(\sprintf('Rate limiter "%s" requires the Lock component to be configured.', $name));
                 }
 
                 $limiter->replaceArgument(2, new Reference($limiterConfig['lock_factory']));
@@ -3111,7 +3111,7 @@ class FrameworkExtension extends Extension
             return $this->configsEnabled[$path];
         }
 
-        throw new LogicException(sprintf('Can not read config enabled at "%s" because it has not been initialized.', $path));
+        throw new LogicException(\sprintf('Can not read config enabled at "%s" because it has not been initialized.', $path));
     }
 
     private function readConfigEnabled(string $path, ContainerBuilder $container, array $config): bool

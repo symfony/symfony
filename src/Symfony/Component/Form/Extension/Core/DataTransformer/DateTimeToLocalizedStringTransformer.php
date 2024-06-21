@@ -128,7 +128,7 @@ class DateTimeToLocalizedStringTransformer extends BaseDateTimeTransformer
         } elseif (false === $timestamp) {
             // the value couldn't be parsed but the Intl extension didn't report an error code, this
             // could be the case when the Intl polyfill is used which always returns 0 as the error code
-            throw new TransformationFailedException(sprintf('"%s" could not be parsed as a date.', $value));
+            throw new TransformationFailedException(\sprintf('"%s" could not be parsed as a date.', $value));
         }
 
         try {
@@ -137,7 +137,7 @@ class DateTimeToLocalizedStringTransformer extends BaseDateTimeTransformer
                 $dateTime = new \DateTime(gmdate('Y-m-d', $timestamp), new \DateTimeZone($this->outputTimezone));
             } else {
                 // read timestamp into DateTime object - the formatter delivers a timestamp
-                $dateTime = new \DateTime(sprintf('@%s', $timestamp));
+                $dateTime = new \DateTime(\sprintf('@%s', $timestamp));
             }
             // set timezone separately, as it would be ignored if set via the constructor,
             // see https://php.net/datetime.construct

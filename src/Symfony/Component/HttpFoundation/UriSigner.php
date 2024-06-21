@@ -55,7 +55,7 @@ class UriSigner
         }
 
         if (null !== $expiration && !$expiration instanceof \DateTimeInterface && !$expiration instanceof \DateInterval && !\is_int($expiration)) {
-            throw new \TypeError(sprintf('The second argument of %s() must be an instance of %s or %s, an integer or null (%s given).', __METHOD__, \DateTimeInterface::class, \DateInterval::class, get_debug_type($expiration)));
+            throw new \TypeError(\sprintf('The second argument of %s() must be an instance of %s or %s, an integer or null (%s given).', __METHOD__, \DateTimeInterface::class, \DateInterval::class, get_debug_type($expiration)));
         }
 
         $url = parse_url($uri);
@@ -66,11 +66,11 @@ class UriSigner
         }
 
         if (isset($params[$this->hashParameter])) {
-            throw new LogicException(sprintf('URI query parameter conflict: parameter name "%s" is reserved.', $this->hashParameter));
+            throw new LogicException(\sprintf('URI query parameter conflict: parameter name "%s" is reserved.', $this->hashParameter));
         }
 
         if (isset($params[$this->expirationParameter])) {
-            throw new LogicException(sprintf('URI query parameter conflict: parameter name "%s" is reserved.', $this->expirationParameter));
+            throw new LogicException(\sprintf('URI query parameter conflict: parameter name "%s" is reserved.', $this->expirationParameter));
         }
 
         if (null !== $expiration) {

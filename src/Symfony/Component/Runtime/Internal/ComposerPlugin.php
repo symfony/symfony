@@ -70,7 +70,7 @@ class ComposerPlugin implements PluginInterface, EventSubscriberInterface
             }
 
             if (!is_file($autoloadTemplate)) {
-                throw new \InvalidArgumentException(sprintf('File "%s" defined under "extra.runtime.autoload_template" in your composer.json file not found.', $this->composer->getPackage()->getExtra()['runtime']['autoload_template']));
+                throw new \InvalidArgumentException(\sprintf('File "%s" defined under "extra.runtime.autoload_template" in your composer.json file not found.', $this->composer->getPackage()->getExtra()['runtime']['autoload_template']));
             }
         }
 

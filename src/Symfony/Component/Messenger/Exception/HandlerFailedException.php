@@ -26,12 +26,12 @@ class HandlerFailedException extends RuntimeException implements WrappedExceptio
     ) {
         $firstFailure = current($exceptions);
 
-        $message = sprintf('Handling "%s" failed: ', $envelope->getMessage()::class);
+        $message = \sprintf('Handling "%s" failed: ', $envelope->getMessage()::class);
 
         parent::__construct(
             $message.(1 === \count($exceptions)
                 ? $firstFailure->getMessage()
-                : sprintf('%d handlers failed. First failure is: %s', \count($exceptions), $firstFailure->getMessage())
+                : \sprintf('%d handlers failed. First failure is: %s', \count($exceptions), $firstFailure->getMessage())
             ),
             (int) $firstFailure->getCode(),
             $firstFailure

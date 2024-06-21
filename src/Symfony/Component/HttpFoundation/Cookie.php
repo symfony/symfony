@@ -101,7 +101,7 @@ class Cookie
     ) {
         // from PHP source code
         if ($raw && false !== strpbrk($name, self::RESERVED_CHARS_LIST)) {
-            throw new \InvalidArgumentException(sprintf('The cookie name "%s" contains invalid characters.', $name));
+            throw new \InvalidArgumentException(\sprintf('The cookie name "%s" contains invalid characters.', $name));
         }
 
         if (!$name) {
@@ -204,7 +204,7 @@ class Cookie
     public function withRaw(bool $raw = true): static
     {
         if ($raw && false !== strpbrk($this->name, self::RESERVED_CHARS_LIST)) {
-            throw new \InvalidArgumentException(sprintf('The cookie name "%s" contains invalid characters.', $this->name));
+            throw new \InvalidArgumentException(\sprintf('The cookie name "%s" contains invalid characters.', $this->name));
         }
 
         $cookie = clone $this;

@@ -88,7 +88,7 @@ class GraphvizDumper extends Dumper
         foreach ($this->nodes as $id => $node) {
             $aliases = $this->getAliases($id);
 
-            $code .= sprintf("  node_%s [label=\"%s\\n%s\\n\", shape=%s%s];\n", $this->dotize($id), $id.($aliases ? ' ('.implode(', ', $aliases).')' : ''), $node['class'], $this->options['node']['shape'], $this->addAttributes($node['attributes']));
+            $code .= \sprintf("  node_%s [label=\"%s\\n%s\\n\", shape=%s%s];\n", $this->dotize($id), $id.($aliases ? ' ('.implode(', ', $aliases).')' : ''), $node['class'], $this->options['node']['shape'], $this->addAttributes($node['attributes']));
         }
 
         return $code;
@@ -99,7 +99,7 @@ class GraphvizDumper extends Dumper
         $code = '';
         foreach ($this->edges as $id => $edges) {
             foreach ($edges as $edge) {
-                $code .= sprintf("  node_%s -> node_%s [label=\"%s\" style=\"%s\"%s];\n", $this->dotize($id), $this->dotize($edge['to']), $edge['name'], $edge['required'] ? 'filled' : 'dashed', $edge['lazy'] ? ' color="#9999ff"' : '');
+                $code .= \sprintf("  node_%s -> node_%s [label=\"%s\" style=\"%s\"%s];\n", $this->dotize($id), $this->dotize($edge['to']), $edge['name'], $edge['required'] ? 'filled' : 'dashed', $edge['lazy'] ? ' color="#9999ff"' : '');
             }
         }
 
@@ -198,7 +198,7 @@ class GraphvizDumper extends Dumper
 
     private function startDot(): string
     {
-        return sprintf("digraph sc {\n  %s\n  node [%s];\n  edge [%s];\n\n",
+        return \sprintf("digraph sc {\n  %s\n  node [%s];\n  edge [%s];\n\n",
             $this->addOptions($this->options['graph']),
             $this->addOptions($this->options['node']),
             $this->addOptions($this->options['edge'])
@@ -214,7 +214,7 @@ class GraphvizDumper extends Dumper
     {
         $code = [];
         foreach ($attributes as $k => $v) {
-            $code[] = sprintf('%s="%s"', $k, $v);
+            $code[] = \sprintf('%s="%s"', $k, $v);
         }
 
         return $code ? ', '.implode(', ', $code) : '';
@@ -224,7 +224,7 @@ class GraphvizDumper extends Dumper
     {
         $code = [];
         foreach ($options as $k => $v) {
-            $code[] = sprintf('%s="%s"', $k, $v);
+            $code[] = \sprintf('%s="%s"', $k, $v);
         }
 
         return implode(' ', $code);

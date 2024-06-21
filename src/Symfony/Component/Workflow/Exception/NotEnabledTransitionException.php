@@ -28,7 +28,7 @@ class NotEnabledTransitionException extends TransitionException
         private TransitionBlockerList $transitionBlockerList,
         array $context = [],
     ) {
-        parent::__construct($subject, $transitionName, $workflow, sprintf('Transition "%s" is not enabled for workflow "%s".', $transitionName, $workflow->getName()), $context);
+        parent::__construct($subject, $transitionName, $workflow, \sprintf('Transition "%s" is not enabled for workflow "%s".', $transitionName, $workflow->getName()), $context);
     }
 
     public function getTransitionBlockerList(): TransitionBlockerList

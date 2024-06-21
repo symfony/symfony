@@ -967,7 +967,7 @@ EOD;
     public function testParseExceptionOnDuplicate($input, $duplicateKey, $lineNumber)
     {
         $this->expectException(ParseException::class);
-        $this->expectExceptionMessage(sprintf('Duplicate key "%s" detected at line %d', $duplicateKey, $lineNumber));
+        $this->expectExceptionMessage(\sprintf('Duplicate key "%s" detected at line %d', $duplicateKey, $lineNumber));
 
         Yaml::parse($input);
     }
@@ -1575,7 +1575,7 @@ EOT;
     public function testParserThrowsExceptionWithCorrectLineNumber($lineNumber, $yaml)
     {
         $this->expectException(ParseException::class);
-        $this->expectExceptionMessage(sprintf('Unexpected characters near "," at line %d (near "bar: "123",").', $lineNumber));
+        $this->expectExceptionMessage(\sprintf('Unexpected characters near "," at line %d (near "bar: "123",").', $lineNumber));
 
         $this->parser->parse($yaml);
     }

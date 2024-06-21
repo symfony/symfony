@@ -41,7 +41,7 @@ class ConfigDebugCommand extends AbstractConfigCommand
 {
     protected function configure(): void
     {
-        $commentedHelpFormats = array_map(fn ($format) => sprintf('<comment>%s</comment>', $format), $this->getAvailableFormatOptions());
+        $commentedHelpFormats = array_map(fn ($format) => \sprintf('<comment>%s</comment>', $format), $this->getAvailableFormatOptions());
         $helpFormats = implode('", "', $commentedHelpFormats);
 
         $this
@@ -49,7 +49,7 @@ class ConfigDebugCommand extends AbstractConfigCommand
                 new InputArgument('name', InputArgument::OPTIONAL, 'The bundle name or the extension alias'),
                 new InputArgument('path', InputArgument::OPTIONAL, 'The configuration option path'),
                 new InputOption('resolve-env', null, InputOption::VALUE_NONE, 'Display resolved environment variable values instead of placeholders'),
-                new InputOption('format', null, InputOption::VALUE_REQUIRED, sprintf('The output format ("%s")', implode('", "', $this->getAvailableFormatOptions())), class_exists(Yaml::class) ? 'txt' : 'json'),
+                new InputOption('format', null, InputOption::VALUE_REQUIRED, \sprintf('The output format ("%s")', implode('", "', $this->getAvailableFormatOptions())), class_exists(Yaml::class) ? 'txt' : 'json'),
             ])
             ->setHelp(<<<EOF
 The <info>%command.name%</info> command dumps the current configuration for an
@@ -106,7 +106,7 @@ EOF
         if (null === $path = $input->getArgument('path')) {
             if ('txt' === $input->getOption('format')) {
                 $io->title(
-                    sprintf('Current configuration for %s', $name === $extensionAlias ? sprintf('extension with alias "%s"', $extensionAlias) : sprintf('"%s"', $name))
+                    \sprintf('Current configuration for %s', $name === $extensionAlias ? \sprintf('extension with alias "%s"', $extensionAlias) : \sprintf('"%s"', $name))
                 );
             }
 
@@ -123,7 +123,7 @@ EOF
             return 1;
         }
 
-        $io->title(sprintf('Current configuration for "%s.%s"', $extensionAlias, $path));
+        $io->title(\sprintf('Current configuration for "%s.%s"', $extensionAlias, $path));
 
         $io->writeln($this->convertToFormat($config, $format));
 
@@ -135,7 +135,7 @@ EOF
         return match ($format) {
             'txt', 'yaml' => Yaml::dump($config, 10),
             'json' => json_encode($config, \JSON_PRETTY_PRINT | \JSON_UNESCAPED_SLASHES | \JSON_UNESCAPED_UNICODE),
-            default => throw new InvalidArgumentException(sprintf('Supported formats are "%s".', implode('", "', $this->getAvailableFormatOptions()))),
+            default => throw new InvalidArgumentException(\sprintf('Supported formats are "%s".', implode('", "', $this->getAvailableFormatOptions()))),
         };
     }
 
@@ -162,7 +162,7 @@ EOF
 
         foreach ($steps as $step) {
             if (!\array_key_exists($step, $config)) {
-                throw new LogicException(sprintf('Unable to find configuration for "%s.%s".', $alias, $path));
+                throw new LogicException(\sprintf('Unable to find configuration for "%s.%s".', $alias, $path));
             }
 
             $config = $config[$step];
@@ -190,7 +190,7 @@ EOF
         // Fall back to default config if the extension has one
 
         if (!$extension instanceof ConfigurationExtensionInterface && !$extension instanceof ConfigurationInterface) {
-            throw new \LogicException(sprintf('The extension with alias "%s" does not have configuration.', $extensionAlias));
+            throw new \LogicException(\sprintf('The extension with alias "%s" does not have configuration.', $extensionAlias));
         }
 
         $configs = $container->getExtensionConfig($extensionAlias);

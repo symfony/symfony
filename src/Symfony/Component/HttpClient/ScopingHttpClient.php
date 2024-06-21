@@ -34,7 +34,7 @@ class ScopingHttpClient implements HttpClientInterface, ResetInterface, LoggerAw
         private ?string $defaultRegexp = null,
     ) {
         if (null !== $defaultRegexp && !isset($defaultOptionsByRegexp[$defaultRegexp])) {
-            throw new InvalidArgumentException(sprintf('No options are mapped to the provided "%s" default regexp.', $defaultRegexp));
+            throw new InvalidArgumentException(\sprintf('No options are mapped to the provided "%s" default regexp.', $defaultRegexp));
         }
     }
 

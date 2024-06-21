@@ -69,7 +69,7 @@ class ErrorListener implements EventSubscriberInterface
 
         $e = FlattenException::createFromThrowable($throwable);
 
-        $this->logException($throwable, sprintf('Uncaught PHP Exception %s: "%s" at %s line %s', $e->getClass(), $e->getMessage(), basename($e->getFile()), $e->getLine()), $logLevel);
+        $this->logException($throwable, \sprintf('Uncaught PHP Exception %s: "%s" at %s line %s', $e->getClass(), $e->getMessage(), basename($e->getFile()), $e->getLine()), $logLevel);
     }
 
     public function onKernelException(ExceptionEvent $event): void
@@ -98,7 +98,7 @@ class ErrorListener implements EventSubscriberInterface
         } catch (\Exception $e) {
             $f = FlattenException::createFromThrowable($e);
 
-            $this->logException($e, sprintf('Exception thrown when handling an exception (%s: %s at %s line %s)', $f->getClass(), $f->getMessage(), basename($e->getFile()), $e->getLine()));
+            $this->logException($e, \sprintf('Exception thrown when handling an exception (%s: %s at %s line %s)', $f->getClass(), $f->getMessage(), basename($e->getFile()), $e->getLine()));
 
             $prev = $e;
             do {

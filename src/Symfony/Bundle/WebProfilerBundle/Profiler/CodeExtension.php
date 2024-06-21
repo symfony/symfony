@@ -57,18 +57,18 @@ final class CodeExtension extends AbstractExtension
         $parts = explode('\\', $class);
         $short = array_pop($parts);
 
-        return sprintf('<abbr title="%s">%s</abbr>', $class, $short);
+        return \sprintf('<abbr title="%s">%s</abbr>', $class, $short);
     }
 
     public function abbrMethod(string $method): string
     {
         if (str_contains($method, '::')) {
             [$class, $method] = explode('::', $method, 2);
-            $result = sprintf('%s::%s()', $this->abbrClass($class), $method);
+            $result = \sprintf('%s::%s()', $this->abbrClass($class), $method);
         } elseif ('Closure' === $method) {
-            $result = sprintf('<abbr title="%s">%1$s</abbr>', $method);
+            $result = \sprintf('<abbr title="%s">%1$s</abbr>', $method);
         } else {
-            $result = sprintf('<abbr title="%s">%1$s</abbr>()', $method);
+            $result = \sprintf('<abbr title="%s">%1$s</abbr>()', $method);
         }
 
         return $result;
@@ -85,9 +85,9 @@ final class CodeExtension extends AbstractExtension
                 $item[1] = htmlspecialchars($item[1], \ENT_COMPAT | \ENT_SUBSTITUTE, $this->charset);
                 $parts = explode('\\', $item[1]);
                 $short = array_pop($parts);
-                $formattedValue = sprintf('<em>object</em>(<abbr title="%s">%s</abbr>)', $item[1], $short);
+                $formattedValue = \sprintf('<em>object</em>(<abbr title="%s">%s</abbr>)', $item[1], $short);
             } elseif ('array' === $item[0]) {
-                $formattedValue = sprintf('<em>array</em>(%s)', \is_array($item[1]) ? $this->formatArgs($item[1]) : htmlspecialchars(var_export($item[1], true), \ENT_COMPAT | \ENT_SUBSTITUTE, $this->charset));
+                $formattedValue = \sprintf('<em>array</em>(%s)', \is_array($item[1]) ? $this->formatArgs($item[1]) : htmlspecialchars(var_export($item[1], true), \ENT_COMPAT | \ENT_SUBSTITUTE, $this->charset));
             } elseif ('null' === $item[0]) {
                 $formattedValue = '<em>null</em>';
             } elseif ('boolean' === $item[0]) {
@@ -100,7 +100,7 @@ final class CodeExtension extends AbstractExtension
                 $formattedValue = str_replace("\n", '', htmlspecialchars(var_export($item[1], true), \ENT_COMPAT | \ENT_SUBSTITUTE, $this->charset));
             }
 
-            $result[] = \is_int($key) ? $formattedValue : sprintf("'%s' => %s", htmlspecialchars($key, \ENT_COMPAT | \ENT_SUBSTITUTE, $this->charset), $formattedValue);
+            $result[] = \is_int($key) ? $formattedValue : \sprintf("'%s' => %s", htmlspecialchars($key, \ENT_COMPAT | \ENT_SUBSTITUTE, $this->charset), $formattedValue);
         }
 
         return implode(', ', $result);
@@ -164,7 +164,7 @@ final class CodeExtension extends AbstractExtension
         if (null === $text) {
             if (null !== $rel = $this->getFileRelative($file)) {
                 $rel = explode('/', htmlspecialchars($rel, \ENT_COMPAT | \ENT_SUBSTITUTE, $this->charset), 2);
-                $text = sprintf('<abbr title="%s%2$s">%s</abbr>%s', htmlspecialchars($this->projectDir, \ENT_COMPAT | \ENT_SUBSTITUTE, $this->charset), $rel[0], '/'.($rel[1] ?? ''));
+                $text = \sprintf('<abbr title="%s%2$s">%s</abbr>%s', htmlspecialchars($this->projectDir, \ENT_COMPAT | \ENT_SUBSTITUTE, $this->charset), $rel[0], '/'.($rel[1] ?? ''));
             } else {
                 $text = htmlspecialchars($file, \ENT_COMPAT | \ENT_SUBSTITUTE, $this->charset);
             }
@@ -177,7 +177,7 @@ final class CodeExtension extends AbstractExtension
         }
 
         if (false !== $link = $this->getFileLink($file, $line)) {
-            return sprintf('<a href="%s" title="Click to open this file" class="file_link">%s</a>', htmlspecialchars($link, \ENT_COMPAT | \ENT_SUBSTITUTE, $this->charset), $text);
+            return \sprintf('<a href="%s" title="Click to open this file" class="file_link">%s</a>', htmlspecialchars($link, \ENT_COMPAT | \ENT_SUBSTITUTE, $this->charset), $text);
         }
 
         return $text;

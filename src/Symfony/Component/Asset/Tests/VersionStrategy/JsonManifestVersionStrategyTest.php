@@ -77,7 +77,7 @@ class JsonManifestVersionStrategyTest extends TestCase
     public function testRemoteManifestFileWithoutHttpClient()
     {
         $this->expectException(\LogicException::class);
-        $this->expectExceptionMessage(sprintf('The "%s" class needs an HTTP client to use a remote manifest. Try running "composer require symfony/http-client".', JsonManifestVersionStrategy::class));
+        $this->expectExceptionMessage(\sprintf('The "%s" class needs an HTTP client to use a remote manifest. Try running "composer require symfony/http-client".', JsonManifestVersionStrategy::class));
 
         new JsonManifestVersionStrategy('https://cdn.example.com/manifest.json');
     }

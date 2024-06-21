@@ -110,10 +110,10 @@ EOF
         if ($errors) {
             foreach ($errors as $locale => $domains) {
                 foreach ($domains as $domain => $domainsErrors) {
-                    $this->io->section(sprintf('Errors for locale "%s" and domain "%s"', $locale, $domain));
+                    $this->io->section(\sprintf('Errors for locale "%s" and domain "%s"', $locale, $domain));
 
                     foreach ($domainsErrors as $id => $error) {
-                        $this->io->text(sprintf('Translation key "%s" is invalid:', $id));
+                        $this->io->text(\sprintf('Translation key "%s" is invalid:', $id));
                         $this->io->error($error->getMessage());
                     }
                 }

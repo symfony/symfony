@@ -96,13 +96,13 @@ final class FakeSmsTransportFactoryTest extends TransportFactoryTestCase
             null,
             $this->createMock(LoggerInterface::class),
             'fakesms+email://default?to=recipient@email.net&from=sender@email.net',
-            sprintf($exceptionMessage, 'fakesms+email', MailerInterface::class),
+            \sprintf($exceptionMessage, 'fakesms+email', MailerInterface::class),
         ];
         yield 'missing logger' => [
             $this->createMock(MailerInterface::class),
             null,
             'fakesms+logger://default',
-            sprintf($exceptionMessage, 'fakesms+logger', LoggerInterface::class),
+            \sprintf($exceptionMessage, 'fakesms+logger', LoggerInterface::class),
         ];
     }
 

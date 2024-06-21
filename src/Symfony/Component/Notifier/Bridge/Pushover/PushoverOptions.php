@@ -116,7 +116,7 @@ final class PushoverOptions implements MessageOptionsInterface
     public function priority(int $priority): static
     {
         if (!\in_array($priority, self::PRIORITIES, true)) {
-            throw new InvalidArgumentException(sprintf('Pushover notification priority must be one of "%s".', implode(', ', self::PRIORITIES)));
+            throw new InvalidArgumentException(\sprintf('Pushover notification priority must be one of "%s".', implode(', ', self::PRIORITIES)));
         }
 
         $this->options['priority'] = $priority;
@@ -156,7 +156,7 @@ final class PushoverOptions implements MessageOptionsInterface
     public function sound(string $sound): static
     {
         if (!\in_array($sound, self::SOUNDS, true)) {
-            throw new InvalidArgumentException(sprintf('Pushover notification sound must be one of "%s".', implode(', ', self::SOUNDS)));
+            throw new InvalidArgumentException(\sprintf('Pushover notification sound must be one of "%s".', implode(', ', self::SOUNDS)));
         }
 
         $this->options['sound'] = $sound;

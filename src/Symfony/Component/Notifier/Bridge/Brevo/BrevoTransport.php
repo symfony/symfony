@@ -39,7 +39,7 @@ final class BrevoTransport extends AbstractTransport
 
     public function __toString(): string
     {
-        return sprintf('brevo://%s?sender=%s', $this->getEndpoint(), $this->sender);
+        return \sprintf('brevo://%s?sender=%s', $this->getEndpoint(), $this->sender);
     }
 
     public function supports(MessageInterface $message): bool

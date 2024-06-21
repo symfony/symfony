@@ -64,10 +64,10 @@ trait ConstructorArgumentsTestTrait
         $normalizer = $this->getDenormalizerForConstructArguments();
         try {
             $normalizer->denormalize($data, ConstructorArgumentsObject::class);
-            self::fail(sprintf('Failed asserting that exception of type "%s" is thrown.', MissingConstructorArgumentsException::class));
+            self::fail(\sprintf('Failed asserting that exception of type "%s" is thrown.', MissingConstructorArgumentsException::class));
         } catch (MissingConstructorArgumentsException $e) {
             self::assertSame(ConstructorArgumentsObject::class, $e->getClass());
-            self::assertSame(sprintf('Cannot create an instance of "%s" from serialized data because its constructor requires the following parameters to be present : "$foo", "$baz".', ConstructorArgumentsObject::class), $e->getMessage());
+            self::assertSame(\sprintf('Cannot create an instance of "%s" from serialized data because its constructor requires the following parameters to be present : "$foo", "$baz".', ConstructorArgumentsObject::class), $e->getMessage());
             self::assertSame(['foo', 'baz'], $e->getMissingConstructorArguments());
         }
     }

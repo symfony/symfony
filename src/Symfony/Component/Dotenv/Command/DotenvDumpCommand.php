@@ -84,7 +84,7 @@ return $vars;
 EOF;
         file_put_contents($dotenvPath.'.local.php', $vars, \LOCK_EX);
 
-        $output->writeln(sprintf('Successfully dumped .env files in <info>.env.local.php</> for the <info>%s</> environment.', $env));
+        $output->writeln(\sprintf('Successfully dumped .env files in <info>.env.local.php</> for the <info>%s</> environment.', $env));
 
         return 0;
     }

@@ -45,9 +45,9 @@ class ResponseFunctionalTest extends TestCase
      */
     public function testCookie($fixture)
     {
-        $result = file_get_contents(sprintf('http://localhost:8054/%s.php', $fixture));
+        $result = file_get_contents(\sprintf('http://localhost:8054/%s.php', $fixture));
         $result = preg_replace_callback('/expires=[^;]++/', fn ($m) => str_replace('-', ' ', $m[0]), $result);
-        $this->assertStringMatchesFormatFile(__DIR__.sprintf('/Fixtures/response-functional/%s.expected', $fixture), $result);
+        $this->assertStringMatchesFormatFile(__DIR__.\sprintf('/Fixtures/response-functional/%s.expected', $fixture), $result);
     }
 
     public static function provideCookie()

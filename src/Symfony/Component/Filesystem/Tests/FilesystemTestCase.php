@@ -82,11 +82,11 @@ class FilesystemTestCase extends TestCase
      */
     protected function assertFilePermissions($expectedFilePerms, $filePath)
     {
-        $actualFilePerms = (int) substr(sprintf('%o', fileperms($filePath)), -3);
+        $actualFilePerms = (int) substr(\sprintf('%o', fileperms($filePath)), -3);
         $this->assertEquals(
             $expectedFilePerms,
             $actualFilePerms,
-            sprintf('File permissions for %s must be %s. Actual %s', $filePath, $expectedFilePerms, $actualFilePerms)
+            \sprintf('File permissions for %s must be %s. Actual %s', $filePath, $expectedFilePerms, $actualFilePerms)
         );
     }
 

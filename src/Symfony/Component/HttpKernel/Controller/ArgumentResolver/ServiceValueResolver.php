@@ -56,12 +56,12 @@ final class ServiceValueResolver implements ValueResolverInterface
             return [$this->container->get($controller)->get($argument->getName())];
         } catch (RuntimeException $e) {
             $what = 'argument $'.$argument->getName();
-            $message = str_replace(sprintf('service "%s"', $argument->getName()), $what, $e->getMessage());
-            $what .= sprintf(' of "%s()"', $controller);
+            $message = str_replace(\sprintf('service "%s"', $argument->getName()), $what, $e->getMessage());
+            $what .= \sprintf(' of "%s()"', $controller);
             $message = preg_replace('/service "\.service_locator\.[^"]++"/', $what, $message);
 
             if ($e->getMessage() === $message) {
-                $message = sprintf('Cannot resolve %s: %s', $what, $message);
+                $message = \sprintf('Cannot resolve %s: %s', $what, $message);
             }
 
             throw new NearMissValueResolverException($message, $e->getCode(), $e);

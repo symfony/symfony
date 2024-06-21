@@ -127,7 +127,7 @@ class JsonLoginAuthenticatorTest extends TestCase
         yield [$request, 'The key "password" must be a non-empty string.'];
 
         $username = str_repeat('x', UserBadge::MAX_USERNAME_LENGTH + 1);
-        $request = new Request([], [], [], [], [], ['HTTP_CONTENT_TYPE' => 'application/json'], sprintf('{"username": "%s", "password": "foo"}', $username));
+        $request = new Request([], [], [], [], [], ['HTTP_CONTENT_TYPE' => 'application/json'], \sprintf('{"username": "%s", "password": "foo"}', $username));
         yield [$request, 'Username too long.', BadCredentialsException::class];
     }
 

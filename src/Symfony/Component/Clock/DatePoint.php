@@ -83,14 +83,14 @@ final class DatePoint extends \DateTimeImmutable
         }
 
         if (!is_finite($timestamp) || \PHP_INT_MAX + 1.0 <= $timestamp || \PHP_INT_MIN > $timestamp) {
-            throw new \DateRangeError(sprintf('DateTimeImmutable::createFromTimestamp(): Argument #1 ($timestamp) must be a finite number between %s and %s.999999, %s given', \PHP_INT_MIN, \PHP_INT_MAX, $timestamp));
+            throw new \DateRangeError(\sprintf('DateTimeImmutable::createFromTimestamp(): Argument #1 ($timestamp) must be a finite number between %s and %s.999999, %s given', \PHP_INT_MIN, \PHP_INT_MAX, $timestamp));
         }
 
         if ($timestamp < 0) {
             $timestamp = (int) $timestamp - 2.0 + $ms;
         }
 
-        return static::createFromFormat('U.u', sprintf('%.6F', $timestamp));
+        return static::createFromFormat('U.u', \sprintf('%.6F', $timestamp));
     }
 
     public function add(\DateInterval $interval): static
@@ -109,7 +109,7 @@ final class DatePoint extends \DateTimeImmutable
     public function modify(string $modifier): static
     {
         if (\PHP_VERSION_ID < 80300) {
-            return @parent::modify($modifier) ?: throw new \DateMalformedStringException(error_get_last()['message'] ?? sprintf('Invalid modifier: "%s".', $modifier));
+            return @parent::modify($modifier) ?: throw new \DateMalformedStringException(error_get_last()['message'] ?? \sprintf('Invalid modifier: "%s".', $modifier));
         }
 
         return parent::modify($modifier);

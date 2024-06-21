@@ -30,7 +30,7 @@ final class SlidingWindow implements LimiterStateInterface
         private int $intervalInSeconds,
     ) {
         if ($intervalInSeconds < 1) {
-            throw new InvalidIntervalException(sprintf('The interval must be positive integer, "%d" given.', $intervalInSeconds));
+            throw new InvalidIntervalException(\sprintf('The interval must be positive integer, "%d" given.', $intervalInSeconds));
         }
         $this->windowEndAt = microtime(true) + $intervalInSeconds;
     }

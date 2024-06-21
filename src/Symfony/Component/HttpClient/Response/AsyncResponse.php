@@ -217,7 +217,7 @@ class AsyncResponse implements ResponseInterface, StreamableInterface
 
             foreach ($responses as $r) {
                 if (!$r instanceof self) {
-                    throw new \TypeError(sprintf('"%s::stream()" expects parameter 1 to be an iterable of AsyncResponse objects, "%s" given.', $class ?? static::class, get_debug_type($r)));
+                    throw new \TypeError(\sprintf('"%s::stream()" expects parameter 1 to be an iterable of AsyncResponse objects, "%s" given.', $class ?? static::class, get_debug_type($r)));
                 }
 
                 if (null !== $e = $r->info['error'] ?? null) {
@@ -269,7 +269,7 @@ class AsyncResponse implements ResponseInterface, StreamableInterface
                     if (null !== $chunk->getError() || $chunk->isLast()) {
                         unset($asyncMap[$response]);
                     } elseif (null !== $r->content && '' !== ($content = $chunk->getContent()) && \strlen($content) !== fwrite($r->content, $content)) {
-                        $chunk = new ErrorChunk($r->offset, new TransportException(sprintf('Failed writing %d bytes to the response buffer.', \strlen($content))));
+                        $chunk = new ErrorChunk($r->offset, new TransportException(\sprintf('Failed writing %d bytes to the response buffer.', \strlen($content))));
                         $r->info['error'] = $chunk->getError();
                         $r->response->cancel();
                     }
@@ -283,7 +283,7 @@ class AsyncResponse implements ResponseInterface, StreamableInterface
                 } elseif ($chunk->isFirst()) {
                     $r->yieldedState = self::FIRST_CHUNK_YIELDED;
                 } elseif (self::FIRST_CHUNK_YIELDED !== $r->yieldedState && null === $chunk->getInformationalStatus()) {
-                    throw new \LogicException(sprintf('Instance of "%s" is already consumed and cannot be managed by "%s". A decorated client should not call any of the response\'s methods in its "request()" method.', get_debug_type($response), $class ?? static::class));
+                    throw new \LogicException(\sprintf('Instance of "%s" is already consumed and cannot be managed by "%s". A decorated client should not call any of the response\'s methods in its "request()" method.', get_debug_type($response), $class ?? static::class));
                 }
 
                 foreach (self::passthru($r->client, $r, $chunk, $asyncMap) as $chunk) {
@@ -330,7 +330,7 @@ class AsyncResponse implements ResponseInterface, StreamableInterface
         }
 
         if (!$stream instanceof \Iterator) {
-            throw new \LogicException(sprintf('A chunk passthru must return an "Iterator", "%s" returned.', get_debug_type($stream)));
+            throw new \LogicException(\sprintf('A chunk passthru must return an "Iterator", "%s" returned.', get_debug_type($stream)));
         }
         $r->stream = $stream;
 
@@ -366,7 +366,7 @@ class AsyncResponse implements ResponseInterface, StreamableInterface
             $chunk = $r->stream->current();
 
             if (!$chunk instanceof ChunkInterface) {
-                throw new \LogicException(sprintf('A chunk passthru must yield instances of "%s", "%s" yielded.', ChunkInterface::class, get_debug_type($chunk)));
+                throw new \LogicException(\sprintf('A chunk passthru must yield instances of "%s", "%s" yielded.', ChunkInterface::class, get_debug_type($chunk)));
             }
 
             if (null !== $chunk->getError()) {
@@ -393,7 +393,7 @@ class AsyncResponse implements ResponseInterface, StreamableInterface
                 }
 
                 if (null !== $r->content && \strlen($content) !== fwrite($r->content, $content)) {
-                    $chunk = new ErrorChunk($r->offset, new TransportException(sprintf('Failed writing %d bytes to the response buffer.', \strlen($content))));
+                    $chunk = new ErrorChunk($r->offset, new TransportException(\sprintf('Failed writing %d bytes to the response buffer.', \strlen($content))));
                     $r->info['error'] = $chunk->getError();
                     $r->response->cancel();
                 }

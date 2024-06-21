@@ -77,7 +77,7 @@ EOF
             $serviceIds = array_filter($serviceIds, fn ($serviceId) => false !== stripos(str_replace('\\', '', $serviceId), $searchNormalized) && !str_starts_with($serviceId, '.'));
 
             if (!$serviceIds) {
-                $errorIo->error(sprintf('No autowirable classes or interfaces found matching "%s"', $search));
+                $errorIo->error(\sprintf('No autowirable classes or interfaces found matching "%s"', $search));
 
                 return 1;
             }
@@ -96,7 +96,7 @@ EOF
         $io->title('Autowirable Types');
         $io->text('The following classes & interfaces can be used as type-hints when autowiring:');
         if ($search) {
-            $io->text(sprintf('(only showing classes/interfaces matching <comment>%s</comment>)', $search));
+            $io->text(\sprintf('(only showing classes/interfaces matching <comment>%s</comment>)', $search));
         }
         $hasAlias = [];
         $all = $input->getOption('all');
@@ -119,10 +119,10 @@ EOF
                 }
             }
 
-            $serviceLine = sprintf('<fg=yellow>%s</>', $serviceId);
+            $serviceLine = \sprintf('<fg=yellow>%s</>', $serviceId);
             if ('' !== $fileLink = $this->getFileLink($previousId)) {
                 $serviceLine = substr($serviceId, \strlen($previousId));
-                $serviceLine = sprintf('<fg=yellow;href=%s>%s</>', $fileLink, $previousId).('' !== $serviceLine ? sprintf('<fg=yellow>%s</>', $serviceLine) : '');
+                $serviceLine = \sprintf('<fg=yellow;href=%s>%s</>', $fileLink, $previousId).('' !== $serviceLine ? \sprintf('<fg=yellow>%s</>', $serviceLine) : '');
             }
 
             if ($container->hasAlias($serviceId)) {
@@ -167,7 +167,7 @@ EOF
         $io->newLine();
 
         if (0 < $serviceIdsNb) {
-            $io->text(sprintf('%s more concrete service%s would be displayed when adding the "--all" option.', $serviceIdsNb, $serviceIdsNb > 1 ? 's' : ''));
+            $io->text(\sprintf('%s more concrete service%s would be displayed when adding the "--all" option.', $serviceIdsNb, $serviceIdsNb > 1 ? 's' : ''));
         }
         if ($all) {
             $io->text('Pro-tip: use interfaces in your type-hints instead of classes to benefit from the dependency inversion principle.');

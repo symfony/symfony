@@ -24,13 +24,13 @@ final class CrawlerAnySelectorTextSame extends Constraint
 
     public function toString(): string
     {
-        return sprintf('has at least a node matching selector "%s" with content "%s"', $this->selector, $this->expectedText);
+        return \sprintf('has at least a node matching selector "%s" with content "%s"', $this->selector, $this->expectedText);
     }
 
     protected function matches($other): bool
     {
         if (!$other instanceof Crawler) {
-            throw new \InvalidArgumentException(sprintf('"%s" constraint expected an argument of type "%s", got "%s".', self::class, Crawler::class, get_debug_type($other)));
+            throw new \InvalidArgumentException(\sprintf('"%s" constraint expected an argument of type "%s", got "%s".', self::class, Crawler::class, get_debug_type($other)));
         }
 
         $other = $other->filter($this->selector);
@@ -46,7 +46,7 @@ final class CrawlerAnySelectorTextSame extends Constraint
     protected function failureDescription($other): string
     {
         if (!$other instanceof Crawler) {
-            throw new \InvalidArgumentException(sprintf('"%s" constraint expected an argument of type "%s", got "%s".', self::class, Crawler::class, get_debug_type($other)));
+            throw new \InvalidArgumentException(\sprintf('"%s" constraint expected an argument of type "%s", got "%s".', self::class, Crawler::class, get_debug_type($other)));
         }
 
         return 'the Crawler '.$this->toString();

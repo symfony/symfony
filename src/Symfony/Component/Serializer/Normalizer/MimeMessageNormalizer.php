@@ -56,7 +56,7 @@ final class MimeMessageNormalizer implements NormalizerInterface, DenormalizerIn
     public function setSerializer(SerializerInterface $serializer): void
     {
         if (!$serializer instanceof NormalizerInterface || !$serializer instanceof DenormalizerInterface) {
-            throw new LogicException(sprintf('The passed serializer should implement both NormalizerInterface and DenormalizerInterface, "%s" given.', get_debug_type($serializer)));
+            throw new LogicException(\sprintf('The passed serializer should implement both NormalizerInterface and DenormalizerInterface, "%s" given.', get_debug_type($serializer)));
         }
         $this->serializer = $serializer;
         $this->normalizer->setSerializer($serializer);

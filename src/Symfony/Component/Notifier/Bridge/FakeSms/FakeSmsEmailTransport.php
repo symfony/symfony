@@ -45,7 +45,7 @@ final class FakeSmsEmailTransport extends AbstractTransport
 
     public function __toString(): string
     {
-        return sprintf('fakesms+email://%s?to=%s&from=%s', $this->getEndpoint(), $this->to, $this->from);
+        return \sprintf('fakesms+email://%s?to=%s&from=%s', $this->getEndpoint(), $this->to, $this->from);
     }
 
     public function supports(MessageInterface $message): bool
@@ -67,7 +67,7 @@ final class FakeSmsEmailTransport extends AbstractTransport
         $email = (new Email())
             ->from($message->getFrom() ?: $this->from)
             ->to($this->to)
-            ->subject(sprintf('New SMS on phone number: %s', $message->getPhone()))
+            ->subject(\sprintf('New SMS on phone number: %s', $message->getPhone()))
             ->html($message->getSubject())
             ->text($message->getSubject());
 

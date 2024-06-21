@@ -39,7 +39,7 @@ final class MailjetTransport extends AbstractTransport
 
     public function __toString(): string
     {
-        return sprintf('mailjet://%s@%s', $this->from, $this->getEndpoint());
+        return \sprintf('mailjet://%s@%s', $this->from, $this->getEndpoint());
     }
 
     public function supports(MessageInterface $message): bool
@@ -53,7 +53,7 @@ final class MailjetTransport extends AbstractTransport
             throw new UnsupportedMessageTypeException(__CLASS__, SmsMessage::class, $message);
         }
 
-        $endpoint = sprintf('https://%s/v4/sms-send', $this->getEndpoint());
+        $endpoint = \sprintf('https://%s/v4/sms-send', $this->getEndpoint());
 
         $response = $this->client->request('POST', $endpoint, [
             'auth_bearer' => $this->authToken,
@@ -75,7 +75,7 @@ final class MailjetTransport extends AbstractTransport
             $errorMessage = $content['requestError']['serviceException']['messageId'] ?? '';
             $errorInfo = $content['requestError']['serviceException']['text'] ?? '';
 
-            throw new TransportException(sprintf('Unable to send the SMS: '.$errorMessage.' (%s).', $errorInfo), $response);
+            throw new TransportException(\sprintf('Unable to send the SMS: '.$errorMessage.' (%s).', $errorInfo), $response);
         }
 
         return new SentMessage($message, (string) $this);

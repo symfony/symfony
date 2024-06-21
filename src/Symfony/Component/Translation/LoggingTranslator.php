@@ -42,7 +42,7 @@ class LoggingTranslator implements TranslatorInterface, TranslatorBagInterface, 
             return;
         }
 
-        $this->logger->debug(sprintf('The locale of the translator has changed from "%s" to "%s".', $prev, $locale));
+        $this->logger->debug(\sprintf('The locale of the translator has changed from "%s" to "%s".', $prev, $locale));
     }
 
     public function getLocale(): string

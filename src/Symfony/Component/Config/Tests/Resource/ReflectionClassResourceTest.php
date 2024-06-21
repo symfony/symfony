@@ -94,7 +94,7 @@ EOPHP;
         static $expectedSignature, $generateSignature;
 
         if (null === $expectedSignature) {
-            eval(sprintf($code, $class = 'Foo'.str_replace('.', '_', uniqid('', true))));
+            eval(\sprintf($code, $class = 'Foo'.str_replace('.', '_', uniqid('', true))));
             $r = new \ReflectionClass(ReflectionClassResource::class);
             $generateSignature = $r->getMethod('generateSignature');
             $generateSignature = $generateSignature->getClosure($r->newInstanceWithoutConstructor());
@@ -105,7 +105,7 @@ EOPHP;
         if (null !== $changedCode) {
             $code[$changedLine] = $changedCode;
         }
-        eval(sprintf(implode("\n", $code), $class = 'Foo'.str_replace('.', '_', uniqid('', true))));
+        eval(\sprintf(implode("\n", $code), $class = 'Foo'.str_replace('.', '_', uniqid('', true))));
         $signature = implode("\n", iterator_to_array($generateSignature(new \ReflectionClass($class))));
 
         if ($changeExpected) {

@@ -99,7 +99,7 @@ class ProfilerController
         }
 
         if (!$profile->hasCollector($panel)) {
-            throw new NotFoundHttpException(sprintf('Panel "%s" is not available for token "%s".', $panel, $token));
+            throw new NotFoundHttpException(\sprintf('Panel "%s" is not available for token "%s".', $panel, $token));
         }
 
         return $this->renderWithCspNonces($request, $this->getTemplateManager()->getName($profile, $panel), [
@@ -336,12 +336,12 @@ class ProfilerController
     {
         $this->denyAccessIfProfilerDisabled();
         if ('JetBrainsMono' !== $fontName) {
-            throw new NotFoundHttpException(sprintf('Font file "%s.woff2" not found.', $fontName));
+            throw new NotFoundHttpException(\sprintf('Font file "%s.woff2" not found.', $fontName));
         }
 
         $fontFile = \dirname(__DIR__).'/Resources/fonts/'.$fontName.'.woff2';
         if (!is_file($fontFile) || !is_readable($fontFile)) {
-            throw new NotFoundHttpException(sprintf('Cannot read font file "%s".', $fontFile));
+            throw new NotFoundHttpException(\sprintf('Cannot read font file "%s".', $fontFile));
         }
 
         $this->profiler?->disable();
@@ -368,7 +368,7 @@ class ProfilerController
         $filename = $this->baseDir.\DIRECTORY_SEPARATOR.$file;
 
         if (preg_match("'(^|[/\\\\])\.'", $file) || !is_readable($filename)) {
-            throw new NotFoundHttpException(sprintf('The file "%s" cannot be opened.', $file));
+            throw new NotFoundHttpException(\sprintf('The file "%s" cannot be opened.', $file));
         }
 
         return $this->renderWithCspNonces($request, '@WebProfiler/Profiler/open.html.twig', [

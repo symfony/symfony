@@ -459,7 +459,7 @@ class CliDumper extends AbstractDumper
             $s = $startCchr;
             $c = $c[$i = 0];
             do {
-                $s .= $map[$c[$i]] ?? sprintf('\x%02X', \ord($c[$i]));
+                $s .= $map[$c[$i]] ?? \sprintf('\x%02X', \ord($c[$i]));
             } while (isset($c[++$i]));
 
             return $s.$endCchr;
@@ -552,7 +552,7 @@ class CliDumper extends AbstractDumper
     protected function dumpLine(int $depth, bool $endOfValue = false): void
     {
         if ($this->colors ??= $this->supportsColors()) {
-            $this->line = sprintf("\033[%sm%s\033[m", $this->styles['default'], $this->line);
+            $this->line = \sprintf("\033[%sm%s\033[m", $this->styles['default'], $this->line);
         }
         parent::dumpLine($depth);
     }
@@ -632,7 +632,7 @@ class CliDumper extends AbstractDumper
             || 'Hyper' === getenv('TERM_PROGRAM');
 
         if (!$result) {
-            $version = sprintf(
+            $version = \sprintf(
                 '%s.%s.%s',
                 PHP_WINDOWS_VERSION_MAJOR,
                 PHP_WINDOWS_VERSION_MINOR,

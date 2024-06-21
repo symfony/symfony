@@ -62,7 +62,7 @@ final class DkimSigner
     {
         $options += $this->defaultOptions;
         if (!\in_array($options['algorithm'], [self::ALGO_SHA256, self::ALGO_ED25519], true)) {
-            throw new InvalidArgumentException(sprintf('Invalid DKIM signing algorithm "%s".', $options['algorithm']));
+            throw new InvalidArgumentException(\sprintf('Invalid DKIM signing algorithm "%s".', $options['algorithm']));
         }
         $headersToIgnore['return-path'] = true;
         $headersToIgnore['x-transport'] = true;
@@ -119,7 +119,7 @@ final class DkimSigner
                 throw new RuntimeException('Unable to sign DKIM hash: '.openssl_error_string());
             }
         } else {
-            throw new \RuntimeException(sprintf('The "%s" DKIM signing algorithm is not supported yet.', self::ALGO_ED25519));
+            throw new \RuntimeException(\sprintf('The "%s" DKIM signing algorithm is not supported yet.', self::ALGO_ED25519));
         }
         $header->setValue($value.' b='.trim(chunk_split(base64_encode($signature), 73, ' ')));
         $headers->add($header);

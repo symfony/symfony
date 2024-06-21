@@ -63,14 +63,14 @@ class Acknowledger
     public function __destruct()
     {
         if (null !== $this->ack) {
-            throw new LogicException(sprintf('The acknowledger was not called by the "%s" batch handler.', $this->handlerClass));
+            throw new LogicException(\sprintf('The acknowledger was not called by the "%s" batch handler.', $this->handlerClass));
         }
     }
 
     private function doAck(?\Throwable $e = null, mixed $result = null): void
     {
         if (!$ack = $this->ack) {
-            throw new LogicException(sprintf('The acknowledger cannot be called twice by the "%s" batch handler.', $this->handlerClass));
+            throw new LogicException(\sprintf('The acknowledger cannot be called twice by the "%s" batch handler.', $this->handlerClass));
         }
         $this->ack = null;
         $this->error = $e;

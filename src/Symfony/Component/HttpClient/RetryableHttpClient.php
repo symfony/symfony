@@ -100,7 +100,7 @@ class RetryableHttpClient implements HttpClientInterface, ResetInterface
                 if ('' !== $context->getInfo('primary_ip')) {
                     $shouldRetry = $this->strategy->shouldRetry($context, null, $exception);
                     if (null === $shouldRetry) {
-                        throw new \LogicException(sprintf('The "%s::shouldRetry()" method must not return null when called with an exception.', $this->strategy::class));
+                        throw new \LogicException(\sprintf('The "%s::shouldRetry()" method must not return null when called with an exception.', $this->strategy::class));
                     }
 
                     if (false === $shouldRetry) {
@@ -131,7 +131,7 @@ class RetryableHttpClient implements HttpClientInterface, ResetInterface
                 }
 
                 if (null === $shouldRetry = $this->strategy->shouldRetry($context, $content, null)) {
-                    throw new \LogicException(sprintf('The "%s::shouldRetry()" method must not return null when called with a body.', $this->strategy::class));
+                    throw new \LogicException(\sprintf('The "%s::shouldRetry()" method must not return null when called with a body.', $this->strategy::class));
                 }
 
                 if (false === $shouldRetry) {

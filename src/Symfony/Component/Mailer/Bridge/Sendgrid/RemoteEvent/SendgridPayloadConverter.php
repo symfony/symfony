@@ -39,13 +39,13 @@ final class SendgridPayloadConverter implements PayloadConverterInterface
                 'unsubscribe' => MailerEngagementEvent::UNSUBSCRIBE,
                 'open' => MailerEngagementEvent::OPEN,
                 'spamreport' => MailerEngagementEvent::SPAM,
-                default => throw new ParseException(sprintf('Unsupported event "%s".', $payload['unsubscribe'])),
+                default => throw new ParseException(\sprintf('Unsupported event "%s".', $payload['unsubscribe'])),
             };
             $event = new MailerEngagementEvent($name, $payload['sg_message_id'], $payload);
         }
 
         if (!$date = \DateTimeImmutable::createFromFormat('U', $payload['timestamp'])) {
-            throw new ParseException(sprintf('Invalid date "%s".', $payload['timestamp']));
+            throw new ParseException(\sprintf('Invalid date "%s".', $payload['timestamp']));
         }
 
         $event->setDate($date);

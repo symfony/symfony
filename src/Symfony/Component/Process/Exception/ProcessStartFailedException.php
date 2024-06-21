@@ -26,7 +26,7 @@ class ProcessStartFailedException extends ProcessFailedException
             throw new InvalidArgumentException('Expected a process that failed during startup, but the given process was started successfully.');
         }
 
-        $error = sprintf('The command "%s" failed.'."\n\nWorking directory: %s\n\nError: %s",
+        $error = \sprintf('The command "%s" failed.'."\n\nWorking directory: %s\n\nError: %s",
             $process->getCommandLine(),
             $process->getWorkingDirectory(),
             $message ?? 'unknown'

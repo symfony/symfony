@@ -622,7 +622,7 @@ class MessengerPassTest extends TestCase
     public function testUnionBuiltinArgumentTypeHandler()
     {
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage(sprintf('Invalid handler service "%s": type-hint of argument "$message" in method "%s::__invoke()" must be a class , "string|int" given.', UnionBuiltinTypeArgumentHandler::class, UnionBuiltinTypeArgumentHandler::class));
+        $this->expectExceptionMessage(\sprintf('Invalid handler service "%s": type-hint of argument "$message" in method "%s::__invoke()" must be a class , "string|int" given.', UnionBuiltinTypeArgumentHandler::class, UnionBuiltinTypeArgumentHandler::class));
         $container = $this->getContainerBuilder();
         $container
             ->register(UnionBuiltinTypeArgumentHandler::class, UnionBuiltinTypeArgumentHandler::class)
@@ -800,7 +800,7 @@ class MessengerPassTest extends TestCase
             unset($tagAttributes['fromTransport']);
             if ($reflector instanceof \ReflectionMethod) {
                 if (isset($tagAttributes['method'])) {
-                    throw new LogicException(sprintf('AsMessageHandler attribute cannot declare a method on "%s::%s()".', $reflector->class, $reflector->name));
+                    throw new LogicException(\sprintf('AsMessageHandler attribute cannot declare a method on "%s::%s()".', $reflector->class, $reflector->name));
                 }
                 $tagAttributes['method'] = $reflector->getName();
             }

@@ -41,10 +41,10 @@ class FlockStore implements BlockingStoreInterface, SharedLockStoreInterface
     {
         if (!is_dir($lockPath ??= sys_get_temp_dir())) {
             if (false === @mkdir($lockPath, 0777, true) && !is_dir($lockPath)) {
-                throw new InvalidArgumentException(sprintf('The FlockStore directory "%s" does not exists and cannot be created.', $lockPath));
+                throw new InvalidArgumentException(\sprintf('The FlockStore directory "%s" does not exists and cannot be created.', $lockPath));
             }
         } elseif (!is_writable($lockPath)) {
-            throw new InvalidArgumentException(sprintf('The FlockStore directory "%s" is not writable.', $lockPath));
+            throw new InvalidArgumentException(\sprintf('The FlockStore directory "%s" is not writable.', $lockPath));
         }
 
         $this->lockPath = $lockPath;
@@ -83,7 +83,7 @@ class FlockStore implements BlockingStoreInterface, SharedLockStoreInterface
         }
 
         if (!$handle) {
-            $fileName = sprintf('%s/sf.%s.%s.lock',
+            $fileName = \sprintf('%s/sf.%s.%s.lock',
                 $this->lockPath,
                 substr(preg_replace('/[^a-z0-9\._-]+/i', '-', $key), 0, 50),
                 strtr(substr(base64_encode(hash('sha256', $key, true)), 0, 7), '/', '_')

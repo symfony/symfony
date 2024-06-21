@@ -53,7 +53,7 @@ class RouterDebugCommand extends Command
                 new InputArgument('name', InputArgument::OPTIONAL, 'A route name'),
                 new InputOption('show-controllers', null, InputOption::VALUE_NONE, 'Show assigned controllers in overview'),
                 new InputOption('show-aliases', null, InputOption::VALUE_NONE, 'Show aliases in overview'),
-                new InputOption('format', null, InputOption::VALUE_REQUIRED, sprintf('The output format ("%s")', implode('", "', $this->getAvailableFormatOptions())), 'txt'),
+                new InputOption('format', null, InputOption::VALUE_REQUIRED, \sprintf('The output format ("%s")', implode('", "', $this->getAvailableFormatOptions())), 'txt'),
                 new InputOption('raw', null, InputOption::VALUE_NONE, 'To output raw route(s)'),
             ])
             ->setHelp(<<<'EOF'
@@ -103,7 +103,7 @@ EOF
             }
 
             if (!$route) {
-                throw new InvalidArgumentException(sprintf('The route "%s" does not exist.', $name));
+                throw new InvalidArgumentException(\sprintf('The route "%s" does not exist.', $name));
             }
 
             $helper->describe($io, $route, [

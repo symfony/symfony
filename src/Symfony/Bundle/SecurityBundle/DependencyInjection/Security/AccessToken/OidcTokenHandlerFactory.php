@@ -79,7 +79,7 @@ class OidcTokenHandlerFactory implements TokenHandlerFactoryInterface
                         if (isset($v['keyset'])) {
                             throw new InvalidConfigurationException('You cannot use both "key" and "keyset" at the same time.');
                         }
-                        $v['keyset'] = sprintf('{"keys":[%s]}', $v['key']);
+                        $v['keyset'] = \sprintf('{"keys":[%s]}', $v['key']);
 
                         return $v;
                     })

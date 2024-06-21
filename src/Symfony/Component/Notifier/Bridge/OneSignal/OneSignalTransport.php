@@ -42,10 +42,10 @@ final class OneSignalTransport extends AbstractTransport
     public function __toString(): string
     {
         if (null === $this->defaultRecipientId) {
-            return sprintf('onesignal://%s@%s', urlencode($this->appId), $this->getEndpoint());
+            return \sprintf('onesignal://%s@%s', urlencode($this->appId), $this->getEndpoint());
         }
 
-        return sprintf('onesignal://%s@%s?recipientId=%s', urlencode($this->appId), $this->getEndpoint(), $this->defaultRecipientId);
+        return \sprintf('onesignal://%s@%s?recipientId=%s', urlencode($this->appId), $this->getEndpoint(), $this->defaultRecipientId);
     }
 
     public function supports(MessageInterface $message): bool
@@ -69,7 +69,7 @@ final class OneSignalTransport extends AbstractTransport
         $recipientId = $message->getRecipientId() ?? $this->defaultRecipientId;
 
         if (null === $recipientId) {
-            throw new LogicException(sprintf('The "%s" transport should have configured `defaultRecipientId` via DSN or provided with message options.', __CLASS__));
+            throw new LogicException(\sprintf('The "%s" transport should have configured `defaultRecipientId` via DSN or provided with message options.', __CLASS__));
         }
 
         $options = $options?->toArray() ?? [];
@@ -101,13 +101,13 @@ final class OneSignalTransport extends AbstractTransport
         }
 
         if (200 !== $statusCode) {
-            throw new TransportException(sprintf('Unable to send the OneSignal push notification: "%s".', $response->getContent(false)), $response);
+            throw new TransportException(\sprintf('Unable to send the OneSignal push notification: "%s".', $response->getContent(false)), $response);
         }
 
         $result = $response->toArray(false);
 
         if (empty($result['id'])) {
-            throw new TransportException(sprintf('Unable to send the OneSignal push notification: "%s".', $response->getContent(false)), $response);
+            throw new TransportException(\sprintf('Unable to send the OneSignal push notification: "%s".', $response->getContent(false)), $response);
         }
 
         $sentMessage = new SentMessage($message, (string) $this);

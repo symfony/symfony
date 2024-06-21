@@ -177,7 +177,7 @@ class MappedAssetFactoryTest extends TestCase
                 } elseif (str_contains($sourcePath, 'circular_dir')) {
                     $logicalPath = substr($sourcePath, strpos($sourcePath, 'circular_dir') + 13);
                 } else {
-                    throw new \RuntimeException(sprintf('Could not find asset "%s".', $sourcePath));
+                    throw new \RuntimeException(\sprintf('Could not find asset "%s".', $sourcePath));
                 }
 
                 return $factory->createMappedAsset($logicalPath, $sourcePath);

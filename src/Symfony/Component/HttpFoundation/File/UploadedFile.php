@@ -194,7 +194,7 @@ class UploadedFile extends File
                 restore_error_handler();
             }
             if (!$moved) {
-                throw new FileException(sprintf('Could not move the file "%s" to "%s" (%s).', $this->getPathname(), $target, strip_tags($error)));
+                throw new FileException(\sprintf('Could not move the file "%s" to "%s" (%s).', $this->getPathname(), $target, strip_tags($error)));
             }
 
             @chmod($target, 0666 & ~umask());
@@ -284,6 +284,6 @@ class UploadedFile extends File
         $maxFilesize = \UPLOAD_ERR_INI_SIZE === $errorCode ? self::getMaxFilesize() / 1024 : 0;
         $message = $errors[$errorCode] ?? 'The file "%s" was not uploaded due to an unknown error.';
 
-        return sprintf($message, $this->getClientOriginalName(), $maxFilesize);
+        return \sprintf($message, $this->getClientOriginalName(), $maxFilesize);
     }
 }

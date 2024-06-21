@@ -24,7 +24,7 @@ final class CrawlerSelectorExists extends Constraint
 
     public function toString(): string
     {
-        return sprintf('matches selector "%s"', $this->selector);
+        return \sprintf('matches selector "%s"', $this->selector);
     }
 
     /**

@@ -63,16 +63,16 @@ EOF
         $cachePool = $this->poolClearer->getPool($pool);
 
         if (!$cachePool->hasItem($key)) {
-            $io->note(sprintf('Cache item "%s" does not exist in cache pool "%s".', $key, $pool));
+            $io->note(\sprintf('Cache item "%s" does not exist in cache pool "%s".', $key, $pool));
 
             return 0;
         }
 
         if (!$cachePool->deleteItem($key)) {
-            throw new \Exception(sprintf('Cache item "%s" could not be deleted.', $key));
+            throw new \Exception(\sprintf('Cache item "%s" could not be deleted.', $key));
         }
 
-        $io->success(sprintf('Cache item "%s" was successfully deleted.', $key));
+        $io->success(\sprintf('Cache item "%s" was successfully deleted.', $key));
 
         return 0;
     }

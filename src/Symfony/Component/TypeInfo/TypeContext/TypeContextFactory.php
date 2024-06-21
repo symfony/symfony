@@ -118,7 +118,7 @@ final class TypeContextFactory
         }
 
         if (false === $lines = @file($fileName)) {
-            throw new RuntimeException(sprintf('Unable to read file "%s".', $fileName));
+            throw new RuntimeException(\sprintf('Unable to read file "%s".', $fileName));
         }
 
         $uses = [];

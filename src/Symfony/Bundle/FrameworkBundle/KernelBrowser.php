@@ -103,11 +103,11 @@ class KernelBrowser extends HttpKernelBrowser
     public function loginUser(object $user, string $firewallContext = 'main', array $tokenAttributes = []): static
     {
         if (!interface_exists(UserInterface::class)) {
-            throw new \LogicException(sprintf('"%s" requires symfony/security-core to be installed. Try running "composer require symfony/security-core".', __METHOD__));
+            throw new \LogicException(\sprintf('"%s" requires symfony/security-core to be installed. Try running "composer require symfony/security-core".', __METHOD__));
         }
 
         if (!$user instanceof UserInterface) {
-            throw new \LogicException(sprintf('The first argument of "%s" must be instance of "%s", "%s" provided.', __METHOD__, UserInterface::class, get_debug_type($user)));
+            throw new \LogicException(\sprintf('The first argument of "%s" must be instance of "%s", "%s" provided.', __METHOD__, UserInterface::class, get_debug_type($user)));
         }
 
         $token = new TestBrowserToken($user->getRoles(), $user, $firewallContext);

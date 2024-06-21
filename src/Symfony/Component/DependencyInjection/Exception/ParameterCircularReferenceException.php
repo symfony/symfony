@@ -22,7 +22,7 @@ class ParameterCircularReferenceException extends RuntimeException
         private array $parameters,
         ?\Throwable $previous = null,
     ) {
-        parent::__construct(sprintf('Circular reference detected for parameter "%s" ("%s" > "%s").', $parameters[0], implode('" > "', $parameters), $parameters[0]), 0, $previous);
+        parent::__construct(\sprintf('Circular reference detected for parameter "%s" ("%s" > "%s").', $parameters[0], implode('" > "', $parameters), $parameters[0]), 0, $previous);
     }
 
     public function getParameters(): array

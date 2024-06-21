@@ -40,7 +40,7 @@ final class FortySixElksTransport extends AbstractTransport
 
     public function __toString(): string
     {
-        return sprintf('forty-six-elks://%s?from=%s', $this->getEndpoint(), $this->from);
+        return \sprintf('forty-six-elks://%s?from=%s', $this->getEndpoint(), $this->from);
     }
 
     public function supports(MessageInterface $message): bool
@@ -59,7 +59,7 @@ final class FortySixElksTransport extends AbstractTransport
         $options['to'] = $message->getPhone();
         $options['message'] = $message->getSubject();
 
-        $endpoint = sprintf('https://%s/a1/sms', $this->getEndpoint());
+        $endpoint = \sprintf('https://%s/a1/sms', $this->getEndpoint());
         $response = $this->client->request('POST', $endpoint, [
             'auth_basic' => [$this->apiUsername, $this->apiPassword],
             'body' => array_filter($options),

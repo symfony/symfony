@@ -128,9 +128,9 @@ class UnusedTagsPass implements CompilerPassInterface
             }
 
             $services = array_keys($container->findTaggedServiceIds($tag));
-            $message = sprintf('Tag "%s" was defined on service(s) "%s", but was never used.', $tag, implode('", "', $services));
+            $message = \sprintf('Tag "%s" was defined on service(s) "%s", but was never used.', $tag, implode('", "', $services));
             if ($candidates) {
-                $message .= sprintf(' Did you mean "%s"?', implode('", "', $candidates));
+                $message .= \sprintf(' Did you mean "%s"?', implode('", "', $candidates));
             }
 
             $container->log($this, $message);

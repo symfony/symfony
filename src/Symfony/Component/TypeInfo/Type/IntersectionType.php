@@ -52,7 +52,7 @@ final class IntersectionType extends Type
      */
     public function getBaseType(): BuiltinType|ObjectType
     {
-        throw new LogicException(sprintf('Cannot get base type on "%s" compound type.', $this));
+        throw new LogicException(\sprintf('Cannot get base type on "%s" compound type.', $this));
     }
 
     /**
@@ -61,7 +61,7 @@ final class IntersectionType extends Type
     public function asNonNullable(): self
     {
         if ($this->isNullable()) {
-            throw new LogicException(sprintf('"%s cannot be turned as non nullable.', (string) $this));
+            throw new LogicException(\sprintf('"%s cannot be turned as non nullable.', (string) $this));
         }
 
         return $this;

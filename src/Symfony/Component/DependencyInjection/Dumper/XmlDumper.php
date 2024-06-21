@@ -422,9 +422,9 @@ class XmlDumper extends Dumper
             case $value instanceof Parameter:
                 return '%'.$value.'%';
             case $value instanceof \UnitEnum:
-                return sprintf('%s::%s', $value::class, $value->name);
+                return \sprintf('%s::%s', $value::class, $value->name);
             case \is_object($value) || \is_resource($value):
-                throw new RuntimeException(sprintf('Unable to dump a service container if a parameter is an object or a resource, got "%s".', get_debug_type($value)));
+                throw new RuntimeException(\sprintf('Unable to dump a service container if a parameter is an object or a resource, got "%s".', get_debug_type($value)));
             default:
                 return (string) $value;
         }

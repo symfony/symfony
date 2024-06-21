@@ -35,7 +35,7 @@ class RemoveEmptyControllerArgumentLocatorsPass implements CompilerPassInterface
 
             if (!$argumentLocator->getArgument(0)) {
                 // remove empty argument locators
-                $reason = sprintf('Removing service-argument resolver for controller "%s": no corresponding services exist for the referenced types.', $controller);
+                $reason = \sprintf('Removing service-argument resolver for controller "%s": no corresponding services exist for the referenced types.', $controller);
             } else {
                 // any methods listed for call-at-instantiation cannot be actions
                 $reason = false;
@@ -48,7 +48,7 @@ class RemoveEmptyControllerArgumentLocatorsPass implements CompilerPassInterface
                 $controllerDef = $container->getDefinition($id);
                 foreach ($controllerDef->getMethodCalls() as [$method]) {
                     if (0 === strcasecmp($action, $method)) {
-                        $reason = sprintf('Removing method "%s" of service "%s" from controller candidates: the method is called at instantiation, thus cannot be an action.', $action, $id);
+                        $reason = \sprintf('Removing method "%s" of service "%s" from controller candidates: the method is called at instantiation, thus cannot be an action.', $action, $id);
                         break;
                     }
                 }

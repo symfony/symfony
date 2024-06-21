@@ -31,7 +31,7 @@ class SerializedPath
         try {
             $this->serializedPath = new PropertyPath($serializedPath);
         } catch (InvalidPropertyPathException $pathException) {
-            throw new InvalidArgumentException(sprintf('Parameter given to "%s" must be a valid property path.', self::class));
+            throw new InvalidArgumentException(\sprintf('Parameter given to "%s" must be a valid property path.', self::class));
         }
     }
 

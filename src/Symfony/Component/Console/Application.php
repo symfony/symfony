@@ -262,9 +262,9 @@ class Application implements ResetInterface
 
                 $style = new SymfonyStyle($input, $output);
                 $output->writeln('');
-                $formattedBlock = (new FormatterHelper())->formatBlock(sprintf('Command "%s" is not defined.', $name), 'error', true);
+                $formattedBlock = (new FormatterHelper())->formatBlock(\sprintf('Command "%s" is not defined.', $name), 'error', true);
                 $output->writeln($formattedBlock);
-                if (!$style->confirm(sprintf('Do you want to run "%s" instead? ', $alternative), false)) {
+                if (!$style->confirm(\sprintf('Do you want to run "%s" instead? ', $alternative), false)) {
                     if (null !== $this->dispatcher) {
                         $event = new ConsoleErrorEvent($input, $output, $e);
                         $this->dispatcher->dispatch($event, ConsoleEvents::ERROR);
@@ -475,7 +475,7 @@ class Application implements ResetInterface
     {
         if ('UNKNOWN' !== $this->getName()) {
             if ('UNKNOWN' !== $this->getVersion()) {
-                return sprintf('%s <info>%s</info>', $this->getName(), $this->getVersion());
+                return \sprintf('%s <info>%s</info>', $this->getName(), $this->getVersion());
             }
 
             return $this->getName();
@@ -530,7 +530,7 @@ class Application implements ResetInterface
         }
 
         if (!$command->getName()) {
-            throw new LogicException(sprintf('The command defined in "%s" cannot have an empty name.', get_debug_type($command)));
+            throw new LogicException(\sprintf('The command defined in "%s" cannot have an empty name.', get_debug_type($command)));
         }
 
         $this->commands[$command->getName()] = $command;
@@ -552,12 +552,12 @@ class Application implements ResetInterface
         $this->init();
 
         if (!$this->has($name)) {
-            throw new CommandNotFoundException(sprintf('The command "%s" does not exist.', $name));
+            throw new CommandNotFoundException(\sprintf('The command "%s" does not exist.', $name));
         }
 
         // When the command has a different name than the one used at the command loader level
         if (!isset($this->commands[$name])) {
-            throw new CommandNotFoundException(sprintf('The "%s" command cannot be found because it is registered under multiple names. Make sure you don\'t set a different name via constructor or "setName()".', $name));
+            throw new CommandNotFoundException(\sprintf('The "%s" command cannot be found because it is registered under multiple names. Make sure you don\'t set a different name via constructor or "setName()".', $name));
         }
 
         $command = $this->commands[$name];
@@ -621,7 +621,7 @@ class Application implements ResetInterface
         $namespaces = preg_grep('{^'.$expr.'}', $allNamespaces);
 
         if (!$namespaces) {
-            $message = sprintf('There are no commands defined in the "%s" namespace.', $namespace);
+            $message = \sprintf('There are no commands defined in the "%s" namespace.', $namespace);
 
             if ($alternatives = $this->findAlternatives($namespace, $allNamespaces)) {
                 if (1 == \count($alternatives)) {
@@ -638,7 +638,7 @@ class Application implements ResetInterface
 
         $exact = \in_array($namespace, $namespaces, true);
         if (\count($namespaces) > 1 && !$exact) {
-            throw new NamespaceNotFoundException(sprintf("The namespace \"%s\" is ambiguous.\nDid you mean one of these?\n%s.", $namespace, $this->getAbbreviationSuggestions(array_values($namespaces))), array_values($namespaces));
+            throw new NamespaceNotFoundException(\sprintf("The namespace \"%s\" is ambiguous.\nDid you mean one of these?\n%s.", $namespace, $this->getAbbreviationSuggestions(array_values($namespaces))), array_values($namespaces));
         }
 
         return $exact ? $namespace : reset($namespaces);
@@ -685,7 +685,7 @@ class Application implements ResetInterface
                 $this->findNamespace(substr($name, 0, $pos));
             }
 
-            $message = sprintf('Command "%s" is not defined.', $name);
+            $message = \sprintf('Command "%s" is not defined.', $name);
 
             if ($alternatives = $this->findAlternatives($name, $allCommands)) {
                 // remove hidden commands
@@ -740,14 +740,14 @@ class Application implements ResetInterface
             if (\count($commands) > 1) {
                 $suggestions = $this->getAbbreviationSuggestions(array_filter($abbrevs));
 
-                throw new CommandNotFoundException(sprintf("Command \"%s\" is ambiguous.\nDid you mean one of these?\n%s.", $name, $suggestions), array_values($commands));
+                throw new CommandNotFoundException(\sprintf("Command \"%s\" is ambiguous.\nDid you mean one of these?\n%s.", $name, $suggestions), array_values($commands));
             }
         }
 
         $command = $this->get(reset($commands));
 
         if ($command->isHidden()) {
-            throw new CommandNotFoundException(sprintf('The command "%s" does not exist.', $name));
+            throw new CommandNotFoundException(\sprintf('The command "%s" does not exist.', $name));
         }
 
         return $command;
@@ -822,7 +822,7 @@ class Application implements ResetInterface
         $this->doRenderThrowable($e, $output);
 
         if (null !== $this->runningCommand) {
-            $output->writeln(sprintf('<info>%s</info>', OutputFormatter::escape(sprintf($this->runningCommand->getSynopsis(), $this->getName()))), OutputInterface::VERBOSITY_QUIET);
+            $output->writeln(\sprintf('<info>%s</info>', OutputFormatter::escape(\sprintf($this->runningCommand->getSynopsis(), $this->getName()))), OutputInterface::VERBOSITY_QUIET);
             $output->writeln('', OutputInterface::VERBOSITY_QUIET);
         }
     }
@@ -833,7 +833,7 @@ class Application implements ResetInterface
             $message = trim($e->getMessage());
             if ('' === $message || OutputInterface::VERBOSITY_VERBOSE <= $output->getVerbosity()) {
                 $class = get_debug_type($e);
-                $title = sprintf('  [%s%s]  ', $class, 0 !== ($code = $e->getCode()) ? ' ('.$code.')' : '');
+                $title = \sprintf('  [%s%s]  ', $class, 0 !== ($code = $e->getCode()) ? ' ('.$code.')' : '');
                 $len = Helper::width($title);
             } else {
                 $len = 0;
@@ -857,14 +857,14 @@ class Application implements ResetInterface
 
             $messages = [];
             if (!$e instanceof ExceptionInterface || OutputInterface::VERBOSITY_VERBOSE <= $output->getVerbosity()) {
-                $messages[] = sprintf('<comment>%s</comment>', OutputFormatter::escape(sprintf('In %s line %s:', basename($e->getFile()) ?: 'n/a', $e->getLine() ?: 'n/a')));
+                $messages[] = \sprintf('<comment>%s</comment>', OutputFormatter::escape(\sprintf('In %s line %s:', basename($e->getFile()) ?: 'n/a', $e->getLine() ?: 'n/a')));
             }
-            $messages[] = $emptyLine = sprintf('<error>%s</error>', str_repeat(' ', $len));
+            $messages[] = $emptyLine = \sprintf('<error>%s</error>', str_repeat(' ', $len));
             if ('' === $message || OutputInterface::VERBOSITY_VERBOSE <= $output->getVerbosity()) {
-                $messages[] = sprintf('<error>%s%s</error>', $title, str_repeat(' ', max(0, $len - Helper::width($title))));
+                $messages[] = \sprintf('<error>%s%s</error>', $title, str_repeat(' ', max(0, $len - Helper::width($title))));
             }
             foreach ($lines as $line) {
-                $messages[] = sprintf('<error>  %s  %s</error>', OutputFormatter::escape($line[0]), str_repeat(' ', $len - $line[1]));
+                $messages[] = \sprintf('<error>  %s  %s</error>', OutputFormatter::escape($line[0]), str_repeat(' ', $len - $line[1]));
             }
             $messages[] = $emptyLine;
             $messages[] = '';
@@ -891,7 +891,7 @@ class Application implements ResetInterface
                     $file = $trace[$i]['file'] ?? 'n/a';
                     $line = $trace[$i]['line'] ?? 'n/a';
 
-                    $output->writeln(sprintf(' %s%s at <info>%s:%s</info>', $class, $function ? $type.$function.'()' : '', $file, $line), OutputInterface::VERBOSITY_QUIET);
+                    $output->writeln(\sprintf(' %s%s at <info>%s:%s</info>', $class, $function ? $type.$function.'()' : '', $file, $line), OutputInterface::VERBOSITY_QUIET);
                 }
 
                 $output->writeln('', OutputInterface::VERBOSITY_QUIET);

@@ -66,14 +66,14 @@ class AddScheduleMessengerPass implements CompilerPassInterface
 
                 $taskArguments = [
                     '$message' => $message,
-                ] + array_filter(match ($tagAttributes['trigger'] ?? throw new InvalidArgumentException(sprintf('Tag "scheduler.task" is missing attribute "trigger" on service "%s".', $serviceId))) {
+                ] + array_filter(match ($tagAttributes['trigger'] ?? throw new InvalidArgumentException(\sprintf('Tag "scheduler.task" is missing attribute "trigger" on service "%s".', $serviceId))) {
                     'every' => [
-                        '$frequency' => $tagAttributes['frequency'] ?? throw new InvalidArgumentException(sprintf('Tag "scheduler.task" is missing attribute "frequency" on service "%s".', $serviceId)),
+                        '$frequency' => $tagAttributes['frequency'] ?? throw new InvalidArgumentException(\sprintf('Tag "scheduler.task" is missing attribute "frequency" on service "%s".', $serviceId)),
                         '$from' => $tagAttributes['from'] ?? null,
                         '$until' => $tagAttributes['until'] ?? null,
                     ],
                     'cron' => [
-                        '$expression' => $tagAttributes['expression'] ?? throw new InvalidArgumentException(sprintf('Tag "scheduler.task" is missing attribute "expression" on service "%s".', $serviceId)),
+                        '$expression' => $tagAttributes['expression'] ?? throw new InvalidArgumentException(\sprintf('Tag "scheduler.task" is missing attribute "expression" on service "%s".', $serviceId)),
                         '$timezone' => $tagAttributes['timezone'] ?? null,
                     ],
                 }, fn ($value) => null !== $value);

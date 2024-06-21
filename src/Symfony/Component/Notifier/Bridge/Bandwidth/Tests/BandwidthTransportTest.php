@@ -49,7 +49,7 @@ final class BandwidthTransportTest extends TransportTestCase
         $transport = $this->createTransport(null, $from);
 
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage(sprintf('The "From" number "%s" is not a valid phone number. The number must be in E.164 format.', $from));
+        $this->expectExceptionMessage(\sprintf('The "From" number "%s" is not a valid phone number. The number must be in E.164 format.', $from));
 
         $transport->send(new SmsMessage('+33612345678', 'Hello!'));
     }

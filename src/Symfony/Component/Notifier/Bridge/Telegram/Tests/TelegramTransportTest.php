@@ -848,7 +848,7 @@ final class TelegramTransportTest extends TransportTestCase
 
                 BODY;
             $expectedBody = str_replace("\n", "\r\n", $expectedBody);
-            $expectedBody = sprintf($expectedBody, file_get_contents(self::FIXTURE_FILE));
+            $expectedBody = \sprintf($expectedBody, file_get_contents(self::FIXTURE_FILE));
 
             $body = '';
             do {

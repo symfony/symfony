@@ -23,7 +23,7 @@ final class ProcessSignaledException extends RuntimeException
     public function __construct(
         private Process $process,
     ) {
-        parent::__construct(sprintf('The process has been signaled with signal "%s".', $process->getTermSignal()));
+        parent::__construct(\sprintf('The process has been signaled with signal "%s".', $process->getTermSignal()));
     }
 
     public function getProcess(): Process

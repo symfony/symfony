@@ -90,7 +90,7 @@ abstract class TransportTestCase extends TestCase
 
         $transport->setHost($customHost = self::CUSTOM_HOST);
 
-        $this->assertMatchesRegularExpression(sprintf('/^.*\:\/\/(%s|.*\@%s)/', $customHost, $customHost), (string) $transport);
+        $this->assertMatchesRegularExpression(\sprintf('/^.*\:\/\/(%s|.*\@%s)/', $customHost, $customHost), (string) $transport);
     }
 
     public function testCanSetCustomPort()
@@ -102,7 +102,7 @@ abstract class TransportTestCase extends TestCase
         /*
          * @see https://regex101.com/r/shT9O2/1
          */
-        $this->assertMatchesRegularExpression(sprintf('/^.*\:\/\/.*(\@.*)?\:%s((\?.*|\/.*))?$/', $customPort), (string) $transport);
+        $this->assertMatchesRegularExpression(\sprintf('/^.*\:\/\/.*(\@.*)?\:%s((\?.*|\/.*))?$/', $customPort), (string) $transport);
     }
 
     public function testCanSetCustomHostAndPort()
@@ -112,6 +112,6 @@ abstract class TransportTestCase extends TestCase
         $transport->setHost($customHost = self::CUSTOM_HOST);
         $transport->setPort($customPort = self::CUSTOM_PORT);
 
-        $this->assertMatchesRegularExpression(sprintf('/^.*\:\/\/(%s|.*\@%s)\:%s/', $customHost, $customHost, $customPort), (string) $transport);
+        $this->assertMatchesRegularExpression(\sprintf('/^.*\:\/\/(%s|.*\@%s)\:%s/', $customHost, $customHost, $customPort), (string) $transport);
     }
 }

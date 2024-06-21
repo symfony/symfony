@@ -23,7 +23,7 @@ final class ExcludeTimeTrigger extends AbstractDecoratedTrigger
 
     public function __toString(): string
     {
-        return sprintf('%s, from: %s, until: %s', $this->inner, $this->from->format(\DateTimeInterface::ATOM), $this->until->format(\DateTimeInterface::ATOM));
+        return \sprintf('%s, from: %s, until: %s', $this->inner, $this->from->format(\DateTimeInterface::ATOM), $this->until->format(\DateTimeInterface::ATOM));
     }
 
     public function getNextRunDate(\DateTimeImmutable $run): ?\DateTimeImmutable

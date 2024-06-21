@@ -111,7 +111,7 @@ final class ResendRequestParser extends AbstractRequestParser
 
     private function sign(string $secret, string $messageId, int $timestamp, string $payload): string
     {
-        $toSign = sprintf('%s.%s.%s', $messageId, $timestamp, $payload);
+        $toSign = \sprintf('%s.%s.%s', $messageId, $timestamp, $payload);
         $hash = hash_hmac('sha256', $toSign, $secret);
         $signature = base64_encode(pack('H*', $hash));
 

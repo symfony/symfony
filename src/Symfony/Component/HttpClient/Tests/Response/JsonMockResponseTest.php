@@ -118,7 +118,7 @@ final class JsonMockResponseTest extends TestCase
         $path = __DIR__.'/Fixtures/invalid_json.json';
 
         $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage(sprintf('File "%s" does not contain valid JSON.', $path));
+        $this->expectExceptionMessage(\sprintf('File "%s" does not contain valid JSON.', $path));
 
         JsonMockResponse::fromFile($path);
     }

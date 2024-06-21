@@ -36,9 +36,9 @@ class DelayedMessageHandlingException extends RuntimeException implements Wrappe
         ));
 
         if (1 === \count($exceptions)) {
-            $message = sprintf("A delayed message handler threw an exception: \n\n%s", $exceptionMessages);
+            $message = \sprintf("A delayed message handler threw an exception: \n\n%s", $exceptionMessages);
         } else {
-            $message = sprintf("Some delayed message handlers threw an exception: \n\n%s", $exceptionMessages);
+            $message = \sprintf("Some delayed message handlers threw an exception: \n\n%s", $exceptionMessages);
         }
 
         parent::__construct($message, 0, $exceptions[array_key_first($exceptions)]);

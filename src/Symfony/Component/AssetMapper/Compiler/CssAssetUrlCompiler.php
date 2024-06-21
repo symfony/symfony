@@ -39,14 +39,14 @@ final class CssAssetUrlCompiler implements AssetCompilerInterface
             try {
                 $resolvedSourcePath = Path::join(\dirname($asset->sourcePath), $matches[1]);
             } catch (RuntimeException $e) {
-                $this->handleMissingImport(sprintf('Error processing import in "%s": ', $asset->sourcePath).$e->getMessage(), $e);
+                $this->handleMissingImport(\sprintf('Error processing import in "%s": ', $asset->sourcePath).$e->getMessage(), $e);
 
                 return $matches[0];
             }
             $dependentAsset = $assetMapper->getAssetFromSourcePath($resolvedSourcePath);
 
             if (null === $dependentAsset) {
-                $message = sprintf('Unable to find asset "%s" referenced in "%s". The file "%s" ', $matches[1], $asset->sourcePath, $resolvedSourcePath);
+                $message = \sprintf('Unable to find asset "%s" referenced in "%s". The file "%s" ', $matches[1], $asset->sourcePath, $resolvedSourcePath);
                 if (is_file($resolvedSourcePath)) {
                     $message .= 'exists, but it is not in a mapped asset path. Add it to the "paths" config.';
                 } else {

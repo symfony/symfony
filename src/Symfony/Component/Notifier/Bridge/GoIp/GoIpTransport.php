@@ -42,7 +42,7 @@ final class GoIpTransport extends AbstractTransport
 
     public function __toString(): string
     {
-        return sprintf('goip://%s?sim_slot=%s', $this->getEndpoint(), $this->simSlot);
+        return \sprintf('goip://%s?sim_slot=%s', $this->getEndpoint(), $this->simSlot);
     }
 
     public function supports(MessageInterface $message): bool
@@ -63,11 +63,11 @@ final class GoIpTransport extends AbstractTransport
         }
 
         if (($options = $message->getOptions()) && !$options instanceof GoIpOptions) {
-            throw new LogicException(sprintf('The "%s" transport only supports an instance of the "%s" as an option class.', __CLASS__, GoIpOptions::class));
+            throw new LogicException(\sprintf('The "%s" transport only supports an instance of the "%s" as an option class.', __CLASS__, GoIpOptions::class));
         }
 
         if ('' !== $message->getFrom()) {
-            throw new LogicException(sprintf('The "%s" transport does not support the "From" option.', __CLASS__));
+            throw new LogicException(\sprintf('The "%s" transport does not support the "From" option.', __CLASS__));
         }
 
         $response = $this->client->request('GET', $this->getEndpoint(), [
@@ -87,15 +87,15 @@ final class GoIpTransport extends AbstractTransport
         }
 
         if (200 !== $statusCode) {
-            throw new TransportException(sprintf('The GoIP gateway has responded with a wrong http_code: "%s" on the address: "%s".', $statusCode, $this->getEndpoint()), $response);
+            throw new TransportException(\sprintf('The GoIP gateway has responded with a wrong http_code: "%s" on the address: "%s".', $statusCode, $this->getEndpoint()), $response);
         }
 
         if (str_contains(strtolower($response->getContent()), 'error') || !str_contains(strtolower($response->getContent()), 'sending')) {
-            throw new TransportException(sprintf('Could not send the message through GoIP. Response: "%s".', $response->getContent()), $response);
+            throw new TransportException(\sprintf('Could not send the message through GoIP. Response: "%s".', $response->getContent()), $response);
         }
 
         if (!$messageId = $this->extractMessageIdFromContent($response->getContent())) {
-            throw new TransportException(sprintf('Could not extract the message id from the GoIP response: "%s".', $response->getContent()), $response);
+            throw new TransportException(\sprintf('Could not extract the message id from the GoIP response: "%s".', $response->getContent()), $response);
         }
 
         $sentMessage = new SentMessage($message, (string) $this);

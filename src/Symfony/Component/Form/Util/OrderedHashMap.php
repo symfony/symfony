@@ -105,7 +105,7 @@ class OrderedHashMap implements \ArrayAccess, \IteratorAggregate, \Countable
     public function offsetGet(mixed $key): mixed
     {
         if (!isset($this->elements[$key])) {
-            throw new \OutOfBoundsException(sprintf('The offset "%s" does not exist.', $key));
+            throw new \OutOfBoundsException(\sprintf('The offset "%s" does not exist.', $key));
         }
 
         return $this->elements[$key];

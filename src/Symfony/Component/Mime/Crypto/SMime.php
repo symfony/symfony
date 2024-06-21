@@ -24,7 +24,7 @@ abstract class SMime
     protected function normalizeFilePath(string $path): string
     {
         if (!file_exists($path)) {
-            throw new RuntimeException(sprintf('File does not exist: "%s".', $path));
+            throw new RuntimeException(\sprintf('File does not exist: "%s".', $path));
         }
 
         return 'file://'.str_replace('\\', '/', realpath($path));

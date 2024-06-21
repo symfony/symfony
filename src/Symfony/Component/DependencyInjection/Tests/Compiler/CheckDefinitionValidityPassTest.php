@@ -109,17 +109,17 @@ class CheckDefinitionValidityPassTest extends TestCase
         yield 'object attribute value' => [
             'foo',
             ['bar' => new class() {}],
-            sprintf($message, 'foo', 'bar'),
+            \sprintf($message, 'foo', 'bar'),
         ];
         yield 'nested object attribute value' => [
             'foo',
             ['bar' => ['baz' => new class() {}]],
-            sprintf($message, 'foo', 'bar.baz'),
+            \sprintf($message, 'foo', 'bar.baz'),
         ];
         yield 'deeply nested object attribute value' => [
             'foo',
             ['bar' => ['baz' => ['qux' => new class() {}]]],
-            sprintf($message, 'foo', 'bar.baz.qux'),
+            \sprintf($message, 'foo', 'bar.baz.qux'),
         ];
     }
 

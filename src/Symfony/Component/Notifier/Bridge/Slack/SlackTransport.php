@@ -47,7 +47,7 @@ final class SlackTransport extends AbstractTransport
             'channel' => $this->channel,
         ]);
 
-        return sprintf('slack://%s%s', $this->getEndpoint(), $query ? '?'.http_build_query($query, '', '&') : '');
+        return \sprintf('slack://%s%s', $this->getEndpoint(), $query ? '?'.http_build_query($query, '', '&') : '');
     }
 
     public function supports(MessageInterface $message): bool
@@ -92,14 +92,14 @@ final class SlackTransport extends AbstractTransport
         }
 
         if (200 !== $statusCode) {
-            throw new TransportException(sprintf('Unable to post the Slack message: "%s".', $response->getContent(false)), $response);
+            throw new TransportException(\sprintf('Unable to post the Slack message: "%s".', $response->getContent(false)), $response);
         }
 
         $result = $response->toArray(false);
         if (!$result['ok']) {
             $errors = isset($result['errors']) ? ' ('.implode('|', $result['errors']).')' : '';
 
-            throw new TransportException(sprintf('Unable to post the Slack message: "%s"%s.', $result['error'], $errors), $response);
+            throw new TransportException(\sprintf('Unable to post the Slack message: "%s"%s.', $result['error'], $errors), $response);
         }
 
         return new SlackSentMessage($message, (string) $this, $result['channel'], $result['ts']);

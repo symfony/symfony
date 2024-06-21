@@ -311,7 +311,7 @@ class MemcachedAdapter extends AbstractAdapter
             throw new CacheException('MemcachedAdapter: "serializer" option must be "php" or "igbinary".');
         }
         if ('' !== $prefix = (string) $this->lazyClient->getOption(\Memcached::OPT_PREFIX_KEY)) {
-            throw new CacheException(sprintf('MemcachedAdapter: "prefix_key" option must be empty when using proxified connections, "%s" given.', $prefix));
+            throw new CacheException(\sprintf('MemcachedAdapter: "prefix_key" option must be empty when using proxified connections, "%s" given.', $prefix));
         }
 
         return $this->client = $this->lazyClient;

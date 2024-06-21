@@ -80,7 +80,7 @@ EOF
         $fs->remove($oldCacheDir);
 
         if (!is_writable($realCacheDir)) {
-            throw new RuntimeException(sprintf('Unable to write in the "%s" directory.', $realCacheDir));
+            throw new RuntimeException(\sprintf('Unable to write in the "%s" directory.', $realCacheDir));
         }
 
         $useBuildDir = $realBuildDir !== $realCacheDir;
@@ -89,7 +89,7 @@ EOF
             $fs->remove($oldBuildDir);
 
             if (!is_writable($realBuildDir)) {
-                throw new RuntimeException(sprintf('Unable to write in the "%s" directory.', $realBuildDir));
+                throw new RuntimeException(\sprintf('Unable to write in the "%s" directory.', $realBuildDir));
             }
 
             if ($this->isNfs($realCacheDir)) {
@@ -100,7 +100,7 @@ EOF
             $fs->mkdir($realCacheDir);
         }
 
-        $io->comment(sprintf('Clearing the cache for the <info>%s</info> environment with debug <info>%s</info>', $kernel->getEnvironment(), var_export($kernel->isDebug(), true)));
+        $io->comment(\sprintf('Clearing the cache for the <info>%s</info> environment with debug <info>%s</info>', $kernel->getEnvironment(), var_export($kernel->isDebug(), true)));
         if ($useBuildDir) {
             $this->cacheClearer->clear($realBuildDir);
         }
@@ -189,7 +189,7 @@ EOF
             $io->comment('Finished');
         }
 
-        $io->success(sprintf('Cache for the "%s" environment (debug=%s) was successfully cleared.', $kernel->getEnvironment(), var_export($kernel->isDebug(), true)));
+        $io->success(\sprintf('Cache for the "%s" environment (debug=%s) was successfully cleared.', $kernel->getEnvironment(), var_export($kernel->isDebug(), true)));
 
         return 0;
     }

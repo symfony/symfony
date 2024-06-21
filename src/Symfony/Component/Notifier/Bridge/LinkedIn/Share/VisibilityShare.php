@@ -40,15 +40,15 @@ final class VisibilityShare extends AbstractLinkedInShare
     public function __construct(string $visibility = self::MEMBER_NETWORK_VISIBILITY, string $value = 'PUBLIC')
     {
         if (!\in_array($visibility, self::AVAILABLE_VISIBILITY, true)) {
-            throw new LogicException(sprintf('"%s" is not a valid visibility, available visibility are "%s".', $visibility, implode(', ', self::AVAILABLE_VISIBILITY)));
+            throw new LogicException(\sprintf('"%s" is not a valid visibility, available visibility are "%s".', $visibility, implode(', ', self::AVAILABLE_VISIBILITY)));
         }
 
         if (self::MEMBER_NETWORK_VISIBILITY === $visibility && !\in_array($value, self::MEMBER_NETWORK, true)) {
-            throw new LogicException(sprintf('"%s" is not a valid value, available value for visibility "%s" are "%s".', $value, $visibility, implode(', ', self::MEMBER_NETWORK)));
+            throw new LogicException(\sprintf('"%s" is not a valid value, available value for visibility "%s" are "%s".', $value, $visibility, implode(', ', self::MEMBER_NETWORK)));
         }
 
         if (self::SPONSORED_CONTENT_VISIBILITY === $visibility && self::DARK !== $value) {
-            throw new LogicException(sprintf('"%s" is not a valid value, available value for visibility "%s" is "%s".', $value, $visibility, self::DARK));
+            throw new LogicException(\sprintf('"%s" is not a valid value, available value for visibility "%s" is "%s".', $value, $visibility, self::DARK));
         }
 
         $this->options['com.linkedin.ugc.'.$visibility] = $value;

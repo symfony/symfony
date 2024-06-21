@@ -23,7 +23,7 @@ class Comparator
         string $operator = '==',
     ) {
         if (!\in_array($operator, ['>', '<', '>=', '<=', '==', '!='])) {
-            throw new \InvalidArgumentException(sprintf('Invalid operator "%s".', $operator));
+            throw new \InvalidArgumentException(\sprintf('Invalid operator "%s".', $operator));
         }
 
         $this->operator = $operator;

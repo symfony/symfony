@@ -42,7 +42,7 @@ final class DebugCommand extends Command
     protected function configure(): void
     {
         $this
-            ->addArgument('schedule', InputArgument::OPTIONAL | InputArgument::IS_ARRAY, sprintf('The schedule name (one of "%s")', implode('", "', $this->scheduleNames)), null, $this->scheduleNames)
+            ->addArgument('schedule', InputArgument::OPTIONAL | InputArgument::IS_ARRAY, \sprintf('The schedule name (one of "%s")', implode('", "', $this->scheduleNames)), null, $this->scheduleNames)
             ->addOption('date', null, InputOption::VALUE_REQUIRED, 'The date to use for the next run date', 'now')
             ->addOption('all', null, InputOption::VALUE_NONE, 'Display all recurring messages, including the terminated ones')
             ->setHelp(<<<'EOF'
@@ -80,7 +80,7 @@ final class DebugCommand extends Command
 
         $date = new \DateTimeImmutable($input->getOption('date'));
         if ('now' !== $input->getOption('date')) {
-            $io->comment(sprintf('All next run dates computed from %s.', $date->format('r')));
+            $io->comment(\sprintf('All next run dates computed from %s.', $date->format('r')));
         }
 
         foreach ($names as $name) {
@@ -89,7 +89,7 @@ final class DebugCommand extends Command
             /** @var ScheduleProviderInterface $schedule */
             $schedule = $this->schedules->get($name);
             if (!$messages = $schedule->getSchedule()->getRecurringMessages()) {
-                $io->warning(sprintf('No recurring messages found for schedule "%s".', $name));
+                $io->warning(\sprintf('No recurring messages found for schedule "%s".', $name));
 
                 continue;
             }

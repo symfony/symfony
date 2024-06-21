@@ -172,13 +172,13 @@ EOF
                 $codePaths = [$path.'/templates'];
 
                 if (!is_dir($transPaths[0])) {
-                    throw new InvalidArgumentException(sprintf('"%s" is neither an enabled bundle nor a directory.', $transPaths[0]));
+                    throw new InvalidArgumentException(\sprintf('"%s" is neither an enabled bundle nor a directory.', $transPaths[0]));
                 }
             }
         }
 
         $io->title('Translation Messages Extractor and Dumper');
-        $io->comment(sprintf('Generating "<info>%s</info>" translation files for "<info>%s</info>"', $input->getArgument('locale'), $currentName));
+        $io->comment(\sprintf('Generating "<info>%s</info>" translation files for "<info>%s</info>"', $input->getArgument('locale'), $currentName));
 
         $io->comment('Parsing templates...');
         $extractedCatalogue = $this->extractMessages($input->getArgument('locale'), $codePaths, $input->getOption('prefix'));
@@ -217,8 +217,8 @@ EOF
 
                 $list = array_merge(
                     array_diff($allKeys, $newKeys),
-                    array_map(fn ($id) => sprintf('<fg=green>%s</>', $id), $newKeys),
-                    array_map(fn ($id) => sprintf('<fg=red>%s</>', $id), array_keys($operation->getObsoleteMessages($domain)))
+                    array_map(fn ($id) => \sprintf('<fg=green>%s</>', $id), $newKeys),
+                    array_map(fn ($id) => \sprintf('<fg=red>%s</>', $id), array_keys($operation->getObsoleteMessages($domain)))
                 );
 
                 $domainMessagesCount = \count($list);
@@ -238,17 +238,17 @@ EOF
                     }
                 }
 
-                $io->section(sprintf('Messages extracted for domain "<info>%s</info>" (%d message%s)', $domain, $domainMessagesCount, $domainMessagesCount > 1 ? 's' : ''));
+                $io->section(\sprintf('Messages extracted for domain "<info>%s</info>" (%d message%s)', $domain, $domainMessagesCount, $domainMessagesCount > 1 ? 's' : ''));
                 $io->listing($list);
 
                 $extractedMessagesCount += $domainMessagesCount;
             }
 
             if ('xlf' === $format) {
-                $io->comment(sprintf('Xliff output version is <info>%s</info>', $xliffVersion));
+                $io->comment(\sprintf('Xliff output version is <info>%s</info>', $xliffVersion));
             }
 
-            $resultMessage = sprintf('%d message%s successfully extracted', $extractedMessagesCount, $extractedMessagesCount > 1 ? 's were' : ' was');
+            $resultMessage = \sprintf('%d message%s successfully extracted', $extractedMessagesCount, $extractedMessagesCount > 1 ? 's were' : ' was');
         }
 
         // save the files

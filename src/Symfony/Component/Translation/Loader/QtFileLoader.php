@@ -32,17 +32,17 @@ class QtFileLoader implements LoaderInterface
         }
 
         if (!stream_is_local($resource)) {
-            throw new InvalidResourceException(sprintf('This is not a local file "%s".', $resource));
+            throw new InvalidResourceException(\sprintf('This is not a local file "%s".', $resource));
         }
 
         if (!file_exists($resource)) {
-            throw new NotFoundResourceException(sprintf('File "%s" not found.', $resource));
+            throw new NotFoundResourceException(\sprintf('File "%s" not found.', $resource));
         }
 
         try {
             $dom = XmlUtils::loadFile($resource);
         } catch (\InvalidArgumentException $e) {
-            throw new InvalidResourceException(sprintf('Unable to load "%s".', $resource), $e->getCode(), $e);
+            throw new InvalidResourceException(\sprintf('Unable to load "%s".', $resource), $e->getCode(), $e);
         }
 
         $internalErrors = libxml_use_internal_errors(true);

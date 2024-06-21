@@ -49,7 +49,7 @@ final class PrimotextoTransport extends AbstractTransport
         $options['number'] = $message->getPhone();
         $options['message'] = $message->getSubject();
 
-        $endpoint = sprintf('https://%s/v2/notification/messages/send', $this->getEndpoint());
+        $endpoint = \sprintf('https://%s/v2/notification/messages/send', $this->getEndpoint());
         $response = $this->client->request('POST', $endpoint, [
             'headers' => [
                 'X-Primotexto-ApiKey' => $this->apiKey,
@@ -69,7 +69,7 @@ final class PrimotextoTransport extends AbstractTransport
 
             $errorCodeValue = PrimotextoErrorCode::tryFrom((int) $error['code']) ?? PrimotextoErrorCode::UNKNOWN_ERROR;
 
-            throw new TransportException(sprintf('Unable to send the SMS, error "%s" : "%s".', $error['code'], $errorCodeValue->name), $response);
+            throw new TransportException(\sprintf('Unable to send the SMS, error "%s" : "%s".', $error['code'], $errorCodeValue->name), $response);
         }
 
         $success = $response->toArray(false);
@@ -82,7 +82,7 @@ final class PrimotextoTransport extends AbstractTransport
 
     public function __toString(): string
     {
-        return sprintf('primotexto://%s%s', $this->getEndpoint(), null !== $this->from ? '?from='.$this->from : '');
+        return \sprintf('primotexto://%s%s', $this->getEndpoint(), null !== $this->from ? '?from='.$this->from : '');
     }
 
     public function supports(MessageInterface $message): bool

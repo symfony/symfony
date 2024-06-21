@@ -46,9 +46,9 @@ abstract class BaseType extends AbstractType
 
         if ($view->parent) {
             if ('' !== ($parentFullName = $view->parent->vars['full_name'])) {
-                $id = sprintf('%s_%s', $view->parent->vars['id'], $name);
-                $fullName = sprintf('%s[%s]', $parentFullName, $name);
-                $uniqueBlockPrefix = sprintf('%s_%s', $view->parent->vars['unique_block_prefix'], $blockName);
+                $id = \sprintf('%s_%s', $view->parent->vars['id'], $name);
+                $fullName = \sprintf('%s[%s]', $parentFullName, $name);
+                $uniqueBlockPrefix = \sprintf('%s_%s', $view->parent->vars['unique_block_prefix'], $blockName);
             } else {
                 $id = $name;
                 $fullName = $name;

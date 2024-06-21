@@ -47,7 +47,7 @@ final class TurboSmsTransport extends AbstractTransport
 
     public function __toString(): string
     {
-        return sprintf('turbosms://%s?from=%s', $this->getEndpoint(), urlencode($this->from));
+        return \sprintf('turbosms://%s?from=%s', $this->getEndpoint(), urlencode($this->from));
     }
 
     public function supports(MessageInterface $message): bool
@@ -72,7 +72,7 @@ final class TurboSmsTransport extends AbstractTransport
             $from = $this->from;
         }
 
-        $endpoint = sprintf('https://%s/message/send.json', $this->getEndpoint());
+        $endpoint = \sprintf('https://%s/message/send.json', $this->getEndpoint());
         $response = $this->client->request('POST', $endpoint, [
             'auth_bearer' => $this->authToken,
             'json' => [
@@ -95,13 +95,13 @@ final class TurboSmsTransport extends AbstractTransport
 
         $error = $response->toArray(false);
 
-        throw new TransportException(sprintf('Unable to send SMS with TurboSMS: Error code %d with message "%s".', (int) $error['response_code'], $error['response_status']), $response);
+        throw new TransportException(\sprintf('Unable to send SMS with TurboSMS: Error code %d with message "%s".', (int) $error['response_code'], $error['response_status']), $response);
     }
 
     private function assertValidFrom(string $from): void
     {
         if (mb_strlen($from, 'UTF-8') > self::SENDER_LIMIT) {
-            throw new LengthException(sprintf('The sender length of a TurboSMS message must not exceed %d characters.', self::SENDER_LIMIT));
+            throw new LengthException(\sprintf('The sender length of a TurboSMS message must not exceed %d characters.', self::SENDER_LIMIT));
         }
     }
 
@@ -117,7 +117,7 @@ final class TurboSmsTransport extends AbstractTransport
         }
 
         if (mb_strlen($subject, 'UTF-8') > $subjectLimit) {
-            throw new LengthException(sprintf('The subject length for "%s" symbols of a TurboSMS message must not exceed %d characters.', $symbols, $subjectLimit));
+            throw new LengthException(\sprintf('The subject length for "%s" symbols of a TurboSMS message must not exceed %d characters.', $symbols, $subjectLimit));
         }
     }
 }

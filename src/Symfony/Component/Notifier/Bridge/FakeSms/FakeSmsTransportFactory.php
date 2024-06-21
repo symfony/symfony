@@ -72,6 +72,6 @@ final class FakeSmsTransportFactory extends AbstractTransportFactory
 
     private function throwMissingDependencyException(string $scheme, string $missingDependency, string $suggestedPackage): void
     {
-        throw new LogicException(sprintf('Cannot create a transport for scheme "%s" without providing an implementation of "%s". Try running "composer require "%s"".', $scheme, $missingDependency, $suggestedPackage));
+        throw new LogicException(\sprintf('Cannot create a transport for scheme "%s" without providing an implementation of "%s". Try running "composer require "%s"".', $scheme, $missingDependency, $suggestedPackage));
     }
 }

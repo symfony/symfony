@@ -62,7 +62,7 @@ class Escaper
      */
     public static function escapeWithDoubleQuotes(string $value): string
     {
-        return sprintf('"%s"', str_replace(self::ESCAPEES, self::ESCAPED, $value));
+        return \sprintf('"%s"', str_replace(self::ESCAPEES, self::ESCAPED, $value));
     }
 
     /**
@@ -90,6 +90,6 @@ class Escaper
      */
     public static function escapeWithSingleQuotes(string $value): string
     {
-        return sprintf("'%s'", str_replace('\'', '\'\'', $value));
+        return \sprintf("'%s'", str_replace('\'', '\'\'', $value));
     }
 }

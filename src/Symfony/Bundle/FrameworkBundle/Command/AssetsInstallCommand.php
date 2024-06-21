@@ -93,7 +93,7 @@ EOT
             $targetArg = $kernel->getProjectDir().'/'.$targetArg;
 
             if (!is_dir($targetArg)) {
-                throw new InvalidArgumentException(sprintf('The target directory "%s" does not exist.', $targetArg));
+                throw new InvalidArgumentException(\sprintf('The target directory "%s" does not exist.', $targetArg));
             }
         }
 
@@ -130,7 +130,7 @@ EOT
             $validAssetDirs[] = $assetDir;
 
             if (OutputInterface::VERBOSITY_VERBOSE <= $output->getVerbosity()) {
-                $message = sprintf("%s\n-> %s", $bundle->getName(), $targetDir);
+                $message = \sprintf("%s\n-> %s", $bundle->getName(), $targetDir);
             } else {
                 $message = $bundle->getName();
             }
@@ -151,13 +151,13 @@ EOT
                 }
 
                 if ($method === $expectedMethod) {
-                    $rows[] = [sprintf('<fg=green;options=bold>%s</>', '\\' === \DIRECTORY_SEPARATOR ? 'OK' : "\xE2\x9C\x94" /* HEAVY CHECK MARK (U+2714) */), $message, $method];
+                    $rows[] = [\sprintf('<fg=green;options=bold>%s</>', '\\' === \DIRECTORY_SEPARATOR ? 'OK' : "\xE2\x9C\x94" /* HEAVY CHECK MARK (U+2714) */), $message, $method];
                 } else {
-                    $rows[] = [sprintf('<fg=yellow;options=bold>%s</>', '\\' === \DIRECTORY_SEPARATOR ? 'WARNING' : '!'), $message, $method];
+                    $rows[] = [\sprintf('<fg=yellow;options=bold>%s</>', '\\' === \DIRECTORY_SEPARATOR ? 'WARNING' : '!'), $message, $method];
                 }
             } catch (\Exception $e) {
                 $exitCode = 1;
-                $rows[] = [sprintf('<fg=red;options=bold>%s</>', '\\' === \DIRECTORY_SEPARATOR ? 'ERROR' : "\xE2\x9C\x98" /* HEAVY BALLOT X (U+2718) */), $message, $e->getMessage()];
+                $rows[] = [\sprintf('<fg=red;options=bold>%s</>', '\\' === \DIRECTORY_SEPARATOR ? 'ERROR' : "\xE2\x9C\x98" /* HEAVY BALLOT X (U+2718) */), $message, $e->getMessage()];
             }
         }
         // remove the assets of the bundles that no longer exist
@@ -230,7 +230,7 @@ EOT
         }
         $this->filesystem->symlink($originDir, $targetDir);
         if (!file_exists($targetDir)) {
-            throw new IOException(sprintf('Symbolic link "%s" was created but appears to be broken.', $targetDir), 0, null, $targetDir);
+            throw new IOException(\sprintf('Symbolic link "%s" was created but appears to be broken.', $targetDir), 0, null, $targetDir);
         }
     }
 

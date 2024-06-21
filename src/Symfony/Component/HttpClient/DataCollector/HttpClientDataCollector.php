@@ -233,8 +233,8 @@ final class HttpClientDataCollector extends DataCollector implements LateDataCol
             }
 
             if (preg_match('/^> ([A-Z]+)/', $line, $match)) {
-                $command[] = sprintf('--request %s', $match[1]);
-                $command[] = sprintf('--url %s', escapeshellarg($url));
+                $command[] = \sprintf('--request %s', $match[1]);
+                $command[] = \sprintf('--url %s', escapeshellarg($url));
                 continue;
             }
 

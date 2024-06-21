@@ -207,7 +207,7 @@ class Profile
     public function getCollector(string $name): DataCollectorInterface
     {
         if (!isset($this->collectors[$name])) {
-            throw new \InvalidArgumentException(sprintf('Collector "%s" does not exist.', $name));
+            throw new \InvalidArgumentException(\sprintf('Collector "%s" does not exist.', $name));
         }
 
         return $this->collectors[$name];

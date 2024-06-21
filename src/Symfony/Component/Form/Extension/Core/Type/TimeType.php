@@ -45,7 +45,7 @@ class TimeType extends AbstractType
         }
 
         if (null !== $options['reference_date'] && $options['reference_date']->getTimezone()->getName() !== $options['model_timezone']) {
-            throw new InvalidConfigurationException(sprintf('The configured "model_timezone" (%s) must match the timezone of the "reference_date" (%s).', $options['model_timezone'], $options['reference_date']->getTimezone()->getName()));
+            throw new InvalidConfigurationException(\sprintf('The configured "model_timezone" (%s) must match the timezone of the "reference_date" (%s).', $options['model_timezone'], $options['reference_date']->getTimezone()->getName()));
         }
 
         if ($options['with_minutes']) {
@@ -66,9 +66,9 @@ class TimeType extends AbstractType
                     if ($options['with_seconds']) {
                         // handle seconds ignored by user's browser when with_seconds enabled
                         // https://codereview.chromium.org/450533009/
-                        $e->setData(sprintf('%s:%s:%s', $matches['hours'], $matches['minutes'], $matches['seconds'] ?? '00'));
+                        $e->setData(\sprintf('%s:%s:%s', $matches['hours'], $matches['minutes'], $matches['seconds'] ?? '00'));
                     } else {
-                        $e->setData(sprintf('%s:%s', $matches['hours'], $matches['minutes']));
+                        $e->setData(\sprintf('%s:%s', $matches['hours'], $matches['minutes']));
                     }
                 }
             });
@@ -217,7 +217,7 @@ class TimeType extends AbstractType
                 }
 
                 if ($date->getTimezone()->getName() !== $options['model_timezone']) {
-                    throw new LogicException(sprintf('Using a "%s" instance with a timezone ("%s") not matching the configured model timezone "%s" is not supported.', get_debug_type($date), $date->getTimezone()->getName(), $options['model_timezone']));
+                    throw new LogicException(\sprintf('Using a "%s" instance with a timezone ("%s") not matching the configured model timezone "%s" is not supported.', get_debug_type($date), $date->getTimezone()->getName(), $options['model_timezone']));
                 }
             });
         }

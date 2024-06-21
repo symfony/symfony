@@ -110,7 +110,7 @@ class XmlDescriptor extends Descriptor
 
     protected function describeContainerDeprecations(ContainerBuilder $container, array $options = []): void
     {
-        $containerDeprecationFilePath = sprintf('%s/%sDeprecations.log', $container->getParameter('kernel.build_dir'), $container->getParameter('kernel.container_class'));
+        $containerDeprecationFilePath = \sprintf('%s/%sDeprecations.log', $container->getParameter('kernel.build_dir'), $container->getParameter('kernel.container_class'));
         if (!file_exists($containerDeprecationFilePath)) {
             throw new RuntimeException('The deprecation file does not exist, please try warming the cache first.');
         }
@@ -243,7 +243,7 @@ class XmlDescriptor extends Descriptor
             $parameterXML->appendChild(new \DOMText($this->formatParameter($value)));
 
             if (isset($deprecatedParameters[$key])) {
-                $parameterXML->setAttribute('deprecated', sprintf('Since %s %s: %s', $deprecatedParameters[$key][0], $deprecatedParameters[$key][1], sprintf(...\array_slice($deprecatedParameters[$key], 2))));
+                $parameterXML->setAttribute('deprecated', \sprintf('Since %s %s: %s', $deprecatedParameters[$key][0], $deprecatedParameters[$key][1], \sprintf(...\array_slice($deprecatedParameters[$key], 2))));
             }
         }
 
@@ -341,7 +341,7 @@ class XmlDescriptor extends Descriptor
                 if ($factory[0] instanceof Reference) {
                     $factoryXML->setAttribute('service', (string) $factory[0]);
                 } elseif ($factory[0] instanceof Definition) {
-                    $factoryXML->setAttribute('service', sprintf('inline factory service (%s)', $factory[0]->getClass() ?? 'not configured'));
+                    $factoryXML->setAttribute('service', \sprintf('inline factory service (%s)', $factory[0]->getClass() ?? 'not configured'));
                 } else {
                     $factoryXML->setAttribute('class', $factory[0]);
                 }
@@ -490,7 +490,7 @@ class XmlDescriptor extends Descriptor
             $parameterXML->setAttribute('key', $options['parameter']);
 
             if ($deprecation) {
-                $parameterXML->setAttribute('deprecated', sprintf('Since %s %s: %s', $deprecation[0], $deprecation[1], sprintf(...\array_slice($deprecation, 2))));
+                $parameterXML->setAttribute('deprecated', \sprintf('Since %s %s: %s', $deprecation[0], $deprecation[1], \sprintf(...\array_slice($deprecation, 2))));
             }
         }
 

@@ -212,7 +212,7 @@ final class DsnTest extends TestCase
      */
     public function testGetRequiredOption(string $expectedValue, string $options, string $option)
     {
-        $dsn = new Dsn(sprintf('scheme://localhost?%s', $options));
+        $dsn = new Dsn(\sprintf('scheme://localhost?%s', $options));
 
         $this->assertSame($expectedValue, $dsn->getRequiredOption($option));
     }
@@ -237,7 +237,7 @@ final class DsnTest extends TestCase
      */
     public function testGetRequiredOptionThrowsMissingRequiredOptionException(string $expectedExceptionMessage, string $options, string $option)
     {
-        $dsn = new Dsn(sprintf('scheme://localhost?%s', $options));
+        $dsn = new Dsn(\sprintf('scheme://localhost?%s', $options));
 
         $this->expectException(MissingRequiredOptionException::class);
         $this->expectExceptionMessage($expectedExceptionMessage);

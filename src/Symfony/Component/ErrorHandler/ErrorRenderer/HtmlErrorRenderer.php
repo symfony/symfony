@@ -160,9 +160,9 @@ class HtmlErrorRenderer implements ErrorRendererInterface
         $result = [];
         foreach ($args as $key => $item) {
             if ('object' === $item[0]) {
-                $formattedValue = sprintf('<em>object</em>(%s)', $this->abbrClass($item[1]));
+                $formattedValue = \sprintf('<em>object</em>(%s)', $this->abbrClass($item[1]));
             } elseif ('array' === $item[0]) {
-                $formattedValue = sprintf('<em>array</em>(%s)', \is_array($item[1]) ? $this->formatArgs($item[1]) : $item[1]);
+                $formattedValue = \sprintf('<em>array</em>(%s)', \is_array($item[1]) ? $this->formatArgs($item[1]) : $item[1]);
             } elseif ('null' === $item[0]) {
                 $formattedValue = '<em>null</em>';
             } elseif ('boolean' === $item[0]) {
@@ -175,7 +175,7 @@ class HtmlErrorRenderer implements ErrorRendererInterface
                 $formattedValue = str_replace("\n", '', $this->escape(var_export($item[1], true)));
             }
 
-            $result[] = \is_int($key) ? $formattedValue : sprintf("'%s' => %s", $this->escape($key), $formattedValue);
+            $result[] = \is_int($key) ? $formattedValue : \sprintf("'%s' => %s", $this->escape($key), $formattedValue);
         }
 
         return implode(', ', $result);
@@ -196,7 +196,7 @@ class HtmlErrorRenderer implements ErrorRendererInterface
         $parts = explode('\\', $class);
         $short = array_pop($parts);
 
-        return sprintf('<abbr title="%s">%s</abbr>', $class, $short);
+        return \sprintf('<abbr title="%s">%s</abbr>', $class, $short);
     }
 
     private function getFileRelative(string $file): ?string
@@ -225,7 +225,7 @@ class HtmlErrorRenderer implements ErrorRendererInterface
             $text = $file;
             if (null !== $rel = $this->getFileRelative($text)) {
                 $rel = explode('/', $rel, 2);
-                $text = sprintf('<abbr title="%s%2$s">%s</abbr>%s', $this->projectDir, $rel[0], '/'.($rel[1] ?? ''));
+                $text = \sprintf('<abbr title="%s%2$s">%s</abbr>%s', $this->projectDir, $rel[0], '/'.($rel[1] ?? ''));
             }
         }
 
@@ -235,7 +235,7 @@ class HtmlErrorRenderer implements ErrorRendererInterface
 
         $link = $this->fileLinkFormat->format($file, $line);
 
-        return sprintf('<a href="%s" title="Click to open this file" class="file_link">%s</a>', $this->escape($link), $text);
+        return \sprintf('<a href="%s" title="Click to open this file" class="file_link">%s</a>', $this->escape($link), $text);
     }
 
     /**

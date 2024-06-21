@@ -61,7 +61,7 @@ final class FakeSmsLoggerTransportTest extends TransportTestCase
         $this->assertNotEmpty($logs);
 
         $log = $logs[0];
-        $this->assertSame(sprintf('New SMS on phone number: %s', $phone), $log['message']);
+        $this->assertSame(\sprintf('New SMS on phone number: %s', $phone), $log['message']);
         $this->assertSame('info', $log['level']);
     }
 }

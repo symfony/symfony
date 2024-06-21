@@ -40,7 +40,7 @@ final class MailerSendApiTransport extends AbstractApiTransport
 
     public function __toString(): string
     {
-        return sprintf('mailersend+api://%s', $this->getEndpoint());
+        return \sprintf('mailersend+api://%s', $this->getEndpoint());
     }
 
     protected function doSendApi(SentMessage $sentMessage, Email $email, Envelope $envelope): ResponseInterface
@@ -63,11 +63,11 @@ final class MailerSendApiTransport extends AbstractApiTransport
         try {
             $result = '' !== $content ? $response->toArray(false) : null;
         } catch (JsonException $e) {
-            throw new HttpTransportException(sprintf('Unable to send an email: "%s" (code %d).', $content, $statusCode), $response, 0, $e);
+            throw new HttpTransportException(\sprintf('Unable to send an email: "%s" (code %d).', $content, $statusCode), $response, 0, $e);
         }
 
         if (202 !== $statusCode) {
-            throw new HttpTransportException('Unable to send an email: '.($result['message'] ?? '').sprintf(' (code %d).', $statusCode), $response);
+            throw new HttpTransportException('Unable to send an email: '.($result['message'] ?? '').\sprintf(' (code %d).', $statusCode), $response);
         }
 
         if (isset($result['warnings'][0]['type']) && 'ALL_SUPPRESSED' === $result['warnings'][0]['type']) {

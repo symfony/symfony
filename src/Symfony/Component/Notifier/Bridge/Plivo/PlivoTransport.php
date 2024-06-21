@@ -42,7 +42,7 @@ final class PlivoTransport extends AbstractTransport
 
     public function __toString(): string
     {
-        return sprintf('plivo://%s?from=%s', $this->getEndpoint(), $this->from);
+        return \sprintf('plivo://%s?from=%s', $this->getEndpoint(), $this->from);
     }
 
     public function supports(MessageInterface $message): bool
@@ -62,10 +62,10 @@ final class PlivoTransport extends AbstractTransport
         $options['dst'] = $message->getPhone();
 
         if (!preg_match('/^[a-zA-Z0-9\s]{2,11}$/', $options['src']) && !preg_match('/^\+?[1-9]\d{1,14}$/', $options['src'])) {
-            throw new InvalidArgumentException(sprintf('The "From" number "%s" is not a valid phone number, shortcode, or alphanumeric sender ID. Phone number must contain only numbers and optional + character.', $options['src']));
+            throw new InvalidArgumentException(\sprintf('The "From" number "%s" is not a valid phone number, shortcode, or alphanumeric sender ID. Phone number must contain only numbers and optional + character.', $options['src']));
         }
 
-        $endpoint = sprintf('https://%s/v1/Account/%s/Message/', $this->getEndpoint(), $this->authId);
+        $endpoint = \sprintf('https://%s/v1/Account/%s/Message/', $this->getEndpoint(), $this->authId);
         $response = $this->client->request('POST', $endpoint, [
             'auth_basic' => [$this->authId, $this->authToken],
             'json' => array_filter($options),
@@ -83,7 +83,7 @@ final class PlivoTransport extends AbstractTransport
             } catch (JsonException) {
                 $error['error'] = $response->getContent(false);
             }
-            throw new TransportException(sprintf('Unable to send the SMS - status code: "%s": "%s".', $statusCode, $error['error'] ?? 'unknown error'), $response);
+            throw new TransportException(\sprintf('Unable to send the SMS - status code: "%s": "%s".', $statusCode, $error['error'] ?? 'unknown error'), $response);
         }
 
         $success = $response->toArray(false);

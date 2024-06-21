@@ -56,7 +56,7 @@ final class UidNormalizer implements NormalizerInterface, DenormalizerInterface
             self::NORMALIZATION_FORMAT_BASE58 => $object->toBase58(),
             self::NORMALIZATION_FORMAT_BASE32 => $object->toBase32(),
             self::NORMALIZATION_FORMAT_RFC4122 => $object->toRfc4122(),
-            default => throw new LogicException(sprintf('The "%s" format is not valid.', $context[self::NORMALIZATION_FORMAT_KEY] ?? $this->defaultContext[self::NORMALIZATION_FORMAT_KEY])),
+            default => throw new LogicException(\sprintf('The "%s" format is not valid.', $context[self::NORMALIZATION_FORMAT_KEY] ?? $this->defaultContext[self::NORMALIZATION_FORMAT_KEY])),
         };
     }
 
@@ -70,7 +70,7 @@ final class UidNormalizer implements NormalizerInterface, DenormalizerInterface
         try {
             return $type::fromString($data);
         } catch (\InvalidArgumentException|\TypeError) {
-            throw NotNormalizableValueException::createForUnexpectedDataType(sprintf('The data is not a valid "%s" string representation.', $type), $data, ['string'], $context['deserialization_path'] ?? null, true);
+            throw NotNormalizableValueException::createForUnexpectedDataType(\sprintf('The data is not a valid "%s" string representation.', $type), $data, ['string'], $context['deserialization_path'] ?? null, true);
         }
     }
 

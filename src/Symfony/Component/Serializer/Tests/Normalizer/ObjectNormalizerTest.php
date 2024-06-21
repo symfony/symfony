@@ -786,12 +786,12 @@ class ObjectNormalizerTest extends TestCase
         $nameConverter = new class() implements AdvancedNameConverterInterface {
             public function normalize(string $propertyName, ?string $class = null, ?string $format = null, array $context = []): string
             {
-                return sprintf('%s-%s-%s-%s', $propertyName, $class, $format, $context['foo']);
+                return \sprintf('%s-%s-%s-%s', $propertyName, $class, $format, $context['foo']);
             }
 
             public function denormalize(string $propertyName, ?string $class = null, ?string $format = null, array $context = []): string
             {
-                return sprintf('%s-%s-%s-%s', $propertyName, $class, $format, $context['foo']);
+                return \sprintf('%s-%s-%s-%s', $propertyName, $class, $format, $context['foo']);
             }
         };
 

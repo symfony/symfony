@@ -1,0 +1,16 @@
+---------------------------------------------------------------------------
+
+by ndousson at 2024-06-21T07:46:56Z
+
+Thanks for taking in into account 🙏🏻
+
+Do you want to tackle the 3 new ones from this MR too ? 👇🏻
+https://github.com/symfony/symfony/pull/57424
+
+These 3 new one will only be available from 7.2. I can create the related MR is you want
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2024-06-21T08:21:45Z
+
+Once this PR is merged, you can create a new one for the 7.2 branch to document the three new headers. Thanks!

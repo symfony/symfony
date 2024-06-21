@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by derrabus at 2024-06-20T08:01:28Z
+
+cc @beberlei
+
+---------------------------------------------------------------------------
+
+by MatTheCat at 2024-06-20T15:18:00Z
+
+Should `.git-blame-ignore-revs` be updated?
+
+---------------------------------------------------------------------------
+
+by derrabus at 2024-06-20T15:54:03Z
+
+> Should `.git-blame-ignore-revs` be updated?
+
+Will do, as soon as this PR is merged and the commit hash is final.

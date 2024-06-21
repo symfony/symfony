@@ -144,7 +144,6 @@ return static function (ContainerConfigurator $container) {
                 service('property_info')->ignoreOnInvalid(),
                 service('serializer.mapping.class_discriminator_resolver')->ignoreOnInvalid(),
                 null,
-                [],
             ])
 
         ->alias(PropertyNormalizer::class, 'serializer.normalizer.property')

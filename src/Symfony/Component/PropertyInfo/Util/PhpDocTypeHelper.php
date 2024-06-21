@@ -105,9 +105,9 @@ final class PhpDocTypeHelper
     /**
      * Creates a {@see Type} from a PHPDoc type.
      */
-    private function createType(DocType $type, bool $nullable, ?string $docType = null): ?Type
+    private function createType(DocType $type, bool $nullable): ?Type
     {
-        $docType ??= (string) $type;
+        $docType = (string) $type;
 
         if ($type instanceof Collection) {
             $fqsen = $type->getFqsen();
@@ -118,10 +118,17 @@ final class PhpDocTypeHelper
 
             [$phpType, $class] = $this->getPhpTypeAndClass((string) $fqsen);
 
+            $collection = \is_a($class, \Traversable::class, true) || \is_a($class, \ArrayAccess::class, true);
+
+            // it's safer to fall back to other extractors if the generic type is too abstract
+            if (!$collection && !class_exists($class)) {
+                return null;
+            }
+
             $keys = $this->getTypes($type->getKeyType());
             $values = $this->getTypes($type->getValueType());
 
-            return new Type($phpType, $nullable, $class, true, $keys, $values);
+            return new Type($phpType, $nullable, $class, $collection, $keys, $values);
         }
 
         // Cannot guess

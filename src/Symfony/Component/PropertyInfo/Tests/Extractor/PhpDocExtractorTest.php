@@ -398,6 +398,11 @@ class PhpDocExtractorTest extends TestCase
         $this->assertEquals([new Type(Type::BUILTIN_TYPE_OBJECT, false, 'scalar')], $this->extractor->getTypes(PseudoTypeDummy::class, 'unknownPseudoType'));
     }
 
+    public function testGenericInterface()
+    {
+        $this->assertNull($this->extractor->getTypes(Dummy::class, 'genericInterface'));
+    }
+
     /**
      * @dataProvider constructorTypesProvider
      */

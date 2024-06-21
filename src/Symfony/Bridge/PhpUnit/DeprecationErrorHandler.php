@@ -11,6 +11,7 @@
 
 namespace Symfony\Bridge\PhpUnit;
 
+use PHPUnit\Framework\TestCase;
 use PHPUnit\Framework\TestResult;
 use PHPUnit\Runner\ErrorHandler;
 use PHPUnit\Util\Error\Handler;

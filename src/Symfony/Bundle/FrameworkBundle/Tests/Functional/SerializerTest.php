@@ -12,6 +12,9 @@
 namespace Symfony\Bundle\FrameworkBundle\Tests\Functional;
 
 use Symfony\Bundle\FrameworkBundle\Tests\Fixtures\TranslatableBackedEnum;
+use Symfony\Bundle\FrameworkBundle\Tests\Functional\app\AppKernel;
+use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
@@ -35,39 +38,54 @@ class SerializerTest extends AbstractWebTestCase
         $this->assertEquals($expected, $result);
     }
 
-    /**
-     * @dataProvider provideNormalizersAndEncodersWithDefaultContextOption
-     */
-    public function testNormalizersAndEncodersUseDefaultContextConfigOption(string $normalizerId)
+    public function testNormalizersAndEncodersUseDefaultContextConfigOption()
     {
-        static::bootKernel(['test_case' => 'Serializer']);
+        /** @var SerializerKernel $kernel */
+        $kernel = static::bootKernel(['test_case' => 'Serializer', 'root_config' => 'default_context.yaml']);
 
-        $normalizer = static::getContainer()->get($normalizerId);
+        foreach ($kernel->normalizersAndEncoders as $normalizerOrEncoderId) {
+            $normalizerOrEncoder = static::getContainer()->get($normalizerOrEncoderId);
 
-        $reflectionObject = new \ReflectionObject($normalizer);
-        $property = $reflectionObject->getProperty('defaultContext');
+            $reflectionObject = new \ReflectionObject($normalizerOrEncoder);
+            $property = $reflectionObject->getProperty('defaultContext');
 
-        $defaultContext = $property->getValue($normalizer);
+            $defaultContext = $property->getValue($normalizerOrEncoder);
 
-        self::assertArrayHasKey('fake_context_option', $defaultContext);
-        self::assertEquals('foo', $defaultContext['fake_context_option']);
+            self::assertArrayHasKey('fake_context_option', $defaultContext);
+            self::assertEquals('foo', $defaultContext['fake_context_option']);
+        }
     }
 
-    public static function provideNormalizersAndEncodersWithDefaultContextOption(): array
+    protected static function getKernelClass(): string
     {
-        return [
-            ['serializer.normalizer.constraint_violation_list.alias'],
-            ['serializer.normalizer.dateinterval.alias'],
-            ['serializer.normalizer.datetime.alias'],
-            ['serializer.normalizer.json_serializable.alias'],
-            ['serializer.normalizer.problem.alias'],
-            ['serializer.normalizer.uid.alias'],
-            ['serializer.normalizer.translatable.alias'],
-            ['serializer.normalizer.object.alias'],
-            ['serializer.encoder.xml.alias'],
-            ['serializer.encoder.yaml.alias'],
-            ['serializer.encoder.csv.alias'],
-        ];
+        return SerializerKernel::class;
+    }
+}
+
+class SerializerKernel extends AppKernel implements CompilerPassInterface
+{
+    public $normalizersAndEncoders = [
+        'serializer.normalizer.property.alias', // Special case as this normalizer isn't tagged
+    ];
+
+    public function process(ContainerBuilder $container)
+    {
+        $services = array_merge(
+            $container->findTaggedServiceIds('serializer.normalizer'),
+            $container->findTaggedServiceIds('serializer.encoder')
+        );
+        foreach ($services as $serviceId => $attributes) {
+            $class = $container->getDefinition($serviceId)->getClass();
+            if (null === $reflectionConstructor = (new \ReflectionClass($class))->getConstructor()) {
+                continue;
+            }
+            foreach ($reflectionConstructor->getParameters() as $reflectionParam) {
+                if ('array $defaultContext' === $reflectionParam->getType()->getName().' $'.$reflectionParam->getName()) {
+                    $this->normalizersAndEncoders[] = $serviceId.'.alias';
+                    break;
+                }
+            }
+        }
     }
 
     public function testSerializeTranslatableBackedEnum()

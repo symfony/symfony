@@ -11,7 +11,13 @@
 
 namespace Symfony\Bridge\Doctrine\Tests;
 
+use Doctrine\Persistence\ObjectManager;
 use PHPUnit\Framework\TestCase;
+use ProxyManager\Proxy\LazyLoadingInterface;
+use ProxyManager\Proxy\ValueHolderInterface;
+use Symfony\Bridge\Doctrine\ManagerRegistry;
+use Symfony\Bridge\Doctrine\Tests\Fixtures\DummyManager;
+use Symfony\Bridge\ProxyManager\LazyProxy\PhpDumper\ProxyDumper;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Dumper\PhpDumper;
@@ -24,8 +30,8 @@ class ManagerRegistryTest extends TestCase
     {
         $container = new ContainerBuilder();
 
-        $container->register('foo', \stdClass::class)->setPublic(true);
-        $container->getDefinition('foo')->setLazy(true)->addTag('proxy', ['interface' => \stdClass::class]);
+        $container->register('foo', DummyManager::class)->setPublic(true);
+        $container->getDefinition('foo')->setLazy(true)->addTag('proxy', ['interface' => ObjectManager::class]);
         $container->compile();
 
         $dumper = new PhpDumper($container);
@@ -46,8 +52,8 @@ class ManagerRegistryTest extends TestCase
         $registry->resetManager();
 
         $this->assertSame($foo, $container->get('foo'));
-        $this->assertInstanceOf(\stdClass::class, $foo);
-        $this->assertFalse(property_exists($foo, 'bar'));
+        $this->assertInstanceOf(ObjectManager::class, $foo);
+        $this->assertFalse(isset($foo->bar));
     }
 
     /**
@@ -79,7 +85,7 @@ class ManagerRegistryTest extends TestCase
 
         $service = $container->get('foo');
 
-        self::assertInstanceOf(\stdClass::class, $service);
+        self::assertInstanceOf(ObjectManager::class, $service);
         self::assertInstanceOf(LazyObjectInterface::class, $service);
         self::assertFalse($service->isLazyObjectInitialized());
 
@@ -92,7 +98,7 @@ class ManagerRegistryTest extends TestCase
         $service->initializeLazyObject();
 
         $wrappedValue = $service->initializeLazyObject();
-        self::assertInstanceOf(\stdClass::class, $wrappedValue);
+        self::assertInstanceOf(DummyManager::class, $wrappedValue);
         self::assertNotInstanceOf(LazyObjectInterface::class, $wrappedValue);
     }
 
@@ -104,10 +110,10 @@ class ManagerRegistryTest extends TestCase
 
         $container = new ContainerBuilder();
 
-        $container->register('foo', \stdClass::class)
+        $container->register('foo', DummyManager::class)
             ->setPublic(true)
             ->setLazy(true)
-            ->addTag('proxy', ['interface' => \stdClass::class]);
+            ->addTag('proxy', ['interface' => ObjectManager::class]);
         $container->compile();
 
         $fileSystem = new Filesystem();

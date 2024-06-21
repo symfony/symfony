@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\HttpClient;
 
+use Symfony\Component\HttpClient\Chunk\DataChunk;
 use Symfony\Component\HttpClient\Chunk\ServerSentEvent;
 use Symfony\Component\HttpClient\Exception\EventSourceException;
 use Symfony\Component\HttpClient\Response\AsyncContext;
@@ -121,17 +122,30 @@ final class EventSourceHttpClient implements HttpClientInterface, ResetInterface
                 return;
             }
 
-            $rx = '/((?:\r\n){2,}|\r{2,}|\n{2,})/';
-            $content = $state->buffer.$chunk->getContent();
-
             if ($chunk->isLast()) {
-                $rx = substr_replace($rx, '|$', -2, 0);
+                if ('' !== $content = $state->buffer) {
+                    $state->buffer = '';
+                    yield new DataChunk(-1, $content);
+                }
+
+                yield $chunk;
+
+                return;
             }
-            $events = preg_split($rx, $content, -1, \PREG_SPLIT_DELIM_CAPTURE);
+
+            $content = $state->buffer.$chunk->getContent();
+            $events = preg_split('/((?:\r\n){2,}|\r{2,}|\n{2,})/', $content, -1, \PREG_SPLIT_DELIM_CAPTURE);
             $state->buffer = array_pop($events);
 
             for ($i = 0; isset($events[$i]); $i += 2) {
-                $event = new ServerSentEvent($events[$i].$events[1 + $i]);
+                $content = $events[$i].$events[1 + $i];
+                if (!preg_match('/(?:^|\r\n|[\r\n])[^:\r\n]/', $content)) {
+                    yield new DataChunk(-1, $content);
+
+                    continue;
+                }
+
+                $event = new ServerSentEvent($content);
 
                 if ('' !== $event->getId()) {
                     $context->setInfo('last_event_id', $state->lastEventId = $event->getId());
@@ -142,17 +156,6 @@ final class EventSourceHttpClient implements HttpClientInterface, ResetInterface
                 }
 
                 yield $event;
-            }
-
-            if (preg_match('/^(?::[^\r\n]*+(?:\r\n|[\r\n]))+$/m', $state->buffer)) {
-                $content = $state->buffer;
-                $state->buffer = '';
-
-                yield $context->createChunk($content);
-            }
-
-            if ($chunk->isLast()) {
-                yield $chunk;
             }
         });
     }

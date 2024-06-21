@@ -156,7 +156,7 @@ class ZooWithKeyTypes
     public $animalsString = [];
     /** @var array<int|string, Animal> */
     public $animalsUnion = [];
-    /** @var \stdClass<Animal> */
+    /** @var \Traversable<Animal> */
     public $animalsGenerics = [];
 }
 

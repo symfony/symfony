@@ -1066,6 +1066,26 @@ class AbstractObjectNormalizerTest extends TestCase
 
         $this->assertSame(['string' => 'yes'], $normalized);
     }
+
+    /**
+     * @dataProvider provideBooleanTypesData
+     */
+    public function testDenormalizeBooleanTypesWithNotMatchingData(array $data, string $type)
+    {
+        $normalizer = new AbstractObjectNormalizerWithMetadataAndPropertyTypeExtractors();
+
+        $this->expectException(NotNormalizableValueException::class);
+
+        $normalizer->denormalize($data, $type);
+    }
+
+    public function provideBooleanTypesData()
+    {
+        return [
+            [['foo' => true], FalsePropertyDummy::class],
+            [['foo' => false], TruePropertyDummy::class],
+        ];
+    }
 }
 
 class AbstractObjectNormalizerDummy extends AbstractObjectNormalizer
@@ -1334,6 +1354,18 @@ class XmlScalarDummy
     public $value;
 }
 
+class FalsePropertyDummy
+{
+    /** @var false */
+    public $foo;
+}
+
+class TruePropertyDummy
+{
+    /** @var true */
+    public $foo;
+}
+
 class SerializerCollectionDummy implements SerializerInterface, DenormalizerInterface
 {
     private array $normalizers;
@@ -1475,5 +1507,30 @@ class DummyWithEnumUnion
     public function __construct(
         public readonly EnumA|EnumB $enum,
     ) {
+    }
+}
+
+class AbstractObjectNormalizerWithMetadataAndPropertyTypeExtractors extends AbstractObjectNormalizer
+{
+    public function __construct()
+    {
+        parent::__construct(new ClassMetadataFactory(new AttributeLoader()), null, new PropertyInfoExtractor([], [new PhpDocExtractor(), new ReflectionExtractor()]));
+    }
+
+    protected function extractAttributes(object $object, ?string $format = null, array $context = []): array
+    {
+        return [];
+    }
+
+    protected function getAttributeValue(object $object, string $attribute, ?string $format = null, array $context = [])
+    {
+        return null;
+    }
+
+    protected function setAttributeValue(object $object, string $attribute, $value, ?string $format = null, array $context = []): void
+    {
+        if (property_exists($object, $attribute)) {
+            $object->$attribute = $value;
+        }
     }
 }

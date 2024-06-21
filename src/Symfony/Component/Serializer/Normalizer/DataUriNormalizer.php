@@ -44,11 +44,7 @@ final class DataUriNormalizer implements NormalizerInterface, DenormalizerInterf
 
     public function getSupportedTypes(?string $format): array
     {
-        return [
-            \SplFileInfo::class => true,
-            \SplFileObject::class => true,
-            File::class => true,
-        ];
+        return self::SUPPORTED_TYPES;
     }
 
     public function normalize(mixed $object, ?string $format = null, array $context = []): string

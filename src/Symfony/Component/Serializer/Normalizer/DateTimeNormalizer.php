@@ -50,11 +50,7 @@ final class DateTimeNormalizer implements NormalizerInterface, DenormalizerInter
 
     public function getSupportedTypes(?string $format): array
     {
-        return [
-            \DateTimeInterface::class => true,
-            \DateTimeImmutable::class => true,
-            \DateTime::class => true,
-        ];
+        return self::SUPPORTED_TYPES;
     }
 
     /**

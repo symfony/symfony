@@ -12,7 +12,6 @@
 namespace Symfony\Component\VarDumper\Tests\Caster;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\VarDumper\Caster\FFICaster;
 use Symfony\Component\VarDumper\Test\VarDumperTestTrait;
 
 /**
@@ -191,34 +190,21 @@ class FFICasterTest extends TestCase
         PHP, $pointer);
     }
 
-    /**
-     * It is worth noting that such a test can cause SIGSEGV, as it breaks
-     * into "foreign" memory. However, this is only theoretical, since
-     * memory is allocated within the PHP process and almost always "garbage
-     * data" will be read from the PHP process itself.
-     *
-     * If this test fails for some reason, please report it: We may have to
-     * disable the dumping of strings ("char*") feature in VarDumper.
-     *
-     * @see FFICaster::castFFIStringValue()
-     */
     public function testCastNonTrailingCharPointer()
     {
         $actualMessage = 'Hello World!';
         $actualLength = \strlen($actualMessage);
 
-        $string = \FFI::cdef()->new('char['.$actualLength.']');
+        $string = \FFI::cdef()->new('char['.($actualLength + 1).']');
         $pointer = \FFI::addr($string[0]);
-
         \FFI::memcpy($pointer, $actualMessage, $actualLength);
 
-        // Remove automatically addition of the trailing "\0" and remove trailing "\0"
         $pointer = \FFI::cdef()->cast('char*', \FFI::cdef()->cast('void*', $pointer));
         $pointer[$actualLength] = "\x01";
 
         $this->assertDumpMatchesFormat(<<<PHP
         FFI\CData<char*> size 8 align 8 {
-          cdata: "$actualMessage%s"
+          cdata: %A"$actualMessage%s"
         }
         PHP, $pointer);
     }

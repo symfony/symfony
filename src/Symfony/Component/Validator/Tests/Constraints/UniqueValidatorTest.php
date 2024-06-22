@@ -246,14 +246,14 @@ class UniqueValidatorTest extends ConstraintValidatorTestCase
     /**
      * @dataProvider getInvalidCollectionValues
      */
-    public function testInvalidCollectionValues(array $value, array $fields)
+    public function testInvalidCollectionValues(array $value, array $fields, string $expectedMessageParam)
     {
         $this->validator->validate($value, new Unique([
             'message' => 'myMessage',
         ], fields: $fields));
 
         $this->buildViolation('myMessage')
-            ->setParameter('{{ value }}', 'array')
+            ->setParameter('{{ value }}', $expectedMessageParam)
             ->setCode(Unique::IS_NOT_UNIQUE)
             ->assertRaised();
     }
@@ -264,23 +264,25 @@ class UniqueValidatorTest extends ConstraintValidatorTestCase
             'unique string' => [[
                 ['lang' => 'eng', 'translation' => 'hi'],
                 ['lang' => 'eng', 'translation' => 'hello'],
-            ], ['lang']],
+            ], ['lang'], 'array'],
             'unique floats' => [[
                 ['latitude' => 51.509865, 'longitude' => -0.118092, 'poi' => 'capital'],
                 ['latitude' => 52.520008, 'longitude' => 13.404954],
                 ['latitude' => 51.509865, 'longitude' => -0.118092],
-            ], ['latitude', 'longitude']],
+            ], ['latitude', 'longitude'], 'array'],
             'unique int' => [[
                 ['id' => 1, 'email' => 'bar@email.com'],
                 ['id' => 1, 'email' => 'foo@email.com'],
-            ], ['id']],
+            ], ['id'], 'array'],
             'unique null' => [
                 [null, null],
                 [],
+                'null',
             ],
             'unique field null' => [
                 [['nullField' => null], ['nullField' => null]],
                 ['nullField'],
+                'array',
             ],
         ];
     }

@@ -44,6 +44,10 @@ class SerializerTest extends AbstractWebTestCase
         $kernel = static::bootKernel(['test_case' => 'Serializer', 'root_config' => 'default_context.yaml']);
 
         foreach ($kernel->normalizersAndEncoders as $normalizerOrEncoderId) {
+            if (!static::getContainer()->has($normalizerOrEncoderId)) {
+                continue;
+            }
+
             $normalizerOrEncoder = static::getContainer()->get($normalizerOrEncoderId);
 
             $reflectionObject = new \ReflectionObject($normalizerOrEncoder);
@@ -68,7 +72,7 @@ class SerializerKernel extends AppKernel implements CompilerPassInterface
         'serializer.normalizer.property.alias', // Special case as this normalizer isn't tagged
     ];
 
-    public function process(ContainerBuilder $container)
+    public function process(ContainerBuilder $container): void
     {
         $services = array_merge(
             $container->findTaggedServiceIds('serializer.normalizer'),

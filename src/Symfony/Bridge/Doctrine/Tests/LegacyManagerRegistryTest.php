@@ -56,7 +56,7 @@ class LegacyManagerRegistryTest extends TestCase
 
         $this->assertSame($foo, $container->get('foo'));
         $this->assertInstanceOf(ObjectManager::class, $foo);
-        $this->assertFalse(isset($foo->bar));
+        $this->assertFalse(property_exists($foo, 'bar'));
     }
 
     /**

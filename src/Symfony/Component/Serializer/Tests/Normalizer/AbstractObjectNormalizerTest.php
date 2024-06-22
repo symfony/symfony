@@ -1517,6 +1517,11 @@ class AbstractObjectNormalizerWithMetadataAndPropertyTypeExtractors extends Abst
         parent::__construct(new ClassMetadataFactory(new AttributeLoader()), null, new PropertyInfoExtractor([], [new PhpDocExtractor(), new ReflectionExtractor()]));
     }
 
+    public function getSupportedTypes(?string $format): array
+    {
+        return ['*' => false];
+    }
+
     protected function extractAttributes(object $object, ?string $format = null, array $context = []): array
     {
         return [];

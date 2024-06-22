@@ -54,7 +54,7 @@ trait MicroKernelTrait
         $container->import($configDir.'/{packages}/*.{php,yaml}');
         $container->import($configDir.'/{packages}/'.$this->environment.'/*.{php,yaml}');
 
-        if (is_file($configDir.'/services.yaml')) {
+        if (is_file($this->getConfigDir().'/services.yaml')) {
             $container->import($configDir.'/services.yaml');
             $container->import($configDir.'/{services}_'.$this->environment.'.yaml');
         } else {
@@ -79,7 +79,7 @@ trait MicroKernelTrait
         $routes->import($configDir.'/{routes}/'.$this->environment.'/*.{php,yaml}');
         $routes->import($configDir.'/{routes}/*.{php,yaml}');
 
-        if (is_file($configDir.'/routes.yaml')) {
+        if (is_file($this->getConfigDir().'/routes.yaml')) {
             $routes->import($configDir.'/routes.yaml');
         } else {
             $routes->import($configDir.'/{routes}.php');

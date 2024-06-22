@@ -11,11 +11,12 @@
 
 namespace Symfony\Bridge\Doctrine\Tests;
 
+use Doctrine\Persistence\ObjectManager;
 use PHPUnit\Framework\TestCase;
 use ProxyManager\Proxy\LazyLoadingInterface;
 use ProxyManager\Proxy\ValueHolderInterface;
+use Symfony\Bridge\Doctrine\Tests\Fixtures\DummyManager;
 use Symfony\Bridge\ProxyManager\LazyProxy\PhpDumper\ProxyDumper;
-use Symfony\Bridge\ProxyManager\Tests\LazyProxy\Dumper\PhpDumperTest;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Dumper\PhpDumper;
@@ -28,9 +29,16 @@ class LegacyManagerRegistryTest extends TestCase
 {
     public static function setUpBeforeClass(): void
     {
-        if (!class_exists(\LazyServiceProjectServiceContainer::class, false)) {
-            eval('?>'.PhpDumperTest::dumpLazyServiceProjectServiceContainer());
-        }
+        $container = new ContainerBuilder();
+
+        $container->register('foo', DummyManager::class)->setPublic(true);
+        $container->getDefinition('foo')->setLazy(true)->addTag('proxy', ['interface' => ObjectManager::class]);
+        $container->compile();
+
+        $dumper = new PhpDumper($container);
+        $dumper->setProxyDumper(new ProxyDumper());
+
+        eval('?>'.$dumper->dump(['class' => 'LazyServiceProjectServiceContainer']));
     }
 
     public function testResetService()
@@ -47,8 +55,8 @@ class LegacyManagerRegistryTest extends TestCase
         $registry->resetManager();
 
         $this->assertSame($foo, $container->get('foo'));
-        $this->assertInstanceOf(\stdClass::class, $foo);
-        $this->assertFalse(property_exists($foo, 'bar'));
+        $this->assertInstanceOf(ObjectManager::class, $foo);
+        $this->assertFalse(isset($foo->bar));
     }
 
     /**
@@ -80,7 +88,7 @@ class LegacyManagerRegistryTest extends TestCase
 
         $service = $container->get('foo');
 
-        self::assertInstanceOf(\stdClass::class, $service);
+        self::assertInstanceOf(DummyManager::class, $service);
         self::assertInstanceOf(LazyLoadingInterface::class, $service);
         self::assertInstanceOf(ValueHolderInterface::class, $service);
         self::assertFalse($service->isProxyInitialized());
@@ -94,7 +102,7 @@ class LegacyManagerRegistryTest extends TestCase
         $service->initializeProxy();
 
         $wrappedValue = $service->getWrappedValueHolderValue();
-        self::assertInstanceOf(\stdClass::class, $wrappedValue);
+        self::assertInstanceOf(DummyManager::class, $wrappedValue);
         self::assertNotInstanceOf(LazyLoadingInterface::class, $wrappedValue);
         self::assertNotInstanceOf(ValueHolderInterface::class, $wrappedValue);
     }
@@ -107,7 +115,7 @@ class LegacyManagerRegistryTest extends TestCase
 
         $container = new ContainerBuilder();
 
-        $container->register('foo', \stdClass::class)
+        $container->register('foo', DummyManager::class)
             ->setPublic(true)
             ->setLazy(true);
         $container->compile();

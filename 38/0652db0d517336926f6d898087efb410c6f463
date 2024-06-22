@@ -1,0 +1,8 @@
+---------------------------------------------------------------------------
+
+by ndousson at 2024-06-21T14:50:35Z
+
+@javiereguiluz already added most of the doc in the 6.4 branch 🙏🏻
+👉🏻 https://github.com/symfony/symfony/pull/57473
+
+I added the latest 3 new supported headers from the linked MR.

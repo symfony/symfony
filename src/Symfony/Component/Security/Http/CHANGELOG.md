@@ -4,6 +4,7 @@ CHANGELOG
 7.2
 ---
 
+ * Allow passing passport attributes to `AuthenticatorManager::authenticateUser()`
  * Deprecate argument `$secret` of `RememberMeAuthenticator`
 
 7.1

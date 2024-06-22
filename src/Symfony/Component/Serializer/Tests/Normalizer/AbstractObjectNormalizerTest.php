@@ -1522,7 +1522,7 @@ class AbstractObjectNormalizerWithMetadataAndPropertyTypeExtractors extends Abst
         return [];
     }
 
-    protected function getAttributeValue(object $object, string $attribute, ?string $format = null, array $context = [])
+    protected function getAttributeValue(object $object, string $attribute, ?string $format = null, array $context = []): mixed
     {
         return null;
     }

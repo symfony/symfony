@@ -140,7 +140,6 @@ return static function (ContainerConfigurator $container) {
                 service('property_info')->ignoreOnInvalid(),
                 service('serializer.mapping.class_discriminator_resolver')->ignoreOnInvalid(),
                 null,
-                [],
             ])
 
         ->set('serializer.denormalizer.array', ArrayDenormalizer::class)

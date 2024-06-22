@@ -1,0 +1,59 @@
+imports:
+    - { resource: ../config/default.yml }
+
+framework:
+    serializer:
+        enabled: true
+        circular_reference_handler: ~ # This must be null
+        max_depth_handler: ~ # This must be null
+        default_context:
+            fake_context_option: foo
+
+services:
+    serializer.normalizer.constraint_violation_list.alias:
+        alias: serializer.normalizer.constraint_violation_list
+        public: true
+
+    serializer.normalizer.dateinterval.alias:
+        alias: serializer.normalizer.dateinterval
+        public: true
+
+    serializer.normalizer.datetime.alias:
+        alias: serializer.normalizer.datetime
+        public: true
+
+    serializer.normalizer.json_serializable.alias:
+        alias: serializer.normalizer.json_serializable
+        public: true
+
+    serializer.normalizer.object.alias:
+        alias: serializer.normalizer.object
+        public: true
+
+    serializer.normalizer.problem.alias:
+        alias: serializer.normalizer.problem
+        public: true
+
+    serializer.normalizer.property.alias:
+        alias: serializer.normalizer.property
+        public: true
+
+    serializer.normalizer.uid.alias:
+        alias: serializer.normalizer.uid
+        public: true
+
+    serializer.encoder.csv.alias:
+        alias: serializer.encoder.csv
+        public: true
+
+    serializer.encoder.json.alias:
+        alias: serializer.encoder.json
+        public: true
+
+    serializer.encoder.xml.alias:
+        alias: serializer.encoder.xml
+        public: true
+
+    serializer.encoder.yaml.alias:
+        alias: serializer.encoder.yaml
+        public: true

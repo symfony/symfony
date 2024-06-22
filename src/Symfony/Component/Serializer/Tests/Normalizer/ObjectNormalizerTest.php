@@ -25,6 +25,7 @@ use Symfony\Component\Serializer\Exception\UnexpectedValueException;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactory;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
 use Symfony\Component\Serializer\Mapping\Loader\AttributeLoader;
+use Symfony\Component\Serializer\Mapping\Loader\YamlFileLoader;
 use Symfony\Component\Serializer\NameConverter\AdvancedNameConverterInterface;
 use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter;
 use Symfony\Component\Serializer\NameConverter\MetadataAwareNameConverter;
@@ -884,6 +885,40 @@ class ObjectNormalizerTest extends TestCase
 
         $expected = new ObjectDummyWithIgnoreAttributeAndPrivateProperty();
         $expected->foo = 'set';
+
+        $this->assertEquals($expected, $obj);
+    }
+
+    public function testNormalizeWithPropertyPath()
+    {
+        $classMetadataFactory = new ClassMetadataFactory(new YamlFileLoader(__DIR__.'/../Fixtures/property-path-mapping.yaml'));
+        $normalizer = new ObjectNormalizer($classMetadataFactory, new MetadataAwareNameConverter($classMetadataFactory));
+
+        $dummyInner = new ObjectInner();
+        $dummyInner->foo = 'foo';
+        $dummy = new ObjectOuter();
+        $dummy->setInner($dummyInner);
+
+        $this->assertSame(['inner_foo' => 'foo'], $normalizer->normalize($dummy, 'json', ['groups' => 'read']));
+    }
+
+    public function testDenormalizeWithPropertyPath()
+    {
+        $classMetadataFactory = new ClassMetadataFactory(new YamlFileLoader(__DIR__.'/../Fixtures/property-path-mapping.yaml'));
+        $normalizer = new ObjectNormalizer($classMetadataFactory, new MetadataAwareNameConverter($classMetadataFactory));
+
+        $dummy = new ObjectOuter();
+        $dummy->setInner(new ObjectInner());
+
+        $obj = $normalizer->denormalize(['inner_foo' => 'foo'], ObjectOuter::class, 'json', [
+            'object_to_populate' => $dummy,
+            'groups' => 'read',
+        ]);
+
+        $expectedInner = new ObjectInner();
+        $expectedInner->foo = 'foo';
+        $expected = new ObjectOuter();
+        $expected->setInner($expectedInner);
 
         $this->assertEquals($expected, $obj);
     }

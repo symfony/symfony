@@ -1,0 +1,18 @@
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2024-06-18T09:38:11Z
+
+cc @xabbuh this fixes CI on 8.4. I don't know if you've seen it, but just in case so you don't pull your hair out trying to figure out failure 😄
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2024-06-18T09:43:14Z
+
+@alexandre-daubois 👍 thanks, I have seen it but I have no idea around this code. That's why I let @nicolas-grekas do the review here. :)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-06-21T14:54:53Z
+
+I don't have the knowledge to review this PR.
+Maybe @arnaud-lb can help?

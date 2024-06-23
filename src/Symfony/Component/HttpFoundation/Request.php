@@ -651,6 +651,11 @@ class Request
         return $default;
     }
 
+    public function isStateless(): bool
+    {
+        return $this->attributes->getBoolean('_stateless');
+    }
+
     /**
      * Gets the Session.
      *

@@ -206,7 +206,7 @@ abstract class AbstractSessionListener implements EventSubscriberInterface, Rese
                 ->headers->addCacheControlDirective('must-revalidate');
         }
 
-        if (!$event->getRequest()->attributes->get('_stateless', false)) {
+        if (!$event->getRequest()->isStateless()) {
             return;
         }
 
@@ -239,7 +239,7 @@ abstract class AbstractSessionListener implements EventSubscriberInterface, Rese
         $stateless = false;
         $clonedRequestStack = clone $requestStack;
         while (null !== ($request = $clonedRequestStack->pop()) && !$stateless) {
-            $stateless = $request->attributes->get('_stateless');
+            $stateless = $request->isStateless();
         }
 
         if (!$stateless) {

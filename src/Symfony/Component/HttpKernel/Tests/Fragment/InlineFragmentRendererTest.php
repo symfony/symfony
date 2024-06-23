@@ -281,7 +281,7 @@ class InlineFragmentRendererTest extends TestCase
         $kernel
             ->expects($this->once())
             ->method('handle')
-            ->with($this->callback(static fn (Request $subRequest) => $subRequest->attributes->get('_stateless')))
+            ->with($this->callback(static fn (Request $subRequest) => $subRequest->isStateless()))
         ;
         $strategy = new InlineFragmentRenderer($kernel);
         $strategy->render('/', $request);
@@ -296,7 +296,7 @@ class InlineFragmentRendererTest extends TestCase
         $kernel
             ->expects($this->once())
             ->method('handle')
-            ->with($this->callback(static fn (Request $subRequest) => !$subRequest->attributes->get('_stateless')))
+            ->with($this->callback(static fn (Request $subRequest) => !$subRequest->isStateless()))
         ;
         $strategy = new InlineFragmentRenderer($kernel);
         $strategy->render(new ControllerReference('main_controller', ['_stateless' => false]), $request);

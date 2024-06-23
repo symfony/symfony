@@ -86,7 +86,7 @@ class DefaultAuthenticationFailureHandler implements AuthenticationFailureHandle
 
         $this->logger?->debug('Authentication failure, redirect triggered.', ['failure_path' => $options['failure_path']]);
 
-        if (!$request->attributes->getBoolean('_stateless')) {
+        if (!$request->isStateless()) {
             $request->getSession()->set(SecurityRequestAttributes::AUTHENTICATION_ERROR, $exception);
         }
 

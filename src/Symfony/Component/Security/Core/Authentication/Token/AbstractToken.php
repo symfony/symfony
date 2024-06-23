@@ -45,7 +45,7 @@ abstract class AbstractToken implements TokenInterface, \Serializable
 
     public function getUserIdentifier(): string
     {
-        return $this->user ? $this->user->getUserIdentifier() : '';
+        return $this->user?->getUserIdentifier() ?? '';
     }
 
     public function getUser(): ?UserInterface

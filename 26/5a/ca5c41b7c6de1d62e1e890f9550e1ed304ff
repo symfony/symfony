@@ -1,0 +1,64 @@
+---------------------------------------------------------------------------
+
+by derrabus at 2024-06-20T08:24:11Z
+
+Not adding types will cause trouble in other scenarios. We should probably document how to use the trait in untyped codebases.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-06-20T08:30:59Z
+
+Instead, we could generate the method in ProxyHelper maybe?
+Something like
+```php
+use LazyProxyTrait {
+    __unserialize as __doUnserialize;
+}
+
+public function __unserialize($data): void { $this->__doUnserialize($data); }
+```
+
+---------------------------------------------------------------------------
+
+by stof at 2024-06-20T09:05:56Z
+
+wouldn't this cause issues in those other cases mentioned above ? And if no, why not updating the trait directly ?
+
+---------------------------------------------------------------------------
+
+by nikophil at 2024-06-20T09:06:42Z
+
+> Not adding types will cause trouble in other scenarios
+
+as a curiosity, which would be these scenarios?
+
+> Instead, we could generate the method in ProxyHelper maybe?
+
+done!
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-06-20T09:09:52Z
+
+> why not updating the trait directly ?
+
+for correctness and also to allow child classes to add the type hint I'd say
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-06-20T11:48:09Z
+
+Tests are failing so there are some details to fix but this looks good to me so far, thanks.
+
+---------------------------------------------------------------------------
+
+by nikophil at 2024-06-20T11:51:17Z
+
+yes, I saw this... any hints about the failure?
+It occurs in doctrine bridge tests: variable `$service` [here](https://github.com/doctrine/persistence/blob/3.3.x/src/Persistence/AbstractManagerRegistry.php#L165) seems to be a `stdClass_c562334` (hence the failure). But I have the same behavior on branch`6.4` :thinking:
+
+---------------------------------------------------------------------------
+
+by derrabus at 2024-06-20T12:09:39Z
+
+The PR title does not reflect the proposed change anymore though.

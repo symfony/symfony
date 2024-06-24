@@ -321,7 +321,6 @@ final class PhpStanExtractor implements PropertyTypeExtractorInterface, Construc
             if ($trait->hasProperty($property)) {
                 return $this->getDocBlockFromProperty($trait->getName(), $property);
             }
-
         }
 
         // Type can be inside property docblock as `@var`

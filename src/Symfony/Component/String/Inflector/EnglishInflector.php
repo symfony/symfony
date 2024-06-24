@@ -141,7 +141,7 @@ final class EnglishInflector implements InflectorInterface
         // shoes (shoe)
         ['se', 2, true, true, ['', 'e']],
 
-         // status (status)
+        // status (status)
         ['sutats', 6, true, true, 'status'],
 
         // tags (tag)

@@ -1214,7 +1214,7 @@ class SerializerTest extends TestCase
                 'useMessageForUser' => false,
                 'message' => 'The type of the "string" attribute for class "Symfony\\Component\\Serializer\\Tests\\Fixtures\\Php74Full" must be one of "string" ("null" given).',
             ],
-            ];
+        ];
 
         $this->assertSame($expected, $exceptionsAsArray);
     }
@@ -1464,8 +1464,8 @@ class SerializerTest extends TestCase
 
         try {
             $serializer->deserialize('{"get": "POST"}', DummyObjectWithEnumProperty::class, 'json', [
-                 DenormalizerInterface::COLLECT_DENORMALIZATION_ERRORS => true,
-             ]);
+                DenormalizerInterface::COLLECT_DENORMALIZATION_ERRORS => true,
+            ]);
         } catch (\Throwable $e) {
             $this->assertInstanceOf(PartialDenormalizationException::class, $e);
         }

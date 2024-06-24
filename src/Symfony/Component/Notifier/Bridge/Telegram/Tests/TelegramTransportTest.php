@@ -404,7 +404,7 @@ final class TelegramTransportTest extends TransportTestCase
                         'emoji' => '🤖',
                     ],
                     'caption' => 'testMessage',
-                    ],
+                ],
             ],
             'sticker-without-emoji' => [
                 'messageOptions' => (new TelegramOptions())->sticker('https://localhost/sticker.webp'),

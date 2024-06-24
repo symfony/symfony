@@ -20,7 +20,6 @@ use Symfony\Component\HttpKernel\DataCollector\DataCollectorInterface;
  */
 class Profile
 {
-
     /**
      * @var DataCollectorInterface[]
      */

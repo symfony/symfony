@@ -187,7 +187,7 @@ class SplCaster
             $storage[] = new EnumStub([
                 'object' => $obj,
                 'info' => $clone->getInfo(),
-             ]);
+            ]);
         }
 
         $a += [
@@ -219,7 +219,7 @@ class SplCaster
             $map[] = new EnumStub([
                 'object' => $obj,
                 'data' => $data,
-             ]);
+            ]);
         }
 
         $a += [

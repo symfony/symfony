@@ -313,8 +313,8 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
     public function testLabelWithoutTranslationOnButton()
     {
         $form = $this->factory->createNamedBuilder('myform', 'Symfony\Component\Form\Extension\Core\Type\FormType', null, [
-                'translation_domain' => false,
-            ])
+            'translation_domain' => false,
+        ])
             ->add('mybutton', 'Symfony\Component\Form\Extension\Core\Type\ButtonType')
             ->getForm();
         $view = $form->get('mybutton')->createView();
@@ -2412,9 +2412,9 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
     public function testStartTagForMultipartForm()
     {
         $form = $this->factory->createBuilder('Symfony\Component\Form\Extension\Core\Type\FormType', null, [
-                'method' => 'get',
-                'action' => 'http://example.com/directory',
-            ])
+            'method' => 'get',
+            'action' => 'http://example.com/directory',
+        ])
             ->add('file', 'Symfony\Component\Form\Extension\Core\Type\FileType')
             ->getForm();
 
@@ -2559,8 +2559,8 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
     public function testAttributesNotTranslatedWhenTranslationDomainIsFalse()
     {
         $view = $this->factory->createNamedBuilder('name', 'Symfony\Component\Form\Extension\Core\Type\FormType', null, [
-                'translation_domain' => false,
-            ])
+            'translation_domain' => false,
+        ])
             ->add('firstName', 'Symfony\Component\Form\Extension\Core\Type\TextType', ['attr' => ['title' => 'Foo']])
             ->add('lastName', 'Symfony\Component\Form\Extension\Core\Type\TextType', ['attr' => ['placeholder' => 'Bar']])
             ->getForm()

@@ -151,7 +151,6 @@ class MergeExtensionConfigurationPassTest extends TestCase
             $this->assertInstanceOf(ParameterNotFoundException::class, $e);
             $this->assertSame('You have requested a non-existent parameter "missing_parameter" while loading extension "foo".', $e->getMessage());
         }
-
     }
 
     public function testReuseEnvPlaceholderGeneratedByPreviousExtension()

@@ -164,7 +164,7 @@ final class GetSetMethodNormalizer extends AbstractObjectNormalizer
             return false;
         }
 
-        $class = \is_object($classOrObject) ? \get_class($classOrObject) : $classOrObject;
+        $class = \is_object($classOrObject) ? $classOrObject::class : $classOrObject;
 
         if (!isset(self::$reflectionCache[$class])) {
             self::$reflectionCache[$class] = new \ReflectionClass($class);

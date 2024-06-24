@@ -31,7 +31,7 @@ class RedisTraitTest extends TestCase
             self::markTestSkipped('REDIS_CLUSTER_HOSTS env var is not defined.');
         }
 
-        $mock = new class () {
+        $mock = new class() {
             use RedisTrait;
         };
         $connection = $mock::createConnection($dsn);
@@ -45,7 +45,7 @@ class RedisTraitTest extends TestCase
             self::markTestSkipped('REDIS_AUTHENTICATED_HOST env var is not defined.');
         }
 
-        $mock = new class () {
+        $mock = new class() {
             use RedisTrait;
         };
         $connection = $mock::createConnection('redis://:p%40ssword@'.getenv('REDIS_AUTHENTICATED_HOST'));
@@ -104,7 +104,7 @@ class RedisTraitTest extends TestCase
         }
 
         try {
-            $mock = new class () {
+            $mock = new class() {
                 use RedisTrait;
             };
 

@@ -1224,14 +1224,14 @@ class XmlFileLoaderTest extends TestCase
     public static function dataForBindingsAndInnerCollections()
     {
         return [
-           ['bar1', ['item.1', 'item.2']],
-           ['bar2', ['item.1', 'item.2']],
-           ['bar3', ['item.1', 'item.2', 'item.3', 'item.4']],
-           ['bar4', ['item.1', 'item.3', 'item.4']],
-           ['bar5', ['item.1', 'item.2', ['item.3.1', 'item.3.2']]],
-           ['bar6', ['item.1', ['item.2.1', 'item.2.2'], 'item.3']],
-           ['bar7', new IteratorArgument(['item.1', 'item.2'])],
-           ['bar8', new IteratorArgument(['item.1', 'item.2', ['item.3.1', 'item.3.2']])],
+            ['bar1', ['item.1', 'item.2']],
+            ['bar2', ['item.1', 'item.2']],
+            ['bar3', ['item.1', 'item.2', 'item.3', 'item.4']],
+            ['bar4', ['item.1', 'item.3', 'item.4']],
+            ['bar5', ['item.1', 'item.2', ['item.3.1', 'item.3.2']]],
+            ['bar6', ['item.1', ['item.2.1', 'item.2.2'], 'item.3']],
+            ['bar7', new IteratorArgument(['item.1', 'item.2'])],
+            ['bar8', new IteratorArgument(['item.1', 'item.2', ['item.3.1', 'item.3.2']])],
         ];
     }
 

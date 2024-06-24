@@ -691,9 +691,9 @@ abstract class AbstractDivLayoutTestCase extends AbstractLayoutTestCase
     public function testChoiceRowWithCustomBlock()
     {
         $form = $this->factory->createNamedBuilder('name_c', 'Symfony\Component\Form\Extension\Core\Type\ChoiceType', 'a', [
-                'choices' => ['ChoiceA' => 'a', 'ChoiceB' => 'b'],
-                'expanded' => true,
-            ])
+            'choices' => ['ChoiceA' => 'a', 'ChoiceB' => 'b'],
+            'expanded' => true,
+        ])
             ->getForm();
 
         $this->assertWidgetMatchesXpath($form->createView(), [],

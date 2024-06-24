@@ -4,6 +4,7 @@ CHANGELOG
 7.2
 ---
 
+ * Add `#[AsMessage]` attribute with `$transport` parameter for message routing
  * Add `--format` option to the `messenger:stats` command
 
 7.1

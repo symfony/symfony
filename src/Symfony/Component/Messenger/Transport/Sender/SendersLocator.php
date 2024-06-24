@@ -12,6 +12,7 @@
 namespace Symfony\Component\Messenger\Transport\Sender;
 
 use Psr\Container\ContainerInterface;
+use Symfony\Component\Messenger\Attribute\AsMessage;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\RuntimeException;
 use Symfony\Component\Messenger\Handler\HandlersLocator;
@@ -45,6 +46,7 @@ class SendersLocator implements SendersLocatorInterface
         }
 
         $seen = [];
+        $found = false;
 
         foreach (HandlersLocator::listTypes($envelope) as $type) {
             if (str_ends_with($type, '*') && $seen) {
@@ -58,9 +60,37 @@ class SendersLocator implements SendersLocatorInterface
                     $seen[] = $senderAlias;
 
                     yield from $this->getSenderFromAlias($senderAlias);
+                    $found = true;
                 }
             }
         }
+
+        // Let the configuration-driven map upper override message attributes,
+        // this allows environment-specific configuration overriding hardcoded
+        // transport name.
+        if ($found) {
+            return;
+        }
+
+        foreach ($this->getTransportNamesFromAttribute($envelope) as $senderAlias) {
+            yield from $this->getSenderFromAlias($senderAlias);
+        }
+    }
+
+    private function getTransportNamesFromAttribute(Envelope $envelope): array
+    {
+        $transports = [];
+        $message = $envelope->getMessage();
+
+        foreach ((new \ReflectionClass($message))->getAttributes(AsMessage::class, \ReflectionAttribute::IS_INSTANCEOF) as $refAttr) {
+            $asMessage = $refAttr->newInstance();
+
+            if ($asMessage->transport) {
+                $transports = \array_merge($transports, (array) $asMessage->transport);
+            }
+        }
+
+        return $transports;
     }
 
     private function getSenderFromAlias(string $senderAlias): iterable

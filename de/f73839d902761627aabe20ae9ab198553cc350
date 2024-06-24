@@ -1,0 +1,12 @@
+---------------------------------------------------------------------------
+
+by keradus at 2024-06-16T16:47:21Z
+
+- 8.4 failing on core repo as well
+- psalm complains about `src/Symfony/Bridge/PhpUnit`, i saw it in previous PRs of mine too and they were not related to my code before, I'm happy to ignore them or have anyone explaining me how i broke it, i tried to debug psalm few times without success
+
+---------------------------------------------------------------------------
+
+by fabpot at 2024-06-21T18:47:29Z
+
+For 7.2.

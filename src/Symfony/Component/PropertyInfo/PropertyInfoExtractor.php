@@ -20,7 +20,7 @@ use Symfony\Component\TypeInfo\Type;
  *
  * @final
  */
-class PropertyInfoExtractor implements PropertyInfoExtractorInterface, PropertyInitializableExtractorInterface
+class PropertyInfoExtractor implements PropertyInfoExtractorInterface, PropertyInitializableExtractorInterface, PropertyAttributesExtractorInterface
 {
     /**
      * @param iterable<mixed, PropertyListExtractorInterface>          $listExtractors

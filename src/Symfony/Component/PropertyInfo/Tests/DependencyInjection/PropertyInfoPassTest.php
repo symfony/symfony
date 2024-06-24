@@ -26,7 +26,7 @@ class PropertyInfoPassTest extends TestCase
     {
         $container = new ContainerBuilder();
 
-        $definition = $container->register('property_info')->setArguments([null, null, null, null, null]);
+        $definition = $container->register('property_info')->setArguments([null, null, null, null, null, null]);
         $container->register('n2')->addTag($tag, ['priority' => 100]);
         $container->register('n1')->addTag($tag, ['priority' => 200]);
         $container->register('n3')->addTag($tag);
@@ -50,6 +50,7 @@ class PropertyInfoPassTest extends TestCase
             [2, 'property_info.description_extractor'],
             [3, 'property_info.access_extractor'],
             [4, 'property_info.initializable_extractor'],
+            [5, 'property_info.attributes_extractor'],
         ];
     }
 
@@ -57,7 +58,7 @@ class PropertyInfoPassTest extends TestCase
     {
         $container = new ContainerBuilder();
         $propertyInfoExtractorDefinition = $container->register('property_info')
-            ->setArguments([[], [], [], [], []]);
+            ->setArguments([[], [], [], [], [], []]);
 
         $propertyInfoPass = new PropertyInfoPass();
         $propertyInfoPass->process($container);
@@ -67,5 +68,6 @@ class PropertyInfoPassTest extends TestCase
         $this->assertEquals(new IteratorArgument([]), $propertyInfoExtractorDefinition->getArgument(2));
         $this->assertEquals(new IteratorArgument([]), $propertyInfoExtractorDefinition->getArgument(3));
         $this->assertEquals(new IteratorArgument([]), $propertyInfoExtractorDefinition->getArgument(4));
+        $this->assertEquals(new IteratorArgument([]), $propertyInfoExtractorDefinition->getArgument(5));
     }
 }

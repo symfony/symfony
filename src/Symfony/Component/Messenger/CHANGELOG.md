@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+7.2
+---
+
+ * Add `--format` option to the `messenger:stats` command
+
 7.1
 ---
 

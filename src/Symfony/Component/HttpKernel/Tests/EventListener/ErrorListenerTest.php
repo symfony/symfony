@@ -143,7 +143,6 @@ class ErrorListenerTest extends TestCase
         $this->assertCount(1, $logger->getLogs('warning'));
     }
 
-
     public function testHandleWithLogChannel()
     {
         $request = new Request();
@@ -196,7 +195,7 @@ class ErrorListenerTest extends TestCase
 
         $this->assertEquals(new Response('foo', 401), $event->getResponse());
 
-        $this->assertEquals(0, $defaultLogger->countErrors());
+        $this->assertSame(0, $defaultLogger->countErrors());
         $this->assertCount(0, $defaultLogger->getLogs('critical'));
         $this->assertCount(1, $defaultLogger->getLogs('warning'));
         $this->assertCount(0, $channelLoger->getLogs('warning'));

@@ -386,7 +386,7 @@ class FrameworkExtension extends Extension
             if (!isset($exception['log_channel'])) {
                 continue;
             }
-            $loggers[$exception['log_channel']] = new Reference(sprintf('monolog.logger.%s', $exception['log_channel']));
+            $loggers[$exception['log_channel']] = new Reference(sprintf('monolog.logger.%s', $exception['log_channel']), ContainerInterface::NULL_ON_INVALID_REFERENCE);
         }
         
         $exceptionListener

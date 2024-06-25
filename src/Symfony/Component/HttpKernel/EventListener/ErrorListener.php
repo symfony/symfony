@@ -165,12 +165,9 @@ class ErrorListener implements EventSubscriberInterface
     protected function logException(\Throwable $exception, string $message, ?string $logLevel = null, ?string $logChannel = null): void
     {
         $logLevel ??= $this->resolveLogLevel($exception);
-        
         $logChannel ??= $this->resolveLogChannel($exception);
         
-        $logger = $this->getLogger($logChannel);
-        
-        if(null === $logger) {
+        if(!$logger = $this->getLogger($logChannel)) {
             return;
         }
 
@@ -267,8 +264,8 @@ class ErrorListener implements EventSubscriberInterface
         return $attributeReflector?->newInstance();
     }
 
-    private function getLogger(?string $logChannel = null): ?LoggerInterface
+    private function getLogger(?string $logChannel): ?LoggerInterface
     {
-        return $this->loggers[$logChannel] ?? $this->logger;
+        return $logChannel ? $this->loggers[$logChannel] ?? $this->logger : $this->logger;
     }
 }

@@ -1,0 +1,42 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2024-06-21T12:38:21Z
+
+Hey!
+
+Thanks for your PR. You are targeting branch "6.4" but it seems your PR description refers to branch "7.2 for features / 5.4, 6.4, 7.0, and 7.1 for bug fixes".
+Could you update the PR description or change target branch? This helps core maintainers a lot.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by derrabus at 2024-06-21T13:08:49Z
+
+Thank you for your PR. However, we do not accept code-style changes on LTS branches, which is why I'm retargeting your PR to the 7.2 branch.
+
+---------------------------------------------------------------------------
+
+by stof at 2024-06-21T14:25:22Z
+
+Is this actually optimizing something ?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-06-21T14:26:42Z
+
+I don't think so, this is just CS cleanup.
+
+---------------------------------------------------------------------------
+
+by stof at 2024-06-21T14:28:26Z
+
+then the PR description is misleading
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2024-06-25T07:47:08Z
+
+I am 👎 on merging this, it is just syntax sugar to me

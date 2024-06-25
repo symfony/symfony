@@ -1,0 +1,58 @@
+---------------------------------------------------------------------------
+
+by 94noni at 2024-06-13T07:21:48Z
+
+I like it, it add lot of value for understanding
+just the cross red icon looks wrong, wdyt (if doable) to replace by a yellow dash ?
+
+green check for supported and ok
+red cross for supported and ko
+yellow dash for unsupported/skipped
+
+(similar to earlier review based on https://github.com/symfony/symfony/pull/51585)
+
+---------------------------------------------------------------------------
+
+by MatTheCat at 2024-06-13T08:07:43Z
+
+@94noni thanks for your feedback! I didn’t design anything though: you can already see authenticators in the profiler as long as at least one supports the request; this PR just displays them the same way when it is not the case.
+
+~That being said changing some styles should not harm this PR :thinking: WDYT @javiereguiluz?~
+
+Design changes will be required for #57382 so we can discuss them here.
+
+---------------------------------------------------------------------------
+
+by MatTheCat at 2024-06-19T07:56:33Z
+
+@fabpot the design did not change: this PR displays authenticators the same way they already are.
+
+We can save design discussions for #57382 which will require some!
+
+---------------------------------------------------------------------------
+
+by MatTheCat at 2024-06-19T15:46:02Z
+
+:warning: I noticed only authenticators which are not skipped are decorated, which means this only happens **after** their `supports` method is called for the first time. Unfortunately this implies we cannot know what happened before.
+
+I thought about displaying authenticators logs in the profiler, but currently we cannot get the ones from the first `supports` call (which could typically explain why the authenticator was skipped).
+
+As such I tried to decorate the authenticators in the container rather than in the `TraceableAuthenticatorManagerListener`, so this PR must be reviewed again (sorry :sweat_smile:).
+
+---------------------------------------------------------------------------
+
+by MatTheCat at 2024-06-21T20:39:46Z
+
+Sooo Iʼd like to understand what `high-deps` is about because it doesnʼt feel right to make two incompatible components work together :thinking:
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-06-24T15:56:02Z
+
+deps=high is ensuring that SecurityBundle v7.1 will work with security-http v7.2. Looks like this is not the case currently;
+
+---------------------------------------------------------------------------
+
+by MatTheCat at 2024-06-24T16:49:47Z
+
+Okay, made it work. I was stuck because SecurityBundle v7.2 requires security-http v7.2 but I didn’t consider the other way around.

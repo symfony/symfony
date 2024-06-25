@@ -1,0 +1,38 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2024-06-21T16:48:08Z
+
+Hey!
+
+Thanks for your PR. You are targeting branch "7.2" but it seems your PR description refers to branch "7.1".
+Could you update the PR description or change target branch? This helps core maintainers a lot.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2024-06-21T17:44:59Z
+
+As this is not a bugfix this PR must target the ’7.2` branch.
+
+---------------------------------------------------------------------------
+
+by eltharin at 2024-06-21T19:14:45Z
+
+If you look the documentation for 7.1 it's written the attribute is alternative to `$submittedToken = $request->getPayload()->get('token');` but it's not really
+So It's a bug not a new feature.
+https://symfony.com/doc/current/security/csrf.html#generating-and-checking-csrf-tokens-manually
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2024-06-21T19:31:29Z
+
+That’s a bug in the documentation (caused by https://github.com/symfony/symfony-docs/pull/19225) and needs to be fixed there.
+
+---------------------------------------------------------------------------
+
+by eltharin at 2024-06-21T19:39:58Z
+
+no need to fix the fake bug in documentation since the real bug is fixed. One moire time it's not a new feature

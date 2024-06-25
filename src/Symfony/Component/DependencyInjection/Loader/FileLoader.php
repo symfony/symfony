@@ -21,6 +21,7 @@ use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\Attribute\AsAlias;
 use Symfony\Component\DependencyInjection\Attribute\Exclude;
 use Symfony\Component\DependencyInjection\Attribute\When;
+use Symfony\Component\DependencyInjection\Attribute\WhenNot;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Compiler\RegisterAutoconfigureAttributesPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -154,14 +155,32 @@ abstract class FileLoader extends BaseFileLoader
                     continue;
                 }
                 if ($this->env) {
-                    $attribute = null;
-                    foreach ($r->getAttributes(When::class, \ReflectionAttribute::IS_INSTANCEOF) as $attribute) {
+                    $excluded = true;
+                    $whenAttributes = $r->getAttributes(When::class, \ReflectionAttribute::IS_INSTANCEOF);
+                    $notWhenAttributes = $r->getAttributes(WhenNot::class, \ReflectionAttribute::IS_INSTANCEOF);
+
+                    if ($whenAttributes && $notWhenAttributes) {
+                        throw new LogicException(sprintf('The "%s" class cannot have both #[When] and #[WhenNot] attributes.', $class));
+                    }
+
+                    if (!$whenAttributes && !$notWhenAttributes) {
+                        $excluded = false;
+                    }
+
+                    foreach ($whenAttributes as $attribute) {
                         if ($this->env === $attribute->newInstance()->env) {
-                            $attribute = null;
+                            $excluded = false;
                             break;
                         }
                     }
-                    if (null !== $attribute) {
+
+                    foreach ($notWhenAttributes as $attribute) {
+                        if ($excluded = $this->env === $attribute->newInstance()->env) {
+                            break;
+                        }
+                    }
+
+                    if ($excluded) {
                         $this->addContainerExcludedTag($class, $source);
                         continue;
                     }

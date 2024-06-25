@@ -16,9 +16,11 @@ use Symfony\Component\Config\Builder\ConfigBuilderGeneratorInterface;
 use Symfony\Component\Config\Builder\ConfigBuilderInterface;
 use Symfony\Component\Config\FileLocatorInterface;
 use Symfony\Component\DependencyInjection\Attribute\When;
+use Symfony\Component\DependencyInjection\Attribute\WhenNot;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
+use Symfony\Component\DependencyInjection\Exception\LogicException;
 use Symfony\Component\DependencyInjection\Extension\ConfigurationExtensionInterface;
 use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
@@ -97,14 +99,32 @@ class PhpFileLoader extends FileLoader
         $configBuilders = [];
         $r = new \ReflectionFunction($callback);
 
-        $attribute = null;
-        foreach ($r->getAttributes(When::class, \ReflectionAttribute::IS_INSTANCEOF) as $attribute) {
+        $excluded = true;
+        $whenAttributes = $r->getAttributes(When::class, \ReflectionAttribute::IS_INSTANCEOF);
+        $notWhenAttributes = $r->getAttributes(WhenNot::class, \ReflectionAttribute::IS_INSTANCEOF);
+
+        if ($whenAttributes && $notWhenAttributes) {
+            throw new LogicException('Using both #[When] and #[WhenNot] attributes on the same target is not allowed.');
+        }
+
+        if (!$whenAttributes && !$notWhenAttributes) {
+            $excluded = false;
+        }
+
+        foreach ($whenAttributes as $attribute) {
             if ($this->env === $attribute->newInstance()->env) {
-                $attribute = null;
+                $excluded = false;
                 break;
             }
         }
-        if (null !== $attribute) {
+
+        foreach ($notWhenAttributes as $attribute) {
+            if ($excluded = $this->env === $attribute->newInstance()->env) {
+                break;
+            }
+        }
+
+        if ($excluded) {
             return;
         }
 

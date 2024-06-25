@@ -1,0 +1,25 @@
+---------------------------------------------------------------------------
+
+by OskarStark at 2024-06-23T12:44:21Z
+
+This is a new feature and must target 7.2 branch please
+
+---------------------------------------------------------------------------
+
+by MrMicky-FR at 2024-06-23T13:05:29Z
+
+Thanks for your quick answer, but isn't this more of a bug fix, since `Email` methods like `replyTo` or `priority` are currently ignored with this bridge, when they shouldn't be?
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2024-06-23T15:39:01Z
+
+One could discuss, as the bridge ignores them now, it is some kind of behavior change and we are always very careful with merging such things.
+From my side a new feature, but open for a bugfix. Let's see what other members say 😎
+
+---------------------------------------------------------------------------
+
+by fabpot at 2024-06-25T06:42:29Z
+
+Without a doubt, this is a new feature (as it introduces a new behavior).
+But as the `Reply-To` header is important, I'm going to merge it as a bug fix.

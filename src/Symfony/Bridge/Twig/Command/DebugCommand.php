@@ -57,7 +57,7 @@ class DebugCommand extends Command
             ->setDefinition([
                 new InputArgument('name', InputArgument::OPTIONAL, 'The template name'),
                 new InputOption('filter', null, InputOption::VALUE_REQUIRED, 'Show details for all entries matching this filter'),
-                new InputOption('format', null, InputOption::VALUE_REQUIRED, \sprintf('The output format ("%s")', implode('", "', $this->getAvailableFormatOptions())), 'text'),
+                new InputOption('format', null, InputOption::VALUE_REQUIRED, \sprintf('The output format ("%s")', implode('", "', $this->getAvailableFormatOptions())), 'txt'),
             ])
             ->setHelp(<<<'EOF'
 The <info>%command.name%</info> command outputs a list of twig functions,
@@ -93,8 +93,14 @@ EOF
             throw new InvalidArgumentException(\sprintf('Argument "name" not supported, it requires the Twig loader "%s".', FilesystemLoader::class));
         }
 
-        match ($input->getOption('format')) {
-            'text' => $name ? $this->displayPathsText($io, $name) : $this->displayGeneralText($io, $filter),
+        $format = $input->getOption('format');
+        if ('text' === $format) {
+            trigger_deprecation('symfony/twig-bridge', '7.2', 'The "text" format is deprecated, use "txt" instead.');
+
+            $format = 'txt';
+        }
+        match ($format) {
+            'txt' => $name ? $this->displayPathsText($io, $name) : $this->displayGeneralText($io, $filter),
             'json' => $name ? $this->displayPathsJson($io, $name) : $this->displayGeneralJson($io, $filter),
             default => throw new InvalidArgumentException(\sprintf('Supported formats are "%s".', implode('", "', $this->getAvailableFormatOptions()))),
         };
@@ -582,8 +588,9 @@ EOF
         return (string) $this->fileLinkFormatter?->format($absolutePath, 1);
     }
 
+    /** @return string[] */
     private function getAvailableFormatOptions(): array
     {
-        return ['text', 'json'];
+        return ['txt', 'json'];
     }
 }

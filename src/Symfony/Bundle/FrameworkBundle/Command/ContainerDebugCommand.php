@@ -106,6 +106,9 @@ using the <info>--show-hidden</info> flag:
 
   <info>php %command.full_name% --show-hidden</info>
 
+The <info>--format</info> option specifies the format of the command output:
+
+  <info>php %command.full_name% --format=json</info>
 EOF
             )
         ;
@@ -358,6 +361,7 @@ EOF
         return class_exists($serviceId) || interface_exists($serviceId, false);
     }
 
+    /** @return string[] */
     private function getAvailableFormatOptions(): array
     {
         return (new DescriptorHelper())->getFormats();

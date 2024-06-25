@@ -17,6 +17,7 @@
     ],
     "require": {
         "php": ">=8.2",
+        "symfony/deprecation-contracts": "^2.5|^3",
         "symfony/translation-contracts": "^2.5|^3",
         "twig/twig": "^3.9"
     },

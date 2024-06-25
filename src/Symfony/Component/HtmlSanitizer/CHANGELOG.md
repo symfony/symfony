@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+7.1
+---
+
+ * Add functions to allow operations on arrays of attributes and elements at a time
+
 6.4
 ---
 

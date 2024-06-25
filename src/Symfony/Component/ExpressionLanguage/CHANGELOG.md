@@ -5,6 +5,7 @@ CHANGELOG
 ---
 
  * Add support for null-coalescing unknown variables
+ * Add support for comments using `/*` & `*/`
 
 7.1
 ---

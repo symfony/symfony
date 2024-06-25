@@ -459,6 +459,43 @@ class ExpressionLanguageTest extends TestCase
         $registerCallback($el);
     }
 
+    public static function validCommentProvider()
+    {
+        yield ['1 /* comment */ + 1'];
+        yield ['1 /* /* comment with spaces */'];
+        yield ['1 /** extra stars **/ + 1'];
+        yield ["/* multi\nline */ 'foo'"];
+    }
+
+    /**
+     * @dataProvider validCommentProvider
+     */
+    public function testLintAllowsComments($expression)
+    {
+        $el = new ExpressionLanguage();
+        $el->lint($expression, []);
+
+        $this->expectNotToPerformAssertions();
+    }
+
+    public static function invalidCommentProvider()
+    {
+        yield ['1 + no start */'];
+        yield ['1 /* no closing'];
+        yield ['1 /* double closing */ */'];
+    }
+
+    /**
+     * @dataProvider invalidCommentProvider
+     */
+    public function testLintThrowsOnInvalidComments($expression)
+    {
+        $el = new ExpressionLanguage();
+
+        $this->expectException(SyntaxError::class);
+        $el->lint($expression, []);
+    }
+
     public function testLintDoesntThrowOnValidExpression()
     {
         $el = new ExpressionLanguage();
@@ -475,6 +512,13 @@ class ExpressionLanguageTest extends TestCase
         $this->expectExceptionMessage('Unexpected end of expression around position 6 for expression `node.`.');
 
         $el->lint('node.', ['node']);
+    }
+
+    public function testCommentsIgnored()
+    {
+        $expressionLanguage = new ExpressionLanguage();
+        $this->assertSame(3, $expressionLanguage->evaluate('1 /* foo */ + 2'));
+        $this->assertSame('(1 + 2)', $expressionLanguage->compile('1 /* foo */ + 2'));
     }
 
     public static function getRegisterCallbacks()

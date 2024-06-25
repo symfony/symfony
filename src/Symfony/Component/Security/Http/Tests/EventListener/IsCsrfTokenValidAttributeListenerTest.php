@@ -88,6 +88,28 @@ class IsCsrfTokenValidAttributeListenerTest extends TestCase
         $listener->onKernelControllerArguments($event);
     }
 
+    public function testIsCsrfTokenValidCalledCorrectlyInPayload()
+    {
+        $request = new Request(server: ['headers' => ['content-type' => 'application/json']], content: json_encode(['_token' => 'bar']));
+
+        $csrfTokenManager = $this->createMock(CsrfTokenManagerInterface::class);
+        $csrfTokenManager->expects($this->once())
+            ->method('isTokenValid')
+            ->with(new CsrfToken('foo', 'bar'))
+            ->willReturn(true);
+
+        $event = new ControllerArgumentsEvent(
+            $this->createMock(HttpKernelInterface::class),
+            [new IsCsrfTokenValidAttributeMethodsController(), 'withDefaultTokenKey'],
+            [],
+            $request,
+            null
+        );
+
+        $listener = new IsCsrfTokenValidAttributeListener($csrfTokenManager);
+        $listener->onKernelControllerArguments($event);
+    }
+
     public function testIsCsrfTokenValidCalledCorrectlyWithCustomExpressionId()
     {
         $request = new Request(query: ['id' => '123'], request: ['_token' => 'bar']);

@@ -1,0 +1,50 @@
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2024-06-12T14:22:09Z
+
+Tests added on both attribute on classes and functions.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-06-13T08:06:20Z
+
+What about `WhenNot`? would that help with DX + IDE autocompletion?
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2024-06-13T08:53:17Z
+
+I was not sure at first it makes sense in English but thinking about it again, seems fine when writing it. This is way better for discovery indeed:
+
+<img width="888" alt="Capture d’écran 2024-06-13 à 10 50 24" src="https://github.com/symfony/symfony/assets/2144837/3a2949eb-9b66-44d7-bd2a-7d8422143b99">
+
+So it's a 👍 to me
+
+---------------------------------------------------------------------------
+
+by dkarlovi at 2024-06-14T12:36:27Z
+
+Note that the `Choice` validator was inverted not by adding `NotChoice` (suggested in #26074) but by adding `match=false` to the original validator in #45977.
+
+It might make sense to streamline here?
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2024-06-16T15:06:34Z
+
+I kind of find it hard to understand at first glance personally. I'm afraid it gives "yoga style" kind of confusion when reading it.
+But I'd understand if we want to keep some consistency (I'm not sure I fully read the discussion about Choice), just my thought 🙂
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-06-25T13:40:15Z
+
+What's the status of this PR?
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2024-06-25T14:29:49Z
+
+Status: Needs Review
+
+I still think that would be a nice addition for DX 👍

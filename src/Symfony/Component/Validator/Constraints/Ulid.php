@@ -12,6 +12,7 @@
 namespace Symfony\Component\Validator\Constraints;
 
 use Symfony\Component\Validator\Constraint;
+use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 
 /**
  * Validates that a value is a valid Universally Unique Lexicographically Sortable Identifier (ULID).
@@ -35,20 +36,31 @@ class Ulid extends Constraint
         self::TOO_LARGE_ERROR => 'TOO_LARGE_ERROR',
     ];
 
+    public const FORMAT_BASE_32 = 'base32';
+    public const FORMAT_BASE_58 = 'base58';
+
     public string $message = 'This is not a valid ULID.';
+    public string $format = self::FORMAT_BASE_32;
 
     /**
      * @param array<string,mixed>|null $options
      * @param string[]|null            $groups
+     * @param self::FORMAT_*|null      $format
      */
     public function __construct(
         ?array $options = null,
         ?string $message = null,
         ?array $groups = null,
         mixed $payload = null,
+        ?string $format = null,
     ) {
         parent::__construct($options, $groups, $payload);
 
         $this->message = $message ?? $this->message;
+        $this->format = $format ?? $this->format;
+
+        if (!\in_array($this->format, [self::FORMAT_BASE_32, self::FORMAT_BASE_58], true)) {
+            throw new ConstraintDefinitionException(sprintf('The "%s" validation format is not supported.', $format));
+        }
     }
 }

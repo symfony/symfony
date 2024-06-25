@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+7.2
+---
+
+ * Add `binary_flags` parameter and argument types in `XmlFileLoader`
+
 7.1
 ---
 

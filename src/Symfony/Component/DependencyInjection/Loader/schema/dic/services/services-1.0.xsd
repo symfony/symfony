@@ -342,6 +342,7 @@
       <xsd:enumeration value="string" />
       <xsd:enumeration value="constant" />
       <xsd:enumeration value="binary" />
+      <xsd:enumeration value="binary_flags" />
     </xsd:restriction>
   </xsd:simpleType>
 
@@ -354,6 +355,7 @@
       <xsd:enumeration value="string" />
       <xsd:enumeration value="constant" />
       <xsd:enumeration value="binary" />
+      <xsd:enumeration value="binary_flags" />
       <xsd:enumeration value="iterator" />
       <xsd:enumeration value="closure" />
       <xsd:enumeration value="service_closure" />

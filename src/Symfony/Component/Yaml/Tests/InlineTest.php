@@ -119,6 +119,42 @@ class InlineTest extends TestCase
         Inline::parse('!php/enum SomeEnum::Foo', Yaml::PARSE_EXCEPTION_ON_INVALID_TYPE);
     }
 
+    public function testParseSingleBinaryFlag()
+    {
+        $this->assertSame(Yaml::PARSE_CONSTANT, Inline::parse('!!binary_flags Symfony\Component\Yaml\Yaml::PARSE_CONSTANT', Yaml::PARSE_CONSTANT));
+    }
+
+    public function testParseMultipleBinaryFlags()
+    {
+        $this->assertSame(Yaml::PARSE_CONSTANT | Yaml::PARSE_CUSTOM_TAGS, Inline::parse('!!binary_flags Symfony\Component\Yaml\Yaml::PARSE_CONSTANT | Symfony\Component\Yaml\Yaml::PARSE_CUSTOM_TAGS', Yaml::PARSE_CONSTANT));
+    }
+
+    public function testParseBinaryFlagsThrowsExceptionWhenUndefined()
+    {
+        $this->expectException(ParseException::class);
+        $this->expectExceptionMessage('The constant "WRONG_CONSTANT" is not defined');
+        Inline::parse('!!binary_flags WRONG_CONSTANT', Yaml::PARSE_CONSTANT);
+    }
+
+    public function testParseBinaryFlagsThrowsExceptionWhenNotAnInt()
+    {
+        $this->expectException(ParseException::class);
+        $this->expectExceptionMessage('The constant "DIRECTORY_SEPARATOR" is not an integer');
+        Inline::parse('!!binary_flags DIRECTORY_SEPARATOR', Yaml::PARSE_CONSTANT);
+    }
+
+    public function testParseBinaryFlagsWithoutFlags()
+    {
+        $this->assertNull(Inline::parse('!!binary_flags PHP_INT_MAX'));
+    }
+
+    public function testParseBinaryFlagsWithoutOptionToParseConstants()
+    {
+        $this->expectException(ParseException::class);
+        $this->expectExceptionMessageMatches('/The string "!!binary_flags PHP_INT_MAX" could not be parsed as binary flags.*/');
+        Inline::parse('!!binary_flags PHP_INT_MAX', Yaml::PARSE_EXCEPTION_ON_INVALID_TYPE);
+    }
+
     /**
      * @dataProvider getTestsForDump
      */

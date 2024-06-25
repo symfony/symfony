@@ -623,6 +623,10 @@ class XmlFileLoader extends FileLoader
                 case 'constant':
                     $arguments[$key] = \constant(trim($arg->nodeValue));
                     break;
+                case 'binary_flags':
+                    $constants = \array_map(\constant(...), \array_map(trim(...), \explode('|', $arg->nodeValue)));
+                    $arguments[$key] = \array_reduce($constants, static fn ($carry, $item) => $carry | $item, 0);
+                    break;
                 default:
                     $arguments[$key] = XmlUtils::phpize($trim ? trim($arg->nodeValue) : $arg->nodeValue);
             }

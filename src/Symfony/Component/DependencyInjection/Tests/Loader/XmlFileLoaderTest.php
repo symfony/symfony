@@ -40,6 +40,7 @@ use Symfony\Component\DependencyInjection\Tests\Fixtures\Bar;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\BarInterface;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\CaseSensitiveClass;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\FooClassWithEnumAttribute;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\FooClassWithFlags;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\FooUnitEnum;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\FooWithAbstractArgument;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\NamedArgumentsDummy;
@@ -962,6 +963,26 @@ class XmlFileLoaderTest extends TestCase
 
         $this->expectException(\Error::class);
         $loader->load('services_with_invalid_enumeration.xml');
+    }
+
+    public function testBinaryFlags()
+    {
+        $container = new ContainerBuilder();
+        $loader = new XmlFileLoader($container, new FileLocator(self::$fixturesPath.'/xml'));
+        $loader->load('services_with_binary_flags.xml');
+        $container->compile();
+
+        $definition = $container->getDefinition(FooClassWithFlags::class);
+        $this->assertSame([FooClassWithFlags::FLAG_A | FooClassWithFlags::FLAG_C], $definition->getArguments());
+    }
+
+    public function testInvalidBinaryFlags()
+    {
+        $container = new ContainerBuilder();
+        $loader = new XmlFileLoader($container, new FileLocator(self::$fixturesPath.'/xml'));
+
+        $this->expectException(\Error::class);
+        $loader->load('services_with_invalid_binary_flags.xml');
     }
 
     public function testInstanceOfAndChildDefinition()

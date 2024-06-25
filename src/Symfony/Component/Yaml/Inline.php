@@ -681,6 +681,15 @@ class Inline
                         return (float) substr($scalar, 8);
                     case str_starts_with($scalar, '!!binary '):
                         return self::evaluateBinaryScalar(substr($scalar, 9));
+                    case str_starts_with($scalar, '!!binary_flags '):
+                        if (self::$constantSupport) {
+                            return self::evaluateBinaryFlags(substr($scalar, 15));
+                        }
+                        if (self::$exceptionOnInvalidType) {
+                            throw new ParseException(\sprintf('The string "%s" could not be parsed as binary flags. Did you forget to pass the "Yaml::PARSE_CONSTANT" flag to the parser?', $scalar), self::$parsedLineNumber + 1, $scalar, self::$parsedFilename);
+                        }
+
+                        return null;
                 }
 
                 throw new ParseException(\sprintf('The string "%s" could not be parsed as it uses an unsupported built-in tag.', $scalar), self::$parsedLineNumber, $scalar, self::$parsedFilename);
@@ -795,6 +804,28 @@ class Inline
         }
 
         return base64_decode($parsedBinaryData, true);
+    }
+
+    public static function evaluateBinaryFlags(string $flags): int
+    {
+        $constants = \explode('|', $flags);
+        $result = 0;
+
+        foreach ($constants as $rawConstant) {
+            $rawConstant = \trim($rawConstant);
+            if (!\defined($rawConstant)) {
+                throw new ParseException(\sprintf('The constant "%s" is not defined.', $rawConstant), self::$parsedLineNumber + 1, $flags, self::$parsedFilename);
+            }
+
+            $constant = \constant($rawConstant);
+            if (!\is_int($constant)) {
+                throw new ParseException(\sprintf('The constant "%s" is not an integer.', $rawConstant), self::$parsedLineNumber + 1, $flags, self::$parsedFilename);
+            }
+
+            $result |= $constant;
+        }
+
+        return $result;
     }
 
     private static function isBinaryString(string $value): bool

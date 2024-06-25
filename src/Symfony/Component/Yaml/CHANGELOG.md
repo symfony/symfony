@@ -5,6 +5,7 @@ CHANGELOG
 ---
 
  * Deprecate parsing duplicate mapping keys whose value is `null`
+ * Add support for binary flags with the `!!binary_flags` tag
 
 7.1
 ---

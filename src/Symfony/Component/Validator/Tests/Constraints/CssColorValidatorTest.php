@@ -403,7 +403,7 @@ final class CssColorValidatorTest extends ConstraintValidatorTestCase
     }
 
     /**
-     * @dataProvider getInvalidHSL
+     * @dataProvider getInvalidHSLA
      */
     public function testInvalidHSLA($cssColor)
     {

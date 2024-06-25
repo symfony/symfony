@@ -422,7 +422,7 @@ class PhpStanExtractorTest extends TestCase
             ['b', [new LegacyType(LegacyType::BUILTIN_TYPE_ARRAY, false, null, true, [new LegacyType(LegacyType::BUILTIN_TYPE_INT)], [new LegacyType(LegacyType::BUILTIN_TYPE_STRING), new LegacyType(LegacyType::BUILTIN_TYPE_INT)])]],
             ['c', [new LegacyType(LegacyType::BUILTIN_TYPE_ARRAY, false, null, true, [], [new LegacyType(LegacyType::BUILTIN_TYPE_STRING), new LegacyType(LegacyType::BUILTIN_TYPE_INT)])]],
             ['d', [new LegacyType(LegacyType::BUILTIN_TYPE_ARRAY, false, null, true, [new LegacyType(LegacyType::BUILTIN_TYPE_STRING), new LegacyType(LegacyType::BUILTIN_TYPE_INT)], [new LegacyType(LegacyType::BUILTIN_TYPE_ARRAY, false, null, true, [], [new LegacyType(LegacyType::BUILTIN_TYPE_STRING)])])]],
-            ['e', [new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, true, Dummy::class, true, [new LegacyType(LegacyType::BUILTIN_TYPE_ARRAY, false, null, true, [], [new LegacyType(LegacyType::BUILTIN_TYPE_STRING)])], [new LegacyType(LegacyType::BUILTIN_TYPE_INT), new LegacyType(LegacyType::BUILTIN_TYPE_ARRAY, false, null, true, [new LegacyType(LegacyType::BUILTIN_TYPE_INT)], [new LegacyType(LegacyType::BUILTIN_TYPE_STRING, false, null, true, [], [new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, false, DefaultValue::class)])])]), new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, false, ParentDummy::class)]],
+            ['e', [new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, true, Dummy::class, false, [new LegacyType(LegacyType::BUILTIN_TYPE_ARRAY, false, null, true, [], [new LegacyType(LegacyType::BUILTIN_TYPE_STRING)])], [new LegacyType(LegacyType::BUILTIN_TYPE_INT), new LegacyType(LegacyType::BUILTIN_TYPE_ARRAY, false, null, true, [new LegacyType(LegacyType::BUILTIN_TYPE_INT)], [new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, false, \Traversable::class, true, [], [new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, false, DefaultValue::class)])])]), new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, false, ParentDummy::class)]],
             ['f', null],
             ['g', [new LegacyType(LegacyType::BUILTIN_TYPE_ARRAY, false, null, true, [], [new LegacyType(LegacyType::BUILTIN_TYPE_STRING), new LegacyType(LegacyType::BUILTIN_TYPE_INT)])]],
         ];
@@ -950,6 +950,11 @@ class PhpStanExtractorTest extends TestCase
             [true, Type::string()],
             [false, Type::array(Type::string(), Type::int())],
         ];
+    }
+
+    public function testGenericInterface()
+    {
+        $this->assertNull($this->extractor->getTypes(Dummy::class, 'genericInterface'));
     }
 }
 

@@ -87,15 +87,24 @@ final class GoogleChatTransport extends AbstractTransport
 
         $threadKey = $options->getThreadKey() ?: $this->threadKey;
 
+        $threadKey = $options->getThreadKey() ?: $this->threadKey;
+
         $url = sprintf('https://%s/v1/spaces/%s/messages?key=%s&token=%s%s',
             $this->getEndpoint(),
             $this->space,
             urlencode($this->accessKey),
             urlencode($this->accessToken),
-            $threadKey ? '&threadKey='.urlencode($threadKey) : ''
+            $threadKey ? '&messageReplyOption=REPLY_MESSAGE_FALLBACK_TO_NEW_THREAD' : ''
         );
+
+        $body = array_filter($options->toArray());
+
+        if ($threadKey) {
+            $body['thread']['threadKey'] = $threadKey;
+        }
+
         $response = $this->client->request('POST', $url, [
-            'json' => array_filter($options->toArray()),
+            'json' => $body,
         ]);
 
         try {

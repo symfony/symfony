@@ -177,15 +177,19 @@ final class ObjectNormalizer extends AbstractObjectNormalizer
 
         if ($context['_read_attributes'] ?? true) {
             if (!isset(self::$isReadableCache[$class.$attribute])) {
-                self::$isReadableCache[$class.$attribute] = $this->propertyInfoExtractor->isReadable($class, $attribute) || $this->hasAttributeAccessorMethod($class, $attribute);
+                self::$isReadableCache[$class.$attribute] = (\is_object($classOrObject) && $this->propertyAccessor->isReadable($classOrObject, $attribute)) || $this->propertyInfoExtractor->isReadable($class, $attribute) || $this->hasAttributeAccessorMethod($class, $attribute);
             }
 
             return self::$isReadableCache[$class.$attribute];
         }
 
         if (!isset(self::$isWritableCache[$class.$attribute])) {
-            self::$isWritableCache[$class.$attribute] = $this->propertyInfoExtractor->isWritable($class, $attribute)
-                || (($writeInfo = $this->writeInfoExtractor->getWriteInfo($class, $attribute)) && PropertyWriteInfo::TYPE_NONE !== $writeInfo->getType());
+            if (str_contains($attribute, '.')) {
+                self::$isWritableCache[$class.$attribute] = true;
+            } else {
+                self::$isWritableCache[$class.$attribute] = $this->propertyInfoExtractor->isWritable($class, $attribute)
+                    || (($writeInfo = $this->writeInfoExtractor->getWriteInfo($class, $attribute)) && PropertyWriteInfo::TYPE_NONE !== $writeInfo->getType());
+            }
         }
 
         return self::$isWritableCache[$class.$attribute];

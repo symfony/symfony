@@ -1175,6 +1175,26 @@ class AbstractObjectNormalizerTest extends TestCase
 
         $this->assertEquals($expected, $normalizer->denormalize(['foo' => 'bar'], MixedPropertyDummy::class));
     }
+
+    /**
+     * @dataProvider provideBooleanTypesData
+     */
+    public function testDenormalizeBooleanTypesWithNotMatchingData(array $data, string $type)
+    {
+        $normalizer = new AbstractObjectNormalizerWithMetadataAndPropertyTypeExtractors();
+
+        $this->expectException(NotNormalizableValueException::class);
+
+        $normalizer->denormalize($data, $type);
+    }
+
+    public function provideBooleanTypesData()
+    {
+        return [
+            [['foo' => true], FalsePropertyDummy::class],
+            [['foo' => false], TruePropertyDummy::class],
+        ];
+    }
 }
 
 class AbstractObjectNormalizerDummy extends AbstractObjectNormalizer
@@ -1446,6 +1466,18 @@ class XmlScalarDummy
 {
     #[SerializedName('#')]
     public $value;
+}
+
+class FalsePropertyDummy
+{
+    /** @var false */
+    public $foo;
+}
+
+class TruePropertyDummy
+{
+    /** @var true */
+    public $foo;
 }
 
 class SerializerCollectionDummy implements SerializerInterface, DenormalizerInterface

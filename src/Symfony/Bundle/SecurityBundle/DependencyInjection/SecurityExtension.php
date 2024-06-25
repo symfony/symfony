@@ -58,6 +58,7 @@ use Symfony\Component\Security\Core\User\ChainUserChecker;
 use Symfony\Component\Security\Core\User\ChainUserProvider;
 use Symfony\Component\Security\Core\User\UserCheckerInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
+use Symfony\Component\Security\Http\Authenticator\Debug\TraceableAuthenticator;
 use Symfony\Component\Security\Http\Authenticator\Debug\TraceableAuthenticatorManagerListener;
 use Symfony\Component\Security\Http\Event\CheckPassportEvent;
 use Symfony\Flex\Command\InstallRecipesCommand;
@@ -635,6 +636,15 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
                         $listeners[] = new Reference($firewallListenerId);
                     }
                 }
+            }
+        }
+
+        if ($container->hasDefinition('debug.security.firewall')) {
+            foreach ($authenticationProviders as $authenticatorId) {
+                $container->register('debug.'.$authenticatorId, TraceableAuthenticator::class)
+                    ->setDecoratedService($authenticatorId)
+                    ->setArguments([new Reference('debug.'.$authenticatorId.'.inner')])
+                ;
             }
         }
 

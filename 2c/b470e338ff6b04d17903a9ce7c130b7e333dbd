@@ -1,0 +1,22 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-06-19T08:37:15Z
+
+IIUC, this doesn't fix #57398, which is about allowing base58 UUIDs. Did I miss something?
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2024-06-19T08:46:48Z
+
+That's right, I think I mixed up the issues. But I guess this opens up the way to accepting multiple formats in Uuid and Ulid constraints. I guess it would worth on or two follow-up PRs:
+
+- Supporting RFC4122 in Ulid
+- Supporting Base58 in Uuid
+
+What do you think?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-06-19T08:49:57Z
+
+Apparently there is a need for that yes :)

@@ -27,6 +27,9 @@ trait VarDumperTestTrait
         'flags' => null,
     ];
 
+    /**
+     * @param array<string, callable> $casters
+     */
     protected function setUpVarDumper(array $casters, ?int $flags = null): void
     {
         $this->varDumperConfig['casters'] = $casters;

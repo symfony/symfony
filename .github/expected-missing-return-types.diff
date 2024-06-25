@@ -1,5 +1,5 @@
 # Run these steps to update this file:
-sed -i 's/ *"\*\*\/Tests\/"//' composer.json
+sed -i 's/ *"\*\*\/Tests\/",\?//' composer.json
 composer u -o
 SYMFONY_PATCH_TYPE_DECLARATIONS='force=2&php=8.1' php .github/patch-types.php
 head=$(sed '/^diff /Q' .github/expected-missing-return-types.diff)
@@ -7,6 +7,16 @@ git checkout src/Symfony/Contracts/Service/ResetInterface.php
 (echo "$head" && echo && git diff -U2 src/ | grep '^index ' -v) > .github/expected-missing-return-types.diff
 git checkout composer.json src/
 
+diff --git a/src/Symfony/Bridge/Twig/Tests/Extension/AbstractLayoutTestCase.php b/src/Symfony/Bridge/Twig/Tests/Extension/AbstractLayoutTestCase.php
+--- a/src/Symfony/Bridge/Twig/Tests/Extension/AbstractLayoutTestCase.php
++++ b/src/Symfony/Bridge/Twig/Tests/Extension/AbstractLayoutTestCase.php
+@@ -52,5 +52,5 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
+      * @return FormExtensionInterface[]
+      */
+-    protected function getExtensions()
++    protected function getExtensions(): array
+     {
+         return [
 diff --git a/src/Symfony/Component/BrowserKit/AbstractBrowser.php b/src/Symfony/Component/BrowserKit/AbstractBrowser.php
 --- a/src/Symfony/Component/BrowserKit/AbstractBrowser.php
 +++ b/src/Symfony/Component/BrowserKit/AbstractBrowser.php
@@ -22,7 +32,7 @@ diff --git a/src/Symfony/Component/BrowserKit/AbstractBrowser.php b/src/Symfony/
       */
 -    abstract protected function doRequest(object $request);
 +    abstract protected function doRequest(object $request): object;
-
+ 
      /**
 @@ -451,5 +451,5 @@ abstract class AbstractBrowser
       * @throws LogicException When this abstract class is not implemented
@@ -146,21 +156,21 @@ diff --git a/src/Symfony/Component/DependencyInjection/Extension/ExtensionInterf
       */
 -    public function load(array $configs, ContainerBuilder $container);
 +    public function load(array $configs, ContainerBuilder $container): void;
-
+ 
      /**
 @@ -37,5 +37,5 @@ interface ExtensionInterface
       * @return string
       */
 -    public function getNamespace();
 +    public function getNamespace(): string;
-
+ 
      /**
 @@ -44,5 +44,5 @@ interface ExtensionInterface
       * @return string|false
       */
 -    public function getXsdValidationBasePath();
 +    public function getXsdValidationBasePath(): string|false;
-
+ 
      /**
 @@ -53,4 +53,4 @@ interface ExtensionInterface
       * @return string
@@ -189,13 +199,13 @@ diff --git a/src/Symfony/Component/EventDispatcher/EventSubscriberInterface.php 
 diff --git a/src/Symfony/Component/ExpressionLanguage/ExpressionLanguage.php b/src/Symfony/Component/ExpressionLanguage/ExpressionLanguage.php
 --- a/src/Symfony/Component/ExpressionLanguage/ExpressionLanguage.php
 +++ b/src/Symfony/Component/ExpressionLanguage/ExpressionLanguage.php
-@@ -139,5 +139,5 @@ class ExpressionLanguage
+@@ -149,5 +149,5 @@ class ExpressionLanguage
       * @return void
       */
 -    protected function registerFunctions()
 +    protected function registerFunctions(): void
      {
-         $this->addFunction(ExpressionFunction::fromPhp('constant'));
+         $basicPhpFunctions = ['constant', 'min', 'max'];
 diff --git a/src/Symfony/Component/Form/AbstractType.php b/src/Symfony/Component/Form/AbstractType.php
 --- a/src/Symfony/Component/Form/AbstractType.php
 +++ b/src/Symfony/Component/Form/AbstractType.php
@@ -249,35 +259,35 @@ diff --git a/src/Symfony/Component/Form/FormTypeInterface.php b/src/Symfony/Comp
       */
 -    public function getParent();
 +    public function getParent(): ?string;
-
+ 
      /**
 @@ -34,5 +34,5 @@ interface FormTypeInterface
       * @return void
       */
 -    public function configureOptions(OptionsResolver $resolver);
 +    public function configureOptions(OptionsResolver $resolver): void;
-
+ 
      /**
 @@ -48,5 +48,5 @@ interface FormTypeInterface
       * @see FormTypeExtensionInterface::buildForm()
       */
 -    public function buildForm(FormBuilderInterface $builder, array $options);
 +    public function buildForm(FormBuilderInterface $builder, array $options): void;
-
+ 
      /**
 @@ -66,5 +66,5 @@ interface FormTypeInterface
       * @see FormTypeExtensionInterface::buildView()
       */
 -    public function buildView(FormView $view, FormInterface $form, array $options);
 +    public function buildView(FormView $view, FormInterface $form, array $options): void;
-
+ 
      /**
 @@ -85,5 +85,5 @@ interface FormTypeInterface
       * @see FormTypeExtensionInterface::finishView()
       */
 -    public function finishView(FormView $view, FormInterface $form, array $options);
 +    public function finishView(FormView $view, FormInterface $form, array $options): void;
-
+ 
      /**
 @@ -95,4 +95,4 @@ interface FormTypeInterface
       * @return string
@@ -285,6 +295,61 @@ diff --git a/src/Symfony/Component/Form/FormTypeInterface.php b/src/Symfony/Comp
 -    public function getBlockPrefix();
 +    public function getBlockPrefix(): string;
  }
+diff --git a/src/Symfony/Component/Form/Test/FormIntegrationTestCase.php b/src/Symfony/Component/Form/Test/FormIntegrationTestCase.php
+--- a/src/Symfony/Component/Form/Test/FormIntegrationTestCase.php
++++ b/src/Symfony/Component/Form/Test/FormIntegrationTestCase.php
+@@ -40,5 +40,5 @@ abstract class FormIntegrationTestCase extends TestCase
+      * @return FormExtensionInterface[]
+      */
+-    protected function getExtensions()
++    protected function getExtensions(): array
+     {
+         return [];
+@@ -48,5 +48,5 @@ abstract class FormIntegrationTestCase extends TestCase
+      * @return FormTypeExtensionInterface[]
+      */
+-    protected function getTypeExtensions()
++    protected function getTypeExtensions(): array
+     {
+         return [];
+@@ -56,5 +56,5 @@ abstract class FormIntegrationTestCase extends TestCase
+      * @return FormTypeInterface[]
+      */
+-    protected function getTypes()
++    protected function getTypes(): array
+     {
+         return [];
+@@ -64,5 +64,5 @@ abstract class FormIntegrationTestCase extends TestCase
+      * @return FormTypeGuesserInterface[]
+      */
+-    protected function getTypeGuessers()
++    protected function getTypeGuessers(): array
+     {
+         return [];
+diff --git a/src/Symfony/Component/Form/Test/TypeTestCase.php b/src/Symfony/Component/Form/Test/TypeTestCase.php
+--- a/src/Symfony/Component/Form/Test/TypeTestCase.php
++++ b/src/Symfony/Component/Form/Test/TypeTestCase.php
+@@ -33,5 +33,5 @@ abstract class TypeTestCase extends FormIntegrationTestCase
+      * @return FormExtensionInterface[]
+      */
+-    protected function getExtensions()
++    protected function getExtensions(): array
+     {
+         $extensions = [];
+@@ -47,5 +47,5 @@ abstract class TypeTestCase extends FormIntegrationTestCase
+      * @return void
+      */
+-    public static function assertDateTimeEquals(\DateTime $expected, \DateTime $actual)
++    public static function assertDateTimeEquals(\DateTime $expected, \DateTime $actual): void
+     {
+         self::assertEquals($expected->format('c'), $actual->format('c'));
+@@ -55,5 +55,5 @@ abstract class TypeTestCase extends FormIntegrationTestCase
+      * @return void
+      */
+-    public static function assertDateIntervalEquals(\DateInterval $expected, \DateInterval $actual)
++    public static function assertDateIntervalEquals(\DateInterval $expected, \DateInterval $actual): void
+     {
+         self::assertEquals($expected->format('%RP%yY%mM%dDT%hH%iM%sS'), $actual->format('%RP%yY%mM%dDT%hH%iM%sS'));
 diff --git a/src/Symfony/Component/HttpKernel/Bundle/Bundle.php b/src/Symfony/Component/HttpKernel/Bundle/Bundle.php
 --- a/src/Symfony/Component/HttpKernel/Bundle/Bundle.php
 +++ b/src/Symfony/Component/HttpKernel/Bundle/Bundle.php
@@ -324,26 +389,26 @@ diff --git a/src/Symfony/Component/HttpKernel/Bundle/BundleInterface.php b/src/S
       */
 -    public function boot();
 +    public function boot(): void;
-
+ 
      /**
 @@ -35,5 +35,5 @@ interface BundleInterface
       * @return void
       */
 -    public function shutdown();
 +    public function shutdown(): void;
-
+ 
      /**
 @@ -44,5 +44,5 @@ interface BundleInterface
       * @return void
       */
 -    public function build(ContainerBuilder $container);
 +    public function build(ContainerBuilder $container): void;
-
+ 
      /**
 diff --git a/src/Symfony/Component/HttpKernel/DataCollector/DataCollector.php b/src/Symfony/Component/HttpKernel/DataCollector/DataCollector.php
 --- a/src/Symfony/Component/HttpKernel/DataCollector/DataCollector.php
 +++ b/src/Symfony/Component/HttpKernel/DataCollector/DataCollector.php
-@@ -101,5 +101,5 @@ abstract class DataCollector implements DataCollectorInterface
+@@ -113,5 +113,5 @@ abstract class DataCollector implements DataCollectorInterface
       * @return void
       */
 -    public function reset()
@@ -358,7 +423,7 @@ diff --git a/src/Symfony/Component/HttpKernel/DataCollector/DataCollectorInterfa
       */
 -    public function collect(Request $request, Response $response, ?\Throwable $exception = null);
 +    public function collect(Request $request, Response $response, ?\Throwable $exception = null): void;
-
+ 
      /**
 @@ -35,4 +35,4 @@ interface DataCollectorInterface extends ResetInterface
       * @return string
@@ -383,38 +448,38 @@ diff --git a/src/Symfony/Component/HttpKernel/KernelInterface.php b/src/Symfony/
       */
 -    public function registerContainerConfiguration(LoaderInterface $loader);
 +    public function registerContainerConfiguration(LoaderInterface $loader): void;
-
+ 
      /**
 @@ -44,5 +44,5 @@ interface KernelInterface extends HttpKernelInterface
       * @return void
       */
 -    public function boot();
 +    public function boot(): void;
-
+ 
      /**
 @@ -53,5 +53,5 @@ interface KernelInterface extends HttpKernelInterface
       * @return void
       */
 -    public function shutdown();
 +    public function shutdown(): void;
-
+ 
      /**
 diff --git a/src/Symfony/Component/Routing/Loader/AttributeClassLoader.php b/src/Symfony/Component/Routing/Loader/AttributeClassLoader.php
 --- a/src/Symfony/Component/Routing/Loader/AttributeClassLoader.php
 +++ b/src/Symfony/Component/Routing/Loader/AttributeClassLoader.php
-@@ -234,5 +234,5 @@ abstract class AttributeClassLoader implements LoaderInterface
+@@ -236,5 +236,5 @@ abstract class AttributeClassLoader implements LoaderInterface
       * @return string
       */
 -    protected function getDefaultRouteName(\ReflectionClass $class, \ReflectionMethod $method)
 +    protected function getDefaultRouteName(\ReflectionClass $class, \ReflectionMethod $method): string
      {
          $name = str_replace('\\', '_', $class->name).'_'.$method->name;
-@@ -333,5 +333,5 @@ abstract class AttributeClassLoader implements LoaderInterface
+@@ -335,5 +335,5 @@ abstract class AttributeClassLoader implements LoaderInterface
       * @return void
       */
 -    abstract protected function configureRoute(Route $route, \ReflectionClass $class, \ReflectionMethod $method, object $annot);
 +    abstract protected function configureRoute(Route $route, \ReflectionClass $class, \ReflectionMethod $method, object $annot): void;
-
+ 
      /**
 diff --git a/src/Symfony/Component/Security/Core/Authentication/RememberMe/TokenProviderInterface.php b/src/Symfony/Component/Security/Core/Authentication/RememberMe/TokenProviderInterface.php
 --- a/src/Symfony/Component/Security/Core/Authentication/RememberMe/TokenProviderInterface.php
@@ -424,21 +489,21 @@ diff --git a/src/Symfony/Component/Security/Core/Authentication/RememberMe/Token
       */
 -    public function loadTokenBySeries(string $series);
 +    public function loadTokenBySeries(string $series): PersistentTokenInterface;
-
+ 
      /**
 @@ -35,5 +35,5 @@ interface TokenProviderInterface
       * @return void
       */
 -    public function deleteTokenBySeries(string $series);
 +    public function deleteTokenBySeries(string $series): void;
-
+ 
      /**
 @@ -44,5 +44,5 @@ interface TokenProviderInterface
       * @throws TokenNotFoundException if the token is not found
       */
 -    public function updateToken(string $series, #[\SensitiveParameter] string $tokenValue, \DateTimeInterface $lastUsed);
 +    public function updateToken(string $series, #[\SensitiveParameter] string $tokenValue, \DateTimeInterface $lastUsed): void;
-
+ 
      /**
 @@ -51,4 +51,4 @@ interface TokenProviderInterface
       * @return void
@@ -449,28 +514,28 @@ diff --git a/src/Symfony/Component/Security/Core/Authentication/RememberMe/Token
 diff --git a/src/Symfony/Component/Security/Http/Firewall.php b/src/Symfony/Component/Security/Http/Firewall.php
 --- a/src/Symfony/Component/Security/Http/Firewall.php
 +++ b/src/Symfony/Component/Security/Http/Firewall.php
-@@ -51,5 +51,5 @@ class Firewall implements EventSubscriberInterface
+@@ -48,5 +48,5 @@ class Firewall implements EventSubscriberInterface
       * @return void
       */
 -    public function onKernelRequest(RequestEvent $event)
 +    public function onKernelRequest(RequestEvent $event): void
      {
          if (!$event->isMainRequest()) {
-@@ -99,5 +99,5 @@ class Firewall implements EventSubscriberInterface
+@@ -96,5 +96,5 @@ class Firewall implements EventSubscriberInterface
       * @return void
       */
 -    public function onKernelFinishRequest(FinishRequestEvent $event)
 +    public function onKernelFinishRequest(FinishRequestEvent $event): void
      {
          $request = $event->getRequest();
-@@ -112,5 +112,5 @@ class Firewall implements EventSubscriberInterface
+@@ -109,5 +109,5 @@ class Firewall implements EventSubscriberInterface
       * @return array
       */
 -    public static function getSubscribedEvents()
 +    public static function getSubscribedEvents(): array
      {
          return [
-@@ -123,5 +123,5 @@ class Firewall implements EventSubscriberInterface
+@@ -120,5 +120,5 @@ class Firewall implements EventSubscriberInterface
       * @return void
       */
 -    protected function callListeners(RequestEvent $event, iterable $listeners)
@@ -485,7 +550,7 @@ diff --git a/src/Symfony/Component/Translation/Extractor/ExtractorInterface.php 
       */
 -    public function extract(string|iterable $resource, MessageCatalogue $catalogue);
 +    public function extract(string|iterable $resource, MessageCatalogue $catalogue): void;
-
+ 
      /**
 @@ -36,4 +36,4 @@ interface ExtractorInterface
       * @return void
@@ -501,7 +566,7 @@ diff --git a/src/Symfony/Component/Validator/ConstraintValidatorInterface.php b/
       */
 -    public function initialize(ExecutionContextInterface $context);
 +    public function initialize(ExecutionContextInterface $context): void;
-
+ 
      /**
 @@ -31,4 +31,4 @@ interface ConstraintValidatorInterface
       * @return void
@@ -526,7 +591,7 @@ diff --git a/src/Symfony/Contracts/Translation/LocaleAwareInterface.php b/src/Sy
       */
 -    public function setLocale(string $locale);
 +    public function setLocale(string $locale): void;
-
+ 
      /**
 diff --git a/src/Symfony/Contracts/Translation/TranslatorTrait.php b/src/Symfony/Contracts/Translation/TranslatorTrait.php
 --- a/src/Symfony/Contracts/Translation/TranslatorTrait.php

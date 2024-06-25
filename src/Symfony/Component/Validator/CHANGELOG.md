@@ -9,6 +9,7 @@ CHANGELOG
  * Add the `Yaml` constraint for validating YAML content
  * Add `errorPath` to Unique constraint
  * Add the `format` option to the `Ulid` constraint to allow accepting different ULID formats
+ * Add the `Xml` constraint for validating XML content
 
 7.1
 ---

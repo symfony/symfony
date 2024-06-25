@@ -35,12 +35,12 @@ abstract class TransportTestCase extends TestCase
     abstract public static function toStringProvider(): iterable;
 
     /**
-     * @return iterable<array{0: MessageInterface, 1: TransportInterface}>
+     * @return iterable<array{0: MessageInterface, 1?: TransportInterface}>
      */
     abstract public static function supportedMessagesProvider(): iterable;
 
     /**
-     * @return iterable<array{0: MessageInterface, 1: TransportInterface}>
+     * @return iterable<array{0: MessageInterface, 1?: TransportInterface}>
      */
     abstract public static function unsupportedMessagesProvider(): iterable;
 

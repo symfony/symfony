@@ -37,15 +37,27 @@ abstract class TransportFactoryTestCase extends TestCase
 
     abstract public function getFactory(): TransportFactoryInterface;
 
+    /**
+     * @psalm-return iterable<array{0: Dsn, 1: bool}>
+     */
     abstract public static function supportsProvider(): iterable;
 
+    /**
+     * @psalm-return iterable<array{0: Dsn, 1: TransportInterface}>
+     */
     abstract public static function createProvider(): iterable;
 
+    /**
+     * @psalm-return iterable<array{0: Dsn, 1?: string|null}>
+     */
     public static function unsupportedSchemeProvider(): iterable
     {
         return [];
     }
 
+    /**
+     * @psalm-return iterable<array{0: Dsn}>
+     */
     public static function incompleteDsnProvider(): iterable
     {
         return [];

@@ -17,6 +17,7 @@ use Symfony\Component\Form\Extension\Core\Type\PercentType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Csrf\CsrfExtension;
 use Symfony\Component\Form\FormError;
+use Symfony\Component\Form\FormExtensionInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\Tests\VersionAwareTest;
 use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
@@ -47,6 +48,9 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
         parent::setUp();
     }
 
+    /**
+     * @return FormExtensionInterface[]
+     */
     protected function getExtensions()
     {
         return [

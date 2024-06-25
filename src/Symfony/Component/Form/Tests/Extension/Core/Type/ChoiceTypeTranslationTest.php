@@ -27,7 +27,7 @@ class ChoiceTypeTranslationTest extends TypeTestCase
         'Roman' => 'e',
     ];
 
-    protected function getExtensions()
+    protected function getExtensions(): array
     {
         $translator = $this->createMock(TranslatorInterface::class);
         $translator->expects($this->any())->method('trans')

@@ -349,7 +349,7 @@ header .container { display: flex; justify-content: space-between; }
 .trace-code li { color: #969896; margin: 0; padding-left: 10px; float: left; width: 100%; }
 .trace-code li + li { margin-top: 5px; }
 .trace-code li.selected { background: var(--trace-selected-background); margin-top: 2px; }
-.trace-code li code { color: var(--base-6); white-space: nowrap; }
+.trace-code li code { color: var(--base-6); white-space: pre; }
 
 .trace-as-text .stacktrace { line-height: 1.8; margin: 0 0 15px; white-space: pre-wrap; }
 

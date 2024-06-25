@@ -443,6 +443,11 @@ class PhpDocExtractorTest extends TestCase
         $this->assertEquals([new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, false, 'scalar')], $this->extractor->getTypes(PseudoTypeDummy::class, 'unknownPseudoType'));
     }
 
+    public function testGenericInterface()
+    {
+        $this->assertNull($this->extractor->getTypes(Dummy::class, 'genericInterface'));
+    }
+
     /**
      * @group legacy
      *

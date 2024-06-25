@@ -33,7 +33,7 @@ return (new PhpCsFixer\Config())
         // TODO: Remove once the "compiler_optimized" set includes "sprintf"
         'native_function_invocation' => ['include' => ['@compiler_optimized', 'sprintf'], 'scope' => 'namespaced', 'strict' => true],
         'nullable_type_declaration' => true,
-        'trailing_comma_in_multiline' => ['elements' => ['arrays', 'match', 'parameters']],
+        'nullable_type_declaration_for_default_null_value' => true,
     ])
     ->setRiskyAllowed(true)
     ->setFinder(

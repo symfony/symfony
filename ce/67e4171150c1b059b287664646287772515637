@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by xvilo at 2024-06-22T10:58:08Z
+
+I see there are several failing tests, I expect them to be unrelated to this Merge Request. Can I leave them as is? In this case it's `Symfony\Bridge\Doctrine\Tests\ManagerRegistryTest::testResetService`

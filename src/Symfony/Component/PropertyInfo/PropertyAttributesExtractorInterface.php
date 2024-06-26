@@ -11,6 +11,9 @@
 
 namespace Symfony\Component\PropertyInfo;
 
+/**
+ * @author Andrew Alyamovsky <andrew.alyamovsky@gmail.com>
+ */
 interface PropertyAttributesExtractorInterface
 {
     /**
@@ -19,9 +22,6 @@ interface PropertyAttributesExtractorInterface
      * Returns an array of attributes, each attribute is an associative array with the following keys:
      * - name: The fully-qualified class name of the attribute
      * - arguments: An associative array of attribute arguments
-     *
-     * Example:
-     * [['name' => 'FQCN', 'arguments' => ['key' => 'value']], ...]
      */
     public function getAttributes(string $class, string $property, array $context = []): ?array;
 }

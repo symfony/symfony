@@ -840,7 +840,10 @@ class PhpStanExtractorTest extends TestCase
             Type::generic(
                 Type::object(Dummy::class),
                 Type::array(Type::string(), Type::mixed()),
-                Type::union(Type::int(), Type::list(Type::generic(Type::string(), Type::object(DefaultValue::class)))),
+                Type::union(
+                    Type::int(),
+                    Type::list(Type::collection(Type::object(\Traversable::class), Type::object(DefaultValue::class))),
+                ),
             ),
             Type::object(ParentDummy::class),
             Type::null(),

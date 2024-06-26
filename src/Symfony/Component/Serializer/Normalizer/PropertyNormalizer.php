@@ -45,9 +45,9 @@ final class PropertyNormalizer extends AbstractObjectNormalizer
      */
     public const NORMALIZE_VISIBILITY = 'normalize_visibility';
 
-    public function __construct(?ClassMetadataFactoryInterface $classMetadataFactory = null, ?NameConverterInterface $nameConverter = null, ?PropertyTypeExtractorInterface $propertyTypeExtractor = null, ?ClassDiscriminatorResolverInterface $classDiscriminatorResolver = null, ?callable $objectClassResolver = null, array $defaultContext = [])
+    public function __construct(?ClassMetadataFactoryInterface $classMetadataFactory = null, ?NameConverterInterface $nameConverter = null, ?PropertyTypeExtractorInterface $propertyTypeExtractor = null, ?ClassDiscriminatorResolverInterface $classDiscriminatorResolver = null, ?callable $objectClassResolver = null, bool $consistency = false, array $defaultContext = [])
     {
-        parent::__construct($classMetadataFactory, $nameConverter, $propertyTypeExtractor, $classDiscriminatorResolver, $objectClassResolver, $defaultContext);
+        parent::__construct($classMetadataFactory, $nameConverter, $propertyTypeExtractor, $classDiscriminatorResolver, $objectClassResolver, $consistency, $defaultContext);
 
         if (!isset($this->defaultContext[self::NORMALIZE_VISIBILITY])) {
             $this->defaultContext[self::NORMALIZE_VISIBILITY] = self::NORMALIZE_PUBLIC | self::NORMALIZE_PROTECTED | self::NORMALIZE_PRIVATE;

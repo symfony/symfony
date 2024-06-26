@@ -45,8 +45,15 @@ use Symfony\Component\TypeInfo\TypeIdentifier;
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-abstract class AbstractObjectNormalizer extends AbstractNormalizer
+abstract class AbstractObjectNormalizer extends AbstractNormalizer implements DenormalizerInterface, DenormalizerAwareInterface
 {
+    use DenormalizerAwareTrait;
+
+    public function setDenormalizer(DenormalizerInterface $denormalizer): void
+    {
+        $this->denormalizer = $denormalizer;
+    }
+
     /**
      * Set to true to respect the max depth metadata on fields.
      */
@@ -122,6 +129,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
     private array $typeCache = [];
     private array $attributesCache = [];
     private readonly \Closure $objectClassResolver;
+    private bool $consistentDenormalization;
 
     public function __construct(
         ?ClassMetadataFactoryInterface $classMetadataFactory = null,
@@ -129,6 +137,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
         private ?PropertyTypeExtractorInterface $propertyTypeExtractor = null,
         ?ClassDiscriminatorResolverInterface $classDiscriminatorResolver = null,
         ?callable $objectClassResolver = null,
+        bool $consistentDenormalization = false,
         array $defaultContext = [],
     ) {
         parent::__construct($classMetadataFactory, $nameConverter, $defaultContext);
@@ -144,6 +153,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
         }
         $this->classDiscriminatorResolver = $classDiscriminatorResolver;
         $this->objectClassResolver = ($objectClassResolver ?? 'get_class')(...);
+        $this->consistentDenormalization = $consistentDenormalization;
     }
 
     public function supportsNormalization(mixed $data, ?string $format = null, array $context = []): bool
@@ -372,12 +382,16 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
 
             if (null !== $type = $this->getType($resolvedClass, $attribute)) {
                 try {
-                    // BC layer for PropertyTypeExtractorInterface::getTypes().
-                    // Can be removed as soon as PropertyTypeExtractorInterface::getTypes() is removed (8.0).
-                    if (\is_array($type)) {
-                        $value = $this->validateAndDenormalizeLegacy($type, $resolvedClass, $attribute, $value, $format, $attributeContext);
+                    if($this->consistentDenormalization) {
+                        $value = $this->denormalizer->denormalize($value, $type, $format, $context);
                     } else {
-                        $value = $this->validateAndDenormalize($type, $resolvedClass, $attribute, $value, $format, $attributeContext);
+                        // BC layer for PropertyTypeExtractorInterface::getTypes().
+                        // Can be removed as soon as PropertyTypeExtractorInterface::getTypes() is removed (8.0).
+                        if (\is_array($type)) {
+                            $value = $this->validateAndDenormalizeLegacy($type, $resolvedClass, $attribute, $value, $format, $attributeContext);
+                        } else {
+                            $value = $this->validateAndDenormalize($type, $resolvedClass, $attribute, $value, $format, $attributeContext);
+                        }
                     }
                 } catch (NotNormalizableValueException $exception) {
                     if (isset($context['not_normalizable_value_exceptions'])) {

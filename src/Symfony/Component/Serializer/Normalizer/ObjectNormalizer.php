@@ -42,19 +42,29 @@ final class ObjectNormalizer extends AbstractObjectNormalizer
 
     private readonly \Closure $objectClassResolver;
 
-    public function __construct(?ClassMetadataFactoryInterface $classMetadataFactory = null, ?NameConverterInterface $nameConverter = null, ?PropertyAccessorInterface $propertyAccessor = null, ?PropertyTypeExtractorInterface $propertyTypeExtractor = null, ?ClassDiscriminatorResolverInterface $classDiscriminatorResolver = null, ?callable $objectClassResolver = null, array $defaultContext = [], ?PropertyInfoExtractorInterface $propertyInfoExtractor = null)
+    public function __construct(
+        ?ClassMetadataFactoryInterface $classMetadataFactory = null,
+        ?NameConverterInterface $nameConverter = null,
+        ?PropertyAccessorInterface $propertyAccessor = null,
+        ?PropertyTypeExtractorInterface $propertyTypeExtractor = null,
+        ?ClassDiscriminatorResolverInterface $classDiscriminatorResolver = null,
+        ?callable $objectClassResolver = null,
+        bool $consistentDenormalization = false,
+        array $defaultContext = [],
+        ?PropertyInfoExtractorInterface $propertyInfoExtractor = null)
     {
         if (!class_exists(PropertyAccess::class)) {
             throw new LogicException('The ObjectNormalizer class requires the "PropertyAccess" component. Try running "composer require symfony/property-access".');
         }
 
-        parent::__construct($classMetadataFactory, $nameConverter, $propertyTypeExtractor, $classDiscriminatorResolver, $objectClassResolver, $defaultContext);
+        parent::__construct($classMetadataFactory, $nameConverter, $propertyTypeExtractor, $classDiscriminatorResolver, $objectClassResolver, $consistentDenormalization, $defaultContext);
 
         $this->propertyAccessor = $propertyAccessor ?: PropertyAccess::createPropertyAccessor();
 
         $this->objectClassResolver = ($objectClassResolver ?? static fn ($class) => \is_object($class) ? $class::class : $class)(...);
         $this->propertyInfoExtractor = $propertyInfoExtractor ?: new ReflectionExtractor();
         $this->writeInfoExtractor = new ReflectionExtractor();
+
     }
 
     public function getSupportedTypes(?string $format): array

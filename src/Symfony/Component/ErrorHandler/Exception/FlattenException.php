@@ -381,6 +381,9 @@ class FlattenException
             } elseif (\is_resource($value)) {
                 $result[$key] = ['resource', get_resource_type($value)];
             } else {
+                if (!preg_match('//u', (string) $value)) {
+                    $value = base64_encode($value);
+                }
                 $result[$key] = ['string', (string) $value];
             }
         }

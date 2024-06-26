@@ -293,4 +293,22 @@ class FlattenExceptionTest extends TestCase
         $this->assertSame($exception->getTraceAsString(), $flattened->getTraceAsString());
         $this->assertSame($exception->__toString(), $flattened->getAsString());
     }
+
+    public function testBinaryTraceArgs()
+    {
+        $binaryContent = base64_decode('gP8=');
+        $flattened = FlattenException::create(new \RuntimeException());
+        $flattened->setTrace([[
+            'namespace' => __NAMESPACE__,
+            'short_class' => '',
+            'class' => __CLASS__,
+            'type' => '->',
+            'function' => 'methodThrowingAnException',
+            'file' => __FILE__,
+            'line' => __LINE__,
+            'args' => [$binaryContent],
+        ]], __FILE__, __LINE__);
+
+        $this->assertSame([['string', base64_encode($binaryContent)]], $flattened->getTrace()[1]['args']);
+    }
 }

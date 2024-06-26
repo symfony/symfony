@@ -18,6 +18,9 @@ use Symfony\Component\Console\Exception\RuntimeException;
  * InputInterface is the interface implemented by all input classes.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @method getRawArguments(bool $strip = false): array<string|bool|int|float|null|array<string|bool|int|float|null>> Returns all the given arguments NOT merged with the default values.
+ * @method getRawOptions(): array<string|bool|int|float|null|array<string|bool|int|float|null>> Returns all the given options NOT merged with the default values.
  */
 interface InputInterface
 {

@@ -63,7 +63,7 @@ abstract class Input implements InputInterface, StreamableInputInterface
         $definition = $this->definition;
         $givenArguments = $this->arguments;
 
-        $missingArguments = array_filter(array_keys($definition->getArguments()), fn ($argument) => !\array_key_exists($argument, $givenArguments) && $definition->getArgument($argument)->isRequired());
+        $missingArguments = array_filter(\array_keys($definition->getArguments()), fn ($argument) => !\array_key_exists($argument, $givenArguments) && $definition->getArgument($argument)->isRequired());
 
         if (\count($missingArguments) > 0) {
             throw new RuntimeException(\sprintf('Not enough arguments (missing: "%s").', implode(', ', $missingArguments)));
@@ -83,6 +83,35 @@ abstract class Input implements InputInterface, StreamableInputInterface
     public function getArguments(): array
     {
         return array_merge($this->definition->getArgumentDefaults(), $this->arguments);
+    }
+
+    /**
+     * Returns all the given arguments NOT merged with the default values.
+     *
+     * @param bool $strip Whether to return the raw parameters (false) or the values after the command name (true)
+     *
+     * @return array<string|bool|int|float|null|array<string|bool|int|float|null>>
+     */
+    public function getRawArguments(bool $strip = false): array
+    {
+        if (!$strip) {
+            return $this->arguments;
+        }
+
+        $arguments = [];
+        $keep = false;
+        foreach ($this->arguments as $argument) {
+            if (!$keep && $argument === $this->getFirstArgument()) {
+                $keep = true;
+
+                continue;
+            }
+            if ($keep) {
+                $arguments[] = $argument;
+            }
+        }
+
+        return $arguments;
     }
 
     public function getArgument(string $name): mixed
@@ -111,6 +140,16 @@ abstract class Input implements InputInterface, StreamableInputInterface
     public function getOptions(): array
     {
         return array_merge($this->definition->getOptionDefaults(), $this->options);
+    }
+
+    /**
+     * Returns all the given options NOT merged with the default values.
+     *
+     * @return array<string|bool|int|float|null|array<string|bool|int|float|null>>
+     */
+    public function getRawOptions(): array
+    {
+        return $this->options;
     }
 
     public function getOption(string $name): mixed
@@ -170,5 +209,58 @@ abstract class Input implements InputInterface, StreamableInputInterface
     public function getStream()
     {
         return $this->stream;
+    }
+
+    /**
+     * Returns a stringified representation of the options passed to the command.
+     *
+     * InputArguments MUST be escaped as well as the InputOption values passed to the command.
+     *
+     * @param string[] $optionNames Name of the options returned. If empty, all options are returned and non-passed or non-existent are ignored.
+     *
+     * @return list<string>
+     */
+    public function unparse(array $optionNames = []): array
+    {
+        $rawOptions = $this->getRawOptions();
+
+        $filteredRawOptions = count($optionNames) === 0
+            ? $rawOptions
+            : array_intersect_key($rawOptions, array_fill_keys($optionNames, ''),
+        );
+
+        return array_map(
+            fn (string $optionName) => $this->unparseOption(
+                $this->definition->getOption($optionName),
+                $optionName,
+                $filteredRawOptions[$optionName],
+            ),
+            array_keys($filteredRawOptions),
+        );
+    }
+
+    /**
+     * @param string|bool|int|float|null|array<string|bool|int|float|null> $value
+     */
+    private function unparseOption(
+        InputOption $option,
+        string $name,
+        array|bool|float|int|string|null $value,
+    ): string
+    {
+        return match(true) {
+            $option->isNegatable() => sprintf('--%s%s', $value ? '' : 'no-', $name),
+            !$option->acceptValue() => sprintf('--%s', $name),
+            $option->isArray() => implode('', array_map(fn($item) => $this->unparseOptionWithValue($name, $item), $value,)),
+            default => $this->unparseOptionWithValue($name, $value),
+        };
+    }
+
+    private function unparseOptionWithValue(
+        string $name,
+        bool|float|int|string|null $value,
+    ): string
+    {
+        return sprintf('--%s=%s', $name, $this->escapeToken($value));
     }
 }

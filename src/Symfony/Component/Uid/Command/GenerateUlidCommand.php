@@ -105,6 +105,7 @@ EOF
         }
     }
 
+    /** @return string[] */
     private function getAvailableFormatOptions(): array
     {
         return [

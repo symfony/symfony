@@ -39,9 +39,6 @@ class ConfigDumpReferenceCommand extends AbstractConfigCommand
 {
     protected function configure(): void
     {
-        $commentedHelpFormats = array_map(fn ($format) => \sprintf('<comment>%s</comment>', $format), $this->getAvailableFormatOptions());
-        $helpFormats = implode('", "', $commentedHelpFormats);
-
         $this
             ->setDefinition([
                 new InputArgument('name', InputArgument::OPTIONAL, 'The Bundle name or the extension alias'),
@@ -57,10 +54,9 @@ Either the extension alias or bundle name can be used:
   <info>php %command.full_name% framework</info>
   <info>php %command.full_name% FrameworkBundle</info>
 
-The <info>--format</info> option specifies the format of the configuration,
-these are "{$helpFormats}".
+The <info>--format</info> option specifies the format of the command output:
 
-  <info>php %command.full_name% FrameworkBundle --format=xml</info>
+  <info>php %command.full_name% FrameworkBundle --format=json</info>
 
 For dumping a specific option, add its path as second argument (only available for the yaml format):
 
@@ -181,6 +177,7 @@ EOF
         return $bundles;
     }
 
+    /** @return string[] */
     private function getAvailableFormatOptions(): array
     {
         return ['yaml', 'xml'];

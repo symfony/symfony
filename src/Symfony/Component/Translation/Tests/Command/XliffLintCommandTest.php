@@ -136,8 +136,10 @@ class XliffLintCommandTest extends TestCase
 Or of a whole directory:
 
   <info>php %command.full_name% dirname</info>
-  <info>php %command.full_name% dirname --format=json</info>
 
+The <info>--format</info> option specifies the format of the command output:
+
+  <info>php %command.full_name% dirname --format=json</info>
 EOF;
 
         $this->assertStringContainsString($expected, $command->getHelp());

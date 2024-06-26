@@ -272,6 +272,7 @@ EOF
         $suggestions->suggestValues($resolvedType->getOptionsResolver()->getDefinedOptions());
     }
 
+    /** @return string[] */
     private function getAvailableFormatOptions(): array
     {
         return (new DescriptorHelper())->getFormats();

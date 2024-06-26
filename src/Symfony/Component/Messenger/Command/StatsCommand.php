@@ -14,6 +14,8 @@ namespace Symfony\Component\Messenger\Command;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Completion\CompletionInput;
+use Symfony\Component\Console\Completion\CompletionSuggestions;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -38,10 +40,9 @@ class StatsCommand extends Command
 
     protected function configure(): void
     {
-        $outputFormats = implode(', ', $this->getAvailableFormatOptions());
         $this
             ->addArgument('transport_names', InputArgument::IS_ARRAY | InputArgument::OPTIONAL, 'List of transports\' names')
-            ->addOption('format', '', InputOption::VALUE_REQUIRED, 'The output format, e.g.: '.$outputFormats, 'text', $this->getAvailableFormatOptions())
+            ->addOption('format', '', InputOption::VALUE_REQUIRED, \sprintf('The output format ("%s")', implode('", "', $this->getAvailableFormatOptions())), 'txt')
             ->setHelp(<<<EOF
 The <info>%command.name%</info> command counts the messages for all the transports:
 
@@ -51,8 +52,7 @@ Or specific transports only:
 
     <info>php %command.full_name% <transportNames></info>
 
-The <info>--format</info> option specifies the format of command output,
-these are "{$outputFormats}".
+The <info>--format</info> option specifies the format of the command output:
 
   <info>php %command.full_name% --format=json</info>
 EOF
@@ -65,6 +65,11 @@ EOF
         $io = new SymfonyStyle($input, $output instanceof ConsoleOutputInterface ? $output->getErrorOutput() : $output);
 
         $format = $input->getOption('format');
+        if ('text' === $format) {
+            trigger_deprecation('symfony/messenger', '7.2', 'The "text" format is deprecated, use "txt" instead.');
+
+            $format = 'txt';
+        }
         if (!\in_array($format, $this->getAvailableFormatOptions(), true)) {
             throw new InvalidArgumentException('Invalid output format.');
         }
@@ -94,7 +99,7 @@ EOF
         }
 
         match ($format) {
-            'text' => $this->outputText($io, $outputTable, $uncountableTransports),
+            'txt' => $this->outputText($io, $outputTable, $uncountableTransports),
             'json' => $this->outputJson($io, $outputTable, $uncountableTransports),
         };
 
@@ -127,14 +132,21 @@ EOF
     private function formatSupportsWarnings(string $format): bool
     {
         return match ($format) {
-            'text' => true,
+            'txt' => true,
             'json' => false,
         };
+    }
+
+    public function complete(CompletionInput $input, CompletionSuggestions $suggestions): void
+    {
+        if ($input->mustSuggestOptionValuesFor('format')) {
+            $suggestions->suggestValues($this->getAvailableFormatOptions());
+        }
     }
 
     /** @return string[] */
     private function getAvailableFormatOptions(): array
     {
-        return ['text', 'json'];
+        return ['txt', 'json'];
     }
 }

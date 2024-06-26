@@ -4,7 +4,7 @@ CHANGELOG
 7.2
 ---
 
- * Add `PropertyAttributesExtractorInterface` to extract property attributes
+ * Add `PropertyAttributesExtractorInterface` to extract property attributes (implemented by `ReflectionExtractor`)
 
 7.1
 ---

@@ -571,16 +571,16 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
                 }
 
                 switch ($builtinType) {
-                    case Type::BUILTIN_TYPE_ARRAY:
-                    case Type::BUILTIN_TYPE_BOOL:
-                    case Type::BUILTIN_TYPE_CALLABLE:
-                    case Type::BUILTIN_TYPE_FLOAT:
-                    case Type::BUILTIN_TYPE_INT:
-                    case Type::BUILTIN_TYPE_ITERABLE:
-                    case Type::BUILTIN_TYPE_NULL:
-                    case Type::BUILTIN_TYPE_OBJECT:
-                    case Type::BUILTIN_TYPE_RESOURCE:
-                    case Type::BUILTIN_TYPE_STRING:
+                    case LegacyType::BUILTIN_TYPE_ARRAY:
+                    case LegacyType::BUILTIN_TYPE_BOOL:
+                    case LegacyType::BUILTIN_TYPE_CALLABLE:
+                    case LegacyType::BUILTIN_TYPE_FLOAT:
+                    case LegacyType::BUILTIN_TYPE_INT:
+                    case LegacyType::BUILTIN_TYPE_ITERABLE:
+                    case LegacyType::BUILTIN_TYPE_NULL:
+                    case LegacyType::BUILTIN_TYPE_OBJECT:
+                    case LegacyType::BUILTIN_TYPE_RESOURCE:
+                    case LegacyType::BUILTIN_TYPE_STRING:
                         if (('is_'.$builtinType)($data)) {
                             return $data;
                         }

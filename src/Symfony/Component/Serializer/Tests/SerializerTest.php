@@ -51,7 +51,7 @@ use Symfony\Component\Serializer\Normalizer\PropertyNormalizer;
 use Symfony\Component\Serializer\Normalizer\UidNormalizer;
 use Symfony\Component\Serializer\Normalizer\UnwrappingDenormalizer;
 use Symfony\Component\Serializer\Normalizer\UnionDenormalizer;
-use Symfony\Component\Serializer\Normalizer\PrimitiveDenormalizer;
+use Symfony\Component\Serializer\Normalizer\NullDenormalizer;
 use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Serializer\Tests\Fixtures\Attributes\AbstractDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\Attributes\AbstractDummyFirstChild;
@@ -474,7 +474,7 @@ class SerializerTest extends TestCase
         };
 
         $discriminatorResolver = new ClassDiscriminatorFromClassMetadata($loaderMock);
-        $serializer = new Serializer([new PrimitiveDenormalizer(), new UnionDenormalizer(), new ObjectNormalizer(null, null, null, new PhpDocExtractor(), $discriminatorResolver, null, $consistency)], ['json' => new JsonEncoder()]);
+        $serializer = new Serializer([new NullDenormalizer(), new UnionDenormalizer(), new ObjectNormalizer(null, null, null, new PhpDocExtractor(), $discriminatorResolver, null, $consistency)], ['json' => new JsonEncoder()]);
 
         $jsonData = '{"type":"first","quux":{"value":"quux"},"bar":"bar-value","foo":"foo-value"}';
 
@@ -964,7 +964,7 @@ class SerializerTest extends TestCase
     {
         $classMetadataFactory = new ClassMetadataFactory(new AttributeLoader());
 
-        return new Serializer([new PrimitiveDenormalizer(), new UnionDenormalizer(), new ObjectNormalizer($classMetadataFactory, null, null, new ReflectionExtractor(), new ClassDiscriminatorFromClassMetadata($classMetadataFactory), null, $consistent)], ['json' => new JsonEncoder()]);
+        return new Serializer([new NullDenormalizer(), new UnionDenormalizer(), new ObjectNormalizer($classMetadataFactory, null, null, new ReflectionExtractor(), new ClassDiscriminatorFromClassMetadata($classMetadataFactory), null, $consistent)], ['json' => new JsonEncoder()]);
     }
 
     /** @dataProvider consistencyProvider  */

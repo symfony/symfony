@@ -521,7 +521,8 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
         }
 
         $attributes = [];
-        foreach ($reflClass->getProperty($property)->getAttributes() as $attribute) {
+        $reflProperty = $reflClass->getProperty($property);
+        foreach ($reflProperty->getAttributes() as $attribute) {
             $attributes[] = [
                 'name' => $attribute->getName(),
                 'arguments' => $attribute->getArguments(),

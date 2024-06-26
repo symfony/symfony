@@ -13,6 +13,7 @@ namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
 use Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor;
 use Symfony\Component\PropertyInfo\PropertyAccessExtractorInterface;
+use Symfony\Component\PropertyInfo\PropertyAttributesExtractorInterface;
 use Symfony\Component\PropertyInfo\PropertyDescriptionExtractorInterface;
 use Symfony\Component\PropertyInfo\PropertyInfoCacheExtractor;
 use Symfony\Component\PropertyInfo\PropertyInfoExtractor;
@@ -26,7 +27,7 @@ use Symfony\Component\PropertyInfo\PropertyWriteInfoExtractorInterface;
 return static function (ContainerConfigurator $container) {
     $container->services()
         ->set('property_info', PropertyInfoExtractor::class)
-            ->args([[], [], [], [], []])
+            ->args([[], [], [], [], [], []])
 
         ->alias(PropertyAccessExtractorInterface::class, 'property_info')
         ->alias(PropertyDescriptionExtractorInterface::class, 'property_info')
@@ -34,6 +35,7 @@ return static function (ContainerConfigurator $container) {
         ->alias(PropertyTypeExtractorInterface::class, 'property_info')
         ->alias(PropertyListExtractorInterface::class, 'property_info')
         ->alias(PropertyInitializableExtractorInterface::class, 'property_info')
+        ->alias(PropertyAttributesExtractorInterface::class, 'property_info')
 
         ->set('property_info.cache', PropertyInfoCacheExtractor::class)
             ->decorate('property_info')

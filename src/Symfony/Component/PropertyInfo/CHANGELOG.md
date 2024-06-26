@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+7.2
+---
+
+ * Add `PropertyAttributesExtractorInterface` to extract property attributes
+
 7.1
 ---
 

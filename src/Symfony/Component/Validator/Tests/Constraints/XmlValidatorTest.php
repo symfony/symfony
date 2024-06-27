@@ -35,10 +35,9 @@ final class XmlValidatorTest extends ConstraintValidatorTestCase
     /**
      * @dataProvider getInvalidXmlValues
      */
-    public function testInValidXmlValue($value)
+    public function testInvalidXmlValue(string $value)
     {
-        $constraint = new Xml(message: 'myMessage');
-        $this->validator->validate($value, $constraint);
+        $this->validator->validate($value, new Xml(message: 'myMessage'));
         $this->buildViolation('myMessage')
             ->setParameter('{{ value }}', '"'.$value.'"')
             ->setCode(Xml::INVALID_XML_ERROR)

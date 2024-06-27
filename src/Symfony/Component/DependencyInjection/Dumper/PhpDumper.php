@@ -1009,7 +1009,7 @@ EOF;
         $name = $this->getNextVariableName();
         $this->referenceVariables[$targetId] = new Variable($name);
 
-        $reference = ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE >= $behavior ? new Reference($targetId, $behavior) : null;
+        $reference = ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE !== $behavior ? new Reference($targetId, $behavior) : null;
         $code .= sprintf("        \$%s = %s;\n", $name, $this->getServiceCall($targetId, $reference));
 
         if (!$hasSelfRef || !$forConstructor) {

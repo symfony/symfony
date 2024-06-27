@@ -18,6 +18,7 @@ use Symfony\Component\DependencyInjection\Loader\Configurator\AbstractConfigurat
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 use Symfony\Component\DependencyInjection\Loader\PhpFileLoader as ContainerPhpFileLoader;
 use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\HttpKernel\Kernel;
 use Symfony\Component\Routing\Loader\Configurator\RoutingConfigurator;
 use Symfony\Component\Routing\Loader\PhpFileLoader as RoutingPhpFileLoader;
 use Symfony\Component\Routing\RouteCollection;
@@ -119,6 +120,9 @@ trait MicroKernelTrait
     {
         if (isset($_SERVER['APP_BUILD_DIR'])) {
             return $_SERVER['APP_BUILD_DIR'].'/'.$this->environment;
+        }
+        if ('prod' === $this->getEnvironment() && Kernel::class === (new \ReflectionMethod(parent::class, 'getCacheDir'))->class) {
+            return $this->getProjectDir().'/var/build/'.$this->environment;
         }
 
         return parent::getBuildDir();

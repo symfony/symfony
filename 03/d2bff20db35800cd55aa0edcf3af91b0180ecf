@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by wouterj at 2024-06-27T08:52:38Z
+
+:+1: But let's wait on the vote. I don't think we want patch releases for this if the method is not deprecated.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-06-27T12:07:08Z
+
+@alexandre-daubois can you please rebase for 7.2? This can be easily back-ported if the deprecation happens.

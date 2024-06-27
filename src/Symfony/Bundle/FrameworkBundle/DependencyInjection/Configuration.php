@@ -1346,7 +1346,6 @@ class Configuration implements ConfigurationInterface
                             ->end()
                             ->scalarNode('log_channel')
                                 ->info('The channel of log message. Null to let Symfony decide.')
-                                ->end()
                             ->end()
                         ->end()
                     ->end()

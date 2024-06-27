@@ -12,6 +12,7 @@
 namespace Symfony\Component\VarDumper\Tests\Caster;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\VarDumper\Caster\FFICaster;
 use Symfony\Component\VarDumper\Test\VarDumperTestTrait;
 
 /**
@@ -22,6 +23,11 @@ use Symfony\Component\VarDumper\Test\VarDumperTestTrait;
 class FFICasterTest extends TestCase
 {
     use VarDumperTestTrait;
+
+    /**
+     * @see FFICaster::MAX_STRING_LENGTH
+     */
+    private const MAX_STRING_LENGTH = 255;
 
     protected function setUp(): void
     {
@@ -172,16 +178,23 @@ class FFICasterTest extends TestCase
     {
         $actualMessage = str_repeat('Hello World!', 30)."\0";
         $actualLength = \strlen($actualMessage);
-
-        $expectedMessage = 'Hello World!Hello World!Hello World!Hello World!'
-            .'Hello World!Hello World!Hello World!Hello World!Hello World!Hel'
-            .'lo World!Hello World!Hello World!Hello World!Hello World!Hello '
-            .'World!Hello World!Hello World!Hello World!Hello World!Hello Wor'
-            .'ld!Hello World!Hel';
+        $expectedMessage = substr($actualMessage, 0, self::MAX_STRING_LENGTH);
 
         $string = \FFI::cdef()->new('char['.$actualLength.']');
         $pointer = \FFI::addr($string[0]);
         \FFI::memcpy($pointer, $actualMessage, $actualLength);
+
+        // the max length is platform-dependent and can be less than 255,
+        // so we need to cut the expected message to the maximum length
+        // allowed by pages size of the current system
+        $ffi = \FFI::cdef(<<<C
+            size_t zend_get_page_size(void);
+        C);
+
+        $pageSize = $ffi->zend_get_page_size();
+        $start = $ffi->cast('uintptr_t', $ffi->cast('char*', $pointer))->cdata;
+        $max = min(self::MAX_STRING_LENGTH, ($start | ($pageSize - 1)) - $start);
+        $expectedMessage = substr($expectedMessage, 0, $max);
 
         $this->assertDumpEquals(<<<PHP
         FFI\CData<char*> size 8 align 8 {

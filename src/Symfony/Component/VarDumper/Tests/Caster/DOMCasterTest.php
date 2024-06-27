@@ -227,7 +227,7 @@ class DOMCasterTest extends TestCase
         $attr = \Dom\HTMLDocument::createEmpty()->createElement('foo');
 
         $this->assertDumpMatchesFormat(<<<'EODUMP'
-            Dom\Element {%A
+            Dom\HTMLElement {%A
               +tagName: ? string
             %A}
             EODUMP,

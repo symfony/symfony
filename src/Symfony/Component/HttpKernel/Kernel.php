@@ -539,10 +539,17 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
             touch($oldContainerDir.'.legacy');
         }
 
-        $preload = $this instanceof WarmableInterface ? (array) $this->warmUp($this->container->getParameter('kernel.cache_dir'), $buildDir) : [];
+        $cacheDir = $this->container->getParameter('kernel.cache_dir');
+        $preload = $this instanceof WarmableInterface ? (array) $this->warmUp($cacheDir, $buildDir) : [];
 
         if ($this->container->has('cache_warmer')) {
-            $preload = array_merge($preload, (array) $this->container->get('cache_warmer')->warmUp($this->container->getParameter('kernel.cache_dir'), $buildDir));
+            $cacheWarmer = $this->container->get('cache_warmer');
+
+            if ($cacheDir !== $buildDir) {
+                $cacheWarmer->enableOptionalWarmers();
+            }
+
+            $preload = array_merge($preload, (array) $cacheWarmer->warmUp($cacheDir, $buildDir));
         }
 
         if ($preload && file_exists($preloadFile = $buildDir.'/'.$class.'.preload.php')) {

@@ -79,8 +79,14 @@ class ExecutableFinder
             }
         }
 
+        if (!\function_exists('exec')) {
+            return $default;
+        }
+
         $command = '\\' === \DIRECTORY_SEPARATOR ? 'where' : 'command -v --';
-        if (\function_exists('exec') && ($executablePath = strtok(@exec($command.' '.escapeshellarg($name)), \PHP_EOL)) && @is_executable($executablePath)) {
+        $execResult = @exec($command.' '.escapeshellarg($name));
+
+        if (($executablePath = substr($execResult, 0, strpos($execResult, \PHP_EOL) ?: null)) && @is_executable($executablePath)) {
             return $executablePath;
         }
 

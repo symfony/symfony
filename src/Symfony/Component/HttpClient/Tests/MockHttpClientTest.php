@@ -519,7 +519,7 @@ class MockHttpClientTest extends HttpClientTestCase
         $client = new MockHttpClient();
 
         $param = new class() {
-            public function __toString()
+            public function __toString(): string
             {
                 return 'bar';
             }

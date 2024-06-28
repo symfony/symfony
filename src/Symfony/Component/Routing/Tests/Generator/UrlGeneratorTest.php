@@ -1076,7 +1076,7 @@ class UrlGeneratorTest extends TestCase
 
 class StringableObject
 {
-    public function __toString()
+    public function __toString(): string
     {
         return 'bar';
     }
@@ -1086,7 +1086,7 @@ class StringableObjectWithPublicProperty
 {
     public $foo = 'property';
 
-    public function __toString()
+    public function __toString(): string
     {
         return 'bar';
     }

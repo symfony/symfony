@@ -133,4 +133,19 @@ class CompletionInputTest extends TestCase
         yield ['bin/console cache:clear "multi word string"', ['bin/console', 'cache:clear', '"multi word string"']];
         yield ['bin/console cache:clear \'multi word string\'', ['bin/console', 'cache:clear', '\'multi word string\'']];
     }
+
+    public function testToString()
+    {
+        $input = CompletionInput::fromTokens(['foo', 'bar', 'baz'], 0);
+        $this->assertSame('foo| bar baz', (string) $input);
+
+        $input = CompletionInput::fromTokens(['foo', 'bar', 'baz'], 1);
+        $this->assertSame('foo bar| baz', (string) $input);
+
+        $input = CompletionInput::fromTokens(['foo', 'bar', 'baz'], 2);
+        $this->assertSame('foo bar baz|', (string) $input);
+
+        $input = CompletionInput::fromTokens(['foo', 'bar', 'baz'], 11);
+        $this->assertSame('foo bar baz |', (string) $input);
+    }
 }

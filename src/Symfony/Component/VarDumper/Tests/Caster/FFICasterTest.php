@@ -24,6 +24,11 @@ class FFICasterTest extends TestCase
 {
     use VarDumperTestTrait;
 
+    /**
+     * @see FFICaster::MAX_STRING_LENGTH
+     */
+    private const MAX_STRING_LENGTH = 255;
+
     protected function setUp(): void
     {
         if (\in_array(\PHP_SAPI, ['cli', 'phpdbg'], true) && 'preload' === \ini_get('ffi.enable')) {
@@ -173,16 +178,23 @@ class FFICasterTest extends TestCase
     {
         $actualMessage = str_repeat('Hello World!', 30)."\0";
         $actualLength = \strlen($actualMessage);
-
-        $expectedMessage = 'Hello World!Hello World!Hello World!Hello World!'
-            .'Hello World!Hello World!Hello World!Hello World!Hello World!Hel'
-            .'lo World!Hello World!Hello World!Hello World!Hello World!Hello '
-            .'World!Hello World!Hello World!Hello World!Hello World!Hello Wor'
-            .'ld!Hello World!Hel';
+        $expectedMessage = substr($actualMessage, 0, self::MAX_STRING_LENGTH);
 
         $string = \FFI::cdef()->new('char['.$actualLength.']');
         $pointer = \FFI::addr($string[0]);
         \FFI::memcpy($pointer, $actualMessage, $actualLength);
+
+        // the max length is platform-dependent and can be less than 255,
+        // so we need to cut the expected message to the maximum length
+        // allowed by pages size of the current system
+        $ffi = \FFI::cdef(<<<C
+            size_t zend_get_page_size(void);
+        C);
+
+        $pageSize = $ffi->zend_get_page_size();
+        $start = $ffi->cast('uintptr_t', $ffi->cast('char*', $pointer))->cdata;
+        $max = min(self::MAX_STRING_LENGTH, ($start | ($pageSize - 1)) - $start);
+        $expectedMessage = substr($expectedMessage, 0, $max);
 
         $this->assertDumpEquals(<<<PHP
         FFI\CData<char*> size 8 align 8 {
@@ -191,34 +203,21 @@ class FFICasterTest extends TestCase
         PHP, $pointer);
     }
 
-    /**
-     * It is worth noting that such a test can cause SIGSEGV, as it breaks
-     * into "foreign" memory. However, this is only theoretical, since
-     * memory is allocated within the PHP process and almost always "garbage
-     * data" will be read from the PHP process itself.
-     *
-     * If this test fails for some reason, please report it: We may have to
-     * disable the dumping of strings ("char*") feature in VarDumper.
-     *
-     * @see FFICaster::castFFIStringValue()
-     */
     public function testCastNonTrailingCharPointer()
     {
         $actualMessage = 'Hello World!';
         $actualLength = \strlen($actualMessage);
 
-        $string = \FFI::cdef()->new('char['.$actualLength.']');
+        $string = \FFI::cdef()->new('char['.($actualLength + 1).']');
         $pointer = \FFI::addr($string[0]);
-
         \FFI::memcpy($pointer, $actualMessage, $actualLength);
 
-        // Remove automatically addition of the trailing "\0" and remove trailing "\0"
         $pointer = \FFI::cdef()->cast('char*', \FFI::cdef()->cast('void*', $pointer));
         $pointer[$actualLength] = "\x01";
 
         $this->assertDumpMatchesFormat(<<<PHP
         FFI\CData<char*> size 8 align 8 {
-          cdata: "$actualMessage%s"
+          cdata: %A"$actualMessage%s"
         }
         PHP, $pointer);
     }

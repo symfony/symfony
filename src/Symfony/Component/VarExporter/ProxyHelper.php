@@ -197,10 +197,35 @@ final class ProxyHelper
         $body = $methods ? "\n".implode("\n\n", $methods)."\n" : '';
         $propertyScopes = $class ? self::exportPropertyScopes($class->name) : '[]';
 
+        if (
+            $class?->hasMethod('__unserialize')
+            && !$class->getMethod('__unserialize')->getParameters()[0]->getType()
+        ) {
+            // fix contravariance type problem when $class declares a `__unserialize()` method without typehint.
+            $lazyProxyTraitStatement = <<<EOPHP
+            use \Symfony\Component\VarExporter\LazyProxyTrait {
+                    __unserialize as private __doUnserialize;
+                }
+            EOPHP;
+
+            $body .= <<<EOPHP
+
+                    public function __unserialize(\$data): void
+                    {
+                        \$this->__doUnserialize(\$data);
+                    }
+
+                EOPHP;
+        } else {
+            $lazyProxyTraitStatement = <<<EOPHP
+            use \Symfony\Component\VarExporter\LazyProxyTrait;
+            EOPHP;
+        }
+
         return <<<EOPHP
             {$parent} implements \\{$interfaces}
             {
-                use \Symfony\Component\VarExporter\LazyProxyTrait;
+                {$lazyProxyTraitStatement}
 
                 private const LAZY_OBJECT_PROPERTY_SCOPES = {$propertyScopes};
             {$body}}

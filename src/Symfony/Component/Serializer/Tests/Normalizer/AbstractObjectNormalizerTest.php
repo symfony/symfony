@@ -893,6 +893,7 @@ class AbstractObjectNormalizerTest extends TestCase
     public function testDenormalizeUntypedFormatNotNormalizable()
     {
         $this->expectException(NotNormalizableValueException::class);
+        $this->expectExceptionMessage('Custom exception message');
         $serializer = new Serializer([new CustomNormalizer(), new ObjectNormalizer(null, null, null, new PropertyInfoExtractor([], [new PhpDocExtractor(), new ReflectionExtractor()]))]);
         $serializer->denormalize(['value' => 'test'], DummyWithNotNormalizable::class, 'xml');
     }

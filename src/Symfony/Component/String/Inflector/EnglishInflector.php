@@ -289,6 +289,9 @@ final class EnglishInflector implements InflectorInterface
         // atlases (atlas)
         ['salta', 5, true, true, 'atlases'],
 
+        // aliases (alias)
+        ['saila', 5, true, true, 'aliases'],
+
         // irises (iris)
         ['siri', 4, true, true, 'irises'],
 

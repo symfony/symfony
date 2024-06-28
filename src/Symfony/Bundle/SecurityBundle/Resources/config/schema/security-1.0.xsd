@@ -112,7 +112,6 @@
 
     <xsd:complexType name="user">
         <xsd:attribute name="identifier" type="xsd:string" />
-        <xsd:attribute name="name" type="xsd:string" />
         <xsd:attribute name="password" type="xsd:string" />
         <xsd:attribute name="roles" type="xsd:string" />
     </xsd:complexType>

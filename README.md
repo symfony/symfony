@@ -17,13 +17,17 @@ Installation
 Sponsor
 -------
 
-Symfony 5.4 is [backed][27] by [Private Packagist][28].
+Symfony 5.4 is [backed][27] by [Private Packagist][28] and [Ibexa][29].
 
 Private Packagist is a fast, reliable, and secure Composer repository for your
 private packages. It mirrors all your open-source dependencies for better
 availability and monitors them for security vulnerabilities.
 
-Help Symfony by [sponsoring][29] its development!
+Ibexa is the leading DXP for Symfony developers. Ibexa DXP is used across the
+world by thousands of websites/shops/portals and supported by a fantastic,
+passionate community of developers, agencies, and users. They love Symfony!
+
+Help Symfony by [sponsoring][30] its development!
 
 Documentation
 -------------
@@ -87,4 +91,5 @@ and supported by [Symfony contributors][19].
 [26]: https://symfony.com/book
 [27]: https://symfony.com/backers
 [28]: https://packagist.com/
-[29]: https://symfony.com/sponsor
+[29]: https://ibexa.co/
+[30]: https://symfony.com/sponsor

@@ -346,8 +346,8 @@ abstract class AbstractUnicodeString extends AbstractString
 
     public function snake(): static
     {
-        $str = $this->camel();
-        $str->string = mb_strtolower(preg_replace(['/(\p{Lu}+)(\p{Lu}\p{Ll})/u', '/([\p{Ll}0-9])(\p{Lu})/u'], '\1_\2', $str->string), 'UTF-8');
+        $str = clone $this;
+        $str->string = str_replace(' ', '_', mb_strtolower(preg_replace(['/(\p{Lu}+)(\p{Lu}\p{Ll})/u', '/([\p{Ll}0-9])(\p{Lu})/u'], '\1 \2', $str->string), 'UTF-8'));
 
         return $str;
     }

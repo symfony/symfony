@@ -61,6 +61,8 @@ abstract class ManagerRegistry extends AbstractManagerRegistry
                 }
                 if (isset($this->fileMap[$name])) {
                     $wrappedInstance = $this->load($this->fileMap[$name], false);
+                } elseif ((new \ReflectionMethod($this, $this->methodMap[$name]))->isStatic()) {
+                    $wrappedInstance = $this->{$this->methodMap[$name]}($this, false);
                 } else {
                     $wrappedInstance = $this->{$this->methodMap[$name]}(false);
                 }

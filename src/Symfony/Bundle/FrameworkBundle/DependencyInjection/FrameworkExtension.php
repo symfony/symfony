@@ -1334,6 +1334,10 @@ class FrameworkExtension extends Extension
     {
         $loader->load('asset_mapper.php');
 
+        if (!$assetEnabled) {
+            $container->removeDefinition('asset_mapper.asset_package');
+        }
+
         if (!$httpClientEnabled) {
             $container->register('asset_mapper.http_client', HttpClientInterface::class)
                 ->addTag('container.error')

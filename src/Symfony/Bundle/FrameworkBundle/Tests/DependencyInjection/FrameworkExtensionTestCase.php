@@ -2386,6 +2386,16 @@ abstract class FrameworkExtensionTestCase extends TestCase
         );
     }
 
+    public function testAssetMapperWithoutAssets()
+    {
+        $container = $this->createContainerFromFile('asset_mapper_without_assets');
+
+        $this->assertTrue($container->has('asset_mapper'));
+        $this->assertFalse($container->has('asset_mapper.asset_package'));
+        $this->assertFalse($container->has('assets.packages'));
+        $this->assertFalse($container->has('assets._default_package'));
+    }
+
     protected function createContainer(array $data = [])
     {
         return new ContainerBuilder(new EnvPlaceholderParameterBag(array_merge([

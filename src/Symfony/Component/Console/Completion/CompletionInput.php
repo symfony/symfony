@@ -226,7 +226,7 @@ final class CompletionInput extends ArgvInput
         return $this->currentIndex >= $nrOfTokens;
     }
 
-    public function __toString()
+    public function __toString(): string
     {
         $str = '';
         foreach ($this->tokens as $i => $token) {

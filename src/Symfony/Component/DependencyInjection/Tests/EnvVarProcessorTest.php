@@ -871,7 +871,7 @@ CSV;
                         'FOO_ENV_LOADER' => '123',
                         'BAZ_ENV_LOADER' => '',
                         'LAZY_ENV_LOADER' => new class() {
-                            public function __toString()
+                            public function __toString(): string
                             {
                                 return '';
                             }
@@ -888,7 +888,7 @@ CSV;
                         'BAR_ENV_LOADER' => '456',
                         'BAZ_ENV_LOADER' => '567',
                         'LAZY_ENV_LOADER' => new class() {
-                            public function __toString()
+                            public function __toString(): string
                             {
                                 return '678';
                             }

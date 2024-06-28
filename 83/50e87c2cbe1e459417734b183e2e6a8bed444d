@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2024-06-17T21:34:23Z
+
+this makes sure that `validateAndDenormalize()` behaves the same way as before the introduction of the TypeInfo component (see the legacy implementation in `validateAndDenormalizeLegacy()`
+
+---------------------------------------------------------------------------
+
+by HypeMC at 2024-06-27T16:24:14Z
+
+@nicolas-grekas @xabbuh See #57559, the test passes on 5.4, 6.4 and 7.0, but fails on 7.1. When I apply the changes made in this PR, it passes on 7.1 as well.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2024-06-27T19:32:55Z
+
+@HypeMC 👍 great, I have cherry-picked your commit here too

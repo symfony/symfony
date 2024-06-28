@@ -566,6 +566,10 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
                     return (float) $data;
                 }
 
+                if (LegacyType::BUILTIN_TYPE_BOOL === $builtinType && \is_string($data) && ($context[self::FILTER_BOOL] ?? false)) {
+                    return filter_var($data, \FILTER_VALIDATE_BOOL, \FILTER_NULL_ON_FAILURE);
+                }
+
                 if ((LegacyType::BUILTIN_TYPE_FALSE === $builtinType && false === $data) || (LegacyType::BUILTIN_TYPE_TRUE === $builtinType && true === $data)) {
                     return $data;
                 }
@@ -795,6 +799,10 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
                 // a float is expected.
                 if (TypeIdentifier::FLOAT === $typeIdentifier && \is_int($data) && null !== $format && str_contains($format, JsonEncoder::FORMAT)) {
                     return (float) $data;
+                }
+
+                if (TypeIdentifier::BOOL === $typeIdentifier && \is_string($data) && ($context[self::FILTER_BOOL] ?? false)) {
+                    return filter_var($data, \FILTER_VALIDATE_BOOL, \FILTER_NULL_ON_FAILURE);
                 }
 
                 $dataMatchesExpectedType = match ($typeIdentifier) {

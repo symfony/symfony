@@ -99,6 +99,9 @@ final class ScalewayApiTransport extends AbstractApiTransport
         if ($attachements = $this->prepareAttachments($email)) {
             $payload['attachments'] = $attachements;
         }
+        if ($headers = $this->getCustomHeaders($email)) {
+            $payload['additional_headers'] = $headers;
+        }
 
         return $payload;
     }
@@ -118,6 +121,24 @@ final class ScalewayApiTransport extends AbstractApiTransport
         }
 
         return $attachments;
+    }
+
+    private function getCustomHeaders(Email $email): array
+    {
+        $headers = [];
+        $headersToBypass = ['from', 'to', 'cc', 'bcc', 'subject', 'content-type', 'sender'];
+        foreach ($email->getHeaders()->all() as $name => $header) {
+            if (\in_array($name, $headersToBypass, true)) {
+                continue;
+            }
+
+            $headers[] = [
+                'key' => $header->getName(),
+                'value' => $header->getBodyAsString(),
+            ];
+        }
+
+        return $headers;
     }
 
     private function formatAddress(Address $address): array

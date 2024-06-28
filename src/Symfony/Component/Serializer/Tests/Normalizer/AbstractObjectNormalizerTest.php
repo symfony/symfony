@@ -946,6 +946,7 @@ class AbstractObjectNormalizerTest extends TestCase
     public function testDenormalizeUntypedFormatNotNormalizable()
     {
         $this->expectException(NotNormalizableValueException::class);
+        $this->expectExceptionMessage('Custom exception message');
         $serializer = new Serializer([new CustomNormalizer(), new ObjectNormalizer(null, null, null, new PropertyInfoExtractor([], [new PhpDocExtractor(), new ReflectionExtractor()]))]);
         $serializer->denormalize(['value' => 'test'], DummyWithNotNormalizable::class, 'xml');
     }
@@ -1193,6 +1194,34 @@ class AbstractObjectNormalizerTest extends TestCase
         return [
             [['foo' => true], FalsePropertyDummy::class],
             [['foo' => false], TruePropertyDummy::class],
+        ];
+    }
+
+    /**
+     * @dataProvider provideDenormalizeWithFilterBoolData
+     */
+    public function testDenormalizeBooleanTypeWithFilterBool(array $data, ?bool $expectedFoo)
+    {
+        $normalizer = new AbstractObjectNormalizerWithMetadataAndPropertyTypeExtractors();
+
+        $dummy = $normalizer->denormalize($data, BoolPropertyDummy::class, null, [AbstractNormalizer::FILTER_BOOL => true]);
+
+        $this->assertSame($expectedFoo, $dummy->foo);
+    }
+
+    public function provideDenormalizeWithFilterBoolData(): array
+    {
+        return [
+            [['foo' => 'true'], true],
+            [['foo' => '1'], true],
+            [['foo' => 'yes'], true],
+            [['foo' => 'false'], false],
+            [['foo' => '0'], false],
+            [['foo' => 'no'], false],
+            [['foo' => ''], false],
+            [['foo' => null], null],
+            [['foo' => 'null'], null],
+            [['foo' => 'something'], null],
         ];
     }
 }
@@ -1477,6 +1506,12 @@ class FalsePropertyDummy
 class TruePropertyDummy
 {
     /** @var true */
+    public $foo;
+}
+
+class BoolPropertyDummy
+{
+    /** @var null|bool */
     public $foo;
 }
 

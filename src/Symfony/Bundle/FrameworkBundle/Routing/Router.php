@@ -69,7 +69,7 @@ class Router extends BaseRouter implements WarmableInterface, ServiceSubscriberI
             $this->collection->addResource(new ContainerParametersResource($this->collectedParameters));
 
             try {
-                $containerFile = ($this->paramFetcher)('kernel.cache_dir').'/'.($this->paramFetcher)('kernel.container_class').'.php';
+                $containerFile = ($this->paramFetcher)('kernel.build_dir').'/'.($this->paramFetcher)('kernel.container_class').'.php';
                 if (file_exists($containerFile)) {
                     $this->collection->addResource(new FileResource($containerFile));
                 } else {
@@ -84,14 +84,12 @@ class Router extends BaseRouter implements WarmableInterface, ServiceSubscriberI
 
     public function warmUp(string $cacheDir, ?string $buildDir = null): array
     {
-        if (!$buildDir) {
-            return [];
+        if (null === $currentDir = $this->getOption('cache_dir')) {
+            return []; // skip warmUp when router doesn't use cache
         }
 
-        $currentDir = $this->getOption('cache_dir');
-
-        // force cache generation in build_dir
-        $this->setOption('cache_dir', $buildDir);
+        // force cache generation
+        $this->setOption('cache_dir', $buildDir ?? $cacheDir);
         $this->getMatcher();
         $this->getGenerator();
 

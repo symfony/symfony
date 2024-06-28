@@ -566,6 +566,10 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
                     return (float) $data;
                 }
 
+                if (LegacyType::BUILTIN_TYPE_BOOL === $builtinType && \is_string($data) && ($context[self::FILTER_BOOL] ?? false)) {
+                    return filter_var($data, \FILTER_VALIDATE_BOOL, \FILTER_NULL_ON_FAILURE);
+                }
+
                 if ((LegacyType::BUILTIN_TYPE_FALSE === $builtinType && false === $data) || (LegacyType::BUILTIN_TYPE_TRUE === $builtinType && true === $data)) {
                     return $data;
                 }
@@ -640,8 +644,11 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
     private function validateAndDenormalize(Type $type, string $currentClass, string $attribute, mixed $data, ?string $format, array $context): mixed
     {
         $expectedTypes = [];
+        $isUnionType = $type->asNonNullable() instanceof UnionType;
+        $e = null;
         $extraAttributesException = null;
         $missingConstructorArgumentsException = null;
+        $isNullable = false;
 
         $types = match (true) {
             $type instanceof IntersectionType => throw new LogicException('Unable to handle intersection type.'),
@@ -679,12 +686,19 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
                 // That's why we have to transform the values, if one of these non-string basic datatypes is expected.
                 $typeIdentifier = $t->getTypeIdentifier();
                 if (\is_string($data) && (XmlEncoder::FORMAT === $format || CsvEncoder::FORMAT === $format)) {
+                    if ('' === $data) {
+                        if (TypeIdentifier::ARRAY === $typeIdentifier) {
+                            return [];
+                        }
+
+                        if (TypeIdentifier::STRING === $typeIdentifier) {
+                            return '';
+                        }
+
+                        $isNullable = $isNullable ?: $type->isNullable();
+                    }
+
                     switch ($typeIdentifier) {
-                        case TypeIdentifier::ARRAY:
-                            if ('' === $data) {
-                                return [];
-                            }
-                            break;
                         case TypeIdentifier::BOOL:
                             // according to https://www.w3.org/TR/xmlschema-2/#boolean, valid representations are "false", "true", "0" and "1"
                             if ('false' === $data || '0' === $data) {
@@ -787,6 +801,10 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
                     return (float) $data;
                 }
 
+                if (TypeIdentifier::BOOL === $typeIdentifier && \is_string($data) && ($context[self::FILTER_BOOL] ?? false)) {
+                    return filter_var($data, \FILTER_VALIDATE_BOOL, \FILTER_NULL_ON_FAILURE);
+                }
+
                 $dataMatchesExpectedType = match ($typeIdentifier) {
                     TypeIdentifier::ARRAY => \is_array($data),
                     TypeIdentifier::BOOL => \is_bool($data),
@@ -808,17 +826,17 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
                     return $data;
                 }
             } catch (NotNormalizableValueException|InvalidArgumentException $e) {
-                if (!$type instanceof UnionType) {
+                if (!$isUnionType && !$isNullable) {
                     throw $e;
                 }
             } catch (ExtraAttributesException $e) {
-                if (!$type instanceof UnionType) {
+                if (!$isUnionType && !$isNullable) {
                     throw $e;
                 }
 
                 $extraAttributesException ??= $e;
             } catch (MissingConstructorArgumentsException $e) {
-                if (!$type instanceof UnionType) {
+                if (!$isUnionType && !$isNullable) {
                     throw $e;
                 }
 
@@ -836,6 +854,10 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
 
         if ($missingConstructorArgumentsException) {
             throw $missingConstructorArgumentsException;
+        }
+
+        if (!$isUnionType && $e) {
+            throw $e;
         }
 
         if ($context[self::DISABLE_TYPE_ENFORCEMENT] ?? $this->defaultContext[self::DISABLE_TYPE_ENFORCEMENT] ?? false) {

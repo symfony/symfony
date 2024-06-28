@@ -28,8 +28,8 @@ use Symfony\Component\WebLink\Link;
 class ImportMapRenderer
 {
     // https://generator.jspm.io/#S2NnYGAIzSvJLMlJTWEAAMYOgCAOAA
-    private const DEFAULT_ES_MODULE_SHIMS_POLYFILL_URL = 'https://ga.jspm.io/npm:es-module-shims@1.8.2/dist/es-module-shims.js';
-    private const DEFAULT_ES_MODULE_SHIMS_POLYFILL_INTEGRITY = 'sha384-+dzlBT6NPToF0UZu7ZUA6ehxHY8h/TxJOZxzNXKhFD+5He5Hbex+0AIOiSsEaokw';
+    private const DEFAULT_ES_MODULE_SHIMS_POLYFILL_URL = 'https://ga.jspm.io/npm:es-module-shims@1.10.0/dist/es-module-shims.js';
+    private const DEFAULT_ES_MODULE_SHIMS_POLYFILL_INTEGRITY = 'sha384-ie1x72Xck445i0j4SlNJ5W5iGeL3Dpa0zD48MZopgWsjNB/lt60SuG1iduZGNnJn';
 
     public function __construct(
         private readonly ImportMapGenerator $importMapGenerator,

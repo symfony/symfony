@@ -93,4 +93,35 @@ class AutowireCallableTest extends TestCase
         self::assertEquals([new Reference('my_service'), '__invoke'], $attribute->value);
         self::assertFalse($attribute->lazy);
     }
+
+    public function testLazyAsArrayInDefinition()
+    {
+        $attribute = new AutowireCallable(callable: [Foo::class, 'myMethod'], lazy: 'my_lazy_class');
+
+        self::assertSame([Foo::class, 'myMethod'], $attribute->value);
+
+        $definition = $attribute->buildDefinition('my_value', 'my_custom_type', new \ReflectionParameter([Foo::class, 'myMethod'], 'myParameter'));
+
+        self::assertSame('my_lazy_class', $definition->getClass());
+        self::assertTrue($definition->isLazy());
+    }
+
+    public function testLazyIsFalseInDefinition()
+    {
+        $attribute = new AutowireCallable(callable: [Foo::class, 'myMethod'], lazy: false);
+
+        self::assertFalse($attribute->lazy);
+
+        $definition = $attribute->buildDefinition('my_value', 'my_custom_type', new \ReflectionParameter([Foo::class, 'myMethod'], 'myParameter'));
+
+        self::assertSame('my_custom_type', $definition->getClass());
+        self::assertFalse($definition->isLazy());
+    }
+}
+
+class Foo
+{
+    public function myMethod(callable $myParameter)
+    {
+    }
 }

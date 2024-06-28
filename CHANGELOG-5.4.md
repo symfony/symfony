@@ -7,6 +7,31 @@ in 5.4 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v5.4.0...v5.4.1
 
+* 5.4.41 (2024-06-28)
+
+ * bug #57497 [String] Fixed u()->snake(), b()->snake() and s()->snake() methods (arczinosek)
+ * bug #57574 [Filesystem] Fix Filesystem::remove() on Windows (nicolas-grekas)
+ * bug #57572 [DoctrineBridge] Fix compat with DI >= 6.4 (nicolas-grekas)
+ * bug #57538 [String] Add `alias` case to `EnglishInflector` (alexandre-daubois)
+ * feature #57557 Ibexa is sponsoring Symfony 5.4, thanks to them! \o/ (nicolas-grekas)
+ * bug #57569 [HttpClient][Mailer] Revert "Let curl handle transfer encoding", use HTTP/1.1 for Mailgun (nicolas-grekas)
+ * bug #57453 [HttpClient] Fix parsing SSE (fancyweb)
+ * bug #57467 [SecurityBundle] Add `provider` XML attribute to the authenticators it’s missing from (MatTheCat)
+ * bug #57384 [Notifier] Fix thread key in GoogleChat bridge (romain-jacquart)
+ * bug #57372 [HttpKernel][Security] Fix accessing session for stateless request (VincentLanglet)
+ * bug #57112 [Messenger] Handle `AMQPConnectionException` when publishing a message (jwage)
+ * bug #57341 [Serializer] properly handle invalid data for false/true types (xabbuh)
+ * bug #57187 [Serializer] Fix `ObjectNormalizer` with property path (HypeMC)
+ * bug #57355 [ErrorHandler] Fix rendered exception code highlighting on PHP 8.3 (tscni)
+ * bug #57273 [FrameworkBundle] Fix setting default context for certain normalizers (HypeMC)
+ * bug #52699 [Serializer] [PropertyAccessor] Ignore non-collection interface generics (mtarld)
+ * bug #54634 [String] Fix #54611 pluralization of -on ending words + singularization of -a ending foreign words (Geordie, DesLynx)
+ * bug #57213 [Validator] [UniqueValidator] Use correct variable as parameter in (custom) error message (seho-nl, Sebastien Hoek)
+ * bug #54920 [Messenger] Comply with Amazon SQS requirements for message body (VincentLanglet)
+ * bug #57110 [PhpUnitBridge] Fix error handler triggered outside of tests (HypeMC)
+ * bug #57297 [FrameworkBundle] not registered definitions must not be modified (xabbuh)
+ * bug #57234 [String] Fix Inflector for 'hardware' (podhy)
+
 * 5.4.40 (2024-06-02)
 
  * bug #57275 Fix autoload configs to avoid warnings when building optimized autoloaders (Seldaek)

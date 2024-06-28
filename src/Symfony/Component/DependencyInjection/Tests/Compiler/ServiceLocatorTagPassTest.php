@@ -214,7 +214,7 @@ class ServiceLocatorTagPassTest extends TestCase
         $locator = $container->getDefinition($locator);
         $factories = $locator->getArguments()[0];
 
-        static::assertSame(['service-1', 'service-2'], array_keys($factories));
+        static::assertSame(['service-2', 'service-1'], array_keys($factories));
     }
 
     public function testBindingsAreProcessed()

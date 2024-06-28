@@ -143,15 +143,15 @@ class DataPartTest extends TestCase
         }
 
         $finder = new PhpExecutableFinder();
-        $process = new Process(array_merge([$finder->find(false)], $finder->findArguments(), ['-dopcache.enable=0', '-dvariables_order=EGPCS', '-S', 'localhost:8057']));
+        $process = new Process(array_merge([$finder->find(false)], $finder->findArguments(), ['-dopcache.enable=0', '-dvariables_order=EGPCS', '-S', 'localhost:8856']));
         $process->setWorkingDirectory(__DIR__.'/../Fixtures/web');
         $process->start();
 
         try {
             do {
                 usleep(50000);
-            } while (!@fopen('http://localhost:8057', 'r'));
-            $p = DataPart::fromPath($file = 'http://localhost:8057/logo_symfony_header.png');
+            } while (!@fopen('http://localhost:8856', 'r'));
+            $p = DataPart::fromPath($file = 'http://localhost:8856/logo_symfony_header.png');
             $content = file_get_contents($file);
             $this->assertEquals($content, $p->getBody());
             $maxLineLength = 76;

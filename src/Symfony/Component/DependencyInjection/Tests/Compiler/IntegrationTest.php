@@ -619,7 +619,7 @@ class IntegrationTest extends TestCase
         // We need to check priority of instances in the factories
         $factories = (new \ReflectionClass($locator))->getProperty('factories');
 
-        self::assertSame([BarTagClass::class, FooTagClass::class], array_keys($factories->getValue($locator)));
+        self::assertSame([FooTagClass::class, BarTagClass::class], array_keys($factories->getValue($locator)));
     }
 
     public function testTaggedLocatorWithDefaultIndexMethodAndWithDefaultPriorityMethodConfiguredViaAttribute()
@@ -648,7 +648,7 @@ class IntegrationTest extends TestCase
         // We need to check priority of instances in the factories
         $factories = (new \ReflectionClass($locator))->getProperty('factories');
 
-        self::assertSame(['bar_tag_class', 'foo_tag_class'], array_keys($factories->getValue($locator)));
+        self::assertSame(['foo_tag_class', 'bar_tag_class'], array_keys($factories->getValue($locator)));
         self::assertSame($container->get(BarTagClass::class), $locator->get('bar_tag_class'));
         self::assertSame($container->get(FooTagClass::class), $locator->get('foo_tag_class'));
     }

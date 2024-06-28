@@ -1,0 +1,29 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-06-28T08:11:36Z
+
+Since this is a code style improvement, it should go on branch 7.2 to me.
+There are a few more occurrences BTW:
+
+```sh
+$ grep 'public function __toString()$' src/ -r
+src/Symfony/Component/Security/Http/Tests/Authenticator/FormLoginAuthenticatorTest.php:            public function __toString()
+src/Symfony/Component/Console/Completion/CompletionInput.php:    public function __toString()
+src/Symfony/Component/HttpClient/Tests/MockHttpClientTest.php:            public function __toString()
+src/Symfony/Component/DependencyInjection/Tests/EnvVarProcessorTest.php:                            public function __toString()
+src/Symfony/Component/DependencyInjection/Tests/EnvVarProcessorTest.php:                            public function __toString()
+src/Symfony/Component/Routing/Tests/Generator/UrlGeneratorTest.php:    public function __toString()
+src/Symfony/Component/Routing/Tests/Generator/UrlGeneratorTest.php:    public function __toString()
+```
+
+---------------------------------------------------------------------------
+
+by seriquynh at 2024-06-28T08:30:13Z
+
+I first though CompletionInput::__toString() should have string as return type because ArgvInput::__toString() already had string as return type (ComplentionInput extends ArgvInput). If a class doesn't extend anything, __toString() without type-hint is fine.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-06-28T08:40:04Z
+
+The `string` return type is implicit on `__toString()` methods so technically it's not needed, but better be explicit.

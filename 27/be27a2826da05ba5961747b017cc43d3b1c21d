@@ -1,0 +1,71 @@
+---------------------------------------------------------------------------
+
+by pounard at 2024-06-24T11:30:22Z
+
+All tests failures seems unrelated, and seem happen in conjunction with some Doctrine ORM versions.
+
+---------------------------------------------------------------------------
+
+by pounard at 2024-06-24T18:57:33Z
+
+@nicolas-grekas @yceruto all done, thanks for the review.
+
+---------------------------------------------------------------------------
+
+by pounard at 2024-06-24T18:59:53Z
+
+Same unrelated failures again in `Symfony\Bridge\Doctrine\Tests\ManagerRegistryTest`.
+
+---------------------------------------------------------------------------
+
+by pounard at 2024-06-25T08:29:47Z
+
+@nicolas-grekas
+
+> small rebase needed
+
+Did it, CI failures are still related to doctrine.
+
+---------------------------------------------------------------------------
+
+by pounard at 2024-06-25T08:41:54Z
+
+> Thanks for your answers. Works for me.
+
+I'd like to thank you for your time, I appreciate it very much.
+
+---------------------------------------------------------------------------
+
+by pounard at 2024-06-26T07:29:32Z
+
+@nicolas-grekas Will this be merged? I need to know in order to continue experimenting/proposing new features for the messenger.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-06-26T07:45:06Z
+
+I'd like to wait a bit in case anyone else would like to review, but eventually I think it should be merged yes.
+
+---------------------------------------------------------------------------
+
+by pounard at 2024-06-26T09:15:31Z
+
+@nicolas-grekas in the meantime, I'd like to have your global impressions about https://github.com/symfony/symfony/issues/57536 if you can find a few minutes for it.
+
+---------------------------------------------------------------------------
+
+by pounard at 2024-06-26T13:25:16Z
+
+> The attributes are retrieved at runtime. As questioned in [#41179 (comment)](https://github.com/symfony/symfony/pull/41179#discussion_r830053607), is this a problem?
+
+I don't think so, reflection is fast and it probably will be insignificant compared to the command execution itself.
+
+EDIT: here we are at dispatch, so it actually will not be executed, yet it is still way faster than the database insert that will be issued if the transport is doctrine-based, or anyother tcp round-trip if it is another type of broker.
+
+---------------------------------------------------------------------------
+
+by kbond at 2024-06-26T13:31:43Z
+
+> I don't think so, reflection is fast and it probably will be insignificant compared to the command execution itself.
+
+I think this also but wanted to confirm.

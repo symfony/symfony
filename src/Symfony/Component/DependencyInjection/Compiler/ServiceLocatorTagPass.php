@@ -131,7 +131,6 @@ final class ServiceLocatorTagPass extends AbstractRecursivePass
 
             $services[$k] = new ServiceClosureArgument($v);
         }
-        ksort($services);
 
         return $services;
     }

@@ -171,17 +171,17 @@ class FilesystemTest extends FilesystemTestCase
         }
 
         $finder = new PhpExecutableFinder();
-        $process = new Process(array_merge([$finder->find(false)], $finder->findArguments(), ['-dopcache.enable=0', '-dvariables_order=EGPCS', '-S', 'localhost:8057']));
+        $process = new Process(array_merge([$finder->find(false)], $finder->findArguments(), ['-dopcache.enable=0', '-dvariables_order=EGPCS', '-S', 'localhost:8857']));
         $process->setWorkingDirectory(__DIR__.'/Fixtures/web');
 
         $process->start();
 
         do {
             usleep(50000);
-        } while (!@fopen('http://localhost:8057', 'r'));
+        } while (!@fopen('http://localhost:8857', 'r'));
 
         try {
-            $sourceFilePath = 'http://localhost:8057/logo_symfony_header.png';
+            $sourceFilePath = 'http://localhost:8857/logo_symfony_header.png';
             $targetFilePath = $this->workspace.\DIRECTORY_SEPARATOR.'copy_target_file';
             file_put_contents($targetFilePath, 'TARGET FILE');
             $this->filesystem->copy($sourceFilePath, $targetFilePath, false);

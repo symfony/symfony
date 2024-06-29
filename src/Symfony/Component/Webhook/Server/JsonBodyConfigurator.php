@@ -20,14 +20,16 @@ use Symfony\Component\Serializer\SerializerInterface;
  */
 final class JsonBodyConfigurator implements RequestConfiguratorInterface
 {
-    public function __construct(
-        private readonly SerializerInterface $serializer,
-    ) {
+    private PayloadSerializerInterface $payloadSerializer;
+
+    public function __construct(SerializerInterface|PayloadSerializerInterface $payloadSerializer)
+    {
+        $this->payloadSerializer = $payloadSerializer instanceof SerializerInterface ? new SerializerPayloadSerializer($payloadSerializer) : $payloadSerializer;
     }
 
     public function configure(RemoteEvent $event, #[\SensitiveParameter] string $secret, HttpOptions $options): void
     {
-        $body = $this->serializer->serialize($event->getPayload(), 'json');
+        $body = $this->payloadSerializer->serialize($event->getPayload());
         $options->setBody($body);
         $headers = $options->toArray()['headers'];
         $headers['Content-Type'] = 'application/json';

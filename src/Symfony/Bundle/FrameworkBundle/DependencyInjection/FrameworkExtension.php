@@ -548,7 +548,7 @@ class FrameworkExtension extends Extension
         $this->registerProfilerConfiguration($config['profiler'], $container, $loader);
 
         if ($this->readConfigEnabled('webhook', $container, $config['webhook'])) {
-            $this->registerWebhookConfiguration($config['webhook'], $container, $loader);
+            $this->registerWebhookConfiguration($config['webhook'], $container, $loader, $this->readConfigEnabled('serializer', $container, $config['serializer']));
 
             // If Webhook is installed but the HttpClient or Serializer components are not available, we should throw an error
             if (!$this->readConfigEnabled('http_client', $container, $config['http_client'])) {
@@ -556,14 +556,6 @@ class FrameworkExtension extends Extension
                     ->setArguments([])
                     ->addError('You cannot use the "webhook transport" service since the HttpClient component is not '
                         .(class_exists(ScopingHttpClient::class) ? 'enabled. Try setting "framework.http_client.enabled" to true.' : 'installed. Try running "composer require symfony/http-client".')
-                    )
-                    ->addTag('container.error');
-            }
-            if (!$this->readConfigEnabled('serializer', $container, $config['serializer'])) {
-                $container->getDefinition('webhook.body_configurator.json')
-                    ->setArguments([])
-                    ->addError('You cannot use the "webhook transport" service since the Serializer component is not '
-                        .(class_exists(Serializer::class) ? 'enabled. Try setting "framework.serializer.enabled" to true.' : 'installed. Try running "composer require symfony/serializer-pack".')
                     )
                     ->addTag('container.error');
             }
@@ -2919,7 +2911,7 @@ class FrameworkExtension extends Extension
         }
     }
 
-    private function registerWebhookConfiguration(array $config, ContainerBuilder $container, PhpFileLoader $loader): void
+    private function registerWebhookConfiguration(array $config, ContainerBuilder $container, PhpFileLoader $loader, bool $serializerEnabled): void
     {
         if (!class_exists(WebhookController::class)) {
             throw new LogicException('Webhook support cannot be enabled as the component is not installed. Try running "composer require symfony/webhook".');
@@ -2938,6 +2930,9 @@ class FrameworkExtension extends Extension
         $controller = $container->getDefinition('webhook.controller');
         $controller->replaceArgument(0, $parsers);
         $controller->replaceArgument(1, new Reference($config['message_bus']));
+
+        $jsonBodyConfigurator = $container->getDefinition('webhook.body_configurator.json');
+        $jsonBodyConfigurator->replaceArgument(0, new Reference($serializerEnabled ? 'webhook.payload_serializer.serializer' : 'webhook.payload_serializer.json'));
     }
 
     private function registerRemoteEventConfiguration(PhpFileLoader $loader): void

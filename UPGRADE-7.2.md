@@ -12,3 +12,8 @@ Security
 --------
 
  * Deprecate argument `$secret` of `RememberMeToken` and `RememberMeAuthenticator`
+
+Yaml
+----
+
+ * Deprecate parsing duplicate mapping keys whose value is `null`

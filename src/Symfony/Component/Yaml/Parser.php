@@ -299,7 +299,11 @@ class Parser
                     if (!$this->isNextLineIndented() && !$this->isNextLineUnIndentedCollection()) {
                         // Spec: Keys MUST be unique; first one wins.
                         // But overwriting is allowed when a merge node is used in current block.
-                        if ($allowOverwrite || !\array_key_exists($key, $data)) {
+                        if ($allowOverwrite || !isset($data[$key])) {
+                            if (!$allowOverwrite && array_key_exists($key, $data)) {
+                                trigger_deprecation('symfony/yaml', '7.2', 'Duplicate key "%s" detected on line %d whilst parsing YAML. Silent handling of duplicate mapping keys in YAML is deprecated and will throw a ParseException in 8.0.', $key, $this->getRealCurrentLineNb() + 1);
+                            }
+
                             if (null !== $subTag) {
                                 $data[$key] = new TaggedValue($subTag, '');
                             } else {
@@ -320,7 +324,11 @@ class Parser
                             }
 
                             $data += $value;
-                        } elseif ($allowOverwrite || !\array_key_exists($key, $data)) {
+                        } elseif ($allowOverwrite || !isset($data[$key])) {
+                            if (!$allowOverwrite && array_key_exists($key, $data)) {
+                                trigger_deprecation('symfony/yaml', '7.2', 'Duplicate key "%s" detected on line %d whilst parsing YAML. Silent handling of duplicate mapping keys in YAML is deprecated and will throw a ParseException in 8.0.', $key, $this->getRealCurrentLineNb() + 1);
+                            }
+
                             // Spec: Keys MUST be unique; first one wins.
                             // But overwriting is allowed when a merge node is used in current block.
                             if (null !== $subTag) {
@@ -336,7 +344,11 @@ class Parser
                     $value = $this->parseValue(rtrim($values['value']), $flags, $context);
                     // Spec: Keys MUST be unique; first one wins.
                     // But overwriting is allowed when a merge node is used in current block.
-                    if ($allowOverwrite || !\array_key_exists($key, $data)) {
+                    if ($allowOverwrite || !isset($data[$key])) {
+                        if (!$allowOverwrite && array_key_exists($key, $data)) {
+                            trigger_deprecation('symfony/yaml', '7.2', 'Duplicate key "%s" detected on line %d whilst parsing YAML. Silent handling of duplicate mapping keys in YAML is deprecated and will throw a ParseException in 8.0.', $key, $this->getRealCurrentLineNb() + 1);
+                        }
+
                         $data[$key] = $value;
                     } else {
                         throw new ParseException(\sprintf('Duplicate key "%s" detected.', $key), $this->getRealCurrentLineNb() + 1, $this->currentLine);

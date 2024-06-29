@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2024-06-29T05:44:26Z
+
+#57261 was merged into the `7.2` to not break existing application. IMO we should go the safe road then and deprecate this first and don't throw before 8.0.

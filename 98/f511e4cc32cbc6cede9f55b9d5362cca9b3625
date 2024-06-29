@@ -1,0 +1,15 @@
+---------------------------------------------------------------------------
+
+by Neirda24 at 2024-06-24T16:21:59Z
+
+> LGTM but please mind the remaining minor comments. Anyone up to do the remaining steps in FramewoorkBundle?
+
+Remaining steps would be to make this configuration available through the semantic configuration ? I'd be happy to try it out.
+
+---------------------------------------------------------------------------
+
+by Seldaek at 2024-06-24T19:52:41Z
+
+Alright I applied fixes for all feedback received.
+
+@Neirda24 yes it would be making sure one can specify a default action in the sanitizer config in FrameworkBundle. Great if you can do that thanks!

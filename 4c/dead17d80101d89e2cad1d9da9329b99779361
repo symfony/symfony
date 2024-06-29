@@ -1,0 +1,49 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-06-25T08:03:40Z
+
+> But what if a third-party service is using the empty secret and does not throw an exception in such a case?
+
+What about not defining the parameter instead when the value is not set?
+
+---------------------------------------------------------------------------
+
+by yceruto at 2024-06-26T01:23:38Z
+
+I didn't include any changelog as it's part of https://github.com/symfony/symfony/pull/56985.
+
+---------------------------------------------------------------------------
+
+by yceruto at 2024-06-26T12:17:00Z
+
+> I'm wondering about what this change will achieve in terms of DX?
+
+Still thinking about it... cause that we can improve the DX for those services but what about the rest? 3rd-party services requiring the param directly won't get any DX.
+
+> Also, what about remember-me and signed URLs that also use kernel.secret?
+
+Updated
+
+>From what I tried, enabling esi+fragments currently triggers a compile time exception if kernel.secret is not defined:
+>
+>>You have requested a non-existent parameter "kernel.secret". Did you mean this: "kernel.charset"?
+>
+>The message is not the best, but wouldn't the proposed way throw the same message, just at runtime vs compile time? Why is it better?
+>
+>Then, if we really want a runtime exception, we could try adding a small internal factory that would throw a better error message if the secret is not configured?
+
+Yes, I'll go that way in the next step
+
+---------------------------------------------------------------------------
+
+by yceruto at 2024-06-26T12:19:45Z
+
+At least for this PR I want to avoid the compiler-errors when none of these services are used.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-06-29T05:47:22Z
+
+> cause that we can improve the DX for those services but what about the rest? 3rd-party services requiring the param directly won't get any DX.
+
+we could deprecate the parameter and replace it by a kernel.secret service (in the next step)

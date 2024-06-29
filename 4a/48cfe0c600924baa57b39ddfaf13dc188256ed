@@ -1,0 +1,22 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2024-06-29T04:14:28Z
+
+~~This does not look like the right solution. The tests used to work before #57553 without the files being present.~~
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-06-29T05:41:44Z
+
+The issue is only on appveyor right?
+Then here is why: before #57553, the router cache warmer wasn't triggered, and since routes where never used by these test cases, we didn't need these yaml files. It looks like on Windows, we take the `$cacheDir !== $buildDir` codepath and we enable the optional cache warmers.
+I think we should figure out why these paths are different on Windows and fix that part.
+The fact that these yaml files are missing is actually a good thing: it proves that we didn't run any logic to care about routes while routes are unused, which is good for the perf of tests.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2024-06-29T05:46:45Z
+
+> The issue is only on appveyor right?
+
+I can observe the same behaviour locally. I will investigate a bit more.

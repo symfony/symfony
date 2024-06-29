@@ -563,7 +563,7 @@ EOF
         $kernel->boot();
 
         $this->assertTrue($kernel->warmedUp);
-        $this->assertSame($kernel->getBuildDir(), $kernel->warmedUpBuildDir);
+        $this->assertSame(realpath($kernel->getBuildDir()), $kernel->warmedUpBuildDir);
     }
 
     public function testServicesResetter()

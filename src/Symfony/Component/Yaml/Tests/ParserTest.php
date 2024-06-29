@@ -12,6 +12,7 @@
 namespace Symfony\Component\Yaml\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\Yaml\Exception\ParseException;
 use Symfony\Component\Yaml\Parser;
 use Symfony\Component\Yaml\Tag\TaggedValue;
@@ -19,6 +20,8 @@ use Symfony\Component\Yaml\Yaml;
 
 class ParserTest extends TestCase
 {
+    use ExpectDeprecationTrait;
+
     private ?Parser $parser;
 
     protected function setUp(): void
@@ -1026,15 +1029,24 @@ parent:
 EOD;
         $tests[] = [$yaml, 'child_sequence', 6];
 
+        return $tests;
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testNullAsDuplicatedData()
+    {
+        $this->expectDeprecation('Since symfony/yaml 7.2: Duplicate key "child" detected on line 4 whilst parsing YAML. Silent handling of duplicate mapping keys in YAML is deprecated and will throw a ParseException in 8.0.');
+
         $yaml = <<<EOD
 parent:
   child:
   child2:
   child:
 EOD;
-        $tests[] = [$yaml, 'child', 4];
 
-        return $tests;
+        Yaml::parse($yaml);
     }
 
     public function testEmptyValue()

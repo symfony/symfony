@@ -4,7 +4,7 @@ CHANGELOG
 7.2
 ---
 
- * Duplicate mapping keys throw a `ParseException` even when such key is `null`
+ * Deprecate parsing duplicate mapping keys whose value is `null`
 
 7.1
 ---

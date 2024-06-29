@@ -12,6 +12,7 @@
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
 use Symfony\Bundle\SecurityBundle\RememberMe\FirewallAwareRememberMeHandler;
+use Symfony\Component\DependencyInjection\Parameter;
 use Symfony\Component\Security\Core\Signature\SignatureHasher;
 use Symfony\Component\Security\Http\Authenticator\RememberMeAuthenticator;
 use Symfony\Component\Security\Http\EventListener\CheckRememberMeConditionsListener;
@@ -30,7 +31,7 @@ return static function (ContainerConfigurator $container) {
             ->args([
                 service('property_accessor'),
                 abstract_arg('signature properties'),
-                '%kernel.secret%',
+                new Parameter('kernel.secret'),
                 null,
                 null,
             ])

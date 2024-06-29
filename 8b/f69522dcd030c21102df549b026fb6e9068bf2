@@ -1,0 +1,57 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-05-15T10:12:02Z
+
+I think we'd better *not* do this: named arguments are out of the BC promise, so using named arguments is a terrible argument for this change :) Also, this interface accepts mixed, not only objects, so $data is a more appropriate name. We might want to change the interface instead.
+
+---------------------------------------------------------------------------
+
+by russelomua at 2024-05-15T16:24:06Z
+
+I was anticipating a discussion, so I was surprised by the sudden appearance of this PR. I agree, @nicolas-grekas, but would modifying the interface be a BC?
+
+---------------------------------------------------------------------------
+
+by maxbeckers at 2024-05-16T09:54:02Z
+
+Yeah i just opened this PR to push the discussion about it because it took just a few seconds to prepare this PR. I'm open to close this PR with "Won't Fix" or even take the topic to change the interface as Nicolas mentioned.
+I can take it with me and change the interface and all related classes to bring them in sync.
+
+And when we want to change it, is it really a bugix or should we do this in 7.2?
+
+---------------------------------------------------------------------------
+
+by scruwi at 2024-05-16T11:08:01Z
+
+IMO those interface changes are rather BC than changes of implemantation.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-05-16T11:13:17Z
+
+Named arguments out of our BC promise. Also, changing argument names on interfaces cannot break existing code since PHP maps to arguments found in concrete implementations, not in abstract ones.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-05-16T11:13:53Z
+
+That'd be for 7.2, it's not a bug fix but just a tweak.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-05-16T13:31:17Z
+
+I'd suggest changing *only* the interface
+
+---------------------------------------------------------------------------
+
+by maxbeckers at 2024-05-16T13:43:14Z
+
+Don't we want to keep the other classes in sync with the interface?
+
+---------------------------------------------------------------------------
+
+by stof at 2024-05-16T15:27:22Z
+
+Renaming all implementations will increase the risk of conflicts when merging between branches.
+And the argument name in our implementations does not really matter for users of Symfony (as we don't support named parameters in our BC policy anyway, and covering them with BC would have prevented the renaming entirely).

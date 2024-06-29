@@ -521,6 +521,7 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
             touch($oldContainerDir.'.legacy');
         }
 
+        $buildDir = $this->container->getParameter('kernel.build_dir');
         $cacheDir = $this->container->getParameter('kernel.cache_dir');
         $preload = $this instanceof WarmableInterface ? (array) $this->warmUp($cacheDir, $buildDir) : [];
 

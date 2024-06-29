@@ -48,6 +48,10 @@ class UnsupportedSchemeException extends LogicException
             'class' => Bridge\Mailjet\Transport\MailjetTransportFactory::class,
             'package' => 'symfony/mailjet-mailer',
         ],
+        'mailomat' => [
+            'class' => Bridge\Mailomat\Transport\MailomatTransportFactory::class,
+            'package' => 'symfony/mailomat-mailer',
+        ],
         'mailpace' => [
             'class' => Bridge\MailPace\Transport\MailPaceTransportFactory::class,
             'package' => 'symfony/mail-pace-mailer',

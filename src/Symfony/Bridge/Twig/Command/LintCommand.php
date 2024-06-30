@@ -89,7 +89,7 @@ EOF
         $this->format = $input->getOption('format') ?? (GithubActionReporter::isGithubActionEnvironment() ? 'github' : 'txt');
 
         if (['-'] === $filenames) {
-            return $this->display($input, $output, $io, [$this->validate(file_get_contents('php://stdin'), uniqid('sf_', true))]);
+            return $this->display($input, $output, $io, [$this->validate(file_get_contents('php://stdin'), 'Standard Input')]);
         }
 
         if (!$filenames) {

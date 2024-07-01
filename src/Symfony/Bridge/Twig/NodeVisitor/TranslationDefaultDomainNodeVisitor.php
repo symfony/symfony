@@ -30,6 +30,8 @@ use Twig\NodeVisitor\NodeVisitorInterface;
  */
 final class TranslationDefaultDomainNodeVisitor implements NodeVisitorInterface
 {
+    private const INTERNAL_VAR_NAME = '__internal_trans_default_domain';
+
     private Scope $scope;
 
     public function __construct()
@@ -49,9 +51,8 @@ final class TranslationDefaultDomainNodeVisitor implements NodeVisitorInterface
 
                 return $node;
             } else {
-                $var = $this->getVarName();
-                $name = new AssignNameExpression($var, $node->getTemplateLine());
-                $this->scope->set('domain', new NameExpression($var, $node->getTemplateLine()));
+                $name = new AssignNameExpression(self::INTERNAL_VAR_NAME, $node->getTemplateLine());
+                $this->scope->set('domain', new NameExpression(self::INTERNAL_VAR_NAME, $node->getTemplateLine()));
 
                 return new SetNode(false, new Node([$name]), new Node([$node->getNode('expr')]), $node->getTemplateLine());
             }
@@ -110,10 +111,5 @@ final class TranslationDefaultDomainNodeVisitor implements NodeVisitorInterface
         }
 
         return false;
-    }
-
-    private function getVarName(): string
-    {
-        return \sprintf('__internal_%s', hash('xxh128', uniqid(mt_rand(), true)));
     }
 }

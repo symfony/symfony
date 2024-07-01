@@ -1,0 +1,22 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2024-07-01T03:14:04Z
+
+Hey!
+
+Thanks for your PR. You are targeting branch "7.2" but it seems your PR description refers to branch "6.4".
+Could you update the PR description or change target branch? This helps core maintainers a lot.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by derrabus at 2024-07-01T07:17:05Z
+
+An implementation of `getUri()` that does not return an instance of `UriInterface` is technically possible with the v1 contracts of PSR-7, but such an implementation would violate the standard. I agree that the check is redundant and can be removed.
+
+> Did I choose branch correctly? If not, please give me more references/posts about how to choose a right branch for a PR.
+
+Your change does not fix a problem. You've merely removed a piece of dead code. This is fine, but does not qualify as a bugfix. Thus, we will target 7.2.

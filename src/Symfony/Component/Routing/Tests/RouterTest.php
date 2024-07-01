@@ -35,7 +35,9 @@ class RouterTest extends TestCase
         $this->loader = $this->createMock(LoaderInterface::class);
         $this->router = new Router($this->loader, 'routing.yml');
 
-        $this->cacheDir = sys_get_temp_dir().\DIRECTORY_SEPARATOR.uniqid('router_', true);
+        $this->cacheDir = tempnam(sys_get_temp_dir(), 'sf_router_');
+        unlink($this->cacheDir);
+        mkdir($this->cacheDir);
     }
 
     protected function tearDown(): void

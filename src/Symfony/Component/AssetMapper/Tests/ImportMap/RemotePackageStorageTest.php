@@ -52,8 +52,6 @@ class RemotePackageStorageTest extends TestCase
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('file_put_contents('.$vendorDir.'/module_specifier/module_specifier.index.js): Failed to open stream: No such file or directory');
         $storage->save($entry, 'any content');
-
-        $this->filesystem->remove($vendorDir);
     }
 
     public function testIsDownloaded()

@@ -104,7 +104,7 @@ class HttpFoundationFactory implements HttpFoundationFactoryInterface
      */
     protected function getTemporaryPath(): string
     {
-        return tempnam(sys_get_temp_dir(), uniqid('symfony', true));
+        return tempnam(sys_get_temp_dir(), 'symfony');
     }
 
     public function createResponse(ResponseInterface $psrResponse, bool $streamed = false): Response

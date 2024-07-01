@@ -217,7 +217,7 @@ class CovertTest extends TestCase
 
     private static function createUploadedFile(string $content, string $originalName, string $mimeType, int $error): UploadedFile
     {
-        $path = tempnam(sys_get_temp_dir(), uniqid());
+        $path = tempnam(sys_get_temp_dir(), 'sftest');
         file_put_contents($path, $content);
 
         return new UploadedFile($path, $originalName, $mimeType, $error, true);

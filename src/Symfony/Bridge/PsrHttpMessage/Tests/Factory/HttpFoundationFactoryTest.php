@@ -198,7 +198,7 @@ class HttpFoundationFactoryTest extends TestCase
 
     private function createUploadedFile(string $content, int $error, string $clientFileName, string $clientMediaType): UploadedFile
     {
-        $filePath = tempnam($this->tmpDir, uniqid());
+        $filePath = tempnam($this->tmpDir, 'sftest');
         file_put_contents($filePath, $content);
 
         return new UploadedFile($filePath, filesize($filePath), $error, $clientFileName, $clientMediaType);

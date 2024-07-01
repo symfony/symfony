@@ -16,11 +16,11 @@ class getFooService extends ProjectServiceContainer
     /**
      * Gets the public 'foo' shared service.
      *
-     * @return \FooClass\Foo
+     * @return \stdClass
      */
     public static function do($container, $lazyLoad = true)
     {
-        return $container->services['foo'] = new \FooClass\Foo();
+        return $container->services['foo'] = new \stdClass($container->getParameter('bar'));
     }
 }
 
@@ -42,8 +42,8 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
  */
 class ProjectServiceContainer extends Container
 {
-    private const DEPRECATED_PARAMETERS = [
-        'foo_class' => ['symfony/test', '6.3', 'The parameter "%s" is deprecated.', 'foo_class'],
+    private const NONEMPTY_PARAMETERS = [
+        'bar' => 'Did you forget to configure the "foo.bar" option?',
     ];
 
     protected $targetDir;
@@ -52,8 +52,6 @@ class ProjectServiceContainer extends Container
     public function __construct(private array $buildParameters = [], protected string $containerDir = __DIR__)
     {
         $this->targetDir = \dirname($containerDir);
-        $this->parameters = $this->getDefaultParameters();
-
         $this->services = $this->privates = [];
         $this->fileMap = [
             'foo' => 'getFooService',
@@ -91,22 +89,22 @@ class ProjectServiceContainer extends Container
 
     public function getParameter(string $name): array|bool|string|int|float|\UnitEnum|null
     {
-        if (isset(self::DEPRECATED_PARAMETERS[$name])) {
-            trigger_deprecation(...self::DEPRECATED_PARAMETERS[$name]);
-        }
-
         if (isset($this->buildParameters[$name])) {
             return $this->buildParameters[$name];
         }
 
         if (!(isset($this->parameters[$name]) || isset($this->loadedDynamicParameters[$name]) || \array_key_exists($name, $this->parameters))) {
-            throw new ParameterNotFoundException($name);
+            throw new ParameterNotFoundException($name, extraMessage: self::NONEMPTY_PARAMETERS[$name] ?? null);
         }
 
         if (isset($this->loadedDynamicParameters[$name])) {
             $value = $this->loadedDynamicParameters[$name] ? $this->dynamicParameters[$name] : $this->getDynamicParameter($name);
         } else {
             $value = $this->parameters[$name];
+        }
+
+        if (isset(self::NONEMPTY_PARAMETERS[$name]) && (null === $value || '' === $value || [] === $value)) {
+            throw new \Symfony\Component\DependencyInjection\Exception\EmptyParameterValueException(self::NONEMPTY_PARAMETERS[$name]);
         }
 
         return $value;
@@ -136,7 +134,7 @@ class ProjectServiceContainer extends Container
             foreach ($this->buildParameters as $name => $value) {
                 $parameters[$name] = $value;
             }
-            $this->parameterBag = new FrozenParameterBag($parameters, self::DEPRECATED_PARAMETERS);
+            $this->parameterBag = new FrozenParameterBag($parameters, [], self::NONEMPTY_PARAMETERS);
         }
 
         return $this->parameterBag;
@@ -153,7 +151,7 @@ class ProjectServiceContainer extends Container
     protected function getDefaultParameters(): array
     {
         return [
-            'foo_class' => 'FooClass\\Foo',
+
         ];
     }
 }
@@ -174,7 +172,6 @@ require dirname(__DIR__, %d)%svendor/autoload.php';
 require __DIR__.'/Container%s/getFooService.php';
 
 $classes = [];
-$classes[] = 'FooClass\Foo';
 $classes[] = 'Symfony\Component\DependencyInjection\ContainerInterface';
 
 $preloaded = Preloader::preload($classes);

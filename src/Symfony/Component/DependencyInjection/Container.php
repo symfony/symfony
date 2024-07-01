@@ -86,7 +86,8 @@ class Container implements ContainerInterface, ResetInterface
 
         $this->parameterBag = new FrozenParameterBag(
             $this->parameterBag->all(),
-            $this->parameterBag instanceof ParameterBag ? $this->parameterBag->allDeprecated() : []
+            $this->parameterBag instanceof ParameterBag ? $this->parameterBag->allDeprecated() : [],
+            $this->parameterBag instanceof ParameterBag ? $this->parameterBag->allNonEmpty() : [],
         );
 
         $this->compiled = true;

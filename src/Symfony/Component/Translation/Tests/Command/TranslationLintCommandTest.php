@@ -148,6 +148,6 @@ EOF, $display);
      */
     private function getNormalizedDisplay(CommandTester $commandTester): string
     {
-        return implode(\PHP_EOL, array_map(fn (string $line) => rtrim($line), explode(\PHP_EOL, $commandTester->getDisplay(true))));
+        return implode("\n", array_map(rtrim(...), explode("\n", $commandTester->getDisplay(true))));
     }
 }

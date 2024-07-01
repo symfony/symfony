@@ -9,7 +9,6 @@ class DummyAttribute
         public string $type,
         public string $name,
         public int $version,
-    )
-    {
+    ) {
     }
 }

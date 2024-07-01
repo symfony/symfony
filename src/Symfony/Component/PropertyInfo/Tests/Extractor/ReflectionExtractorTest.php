@@ -501,14 +501,14 @@ class ReflectionExtractorTest extends TestCase
     }
 
     /**
-     * @dataProvider getAttributes
+     * @dataProvider attributesProvider
      */
     public function testGetAttributes(string $class, string $property, ?array $expected)
     {
         $this->assertSame($expected, $this->extractor->getAttributes($class, $property));
     }
 
-    public static function getAttributes(): array
+    public static function attributesProvider(): array
     {
         return [
             [

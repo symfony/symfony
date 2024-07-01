@@ -21,7 +21,9 @@ interface PropertyAttributesExtractorInterface
      *
      * Returns an array of attributes, each attribute is an associative array with the following keys:
      * - name: The fully-qualified class name of the attribute
-     * - arguments: An associative array of attribute arguments
+     * - arguments: An associative array of attribute arguments if present
+     *
+     * @return array<int, array{name: string, arguments: array<array-key, mixed>}>|null
      */
     public function getAttributes(string $class, string $property, array $context = []): ?array;
 }

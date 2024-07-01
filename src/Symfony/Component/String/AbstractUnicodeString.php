@@ -367,7 +367,9 @@ abstract class AbstractUnicodeString extends AbstractString
     public function snake(): parent
     {
         $str = clone $this;
-        $str->string = preg_replace('/[ _]+/', '_', mb_strtolower(preg_replace(['/(\p{Lu}+)(\p{Lu}\p{Ll})/u', '/([\p{Ll}0-9])(\p{Lu})/u'], '\1 \2', $str->string), 'UTF-8'));
+        $str->string = preg_replace('/[^\pL0-9_ ]++/u', '', $str->string);
+        $str->string = mb_strtolower(preg_replace(['/(\p{Lu}+)(\p{Lu}\p{Ll})/u', '/([\p{Ll}0-9])(\p{Lu})/u'], '\1 \2', $str->string), 'UTF-8');
+        $str->string = preg_replace('/[ _]+/', '_', $str->string);
 
         return $str;
     }

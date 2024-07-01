@@ -61,29 +61,35 @@ final readonly class TypeResolver implements TypeResolverInterface
         return $resolver->resolve($subject, $typeContext);
     }
 
-    public static function create(): self
+    /**
+     * @param array<string, TypeResolverInterface>|null $resolvers
+     */
+    public static function create(?array $resolvers = null): self
     {
-        $resolvers = new class() implements ContainerInterface {
-            private readonly array $resolvers;
+        if (null === $resolvers) {
+            $stringTypeResolver = class_exists(PhpDocParser::class) ? new StringTypeResolver() : null;
+            $typeContextFactory = new TypeContextFactory($stringTypeResolver);
+            $reflectionTypeResolver = new ReflectionTypeResolver();
 
-            public function __construct()
-            {
-                $stringTypeResolver = class_exists(PhpDocParser::class) ? new StringTypeResolver() : null;
-                $typeContextFactory = new TypeContextFactory($stringTypeResolver);
-                $reflectionTypeResolver = new ReflectionTypeResolver();
+            $resolvers = [
+                \ReflectionType::class => $reflectionTypeResolver,
+                \ReflectionParameter::class => new ReflectionParameterTypeResolver($reflectionTypeResolver, $typeContextFactory),
+                \ReflectionProperty::class => new ReflectionPropertyTypeResolver($reflectionTypeResolver, $typeContextFactory),
+                \ReflectionFunctionAbstract::class => new ReflectionReturnTypeResolver($reflectionTypeResolver, $typeContextFactory),
+            ];
 
-                $resolvers = [
-                    \ReflectionType::class => $reflectionTypeResolver,
-                    \ReflectionParameter::class => new ReflectionParameterTypeResolver($reflectionTypeResolver, $typeContextFactory),
-                    \ReflectionProperty::class => new ReflectionPropertyTypeResolver($reflectionTypeResolver, $typeContextFactory),
-                    \ReflectionFunctionAbstract::class => new ReflectionReturnTypeResolver($reflectionTypeResolver, $typeContextFactory),
-                ];
+            if (null !== $stringTypeResolver) {
+                $resolvers['string'] = $stringTypeResolver;
+                $resolvers[\ReflectionParameter::class] = new PhpDocAwareReflectionTypeResolver($resolvers[\ReflectionParameter::class], $stringTypeResolver, $typeContextFactory);
+                $resolvers[\ReflectionProperty::class] = new PhpDocAwareReflectionTypeResolver($resolvers[\ReflectionProperty::class], $stringTypeResolver, $typeContextFactory);
+                $resolvers[\ReflectionFunctionAbstract::class] = new PhpDocAwareReflectionTypeResolver($resolvers[\ReflectionFunctionAbstract::class], $stringTypeResolver, $typeContextFactory);
+            }
+        }
 
-                if (null !== $stringTypeResolver) {
-                    $resolvers['string'] = $stringTypeResolver;
-                }
-
-                $this->resolvers = $resolvers;
+        $resolversContainer = new class($resolvers) implements ContainerInterface {
+            public function __construct(
+                private readonly array $resolvers,
+            ) {
             }
 
             public function has(string $id): bool
@@ -97,6 +103,6 @@ final readonly class TypeResolver implements TypeResolverInterface
             }
         };
 
-        return new self($resolvers);
+        return new self($resolversContainer);
     }
 }

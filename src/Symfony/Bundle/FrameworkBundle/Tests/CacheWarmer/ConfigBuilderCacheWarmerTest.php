@@ -37,8 +37,9 @@ class ConfigBuilderCacheWarmerTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->varDir = sys_get_temp_dir().'/'.uniqid();
         $fs = new Filesystem();
+        $this->varDir = tempnam(sys_get_temp_dir(), 'sf_var_');
+        $fs->remove($this->varDir);
         $fs->mkdir($this->varDir);
     }
 

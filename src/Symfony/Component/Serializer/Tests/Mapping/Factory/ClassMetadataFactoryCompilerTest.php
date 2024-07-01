@@ -27,7 +27,7 @@ final class ClassMetadataFactoryCompilerTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->dumpPath = sys_get_temp_dir().\DIRECTORY_SEPARATOR.'php_serializer_metadata.'.uniqid('CompiledClassMetadataFactory').'.php';
+        $this->dumpPath = tempnam(sys_get_temp_dir(), 'sf_serializer_metadata_');
     }
 
     protected function tearDown(): void

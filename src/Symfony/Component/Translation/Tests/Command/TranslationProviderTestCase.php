@@ -33,7 +33,8 @@ abstract class TranslationProviderTestCase extends TestCase
         $this->defaultLocale = \Locale::getDefault();
         \Locale::setDefault('en');
         $this->fs = new Filesystem();
-        $this->translationAppDir = sys_get_temp_dir().'/'.uniqid('sf_translation', true);
+        $this->translationAppDir = tempnam(sys_get_temp_dir(), 'sf_translation_');
+        $this->fs->remove($this->translationAppDir);
         $this->fs->mkdir($this->translationAppDir.'/translations');
     }
 

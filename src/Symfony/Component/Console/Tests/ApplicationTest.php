@@ -1977,6 +1977,7 @@ class ApplicationTest extends TestCase
 
     /**
      * @requires extension pcntl
+     * @requires OSFAMILY !Darwin
      */
     public function testSignalListener()
     {
@@ -2015,6 +2016,7 @@ class ApplicationTest extends TestCase
 
     /**
      * @requires extension pcntl
+     * @requires OSFAMILY !Darwin
      */
     public function testSignalSubscriber()
     {
@@ -2036,6 +2038,7 @@ class ApplicationTest extends TestCase
 
     /**
      * @requires extension pcntl
+     * @requires OSFAMILY !Darwin
      */
     public function testSignalDispatchWithoutEventToDispatch()
     {
@@ -2050,6 +2053,7 @@ class ApplicationTest extends TestCase
 
     /**
      * @requires extension pcntl
+     * @requires OSFAMILY !Darwin
      */
     public function testSignalDispatchWithoutEventDispatcher()
     {

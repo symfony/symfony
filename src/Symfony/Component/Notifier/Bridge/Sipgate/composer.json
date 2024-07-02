@@ -1,0 +1,32 @@
+{
+    "name": "symfony/sipgate-notifier",
+    "type": "symfony-notifier-bridge",
+    "description": "Symfony Sipgate Notifier Bridge",
+    "keywords": ["sms", "sipgate", "notifier"],
+    "homepage": "https://symfony.com",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Lukas Kaltenbach",
+            "email": "lk@wikanet.de"
+        },
+        {
+            "name": "Symfony Community",
+            "homepage": "https://symfony.com/contributors"
+        }
+    ],
+    "require": {
+        "php": ">=8.2",
+        "symfony/http-client": "^6.4|^7.0",
+        "symfony/notifier": "^7.2"
+    },
+    "autoload": {
+        "psr-4": {
+            "Symfony\\Component\\Notifier\\Bridge\\Sipgate\\": ""
+        },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
+    },
+    "minimum-stability": "dev"
+}

@@ -79,6 +79,7 @@ final class UnsupportedSchemeExceptionTest extends TestCase
             Bridge\RocketChat\RocketChatTransportFactory::class => false,
             Bridge\Sendberry\SendberryTransportFactory::class => false,
             Bridge\Sevenio\SevenIoTransportFactory::class => false,
+            Bridge\Sipgate\SipgateTransportFactory::class => false,
             Bridge\SimpleTextin\SimpleTextinTransportFactory::class => false,
             Bridge\Sinch\SinchTransportFactory::class => false,
             Bridge\Slack\SlackTransportFactory::class => false,
@@ -164,6 +165,7 @@ final class UnsupportedSchemeExceptionTest extends TestCase
         yield ['rocketchat', 'symfony/rocket-chat-notifier'];
         yield ['sendberry', 'symfony/sendberry-notifier'];
         yield ['sevenio', 'symfony/sevenio-notifier'];
+        yield ['sipgate', 'symfony/sipgate-notifier'];
         yield ['simpletextin', 'symfony/simple-textin-notifier'];
         yield ['sinch', 'symfony/sinch-notifier'];
         yield ['slack', 'symfony/slack-notifier'];

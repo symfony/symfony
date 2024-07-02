@@ -93,6 +93,7 @@ return static function (ContainerConfigurator $container) {
         'ring-central' => Bridge\RingCentral\RingCentralTransportFactory::class,
         'sendberry' => Bridge\Sendberry\SendberryTransportFactory::class,
         'sevenio' => Bridge\Sevenio\SevenIoTransportFactory::class,
+        'sipgate' => Bridge\Sipgate\SipgateTransportFactory::class,
         'simple-textin' => Bridge\SimpleTextin\SimpleTextinTransportFactory::class,
         'sinch' => Bridge\Sinch\SinchTransportFactory::class,
         'sms-biuras' => Bridge\SmsBiuras\SmsBiurasTransportFactory::class,

@@ -228,6 +228,10 @@ class UnsupportedSchemeException extends LogicException
             'class' => Bridge\Sevenio\SevenIoTransportFactory::class,
             'package' => 'symfony/sevenio-notifier',
         ],
+        'sipgate' => [
+            'class' => Bridge\Sipgate\SipgateTransportFactory::class,
+            'package' => 'symfony/sipgate-notifier',
+        ],
         'simpletextin' => [
             'class' => Bridge\SimpleTextin\SimpleTextinTransportFactory::class,
             'package' => 'symfony/simple-textin-notifier',

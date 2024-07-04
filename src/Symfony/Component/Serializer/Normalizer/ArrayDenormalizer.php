@@ -27,7 +27,7 @@ class ArrayDenormalizer implements ContextAwareDenormalizerInterface, Denormaliz
 {
     use DenormalizerAwareTrait;
 
-    public function setDenormalizer(DenormalizerInterface $denormalizer): void
+    public function setDenormalizer(DenormalizerInterface $denormalizer)
     {
         if (!method_exists($denormalizer, 'getSupportedTypes')) {
             trigger_deprecation('symfony/serializer', '6.3', 'Not implementing the "DenormalizerInterface::getSupportedTypes()" in "%s" is deprecated.', get_debug_type($denormalizer));

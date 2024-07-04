@@ -12,6 +12,7 @@
 namespace Symfony\Bundle\FrameworkBundle\DependencyInjection;
 
 use Composer\InstalledVersions;
+use Composer\Semver\VersionParser;
 use Http\Client\HttpAsyncClient;
 use Http\Client\HttpClient;
 use phpDocumentor\Reflection\DocBlockFactoryInterface;
@@ -3008,6 +3009,13 @@ class FrameworkExtension extends Extension
 
             // Base
             if ($sanitizerConfig['default_action']) {
+                if (InstalledVersions::satisfies(new VersionParser(), 'symfony/html-sanitizer', '>=7.2') === false) {
+                    throw new LogicException(\sprintf(
+                        'Default action requires the HtmlSanitizer component to be installed in version >=7.2 (%s currently installed). Try running "composer require symfony/html-sanitizer".',
+                        InstalledVersions::getVersion('symfony/html-sanitizer')
+                    ));
+                }
+
                 $def->addMethodCall('defaultAction', [HtmlSanitizerAction::from($sanitizerConfig['default_action'])], true);
             }
 

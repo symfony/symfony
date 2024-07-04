@@ -61,6 +61,7 @@ class MailgunApiTransport extends AbstractApiTransport
 
         $endpoint = sprintf('%s/v3/%s/messages', $this->getEndpoint(), urlencode($this->domain));
         $response = $this->client->request('POST', 'https://'.$endpoint, [
+            'http_version' => '1.1',
             'auth_basic' => 'api:'.$this->key,
             'headers' => $headers,
             'body' => $body->bodyToIterable(),

@@ -29,11 +29,6 @@ class ArrayDenormalizer implements DenormalizerInterface, DenormalizerAwareInter
 {
     use DenormalizerAwareTrait;
 
-    public function setDenormalizer(DenormalizerInterface $denormalizer): void
-    {
-        $this->denormalizer = $denormalizer;
-    }
-
     public function getSupportedTypes(?string $format): array
     {
         return ['object' => null, '*' => false];

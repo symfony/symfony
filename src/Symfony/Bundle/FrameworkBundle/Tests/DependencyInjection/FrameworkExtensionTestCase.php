@@ -15,6 +15,11 @@ use Psr\Cache\CacheItemPoolInterface;
 use Psr\Log\LoggerAwareInterface;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\FrameworkExtension;
 use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
+use Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\Fixtures\TestClasses\ConstructorAttributeChildClass;
+use Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\Fixtures\TestClasses\ConstructorAttributeChildOverrideClass;
+use Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\Fixtures\TestClasses\ConstructorAttributeMultipleOnSameClass;
+use Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\Fixtures\TestClasses\ConstructorAttributeOnNonStaticClass;
+use Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\Fixtures\TestClasses\ConstructorAttributeValidClass;
 use Symfony\Bundle\FrameworkBundle\Tests\Fixtures\Messenger\DummyMessage;
 use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
 use Symfony\Bundle\FullStack;
@@ -32,7 +37,10 @@ use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
 use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
+use Symfony\Component\DependencyInjection\Attribute\Constructor;
 use Symfony\Component\DependencyInjection\ChildDefinition;
+use Symfony\Component\DependencyInjection\Compiler\AttributeAutoconfigurationPass;
+use Symfony\Component\DependencyInjection\Compiler\ResolveChildDefinitionsPass;
 use Symfony\Component\DependencyInjection\Compiler\ResolveInstanceofConditionalsPass;
 use Symfony\Component\DependencyInjection\Compiler\ResolveTaggedIteratorArgumentPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -2384,6 +2392,56 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $this->assertFalse($container->has('asset_mapper.asset_package'));
         $this->assertFalse($container->has('assets.packages'));
         $this->assertFalse($container->has('assets._default_package'));
+    }
+
+    /**
+     * @dataProvider provideConstructorAutoconfigurationData
+     */
+    public function testConstructorAutoconfiguration(string $class, string $factoryMethod)
+    {
+        $container = $this->createContainerFromFile('full', compile: false);
+        $container->register('foo', $class)->setAutoconfigured(true)->setAutowired(true);
+        $container->addCompilerPass(new AttributeAutoconfigurationPass());
+        $container->addCompilerPass(new ResolveInstanceofConditionalsPass());
+        $container->addCompilerPass(new ResolveChildDefinitionsPass());
+        $container->compile();
+
+        $definition = $container->getDefinition('foo');
+
+        $this->assertArrayHasKey(Constructor::class, $container->getAutoconfiguredAttributes());
+        $this->assertIsArray($definition->getFactory());
+        $this->assertNull($definition->getFactory()[0]);
+        $this->assertEquals($factoryMethod, $definition->getFactory()[1]);
+    }
+
+    public static function provideConstructorAutoconfigurationData()
+    {
+        return [
+            'simple constructor definition' => [ConstructorAttributeValidClass::class, 'staticConstructor'],
+            'child class without constructor re-definition' => [ConstructorAttributeChildClass::class, 'staticConstructor'],
+            'child class with constructor re-definition' => [ConstructorAttributeChildOverrideClass::class, 'childStaticConstructor'],
+        ];
+    }
+
+    /**
+     * @dataProvider provideInvalidConstructorAutoconfigurationClasses
+     */
+    public function testInvalidConstructorAutoconfiguration(string $class)
+    {
+        $container = $this->createContainerFromFile('full', compile: false);
+        $this->expectException(LogicException::class);
+        $container->register('invalid_service', $class)->setAutoconfigured(true)->setAutowired(true);
+        $container->addCompilerPass(new AttributeAutoconfigurationPass());
+        $container->addCompilerPass(new ResolveInstanceofConditionalsPass());
+        $container->compile();
+    }
+
+    public static function provideInvalidConstructorAutoconfigurationClasses()
+    {
+        return [
+            'non-static method' => [ConstructorAttributeOnNonStaticClass::class],
+            'multiple definition on same class' => [ConstructorAttributeMultipleOnSameClass::class],
+        ];
     }
 
     protected function createContainer(array $data = [])

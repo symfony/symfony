@@ -80,6 +80,7 @@ use Symfony\Component\Form\FormTypeExtensionInterface;
 use Symfony\Component\Form\FormTypeGuesserInterface;
 use Symfony\Component\Form\FormTypeInterface;
 use Symfony\Component\HtmlSanitizer\HtmlSanitizer;
+use Symfony\Component\HtmlSanitizer\HtmlSanitizerAction;
 use Symfony\Component\HtmlSanitizer\HtmlSanitizerConfig;
 use Symfony\Component\HtmlSanitizer\HtmlSanitizerInterface;
 use Symfony\Component\HttpClient\Messenger\PingWebhookMessageHandler;
@@ -3006,6 +3007,10 @@ class FrameworkExtension extends Extension
             $def = $container->register($configId, HtmlSanitizerConfig::class);
 
             // Base
+            if ($sanitizerConfig['default_action']) {
+                $def->addMethodCall('defaultAction', [HtmlSanitizerAction::from($sanitizerConfig['default_action'])], true);
+            }
+
             if ($sanitizerConfig['allow_safe_elements']) {
                 $def->addMethodCall('allowSafeElements', [], true);
             }

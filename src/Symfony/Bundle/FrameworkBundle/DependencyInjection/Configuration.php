@@ -26,6 +26,7 @@ use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Exception\LogicException;
 use Symfony\Component\Form\Form;
+use Symfony\Component\HtmlSanitizer\HtmlSanitizerAction;
 use Symfony\Component\HtmlSanitizer\HtmlSanitizerInterface;
 use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Component\HttpFoundation\Cookie;
@@ -2382,6 +2383,10 @@ class Configuration implements ConfigurationInterface
                                 ->fixXmlConfig('with_attribute_sanitizer')
                                 ->fixXmlConfig('without_attribute_sanitizer')
                                 ->children()
+                                    ->enumNode('default_action')
+                                        ->info('Defines how the sanitizer must behave by default.')
+                                        ->values(array_map(static fn (HtmlSanitizerAction $action): string => $action->value, HtmlSanitizerAction::cases()))
+                                    ->end()
                                     ->booleanNode('allow_safe_elements')
                                         ->info('Allows "safe" elements and attributes.')
                                         ->defaultFalse()

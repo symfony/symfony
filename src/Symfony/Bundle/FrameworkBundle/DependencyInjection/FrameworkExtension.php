@@ -3008,7 +3008,7 @@ class FrameworkExtension extends Extension
             $def = $container->register($configId, HtmlSanitizerConfig::class);
 
             // Base
-            if ($sanitizerConfig['default_action']) {
+            if ($sanitizerConfig['default_action'] ?? false) {
                 if (InstalledVersions::satisfies(new VersionParser(), 'symfony/html-sanitizer', '>=7.2') === false) {
                     throw new LogicException(\sprintf(
                         'Default action requires the HtmlSanitizer component to be installed in version >=7.2 (%s currently installed). Try running "composer require symfony/html-sanitizer".',

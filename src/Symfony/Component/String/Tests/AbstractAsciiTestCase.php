@@ -1532,6 +1532,26 @@ abstract class AbstractAsciiTestCase extends TestCase
         ];
     }
 
+    /**
+     * @dataProvider provideToNullOrNonEmptyString
+     */
+    public function testToNullOrNonEmptyString(?string $expected, string $origin)
+    {
+        $instance = static::createFromString($origin);
+
+        self::assertSame($expected, $instance->toNullOrNonEmptyString());
+    }
+
+    public static function provideToNullOrNonEmptyString()
+    {
+        return [
+            [null, ''],
+            [' ', ' '],
+            ['0', '0'],
+            ['foo', 'foo'],
+        ];
+    }
+
     public function testToString()
     {
         $instance = static::createFromString('foobar');

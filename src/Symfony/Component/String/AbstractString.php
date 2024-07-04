@@ -525,6 +525,14 @@ abstract class AbstractString implements \Stringable, \JsonSerializable
         return new CodePointString($this->string);
     }
 
+    /**
+     * @return non-empty-string|null
+     */
+    public function toNullOrNonEmptyString(): ?string
+    {
+        return '' === $this->string ? null : $this->string;
+    }
+
     public function toString(): string
     {
         return $this->string;

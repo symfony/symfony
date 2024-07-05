@@ -1,0 +1,60 @@
+---------------------------------------------------------------------------
+
+by smnandre at 2024-05-31T09:30:37Z
+
+This deprecation will deteriorate the DX when using String instances in twig  😐
+
+Why not adding a second parameter that would dictate if the cut must happen before or after the word beeing cut in ?
+
+---------------------------------------------------------------------------
+
+by Korbeil at 2024-06-23T07:45:51Z
+
+> This deprecation will deteriorate the DX when using String instances in twig 😐
+>
+> Why not adding a second parameter that would dictate if the cut must happen before or after the word beeing cut in ?
+
+I do not know how much it's being used within Twig, is it a very common function in there ?
+Also for the proposal, it would be possible but consider:
+```php
+public function truncate(int $length, string $ellipsis = '', bool $cut = true, bool $strict = true): static
+```
+`true, true`  would mean CharStrict but `true, false`  would mean Char, which is something that is kinda useless/not required here :confused: that's why I prefered a more "declarative" mode over 2 booleans.
+
+---------------------------------------------------------------------------
+
+by smnandre at 2024-06-25T21:30:12Z
+
+> `true, true` would mean CharStrict but `true, false` would mean Char, which is something that is kinda useless/not required here 😕 that's why I prefered a more "declarative" mode over 2 booleans.
+
+Yep absolutely right.
+
+But with the bool not beeing deprecated my point is obselete anyway :) And if we want, we can add a |truncate filter with bool or named parameter in Twig, that use the new Enums 👍
+
+---------------------------------------------------------------------------
+
+by smnandre at 2024-06-25T21:51:59Z
+
+Just some suggestion regarding the names and docblock..
+
+To _me_ it seems easier to understand the use cases / differences...
+
+but feel free to ignore... as DX is always very personal :)
+
+---------------------------------------------------------------------------
+
+by Korbeil at 2024-06-26T08:38:36Z
+
+Updated with @smnandre recommendations ! Thanks :heart:
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2024-06-27T07:45:44Z
+
+```diff
+- TruncateCut
++ TruncateMode
+```
+?
+
+Also the PR title needs some update

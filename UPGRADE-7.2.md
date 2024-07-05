@@ -13,11 +13,6 @@ Security
 
  * Deprecate argument `$secret` of `RememberMeToken` and `RememberMeAuthenticator`
 
-Yaml
-----
-
- * Deprecate parsing duplicate mapping keys whose value is `null`
-
 String
 ------
 
@@ -25,3 +20,8 @@ String
    * `TruncateMode::Char` is equivalent to `true` value ;
    * `TruncateMode::WordAfter` is equivalent to `false` value ;
    * `TruncateMode::Word` is a new mode that will cut the sentence on the last word before the limit is reached.
+
+Yaml
+----
+
+ * Deprecate parsing duplicate mapping keys whose value is `null`

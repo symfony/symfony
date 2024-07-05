@@ -2298,7 +2298,6 @@ abstract class FrameworkExtensionTestCase extends TestCase
         // config
         $this->assertTrue($container->hasDefinition('html_sanitizer.config.custom'), '->registerHtmlSanitizerConfiguration() loads custom sanitizer');
         $this->assertSame(HtmlSanitizerConfig::class, $container->getDefinition('html_sanitizer.config.custom')->getClass());
-        $calls = $container->getDefinition('html_sanitizer.config.custom')->getMethodCalls();
         $this->assertCount(24, $calls = $container->getDefinition('html_sanitizer.config.custom')->getMethodCalls());
         $this->assertSame(
             [

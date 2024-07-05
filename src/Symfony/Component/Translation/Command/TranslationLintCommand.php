@@ -42,7 +42,7 @@ class TranslationLintCommand extends Command
 
     public function complete(CompletionInput $input, CompletionSuggestions $suggestions): void
     {
-        if ($input->mustSuggestOptionValuesFor('locales')) {
+        if ($input->mustSuggestOptionValuesFor('locale')) {
             $suggestions->suggestValues($this->enabledLocales);
         }
     }
@@ -51,7 +51,7 @@ class TranslationLintCommand extends Command
     {
         $this
             ->setDefinition([
-                new InputOption('locales', null, InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY, 'Specify the locales to lint.', $this->enabledLocales),
+                new InputOption('locale', null, InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY, 'Specify the locales to lint.', $this->enabledLocales),
             ])
             ->setHelp(<<<'EOF'
 The <info>%command.name%</> command lint translations.
@@ -68,7 +68,7 @@ EOF
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $locales = $input->getOption('locales');
+        $locales = $input->getOption('locale');
 
         /** @var array<string, array<string, array<string, \Throwable>> $errors */
         $errors = [];

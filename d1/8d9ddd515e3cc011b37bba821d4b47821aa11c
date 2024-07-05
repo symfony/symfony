@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2024-07-04T11:03:29Z
+
+Do we have this discrepancy only on Notifier components? If not, can we fix them all here?
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2024-07-04T11:21:53Z
+
+> Do we have this discrepancy only on Notifier components? If not, can we fix them all here?
+
+Let me check
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2024-07-04T11:23:31Z
+
+Only in Notifier

@@ -31,7 +31,6 @@ return static function (ContainerConfigurator $container) {
         'discord' => Bridge\Discord\DiscordTransportFactory::class,
         'fake-chat' => Bridge\FakeChat\FakeChatTransportFactory::class,
         'firebase' => Bridge\Firebase\FirebaseTransportFactory::class,
-        'gitter' => Bridge\Gitter\GitterTransportFactory::class,
         'google-chat' => Bridge\GoogleChat\GoogleChatTransportFactory::class,
         'line-notify' => Bridge\LineNotify\LineNotifyTransportFactory::class,
         'linked-in' => Bridge\LinkedIn\LinkedInTransportFactory::class,

@@ -45,7 +45,6 @@ final class UnsupportedSchemeExceptionTest extends TestCase
             Bridge\FortySixElks\FortySixElksTransportFactory::class => false,
             Bridge\FreeMobile\FreeMobileTransportFactory::class => false,
             Bridge\GatewayApi\GatewayApiTransportFactory::class => false,
-            Bridge\Gitter\GitterTransportFactory::class => false,
             Bridge\GoIp\GoIpTransportFactory::class => false,
             Bridge\GoogleChat\GoogleChatTransportFactory::class => false,
             Bridge\Infobip\InfobipTransportFactory::class => false,
@@ -137,7 +136,6 @@ final class UnsupportedSchemeExceptionTest extends TestCase
         yield ['firebase', 'symfony/firebase-notifier'];
         yield ['freemobile', 'symfony/free-mobile-notifier'];
         yield ['gatewayapi', 'symfony/gateway-api-notifier'];
-        yield ['gitter', 'symfony/gitter-notifier'];
         yield ['googlechat', 'symfony/google-chat-notifier'];
         yield ['infobip', 'symfony/infobip-notifier'];
         yield ['iqsms', 'symfony/iqsms-notifier'];

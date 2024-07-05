@@ -47,7 +47,6 @@ final class Transport
         Bridge\FortySixElks\FortySixElksTransportFactory::class,
         Bridge\FreeMobile\FreeMobileTransportFactory::class,
         Bridge\GatewayApi\GatewayApiTransportFactory::class,
-        Bridge\Gitter\GitterTransportFactory::class,
         Bridge\GoIp\GoIpTransportFactory::class,
         Bridge\GoogleChat\GoogleChatTransportFactory::class,
         Bridge\Infobip\InfobipTransportFactory::class,

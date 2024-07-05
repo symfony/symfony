@@ -605,7 +605,7 @@ abstract class AbstractString implements \Stringable, \JsonSerializable
         return $str;
     }
 
-    public function truncate(int $length, string $ellipsis = '', bool $cut = true): static
+    public function truncate(int $length, string $ellipsis = '', bool|TruncateMode $cut = TruncateMode::Char): static
     {
         $stringLength = $this->length();
 
@@ -619,7 +619,8 @@ abstract class AbstractString implements \Stringable, \JsonSerializable
             $ellipsisLength = 0;
         }
 
-        if (!$cut) {
+        $desiredLength = $length;
+        if (TruncateMode::WordAfter === $cut || TruncateMode::WordBefore === $cut || !$cut) {
             if (null === $length = $this->indexOf([' ', "\r", "\n", "\t"], ($length ?: 1) - 1)) {
                 return clone $this;
             }
@@ -628,6 +629,14 @@ abstract class AbstractString implements \Stringable, \JsonSerializable
         }
 
         $str = $this->slice(0, $length - $ellipsisLength);
+
+        if (TruncateMode::WordBefore === $cut) {
+            if (0 === $ellipsisLength && $desiredLength === $this->indexOf([' ', "\r", "\n", "\t"], $length)) {
+                return $str;
+            }
+
+            $str = $str->beforeLast([' ', "\r", "\n", "\t"]);
+        }
 
         return $ellipsisLength ? $str->trimEnd()->append($ellipsis) : $str;
     }

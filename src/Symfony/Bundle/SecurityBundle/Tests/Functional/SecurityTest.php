@@ -134,7 +134,7 @@ class SecurityTest extends AbstractWebTestCase
         };
         $eventDispatcher->addListener(KernelEvents::REQUEST, $setCsrfToken);
         try {
-            $client->request('GET', '/'.uniqid('', true));
+            $client->request('GET', '/not-existent');
         } finally {
             $eventDispatcher->removeListener(KernelEvents::REQUEST, $setCsrfToken);
         }

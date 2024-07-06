@@ -1,0 +1,83 @@
+---------------------------------------------------------------------------
+
+by sakul95 at 2024-07-03T07:45:58Z
+
+> Thank you, I left some comments.
+>
+> Can you also create a docs and recipes PR?
+
+Yes sure, I have not created a recipe yet so will read into it first.
+
+---------------------------------------------------------------------------
+
+by sakul95 at 2024-07-03T08:14:02Z
+
+@OskarStark
+
+Docs: https://github.com/symfony/symfony-docs/pull/20018
+Recipe: https://github.com/symfony/recipes/pull/1323
+
+Is this the correct way to do this?
+
+---------------------------------------------------------------------------
+
+by sakul95 at 2024-07-04T07:22:15Z
+
+@OskarStark Maybe you can answer me two more questions:
+
+1) Is it normal that 3 of the tests fail and if not, what can I do to fix these?
+
+2) The recipe tests fail because the missing package on packagist. Shall I upload the package there or how is the workflow regarding those optional parts of symfony?
+
+Best regards
+Lukas
+
+---------------------------------------------------------------------------
+
+by fabpot at 2024-07-04T07:33:42Z
+
+> @OskarStark Maybe you can answer me two more questions:
+>
+>     1. Is it normal that 3 of the tests fail and if not, what can I do to fix these?
+>
+
+You can ignore all errors that are not related to your work.
+
+>     2. The recipe tests fail because the missing package on packagist. Shall I upload the package there or how is the workflow regarding those optional parts of symfony?
+
+This will be automatically fixed when I will submit the package. Nothing to do on your side.
+
+>
+>
+> Best regards Lukas
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2024-07-04T09:21:03Z
+
+> Is it normal that 3 of the tests fail and if not, what can I do to fix these?
+
+The failures in the „Verify Packages“ job are related. Looks like some files are missing. You can take inspiration from other existing bridges.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2024-07-05T06:31:54Z
+
+There are some hidden useful information in the broken tests:
+
+```
+  File src/Symfony/Component/Notifier/Bridge/Sipgate/.gitattributes does not exist
+  File src/Symfony/Component/Notifier/Bridge/Sipgate/.gitignore does not exist
+  File src/Symfony/Component/Notifier/Bridge/Sipgate/phpunit.xml.dist does not exist
+```
+
+---------------------------------------------------------------------------
+
+by sakul95 at 2024-07-05T12:48:15Z
+
+I've added the missing files but the _Verify Packages_ check still fails, this time because of "Composer.json's replace section needs to contain symfony/sipgate-notifier".
+
+I have read into the composer schema and also looked into other comparable packages and can't find a clue why I should do that.
+
+Of course I could simply add it but that does not seem to be right, maybe you can give me some insight for that?
+(Maybe it correlates with comment of @OskarStark  https://github.com/symfony/symfony/pull/57627#discussion_r1663579197)

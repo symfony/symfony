@@ -413,7 +413,7 @@ class ConnectionTest extends TestCase
         }
 
         $master = getenv('MESSENGER_REDIS_DSN');
-        $uid = uniqid('sentinel_');
+        $uid = random_int(1, PHP_INT_MAX);
 
         $exp = explode('://', $master, 2)[1];
         $this->expectException(\InvalidArgumentException::class);

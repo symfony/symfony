@@ -863,7 +863,7 @@ class FilesystemTest extends FilesystemTestCase
     public function testRenameThrowsExceptionOnError()
     {
         $this->expectException(IOException::class);
-        $file = $this->workspace.\DIRECTORY_SEPARATOR.uniqid('fs_test_', true);
+        $file = $this->workspace.\DIRECTORY_SEPARATOR.'does-not-exist';
         $newPath = $this->workspace.\DIRECTORY_SEPARATOR.'new_file';
 
         $this->filesystem->rename($file, $newPath);

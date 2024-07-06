@@ -17,6 +17,7 @@ use phpDocumentor\Reflection\Types\Collection;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\Dummy;
+use Symfony\Component\PropertyInfo\Tests\Fixtures\DummyCollection;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\ParentDummy;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\PseudoTypeDummy;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\TraitUsage\DummyUsedInTrait;
@@ -160,6 +161,7 @@ class PhpDocExtractorTest extends TestCase
                 null,
             ],
             ['self', [new Type(Type::BUILTIN_TYPE_OBJECT, false, Dummy::class)], null, null],
+            ['collectionAsObject', [new Type(Type::BUILTIN_TYPE_OBJECT, false, DummyCollection::class, true, [new Type(Type::BUILTIN_TYPE_INT)], [new Type(Type::BUILTIN_TYPE_STRING)])], null, null],
         ];
     }
 

@@ -16,7 +16,7 @@ namespace Symfony\Component\Messenger\Exception;
  *
  * @author Jeroen <https://github.com/Jeroeny>
  */
-interface WrappedExceptionsInterface
+interface WrappedExceptionsInterface extends \Throwable
 {
     /**
      * @return \Throwable[]

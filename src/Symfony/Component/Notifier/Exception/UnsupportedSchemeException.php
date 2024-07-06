@@ -92,10 +92,6 @@ class UnsupportedSchemeException extends LogicException
             'class' => Bridge\GatewayApi\GatewayApiTransportFactory::class,
             'package' => 'symfony/gateway-api-notifier',
         ],
-        'gitter' => [
-            'class' => Bridge\Gitter\GitterTransportFactory::class,
-            'package' => 'symfony/gitter-notifier',
-        ],
         'goip' => [
             'class' => Bridge\GoIp\GoIpTransportFactory::class,
             'package' => 'symfony/go-ip-notifier',

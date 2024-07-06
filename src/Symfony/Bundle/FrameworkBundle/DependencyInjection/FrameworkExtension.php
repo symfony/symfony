@@ -2779,7 +2779,6 @@ class FrameworkExtension extends Extension
             NotifierBridge\FortySixElks\FortySixElksTransportFactory::class => 'notifier.transport_factory.forty-six-elks',
             NotifierBridge\FreeMobile\FreeMobileTransportFactory::class => 'notifier.transport_factory.free-mobile',
             NotifierBridge\GatewayApi\GatewayApiTransportFactory::class => 'notifier.transport_factory.gateway-api',
-            NotifierBridge\Gitter\GitterTransportFactory::class => 'notifier.transport_factory.gitter',
             NotifierBridge\GoIp\GoIpTransportFactory::class => 'notifier.transport_factory.go-ip',
             NotifierBridge\GoogleChat\GoogleChatTransportFactory::class => 'notifier.transport_factory.google-chat',
             NotifierBridge\Infobip\InfobipTransportFactory::class => 'notifier.transport_factory.infobip',

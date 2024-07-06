@@ -62,7 +62,7 @@ class PostgreSqlStoreTest extends AbstractStoreTestCase
         $store1 = $this->getStore();
         $store2 = $this->getStore();
 
-        $key = new Key(uniqid(__METHOD__, true));
+        $key = new Key(__METHOD__);
 
         $store1->save($key);
         $this->assertTrue($store1->exists($key));
@@ -92,8 +92,7 @@ class PostgreSqlStoreTest extends AbstractStoreTestCase
         $pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
         $store2 = new PostgreSqlStore($pdo);
 
-        $keyId = uniqid(__METHOD__, true);
-        $store1Key = new Key($keyId);
+        $store1Key = new Key(__METHOD__);
 
         $store1->save($store1Key);
 
@@ -102,7 +101,7 @@ class PostgreSqlStoreTest extends AbstractStoreTestCase
         $pdo->exec('SET statement_timeout = 1');
         $waitSaveError = null;
         try {
-            $store2->waitAndSave(new Key($keyId));
+            $store2->waitAndSave(new Key(__METHOD__));
         } catch (\PDOException $waitSaveError) {
         }
         $this->assertInstanceOf(\PDOException::class, $waitSaveError, 'waitAndSave should have thrown');
@@ -111,7 +110,7 @@ class PostgreSqlStoreTest extends AbstractStoreTestCase
         $store1->delete($store1Key);
         $this->assertFalse($store1->exists($store1Key));
 
-        $store2Key = new Key($keyId);
+        $store2Key = new Key(__METHOD__);
         $lockConflicted = false;
         try {
             $store2->waitAndSave($store2Key);
@@ -131,8 +130,7 @@ class PostgreSqlStoreTest extends AbstractStoreTestCase
         $pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
         $store2 = new PostgreSqlStore($pdo);
 
-        $keyId = uniqid(__METHOD__, true);
-        $store1Key = new Key($keyId);
+        $store1Key = new Key(__METHOD__);
 
         $store1->save($store1Key);
 
@@ -141,7 +139,7 @@ class PostgreSqlStoreTest extends AbstractStoreTestCase
         $pdo->exec('SET statement_timeout = 1');
         $waitSaveError = null;
         try {
-            $store2->waitAndSaveRead(new Key($keyId));
+            $store2->waitAndSaveRead(new Key(__METHOD__));
         } catch (\PDOException $waitSaveError) {
         }
         $this->assertInstanceOf(\PDOException::class, $waitSaveError, 'waitAndSave should have thrown');
@@ -149,7 +147,7 @@ class PostgreSqlStoreTest extends AbstractStoreTestCase
         $store1->delete($store1Key);
         $this->assertFalse($store1->exists($store1Key));
 
-        $store2Key = new Key($keyId);
+        $store2Key = new Key(__METHOD__);
         // since the lock is going to be acquired in read mode and is not exclusive
         // this won't every throw a LockConflictedException as it would from
         // waitAndSave, but it will hang indefinitely as it waits for postgres

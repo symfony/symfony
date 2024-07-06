@@ -74,7 +74,7 @@ class DoctrineDbalStoreTest extends AbstractStoreTestCase
      */
     public function testDsnWithSQLite(string $dsn, ?string $file = null)
     {
-        $key = new Key(uniqid(__METHOD__, true));
+        $key = new Key(__METHOD__);
 
         try {
             $store = new DoctrineDbalStore($dsn);
@@ -107,7 +107,7 @@ class DoctrineDbalStoreTest extends AbstractStoreTestCase
             $this->markTestSkipped('Missing POSTGRES_HOST env variable');
         }
 
-        $key = new Key(uniqid(__METHOD__, true));
+        $key = new Key(__METHOD__);
 
         try {
             $store = new DoctrineDbalStore('pgsql://postgres:password@'.$host);
@@ -162,7 +162,7 @@ class DoctrineDbalStoreTest extends AbstractStoreTestCase
 
         $store = new DoctrineDbalStore($conn);
 
-        $key = new Key(uniqid(__METHOD__, true));
+        $key = new Key(__METHOD__);
 
         $store->save($key);
     }
@@ -221,7 +221,7 @@ class DoctrineDbalStoreTest extends AbstractStoreTestCase
 
         $store = new DoctrineDbalStore($conn);
 
-        $key = new Key(uniqid(__METHOD__, true));
+        $key = new Key(__METHOD__);
 
         $store->save($key);
     }
@@ -263,7 +263,7 @@ class DoctrineDbalStoreTest extends AbstractStoreTestCase
 
         $store = new DoctrineDbalStore($conn);
 
-        $key = new Key(uniqid(__METHOD__, true));
+        $key = new Key(__METHOD__);
 
         $store->save($key);
     }

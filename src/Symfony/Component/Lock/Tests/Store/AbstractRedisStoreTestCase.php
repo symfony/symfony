@@ -39,8 +39,8 @@ abstract class AbstractRedisStoreTestCase extends AbstractStoreTestCase
 
     public function testBackwardCompatibility()
     {
-        $key1 = new Key(__METHOD__);
-        $key2 = new Key(__METHOD__);
+        $key1 = new Key(static::class.__METHOD__);
+        $key2 = new Key(static::class.__METHOD__);
 
         $oldStore = new Symfony51Store($this->getRedisConnection());
         $newStore = $this->getStore();

@@ -27,7 +27,7 @@ abstract class AbstractStoreTestCase extends TestCase
     {
         $store = $this->getStore();
 
-        $key = new Key(__METHOD__);
+        $key = new Key(static::class.__METHOD__);
 
         $this->assertFalse($store->exists($key));
         $store->save($key);
@@ -40,8 +40,8 @@ abstract class AbstractStoreTestCase extends TestCase
     {
         $store = $this->getStore();
 
-        $key1 = new Key(__METHOD__.'1');
-        $key2 = new Key(__METHOD__.'2');
+        $key1 = new Key(static::class.__METHOD__.'1');
+        $key2 = new Key(static::class.__METHOD__.'2');
 
         $store->save($key1);
         $this->assertTrue($store->exists($key1));
@@ -64,8 +64,8 @@ abstract class AbstractStoreTestCase extends TestCase
     {
         $store = $this->getStore();
 
-        $key1 = new Key(__METHOD__);
-        $key2 = new Key(__METHOD__);
+        $key1 = new Key(static::class.__METHOD__);
+        $key2 = new Key(static::class.__METHOD__);
 
         $store->save($key1);
         $this->assertTrue($store->exists($key1));
@@ -98,7 +98,7 @@ abstract class AbstractStoreTestCase extends TestCase
     {
         $store = $this->getStore();
 
-        $key = new Key(__METHOD__);
+        $key = new Key(static::class.__METHOD__);
 
         $store->save($key);
         $store->save($key);
@@ -112,8 +112,8 @@ abstract class AbstractStoreTestCase extends TestCase
     {
         $store = $this->getStore();
 
-        $key1 = new Key(__METHOD__.'1');
-        $key2 = new Key(__METHOD__.'2');
+        $key1 = new Key(static::class.__METHOD__.'1');
+        $key2 = new Key(static::class.__METHOD__.'2');
 
         $store->save($key1);
         $this->assertTrue($store->exists($key1));

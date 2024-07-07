@@ -13,6 +13,7 @@ namespace Symfony\Component\Cache\Tests\Traits;
 
 use PHPUnit\Framework\SkippedTestSuiteError;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Cache\Exception\InvalidArgumentException;
 use Symfony\Component\Cache\Traits\RedisTrait;
 
 /**
@@ -132,5 +133,79 @@ class RedisTraitTest extends TestCase
         } finally {
             ini_set('redis.pconnect.connection_limit', $prevPoolSize);
         }
+    }
+
+    /**
+     * @dataProvider provideDbIndexDsnParameter
+     */
+    public function testDbIndexDsnParameter(string $dsn, int $expectedDb)
+    {
+        if (!getenv('REDIS_AUTHENTICATED_HOST')) {
+            self::markTestSkipped('REDIS_AUTHENTICATED_HOST env var is not defined.');
+        }
+
+        $mock = new class () {
+            use RedisTrait;
+        };
+        $connection = $mock::createConnection($dsn);
+        self::assertSame($expectedDb, $connection->getDbNum());
+    }
+
+    public static function provideDbIndexDsnParameter(): array
+    {
+        return [
+            [
+                'redis://:p%40ssword@'.getenv('REDIS_AUTHENTICATED_HOST'),
+                0,
+            ],
+            [
+                'redis:?host['.getenv('REDIS_HOST').']',
+                0,
+            ],
+            [
+                'redis:?host['.getenv('REDIS_HOST').']&dbindex=1',
+                1,
+            ],
+            [
+                'redis://:p%40ssword@'.getenv('REDIS_AUTHENTICATED_HOST').'?dbindex=2',
+                2,
+            ],
+            [
+                'redis://:p%40ssword@'.getenv('REDIS_AUTHENTICATED_HOST').'/4',
+                4,
+            ],
+            [
+                'redis://:p%40ssword@'.getenv('REDIS_AUTHENTICATED_HOST').'/?dbindex=5',
+                5,
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider provideInvalidDbIndexDsnParameter
+     */
+    public function testInvalidDbIndexDsnParameter(string $dsn)
+    {
+        if (!getenv('REDIS_AUTHENTICATED_HOST')) {
+            self::markTestSkipped('REDIS_AUTHENTICATED_HOST env var is not defined.');
+        }
+        $this->expectException(InvalidArgumentException::class);
+
+        $mock = new class () {
+            use RedisTrait;
+        };
+        $mock::createConnection($dsn);
+    }
+
+    public static function provideInvalidDbIndexDsnParameter(): array
+    {
+        return [
+            [
+                'redis://:p%40ssword@'.getenv('REDIS_AUTHENTICATED_HOST').'/abc'
+            ],
+            [
+                'redis://:p%40ssword@'.getenv('REDIS_AUTHENTICATED_HOST').'/3?dbindex=6'
+            ]
+        ];
     }
 }

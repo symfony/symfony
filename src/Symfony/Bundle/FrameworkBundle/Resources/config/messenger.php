@@ -186,6 +186,7 @@ return static function (ContainerConfigurator $container) {
             ->args([
                 abstract_arg('failure transports'),
                 service('logger')->ignoreOnInvalid(),
+                service('messenger.retry_strategy_locator'),
             ])
             ->tag('kernel.event_subscriber')
             ->tag('monolog.logger', ['channel' => 'messenger'])

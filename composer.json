@@ -135,6 +135,7 @@
         "dragonmantank/cron-expression": "^3.1",
         "egulias/email-validator": "^2.1.10|^3.1|^4",
         "guzzlehttp/promises": "^1.4|^2.0",
+        "jolicode/jolinotif": "^2.7.2",
         "league/html-to-markdown": "^5.0",
         "league/uri": "^6.5|^7.0",
         "masterminds/html5": "^2.7.2",

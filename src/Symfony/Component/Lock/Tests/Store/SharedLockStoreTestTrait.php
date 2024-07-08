@@ -132,8 +132,8 @@ trait SharedLockStoreTestTrait
     {
         $store = $this->getStore();
 
-        $key1 = new Key(__METHOD__);
-        $key2 = new Key(__METHOD__);
+        $key1 = new Key(static::class.__METHOD__);
+        $key2 = new Key(static::class.__METHOD__);
 
         $store->saveRead($key1);
         $store->save($key1);
@@ -156,8 +156,8 @@ trait SharedLockStoreTestTrait
     {
         $store = $this->getStore();
 
-        $key1 = new Key(__METHOD__);
-        $key2 = new Key(__METHOD__);
+        $key1 = new Key(static::class.__METHOD__);
+        $key2 = new Key(static::class.__METHOD__);
 
         $store->save($key1);
         $store->saveRead($key1);

@@ -106,8 +106,8 @@ trait ExpiringStoreTestTrait
 
     public function testExpiredLockCleaned()
     {
-        $key1 = new Key(__METHOD__);
-        $key2 = new Key(__METHOD__);
+        $key1 = new Key(static::class.__METHOD__);
+        $key2 = new Key(static::class.__METHOD__);
 
         /** @var PersistingStoreInterface $store */
         $store = $this->getStore();

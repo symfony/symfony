@@ -11,18 +11,31 @@
 
 namespace Symfony\Component\AssetMapper\Tests;
 
-use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Asset\Packages;
 use Symfony\Component\AssetMapper\Tests\Fixtures\AssetMapperTestAppKernel;
+use Symfony\Component\Filesystem\Filesystem;
 
-class MapperAwareAssetPackageIntegrationTest extends KernelTestCase
+class MapperAwareAssetPackageIntegrationTest extends TestCase
 {
+    private AssetMapperTestAppKernel $kernel;
+    private Filesystem $filesystem;
+
+    protected function setUp(): void
+    {
+        $this->filesystem = new Filesystem();
+        $this->kernel = new AssetMapperTestAppKernel('test', true);
+        $this->kernel->boot();
+    }
+
+    protected function tearDown(): void
+    {
+        $this->filesystem->remove($this->kernel->getProjectDir().'/var');
+    }
+
     public function testDefaultAssetPackageIsDecorated()
     {
-        $kernel = new AssetMapperTestAppKernel('test', true);
-        $kernel->boot();
-
-        $packages = $kernel->getContainer()->get('public.assets.packages');
+        $packages = $this->kernel->getContainer()->get('public.assets.packages');
         \assert($packages instanceof Packages);
         $this->assertSame('/assets/file1-b3445cb7a86a0795a7af7f2004498aef.css', $packages->getUrl('file1.css'));
         $this->assertSame('/non-existent.css', $packages->getUrl('non-existent.css'));

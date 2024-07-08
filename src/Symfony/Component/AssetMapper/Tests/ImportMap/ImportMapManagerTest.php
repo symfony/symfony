@@ -32,18 +32,14 @@ class ImportMapManagerTest extends TestCase
     private PackageResolverInterface&MockObject $packageResolver;
     private ImportMapConfigReader&MockObject $configReader;
     private RemotePackageDownloader&MockObject $remotePackageDownloader;
-    private ImportMapManager $importMapManager;
 
     private Filesystem $filesystem;
-    private static string $writableRoot = __DIR__.'/../Fixtures/importmaps_for_writing';
+    private static string $writableRoot = __DIR__.'/../Fixtures/importmap_manager';
 
     protected function setUp(): void
     {
         $this->filesystem = new Filesystem();
-        if (!file_exists(__DIR__.'/../Fixtures/importmaps_for_writing')) {
-            $this->filesystem->mkdir(self::$writableRoot);
-        }
-        if (!file_exists(__DIR__.'/../Fixtures/importmaps_for_writing/assets')) {
+        if (!file_exists(__DIR__.'/../Fixtures/importmap_manager/assets')) {
             $this->filesystem->mkdir(self::$writableRoot.'/assets');
         }
     }
@@ -386,7 +382,7 @@ class ImportMapManagerTest extends TestCase
                 return ImportMapEntry::createRemote($importName, $type, $path, $version, $packageModuleSpecifier, $isEntrypoint);
             });
 
-        return $this->importMapManager = new ImportMapManager(
+        return new ImportMapManager(
             $this->assetMapper,
             $this->configReader,
             $this->remotePackageDownloader,

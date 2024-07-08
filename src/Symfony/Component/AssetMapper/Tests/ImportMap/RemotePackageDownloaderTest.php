@@ -24,7 +24,7 @@ use Symfony\Component\Filesystem\Filesystem;
 class RemotePackageDownloaderTest extends TestCase
 {
     private Filesystem $filesystem;
-    private static string $writableRoot = __DIR__.'/../Fixtures/importmaps_for_writing';
+    private static string $writableRoot = __DIR__.'/../Fixtures/remote_package_downloader';
 
     protected function setUp(): void
     {

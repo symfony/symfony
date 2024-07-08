@@ -5,6 +5,7 @@ CHANGELOG
 ---
 
  * Remove `@internal` flag and add `@final` to `ServicesResetter`
+ * Allow configuring the logging channel per type of exceptions in ErrorListener
 
 7.1
 ---

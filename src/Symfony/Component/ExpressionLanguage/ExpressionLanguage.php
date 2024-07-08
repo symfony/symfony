@@ -32,9 +32,9 @@ class ExpressionLanguage
     protected array $functions = [];
 
     /**
-     * @param ExpressionFunctionProviderInterface[] $providers
+     * @param iterable<ExpressionFunctionProviderInterface> $providers
      */
-    public function __construct(?CacheItemPoolInterface $cache = null, array $providers = [])
+    public function __construct(?CacheItemPoolInterface $cache = null, iterable $providers = [])
     {
         $this->cache = $cache ?? new ArrayAdapter();
         $this->registerFunctions();

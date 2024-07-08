@@ -137,9 +137,12 @@ class ExpressionLanguageTest extends TestCase
         $this->assertSame(FooBackedEnum::Bar, $result);
     }
 
-    public function testProviders()
+    /**
+     * @dataProvider providerTestCases
+     */
+    public function testProviders(iterable $providers)
     {
-        $expressionLanguage = new ExpressionLanguage(null, [new TestProvider()]);
+        $expressionLanguage = new ExpressionLanguage(null, $providers);
         $this->assertEquals('foo', $expressionLanguage->evaluate('identity("foo")'));
         $this->assertEquals('"foo"', $expressionLanguage->compile('identity("foo")'));
         $this->assertEquals('FOO', $expressionLanguage->evaluate('strtoupper("foo")'));
@@ -148,6 +151,14 @@ class ExpressionLanguageTest extends TestCase
         $this->assertEquals('\strtolower("FOO")', $expressionLanguage->compile('strtolower("FOO")'));
         $this->assertTrue($expressionLanguage->evaluate('fn_namespaced()'));
         $this->assertEquals('\Symfony\Component\ExpressionLanguage\Tests\Fixtures\fn_namespaced()', $expressionLanguage->compile('fn_namespaced()'));
+    }
+
+    public static function providerTestCases(): iterable
+    {
+        yield 'array' => [[new TestProvider()]];
+        yield 'Traversable' => [(function () {
+            yield new TestProvider();
+        })()];
     }
 
     /**

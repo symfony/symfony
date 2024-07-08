@@ -319,7 +319,7 @@
                                             {% endif %}
                                         </td>
                                         <td>
-                                            {{ call.duration }}ms
+                                            {{ '%0.2f ms'|format(call.duration) }}
                                         </td>
                                     </tr>
                                 {% endfor %}

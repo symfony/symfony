@@ -204,7 +204,7 @@ class LocaleListenerTest extends TestCase
         $this->assertEquals('de', $request->getLocale());
     }
 
-    public function testRequestAttributeLocaleNotOverridenFromAcceptLanguageHeader()
+    public function testRequestAttributeLocaleNotOverriddenFromAcceptLanguageHeader()
     {
         $request = Request::create('/');
         $request->attributes->set('_locale', 'it');

@@ -594,6 +594,7 @@ class PhpStanExtractorTest extends TestCase
         yield ['self', Type::object(Dummy::class)];
         yield ['rootDummyItems', Type::list(Type::object(RootDummyItem::class))];
         yield ['rootDummyItem', Type::object(RootDummyItem::class)];
+        yield ['collectionAsObject', Type::collection(Type::object(DummyCollection::class), Type::string(), Type::int())];
     }
 
     public function testParamTagTypeIsOmitted()

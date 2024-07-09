@@ -20,14 +20,14 @@ use Symfony\Component\Filesystem\Filesystem;
 class RemotePackageStorageTest extends TestCase
 {
     private Filesystem $filesystem;
-    private static string $writableRoot = __DIR__.'/../Fixtures/importmaps_for_writing';
+    private static string $writableRoot;
+    private static int $writableRootIndex = 0;
 
     protected function setUp(): void
     {
+        self::$writableRoot = sys_get_temp_dir().'/remote_package_storage'.++self::$writableRootIndex;
         $this->filesystem = new Filesystem();
-        if (!$this->filesystem->exists(self::$writableRoot)) {
-            $this->filesystem->mkdir(self::$writableRoot);
-        }
+        $this->filesystem->mkdir(self::$writableRoot);
     }
 
     protected function tearDown(): void
@@ -41,17 +41,24 @@ class RemotePackageStorageTest extends TestCase
         $this->assertSame(realpath(self::$writableRoot.'/assets/vendor'), realpath($storage->getStorageDir()));
     }
 
-    public function testSaveThrowsWhenVendorDirectoryIsNotWritable()
+    public function testSaveThrowsWhenFailing()
     {
-        $this->filesystem->mkdir($vendorDir = self::$writableRoot.'/assets/acme/vendor');
-        $this->filesystem->chmod($vendorDir, 0555);
+        $vendorDir = self::$writableRoot.'/assets/acme/vendor';
+        $this->filesystem->mkdir($vendorDir.'/module_specifier');
+        $this->filesystem->touch($vendorDir.'/module_specifier/module_specifier.index.js');
+        $this->filesystem->chmod($vendorDir.'/module_specifier/module_specifier.index.js', 0555);
 
         $storage = new RemotePackageStorage($vendorDir);
         $entry = ImportMapEntry::createRemote('foo', ImportMapType::JS, '/does/not/matter', '1.0.0', 'module_specifier', false);
 
         $this->expectException(\RuntimeException::class);
-        $this->expectExceptionMessage('file_put_contents('.$vendorDir.'/module_specifier/module_specifier.index.js): Failed to open stream: No such file or directory');
-        $storage->save($entry, 'any content');
+        $this->expectExceptionMessage('file_put_contents('.$vendorDir.'/module_specifier/module_specifier.index.js): Failed to open stream: Permission denied');
+
+        try {
+            $storage->save($entry, 'any content');
+        } finally {
+            $this->filesystem->chmod($vendorDir.'/module_specifier/module_specifier.index.js', 0777);
+        }
     }
 
     public function testIsDownloaded()
@@ -104,7 +111,7 @@ class RemotePackageStorageTest extends TestCase
     public function testGetDownloadedPath(string $packageModuleSpecifier, ImportMapType $importMapType, string $expectedPath)
     {
         $storage = new RemotePackageStorage(self::$writableRoot.'/assets/vendor');
-        $this->assertSame($expectedPath, $storage->getDownloadPath($packageModuleSpecifier, $importMapType));
+        $this->assertSame(self::$writableRoot.$expectedPath, $storage->getDownloadPath($packageModuleSpecifier, $importMapType));
     }
 
     public static function getDownloadPathTests(): iterable
@@ -112,25 +119,25 @@ class RemotePackageStorageTest extends TestCase
         yield 'javascript bare package' => [
             'packageModuleSpecifier' => 'foo',
             'importMapType' => ImportMapType::JS,
-            'expectedPath' => self::$writableRoot.'/assets/vendor/foo/foo.index.js',
+            'expectedPath' => '/assets/vendor/foo/foo.index.js',
         ];
 
         yield 'javascript package with path' => [
             'packageModuleSpecifier' => 'foo/bar',
             'importMapType' => ImportMapType::JS,
-            'expectedPath' => self::$writableRoot.'/assets/vendor/foo/bar.js',
+            'expectedPath' => '/assets/vendor/foo/bar.js',
         ];
 
         yield 'javascript package with path and extension' => [
             'packageModuleSpecifier' => 'foo/bar.js',
             'importMapType' => ImportMapType::JS,
-            'expectedPath' => self::$writableRoot.'/assets/vendor/foo/bar.js',
+            'expectedPath' => '/assets/vendor/foo/bar.js',
         ];
 
         yield 'CSS package with path' => [
             'packageModuleSpecifier' => 'foo/bar',
             'importMapType' => ImportMapType::CSS,
-            'expectedPath' => self::$writableRoot.'/assets/vendor/foo/bar.css',
+            'expectedPath' => '/assets/vendor/foo/bar.css',
         ];
     }
 }

@@ -19,6 +19,7 @@ use Symfony\Component\PropertyInfo\Tests\Fixtures\ConstructorDummyWithoutDocBloc
 use Symfony\Component\PropertyInfo\Tests\Fixtures\DefaultValue;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\DockBlockFallback;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\Dummy;
+use Symfony\Component\PropertyInfo\Tests\Fixtures\DummyCollection;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\DummyNamespace;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\DummyPropertyAndGetterWithDifferentTypes;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\DummyUnionType;
@@ -144,6 +145,7 @@ class PhpStanExtractorTest extends TestCase
             ['self', [new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, false, Dummy::class)]],
             ['rootDummyItems', [new LegacyType(LegacyType::BUILTIN_TYPE_ARRAY, false, null, true, new LegacyType(LegacyType::BUILTIN_TYPE_INT), new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, false, RootDummyItem::class))]],
             ['rootDummyItem', [new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, false, RootDummyItem::class)]],
+            ['collectionAsObject', [new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, false, DummyCollection::class, true, [new LegacyType(LegacyType::BUILTIN_TYPE_INT)], [new LegacyType(LegacyType::BUILTIN_TYPE_STRING)])]],
         ];
     }
 

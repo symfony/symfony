@@ -30,10 +30,9 @@ class ImportMapGeneratorTest extends TestCase
     private AssetMapperInterface&MockObject $assetMapper;
     private CompiledAssetMapperConfigReader&MockObject $compiledConfigReader;
     private ImportMapConfigReader&MockObject $configReader;
-    private ImportMapGenerator $importMapGenerator;
 
     private Filesystem $filesystem;
-    private static string $writableRoot = __DIR__.'/../Fixtures/importmaps_for_writing';
+    private static string $writableRoot = __DIR__.'/../Fixtures/importmap_generator';
 
     protected function setUp(): void
     {
@@ -725,7 +724,7 @@ class ImportMapGeneratorTest extends TestCase
                 return ImportMapEntry::createRemote($importName, $type, $path, $version, $packageModuleSpecifier, $isEntrypoint);
             });
 
-        return $this->importMapGenerator = new ImportMapGenerator(
+        return new ImportMapGenerator(
             $this->assetMapper,
             $this->compiledConfigReader,
             $this->configReader,

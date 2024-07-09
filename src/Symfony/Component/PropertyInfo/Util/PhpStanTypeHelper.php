@@ -125,7 +125,7 @@ final class PhpStanTypeHelper
                 return [$mainType];
             }
 
-            $collection = $mainType->isCollection() || \in_array($mainType->getClassName(), [\Traversable::class, \Iterator::class, \IteratorAggregate::class, \ArrayAccess::class, \Generator::class], true);
+            $collection = $mainType->isCollection() || \is_a($mainType->getClassName(), \Traversable::class, true) || \is_a($mainType->getClassName(), \ArrayAccess::class, true);
 
             // it's safer to fall back to other extractors if the generic type is too abstract
             if (!$collection && !class_exists($mainType->getClassName())) {

@@ -174,7 +174,7 @@ class ProfilerController
         $this->cspHandler?->disableCsp();
 
         $session = null;
-        if ($request->attributes->getBoolean('_stateless') && $request->hasSession()) {
+        if (!$request->attributes->getBoolean('_stateless') && $request->hasSession()) {
             $session = $request->getSession();
         }
 

@@ -13,6 +13,7 @@ namespace Symfony\Bundle\SecurityBundle\DataCollector;
 
 use Symfony\Bundle\SecurityBundle\Debug\TraceableFirewallListener;
 use Symfony\Bundle\SecurityBundle\Security\FirewallMap;
+use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\DataCollector\DataCollector;
@@ -195,6 +196,27 @@ class SecurityDataCollector extends DataCollector implements LateDataCollectorIn
         }
 
         $this->data['authenticators'] = $this->firewall ? $this->firewall->getAuthenticatorsInfo() : [];
+
+        if ($this->data['listeners'] && !($this->data['firewall']['stateless'] ?? true)) {
+            $authCookieName = "{$this->data['firewall']['name']}_auth_profile_token";
+            $deauthCookieName = "{$this->data['firewall']['name']}_deauth_profile_token";
+            $profileToken = $response->headers->get('X-Debug-Token');
+
+            $this->data['auth_profile_token'] = $request->cookies->get($authCookieName);
+            $this->data['deauth_profile_token'] = $request->cookies->get($deauthCookieName);
+
+            if ($this->data['authenticated'] && !$this->data['auth_profile_token']) {
+                $response->headers->setCookie(new Cookie($authCookieName, $profileToken));
+
+                $this->data['deauth_profile_token'] = null;
+                $response->headers->clearCookie($deauthCookieName);
+            } elseif(!$this->data['authenticated'] && !$this->data['deauth_profile_token']) {
+                $response->headers->setCookie(new Cookie($deauthCookieName, $profileToken));
+
+                $this->data['auth_profile_token'] = null;
+                $response->headers->clearCookie($authCookieName);
+            }
+        }
     }
 
     public function reset(): void
@@ -337,6 +359,16 @@ class SecurityDataCollector extends DataCollector implements LateDataCollectorIn
     public function getAuthenticators(): array|Data
     {
         return $this->data['authenticators'];
+    }
+
+    public function getAuthProfileToken(): string|Data|null
+    {
+        return $this->data['auth_profile_token'] ?? null;
+    }
+
+    public function getDeauthProfileToken(): string|Data|null
+    {
+        return $this->data['deauth_profile_token'] ?? null;
     }
 
     public function getName(): string

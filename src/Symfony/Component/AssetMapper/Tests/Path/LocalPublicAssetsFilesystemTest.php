@@ -18,12 +18,12 @@ use Symfony\Component\Filesystem\Filesystem;
 class LocalPublicAssetsFilesystemTest extends TestCase
 {
     private Filesystem $filesystem;
-    private static string $writableRoot = __DIR__.'/../Fixtures/importmaps_for_writing';
+    private static string $writableRoot = __DIR__.'/../Fixtures/local_public_assets_filesystem';
 
     protected function setUp(): void
     {
         $this->filesystem = new Filesystem();
-        if (!file_exists(__DIR__.'/../Fixtures/importmaps_for_writing')) {
+        if (!file_exists(__DIR__.'/../Fixtures/local_public_assets_filesystem')) {
             $this->filesystem->mkdir(self::$writableRoot);
         }
     }

@@ -17,6 +17,7 @@ use Symfony\Component\PropertyInfo\Extractor\PhpStanExtractor;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\ConstructorDummyWithoutDocBlock;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\DefaultValue;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\Dummy;
+use Symfony\Component\PropertyInfo\Tests\Fixtures\DummyCollection;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\ParentDummy;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\Php80Dummy;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\Php80PromotedDummy;
@@ -125,6 +126,7 @@ class PhpStanExtractorTest extends TestCase
             ['self', [new Type(Type::BUILTIN_TYPE_OBJECT, false, Dummy::class)]],
             ['rootDummyItems', [new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, new Type(Type::BUILTIN_TYPE_INT), new Type(Type::BUILTIN_TYPE_OBJECT, false, RootDummyItem::class))]],
             ['rootDummyItem', [new Type(Type::BUILTIN_TYPE_OBJECT, false, RootDummyItem::class)]],
+            ['collectionAsObject', [new Type(Type::BUILTIN_TYPE_OBJECT, false, DummyCollection::class, true, [new Type(Type::BUILTIN_TYPE_INT)], [new Type(Type::BUILTIN_TYPE_STRING)])]],
         ];
     }
 

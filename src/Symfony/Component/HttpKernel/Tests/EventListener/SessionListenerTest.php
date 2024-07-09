@@ -539,7 +539,7 @@ class SessionListenerTest extends TestCase
         $this->assertSame('60', $response->headers->getCacheControlDirective('s-maxage'));
     }
 
-    public function testResponseHeadersMaxAgeAndExpiresNotBeOverridenIfSessionStarted()
+    public function testResponseHeadersMaxAgeAndExpiresNotBeOverriddenIfSessionStarted()
     {
         $session = $this->createMock(Session::class);
         $session->expects($this->exactly(2))->method('getUsageIndex')->willReturn(0, 1);

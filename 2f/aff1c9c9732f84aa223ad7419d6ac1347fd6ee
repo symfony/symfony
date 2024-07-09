@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-07-09T08:43:09Z
+
+Yes: this creates coupling between test cases. If one test fails, many others fail in cascade. This cost us several hours of debugging.

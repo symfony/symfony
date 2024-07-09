@@ -77,8 +77,8 @@ class ExpressionLanguageTest extends TestCase
     public function testBasicPhpFunction($expression, $expected, $compiled)
     {
         $expressionLanguage = new ExpressionLanguage();
-        $this->assertEquals($expected, $expressionLanguage->evaluate($expression));
-        $this->assertEquals($compiled, $expressionLanguage->compile($expression));
+        $this->assertSame($expected, $expressionLanguage->evaluate($expression));
+        $this->assertSame($compiled, $expressionLanguage->compile($expression));
     }
 
     public static function basicPhpFunctionProvider()
@@ -143,14 +143,14 @@ class ExpressionLanguageTest extends TestCase
     public function testProviders(iterable $providers)
     {
         $expressionLanguage = new ExpressionLanguage(null, $providers);
-        $this->assertEquals('foo', $expressionLanguage->evaluate('identity("foo")'));
-        $this->assertEquals('"foo"', $expressionLanguage->compile('identity("foo")'));
-        $this->assertEquals('FOO', $expressionLanguage->evaluate('strtoupper("foo")'));
-        $this->assertEquals('\strtoupper("foo")', $expressionLanguage->compile('strtoupper("foo")'));
-        $this->assertEquals('foo', $expressionLanguage->evaluate('strtolower("FOO")'));
-        $this->assertEquals('\strtolower("FOO")', $expressionLanguage->compile('strtolower("FOO")'));
+        $this->assertSame('foo', $expressionLanguage->evaluate('identity("foo")'));
+        $this->assertSame('"foo"', $expressionLanguage->compile('identity("foo")'));
+        $this->assertSame('FOO', $expressionLanguage->evaluate('strtoupper("foo")'));
+        $this->assertSame('\strtoupper("foo")', $expressionLanguage->compile('strtoupper("foo")'));
+        $this->assertSame('foo', $expressionLanguage->evaluate('strtolower("FOO")'));
+        $this->assertSame('\strtolower("FOO")', $expressionLanguage->compile('strtolower("FOO")'));
         $this->assertTrue($expressionLanguage->evaluate('fn_namespaced()'));
-        $this->assertEquals('\Symfony\Component\ExpressionLanguage\Tests\Fixtures\fn_namespaced()', $expressionLanguage->compile('fn_namespaced()'));
+        $this->assertSame('\Symfony\Component\ExpressionLanguage\Tests\Fixtures\fn_namespaced()', $expressionLanguage->compile('fn_namespaced()'));
     }
 
     public static function providerTestCases(): iterable
@@ -167,7 +167,7 @@ class ExpressionLanguageTest extends TestCase
     public function testShortCircuitOperatorsEvaluate($expression, array $values, $expected)
     {
         $expressionLanguage = new ExpressionLanguage();
-        $this->assertEquals($expected, $expressionLanguage->evaluate($expression, $values));
+        $this->assertSame($expected, $expressionLanguage->evaluate($expression, $values));
     }
 
     /**

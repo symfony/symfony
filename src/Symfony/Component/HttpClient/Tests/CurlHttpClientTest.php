@@ -115,7 +115,7 @@ class CurlHttpClientTest extends HttpClientTestCase
         $httpClient->request('POST', 'http://localhost:8057/', [
             'extra' => [
                 'curl' => [
-                    \CURLOPT_PRIVATE => 'overriden private',
+                    \CURLOPT_PRIVATE => 'overridden private',
                 ],
             ],
         ]);

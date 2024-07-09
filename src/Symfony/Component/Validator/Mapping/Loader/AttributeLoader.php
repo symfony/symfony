@@ -37,6 +37,7 @@ class AttributeLoader implements LoaderInterface
             if ($constraint instanceof GroupSequence) {
                 $metadata->setGroupSequence($constraint->groups);
             } elseif ($constraint instanceof GroupSequenceProvider) {
+                $metadata->setGroupProvider($constraint->provider);
                 $metadata->setGroupSequenceProvider(true);
             } elseif ($constraint instanceof Constraint) {
                 $metadata->addConstraint($constraint);

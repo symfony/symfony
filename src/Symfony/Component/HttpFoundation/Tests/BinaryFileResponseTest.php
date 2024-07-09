@@ -344,7 +344,7 @@ class BinaryFileResponseTest extends ResponseTestCase
         $this->assertEquals('none', $response->headers->get('Accept-Ranges'));
     }
 
-    public function testAcceptRangeNotOverriden()
+    public function testAcceptRangeNotOverridden()
     {
         $request = Request::create('/', 'POST');
         $response = new BinaryFileResponse(__DIR__.'/File/Fixtures/test.gif', 200, ['Content-Type' => 'application/octet-stream']);

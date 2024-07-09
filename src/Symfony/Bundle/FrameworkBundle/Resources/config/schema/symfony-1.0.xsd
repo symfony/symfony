@@ -918,6 +918,7 @@
         <xsd:attribute name="allow-relative-links" type="xsd:boolean" />
         <xsd:attribute name="allow-relative-medias" type="xsd:boolean" />
         <xsd:attribute name="max-input-length" type="xsd:positiveInteger" />
+        <xsd:attribute name="default-action" type="xsd:string" />
     </xsd:complexType>
 
     <xsd:complexType name="element-option">

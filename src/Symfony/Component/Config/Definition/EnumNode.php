@@ -21,11 +21,28 @@ use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 class EnumNode extends ScalarNode
 {
     private array $values;
+    private ?string $enumFqcn = null;
 
-    public function __construct(?string $name, ?NodeInterface $parent = null, array $values = [], string $pathSeparator = BaseNode::DEFAULT_PATH_SEPARATOR)
+    /**
+     * @param class-string<\UnitEnum>|null $enumFqcn
+     */
+    public function __construct(?string $name, ?NodeInterface $parent = null, array $values = [], string $pathSeparator = BaseNode::DEFAULT_PATH_SEPARATOR, ?string $enumFqcn = null)
     {
-        if (!$values) {
+        if (!$values && !$enumFqcn) {
             throw new \InvalidArgumentException('$values must contain at least one element.');
+        }
+
+        if ($values && $enumFqcn) {
+            throw new \InvalidArgumentException('$values or $enumFqcn cannot be both set.');
+        }
+
+        if (null !== $enumFqcn) {
+            if (!enum_exists($enumFqcn)) {
+                throw new \InvalidArgumentException(\sprintf('The "%s" enum does not exist.', $enumFqcn));
+            }
+
+            $values = $enumFqcn::cases();
+            $this->enumFqcn = $enumFqcn;
         }
 
         foreach ($values as $value) {
@@ -51,11 +68,20 @@ class EnumNode extends ScalarNode
         return $this->values;
     }
 
+    public function getEnumFqcn(): ?string
+    {
+        return $this->enumFqcn;
+    }
+
     /**
      * @internal
      */
     public function getPermissibleValues(string $separator): string
     {
+        if ($this->enumFqcn && is_a($this->enumFqcn, \BackedEnum::class, true)) {
+            return implode($separator, array_column($this->enumFqcn::cases(), 'value'));
+        }
+
         return implode($separator, array_unique(array_map(static function (mixed $value): string {
             if (!$value instanceof \UnitEnum) {
                 return json_encode($value);
@@ -78,13 +104,48 @@ class EnumNode extends ScalarNode
     {
         $value = parent::finalizeValue($value);
 
-        if (!\in_array($value, $this->values, true)) {
-            $ex = new InvalidConfigurationException(\sprintf('The value %s is not allowed for path "%s". Permissible values: %s', json_encode($value), $this->getPath(), $this->getPermissibleValues(', ')));
-            $ex->setPath($this->getPath());
+        if ($this->enumFqcn) {
+            if (is_a($this->enumFqcn, \BackedEnum::class, true)) {
+                if (\is_string($value) || \is_int($value)) {
+                    try {
+                        $case = $this->enumFqcn::tryFrom($value);
+                    } catch (\TypeError) {
+                        throw new InvalidConfigurationException(\sprintf('The value could not be casted to a case of the "%s" enum. Is the value the same type as the backing type of the enum?', $this->enumFqcn));
+                    }
 
-            throw $ex;
+                    if (null !== $case) {
+                        return $case;
+                    }
+                } elseif ($value instanceof \UnitEnum && !$value instanceof $this->enumFqcn) {
+                    throw new InvalidConfigurationException(\sprintf('The value should be part of the "%s" enum, got a value from the "%s" enum.', $this->enumFqcn, get_debug_type($value)));
+                }
+            }
+
+            if ($value instanceof $this->enumFqcn) {
+                return $value;
+            }
+
+            throw $this->createInvalidValueException($value);
+        }
+
+        if (!\in_array($value, $this->values, true)) {
+            throw $this->createInvalidValueException($value);
         }
 
         return $value;
+    }
+
+    private function createInvalidValueException(mixed $value): InvalidConfigurationException
+    {
+        if ($this->enumFqcn) {
+            $message = \sprintf('The value %s is not allowed for path "%s". Permissible values: %s (cases of the "%s" enum).', json_encode($value), $this->getPath(), $this->getPermissibleValues(', '), $this->enumFqcn);
+        } else {
+            $message = \sprintf('The value %s is not allowed for path "%s". Permissible values: %s.', json_encode($value), $this->getPath(), $this->getPermissibleValues(', '));
+        }
+
+        $ex = new InvalidConfigurationException($message);
+        $ex->setPath($this->getPath());
+
+        return $ex;
     }
 }

@@ -103,6 +103,8 @@ acme_root:
     node_with_a_looong_name: ~
     enum_with_default:    this # One of "this"; "that"
     enum:                 ~ # One of "this"; "that"; Symfony\Component\Config\Tests\Fixtures\TestEnum::Ccc
+    enum_with_class:      ~ # One of foo; bar
+    unit_enum_with_class: ~ # One of Symfony\Component\Config\Tests\Fixtures\TestEnum::Foo; Symfony\Component\Config\Tests\Fixtures\TestEnum::Bar; Symfony\Component\Config\Tests\Fixtures\TestEnum::Ccc
 
     # some info
     array:

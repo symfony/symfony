@@ -190,6 +190,14 @@ class JsonResponseTest extends TestCase
 
         new JsonResponse(new \stdClass(), 200, [], true);
     }
+
+    public function testSetDataWithNull()
+    {
+        $response = new JsonResponse();
+        $response->setData(null);
+
+        $this->assertSame('null', $response->getContent());
+    }
 }
 
 class JsonSerializableObject implements \JsonSerializable

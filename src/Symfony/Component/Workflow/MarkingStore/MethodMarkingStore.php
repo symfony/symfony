@@ -53,7 +53,7 @@ final class MethodMarkingStore implements MarkingStoreInterface
         try {
             $marking = ($this->getGetter($subject))();
         } catch (\Error $e) {
-            $unInitializedPropertyMessage = sprintf('Typed property %s::$%s must not be accessed before initialization', get_debug_type($subject), $this->property);
+            $unInitializedPropertyMessage = \sprintf('Typed property %s::$%s must not be accessed before initialization', get_debug_type($subject), $this->property);
             if ($e->getMessage() !== $unInitializedPropertyMessage) {
                 throw $e;
             }
@@ -66,7 +66,7 @@ final class MethodMarkingStore implements MarkingStoreInterface
         if ($this->singleState) {
             $marking = [(string) $marking => 1];
         } elseif (!\is_array($marking)) {
-            throw new LogicException(sprintf('The marking stored in "%s::$%s" is not an array and the Workflow\'s Marking store is instantiated with $singleState=false.', get_debug_type($subject), $this->property));
+            throw new LogicException(\sprintf('The marking stored in "%s::$%s" is not an array and the Workflow\'s Marking store is instantiated with $singleState=false.', get_debug_type($subject), $this->property));
         }
 
         return new Marking($marking);
@@ -118,7 +118,7 @@ final class MethodMarkingStore implements MarkingStoreInterface
         } catch (\ReflectionException) {
         }
 
-        throw new LogicException(sprintf('Cannot store marking: class "%s" should have either a public method named "%s()" or a public property named "$%s"; none found.', get_debug_type($subject), $method, $property));
+        throw new LogicException(\sprintf('Cannot store marking: class "%s" should have either a public method named "%s()" or a public property named "$%s"; none found.', get_debug_type($subject), $method, $property));
     }
 }
 

@@ -26,7 +26,7 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
  */
 final class LineNotifyTransportTest extends TransportTestCase
 {
-    public static function createTransport(HttpClientInterface $client = null): LineNotifyTransport
+    public static function createTransport(?HttpClientInterface $client = null): LineNotifyTransport
     {
         return (new LineNotifyTransport('testToken', $client ?? new MockHttpClient()))->setHost('host.test');
     }

@@ -13,16 +13,18 @@ namespace Symfony\Component\ErrorHandler\Error;
 
 class FatalError extends \Error
 {
-    private array $error;
-
     /**
      * @param array $error An array as returned by error_get_last()
      */
-    public function __construct(string $message, int $code, array $error, int $traceOffset = null, bool $traceArgs = true, array $trace = null)
-    {
+    public function __construct(
+        string $message,
+        int $code,
+        private array $error,
+        ?int $traceOffset = null,
+        bool $traceArgs = true,
+        ?array $trace = null,
+    ) {
         parent::__construct($message, $code);
-
-        $this->error = $error;
 
         if (null !== $trace) {
             if (!$traceArgs) {
@@ -31,7 +33,7 @@ class FatalError extends \Error
                 }
             }
         } elseif (null !== $traceOffset) {
-            if (\function_exists('xdebug_get_function_stack') && $trace = @xdebug_get_function_stack()) {
+            if (\function_exists('xdebug_get_function_stack') && \in_array(\ini_get('xdebug.mode'), ['develop', false], true) && $trace = @xdebug_get_function_stack()) {
                 if (0 < $traceOffset) {
                     array_splice($trace, -$traceOffset);
                 }

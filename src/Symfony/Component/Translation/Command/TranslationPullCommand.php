@@ -34,22 +34,14 @@ final class TranslationPullCommand extends Command
 {
     use TranslationTrait;
 
-    private TranslationProviderCollection $providerCollection;
-    private TranslationWriterInterface $writer;
-    private TranslationReaderInterface $reader;
-    private string $defaultLocale;
-    private array $transPaths;
-    private array $enabledLocales;
-
-    public function __construct(TranslationProviderCollection $providerCollection, TranslationWriterInterface $writer, TranslationReaderInterface $reader, string $defaultLocale, array $transPaths = [], array $enabledLocales = [])
-    {
-        $this->providerCollection = $providerCollection;
-        $this->writer = $writer;
-        $this->reader = $reader;
-        $this->defaultLocale = $defaultLocale;
-        $this->transPaths = $transPaths;
-        $this->enabledLocales = $enabledLocales;
-
+    public function __construct(
+        private TranslationProviderCollection $providerCollection,
+        private TranslationWriterInterface $writer,
+        private TranslationReaderInterface $reader,
+        private string $defaultLocale,
+        private array $transPaths = [],
+        private array $enabledLocales = [],
+    ) {
         parent::__construct();
     }
 
@@ -163,7 +155,7 @@ EOF
                 $this->writer->write($operation->getResult(), $format, $writeOptions);
             }
 
-            $io->success(sprintf('Local translations has been updated from "%s" (for "%s" locale(s), and "%s" domain(s)).', parse_url($provider, \PHP_URL_SCHEME), implode(', ', $locales), implode(', ', $domains)));
+            $io->success(\sprintf('Local translations has been updated from "%s" (for "%s" locale(s), and "%s" domain(s)).', parse_url($provider, \PHP_URL_SCHEME), implode(', ', $locales), implode(', ', $domains)));
 
             return 0;
         }
@@ -177,7 +169,7 @@ EOF
             $this->writer->write($catalogue, $format, $writeOptions);
         }
 
-        $io->success(sprintf('New translations from "%s" has been written locally (for "%s" locale(s), and "%s" domain(s)).', parse_url($provider, \PHP_URL_SCHEME), implode(', ', $locales), implode(', ', $domains)));
+        $io->success(\sprintf('New translations from "%s" has been written locally (for "%s" locale(s), and "%s" domain(s)).', parse_url($provider, \PHP_URL_SCHEME), implode(', ', $locales), implode(', ', $domains)));
 
         return 0;
     }

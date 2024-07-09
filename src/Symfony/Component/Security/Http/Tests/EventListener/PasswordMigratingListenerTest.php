@@ -69,7 +69,7 @@ class PasswordMigratingListenerTest extends TestCase
 
     public function testUpgradeWithUpgrader()
     {
-        $passwordUpgrader = $this->getMockForAbstractClass(TestMigratingUserProvider::class);
+        $passwordUpgrader = $this->createMock(TestMigratingUserProvider::class);
         $passwordUpgrader->expects($this->once())
             ->method('upgradePassword')
             ->with($this->user, 'new-hash')
@@ -81,7 +81,7 @@ class PasswordMigratingListenerTest extends TestCase
 
     public function testUpgradeWithoutUpgrader()
     {
-        $userLoader = $this->getMockForAbstractClass(TestMigratingUserProvider::class);
+        $userLoader = $this->createMock(TestMigratingUserProvider::class);
         $userLoader->expects($this->any())->method('loadUserByIdentifier')->willReturn($this->user);
 
         $userLoader->expects($this->exactly(2))

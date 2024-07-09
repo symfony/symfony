@@ -214,9 +214,9 @@ abstract class AbstractBootstrap4HorizontalLayoutTestCase extends AbstractBootst
     public function testStartTagForMultipartForm()
     {
         $form = $this->factory->createBuilder('Symfony\Component\Form\Extension\Core\Type\FormType', null, [
-                'method' => 'get',
-                'action' => 'http://example.com/directory',
-            ])
+            'method' => 'get',
+            'action' => 'http://example.com/directory',
+        ])
             ->add('file', 'Symfony\Component\Form\Extension\Core\Type\FileType')
             ->getForm();
 

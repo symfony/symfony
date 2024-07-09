@@ -360,7 +360,7 @@ class RouteCollection implements \IteratorAggregate, \Countable
     public function addAlias(string $name, string $alias): Alias
     {
         if ($name === $alias) {
-            throw new InvalidArgumentException(sprintf('Route alias "%s" can not reference itself.', $name));
+            throw new InvalidArgumentException(\sprintf('Route alias "%s" can not reference itself.', $name));
         }
 
         unset($this->routes[$name], $this->priorities[$name]);
@@ -379,5 +379,10 @@ class RouteCollection implements \IteratorAggregate, \Countable
     public function getAlias(string $name): ?Alias
     {
         return $this->aliases[$name] ?? null;
+    }
+
+    public function getPriority(string $name): ?int
+    {
+        return $this->priorities[$name] ?? null;
     }
 }

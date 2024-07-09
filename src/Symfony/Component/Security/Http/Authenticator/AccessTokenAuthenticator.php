@@ -103,7 +103,7 @@ class AccessTokenAuthenticator implements AuthenticatorInterface
     /**
      * @see https://datatracker.ietf.org/doc/html/rfc6750#section-3
      */
-    private function getAuthenticateHeader(string $errorDescription = null): string
+    private function getAuthenticateHeader(?string $errorDescription = null): string
     {
         $data = [
             'realm' => $this->realm,
@@ -115,9 +115,9 @@ class AccessTokenAuthenticator implements AuthenticatorInterface
             if (null === $v || '' === $v) {
                 continue;
             }
-            $values[] = sprintf('%s="%s"', $k, $v);
+            $values[] = \sprintf('%s="%s"', $k, $v);
         }
 
-        return sprintf('Bearer %s', implode(',', $values));
+        return \sprintf('Bearer %s', implode(',', $values));
     }
 }

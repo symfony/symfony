@@ -20,7 +20,7 @@ class Suggestion implements \Stringable
 {
     public function __construct(
         private readonly string $value,
-        private readonly string $description = ''
+        private readonly string $description = '',
     ) {
     }
 

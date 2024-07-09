@@ -4,7 +4,17 @@ CHANGELOG
 7.1
 ---
 
+ * Add `CheckAliasValidityPass` to check service compatibility with aliased interface
  * Add argument `$prepend` to `ContainerConfigurator::extension()` to prepend the configuration instead of appending it
+ * Have `ServiceLocator` implement `ServiceCollectionInterface`
+ * Add `#[Lazy]` attribute as shortcut for `#[Autowire(lazy: [bool|string])]` and `#[Autoconfigure(lazy: [bool|string])]`
+ * Add `#[AutowireMethodOf]` attribute to autowire a method of a service as a callable
+ * Make `ContainerBuilder::registerAttributeForAutoconfiguration()` propagate to attribute classes that extend the registered class
+ * Add argument `$prepend` to `FileLoader::construct()` to prepend loaded configuration instead of appending it
+ * [BC BREAK] When used in the `prependExtension()` method, the `ContainerConfigurator::import()` method now prepends the configuration instead of appending it
+ * Cast env vars to null or bool when referencing them using `#[Autowire(env: '...')]` depending on the signature of the corresponding parameter
+ * Add `#[AutowireInline]` attribute to allow service definition at the class level
+ * Add `StaticEnvVarLoader`
 
 7.0
 ---

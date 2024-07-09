@@ -55,6 +55,7 @@ class PassConfig
             new AutoAliasServicePass(),
             new ValidateEnvPlaceholdersPass(),
             new ResolveDecoratorStackPass(),
+            new ResolveAutowireInlineAttributesPass(),
             new ResolveChildDefinitionsPass(),
             new RegisterServiceSubscribersPass(),
             new ResolveParameterPlaceHoldersPass(false, false),
@@ -127,7 +128,7 @@ class PassConfig
     {
         $property = $type.'Passes';
         if (!isset($this->$property)) {
-            throw new InvalidArgumentException(sprintf('Invalid type "%s".', $type));
+            throw new InvalidArgumentException(\sprintf('Invalid type "%s".', $type));
         }
 
         $passes = &$this->$property;

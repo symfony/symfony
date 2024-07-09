@@ -28,7 +28,7 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
  */
 final class FirebaseTransportTest extends TransportTestCase
 {
-    public static function createTransport(HttpClientInterface $client = null): FirebaseTransport
+    public static function createTransport(?HttpClientInterface $client = null): FirebaseTransport
     {
         return new FirebaseTransport([
             'client_email' => 'firebase-adminsdk-test@test.iam.gserviceaccount.com',

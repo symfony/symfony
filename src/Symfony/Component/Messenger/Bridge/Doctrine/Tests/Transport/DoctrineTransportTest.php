@@ -69,7 +69,7 @@ class DoctrineTransportTest extends TestCase
         $transport->configureSchema($schema, $dbalConnection, static fn () => true);
     }
 
-    private function getTransport(SerializerInterface $serializer = null, Connection $connection = null): DoctrineTransport
+    private function getTransport(?SerializerInterface $serializer = null, ?Connection $connection = null): DoctrineTransport
     {
         $serializer ??= $this->createMock(SerializerInterface::class);
         $connection ??= $this->createMock(Connection::class);

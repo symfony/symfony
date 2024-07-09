@@ -15,6 +15,8 @@ use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Exception\MissingOptionsException;
 
 /**
+ * Validates a collection's element count.
+ *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
 #[\Attribute(\Attribute::TARGET_PROPERTY | \Attribute::TARGET_METHOD | \Attribute::IS_REPEATABLE)]
@@ -40,18 +42,26 @@ class Count extends Constraint
     public ?int $max = null;
     public ?int $divisibleBy = null;
 
+    /**
+     * @param int|array<string,mixed>|null $exactly     The exact expected number of elements
+     * @param int|null                     $min         Minimum expected number of elements
+     * @param int|null                     $max         Maximum expected number of elements
+     * @param int|null                     $divisibleBy The number the collection count should be divisible by
+     * @param string[]|null                $groups
+     * @param array<mixed,string>          $options
+     */
     public function __construct(
-        int|array $exactly = null,
-        int $min = null,
-        int $max = null,
-        int $divisibleBy = null,
-        string $exactMessage = null,
-        string $minMessage = null,
-        string $maxMessage = null,
-        string $divisibleByMessage = null,
-        array $groups = null,
+        int|array|null $exactly = null,
+        ?int $min = null,
+        ?int $max = null,
+        ?int $divisibleBy = null,
+        ?string $exactMessage = null,
+        ?string $minMessage = null,
+        ?string $maxMessage = null,
+        ?string $divisibleByMessage = null,
+        ?array $groups = null,
         mixed $payload = null,
-        array $options = []
+        array $options = [],
     ) {
         if (\is_array($exactly)) {
             $options = array_merge($exactly, $options);
@@ -78,7 +88,7 @@ class Count extends Constraint
         $this->divisibleByMessage = $divisibleByMessage ?? $this->divisibleByMessage;
 
         if (null === $this->min && null === $this->max && null === $this->divisibleBy) {
-            throw new MissingOptionsException(sprintf('Either option "min", "max" or "divisibleBy" must be given for constraint "%s".', __CLASS__), ['min', 'max', 'divisibleBy']);
+            throw new MissingOptionsException(\sprintf('Either option "min", "max" or "divisibleBy" must be given for constraint "%s".', __CLASS__), ['min', 'max', 'divisibleBy']);
         }
     }
 }

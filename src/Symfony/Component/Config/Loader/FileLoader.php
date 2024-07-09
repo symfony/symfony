@@ -31,7 +31,7 @@ abstract class FileLoader extends Loader
 
     private ?string $currentDir = null;
 
-    public function __construct(FileLocatorInterface $locator, string $env = null)
+    public function __construct(FileLocatorInterface $locator, ?string $env = null)
     {
         $this->locator = $locator;
         parent::__construct($env);
@@ -66,7 +66,7 @@ abstract class FileLoader extends Loader
      * @throws FileLoaderImportCircularReferenceException
      * @throws FileLocatorFileNotFoundException
      */
-    public function import(mixed $resource, string $type = null, bool $ignoreErrors = false, string $sourceResource = null, string|array $exclude = null): mixed
+    public function import(mixed $resource, ?string $type = null, bool $ignoreErrors = false, ?string $sourceResource = null, string|array|null $exclude = null): mixed
     {
         if (\is_string($resource) && \strlen($resource) !== ($i = strcspn($resource, '*?{[')) && !str_contains($resource, "\n")) {
             $excluded = [];
@@ -97,7 +97,7 @@ abstract class FileLoader extends Loader
     /**
      * @internal
      */
-    protected function glob(string $pattern, bool $recursive, array|GlobResource &$resource = null, bool $ignoreErrors = false, bool $forExclusion = false, array $excluded = []): iterable
+    protected function glob(string $pattern, bool $recursive, array|GlobResource|null &$resource = null, bool $ignoreErrors = false, bool $forExclusion = false, array $excluded = []): iterable
     {
         if (\strlen($pattern) === $i = strcspn($pattern, '*?{[')) {
             $prefix = $pattern;
@@ -129,7 +129,7 @@ abstract class FileLoader extends Loader
         yield from $resource;
     }
 
-    private function doImport(mixed $resource, string $type = null, bool $ignoreErrors = false, string $sourceResource = null): mixed
+    private function doImport(mixed $resource, ?string $type = null, bool $ignoreErrors = false, ?string $sourceResource = null): mixed
     {
         try {
             $loader = $this->resolve($resource, $type);

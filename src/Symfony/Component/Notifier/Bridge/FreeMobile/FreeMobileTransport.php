@@ -29,14 +29,13 @@ final class FreeMobileTransport extends AbstractTransport
 {
     protected const HOST = 'smsapi.free-mobile.fr/sendmsg';
 
-    private string $login;
-    private string $password;
-    private string $phone;
-
-    public function __construct(string $login, #[\SensitiveParameter] string $password, string $phone, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
-    {
-        $this->login = $login;
-        $this->password = $password;
+    public function __construct(
+        private string $login,
+        #[\SensitiveParameter] private string $password,
+        private string $phone,
+        ?HttpClientInterface $client = null,
+        ?EventDispatcherInterface $dispatcher = null,
+    ) {
         $this->phone = str_replace('+33', '0', $phone);
 
         parent::__construct($client, $dispatcher);
@@ -44,7 +43,7 @@ final class FreeMobileTransport extends AbstractTransport
 
     public function __toString(): string
     {
-        return sprintf('freemobile://%s?phone=%s', $this->getEndpoint(), $this->phone);
+        return \sprintf('freemobile://%s?phone=%s', $this->getEndpoint(), $this->phone);
     }
 
     public function supports(MessageInterface $message): bool
@@ -60,10 +59,10 @@ final class FreeMobileTransport extends AbstractTransport
 
         /** @var SmsMessage $message */
         if ('' !== $message->getFrom()) {
-            throw new InvalidArgumentException(sprintf('The "%s" transport does not support "from" in "%s".', __CLASS__, SmsMessage::class));
+            throw new InvalidArgumentException(\sprintf('The "%s" transport does not support "from" in "%s".', __CLASS__, SmsMessage::class));
         }
 
-        $endpoint = sprintf('https://%s', $this->getEndpoint());
+        $endpoint = \sprintf('https://%s', $this->getEndpoint());
 
         $response = $this->client->request('POST', $endpoint, [
             'query' => [
@@ -87,7 +86,7 @@ final class FreeMobileTransport extends AbstractTransport
                 500 => 'Server error, please try again later.',
             ];
 
-            throw new TransportException(sprintf('Unable to send the SMS: error %d: ', $statusCode).($errors[$statusCode] ?? ''), $response);
+            throw new TransportException(\sprintf('Unable to send the SMS: error %d: ', $statusCode).($errors[$statusCode] ?? ''), $response);
         }
 
         return new SentMessage($message, (string) $this);

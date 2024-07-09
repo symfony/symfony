@@ -137,7 +137,7 @@ class MappedAssetFactoryTest extends TestCase
         $this->assertTrue($asset->isVendor);
     }
 
-    private function createFactory(AssetCompilerInterface $extraCompiler = null): MappedAssetFactory
+    private function createFactory(?AssetCompilerInterface $extraCompiler = null): MappedAssetFactory
     {
         $compilers = [
             new JavaScriptImportPathCompiler($this->createMock(ImportMapConfigReader::class)),
@@ -177,7 +177,7 @@ class MappedAssetFactoryTest extends TestCase
                 } elseif (str_contains($sourcePath, 'circular_dir')) {
                     $logicalPath = substr($sourcePath, strpos($sourcePath, 'circular_dir') + 13);
                 } else {
-                    throw new \RuntimeException(sprintf('Could not find asset "%s".', $sourcePath));
+                    throw new \RuntimeException(\sprintf('Could not find asset "%s".', $sourcePath));
                 }
 
                 return $factory->createMappedAsset($logicalPath, $sourcePath);

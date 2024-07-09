@@ -70,16 +70,16 @@ class Configuration
      * @param string      $baselineFile     The path to the baseline file
      * @param string|null $logFile          The path to the log file
      */
-    private function __construct(array $thresholds = [], string $regex = '', array $verboseOutput = [], string $ignoreFile = '', bool $generateBaseline = false, string $baselineFile = '', string $logFile = null)
+    private function __construct(array $thresholds = [], string $regex = '', array $verboseOutput = [], string $ignoreFile = '', bool $generateBaseline = false, string $baselineFile = '', ?string $logFile = null)
     {
         $groups = ['total', 'indirect', 'direct', 'self'];
 
         foreach ($thresholds as $group => $threshold) {
             if (!\in_array($group, $groups, true)) {
-                throw new \InvalidArgumentException(sprintf('Unrecognized threshold "%s", expected one of "%s".', $group, implode('", "', $groups)));
+                throw new \InvalidArgumentException(\sprintf('Unrecognized threshold "%s", expected one of "%s".', $group, implode('", "', $groups)));
             }
             if (!is_numeric($threshold)) {
-                throw new \InvalidArgumentException(sprintf('Threshold for group "%s" has invalid value "%s".', $group, $threshold));
+                throw new \InvalidArgumentException(\sprintf('Threshold for group "%s" has invalid value "%s".', $group, $threshold));
             }
             $this->thresholds[$group] = (int) $threshold;
         }
@@ -111,17 +111,17 @@ class Configuration
 
         foreach ($verboseOutput as $group => $status) {
             if (!isset($this->verboseOutput[$group])) {
-                throw new \InvalidArgumentException(sprintf('Unsupported verbosity group "%s", expected one of "%s".', $group, implode('", "', array_keys($this->verboseOutput))));
+                throw new \InvalidArgumentException(\sprintf('Unsupported verbosity group "%s", expected one of "%s".', $group, implode('", "', array_keys($this->verboseOutput))));
             }
             $this->verboseOutput[$group] = $status;
         }
 
         if ($ignoreFile) {
             if (!is_file($ignoreFile)) {
-                throw new \InvalidArgumentException(sprintf('The ignoreFile "%s" does not exist.', $ignoreFile));
+                throw new \InvalidArgumentException(\sprintf('The ignoreFile "%s" does not exist.', $ignoreFile));
             }
             set_error_handler(static function ($t, $m) use ($ignoreFile, &$line) {
-                throw new \RuntimeException(sprintf('Invalid pattern found in "%s" on line "%d"', $ignoreFile, 1 + $line).substr($m, 12));
+                throw new \RuntimeException(\sprintf('Invalid pattern found in "%s" on line "%d"', $ignoreFile, 1 + $line).substr($m, 12));
             });
             try {
                 foreach (file($ignoreFile) as $line => $pattern) {
@@ -147,7 +147,7 @@ class Configuration
                     $this->baselineDeprecations[$baseline_deprecation->location][$baseline_deprecation->message] = $baseline_deprecation->count;
                 }
             } else {
-                throw new \InvalidArgumentException(sprintf('The baselineFile "%s" does not exist.', $this->baselineFile));
+                throw new \InvalidArgumentException(\sprintf('The baselineFile "%s" does not exist.', $this->baselineFile));
             }
         }
 
@@ -312,7 +312,7 @@ class Configuration
         parse_str($serializedConfiguration, $normalizedConfiguration);
         foreach (array_keys($normalizedConfiguration) as $key) {
             if (!\in_array($key, ['max', 'disabled', 'verbose', 'quiet', 'ignoreFile', 'generateBaseline', 'baselineFile', 'logFile'], true)) {
-                throw new \InvalidArgumentException(sprintf('Unknown configuration option "%s".', $key));
+                throw new \InvalidArgumentException(\sprintf('Unknown configuration option "%s".', $key));
             }
         }
 

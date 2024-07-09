@@ -23,28 +23,21 @@ use Psr\Container\ContainerInterface;
  */
 class ContainerAwareEventManager extends EventManager
 {
-    /**
-     * Map of registered listeners.
-     *
-     * <event> => <listeners>
-     */
-    private array $listeners = [];
     private array $initialized = [];
     private bool $initializedSubscribers = false;
     private array $initializedHashMapping = [];
     private array $methods = [];
-    private ContainerInterface $container;
 
     /**
      * @param list<array{string[], string|object}> $listeners List of [events, listener] tuples
      */
-    public function __construct(ContainerInterface $container, array $listeners = [])
-    {
-        $this->container = $container;
-        $this->listeners = $listeners;
+    public function __construct(
+        private ContainerInterface $container,
+        private array $listeners = [],
+    ) {
     }
 
-    public function dispatchEvent(string $eventName, EventArgs $eventArgs = null): void
+    public function dispatchEvent(string $eventName, ?EventArgs $eventArgs = null): void
     {
         if (!$this->initializedSubscribers) {
             $this->initializeSubscribers();
@@ -200,7 +193,7 @@ class ContainerAwareEventManager extends EventManager
                 continue;
             }
 
-            throw new \InvalidArgumentException(sprintf('Using Doctrine subscriber "%s" is not allowed. Register it as a listener instead, using e.g. the #[AsDoctrineListener] or #[AsDocumentListener] attribute.', \is_object($listener) ? get_debug_type($listener) : $listener));
+            throw new \InvalidArgumentException(\sprintf('Using Doctrine subscriber "%s" is not allowed. Register it as a listener instead, using e.g. the #[AsDoctrineListener] or #[AsDocumentListener] attribute.', \is_object($listener) ? get_debug_type($listener) : $listener));
         }
     }
 

@@ -64,7 +64,7 @@ class ConsoleHandlerTest extends TestCase
 
         // check that the handler actually outputs the record if it handles it
         $levelName = Logger::getLevelName($level);
-        $levelName = sprintf('%-9s', $levelName);
+        $levelName = \sprintf('%-9s', $levelName);
 
         $realOutput = $this->getMockBuilder(Output::class)->onlyMethods(['doWrite'])->getMock();
         $realOutput->setVerbosity($verbosity);
@@ -111,10 +111,7 @@ class ConsoleHandlerTest extends TestCase
         $output
             ->expects($this->exactly(2))
             ->method('getVerbosity')
-            ->willReturnOnConsecutiveCalls(
-                OutputInterface::VERBOSITY_QUIET,
-                OutputInterface::VERBOSITY_DEBUG
-            )
+            ->willReturn(OutputInterface::VERBOSITY_QUIET, OutputInterface::VERBOSITY_DEBUG)
         ;
         $handler = new ConsoleHandler($output);
         $this->assertFalse($handler->isHandling(RecordFactory::create(Level::Notice)),

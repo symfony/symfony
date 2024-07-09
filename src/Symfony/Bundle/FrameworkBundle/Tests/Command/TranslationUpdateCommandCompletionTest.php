@@ -57,7 +57,8 @@ class TranslationUpdateCommandCompletionTest extends TestCase
     protected function setUp(): void
     {
         $this->fs = new Filesystem();
-        $this->translationDir = sys_get_temp_dir().'/'.uniqid('sf_translation', true);
+        $this->translationDir = tempnam(sys_get_temp_dir(), 'sf_translation_');
+        $this->fs->remove($this->translationDir);
         $this->fs->mkdir($this->translationDir.'/translations');
         $this->fs->mkdir($this->translationDir.'/templates');
     }
@@ -67,7 +68,7 @@ class TranslationUpdateCommandCompletionTest extends TestCase
         $this->fs->remove($this->translationDir);
     }
 
-    private function createCommandCompletionTester($extractedMessages = [], $loadedMessages = [], KernelInterface $kernel = null, array $transPaths = [], array $codePaths = []): CommandCompletionTester
+    private function createCommandCompletionTester($extractedMessages = [], $loadedMessages = [], ?KernelInterface $kernel = null, array $transPaths = [], array $codePaths = []): CommandCompletionTester
     {
         $translator = $this->createMock(Translator::class);
         $translator

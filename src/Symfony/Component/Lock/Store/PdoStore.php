@@ -70,7 +70,7 @@ class PdoStore implements PersistingStoreInterface
 
         if ($connOrDsn instanceof \PDO) {
             if (\PDO::ERRMODE_EXCEPTION !== $connOrDsn->getAttribute(\PDO::ATTR_ERRMODE)) {
-                throw new InvalidArgumentException(sprintf('"%s" requires PDO error mode attribute be set to throw Exceptions (i.e. $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION)).', __METHOD__));
+                throw new InvalidArgumentException(\sprintf('"%s" requires PDO error mode attribute be set to throw Exceptions (i.e. $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION)).', __METHOD__));
             }
 
             $this->conn = $connOrDsn;
@@ -125,7 +125,7 @@ class PdoStore implements PersistingStoreInterface
     public function putOffExpiration(Key $key, float $ttl): void
     {
         if ($ttl < 1) {
-            throw new InvalidTtlException(sprintf('"%s()" expects a TTL greater or equals to 1 second. Got "%s".', __METHOD__, $ttl));
+            throw new InvalidTtlException(\sprintf('"%s()" expects a TTL greater or equals to 1 second. Got "%s".', __METHOD__, $ttl));
         }
 
         $key->reduceLifetime($ttl);
@@ -193,7 +193,7 @@ class PdoStore implements PersistingStoreInterface
             'pgsql' => "CREATE TABLE $this->table ($this->idCol VARCHAR(64) NOT NULL PRIMARY KEY, $this->tokenCol VARCHAR(64) NOT NULL, $this->expirationCol INTEGER)",
             'oci' => "CREATE TABLE $this->table ($this->idCol VARCHAR2(64) NOT NULL PRIMARY KEY, $this->tokenCol VARCHAR2(64) NOT NULL, $this->expirationCol INTEGER)",
             'sqlsrv' => "CREATE TABLE $this->table ($this->idCol VARCHAR(64) NOT NULL PRIMARY KEY, $this->tokenCol VARCHAR(64) NOT NULL, $this->expirationCol INTEGER)",
-            default => throw new \DomainException(sprintf('Creating the lock table is currently not implemented for platform "%s".', $driver)),
+            default => throw new \DomainException(\sprintf('Creating the lock table is currently not implemented for platform "%s".', $driver)),
         };
 
         $this->getConnection()->exec($sql);
@@ -232,10 +232,10 @@ class PdoStore implements PersistingStoreInterface
     private function isTableMissing(\PDOException $exception): bool
     {
         $driver = $this->getDriver();
-        $code = $exception->getCode();
+        [$sqlState, $code] = $exception->errorInfo ?? [null, $exception->getCode()];
 
         return match ($driver) {
-            'pgsql' => '42P01' === $code,
+            'pgsql' => '42P01' === $sqlState,
             'sqlite' => str_contains($exception->getMessage(), 'no such table:'),
             'oci' => 942 === $code,
             'sqlsrv' => 208 === $code,

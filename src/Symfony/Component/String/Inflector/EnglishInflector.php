@@ -25,8 +25,32 @@ final class EnglishInflector implements InflectorInterface
         // Fourth entry: Whether the suffix may succeed a consonant
         // Fifth entry: singular suffix, normal
 
-        // bacteria (bacterium), criteria (criterion), phenomena (phenomenon)
-        ['a', 1, true, true, ['on', 'um']],
+        // bacteria (bacterium)
+        ['airetcab', 8, true, true, 'bacterium'],
+
+        // corpora (corpus)
+        ['aroproc', 7, true, true, 'corpus'],
+
+        // criteria (criterion)
+        ['airetirc', 8, true, true, 'criterion'],
+
+        // curricula (curriculum)
+        ['alucirruc', 9, true, true, 'curriculum'],
+
+        // genera (genus)
+        ['areneg', 6, true, true, 'genus'],
+
+        // media (medium)
+        ['aidem', 5, true, true, 'medium'],
+
+        // memoranda (memorandum)
+        ['adnaromem', 9, true, true, 'memorandum'],
+
+        // phenomena (phenomenon)
+        ['anemonehp', 9, true, true, 'phenomenon'],
+
+        // strata (stratum)
+        ['atarts', 6, true, true, 'stratum'],
 
         // nebulae (nebula)
         ['ea', 2, true, true, 'a'],
@@ -141,7 +165,7 @@ final class EnglishInflector implements InflectorInterface
         // shoes (shoe)
         ['se', 2, true, true, ['', 'e']],
 
-         // status (status)
+        // status (status)
         ['sutats', 6, true, true, 'status'],
 
         // tags (tag)
@@ -165,6 +189,9 @@ final class EnglishInflector implements InflectorInterface
         // Third entry: Whether the suffix may succeed a vowel
         // Fourth entry: Whether the suffix may succeed a consonant
         // Fifth entry: plural suffix, normal
+
+        // axes (axis)
+        ['sixa', 4, false, false, 'axes'],
 
         // criterion (criteria)
         ['airetirc', 8, false, false, 'criterion'],
@@ -235,7 +262,10 @@ final class EnglishInflector implements InflectorInterface
         // teeth (tooth)
         ['htoot', 5, true, true, 'teeth'],
 
-        // bacteria (bacterium), criteria (criterion), phenomena (phenomenon)
+        // albums (album)
+        ['mubla', 5, true, true, 'albums'],
+
+        // bacteria (bacterium), curricula (curriculum), media (medium), memoranda (memorandum), phenomena (phenomenon), strata (stratum)
         ['mu', 2, true, true, 'a'],
 
         // men (man), women (woman)
@@ -244,20 +274,11 @@ final class EnglishInflector implements InflectorInterface
         // people (person)
         ['nosrep', 6, true, true, ['persons', 'people']],
 
-        // bacteria (bacterium), criteria (criterion), phenomena (phenomenon)
-        ['noi', 3, true, true, 'ions'],
+        // criteria (criterion)
+        ['noiretirc', 9, true, true, 'criteria'],
 
-        // coupon (coupons)
-        ['nop', 3, true, true, 'pons'],
-
-        // seasons (season), treasons (treason), poisons (poison), lessons (lesson)
-        ['nos', 3, true, true, 'sons'],
-
-        // icons (icon)
-        ['noc', 3, true, true, 'cons'],
-
-        // bacteria (bacterium), criteria (criterion), phenomena (phenomenon)
-        ['no', 2, true, true, 'a'],
+        // phenomena (phenomenon)
+        ['nonemonehp', 10, true, true, 'phenomena'],
 
         // echoes (echo)
         ['ohce', 4, true, true, 'echoes'],
@@ -267,6 +288,9 @@ final class EnglishInflector implements InflectorInterface
 
         // atlases (atlas)
         ['salta', 5, true, true, 'atlases'],
+
+        // aliases (alias)
+        ['saila', 5, true, true, 'aliases'],
 
         // irises (iris)
         ['siri', 4, true, true, 'irises'],
@@ -287,6 +311,12 @@ final class EnglishInflector implements InflectorInterface
 
         // circuses (circus)
         ['suc', 3, true, true, 'cuses'],
+
+        // hippocampi (hippocampus)
+        ['supmacoppih', 11, false, false, 'hippocampi'],
+
+        // campuses (campus)
+        ['sup', 3, true, true, 'puses'],
 
         // status (status)
         ['sutats', 6, true, true, ['status', 'statuses']],
@@ -384,6 +414,12 @@ final class EnglishInflector implements InflectorInterface
 
         // traffic
         'ciffart',
+
+        // aircraft
+        'tfarcria',
+
+        // hardware
+        'erawdrah',
     ];
 
     public function singularize(string $plural): array

@@ -24,7 +24,7 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
 
 class ChatworkTransportTest extends TransportTestCase
 {
-    public static function createTransport(HttpClientInterface $client = null): TransportInterface
+    public static function createTransport(?HttpClientInterface $client = null): TransportInterface
     {
         return (new ChatworkTransport('testToken', 'testRoomId', $client ?? new MockHttpClient()))->setHost('host.test');
     }

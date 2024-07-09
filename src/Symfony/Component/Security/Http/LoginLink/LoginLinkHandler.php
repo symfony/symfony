@@ -28,23 +28,21 @@ use Symfony\Component\Security\Http\LoginLink\Exception\InvalidLoginLinkExceptio
  */
 final class LoginLinkHandler implements LoginLinkHandlerInterface
 {
-    private UrlGeneratorInterface $urlGenerator;
-    private UserProviderInterface $userProvider;
     private array $options;
-    private SignatureHasher $signatureHasher;
 
-    public function __construct(UrlGeneratorInterface $urlGenerator, UserProviderInterface $userProvider, SignatureHasher $signatureHasher, array $options)
-    {
-        $this->urlGenerator = $urlGenerator;
-        $this->userProvider = $userProvider;
-        $this->signatureHasher = $signatureHasher;
+    public function __construct(
+        private UrlGeneratorInterface $urlGenerator,
+        private UserProviderInterface $userProvider,
+        private SignatureHasher $signatureHasher,
+        array $options,
+    ) {
         $this->options = array_merge([
             'route_name' => null,
             'lifetime' => 600,
         ], $options);
     }
 
-    public function createLoginLink(UserInterface $user, Request $request = null, int $lifetime = null): LoginLinkDetails
+    public function createLoginLink(UserInterface $user, ?Request $request = null, ?int $lifetime = null): LoginLinkDetails
     {
         $expires = time() + ($lifetime ?: $this->options['lifetime']);
         $expiresAt = new \DateTimeImmutable('@'.$expires);

@@ -40,6 +40,13 @@ class EmailTest extends TestCase
         new Email(['mode' => 'Unknown Mode']);
     }
 
+    public function testUnknownModeArgumentsTriggerException()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('The "mode" parameter value is not valid.');
+        new Email(null, null, 'Unknown Mode');
+    }
+
     public function testNormalizerCanBeSet()
     {
         $email = new Email(['normalizer' => 'trim']);

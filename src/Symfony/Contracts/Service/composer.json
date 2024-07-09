@@ -17,7 +17,8 @@
     ],
     "require": {
         "php": ">=8.1",
-        "psr/container": "^1.1|^2.0"
+        "psr/container": "^1.1|^2.0",
+        "symfony/deprecation-contracts": "^2.5|^3"
     },
     "conflict": {
         "ext-psr": "<1.1|>=2"
@@ -31,7 +32,7 @@
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
-            "dev-main": "3.4-dev"
+            "dev-main": "3.5-dev"
         },
         "thanks": {
             "name": "symfony/contracts",

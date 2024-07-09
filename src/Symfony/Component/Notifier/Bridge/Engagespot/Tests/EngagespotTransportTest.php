@@ -24,7 +24,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
  */
 final class EngagespotTransportTest extends TransportTestCase
 {
-    public static function createTransport(HttpClientInterface $client = null): EngagespotTransport
+    public static function createTransport(?HttpClientInterface $client = null): EngagespotTransport
     {
         return new EngagespotTransport('apiKey', 'TEST', $client ?? new MockHttpClient());
     }

@@ -38,7 +38,6 @@ class DoctrineDbalAdapter extends AbstractAdapter implements PruneableInterface
     private string $dataCol = 'item_data';
     private string $lifetimeCol = 'item_lifetime';
     private string $timeCol = 'item_time';
-    private string $namespace;
 
     /**
      * You can either pass an existing database Doctrine DBAL Connection or
@@ -56,10 +55,15 @@ class DoctrineDbalAdapter extends AbstractAdapter implements PruneableInterface
      *
      * @throws InvalidArgumentException When namespace contains invalid characters
      */
-    public function __construct(Connection|string $connOrDsn, string $namespace = '', int $defaultLifetime = 0, array $options = [], MarshallerInterface $marshaller = null)
-    {
+    public function __construct(
+        Connection|string $connOrDsn,
+        private string $namespace = '',
+        int $defaultLifetime = 0,
+        array $options = [],
+        ?MarshallerInterface $marshaller = null,
+    ) {
         if (isset($namespace[0]) && preg_match('#[^-+.A-Za-z0-9]#', $namespace, $match)) {
-            throw new InvalidArgumentException(sprintf('Namespace contains "%s" but only characters in [-+.A-Za-z0-9] are allowed.', $match[0]));
+            throw new InvalidArgumentException(\sprintf('Namespace contains "%s" but only characters in [-+.A-Za-z0-9] are allowed.', $match[0]));
         }
 
         if ($connOrDsn instanceof Connection) {
@@ -92,7 +96,6 @@ class DoctrineDbalAdapter extends AbstractAdapter implements PruneableInterface
         $this->dataCol = $options['db_data_col'] ?? $this->dataCol;
         $this->lifetimeCol = $options['db_lifetime_col'] ?? $this->lifetimeCol;
         $this->timeCol = $options['db_time_col'] ?? $this->timeCol;
-        $this->namespace = $namespace;
         $this->marshaller = $marshaller ?? new DefaultMarshaller();
 
         parent::__construct($namespace, $defaultLifetime);
@@ -137,7 +140,7 @@ class DoctrineDbalAdapter extends AbstractAdapter implements PruneableInterface
 
         if ('' !== $this->namespace) {
             $deleteSql .= " AND $this->idCol LIKE ?";
-            $params[] = sprintf('%s%%', $this->namespace);
+            $params[] = \sprintf('%s%%', $this->namespace);
             $paramTypes[] = ParameterType::STRING;
         }
 

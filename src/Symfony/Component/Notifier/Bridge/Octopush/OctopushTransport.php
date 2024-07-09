@@ -28,24 +28,20 @@ final class OctopushTransport extends AbstractTransport
 {
     protected const HOST = 'www.octopush-dm.com';
 
-    private string $userLogin;
-    private string $apiKey;
-    private string $from;
-    private string $type;
-
-    public function __construct(string $userLogin, #[\SensitiveParameter] string $apiKey, string $from, string $type, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
-    {
-        $this->userLogin = $userLogin;
-        $this->apiKey = $apiKey;
-        $this->from = $from;
-        $this->type = $type;
-
+    public function __construct(
+        private string $userLogin,
+        #[\SensitiveParameter] private string $apiKey,
+        private string $from,
+        private string $type,
+        ?HttpClientInterface $client = null,
+        ?EventDispatcherInterface $dispatcher = null,
+    ) {
         parent::__construct($client, $dispatcher);
     }
 
     public function __toString(): string
     {
-        return sprintf('octopush://%s?from=%s&type=%s', $this->getEndpoint(), $this->from, $this->type);
+        return \sprintf('octopush://%s?from=%s&type=%s', $this->getEndpoint(), $this->from, $this->type);
     }
 
     public function supports(MessageInterface $message): bool
@@ -61,7 +57,7 @@ final class OctopushTransport extends AbstractTransport
 
         $from = $message->getFrom() ?: $this->from;
 
-        $endpoint = sprintf('https://%s/api/sms/json', $this->getEndpoint());
+        $endpoint = \sprintf('https://%s/api/sms/json', $this->getEndpoint());
 
         $response = $this->client->request('POST', $endpoint, [
             'body' => [

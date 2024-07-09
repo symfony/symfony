@@ -13,21 +13,24 @@ namespace Symfony\Component\Config\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\ConfigCache;
+use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\Config\Resource\SelfCheckingResourceChecker;
 use Symfony\Component\Config\Tests\Resource\ResourceStub;
 
 class ConfigCacheTest extends TestCase
 {
     private string $cacheFile;
+    private string $metaFile;
 
     protected function setUp(): void
     {
         $this->cacheFile = tempnam(sys_get_temp_dir(), 'config_');
+        $this->metaFile = tempnam(sys_get_temp_dir(), 'config_');
     }
 
     protected function tearDown(): void
     {
-        $files = [$this->cacheFile, $this->cacheFile.'.meta'];
+        $files = [$this->cacheFile, $this->cacheFile.'.meta', $this->metaFile];
 
         foreach ($files as $file) {
             if (file_exists($file)) {
@@ -102,5 +105,15 @@ class ConfigCacheTest extends TestCase
             [true],
             [false],
         ];
+    }
+
+    public function testCacheWithCustomMetaFile()
+    {
+        $this->assertStringEqualsFile($this->metaFile, '');
+
+        $cache = new ConfigCache($this->cacheFile, false, $this->metaFile);
+        $cache->write('foo', [new FileResource(__FILE__)]);
+
+        $this->assertStringNotEqualsFile($this->metaFile, '');
     }
 }

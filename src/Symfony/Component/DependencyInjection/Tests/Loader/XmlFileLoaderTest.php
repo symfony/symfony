@@ -82,7 +82,7 @@ class XmlFileLoaderTest extends TestCase
             $this->fail('->parseFileToDOM() throws an InvalidArgumentException if the loaded file is not a valid XML file');
         } catch (\Exception $e) {
             $this->assertInstanceOf(InvalidArgumentException::class, $e, '->parseFileToDOM() throws an InvalidArgumentException if the loaded file is not a valid XML file');
-            $this->assertMatchesRegularExpression(sprintf('#^Unable to parse file ".+%s": .+.$#', 'parameters.ini'), $e->getMessage(), '->parseFileToDOM() throws an InvalidArgumentException if the loaded file is not a valid XML file');
+            $this->assertMatchesRegularExpression(\sprintf('#^Unable to parse file ".+%s": .+.$#', 'parameters.ini'), $e->getMessage(), '->parseFileToDOM() throws an InvalidArgumentException if the loaded file is not a valid XML file');
 
             $e = $e->getPrevious();
             $this->assertInstanceOf(\InvalidArgumentException::class, $e, '->parseFileToDOM() throws an InvalidArgumentException if the loaded file is not a valid XML file');
@@ -96,7 +96,7 @@ class XmlFileLoaderTest extends TestCase
             $this->fail('->parseFileToDOM() throws an InvalidArgumentException if the loaded file does not validate the XSD');
         } catch (\Exception $e) {
             $this->assertInstanceOf(InvalidArgumentException::class, $e, '->parseFileToDOM() throws an InvalidArgumentException if the loaded file does not validate the XSD');
-            $this->assertMatchesRegularExpression(sprintf('#^Unable to parse file ".+%s": .+.$#', 'nonvalid.xml'), $e->getMessage(), '->parseFileToDOM() throws an InvalidArgumentException if the loaded file is not a valid XML file');
+            $this->assertMatchesRegularExpression(\sprintf('#^Unable to parse file ".+%s": .+.$#', 'nonvalid.xml'), $e->getMessage(), '->parseFileToDOM() throws an InvalidArgumentException if the loaded file is not a valid XML file');
 
             $e = $e->getPrevious();
             $this->assertInstanceOf(\InvalidArgumentException::class, $e, '->parseFileToDOM() throws an InvalidArgumentException if the loaded file does not validate the XSD');
@@ -201,11 +201,11 @@ class XmlFileLoaderTest extends TestCase
             $this->fail('->load() throws a LoaderLoadException if the imported xml file configuration does not exist');
         } catch (\Exception $e) {
             $this->assertInstanceOf(LoaderLoadException::class, $e, '->load() throws a LoaderLoadException if the imported xml file configuration does not exist');
-            $this->assertMatchesRegularExpression(sprintf('#^The file "%1$s" does not exist \(in: .+\) in %1$s \(which is being imported from ".+%2$s"\)\.$#', 'foo_fake\.xml', 'services4_bad_import_with_errors\.xml'), $e->getMessage(), '->load() throws a LoaderLoadException if the imported xml file configuration does not exist');
+            $this->assertMatchesRegularExpression(\sprintf('#^The file "%1$s" does not exist \(in: .+\) in %1$s \(which is being imported from ".+%2$s"\)\.$#', 'foo_fake\.xml', 'services4_bad_import_with_errors\.xml'), $e->getMessage(), '->load() throws a LoaderLoadException if the imported xml file configuration does not exist');
 
             $e = $e->getPrevious();
             $this->assertInstanceOf(FileLocatorFileNotFoundException::class, $e, '->load() throws a FileLocatorFileNotFoundException if the imported xml file configuration does not exist');
-            $this->assertMatchesRegularExpression(sprintf('#^The file "%s" does not exist \(in: .+\)\.$#', 'foo_fake\.xml'), $e->getMessage(), '->load() throws a FileLocatorFileNotFoundException if the imported xml file configuration does not exist');
+            $this->assertMatchesRegularExpression(\sprintf('#^The file "%s" does not exist \(in: .+\)\.$#', 'foo_fake\.xml'), $e->getMessage(), '->load() throws a FileLocatorFileNotFoundException if the imported xml file configuration does not exist');
         }
 
         try {
@@ -213,11 +213,11 @@ class XmlFileLoaderTest extends TestCase
             $this->fail('->load() throws an LoaderLoadException if the imported configuration does not validate the XSD');
         } catch (\Exception $e) {
             $this->assertInstanceOf(LoaderLoadException::class, $e, '->load() throws a LoaderLoadException if the imported configuration does not validate the XSD');
-            $this->assertMatchesRegularExpression(sprintf('#^Unable to parse file ".+%s": .+.$#', 'nonvalid\.xml'), $e->getMessage(), '->load() throws a LoaderLoadException if the imported configuration does not validate the XSD');
+            $this->assertMatchesRegularExpression(\sprintf('#^Unable to parse file ".+%s": .+.$#', 'nonvalid\.xml'), $e->getMessage(), '->load() throws a LoaderLoadException if the imported configuration does not validate the XSD');
 
             $e = $e->getPrevious();
             $this->assertInstanceOf(InvalidArgumentException::class, $e, '->load() throws an InvalidArgumentException if the configuration does not validate the XSD');
-            $this->assertMatchesRegularExpression(sprintf('#^Unable to parse file ".+%s": .+.$#', 'nonvalid\.xml'), $e->getMessage(), '->load() throws an InvalidArgumentException if the configuration does not validate the XSD');
+            $this->assertMatchesRegularExpression(\sprintf('#^Unable to parse file ".+%s": .+.$#', 'nonvalid\.xml'), $e->getMessage(), '->load() throws an InvalidArgumentException if the configuration does not validate the XSD');
 
             $e = $e->getPrevious();
             $this->assertInstanceOf(XmlParsingException::class, $e, '->load() throws a XmlParsingException if the configuration does not validate the XSD');
@@ -460,7 +460,7 @@ class XmlFileLoaderTest extends TestCase
         $loader = new XmlFileLoader($container, new FileLocator(self::$fixturesPath.'/xml'));
         $loader->load('services_with_array_tags.xml');
 
-        $this->assertEquals(['foo_tag' => [['foo' => 'bar', 'bar' => ['foo' => 'bar', 'bar' => 'foo']]]], $container->getDefinition('foo')->getTags());
+        $this->assertEquals(['foo_tag' => [['name' => 'attributeName', 'foo' => 'bar', 'bar' => ['foo' => 'bar', 'bar' => 'foo']]]], $container->getDefinition('foo')->getTags());
     }
 
     public function testParseTagsWithoutNameThrowsException()
@@ -587,7 +587,7 @@ class XmlFileLoaderTest extends TestCase
             $this->fail('->load() throws an InvalidArgumentException if the configuration does not validate the XSD');
         } catch (\Exception $e) {
             $this->assertInstanceOf(InvalidArgumentException::class, $e, '->load() throws an InvalidArgumentException if the configuration does not validate the XSD');
-            $this->assertMatchesRegularExpression(sprintf('#^Unable to parse file ".+%s": .+.$#', 'services3.xml'), $e->getMessage(), '->load() throws an InvalidArgumentException if the configuration does not validate the XSD');
+            $this->assertMatchesRegularExpression(\sprintf('#^Unable to parse file ".+%s": .+.$#', 'services3.xml'), $e->getMessage(), '->load() throws an InvalidArgumentException if the configuration does not validate the XSD');
 
             $e = $e->getPrevious();
             $this->assertInstanceOf(\InvalidArgumentException::class, $e, '->load() throws an InvalidArgumentException if the configuration does not validate the XSD');
@@ -602,6 +602,20 @@ class XmlFileLoaderTest extends TestCase
             $this->assertInstanceOf(\InvalidArgumentException::class, $e, '->load() throws an InvalidArgumentException if the tag is not valid');
             $this->assertStringStartsWith('There is no extension able to load the configuration for "project:bar" (in', $e->getMessage(), '->load() throws an InvalidArgumentException if the tag is not valid');
         }
+    }
+
+    public function testPrependExtensionConfig()
+    {
+        $container = new ContainerBuilder();
+        $container->prependExtensionConfig('http://www.example.com/schema/project', ['foo' => 'bar']);
+        $loader = new XmlFileLoader($container, new FileLocator(self::$fixturesPath.'/xml'), prepend: true);
+        $loader->load('extensions/services1.xml');
+
+        $expected = [
+            ['foo' => 'ping'],
+            ['foo' => 'bar'],
+        ];
+        $this->assertSame($expected, $container->getExtensionConfig('http://www.example.com/schema/project'));
     }
 
     public function testExtensionInPhar()
@@ -624,7 +638,7 @@ class XmlFileLoaderTest extends TestCase
             $this->fail('->load() throws an InvalidArgumentException if the configuration does not validate the XSD');
         } catch (\Exception $e) {
             $this->assertInstanceOf(InvalidArgumentException::class, $e, '->load() throws an InvalidArgumentException if the configuration does not validate the XSD');
-            $this->assertMatchesRegularExpression(sprintf('#^Unable to parse file ".+%s": .+.$#', 'services7.xml'), $e->getMessage(), '->load() throws an InvalidArgumentException if the configuration does not validate the XSD');
+            $this->assertMatchesRegularExpression(\sprintf('#^Unable to parse file ".+%s": .+.$#', 'services7.xml'), $e->getMessage(), '->load() throws an InvalidArgumentException if the configuration does not validate the XSD');
 
             $e = $e->getPrevious();
             $this->assertInstanceOf(\InvalidArgumentException::class, $e, '->load() throws an InvalidArgumentException if the configuration does not validate the XSD');
@@ -675,7 +689,7 @@ class XmlFileLoaderTest extends TestCase
             $this->fail('->load() throws an InvalidArgumentException if the configuration contains a document type');
         } catch (\Exception $e) {
             $this->assertInstanceOf(InvalidArgumentException::class, $e, '->load() throws an InvalidArgumentException if the configuration contains a document type');
-            $this->assertMatchesRegularExpression(sprintf('#^Unable to parse file ".+%s": .+.$#', 'withdoctype.xml'), $e->getMessage(), '->load() throws an InvalidArgumentException if the configuration contains a document type');
+            $this->assertMatchesRegularExpression(\sprintf('#^Unable to parse file ".+%s": .+.$#', 'withdoctype.xml'), $e->getMessage(), '->load() throws an InvalidArgumentException if the configuration contains a document type');
 
             $e = $e->getPrevious();
             $this->assertInstanceOf(\InvalidArgumentException::class, $e, '->load() throws an InvalidArgumentException if the configuration contains a document type');
@@ -765,7 +779,7 @@ class XmlFileLoaderTest extends TestCase
 
         $ids = array_keys(array_filter($container->getDefinitions(), fn ($def) => !$def->hasTag('container.excluded')));
         sort($ids);
-        $this->assertSame([Prototype\Foo::class, Prototype\Sub\Bar::class, 'service_container'], $ids);
+        $this->assertSame([Prototype\Foo::class, Prototype\NotFoo::class, Prototype\Sub\Bar::class, 'service_container'], $ids);
 
         $resources = array_map('strval', $container->getResources());
 
@@ -781,6 +795,7 @@ class XmlFileLoaderTest extends TestCase
             [
                 str_replace(\DIRECTORY_SEPARATOR, '/', $prototypeRealPath.\DIRECTORY_SEPARATOR.'OtherDir') => true,
                 str_replace(\DIRECTORY_SEPARATOR, '/', $prototypeRealPath.\DIRECTORY_SEPARATOR.'BadClasses') => true,
+                str_replace(\DIRECTORY_SEPARATOR, '/', $prototypeRealPath.\DIRECTORY_SEPARATOR.'BadAttributes') => true,
                 str_replace(\DIRECTORY_SEPARATOR, '/', $prototypeRealPath.\DIRECTORY_SEPARATOR.'SinglyImplementedInterface') => true,
                 str_replace(\DIRECTORY_SEPARATOR, '/', $prototypeRealPath.\DIRECTORY_SEPARATOR.'StaticConstructor') => true,
             ]
@@ -801,7 +816,7 @@ class XmlFileLoaderTest extends TestCase
 
         $ids = array_keys(array_filter($container->getDefinitions(), fn ($def) => !$def->hasTag('container.excluded')));
         sort($ids);
-        $this->assertSame([Prototype\Foo::class, Prototype\Sub\Bar::class, 'service_container'], $ids);
+        $this->assertSame([Prototype\Foo::class, Prototype\NotFoo::class, Prototype\Sub\Bar::class, 'service_container'], $ids);
 
         $resources = array_map('strval', $container->getResources());
 
@@ -816,6 +831,7 @@ class XmlFileLoaderTest extends TestCase
             false,
             [
                 str_replace(\DIRECTORY_SEPARATOR, '/', $prototypeRealPath.\DIRECTORY_SEPARATOR.'BadClasses') => true,
+                str_replace(\DIRECTORY_SEPARATOR, '/', $prototypeRealPath.\DIRECTORY_SEPARATOR.'BadAttributes') => true,
                 str_replace(\DIRECTORY_SEPARATOR, '/', $prototypeRealPath.\DIRECTORY_SEPARATOR.'OtherDir') => true,
                 str_replace(\DIRECTORY_SEPARATOR, '/', $prototypeRealPath.\DIRECTORY_SEPARATOR.'SinglyImplementedInterface') => true,
                 str_replace(\DIRECTORY_SEPARATOR, '/', $prototypeRealPath.\DIRECTORY_SEPARATOR.'StaticConstructor') => true,
@@ -1210,14 +1226,14 @@ class XmlFileLoaderTest extends TestCase
     public static function dataForBindingsAndInnerCollections()
     {
         return [
-           ['bar1', ['item.1', 'item.2']],
-           ['bar2', ['item.1', 'item.2']],
-           ['bar3', ['item.1', 'item.2', 'item.3', 'item.4']],
-           ['bar4', ['item.1', 'item.3', 'item.4']],
-           ['bar5', ['item.1', 'item.2', ['item.3.1', 'item.3.2']]],
-           ['bar6', ['item.1', ['item.2.1', 'item.2.2'], 'item.3']],
-           ['bar7', new IteratorArgument(['item.1', 'item.2'])],
-           ['bar8', new IteratorArgument(['item.1', 'item.2', ['item.3.1', 'item.3.2']])],
+            ['bar1', ['item.1', 'item.2']],
+            ['bar2', ['item.1', 'item.2']],
+            ['bar3', ['item.1', 'item.2', 'item.3', 'item.4']],
+            ['bar4', ['item.1', 'item.3', 'item.4']],
+            ['bar5', ['item.1', 'item.2', ['item.3.1', 'item.3.2']]],
+            ['bar6', ['item.1', ['item.2.1', 'item.2.2'], 'item.3']],
+            ['bar7', new IteratorArgument(['item.1', 'item.2'])],
+            ['bar8', new IteratorArgument(['item.1', 'item.2', ['item.3.1', 'item.3.2']])],
         ];
     }
 

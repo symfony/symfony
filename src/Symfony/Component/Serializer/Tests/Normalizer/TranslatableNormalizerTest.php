@@ -56,7 +56,7 @@ class TranslatableNormalizerTest extends TestCase
 
 class TestMessage implements TranslatableInterface
 {
-    public function trans(TranslatorInterface $translator, string $locale = null): string
+    public function trans(TranslatorInterface $translator, ?string $locale = null): string
     {
         return 'key_'.($locale ?? 'null');
     }

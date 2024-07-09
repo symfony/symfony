@@ -20,8 +20,10 @@ use Symfony\Component\Cache\Adapter\RedisAdapter;
 use Symfony\Component\Cache\DependencyInjection\CachePoolPass;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\HttpKernel\CacheClearer\Psr6CacheClearer;
 
 class CachePoolPassTest extends TestCase
 {
@@ -232,5 +234,34 @@ class CachePoolPassTest extends TestCase
         $doctrineCachePool = $container->getDefinition('doctrine.result_cache_pool');
         $this->assertInstanceOf(ChildDefinition::class, $doctrineCachePool);
         $this->assertSame('cache.app', $doctrineCachePool->getParent());
+    }
+
+    public function testGlobalClearerAlias()
+    {
+        $container = new ContainerBuilder();
+        $container->setParameter('kernel.container_class', 'app');
+        $container->setParameter('kernel.project_dir', 'foo');
+
+        $container->register('cache.default_clearer', Psr6CacheClearer::class);
+
+        $container->setDefinition('cache.system_clearer', new ChildDefinition('cache.default_clearer'));
+
+        $container->setDefinition('cache.foo_bar_clearer', new ChildDefinition('cache.default_clearer'));
+        $container->setAlias('cache.global_clearer', 'cache.foo_bar_clearer');
+
+        $container->register('cache.adapter.array', ArrayAdapter::class)
+            ->setAbstract(true)
+            ->addTag('cache.pool');
+
+        $cachePool = new ChildDefinition('cache.adapter.array');
+        $cachePool->addTag('cache.pool', ['clearer' => 'cache.system_clearer']);
+        $container->setDefinition('app.cache_pool', $cachePool);
+
+        $this->cachePoolPass->process($container);
+
+        $definition = $container->getDefinition('cache.foo_bar_clearer');
+
+        $this->assertTrue($definition->hasTag('cache.pool.clearer'));
+        $this->assertEquals(['app.cache_pool' => new Reference('app.cache_pool', ContainerInterface::IGNORE_ON_UNINITIALIZED_REFERENCE)], $definition->getArgument(0));
     }
 }

@@ -24,11 +24,9 @@ use Symfony\Component\Notifier\Notifier;
  */
 class SendFailedMessageToNotifierListener implements EventSubscriberInterface
 {
-    private Notifier $notifier;
-
-    public function __construct(Notifier $notifier)
-    {
-        $this->notifier = $notifier;
+    public function __construct(
+        private Notifier $notifier,
+    ) {
     }
 
     public function onMessageFailed(WorkerMessageFailedEvent $event): void
@@ -44,7 +42,7 @@ class SendFailedMessageToNotifierListener implements EventSubscriberInterface
         }
         $envelope = $event->getEnvelope();
         $notification = Notification::fromThrowable($throwable)->importance(Notification::IMPORTANCE_HIGH);
-        $notification->subject(sprintf('A "%s" message has just failed: %s.', $envelope->getMessage()::class, $notification->getSubject()));
+        $notification->subject(\sprintf('A "%s" message has just failed: %s.', $envelope->getMessage()::class, $notification->getSubject()));
 
         $this->notifier->send($notification, ...$this->notifier->getAdminRecipients());
     }

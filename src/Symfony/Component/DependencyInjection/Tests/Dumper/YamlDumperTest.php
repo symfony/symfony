@@ -163,7 +163,11 @@ class YamlDumperTest extends TestCase
         $container->compile();
         $dumper = new YamlDumper($container);
 
-        $this->assertEquals(file_get_contents(self::$fixturesPath.'/yaml/services_with_enumeration.yml'), $dumper->dump());
+        if (str_starts_with(Yaml::dump(FooUnitEnum::BAR), '!php/enum')) {
+            $this->assertEquals(file_get_contents(self::$fixturesPath.'/yaml/services_with_enumeration_enum_tag.yml'), $dumper->dump());
+        } else {
+            $this->assertEquals(file_get_contents(self::$fixturesPath.'/yaml/services_with_enumeration.yml'), $dumper->dump());
+        }
     }
 
     /**

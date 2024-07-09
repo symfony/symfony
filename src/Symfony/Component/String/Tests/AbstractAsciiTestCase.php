@@ -16,6 +16,7 @@ use Symfony\Component\String\AbstractString;
 use Symfony\Component\String\ByteString;
 use Symfony\Component\String\CodePointString;
 use Symfony\Component\String\Exception\InvalidArgumentException;
+use Symfony\Component\String\TruncateMode;
 use Symfony\Component\String\UnicodeString;
 
 abstract class AbstractAsciiTestCase extends TestCase
@@ -46,7 +47,7 @@ abstract class AbstractAsciiTestCase extends TestCase
     /**
      * @dataProvider provideBytesAt
      */
-    public function testBytesAt(array $expected, string $string, int $offset, int $form = null)
+    public function testBytesAt(array $expected, string $string, int $offset, ?int $form = null)
     {
         if (2 !== grapheme_strlen('च्छे') && 'नमस्ते' === $string) {
             $this->markTestSkipped('Skipping due to issue ICU-21661.');
@@ -319,7 +320,7 @@ abstract class AbstractAsciiTestCase extends TestCase
     /**
      * @dataProvider provideSplit
      */
-    public function testSplit(string $string, string $delimiter, array $chunks, ?int $limit, int $flags = null)
+    public function testSplit(string $string, string $delimiter, array $chunks, ?int $limit, ?int $flags = null)
     {
         $this->assertEquals($chunks, static::createFromString($string)->split($delimiter, $limit, $flags));
     }
@@ -595,7 +596,7 @@ abstract class AbstractAsciiTestCase extends TestCase
     /**
      * @dataProvider provideSlice
      */
-    public function testSlice(string $expected, string $origin, int $start, int $length = null)
+    public function testSlice(string $expected, string $origin, int $start, ?int $length = null)
     {
         $this->assertEquals(
             static::createFromString($expected),
@@ -623,7 +624,7 @@ abstract class AbstractAsciiTestCase extends TestCase
     /**
      * @dataProvider provideSplice
      */
-    public function testSplice(string $expected, int $start, int $length = null)
+    public function testSplice(string $expected, int $start, ?int $length = null)
     {
         $this->assertEquals(
             static::createFromString($expected),
@@ -1044,6 +1045,7 @@ abstract class AbstractAsciiTestCase extends TestCase
             ['symfonyIsGreat', 'symfony_is_great'],
             ['symfony5IsGreat', 'symfony_5_is_great'],
             ['symfonyIsGreat', 'Symfony is great'],
+            ['SYMFONYISGREAT', 'SYMFONY_IS_GREAT'],
             ['symfonyIsAGreatFramework', 'Symfony is a great framework'],
             ['symfonyIsGREAT', '*Symfony* is GREAT!!'],
             ['SYMFONY', 'SYMFONY'],
@@ -1075,13 +1077,19 @@ abstract class AbstractAsciiTestCase extends TestCase
             ['symfony_is_great', 'symfonyIsGREAT'],
             ['symfony_is_really_great', 'symfonyIsREALLYGreat'],
             ['symfony', 'SYMFONY'],
+            ['symfonyisgreat', 'SYMFONY IS GREAT'],
+            ['symfonyisgreat', 'SYMFONY_IS_GREAT'],
+            ['symfony_is_great', 'symfony    is     great'],
+            ['symfonyisgreat', 'SYMFONY    IS     GREAT'],
+            ['symfonyisgreat', 'SYMFONY _ IS _ GREAT'],
+            ['symfony_isgreat', 'Symfony IS GREAT!'],
         ];
     }
 
     /**
      * @dataProvider provideStartsWith
      */
-    public function testStartsWith(bool $expected, string $origin, $prefix, int $form = null)
+    public function testStartsWith(bool $expected, string $origin, $prefix, ?int $form = null)
     {
         $instance = static::createFromString($origin);
         $instance = $form ? $instance->normalize($form) : $instance;
@@ -1135,7 +1143,7 @@ abstract class AbstractAsciiTestCase extends TestCase
     /**
      * @dataProvider provideEndsWith
      */
-    public function testEndsWith(bool $expected, string $origin, $suffix, int $form = null)
+    public function testEndsWith(bool $expected, string $origin, $suffix, ?int $form = null)
     {
         $instance = static::createFromString($origin);
         $instance = $form ? $instance->normalize($form) : $instance;
@@ -1498,22 +1506,24 @@ abstract class AbstractAsciiTestCase extends TestCase
     /**
      * @dataProvider provideTruncate
      */
-    public function testTruncate(string $expected, string $origin, int $length, string $ellipsis, bool $cut = true)
+    public function testTruncate(string $expected, string $origin, int $length, string $ellipsis, bool|TruncateMode $cut = TruncateMode::Char)
     {
         $instance = static::createFromString($origin)->truncate($length, $ellipsis, $cut);
 
         $this->assertEquals(static::createFromString($expected), $instance);
     }
 
-    public static function provideTruncate()
+    public static function provideTruncate(): array
     {
         return [
             ['', '', 3, ''],
             ['', 'foo', 0, '...'],
             ['foo', 'foo', 0, '...', false],
+            ['foo', 'foo', 0, '...', TruncateMode::WordAfter],
             ['fo', 'foobar', 2, ''],
             ['foobar', 'foobar', 10, ''],
             ['foobar', 'foobar', 10, '...', false],
+            ['foobar', 'foobar', 10, '...', TruncateMode::WordAfter],
             ['foo', 'foo', 3, '...'],
             ['fo', 'foobar', 2, '...'],
             ['...', 'foobar', 3, '...'],
@@ -1522,6 +1532,14 @@ abstract class AbstractAsciiTestCase extends TestCase
             ['foobar...', 'foobar foo', 7, '...', false],
             ['foobar foo...', 'foobar foo a', 10, '...', false],
             ['foobar foo aar', 'foobar foo aar', 12, '...', false],
+            ['foobar...', 'foobar foo', 6, '...', TruncateMode::WordAfter],
+            ['foobar...', 'foobar foo', 7, '...', TruncateMode::WordAfter],
+            ['foobar foo...', 'foobar foo a', 10, '...', TruncateMode::WordAfter],
+            ['foobar foo aar', 'foobar foo aar', 12, '...', TruncateMode::WordAfter],
+            ['foobar foo', 'foobar foo aar', 10, '', TruncateMode::WordBefore],
+            ['foobar...', 'foobar foo aar', 10, '...', TruncateMode::WordBefore],
+            ['Lorem ipsum', 'Lorem ipsum dolor sit amet', 14, '', TruncateMode::WordBefore],
+            ['Lorem...', 'Lorem ipsum dolor sit amet', 10, '...', TruncateMode::WordBefore],
         ];
     }
 

@@ -26,7 +26,7 @@ class TextareaFormField extends FormField
     protected function initialize(): void
     {
         if ('textarea' !== $this->node->nodeName) {
-            throw new \LogicException(sprintf('A TextareaFormField can only be created from a textarea tag (%s given).', $this->node->nodeName));
+            throw new \LogicException(\sprintf('A TextareaFormField can only be created from a textarea tag (%s given).', $this->node->nodeName));
         }
 
         $this->value = '';

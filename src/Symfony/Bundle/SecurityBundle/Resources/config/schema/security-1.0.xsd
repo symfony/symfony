@@ -112,7 +112,6 @@
 
     <xsd:complexType name="user">
         <xsd:attribute name="identifier" type="xsd:string" />
-        <xsd:attribute name="name" type="xsd:string" />
         <xsd:attribute name="password" type="xsd:string" />
         <xsd:attribute name="roles" type="xsd:string" />
     </xsd:complexType>
@@ -206,6 +205,7 @@
         <xsd:attribute name="check-path" type="xsd:string" />
         <xsd:attribute name="use-forward" type="xsd:boolean" />
         <xsd:attribute name="require-previous-session" type="xsd:boolean" />
+        <xsd:attribute name="provider" type="xsd:string" />
     </xsd:complexType>
 
     <xsd:attributeGroup name="success-handler-options">
@@ -377,6 +377,7 @@
         <xsd:attribute name="catch-exceptions" type="xsd:boolean" />
         <xsd:attribute name="secure" type="remember_me_secure" />
         <xsd:attribute name="samesite" type="remember_me_samesite" />
+        <xsd:attribute name="partitioned" type="xsd:boolean" />
     </xsd:complexType>
 
     <xsd:complexType name="remember_me_token_provider">

@@ -22,11 +22,10 @@ class DebugProcessor implements DebugLoggerInterface, ResetInterface
 {
     private array $records = [];
     private array $errorCount = [];
-    private ?RequestStack $requestStack;
 
-    public function __construct(RequestStack $requestStack = null)
-    {
-        $this->requestStack = $requestStack;
+    public function __construct(
+        private ?RequestStack $requestStack = null,
+    ) {
     }
 
     public function __invoke(LogRecord $record): LogRecord
@@ -54,7 +53,7 @@ class DebugProcessor implements DebugLoggerInterface, ResetInterface
         return $record;
     }
 
-    public function getLogs(Request $request = null): array
+    public function getLogs(?Request $request = null): array
     {
         if (null !== $request) {
             return $this->records[spl_object_id($request)] ?? [];
@@ -67,7 +66,7 @@ class DebugProcessor implements DebugLoggerInterface, ResetInterface
         return array_merge(...array_values($this->records));
     }
 
-    public function countErrors(Request $request = null): int
+    public function countErrors(?Request $request = null): int
     {
         if (null !== $request) {
             return $this->errorCount[spl_object_id($request)] ?? 0;

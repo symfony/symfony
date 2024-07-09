@@ -22,6 +22,8 @@ final class SlackSectionBlockTest extends TestCase
         $section = new SlackSectionBlock();
         $section->text('section text');
         $section->field('section field');
+        $section->field('section field with verbatim', true, true, false);
+        $section->field('section field in plain text with verbatim', false, true, true);
         $section->accessory(new SlackImageBlockElement('https://example.com/image.jpg', 'an image'));
 
         $this->assertSame([
@@ -29,11 +31,23 @@ final class SlackSectionBlockTest extends TestCase
             'text' => [
                 'type' => 'mrkdwn',
                 'text' => 'section text',
+                'verbatim' => false,
             ],
             'fields' => [
                 [
                     'type' => 'mrkdwn',
                     'text' => 'section field',
+                    'verbatim' => false,
+                ],
+                [
+                    'type' => 'mrkdwn',
+                    'text' => 'section field with verbatim',
+                    'verbatim' => false,
+                ],
+                [
+                    'type' => 'plain_text',
+                    'text' => 'section field in plain text with verbatim',
+                    'emoji' => true,
                 ],
             ],
             'accessory' => [

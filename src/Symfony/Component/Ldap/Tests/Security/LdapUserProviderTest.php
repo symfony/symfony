@@ -123,8 +123,8 @@ class LdapUserProviderTest extends TestCase
             ->method('offsetGet')
             ->with(0)
             ->willReturn(new Entry('foo', [
-                    'sAMAccountName' => ['foo'],
-                    'userpassword' => ['bar', 'baz'],
+                'sAMAccountName' => ['foo'],
+                'userpassword' => ['bar', 'baz'],
             ]))
         ;
         $result
@@ -308,9 +308,9 @@ class LdapUserProviderTest extends TestCase
             ->method('offsetGet')
             ->with(0)
             ->willReturn(new Entry('foo', [
-                    'sAMAccountName' => ['foo'],
-                    'userpassword' => ['bar'],
-                    'email' => ['elsa@symfony.com'],
+                'sAMAccountName' => ['foo'],
+                'userpassword' => ['bar'],
+                'email' => ['elsa@symfony.com'],
             ]))
         ;
         $result

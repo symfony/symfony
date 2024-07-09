@@ -19,7 +19,7 @@
         "php": ">=8.2",
         "psr/container": "^1.1|^2.0",
         "symfony/deprecation-contracts": "^2.5|^3",
-        "symfony/service-contracts": "^3.3",
+        "symfony/service-contracts": "^3.5",
         "symfony/var-exporter": "^6.4|^7.0"
     },
     "require-dev": {

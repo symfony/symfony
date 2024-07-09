@@ -50,7 +50,7 @@ abstract class AbstractExtension implements FormExtensionInterface
         }
 
         if (!isset($this->types[$name])) {
-            throw new InvalidArgumentException(sprintf('The type "%s" cannot be loaded by this extension.', $name));
+            throw new InvalidArgumentException(\sprintf('The type "%s" cannot be loaded by this extension.', $name));
         }
 
         return $this->types[$name];

@@ -42,10 +42,9 @@ class ArgsStub extends EnumStub
             $params[] = $variadic;
         }
         if (['...'] === $params) {
-            $this->dumpKeys = false;
-            $this->value = $values[0]->value;
+            parent::__construct($values[0]->value, false);
         } else {
-            $this->value = array_combine($params, $values);
+            parent::__construct(array_combine($params, $values));
         }
     }
 

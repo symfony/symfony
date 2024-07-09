@@ -21,7 +21,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 final class OrangeSmsTransportTest extends TransportTestCase
 {
-    public static function createTransport(HttpClientInterface $client = null): OrangeSmsTransport
+    public static function createTransport(?HttpClientInterface $client = null): OrangeSmsTransport
     {
         return (new OrangeSmsTransport('CLIENT_ID', 'CLIENT_SECRET', 'FROM', 'SENDER_NAME', $client ?? new MockHttpClient()))->setHost('host.test');
     }

@@ -28,22 +28,19 @@ final class FortySixElksTransport extends AbstractTransport
 {
     protected const HOST = 'api.46elks.com';
 
-    private string $apiUsername;
-    private string $apiPassword;
-    private string $from;
-
-    public function __construct(string $apiUsername, #[\SensitiveParameter] string $apiPassword, string $from, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
-    {
-        $this->apiUsername = $apiUsername;
-        $this->apiPassword = $apiPassword;
-        $this->from = $from;
-
+    public function __construct(
+        private string $apiUsername,
+        #[\SensitiveParameter] private string $apiPassword,
+        private string $from,
+        ?HttpClientInterface $client = null,
+        ?EventDispatcherInterface $dispatcher = null,
+    ) {
         parent::__construct($client, $dispatcher);
     }
 
     public function __toString(): string
     {
-        return sprintf('forty-six-elks://%s?from=%s', $this->getEndpoint(), $this->from);
+        return \sprintf('forty-six-elks://%s?from=%s', $this->getEndpoint(), $this->from);
     }
 
     public function supports(MessageInterface $message): bool
@@ -62,7 +59,7 @@ final class FortySixElksTransport extends AbstractTransport
         $options['to'] = $message->getPhone();
         $options['message'] = $message->getSubject();
 
-        $endpoint = sprintf('https://%s/a1/sms', $this->getEndpoint());
+        $endpoint = \sprintf('https://%s/a1/sms', $this->getEndpoint());
         $response = $this->client->request('POST', $endpoint, [
             'auth_basic' => [$this->apiUsername, $this->apiPassword],
             'body' => array_filter($options),

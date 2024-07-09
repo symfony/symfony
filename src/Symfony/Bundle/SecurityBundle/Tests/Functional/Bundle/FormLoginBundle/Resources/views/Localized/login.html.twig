@@ -8,14 +8,14 @@
 
     <form action="{{ path('localized_check_path') }}" method="post">
         <label for="username">Username:</label>
-        <input type="text" id="username" name="_username" value="{{ last_username }}">
+        <input type="text" id="username" name="_username" value="{{ last_username }}" />
 
         <label for="password">Password:</label>
-        <input type="password" id="password" name="_password">
+        <input type="password" id="password" name="_password" />
 
-        <input type="hidden" name="_target_path" value="">
+        <input type="hidden" name="_target_path" value="" />
 
-        <input type="submit" name="login">
+        <input type="submit" name="login" />
     </form>
 
 {% endblock %}

@@ -15,6 +15,7 @@ use Symfony\Component\Validator\Constraints\Charset;
 use Symfony\Component\Validator\Constraints\CharsetValidator;
 use Symfony\Component\Validator\Exception\UnexpectedValueException;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
+use Symfony\Component\Validator\Tests\Constraints\Fixtures\StringableValue;
 
 class CharsetValidatorTest extends ConstraintValidatorTestCase
 {
@@ -26,7 +27,7 @@ class CharsetValidatorTest extends ConstraintValidatorTestCase
     /**
      * @dataProvider provideValidValues
      */
-    public function testEncodingIsValid(string|\Stringable $value, array $encodings)
+    public function testEncodingIsValid(string|\Stringable $value, array|string $encodings)
     {
         $this->validator->validate($value, new Charset(encodings: $encodings));
 
@@ -36,13 +37,13 @@ class CharsetValidatorTest extends ConstraintValidatorTestCase
     /**
      * @dataProvider provideInvalidValues
      */
-    public function testInvalidValues(string $value, array $encodings)
+    public function testInvalidValues(string $value, array|string $encodings)
     {
         $this->validator->validate($value, new Charset(encodings: $encodings));
 
         $this->buildViolation('The detected character encoding is invalid ({{ detected }}). Allowed encodings are {{ encodings }}.')
-            ->setParameter('{{ detected }}', mb_detect_encoding($value, $encodings, true))
-            ->setParameter('{{ encodings }}', implode(', ', $encodings))
+            ->setParameter('{{ detected }}', 'UTF-8')
+            ->setParameter('{{ encodings }}', implode(', ', (array) $encodings))
             ->setCode(Charset::BAD_ENCODING_ERROR)
             ->assertRaised();
     }
@@ -62,20 +63,17 @@ class CharsetValidatorTest extends ConstraintValidatorTestCase
     {
         yield ['my ascii string', ['ASCII']];
         yield ['my ascii string', ['UTF-8']];
+        yield ['my ascii string', 'UTF-8'];
         yield ['my ascii string', ['ASCII', 'UTF-8']];
         yield ['my ûtf 8', ['ASCII', 'UTF-8']];
         yield ['my ûtf 8', ['UTF-8']];
         yield ['string', ['ISO-8859-1']];
-        yield [new class() implements \Stringable {
-            public function __toString(): string
-            {
-                return 'my ûtf 8';
-            }
-        }, ['UTF-8']];
+        yield [new StringableValue('my ûtf 8'), ['UTF-8']];
     }
 
     public static function provideInvalidValues()
     {
+        yield ['my non-Äscîi string', 'ASCII'];
         yield ['my non-Äscîi string', ['ASCII']];
         yield ['😊', ['7bit']];
     }

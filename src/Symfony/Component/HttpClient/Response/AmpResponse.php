@@ -45,7 +45,6 @@ final class AmpResponse implements ResponseInterface, StreamableInterface
 
     private static string $nextId = 'a';
 
-    private AmpClientState $multi;
     private ?array $options;
     private \Closure $onProgress;
 
@@ -54,9 +53,12 @@ final class AmpResponse implements ResponseInterface, StreamableInterface
     /**
      * @internal
      */
-    public function __construct(AmpClientState $multi, Request $request, array $options, ?LoggerInterface $logger)
-    {
-        $this->multi = $multi;
+    public function __construct(
+        private AmpClientState $multi,
+        Request $request,
+        array $options,
+        ?LoggerInterface $logger,
+    ) {
         $this->options = &$options;
         $this->logger = $logger;
         $this->timeout = $options['timeout'];
@@ -134,7 +136,7 @@ final class AmpResponse implements ResponseInterface, StreamableInterface
         });
     }
 
-    public function getInfo(string $type = null): mixed
+    public function getInfo(?string $type = null): mixed
     {
         return null !== $type ? $this->info[$type] ?? null : $this->info;
     }
@@ -179,7 +181,7 @@ final class AmpResponse implements ResponseInterface, StreamableInterface
     /**
      * @param AmpClientState $multi
      */
-    private static function perform(ClientState $multi, array &$responses = null): void
+    private static function perform(ClientState $multi, ?array &$responses = null): void
     {
         if ($responses) {
             foreach ($responses as $response) {
@@ -226,7 +228,7 @@ final class AmpResponse implements ResponseInterface, StreamableInterface
         try {
             /* @var Response $response */
             if (null === $response = yield from self::getPushedResponse($request, $multi, $info, $headers, $options, $logger)) {
-                $logger?->info(sprintf('Request: "%s %s"', $info['http_method'], $info['url']));
+                $logger?->info(\sprintf('Request: "%s %s"', $info['http_method'], $info['url']));
 
                 $response = yield from self::followRedirects($request, $multi, $info, $headers, $canceller, $options, $onProgress, $handle, $logger, $pause);
             }
@@ -310,7 +312,7 @@ final class AmpResponse implements ResponseInterface, StreamableInterface
                 return $response;
             }
 
-            $logger?->info(sprintf('Redirecting: "%s %s"', $status, $info['url']));
+            $logger?->info(\sprintf('Redirecting: "%s %s"', $status, $info['url']));
 
             try {
                 // Discard body of redirects
@@ -371,7 +373,7 @@ final class AmpResponse implements ResponseInterface, StreamableInterface
             $headers = [];
         }
 
-        $h = sprintf('HTTP/%s %s %s', $response->getProtocolVersion(), $response->getStatus(), $response->getReason());
+        $h = \sprintf('HTTP/%s %s %s', $response->getProtocolVersion(), $response->getStatus(), $response->getReason());
         $info['debug'] .= "< {$h}\r\n";
         $info['response_headers'][] = $h;
 
@@ -418,14 +420,14 @@ final class AmpResponse implements ResponseInterface, StreamableInterface
             foreach ($response->getHeaderArray('vary') as $vary) {
                 foreach (preg_split('/\s*+,\s*+/', $vary) as $v) {
                     if ('*' === $v || ($pushedRequest->getHeaderArray($v) !== $request->getHeaderArray($v) && 'accept-encoding' !== strtolower($v))) {
-                        $logger?->debug(sprintf('Skipping pushed response: "%s"', $info['url']));
+                        $logger?->debug(\sprintf('Skipping pushed response: "%s"', $info['url']));
                         continue 3;
                     }
                 }
             }
 
             $pushDeferred->resolve();
-            $logger?->debug(sprintf('Accepting pushed response: "%s %s"', $info['http_method'], $info['url']));
+            $logger?->debug(\sprintf('Accepting pushed response: "%s %s"', $info['http_method'], $info['url']));
             self::addResponseHeaders($response, $info, $headers);
             unset($multi->pushedResponses[$authority][$i]);
 

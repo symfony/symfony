@@ -28,7 +28,7 @@ class RouterDataCollector extends BaseRouterDataCollector
             $controller = $controller[0];
         }
 
-        if ($controller instanceof RedirectController) {
+        if ($controller instanceof RedirectController && $request->attributes->has('_route')) {
             return $request->attributes->get('_route');
         }
 

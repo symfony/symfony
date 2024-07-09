@@ -28,14 +28,12 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class ViolationMapper implements ViolationMapperInterface
 {
-    private ?FormRendererInterface $formRenderer;
-    private ?TranslatorInterface $translator;
     private bool $allowNonSynchronized = false;
 
-    public function __construct(FormRendererInterface $formRenderer = null, TranslatorInterface $translator = null)
-    {
-        $this->formRenderer = $formRenderer;
-        $this->translator = $translator;
+    public function __construct(
+        private ?FormRendererInterface $formRenderer = null,
+        private ?TranslatorInterface $translator = null,
+    ) {
     }
 
     public function mapViolation(ConstraintViolation $violation, FormInterface $form, bool $allowNonSynchronized = false): void

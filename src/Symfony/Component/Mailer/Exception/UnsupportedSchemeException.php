@@ -20,6 +20,10 @@ use Symfony\Component\Mailer\Transport\Dsn;
 class UnsupportedSchemeException extends LogicException
 {
     private const SCHEME_TO_PACKAGE_MAP = [
+        'azure' => [
+            'class' => Bridge\Azure\Transport\AzureTransportFactory::class,
+            'package' => 'symfony/azure-mailer',
+        ],
         'brevo' => [
             'class' => Bridge\Brevo\Transport\BrevoTransportFactory::class,
             'package' => 'symfony/brevo-mailer',
@@ -44,6 +48,10 @@ class UnsupportedSchemeException extends LogicException
             'class' => Bridge\Mailjet\Transport\MailjetTransportFactory::class,
             'package' => 'symfony/mailjet-mailer',
         ],
+        'mailomat' => [
+            'class' => Bridge\Mailomat\Transport\MailomatTransportFactory::class,
+            'package' => 'symfony/mailomat-mailer',
+        ],
         'mailpace' => [
             'class' => Bridge\MailPace\Transport\MailPaceTransportFactory::class,
             'package' => 'symfony/mail-pace-mailer',
@@ -55,6 +63,10 @@ class UnsupportedSchemeException extends LogicException
         'postmark' => [
             'class' => Bridge\Postmark\Transport\PostmarkTransportFactory::class,
             'package' => 'symfony/postmark-mailer',
+        ],
+        'resend' => [
+            'class' => Bridge\Resend\Transport\ResendTransportFactory::class,
+            'package' => 'symfony/resend-mailer',
         ],
         'scaleway' => [
             'class' => Bridge\Scaleway\Transport\ScalewayTransportFactory::class,
@@ -70,7 +82,7 @@ class UnsupportedSchemeException extends LogicException
         ],
     ];
 
-    public function __construct(Dsn $dsn, string $name = null, array $supported = [])
+    public function __construct(Dsn $dsn, ?string $name = null, array $supported = [])
     {
         $provider = $dsn->getScheme();
         if (false !== $pos = strpos($provider, '+')) {
@@ -78,14 +90,14 @@ class UnsupportedSchemeException extends LogicException
         }
         $package = self::SCHEME_TO_PACKAGE_MAP[$provider] ?? null;
         if ($package && !class_exists($package['class'])) {
-            parent::__construct(sprintf('Unable to send emails via "%s" as the bridge is not installed. Try running "composer require %s".', $provider, $package['package']));
+            parent::__construct(\sprintf('Unable to send emails via "%s" as the bridge is not installed. Try running "composer require %s".', $provider, $package['package']));
 
             return;
         }
 
-        $message = sprintf('The "%s" scheme is not supported', $dsn->getScheme());
+        $message = \sprintf('The "%s" scheme is not supported', $dsn->getScheme());
         if ($name && $supported) {
-            $message .= sprintf('; supported schemes for mailer "%s" are: "%s"', $name, implode('", "', $supported));
+            $message .= \sprintf('; supported schemes for mailer "%s" are: "%s"', $name, implode('", "', $supported));
         }
 
         parent::__construct($message.'.');

@@ -23,7 +23,7 @@ trait WrappedExceptionsTrait
     /**
      * @return \Throwable[]
      */
-    public function getWrappedExceptions(string $class = null, bool $recursive = false): array
+    public function getWrappedExceptions(?string $class = null, bool $recursive = false): array
     {
         return $this->getWrappedExceptionsRecursively($class, $recursive, $this->exceptions);
     }

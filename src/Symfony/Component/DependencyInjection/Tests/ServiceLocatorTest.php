@@ -101,6 +101,17 @@ class ServiceLocatorTest extends ServiceLocatorTestCase
             'baz' => '?string',
         ]);
     }
+
+    public function testIsCountableAndIterable()
+    {
+        $locator = $this->getServiceLocator([
+            'foo' => fn () => 'bar',
+            'bar' => fn () => 'baz',
+        ]);
+
+        $this->assertCount(2, $locator);
+        $this->assertSame(['foo' => 'bar', 'bar' => 'baz'], iterator_to_array($locator));
+    }
 }
 
 class SomeServiceSubscriber implements ServiceSubscriberInterface

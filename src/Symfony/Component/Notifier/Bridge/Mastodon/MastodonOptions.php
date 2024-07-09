@@ -49,7 +49,7 @@ final class MastodonOptions implements MessageOptionsInterface
     /**
      * @return $this
      */
-    public function attachMedia(File $file, File $thumbnail = null, string $description = null, string $focus = null): static
+    public function attachMedia(File $file, ?File $thumbnail = null, ?string $description = null, ?string $focus = null): static
     {
         $this->options['attach'][] = [
             'file' => $file,

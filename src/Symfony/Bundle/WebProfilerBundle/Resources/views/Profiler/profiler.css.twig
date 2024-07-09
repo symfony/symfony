@@ -614,6 +614,29 @@ table tbody td.num-col {
     text-align: center;
 }
 
+div.table-with-search-field {
+    position: relative;
+}
+div.table-with-search-field label.table-search-field-label {
+    display: none;
+}
+div.table-with-search-field input.table-search-field-input {
+    position: absolute;
+    right: 5px;
+    top: 5px;
+    max-height: 27px; /* needed for Safari */
+}
+div.table-with-search-field .no-results-message {
+    background: var(--page-background);
+    border: solid var(--table-border-color);
+    border-width: 0 1px 1px;
+    border-bottom-left-radius: 6px;
+    border-bottom-right-radius: 6px;
+    font-size: var(--table-font-size);
+    margin-top: -1em;
+    padding: 15px 10px;
+}
+
 {# Utility classes
    ========================================================================= #}
 .block {
@@ -641,6 +664,7 @@ table tbody td.num-col {
     -webkit-hyphens: auto;
     -moz-hyphens: auto;
     hyphens: auto;
+    hyphenate-character: '';
 }
 .text-small {
     font-size: 12px !important;
@@ -1393,7 +1417,7 @@ tr.status-warning td {
    ------------------------------------------------------------------------- #}
 #sidebar #sidebar-shortcuts {
     color: var(--gray-500);
-    padding: 10px 15px;
+    padding: 5px 8px;
 }
 #sidebar #sidebar-shortcuts .sf-tabs .tab-navigation {
     margin: 5px 0 15px;
@@ -1408,14 +1432,20 @@ tr.status-warning td {
     display: flex;
     align-items: center;
     font-size: 13px;
+    padding: 5px 7px;
 }
-#sidebar #sidebar-shortcuts:hover .btn-link {
-    color: var(--menu-color);
+#sidebar #sidebar-shortcuts .btn-link:hover {
+    background: var(--menu-active-background);
+    color: var(--menu-active-color);
+    text-decoration: none;
 }
 #sidebar-shortcuts .shortcuts svg {
     height: 16px;
     width: 16px;
     margin-right: 4px;
+}
+#sidebar #sidebar-shortcuts form {
+    padding: 5px 7px;
 }
 
 {# Sidebar Search (the colors of this element don't change based on the selected theme)
@@ -1469,10 +1499,15 @@ tr.status-warning td {
     list-style-type: none;
     margin: 0;
     padding: 7px;
+    display: flex;
+    flex-direction: column;
 }
 #menu-profiler li {
     margin-bottom: 0;
     position: relative;
+}
+#menu-profiler li:has(span.disabled) {
+    order: 1;
 }
 #menu-profiler li + li {
     margin-top: 4px;

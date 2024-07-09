@@ -44,7 +44,7 @@ class ConsoleSectionOutputTest extends TestCase
         $output->clear();
 
         rewind($output->getStream());
-        $this->assertEquals('Foo'.\PHP_EOL.'Bar'.\PHP_EOL.sprintf("\x1b[%dA", 2)."\x1b[0J", stream_get_contents($output->getStream()));
+        $this->assertEquals('Foo'.\PHP_EOL.'Bar'.\PHP_EOL.\sprintf("\x1b[%dA", 2)."\x1b[0J", stream_get_contents($output->getStream()));
     }
 
     public function testClearNumberOfLines()
@@ -56,7 +56,7 @@ class ConsoleSectionOutputTest extends TestCase
         $output->clear(2);
 
         rewind($output->getStream());
-        $this->assertEquals("Foo\nBar\nBaz\nFooBar".\PHP_EOL.sprintf("\x1b[%dA", 2)."\x1b[0J", stream_get_contents($output->getStream()));
+        $this->assertEquals("Foo\nBar\nBaz\nFooBar".\PHP_EOL.\sprintf("\x1b[%dA", 2)."\x1b[0J", stream_get_contents($output->getStream()));
     }
 
     public function testClearNumberOfLinesWithMultipleSections()
@@ -197,7 +197,7 @@ class ConsoleSectionOutputTest extends TestCase
         $output->overwrite('Bar');
 
         rewind($output->getStream());
-        $this->assertEquals('Foo'.\PHP_EOL.'Bar'.\PHP_EOL.'Baz'.\PHP_EOL.sprintf("\x1b[%dA", 3)."\x1b[0J".'Bar'.\PHP_EOL, stream_get_contents($output->getStream()));
+        $this->assertEquals('Foo'.\PHP_EOL.'Bar'.\PHP_EOL.'Baz'.\PHP_EOL.\sprintf("\x1b[%dA", 3)."\x1b[0J".'Bar'.\PHP_EOL, stream_get_contents($output->getStream()));
     }
 
     public function testAddingMultipleSections()

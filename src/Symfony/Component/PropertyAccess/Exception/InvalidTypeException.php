@@ -22,10 +22,10 @@ class InvalidTypeException extends InvalidArgumentException
         public readonly string $expectedType,
         public readonly string $actualType,
         public readonly string $propertyPath,
-        \Throwable $previous = null,
+        ?\Throwable $previous = null,
     ) {
         parent::__construct(
-            sprintf('Expected argument of type "%s", "%s" given at property path "%s".', $expectedType, 'NULL' === $actualType ? 'null' : $actualType, $propertyPath),
+            \sprintf('Expected argument of type "%s", "%s" given at property path "%s".', $expectedType, 'NULL' === $actualType ? 'null' : $actualType, $propertyPath),
             previous: $previous,
         );
     }

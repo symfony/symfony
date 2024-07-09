@@ -31,7 +31,7 @@ final class SMimeSigner extends SMime
      * @param string|null $extraCerts           The path of the file containing intermediate certificates (in PEM format) needed by the signing certificate
      * @param int|null    $signOptions          Bitwise operator options for openssl_pkcs7_sign() (@see https://secure.php.net/manual/en/openssl.pkcs7.flags.php)
      */
-    public function __construct(string $certificate, string $privateKey, string $privateKeyPassphrase = null, string $extraCerts = null, int $signOptions = null)
+    public function __construct(string $certificate, string $privateKey, ?string $privateKeyPassphrase = null, ?string $extraCerts = null, ?int $signOptions = null)
     {
         if (!\extension_loaded('openssl')) {
             throw new \LogicException('PHP extension "openssl" is required to use SMime.');
@@ -57,7 +57,7 @@ final class SMimeSigner extends SMime
         $this->iteratorToFile($message->getBody()->toIterable(), $bufferFile);
 
         if (!@openssl_pkcs7_sign(stream_get_meta_data($bufferFile)['uri'], stream_get_meta_data($outputFile)['uri'], $this->signCertificate, $this->signPrivateKey, [], $this->signOptions, $this->extraCerts)) {
-            throw new RuntimeException(sprintf('Failed to sign S/Mime message. Error: "%s".', openssl_error_string()));
+            throw new RuntimeException(\sprintf('Failed to sign S/Mime message. Error: "%s".', openssl_error_string()));
         }
 
         return new Message($message->getHeaders(), $this->convertMessageToSMimePart($outputFile, 'multipart', 'signed'));

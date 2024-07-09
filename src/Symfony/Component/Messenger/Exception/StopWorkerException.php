@@ -16,7 +16,7 @@ namespace Symfony\Component\Messenger\Exception;
  */
 class StopWorkerException extends RuntimeException implements StopWorkerExceptionInterface
 {
-    public function __construct(string $message = 'Worker should stop.', \Throwable $previous = null)
+    public function __construct(string $message = 'Worker should stop.', ?\Throwable $previous = null)
     {
         parent::__construct($message, 0, $previous);
     }

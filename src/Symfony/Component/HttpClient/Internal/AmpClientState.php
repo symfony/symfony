@@ -47,18 +47,15 @@ final class AmpClientState extends ClientState
 
     private array $clients = [];
     private \Closure $clientConfigurator;
-    private int $maxHostConnections;
-    private int $maxPendingPushes;
-    private ?LoggerInterface $logger;
 
-    public function __construct(?callable $clientConfigurator, int $maxHostConnections, int $maxPendingPushes, ?LoggerInterface &$logger)
-    {
+    public function __construct(
+        ?callable $clientConfigurator,
+        private int $maxHostConnections,
+        private int $maxPendingPushes,
+        private ?LoggerInterface &$logger,
+    ) {
         $clientConfigurator ??= static fn (PooledHttpClient $client) => new InterceptedHttpClient($client, new RetryRequests(2));
         $this->clientConfigurator = $clientConfigurator(...);
-
-        $this->maxHostConnections = $maxHostConnections;
-        $this->maxPendingPushes = $maxPendingPushes;
-        $this->logger = &$logger;
     }
 
     /**
@@ -150,7 +147,7 @@ final class AmpClientState extends ClientState
             /** @var resource|null */
             public $handle;
 
-            public function connect(string $uri, ConnectContext $context = null, CancellationToken $token = null): Promise
+            public function connect(string $uri, ?ConnectContext $context = null, ?CancellationToken $token = null): Promise
             {
                 $result = $this->connector->connect($this->uri ?? $uri, $context, $token);
                 $result->onResolve(function ($e, $socket) {
@@ -201,11 +198,11 @@ final class AmpClientState extends ClientState
         if ($this->maxPendingPushes <= \count($this->pushedResponses[$authority] ?? [])) {
             $fifoUrl = key($this->pushedResponses[$authority]);
             unset($this->pushedResponses[$authority][$fifoUrl]);
-            $this->logger?->debug(sprintf('Evicting oldest pushed response: "%s"', $fifoUrl));
+            $this->logger?->debug(\sprintf('Evicting oldest pushed response: "%s"', $fifoUrl));
         }
 
         $url = (string) $request->getUri();
-        $this->logger?->debug(sprintf('Queueing pushed response: "%s"', $url));
+        $this->logger?->debug(\sprintf('Queueing pushed response: "%s"', $url));
         $this->pushedResponses[$authority][] = [$url, $deferred, $request, $response, [
             'proxy' => $options['proxy'],
             'bindto' => $options['bindto'],

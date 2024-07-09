@@ -1,6 +1,6 @@
-<?xml version="1.0"?>
-<xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
-    <file source-language="en" datatype="plaintext" original="file.ext">
+<?xml version="1.0" encoding="utf-8"?>
+<xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
+    <file source-language="en" target-language="tl" datatype="plaintext" original="file.ext">
         <body>
             <trans-unit id="1">
                 <source>An authentication exception occurred.</source>
@@ -75,8 +75,8 @@
                 <target>Napakaraming nabigong mga pagtatangka sa pag-login, pakisubukan ulit sa% minuto% minuto.</target>
             </trans-unit>
             <trans-unit id="20">
-                <source>Too many failed login attempts, please try again in %minutes% minute.</source>
-                <target>Napakaraming nabigong mga pagtatangka sa pag-login, pakisubukan ulit sa% minuto% minuto.</target>
+                <source>Too many failed login attempts, please try again in %minutes% minutes.</source>
+                <target state="needs-review-translation">Napakaraming nabigong pagtatangka ng pag-login, mangyaring subukang muli sa loob ng %minutes% minuto.|Napakaraming nabigong pagtatangka ng pag-login, mangyaring subukang muli sa loob ng %minutes% minuto.</target>
             </trans-unit>
         </body>
     </file>

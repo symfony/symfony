@@ -40,7 +40,7 @@ class PreRunEvent
         return $this->message;
     }
 
-    public function shouldCancel(bool $shouldCancel = null): bool
+    public function shouldCancel(?bool $shouldCancel = null): bool
     {
         if (null !== $shouldCancel) {
             $this->shouldCancel = $shouldCancel;

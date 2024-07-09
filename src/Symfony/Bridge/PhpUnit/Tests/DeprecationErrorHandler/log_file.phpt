@@ -2,7 +2,7 @@
 Test DeprecationErrorHandler with log file
 --FILE--
 <?php
-$filename = tempnam(sys_get_temp_dir(), 'sf-').uniqid();
+$filename = tempnam(sys_get_temp_dir(), 'sf-');
 $k = 'SYMFONY_DEPRECATIONS_HELPER';
 putenv($k.'='.$_SERVER[$k] = $_ENV[$k] = 'logFile='.$filename);
 putenv('ANSICON');

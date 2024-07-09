@@ -175,6 +175,22 @@ class PasswordHasherFactoryTest extends TestCase
         $this->assertStringStartsWith(\SODIUM_CRYPTO_PWHASH_STRPREFIX, $hasher->hash('foo', null));
     }
 
+    public function testMissingClass()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('"class" must be set in {"arguments":[]}');
+
+        (new PasswordHasherFactory([SomeUser::class => ['arguments' => []]]))->getPasswordHasher(SomeUser::class);
+    }
+
+    public function testMissingArguments()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('"arguments" must be set in {"class":"stdClass"}');
+
+        (new PasswordHasherFactory([SomeUser::class => ['class' => \stdClass::class]]))->getPasswordHasher(SomeUser::class);
+    }
+
     public function testDefaultMigratingHashers()
     {
         $this->assertInstanceOf(

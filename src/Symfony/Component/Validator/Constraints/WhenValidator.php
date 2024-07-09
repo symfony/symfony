@@ -43,7 +43,7 @@ final class WhenValidator extends ConstraintValidator
     private function getExpressionLanguage(): ExpressionLanguage
     {
         if (!class_exists(ExpressionLanguage::class)) {
-            throw new LogicException(sprintf('The "symfony/expression-language" component is required to use the "%s" validator. Try running "composer require symfony/expression-language".', __CLASS__));
+            throw new LogicException(\sprintf('The "symfony/expression-language" component is required to use the "%s" validator. Try running "composer require symfony/expression-language".', __CLASS__));
         }
 
         return $this->expressionLanguage ??= new ExpressionLanguage();

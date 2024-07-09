@@ -51,10 +51,10 @@ class ProblemNormalizer implements NormalizerInterface, SerializerAwareInterface
         ];
     }
 
-    public function normalize(mixed $object, string $format = null, array $context = []): array
+    public function normalize(mixed $object, ?string $format = null, array $context = []): array
     {
         if (!$object instanceof FlattenException) {
-            throw new InvalidArgumentException(sprintf('The object must implement "%s".', FlattenException::class));
+            throw new InvalidArgumentException(\sprintf('The object must implement "%s".', FlattenException::class));
         }
 
         $data = [];
@@ -107,7 +107,7 @@ class ProblemNormalizer implements NormalizerInterface, SerializerAwareInterface
         return $data;
     }
 
-    public function supportsNormalization(mixed $data, string $format = null, array $context = []): bool
+    public function supportsNormalization(mixed $data, ?string $format = null, array $context = []): bool
     {
         return $data instanceof FlattenException;
     }

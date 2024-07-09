@@ -167,6 +167,11 @@ class Dummy extends ParentDummy
      */
     public $parentAnnotation;
 
+    /**
+     * @var \BackedEnum<string>
+     */
+    public $genericInterface;
+
     public static function getStatic()
     {
     }
@@ -196,7 +201,7 @@ class Dummy extends ParentDummy
      *
      * @param ParentDummy|null $parent
      */
-    public function setB(ParentDummy $parent = null)
+    public function setB(?ParentDummy $parent = null)
     {
     }
 

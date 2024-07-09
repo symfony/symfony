@@ -81,7 +81,7 @@ class ORMQueryBuilderLoader implements EntityLoaderInterface
                     try {
                         $value = $doctrineType->convertToDatabaseValue($value, $platform);
                     } catch (ConversionException $e) {
-                        throw new TransformationFailedException(sprintf('Failed to transform "%s" into "%s".', $value, $type), 0, $e);
+                        throw new TransformationFailedException(\sprintf('Failed to transform "%s" into "%s".', $value, $type), 0, $e);
                     }
                 }
                 unset($value);

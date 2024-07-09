@@ -313,8 +313,8 @@ class MockHttpClientTest extends HttpClientTestCase
         $responses = [];
 
         $headers = [
-          'Host: localhost:8057',
-          'Content-Type: application/json',
+            'Host: localhost:8057',
+            'Content-Type: application/json',
         ];
 
         $body = '{
@@ -387,9 +387,9 @@ class MockHttpClientTest extends HttpClientTestCase
                 $responses[] = new MockResponse($body, ['response_headers' => $headers]);
 
                 $headers = [
-                  'Host: localhost:8057',
-                  'Content-Length: 1000',
-                  'Content-Type: application/json',
+                    'Host: localhost:8057',
+                    'Content-Length: 1000',
+                    'Content-Type: application/json',
                 ];
 
                 $responses[] = new MockResponse($body, ['response_headers' => $headers]);
@@ -471,11 +471,21 @@ class MockHttpClientTest extends HttpClientTestCase
 
             case 'testNonBlockingStream':
             case 'testSeekAsyncStream':
-                $responses[] = new MockResponse((function () { yield '<1>'; yield ''; yield '<2>'; })(), ['response_headers' => $headers]);
+                $responses[] = new MockResponse(
+                    (function () {
+                        yield '<1>';
+                        yield '';
+                        yield '<2>';
+                    })(),
+                    ['response_headers' => $headers]
+                );
                 break;
 
             case 'testMaxDuration':
-                $responses[] = new MockResponse('', ['error' => 'Max duration was reached.']);
+                $responses[] = new MockResponse(
+                    '',
+                    ['error' => 'Max duration was reached.']
+                );
                 break;
         }
 
@@ -509,7 +519,7 @@ class MockHttpClientTest extends HttpClientTestCase
         $client = new MockHttpClient();
 
         $param = new class() {
-            public function __toString()
+            public function __toString(): string
             {
                 return 'bar';
             }

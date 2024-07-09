@@ -29,26 +29,23 @@ final class OneSignalTransport extends AbstractTransport
 {
     protected const HOST = 'onesignal.com';
 
-    private string $appId;
-    private string $apiKey;
-    private ?string $defaultRecipientId;
-
-    public function __construct(string $appId, #[\SensitiveParameter] string $apiKey, string $defaultRecipientId = null, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
-    {
-        $this->appId = $appId;
-        $this->apiKey = $apiKey;
-        $this->defaultRecipientId = $defaultRecipientId;
-
+    public function __construct(
+        private string $appId,
+        #[\SensitiveParameter] private string $apiKey,
+        private ?string $defaultRecipientId = null,
+        ?HttpClientInterface $client = null,
+        ?EventDispatcherInterface $dispatcher = null,
+    ) {
         parent::__construct($client, $dispatcher);
     }
 
     public function __toString(): string
     {
         if (null === $this->defaultRecipientId) {
-            return sprintf('onesignal://%s@%s', urlencode($this->appId), $this->getEndpoint());
+            return \sprintf('onesignal://%s@%s', urlencode($this->appId), $this->getEndpoint());
         }
 
-        return sprintf('onesignal://%s@%s?recipientId=%s', urlencode($this->appId), $this->getEndpoint(), $this->defaultRecipientId);
+        return \sprintf('onesignal://%s@%s?recipientId=%s', urlencode($this->appId), $this->getEndpoint(), $this->defaultRecipientId);
     }
 
     public function supports(MessageInterface $message): bool
@@ -72,7 +69,7 @@ final class OneSignalTransport extends AbstractTransport
         $recipientId = $message->getRecipientId() ?? $this->defaultRecipientId;
 
         if (null === $recipientId) {
-            throw new LogicException(sprintf('The "%s" transport should have configured `defaultRecipientId` via DSN or provided with message options.', __CLASS__));
+            throw new LogicException(\sprintf('The "%s" transport should have configured `defaultRecipientId` via DSN or provided with message options.', __CLASS__));
         }
 
         $options = $options?->toArray() ?? [];
@@ -104,13 +101,13 @@ final class OneSignalTransport extends AbstractTransport
         }
 
         if (200 !== $statusCode) {
-            throw new TransportException(sprintf('Unable to send the OneSignal push notification: "%s".', $response->getContent(false)), $response);
+            throw new TransportException(\sprintf('Unable to send the OneSignal push notification: "%s".', $response->getContent(false)), $response);
         }
 
         $result = $response->toArray(false);
 
         if (empty($result['id'])) {
-            throw new TransportException(sprintf('Unable to send the OneSignal push notification: "%s".', $response->getContent(false)), $response);
+            throw new TransportException(\sprintf('Unable to send the OneSignal push notification: "%s".', $response->getContent(false)), $response);
         }
 
         $sentMessage = new SentMessage($message, (string) $this);

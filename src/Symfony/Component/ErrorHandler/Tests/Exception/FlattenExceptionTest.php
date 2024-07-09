@@ -255,7 +255,7 @@ class FlattenExceptionTest extends TestCase
 
         $this->assertSame('Symfony\Component\HttpKernel\Exception\NotFoundHttpException@anonymous', $flattened->getClass());
 
-        $flattened = FlattenException::createFromThrowable(new \Exception(sprintf('Class "%s" blah.', (new class() extends \RuntimeException {
+        $flattened = FlattenException::createFromThrowable(new \Exception(\sprintf('Class "%s" blah.', (new class() extends \RuntimeException {
         })::class)));
 
         $this->assertSame('Class "RuntimeException@anonymous" blah.', $flattened->getMessage());

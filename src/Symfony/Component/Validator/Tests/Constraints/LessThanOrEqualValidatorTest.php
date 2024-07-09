@@ -28,7 +28,7 @@ class LessThanOrEqualValidatorTest extends AbstractComparisonValidatorTestCase
         return new LessThanOrEqualValidator();
     }
 
-    protected static function createConstraint(array $options = null): Constraint
+    protected static function createConstraint(?array $options = null): Constraint
     {
         return new LessThanOrEqual($options);
     }

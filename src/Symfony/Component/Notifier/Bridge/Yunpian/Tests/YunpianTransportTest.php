@@ -22,7 +22,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 final class YunpianTransportTest extends TransportTestCase
 {
-    public static function createTransport(HttpClientInterface $client = null): YunpianTransport
+    public static function createTransport(?HttpClientInterface $client = null): YunpianTransport
     {
         return new YunpianTransport('api_key', $client ?? new MockHttpClient());
     }

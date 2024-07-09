@@ -28,14 +28,17 @@ final class PagerDutyTransport extends AbstractTransport
 {
     protected const HOST = 'events.pagerduty.com';
 
-    public function __construct(#[\SensitiveParameter] private readonly string $token, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
-    {
+    public function __construct(
+        #[\SensitiveParameter] private readonly string $token,
+        ?HttpClientInterface $client = null,
+        ?EventDispatcherInterface $dispatcher = null,
+    ) {
         parent::__construct($client, $dispatcher);
     }
 
     public function __toString(): string
     {
-        return sprintf('pagerduty://%s', $this->getEndpoint());
+        return \sprintf('pagerduty://%s', $this->getEndpoint());
     }
 
     public function supports(MessageInterface $message): bool
@@ -43,7 +46,7 @@ final class PagerDutyTransport extends AbstractTransport
         return $message instanceof PushMessage && (null === $message->getOptions() || $message->getOptions() instanceof PagerDutyOptions);
     }
 
-    protected function doSend(MessageInterface $message = null): SentMessage
+    protected function doSend(?MessageInterface $message = null): SentMessage
     {
         if (!$message instanceof PushMessage) {
             throw new UnsupportedMessageTypeException(__CLASS__, PushMessage::class, $message);
@@ -70,7 +73,7 @@ final class PagerDutyTransport extends AbstractTransport
         $result = $response->toArray(false);
 
         if (202 !== $statusCode) {
-            throw new TransportException(sprintf('Unable to post the PagerDuty message: "%s".', $result['error']['message']), $response);
+            throw new TransportException(\sprintf('Unable to post the PagerDuty message: "%s".', $result['error']['message']), $response);
         }
 
         $sentMessage = new SentMessage($message, (string) $this);

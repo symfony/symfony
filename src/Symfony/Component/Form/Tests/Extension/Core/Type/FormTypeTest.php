@@ -156,24 +156,24 @@ class FormTypeTest extends BaseTypeTestCase
     {
         $this->assertInstanceOf(
             FormBuilderInterface::class, $this->factory->createBuilder(static::TESTED_TYPE, null, [
-            'data_class' => null,
-        ]));
+                'data_class' => null,
+            ]));
     }
 
     public function testDataClassMayBeAbstractClass()
     {
         $this->assertInstanceOf(
             FormBuilderInterface::class, $this->factory->createBuilder(static::TESTED_TYPE, null, [
-            'data_class' => 'Symfony\Component\Form\Tests\Fixtures\AbstractAuthor',
-        ]));
+                'data_class' => 'Symfony\Component\Form\Tests\Fixtures\AbstractAuthor',
+            ]));
     }
 
     public function testDataClassMayBeInterface()
     {
         $this->assertInstanceOf(
             FormBuilderInterface::class, $this->factory->createBuilder(static::TESTED_TYPE, null, [
-            'data_class' => 'Symfony\Component\Form\Tests\Fixtures\AuthorInterface',
-        ]));
+                'data_class' => 'Symfony\Component\Form\Tests\Fixtures\AuthorInterface',
+            ]));
     }
 
     public function testDataClassMustBeValidClassOrInterface()
@@ -402,7 +402,7 @@ class FormTypeTest extends BaseTypeTestCase
             // referenceCopy has a getter that returns a copy
             'referenceCopy' => [
                 'firstName' => 'Foo',
-        ],
+            ],
         ]);
 
         $this->assertEquals('Foo', $author->getReferenceCopy()->firstName);
@@ -680,8 +680,8 @@ $ref2
     public function testPassZeroLabelToView()
     {
         $view = $this->factory->create(static::TESTED_TYPE, null, [
-                'label' => '0',
-            ])
+            'label' => '0',
+        ])
             ->createView();
 
         $this->assertSame('0', $view->vars['label']);

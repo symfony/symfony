@@ -32,7 +32,8 @@
         "files": [ "bootstrap.php" ],
         "psr-4": { "Symfony\\Bridge\\PhpUnit\\": "" },
         "exclude-from-classmap": [
-            "/Tests/"
+            "/Tests/",
+            "/bin/"
         ]
     },
     "bin": [

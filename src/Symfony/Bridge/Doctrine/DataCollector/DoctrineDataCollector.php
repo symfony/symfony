@@ -39,7 +39,7 @@ class DoctrineDataCollector extends DataCollector
         $this->managers = $registry->getManagerNames();
     }
 
-    public function collect(Request $request, Response $response, \Throwable $exception = null): void
+    public function collect(Request $request, Response $response, ?\Throwable $exception = null): void
     {
         $this->data = [
             'queries' => $this->collectQueries(),
@@ -126,7 +126,7 @@ class DoctrineDataCollector extends DataCollector
                     return [Caster::PREFIX_VIRTUAL.'__toString()' => (string) $o->getObject()];
                 }
 
-                return [Caster::PREFIX_VIRTUAL.'⚠' => sprintf('Object of class "%s" could not be converted to string.', $o->getClass())];
+                return [Caster::PREFIX_VIRTUAL.'⚠' => \sprintf('Object of class "%s" could not be converted to string.', $o->getClass())];
             },
         ];
     }
@@ -214,7 +214,7 @@ class DoctrineDataCollector extends DataCollector
         }
 
         if (\is_resource($var)) {
-            return [sprintf('/* Resource(%s) */', get_resource_type($var)), false, false];
+            return [\sprintf('/* Resource(%s) */', get_resource_type($var)), false, false];
         }
 
         return [$var, true, true];

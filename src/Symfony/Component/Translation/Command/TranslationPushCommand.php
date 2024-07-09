@@ -34,18 +34,12 @@ final class TranslationPushCommand extends Command
 {
     use TranslationTrait;
 
-    private TranslationProviderCollection $providers;
-    private TranslationReaderInterface $reader;
-    private array $transPaths;
-    private array $enabledLocales;
-
-    public function __construct(TranslationProviderCollection $providers, TranslationReaderInterface $reader, array $transPaths = [], array $enabledLocales = [])
-    {
-        $this->providers = $providers;
-        $this->reader = $reader;
-        $this->transPaths = $transPaths;
-        $this->enabledLocales = $enabledLocales;
-
+    public function __construct(
+        private TranslationProviderCollection $providers,
+        private TranslationReaderInterface $reader,
+        private array $transPaths = [],
+        private array $enabledLocales = [],
+    ) {
         parent::__construct();
     }
 
@@ -115,7 +109,7 @@ EOF
         $provider = $this->providers->get($input->getArgument('provider'));
 
         if (!$this->enabledLocales) {
-            throw new InvalidArgumentException(sprintf('You must define "framework.enabled_locales" or "framework.translator.providers.%s.locales" config key in order to work with translation providers.', parse_url($provider, \PHP_URL_SCHEME)));
+            throw new InvalidArgumentException(\sprintf('You must define "framework.enabled_locales" or "framework.translator.providers.%s.locales" config key in order to work with translation providers.', parse_url($provider, \PHP_URL_SCHEME)));
         }
 
         $io = new SymfonyStyle($input, $output);
@@ -139,7 +133,7 @@ EOF
         if (!$deleteMissing && $force) {
             $provider->write($localTranslations);
 
-            $io->success(sprintf('All local translations has been sent to "%s" (for "%s" locale(s), and "%s" domain(s)).', parse_url($provider, \PHP_URL_SCHEME), implode(', ', $locales), implode(', ', $domains)));
+            $io->success(\sprintf('All local translations has been sent to "%s" (for "%s" locale(s), and "%s" domain(s)).', parse_url($provider, \PHP_URL_SCHEME), implode(', ', $locales), implode(', ', $domains)));
 
             return 0;
         }
@@ -149,7 +143,7 @@ EOF
         if ($deleteMissing) {
             $provider->delete($providerTranslations->diff($localTranslations));
 
-            $io->success(sprintf('Missing translations on "%s" has been deleted (for "%s" locale(s), and "%s" domain(s)).', parse_url($provider, \PHP_URL_SCHEME), implode(', ', $locales), implode(', ', $domains)));
+            $io->success(\sprintf('Missing translations on "%s" has been deleted (for "%s" locale(s), and "%s" domain(s)).', parse_url($provider, \PHP_URL_SCHEME), implode(', ', $locales), implode(', ', $domains)));
 
             // Read provider translations again, after missing translations deletion,
             // to avoid push freshly deleted translations.
@@ -164,7 +158,7 @@ EOF
 
         $provider->write($translationsToWrite);
 
-        $io->success(sprintf('%s local translations has been sent to "%s" (for "%s" locale(s), and "%s" domain(s)).', $force ? 'All' : 'New', parse_url($provider, \PHP_URL_SCHEME), implode(', ', $locales), implode(', ', $domains)));
+        $io->success(\sprintf('%s local translations has been sent to "%s" (for "%s" locale(s), and "%s" domain(s)).', $force ? 'All' : 'New', parse_url($provider, \PHP_URL_SCHEME), implode(', ', $locales), implode(', ', $domains)));
 
         return 0;
     }

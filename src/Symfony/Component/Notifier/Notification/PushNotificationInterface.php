@@ -16,5 +16,5 @@ use Symfony\Component\Notifier\Recipient\RecipientInterface;
 
 interface PushNotificationInterface
 {
-    public function asPushMessage(RecipientInterface $recipient, string $transport = null): ?PushMessage;
+    public function asPushMessage(RecipientInterface $recipient, ?string $transport = null): ?PushMessage;
 }

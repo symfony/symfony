@@ -292,7 +292,7 @@ class DefinitionTest extends TestCase
         $def->addArgument('foo');
 
         $this->expectException(\OutOfBoundsException::class);
-        $this->expectExceptionMessage('The index "1" is not in the range [0, 0] of the arguments of class "stdClass".');
+        $this->expectExceptionMessage('The argument "1" doesn\'t exist in class "stdClass".');
 
         $def->replaceArgument(1, 'bar');
     }
@@ -305,6 +305,17 @@ class DefinitionTest extends TestCase
         $this->expectExceptionMessage('Cannot replace arguments for class "stdClass" if none have been configured yet.');
 
         $def->replaceArgument(0, 'bar');
+    }
+
+    public function testReplaceArgumentWithNonConsecutiveIntIndex()
+    {
+        $def = new Definition('stdClass');
+
+        $def->setArguments([1 => 'foo']);
+        $this->assertSame([1 => 'foo'], $def->getArguments());
+
+        $def->replaceArgument(1, 'bar');
+        $this->assertSame([1 => 'bar'], $def->getArguments());
     }
 
     public function testSetGetProperties()

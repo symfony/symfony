@@ -19,5 +19,5 @@ use Symfony\Component\Notifier\Recipient\SmsRecipientInterface;
  */
 interface SmsNotificationInterface
 {
-    public function asSmsMessage(SmsRecipientInterface $recipient, string $transport = null): ?SmsMessage;
+    public function asSmsMessage(SmsRecipientInterface $recipient, ?string $transport = null): ?SmsMessage;
 }

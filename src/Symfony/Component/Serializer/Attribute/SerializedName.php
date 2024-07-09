@@ -19,10 +19,13 @@ use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 #[\Attribute(\Attribute::TARGET_METHOD | \Attribute::TARGET_PROPERTY)]
 class SerializedName
 {
+    /**
+     * @param string $serializedName The name of the property as it will be serialized
+     */
     public function __construct(private readonly string $serializedName)
     {
         if ('' === $serializedName) {
-            throw new InvalidArgumentException(sprintf('Parameter given to "%s" must be a non-empty string.', self::class));
+            throw new InvalidArgumentException(\sprintf('Parameter given to "%s" must be a non-empty string.', self::class));
         }
     }
 

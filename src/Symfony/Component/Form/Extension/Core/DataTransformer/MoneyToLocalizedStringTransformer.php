@@ -22,14 +22,18 @@ use Symfony\Component\Form\Exception\TransformationFailedException;
 class MoneyToLocalizedStringTransformer extends NumberToLocalizedStringTransformer
 {
     private int $divisor;
-    private string $modelType;
 
-    public function __construct(?int $scale = 2, ?bool $grouping = true, ?int $roundingMode = \NumberFormatter::ROUND_HALFUP, ?int $divisor = 1, string $locale = null, string $modelType = 'float')
-    {
+    public function __construct(
+        ?int $scale = 2,
+        ?bool $grouping = true,
+        ?int $roundingMode = \NumberFormatter::ROUND_HALFUP,
+        ?int $divisor = 1,
+        ?string $locale = null,
+        private readonly string $input = 'float',
+    ) {
         parent::__construct($scale ?? 2, $grouping ?? true, $roundingMode, $locale);
 
         $this->divisor = $divisor ?? 1;
-        $this->modelType = $modelType;
     }
 
     /**
@@ -63,9 +67,18 @@ class MoneyToLocalizedStringTransformer extends NumberToLocalizedStringTransform
     public function reverseTransform(mixed $value): int|float|null
     {
         $value = parent::reverseTransform($value);
-        if (null !== $value && 1 !== $this->divisor) {
+        if (null !== $value) {
             $value = (string) ($value * $this->divisor);
-            $value = 'integer' === $this->modelType ? (int) $value : (float) $value;
+
+            if ('float' === $this->input) {
+                return (float) $value;
+            }
+
+            if ($value > \PHP_INT_MAX || $value < \PHP_INT_MIN) {
+                throw new TransformationFailedException(\sprintf('Cannot cast "%s" to an integer. Try setting the input to "float" instead.', $value));
+            }
+
+            $value = (int) $value;
         }
 
         return $value;

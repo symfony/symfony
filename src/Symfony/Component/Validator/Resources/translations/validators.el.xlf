@@ -1,6 +1,6 @@
-<?xml version="1.0"?>
-<xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
-    <file source-language="en" datatype="plaintext" original="file.ext">
+<?xml version="1.0" encoding="utf-8"?>
+<xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
+    <file source-language="en" target-language="el" datatype="plaintext" original="file.ext">
         <body>
             <trans-unit id="1">
                 <source>This value should be false.</source>
@@ -134,9 +134,9 @@
                 <source>This file is not a valid image.</source>
                 <target>Το αρχείο δεν αποτελεί έγκυρη εικόνα.</target>
             </trans-unit>
-            <trans-unit id="37">
-                <source>This is not a valid IP address.</source>
-                <target>Αυτό δεν είναι μια έγκυρη διεύθυνση IP.</target>
+            <trans-unit id="37" resname="This is not a valid IP address.">
+                <source>This value is not a valid IP address.</source>
+                <target>Αυτή η IP διεύθυνση δεν είναι έγκυρη.</target>
             </trans-unit>
             <trans-unit id="38">
                 <source>This value is not a valid language.</source>
@@ -190,9 +190,9 @@
                 <source>No file was uploaded.</source>
                 <target>Δεν ανέβηκε κανένα αρχείο.</target>
             </trans-unit>
-            <trans-unit id="51">
-                <source>No temporary folder was configured in php.ini.</source>
-                <target>Κανένας προσωρινός φάκελος δεν έχει ρυθμιστεί στο php.ini.</target>
+            <trans-unit id="51" resname="No temporary folder was configured in php.ini.">
+                <source>No temporary folder was configured in php.ini, or the configured folder does not exist.</source>
+                <target>Δεν έχει ρυθμιστεί προσωρινός φάκελος στο php.ini, ή ο ρυθμισμένος φάκελος δεν υπάρχει.</target>
             </trans-unit>
             <trans-unit id="52">
                 <source>Cannot write temporary file to disk.</source>
@@ -222,9 +222,9 @@
                 <source>Unsupported card type or invalid card number.</source>
                 <target>Μη υποστηριζόμενος τύπος κάρτας ή μη έγκυρος αριθμός κάρτας.</target>
             </trans-unit>
-            <trans-unit id="59">
-                <source>This is not a valid International Bank Account Number (IBAN).</source>
-                <target>Αυτό δεν αντιστοιχεί σε έγκυρο διεθνή αριθμό τραπεζικού λογαριασμού (IBAN).</target>
+            <trans-unit id="59" resname="This is not a valid International Bank Account Number (IBAN).">
+                <source>This value is not a valid International Bank Account Number (IBAN).</source>
+                <target>Αυτός δεν είναι έγκυρος διεθνής αριθμός τραπεζικού λογαριασμού (IBAN).</target>
             </trans-unit>
             <trans-unit id="60">
                 <source>This value is not a valid ISBN-10.</source>
@@ -310,17 +310,17 @@
                 <source>This value does not match the expected {{ charset }} charset.</source>
                 <target>Αυτή η τιμή δεν ταιριάζει στο αναμενόμενο {{ charset }} σύνολο χαρακτήρων.</target>
             </trans-unit>
-            <trans-unit id="81">
-                <source>This is not a valid Business Identifier Code (BIC).</source>
-                <target>Αυτός δεν είναι ένας έγκυρος κωδικός BIC.</target>
+            <trans-unit id="81" resname="This is not a valid Business Identifier Code (BIC).">
+                <source>This value is not a valid Business Identifier Code (BIC).</source>
+                <target>Αυτός ο αριθμός δεν είναι έγκυρος Κωδικός Ταυτοποίησης Επιχείρησης (BIC).</target>
             </trans-unit>
             <trans-unit id="82">
                 <source>Error</source>
                 <target>Σφάλμα</target>
             </trans-unit>
-            <trans-unit id="83">
-                <source>This is not a valid UUID.</source>
-                <target>Αυτό δεν είναι ένα έγκυρο UUID.</target>
+            <trans-unit id="83" resname="This is not a valid UUID.">
+                <source>This value is not a valid UUID.</source>
+                <target>Αυτός ο αριθμός δεν είναι έγκυρη UUID.</target>
             </trans-unit>
             <trans-unit id="84">
                 <source>This value should be a multiple of {{ compared_value }}.</source>
@@ -429,6 +429,18 @@
             <trans-unit id="110">
                 <source>The extension of the file is invalid ({{ extension }}). Allowed extensions are {{ extensions }}.</source>
                 <target>Η επέκταση του αρχείου δεν είναι έγκυρη ({{ extension }}). Οι επιτρεπτόμενες επεκτάσεις είναι {{ extensions }}.</target>
+            </trans-unit>
+            <trans-unit id="111">
+                <source>The detected character encoding is invalid ({{ detected }}). Allowed encodings are {{ encodings }}.</source>
+                <target>Η κωδικοποίηση χαρακτήρων που ανιχνεύτηκε δεν είναι έγκυρη ({{ detected }}). Οι επιτρεπόμενες κωδικοποιήσεις είναι {{ encodings }}.</target>
+            </trans-unit>
+            <trans-unit id="112">
+                <source>This value is not a valid MAC address.</source>
+                <target>Αυτός ο αριθμός δεν είναι έγκυρη διεύθυνση MAC.</target>
+            </trans-unit>
+            <trans-unit id="113">
+                <source>This URL is missing a top-level domain.</source>
+                <target state="needs-review-translation">Αυτή η διεύθυνση URL λείπει ένας τομέας ανώτατου επιπέδου.</target>
             </trans-unit>
         </body>
     </file>

@@ -121,26 +121,26 @@ class ImportMapGenerator
      */
     public function findEagerEntrypointImports(string $entryName): array
     {
-        if ($this->compiledConfigReader->configExists(sprintf(self::ENTRYPOINT_CACHE_FILENAME_PATTERN, $entryName))) {
-            return $this->compiledConfigReader->loadConfig(sprintf(self::ENTRYPOINT_CACHE_FILENAME_PATTERN, $entryName));
+        if ($this->compiledConfigReader->configExists(\sprintf(self::ENTRYPOINT_CACHE_FILENAME_PATTERN, $entryName))) {
+            return $this->compiledConfigReader->loadConfig(\sprintf(self::ENTRYPOINT_CACHE_FILENAME_PATTERN, $entryName));
         }
 
         $rootImportEntries = $this->importMapConfigReader->getEntries();
         if (!$rootImportEntries->has($entryName)) {
-            throw new \InvalidArgumentException(sprintf('The entrypoint "%s" does not exist in "importmap.php".', $entryName));
+            throw new \InvalidArgumentException(\sprintf('The entrypoint "%s" does not exist in "importmap.php".', $entryName));
         }
 
         if (!$rootImportEntries->get($entryName)->isEntrypoint) {
-            throw new \InvalidArgumentException(sprintf('The entrypoint "%s" is not an entry point in "importmap.php". Set "entrypoint" => true to make it available as an entrypoint.', $entryName));
+            throw new \InvalidArgumentException(\sprintf('The entrypoint "%s" is not an entry point in "importmap.php". Set "entrypoint" => true to make it available as an entrypoint.', $entryName));
         }
 
         if ($rootImportEntries->get($entryName)->isRemotePackage()) {
-            throw new \InvalidArgumentException(sprintf('The entrypoint "%s" is a remote package and cannot be used as an entrypoint.', $entryName));
+            throw new \InvalidArgumentException(\sprintf('The entrypoint "%s" is a remote package and cannot be used as an entrypoint.', $entryName));
         }
 
         $asset = $this->findAsset($rootImportEntries->get($entryName)->path);
         if (!$asset) {
-            throw new \InvalidArgumentException(sprintf('The path "%s" of the entrypoint "%s" mentioned in "importmap.php" cannot be found in any asset map paths.', $rootImportEntries->get($entryName)->path, $entryName));
+            throw new \InvalidArgumentException(\sprintf('The path "%s" of the entrypoint "%s" mentioned in "importmap.php" cannot be found in any asset map paths.', $rootImportEntries->get($entryName)->path, $entryName));
         }
 
         return $this->findEagerImports($asset);
@@ -181,7 +181,7 @@ class ImportMapGenerator
             if ($javaScriptImport->addImplicitlyToImportMap) {
                 if (!$importedAsset = $this->assetMapper->getAsset($javaScriptImport->assetLogicalPath)) {
                     // should not happen at this point, unless something added a bogus JavaScriptImport to this asset
-                    throw new LogicException(sprintf('Cannot find imported JavaScript asset "%s" in asset mapper.', $javaScriptImport->assetLogicalPath));
+                    throw new LogicException(\sprintf('Cannot find imported JavaScript asset "%s" in asset mapper.', $javaScriptImport->assetLogicalPath));
                 }
 
                 $nextEntry = ImportMapEntry::createLocal(
@@ -240,7 +240,7 @@ class ImportMapGenerator
                 // Follow its imports!
                 if (!$javaScriptAsset = $this->assetMapper->getAsset($javaScriptImport->assetLogicalPath)) {
                     // should not happen at this point, unless something added a bogus JavaScriptImport to this asset
-                    throw new LogicException(sprintf('Cannot find JavaScript asset "%s" (imported in "%s") in asset mapper.', $javaScriptImport->assetLogicalPath, $asset->logicalPath));
+                    throw new LogicException(\sprintf('Cannot find JavaScript asset "%s" (imported in "%s") in asset mapper.', $javaScriptImport->assetLogicalPath, $asset->logicalPath));
                 }
                 $queue[] = $javaScriptAsset;
             }
@@ -253,12 +253,12 @@ class ImportMapGenerator
     {
         if ($entry->isRemotePackage()) {
             if (!is_file($entry->path)) {
-                throw new LogicException(sprintf('The "%s" vendor asset is missing. Try running the "importmap:install" command.', $entry->importName));
+                throw new LogicException(\sprintf('The "%s" vendor asset is missing. Try running the "importmap:install" command.', $entry->importName));
             }
 
-            throw new LogicException(sprintf('The "%s" vendor file exists locally (%s), but cannot be found in any asset map paths. Be sure the assets vendor directory is an asset mapper path.', $entry->importName, $entry->path));
+            throw new LogicException(\sprintf('The "%s" vendor file exists locally (%s), but cannot be found in any asset map paths. Be sure the assets vendor directory is an asset mapper path.', $entry->importName, $entry->path));
         }
 
-        throw new LogicException(sprintf('The asset "%s" cannot be found in any asset map paths.', $entry->path));
+        throw new LogicException(\sprintf('The asset "%s" cannot be found in any asset map paths.', $entry->path));
     }
 }

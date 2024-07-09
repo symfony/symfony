@@ -40,7 +40,6 @@ class Symfony_DI_PhpDumper_Test_Lazy_Autowire_Attribute extends Container
     public function getRemovedIds(): array
     {
         return [
-            '.lazy.Symfony\\Component\\DependencyInjection\\Tests\\Compiler\\Foo' => true,
             'Symfony\\Component\\DependencyInjection\\Tests\\Compiler\\Foo' => true,
         ];
     }

@@ -35,7 +35,7 @@ class BrowserChannelTest extends TestCase
     public function testImportanceLevelIsReflectedInFlashMessageType(
         FlashMessageImportanceMapperInterface $mapper,
         string $importance,
-        string $expectedFlashMessageType
+        string $expectedFlashMessageType,
     ) {
         $session = $this->createMock(Session::class);
         $session->method('getFlashBag')->willReturn(new FlashBag());
@@ -79,10 +79,10 @@ class BrowserChannelTest extends TestCase
 
     private function buildBrowserChannel(Session $session, FlashMessageImportanceMapperInterface $mapper): BrowserChannel
     {
-        $request = $this->createMock(Request::class);
-        $request->method('getSession')->willReturn($session);
-        $requestStack = $this->createStub(RequestStack::class);
-        $requestStack->method('getCurrentRequest')->willReturn($request);
+        $request = new Request();
+        $request->setSession($session);
+        $requestStack = new RequestStack();
+        $requestStack->push($request);
 
         return new BrowserChannel($requestStack, $mapper);
     }

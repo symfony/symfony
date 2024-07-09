@@ -25,7 +25,7 @@ final class MonotonicClock implements ClockInterface
     /**
      * @throws \DateInvalidTimeZoneException When $timezone is invalid
      */
-    public function __construct(\DateTimeZone|string $timezone = null)
+    public function __construct(\DateTimeZone|string|null $timezone = null)
     {
         if (false === $offset = hrtime()) {
             throw new \RuntimeException('hrtime() returned false: the runtime environment does not provide access to a monotonic timer.');

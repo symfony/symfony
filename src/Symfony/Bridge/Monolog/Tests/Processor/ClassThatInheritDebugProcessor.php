@@ -16,12 +16,12 @@ use Symfony\Component\HttpFoundation\Request;
 
 class ClassThatInheritDebugProcessor extends DebugProcessor
 {
-    public function getLogs(Request $request = null): array
+    public function getLogs(?Request $request = null): array
     {
         return parent::getLogs($request);
     }
 
-    public function countErrors(Request $request = null): int
+    public function countErrors(?Request $request = null): int
     {
         return parent::countErrors($request);
     }

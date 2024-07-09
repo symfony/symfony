@@ -26,15 +26,13 @@ use Symfony\Component\Messenger\Transport\TransportInterface;
  */
 class DoctrineTransport implements TransportInterface, SetupableTransportInterface, MessageCountAwareInterface, ListableReceiverInterface
 {
-    private Connection $connection;
-    private SerializerInterface $serializer;
     private DoctrineReceiver $receiver;
     private DoctrineSender $sender;
 
-    public function __construct(Connection $connection, SerializerInterface $serializer)
-    {
-        $this->connection = $connection;
-        $this->serializer = $serializer;
+    public function __construct(
+        private Connection $connection,
+        private SerializerInterface $serializer,
+    ) {
     }
 
     public function get(): iterable
@@ -57,7 +55,7 @@ class DoctrineTransport implements TransportInterface, SetupableTransportInterfa
         return $this->getReceiver()->getMessageCount();
     }
 
-    public function all(int $limit = null): iterable
+    public function all(?int $limit = null): iterable
     {
         return $this->getReceiver()->all($limit);
     }

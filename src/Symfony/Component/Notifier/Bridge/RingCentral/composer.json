@@ -27,7 +27,7 @@
         "symfony/event-dispatcher": "^6.4|^7.0"
     },
     "autoload": {
-        "psr-4": {"Symfony\\Component\\Notifier\\Bridge\\RingCentral\\": ""},
+        "psr-4": { "Symfony\\Component\\Notifier\\Bridge\\RingCentral\\": "" },
         "exclude-from-classmap": [
             "/Tests/"
         ]

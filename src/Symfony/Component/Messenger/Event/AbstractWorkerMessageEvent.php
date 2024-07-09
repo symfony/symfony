@@ -16,13 +16,10 @@ use Symfony\Component\Messenger\Stamp\StampInterface;
 
 abstract class AbstractWorkerMessageEvent
 {
-    private Envelope $envelope;
-    private string $receiverName;
-
-    public function __construct(Envelope $envelope, string $receiverName)
-    {
-        $this->envelope = $envelope;
-        $this->receiverName = $receiverName;
+    public function __construct(
+        private Envelope $envelope,
+        private string $receiverName,
+    ) {
     }
 
     public function getEnvelope(): Envelope

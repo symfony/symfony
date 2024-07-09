@@ -20,12 +20,7 @@ class RecurringMessageTest extends TestCase
 {
     public function testCanCreateHashedCronMessage()
     {
-        $object = new class() {
-            public function __toString(): string
-            {
-                return 'my task';
-            }
-        };
+        $object = new DummyStringableMessage();
 
         if (class_exists(Randomizer::class)) {
             $this->assertSame('30 0 * * *', (string) RecurringMessage::cron('#midnight', $object)->getTrigger());
@@ -50,5 +45,13 @@ class RecurringMessageTest extends TestCase
 
         $this->assertSame($message1->getId(), (clone $message1)->getId());
         $this->assertNotSame($message1->getId(), $message2->getId());
+    }
+}
+
+class DummyStringableMessage implements \Stringable
+{
+    public function __toString(): string
+    {
+        return 'my task';
     }
 }

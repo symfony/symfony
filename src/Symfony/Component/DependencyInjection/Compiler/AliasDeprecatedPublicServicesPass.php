@@ -25,11 +25,11 @@ final class AliasDeprecatedPublicServicesPass extends AbstractRecursivePass
     {
         foreach ($container->findTaggedServiceIds('container.private') as $id => $tags) {
             if (null === $package = $tags[0]['package'] ?? null) {
-                throw new InvalidArgumentException(sprintf('The "package" attribute is mandatory for the "container.private" tag on the "%s" service.', $id));
+                throw new InvalidArgumentException(\sprintf('The "package" attribute is mandatory for the "container.private" tag on the "%s" service.', $id));
             }
 
             if (null === $version = $tags[0]['version'] ?? null) {
-                throw new InvalidArgumentException(sprintf('The "version" attribute is mandatory for the "container.private" tag on the "%s" service.', $id));
+                throw new InvalidArgumentException(\sprintf('The "version" attribute is mandatory for the "container.private" tag on the "%s" service.', $id));
             }
 
             $definition = $container->getDefinition($id);

@@ -16,15 +16,15 @@ use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
 
 abstract class AbstractServiceConfigurator extends AbstractConfigurator
 {
-    protected ServicesConfigurator $parent;
-    protected ?string $id;
     private array $defaultTags = [];
 
-    public function __construct(ServicesConfigurator $parent, Definition $definition, string $id = null, array $defaultTags = [])
-    {
-        $this->parent = $parent;
+    public function __construct(
+        protected ServicesConfigurator $parent,
+        Definition $definition,
+        protected ?string $id = null,
+        array $defaultTags = [],
+    ) {
         $this->definition = $definition;
-        $this->id = $id;
         $this->defaultTags = $defaultTags;
     }
 
@@ -42,7 +42,7 @@ abstract class AbstractServiceConfigurator extends AbstractConfigurator
     /**
      * Registers a service.
      */
-    final public function set(?string $id, string $class = null): ServiceConfigurator
+    final public function set(?string $id, ?string $class = null): ServiceConfigurator
     {
         $this->__destruct();
 
@@ -106,7 +106,7 @@ abstract class AbstractServiceConfigurator extends AbstractConfigurator
     /**
      * Registers a service.
      */
-    final public function __invoke(string $id, string $class = null): ServiceConfigurator
+    final public function __invoke(string $id, ?string $class = null): ServiceConfigurator
     {
         $this->__destruct();
 

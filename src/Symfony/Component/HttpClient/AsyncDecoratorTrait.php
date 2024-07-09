@@ -30,7 +30,7 @@ trait AsyncDecoratorTrait
      */
     abstract public function request(string $method, string $url, array $options = []): ResponseInterface;
 
-    public function stream(ResponseInterface|iterable $responses, float $timeout = null): ResponseStreamInterface
+    public function stream(ResponseInterface|iterable $responses, ?float $timeout = null): ResponseStreamInterface
     {
         if ($responses instanceof AsyncResponse) {
             $responses = [$responses];

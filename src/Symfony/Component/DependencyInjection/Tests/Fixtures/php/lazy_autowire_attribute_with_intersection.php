@@ -36,13 +36,6 @@ class ProjectServiceContainer extends Container
         return true;
     }
 
-    public function getRemovedIds(): array
-    {
-        return [
-            '.lazy.foo.qFdMZVK' => true,
-        ];
-    }
-
     protected function createProxy($class, \Closure $factory)
     {
         return $factory();

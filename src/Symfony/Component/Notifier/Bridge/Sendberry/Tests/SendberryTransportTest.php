@@ -21,7 +21,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 final class SendberryTransportTest extends TransportTestCase
 {
-    public static function createTransport(HttpClientInterface $client = null): SendberryTransport
+    public static function createTransport(?HttpClientInterface $client = null): SendberryTransport
     {
         return new SendberryTransport('username', 'password', 'auth_key', 'from', $client ?? new MockHttpClient());
     }

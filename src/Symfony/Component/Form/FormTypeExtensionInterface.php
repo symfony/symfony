@@ -25,9 +25,6 @@ interface FormTypeExtensionInterface
      */
     public static function getExtendedTypes(): iterable;
 
-    /**
-     * @return void
-     */
     public function configureOptions(OptionsResolver $resolver): void;
 
     /**

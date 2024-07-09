@@ -38,7 +38,7 @@ trait HostTrait
                     $routes->add($name.'.'.$locale, $localizedRoute);
                 }
             } elseif (!isset($hosts[$locale])) {
-                throw new \InvalidArgumentException(sprintf('Route "%s" with locale "%s" is missing a corresponding host in its parent collection.', $name, $locale));
+                throw new \InvalidArgumentException(\sprintf('Route "%s" with locale "%s" is missing a corresponding host in its parent collection.', $name, $locale));
             } else {
                 $route->setHost($hosts[$locale]);
                 $route->setRequirement('_locale', preg_quote($locale));

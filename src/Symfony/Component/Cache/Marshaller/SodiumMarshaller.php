@@ -22,15 +22,16 @@ use Symfony\Component\Cache\Exception\InvalidArgumentException;
 class SodiumMarshaller implements MarshallerInterface
 {
     private MarshallerInterface $marshaller;
-    private array $decryptionKeys;
 
     /**
      * @param string[] $decryptionKeys The key at index "0" is required and is used to decrypt and encrypt values;
      *                                 more rotating keys can be provided to decrypt values;
      *                                 each key must be generated using sodium_crypto_box_keypair()
      */
-    public function __construct(array $decryptionKeys, MarshallerInterface $marshaller = null)
-    {
+    public function __construct(
+        private array $decryptionKeys,
+        ?MarshallerInterface $marshaller = null,
+    ) {
         if (!self::isSupported()) {
             throw new CacheException('The "sodium" PHP extension is not loaded.');
         }
@@ -40,7 +41,6 @@ class SodiumMarshaller implements MarshallerInterface
         }
 
         $this->marshaller = $marshaller ?? new DefaultMarshaller();
-        $this->decryptionKeys = $decryptionKeys;
     }
 
     public static function isSupported(): bool

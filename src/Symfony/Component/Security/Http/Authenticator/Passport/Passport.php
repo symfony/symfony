@@ -72,7 +72,7 @@ class Passport
      *
      * @return $this
      */
-    public function addBadge(BadgeInterface $badge, string $badgeFqcn = null): static
+    public function addBadge(BadgeInterface $badge, ?string $badgeFqcn = null): static
     {
         $badgeFqcn ??= $badge::class;
 

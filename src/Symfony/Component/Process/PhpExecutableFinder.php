@@ -33,8 +33,13 @@ class PhpExecutableFinder
     {
         if ($php = getenv('PHP_BINARY')) {
             if (!is_executable($php)) {
-                $command = '\\' === \DIRECTORY_SEPARATOR ? 'where' : 'command -v';
-                if (\function_exists('exec') && $php = strtok(exec($command.' '.escapeshellarg($php)), \PHP_EOL)) {
+                if (!\function_exists('exec')) {
+                    return false;
+                }
+
+                $command = '\\' === \DIRECTORY_SEPARATOR ? 'where' : 'command -v --';
+                $execResult = exec($command.' '.escapeshellarg($php));
+                if ($php = substr($execResult, 0, strpos($execResult, \PHP_EOL) ?: null)) {
                     if (!is_executable($php)) {
                         return false;
                     }

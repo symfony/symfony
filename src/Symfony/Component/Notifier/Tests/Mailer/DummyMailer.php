@@ -22,7 +22,7 @@ class DummyMailer implements MailerInterface
 {
     private RawMessage $sentMessage;
 
-    public function send(RawMessage $message, Envelope $envelope = null): void
+    public function send(RawMessage $message, ?Envelope $envelope = null): void
     {
         $this->sentMessage = $message;
     }

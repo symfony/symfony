@@ -106,7 +106,7 @@ class OutputFormatter implements WrappableOutputFormatterInterface
     public function getStyle(string $name): OutputFormatterStyleInterface
     {
         if (!$this->hasStyle($name)) {
-            throw new InvalidArgumentException(sprintf('Undefined style: "%s".', $name));
+            throw new InvalidArgumentException(\sprintf('Undefined style: "%s".', $name));
         }
 
         return $this->styles[strtolower($name)];

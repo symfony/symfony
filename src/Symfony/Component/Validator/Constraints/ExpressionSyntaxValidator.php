@@ -25,7 +25,7 @@ class ExpressionSyntaxValidator extends ConstraintValidator
 {
     private ?ExpressionLanguage $expressionLanguage;
 
-    public function __construct(ExpressionLanguage $expressionLanguage = null)
+    public function __construct(?ExpressionLanguage $expressionLanguage = null)
     {
         $this->expressionLanguage = $expressionLanguage;
     }
@@ -40,7 +40,7 @@ class ExpressionSyntaxValidator extends ConstraintValidator
             return;
         }
 
-        if (!\is_string($expression)) {
+        if (!\is_string($expression) && !$expression instanceof \Stringable) {
             throw new UnexpectedValueException($expression, 'string');
         }
 

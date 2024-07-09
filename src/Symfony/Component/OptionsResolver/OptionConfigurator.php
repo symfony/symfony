@@ -15,13 +15,10 @@ use Symfony\Component\OptionsResolver\Exception\AccessException;
 
 final class OptionConfigurator
 {
-    private string $name;
-    private OptionsResolver $resolver;
-
-    public function __construct(string $name, OptionsResolver $resolver)
-    {
-        $this->name = $name;
-        $this->resolver = $resolver;
+    public function __construct(
+        private string $name,
+        private OptionsResolver $resolver,
+    ) {
         $this->resolver->setDefined($name);
     }
 

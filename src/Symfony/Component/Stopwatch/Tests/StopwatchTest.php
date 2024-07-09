@@ -156,6 +156,19 @@ class StopwatchTest extends TestCase
         $this->assertCount(2, $events['__section__']->getPeriods());
     }
 
+    public function testLap()
+    {
+        $stopwatch = new Stopwatch();
+
+        $stopwatch->start('foo');
+        $stopwatch->lap('foo');
+        $stopwatch->stop('foo');
+
+        $event = $stopwatch->getEvent('foo');
+
+        $this->assertCount(2, $event->getPeriods());
+    }
+
     public function testReopenANewSectionShouldThrowAnException()
     {
         $this->expectException(\LogicException::class);

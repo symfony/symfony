@@ -16,10 +16,10 @@ namespace Symfony\Component\Messenger\Exception;
  *
  * @author Jeroen <https://github.com/Jeroeny>
  */
-interface WrappedExceptionsInterface
+interface WrappedExceptionsInterface extends \Throwable
 {
     /**
      * @return \Throwable[]
      */
-    public function getWrappedExceptions(string $class = null, bool $recursive = false): array;
+    public function getWrappedExceptions(?string $class = null, bool $recursive = false): array;
 }

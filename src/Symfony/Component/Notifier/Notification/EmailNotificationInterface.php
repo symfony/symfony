@@ -19,5 +19,5 @@ use Symfony\Component\Notifier\Recipient\EmailRecipientInterface;
  */
 interface EmailNotificationInterface
 {
-    public function asEmailMessage(EmailRecipientInterface $recipient, string $transport = null): ?EmailMessage;
+    public function asEmailMessage(EmailRecipientInterface $recipient, ?string $transport = null): ?EmailMessage;
 }

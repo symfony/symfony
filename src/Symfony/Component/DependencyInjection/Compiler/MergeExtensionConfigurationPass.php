@@ -14,6 +14,7 @@ namespace Symfony\Component\DependencyInjection\Compiler;
 use Symfony\Component\Config\Definition\BaseNode;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Exception\LogicException;
+use Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\Extension\ConfigurationExtensionInterface;
 use Symfony\Component\DependencyInjection\Extension\Extension;
@@ -56,7 +57,14 @@ class MergeExtensionConfigurationPass implements CompilerPassInterface
                     BaseNode::setPlaceholderUniquePrefix($resolvingBag->getEnvPlaceholderUniquePrefix());
                 }
             }
-            $config = $resolvingBag->resolveValue($config);
+
+            try {
+                $config = $resolvingBag->resolveValue($config);
+            } catch (ParameterNotFoundException $e) {
+                $e->setSourceExtensionName($name);
+
+                throw $e;
+            }
 
             try {
                 $tmpContainer = new MergeExtensionConfigurationContainerBuilder($extension, $resolvingBag);
@@ -153,7 +161,7 @@ class MergeExtensionConfigurationContainerBuilder extends ContainerBuilder
 {
     private string $extensionClass;
 
-    public function __construct(ExtensionInterface $extension, ParameterBagInterface $parameterBag = null)
+    public function __construct(ExtensionInterface $extension, ?ParameterBagInterface $parameterBag = null)
     {
         parent::__construct($parameterBag);
 
@@ -162,20 +170,20 @@ class MergeExtensionConfigurationContainerBuilder extends ContainerBuilder
 
     public function addCompilerPass(CompilerPassInterface $pass, string $type = PassConfig::TYPE_BEFORE_OPTIMIZATION, int $priority = 0): static
     {
-        throw new LogicException(sprintf('You cannot add compiler pass "%s" from extension "%s". Compiler passes must be registered before the container is compiled.', get_debug_type($pass), $this->extensionClass));
+        throw new LogicException(\sprintf('You cannot add compiler pass "%s" from extension "%s". Compiler passes must be registered before the container is compiled.', get_debug_type($pass), $this->extensionClass));
     }
 
     public function registerExtension(ExtensionInterface $extension): void
     {
-        throw new LogicException(sprintf('You cannot register extension "%s" from "%s". Extensions must be registered before the container is compiled.', get_debug_type($extension), $this->extensionClass));
+        throw new LogicException(\sprintf('You cannot register extension "%s" from "%s". Extensions must be registered before the container is compiled.', get_debug_type($extension), $this->extensionClass));
     }
 
     public function compile(bool $resolveEnvPlaceholders = false): void
     {
-        throw new LogicException(sprintf('Cannot compile the container in extension "%s".', $this->extensionClass));
+        throw new LogicException(\sprintf('Cannot compile the container in extension "%s".', $this->extensionClass));
     }
 
-    public function resolveEnvPlaceholders(mixed $value, string|bool $format = null, array &$usedEnvs = null): mixed
+    public function resolveEnvPlaceholders(mixed $value, string|bool|null $format = null, ?array &$usedEnvs = null): mixed
     {
         if (true !== $format || !\is_string($value)) {
             return parent::resolveEnvPlaceholders($value, $format, $usedEnvs);
@@ -194,7 +202,7 @@ class MergeExtensionConfigurationContainerBuilder extends ContainerBuilder
             }
             foreach ($placeholders as $placeholder) {
                 if (false !== stripos($value, $placeholder)) {
-                    throw new RuntimeException(sprintf('Using a cast in "env(%s)" is incompatible with resolution at compile time in "%s". The logic in the extension should be moved to a compiler pass, or an env parameter with no cast should be used instead.', $env, $this->extensionClass));
+                    throw new RuntimeException(\sprintf('Using a cast in "env(%s)" is incompatible with resolution at compile time in "%s". The logic in the extension should be moved to a compiler pass, or an env parameter with no cast should be used instead.', $env, $this->extensionClass));
                 }
             }
         }

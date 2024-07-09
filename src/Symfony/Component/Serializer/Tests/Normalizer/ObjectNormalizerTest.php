@@ -19,6 +19,7 @@ use Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor;
 use Symfony\Component\PropertyInfo\Extractor\PhpStanExtractor;
 use Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor;
 use Symfony\Component\PropertyInfo\PropertyInfoExtractor;
+use Symfony\Component\Serializer\Attribute\Ignore;
 use Symfony\Component\Serializer\Exception\LogicException;
 use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
 use Symfony\Component\Serializer\Exception\RuntimeException;
@@ -26,6 +27,7 @@ use Symfony\Component\Serializer\Exception\UnexpectedValueException;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactory;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
 use Symfony\Component\Serializer\Mapping\Loader\AttributeLoader;
+use Symfony\Component\Serializer\Mapping\Loader\YamlFileLoader;
 use Symfony\Component\Serializer\NameConverter\AdvancedNameConverterInterface;
 use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter;
 use Symfony\Component\Serializer\NameConverter\MetadataAwareNameConverter;
@@ -50,6 +52,7 @@ use Symfony\Component\Serializer\Tests\Normalizer\Features\CallbacksTestTrait;
 use Symfony\Component\Serializer\Tests\Normalizer\Features\CircularReferenceTestTrait;
 use Symfony\Component\Serializer\Tests\Normalizer\Features\ConstructorArgumentsTestTrait;
 use Symfony\Component\Serializer\Tests\Normalizer\Features\ContextMetadataTestTrait;
+use Symfony\Component\Serializer\Tests\Normalizer\Features\FilterBoolTestTrait;
 use Symfony\Component\Serializer\Tests\Normalizer\Features\GroupsTestTrait;
 use Symfony\Component\Serializer\Tests\Normalizer\Features\IgnoredAttributesTestTrait;
 use Symfony\Component\Serializer\Tests\Normalizer\Features\MaxDepthTestTrait;
@@ -72,6 +75,7 @@ class ObjectNormalizerTest extends TestCase
     use CircularReferenceTestTrait;
     use ConstructorArgumentsTestTrait;
     use ContextMetadataTestTrait;
+    use FilterBoolTestTrait;
     use GroupsTestTrait;
     use IgnoredAttributesTestTrait;
     use MaxDepthTestTrait;
@@ -88,7 +92,7 @@ class ObjectNormalizerTest extends TestCase
         $this->createNormalizer();
     }
 
-    private function createNormalizer(array $defaultContext = [], ClassMetadataFactoryInterface $classMetadataFactory = null): void
+    private function createNormalizer(array $defaultContext = [], ?ClassMetadataFactoryInterface $classMetadataFactory = null): void
     {
         $this->serializer = $this->createMock(ObjectSerializerNormalizer::class);
         $this->normalizer = new ObjectNormalizer($classMetadataFactory, null, null, null, null, null, $defaultContext);
@@ -266,6 +270,22 @@ class ObjectNormalizerTest extends TestCase
         $this->assertEquals('bar', $obj->bar);
     }
 
+    public function testConstructorWithObjectDenormalizeUsingPropertyInfoExtractor()
+    {
+        $serializer = $this->createMock(ObjectSerializerNormalizer::class);
+        $normalizer = new ObjectNormalizer(null, null, null, null, null, null, [], new PropertyInfoExtractor());
+        $normalizer->setSerializer($serializer);
+
+        $data = new \stdClass();
+        $data->foo = 'foo';
+        $data->bar = 'bar';
+        $data->baz = true;
+        $data->fooBar = 'foobar';
+        $obj = $normalizer->denormalize($data, ObjectConstructorDummy::class, 'any');
+        $this->assertEquals('foo', $obj->getFoo());
+        $this->assertEquals('bar', $obj->bar);
+    }
+
     public function testConstructorWithObjectTypeHintDenormalize()
     {
         $data = [
@@ -343,6 +363,11 @@ class ObjectNormalizerTest extends TestCase
         new Serializer([$normalizer]);
 
         return $normalizer;
+    }
+
+    protected function getNormalizerForFilterBool(): ObjectNormalizer
+    {
+        return new ObjectNormalizer();
     }
 
     public function testAttributesContextDenormalizeConstructor()
@@ -482,6 +507,8 @@ class ObjectNormalizerTest extends TestCase
                 'bar' => null,
                 'foo_bar' => '@dunglas',
                 'symfony' => '@coopTilleuls',
+                'default' => null,
+                'class_name' => null,
             ],
             $this->normalizer->normalize($obj, null, [ObjectNormalizer::GROUPS => ['name_converter']])
         );
@@ -758,14 +785,14 @@ class ObjectNormalizerTest extends TestCase
     public function testAdvancedNameConverter()
     {
         $nameConverter = new class() implements AdvancedNameConverterInterface {
-            public function normalize(string $propertyName, string $class = null, string $format = null, array $context = []): string
+            public function normalize(string $propertyName, ?string $class = null, ?string $format = null, array $context = []): string
             {
-                return sprintf('%s-%s-%s-%s', $propertyName, $class, $format, $context['foo']);
+                return \sprintf('%s-%s-%s-%s', $propertyName, $class, $format, $context['foo']);
             }
 
-            public function denormalize(string $propertyName, string $class = null, string $format = null, array $context = []): string
+            public function denormalize(string $propertyName, ?string $class = null, ?string $format = null, array $context = []): string
             {
-                return sprintf('%s-%s-%s-%s', $propertyName, $class, $format, $context['foo']);
+                return \sprintf('%s-%s-%s-%s', $propertyName, $class, $format, $context['foo']);
             }
         };
 
@@ -856,6 +883,75 @@ class ObjectNormalizerTest extends TestCase
 
             throw $e;
         }
+    }
+
+    public function testNormalizeWithoutSerializerSet()
+    {
+        $normalizer = new ObjectNormalizer(new ClassMetadataFactory(new AttributeLoader()));
+
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('Cannot normalize attribute "foo" because the injected serializer is not a normalizer.');
+
+        $normalizer->normalize(new ObjectConstructorDummy([], [], []));
+    }
+
+    public function testNormalizeWithIgnoreAttributeAndPrivateProperties()
+    {
+        $classMetadataFactory = new ClassMetadataFactory(new AttributeLoader());
+        $normalizer = new ObjectNormalizer($classMetadataFactory);
+
+        $this->assertSame(['foo' => 'foo'], $normalizer->normalize(new ObjectDummyWithIgnoreAttributeAndPrivateProperty()));
+    }
+
+    public function testDenormalizeWithIgnoreAttributeAndPrivateProperties()
+    {
+        $classMetadataFactory = new ClassMetadataFactory(new AttributeLoader());
+        $normalizer = new ObjectNormalizer($classMetadataFactory);
+
+        $obj = $normalizer->denormalize([
+            'foo' => 'set',
+            'ignore' => 'set',
+            'private' => 'set',
+        ], ObjectDummyWithIgnoreAttributeAndPrivateProperty::class);
+
+        $expected = new ObjectDummyWithIgnoreAttributeAndPrivateProperty();
+        $expected->foo = 'set';
+
+        $this->assertEquals($expected, $obj);
+    }
+
+    public function testNormalizeWithPropertyPath()
+    {
+        $classMetadataFactory = new ClassMetadataFactory(new YamlFileLoader(__DIR__.'/../Fixtures/property-path-mapping.yaml'));
+        $normalizer = new ObjectNormalizer($classMetadataFactory, new MetadataAwareNameConverter($classMetadataFactory));
+
+        $dummyInner = new ObjectInner();
+        $dummyInner->foo = 'foo';
+        $dummy = new ObjectOuter();
+        $dummy->setInner($dummyInner);
+
+        $this->assertSame(['inner_foo' => 'foo'], $normalizer->normalize($dummy, 'json', ['groups' => 'read']));
+    }
+
+    public function testDenormalizeWithPropertyPath()
+    {
+        $classMetadataFactory = new ClassMetadataFactory(new YamlFileLoader(__DIR__.'/../Fixtures/property-path-mapping.yaml'));
+        $normalizer = new ObjectNormalizer($classMetadataFactory, new MetadataAwareNameConverter($classMetadataFactory));
+
+        $dummy = new ObjectOuter();
+        $dummy->setInner(new ObjectInner());
+
+        $obj = $normalizer->denormalize(['inner_foo' => 'foo'], ObjectOuter::class, 'json', [
+            'object_to_populate' => $dummy,
+            'groups' => 'read',
+        ]);
+
+        $expectedInner = new ObjectInner();
+        $expectedInner->foo = 'foo';
+        $expected = new ObjectOuter();
+        $expected->setInner($expectedInner);
+
+        $this->assertEquals($expected, $obj);
     }
 }
 
@@ -1031,6 +1127,11 @@ class LazyObjectInner extends ObjectInner
             return $this->foo = 123;
         }
     }
+
+    public function __isset($name): bool
+    {
+        return 'foo' === $name;
+    }
 }
 
 class DummyWithConstructorObject
@@ -1075,7 +1176,7 @@ class DummyWithConstructorObjectAndDefaultValue
     private $foo;
     private $inner;
 
-    public function __construct($foo = 'a', ObjectInner $inner = null)
+    public function __construct($foo = 'a', ?ObjectInner $inner = null)
     {
         $this->foo = $foo;
         $this->inner = $inner;
@@ -1123,4 +1224,14 @@ class DummyWithNullableConstructorObject
     {
         return $this->inner;
     }
+}
+
+class ObjectDummyWithIgnoreAttributeAndPrivateProperty
+{
+    public $foo = 'foo';
+
+    #[Ignore]
+    public $ignored = 'ignored';
+
+    private $private = 'private';
 }

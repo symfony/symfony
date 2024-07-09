@@ -33,12 +33,11 @@ class WindowsPipes extends AbstractPipes
         Process::STDOUT => 0,
         Process::STDERR => 0,
     ];
-    private bool $haveReadSupport;
 
-    public function __construct(mixed $input, bool $haveReadSupport)
-    {
-        $this->haveReadSupport = $haveReadSupport;
-
+    public function __construct(
+        mixed $input,
+        private bool $haveReadSupport,
+    ) {
         if ($this->haveReadSupport) {
             // Fix for PHP bug #51800: reading from STDOUT pipe hangs forever on Windows if the output is too big.
             // Workaround for this problem is to use temporary files instead of pipes on Windows platform.
@@ -53,7 +52,7 @@ class WindowsPipes extends AbstractPipes
             set_error_handler(function ($type, $msg) use (&$lastError) { $lastError = $msg; });
             for ($i = 0;; ++$i) {
                 foreach ($pipes as $pipe => $name) {
-                    $file = sprintf('%s\\sf_proc_%02X.%s', $tmpDir, $i, $name);
+                    $file = \sprintf('%s\\sf_proc_%02X.%s', $tmpDir, $i, $name);
 
                     if (!$h = fopen($file.'.lock', 'w')) {
                         if (file_exists($file.'.lock')) {

@@ -25,6 +25,7 @@ class UndefinedCallableHandler
     private const FILTER_COMPONENTS = [
         'humanize' => 'form',
         'form_encode_currency' => 'form',
+        'serialize' => 'serializer',
         'trans' => 'translation',
         'sanitize_html' => 'html-sanitizer',
         'yaml_encode' => 'yaml',
@@ -36,6 +37,7 @@ class UndefinedCallableHandler
         'asset_version' => 'asset',
         'importmap' => 'asset-mapper',
         'dump' => 'debug-bundle',
+        'emojify' => 'emoji',
         'encore_entry_link_tags' => 'webpack-encore-bundle',
         'encore_entry_script_tags' => 'webpack-encore-bundle',
         'expression' => 'expression-language',
@@ -59,6 +61,11 @@ class UndefinedCallableHandler
         'logout_url' => 'security-http',
         'logout_path' => 'security-http',
         'is_granted' => 'security-core',
+        'impersonation_path' => 'security-http',
+        'impersonation_url' => 'security-http',
+        'impersonation_exit_path' => 'security-http',
+        'impersonation_exit_url' => 'security-http',
+        't' => 'translation',
         'link' => 'web-link',
         'preload' => 'web-link',
         'dns_prefetch' => 'web-link',
@@ -108,7 +115,7 @@ class UndefinedCallableHandler
     private static function onUndefined(string $name, string $type, string $component): string
     {
         if (class_exists(FullStack::class) && isset(self::FULL_STACK_ENABLE[$component])) {
-            return sprintf('Did you forget to %s? Unknown %s "%s".', self::FULL_STACK_ENABLE[$component], $type, $name);
+            return \sprintf('Did you forget to %s? Unknown %s "%s".', self::FULL_STACK_ENABLE[$component], $type, $name);
         }
 
         $missingPackage = 'symfony/'.$component;
@@ -117,6 +124,6 @@ class UndefinedCallableHandler
             $missingPackage = 'symfony/twig-bundle';
         }
 
-        return sprintf('Did you forget to run "composer require %s"? Unknown %s "%s".', $missingPackage, $type, $name);
+        return \sprintf('Did you forget to run "composer require %s"? Unknown %s "%s".', $missingPackage, $type, $name);
     }
 }

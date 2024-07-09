@@ -30,33 +30,29 @@ class ArrayAdapter implements AdapterInterface, CacheInterface, LoggerAwareInter
 {
     use LoggerAwareTrait;
 
-    private bool $storeSerialized;
     private array $values = [];
     private array $tags = [];
     private array $expiries = [];
-    private int $defaultLifetime;
-    private float $maxLifetime;
-    private int $maxItems;
 
     private static \Closure $createCacheItem;
 
     /**
      * @param bool $storeSerialized Disabling serialization can lead to cache corruptions when storing mutable values but increases performance otherwise
      */
-    public function __construct(int $defaultLifetime = 0, bool $storeSerialized = true, float $maxLifetime = 0, int $maxItems = 0)
-    {
+    public function __construct(
+        private int $defaultLifetime = 0,
+        private bool $storeSerialized = true,
+        private float $maxLifetime = 0,
+        private int $maxItems = 0,
+    ) {
         if (0 > $maxLifetime) {
-            throw new InvalidArgumentException(sprintf('Argument $maxLifetime must be positive, %F passed.', $maxLifetime));
+            throw new InvalidArgumentException(\sprintf('Argument $maxLifetime must be positive, %F passed.', $maxLifetime));
         }
 
         if (0 > $maxItems) {
-            throw new InvalidArgumentException(sprintf('Argument $maxItems must be a positive integer, %d passed.', $maxItems));
+            throw new InvalidArgumentException(\sprintf('Argument $maxItems must be a positive integer, %d passed.', $maxItems));
         }
 
-        $this->defaultLifetime = $defaultLifetime;
-        $this->storeSerialized = $storeSerialized;
-        $this->maxLifetime = $maxLifetime;
-        $this->maxItems = $maxItems;
         self::$createCacheItem ??= \Closure::bind(
             static function ($key, $value, $isHit, $tags) {
                 $item = new CacheItem();
@@ -74,7 +70,7 @@ class ArrayAdapter implements AdapterInterface, CacheInterface, LoggerAwareInter
         );
     }
 
-    public function get(string $key, callable $callback, float $beta = null, array &$metadata = null): mixed
+    public function get(string $key, callable $callback, ?float $beta = null, ?array &$metadata = null): mixed
     {
         $item = $this->getItem($key);
         $metadata = $item->getMetadata();
@@ -311,7 +307,7 @@ class ArrayAdapter implements AdapterInterface, CacheInterface, LoggerAwareInter
             } catch (\Exception $e) {
                 unset($this->values[$key], $this->tags[$key]);
                 $type = get_debug_type($value);
-                $message = sprintf('Failed to save key "{key}" of type %s: %s', $type, $e->getMessage());
+                $message = \sprintf('Failed to save key "{key}" of type %s: %s', $type, $e->getMessage());
                 CacheItem::log($this->logger, $message, ['key' => $key, 'exception' => $e, 'cache-adapter' => get_debug_type($this)]);
 
                 return null;

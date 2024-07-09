@@ -21,8 +21,8 @@ Symfony\Component\Form\Extension\Core\Type\ChoiceType (Block prefix: "choice")
   placeholder                                          getter                                                
   placeholder_attr                                     help                                                  
   preferred_choices                                    help_attr                                             
-                                                       help_html                                             
-                                                       help_translation_parameters                           
+  separator                                            help_html                                             
+  separator_html                                       help_translation_parameters                           
                                                        inherit_data                                          
                                                        invalid_message_parameters                            
                                                        is_empty_callback                                     

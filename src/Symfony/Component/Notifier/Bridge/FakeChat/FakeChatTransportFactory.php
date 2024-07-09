@@ -29,7 +29,7 @@ final class FakeChatTransportFactory extends AbstractTransportFactory
     private ?MailerInterface $mailer;
     private ?LoggerInterface $logger;
 
-    public function __construct(MailerInterface $mailer = null, LoggerInterface $logger = null, EventDispatcherInterface $dispatcher = null, HttpClientInterface $client = null)
+    public function __construct(?MailerInterface $mailer = null, ?LoggerInterface $logger = null, ?EventDispatcherInterface $dispatcher = null, ?HttpClientInterface $client = null)
     {
         parent::__construct($dispatcher, $client);
 
@@ -71,6 +71,6 @@ final class FakeChatTransportFactory extends AbstractTransportFactory
 
     private function throwMissingDependencyException(string $scheme, string $missingDependency, string $suggestedPackage): void
     {
-        throw new LogicException(sprintf('Cannot create a transport for scheme "%s" without providing an implementation of "%s". Try running "composer require "%s"".', $scheme, $missingDependency, $suggestedPackage));
+        throw new LogicException(\sprintf('Cannot create a transport for scheme "%s" without providing an implementation of "%s". Try running "composer require "%s"".', $scheme, $missingDependency, $suggestedPackage));
     }
 }

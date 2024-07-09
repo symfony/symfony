@@ -23,6 +23,7 @@ use Symfony\Component\Config\ResourceCheckerConfigCacheFactory;
 use Symfony\Component\Console\ConsoleEvents;
 use Symfony\Component\DependencyInjection\Config\ContainerParametersResourceChecker;
 use Symfony\Component\DependencyInjection\EnvVarProcessor;
+use Symfony\Component\DependencyInjection\Parameter;
 use Symfony\Component\DependencyInjection\ParameterBag\ContainerBag;
 use Symfony\Component\DependencyInjection\ParameterBag\ContainerBagInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
@@ -129,7 +130,7 @@ return static function (ContainerConfigurator $container) {
             ->args([
                 tagged_iterator('kernel.cache_warmer'),
                 param('kernel.debug'),
-                sprintf('%s/%sDeprecations.log', param('kernel.build_dir'), param('kernel.container_class')),
+                \sprintf('%s/%sDeprecations.log', param('kernel.build_dir'), param('kernel.container_class')),
             ])
             ->tag('container.no_preload')
 
@@ -154,7 +155,7 @@ return static function (ContainerConfigurator $container) {
 
         ->set('uri_signer', UriSigner::class)
             ->args([
-                param('kernel.secret'),
+                new Parameter('kernel.secret')
             ])
         ->alias(UriSigner::class, 'uri_signer')
 

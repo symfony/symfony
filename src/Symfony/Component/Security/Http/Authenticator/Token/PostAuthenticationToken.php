@@ -16,15 +16,16 @@ use Symfony\Component\Security\Core\User\UserInterface;
 
 class PostAuthenticationToken extends AbstractToken
 {
-    private string $firewallName;
-
     /**
      * @param string[] $roles An array of roles
      *
      * @throws \InvalidArgumentException
      */
-    public function __construct(UserInterface $user, string $firewallName, array $roles)
-    {
+    public function __construct(
+        UserInterface $user,
+        private string $firewallName,
+        array $roles,
+    ) {
         parent::__construct($roles);
 
         if ('' === $firewallName) {
@@ -32,7 +33,6 @@ class PostAuthenticationToken extends AbstractToken
         }
 
         $this->setUser($user);
-        $this->firewallName = $firewallName;
     }
 
     /**

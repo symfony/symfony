@@ -32,20 +32,18 @@ final class LinkedInTransport extends AbstractTransport
 {
     protected const HOST = 'api.linkedin.com';
 
-    private string $authToken;
-    private string $accountId;
-
-    public function __construct(#[\SensitiveParameter] string $authToken, string $accountId, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
-    {
-        $this->authToken = $authToken;
-        $this->accountId = $accountId;
-
+    public function __construct(
+        #[\SensitiveParameter] private string $authToken,
+        private string $accountId,
+        ?HttpClientInterface $client = null,
+        ?EventDispatcherInterface $dispatcher = null,
+    ) {
         parent::__construct($client, $dispatcher);
     }
 
     public function __toString(): string
     {
-        return sprintf('linkedin://%s', $this->getEndpoint());
+        return \sprintf('linkedin://%s', $this->getEndpoint());
     }
 
     public function supports(MessageInterface $message): bool
@@ -63,7 +61,7 @@ final class LinkedInTransport extends AbstractTransport
         }
 
         if (($options = $message->getOptions()) && !$options instanceof LinkedInOptions) {
-            throw new LogicException(sprintf('The "%s" transport only supports instances of "%s" for options.', __CLASS__, LinkedInOptions::class));
+            throw new LogicException(\sprintf('The "%s" transport only supports instances of "%s" for options.', __CLASS__, LinkedInOptions::class));
         }
 
         if (!$options && $notification = $message->getNotification()) {
@@ -71,7 +69,7 @@ final class LinkedInTransport extends AbstractTransport
             $options->author(new AuthorShare($this->accountId));
         }
 
-        $endpoint = sprintf('https://%s/v2/ugcPosts', $this->getEndpoint());
+        $endpoint = \sprintf('https://%s/v2/ugcPosts', $this->getEndpoint());
 
         $response = $this->client->request('POST', $endpoint, [
             'auth_bearer' => $this->authToken,
@@ -86,13 +84,13 @@ final class LinkedInTransport extends AbstractTransport
         }
 
         if (201 !== $statusCode) {
-            throw new TransportException(sprintf('Unable to post the Linkedin message: "%s".', $response->getContent(false)), $response);
+            throw new TransportException(\sprintf('Unable to post the Linkedin message: "%s".', $response->getContent(false)), $response);
         }
 
         $result = $response->toArray(false);
 
         if (!$result['id']) {
-            throw new TransportException(sprintf('Unable to post the Linkedin message: "%s".', $result['error']), $response);
+            throw new TransportException(\sprintf('Unable to post the Linkedin message: "%s".', $result['error']), $response);
         }
 
         $sentMessage = new SentMessage($message, (string) $this);
@@ -117,7 +115,7 @@ final class LinkedInTransport extends AbstractTransport
                 'com.linkedin.ugc.MemberNetworkVisibility' => 'PUBLIC',
             ],
             'lifecycleState' => 'PUBLISHED',
-            'author' => sprintf('urn:li:person:%s', $this->accountId),
+            'author' => \sprintf('urn:li:person:%s', $this->accountId),
         ];
     }
 }

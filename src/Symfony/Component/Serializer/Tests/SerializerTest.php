@@ -12,6 +12,7 @@
 namespace Symfony\Component\Serializer\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\PropertyAccess\Exception\InvalidTypeException;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor;
 use Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor;
@@ -1081,11 +1082,11 @@ class SerializerTest extends TestCase
                 'message' => 'The type of the "string" attribute for class "Symfony\Component\Serializer\Tests\Fixtures\Php74Full" must be one of "string" ("null" given).',
             ],
             [
-                'currentType' => 'array',
+                'currentType' => 'null',
                 'expectedTypes' => [
                     'unknown',
                 ],
-                'path' => 'php74FullWithConstructor',
+                'path' => 'php74FullWithConstructor.constructorArgument',
                 'useMessageForUser' => true,
                 'message' => 'Failed to create object because the class misses the "constructorArgument" property.',
             ],
@@ -1213,7 +1214,71 @@ class SerializerTest extends TestCase
                 'useMessageForUser' => false,
                 'message' => 'The type of the "string" attribute for class "Symfony\\Component\\Serializer\\Tests\\Fixtures\\Php74Full" must be one of "string" ("null" given).',
             ],
-            ];
+        ];
+
+        $this->assertSame($expected, $exceptionsAsArray);
+    }
+
+    public function testCollectDenormalizationErrorsWithoutTypeExtractor()
+    {
+        $json = '
+        {
+            "string": [],
+            "int": [],
+            "float": []
+        }';
+
+        $serializer = new Serializer([new ObjectNormalizer()], ['json' => new JsonEncoder()]);
+
+        try {
+            $serializer->deserialize($json, Php74Full::class, 'json', [
+                DenormalizerInterface::COLLECT_DENORMALIZATION_ERRORS => true,
+            ]);
+
+            $this->fail();
+        } catch (\Throwable $th) {
+            $this->assertInstanceOf(PartialDenormalizationException::class, $th);
+        }
+
+        $this->assertInstanceOf(Php74Full::class, $th->getData());
+
+        $exceptionsAsArray = array_map(fn (NotNormalizableValueException $e): array => [
+            'currentType' => $e->getCurrentType(),
+            'expectedTypes' => $e->getExpectedTypes(),
+            'path' => $e->getPath(),
+            'useMessageForUser' => $e->canUseMessageForUser(),
+            'message' => $e->getMessage(),
+        ], $th->getErrors());
+
+        $expected = [
+            [
+                'currentType' => 'array',
+                'expectedTypes' => [
+                    class_exists(InvalidTypeException::class) ? 'string' : 'unknown',
+                ],
+                'path' => 'string',
+                'useMessageForUser' => false,
+                'message' => 'Failed to denormalize attribute "string" value for class "Symfony\\Component\\Serializer\\Tests\\Fixtures\\Php74Full": Expected argument of type "string", "array" given at property path "string".',
+            ],
+            [
+                'currentType' => 'array',
+                'expectedTypes' => [
+                    class_exists(InvalidTypeException::class) ? 'int' : 'unknown',
+                ],
+                'path' => 'int',
+                'useMessageForUser' => false,
+                'message' => 'Failed to denormalize attribute "int" value for class "Symfony\\Component\\Serializer\\Tests\\Fixtures\\Php74Full": Expected argument of type "int", "array" given at property path "int".',
+            ],
+            [
+                'currentType' => 'array',
+                'expectedTypes' => [
+                    class_exists(InvalidTypeException::class) ? 'float' : 'unknown',
+                ],
+                'path' => 'float',
+                'useMessageForUser' => false,
+                'message' => 'Failed to denormalize attribute "float" value for class "Symfony\\Component\\Serializer\\Tests\\Fixtures\\Php74Full": Expected argument of type "float", "array" given at property path "float".',
+            ],
+        ];
 
         $this->assertSame($expected, $exceptionsAsArray);
     }
@@ -1265,20 +1330,20 @@ class SerializerTest extends TestCase
                 'message' => 'The type of the "bool" attribute for class "Symfony\\Component\\Serializer\\Tests\\Fixtures\\Php80WithPromotedTypedConstructor" must be one of "bool" ("string" given).',
             ],
             [
-                'currentType' => 'array',
+                'currentType' => 'null',
                 'expectedTypes' => [
-                    'unknown',
+                    'string',
                 ],
-                'path' => null,
+                'path' => 'string',
                 'useMessageForUser' => true,
                 'message' => 'Failed to create object because the class misses the "string" property.',
             ],
             [
-                'currentType' => 'array',
+                'currentType' => 'null',
                 'expectedTypes' => [
-                    'unknown',
+                    'int',
                 ],
-                'path' => null,
+                'path' => 'int',
                 'useMessageForUser' => true,
                 'message' => 'Failed to create object because the class misses the "int" property.',
             ],
@@ -1328,7 +1393,7 @@ class SerializerTest extends TestCase
             [
                 'currentType' => 'string',
                 'expectedTypes' => [
-                    0 => 'bool',
+                    'bool',
                 ],
                 'path' => 'bool',
                 'useMessageForUser' => false,
@@ -1337,7 +1402,7 @@ class SerializerTest extends TestCase
             [
                 'currentType' => 'bool',
                 'expectedTypes' => [
-                    0 => 'int',
+                    'int',
                 ],
                 'path' => 'int',
                 'useMessageForUser' => false,
@@ -1374,7 +1439,7 @@ class SerializerTest extends TestCase
 
         $expected = [
             [
-                'currentType' => 'array',
+                'currentType' => 'null',
                 'useMessageForUser' => true,
                 'message' => 'Failed to create object because the class misses the "get" property.',
             ],
@@ -1399,8 +1464,8 @@ class SerializerTest extends TestCase
 
         try {
             $serializer->deserialize('{"get": "POST"}', DummyObjectWithEnumProperty::class, 'json', [
-                 DenormalizerInterface::COLLECT_DENORMALIZATION_ERRORS => true,
-             ]);
+                DenormalizerInterface::COLLECT_DENORMALIZATION_ERRORS => true,
+            ]);
         } catch (\Throwable $e) {
             $this->assertInstanceOf(PartialDenormalizationException::class, $e);
         }
@@ -1583,11 +1648,11 @@ class SerializerTest extends TestCase
 
         $expected = [
             [
-                'currentType' => 'array',
+                'currentType' => 'null',
                 'expectedTypes' => [
-                    'unknown',
+                    'string',
                 ],
-                'path' => null,
+                'path' => 'two',
                 'useMessageForUser' => true,
                 'message' => 'Failed to create object because the class misses the "two" property.',
             ],

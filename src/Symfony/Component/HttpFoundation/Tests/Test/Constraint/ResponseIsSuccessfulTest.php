@@ -27,9 +27,28 @@ class ResponseIsSuccessfulTest extends TestCase
         $this->assertFalse($constraint->evaluate(new Response('', 404), '', true));
 
         try {
-            $constraint->evaluate(new Response('', 404));
+            $constraint->evaluate(new Response('Response body', 404));
         } catch (ExpectationFailedException $e) {
-            $this->assertStringContainsString("Failed asserting that the Response is successful.\nHTTP/1.0 404 Not Found", TestFailure::exceptionToString($e));
+            $exceptionMessage = TestFailure::exceptionToString($e);
+            $this->assertStringContainsString("Failed asserting that the Response is successful.\nHTTP/1.0 404 Not Found", $exceptionMessage);
+            $this->assertStringContainsString('Response body', $exceptionMessage);
+
+            return;
+        }
+
+        $this->fail();
+    }
+
+    public function testReducedVerbosity()
+    {
+        $constraint = new ResponseIsSuccessful(verbose: false);
+
+        try {
+            $constraint->evaluate(new Response('Response body', 404));
+        } catch (ExpectationFailedException $e) {
+            $exceptionMessage = TestFailure::exceptionToString($e);
+            $this->assertStringContainsString("Failed asserting that the Response is successful.\nHTTP/1.0 404 Not Found", $exceptionMessage);
+            $this->assertStringNotContainsString('Response body', $exceptionMessage);
 
             return;
         }

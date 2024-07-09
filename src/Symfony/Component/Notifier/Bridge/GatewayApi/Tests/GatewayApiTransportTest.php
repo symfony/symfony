@@ -28,7 +28,7 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
  */
 final class GatewayApiTransportTest extends TransportTestCase
 {
-    public static function createTransport(HttpClientInterface $client = null): GatewayApiTransport
+    public static function createTransport(?HttpClientInterface $client = null): GatewayApiTransport
     {
         return new GatewayApiTransport('authtoken', 'Symfony', $client ?? new MockHttpClient());
     }

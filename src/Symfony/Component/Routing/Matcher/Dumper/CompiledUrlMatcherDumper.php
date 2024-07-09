@@ -134,7 +134,7 @@ EOF;
 
         $code .= '[ // $staticRoutes'."\n";
         foreach ($staticRoutes as $path => $routes) {
-            $code .= sprintf("    %s => [\n", self::export($path));
+            $code .= \sprintf("    %s => [\n", self::export($path));
             foreach ($routes as $route) {
                 $code .= vsprintf("        [%s, %s, %s, %s, %s, %s, %s],\n", array_map([__CLASS__, 'export'], $route));
             }
@@ -142,11 +142,11 @@ EOF;
         }
         $code .= "],\n";
 
-        $code .= sprintf("[ // \$regexpList%s\n],\n", $regexpCode);
+        $code .= \sprintf("[ // \$regexpList%s\n],\n", $regexpCode);
 
         $code .= '[ // $dynamicRoutes'."\n";
         foreach ($dynamicRoutes as $path => $routes) {
-            $code .= sprintf("    %s => [\n", self::export($path));
+            $code .= \sprintf("    %s => [\n", self::export($path));
             foreach ($routes as $route) {
                 $code .= vsprintf("        [%s, %s, %s, %s, %s, %s, %s],\n", array_map([__CLASS__, 'export'], $route));
             }
@@ -399,7 +399,7 @@ EOF;
 
             $state->mark += 3 + $state->markTail + \strlen($regex) - $prefixLen;
             $state->markTail = 2 + \strlen($state->mark);
-            $rx = sprintf('|%s(*:%s)', substr($regex, $prefixLen), $state->mark);
+            $rx = \sprintf('|%s(*:%s)', substr($regex, $prefixLen), $state->mark);
             $code .= "\n            .".self::export($rx);
             $state->regex .= $rx;
 

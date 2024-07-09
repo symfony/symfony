@@ -21,7 +21,7 @@ interface FormRegistryInterface
     /**
      * Returns a form type by name.
      *
-     * This methods registers the type extensions from the form extensions.
+     * This method registers the type extensions from the form extensions.
      *
      * @throws Exception\InvalidArgumentException if the type cannot be retrieved from any extension
      */

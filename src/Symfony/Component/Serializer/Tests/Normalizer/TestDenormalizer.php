@@ -20,7 +20,7 @@ use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
  */
 class TestDenormalizer implements DenormalizerInterface
 {
-    public function denormalize($data, string $type, string $format = null, array $context = []): mixed
+    public function denormalize($data, string $type, ?string $format = null, array $context = []): mixed
     {
     }
 
@@ -29,7 +29,7 @@ class TestDenormalizer implements DenormalizerInterface
         return ['*' => false];
     }
 
-    public function supportsDenormalization($data, string $type, string $format = null, array $context = []): bool
+    public function supportsDenormalization($data, string $type, ?string $format = null, array $context = []): bool
     {
         return true;
     }

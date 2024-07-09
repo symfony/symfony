@@ -40,18 +40,19 @@ class CouchbaseBucketAdapter extends AbstractAdapter
         'durabilityTimeout',
     ];
 
-    private \CouchbaseBucket $bucket;
     private MarshallerInterface $marshaller;
 
-    public function __construct(\CouchbaseBucket $bucket, string $namespace = '', int $defaultLifetime = 0, MarshallerInterface $marshaller = null)
-    {
+    public function __construct(
+        private \CouchbaseBucket $bucket,
+        string $namespace = '',
+        int $defaultLifetime = 0,
+        ?MarshallerInterface $marshaller = null,
+    ) {
         if (!static::isSupported()) {
             throw new CacheException('Couchbase >= 2.6.0 < 3.0.0 is required.');
         }
 
         $this->maxIdLength = static::MAX_KEY_LENGTH;
-
-        $this->bucket = $bucket;
 
         parent::__construct($namespace, $defaultLifetime);
         $this->enableVersioning();
@@ -111,7 +112,7 @@ class CouchbaseBucketAdapter extends AbstractAdapter
 
             unset($options['username'], $options['password']);
             foreach ($options as $option => $value) {
-                if (!empty($value)) {
+                if ($value) {
                     $bucket->$option = $value;
                 }
             }

@@ -21,7 +21,7 @@ use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
  */
 class GreaterThanOrEqualValidatorWithPositiveOrZeroConstraintTest extends GreaterThanOrEqualValidatorTest
 {
-    protected static function createConstraint(array $options = null): Constraint
+    protected static function createConstraint(?array $options = null): Constraint
     {
         return new PositiveOrZero();
     }
@@ -69,7 +69,7 @@ class GreaterThanOrEqualValidatorWithPositiveOrZeroConstraintTest extends Greate
      */
     public function testThrowsConstraintExceptionIfNoValueOrPropertyPath($options)
     {
-       $this->markTestSkipped('Value option always set for PositiveOrZero constraint');
+        $this->markTestSkipped('Value option always set for PositiveOrZero constraint');
     }
 
     public function testThrowsConstraintExceptionIfBothValueAndPropertyPath()

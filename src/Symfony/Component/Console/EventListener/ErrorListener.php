@@ -24,11 +24,9 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  */
 class ErrorListener implements EventSubscriberInterface
 {
-    private ?LoggerInterface $logger;
-
-    public function __construct(LoggerInterface $logger = null)
-    {
-        $this->logger = $logger;
+    public function __construct(
+        private ?LoggerInterface $logger = null,
+    ) {
     }
 
     public function onConsoleError(ConsoleErrorEvent $event): void

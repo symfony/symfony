@@ -29,18 +29,17 @@ use Symfony\Component\Validator\ValidatorBuilder;
  */
 class ValidatorCacheWarmer extends AbstractPhpFileCacheWarmer
 {
-    private ValidatorBuilder $validatorBuilder;
-
     /**
      * @param string $phpArrayFile The PHP file where metadata are cached
      */
-    public function __construct(ValidatorBuilder $validatorBuilder, string $phpArrayFile)
-    {
+    public function __construct(
+        private ValidatorBuilder $validatorBuilder,
+        string $phpArrayFile,
+    ) {
         parent::__construct($phpArrayFile);
-        $this->validatorBuilder = $validatorBuilder;
     }
 
-    protected function doWarmUp(string $cacheDir, ArrayAdapter $arrayAdapter, string $buildDir = null): bool
+    protected function doWarmUp(string $cacheDir, ArrayAdapter $arrayAdapter, ?string $buildDir = null): bool
     {
         $loaders = $this->validatorBuilder->getLoaders();
         $metadataFactory = new LazyLoadingMetadataFactory(new LoaderChain($loaders), $arrayAdapter);

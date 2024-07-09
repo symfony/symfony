@@ -22,7 +22,7 @@ class FixedTranslator implements TranslatorInterface
         $this->translations = $translations;
     }
 
-    public function trans(string $id, array $parameters = [], string $domain = null, string $locale = null): string
+    public function trans(string $id, array $parameters = [], ?string $domain = null, ?string $locale = null): string
     {
         return $this->translations[$id] ?? $id;
     }

@@ -24,7 +24,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
  */
 final class RocketChatTransportTest extends TransportTestCase
 {
-    public static function createTransport(HttpClientInterface $client = null, string $channel = null): RocketChatTransport
+    public static function createTransport(?HttpClientInterface $client = null, ?string $channel = null): RocketChatTransport
     {
         return new RocketChatTransport('testAccessToken', $channel, $client ?? new MockHttpClient());
     }

@@ -33,14 +33,10 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 #[AsCommand(name: 'secrets:set', description: 'Set a secret in the vault')]
 final class SecretsSetCommand extends Command
 {
-    private AbstractVault $vault;
-    private ?AbstractVault $localVault;
-
-    public function __construct(AbstractVault $vault, AbstractVault $localVault = null)
-    {
-        $this->vault = $vault;
-        $this->localVault = $localVault;
-
+    public function __construct(
+        private AbstractVault $vault,
+        private ?AbstractVault $localVault = null,
+    ) {
         parent::__construct();
     }
 
@@ -88,7 +84,7 @@ EOF
         }
 
         if ($this->localVault === $vault && !\array_key_exists($name, $this->vault->list())) {
-            $io->error(sprintf('Secret "%s" does not exist in the vault, you cannot override it locally.', $name));
+            $io->error(\sprintf('Secret "%s" does not exist in the vault, you cannot override it locally.', $name));
 
             return 1;
         }
@@ -107,9 +103,9 @@ EOF
         } elseif (is_file($file) && is_readable($file)) {
             $value = file_get_contents($file);
         } elseif (!is_file($file)) {
-            throw new \InvalidArgumentException(sprintf('File not found: "%s".', $file));
+            throw new \InvalidArgumentException(\sprintf('File not found: "%s".', $file));
         } elseif (!is_readable($file)) {
-            throw new \InvalidArgumentException(sprintf('File is not readable: "%s".', $file));
+            throw new \InvalidArgumentException(\sprintf('File is not readable: "%s".', $file));
         }
 
         if ($vault->generateKeys()) {

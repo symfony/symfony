@@ -133,8 +133,7 @@ class PostmarkApiTransportTest extends TestCase
             ->from(new Address('fabpot@symfony.com', 'Fabien'))
             ->text('Hello There!');
 
-        $expectedEvent = (new PostmarkDeliveryEvent('Inactive recipient', 406))
-            ->setHeaders($mail->getHeaders());
+        $expectedEvent = (new PostmarkDeliveryEvent('Inactive recipient', 406, $mail->getHeaders()));
 
         $dispatcher = $this->createMock(EventDispatcherInterface::class);
         $dispatcher

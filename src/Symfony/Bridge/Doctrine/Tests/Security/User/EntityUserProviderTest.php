@@ -236,14 +236,11 @@ class EntityUserProviderTest extends TestCase
 
     private function getObjectManager($repository)
     {
-        $em = $this->getMockBuilder(ObjectManager::class)
-            ->onlyMethods(['getClassMetadata', 'getRepository'])
-            ->getMockForAbstractClass();
-        $em->expects($this->any())
-            ->method('getRepository')
+        $objectManager = $this->createMock(ObjectManager::class);
+        $objectManager->method('getRepository')
             ->willReturn($repository);
 
-        return $em;
+        return $objectManager;
     }
 
     private function createSchema($em)

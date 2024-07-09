@@ -42,7 +42,7 @@ final class Address
     public function __construct(string $address, string $name = '')
     {
         if (!class_exists(EmailValidator::class)) {
-            throw new LogicException(sprintf('The "%s" class cannot be used as it needs "%s". Try running "composer require egulias/email-validator".', __CLASS__, EmailValidator::class));
+            throw new LogicException(\sprintf('The "%s" class cannot be used as it needs "%s". Try running "composer require egulias/email-validator".', __CLASS__, EmailValidator::class));
         }
 
         self::$validator ??= new EmailValidator();
@@ -51,7 +51,7 @@ final class Address
         $this->name = trim(str_replace(["\n", "\r"], '', $name));
 
         if (!self::$validator->isValid($this->address, class_exists(MessageIDValidation::class) ? new MessageIDValidation() : new RFCValidation())) {
-            throw new RfcComplianceException(sprintf('Email "%s" does not comply with addr-spec of RFC 2822.', $address));
+            throw new RfcComplianceException(\sprintf('Email "%s" does not comply with addr-spec of RFC 2822.', $address));
         }
     }
 
@@ -83,7 +83,7 @@ final class Address
             return '';
         }
 
-        return sprintf('"%s"', preg_replace('/"/u', '\"', $this->getName()));
+        return \sprintf('"%s"', preg_replace('/"/u', '\"', $this->getName()));
     }
 
     public static function create(self|string $address): self
@@ -97,7 +97,7 @@ final class Address
         }
 
         if (!preg_match(self::FROM_STRING_PATTERN, $address, $matches)) {
-            throw new InvalidArgumentException(sprintf('Could not parse "%s" to a "%s" instance.', $address, self::class));
+            throw new InvalidArgumentException(\sprintf('Could not parse "%s" to a "%s" instance.', $address, self::class));
         }
 
         return new self($matches['addrSpec'], trim($matches['displayName'], ' \'"'));

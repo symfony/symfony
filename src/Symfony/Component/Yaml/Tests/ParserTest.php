@@ -12,6 +12,7 @@
 namespace Symfony\Component\Yaml\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\Yaml\Exception\ParseException;
 use Symfony\Component\Yaml\Parser;
 use Symfony\Component\Yaml\Tag\TaggedValue;
@@ -19,6 +20,8 @@ use Symfony\Component\Yaml\Yaml;
 
 class ParserTest extends TestCase
 {
+    use ExpectDeprecationTrait;
+
     private ?Parser $parser;
 
     protected function setUp(): void
@@ -967,7 +970,7 @@ EOD;
     public function testParseExceptionOnDuplicate($input, $duplicateKey, $lineNumber)
     {
         $this->expectException(ParseException::class);
-        $this->expectExceptionMessage(sprintf('Duplicate key "%s" detected at line %d', $duplicateKey, $lineNumber));
+        $this->expectExceptionMessage(\sprintf('Duplicate key "%s" detected at line %d', $duplicateKey, $lineNumber));
 
         Yaml::parse($input);
     }
@@ -1027,6 +1030,23 @@ EOD;
         $tests[] = [$yaml, 'child_sequence', 6];
 
         return $tests;
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testNullAsDuplicatedData()
+    {
+        $this->expectDeprecation('Since symfony/yaml 7.2: Duplicate key "child" detected on line 4 whilst parsing YAML. Silent handling of duplicate mapping keys in YAML is deprecated and will throw a ParseException in 8.0.');
+
+        $yaml = <<<EOD
+parent:
+  child:
+  child2:
+  child:
+EOD;
+
+        Yaml::parse($yaml);
     }
 
     public function testEmptyValue()
@@ -1476,13 +1496,13 @@ EOT
 data: !!binary |
     SGVsbG8gd29ybGQ=
 EOT
-    ],
+            ],
             'containing spaces in block scalar' => [
                 <<<'EOT'
 data: !!binary |
     SGVs bG8gd 29ybGQ=
 EOT
-    ],
+            ],
         ];
     }
 
@@ -1567,7 +1587,7 @@ EOT;
     public function testParserThrowsExceptionWithCorrectLineNumber($lineNumber, $yaml)
     {
         $this->expectException(ParseException::class);
-        $this->expectExceptionMessage(sprintf('Unexpected characters near "," at line %d (near "bar: "123",").', $lineNumber));
+        $this->expectExceptionMessage(\sprintf('Unexpected characters near "," at line %d (near "bar: "123",").', $lineNumber));
 
         $this->parser->parse($yaml);
     }
@@ -2965,6 +2985,11 @@ YAML;
             'within_string' => 'a　b',
             'regular_space' => 'a b',
         ], $this->parser->parse($expected));
+    }
+
+    public function testSkipBlankLines()
+    {
+        $this->assertSame(['foo' => [null]], (new Parser())->parse("foo:\n-\n\n"));
     }
 
     private function assertSameData($expected, $actual)

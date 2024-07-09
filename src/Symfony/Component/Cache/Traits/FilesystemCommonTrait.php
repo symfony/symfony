@@ -32,7 +32,7 @@ trait FilesystemCommonTrait
         }
         if (isset($namespace[0])) {
             if (preg_match('#[^-+_.A-Za-z0-9]#', $namespace, $match)) {
-                throw new InvalidArgumentException(sprintf('Namespace contains "%s" but only characters in [-+_.A-Za-z0-9] are allowed.', $match[0]));
+                throw new InvalidArgumentException(\sprintf('Namespace contains "%s" but only characters in [-+_.A-Za-z0-9] are allowed.', $match[0]));
             }
             $directory .= \DIRECTORY_SEPARATOR.$namespace;
         } else {
@@ -44,7 +44,7 @@ trait FilesystemCommonTrait
         $directory .= \DIRECTORY_SEPARATOR;
         // On Windows the whole path is limited to 258 chars
         if ('\\' === \DIRECTORY_SEPARATOR && \strlen($directory) > 234) {
-            throw new InvalidArgumentException(sprintf('Cache directory too long (%s).', $directory));
+            throw new InvalidArgumentException(\sprintf('Cache directory too long (%s).', $directory));
         }
 
         $this->directory = $directory;
@@ -82,7 +82,7 @@ trait FilesystemCommonTrait
         return @unlink($file);
     }
 
-    private function write(string $file, string $data, int $expiresAt = null): bool
+    private function write(string $file, string $data, ?int $expiresAt = null): bool
     {
         $unlink = false;
         set_error_handler(static fn ($type, $message, $file, $line) => throw new \ErrorException($message, 0, $type, $file, $line));
@@ -119,7 +119,7 @@ trait FilesystemCommonTrait
         }
     }
 
-    private function getFile(string $id, bool $mkdir = false, string $directory = null): string
+    private function getFile(string $id, bool $mkdir = false, ?string $directory = null): string
     {
         // Use xxh128 to favor speed over security, which is not an issue here
         $hash = str_replace('/', '-', base64_encode(hash('xxh128', static::class.$id, true)));

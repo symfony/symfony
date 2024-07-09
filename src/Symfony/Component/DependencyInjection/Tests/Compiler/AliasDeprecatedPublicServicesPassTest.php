@@ -53,7 +53,7 @@ final class AliasDeprecatedPublicServicesPassTest extends TestCase
             ->addTag('container.private', $attributes);
 
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage(sprintf('The "%s" attribute is mandatory for the "container.private" tag on the "foo" service.', $attribute));
+        $this->expectExceptionMessage(\sprintf('The "%s" attribute is mandatory for the "container.private" tag on the "foo" service.', $attribute));
 
         (new AliasDeprecatedPublicServicesPass())->process($container);
     }

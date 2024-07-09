@@ -35,18 +35,18 @@ final class HttpHeaderSerializer
                 continue;
             }
 
-            $attributesParts = ['', sprintf('rel="%s"', implode(' ', $link->getRels()))];
+            $attributesParts = ['', \sprintf('rel="%s"', implode(' ', $link->getRels()))];
             foreach ($link->getAttributes() as $key => $value) {
                 if (\is_array($value)) {
                     foreach ($value as $v) {
-                        $attributesParts[] = sprintf('%s="%s"', $key, preg_replace('/(?<!\\\\)"/', '\"', $v));
+                        $attributesParts[] = \sprintf('%s="%s"', $key, preg_replace('/(?<!\\\\)"/', '\"', $v));
                     }
 
                     continue;
                 }
 
                 if (!\is_bool($value)) {
-                    $attributesParts[] = sprintf('%s="%s"', $key, preg_replace('/(?<!\\\\)"/', '\"', $value));
+                    $attributesParts[] = \sprintf('%s="%s"', $key, preg_replace('/(?<!\\\\)"/', '\"', $value));
 
                     continue;
                 }
@@ -56,7 +56,7 @@ final class HttpHeaderSerializer
                 }
             }
 
-            $elements[] = sprintf('<%s>%s', $link->getHref(), implode('; ', $attributesParts));
+            $elements[] = \sprintf('<%s>%s', $link->getHref(), implode('; ', $attributesParts));
         }
 
         return $elements ? implode(',', $elements) : null;

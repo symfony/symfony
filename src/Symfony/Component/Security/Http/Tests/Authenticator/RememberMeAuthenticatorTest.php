@@ -34,7 +34,7 @@ class RememberMeAuthenticatorTest extends TestCase
     {
         $this->rememberMeHandler = $this->createMock(RememberMeHandlerInterface::class);
         $this->tokenStorage = new TokenStorage();
-        $this->authenticator = new RememberMeAuthenticator($this->rememberMeHandler, 's3cr3t', $this->tokenStorage, '_remember_me_cookie');
+        $this->authenticator = new RememberMeAuthenticator($this->rememberMeHandler, $this->tokenStorage, '_remember_me_cookie');
     }
 
     public function testSupportsTokenStorageWithToken()

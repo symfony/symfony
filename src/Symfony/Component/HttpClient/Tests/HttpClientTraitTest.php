@@ -72,10 +72,8 @@ class HttpClientTraitTest extends TestCase
     public function testNormalizeBodyMultipart()
     {
         $file = fopen('php://memory', 'r+');
-        stream_context_set_option($file, ['http' => [
-            'filename' => 'test.txt',
-            'content_type' => 'text/plain',
-        ]]);
+        stream_context_set_option($file, 'http', 'filename', 'test.txt');
+        stream_context_set_option($file, 'http', 'content_type', 'text/plain');
         fwrite($file, 'foobarbaz');
         rewind($file);
 

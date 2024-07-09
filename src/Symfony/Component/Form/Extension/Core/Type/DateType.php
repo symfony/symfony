@@ -58,7 +58,7 @@ class DateType extends AbstractType
 
         if ('single_text' === $options['widget']) {
             if ('' !== $pattern && !str_contains($pattern, 'y') && !str_contains($pattern, 'M') && !str_contains($pattern, 'd')) {
-                throw new InvalidOptionsException(sprintf('The "format" option should contain the letters "y", "M" or "d". Its current value is "%s".', $pattern));
+                throw new InvalidOptionsException(\sprintf('The "format" option should contain the letters "y", "M" or "d". Its current value is "%s".', $pattern));
             }
 
             $builder->addViewTransformer(new DateTimeToLocalizedStringTransformer(
@@ -71,7 +71,7 @@ class DateType extends AbstractType
             ));
         } else {
             if ('' !== $pattern && (!str_contains($pattern, 'y') || !str_contains($pattern, 'M') || !str_contains($pattern, 'd'))) {
-                throw new InvalidOptionsException(sprintf('The "format" option should contain the letters "y", "M" and "d". Its current value is "%s".', $pattern));
+                throw new InvalidOptionsException(\sprintf('The "format" option should contain the letters "y", "M" and "d". Its current value is "%s".', $pattern));
             }
 
             $yearOptions = $monthOptions = $dayOptions = [
@@ -187,7 +187,7 @@ class DateType extends AbstractType
                 }
 
                 if ($date->getTimezone()->getName() !== $options['model_timezone']) {
-                    throw new LogicException(sprintf('Using a "%s" instance with a timezone ("%s") not matching the configured model timezone "%s" is not supported.', get_debug_type($date), $date->getTimezone()->getName(), $options['model_timezone']));
+                    throw new LogicException(\sprintf('Using a "%s" instance with a timezone ("%s") not matching the configured model timezone "%s" is not supported.', get_debug_type($date), $date->getTimezone()->getName(), $options['model_timezone']));
                 }
             });
         }
@@ -323,7 +323,7 @@ class DateType extends AbstractType
 
         $resolver->setNormalizer('html5', static function (Options $options, $html5) {
             if ($html5 && 'single_text' === $options['widget'] && self::HTML5_FORMAT !== $options['format']) {
-                throw new LogicException(sprintf('Cannot use the "format" option of "%s" when the "html5" option is enabled.', self::class));
+                throw new LogicException(\sprintf('Cannot use the "format" option of "%s" when the "html5" option is enabled.', self::class));
             }
 
             return $html5;

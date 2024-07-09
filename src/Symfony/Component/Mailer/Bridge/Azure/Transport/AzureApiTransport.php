@@ -29,42 +29,30 @@ final class AzureApiTransport extends AbstractApiTransport
     private const HOST = '%s.communication.azure.com';
 
     /**
-     * User Access Key from Azure Communication Service (Primary or Secondary key).
+     * @param string $key             User Access Key from Azure Communication Service (Primary or Secondary key)
+     * @param string $resourceName    The endpoint API URL to which to POST emails to Azure https://{acsResourceName}.communication.azure.com/
+     * @param bool   $disableTracking Indicates whether user engagement tracking should be disabled
+     * @param string $apiVersion      The version of API to invoke
      */
-    private string $key;
-
-    /**
-     * The endpoint API URL to which to POST emails to Azure
-     * https://{acsResourceName}.communication.azure.com/.
-     */
-    private string $resourceName;
-
-    /**
-     * The version of API to invoke.
-     */
-    private string $apiVersion;
-
-    /**
-     * Indicates whether user engagement tracking should be disabled.
-     */
-    private bool $disableTracking;
-
-    public function __construct(string $key, string $resourceName, bool $disableTracking = false, string $apiVersion = '2023-03-31', HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null, LoggerInterface $logger = null)
-    {
-        if (str_contains($resourceName, '.') || str_ends_with($resourceName, '.')) {
-            throw new \Exception('Resource name cannot contain or end with a dot.');
+    public function __construct(
+        #[\SensitiveParameter] private string $key,
+        private string $resourceName,
+        private bool $disableTracking = false,
+        private string $apiVersion = '2023-03-31',
+        ?HttpClientInterface $client = null,
+        ?EventDispatcherInterface $dispatcher = null,
+        ?LoggerInterface $logger = null,
+    ) {
+        if (str_ends_with($resourceName, '.')) {
+            throw new \Exception('Resource name must not end with a dot ".".');
         }
 
-        $this->resourceName = $resourceName;
-        $this->key = $key;
-        $this->apiVersion = $apiVersion;
-        $this->disableTracking = $disableTracking;
         parent::__construct($client, $dispatcher, $logger);
     }
 
     public function __toString(): string
     {
-        return sprintf('azure+api://%s', $this->getAzureCSEndpoint());
+        return \sprintf('azure+api://%s', $this->getAzureCSEndpoint());
     }
 
     /**
@@ -91,7 +79,7 @@ final class AzureApiTransport extends AbstractApiTransport
                 $result = $response->toArray(false);
                 throw new HttpTransportException('Unable to send an email (.'.$result['error']['code'].'): '.$result['error']['message'], $response, $statusCode);
             } catch (DecodingExceptionInterface $e) {
-                throw new HttpTransportException('Unable to send an email: '.$response->getContent(false).sprintf(' (code %d).', $statusCode), $response, 0, $e);
+                throw new HttpTransportException('Unable to send an email: '.$response->getContent(false).\sprintf(' (code %d).', $statusCode), $response, 0, $e);
             }
         }
 
@@ -127,7 +115,7 @@ final class AzureApiTransport extends AbstractApiTransport
             'senderAddress' => $envelope->getSender()->getAddress(),
             'attachments' => $this->getMessageAttachments($email),
             'userEngagementTrackingDisabled' => $this->disableTracking,
-            'headers' => empty($headers = $this->getMessageCustomHeaders($email)) ? null : $headers,
+            'headers' => ($headers = $this->getMessageCustomHeaders($email)) ? $headers : null,
             'importance' => $this->getPriorityLevel($email->getPriority()),
         ];
 
@@ -160,7 +148,7 @@ final class AzureApiTransport extends AbstractApiTransport
 
             $att = [
                 'name' => $filename,
-                'contentInBase64' => base64_encode(str_replace("\r\n", '', $attachment->bodyToString())),
+                'contentInBase64' => base64_encode($attachment->getBody()),
                 'contentType' => $headers->get('Content-Type')->getBody(),
             ];
 
@@ -179,7 +167,7 @@ final class AzureApiTransport extends AbstractApiTransport
      */
     private function getAzureCSEndpoint(): string
     {
-        return !empty($this->host) ? $this->host : sprintf(self::HOST, $this->resourceName);
+        return $this->host ?: \sprintf(self::HOST, $this->resourceName);
     }
 
     private function generateContentHash(string $content): string

@@ -21,13 +21,14 @@ use Symfony\Component\Workflow\WorkflowInterface;
  */
 class NotEnabledTransitionException extends TransitionException
 {
-    private TransitionBlockerList $transitionBlockerList;
-
-    public function __construct(object $subject, string $transitionName, WorkflowInterface $workflow, TransitionBlockerList $transitionBlockerList, array $context = [])
-    {
-        parent::__construct($subject, $transitionName, $workflow, sprintf('Transition "%s" is not enabled for workflow "%s".', $transitionName, $workflow->getName()), $context);
-
-        $this->transitionBlockerList = $transitionBlockerList;
+    public function __construct(
+        object $subject,
+        string $transitionName,
+        WorkflowInterface $workflow,
+        private TransitionBlockerList $transitionBlockerList,
+        array $context = [],
+    ) {
+        parent::__construct($subject, $transitionName, $workflow, \sprintf('Transition "%s" is not enabled for workflow "%s".', $transitionName, $workflow->getName()), $context);
     }
 
     public function getTransitionBlockerList(): TransitionBlockerList

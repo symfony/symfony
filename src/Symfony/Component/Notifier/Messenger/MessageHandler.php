@@ -20,11 +20,9 @@ use Symfony\Component\Notifier\Transport\TransportInterface;
  */
 final class MessageHandler
 {
-    private TransportInterface $transport;
-
-    public function __construct(TransportInterface $transport)
-    {
-        $this->transport = $transport;
+    public function __construct(
+        private TransportInterface $transport,
+    ) {
     }
 
     public function __invoke(MessageInterface $message): ?SentMessage

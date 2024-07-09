@@ -32,7 +32,7 @@ class ProxyAdapterAndRedisAdapterTest extends AbstractRedisAdapterTestCase
         self::$redis = AbstractAdapter::createConnection('redis://'.getenv('REDIS_HOST'));
     }
 
-    public function createCachePool($defaultLifetime = 0, string $testMethod = null): CacheItemPoolInterface
+    public function createCachePool($defaultLifetime = 0, ?string $testMethod = null): CacheItemPoolInterface
     {
         return new ProxyAdapter(new RedisAdapter(self::$redis, str_replace('\\', '.', __CLASS__), 100), 'ProxyNS', $defaultLifetime);
     }
@@ -66,6 +66,7 @@ class ProxyAdapterAndRedisAdapterTest extends AbstractRedisAdapterTestCase
         $this->assertSame($value, $this->cache->getItem('baz')->get());
 
         sleep(1);
+        usleep(100000);
         $this->assertSame($value, $this->cache->getItem('foo')->get());
         $this->assertSame($value, $this->cache->getItem('bar')->get());
         $this->assertFalse($this->cache->getItem('baz')->isHit());

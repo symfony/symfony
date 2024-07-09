@@ -30,7 +30,7 @@ class CompiledUrlMatcherDumperTest extends TestCase
     {
         parent::setUp();
 
-        $this->dumpPath = sys_get_temp_dir().\DIRECTORY_SEPARATOR.'php_matcher.'.uniqid('CompiledUrlMatcher').'.php';
+        $this->dumpPath = tempnam(sys_get_temp_dir(), 'sf_matcher_');
     }
 
     protected function tearDown(): void
@@ -506,7 +506,7 @@ class CompiledUrlMatcherDumperTest extends TestCase
 
 class TestCompiledUrlMatcher extends CompiledUrlMatcher implements RedirectableUrlMatcherInterface
 {
-    public function redirect(string $path, string $route, string $scheme = null): array
+    public function redirect(string $path, string $route, ?string $scheme = null): array
     {
         return [];
     }

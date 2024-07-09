@@ -65,7 +65,7 @@ class RouteTest extends TestCase
         $route = new Route('/{foo}');
         $route->setOptions(['foo' => 'bar']);
         $this->assertEquals(array_merge([
-        'compiler_class' => 'Symfony\\Component\\Routing\\RouteCompiler',
+            'compiler_class' => 'Symfony\\Component\\Routing\\RouteCompiler',
         ], ['foo' => 'bar']), $route->getOptions(), '->setOptions() sets the options');
         $this->assertEquals($route, $route->setOptions([]), '->setOptions() implements a fluent interface');
 
@@ -156,13 +156,13 @@ class RouteTest extends TestCase
     public static function getInvalidRequirements()
     {
         return [
-           [''],
-           ['^$'],
-           ['^'],
-           ['$'],
-           ['\A\z'],
-           ['\A'],
-           ['\z'],
+            [''],
+            ['^$'],
+            ['^'],
+            ['$'],
+            ['\A\z'],
+            ['\A'],
+            ['\z'],
         ];
     }
 

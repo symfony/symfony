@@ -31,7 +31,7 @@ class InlineTest extends TestCase
      */
     public function testParse(string $yaml, $value, $flags = 0)
     {
-        $this->assertSame($value, Inline::parse($yaml, $flags), sprintf('::parse() converts an inline YAML to a PHP structure (%s)', $yaml));
+        $this->assertSame($value, Inline::parse($yaml, $flags), \sprintf('::parse() converts an inline YAML to a PHP structure (%s)', $yaml));
     }
 
     /**
@@ -76,14 +76,21 @@ class InlineTest extends TestCase
     public function testParsePhpEnumThrowsExceptionWhenUndefined()
     {
         $this->expectException(ParseException::class);
-        $this->expectExceptionMessage('The enum "SomeEnum::Foo" is not defined');
-        Inline::parse('!php/enum SomeEnum::Foo', Yaml::PARSE_CONSTANT);
+        $this->expectExceptionMessage('The enum "SomeEnum" is not defined');
+        Inline::parse('!php/enum SomeEnum', Yaml::PARSE_CONSTANT);
+    }
+
+    public function testParsePhpEnumThrowsExceptionWhenNameUndefined()
+    {
+        $this->expectException(ParseException::class);
+        $this->expectExceptionMessage('The string "Symfony\Component\Yaml\Tests\Fixtures\FooUnitEnum::Foo" is not the name of a valid enum');
+        Inline::parse('!php/enum Symfony\Component\Yaml\Tests\Fixtures\FooUnitEnum::Foo', Yaml::PARSE_CONSTANT);
     }
 
     public function testParsePhpEnumThrowsExceptionWhenNotAnEnum()
     {
         $this->expectException(ParseException::class);
-        $this->expectExceptionMessage('The string "PHP_INT_MAX" is not the name of a valid enum');
+        $this->expectExceptionMessage('The enum "PHP_INT_MAX" is not defined');
         Inline::parse('!php/enum PHP_INT_MAX', Yaml::PARSE_CONSTANT);
     }
 
@@ -117,7 +124,7 @@ class InlineTest extends TestCase
      */
     public function testDump($yaml, $value, $parseFlags = 0)
     {
-        $this->assertEquals($yaml, Inline::dump($value), sprintf('::dump() converts a PHP structure to an inline YAML (%s)', $yaml));
+        $this->assertEquals($yaml, Inline::dump($value), \sprintf('::dump() converts a PHP structure to an inline YAML (%s)', $yaml));
 
         $this->assertSame($value, Inline::parse(Inline::dump($value), $parseFlags), 'check consistency');
     }
@@ -270,9 +277,9 @@ class InlineTest extends TestCase
     public function testParseUnquotedScalarStartingWithReservedIndicator($indicator)
     {
         $this->expectException(ParseException::class);
-        $this->expectExceptionMessage(sprintf('cannot start a plain scalar; you need to quote the scalar at line 1 (near "%sfoo").', $indicator));
+        $this->expectExceptionMessage(\sprintf('cannot start a plain scalar; you need to quote the scalar at line 1 (near "%sfoo").', $indicator));
 
-        Inline::parse(sprintf('{ foo: %sfoo }', $indicator));
+        Inline::parse(\sprintf('{ foo: %sfoo }', $indicator));
     }
 
     public static function getReservedIndicators()
@@ -286,9 +293,9 @@ class InlineTest extends TestCase
     public function testParseUnquotedScalarStartingWithScalarIndicator($indicator)
     {
         $this->expectException(ParseException::class);
-        $this->expectExceptionMessage(sprintf('cannot start a plain scalar; you need to quote the scalar at line 1 (near "%sfoo").', $indicator));
+        $this->expectExceptionMessage(\sprintf('cannot start a plain scalar; you need to quote the scalar at line 1 (near "%sfoo").', $indicator));
 
-        Inline::parse(sprintf('{ foo: %sfoo }', $indicator));
+        Inline::parse(\sprintf('{ foo: %sfoo }', $indicator));
     }
 
     public static function getScalarIndicators()
@@ -715,7 +722,12 @@ class InlineTest extends TestCase
 
     public function testDumpUnitEnum()
     {
-        $this->assertSame("!php/const Symfony\Component\Yaml\Tests\Fixtures\FooUnitEnum::BAR", Inline::dump(FooUnitEnum::BAR));
+        $this->assertSame("!php/enum Symfony\Component\Yaml\Tests\Fixtures\FooUnitEnum::BAR", Inline::dump(FooUnitEnum::BAR));
+    }
+
+    public function testParseUnitEnumCases()
+    {
+        $this->assertSame(FooUnitEnum::cases(), Inline::parse("!php/enum Symfony\Component\Yaml\Tests\Fixtures\FooUnitEnum", Yaml::PARSE_CONSTANT));
     }
 
     public function testParseUnitEnum()

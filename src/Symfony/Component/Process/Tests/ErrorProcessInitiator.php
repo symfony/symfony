@@ -25,7 +25,7 @@ try {
     while (!str_contains($process->getOutput(), 'ready')) {
         usleep(1000);
     }
-    $process->signal(\SIGSTOP);
+    $process->isRunning() && $process->signal(\SIGSTOP);
     $process->wait();
 
     return $process->getExitCode();

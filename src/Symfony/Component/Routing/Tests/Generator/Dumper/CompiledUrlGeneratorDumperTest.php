@@ -48,6 +48,7 @@ class CompiledUrlGeneratorDumperTest extends TestCase
         parent::tearDown();
 
         @unlink($this->testTmpFilepath);
+        @unlink($this->largeTestTmpFilepath);
     }
 
     public function testDumpWithRoutes()

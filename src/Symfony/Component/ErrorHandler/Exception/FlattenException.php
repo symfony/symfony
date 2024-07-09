@@ -42,12 +42,12 @@ class FlattenException
     private ?string $asString = null;
     private Data $dataRepresentation;
 
-    public static function create(\Exception $exception, int $statusCode = null, array $headers = []): static
+    public static function create(\Exception $exception, ?int $statusCode = null, array $headers = []): static
     {
         return static::createFromThrowable($exception, $statusCode, $headers);
     }
 
-    public static function createFromThrowable(\Throwable $exception, int $statusCode = null, array $headers = []): static
+    public static function createFromThrowable(\Throwable $exception, ?int $statusCode = null, array $headers = []): static
     {
         $e = new static();
         $e->setMessage($exception->getMessage());
@@ -85,7 +85,7 @@ class FlattenException
         return $e;
     }
 
-    public static function createWithDataRepresentation(\Throwable $throwable, int $statusCode = null, array $headers = [], VarCloner $cloner = null): static
+    public static function createWithDataRepresentation(\Throwable $throwable, ?int $statusCode = null, array $headers = [], ?VarCloner $cloner = null): static
     {
         $e = static::createFromThrowable($throwable, $statusCode, $headers);
 

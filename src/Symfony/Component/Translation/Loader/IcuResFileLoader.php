@@ -26,11 +26,11 @@ class IcuResFileLoader implements LoaderInterface
     public function load(mixed $resource, string $locale, string $domain = 'messages'): MessageCatalogue
     {
         if (!stream_is_local($resource)) {
-            throw new InvalidResourceException(sprintf('This is not a local file "%s".', $resource));
+            throw new InvalidResourceException(\sprintf('This is not a local file "%s".', $resource));
         }
 
         if (!is_dir($resource)) {
-            throw new NotFoundResourceException(sprintf('File "%s" not found.', $resource));
+            throw new NotFoundResourceException(\sprintf('File "%s" not found.', $resource));
         }
 
         try {
@@ -40,7 +40,7 @@ class IcuResFileLoader implements LoaderInterface
         }
 
         if (!$rb) {
-            throw new InvalidResourceException(sprintf('Cannot load resource "%s".', $resource));
+            throw new InvalidResourceException(\sprintf('Cannot load resource "%s".', $resource));
         } elseif (intl_is_failure($rb->getErrorCode())) {
             throw new InvalidResourceException($rb->getErrorMessage(), $rb->getErrorCode());
         }
@@ -70,7 +70,7 @@ class IcuResFileLoader implements LoaderInterface
      * @param array           $messages Used internally for recursive calls
      * @param string|null     $path     Current path being parsed, used internally for recursive calls
      */
-    protected function flatten(\ResourceBundle $rb, array &$messages = [], string $path = null): array
+    protected function flatten(\ResourceBundle $rb, array &$messages = [], ?string $path = null): array
     {
         foreach ($rb as $key => $value) {
             $nodePath = $path ? $path.'.'.$key : $key;

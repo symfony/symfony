@@ -11,7 +11,8 @@
 
 namespace Symfony\Component\PropertyInfo\Extractor;
 
-use Symfony\Component\PropertyInfo\Type;
+use Symfony\Component\PropertyInfo\Type as LegacyType;
+use Symfony\Component\TypeInfo\Type;
 
 /**
  * Infers the constructor argument type.
@@ -25,9 +26,18 @@ interface ConstructorArgumentTypeExtractorInterface
     /**
      * Gets types of an argument from constructor.
      *
-     * @return Type[]|null
+     * @return LegacyType[]|null
      *
      * @internal
      */
     public function getTypesFromConstructor(string $class, string $property): ?array;
+
+    /**
+     * Gets type of an argument from constructor.
+     *
+     * @param class-string $class
+     *
+     * @internal
+     */
+    public function getTypeFromConstructor(string $class, string $property): ?Type;
 }

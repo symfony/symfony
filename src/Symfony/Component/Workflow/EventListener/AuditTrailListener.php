@@ -20,29 +20,27 @@ use Symfony\Component\Workflow\Event\Event;
  */
 class AuditTrailListener implements EventSubscriberInterface
 {
-    private LoggerInterface $logger;
-
-    public function __construct(LoggerInterface $logger)
-    {
-        $this->logger = $logger;
+    public function __construct(
+        private LoggerInterface $logger,
+    ) {
     }
 
     public function onLeave(Event $event): void
     {
         foreach ($event->getTransition()->getFroms() as $place) {
-            $this->logger->info(sprintf('Leaving "%s" for subject of class "%s" in workflow "%s".', $place, $event->getSubject()::class, $event->getWorkflowName()));
+            $this->logger->info(\sprintf('Leaving "%s" for subject of class "%s" in workflow "%s".', $place, $event->getSubject()::class, $event->getWorkflowName()));
         }
     }
 
     public function onTransition(Event $event): void
     {
-        $this->logger->info(sprintf('Transition "%s" for subject of class "%s" in workflow "%s".', $event->getTransition()->getName(), $event->getSubject()::class, $event->getWorkflowName()));
+        $this->logger->info(\sprintf('Transition "%s" for subject of class "%s" in workflow "%s".', $event->getTransition()->getName(), $event->getSubject()::class, $event->getWorkflowName()));
     }
 
     public function onEnter(Event $event): void
     {
         foreach ($event->getTransition()->getTos() as $place) {
-            $this->logger->info(sprintf('Entering "%s" for subject of class "%s" in workflow "%s".', $place, $event->getSubject()::class, $event->getWorkflowName()));
+            $this->logger->info(\sprintf('Entering "%s" for subject of class "%s" in workflow "%s".', $place, $event->getSubject()::class, $event->getWorkflowName()));
         }
     }
 

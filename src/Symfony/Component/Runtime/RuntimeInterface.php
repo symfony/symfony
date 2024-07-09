@@ -23,7 +23,7 @@ interface RuntimeInterface
      *
      * The callable itself should return an object that represents the application to pass to the getRunner() method.
      */
-    public function getResolver(callable $callable, \ReflectionFunction $reflector = null): ResolverInterface;
+    public function getResolver(callable $callable, ?\ReflectionFunction $reflector = null): ResolverInterface;
 
     /**
      * Returns a callable that knows how to run the passed object and that returns its exit status as int.

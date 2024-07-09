@@ -37,9 +37,7 @@ class HtmlErrorRenderer implements ErrorRendererInterface
     private bool|\Closure $debug;
     private string $charset;
     private FileLinkFormatter $fileLinkFormat;
-    private ?string $projectDir;
     private string|\Closure $outputBuffer;
-    private ?LoggerInterface $logger;
 
     private static string $template = 'views/error.html.php';
 
@@ -47,14 +45,18 @@ class HtmlErrorRenderer implements ErrorRendererInterface
      * @param bool|callable   $debug        The debugging mode as a boolean or a callable that should return it
      * @param string|callable $outputBuffer The output buffer as a string or a callable that should return it
      */
-    public function __construct(bool|callable $debug = false, string $charset = null, string|FileLinkFormatter $fileLinkFormat = null, string $projectDir = null, string|callable $outputBuffer = '', LoggerInterface $logger = null)
-    {
+    public function __construct(
+        bool|callable $debug = false,
+        ?string $charset = null,
+        string|FileLinkFormatter|null $fileLinkFormat = null,
+        private ?string $projectDir = null,
+        string|callable $outputBuffer = '',
+        private ?LoggerInterface $logger = null,
+    ) {
         $this->debug = \is_bool($debug) ? $debug : $debug(...);
         $this->charset = $charset ?: (\ini_get('default_charset') ?: 'UTF-8');
         $this->fileLinkFormat = $fileLinkFormat instanceof FileLinkFormatter ? $fileLinkFormat : new FileLinkFormatter($fileLinkFormat);
-        $this->projectDir = $projectDir;
         $this->outputBuffer = \is_string($outputBuffer) ? $outputBuffer : $outputBuffer(...);
-        $this->logger = $logger;
     }
 
     public function render(\Throwable $exception): FlattenException
@@ -140,7 +142,7 @@ class HtmlErrorRenderer implements ErrorRendererInterface
             'exceptionMessage' => $exceptionMessage,
             'statusText' => $statusText,
             'statusCode' => $statusCode,
-            'logger' => DebugLoggerConfigurator::getDebugLogger($this->logger),
+            'logger' => null !== $this->logger && class_exists(DebugLoggerConfigurator::class) ? DebugLoggerConfigurator::getDebugLogger($this->logger) : null,
             'currentContent' => \is_string($this->outputBuffer) ? $this->outputBuffer : ($this->outputBuffer)(),
         ]);
     }
@@ -158,20 +160,22 @@ class HtmlErrorRenderer implements ErrorRendererInterface
         $result = [];
         foreach ($args as $key => $item) {
             if ('object' === $item[0]) {
-                $formattedValue = sprintf('<em>object</em>(%s)', $this->abbrClass($item[1]));
+                $formattedValue = \sprintf('<em>object</em>(%s)', $this->abbrClass($item[1]));
             } elseif ('array' === $item[0]) {
-                $formattedValue = sprintf('<em>array</em>(%s)', \is_array($item[1]) ? $this->formatArgs($item[1]) : $item[1]);
+                $formattedValue = \sprintf('<em>array</em>(%s)', \is_array($item[1]) ? $this->formatArgs($item[1]) : $item[1]);
             } elseif ('null' === $item[0]) {
                 $formattedValue = '<em>null</em>';
             } elseif ('boolean' === $item[0]) {
                 $formattedValue = '<em>'.strtolower(var_export($item[1], true)).'</em>';
             } elseif ('resource' === $item[0]) {
                 $formattedValue = '<em>resource</em>';
+            } elseif (preg_match('/[^\x07-\x0D\x1B\x20-\xFF]/', $item[1])) {
+                $formattedValue = '<em>binary string</em>';
             } else {
                 $formattedValue = str_replace("\n", '', $this->escape(var_export($item[1], true)));
             }
 
-            $result[] = \is_int($key) ? $formattedValue : sprintf("'%s' => %s", $this->escape($key), $formattedValue);
+            $result[] = \is_int($key) ? $formattedValue : \sprintf("'%s' => %s", $this->escape($key), $formattedValue);
         }
 
         return implode(', ', $result);
@@ -192,7 +196,7 @@ class HtmlErrorRenderer implements ErrorRendererInterface
         $parts = explode('\\', $class);
         $short = array_pop($parts);
 
-        return sprintf('<abbr title="%s">%s</abbr>', $class, $short);
+        return \sprintf('<abbr title="%s">%s</abbr>', $class, $short);
     }
 
     private function getFileRelative(string $file): ?string
@@ -213,7 +217,7 @@ class HtmlErrorRenderer implements ErrorRendererInterface
      * @param int    $line The line number
      * @param string $text Use this text for the link rather than the file path
      */
-    private function formatFile(string $file, int $line, string $text = null): string
+    private function formatFile(string $file, int $line, ?string $text = null): string
     {
         $file = trim($file);
 
@@ -221,7 +225,7 @@ class HtmlErrorRenderer implements ErrorRendererInterface
             $text = $file;
             if (null !== $rel = $this->getFileRelative($text)) {
                 $rel = explode('/', $rel, 2);
-                $text = sprintf('<abbr title="%s%2$s">%s</abbr>%s', $this->projectDir, $rel[0], '/'.($rel[1] ?? ''));
+                $text = \sprintf('<abbr title="%s%2$s">%s</abbr>%s', $this->projectDir, $rel[0], '/'.($rel[1] ?? ''));
             }
         }
 
@@ -231,7 +235,7 @@ class HtmlErrorRenderer implements ErrorRendererInterface
 
         $link = $this->fileLinkFormat->format($file, $line);
 
-        return sprintf('<a href="%s" title="Click to open this file" class="file_link">%s</a>', $this->escape($link), $text);
+        return \sprintf('<a href="%s" title="Click to open this file" class="file_link">%s</a>', $this->escape($link), $text);
     }
 
     /**
@@ -250,10 +254,10 @@ class HtmlErrorRenderer implements ErrorRendererInterface
             if (\PHP_VERSION_ID >= 80300) {
                 // remove main pre/code tags
                 $code = preg_replace('#^<pre.*?>\s*<code.*?>(.*)</code>\s*</pre>#s', '\\1', $code);
-                // split multiline code tags
-                $code = preg_replace_callback('#<code ([^>]++)>((?:[^<]*+\\n)++[^<]*+)</code>#', fn ($m) => "<code $m[1]>".str_replace("\n", "</code>\n<code $m[1]>", $m[2]).'</code>', $code);
-                // Convert spaces to html entities to preserve indentation when rendered
-                $code = str_replace(' ', '&nbsp;', $code);
+                // split multiline span tags
+                $code = preg_replace_callback('#<span ([^>]++)>((?:[^<\\n]*+\\n)++[^<]*+)</span>#', function ($m) {
+                    return "<span $m[1]>".str_replace("\n", "</span>\n<span $m[1]>", $m[2]).'</span>';
+                }, $code);
                 $content = explode("\n", $code);
             } else {
                 // remove main code/span tags
@@ -299,7 +303,7 @@ class HtmlErrorRenderer implements ErrorRendererInterface
 
     private function formatFileFromText(string $text): string
     {
-        return preg_replace_callback('/in ("|&quot;)?(.+?)\1(?: +(?:on|at))? +line (\d+)/s', fn ($match) => 'in '.$this->formatFile($match[2], $match[3]), $text);
+        return preg_replace_callback('/in ("|&quot;)?(.+?)\1(?: +(?:on|at))? +line (\d+)/s', fn ($match) => 'in '.$this->formatFile($match[2], $match[3]), $text) ?? $text;
     }
 
     private function formatLogMessage(string $message, array $context): string

@@ -33,7 +33,7 @@ final class DataUriNormalizer implements NormalizerInterface, DenormalizerInterf
 
     private readonly ?MimeTypeGuesserInterface $mimeTypeGuesser;
 
-    public function __construct(MimeTypeGuesserInterface $mimeTypeGuesser = null)
+    public function __construct(?MimeTypeGuesserInterface $mimeTypeGuesser = null)
     {
         if (!$mimeTypeGuesser && class_exists(MimeTypes::class)) {
             $mimeTypeGuesser = MimeTypes::getDefault();
@@ -44,14 +44,10 @@ final class DataUriNormalizer implements NormalizerInterface, DenormalizerInterf
 
     public function getSupportedTypes(?string $format): array
     {
-        return [
-            \SplFileInfo::class => true,
-            \SplFileObject::class => true,
-            File::class => true,
-        ];
+        return self::SUPPORTED_TYPES;
     }
 
-    public function normalize(mixed $object, string $format = null, array $context = []): string
+    public function normalize(mixed $object, ?string $format = null, array $context = []): string
     {
         if (!$object instanceof \SplFileInfo) {
             throw new InvalidArgumentException('The object must be an instance of "\SplFileInfo".');
@@ -68,13 +64,13 @@ final class DataUriNormalizer implements NormalizerInterface, DenormalizerInterf
         }
 
         if ('text' === explode('/', $mimeType, 2)[0]) {
-            return sprintf('data:%s,%s', $mimeType, rawurlencode($data));
+            return \sprintf('data:%s,%s', $mimeType, rawurlencode($data));
         }
 
-        return sprintf('data:%s;base64,%s', $mimeType, base64_encode($data));
+        return \sprintf('data:%s;base64,%s', $mimeType, base64_encode($data));
     }
 
-    public function supportsNormalization(mixed $data, string $format = null, array $context = []): bool
+    public function supportsNormalization(mixed $data, ?string $format = null, array $context = []): bool
     {
         return $data instanceof \SplFileInfo;
     }
@@ -87,7 +83,7 @@ final class DataUriNormalizer implements NormalizerInterface, DenormalizerInterf
      * @throws InvalidArgumentException
      * @throws NotNormalizableValueException
      */
-    public function denormalize(mixed $data, string $type, string $format = null, array $context = []): \SplFileInfo
+    public function denormalize(mixed $data, string $type, ?string $format = null, array $context = []): \SplFileInfo
     {
         if (null === $data || !preg_match('/^data:([a-z0-9][a-z0-9\!\#\$\&\-\^\_\+\.]{0,126}\/[a-z0-9][a-z0-9\!\#\$\&\-\^\_\+\.]{0,126}(;[a-z0-9\-]+\=[a-z0-9\-]+)?)?(;base64)?,[a-z0-9\!\$\&\\\'\,\(\)\*\+\;\=\-\.\_\~\:\@\/\?\%\s]*\s*$/i', $data)) {
             throw NotNormalizableValueException::createForUnexpectedDataType('The provided "data:" URI is not valid.', $data, ['string'], $context['deserialization_path'] ?? null, true);
@@ -97,7 +93,7 @@ final class DataUriNormalizer implements NormalizerInterface, DenormalizerInterf
             switch ($type) {
                 case File::class:
                     if (!class_exists(File::class)) {
-                        throw new InvalidArgumentException(sprintf('Cannot denormalize to a "%s" without the HttpFoundation component installed. Try running "composer require symfony/http-foundation".', File::class));
+                        throw new InvalidArgumentException(\sprintf('Cannot denormalize to a "%s" without the HttpFoundation component installed. Try running "composer require symfony/http-foundation".', File::class));
                     }
 
                     return new File($data, false);
@@ -110,10 +106,10 @@ final class DataUriNormalizer implements NormalizerInterface, DenormalizerInterf
             throw NotNormalizableValueException::createForUnexpectedDataType($exception->getMessage(), $data, ['string'], $context['deserialization_path'] ?? null, false, $exception->getCode(), $exception);
         }
 
-        throw new InvalidArgumentException(sprintf('The class parameter "%s" is not supported. It must be one of "SplFileInfo", "SplFileObject" or "Symfony\Component\HttpFoundation\File\File".', $type));
+        throw new InvalidArgumentException(\sprintf('The class parameter "%s" is not supported. It must be one of "SplFileInfo", "SplFileObject" or "Symfony\Component\HttpFoundation\File\File".', $type));
     }
 
-    public function supportsDenormalization(mixed $data, string $type, string $format = null, array $context = []): bool
+    public function supportsDenormalization(mixed $data, string $type, ?string $format = null, array $context = []): bool
     {
         return isset(self::SUPPORTED_TYPES[$type]);
     }

@@ -11,8 +11,11 @@
 
 namespace Symfony\Component\Clock\Test;
 
-use Psr\Clock\ClockInterface;
+use PHPUnit\Framework\Attributes\After;
+use PHPUnit\Framework\Attributes\Before;
+use PHPUnit\Framework\Attributes\BeforeClass;
 use Symfony\Component\Clock\Clock;
+use Symfony\Component\Clock\ClockInterface;
 use Symfony\Component\Clock\MockClock;
 
 use function Symfony\Component\Clock\now;
@@ -48,6 +51,8 @@ trait ClockSensitiveTrait
      *
      * @internal
      */
+    #[Before]
+    #[BeforeClass]
     public static function saveClockBeforeTest(bool $save = true): ClockInterface
     {
         static $originalClock;
@@ -64,6 +69,7 @@ trait ClockSensitiveTrait
      *
      * @internal
      */
+    #[After]
     protected static function restoreClockAfterTest(): void
     {
         Clock::set(self::saveClockBeforeTest(false));

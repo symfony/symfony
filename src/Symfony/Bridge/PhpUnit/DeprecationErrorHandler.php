@@ -11,6 +11,7 @@
 
 namespace Symfony\Bridge\PhpUnit;
 
+use PHPUnit\Framework\TestCase;
 use PHPUnit\Framework\TestResult;
 use PHPUnit\Runner\ErrorHandler;
 use PHPUnit\Util\Error\Handler;
@@ -300,7 +301,7 @@ class DeprecationErrorHandler
 
         if ($configuration->shouldWriteToLogFile()) {
             if (false === $handle = @fopen($file = $configuration->getLogFile(), 'a')) {
-                throw new \InvalidArgumentException(sprintf('The configured log file "%s" is not writeable.', $file));
+                throw new \InvalidArgumentException(\sprintf('The configured log file "%s" is not writeable.', $file));
             }
         } else {
             $handle = fopen('php://output', 'w');
@@ -308,7 +309,7 @@ class DeprecationErrorHandler
 
         foreach ($groups as $group) {
             if ($this->deprecationGroups[$group]->count()) {
-                $deprecationGroupMessage = sprintf(
+                $deprecationGroupMessage = \sprintf(
                     '%s deprecation notices (%d)',
                     \in_array($group, ['direct', 'indirect', 'self'], true) ? "Remaining $group" : ucfirst($group),
                     $this->deprecationGroups[$group]->count()
@@ -327,7 +328,7 @@ class DeprecationErrorHandler
                 uasort($notices, $cmp);
 
                 foreach ($notices as $msg => $notice) {
-                    fwrite($handle, sprintf("\n  %sx: %s\n", $notice->count(), $msg));
+                    fwrite($handle, \sprintf("\n  %sx: %s\n", $notice->count(), $msg));
 
                     $countsByCaller = $notice->getCountsByCaller();
                     arsort($countsByCaller);
@@ -339,7 +340,7 @@ class DeprecationErrorHandler
                                 fwrite($handle, "    ...\n");
                                 break;
                             }
-                            fwrite($handle, sprintf("    %dx in %s\n", $count, preg_replace('/(.*)\\\\(.*?::.*?)$/', '$2 from $1', $method)));
+                            fwrite($handle, \sprintf("    %dx in %s\n", $count, preg_replace('/(.*)\\\\(.*?::.*?)$/', '$2 from $1', $method)));
                         }
                     }
                 }
@@ -370,13 +371,23 @@ class DeprecationErrorHandler
         }
 
         foreach (debug_backtrace(\DEBUG_BACKTRACE_PROVIDE_OBJECT | \DEBUG_BACKTRACE_IGNORE_ARGS) as $frame) {
-            if (isset($frame['object']) && $frame['object'] instanceof TestResult) {
+            if (!isset($frame['object'])) {
+                continue;
+            }
+
+            if ($frame['object'] instanceof TestResult) {
                 return new $eh(
                     $frame['object']->getConvertDeprecationsToExceptions(),
                     $frame['object']->getConvertErrorsToExceptions(),
                     $frame['object']->getConvertNoticesToExceptions(),
                     $frame['object']->getConvertWarningsToExceptions()
                 );
+            } elseif (ErrorHandler::class === $eh && $frame['object'] instanceof TestCase) {
+                return function (int $errorNumber, string $errorString, string $errorFile, int $errorLine) {
+                    ErrorHandler::instance()($errorNumber, $errorString, $errorFile, $errorLine);
+
+                    return true;
+                };
             }
         }
 
@@ -400,29 +411,29 @@ class DeprecationErrorHandler
             return false;
         }
 
-        if ('Hyper' === getenv('TERM_PROGRAM')) {
+        // Detect msysgit/mingw and assume this is a tty because detection
+        // does not work correctly, see https://github.com/composer/composer/issues/9690
+        if (!@stream_isatty(\STDOUT) && !\in_array(strtoupper((string) getenv('MSYSTEM')), ['MINGW32', 'MINGW64'], true)) {
+            return false;
+        }
+
+        if ('\\' === \DIRECTORY_SEPARATOR && @sapi_windows_vt100_support(\STDOUT)) {
             return true;
         }
 
-        if (\DIRECTORY_SEPARATOR === '\\') {
-            return (\function_exists('sapi_windows_vt100_support')
-                && sapi_windows_vt100_support(\STDOUT))
-                || false !== getenv('ANSICON')
-                || 'ON' === getenv('ConEmuANSI')
-                || 'xterm' === getenv('TERM');
+        if ('Hyper' === getenv('TERM_PROGRAM')
+            || false !== getenv('COLORTERM')
+            || false !== getenv('ANSICON')
+            || 'ON' === getenv('ConEmuANSI')
+        ) {
+            return true;
         }
 
-        if (\function_exists('stream_isatty')) {
-            return @stream_isatty(\STDOUT);
+        if ('dumb' === $term = (string) getenv('TERM')) {
+            return false;
         }
 
-        if (\function_exists('posix_isatty')) {
-            return @posix_isatty(\STDOUT);
-        }
-
-        $stat = fstat(\STDOUT);
-
-        // Check if formatted mode is S_IFCHR
-        return $stat ? 0020000 === ($stat['mode'] & 0170000) : false;
+        // See https://github.com/chalk/supports-color/blob/d4f413efaf8da045c5ab440ed418ef02dbb28bf1/index.js#L157
+        return preg_match('/^((screen|xterm|vt100|vt220|putty|rxvt|ansi|cygwin|linux).*)|(.*-256(color)?(-bce)?)$/', $term);
     }
 }

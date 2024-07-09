@@ -39,20 +39,23 @@ final class InfobipApiTransport extends AbstractApiTransport
         'X-Infobip-NotifyContentType' => 'notifyContentType',
         'X-Infobip-MessageId' => 'messageId',
         'X-Infobip-Track' => 'track',
+        'X-Infobip-TrackingUrl' => 'trackingUrl',
+        'X-Infobip-TrackClicks' => 'trackClicks',
+        'X-Infobip-TrackOpens' => 'trackOpens',
     ];
 
-    private string $key;
-
-    public function __construct(string $key, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null, LoggerInterface $logger = null)
-    {
-        $this->key = $key;
-
+    public function __construct(
+        #[\SensitiveParameter] private string $key,
+        ?HttpClientInterface $client = null,
+        ?EventDispatcherInterface $dispatcher = null,
+        ?LoggerInterface $logger = null,
+    ) {
         parent::__construct($client, $dispatcher, $logger);
     }
 
     public function __toString(): string
     {
-        return sprintf('infobip+api://%s', $this->getEndpoint());
+        return \sprintf('infobip+api://%s', $this->getEndpoint());
     }
 
     protected function doSendApi(SentMessage $sentMessage, Email $email, Envelope $envelope): ResponseInterface
@@ -65,7 +68,7 @@ final class InfobipApiTransport extends AbstractApiTransport
 
         $response = $this->client->request(
             'POST',
-            sprintf('https://%s/email/%s/send', $this->getEndpoint(), self::API_VERSION),
+            \sprintf('https://%s/email/%s/send', $this->getEndpoint(), self::API_VERSION),
             [
                 'headers' => $headers,
                 'body' => $formData->bodyToIterable(),
@@ -79,13 +82,13 @@ final class InfobipApiTransport extends AbstractApiTransport
         }
 
         if (200 !== $statusCode) {
-            throw new HttpTransportException(sprintf('Unable to send an email: "%s" (code %d).', $response->getContent(false), $statusCode), $response);
+            throw new HttpTransportException(\sprintf('Unable to send an email: "%s" (code %d).', $response->getContent(false), $statusCode), $response);
         }
 
         try {
             $result = $response->toArray();
         } catch (DecodingExceptionInterface $e) {
-            throw new HttpTransportException(sprintf('Unable to send an email: "%s" (code %d).', $response->getContent(false), $statusCode), $response, 0, $e);
+            throw new HttpTransportException(\sprintf('Unable to send an email: "%s" (code %d).', $response->getContent(false), $statusCode), $response, 0, $e);
         }
 
         if (isset($result['messages'][0]['messageId'])) {

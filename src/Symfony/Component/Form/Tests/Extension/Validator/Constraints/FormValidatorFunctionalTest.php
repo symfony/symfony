@@ -88,9 +88,9 @@ class FormValidatorFunctionalTest extends TestCase
     public function testNonCompositeConstraintValidatedOnce()
     {
         $form = $this->formFactory->create(TextType::class, null, [
-                'constraints' => [new NotBlank(['groups' => ['foo', 'bar']])],
-                'validation_groups' => ['foo', 'bar'],
-            ]);
+            'constraints' => [new NotBlank(['groups' => ['foo', 'bar']])],
+            'validation_groups' => ['foo', 'bar'],
+        ]);
         $form->submit('');
 
         $violations = $this->validator->validate($form);

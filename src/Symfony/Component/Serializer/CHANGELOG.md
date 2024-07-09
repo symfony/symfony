@@ -1,6 +1,17 @@
 CHANGELOG
 =========
 
+7.1
+---
+
+ * Add arguments `$class`, `$format` and `$context` to `NameConverterInterface::normalize()` and `NameConverterInterface::denormalize()`
+ * Add `DateTimeNormalizer::CAST_KEY` context option
+ * Add `Default` and "class name" default groups
+ * Add `AbstractNormalizer::FILTER_BOOL` context option
+ * Add `CamelCaseToSnakeCaseNameConverter::REQUIRE_SNAKE_CASE_PROPERTIES` context option
+ * Deprecate `AbstractNormalizerContextBuilder::withDefaultContructorArguments(?array $defaultContructorArguments)`, use `withDefaultConstructorArguments(?array $defaultConstructorArguments)` instead (note the missing `s` character in Contructor word in deprecated method)
+ * Add `XmlEncoder::CDATA_WRAPPING_PATTERN` context option
+
 7.0
 ---
 

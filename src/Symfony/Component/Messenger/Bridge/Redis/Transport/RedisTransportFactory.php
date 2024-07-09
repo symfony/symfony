@@ -32,6 +32,6 @@ class RedisTransportFactory implements TransportFactoryInterface
 
     public function supports(#[\SensitiveParameter] string $dsn, array $options): bool
     {
-        return str_starts_with($dsn, 'redis://') || str_starts_with($dsn, 'rediss://');
+        return str_starts_with($dsn, 'redis:') || str_starts_with($dsn, 'rediss:');
     }
 }

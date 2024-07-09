@@ -83,7 +83,7 @@ final class LockRegistry
         return $previousFiles;
     }
 
-    public static function compute(callable $callback, ItemInterface $item, bool &$save, CacheInterface $pool, \Closure $setMetadata = null, LoggerInterface $logger = null): mixed
+    public static function compute(callable $callback, ItemInterface $item, bool &$save, CacheInterface $pool, ?\Closure $setMetadata = null, ?LoggerInterface $logger = null): mixed
     {
         if ('\\' === \DIRECTORY_SEPARATOR && null === self::$lockedFiles) {
             // disable locking on Windows by default
@@ -105,7 +105,7 @@ final class LockRegistry
                 $locked = flock($lock, \LOCK_EX | \LOCK_NB, $wouldBlock);
 
                 if ($locked || !$wouldBlock) {
-                    $logger?->info(sprintf('Lock %s, now computing item "{key}"', $locked ? 'acquired' : 'not supported'), ['key' => $item->getKey()]);
+                    $logger?->info(\sprintf('Lock %s, now computing item "{key}"', $locked ? 'acquired' : 'not supported'), ['key' => $item->getKey()]);
                     self::$lockedFiles[$key] = true;
 
                     $value = $callback($item, $save);

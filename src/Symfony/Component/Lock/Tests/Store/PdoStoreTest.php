@@ -72,9 +72,9 @@ class PdoStoreTest extends AbstractStoreTestCase
     /**
      * @dataProvider provideDsnWithSQLite
      */
-    public function testDsnWithSQLite(string $dsn, string $file = null)
+    public function testDsnWithSQLite(string $dsn, ?string $file = null)
     {
-        $key = new Key(uniqid(__METHOD__, true));
+        $key = new Key(__METHOD__);
 
         try {
             $store = new PdoStore($dsn);
@@ -106,7 +106,7 @@ class PdoStoreTest extends AbstractStoreTestCase
             $this->markTestSkipped('Missing POSTGRES_HOST env variable');
         }
 
-        $key = new Key(uniqid(__METHOD__, true));
+        $key = new Key(__METHOD__);
 
         $dsn = 'pgsql:host='.$host.';user=postgres;password=password';
 

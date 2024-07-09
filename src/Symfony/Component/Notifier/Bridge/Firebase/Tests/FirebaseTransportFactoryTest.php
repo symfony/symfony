@@ -27,19 +27,19 @@ final class FirebaseTransportFactoryTest extends TransportFactoryTestCase
     public static function createProvider(): iterable
     {
         yield [
-            'firebase://host.test',
-            'firebase://username:password@host.test',
+            'firebase://fcm.googleapis.com/v1/projects/<PROJECT_ID>/messages:send',
+            'firebase://firebase-adminsdk@stag.iam.gserviceaccount.com?project_id=<PROJECT_ID>&private_key_id=<PRIVATE_KEY_ID>&private_key=<PRIVATE_KEY>',
         ];
     }
 
     public static function supportsProvider(): iterable
     {
-        yield [true, 'firebase://username:password@default'];
-        yield [false, 'somethingElse://username:password@default'];
+        yield [true, 'firebase://client_email?project_id=1'];
+        yield [false, 'somethingElse://client_email?project_id=1'];
     }
 
     public static function unsupportedSchemeProvider(): iterable
     {
-        yield ['somethingElse://username:password@default'];
+        yield ['somethingElse://client_email'];
     }
 }

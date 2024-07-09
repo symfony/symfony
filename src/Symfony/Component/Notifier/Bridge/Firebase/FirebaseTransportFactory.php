@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Notifier\Bridge\Firebase;
 
+use Symfony\Component\Notifier\Exception\MissingRequiredOptionException;
 use Symfony\Component\Notifier\Exception\UnsupportedSchemeException;
 use Symfony\Component\Notifier\Transport\AbstractTransportFactory;
 use Symfony\Component\Notifier\Transport\Dsn;
@@ -20,36 +21,29 @@ use Symfony\Component\Notifier\Transport\Dsn;
  */
 final class FirebaseTransportFactory extends AbstractTransportFactory
 {
-    public function create(Dsn $dsn): FirebaseTransport|FirebaseJwtTransport
+    public function create(Dsn $dsn): FirebaseTransport
     {
         $scheme = $dsn->getScheme();
-        if ('firebase-jwt' === $scheme) {
-            return $this->createJwt($dsn);
-        }
 
         if ('firebase' !== $scheme) {
             throw new UnsupportedSchemeException($dsn, 'firebase', $this->getSupportedSchemes());
         }
 
-        $token = sprintf('%s:%s', $this->getUser($dsn), $this->getPassword($dsn));
-        $host = 'default' === $dsn->getHost() ? null : $dsn->getHost();
-        $port = $dsn->getPort();
+        $credentials = [
+            'client_email' => sprintf('%s@%s', $dsn->getUser(), $dsn->getHost()),
+            ...$dsn->getOptions()
+        ];
 
-        return (new FirebaseTransport($token, $this->client, $this->dispatcher))->setHost($host)->setPort($port);
-    }
+        $requiredParameters = array_diff(array_keys($credentials), ['client_email', 'project_id', 'private_key_id', 'private_key']);
+        if ($requiredParameters) {
+            throw new MissingRequiredOptionException(implode(', ', $requiredParameters));
+        }
 
-    public function createJwt(Dsn $dsn): FirebaseJwtTransport
-    {
-        $credentials = match ($this->getUser($dsn)) {
-            'credentials_path' => file_get_contents($this->getPassword($dsn)),
-            'credentials_content' => base64_decode($this->getPassword($dsn)),
-        };
-
-        return (new FirebaseJwtTransport(json_decode($credentials, true, 512, JSON_THROW_ON_ERROR), $this->client, $this->dispatcher));
+        return (new FirebaseTransport($credentials, $this->client, $this->dispatcher));
     }
 
     protected function getSupportedSchemes(): array
     {
-        return ['firebase', 'firebase-jwt'];
+        return ['firebase'];
     }
 }

@@ -22,7 +22,7 @@ class UriTemplateHttpClient implements HttpClientInterface, ResetInterface
     /**
      * @param (\Closure(string $url, array $vars): string)|null $expander
      */
-    public function __construct(HttpClientInterface $client = null, private ?\Closure $expander = null, private array $defaultVars = [])
+    public function __construct(?HttpClientInterface $client = null, private ?\Closure $expander = null, private array $defaultVars = [])
     {
         $this->client = $client ?? HttpClient::create();
     }

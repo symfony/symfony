@@ -107,7 +107,7 @@ class DoctrineDbalAdapterTest extends AdapterTestCase
     /**
      * @dataProvider provideDsnWithSQLite
      */
-    public function testDsnWithSQLite(string $dsn, string $file = null)
+    public function testDsnWithSQLite(string $dsn, ?string $file = null)
     {
         try {
             $pool = new DoctrineDbalAdapter($dsn);
@@ -160,7 +160,7 @@ class DoctrineDbalAdapterTest extends AdapterTestCase
 
         /** @var Connection $conn */
         $conn = $connProp->getValue($cache);
-        $result = $conn->executeQuery('SELECT 1 FROM cache_items WHERE item_id LIKE ?', [sprintf('%%%s', $name)]);
+        $result = $conn->executeQuery('SELECT 1 FROM cache_items WHERE item_id LIKE ?', [\sprintf('%%%s', $name)]);
 
         return 1 !== (int) $result->fetchOne();
     }

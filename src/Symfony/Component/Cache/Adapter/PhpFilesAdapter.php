@@ -30,7 +30,6 @@ class PhpFilesAdapter extends AbstractAdapter implements PruneableInterface
     }
 
     private \Closure $includeHandler;
-    private bool $appendOnly;
     private array $values = [];
     private array $files = [];
 
@@ -43,9 +42,12 @@ class PhpFilesAdapter extends AbstractAdapter implements PruneableInterface
      *
      * @throws CacheException if OPcache is not enabled
      */
-    public function __construct(string $namespace = '', int $defaultLifetime = 0, string $directory = null, bool $appendOnly = false)
-    {
-        $this->appendOnly = $appendOnly;
+    public function __construct(
+        string $namespace = '',
+        int $defaultLifetime = 0,
+        ?string $directory = null,
+        private bool $appendOnly = false,
+    ) {
         self::$startTime ??= $_SERVER['REQUEST_TIME'] ?? time();
         parent::__construct('', $defaultLifetime);
         $this->init($namespace, $directory);
@@ -214,7 +216,7 @@ class PhpFilesAdapter extends AbstractAdapter implements PruneableInterface
                 try {
                     $value = VarExporter::export($value, $isStaticValue);
                 } catch (\Exception $e) {
-                    throw new InvalidArgumentException(sprintf('Cache key "%s" has non-serializable "%s" value.', $key, get_debug_type($value)), 0, $e);
+                    throw new InvalidArgumentException(\sprintf('Cache key "%s" has non-serializable "%s" value.', $key, get_debug_type($value)), 0, $e);
                 }
             } elseif (\is_string($value)) {
                 // Wrap "N;" in a closure to not confuse it with an encoded `null`
@@ -223,7 +225,7 @@ class PhpFilesAdapter extends AbstractAdapter implements PruneableInterface
                 }
                 $value = var_export($value, true);
             } elseif (!\is_scalar($value)) {
-                throw new InvalidArgumentException(sprintf('Cache key "%s" has non-serializable "%s" value.', $key, get_debug_type($value)));
+                throw new InvalidArgumentException(\sprintf('Cache key "%s" has non-serializable "%s" value.', $key, get_debug_type($value)));
             } else {
                 $value = var_export($value, true);
             }
@@ -252,7 +254,7 @@ class PhpFilesAdapter extends AbstractAdapter implements PruneableInterface
         }
 
         if (!$ok && !is_writable($this->directory)) {
-            throw new CacheException(sprintf('Cache directory is not writable (%s).', $this->directory));
+            throw new CacheException(\sprintf('Cache directory is not writable (%s).', $this->directory));
         }
 
         return $ok;

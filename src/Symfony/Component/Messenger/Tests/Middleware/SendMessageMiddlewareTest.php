@@ -11,8 +11,8 @@
 
 namespace Symfony\Component\Messenger\Tests\Middleware;
 
-use Psr\Container\ContainerInterface;
 use Psr\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Event\SendMessageToTransportsEvent;
 use Symfony\Component\Messenger\Exception\NoSenderForMessageException;
@@ -234,13 +234,11 @@ class SendMessageMiddlewareTest extends MiddlewareTestCase
 
     private function createSendersLocator(array $sendersMap, array $senders): SendersLocator
     {
-        $container = $this->createMock(ContainerInterface::class);
-        $container->expects($this->any())
-            ->method('has')
-            ->willReturnCallback(fn ($id) => isset($senders[$id]));
-        $container->expects($this->any())
-            ->method('get')
-            ->willReturnCallback(fn ($id) => $senders[$id]);
+        $container = new Container();
+
+        foreach ($senders as $id => $sender) {
+            $container->set($id, $sender);
+        }
 
         return new SendersLocator($sendersMap, $container);
     }

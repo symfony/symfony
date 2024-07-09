@@ -26,9 +26,9 @@
         "symfony/http-kernel": "^6.4|^7.0",
         "symfony/http-foundation": "^6.4|^7.0",
         "symfony/password-hasher": "^6.4|^7.0",
-        "symfony/security-core": "^6.4|^7.0",
+        "symfony/security-core": "^7.2",
         "symfony/security-csrf": "^6.4|^7.0",
-        "symfony/security-http": "^7.1",
+        "symfony/security-http": "^7.2",
         "symfony/service-contracts": "^2.5|^3"
     },
     "require-dev": {
@@ -50,13 +50,8 @@
         "symfony/twig-bridge": "^6.4|^7.0",
         "symfony/validator": "^6.4|^7.0",
         "symfony/yaml": "^6.4|^7.0",
-        "twig/twig": "^3.0.4|^4.0",
-        "web-token/jwt-checker": "^3.1",
-        "web-token/jwt-signature-algorithm-hmac": "^3.1",
-        "web-token/jwt-signature-algorithm-ecdsa": "^3.1",
-        "web-token/jwt-signature-algorithm-rsa": "^3.1",
-        "web-token/jwt-signature-algorithm-eddsa": "^3.1",
-        "web-token/jwt-signature-algorithm-none": "^3.1"
+        "twig/twig": "^3.0.4",
+        "web-token/jwt-library": "^3.3.2"
     },
     "conflict": {
         "symfony/browser-kit": "<6.4",

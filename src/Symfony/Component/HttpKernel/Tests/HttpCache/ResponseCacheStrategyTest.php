@@ -316,14 +316,14 @@ class ResponseCacheStrategyTest extends TestCase
             } elseif ('age' === $key) {
                 $this->assertSame($value, $response->getAge());
             } elseif (true === $value) {
-                $this->assertTrue($response->headers->hasCacheControlDirective($key), sprintf('Cache-Control header must have "%s" flag', $key));
+                $this->assertTrue($response->headers->hasCacheControlDirective($key), \sprintf('Cache-Control header must have "%s" flag', $key));
             } elseif (false === $value) {
                 $this->assertFalse(
                     $response->headers->hasCacheControlDirective($key),
-                    sprintf('Cache-Control header must NOT have "%s" flag', $key)
+                    \sprintf('Cache-Control header must NOT have "%s" flag', $key)
                 );
             } else {
-                $this->assertSame($value, $response->headers->getCacheControlDirective($key), sprintf('Cache-Control flag "%s" should be "%s"', $key, $value));
+                $this->assertSame($value, $response->headers->getCacheControlDirective($key), \sprintf('Cache-Control flag "%s" should be "%s"', $key, $value));
             }
         }
     }

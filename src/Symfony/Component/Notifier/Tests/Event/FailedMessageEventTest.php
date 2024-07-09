@@ -58,7 +58,7 @@ class FailedMessageEventTest extends TestCase
         $transport = new class($clientMock, $eventDispatcherMock) extends AbstractTransport {
             public NullTransportException $exception;
 
-            public function __construct($client, EventDispatcherInterface $dispatcher = null)
+            public function __construct($client, ?EventDispatcherInterface $dispatcher = null)
             {
                 $this->exception = new NullTransportException();
                 parent::__construct($client, $dispatcher);

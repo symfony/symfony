@@ -84,14 +84,20 @@ class CheckExceptionOnInvalidReferenceBehaviorPassTest extends TestCase
         $this->addToAssertionCount(1);
     }
 
-    public function testWithErroredServiceLocator()
+    /**
+     * @testWith [true]
+     *           [false]
+     */
+    public function testWithErroredServiceLocator(bool $inline)
     {
         $container = new ContainerBuilder();
 
         ServiceLocatorTagPass::register($container, ['foo' => new Reference('baz')], 'bar');
 
         (new AnalyzeServiceReferencesPass())->process($container);
-        (new InlineServiceDefinitionsPass())->process($container);
+        if ($inline) {
+            (new InlineServiceDefinitionsPass())->process($container);
+        }
 
         $this->expectException(ServiceNotFoundException::class);
         $this->expectExceptionMessage('The service "foo" in the container provided to "bar" has a dependency on a non-existent service "baz".');
@@ -99,14 +105,20 @@ class CheckExceptionOnInvalidReferenceBehaviorPassTest extends TestCase
         $this->process($container);
     }
 
-    public function testWithErroredHiddenService()
+    /**
+     * @testWith [true]
+     *           [false]
+     */
+    public function testWithErroredHiddenService(bool $inline)
     {
         $container = new ContainerBuilder();
 
         ServiceLocatorTagPass::register($container, ['foo' => new Reference('foo')], 'bar');
 
         (new AnalyzeServiceReferencesPass())->process($container);
-        (new InlineServiceDefinitionsPass())->process($container);
+        if ($inline) {
+            (new InlineServiceDefinitionsPass())->process($container);
+        }
 
         $this->expectException(ServiceNotFoundException::class);
         $this->expectExceptionMessage('The service "bar" has a dependency on a non-existent service "foo".');

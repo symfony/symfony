@@ -29,7 +29,7 @@ final class ParameterNormalizer
         try {
             return \DateTimeImmutable::createFromFormat('U', 0)->add(new \DateInterval($duration))->getTimestamp();
         } catch (\Exception $e) {
-            throw new \InvalidArgumentException(sprintf('Cannot parse date interval "%s".', $duration), 0, $e);
+            throw new \InvalidArgumentException(\sprintf('Cannot parse date interval "%s".', $duration), 0, $e);
         }
     }
 }

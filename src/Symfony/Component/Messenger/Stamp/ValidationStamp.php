@@ -18,16 +18,15 @@ use Symfony\Component\Validator\Constraints\GroupSequence;
  */
 final class ValidationStamp implements StampInterface
 {
-    private array|GroupSequence $groups;
-
     /**
      * @param string[]|GroupSequence $groups
      */
-    public function __construct(array|GroupSequence $groups)
-    {
-        $this->groups = $groups;
+    public function __construct(
+        private array|GroupSequence $groups,
+    ) {
     }
 
+    /** @return string[]|GroupSequence */
     public function getGroups(): array|GroupSequence
     {
         return $this->groups;

@@ -360,7 +360,7 @@ class ConnectionTest extends TestCase
         $redis->expects($this->once())->method('xadd')->willReturn('0');
         $redis->expects($this->once())->method('xack')->willReturn(0);
 
-        $redis->method('getLastError')->willReturnOnConsecutiveCalls('xadd error', 'xack error');
+        $redis->method('getLastError')->willReturn('xadd error', 'xack error');
         $redis->expects($this->exactly(2))->method('clearLastError');
 
         $connection = Connection::fromDsn('redis://localhost/messenger-clearlasterror', ['auto_setup' => false], $redis);
@@ -413,13 +413,13 @@ class ConnectionTest extends TestCase
         }
 
         $master = getenv('MESSENGER_REDIS_DSN');
-        $uid = uniqid('sentinel_');
+        $uid = random_int(1, PHP_INT_MAX);
 
         $exp = explode('://', $master, 2)[1];
         $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage(sprintf('Failed to retrieve master information from master name "%s" and address "%s".', $uid, $exp));
+        $this->expectExceptionMessage(\sprintf('Failed to retrieve master information from master name "%s" and address "%s".', $uid, $exp));
 
-        Connection::fromDsn(sprintf('%s/messenger-clearlasterror', $master), ['delete_after_ack' => true, 'sentinel_master' => $uid], null);
+        Connection::fromDsn(\sprintf('%s/messenger-clearlasterror', $master), ['delete_after_ack' => true, 'sentinel_master' => $uid], null);
     }
 
     public function testFromDsnOnUnixSocketWithUserAndPassword()

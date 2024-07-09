@@ -15,6 +15,12 @@ Symfony\Component\Validator\Tests\Fixtures\NestedAttribute\Entity:
     - Callback: validateMe
     - Callback: validateMeStatic
     - Callback: [Symfony\Component\Validator\Tests\Fixtures\CallbackClass, callback]
+    # Constraint with named arguments support without value
+    - Symfony\Component\Validator\Tests\Mapping\Loader\Fixtures\ConstraintWithoutValueWithNamedArguments: ~
+    # Constraint with named arguments support with scalar value
+    - Symfony\Component\Validator\Tests\Mapping\Loader\Fixtures\ConstraintWithNamedArguments: foo
+    # Constraint with named arguments support with array value
+    - Symfony\Component\Validator\Tests\Mapping\Loader\Fixtures\ConstraintWithNamedArguments: [foo, bar]
 
   properties:
     firstName:

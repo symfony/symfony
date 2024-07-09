@@ -91,7 +91,6 @@ class UserValueResolverTest extends TestCase
         $tokenStorage->setToken($token);
 
         $resolver = new UserValueResolver($tokenStorage);
-        $metadata = $this->createMock(ArgumentMetadata::class);
         $metadata = new ArgumentMetadata('foo', null, false, false, null, false, [new CurrentUser()]);
 
         $this->assertSame([$user], $resolver->resolve(Request::create('/'), $metadata));
@@ -105,7 +104,6 @@ class UserValueResolverTest extends TestCase
         $tokenStorage->setToken($token);
 
         $resolver = new UserValueResolver($tokenStorage);
-        $metadata = $this->createMock(ArgumentMetadata::class);
         $metadata = new ArgumentMetadata('foo', InMemoryUser::class, false, false, null, false, [new CurrentUser()]);
 
         $this->assertSame([$user], $resolver->resolve(Request::create('/'), $metadata));
@@ -164,6 +162,6 @@ class UserValueResolverTest extends TestCase
         $tokenStorage = new TokenStorage();
 
         $argumentResolver = new ArgumentResolver(null, [new UserValueResolver($tokenStorage), new DefaultValueResolver()]);
-        $this->assertSame([null], $argumentResolver->getArguments(Request::create('/'), function (UserInterface $user = null) {}));
+        $this->assertSame([null], $argumentResolver->getArguments(Request::create('/'), function (?UserInterface $user = null) {}));
     }
 }

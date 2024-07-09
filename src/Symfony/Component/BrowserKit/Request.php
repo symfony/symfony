@@ -16,37 +16,29 @@ namespace Symfony\Component\BrowserKit;
  */
 class Request
 {
-    protected string $uri;
-    protected string $method;
-    protected array $parameters;
-    protected array $files;
-    protected array $cookies;
-    protected array $server;
-    protected ?string $content;
-
     /**
-     * @param string $uri        The request URI
-     * @param string $method     The HTTP method request
-     * @param array  $parameters The request parameters
-     * @param array  $files      An array of uploaded files
-     * @param array  $cookies    An array of cookies
-     * @param array  $server     An array of server parameters
-     * @param string $content    The raw body data
+     * @param string      $uri        The request URI
+     * @param string      $method     The HTTP method request
+     * @param array       $parameters The request parameters
+     * @param array       $files      An array of uploaded files
+     * @param array       $cookies    An array of cookies
+     * @param array       $server     An array of server parameters
+     * @param string|null $content    The raw body data
      */
-    public function __construct(string $uri, string $method, array $parameters = [], array $files = [], array $cookies = [], array $server = [], string $content = null)
-    {
-        $this->uri = $uri;
-        $this->method = $method;
-
+    public function __construct(
+        protected string $uri,
+        protected string $method,
+        protected array $parameters = [],
+        protected array $files = [],
+        protected array $cookies = [],
+        protected array $server = [],
+        protected ?string $content = null,
+    ) {
         array_walk_recursive($parameters, static function (&$value) {
             $value = (string) $value;
         });
 
         $this->parameters = $parameters;
-        $this->files = $files;
-        $this->cookies = $cookies;
-        $this->server = $server;
-        $this->content = $content;
     }
 
     /**

@@ -23,7 +23,7 @@ final class NativeClock implements ClockInterface
     /**
      * @throws \DateInvalidTimeZoneException When $timezone is invalid
      */
-    public function __construct(\DateTimeZone|string $timezone = null)
+    public function __construct(\DateTimeZone|string|null $timezone = null)
     {
         $this->timezone = \is_string($timezone ??= date_default_timezone_get()) ? $this->withTimeZone($timezone)->timezone : $timezone;
     }

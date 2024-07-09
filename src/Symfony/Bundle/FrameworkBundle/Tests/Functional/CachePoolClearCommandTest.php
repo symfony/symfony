@@ -143,7 +143,7 @@ class CachePoolClearCommandTest extends AbstractWebTestCase
         $this->assertStringContainsString('[OK] Cache was successfully cleared.', $tester->getDisplay());
     }
 
-    private function createCommandTester(array $poolNames = null)
+    private function createCommandTester(?array $poolNames = null)
     {
         $application = new Application(static::$kernel);
         $application->add(new CachePoolClearCommand(static::getContainer()->get('cache.global_clearer'), $poolNames));

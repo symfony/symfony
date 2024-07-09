@@ -21,11 +21,9 @@ use Symfony\Component\Form\Exception\TransformationFailedException;
  */
 class ArrayToPartsTransformer implements DataTransformerInterface
 {
-    private array $partMapping;
-
-    public function __construct(array $partMapping)
-    {
-        $this->partMapping = $partMapping;
+    public function __construct(
+        private array $partMapping,
+    ) {
     }
 
     public function transform(mixed $array): mixed
@@ -74,7 +72,7 @@ class ArrayToPartsTransformer implements DataTransformerInterface
                 return null;
             }
 
-            throw new TransformationFailedException(sprintf('The keys "%s" should not be empty.', implode('", "', $emptyKeys)));
+            throw new TransformationFailedException(\sprintf('The keys "%s" should not be empty.', implode('", "', $emptyKeys)));
         }
 
         return $result;

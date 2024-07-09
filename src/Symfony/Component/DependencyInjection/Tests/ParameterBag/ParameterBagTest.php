@@ -91,7 +91,7 @@ class ParameterBagTest extends TestCase
         $bag = new ParameterBag();
 
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage(sprintf('The parameter name "%s" cannot be numeric.', $name));
+        $this->expectExceptionMessage(\sprintf('The parameter name "%s" cannot be numeric.', $name));
 
         $bag->set($name, 'foo');
     }
@@ -103,7 +103,7 @@ class ParameterBagTest extends TestCase
     public function testConstructorNumericName(int|float $name)
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage(sprintf('The parameter name "%s" cannot be numeric.', $name));
+        $this->expectExceptionMessage(\sprintf('The parameter name "%s" cannot be numeric.', $name));
 
         new ParameterBag([$name => 'foo']);
     }
@@ -341,7 +341,7 @@ class ParameterBagTest extends TestCase
         try {
             $this->assertEquals($expected, $bag->resolveString($test), $description);
         } catch (ParameterNotFoundException $e) {
-            $this->fail(sprintf('%s - "%s"', $description, $expected));
+            $this->fail(\sprintf('%s - "%s"', $description, $expected));
         }
     }
 

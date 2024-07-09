@@ -82,7 +82,7 @@ final class MicrosoftTeamsOptions implements MessageOptionsInterface
     public function recipient(string $path): static
     {
         if (!preg_match('/^\/webhookb2\//', $path)) {
-            throw new InvalidArgumentException(sprintf('"%s" require recipient id format to be "/webhookb2/{uuid}@{uuid}/IncomingWebhook/{id}/{uuid}", "%s" given.', __CLASS__, $path));
+            throw new InvalidArgumentException(\sprintf('"%s" require recipient id format to be "/webhookb2/{uuid}@{uuid}/IncomingWebhook/{id}/{uuid}", "%s" given.', __CLASS__, $path));
         }
 
         $this->options['recipient_id'] = $path;
@@ -169,7 +169,7 @@ final class MicrosoftTeamsOptions implements MessageOptionsInterface
     private function validateNumberOfActions(): void
     {
         if (\count($this->options['potentialAction'] ?? []) >= self::MAX_ACTIONS) {
-            throw new InvalidArgumentException(sprintf('MessageCard maximum number of "potentialAction" has been reached (%d).', self::MAX_ACTIONS));
+            throw new InvalidArgumentException(\sprintf('MessageCard maximum number of "potentialAction" has been reached (%d).', self::MAX_ACTIONS));
         }
     }
 

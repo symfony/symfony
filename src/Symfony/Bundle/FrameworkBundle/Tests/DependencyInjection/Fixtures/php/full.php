@@ -70,6 +70,7 @@ $container->loadFromExtension('framework', [
         'default_context' => ['enable_max_depth' => true],
     ],
     'property_info' => true,
+    'type_info' => true,
     'ide' => 'file%%link%%format',
     'request' => [
         'formats' => [

@@ -20,8 +20,12 @@ use phpDocumentor\Reflection\Types\ContextFactory;
 use Symfony\Component\PropertyInfo\PropertyDescriptionExtractorInterface;
 use Symfony\Component\PropertyInfo\PropertyDocBlockExtractorInterface;
 use Symfony\Component\PropertyInfo\PropertyTypeExtractorInterface;
-use Symfony\Component\PropertyInfo\Type;
+use Symfony\Component\PropertyInfo\Type as LegacyType;
 use Symfony\Component\PropertyInfo\Util\PhpDocTypeHelper;
+use Symfony\Component\TypeInfo\Exception\LogicException;
+use Symfony\Component\TypeInfo\Type;
+use Symfony\Component\TypeInfo\Type\ObjectType;
+use Symfony\Component\TypeInfo\TypeContext\TypeContextFactory;
 
 /**
  * Extracts data using a PHPDoc parser.
@@ -48,6 +52,7 @@ class PhpDocExtractor implements PropertyDescriptionExtractorInterface, Property
 
     private DocBlockFactoryInterface $docBlockFactory;
     private ContextFactory $contextFactory;
+    private TypeContextFactory $typeContextFactory;
     private PhpDocTypeHelper $phpDocTypeHelper;
     private array $mutatorPrefixes;
     private array $accessorPrefixes;
@@ -58,14 +63,15 @@ class PhpDocExtractor implements PropertyDescriptionExtractorInterface, Property
      * @param string[]|null $accessorPrefixes
      * @param string[]|null $arrayMutatorPrefixes
      */
-    public function __construct(DocBlockFactoryInterface $docBlockFactory = null, array $mutatorPrefixes = null, array $accessorPrefixes = null, array $arrayMutatorPrefixes = null)
+    public function __construct(?DocBlockFactoryInterface $docBlockFactory = null, ?array $mutatorPrefixes = null, ?array $accessorPrefixes = null, ?array $arrayMutatorPrefixes = null)
     {
         if (!class_exists(DocBlockFactory::class)) {
-            throw new \LogicException(sprintf('Unable to use the "%s" class as the "phpdocumentor/reflection-docblock" package is not installed. Try running composer require "phpdocumentor/reflection-docblock".', __CLASS__));
+            throw new \LogicException(\sprintf('Unable to use the "%s" class as the "phpdocumentor/reflection-docblock" package is not installed. Try running composer require "phpdocumentor/reflection-docblock".', __CLASS__));
         }
 
         $this->docBlockFactory = $docBlockFactory ?: DocBlockFactory::createInstance();
         $this->contextFactory = new ContextFactory();
+        $this->typeContextFactory = new TypeContextFactory();
         $this->phpDocTypeHelper = new PhpDocTypeHelper();
         $this->mutatorPrefixes = $mutatorPrefixes ?? ReflectionExtractor::$defaultMutatorPrefixes;
         $this->accessorPrefixes = $accessorPrefixes ?? ReflectionExtractor::$defaultAccessorPrefixes;
@@ -82,7 +88,7 @@ class PhpDocExtractor implements PropertyDescriptionExtractorInterface, Property
 
         $shortDescription = $docBlock->getSummary();
 
-        if (!empty($shortDescription)) {
+        if ($shortDescription) {
             return $shortDescription;
         }
 
@@ -90,7 +96,7 @@ class PhpDocExtractor implements PropertyDescriptionExtractorInterface, Property
             if ($var && !$var instanceof InvalidTag) {
                 $varDescription = $var->getDescription()->render();
 
-                if (!empty($varDescription)) {
+                if ($varDescription) {
                     return $varDescription;
                 }
             }
@@ -149,7 +155,7 @@ class PhpDocExtractor implements PropertyDescriptionExtractorInterface, Property
                             continue 2;
                     }
 
-                    $types[] = new Type(Type::BUILTIN_TYPE_OBJECT, $type->isNullable(), $resolvedClass, $type->isCollection(), $type->getCollectionKeyTypes(), $type->getCollectionValueTypes());
+                    $types[] = new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, $type->isNullable(), $resolvedClass, $type->isCollection(), $type->getCollectionKeyTypes(), $type->getCollectionValueTypes());
                 }
             }
         }
@@ -162,7 +168,7 @@ class PhpDocExtractor implements PropertyDescriptionExtractorInterface, Property
             return $types;
         }
 
-        return [new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, new Type(Type::BUILTIN_TYPE_INT), $types[0])];
+        return [new LegacyType(LegacyType::BUILTIN_TYPE_ARRAY, false, null, true, new LegacyType(LegacyType::BUILTIN_TYPE_INT), $types[0])];
     }
 
     public function getTypesFromConstructor(string $class, string $property): ?array
@@ -186,6 +192,90 @@ class PhpDocExtractor implements PropertyDescriptionExtractorInterface, Property
         }
 
         return array_merge([], ...$types);
+    }
+
+    /**
+     * @experimental
+     */
+    public function getType(string $class, string $property, array $context = []): ?Type
+    {
+        /** @var $docBlock DocBlock */
+        [$docBlock, $source, $prefix] = $this->findDocBlock($class, $property);
+        if (!$docBlock) {
+            return null;
+        }
+
+        $tag = match ($source) {
+            self::PROPERTY => 'var',
+            self::ACCESSOR => 'return',
+            self::MUTATOR => 'param',
+        };
+
+        $types = [];
+        $typeContext = $this->typeContextFactory->createFromClassName($class);
+
+        /** @var DocBlock\Tags\Var_|DocBlock\Tags\Return_|DocBlock\Tags\Param $tag */
+        foreach ($docBlock->getTagsByName($tag) as $tag) {
+            if ($tag instanceof InvalidTag || !$tagType = $tag->getType()) {
+                continue;
+            }
+
+            $type = $this->phpDocTypeHelper->getType($tagType);
+
+            if (!$type instanceof ObjectType) {
+                $types[] = $type;
+
+                continue;
+            }
+
+            $normalizedClassName = match ($type->getClassName()) {
+                'self' => $typeContext->getDeclaringClass(),
+                'static' => $typeContext->getCalledClass(),
+                default => $type->getClassName(),
+            };
+
+            if ('parent' === $normalizedClassName) {
+                try {
+                    $normalizedClassName = $typeContext->getParentClass();
+                } catch (LogicException) {
+                    // if there is no parent for the current class, we keep the "parent" raw string
+                }
+            }
+
+            $types[] = $type->isNullable() ? Type::nullable(Type::object($normalizedClassName)) : Type::object($normalizedClassName);
+        }
+
+        if (null === $type = $types[0] ?? null) {
+            return null;
+        }
+
+        if (!\in_array($prefix, $this->arrayMutatorPrefixes, true)) {
+            return $type;
+        }
+
+        return Type::list($type);
+    }
+
+    /**
+     * @experimental
+     */
+    public function getTypeFromConstructor(string $class, string $property): ?Type
+    {
+        if (!$docBlock = $this->getDocBlockFromConstructor($class, $property)) {
+            return null;
+        }
+
+        $types = [];
+        /** @var DocBlock\Tags\Var_|DocBlock\Tags\Return_|DocBlock\Tags\Param $tag */
+        foreach ($docBlock->getTagsByName('param') as $tag) {
+            if ($tag instanceof InvalidTag || !$tagType = $tag->getType()) {
+                continue;
+            }
+
+            $types[] = $this->phpDocTypeHelper->getType($tagType);
+        }
+
+        return $types[0] ?? null;
     }
 
     public function getDocBlock(string $class, string $property): ?DocBlock
@@ -229,7 +319,7 @@ class PhpDocExtractor implements PropertyDescriptionExtractorInterface, Property
      */
     private function findDocBlock(string $class, string $property): array
     {
-        $propertyHash = sprintf('%s::%s', $class, $property);
+        $propertyHash = \sprintf('%s::%s', $class, $property);
 
         if (isset($this->docBlocks[$propertyHash])) {
             return $this->docBlocks[$propertyHash];

@@ -27,7 +27,7 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
 
 final class GoogleChatTransportTest extends TransportTestCase
 {
-    public static function createTransport(HttpClientInterface $client = null, string $threadKey = null): GoogleChatTransport
+    public static function createTransport(?HttpClientInterface $client = null, ?string $threadKey = null): GoogleChatTransport
     {
         return new GoogleChatTransport('My-Space', 'theAccessKey', 'theAccessToken=', $threadKey, $client ?? new MockHttpClient());
     }
@@ -108,11 +108,11 @@ final class GoogleChatTransportTest extends TransportTestCase
             ->method('getContent')
             ->willReturn('{"name":"spaces/My-Space/messages/abcdefg.hijklmno"}');
 
-        $expectedBody = json_encode(['text' => $message]);
+        $expectedBody = json_encode(['text' => $message, 'thread' => ['threadKey' => 'My-Thread']]);
 
         $client = new MockHttpClient(function (string $method, string $url, array $options = []) use ($response, $expectedBody): ResponseInterface {
             $this->assertSame('POST', $method);
-            $this->assertSame('https://chat.googleapis.com/v1/spaces/My-Space/messages?key=theAccessKey&token=theAccessToken%3D&threadKey=My-Thread', $url);
+            $this->assertSame('https://chat.googleapis.com/v1/spaces/My-Space/messages?key=theAccessKey&token=theAccessToken%3D&messageReplyOption=REPLY_MESSAGE_FALLBACK_TO_NEW_THREAD', $url);
             $this->assertSame($expectedBody, $options['body']);
 
             return $response;

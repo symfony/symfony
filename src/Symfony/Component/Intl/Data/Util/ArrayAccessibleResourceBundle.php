@@ -25,11 +25,9 @@ use Symfony\Component\Intl\Exception\BadMethodCallException;
  */
 class ArrayAccessibleResourceBundle implements \ArrayAccess, \IteratorAggregate, \Countable
 {
-    private \ResourceBundle $bundleImpl;
-
-    public function __construct(\ResourceBundle $bundleImpl)
-    {
-        $this->bundleImpl = $bundleImpl;
+    public function __construct(
+        private \ResourceBundle $bundleImpl,
+    ) {
     }
 
     public function get(int|string $offset): mixed

@@ -30,7 +30,7 @@ class IntlTestHelper
     /**
      * Should be called before tests that work fine with the stub implementation.
      */
-    public static function requireIntl(TestCase $testCase, string $minimumIcuVersion = null): void
+    public static function requireIntl(TestCase $testCase, ?string $minimumIcuVersion = null): void
     {
         $minimumIcuVersion ??= Intl::getIcuStubVersion();
 
@@ -62,7 +62,7 @@ class IntlTestHelper
      * Should be called before tests that require a feature-complete intl
      * implementation.
      */
-    public static function requireFullIntl(TestCase $testCase, string $minimumIcuVersion = null): void
+    public static function requireFullIntl(TestCase $testCase, ?string $minimumIcuVersion = null): void
     {
         // We only run tests if the intl extension is loaded...
         if (!Intl::isExtensionLoaded()) {

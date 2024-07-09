@@ -18,7 +18,7 @@ use Symfony\Component\AssetMapper\MappedAsset;
  */
 class CircularAssetsException extends RuntimeException
 {
-    public function __construct(private MappedAsset $mappedAsset, string $message = '', int $code = 0, \Throwable $previous = null)
+    public function __construct(private MappedAsset $mappedAsset, string $message = '', int $code = 0, ?\Throwable $previous = null)
     {
         parent::__construct($message, $code, $previous);
     }

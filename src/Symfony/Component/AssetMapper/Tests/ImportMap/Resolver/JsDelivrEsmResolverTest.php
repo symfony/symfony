@@ -688,7 +688,7 @@ EOF,
         ];
     }
 
-    private static function createRemoteEntry(string $importName, string $version, ImportMapType $type = ImportMapType::JS, string $packageSpecifier = null): ImportMapEntry
+    private static function createRemoteEntry(string $importName, string $version, ImportMapType $type = ImportMapType::JS, ?string $packageSpecifier = null): ImportMapEntry
     {
         $packageSpecifier = $packageSpecifier ?? $importName;
 

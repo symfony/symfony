@@ -248,6 +248,29 @@ class UuidTest extends TestCase
         yield [new \stdClass()];
     }
 
+    public function testHashable()
+    {
+        $uuid1 = new UuidV4(self::A_UUID_V4);
+        $uuid2 = new UuidV4(self::A_UUID_V4);
+
+        $this->assertSame($uuid1->hash(), $uuid2->hash());
+    }
+
+    /** @requires extension ds */
+    public function testDsCompatibility()
+    {
+        $uuid1 = new UuidV4(self::A_UUID_V4);
+        $uuid2 = new UuidV4(self::A_UUID_V4);
+
+        $set = new \Ds\Set();
+        $set->add($uuid1);
+        $set->add($uuid2);
+
+        $this->assertTrue($set->contains($uuid1));
+        $this->assertTrue($set->contains($uuid2));
+        $this->assertCount(1, $set);
+    }
+
     public function testCompare()
     {
         $uuids = [];
@@ -470,5 +493,10 @@ class UuidTest extends TestCase
         $this->assertEquals($uuidV7, $uuidV1->toV7());
         $this->assertNotEquals($uuidV7, $sameUuidV7100NanosecondsLater);
         $this->assertSame(hexdec('0'.substr($uuidV7, -2)) + 1, hexdec('0'.substr($sameUuidV7100NanosecondsLater, -2)));
+    }
+
+    public function testToString()
+    {
+        $this->assertSame('a45a8538-77a9-4335-bd30-236f59b81b81', (new UuidV4('a45a8538-77a9-4335-bd30-236f59b81b81'))->toString());
     }
 }

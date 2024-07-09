@@ -111,13 +111,13 @@ class AuthenticatorTest extends AbstractWebTestCase
 
         $client->request('POST', '/firewall1/login', [
             '_username' => 'jane@example.org',
-            '_password' => '',
+            '_password' => 'wrong',
         ]);
         $this->assertResponseRedirects('http://localhost/firewall1/login');
 
         $client->request('POST', '/firewall1/dummy_login', [
             '_username' => 'jane@example.org',
-            '_password' => '',
+            '_password' => 'wrong',
         ]);
         $this->assertResponseRedirects('http://localhost/firewall1/dummy_login');
     }

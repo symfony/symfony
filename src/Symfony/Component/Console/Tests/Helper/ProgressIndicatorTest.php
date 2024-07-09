@@ -179,6 +179,6 @@ class ProgressIndicatorTest extends TestCase
     {
         $count = substr_count($expected, "\n");
 
-        return "\x0D\x1B[2K".($count ? sprintf("\033[%dA", $count) : '').$expected;
+        return "\x0D\x1B[2K".($count ? \sprintf("\033[%dA", $count) : '').$expected;
     }
 }

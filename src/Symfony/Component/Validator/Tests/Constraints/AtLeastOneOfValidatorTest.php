@@ -107,12 +107,12 @@ class AtLeastOneOfValidatorTest extends ConstraintValidatorTestCase
         $i = 0;
 
         foreach ($constraints as $constraint) {
-            $message[] = sprintf(' [%d] %s', ++$i, $validator->validate($value, $constraint)->get(0)->getMessage());
+            $message[] = \sprintf(' [%d] %s', ++$i, $validator->validate($value, $constraint)->get(0)->getMessage());
         }
 
         $violations = $validator->validate($value, $atLeastOneOf);
 
-        $this->assertCount(1, $violations, sprintf('1 violation expected. Got %u.', \count($violations)));
+        $this->assertCount(1, $violations, \sprintf('1 violation expected. Got %u.', \count($violations)));
         $this->assertEquals(new ConstraintViolation(implode('', $message), implode('', $message), [], $value, '', $value, null, AtLeastOneOf::AT_LEAST_ONE_OF_ERROR, $atLeastOneOf), $violations->get(0));
     }
 
@@ -125,7 +125,7 @@ class AtLeastOneOfValidatorTest extends ConstraintValidatorTestCase
 
         $violations = Validation::createValidator()->validate($value, $atLeastOneOf);
 
-        $this->assertCount(1, $violations, sprintf('1 violation expected. Got %u.', \count($violations)));
+        $this->assertCount(1, $violations, \sprintf('1 violation expected. Got %u.', \count($violations)));
         $this->assertEquals(new ConstraintViolation('foo', 'foo', [], $value, '', $value, null, AtLeastOneOf::AT_LEAST_ONE_OF_ERROR, $atLeastOneOf), $violations->get(0));
     }
 
@@ -268,7 +268,7 @@ class AtLeastOneOfValidatorTest extends ConstraintValidatorTestCase
         $translator = new class() implements TranslatorInterface, LocaleAwareInterface {
             use TranslatorTrait;
 
-            public function trans(?string $id, array $parameters = [], string $domain = null, string $locale = null): string
+            public function trans(?string $id, array $parameters = [], ?string $domain = null, ?string $locale = null): string
             {
                 if ('This value should satisfy at least one of the following constraints:' === $id) {
                     return 'Dummy translation:';

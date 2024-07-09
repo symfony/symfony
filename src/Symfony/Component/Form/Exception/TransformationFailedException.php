@@ -21,7 +21,7 @@ class TransformationFailedException extends RuntimeException
     private ?string $invalidMessage;
     private array $invalidMessageParameters;
 
-    public function __construct(string $message = '', int $code = 0, \Throwable $previous = null, string $invalidMessage = null, array $invalidMessageParameters = [])
+    public function __construct(string $message = '', int $code = 0, ?\Throwable $previous = null, ?string $invalidMessage = null, array $invalidMessageParameters = [])
     {
         parent::__construct($message, $code, $previous);
 

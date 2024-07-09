@@ -27,7 +27,7 @@ class DataMapper implements DataMapperInterface
 {
     private DataAccessorInterface $dataAccessor;
 
-    public function __construct(DataAccessorInterface $dataAccessor = null)
+    public function __construct(?DataAccessorInterface $dataAccessor = null)
     {
         $this->dataAccessor = $dataAccessor ?? new ChainAccessor([
             new CallbackAccessor(),
@@ -73,5 +73,13 @@ class DataMapper implements DataMapperInterface
                 $this->dataAccessor->setValue($data, $form->getData(), $form);
             }
         }
+    }
+
+    /**
+     * @internal
+     */
+    public function getDataAccessor(): DataAccessorInterface
+    {
+        return $this->dataAccessor;
     }
 }

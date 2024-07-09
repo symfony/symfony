@@ -28,7 +28,7 @@ class UuidV7 extends Uuid implements TimeBasedUidInterface
     private static array $seedParts;
     private static int $seedIndex = 0;
 
-    public function __construct(string $uuid = null)
+    public function __construct(?string $uuid = null)
     {
         if (null === $uuid) {
             $this->uid = static::generate();
@@ -49,7 +49,7 @@ class UuidV7 extends Uuid implements TimeBasedUidInterface
         return \DateTimeImmutable::createFromFormat('U.v', substr_replace($time, '.', -3, 0));
     }
 
-    public static function generate(\DateTimeInterface $time = null): string
+    public static function generate(?\DateTimeInterface $time = null): string
     {
         if (null === $mtime = $time) {
             $time = microtime(false);
@@ -113,7 +113,7 @@ class UuidV7 extends Uuid implements TimeBasedUidInterface
             $time = bin2hex(BinaryUtil::fromBase($time, BinaryUtil::BASE10));
         }
 
-        return substr_replace(sprintf('%012s-%04x-%04x-%04x%04x%04x',
+        return substr_replace(\sprintf('%012s-%04x-%04x-%04x%04x%04x',
             $time,
             0x7000 | (self::$rand[1] << 2) | (self::$rand[2] >> 14),
             0x8000 | (self::$rand[2] & 0x3FFF),

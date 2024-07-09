@@ -22,21 +22,23 @@ use Symfony\Component\DependencyInjection\Exception\LogicException;
 #[\Attribute(\Attribute::TARGET_PARAMETER)]
 final class Target
 {
-    public function __construct(
-        public ?string $name = null,
-    ) {
+    /**
+     * @param string|null $name The name of the target autowiring alias
+     */
+    public function __construct(public ?string $name = null)
+    {
     }
 
     public function getParsedName(): string
     {
         if (null === $this->name) {
-            throw new LogicException(sprintf('Cannot parse the name of a #[Target] attribute that has not been resolved. Did you forget to call "%s::parseName()"?', __CLASS__));
+            throw new LogicException(\sprintf('Cannot parse the name of a #[Target] attribute that has not been resolved. Did you forget to call "%s::parseName()"?', __CLASS__));
         }
 
         return lcfirst(str_replace(' ', '', ucwords(preg_replace('/[^a-zA-Z0-9\x7f-\xff]++/', ' ', $this->name))));
     }
 
-    public static function parseName(\ReflectionParameter $parameter, self &$attribute = null, string &$parsedName = null): string
+    public static function parseName(\ReflectionParameter $parameter, ?self &$attribute = null, ?string &$parsedName = null): string
     {
         $attribute = null;
         if (!$target = $parameter->getAttributes(self::class)[0] ?? null) {
@@ -56,7 +58,7 @@ final class Target
                 $function = $function->name;
             }
 
-            throw new InvalidArgumentException(sprintf('Invalid #[Target] name "%s" on parameter "$%s" of "%s()": the first character must be a letter.', $name, $parameter->name, $function));
+            throw new InvalidArgumentException(\sprintf('Invalid #[Target] name "%s" on parameter "$%s" of "%s()": the first character must be a letter.', $name, $parameter->name, $function));
         }
 
         return preg_match('/^[a-zA-Z0-9_\x7f-\xff]++$/', $name) ? $name : $parsedName;

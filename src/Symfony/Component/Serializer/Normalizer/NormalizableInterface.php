@@ -33,5 +33,5 @@ interface NormalizableInterface
      *                                        based on different output formats
      * @param array               $context    Options for normalizing this object
      */
-    public function normalize(NormalizerInterface $normalizer, string $format = null, array $context = []): array|string|int|float|bool|\ArrayObject|null;
+    public function normalize(NormalizerInterface $normalizer, ?string $format = null, array $context = []): array|string|int|float|bool|\ArrayObject|null;
 }

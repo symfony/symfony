@@ -21,11 +21,9 @@ use Symfony\Component\Messenger\Stamp\BusNameStamp;
  */
 class AddBusNameStampMiddleware implements MiddlewareInterface
 {
-    private string $busName;
-
-    public function __construct(string $busName)
-    {
-        $this->busName = $busName;
+    public function __construct(
+        private string $busName,
+    ) {
     }
 
     public function handle(Envelope $envelope, StackInterface $stack): Envelope

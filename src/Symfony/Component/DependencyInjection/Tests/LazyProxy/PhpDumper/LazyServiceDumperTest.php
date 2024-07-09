@@ -16,6 +16,7 @@ use Psr\Container\ContainerInterface;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\LazyProxy\PhpDumper\LazyServiceDumper;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\ReadOnlyClass;
 
 class LazyServiceDumperTest extends TestCase
 {
@@ -51,6 +52,18 @@ class LazyServiceDumperTest extends TestCase
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Invalid "proxy" tag for service "stdClass": class "stdClass" doesn\'t implement "Psr\Container\ContainerInterface".');
         $dumper->getProxyCode($definition);
+    }
+
+    /**
+     * @requires PHP 8.3
+     */
+    public function testReadonlyClass()
+    {
+        $dumper = new LazyServiceDumper();
+        $definition = (new Definition(ReadOnlyClass::class))->setLazy(true);
+
+        $this->assertTrue($dumper->isProxyCandidate($definition));
+        $this->assertStringContainsString('readonly class ReadOnlyClassGhost', $dumper->getProxyCode($definition));
     }
 }
 

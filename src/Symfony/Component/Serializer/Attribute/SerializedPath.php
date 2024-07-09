@@ -23,12 +23,15 @@ class SerializedPath
 {
     private PropertyPath $serializedPath;
 
+    /**
+     * @param string $serializedPath A path using a valid PropertyAccess syntax where the value is stored in a normalized representation
+     */
     public function __construct(string $serializedPath)
     {
         try {
             $this->serializedPath = new PropertyPath($serializedPath);
         } catch (InvalidPropertyPathException $pathException) {
-            throw new InvalidArgumentException(sprintf('Parameter given to "%s" must be a valid property path.', self::class));
+            throw new InvalidArgumentException(\sprintf('Parameter given to "%s" must be a valid property path.', self::class));
         }
     }
 

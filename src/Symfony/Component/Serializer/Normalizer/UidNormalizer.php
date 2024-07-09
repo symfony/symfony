@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Serializer\Normalizer;
 
-use Symfony\Component\PropertyInfo\Type;
 use Symfony\Component\Serializer\Exception\LogicException;
 use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
 use Symfony\Component\Uid\AbstractUid;
@@ -50,32 +49,32 @@ final class UidNormalizer implements NormalizerInterface, DenormalizerInterface
     /**
      * @param AbstractUid $object
      */
-    public function normalize(mixed $object, string $format = null, array $context = []): array|string|int|float|bool|\ArrayObject|null
+    public function normalize(mixed $object, ?string $format = null, array $context = []): array|string|int|float|bool|\ArrayObject|null
     {
         return match ($context[self::NORMALIZATION_FORMAT_KEY] ?? $this->defaultContext[self::NORMALIZATION_FORMAT_KEY]) {
             self::NORMALIZATION_FORMAT_CANONICAL => (string) $object,
             self::NORMALIZATION_FORMAT_BASE58 => $object->toBase58(),
             self::NORMALIZATION_FORMAT_BASE32 => $object->toBase32(),
             self::NORMALIZATION_FORMAT_RFC4122 => $object->toRfc4122(),
-            default => throw new LogicException(sprintf('The "%s" format is not valid.', $context[self::NORMALIZATION_FORMAT_KEY] ?? $this->defaultContext[self::NORMALIZATION_FORMAT_KEY])),
+            default => throw new LogicException(\sprintf('The "%s" format is not valid.', $context[self::NORMALIZATION_FORMAT_KEY] ?? $this->defaultContext[self::NORMALIZATION_FORMAT_KEY])),
         };
     }
 
-    public function supportsNormalization(mixed $data, string $format = null, array $context = []): bool
+    public function supportsNormalization(mixed $data, ?string $format = null, array $context = []): bool
     {
         return $data instanceof AbstractUid;
     }
 
-    public function denormalize(mixed $data, string $type, string $format = null, array $context = []): mixed
+    public function denormalize(mixed $data, string $type, ?string $format = null, array $context = []): mixed
     {
         try {
             return $type::fromString($data);
         } catch (\InvalidArgumentException|\TypeError) {
-            throw NotNormalizableValueException::createForUnexpectedDataType(sprintf('The data is not a valid "%s" string representation.', $type), $data, [Type::BUILTIN_TYPE_STRING], $context['deserialization_path'] ?? null, true);
+            throw NotNormalizableValueException::createForUnexpectedDataType(\sprintf('The data is not a valid "%s" string representation.', $type), $data, ['string'], $context['deserialization_path'] ?? null, true);
         }
     }
 
-    public function supportsDenormalization(mixed $data, string $type, string $format = null, array $context = []): bool
+    public function supportsDenormalization(mixed $data, string $type, ?string $format = null, array $context = []): bool
     {
         return is_subclass_of($type, AbstractUid::class, true);
     }

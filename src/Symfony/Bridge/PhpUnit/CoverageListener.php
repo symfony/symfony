@@ -26,7 +26,7 @@ class CoverageListener implements TestListener
     private $sutFqcnResolver;
     private $warningOnSutNotFound;
 
-    public function __construct(callable $sutFqcnResolver = null, bool $warningOnSutNotFound = false)
+    public function __construct(?callable $sutFqcnResolver = null, bool $warningOnSutNotFound = false)
     {
         $this->sutFqcnResolver = $sutFqcnResolver ?? static function (Test $test): ?string {
             $class = \get_class($test);

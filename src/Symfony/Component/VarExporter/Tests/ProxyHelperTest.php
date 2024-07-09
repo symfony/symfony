@@ -14,6 +14,7 @@ namespace Symfony\Component\VarExporter\Tests;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\VarExporter\Exception\LogicException;
 use Symfony\Component\VarExporter\ProxyHelper;
+use Symfony\Component\VarExporter\Tests\Fixtures\LazyProxy\Php82NullStandaloneReturnType;
 use Symfony\Component\VarExporter\Tests\Fixtures\LazyProxy\StringMagicGetClass;
 
 class ProxyHelperTest extends TestCase
@@ -36,6 +37,7 @@ class ProxyHelperTest extends TestCase
             $expected = str_replace(['.', ' .  .  . ', '\'$a\', \'$a\n\', "\$a\n"'], [' . ', '...', '\'$a\', "\$a\\\n", "\$a\n"'], $expected);
             $expected = str_replace('Bar', '\\'.Bar::class, $expected);
             $expected = str_replace('self', '\\'.TestForProxyHelper::class, $expected);
+            $expected = str_replace('= [namespace\M_PI, new M_PI()]', '= [\M_PI, new \Symfony\Component\VarExporter\Tests\M_PI()]', $expected);
 
             yield [$expected, $method];
         }
@@ -158,6 +160,50 @@ class ProxyHelperTest extends TestCase
         $this->assertSame($expected, ProxyHelper::generateLazyProxy(null, [new \ReflectionClass(TestForProxyHelperInterface1::class), new \ReflectionClass(TestForProxyHelperInterface2::class)]));
     }
 
+    /**
+     * @dataProvider classWithUnserializeMagicMethodProvider
+     */
+    public function testGenerateLazyProxyForClassWithUnserializeMagicMethod(object $obj, string $expected)
+    {
+        $this->assertStringContainsString($expected, ProxyHelper::generateLazyProxy(new \ReflectionClass($obj::class)));
+    }
+
+    public static function classWithUnserializeMagicMethodProvider(): iterable
+    {
+        yield 'not type hinted __unserialize method' => [new class() {
+            public function __unserialize($array)
+            {
+            }
+        }, <<<'EOPHP'
+        implements \Symfony\Component\VarExporter\LazyObjectInterface
+        {
+            use \Symfony\Component\VarExporter\LazyProxyTrait {
+                __unserialize as private __doUnserialize;
+            }
+
+            private const LAZY_OBJECT_PROPERTY_SCOPES = [];
+
+            public function __unserialize($data): void
+            {
+                $this->__doUnserialize($data);
+            }
+        }
+        EOPHP];
+
+        yield 'type hinted __unserialize method' => [new class() {
+            public function __unserialize(array $array)
+            {
+            }
+        }, <<<'EOPHP'
+        implements \Symfony\Component\VarExporter\LazyObjectInterface
+        {
+            use \Symfony\Component\VarExporter\LazyProxyTrait;
+
+            private const LAZY_OBJECT_PROPERTY_SCOPES = [];
+        }
+        EOPHP];
+    }
+
     public function testAttributes()
     {
         $expected = <<<'EOPHP'
@@ -180,6 +226,7 @@ class ProxyHelperTest extends TestCase
             {
             }
         });
+
         $this->assertStringContainsString($expected, ProxyHelper::generateLazyProxy($class));
     }
 
@@ -187,6 +234,17 @@ class ProxyHelperTest extends TestCase
     {
         $this->expectException(LogicException::class);
         ProxyHelper::generateLazyGhost(new \ReflectionClass(StringMagicGetClass::class));
+    }
+
+    /**
+     * @requires PHP 8.2
+     */
+    public function testNullStandaloneReturnType()
+    {
+        self::assertStringContainsString(
+            'public function foo(): null',
+            ProxyHelper::generateLazyProxy(new \ReflectionClass(Php82NullStandaloneReturnType::class))
+        );
     }
 }
 
@@ -223,6 +281,10 @@ abstract class TestForProxyHelper
     }
 
     public function foo9($a = self::BOB, $b = ['$a', '$a\n', "\$a\n"], $c = ['$a', '$a\n', "\$a\n", new \stdClass()])
+    {
+    }
+
+    public function foo10($a = [namespace\M_PI, new M_PI()])
     {
     }
 }

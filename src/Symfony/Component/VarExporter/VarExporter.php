@@ -37,7 +37,7 @@ final class VarExporter
      *
      * @throws ExceptionInterface When the provided value cannot be serialized
      */
-    public static function export(mixed $value, bool &$isStaticValue = null, array &$foundClasses = []): string
+    public static function export(mixed $value, ?bool &$isStaticValue = null, array &$foundClasses = []): string
     {
         $isStaticValue = true;
 

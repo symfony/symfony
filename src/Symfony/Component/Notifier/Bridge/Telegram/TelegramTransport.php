@@ -33,9 +33,6 @@ final class TelegramTransport extends AbstractTransport
 {
     protected const HOST = 'api.telegram.org';
 
-    private string $token;
-    private ?string $chatChannel;
-
     private const EXCLUSIVE_OPTIONS = [
         'message_id',
         'callback_query_id',
@@ -50,22 +47,22 @@ final class TelegramTransport extends AbstractTransport
         'sticker',
     ];
 
-    public function __construct(#[\SensitiveParameter] string $token, string $channel = null, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
-    {
-        $this->token = $token;
-        $this->chatChannel = $channel;
-        $this->client = $client;
-
+    public function __construct(
+        #[\SensitiveParameter] private string $token,
+        private ?string $chatChannel = null,
+        ?HttpClientInterface $client = null,
+        ?EventDispatcherInterface $dispatcher = null,
+    ) {
         parent::__construct($client, $dispatcher);
     }
 
     public function __toString(): string
     {
         if (null === $this->chatChannel) {
-            return sprintf('telegram://%s', $this->getEndpoint());
+            return \sprintf('telegram://%s', $this->getEndpoint());
         }
 
-        return sprintf('telegram://%s?channel=%s', $this->getEndpoint(), $this->chatChannel);
+        return \sprintf('telegram://%s?channel=%s', $this->getEndpoint(), $this->chatChannel);
     }
 
     public function supports(MessageInterface $message): bool
@@ -108,7 +105,7 @@ final class TelegramTransport extends AbstractTransport
         $this->ensureExclusiveOptionsNotDuplicated($options);
         $options = $this->expandOptions($options, 'contact', 'location', 'venue');
 
-        $endpoint = sprintf('https://%s/bot%s/%s', $this->getEndpoint(), $this->token, $method);
+        $endpoint = \sprintf('https://%s/bot%s/%s', $this->getEndpoint(), $this->token, $method);
 
         $response = $this->client->request('POST', $endpoint, [
             $optionsContainer => array_filter($options),
@@ -123,7 +120,7 @@ final class TelegramTransport extends AbstractTransport
         if (200 !== $statusCode) {
             $result = $response->toArray(false);
 
-            throw new TransportException('Unable to '.$this->getAction($options).' the Telegram message: '.$result['description'].sprintf(' (code %d).', $result['error_code']), $response);
+            throw new TransportException('Unable to '.$this->getAction($options).' the Telegram message: '.$result['description'].\sprintf(' (code %d).', $result['error_code']), $response);
         }
 
         $success = $response->toArray(false);

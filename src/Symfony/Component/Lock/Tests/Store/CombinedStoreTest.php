@@ -67,7 +67,7 @@ class CombinedStoreTest extends AbstractStoreTestCase
     public function testSaveThrowsExceptionOnFailure()
     {
         $this->expectException(LockConflictedException::class);
-        $key = new Key(uniqid(__METHOD__, true));
+        $key = new Key(__METHOD__);
 
         $this->store1
             ->expects($this->once())
@@ -94,7 +94,7 @@ class CombinedStoreTest extends AbstractStoreTestCase
 
     public function testSaveCleanupOnFailure()
     {
-        $key = new Key(uniqid(__METHOD__, true));
+        $key = new Key(__METHOD__);
 
         $this->store1
             ->expects($this->once())
@@ -132,7 +132,7 @@ class CombinedStoreTest extends AbstractStoreTestCase
 
     public function testSaveAbortWhenStrategyCantBeMet()
     {
-        $key = new Key(uniqid(__METHOD__, true));
+        $key = new Key(__METHOD__);
 
         $this->store1
             ->expects($this->once())
@@ -162,7 +162,7 @@ class CombinedStoreTest extends AbstractStoreTestCase
     public function testputOffExpirationThrowsExceptionOnFailure()
     {
         $this->expectException(LockConflictedException::class);
-        $key = new Key(uniqid(__METHOD__, true));
+        $key = new Key(__METHOD__);
         $ttl = random_int(1, 10);
 
         $this->store1
@@ -190,7 +190,7 @@ class CombinedStoreTest extends AbstractStoreTestCase
 
     public function testputOffExpirationCleanupOnFailure()
     {
-        $key = new Key(uniqid(__METHOD__, true));
+        $key = new Key(__METHOD__);
         $ttl = random_int(1, 10);
 
         $this->store1
@@ -229,7 +229,7 @@ class CombinedStoreTest extends AbstractStoreTestCase
 
     public function testputOffExpirationAbortWhenStrategyCantBeMet()
     {
-        $key = new Key(uniqid(__METHOD__, true));
+        $key = new Key(__METHOD__);
         $ttl = random_int(1, 10);
 
         $this->store1
@@ -264,7 +264,7 @@ class CombinedStoreTest extends AbstractStoreTestCase
 
         $store = new CombinedStore([$store1, $store2], $this->strategy);
 
-        $key = new Key(uniqid(__METHOD__, true));
+        $key = new Key(__METHOD__);
         $ttl = random_int(1, 10);
 
         $this->strategy
@@ -282,7 +282,7 @@ class CombinedStoreTest extends AbstractStoreTestCase
 
     public function testExistsDontAskToEveryBody()
     {
-        $key = new Key(uniqid(__METHOD__, true));
+        $key = new Key(__METHOD__);
 
         $this->store1
             ->expects($this->any())
@@ -307,7 +307,7 @@ class CombinedStoreTest extends AbstractStoreTestCase
 
     public function testExistsAbortWhenStrategyCantBeMet()
     {
-        $key = new Key(uniqid(__METHOD__, true));
+        $key = new Key(__METHOD__);
 
         $this->store1
             ->expects($this->any())
@@ -332,7 +332,7 @@ class CombinedStoreTest extends AbstractStoreTestCase
 
     public function testDeleteDontStopOnFailure()
     {
-        $key = new Key(uniqid(__METHOD__, true));
+        $key = new Key(__METHOD__);
 
         $this->store1
             ->expects($this->once())
@@ -349,7 +349,7 @@ class CombinedStoreTest extends AbstractStoreTestCase
 
     public function testExistsDontStopOnFailure()
     {
-        $key = new Key(uniqid(__METHOD__, true));
+        $key = new Key(__METHOD__);
 
         $this->strategy
             ->expects($this->any())
@@ -374,7 +374,7 @@ class CombinedStoreTest extends AbstractStoreTestCase
 
     public function testSaveReadWithCompatibleStore()
     {
-        $key = new Key(uniqid(__METHOD__, true));
+        $key = new Key(__METHOD__);
 
         $goodStore = $this->createMock(SharedLockStoreInterface::class);
         $goodStore->expects($this->once())

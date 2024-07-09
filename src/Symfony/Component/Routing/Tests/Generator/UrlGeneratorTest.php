@@ -1054,7 +1054,7 @@ class UrlGeneratorTest extends TestCase
         $this->assertSame('/app.php/foo/baz', $this->getGenerator($routes)->generate('test', ['bär' => 'baz']));
     }
 
-    protected function getGenerator(RouteCollection $routes, array $parameters = [], $logger = null, string $defaultLocale = null)
+    protected function getGenerator(RouteCollection $routes, array $parameters = [], $logger = null, ?string $defaultLocale = null)
     {
         $context = new RequestContext('/app.php');
         foreach ($parameters as $key => $value) {
@@ -1076,7 +1076,7 @@ class UrlGeneratorTest extends TestCase
 
 class StringableObject
 {
-    public function __toString()
+    public function __toString(): string
     {
         return 'bar';
     }
@@ -1086,7 +1086,7 @@ class StringableObjectWithPublicProperty
 {
     public $foo = 'property';
 
-    public function __toString()
+    public function __toString(): string
     {
         return 'bar';
     }

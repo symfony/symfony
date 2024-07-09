@@ -138,7 +138,7 @@ class DateTimeToRfc3339TransformerTest extends BaseDateTimeTransformerTestCase
         ];
     }
 
-    protected function createDateTimeTransformer(string $inputTimezone = null, string $outputTimezone = null): BaseDateTimeTransformer
+    protected function createDateTimeTransformer(?string $inputTimezone = null, ?string $outputTimezone = null): BaseDateTimeTransformer
     {
         return new DateTimeToRfc3339Transformer($inputTimezone, $outputTimezone);
     }

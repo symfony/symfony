@@ -24,7 +24,7 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
 
 final class UnifonicTransportTest extends TransportTestCase
 {
-    public static function createTransport(HttpClientInterface $client = null, string $host = null): UnifonicTransport
+    public static function createTransport(?HttpClientInterface $client = null, ?string $host = null): UnifonicTransport
     {
         return (new UnifonicTransport('S3cr3t', 'Sender', $client ?? new MockHttpClient()))->setHost($host);
     }

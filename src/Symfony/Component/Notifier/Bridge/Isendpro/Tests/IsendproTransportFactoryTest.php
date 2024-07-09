@@ -78,7 +78,7 @@ final class IsendproTransportFactoryTest extends TransportFactoryTestCase
     /**
      * @dataProvider missingRequiredOptionProvider
      */
-    public function testMissingRequiredOptionException(string $dsn, string $message = null)
+    public function testMissingRequiredOptionException(string $dsn, ?string $message = null)
     {
         $this->markTestIncomplete('The only required option is account key id, matched by incompleteDsnProvider');
     }

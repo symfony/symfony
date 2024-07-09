@@ -26,7 +26,7 @@ class ImportMapVersionChecker
     public function __construct(
         private ImportMapConfigReader $importMapConfigReader,
         private RemotePackageDownloader $packageDownloader,
-        HttpClientInterface $httpClient = null,
+        ?HttpClientInterface $httpClient = null,
     ) {
         $this->httpClient = $httpClient ?? HttpClient::create();
     }
@@ -106,7 +106,7 @@ class ImportMapVersionChecker
             $response = $e->getResponse();
             $packageNames = implode('", "', array_column($errors, 0));
 
-            throw new RuntimeException(sprintf('Error %d finding metadata for package "%s". Response: ', $response->getStatusCode(), $packageNames).$response->getContent(false), 0, $e);
+            throw new RuntimeException(\sprintf('Error %d finding metadata for package "%s". Response: ', $response->getStatusCode(), $packageNames).$response->getContent(false), 0, $e);
         }
 
         return $problems;
@@ -137,7 +137,7 @@ class ImportMapVersionChecker
             if (str_contains($segment, '-') && !preg_match('/-(alpha|beta|rc)\./', $segment)) {
                 // This is a range
                 [$start, $end] = explode('-', $segment);
-                $processedSegments[] = '>='.self::cleanVersionSegment(trim($start)).' <='.self::cleanVersionSegment(trim($end));
+                $processedSegments[] = self::cleanVersionSegment(trim($start)).' - '.self::cleanVersionSegment(trim($end));
             } elseif (preg_match('/^~(\d+\.\d+)$/', $segment, $matches)) {
                 // Handle the tilde when only major.minor specified
                 $baseVersion = $matches[1];

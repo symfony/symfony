@@ -23,11 +23,9 @@ use Symfony\Component\Security\Http\SecurityRequestAttributes;
  */
 class AuthenticationUtils
 {
-    private RequestStack $requestStack;
-
-    public function __construct(RequestStack $requestStack)
-    {
-        $this->requestStack = $requestStack;
+    public function __construct(
+        private RequestStack $requestStack,
+    ) {
     }
 
     public function getLastAuthenticationError(bool $clearSession = true): ?AuthenticationException
@@ -53,10 +51,10 @@ class AuthenticationUtils
         $request = $this->getRequest();
 
         if ($request->attributes->has(SecurityRequestAttributes::LAST_USERNAME)) {
-            return $request->attributes->get(SecurityRequestAttributes::LAST_USERNAME, '');
+            return $request->attributes->get(SecurityRequestAttributes::LAST_USERNAME) ?? '';
         }
 
-        return $request->hasSession() ? $request->getSession()->get(SecurityRequestAttributes::LAST_USERNAME, '') : '';
+        return $request->hasSession() ? ($request->getSession()->get(SecurityRequestAttributes::LAST_USERNAME) ?? '') : '';
     }
 
     /**

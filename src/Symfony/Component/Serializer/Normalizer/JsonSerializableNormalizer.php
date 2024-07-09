@@ -21,14 +21,14 @@ use Symfony\Component\Serializer\Exception\LogicException;
  */
 final class JsonSerializableNormalizer extends AbstractNormalizer
 {
-    public function normalize(mixed $object, string $format = null, array $context = []): array|string|int|float|bool|\ArrayObject|null
+    public function normalize(mixed $object, ?string $format = null, array $context = []): array|string|int|float|bool|\ArrayObject|null
     {
         if ($this->isCircularReference($object, $context)) {
             return $this->handleCircularReference($object, $format, $context);
         }
 
         if (!$object instanceof \JsonSerializable) {
-            throw new InvalidArgumentException(sprintf('The object must implement "%s".', \JsonSerializable::class));
+            throw new InvalidArgumentException(\sprintf('The object must implement "%s".', \JsonSerializable::class));
         }
 
         if (!$this->serializer instanceof NormalizerInterface) {
@@ -45,18 +45,18 @@ final class JsonSerializableNormalizer extends AbstractNormalizer
         ];
     }
 
-    public function supportsNormalization(mixed $data, string $format = null, array $context = []): bool
+    public function supportsNormalization(mixed $data, ?string $format = null, array $context = []): bool
     {
         return $data instanceof \JsonSerializable;
     }
 
-    public function supportsDenormalization(mixed $data, string $type, string $format = null, array $context = []): bool
+    public function supportsDenormalization(mixed $data, string $type, ?string $format = null, array $context = []): bool
     {
         return false;
     }
 
-    public function denormalize(mixed $data, string $type, string $format = null, array $context = []): mixed
+    public function denormalize(mixed $data, string $type, ?string $format = null, array $context = []): mixed
     {
-        throw new LogicException(sprintf('Cannot denormalize with "%s".', \JsonSerializable::class));
+        throw new LogicException(\sprintf('Cannot denormalize with "%s".', \JsonSerializable::class));
     }
 }

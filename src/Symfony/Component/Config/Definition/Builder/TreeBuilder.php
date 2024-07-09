@@ -23,7 +23,7 @@ class TreeBuilder implements NodeParentInterface
     protected ?NodeInterface $tree = null;
     protected ?NodeDefinition $root = null;
 
-    public function __construct(string $name, string $type = 'array', NodeBuilder $builder = null)
+    public function __construct(string $name, string $type = 'array', ?NodeBuilder $builder = null)
     {
         $builder ??= new NodeBuilder();
         $this->root = $builder->node($name, $type)->setParent($this);

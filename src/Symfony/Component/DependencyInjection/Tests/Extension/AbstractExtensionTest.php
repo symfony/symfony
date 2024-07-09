@@ -54,28 +54,55 @@ class AbstractExtensionTest extends TestCase
         self::assertSame($expected, $this->processConfiguration($extension));
     }
 
-    public function testPrependAppendExtensionConfig()
+    public function testPrependExtensionConfig()
     {
         $extension = new class() extends AbstractExtension {
+            public function configure(DefinitionConfigurator $definition): void
+            {
+                $definition->rootNode()
+                    ->children()
+                        ->scalarNode('foo')->end()
+                    ->end();
+            }
+
             public function prependExtension(ContainerConfigurator $container, ContainerBuilder $builder): void
             {
-                // append config
-                $container->extension('third', ['foo' => 'append']);
+                // prepend config from plain array
+                $container->extension('third', ['foo' => 'pong'], true);
 
-                // prepend config
-                $container->extension('third', ['foo' => 'prepend'], true);
+                // prepend config from external file
+                $container->import('../Fixtures/config/packages/ping.yaml');
+            }
+
+            public function loadExtension(array $config, ContainerConfigurator $container, ContainerBuilder $builder): void
+            {
+                $container->parameters()->set('foo_param', $config['foo']);
+            }
+
+            public function getAlias(): string
+            {
+                return 'third';
             }
         };
 
         $container = $this->processPrependExtension($extension);
 
         $expected = [
-            ['foo' => 'prepend'],
+            ['foo' => 'a'],
+            ['foo' => 'c1'],
+            ['foo' => 'c2'],
+            ['foo' => 'b'],
+            ['foo' => 'ping'],
+            ['foo' => 'zaa'],
+            ['foo' => 'pong'],
             ['foo' => 'bar'],
-            ['foo' => 'append'],
         ];
 
         self::assertSame($expected, $container->getExtensionConfig('third'));
+
+        $container = $this->processLoadExtension($extension, $expected);
+
+        self::assertSame('bar', $container->getParameter('foo_param'));
     }
 
     public function testLoadExtension()

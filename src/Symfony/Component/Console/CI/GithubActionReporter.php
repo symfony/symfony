@@ -57,7 +57,7 @@ class GithubActionReporter
      *
      * @see https://docs.github.com/en/free-pro-team@latest/actions/reference/workflow-commands-for-github-actions#setting-an-error-message
      */
-    public function error(string $message, string $file = null, int $line = null, int $col = null): void
+    public function error(string $message, ?string $file = null, ?int $line = null, ?int $col = null): void
     {
         $this->log('error', $message, $file, $line, $col);
     }
@@ -67,7 +67,7 @@ class GithubActionReporter
      *
      * @see https://docs.github.com/en/free-pro-team@latest/actions/reference/workflow-commands-for-github-actions#setting-a-warning-message
      */
-    public function warning(string $message, string $file = null, int $line = null, int $col = null): void
+    public function warning(string $message, ?string $file = null, ?int $line = null, ?int $col = null): void
     {
         $this->log('warning', $message, $file, $line, $col);
     }
@@ -77,23 +77,23 @@ class GithubActionReporter
      *
      * @see https://docs.github.com/en/free-pro-team@latest/actions/reference/workflow-commands-for-github-actions#setting-a-debug-message
      */
-    public function debug(string $message, string $file = null, int $line = null, int $col = null): void
+    public function debug(string $message, ?string $file = null, ?int $line = null, ?int $col = null): void
     {
         $this->log('debug', $message, $file, $line, $col);
     }
 
-    private function log(string $type, string $message, string $file = null, int $line = null, int $col = null): void
+    private function log(string $type, string $message, ?string $file = null, ?int $line = null, ?int $col = null): void
     {
         // Some values must be encoded.
         $message = strtr($message, self::ESCAPED_DATA);
 
         if (!$file) {
             // No file provided, output the message solely:
-            $this->output->writeln(sprintf('::%s::%s', $type, $message));
+            $this->output->writeln(\sprintf('::%s::%s', $type, $message));
 
             return;
         }
 
-        $this->output->writeln(sprintf('::%s file=%s,line=%s,col=%s::%s', $type, strtr($file, self::ESCAPED_PROPERTIES), strtr($line ?? 1, self::ESCAPED_PROPERTIES), strtr($col ?? 0, self::ESCAPED_PROPERTIES), $message));
+        $this->output->writeln(\sprintf('::%s file=%s,line=%s,col=%s::%s', $type, strtr($file, self::ESCAPED_PROPERTIES), strtr($line ?? 1, self::ESCAPED_PROPERTIES), strtr($col ?? 0, self::ESCAPED_PROPERTIES), $message));
     }
 }

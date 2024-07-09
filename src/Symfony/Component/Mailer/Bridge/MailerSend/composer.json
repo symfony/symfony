@@ -24,7 +24,8 @@
         "symfony/mailer": "^6.4|^7.0"
     },
     "require-dev": {
-        "symfony/http-client": "^6.4|^7.0"
+        "symfony/http-client": "^6.4|^7.0",
+        "symfony/webhook": "^6.3|^7.0"
     },
     "autoload": {
         "psr-4": { "Symfony\\Component\\Mailer\\Bridge\\MailerSend\\": "" },

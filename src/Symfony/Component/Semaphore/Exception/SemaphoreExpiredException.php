@@ -23,6 +23,6 @@ class SemaphoreExpiredException extends \RuntimeException implements ExceptionIn
 {
     public function __construct(Key $key, string $message)
     {
-        parent::__construct(sprintf('The semaphore "%s" has expired: %s.', $key, $message));
+        parent::__construct(\sprintf('The semaphore "%s" has expired: %s.', $key, $message));
     }
 }

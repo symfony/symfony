@@ -24,7 +24,7 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
 
 final class SmsmodeTransportTest extends TransportTestCase
 {
-    public static function createTransport(HttpClientInterface $client = null, string $from = 'test_from'): SmsmodeTransport
+    public static function createTransport(?HttpClientInterface $client = null, string $from = 'test_from'): SmsmodeTransport
     {
         return new SmsmodeTransport('test_api_key', $from, $client ?? new MockHttpClient());
     }
@@ -48,7 +48,7 @@ final class SmsmodeTransportTest extends TransportTestCase
         $transport = $this->createTransport(null, $from);
 
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage(sprintf('The "From" value "%s" is not a valid sender ID.', $from));
+        $this->expectExceptionMessage(\sprintf('The "From" value "%s" is not a valid sender ID.', $from));
 
         $transport->send(new SmsMessage('+33612345678', 'Hello!'));
     }

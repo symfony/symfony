@@ -17,6 +17,7 @@ use Symfony\Component\Form\Extension\Core\Type\PercentType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Csrf\CsrfExtension;
 use Symfony\Component\Form\FormError;
+use Symfony\Component\Form\FormExtensionInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\Tests\VersionAwareTest;
 use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
@@ -47,6 +48,9 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
         parent::setUp();
     }
 
+    /**
+     * @return FormExtensionInterface[]
+     */
     protected function getExtensions()
     {
         return [
@@ -313,8 +317,8 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
     public function testLabelWithoutTranslationOnButton()
     {
         $form = $this->factory->createNamedBuilder('myform', 'Symfony\Component\Form\Extension\Core\Type\FormType', null, [
-                'translation_domain' => false,
-            ])
+            'translation_domain' => false,
+        ])
             ->add('mybutton', 'Symfony\Component\Form\Extension\Core\Type\ButtonType')
             ->getForm();
         $view = $form->get('mybutton')->createView();
@@ -2412,9 +2416,9 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
     public function testStartTagForMultipartForm()
     {
         $form = $this->factory->createBuilder('Symfony\Component\Form\Extension\Core\Type\FormType', null, [
-                'method' => 'get',
-                'action' => 'http://example.com/directory',
-            ])
+            'method' => 'get',
+            'action' => 'http://example.com/directory',
+        ])
             ->add('file', 'Symfony\Component\Form\Extension\Core\Type\FileType')
             ->getForm();
 
@@ -2448,7 +2452,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
         $html = $this->renderWidget($form->createView());
 
         // compare plain HTML to check the whitespace
-        $this->assertSame('<input type="text" id="text" name="text" disabled="disabled" required="required" readonly="readonly" maxlength="10" pattern="\d+" class="foobar" data-foo="bar" value="value">', $html);
+        $this->assertSame('<input type="text" id="text" name="text" disabled="disabled" required="required" readonly="readonly" maxlength="10" pattern="\d+" class="foobar" data-foo="bar" value="value" />', $html);
     }
 
     public function testWidgetAttributeNameRepeatedIfTrue()
@@ -2460,7 +2464,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
         $html = $this->renderWidget($form->createView());
 
         // foo="foo"
-        $this->assertSame('<input type="text" id="text" name="text" required="required" foo="foo" value="value">', $html);
+        $this->assertSame('<input type="text" id="text" name="text" required="required" foo="foo" value="value" />', $html);
     }
 
     public function testWidgetAttributeHiddenIfFalse()
@@ -2559,8 +2563,8 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
     public function testAttributesNotTranslatedWhenTranslationDomainIsFalse()
     {
         $view = $this->factory->createNamedBuilder('name', 'Symfony\Component\Form\Extension\Core\Type\FormType', null, [
-                'translation_domain' => false,
-            ])
+            'translation_domain' => false,
+        ])
             ->add('firstName', 'Symfony\Component\Form\Extension\Core\Type\TextType', ['attr' => ['title' => 'Foo']])
             ->add('lastName', 'Symfony\Component\Form\Extension\Core\Type\TextType', ['attr' => ['placeholder' => 'Bar']])
             ->getForm()
@@ -2672,7 +2676,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
     public function testHelpWithTranslatableInterface()
     {
         $message = new class() implements TranslatableInterface {
-            public function trans(TranslatorInterface $translator, string $locale = null): string
+            public function trans(TranslatorInterface $translator, ?string $locale = null): string
             {
                 return $translator->trans('foo');
             }

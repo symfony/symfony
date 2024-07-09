@@ -21,7 +21,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 final class IqsmsTransportTest extends TransportTestCase
 {
-    public static function createTransport(HttpClientInterface $client = null): IqsmsTransport
+    public static function createTransport(?HttpClientInterface $client = null): IqsmsTransport
     {
         return new IqsmsTransport('login', 'password', 'sender', $client ?? new MockHttpClient());
     }

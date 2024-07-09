@@ -16,8 +16,8 @@ namespace Symfony\Component\Security\Http\Authenticator;
  * be used by interactive authenticators.
  *
  * Interactive login requires explicit user action (e.g. a login
- * form or HTTP basic authentication). Implementing this interface
- * will dispatch the InteractiveLoginEvent upon successful login.
+ * form). Implementing this interface will dispatch the InteractiveLoginEvent
+ * upon successful login.
  *
  * @author Wouter de Jong <wouter@wouterj.nl>
  */

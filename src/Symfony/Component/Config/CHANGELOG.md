@@ -1,6 +1,17 @@
 CHANGELOG
 =========
 
+7.2
+---
+
+ * Add `#[WhenNot]` attribute to prevent service from being registered in a specific environment
+
+7.1
+---
+
+ * Allow custom meta location in `ResourceCheckerConfigCache`
+ * Allow custom meta location in `ConfigCache`
+
 7.0
 ---
 

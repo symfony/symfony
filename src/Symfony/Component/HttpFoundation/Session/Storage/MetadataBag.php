@@ -29,18 +29,16 @@ class MetadataBag implements SessionBagInterface
     protected array $meta = [self::CREATED => 0, self::UPDATED => 0, self::LIFETIME => 0];
 
     private string $name = '__metadata';
-    private string $storageKey;
     private int $lastUsed;
-    private int $updateThreshold;
 
     /**
      * @param string $storageKey      The key used to store bag in the session
      * @param int    $updateThreshold The time to wait between two UPDATED updates
      */
-    public function __construct(string $storageKey = '_sf2_meta', int $updateThreshold = 0)
-    {
-        $this->storageKey = $storageKey;
-        $this->updateThreshold = $updateThreshold;
+    public function __construct(
+        private string $storageKey = '_sf2_meta',
+        private int $updateThreshold = 0,
+    ) {
     }
 
     public function initialize(array &$array): void
@@ -75,7 +73,7 @@ class MetadataBag implements SessionBagInterface
      *                           to expire with browser session. Time is in seconds, and is
      *                           not a Unix timestamp.
      */
-    public function stampNew(int $lifetime = null): void
+    public function stampNew(?int $lifetime = null): void
     {
         $this->stampCreated($lifetime);
     }
@@ -124,7 +122,7 @@ class MetadataBag implements SessionBagInterface
         $this->name = $name;
     }
 
-    private function stampCreated(int $lifetime = null): void
+    private function stampCreated(?int $lifetime = null): void
     {
         $timeStamp = time();
         $this->meta[self::CREATED] = $this->meta[self::UPDATED] = $this->lastUsed = $timeStamp;

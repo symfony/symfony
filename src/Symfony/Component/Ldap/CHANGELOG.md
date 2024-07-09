@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+7.1
+---
+
+ * Improve error reporting during LDAP bind
+
 7.0
 ---
 

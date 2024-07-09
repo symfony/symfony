@@ -375,6 +375,8 @@ class PathTest extends TestCase
 
         yield ['C:/css/style.css', true];
         yield ['D:/', true];
+        yield ['C:///windows', true];
+        yield ['C://test', true];
 
         yield ['E:\\css\\style.css', true];
         yield ['F:\\', true];

@@ -34,6 +34,7 @@ use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\BarInterface;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\CaseSensitiveClass;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\includes\FooVariadic;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\OptionalParameter;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\WithTarget;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\WithTargetAnonymous;
 use Symfony\Component\DependencyInjection\TypedReference;
@@ -244,7 +245,7 @@ class AutowirePassTest extends TestCase
             $pass->process($container);
             $this->fail('AutowirePass should have thrown an exception');
         } catch (AutowiringFailedException $e) {
-            $this->assertSame('Cannot autowire service "a": argument "$collision" of method "Symfony\Component\DependencyInjection\Tests\Compiler\CannotBeAutowired::__construct()" references interface "Symfony\Component\DependencyInjection\Tests\Compiler\CollisionInterface" but no such service exists. Did you create a class that implements this interface?', (string) $e->getMessage());
+            $this->assertSame('Cannot autowire service "a": argument "$collision" of method "Symfony\Component\DependencyInjection\Tests\Compiler\CannotBeAutowired::__construct()" references interface "Symfony\Component\DependencyInjection\Tests\Compiler\CollisionInterface" but no such service exists. Did you create an instantiable class that implements this interface?', (string) $e->getMessage());
         }
     }
 
@@ -399,6 +400,9 @@ class AutowirePassTest extends TestCase
         $this->assertEquals(Foo::class, $container->getDefinition('bar')->getArgument(0));
     }
 
+    /**
+     * @group legacy
+     */
     public function testOptionalParameter()
     {
         $container = new ContainerBuilder();
@@ -815,7 +819,7 @@ class AutowirePassTest extends TestCase
             $pass->process($container);
             $this->fail('AutowirePass should have thrown an exception');
         } catch (AutowiringFailedException $e) {
-            $this->assertSame('Cannot autowire service "my_service": argument "$i" of method "Symfony\Component\DependencyInjection\Tests\Compiler\K::__construct()" references interface "Symfony\Component\DependencyInjection\Tests\Compiler\IInterface" but no such service exists. Did you create a class that implements this interface?', (string) $e->getMessage());
+            $this->assertSame('Cannot autowire service "my_service": argument "$i" of method "Symfony\Component\DependencyInjection\Tests\Compiler\K::__construct()" references interface "Symfony\Component\DependencyInjection\Tests\Compiler\IInterface" but no such service exists. Did you create an instantiable class that implements this interface?', (string) $e->getMessage());
         }
     }
 
@@ -1367,5 +1371,44 @@ class AutowirePassTest extends TestCase
             'service' => new Reference('bar'),
         ];
         $this->assertEquals($expected, $container->getDefinition(AutowireNestedAttributes::class)->getArgument(0));
+    }
+
+    public function testLazyServiceAttribute()
+    {
+        $container = new ContainerBuilder();
+        $container->register('a', A::class)->setAutowired(true);
+        $container->register('foo', LazyServiceAttributeAutowiring::class)->setAutowired(true);
+
+        (new AutowirePass())->process($container);
+
+        $expected = new Reference('.lazy.'.A::class);
+        $this->assertEquals($expected, $container->getDefinition('foo')->getArgument(0));
+    }
+
+    public function testLazyNotCompatibleWithAutowire()
+    {
+        $container = new ContainerBuilder();
+        $container->register('a', A::class)->setAutowired(true);
+        $container->register('foo', LazyAutowireServiceAttributesAutowiring::class)->setAutowired(true);
+
+        try {
+            (new AutowirePass())->process($container);
+        } catch (AutowiringFailedException $e) {
+            $this->assertSame('Using both attributes #[Lazy] and #[Autowire] on an argument is not allowed; use the "lazy" parameter of #[Autowire] instead.', $e->getMessage());
+        }
+    }
+
+    public function testAutowireAttributeWithEnvVar()
+    {
+        $container = new ContainerBuilder();
+
+        $container->register('foo', AutowireAttributeEnv::class)->setAutowired(true);
+
+        (new AutowirePass())->process($container);
+
+        $definition = $container->getDefinition('foo');
+
+        $this->assertSame('%env(bool:ENABLED)%', $container->resolveEnvPlaceholders($definition->getArguments()[0]));
+        $this->assertSame('%env(default::OPTIONAL)%', $container->resolveEnvPlaceholders($definition->getArguments()[1]));
     }
 }

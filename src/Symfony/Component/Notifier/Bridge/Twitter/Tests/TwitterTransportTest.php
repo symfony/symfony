@@ -24,7 +24,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 class TwitterTransportTest extends TransportTestCase
 {
-    public static function createTransport(HttpClientInterface $client = null): TwitterTransport
+    public static function createTransport(?HttpClientInterface $client = null): TwitterTransport
     {
         return new TwitterTransport('APIK', 'APIS', 'TOKEN', 'SECRET', $client ?? new MockHttpClient());
     }

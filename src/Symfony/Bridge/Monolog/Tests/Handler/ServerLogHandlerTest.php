@@ -58,7 +58,7 @@ class ServerLogHandlerTest extends TestCase
         $infoRecord = RecordFactory::create(Level::Info, 'My info message', 'app', datetime: new \DateTimeImmutable('2013-05-29 16:21:54'));
 
         $socket = stream_socket_server($host, $errno, $errstr);
-        $this->assertIsResource($socket, sprintf('Server start failed on "%s": %s %s.', $host, $errstr, $errno));
+        $this->assertIsResource($socket, \sprintf('Server start failed on "%s": %s %s.', $host, $errstr, $errno));
 
         $this->assertTrue($handler->handle($infoRecord), 'The handler finished handling the log as bubble is false.');
 

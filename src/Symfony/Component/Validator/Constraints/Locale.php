@@ -16,6 +16,10 @@ use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Exception\LogicException;
 
 /**
+ * Validates that a value is a valid locale (e.g. fr, fr_FR, etc.).
+ *
+ * @see https://unicode-org.github.io/icu/userguide/locale/
+ *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
 #[\Attribute(\Attribute::TARGET_PROPERTY | \Attribute::TARGET_METHOD | \Attribute::IS_REPEATABLE)]
@@ -30,12 +34,17 @@ class Locale extends Constraint
     public string $message = 'This value is not a valid locale.';
     public bool $canonicalize = true;
 
+    /**
+     * @param array<string,mixed>|null $options
+     * @param bool|null                $canonicalize Whether to canonicalize the value before validation (defaults to true) (see {@see https://www.php.net/manual/en/locale.canonicalize.php})
+     * @param string[]|null            $groups
+     */
     public function __construct(
-        array $options = null,
-        string $message = null,
-        bool $canonicalize = null,
-        array $groups = null,
-        mixed $payload = null
+        ?array $options = null,
+        ?string $message = null,
+        ?bool $canonicalize = null,
+        ?array $groups = null,
+        mixed $payload = null,
     ) {
         if (!class_exists(Locales::class)) {
             throw new LogicException('The Intl component is required to use the Locale constraint. Try running "composer require symfony/intl".');

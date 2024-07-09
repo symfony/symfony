@@ -68,6 +68,8 @@ class CsrfFormLoginTest extends AbstractWebTestCase
         });
 
         $form = $client->request('GET', '/login')->selectButton('login')->form();
+        $form['user_login[username]'] = 'johannes';
+        $form['user_login[password]'] = 'test';
         $form['user_login[_token]'] = '';
         $client->submit($form);
 
@@ -140,7 +142,7 @@ class CsrfFormLoginTest extends AbstractWebTestCase
 
         $eventDispatcher->addListener(KernelEvents::REQUEST, $wrappedCallable);
         try {
-            $client->request('GET', '/'.uniqid('', true));
+            $client->request('GET', '/not-existent');
         } finally {
             $eventDispatcher->removeListener(KernelEvents::REQUEST, $wrappedCallable);
         }

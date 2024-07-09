@@ -40,28 +40,27 @@ class SymfonyStyle extends OutputStyle
 {
     public const MAX_LINE_LENGTH = 120;
 
-    private InputInterface $input;
-    private OutputInterface $output;
     private SymfonyQuestionHelper $questionHelper;
     private ProgressBar $progressBar;
     private int $lineLength;
     private TrimmedBufferOutput $bufferedOutput;
 
-    public function __construct(InputInterface $input, OutputInterface $output)
-    {
-        $this->input = $input;
+    public function __construct(
+        private InputInterface $input,
+        private OutputInterface $output,
+    ) {
         $this->bufferedOutput = new TrimmedBufferOutput(\DIRECTORY_SEPARATOR === '\\' ? 4 : 2, $output->getVerbosity(), false, clone $output->getFormatter());
         // Windows cmd wraps lines as soon as the terminal width is reached, whether there are following chars or not.
         $width = (new Terminal())->getWidth() ?: self::MAX_LINE_LENGTH;
         $this->lineLength = min($width - (int) (\DIRECTORY_SEPARATOR === '\\'), self::MAX_LINE_LENGTH);
 
-        parent::__construct($this->output = $output);
+        parent::__construct($output);
     }
 
     /**
      * Formats a message as a block of text.
      */
-    public function block(string|array $messages, string $type = null, string $style = null, string $prefix = ' ', bool $padding = false, bool $escape = true): void
+    public function block(string|array $messages, ?string $type = null, ?string $style = null, string $prefix = ' ', bool $padding = false, bool $escape = true): void
     {
         $messages = \is_array($messages) ? array_values($messages) : [$messages];
 
@@ -74,8 +73,8 @@ class SymfonyStyle extends OutputStyle
     {
         $this->autoPrependBlock();
         $this->writeln([
-            sprintf('<comment>%s</>', OutputFormatter::escapeTrailingBackslash($message)),
-            sprintf('<comment>%s</>', str_repeat('=', Helper::width(Helper::removeDecoration($this->getFormatter(), $message)))),
+            \sprintf('<comment>%s</>', OutputFormatter::escapeTrailingBackslash($message)),
+            \sprintf('<comment>%s</>', str_repeat('=', Helper::width(Helper::removeDecoration($this->getFormatter(), $message)))),
         ]);
         $this->newLine();
     }
@@ -84,8 +83,8 @@ class SymfonyStyle extends OutputStyle
     {
         $this->autoPrependBlock();
         $this->writeln([
-            sprintf('<comment>%s</>', OutputFormatter::escapeTrailingBackslash($message)),
-            sprintf('<comment>%s</>', str_repeat('-', Helper::width(Helper::removeDecoration($this->getFormatter(), $message)))),
+            \sprintf('<comment>%s</>', OutputFormatter::escapeTrailingBackslash($message)),
+            \sprintf('<comment>%s</>', str_repeat('-', Helper::width(Helper::removeDecoration($this->getFormatter(), $message)))),
         ]);
         $this->newLine();
     }
@@ -93,7 +92,7 @@ class SymfonyStyle extends OutputStyle
     public function listing(array $elements): void
     {
         $this->autoPrependText();
-        $elements = array_map(fn ($element) => sprintf(' * %s', $element), $elements);
+        $elements = array_map(fn ($element) => \sprintf(' * %s', $element), $elements);
 
         $this->writeln($elements);
         $this->newLine();
@@ -105,7 +104,7 @@ class SymfonyStyle extends OutputStyle
 
         $messages = \is_array($message) ? array_values($message) : [$message];
         foreach ($messages as $message) {
-            $this->writeln(sprintf(' %s', $message));
+            $this->writeln(\sprintf(' %s', $message));
         }
     }
 
@@ -209,7 +208,7 @@ class SymfonyStyle extends OutputStyle
         $this->horizontalTable($headers, [$row]);
     }
 
-    public function ask(string $question, string $default = null, callable $validator = null): mixed
+    public function ask(string $question, ?string $default = null, ?callable $validator = null): mixed
     {
         $question = new Question($question, $default);
         $question->setValidator($validator);
@@ -217,7 +216,7 @@ class SymfonyStyle extends OutputStyle
         return $this->askQuestion($question);
     }
 
-    public function askHidden(string $question, callable $validator = null): mixed
+    public function askHidden(string $question, ?callable $validator = null): mixed
     {
         $question = new Question($question);
 
@@ -287,7 +286,7 @@ class SymfonyStyle extends OutputStyle
      *
      * @return iterable<TKey, TValue>
      */
-    public function progressIterate(iterable $iterable, int $max = null): iterable
+    public function progressIterate(iterable $iterable, ?int $max = null): iterable
     {
         yield from $this->createProgressBar()->iterate($iterable, $max);
 
@@ -398,14 +397,14 @@ class SymfonyStyle extends OutputStyle
         $this->bufferedOutput->write($message, $newLine, $type);
     }
 
-    private function createBlock(iterable $messages, string $type = null, string $style = null, string $prefix = ' ', bool $padding = false, bool $escape = false): array
+    private function createBlock(iterable $messages, ?string $type = null, ?string $style = null, string $prefix = ' ', bool $padding = false, bool $escape = false): array
     {
         $indentLength = 0;
         $prefixLength = Helper::width(Helper::removeDecoration($this->getFormatter(), $prefix));
         $lines = [];
 
         if (null !== $type) {
-            $type = sprintf('[%s] ', $type);
+            $type = \sprintf('[%s] ', $type);
             $indentLength = Helper::width($type);
             $lineIndentation = str_repeat(' ', $indentLength);
         }
@@ -447,7 +446,7 @@ class SymfonyStyle extends OutputStyle
             $line .= str_repeat(' ', max($this->lineLength - Helper::width(Helper::removeDecoration($this->getFormatter(), $line)), 0));
 
             if ($style) {
-                $line = sprintf('<%s>%s</>', $style, $line);
+                $line = \sprintf('<%s>%s</>', $style, $line);
             }
         }
 

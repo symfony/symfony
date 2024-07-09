@@ -28,7 +28,6 @@ use Symfony\Component\HttpFoundation\Session\SessionBagInterface;
 class MockArraySessionStorage implements SessionStorageInterface
 {
     protected string $id = '';
-    protected string $name;
     protected bool $started = false;
     protected bool $closed = false;
     protected array $data = [];
@@ -39,9 +38,10 @@ class MockArraySessionStorage implements SessionStorageInterface
      */
     protected array $bags = [];
 
-    public function __construct(string $name = 'MOCKSESSID', MetadataBag $metaBag = null)
-    {
-        $this->name = $name;
+    public function __construct(
+        protected string $name = 'MOCKSESSID',
+        ?MetadataBag $metaBag = null,
+    ) {
         $this->setMetadataBag($metaBag);
     }
 
@@ -56,7 +56,7 @@ class MockArraySessionStorage implements SessionStorageInterface
             return true;
         }
 
-        if (empty($this->id)) {
+        if (!$this->id) {
             $this->id = $this->generateId();
         }
 
@@ -65,7 +65,7 @@ class MockArraySessionStorage implements SessionStorageInterface
         return true;
     }
 
-    public function regenerate(bool $destroy = false, int $lifetime = null): bool
+    public function regenerate(bool $destroy = false, ?int $lifetime = null): bool
     {
         if (!$this->started) {
             $this->start();
@@ -133,7 +133,7 @@ class MockArraySessionStorage implements SessionStorageInterface
     public function getBag(string $name): SessionBagInterface
     {
         if (!isset($this->bags[$name])) {
-            throw new \InvalidArgumentException(sprintf('The SessionBagInterface "%s" is not registered.', $name));
+            throw new \InvalidArgumentException(\sprintf('The SessionBagInterface "%s" is not registered.', $name));
         }
 
         if (!$this->started) {
@@ -169,7 +169,7 @@ class MockArraySessionStorage implements SessionStorageInterface
      */
     protected function generateId(): string
     {
-        return hash('xxh128', uniqid('ss_mock_', true));
+        return bin2hex(random_bytes(16));
     }
 
     protected function loadSession(): void

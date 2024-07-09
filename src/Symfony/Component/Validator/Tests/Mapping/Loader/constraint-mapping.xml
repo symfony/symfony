@@ -36,6 +36,22 @@
         false
     </constraint>
 
+    <!-- Constraint with named arguments support with scalar value -->
+    <constraint name="Symfony\Component\Validator\Tests\Mapping\Loader\Fixtures\ConstraintWithNamedArguments">
+      foo
+    </constraint>
+
+    <!-- Constraint with named arguments support with array value -->
+    <constraint name="Symfony\Component\Validator\Tests\Mapping\Loader\Fixtures\ConstraintWithNamedArguments">
+      <value>foo</value>
+      <value>bar</value>
+    </constraint>
+
+    <!-- Constraint with named arguments support with exactly one group -->
+    <constraint name="Symfony\Component\Validator\Tests\Mapping\Loader\Fixtures\ConstraintWithoutValueWithNamedArguments">
+      <option name="groups">foo</option>
+    </constraint>
+
     <!-- PROPERTY CONSTRAINTS -->
 
     <property name="firstName">

@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+7.2
+---
+
+ * Add `TruncateMode` enum to handle more truncate methods
+
 7.1
 ---
 

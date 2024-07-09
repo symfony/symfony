@@ -1,10 +1,16 @@
 CHANGELOG
 =========
 
+7.2
+---
+
+ * Make `AbstractUid` implement `Ds\Hashable` if available
+
 7.1
 ---
 
  * Add `UuidV1::toV6()`, `UuidV1::toV7()` and `UuidV6::toV7()`
+ * Add `AbstractUid::toString()`
 
 6.2
 ---

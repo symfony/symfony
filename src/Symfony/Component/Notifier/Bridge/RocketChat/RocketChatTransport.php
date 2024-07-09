@@ -28,21 +28,18 @@ final class RocketChatTransport extends AbstractTransport
 {
     protected const HOST = 'rocketchat.com';
 
-    private string $accessToken;
-    private ?string $chatChannel;
-
-    public function __construct(#[\SensitiveParameter] string $accessToken, string $chatChannel = null, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
-    {
-        $this->accessToken = $accessToken;
-        $this->chatChannel = $chatChannel;
-        $this->client = $client;
-
+    public function __construct(
+        #[\SensitiveParameter] private string $accessToken,
+        private ?string $chatChannel = null,
+        ?HttpClientInterface $client = null,
+        ?EventDispatcherInterface $dispatcher = null,
+    ) {
         parent::__construct($client, $dispatcher);
     }
 
     public function __toString(): string
     {
-        return sprintf('rocketchat://%s%s', $this->getEndpoint(), null !== $this->chatChannel ? '?channel='.$this->chatChannel : '');
+        return \sprintf('rocketchat://%s%s', $this->getEndpoint(), null !== $this->chatChannel ? '?channel='.$this->chatChannel : '');
     }
 
     public function supports(MessageInterface $message): bool
@@ -63,7 +60,7 @@ final class RocketChatTransport extends AbstractTransport
         $options['channel'] ??= $message->getRecipientId() ?: $this->chatChannel;
         $options['text'] = $message->getSubject();
 
-        $endpoint = sprintf('https://%s/hooks/%s', $this->getEndpoint(), $this->accessToken);
+        $endpoint = \sprintf('https://%s/hooks/%s', $this->getEndpoint(), $this->accessToken);
         $response = $this->client->request('POST', $endpoint, [
             'json' => array_filter($options),
         ]);
@@ -75,12 +72,12 @@ final class RocketChatTransport extends AbstractTransport
         }
 
         if (200 !== $statusCode) {
-            throw new TransportException(sprintf('Unable to post the RocketChat message: %s.', $response->getContent(false)), $response);
+            throw new TransportException(\sprintf('Unable to post the RocketChat message: %s.', $response->getContent(false)), $response);
         }
 
         $result = $response->toArray(false);
         if (!$result['success']) {
-            throw new TransportException(sprintf('Unable to post the RocketChat message: %s.', $result['error']), $response);
+            throw new TransportException(\sprintf('Unable to post the RocketChat message: %s.', $result['error']), $response);
         }
 
         $success = $response->toArray(false);

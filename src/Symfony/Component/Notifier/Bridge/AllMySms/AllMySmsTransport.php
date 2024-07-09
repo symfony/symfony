@@ -28,22 +28,19 @@ final class AllMySmsTransport extends AbstractTransport
 {
     protected const HOST = 'api.allmysms.com';
 
-    private string $login;
-    private string $apiKey;
-    private ?string $from;
-
-    public function __construct(string $login, #[\SensitiveParameter] string $apiKey, string $from = null, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
-    {
-        $this->login = $login;
-        $this->apiKey = $apiKey;
-        $this->from = $from;
-
+    public function __construct(
+        private string $login,
+        #[\SensitiveParameter] private string $apiKey,
+        private ?string $from = null,
+        ?HttpClientInterface $client = null,
+        ?EventDispatcherInterface $dispatcher = null,
+    ) {
         parent::__construct($client, $dispatcher);
     }
 
     public function __toString(): string
     {
-        return sprintf('allmysms://%s%s', $this->getEndpoint(), null !== $this->from ? '?from='.$this->from : '');
+        return \sprintf('allmysms://%s%s', $this->getEndpoint(), null !== $this->from ? '?from='.$this->from : '');
     }
 
     public function supports(MessageInterface $message): bool
@@ -62,7 +59,7 @@ final class AllMySmsTransport extends AbstractTransport
         $options['to'] = $message->getPhone();
         $options['text'] = $message->getSubject();
 
-        $endpoint = sprintf('https://%s/sms/send/', $this->getEndpoint());
+        $endpoint = \sprintf('https://%s/sms/send/', $this->getEndpoint());
         $response = $this->client->request('POST', $endpoint, [
             'auth_basic' => [$this->login, $this->apiKey],
             'json' => array_filter($options),
@@ -77,13 +74,13 @@ final class AllMySmsTransport extends AbstractTransport
         if (201 !== $statusCode) {
             $error = $response->toArray(false);
 
-            throw new TransportException(sprintf('Unable to send the SMS: "%s" (%s).', $error['description'], $error['code']), $response);
+            throw new TransportException(\sprintf('Unable to send the SMS: "%s" (%s).', $error['description'], $error['code']), $response);
         }
 
         $success = $response->toArray(false);
 
         if (false === isset($success['smsId'])) {
-            throw new TransportException(sprintf('Unable to send the SMS: "%s" (%s).', $success['description'], $success['code']), $response);
+            throw new TransportException(\sprintf('Unable to send the SMS: "%s" (%s).', $success['description'], $success['code']), $response);
         }
 
         $sentMessage = new SentMessage($message, (string) $this);

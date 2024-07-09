@@ -53,6 +53,7 @@ class IbanValidatorTest extends ConstraintValidatorTestCase
         return [
             ['CH9300762011623852957'], // Switzerland without spaces
             ['CH93  0076 2011 6238 5295 7'], // Switzerland with multiple spaces
+            ['ch93 0076 2011 6238 5295 7'], // Switzerland lower case
 
             // Country list
             // http://www.rbs.co.uk/corporate/international/g0/guide-to-international-business/regulatory-information/iban/iban-example.ashx
@@ -76,6 +77,8 @@ class IbanValidatorTest extends ConstraintValidatorTestCase
             ['FO97 5432 0388 8999 44'], // Faroe Islands
             ['FI21 1234 5600 0007 85'], // Finland
             ['FR14 2004 1010 0505 0001 3M02 606'], // France
+            ["FR14\xc2\xa02004\xc2\xa01010\xc2\xa00505\xc2\xa00001\xc2\xa03M02\xc2\xa0606"], // France with non-breaking spaces
+            ["FR14\xe2\x80\xaf2004\xe2\x80\xaf1010\xe2\x80\xaf0505\xe2\x80\xaf0001\xe2\x80\xaf3M02\xe2\x80\xaf606"], // France with narrow non-breaking spaces
             ['GE29 NB00 0000 0101 9049 17'], // Georgia
             ['DE89 3704 0044 0532 0130 00'], // Germany
             ['GI75 NWBK 0000 0000 7099 453'], // Gibraltar
@@ -401,6 +404,12 @@ class IbanValidatorTest extends ConstraintValidatorTestCase
             ['UA213223130000026007233566002'], // Ukraine
             ['AE260211000000230064017'], // United Arab Emirates
             ['VA59001123000012345671'], // Vatican City State
+
+            // Checksum digits not between 02 and 98
+            ['FO00 5432 0388 8999 44'], // Faroe Islands
+            ['NL01INGB0001393698'], // Netherlands
+            ['NL01RABO0331811235'], // Netherlands
+            ['RU99 0445 2560 0407 0281 0412 3456 7890 1'], // Russia
         ];
     }
 

@@ -70,14 +70,14 @@ class EmailValidator extends ConstraintValidator
 
         if (null === $constraint->mode) {
             if (Email::VALIDATION_MODE_STRICT === $this->defaultMode && !class_exists(EguliasEmailValidator::class)) {
-                throw new LogicException(sprintf('The "egulias/email-validator" component is required to make the "%s" constraint default to strict mode. Try running "composer require egulias/email-validator".', Email::class));
+                throw new LogicException(\sprintf('The "egulias/email-validator" component is required to make the "%s" constraint default to strict mode. Try running "composer require egulias/email-validator".', Email::class));
             }
 
             $constraint->mode = $this->defaultMode;
         }
 
         if (!\in_array($constraint->mode, Email::VALIDATION_MODES, true)) {
-            throw new InvalidArgumentException(sprintf('The "%s::$mode" parameter value is not valid.', get_debug_type($constraint)));
+            throw new InvalidArgumentException(\sprintf('The "%s::$mode" parameter value is not valid.', get_debug_type($constraint)));
         }
 
         if (Email::VALIDATION_MODE_STRICT === $constraint->mode) {

@@ -13,25 +13,31 @@ namespace Symfony\Contracts\Tests\Service;
 
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
-use Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype\OtherDir\Component1\Dir1\Service1;
-use Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype\OtherDir\Component1\Dir2\Service2;
 use Symfony\Contracts\Service\Attribute\Required;
 use Symfony\Contracts\Service\Attribute\SubscribedService;
 use Symfony\Contracts\Service\ServiceLocatorTrait;
 use Symfony\Contracts\Service\ServiceSubscriberInterface;
 use Symfony\Contracts\Service\ServiceSubscriberTrait;
 
+/**
+ * @group legacy
+ */
 class ServiceSubscriberTraitTest extends TestCase
 {
+    public static function setUpBeforeClass(): void
+    {
+        class_exists(LegacyTestService::class);
+    }
+
     public function testMethodsOnParentsAndChildrenAreIgnoredInGetSubscribedServices()
     {
         $expected = [
-            TestService::class.'::aService' => Service2::class,
-            TestService::class.'::nullableService' => '?'.Service2::class,
-            new SubscribedService(TestService::class.'::withAttribute', Service2::class, true, new Required()),
+            LegacyTestService::class.'::aService' => Service2::class,
+            LegacyTestService::class.'::nullableService' => '?'.Service2::class,
+            new SubscribedService(LegacyTestService::class.'::withAttribute', Service2::class, true, new Required()),
         ];
 
-        $this->assertEquals($expected, ChildTestService::getSubscribedServices());
+        $this->assertEquals($expected, LegacyChildTestService::getSubscribedServices());
     }
 
     public function testSetContainerIsCalledOnParent()
@@ -40,7 +46,7 @@ class ServiceSubscriberTraitTest extends TestCase
             use ServiceLocatorTrait;
         };
 
-        $this->assertSame($container, (new TestService())->setContainer($container));
+        $this->assertSame($container, (new LegacyTestService())->setContainer($container));
     }
 
     public function testParentNotCalledIfHasMagicCall()
@@ -76,84 +82,10 @@ class ServiceSubscriberTraitTest extends TestCase
         };
         $container2 = clone $container1;
 
-        $testService = new TestService2();
+        $testService = new class() extends LegacyParentTestService2 implements ServiceSubscriberInterface {
+            use ServiceSubscriberTrait;
+        };
         $this->assertNull($testService->setContainer($container1));
         $this->assertSame($container1, $testService->setContainer($container2));
     }
-}
-
-class ParentTestService
-{
-    public function aParentService(): Service1
-    {
-    }
-
-    public function setContainer(ContainerInterface $container): ?ContainerInterface
-    {
-        return $container;
-    }
-}
-
-class TestService extends ParentTestService implements ServiceSubscriberInterface
-{
-    use ServiceSubscriberTrait;
-
-    #[SubscribedService]
-    public function aService(): Service2
-    {
-    }
-
-    #[SubscribedService]
-    public function nullableService(): ?Service2
-    {
-    }
-
-    #[SubscribedService(attributes: new Required())]
-    public function withAttribute(): ?Service2
-    {
-    }
-}
-
-class ChildTestService extends TestService
-{
-    #[SubscribedService]
-    public function aChildService(): Service3
-    {
-    }
-}
-
-class ParentWithMagicCall
-{
-    public function __call($method, $args)
-    {
-        throw new \BadMethodCallException('Should not be called.');
-    }
-
-    public static function __callStatic($method, $args)
-    {
-        throw new \BadMethodCallException('Should not be called.');
-    }
-}
-
-class Service3
-{
-}
-
-class ParentTestService2
-{
-    /** @var ContainerInterface */
-    protected $container;
-
-    public function setContainer(ContainerInterface $container)
-    {
-        $previous = $this->container ?? null;
-        $this->container = $container;
-
-        return $previous;
-    }
-}
-
-class TestService2 extends ParentTestService2 implements ServiceSubscriberInterface
-{
-    use ServiceSubscriberTrait;
 }

@@ -28,26 +28,23 @@ final class OvhCloudTransport extends AbstractTransport
 {
     protected const HOST = 'eu.api.ovh.com';
 
-    private string $applicationKey;
-    private string $applicationSecret;
-    private string $consumerKey;
-    private string $serviceName;
     private ?string $sender = null;
     private bool $noStopClause = false;
 
-    public function __construct(string $applicationKey, #[\SensitiveParameter] string $applicationSecret, #[\SensitiveParameter] string $consumerKey, string $serviceName, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
-    {
-        $this->applicationKey = $applicationKey;
-        $this->applicationSecret = $applicationSecret;
-        $this->consumerKey = $consumerKey;
-        $this->serviceName = $serviceName;
-
+    public function __construct(
+        #[\SensitiveParameter] private string $applicationKey,
+        #[\SensitiveParameter] private string $applicationSecret,
+        #[\SensitiveParameter] private string $consumerKey,
+        private string $serviceName,
+        ?HttpClientInterface $client = null,
+        ?EventDispatcherInterface $dispatcher = null,
+    ) {
         parent::__construct($client, $dispatcher);
     }
 
     public function __toString(): string
     {
-        return sprintf('ovhcloud://%s?service_name=%s%s', $this->getEndpoint(), $this->serviceName, $this->sender ? '&sender='.$this->sender : '');
+        return \sprintf('ovhcloud://%s?service_name=%s%s', $this->getEndpoint(), $this->serviceName, $this->sender ? '&sender='.$this->sender : '');
     }
 
     /**
@@ -81,7 +78,7 @@ final class OvhCloudTransport extends AbstractTransport
             throw new UnsupportedMessageTypeException(__CLASS__, SmsMessage::class, $message);
         }
 
-        $endpoint = sprintf('https://%s/1.0/sms/%s/jobs', $this->getEndpoint(), $this->serviceName);
+        $endpoint = \sprintf('https://%s/1.0/sms/%s/jobs', $this->getEndpoint(), $this->serviceName);
 
         $content = [
             'charset' => 'UTF-8',
@@ -125,13 +122,13 @@ final class OvhCloudTransport extends AbstractTransport
         if (200 !== $statusCode) {
             $error = $response->toArray(false);
 
-            throw new TransportException(sprintf('Unable to send the SMS: %s.', $error['message']), $response);
+            throw new TransportException(\sprintf('Unable to send the SMS: %s.', $error['message']), $response);
         }
 
         $success = $response->toArray(false);
 
         if (!isset($success['ids'][0])) {
-            throw new TransportException(sprintf('Attempt to send the SMS to invalid receivers: "%s".', implode(',', $success['invalidReceivers'])), $response);
+            throw new TransportException(\sprintf('Attempt to send the SMS to invalid receivers: "%s".', implode(',', $success['invalidReceivers'])), $response);
         }
 
         $sentMessage = new SentMessage($message, (string) $this);
@@ -145,7 +142,7 @@ final class OvhCloudTransport extends AbstractTransport
      */
     private function calculateTimeDelta(): int
     {
-        $endpoint = sprintf('https://%s/1.0/auth/time', $this->getEndpoint());
+        $endpoint = \sprintf('https://%s/1.0/auth/time', $this->getEndpoint());
         $response = $this->client->request('GET', $endpoint);
 
         return $response->getContent() - time();

@@ -25,6 +25,7 @@ use Doctrine\DBAL\Platforms\PostgreSQL94Platform;
 use Doctrine\DBAL\Platforms\PostgreSQLPlatform;
 use Doctrine\DBAL\Platforms\SQLServer2012Platform;
 use Doctrine\DBAL\Platforms\SQLServerPlatform;
+use Doctrine\DBAL\Query\ForUpdate\ConflictResolutionMode;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\DBAL\Result;
 use Doctrine\DBAL\Schema\AbstractSchemaManager;
@@ -104,6 +105,82 @@ class ConnectionTest extends TestCase
         $this->assertNull($doctrineEnvelope);
     }
 
+    public function testGetWithSkipLockedWithForUpdateMethod()
+    {
+        if (!method_exists(QueryBuilder::class, 'forUpdate')) {
+            $this->markTestSkipped('This test is for when forUpdate method exists.');
+        }
+
+        $queryBuilder = $this->getQueryBuilderMock();
+        $driverConnection = $this->getDBALConnectionMock();
+        $stmt = $this->getResultMock(false);
+
+        $queryBuilder
+            ->method('getParameters')
+            ->willReturn([]);
+        $queryBuilder
+            ->method('getParameterTypes')
+            ->willReturn([]);
+        $queryBuilder
+            ->method('forUpdate')
+            ->with(ConflictResolutionMode::SKIP_LOCKED)
+            ->willReturn($queryBuilder);
+        $queryBuilder
+            ->method('getSQL')
+            ->willReturn('SELECT FOR UPDATE SKIP LOCKED');
+        $driverConnection->expects($this->once())
+            ->method('createQueryBuilder')
+            ->willReturn($queryBuilder);
+        $driverConnection->expects($this->never())
+            ->method('update');
+        $driverConnection
+            ->method('executeQuery')
+            ->with($this->callback(function ($sql) {
+                return str_contains($sql, 'SKIP LOCKED');
+            }))
+            ->willReturn($stmt);
+
+        $connection = new Connection(['skip_locked' => true], $driverConnection);
+        $doctrineEnvelope = $connection->get();
+        $this->assertNull($doctrineEnvelope);
+    }
+
+    public function testGetWithSkipLockedWithoutForUpdateMethod()
+    {
+        if (method_exists(QueryBuilder::class, 'forUpdate')) {
+            $this->markTestSkipped('This test is for when forUpdate method does not exist.');
+        }
+
+        $queryBuilder = $this->getQueryBuilderMock();
+        $driverConnection = $this->getDBALConnectionMock();
+        $stmt = $this->getResultMock(false);
+
+        $queryBuilder
+            ->method('getParameters')
+            ->willReturn([]);
+        $queryBuilder
+            ->method('getParameterTypes')
+            ->willReturn([]);
+        $queryBuilder
+            ->method('getSQL')
+            ->willReturn('SELECT');
+        $driverConnection->expects($this->once())
+            ->method('createQueryBuilder')
+            ->willReturn($queryBuilder);
+        $driverConnection->expects($this->never())
+            ->method('update');
+        $driverConnection
+            ->method('executeQuery')
+            ->with($this->callback(function ($sql) {
+                return str_contains($sql, 'SKIP LOCKED');
+            }))
+            ->willReturn($stmt);
+
+        $connection = new Connection(['skip_locked' => true], $driverConnection);
+        $doctrineEnvelope = $connection->get();
+        $this->assertNull($doctrineEnvelope);
+    }
+
     public function testItThrowsATransportExceptionIfItCannotAcknowledgeMessage()
     {
         $this->expectException(TransportException::class);
@@ -124,13 +201,111 @@ class ConnectionTest extends TestCase
         $connection->reject('dummy_id');
     }
 
+    public function testSend()
+    {
+        $queryBuilder = $this->getQueryBuilderMock();
+        $driverConnection = $this->getDBALConnectionMock();
+
+        $driverConnection->expects($this->once())
+            ->method('createQueryBuilder')
+            ->willReturn($queryBuilder);
+
+        $queryBuilder->expects($this->once())
+            ->method('insert')
+            ->willReturn($queryBuilder);
+
+        $queryBuilder->expects($this->once())
+            ->method('values')
+            ->with([
+                'body' => '?',
+                'headers' => '?',
+                'queue_name' => '?',
+                'created_at' => '?',
+                'available_at' => '?',
+            ])
+            ->willReturn($queryBuilder);
+
+        $queryBuilder->expects($this->once())
+            ->method('getSQL')
+            ->willReturn('INSERT');
+
+        $driverConnection->expects($this->once())
+            ->method('beginTransaction');
+
+        $driverConnection->expects($this->once())
+            ->method('executeStatement')
+            ->with('INSERT')
+            ->willReturn(1);
+
+        $driverConnection->expects($this->once())
+            ->method('lastInsertId')
+            ->willReturn('1');
+
+        $driverConnection->expects($this->once())
+            ->method('commit');
+
+        $connection = new Connection([], $driverConnection);
+        $id = $connection->send('test', []);
+
+        self::assertSame('1', $id);
+    }
+
+    public function testSendLastInsertIdReturnsInteger()
+    {
+        $queryBuilder = $this->getQueryBuilderMock();
+        $driverConnection = $this->getDBALConnectionMock();
+
+        $driverConnection->expects($this->once())
+            ->method('createQueryBuilder')
+            ->willReturn($queryBuilder);
+
+        $queryBuilder->expects($this->once())
+            ->method('insert')
+            ->willReturn($queryBuilder);
+
+        $queryBuilder->expects($this->once())
+            ->method('values')
+            ->with([
+                'body' => '?',
+                'headers' => '?',
+                'queue_name' => '?',
+                'created_at' => '?',
+                'available_at' => '?',
+            ])
+            ->willReturn($queryBuilder);
+
+        $queryBuilder->expects($this->once())
+            ->method('getSQL')
+            ->willReturn('INSERT');
+
+        $driverConnection->expects($this->once())
+            ->method('beginTransaction');
+
+        $driverConnection->expects($this->once())
+            ->method('executeStatement')
+            ->with('INSERT')
+            ->willReturn(1);
+
+        $driverConnection->expects($this->once())
+            ->method('lastInsertId')
+            ->willReturn(1);
+
+        $driverConnection->expects($this->once())
+            ->method('commit');
+
+        $connection = new Connection([], $driverConnection);
+        $id = $connection->send('test', []);
+
+        self::assertSame('1', $id);
+    }
+
     private function getDBALConnectionMock()
     {
         $driverConnection = $this->createMock(DBALConnection::class);
         $platform = $this->createMock(AbstractPlatform::class);
 
         if (!method_exists(QueryBuilder::class, 'forUpdate')) {
-            $platform->method('getWriteLockSQL')->willReturn('FOR UPDATE');
+            $platform->method('getWriteLockSQL')->willReturn('FOR UPDATE SKIP LOCKED');
         }
 
         $configuration = $this->createMock(\Doctrine\DBAL\Configuration::class);
@@ -472,7 +647,7 @@ class ConnectionTest extends TestCase
         if (!method_exists(QueryBuilder::class, 'forUpdate')) {
             yield 'Oracle & DBAL<3.8' => [
                 new OraclePlatform(),
-                'SELECT w.id AS "id", w.body AS "body", w.headers AS "headers", w.queue_name AS "queue_name", w.created_at AS "created_at", w.available_at AS "available_at", w.delivered_at AS "delivered_at" FROM messenger_messages w WHERE w.id IN (SELECT a.id FROM (SELECT m.id FROM messenger_messages m WHERE (m.queue_name = ?) AND (m.delivered_at is null OR m.delivered_at < ?) AND (m.available_at <= ?) ORDER BY available_at ASC) a WHERE ROWNUM <= 1) FOR UPDATE',
+                \sprintf('SELECT w.id AS "id", w.body AS "body", w.headers AS "headers", w.queue_name AS "queue_name", w.created_at AS "created_at", w.available_at AS "available_at", w.delivered_at AS "delivered_at" FROM messenger_messages w WHERE w.id IN (SELECT a.id FROM (SELECT m.id FROM messenger_messages m WHERE (m.queue_name = ?) AND (m.delivered_at is null OR m.delivered_at < ?) AND (m.available_at <= ?) ORDER BY available_at ASC) a WHERE ROWNUM <= 1) FOR UPDATE%s', method_exists(QueryBuilder::class, 'forUpdate') ? ' SKIP LOCKED' : ''),
             ];
         } elseif (class_exists(MySQL57Platform::class)) {
             yield 'Oracle & 3.8<=DBAL<4' => [

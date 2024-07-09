@@ -68,11 +68,11 @@ class NoPrivateNetworkHttpClientTest extends TestCase
     public function testExclude(string $ipAddr, $subnets, bool $mustThrow)
     {
         $content = 'foo';
-        $url = sprintf('http://%s/', 0 < substr_count($ipAddr, ':') ? sprintf('[%s]', $ipAddr) : $ipAddr);
+        $url = \sprintf('http://%s/', 0 < substr_count($ipAddr, ':') ? \sprintf('[%s]', $ipAddr) : $ipAddr);
 
         if ($mustThrow) {
             $this->expectException(TransportException::class);
-            $this->expectExceptionMessage(sprintf('IP "%s" is blocked for "%s".', $ipAddr, $url));
+            $this->expectExceptionMessage(\sprintf('IP "%s" is blocked for "%s".', $ipAddr, $url));
         }
 
         $previousHttpClient = $this->getHttpClientMock($url, $ipAddr, $content);
@@ -88,7 +88,7 @@ class NoPrivateNetworkHttpClientTest extends TestCase
     public function testCustomOnProgressCallback()
     {
         $ipAddr = '104.26.14.6';
-        $url = sprintf('http://%s/', $ipAddr);
+        $url = \sprintf('http://%s/', $ipAddr);
         $content = 'foo';
 
         $executionCount = 0;
@@ -108,9 +108,9 @@ class NoPrivateNetworkHttpClientTest extends TestCase
     public function testNonCallableOnProgressCallback()
     {
         $ipAddr = '104.26.14.6';
-        $url = sprintf('http://%s/', $ipAddr);
+        $url = \sprintf('http://%s/', $ipAddr);
         $content = 'bar';
-        $customCallback = sprintf('cb_%s', microtime(true));
+        $customCallback = \sprintf('cb_%s', microtime(true));
 
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Option "on_progress" must be callable, "string" given.');

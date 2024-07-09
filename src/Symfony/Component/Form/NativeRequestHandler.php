@@ -36,13 +36,13 @@ class NativeRequestHandler implements RequestHandlerInterface
         'type',
     ];
 
-    public function __construct(ServerParams $params = null)
+    public function __construct(?ServerParams $params = null)
     {
         $this->serverParams = $params ?? new ServerParams();
     }
 
     /**
-     * @throws Exception\UnexpectedTypeException If the $request is not null
+     * @throws UnexpectedTypeException If the $request is not null
      */
     public function handleRequest(FormInterface $form, mixed $request = null): void
     {

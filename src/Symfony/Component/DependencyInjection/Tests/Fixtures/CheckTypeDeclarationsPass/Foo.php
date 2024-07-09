@@ -9,7 +9,7 @@ class Foo
         return new Bar(new \stdClass());
     }
 
-    public static function createBarArguments(\stdClass $stdClass, \stdClass $stdClassOptional = null)
+    public static function createBarArguments(\stdClass $stdClass, ?\stdClass $stdClassOptional = null)
     {
         return new Bar($stdClass);
     }

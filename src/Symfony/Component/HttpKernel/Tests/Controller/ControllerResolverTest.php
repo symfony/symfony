@@ -251,7 +251,7 @@ class ControllerResolverTest extends TestCase
         $this->assertSame($controller, $resolver->getController($request));
     }
 
-    protected function createControllerResolver(LoggerInterface $logger = null)
+    protected function createControllerResolver(?LoggerInterface $logger = null)
     {
         return new ControllerResolver($logger);
     }

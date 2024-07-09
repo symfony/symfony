@@ -1,0 +1,40 @@
+{
+    "type": "activity.unsubscribed",
+    "domain_id": "7z3m5jgrogdpyo6n",
+    "created_at": "2024-01-01T12:00:00.000000Z",
+    "webhook_id": "7z3m5jgrogdpyo6n",
+    "url": "https://www.mailersend.com/webhook",
+    "data": {
+        "object": "activity",
+        "id": "62f114f8165fe0d8db0288e5",
+        "type": "unsubscribed",
+        "created_at": "2024-01-01T12:00:00.000000Z",
+        "email": {
+            "object": "email",
+            "id": "62f114f7165fe0d8db0288e2",
+            "created_at": "2024-01-01T12:00:00.000000Z",
+            "from": "test@mailersend.com",
+            "subject": "Test subject",
+            "status": "delivered",
+            "tags": ["test-tag"],
+            "headers": null,
+            "message": {
+                "object": "message",
+                "id": "62fb66bef54a112e920b5493",
+                "created_at": "2024-01-01T12:00:00.000000Z"
+            },
+            "recipient": {
+                "object": "recipient",
+                "id": "62c69be104270ee9c0074d32",
+                "email": "test@example.com",
+                "created_at": "2024-01-01T12:00:00.000000Z"
+            }
+        },
+        "morph": {
+            "object": "recipient_unsubscribe",
+            "reason": "NO_LONGER_WANT",
+            "readable_reason": "I no longer want to receive these emails"
+        },
+        "template_id": "0z76k5jg0o3yeg2d"
+    }
+}

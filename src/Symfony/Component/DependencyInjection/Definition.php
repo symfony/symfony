@@ -61,7 +61,7 @@ class Definition
      */
     public ?int $decorationOnInvalid = null;
 
-    public function __construct(string $class = null, array $arguments = [])
+    public function __construct(?string $class = null, array $arguments = [])
     {
         if (null !== $class) {
             $this->setClass($class);
@@ -133,10 +133,10 @@ class Definition
      *
      * @throws InvalidArgumentException in case the decorated service id and the new decorated service id are equals
      */
-    public function setDecoratedService(?string $id, string $renamedId = null, int $priority = 0, int $invalidBehavior = ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE): static
+    public function setDecoratedService(?string $id, ?string $renamedId = null, int $priority = 0, int $invalidBehavior = ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE): static
     {
         if ($renamedId && $id === $renamedId) {
-            throw new InvalidArgumentException(sprintf('The decorated service inner name for "%s" must be different than the service name itself.', $id));
+            throw new InvalidArgumentException(\sprintf('The decorated service inner name for "%s" must be different than the service name itself.', $id));
         }
 
         $this->changes['decorated_service'] = true;
@@ -254,15 +254,11 @@ class Definition
     public function replaceArgument(int|string $index, mixed $argument): static
     {
         if (0 === \count($this->arguments)) {
-            throw new OutOfBoundsException(sprintf('Cannot replace arguments for class "%s" if none have been configured yet.', $this->class));
-        }
-
-        if (\is_int($index) && ($index < 0 || $index > \count($this->arguments) - 1)) {
-            throw new OutOfBoundsException(sprintf('The index "%d" is not in the range [0, %d] of the arguments of class "%s".', $index, \count($this->arguments) - 1, $this->class));
+            throw new OutOfBoundsException(\sprintf('Cannot replace arguments for class "%s" if none have been configured yet.', $this->class));
         }
 
         if (!\array_key_exists($index, $this->arguments)) {
-            throw new OutOfBoundsException(sprintf('The argument "%s" doesn\'t exist in class "%s".', $index, $this->class));
+            throw new OutOfBoundsException(\sprintf('The argument "%s" doesn\'t exist in class "%s".', $index, $this->class));
         }
 
         $this->arguments[$index] = $argument;
@@ -298,7 +294,7 @@ class Definition
     public function getArgument(int|string $index): mixed
     {
         if (!\array_key_exists($index, $this->arguments)) {
-            throw new OutOfBoundsException(sprintf('The argument "%s" doesn\'t exist in class "%s".', $index, $this->class));
+            throw new OutOfBoundsException(\sprintf('The argument "%s" doesn\'t exist in class "%s".', $index, $this->class));
         }
 
         return $this->arguments[$index];
@@ -332,7 +328,7 @@ class Definition
      */
     public function addMethodCall(string $method, array $arguments = [], bool $returnsClone = false): static
     {
-        if (empty($method)) {
+        if (!$method) {
             throw new InvalidArgumentException('Method name cannot be empty.');
         }
         $this->calls[] = $returnsClone ? [$method, $arguments, true] : [$method, $arguments];

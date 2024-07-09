@@ -23,6 +23,8 @@ class InformationalChunk extends DataChunk
     public function __construct(int $statusCode, array $headers)
     {
         $this->status = [$statusCode, $headers];
+
+        parent::__construct();
     }
 
     public function getInformationalStatus(): ?array

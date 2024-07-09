@@ -17,8 +17,6 @@ namespace Symfony\Component\Ldap;
  */
 class Entry
 {
-    private string $dn;
-
     /**
      * @var array<string, array>
      */
@@ -32,10 +30,10 @@ class Entry
     /**
      * @param array<string, array> $attributes
      */
-    public function __construct(string $dn, array $attributes = [])
-    {
-        $this->dn = $dn;
-
+    public function __construct(
+        private string $dn,
+        array $attributes = [],
+    ) {
         foreach ($attributes as $key => $attribute) {
             $this->setAttribute($key, $attribute);
         }

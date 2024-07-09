@@ -24,6 +24,11 @@ class HttpClientDataCollectorTest extends TestCase
         TestHttpServer::start();
     }
 
+    public static function tearDownAfterClass(): void
+    {
+        TestHttpServer::stop();
+    }
+
     public function testItCollectsRequestCount()
     {
         $httpClient1 = $this->httpClientThatHasTracedRequests([
@@ -177,7 +182,7 @@ class HttpClientDataCollectorTest extends TestCase
         $curlCommand = $collectedData['http_client']['traces'][0]['curlCommand'];
 
         $isWindows = '\\' === \DIRECTORY_SEPARATOR;
-        self::assertEquals(sprintf($expectedCurlCommand, $isWindows ? '"' : "'", $isWindows ? '' : "'"), $curlCommand);
+        self::assertEquals(\sprintf($expectedCurlCommand, $isWindows ? '"' : "'", $isWindows ? '' : "'"), $curlCommand);
     }
 
     public static function provideCurlRequests(): iterable
@@ -358,7 +363,7 @@ class HttpClientDataCollectorTest extends TestCase
         $collectedData = $sut->getClients();
         self::assertCount(1, $collectedData['http_client']['traces']);
         $curlCommand = $collectedData['http_client']['traces'][0]['curlCommand'];
-        self::assertEquals(sprintf('curl \\
+        self::assertEquals(\sprintf('curl \\
   --compressed \\
   --request GET \\
   --url %1$shttp://localhost:8057/301%1$s \\

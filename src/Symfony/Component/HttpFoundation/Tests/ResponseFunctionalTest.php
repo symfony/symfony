@@ -12,6 +12,8 @@
 namespace Symfony\Component\HttpFoundation\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Process\ExecutableFinder;
+use Symfony\Component\Process\Process;
 
 class ResponseFunctionalTest extends TestCase
 {
@@ -43,15 +45,39 @@ class ResponseFunctionalTest extends TestCase
      */
     public function testCookie($fixture)
     {
-        $result = file_get_contents(sprintf('http://localhost:8054/%s.php', $fixture));
+        $result = file_get_contents(\sprintf('http://localhost:8054/%s.php', $fixture));
         $result = preg_replace_callback('/expires=[^;]++/', fn ($m) => str_replace('-', ' ', $m[0]), $result);
-        $this->assertStringMatchesFormatFile(__DIR__.sprintf('/Fixtures/response-functional/%s.expected', $fixture), $result);
+        $this->assertStringMatchesFormatFile(__DIR__.\sprintf('/Fixtures/response-functional/%s.expected', $fixture), $result);
     }
 
     public static function provideCookie()
     {
         foreach (glob(__DIR__.'/Fixtures/response-functional/*.php') as $file) {
-            yield [pathinfo($file, \PATHINFO_FILENAME)];
+            if (str_contains($file, 'cookie')) {
+                yield [pathinfo($file, \PATHINFO_FILENAME)];
+            }
         }
+    }
+
+    /**
+     * @group integration
+     */
+    public function testInformationalResponse()
+    {
+        if (!(new ExecutableFinder())->find('curl')) {
+            $this->markTestSkipped('curl is not installed');
+        }
+
+        if (!($fp = @fsockopen('localhost', 80, $errorCode, $errorMessage, 2))) {
+            $this->markTestSkipped('FrankenPHP is not running');
+        }
+        fclose($fp);
+
+        $p = new Process(['curl', '-v', 'http://localhost/early_hints.php']);
+        $p->run();
+        $output = $p->getErrorOutput();
+
+        $this->assertSame(3, preg_match_all('#Link: </css/style\.css>; rel="preload"; as="style"#', $output));
+        $this->assertSame(2, preg_match_all('#Link: </js/app\.js>; rel="preload"; as="script"#', $output));
     }
 }

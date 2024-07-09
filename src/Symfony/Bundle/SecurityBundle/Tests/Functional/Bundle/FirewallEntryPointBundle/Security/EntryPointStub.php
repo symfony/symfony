@@ -20,7 +20,7 @@ class EntryPointStub implements AuthenticationEntryPointInterface
 {
     public const RESPONSE_TEXT = '2be8e651259189d841a19eecdf37e771e2431741';
 
-    public function start(Request $request, AuthenticationException $authException = null): Response
+    public function start(Request $request, ?AuthenticationException $authException = null): Response
     {
         return new Response(self::RESPONSE_TEXT);
     }

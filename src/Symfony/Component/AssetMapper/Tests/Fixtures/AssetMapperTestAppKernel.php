@@ -43,7 +43,7 @@ class AssetMapperTestAppKernel extends Kernel
                 'http_client' => true,
                 'assets' => null,
                 'asset_mapper' => [
-                    'paths' => ['dir1', 'dir2', 'assets'],
+                    'paths' => ['dir1', 'dir2', 'non_ascii', 'assets'],
                 ],
                 'test' => true,
             ]);

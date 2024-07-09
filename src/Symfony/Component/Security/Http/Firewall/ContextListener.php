@@ -43,11 +43,7 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
  */
 class ContextListener extends AbstractListener
 {
-    private TokenStorageInterface $tokenStorage;
     private string $sessionKey;
-    private ?LoggerInterface $logger;
-    private iterable $userProviders;
-    private ?EventDispatcherInterface $dispatcher;
     private bool $registered = false;
     private AuthenticationTrustResolverInterface $trustResolver;
     private ?\Closure $sessionTrackerEnabler;
@@ -55,18 +51,20 @@ class ContextListener extends AbstractListener
     /**
      * @param iterable<mixed, UserProviderInterface> $userProviders
      */
-    public function __construct(TokenStorageInterface $tokenStorage, iterable $userProviders, string $contextKey, LoggerInterface $logger = null, EventDispatcherInterface $dispatcher = null, AuthenticationTrustResolverInterface $trustResolver = null, callable $sessionTrackerEnabler = null)
-    {
-        if (empty($contextKey)) {
+    public function __construct(
+        private TokenStorageInterface $tokenStorage,
+        private iterable $userProviders,
+        string $contextKey,
+        private ?LoggerInterface $logger = null,
+        private ?EventDispatcherInterface $dispatcher = null,
+        ?AuthenticationTrustResolverInterface $trustResolver = null,
+        ?callable $sessionTrackerEnabler = null,
+    ) {
+        if (!$contextKey) {
             throw new \InvalidArgumentException('$contextKey must not be empty.');
         }
 
-        $this->tokenStorage = $tokenStorage;
-        $this->userProviders = $userProviders;
         $this->sessionKey = '_security_'.$contextKey;
-        $this->logger = $logger;
-        $this->dispatcher = $dispatcher;
-
         $this->trustResolver = $trustResolver ?? new AuthenticationTrustResolver();
         $this->sessionTrackerEnabler = null === $sessionTrackerEnabler ? null : $sessionTrackerEnabler(...);
     }
@@ -87,7 +85,7 @@ class ContextListener extends AbstractListener
         }
 
         $request = $event->getRequest();
-        $session = $request->hasPreviousSession() ? $request->getSession() : null;
+        $session = !$request->attributes->getBoolean('_stateless') && $request->hasPreviousSession() ? $request->getSession() : null;
 
         $request->attributes->set('_security_firewall_run', $this->sessionKey);
 
@@ -196,7 +194,7 @@ class ContextListener extends AbstractListener
 
         foreach ($this->userProviders as $provider) {
             if (!$provider instanceof UserProviderInterface) {
-                throw new \InvalidArgumentException(sprintf('User provider "%s" must implement "%s".', get_debug_type($provider), UserProviderInterface::class));
+                throw new \InvalidArgumentException(\sprintf('User provider "%s" must implement "%s".', get_debug_type($provider), UserProviderInterface::class));
             }
 
             if (!$provider->supportsClass($userClass)) {
@@ -248,7 +246,7 @@ class ContextListener extends AbstractListener
             return null;
         }
 
-        throw new \RuntimeException(sprintf('There is no user provider for user "%s". Shouldn\'t the "supportsClass()" method of your user provider return true for this classname?', $userClass));
+        throw new \RuntimeException(\sprintf('There is no user provider for user "%s". Shouldn\'t the "supportsClass()" method of your user provider return true for this classname?', $userClass));
     }
 
     private function safelyUnserialize(string $serializedToken): mixed
@@ -256,7 +254,7 @@ class ContextListener extends AbstractListener
         $token = null;
         $prevUnserializeHandler = ini_set('unserialize_callback_func', __CLASS__.'::handleUnserializeCallback');
         $prevErrorHandler = set_error_handler(function ($type, $msg, $file, $line, $context = []) use (&$prevErrorHandler) {
-            if (__FILE__ === $file) {
+            if (__FILE__ === $file && !\in_array($type, [\E_DEPRECATED, \E_USER_DEPRECATED], true)) {
                 throw new \ErrorException($msg, 0x37313BC, $type, $file, $line);
             }
 

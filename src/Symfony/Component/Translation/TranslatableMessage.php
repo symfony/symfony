@@ -19,15 +19,11 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class TranslatableMessage implements TranslatableInterface
 {
-    private string $message;
-    private array $parameters;
-    private ?string $domain;
-
-    public function __construct(string $message, array $parameters = [], string $domain = null)
-    {
-        $this->message = $message;
-        $this->parameters = $parameters;
-        $this->domain = $domain;
+    public function __construct(
+        private string $message,
+        private array $parameters = [],
+        private ?string $domain = null,
+    ) {
     }
 
     public function __toString(): string
@@ -50,7 +46,7 @@ class TranslatableMessage implements TranslatableInterface
         return $this->domain;
     }
 
-    public function trans(TranslatorInterface $translator, string $locale = null): string
+    public function trans(TranslatorInterface $translator, ?string $locale = null): string
     {
         return $translator->trans($this->getMessage(), array_map(
             static fn ($parameter) => $parameter instanceof TranslatableInterface ? $parameter->trans($translator, $locale) : $parameter,

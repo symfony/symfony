@@ -27,7 +27,7 @@ abstract class TransportTestCase extends TestCase
     protected const CUSTOM_HOST = 'host.test';
     protected const CUSTOM_PORT = 42;
 
-    abstract public static function createTransport(HttpClientInterface $client = null): TransportInterface;
+    abstract public static function createTransport(?HttpClientInterface $client = null): TransportInterface;
 
     /**
      * @return iterable<array{0: string, 1: TransportInterface}>
@@ -35,12 +35,12 @@ abstract class TransportTestCase extends TestCase
     abstract public static function toStringProvider(): iterable;
 
     /**
-     * @return iterable<array{0: MessageInterface, 1: TransportInterface}>
+     * @return iterable<array{0: MessageInterface, 1?: TransportInterface}>
      */
     abstract public static function supportedMessagesProvider(): iterable;
 
     /**
-     * @return iterable<array{0: MessageInterface, 1: TransportInterface}>
+     * @return iterable<array{0: MessageInterface, 1?: TransportInterface}>
      */
     abstract public static function unsupportedMessagesProvider(): iterable;
 
@@ -55,7 +55,7 @@ abstract class TransportTestCase extends TestCase
     /**
      * @dataProvider supportedMessagesProvider
      */
-    public function testSupportedMessages(MessageInterface $message, TransportInterface $transport = null)
+    public function testSupportedMessages(MessageInterface $message, ?TransportInterface $transport = null)
     {
         $transport ??= $this->createTransport();
 
@@ -65,7 +65,7 @@ abstract class TransportTestCase extends TestCase
     /**
      * @dataProvider unsupportedMessagesProvider
      */
-    public function testUnsupportedMessages(MessageInterface $message, TransportInterface $transport = null)
+    public function testUnsupportedMessages(MessageInterface $message, ?TransportInterface $transport = null)
     {
         $transport ??= $this->createTransport();
 
@@ -75,7 +75,7 @@ abstract class TransportTestCase extends TestCase
     /**
      * @dataProvider unsupportedMessagesProvider
      */
-    public function testUnsupportedMessagesTrowUnsupportedMessageTypeExceptionWhenSend(MessageInterface $message, TransportInterface $transport = null)
+    public function testUnsupportedMessagesTrowUnsupportedMessageTypeExceptionWhenSend(MessageInterface $message, ?TransportInterface $transport = null)
     {
         $transport ??= $this->createTransport();
 
@@ -90,7 +90,7 @@ abstract class TransportTestCase extends TestCase
 
         $transport->setHost($customHost = self::CUSTOM_HOST);
 
-        $this->assertMatchesRegularExpression(sprintf('/^.*\:\/\/(%s|.*\@%s)/', $customHost, $customHost), (string) $transport);
+        $this->assertMatchesRegularExpression(\sprintf('/^.*\:\/\/(%s|.*\@%s)/', $customHost, $customHost), (string) $transport);
     }
 
     public function testCanSetCustomPort()
@@ -102,7 +102,7 @@ abstract class TransportTestCase extends TestCase
         /*
          * @see https://regex101.com/r/shT9O2/1
          */
-        $this->assertMatchesRegularExpression(sprintf('/^.*\:\/\/.*(\@.*)?\:%s((\?.*|\/.*))?$/', $customPort), (string) $transport);
+        $this->assertMatchesRegularExpression(\sprintf('/^.*\:\/\/.*(\@.*)?\:%s((\?.*|\/.*))?$/', $customPort), (string) $transport);
     }
 
     public function testCanSetCustomHostAndPort()
@@ -112,6 +112,6 @@ abstract class TransportTestCase extends TestCase
         $transport->setHost($customHost = self::CUSTOM_HOST);
         $transport->setPort($customPort = self::CUSTOM_PORT);
 
-        $this->assertMatchesRegularExpression(sprintf('/^.*\:\/\/(%s|.*\@%s)\:%s/', $customHost, $customHost, $customPort), (string) $transport);
+        $this->assertMatchesRegularExpression(\sprintf('/^.*\:\/\/(%s|.*\@%s)\:%s/', $customHost, $customHost, $customPort), (string) $transport);
     }
 }

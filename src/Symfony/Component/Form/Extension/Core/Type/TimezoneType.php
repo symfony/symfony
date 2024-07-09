@@ -43,7 +43,7 @@ class TimezoneType extends AbstractType
 
                 if ($options['intl']) {
                     if (!class_exists(Intl::class)) {
-                        throw new LogicException(sprintf('The "symfony/intl" component is required to use "%s" with option "intl=true". Try running "composer require symfony/intl".', static::class));
+                        throw new LogicException(\sprintf('The "symfony/intl" component is required to use "%s" with option "intl=true". Try running "composer require symfony/intl".', static::class));
                     }
 
                     $choiceTranslationLocale = $options['choice_translation_locale'];
@@ -106,7 +106,7 @@ class TimezoneType extends AbstractType
         return $timezones;
     }
 
-    private static function getIntlTimezones(string $input, string $locale = null): array
+    private static function getIntlTimezones(string $input, ?string $locale = null): array
     {
         $timezones = array_flip(Timezones::getNames($locale));
 

@@ -24,13 +24,10 @@ use Symfony\Component\Security\Http\FirewallMapInterface;
  */
 class FirewallMap implements FirewallMapInterface
 {
-    private ContainerInterface $container;
-    private iterable $map;
-
-    public function __construct(ContainerInterface $container, iterable $map)
-    {
-        $this->container = $container;
-        $this->map = $map;
+    public function __construct(
+        private ContainerInterface $container,
+        private iterable $map,
+    ) {
     }
 
     public function getListeners(Request $request): array

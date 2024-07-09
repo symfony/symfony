@@ -41,5 +41,5 @@ interface ConfigCacheInterface
      *
      * @throws \RuntimeException When the cache file cannot be written
      */
-    public function write(string $content, array $metadata = null): void;
+    public function write(string $content, ?array $metadata = null): void;
 }

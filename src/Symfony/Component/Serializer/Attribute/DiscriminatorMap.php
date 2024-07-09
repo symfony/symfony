@@ -19,16 +19,22 @@ use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 #[\Attribute(\Attribute::TARGET_CLASS)]
 class DiscriminatorMap
 {
+    /**
+     * @param string                      $typeProperty The property holding the type discriminator
+     * @param array<string, class-string> $mapping      The mapping between types and classes (i.e. ['admin_user' => AdminUser::class])
+     *
+     * @throws InvalidArgumentException
+     */
     public function __construct(
         private readonly string $typeProperty,
         private readonly array $mapping,
     ) {
-        if (empty($typeProperty)) {
-            throw new InvalidArgumentException(sprintf('Parameter "typeProperty" given to "%s" cannot be empty.', static::class));
+        if (!$typeProperty) {
+            throw new InvalidArgumentException(\sprintf('Parameter "typeProperty" given to "%s" cannot be empty.', static::class));
         }
 
-        if (empty($mapping)) {
-            throw new InvalidArgumentException(sprintf('Parameter "mapping" given to "%s" cannot be empty.', static::class));
+        if (!$mapping) {
+            throw new InvalidArgumentException(\sprintf('Parameter "mapping" given to "%s" cannot be empty.', static::class));
         }
     }
 

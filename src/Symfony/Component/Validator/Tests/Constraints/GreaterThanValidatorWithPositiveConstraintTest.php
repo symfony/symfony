@@ -21,7 +21,7 @@ use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
  */
 class GreaterThanValidatorWithPositiveConstraintTest extends GreaterThanValidatorTest
 {
-    protected static function createConstraint(array $options = null): Constraint
+    protected static function createConstraint(?array $options = null): Constraint
     {
         return new Positive();
     }

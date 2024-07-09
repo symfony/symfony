@@ -1,0 +1,39 @@
+{
+  "signature":{
+    "token": "885894756b6c371a377f5f9516d60a4db497ad27d4931ed215",
+    "timestamp": "1661621710",
+    "signature": "606307bb55b72686b1b2a2c8c37ae6e6ec89496592bac4a4eee5a346337d04a5"
+  },
+  "event-data":{
+    "event":"accepted",
+    "id":"4o7-z86dSkSI54c6IudeuA",
+    "timestamp":1707402341.91242,
+    "api-key-id":"##REDACTED##",
+    "envelope":{
+      "sender":"postmaster@mg.herehaveth.is",
+      "targets":"ben@##REDACTED##",
+      "transport":"smtp"
+    },
+    "flags":{
+      "is-authenticated":true,
+      "is-test-mode":false
+    },
+    "message":{
+      "headers":{
+        "message-id":"##REDACTED##",
+        "from":"\"Here, have this\" <hello@herehaveth.is>",
+        "to":"alice@example.com",
+        "subject":"Please verify your email address."
+      },
+      "size":2411
+    },
+    "storage":{
+      "key":"##REDACTED##",
+      "url":"https:\/\/storage-us-east4.api.mailgun.net\/v3\/domains\/##REDACTED##"
+    },
+    "method":"HTTP",
+    "log-level":"info",
+    "recipient":"alice@example.com",
+    "recipient-domain":"example.com"
+  }
+}

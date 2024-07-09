@@ -29,11 +29,6 @@ final class NativeResponse implements ResponseInterface, StreamableInterface
     use CommonResponseTrait;
     use TransportResponseTrait;
 
-    /**
-     * @var resource
-     */
-    private $context;
-    private string $url;
     private \Closure $resolver;
     private ?\Closure $onProgress;
     private ?int $remaining = null;
@@ -43,18 +38,24 @@ final class NativeResponse implements ResponseInterface, StreamableInterface
      */
     private $buffer;
 
-    private NativeClientState $multi;
     private float $pauseExpiry = 0.0;
 
     /**
      * @internal
+     *
+     * @param $context resource
      */
-    public function __construct(NativeClientState $multi, $context, string $url, array $options, array &$info, callable $resolver, ?callable $onProgress, ?LoggerInterface $logger)
-    {
-        $this->multi = $multi;
+    public function __construct(
+        private NativeClientState $multi,
+        private $context,
+        private string $url,
+        array $options,
+        array &$info,
+        callable $resolver,
+        ?callable $onProgress,
+        ?LoggerInterface $logger,
+    ) {
         $this->id = $id = (int) $context;
-        $this->context = $context;
-        $this->url = $url;
         $this->logger = $logger;
         $this->timeout = $options['timeout'];
         $this->info = &$info;
@@ -86,7 +87,7 @@ final class NativeResponse implements ResponseInterface, StreamableInterface
         });
     }
 
-    public function getInfo(string $type = null): mixed
+    public function getInfo(?string $type = null): mixed
     {
         if (!$info = $this->finalInfo) {
             $info = $this->info;
@@ -123,7 +124,7 @@ final class NativeResponse implements ResponseInterface, StreamableInterface
                 throw new TransportException($msg);
             }
 
-            $this->logger?->info(sprintf('%s for "%s".', $msg, $url ?? $this->url));
+            $this->logger?->info(\sprintf('%s for "%s".', $msg, $url ?? $this->url));
         });
 
         try {
@@ -142,7 +143,7 @@ final class NativeResponse implements ResponseInterface, StreamableInterface
                     $this->info['request_header'] = $this->info['url']['path'].$this->info['url']['query'];
                 }
 
-                $this->info['request_header'] = sprintf("> %s %s HTTP/%s \r\n", $context['http']['method'], $this->info['request_header'], $context['http']['protocol_version']);
+                $this->info['request_header'] = \sprintf("> %s %s HTTP/%s \r\n", $context['http']['method'], $this->info['request_header'], $context['http']['protocol_version']);
                 $this->info['request_header'] .= implode("\r\n", $context['http']['header'])."\r\n\r\n";
 
                 if (\array_key_exists('peer_name', $context['ssl']) && null === $context['ssl']['peer_name']) {
@@ -159,7 +160,7 @@ final class NativeResponse implements ResponseInterface, StreamableInterface
                     break;
                 }
 
-                $this->logger?->info(sprintf('Redirecting: "%s %s"', $this->info['http_code'], $url ?? $this->url));
+                $this->logger?->info(\sprintf('Redirecting: "%s %s"', $this->info['http_code'], $url ?? $this->url));
             }
         } catch (\Throwable $e) {
             $this->close();
@@ -228,7 +229,7 @@ final class NativeResponse implements ResponseInterface, StreamableInterface
     /**
      * @param NativeClientState $multi
      */
-    private static function perform(ClientState $multi, array &$responses = null): void
+    private static function perform(ClientState $multi, ?array &$responses = null): void
     {
         foreach ($multi->openHandles as $i => [$pauseExpiry, $h, $buffer, $onProgress]) {
             if ($pauseExpiry) {
@@ -294,7 +295,7 @@ final class NativeResponse implements ResponseInterface, StreamableInterface
 
                 if (null === $e) {
                     if (0 < $remaining) {
-                        $e = new TransportException(sprintf('Transfer closed with %s bytes remaining to read.', $remaining));
+                        $e = new TransportException(\sprintf('Transfer closed with %s bytes remaining to read.', $remaining));
                     } elseif (-1 === $remaining && fwrite($buffer, '-') && '' !== stream_get_contents($buffer, -1, 0)) {
                         $e = new TransportException('Transfer closed with outstanding data remaining from chunked response.');
                     }

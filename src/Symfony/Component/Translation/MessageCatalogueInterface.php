@@ -37,7 +37,7 @@ interface MessageCatalogueInterface
      *
      * If $domain is null, it returns all messages.
      */
-    public function all(string $domain = null): array;
+    public function all(?string $domain = null): array;
 
     /**
      * Sets a message translation.

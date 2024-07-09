@@ -28,16 +28,14 @@ final class ScalewayApiTransport extends AbstractApiTransport
 {
     private const HOST = 'api.scaleway.com';
 
-    private string $projectId;
-    private string $token;
-    private ?string $region;
-
-    public function __construct(string $projectId, string $token, string $region = null, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null, LoggerInterface $logger = null)
-    {
-        $this->projectId = $projectId;
-        $this->token = $token;
-        $this->region = $region;
-
+    public function __construct(
+        private string $projectId,
+        #[\SensitiveParameter] private string $token,
+        private ?string $region = null,
+        ?HttpClientInterface $client = null,
+        ?EventDispatcherInterface $dispatcher = null,
+        ?LoggerInterface $logger = null,
+    ) {
         parent::__construct($client, $dispatcher, $logger);
     }
 
@@ -45,13 +43,13 @@ final class ScalewayApiTransport extends AbstractApiTransport
     {
         $region = $this->region ? '?region='.$this->region : '';
 
-        return sprintf('scaleway+api://%s@%s%s', $this->getEndpoint(), $this->projectId, $region);
+        return \sprintf('scaleway+api://%s@%s%s', $this->getEndpoint(), $this->projectId, $region);
     }
 
     protected function doSendApi(SentMessage $sentMessage, Email $email, Envelope $envelope): ResponseInterface
     {
         $region = $this->region ?? 'fr-par';
-        $path = sprintf('/transactional-email/v1alpha1/regions/%s/emails', $region);
+        $path = \sprintf('/transactional-email/v1alpha1/regions/%s/emails', $region);
 
         $response = $this->client->request('POST', 'https://'.$this->getEndpoint().$path, [
             'json' => $this->getPayload($email, $envelope),
@@ -64,13 +62,13 @@ final class ScalewayApiTransport extends AbstractApiTransport
             $statusCode = $response->getStatusCode();
             $result = $response->toArray(false);
         } catch (DecodingExceptionInterface $e) {
-            throw new HttpTransportException('Unable to send an email: '.$response->getContent(false).sprintf(' (code %d).', $statusCode), $response);
+            throw new HttpTransportException('Unable to send an email: '.$response->getContent(false).\sprintf(' (code %d).', $statusCode), $response);
         } catch (TransportExceptionInterface $e) {
             throw new HttpTransportException('Could not reach the remote Scaleway server.', $response, 0, $e);
         }
 
         if (200 !== $statusCode) {
-            throw new HttpTransportException('Unable to send an email: '.$result['message'].sprintf(' (code %d).', $statusCode), $response);
+            throw new HttpTransportException('Unable to send an email: '.$result['message'].\sprintf(' (code %d).', $statusCode), $response);
         }
 
         $sentMessage->setMessageId($result['emails'][0]['message_id']);
@@ -99,7 +97,10 @@ final class ScalewayApiTransport extends AbstractApiTransport
             $payload['html'] = $email->getHtmlBody();
         }
         if ($attachements = $this->prepareAttachments($email)) {
-            $payload['attachment'] = $attachements;
+            $payload['attachments'] = $attachements;
+        }
+        if ($headers = $this->getCustomHeaders($email)) {
+            $payload['additional_headers'] = $headers;
         }
 
         return $payload;
@@ -115,11 +116,29 @@ final class ScalewayApiTransport extends AbstractApiTransport
             $attachments[] = [
                 'name' => $filename,
                 'type' => $headers->get('Content-Type')->getBody(),
-                'content' => base64_encode($attachment->bodyToString()),
+                'content' => str_replace("\r\n", '', $attachment->bodyToString()),
             ];
         }
 
         return $attachments;
+    }
+
+    private function getCustomHeaders(Email $email): array
+    {
+        $headers = [];
+        $headersToBypass = ['from', 'to', 'cc', 'bcc', 'subject', 'content-type', 'sender'];
+        foreach ($email->getHeaders()->all() as $name => $header) {
+            if (\in_array($name, $headersToBypass, true)) {
+                continue;
+            }
+
+            $headers[] = [
+                'key' => $header->getName(),
+                'value' => $header->getBodyAsString(),
+            ];
+        }
+
+        return $headers;
     }
 
     private function formatAddress(Address $address): array

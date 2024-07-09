@@ -98,7 +98,7 @@ class ConcreteToken extends AbstractToken
 {
     private string $credentials = 'credentials_value';
 
-    public function __construct(array $roles = [], UserInterface $user = null)
+    public function __construct(array $roles = [], ?UserInterface $user = null)
     {
         parent::__construct($roles);
 

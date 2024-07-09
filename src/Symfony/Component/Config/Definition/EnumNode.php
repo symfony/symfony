@@ -22,7 +22,7 @@ class EnumNode extends ScalarNode
 {
     private array $values;
 
-    public function __construct(?string $name, NodeInterface $parent = null, array $values = [], string $pathSeparator = BaseNode::DEFAULT_PATH_SEPARATOR)
+    public function __construct(?string $name, ?NodeInterface $parent = null, array $values = [], string $pathSeparator = BaseNode::DEFAULT_PATH_SEPARATOR)
     {
         if (!$values) {
             throw new \InvalidArgumentException('$values must contain at least one element.');
@@ -34,11 +34,11 @@ class EnumNode extends ScalarNode
             }
 
             if (!$value instanceof \UnitEnum) {
-                throw new \InvalidArgumentException(sprintf('"%s" only supports scalar, enum, or null values, "%s" given.', __CLASS__, get_debug_type($value)));
+                throw new \InvalidArgumentException(\sprintf('"%s" only supports scalar, enum, or null values, "%s" given.', __CLASS__, get_debug_type($value)));
             }
 
             if ($value::class !== ($enumClass ??= $value::class)) {
-                throw new \InvalidArgumentException(sprintf('"%s" only supports one type of enum, "%s" and "%s" passed.', __CLASS__, $enumClass, $value::class));
+                throw new \InvalidArgumentException(\sprintf('"%s" only supports one type of enum, "%s" and "%s" passed.', __CLASS__, $enumClass, $value::class));
             }
         }
 
@@ -79,7 +79,7 @@ class EnumNode extends ScalarNode
         $value = parent::finalizeValue($value);
 
         if (!\in_array($value, $this->values, true)) {
-            $ex = new InvalidConfigurationException(sprintf('The value %s is not allowed for path "%s". Permissible values: %s', json_encode($value), $this->getPath(), $this->getPermissibleValues(', ')));
+            $ex = new InvalidConfigurationException(\sprintf('The value %s is not allowed for path "%s". Permissible values: %s', json_encode($value), $this->getPath(), $this->getPermissibleValues(', ')));
             $ex->setPath($this->getPath());
 
             throw $ex;

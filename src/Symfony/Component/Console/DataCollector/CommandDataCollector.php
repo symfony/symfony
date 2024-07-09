@@ -27,7 +27,7 @@ use Symfony\Component\VarDumper\Cloner\Data;
  */
 final class CommandDataCollector extends DataCollector
 {
-    public function collect(Request $request, Response $response, \Throwable $exception = null): void
+    public function collect(Request $request, Response $response, ?\Throwable $exception = null): void
     {
         if (!$request instanceof CliRequest) {
             return;
@@ -118,7 +118,7 @@ final class CommandDataCollector extends DataCollector
     public function getInterruptedBySignal(): ?string
     {
         if (isset($this->data['interrupted_by_signal'])) {
-            return sprintf('%s (%d)', SignalMap::getSignalName($this->data['interrupted_by_signal']), $this->data['interrupted_by_signal']);
+            return \sprintf('%s (%d)', SignalMap::getSignalName($this->data['interrupted_by_signal']), $this->data['interrupted_by_signal']);
         }
 
         return null;
@@ -204,7 +204,7 @@ final class CommandDataCollector extends DataCollector
     public function getSignalable(): array
     {
         return array_map(
-            static fn (int $signal): string => sprintf('%s (%d)', SignalMap::getSignalName($signal), $signal),
+            static fn (int $signal): string => \sprintf('%s (%d)', SignalMap::getSignalName($signal), $signal),
             $this->data['signalable']
         );
     }
@@ -212,7 +212,7 @@ final class CommandDataCollector extends DataCollector
     public function getHandledSignals(): array
     {
         $keys = array_map(
-            static fn (int $signal): string => sprintf('%s (%d)', SignalMap::getSignalName($signal), $signal),
+            static fn (int $signal): string => \sprintf('%s (%d)', SignalMap::getSignalName($signal), $signal),
             array_keys($this->data['handled_signals'])
         );
 

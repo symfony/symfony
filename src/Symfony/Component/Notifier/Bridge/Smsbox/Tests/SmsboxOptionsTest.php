@@ -137,7 +137,7 @@ class SmsboxOptionsTest extends TestCase
     public function testMaxPartIsInvalid(int $maxPart)
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage(sprintf('The "max_parts" option must be an integer between 1 and 8, got "%d".', $maxPart));
+        $this->expectExceptionMessage(\sprintf('The "max_parts" option must be an integer between 1 and 8, got "%d".', $maxPart));
 
         (new SmsboxOptions())
             ->maxParts($maxPart);
@@ -150,7 +150,7 @@ class SmsboxOptionsTest extends TestCase
     public function testValidityIsInvalid(int $validity)
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage(sprintf('The "validity" option must be an integer between 5 and 1440, got "%d".', $validity));
+        $this->expectExceptionMessage(\sprintf('The "validity" option must be an integer between 5 and 1440, got "%d".', $validity));
 
         (new SmsboxOptions())
             ->validity($validity);

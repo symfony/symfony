@@ -35,7 +35,6 @@ class ChainAdapter implements AdapterInterface, CacheInterface, PruneableInterfa
 
     private array $adapters = [];
     private int $adapterCount;
-    private int $defaultLifetime;
 
     private static \Closure $syncItem;
 
@@ -43,15 +42,17 @@ class ChainAdapter implements AdapterInterface, CacheInterface, PruneableInterfa
      * @param CacheItemPoolInterface[] $adapters        The ordered list of adapters used to fetch cached items
      * @param int                      $defaultLifetime The default lifetime of items propagated from lower adapters to upper ones
      */
-    public function __construct(array $adapters, int $defaultLifetime = 0)
-    {
+    public function __construct(
+        array $adapters,
+        private int $defaultLifetime = 0,
+    ) {
         if (!$adapters) {
             throw new InvalidArgumentException('At least one adapter must be specified.');
         }
 
         foreach ($adapters as $adapter) {
             if (!$adapter instanceof CacheItemPoolInterface) {
-                throw new InvalidArgumentException(sprintf('The class "%s" does not implement the "%s" interface.', get_debug_type($adapter), CacheItemPoolInterface::class));
+                throw new InvalidArgumentException(\sprintf('The class "%s" does not implement the "%s" interface.', get_debug_type($adapter), CacheItemPoolInterface::class));
             }
             if ('cli' === \PHP_SAPI && $adapter instanceof ApcuAdapter && !filter_var(\ini_get('apc.enable_cli'), \FILTER_VALIDATE_BOOL)) {
                 continue; // skip putting APCu in the chain when the backend is disabled
@@ -64,7 +65,6 @@ class ChainAdapter implements AdapterInterface, CacheInterface, PruneableInterfa
             }
         }
         $this->adapterCount = \count($this->adapters);
-        $this->defaultLifetime = $defaultLifetime;
 
         self::$syncItem ??= \Closure::bind(
             static function ($sourceItem, $item, $defaultLifetime, $sourceMetadata = null) {
@@ -76,7 +76,7 @@ class ChainAdapter implements AdapterInterface, CacheInterface, PruneableInterfa
                 $item->metadata = $item->newMetadata = $sourceItem->metadata = $sourceMetadata;
 
                 if (isset($item->metadata[CacheItem::METADATA_EXPIRY])) {
-                    $item->expiresAt(\DateTimeImmutable::createFromFormat('U.u', sprintf('%.6F', $item->metadata[CacheItem::METADATA_EXPIRY])));
+                    $item->expiresAt(\DateTimeImmutable::createFromFormat('U.u', \sprintf('%.6F', $item->metadata[CacheItem::METADATA_EXPIRY])));
                 } elseif (0 < $defaultLifetime) {
                     $item->expiresAfter($defaultLifetime);
                 }
@@ -88,7 +88,7 @@ class ChainAdapter implements AdapterInterface, CacheInterface, PruneableInterfa
         );
     }
 
-    public function get(string $key, callable $callback, float $beta = null, array &$metadata = null): mixed
+    public function get(string $key, callable $callback, ?float $beta = null, ?array &$metadata = null): mixed
     {
         $doSave = true;
         $callback = static function (CacheItem $item, bool &$save) use ($callback, &$doSave) {
@@ -98,7 +98,7 @@ class ChainAdapter implements AdapterInterface, CacheInterface, PruneableInterfa
             return $value;
         };
 
-        $wrap = function (CacheItem $item = null, bool &$save = true) use ($key, $callback, $beta, &$wrap, &$doSave, &$metadata) {
+        $wrap = function (?CacheItem $item = null, bool &$save = true) use ($key, $callback, $beta, &$wrap, &$doSave, &$metadata) {
             static $lastItem;
             static $i = 0;
             $adapter = $this->adapters[$i];

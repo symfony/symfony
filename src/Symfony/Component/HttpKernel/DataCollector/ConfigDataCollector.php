@@ -35,7 +35,7 @@ class ConfigDataCollector extends DataCollector implements LateDataCollectorInte
         $this->kernel = $kernel;
     }
 
-    public function collect(Request $request, Response $response, \Throwable $exception = null): void
+    public function collect(Request $request, Response $response, ?\Throwable $exception = null): void
     {
         $eom = \DateTimeImmutable::createFromFormat('d/m/Y', '01/'.Kernel::END_OF_MAINTENANCE);
         $eol = \DateTimeImmutable::createFromFormat('d/m/Y', '01/'.Kernel::END_OF_LIFE);
@@ -43,7 +43,7 @@ class ConfigDataCollector extends DataCollector implements LateDataCollectorInte
         $this->data = [
             'token' => $response->headers->get('X-Debug-Token'),
             'symfony_version' => Kernel::VERSION,
-            'symfony_minor_version' => sprintf('%s.%s', Kernel::MAJOR_VERSION, Kernel::MINOR_VERSION),
+            'symfony_minor_version' => \sprintf('%s.%s', Kernel::MAJOR_VERSION, Kernel::MINOR_VERSION),
             'symfony_lts' => 4 === Kernel::MINOR_VERSION,
             'symfony_state' => $this->determineSymfonyState(),
             'symfony_eom' => $eom->format('F Y'),

@@ -14,14 +14,14 @@ class ClassWithAnnotatedParameters
     /**
      * @param string $bar parameter not implemented yet
      */
-    public function barMethod(/* string $bar = null */)
+    public function barMethod(/* ?string $bar = null */)
     {
     }
 
     /**
      * @param Quz $quz parameter not implemented yet
      */
-    public function quzMethod(/* Quz $quz = null */)
+    public function quzMethod(/* ?Quz $quz = null */)
     {
     }
 

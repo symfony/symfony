@@ -12,14 +12,19 @@
 namespace Symfony\Component\VarExporter\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactory;
+use Symfony\Component\Serializer\Mapping\Loader\AttributeLoader;
+use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\VarExporter\ProxyHelper;
 use Symfony\Component\VarExporter\Tests\Fixtures\LazyGhost\ChildMagicClass;
 use Symfony\Component\VarExporter\Tests\Fixtures\LazyGhost\ChildStdClass;
 use Symfony\Component\VarExporter\Tests\Fixtures\LazyGhost\ChildTestClass;
+use Symfony\Component\VarExporter\Tests\Fixtures\LazyGhost\ClassWithUninitializedObjectProperty;
 use Symfony\Component\VarExporter\Tests\Fixtures\LazyGhost\LazyClass;
 use Symfony\Component\VarExporter\Tests\Fixtures\LazyGhost\MagicClass;
 use Symfony\Component\VarExporter\Tests\Fixtures\LazyGhost\ReadOnlyClass;
 use Symfony\Component\VarExporter\Tests\Fixtures\LazyGhost\TestClass;
+use Symfony\Component\VarExporter\Tests\Fixtures\SimpleObject;
 
 class LazyGhostTraitTest extends TestCase
 {
@@ -240,6 +245,41 @@ class LazyGhostTraitTest extends TestCase
         $this->assertSame(123, $proxy->foo);
     }
 
+    public function testAccessingUninializedPropertyWithoutLazyGhost()
+    {
+        $object = new ClassWithUninitializedObjectProperty();
+
+        $this->expectException(\Error::class);
+        $this->expectExceptionCode(0);
+        $this->expectExceptionMessage('Typed property Symfony\Component\VarExporter\Tests\Fixtures\LazyGhost\ClassWithUninitializedObjectProperty::$property must not be accessed before initialization');
+
+        $object->property;
+    }
+
+    public function testAccessingUninializedPropertyWithLazyGhost()
+    {
+        $object = $this->createLazyGhost(ClassWithUninitializedObjectProperty::class, function ($instance) {});
+
+        $this->expectException(\Error::class);
+        $this->expectExceptionCode(0);
+        $this->expectExceptionMessage('Typed property Symfony\Component\VarExporter\Tests\Fixtures\LazyGhost\ClassWithUninitializedObjectProperty::$property must not be accessed before initialization');
+
+        $object->property;
+    }
+
+    public function testNormalization()
+    {
+        $object = $this->createLazyGhost(SimpleObject::class, function ($instance) {});
+
+        $loader = new AttributeLoader();
+        $metadataFactory = new ClassMetadataFactory($loader);
+        $serializer = new ObjectNormalizer($metadataFactory);
+
+        $output = $serializer->normalize($object);
+
+        $this->assertSame(['property' => 'property', 'method' => 'method'], $output);
+    }
+
     /**
      * @template T
      *
@@ -247,7 +287,7 @@ class LazyGhostTraitTest extends TestCase
      *
      * @return T
      */
-    private function createLazyGhost(string $class, \Closure $initializer, array $skippedProperties = null): object
+    private function createLazyGhost(string $class, \Closure $initializer, ?array $skippedProperties = null): object
     {
         $r = new \ReflectionClass($class);
 

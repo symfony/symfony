@@ -20,17 +20,15 @@ namespace Symfony\Component\Config\Builder;
  */
 class Property
 {
-    private string $name;
-    private string $originalName;
     private bool $array = false;
     private bool $scalarsAllowed = false;
     private ?string $type = null;
     private ?string $content = null;
 
-    public function __construct(string $originalName, string $name)
-    {
-        $this->name = $name;
-        $this->originalName = $originalName;
+    public function __construct(
+        private string $originalName,
+        private string $name,
+    ) {
     }
 
     public function getName(): string

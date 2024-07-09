@@ -16,6 +16,7 @@ use Symfony\Component\AssetMapper\Exception\CircularAssetsException;
 use Symfony\Component\AssetMapper\Exception\RuntimeException;
 use Symfony\Component\AssetMapper\MappedAsset;
 use Symfony\Component\AssetMapper\Path\PublicAssetsPathResolverInterface;
+use Symfony\Component\Filesystem\Filesystem;
 
 /**
  * Creates MappedAsset objects by reading their contents & passing it through compilers.
@@ -37,7 +38,7 @@ class MappedAssetFactory implements MappedAssetFactoryInterface
     public function createMappedAsset(string $logicalPath, string $sourcePath): ?MappedAsset
     {
         if (isset($this->assetsBeingCreated[$logicalPath])) {
-            throw new CircularAssetsException($this->assetsCache[$logicalPath], sprintf('Circular reference detected while creating asset for "%s": "%s".', $logicalPath, implode(' -> ', $this->assetsBeingCreated).' -> '.$logicalPath));
+            throw new CircularAssetsException($this->assetsCache[$logicalPath], \sprintf('Circular reference detected while creating asset for "%s": "%s".', $logicalPath, implode(' -> ', $this->assetsBeingCreated).' -> '.$logicalPath));
         }
         $this->assetsBeingCreated[$logicalPath] = $logicalPath;
 
@@ -97,14 +98,14 @@ class MappedAssetFactory implements MappedAssetFactoryInterface
     private function compileContent(MappedAsset $asset): ?string
     {
         if (!is_file($asset->sourcePath)) {
-            throw new RuntimeException(sprintf('Asset source path "%s" could not be found.', $asset->sourcePath));
+            throw new RuntimeException(\sprintf('Asset source path "%s" could not be found.', $asset->sourcePath));
         }
 
         if (!$this->compiler->supports($asset)) {
             return null;
         }
 
-        $content = file_get_contents($asset->sourcePath);
+        $content = (new Filesystem())->readFile($asset->sourcePath);
         $compiled = $this->compiler->compile($content, $asset);
 
         return $compiled !== $content ? $compiled : null;

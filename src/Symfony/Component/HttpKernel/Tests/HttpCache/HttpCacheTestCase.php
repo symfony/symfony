@@ -146,7 +146,7 @@ abstract class HttpCacheTestCase extends TestCase
     }
 
     // A basic response with 200 status code and a tiny body.
-    public function setNextResponse($statusCode = 200, array $headers = [], $body = 'Hello World', \Closure $customizer = null, EventDispatcher $eventDispatcher = null)
+    public function setNextResponse($statusCode = 200, array $headers = [], $body = 'Hello World', ?\Closure $customizer = null, ?EventDispatcher $eventDispatcher = null)
     {
         $this->kernel = new TestHttpKernel($body, $statusCode, $headers, $customizer, $eventDispatcher);
     }

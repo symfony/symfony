@@ -25,8 +25,6 @@ abstract class AbstractRendererEngine implements FormRendererEngineInterface, Re
      */
     public const CACHE_KEY_VAR = 'cache_key';
 
-    protected array $defaultThemes;
-
     /**
      * @var array[]
      */
@@ -53,9 +51,9 @@ abstract class AbstractRendererEngine implements FormRendererEngineInterface, Re
      * @param array $defaultThemes The default themes. The type of these
      *                             themes is open to the implementation.
      */
-    public function __construct(array $defaultThemes = [])
-    {
-        $this->defaultThemes = $defaultThemes;
+    public function __construct(
+        protected array $defaultThemes = [],
+    ) {
     }
 
     public function setTheme(FormView $view, mixed $themes, bool $useDefaultThemes = true): void

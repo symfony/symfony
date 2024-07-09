@@ -38,7 +38,7 @@ class LocalPublicAssetsFilesystemTest extends TestCase
         $filesystem = new LocalPublicAssetsFilesystem(self::$writableRoot);
         $filesystem->write('foo/bar.js', 'foobar');
         $this->assertFileExists(self::$writableRoot.'/foo/bar.js');
-        $this->assertSame('foobar', file_get_contents(self::$writableRoot.'/foo/bar.js'));
+        $this->assertSame('foobar', $this->filesystem->readFile(self::$writableRoot.'/foo/bar.js'));
 
         // with a directory
         $filesystem->write('foo/baz/bar.js', 'foobar');
@@ -50,6 +50,6 @@ class LocalPublicAssetsFilesystemTest extends TestCase
         $filesystem = new LocalPublicAssetsFilesystem(self::$writableRoot);
         $filesystem->copy(__DIR__.'/../Fixtures/importmaps/assets/pizza/index.js', 'foo/bar.js');
         $this->assertFileExists(self::$writableRoot.'/foo/bar.js');
-        $this->assertSame("console.log('pizza/index.js');", trim(file_get_contents(self::$writableRoot.'/foo/bar.js')));
+        $this->assertSame("console.log('pizza/index.js');", trim($this->filesystem->readFile(self::$writableRoot.'/foo/bar.js')));
     }
 }

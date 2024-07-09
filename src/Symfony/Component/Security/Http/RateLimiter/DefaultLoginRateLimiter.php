@@ -27,22 +27,17 @@ use Symfony\Component\Security\Http\SecurityRequestAttributes;
  */
 final class DefaultLoginRateLimiter extends AbstractRequestRateLimiter
 {
-    private RateLimiterFactory $globalFactory;
-    private RateLimiterFactory $localFactory;
-    private string $secret;
-
     /**
      * @param non-empty-string $secret A secret to use for hashing the IP address and username
      */
-    public function __construct(RateLimiterFactory $globalFactory, RateLimiterFactory $localFactory, #[\SensitiveParameter] string $secret)
-    {
+    public function __construct(
+        private RateLimiterFactory $globalFactory,
+        private RateLimiterFactory $localFactory,
+        #[\SensitiveParameter] private string $secret,
+    ) {
         if (!$secret) {
             throw new InvalidArgumentException('A non-empty secret is required.');
         }
-
-        $this->globalFactory = $globalFactory;
-        $this->localFactory = $localFactory;
-        $this->secret = $secret;
     }
 
     protected function getLimiters(Request $request): array

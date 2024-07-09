@@ -62,7 +62,7 @@ class Connection extends AbstractConnection
     /**
      * @param string $password WARNING: When the LDAP server allows unauthenticated binds, a blank $password will always be valid
      */
-    public function bind(string $dn = null, #[\SensitiveParameter] string $password = null): void
+    public function bind(?string $dn = null, #[\SensitiveParameter] ?string $password = null): void
     {
         if (!$this->connection) {
             $this->connect();
@@ -78,7 +78,8 @@ class Connection extends AbstractConnection
                 case self::LDAP_ALREADY_EXISTS:
                     throw new AlreadyExistsException($error);
             }
-            throw new ConnectionException($error);
+            ldap_get_option($this->connection, LDAP_OPT_DIAGNOSTIC_MESSAGE, $diagnostic_message);
+            throw new ConnectionException($error.' '.$diagnostic_message);
         }
 
         $this->bound = true;
@@ -95,14 +96,14 @@ class Connection extends AbstractConnection
     public function setOption(string $name, array|string|int|bool $value): void
     {
         if (!@ldap_set_option($this->connection, ConnectionOptions::getOption($name), $value)) {
-            throw new LdapException(sprintf('Could not set value "%s" for option "%s".', $value, $name));
+            throw new LdapException(\sprintf('Could not set value "%s" for option "%s".', $value, $name));
         }
     }
 
     public function getOption(string $name): array|string|int|null
     {
         if (!@ldap_get_option($this->connection, ConnectionOptions::getOption($name), $ret)) {
-            throw new LdapException(sprintf('Could not retrieve value for option "%s".', $name));
+            throw new LdapException(\sprintf('Could not retrieve value for option "%s".', $name));
         }
 
         return $ret;

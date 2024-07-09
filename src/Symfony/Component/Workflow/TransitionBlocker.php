@@ -20,21 +20,17 @@ final class TransitionBlocker
     public const BLOCKED_BY_EXPRESSION_GUARD_LISTENER = '326a1e9c-0c12-11e8-ba89-0ed5f89f718b';
     public const UNKNOWN = 'e8b5bbb9-5913-4b98-bfa6-65dbd228a82a';
 
-    private string $message;
-    private string $code;
-    private array $parameters;
-
     /**
      * @param string $code       Code is a machine-readable string, usually an UUID
      * @param array  $parameters This is useful if you would like to pass around the condition values, that
      *                           blocked the transition. E.g. for a condition "distance must be larger than
      *                           5 miles", you might want to pass around the value of 5.
      */
-    public function __construct(string $message, string $code, array $parameters = [])
-    {
-        $this->message = $message;
-        $this->code = $code;
-        $this->parameters = $parameters;
+    public function __construct(
+        private string $message,
+        private string $code,
+        private array $parameters = [],
+    ) {
     }
 
     /**
@@ -67,7 +63,7 @@ final class TransitionBlocker
      * Creates a blocker that says the transition cannot be made because of an
      * unknown reason.
      */
-    public static function createUnknown(string $message = null, int $backtraceFrame = 2): self
+    public static function createUnknown(?string $message = null, int $backtraceFrame = 2): self
     {
         if (null !== $message) {
             return new static($message, self::UNKNOWN);

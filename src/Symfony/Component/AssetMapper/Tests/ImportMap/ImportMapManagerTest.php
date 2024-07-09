@@ -81,14 +81,14 @@ class ImportMapManagerTest extends TestCase
                     return '/path/to/assets/some_file.js';
                 }
 
-                throw new \Exception(sprintf('Unexpected path "%s"', $path));
+                throw new \Exception(\sprintf('Unexpected path "%s"', $path));
             });
         $this->configReader->expects($this->any())
             ->method('convertFilesystemPathToPath')
             ->willReturnCallback(function ($path) {
                 return match ($path) {
                     '/path/to/assets/some_file.js' => './assets/some_file.js',
-                    default => throw new \Exception(sprintf('Unexpected path "%s"', $path)),
+                    default => throw new \Exception(\sprintf('Unexpected path "%s"', $path)),
                 };
             });
         $this->configReader->expects($this->once())
@@ -201,15 +201,15 @@ class ImportMapManagerTest extends TestCase
         ];
 
         yield 'single_package_with_a_path' => [
-        'packages' => [new PackageRequireOptions('some/module', path: self::$writableRoot.'/assets/some_file.js')],
-        'expectedProviderPackageArgumentCount' => 0,
-        'resolvedPackages' => [],
-        'expectedImportMap' => [
-            'some/module' => [
-                // converted to relative path
-                'path' => './assets/some_file.js',
+            'packages' => [new PackageRequireOptions('some/module', path: self::$writableRoot.'/assets/some_file.js')],
+            'expectedProviderPackageArgumentCount' => 0,
+            'resolvedPackages' => [],
+            'expectedImportMap' => [
+                'some/module' => [
+                    // converted to relative path
+                    'path' => './assets/some_file.js',
+                ],
             ],
-        ],
         ];
     }
 
@@ -425,7 +425,7 @@ class ImportMapManagerTest extends TestCase
         return ImportMapEntry::createLocal($importName, $type, path: $path, isEntrypoint: $isEntrypoint);
     }
 
-    private static function createRemoteEntry(string $importName, string $version, string $path = null, ImportMapType $type = ImportMapType::JS, string $packageSpecifier = null): ImportMapEntry
+    private static function createRemoteEntry(string $importName, string $version, ?string $path = null, ImportMapType $type = ImportMapType::JS, ?string $packageSpecifier = null): ImportMapEntry
     {
         $packageSpecifier = $packageSpecifier ?? $importName;
         $path = $path ?? '/vendor/any-path.js';

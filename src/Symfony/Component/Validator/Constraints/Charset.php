@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Validator\Constraints;
 
+use Symfony\Component\Validator\Attribute\HasNamedArguments;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 
@@ -26,18 +27,17 @@ final class Charset extends Constraint
         self::BAD_ENCODING_ERROR => 'BAD_ENCODING_ERROR',
     ];
 
-    public array|string $encodings = [];
-    public string $message = 'The detected character encoding is invalid ({{ detected }}). Allowed encodings are {{ encodings }}.';
-
-    public function __construct(array|string $encodings = null, string $message = null, array $groups = null, mixed $payload = null, array $options = null)
-    {
-        parent::__construct($options, $groups, $payload);
-
-        $this->message = $message ?? $this->message;
-        $this->encodings = (array) ($encodings ?? $this->encodings);
+    #[HasNamedArguments]
+    public function __construct(
+        public array|string $encodings = [],
+        public string $message = 'The detected character encoding is invalid ({{ detected }}). Allowed encodings are {{ encodings }}.',
+        ?array $groups = null,
+        mixed $payload = null,
+    ) {
+        parent::__construct(null, $groups, $payload);
 
         if ([] === $this->encodings) {
-            throw new ConstraintDefinitionException(sprintf('The "%s" constraint requires at least one encoding.', static::class));
+            throw new ConstraintDefinitionException(\sprintf('The "%s" constraint requires at least one encoding.', static::class));
         }
     }
 }

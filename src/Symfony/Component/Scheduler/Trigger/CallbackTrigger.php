@@ -19,7 +19,7 @@ final class CallbackTrigger implements TriggerInterface
     private \Closure $callback;
     private string $description;
 
-    public function __construct(callable $callback, string $description = null)
+    public function __construct(callable $callback, ?string $description = null)
     {
         $this->callback = $callback(...);
         $this->description = $description ?? spl_object_hash($this->callback);

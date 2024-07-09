@@ -256,14 +256,14 @@ class ChainUserProviderTest extends TestCase
     {
         $user = new InMemoryUser('user', 'pwd');
 
-        $provider1 = $this->getMockForAbstractClass(MigratingProvider::class);
+        $provider1 = $this->createMock(MigratingProvider::class);
         $provider1
             ->expects($this->once())
             ->method('upgradePassword')
             ->willThrowException(new UnsupportedUserException('unsupported'))
         ;
 
-        $provider2 = $this->getMockForAbstractClass(MigratingProvider::class);
+        $provider2 = $this->createMock(MigratingProvider::class);
         $provider2
             ->expects($this->once())
             ->method('upgradePassword')

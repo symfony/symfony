@@ -51,17 +51,15 @@ class PlantUmlDumper implements DumperInterface
         ],
     ];
 
-    private string $transitionType = self::STATEMACHINE_TRANSITION;
-
-    public function __construct(string $transitionType)
-    {
+    public function __construct(
+        private string $transitionType,
+    ) {
         if (!\in_array($transitionType, self::TRANSITION_TYPES, true)) {
             throw new \InvalidArgumentException("Transition type '$transitionType' does not exist.");
         }
-        $this->transitionType = $transitionType;
     }
 
-    public function dump(Definition $definition, Marking $marking = null, array $options = []): string
+    public function dump(Definition $definition, ?Marking $marking = null, array $options = []): string
     {
         $options = array_replace_recursive(self::DEFAULT_OPTIONS, $options);
 
@@ -191,7 +189,7 @@ class PlantUmlDumper implements DumperInterface
         return '"'.str_replace('"', '', $string).'"';
     }
 
-    private function getState(string $place, Definition $definition, Marking $marking = null): string
+    private function getState(string $place, Definition $definition, ?Marking $marking = null): string
     {
         $workflowMetadata = $definition->getMetadataStore();
 
@@ -228,9 +226,9 @@ class PlantUmlDumper implements DumperInterface
         if (null !== $color) {
             // Close and open <font> before and after every '\n' string,
             // so that the style is applied properly on every line
-            $to = str_replace('\n', sprintf('</font>\n<font color=%1$s>', $color), $to);
+            $to = str_replace('\n', \sprintf('</font>\n<font color=%1$s>', $color), $to);
 
-            $to = sprintf(
+            $to = \sprintf(
                 '<font color=%1$s>%2$s</font>',
                 $color,
                 $to
@@ -247,7 +245,7 @@ class PlantUmlDumper implements DumperInterface
             $color = '#'.$color;
         }
 
-        return sprintf('[%s]', $color);
+        return \sprintf('[%s]', $color);
     }
 
     private function getColorId(string $color): string

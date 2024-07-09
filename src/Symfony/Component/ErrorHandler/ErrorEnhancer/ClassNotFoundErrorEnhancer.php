@@ -34,11 +34,11 @@ class ClassNotFoundErrorEnhancer implements ErrorEnhancerInterface
         if (false !== $namespaceSeparatorIndex = strrpos($fullyQualifiedClassName, '\\')) {
             $className = substr($fullyQualifiedClassName, $namespaceSeparatorIndex + 1);
             $namespacePrefix = substr($fullyQualifiedClassName, 0, $namespaceSeparatorIndex);
-            $message = sprintf('Attempted to load %s "%s" from namespace "%s".', $typeName, $className, $namespacePrefix);
+            $message = \sprintf('Attempted to load %s "%s" from namespace "%s".', $typeName, $className, $namespacePrefix);
             $tail = ' for another namespace?';
         } else {
             $className = $fullyQualifiedClassName;
-            $message = sprintf('Attempted to load %s "%s" from the global namespace.', $typeName, $className);
+            $message = \sprintf('Attempted to load %s "%s" from the global namespace.', $typeName, $className);
             $tail = '?';
         }
 
@@ -107,7 +107,8 @@ class ClassNotFoundErrorEnhancer implements ErrorEnhancerInterface
 
     private function findClassInPath(string $path, string $class, string $prefix): array
     {
-        if (!$path = realpath($path.'/'.strtr($prefix, '\\_', '//')) ?: realpath($path.'/'.\dirname(strtr($prefix, '\\_', '//'))) ?: realpath($path)) {
+        $path = realpath($path.'/'.strtr($prefix, '\\_', '//')) ?: realpath($path.'/'.\dirname(strtr($prefix, '\\_', '//'))) ?: realpath($path);
+        if (!$path || !is_dir($path)) {
             return [];
         }
 

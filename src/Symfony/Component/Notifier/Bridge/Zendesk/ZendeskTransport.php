@@ -26,20 +26,18 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
  */
 final class ZendeskTransport extends AbstractTransport
 {
-    private string $email;
-    private string $token;
-
-    public function __construct(string $email, #[\SensitiveParameter] string $token, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
-    {
+    public function __construct(
+        private string $email,
+        #[\SensitiveParameter] private string $token,
+        ?HttpClientInterface $client = null,
+        ?EventDispatcherInterface $dispatcher = null,
+    ) {
         parent::__construct($client, $dispatcher);
-
-        $this->email = $email;
-        $this->token = $token;
     }
 
     public function __toString(): string
     {
-        return sprintf('zendesk://%s', $this->getEndpoint());
+        return \sprintf('zendesk://%s', $this->getEndpoint());
     }
 
     public function supports(MessageInterface $message): bool
@@ -47,13 +45,13 @@ final class ZendeskTransport extends AbstractTransport
         return $message instanceof ChatMessage && (null === $message->getOptions() || $message->getOptions() instanceof ZendeskOptions);
     }
 
-    protected function doSend(MessageInterface $message = null): SentMessage
+    protected function doSend(?MessageInterface $message = null): SentMessage
     {
         if (!$message instanceof ChatMessage) {
             throw new UnsupportedMessageTypeException(__CLASS__, ChatMessage::class, $message);
         }
 
-        $endpoint = sprintf('https://%s/api/v2/tickets.json', $this->getEndpoint());
+        $endpoint = \sprintf('https://%s/api/v2/tickets.json', $this->getEndpoint());
 
         $body = [
             'ticket' => [
@@ -88,7 +86,7 @@ final class ZendeskTransport extends AbstractTransport
                 $errorMessage = implode(' | ', array_values($errorMessage));
             }
 
-            throw new TransportException(sprintf('Unable to post the Zendesk message: "%s".', $errorMessage), $response);
+            throw new TransportException(\sprintf('Unable to post the Zendesk message: "%s".', $errorMessage), $response);
         }
 
         return new SentMessage($message, (string) $this);

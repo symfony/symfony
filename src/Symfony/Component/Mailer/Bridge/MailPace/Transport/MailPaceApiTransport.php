@@ -31,18 +31,18 @@ final class MailPaceApiTransport extends AbstractApiTransport
 {
     private const HOST = 'app.mailpace.com/api/v1';
 
-    private string $key;
-
-    public function __construct(string $key, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null, LoggerInterface $logger = null)
-    {
-        $this->key = $key;
-
+    public function __construct(
+        #[\SensitiveParameter] private string $key,
+        ?HttpClientInterface $client = null,
+        ?EventDispatcherInterface $dispatcher = null,
+        ?LoggerInterface $logger = null,
+    ) {
         parent::__construct($client, $dispatcher, $logger);
     }
 
     public function __toString(): string
     {
-        return sprintf('mailpace+api://%s', $this->getEndpoint());
+        return \sprintf('mailpace+api://%s', $this->getEndpoint());
     }
 
     protected function doSendApi(SentMessage $sentMessage, Email $email, Envelope $envelope): ResponseInterface
@@ -61,7 +61,7 @@ final class MailPaceApiTransport extends AbstractApiTransport
             $statusCode = $response->getStatusCode();
             $result = $response->toArray(false);
         } catch (DecodingExceptionInterface $e) {
-            throw new HttpTransportException('Unable to send an email: '.$response->getContent(false).sprintf(' (code %d).', $statusCode), $response, 0, $e);
+            throw new HttpTransportException('Unable to send an email: '.$response->getContent(false).\sprintf(' (code %d).', $statusCode), $response, 0, $e);
         } catch (TransportExceptionInterface $e) {
             throw new HttpTransportException('Could not reach the remote MailPace endpoint.', $response, 0, $e);
         }
@@ -79,7 +79,7 @@ final class MailPaceApiTransport extends AbstractApiTransport
             } else {
                 $errorMessage .= 'unknown error';
             }
-            $errorMessage .= sprintf(' (code %d).', $statusCode);
+            $errorMessage .= \sprintf(' (code %d).', $statusCode);
             throw new HttpTransportException($errorMessage, $response);
         }
 

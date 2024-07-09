@@ -55,10 +55,18 @@ final class DateTimeNormalizerContextBuilder implements ContextBuilderInterface
             try {
                 $timezone = new \DateTimeZone($timezone);
             } catch (\Exception $e) {
-                throw new InvalidArgumentException(sprintf('The "%s" timezone is invalid.', $timezone), previous: $e);
+                throw new InvalidArgumentException(\sprintf('The "%s" timezone is invalid.', $timezone), previous: $e);
             }
         }
 
         return $this->with(DateTimeNormalizer::TIMEZONE_KEY, $timezone);
+    }
+
+    /**
+     * @param 'int'|'float'|null $cast
+     */
+    public function withCast(?string $cast): static
+    {
+        return $this->with(DateTimeNormalizer::CAST_KEY, $cast);
     }
 }

@@ -76,14 +76,6 @@ class LazyObjectRegistry
             }, null, $scope);
         }
 
-        $resetters[] = static function ($instance, $skippedProperties) {
-            foreach ((array) $instance as $name => $value) {
-                if ("\0" !== ($name[0] ?? '') && !\array_key_exists($name, $skippedProperties)) {
-                    unset($instance->$name);
-                }
-            }
-        };
-
         return $resetters;
     }
 

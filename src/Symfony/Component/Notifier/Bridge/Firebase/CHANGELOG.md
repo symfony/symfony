@@ -1,7 +1,7 @@
 CHANGELOG
 =========
 
-7.1
+7.2
 ---
 
 * The legacy api has been replaced with HTTP v1

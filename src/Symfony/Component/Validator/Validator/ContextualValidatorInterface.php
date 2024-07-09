@@ -44,7 +44,7 @@ interface ContextualValidatorInterface
      *
      * @return $this
      */
-    public function validate(mixed $value, Constraint|array $constraints = null, string|GroupSequence|array $groups = null): static;
+    public function validate(mixed $value, Constraint|array|null $constraints = null, string|GroupSequence|array|null $groups = null): static;
 
     /**
      * Validates a property of an object against the constraints specified
@@ -55,7 +55,7 @@ interface ContextualValidatorInterface
      *
      * @return $this
      */
-    public function validateProperty(object $object, string $propertyName, string|GroupSequence|array $groups = null): static;
+    public function validateProperty(object $object, string $propertyName, string|GroupSequence|array|null $groups = null): static;
 
     /**
      * Validates a value against the constraints specified for an object's
@@ -68,7 +68,7 @@ interface ContextualValidatorInterface
      *
      * @return $this
      */
-    public function validatePropertyValue(object|string $objectOrClass, string $propertyName, mixed $value, string|GroupSequence|array $groups = null): static;
+    public function validatePropertyValue(object|string $objectOrClass, string $propertyName, mixed $value, string|GroupSequence|array|null $groups = null): static;
 
     /**
      * Returns the violations that have been generated so far in the context

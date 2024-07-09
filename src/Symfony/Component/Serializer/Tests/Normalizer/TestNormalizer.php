@@ -20,7 +20,7 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
  */
 class TestNormalizer implements NormalizerInterface
 {
-    public function normalize($object, string $format = null, array $context = []): array|string|int|float|bool|\ArrayObject|null
+    public function normalize($object, ?string $format = null, array $context = []): array|string|int|float|bool|\ArrayObject|null
     {
         return null;
     }
@@ -30,7 +30,7 @@ class TestNormalizer implements NormalizerInterface
         return ['*' => false];
     }
 
-    public function supportsNormalization($data, string $format = null, array $context = []): bool
+    public function supportsNormalization($data, ?string $format = null, array $context = []): bool
     {
         return true;
     }

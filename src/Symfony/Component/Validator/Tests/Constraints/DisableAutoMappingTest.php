@@ -26,7 +26,7 @@ class DisableAutoMappingTest extends TestCase
     public function testGroups()
     {
         $this->expectException(ConstraintDefinitionException::class);
-        $this->expectExceptionMessage(sprintf('The option "groups" is not supported by the constraint "%s".', DisableAutoMapping::class));
+        $this->expectExceptionMessage(\sprintf('The option "groups" is not supported by the constraint "%s".', DisableAutoMapping::class));
 
         new DisableAutoMapping(['groups' => 'foo']);
     }

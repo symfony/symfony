@@ -139,7 +139,7 @@ class CommandTest extends TestCase
     public function testInvalidCommandNames($name)
     {
         $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage(sprintf('Command name "%s" is invalid.', $name));
+        $this->expectExceptionMessage(\sprintf('Command name "%s" is invalid.', $name));
 
         (new \TestCommand())->setName($name);
     }

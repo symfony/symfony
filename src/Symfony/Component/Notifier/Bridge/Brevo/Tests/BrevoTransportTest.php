@@ -23,7 +23,7 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
 
 final class BrevoTransportTest extends TransportTestCase
 {
-    public static function createTransport(HttpClientInterface $client = null): BrevoTransport
+    public static function createTransport(?HttpClientInterface $client = null): BrevoTransport
     {
         return (new BrevoTransport('api-key', '0611223344', $client ?? new MockHttpClient()))->setHost('host.test');
     }

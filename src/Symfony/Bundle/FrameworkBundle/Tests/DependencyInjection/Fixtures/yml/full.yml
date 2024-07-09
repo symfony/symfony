@@ -59,6 +59,7 @@ framework:
          max_depth_handler:          my.max.depth.handler
          default_context:
              enable_max_depth: true
+    type_info: ~
     property_info: ~
     ide: file%%link%%format
     request:

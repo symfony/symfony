@@ -278,8 +278,24 @@
                             {% for event in collector.events.events(transport) %}
                                 <tr class="mailer-email-summary-table-row {{ loop.first ? 'active' }}" data-target="#email-{{ loop.index }}">
                                     <td>{{ loop.index }}</td>
-                                    <td>{{ event.message.getSubject() ?? '(No subject)' }}</td>
-                                    <td>{{ event.message.getTo()|map(addr => addr.toString())|join(', ')|default('(empty)') }}</td>
+                                    <td>
+                                        {% if event.message.subject is defined %}
+                                            {{ event.message.getSubject() ?? '(No subject)' }}
+                                        {% elseif event.message.headers.has('subject') %}
+                                            {{ event.message.headers.get('subject').bodyAsString()|default('(No subject)') }}
+                                        {% else %}
+                                            (No subject)
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if event.message.to is defined %}
+                                            {{ event.message.getTo()|map(addr => addr.toString())|join(', ')|default('(empty)') }}
+                                        {% elseif event.message.headers.has('to') %}
+                                            {{ event.message.headers.get('to').bodyAsString()|default('(empty)') }}
+                                        {% else %}
+                                            (empty)
+                                        {% endif %}
+                                    </td>
                                     <td class="visually-hidden"><button class="mailer-email-summary-table-row-button" data-target="#email-{{ loop.index }}">View email details</button></td>
                                 </tr>
                             {% endfor %}
@@ -323,18 +339,42 @@
                     <div class="tab-content">
                         <div class="card-block">
                             <p class="mailer-message-subject">
-                                {{ message.getSubject() ?? '(No subject)' }}
+                                {% if message.subject is defined %}
+                                    {{ message.getSubject() ?? '(No subject)' }}
+                                {% elseif message.headers.has('subject') %}
+                                    {{ message.headers.get('subject').bodyAsString()|default('(No subject)') }}
+                                {% else %}
+                                    (No subject)
+                                {% endif %}
                             </p>
                             <div class="mailer-message-headers">
-                                <p><strong>From:</strong> {{ message.getFrom()|map(addr => addr.toString())|join(', ')|default('(empty)') }}</p>
-                                <p><strong>To:</strong> {{ message.getTo()|map(addr => addr.toString())|join(', ')|default('(empty)') }}</p>
+                                <p>
+                                    <strong>From:</strong>
+                                    {% if message.from is defined %}
+                                        {{ message.getFrom()|map(addr => addr.toString())|join(', ')|default('(empty)') }}
+                                    {% elseif message.headers.has('from') %}
+                                        {{ message.headers.get('from').bodyAsString()|default('(empty)') }}
+                                    {% else %}
+                                        (empty)
+                                    {% endif %}
+                                </p>
+                                <p>
+                                    <strong>To:</strong>
+                                    {% if message.to is defined %}
+                                        {{ message.getTo()|map(addr => addr.toString())|join(', ')|default('(empty)') }}
+                                    {% elseif message.headers.has('to') %}
+                                        {{ message.headers.get('to').bodyAsString()|default('(empty)') }}
+                                    {% else %}
+                                        (empty)
+                                    {% endif %}
+                                </p>
                                 {% for header in message.headers.all|filter(header => (header.name ?? '')|lower not in ['subject', 'from', 'to']) %}
                                     <p class="mailer-message-header-secondary">{{ header.toString }}</p>
                                 {% endfor %}
                             </div>
                         </div>
 
-                        {% if message.attachments %}
+                        {% if message.attachments is defined and message.attachments %}
                             <div class="card-block">
                                 {% set num_of_attachments = message.attachments|length %}
                                 {% set total_attachments_size_in_bytes = message.attachments|reduce((total_size, attachment) => total_size + attachment.body|length, 0) %}
@@ -364,9 +404,10 @@
                         {% endif %}
 
                         <div class="card-block">
-                            {% set textBody = message.textBody %}
-                            {% set htmlBody = message.htmlBody %}
                             <div class="sf-tabs sf-tabs-sm">
+                            {% if message.htmlBody is defined %}
+                                {% set textBody = message.textBody %}
+                                {% set htmlBody = message.htmlBody %}
                                 <div class="tab {{ not textBody ? 'disabled' }} {{ textBody ? 'active' }}">
                                     <h3 class="tab-title">Text content</h3>
                                     <div class="tab-content">
@@ -414,6 +455,23 @@
                                         {% endif %}
                                     </div>
                                 </div>
+                            {% else %}
+                                {% set body = message.body ? message.body.toString() : null %}
+                                <div class="tab {{ not body ? 'disabled' }} {{ body ? 'active' }}">
+                                    <h3 class="tab-title">Content</h3>
+                                    <div class="tab-content">
+                                        {% if body %}
+                                            <pre class="mailer-email-body prewrap" style="max-height: 600px">
+                                                {{- body }}
+                                            </pre>
+                                        {% else %}
+                                            <div class="mailer-empty-email-body">
+                                                <p>The body is empty.</p>
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            {% endif %}
                             </div>
                         </div>
                     </div>

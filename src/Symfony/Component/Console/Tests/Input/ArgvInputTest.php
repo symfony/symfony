@@ -324,6 +324,11 @@ class ArgvInputTest extends TestCase
                 new InputDefinition([new InputArgument('name', InputArgument::REQUIRED)]),
                 'Too many arguments, expected arguments "name".',
             ],
+            [
+                ['cli.php', ['array']],
+                new InputDefinition(),
+                'Argument values expected to be all scalars, got "array".',
+            ],
         ];
     }
 
@@ -561,5 +566,32 @@ class ArgvInputTest extends TestCase
         $input->bind(new InputDefinition([new InputOption('foo', 'f', InputOption::VALUE_OPTIONAL), new InputArgument('name', InputArgument::OPTIONAL)]));
         $this->assertEquals(['foo' => '0'], $input->getOptions(), '->parse() parses optional options with empty value as null');
         $this->assertEquals(['name' => 'bar'], $input->getArguments(), '->parse() parses optional arguments');
+    }
+
+    public function testGetRawTokensFalse()
+    {
+        $input = new ArgvInput(['cli.php', '--foo', 'bar']);
+        $this->assertSame(['--foo', 'bar'], $input->getRawTokens());
+    }
+
+    /**
+     * @dataProvider provideGetRawTokensTrueTests
+     */
+    public function testGetRawTokensTrue(array $argv, array $expected)
+    {
+        $input = new ArgvInput($argv);
+        $this->assertSame($expected, $input->getRawTokens(true));
+    }
+
+    public static function provideGetRawTokensTrueTests(): iterable
+    {
+        yield [['app/console', 'foo:bar'], []];
+        yield [['app/console', 'foo:bar', '--env=prod'], ['--env=prod']];
+        yield [['app/console', 'foo:bar', '--env', 'prod'], ['--env', 'prod']];
+        yield [['app/console', '--no-ansi', 'foo:bar', '--env', 'prod'], ['--env', 'prod']];
+        yield [['app/console', '--no-ansi', 'foo:bar', '--env', 'prod'], ['--env', 'prod']];
+        yield [['app/console', '--no-ansi', 'foo:bar', 'argument'], ['argument']];
+        yield [['app/console', '--no-ansi', 'foo:bar', 'foo:bar'], ['foo:bar']];
+        yield [['app/console', '--no-ansi', 'foo:bar', '--', 'argument'], ['--', 'argument']];
     }
 }

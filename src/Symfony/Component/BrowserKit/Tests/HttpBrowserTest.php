@@ -19,7 +19,7 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
 
 class HttpBrowserTest extends AbstractBrowserTest
 {
-    public function getBrowser(array $server = [], History $history = null, CookieJar $cookieJar = null)
+    public function getBrowser(array $server = [], ?History $history = null, ?CookieJar $cookieJar = null)
     {
         return new TestHttpClient($server, $history, $cookieJar);
     }

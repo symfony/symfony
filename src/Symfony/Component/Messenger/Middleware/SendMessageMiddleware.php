@@ -63,7 +63,7 @@ class SendMessageMiddleware implements MiddlewareInterface
             }
 
             if (!$this->allowNoSenders && !$sender) {
-                throw new NoSenderForMessageException(sprintf('No sender for message "%s".', $context['class']));
+                throw new NoSenderForMessageException(\sprintf('No sender for message "%s".', $context['class']));
             }
         }
 

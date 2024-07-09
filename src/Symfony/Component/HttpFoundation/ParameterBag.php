@@ -23,11 +23,9 @@ use Symfony\Component\HttpFoundation\Exception\UnexpectedValueException;
  */
 class ParameterBag implements \IteratorAggregate, \Countable
 {
-    protected array $parameters;
-
-    public function __construct(array $parameters = [])
-    {
-        $this->parameters = $parameters;
+    public function __construct(
+        protected array $parameters = [],
+    ) {
     }
 
     /**
@@ -35,14 +33,14 @@ class ParameterBag implements \IteratorAggregate, \Countable
      *
      * @param string|null $key The name of the parameter to return or null to get them all
      */
-    public function all(string $key = null): array
+    public function all(?string $key = null): array
     {
         if (null === $key) {
             return $this->parameters;
         }
 
         if (!\is_array($value = $this->parameters[$key] ?? [])) {
-            throw new BadRequestException(sprintf('Unexpected value for parameter "%s": expecting "array", got "%s".', $key, get_debug_type($value)));
+            throw new BadRequestException(\sprintf('Unexpected value for parameter "%s": expecting "array", got "%s".', $key, get_debug_type($value)));
         }
 
         return $value;
@@ -129,7 +127,7 @@ class ParameterBag implements \IteratorAggregate, \Countable
     {
         $value = $this->get($key, $default);
         if (!\is_scalar($value) && !$value instanceof \Stringable) {
-            throw new UnexpectedValueException(sprintf('Parameter value "%s" cannot be converted to "string".', $key));
+            throw new UnexpectedValueException(\sprintf('Parameter value "%s" cannot be converted to "string".', $key));
         }
 
         return (string) $value;
@@ -160,8 +158,10 @@ class ParameterBag implements \IteratorAggregate, \Countable
      * @param ?T              $default
      *
      * @return ?T
+     *
+     * @psalm-return ($default is null ? T|null : T)
      */
-    public function getEnum(string $key, string $class, \BackedEnum $default = null): ?\BackedEnum
+    public function getEnum(string $key, string $class, ?\BackedEnum $default = null): ?\BackedEnum
     {
         $value = $this->get($key);
 
@@ -172,7 +172,7 @@ class ParameterBag implements \IteratorAggregate, \Countable
         try {
             return $class::from($value);
         } catch (\ValueError|\TypeError $e) {
-            throw new UnexpectedValueException(sprintf('Parameter "%s" cannot be converted to enum: %s.', $key, $e->getMessage()), $e->getCode(), $e);
+            throw new UnexpectedValueException(\sprintf('Parameter "%s" cannot be converted to enum: %s.', $key, $e->getMessage()), $e->getCode(), $e);
         }
     }
 
@@ -199,11 +199,11 @@ class ParameterBag implements \IteratorAggregate, \Countable
         }
 
         if (\is_object($value) && !$value instanceof \Stringable) {
-            throw new UnexpectedValueException(sprintf('Parameter value "%s" cannot be filtered.', $key));
+            throw new UnexpectedValueException(\sprintf('Parameter value "%s" cannot be filtered.', $key));
         }
 
         if ((\FILTER_CALLBACK & $filter) && !(($options['options'] ?? null) instanceof \Closure)) {
-            throw new \InvalidArgumentException(sprintf('A Closure must be passed to "%s()" when FILTER_CALLBACK is used, "%s" given.', __METHOD__, get_debug_type($options['options'] ?? null)));
+            throw new \InvalidArgumentException(\sprintf('A Closure must be passed to "%s()" when FILTER_CALLBACK is used, "%s" given.', __METHOD__, get_debug_type($options['options'] ?? null)));
         }
 
         $options['flags'] ??= 0;
@@ -216,7 +216,7 @@ class ParameterBag implements \IteratorAggregate, \Countable
             return $value;
         }
 
-        throw new \UnexpectedValueException(sprintf('Parameter value "%s" is invalid and flag "FILTER_NULL_ON_FAILURE" was not set.', $key));
+        throw new \UnexpectedValueException(\sprintf('Parameter value "%s" is invalid and flag "FILTER_NULL_ON_FAILURE" was not set.', $key));
     }
 
     /**

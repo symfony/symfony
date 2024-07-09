@@ -19,16 +19,13 @@ use Symfony\Component\Messenger\Stamp\NonSendableStampInterface;
  */
 final class AmqpStamp implements NonSendableStampInterface
 {
-    private ?string $routingKey;
-    private int $flags;
-    private array $attributes;
     private bool $isRetryAttempt = false;
 
-    public function __construct(string $routingKey = null, int $flags = \AMQP_NOPARAM, array $attributes = [])
-    {
-        $this->routingKey = $routingKey;
-        $this->flags = $flags;
-        $this->attributes = $attributes;
+    public function __construct(
+        private ?string $routingKey = null,
+        private int $flags = \AMQP_NOPARAM,
+        private array $attributes = [],
+    ) {
     }
 
     public function getRoutingKey(): ?string
@@ -46,7 +43,7 @@ final class AmqpStamp implements NonSendableStampInterface
         return $this->attributes;
     }
 
-    public static function createFromAmqpEnvelope(\AMQPEnvelope $amqpEnvelope, self $previousStamp = null, string $retryRoutingKey = null): self
+    public static function createFromAmqpEnvelope(\AMQPEnvelope $amqpEnvelope, ?self $previousStamp = null, ?string $retryRoutingKey = null): self
     {
         $attr = $previousStamp->attributes ?? [];
 
@@ -79,7 +76,7 @@ final class AmqpStamp implements NonSendableStampInterface
         return $this->isRetryAttempt;
     }
 
-    public static function createWithAttributes(array $attributes, self $previousStamp = null): self
+    public static function createWithAttributes(array $attributes, ?self $previousStamp = null): self
     {
         return new self(
             $previousStamp->routingKey ?? null,

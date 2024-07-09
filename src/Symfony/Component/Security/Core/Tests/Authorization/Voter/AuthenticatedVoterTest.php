@@ -101,7 +101,7 @@ class AuthenticatedVoterTest extends TestCase
         }
 
         if ('remembered' === $authenticated) {
-            return new RememberMeToken($user, 'foo', 'bar');
+            return new RememberMeToken($user, 'foo');
         }
 
         if ('impersonated' === $authenticated) {

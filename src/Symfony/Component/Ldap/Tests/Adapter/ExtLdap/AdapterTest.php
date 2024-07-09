@@ -173,8 +173,8 @@ class AdapterTest extends LdapTestCase
         // Create 25 'users' that we'll query for in different page sizes
         $em = $ldap->getEntryManager();
         for ($i = 0; $i < 25; ++$i) {
-            $cn = sprintf('user%d', $i);
-            $entry = new Entry(sprintf('cn=%s,dc=symfony,dc=com', $cn));
+            $cn = \sprintf('user%d', $i);
+            $entry = new Entry(\sprintf('cn=%s,dc=symfony,dc=com', $cn));
             $entry->setAttribute('objectClass', ['applicationProcess']);
             $entry->setAttribute('cn', [$cn]);
             try {

@@ -108,7 +108,7 @@ class SymfonyRuntime extends GenericRuntime
 
             if (isset($this->input) && ($options['dotenv_overload'] ?? false)) {
                 if ($this->input->getParameterOption(['--env', '-e'], $_SERVER[$envKey], true) !== $_SERVER[$envKey]) {
-                    throw new \LogicException(sprintf('Cannot use "--env" or "-e" when the "%s" file defines "%s" and the "dotenv_overload" runtime option is true.', $options['dotenv_path'] ?? '.env', $envKey));
+                    throw new \LogicException(\sprintf('Cannot use "--env" or "-e" when the "%s" file defines "%s" and the "dotenv_overload" runtime option is true.', $options['dotenv_path'] ?? '.env', $envKey));
                 }
 
                 if ($_SERVER[$debugKey] && $this->input->hasParameterOption('--no-debug', true)) {

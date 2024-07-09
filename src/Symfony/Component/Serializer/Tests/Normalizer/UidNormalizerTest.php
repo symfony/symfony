@@ -47,8 +47,8 @@ class UidNormalizerTest extends TestCase
     {
         $uidFormats = [null, 'canonical', 'base58', 'base32', 'rfc4122'];
         $data = [
-             [
-                 UuidV1::fromString('9b7541de-6f87-11ea-ab3c-9da9a81562fc'),
+            [
+                UuidV1::fromString('9b7541de-6f87-11ea-ab3c-9da9a81562fc'),
                 '9b7541de-6f87-11ea-ab3c-9da9a81562fc',
                 '9b7541de-6f87-11ea-ab3c-9da9a81562fc',
                 'LCQS8f2p5SDSiAt9V7ZYnF',

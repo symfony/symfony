@@ -1,10 +1,17 @@
 CHANGELOG
 =========
 
+7.2
+---
+
+ * Deprecate argument `$secret` of `RememberMeAuthenticator`
+
 7.1
 ---
 
  * Add `#[IsCsrfTokenValid]` attribute
+ * Add CAS 2.0 access token handler
+ * Make empty username or empty password on form login attempts return Bad Request (400)
 
 7.0
 ---

@@ -34,7 +34,7 @@ class RouterDataCollector extends DataCollector
     /**
      * @final
      */
-    public function collect(Request $request, Response $response, \Throwable $exception = null): void
+    public function collect(Request $request, Response $response, ?\Throwable $exception = null): void
     {
         if ($response instanceof RedirectResponse) {
             $this->data['redirect'] = true;

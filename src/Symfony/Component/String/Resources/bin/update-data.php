@@ -18,7 +18,7 @@ if ('cli' !== \PHP_SAPI) {
 error_reporting(\E_ALL);
 
 set_error_handler(static function (int $type, string $msg, string $file, int $line): void {
-    throw new \ErrorException($msg, 0, $type, $file, $line);
+    throw new ErrorException($msg, 0, $type, $file, $line);
 });
 
 set_exception_handler(static function (Throwable $exception): void {

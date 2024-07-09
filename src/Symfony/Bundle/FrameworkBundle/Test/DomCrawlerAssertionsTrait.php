@@ -26,12 +26,12 @@ trait DomCrawlerAssertionsTrait
 {
     public static function assertSelectorExists(string $selector, string $message = ''): void
     {
-        self::assertThat(self::getCrawler(), new DomCrawlerConstraint\CrawlerSelectorExists($selector), $message);
+        self::assertThat(self::getCrawler(), new CrawlerSelectorExists($selector), $message);
     }
 
     public static function assertSelectorNotExists(string $selector, string $message = ''): void
     {
-        self::assertThat(self::getCrawler(), new LogicalNot(new DomCrawlerConstraint\CrawlerSelectorExists($selector)), $message);
+        self::assertThat(self::getCrawler(), new LogicalNot(new CrawlerSelectorExists($selector)), $message);
     }
 
     public static function assertSelectorCount(int $expectedCount, string $selector, string $message = ''): void
@@ -42,7 +42,7 @@ trait DomCrawlerAssertionsTrait
     public static function assertSelectorTextContains(string $selector, string $text, string $message = ''): void
     {
         self::assertThat(self::getCrawler(), LogicalAnd::fromConstraints(
-            new DomCrawlerConstraint\CrawlerSelectorExists($selector),
+            new CrawlerSelectorExists($selector),
             new DomCrawlerConstraint\CrawlerSelectorTextContains($selector, $text)
         ), $message);
     }
@@ -50,7 +50,7 @@ trait DomCrawlerAssertionsTrait
     public static function assertAnySelectorTextContains(string $selector, string $text, string $message = ''): void
     {
         self::assertThat(self::getCrawler(), LogicalAnd::fromConstraints(
-            new DomCrawlerConstraint\CrawlerSelectorExists($selector),
+            new CrawlerSelectorExists($selector),
             new DomCrawlerConstraint\CrawlerAnySelectorTextContains($selector, $text)
         ), $message);
     }
@@ -58,7 +58,7 @@ trait DomCrawlerAssertionsTrait
     public static function assertSelectorTextSame(string $selector, string $text, string $message = ''): void
     {
         self::assertThat(self::getCrawler(), LogicalAnd::fromConstraints(
-            new DomCrawlerConstraint\CrawlerSelectorExists($selector),
+            new CrawlerSelectorExists($selector),
             new DomCrawlerConstraint\CrawlerSelectorTextSame($selector, $text)
         ), $message);
     }
@@ -66,7 +66,7 @@ trait DomCrawlerAssertionsTrait
     public static function assertAnySelectorTextSame(string $selector, string $text, string $message = ''): void
     {
         self::assertThat(self::getCrawler(), LogicalAnd::fromConstraints(
-            new DomCrawlerConstraint\CrawlerSelectorExists($selector),
+            new CrawlerSelectorExists($selector),
             new DomCrawlerConstraint\CrawlerAnySelectorTextSame($selector, $text)
         ), $message);
     }
@@ -74,7 +74,7 @@ trait DomCrawlerAssertionsTrait
     public static function assertSelectorTextNotContains(string $selector, string $text, string $message = ''): void
     {
         self::assertThat(self::getCrawler(), LogicalAnd::fromConstraints(
-            new DomCrawlerConstraint\CrawlerSelectorExists($selector),
+            new CrawlerSelectorExists($selector),
             new LogicalNot(new DomCrawlerConstraint\CrawlerSelectorTextContains($selector, $text))
         ), $message);
     }
@@ -82,7 +82,7 @@ trait DomCrawlerAssertionsTrait
     public static function assertAnySelectorTextNotContains(string $selector, string $text, string $message = ''): void
     {
         self::assertThat(self::getCrawler(), LogicalAnd::fromConstraints(
-            new DomCrawlerConstraint\CrawlerSelectorExists($selector),
+            new CrawlerSelectorExists($selector),
             new LogicalNot(new DomCrawlerConstraint\CrawlerAnySelectorTextContains($selector, $text))
         ), $message);
     }
@@ -100,7 +100,7 @@ trait DomCrawlerAssertionsTrait
     public static function assertInputValueSame(string $fieldName, string $expectedValue, string $message = ''): void
     {
         self::assertThat(self::getCrawler(), LogicalAnd::fromConstraints(
-            new DomCrawlerConstraint\CrawlerSelectorExists("input[name=\"$fieldName\"]"),
+            new CrawlerSelectorExists("input[name=\"$fieldName\"]"),
             new DomCrawlerConstraint\CrawlerSelectorAttributeValueSame("input[name=\"$fieldName\"]", 'value', $expectedValue)
         ), $message);
     }
@@ -108,7 +108,7 @@ trait DomCrawlerAssertionsTrait
     public static function assertInputValueNotSame(string $fieldName, string $expectedValue, string $message = ''): void
     {
         self::assertThat(self::getCrawler(), LogicalAnd::fromConstraints(
-            new DomCrawlerConstraint\CrawlerSelectorExists("input[name=\"$fieldName\"]"),
+            new CrawlerSelectorExists("input[name=\"$fieldName\"]"),
             new LogicalNot(new DomCrawlerConstraint\CrawlerSelectorAttributeValueSame("input[name=\"$fieldName\"]", 'value', $expectedValue))
         ), $message);
     }
@@ -126,18 +126,18 @@ trait DomCrawlerAssertionsTrait
     public static function assertFormValue(string $formSelector, string $fieldName, string $value, string $message = ''): void
     {
         $node = self::getCrawler()->filter($formSelector);
-        self::assertNotEmpty($node, sprintf('Form "%s" not found.', $formSelector));
+        self::assertNotEmpty($node, \sprintf('Form "%s" not found.', $formSelector));
         $values = $node->form()->getValues();
-        self::assertArrayHasKey($fieldName, $values, $message ?: sprintf('Field "%s" not found in form "%s".', $fieldName, $formSelector));
+        self::assertArrayHasKey($fieldName, $values, $message ?: \sprintf('Field "%s" not found in form "%s".', $fieldName, $formSelector));
         self::assertSame($value, $values[$fieldName]);
     }
 
     public static function assertNoFormValue(string $formSelector, string $fieldName, string $message = ''): void
     {
         $node = self::getCrawler()->filter($formSelector);
-        self::assertNotEmpty($node, sprintf('Form "%s" not found.', $formSelector));
+        self::assertNotEmpty($node, \sprintf('Form "%s" not found.', $formSelector));
         $values = $node->form()->getValues();
-        self::assertArrayNotHasKey($fieldName, $values, $message ?: sprintf('Field "%s" has a value in form "%s".', $fieldName, $formSelector));
+        self::assertArrayNotHasKey($fieldName, $values, $message ?: \sprintf('Field "%s" has a value in form "%s".', $fieldName, $formSelector));
     }
 
     private static function getCrawler(): Crawler

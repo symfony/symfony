@@ -145,7 +145,7 @@ HTML;
         $this->assertEquals('Locale: fr', $email->getHtmlBody());
     }
 
-    private function prepareEmail(?string $text, ?string $html, array $context = [], HtmlToTextConverterInterface $converter = null, LocaleSwitcher $localeSwitcher = null, string $locale = null): TemplatedEmail
+    private function prepareEmail(?string $text, ?string $html, array $context = [], ?HtmlToTextConverterInterface $converter = null, ?LocaleSwitcher $localeSwitcher = null, ?string $locale = null): TemplatedEmail
     {
         $twig = new Environment(new ArrayLoader([
             'text' => $text,

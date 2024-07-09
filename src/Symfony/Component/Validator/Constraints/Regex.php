@@ -15,6 +15,8 @@ use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Exception\InvalidArgumentException;
 
 /**
+ * Validates that a value matches a regular expression.
+ *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
 #[\Attribute(\Attribute::TARGET_PROPERTY | \Attribute::TARGET_METHOD | \Attribute::IS_REPEATABLE)]
@@ -33,15 +35,22 @@ class Regex extends Constraint
     /** @var callable|null */
     public $normalizer;
 
+    /**
+     * @param string|array<string,mixed>|null $pattern     The regular expression to match
+     * @param string|null                     $htmlPattern The pattern to use in the HTML5 pattern attribute
+     * @param bool|null                       $match       Whether to validate the value matches the configured pattern or not (defaults to false)
+     * @param string[]|null                   $groups
+     * @param array<string,mixed>             $options
+     */
     public function __construct(
         string|array|null $pattern,
-        string $message = null,
-        string $htmlPattern = null,
-        bool $match = null,
-        callable $normalizer = null,
-        array $groups = null,
+        ?string $message = null,
+        ?string $htmlPattern = null,
+        ?bool $match = null,
+        ?callable $normalizer = null,
+        ?array $groups = null,
         mixed $payload = null,
-        array $options = []
+        array $options = [],
     ) {
         if (\is_array($pattern)) {
             $options = array_merge($pattern, $options);
@@ -57,7 +66,7 @@ class Regex extends Constraint
         $this->normalizer = $normalizer ?? $this->normalizer;
 
         if (null !== $this->normalizer && !\is_callable($this->normalizer)) {
-            throw new InvalidArgumentException(sprintf('The "normalizer" option must be a valid callable ("%s" given).', get_debug_type($this->normalizer)));
+            throw new InvalidArgumentException(\sprintf('The "normalizer" option must be a valid callable ("%s" given).', get_debug_type($this->normalizer)));
         }
     }
 
@@ -82,9 +91,7 @@ class Regex extends Constraint
     {
         // If htmlPattern is specified, use it
         if (null !== $this->htmlPattern) {
-            return empty($this->htmlPattern)
-                ? null
-                : $this->htmlPattern;
+            return $this->htmlPattern ?: null;
         }
 
         // Quit if delimiters not at very beginning/end (e.g. when options are passed)

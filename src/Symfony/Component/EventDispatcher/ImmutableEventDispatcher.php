@@ -18,14 +18,12 @@ namespace Symfony\Component\EventDispatcher;
  */
 class ImmutableEventDispatcher implements EventDispatcherInterface
 {
-    private EventDispatcherInterface $dispatcher;
-
-    public function __construct(EventDispatcherInterface $dispatcher)
-    {
-        $this->dispatcher = $dispatcher;
+    public function __construct(
+        private EventDispatcherInterface $dispatcher,
+    ) {
     }
 
-    public function dispatch(object $event, string $eventName = null): object
+    public function dispatch(object $event, ?string $eventName = null): object
     {
         return $this->dispatcher->dispatch($event, $eventName);
     }
@@ -50,7 +48,7 @@ class ImmutableEventDispatcher implements EventDispatcherInterface
         throw new \BadMethodCallException('Unmodifiable event dispatchers must not be modified.');
     }
 
-    public function getListeners(string $eventName = null): array
+    public function getListeners(?string $eventName = null): array
     {
         return $this->dispatcher->getListeners($eventName);
     }
@@ -60,7 +58,7 @@ class ImmutableEventDispatcher implements EventDispatcherInterface
         return $this->dispatcher->getListenerPriority($eventName, $listener);
     }
 
-    public function hasListeners(string $eventName = null): bool
+    public function hasListeners(?string $eventName = null): bool
     {
         return $this->dispatcher->hasListeners($eventName);
     }

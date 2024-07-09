@@ -51,7 +51,7 @@ abstract class ProviderFactoryTestCase extends TestCase
     abstract public static function createProvider(): iterable;
 
     /**
-     * @return iterable<array{0: string, 1: string|null}>
+     * @return iterable<array{0: string, 1?: string|null}>
      */
     public static function unsupportedSchemeProvider(): iterable
     {
@@ -59,7 +59,7 @@ abstract class ProviderFactoryTestCase extends TestCase
     }
 
     /**
-     * @return iterable<array{0: string, 1: string|null}>
+     * @return iterable<array{0: string, 1?: string|null}>
      */
     public static function incompleteDsnProvider(): iterable
     {
@@ -90,7 +90,7 @@ abstract class ProviderFactoryTestCase extends TestCase
     /**
      * @dataProvider unsupportedSchemeProvider
      */
-    public function testUnsupportedSchemeException(string $dsn, string $message = null)
+    public function testUnsupportedSchemeException(string $dsn, ?string $message = null)
     {
         $factory = $this->createFactory();
 
@@ -107,7 +107,7 @@ abstract class ProviderFactoryTestCase extends TestCase
     /**
      * @dataProvider incompleteDsnProvider
      */
-    public function testIncompleteDsnException(string $dsn, string $message = null)
+    public function testIncompleteDsnException(string $dsn, ?string $message = null)
     {
         $factory = $this->createFactory();
 

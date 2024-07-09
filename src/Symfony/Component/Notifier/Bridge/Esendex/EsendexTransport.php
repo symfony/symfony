@@ -26,24 +26,20 @@ final class EsendexTransport extends AbstractTransport
 {
     protected const HOST = 'api.esendex.com';
 
-    private string $email;
-    private string $password;
-    private string $accountReference;
-    private string $from;
-
-    public function __construct(string $email, #[\SensitiveParameter] string $password, string $accountReference, string $from, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
-    {
-        $this->email = $email;
-        $this->password = $password;
-        $this->accountReference = $accountReference;
-        $this->from = $from;
-
+    public function __construct(
+        private string $email,
+        #[\SensitiveParameter] private string $password,
+        private string $accountReference,
+        private string $from,
+        ?HttpClientInterface $client = null,
+        ?EventDispatcherInterface $dispatcher = null,
+    ) {
         parent::__construct($client, $dispatcher);
     }
 
     public function __toString(): string
     {
-        return sprintf('esendex://%s?accountreference=%s&from=%s', $this->getEndpoint(), $this->accountReference, $this->from);
+        return \sprintf('esendex://%s?accountreference=%s&from=%s', $this->getEndpoint(), $this->accountReference, $this->from);
     }
 
     public function supports(MessageInterface $message): bool
@@ -93,14 +89,14 @@ final class EsendexTransport extends AbstractTransport
             return $sentMessage;
         }
 
-        $message = sprintf('Unable to send the SMS: error %d.', $statusCode);
+        $message = \sprintf('Unable to send the SMS: error %d.', $statusCode);
 
         try {
             $result = $response->toArray(false);
             if (!empty($result['errors'])) {
                 $error = $result['errors'][0];
 
-                $message .= sprintf(' Details from Esendex: %s: "%s".', $error['code'], $error['description']);
+                $message .= \sprintf(' Details from Esendex: %s: "%s".', $error['code'], $error['description']);
             }
         } catch (JsonException) {
         }

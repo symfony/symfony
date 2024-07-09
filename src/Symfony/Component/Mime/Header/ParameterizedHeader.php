@@ -85,7 +85,7 @@ final class ParameterizedHeader extends UnstructuredHeader
      * This doesn't need to be overridden in theory, but it is for implementation
      * reasons to prevent potential breakage of attributes.
      */
-    protected function toTokens(string $string = null): array
+    protected function toTokens(?string $string = null): array
     {
         $tokens = parent::toTokens(parent::getBodyAsString());
 

@@ -158,12 +158,12 @@ class SMimeSignerTest extends SMimeTestCase
         file_put_contents($messageFile, $messageString);
 
         $this->assertMessageHeaders($message, $originalMessage);
-        $this->assertTrue(openssl_pkcs7_verify($messageFile, 0, $this->generateTmpFilename(), [$this->samplesDir.'ca.crt']), sprintf('Verification of the message %s failed. Internal error "%s".', $messageFile, openssl_error_string()));
+        $this->assertTrue(openssl_pkcs7_verify($messageFile, 0, $this->generateTmpFilename(), [$this->samplesDir.'ca.crt']), \sprintf('Verification of the message %s failed. Internal error "%s".', $messageFile, openssl_error_string()));
 
         if (!str_contains($messageString, 'enveloped-data')) {
             // Tamper to ensure it actually verified
             file_put_contents($messageFile, str_replace('Content-Transfer-Encoding: ', 'Content-Transfer-Encoding:  ', $messageString));
-            $this->assertFalse(openssl_pkcs7_verify($messageFile, 0, $this->generateTmpFilename(), [$this->samplesDir.'ca.crt']), sprintf('Verification of the message failed. Internal error "%s".', openssl_error_string()));
+            $this->assertFalse(openssl_pkcs7_verify($messageFile, 0, $this->generateTmpFilename(), [$this->samplesDir.'ca.crt']), \sprintf('Verification of the message failed. Internal error "%s".', openssl_error_string()));
         }
     }
 }

@@ -16,6 +16,8 @@ use Doctrine\DBAL\Schema\Table;
 /**
  * Uses PostgreSQL LISTEN/NOTIFY to push messages to workers.
  *
+ * If you do not want to use the LISTEN mechanism, set the `use_notify` option to `false` when calling DoctrineTransportFactory::createTransport.
+ *
  * @internal
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
@@ -23,12 +25,10 @@ use Doctrine\DBAL\Schema\Table;
 final class PostgreSqlConnection extends Connection
 {
     /**
-     * * use_notify: Set to false to disable the use of LISTEN/NOTIFY. Default: true
      * * check_delayed_interval: The interval to check for delayed messages, in milliseconds. Set to 0 to disable checks. Default: 60000 (1 minute)
      * * get_notify_timeout: The length of time to wait for a response when calling PDO::pgsqlGetNotify, in milliseconds. Default: 0.
      */
     protected const DEFAULT_OPTIONS = parent::DEFAULT_OPTIONS + [
-        'use_notify' => true,
         'check_delayed_interval' => 60000,
         'get_notify_timeout' => 0,
     ];
@@ -62,7 +62,7 @@ final class PostgreSqlConnection extends Connection
 
         // This is secure because the table name must be a valid identifier:
         // https://www.postgresql.org/docs/current/sql-syntax-lexical.html#SQL-SYNTAX-IDENTIFIERS
-        $this->executeStatement(sprintf('LISTEN "%s"', $this->configuration['table_name']));
+        $this->executeStatement(\sprintf('LISTEN "%s"', $this->configuration['table_name']));
 
         /** @var \PDO $nativeConnection */
         $nativeConnection = $this->driverConnection->getNativeConnection();
@@ -111,7 +111,7 @@ final class PostgreSqlConnection extends Connection
 
         return [
             // create trigger function
-            sprintf(<<<'SQL'
+            \sprintf(<<<'SQL'
 CREATE OR REPLACE FUNCTION %1$s() RETURNS TRIGGER AS $$
     BEGIN
         PERFORM pg_notify('%2$s', NEW.queue_name::text);
@@ -121,8 +121,8 @@ $$ LANGUAGE plpgsql;
 SQL
                 , $functionName, $this->configuration['table_name']),
             // register trigger
-            sprintf('DROP TRIGGER IF EXISTS notify_trigger ON %s;', $this->configuration['table_name']),
-            sprintf('CREATE TRIGGER notify_trigger AFTER INSERT OR UPDATE ON %1$s FOR EACH ROW EXECUTE PROCEDURE %2$s();', $this->configuration['table_name'], $functionName),
+            \sprintf('DROP TRIGGER IF EXISTS notify_trigger ON %s;', $this->configuration['table_name']),
+            \sprintf('CREATE TRIGGER notify_trigger AFTER INSERT OR UPDATE ON %1$s FOR EACH ROW EXECUTE PROCEDURE %2$s();', $this->configuration['table_name'], $functionName),
         ];
     }
 
@@ -131,14 +131,14 @@ SQL
         $tableConfig = explode('.', $this->configuration['table_name']);
 
         if (1 === \count($tableConfig)) {
-            return sprintf('notify_%1$s', $tableConfig[0]);
+            return \sprintf('notify_%1$s', $tableConfig[0]);
         }
 
-        return sprintf('%1$s.notify_%2$s', $tableConfig[0], $tableConfig[1]);
+        return \sprintf('%1$s.notify_%2$s', $tableConfig[0], $tableConfig[1]);
     }
 
     private function unlisten(): void
     {
-        $this->executeStatement(sprintf('UNLISTEN "%s"', $this->configuration['table_name']));
+        $this->executeStatement(\sprintf('UNLISTEN "%s"', $this->configuration['table_name']));
     }
 }

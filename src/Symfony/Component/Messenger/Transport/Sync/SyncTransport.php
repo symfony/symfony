@@ -25,11 +25,9 @@ use Symfony\Component\Messenger\Transport\TransportInterface;
  */
 class SyncTransport implements TransportInterface
 {
-    private MessageBusInterface $messageBus;
-
-    public function __construct(MessageBusInterface $messageBus)
-    {
-        $this->messageBus = $messageBus;
+    public function __construct(
+        private MessageBusInterface $messageBus,
+    ) {
     }
 
     public function get(): iterable

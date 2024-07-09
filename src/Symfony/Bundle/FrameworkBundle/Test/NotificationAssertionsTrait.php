@@ -22,12 +22,12 @@ use Symfony\Component\Notifier\Test\Constraint as NotifierConstraint;
  */
 trait NotificationAssertionsTrait
 {
-    public static function assertNotificationCount(int $count, string $transportName = null, string $message = ''): void
+    public static function assertNotificationCount(int $count, ?string $transportName = null, string $message = ''): void
     {
         self::assertThat(self::getNotificationEvents(), new NotifierConstraint\NotificationCount($count, $transportName), $message);
     }
 
-    public static function assertQueuedNotificationCount(int $count, string $transportName = null, string $message = ''): void
+    public static function assertQueuedNotificationCount(int $count, ?string $transportName = null, string $message = ''): void
     {
         self::assertThat(self::getNotificationEvents(), new NotifierConstraint\NotificationCount($count, $transportName, true), $message);
     }
@@ -52,12 +52,12 @@ trait NotificationAssertionsTrait
         self::assertThat($notification, new LogicalNot(new NotifierConstraint\NotificationSubjectContains($text)), $message);
     }
 
-    public static function assertNotificationTransportIsEqual(MessageInterface $notification, string $transportName = null, string $message = ''): void
+    public static function assertNotificationTransportIsEqual(MessageInterface $notification, ?string $transportName = null, string $message = ''): void
     {
         self::assertThat($notification, new NotifierConstraint\NotificationTransportIsEqual($transportName), $message);
     }
 
-    public static function assertNotificationTransportIsNotEqual(MessageInterface $notification, string $transportName = null, string $message = ''): void
+    public static function assertNotificationTransportIsNotEqual(MessageInterface $notification, ?string $transportName = null, string $message = ''): void
     {
         self::assertThat($notification, new LogicalNot(new NotifierConstraint\NotificationTransportIsEqual($transportName)), $message);
     }
@@ -65,12 +65,12 @@ trait NotificationAssertionsTrait
     /**
      * @return MessageEvent[]
      */
-    public static function getNotifierEvents(string $transportName = null): array
+    public static function getNotifierEvents(?string $transportName = null): array
     {
         return self::getNotificationEvents()->getEvents($transportName);
     }
 
-    public static function getNotifierEvent(int $index = 0, string $transportName = null): ?MessageEvent
+    public static function getNotifierEvent(int $index = 0, ?string $transportName = null): ?MessageEvent
     {
         return self::getNotifierEvents($transportName)[$index] ?? null;
     }
@@ -78,12 +78,12 @@ trait NotificationAssertionsTrait
     /**
      * @return MessageInterface[]
      */
-    public static function getNotifierMessages(string $transportName = null): array
+    public static function getNotifierMessages(?string $transportName = null): array
     {
         return self::getNotificationEvents()->getMessages($transportName);
     }
 
-    public static function getNotifierMessage(int $index = 0, string $transportName = null): ?MessageInterface
+    public static function getNotifierMessage(int $index = 0, ?string $transportName = null): ?MessageInterface
     {
         return self::getNotifierMessages($transportName)[$index] ?? null;
     }

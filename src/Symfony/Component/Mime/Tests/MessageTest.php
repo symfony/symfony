@@ -13,6 +13,7 @@ namespace Symfony\Component\Mime\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Mime\Address;
+use Symfony\Component\Mime\Exception\LogicException;
 use Symfony\Component\Mime\Header\Headers;
 use Symfony\Component\Mime\Header\MailboxListHeader;
 use Symfony\Component\Mime\Header\UnstructuredHeader;
@@ -123,6 +124,14 @@ class MessageTest extends TestCase
         $message->getHeaders()->addMailboxListHeader('From', ['fabien@symfony.com', 'lucas@symfony.com']);
         $message->getHeaders()->addMailboxHeader('Sender', 'thomas@symfony.com');
         $this->assertEquals('thomas@symfony.com', $message->getPreparedHeaders()->get('Sender')->getAddress()->getAddress());
+    }
+
+    public function testGenerateMessageIdThrowsWhenHasFromButNoAddresses()
+    {
+        $message = new Message();
+        $message->getHeaders()->addMailboxListHeader('From', []);
+        $this->expectException(LogicException::class);
+        $message->generateMessageId();
     }
 
     public function testToString()
@@ -245,8 +254,7 @@ EOF;
             ]
         },
         "class": "Symfony\\\\Component\\\\Mime\\\\Part\\\\Multipart\\\\MixedPart"
-    },
-    "message": null
+    }
 }
 EOF;
 
@@ -267,5 +275,72 @@ EOF;
 
         $serialized = $serializer->serialize($e, 'json');
         $this->assertStringMatchesFormat($expectedJson, json_encode(json_decode($serialized), \JSON_PRETTY_PRINT | \JSON_UNESCAPED_SLASHES));
+    }
+
+    /**
+     * @dataProvider ensureValidityProvider
+     */
+    public function testEnsureValidity(array $headers, ?string $exceptionClass, ?string $exceptionMessage)
+    {
+        if ($exceptionClass) {
+            $this->expectException($exceptionClass);
+            $this->expectExceptionMessage($exceptionMessage);
+        } else {
+            $this->expectNotToPerformAssertions();
+        }
+
+        $m = new Message();
+        foreach ($headers as $headerName => $headerValue) {
+            $m->getHeaders()->addMailboxListHeader($headerName, $headerValue);
+        }
+        $m->ensureValidity();
+    }
+
+    public function ensureValidityProvider()
+    {
+        return [
+            'Valid address fields' => [
+                [
+                    'To' => ['dummy@symfony.com'],
+                    'From' => ['test@symfony.com'],
+                ],
+                null,
+                null,
+            ],
+
+            'No destination address fields' => [
+                [
+                    'From' => ['test@symfony.com'],
+                ],
+                LogicException::class,
+                'An email must have a "To", "Cc", or "Bcc" header.',
+            ],
+
+            'Empty destination address fields' => [
+                [
+                    'To' => [],
+                    'From' => ['test@symfony.com'],
+                ],
+                LogicException::class,
+                'An email must have a "To", "Cc", or "Bcc" header.',
+            ],
+
+            'No originator fields' => [
+                [
+                    'To' => ['dummy@symfony.com'],
+                ],
+                LogicException::class,
+                'An email must have a "From" or a "Sender" header.',
+            ],
+
+            'Empty originator fields' => [
+                [
+                    'To' => ['dummy@symfony.com'],
+                    'From' => [],
+                ],
+                LogicException::class,
+                'An email must have a "From" or a "Sender" header.',
+            ],
+        ];
     }
 }

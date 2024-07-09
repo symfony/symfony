@@ -17,18 +17,20 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\ErrorHandler\DebugClassLoader;
 use Symfony\Component\HttpKernel\Kernel;
 
+trigger_deprecation('symfony/http-kernel', '7.1', 'The "%s" class is deprecated since Symfony 7.1 and will be removed in 8.0.', AddAnnotatedClassesToCachePass::class);
+
 /**
  * Sets the classes to compile in the cache for the container.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @deprecated since Symfony 7.1, to be removed in 8.0
  */
 class AddAnnotatedClassesToCachePass implements CompilerPassInterface
 {
-    private Kernel $kernel;
-
-    public function __construct(Kernel $kernel)
-    {
-        $this->kernel = $kernel;
+    public function __construct(
+        private Kernel $kernel,
+    ) {
     }
 
     public function process(ContainerBuilder $container): void

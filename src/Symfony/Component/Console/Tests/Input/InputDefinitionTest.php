@@ -113,7 +113,7 @@ class InputDefinitionTest extends TestCase
     {
         $this->initializeArguments();
         $this->expectException(\LogicException::class);
-        $this->expectExceptionMessage(sprintf('Cannot add a required argument "%s" after an optional one "%s".', $this->foo2->getName(), $this->foo->getName()));
+        $this->expectExceptionMessage(\sprintf('Cannot add a required argument "%s" after an optional one "%s".', $this->foo2->getName(), $this->foo->getName()));
 
         $definition = new InputDefinition();
         $definition->addArgument($this->foo);
@@ -179,7 +179,7 @@ class InputDefinitionTest extends TestCase
             new InputArgument('foo1', InputArgument::OPTIONAL),
             new InputArgument('foo2', InputArgument::OPTIONAL, '', 'default'),
             new InputArgument('foo3', InputArgument::OPTIONAL | InputArgument::IS_ARRAY),
-        //  new InputArgument('foo4', InputArgument::OPTIONAL | InputArgument::IS_ARRAY, '', [1, 2]),
+            //  new InputArgument('foo4', InputArgument::OPTIONAL | InputArgument::IS_ARRAY, '', [1, 2]),
         ]);
         $this->assertEquals(['foo1' => null, 'foo2' => 'default', 'foo3' => []], $definition->getArgumentDefaults(), '->getArgumentDefaults() return the default values for each argument');
 

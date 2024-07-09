@@ -17,6 +17,7 @@ use Symfony\Bridge\Twig\DataCollector\TwigDataCollector;
 use Symfony\Bridge\Twig\ErrorRenderer\TwigErrorRenderer;
 use Symfony\Bridge\Twig\EventListener\TemplateAttributeListener;
 use Symfony\Bridge\Twig\Extension\AssetExtension;
+use Symfony\Bridge\Twig\Extension\EmojiExtension;
 use Symfony\Bridge\Twig\Extension\ExpressionExtension;
 use Symfony\Bridge\Twig\Extension\HtmlSanitizerExtension;
 use Symfony\Bridge\Twig\Extension\HttpFoundationExtension;
@@ -114,6 +115,8 @@ return static function (ContainerConfigurator $container) {
             ->args([service('debug.stopwatch')->ignoreOnInvalid(), param('kernel.debug')])
 
         ->set('twig.extension.expression', ExpressionExtension::class)
+
+        ->set('twig.extension.emoji', EmojiExtension::class)
 
         ->set('twig.extension.htmlsanitizer', HtmlSanitizerExtension::class)
             ->args([tagged_locator('html_sanitizer', 'sanitizer')])

@@ -52,7 +52,7 @@ interface ResolvedFormTypeInterface
     /**
      * Creates a new form view for a form of this type.
      */
-    public function createView(FormInterface $form, FormView $parent = null): FormView;
+    public function createView(FormInterface $form, ?FormView $parent = null): FormView;
 
     /**
      * Configures a form builder for the type hierarchy.

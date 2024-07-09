@@ -30,23 +30,18 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
  */
 final class HttplugWaitLoop
 {
-    private HttpClientInterface $client;
-    private ?\SplObjectStorage $promisePool;
-    private ResponseFactoryInterface $responseFactory;
-    private StreamFactoryInterface $streamFactory;
-
     /**
      * @param \SplObjectStorage<ResponseInterface, array{Psr7RequestInterface, Promise}>|null $promisePool
      */
-    public function __construct(HttpClientInterface $client, ?\SplObjectStorage $promisePool, ResponseFactoryInterface $responseFactory, StreamFactoryInterface $streamFactory)
-    {
-        $this->client = $client;
-        $this->promisePool = $promisePool;
-        $this->responseFactory = $responseFactory;
-        $this->streamFactory = $streamFactory;
+    public function __construct(
+        private HttpClientInterface $client,
+        private ?\SplObjectStorage $promisePool,
+        private ResponseFactoryInterface $responseFactory,
+        private StreamFactoryInterface $streamFactory,
+    ) {
     }
 
-    public function wait(?ResponseInterface $pendingResponse, float $maxDuration = null, float $idleTimeout = null): int
+    public function wait(?ResponseInterface $pendingResponse, ?float $maxDuration = null, ?float $idleTimeout = null): int
     {
         if (!$this->promisePool) {
             return 0;

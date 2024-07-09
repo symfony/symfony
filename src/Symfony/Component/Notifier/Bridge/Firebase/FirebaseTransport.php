@@ -43,7 +43,7 @@ final class FirebaseTransport extends AbstractTransport
 
     public function __toString(): string
     {
-        return sprintf('firebase://%s', $this->getEndpoint());
+        return \sprintf('firebase://%s', $this->getEndpoint());
     }
 
     public function supports(MessageInterface $message): bool

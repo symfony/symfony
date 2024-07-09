@@ -12,6 +12,7 @@
 namespace Symfony\Component\Cache\Tests\Adapter;
 
 use Psr\Cache\CacheItemPoolInterface;
+use Symfony\Component\Cache\Adapter\AbstractAdapter;
 use Symfony\Component\Cache\Adapter\PdoAdapter;
 
 /**
@@ -41,6 +42,16 @@ class PdoAdapterTest extends AdapterTestCase
         return new PdoAdapter('sqlite:'.self::$dbFile, 'ns', $defaultLifetime);
     }
 
+    public function testCreateConnectionReturnsStringWithLazyTrue()
+    {
+        self::assertSame('sqlite:'.self::$dbFile, AbstractAdapter::createConnection('sqlite:'.self::$dbFile));
+    }
+
+    public function testCreateConnectionReturnsPDOWithLazyFalse()
+    {
+        self::assertInstanceOf(\PDO::class, AbstractAdapter::createConnection('sqlite:'.self::$dbFile, ['lazy' => false]));
+    }
+
     public function testCleanupExpiredItems()
     {
         $pdo = new \PDO('sqlite:'.self::$dbFile);
@@ -68,7 +79,7 @@ class PdoAdapterTest extends AdapterTestCase
     /**
      * @dataProvider provideDsnSQLite
      */
-    public function testDsnWithSQLite(string $dsn, string $file = null)
+    public function testDsnWithSQLite(string $dsn, ?string $file = null)
     {
         try {
             $pool = new PdoAdapter($dsn);
@@ -123,7 +134,7 @@ class PdoAdapterTest extends AdapterTestCase
 
         /** @var \PDOStatement $select */
         $select = $getPdoConn->invoke($cache)->prepare('SELECT 1 FROM cache_items WHERE item_id LIKE :id');
-        $select->bindValue(':id', sprintf('%%%s', $name));
+        $select->bindValue(':id', \sprintf('%%%s', $name));
         $select->execute();
 
         return 1 !== (int) $select->fetch(\PDO::FETCH_COLUMN);

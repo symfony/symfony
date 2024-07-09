@@ -23,7 +23,7 @@ class FileTypeTest extends BaseTypeTestCase
 {
     public const TESTED_TYPE = 'Symfony\Component\Form\Extension\Core\Type\FileType';
 
-    protected function getExtensions()
+    protected function getExtensions(): array
     {
         return array_merge(parent::getExtensions(), [new CoreExtension(null, null, new IdentityTranslator())]);
     }

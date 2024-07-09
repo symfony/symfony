@@ -11,6 +11,7 @@
 
 namespace Symfony\Bridge\Twig\Node;
 
+use Twig\Attribute\YieldReady;
 use Twig\Compiler;
 use Twig\Node\Expression\AbstractExpression;
 use Twig\Node\Expression\ArrayExpression;
@@ -22,9 +23,10 @@ use Twig\Node\TextNode;
 /**
  * @author Fabien Potencier <fabien@symfony.com>
  */
+#[YieldReady]
 final class TransNode extends Node
 {
-    public function __construct(Node $body, Node $domain = null, AbstractExpression $count = null, AbstractExpression $vars = null, AbstractExpression $locale = null, int $lineno = 0, string $tag = null)
+    public function __construct(Node $body, ?Node $domain = null, ?AbstractExpression $count = null, ?AbstractExpression $vars = null, ?AbstractExpression $locale = null, int $lineno = 0, ?string $tag = null)
     {
         $nodes = ['body' => $body];
         if (null !== $domain) {
@@ -53,9 +55,8 @@ final class TransNode extends Node
             $vars = null;
         }
         [$msg, $defaults] = $this->compileString($this->getNode('body'), $defaults, (bool) $vars);
-
         $compiler
-            ->write('echo $this->env->getExtension(\'Symfony\Bridge\Twig\Extension\TranslationExtension\')->trans(')
+            ->write('yield $this->env->getExtension(\'Symfony\Bridge\Twig\Extension\TranslationExtension\')->trans(')
             ->subcompile($msg)
         ;
 

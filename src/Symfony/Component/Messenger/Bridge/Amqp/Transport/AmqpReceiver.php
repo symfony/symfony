@@ -28,11 +28,11 @@ use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
 class AmqpReceiver implements QueueReceiverInterface, MessageCountAwareInterface
 {
     private SerializerInterface $serializer;
-    private Connection $connection;
 
-    public function __construct(Connection $connection, SerializerInterface $serializer = null)
-    {
-        $this->connection = $connection;
+    public function __construct(
+        private Connection $connection,
+        ?SerializerInterface $serializer = null,
+    ) {
         $this->serializer = $serializer ?? new PhpSerializer();
     }
 
@@ -52,6 +52,16 @@ class AmqpReceiver implements QueueReceiverInterface, MessageCountAwareInterface
     {
         try {
             $amqpEnvelope = $this->connection->get($queueName);
+        } catch (\AMQPConnectionException) {
+            // Try to reconnect once to accommodate need for one of the nodes in cluster needing to stop serving the
+            // traffic. This may happen for example when one of the nodes in cluster is going into maintenance node.
+            // see https://github.com/php-amqplib/php-amqplib/issues/1161
+            try {
+                $this->connection->queue($queueName)->getConnection()->reconnect();
+                $amqpEnvelope = $this->connection->get($queueName);
+            } catch (\AMQPException $exception) {
+                throw new TransportException($exception->getMessage(), 0, $exception);
+            }
         } catch (\AMQPException $exception) {
             throw new TransportException($exception->getMessage(), 0, $exception);
         }

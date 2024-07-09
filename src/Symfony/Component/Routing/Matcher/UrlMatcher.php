@@ -32,8 +32,6 @@ class UrlMatcher implements UrlMatcherInterface, RequestMatcherInterface
     public const REQUIREMENT_MISMATCH = 1;
     public const ROUTE_MATCH = 2;
 
-    protected RequestContext $context;
-
     /**
      * Collects HTTP methods that would be allowed for the request.
      */
@@ -45,8 +43,6 @@ class UrlMatcher implements UrlMatcherInterface, RequestMatcherInterface
      * @internal
      */
     protected array $allowSchemes = [];
-
-    protected RouteCollection $routes;
     protected ?Request $request = null;
     protected ExpressionLanguage $expressionLanguage;
 
@@ -55,10 +51,10 @@ class UrlMatcher implements UrlMatcherInterface, RequestMatcherInterface
      */
     protected array $expressionLanguageProviders = [];
 
-    public function __construct(RouteCollection $routes, RequestContext $context)
-    {
-        $this->routes = $routes;
-        $this->context = $context;
+    public function __construct(
+        protected RouteCollection $routes,
+        protected RequestContext $context,
+    ) {
     }
 
     public function setContext(RequestContext $context): void
@@ -83,7 +79,7 @@ class UrlMatcher implements UrlMatcherInterface, RequestMatcherInterface
             throw new NoConfigurationException();
         }
 
-        throw 0 < \count($this->allow) ? new MethodNotAllowedException(array_unique($this->allow)) : new ResourceNotFoundException(sprintf('No routes found for "%s".', $pathinfo));
+        throw 0 < \count($this->allow) ? new MethodNotAllowedException(array_unique($this->allow)) : new ResourceNotFoundException(\sprintf('No routes found for "%s".', $pathinfo));
     }
 
     public function matchRequest(Request $request): array
@@ -200,6 +196,10 @@ class UrlMatcher implements UrlMatcherInterface, RequestMatcherInterface
             unset($defaults['_canonical_route']);
         }
         $attributes['_route'] = $name;
+
+        if ($mapping = $route->getOption('mapping')) {
+            $attributes['_route_mapping'] = $mapping;
+        }
 
         return $this->mergeDefaults($attributes, $defaults);
     }

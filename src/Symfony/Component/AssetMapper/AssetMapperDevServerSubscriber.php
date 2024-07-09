@@ -119,7 +119,7 @@ final class AssetMapperDevServerSubscriber implements EventSubscriberInterface
             return;
         }
 
-        $pathInfo = $event->getRequest()->getPathInfo();
+        $pathInfo = rawurldecode($event->getRequest()->getPathInfo());
         if (!str_starts_with($pathInfo, $this->publicPrefix)) {
             return;
         }
@@ -127,7 +127,7 @@ final class AssetMapperDevServerSubscriber implements EventSubscriberInterface
         $asset = $this->findAssetFromCache($pathInfo);
 
         if (!$asset) {
-            throw new NotFoundHttpException(sprintf('Asset with public path "%s" not found.', $pathInfo));
+            throw new NotFoundHttpException(\sprintf('Asset with public path "%s" not found.', $pathInfo));
         }
 
         $this->profiler?->disable();

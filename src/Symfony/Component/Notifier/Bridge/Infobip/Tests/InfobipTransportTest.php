@@ -21,7 +21,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 final class InfobipTransportTest extends TransportTestCase
 {
-    public static function createTransport(HttpClientInterface $client = null): InfobipTransport
+    public static function createTransport(?HttpClientInterface $client = null): InfobipTransport
     {
         return (new InfobipTransport('authtoken', '0611223344', $client ?? new MockHttpClient()))->setHost('host.test');
     }

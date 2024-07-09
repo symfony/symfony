@@ -25,13 +25,11 @@ use Symfony\Contracts\Service\ResetInterface;
 final class ConsoleCommandProcessor implements EventSubscriberInterface, ResetInterface
 {
     private array $commandData;
-    private bool $includeArguments;
-    private bool $includeOptions;
 
-    public function __construct(bool $includeArguments = true, bool $includeOptions = false)
-    {
-        $this->includeArguments = $includeArguments;
-        $this->includeOptions = $includeOptions;
+    public function __construct(
+        private bool $includeArguments = true,
+        private bool $includeOptions = false,
+    ) {
     }
 
     public function __invoke(LogRecord $record): LogRecord

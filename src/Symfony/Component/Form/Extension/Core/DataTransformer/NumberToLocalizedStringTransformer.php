@@ -28,15 +28,14 @@ class NumberToLocalizedStringTransformer implements DataTransformerInterface
     protected bool $grouping;
     protected int $roundingMode;
 
-    private ?int $scale;
-    private ?string $locale;
-
-    public function __construct(int $scale = null, ?bool $grouping = false, ?int $roundingMode = \NumberFormatter::ROUND_HALFUP, string $locale = null)
-    {
-        $this->scale = $scale;
+    public function __construct(
+        private ?int $scale = null,
+        ?bool $grouping = false,
+        ?int $roundingMode = \NumberFormatter::ROUND_HALFUP,
+        private ?string $locale = null,
+    ) {
         $this->grouping = $grouping ?? false;
         $this->roundingMode = $roundingMode ?? \NumberFormatter::ROUND_HALFUP;
-        $this->locale = $locale;
     }
 
     /**
@@ -141,7 +140,7 @@ class NumberToLocalizedStringTransformer implements DataTransformerInterface
             $remainder = trim($remainder, " \t\n\r\0\x0b\xc2\xa0");
 
             if ('' !== $remainder) {
-                throw new TransformationFailedException(sprintf('The number contains unrecognized characters: "%s".', $remainder));
+                throw new TransformationFailedException(\sprintf('The number contains unrecognized characters: "%s".', $remainder));
             }
         }
 

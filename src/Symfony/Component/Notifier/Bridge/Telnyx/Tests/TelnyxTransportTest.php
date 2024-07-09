@@ -21,7 +21,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 final class TelnyxTransportTest extends TransportTestCase
 {
-    public static function createTransport(HttpClientInterface $client = null): TelnyxTransport
+    public static function createTransport(?HttpClientInterface $client = null): TelnyxTransport
     {
         return new TelnyxTransport('api_key', 'from', 'messaging_profile_id', $client ?? new MockHttpClient());
     }

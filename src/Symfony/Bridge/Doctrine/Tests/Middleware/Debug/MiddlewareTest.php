@@ -41,7 +41,7 @@ class MiddlewareTest extends TestCase
         parent::setUp();
 
         if (!interface_exists(MiddlewareInterface::class)) {
-            $this->markTestSkipped(sprintf('%s needed to run this test', MiddlewareInterface::class));
+            $this->markTestSkipped(\sprintf('%s needed to run this test', MiddlewareInterface::class));
         }
 
         ClockMock::withClockMock(false);

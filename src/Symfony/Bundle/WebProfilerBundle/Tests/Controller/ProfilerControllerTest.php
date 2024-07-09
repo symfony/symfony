@@ -225,7 +225,7 @@ class ProfilerControllerTest extends WebTestCase
         $this->assertSame(200, $client->getResponse()->getStatusCode());
 
         foreach (['ip', 'status_code', 'url', 'token', 'start', 'end'] as $searchCriteria) {
-            $this->assertSame('', $crawler->filter(sprintf('form input[name="%s"]', $searchCriteria))->text());
+            $this->assertSame('', $crawler->filter(\sprintf('form input[name="%s"]', $searchCriteria))->text());
         }
     }
 
@@ -334,7 +334,7 @@ class ProfilerControllerTest extends WebTestCase
         $client->request('GET', '/_profiler/search?ip=&method=GET&status_code=&url=&token=&start=&end=&limit=10');
 
         $this->assertStringContainsString('results found', $client->getResponse()->getContent());
-        $this->assertStringContainsString(sprintf('<a href="/_profiler/%s">%s</a>', $token, $token), $client->getResponse()->getContent());
+        $this->assertStringContainsString(\sprintf('<a href="/_profiler/%s">%s</a>', $token, $token), $client->getResponse()->getContent());
     }
 
     public function testPhpinfoActionWithProfilerDisabled()

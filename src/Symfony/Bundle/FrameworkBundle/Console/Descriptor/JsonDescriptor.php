@@ -70,7 +70,7 @@ class JsonDescriptor extends Descriptor
         $this->writeData($data, $options);
     }
 
-    protected function describeContainerService(object $service, array $options = [], ContainerBuilder $container = null): void
+    protected function describeContainerService(object $service, array $options = [], ?ContainerBuilder $container = null): void
     {
         if (!isset($options['id'])) {
             throw new \InvalidArgumentException('An "id" option must be provided.');
@@ -121,12 +121,12 @@ class JsonDescriptor extends Descriptor
         $this->writeData($data, $options);
     }
 
-    protected function describeContainerDefinition(Definition $definition, array $options = [], ContainerBuilder $container = null): void
+    protected function describeContainerDefinition(Definition $definition, array $options = [], ?ContainerBuilder $container = null): void
     {
         $this->writeData($this->getContainerDefinitionData($definition, isset($options['omit_tags']) && $options['omit_tags'], isset($options['show_arguments']) && $options['show_arguments'], $container, $options['id'] ?? null), $options);
     }
 
-    protected function describeContainerAlias(Alias $alias, array $options = [], ContainerBuilder $container = null): void
+    protected function describeContainerAlias(Alias $alias, array $options = [], ?ContainerBuilder $container = null): void
     {
         if (!$container) {
             $this->writeData($this->getContainerAliasData($alias), $options);
@@ -156,7 +156,7 @@ class JsonDescriptor extends Descriptor
         $data = [$key => $parameter];
 
         if ($deprecation) {
-            $data['_deprecation'] = sprintf('Since %s %s: %s', $deprecation[0], $deprecation[1], sprintf(...\array_slice($deprecation, 2)));
+            $data['_deprecation'] = \sprintf('Since %s %s: %s', $deprecation[0], $deprecation[1], \sprintf(...\array_slice($deprecation, 2)));
         }
 
         $this->writeData($data, $options);
@@ -169,7 +169,7 @@ class JsonDescriptor extends Descriptor
 
     protected function describeContainerDeprecations(ContainerBuilder $container, array $options = []): void
     {
-        $containerDeprecationFilePath = sprintf('%s/%sDeprecations.log', $container->getParameter('kernel.build_dir'), $container->getParameter('kernel.container_class'));
+        $containerDeprecationFilePath = \sprintf('%s/%sDeprecations.log', $container->getParameter('kernel.build_dir'), $container->getParameter('kernel.container_class'));
         if (!file_exists($containerDeprecationFilePath)) {
             throw new RuntimeException('The deprecation file does not exist, please try warming the cache first.');
         }
@@ -236,7 +236,7 @@ class JsonDescriptor extends Descriptor
             $deprecations = [];
 
             foreach ($deprecated as $parameter => $deprecation) {
-                $deprecations[$parameter] = sprintf('Since %s %s: %s', $deprecation[0], $deprecation[1], sprintf(...\array_slice($deprecation, 2)));
+                $deprecations[$parameter] = \sprintf('Since %s %s: %s', $deprecation[0], $deprecation[1], \sprintf(...\array_slice($deprecation, 2)));
             }
 
             $sortedParameters['_deprecations'] = $deprecations;
@@ -245,7 +245,7 @@ class JsonDescriptor extends Descriptor
         return $sortedParameters;
     }
 
-    private function getContainerDefinitionData(Definition $definition, bool $omitTags = false, bool $showArguments = false, ContainerBuilder $container = null, string $id = null): array
+    private function getContainerDefinitionData(Definition $definition, bool $omitTags = false, bool $showArguments = false, ?ContainerBuilder $container = null, ?string $id = null): array
     {
         $data = [
             'class' => (string) $definition->getClass(),
@@ -280,7 +280,7 @@ class JsonDescriptor extends Descriptor
                 if ($factory[0] instanceof Reference) {
                     $data['factory_service'] = (string) $factory[0];
                 } elseif ($factory[0] instanceof Definition) {
-                    $data['factory_service'] = sprintf('inline factory service (%s)', $factory[0]->getClass() ?? 'class not configured');
+                    $data['factory_service'] = \sprintf('inline factory service (%s)', $factory[0]->getClass() ?? 'class not configured');
                 } else {
                     $data['factory_class'] = $factory[0];
                 }
@@ -418,7 +418,7 @@ class JsonDescriptor extends Descriptor
         throw new \InvalidArgumentException('Callable is not describable.');
     }
 
-    private function describeValue($value, bool $omitTags, bool $showArguments, ContainerBuilder $container = null, string $id = null): mixed
+    private function describeValue($value, bool $omitTags, bool $showArguments, ?ContainerBuilder $container = null, ?string $id = null): mixed
     {
         if (\is_array($value)) {
             $data = [];

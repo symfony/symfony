@@ -1,13 +1,30 @@
 CHANGELOG
 =========
 
+7.2
+---
+
+ * Add support for setting `headers` with `Symfony\Bundle\FrameworkBundle\Controller\TemplateController`
+ * Derivate `kernel.secret` from the decryption secret when its env var is not defined
+ * Make the `config/` directory optional in `MicroKernelTrait`, add support for service arguments in the
+   invokable Kernel class, and register `FrameworkBundle` by default when the `bundles.php` file is missing
+ * Add `exit` option for `secrets:decrypt-to-local` command
+
 7.1
 ---
 
+ * Add `CheckAliasValidityPass` to `lint:container` command
+ * Add `private_ranges` as a shortcut for private IP address ranges to the `trusted_proxies` option
  * Mark classes `ConfigBuilderCacheWarmer`, `Router`, `SerializerCacheWarmer`, `TranslationsCacheWarmer`, `Translator` and `ValidatorCacheWarmer` as `final`
  * Move the Router `cache_dir` to `kernel.build_dir`
  * Deprecate the `router.cache_dir` config option
  * Add `rate_limiter` tags to rate limiter services
+ * Add `secrets:reveal` command
+ * Add `rate_limiter` option to `http_client.default_options` and `http_client.scoped_clients`
+ * Attach the workflow's configuration to the `workflow` tag
+ * Add the `allowed_recipients` option for mailer to allow some users to receive
+   emails even if `recipients` is defined.
+ * Reset env vars when resetting the container
 
 7.0
 ---

@@ -86,7 +86,7 @@ class EntityTypeTest extends BaseTypeTestCase
         }
     }
 
-    protected function getExtensions()
+    protected function getExtensions(): array
     {
         return array_merge(parent::getExtensions(), [
             new DoctrineOrmExtension($this->emRegistry),
@@ -766,7 +766,7 @@ class EntityTypeTest extends BaseTypeTestCase
             'em' => 'default',
             'class' => self::ITEM_GROUP_CLASS,
             'choice_label' => 'name',
-            'choice_value' => function (GroupableEntity $entity = null) {
+            'choice_value' => function (?GroupableEntity $entity = null) {
                 if (null === $entity) {
                     return '';
                 }
@@ -780,7 +780,7 @@ class EntityTypeTest extends BaseTypeTestCase
         $this->assertEquals([
             'BazGroup/Foo' => new ChoiceView($entity1, 'BazGroup/Foo', 'Foo'),
             'BooGroup/Bar' => new ChoiceView($entity2, 'BooGroup/Bar', 'Bar'),
-            ], $field->createView()->vars['choices']);
+        ], $field->createView()->vars['choices']);
         $this->assertTrue($field->isSynchronized(), 'Field should be synchronized.');
         $this->assertSame($entity2, $field->getData(), 'Entity should be loaded by custom value.');
         $this->assertSame('BooGroup/Bar', $field->getViewData());
@@ -1312,19 +1312,6 @@ class EntityTypeTest extends BaseTypeTestCase
         $this->assertEquals('name', $view->vars['id']);
         $this->assertEquals('name', $view->vars['name']);
         $this->assertEquals('name', $view->vars['full_name']);
-    }
-
-    public function testStripLeadingUnderscoresAndDigitsFromId()
-    {
-        $view = $this->factory->createNamed('_09name', static::TESTED_TYPE, null, [
-            'em' => 'default',
-            'class' => self::SINGLE_IDENT_CLASS,
-        ])
-            ->createView();
-
-        $this->assertEquals('name', $view->vars['id']);
-        $this->assertEquals('_09name', $view->vars['name']);
-        $this->assertEquals('_09name', $view->vars['full_name']);
     }
 
     public function testPassIdAndNameToViewWithParent()

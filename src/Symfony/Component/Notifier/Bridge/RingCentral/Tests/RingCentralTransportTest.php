@@ -24,7 +24,7 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
 
 final class RingCentralTransportTest extends TransportTestCase
 {
-    public static function createTransport(HttpClientInterface $client = null, string $from = 'from'): RingCentralTransport
+    public static function createTransport(?HttpClientInterface $client = null, string $from = 'from'): RingCentralTransport
     {
         return new RingCentralTransport('apiToken', $from, $client ?? new MockHttpClient());
     }
@@ -49,7 +49,7 @@ final class RingCentralTransportTest extends TransportTestCase
         $transport = $this->createTransport(null, $from);
 
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage(sprintf('The "From" number "%s" is not a valid phone number.', $from));
+        $this->expectExceptionMessage(\sprintf('The "From" number "%s" is not a valid phone number.', $from));
 
         $transport->send(new SmsMessage('+33612345678', 'Hello!'));
     }

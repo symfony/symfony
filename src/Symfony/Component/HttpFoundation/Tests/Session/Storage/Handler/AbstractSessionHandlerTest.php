@@ -45,10 +45,10 @@ class AbstractSessionHandlerTest extends TestCase
     {
         $context = ['http' => ['header' => "Cookie: sid=123abc\r\n"]];
         $context = stream_context_create($context);
-        $result = file_get_contents(sprintf('http://localhost:8053/%s.php', $fixture), false, $context);
+        $result = file_get_contents(\sprintf('http://localhost:8053/%s.php', $fixture), false, $context);
         $result = preg_replace_callback('/expires=[^;]++/', fn ($m) => str_replace('-', ' ', $m[0]), $result);
 
-        $this->assertStringEqualsFile(__DIR__.sprintf('/Fixtures/%s.expected', $fixture), $result);
+        $this->assertStringEqualsFile(__DIR__.\sprintf('/Fixtures/%s.expected', $fixture), $result);
     }
 
     public static function provideSession()

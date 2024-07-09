@@ -25,15 +25,11 @@ use Symfony\Component\Security\Http\Firewall\SwitchUserListener;
  */
 class ImpersonateUrlGenerator
 {
-    private RequestStack $requestStack;
-    private TokenStorageInterface $tokenStorage;
-    private FirewallMap $firewallMap;
-
-    public function __construct(RequestStack $requestStack, FirewallMap $firewallMap, TokenStorageInterface $tokenStorage)
-    {
-        $this->requestStack = $requestStack;
-        $this->tokenStorage = $tokenStorage;
-        $this->firewallMap = $firewallMap;
+    public function __construct(
+        private RequestStack $requestStack,
+        private FirewallMap $firewallMap,
+        private TokenStorageInterface $tokenStorage,
+    ) {
     }
 
     public function generateImpersonationPath(string $identifier): string
@@ -50,12 +46,12 @@ class ImpersonateUrlGenerator
         return $request->getUriForPath($this->buildPath(null, $identifier));
     }
 
-    public function generateExitPath(string $targetUri = null): string
+    public function generateExitPath(?string $targetUri = null): string
     {
         return $this->buildPath($targetUri);
     }
 
-    public function generateExitUrl(string $targetUri = null): string
+    public function generateExitUrl(?string $targetUri = null): string
     {
         if (null === $request = $this->requestStack->getCurrentRequest()) {
             return '';
@@ -69,7 +65,7 @@ class ImpersonateUrlGenerator
         return $this->tokenStorage->getToken() instanceof SwitchUserToken;
     }
 
-    private function buildPath(string $targetUri = null, string $identifier = SwitchUserListener::EXIT_VALUE): string
+    private function buildPath(?string $targetUri = null, string $identifier = SwitchUserListener::EXIT_VALUE): string
     {
         if (null === ($request = $this->requestStack->getCurrentRequest())) {
             return '';

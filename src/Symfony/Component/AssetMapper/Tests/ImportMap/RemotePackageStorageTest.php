@@ -25,7 +25,7 @@ class RemotePackageStorageTest extends TestCase
     protected function setUp(): void
     {
         $this->filesystem = new Filesystem();
-        if (!file_exists(self::$writableRoot)) {
+        if (!$this->filesystem->exists(self::$writableRoot)) {
             $this->filesystem->mkdir(self::$writableRoot);
         }
     }
@@ -41,14 +41,28 @@ class RemotePackageStorageTest extends TestCase
         $this->assertSame(realpath(self::$writableRoot.'/assets/vendor'), realpath($storage->getStorageDir()));
     }
 
+    public function testSaveThrowsWhenVendorDirectoryIsNotWritable()
+    {
+        $this->filesystem->mkdir($vendorDir = self::$writableRoot.'/assets/acme/vendor');
+        $this->filesystem->chmod($vendorDir, 0555);
+
+        $storage = new RemotePackageStorage($vendorDir);
+        $entry = ImportMapEntry::createRemote('foo', ImportMapType::JS, '/does/not/matter', '1.0.0', 'module_specifier', false);
+
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('file_put_contents('.$vendorDir.'/module_specifier/module_specifier.index.js): Failed to open stream: No such file or directory');
+        $storage->save($entry, 'any content');
+    }
+
     public function testIsDownloaded()
     {
         $storage = new RemotePackageStorage(self::$writableRoot.'/assets/vendor');
         $entry = ImportMapEntry::createRemote('foo', ImportMapType::JS, '/does/not/matter', '1.0.0', 'module_specifier', false);
         $this->assertFalse($storage->isDownloaded($entry));
+
         $targetPath = self::$writableRoot.'/assets/vendor/module_specifier/module_specifier.index.js';
-        @mkdir(\dirname($targetPath), 0777, true);
-        file_put_contents($targetPath, 'any content');
+        $this->filesystem->mkdir(\dirname($targetPath));
+        $this->filesystem->dumpFile($targetPath, 'any content');
         $this->assertTrue($storage->isDownloaded($entry));
     }
 
@@ -57,9 +71,10 @@ class RemotePackageStorageTest extends TestCase
         $storage = new RemotePackageStorage(self::$writableRoot.'/assets/vendor');
         $entry = ImportMapEntry::createRemote('foo', ImportMapType::JS, '/does/not/matter', '1.0.0', 'module_specifier', false);
         $this->assertFalse($storage->isExtraFileDownloaded($entry, '/path/to/extra.woff'));
+
         $targetPath = self::$writableRoot.'/assets/vendor/module_specifier/path/to/extra.woff';
-        @mkdir(\dirname($targetPath), 0777, true);
-        file_put_contents($targetPath, 'any content');
+        $this->filesystem->mkdir(\dirname($targetPath));
+        $this->filesystem->dumpFile($targetPath, 'any content');
         $this->assertTrue($storage->isExtraFileDownloaded($entry, '/path/to/extra.woff'));
     }
 
@@ -70,7 +85,7 @@ class RemotePackageStorageTest extends TestCase
         $storage->save($entry, 'any content');
         $targetPath = self::$writableRoot.'/assets/vendor/module_specifier/module_specifier.index.js';
         $this->assertFileExists($targetPath);
-        $this->assertEquals('any content', file_get_contents($targetPath));
+        $this->assertEquals('any content', $this->filesystem->readFile($targetPath));
     }
 
     public function testSaveExtraFile()
@@ -80,7 +95,7 @@ class RemotePackageStorageTest extends TestCase
         $storage->saveExtraFile($entry, '/path/to/extra-file.woff2', 'any content');
         $targetPath = self::$writableRoot.'/assets/vendor/module_specifier/path/to/extra-file.woff2';
         $this->assertFileExists($targetPath);
-        $this->assertEquals('any content', file_get_contents($targetPath));
+        $this->assertEquals('any content', $this->filesystem->readFile($targetPath));
     }
 
     /**
@@ -92,7 +107,7 @@ class RemotePackageStorageTest extends TestCase
         $this->assertSame($expectedPath, $storage->getDownloadPath($packageModuleSpecifier, $importMapType));
     }
 
-    public static function getDownloadPathTests()
+    public static function getDownloadPathTests(): iterable
     {
         yield 'javascript bare package' => [
             'packageModuleSpecifier' => 'foo',

@@ -28,7 +28,7 @@ final class TelegramTransportTest extends TransportTestCase
 {
     private const FIXTURE_FILE = __DIR__.'/Fixtures/image.png';
 
-    public static function createTransport(HttpClientInterface $client = null, string $channel = null): TelegramTransport
+    public static function createTransport(?HttpClientInterface $client = null, ?string $channel = null): TelegramTransport
     {
         return new TelegramTransport('token', $channel, $client ?? new MockHttpClient());
     }
@@ -404,7 +404,7 @@ final class TelegramTransportTest extends TransportTestCase
                         'emoji' => '🤖',
                     ],
                     'caption' => 'testMessage',
-                    ],
+                ],
             ],
             'sticker-without-emoji' => [
                 'messageOptions' => (new TelegramOptions())->sticker('https://localhost/sticker.webp'),
@@ -848,7 +848,7 @@ final class TelegramTransportTest extends TransportTestCase
 
                 BODY;
             $expectedBody = str_replace("\n", "\r\n", $expectedBody);
-            $expectedBody = sprintf($expectedBody, file_get_contents(self::FIXTURE_FILE));
+            $expectedBody = \sprintf($expectedBody, file_get_contents(self::FIXTURE_FILE));
 
             $body = '';
             do {

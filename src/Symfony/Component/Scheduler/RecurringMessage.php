@@ -43,9 +43,9 @@ final class RecurringMessage implements MessageProviderInterface
      * @param MessageProviderInterface|object $message A message provider that yields messages or a static message that will be dispatched on every trigger
      *
      * @see https://en.wikipedia.org/wiki/ISO_8601#Durations
-     * @see https://php.net/datetime.formats.relative
+     * @see https://php.net/datetime.formats#datetime.formats.relative
      */
-    public static function every(string|int|\DateInterval $frequency, object $message, string|\DateTimeImmutable $from = null, string|\DateTimeImmutable $until = new \DateTimeImmutable('3000-01-01')): self
+    public static function every(string|int|\DateInterval $frequency, object $message, string|\DateTimeImmutable|null $from = null, string|\DateTimeImmutable $until = new \DateTimeImmutable('3000-01-01')): self
     {
         return self::trigger(new PeriodicalTrigger($frequency, $from, $until), $message);
     }
@@ -53,7 +53,7 @@ final class RecurringMessage implements MessageProviderInterface
     /**
      * @param MessageProviderInterface|object $message A message provider that yields messages or a static message that will be dispatched on every trigger
      */
-    public static function cron(string $expression, object $message, \DateTimeZone|string $timezone = null): self
+    public static function cron(string $expression, object $message, \DateTimeZone|string|null $timezone = null): self
     {
         if (!str_contains($expression, '#')) {
             return self::trigger(CronExpressionTrigger::fromSpec($expression, null, $timezone), $message);
@@ -75,14 +75,15 @@ final class RecurringMessage implements MessageProviderInterface
             return new self($trigger, $message);
         }
 
-        $description = '';
-        try {
-            $description = $message instanceof \Stringable ? (string) $message : serialize($message);
-        } catch (\Exception) {
+        $description = $message::class;
+        if ($message instanceof \Stringable) {
+            try {
+                $description .= " ($message)";
+            } catch (\Exception) {
+            }
         }
-        $description = sprintf('%s(%s)', $message::class, $description);
 
-        return new self($trigger, new StaticMessageProvider([$message], $description));
+        return new self($trigger, new StaticMessageProvider([$message], strtr(substr(base64_encode(hash('xxh128', serialize($message), true)), 0, 7), '/+', '._'), $description));
     }
 
     public function withJitter(int $maxSeconds = 60): self

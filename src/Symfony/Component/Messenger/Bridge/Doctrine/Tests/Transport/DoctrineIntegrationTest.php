@@ -191,6 +191,7 @@ class DoctrineIntegrationTest extends TestCase
 
     public function testTheTransportIsSetupOnGet()
     {
+        $this->driverConnection->executeStatement('CREATE TABLE unrelated (unknown_type_column)');
         $this->assertFalse($this->driverConnection->createSchemaManager()->tablesExist(['messenger_messages']));
         $this->assertNull($this->connection->get());
 

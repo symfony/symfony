@@ -37,7 +37,7 @@ interface ValidatorInterface extends MetadataFactoryInterface
      *                                          If the list is empty, validation
      *                                          succeeded
      */
-    public function validate(mixed $value, Constraint|array $constraints = null, string|GroupSequence|array $groups = null): ConstraintViolationListInterface;
+    public function validate(mixed $value, Constraint|array|null $constraints = null, string|GroupSequence|array|null $groups = null): ConstraintViolationListInterface;
 
     /**
      * Validates a property of an object against the constraints specified
@@ -50,7 +50,7 @@ interface ValidatorInterface extends MetadataFactoryInterface
      *                                          If the list is empty, validation
      *                                          succeeded
      */
-    public function validateProperty(object $object, string $propertyName, string|GroupSequence|array $groups = null): ConstraintViolationListInterface;
+    public function validateProperty(object $object, string $propertyName, string|GroupSequence|array|null $groups = null): ConstraintViolationListInterface;
 
     /**
      * Validates a value against the constraints specified for an object's
@@ -65,7 +65,7 @@ interface ValidatorInterface extends MetadataFactoryInterface
      *                                          If the list is empty, validation
      *                                          succeeded
      */
-    public function validatePropertyValue(object|string $objectOrClass, string $propertyName, mixed $value, string|GroupSequence|array $groups = null): ConstraintViolationListInterface;
+    public function validatePropertyValue(object|string $objectOrClass, string $propertyName, mixed $value, string|GroupSequence|array|null $groups = null): ConstraintViolationListInterface;
 
     /**
      * Starts a new validation context and returns a validator for that context.

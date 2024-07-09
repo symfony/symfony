@@ -50,29 +50,18 @@ class TranslationUpdateCommand extends Command
         'xlf20' => ['xlf', '2.0'],
     ];
 
-    private TranslationWriterInterface $writer;
-    private TranslationReaderInterface $reader;
-    private ExtractorInterface $extractor;
-    private string $defaultLocale;
-    private ?string $defaultTransPath;
-    private ?string $defaultViewsPath;
-    private array $transPaths;
-    private array $codePaths;
-    private array $enabledLocales;
-
-    public function __construct(TranslationWriterInterface $writer, TranslationReaderInterface $reader, ExtractorInterface $extractor, string $defaultLocale, string $defaultTransPath = null, string $defaultViewsPath = null, array $transPaths = [], array $codePaths = [], array $enabledLocales = [])
-    {
+    public function __construct(
+        private TranslationWriterInterface $writer,
+        private TranslationReaderInterface $reader,
+        private ExtractorInterface $extractor,
+        private string $defaultLocale,
+        private ?string $defaultTransPath = null,
+        private ?string $defaultViewsPath = null,
+        private array $transPaths = [],
+        private array $codePaths = [],
+        private array $enabledLocales = [],
+    ) {
         parent::__construct();
-
-        $this->writer = $writer;
-        $this->reader = $reader;
-        $this->extractor = $extractor;
-        $this->defaultLocale = $defaultLocale;
-        $this->defaultTransPath = $defaultTransPath;
-        $this->defaultViewsPath = $defaultViewsPath;
-        $this->transPaths = $transPaths;
-        $this->codePaths = $codePaths;
-        $this->enabledLocales = $enabledLocales;
     }
 
     protected function configure(): void
@@ -183,13 +172,13 @@ EOF
                 $codePaths = [$path.'/templates'];
 
                 if (!is_dir($transPaths[0])) {
-                    throw new InvalidArgumentException(sprintf('"%s" is neither an enabled bundle nor a directory.', $transPaths[0]));
+                    throw new InvalidArgumentException(\sprintf('"%s" is neither an enabled bundle nor a directory.', $transPaths[0]));
                 }
             }
         }
 
         $io->title('Translation Messages Extractor and Dumper');
-        $io->comment(sprintf('Generating "<info>%s</info>" translation files for "<info>%s</info>"', $input->getArgument('locale'), $currentName));
+        $io->comment(\sprintf('Generating "<info>%s</info>" translation files for "<info>%s</info>"', $input->getArgument('locale'), $currentName));
 
         $io->comment('Parsing templates...');
         $extractedCatalogue = $this->extractMessages($input->getArgument('locale'), $codePaths, $input->getOption('prefix'));
@@ -228,8 +217,8 @@ EOF
 
                 $list = array_merge(
                     array_diff($allKeys, $newKeys),
-                    array_map(fn ($id) => sprintf('<fg=green>%s</>', $id), $newKeys),
-                    array_map(fn ($id) => sprintf('<fg=red>%s</>', $id), array_keys($operation->getObsoleteMessages($domain)))
+                    array_map(fn ($id) => \sprintf('<fg=green>%s</>', $id), $newKeys),
+                    array_map(fn ($id) => \sprintf('<fg=red>%s</>', $id), array_keys($operation->getObsoleteMessages($domain)))
                 );
 
                 $domainMessagesCount = \count($list);
@@ -249,17 +238,17 @@ EOF
                     }
                 }
 
-                $io->section(sprintf('Messages extracted for domain "<info>%s</info>" (%d message%s)', $domain, $domainMessagesCount, $domainMessagesCount > 1 ? 's' : ''));
+                $io->section(\sprintf('Messages extracted for domain "<info>%s</info>" (%d message%s)', $domain, $domainMessagesCount, $domainMessagesCount > 1 ? 's' : ''));
                 $io->listing($list);
 
                 $extractedMessagesCount += $domainMessagesCount;
             }
 
             if ('xlf' === $format) {
-                $io->comment(sprintf('Xliff output version is <info>%s</info>', $xliffVersion));
+                $io->comment(\sprintf('Xliff output version is <info>%s</info>', $xliffVersion));
             }
 
-            $resultMessage = sprintf('%d message%s successfully extracted', $extractedMessagesCount, $extractedMessagesCount > 1 ? 's were' : ' was');
+            $resultMessage = \sprintf('%d message%s successfully extracted', $extractedMessagesCount, $extractedMessagesCount > 1 ? 's were' : ' was');
         }
 
         // save the files

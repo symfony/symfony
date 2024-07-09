@@ -36,26 +36,20 @@ use Symfony\Component\VarDumper\Cloner\Data;
  */
 class SecurityDataCollector extends DataCollector implements LateDataCollectorInterface
 {
-    private ?TokenStorageInterface $tokenStorage;
-    private ?RoleHierarchyInterface $roleHierarchy;
-    private ?LogoutUrlGenerator $logoutUrlGenerator;
-    private ?AccessDecisionManagerInterface $accessDecisionManager;
-    private ?FirewallMapInterface $firewallMap;
-    private ?TraceableFirewallListener $firewall;
     private bool $hasVarDumper;
 
-    public function __construct(TokenStorageInterface $tokenStorage = null, RoleHierarchyInterface $roleHierarchy = null, LogoutUrlGenerator $logoutUrlGenerator = null, AccessDecisionManagerInterface $accessDecisionManager = null, FirewallMapInterface $firewallMap = null, TraceableFirewallListener $firewall = null)
-    {
-        $this->tokenStorage = $tokenStorage;
-        $this->roleHierarchy = $roleHierarchy;
-        $this->logoutUrlGenerator = $logoutUrlGenerator;
-        $this->accessDecisionManager = $accessDecisionManager;
-        $this->firewallMap = $firewallMap;
-        $this->firewall = $firewall;
+    public function __construct(
+        private ?TokenStorageInterface $tokenStorage = null,
+        private ?RoleHierarchyInterface $roleHierarchy = null,
+        private ?LogoutUrlGenerator $logoutUrlGenerator = null,
+        private ?AccessDecisionManagerInterface $accessDecisionManager = null,
+        private ?FirewallMapInterface $firewallMap = null,
+        private ?TraceableFirewallListener $firewall = null,
+    ) {
         $this->hasVarDumper = class_exists(ClassStub::class);
     }
 
-    public function collect(Request $request, Response $response, \Throwable $exception = null): void
+    public function collect(Request $request, Response $response, ?\Throwable $exception = null): void
     {
         if (null === $this->tokenStorage) {
             $this->data = [
@@ -131,6 +125,7 @@ class SecurityDataCollector extends DataCollector implements LateDataCollectorIn
         // collect voters and access decision manager information
         if ($this->accessDecisionManager instanceof TraceableAccessDecisionManager) {
             $this->data['voter_strategy'] = $this->accessDecisionManager->getStrategy();
+            $this->data['voters'] = [];
 
             foreach ($this->accessDecisionManager->getVoters() as $voter) {
                 if ($voter instanceof TraceableVoter) {
@@ -186,7 +181,7 @@ class SecurityDataCollector extends DataCollector implements LateDataCollectorIn
                 if ($this->data['impersonated'] && null !== $switchUserConfig = $firewallConfig->getSwitchUser()) {
                     $exitPath = $request->getRequestUri();
                     $exitPath .= null === $request->getQueryString() ? '?' : '&';
-                    $exitPath .= sprintf('%s=%s', urlencode($switchUserConfig['parameter']), SwitchUserListener::EXIT_VALUE);
+                    $exitPath .= \sprintf('%s=%s', urlencode($switchUserConfig['parameter']), SwitchUserListener::EXIT_VALUE);
 
                     $this->data['impersonation_exit_path'] = $exitPath;
                 }

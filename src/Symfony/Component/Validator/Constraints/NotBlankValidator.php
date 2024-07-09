@@ -35,7 +35,7 @@ class NotBlankValidator extends ConstraintValidator
             $value = ($constraint->normalizer)($value);
         }
 
-        if (false === $value || (empty($value) && '0' != $value)) {
+        if (false === $value || (!$value && '0' != $value)) {
             $this->context->buildViolation($constraint->message)
                 ->setParameter('{{ value }}', $this->formatValue($value))
                 ->setCode(NotBlank::IS_BLANK_ERROR)

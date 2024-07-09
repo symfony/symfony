@@ -16,7 +16,7 @@ class Foo
     public static int $counter = 0;
 
     #[Required]
-    public function cloneFoo(\stdClass $bar = null): static
+    public function cloneFoo(?\stdClass $bar = null): static
     {
         ++self::$counter;
 
@@ -106,7 +106,7 @@ class D
 
 class E
 {
-    public function __construct(D $d = null)
+    public function __construct(?D $d = null)
     {
     }
 }
@@ -162,13 +162,6 @@ class LesTilleuls
     }
 }
 
-class OptionalParameter
-{
-    public function __construct(CollisionInterface $c = null, A $a, Foo $f = null)
-    {
-    }
-}
-
 class BadTypeHintedArgument
 {
     public function __construct(Dunglas $k, NotARealClass $r)
@@ -202,7 +195,7 @@ class MultipleArguments
 
 class MultipleArgumentsOptionalScalar
 {
-    public function __construct(A $a, $foo = 'default_val', Lille $lille = null)
+    public function __construct(A $a, $foo = 'default_val', ?Lille $lille = null)
     {
     }
 }
@@ -226,7 +219,7 @@ class UnderscoreNamedArgument
  */
 class ClassForResource
 {
-    public function __construct($foo, Bar $bar = null)
+    public function __construct($foo, ?Bar $bar = null)
     {
     }
 
@@ -345,7 +338,7 @@ class NotWireable
     {
     }
 
-    public function setOptionalNotAutowireable(NotARealClass $n = null)
+    public function setOptionalNotAutowireable(?NotARealClass $n = null)
     {
     }
 
@@ -392,7 +385,7 @@ class DecoratorImpl implements DecoratorInterface
 
 class Decorated implements DecoratorInterface
 {
-    public function __construct($quz = null, \NonExistent $nonExistent = null, DecoratorInterface $decorated = null, array $foo = [])
+    public function __construct($quz = null, ?\NonExistent $nonExistent = null, ?DecoratorInterface $decorated = null, array $foo = [])
     {
     }
 }
@@ -467,5 +460,61 @@ class MyCallable
 {
     public function __invoke(): void
     {
+    }
+}
+
+class MyInlineService
+{
+    public function __construct(private readonly ?string $someParam = null)
+    {
+    }
+
+    public function someMethod(): void
+    {
+    }
+
+    public function someMethod1(): void
+    {
+    }
+
+    public function someMethod2(): void
+    {
+    }
+
+    public function getSomeParam(): ?string
+    {
+        return $this->someParam;
+    }
+}
+
+class MyFactory
+{
+    public function __construct()
+    {
+    }
+
+    public function __invoke(mixed $someParam = null): MyInlineService
+    {
+        return new MyInlineService($someParam ?? 'someString');
+    }
+
+    public function createFoo(): MyInlineService
+    {
+        return new MyInlineService('someString');
+    }
+
+    public function createFooWithParam(mixed $someParam): MyInlineService
+    {
+        return new MyInlineService($someParam);
+    }
+
+    public static function staticCreateFoo(): MyInlineService
+    {
+        return new MyInlineService('someString');
+    }
+
+    public static function staticCreateFooWithParam(mixed $someParam): MyInlineService
+    {
+        return new MyInlineService($someParam);
     }
 }

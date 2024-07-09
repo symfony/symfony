@@ -92,10 +92,6 @@ class UnsupportedSchemeException extends LogicException
             'class' => Bridge\GatewayApi\GatewayApiTransportFactory::class,
             'package' => 'symfony/gateway-api-notifier',
         ],
-        'gitter' => [
-            'class' => Bridge\Gitter\GitterTransportFactory::class,
-            'package' => 'symfony/gitter-notifier',
-        ],
         'goip' => [
             'class' => Bridge\GoIp\GoIpTransportFactory::class,
             'package' => 'symfony/go-ip-notifier',
@@ -131,6 +127,10 @@ class UnsupportedSchemeException extends LogicException
         'linkedin' => [
             'class' => Bridge\LinkedIn\LinkedInTransportFactory::class,
             'package' => 'symfony/linked-in-notifier',
+        ],
+        'lox24' => [
+            'class' => Bridge\Lox24\Lox24TransportFactory::class,
+            'package' => 'symfony/lox24-notifier',
         ],
         'mailjet' => [
             'class' => Bridge\Mailjet\MailjetTransportFactory::class,
@@ -196,9 +196,17 @@ class UnsupportedSchemeException extends LogicException
             'class' => Bridge\Plivo\PlivoTransportFactory::class,
             'package' => 'symfony/plivo-notifier',
         ],
+        'primotexto' => [
+            'class' => Bridge\Primotexto\PrimotextoTransportFactory::class,
+            'package' => 'symfony/primotexto-notifier',
+        ],
         'pushover' => [
             'class' => Bridge\Pushover\PushoverTransportFactory::class,
             'package' => 'symfony/pushover-notifier',
+        ],
+        'pushy' => [
+            'class' => Bridge\Pushy\PushyTransportFactory::class,
+            'package' => 'symfony/pushy-notifier',
         ],
         'redlink' => [
             'class' => Bridge\Redlink\RedlinkTransportFactory::class,
@@ -219,6 +227,10 @@ class UnsupportedSchemeException extends LogicException
         'sevenio' => [
             'class' => Bridge\Sevenio\SevenIoTransportFactory::class,
             'package' => 'symfony/sevenio-notifier',
+        ],
+        'sipgate' => [
+            'class' => Bridge\Sipgate\SipgateTransportFactory::class,
+            'package' => 'symfony/sipgate-notifier',
         ],
         'simpletextin' => [
             'class' => Bridge\SimpleTextin\SimpleTextinTransportFactory::class,
@@ -251,6 +263,10 @@ class UnsupportedSchemeException extends LogicException
         'smsc' => [
             'class' => Bridge\Smsc\SmscTransportFactory::class,
             'package' => 'symfony/smsc-notifier',
+        ],
+        'smsense' => [
+            'class' => Bridge\Smsense\SmsenseTransportFactory::class,
+            'package' => 'symfony/smsense-notifier',
         ],
         'sms-factor' => [
             'class' => Bridge\SmsFactor\SmsFactorTransportFactory::class,
@@ -321,7 +337,7 @@ class UnsupportedSchemeException extends LogicException
     /**
      * @param string[] $supported
      */
-    public function __construct(Dsn $dsn, string $name = null, array $supported = [], \Throwable $previous = null)
+    public function __construct(Dsn $dsn, ?string $name = null, array $supported = [], ?\Throwable $previous = null)
     {
         $provider = $dsn->getScheme();
         if (false !== $pos = strpos($provider, '+')) {
@@ -329,14 +345,14 @@ class UnsupportedSchemeException extends LogicException
         }
         $package = self::SCHEME_TO_PACKAGE_MAP[$provider] ?? null;
         if ($package && !class_exists($package['class'])) {
-            parent::__construct(sprintf('Unable to send notification via "%s" as the bridge is not installed. Try running "composer require %s".', $provider, $package['package']));
+            parent::__construct(\sprintf('Unable to send notification via "%s" as the bridge is not installed. Try running "composer require %s".', $provider, $package['package']));
 
             return;
         }
 
-        $message = sprintf('The "%s" scheme is not supported', $dsn->getScheme());
+        $message = \sprintf('The "%s" scheme is not supported', $dsn->getScheme());
         if ($name && $supported) {
-            $message .= sprintf('; supported schemes for notifier "%s" are: "%s"', $name, implode('", "', $supported));
+            $message .= \sprintf('; supported schemes for notifier "%s" are: "%s"', $name, implode('", "', $supported));
         }
 
         parent::__construct($message.'.', 0, $previous);

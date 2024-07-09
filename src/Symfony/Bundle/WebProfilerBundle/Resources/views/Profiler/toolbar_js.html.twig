@@ -51,6 +51,9 @@
             }
 
             var request = function(url, onSuccess, onError, payload, options, tries) {
+                url = new URL(url);
+                url.searchParams.set('XDEBUG_IGNORE', '1');
+                url = url.toString();
                 var xhr = window.XMLHttpRequest ? new XMLHttpRequest() : new ActiveXObject('Microsoft.XMLHTTP');
                 options = options || {};
                 options.retry = options.retry || false;

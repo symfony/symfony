@@ -21,7 +21,6 @@ use Symfony\Component\Messenger\Stamp\SerializerStamp;
 use Symfony\Component\Messenger\Stamp\ValidationStamp;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
 use Symfony\Component\Messenger\Transport\Serialization\Serializer;
-use Symfony\Component\Serializer as SerializerComponent;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\Serializer\SerializerInterface as SerializerComponentInterface;
 
@@ -78,7 +77,7 @@ class SerializerTest extends TestCase
     {
         $message = new DummyMessage('Foo');
 
-        $serializer = $this->createMock(SerializerComponent\SerializerInterface::class);
+        $serializer = $this->createMock(SerializerComponentInterface::class);
         $serializer->expects($this->once())->method('serialize')->with($message, 'csv', ['foo' => 'bar', Serializer::MESSENGER_SERIALIZATION_CONTEXT => true])->willReturn('Yay');
         $serializer->expects($this->once())->method('deserialize')->with('Yay', DummyMessage::class, 'csv', ['foo' => 'bar', Serializer::MESSENGER_SERIALIZATION_CONTEXT => true])->willReturn($message);
 

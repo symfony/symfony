@@ -28,7 +28,7 @@ class DelegatingLoader extends Loader
         $this->resolver = $resolver;
     }
 
-    public function load(mixed $resource, string $type = null): mixed
+    public function load(mixed $resource, ?string $type = null): mixed
     {
         if (false === $loader = $this->resolver->resolve($resource, $type)) {
             throw new LoaderLoadException($resource, null, 0, null, $type);
@@ -37,7 +37,7 @@ class DelegatingLoader extends Loader
         return $loader->load($resource, $type);
     }
 
-    public function supports(mixed $resource, string $type = null): bool
+    public function supports(mixed $resource, ?string $type = null): bool
     {
         return false !== $this->resolver->resolve($resource, $type);
     }

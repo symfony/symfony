@@ -40,5 +40,5 @@ interface AuthenticationEntryPointInterface
      *
      *     return new Response('Auth header required', 401);
      */
-    public function start(Request $request, AuthenticationException $authException = null): Response;
+    public function start(Request $request, ?AuthenticationException $authException = null): Response;
 }

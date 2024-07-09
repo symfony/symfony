@@ -1895,8 +1895,8 @@ class ChoiceTypeTest extends BaseTypeTestCase
     {
         $this->assertInstanceOf(
             FormInterface::class, $this->factory->createNamed('name', static::TESTED_TYPE, null, [
-            'choices' => [],
-        ]));
+                'choices' => [],
+            ]));
     }
 
     public function testInitializeWithDefaultObjectChoice()

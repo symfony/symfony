@@ -129,7 +129,11 @@ class Configuration implements ConfigurationInterface
             ->children()
                 ->scalarNode('autoescape_service')->defaultNull()->end()
                 ->scalarNode('autoescape_service_method')->defaultNull()->end()
-                ->scalarNode('base_template_class')->example('Twig\Template')->cannotBeEmpty()->end()
+                ->scalarNode('base_template_class')
+                    ->setDeprecated('symfony/twig-bundle', '7.1')
+                    ->example('Twig\Template')
+                    ->cannotBeEmpty()
+                ->end()
                 ->scalarNode('cache')->defaultValue('%kernel.cache_dir%/twig')->end()
                 ->scalarNode('charset')->defaultValue('%kernel.charset%')->end()
                 ->booleanNode('debug')->defaultValue('%kernel.debug%')->end()
@@ -153,7 +157,7 @@ class Configuration implements ConfigurationInterface
                     ->normalizeKeys(false)
                     ->useAttributeAsKey('paths')
                     ->beforeNormalization()
-                        ->always()
+                        ->ifArray()
                         ->then(function ($paths) {
                             $normalized = [];
                             foreach ($paths as $path => $namespace) {
@@ -217,7 +221,7 @@ class Configuration implements ConfigurationInterface
                 ->arrayNode('mailer')
                     ->children()
                         ->scalarNode('html_to_text_converter')
-                            ->info(sprintf('A service implementing the "%s"', HtmlToTextConverterInterface::class))
+                            ->info(\sprintf('A service implementing the "%s"', HtmlToTextConverterInterface::class))
                             ->defaultNull()
                         ->end()
                     ->end()

@@ -33,7 +33,7 @@ final class RingCentralOptions implements MessageOptionsInterface
     /**
      * @return $this
      */
-    public function country(string $id, string $isoCode = null, string $name = null, string $uri = null, string $callingCode = null): static
+    public function country(string $id, ?string $isoCode = null, ?string $name = null, ?string $uri = null, ?string $callingCode = null): static
     {
         $this->options['country'] = [
             'id' => $id,

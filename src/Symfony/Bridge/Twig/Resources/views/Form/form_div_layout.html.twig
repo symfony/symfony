@@ -14,7 +14,7 @@
         {# Attribute "required" is not supported #}
         {%- set required = false -%}
     {%- endif -%}
-    <input type="{{ type }}" {{ block('widget_attributes') }}{% if value is not empty %} value="{{ value }}"{% endif %}>
+    <input type="{{ type }}" {{ block('widget_attributes') }} {% if value is not empty %}value="{{ value }}" {% endif %}/>
 {%- endblock form_widget_simple -%}
 
 {%- block form_widget_compound -%}
@@ -68,7 +68,11 @@
             {% set render_preferred_choices = true %}
             {{- block('choice_widget_options') -}}
             {%- if choices|length > 0 and separator is not none -%}
-                <option disabled="disabled">{{ separator }}</option>
+                {%- if separator_html is not defined or separator_html is same as(false) -%}
+                    <option disabled="disabled">{{ separator }}</option>
+                {% else %}
+                    {{ separator|raw }}
+                {% endif %}
             {%- endif -%}
         {%- endif -%}
         {%- set options = choices -%}
@@ -91,11 +95,11 @@
 {%- endblock choice_widget_options -%}
 
 {%- block checkbox_widget -%}
-    <input type="checkbox" {{ block('widget_attributes') }}{% if value is defined %} value="{{ value }}"{% endif %}{% if checked %} checked="checked"{% endif %}>
+    <input type="checkbox" {{ block('widget_attributes') }}{% if value is defined %} value="{{ value }}"{% endif %}{% if checked %} checked="checked"{% endif %} />
 {%- endblock checkbox_widget -%}
 
 {%- block radio_widget -%}
-    <input type="radio" {{ block('widget_attributes') }}{% if value is defined %} value="{{ value }}"{% endif %}{% if checked %} checked="checked"{% endif %}>
+    <input type="radio" {{ block('widget_attributes') }}{% if value is defined %} value="{{ value }}"{% endif %}{% if checked %} checked="checked"{% endif %} />
 {%- endblock radio_widget -%}
 
 {%- block datetime_widget -%}
@@ -402,7 +406,7 @@
     {%- endif -%}
     <form{% if name != '' %} name="{{ name }}"{% endif %} method="{{ form_method|lower }}"{% if action != '' %} action="{{ action }}"{% endif %}{{ block('attributes') }}{% if multipart %} enctype="multipart/form-data"{% endif %}>
     {%- if form_method != method -%}
-        <input type="hidden" name="_method" value="{{ method }}">
+        <input type="hidden" name="_method" value="{{ method }}" />
     {%- endif -%}
 {%- endblock form_start -%}
 
@@ -440,7 +444,7 @@
         {%- endif -%}
 
         {%- if form_method != method -%}
-            <input type="hidden" name="_method" value="{{ method }}">
+            <input type="hidden" name="_method" value="{{ method }}" />
         {%- endif -%}
     {% endif -%}
 {% endblock form_rest %}

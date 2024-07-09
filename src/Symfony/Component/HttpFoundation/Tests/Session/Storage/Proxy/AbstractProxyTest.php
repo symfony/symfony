@@ -23,11 +23,11 @@ use Symfony\Component\HttpFoundation\Session\Storage\Proxy\SessionHandlerProxy;
  */
 class AbstractProxyTest extends TestCase
 {
-    protected MockObject&AbstractProxy $proxy;
+    protected AbstractProxy $proxy;
 
     protected function setUp(): void
     {
-        $this->proxy = $this->getMockForAbstractClass(AbstractProxy::class);
+        $this->proxy = new class() extends AbstractProxy {};
     }
 
     public function testGetSaveHandlerName()

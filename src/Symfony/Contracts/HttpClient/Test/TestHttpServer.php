@@ -21,7 +21,7 @@ class TestHttpServer
     /**
      * @param string|null $workingDirectory
      */
-    public static function start(int $port = 8057/* , string $workingDirectory = null */): Process
+    public static function start(int $port = 8057/* , ?string $workingDirectory = null */): Process
     {
         $workingDirectory = \func_get_args()[1] ?? __DIR__.'/Fixtures/web';
 
@@ -44,5 +44,12 @@ class TestHttpServer
         } while (!@fopen('http://127.0.0.1:'.$port, 'r'));
 
         return $process;
+    }
+
+    public static function stop(int $port = 8057)
+    {
+        if (isset(self::$process[$port])) {
+            self::$process[$port]->stop();
+        }
     }
 }

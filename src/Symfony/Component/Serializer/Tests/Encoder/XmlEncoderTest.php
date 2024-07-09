@@ -231,16 +231,56 @@ XML;
         $this->assertEquals($expected, $this->encoder->encode($array, 'xml'));
     }
 
-    public function testEncodeCdataWrapping()
+    /**
+     * @dataProvider encodeCdataWrappingWithDefaultPattern
+     */
+    public function testEncodeCdataWrappingWithDefaultPattern($input, $expected)
     {
-        $array = [
-            'firstname' => 'Paul & Martha <or Me>',
+        $this->assertEquals($expected, $this->encoder->encode($input, 'xml'));
+    }
+
+    public static function encodeCdataWrappingWithDefaultPattern()
+    {
+        return [
+            [
+                ['firstname' => 'Paul and Martha'],
+                '<?xml version="1.0"?>'."\n".'<response><firstname>Paul and Martha</firstname></response>'."\n",
+            ],
+            [
+                ['lastname' => 'O\'Donnel'],
+                '<?xml version="1.0"?>'."\n".'<response><lastname>O\'Donnel</lastname></response>'."\n",
+            ],
+            [
+                ['firstname' => 'Paul & Martha <or Me>'],
+                '<?xml version="1.0"?>'."\n".'<response><firstname><![CDATA[Paul & Martha <or Me>]]></firstname></response>'."\n",
+            ],
         ];
+    }
 
-        $expected = '<?xml version="1.0"?>'."\n".
-            '<response><firstname><![CDATA[Paul & Martha <or Me>]]></firstname></response>'."\n";
+    /**
+     * @dataProvider encodeCdataWrappingWithCustomPattern
+     */
+    public function testEncodeCdataWrappingWithCustomPattern($input, $expected)
+    {
+        $this->assertEquals($expected, $this->encoder->encode($input, 'xml', ['cdata_wrapping_pattern' => '/[<>&"\']/']));
+    }
 
-        $this->assertEquals($expected, $this->encoder->encode($array, 'xml'));
+    public static function encodeCdataWrappingWithCustomPattern()
+    {
+        return [
+            [
+                ['firstname' => 'Paul and Martha'],
+                '<?xml version="1.0"?>'."\n".'<response><firstname>Paul and Martha</firstname></response>'."\n",
+            ],
+            [
+                ['lastname' => 'O\'Donnel'],
+                '<?xml version="1.0"?>'."\n".'<response><lastname><![CDATA[O\'Donnel]]></lastname></response>'."\n",
+            ],
+            [
+                ['firstname' => 'Paul & Martha <or Me>'],
+                '<?xml version="1.0"?>'."\n".'<response><firstname><![CDATA[Paul & Martha <or Me>]]></firstname></response>'."\n",
+            ],
+        ];
     }
 
     public function testEnableCdataWrapping()
@@ -431,6 +471,12 @@ XML;
 XML;
 
         $this->assertEquals($expected, $serializer->serialize(new NormalizableTraversableDummy(), 'xml'));
+    }
+
+    public function testEncodeException()
+    {
+        $this->expectException(NotEncodableValueException::class);
+        $this->encoder->encode('Invalid character: '.\chr(7), 'xml');
     }
 
     public function testDecode()
@@ -625,8 +671,8 @@ XML;
 XML;
 
         $expected = ['person' => [
-          ['firstname' => 'Benjamin', 'lastname' => 'Alexandre'],
-          ['firstname' => 'Damien', 'lastname' => 'Clay'],
+            ['firstname' => 'Benjamin', 'lastname' => 'Alexandre'],
+            ['firstname' => 'Damien', 'lastname' => 'Clay'],
         ]];
 
         $this->assertEquals($expected, $this->encoder->decode($source, 'xml'));
@@ -649,8 +695,8 @@ XML;
 </people>
 XML;
         $expected = ['person' => [
-          ['firstname' => 'Benjamin', 'lastname' => 'Alexandre'],
-          ['firstname' => 'Damien', 'lastname' => 'Clay'],
+            ['firstname' => 'Benjamin', 'lastname' => 'Alexandre'],
+            ['firstname' => 'Damien', 'lastname' => 'Clay'],
         ]];
         $this->assertEquals($expected, $this->encoder->decode(
             $source,
@@ -684,8 +730,8 @@ XML;
         $this->encoder->setSerializer($serializer);
 
         $expected = ['person' => [
-          ['firstname' => 'Benjamin', 'lastname' => 'Alexandre', '#comment' => ' This comment should be decoded. '],
-          ['firstname' => 'Damien', 'lastname' => 'Clay'],
+            ['firstname' => 'Benjamin', 'lastname' => 'Alexandre', '#comment' => ' This comment should be decoded. '],
+            ['firstname' => 'Damien', 'lastname' => 'Clay'],
         ]];
 
         $this->assertEquals($expected, $this->encoder->decode($source, 'xml'));
@@ -1004,14 +1050,14 @@ XML;
 
     private function createXmlWithDateTime(): string
     {
-        return sprintf('<?xml version="1.0"?>
+        return \sprintf('<?xml version="1.0"?>
 <response><dateTime>%s</dateTime></response>
 ', $this->exampleDateTimeString);
     }
 
     private function createXmlWithDateTimeField(): string
     {
-        return sprintf('<?xml version="1.0"?>
+        return \sprintf('<?xml version="1.0"?>
 <response><foo dateTime="%s"/></response>
 ', $this->exampleDateTimeString);
     }

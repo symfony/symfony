@@ -237,7 +237,7 @@ class RedisExtIntegrationTest extends TestCase
 
         $connection = Connection::fromDsn($dsn,
             ['delete_after_ack' => true,
-             $sentinelOptionName => getenv('MESSENGER_REDIS_SENTINEL_MASTER') ?: null,
+                $sentinelOptionName => getenv('MESSENGER_REDIS_SENTINEL_MASTER') ?: null,
             ], $this->redis);
 
         $connection->add('1', []);
@@ -262,8 +262,8 @@ class RedisExtIntegrationTest extends TestCase
     {
         $connection = Connection::fromDsn(getenv('MESSENGER_REDIS_DSN'),
             ['lazy' => true,
-             'delete_after_ack' => true,
-             'sentinel_master' => getenv('MESSENGER_REDIS_SENTINEL_MASTER') ?: null,
+                'delete_after_ack' => true,
+                'sentinel_master' => getenv('MESSENGER_REDIS_SENTINEL_MASTER') ?: null,
             ], $this->redis);
 
         $connection->add('1', []);
@@ -313,7 +313,7 @@ class RedisExtIntegrationTest extends TestCase
             ], $message['data']);
             $connection->reject($message['id']);
         } finally {
-            $redis->del('messenger-lazy');
+            $redis->unlink('messenger-lazy');
         }
     }
 
@@ -349,7 +349,7 @@ class RedisExtIntegrationTest extends TestCase
         } catch (TransportException $e) {
             $this->assertSame('Malformed UTF-8 characters, possibly incorrectly encoded', $e->getMessage());
         } finally {
-            $redis->del('messenger-json-error');
+            $redis->unlink('messenger-json-error');
         }
     }
 
@@ -365,7 +365,7 @@ class RedisExtIntegrationTest extends TestCase
             $this->assertNotEmpty($message = $connection->get());
             $connection->reject($message['id']);
         } finally {
-            $redis->del('messenger-getnonblocking');
+            $redis->unlink('messenger-getnonblocking');
         }
     }
 
@@ -381,10 +381,10 @@ class RedisExtIntegrationTest extends TestCase
             $failing = $connection->get();
             $connection->reject($failing['id']);
 
-            $connection = Connection::fromDsn('redis://localhost/messenger-rejectthenget', ['sentinel_master' => null]);
+            $connection = Connection::fromDsn('redis://localhost/messenger-rejectthenget', ['sentinel_master' => null], $redis);
             $this->assertNotNull($connection->get());
         } finally {
-            $redis->del('messenger-rejectthenget');
+            $redis->unlink('messenger-rejectthenget');
         }
     }
 

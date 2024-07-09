@@ -32,18 +32,18 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
  */
 final class BrevoApiTransport extends AbstractApiTransport
 {
-    private string $key;
-
-    public function __construct(string $key, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null, LoggerInterface $logger = null)
-    {
-        $this->key = $key;
-
+    public function __construct(
+        #[\SensitiveParameter] private string $key,
+        ?HttpClientInterface $client = null,
+        ?EventDispatcherInterface $dispatcher = null,
+        ?LoggerInterface $logger = null,
+    ) {
         parent::__construct($client, $dispatcher, $logger);
     }
 
     public function __toString(): string
     {
-        return sprintf('brevo+api://%s', $this->getEndpoint());
+        return \sprintf('brevo+api://%s', $this->getEndpoint());
     }
 
     protected function doSendApi(SentMessage $sentMessage, Email $email, Envelope $envelope): ResponseInterface
@@ -59,13 +59,13 @@ final class BrevoApiTransport extends AbstractApiTransport
             $statusCode = $response->getStatusCode();
             $result = $response->toArray(false);
         } catch (DecodingExceptionInterface) {
-            throw new HttpTransportException('Unable to send an email: '.$response->getContent(false).sprintf(' (code %d).', $statusCode), $response);
+            throw new HttpTransportException('Unable to send an email: '.$response->getContent(false).\sprintf(' (code %d).', $statusCode), $response);
         } catch (TransportExceptionInterface $e) {
             throw new HttpTransportException('Could not reach the remote Brevo server.', $response, 0, $e);
         }
 
         if (201 !== $statusCode) {
-            throw new HttpTransportException('Unable to send an email: '.($result['message'] ?? $response->getContent(false)).sprintf(' (code %d).', $statusCode), $response);
+            throw new HttpTransportException('Unable to send an email: '.($result['message'] ?? $response->getContent(false)).\sprintf(' (code %d).', $statusCode), $response);
         }
 
         $sentMessage->setMessageId($result['messageId']);

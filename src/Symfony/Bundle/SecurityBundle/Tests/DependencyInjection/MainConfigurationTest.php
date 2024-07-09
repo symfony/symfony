@@ -141,6 +141,39 @@ class MainConfigurationTest extends TestCase
         }
     }
 
+    public function testLogoutDeleteCookies()
+    {
+        $config = [
+            'firewalls' => [
+                'stub' => [
+                    'logout' => [
+                        'delete_cookies' => [
+                            'my_cookie' => [
+                                'path' => '/',
+                                'domain' => 'example.org',
+                                'secure' => true,
+                                'samesite' => 'none',
+                                'partitioned' => true,
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ];
+        $config = array_merge(static::$minimalConfig, $config);
+
+        $processor = new Processor();
+        $configuration = new MainConfiguration([], []);
+        $processedConfig = $processor->processConfiguration($configuration, [$config]);
+        $this->assertArrayHasKey('delete_cookies', $processedConfig['firewalls']['stub']['logout']);
+        $deleteCookies = $processedConfig['firewalls']['stub']['logout']['delete_cookies'];
+        $this->assertSame('/', $deleteCookies['my_cookie']['path']);
+        $this->assertSame('example.org', $deleteCookies['my_cookie']['domain']);
+        $this->assertTrue($deleteCookies['my_cookie']['secure']);
+        $this->assertSame('none', $deleteCookies['my_cookie']['samesite']);
+        $this->assertTrue($deleteCookies['my_cookie']['partitioned']);
+    }
+
     public function testDefaultUserCheckers()
     {
         $processor = new Processor();

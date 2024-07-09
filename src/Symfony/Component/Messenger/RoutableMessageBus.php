@@ -28,7 +28,7 @@ class RoutableMessageBus implements MessageBusInterface
     private ContainerInterface $busLocator;
     private ?MessageBusInterface $fallbackBus;
 
-    public function __construct(ContainerInterface $busLocator, MessageBusInterface $fallbackBus = null)
+    public function __construct(ContainerInterface $busLocator, ?MessageBusInterface $fallbackBus = null)
     {
         $this->busLocator = $busLocator;
         $this->fallbackBus = $fallbackBus;
@@ -60,7 +60,7 @@ class RoutableMessageBus implements MessageBusInterface
     public function getMessageBus(string $busName): MessageBusInterface
     {
         if (!$this->busLocator->has($busName)) {
-            throw new InvalidArgumentException(sprintf('Bus named "%s" does not exist.', $busName));
+            throw new InvalidArgumentException(\sprintf('Bus named "%s" does not exist.', $busName));
         }
 
         return $this->busLocator->get($busName);

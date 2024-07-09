@@ -50,27 +50,17 @@ class TranslationDebugCommand extends Command
     public const MESSAGE_UNUSED = 1;
     public const MESSAGE_EQUALS_FALLBACK = 2;
 
-    private TranslatorInterface $translator;
-    private TranslationReaderInterface $reader;
-    private ExtractorInterface $extractor;
-    private ?string $defaultTransPath;
-    private ?string $defaultViewsPath;
-    private array $transPaths;
-    private array $codePaths;
-    private array $enabledLocales;
-
-    public function __construct(TranslatorInterface $translator, TranslationReaderInterface $reader, ExtractorInterface $extractor, string $defaultTransPath = null, string $defaultViewsPath = null, array $transPaths = [], array $codePaths = [], array $enabledLocales = [])
-    {
+    public function __construct(
+        private TranslatorInterface $translator,
+        private TranslationReaderInterface $reader,
+        private ExtractorInterface $extractor,
+        private ?string $defaultTransPath = null,
+        private ?string $defaultViewsPath = null,
+        private array $transPaths = [],
+        private array $codePaths = [],
+        private array $enabledLocales = [],
+    ) {
         parent::__construct();
-
-        $this->translator = $translator;
-        $this->reader = $reader;
-        $this->extractor = $extractor;
-        $this->defaultTransPath = $defaultTransPath;
-        $this->defaultViewsPath = $defaultViewsPath;
-        $this->transPaths = $transPaths;
-        $this->codePaths = $codePaths;
-        $this->enabledLocales = $enabledLocales;
     }
 
     protected function configure(): void
@@ -155,7 +145,7 @@ EOF
                 $codePaths = [$path.'/templates'];
 
                 if (!is_dir($transPaths[0])) {
-                    throw new InvalidArgumentException(sprintf('"%s" is neither an enabled bundle nor a directory.', $transPaths[0]));
+                    throw new InvalidArgumentException(\sprintf('"%s" is neither an enabled bundle nor a directory.', $transPaths[0]));
                 }
             }
         } elseif ($input->getOption('all')) {
@@ -181,10 +171,10 @@ EOF
 
         // No defined or extracted messages
         if (!$allMessages || null !== $domain && empty($allMessages[$domain])) {
-            $outputMessage = sprintf('No defined or extracted messages for locale "%s"', $locale);
+            $outputMessage = \sprintf('No defined or extracted messages for locale "%s"', $locale);
 
             if (null !== $domain) {
-                $outputMessage .= sprintf(' and domain "%s"', $domain);
+                $outputMessage .= \sprintf(' and domain "%s"', $domain);
             }
 
             $io->getErrorStyle()->warning($outputMessage);
@@ -196,9 +186,9 @@ EOF
         $fallbackCatalogues = $this->loadFallbackCatalogues($locale, $transPaths);
 
         // Display header line
-        $headers = ['State', 'Domain', 'Id', sprintf('Message Preview (%s)', $locale)];
+        $headers = ['State', 'Domain', 'Id', \sprintf('Message Preview (%s)', $locale)];
         foreach ($fallbackCatalogues as $fallbackCatalogue) {
-            $headers[] = sprintf('Fallback Message Preview (%s)', $fallbackCatalogue->getLocale());
+            $headers[] = \sprintf('Fallback Message Preview (%s)', $fallbackCatalogue->getLocale());
         }
         $rows = [];
         // Iterate all message ids and determine their state
@@ -320,7 +310,7 @@ EOF
 
     private function formatId(string $id): string
     {
-        return sprintf('<fg=cyan;options=bold>%s</>', $id);
+        return \sprintf('<fg=cyan;options=bold>%s</>', $id);
     }
 
     private function sanitizeString(string $string, int $length = 40): string

@@ -18,11 +18,9 @@ namespace Symfony\Component\DependencyInjection;
  */
 class Parameter
 {
-    private string $id;
-
-    public function __construct(string $id)
-    {
-        $this->id = $id;
+    public function __construct(
+        private string $id,
+    ) {
     }
 
     public function __toString(): string

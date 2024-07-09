@@ -84,7 +84,17 @@ class SchedulerTest extends AbstractWebTestCase
         $this->assertCount(779, $calls['__invoke']);
         $this->assertSame([['2']], $calls['method2']);
         $this->assertSame([['4']], $calls['method4']);
+        $this->assertSame([['9'], ['9b'], ['named' => '9']], $calls['method5']);
         $this->assertSame([['5', 6], ['7', 8]], $calls['attributesOnMethod']);
+    }
+
+    public function testSchedulerWithCustomTransport()
+    {
+        $container = self::getContainer();
+        $container->set('clock', new MockClock('2023-10-26T08:59:59Z'));
+
+        $this->assertTrue($container->get('receivers')->has('scheduler_custom_receiver'));
+        $this->assertSame($container->get('scheduler_custom_receiver'), $container->get('receivers')->get('scheduler_custom_receiver'));
     }
 
     protected static function createKernel(array $options = []): KernelInterface

@@ -33,6 +33,9 @@ class Psr18ClientTest extends TestCase
         TestHttpServer::stop();
     }
 
+    /**
+     * @requires function ob_gzhandler
+     */
     public function testSendRequest()
     {
         $factory = new Psr17Factory();

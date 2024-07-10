@@ -132,6 +132,9 @@ final class FirebaseTransport extends AbstractTransport
 
     protected function encodePk(string $privateKey): string
     {
-        return str_replace(['\n', '_', ' ', 'BEGIN+PRIVATE+KEY', 'END+PRIVATE+KEY'], ["\n", "\n", '+', 'BEGIN PRIVATE KEY', 'END PRIVATE KEY'], $privateKey);
+        $text = explode('-----', $privateKey);
+        $text[2] = str_replace(['\n', '_', ' '], ["\n", "\n", '+'], $text[2]);
+
+        return implode('-----', $text);
     }
 }

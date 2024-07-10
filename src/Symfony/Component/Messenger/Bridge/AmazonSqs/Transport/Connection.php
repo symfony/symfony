@@ -147,7 +147,7 @@ class Connection
         unset($query['region']);
 
         if ('default' !== ($params['host'] ?? 'default')) {
-            $clientConfiguration['endpoint'] = \sprintf('%s://%s%s', ($query['sslmode'] ?? null) === 'disable' ? 'http' : 'https', $params['host'], ($params['port'] ?? null) ? ':'.$params['port'] : '');
+            $clientConfiguration['endpoint'] = \sprintf('%s://%s%s', ($options['sslmode'] ?? null) === 'disable' ? 'http' : 'https', $params['host'], ($params['port'] ?? null) ? ':'.$params['port'] : '');
             if (preg_match(';^sqs\.([^\.]++)\.amazonaws\.com$;', $params['host'], $matches)) {
                 $clientConfiguration['region'] = $matches[1];
             }

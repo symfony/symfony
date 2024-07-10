@@ -264,4 +264,39 @@ class CachePoolPassTest extends TestCase
         $this->assertTrue($definition->hasTag('cache.pool.clearer'));
         $this->assertEquals(['app.cache_pool' => new Reference('app.cache_pool', ContainerInterface::IGNORE_ON_UNINITIALIZED_REFERENCE)], $definition->getArgument(0));
     }
+    
+    public function testChainAdapterPoolSetsCorrectArgumentsToChainedAdapters()
+    {
+        $container = new ContainerBuilder();
+        $container->setParameter('kernel.container_class', 'app');
+        $container->setParameter('kernel.project_dir', 'foo');
+        
+        $container->register('cache.adapter.redis', RedisAdapter::class)
+            ->addArgument(null)
+            ->addTag('cache.pool');
+        $container->register('cache.chain', ChainAdapter::class)
+            ->addArgument(['cache.adapter.redis_child'])
+            ->addTag('cache.pool');
+        $container->setDefinition('cache.app', new ChildDefinition('cache.chain'))
+            ->addTag('cache.pool');
+        $container->setDefinition('doctrine.result_cache_pool', new ChildDefinition('cache.app'))
+            ->addTag('cache.pool');
+
+        $childAdapter = new ChildDefinition('cache.adapter.redis');
+        $childAdapter->addTag('cache.pool', ['namespace' => 'child_namespace']);
+        $container->setDefinition('cache.adapter.redis_child', $childAdapter);
+
+        $this->cachePoolPass->process($container);
+
+        $appCachePool = $container->getDefinition('cache.app');
+        $this->assertInstanceOf(ChildDefinition::class, $appCachePool);
+        $this->assertSame('cache.chain', $appCachePool->getParent());
+
+        $chainCachePool = $container->getDefinition('cache.chain');
+        $this->assertNotInstanceOf(ChildDefinition::class, $chainCachePool);
+        $this->assertCount(1, $chainCachePool->getArgument(0));
+        $this->assertInstanceOf(ChildDefinition::class, $chainCachePool->getArgument(0)[0]);
+        $this->assertSame('cache.adapter.redis_child', $chainCachePool->getArgument(0)[0]->getParent());
+        $this->assertEquals('child_namespace', $chainCachePool->getArgument(0)[0]->getArgument(0));
+    }
 }

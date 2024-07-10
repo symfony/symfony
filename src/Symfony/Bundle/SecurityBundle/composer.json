@@ -51,7 +51,7 @@
         "symfony/validator": "^6.4|^7.0",
         "symfony/yaml": "^6.4|^7.0",
         "twig/twig": "^3.0.4",
-        "web-token/jwt-library": "^3.3.2"
+        "web-token/jwt-library": "^3.3.2|^4.0"
     },
     "conflict": {
         "symfony/browser-kit": "<6.4",

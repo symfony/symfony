@@ -86,9 +86,9 @@ final class OidcTokenHandler implements AccessTokenHandlerInterface
 
             // Verify the claims
             $checkers = [
-                new Checker\IssuedAtChecker(0, false, $this->clock),
-                new Checker\NotBeforeChecker(0, false, $this->clock),
-                new Checker\ExpirationTimeChecker(0, false, $this->clock),
+                new Checker\IssuedAtChecker(clock: $this->clock, allowedTimeDrift: 0, protectedHeaderOnly: false),
+                new Checker\NotBeforeChecker(clock: $this->clock, allowedTimeDrift: 0, protectedHeaderOnly: false),
+                new Checker\ExpirationTimeChecker(clock: $this->clock, allowedTimeDrift: 0, protectedHeaderOnly: false),
                 new Checker\AudienceChecker($this->audience),
                 new Checker\IssuerChecker($this->issuers),
             ];

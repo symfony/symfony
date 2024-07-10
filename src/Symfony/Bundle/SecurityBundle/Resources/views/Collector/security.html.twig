@@ -181,6 +181,17 @@
                                 <span class="value">{{ source('@WebProfiler/Icon/' ~ (collector.authenticated ? 'yes' : 'no') ~ '.svg') }}</span>
                                 <span class="label">Authenticated</span>
                             </div>
+
+                            {% if collector.authProfileToken %}
+                                <div class="metric">
+                                    <span class="value">
+                                        <a href="{{ path('_profiler', {token: collector.authProfileToken, panel: 'security'}) }}">
+                                            {{- collector.authProfileToken -}}
+                                        </a>
+                                    </span>
+                                    <span class="label">From</span>
+                                </div>
+                            {% endif %}
                         </div>
 
                         <table>
@@ -219,7 +230,15 @@
                         </table>
                     {% elseif collector.enabled %}
                         <div class="empty">
-                            <p>There is no security token.</p>
+                            <p>
+                                There is no security token.
+                                {% if collector.deauthProfileToken %}
+                                    It was removed in
+                                    <a href="{{ path('_profiler', {token: collector.deauthProfileToken, panel: 'security'}) }}">
+                                        {{- collector.deauthProfileToken -}}
+                                    </a>.
+                                {% endif %}
+                            </p>
                         </div>
                     {% endif %}
                 </div>

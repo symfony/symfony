@@ -149,6 +149,7 @@ abstract class CompleteConfigurationTestCase extends TestCase
                 [],
                 null,
                 null,
+                null,
             ],
             [
                 'secure',
@@ -184,6 +185,7 @@ abstract class CompleteConfigurationTestCase extends TestCase
                     'enable_csrf' => null,
                     'clear_site_data' => [],
                 ],
+                null,
             ],
             [
                 'host',
@@ -201,6 +203,7 @@ abstract class CompleteConfigurationTestCase extends TestCase
                 ],
                 null,
                 null,
+                null,
             ],
             [
                 'with_user_checker',
@@ -216,6 +219,7 @@ abstract class CompleteConfigurationTestCase extends TestCase
                 [
                     'http_basic',
                 ],
+                null,
                 null,
                 null,
             ],

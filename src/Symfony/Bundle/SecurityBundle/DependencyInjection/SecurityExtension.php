@@ -582,6 +582,7 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
 
         $config->replaceArgument(10, $listenerKeys);
         $config->replaceArgument(11, $firewall['switch_user'] ?? null);
+        $config->replaceArgument(13, $firewall['not_full_fledged_handler'] ?? null);
 
         return [$matcher, $listeners, $exceptionListener, null !== $logoutListenerId ? new Reference($logoutListenerId) : null, $firewallAuthenticationProviders];
     }
@@ -886,6 +887,11 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
             $listener->replaceArgument(6, new Reference($config['access_denied_handler']));
         } elseif (isset($config['access_denied_url'])) {
             $listener->replaceArgument(5, $config['access_denied_url']);
+        }
+
+        // not full fledged handler setup
+        if (isset($config['not_full_fledged_handler'])) {
+            $listener->replaceArgument(9, new Reference($config['not_full_fledged_handler']));
         }
 
         return $exceptionListenerId;

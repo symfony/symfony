@@ -19,6 +19,7 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface;
 use Symfony\Component\Security\Http\Session\SessionAuthenticationStrategy;
+use Symfony\Component\Security\Http\Authorization\SameAsNotFullFledgedHandle;
 
 /**
  * SecurityExtension configuration structure.
@@ -214,6 +215,14 @@ class MainConfiguration implements ConfigurationInterface
             ->booleanNode('stateless')->defaultFalse()->end()
             ->booleanNode('lazy')->defaultFalse()->end()
             ->scalarNode('context')->cannotBeEmpty()->end()
+            ->scalarNode('not_full_fledged_handler')
+                ->beforeNormalization()
+                    ->ifTrue(fn ($v): bool => $v == 'original')
+                        ->then(fn ($v) => null)
+                    ->ifTrue(fn ($v): bool => $v == 'same')
+                        ->then(fn ($v) => SameAsNotFullFledgedHandle::class)
+                    ->end()
+                ->end()
             ->arrayNode('logout')
                 ->treatTrueLike([])
                 ->canBeUnset()

@@ -176,6 +176,7 @@ class SecurityDataCollector extends DataCollector implements LateDataCollectorIn
                     'access_denied_url' => $firewallConfig->getAccessDeniedUrl(),
                     'user_checker' => $firewallConfig->getUserChecker(),
                     'authenticators' => $firewallConfig->getAuthenticators(),
+                    'not_full_fledged_handler' => $firewallConfig->getNotFullFledgedHandler(),
                 ];
 
                 // generate exit impersonation path from current request

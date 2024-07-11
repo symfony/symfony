@@ -334,6 +334,10 @@
                                         <th>authenticators</th>
                                         <td>{{ collector.firewall.authenticators is empty ? '(none)' : profiler_dump(collector.firewall.authenticators, maxDepth=1) }}</td>
                                     </tr>
+                                    <tr>
+                                        <th>not_full_fledged_handler</th>
+                                        <td>{{ collector.firewall.not_full_fledged_handler ?: '(none)' }}</td>
+                                    </tr>
                                 </tbody>
                             </table>
                         {% endif %}

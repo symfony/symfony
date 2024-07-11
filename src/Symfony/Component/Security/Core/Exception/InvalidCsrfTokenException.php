@@ -11,16 +11,14 @@
 
 namespace Symfony\Component\Security\Core\Exception;
 
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
+
 /**
  * This exception is thrown when the csrf token is invalid.
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  * @author Alexander <iam.asm89@gmail.com>
  */
-class InvalidCsrfTokenException extends AuthenticationException
+class InvalidCsrfTokenException extends BadRequestHttpException
 {
-    public function getMessageKey(): string
-    {
-        return 'Invalid CSRF token.';
-    }
 }

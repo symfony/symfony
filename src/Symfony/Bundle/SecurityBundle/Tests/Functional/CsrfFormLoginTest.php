@@ -73,14 +73,8 @@ class CsrfFormLoginTest extends AbstractWebTestCase
         $form['user_login[_token]'] = '';
         $client->submit($form);
 
-        $this->assertRedirect($client->getResponse(), '/login');
-
-        $text = $client->followRedirect()->text(null, true);
-        $this->assertStringContainsString('Invalid CSRF token.', $text);
-
-        $this->callInRequestContext($client, function () {
-            $this->assertTrue(static::getContainer()->get('security.csrf.token_storage')->hasToken('foo'));
-        });
+        $this->assertEquals(400, $client->getResponse()->getStatusCode());
+        $this->assertStringContainsString('400 Bad Request', $client->getResponse()->getContent());
     }
 
     /**

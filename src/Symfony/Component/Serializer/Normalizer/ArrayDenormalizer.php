@@ -18,6 +18,8 @@ use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
 use Symfony\Component\TypeInfo\Type;
 use Symfony\Component\TypeInfo\Type\UnionType;
 
+use Symfony\Component\PropertyInfo\Util\PhpDocTypeHelper;
+
 /**
  * Denormalizes arrays of objects.
  *
@@ -39,26 +41,37 @@ class ArrayDenormalizer implements DenormalizerInterface, DenormalizerAwareInter
      */
     public function denormalize(mixed $data, string $type, ?string $format = null, array $context = []): array
     {
+        $typeResolver = new \phpDocumentor\Reflection\TypeResolver();
+        $result = $typeResolver->resolve($type);
+
         if (null === $this->denormalizer) {
             throw new BadMethodCallException('Please set a denormalizer before calling denormalize()!');
         }
         if (!\is_array($data)) {
             throw NotNormalizableValueException::createForUnexpectedDataType(\sprintf('Data expected to be "%s", "%s" given.', $type, get_debug_type($data)), $data, ['array'], $context['deserialization_path'] ?? null);
         }
-        if (!str_ends_with($type, '[]')) {
+
+        if (!$result instanceof \phpDocumentor\Reflection\Types\AbstractList) {
             throw new InvalidArgumentException('Unsupported class: '.$type);
         }
 
-        $type = substr($type, 0, -2);
+
+        $type = (string) $result->getValueType();
 
         $typeIdentifiers = [];
-        if (null !== $keyType = ($context['key_type'] ?? null)) {
+        $keyTYye = $result->getKeyType();
+        if ($keyType == null) {
+            // Overwrite if context provides keyType
+            $keyType = $context['key_type'] ?? null;
+        }
+        if (null !== $keyType) {
             if ($keyType instanceof Type) {
                 $typeIdentifiers = array_map(fn (Type $t): string => $t->getBaseType()->getTypeIdentifier()->value, $keyType instanceof UnionType ? $keyType->getTypes() : [$keyType]);
             } else {
                 $typeIdentifiers = array_map(fn (LegacyType $t): string => $t->getBuiltinType(), \is_array($keyType) ? $keyType : [$keyType]);
             }
         }
+
 
         foreach ($data as $key => $value) {
             $subContext = $context;
@@ -78,8 +91,12 @@ class ArrayDenormalizer implements DenormalizerInterface, DenormalizerAwareInter
             throw new BadMethodCallException(\sprintf('The nested denormalizer needs to be set to allow "%s()" to be used.', __METHOD__));
         }
 
-        return str_ends_with($type, '[]')
-            && $this->denormalizer->supportsDenormalization($data, substr($type, 0, -2), $format, $context);
+        $typeResolver = new \phpDocumentor\Reflection\TypeResolver();
+        $result = $typeResolver->resolve($type);
+
+
+        return $result instanceof \phpDocumentor\Reflection\Types\AbstractList
+            && $this->denormalizer->supportsDenormalization($data, (string) $result->getValueType(), $format, $context);
     }
 
     /**

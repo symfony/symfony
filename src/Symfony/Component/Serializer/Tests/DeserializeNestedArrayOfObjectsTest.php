@@ -23,17 +23,32 @@ class DeserializeNestedArrayOfObjectsTest extends TestCase
     public static function provider()
     {
         return [
-            // from property PhpDoc
-            [Zoo::class],
-            // from argument constructor PhpDoc
-            [ZooImmutable::class],
+            // from property PhpDoc, consistent
+            [Zoo::class, true],
+            // from property PhpDoc, legacy
+            [Zoo::class, false],
+            // from argument constructor PhpDoc, consistent
+            [ZooImmutable::class, true],
+            // from argument constructor PhpDoc, legacy
+            [ZooImmutable::class, false],
+
+        ];
+    }
+
+    public static function consistencyProvider()
+    {
+        return [
+            // consistent
+            [true],
+            // legacy
+            [false],
         ];
     }
 
     /**
      * @dataProvider provider
      */
-    public function testPropertyPhpDoc($class)
+    public function testPropertyPhpDoc($class, $consistent)
     {
         $json = <<<EOF
 {
@@ -43,7 +58,7 @@ class DeserializeNestedArrayOfObjectsTest extends TestCase
 }
 EOF;
         $serializer = new Serializer([
-            new ObjectNormalizer(null, null, null, new PhpDocExtractor()),
+            new ObjectNormalizer(null, null, null, new PhpDocExtractor(), null, null, $consistent),
             new ArrayDenormalizer(),
         ], ['json' => new JsonEncoder()]);
 
@@ -54,7 +69,10 @@ EOF;
         self::assertInstanceOf(Animal::class, $zoo->getAnimals()[0]);
     }
 
-    public function testPropertyPhpDocWithKeyTypes()
+    /**
+     * @dataProvider consistencyProvider
+     */
+    public function testPropertyPhpDocWithKeyTypes($consistent)
     {
         $json = <<<EOF
 {
@@ -75,7 +93,7 @@ EOF;
 }
 EOF;
         $serializer = new Serializer([
-            new ObjectNormalizer(null, null, null, new PhpDocExtractor()),
+            new ObjectNormalizer(null, null, null, new PhpDocExtractor(), null, null, $consistent),
             new ArrayDenormalizer(),
         ], ['json' => new JsonEncoder()]);
 

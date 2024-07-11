@@ -35,6 +35,7 @@ final class EntityValueResolver implements ValueResolverInterface
         private ManagerRegistry $registry,
         private ?ExpressionLanguage $expressionLanguage = null,
         private MapEntity $defaults = new MapEntity(),
+        private ?EntityValueResolverVariableInjectorInterface $variableInjector = null,
     ) {
     }
 
@@ -218,7 +219,7 @@ final class EntityValueResolver implements ValueResolverInterface
         }
 
         $repository = $manager->getRepository($options->class);
-        $variables = array_merge($request->attributes->all(), [
+        $variables = array_merge($this->variableInjector?->getVariables() ?? [], $request->attributes->all(), [
             'repository' => $repository,
             'request' => $request,
         ]);

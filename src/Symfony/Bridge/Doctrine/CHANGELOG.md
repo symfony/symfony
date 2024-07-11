@@ -1,6 +1,10 @@
 CHANGELOG
 =========
 
+7.2
+---
+* Allow Inject own variables in `EntityValueResolver`
+
 7.1
 ---
 

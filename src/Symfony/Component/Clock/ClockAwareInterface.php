@@ -21,6 +21,4 @@ use Psr\Clock\ClockInterface;
 interface ClockAwareInterface
 {
     public function setClock(ClockInterface $clock): void;
-
-    public function now(): DatePoint;
 }

@@ -38,5 +38,7 @@ class ClockAwareTraitTest extends TestCase
 
 class ClockAwareTestImplem implements ClockAwareInterface
 {
-    use ClockAwareTrait;
+    use ClockAwareTrait {
+        now as public;
+    }
 }

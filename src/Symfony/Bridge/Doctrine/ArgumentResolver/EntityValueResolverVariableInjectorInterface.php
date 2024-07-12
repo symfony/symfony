@@ -12,11 +12,14 @@
 namespace Symfony\Bridge\Doctrine\ArgumentResolver;
 
 /**
- * return a key named array for adding variables to ExpressionLanguage in EntityResolver
+ * Return a key named array for adding variables to ExpressionLanguage in EntityResolver.
  *
  * @author Roman JOLY <eltharin18@outlook.fr>
  */
 interface EntityValueResolverVariableInjectorInterface
 {
+    /**
+     * @return array<string, mixed>
+     */
     public function getVariables() : array;
 }

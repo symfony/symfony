@@ -14,13 +14,13 @@ namespace Symfony\Bridge\Doctrine\ArgumentResolver;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 /**
- * Default variable loader service used to inject user in EntityValueResolver
+ * Default variable loader service used to inject user in EntityValueResolver.
  *
  * @author Roman JOLY <eltharin18@outlook.fr>
  */
-class EntityValueResolverVariableInjector implements EntityValueResolverVariableInjectorInterface
+class UserInjector implements EntityValueResolverVariableInjectorInterface
 {
-    public function __construct(private readonly TokenStorageInterface $tokenStorage)
+    public function __construct(private TokenStorageInterface $tokenStorage)
     {
     }
 

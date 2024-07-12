@@ -29,7 +29,7 @@ trait ClockAwareTrait
         $this->clock = $clock;
     }
 
-    protected function now(): DatePoint
+    public function now(): DatePoint
     {
         $now = ($this->clock ??= new Clock())->now();
 

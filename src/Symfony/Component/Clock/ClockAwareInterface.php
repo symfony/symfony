@@ -16,7 +16,7 @@ use Psr\Clock\ClockInterface;
 /**
  * An interface to help write time-sensitive classes.
  *
- * @author Sergii Dolgushev <p@tchwork.com>
+ * @author Sergii Dolgushev <dolgushev.serhey@gmail.com>
  */
 interface ClockAwareInterface
 {

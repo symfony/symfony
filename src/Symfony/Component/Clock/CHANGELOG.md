@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+7.2
+---
+
+* Add `ClockAwareInterface` that have to be used with `ClockAwareTrait`
+
 7.1
 ---
 

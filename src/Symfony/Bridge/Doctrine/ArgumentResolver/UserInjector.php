@@ -18,7 +18,7 @@ use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInt
  *
  * @author Roman JOLY <eltharin18@outlook.fr>
  */
-class UserInjector implements EntityValueResolverVariableInjectorInterface
+class UserInjector implements EntityValueResolverExpressionModifiersInjectorInterface
 {
     public function __construct(private TokenStorageInterface $tokenStorage)
     {

@@ -226,7 +226,7 @@ final class EntityValueResolver implements ValueResolverInterface
             $injectorObject = $this->variablesInjectorLocator->get($injector);
 
             if (!$injectorObject instanceof EntityValueResolverExpressionModifiersInjectorInterface) {
-                throw new \LogicException(sprintf('You cannot use "%s" as Expression Modifier, it must implement %s.', $injector, EntityValueResolverExpressionModifiersInjectorInterface::class));
+                throw new \LogicException(sprintf('You cannot use "%s" as Expression Modifier, it must implement "%s" instead.', $injector, EntityValueResolverExpressionModifiersInjectorInterface::class));
             }
 
             $variablesFormInjectors = array_merge($variablesFormInjectors, $injectorObject->getVariables());

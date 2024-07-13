@@ -24,7 +24,6 @@ use Symfony\Component\HttpKernel\Controller\ValueResolverInterface;
 use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
-
 /**
  * Yields the entity matching the criteria provided in the route.
  *
@@ -61,7 +60,7 @@ final class EntityValueResolver implements ValueResolverInterface
         $message = '';
         if (null !== $options->expr) {
             if (null === $object = $this->findViaExpression($manager, $request, $options)) {
-                $message = sprintf(' The expression "%s" returned null.', $options->expr);
+                $message = \sprintf(' The expression "%s" returned null.', $options->expr);
             }
             // find by identifier?
         } elseif (false === $object = $this->find($manager, $request, $options, $argument)) {
@@ -77,7 +76,7 @@ final class EntityValueResolver implements ValueResolverInterface
         }
 
         if (null === $object && !$argument->isNullable()) {
-            throw new NotFoundHttpException($options->message ?? (sprintf('"%s" object not found by "%s".', $options->class, self::class).$message));
+            throw new NotFoundHttpException($options->message ?? (\sprintf('"%s" object not found by "%s".', $options->class, self::class).$message));
         }
 
         return [$object];
@@ -130,7 +129,7 @@ final class EntityValueResolver implements ValueResolverInterface
             foreach ($options->id as $field) {
                 // Convert "%s_uuid" to "foobar_uuid"
                 if (str_contains($field, '%s')) {
-                    $field = sprintf($field, $argument->getName());
+                    $field = \sprintf($field, $argument->getName());
                 }
 
                 $id[$field] = $request->attributes->get($field);
@@ -218,7 +217,7 @@ final class EntityValueResolver implements ValueResolverInterface
     private function findViaExpression(ObjectManager $manager, Request $request, MapEntity $options): object|iterable|null
     {
         if (!$this->expressionLanguage) {
-            throw new \LogicException(sprintf('You cannot use the "%s" if the ExpressionLanguage component is not available. Try running "composer require symfony/expression-language".', __CLASS__));
+            throw new \LogicException(\sprintf('You cannot use the "%s" if the ExpressionLanguage component is not available. Try running "composer require symfony/expression-language".', __CLASS__));
         }
 
         $variablesFormInjectors = [];
@@ -226,7 +225,7 @@ final class EntityValueResolver implements ValueResolverInterface
             $injectorObject = $this->variablesInjectorLocator->get($injector);
 
             if (!$injectorObject instanceof EntityValueResolverExpressionModifiersInjectorInterface) {
-                throw new \LogicException(sprintf('You cannot use "%s" as Expression Modifier, it must implement "%s" instead.', $injector, EntityValueResolverExpressionModifiersInjectorInterface::class));
+                throw new \LogicException(\sprintf('You cannot use "%s" as Expression Modifier, please make it implement "%s".', $injector, EntityValueResolverExpressionModifiersInjectorInterface::class));
             }
 
             $variablesFormInjectors = array_merge($variablesFormInjectors, $injectorObject->getVariables());

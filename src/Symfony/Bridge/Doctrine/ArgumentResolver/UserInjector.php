@@ -26,7 +26,7 @@ class UserInjector implements EntityValueResolverExpressionModifiersInjectorInte
 
     public function getVariables(): array
     {
-        return ['user' => $this->tokenStorage?->getToken()?->getUser()];
+        return ['user' => $this->tokenStorage->getToken()?->getUser()];
     }
 
     public function getFunctions(): array

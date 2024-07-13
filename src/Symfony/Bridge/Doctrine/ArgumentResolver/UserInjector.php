@@ -28,4 +28,9 @@ class UserInjector implements EntityValueResolverVariableInjectorInterface
     {
         return ['user' => $this->tokenStorage?->getToken()?->getUser()];
     }
+
+    public function getFunctions(): array
+    {
+        return [];
+    }
 }

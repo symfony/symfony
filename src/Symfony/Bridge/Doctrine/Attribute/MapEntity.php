@@ -45,7 +45,12 @@ class MapEntity extends ValueResolver
         bool $disabled = false,
         string $resolver = EntityValueResolver::class,
         public ?string $message = null,
+        public null|string|array $modifiersInjectors = null,
     ) {
+        if ( null !== $this->modifiersInjectors && !is_array($modifiersInjectors)) {
+            $this->modifiersInjectors = [$modifiersInjectors];
+        }
+
         parent::__construct($resolver, $disabled);
         $this->selfValidate();
     }

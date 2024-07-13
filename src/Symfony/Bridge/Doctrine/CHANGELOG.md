@@ -3,7 +3,7 @@ CHANGELOG
 
 7.2
 ---
- * Add support to user-variables injection in `EntityValueResolver` expressions
+ * Add support to user-modifiers injection in `EntityValueResolver` expressions
 
 7.1
 ---

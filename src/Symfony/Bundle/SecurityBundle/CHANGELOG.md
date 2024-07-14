@@ -5,6 +5,7 @@ CHANGELOG
 ---
 
  * Allow configuring the secret used to sign login links
+ * Add `OAuth2TokenHandlerFactory` for `AccessTokenFactory`
 
 7.1
 ---

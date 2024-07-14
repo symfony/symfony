@@ -5,6 +5,7 @@ CHANGELOG
 ---
 
  * Deprecate argument `$secret` of `RememberMeAuthenticator`
+ * Add `OAuth2TokenHandler` with OAuth2 Token Introspection support for `AccessTokenAuthenticator`
 
 7.1
 ---

@@ -13,6 +13,7 @@ namespace Symfony\Bundle\SecurityBundle\Tests\DependencyInjection\Security\Facto
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\AccessToken\CasTokenHandlerFactory;
+use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\AccessToken\OAuth2TokenHandlerFactory;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\AccessToken\OidcTokenHandlerFactory;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\AccessToken\OidcUserInfoTokenHandlerFactory;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\AccessToken\ServiceTokenHandlerFactory;
@@ -341,6 +342,40 @@ class AccessTokenFactoryTest extends TestCase
         $this->processConfig($config, $factory);
     }
 
+    public function testOAuth2TokenHandlerConfigurationWithExistingClient()
+    {
+        $container = new ContainerBuilder();
+        $config = [
+            'token_handler' => ['oauth2' => ['client' => 'oauth2.client']],
+        ];
+
+        $factory = new AccessTokenFactory($this->createTokenHandlerFactories());
+        $finalizedConfig = $this->processConfig($config, $factory);
+
+        $factory->createAuthenticator($container, 'firewall1', $finalizedConfig, 'userprovider');
+
+        $this->assertTrue($container->hasDefinition('security.authenticator.access_token.firewall1'));
+        $this->assertTrue($container->hasDefinition('security.access_token_handler.firewall1'));
+        $this->assertFalse($container->hasDefinition('http_client.security.access_token_handler.oauth2'));
+    }
+
+    public function testOAuth2TokenHandlerConfigurationWithClientCreation()
+    {
+        $container = new ContainerBuilder();
+        $config = [
+            'token_handler' => ['oauth2' => ['client' => ['base_uri' => 'https://www.example.com/realms/demo/protocol/openid-connect/userinfo']]],
+        ];
+
+        $factory = new AccessTokenFactory($this->createTokenHandlerFactories());
+        $finalizedConfig = $this->processConfig($config, $factory);
+
+        $factory->createAuthenticator($container, 'firewall1', $finalizedConfig, 'userprovider');
+
+        $this->assertTrue($container->hasDefinition('security.authenticator.access_token.firewall1'));
+        $this->assertTrue($container->hasDefinition('security.access_token_handler.firewall1'));
+        $this->assertTrue($container->hasDefinition('http_client.security.access_token_handler.oauth2'));
+    }
+
     public function testNoTokenHandlerSet()
     {
         $this->expectException(InvalidConfigurationException::class);
@@ -400,6 +435,7 @@ class AccessTokenFactoryTest extends TestCase
             new OidcUserInfoTokenHandlerFactory(),
             new OidcTokenHandlerFactory(),
             new CasTokenHandlerFactory(),
+            new OAuth2TokenHandlerFactory(),
         ];
     }
 }

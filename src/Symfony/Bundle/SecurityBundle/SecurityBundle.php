@@ -24,6 +24,7 @@ use Symfony\Bundle\SecurityBundle\DependencyInjection\Compiler\RegisterTokenUsag
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Compiler\ReplaceDecoratedRememberMeHandlerPass;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Compiler\SortFirewallListenersPass;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\AccessToken\CasTokenHandlerFactory;
+use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\AccessToken\OAuth2TokenHandlerFactory;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\AccessToken\OidcTokenHandlerFactory;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\AccessToken\OidcUserInfoTokenHandlerFactory;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\AccessToken\ServiceTokenHandlerFactory;
@@ -80,6 +81,7 @@ class SecurityBundle extends Bundle
             new OidcUserInfoTokenHandlerFactory(),
             new OidcTokenHandlerFactory(),
             new CasTokenHandlerFactory(),
+            new OAuth2TokenHandlerFactory(),
         ]));
 
         $extension->addUserProviderFactory(new InMemoryFactory());

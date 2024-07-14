@@ -27,6 +27,7 @@ use Jose\Component\Signature\Algorithm\RS512;
 use Symfony\Component\Security\Http\AccessToken\ChainAccessTokenExtractor;
 use Symfony\Component\Security\Http\AccessToken\FormEncodedBodyExtractor;
 use Symfony\Component\Security\Http\AccessToken\HeaderAccessTokenExtractor;
+use Symfony\Component\Security\Http\AccessToken\OAuth2\Oauth2TokenHandler;
 use Symfony\Component\Security\Http\AccessToken\Oidc\OidcTokenHandler;
 use Symfony\Component\Security\Http\AccessToken\Oidc\OidcUserInfoTokenHandler;
 use Symfony\Component\Security\Http\AccessToken\QueryAccessTokenExtractor;
@@ -135,5 +136,13 @@ return static function (ContainerConfigurator $container) {
 
         ->set('security.access_token_handler.oidc.signature.PS512', PS512::class)
             ->tag('security.access_token_handler.oidc.signature_algorithm')
+
+    // OAuth2 Introspection (RFC 7662)
+    ->set('security.access_token_handler.oauth2', Oauth2TokenHandler::class)
+        ->abstract()
+        ->args([
+            abstract_arg('http client'),
+            service('logger')->nullOnInvalid(),
+        ])
     ;
 };

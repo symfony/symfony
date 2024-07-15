@@ -24,9 +24,9 @@ class UuidTest extends TestCase
 {
     public function testNormalizerCanBeSet()
     {
-        $uuid = new Uuid(['normalizer' => 'trim']);
+        $uuid = new Uuid(['normalizer' => trim(...)]);
 
-        $this->assertEquals('trim', $uuid->normalizer);
+        $this->assertEquals(trim(...), $uuid->normalizer);
     }
 
     public function testInvalidNormalizerThrowsException()

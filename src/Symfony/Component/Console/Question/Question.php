@@ -260,7 +260,7 @@ class Question
 
     protected function isAssoc(array $array): bool
     {
-        return (bool) \count(array_filter(array_keys($array), 'is_string'));
+        return (bool) \count(array_filter(array_keys($array), is_string(...)));
     }
 
     public function isTrimmable(): bool

@@ -156,7 +156,7 @@ class PhpSubprocess extends Process
         $paths = [(string) php_ini_loaded_file()];
 
         if (false !== $scanned = php_ini_scanned_files()) {
-            $paths = array_merge($paths, array_map('trim', explode(',', $scanned)));
+            $paths = array_merge($paths, array_map(trim(...), explode(',', $scanned)));
         }
 
         return $paths;

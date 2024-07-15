@@ -135,7 +135,7 @@ final class CharacterStream
     public function readBytes(int $length): ?array
     {
         if (null !== $read = $this->read($length)) {
-            return array_map('ord', str_split($read, 1));
+            return array_map(ord(...), str_split($read, 1));
         }
 
         return null;

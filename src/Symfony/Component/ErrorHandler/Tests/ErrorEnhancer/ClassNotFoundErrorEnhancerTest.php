@@ -53,7 +53,7 @@ class ClassNotFoundErrorEnhancerTest extends TestCase
                 // Unregister all autoloaders to ensure the custom provided
                 // autoloader is the only one to be used during the test run.
                 $autoloaders = spl_autoload_functions();
-                array_map('spl_autoload_unregister', $autoloaders);
+                array_map(spl_autoload_unregister(...), $autoloaders);
                 spl_autoload_register($autoloader);
             }
 
@@ -62,7 +62,7 @@ class ClassNotFoundErrorEnhancerTest extends TestCase
         } finally {
             if ($autoloader) {
                 spl_autoload_unregister($autoloader);
-                array_map('spl_autoload_register', $autoloaders);
+                array_map(spl_autoload_register(...), $autoloaders);
             }
         }
 

@@ -151,7 +151,7 @@ class LengthValidatorTest extends ConstraintValidatorTestCase
      */
     public function testValidNormalizedValues($value)
     {
-        $constraint = new Length(['min' => 3, 'max' => 3, 'normalizer' => 'trim']);
+        $constraint = new Length(['min' => 3, 'max' => 3, 'normalizer' => trim(...)]);
         $this->validator->validate($value, $constraint);
 
         $this->assertNoViolation();

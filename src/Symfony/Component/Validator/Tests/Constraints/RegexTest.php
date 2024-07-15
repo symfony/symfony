@@ -91,9 +91,9 @@ class RegexTest extends TestCase
 
     public function testNormalizerCanBeSet()
     {
-        $regex = new Regex(['pattern' => '/^[0-9]+$/', 'normalizer' => 'trim']);
+        $regex = new Regex(['pattern' => '/^[0-9]+$/', 'normalizer' => trim(...)]);
 
-        $this->assertEquals('trim', $regex->normalizer);
+        $this->assertEquals(trim(...), $regex->normalizer);
     }
 
     public function testInvalidNormalizerThrowsException()

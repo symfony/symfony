@@ -581,7 +581,7 @@ class ErrorHandlerTest extends TestCase
     {
         try {
             if ($previousHandlerWasDefined) {
-                set_error_handler('count');
+                set_error_handler(count(...));
             }
 
             $logger = $loggerSetsAnotherHandler ? new LoggerThatSetAnErrorHandler() : new NullLogger();

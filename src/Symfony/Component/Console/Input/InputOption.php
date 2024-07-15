@@ -88,7 +88,7 @@ class InputOption
                 $shortcut = implode('|', $shortcut);
             }
             $shortcuts = preg_split('{(\|)-?}', ltrim($shortcut, '-'));
-            $shortcuts = array_filter($shortcuts, 'strlen');
+            $shortcuts = array_filter($shortcuts, strlen(...));
             $shortcut = implode('|', $shortcuts);
 
             if ('' === $shortcut) {

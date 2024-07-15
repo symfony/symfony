@@ -493,7 +493,7 @@ class MacAddressValidatorTest extends ConstraintValidatorTestCase
      */
     public function testValidMacsWithWhitespaces($mac)
     {
-        $this->validator->validate($mac, new MacAddress(normalizer: 'trim'));
+        $this->validator->validate($mac, new MacAddress(normalizer: trim(...)));
 
         $this->assertNoViolation();
     }

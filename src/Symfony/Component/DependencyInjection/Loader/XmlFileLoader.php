@@ -720,7 +720,7 @@ class XmlFileLoader extends FileLoader
                 $locationstart = '';
             }
             $drive = '\\' === \DIRECTORY_SEPARATOR ? array_shift($parts).'/' : '';
-            $location = $locationstart.$drive.implode('/', array_map('rawurlencode', $parts));
+            $location = $locationstart.$drive.implode('/', array_map(rawurlencode(...), $parts));
 
             $imports .= \sprintf('  <xsd:import namespace="%s" schemaLocation="%s" />'."\n", $namespace, $location);
         }

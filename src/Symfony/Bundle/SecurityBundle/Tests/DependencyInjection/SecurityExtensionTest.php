@@ -711,7 +711,7 @@ class SecurityExtensionTest extends TestCase
 
         $container->compile();
 
-        $this->assertEquals($expectedAuthenticators, array_map('strval', $container->getDefinition('security.authenticator.manager.main')->getArgument(0)));
+        $this->assertEquals($expectedAuthenticators, array_map(strval(...), $container->getDefinition('security.authenticator.manager.main')->getArgument(0)));
     }
 
     public static function provideConfigureCustomAuthenticatorData(): iterable
@@ -816,7 +816,7 @@ class SecurityExtensionTest extends TestCase
 
         /** @var IteratorArgument $listenersIteratorArgument */
         $listenersIteratorArgument = $container->getDefinition('security.firewall.map.context.main')->getArgument(0);
-        $firewallListeners = array_map('strval', $listenersIteratorArgument->getValues());
+        $firewallListeners = array_map(strval(...), $listenersIteratorArgument->getValues());
         $this->assertContains('custom_firewall_listener_id', $firewallListeners);
     }
 

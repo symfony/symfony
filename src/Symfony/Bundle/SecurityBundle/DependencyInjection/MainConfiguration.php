@@ -239,7 +239,7 @@ class MainConfiguration implements ConfigurationInterface
                     ->booleanNode('invalidate_session')->defaultTrue()->end()
                     ->arrayNode('clear_site_data')
                         ->performNoDeepMerging()
-                        ->beforeNormalization()->ifString()->then(fn ($v) => $v ? array_map('trim', explode(',', $v)) : [])->end()
+                        ->beforeNormalization()->ifString()->then(fn ($v) => $v ? array_map(trim(...), explode(',', $v)) : [])->end()
                         ->enumPrototype()
                             ->values([
                                 '*', 'cache', 'cookies', 'storage', 'executionContexts',

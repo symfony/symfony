@@ -24,9 +24,9 @@ class NotBlankTest extends TestCase
 {
     public function testNormalizerCanBeSet()
     {
-        $notBlank = new NotBlank(['normalizer' => 'trim']);
+        $notBlank = new NotBlank(['normalizer' => trim(...)]);
 
-        $this->assertEquals('trim', $notBlank->normalizer);
+        $this->assertEquals(trim(...), $notBlank->normalizer);
     }
 
     public function testAttributes()

@@ -132,7 +132,7 @@ class NotBlankValidatorTest extends ConstraintValidatorTestCase
     {
         $constraint = new NotBlank([
             'message' => 'myMessage',
-            'normalizer' => 'trim',
+            'normalizer' => trim(...),
         ]);
 
         $this->validator->validate($value, $constraint);

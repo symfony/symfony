@@ -49,9 +49,9 @@ class EmailTest extends TestCase
 
     public function testNormalizerCanBeSet()
     {
-        $email = new Email(['normalizer' => 'trim']);
+        $email = new Email(['normalizer' => trim(...)]);
 
-        $this->assertEquals('trim', $email->normalizer);
+        $this->assertEquals(trim(...), $email->normalizer);
     }
 
     public function testInvalidNormalizerThrowsException()

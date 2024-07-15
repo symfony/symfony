@@ -662,7 +662,7 @@ class AutowirePass extends AbstractRecursivePass
             return \sprintf(' Did you mean to target%s "%s" instead?', 1 < \count($autowiringAliases) ? ' one of' : '', implode('", "', $autowiringAliases));
         }
 
-        if (!$container->has($type) && false !== $key = array_search(strtolower($type), array_map('strtolower', $servicesAndAliases))) {
+        if (!$container->has($type) && false !== $key = array_search(strtolower($type), array_map(strtolower(...), $servicesAndAliases))) {
             return \sprintf(' Did you mean "%s"?', $servicesAndAliases[$key]);
         } elseif (isset($this->ambiguousServiceTypes[$type])) {
             $message = \sprintf('one of these existing services: "%s"', implode('", "', $this->ambiguousServiceTypes[$type]));

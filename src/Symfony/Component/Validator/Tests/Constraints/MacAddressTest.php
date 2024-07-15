@@ -23,7 +23,7 @@ class MacAddressTest extends TestCase
 {
     public function testNormalizerCanBeSet()
     {
-        $mac = new MacAddress(normalizer: 'trim');
+        $mac = new MacAddress(normalizer: trim(...));
 
         $this->assertEquals(trim(...), $mac->normalizer);
     }

@@ -170,7 +170,7 @@ EOT
         $filePath = $_SERVER['SYMFONY_DOTENV_PATH'] ?? $this->projectDirectory.\DIRECTORY_SEPARATOR.'.env';
         $envFiles = $this->getEnvFiles($filePath);
 
-        return array_keys($this->getVariables(array_filter($envFiles, 'is_file'), null));
+        return array_keys($this->getVariables(array_filter($envFiles, is_file(...)), null));
     }
 
     private function getEnvFiles(string $filePath): array

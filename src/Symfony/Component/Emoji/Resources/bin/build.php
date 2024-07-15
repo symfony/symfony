@@ -94,7 +94,7 @@ final class Builder
                     continue;
                 }
                 $parts = preg_split('//u', $emoji, -1, \PREG_SPLIT_NO_EMPTY);
-                $emojiCodePoints = strtoupper(implode('-', array_map('dechex', array_map('mb_ord', $parts))));
+                $emojiCodePoints = strtoupper(implode('-', array_map(dechex(...), array_map(mb_ord(...), $parts))));
                 if (!array_key_exists($emojiCodePoints, $emojisCodePoints)) {
                     continue;
                 }

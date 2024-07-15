@@ -38,9 +38,8 @@ class WrappedListenerTest extends TestCase
             [['Symfony\Component\EventDispatcher\Tests\Debug\FooListener', 'invalidMethod'], 'Symfony\Component\EventDispatcher\Tests\Debug\FooListener::invalidMethod'],
             ['var_dump', 'var_dump'],
             [function () {}, 'closure'],
-            [\Closure::fromCallable([new FooListener(), 'listen']), 'Symfony\Component\EventDispatcher\Tests\Debug\FooListener::listen'],
-            [\Closure::fromCallable(['Symfony\Component\EventDispatcher\Tests\Debug\FooListener', 'listenStatic']), 'Symfony\Component\EventDispatcher\Tests\Debug\FooListener::listenStatic'],
-            [\Closure::fromCallable(function () {}), 'closure'],
+            [(new FooListener())->listen(...), 'Symfony\Component\EventDispatcher\Tests\Debug\FooListener::listen'],
+            [FooListener::listenStatic(...), 'Symfony\Component\EventDispatcher\Tests\Debug\FooListener::listenStatic'],
             [[#[\Closure(name: FooListener::class)] static fn () => new FooListener(), 'listen'], 'Symfony\Component\EventDispatcher\Tests\Debug\FooListener::listen'],
         ];
     }

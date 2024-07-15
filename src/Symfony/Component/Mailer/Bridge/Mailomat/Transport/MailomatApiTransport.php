@@ -85,7 +85,7 @@ final class MailomatApiTransport extends AbstractApiTransport
     {
         $payload = [
             'from' => $this->addressToPayload($envelope->getSender()),
-            'to' => array_map([$this, 'addressToPayload'], $email->getTo()),
+            'to' => array_map($this->addressToPayload(...), $email->getTo()),
             'subject' => $email->getSubject(),
             'text' => $email->getTextBody(),
             'html' => $email->getHtmlBody(),
@@ -93,15 +93,15 @@ final class MailomatApiTransport extends AbstractApiTransport
         ];
 
         if ($email->getCc()) {
-            $payload['cc'] = array_map([$this, 'addressToPayload'], $email->getCc());
+            $payload['cc'] = array_map($this->addressToPayload(...), $email->getCc());
         }
 
         if ($email->getBcc()) {
-            $payload['bcc'] = array_map([$this, 'addressToPayload'], $email->getBcc());
+            $payload['bcc'] = array_map($this->addressToPayload(...), $email->getBcc());
         }
 
         if ($email->getReplyTo()) {
-            $payload['replyTo'] = array_map([$this, 'addressToPayload'], $email->getReplyTo());
+            $payload['replyTo'] = array_map($this->addressToPayload(...), $email->getReplyTo());
         }
 
         return $payload;

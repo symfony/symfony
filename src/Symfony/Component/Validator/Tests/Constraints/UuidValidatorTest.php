@@ -93,7 +93,7 @@ class UuidValidatorTest extends ConstraintValidatorTestCase
      */
     public function testValidStrictUuidsWithWhitespaces($uuid, $versions = null)
     {
-        $constraint = new Uuid(['normalizer' => 'trim']);
+        $constraint = new Uuid(['normalizer' => trim(...)]);
 
         if (null !== $versions) {
             $constraint->versions = $versions;
@@ -120,7 +120,7 @@ class UuidValidatorTest extends ConstraintValidatorTestCase
     {
         $this->validator->validate(
             "\x09\x09216fff40-98d9-11e3-a5e2-0800200c9a66",
-            new Uuid(normalizer: 'trim', versions: [Uuid::V1_MAC])
+            new Uuid(versions: [Uuid::V1_MAC], normalizer: trim(...))
         );
 
         $this->assertNoViolation();

@@ -24,9 +24,9 @@ class LengthTest extends TestCase
 {
     public function testNormalizerCanBeSet()
     {
-        $length = new Length(['min' => 0, 'max' => 10, 'normalizer' => 'trim']);
+        $length = new Length(['min' => 0, 'max' => 10, 'normalizer' => trim(...)]);
 
-        $this->assertEquals('trim', $length->normalizer);
+        $this->assertEquals(trim(...), $length->normalizer);
     }
 
     public function testInvalidNormalizerThrowsException()

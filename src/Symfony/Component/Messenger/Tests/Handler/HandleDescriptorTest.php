@@ -30,15 +30,15 @@ class HandleDescriptorTest extends TestCase
     public static function provideHandlers(): iterable
     {
         yield [function () {}, 'Closure'];
-        yield ['var_dump', 'var_dump'];
+        yield [var_dump(...), 'var_dump'];
         yield [new DummyCommandHandler(), DummyCommandHandler::class.'::__invoke'];
         yield [
             [new DummyCommandHandlerWithSpecificMethod(), 'handle'],
             DummyCommandHandlerWithSpecificMethod::class.'::handle',
         ];
-        yield [\Closure::fromCallable(function () {}), 'Closure'];
-        yield [\Closure::fromCallable(new DummyCommandHandler()), DummyCommandHandler::class.'::__invoke'];
-        yield [\Closure::bind(\Closure::fromCallable(function () {}), new \stdClass()), 'Closure'];
+        yield [(function () {})(...), 'Closure'];
+        yield [(new DummyCommandHandler())(...), DummyCommandHandler::class.'::__invoke'];
+        yield [\Closure::bind((function () {})(...), new \stdClass()), 'Closure'];
         yield [new class() {
             public function __invoke()
             {

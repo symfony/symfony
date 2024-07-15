@@ -24,9 +24,9 @@ class IpTest extends TestCase
 {
     public function testNormalizerCanBeSet()
     {
-        $ip = new Ip(['normalizer' => 'trim']);
+        $ip = new Ip(['normalizer' => trim(...)]);
 
-        $this->assertEquals('trim', $ip->normalizer);
+        $this->assertEquals(trim(...), $ip->normalizer);
     }
 
     public function testInvalidNormalizerThrowsException()

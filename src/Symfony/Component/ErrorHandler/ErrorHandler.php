@@ -575,7 +575,7 @@ class ErrorHandler
         $sameHandlerLimit = 10;
 
         while (!\is_array($handler) || !$handler[0] instanceof self) {
-            $handler = set_exception_handler('is_int');
+            $handler = set_exception_handler(is_int(...));
             restore_exception_handler();
 
             if (!$handler) {

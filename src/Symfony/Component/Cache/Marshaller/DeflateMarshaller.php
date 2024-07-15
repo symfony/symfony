@@ -30,7 +30,7 @@ class DeflateMarshaller implements MarshallerInterface
 
     public function marshall(array $values, ?array &$failed): array
     {
-        return array_map('gzdeflate', $this->marshaller->marshall($values, $failed));
+        return array_map(gzdeflate(...), $this->marshaller->marshall($values, $failed));
     }
 
     public function unmarshall(string $value): mixed

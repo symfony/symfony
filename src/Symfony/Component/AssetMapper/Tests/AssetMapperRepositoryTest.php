@@ -91,7 +91,7 @@ class AssetMapperRepositoryTest extends TestCase
         $this->assertCount(8, $actualAllAssets);
 
         // use realpath to normalize slashes on Windows for comparison
-        $expectedAllAssets = array_map('realpath', [
+        $expectedAllAssets = array_map(realpath(...), [
             'file1.css' => __DIR__.'/Fixtures/dir1/file1.css',
             'file2.js' => __DIR__.'/Fixtures/dir1/file2.js',
             'already-abcdefVWXYZ0123456789.digested.css' => __DIR__.'/Fixtures/dir2/already-abcdefVWXYZ0123456789.digested.css',
@@ -101,7 +101,7 @@ class AssetMapperRepositoryTest extends TestCase
             'subdir/file6.js' => __DIR__.'/Fixtures/dir2/subdir/file6.js',
             'test.gif.foo' => __DIR__.'/Fixtures/dir3/test.gif.foo',
         ]);
-        $this->assertEquals($expectedAllAssets, array_map('realpath', $actualAllAssets));
+        $this->assertEquals($expectedAllAssets, array_map(realpath(...), $actualAllAssets));
     }
 
     public function testAllWithNamespaces()
@@ -123,10 +123,10 @@ class AssetMapperRepositoryTest extends TestCase
             'dir3_namespace/test.gif.foo' => __DIR__.'/Fixtures/dir3/test.gif.foo',
         ];
 
-        $normalizedExpectedAllAssets = array_map('realpath', $expectedAllAssets);
+        $normalizedExpectedAllAssets = array_map(realpath(...), $expectedAllAssets);
 
         $actualAssets = $repository->all();
-        $normalizedActualAssets = array_map('realpath', $actualAssets);
+        $normalizedActualAssets = array_map(realpath(...), $actualAssets);
 
         $this->assertEquals($normalizedExpectedAllAssets, $normalizedActualAssets);
     }

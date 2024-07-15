@@ -66,7 +66,7 @@ class UrlValidatorTest extends ConstraintValidatorTestCase
     public function testValidUrlsWithWhitespaces($url)
     {
         $this->validator->validate($url, new Url([
-            'normalizer' => 'trim',
+            'normalizer' => trim(...),
             'requireTld' => true,
         ]));
 

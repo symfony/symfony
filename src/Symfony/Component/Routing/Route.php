@@ -164,7 +164,7 @@ class Route implements \Serializable
      */
     public function setSchemes(string|array $schemes): static
     {
-        $this->schemes = array_map('strtolower', (array) $schemes);
+        $this->schemes = array_map(strtolower(...), (array) $schemes);
         $this->compiled = null;
 
         return $this;
@@ -199,7 +199,7 @@ class Route implements \Serializable
      */
     public function setMethods(string|array $methods): static
     {
-        $this->methods = array_map('strtoupper', (array) $methods);
+        $this->methods = array_map(strtoupper(...), (array) $methods);
         $this->compiled = null;
 
         return $this;

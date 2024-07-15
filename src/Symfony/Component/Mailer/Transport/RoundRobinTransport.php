@@ -63,7 +63,7 @@ class RoundRobinTransport implements TransportInterface
 
     public function __toString(): string
     {
-        return $this->getNameSymbol().'('.implode(' ', array_map('strval', $this->transports)).')';
+        return $this->getNameSymbol().'('.implode(' ', array_map(strval(...), $this->transports)).')';
     }
 
     /**

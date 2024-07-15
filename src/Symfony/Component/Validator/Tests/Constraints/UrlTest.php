@@ -24,9 +24,9 @@ class UrlTest extends TestCase
 {
     public function testNormalizerCanBeSet()
     {
-        $url = new Url(['normalizer' => 'trim', 'requireTld' => true]);
+        $url = new Url(['normalizer' => trim(...), 'requireTld' => true]);
 
-        $this->assertEquals('trim', $url->normalizer);
+        $this->assertEquals(trim(...), $url->normalizer);
     }
 
     public function testInvalidNormalizerThrowsException()

@@ -1122,7 +1122,7 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $this->assertArrayHasKey('cache_dir', $options);
         $this->assertSame($container->getParameter('kernel.cache_dir').'/translations', $options['cache_dir']);
 
-        $files = array_map('realpath', $options['resource_files']['en']);
+        $files = array_map(realpath(...), $options['resource_files']['en']);
         $ref = new \ReflectionClass(Validation::class);
         $this->assertContains(
             strtr(\dirname($ref->getFileName()).'/Resources/translations/validators.en.xlf', '/', \DIRECTORY_SEPARATOR),
@@ -2341,7 +2341,7 @@ abstract class FrameworkExtensionTestCase extends TestCase
     {
         $container = $this->createContainerFromFile('trusted_proxies_private_ranges');
 
-        $this->assertSame(IpUtils::PRIVATE_SUBNETS, array_map('trim', explode(',', $container->getParameter('kernel.trusted_proxies'))));
+        $this->assertSame(IpUtils::PRIVATE_SUBNETS, array_map(trim(...), explode(',', $container->getParameter('kernel.trusted_proxies'))));
     }
 
     public function testWebhook()

@@ -1658,7 +1658,7 @@ class Request
      */
     public function getCharsets(): array
     {
-        return $this->charsets ??= array_map('strval', array_keys(AcceptHeader::fromString($this->headers->get('Accept-Charset'))->all()));
+        return $this->charsets ??= array_map(strval(...), array_keys(AcceptHeader::fromString($this->headers->get('Accept-Charset'))->all()));
     }
 
     /**
@@ -1668,7 +1668,7 @@ class Request
      */
     public function getEncodings(): array
     {
-        return $this->encodings ??= array_map('strval', array_keys(AcceptHeader::fromString($this->headers->get('Accept-Encoding'))->all()));
+        return $this->encodings ??= array_map(strval(...), array_keys(AcceptHeader::fromString($this->headers->get('Accept-Encoding'))->all()));
     }
 
     /**
@@ -1678,7 +1678,7 @@ class Request
      */
     public function getAcceptableContentTypes(): array
     {
-        return $this->acceptableContentTypes ??= array_map('strval', array_keys(AcceptHeader::fromString($this->headers->get('Accept'))->all()));
+        return $this->acceptableContentTypes ??= array_map(strval(...), array_keys(AcceptHeader::fromString($this->headers->get('Accept'))->all()));
     }
 
     /**

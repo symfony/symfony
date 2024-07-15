@@ -84,7 +84,7 @@ class EmailValidatorTest extends ConstraintValidatorTestCase
      */
     public function testValidNormalizedEmails($email)
     {
-        $this->validator->validate($email, new Email(['normalizer' => 'trim']));
+        $this->validator->validate($email, new Email(['normalizer' => trim(...)]));
 
         $this->assertNoViolation();
     }

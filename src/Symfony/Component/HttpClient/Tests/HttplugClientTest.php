@@ -37,6 +37,9 @@ class HttplugClientTest extends TestCase
         TestHttpServer::stop();
     }
 
+    /**
+     * @requires function ob_gzhandler
+     */
     public function testSendRequest()
     {
         $client = new HttplugClient(new NativeHttpClient());
@@ -51,6 +54,9 @@ class HttplugClientTest extends TestCase
         $this->assertSame('HTTP/1.1', $body['SERVER_PROTOCOL']);
     }
 
+    /**
+     * @requires function ob_gzhandler
+     */
     public function testSendAsyncRequest()
     {
         $client = new HttplugClient(new NativeHttpClient());

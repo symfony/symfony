@@ -30,7 +30,7 @@ class CompiledUrlMatcherDumperTest extends TestCase
     {
         parent::setUp();
 
-        $this->dumpPath = sys_get_temp_dir().\DIRECTORY_SEPARATOR.'php_matcher.'.uniqid('CompiledUrlMatcher').'.php';
+        $this->dumpPath = sys_get_temp_dir().\DIRECTORY_SEPARATOR.'php_matcher.'.uniqid('CompiledUrlMatcher', true).'.php';
     }
 
     protected function tearDown(): void

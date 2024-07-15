@@ -34,7 +34,7 @@ class AnnotationsCacheWarmerTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->cacheDir = sys_get_temp_dir().'/'.uniqid();
+        $this->cacheDir = sys_get_temp_dir().'/'.uniqid('', true);
         $fs = new Filesystem();
         $fs->mkdir($this->cacheDir);
         parent::setUp();

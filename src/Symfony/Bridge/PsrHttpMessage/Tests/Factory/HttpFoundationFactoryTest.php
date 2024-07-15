@@ -172,7 +172,7 @@ class HttpFoundationFactoryTest extends TestCase
         $symfonyUploadedFile = $this->callCreateUploadedFile($uploadedFile);
         $size = $symfonyUploadedFile->getSize();
 
-        $uniqid = uniqid();
+        $uniqid = uniqid('', true);
         $symfonyUploadedFile->move($this->tmpDir, $uniqid);
 
         $this->assertEquals($uploadedFile->getSize(), $size);
@@ -198,7 +198,7 @@ class HttpFoundationFactoryTest extends TestCase
 
     private function createUploadedFile(string $content, int $error, string $clientFileName, string $clientMediaType): UploadedFile
     {
-        $filePath = tempnam($this->tmpDir, uniqid());
+        $filePath = tempnam($this->tmpDir, uniqid('', true));
         file_put_contents($filePath, $content);
 
         return new UploadedFile($filePath, filesize($filePath), $error, $clientFileName, $clientMediaType);

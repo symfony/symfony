@@ -413,7 +413,7 @@ class ConnectionTest extends TestCase
         }
 
         $master = getenv('MESSENGER_REDIS_DSN');
-        $uid = uniqid('sentinel_');
+        $uid = uniqid('sentinel_', true);
 
         $exp = explode('://', $master, 2)[1];
         $this->expectException(\InvalidArgumentException::class);

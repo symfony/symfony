@@ -4,7 +4,7 @@ CHANGELOG
 7.2
 ---
 
- * Add `DomCrawler` to parse HTML and XML with native capabilities
+ * Add `NativeCrawler\*` classes to parse HTML and XML with native PHP parser
 
 7.0
 ---

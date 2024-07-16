@@ -9,56 +9,54 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\DomCrawler\Tests;
+namespace Symfony\Component\DomCrawler\Tests\NativeCrawler;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\DomCrawler\Link;
+use Symfony\Component\DomCrawler\NativeCrawler\Link;
 
+/**
+ * @requires PHP 8.4
+ */
 class LinkTest extends TestCase
 {
-    public function testConstructorWithANonATag()
+    public function testConstructorWithANonATagFromHTMLDocument()
     {
         $this->expectException(\LogicException::class);
-        $dom = new \DOMDocument();
-        $dom->loadHTML('<html><div><div></html>');
+        $dom = \DOM\HTMLDocument::createFromString('<!DOCTYPE html><html><div><div></html>');
 
         new Link($dom->getElementsByTagName('div')->item(0), 'http://www.example.com/');
     }
 
-    public function testBaseUriIsOptionalWhenLinkUrlIsAbsolute()
+    public function testBaseUriIsOptionalWhenLinkUrlIsAbsoluteFromHTMLDocument()
     {
-        $dom = new \DOMDocument();
-        $dom->loadHTML('<html><a href="https://example.com/foo">foo</a></html>');
+        $dom = \DOM\HTMLDocument::createFromString('<!DOCTYPE html><html><a href="https://example.com/foo">foo</a></html>');
 
         $link = new Link($dom->getElementsByTagName('a')->item(0));
         $this->assertSame('https://example.com/foo', $link->getUri());
     }
 
-    public function testAbsoluteBaseUriIsMandatoryWhenLinkUrlIsRelative()
+    public function testAbsoluteBaseUriIsMandatoryWhenLinkUrlIsRelativeFromHTMLDocument()
     {
         $this->expectException(\InvalidArgumentException::class);
-        $dom = new \DOMDocument();
-        $dom->loadHTML('<html><a href="/foo">foo</a></html>');
+        $dom = \DOM\HTMLDocument::createFromString('<!DOCTYPE html><html><a href="/foo">foo</a></html>');
 
         $link = new Link($dom->getElementsByTagName('a')->item(0), 'example.com');
         $link->getUri();
     }
 
-    public function testGetNode()
+    public function testGetNodeFromHTMLDocument()
     {
-        $dom = new \DOMDocument();
-        $dom->loadHTML('<html><a href="/foo">foo</a></html>');
+        $dom = \DOM\HTMLDocument::createFromString('<!DOCTYPE html><html><a href="/foo">foo</a></html>');
 
         $node = $dom->getElementsByTagName('a')->item(0);
         $link = new Link($node, 'http://example.com/');
 
-        $this->assertEquals($node, $link->getNode(), '->getNode() returns the node associated with the link');
+        $this->assertEquals($node, $link->getNode(), '->getDomNode() returns the node associated with the link');
     }
 
-    public function testGetMethod()
+    public function testGetMethodFromHTMLDocument()
     {
-        $dom = new \DOMDocument();
-        $dom->loadHTML('<html><a href="/foo">foo</a></html>');
+        $dom = \DOM\HTMLDocument::createFromString('<!DOCTYPE html><html><a href="/foo">foo</a></html>');
 
         $node = $dom->getElementsByTagName('a')->item(0);
         $link = new Link($node, 'http://example.com/');
@@ -72,10 +70,10 @@ class LinkTest extends TestCase
     /**
      * @dataProvider getGetUriTests
      */
-    public function testGetUri($url, $currentUri, $expected)
+    public function testGetUriFromHTMLDocument($url, $currentUri, $expected)
     {
-        $dom = new \DOMDocument();
-        $dom->loadHTML(\sprintf('<html><a href="%s">foo</a></html>', $url));
+        $dom = \DOM\HTMLDocument::createFromString(sprintf('<!DOCTYPE html><html><a href="%s">foo</a></html>', $url));
+
         $link = new Link($dom->getElementsByTagName('a')->item(0), $currentUri);
 
         $this->assertEquals($expected, $link->getUri());
@@ -84,10 +82,10 @@ class LinkTest extends TestCase
     /**
      * @dataProvider getGetUriTests
      */
-    public function testGetUriOnArea($url, $currentUri, $expected)
+    public function testGetUriOnAreaFromHTMLDocument($url, $currentUri, $expected)
     {
-        $dom = new \DOMDocument();
-        $dom->loadHTML(\sprintf('<html><map><area href="%s" /></map></html>', $url));
+        $dom = \DOM\HTMLDocument::createFromString(sprintf('<!DOCTYPE html><html><map><area href="%s"></map></html>', $url));
+
         $link = new Link($dom->getElementsByTagName('area')->item(0), $currentUri);
 
         $this->assertEquals($expected, $link->getUri());
@@ -96,10 +94,10 @@ class LinkTest extends TestCase
     /**
      * @dataProvider getGetUriTests
      */
-    public function testGetUriOnLink($url, $currentUri, $expected)
+    public function testGetUriOnLinkFromHTMLDocument($url, $currentUri, $expected)
     {
-        $dom = new \DOMDocument();
-        $dom->loadHTML(\sprintf('<html><head><link href="%s" /></head></html>', $url));
+        $dom = \DOM\HTMLDocument::createFromString(sprintf('<!DOCTYPE html><html><head><link href="%s"></head></html>', $url));
+
         $link = new Link($dom->getElementsByTagName('link')->item(0), $currentUri);
 
         $this->assertEquals($expected, $link->getUri());

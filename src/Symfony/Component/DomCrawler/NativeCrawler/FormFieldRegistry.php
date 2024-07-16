@@ -9,12 +9,14 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\DomCrawler;
+namespace Symfony\Component\DomCrawler\NativeCrawler;
 
-use Symfony\Component\DomCrawler\Field\FormField;
+use Symfony\Component\DomCrawler\FormFieldRegistryTrait;
+use Symfony\Component\DomCrawler\NativeCrawler\Field\ChoiceFormField;
+use Symfony\Component\DomCrawler\NativeCrawler\Field\FormField;
 
 /**
- * This is an internal class that must not be used directly.
+ * @author Alexandre Daubois <alex.daubois@gmail.com>
  *
  * @internal
  */
@@ -74,7 +76,7 @@ class FormFieldRegistry
     public function set(string $name, mixed $value): void
     {
         $target = &$this->get($name);
-        if ((!\is_array($value) && $target instanceof FormField) || $target instanceof Field\ChoiceFormField) {
+        if ((!\is_array($value) && $target instanceof FormField) || $target instanceof ChoiceFormField) {
             $target->setValue($value);
         } elseif (\is_array($value)) {
             $registry = new static();

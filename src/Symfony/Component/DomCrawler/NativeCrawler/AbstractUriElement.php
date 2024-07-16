@@ -9,27 +9,30 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\DomCrawler;
+namespace Symfony\Component\DomCrawler\NativeCrawler;
+
+use Symfony\Component\DomCrawler\UriResolver;
 
 /**
  * Any HTML element that can link to an URI.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ * @author Alexandre Daubois <alex.daubois@gmail.com>
  */
 abstract class AbstractUriElement
 {
-    protected \DOMElement $node;
+    protected \DOM\Element $node;
     protected ?string $method;
 
     /**
-     * @param \DOMElement $node       A \DOMElement instance
-     * @param string|null $currentUri The URI of the page where the link is embedded (or the base href)
-     * @param string|null $method     The method to use for the link (GET by default)
+     * @param \DOM\Element             $node       A \DOM\Element instance
+     * @param string|null              $currentUri The URI of the page where the link is embedded (or the base href)
+     * @param string|null              $method     The method to use for the link (GET by default)
      *
      * @throws \InvalidArgumentException if the node is not a link
      */
     public function __construct(
-        \DOMElement $node,
+        \DOM\Element $node,
         protected ?string $currentUri = null,
         ?string $method = 'GET',
     ) {
@@ -43,10 +46,7 @@ abstract class AbstractUriElement
         }
     }
 
-    /**
-     * Gets the node associated with this link.
-     */
-    public function getNode(): \DOMElement
+    public function getNode(): \DOM\Element
     {
         return $this->node;
     }
@@ -101,11 +101,11 @@ abstract class AbstractUriElement
     }
 
     /**
-     * Sets current \DOMElement instance.
+     * Sets current \DOM\Element instance.
      *
-     * @param \DOMElement $node A \DOMElement instance
+     * @param \DOM\Element $node A \DOM\Element instance
      *
      * @throws \LogicException If given node is not an anchor
      */
-    abstract protected function setNode(\DOMElement $node): void;
+    abstract protected function setNode(\DOM\Element $node): void;
 }

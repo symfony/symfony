@@ -9,13 +9,13 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\DomCrawler\Tests;
+namespace Symfony\Component\DomCrawler\Tests\NativeCrawler;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\DomCrawler\DomCrawler;
-use Symfony\Component\DomCrawler\Form;
-use Symfony\Component\DomCrawler\Image;
-use Symfony\Component\DomCrawler\Link;
+use Symfony\Component\DomCrawler\NativeCrawler\Form;
+use Symfony\Component\DomCrawler\NativeCrawler\Image;
+use Symfony\Component\DomCrawler\NativeCrawler\Link;
+use Symfony\Component\DomCrawler\NativeCrawler\DomCrawler;
 
 /**
  * @requires PHP 8.4
@@ -29,7 +29,7 @@ class DomCrawlerTest extends TestCase
 
     protected function createCrawler($node = null, ?string $uri = null, ?string $baseHref = null)
     {
-        return new DomCrawler($node, $uri, $baseHref, DomCrawler::CRAWLER_DISABLE_DEFAULT_NAMESPACE);
+        return new DomCrawler($node, $uri, $baseHref);
     }
 
     protected static function getCrawlerClass(): string
@@ -42,8 +42,7 @@ class DomCrawlerTest extends TestCase
         $crawler = $this->createCrawler();
         $this->assertCount(0, $crawler, '__construct() returns an empty crawler');
 
-        $doc = \DOM\HTMLDocument::createEmpty();
-        $node = $doc->createElement('test');
+        $node = \DOM\HTMLDocument::createEmpty()->createElement('test');
 
         $crawler = $this->createCrawler($node);
         $this->assertCount(1, $crawler, '__construct() takes a node as a first argument');
@@ -51,8 +50,7 @@ class DomCrawlerTest extends TestCase
 
     public function testClearWithModerNode()
     {
-        $doc = \DOM\HTMLDocument::createEmpty();
-        $node = $doc->createElement('test');
+        $node = \DOM\HTMLDocument::createEmpty()->createElement('test');
 
         $crawler = $this->createCrawler($node);
         $crawler->clear();
@@ -65,8 +63,7 @@ class DomCrawlerTest extends TestCase
         $crawler = $this->createCrawler();
         $this->assertCount(0, $crawler, '__construct() returns an empty crawler');
 
-        $doc = \DOM\XMLDocument::createEmpty();
-        $node = $doc->createElement('test');
+        $node = \DOM\HTMLDocument::createEmpty()->createElement('test');
 
         $crawler = $this->createCrawler($node);
         $this->assertCount(1, $crawler, '__construct() takes a node as a first argument');
@@ -273,8 +270,7 @@ class DomCrawlerTest extends TestCase
 
     public function testClear()
     {
-        $doc = \DOM\XMLDocument::createEmpty();
-        $node = $doc->createElement('test');
+        $node = \DOM\XMLDocument::createEmpty()->createElement('test');
 
         $crawler = $this->createCrawler($node);
         $crawler->clear();
@@ -901,7 +897,7 @@ HTML;
 
         $this->assertCount(4, $crawler->links(), '->links() returns an array');
         $links = $crawler->links();
-        $this->assertContainsOnlyInstancesOf('Symfony\\Component\\DomCrawler\\Link', $links, '->links() returns an array of Link instances');
+        $this->assertContainsOnlyInstancesOf(\Symfony\Component\DomCrawler\NativeCrawler\Link::class, $links, '->links() returns an array of Link instances');
 
         $this->assertEquals([], $this->createTestCrawler()->filterXPath('//ol')->links(), '->links() returns an empty array if the node selection is empty');
     }
@@ -913,7 +909,7 @@ HTML;
 
         $this->assertCount(4, $crawler->images(), '->images() returns an array');
         $images = $crawler->images();
-        $this->assertContainsOnlyInstancesOf('Symfony\\Component\\DomCrawler\\Image', $images, '->images() returns an array of Image instances');
+        $this->assertContainsOnlyInstancesOf(Image::class, $images, '->images() returns an array of Image instances');
 
         $this->assertEquals([], $this->createTestCrawler()->filterXPath('//ol')->links(), '->links() returns an empty array if the node selection is empty');
     }
@@ -926,7 +922,7 @@ HTML;
         $this->assertInstanceOf(Form::class, $crawler->form(), '->form() returns a Form instance');
         $this->assertInstanceOf(Form::class, $crawler2->form(), '->form() returns a Form instance');
 
-        $this->assertEquals($crawler->form()->getFormDomNode()->getAttribute('id'), $crawler2->form()->getFormDomNode()->getAttribute('id'), '->form() works on elements with form attribute');
+        $this->assertEquals($crawler->form()->getFormNode()->getAttribute('id'), $crawler2->form()->getFormNode()->getAttribute('id'), '->form() works on elements with form attribute');
 
         $this->assertEquals(['FooName' => 'FooBar', 'TextName' => 'TextValue', 'FooTextName' => 'FooTextValue'], $crawler->form(['FooName' => 'FooBar'])->getValues(), '->form() takes an array of values to submit as its first argument');
         $this->assertEquals(['FooName' => 'FooValue', 'TextName' => 'TextValue', 'FooTextName' => 'FooTextValue'], $crawler->form()->getValues(), '->getValues() returns correct form values');
@@ -1299,7 +1295,7 @@ HTML;
     public function testAddHtmlContentUnsupportedCharset()
     {
         $crawler = $this->createCrawler();
-        $crawler->addHtmlContent($this->getDoctype().file_get_contents(__DIR__.'/Fixtures/windows-1250.html'), 'Windows-1250');
+        $crawler->addHtmlContent($this->getDoctype().file_get_contents(__DIR__.'/../Fixtures/windows-1250.html'), 'Windows-1250');
 
         $this->assertEquals('Žťčýů', $crawler->filterXPath('//p')->text());
     }

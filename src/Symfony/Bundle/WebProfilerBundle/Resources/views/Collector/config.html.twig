@@ -125,6 +125,13 @@
                 <b>PHP SAPI</b>
                 <span>{{ collector.sapiName }}</span>
             </div>
+
+            <div class="sf-toolbar-info-piece sf-toolbar-info-php">
+                <b>PHP session</b>
+                <span>
+                    <a href="{{ path('_profiler_session_clear') }}" class="clear-session">Clear PHP session</a>
+                </span>
+            </div>
         </div>
 
         <div class="sf-toolbar-info-group">
@@ -268,6 +275,10 @@
 
     <p>
         <a href="{{ path('_profiler_phpinfo') }}">View full PHP configuration</a>
+    </p>
+
+    <p>
+        <a href="{{ path('_profiler_session_clear', { token: collector.token}) }}" class="clear-session">Clear PHP sessions</a>
     </p>
 
     {% if collector.bundles %}

@@ -1,6 +1,10 @@
 CHANGELOG
 =========
 
+7.2
+--
+ * Add clear php session button
+
 7.1
 ---
 

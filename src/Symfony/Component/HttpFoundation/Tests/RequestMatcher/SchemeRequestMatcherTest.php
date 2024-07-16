@@ -42,6 +42,13 @@ class SchemeRequestMatcherTest extends TestCase
         }
     }
 
+    public function testAlwaysMatchesOnParamsHeaders()
+    {
+        $matcher = new SchemeRequestMatcher([]);
+        $request = Request::create('sftp://example.com');
+        $this->assertTrue($matcher->matches($request));
+    }
+
     public static function getData()
     {
         return [

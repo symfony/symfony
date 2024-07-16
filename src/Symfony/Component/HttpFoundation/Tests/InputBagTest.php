@@ -98,4 +98,22 @@ class InputBagTest extends TestCase
         $this->expectDeprecation('Since symfony/http-foundation 5.1: Filtering an array value with "Symfony\Component\HttpFoundation\InputBag::filter()" without passing the FILTER_REQUIRE_ARRAY or FILTER_FORCE_ARRAY flag is deprecated');
         $bag->filter('foo', \FILTER_VALIDATE_INT);
     }
+
+    public function testAdd()
+    {
+        $bag = new InputBag(['foo' => 'bar']);
+        $bag->add(['baz' => 'qux']);
+
+        $this->assertSame('bar', $bag->get('foo'), '->add() does not remove existing parameters');
+        $this->assertSame('qux', $bag->get('baz'), '->add() adds new parameters');
+    }
+
+    public function testReplace()
+    {
+        $bag = new InputBag(['foo' => 'bar']);
+        $bag->replace(['baz' => 'qux']);
+
+        $this->assertNull($bag->get('foo'), '->replace() removes existing parameters');
+        $this->assertSame('qux', $bag->get('baz'), '->replace() adds new parameters');
+    }
 }

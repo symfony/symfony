@@ -15,6 +15,7 @@ use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Messenger\Event\WorkerMessageFailedEvent;
+use Symfony\Component\Messenger\Exception\RejectRedeliveredMessageException;
 use Symfony\Component\Messenger\Stamp\DelayStamp;
 use Symfony\Component\Messenger\Stamp\RedeliveryStamp;
 use Symfony\Component\Messenger\Stamp\SentToFailureTransportStamp;
@@ -46,6 +47,10 @@ class SendFailedMessageToFailureTransportListener implements EventSubscriberInte
     public function onMessageFailed(WorkerMessageFailedEvent $event)
     {
         if ($event->willRetry()) {
+            return;
+        }
+
+        if ($event->getThrowable() instanceof RejectRedeliveredMessageException) {
             return;
         }
 

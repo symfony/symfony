@@ -896,7 +896,7 @@ HTML;
         $this->assertInstanceOf(Form::class, $crawler->form(), '->form() returns a Form instance');
         $this->assertInstanceOf(Form::class, $crawler2->form(), '->form() returns a Form instance');
 
-        $this->assertEquals($crawler->form()->getFormDomNode()->getAttribute('id'), $crawler2->form()->getFormDomNode()->getAttribute('id'), '->form() works on elements with form attribute');
+        $this->assertEquals($crawler->form()->getFormNode()->getAttribute('id'), $crawler2->form()->getFormNode()->getAttribute('id'), '->form() works on elements with form attribute');
 
         $this->assertEquals(['FooName' => 'FooBar', 'TextName' => 'TextValue', 'FooTextName' => 'FooTextValue'], $crawler->form(['FooName' => 'FooBar'])->getValues(), '->form() takes an array of values to submit as its first argument');
         $this->assertEquals(['FooName' => 'FooValue', 'TextName' => 'TextValue', 'FooTextName' => 'FooTextValue'], $crawler->form()->getValues(), '->getValues() returns correct form values');

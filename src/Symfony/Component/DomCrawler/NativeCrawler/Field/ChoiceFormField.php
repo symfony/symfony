@@ -9,7 +9,9 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\DomCrawler\Field;
+namespace Symfony\Component\DomCrawler\NativeCrawler\Field;
+
+use Symfony\Component\DomCrawler\Field\ChoiceFormFieldTrait;
 
 /**
  * ChoiceFormField represents a choice form field.
@@ -17,6 +19,7 @@ namespace Symfony\Component\DomCrawler\Field;
  * It is constructed from an HTML select tag, or an HTML checkbox, or radio inputs.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ * @author Alexandre Daubois <alex.daubois@gmail.com>
  */
 class ChoiceFormField extends FormField
 {
@@ -29,7 +32,7 @@ class ChoiceFormField extends FormField
      *
      * @internal
      */
-    public function addChoice(\DOMElement $node): void
+    public function addChoice(\DOM\Element $node): void
     {
         if (!$this->multiple && 'radio' !== $this->type) {
             throw new \LogicException(\sprintf('Unable to add a choice for "%s" as it is not multiple or is not a radio button.', $this->name));
@@ -50,11 +53,12 @@ class ChoiceFormField extends FormField
      */
     protected function initialize(): void
     {
-        if ('input' !== $this->node->nodeName && 'select' !== $this->node->nodeName) {
-            throw new \LogicException(\sprintf('A ChoiceFormField can only be created from an input or select tag (%s given).', $this->node->nodeName));
+        $nodeName = strtolower($this->node->nodeName);
+        if ('input' !== $nodeName && 'select' !== $nodeName) {
+            throw new \LogicException(\sprintf('A ChoiceFormField can only be created from an input or select tag (%s given).', $nodeName));
         }
 
-        if ('input' === $this->node->nodeName && 'checkbox' !== strtolower($this->node->getAttribute('type')) && 'radio' !== strtolower($this->node->getAttribute('type'))) {
+        if ('input' === $nodeName && 'checkbox' !== strtolower($this->node->getAttribute('type')) && 'radio' !== strtolower($this->node->getAttribute('type'))) {
             throw new \LogicException(\sprintf('A ChoiceFormField can only be created from an input tag with a type of checkbox or radio (given type is "%s").', $this->node->getAttribute('type')));
         }
 
@@ -62,7 +66,7 @@ class ChoiceFormField extends FormField
         $this->options = [];
         $this->multiple = false;
 
-        if ('input' == $this->node->nodeName) {
+        if ('input' == $nodeName) {
             $this->type = strtolower($this->node->getAttribute('type'));
             $optionValue = $this->buildOptionValue($this->node);
             $this->options[] = $optionValue;
@@ -79,7 +83,11 @@ class ChoiceFormField extends FormField
             }
 
             $found = false;
-            foreach ($this->xpath->query('descendant::option', $this->node) as $option) {
+            foreach ($this->node->childNodes as $option) {
+                if ('option' !== strtolower($option->nodeName)) {
+                    continue;
+                }
+
                 $optionValue = $this->buildOptionValue($option);
                 $this->options[] = $optionValue;
 
@@ -103,11 +111,11 @@ class ChoiceFormField extends FormField
     /**
      * Returns option value with associated disabled flag.
      */
-    private function buildOptionValue(\DOMElement $node): array
+    private function buildOptionValue(\DOM\Element $node): array
     {
         $option = [];
 
-        $defaultDefaultValue = 'select' === $this->node->nodeName ? '' : 'on';
+        $defaultDefaultValue = 'select' === strtolower($this->node->nodeName) ? '' : 'on';
         $defaultValue = (isset($node->nodeValue) && $node->nodeValue) ? $node->nodeValue : $defaultDefaultValue;
         $option['value'] = $node->hasAttribute('value') ? $node->getAttribute('value') : $defaultValue;
         $option['disabled'] = $node->hasAttribute('disabled');

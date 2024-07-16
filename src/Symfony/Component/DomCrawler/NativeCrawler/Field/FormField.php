@@ -9,28 +9,31 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\DomCrawler\Field;
+namespace Symfony\Component\DomCrawler\NativeCrawler\Field;
+
+use Symfony\Component\DomCrawler\Field\FormFieldTrait;
 
 /**
  * FormField is the abstract class for all form fields.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ * @author Alexandre Daubois <alex.daubois@gmail.com>
  */
 abstract class FormField
 {
     use FormFieldTrait;
 
-    protected \DOMDocument $document;
-    protected \DOMXPath $xpath;
+    protected \DOM\Document $document;
+    protected \DOM\XPath $xpath;
 
     /**
-     * @param \DOMElement $node The node associated with this field
+     * @param \DOM\Element $node The node associated with this field
      */
     public function __construct(
-        protected \DOMElement $node,
+        protected \DOM\Element $node,
     ) {
-        $this->name = $node->getAttribute('name');
-        $this->xpath = new \DOMXPath($node->ownerDocument);
+        $this->name = $node->getAttribute('name') ?? '';
+        $this->xpath = new \DOM\XPath($node->ownerDocument);
 
         $this->initialize();
     }
@@ -38,9 +41,9 @@ abstract class FormField
     /**
      * Returns the label tag associated to the field or null if none.
      */
-    public function getLabel(): ?\DOMElement
+    public function getLabel(): ?\DOM\Element
     {
-        $xpath = new \DOMXPath($this->node->ownerDocument);
+        $xpath = new \DOM\XPath($this->node->ownerDocument);
 
         if ($this->node->hasAttribute('id')) {
             $labels = $xpath->query(\sprintf('descendant::label[@for="%s"]', $this->node->getAttribute('id')));

@@ -9,12 +9,15 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\DomCrawler\Field;
+namespace Symfony\Component\DomCrawler\NativeCrawler\Field;
+
+use Symfony\Component\DomCrawler\Field\FileFormFieldTrait;
 
 /**
  * FileFormField represents a file form field (an HTML file input tag).
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ * @author Alexandre Daubois <alex.daubois@gmail.com>
  */
 class FileFormField extends FormField
 {

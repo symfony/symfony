@@ -9,23 +9,25 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\DomCrawler;
+namespace Symfony\Component\DomCrawler\NativeCrawler;
 
 /**
  * Link represents an HTML link (an HTML a, area or link tag).
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ * @author Alexandre Daubois <alex.daubois@gmail.com>
  */
 class Link extends AbstractUriElement
 {
     protected function getRawUri(): string
     {
-        return $this->node->getAttribute('href');
+        return $this->node->getAttribute('href') ?? '';
     }
 
-    protected function setNode(\DOMElement $node): void
+    protected function setNode(\DOM\Element $node): void
     {
-        if ('a' !== $node->nodeName && 'area' !== $node->nodeName && 'link' !== $node->nodeName) {
+        $nodeName = strtolower($node->nodeName);
+        if ('a' !== $nodeName && 'area' !== $nodeName && 'link' !== $nodeName) {
             throw new \LogicException(\sprintf('Unable to navigate from a "%s" tag.', $node->nodeName));
         }
 

@@ -64,7 +64,7 @@
             </trans-unit>
             <trans-unit id="17">
                 <source>Too many failed login attempts, please try again later.</source>
-                <target>عدد كبير جدا من محاولات الدخول الفاشلة، يرجى المحاولة مرة أخرى في وقت لاحق.</target>
+                <target>العديد من محاولات الدخول الفاشلة، يرجى المحاولة مرة أخرى في وقت لاحق.</target>
             </trans-unit>
             <trans-unit id="18">
                 <source>Invalid or expired login link.</source>
@@ -72,11 +72,11 @@
             </trans-unit>
             <trans-unit id="19">
                 <source>Too many failed login attempts, please try again in %minutes% minute.</source>
-                <target>عدد كبير جدا من محاولات الدخول الفاشلة، يرجى اعادة المحاولة بعد %minutes% دقيقة.</target>
+                <target>العديد من محاولات الدخول الفاشلة، يرجى اعادة المحاولة بعد %minutes% دقيقة.</target>
             </trans-unit>
             <trans-unit id="20">
                 <source>Too many failed login attempts, please try again in %minutes% minutes.</source>
-                <target state="needs-review-translation">عدد محاولات تسجيل الدخول الفاشلة كثيرة، الرجاء المحاولة مرة أخرى بعد %minutes% دقيقة.|عدد محاولات تسجيل الدخول الفاشلة كثيرة، الرجاء المحاولة مرة أخرى بعد %minutes% دقائق.</target>
+                <target>العديد من محاولات الدخول الفاشلة ، يرجى اعادة المحاولة بعد %minutes% دقائق.</target>
             </trans-unit>
         </body>
     </file>

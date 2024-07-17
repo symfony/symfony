@@ -330,7 +330,7 @@ class CacheAttributeListenerTest extends TestCase
 
     private function getKernel(): MockObject&HttpKernelInterface
     {
-        return $this->getMockBuilder(HttpKernelInterface::class)->getMock();
+        return $this->createMock(HttpKernelInterface::class);
     }
 }
 

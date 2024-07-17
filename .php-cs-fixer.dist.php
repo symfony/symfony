@@ -23,6 +23,8 @@ file that was distributed with this source code.
 EOF;
 
 return (new PhpCsFixer\Config())
+    // @see https://github.com/PHP-CS-Fixer/PHP-CS-Fixer/pull/7777
+    ->setParallelConfig(PhpCsFixer\Runner\Parallel\ParallelConfigFactory::detect())
     ->setRules([
         '@PHP71Migration' => true,
         '@PHPUnit75Migration:risky' => true,

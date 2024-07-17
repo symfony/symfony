@@ -571,6 +571,7 @@ class PhpDocExtractorTest extends TestCase
         yield ['arrayOfMixed', Type::dict(Type::mixed()), null, null];
         yield ['listOfStrings', Type::list(Type::string()), null, null];
         yield ['self', Type::object(Dummy::class), null, null];
+        yield ['collectionAsObject', Type::collection(Type::object(DummyCollection::class), Type::string(), Type::int()), null, null];
     }
 
     /**

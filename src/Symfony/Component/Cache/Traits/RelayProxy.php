@@ -27,6 +27,7 @@ class RelayProxy extends \Relay\Relay implements ResetInterface, LazyObjectInter
     use RedisProxyTrait {
         resetLazyObject as reset;
     }
+    use RelayProxyTrait;
 
     public function __construct($host = null, $port = 6379, $connect_timeout = 0.0, $command_timeout = 0.0, #[\SensitiveParameter] $context = [], $database = 0)
     {
@@ -286,11 +287,6 @@ class RelayProxy extends \Relay\Relay implements ResetInterface, LazyObjectInter
     public function migrate($host, $port, $key, $dstdb, $timeout, $copy = false, $replace = false, #[\SensitiveParameter] $credentials = null): \Relay\Relay|bool
     {
         return $this->initializeLazyObject()->migrate(...\func_get_args());
-    }
-
-    public function copy($src, $dst, $options = null): \Relay\Relay|false|int
-    {
-        return $this->initializeLazyObject()->copy(...\func_get_args());
     }
 
     public function echo($arg): \Relay\Relay|bool|string

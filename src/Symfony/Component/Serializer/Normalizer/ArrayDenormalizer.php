@@ -44,7 +44,7 @@ class ArrayDenormalizer implements DenormalizerInterface, DenormalizerAwareInter
      */
     public function denormalize(mixed $data, string $type, ?string $format = null, array $context = []): array
     {
-        if (null === $this->denormalizer) {
+        if (!isset($this->denormalizer)) {
             throw new BadMethodCallException('Please set a denormalizer before calling denormalize()!');
         }
         if (!\is_array($data)) {
@@ -79,7 +79,7 @@ class ArrayDenormalizer implements DenormalizerInterface, DenormalizerAwareInter
 
     public function supportsDenormalization(mixed $data, string $type, ?string $format = null, array $context = []): bool
     {
-        if (null === $this->denormalizer) {
+        if (!isset($this->denormalizer)) {
             throw new BadMethodCallException(sprintf('The nested denormalizer needs to be set to allow "%s()" to be used.', __METHOD__));
         }
 

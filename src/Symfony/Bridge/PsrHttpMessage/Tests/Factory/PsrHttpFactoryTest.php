@@ -131,7 +131,7 @@ class PsrHttpFactoryTest extends TestCase
 
     private function createUploadedFile(string $content, string $originalName, string $mimeType, int $error): UploadedFile
     {
-        $path = tempnam($this->tmpDir, uniqid());
+        $path = tempnam($this->tmpDir, uniqid('', true));
         file_put_contents($path, $content);
 
         return new UploadedFile($path, $originalName, $mimeType, $error, true);
@@ -182,7 +182,7 @@ class PsrHttpFactoryTest extends TestCase
 
     public function testCreateResponseFromBinaryFile()
     {
-        $path = tempnam($this->tmpDir, uniqid());
+        $path = tempnam($this->tmpDir, uniqid('', true));
         file_put_contents($path, 'Binary');
 
         $response = new BinaryFileResponse($path);
@@ -194,7 +194,7 @@ class PsrHttpFactoryTest extends TestCase
 
     public function testCreateResponseFromBinaryFileWithRange()
     {
-        $path = tempnam($this->tmpDir, uniqid());
+        $path = tempnam($this->tmpDir, uniqid('', true));
         file_put_contents($path, 'Binary');
 
         $request = new Request();

@@ -13,6 +13,7 @@ namespace Symfony\Component\Cache\Tests\Traits;
 
 use PHPUnit\Framework\TestCase;
 use Relay\Relay;
+use Symfony\Component\Cache\Traits\RelayProxy;
 use Symfony\Component\VarExporter\LazyProxyTrait;
 use Symfony\Component\VarExporter\ProxyHelper;
 
@@ -61,14 +62,30 @@ class RedisProxiesTest extends TestCase
     {
         $proxy = file_get_contents(\dirname(__DIR__, 2).'/Traits/RelayProxy.php');
         $proxy = substr($proxy, 0, 4 + strpos($proxy, '[];'));
+        $expectedProxy = $proxy;
         $methods = [];
+        $expectedMethods = [];
+
+        foreach ((new \ReflectionClass(RelayProxy::class))->getMethods() as $method) {
+            if ('reset' === $method->name || method_exists(LazyProxyTrait::class, $method->name) || $method->isStatic()) {
+                continue;
+            }
+
+            $return = $method->getReturnType() instanceof \ReflectionNamedType && 'void' === (string) $method->getReturnType() ? '' : 'return ';
+            $expectedMethods[$method->name] = "\n    ".ProxyHelper::exportSignature($method, false, $args)."\n".<<<EOPHP
+                {
+                    {$return}(\$this->lazyObjectState->realInstance ??= (\$this->lazyObjectState->initializer)())->{$method->name}({$args});
+                }
+
+            EOPHP;
+        }
 
         foreach ((new \ReflectionClass(Relay::class))->getMethods() as $method) {
             if ('reset' === $method->name || method_exists(LazyProxyTrait::class, $method->name) || $method->isStatic()) {
                 continue;
             }
             $return = $method->getReturnType() instanceof \ReflectionNamedType && 'void' === (string) $method->getReturnType() ? '' : 'return ';
-            $methods[] = "\n    ".ProxyHelper::exportSignature($method, false, $args)."\n".<<<EOPHP
+            $methods[$method->name] = "\n    ".ProxyHelper::exportSignature($method, false, $args)."\n".<<<EOPHP
                 {
                     {$return}(\$this->lazyObjectState->realInstance ??= (\$this->lazyObjectState->initializer)())->{$method->name}({$args});
                 }
@@ -79,6 +96,9 @@ class RedisProxiesTest extends TestCase
         uksort($methods, 'strnatcmp');
         $proxy .= implode('', $methods)."}\n";
 
-        $this->assertStringEqualsFile(\dirname(__DIR__, 2).'/Traits/RelayProxy.php', $proxy);
+        uksort($expectedMethods, 'strnatcmp');
+        $expectedProxy .= implode('', $expectedMethods)."}\n";
+
+        $this->assertEquals($expectedProxy, $proxy);
     }
 }

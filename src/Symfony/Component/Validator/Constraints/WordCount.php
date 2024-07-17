@@ -48,8 +48,8 @@ final class WordCount extends Constraint
             throw new MissingOptionsException(\sprintf('Either option "min" or "max" must be given for constraint "%s".', __CLASS__), ['min', 'max']);
         }
 
-        if (null !== $min && $min < 0) {
-            throw new ConstraintDefinitionException(\sprintf('The "%s" constraint requires the min word count to be a positive integer or 0 if set.', __CLASS__));
+        if (null !== $min && $min <= 0) {
+            throw new ConstraintDefinitionException(\sprintf('The "%s" constraint requires the min word count to be a positive integer if set.', __CLASS__));
         }
 
         if (null !== $max && $max <= 0) {

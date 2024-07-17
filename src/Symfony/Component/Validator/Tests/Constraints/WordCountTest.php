@@ -48,15 +48,31 @@ class WordCountTest extends TestCase
         $this->assertNull($wordCount->locale);
     }
 
-    public function testMinMustBeNatural()
+    public function testMinIsNegative()
     {
         $this->expectException(ConstraintDefinitionException::class);
-        $this->expectExceptionMessage('The "Symfony\Component\Validator\Constraints\WordCount" constraint requires the min word count to be a positive integer or 0 if set.');
+        $this->expectExceptionMessage('The "Symfony\Component\Validator\Constraints\WordCount" constraint requires the min word count to be a positive integer if set.');
 
         new WordCount(-1);
     }
 
-    public function testMaxMustBePositive()
+    public function testMinIsZero()
+    {
+        $this->expectException(ConstraintDefinitionException::class);
+        $this->expectExceptionMessage('The "Symfony\Component\Validator\Constraints\WordCount" constraint requires the min word count to be a positive integer if set.');
+
+        new WordCount(0);
+    }
+
+    public function testMaxIsNegative()
+    {
+        $this->expectException(ConstraintDefinitionException::class);
+        $this->expectExceptionMessage('The "Symfony\Component\Validator\Constraints\WordCount" constraint requires the max word count to be a positive integer if set.');
+
+        new WordCount(max: -1);
+    }
+
+    public function testMaxIsZero()
     {
         $this->expectException(ConstraintDefinitionException::class);
         $this->expectExceptionMessage('The "Symfony\Component\Validator\Constraints\WordCount" constraint requires the max word count to be a positive integer if set.');

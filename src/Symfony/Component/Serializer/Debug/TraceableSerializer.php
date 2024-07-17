@@ -37,7 +37,7 @@ class TraceableSerializer implements SerializerInterface, NormalizerInterface, D
 
     public function serialize(mixed $data, string $format, array $context = []): string
     {
-        $context[self::DEBUG_TRACE_ID] = $traceId = uniqid();
+        $context[self::DEBUG_TRACE_ID] = $traceId = uniqid('', true);
 
         $startTime = microtime(true);
         $result = $this->serializer->serialize($data, $format, $context);
@@ -52,7 +52,7 @@ class TraceableSerializer implements SerializerInterface, NormalizerInterface, D
 
     public function deserialize(mixed $data, string $type, string $format, array $context = []): mixed
     {
-        $context[self::DEBUG_TRACE_ID] = $traceId = uniqid();
+        $context[self::DEBUG_TRACE_ID] = $traceId = uniqid('', true);
 
         $startTime = microtime(true);
         $result = $this->serializer->deserialize($data, $type, $format, $context);
@@ -67,7 +67,7 @@ class TraceableSerializer implements SerializerInterface, NormalizerInterface, D
 
     public function normalize(mixed $object, ?string $format = null, array $context = []): array|string|int|float|bool|\ArrayObject|null
     {
-        $context[self::DEBUG_TRACE_ID] = $traceId = uniqid();
+        $context[self::DEBUG_TRACE_ID] = $traceId = uniqid('', true);
 
         $startTime = microtime(true);
         $result = $this->serializer->normalize($object, $format, $context);
@@ -82,7 +82,7 @@ class TraceableSerializer implements SerializerInterface, NormalizerInterface, D
 
     public function denormalize(mixed $data, string $type, ?string $format = null, array $context = []): mixed
     {
-        $context[self::DEBUG_TRACE_ID] = $traceId = uniqid();
+        $context[self::DEBUG_TRACE_ID] = $traceId = uniqid('', true);
 
         $startTime = microtime(true);
         $result = $this->serializer->denormalize($data, $type, $format, $context);
@@ -97,7 +97,7 @@ class TraceableSerializer implements SerializerInterface, NormalizerInterface, D
 
     public function encode(mixed $data, string $format, array $context = []): string
     {
-        $context[self::DEBUG_TRACE_ID] = $traceId = uniqid();
+        $context[self::DEBUG_TRACE_ID] = $traceId = uniqid('', true);
 
         $startTime = microtime(true);
         $result = $this->serializer->encode($data, $format, $context);
@@ -112,7 +112,7 @@ class TraceableSerializer implements SerializerInterface, NormalizerInterface, D
 
     public function decode(string $data, string $format, array $context = []): mixed
     {
-        $context[self::DEBUG_TRACE_ID] = $traceId = uniqid();
+        $context[self::DEBUG_TRACE_ID] = $traceId = uniqid('', true);
 
         $startTime = microtime(true);
         $result = $this->serializer->decode($data, $format, $context);

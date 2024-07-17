@@ -24,6 +24,7 @@ use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 use Symfony\Component\Messenger\Bridge\Amqp\Transport\AmqpReceiver;
+use Symfony\Component\Messenger\Bridge\Doctrine\Transport\DoctrineReceiver;
 use Symfony\Component\Messenger\Command\ConsumeMessagesCommand;
 use Symfony\Component\Messenger\Command\DebugCommand;
 use Symfony\Component\Messenger\Command\FailedMessagesRetryCommand;
@@ -448,11 +449,12 @@ class MessengerPassTest extends TestCase
         ]);
 
         $container->register(AmqpReceiver::class, AmqpReceiver::class)->addTag('messenger.receiver', ['alias' => 'amqp']);
+        $container->register(DoctrineReceiver::class, DoctrineReceiver::class)->addTag('messenger.receiver', ['alias' => 'doctrine', 'priority' => 1]);
         $container->register(DummyReceiver::class, DummyReceiver::class)->addTag('messenger.receiver', ['alias' => 'dummy']);
 
         (new MessengerPass())->process($container);
 
-        $this->assertSame(['amqp', 'dummy'], $container->getDefinition('console.command.messenger_consume_messages')->getArgument(4));
+        $this->assertSame(['doctrine', 'amqp', 'dummy'], $container->getDefinition('console.command.messenger_consume_messages')->getArgument(4));
     }
 
     public function testItSetsTheReceiverNamesOnTheSetupTransportsCommand()
@@ -464,11 +466,12 @@ class MessengerPassTest extends TestCase
         ]);
 
         $container->register(AmqpReceiver::class, AmqpReceiver::class)->addTag('messenger.receiver', ['alias' => 'amqp']);
+        $container->register(DoctrineReceiver::class, DoctrineReceiver::class)->addTag('messenger.receiver', ['alias' => 'doctrine', 'priority' => 1]);
         $container->register(DummyReceiver::class, DummyReceiver::class)->addTag('messenger.receiver', ['alias' => 'dummy']);
 
         (new MessengerPass())->process($container);
 
-        $this->assertSame(['amqp', 'dummy'], $container->getDefinition('console.command.messenger_setup_transports')->getArgument(1));
+        $this->assertSame(['doctrine', 'amqp', 'dummy'], $container->getDefinition('console.command.messenger_setup_transports')->getArgument(1));
     }
 
     public function testItRegistersHandlersOnDifferentBuses()

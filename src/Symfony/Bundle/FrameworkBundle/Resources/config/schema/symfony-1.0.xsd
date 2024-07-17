@@ -606,6 +606,7 @@
         <xsd:attribute name="dsn" type="xsd:string" />
         <xsd:attribute name="failure-transport" type="xsd:string" />
         <xsd:attribute name="rate-limiter" type="xsd:string" />
+        <xsd:attribute name="priority" type="xsd:integer" />
     </xsd:complexType>
 
     <xsd:complexType name="messenger_retry_strategy">

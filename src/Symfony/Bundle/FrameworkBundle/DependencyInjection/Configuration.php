@@ -1612,6 +1612,7 @@ class Configuration implements ConfigurationInterface
                                         ->defaultNull()
                                         ->info('Rate limiter name to use when processing messages')
                                     ->end()
+                                    ->integerNode('priority')->defaultValue(0)->info('Priority of this transport when the consumer is executed with the --all flag')->end()
                                 ->end()
                             ->end()
                         ->end()

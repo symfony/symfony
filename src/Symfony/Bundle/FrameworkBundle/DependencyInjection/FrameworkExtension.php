@@ -2220,6 +2220,7 @@ class FrameworkExtension extends Extension
                 ->addTag('messenger.receiver', [
                     'alias' => $name,
                     'is_failure_transport' => \in_array($name, $failureTransports, true),
+                    'priority' => $transport['priority'],
                 ])
             ;
             $container->setDefinition($transportId = 'messenger.transport.'.$name, $transportDefinition);

@@ -7,6 +7,7 @@ CHANGELOG
  * `WrappedExceptionsInterface` now extends PHP's `Throwable` interface
  * Add `#[AsMessage]` attribute with `$transport` parameter for message routing
  * Add `--format` option to the `messenger:stats` command
+ * Allow prioritizing receivers so that `messenger:consume --all` consumes receivers in a predefined order
 
 7.1
 ---

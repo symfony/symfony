@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by derrabus at 2024-07-17T11:41:45Z
+
+How important is it to have _collision-free_ tokens? I mean, the places where we've cut six characters out of a hash were certainly not collision-free, but `TraceableSerializer` used the (allegedly) collision-free `uniqid()` directly.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2024-07-17T14:02:25Z
+
+We could increase the length of the generated string. What do you think about that?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2024-07-18T09:35:45Z
+
+updated for four random bytes

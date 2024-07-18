@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+7.2
+---
+
+ * Add a DSN option to allow making the transport use `http` protocol instead of default `https`
+
 6.4
 ---
 

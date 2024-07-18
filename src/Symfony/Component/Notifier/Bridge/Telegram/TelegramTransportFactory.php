@@ -23,9 +23,7 @@ final class TelegramTransportFactory extends AbstractTransportFactory
 {
     public function create(Dsn $dsn): TelegramTransport
     {
-        $scheme = $dsn->getScheme();
-
-        if ('telegram' !== $scheme) {
+        if ('telegram' !== $dsn->getScheme()) {
             throw new UnsupportedSchemeException($dsn, 'telegram', $this->getSupportedSchemes());
         }
 
@@ -33,8 +31,9 @@ final class TelegramTransportFactory extends AbstractTransportFactory
         $channel = $dsn->getOption('channel');
         $host = 'default' === $dsn->getHost() ? null : $dsn->getHost();
         $port = $dsn->getPort();
+        $useHttpProtocol = '1' === $dsn->getOption('use_http_protocol');
 
-        return (new TelegramTransport($token, $channel, $this->client, $this->dispatcher))->setHost($host)->setPort($port);
+        return (new TelegramTransport($token, $channel, $useHttpProtocol, $this->client, $this->dispatcher))->setHost($host)->setPort($port);
     }
 
     protected function getSupportedSchemes(): array

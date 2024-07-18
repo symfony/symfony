@@ -14,6 +14,18 @@ where:
  - `TOKEN` is your Telegram token
  - `CHAT_ID` is your Telegram chat id
 
+Interacting with a local API server instead of the official Telegram API
+------------------------------------------------------------------------
+
+If such a case is needed, you can simply replace the `default` keyword
+with the desired domain/IP of the local API server.
+
+Also, and unless you have a TLS-Termination server in front of the API server,
+you may want to disable the default `https` protocol and switch to `http`
+by adding an extra option `use_http_protocol` to the DSN and setting it to `1`.
+
+Example: `TELEGRAM_DSN=telegram://TOKEN@localhost:5001?channel=CHAT_ID&use_http_protocol=1`
+
 Adding Interactions to a Message
 --------------------------------
 

@@ -214,7 +214,7 @@ SecurityBundle
 Serializer
 ----------
 
- * Deprecate the `withDefaultContructorArguments()` method of `AbstractNormalizerContextBuilder`, use `withDefaultContructorArguments()` instead (note the typo in the old method name)
+ * Deprecate the `withDefaultContructorArguments()` method of `AbstractNormalizerContextBuilder`, use `withDefaultConstructorArguments()` instead (note the typo in the old method name)
 
 Translation
 -----------

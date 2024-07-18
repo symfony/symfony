@@ -1669,7 +1669,7 @@ class ProcessTest extends TestCase
             $this->markTestSkipped('pnctl extension is required.');
         }
 
-        $process = $this->getProcess('sleep 10');
+        $process = $this->getProcess(['sleep', '10']);
         $process->setIgnoredSignals([\SIGTERM]);
 
         $process->start();

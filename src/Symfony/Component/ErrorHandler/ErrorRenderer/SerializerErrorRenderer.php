@@ -47,7 +47,7 @@ class SerializerErrorRenderer implements ErrorRendererInterface
         $headers = ['Vary' => 'Accept'];
         $debug = \is_bool($this->debug) ? $this->debug : ($this->debug)($exception);
         if ($debug) {
-            $headers['X-Debug-Exception'] = rawurlencode($exception->getMessage());
+            $headers['X-Debug-Exception'] = rawurlencode(substr($exception->getMessage(), 0, 2000));
             $headers['X-Debug-Exception-File'] = rawurlencode($exception->getFile()).':'.$exception->getLine();
         }
 

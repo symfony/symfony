@@ -133,7 +133,7 @@ class Profiler implements ResetInterface
             return null;
         }
 
-        $profile = new Profile(substr(hash('xxh128', uniqid(mt_rand(), true)), 0, 6));
+        $profile = new Profile(bin2hex(random_bytes(3)));
         $profile->setTime(time());
         $profile->setUrl($request->getUri());
         $profile->setMethod($request->getMethod());

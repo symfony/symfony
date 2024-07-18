@@ -455,4 +455,14 @@ class BinaryFileResponseTest extends ResponseTestCase
         $string = ob_get_clean();
         $this->assertSame('foo,bar', $string);
     }
+
+    public function testSetChunkSizeTooSmall()
+    {
+        $response = new BinaryFileResponse(__DIR__.'/File/Fixtures/test.gif');
+
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('The chunk size of a BinaryFileResponse cannot be less than 1.');
+
+        $response->setChunkSize(0);
+    }
 }

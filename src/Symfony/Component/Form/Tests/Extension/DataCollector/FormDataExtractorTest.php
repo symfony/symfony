@@ -314,12 +314,12 @@ array:3 [
           -message: "Foo"
           -messageTemplate: "Foo"
           -parameters: []
-          -plural: null
           -root: "Root"
           -propertyPath: "property.path"
           -invalidValue: "Invalid!"
-          -constraint: null
+          -plural: null
           -code: null
+          -constraint: null
           -cause: Exception {%A}
         }
         1 => Exception {#1}

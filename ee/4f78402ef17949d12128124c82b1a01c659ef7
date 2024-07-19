@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by derrabus at 2024-07-18T15:49:46Z
+
+Removing dead code is not a bugfix. Let's target 7.2.
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2024-07-19T06:49:07Z
+
+> Removing dead code is not a bugfix.
+
+Noted for the next time! It is now rebased

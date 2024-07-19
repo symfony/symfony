@@ -57,7 +57,7 @@ abstract class DataCollector implements DataCollectorInterface
      */
     protected function getCasters(): array
     {
-        $casters = [
+        return [
             '*' => function ($v, array $a, Stub $s, $isNested) {
                 if (!$v instanceof Stub) {
                     $b = $a;
@@ -82,8 +82,6 @@ abstract class DataCollector implements DataCollectorInterface
                 return $a;
             },
         ] + ReflectionCaster::UNSET_CLOSURE_FILE_INFO;
-
-        return $casters;
     }
 
     public function __sleep(): array

@@ -40,7 +40,7 @@ class TranslationsCacheWarmer implements CacheWarmerInterface, ServiceSubscriber
         $this->translator ??= $this->container->get('translator');
 
         if ($this->translator instanceof WarmableInterface) {
-            return (array) $this->translator->warmUp($cacheDir, $buildDir);
+            return $this->translator->warmUp($cacheDir, $buildDir);
         }
 
         return [];

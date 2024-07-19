@@ -118,7 +118,7 @@ class HeaderBag implements \IteratorAggregate, \Countable, \Stringable
             return null;
         }
 
-        return (string) $headers[0];
+        return $headers[0];
     }
 
     /**

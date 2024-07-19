@@ -43,7 +43,7 @@ class RouterCacheWarmer implements CacheWarmerInterface, ServiceSubscriberInterf
         $router = $this->container->get('router');
 
         if ($router instanceof WarmableInterface) {
-            return (array) $router->warmUp($cacheDir, $buildDir);
+            return $router->warmUp($cacheDir, $buildDir);
         }
 
         throw new \LogicException(\sprintf('The router "%s" cannot be warmed up because it does not implement "%s".', get_debug_type($router), WarmableInterface::class));

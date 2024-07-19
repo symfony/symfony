@@ -1020,7 +1020,7 @@ EOF;
             return $code;
         }
 
-        $code .= \sprintf(<<<'EOTXT'
+        return $code.\sprintf(<<<'EOTXT'
 
         if (isset($container->%s[%s])) {
             return $container->%1$s[%2$s];
@@ -1031,8 +1031,6 @@ EOTXT
             $this->container->getDefinition($id)->isPublic() ? 'services' : 'privates',
             $this->doExport($id)
         );
-
-        return $code;
     }
 
     private function addInlineService(string $id, Definition $definition, ?Definition $inlineDef = null, bool $forConstructor = true): string
@@ -1670,7 +1668,7 @@ EOF;
             $getDynamicParameter = str_repeat(' ', 8).'throw new ParameterNotFoundException($name);';
         }
 
-        $code .= <<<EOF
+        return $code.<<<EOF
 
     private \$loadedDynamicParameters = {$loadedDynamicParameters};
     private \$dynamicParameters = [];
@@ -1686,8 +1684,6 @@ EOF;
     }
 
 EOF;
-
-        return $code;
     }
 
     /**
@@ -1947,9 +1943,7 @@ EOF;
             } else {
                 $replaceParameters = fn ($match) => "'.".$this->dumpParameter($match[2]).".'";
 
-                $code = str_replace('%%', '%', preg_replace_callback('/(?<!%)(%)([^%]+)\1/', $replaceParameters, $this->export($value)));
-
-                return $code;
+                return str_replace('%%', '%', preg_replace_callback('/(?<!%)(%)([^%]+)\1/', $replaceParameters, $this->export($value)));
             }
         } elseif ($value instanceof \UnitEnum) {
             return \sprintf('\%s::%s', $value::class, $value->name);
@@ -2102,11 +2096,8 @@ EOF;
         while (true) {
             $name = '';
             $i = $this->variableCount;
-
-            if ('' === $name) {
-                $name .= $firstChars[$i % $firstCharsLength];
-                $i = (int) ($i / $firstCharsLength);
-            }
+            $name .= $firstChars[$i % $firstCharsLength];
+            $i = (int) ($i / $firstCharsLength);
 
             while ($i > 0) {
                 --$i;

@@ -92,7 +92,7 @@ class ReStructuredTextDescriptor extends Descriptor
     protected function describeInputDefinition(InputDefinition $definition, array $options = []): void
     {
         if ($showArguments = ((bool) $definition->getArguments())) {
-            $this->write("Arguments\n".str_repeat($this->subsubsectionChar, 9))."\n\n";
+            $this->write("Arguments\n".str_repeat($this->subsubsectionChar, 9));
             foreach ($definition->getArguments() as $argument) {
                 $this->write("\n\n");
                 $this->describeInputArgument($argument);

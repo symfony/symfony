@@ -689,9 +689,8 @@ class AutowirePass extends AbstractRecursivePass
             for ($i = 0, --$len; $i < $len; ++$i) {
                 $message .= \sprintf('%s "%s", ', class_exists($aliases[$i], false) ? 'class' : 'interface', $aliases[$i]);
             }
-            $message .= \sprintf('or %s "%s".', class_exists($aliases[$i], false) ? 'class' : 'interface', $aliases[$i]);
 
-            return $message;
+            return $message.\sprintf('or %s "%s".', class_exists($aliases[$i], false) ? 'class' : 'interface', $aliases[$i]);
         }
 
         if ($aliases) {

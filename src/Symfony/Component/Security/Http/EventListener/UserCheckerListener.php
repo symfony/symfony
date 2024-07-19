@@ -47,7 +47,7 @@ class UserCheckerListener implements EventSubscriberInterface
             return;
         }
 
-        $this->userChecker->checkPostAuth($user);
+        $this->userChecker->checkPostAuth($user, $event->getAuthenticationToken());
     }
 
     public static function getSubscribedEvents(): array

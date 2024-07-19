@@ -11,6 +11,7 @@ If you're upgrading from a version below 7.1, follow the [7.1 upgrade guide](UPG
 Security
 --------
 
+ * Add `$token` argument to `UserCheckerInterface::checkPostAuth()`
  * Deprecate argument `$secret` of `RememberMeToken` and `RememberMeAuthenticator`
 
 String

@@ -4,6 +4,7 @@ CHANGELOG
 7.2
 ---
 
+ * Add `$token` argument to `UserCheckerInterface::checkPostAuth()`
  * Deprecate argument `$secret` of `RememberMeToken`
 
 7.0

@@ -366,10 +366,23 @@ abstract class AbstractUnicodeString extends AbstractString
 
     public function snake(): parent
     {
-        $str = $this->camel();
-        $str->string = mb_strtolower(preg_replace(['/(\p{Lu}+)(\p{Lu}\p{Ll})/u', '/([\p{Ll}0-9])(\p{Lu})/u'], '\1_\2', $str->string), 'UTF-8');
+        $str = clone $this;
+        $matches = [];
 
-        return $str;
+        preg_match_all(
+            '/([\p{Ll}0-9]+(?=\p{Lu}))|(\p{Lu}[\p{Ll}0-9]+)|(\p{Lu}+(?=\p{Lu}\p{Ll}))|((?<=\w)?[\p{Ll}\p{Lu}0-9]+(?=\w)?)/u',
+            $str,
+            $matches
+        );
+
+        $strings = array_map(
+            function (string $matchedString) {
+                return mb_strtolower($matchedString);
+            },
+            $matches[0] ?? []
+        );
+
+        return new static(implode('_', $strings));
     }
 
     public function title(bool $allWords = false): parent

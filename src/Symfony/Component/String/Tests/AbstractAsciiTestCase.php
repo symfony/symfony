@@ -1080,12 +1080,14 @@ abstract class AbstractAsciiTestCase extends TestCase
             ['symfony_is_great', 'symfonyIsGREAT'],
             ['symfony_is_really_great', 'symfonyIsREALLYGreat'],
             ['symfony', 'SYMFONY'],
-            ['symfonyisgreat', 'SYMFONY IS GREAT'],
-            ['symfonyisgreat', 'SYMFONY_IS_GREAT'],
+            ['symfony_is_great', 'SYMFONY IS GREAT'],
+            ['symfony_is_great', 'SYMFONY_IS_GREAT'],
             ['symfony_is_great', 'symfony    is     great'],
-            ['symfonyisgreat', 'SYMFONY    IS     GREAT'],
-            ['symfonyisgreat', 'SYMFONY _ IS _ GREAT'],
-            ['symfony_isgreat', 'Symfony IS GREAT!'],
+            ['symfony_is_great', 'SYMFONY    IS     GREAT'],
+            ['symfony_is_great', 'SYMFONY _ IS _ GREAT'],
+            ['symfony_is_great', 'Symfony IS GREAT!'],
+            ['123_customer_with_special_name', '123-customer,with/special#name'],
+            ['this_value_should_be_false', 'This value should be false.'],
         ];
     }
 

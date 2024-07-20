@@ -366,10 +366,23 @@ class ByteString extends AbstractString
 
     public function snake(): parent
     {
-        $str = $this->camel();
-        $str->string = strtolower(preg_replace(['/([A-Z]+)([A-Z][a-z])/', '/([a-z\d])([A-Z])/'], '\1_\2', $str->string));
+        $str = clone $this;
+        $matches = [];
 
-        return $str;
+        preg_match_all(
+            '/([a-z0-9]+(?=[A-Z]))|([A-Z][a-z0-9]+)|([A-Z]+(?=[A-Z][a-z]))|((?<=\w)?[a-zA-Z0-9]+(?=\w)?)/',
+            $str,
+            $matches
+        );
+
+        $strings = array_map(
+            function (string $matchedString) {
+                return mb_strtolower($matchedString);
+            },
+            $matches[0] ?? []
+        );
+
+        return new static(implode('_', $strings));
     }
 
     public function splice(string $replacement, int $start = 0, ?int $length = null): parent

@@ -371,7 +371,7 @@ abstract class AbstractUnicodeString extends AbstractString
 
         preg_match_all(
             '/([\p{Ll}0-9]+(?=\p{Lu}))|(\p{Lu}[\p{Ll}0-9]+)|(\p{Lu}+(?=\p{Lu}\p{Ll}))|((?<=\w)?[\p{Ll}\p{Lu}0-9]+(?=\w)?)/u',
-            $str,
+            $str->string,
             $matches
         );
 
@@ -382,7 +382,9 @@ abstract class AbstractUnicodeString extends AbstractString
             $matches[0] ?? []
         );
 
-        return new static(implode('_', $strings));
+        $str->string = implode('_', $strings);
+
+        return $str;
     }
 
     public function title(bool $allWords = false): parent

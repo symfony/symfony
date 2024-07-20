@@ -371,7 +371,7 @@ class ByteString extends AbstractString
 
         preg_match_all(
             '/([a-z0-9]+(?=[A-Z]))|([A-Z][a-z0-9]+)|([A-Z]+(?=[A-Z][a-z]))|((?<=\w)?[a-zA-Z0-9]+(?=\w)?)/',
-            $str,
+            $str->string,
             $matches
         );
 
@@ -382,7 +382,9 @@ class ByteString extends AbstractString
             $matches[0] ?? []
         );
 
-        return new static(implode('_', $strings));
+        $str->string = implode('_', $strings);
+
+        return $str;
     }
 
     public function splice(string $replacement, int $start = 0, ?int $length = null): parent

@@ -377,7 +377,7 @@ abstract class AbstractUnicodeString extends AbstractString
 
         $strings = array_map(
             function (string $matchedString) {
-                return mb_strtolower($matchedString);
+                return mb_strtolower($matchedString, 'UTF-8');
             },
             $matches[0] ?? []
         );

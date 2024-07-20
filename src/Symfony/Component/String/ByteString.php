@@ -377,7 +377,7 @@ class ByteString extends AbstractString
 
         $strings = array_map(
             function (string $matchedString) {
-                return mb_strtolower($matchedString);
+                return strtolower($matchedString);
             },
             $matches[0] ?? []
         );

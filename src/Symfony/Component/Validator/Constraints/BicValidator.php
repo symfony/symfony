@@ -56,11 +56,8 @@ class BicValidator extends ConstraintValidator
         'EA' => 'ES', // Ceuta and Melilla
     ];
 
-    private ?PropertyAccessor $propertyAccessor;
-
-    public function __construct(?PropertyAccessor $propertyAccessor = null)
+    public function __construct(private ?PropertyAccessor $propertyAccessor = null)
     {
-        $this->propertyAccessor = $propertyAccessor;
     }
 
     public function validate(mixed $value, Constraint $constraint): void

@@ -26,9 +26,8 @@ class YamlFileLoader extends FileLoader
 {
     protected array $classes;
 
-    public function __construct(string $file)
+    public function __construct(protected string $file)
     {
-        $this->file = $file;
     }
 
     /**

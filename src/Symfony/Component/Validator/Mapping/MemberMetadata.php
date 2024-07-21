@@ -30,27 +30,6 @@ use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 abstract class MemberMetadata extends GenericMetadata implements PropertyMetadataInterface
 {
     /**
-     * @internal This property is public in order to reduce the size of the
-     *           class' serialized representation. Do not access it. Use
-     *           {@link getClassName()} instead.
-     */
-    public string $class;
-
-    /**
-     * @internal This property is public in order to reduce the size of the
-     *           class' serialized representation. Do not access it. Use
-     *           {@link getName()} instead.
-     */
-    public string $name;
-
-    /**
-     * @internal This property is public in order to reduce the size of the
-     *           class' serialized representation. Do not access it. Use
-     *           {@link getPropertyName()} instead.
-     */
-    public string $property;
-
-    /**
      * @var \ReflectionMethod[]|\ReflectionProperty[]
      */
     private array $reflMember = [];
@@ -60,11 +39,11 @@ abstract class MemberMetadata extends GenericMetadata implements PropertyMetadat
      * @param string $name     The name of the member
      * @param string $property The property the member belongs to
      */
-    public function __construct(string $class, string $name, string $property)
-    {
-        $this->class = $class;
-        $this->name = $name;
-        $this->property = $property;
+    public function __construct(
+        public string $class,
+        public string $name,
+        public string $property
+    ) {
     }
 
     public function addConstraint(Constraint $constraint): static

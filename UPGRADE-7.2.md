@@ -8,6 +8,11 @@ Read more about this in the [Symfony documentation](https://symfony.com/doc/7.2/
 
 If you're upgrading from a version below 7.1, follow the [7.1 upgrade guide](UPGRADE-7.1.md) first.
 
+FrameworkBundle
+---------------
+
+ * [BC BREAK] The `secrets:decrypt-to-local` command terminates with a non-zero exit code when a secret could not be read
+
 Security
 --------
 

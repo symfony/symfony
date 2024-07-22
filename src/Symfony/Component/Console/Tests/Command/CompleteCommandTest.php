@@ -53,6 +53,8 @@ class CompleteCommandTest extends TestCase
 
     public function testAdditionalShellSupport()
     {
+        $this->expectNotToPerformAssertions();
+
         $this->command = new CompleteCommand(['supported' => BashCompletionOutput::class]);
         $this->command->setApplication($this->application);
         $this->tester = new CommandTester($this->command);
@@ -61,8 +63,6 @@ class CompleteCommandTest extends TestCase
 
         // verify that the default set of shells is still supported
         $this->execute(['--shell' => 'bash', '--current' => '1', '--input' => ['bin/console']]);
-
-        $this->assertTrue(true);
     }
 
     /**

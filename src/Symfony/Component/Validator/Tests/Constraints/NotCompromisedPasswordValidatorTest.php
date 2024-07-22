@@ -213,8 +213,9 @@ class NotCompromisedPasswordValidatorTest extends ConstraintValidatorTestCase
      */
     public function testApiErrorSkipped(NotCompromisedPassword $constraint)
     {
+        $this->expectNotToPerformAssertions();
+
         $this->validator->validate(self::PASSWORD_TRIGGERING_AN_ERROR, $constraint);
-        $this->assertTrue(true); // No exception have been thrown
     }
 
     public static function provideErrorSkippingConstraints(): iterable

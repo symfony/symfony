@@ -27,11 +27,10 @@ class RecursiveDirectoryIteratorTest extends IteratorTestCase
      */
     public function testRewindOnFtp()
     {
+        $this->expectNotToPerformAssertions();
+
         $i = new RecursiveDirectoryIterator('ftp://speedtest:speedtest@ftp.otenet.gr/', \RecursiveDirectoryIterator::SKIP_DOTS);
-
         $i->rewind();
-
-        $this->assertTrue(true);
     }
 
     /**

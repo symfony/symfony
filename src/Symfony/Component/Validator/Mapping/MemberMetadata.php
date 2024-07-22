@@ -36,23 +36,27 @@ abstract class MemberMetadata extends GenericMetadata implements PropertyMetadat
 
     /**
      * @param string $class    The name of the class this member is defined on
-     * This property is public in order to reduce the size of the
-     * class' serialized representation. Do not access it. Use
-     * {@link getClassName()} instead.
-     *
      * @param string $name     The name of the member
-     * This property is public in order to reduce the size of the
-     * class' serialized representation. Do not access it. Use
-     * {@link getName()} instead.
-     *
      * @param string $property The property the member belongs to
-     * This property is public in order to reduce the size of the
-     * class' serialized representation. Do not access it. Use
-     * {@link getPropertyName()} instead.
      */
     public function __construct(
+       /**
+        * @internal This property is public in order to reduce the size of the
+        *           class' serialized representation. Do not access it. Use
+        *           {@link getClassName()} instead.
+        */
         public string $class,
+        /**
+         * @internal This property is public in order to reduce the size of the
+         *           class' serialized representation. Do not access it. Use
+         *           {@link getName()} instead.
+         */
         public string $name,
+        /**
+         * @internal This property is public in order to reduce the size of the
+         *           class' serialized representation. Do not access it. Use
+         *           {@link getPropertyName()} instead.
+         */
         public string $property
     ) {
     }

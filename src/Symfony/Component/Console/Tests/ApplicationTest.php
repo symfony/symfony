@@ -71,12 +71,10 @@ class ApplicationTest extends TestCase
 
         if (\function_exists('pcntl_signal')) {
             // We reset all signals to their default value to avoid side effects
-            for ($i = 1; $i <= 15; ++$i) {
-                if (9 === $i) {
-                    continue;
-                }
-                pcntl_signal($i, \SIG_DFL);
-            }
+            pcntl_signal(\SIGINT, \SIG_DFL);
+            pcntl_signal(\SIGTERM, \SIG_DFL);
+            pcntl_signal(\SIGUSR1, \SIG_DFL);
+            pcntl_signal(\SIGUSR2, \SIG_DFL);
         }
     }
 

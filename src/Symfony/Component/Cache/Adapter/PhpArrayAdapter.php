@@ -41,7 +41,7 @@ class PhpArrayAdapter implements AdapterInterface, CacheInterface, PruneableInte
     private static array $valuesCache = [];
 
     /**
-     * @param string           $file         The PHP file were values are cached
+     * @param string           $file         The PHP file where values are cached
      * @param AdapterInterface $fallbackPool A pool to fallback on when an item is not hit
      */
     public function __construct(
@@ -321,7 +321,7 @@ EOF;
 
         $dump .= "\n], [\n\n{$dumpedValues}\n]];\n";
 
-        $tmpFile = uniqid($this->file, true);
+        $tmpFile = tempnam(dirname($this->file), basename($this->file));
 
         file_put_contents($tmpFile, $dump);
         @chmod($tmpFile, 0666 & ~umask());

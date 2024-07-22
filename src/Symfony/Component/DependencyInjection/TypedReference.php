@@ -18,7 +18,6 @@ namespace Symfony\Component\DependencyInjection;
  */
 class TypedReference extends Reference
 {
-    private string $type;
     private ?string $name;
 
     /**
@@ -30,14 +29,13 @@ class TypedReference extends Reference
      */
     public function __construct(
         string $id,
-        string $type,
+        private string $type,
         int $invalidBehavior = ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE,
         ?string $name = null,
         private array $attributes = [],
     ) {
         $this->name = $type === $id ? $name : null;
         parent::__construct($id, $invalidBehavior);
-        $this->type = $type;
     }
 
     public function getType(): string

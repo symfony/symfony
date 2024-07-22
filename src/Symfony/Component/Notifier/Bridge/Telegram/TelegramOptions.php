@@ -23,11 +23,9 @@ final class TelegramOptions implements MessageOptionsInterface
     public const PARSE_MODE_MARKDOWN = 'Markdown';
     public const PARSE_MODE_MARKDOWN_V2 = 'MarkdownV2';
 
-    private array $options;
-
-    public function __construct(array $options = [])
-    {
-        $this->options = $options;
+    public function __construct(
+        private array $options = [],
+    ) {
     }
 
     public function toArray(): array

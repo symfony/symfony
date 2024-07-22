@@ -56,13 +56,14 @@ class Connection
     private ?ReceiveMessageResult $currentResponse = null;
     /** @var array[] */
     private array $buffer = [];
-    private ?string $queueUrl;
 
-    public function __construct(array $configuration, ?SqsClient $client = null, ?string $queueUrl = null)
-    {
+    public function __construct(
+        array $configuration,
+        ?SqsClient $client = null,
+        private ?string $queueUrl = null,
+    ) {
         $this->configuration = array_replace_recursive(self::DEFAULT_OPTIONS, $configuration);
         $this->client = $client ?? new SqsClient([]);
-        $this->queueUrl = $queueUrl;
     }
 
     public function __sleep(): array

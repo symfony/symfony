@@ -40,12 +40,8 @@ class Router implements RouterInterface, RequestMatcherInterface
     protected UrlMatcherInterface|RequestMatcherInterface $matcher;
     protected UrlGeneratorInterface $generator;
     protected RequestContext $context;
-    protected LoaderInterface $loader;
     protected RouteCollection $collection;
-    protected mixed $resource;
     protected array $options = [];
-    protected ?LoggerInterface $logger;
-    protected ?string $defaultLocale;
 
     private ConfigCacheFactoryInterface $configCacheFactory;
 
@@ -56,14 +52,16 @@ class Router implements RouterInterface, RequestMatcherInterface
 
     private static ?array $cache = [];
 
-    public function __construct(LoaderInterface $loader, mixed $resource, array $options = [], ?RequestContext $context = null, ?LoggerInterface $logger = null, ?string $defaultLocale = null)
-    {
-        $this->loader = $loader;
-        $this->resource = $resource;
-        $this->logger = $logger;
+    public function __construct(
+        protected LoaderInterface $loader,
+        protected mixed $resource,
+        array $options = [],
+        ?RequestContext $context = null,
+        protected ?LoggerInterface $logger = null,
+        protected ?string $defaultLocale = null,
+    ) {
         $this->context = $context ?? new RequestContext();
         $this->setOptions($options);
-        $this->defaultLocale = $defaultLocale;
     }
 
     /**

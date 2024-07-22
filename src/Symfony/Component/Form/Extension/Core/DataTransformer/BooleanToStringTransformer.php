@@ -25,17 +25,13 @@ use Symfony\Component\Form\Exception\TransformationFailedException;
  */
 class BooleanToStringTransformer implements DataTransformerInterface
 {
-    private string $trueValue;
-
-    private array $falseValues;
-
     /**
      * @param string $trueValue The value emitted upon transform if the input is true
      */
-    public function __construct(string $trueValue, array $falseValues = [null])
-    {
-        $this->trueValue = $trueValue;
-        $this->falseValues = $falseValues;
+    public function __construct(
+        private string $trueValue,
+        private array $falseValues = [null],
+    ) {
         if (\in_array($this->trueValue, $this->falseValues, true)) {
             throw new InvalidArgumentException('The specified "true" value is contained in the false-values.');
         }

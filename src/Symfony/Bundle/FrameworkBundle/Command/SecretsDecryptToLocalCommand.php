@@ -38,7 +38,6 @@ final class SecretsDecryptToLocalCommand extends Command
     protected function configure(): void
     {
         $this
-            ->addOption('exit', null, InputOption::VALUE_NONE, 'Returns a non-zero exit code if any errors are encountered')
             ->addOption('force', 'f', InputOption::VALUE_NONE, 'Force overriding of secrets that already exist in the local vault')
             ->setHelp(<<<'EOF'
 The <info>%command.name%</info> command decrypts all secrets and copies them in the local vault.
@@ -48,10 +47,6 @@ The <info>%command.name%</info> command decrypts all secrets and copies them in 
 When the <info>--force</info> option is provided, secrets that already exist in the local vault are overridden.
 
     <info>%command.full_name% --force</info>
-
-When the <info>--exit</info> option is provided, the command will return a non-zero exit code if any errors are encountered.
-
-    <info>%command.full_name% --exit</info>
 EOF
             )
         ;
@@ -100,7 +95,7 @@ EOF
             $io->note($this->localVault->getLastMessage());
         }
 
-        if ($hadErrors && $input->getOption('exit'))  {
+        if ($hadErrors)  {
             return 1;
         }
 

@@ -19,6 +19,7 @@ use Symfony\Bundle\SecurityBundle\Security\FirewallConfig;
 use Symfony\Bundle\SecurityBundle\Security\FirewallContext;
 use Symfony\Bundle\SecurityBundle\Security\FirewallMap;
 use Symfony\Bundle\SecurityBundle\Security\LazyFirewallContext;
+use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage as BaseExpressionLanguage;
 use Symfony\Component\Ldap\Security\LdapUserProvider;
 use Symfony\Component\Security\Core\Authentication\AuthenticationTrustResolver;
@@ -88,7 +89,7 @@ return static function (ContainerConfigurator $container) {
                     'security.authenticator.managers_locator' => service('security.authenticator.managers_locator')->ignoreOnInvalid(),
                     'request_stack' => service('request_stack'),
                     'security.firewall.map' => service('security.firewall.map'),
-                    'security.user_checker' => service('security.user_checker'),
+                    'security.user_checker_locator' => service('security.user_checker_locator'),
                     'security.firewall.event_dispatcher_locator' => service('security.firewall.event_dispatcher_locator'),
                     'security.csrf.token_manager' => service('security.csrf.token_manager')->ignoreOnInvalid(),
                 ]),
@@ -124,6 +125,8 @@ return static function (ContainerConfigurator $container) {
             ->args(['none'])
 
         ->set('security.user_checker', InMemoryUserChecker::class)
+        ->set('security.user_checker_locator', ServiceLocator::class)
+            ->args([[]])
 
         ->set('security.expression_language', ExpressionLanguage::class)
             ->args([service('cache.security_expression_language')->nullOnInvalid()])

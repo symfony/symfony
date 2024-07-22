@@ -1,0 +1,18 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-07-22T11:23:00Z
+
+Why? I mean, this zero-even-if-fail was explicitly desired in an earlier PR, isn't it?
+I'm missing context here.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2024-07-22T11:27:10Z
+
+The current behaviour was introduced as a fix for #42038 in #43137. According to @wouterj the report wasn't about the exit code but about the PHP error that was not caught (but was also fixed in #43137).
+
+---------------------------------------------------------------------------
+
+by wouterj at 2024-07-22T11:35:07Z
+
+Yes, I think it makes sense for this command to fail if it failed to decrypt the secrets, as also described in #57539

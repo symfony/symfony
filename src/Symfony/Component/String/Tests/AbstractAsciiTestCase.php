@@ -1086,6 +1086,7 @@ abstract class AbstractAsciiTestCase extends TestCase
             ['symfonyisgreat', 'SYMFONY    IS     GREAT'],
             ['symfonyisgreat', 'SYMFONY _ IS _ GREAT'],
             ['symfony_isgreat', 'Symfony IS GREAT!'],
+            ['123_customer_with_special_name', '123-customer,with/special#name'],
         ];
     }
 

@@ -36,7 +36,7 @@
         "symfony/security-csrf": "^6.4|^7.0",
         "symfony/translation": "^6.4|^7.0",
         "psr/log": "^1|^2|^3",
-        "web-token/jwt-library": "^3.3.2"
+        "web-token/jwt-library": "^3.3.2|^4.0"
     },
     "conflict": {
         "symfony/clock": "<6.4",

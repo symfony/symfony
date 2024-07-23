@@ -29,6 +29,9 @@ use Symfony\Component\Process\PhpProcess;
  * you need to also implement the getScript() method.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @template TRequest of object
+ * @template TResponse of object
  */
 abstract class AbstractBrowser
 {
@@ -36,8 +39,10 @@ abstract class AbstractBrowser
     protected CookieJar $cookieJar;
     protected array $server = [];
     protected Request $internalRequest;
+    /** @psalm-var TRequest */
     protected object $request;
     protected Response $internalResponse;
+    /** @psalm-var TResponse */
     protected object $response;
     protected Crawler $crawler;
     protected bool $useHtml5Parser = true;
@@ -221,6 +226,8 @@ abstract class AbstractBrowser
      * The origin response is the response instance that is returned
      * by the code that handles requests.
      *
+     * @psalm-return TResponse
+     *
      * @see doRequest()
      */
     public function getResponse(): object
@@ -241,6 +248,8 @@ abstract class AbstractBrowser
      *
      * The origin request is the request instance that is sent
      * to the code that handles requests.
+     *
+     * @psalm-return TRequest
      *
      * @see doRequest()
      */
@@ -402,7 +411,9 @@ abstract class AbstractBrowser
     /**
      * Makes a request in another process.
      *
-     * @return object
+     * @psalm-param TRequest $request
+     *
+     * @psalm-return TResponse
      *
      * @throws \RuntimeException When processing returns exit code
      */
@@ -437,12 +448,16 @@ abstract class AbstractBrowser
     /**
      * Makes a request.
      *
-     * @return object
+     * @psalm-param TRequest $request
+     *
+     * @psalm-return TResponse
      */
     abstract protected function doRequest(object $request);
 
     /**
      * Returns the script to execute when the request must be insulated.
+     *
+     * @psalm-param TRequest $request
      *
      * @param object $request An origin request instance
      *
@@ -459,6 +474,8 @@ abstract class AbstractBrowser
      * Filters the BrowserKit request to the origin one.
      *
      * @return object
+     *
+     * @psalm-return TRequest
      */
     protected function filterRequest(Request $request)
     {
@@ -467,6 +484,8 @@ abstract class AbstractBrowser
 
     /**
      * Filters the origin response to the BrowserKit one.
+     *
+     * @psalm-param TResponse $response
      *
      * @return Response
      */

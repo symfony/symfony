@@ -12,6 +12,7 @@ CHANGELOG
  * Deprecate making `cache.app` adapter taggable, use the `cache.app.taggable` adapter instead
  * Enable `json_decode_detailed_errors` in the default serializer context in debug mode by default when `seld/jsonlint` is installed
  * Register `Symfony\Component\Serializer\NameConverter\SnakeCaseToCamelCaseNameConverter` as a service named `serializer.name_converter.snake_case_to_camel_case` if available
+ * Deprecate `session.sid_length` and `session.sid_bits_per_character` config options
 
 7.1
 ---

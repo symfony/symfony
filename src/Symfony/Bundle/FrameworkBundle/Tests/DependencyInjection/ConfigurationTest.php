@@ -673,6 +673,30 @@ class ConfigurationTest extends TestCase
         $this->assertSame(999, $scopedClients['qux']['retry_failed']['delay']);
     }
 
+    public function testSerializerJsonDetailedErrorMessagesEnabledByDefaultWithDebugEnabled()
+    {
+        $processor = new Processor();
+        $config = $processor->processConfiguration(new Configuration(true), [
+            [
+                'serializer' => null,
+            ],
+        ]);
+
+        $this->assertSame([JsonDecode::DETAILED_ERROR_MESSAGES => true], $config['serializer']['default_context'] ?? []);
+    }
+
+    public function testSerializerJsonDetailedErrorMessagesNotSetByDefaultWithDebugDisabled()
+    {
+        $processor = new Processor();
+        $config = $processor->processConfiguration(new Configuration(false), [
+            [
+                'serializer' => null,
+            ],
+        ]);
+
+        $this->assertSame([], $config['serializer']['default_context'] ?? []);
+    }
+
     protected static function getBundleDefaultConfig()
     {
         return [

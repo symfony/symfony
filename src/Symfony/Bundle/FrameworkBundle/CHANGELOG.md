@@ -10,6 +10,7 @@ CHANGELOG
    invokable Kernel class, and register `FrameworkBundle` by default when the `bundles.php` file is missing
  * [BC BREAK] The `secrets:decrypt-to-local` command terminates with a non-zero exit code when a secret could not be read
  * Deprecate making `cache.app` adapter taggable, use the `cache.app.taggable` adapter instead
+ * Enable `json_decode_detailed_errors` in the default serializer context in debug mode by default when `seld/jsonlint` is installed
 
 7.1
 ---

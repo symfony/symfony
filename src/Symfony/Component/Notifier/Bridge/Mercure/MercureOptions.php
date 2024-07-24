@@ -23,17 +23,19 @@ final class MercureOptions implements MessageOptionsInterface
     private ?string $id;
     private ?string $type;
     private ?int $retry;
+    private ?array $content;
 
     /**
      * @param string|string[]|null $topics
      */
-    public function __construct(string|array|null $topics = null, bool $private = false, ?string $id = null, ?string $type = null, ?int $retry = null)
+    public function __construct(string|array|null $topics = null, bool $private = false, ?string $id = null, ?string $type = null, ?int $retry = null, ?array $content = null)
     {
         $this->topics = null !== $topics ? (array) $topics : null;
         $this->private = $private;
         $this->id = $id;
         $this->type = $type;
         $this->retry = $retry;
+        $this->content = $content;
     }
 
     /**
@@ -64,6 +66,11 @@ final class MercureOptions implements MessageOptionsInterface
         return $this->retry;
     }
 
+    public function getContent(): ?array
+    {
+        return $this->content;
+    }
+
     public function toArray(): array
     {
         return [
@@ -72,6 +79,7 @@ final class MercureOptions implements MessageOptionsInterface
             'id' => $this->id,
             'type' => $this->type,
             'retry' => $this->retry,
+            'content' => $this->content,
         ];
     }
 

@@ -23,7 +23,7 @@ class GreaterThanValidatorWithPositiveConstraintTest extends GreaterThanValidato
 {
     protected static function createConstraint(?array $options = null): Constraint
     {
-        return new Positive();
+        return new Positive($options);
     }
 
     /**
@@ -95,6 +95,11 @@ class GreaterThanValidatorWithPositiveConstraintTest extends GreaterThanValidato
         $this->markTestSkipped('PropertyPath option is not used in Positive constraint');
     }
 
+    public static function provideAllValidComparisons(): array
+    {
+        self::markTestSkipped('The "value" option cannot be used in the Positive constraint');
+    }
+
     /**
      * @dataProvider provideValidComparisonsToPropertyPath
      */
@@ -114,5 +119,20 @@ class GreaterThanValidatorWithPositiveConstraintTest extends GreaterThanValidato
     public function testInvalidComparisonToPropertyPathAddsPathAsParameter()
     {
         $this->markTestSkipped('PropertyPath option is not used in Positive constraint');
+    }
+
+    public static function throwsOnInvalidStringDatesProvider(): array
+    {
+        self::markTestSkipped('The "value" option cannot be used in the Positive constraint');
+    }
+
+    public static function provideAllInvalidComparisons(): array
+    {
+        self::markTestSkipped('The "value" option cannot be used in the Positive constraint');
+    }
+
+    public static function provideComparisonsToNullValueAtPropertyPath(): array
+    {
+        self::markTestSkipped('PropertyPath option is not used in PositiveOrZero constraint');
     }
 }

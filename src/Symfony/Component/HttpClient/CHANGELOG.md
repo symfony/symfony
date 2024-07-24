@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+7.2
+---
+
+ * Allow setting the `CURLOPT_CONNECTTIMEOUT(_MS)` options in `CurlHttpClient`
+
 7.1
 ---
 

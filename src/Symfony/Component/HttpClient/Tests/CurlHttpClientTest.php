@@ -13,6 +13,7 @@ namespace Symfony\Component\HttpClient\Tests;
 
 use Symfony\Component\HttpClient\CurlHttpClient;
 use Symfony\Component\HttpClient\Exception\InvalidArgumentException;
+use Symfony\Component\HttpClient\Exception\TransportException;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
@@ -116,6 +117,26 @@ class CurlHttpClientTest extends HttpClientTestCase
             'extra' => [
                 'curl' => [
                     \CURLOPT_PRIVATE => 'overridden private',
+                ],
+            ],
+        ]);
+    }
+
+    /**
+     * @testWith [1]
+     *           [5]
+     */
+    public function testOverridingConnectTimeoutUsingCurlOptions(int $connectTimeout)
+    {
+        $httpClient = $this->getHttpClient(__FUNCTION__);
+        $this->expectException(TransportException::class);
+        $this->expectExceptionMessageMatches(\sprintf('~Connection (timeout|timed out) after %d (ms|milliseconds) for "http\://10\.255\.255\.1/"\.~', $connectTimeout));
+
+        // Make a request to a non-routable IP address
+        $httpClient->request('GET', 'http://10.255.255.1/', [
+            'extra' => [
+                'curl' => [
+                    \CURLOPT_CONNECTTIMEOUT_MS => $connectTimeout,
                 ],
             ],
         ]);

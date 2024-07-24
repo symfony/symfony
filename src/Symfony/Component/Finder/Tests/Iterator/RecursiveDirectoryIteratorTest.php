@@ -27,7 +27,7 @@ class RecursiveDirectoryIteratorTest extends IteratorTestCase
      */
     public function testRewindOnFtp()
     {
-        $i = new RecursiveDirectoryIterator('ftp://speedtest:speedtest@ftp.otenet.gr/', \RecursiveDirectoryIterator::SKIP_DOTS);
+        $i = new RecursiveDirectoryIterator('ftp://test.rebex.net/', \RecursiveDirectoryIterator::SKIP_DOTS);
 
         $i->rewind();
 
@@ -39,11 +39,11 @@ class RecursiveDirectoryIteratorTest extends IteratorTestCase
      */
     public function testSeekOnFtp()
     {
-        $i = new RecursiveDirectoryIterator('ftp://speedtest:speedtest@ftp.otenet.gr/', \RecursiveDirectoryIterator::SKIP_DOTS);
+        $i = new RecursiveDirectoryIterator('ftp://test.rebex.net/', \RecursiveDirectoryIterator::SKIP_DOTS);
 
         $contains = [
-            'ftp://speedtest:speedtest@ftp.otenet.gr'.\DIRECTORY_SEPARATOR.'test100Mb.db',
-            'ftp://speedtest:speedtest@ftp.otenet.gr'.\DIRECTORY_SEPARATOR.'test100k.db',
+            'ftp://test.rebex.net'.\DIRECTORY_SEPARATOR.'pub',
+            'ftp://test.rebex.net'.\DIRECTORY_SEPARATOR.'readme.txt',
         ];
         $actual = [];
 

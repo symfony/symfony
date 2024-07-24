@@ -16,6 +16,7 @@ use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Constraints\AbstractComparison;
 use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
+use Symfony\Component\Validator\Tests\Constraints\Fixtures\TypedDummy;
 
 class ComparisonTest_Class
 {
@@ -260,6 +261,33 @@ abstract class AbstractComparisonValidatorTestCase extends ConstraintValidatorTe
         $this->setObject($object);
 
         $this->validator->validate($dirtyValue, $constraint);
+
+        if ($isValid) {
+            $this->assertNoViolation();
+        } else {
+            $this->buildViolation('Constraint Message')
+                ->setParameter('{{ value }}', $dirtyValueAsString)
+                ->setParameter('{{ compared_value }}', 'null')
+                ->setParameter('{{ compared_value_type }}', 'null')
+                ->setParameter('{{ compared_value_path }}', 'value')
+                ->setCode($this->getErrorCode())
+                ->assertRaised();
+        }
+    }
+
+    /**
+     * @requires PHP 7.4
+     *
+     * @dataProvider provideComparisonsToNullValueAtPropertyPath
+     */
+    public function testCompareWithUninitializedPropertyAtPropertyPath($dirtyValue, $dirtyValueAsString, $isValid)
+    {
+        $this->setObject(new TypedDummy());
+
+        $this->validator->validate($dirtyValue, $this->createConstraint([
+            'message' => 'Constraint Message',
+            'propertyPath' => 'value',
+        ]));
 
         if ($isValid) {
             $this->assertNoViolation();

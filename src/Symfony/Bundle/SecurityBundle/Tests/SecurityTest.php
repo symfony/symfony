@@ -140,7 +140,7 @@ class SecurityTest extends TestCase
         $container->set('request_stack', $requestStack);
         $container->set('security.firewall.map', $firewallMap);
         $container->set('security.authenticator.managers_locator', $this->createContainer('main', $userAuthenticator));
-        $container->set('security.user_checker', $userChecker);
+        $container->set('security.user_checker_locator', $this->createContainer('main', $userChecker));
 
         $firewallMap->expects($this->once())->method('getFirewallConfig')->willReturn($firewall);
         $userAuthenticator->expects($this->once())->method('authenticateUser')->with($user, $authenticator, $request);
@@ -180,7 +180,7 @@ class SecurityTest extends TestCase
         $container->set('request_stack', $requestStack);
         $container->set('security.firewall.map', $firewallMap);
         $container->set('security.authenticator.managers_locator', $this->createContainer('main', $userAuthenticator));
-        $container->set('security.user_checker', $userChecker);
+        $container->set('security.user_checker_locator', $this->createContainer('main', $userChecker));
 
         $firewallMap->expects($this->once())->method('getFirewallConfig')->willReturn($firewall);
         $userChecker->expects($this->once())->method('checkPreAuth')->with($user);

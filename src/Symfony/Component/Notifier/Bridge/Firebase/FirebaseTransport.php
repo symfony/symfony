@@ -24,16 +24,20 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
  * @author Jeroen Spee <https://github.com/Jeroeny>
+ * @author Cesur APAYDIN <https://github.com/cesurapp>
  */
 final class FirebaseTransport extends AbstractTransport
 {
-    protected const HOST = 'fcm.googleapis.com/fcm/send';
+    protected const HOST = 'fcm.googleapis.com/v1/projects/project_id/messages:send';
 
-    public function __construct(
-        #[\SensitiveParameter] private string $token,
-        ?HttpClientInterface $client = null,
-        ?EventDispatcherInterface $dispatcher = null,
-    ) {
+    private array $credentials;
+
+    public function __construct(#[\SensitiveParameter] array $credentials, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
+    {
+        $this->credentials = $credentials;
+        $this->client = $client;
+        $this->setHost(str_replace('project_id', $credentials['project_id'], $this->getDefaultHost()));
+
         parent::__construct($client, $dispatcher);
     }
 
@@ -53,21 +57,20 @@ final class FirebaseTransport extends AbstractTransport
             throw new UnsupportedMessageTypeException(__CLASS__, ChatMessage::class, $message);
         }
 
-        $endpoint = \sprintf('https://%s', $this->getEndpoint());
-        $options = $message->getOptions()?->toArray() ?? [];
-        $options['to'] = $message->getRecipientId();
+        $endpoint = sprintf('https://%s', $this->getEndpoint());
 
-        if (!$options['to']) {
-            throw new InvalidArgumentException(\sprintf('The "%s" transport required the "to" option to be set.', __CLASS__));
+        // Generate Options
+        $options = $message->getOptions()?->toArray() ?? [];
+        if (!$options['token'] && !$options['topic']) {
+            throw new InvalidArgumentException(sprintf('The "%s" transport required the "token" or "topic" option to be set.', __CLASS__));
         }
         $options['notification']['body'] = $message->getSubject();
         $options['data'] ??= [];
 
+        // Send
         $response = $this->client->request('POST', $endpoint, [
-            'headers' => [
-                'Authorization' => \sprintf('key=%s', $this->token),
-            ],
-            'json' => array_filter($options),
+            'headers' => ['Authorization' => sprintf('Bearer %s', $this->getJwtToken())],
+            'json' => array_filter(['message' => $options]),
         ]);
 
         try {
@@ -87,14 +90,51 @@ final class FirebaseTransport extends AbstractTransport
         }
 
         if (null !== $errorMessage) {
-            throw new TransportException('Unable to post the Firebase message: '.$errorMessage, $response);
+            throw new TransportException('Unable to post the Firebase message: ' . $errorMessage, $response);
         }
 
         $success = $response->toArray(false);
 
-        $sentMessage = new SentMessage($message, (string) $this);
+        $sentMessage = new SentMessage($message, (string)$this);
         $sentMessage->setMessageId($success['results'][0]['message_id'] ?? '');
 
         return $sentMessage;
+    }
+
+    private function getJwtToken(): string
+    {
+        $time = time();
+        $payload = [
+            'iss' => $this->credentials['client_email'],
+            'sub' => $this->credentials['client_email'],
+            'aud' => 'https://fcm.googleapis.com/',
+            'iat' => $time,
+            'exp' => $time + 3600,
+            'kid' => $this->credentials['private_key_id'],
+        ];
+
+        $header = $this->urlSafeEncode(['alg' => 'RS256', 'typ' => 'JWT']);
+        $payload = $this->urlSafeEncode($payload);
+        openssl_sign($header . '.' . $payload, $signature, openssl_pkey_get_private($this->encodePk($this->credentials['private_key'])), OPENSSL_ALGO_SHA256);
+        $signature = $this->urlSafeEncode($signature);
+
+        return $header . '.' . $payload . '.' . $signature;
+    }
+
+    protected function urlSafeEncode(string|array $data): string
+    {
+        if (is_array($data)) {
+            $data = json_encode($data, JSON_UNESCAPED_SLASHES);
+        }
+
+        return rtrim(strtr(base64_encode($data), '+/', '-_'), '=');
+    }
+
+    protected function encodePk(string $privateKey): string
+    {
+        $text = explode('-----', $privateKey);
+        $text[2] = str_replace(['\n', '_', ' '], ["\n", "\n", '+'], $text[2]);
+
+        return implode('-----', $text);
     }
 }

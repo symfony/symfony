@@ -3,16 +3,25 @@ Firebase Notifier
 
 Provides [Firebase](https://firebase.google.com) integration for Symfony Notifier.
 
-DSN example
+JWT DSN Example (HTTP v1)
 -----------
 
 ```
-FIREBASE_DSN=firebase://USERNAME:PASSWORD@default
+FIREBASE_DSN=firebase://<CLIENT_EMAIL>?project_id=<PROJECT_ID>&private_key_id=<PRIVATE_KEY_ID>&private_key=<PRIVATE_KEY>
+FIREBASE_DSN=firebase://firebase-adminsdk@stag.iam.gserviceaccount.com?project_id=<PROJECT_ID>&private_key_id=<PRIVATE_KEY_ID>&private_key=<PRIVATE_KEY>
 ```
 
-where:
- - `USERNAME` is your Firebase username
- - `PASSWORD` is your Firebase password
+Since __"private_key"__ is long, you must write it in a single line with "\n". Example:
+```
+-----BEGIN RSA PRIVATE KEY-----\n.....\n....\n-----END RSA PRIVATE KEY-----
+```
+
+__Required Options:__
+* client_email
+* project_id
+* private_key_id
+* private_key
+
 
 Adding Interactions to a Message
 --------------------------------
@@ -27,7 +36,7 @@ use Symfony\Component\Notifier\Bridge\Firebase\Notification\AndroidNotification;
 $chatMessage = new ChatMessage('');
 
 // Create AndroidNotification options
-$androidOptions = (new AndroidNotification('/topics/news', []))
+$androidOptions = (new AndroidNotification('/topics/news', [], [], true))
     ->icon('myicon')
     ->sound('default')
     ->tag('myNotificationId')

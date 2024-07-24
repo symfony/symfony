@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+7.2
+---
+
+* The legacy api has been replaced with HTTP v1
+* Add `useTopic` field to options
+
 5.3
 ---
 

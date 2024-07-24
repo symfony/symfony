@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Notifier\Bridge\Firebase;
 
+use Symfony\Component\Notifier\Exception\MissingRequiredOptionException;
 use Symfony\Component\Notifier\Exception\UnsupportedSchemeException;
 use Symfony\Component\Notifier\Transport\AbstractTransportFactory;
 use Symfony\Component\Notifier\Transport\Dsn;
@@ -28,11 +29,17 @@ final class FirebaseTransportFactory extends AbstractTransportFactory
             throw new UnsupportedSchemeException($dsn, 'firebase', $this->getSupportedSchemes());
         }
 
-        $token = \sprintf('%s:%s', $this->getUser($dsn), $this->getPassword($dsn));
-        $host = 'default' === $dsn->getHost() ? null : $dsn->getHost();
-        $port = $dsn->getPort();
+        $credentials = [
+            'client_email' => sprintf('%s@%s', $dsn->getUser(), $dsn->getHost()),
+            ...$dsn->getOptions()
+        ];
 
-        return (new FirebaseTransport($token, $this->client, $this->dispatcher))->setHost($host)->setPort($port);
+        $requiredParameters = array_diff(array_keys($credentials), ['client_email', 'project_id', 'private_key_id', 'private_key']);
+        if ($requiredParameters) {
+            throw new MissingRequiredOptionException(implode(', ', $requiredParameters));
+        }
+
+        return (new FirebaseTransport($credentials, $this->client, $this->dispatcher));
     }
 
     protected function getSupportedSchemes(): array

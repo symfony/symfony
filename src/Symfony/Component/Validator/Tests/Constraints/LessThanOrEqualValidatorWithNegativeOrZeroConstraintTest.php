@@ -121,6 +121,16 @@ class LessThanOrEqualValidatorWithNegativeOrZeroConstraintTest extends LessThanO
         $this->markTestSkipped('PropertyPath option is not used in NegativeOrZero constraint');
     }
 
+    /**
+     * @requires PHP 7.4
+     *
+     * @dataProvider provideComparisonsToNullValueAtPropertyPath
+     */
+    public function testCompareWithUninitializedPropertyAtPropertyPath($dirtyValue, $dirtyValueAsString, $isValid)
+    {
+        $this->markTestSkipped('PropertyPath option is not used in NegativeOrZero constraint');
+    }
+
     public static function throwsOnInvalidStringDatesProvider(): array
     {
         self::markTestSkipped('The "value" option cannot be used in the NegativeOrZero constraint');

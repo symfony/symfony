@@ -38,7 +38,7 @@
         "symfony/expression-language": "^5.1|^6.0",
         "symfony/cache": "^4.4|^5.0|^6.0",
         "symfony/mime": "^4.4|^5.0|^6.0",
-        "symfony/property-access": "^4.4|^5.0|^6.0",
+        "symfony/property-access": "^5.4|^6.0",
         "symfony/property-info": "^5.3|^6.0",
         "symfony/translation": "^5.4.35|~6.3.12|^6.4.3",
         "doctrine/annotations": "^1.13|^2",

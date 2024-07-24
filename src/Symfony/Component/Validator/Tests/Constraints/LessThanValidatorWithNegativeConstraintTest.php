@@ -121,6 +121,16 @@ class LessThanValidatorWithNegativeConstraintTest extends LessThanValidatorTest
         $this->markTestSkipped('PropertyPath option is not used in Negative constraint');
     }
 
+    /**
+     * @requires PHP 7.4
+     *
+     * @dataProvider provideComparisonsToNullValueAtPropertyPath
+     */
+    public function testCompareWithUninitializedPropertyAtPropertyPath($dirtyValue, $dirtyValueAsString, $isValid)
+    {
+        $this->markTestSkipped('PropertyPath option is not used in Negative constraint');
+    }
+
     public function testInvalidComparisonToPropertyPathAddsPathAsParameter()
     {
         $this->markTestSkipped('PropertyPath option is not used in Negative constraint');

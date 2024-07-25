@@ -530,7 +530,7 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
 
         $buildDir = $this->container->getParameter('kernel.build_dir');
         $cacheDir = $this->container->getParameter('kernel.cache_dir');
-        $preload = $this instanceof WarmableInterface ? (array) $this->warmUp($cacheDir, $buildDir) : [];
+        $preload = $this instanceof WarmableInterface ? $this->warmUp($cacheDir, $buildDir) : [];
 
         if ($this->container->has('cache_warmer')) {
             $cacheWarmer = $this->container->get('cache_warmer');
@@ -539,7 +539,7 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
                 $cacheWarmer->enableOptionalWarmers();
             }
 
-            $preload = array_merge($preload, (array) $cacheWarmer->warmUp($cacheDir, $buildDir));
+            $preload = array_merge($preload, $cacheWarmer->warmUp($cacheDir, $buildDir));
         }
 
         if ($preload && file_exists($preloadFile = $buildDir.'/'.$class.'.preload.php')) {

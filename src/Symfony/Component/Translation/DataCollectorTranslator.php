@@ -65,7 +65,7 @@ class DataCollectorTranslator implements TranslatorInterface, TranslatorBagInter
     public function warmUp(string $cacheDir, ?string $buildDir = null): array
     {
         if ($this->translator instanceof WarmableInterface) {
-            return (array) $this->translator->warmUp($cacheDir, $buildDir);
+            return $this->translator->warmUp($cacheDir, $buildDir);
         }
 
         return [];

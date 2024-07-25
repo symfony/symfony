@@ -34,9 +34,8 @@ final class ResponseCookieValueSame extends Constraint
         if ($this->domain) {
             $str .= \sprintf(' for domain "%s"', $this->domain);
         }
-        $str .= \sprintf(' with value "%s"', $this->value);
 
-        return $str;
+        return $str.\sprintf(' with value "%s"', $this->value);
     }
 
     /**

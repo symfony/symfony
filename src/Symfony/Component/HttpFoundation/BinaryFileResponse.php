@@ -70,7 +70,7 @@ class BinaryFileResponse extends Response
             if ($file instanceof \SplFileInfo) {
                 $file = new File($file->getPathname(), !$isTemporaryFile);
             } else {
-                $file = new File((string) $file);
+                $file = new File($file);
             }
         }
 

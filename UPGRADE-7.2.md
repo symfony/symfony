@@ -16,6 +16,7 @@ FrameworkBundle
 Security
 --------
 
+ * Add `$token` argument to `UserCheckerInterface::checkPostAuth()`
  * Deprecate argument `$secret` of `RememberMeToken` and `RememberMeAuthenticator`
 
 String

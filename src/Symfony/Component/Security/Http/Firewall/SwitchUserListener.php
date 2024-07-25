@@ -163,7 +163,7 @@ class SwitchUserListener extends AbstractListener
 
         $this->logger?->info('Attempting to switch to user.', ['username' => $username]);
 
-        $this->userChecker->checkPostAuth($user);
+        $this->userChecker->checkPostAuth($user, $token);
 
         $roles = $user->getRoles();
         $originatedFromUri = str_replace('/&', '/?', preg_replace('#[&?]'.$this->usernameParameter.'=[^&]*#', '', $request->getRequestUri()));

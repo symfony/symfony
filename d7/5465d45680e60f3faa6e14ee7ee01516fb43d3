@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by alexislefebvre at 2024-07-19T10:50:50Z
+
+In another PR, it was suggested to keep explicit casts: https://github.com/symfony/symfony/pull/57758#discussion_r1682790234
+
+Is there a guideline about this topic?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2024-07-19T10:54:36Z
+
+If I don't miss anything, the places where the explicit cast was removed does not change anything as the desired type is already present and removing the cast won't lead to an implicit type cast.
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2024-07-19T11:17:31Z
+
+That's right. I guess derrabus wanted to keep the explicit cast because it is done on a Stringable object. In this PR, the removed casts were useless and my guess is that those casts were introduced when the codebase wasn't as typed as it is now.

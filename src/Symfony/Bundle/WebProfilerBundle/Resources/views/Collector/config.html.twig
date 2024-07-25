@@ -250,17 +250,17 @@
     <div class="metrics">
         <div class="metric-group">
             <div class="metric">
-                <span class="value value-is-icon {{ not collector.haszendopcache ? 'value-shows-no-color' }}">{{ source('@WebProfiler/Icon/' ~ (collector.haszendopcache ? 'yes' : 'no') ~ '.svg') }}</span>
+                <span class="value value-is-icon {{ not collector.haszendopcache ? 'value-shows-no-color' }}" title="{{ collector.zendopcachestatus|default('') }}">{{ source('@WebProfiler/Icon/' ~ (collector.haszendopcache ? 'yes' : 'no') ~ '.svg') }}</span>
                 <span class="label">OPcache</span>
             </div>
 
             <div class="metric">
-                <span class="value value-is-icon {{ not collector.hasapcu ? 'value-shows-no-color' }}">{{ source('@WebProfiler/Icon/' ~ (collector.hasapcu ? 'yes' : 'no') ~ '.svg') }}</span>
+                <span class="value value-is-icon {{ not collector.hasapcu ? 'value-shows-no-color' }}" title="{{ collector.apcustatus|default('') }}">{{ source('@WebProfiler/Icon/' ~ (collector.hasapcu ? 'yes' : 'no') ~ '.svg') }}</span>
                 <span class="label">APCu</span>
             </div>
 
             <div class="metric">
-                <span class="value value-is-icon {{ not collector.hasxdebug ? 'value-shows-no-color' }}">{{ source('@WebProfiler/Icon/' ~ (collector.hasxdebug ? 'yes' : 'no') ~ '.svg') }}</span>
+                <span class="value value-is-icon {{ not collector.hasxdebug ? 'value-shows-no-color' }}" title="{{ collector.xdebugstatus|default('') }}">{{ source('@WebProfiler/Icon/' ~ (collector.hasxdebug ? 'yes' : 'no') ~ '.svg') }}</span>
                 <span class="label">Xdebug</span>
             </div>
         </div>

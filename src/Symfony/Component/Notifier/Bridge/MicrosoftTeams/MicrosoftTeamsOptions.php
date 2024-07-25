@@ -28,15 +28,12 @@ final class MicrosoftTeamsOptions implements MessageOptionsInterface
 {
     private const MAX_ACTIONS = 4;
 
-    private array $options = [];
-
-    public function __construct(array $options = [])
-    {
+    public function __construct(
+        private array $options = [],
+    ) {
         if (\array_key_exists('themeColor', $options)) {
             $this->validateThemeColor($options['themeColor']);
         }
-
-        $this->options = $options;
 
         $this->validateNumberOfActions();
     }

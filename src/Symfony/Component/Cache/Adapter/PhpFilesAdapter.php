@@ -305,10 +305,8 @@ class PhpFilesAdapter extends AbstractAdapter implements PruneableInterface
  */
 class LazyValue
 {
-    public string $file;
-
-    public function __construct(string $file)
-    {
-        $this->file = $file;
+    public function __construct(
+        public string $file,
+    ) {
     }
 }

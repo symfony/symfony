@@ -452,7 +452,7 @@ class RegisterServiceSubscribersPassTest extends TestCase
             'autowired' => new ServiceClosureArgument(new TypedReference('service.id', 'stdClass', ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE, 'autowired', [new Autowire(service: 'service.id')])),
             'autowired.nullable' => new ServiceClosureArgument(new TypedReference('service.id', 'stdClass', ContainerInterface::IGNORE_ON_INVALID_REFERENCE, 'autowired.nullable', [new Autowire(service: 'service.id')])),
             'autowired.parameter' => new ServiceClosureArgument('foobar'),
-            'autowire.decorated' => new ServiceClosureArgument(new Reference('.service_locator.PIYLhDv.inner', ContainerInterface::NULL_ON_INVALID_REFERENCE)),
+            'autowire.decorated' => new ServiceClosureArgument(new Reference('.service_locator.oNVewcO.inner', ContainerInterface::NULL_ON_INVALID_REFERENCE)),
             'target' => new ServiceClosureArgument(new TypedReference('stdClass', 'stdClass', ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE, 'target', [new Target('someTarget')])),
         ];
         $this->assertEquals($expected, $container->getDefinition((string) $locator->getFactory()[0])->getArgument(0));

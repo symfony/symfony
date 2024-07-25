@@ -51,16 +51,16 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class ChoiceType extends AbstractType
 {
     private ChoiceListFactoryInterface $choiceListFactory;
-    private ?TranslatorInterface $translator;
 
-    public function __construct(?ChoiceListFactoryInterface $choiceListFactory = null, ?TranslatorInterface $translator = null)
-    {
+    public function __construct(
+        ?ChoiceListFactoryInterface $choiceListFactory = null,
+        private ?TranslatorInterface $translator = null,
+    ) {
         $this->choiceListFactory = $choiceListFactory ?? new CachingFactoryDecorator(
             new PropertyAccessDecorator(
                 new DefaultChoiceListFactory()
             )
         );
-        $this->translator = $translator;
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void

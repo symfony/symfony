@@ -23,14 +23,14 @@ class ReflectionClassResource implements SelfCheckingResourceInterface
 {
     private array $files = [];
     private string $className;
-    private \ReflectionClass $classReflector;
     private array $excludedVendors = [];
     private string $hash;
 
-    public function __construct(\ReflectionClass $classReflector, array $excludedVendors = [])
-    {
+    public function __construct(
+        private \ReflectionClass $classReflector,
+        array $excludedVendors = [],
+    ) {
         $this->className = $classReflector->name;
-        $this->classReflector = $classReflector;
         $this->excludedVendors = $excludedVendors;
     }
 

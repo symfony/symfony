@@ -38,12 +38,12 @@ use Symfony\Component\PropertyAccess\PropertyPathInterface;
  */
 class PropertyAccessDecorator implements ChoiceListFactoryInterface
 {
-    private ChoiceListFactoryInterface $decoratedFactory;
     private PropertyAccessorInterface $propertyAccessor;
 
-    public function __construct(ChoiceListFactoryInterface $decoratedFactory, ?PropertyAccessorInterface $propertyAccessor = null)
-    {
-        $this->decoratedFactory = $decoratedFactory;
+    public function __construct(
+        private ChoiceListFactoryInterface $decoratedFactory,
+        ?PropertyAccessorInterface $propertyAccessor = null,
+    ) {
         $this->propertyAccessor = $propertyAccessor ?: PropertyAccess::createPropertyAccessor();
     }
 

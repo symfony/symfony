@@ -35,18 +35,14 @@ class PostmarkApiTransport extends AbstractApiTransport
     private const HOST = 'api.postmarkapp.com';
     private const CODE_INACTIVE_RECIPIENT = 406;
 
-    private ?EventDispatcherInterface $dispatcher;
-
     private ?string $messageStream = null;
 
     public function __construct(
         #[\SensitiveParameter] private string $key,
         ?HttpClientInterface $client = null,
-        ?EventDispatcherInterface $dispatcher = null,
+        private ?EventDispatcherInterface $dispatcher = null,
         ?LoggerInterface $logger = null,
     ) {
-        $this->dispatcher = $dispatcher;
-
         parent::__construct($client, $dispatcher, $logger);
     }
 

@@ -92,7 +92,6 @@ class ErrorHandler
     private int $screamedErrors = 0x55; // E_ERROR + E_CORE_ERROR + E_COMPILE_ERROR + E_PARSE
     private int $loggedErrors = 0;
     private \Closure $configureException;
-    private bool $debug;
 
     private bool $isRecursive = false;
     private bool $isRoot = false;
@@ -179,8 +178,10 @@ class ErrorHandler
         }
     }
 
-    public function __construct(?BufferingLogger $bootstrappingLogger = null, bool $debug = false)
-    {
+    public function __construct(
+        ?BufferingLogger $bootstrappingLogger = null,
+        private bool $debug = false,
+    ) {
         if ($bootstrappingLogger) {
             $this->bootstrappingLogger = $bootstrappingLogger;
             $this->setDefaultLogger($bootstrappingLogger);
@@ -192,7 +193,6 @@ class ErrorHandler
             $e->line = $line ?? $e->line;
         }, null, new class() extends \Exception {
         });
-        $this->debug = $debug;
     }
 
     /**

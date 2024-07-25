@@ -35,16 +35,21 @@ use Symfony\Contracts\Service\ServiceSubscriberInterface;
  */
 class Router extends BaseRouter implements WarmableInterface, ServiceSubscriberInterface
 {
-    private ContainerInterface $container;
     private array $collectedParameters = [];
     private \Closure $paramFetcher;
 
     /**
      * @param mixed $resource The main resource to load
      */
-    public function __construct(ContainerInterface $container, mixed $resource, array $options = [], ?RequestContext $context = null, ?ContainerInterface $parameters = null, ?LoggerInterface $logger = null, ?string $defaultLocale = null)
-    {
-        $this->container = $container;
+    public function __construct(
+        private ContainerInterface $container,
+        mixed $resource,
+        array $options = [],
+        ?RequestContext $context = null,
+        ?ContainerInterface $parameters = null,
+        ?LoggerInterface $logger = null,
+        ?string $defaultLocale = null,
+    ) {
         $this->resource = $resource;
         $this->context = $context ?? new RequestContext();
         $this->logger = $logger;

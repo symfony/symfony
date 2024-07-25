@@ -11,7 +11,7 @@
 
 namespace Symfony\Bundle\TwigBundle\Tests\DependencyInjection;
 
-use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
+use Symfony\Bridge\PhpUnit\ExpectUserDeprecationMessageTrait;
 use Symfony\Bundle\TwigBundle\DependencyInjection\Compiler\RuntimeLoaderPass;
 use Symfony\Bundle\TwigBundle\DependencyInjection\TwigExtension;
 use Symfony\Bundle\TwigBundle\Tests\DependencyInjection\AcmeBundle\AcmeBundle;
@@ -32,7 +32,7 @@ use Twig\Environment;
 
 class TwigExtensionTest extends TestCase
 {
-    use ExpectDeprecationTrait;
+    use ExpectUserDeprecationMessageTrait;
 
     public function testLoadEmptyConfiguration()
     {
@@ -111,7 +111,7 @@ class TwigExtensionTest extends TestCase
         $container = $this->createContainer();
         $container->registerExtension(new TwigExtension());
 
-        $this->expectDeprecation('Since symfony/twig-bundle 7.1: The child node "base_template_class" at path "twig" is deprecated.');
+        $this->expectUserDeprecationMessage('Since symfony/twig-bundle 7.1: The child node "base_template_class" at path "twig" is deprecated.');
 
         $this->loadFromFile($container, 'templateClass', $format);
         $this->compileContainer($container);

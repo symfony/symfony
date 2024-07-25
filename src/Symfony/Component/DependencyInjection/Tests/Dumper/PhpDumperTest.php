@@ -13,7 +13,7 @@ namespace Symfony\Component\DependencyInjection\Tests\Dumper;
 
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
-use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
+use Symfony\Bridge\PhpUnit\ExpectUserDeprecationMessageTrait;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\Argument\AbstractArgument;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
@@ -76,7 +76,7 @@ require_once __DIR__.'/../Fixtures/includes/foo_lazy.php';
 
 class PhpDumperTest extends TestCase
 {
-    use ExpectDeprecationTrait;
+    use ExpectUserDeprecationMessageTrait;
 
     protected static string $fixturesPath;
 
@@ -485,7 +485,7 @@ class PhpDumperTest extends TestCase
     {
         $container = include self::$fixturesPath.'/containers/container_deprecated_parameters.php';
 
-        $this->expectDeprecation('Since symfony/test 6.3: The parameter "foo_class" is deprecated.');
+        $this->expectUserDeprecationMessage('Since symfony/test 6.3: The parameter "foo_class" is deprecated.');
         $container->compile();
 
         $dumper = new PhpDumper($container);
@@ -502,7 +502,7 @@ class PhpDumperTest extends TestCase
     {
         $container = include self::$fixturesPath.'/containers/container_deprecated_parameters.php';
 
-        $this->expectDeprecation('Since symfony/test 6.3: The parameter "foo_class" is deprecated.');
+        $this->expectUserDeprecationMessage('Since symfony/test 6.3: The parameter "foo_class" is deprecated.');
         $container->compile();
 
         $dumper = new PhpDumper($container);
@@ -1702,7 +1702,7 @@ PHP
      */
     public function testDirectlyAccessingDeprecatedPublicService()
     {
-        $this->expectDeprecation('Since foo/bar 3.8: Accessing the "bar" service directly from the container is deprecated, use dependency injection instead.');
+        $this->expectUserDeprecationMessage('Since foo/bar 3.8: Accessing the "bar" service directly from the container is deprecated, use dependency injection instead.');
 
         $container = new ContainerBuilder();
         $container

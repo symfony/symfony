@@ -1,0 +1,25 @@
+---------------------------------------------------------------------------
+
+by wouterj at 2024-07-01T20:29:04Z
+
+Isn't this outside the scope of TypeInfo and exactly the scope for the PropertyType component? Or what is the difference between these 2 components if TypeInfo is also going to read type information from different sources outside of PHP's native types?
+
+---------------------------------------------------------------------------
+
+by chalasr at 2024-07-01T21:37:11Z
+
+TypeInfo is about getting the type of any PHP element including class properties but also methods, functions and their parameters. It does it by reading through the most common sources that are built-in types but also docblocks until we don't need them anymore for types.
+It’s a low-level brick that PropertyInfo builds on to provide more high-level features about class properties introspection.
+That low-level API is more powerful and flexible than the one PropertyInfo used to embed, which mostly needs [to be deprecated ](https://github.com/symfony/symfony/commit/08ac161f1c12c1b91ab18a8983f791c6d09e1609#diff-bb3e95caba924e645a85dfb4740de5d0eac3546382a8484f2da4298fbc8eb478)in favor of a TypeInfo integration as it appeared to be not good enough for some use cases, notably other on-going work such as [json-encoder](https://github.com/symfony/symfony/pull/51718).
+
+---------------------------------------------------------------------------
+
+by chalasr at 2024-07-01T21:46:01Z
+
+To illustrate more, this change unlocks making `MapRequestPayload` able to guess the inner type of a list of objects mapped from the request by extracting it from the controller action's docblock (see https://github.com/symfony/symfony/pull/54385#issuecomment-2028383940)
+
+---------------------------------------------------------------------------
+
+by chalasr at 2024-07-22T13:20:01Z
+
+Unless I'm mistaken the build failure should disappear once merged in 7.2 and is due to 7.2.x-dev being installed as part of property-info's test suite, while this breaks BC in the experimental TypeInfo.

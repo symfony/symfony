@@ -1,0 +1,91 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2024-07-10T19:24:14Z
+
+Hey!
+
+I see that this is your first PR. That is great! Welcome!
+
+Symfony has a [contribution guide](https://symfony.com/doc/current/contributing/index.html) which I suggest you to read.
+
+In short:
+- Always add tests
+- Keep backward compatibility (see https://symfony.com/bc).
+- Bug fixes must be submitted against the lowest maintained branch where they apply (see https://symfony.com/releases)
+- Features and deprecations must be submitted against the 7.2 branch.
+
+Review the GitHub status checks of your pull request and try to solve the reported issues. If some tests are failing, try to see if they are failing because of this change.
+
+When two Symfony core team members approve this change, it will be merged and you will become an official Symfony contributor!
+If this PR is merged in a lower version branch, it will be merged up to all maintained branches within a few days.
+
+I am going to sit back now and wait for the reviews.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by carsonbot at 2024-07-10T19:24:15Z
+
+Hey!
+
+Thanks for your PR. You are targeting branch "7.2" but it seems your PR description refers to branch "7.2 (not sure if this is correct in this case)".
+Could you update the PR description or change target branch? This helps core maintainers a lot.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by derrabus at 2024-07-10T20:18:58Z
+
+Changing the default behavior silently in a bugfix release on an LTS branch sounds like a bad idea, tbh.
+
+If we want to do this, we should target 7.2 and deprecate not setting this option first.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-07-11T09:05:06Z
+
+The code is able to auto-detect if igbinary was used when serializing so that payloads are compatible with either flags (if igbinary is installed).
+This means changing the default behavior is fine without further precautions.
+We could even do this on 5.4 if we think the state of igbinary is too bad.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2024-07-17T04:50:06Z
+
+> This means changing the default behavior is fine without further precautions.
+
+I am not convinced that this is always true. What if other PHP projects not using Symfony read the serialised data? They may not have the same mechanism to detect if igbinary was used.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-07-17T06:13:10Z
+
+> What if other PHP projects not using Symfony read the serialised data? They may not have the same mechanism to detect if igbinary was used.
+
+This would be an unsupported use case. Cached items are certainly not meant for interop. We already changed their format without caring in the past.
+
+This change is desired to me.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-07-17T06:36:43Z
+
+See eg comments in https://github.com/igbinary/igbinary/issues/273
+
+---------------------------------------------------------------------------
+
+by derrabus at 2024-07-21T12:44:02Z
+
+> Works for me on 7.2.
+
+I think, 7.2 is the compromise we can all settle on. And please let's add a remark to the upgrade guide for 7.2 and the Cache component's change log.
+
+> I'd also be fine on 5.4/6.4: igbinary is not safe anymore, ppl are at risk when using it, and the fact that it's not opt-in when the extension is installed adds to the risk.
+
+I understand that and maybe it was even a mistake to enable igbinary serialization automatically. But I believe that there are enough projects out there that don't hit those issues and still rely on the performance gain they get from leveraging igbinary. Maybe I'm too conservative here, but I wouldn't want to lure those apps into a performance degradation with an innocent bugfix release.

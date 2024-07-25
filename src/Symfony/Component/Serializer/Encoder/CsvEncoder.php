@@ -54,6 +54,10 @@ class CsvEncoder implements EncoderInterface, DecoderInterface
     public function __construct(array $defaultContext = [])
     {
         $this->defaultContext = array_merge($this->defaultContext, $defaultContext);
+
+        if ('' !== $this->defaultContext[self::ESCAPE_CHAR_KEY]) {
+            trigger_deprecation('symfony/serializer', '7.2', 'Setting the "csv_escape_char" option to a non-empty string is deprecated. The option will be removed in Symfony 8.0.');
+        }
     }
 
     public function encode(mixed $data, string $format, array $context = []): string

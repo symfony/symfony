@@ -5,6 +5,7 @@ CHANGELOG
 ---
 
  * Add `lint:translations` command
+ * Deprecate passing an escape character to `CsvFileLoader::setCsvControl()`
 
 7.1
 ---

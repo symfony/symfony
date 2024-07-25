@@ -1,0 +1,36 @@
+---------------------------------------------------------------------------
+
+by chalasr at 2024-06-27T23:11:18Z
+
+The duration and laziness info feel less readable/structured to me. Looks good apart from that
+
+---------------------------------------------------------------------------
+
+by MatTheCat at 2024-07-12T19:05:53Z
+
+Okay tried to iterate on my previous idea (code not pushed yet):
+
+![](https://github.com/user-attachments/assets/1e26c720-ee19-44a2-8695-7d5e46851d38)
+
+Does that look better?
+
+---------------------------------------------------------------------------
+
+by MatTheCat at 2024-07-13T15:24:58Z
+
+Pushed previously mentioned iteration with small modifications. Updated the PR description accordingly.
+
+---------------------------------------------------------------------------
+
+by MatTheCat at 2024-07-13T16:16:42Z
+
+Yay :grinning:
+
+By “flag”, do you mean “icon”?
+I replaced these by text because I felt the sense of good/bad they carry did not fit with authenticators’ data (e.g. it is not “good” if one is lazy, as it is not “bad” if it isn’t).
+
+---------------------------------------------------------------------------
+
+by chalasr at 2024-07-13T16:29:32Z
+
+Makes sense 👍

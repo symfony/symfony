@@ -58,13 +58,10 @@ final class StringTypeResolver implements TypeResolverInterface
      */
     private static array $classExistCache = [];
 
-    private readonly Lexer $lexer;
-    private readonly TypeParser $parser;
-
-    public function __construct()
-    {
-        $this->lexer = new Lexer();
-        $this->parser = new TypeParser(new ConstExprParser());
+    public function __construct(
+        private Lexer $lexer = new Lexer(),
+        private TypeParser $parser = new TypeParser(new ConstExprParser()),
+    ) {
     }
 
     public function resolve(mixed $subject, ?TypeContext $typeContext = null): Type

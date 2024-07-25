@@ -24,6 +24,11 @@ use Symfony\Component\String\Inflector\EnglishInflector;
 use Symfony\Component\String\Inflector\InflectorInterface;
 use Symfony\Component\TypeInfo\Exception\UnsupportedException;
 use Symfony\Component\TypeInfo\Type;
+use Symfony\Component\TypeInfo\TypeContext\TypeContextFactory;
+use Symfony\Component\TypeInfo\TypeResolver\ReflectionParameterTypeResolver;
+use Symfony\Component\TypeInfo\TypeResolver\ReflectionPropertyTypeResolver;
+use Symfony\Component\TypeInfo\TypeResolver\ReflectionReturnTypeResolver;
+use Symfony\Component\TypeInfo\TypeResolver\ReflectionTypeResolver;
 use Symfony\Component\TypeInfo\Type\CollectionType;
 use Symfony\Component\TypeInfo\TypeIdentifier;
 use Symfony\Component\TypeInfo\TypeResolver\TypeResolver;
@@ -102,7 +107,14 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
         $this->methodReflectionFlags = $this->getMethodsFlags($accessFlags);
         $this->propertyReflectionFlags = $this->getPropertyFlags($accessFlags);
         $this->inflector = $inflector ?? new EnglishInflector();
-        $this->typeResolver = TypeResolver::create();
+
+        $typeContextFactory = new TypeContextFactory();
+        $this->typeResolver = TypeResolver::create([
+            \ReflectionType::class => $reflectionTypeResolver = new ReflectionTypeResolver(),
+            \ReflectionParameter::class => new ReflectionParameterTypeResolver($reflectionTypeResolver, $typeContextFactory),
+            \ReflectionProperty::class => new ReflectionPropertyTypeResolver($reflectionTypeResolver, $typeContextFactory),
+            \ReflectionFunctionAbstract::class => new ReflectionReturnTypeResolver($reflectionTypeResolver, $typeContextFactory),
+        ]);
 
         $this->arrayMutatorPrefixesFirst = array_merge($this->arrayMutatorPrefixes, array_diff($this->mutatorPrefixes, $this->arrayMutatorPrefixes));
         $this->arrayMutatorPrefixesLast = array_reverse($this->arrayMutatorPrefixesFirst);

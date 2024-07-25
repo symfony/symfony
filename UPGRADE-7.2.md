@@ -25,7 +25,7 @@ String
  * `truncate` method now also accept `TruncateMode` enum instead of a boolean:
    * `TruncateMode::Char` is equivalent to `true` value ;
    * `TruncateMode::WordAfter` is equivalent to `false` value ;
-   * `TruncateMode::Word` is a new mode that will cut the sentence on the last word before the limit is reached.
+   * `TruncateMode::WordBefore` is a new mode that will cut the sentence on the last word before the limit is reached.
 
 Yaml
 ----

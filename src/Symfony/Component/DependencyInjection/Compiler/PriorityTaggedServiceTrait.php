@@ -133,6 +133,10 @@ class PriorityTaggedServiceUtil
             return null;
         }
 
+        if ($r->isInterface()) {
+            return null;
+        }
+
         if (null !== $indexAttribute) {
             $service = $class !== $serviceId ? sprintf('service "%s"', $serviceId) : 'on the corresponding service';
             $message = [sprintf('Either method "%s::%s()" should ', $class, $defaultMethod), sprintf(' or tag "%s" on %s is missing attribute "%s".', $tagName, $service, $indexAttribute)];

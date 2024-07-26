@@ -27,7 +27,7 @@ use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\Exception\LogoutException;
 use Symfony\Component\Security\Http\Authorization\AccessDeniedHandlerInterface;
 use Symfony\Component\Security\Http\Authorization\NotFullFledgedHandlerInterface;
-use Symfony\Component\Security\Http\Authorization\SameAsNotFullFledgedHandle;
+use Symfony\Component\Security\Http\Authorization\SameAsNotFullFledgedHandler;
 use Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface;
 use Symfony\Component\Security\Http\Firewall\ExceptionListener;
 use Symfony\Component\Security\Http\HttpUtils;
@@ -267,7 +267,7 @@ class ExceptionListenerTest extends TestCase
         return new ExceptionEvent($kernel, Request::create('/'), HttpKernelInterface::MAIN_REQUEST, $exception);
     }
 
-    private function createExceptionListener(?TokenStorageInterface $tokenStorage = null, ?AuthenticationTrustResolverInterface $trustResolver = null, ?HttpUtils $httpUtils = null, ?AuthenticationEntryPointInterface $authenticationEntryPoint = null, $errorPage = null, ?AccessDeniedHandlerInterface $accessDeniedHandler = null, ?NotFullFledgedHandlerInterface $notFullFledgedHandle = null)
+    private function createExceptionListener(?TokenStorageInterface $tokenStorage = null, ?AuthenticationTrustResolverInterface $trustResolver = null, ?HttpUtils $httpUtils = null, ?AuthenticationEntryPointInterface $authenticationEntryPoint = null, $errorPage = null, ?AccessDeniedHandlerInterface $accessDeniedHandler = null, ?NotFullFledgedHandlerInterface $notFullFledgedHandler = null)
     {
         return new ExceptionListener(
             $tokenStorage ?? $this->createMock(TokenStorageInterface::class),
@@ -279,15 +279,15 @@ class ExceptionListenerTest extends TestCase
             $accessDeniedHandler,
             null,
             false,
-            $notFullFledgedHandle,
+            $notFullFledgedHandler,
         );
     }
 
     private function createNotFullFledgedHandler(?Response $response = null)
     {
-        $entryPoint = $this->createMock(NotFullFledgedHandlerInterface::class);
-        $entryPoint->method('handle')->willReturn($response);
+        $handler = $this->createMock(NotFullFledgedHandlerInterface::class);
+        $handler->method('handle')->willReturn($response);
 
-        return $entryPoint;
+        return $handler;
     }
 }

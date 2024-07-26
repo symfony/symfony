@@ -43,7 +43,7 @@ use Symfony\Component\Security\Core\User\InMemoryUserProvider;
 use Symfony\Component\Security\Core\User\MissingUserProvider;
 use Symfony\Component\Security\Core\Validator\Constraints\UserPasswordValidator;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
-use Symfony\Component\Security\Http\Authorization\SameAsNotFullFledgedHandle;
+use Symfony\Component\Security\Http\Authorization\SameAsNotFullFledgedHandler;
 use Symfony\Component\Security\Http\Controller\SecurityTokenValueResolver;
 use Symfony\Component\Security\Http\Controller\UserValueResolver;
 use Symfony\Component\Security\Http\EventListener\IsGrantedAttributeListener;
@@ -316,6 +316,6 @@ return static function (ContainerConfigurator $container) {
             ->parent('cache.system')
             ->tag('cache.pool')
 
-        ->set('security.same_as_not_full_fledged_handle', SameAsNotFullFledgedHandle::class)
+        ->set('security.same_as_not_full_fledged_handle', SameAsNotFullFledgedHandler::class)
     ;
 };

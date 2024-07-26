@@ -19,13 +19,13 @@ use Symfony\Component\Security\Core\Authorization\Voter\AuthenticatedVoter;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 /**
- * This is a basic NotFullFledgedHandle
+ * This is a basic NotFullFledgedHandler
  * If IS_AUTHENTICATED_FULLY is in access denied Exception Attrribute, behavior will be as before,
  * Otherwise The original AccessDeniedException is throw
  *
  * @author Roman JOLY <eltharin18@outlook.fr>
  */
-class SameAsNotFullFledgedHandle implements NotFullFledgedHandlerInterface
+class SameAsNotFullFledgedHandler implements NotFullFledgedHandlerInterface
 {
     public function handle(Request $request, AccessDeniedException $accessDeniedException, AuthenticationTrustResolverInterface $trustResolver, ?TokenInterface $token, callable $reauthenticateResponse): ?Response
     {

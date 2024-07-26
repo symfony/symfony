@@ -33,7 +33,6 @@ use Symfony\Component\PropertyInfo\Tests\Fixtures\Php82Dummy;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\SnakeCaseDummy;
 use Symfony\Component\PropertyInfo\Type as LegacyType;
 use Symfony\Component\TypeInfo\Type;
-use Symfony\Component\TypeInfo\TypeResolver\PhpDocAwareReflectionTypeResolver;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
@@ -698,9 +697,9 @@ class ReflectionExtractorTest extends TestCase
      */
     public static function typesProvider(): iterable
     {
-        yield ['a', class_exists(PhpDocAwareReflectionTypeResolver::class) ? Type::int() : null];
+        yield ['a', null];
         yield ['b', Type::nullable(Type::object(ParentDummy::class))];
-        yield ['e', class_exists(PhpDocAwareReflectionTypeResolver::class) ? Type::list(Type::resource()) : null];
+        yield ['e', null];
         yield ['f', Type::list(Type::object(\DateTimeImmutable::class))];
         yield ['donotexist', null];
         yield ['staticGetter', null];
@@ -883,8 +882,8 @@ class ReflectionExtractorTest extends TestCase
     public static function extractConstructorTypesProvider(): iterable
     {
         yield ['timezone', Type::object(\DateTimeZone::class)];
-        yield ['date', class_exists(PhpDocAwareReflectionTypeResolver::class) ? Type::int() : null];
-        yield ['dateObject', class_exists(PhpDocAwareReflectionTypeResolver::class) ? Type::object(\DateTimeInterface::class) : null];
+        yield ['date', null];
+        yield ['dateObject', null];
         yield ['dateTime', Type::object(\DateTimeImmutable::class)];
         yield ['ddd', null];
     }

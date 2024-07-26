@@ -179,7 +179,8 @@ class XmlFileLoader extends FileLoader
                         }
                         $excludes = [$service->getAttribute('exclude')];
                     }
-                    $this->registerClasses($definition, (string) $service->getAttribute('namespace'), (string) $service->getAttribute('resource'), $excludes, $file);
+                    $onlyWithServiceAttribute = XmlUtils::phpize($service->getAttribute('onlyWithServiceAttribute'));
+                    $this->registerClasses($definition, (string) $service->getAttribute('namespace'), (string) $service->getAttribute('resource'), $excludes, $file, $onlyWithServiceAttribute);
                 } else {
                     $this->setDefinition((string) $service->getAttribute('id'), $definition);
                 }

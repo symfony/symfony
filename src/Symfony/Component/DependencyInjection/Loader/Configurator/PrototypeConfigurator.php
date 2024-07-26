@@ -40,6 +40,8 @@ class PrototypeConfigurator extends AbstractServiceConfigurator
 
     private ?array $excludes = null;
 
+    private bool $onlyWithServiceAttribute = false;
+
     public function __construct(
         ServicesConfigurator $parent,
         private PhpFileLoader $loader,
@@ -67,9 +69,16 @@ class PrototypeConfigurator extends AbstractServiceConfigurator
         parent::__destruct();
 
         if (isset($this->loader)) {
-            $this->loader->registerClasses($this->definition, $this->id, $this->resource, $this->excludes, $this->path);
+            $this->loader->registerClasses($this->definition, $this->id, $this->resource, $this->excludes, $this->path, $this->onlyWithServiceAttribute);
         }
         unset($this->loader);
+    }
+
+    public function onlyWithServiceAttribute(bool $onlyWithServiceAttribute = true): static
+    {
+        $this->onlyWithServiceAttribute = $onlyWithServiceAttribute;
+
+        return $this;
     }
 
     /**

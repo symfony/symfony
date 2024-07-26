@@ -7,6 +7,7 @@
           <exclude>../Prototype/BadAttributes</exclude>
           <exclude>../Prototype/SinglyImplementedInterface</exclude>
           <exclude>../Prototype/StaticConstructor</exclude>
+          <exclude>../Prototype/ServiceAttributes</exclude>
           <exclude> </exclude>
       </prototype>
   </services>

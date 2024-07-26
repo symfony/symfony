@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+7.2
+---
+
+* Explicitly add service definitions with a new `Service` attribute
+
 7.1
 ---
 

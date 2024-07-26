@@ -20,6 +20,7 @@ use Symfony\Component\Config\Resource\GlobResource;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\Attribute\AsAlias;
 use Symfony\Component\DependencyInjection\Attribute\Exclude;
+use Symfony\Component\DependencyInjection\Attribute\Service;
 use Symfony\Component\DependencyInjection\Attribute\When;
 use Symfony\Component\DependencyInjection\Attribute\WhenNot;
 use Symfony\Component\DependencyInjection\ChildDefinition;
@@ -100,13 +101,14 @@ abstract class FileLoader extends BaseFileLoader
     /**
      * Registers a set of classes as services using PSR-4 for discovery.
      *
-     * @param Definition           $prototype A definition to use as template
-     * @param string               $namespace The namespace prefix of classes in the scanned directory
-     * @param string               $resource  The directory to look for classes, glob-patterns allowed
-     * @param string|string[]|null $exclude   A globbed path of files to exclude or an array of globbed paths of files to exclude
-     * @param string|null          $source    The path to the file that defines the auto-discovery rule
+     * @param Definition           $prototype                A definition to use as template
+     * @param string               $namespace                The namespace prefix of classes in the scanned directory
+     * @param string               $resource                 The directory to look for classes, glob-patterns allowed
+     * @param string|string[]|null $exclude                  A globbed path of files to exclude or an array of globbed paths of files to exclude
+     * @param string|null          $source                   The path to the file that defines the auto-discovery rule
+     * @param bool|null            $onlyWithServiceAttribute Whether to include only classes with the service attribute
      */
-    public function registerClasses(Definition $prototype, string $namespace, string $resource, string|array|null $exclude = null, ?string $source = null): void
+    public function registerClasses(Definition $prototype, string $namespace, string $resource, string|array|null $exclude = null, ?string $source = null, ?bool $onlyWithServiceAttribute = null): void
     {
         if (!str_ends_with($namespace, '\\')) {
             throw new InvalidArgumentException(\sprintf('Namespace prefix must end with a "\\": "%s".', $namespace));
@@ -154,13 +156,18 @@ abstract class FileLoader extends BaseFileLoader
                     $this->addContainerExcludedTag($class, $source);
                     continue;
                 }
+                if ($onlyWithServiceAttribute && !($r->getAttributes(Service::class)[0] ?? null)) {
+                    $this->addContainerExcludedTag($class, $source);
+                    continue;
+                }
+
                 if ($this->env) {
                     $excluded = true;
                     $whenAttributes = $r->getAttributes(When::class, \ReflectionAttribute::IS_INSTANCEOF);
                     $notWhenAttributes = $r->getAttributes(WhenNot::class, \ReflectionAttribute::IS_INSTANCEOF);
 
                     if ($whenAttributes && $notWhenAttributes) {
-                        throw new LogicException(sprintf('The "%s" class cannot have both #[When] and #[WhenNot] attributes.', $class));
+                        throw new LogicException(\sprintf('The "%s" class cannot have both #[When] and #[WhenNot] attributes.', $class));
                     }
 
                     if (!$whenAttributes && !$notWhenAttributes) {

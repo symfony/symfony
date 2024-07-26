@@ -1,0 +1,6 @@
+services:
+    Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype\:
+        resource: ../Prototype
+        exclude: '../Prototype/{BadClasses,BadAttributes}'
+        onlyWithServiceAttribute: true
+        autoconfigure: true

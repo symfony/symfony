@@ -212,6 +212,7 @@
     <xsd:attribute name="autowire" type="boolean" />
     <xsd:attribute name="autoconfigure" type="boolean" />
     <xsd:attribute name="constructor" type="xsd:string" />
+    <xsd:attribute name="onlyWithServiceAttribute" type="boolean" />
   </xsd:complexType>
 
   <xsd:complexType name="stack">

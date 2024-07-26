@@ -98,13 +98,13 @@ final class CompleteCommand extends Command
                 '',
                 '<comment>'.date('Y-m-d H:i:s').'</>',
                 '<info>Input:</> <comment>("|" indicates the cursor position)</>',
-                '  '.(string) $completionInput,
+                '  '.$completionInput,
                 '<info>Command:</>',
-                '  '.(string) implode(' ', $_SERVER['argv']),
+                '  '.implode(' ', $_SERVER['argv']),
                 '<info>Messages:</>',
             ]);
 
-            $command = $this->findCommand($completionInput, $output);
+            $command = $this->findCommand($completionInput);
             if (null === $command) {
                 $this->log('  No command found, completing using the Application class.');
 
@@ -185,7 +185,7 @@ final class CompleteCommand extends Command
         return $completionInput;
     }
 
-    private function findCommand(CompletionInput $completionInput, OutputInterface $output): ?Command
+    private function findCommand(CompletionInput $completionInput): ?Command
     {
         try {
             $inputName = $completionInput->getFirstArgument();

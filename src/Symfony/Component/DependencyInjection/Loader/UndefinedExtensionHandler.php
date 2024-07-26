@@ -39,8 +39,6 @@ class UndefinedExtensionHandler
             default => \sprintf('There is no extension able to load the configuration for "%s". ', $extensionName),
         };
 
-        $message .= \sprintf('Looked for namespace "%s", found "%s".', $namespaceOrAlias, $foundExtensionNamespaces ? implode('", "', $foundExtensionNamespaces) : 'none');
-
-        return $message;
+        return $message.\sprintf('Looked for namespace "%s", found "%s".', $namespaceOrAlias, $foundExtensionNamespaces ? implode('", "', $foundExtensionNamespaces) : 'none');
     }
 }

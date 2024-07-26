@@ -498,7 +498,7 @@ class FrameworkExtension extends Extension
             if (!$messengerEnabled) {
                 throw new LogicException('Scheduler support cannot be enabled as the Messenger component is not '.(interface_exists(MessageBusInterface::class) ? 'enabled.' : 'installed. Try running "composer require symfony/messenger".'));
             }
-            $this->registerSchedulerConfiguration($config['scheduler'], $container, $loader);
+            $this->registerSchedulerConfiguration($container, $loader);
         } else {
             $container->removeDefinition('cache.scheduler');
             $container->removeDefinition('console.command.scheduler_debug');
@@ -570,7 +570,7 @@ class FrameworkExtension extends Extension
         }
 
         if ($this->readConfigEnabled('remote-event', $container, $config['remote-event'])) {
-            $this->registerRemoteEventConfiguration($config['remote-event'], $container, $loader);
+            $this->registerRemoteEventConfiguration($loader);
         }
 
         if ($this->readConfigEnabled('html_sanitizer', $container, $config['html_sanitizer'])) {
@@ -2073,7 +2073,7 @@ class FrameworkExtension extends Extension
         }
     }
 
-    private function registerSchedulerConfiguration(array $config, ContainerBuilder $container, PhpFileLoader $loader): void
+    private function registerSchedulerConfiguration(ContainerBuilder $container, PhpFileLoader $loader): void
     {
         if (!class_exists(SchedulerTransportFactory::class)) {
             throw new LogicException('Scheduler support cannot be enabled as the Scheduler component is not installed. Try running "composer require symfony/scheduler".');
@@ -2940,7 +2940,7 @@ class FrameworkExtension extends Extension
         $controller->replaceArgument(1, new Reference($config['message_bus']));
     }
 
-    private function registerRemoteEventConfiguration(array $config, ContainerBuilder $container, PhpFileLoader $loader): void
+    private function registerRemoteEventConfiguration(PhpFileLoader $loader): void
     {
         if (!class_exists(RemoteEvent::class)) {
             throw new LogicException('RemoteEvent support cannot be enabled as the component is not installed. Try running "composer require symfony/remote-event".');

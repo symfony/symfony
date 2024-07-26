@@ -186,7 +186,7 @@ abstract class AbstractTagAwareAdapter implements TagAwareAdapterInterface, TagA
                 $e = $this->doSave($values, $lifetime, $addTagData, $removeTagData);
             } catch (\Exception $e) {
             }
-            if (true === $e || [] === $e) {
+            if ([] === $e) {
                 continue;
             }
             if (\is_array($e) || 1 === \count($values)) {
@@ -213,7 +213,7 @@ abstract class AbstractTagAwareAdapter implements TagAwareAdapterInterface, TagA
                     $e = $this->doSave($values, $lifetime, $addTagData, $removeTagData);
                 } catch (\Exception $e) {
                 }
-                if (true === $e || [] === $e) {
+                if ([] === $e) {
                     continue;
                 }
                 $ok = false;

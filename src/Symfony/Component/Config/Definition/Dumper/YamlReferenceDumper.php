@@ -193,7 +193,6 @@ class YamlReferenceDumper
             } else {
                 $val = $value;
             }
-            $prefix = $asComment ? '# ' : '';
 
             $prefix = $asComment ? '# ' : '';
 

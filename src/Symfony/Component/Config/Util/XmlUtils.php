@@ -80,7 +80,7 @@ class XmlUtils
                     $valid = false;
                 }
             } elseif (is_file($schemaOrCallable)) {
-                $schemaSource = (new Filesystem())->readFile((string) $schemaOrCallable);
+                $schemaSource = (new Filesystem())->readFile($schemaOrCallable);
                 $valid = @$dom->schemaValidateSource($schemaSource);
             } else {
                 libxml_use_internal_errors($internalErrors);
@@ -156,7 +156,7 @@ class XmlUtils
      */
     public static function convertDomElementToArray(\DOMElement $element, bool $checkPrefix = true): mixed
     {
-        $prefix = (string) $element->prefix;
+        $prefix = $element->prefix;
         $empty = true;
         $config = [];
         foreach ($element->attributes as $name => $node) {
@@ -174,7 +174,7 @@ class XmlUtils
                     $nodeValue = trim($node->nodeValue);
                     $empty = false;
                 }
-            } elseif ($checkPrefix && $prefix != (string) $node->prefix) {
+            } elseif ($checkPrefix && $prefix != $node->prefix) {
                 continue;
             } elseif (!$node instanceof \DOMComment) {
                 $value = static::convertDomElementToArray($node, $checkPrefix);

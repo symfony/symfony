@@ -217,10 +217,8 @@ class PrototypedArrayNode extends ArrayNode
                             $valuePrototype = current($this->valuePrototypes) ?: clone $children['value'];
                             $valuePrototype->parent = $this;
                             $originalClosures = $this->prototype->normalizationClosures;
-                            if (\is_array($originalClosures)) {
-                                $valuePrototypeClosures = $valuePrototype->normalizationClosures;
-                                $valuePrototype->normalizationClosures = \is_array($valuePrototypeClosures) ? array_merge($originalClosures, $valuePrototypeClosures) : $originalClosures;
-                            }
+                            $valuePrototypeClosures = $valuePrototype->normalizationClosures;
+                            $valuePrototype->normalizationClosures = \is_array($valuePrototypeClosures) ? array_merge($originalClosures, $valuePrototypeClosures) : $originalClosures;
                             $this->valuePrototypes[$k] = $valuePrototype;
                         }
                     }

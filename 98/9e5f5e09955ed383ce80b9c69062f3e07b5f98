@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2024-07-23T12:37:33Z
+
+Again it cannot be changed in `ExceptionCaster` but I think it's OK to keep it like this given that the `E_STRICT` plain string remains. No chances to forget about it the day it's removed from the codebase.

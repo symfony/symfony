@@ -574,6 +574,8 @@ class ConfigurationTest extends TestCase
         $config = $processor->processConfiguration(new Configuration(true), [
             [
                 'http_method_override' => false,
+                'handle_all_throwables' => true,
+                'php_errors' => ['log' => true],
                 'serializer' => [
                     'default_context' => [
                         'foo' => 'bar',
@@ -591,6 +593,8 @@ class ConfigurationTest extends TestCase
         $config = $processor->processConfiguration(new Configuration(true), [
             [
                 'http_method_override' => false,
+                'handle_all_throwables' => true,
+                'php_errors' => ['log' => true],
                 'serializer' => [
                     'default_context' => [
                         'foo' => 'bar',
@@ -609,6 +613,8 @@ class ConfigurationTest extends TestCase
         $config = $processor->processConfiguration(new Configuration(true), [
             [
                 'http_method_override' => false,
+                'handle_all_throwables' => true,
+                'php_errors' => ['log' => true],
                 'serializer' => [
                     'default_context' => [
                         'foo' => 'bar',

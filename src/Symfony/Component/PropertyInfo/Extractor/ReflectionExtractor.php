@@ -202,7 +202,7 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
                 $type = $this->typeResolver->resolve($mutatorReflection->getParameters()[0]);
 
                 if (!$type instanceof CollectionType && \in_array($prefix, $this->arrayMutatorPrefixes, true)) {
-                    $type = Type::list($type);
+                    $type = $this->isNullableProperty($class, $property) ? Type::nullable(Type::list($type)) : Type::list($type);
                 }
 
                 return $type;

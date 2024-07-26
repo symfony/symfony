@@ -77,6 +77,7 @@ class ReflectionExtractorTest extends TestCase
                 'listOfStrings',
                 'parentAnnotation',
                 'genericInterface',
+                'nullableTypedCollection',
                 'foo',
                 'foo2',
                 'foo3',
@@ -144,6 +145,7 @@ class ReflectionExtractorTest extends TestCase
                 'listOfStrings',
                 'parentAnnotation',
                 'genericInterface',
+                'nullableTypedCollection',
                 'foo',
                 'foo2',
                 'foo3',
@@ -200,6 +202,7 @@ class ReflectionExtractorTest extends TestCase
                 'listOfStrings',
                 'parentAnnotation',
                 'genericInterface',
+                'nullableTypedCollection',
                 'foo',
                 'foo2',
                 'foo3',
@@ -867,6 +870,7 @@ class ReflectionExtractorTest extends TestCase
         $this->assertEquals(Type::list(Type::string()), $this->extractor->getType(Php74Dummy::class, 'stringCollection'));
         $this->assertEquals(Type::nullable(Type::int()), $this->extractor->getType(Php74Dummy::class, 'nullableWithDefault'));
         $this->assertEquals(Type::array(), $this->extractor->getType(Php74Dummy::class, 'collection'));
+        $this->assertEquals(Type::nullable(Type::list(Type::object(Dummy::class))), $this->extractor->getType(Php74Dummy::class, 'nullableTypedCollection'));
     }
 
     /**

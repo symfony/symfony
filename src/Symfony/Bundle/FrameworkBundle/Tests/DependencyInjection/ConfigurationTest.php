@@ -572,6 +572,7 @@ class ConfigurationTest extends TestCase
         $processor = new Processor();
         $config = $processor->processConfiguration(new Configuration(true), [
             [
+                'http_method_override' => false,
                 'serializer' => [
                     'default_context' => [
                         'foo' => 'bar',
@@ -588,6 +589,7 @@ class ConfigurationTest extends TestCase
         $processor = new Processor();
         $config = $processor->processConfiguration(new Configuration(true), [
             [
+                'http_method_override' => false,
                 'serializer' => [
                     'default_context' => [
                         'foo' => 'bar',
@@ -605,6 +607,7 @@ class ConfigurationTest extends TestCase
         $processor = new Processor();
         $config = $processor->processConfiguration(new Configuration(true), [
             [
+                'http_method_override' => false,
                 'serializer' => [
                     'default_context' => [
                         'foo' => 'bar',

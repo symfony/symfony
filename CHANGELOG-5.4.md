@@ -7,6 +7,26 @@ in 5.4 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v5.4.0...v5.4.1
 
+* 5.4.42 (2024-07-26)
+
+ * bug #57815 [Console][PhpUnitBridge][VarDumper] Fix `NO_COLOR` empty value handling (alexandre-daubois)
+ * bug #57828 [Translation] Fix CSV escape char in `CsvFileLoader` on PHP >= 7.4 (alexandre-daubois)
+ * bug #57812 [Validator] treat uninitialized properties referenced by property paths as null (xabbuh)
+ * bug #57816 [DoctrineBridge] fix messenger bus dispatch inside an active transaction (IndraGunawan)
+ * bug #57799 [ErrorHandler][VarDumper] Remove PHP 8.4 deprecations (alexandre-daubois)
+ * bug #57802 [PropertyInfo] Fix nullable value returned from extractFromMutator on CollectionType (benjilebon)
+ * bug #57832 [DependencyInjection] Do not try to load default method name on interface (lyrixx)
+ * bug #57753 [ErrorHandler] restrict the maximum length of the X-Debug-Exception header (xabbuh)
+ * bug #57674 [Cache] Improve `dbindex` DSN parameter parsing (constantable)
+ * bug #57663 [Cache] use copy() instead of rename() on Windows (xabbuh)
+ * bug #57617 [PropertyInfo] Handle collection in PhpStan same as PhpDoc (mtarld)
+ * bug #54057 [Messenger] Passing actual `Envelope` to `WorkerMessageRetriedEvent`  (daffoxdev)
+ * bug #57645 [Routing] Discard in-memory cache of routes when writing the file-based cache (mpdude)
+ * bug #57621 [Mailer]  force HTTP 1.1 for Mailgun API requests (xabbuh)
+ * bug #57616 [String] Revert "Fixed u()->snake(), b()->snake() and s()->snake() methods" (nicolas-grekas)
+ * bug #57594 [String] Normalize underscores in snake() (xabbuh)
+ * bug #57585 [HttpFoundation] Fix MockArraySessionStorage to generate more conform ids (Seldaek)
+
 * 5.4.41 (2024-06-28)
 
  * bug #57497 [String] Fixed u()->snake(), b()->snake() and s()->snake() methods (arczinosek)

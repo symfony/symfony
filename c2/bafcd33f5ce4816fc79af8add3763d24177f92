@@ -1,0 +1,36 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2024-07-22T09:31:58Z
+
+Hey!
+
+Thanks for your PR. You are targeting branch "7.1" but it seems your PR description refers to branch "7.1 for bug fixes".
+Could you update the PR description or change target branch? This helps core maintainers a lot.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2024-07-22T09:39:18Z
+
+Maybe we should backport #57694. In tests we don't use version 4 of web-token/jwt-library, but since we don't have a conflict rule for it consumers of symfony/security-http can use it and run into the issue this PR is going to fix.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-07-23T08:04:45Z
+
+Better back port than conflict to me also.
+
+---------------------------------------------------------------------------
+
+by thibaut22200 at 2024-07-24T13:19:08Z
+
+Backport commit done @xabbuh @nicolas-grekas
+
+---------------------------------------------------------------------------
+
+by thibaut22200 at 2024-07-25T08:53:01Z
+
+Oops, fixed @xabbuh

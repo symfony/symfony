@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+7.2
+---
+
+ * Allow specifying `prototype_name` option of `CollectionType` as a `callable`
+
 7.1
 ---
 

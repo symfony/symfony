@@ -538,7 +538,7 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
         $type = $this->extractFromReflectionType($reflectionType, $reflectionMethod->getDeclaringClass());
 
         if (1 === \count($type) && \in_array($prefix, $this->arrayMutatorPrefixes, true)) {
-            $type = [new LegacyType(LegacyType::BUILTIN_TYPE_ARRAY, false, null, true, new LegacyType(LegacyType::BUILTIN_TYPE_INT), $type[0])];
+            $type = [new LegacyType(LegacyType::BUILTIN_TYPE_ARRAY, $this->isNullableProperty($class, $property), null, true, new LegacyType(LegacyType::BUILTIN_TYPE_INT), $type[0])];
         }
 
         return $type;

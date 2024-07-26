@@ -33,6 +33,7 @@ use Symfony\Component\PropertyInfo\Tests\Fixtures\Php82Dummy;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\SnakeCaseDummy;
 use Symfony\Component\PropertyInfo\Type as LegacyType;
 use Symfony\Component\TypeInfo\Type;
+use Symfony\Component\TypeInfo\TypeResolver\PhpDocAwareReflectionTypeResolver;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
@@ -548,6 +549,7 @@ class ReflectionExtractorTest extends TestCase
         $this->assertEquals([new LegacyType(LegacyType::BUILTIN_TYPE_ARRAY, false, null, true, new LegacyType(LegacyType::BUILTIN_TYPE_INT), new LegacyType(LegacyType::BUILTIN_TYPE_STRING))], $this->extractor->getTypes(Php74Dummy::class, 'stringCollection'));
         $this->assertEquals([new LegacyType(LegacyType::BUILTIN_TYPE_INT, true)], $this->extractor->getTypes(Php74Dummy::class, 'nullableWithDefault'));
         $this->assertEquals([new LegacyType(LegacyType::BUILTIN_TYPE_ARRAY, false, null, true)], $this->extractor->getTypes(Php74Dummy::class, 'collection'));
+        $this->assertEquals([new LegacyType(LegacyType::BUILTIN_TYPE_ARRAY, true, null, true, new LegacyType(LegacyType::BUILTIN_TYPE_INT), new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, false, Dummy::class))], $this->extractor->getTypes(Php74Dummy::class, 'nullableTypedCollection'));
     }
 
     /**
@@ -696,9 +698,9 @@ class ReflectionExtractorTest extends TestCase
      */
     public static function typesProvider(): iterable
     {
-        yield ['a', null];
+        yield ['a', class_exists(PhpDocAwareReflectionTypeResolver::class) ? Type::int() : null];
         yield ['b', Type::nullable(Type::object(ParentDummy::class))];
-        yield ['e', null];
+        yield ['e', class_exists(PhpDocAwareReflectionTypeResolver::class) ? Type::list(Type::resource()) : null];
         yield ['f', Type::list(Type::object(\DateTimeImmutable::class))];
         yield ['donotexist', null];
         yield ['staticGetter', null];
@@ -881,8 +883,8 @@ class ReflectionExtractorTest extends TestCase
     public static function extractConstructorTypesProvider(): iterable
     {
         yield ['timezone', Type::object(\DateTimeZone::class)];
-        yield ['date', null];
-        yield ['dateObject', null];
+        yield ['date', class_exists(PhpDocAwareReflectionTypeResolver::class) ? Type::int() : null];
+        yield ['dateObject', class_exists(PhpDocAwareReflectionTypeResolver::class) ? Type::object(\DateTimeInterface::class) : null];
         yield ['dateTime', Type::object(\DateTimeImmutable::class)];
         yield ['ddd', null];
     }

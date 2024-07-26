@@ -611,7 +611,7 @@ class Filesystem
         // Loop until we create a valid temp file or have reached 10 attempts
         for ($i = 0; $i < 10; ++$i) {
             // Create a unique filename
-            $tmpFile = $dir.'/'.$prefix.uniqid(mt_rand(), true).$suffix;
+            $tmpFile = $dir.'/'.$prefix.bin2hex(random_bytes(4)).$suffix;
 
             // Use fopen instead of file_exists as some streams do not support stat
             // Use mode 'x+' to atomically check existence and create to avoid a TOCTOU vulnerability

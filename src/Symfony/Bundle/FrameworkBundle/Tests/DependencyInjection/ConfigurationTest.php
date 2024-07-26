@@ -13,6 +13,7 @@ namespace Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection;
 
 use Doctrine\DBAL\Connection;
 use PHPUnit\Framework\TestCase;
+use Seld\JsonLint\JsonParser;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Configuration;
 use Symfony\Bundle\FullStack;
 use Symfony\Component\Cache\Adapter\DoctrineAdapter;
@@ -564,6 +565,63 @@ class ConfigurationTest extends TestCase
                 'lock' => ['enabled' => true],
             ],
         ]);
+    }
+
+    public function testSerializerJsonDetailedErrorMessagesEnabledWhenDefaultContextIsConfigured()
+    {
+        $processor = new Processor();
+        $config = $processor->processConfiguration(new Configuration(true), [
+            [
+                'serializer' => [
+                    'default_context' => [
+                        'foo' => 'bar',
+                    ],
+                ],
+            ],
+        ]);
+
+        $this->assertSame(['foo' => 'bar', JsonDecode::DETAILED_ERROR_MESSAGES => true], $config['serializer']['default_context'] ?? []);
+    }
+
+    public function testSerializerJsonDetailedErrorMessagesInDefaultContextCanBeDisabled()
+    {
+        $processor = new Processor();
+        $config = $processor->processConfiguration(new Configuration(true), [
+            [
+                'serializer' => [
+                    'default_context' => [
+                        'foo' => 'bar',
+                        JsonDecode::DETAILED_ERROR_MESSAGES => false,
+                    ],
+                ],
+            ],
+        ]);
+
+        $this->assertSame(['foo' => 'bar', JsonDecode::DETAILED_ERROR_MESSAGES => false], $config['serializer']['default_context'] ?? []);
+    }
+
+    public function testSerializerJsonDetailedErrorMessagesInDefaultContextCanBeDisabledWithSeveralConfigsBeingMerged()
+    {
+        $processor = new Processor();
+        $config = $processor->processConfiguration(new Configuration(true), [
+            [
+                'serializer' => [
+                    'default_context' => [
+                        'foo' => 'bar',
+                        JsonDecode::DETAILED_ERROR_MESSAGES => false,
+                    ],
+                ],
+            ],
+            [
+                'serializer' => [
+                    'default_context' => [
+                        'foobar' => 'baz',
+                    ],
+                ],
+            ],
+        ]);
+
+        $this->assertSame(['foo' => 'bar', JsonDecode::DETAILED_ERROR_MESSAGES => false, 'foobar' => 'baz'], $config['serializer']['default_context'] ?? []);
     }
 
     protected static function getBundleDefaultConfig()

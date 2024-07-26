@@ -154,7 +154,7 @@ diff --git a/src/Symfony/Bridge/Doctrine/DependencyInjection/CompilerPass/Regist
 diff --git a/src/Symfony/Bridge/Doctrine/Form/DoctrineOrmTypeGuesser.php b/src/Symfony/Bridge/Doctrine/Form/DoctrineOrmTypeGuesser.php
 --- a/src/Symfony/Bridge/Doctrine/Form/DoctrineOrmTypeGuesser.php
 +++ b/src/Symfony/Bridge/Doctrine/Form/DoctrineOrmTypeGuesser.php
-@@ -160,5 +160,5 @@ class DoctrineOrmTypeGuesser implements FormTypeGuesserInterface
+@@ -164,5 +164,5 @@ class DoctrineOrmTypeGuesser implements FormTypeGuesserInterface
       * @return array{0:ClassMetadata<T>, 1:string}|null
       */
 -    protected function getMetadata(string $class)
@@ -653,7 +653,7 @@ diff --git a/src/Symfony/Bundle/FrameworkBundle/DependencyInjection/FrameworkExt
 +    public function load(array $configs, ContainerBuilder $container): void
      {
          $loader = new PhpFileLoader($container, new FileLocator(\dirname(__DIR__).'/Resources/config'));
-@@ -2995,5 +2995,5 @@ class FrameworkExtension extends Extension
+@@ -3007,5 +3007,5 @@ class FrameworkExtension extends Extension
       * @return void
       */
 -    public static function registerRateLimiter(ContainerBuilder $container, string $name, array $limiterConfig)
@@ -1339,14 +1339,14 @@ diff --git a/src/Symfony/Component/Cache/Adapter/PhpFilesAdapter.php b/src/Symfo
 diff --git a/src/Symfony/Component/Cache/Adapter/TagAwareAdapter.php b/src/Symfony/Component/Cache/Adapter/TagAwareAdapter.php
 --- a/src/Symfony/Component/Cache/Adapter/TagAwareAdapter.php
 +++ b/src/Symfony/Component/Cache/Adapter/TagAwareAdapter.php
-@@ -283,5 +283,5 @@ class TagAwareAdapter implements TagAwareAdapterInterface, TagAwareCacheInterfac
+@@ -287,5 +287,5 @@ class TagAwareAdapter implements TagAwareAdapterInterface, TagAwareCacheInterfac
       * @return void
       */
 -    public function reset()
 +    public function reset(): void
      {
          $this->commit();
-@@ -299,5 +299,5 @@ class TagAwareAdapter implements TagAwareAdapterInterface, TagAwareCacheInterfac
+@@ -303,5 +303,5 @@ class TagAwareAdapter implements TagAwareAdapterInterface, TagAwareCacheInterfac
       * @return void
       */
 -    public function __wakeup()
@@ -1464,7 +1464,7 @@ diff --git a/src/Symfony/Component/Cache/Traits/FilesystemCommonTrait.php b/src/
 +    protected function doUnlink(string $file): bool
      {
          return @unlink($file);
-@@ -176,5 +176,5 @@ trait FilesystemCommonTrait
+@@ -181,5 +181,5 @@ trait FilesystemCommonTrait
       * @return void
       */
 -    public function __wakeup()
@@ -1749,21 +1749,21 @@ diff --git a/src/Symfony/Component/Config/Definition/Dumper/XmlReferenceDumper.p
 diff --git a/src/Symfony/Component/Config/Definition/Dumper/YamlReferenceDumper.php b/src/Symfony/Component/Config/Definition/Dumper/YamlReferenceDumper.php
 --- a/src/Symfony/Component/Config/Definition/Dumper/YamlReferenceDumper.php
 +++ b/src/Symfony/Component/Config/Definition/Dumper/YamlReferenceDumper.php
-@@ -34,5 +34,5 @@ class YamlReferenceDumper
+@@ -33,5 +33,5 @@ class YamlReferenceDumper
       * @return string
       */
 -    public function dump(ConfigurationInterface $configuration)
 +    public function dump(ConfigurationInterface $configuration): string
      {
          return $this->dumpNode($configuration->getConfigTreeBuilder()->buildTree());
-@@ -42,5 +42,5 @@ class YamlReferenceDumper
+@@ -41,5 +41,5 @@ class YamlReferenceDumper
       * @return string
       */
 -    public function dumpAtPath(ConfigurationInterface $configuration, string $path)
 +    public function dumpAtPath(ConfigurationInterface $configuration, string $path): string
      {
          $rootNode = $node = $configuration->getConfigTreeBuilder()->buildTree();
-@@ -71,5 +71,5 @@ class YamlReferenceDumper
+@@ -70,5 +70,5 @@ class YamlReferenceDumper
       * @return string
       */
 -    public function dumpNode(NodeInterface $node)
@@ -5162,84 +5162,84 @@ diff --git a/src/Symfony/Component/Filesystem/Filesystem.php b/src/Symfony/Compo
 +    public function copy(string $originFile, string $targetFile, bool $overwriteNewerFiles = false): void
      {
          $originIsLocal = stream_is_local($originFile) || 0 === stripos($originFile, 'file://');
-@@ -89,5 +89,5 @@ class Filesystem
+@@ -92,5 +92,5 @@ class Filesystem
       * @throws IOException On any directory creation failure
       */
 -    public function mkdir(string|iterable $dirs, int $mode = 0777)
 +    public function mkdir(string|iterable $dirs, int $mode = 0777): void
      {
          foreach ($this->toIterable($dirs) as $dir) {
-@@ -132,5 +132,5 @@ class Filesystem
+@@ -135,5 +135,5 @@ class Filesystem
       * @throws IOException When touch fails
       */
 -    public function touch(string|iterable $files, ?int $time = null, ?int $atime = null)
 +    public function touch(string|iterable $files, ?int $time = null, ?int $atime = null): void
      {
          foreach ($this->toIterable($files) as $file) {
-@@ -148,5 +148,5 @@ class Filesystem
+@@ -151,5 +151,5 @@ class Filesystem
       * @throws IOException When removal fails
       */
 -    public function remove(string|iterable $files)
 +    public function remove(string|iterable $files): void
      {
          if ($files instanceof \Traversable) {
-@@ -216,5 +216,5 @@ class Filesystem
+@@ -219,5 +219,5 @@ class Filesystem
       * @throws IOException When the change fails
       */
 -    public function chmod(string|iterable $files, int $mode, int $umask = 0000, bool $recursive = false)
 +    public function chmod(string|iterable $files, int $mode, int $umask = 0000, bool $recursive = false): void
      {
          foreach ($this->toIterable($files) as $file) {
-@@ -238,5 +238,5 @@ class Filesystem
+@@ -241,5 +241,5 @@ class Filesystem
       * @throws IOException When the change fails
       */
 -    public function chown(string|iterable $files, string|int $user, bool $recursive = false)
 +    public function chown(string|iterable $files, string|int $user, bool $recursive = false): void
      {
          foreach ($this->toIterable($files) as $file) {
-@@ -266,5 +266,5 @@ class Filesystem
+@@ -269,5 +269,5 @@ class Filesystem
       * @throws IOException When the change fails
       */
 -    public function chgrp(string|iterable $files, string|int $group, bool $recursive = false)
 +    public function chgrp(string|iterable $files, string|int $group, bool $recursive = false): void
      {
          foreach ($this->toIterable($files) as $file) {
-@@ -292,5 +292,5 @@ class Filesystem
+@@ -295,5 +295,5 @@ class Filesystem
       * @throws IOException When origin cannot be renamed
       */
 -    public function rename(string $origin, string $target, bool $overwrite = false)
 +    public function rename(string $origin, string $target, bool $overwrite = false): void
      {
          // we check that target does not exist
-@@ -334,5 +334,5 @@ class Filesystem
+@@ -337,5 +337,5 @@ class Filesystem
       * @throws IOException When symlink fails
       */
 -    public function symlink(string $originDir, string $targetDir, bool $copyOnWindows = false)
 +    public function symlink(string $originDir, string $targetDir, bool $copyOnWindows = false): void
      {
          self::assertFunctionExists('symlink');
-@@ -373,5 +373,5 @@ class Filesystem
+@@ -376,5 +376,5 @@ class Filesystem
       * @throws IOException           When link fails, including if link already exists
       */
 -    public function hardlink(string $originFile, string|iterable $targetFiles)
 +    public function hardlink(string $originFile, string|iterable $targetFiles): void
      {
          self::assertFunctionExists('link');
-@@ -531,5 +531,5 @@ class Filesystem
+@@ -534,5 +534,5 @@ class Filesystem
       * @throws IOException When file type is unknown
       */
 -    public function mirror(string $originDir, string $targetDir, ?\Traversable $iterator = null, array $options = [])
 +    public function mirror(string $originDir, string $targetDir, ?\Traversable $iterator = null, array $options = []): void
      {
          $targetDir = rtrim($targetDir, '/\\');
-@@ -657,5 +657,5 @@ class Filesystem
+@@ -660,5 +660,5 @@ class Filesystem
       * @throws IOException if the file cannot be written to
       */
 -    public function dumpFile(string $filename, $content)
 +    public function dumpFile(string $filename, $content): void
      {
          if (\is_array($content)) {
-@@ -704,5 +704,5 @@ class Filesystem
+@@ -707,5 +707,5 @@ class Filesystem
       * @throws IOException If the file is not writable
       */
 -    public function appendToFile(string $filename, $content/* , bool $lock = false */)
@@ -8077,14 +8077,14 @@ diff --git a/src/Symfony/Component/HttpKernel/DataCollector/DataCollector.php b/
 +    protected function getCasters(): array
      {
          $casters = [
-@@ -86,5 +86,5 @@ abstract class DataCollector implements DataCollectorInterface
+@@ -98,5 +98,5 @@ abstract class DataCollector implements DataCollectorInterface
       * @return void
       */
 -    public function __wakeup()
 +    public function __wakeup(): void
      {
      }
-@@ -107,5 +107,5 @@ abstract class DataCollector implements DataCollectorInterface
+@@ -119,5 +119,5 @@ abstract class DataCollector implements DataCollectorInterface
       * @return void
       */
 -    public function reset()
@@ -8678,21 +8678,21 @@ diff --git a/src/Symfony/Component/HttpKernel/Kernel.php b/src/Symfony/Component
 +    protected function initializeContainer(): void
      {
          $class = $this->getContainerClass();
-@@ -618,5 +618,5 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
+@@ -626,5 +626,5 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
       * @return void
       */
 -    protected function prepareContainer(ContainerBuilder $container)
 +    protected function prepareContainer(ContainerBuilder $container): void
      {
          $extensions = [];
-@@ -671,5 +671,5 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
+@@ -679,5 +679,5 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
       * @return void
       */
 -    protected function dumpContainer(ConfigCache $cache, ContainerBuilder $container, string $class, string $baseClass)
 +    protected function dumpContainer(ConfigCache $cache, ContainerBuilder $container, string $class, string $baseClass): void
      {
          // cache the container
-@@ -849,5 +849,5 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
+@@ -857,5 +857,5 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
       * @return void
       */
 -    public function __wakeup()
@@ -9771,7 +9771,7 @@ diff --git a/src/Symfony/Component/Messenger/EventListener/SendFailedMessageToFa
 diff --git a/src/Symfony/Component/Messenger/Exception/ValidationFailedException.php b/src/Symfony/Component/Messenger/Exception/ValidationFailedException.php
 --- a/src/Symfony/Component/Messenger/Exception/ValidationFailedException.php
 +++ b/src/Symfony/Component/Messenger/Exception/ValidationFailedException.php
-@@ -33,5 +33,5 @@ class ValidationFailedException extends RuntimeException
+@@ -37,5 +37,5 @@ class ValidationFailedException extends RuntimeException implements EnvelopeAwar
       * @return object
       */
 -    public function getViolatingMessage()
@@ -9919,7 +9919,7 @@ diff --git a/src/Symfony/Component/Mime/Message.php b/src/Symfony/Component/Mime
 -    public function ensureValidity()
 +    public function ensureValidity(): void
      {
-         if (!$this->headers->has('To') && !$this->headers->has('Cc') && !$this->headers->has('Bcc')) {
+         if (!$this->headers->get('To')?->getBody() && !$this->headers->get('Cc')?->getBody() && !$this->headers->get('Bcc')?->getBody()) {
 diff --git a/src/Symfony/Component/Mime/Part/DataPart.php b/src/Symfony/Component/Mime/Part/DataPart.php
 --- a/src/Symfony/Component/Mime/Part/DataPart.php
 +++ b/src/Symfony/Component/Mime/Part/DataPart.php
@@ -9933,7 +9933,7 @@ diff --git a/src/Symfony/Component/Mime/Part/DataPart.php b/src/Symfony/Componen
 diff --git a/src/Symfony/Component/Mime/Part/TextPart.php b/src/Symfony/Component/Mime/Part/TextPart.php
 --- a/src/Symfony/Component/Mime/Part/TextPart.php
 +++ b/src/Symfony/Component/Mime/Part/TextPart.php
-@@ -236,5 +236,5 @@ class TextPart extends AbstractPart
+@@ -240,5 +240,5 @@ class TextPart extends AbstractPart
       * @return void
       */
 -    public function __wakeup()
@@ -9943,7 +9943,7 @@ diff --git a/src/Symfony/Component/Mime/Part/TextPart.php b/src/Symfony/Componen
 diff --git a/src/Symfony/Component/Mime/RawMessage.php b/src/Symfony/Component/Mime/RawMessage.php
 --- a/src/Symfony/Component/Mime/RawMessage.php
 +++ b/src/Symfony/Component/Mime/RawMessage.php
-@@ -76,5 +76,5 @@ class RawMessage
+@@ -97,5 +97,5 @@ class RawMessage
       * @throws LogicException if the message is not valid
       */
 -    public function ensureValidity()
@@ -10103,35 +10103,35 @@ diff --git a/src/Symfony/Component/Process/PhpProcess.php b/src/Symfony/Componen
 diff --git a/src/Symfony/Component/Process/Process.php b/src/Symfony/Component/Process/Process.php
 --- a/src/Symfony/Component/Process/Process.php
 +++ b/src/Symfony/Component/Process/Process.php
-@@ -203,5 +203,5 @@ class Process implements \IteratorAggregate
+@@ -204,5 +204,5 @@ class Process implements \IteratorAggregate
       * @return void
       */
 -    public function __wakeup()
 +    public function __wakeup(): void
      {
          throw new \BadMethodCallException('Cannot unserialize '.__CLASS__);
-@@ -294,5 +294,5 @@ class Process implements \IteratorAggregate
+@@ -295,5 +295,5 @@ class Process implements \IteratorAggregate
       * @throws LogicException   In case a callback is provided and output has been disabled
       */
 -    public function start(?callable $callback = null, array $env = [])
 +    public function start(?callable $callback = null, array $env = []): void
      {
          if ($this->isRunning()) {
-@@ -1145,5 +1145,5 @@ class Process implements \IteratorAggregate
+@@ -1146,5 +1146,5 @@ class Process implements \IteratorAggregate
       * @throws ProcessTimedOutException In case the timeout was reached
       */
 -    public function checkTimeout()
 +    public function checkTimeout(): void
      {
          if (self::STATUS_STARTED !== $this->status) {
-@@ -1186,5 +1186,5 @@ class Process implements \IteratorAggregate
+@@ -1187,5 +1187,5 @@ class Process implements \IteratorAggregate
       * @return void
       */
 -    public function setOptions(array $options)
 +    public function setOptions(array $options): void
      {
          if ($this->isRunning()) {
-@@ -1283,5 +1283,5 @@ class Process implements \IteratorAggregate
+@@ -1284,5 +1284,5 @@ class Process implements \IteratorAggregate
       * @return void
       */
 -    protected function updateStatus(bool $blocking)
@@ -10777,7 +10777,7 @@ diff --git a/src/Symfony/Component/Routing/Router.php b/src/Symfony/Component/Ro
 +    public function setConfigCacheFactory(ConfigCacheFactoryInterface $configCacheFactory): void
      {
          $this->configCacheFactory = $configCacheFactory;
-@@ -318,5 +318,5 @@ class Router implements RouterInterface, RequestMatcherInterface
+@@ -320,5 +320,5 @@ class Router implements RouterInterface, RequestMatcherInterface
       * @return void
       */
 -    public function addExpressionLanguageProvider(ExpressionFunctionProviderInterface $provider)
@@ -11544,43 +11544,43 @@ diff --git a/src/Symfony/Component/Serializer/Normalizer/AbstractObjectNormalize
 -    public function normalize(mixed $object, ?string $format = null, array $context = [])
 +    public function normalize(mixed $object, ?string $format = null, array $context = []): array|string|int|float|bool|\ArrayObject|null
      {
-         if (!isset($context['cache_key'])) {
-@@ -233,5 +233,5 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
+         $context['_read_attributes'] = true;
+@@ -235,5 +235,5 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
       * @return object
       */
 -    protected function instantiateObject(array &$data, string $class, array &$context, \ReflectionClass $reflectionClass, array|bool $allowedAttributes, ?string $format = null)
 +    protected function instantiateObject(array &$data, string $class, array &$context, \ReflectionClass $reflectionClass, array|bool $allowedAttributes, ?string $format = null): object
      {
          if ($class !== $mappedClass = $this->getMappedClass($data, $class, $context)) {
-@@ -284,5 +284,5 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
+@@ -286,5 +286,5 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
       * @return string[]
       */
 -    abstract protected function extractAttributes(object $object, ?string $format = null, array $context = []);
 +    abstract protected function extractAttributes(object $object, ?string $format = null, array $context = []): array;
  
      /**
-@@ -291,5 +291,5 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
+@@ -293,5 +293,5 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
       * @return mixed
       */
 -    abstract protected function getAttributeValue(object $object, string $attribute, ?string $format = null, array $context = []);
 +    abstract protected function getAttributeValue(object $object, string $attribute, ?string $format = null, array $context = []): mixed;
  
      /**
-@@ -298,5 +298,5 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
+@@ -300,5 +300,5 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
       * @return bool
       */
 -    public function supportsDenormalization(mixed $data, string $type, ?string $format = null /* , array $context = [] */)
 +    public function supportsDenormalization(mixed $data, string $type, ?string $format = null /* , array $context = [] */): bool
      {
          return class_exists($type) || (interface_exists($type, false) && null !== $this->classDiscriminatorResolver?->getMappingForClass($type));
-@@ -306,5 +306,5 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
+@@ -308,5 +308,5 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
       * @return mixed
       */
 -    public function denormalize(mixed $data, string $type, ?string $format = null, array $context = [])
 +    public function denormalize(mixed $data, string $type, ?string $format = null, array $context = []): mixed
      {
-         if (!isset($context['cache_key'])) {
-@@ -422,5 +422,5 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
+         $context['_read_attributes'] = false;
+@@ -430,5 +430,5 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
       * @return void
       */
 -    abstract protected function setAttributeValue(object $object, string $attribute, mixed $value, ?string $format = null, array $context = []);
@@ -11625,16 +11625,16 @@ diff --git a/src/Symfony/Component/Serializer/Normalizer/DenormalizerInterface.p
 diff --git a/src/Symfony/Component/Serializer/Normalizer/GetSetMethodNormalizer.php b/src/Symfony/Component/Serializer/Normalizer/GetSetMethodNormalizer.php
 --- a/src/Symfony/Component/Serializer/Normalizer/GetSetMethodNormalizer.php
 +++ b/src/Symfony/Component/Serializer/Normalizer/GetSetMethodNormalizer.php
-@@ -152,5 +152,5 @@ class GetSetMethodNormalizer extends AbstractObjectNormalizer
+@@ -166,5 +166,5 @@ class GetSetMethodNormalizer extends AbstractObjectNormalizer
       * @return void
       */
 -    protected function setAttributeValue(object $object, string $attribute, mixed $value, ?string $format = null, array $context = [])
 +    protected function setAttributeValue(object $object, string $attribute, mixed $value, ?string $format = null, array $context = []): void
      {
-         $setter = 'set'.ucfirst($attribute);
-@@ -182,5 +182,5 @@ class GetSetMethodNormalizer extends AbstractObjectNormalizer
+         $setter = 'set'.$attribute;
+@@ -180,5 +180,5 @@ class GetSetMethodNormalizer extends AbstractObjectNormalizer
      }
-
+ 
 -    protected function isAllowedAttribute($classOrObject, string $attribute, ?string $format = null, array $context = [])
 +    protected function isAllowedAttribute($classOrObject, string $attribute, ?string $format = null, array $context = []): bool
      {
@@ -11678,20 +11678,20 @@ diff --git a/src/Symfony/Component/Serializer/Normalizer/NormalizerInterface.php
 diff --git a/src/Symfony/Component/Serializer/Normalizer/ObjectNormalizer.php b/src/Symfony/Component/Serializer/Normalizer/ObjectNormalizer.php
 --- a/src/Symfony/Component/Serializer/Normalizer/ObjectNormalizer.php
 +++ b/src/Symfony/Component/Serializer/Normalizer/ObjectNormalizer.php
-@@ -138,5 +138,5 @@ class ObjectNormalizer extends AbstractObjectNormalizer
+@@ -150,5 +150,5 @@ class ObjectNormalizer extends AbstractObjectNormalizer
       * @return void
       */
 -    protected function setAttributeValue(object $object, string $attribute, mixed $value, ?string $format = null, array $context = [])
 +    protected function setAttributeValue(object $object, string $attribute, mixed $value, ?string $format = null, array $context = []): void
      {
          try {
-@@ -189,5 +189,5 @@ class ObjectNormalizer extends AbstractObjectNormalizer
+@@ -183,5 +183,5 @@ class ObjectNormalizer extends AbstractObjectNormalizer
      }
-
+ 
 -    protected function isAllowedAttribute($classOrObject, string $attribute, ?string $format = null, array $context = [])
 +    protected function isAllowedAttribute($classOrObject, string $attribute, ?string $format = null, array $context = []): bool
      {
-         $ignoredAttributes = $context[self::IGNORED_ATTRIBUTES] ?? $this->defaultContext[self::IGNORED_ATTRIBUTES];
+         if (!parent::isAllowedAttribute($classOrObject, $attribute, $format, $context)) {
 diff --git a/src/Symfony/Component/Serializer/Normalizer/PropertyNormalizer.php b/src/Symfony/Component/Serializer/Normalizer/PropertyNormalizer.php
 --- a/src/Symfony/Component/Serializer/Normalizer/PropertyNormalizer.php
 +++ b/src/Symfony/Component/Serializer/Normalizer/PropertyNormalizer.php
@@ -12164,8 +12164,8 @@ diff --git a/src/Symfony/Component/Translation/Loader/CsvFileLoader.php b/src/Sy
 @@ -56,5 +56,5 @@ class CsvFileLoader extends FileLoader
       * @return void
       */
--    public function setCsvControl(string $delimiter = ';', string $enclosure = '"', string $escape = '\\')
-+    public function setCsvControl(string $delimiter = ';', string $enclosure = '"', string $escape = '\\'): void
+-    public function setCsvControl(string $delimiter = ';', string $enclosure = '"', string $escape = '')
++    public function setCsvControl(string $delimiter = ';', string $enclosure = '"', string $escape = ''): void
      {
          $this->delimiter = $delimiter;
 diff --git a/src/Symfony/Component/Translation/LoggingTranslator.php b/src/Symfony/Component/Translation/LoggingTranslator.php
@@ -12581,7 +12581,7 @@ diff --git a/src/Symfony/Component/Validator/ConstraintViolationListInterface.ph
 diff --git a/src/Symfony/Component/Validator/Constraints/AbstractComparisonValidator.php b/src/Symfony/Component/Validator/Constraints/AbstractComparisonValidator.php
 --- a/src/Symfony/Component/Validator/Constraints/AbstractComparisonValidator.php
 +++ b/src/Symfony/Component/Validator/Constraints/AbstractComparisonValidator.php
-@@ -38,5 +38,5 @@ abstract class AbstractComparisonValidator extends ConstraintValidator
+@@ -39,5 +39,5 @@ abstract class AbstractComparisonValidator extends ConstraintValidator
       * @return void
       */
 -    public function validate(mixed $value, Constraint $constraint)
@@ -12611,7 +12611,7 @@ diff --git a/src/Symfony/Component/Validator/Constraints/AtLeastOneOfValidator.p
 diff --git a/src/Symfony/Component/Validator/Constraints/BicValidator.php b/src/Symfony/Component/Validator/Constraints/BicValidator.php
 --- a/src/Symfony/Component/Validator/Constraints/BicValidator.php
 +++ b/src/Symfony/Component/Validator/Constraints/BicValidator.php
-@@ -67,5 +67,5 @@ class BicValidator extends ConstraintValidator
+@@ -68,5 +68,5 @@ class BicValidator extends ConstraintValidator
       * @return void
       */
 -    public function validate(mixed $value, Constraint $constraint)
@@ -12778,7 +12778,7 @@ diff --git a/src/Symfony/Component/Validator/Constraints/ExpressionValidator.php
 diff --git a/src/Symfony/Component/Validator/Constraints/File.php b/src/Symfony/Component/Validator/Constraints/File.php
 --- a/src/Symfony/Component/Validator/Constraints/File.php
 +++ b/src/Symfony/Component/Validator/Constraints/File.php
-@@ -134,5 +134,5 @@ class File extends Constraint
+@@ -135,5 +135,5 @@ class File extends Constraint
       * @return void
       */
 -    public function __set(string $option, mixed $value)
@@ -13009,7 +13009,7 @@ diff --git a/src/Symfony/Component/Validator/Constraints/NotNullValidator.php b/
 diff --git a/src/Symfony/Component/Validator/Constraints/RangeValidator.php b/src/Symfony/Component/Validator/Constraints/RangeValidator.php
 --- a/src/Symfony/Component/Validator/Constraints/RangeValidator.php
 +++ b/src/Symfony/Component/Validator/Constraints/RangeValidator.php
-@@ -35,5 +35,5 @@ class RangeValidator extends ConstraintValidator
+@@ -36,5 +36,5 @@ class RangeValidator extends ConstraintValidator
       * @return void
       */
 -    public function validate(mixed $value, Constraint $constraint)
@@ -13280,7 +13280,7 @@ diff --git a/src/Symfony/Component/Validator/ObjectInitializerInterface.php b/sr
 diff --git a/src/Symfony/Component/Validator/Test/ConstraintValidatorTestCase.php b/src/Symfony/Component/Validator/Test/ConstraintValidatorTestCase.php
 --- a/src/Symfony/Component/Validator/Test/ConstraintValidatorTestCase.php
 +++ b/src/Symfony/Component/Validator/Test/ConstraintValidatorTestCase.php
-@@ -291,5 +291,5 @@ abstract class ConstraintValidatorTestCase extends TestCase
+@@ -295,5 +295,5 @@ abstract class ConstraintValidatorTestCase extends TestCase
       * @psalm-return T
       */
 -    abstract protected function createValidator();
@@ -13399,63 +13399,63 @@ diff --git a/src/Symfony/Component/VarDumper/Caster/DOMCaster.php b/src/Symfony/
 +    public static function castDocument(\DOMDocument $dom, array $a, Stub $stub, bool $isNested, int $filter = 0): array
      {
          $a += [
-@@ -188,5 +188,5 @@ class DOMCaster
+@@ -184,5 +184,5 @@ class DOMCaster
       * @return array
       */
 -    public static function castCharacterData(\DOMCharacterData $dom, array $a, Stub $stub, bool $isNested)
 +    public static function castCharacterData(\DOMCharacterData $dom, array $a, Stub $stub, bool $isNested): array
      {
          $a += [
-@@ -201,5 +201,5 @@ class DOMCaster
+@@ -197,5 +197,5 @@ class DOMCaster
       * @return array
       */
 -    public static function castAttr(\DOMAttr $dom, array $a, Stub $stub, bool $isNested)
 +    public static function castAttr(\DOMAttr $dom, array $a, Stub $stub, bool $isNested): array
      {
          $a += [
-@@ -217,5 +217,5 @@ class DOMCaster
+@@ -213,5 +213,5 @@ class DOMCaster
       * @return array
       */
 -    public static function castElement(\DOMElement $dom, array $a, Stub $stub, bool $isNested)
 +    public static function castElement(\DOMElement $dom, array $a, Stub $stub, bool $isNested): array
      {
          $a += [
-@@ -230,5 +230,5 @@ class DOMCaster
+@@ -226,5 +226,5 @@ class DOMCaster
       * @return array
       */
 -    public static function castText(\DOMText $dom, array $a, Stub $stub, bool $isNested)
 +    public static function castText(\DOMText $dom, array $a, Stub $stub, bool $isNested): array
      {
          $a += [
-@@ -242,5 +242,5 @@ class DOMCaster
+@@ -238,5 +238,5 @@ class DOMCaster
       * @return array
       */
 -    public static function castDocumentType(\DOMDocumentType $dom, array $a, Stub $stub, bool $isNested)
 +    public static function castDocumentType(\DOMDocumentType $dom, array $a, Stub $stub, bool $isNested): array
      {
          $a += [
-@@ -259,5 +259,5 @@ class DOMCaster
+@@ -255,5 +255,5 @@ class DOMCaster
       * @return array
       */
 -    public static function castNotation(\DOMNotation $dom, array $a, Stub $stub, bool $isNested)
 +    public static function castNotation(\DOMNotation $dom, array $a, Stub $stub, bool $isNested): array
      {
          $a += [
-@@ -272,5 +272,5 @@ class DOMCaster
+@@ -268,5 +268,5 @@ class DOMCaster
       * @return array
       */
 -    public static function castEntity(\DOMEntity $dom, array $a, Stub $stub, bool $isNested)
 +    public static function castEntity(\DOMEntity $dom, array $a, Stub $stub, bool $isNested): array
      {
          $a += [
-@@ -289,5 +289,5 @@ class DOMCaster
+@@ -282,5 +282,5 @@ class DOMCaster
       * @return array
       */
 -    public static function castProcessingInstruction(\DOMProcessingInstruction $dom, array $a, Stub $stub, bool $isNested)
 +    public static function castProcessingInstruction(\DOMProcessingInstruction $dom, array $a, Stub $stub, bool $isNested): array
      {
          $a += [
-@@ -302,5 +302,5 @@ class DOMCaster
+@@ -295,5 +295,5 @@ class DOMCaster
       * @return array
       */
 -    public static function castXPath(\DOMXPath $dom, array $a, Stub $stub, bool $isNested)
@@ -13826,78 +13826,78 @@ diff --git a/src/Symfony/Component/VarDumper/Caster/ReflectionCaster.php b/src/S
 -    public static function castAttribute(\ReflectionAttribute $c, array $a, Stub $stub, bool $isNested)
 +    public static function castAttribute(\ReflectionAttribute $c, array $a, Stub $stub, bool $isNested): array
      {
-         self::addMap($a, $c, [
-@@ -140,5 +140,5 @@ class ReflectionCaster
+         $map = [
+@@ -146,5 +146,5 @@ class ReflectionCaster
       * @return array
       */
 -    public static function castReflectionGenerator(\ReflectionGenerator $c, array $a, Stub $stub, bool $isNested)
 +    public static function castReflectionGenerator(\ReflectionGenerator $c, array $a, Stub $stub, bool $isNested): array
      {
          $prefix = Caster::PREFIX_VIRTUAL;
-@@ -178,5 +178,5 @@ class ReflectionCaster
+@@ -184,5 +184,5 @@ class ReflectionCaster
       * @return array
       */
 -    public static function castClass(\ReflectionClass $c, array $a, Stub $stub, bool $isNested, int $filter = 0)
 +    public static function castClass(\ReflectionClass $c, array $a, Stub $stub, bool $isNested, int $filter = 0): array
      {
          $prefix = Caster::PREFIX_VIRTUAL;
-@@ -212,5 +212,5 @@ class ReflectionCaster
+@@ -218,5 +218,5 @@ class ReflectionCaster
       * @return array
       */
 -    public static function castFunctionAbstract(\ReflectionFunctionAbstract $c, array $a, Stub $stub, bool $isNested, int $filter = 0)
 +    public static function castFunctionAbstract(\ReflectionFunctionAbstract $c, array $a, Stub $stub, bool $isNested, int $filter = 0): array
      {
          $prefix = Caster::PREFIX_VIRTUAL;
-@@ -273,5 +273,5 @@ class ReflectionCaster
+@@ -279,5 +279,5 @@ class ReflectionCaster
       * @return array
       */
 -    public static function castClassConstant(\ReflectionClassConstant $c, array $a, Stub $stub, bool $isNested)
 +    public static function castClassConstant(\ReflectionClassConstant $c, array $a, Stub $stub, bool $isNested): array
      {
          $a[Caster::PREFIX_VIRTUAL.'modifiers'] = implode(' ', \Reflection::getModifierNames($c->getModifiers()));
-@@ -286,5 +286,5 @@ class ReflectionCaster
+@@ -292,5 +292,5 @@ class ReflectionCaster
       * @return array
       */
 -    public static function castMethod(\ReflectionMethod $c, array $a, Stub $stub, bool $isNested)
 +    public static function castMethod(\ReflectionMethod $c, array $a, Stub $stub, bool $isNested): array
      {
          $a[Caster::PREFIX_VIRTUAL.'modifiers'] = implode(' ', \Reflection::getModifierNames($c->getModifiers()));
-@@ -296,5 +296,5 @@ class ReflectionCaster
+@@ -302,5 +302,5 @@ class ReflectionCaster
       * @return array
       */
 -    public static function castParameter(\ReflectionParameter $c, array $a, Stub $stub, bool $isNested)
 +    public static function castParameter(\ReflectionParameter $c, array $a, Stub $stub, bool $isNested): array
      {
          $prefix = Caster::PREFIX_VIRTUAL;
-@@ -339,5 +339,5 @@ class ReflectionCaster
+@@ -345,5 +345,5 @@ class ReflectionCaster
       * @return array
       */
 -    public static function castProperty(\ReflectionProperty $c, array $a, Stub $stub, bool $isNested)
 +    public static function castProperty(\ReflectionProperty $c, array $a, Stub $stub, bool $isNested): array
      {
          $a[Caster::PREFIX_VIRTUAL.'modifiers'] = implode(' ', \Reflection::getModifierNames($c->getModifiers()));
-@@ -352,5 +352,5 @@ class ReflectionCaster
+@@ -358,5 +358,5 @@ class ReflectionCaster
       * @return array
       */
 -    public static function castReference(\ReflectionReference $c, array $a, Stub $stub, bool $isNested)
 +    public static function castReference(\ReflectionReference $c, array $a, Stub $stub, bool $isNested): array
      {
          $a[Caster::PREFIX_VIRTUAL.'id'] = $c->getId();
-@@ -362,5 +362,5 @@ class ReflectionCaster
+@@ -368,5 +368,5 @@ class ReflectionCaster
       * @return array
       */
 -    public static function castExtension(\ReflectionExtension $c, array $a, Stub $stub, bool $isNested)
 +    public static function castExtension(\ReflectionExtension $c, array $a, Stub $stub, bool $isNested): array
      {
          self::addMap($a, $c, [
-@@ -381,5 +381,5 @@ class ReflectionCaster
+@@ -387,5 +387,5 @@ class ReflectionCaster
       * @return array
       */
 -    public static function castZendExtension(\ReflectionZendExtension $c, array $a, Stub $stub, bool $isNested)
 +    public static function castZendExtension(\ReflectionZendExtension $c, array $a, Stub $stub, bool $isNested): array
      {
          self::addMap($a, $c, [
-@@ -396,5 +396,5 @@ class ReflectionCaster
+@@ -402,5 +402,5 @@ class ReflectionCaster
       * @return string
       */
 -    public static function getSignature(array $a)
@@ -14216,84 +14216,84 @@ diff --git a/src/Symfony/Component/VarDumper/Dumper/AbstractDumper.php b/src/Sym
 diff --git a/src/Symfony/Component/VarDumper/Dumper/CliDumper.php b/src/Symfony/Component/VarDumper/Dumper/CliDumper.php
 --- a/src/Symfony/Component/VarDumper/Dumper/CliDumper.php
 +++ b/src/Symfony/Component/VarDumper/Dumper/CliDumper.php
-@@ -91,5 +91,5 @@ class CliDumper extends AbstractDumper
+@@ -92,5 +92,5 @@ class CliDumper extends AbstractDumper
       * @return void
       */
 -    public function setColors(bool $colors)
 +    public function setColors(bool $colors): void
      {
          $this->colors = $colors;
-@@ -101,5 +101,5 @@ class CliDumper extends AbstractDumper
+@@ -102,5 +102,5 @@ class CliDumper extends AbstractDumper
       * @return void
       */
 -    public function setMaxStringWidth(int $maxStringWidth)
 +    public function setMaxStringWidth(int $maxStringWidth): void
      {
          $this->maxStringWidth = $maxStringWidth;
-@@ -113,5 +113,5 @@ class CliDumper extends AbstractDumper
+@@ -114,5 +114,5 @@ class CliDumper extends AbstractDumper
       * @return void
       */
 -    public function setStyles(array $styles)
 +    public function setStyles(array $styles): void
      {
          $this->styles = $styles + $this->styles;
-@@ -125,5 +125,5 @@ class CliDumper extends AbstractDumper
+@@ -126,5 +126,5 @@ class CliDumper extends AbstractDumper
       * @return void
       */
 -    public function setDisplayOptions(array $displayOptions)
 +    public function setDisplayOptions(array $displayOptions): void
      {
          $this->displayOptions = $displayOptions + $this->displayOptions;
-@@ -133,5 +133,5 @@ class CliDumper extends AbstractDumper
+@@ -134,5 +134,5 @@ class CliDumper extends AbstractDumper
       * @return void
       */
 -    public function dumpScalar(Cursor $cursor, string $type, string|int|float|bool|null $value)
 +    public function dumpScalar(Cursor $cursor, string $type, string|int|float|bool|null $value): void
      {
          $this->dumpKey($cursor);
-@@ -197,5 +197,5 @@ class CliDumper extends AbstractDumper
+@@ -198,5 +198,5 @@ class CliDumper extends AbstractDumper
       * @return void
       */
 -    public function dumpString(Cursor $cursor, string $str, bool $bin, int $cut)
 +    public function dumpString(Cursor $cursor, string $str, bool $bin, int $cut): void
      {
          $this->dumpKey($cursor);
-@@ -289,5 +289,5 @@ class CliDumper extends AbstractDumper
+@@ -290,5 +290,5 @@ class CliDumper extends AbstractDumper
       * @return void
       */
 -    public function enterHash(Cursor $cursor, int $type, string|int|null $class, bool $hasChild)
 +    public function enterHash(Cursor $cursor, int $type, string|int|null $class, bool $hasChild): void
      {
          $this->colors ??= $this->supportsColors();
-@@ -329,5 +329,5 @@ class CliDumper extends AbstractDumper
+@@ -330,5 +330,5 @@ class CliDumper extends AbstractDumper
       * @return void
       */
 -    public function leaveHash(Cursor $cursor, int $type, string|int|null $class, bool $hasChild, int $cut)
 +    public function leaveHash(Cursor $cursor, int $type, string|int|null $class, bool $hasChild, int $cut): void
      {
          if (empty($cursor->attr['cut_hash'])) {
-@@ -347,5 +347,5 @@ class CliDumper extends AbstractDumper
+@@ -348,5 +348,5 @@ class CliDumper extends AbstractDumper
       * @return void
       */
 -    protected function dumpEllipsis(Cursor $cursor, bool $hasChild, int $cut)
 +    protected function dumpEllipsis(Cursor $cursor, bool $hasChild, int $cut): void
      {
          if ($cut) {
-@@ -365,5 +365,5 @@ class CliDumper extends AbstractDumper
+@@ -366,5 +366,5 @@ class CliDumper extends AbstractDumper
       * @return void
       */
 -    protected function dumpKey(Cursor $cursor)
 +    protected function dumpKey(Cursor $cursor): void
      {
          if (null !== $key = $cursor->hashKey) {
-@@ -576,5 +576,5 @@ class CliDumper extends AbstractDumper
+@@ -577,5 +577,5 @@ class CliDumper extends AbstractDumper
       * @return void
       */
 -    protected function dumpLine(int $depth, bool $endOfValue = false)
 +    protected function dumpLine(int $depth, bool $endOfValue = false): void
      {
          if (null === $this->colors) {
-@@ -591,5 +591,5 @@ class CliDumper extends AbstractDumper
+@@ -592,5 +592,5 @@ class CliDumper extends AbstractDumper
       * @return void
       */
 -    protected function endValue(Cursor $cursor)

@@ -1,0 +1,14 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2024-07-26T09:38:52Z
+
+@mtarld @chalasr I could need your help here as I am not sure that this is really the best way to fix the test failures. Basically, this PR reverts #57825. On the `7.1` branch this change was necessary as the `ReflectionExtractor` does not pass any resolvers to `TypeResolver::create()` which in turn means that the new `PhpDocAwareReflectionTypeResolver` will be used. On the `7.2` branch we are explicit and this means that the new `PhpDocAwareReflectionTypeResolver` is not used (is that intended)?
+
+---------------------------------------------------------------------------
+
+by chalasr at 2024-07-26T11:20:54Z
+
+@xabbuh The reasoning behind not wiring the `PhpDocAwareReflectionTypeResolver` in PropertyInfo is that PropertyInfo has its own implementation for extracting types from phpdoc (`PhpStanTypeHelper`). I'm not entirely sure but as far as I understand that helper is only used by the to-be-deprecated `PropertyTypeExtractorInterface::getTypes()`, not the new type-info based `getType()`. If I'm right, then we should probably just always wire `PhpDocAwareReflectionTypeResolver` and keep relying on `TypeResolver::create()` on 7.2.
+
+Mathias is on vacation for 2 weeks so I suggest merging this PR, he will revisit the topic once it gets back.
+Thanks for the PRs

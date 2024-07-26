@@ -182,7 +182,7 @@ class ErrorHandler
     ) {
         if (\PHP_VERSION_ID < 80400) {
             $this->levels[\E_STRICT] = 'Runtime Notice';
-            $this->loggers[\E_STRICT] = [null, LogLevel::WARNING];
+            $this->loggers[\E_STRICT] = [null, LogLevel::ERROR];
         }
 
         if ($bootstrappingLogger) {

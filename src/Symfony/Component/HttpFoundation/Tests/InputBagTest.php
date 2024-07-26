@@ -154,6 +154,24 @@ class InputBagTest extends TestCase
         $bag->filter('foo', \FILTER_VALIDATE_INT);
     }
 
+    public function testAdd()
+    {
+        $bag = new InputBag(['foo' => 'bar']);
+        $bag->add(['baz' => 'qux']);
+
+        $this->assertSame('bar', $bag->get('foo'), '->add() does not remove existing parameters');
+        $this->assertSame('qux', $bag->get('baz'), '->add() adds new parameters');
+    }
+
+    public function testReplace()
+    {
+        $bag = new InputBag(['foo' => 'bar']);
+        $bag->replace(['baz' => 'qux']);
+
+        $this->assertNull($bag->get('foo'), '->replace() removes existing parameters');
+        $this->assertSame('qux', $bag->get('baz'), '->replace() adds new parameters');
+    }
+
     public function testGetEnum()
     {
         $bag = new InputBag(['valid-value' => 1]);

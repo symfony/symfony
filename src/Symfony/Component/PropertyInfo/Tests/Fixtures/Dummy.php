@@ -177,6 +177,9 @@ class Dummy extends ParentDummy
      */
     public $genericInterface;
 
+    /** @var Dummy[]|null  */
+    public $nullableTypedCollection = null;
+
     public static function getStatic()
     {
     }
@@ -267,6 +270,10 @@ class Dummy extends ParentDummy
     }
 
     public function hasElement(string $element): bool
+    {
+    }
+
+    public function addNullableTypedCollection(Dummy $dummy): void
     {
     }
 }

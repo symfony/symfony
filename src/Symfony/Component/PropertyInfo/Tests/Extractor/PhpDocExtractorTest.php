@@ -164,6 +164,7 @@ class PhpDocExtractorTest extends TestCase
             ['listOfStrings', [new LegacyType(LegacyType::BUILTIN_TYPE_ARRAY, false, null, true, new LegacyType(LegacyType::BUILTIN_TYPE_INT), new LegacyType(LegacyType::BUILTIN_TYPE_STRING))], null, null],
             ['self', [new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, false, Dummy::class)], null, null],
             ['collectionAsObject', [new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, false, DummyCollection::class, true, [new LegacyType(LegacyType::BUILTIN_TYPE_INT)], [new LegacyType(LegacyType::BUILTIN_TYPE_STRING)])], null, null],
+            ['nullableTypedCollection', [new LegacyType(LegacyType::BUILTIN_TYPE_ARRAY, true, null, true, new LegacyType(LegacyType::BUILTIN_TYPE_INT), new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, false, Dummy::class))], null, null],
         ];
     }
 
@@ -548,6 +549,7 @@ class PhpDocExtractorTest extends TestCase
         yield ['collection', Type::list(Type::object(\DateTimeImmutable::class)), null, null];
         yield ['nestedCollection', Type::list(Type::list(Type::string())), null, null];
         yield ['mixedCollection', Type::array(), null, null];
+        yield ['nullableTypedCollection', Type::nullable(Type::list(Type::object(Dummy::class))), null, null];
         yield ['a', Type::int(), 'A.', null];
         yield ['b', Type::nullable(Type::object(ParentDummy::class)), 'B.', null];
         yield ['c', Type::nullable(Type::bool()), null, null];

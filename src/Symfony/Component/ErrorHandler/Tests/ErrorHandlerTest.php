@@ -203,7 +203,6 @@ class ErrorHandlerTest extends TestCase
                 \E_USER_DEPRECATED => [null, LogLevel::INFO],
                 \E_NOTICE => [$logger, LogLevel::WARNING],
                 \E_USER_NOTICE => [$logger, LogLevel::CRITICAL],
-                \E_STRICT => [null, LogLevel::WARNING],
                 \E_WARNING => [null, LogLevel::WARNING],
                 \E_USER_WARNING => [null, LogLevel::WARNING],
                 \E_COMPILE_WARNING => [null, LogLevel::WARNING],
@@ -215,6 +214,11 @@ class ErrorHandlerTest extends TestCase
                 \E_ERROR => [null, LogLevel::CRITICAL],
                 \E_CORE_ERROR => [null, LogLevel::CRITICAL],
             ];
+
+            if (\PHP_VERSION_ID < 80400) {
+                $loggers[\E_STRICT] = [null, LogLevel::WARNING];
+            }
+
             $this->assertSame($loggers, $handler->setLoggers([]));
         } finally {
             restore_error_handler();
@@ -440,7 +444,6 @@ class ErrorHandlerTest extends TestCase
             \E_USER_DEPRECATED => [$bootLogger, LogLevel::INFO],
             \E_NOTICE => [$bootLogger, LogLevel::WARNING],
             \E_USER_NOTICE => [$bootLogger, LogLevel::WARNING],
-            \E_STRICT => [$bootLogger, LogLevel::WARNING],
             \E_WARNING => [$bootLogger, LogLevel::WARNING],
             \E_USER_WARNING => [$bootLogger, LogLevel::WARNING],
             \E_COMPILE_WARNING => [$bootLogger, LogLevel::WARNING],
@@ -452,6 +455,10 @@ class ErrorHandlerTest extends TestCase
             \E_ERROR => [$bootLogger, LogLevel::CRITICAL],
             \E_CORE_ERROR => [$bootLogger, LogLevel::CRITICAL],
         ];
+
+        if (\PHP_VERSION_ID < 80400) {
+            $loggers[\E_STRICT] = [$bootLogger, LogLevel::WARNING];
+        }
 
         $this->assertSame($loggers, $handler->setLoggers([]));
 

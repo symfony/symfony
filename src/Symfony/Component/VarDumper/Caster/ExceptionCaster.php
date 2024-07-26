@@ -42,7 +42,7 @@ class ExceptionCaster
         \E_USER_ERROR => 'E_USER_ERROR',
         \E_USER_WARNING => 'E_USER_WARNING',
         \E_USER_NOTICE => 'E_USER_NOTICE',
-        \E_STRICT => 'E_STRICT',
+        2048 => 'E_STRICT',
     ];
 
     private static array $framesCache = [];

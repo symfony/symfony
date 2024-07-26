@@ -16,6 +16,7 @@ use Symfony\Component\Validator\Constraints\Range;
 use Symfony\Component\Validator\Constraints\RangeValidator;
 use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
+use Symfony\Component\Validator\Tests\Constraints\Fixtures\MinMaxTyped;
 use Symfony\Component\Validator\Tests\IcuCompatibilityTrait;
 
 class RangeValidatorTest extends ConstraintValidatorTestCase
@@ -1018,6 +1019,28 @@ class RangeValidatorTest extends ConstraintValidatorTestCase
             ->setParameter('{{ min_limit_path }}', 'min')
             ->setCode(Range::NOT_IN_RANGE_ERROR)
             ->assertRaised();
+    }
+
+    public function testMinPropertyPathReferencingUninitializedProperty()
+    {
+        $object = new MinMaxTyped();
+        $object->max = 5;
+        $this->setObject($object);
+
+        $this->validator->validate(5, new Range(['minPropertyPath' => 'min', 'maxPropertyPath' => 'max']));
+
+        $this->assertNoViolation();
+    }
+
+    public function testMaxPropertyPathReferencingUninitializedProperty()
+    {
+        $object = new MinMaxTyped();
+        $object->min = 5;
+        $this->setObject($object);
+
+        $this->validator->validate(5, new Range(['minPropertyPath' => 'min', 'maxPropertyPath' => 'max']));
+
+        $this->assertNoViolation();
     }
 
     public static function provideMessageIfMinAndMaxSet(): array

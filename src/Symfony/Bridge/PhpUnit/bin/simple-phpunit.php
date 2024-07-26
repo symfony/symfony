@@ -371,7 +371,7 @@ if (isset($argv[1]) && is_dir($argv[1]) && !file_exists($argv[1].'/phpunit.xml.d
     }
 }
 
-$cmd[0] = sprintf('%s %s --colors=%s', $PHP, escapeshellarg("$PHPUNIT_DIR/$PHPUNIT_VERSION_DIR/phpunit"), false === $getEnvVar('NO_COLOR') ? 'always' : 'never');
+$cmd[0] = sprintf('%s %s --colors=%s', $PHP, escapeshellarg("$PHPUNIT_DIR/$PHPUNIT_VERSION_DIR/phpunit"), '' === $getEnvVar('NO_COLOR', '') ? 'always' : 'never');
 $cmd = str_replace('%', '%%', implode(' ', $cmd)).' %1$s';
 
 if ('\\' === \DIRECTORY_SEPARATOR) {
@@ -461,7 +461,7 @@ if ($components) {
         {
         }
     }
-    array_splice($argv, 1, 0, ['--colors='.(false === $getEnvVar('NO_COLOR') ? 'always' : 'never')]);
+    array_splice($argv, 1, 0, ['--colors='.('' === $getEnvVar('NO_COLOR', '') ? 'always' : 'never')]);
     $_SERVER['argv'] = $argv;
     $_SERVER['argc'] = ++$argc;
     include "$PHPUNIT_DIR/$PHPUNIT_VERSION_DIR/phpunit";

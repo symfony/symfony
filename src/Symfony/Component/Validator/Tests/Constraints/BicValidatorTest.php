@@ -18,6 +18,7 @@ use Symfony\Component\Validator\Exception\UnexpectedValueException;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Mapping\Loader\AttributeLoader;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
+use Symfony\Component\Validator\Tests\Constraints\Fixtures\BicTypedDummy;
 
 class BicValidatorTest extends ConstraintValidatorTestCase
 {
@@ -87,6 +88,15 @@ class BicValidatorTest extends ConstraintValidatorTestCase
             ->setParameter('{{ iban }}', 'FR14 2004 1010 0505 0001 3M02 606')
             ->setCode(Bic::INVALID_IBAN_COUNTRY_CODE_ERROR)
             ->assertRaised();
+    }
+
+    public function testPropertyPathReferencingUninitializedProperty()
+    {
+        $this->setObject(new BicTypedDummy());
+
+        $this->validator->validate('UNCRIT2B912', new Bic(['ibanPropertyPath' => 'iban']));
+
+        $this->assertNoViolation();
     }
 
     public function testValidComparisonToValue()

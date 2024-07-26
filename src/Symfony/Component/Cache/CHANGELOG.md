@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+7.2
+---
+
+ * Add optional `Psr\Clock\ClockInterface` parameter to `ArrayAdapter`
+
 7.1
 ---
 

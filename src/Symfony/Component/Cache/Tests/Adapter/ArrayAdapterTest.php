@@ -14,6 +14,7 @@ namespace Symfony\Component\Cache\Tests\Adapter;
 use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Cache\Tests\Fixtures\TestEnum;
+use Symfony\Component\Clock\MockClock;
 
 /**
  * @group time-sensitive
@@ -101,5 +102,18 @@ class ArrayAdapterTest extends AdapterTestCase
         $cache->save($item);
 
         $this->assertSame(TestEnum::Foo, $cache->getItem('foo')->get());
+    }
+
+    public function testClockAware()
+    {
+        $clock = new MockClock();
+        $cache = new ArrayAdapter(10, false, 0, 0, $clock);
+
+        $cache->save($cache->getItem('foo'));
+        $this->assertTrue($cache->hasItem('foo'));
+
+        $clock->modify('+11 seconds');
+
+        $this->assertFalse($cache->hasItem('foo'));
     }
 }

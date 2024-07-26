@@ -1,0 +1,29 @@
+---------------------------------------------------------------------------
+
+by OskarStark at 2024-07-13T05:10:33Z
+
+Great, I propose to merge such PRs in lower branches. 😎
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2024-07-13T06:28:45Z
+
+That's what I went for at first but I remembered that this topic was raised in my other PRs about test coverage, where it's merged in the highest branch possible 😄 For example: https://github.com/symfony/symfony/pull/52771#issuecomment-1905597295, https://github.com/symfony/symfony/pull/52746#pullrequestreview-1754583939
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2024-07-13T07:02:31Z
+
+Yes, same for me 😄
+
+---------------------------------------------------------------------------
+
+by derrabus at 2024-07-15T16:14:38Z
+
+There's nothing wrong with increasing test coverage on LTS branches. I'd say, go for it.
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2024-07-16T07:43:44Z
+
+Suits me fine. I opened a follow-up for 6.4 and will do another for 7.1 for the remaining ones if this gets actually merged in 5.4

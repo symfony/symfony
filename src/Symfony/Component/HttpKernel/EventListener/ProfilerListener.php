@@ -91,7 +91,7 @@ class ProfilerListener implements EventSubscriberInterface
             return;
         }
 
-        $session = !$request->attributes->getBoolean('_stateless') && $request->hasPreviousSession() ? $request->getSession() : null;
+        $session = !$request->isStateless() && $request->hasPreviousSession() ? $request->getSession() : null;
 
         if ($session instanceof Session) {
             $usageIndexValue = $usageIndexReference = &$session->getUsageIndex();

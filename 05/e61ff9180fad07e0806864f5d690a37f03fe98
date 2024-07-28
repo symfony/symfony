@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by derrabus at 2024-07-26T11:24:25Z
+
+Question: is `Symfony\Bridge\Twig\Tests\Extension\AbstractLayoutTestCase` a class that is supposed to be used downstream when testing custom form layouts? Or is this a test case class internal to the Twig bridge? If the latter is the case, I'd like to remove the `use VersionAwareTest;` from there at least.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2024-07-26T11:26:46Z
+
+It's not intended to be used by other projects.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2024-07-26T11:38:09Z
+
+> It's not intended to be used by other projects.
+
+Perfect. I've removed the trait usage from there then. This will make it a lot easier to remove the trait in 8.0.

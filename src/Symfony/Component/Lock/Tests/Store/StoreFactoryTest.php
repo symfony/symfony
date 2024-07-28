@@ -92,5 +92,6 @@ class StoreFactoryTest extends TestCase
 
         yield ['flock', FlockStore::class];
         yield ['flock://'.sys_get_temp_dir(), FlockStore::class];
+        yield ['flock+exclusive://'.sys_get_temp_dir(), FlockStore::class];
     }
 }

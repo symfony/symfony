@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+7.2
+---
+
+ * Add parameter `$prefix` to `FlockStore::__construct()`
+
 7.0
 ---
 

@@ -24,7 +24,7 @@ use Symfony\Component\Lock\PersistingStoreInterface;
  */
 class StoreFactory
 {
-    public static function createStore(#[\SensitiveParameter] object|string $connection): PersistingStoreInterface
+    public static function createStore(#[\SensitiveParameter] object|string $connection, #[\SensitiveParameter] ?string $secret = null): PersistingStoreInterface
     {
         switch (true) {
             case $connection instanceof \Redis:
@@ -53,6 +53,9 @@ class StoreFactory
                 throw new InvalidArgumentException(\sprintf('Unsupported Connection: "%s".', get_debug_type($connection)));
             case 'flock' === $connection:
                 return new FlockStore();
+
+            case str_starts_with($connection, 'flock+exclusive://'):
+                return new FlockStore(substr($connection, 15), $secret);
 
             case str_starts_with($connection, 'flock://'):
                 return new FlockStore(substr($connection, 8));

@@ -2009,7 +2009,7 @@ class FrameworkExtension extends Extension
                 $storeDefinition = new Definition(PersistingStoreInterface::class);
                 $storeDefinition
                     ->setFactory([StoreFactory::class, 'createStore'])
-                    ->setArguments([$resourceStore])
+                    ->setArguments([$resourceStore, new Parameter('kernel.secret')])
                     ->addTag('lock.store');
 
                 $container->setDefinition($storeDefinitionId = '.lock.'.$resourceName.'.store.'.$container->hash($storeDsn), $storeDefinition);

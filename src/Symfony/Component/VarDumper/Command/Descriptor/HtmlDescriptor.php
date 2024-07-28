@@ -50,7 +50,7 @@ class HtmlDescriptor implements DumpDescriptorInterface
             $title = '<code>$ </code>'.$context['cli']['command_line'];
             $dedupIdentifier = $context['cli']['identifier'];
         } else {
-            $dedupIdentifier = uniqid('', true);
+            $dedupIdentifier = bin2hex(random_bytes(4));
         }
 
         $sourceDescription = '';

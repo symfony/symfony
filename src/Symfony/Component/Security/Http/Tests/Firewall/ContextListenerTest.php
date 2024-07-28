@@ -146,6 +146,29 @@ class ContextListenerTest extends TestCase
         $this->assertFalse($session->isStarted());
     }
 
+    public function testOnKernelResponseWithStatelessAndPreviousSession()
+    {
+        $request = new Request();
+        $request->attributes->set('_security_firewall_run', '_security_session');
+        $request->attributes->set('_stateless', true);
+
+        $session = new Session(new MockArraySessionStorage());
+        $request->setSession($session);
+        $request->cookies->set('MOCKSESSID', true);
+
+        $event = new ResponseEvent(
+            $this->createMock(HttpKernelInterface::class),
+            $request,
+            HttpKernelInterface::MAIN_REQUEST,
+            new Response()
+        );
+
+        $listener = new ContextListener(new TokenStorage(), [], 'session', null, new EventDispatcher());
+        $listener->onKernelResponse($event);
+
+        $this->assertFalse($session->isStarted());
+    }
+
     /**
      * @dataProvider provideInvalidToken
      */

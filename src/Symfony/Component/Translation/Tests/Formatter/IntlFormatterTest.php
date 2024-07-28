@@ -93,11 +93,11 @@ _MSG_;
     /**
      * @dataProvider percentAndBracketsAreTrimmedProvider
      */
-    public function testPercentsAndBracketsAreTrimmed(string $expected, string $message, array $paramters)
+    public function testPercentsAndBracketsAreTrimmed(string $expected, string $message, array $parameters)
     {
         $formatter = new IntlFormatter();
         $this->assertInstanceof(IntlFormatterInterface::class, $formatter);
-        $this->assertSame($expected, $formatter->formatIntl($message, 'en', $paramters));
+        $this->assertSame($expected, $formatter->formatIntl($message, 'en', $parameters));
     }
 
     public static function percentAndBracketsAreTrimmedProvider(): array

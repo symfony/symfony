@@ -85,7 +85,7 @@ final class SipgateTransport extends AbstractTransport
         } elseif (402 === $statusCode) {
             throw new TransportException(sprintf('Unable to send SMS with Sipgate: Error code %d - insufficient funds.', $statusCode), $response);    
         } elseif (403 === $statusCode) {
-            throw new TransportException(sprintf('Unable to send SMS with Sipgate: Error code %d - no permisssion to use sms feature or password must be reset or senderId is wrong.', $statusCode), $response);
+            throw new TransportException(sprintf('Unable to send SMS with Sipgate: Error code %d - no permission to use sms feature or password must be reset or senderId is wrong.', $statusCode), $response);
         }
         throw new TransportException(sprintf('Unable to send SMS with Sipgate: Error code %d.', $statusCode), $response);
     }

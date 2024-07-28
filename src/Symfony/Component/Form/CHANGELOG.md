@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+7.2
+---
+
+ * Deprecate the `VersionAwareTest` trait, use feature detection instead
+
 7.1
 ---
 

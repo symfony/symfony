@@ -104,7 +104,8 @@ class NumberToLocalizedStringTransformer implements DataTransformerInterface
             $value = str_replace(',', $decSep, $value);
         }
 
-        if (str_contains($value, $decSep)) {
+        //If the value is in exponential notation with a negative exponent, we end up with a float value too
+        if (str_contains($value, $decSep) || stripos($value, 'e-') !== false) {
             $type = \NumberFormatter::TYPE_DOUBLE;
         } else {
             $type = \PHP_INT_SIZE === 8

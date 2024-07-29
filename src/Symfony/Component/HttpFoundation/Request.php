@@ -656,12 +656,8 @@ class Request
         $this->attributes->set('_stateless', $stateless);
     }
 
-    public function isStateless(): ?bool
+    public function isStateless(): bool
     {
-        if (!$this->attributes->has('_stateless')) {
-            return null;
-        }
-
         return $this->attributes->getBoolean('_stateless');
     }
 

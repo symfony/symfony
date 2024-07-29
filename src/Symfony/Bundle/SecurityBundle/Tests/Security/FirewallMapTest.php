@@ -54,7 +54,7 @@ class FirewallMapTest extends TestCase
         $this->assertEquals([[], null, null], $firewallMap->getListeners($request));
         $this->assertNull($firewallMap->getFirewallConfig($request));
         $this->assertFalse($request->attributes->has(self::ATTRIBUTE_FIREWALL_CONTEXT));
-        $this->assertNull($request->isStateless());
+        $this->assertFalse($request->attributes->has('_stateless'));
     }
 
     /** @dataProvider providesStatefulStatelessRequests */

@@ -753,7 +753,7 @@ class SessionListenerTest extends TestCase
         $kernel = $this->createMock(HttpKernelInterface::class);
 
         $request = new Request();
-        $request->attributes->set('_stateless', true);
+        $request->setStateless();
         $listener->onKernelRequest(new RequestEvent($kernel, $request, HttpKernelInterface::MAIN_REQUEST));
         $request->getSession();
 
@@ -780,7 +780,7 @@ class SessionListenerTest extends TestCase
         $kernel = $this->createMock(HttpKernelInterface::class);
 
         $request = new Request();
-        $request->attributes->set('_stateless', true);
+        $request->setStateless();
         $listener->onKernelRequest(new RequestEvent($kernel, $request, HttpKernelInterface::MAIN_REQUEST));
         $request->getSession();
 
@@ -805,7 +805,7 @@ class SessionListenerTest extends TestCase
         $kernel = $this->createMock(HttpKernelInterface::class);
 
         $request = new Request();
-        $request->attributes->set('_stateless', true);
+        $request->setStateless();
 
         $listener->onKernelRequest(new RequestEvent($kernel, $request, HttpKernelInterface::MAIN_REQUEST));
         $request->getSession();
@@ -824,7 +824,7 @@ class SessionListenerTest extends TestCase
         $requestStack = new RequestStack();
 
         $request = new Request();
-        $request->attributes->set('_stateless', true);
+        $request->setStateless();
 
         $requestStack->push(new Request());
         $requestStack->push($request);
@@ -849,7 +849,7 @@ class SessionListenerTest extends TestCase
         $session->expects($this->exactly(0))->method('save');
 
         $request = new Request();
-        $request->attributes->set('_stateless', true);
+        $request->setStateless();
 
         $requestStack = new RequestStack();
         $requestStack->push($request);

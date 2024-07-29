@@ -318,7 +318,7 @@ class RequestDataCollectorTest extends TestCase
 
         $requestStack = new RequestStack();
         $request = $this->createRequest();
-        $request->attributes->set('_stateless', true);
+        $request->setStateless();
         $requestStack->push($request);
 
         $collector = new RequestDataCollector($requestStack);

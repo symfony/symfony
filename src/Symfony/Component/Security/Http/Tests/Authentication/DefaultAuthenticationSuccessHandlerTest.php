@@ -63,7 +63,7 @@ class DefaultAuthenticationSuccessHandlerTest extends TestCase
         $session->expects($this->never())->method('remove')->with('_security.admin.target_path');
         $statelessRequest = Request::create('/');
         $statelessRequest->setSession($session);
-        $statelessRequest->attributes->set('_stateless', true);
+        $statelessRequest->setStateless();
 
         $urlGenerator = $this->createMock(UrlGeneratorInterface::class);
         $urlGenerator->expects($this->any())->method('generate')->willReturn('http://localhost/login');

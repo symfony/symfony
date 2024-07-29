@@ -66,8 +66,8 @@ class FirewallMap implements FirewallMapInterface
                 /** @var FirewallContext $context */
                 $context = $this->container->get($contextId);
 
-                if ($context->getConfig()?->isStateless() && !$request->attributes->has('_stateless')) {
-                    $request->attributes->set('_stateless', true);
+                if ($context->getConfig()?->isStateless() && null === $request->isStateless()) {
+                    $request->setStateless();
                 }
 
                 return $context;

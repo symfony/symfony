@@ -54,7 +54,7 @@ class FirewallMapTest extends TestCase
         $this->assertEquals([[], null, null], $firewallMap->getListeners($request));
         $this->assertNull($firewallMap->getFirewallConfig($request));
         $this->assertFalse($request->attributes->has(self::ATTRIBUTE_FIREWALL_CONTEXT));
-        $this->assertFalse($request->attributes->has('_stateless'));
+        $this->assertNull($request->isStateless());
     }
 
     /** @dataProvider providesStatefulStatelessRequests */
@@ -88,7 +88,7 @@ class FirewallMapTest extends TestCase
         $this->assertEquals([[$listener], $exceptionListener, $logoutListener], $firewallMap->getListeners($request));
         $this->assertEquals($firewallConfig, $firewallMap->getFirewallConfig($request));
         $this->assertEquals('security.firewall.map.context.foo', $request->attributes->get(self::ATTRIBUTE_FIREWALL_CONTEXT));
-        $this->assertEquals($expectedState, method_exists($request, 'isStateless') ? $request->isStateless() : $request->attributes->get('_stateless'));
+        $this->assertEquals($expectedState, $request->isStateless());
     }
 
     public static function providesStatefulStatelessRequests(): \Generator

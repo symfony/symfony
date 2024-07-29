@@ -127,7 +127,7 @@ class ProfilerController
             throw new NotFoundHttpException('The profiler must be enabled.');
         }
 
-        if (!$request->attributes->getBoolean('_stateless') && $request->hasSession()
+        if (!$request->isStateless() && $request->hasSession()
             && ($session = $request->getSession())->isStarted() && $session->getFlashBag() instanceof AutoExpireFlashBag
         ) {
             // keep current flashes for one more request if using AutoExpireFlashBag
@@ -174,7 +174,7 @@ class ProfilerController
         $this->cspHandler?->disableCsp();
 
         $session = null;
-        if (!$request->attributes->getBoolean('_stateless') && $request->hasSession()) {
+        if (!$request->isStateless() && $request->hasSession()) {
             $session = $request->getSession();
         }
 
@@ -254,7 +254,7 @@ class ProfilerController
         $token = $request->query->get('token');
         $profileType = $request->query->get('type', 'request');
 
-        if (!$request->attributes->getBoolean('_stateless') && $request->hasSession()) {
+        if (!$request->isStateless() && $request->hasSession()) {
             $session = $request->getSession();
 
             $session->set('_profiler_search_ip', $ip);

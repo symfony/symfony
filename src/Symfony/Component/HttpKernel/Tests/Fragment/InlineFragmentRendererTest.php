@@ -275,7 +275,7 @@ class InlineFragmentRendererTest extends TestCase
     public function testStatelessAttributeIsForwardedByDefault()
     {
         $request = Request::create('/');
-        $request->attributes->set('_stateless', true);
+        $request->setStateless();
 
         $kernel = $this->createMock(HttpKernelInterface::class);
         $kernel
@@ -290,7 +290,7 @@ class InlineFragmentRendererTest extends TestCase
     public function testStatelessAttributeCanBeDisabled()
     {
         $request = Request::create('/');
-        $request->attributes->set('_stateless', true);
+        $request->setStateless();
 
         $kernel = $this->createMock(HttpKernelInterface::class);
         $kernel

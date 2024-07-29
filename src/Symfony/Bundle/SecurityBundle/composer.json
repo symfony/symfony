@@ -24,7 +24,7 @@
         "symfony/dependency-injection": "^6.4|^7.0",
         "symfony/event-dispatcher": "^6.4|^7.0",
         "symfony/http-kernel": "^6.4|^7.0",
-        "symfony/http-foundation": "^6.4|^7.0",
+        "symfony/http-foundation": "^7.2",
         "symfony/password-hasher": "^6.4|^7.0",
         "symfony/security-core": "^7.2",
         "symfony/security-csrf": "^6.4|^7.0",

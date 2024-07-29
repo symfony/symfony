@@ -5,6 +5,7 @@ CHANGELOG
 ---
 
  * Add optional `$requests` argument to `RequestStack::__construct()`
+ * Add `Request::isStateless()`
 
 7.1
 ---

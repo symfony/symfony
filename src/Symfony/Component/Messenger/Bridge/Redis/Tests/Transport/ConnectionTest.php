@@ -397,7 +397,7 @@ class ConnectionTest extends TestCase
     {
         yield 'No delay' => ['/^THE_MESSAGE_ID$/', 0, 'xadd', 'THE_MESSAGE_ID'];
 
-        yield '100ms delay' => ['/^[a-f\d]+$/', 100, 'rawCommand', '1'];
+        yield '100ms delay' => ['/^[A-Z\d\/+]+$/i', 100, 'rawCommand', '1'];
     }
 
     public function testInvalidSentinelMasterName()

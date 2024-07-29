@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+7.2
+---
+
+ * Shorten the public digest of mapped assets to 7 characters
+
 7.1
 ---
 

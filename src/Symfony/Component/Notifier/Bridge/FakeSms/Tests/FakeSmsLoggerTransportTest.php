@@ -25,9 +25,7 @@ final class FakeSmsLoggerTransportTest extends TransportTestCase
 {
     public static function createTransport(?HttpClientInterface $client = null, ?LoggerInterface $logger = null): FakeSmsLoggerTransport
     {
-        $transport = (new FakeSmsLoggerTransport($logger ?? new NullLogger(), $client ?? new MockHttpClient()));
-
-        return $transport;
+        return new FakeSmsLoggerTransport($logger ?? new NullLogger(), $client ?? new MockHttpClient());
     }
 
     public static function toStringProvider(): iterable

@@ -65,7 +65,7 @@ final class AzureApiTransport extends AbstractApiTransport
 
         $response = $this->client->request('POST', 'https://'.$endpoint, [
             'body' => json_encode($payload),
-            'headers' => $this->getSignedHeaders($payload, $email),
+            'headers' => $this->getSignedHeaders($payload),
         ]);
 
         try {
@@ -189,7 +189,7 @@ final class AzureApiTransport extends AbstractApiTransport
     /**
      * Get authenticated headers for signed request,.
      */
-    private function getSignedHeaders(array $payload, Email $message): array
+    private function getSignedHeaders(array $payload): array
     {
         // HTTP Method verb (uppercase)
         $verb = 'POST';

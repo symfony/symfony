@@ -115,7 +115,7 @@ class PlantUmlDumper implements DumperInterface
             }
         }
 
-        return $this->startPuml($options).$this->getLines($code).$this->endPuml($options);
+        return $this->startPuml().$this->getLines($code).$this->endPuml();
     }
 
     private function isWorkflowTransitionType(): bool
@@ -123,15 +123,12 @@ class PlantUmlDumper implements DumperInterface
         return self::WORKFLOW_TRANSITION === $this->transitionType;
     }
 
-    private function startPuml(array $options): string
+    private function startPuml(): string
     {
-        $start = '@startuml'.\PHP_EOL;
-        $start .= 'allow_mixing'.\PHP_EOL;
-
-        return $start;
+        return '@startuml'.\PHP_EOL.'allow_mixing'.\PHP_EOL;
     }
 
-    private function endPuml(array $options): string
+    private function endPuml(): string
     {
         return \PHP_EOL.'@enduml';
     }

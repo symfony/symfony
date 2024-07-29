@@ -157,7 +157,7 @@ class Connection
         }
 
         $parsedPath = explode('/', ltrim($params['path'] ?? '/', '/'));
-        if (\count($parsedPath) > 0 && ($queueName = end($parsedPath))) {
+        if ($queueName = end($parsedPath)) {
             $configuration['queue_name'] = $queueName;
         }
         $configuration['account'] = 2 === \count($parsedPath) ? $parsedPath[0] : $options['account'] ?? self::DEFAULT_OPTIONS['account'];

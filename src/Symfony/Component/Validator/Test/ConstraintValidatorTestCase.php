@@ -235,7 +235,7 @@ abstract class ConstraintValidatorTestCase extends TestCase
     {
         $contextualValidator = $this->context->getValidator()->inContext($this->context);
         $contextualValidator->expectValidation($i, null, $value, $group, function ($passedConstraints) use ($constraints) {
-            if (\is_array($constraints) && !\is_array($passedConstraints)) {
+            if (!\is_array($passedConstraints)) {
                 $passedConstraints = [$passedConstraints];
             }
 
@@ -247,7 +247,7 @@ abstract class ConstraintValidatorTestCase extends TestCase
     {
         $contextualValidator = $this->context->getValidator()->inContext($this->context);
         $contextualValidator->expectValidation($i, null, $value, $group, function ($passedConstraints) use ($constraints) {
-            if (\is_array($constraints) && !\is_array($passedConstraints)) {
+            if (!\is_array($passedConstraints)) {
                 $passedConstraints = [$passedConstraints];
             }
 

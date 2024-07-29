@@ -318,7 +318,7 @@ class Connection
     private function publishWithDelay(string $body, array $headers, int $delay, ?AmqpStamp $amqpStamp = null): void
     {
         $routingKey = $this->getRoutingKeyForMessage($amqpStamp);
-        $isRetryAttempt = $amqpStamp ? $amqpStamp->isRetryAttempt() : false;
+        $isRetryAttempt = $amqpStamp && $amqpStamp->isRetryAttempt();
 
         $this->setupDelay($delay, $routingKey, $isRetryAttempt);
 

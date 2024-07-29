@@ -129,7 +129,7 @@ abstract class Constraint
         $normalizedOptions = [];
         $defaultOption = $this->getDefaultOption();
         $invalidOptions = [];
-        $missingOptions = array_flip((array) $this->getRequiredOptions());
+        $missingOptions = array_flip($this->getRequiredOptions());
         $knownOptions = get_class_vars(static::class);
 
         if (\is_array($options) && isset($options['value']) && !property_exists($this, 'value')) {

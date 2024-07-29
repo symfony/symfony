@@ -81,7 +81,7 @@ final class GenericType extends Type
         $variableTypesString = '';
         $glue = '';
         foreach ($this->variableTypes as $t) {
-            $variableTypesString .= $glue.((string) $t);
+            $variableTypesString .= $glue.$t;
             $glue = ',';
         }
 

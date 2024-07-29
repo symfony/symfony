@@ -11,8 +11,6 @@
 
 namespace Symfony\Component\Notifier\Bridge\PagerDuty;
 
-use Symfony\Component\Clock\Clock;
-use Symfony\Component\Clock\ClockInterface;
 use Symfony\Component\Notifier\Exception\InvalidArgumentException;
 use Symfony\Component\Notifier\Message\MessageOptionsInterface;
 
@@ -21,9 +19,7 @@ use Symfony\Component\Notifier\Message\MessageOptionsInterface;
  */
 final class PagerDutyOptions implements MessageOptionsInterface
 {
-    private ClockInterface $clock;
-
-    public function __construct(string $routingKey, string $eventAction, string $severity, private array $options = [], ?ClockInterface $clock = null)
+    public function __construct(string $routingKey, string $eventAction, string $severity, private array $options = [])
     {
         if (!\in_array($eventAction, ['trigger', 'acknowledge', 'resolve'], true)) {
             throw new InvalidArgumentException('Invalid "event_action" option given.');
@@ -56,8 +52,6 @@ final class PagerDutyOptions implements MessageOptionsInterface
         if (null === $dedupKey && \in_array($eventAction, ['acknowledge', 'resolve'], true)) {
             throw new InvalidArgumentException('Option "dedup_key" must be set for event actions: "acknowledge" & "resolve".');
         }
-
-        $this->clock = $clock ?? Clock::get();
     }
 
     public function toArray(): array

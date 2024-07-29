@@ -169,7 +169,7 @@ class PostgreSqlStore implements BlockingSharedLockStoreInterface, BlockingStore
         $stmt = $this->getConnection()->prepare($sql);
 
         $stmt->bindValue(':key', $this->getHashedKey($key));
-        $result = $stmt->execute();
+        $stmt->execute();
 
         if ($stmt->fetchColumn() > 0) {
             // connection is locked, check for lock in internal store

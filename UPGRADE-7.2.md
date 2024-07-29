@@ -8,6 +8,11 @@ Read more about this in the [Symfony documentation](https://symfony.com/doc/7.2/
 
 If you're upgrading from a version below 7.1, follow the [7.1 upgrade guide](UPGRADE-7.1.md) first.
 
+Cache
+-----
+
+ * `igbinary_serialize()` is not used by default when the igbinary extension is installed
+
 Form
 ----
 

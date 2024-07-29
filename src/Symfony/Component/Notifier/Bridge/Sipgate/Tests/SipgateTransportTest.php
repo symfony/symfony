@@ -89,7 +89,7 @@ class SipgateTransportTest extends TransportTestCase
         yield [
             403,
             '',
-            'Unable to send SMS with Sipgate: Error code 403 - no permisssion to use sms feature or password must be reset or senderId is wrong.',
+            'Unable to send SMS with Sipgate: Error code 403 - no permission to use sms feature or password must be reset or senderId is wrong.',
         ];
         yield [
             415,

@@ -61,7 +61,7 @@ final class IqsmsTransport extends AbstractTransport
                         'phone' => $message->getPhone(),
                         'text' => $message->getSubject(),
                         'sender' => $message->getFrom() ?: $this->from,
-                        'clientId' => uniqid('', true),
+                        'clientId' => bin2hex(random_bytes(4)),
                     ],
                 ],
                 'login' => $this->login,

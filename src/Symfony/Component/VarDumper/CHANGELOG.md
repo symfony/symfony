@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+7.2
+---
+
+ * Add clickable links in `HtmlDumper`
+
 7.1
 ---
 

@@ -186,6 +186,7 @@ EOTXT
         return [
             [['dummy' => new ImgStub('dummy', 'img/png', '100em')], '<img src="data:img/png;base64,ZHVtbXk=" />'],
             ['foo', '<span class=sf-dump-str title="3 characters">foo</span>'],
+            ['https://symfony.com', "<a href=https://symfony.com target=_blank class=sf-dump-link>\"<span class=sf-dump-str title=\"19 characters\">https://symfony.com</span>\"\n</a>"],
         ];
     }
 }

@@ -681,6 +681,9 @@ pre.sf-dump code {
     padding:0;
     background:none;
 }
+.sf-dump-link .sf-dump-str:hover {
+    text-decoration: underline;
+}
 .sf-dump-public.sf-dump-highlight,
 .sf-dump-protected.sf-dump-highlight,
 .sf-dump-private.sf-dump-highlight,
@@ -779,6 +782,10 @@ EOHTML
             $this->line .= $this->indentPad;
             $this->line .= \sprintf('<img src="data:%s;base64,%s" /></samp>', $cursor->attr['content-type'], base64_encode($cursor->attr['img-data']));
             $this->endValue($cursor);
+        } elseif (filter_var($str, FILTER_VALIDATE_URL)) {
+            $this->line .= \sprintf('<a href=%s target=_blank class=sf-dump-link>', $str);
+            parent::dumpString($cursor, $str, $bin, $cut);
+            $this->line .= '</a>';
         } else {
             parent::dumpString($cursor, $str, $bin, $cut);
         }

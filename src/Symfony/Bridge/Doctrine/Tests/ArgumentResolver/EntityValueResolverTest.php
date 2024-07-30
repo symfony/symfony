@@ -139,6 +139,20 @@ class EntityValueResolverTest extends TestCase
         $this->assertSame([null], $resolver->resolve($request, $argument));
     }
 
+    public function testResolveWithArrayIdNullValue()
+    {
+        $manager = $this->createMock(ObjectManager::class);
+        $registry = $this->createRegistry($manager);
+        $resolver = new EntityValueResolver($registry);
+
+        $request = new Request();
+        $request->attributes->set('nullValue', null);
+
+        $argument = $this->createArgument(entity: new MapEntity(id: ['nullValue']), isNullable: true,);
+
+        $this->assertSame([null], $resolver->resolve($request, $argument));
+    }
+
     public function testResolveWithConversionFailedException()
     {
         $manager = $this->getMockBuilder(ObjectManager::class)->getMock();

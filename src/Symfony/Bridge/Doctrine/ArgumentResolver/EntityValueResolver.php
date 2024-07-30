@@ -104,6 +104,9 @@ final class EntityValueResolver implements ValueResolverInterface
         if (false === $id || null === $id) {
             return $id;
         }
+        if (\is_array($id) && \in_array(null, $id, true)) {
+            return null;
+        }
 
         if ($options->evictCache && $manager instanceof EntityManagerInterface) {
             $cacheProvider = $manager->getCache();

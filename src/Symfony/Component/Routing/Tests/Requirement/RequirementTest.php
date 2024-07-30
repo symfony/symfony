@@ -464,4 +464,62 @@ class RequirementTest extends TestCase
             '/'.$uuid,
         );
     }
+
+    /**
+     * @testWith    ["00000000-0000-7000-8000-000000000000"]
+     *              ["ffffffff-ffff-7fff-bfff-ffffffffffff"]
+     *              ["01910577-4898-7c47-966e-68d127dde2ac"]
+     */
+    public function testUuidV7OK(string $uuid)
+    {
+        $this->assertMatchesRegularExpression(
+            (new Route('/{uuid}', [], ['uuid' => Requirement::UUID_V7]))->compile()->getRegex(),
+            '/'.$uuid,
+        );
+    }
+
+    /**
+     * @testWith    [""]
+     *              ["foo"]
+     *              ["15baaab2-f310-11d2-9ecf-53afc49918d1"]
+     *              ["acd44dc8-d2cc-326c-9e3a-80a3305a25e8"]
+     *              ["7fc2705f-a8a4-5b31-99a8-890686d64189"]
+     *              ["1ecbc991-3552-6920-998e-efad54178a98"]
+     */
+    public function testUuidV7KO(string $uuid)
+    {
+        $this->assertDoesNotMatchRegularExpression(
+            (new Route('/{uuid}', [], ['uuid' => Requirement::UUID_V7]))->compile()->getRegex(),
+            '/'.$uuid,
+        );
+    }
+
+    /**
+     * @testWith    ["00000000-0000-8000-8000-000000000000"]
+     *              ["ffffffff-ffff-8fff-bfff-ffffffffffff"]
+     *              ["01910577-4898-8c47-966e-68d127dde2ac"]
+     */
+    public function testUuidV8OK(string $uuid)
+    {
+        $this->assertMatchesRegularExpression(
+            (new Route('/{uuid}', [], ['uuid' => Requirement::UUID_V8]))->compile()->getRegex(),
+            '/'.$uuid,
+        );
+    }
+
+    /**
+     * @testWith    [""]
+     *              ["foo"]
+     *              ["15baaab2-f310-11d2-9ecf-53afc49918d1"]
+     *              ["acd44dc8-d2cc-326c-9e3a-80a3305a25e8"]
+     *              ["7fc2705f-a8a4-5b31-99a8-890686d64189"]
+     *              ["1ecbc991-3552-6920-998e-efad54178a98"]
+     */
+    public function testUuidV8KO(string $uuid)
+    {
+        $this->assertDoesNotMatchRegularExpression(
+            (new Route('/{uuid}', [], ['uuid' => Requirement::UUID_V8]))->compile()->getRegex(),
+            '/'.$uuid,
+        );
+    }
 }

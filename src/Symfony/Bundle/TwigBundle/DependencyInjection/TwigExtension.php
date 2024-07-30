@@ -25,6 +25,7 @@ use Symfony\Component\Mailer\Mailer;
 use Symfony\Component\Translation\LocaleSwitcher;
 use Symfony\Component\Translation\Translator;
 use Symfony\Contracts\Service\ResetInterface;
+use Twig\Cache\FilesystemCache;
 use Twig\Extension\ExtensionInterface;
 use Twig\Extension\RuntimeExtensionInterface;
 use Twig\Loader\LoaderInterface;
@@ -153,6 +154,24 @@ class TwigExtension extends Extension
             }
         }
 
+        if (!isset($config['cache']) || true === $config['cache']) {
+            $config['cache'] = new Reference('twig.template_cache.chain');
+
+            $cacheOptions = ($config['auto_reload'] ?? true) ? FilesystemCache::FORCE_BYTECODE_INVALIDATION : 0;
+            $container->getDefinition('twig.template_cache.runtime_cache')->replaceArgument(1, $cacheOptions);
+        } else {
+            $container->removeDefinition('twig.template_cache.chain');
+            $container->removeDefinition('twig.template_cache.runtime_cache');
+            $container->removeDefinition('twig.template_cache.readonly_cache');
+            $container->removeDefinition('twig.template_cache.warmup_cache');
+
+            if (false === $config['cache']) {
+                $container->removeDefinition('twig.template_cache_warmer');
+            } else {
+                $container->getDefinition('twig.template_cache_warmer')->replaceArgument(2, null);
+            }
+        }
+
         if (isset($config['autoescape_service'])) {
             $config['autoescape'] = [new Reference($config['autoescape_service']), $config['autoescape_service_method'] ?? '__invoke'];
         } else {
@@ -173,10 +192,6 @@ class TwigExtension extends Extension
         $container->registerForAutoconfiguration(ExtensionInterface::class)->addTag('twig.extension');
         $container->registerForAutoconfiguration(LoaderInterface::class)->addTag('twig.loader');
         $container->registerForAutoconfiguration(RuntimeExtensionInterface::class)->addTag('twig.runtime');
-
-        if (false === $config['cache']) {
-            $container->removeDefinition('twig.template_cache_warmer');
-        }
     }
 
     private function getBundleTemplatePaths(ContainerBuilder $container, array $config): array

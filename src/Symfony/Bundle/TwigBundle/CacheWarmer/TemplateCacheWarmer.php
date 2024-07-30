@@ -14,6 +14,7 @@ namespace Symfony\Bundle\TwigBundle\CacheWarmer;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerInterface;
 use Symfony\Contracts\Service\ServiceSubscriberInterface;
+use Twig\Cache\CacheInterface;
 use Twig\Environment;
 use Twig\Error\Error;
 
@@ -34,12 +35,23 @@ class TemplateCacheWarmer implements CacheWarmerInterface, ServiceSubscriberInte
     public function __construct(
         private ContainerInterface $container,
         private iterable $iterator,
+        private ?CacheInterface $cache = null,
     ) {
     }
 
     public function warmUp(string $cacheDir, ?string $buildDir = null): array
     {
+        if (!$buildDir) {
+            return [];
+        }
+
         $this->twig ??= $this->container->get('twig');
+
+        $originalCache = $this->twig->getCache();
+        if (null !== $this->cache) {
+            // Swap the cache for the warmup as the Twig Environment has the ChainCache injected
+            $this->twig->setCache($this->cache);
+        }
 
         foreach ($this->iterator as $template) {
             try {
@@ -55,6 +67,8 @@ class TemplateCacheWarmer implements CacheWarmerInterface, ServiceSubscriberInte
                  */
             }
         }
+
+        $this->twig->setCache($originalCache);
 
         return [];
     }

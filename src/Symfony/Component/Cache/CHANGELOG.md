@@ -4,6 +4,7 @@ CHANGELOG
 7.2
 ---
 
+ * `igbinary_serialize()` is not used by default when the igbinary extension is installed
  * Add optional `Psr\Clock\ClockInterface` parameter to `ArrayAdapter`
 
 7.1

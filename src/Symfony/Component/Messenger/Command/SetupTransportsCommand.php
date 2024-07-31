@@ -87,8 +87,6 @@ EOF
     {
         if ($input->mustSuggestArgumentValuesFor('transport')) {
             $suggestions->suggestValues($this->transportNames);
-
-            return;
         }
     }
 }

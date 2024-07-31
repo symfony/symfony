@@ -88,8 +88,6 @@ class UrlValidator extends ConstraintValidator
                     ->setParameter('{{ value }}', $this->formatValue($value))
                     ->setCode(Url::MISSING_TLD_ERROR)
                     ->addViolation();
-
-                return;
             }
         }
     }

@@ -485,7 +485,7 @@ final class Dotenv
             (?P<closing_brace>\})?             # optional closing brace
         /x';
 
-        $value = preg_replace_callback($regex, function ($matches) use ($loadedVars) {
+        return preg_replace_callback($regex, function ($matches) use ($loadedVars) {
             // odd number of backslashes means the $ character is escaped
             if (1 === \strlen($matches['backslashes']) % 2) {
                 return substr($matches[0], 1);
@@ -532,8 +532,6 @@ final class Dotenv
 
             return $matches['backslashes'].$value;
         }, $value);
-
-        return $value;
     }
 
     private function moveCursor(string $text): void

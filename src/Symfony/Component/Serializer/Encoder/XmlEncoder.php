@@ -152,9 +152,8 @@ class XmlEncoder implements EncoderInterface, DecoderInterface, NormalizationAwa
         }
 
         $data = array_merge($this->parseXmlAttributes($rootNode, $context), ['#' => $rootNode->nodeValue]);
-        $data = $this->addXmlNamespaces($data, $rootNode, $dom);
 
-        return $data;
+        return $this->addXmlNamespaces($data, $rootNode, $dom);
     }
 
     public function supportsEncoding(string $format): bool

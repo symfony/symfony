@@ -610,7 +610,7 @@ final class ProgressBar
     {
         \assert(null !== $this->format);
 
-        $regex = "{%([a-z\-_]+)(?:\:([^%]+))?%}i";
+        $regex = '{%([a-z\-_]+)(?:\:([^%]+))?%}i';
         $callback = function ($matches) {
             if ($formatter = $this->getPlaceholderFormatter($matches[1])) {
                 $text = $formatter($this, $this->output);

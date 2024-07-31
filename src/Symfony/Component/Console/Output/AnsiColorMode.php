@@ -96,11 +96,11 @@ enum AnsiColorMode
             }
 
             return (int) round(($r - 8) / 247 * 24) + 232;
-        } else {
-            return 16 +
-                    (36 * (int) round($r / 255 * 5)) +
-                    (6 * (int) round($g / 255 * 5)) +
-                    (int) round($b / 255 * 5);
         }
+
+        return 16 +
+            (36 * (int) round($r / 255 * 5)) +
+            (6 * (int) round($g / 255 * 5)) +
+            (int) round($b / 255 * 5);
     }
 }

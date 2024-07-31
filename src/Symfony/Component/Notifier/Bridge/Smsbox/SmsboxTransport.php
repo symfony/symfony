@@ -66,7 +66,7 @@ final class SmsboxTransport extends AbstractTransport
         }
 
         $phoneCleaned = preg_replace('/[^0-9+]+/', '', $message->getPhone());
-        if (!preg_match("/^(\+|)[0-9]{7,14}$/", $phoneCleaned)) {
+        if (!preg_match('/^(\+|)[0-9]{7,14}$/', $phoneCleaned)) {
             throw new InvalidArgumentException('Invalid phone number.');
         }
 

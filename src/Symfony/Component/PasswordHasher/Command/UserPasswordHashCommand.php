@@ -162,8 +162,6 @@ EOF
     {
         if ($input->mustSuggestArgumentValuesFor('user-class')) {
             $suggestions->suggestValues($this->userClasses);
-
-            return;
         }
     }
 

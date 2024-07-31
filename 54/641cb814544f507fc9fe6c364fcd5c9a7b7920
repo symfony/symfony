@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by stof at 2024-07-31T07:37:14Z
+
+because of my comment in https://github.com/symfony/symfony/issues/57878#issuecomment-2258101585, I would suggest considering it as a bugfix
+
+---------------------------------------------------------------------------
+
+by smnandre at 2024-07-31T09:39:39Z
+
+Do you want me to change the target branch ?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2024-07-31T10:05:30Z
+
+we should be able to do that while merging

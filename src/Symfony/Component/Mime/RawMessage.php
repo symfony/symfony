@@ -18,11 +18,14 @@ use Symfony\Component\Mime\Exception\LogicException;
  */
 class RawMessage
 {
-    /** @var iterable|string|resource */
+    /** @var iterable<string>|string|resource */
     private $message;
     private bool $isGeneratorClosed;
 
-    public function __construct(iterable|string $message)
+    /**
+     * @param iterable<string>|string|resource $message
+     */
+    public function __construct(mixed $message)
     {
         $this->message = $message;
     }

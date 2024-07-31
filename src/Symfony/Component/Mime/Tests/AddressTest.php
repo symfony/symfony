@@ -44,6 +44,14 @@ class AddressTest extends TestCase
         $this->assertEquals($a, Address::create('fabien@symfony.com'));
     }
 
+    public function testCreateWithInvalidFormat()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Could not parse "<fabien@symfony" to a "Symfony\Component\Mime\Address" instance.');
+
+        Address::create('<fabien@symfony');
+    }
+
     /**
      * @dataProvider fromStringProvider
      */

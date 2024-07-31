@@ -54,6 +54,7 @@ class Url extends Constraint
         ?array $groups = null,
         mixed $payload = null,
         ?bool $requireTld = null,
+        ?string $tldMessage = null,
     ) {
         parent::__construct($options, $groups, $payload);
 
@@ -66,6 +67,7 @@ class Url extends Constraint
         $this->relativeProtocol = $relativeProtocol ?? $this->relativeProtocol;
         $this->normalizer = $normalizer ?? $this->normalizer;
         $this->requireTld = $requireTld ?? $this->requireTld;
+        $this->tldMessage = $tldMessage ?? $this->tldMessage;
 
         if (null !== $this->normalizer && !\is_callable($this->normalizer)) {
             throw new InvalidArgumentException(sprintf('The "normalizer" option must be a valid callable ("%s" given).', get_debug_type($this->normalizer)));

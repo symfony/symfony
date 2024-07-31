@@ -46,18 +46,26 @@ class RemotePackageStorageTest extends TestCase
         $vendorDir = self::$writableRoot.'/assets/acme/vendor';
         $this->filesystem->mkdir($vendorDir.'/module_specifier');
         $this->filesystem->touch($vendorDir.'/module_specifier/module_specifier.index.js');
-        $this->filesystem->chmod($vendorDir.'/module_specifier/module_specifier.index.js', 0555);
+        if ('\\' === \DIRECTORY_SEPARATOR) {
+            $this->filesystem->chmod($vendorDir.'/module_specifier/module_specifier.index.js', 0555);
+        } else {
+            $this->filesystem->chmod($vendorDir.'/module_specifier/', 0555);
+        }
 
         $storage = new RemotePackageStorage($vendorDir);
         $entry = ImportMapEntry::createRemote('foo', ImportMapType::JS, '/does/not/matter', '1.0.0', 'module_specifier', false);
 
         $this->expectException(\RuntimeException::class);
-        $this->expectExceptionMessage('file_put_contents('.$vendorDir.'/module_specifier/module_specifier.index.js): Failed to open stream: Permission denied');
+        $this->expectExceptionMessage('Failed to write file "'.$vendorDir.'/module_specifier/module_specifier.index.js".');
 
         try {
             $storage->save($entry, 'any content');
         } finally {
-            $this->filesystem->chmod($vendorDir.'/module_specifier/module_specifier.index.js', 0777);
+            if ('\\' === \DIRECTORY_SEPARATOR) {
+                $this->filesystem->chmod($vendorDir.'/module_specifier/module_specifier.index.js', 0777);
+            } else {
+                $this->filesystem->chmod($vendorDir.'/module_specifier/', 0777);
+            }
         }
     }
 

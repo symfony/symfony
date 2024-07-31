@@ -409,11 +409,7 @@ class ImportMapManagerTest extends TestCase
 
     private function writeFile(string $filename, string $content): void
     {
-        $path = \dirname(self::$writableRoot.'/'.$filename);
-        if (!is_dir($path)) {
-            mkdir($path, 0777, true);
-        }
-        file_put_contents(self::$writableRoot.'/'.$filename, $content);
+        $this->filesystem->dumpFile(self::$writableRoot.'/'.$filename, $content);
     }
 
     private static function createLocalEntry(string $importName, string $path, ImportMapType $type = ImportMapType::JS, bool $isEntrypoint = false): ImportMapEntry

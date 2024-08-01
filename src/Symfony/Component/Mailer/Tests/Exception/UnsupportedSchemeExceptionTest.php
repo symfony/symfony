@@ -24,6 +24,7 @@ use Symfony\Component\Mailer\Bridge\Mailgun\Transport\MailgunTransportFactory;
 use Symfony\Component\Mailer\Bridge\Mailjet\Transport\MailjetTransportFactory;
 use Symfony\Component\Mailer\Bridge\Mailomat\Transport\MailomatTransportFactory;
 use Symfony\Component\Mailer\Bridge\MailPace\Transport\MailPaceTransportFactory;
+use Symfony\Component\Mailer\Bridge\Postal\Transport\PostalTransportFactory;
 use Symfony\Component\Mailer\Bridge\Postmark\Transport\PostmarkTransportFactory;
 use Symfony\Component\Mailer\Bridge\Resend\Transport\ResendTransportFactory;
 use Symfony\Component\Mailer\Bridge\Scaleway\Transport\ScalewayTransportFactory;
@@ -50,6 +51,7 @@ final class UnsupportedSchemeExceptionTest extends TestCase
             MailjetTransportFactory::class => false,
             MailomatTransportFactory::class => false,
             MandrillTransportFactory::class => false,
+            PostalTransportFactory::class => false,
             PostmarkTransportFactory::class => false,
             ResendTransportFactory::class => false,
             ScalewayTransportFactory::class => false,
@@ -83,6 +85,7 @@ final class UnsupportedSchemeExceptionTest extends TestCase
         yield ['mailomat', 'symfony/mailomat-mailer'];
         yield ['mailpace', 'symfony/mail-pace-mailer'];
         yield ['mandrill', 'symfony/mailchimp-mailer'];
+        yield ['postal', 'symfony/postal-mailer'];
         yield ['postmark', 'symfony/postmark-mailer'];
         yield ['resend', 'symfony/resend-mailer'];
         yield ['scaleway', 'symfony/scaleway-mailer'];

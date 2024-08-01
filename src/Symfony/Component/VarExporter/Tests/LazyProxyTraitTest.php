@@ -205,7 +205,7 @@ class LazyProxyTraitTest extends TestCase
 
     public function testWither()
     {
-        $obj = new class() {
+        $obj = new class {
             public $foo = 123;
 
             public function withFoo($foo): static
@@ -226,7 +226,7 @@ class LazyProxyTraitTest extends TestCase
 
     public function testFluent()
     {
-        $obj = new class() {
+        $obj = new class {
             public $foo = 123;
 
             public function setFoo($foo): static
@@ -244,7 +244,7 @@ class LazyProxyTraitTest extends TestCase
 
     public function testIndirectModification()
     {
-        $obj = new class() {
+        $obj = new class {
             public array $foo;
         };
         $proxy = $this->createLazyProxy($obj::class, fn () => $obj);
@@ -268,7 +268,7 @@ class LazyProxyTraitTest extends TestCase
 
     public function testLazyDecoratorClass()
     {
-        $obj = new class() extends TestClass {
+        $obj = new class extends TestClass {
             use LazyProxyTrait {
                 createLazyProxy as private;
             }

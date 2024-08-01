@@ -98,7 +98,7 @@ class CheckExceptionOnInvalidReferenceBehaviorPass extends AbstractRecursivePass
             }
         }
 
-        $pass = new class() extends AbstractRecursivePass {
+        $pass = new class extends AbstractRecursivePass {
             public Reference $ref;
             public string $sourceId;
             public array $alternatives;

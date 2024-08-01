@@ -292,7 +292,7 @@ final class AmpResponse implements ResponseInterface, StreamableInterface
                 return $response;
             }
 
-            $urlResolver = new class() {
+            $urlResolver = new class {
                 use HttpClientTrait {
                     parseUrl as public;
                     resolveUrl as public;

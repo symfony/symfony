@@ -273,7 +273,7 @@ class HttpClientDataCollectorTest extends TestCase
                             'fooprop' => 'foopropval',
                             'barprop' => 'barpropval',
                         ],
-                        'tostring' => new class() {
+                        'tostring' => new class {
                             public function __toString(): string
                             {
                                 return 'tostringval';

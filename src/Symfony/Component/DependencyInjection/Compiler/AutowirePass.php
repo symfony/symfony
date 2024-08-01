@@ -50,7 +50,7 @@ class AutowirePass extends AbstractRecursivePass
     public function __construct(
         private bool $throwOnAutowiringException = true,
     ) {
-        $this->defaultArgument = new class() {
+        $this->defaultArgument = new class {
             public $value;
             public $names;
             public $bag;

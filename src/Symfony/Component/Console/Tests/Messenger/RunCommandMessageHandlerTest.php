@@ -86,7 +86,7 @@ final class RunCommandMessageHandlerTest extends TestCase
         $application = new Application();
         $application->setAutoExit(false);
         $application->addCommands([
-            new class() extends Command {
+            new class extends Command {
                 public function configure(): void
                 {
                     $this

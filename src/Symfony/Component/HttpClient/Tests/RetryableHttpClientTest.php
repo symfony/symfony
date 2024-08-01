@@ -215,7 +215,7 @@ class RetryableHttpClientTest extends TestCase
             ]),
             new GenericRetryStrategy(),
             1,
-            $logger = new class() extends TestLogger {
+            $logger = new class extends TestLogger {
                 public array $context = [];
 
                 public function log($level, $message, array $context = []): void
@@ -259,7 +259,7 @@ class RetryableHttpClientTest extends TestCase
 
         TestHttpServer::start();
 
-        $strategy = new class() implements RetryStrategyInterface {
+        $strategy = new class implements RetryStrategyInterface {
             public $isCalled = false;
 
             public function shouldRetry(AsyncContext $context, ?string $responseContent, ?TransportExceptionInterface $exception): ?bool

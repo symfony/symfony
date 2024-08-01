@@ -117,7 +117,7 @@ class TextPartTest extends TestCase
 
     public function testCustomEncoding()
     {
-        TextPart::addEncoder('upper_encoder', new class() implements ContentEncoderInterface {
+        TextPart::addEncoder('upper_encoder', new class implements ContentEncoderInterface {
             public function encodeByteStream($stream, int $maxLineLength = 0): iterable
             {
                 $filter = stream_filter_append($stream, 'string.toupper', \STREAM_FILTER_READ);

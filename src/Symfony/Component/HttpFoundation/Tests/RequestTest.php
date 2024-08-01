@@ -2213,7 +2213,7 @@ class RequestTest extends TestCase
 
     public function testFactoryCallable()
     {
-        $requestFactory = new class() {
+        $requestFactory = new class {
             public function createRequest(): Request
             {
                 return new NewRequest();

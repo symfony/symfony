@@ -147,7 +147,7 @@ class PropertyAccessorTest extends TestCase
 
     public function testGetValueThrowsExceptionIfUninitializedPropertyWithGetterOfAnonymousClass()
     {
-        $object = new class() {
+        $object = new class {
             private $uninitialized;
 
             public function getUninitialized(): array
@@ -164,7 +164,7 @@ class PropertyAccessorTest extends TestCase
 
     public function testGetValueThrowsExceptionIfUninitializedNotNullablePropertyWithGetterOfAnonymousClass()
     {
-        $object = new class() {
+        $object = new class {
             private string $uninitialized;
 
             public function getUninitialized(): string
@@ -181,7 +181,7 @@ class PropertyAccessorTest extends TestCase
 
     public function testGetValueThrowsExceptionIfUninitializedPropertyOfAnonymousClass()
     {
-        $object = new class() {
+        $object = new class {
             public string $uninitialized;
         };
 
@@ -209,7 +209,7 @@ class PropertyAccessorTest extends TestCase
 
     public function testGetValueThrowsExceptionIfUninitializedPropertyWithGetterOfAnonymousStdClass()
     {
-        $object = new class() extends \stdClass {
+        $object = new class extends \stdClass {
             private $uninitialized;
 
             public function getUninitialized(): array
@@ -226,7 +226,7 @@ class PropertyAccessorTest extends TestCase
 
     public function testGetValueThrowsExceptionIfUninitializedPropertyWithGetterOfAnonymousChildClass()
     {
-        $object = new class() extends UninitializedPrivateProperty {
+        $object = new class extends UninitializedPrivateProperty {
         };
 
         $this->expectException(UninitializedPropertyException::class);

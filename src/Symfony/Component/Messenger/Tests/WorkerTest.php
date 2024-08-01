@@ -72,7 +72,7 @@ class WorkerTest extends TestCase
                 return $envelopes[] = $envelope;
             });
 
-        $dispatcher = new class() implements EventDispatcherInterface {
+        $dispatcher = new class implements EventDispatcherInterface {
             private StopWorkerOnMessageLimitListener $listener;
 
             public function __construct()
@@ -417,7 +417,7 @@ class WorkerTest extends TestCase
         $eventDispatcher = new EventDispatcher();
         $eventDispatcher->addSubscriber(new StopWorkerOnMessageLimitListener(1));
 
-        $stamp = new class() implements StampInterface {
+        $stamp = new class implements StampInterface {
         };
         $listener = function (WorkerMessageReceivedEvent $event) use ($stamp) {
             $event->addStamps($stamp);

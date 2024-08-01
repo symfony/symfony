@@ -29,7 +29,7 @@ class DoctrineOpenTransactionLoggerMiddlewareTest extends MiddlewareTestCase
 
     protected function setUp(): void
     {
-        $this->logger = new class() extends AbstractLogger {
+        $this->logger = new class extends AbstractLogger {
             public array $logs = [];
 
             public function log($level, $message, $context = []): void

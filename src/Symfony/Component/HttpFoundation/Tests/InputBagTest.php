@@ -20,7 +20,7 @@ class InputBagTest extends TestCase
 {
     public function testGet()
     {
-        $bag = new InputBag(['foo' => 'bar', 'null' => null, 'int' => 1, 'float' => 1.0, 'bool' => false, 'stringable' => new class() implements \Stringable {
+        $bag = new InputBag(['foo' => 'bar', 'null' => null, 'int' => 1, 'float' => 1.0, 'bool' => false, 'stringable' => new class implements \Stringable {
             public function __toString(): string
             {
                 return 'strval';
@@ -58,7 +58,7 @@ class InputBagTest extends TestCase
 
     public function testGetString()
     {
-        $bag = new InputBag(['integer' => 123, 'bool_true' => true, 'bool_false' => false, 'string' => 'abc', 'stringable' => new class() implements \Stringable {
+        $bag = new InputBag(['integer' => 123, 'bool_true' => true, 'bool_false' => false, 'string' => 'abc', 'stringable' => new class implements \Stringable {
             public function __toString(): string
             {
                 return 'strval';

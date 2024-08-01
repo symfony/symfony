@@ -141,7 +141,7 @@ final class AmpClientState extends ClientState
         $options['capture_peer_cert_chain'] && $context = $context->withPeerCapturing();
         $options['crypto_method'] && $context = $context->withMinimumVersion($options['crypto_method']);
 
-        $connector = $handleConnector = new class() implements Connector {
+        $connector = $handleConnector = new class implements Connector {
             public DnsConnector $connector;
             public string $uri;
             /** @var resource|null */

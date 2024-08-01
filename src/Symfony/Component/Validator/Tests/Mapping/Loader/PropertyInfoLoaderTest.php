@@ -58,7 +58,7 @@ class PropertyInfoLoaderTest extends TestCase
             ])
         ;
 
-        $propertyTypeExtractor = new class() implements PropertyTypeExtractorInterface {
+        $propertyTypeExtractor = new class implements PropertyTypeExtractorInterface {
             private int $i = 0;
             private int $j = 0;
             private array $types;
@@ -234,7 +234,7 @@ class PropertyInfoLoaderTest extends TestCase
             ->willReturn(['string'])
         ;
 
-        $propertyTypeExtractor = new class() implements PropertyTypeExtractorInterface {
+        $propertyTypeExtractor = new class implements PropertyTypeExtractorInterface {
             public function getType(string $class, string $property, array $context = []): ?Type
             {
                 return Type::string();
@@ -273,7 +273,7 @@ class PropertyInfoLoaderTest extends TestCase
                 ->willReturn(['string', 'autoMappingExplicitlyEnabled'])
             ;
 
-            $propertyTypeExtractor = new class() implements PropertyTypeExtractorInterface {
+            $propertyTypeExtractor = new class implements PropertyTypeExtractorInterface {
                 public function getType(string $class, string $property, array $context = []): ?Type
                 {
                     return Type::string();

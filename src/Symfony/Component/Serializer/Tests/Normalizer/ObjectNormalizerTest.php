@@ -749,7 +749,7 @@ class ObjectNormalizerTest extends TestCase
         $normalizer = new ObjectNormalizer(null, null, null, $extractor);
         $serializer = new Serializer([new ArrayDenormalizer(), new DateTimeNormalizer(), $normalizer]);
 
-        $this->assertSame('bar', $serializer->denormalize(['foo' => 'bar'], (new class() {
+        $this->assertSame('bar', $serializer->denormalize(['foo' => 'bar'], (new class {
             /** @var self::*|null */
             public $foo;
         })::class)->foo);
@@ -784,7 +784,7 @@ class ObjectNormalizerTest extends TestCase
 
     public function testAdvancedNameConverter()
     {
-        $nameConverter = new class() implements AdvancedNameConverterInterface {
+        $nameConverter = new class implements AdvancedNameConverterInterface {
             public function normalize(string $propertyName, ?string $class = null, ?string $format = null, array $context = []): string
             {
                 return \sprintf('%s-%s-%s-%s', $propertyName, $class, $format, $context['foo']);

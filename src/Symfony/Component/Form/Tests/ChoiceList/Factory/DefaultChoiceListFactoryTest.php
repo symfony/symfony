@@ -728,7 +728,7 @@ class DefaultChoiceListFactoryTest extends TestCase
 
     public function testPassTranslatableInterfaceAsLabelDoesntCastItToString()
     {
-        $message = new class() implements TranslatableInterface {
+        $message = new class implements TranslatableInterface {
             public function trans(TranslatorInterface $translator, ?string $locale = null): string
             {
                 return 'my_message';

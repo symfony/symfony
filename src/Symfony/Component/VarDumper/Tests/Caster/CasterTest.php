@@ -178,7 +178,7 @@ EOTXT
 
     public function testTypeErrorInDebugInfo()
     {
-        $this->assertDumpMatchesFormat('class@anonymous {}', new class() {
+        $this->assertDumpMatchesFormat('class@anonymous {}', new class {
             public function __debugInfo(): array
             {
                 return ['class' => \get_class(null)];

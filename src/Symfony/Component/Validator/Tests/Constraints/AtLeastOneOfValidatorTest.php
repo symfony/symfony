@@ -189,7 +189,7 @@ class AtLeastOneOfValidatorTest extends ConstraintValidatorTestCase
     public function testContextIsPropagatedToNestedConstraints()
     {
         $validator = Validation::createValidatorBuilder()
-            ->setMetadataFactory(new class() implements MetadataFactoryInterface {
+            ->setMetadataFactory(new class implements MetadataFactoryInterface {
                 public function getMetadataFor($classOrObject): MetadataInterface
                 {
                     return (new ClassMetadata(ExpressionConstraintNested::class))
@@ -215,7 +215,7 @@ class AtLeastOneOfValidatorTest extends ConstraintValidatorTestCase
     public function testEmbeddedMessageTakenFromFailingConstraint()
     {
         $validator = Validation::createValidatorBuilder()
-            ->setMetadataFactory(new class() implements MetadataFactoryInterface {
+            ->setMetadataFactory(new class implements MetadataFactoryInterface {
                 public function getMetadataFor($classOrObject): MetadataInterface
                 {
                     return (new ClassMetadata(Data::class))
@@ -265,7 +265,7 @@ class AtLeastOneOfValidatorTest extends ConstraintValidatorTestCase
 
     public function testTranslatorIsCalledOnConstraintBaseMessageAndViolations()
     {
-        $translator = new class() implements TranslatorInterface, LocaleAwareInterface {
+        $translator = new class implements TranslatorInterface, LocaleAwareInterface {
             use TranslatorTrait;
 
             public function trans(?string $id, array $parameters = [], ?string $domain = null, ?string $locale = null): string

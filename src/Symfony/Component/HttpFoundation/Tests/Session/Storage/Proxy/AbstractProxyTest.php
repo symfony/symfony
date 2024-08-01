@@ -27,7 +27,7 @@ class AbstractProxyTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->proxy = new class() extends AbstractProxy {};
+        $this->proxy = new class extends AbstractProxy {};
     }
 
     public function testGetSaveHandlerName()

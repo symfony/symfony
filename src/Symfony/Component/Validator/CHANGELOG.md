@@ -10,6 +10,7 @@ CHANGELOG
  * Add `errorPath` to Unique constraint
  * Add the `format` option to the `Ulid` constraint to allow accepting different ULID formats
  * Add the `WordCount` constraint
+ * Add the `Week` constraint
 
 7.1
 ---

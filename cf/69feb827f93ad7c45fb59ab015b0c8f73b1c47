@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2024-05-02T14:30:01Z
+
+That's nice! If this get accepted, don't forget to declare your new data providers static, a few ones are missing in the current codebase and will be fixed here https://github.com/symfony/symfony/pull/54824 🙂
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2024-07-13T07:59:34Z
+
+Ready to merge from my side
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2024-07-26T12:52:25Z
+
+Rebased
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2024-08-02T19:08:52Z
+
+Rebased

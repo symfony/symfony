@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+7.2
+---
+
+ * Add optional `$requests` argument to `RequestStack::__construct()`
+
 7.1
 ---
 

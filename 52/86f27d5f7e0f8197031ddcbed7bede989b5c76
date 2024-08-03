@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by alexander-schranz at 2024-08-02T09:26:17Z
+
+I was may a little bit to fast with refactor the symfony core tests as that would mean to increase the requirements for `symfony/http-foundation`. So reverting that part.
+
+Still for reference: https://github.com/symfony/symfony/pull/57909/commits/e16fd501da59c21ca23398b86e8cbe5faea0f4af
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2024-08-02T12:29:06Z
+
+This looks like a reasonable change to me. Can you also add a changelog entry?
+
+---------------------------------------------------------------------------
+
+by alexander-schranz at 2024-08-02T12:46:54Z
+
+The AppVeyor failing test seems to be unrelated to the change and happens currently als on 7.2 branch: https://ci.appveyor.com/project/fabpot/symfony/builds/50310250

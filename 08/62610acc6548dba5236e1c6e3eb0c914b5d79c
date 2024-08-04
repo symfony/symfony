@@ -1,0 +1,87 @@
+---------------------------------------------------------------------------
+
+by smnandre at 2024-08-01T12:18:31Z
+
+You're right, this implementation is in fact not required to do what i initially wanted.
+
+I think i can find another method via the "public path" & the asset package... to keep unique digest locally while exposing shorter ones.
+
+I'll rework this later today
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2024-08-02T04:49:47Z
+
+Shorter hashes for everyone 👌🏻
+
+---------------------------------------------------------------------------
+
+by smnandre at 2024-08-02T18:27:30Z
+
+Webpack seems to have [two options](https://webpack.js.org/configuration/output/#outputhashdigest) `hashDigest` and `hashDigestLenth`
+
+I don't think there would be any problem if we allow to reduce digests down to 7 caracters (the risk of collision for one given file is practically null).
+
+So instead of configure the hash, could we add an option "digestLength" / "hashLength" ?
+
+@nicolas-grekas with this "hashLenght" idea, would a closure still be necessary ? I'd rather avoid it, as it would create difficulties: we need to enforce some things currently to extract/identify the digest part in file names.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-08-03T06:55:58Z
+
+Why make it configurable at all ? Base64+7chars and done, no ?
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2024-08-03T10:47:10Z
+
+I agree with Nicolas and I don't think we should make this configurable ... but if we think we can change this for all to improve it, let's change it. Thanks.
+
+---------------------------------------------------------------------------
+
+by smnandre at 2024-08-03T11:05:47Z
+
+Let's shorten the public digest for everyone then :)
+
+@nicolas-grekas i suggest we keep only hexa characters for now, as it's safer to catch (in dev) or identifiy (i'm thinking web servers or CDN using url patterns, log exclusion, ...) .. wdyt ?
+
+If we truncate down to 7 caracters we keep the same "contract" than before.
+
+(PR update incoming)
+
+---------------------------------------------------------------------------
+
+by smnandre at 2024-08-03T11:47:36Z
+
+**PR Updated**
+
+I reverted what i did before (with hash algorithm)
+
+It now only truncates the public digest down to 8 caracters
+
+(8 feels more similar to what can be found in gulp/webpack/etc. and still way shorter than today)
+
+This solution is fully compatible with the current behaviour and requires no change on config/framework/recipe/ or user code.
+
+Thanks everyone for the feedback / ideas
+
+--
+
+PHP 8.2 high-deps failures unrelated (doctrine)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-08-03T11:58:11Z
+
+I'd do the base64 now because that allows a lot more entropy per character. We could then truncate to 7 bytes.
+
+---------------------------------------------------------------------------
+
+by smnandre at 2024-08-03T12:45:15Z
+
+@nicolas-grekas added base64 encode & now truncate to 7 !
+
+--
+
+PHP 8.4 failures unrelated (mime)

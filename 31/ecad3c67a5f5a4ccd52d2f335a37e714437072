@@ -1,0 +1,98 @@
+---------------------------------------------------------------------------
+
+by Dean151 at 2024-07-30T11:38:05Z
+
+Added rationale, and problem section in description.
+We need to discuss which, from Quorums or Quora should be inflected by Symfony String.
+
+---------------------------------------------------------------------------
+
+by Dean151 at 2024-07-30T11:40:27Z
+
+ChatGPT "knowledge" about this matter:
+
+```
+It seems there might be some confusion, as "Quorums" generally refers to a concept rather than a platform. Here’s a detailed comparison:
+
+### Quora
+**Description:** Quora is a question-and-answer platform where users can ask questions, provide answers, and engage in discussions on a variety of topics. It is a social media website that focuses on knowledge sharing.
+
+**Key Features:**
+- User-generated questions and answers.
+- Upvoting and downvoting system to prioritize content.
+- Personalized feeds based on user interests.
+- Spaces (communities) for focused discussions.
+- User profiles showcasing expertise and activity.
+
+**Usage Scenarios:**
+- Seeking expert opinions or crowdsourced answers.
+- Sharing knowledge or expertise on various subjects.
+- Networking with professionals and like-minded individuals.
+- Exploring diverse viewpoints and discussions.
+
+**Most Widely Used For:**
+- Knowledge sharing.
+- Q&A interactions.
+- Community engagement on specific topics.
+
+### Quorums
+**Description:** "Quorums" typically refers to the minimum number of members required to be present at a meeting to make the proceedings of that meeting valid. This term is commonly used in the context of organizational, legislative, or governance meetings.
+
+**Key Features:**
+- Ensures legitimacy and representativeness of meetings.
+- Defined by bylaws or regulations of an organization.
+- Critical in decision-making processes within organizations or legislative bodies.
+
+**Usage Scenarios:**
+- Organizational meetings (e.g., board meetings, general assemblies).
+- Legislative sessions (e.g., parliament, councils).
+- Any formal gathering requiring a minimum attendance for decisions to be binding.
+
+**Most Widely Used For:**
+- Ensuring valid and representative decision-making in organizations.
+- Compliance with governance rules and regulations.
+
+### In Summary:
+- **Quora** is a widely used platform for online Q&A and community discussions, suitable for individual knowledge sharing and crowdsourced information.
+- **Quorums** is a concept used in organizational and legislative contexts to ensure that meetings and decisions are legitimate and representative.
+
+**When to Use Each:**
+- **Quora:** When seeking information, sharing knowledge, or engaging in discussions on a wide range of topics with a global online community.
+- **Quorums:** When organizing or participating in formal meetings within an organization or legislative body to ensure decisions are valid and representative.
+
+Quora, as a web platform, is much more widely used by the general public for knowledge sharing and community interaction. Quorums, being a procedural concept, is essential in specific formal and organizational contexts to ensure proper governance and decision-making.
+```
+
+---------------------------------------------------------------------------
+
+by stof at 2024-07-30T11:53:32Z
+
+As both plurals are valid, I suggest that the EnglishInflector return both, which will be better for use cases able to deal with multiple candidates (like code trying to find the corresponding method in a class for instance, to support methods defined with any valid plural).
+The question of the most common plural form still need to be answered to decide which form should be the first one in the array.
+
+---------------------------------------------------------------------------
+
+by Dean151 at 2024-07-30T17:22:06Z
+
+Added quora to be singularized to quorum.
+Added back quora in the plural list. Order not yet final
+@stof @xabbuh
+
+---------------------------------------------------------------------------
+
+by Dean151 at 2024-08-04T09:24:26Z
+
+> I would keep quorums first to keep as this is what we return today.
+
+@fabpot
+To be 100% transparent, "quorums" inflection was the behavior of ApiPlatform legacy inflector.
+Symfony currently inflect "quorum" to "quora".
+In a pure backward compatibility consideration, I'll put back quora to be the first return if that's okay for you.
+
+For the reverse, quora plural is not inflected back to quorum. This is a new behavior that will be some kind of bugfix.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2024-08-04T10:24:31Z
+
+Oops, you're right, quora first for Symfony BC.

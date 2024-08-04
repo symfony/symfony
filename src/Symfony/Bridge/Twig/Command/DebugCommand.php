@@ -344,15 +344,13 @@ EOF
             }
 
             // format args
-            $args = array_map(function (\ReflectionParameter $param) {
+            return array_map(function (\ReflectionParameter $param) {
                 if ($param->isDefaultValueAvailable()) {
                     return $param->getName().' = '.json_encode($param->getDefaultValue());
                 }
 
                 return $param->getName();
             }, $args);
-
-            return $args;
         }
 
         return null;

@@ -90,7 +90,7 @@ final class WorkflowDataCollector extends DataCollector implements LateDataColle
 
     protected function getCasters(): array
     {
-        $casters = [
+        return [
             ...parent::getCasters(),
             TransitionBlocker::class => function ($v, array $a, Stub $s, $isNested) {
                 unset(
@@ -108,8 +108,6 @@ final class WorkflowDataCollector extends DataCollector implements LateDataColle
                 return $a;
             },
         ];
-
-        return $casters;
     }
 
     public function hash(string $string): string

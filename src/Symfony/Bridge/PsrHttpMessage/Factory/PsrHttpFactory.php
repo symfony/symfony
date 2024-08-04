@@ -195,8 +195,7 @@ class PsrHttpFactory implements HttpMessageFactoryInterface
         }
 
         $protocolVersion = $symfonyResponse->getProtocolVersion();
-        $response = $response->withProtocolVersion($protocolVersion);
 
-        return $response;
+        return $response->withProtocolVersion($protocolVersion);
     }
 }

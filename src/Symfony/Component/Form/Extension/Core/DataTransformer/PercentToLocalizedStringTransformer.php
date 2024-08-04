@@ -210,8 +210,6 @@ class PercentToLocalizedStringTransformer implements DataTransformerInterface
             \NumberFormatter::ROUND_HALFDOWN => round($number, 0, \PHP_ROUND_HALF_DOWN),
         };
 
-        $number = 1 === $roundingCoef ? (int) $number : $number / $roundingCoef;
-
-        return $number;
+        return 1 === $roundingCoef ? (int) $number : $number / $roundingCoef;
     }
 }

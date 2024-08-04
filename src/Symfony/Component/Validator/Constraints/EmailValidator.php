@@ -88,23 +88,17 @@ class EmailValidator extends ConstraintValidator
                     ->setParameter('{{ value }}', $this->formatValue($value))
                     ->setCode(Email::INVALID_FORMAT_ERROR)
                     ->addViolation();
-
-                return;
             } elseif (!interface_exists(EmailValidation::class) && !$strictValidator->isValid($value, false, true)) {
                 $this->context->buildViolation($constraint->message)
                     ->setParameter('{{ value }}', $this->formatValue($value))
                     ->setCode(Email::INVALID_FORMAT_ERROR)
                     ->addViolation();
-
-                return;
             }
         } elseif (!preg_match(self::EMAIL_PATTERNS[$constraint->mode], $value)) {
             $this->context->buildViolation($constraint->message)
                 ->setParameter('{{ value }}', $this->formatValue($value))
                 ->setCode(Email::INVALID_FORMAT_ERROR)
                 ->addViolation();
-
-            return;
         }
     }
 }

@@ -93,8 +93,6 @@ class ChoiceValidator extends ConstraintValidator
                     ->setPlural($constraint->max)
                     ->setCode(Choice::TOO_MANY_ERROR)
                     ->addViolation();
-
-                return;
             }
         } elseif ($constraint->match xor \in_array($value, $choices, true)) {
             $this->context->buildViolation($constraint->message)

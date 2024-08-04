@@ -128,13 +128,11 @@ class TimezoneDataGenerator extends AbstractDataGenerator
         sort($this->zoneIds);
         ksort($this->zoneToCountryMapping);
 
-        $data = [
+        return [
             'Zones' => $this->zoneIds,
             'ZoneToCountry' => $this->zoneToCountryMapping,
             'CountryToZone' => self::generateCountryToZoneMapping($this->zoneToCountryMapping),
         ];
-
-        return $data;
     }
 
     private function generateZones(BundleEntryReaderInterface $reader, string $tempDir, string $locale): array

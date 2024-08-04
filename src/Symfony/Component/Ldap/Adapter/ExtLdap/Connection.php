@@ -149,9 +149,9 @@ class Connection extends AbstractConnection
 
         if (false === $connection = ldap_connect($this->config['connection_string'])) {
             throw new LdapException('Invalid connection string: '.$this->config['connection_string']);
-        } else {
-            $this->connection = $connection;
         }
+
+        $this->connection = $connection;
 
         foreach ($this->config['options'] as $name => $value) {
             if (!\in_array(ConnectionOptions::getOption($name), self::PRECONNECT_OPTIONS, true)) {

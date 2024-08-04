@@ -355,9 +355,8 @@ final class ProxyHelper
         $propertyScopes = VarExporter::export($propertyScopes);
         $propertyScopes = str_replace(VarExporter::export($parent), 'parent::class', $propertyScopes);
         $propertyScopes = preg_replace("/(?|(,)\n( )       |\n        |,\n    (\]))/", '$1$2', $propertyScopes);
-        $propertyScopes = str_replace("\n", "\n    ", $propertyScopes);
 
-        return $propertyScopes;
+        return str_replace("\n", "\n    ", $propertyScopes);
     }
 
     private static function exportDefault(\ReflectionParameter $param, $namespace): string

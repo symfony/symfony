@@ -93,9 +93,8 @@ class DateIntervalToArrayTransformer implements DataTransformerInterface
             }
         }
         $result['invert'] = '-' === $result['invert'];
-        $result = array_intersect_key($result, array_flip($this->fields));
 
-        return $result;
+        return array_intersect_key($result, array_flip($this->fields));
     }
 
     /**

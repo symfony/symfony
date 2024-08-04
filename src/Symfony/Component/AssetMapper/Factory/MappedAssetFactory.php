@@ -24,6 +24,7 @@ use Symfony\Component\Filesystem\Filesystem;
 class MappedAssetFactory implements MappedAssetFactoryInterface
 {
     private const PREDIGESTED_REGEX = '/-([0-9a-zA-Z]{7,128}\.digested)/';
+    private const PUBLIC_DIGEST_LENGTH = 7;
 
     private array $assetsCache = [];
     private array $assetsBeingCreated = [];
@@ -89,10 +90,7 @@ class MappedAssetFactory implements MappedAssetFactoryInterface
             return [hash('xxh128', $content), false];
         }
 
-        return [
-            hash_file('xxh128', $asset->sourcePath),
-            false,
-        ];
+        return [hash_file('xxh128', $asset->sourcePath), false];
     }
 
     private function compileContent(MappedAsset $asset): ?string
@@ -119,6 +117,7 @@ class MappedAssetFactory implements MappedAssetFactoryInterface
             return $this->assetsPathResolver->resolvePublicPath($asset->logicalPath);
         }
 
+        $digest = substr(base64_encode($digest), 0, self::PUBLIC_DIGEST_LENGTH);
         $digestedPath = preg_replace_callback('/\.(\w+)$/', fn ($matches) => "-{$digest}{$matches[0]}", $asset->logicalPath);
 
         return $this->assetsPathResolver->resolvePublicPath($digestedPath);

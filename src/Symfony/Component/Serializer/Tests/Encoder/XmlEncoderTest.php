@@ -220,21 +220,21 @@ XML,
             '<?xml version="1.0"?>'."\n".
             '<response><firstname><![CDATA[Paul & Martha <or Me>]]></firstname></response>'."\n",
             ['firstname' => 'Paul & Martha <or Me>'],
-            ['cdata_wrapping_pattern' => '/[<>&"\']/']
+            ['cdata_wrapping_pattern' => '/[<>&"\']/'],
         ];
 
         yield 'encode with CDATA wrapping with custom pattern #2' => [
             '<?xml version="1.0"?>'."\n".
             '<response><lastname><![CDATA[O\'Donnel]]></lastname></response>'."\n",
             ['lastname' => 'O\'Donnel'],
-            ['cdata_wrapping_pattern' => '/[<>&"\']/']
+            ['cdata_wrapping_pattern' => '/[<>&"\']/'],
         ];
 
         yield 'encode with CDATA wrapping with custom pattern #3' => [
             '<?xml version="1.0"?>'."\n".
             '<response><firstname>Paul and Martha</firstname></response>'."\n",
             ['firstname' => 'Paul and Martha'],
-            ['cdata_wrapping_pattern' => '/[<>&"\']/']
+            ['cdata_wrapping_pattern' => '/[<>&"\']/'],
         ];
 
         yield 'enable CDATA wrapping' => [

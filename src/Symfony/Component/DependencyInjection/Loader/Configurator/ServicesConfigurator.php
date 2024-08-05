@@ -36,7 +36,7 @@ class ServicesConfigurator extends AbstractConfigurator
         private PhpFileLoader $loader,
         array &$instanceof,
         private ?string $path = null,
-        int &$anonymousCount = 0
+        int &$anonymousCount = 0,
     ) {
         $this->defaults = new Definition();
         $this->instanceof = &$instanceof;

@@ -321,7 +321,7 @@ EOF;
 
         $dump .= "\n], [\n\n{$dumpedValues}\n]];\n";
 
-        $tmpFile = tempnam(dirname($this->file), basename($this->file));
+        $tmpFile = tempnam(\dirname($this->file), basename($this->file));
 
         file_put_contents($tmpFile, $dump);
         @chmod($tmpFile, 0666 & ~umask());

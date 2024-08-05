@@ -40,7 +40,7 @@ final class SipgateTransport extends AbstractTransport
 
     public function __toString(): string
     {
-        return sprintf('sipgate://%s?senderId=%s', $this->getEndpoint(), $this->senderId);
+        return \sprintf('sipgate://%s?senderId=%s', $this->getEndpoint(), $this->senderId);
     }
 
     public function supports(MessageInterface $message): bool
@@ -54,7 +54,7 @@ final class SipgateTransport extends AbstractTransport
             throw new UnsupportedMessageTypeException(__CLASS__, SmsMessage::class, $message);
         }
 
-        $endpoint = sprintf('https://%s/v2/sessions/sms', $this->getEndpoint());
+        $endpoint = \sprintf('https://%s/v2/sessions/sms', $this->getEndpoint());
 
         $options = [];
         $options['smsId'] = $this->senderId;
@@ -79,12 +79,12 @@ final class SipgateTransport extends AbstractTransport
         if (204 === $statusCode) {
             return new SentMessage($message, (string) $this);
         } elseif (401 === $statusCode) {
-            throw new TransportException(sprintf('Unable to send SMS with Sipgate: Error code %d - tokenId or token is wrong.', $statusCode), $response);
+            throw new TransportException(\sprintf('Unable to send SMS with Sipgate: Error code %d - tokenId or token is wrong.', $statusCode), $response);
         } elseif (402 === $statusCode) {
-            throw new TransportException(sprintf('Unable to send SMS with Sipgate: Error code %d - insufficient funds.', $statusCode), $response);
+            throw new TransportException(\sprintf('Unable to send SMS with Sipgate: Error code %d - insufficient funds.', $statusCode), $response);
         } elseif (403 === $statusCode) {
-            throw new TransportException(sprintf('Unable to send SMS with Sipgate: Error code %d - no permission to use sms feature or password must be reset or senderId is wrong.', $statusCode), $response);
+            throw new TransportException(\sprintf('Unable to send SMS with Sipgate: Error code %d - no permission to use sms feature or password must be reset or senderId is wrong.', $statusCode), $response);
         }
-        throw new TransportException(sprintf('Unable to send SMS with Sipgate: Error code %d.', $statusCode), $response);
+        throw new TransportException(\sprintf('Unable to send SMS with Sipgate: Error code %d.', $statusCode), $response);
     }
 }

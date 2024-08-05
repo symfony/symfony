@@ -78,8 +78,8 @@ class WordCountValidatorTest extends ConstraintValidatorTestCase
     {
         yield ['my ascii string', 3];
         yield ["   with a\nnewline", 3];
-        yield ["皆さん、こんにちは。", 4];
-        yield ["你好，世界！这是一个测试。", 9];
+        yield ['皆さん、こんにちは。', 4];
+        yield ['你好，世界！这是一个测试。', 9];
         yield [new StringableValue('my ûtf 8'), 3];
         yield [null, 1]; // null should always pass and eventually be handled by NotNullValidator
         yield ['', 1]; // empty string should always pass and eventually be handled by NotBlankValidator

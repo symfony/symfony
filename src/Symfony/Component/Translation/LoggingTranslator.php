@@ -22,7 +22,7 @@ class LoggingTranslator implements TranslatorInterface, TranslatorBagInterface, 
 {
     public function __construct(
         private TranslatorInterface&TranslatorBagInterface&LocaleAwareInterface $translator,
-        private LoggerInterface $logger
+        private LoggerInterface $logger,
     ) {
     }
 

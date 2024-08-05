@@ -300,7 +300,7 @@ class Parser
                         // Spec: Keys MUST be unique; first one wins.
                         // But overwriting is allowed when a merge node is used in current block.
                         if ($allowOverwrite || !isset($data[$key])) {
-                            if (!$allowOverwrite && array_key_exists($key, $data)) {
+                            if (!$allowOverwrite && \array_key_exists($key, $data)) {
                                 trigger_deprecation('symfony/yaml', '7.2', 'Duplicate key "%s" detected on line %d whilst parsing YAML. Silent handling of duplicate mapping keys in YAML is deprecated and will throw a ParseException in 8.0.', $key, $this->getRealCurrentLineNb() + 1);
                             }
 
@@ -325,7 +325,7 @@ class Parser
 
                             $data += $value;
                         } elseif ($allowOverwrite || !isset($data[$key])) {
-                            if (!$allowOverwrite && array_key_exists($key, $data)) {
+                            if (!$allowOverwrite && \array_key_exists($key, $data)) {
                                 trigger_deprecation('symfony/yaml', '7.2', 'Duplicate key "%s" detected on line %d whilst parsing YAML. Silent handling of duplicate mapping keys in YAML is deprecated and will throw a ParseException in 8.0.', $key, $this->getRealCurrentLineNb() + 1);
                             }
 
@@ -345,7 +345,7 @@ class Parser
                     // Spec: Keys MUST be unique; first one wins.
                     // But overwriting is allowed when a merge node is used in current block.
                     if ($allowOverwrite || !isset($data[$key])) {
-                        if (!$allowOverwrite && array_key_exists($key, $data)) {
+                        if (!$allowOverwrite && \array_key_exists($key, $data)) {
                             trigger_deprecation('symfony/yaml', '7.2', 'Duplicate key "%s" detected on line %d whilst parsing YAML. Silent handling of duplicate mapping keys in YAML is deprecated and will throw a ParseException in 8.0.', $key, $this->getRealCurrentLineNb() + 1);
                         }
 

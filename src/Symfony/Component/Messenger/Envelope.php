@@ -33,7 +33,6 @@ final class Envelope
         private object $message,
         array $stamps = [],
     ) {
-
         foreach ($stamps as $stamp) {
             $this->stamps[$stamp::class][] = $stamp;
         }

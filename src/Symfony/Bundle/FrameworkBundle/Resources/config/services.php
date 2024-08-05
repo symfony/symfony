@@ -155,7 +155,7 @@ return static function (ContainerConfigurator $container) {
 
         ->set('uri_signer', UriSigner::class)
             ->args([
-                new Parameter('kernel.secret')
+                new Parameter('kernel.secret'),
             ])
         ->alias(UriSigner::class, 'uri_signer')
 

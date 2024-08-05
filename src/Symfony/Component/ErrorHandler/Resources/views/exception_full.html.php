@@ -1,4 +1,4 @@
-<!-- <?= $_message = sprintf('%s (%d %s)', $exceptionMessage, $statusCode, $statusText); ?> -->
+<!-- <?= $_message = \sprintf('%s (%d %s)', $exceptionMessage, $statusCode, $statusText); ?> -->
 <!DOCTYPE html>
 <html lang="en">
     <head>

@@ -1942,7 +1942,7 @@ EOF;
                 return $this->dumpParameter($match[1]);
             }
 
-            $replaceParameters = fn($match) => "'." . $this->dumpParameter($match[2]) . ".'";
+            $replaceParameters = fn ($match) => "'.".$this->dumpParameter($match[2]).".'";
 
             return str_replace('%%', '%', preg_replace_callback('/(?<!%)(%)([^%]+)\1/', $replaceParameters, $this->export($value)));
         } elseif ($value instanceof \UnitEnum) {

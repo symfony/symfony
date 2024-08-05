@@ -362,8 +362,7 @@ class FormDataExtractorTest extends TestCase
                 ]
                 EODUMP;
         }
-        $this->assertDumpMatchesFormat($expectedFormat
-            ,
+        $this->assertDumpMatchesFormat($expectedFormat,
             $this->dataExtractor->extractSubmittedData($form)
         );
     }

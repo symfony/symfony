@@ -200,11 +200,11 @@ class RedisTraitTest extends TestCase
     {
         return [
             [
-                'redis://:p%40ssword@'.getenv('REDIS_AUTHENTICATED_HOST').'/abc'
+                'redis://:p%40ssword@'.getenv('REDIS_AUTHENTICATED_HOST').'/abc',
             ],
             [
-                'redis://:p%40ssword@'.getenv('REDIS_AUTHENTICATED_HOST').'/3?dbindex=6'
-            ]
+                'redis://:p%40ssword@'.getenv('REDIS_AUTHENTICATED_HOST').'/3?dbindex=6',
+            ],
         ];
     }
 }

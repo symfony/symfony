@@ -37,13 +37,13 @@ final class MailomatPayloadConverter implements PayloadConverterInterface
             $name = match ($payload['eventType']) {
                 'opened' => MailerEngagementEvent::OPEN,
                 'clicked' => MailerEngagementEvent::CLICK,
-                default => throw new ParseException(sprintf('Unsupported event "%s".', $payload['eventType'])),
+                default => throw new ParseException(\sprintf('Unsupported event "%s".', $payload['eventType'])),
             };
             $event = new MailerEngagementEvent($name, $payload['id'], $payload);
         }
 
         if (!$date = \DateTimeImmutable::createFromFormat(\DateTimeInterface::ATOM, $payload['occurredAt'])) {
-            throw new ParseException(sprintf('Invalid date "%s".', $payload['occurredAt']));
+            throw new ParseException(\sprintf('Invalid date "%s".', $payload['occurredAt']));
         }
 
         $event->setDate($date);

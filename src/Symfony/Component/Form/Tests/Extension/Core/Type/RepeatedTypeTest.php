@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Form\Tests\Extension\Core\Type;
 
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\Tests\Fixtures\NotMappedType;
 use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
@@ -189,6 +190,36 @@ class RepeatedTypeTest extends BaseTypeTestCase
         $this->assertSame('Second label', $form['second']->getConfig()->getOption('label'));
         $this->assertTrue($form['first']->isRequired());
         $this->assertTrue($form['second']->isRequired());
+    }
+
+    /**
+     * @dataProvider emptyDataProvider
+     */
+    public function testSubmitNullForTextTypeWithEmptyDataOptionSetToEmptyString($emptyData, $submittedData, $expected)
+    {
+        $form = $this->factory->create(static::TESTED_TYPE, null, [
+            'type' => TextType::class,
+            'options' => [
+                'empty_data' => $emptyData,
+            ]
+        ]);
+        $form->submit($submittedData);
+
+        $this->assertSame($expected, $form->getData());
+    }
+
+    public static function emptyDataProvider()
+    {
+        yield ['', null, ''];
+        yield ['', ['first' => null, 'second' => null], ''];
+        yield ['', ['first' => '', 'second' => null], ''];
+        yield ['', ['first' => null, 'second' => ''], ''];
+        yield ['', ['first' => '', 'second' => ''], ''];
+        yield [null, null, null];
+        yield [null, ['first' => null, 'second' => null], null];
+        yield [null, ['first' => '', 'second' => null], null];
+        yield [null, ['first' => null, 'second' => ''], null];
+        yield [null, ['first' => '', 'second' => ''], null];
     }
 
     public function testSubmitUnequal()

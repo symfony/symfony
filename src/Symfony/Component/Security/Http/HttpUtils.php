@@ -14,7 +14,9 @@ namespace Symfony\Component\Security\Http;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Exception\MethodNotAllowedException;
+use Symfony\Component\Routing\Exception\MissingMandatoryParametersException;
 use Symfony\Component\Routing\Exception\ResourceNotFoundException;
+use Symfony\Component\Routing\Exception\RouteNotFoundException;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\Matcher\RequestMatcherInterface;
 use Symfony\Component\Routing\Matcher\UrlMatcherInterface;
@@ -109,7 +111,19 @@ class HttpUtils
         if ('/' !== $path[0]) {
             // Shortcut if request has already been matched before
             if ($request->attributes->has('_route')) {
-                return $path === $request->attributes->get('_route');
+                if ($path === $request->attributes->get('_route')) {
+                    return true;
+                }
+
+                if (null === $this->urlGenerator) {
+                    return false;
+                }
+
+                try {
+                    return $request->getPathInfo() === $this->urlGenerator->generate($path);
+                } catch (RouteNotFoundException|MissingMandatoryParametersException) {
+                    return false;
+                }
             }
 
             try {

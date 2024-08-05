@@ -21,7 +21,7 @@ class AssetMapperDevServerSubscriberFunctionalTest extends WebTestCase
     {
         $client = static::createClient();
 
-        $client->request('GET', '/assets/file1-YjM0NDV.css');
+        $client->request('GET', '/assets/file1-s0Rct6h.css');
         $response = $client->getResponse();
         $this->assertSame(200, $response->getStatusCode());
         $this->assertInstanceOf(BinaryFileResponse::class, $response);
@@ -39,7 +39,7 @@ class AssetMapperDevServerSubscriberFunctionalTest extends WebTestCase
     {
         $client = static::createClient();
 
-        $client->request('GET', '/assets/voilà-NjM0NDQ.css');
+        $client->request('GET', '/assets/voilà-Y0RCLaa.css');
         $response = $client->getResponse();
         $this->assertSame(200, $response->getStatusCode());
         $this->assertSame(<<<EOF

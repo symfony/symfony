@@ -37,7 +37,7 @@ class MapperAwareAssetPackageIntegrationTest extends TestCase
     {
         $packages = $this->kernel->getContainer()->get('public.assets.packages');
         \assert($packages instanceof Packages);
-        $this->assertSame('/assets/file1-YjM0NDV.css', $packages->getUrl('file1.css'));
+        $this->assertSame('/assets/file1-s0Rct6h.css', $packages->getUrl('file1.css'));
         $this->assertSame('/non-existent.css', $packages->getUrl('non-existent.css'));
     }
 }

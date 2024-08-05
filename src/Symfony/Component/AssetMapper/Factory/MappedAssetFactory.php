@@ -116,9 +116,10 @@ class MappedAssetFactory implements MappedAssetFactoryInterface
         if ($isPredigested) {
             return $this->assetsPathResolver->resolvePublicPath($asset->logicalPath);
         }
-
-        $digest = substr(base64_encode($digest), 0, self::PUBLIC_DIGEST_LENGTH);
-        $digestedPath = preg_replace_callback('/\.(\w+)$/', fn ($matches) => "-{$digest}{$matches[0]}", $asset->logicalPath);
+        $digest = base64_encode(hex2bin($digest));
+        $digest = substr($digest, 0, self::PUBLIC_DIGEST_LENGTH);
+        $digest = strtr($digest, '+/', '-_');
+        $digestedPath = preg_replace('/\.(\w+)$/', "-{$digest}\\0", $asset->logicalPath);
 
         return $this->assetsPathResolver->resolvePublicPath($digestedPath);
     }

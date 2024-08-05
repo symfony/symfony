@@ -148,7 +148,7 @@ class EntityValueResolverTest extends TestCase
         $request = new Request();
         $request->attributes->set('nullValue', null);
 
-        $argument = $this->createArgument(entity: new MapEntity(id: ['nullValue']), isNullable: true,);
+        $argument = $this->createArgument(entity: new MapEntity(id: ['nullValue']), isNullable: true);
 
         $this->assertSame([null], $resolver->resolve($request, $argument));
     }

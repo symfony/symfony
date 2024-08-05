@@ -23,7 +23,6 @@ use Symfony\Component\TypeInfo\Exception\UnsupportedException;
 use Symfony\Component\TypeInfo\Type;
 use Symfony\Component\TypeInfo\TypeContext\TypeContext;
 use Symfony\Component\TypeInfo\TypeContext\TypeContextFactory;
-use Symfony\Component\TypeInfo\TypeResolver\TypeResolverInterface;
 
 /**
  * Resolves type on reflection prioriziting PHP documentation.
@@ -46,7 +45,7 @@ final readonly class PhpDocAwareReflectionTypeResolver implements TypeResolverIn
     public function resolve(mixed $subject, ?TypeContext $typeContext = null): Type
     {
         if (!$subject instanceof \ReflectionProperty && !$subject instanceof \ReflectionParameter && !$subject instanceof \ReflectionFunctionAbstract) {
-            throw new UnsupportedException(sprintf('Expected subject to be a "ReflectionProperty", a "ReflectionParameter" or a "ReflectionFunctionAbstract", "%s" given.', get_debug_type($subject)), $subject);
+            throw new UnsupportedException(\sprintf('Expected subject to be a "ReflectionProperty", a "ReflectionParameter" or a "ReflectionFunctionAbstract", "%s" given.', get_debug_type($subject)), $subject);
         }
 
         $docComment = match (true) {

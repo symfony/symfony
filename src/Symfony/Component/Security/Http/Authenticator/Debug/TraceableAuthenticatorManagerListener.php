@@ -34,7 +34,7 @@ final class TraceableAuthenticatorManagerListener extends AbstractListener imple
     {
         $supports = $this->authenticationManagerListener->supports($request);
 
-        foreach($request->attributes->get('_security_skipped_authenticators') as $authenticator) {
+        foreach ($request->attributes->get('_security_skipped_authenticators') as $authenticator) {
             $this->authenticators[] = $authenticator instanceof TraceableAuthenticator
                 ? $authenticator
                 : new TraceableAuthenticator($authenticator)

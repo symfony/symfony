@@ -39,12 +39,12 @@ final class MailomatApiTransport extends AbstractApiTransport
 
     public function __toString(): string
     {
-        return sprintf('mailomat+api://%s', $this->getEndpoint());
+        return \sprintf('mailomat+api://%s', $this->getEndpoint());
     }
 
     protected function doSendApi(SentMessage $sentMessage, Email $email, Envelope $envelope): ResponseInterface
     {
-        $response = $this->client->request('POST', sprintf('https://%s/message', $this->getEndpoint()), [
+        $response = $this->client->request('POST', \sprintf('https://%s/message', $this->getEndpoint()), [
             'auth_bearer' => $this->key,
             'json' => $this->getPayload($email, $envelope),
             'headers' => [
@@ -58,7 +58,7 @@ final class MailomatApiTransport extends AbstractApiTransport
         } catch (TransportExceptionInterface $e) {
             throw new HttpTransportException('Could not reach the remote Mailomat server.', $response, 0, $e);
         } catch (DecodingExceptionInterface $e) {
-            throw new HttpTransportException(sprintf('Unable to send an email: %s (code %d).', $response->getContent(false), $statusCode), $response, 0, $e);
+            throw new HttpTransportException(\sprintf('Unable to send an email: %s (code %d).', $response->getContent(false), $statusCode), $response, 0, $e);
         }
 
         if (202 !== $statusCode) {
@@ -66,7 +66,7 @@ final class MailomatApiTransport extends AbstractApiTransport
                 return ($violation['propertyPath'] ? '('.$violation['propertyPath'].') ' : '').$violation['message'];
             }, $result['violations']);
 
-            throw new HttpTransportException(sprintf('Unable to send an email: %s (code %d).', implode('; ', $violations), $statusCode), $response);
+            throw new HttpTransportException(\sprintf('Unable to send an email: %s (code %d).', implode('; ', $violations), $statusCode), $response);
         }
 
         if (isset($result['messageUuid'])) {

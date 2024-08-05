@@ -60,7 +60,7 @@ class Ulid extends Constraint
         $this->format = $format ?? $this->format;
 
         if (!\in_array($this->format, [self::FORMAT_BASE_32, self::FORMAT_BASE_58], true)) {
-            throw new ConstraintDefinitionException(sprintf('The "%s" validation format is not supported.', $format));
+            throw new ConstraintDefinitionException(\sprintf('The "%s" validation format is not supported.', $format));
         }
     }
 }

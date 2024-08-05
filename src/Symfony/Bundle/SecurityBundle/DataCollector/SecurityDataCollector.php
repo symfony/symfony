@@ -210,7 +210,7 @@ class SecurityDataCollector extends DataCollector implements LateDataCollectorIn
 
                 $this->data['deauth_profile_token'] = null;
                 $response->headers->clearCookie($deauthCookieName);
-            } elseif(!$this->data['authenticated'] && !$this->data['deauth_profile_token']) {
+            } elseif (!$this->data['authenticated'] && !$this->data['deauth_profile_token']) {
                 $response->headers->setCookie(new Cookie($deauthCookieName, $profileToken));
 
                 $this->data['auth_profile_token'] = null;

@@ -95,7 +95,7 @@ EOF
             $io->note($this->localVault->getLastMessage());
         }
 
-        if ($hadErrors)  {
+        if ($hadErrors) {
             return 1;
         }
 

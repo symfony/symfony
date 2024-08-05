@@ -40,7 +40,7 @@ abstract class AbstractPreAuthenticatedAuthenticator implements InteractiveAuthe
         private UserProviderInterface $userProvider,
         private TokenStorageInterface $tokenStorage,
         private string $firewallName,
-        private ?LoggerInterface $logger = null
+        private ?LoggerInterface $logger = null,
     ) {
     }
 

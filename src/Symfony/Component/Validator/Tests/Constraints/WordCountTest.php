@@ -113,7 +113,7 @@ class WordCountTest extends TestCase
 
         [$aConstraint] = $metadata->properties['a']->getConstraints();
         $this->assertSame(1, $aConstraint->min);
-        $this->assertSame(null, $aConstraint->max);
+        $this->assertNull($aConstraint->max);
         $this->assertNull($aConstraint->locale);
 
         [$bConstraint] = $metadata->properties['b']->getConstraints();

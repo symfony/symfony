@@ -19,7 +19,6 @@ use Symfony\Component\AssetMapper\Compiler\AssetCompilerInterface;
 use Symfony\Component\AssetMapper\Compiler\CssAssetUrlCompiler;
 use Symfony\Component\AssetMapper\Compiler\JavaScriptImportPathCompiler;
 use Symfony\Component\AssetMapper\Exception\CircularAssetsException;
-use Symfony\Component\AssetMapper\Exception\InvalidArgumentException;
 use Symfony\Component\AssetMapper\Factory\MappedAssetFactory;
 use Symfony\Component\AssetMapper\ImportMap\ImportMapConfigReader;
 use Symfony\Component\AssetMapper\MappedAsset;

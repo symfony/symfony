@@ -14,6 +14,7 @@ namespace Symfony\Component\Validator\Tests\Constraints;
 use Symfony\Component\Validator\Constraints\AtLeastOneOf;
 use Symfony\Component\Validator\Constraints\AtLeastOneOfValidator;
 use Symfony\Component\Validator\Constraints\Choice;
+use Symfony\Component\Validator\Constraints\Collection;
 use Symfony\Component\Validator\Constraints\Count;
 use Symfony\Component\Validator\Constraints\Country;
 use Symfony\Component\Validator\Constraints\DivisibleBy;
@@ -27,9 +28,11 @@ use Symfony\Component\Validator\Constraints\Language;
 use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\LessThan;
 use Symfony\Component\Validator\Constraints\Negative;
+use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\NotNull;
 use Symfony\Component\Validator\Constraints\Range;
 use Symfony\Component\Validator\Constraints\Regex;
+use Symfony\Component\Validator\Constraints\Type;
 use Symfony\Component\Validator\Constraints\Unique;
 use Symfony\Component\Validator\Constraints\Valid;
 use Symfony\Component\Validator\ConstraintViolation;
@@ -295,6 +298,35 @@ class AtLeastOneOfValidatorTest extends ConstraintValidatorTestCase
 
         $this->assertCount(1, $violations);
         $this->assertSame('Dummy translation: [1] Dummy violation.', $violations->get(0)->getMessage());
+    }
+
+    public function testValidateNestedAtLeaseOneOfConstraints()
+    {
+        $data = [
+            'foo' => [
+                'bar' => 'foo.bar',
+                'baz' => 'foo.baz',
+            ],
+        ];
+
+        $constraints = new Collection([
+            'foo' => new AtLeastOneOf([
+                new Collection([
+                    'bar' => new AtLeastOneOf([
+                        new Type('int'),
+                        new Choice(['test1', 'test2'])
+                    ]),
+                ]),
+                new Collection([
+                    'baz' => new Type('int'),
+                ]),
+            ]),
+        ]);
+
+        $validator = Validation::createValidator();
+        $violations = $validator->validate($data, $constraints);
+
+        self::assertCount(1, $violations);
     }
 }
 

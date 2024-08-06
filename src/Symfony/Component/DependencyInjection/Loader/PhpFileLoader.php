@@ -143,7 +143,12 @@ class PhpFileLoader extends FileLoader
         // Force load ContainerConfigurator to make env(), param() etc available.
         class_exists(ContainerConfigurator::class);
 
-        $callback(...$arguments);
+        ++$this->importing;
+        try {
+            $callback(...$arguments);
+        } finally {
+            --$this->importing;
+        }
 
         foreach ($configBuilders as $configBuilder) {
             $this->loadExtensionConfig($configBuilder->getExtensionAlias(), ContainerConfigurator::processValue($configBuilder->toArray()));

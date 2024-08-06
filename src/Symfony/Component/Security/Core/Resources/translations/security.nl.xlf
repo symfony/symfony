@@ -76,7 +76,7 @@
             </trans-unit>
             <trans-unit id="20">
                 <source>Too many failed login attempts, please try again in %minutes% minutes.</source>
-                <target>Te veel mislukte inlogpogingen, probeer het over %minutes% minuten opnieuw.</target>
+                <target>Te veel onjuiste inlogpogingen, probeer het opnieuw over %minutes% minuten.</target>
             </trans-unit>
         </body>
     </file>

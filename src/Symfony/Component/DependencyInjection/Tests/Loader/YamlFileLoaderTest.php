@@ -12,6 +12,7 @@
 namespace Symfony\Component\DependencyInjection\Tests\Loader;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\Config\Exception\FileLocatorFileNotFoundException;
 use Symfony\Component\Config\Exception\LoaderLoadException;
 use Symfony\Component\Config\FileLocator;
@@ -47,6 +48,8 @@ use Symfony\Component\Yaml\Yaml;
 
 class YamlFileLoaderTest extends TestCase
 {
+    use ExpectDeprecationTrait;
+
     protected static string $fixturesPath;
 
     public static function setUpBeforeClass(): void
@@ -1198,5 +1201,18 @@ class YamlFileLoaderTest extends TestCase
 
         $definition = $container->getDefinition('static_constructor');
         $this->assertEquals((new Definition('stdClass'))->setFactory([null, 'create']), $definition);
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testDeprecatedTagged()
+    {
+        $container = new ContainerBuilder();
+        $loader = new YamlFileLoader($container, new FileLocator(self::$fixturesPath.'/yaml'));
+
+        $this->expectDeprecation(sprintf('Since symfony/dependency-injection 7.2: Using "!tagged" is deprecated, use "!tagged_iterator" instead in "%s".', self::$fixturesPath.'/yaml/tagged_deprecated.yml'));
+
+        $loader->load('tagged_deprecated.yml');
     }
 }

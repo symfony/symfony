@@ -586,6 +586,8 @@ class XmlFileLoader extends FileLoader
                     $arguments[$key] = new ServiceLocatorArgument($arg);
                     break;
                 case 'tagged':
+                    trigger_deprecation('symfony/dependency-injection', '7.2', 'Type "tagged" is deprecated for tag <%s>, use "tagged_iterator" instead in "%s".', $name, $file);
+                    // no break
                 case 'tagged_iterator':
                 case 'tagged_locator':
                     $forLocator = 'tagged_locator' === $type;

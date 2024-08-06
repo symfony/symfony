@@ -852,6 +852,10 @@ class YamlFileLoader extends FileLoader
                 return new ServiceLocatorArgument($argument);
             }
             if (\in_array($value->getTag(), ['tagged', 'tagged_iterator', 'tagged_locator'], true)) {
+                if ('tagged' === $value->getTag()) {
+                    trigger_deprecation('symfony/dependency-injection', '7.2', 'Using "!tagged" is deprecated, use "!tagged_iterator" instead in "%s".', $file);
+                }
+
                 $forLocator = 'tagged_locator' === $value->getTag();
 
                 if (\is_array($argument) && isset($argument['tag']) && $argument['tag']) {

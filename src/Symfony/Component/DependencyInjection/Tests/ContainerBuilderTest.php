@@ -151,7 +151,7 @@ class ContainerBuilderTest extends TestCase
 
     public function testDeprecateParameterThrowsWhenParameterBagIsNotInternal()
     {
-        $builder = new ContainerBuilder(new class() implements ParameterBagInterface {
+        $builder = new ContainerBuilder(new class implements ParameterBagInterface {
             public function clear(): void
             {
             }

@@ -373,7 +373,7 @@ class LockTest extends TestCase
     {
         $key = new Key((string) random_int(100, 1000));
         $store = new InMemoryStore();
-        $logger = new class() extends AbstractLogger {
+        $logger = new class extends AbstractLogger {
             private array $logs = [];
 
             public function log($level, $message, array $context = []): void
@@ -468,7 +468,7 @@ class LockTest extends TestCase
     public function testAcquireReadTwiceWithExpiration()
     {
         $key = new Key(__METHOD__);
-        $store = new class() implements PersistingStoreInterface {
+        $store = new class implements PersistingStoreInterface {
             use ExpiringStoreTrait;
             private array $keys = [];
             private int $initialTtl = 30;
@@ -512,7 +512,7 @@ class LockTest extends TestCase
     public function testAcquireTwiceWithExpiration()
     {
         $key = new Key(__METHOD__);
-        $store = new class() implements PersistingStoreInterface {
+        $store = new class implements PersistingStoreInterface {
             use ExpiringStoreTrait;
             private array $keys = [];
             private int $initialTtl = 30;

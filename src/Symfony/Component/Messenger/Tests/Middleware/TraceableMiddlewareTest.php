@@ -32,7 +32,7 @@ class TraceableMiddlewareTest extends MiddlewareTestCase
         $busId = 'command_bus';
         $envelope = new Envelope(new DummyMessage('Hello'));
 
-        $middleware = new class() implements MiddlewareInterface {
+        $middleware = new class implements MiddlewareInterface {
             public int $calls = 0;
 
             public function handle(Envelope $envelope, StackInterface $stack): Envelope

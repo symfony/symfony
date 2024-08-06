@@ -46,7 +46,7 @@ class ServiceMethodsSubscriberTraitTest extends TestCase
         $container = new class([]) implements ContainerInterface {
             use ServiceLocatorTrait;
         };
-        $service = new class() extends ParentWithMagicCall {
+        $service = new class extends ParentWithMagicCall {
             use ServiceMethodsSubscriberTrait;
         };
 
@@ -59,7 +59,7 @@ class ServiceMethodsSubscriberTraitTest extends TestCase
         $container = new class([]) implements ContainerInterface {
             use ServiceLocatorTrait;
         };
-        $service = new class() {
+        $service = new class {
             use ServiceMethodsSubscriberTrait;
         };
 

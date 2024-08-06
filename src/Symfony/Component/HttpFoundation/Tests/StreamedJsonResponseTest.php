@@ -132,14 +132,14 @@ class StreamedJsonResponseTest extends TestCase
     {
         $arrayObject = new \ArrayObject(['__symfony_json__' => '__symfony_json__']);
 
-        $iteratorAggregate = new class() implements \IteratorAggregate {
+        $iteratorAggregate = new class implements \IteratorAggregate {
             public function getIterator(): \Traversable
             {
                 return new \ArrayIterator(['__symfony_json__']);
             }
         };
 
-        $jsonSerializable = new class() implements \IteratorAggregate, \JsonSerializable {
+        $jsonSerializable = new class implements \IteratorAggregate, \JsonSerializable {
             public function getIterator(): \Traversable
             {
                 return new \ArrayIterator(['This should be ignored']);
@@ -187,7 +187,7 @@ class StreamedJsonResponseTest extends TestCase
 
     public function testPlaceholderAsObjectStructure()
     {
-        $object = new class() {
+        $object = new class {
             public $__symfony_json__ = 'foo';
             public $bar = '__symfony_json__';
         };

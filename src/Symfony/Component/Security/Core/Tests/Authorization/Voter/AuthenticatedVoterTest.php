@@ -90,7 +90,7 @@ class AuthenticatedVoterTest extends TestCase
         $user = new InMemoryUser('wouter', '', ['ROLE_USER']);
 
         if ('fully' === $authenticated) {
-            $token = new class() extends AbstractToken {
+            $token = new class extends AbstractToken {
                 public function getCredentials()
                 {
                 }

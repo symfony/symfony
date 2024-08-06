@@ -194,7 +194,7 @@ class ErrorHandler
             $traceReflector->setValue($e, $trace);
             $e->file = $file ?? $e->file;
             $e->line = $line ?? $e->line;
-        }, null, new class() extends \Exception {
+        }, null, new class extends \Exception {
         });
     }
 

@@ -352,7 +352,7 @@ class ValidatorBuilder
         $translator = $this->translator;
 
         if (null === $translator) {
-            $translator = new class() implements TranslatorInterface, LocaleAwareInterface {
+            $translator = new class implements TranslatorInterface, LocaleAwareInterface {
                 use TranslatorTrait;
             };
             // Force the locale to be 'en' when no translator is provided rather than relying on the Intl default locale

@@ -37,6 +37,7 @@ return (new PhpCsFixer\Config())
         'nullable_type_declaration' => true,
         'nullable_type_declaration_for_default_null_value' => true,
         'trailing_comma_in_multiline' => ['elements' => ['arrays', 'match', 'parameters']],
+        'new_with_parentheses' => ['anonymous_class' => false],
     ])
     ->setRiskyAllowed(true)
     ->setFinder(

@@ -320,7 +320,7 @@ class ContainerTest extends TestCase
     public function testReset()
     {
         $c = new Container();
-        $c->set('bar', $bar = new class() implements ResetInterface {
+        $c->set('bar', $bar = new class implements ResetInterface {
             public int $resetCounter = 0;
 
             public function reset(): void

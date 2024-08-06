@@ -225,7 +225,7 @@ class LazyGhostTraitTest extends TestCase
 
     public function testIndirectModification()
     {
-        $obj = new class() {
+        $obj = new class {
             public array $foo;
         };
         $proxy = $this->createLazyGhost($obj::class, fn () => null);

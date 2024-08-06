@@ -41,7 +41,7 @@ class MailerTest extends TestCase
 
     public function testSendMessageToBus()
     {
-        $bus = new class() implements MessageBusInterface {
+        $bus = new class implements MessageBusInterface {
             public array $messages = [];
             public array $stamps = [];
 

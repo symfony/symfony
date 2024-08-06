@@ -189,7 +189,7 @@ class ConfigBuilderCacheWarmerTest extends TestCase
         $kernel = new class($this->varDir) extends TestKernel {
             protected function build(ContainerBuilder $container): void
             {
-                $container->registerExtension(new class() extends Extension implements ConfigurationInterface {
+                $container->registerExtension(new class extends Extension implements ConfigurationInterface {
                     public function load(array $configs, ContainerBuilder $container): void
                     {
                     }
@@ -276,7 +276,7 @@ class ConfigBuilderCacheWarmerTest extends TestCase
             {
                 /** @var TestSecurityExtension $extension */
                 $extension = $container->getExtension('test_security');
-                $extension->addAuthenticatorFactory(new class() implements TestAuthenticatorFactoryInterface {
+                $extension->addAuthenticatorFactory(new class implements TestAuthenticatorFactoryInterface {
                     public function getKey(): string
                     {
                         return 'token';
@@ -292,19 +292,19 @@ class ConfigBuilderCacheWarmerTest extends TestCase
             {
                 yield from parent::registerBundles();
 
-                yield new class() extends Bundle {
+                yield new class extends Bundle {
                     public function getContainerExtension(): ExtensionInterface
                     {
                         return new TestSecurityExtension();
                     }
                 };
 
-                yield new class() extends Bundle {
+                yield new class extends Bundle {
                     public function build(ContainerBuilder $container): void
                     {
                         /** @var TestSecurityExtension $extension */
                         $extension = $container->getExtension('test_security');
-                        $extension->addAuthenticatorFactory(new class() implements TestAuthenticatorFactoryInterface {
+                        $extension->addAuthenticatorFactory(new class implements TestAuthenticatorFactoryInterface {
                             public function getKey(): string
                             {
                                 return 'form-login';

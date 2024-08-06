@@ -108,17 +108,17 @@ class CheckDefinitionValidityPassTest extends TestCase
         $message = 'A "tags" attribute must be of a scalar-type for service "a", tag "%s", attribute "%s".';
         yield 'object attribute value' => [
             'foo',
-            ['bar' => new class() {}],
+            ['bar' => new class {}],
             \sprintf($message, 'foo', 'bar'),
         ];
         yield 'nested object attribute value' => [
             'foo',
-            ['bar' => ['baz' => new class() {}]],
+            ['bar' => ['baz' => new class {}]],
             \sprintf($message, 'foo', 'bar.baz'),
         ];
         yield 'deeply nested object attribute value' => [
             'foo',
-            ['bar' => ['baz' => ['qux' => new class() {}]]],
+            ['bar' => ['baz' => ['qux' => new class {}]]],
             \sprintf($message, 'foo', 'bar.baz.qux'),
         ];
     }

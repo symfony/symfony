@@ -47,7 +47,7 @@ final class TranslationExtension extends AbstractExtension
                 throw new \LogicException(\sprintf('You cannot use the "%s" if the Translation Contracts are not available. Try running "composer require symfony/translation".', __CLASS__));
             }
 
-            $this->translator = new class() implements TranslatorInterface {
+            $this->translator = new class implements TranslatorInterface {
                 use TranslatorTrait;
             };
         }

@@ -412,7 +412,7 @@ class KernelTest extends TestCase
 
     public function testKernelExtension()
     {
-        $kernel = new class() extends CustomProjectDirKernel implements ExtensionInterface {
+        $kernel = new class extends CustomProjectDirKernel implements ExtensionInterface {
             public function load(array $configs, ContainerBuilder $container): void
             {
                 $container->setParameter('test.extension-registered', true);

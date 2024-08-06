@@ -42,7 +42,7 @@ class AccessListenerTest extends TestCase
             ->willReturn([['foo' => 'bar'], null])
         ;
 
-        $token = new class() extends AbstractToken {
+        $token = new class extends AbstractToken {
             public function getCredentials(): mixed
             {
             }

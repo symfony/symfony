@@ -206,7 +206,7 @@ EODUMP;
 
     public function testClassStubWithAnonymousClass()
     {
-        $var = [new ClassStub((new class() extends \Exception {
+        $var = [new ClassStub((new class extends \Exception {
         })::class)];
 
         $cloner = new VarCloner();

@@ -336,7 +336,7 @@ class SessionListenerTest extends TestCase
 
     public function testOnlyTriggeredOnMainRequest()
     {
-        $listener = new class() extends AbstractSessionListener {
+        $listener = new class extends AbstractSessionListener {
             protected function getSession(): ?SessionInterface
             {
                 return null;

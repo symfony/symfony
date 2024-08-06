@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+7.2
+---
+
+ * Add support for closures in the `MockClock` constructor
+
 7.1
 ---
 

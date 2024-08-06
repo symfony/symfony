@@ -12,6 +12,7 @@
 namespace Symfony\Component\Clock\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Clock\DatePoint;
 use Symfony\Component\Clock\MockClock;
 
 class MockClockTest extends TestCase
@@ -39,6 +40,21 @@ class MockClockTest extends TestCase
         $this->assertSame('2022-06-20 00:00:00', $clock->now()->format('Y-m-d H:i:s'));
     }
 
+    public function testWithTimeProviderClosure()
+    {
+        $clock = new MockClock(static function () {
+            static $calls = 0;
+
+            return new DatePoint('2022-06-20 00:00:0'.$calls++);
+        });
+
+        $this->assertSame('2022-06-20 00:00:00.000000', $clock->now()->format('Y-m-d H:i:s.u'));
+        $this->assertSame('2022-06-20 00:00:00.000000', $clock->now()->format('Y-m-d H:i:s.u'), 'The clock should not change between calls');
+
+        $clock->reset();
+        $this->assertSame('2022-06-20 00:00:01.000000', $clock->now()->format('Y-m-d H:i:s.u'), 'The clock should be reset and rerun the closure');
+    }
+
     public function testNow()
     {
         $before = new \DateTimeImmutable();
@@ -61,6 +77,19 @@ class MockClockTest extends TestCase
         $clock->sleep(2.002001);
         $this->assertSame('2112-09-17 23:53:03.001001', $clock->now()->format('Y-m-d H:i:s.u'));
         $this->assertSame($tz, $clock->now()->getTimezone()->getName());
+    }
+
+    public function testSleepWithTimeProviderClosure()
+    {
+        $clock = new MockClock(static fn () => new DatePoint('2022-06-20 00:00:00'));
+
+        $this->assertSame('2022-06-20 00:00:00.000000', $clock->now()->format('Y-m-d H:i:s.u'));
+
+        $clock->sleep(1);
+        $this->assertSame('2022-06-20 00:00:01.000000', $clock->now()->format('Y-m-d H:i:s.u'));
+
+        $clock->reset();
+        $this->assertSame('2022-06-20 00:00:00.000000', $clock->now()->format('Y-m-d H:i:s.u'));
     }
 
     public static function provideValidModifyStrings(): iterable
@@ -116,5 +145,36 @@ class MockClockTest extends TestCase
 
         $this->assertNotSame($clock, $utcClock);
         $this->assertSame('UTC', $utcClock->now()->getTimezone()->getName());
+    }
+
+    public function testWithTimeZoneWithTimeProviderClosure()
+    {
+        $clock = new MockClock(static fn () => new DatePoint('2022-06-20 00:00:00'));
+
+        $this->assertSame('2022-06-20 00:00:00.000000', $clock->now()->format('Y-m-d H:i:s.u'));
+
+        $parisClock = $clock->withTimeZone('Europe/Paris');
+        $this->assertSame('Europe/Paris', $parisClock->now()->getTimezone()->getName());
+        $this->assertSame('2022-06-20 02:00:00.000000', $parisClock->now()->format('Y-m-d H:i:s.u'));
+
+        $utcClock = $parisClock->withTimeZone('UTC');
+        $this->assertSame('UTC', $utcClock->now()->getTimezone()->getName());
+        $this->assertSame('2022-06-20 00:00:00.000000', $utcClock->now()->format('Y-m-d H:i:s.u'));
+    }
+
+    public function testConstructorTimezoneTimeTakesPriorityOnClosure()
+    {
+        $clock = new MockClock(static fn () => new DatePoint('2022-06-20 00:00:00', new \DateTimeZone('Europe/Paris')), 'UTC');
+
+        $this->assertSame('UTC', $clock->now()->getTimezone()->getName());
+        $this->assertSame('2022-06-19 22:00:00.000000', $clock->now()->format('Y-m-d H:i:s.u'));
+    }
+
+    public function testTimeProviderClosureSetsTimezone()
+    {
+        $clock = new MockClock(static fn () => new DatePoint('2022-06-20 00:00:00', new \DateTimeZone('Europe/Paris')));
+
+        $this->assertSame('Europe/Paris', $clock->now()->getTimezone()->getName());
+        $this->assertSame('2022-06-20 00:00:00.000000', $clock->now()->format('Y-m-d H:i:s.u'));
     }
 }

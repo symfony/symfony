@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+7.2
+---
+
+ * Accept `ReadableCollection` in `CollectionToArrayTransformer`
+
 7.1
 ---
 

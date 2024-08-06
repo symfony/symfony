@@ -59,12 +59,12 @@ class AssetMapperCompileCommandTest extends TestCase
         // match Compiling \d+ assets
         $this->assertMatchesRegularExpression('/Compiled \d+ assets/', $tester->getDisplay());
 
-        $this->assertFileExists($targetBuildDir.'/subdir/file5-ZjRmZGM.js');
+        $this->assertFileExists($targetBuildDir.'/subdir/file5-9P3Dc3X.js');
         $this->assertSame(<<<EOF
         import '../file4.js';
         console.log('file5.js');
 
-        EOF, $this->filesystem->readFile($targetBuildDir.'/subdir/file5-ZjRmZGM.js'));
+        EOF, $this->filesystem->readFile($targetBuildDir.'/subdir/file5-9P3Dc3X.js'));
 
         $finder = new Finder();
         $finder->in($targetBuildDir)->files();

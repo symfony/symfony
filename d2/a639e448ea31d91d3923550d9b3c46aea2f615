@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2024-08-05T06:34:23Z
+
+found these missing entries when looking at why no tests were failing when we made changes to the supported schemes in #57916

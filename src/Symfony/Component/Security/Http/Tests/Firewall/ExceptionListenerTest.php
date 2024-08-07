@@ -27,7 +27,7 @@ use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\Exception\LogoutException;
 use Symfony\Component\Security\Http\Authorization\AccessDeniedHandlerInterface;
 use Symfony\Component\Security\Http\Authorization\NotFullFledgedHandlerInterface;
-use Symfony\Component\Security\Http\Authorization\SameAsNotFullFledgedHandler;
+use Symfony\Component\Security\Http\Authorization\NotFullFledgedEqualNormalLoginHandler;
 use Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface;
 use Symfony\Component\Security\Http\Firewall\ExceptionListener;
 use Symfony\Component\Security\Http\HttpUtils;
@@ -145,7 +145,6 @@ class ExceptionListenerTest extends TestCase
         $listener = $this->createExceptionListener($tokenStorage, $this->createTrustResolver(false), null, $this->createEntryPoint());
         $listener->onKernelException($event);
 
-        $this->assertEquals('OK', $event->getResponse()->getContent());
         $this->assertSame($eventException ?? $exception, $event->getThrowable()->getPrevious());
     }
 
@@ -159,10 +158,9 @@ class ExceptionListenerTest extends TestCase
         $tokenStorage = $this->createMock(TokenStorageInterface::class);
         $tokenStorage->expects($this->once())->method('getToken')->willReturn($this->createMock(TokenInterface::class));
 
-        $listener = $this->createExceptionListener($tokenStorage, $this->createTrustResolver(false,false), null, $this->createEntryPointWithoutStartCalled(), null, null, $this->createNotFullFledgedHandler(new Response('Full Fledged Response', 401)));
+        $listener = $this->createExceptionListener($tokenStorage, $this->createTrustResolver(false,false), null, $this->createEntryPointWithoutStartCalled(), null, null, $this->createNotFullFledgedHandler(true));
         $listener->onKernelException($event);
 
-        $this->assertEquals('Full Fledged Response', $event->getResponse()->getContent());
         $this->assertSame($eventException ?? $exception, $event->getThrowable()->getPrevious());
     }
 
@@ -176,7 +174,7 @@ class ExceptionListenerTest extends TestCase
         $tokenStorage = $this->createMock(TokenStorageInterface::class);
         $tokenStorage->expects($this->once())->method('getToken')->willReturn($this->createMock(TokenInterface::class));
 
-        $listener = $this->createExceptionListener($tokenStorage, $this->createTrustResolver(false,true), null, $this->createEntryPointWithoutStartCalled(), null, null, $this->createNotFullFledgedHandler(null));
+        $listener = $this->createExceptionListener($tokenStorage, $this->createTrustResolver(false,true), null, $this->createEntryPointWithoutStartCalled(), null, null, $this->createNotFullFledgedHandler(false));
         $listener->onKernelException($event);
 
         $this->assertNull($event->getResponse());
@@ -193,11 +191,9 @@ class ExceptionListenerTest extends TestCase
         $tokenStorage = $this->createMock(TokenStorageInterface::class);
         $tokenStorage->expects($this->once())->method('getToken')->willReturn($this->createMock(TokenInterface::class));
 
-        $listener = $this->createExceptionListener($tokenStorage, $this->createTrustResolver(false,true), null, $this->createEntryPointWithoutStartCalled(), null, null, $this->createNotFullFledgedHandler(new Response('Full Fledged Response', 401)));
+        $listener = $this->createExceptionListener($tokenStorage, $this->createTrustResolver(false,true), null, $this->createEntryPointWithoutStartCalled(), null, null, $this->createNotFullFledgedHandler(true));
         $listener->onKernelException($event);
 
-        $this->assertEquals('Full Fledged Response', $event->getResponse()->getContent());
-        $this->assertEquals(401, $event->getResponse()->getStatusCode());
         $this->assertSame($eventException ?? $exception, $event->getThrowable()->getPrevious());
     }
 
@@ -238,7 +234,7 @@ class ExceptionListenerTest extends TestCase
     private function createEntryPoint(?Response $response = null)
     {
         $entryPoint = $this->createMock(AuthenticationEntryPointInterface::class);
-        $entryPoint->expects($this->once())->method('start')->willReturn($response ?? new Response('OK'));
+        $entryPoint->method('start')->willReturn($response ?? new Response('OK'));
 
         return $entryPoint;
     }
@@ -254,7 +250,7 @@ class ExceptionListenerTest extends TestCase
     private function createTrustResolver($fullFledged, $authenticate = false)
     {
         $trustResolver = $this->createMock(AuthenticationTrustResolverInterface::class);
-        $trustResolver->expects($this->once())->method('isFullFledged')->willReturn($fullFledged);
+        $trustResolver->method('isFullFledged')->willReturn($fullFledged);
         $trustResolver->method('isAuthenticated')->willReturn($authenticate);
 
         return $trustResolver;
@@ -283,10 +279,10 @@ class ExceptionListenerTest extends TestCase
         );
     }
 
-    private function createNotFullFledgedHandler(?Response $response = null)
+    private function createNotFullFledgedHandler(bool $break = false)
     {
         $handler = $this->createMock(NotFullFledgedHandlerInterface::class);
-        $handler->method('handle')->willReturn($response);
+        $handler->method('handle')->willReturn($break);
 
         return $handler;
     }

@@ -19,7 +19,8 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface;
 use Symfony\Component\Security\Http\Session\SessionAuthenticationStrategy;
-use Symfony\Component\Security\Http\Authorization\SameAsNotFullFledgedHandler;
+use Symfony\Component\Security\Http\Authorization\NotFullFledgedEqualNormalLoginHandler;
+use Symfony\Component\Security\Http\Authorization\NotFullFledgedRedirectToStartAuthenticationHandler;
 
 /**
  * SecurityExtension configuration structure.
@@ -216,13 +217,16 @@ class MainConfiguration implements ConfigurationInterface
             ->booleanNode('lazy')->defaultFalse()->end()
             ->scalarNode('context')->cannotBeEmpty()->end()
             ->scalarNode('not_full_fledged_handler')
+                ->defaultValue(NotFullFledgedRedirectToStartAuthenticationHandler::class)
                 ->beforeNormalization()
-                    ->ifTrue(fn ($v): bool => $v == 'original')
-                        ->then(fn ($v) => null)
-                    ->ifTrue(fn ($v): bool => $v == 'same')
-                        ->then(fn ($v) => SameAsNotFullFledgedHandler::class)
-                    ->end()
+                    ->ifTrue(fn ($v): bool => $v == 'redirect')
+                        ->then(fn ($v) => NotFullFledgedRedirectToStartAuthenticationHandler::class)
                 ->end()
+                ->beforeNormalization()
+                    ->ifTrue(fn ($v): bool => $v == 'equal')
+                        ->then(fn ($v) => NotFullFledgedEqualNormalLoginHandler::class)
+                ->end()
+            ->end()
             ->arrayNode('logout')
                 ->treatTrueLike([])
                 ->canBeUnset()

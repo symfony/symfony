@@ -25,7 +25,6 @@ use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInt
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\Security\Core\Exception\AccountStatusException;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
-use Symfony\Component\Security\Core\Exception\InsufficientAuthenticationException;
 use Symfony\Component\Security\Core\Exception\LazyResponseException;
 use Symfony\Component\Security\Core\Exception\LogoutException;
 use Symfony\Component\Security\Http\Authorization\AccessDeniedHandlerInterface;
@@ -126,36 +125,11 @@ class ExceptionListener
     private function handleAccessDeniedException(ExceptionEvent $event, AccessDeniedException $exception): void
     {
         $event->setThrowable(new AccessDeniedHttpException($exception->getMessage(), $exception));
-
         $token = $this->tokenStorage->getToken();
-        if (!$this->authenticationTrustResolver->isFullFledged($token)) {
 
-            $starAuthenticationResponse = function () use($exception, $event, $token) {
-                $this->logger?->debug('Access denied, the user is not fully authenticated; redirecting to authentication entry point.', ['exception' => $exception]);
-
-                try {
-                    $insufficientAuthenticationException = new InsufficientAuthenticationException('Full authentication is required to access this resource.', 0, $exception);
-                    if (null !== $token) {
-                        $insufficientAuthenticationException->setToken($token);
-                    }
-
-                    $event->setResponse($this->startAuthentication($event->getRequest(), $insufficientAuthenticationException));
-                } catch (\Exception $e) {
-                    $event->setThrowable($e);
-                }
-            };
-
-            if(null === $this->notFullFledgedHandler) {
-                $starAuthenticationResponse();
-                return;
-            }
-
-            $response = $this->notFullFledgedHandler->handle($event->getRequest(), $exception,$this->authenticationTrustResolver, $token, $starAuthenticationResponse);
-
-            if ($response instanceof Response) {
-                $event->setResponse($response);
-                return;
-            }
+        if($this->notFullFledgedHandler?->handle($event, $exception,$this->authenticationTrustResolver, $token, $this->logger, function ($request, $exception) {return $this->startAuthentication($request, $exception);} ))
+        {
+            return;
         }
 
         $this->logger?->debug('Access denied, the user is neither anonymous, nor remember-me.', ['exception' => $exception]);

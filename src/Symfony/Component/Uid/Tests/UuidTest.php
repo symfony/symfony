@@ -204,6 +204,16 @@ class UuidTest extends TestCase
         $this->assertTrue(UuidV4::isValid(self::A_UUID_V4));
     }
 
+    public function testIsValidWithVariousFormat()
+    {
+        $uuid = Uuid::v4();
+
+        $this->assertTrue(UuidV4::isValid($uuid->toBase32()));
+        $this->assertTrue(UuidV4::isValid($uuid->toBase58()));
+        $this->assertTrue(UuidV4::isValid($uuid->toBinary()));
+        $this->assertFalse(Uuid::isValid('30J7CNpDMfXPZrCsn4Cgey'), 'Fake base-58 string with the "O" forbidden char is not valid');
+    }
+
     public function testIsValidWithNilUuid()
     {
         $this->assertTrue(Uuid::isValid('00000000-0000-0000-0000-000000000000'));

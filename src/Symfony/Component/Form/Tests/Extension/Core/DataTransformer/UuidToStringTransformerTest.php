@@ -56,15 +56,6 @@ class UuidToStringTransformerTest extends TestCase
         $this->assertNull($reverseTransformer->reverseTransform(''));
     }
 
-    public function testReverseTransformExpectsString()
-    {
-        $reverseTransformer = new UuidToStringTransformer();
-
-        $this->expectException(TransformationFailedException::class);
-
-        $reverseTransformer->reverseTransform(Uuid::fromString('123e4567-e89b-12d3-a456-426655440000')->toBase32());
-    }
-
     public function testReverseTransformExpectsValidUuidString()
     {
         $reverseTransformer = new UuidToStringTransformer();

@@ -44,22 +44,7 @@ class Uuid extends AbstractUid
 
     public static function fromString(string $uuid): static
     {
-        if (22 === \strlen($uuid) && 22 === strspn($uuid, BinaryUtil::BASE58[''])) {
-            $uuid = str_pad(BinaryUtil::fromBase($uuid, BinaryUtil::BASE58), 16, "\0", \STR_PAD_LEFT);
-        }
-
-        if (16 === \strlen($uuid)) {
-            // don't use uuid_unparse(), it's slower
-            $uuid = bin2hex($uuid);
-            $uuid = substr_replace($uuid, '-', 8, 0);
-            $uuid = substr_replace($uuid, '-', 13, 0);
-            $uuid = substr_replace($uuid, '-', 18, 0);
-            $uuid = substr_replace($uuid, '-', 23, 0);
-        } elseif (26 === \strlen($uuid) && Ulid::isValid($uuid)) {
-            $ulid = new NilUlid();
-            $ulid->uid = strtoupper($uuid);
-            $uuid = $ulid->toRfc4122();
-        }
+        $uuid = self::transformAnyToRfc4122($uuid);
 
         if (__CLASS__ !== static::class || 36 !== \strlen($uuid)) {
             return new static($uuid);
@@ -132,6 +117,8 @@ class Uuid extends AbstractUid
 
     public static function isValid(string $uuid): bool
     {
+        $uuid = self::transformAnyToRfc4122($uuid);
+
         if (self::NIL === $uuid && \in_array(static::class, [__CLASS__, NilUuid::class], true)) {
             return true;
         }
@@ -181,5 +168,32 @@ class Uuid extends AbstractUid
         $uuid = substr_replace($uuid, '-', 18, 0);
 
         return substr_replace($uuid, '-', 23, 0);
+    }
+
+    /**
+     * Transform a binary string, a base-32 string or a base-58 string to a RFC4122 string.
+     *
+     * @return non-empty-string
+     */
+    private static function transformAnyToRfc4122(string $uuid): string
+    {
+        if (22 === \strlen($uuid) && 22 === strspn($uuid, BinaryUtil::BASE58[''])) {
+            $uuid = str_pad(BinaryUtil::fromBase($uuid, BinaryUtil::BASE58), 16, "\0", \STR_PAD_LEFT);
+        }
+
+        if (16 === \strlen($uuid)) {
+            // don't use uuid_unparse(), it's slower
+            $uuid = bin2hex($uuid);
+            $uuid = substr_replace($uuid, '-', 8, 0);
+            $uuid = substr_replace($uuid, '-', 13, 0);
+            $uuid = substr_replace($uuid, '-', 18, 0);
+            $uuid = substr_replace($uuid, '-', 23, 0);
+        } elseif (26 === \strlen($uuid) && Ulid::isValid($uuid)) {
+            $ulid = new NilUlid();
+            $ulid->uid = strtoupper($uuid);
+            $uuid = $ulid->toRfc4122();
+        }
+
+        return $uuid;
     }
 }

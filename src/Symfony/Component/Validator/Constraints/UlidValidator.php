@@ -43,6 +43,7 @@ class UlidValidator extends ConstraintValidator
         [$requiredLength, $requiredCharset] = match ($constraint->format) {
             Ulid::FORMAT_BASE_32 => [26, '0123456789ABCDEFGHJKMNPQRSTVWXYZabcdefghjkmnpqrstvwxyz'],
             Ulid::FORMAT_BASE_58 => [22, '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz'],
+            Ulid::FORMAT_RFC_4122 => [36, '0123456789ABCDEFabcdef-'],
         };
 
         if ($requiredLength !== \strlen($value)) {
@@ -79,6 +80,16 @@ class UlidValidator extends ConstraintValidator
                         '{{ format }}' => $constraint->format,
                     ])
                     ->setCode(Ulid::TOO_LARGE_ERROR)
+                    ->addViolation();
+            }
+        } elseif (Ulid::FORMAT_RFC_4122 === $constraint->format) {
+            if (!preg_match('/^[^-]{8}-[^-]{4}-[^-]{4}-[^-]{4}-[^-]{12}$/', $value)) {
+                $this->context->buildViolation($constraint->message)
+                    ->setParameters([
+                        '{{ value }}' => $this->formatValue($value),
+                        '{{ format }}' => $constraint->format,
+                    ])
+                    ->setCode(Ulid::INVALID_FORMAT_ERROR)
                     ->addViolation();
             }
         }

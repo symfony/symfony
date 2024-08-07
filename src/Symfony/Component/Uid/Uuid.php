@@ -23,6 +23,12 @@ class Uuid extends AbstractUid
     public const NAMESPACE_OID = '6ba7b812-9dad-11d1-80b4-00c04fd430c8';
     public const NAMESPACE_X500 = '6ba7b814-9dad-11d1-80b4-00c04fd430c8';
 
+    public const FORMAT_BINARY = 1;
+    public const FORMAT_BASE_32 = 1 << 1;
+    public const FORMAT_BASE_58 = 1 << 2;
+    public const FORMAT_RFC_4122 = 1 << 3;
+    public const FORMAT_ALL = -1;
+
     protected const TYPE = 0;
     protected const NIL = '00000000-0000-0000-0000-000000000000';
     protected const MAX = 'ffffffff-ffff-ffff-ffff-ffffffffffff';
@@ -44,22 +50,7 @@ class Uuid extends AbstractUid
 
     public static function fromString(string $uuid): static
     {
-        if (22 === \strlen($uuid) && 22 === strspn($uuid, BinaryUtil::BASE58[''])) {
-            $uuid = str_pad(BinaryUtil::fromBase($uuid, BinaryUtil::BASE58), 16, "\0", \STR_PAD_LEFT);
-        }
-
-        if (16 === \strlen($uuid)) {
-            // don't use uuid_unparse(), it's slower
-            $uuid = bin2hex($uuid);
-            $uuid = substr_replace($uuid, '-', 8, 0);
-            $uuid = substr_replace($uuid, '-', 13, 0);
-            $uuid = substr_replace($uuid, '-', 18, 0);
-            $uuid = substr_replace($uuid, '-', 23, 0);
-        } elseif (26 === \strlen($uuid) && Ulid::isValid($uuid)) {
-            $ulid = new NilUlid();
-            $ulid->uid = strtoupper($uuid);
-            $uuid = $ulid->toRfc4122();
-        }
+        $uuid = self::transformToRfc4122($uuid, self::FORMAT_ALL);
 
         if (__CLASS__ !== static::class || 36 !== \strlen($uuid)) {
             return new static($uuid);
@@ -130,8 +121,19 @@ class Uuid extends AbstractUid
         return new UuidV8($uuid);
     }
 
-    public static function isValid(string $uuid): bool
+    /**
+     * @param int-mask-of<Uuid::FORMAT_*> $format
+     */
+    public static function isValid(string $uuid /*, int $format = self::FORMAT_RFC_4122 */): bool
     {
+        $format = 1 < \func_num_args() ? func_get_arg(1) : self::FORMAT_RFC_4122;
+
+        if (36 === \strlen($uuid) && !($format & self::FORMAT_RFC_4122)) {
+            return false;
+        }
+
+        $uuid = self::transformToRfc4122($uuid, $format);
+
         if (self::NIL === $uuid && \in_array(static::class, [__CLASS__, NilUuid::class], true)) {
             return true;
         }
@@ -181,5 +183,37 @@ class Uuid extends AbstractUid
         $uuid = substr_replace($uuid, '-', 18, 0);
 
         return substr_replace($uuid, '-', 23, 0);
+    }
+
+    /**
+     * Transforms a binary string, a base-32 string or a base-58 string to a RFC4122 string.
+     *
+     * @param int-mask-of<Uuid::FORMAT_*> $format
+     *
+     * @return non-empty-string
+     */
+    private static function transformToRfc4122(string $uuid, int $format): string
+    {
+        $fromBase58 = false;
+        if (22 === \strlen($uuid) && 22 === strspn($uuid, BinaryUtil::BASE58['']) && $format & self::FORMAT_BASE_58) {
+            $uuid = str_pad(BinaryUtil::fromBase($uuid, BinaryUtil::BASE58), 16, "\0", \STR_PAD_LEFT);
+            $fromBase58 = true;
+        }
+
+        // base-58 are always transformed to binary string, but they must only be valid when the format is FORMAT_BASE_58
+        if (16 === \strlen($uuid) && $format & self::FORMAT_BINARY || $fromBase58 && $format & self::FORMAT_BASE_58) {
+            // don't use uuid_unparse(), it's slower
+            $uuid = bin2hex($uuid);
+            $uuid = substr_replace($uuid, '-', 8, 0);
+            $uuid = substr_replace($uuid, '-', 13, 0);
+            $uuid = substr_replace($uuid, '-', 18, 0);
+            $uuid = substr_replace($uuid, '-', 23, 0);
+        } elseif (26 === \strlen($uuid) && Ulid::isValid($uuid) && $format & self::FORMAT_BASE_32) {
+            $ulid = new NilUlid();
+            $ulid->uid = strtoupper($uuid);
+            $uuid = $ulid->toRfc4122();
+        }
+
+        return $uuid;
     }
 }

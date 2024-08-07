@@ -5,6 +5,7 @@ CHANGELOG
 ---
 
  * Make `AbstractUid` implement `Ds\Hashable` if available
+ * Add support for binary, base-32 and base-58 representations in `Uuid::isValid()`
 
 7.1
 ---

@@ -60,6 +60,13 @@ class UlidValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
+    public function testValidUlidAsRfc4122()
+    {
+        $this->validator->validate('01912bf3-feff-fa6c-00f2-90d2f2e00564', new Ulid(format: Ulid::FORMAT_RFC_4122));
+
+        $this->assertNoViolation();
+    }
+
     /**
      * @dataProvider getInvalidUlids
      */
@@ -116,6 +123,36 @@ class UlidValidatorTest extends ConstraintValidatorTestCase
             ['1CCD2w4mK2m455S2BAXFhttt', Ulid::TOO_LONG_ERROR],
             ['1CCD2w4mK2m455S2BAXFhO', Ulid::INVALID_CHARACTERS_ERROR],
             ['not-even-ulid-like', Ulid::TOO_SHORT_ERROR],
+        ];
+    }
+
+    /**
+     * @dataProvider getInvalidRfc4122Ulids
+     */
+    public function testInvalidInvalid4122Ulid(string $ulid, string $code)
+    {
+        $constraint = new Ulid(message: 'testMessage', format: Ulid::FORMAT_RFC_4122);
+
+        $this->validator->validate($ulid, $constraint);
+
+        $this->buildViolation('testMessage')
+            ->setParameters([
+                '{{ value }}' => '"'.$ulid.'"',
+                '{{ format }}' => Ulid::FORMAT_RFC_4122,
+            ])
+            ->setCode($code)
+            ->assertRaised();
+    }
+
+    public static function getInvalidRfc4122Ulids(): array
+    {
+        return [
+            ['01912bf3-f5b7-e55d', Ulid::TOO_SHORT_ERROR],
+            ['01912bf3-f5b7-e55d-d21f-5ef032cd8e29999999', Ulid::TOO_LONG_ERROR],
+            ['01912bf3-f5b7-e55d-d21f-5ef032cd8eZZ', Ulid::INVALID_CHARACTERS_ERROR],
+            ['not-even-ulid-like', Ulid::TOO_SHORT_ERROR],
+            ['01912bf30feff0fa6c000f2090d2f2e00564', Ulid::INVALID_FORMAT_ERROR],
+            ['019-2bf3-feff-fa6c-00f2-90d2f2e00564', Ulid::INVALID_FORMAT_ERROR],
         ];
     }
 

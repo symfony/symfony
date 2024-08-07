@@ -28,6 +28,7 @@ class UlidTest extends TestCase
         [$bConstraint] = $metadata->properties['b']->getConstraints();
         self::assertSame('myMessage', $bConstraint->message);
         self::assertSame(['Default', 'UlidDummy'], $bConstraint->groups);
+        self::assertSame(Ulid::FORMAT_BASE_58, $bConstraint->format);
 
         [$cConstraint] = $metadata->properties['c']->getConstraints();
         self::assertSame(['my_group'], $cConstraint->groups);
@@ -48,7 +49,7 @@ class UlidDummy
     #[Ulid]
     private $a;
 
-    #[Ulid(message: 'myMessage')]
+    #[Ulid(message: 'myMessage', format: Ulid::FORMAT_BASE_58)]
     private $b;
 
     #[Ulid(groups: ['my_group'], payload: 'some attached data')]

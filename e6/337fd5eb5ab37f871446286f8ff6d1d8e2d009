@@ -1,0 +1,26 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2024-07-28T20:13:50Z
+
+Hey!
+
+Thanks for your PR. You are targeting branch "7.1" but it seems your PR description refers to branch "5.4, 6.4, 7.0, and 7.1 for bug fixes".
+Could you update the PR description or change target branch? This helps core maintainers a lot.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2024-07-29T06:24:19Z
+
+Is 5.4 not affected by this? Also we need some tests to prevent regressions.
+
+---------------------------------------------------------------------------
+
+by jbtronics at 2024-07-29T20:31:14Z
+
+@xabbuh Yes Symfony 5.4 (and all other currently supported versions) are affected by this bug, as the relevant code parts were not changed for a while.
+
+I also added some tests for the parsing of numbers in e-notation, which was not covered by tests before. These should also prevent regression of this issue.

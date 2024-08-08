@@ -48,9 +48,13 @@ class ExecutableFinder
      */
     public function find(string $name, ?string $default = null, array $extraDirs = [])
     {
-        if (\ini_get('open_basedir')) {
-            $searchPath = array_merge(explode(\PATH_SEPARATOR, \ini_get('open_basedir')), $extraDirs);
-            $dirs = [];
+        $dirs = array_merge(
+            explode(\PATH_SEPARATOR, getenv('PATH') ?: getenv('Path')),
+            $extraDirs
+        );
+
+        if ($openBaseDir = \ini_get('open_basedir')) {
+            $searchPath = array_merge(explode(\PATH_SEPARATOR, $openBaseDir));
             foreach ($searchPath as $path) {
                 // Silencing against https://bugs.php.net/69240
                 if (@is_dir($path)) {
@@ -61,11 +65,6 @@ class ExecutableFinder
                     }
                 }
             }
-        } else {
-            $dirs = array_merge(
-                explode(\PATH_SEPARATOR, getenv('PATH') ?: getenv('Path')),
-                $extraDirs
-            );
         }
 
         $suffixes = [''];
@@ -74,7 +73,7 @@ class ExecutableFinder
             $suffixes = array_merge($pathExt ? explode(\PATH_SEPARATOR, $pathExt) : $this->suffixes, $suffixes);
         }
         foreach ($suffixes as $suffix) {
-            foreach ($dirs as $dir) {
+            foreach (array_unique($dirs) as $dir) {
                 if (@is_file($file = $dir.\DIRECTORY_SEPARATOR.$name.$suffix) && ('\\' === \DIRECTORY_SEPARATOR || @is_executable($file))) {
                     return $file;
                 }

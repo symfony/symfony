@@ -29,6 +29,8 @@ interface NotFullFledgedHandlerInterface
 {
     /**
      * Allow to manage NotFullFledged cases when ExceptionListener catch AccessDeniedException
+     * This function can make checks and event / exception changes to change the Response
+     * It returns a boolean for break or not after that or continue the ExceptionListener process to decorate Exception and their response
      * 
      * @param $starAuthenticationCallback callable for call start function from 
      * 

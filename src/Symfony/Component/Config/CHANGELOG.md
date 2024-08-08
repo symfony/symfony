@@ -5,6 +5,8 @@ CHANGELOG
 ---
 
  * Add `#[WhenNot]` attribute to prevent service from being registered in a specific environment
+ * Generate a meta file in JSON format for resource tracking
+ * Add `SkippingResourceChecker`
 
 7.1
 ---

@@ -70,7 +70,7 @@ class ValueToDuplicatesTransformerTest extends TestCase
             'c' => '',
         ];
 
-        $this->assertNull($this->transformer->reverseTransform($input));
+        $this->assertSame('', $this->transformer->reverseTransform($input));
     }
 
     public function testReverseTransformCompletelyNull()

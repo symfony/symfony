@@ -70,4 +70,23 @@ trait CompositeTypeTrait
 
         return true;
     }
+
+    /**
+     * @param callable(T): bool $callable
+     * @return list<T>
+     */
+    public function filter(callable $callable): array
+    {
+        return $this->filterTypes($callable, ...$this->getTypes());
+    }
+
+    /**
+     * @param callable(T): bool $callable
+     * @param array<T>          $types
+     * @return list<T>
+     */
+    private function filterTypes(callable $callable, Type ...$types): array
+    {
+        return array_values(array_filter($types, $callable));
+    }
 }

@@ -27,6 +27,9 @@ abstract class Type implements \Stringable
 
     abstract public function getBaseType(): BuiltinType|ObjectType;
 
+    /**
+     * Return the simplest primitive type that this type will satisfy.
+     */
     abstract public function getTypeIdentifier(): TypeIdentifier;
 
     /**

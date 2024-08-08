@@ -31,35 +31,55 @@ final class UnionType extends Type implements CompositeTypeInterface, NullableTy
      */
     use CompositeTypeTrait;
 
+    private readonly TypeIdentifier $typeIdentifier;
+    private readonly bool $isNullable;
+
     public function __construct(Type ...$types)
     {
         if (\count($types) < 2) {
             throw new InvalidArgumentException(\sprintf('"%s" expects at least 2 types.', self::class));
         }
 
+        $nullable = false;
+        $hasClassType = false;
+        $hasObject = false;
+        $identifiers = [];
         foreach ($types as $t) {
-            if ($t instanceof self || \in_array($t->getTypeIdentifier(), [TypeIdentifier::NEVER, TypeIdentifier::VOID], true)) {
+            if ($t instanceof self) {
                 throw new InvalidArgumentException(\sprintf('Cannot set "%s" as a "%s" part.', $t, self::class));
             }
+            if (!$t->getTypeIdentifier()->isComposable()) {
+                throw new InvalidArgumentException(\sprintf('Type %s can only be used as a standalone type', $t->getTypeIdentifier()->value));
+            }
+            if (TypeIdentifier::NULL === $t->getTypeIdentifier()) {
+                $nullable = true;
+            }
+            $hasClassType = $hasClassType || !$t instanceof BuiltinType && TypeIdentifier::OBJECT === $t->getTypeIdentifier();
+            $hasObject = $hasObject || $t instanceof BuiltinType && TypeIdentifier::OBJECT === $t->getTypeIdentifier();
+            $identifiers[$t->getTypeIdentifier()->name] = $t->getTypeIdentifier();
         }
-        // Sort intersections first, then classes, then builtins
-        $prefix = function (Type $t): string {
-            return match ($t::class) {
-                IntersectionType::class => '!!',
-                ObjectType::class => '!',
-                default => '',
-            }.$t;
-        };
-        usort($types, fn (Type $a, Type $b): int => $prefix($a) <=> $prefix($b));
+        if ($hasClassType && $hasObject) {
+            throw new InvalidArgumentException('Union contains both object and a class type, which is redundant.');
+        }
 
-        $this->types = array_values(array_unique($types));
+        $types = array_values(array_unique($types));
+
+        // bool, true and false cannot be composed together (use same errors as PHP in similar cases)
+        $booleanTypes = $this->filterTypes(fn(Type $t): bool => $t->getTypeIdentifier()->isBool(), ...$types);
+        if (1 < \count($booleanTypes)) {
+            throw \in_array(TypeIdentifier::TRUE, $identifiers, true) && \in_array(TypeIdentifier::FALSE, $identifiers, true)
+                ? new InvalidArgumentException('Union type contains both true and false, bool should be used instead.')
+                : new InvalidArgumentException('Duplicate boolean type is redundant.');
+        }
+
+        $this->typeIdentifier = 1 === count($identifiers) ? current($identifiers) : TypeIdentifier::MIXED;
+        $this->isNullable = $nullable;
+        $this->types = $this->sortSubtypesForRendering(...$types);
     }
 
     public function getTypeIdentifier(): TypeIdentifier
     {
-        $identifiers = array_values(array_unique(array_map(fn($t) => $t->getTypeIdentifier(), $this->getTypes())));
-
-        return 1 === count($identifiers) ? $identifiers[0] : TypeIdentifier::MIXED;
+        return $this->typeIdentifier;
     }
 
     /**
@@ -83,33 +103,22 @@ final class UnionType extends Type implements CompositeTypeInterface, NullableTy
         throw new LogicException(\sprintf('Cannot get base type on "%s" compound type.', $this));
     }
 
+    /**
+     * Whether this union represents a nullable type.
+     *
+     * A union is nullable if it contains "null" (as it may not contain unions or mixed).
+     */
     public function isNullable(): bool
     {
-        foreach ($this->getTypes() as $type) {
-            if ($type instanceof NullableTypeInterface && $type->isNullable()) {
-                return true;
-            }
-        }
-
-        return false;
+        return $this->isNullable;
     }
 
     public function asNonNullable(): Type
     {
-        if (!$this->isNullable()) {
+        if (!$this->isNullable) {
             return $this;
         }
-        $nonNullableTypes = [];
-        foreach ($this->getTypes() as $type) {
-            if (TypeIdentifier::NULL === $type->getTypeIdentifier()) {
-                continue;
-            }
-            if ($type instanceof NullableTypeInterface && $type->isNullable()) {
-                $type = $type->asNonNullable();
-            }
-            $nonNullableTypes[] = $type instanceof self ? $type->getTypes() : [$type];
-        }
-        $nonNullableTypes = array_merge(...$nonNullableTypes);
+        $nonNullableTypes = $this->filter(fn (Type $t): bool => TypeIdentifier::NULL !== $t->getTypeIdentifier());
 
         return 1 < \count($nonNullableTypes) ? new self(...$nonNullableTypes) : $nonNullableTypes[0];
     }
@@ -145,5 +154,25 @@ final class UnionType extends Type implements CompositeTypeInterface, NullableTy
         }
 
         throw new LogicException(\sprintf('Cannot call "%s" on "%s" compound type.', $method, $this));
+    }
+
+    /**
+     * Sort intersections first, then classes, then builtins and order alphabetically within each group.
+     *
+     * @param array<T> $types
+     * @return list<T>
+     */
+    private function sortSubtypesForRendering(Type ...$types): array
+    {
+        $prefix = function (Type $t): string {
+            return match ($t::class) {
+                    IntersectionType::class => '!!',
+                    ObjectType::class => '!',
+                    default => '',
+                }.$t;
+        };
+        usort($types, fn (Type $a, Type $b): int => $prefix($a) <=> $prefix($b));
+
+        return array_values($types);
     }
 }

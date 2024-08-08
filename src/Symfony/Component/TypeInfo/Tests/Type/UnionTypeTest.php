@@ -30,7 +30,54 @@ class UnionTypeTest extends TestCase
     public function testCannotCreateWithUnionTypeParts()
     {
         $this->expectException(InvalidArgumentException::class);
-        new UnionType(Type::int(), new UnionType());
+        new UnionType(Type::int(), new UnionType(Type::bool(), Type::float()));
+    }
+
+    /**
+     * @dataProvider provideStandaloneTypes
+     */
+    public function testCannotCreateWithStandaloneParts(Type $type): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        new UnionType(Type::generic(Type::int()), $type);
+    }
+
+    /**
+     * @dataProvider provideComposableTypes
+     */
+    public function testCanCreateWithComposableTypes(Type $type): void
+    {
+        $this->assertContains($type, (new UnionType(Type::generic(Type::int()), $type))->getTypes());
+    }
+
+    public static function provideComposableTypes(): iterable
+    {
+        foreach (TypeIdentifier::cases() as $case) {
+            if ($case->isComposable()) {
+                yield $case->name => [Type::builtin($case)];
+            }
+        }
+    }
+
+    public static function provideStandaloneTypes(): iterable
+    {
+        foreach (TypeIdentifier::cases() as $case) {
+            if (!$case->isComposable()) {
+                yield $case->name => [Type::builtin($case)];
+            }
+        }
+    }
+
+    public function testCannotComposeTrueAndFalse(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        new UnionType(Type::true(), Type::false());
+    }
+
+    public function testCannotComposeBoolAndBoolValue(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        new UnionType(Type::bool(), Type::false());
     }
 
     public function testSortTypesOnCreation()
@@ -52,19 +99,6 @@ class UnionTypeTest extends TestCase
         $type = new UnionType(Type::int(), Type::null());
         $this->assertInstanceOf(BuiltinType::class, $type->asNonNullable());
         $this->assertEquals(Type::int(), $type->asNonNullable());
-
-        $type = new UnionType(Type::int(), Type::object(\stdClass::class), Type::mixed());
-        $this->assertInstanceOf(UnionType::class, $type->asNonNullable());
-        $this->assertEquals([
-            Type::object(\stdClass::class),
-            Type::builtin(TypeIdentifier::ARRAY),
-            Type::bool(),
-            Type::float(),
-            Type::int(),
-            Type::object(),
-            Type::resource(),
-            Type::string(),
-        ], $type->asNonNullable()->getTypes());
     }
 
     public function testGetBaseType()
@@ -88,7 +122,7 @@ class UnionTypeTest extends TestCase
         $type = new UnionType(Type::int(), Type::string(), Type::bool());
         $this->assertTrue($type->everyTypeIs(fn (Type $t) => $t instanceof BuiltinType));
 
-        $type = new UnionType(Type::int(), Type::string(), Type::template('T'));
+        $type = new UnionType(Type::int(), Type::string(), Type::object('T'));
         $this->assertFalse($type->everyTypeIs(fn (Type $t) => $t instanceof BuiltinType));
     }
 
@@ -104,8 +138,31 @@ class UnionTypeTest extends TestCase
     public function testIsNullable()
     {
         $this->assertFalse((new UnionType(Type::int(), Type::intersection(Type::object('Foo'), Type::object('Bar'))))->isNullable());
+        $this->assertFalse((new UnionType(Type::int(), Type::string()))->isNullable());
         $this->assertTrue((new UnionType(Type::int(), Type::null()))->isNullable());
-        $this->assertTrue((new UnionType(Type::int(), Type::mixed()))->isNullable());
+    }
+
+    /**
+     * @dataProvider provideTypeIdentifierAndParts
+     */
+    public function testGetTypeIdentifier(TypeIdentifier $expected, Type $first, Type $second): void
+    {
+        $this->assertSame($expected, (new UnionType($first, $second))->getTypeIdentifier());
+    }
+
+    public static function provideTypeIdentifierAndParts(): iterable
+    {
+        $int1 = Type::intersection(Type::object('Foo'), Type::object('Bar'));
+        $int2 = Type::intersection(Type::object('Bar'), Type::object('Baz'));
+
+        yield 'int|string' => [TypeIdentifier::MIXED, Type::int(), Type::string()];
+        yield 'int|null' => [TypeIdentifier::MIXED, Type::int(), Type::null()];
+        yield 'int|int<var>' => [TypeIdentifier::INT, Type::int(), Type::generic(Type::int())];
+        yield 'int|object' => [TypeIdentifier::MIXED, Type::int(), Type::object()];
+        yield 'intersections' => [TypeIdentifier::OBJECT, $int1, $int2];
+        yield 'intersection|ClassName' => [TypeIdentifier::OBJECT, $int1, Type::object('Foo')];
+        yield 'intersection|scalar' => [TypeIdentifier::MIXED, $int1, Type::int()];
+        yield 'ClassName|ClassName<var>' => [TypeIdentifier::OBJECT, Type::object('Foo'), Type::generic(Type::object('Foo'))];
     }
 
     public function testIsA()

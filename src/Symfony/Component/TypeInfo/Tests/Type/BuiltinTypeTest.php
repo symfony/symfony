@@ -29,11 +29,19 @@ class BuiltinTypeTest extends TestCase
         $this->assertEquals(new BuiltinType(TypeIdentifier::INT), (new BuiltinType(TypeIdentifier::INT))->getBaseType());
     }
 
-    public function testIsNullable()
+    /**
+     * @dataProvider provideNullabilityResults
+     */
+    public function testIsNullable(TypeIdentifier $typeIdentifier, bool $isNullable): void
     {
-        $this->assertFalse((new BuiltinType(TypeIdentifier::INT))->isNullable());
-        $this->assertTrue((new BuiltinType(TypeIdentifier::NULL))->isNullable());
-        $this->assertTrue((new BuiltinType(TypeIdentifier::MIXED))->isNullable());
+        $this->assertSame($isNullable, (new BuiltinType($typeIdentifier))->isNullable());
+    }
+
+    public static function provideNullabilityResults(): iterable
+    {
+        foreach (TypeIdentifier::cases() as $case) {
+            yield $case->value => [$case, TypeIdentifier::NULL === $case || TypeIdentifier::MIXED === $case];
+        }
     }
 
     public function testAsNonNullable()

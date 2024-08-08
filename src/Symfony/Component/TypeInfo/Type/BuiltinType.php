@@ -23,7 +23,7 @@ use Symfony\Component\TypeInfo\TypeIdentifier;
  *
  * @experimental
  */
-final class BuiltinType extends Type implements NullableTypeInterface
+final class BuiltinType extends Type
 {
     /**
      * @param T $typeIdentifier

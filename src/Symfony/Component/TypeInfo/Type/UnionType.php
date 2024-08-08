@@ -24,7 +24,7 @@ use Symfony\Component\TypeInfo\TypeIdentifier;
  *
  * @experimental
  */
-final class UnionType extends Type implements CompositeTypeInterface, NullableTypeInterface
+final class UnionType extends Type implements CompositeTypeInterface
 {
     /**
      * @use CompositeTypeTrait<T>

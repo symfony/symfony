@@ -306,9 +306,9 @@ trait TypeFactoryTrait
      *
      * @return (T is UnionType ? T : UnionType<T|BuiltinType<TypeIdentifier::NULL>>)
      */
-    public static function nullable(Type $type): Type&NullableTypeInterface
+    public static function nullable(Type $type): Type
     {
-        if ($type instanceof NullableTypeInterface && $type->isNullable()) {
+        if ($type->isNullable()) {
             return $type;
         }
         if ($type instanceof UnionType) {

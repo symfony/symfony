@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Scheduler\Tests;
 
+use Cron\CronExpression;
 use PHPUnit\Framework\TestCase;
 use Random\Randomizer;
 use Symfony\Component\Scheduler\Exception\InvalidArgumentException;
@@ -20,6 +21,10 @@ class RecurringMessageTest extends TestCase
 {
     public function testCanCreateHashedCronMessage()
     {
+        if (!class_exists(CronExpression::class)) {
+            $this->markTestSkipped('The "dragonmantank/cron-expression" package is required to run this test.');
+        }
+
         $object = new DummyStringableMessage();
 
         if (class_exists(Randomizer::class)) {
@@ -40,6 +45,10 @@ class RecurringMessageTest extends TestCase
 
     public function testUniqueId()
     {
+        if (!class_exists(CronExpression::class)) {
+            $this->markTestSkipped('The "dragonmantank/cron-expression" package is required to run this test.');
+        }
+
         $message1 = RecurringMessage::cron('* * * * *', new \stdClass());
         $message2 = RecurringMessage::cron('* 5 * * *', new \stdClass());
 

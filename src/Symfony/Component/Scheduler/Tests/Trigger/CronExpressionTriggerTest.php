@@ -11,12 +11,20 @@
 
 namespace Symfony\Component\Scheduler\Tests\Trigger;
 
+use Cron\CronExpression;
 use PHPUnit\Framework\TestCase;
 use Random\Randomizer;
 use Symfony\Component\Scheduler\Trigger\CronExpressionTrigger;
 
 class CronExpressionTriggerTest extends TestCase
 {
+    protected function setUp(): void
+    {
+        if (!class_exists(CronExpression::class)) {
+            $this->markTestSkipped('The "dragonmantank/cron-expression" package is required to run this test.');
+        }
+    }
+
     /**
      * @dataProvider hashedExpressionProvider
      */

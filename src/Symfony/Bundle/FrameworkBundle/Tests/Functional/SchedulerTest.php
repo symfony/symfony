@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Tests\Functional;
 
+use Cron\CronExpression;
 use Symfony\Bundle\FrameworkBundle\Tests\Fixtures\Messenger\BarMessage;
 use Symfony\Bundle\FrameworkBundle\Tests\Fixtures\Messenger\DummySchedule;
 use Symfony\Bundle\FrameworkBundle\Tests\Fixtures\Messenger\DummyTask;
@@ -59,6 +60,10 @@ class SchedulerTest extends AbstractWebTestCase
 
     public function testAutoconfiguredScheduler()
     {
+        if (!class_exists(CronExpression::class)) {
+            $this->markTestSkipped('The "dragonmantank/cron-expression" package is required to run this test.');
+        }
+
         $container = self::getContainer();
         $container->set('clock', $clock = new MockClock('2023-10-26T08:59:59Z'));
 

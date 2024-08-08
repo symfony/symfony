@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Scheduler\Tests;
 
+use Cron\CronExpression;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Scheduler\Exception\LogicException;
 use Symfony\Component\Scheduler\RecurringMessage;
@@ -20,6 +21,10 @@ class ScheduleTest extends TestCase
 {
     public function testCannotAddDuplicateMessage()
     {
+        if (!class_exists(CronExpression::class)) {
+            $this->markTestSkipped('The "dragonmantank/cron-expression" package is required to run this test.');
+        }
+
         $schedule = new Schedule();
         $schedule->add(RecurringMessage::cron('* * * * *', new \stdClass()));
 

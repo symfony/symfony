@@ -27,12 +27,12 @@ abstract class Type implements \Stringable
 
     abstract public function getBaseType(): BuiltinType|ObjectType;
 
+    abstract public function getTypeIdentifier(): TypeIdentifier;
+
     /**
      * @param TypeIdentifier|class-string $subject
      */
     abstract public function isA(TypeIdentifier|string $subject): bool;
-
-    abstract public function asNonNullable(): self;
 
     /**
      * @param callable(Type): bool $callable
@@ -40,11 +40,6 @@ abstract class Type implements \Stringable
     public function is(callable $callable): bool
     {
         return $callable($this);
-    }
-
-    public function isNullable(): bool
-    {
-        return $this->is(fn (Type $t): bool => $t->isA(TypeIdentifier::NULL) || $t->isA(TypeIdentifier::MIXED));
     }
 
     /**

@@ -22,9 +22,9 @@ class ObjectTypeTest extends TestCase
         $this->assertSame(self::class, (string) new ObjectType(self::class));
     }
 
-    public function testIsNullable()
+    public function testGetTypeIdentifier(): void
     {
-        $this->assertFalse((new ObjectType(self::class))->isNullable());
+        $this->assertSame(TypeIdentifier::OBJECT, (new ObjectType(self::class))->getTypeIdentifier());
     }
 
     public function testGetBaseType()

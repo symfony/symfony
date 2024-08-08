@@ -43,6 +43,11 @@ final class GenericType extends Type
         $this->variableTypes = $variableTypes;
     }
 
+    public function getTypeIdentifier(): TypeIdentifier
+    {
+        return $this->getType()->getTypeIdentifier();
+    }
+
     public function getBaseType(): BuiltinType|ObjectType
     {
         return $this->getType();
@@ -59,11 +64,6 @@ final class GenericType extends Type
     public function isA(TypeIdentifier|string $subject): bool
     {
         return $this->getType()->isA($subject);
-    }
-
-    public function asNonNullable(): self
-    {
-        return $this;
     }
 
     /**

@@ -24,21 +24,14 @@ class BackedEnumTypeTest extends TestCase
         $this->assertSame(DummyBackedEnum::class, (string) new BackedEnumType(DummyBackedEnum::class, Type::int()));
     }
 
-    public function testIsNullable()
+    public function testGetTypeIdentifier()
     {
-        $this->assertFalse((new BackedEnumType(DummyBackedEnum::class, Type::int()))->isNullable());
+        $this->assertSame(TypeIdentifier::OBJECT,  (new BackedEnumType(DummyBackedEnum::class, Type::int()))->getTypeIdentifier());
     }
 
     public function testGetBaseType()
     {
         $this->assertEquals(new BackedEnumType(DummyBackedEnum::class, Type::int()), (new BackedEnumType(DummyBackedEnum::class, Type::int()))->getBaseType());
-    }
-
-    public function testAsNonNullable()
-    {
-        $type = new BackedEnumType(DummyBackedEnum::class, Type::int());
-
-        $this->assertSame($type, $type->asNonNullable());
     }
 
     public function testIsA()

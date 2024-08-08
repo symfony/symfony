@@ -17,6 +17,7 @@ use Symfony\Component\TypeInfo\Type\CollectionType;
 use Symfony\Component\TypeInfo\Type\EnumType;
 use Symfony\Component\TypeInfo\Type\GenericType;
 use Symfony\Component\TypeInfo\Type\IntersectionType;
+use Symfony\Component\TypeInfo\Type\NullableTypeInterface;
 use Symfony\Component\TypeInfo\Type\ObjectType;
 use Symfony\Component\TypeInfo\Type\TemplateType;
 use Symfony\Component\TypeInfo\Type\UnionType;
@@ -305,8 +306,11 @@ trait TypeFactoryTrait
      *
      * @return (T is UnionType ? T : UnionType<T|BuiltinType<TypeIdentifier::NULL>>)
      */
-    public static function nullable(Type $type): UnionType
+    public static function nullable(Type $type): Type&NullableTypeInterface
     {
+        if ($type instanceof NullableTypeInterface && $type->isNullable()) {
+            return $type;
+        }
         if ($type instanceof UnionType) {
             return Type::union(Type::null(), ...$type->getTypes());
         }

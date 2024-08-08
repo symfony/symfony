@@ -32,14 +32,14 @@ class ObjectType extends Type
     ) {
     }
 
-    public function getBaseType(): BuiltinType|self
-    {
-        return $this;
-    }
-
     public function getTypeIdentifier(): TypeIdentifier
     {
         return TypeIdentifier::OBJECT;
+    }
+
+    public function getBaseType(): BuiltinType|self
+    {
+        return $this;
     }
 
     public function isA(TypeIdentifier|string $subject): bool
@@ -57,11 +57,6 @@ class ObjectType extends Type
     public function getClassName(): string
     {
         return $this->className;
-    }
-
-    public function asNonNullable(): static
-    {
-        return $this;
     }
 
     public function __toString(): string

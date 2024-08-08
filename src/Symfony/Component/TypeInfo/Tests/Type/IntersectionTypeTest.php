@@ -17,89 +17,89 @@ use Symfony\Component\TypeInfo\Exception\LogicException;
 use Symfony\Component\TypeInfo\Type;
 use Symfony\Component\TypeInfo\Type\BuiltinType;
 use Symfony\Component\TypeInfo\Type\IntersectionType;
+use Symfony\Component\TypeInfo\Type\ObjectType;
 use Symfony\Component\TypeInfo\TypeIdentifier;
 
 class IntersectionTypeTest extends TestCase
 {
-    public function testCannotCreateWithOnlyOneType()
+    public function testCannotCreateWithOnlyOneType(): void
     {
         $this->expectException(InvalidArgumentException::class);
-        new IntersectionType(Type::int());
+        new IntersectionType(Type::object('Foo'));
     }
 
-    public function testCannotCreateWithIntersectionTypeParts()
+    public static function getInvalidParts(): iterable
+    {
+        $foo = Type::object('Foo');
+        $bar = Type::object('Bar');
+
+        yield 'intersection' => [Type::intersection($foo, $bar), Type::intersection($foo, $bar)];
+        yield 'union' => [Type::intersection($foo, $bar), Type::intersection($foo, $bar)];
+        foreach (TypeIdentifier::cases() as $case) {
+            yield $case->value => [Type::builtin($case), Type::builtin($case)];
+        }
+        yield 'generic<builtin>' => [Type::object('Foo'), Type::generic(Type::builtin('array'), Type::string())];
+        yield 'collection<builtin>' => [Type::object('Foo'), Type::collection(Type::generic(Type::builtin('array')))];
+    }
+
+    /**
+     * @dataProvider getInvalidParts
+     */
+    public function testCannotCreateWithNonObjectParts(Type ...$parts): void
     {
         $this->expectException(InvalidArgumentException::class);
-        new IntersectionType(Type::int(), new IntersectionType());
+
+        new IntersectionType(...$parts);
     }
 
-    public function testSortTypesOnCreation()
+    public function testCreateWithObjectParts(): void
     {
-        $type = new IntersectionType(Type::int(), Type::string(), Type::bool());
-        $this->assertEquals([Type::bool(), Type::int(), Type::string()], $type->getTypes());
+        $foo = Type::object('Foo');
+        $bar = Type::generic(Type::object('Bar'), Type::string());
+        $baz = Type::collection(Type::generic(Type::object('Baz'), Type::string()));
+
+        $type = new IntersectionType($foo, $bar, $baz);
+        $this->assertEquals([$bar, $baz, $foo], $type->getTypes());
     }
 
-    public function testAtLeastOneTypeIs()
+    public function testAtLeastOneTypeIs(): void
     {
-        $type = new IntersectionType(Type::int(), Type::string(), Type::bool());
+        $type = new IntersectionType(Type::object('Foo'), Type::object('Bar'), Type::object('Baz'));
 
-        $this->assertTrue($type->atLeastOneTypeIs(fn (Type $t) => 'int' === (string) $t));
-        $this->assertFalse($type->atLeastOneTypeIs(fn (Type $t) => 'float' === (string) $t));
+        $this->assertTrue($type->atLeastOneTypeIs(fn (Type $t) => 'Bar' === (string) $t));
+        $this->assertFalse($type->atLeastOneTypeIs(fn (Type $t) => 'Blip' === (string) $t));
     }
 
     public function testEveryTypeIs()
     {
-        $type = new IntersectionType(Type::int(), Type::string(), Type::bool());
-        $this->assertTrue($type->everyTypeIs(fn (Type $t) => $t instanceof BuiltinType));
+        $type = new IntersectionType(Type::object('Foo'), Type::object('Bar'), Type::object('Baz'));
+        $this->assertTrue($type->everyTypeIs(fn (Type $t) => $t instanceof ObjectType));
 
-        $type = new IntersectionType(Type::int(), Type::string(), Type::template('T'));
-        $this->assertFalse($type->everyTypeIs(fn (Type $t) => $t instanceof BuiltinType));
+        $type = new IntersectionType(Type::object('Foo'), Type::object('Bar'), Type::generic(Type::object('Baz')));
+        $this->assertFalse($type->everyTypeIs(fn (Type $t) => $t instanceof ObjectType));
     }
 
     public function testGetBaseType()
     {
         $this->expectException(LogicException::class);
-        (new IntersectionType(Type::string(), Type::int()))->getBaseType();
+        (new IntersectionType(Type::object('Bar'), Type::object('Foo')))->getBaseType();
     }
 
     public function testToString()
     {
-        $type = new IntersectionType(Type::int(), Type::string(), Type::float());
-        $this->assertSame('float&int&string', (string) $type);
-
-        $type = new IntersectionType(Type::int(), Type::string(), Type::union(Type::float(), Type::bool()));
-        $this->assertSame('(bool|float)&int&string', (string) $type);
-    }
-
-    public function testIsNullable()
-    {
-        $this->assertFalse((new IntersectionType(Type::int(), Type::string(), Type::float()))->isNullable());
-        $this->assertTrue((new IntersectionType(Type::null(), Type::union(Type::int(), Type::mixed())))->isNullable());
-    }
-
-    public function testAsNonNullable()
-    {
-        $type = new IntersectionType(Type::int(), Type::string(), Type::float());
-
-        $this->assertSame($type, $type->asNonNullable());
-    }
-
-    public function testCannotTurnNullIntersectionAsNonNullable()
-    {
-        $this->expectException(LogicException::class);
-
-        $type = (new IntersectionType(Type::null(), Type::mixed()))->asNonNullable();
+        $type = new IntersectionType(Type::object('Foo'), Type::object('Bar'), Type::generic(Type::object('Baz'), Type::string()));
+        $this->assertSame('Bar&Baz<string>&Foo', (string) $type);
     }
 
     public function testIsA()
     {
-        $type = new IntersectionType(Type::int(), Type::string(), Type::float());
+        $type = new IntersectionType(Type::object('Foo'), Type::object('Bar'));
         $this->assertFalse($type->isA(TypeIdentifier::ARRAY));
 
-        $type = new IntersectionType(Type::int(), Type::string(), Type::union(Type::float(), Type::bool()));
+        $type = new IntersectionType(Type::object('Foo'), Type::object('Bar'));
         $this->assertFalse($type->isA(TypeIdentifier::INT));
 
-        $type = new IntersectionType(Type::int(), Type::union(Type::int(), Type::int()));
-        $this->assertTrue($type->isA(TypeIdentifier::INT));
+        $type = new IntersectionType(Type::object('Foo'), Type::object('Bar'));
+        $this->assertTrue($type->isA(TypeIdentifier::OBJECT));
     }
 }

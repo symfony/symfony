@@ -56,13 +56,13 @@ class UnionTypeTest extends TestCase
         $type = new UnionType(Type::int(), Type::object(\stdClass::class), Type::mixed());
         $this->assertInstanceOf(UnionType::class, $type->asNonNullable());
         $this->assertEquals([
+            Type::object(\stdClass::class),
             Type::builtin(TypeIdentifier::ARRAY),
             Type::bool(),
             Type::float(),
             Type::int(),
             Type::object(),
             Type::resource(),
-            Type::object(\stdClass::class),
             Type::string(),
         ], $type->asNonNullable()->getTypes());
     }
@@ -97,13 +97,13 @@ class UnionTypeTest extends TestCase
         $type = new UnionType(Type::int(), Type::string(), Type::float());
         $this->assertSame('float|int|string', (string) $type);
 
-        $type = new UnionType(Type::int(), Type::string(), Type::intersection(Type::float(), Type::bool()));
-        $this->assertSame('(bool&float)|int|string', (string) $type);
+        $type = new UnionType(Type::int(), Type::string(), Type::intersection(Type::object('Foo'), Type::object('Bar')));
+        $this->assertSame('(Bar&Foo)|int|string', (string) $type);
     }
 
     public function testIsNullable()
     {
-        $this->assertFalse((new UnionType(Type::int(), Type::intersection(Type::float(), Type::int())))->isNullable());
+        $this->assertFalse((new UnionType(Type::int(), Type::intersection(Type::object('Foo'), Type::object('Bar'))))->isNullable());
         $this->assertTrue((new UnionType(Type::int(), Type::null()))->isNullable());
         $this->assertTrue((new UnionType(Type::int(), Type::mixed()))->isNullable());
     }
@@ -114,14 +114,11 @@ class UnionTypeTest extends TestCase
         $this->assertFalse($type->isNullable());
         $this->assertFalse($type->isA(TypeIdentifier::ARRAY));
 
-        $type = new UnionType(Type::int(), Type::string(), Type::intersection(Type::float(), Type::bool()));
+        $type = new UnionType(Type::int(), Type::string(), Type::intersection(Type::object('Foo'), Type::object('Bar')));
         $this->assertTrue($type->isA(TypeIdentifier::INT));
         $this->assertTrue($type->isA(TypeIdentifier::STRING));
         $this->assertFalse($type->isA(TypeIdentifier::FLOAT));
         $this->assertFalse($type->isA(TypeIdentifier::BOOL));
-
-        $type = new UnionType(Type::string(), Type::intersection(Type::int(), Type::int()));
-        $this->assertTrue($type->isA(TypeIdentifier::INT));
     }
 
     public function testProxiesMethodsToNonNullableType()

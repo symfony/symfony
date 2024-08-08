@@ -60,7 +60,7 @@ class StringTypeResolverTest extends TestCase
     /**
      * @return iterable<array{0: Type, 1: string, 2?: TypeContext}>
      */
-    public function resolveDataProvider(): iterable
+    public static function resolveDataProvider(): iterable
     {
         $typeContextFactory = new TypeContextFactory(new StringTypeResolver());
 
@@ -153,10 +153,10 @@ class StringTypeResolverTest extends TestCase
         yield [Type::union(Type::int(), Type::string()), 'int|string'];
 
         // intersection
-        yield [Type::intersection(Type::int(), Type::string()), 'int&string'];
+        yield [Type::intersection(Type::object('DateTimeInterface'), Type::object('DateTimeImmutable')), 'DateTimeImmutable&DateTimeInterface'];
 
         // DNF
-        yield [Type::union(Type::int(), Type::intersection(Type::string(), Type::bool())), 'int|(string&bool)'];
+        yield [Type::union(Type::intersection(Type::object('DateTimeInterface'), Type::object('DateTimeImmutable')), Type::int()), 'int|(DateTimeImmutable&DateTimeInterface)'];
 
         // collection objects
         yield [Type::collection(Type::object(\Traversable::class)), \Traversable::class];

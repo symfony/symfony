@@ -23,7 +23,7 @@ use Symfony\Component\TypeInfo\TypeIdentifier;
  *
  * @experimental
  */
-final class BuiltinType extends Type
+final class BuiltinType extends Type implements NullableTypeInterface
 {
     /**
      * @param T $typeIdentifier
@@ -33,17 +33,17 @@ final class BuiltinType extends Type
     ) {
     }
 
-    public function getBaseType(): self|ObjectType
-    {
-        return $this;
-    }
-
     /**
      * @return T
      */
     public function getTypeIdentifier(): TypeIdentifier
     {
         return $this->typeIdentifier;
+    }
+
+    public function getBaseType(): self|ObjectType
+    {
+        return $this;
     }
 
     public function isA(TypeIdentifier|string $subject): bool
@@ -57,6 +57,11 @@ final class BuiltinType extends Type
         } catch (\ValueError) {
             return false;
         }
+    }
+
+    public function isNullable(): bool
+    {
+        return \in_array($this->getTypeIdentifier(), [TypeIdentifier::NULL, TypeIdentifier::MIXED], true);
     }
 
     /**

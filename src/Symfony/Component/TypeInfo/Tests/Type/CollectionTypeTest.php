@@ -79,20 +79,6 @@ class CollectionTypeTest extends TestCase
         $this->assertEquals(Type::int(), Type::collection(Type::generic(Type::int(), Type::string()))->getBaseType());
     }
 
-    public function testIsNullable()
-    {
-        $this->assertFalse((new CollectionType(Type::generic(Type::builtin(TypeIdentifier::ARRAY), Type::int())))->isNullable());
-        $this->assertTrue((new CollectionType(Type::generic(Type::null(), Type::int())))->isNullable());
-        $this->assertTrue((new CollectionType(Type::generic(Type::mixed(), Type::int())))->isNullable());
-    }
-
-    public function testAsNonNullable()
-    {
-        $type = new CollectionType(Type::builtin(TypeIdentifier::ITERABLE));
-
-        $this->assertSame($type, $type->asNonNullable());
-    }
-
     public function testIsA()
     {
         $type = new CollectionType(new GenericType(Type::builtin(TypeIdentifier::ARRAY), Type::string(), Type::bool()));

@@ -185,9 +185,14 @@ class TypeFactoryTest extends TestCase
 
     public function testCreateIntersection()
     {
-        $this->assertEquals(new IntersectionType(new BuiltinType(TypeIdentifier::INT), new ObjectType(self::class)), Type::intersection(Type::int(), Type::object(self::class)));
-        $this->assertEquals(new IntersectionType(new BuiltinType(TypeIdentifier::INT), new BuiltinType(TypeIdentifier::STRING)), Type::intersection(Type::int(), Type::string(), Type::int()));
-        $this->assertEquals(new IntersectionType(new BuiltinType(TypeIdentifier::INT), new BuiltinType(TypeIdentifier::STRING)), Type::intersection(Type::int(), Type::intersection(Type::int(), Type::string())));
+        $this->assertEquals(
+            new IntersectionType(new ObjectType('Foo'), new ObjectType('Bar')),
+            Type::intersection(Type::object('Foo'), Type::object('Bar'))
+        );
+        $this->assertEquals(
+            new IntersectionType(new ObjectType('Foo'), new ObjectType('Bar'), new ObjectType('Baz')),
+            Type::intersection(Type::object('Baz'), Type::intersection(Type::object('Foo'), Type::object('Bar')))
+        );
     }
 
     public function testCreateNullable()

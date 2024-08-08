@@ -11,23 +11,50 @@
 
 namespace Symfony\Component\TypeInfo\Type;
 
+use Symfony\Component\TypeInfo\Exception\InvalidArgumentException;
 use Symfony\Component\TypeInfo\Exception\LogicException;
 use Symfony\Component\TypeInfo\Type;
+use Symfony\Component\TypeInfo\TypeIdentifier;
 
 /**
  * @author Mathias Arlaud <mathias.arlaud@gmail.com>
  * @author Baptiste Leduc <baptiste.leduc@gmail.com>
  *
- * @template T of Type
+ * @template T of ObjectType|GenericType<ObjectType>|CollectionType<GenericType<ObjectType>>
  *
  * @experimental
  */
-final class IntersectionType extends Type
+final class IntersectionType extends Type implements CompositeTypeInterface
 {
     /**
      * @use CompositeTypeTrait<T>
      */
     use CompositeTypeTrait;
+
+    /**
+     * @param list<T> $types
+     */
+    public function __construct(Type ...$types)
+    {
+        if (\count($types) < 2) {
+            throw new InvalidArgumentException(\sprintf('"%s" expects at least 2 types.', self::class));
+        }
+        // Only accept non-composite object types, except the builtin 'object'
+        foreach ($types as $t) {
+            if ($t instanceof CompositeTypeInterface || $t instanceof BuiltinType || TypeIdentifier::OBJECT !== $t->getTypeIdentifier()) {
+                throw new InvalidArgumentException(\sprintf('Cannot set type "%s" as a "%s" part.', $t, self::class));
+            }
+        }
+        // All subtypes are class names and are sorted alphabetically
+        usort($types, fn (Type $a, Type $b): int => (string) $a <=> (string) $b);
+
+        $this->types = array_values(array_unique($types));
+    }
+
+    public function getTypeIdentifier(): TypeIdentifier
+    {
+        return TypeIdentifier::OBJECT;
+    }
 
     public function is(callable $callable): bool
     {
@@ -53,17 +80,5 @@ final class IntersectionType extends Type
     public function getBaseType(): BuiltinType|ObjectType
     {
         throw new LogicException(\sprintf('Cannot get base type on "%s" compound type.', $this));
-    }
-
-    /**
-     * @throws LogicException
-     */
-    public function asNonNullable(): self
-    {
-        if ($this->isNullable()) {
-            throw new LogicException(\sprintf('"%s cannot be turned as non nullable.', (string) $this));
-        }
-
-        return $this;
     }
 }

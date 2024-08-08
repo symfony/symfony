@@ -30,25 +30,6 @@ trait CompositeTypeTrait
      */
     private readonly array $types;
 
-    /**
-     * @param list<T> $types
-     */
-    public function __construct(Type ...$types)
-    {
-        if (\count($types) < 2) {
-            throw new InvalidArgumentException(\sprintf('"%s" expects at least 2 types.', self::class));
-        }
-
-        foreach ($types as $t) {
-            if ($t instanceof self) {
-                throw new InvalidArgumentException(\sprintf('Cannot set "%s" as a "%1$s" part.', self::class));
-            }
-        }
-
-        usort($types, fn (Type $a, Type $b): int => (string) $a <=> (string) $b);
-        $this->types = array_values(array_unique($types));
-    }
-
     public function isA(TypeIdentifier|string $subject): bool
     {
         return $this->is(fn (Type $type) => $type->isA($subject));

@@ -45,6 +45,11 @@ final class CollectionType extends Type
         }
     }
 
+    public function getTypeIdentifier(): TypeIdentifier
+    {
+        return $this->getType()->getTypeIdentifier();
+    }
+
     public function getBaseType(): BuiltinType|ObjectType
     {
         return $this->getType()->getBaseType();
@@ -66,11 +71,6 @@ final class CollectionType extends Type
     public function isList(): bool
     {
         return $this->isList;
-    }
-
-    public function asNonNullable(): self
-    {
-        return $this;
     }
 
     public function getCollectionKeyType(): Type

@@ -35,18 +35,14 @@ class GenericTypeTest extends TestCase
         $this->assertEquals(Type::object(), Type::generic(Type::object(), Type::int())->getBaseType());
     }
 
+    /**
+     * This should fail! GenericType::isNullable() does not exist. We need to remove __call and use interfaces.
+     */
     public function testIsNullable()
     {
         $this->assertFalse((new GenericType(Type::builtin(TypeIdentifier::ARRAY), Type::int()))->isNullable());
         $this->assertTrue((new GenericType(Type::null(), Type::int()))->isNullable());
         $this->assertTrue((new GenericType(Type::mixed(), Type::int()))->isNullable());
-    }
-
-    public function testAsNonNullable()
-    {
-        $type = new GenericType(Type::builtin(TypeIdentifier::ARRAY), Type::int());
-
-        $this->assertSame($type, $type->asNonNullable());
     }
 
     public function testIsA()

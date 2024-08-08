@@ -31,6 +31,11 @@ final class TemplateType extends Type
     ) {
     }
 
+    public function getTypeIdentifier(): TypeIdentifier
+    {
+        return $this->getBound()->getTypeIdentifier();
+    }
+
     public function getBaseType(): BuiltinType|ObjectType
     {
         throw new LogicException(\sprintf('Cannot get base type on "%s" template type.', $this));
@@ -49,11 +54,6 @@ final class TemplateType extends Type
     public function getBound(): Type
     {
         return $this->bound;
-    }
-
-    public function asNonNullable(): self
-    {
-        return $this;
     }
 
     public function __toString(): string

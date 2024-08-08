@@ -21,6 +21,7 @@ use Symfony\Component\TypeInfo\TypeIdentifier;
  * @author Baptiste Leduc <baptiste.leduc@gmail.com>
  *
  * @template T of ObjectType|GenericType<ObjectType>|CollectionType<GenericType<ObjectType>>
+ * @implements CompositeTypeInterface<T>
  *
  * @experimental
  */

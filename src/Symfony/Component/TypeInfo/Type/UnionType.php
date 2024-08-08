@@ -20,7 +20,8 @@ use Symfony\Component\TypeInfo\TypeIdentifier;
  * @author Mathias Arlaud <mathias.arlaud@gmail.com>
  * @author Baptiste Leduc <baptiste.leduc@gmail.com>
  *
- * @template T of BuiltinType|ObjectType|GenericType|CollectionType|IntersectionType
+ * @template T of Type
+ * @implements CompositeTypeInterface<T>
  *
  * @experimental
  */
@@ -48,7 +49,7 @@ final class UnionType extends Type implements CompositeTypeInterface
             if ($t instanceof self) {
                 throw new InvalidArgumentException(\sprintf('Cannot set "%s" as a "%s" part.', $t, self::class));
             }
-            if (!$t->getTypeIdentifier()->isComposable()) {
+            if ($t->getTypeIdentifier()->isStandalone()) {
                 throw new InvalidArgumentException(\sprintf('Type %s can only be used as a standalone type', $t->getTypeIdentifier()->value));
             }
             if (TypeIdentifier::NULL === $t->getTypeIdentifier()) {

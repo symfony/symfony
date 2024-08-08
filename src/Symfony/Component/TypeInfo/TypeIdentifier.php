@@ -46,11 +46,11 @@ enum TypeIdentifier: string
     }
 
     /**
-     * Whether this type can be used in unions.
+     * Whether this type is a standalone PHP type (i.e. not allowed to be used as a part of a composite type or as a base type).
      */
-    public function isComposable(): bool
+    public function isStandalone(): bool
     {
-        return !\in_array($this, [self::MIXED, self::NEVER, self::VOID], true);
+        return \in_array($this, [self::MIXED, self::NEVER, self::VOID], true);
     }
 
     /**

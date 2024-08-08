@@ -53,7 +53,7 @@ class UnionTypeTest extends TestCase
     public static function provideComposableTypes(): iterable
     {
         foreach (TypeIdentifier::cases() as $case) {
-            if ($case->isComposable()) {
+            if (!$case->isStandalone()) {
                 yield $case->name => [Type::builtin($case)];
             }
         }
@@ -62,7 +62,7 @@ class UnionTypeTest extends TestCase
     public static function provideStandaloneTypes(): iterable
     {
         foreach (TypeIdentifier::cases() as $case) {
-            if (!$case->isComposable()) {
+            if ($case->isStandalone()) {
                 yield $case->name => [Type::builtin($case)];
             }
         }

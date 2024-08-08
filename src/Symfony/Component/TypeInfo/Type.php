@@ -45,6 +45,16 @@ abstract class Type implements \Stringable
         return $callable($this);
     }
 
+    public function asNonNullable(): self
+    {
+        return $this;
+    }
+
+    public function isNullable(): bool
+    {
+        return false;
+    }
+
     /**
      * Graceful fallback for unexisting methods.
      *

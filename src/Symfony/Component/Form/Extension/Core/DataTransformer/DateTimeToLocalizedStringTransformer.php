@@ -30,12 +30,12 @@ class DateTimeToLocalizedStringTransformer extends BaseDateTimeTransformer
     /**
      * @see BaseDateTimeTransformer::formats for available format options
      *
-     * @param string|null $inputTimezone  The name of the input timezone
-     * @param string|null $outputTimezone The name of the output timezone
-     * @param int|null    $dateFormat     The date format
-     * @param int|null    $timeFormat     The time format
-     * @param int         $calendar       One of the \IntlDateFormatter calendar constants
-     * @param string|null $pattern        A pattern to pass to \IntlDateFormatter
+     * @param string|null       $inputTimezone  The name of the input timezone
+     * @param string|null       $outputTimezone The name of the output timezone
+     * @param int|null          $dateFormat     The date format
+     * @param int|null          $timeFormat     The time format
+     * @param int|\IntlCalendar $calendar       One of the \IntlDateFormatter calendar constants or an \IntlCalendar instance
+     * @param string|null       $pattern        A pattern to pass to \IntlDateFormatter
      *
      * @throws UnexpectedTypeException If a format is not supported or if a timezone is not a string
      */
@@ -44,7 +44,7 @@ class DateTimeToLocalizedStringTransformer extends BaseDateTimeTransformer
         ?string $outputTimezone = null,
         ?int $dateFormat = null,
         ?int $timeFormat = null,
-        private int $calendar = \IntlDateFormatter::GREGORIAN,
+        private int|\IntlCalendar $calendar = \IntlDateFormatter::GREGORIAN,
         private ?string $pattern = null,
     ) {
         parent::__construct($inputTimezone, $outputTimezone);

@@ -217,7 +217,7 @@ class UniqueEntityValidator extends ConstraintValidator
             ->setCode(UniqueEntity::NOT_UNIQUE_ERROR)
             ->setCause($result);
 
-        if(is_array($criteria) && count($criteria) > 1) {
+        if(\is_array($criteria) && \count($criteria) > 1) {
             foreach($criteria as $field => $value) {
                 $violation->setParameter('{{ '.$field.' value }}', $this->formatWithIdentifiers($em, $class, $value));
             }

@@ -18,7 +18,7 @@ use Symfony\Component\DependencyInjection\Extension\Extension as BaseExtension;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  *
- * @internal since Symfony 7.1, to be deprecated in 8.1; use Symfony\Component\DependencyInjection\Extension\Extension instead
+ * @internal since Symfony 7.1, to be deprecated in 8.0; use Symfony\Component\DependencyInjection\Extension\Extension instead
  */
 abstract class Extension extends BaseExtension
 {

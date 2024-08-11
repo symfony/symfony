@@ -60,6 +60,10 @@ class UnsupportedSchemeException extends LogicException
             'class' => Bridge\Mailchimp\Transport\MandrillTransportFactory::class,
             'package' => 'symfony/mailchimp-mailer',
         ],
+        'postal' => [
+            'class' => Bridge\Postal\Transport\PostalTransportFactory::class,
+            'package' => 'symfony/postal-mailer',
+        ],
         'postmark' => [
             'class' => Bridge\Postmark\Transport\PostmarkTransportFactory::class,
             'package' => 'symfony/postmark-mailer',

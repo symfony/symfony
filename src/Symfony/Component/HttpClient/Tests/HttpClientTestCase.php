@@ -13,6 +13,7 @@ namespace Symfony\Component\HttpClient\Tests;
 
 use PHPUnit\Framework\SkippedTestSuiteError;
 use Symfony\Component\HttpClient\Exception\ClientException;
+use Symfony\Component\HttpClient\Exception\InvalidArgumentException;
 use Symfony\Component\HttpClient\Exception\TransportException;
 use Symfony\Component\HttpClient\Internal\ClientState;
 use Symfony\Component\HttpClient\Response\StreamWrapper;
@@ -454,5 +455,15 @@ abstract class HttpClientTestCase extends BaseHttpClientTestCase
         ]);
 
         $this->expectNotToPerformAssertions();
+    }
+
+    public function testMisspelledScheme()
+    {
+        $httpClient = $this->getHttpClient(__FUNCTION__);
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Invalid URL: host is missing in "http:/localhost:8057/".');
+
+        $httpClient->request('GET', 'http:/localhost:8057/');
     }
 }

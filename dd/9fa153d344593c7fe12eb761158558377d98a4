@@ -1,0 +1,15 @@
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2024-08-03T09:12:58Z
+
+I'd say yes for a the following reasons:
+
+- Removed casts are either not needed or delegated to the engine which will do it faster
+- A strong dependency to Clock is removed from a bridge because it actually doesn't need it
+- ~Many local variables are inlined which saves some useless allocations~
+- Some private functions and constructors have parameters that are not used at all anywhere and can be removed entirely without consequence
+- In some places, exceptions are immediately thrown after being catch which adds a bit of complexity for no gain
+- There is also an example of a `@var` that doesn't point to an existing variable
+- A few other things in the same vibe, but above are the main changes
+
+Overall, it is a few optimization here and there and also a cleaner code with less "abandoned" method parameters and local variables that were maybe useful at some point but not anymore.

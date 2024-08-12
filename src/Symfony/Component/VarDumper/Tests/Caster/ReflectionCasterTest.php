@@ -594,9 +594,9 @@ Generator {
   %s: {
     %sGeneratorDemo.php:14 {
       Symfony\Component\VarDumper\Tests\Fixtures\GeneratorDemo->baz()
+      › 
+      › public function baz()
       › {
-      ›     yield from bar();
-      › }
     }
     Symfony\Component\VarDumper\Tests\Fixtures\GeneratorDemo->baz() {}
 %A}

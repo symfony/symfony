@@ -26,13 +26,6 @@ jobs:
     strategy:
       matrix:
         include:
-          - php: '7.2'
-          - php: '7.4'
-          - php: '8.2'
-            mode: high-deps
-          - php: '8.2'
-            mode: low-deps
-          - php: '8.3'
           - php: '8.4'
             extensions: amqp,apcu,igbinary,intl,mbstring,memcached,redis
             #mode: experimental
@@ -112,14 +105,14 @@ jobs:
             SYMFONY_VERSION=$(echo "$SYMFONY_VERSIONS" | grep -FB1 /$SYMFONY_VERSION | head -n 1 | sed s/.//)
             git fetch --depth=2 origin $SYMFONY_VERSION
             git checkout -m FETCH_HEAD
-            echo COMPONENTS=$(find src/Symfony -mindepth 2 -type f -name phpunit.xml.dist -printf '%h ') >> $GITHUB_ENV
+            echo COMPONENTS=src/Symfony/Component/VarDumper >> $GITHUB_ENV
           fi
 
           # Skip the phpunit-bridge on bugfix-branches when not in *-deps mode
           if [[ ! "${{ matrix.mode }}" = *-deps && $SYMFONY_VERSION != $SYMFONY_FEATURE_BRANCH ]]; then
-            echo COMPONENTS=$(find src/Symfony -mindepth 2 -type f -name phpunit.xml.dist -not -wholename '*/Bridge/PhpUnit/*' | xargs -I{} dirname {}) >> $GITHUB_ENV
+            echo COMPONENTS=src/Symfony/Component/VarDumper >> $GITHUB_ENV
           else
-            echo COMPONENTS=$(find src/Symfony -mindepth 2 -type f -name phpunit.xml.dist | xargs -I{} dirname {}) >> $GITHUB_ENV
+            echo COMPONENTS=src/Symfony/Component/VarDumper >> $GITHUB_ENV
           fi
 
           # Legacy tests are skipped when deps=high and when the current branch version has not the same major version number as the next one

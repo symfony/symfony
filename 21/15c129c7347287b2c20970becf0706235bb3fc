@@ -1,0 +1,30 @@
+---------------------------------------------------------------------------
+
+by derrabus at 2024-08-07T20:47:09Z
+
+We can also clean up the `native_function_invocation` override, can't we?
+
+---------------------------------------------------------------------------
+
+by keradus at 2024-08-07T20:53:35Z
+
+indeed @derrabus 🙇🏻
+applied to the PR, also don't hesitate to raise such cleanups whenever you are aware of such possibilities
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2024-08-08T06:49:15Z
+
+@fabpot Does fabbot need to be updated to use the latest PHP CS fixer version or does that happen automatically?
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2024-08-08T08:03:51Z
+
+I think it does not work automatically
+
+---------------------------------------------------------------------------
+
+by fabpot at 2024-08-12T10:26:37Z
+
+Thank you @keradus.

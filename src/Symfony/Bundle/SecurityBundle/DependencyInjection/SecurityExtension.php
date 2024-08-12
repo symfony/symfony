@@ -889,7 +889,6 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
             $listener->replaceArgument(5, $config['access_denied_url']);
         }
 
-        // not full fledged handler setup
         if (isset($config['not_full_fledged_handler'])) {
             $listener->replaceArgument(9, new Reference($config['not_full_fledged_handler']));
         }

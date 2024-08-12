@@ -198,12 +198,6 @@ class ExceptionListener
             $this->throwUnauthorizedException($authException);
         }
 
-        if (!$response instanceof Response) {
-            $given = get_debug_type($response);
-
-            throw new \LogicException(\sprintf('The "%s::start()" method must return a Response object ("%s" returned).', get_debug_type($this->authenticationEntryPoint), $given));
-        }
-
         return $response;
     }
 

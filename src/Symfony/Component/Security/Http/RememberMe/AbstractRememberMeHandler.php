@@ -57,16 +57,7 @@ abstract class AbstractRememberMeHandler implements RememberMeHandlerInterface
 
     public function consumeRememberMeCookie(RememberMeDetails $rememberMeDetails): UserInterface
     {
-        try {
-            $user = $this->userProvider->loadUserByIdentifier($rememberMeDetails->getUserIdentifier());
-        } catch (AuthenticationException $e) {
-            throw $e;
-        }
-
-        if (!$user instanceof UserInterface) {
-            throw new \LogicException(\sprintf('The UserProviderInterface implementation must return an instance of UserInterface, but returned "%s".', get_debug_type($user)));
-        }
-
+        $user = $this->userProvider->loadUserByIdentifier($rememberMeDetails->getUserIdentifier());
         $this->processRememberMe($rememberMeDetails, $user);
 
         $this->logger?->info('Remember-me cookie accepted.');

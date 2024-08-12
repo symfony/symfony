@@ -193,7 +193,7 @@ class Connection implements ResetInterface
             if (method_exists(QueryBuilder::class, 'forUpdate')) {
                 $sql = $this->addLockMode($query, $sql);
             } else {
-                if (preg_match('/FROM (.+) WHERE/', (string) $sql, $matches)) {
+                if (preg_match('/FROM (.+) WHERE/', $sql, $matches)) {
                     $fromClause = $matches[1];
                     $sql = str_replace(
                         \sprintf('FROM %s WHERE', $fromClause),

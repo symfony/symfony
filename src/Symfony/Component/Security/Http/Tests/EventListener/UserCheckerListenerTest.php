@@ -72,9 +72,4 @@ class UserCheckerListenerTest extends TestCase
 
         return new CheckPassportEvent($this->createMock(AuthenticatorInterface::class), $passport);
     }
-
-    private function createAuthenticationSuccessEvent()
-    {
-        return new AuthenticationSuccessEvent(new PostAuthenticationToken($this->user, 'main', []));
-    }
 }

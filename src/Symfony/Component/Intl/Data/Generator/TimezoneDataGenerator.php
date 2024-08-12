@@ -121,8 +121,6 @@ class TimezoneDataGenerator extends AbstractDataGenerator
 
     protected function generateDataForMeta(BundleEntryReaderInterface $reader, string $tempDir): ?array
     {
-        $rootBundle = $reader->read($tempDir, 'root');
-
         $this->zoneIds = array_unique($this->zoneIds);
 
         sort($this->zoneIds);

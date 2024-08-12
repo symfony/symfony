@@ -88,8 +88,8 @@ final class InMemoryUser implements UserInterface, PasswordAuthenticatedUserInte
             return false;
         }
 
-        $currentRoles = array_map('strval', (array) $this->getRoles());
-        $newRoles = array_map('strval', (array) $user->getRoles());
+        $currentRoles = array_map('strval', $this->getRoles());
+        $newRoles = array_map('strval', $user->getRoles());
         $rolesChanged = \count($currentRoles) !== \count($newRoles) || \count($currentRoles) !== \count(array_intersect($currentRoles, $newRoles));
         if ($rolesChanged) {
             return false;

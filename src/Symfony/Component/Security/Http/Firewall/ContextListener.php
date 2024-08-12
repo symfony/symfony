@@ -298,7 +298,7 @@ class ContextListener extends AbstractListener
             }
         }
 
-        $userRoles = array_map('strval', (array) $refreshedUser->getRoles());
+        $userRoles = array_map('strval', $refreshedUser->getRoles());
 
         if (
             \count($userRoles) !== \count($refreshedToken->getRoleNames())

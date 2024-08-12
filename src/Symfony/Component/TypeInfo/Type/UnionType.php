@@ -72,7 +72,7 @@ final class UnionType extends Type
         $glue = '';
 
         foreach ($this->types as $t) {
-            $string .= $glue.($t instanceof IntersectionType ? '('.((string) $t).')' : ((string) $t));
+            $string .= $glue.($t instanceof IntersectionType ? '('.$t.')' : $t);
             $glue = '|';
         }
 

@@ -12,6 +12,7 @@
 namespace Symfony\Component\DependencyInjection\Tests\Loader;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\Config\Exception\FileLocatorFileNotFoundException;
 use Symfony\Component\Config\Exception\LoaderLoadException;
 use Symfony\Component\Config\FileLocator;
@@ -48,6 +49,8 @@ use Symfony\Component\ExpressionLanguage\Expression;
 
 class XmlFileLoaderTest extends TestCase
 {
+    use ExpectDeprecationTrait;
+
     protected static string $fixturesPath;
 
     public static function setUpBeforeClass(): void
@@ -1275,5 +1278,18 @@ class XmlFileLoaderTest extends TestCase
         $this->expectException(LogicException::class);
         $this->expectExceptionMessage('The "static_constructor" service cannot declare a factory as well as a constructor.');
         $loader->load('static_constructor_and_factory.xml');
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testDeprecatedTagged()
+    {
+        $container = new ContainerBuilder();
+        $loader = new XmlFileLoader($container, new FileLocator(self::$fixturesPath.'/xml'));
+
+        $this->expectDeprecation(sprintf('Since symfony/dependency-injection 7.2: Type "tagged" is deprecated for tag <argument>, use "tagged_iterator" instead in "%s".', self::$fixturesPath.'/xml/services_with_deprecated_tagged.xml'));
+
+        $loader->load('services_with_deprecated_tagged.xml');
     }
 }

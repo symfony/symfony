@@ -13,6 +13,11 @@ Cache
 
  * `igbinary_serialize()` is not used by default when the igbinary extension is installed
 
+DependencyInjection
+-------------------
+
+ * Deprecate `!tagged` tag, use `!tagged_iterator` instead
+
 Form
 ----
 

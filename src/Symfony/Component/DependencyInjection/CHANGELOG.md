@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+7.2
+---
+
+ * Deprecate `!tagged` tag, use `!tagged_iterator` instead
+
 7.1
 ---
 

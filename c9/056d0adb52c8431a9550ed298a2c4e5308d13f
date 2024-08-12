@@ -1,0 +1,24 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2024-07-29T15:20:56Z
+
+based on [the PR feedback](https://github.com/symfony/symfony/pull/57856#discussion_r1694799065) I chose to pick Alexander's suggestion from #57588
+
+---------------------------------------------------------------------------
+
+by stof at 2024-07-30T10:32:54Z
+
+is it actually worth introducing a dependency to generate this (mostly internal) message identifier ? To me, using `bin2hex(random_bytes(...))` seems fine (still worth increasing the entropy by using 16 bytes instead of 4, matching the size of a UUID)
+
+---------------------------------------------------------------------------
+
+by derrabus at 2024-07-30T12:38:54Z
+
+We need random and collision-free identifiers, so we're pulling a dependency that does exactly that. This sounds absolutely reasonable to me.
+
+---------------------------------------------------------------------------
+
+by stof at 2024-07-30T13:06:43Z
+
+`bin2hex(random_bytes(16))` provides random identifiers without any dependency (we already depend on PHP), so I'm wondering whether we need that dependency.
+A UUIDv7 provides additional features (time-sorting, standard UUID format), but I don't think those places need those additional benefits.

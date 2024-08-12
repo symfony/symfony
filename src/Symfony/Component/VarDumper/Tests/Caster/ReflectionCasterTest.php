@@ -555,11 +555,11 @@ Generator {
   function: "Symfony\Component\VarDumper\Tests\Fixtures\GeneratorDemo::baz"
   this: Symfony\Component\VarDumper\Tests\Fixtures\GeneratorDemo { …}
   %s: {
-    %sGeneratorDemo.php:14 {
+    %sGeneratorDemo.php:12 {
       Symfony\Component\VarDumper\Tests\Fixtures\GeneratorDemo->baz()
+      › 
+      › public function baz()
       › {
-      ›     yield from bar();
-      › }
     }
     Symfony\Component\VarDumper\Tests\Fixtures\GeneratorDemo->baz() {}
 %A}
@@ -580,7 +580,9 @@ array:2 [
     %s: {
       %s%eTests%eFixtures%eGeneratorDemo.php:%d {
         Symfony\Component\VarDumper\Tests\Fixtures\GeneratorDemo::foo()
-%A      ›     yield 1;
+        › {
+        ›     yield 1;
+        › }
 %A    }
       %s%eTests%eFixtures%eGeneratorDemo.php:20 { …}
       %s%eTests%eFixtures%eGeneratorDemo.php:14 { …}
@@ -592,9 +594,9 @@ array:2 [
     %s: {
       %s%eTests%eFixtures%eGeneratorDemo.php:%d {
         Symfony\Component\VarDumper\Tests\Fixtures\GeneratorDemo::foo()
+        › {
         ›     yield 1;
         › }
-        › 
       }
 %A  }
     closed: false

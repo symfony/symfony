@@ -14,6 +14,7 @@ namespace Symfony\Component\Messenger\Bridge\Beanstalkd\Transport;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\LogicException;
 use Symfony\Component\Messenger\Exception\MessageDecodingFailedException;
+use Symfony\Component\Messenger\Stamp\SentForRetryStamp;
 use Symfony\Component\Messenger\Transport\Receiver\MessageCountAwareInterface;
 use Symfony\Component\Messenger\Transport\Receiver\ReceiverInterface;
 use Symfony\Component\Messenger\Transport\Serialization\PhpSerializer;
@@ -47,7 +48,7 @@ class BeanstalkdReceiver implements ReceiverInterface, MessageCountAwareInterfac
                 'headers' => $beanstalkdEnvelope['headers'],
             ]);
         } catch (MessageDecodingFailedException $exception) {
-            $this->connection->reject($beanstalkdEnvelope['id']);
+            $this->connection->reject($beanstalkdEnvelope['id'], $this->connection->getMessagePriority($beanstalkdEnvelope['id']));
 
             throw $exception;
         }
@@ -62,7 +63,11 @@ class BeanstalkdReceiver implements ReceiverInterface, MessageCountAwareInterfac
 
     public function reject(Envelope $envelope): void
     {
-        $this->connection->reject($this->findBeanstalkdReceivedStamp($envelope)->getId());
+        $this->connection->reject(
+            $this->findBeanstalkdReceivedStamp($envelope)->getId(),
+            $envelope->last(BeanstalkdPriorityStamp::class)?->priority,
+            $envelope->last(SentForRetryStamp::class)?->isSent ?? false,
+        );
     }
 
     public function getMessageCount(): int

@@ -32,11 +32,13 @@ class Connection
         'tube_name' => PheanstalkInterface::DEFAULT_TUBE,
         'timeout' => 0,
         'ttr' => 90,
+        'bury_on_reject' => false,
     ];
 
     private string $tube;
     private int $timeout;
     private int $ttr;
+    private bool $buryOnReject;
 
     /**
      * Constructor.
@@ -46,6 +48,7 @@ class Connection
      * * tube_name: name of the tube
      * * timeout: message reservation timeout (in seconds)
      * * ttr: the message time to run before it is put back in the ready queue (in seconds)
+     * * bury_on_reject: bury rejected messages instead of deleting them
      */
     public function __construct(
         private array $configuration,
@@ -55,6 +58,7 @@ class Connection
         $this->tube = $this->configuration['tube_name'];
         $this->timeout = $this->configuration['timeout'];
         $this->ttr = $this->configuration['ttr'];
+        $this->buryOnReject = $this->configuration['bury_on_reject'];
     }
 
     public static function fromDsn(#[\SensitiveParameter] string $dsn, array $options = []): self
@@ -74,7 +78,15 @@ class Connection
         }
 
         $configuration = [];
-        $configuration += $options + $query + self::DEFAULT_OPTIONS;
+        foreach (self::DEFAULT_OPTIONS as $k => $v) {
+            $value = $options[$k] ?? $query[$k] ?? $v;
+
+            $configuration[$k] = match (\gettype($v)) {
+                'integer' => filter_var($value, \FILTER_VALIDATE_INT),
+                'boolean' => filter_var($value, \FILTER_VALIDATE_BOOL),
+                default => $value,
+            };
+        }
 
         // check for extra keys in options
         $optionsExtraKeys = array_diff(array_keys($options), array_keys(self::DEFAULT_OPTIONS));
@@ -105,11 +117,12 @@ class Connection
     }
 
     /**
-     * @param int $delay The delay in milliseconds
+     * @param int  $delay    The delay in milliseconds
+     * @param ?int $priority The priority by which the message will be reserved
      *
      * @return string The inserted id
      */
-    public function send(string $body, array $headers, int $delay = 0): string
+    public function send(string $body, array $headers, int $delay = 0, ?int $priority = null): string
     {
         $message = json_encode([
             'body' => $body,
@@ -123,7 +136,7 @@ class Connection
         try {
             $job = $this->client->useTube($this->tube)->put(
                 $message,
-                PheanstalkInterface::DEFAULT_PRIORITY,
+                $priority ?? PheanstalkInterface::DEFAULT_PRIORITY,
                 $delay / 1000,
                 $this->ttr
             );
@@ -171,10 +184,14 @@ class Connection
         }
     }
 
-    public function reject(string $id): void
+    public function reject(string $id, ?int $priority = null, bool $forceDelete = false): void
     {
         try {
-            $this->client->useTube($this->tube)->delete(new JobId((int) $id));
+            if (!$forceDelete && $this->buryOnReject) {
+                $this->client->useTube($this->tube)->bury(new JobId((int) $id), $priority ?? PheanstalkInterface::DEFAULT_PRIORITY);
+            } else {
+                $this->client->useTube($this->tube)->delete(new JobId((int) $id));
+            }
         } catch (Exception $exception) {
             throw new TransportException($exception->getMessage(), 0, $exception);
         }
@@ -190,5 +207,16 @@ class Connection
         }
 
         return (int) $tubeStats['current-jobs-ready'];
+    }
+
+    public function getMessagePriority(string $id): int
+    {
+        try {
+            $jobStats = $this->client->statsJob(new JobId((int) $id));
+        } catch (Exception $exception) {
+            throw new TransportException($exception->getMessage(), 0, $exception);
+        }
+
+        return (int) $jobStats['pri'];
     }
 }

@@ -13,10 +13,13 @@ namespace Symfony\Component\Messenger\Bridge\Beanstalkd\Tests\Transport;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Messenger\Bridge\Beanstalkd\Tests\Fixtures\DummyMessage;
+use Symfony\Component\Messenger\Bridge\Beanstalkd\Transport\BeanstalkdPriorityStamp;
 use Symfony\Component\Messenger\Bridge\Beanstalkd\Transport\BeanstalkdReceivedStamp;
 use Symfony\Component\Messenger\Bridge\Beanstalkd\Transport\BeanstalkdReceiver;
 use Symfony\Component\Messenger\Bridge\Beanstalkd\Transport\Connection;
+use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\MessageDecodingFailedException;
+use Symfony\Component\Messenger\Stamp\SentForRetryStamp;
 use Symfony\Component\Messenger\Transport\Serialization\PhpSerializer;
 use Symfony\Component\Messenger\Transport\Serialization\Serializer;
 use Symfony\Component\Serializer as SerializerComponent;
@@ -72,10 +75,40 @@ final class BeanstalkdReceiverTest extends TestCase
         $beanstalkdEnvelope = $this->createBeanstalkdEnvelope();
         $connection = $this->createMock(Connection::class);
         $connection->expects($this->once())->method('get')->willReturn($beanstalkdEnvelope);
-        $connection->expects($this->once())->method('reject');
+        $connection->expects($this->once())->method('getMessagePriority')->with($beanstalkdEnvelope['id'])->willReturn(2);
+        $connection->expects($this->once())->method('reject')->with($beanstalkdEnvelope['id'], 2);
 
         $receiver = new BeanstalkdReceiver($connection, $serializer);
         $receiver->get();
+    }
+
+    /**
+     * @dataProvider provideRejectCases
+     */
+    public function testReject(array $stamps, ?int $priority, bool $forceDelete)
+    {
+        $serializer = $this->createSerializer();
+
+        $id = 'some id';
+
+        $connection = $this->createMock(Connection::class);
+        $connection->expects($this->once())->method('reject')->with($id, $priority, $forceDelete);
+
+        $envelope = (new Envelope(new DummyMessage('Oy')))->with(new BeanstalkdReceivedStamp($id, 'foo bar'));
+        foreach ($stamps as $stamp) {
+            $envelope = $envelope->with($stamp);
+        }
+
+        $receiver = new BeanstalkdReceiver($connection, $serializer);
+        $receiver->reject($envelope);
+    }
+
+    public static function provideRejectCases(): iterable
+    {
+        yield 'No stamp' => [[], null, false];
+        yield 'With sent for retry true' => [[new SentForRetryStamp(true)], null, true];
+        yield 'With sent for retry true and priority' => [[new BeanstalkdPriorityStamp(2), new SentForRetryStamp(true)], 2, true];
+        yield 'With sent for retry false' => [[new SentForRetryStamp(false)], null, false];
     }
 
     private function createBeanstalkdEnvelope(): array

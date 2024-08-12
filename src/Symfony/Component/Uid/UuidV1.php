@@ -25,7 +25,7 @@ class UuidV1 extends Uuid implements TimeBasedUidInterface
     public function __construct(?string $uuid = null)
     {
         if (null === $uuid) {
-            $this->uid = uuid_create(static::TYPE);
+            $this->uid = strtolower(uuid_create(static::TYPE));
         } else {
             parent::__construct($uuid, true);
         }

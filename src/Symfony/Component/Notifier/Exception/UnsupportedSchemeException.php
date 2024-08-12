@@ -118,7 +118,7 @@ class UnsupportedSchemeException extends LogicException
         ],
         'kaz-info-teh' => [
             'class' => Bridge\KazInfoTeh\KazInfoTehTransportFactory::class,
-            'package' => 'symfony/symfony/kaz-info-teh-notifier',
+            'package' => 'symfony/kaz-info-teh-notifier',
         ],
         'lightsms' => [
             'class' => Bridge\LightSms\LightSmsTransportFactory::class,

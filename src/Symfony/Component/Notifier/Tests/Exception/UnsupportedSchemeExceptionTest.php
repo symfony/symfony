@@ -126,14 +126,18 @@ final class UnsupportedSchemeExceptionTest extends TestCase
         yield ['bandwidth', 'symfony/bandwidth-notifier'];
         yield ['bluesky', 'symfony/bluesky-notifier'];
         yield ['brevo', 'symfony/brevo-notifier'];
+        yield ['chatwork', 'symfony/chatwork-notifier'];
         yield ['clickatell', 'symfony/clickatell-notifier'];
         yield ['clicksend', 'symfony/click-send-notifier'];
         yield ['contact-everyone', 'symfony/contact-everyone-notifier'];
         yield ['discord', 'symfony/discord-notifier'];
+        yield ['engagespot', 'symfony/engagespot-notifier'];
         yield ['esendex', 'symfony/esendex-notifier'];
+        yield ['expo', 'symfony/expo-notifier'];
         yield ['fakechat', 'symfony/fake-chat-notifier'];
         yield ['fakesms', 'symfony/fake-sms-notifier'];
         yield ['firebase', 'symfony/firebase-notifier'];
+        yield ['forty-six-elks', 'symfony/forty-six-elks-notifier'];
         yield ['freemobile', 'symfony/free-mobile-notifier'];
         yield ['gatewayapi', 'symfony/gateway-api-notifier'];
         yield ['gitter', 'symfony/gitter-notifier'];
@@ -141,6 +145,7 @@ final class UnsupportedSchemeExceptionTest extends TestCase
         yield ['infobip', 'symfony/infobip-notifier'];
         yield ['iqsms', 'symfony/iqsms-notifier'];
         yield ['isendpro', 'symfony/isendpro-notifier'];
+        yield ['kaz-info-teh', 'symfony/kaz-info-teh-notifier'];
         yield ['lightsms', 'symfony/light-sms-notifier'];
         yield ['linenotify', 'symfony/line-notify-notifier'];
         yield ['linkedin', 'symfony/linked-in-notifier'];
@@ -157,8 +162,11 @@ final class UnsupportedSchemeExceptionTest extends TestCase
         yield ['ntfy', 'symfony/ntfy-notifier'];
         yield ['octopush', 'symfony/octopush-notifier'];
         yield ['onesignal', 'symfony/one-signal-notifier'];
+        yield ['orange-sms', 'symfony/orange-sms-notifier'];
         yield ['ovhcloud', 'symfony/ovh-cloud-notifier'];
+        yield ['pagerduty', 'symfony/pager-duty-notifier'];
         yield ['plivo', 'symfony/plivo-notifier'];
+        yield ['pushover', 'symfony/pushover-notifier'];
         yield ['redlink', 'symfony/redlink-notifier'];
         yield ['ringcentral', 'symfony/ring-central-notifier'];
         yield ['rocketchat', 'symfony/rocket-chat-notifier'];
@@ -181,6 +189,8 @@ final class UnsupportedSchemeExceptionTest extends TestCase
         yield ['twilio', 'symfony/twilio-notifier'];
         yield ['twitter', 'symfony/twitter-notifier'];
         yield ['unifonic', 'symfony/unifonic-notifier'];
+        yield ['vonage', 'symfony/vonage-notifier'];
+        yield ['yunpian', 'symfony/yunpian-notifier'];
         yield ['zendesk', 'symfony/zendesk-notifier'];
         yield ['zulip', 'symfony/zulip-notifier'];
         yield ['goip', 'symfony/go-ip-notifier'];

@@ -70,7 +70,7 @@ class HttpKernelExtensionTest extends TestCase
             'index' => sprintf(<<<TWIG
 {{ fragment_uri(controller("%s::templateAction", {template: "foo.html.twig"})) }}
 TWIG
-                , TemplateController::class), ]);
+                , str_replace('\\', '\\\\', TemplateController::class)), ]);
         $twig = new Environment($loader, ['debug' => true, 'cache' => false]);
         $twig->addExtension(new HttpKernelExtension());
 
@@ -80,7 +80,7 @@ TWIG
         ]);
         $twig->addRuntimeLoader($loader);
 
-        $this->assertSame('/_fragment?_hash=PP8%2FeEbn1pr27I9wmag%2FM6jYGVwUZ0l2h0vhh2OJ6CI%3D&amp;_path=template%3Dfoo.html.twig%26_format%3Dhtml%26_locale%3Den%26_controller%3DSymfonyBundleFrameworkBundleControllerTemplateController%253A%253AtemplateAction', $twig->render('index'));
+        $this->assertSame('/_fragment?_hash=XCg0hX8QzSwik8Xuu9aMXhoCeI4oJOob7lUVacyOtyY%3D&amp;_path=template%3Dfoo.html.twig%26_format%3Dhtml%26_locale%3Den%26_controller%3DSymfony%255CBundle%255CFrameworkBundle%255CController%255CTemplateController%253A%253AtemplateAction', $twig->render('index'));
     }
 
     protected function getFragmentHandler($returnOrException): FragmentHandler

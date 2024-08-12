@@ -460,4 +460,11 @@ class ExpressionLanguageTest extends TestCase
             ],
         ];
     }
+
+    public function testParseAlreadyParsedExpressionReturnsSameObject()
+    {
+        $el = new ExpressionLanguage();
+        $parsed = $el->parse('1 + 1', []);
+        $this->assertSame($parsed, $el->parse($parsed, []));
+    }
 }

@@ -83,10 +83,10 @@ class RouterController
      */
     private function getTraces(RequestDataCollector $request, string $method): array
     {
-        $traceRequest = Request::create(
-            $request->getPathInfo(),
-            $request->getRequestServer(true)->get('REQUEST_METHOD'),
-            \in_array($request->getMethod(), ['DELETE', 'PATCH', 'POST', 'PUT'], true) ? $request->getRequestRequest()->all() : $request->getRequestQuery()->all(),
+        $traceRequest = new Request(
+            $request->getRequestQuery()->all(),
+            $request->getRequestRequest()->all(),
+            $request->getRequestAttributes()->all(),
             $request->getRequestCookies(true)->all(),
             [],
             $request->getRequestServer(true)->all()

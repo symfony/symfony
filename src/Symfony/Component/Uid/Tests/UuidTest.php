@@ -95,6 +95,15 @@ class UuidTest extends TestCase
         $this->assertSame('3499710062d0', $uuid->getNode());
     }
 
+    public function testV1IsLowerCase()
+    {
+        $uuid = new UuidV1();
+        $this->assertSame(strtolower((string) $uuid), (string) $uuid);
+
+        $uuid = new UuidV1('D9E7A184-5D5B-11EA-A62A-3499710062D0');
+        $this->assertSame(strtolower((string) $uuid), (string) $uuid);
+    }
+
     public function testV3()
     {
         $uuid = Uuid::v3(new UuidV4(self::A_UUID_V4), 'the name');

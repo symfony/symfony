@@ -52,6 +52,17 @@ class ErrorDetailsStampTest extends TestCase
         $this->assertEquals($flattenException, $stamp->getFlattenException());
     }
 
+    public function testFlattenExceptionIsNotIncluded()
+    {
+        $exception = new \Exception('exception message');
+
+        $stamp = ErrorDetailsStamp::create($exception, false);
+
+        $this->assertSame(\Exception::class, $stamp->getExceptionClass());
+        $this->assertSame('exception message', $stamp->getExceptionMessage());
+        $this->assertNull($stamp->getFlattenException());
+    }
+
     public function testDeserialization()
     {
         $exception = new \Exception('exception message');

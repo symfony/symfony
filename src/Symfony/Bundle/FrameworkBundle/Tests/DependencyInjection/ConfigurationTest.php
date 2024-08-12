@@ -870,6 +870,7 @@ class ConfigurationTest extends TestCase
                 'default_bus' => null,
                 'buses' => ['messenger.bus.default' => ['default_middleware' => ['enabled' => true, 'allow_no_handlers' => false, 'allow_no_senders' => true], 'middleware' => []]],
                 'stop_worker_on_signals' => [],
+                'include_stack_trace_in_error' => true,
             ],
             'disallow_search_engine_index' => true,
             'http_client' => [

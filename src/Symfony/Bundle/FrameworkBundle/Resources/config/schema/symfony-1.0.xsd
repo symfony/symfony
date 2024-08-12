@@ -569,6 +569,7 @@
         <xsd:attribute name="default-bus" type="xsd:string" />
         <xsd:attribute name="enabled" type="xsd:boolean" />
         <xsd:attribute name="failure-transport" type="xsd:string" />
+        <xsd:attribute name="include-stack-trace-in-error" type="xsd:boolean" />
     </xsd:complexType>
 
     <xsd:complexType name="messenger_serializer">
@@ -605,6 +606,7 @@
         <xsd:attribute name="serializer" type="xsd:string" />
         <xsd:attribute name="dsn" type="xsd:string" />
         <xsd:attribute name="failure-transport" type="xsd:string" />
+        <xsd:attribute name="include-stack-trace-in-error" type="xsd:boolean" />
         <xsd:attribute name="rate-limiter" type="xsd:string" />
     </xsd:complexType>
 

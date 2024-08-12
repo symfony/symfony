@@ -215,6 +215,26 @@ class BinaryNodeTest extends AbstractNodeTestCase
         eval('$regexp = "this is not a regexp"; '.$compiler->getSource().';');
     }
 
+    public function testDivisionByZero()
+    {
+        $node = new BinaryNode('/', new ConstantNode(1), new ConstantNode(0));
+
+        $this->expectException(\DivisionByZeroError::class);
+        $this->expectExceptionMessage('Division by zero.');
+
+        $node->evaluate([], []);
+    }
+
+    public function testModuloByZero()
+    {
+        $node = new BinaryNode('%', new ConstantNode(1), new ConstantNode(0));
+
+        $this->expectException(\DivisionByZeroError::class);
+        $this->expectExceptionMessage('Modulo by zero.');
+
+        $node->evaluate([], []);
+    }
+
     /**
      * @testWith [1]
      *           ["true"]

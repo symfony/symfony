@@ -37,6 +37,17 @@ class ParserTest extends TestCase
         $parser->parse($lexer->tokenize('foo'), [0]);
     }
 
+    public function testParsePrimaryExpressionWithUnknownFunctionThrows()
+    {
+        $parser = new Parser([]);
+        $stream = (new Lexer())->tokenize('foo()');
+
+        $this->expectException(SyntaxError::class);
+        $this->expectExceptionMessage('The function "foo" does not exist around position 1 for expression `foo()`.');
+
+        $parser->parse($stream);
+    }
+
     public function testParseUnknownFunction()
     {
         $parser = new Parser([]);

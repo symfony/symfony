@@ -83,7 +83,7 @@ class MultiplierRetryStrategy implements RetryStrategyInterface
         $delay = $this->delayMilliseconds * $this->multiplier ** $retries;
 
         if ($this->jitter > 0) {
-            $randomness = (int) ($delay * $this->jitter);
+            $randomness = (int) min(\PHP_INT_MAX, $delay * $this->jitter);
             $delay += random_int(-$randomness, +$randomness);
         }
 
@@ -91,6 +91,6 @@ class MultiplierRetryStrategy implements RetryStrategyInterface
             return $this->maxDelayMilliseconds;
         }
 
-        return (int) ceil($delay);
+        return (int) min(\PHP_INT_MAX, ceil($delay));
     }
 }

@@ -1118,7 +1118,6 @@ class Configuration implements ConfigurationInterface
                         ->end()
                         ->arrayNode('default_context')
                             ->normalizeKeys(false)
-                            ->useAttributeAsKey('name')
                             ->validate()
                                 ->ifTrue(fn () => $this->debug && class_exists(JsonParser::class))
                                 ->then(fn (array $v) => $v + [JsonDecode::DETAILED_ERROR_MESSAGES => true])

@@ -55,4 +55,31 @@ class RecursiveDirectoryIteratorTest extends IteratorTestCase
 
         $this->assertEquals($contains, $actual);
     }
+
+    public function testTrailingDirectorySeparatorIsStripped()
+    {
+        $fixturesDirectory = __DIR__ . '/../Fixtures/';
+        $actual = [];
+
+        foreach (new RecursiveDirectoryIterator($fixturesDirectory, RecursiveDirectoryIterator::SKIP_DOTS) as $file) {
+            $actual[] = $file->getPathname();
+        }
+
+        sort($actual);
+
+        $expected = [
+            $fixturesDirectory.'.dot',
+            $fixturesDirectory.'A',
+            $fixturesDirectory.'copy',
+            $fixturesDirectory.'dolor.txt',
+            $fixturesDirectory.'gitignore',
+            $fixturesDirectory.'ipsum.txt',
+            $fixturesDirectory.'lorem.txt',
+            $fixturesDirectory.'one',
+            $fixturesDirectory.'r+e.gex[c]a(r)s',
+            $fixturesDirectory.'with space',
+        ];
+
+        $this->assertEquals($expected, $actual);
+    }
 }

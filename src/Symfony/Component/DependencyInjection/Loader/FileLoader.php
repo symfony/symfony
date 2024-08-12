@@ -92,6 +92,7 @@ abstract class FileLoader extends BaseFileLoader
             }
         } finally {
             --$this->importing;
+            $this->loadExtensionConfigs();
         }
 
         return null;

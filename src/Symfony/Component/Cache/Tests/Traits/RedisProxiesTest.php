@@ -30,7 +30,26 @@ class RedisProxiesTest extends TestCase
     {
         $version = version_compare(phpversion('redis'), '6', '>') ? '6' : '5';
         $proxy = file_get_contents(\dirname(__DIR__, 2)."/Traits/{$class}{$version}Proxy.php");
+        $proxy = substr($proxy, 0, 2 + strpos($proxy, '[];'));
         $expected = substr($proxy, 0, 2 + strpos($proxy, '}'));
+        $methods = [];
+
+        foreach ((new \ReflectionClass(sprintf('Symfony\Component\Cache\Traits\\%s%dProxy', $class, $version)))->getMethods() as $method) {
+            if ('reset' === $method->name || method_exists(LazyProxyTrait::class, $method->name)) {
+                continue;
+            }
+            $return = '__construct' === $method->name || $method->getReturnType() instanceof \ReflectionNamedType && 'void' === (string) $method->getReturnType() ? '' : 'return ';
+            $methods[$method->name] = "\n    ".ProxyHelper::exportSignature($method, false, $args)."\n".<<<EOPHP
+                {
+                    {$return}\$this->initializeLazyObject()->{$method->name}({$args});
+                }
+
+            EOPHP;
+        }
+
+        uksort($methods, 'strnatcmp');
+        $proxy .= implode('', $methods)."}\n";
+
         $methods = [];
 
         foreach ((new \ReflectionClass($class))->getMethods() as $method) {
@@ -38,7 +57,7 @@ class RedisProxiesTest extends TestCase
                 continue;
             }
             $return = '__construct' === $method->name || $method->getReturnType() instanceof \ReflectionNamedType && 'void' === (string) $method->getReturnType() ? '' : 'return ';
-            $methods[] = "\n    ".ProxyHelper::exportSignature($method, false, $args)."\n".<<<EOPHP
+            $methods[$method->name] = "\n    ".ProxyHelper::exportSignature($method, false, $args)."\n".<<<EOPHP
                 {
                     {$return}\$this->initializeLazyObject()->{$method->name}({$args});
                 }

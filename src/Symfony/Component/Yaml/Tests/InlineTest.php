@@ -620,6 +620,14 @@ class InlineTest extends TestCase
         $this->assertEquals($expectedNested, Inline::parse($yamlNested, Yaml::PARSE_DATETIME));
     }
 
+    public function testParseInvalidDate()
+    {
+        $this->expectException(ParseException::class);
+        $this->expectExceptionMessageMatches('/^The date "2024-50-50" could not be parsed as it is an invalid date.*/');
+
+        Inline::parse('2024-50-50', Yaml::PARSE_DATETIME);
+    }
+
     /**
      * @dataProvider getDateTimeDumpTests
      */

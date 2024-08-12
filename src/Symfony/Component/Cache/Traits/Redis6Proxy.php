@@ -24,6 +24,7 @@ class_exists(\Symfony\Component\VarExporter\Internal\LazyObjectState::class);
  */
 class Redis6Proxy extends \Redis implements ResetInterface, LazyObjectInterface
 {
+    use Redis6ProxyTrait;
     use RedisProxyTrait {
         resetLazyObject as reset;
     }
@@ -221,11 +222,6 @@ class Redis6Proxy extends \Redis implements ResetInterface, LazyObjectInterface
     public function discard(): \Redis|bool
     {
         return $this->initializeLazyObject()->discard(...\func_get_args());
-    }
-
-    public function dump($key): \Redis|string
-    {
-        return $this->initializeLazyObject()->dump(...\func_get_args());
     }
 
     public function echo($str): \Redis|false|string
@@ -508,16 +504,6 @@ class Redis6Proxy extends \Redis implements ResetInterface, LazyObjectInterface
         return $this->initializeLazyObject()->hMset(...\func_get_args());
     }
 
-    public function hRandField($key, $options = null): \Redis|array|string
-    {
-        return $this->initializeLazyObject()->hRandField(...\func_get_args());
-    }
-
-    public function hSet($key, $member, $value): \Redis|false|int
-    {
-        return $this->initializeLazyObject()->hSet(...\func_get_args());
-    }
-
     public function hSetNx($key, $field, $value): \Redis|bool
     {
         return $this->initializeLazyObject()->hSetNx(...\func_get_args());
@@ -646,11 +632,6 @@ class Redis6Proxy extends \Redis implements ResetInterface, LazyObjectInterface
     public function ltrim($key, $start, $end): \Redis|bool
     {
         return $this->initializeLazyObject()->ltrim(...\func_get_args());
-    }
-
-    public function mget($keys): \Redis|array
-    {
-        return $this->initializeLazyObject()->mget(...\func_get_args());
     }
 
     public function migrate($host, $port, $key, $dstdb, $timeout, $copy = false, $replace = false, #[\SensitiveParameter] $credentials = null): \Redis|bool
@@ -861,11 +842,6 @@ class Redis6Proxy extends \Redis implements ResetInterface, LazyObjectInterface
     public function sPop($key, $count = 0): \Redis|array|false|string
     {
         return $this->initializeLazyObject()->sPop(...\func_get_args());
-    }
-
-    public function sRandMember($key, $count = 0): \Redis|array|false|string
-    {
-        return $this->initializeLazyObject()->sRandMember(...\func_get_args());
     }
 
     public function sUnion($key, ...$other_keys): \Redis|array|false

@@ -42,16 +42,16 @@ use Symfony\Component\OptionsResolver\Exception\MissingOptionsException;
 
 class EntityTypeTest extends BaseTypeTestCase
 {
-    public const TESTED_TYPE = 'Symfony\Bridge\Doctrine\Form\Type\EntityType';
+    public const TESTED_TYPE = EntityType::class;
 
-    private const ITEM_GROUP_CLASS = 'Symfony\Bridge\Doctrine\Tests\Fixtures\GroupableEntity';
-    private const SINGLE_IDENT_CLASS = 'Symfony\Bridge\Doctrine\Tests\Fixtures\SingleIntIdEntity';
-    private const SINGLE_IDENT_NO_TO_STRING_CLASS = 'Symfony\Bridge\Doctrine\Tests\Fixtures\SingleIntIdNoToStringEntity';
-    private const SINGLE_STRING_IDENT_CLASS = 'Symfony\Bridge\Doctrine\Tests\Fixtures\SingleStringIdEntity';
-    private const SINGLE_ASSOC_IDENT_CLASS = 'Symfony\Bridge\Doctrine\Tests\Fixtures\SingleAssociationToIntIdEntity';
-    private const SINGLE_STRING_CASTABLE_IDENT_CLASS = 'Symfony\Bridge\Doctrine\Tests\Fixtures\SingleStringCastableIdEntity';
-    private const COMPOSITE_IDENT_CLASS = 'Symfony\Bridge\Doctrine\Tests\Fixtures\CompositeIntIdEntity';
-    private const COMPOSITE_STRING_IDENT_CLASS = 'Symfony\Bridge\Doctrine\Tests\Fixtures\CompositeStringIdEntity';
+    private const ITEM_GROUP_CLASS = GroupableEntity::class;
+    private const SINGLE_IDENT_CLASS = SingleIntIdEntity::class;
+    private const SINGLE_IDENT_NO_TO_STRING_CLASS = SingleIntIdNoToStringEntity::class;
+    private const SINGLE_STRING_IDENT_CLASS = SingleStringIdEntity::class;
+    private const SINGLE_ASSOC_IDENT_CLASS = SingleAssociationToIntIdEntity::class;
+    private const SINGLE_STRING_CASTABLE_IDENT_CLASS = SingleStringCastableIdEntity::class;
+    private const COMPOSITE_IDENT_CLASS = CompositeIntIdEntity::class;
+    private const COMPOSITE_STRING_IDENT_CLASS = CompositeStringIdEntity::class;
 
     private EntityManager $em;
     private MockObject&ManagerRegistry $emRegistry;

@@ -1,0 +1,55 @@
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2024-08-12T08:53:07Z
+
+This change allows to be more consistent across the different components. Having an abstract method in tests seems well widespread in the codebase unlike constants overriding. It is used in particular in:
+
+- `TransportFactoryTestCase`
+- `ProviderFactoryTestCase`
+- `TransportTestCase`
+- `ConstraintValidatorTestCase`
+- `AbstractDescriptorTestCase`
+- `AbstractMimeTypeGuesserTestCase`
+- And more.
+
+The only place where the constant overriding way is used seems in Form. The result is an inconsistency that can be changed quite simply. While I understand this is a consequent change in the codebase, it only affects internals classes, not covered by BC promise so it's fine on this side.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-08-12T09:04:58Z
+
+I'm not really sensible to consistency across components for test suites, especially compared to git blame and merge conflicts + review time that this will inflict us :)
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2024-08-12T09:11:55Z
+
+Oh right, I admit I didn't have the upmerge maintenance by maintainers argument in mind. This argument convinces me.
+
+What about the first solution, which is changing plain strings to `::class`? Would it be OK for maintainers?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-08-12T09:16:48Z
+
+> changing plain strings to ::class
+
+This looks fine to me.
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2024-08-12T09:29:13Z
+
+Alright, here you go
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2024-08-12T09:45:41Z
+
+Can you update the commit message and PR title accordingly?
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2024-08-12T09:48:09Z
+
+Isn't it already up-to-date, in addition to the description?

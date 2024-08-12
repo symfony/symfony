@@ -24,7 +24,7 @@ class RawMessage
      * @param iterable<string>|string|resource $message
      */
     public function __construct(
-        private mixed $message,
+        private $message,
     ) {
     }
 

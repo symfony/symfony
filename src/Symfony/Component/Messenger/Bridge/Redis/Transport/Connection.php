@@ -521,7 +521,7 @@ class Connection
 
         try {
             if ($delayInMs > 0) { // the delay is <= 0 for queued messages
-                $id = bin2hex(random_bytes(4));
+                $id = base64_encode(random_bytes(9));
                 $message = json_encode([
                     'body' => $body,
                     'headers' => $headers,

@@ -1,0 +1,15 @@
+---------------------------------------------------------------------------
+
+by derrabus at 2024-08-12T07:18:14Z
+
+> > 👍 However, as far as I know we count editing/adding PHPdoc as a feature and not a bugfix.
+>
+> Unless the patched doc is wrong at first. It is not the case here so this indeed looks like an improvement
+
+It is a bugfix: The current annotation documents this property as an array of strings while it is in fact an array of booleans.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2024-08-12T07:19:50Z
+
+Indeed

@@ -638,6 +638,8 @@ class NumberToLocalizedStringTransformerTest extends TestCase
      */
     public function testReverseTransformENotation($output, $input)
     {
+        IntlTestHelper::requireFullIntl($this);
+
         \Locale::setDefault('en');
 
         $transformer = new NumberToLocalizedStringTransformer();

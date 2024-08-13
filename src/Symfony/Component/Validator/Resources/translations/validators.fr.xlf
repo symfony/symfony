@@ -455,16 +455,16 @@
                 <target>Cette valeur ne représente pas une semaine valide au format ISO 8601.</target>
             </trans-unit>
             <trans-unit id="117">
-                <source>The week "{{ value }}" is not a valid week.</source>
-                <target>La semaine "{{ value }}" n'est pas une semaine valide.</target>
+                <source>This value is not a valid week.</source>
+                <target>Cette valeur n'est pas une semaine valide.</target>
             </trans-unit>
             <trans-unit id="118">
-                <source>The value should not be before week "{{ min }}".</source>
-                <target>La valeur ne doit pas être antérieure à la semaine "{{ min }}".</target>
+                <source>This value should not be before week "{{ min }}".</source>
+                <target>Cette valeur ne doit pas être antérieure à la semaine "{{ min }}".</target>
             </trans-unit>
             <trans-unit id="119">
-                <source>The value should not be after week "{{ max }}".</source>
-                <target>La valeur ne doit pas être postérieure à la semaine "{{ max }}".</target>
+                <source>This value should not be after week "{{ max }}".</source>
+                <target>Cette valeur ne doit pas être postérieure à la semaine "{{ max }}".</target>
             </trans-unit>
         </body>
     </file>

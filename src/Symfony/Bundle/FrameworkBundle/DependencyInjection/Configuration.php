@@ -1126,6 +1126,10 @@ class Configuration implements ConfigurationInterface
                             ->prototype('variable')->end()
                         ->end()
                     ->end()
+                    ->validate()
+                        ->ifTrue(fn ($v) => $this->debug && class_exists(JsonParser::class) && !isset($v['default_context'][JsonDecode::DETAILED_ERROR_MESSAGES]))
+                        ->then(function ($v) { $v['default_context'][JsonDecode::DETAILED_ERROR_MESSAGES] = true; return $v; })
+                    ->end()
                 ->end()
             ->end()
         ;

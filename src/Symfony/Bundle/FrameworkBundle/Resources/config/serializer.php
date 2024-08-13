@@ -54,7 +54,7 @@ use Symfony\Component\Serializer\SerializerInterface;
 
 return static function (ContainerConfigurator $container) {
     $container->parameters()
-        ->set('serializer.mapping.cache.file', '%kernel.cache_dir%/serialization.php')
+        ->set('serializer.mapping.cache.file', '%kernel.build_dir%/serialization.php')
     ;
 
     $container->services()
@@ -162,7 +162,10 @@ return static function (ContainerConfigurator $container) {
 
         ->set('serializer.mapping.cache.symfony', CacheItemPoolInterface::class)
             ->factory([PhpArrayAdapter::class, 'create'])
-            ->args([param('serializer.mapping.cache.file'), service('cache.serializer')])
+            ->args([
+                param('serializer.mapping.cache.file'),
+                service('cache.serializer'),
+            ])
 
         ->set('serializer.mapping.cache_class_metadata_factory', CacheClassMetadataFactory::class)
             ->decorate('serializer.mapping.class_metadata_factory')

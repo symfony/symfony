@@ -30,9 +30,50 @@ class SerializerCacheWarmerTest extends TestCase
         @unlink($file);
 
         $warmer = new SerializerCacheWarmer($loaders, $file);
-        $warmer->warmUp(\dirname($file));
+        $warmer->warmUp(\dirname($file), \dirname($file));
 
         $this->assertFileExists($file);
+
+        $arrayPool = new PhpArrayAdapter($file, new NullAdapter());
+
+        $this->assertTrue($arrayPool->getItem('Symfony_Bundle_FrameworkBundle_Tests_Fixtures_Serialization_Person')->isHit());
+        $this->assertTrue($arrayPool->getItem('Symfony_Bundle_FrameworkBundle_Tests_Fixtures_Serialization_Author')->isHit());
+    }
+
+    /**
+     * @dataProvider loaderProvider
+     */
+    public function testWarmUpAbsoluteFilePath(array $loaders)
+    {
+        $file = sys_get_temp_dir().'/0/cache-serializer.php';
+        @unlink($file);
+
+        $cacheDir = sys_get_temp_dir().'/1';
+
+        $warmer = new SerializerCacheWarmer($loaders, $file);
+        $warmer->warmUp($cacheDir, $cacheDir);
+
+        $this->assertFileExists($file);
+        $this->assertFileDoesNotExist($cacheDir.'/cache-serializer.php');
+
+        $arrayPool = new PhpArrayAdapter($file, new NullAdapter());
+
+        $this->assertTrue($arrayPool->getItem('Symfony_Bundle_FrameworkBundle_Tests_Fixtures_Serialization_Person')->isHit());
+        $this->assertTrue($arrayPool->getItem('Symfony_Bundle_FrameworkBundle_Tests_Fixtures_Serialization_Author')->isHit());
+    }
+
+    /**
+     * @dataProvider loaderProvider
+     */
+    public function testWarmUpWithoutBuildDir(array $loaders)
+    {
+        $file = sys_get_temp_dir().'/cache-serializer.php';
+        @unlink($file);
+
+        $warmer = new SerializerCacheWarmer($loaders, $file);
+        $warmer->warmUp(\dirname($file));
+
+        $this->assertFileDoesNotExist($file);
 
         $arrayPool = new PhpArrayAdapter($file, new NullAdapter());
 
@@ -66,7 +107,7 @@ class SerializerCacheWarmerTest extends TestCase
         @unlink($file);
 
         $warmer = new SerializerCacheWarmer([], $file);
-        $warmer->warmUp(\dirname($file));
+        $warmer->warmUp(\dirname($file), \dirname($file));
 
         $this->assertFileExists($file);
     }
@@ -79,7 +120,10 @@ class SerializerCacheWarmerTest extends TestCase
     {
         $this->assertFalse(class_exists($mappedClass = 'AClassThatDoesNotExist_FWB_CacheWarmer_SerializerCacheWarmerTest', false));
 
-        $warmer = new SerializerCacheWarmer([new YamlFileLoader(__DIR__.'/../Fixtures/Serialization/Resources/does_not_exist.yaml')], tempnam(sys_get_temp_dir(), __FUNCTION__));
+        $file = tempnam(sys_get_temp_dir(), __FUNCTION__);
+        @unlink($file);
+
+        $warmer = new SerializerCacheWarmer([new YamlFileLoader(__DIR__.'/../Fixtures/Serialization/Resources/does_not_exist.yaml')], $file);
 
         spl_autoload_register($classLoader = function ($class) use ($mappedClass) {
             if ($class === $mappedClass) {
@@ -87,7 +131,8 @@ class SerializerCacheWarmerTest extends TestCase
             }
         }, true, true);
 
-        $warmer->warmUp('foo');
+        $warmer->warmUp(\dirname($file), \dirname($file));
+        $this->assertFileExists($file);
 
         spl_autoload_unregister($classLoader);
     }
@@ -98,12 +143,12 @@ class SerializerCacheWarmerTest extends TestCase
      */
     public function testClassAutoloadExceptionWithUnrelatedException()
     {
-        $this->expectException(\DomainException::class);
-        $this->expectExceptionMessage('This exception should not be caught by the warmer.');
-
         $this->assertFalse(class_exists($mappedClass = 'AClassThatDoesNotExist_FWB_CacheWarmer_SerializerCacheWarmerTest', false));
 
-        $warmer = new SerializerCacheWarmer([new YamlFileLoader(__DIR__.'/../Fixtures/Serialization/Resources/does_not_exist.yaml')], tempnam(sys_get_temp_dir(), __FUNCTION__));
+        $file = tempnam(sys_get_temp_dir(), __FUNCTION__);
+        @unlink($file);
+
+        $warmer = new SerializerCacheWarmer([new YamlFileLoader(__DIR__.'/../Fixtures/Serialization/Resources/does_not_exist.yaml')], basename($file));
 
         spl_autoload_register($classLoader = function ($class) use ($mappedClass) {
             if ($class === $mappedClass) {
@@ -112,8 +157,17 @@ class SerializerCacheWarmerTest extends TestCase
             }
         }, true, true);
 
-        $warmer->warmUp('foo');
+        $this->expectException(\DomainException::class);
+        $this->expectExceptionMessage('This exception should not be caught by the warmer.');
 
-        spl_autoload_unregister($classLoader);
+        try {
+            $warmer->warmUp(\dirname($file), \dirname($file));
+        } catch (\DomainException $e) {
+            $this->assertFileDoesNotExist($file);
+
+            throw $e;
+        } finally {
+            spl_autoload_unregister($classLoader);
+        }
     }
 }

@@ -41,6 +41,9 @@ class SerializerCacheWarmer extends AbstractPhpFileCacheWarmer
 
     protected function doWarmUp(string $cacheDir, ArrayAdapter $arrayAdapter, ?string $buildDir = null): bool
     {
+        if (!$buildDir) {
+            return false;
+        }
         if (!$this->loaders) {
             return true;
         }

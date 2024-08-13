@@ -1,0 +1,31 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2024-08-02T12:30:22Z
+
+What I wonder: Do we really need the `strict` toggle? Are there use cases where we don't want to be that strict? IMO those use cases could be covered in userland using the `Regex` constraint.
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2024-08-02T12:35:06Z
+
+ISO8601 only defines that week number must be between 1 and 53 it seems, and the week number is not strictly validated depending on the year.
+
+To me, it is useful depending on if you only want to stick to ISO or if you want a little bit of additional check.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2024-08-08T08:48:46Z
+
+I think I agree with @xabbuh here. In the equivalent `<input type="week"/>` field, you can pass invalid values if you set them manually or via JS (e.g. `2024-W53`) but when using the browser UI, you can only select correct week numbers (See https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/week#validation)
+
+So, I think we should remove the `strict` option and make that strict behavior the default one.
+
+-----
+
+An additional comment: should we add the `max` and `min` options to restrict which weeks are considered valid? The `<input type="week"/>` field defines that too. See https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/week#setting_maximum_and_minimum_weeks
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2024-08-08T11:07:07Z
+
+Thank you Javier for your super relevant feedback! I think @xabbuh and you are right about `strict`. I implemented min and max weeks

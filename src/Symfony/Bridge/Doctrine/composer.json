@@ -43,13 +43,14 @@
         "symfony/uid": "^6.4|^7.0",
         "symfony/validator": "^6.4|^7.0",
         "symfony/var-dumper": "^6.4|^7.0",
-        "doctrine/collections": "^1.0|^2.0",
+        "doctrine/collections": "^1.8|^2.0",
         "doctrine/data-fixtures": "^1.1",
         "doctrine/dbal": "^3.6|^4",
         "doctrine/orm": "^2.15|^3",
         "psr/log": "^1|^2|^3"
     },
     "conflict": {
+        "doctrine/collections": "<1.8",
         "doctrine/dbal": "<3.6",
         "doctrine/lexer": "<1.1",
         "doctrine/orm": "<2.15",

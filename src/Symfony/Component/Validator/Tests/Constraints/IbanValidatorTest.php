@@ -48,6 +48,19 @@ class IbanValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
+    /**
+     * @dataProvider getValidIbans
+     */
+    public function testValidIbansWithNewLine(string $iban)
+    {
+        $this->validator->validate($iban."\n", new Iban());
+
+        $this->buildViolation('This is not a valid International Bank Account Number (IBAN).')
+            ->setParameter('{{ value }}', '"'.$iban."\n\"")
+            ->setCode(Iban::INVALID_CHARACTERS_ERROR)
+            ->assertRaised();
+    }
+
     public static function getValidIbans()
     {
         return [

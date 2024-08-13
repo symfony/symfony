@@ -65,7 +65,7 @@ class UrlValidatorTest extends ConstraintValidatorTestCase
      */
     public function testValidUrlsWithNewLine($url)
     {
-        $this->validator->validate($url."\n", new Url());
+        $this->validator->validate($url."\n", new Url(requireTld: false));
 
         $this->buildViolation('This value is not a valid URL.')
             ->setParameter('{{ value }}', '"'.$url."\n".'"')
@@ -108,9 +108,7 @@ class UrlValidatorTest extends ConstraintValidatorTestCase
      */
     public function testValidRelativeUrlWithNewLine(string $url)
     {
-        $constraint = new Url([
-            'relativeProtocol' => true,
-        ]);
+        $constraint = new Url(relativeProtocol: true, requireTld: false);
 
         $this->validator->validate($url."\n", $constraint);
 

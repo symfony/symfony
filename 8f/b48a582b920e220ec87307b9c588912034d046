@@ -1,0 +1,50 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-07-19T14:07:05Z
+
+Related also: https://force-color.org/
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-07-19T14:09:18Z
+
+BTW, https://no-color.org/ tells that the NO_COLOR env var should not be the empty string, and we don't follow this spec currently. I think we should.
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2024-07-29T12:34:53Z
+
+Hi @artshade, you may have a look at this fix to be sure to update everywhere it is relevant in Symfony: https://github.com/symfony/symfony/pull/57815
+
+---------------------------------------------------------------------------
+
+by artshade at 2024-07-29T13:45:00Z
+
+> ...you may have a look at this fix to be sure to update everywhere it is relevant in Symfony: https://github.com/symfony/symfony/pull/57815
+
+This is awesome! Thank you, @alexandre-daubois ! Have you considered the related forced color option?
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2024-07-29T13:48:55Z
+
+You seemed to be well on your way to adding this feature, so I didn't want to impose a PR if you wanted to finish it :)
+
+---------------------------------------------------------------------------
+
+by artshade at 2024-07-29T21:36:03Z
+
+> You seemed to be well on your way to adding this feature, so I didn't want to impose a PR if you wanted to finish it :)
+
+Changed the priority of `NO_COLOR` as in the snippet at https://force-color.org, where `NO_COLOR` comes first and only then - `FORCE_COLOR`:
+
+```c
+if (no_color != NULL && no_color[0] != '\0')
+    color = false;
+// ...
+if (force_color != NULL && force_color[0] != '\0')
+    color = true;
+```
+[Source](<https://force-color.org>)
+
+Regarding the PR, I am frankly not sure if the current state of the PR is correct considering all the branches and rules.

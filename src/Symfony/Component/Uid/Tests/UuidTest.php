@@ -213,6 +213,38 @@ class UuidTest extends TestCase
         $this->assertTrue(UuidV4::isValid(self::A_UUID_V4));
     }
 
+    public function testIsValidWithVariousFormat()
+    {
+        $uuid = Uuid::v4();
+
+        $this->assertTrue(Uuid::isValid($uuid->toBase32(), Uuid::FORMAT_BASE_32));
+        $this->assertFalse(Uuid::isValid($uuid->toBase58(), Uuid::FORMAT_BASE_32));
+        $this->assertFalse(Uuid::isValid($uuid->toBinary(), Uuid::FORMAT_BASE_32));
+        $this->assertFalse(Uuid::isValid($uuid->toRfc4122(), Uuid::FORMAT_BASE_32));
+
+        $this->assertFalse(Uuid::isValid($uuid->toBase32(), Uuid::FORMAT_BASE_58));
+        $this->assertTrue(Uuid::isValid($uuid->toBase58(), Uuid::FORMAT_BASE_58));
+        $this->assertFalse(Uuid::isValid($uuid->toBinary(), Uuid::FORMAT_BASE_58));
+        $this->assertFalse(Uuid::isValid($uuid->toRfc4122(), Uuid::FORMAT_BASE_58));
+
+        $this->assertFalse(Uuid::isValid($uuid->toBase32(), Uuid::FORMAT_BINARY));
+        $this->assertFalse(Uuid::isValid($uuid->toBase58(), Uuid::FORMAT_BINARY));
+        $this->assertTrue(Uuid::isValid($uuid->toBinary(), Uuid::FORMAT_BINARY));
+        $this->assertFalse(Uuid::isValid($uuid->toRfc4122(), Uuid::FORMAT_BINARY));
+
+        $this->assertFalse(Uuid::isValid($uuid->toBase32(), Uuid::FORMAT_RFC_4122));
+        $this->assertFalse(Uuid::isValid($uuid->toBase58(), Uuid::FORMAT_RFC_4122));
+        $this->assertFalse(Uuid::isValid($uuid->toBinary(), Uuid::FORMAT_RFC_4122));
+        $this->assertTrue(Uuid::isValid($uuid->toRfc4122(), Uuid::FORMAT_RFC_4122));
+
+        $this->assertTrue(Uuid::isValid($uuid->toBase32(), Uuid::FORMAT_ALL));
+        $this->assertTrue(Uuid::isValid($uuid->toBase58(), Uuid::FORMAT_ALL));
+        $this->assertTrue(Uuid::isValid($uuid->toBinary(), Uuid::FORMAT_ALL));
+        $this->assertTrue(Uuid::isValid($uuid->toRfc4122(), Uuid::FORMAT_ALL));
+
+        $this->assertFalse(Uuid::isValid('30J7CNpDMfXPZrCsn4Cgey', Uuid::FORMAT_BASE_58), 'Fake base-58 string with the "O" forbidden char is not valid');
+    }
+
     public function testIsValidWithNilUuid()
     {
         $this->assertTrue(Uuid::isValid('00000000-0000-0000-0000-000000000000'));

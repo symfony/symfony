@@ -24,26 +24,38 @@ class RecursiveDirectoryIteratorTest extends IteratorTestCase
 
     /**
      * @group network
+     * @group integration
      */
     public function testRewindOnFtp()
     {
-        $this->expectNotToPerformAssertions();
+        if (!getenv('INTEGRATION_FTP_URL')) {
+            self::markTestSkipped('INTEGRATION_FTP_URL env var is not defined.');
+        }
 
-        $i = new RecursiveDirectoryIterator('ftp://test.rebex.net/', \RecursiveDirectoryIterator::SKIP_DOTS);
+        $i = new RecursiveDirectoryIterator(getenv('INTEGRATION_FTP_URL').\DIRECTORY_SEPARATOR, \RecursiveDirectoryIterator::SKIP_DOTS);
 
         $i->rewind();
+
+        $this->expectNotToPerformAssertions();
     }
 
     /**
      * @group network
+     * @group integration
      */
     public function testSeekOnFtp()
     {
-        $i = new RecursiveDirectoryIterator('ftp://test.rebex.net/', \RecursiveDirectoryIterator::SKIP_DOTS);
+        if (!getenv('INTEGRATION_FTP_URL')) {
+            self::markTestSkipped('INTEGRATION_FTP_URL env var is not defined.');
+        }
+
+        $ftpUrl = getenv('INTEGRATION_FTP_URL');
+
+        $i = new RecursiveDirectoryIterator($ftpUrl.\DIRECTORY_SEPARATOR, \RecursiveDirectoryIterator::SKIP_DOTS);
 
         $contains = [
-            'ftp://test.rebex.net'.\DIRECTORY_SEPARATOR.'pub',
-            'ftp://test.rebex.net'.\DIRECTORY_SEPARATOR.'readme.txt',
+            $ftpUrl.\DIRECTORY_SEPARATOR.'pub',
+            $ftpUrl.\DIRECTORY_SEPARATOR.'readme.txt',
         ];
         $actual = [];
 

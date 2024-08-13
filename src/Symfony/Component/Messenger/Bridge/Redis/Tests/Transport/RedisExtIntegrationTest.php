@@ -344,6 +344,9 @@ class RedisExtIntegrationTest extends TestCase
         }
     }
 
+    /**
+     * @group transient-on-windows
+     */
     public function testGetNonBlocking()
     {
         $redis = $this->createRedisClient();
@@ -379,6 +382,9 @@ class RedisExtIntegrationTest extends TestCase
         }
     }
 
+    /**
+     * @group transient-on-windows
+     */
     public function testItProperlyHandlesEmptyMessages()
     {
         $redisReceiver = new RedisReceiver($this->connection, new Serializer());

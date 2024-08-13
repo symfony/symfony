@@ -223,7 +223,7 @@ return static function (ContainerConfigurator $container) {
                 [], // listeners
                 null, // switch_user
                 null, // logout
-                null, //not_full_fledged_handler
+                null, // not_full_fledged_handler
             ])
 
         ->set('security.logout_url_generator', LogoutUrlGenerator::class)

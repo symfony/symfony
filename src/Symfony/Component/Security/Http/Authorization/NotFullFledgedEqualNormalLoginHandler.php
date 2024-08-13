@@ -12,8 +12,6 @@
 namespace Symfony\Component\Security\Http\Authorization;
 
 use Psr\Log\LoggerInterface;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
 use Symfony\Component\Security\Core\Authentication\AuthenticationTrustResolverInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
@@ -25,21 +23,22 @@ use Symfony\Component\Security\Core\Exception\InsufficientAuthenticationExceptio
  * NotFullFledgedHandler for considering NotFullFledged Login equal to Normal Login except if IS_AUTHENTICATED_FULLY is asked
  * If IS_AUTHENTICATED_FULLY is in access denied Exception Attrribute, user is redirect to
  * startAuthentication function in AuthenticationTrustResolver
- * Otherwise The original AccessDeniedException is passing to accessDeniedHandler or ErrorPage or Thrown
+ * Otherwise The original AccessDeniedException is passing to accessDeniedHandler or ErrorPage or Thrown.
  *
  * @author Roman JOLY <eltharin18@outlook.fr>
  */
 class NotFullFledgedEqualNormalLoginHandler implements NotFullFledgedHandlerInterface
 {
-    public function handle( ExceptionEvent $event, AccessDeniedException $exception, AuthenticationTrustResolverInterface $trustResolver, ?TokenInterface $token, ?LoggerInterface $logger, callable $starAuthenticationCallback): bool
+    public function handle(ExceptionEvent $event, AccessDeniedException $exception, AuthenticationTrustResolverInterface $trustResolver, ?TokenInterface $token, ?LoggerInterface $logger, callable $starAuthenticationCallback): bool
     {
-        if( !$trustResolver->isAuthenticated($token)) {
+        if (!$trustResolver->isAuthenticated($token)) {
             $this->reauthenticate($starAuthenticationCallback, $event, $token, $exception, $logger);
         }
 
-        foreach($exception->getAttributes() as $attribute) {
-            if(in_array($attribute, [AuthenticatedVoter::IS_AUTHENTICATED_FULLY])) {
+        foreach ($exception->getAttributes() as $attribute) {
+            if (\in_array($attribute, [AuthenticatedVoter::IS_AUTHENTICATED_FULLY])) {
                 $this->reauthenticate($starAuthenticationCallback, $event, $token, $exception, $logger);
+
                 return true;
             }
         }
@@ -47,7 +46,7 @@ class NotFullFledgedEqualNormalLoginHandler implements NotFullFledgedHandlerInte
         return false;
     }
 
-    private function reauthenticate(callable $starAuthenticationCallback, ExceptionEvent $event, ?TokenInterface $token,  AccessDeniedException $exception, ?LoggerInterface$logger): void
+    private function reauthenticate(callable $starAuthenticationCallback, ExceptionEvent $event, ?TokenInterface $token, AccessDeniedException $exception, ?LoggerInterface $logger): void
     {
         $logger?->debug('Access denied, the user is not fully authenticated; redirecting to authentication entry point.', ['exception' => $exception]);
 

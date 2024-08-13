@@ -12,8 +12,6 @@
 namespace Symfony\Component\Security\Http\Authorization;
 
 use Psr\Log\LoggerInterface;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
 use Symfony\Component\Security\Core\Authentication\AuthenticationTrustResolverInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
@@ -30,11 +28,11 @@ interface NotFullFledgedHandlerInterface
     /**
      * Allow to manage NotFullFledged cases when ExceptionListener catch AccessDeniedException
      * This function can make checks and event / exception changes to change the Response
-     * It returns a boolean for break or not after that or continue the ExceptionListener process to decorate Exception and their response
-     * 
-     * @param $starAuthenticationCallback callable for call start function from 
-     * 
-     * @return boolean break handleAccessDeniedException function in ExceptionListener after handle
+     * It returns a boolean for break or not after that or continue the ExceptionListener process to decorate Exception and their response.
+     *
+     * @param $starAuthenticationCallback callable for call start function from
+     *
+     * @return bool break handleAccessDeniedException function in ExceptionListener after handle
      */
-    public function handle( ExceptionEvent $event, AccessDeniedException $exception, AuthenticationTrustResolverInterface $trustResolver, ?TokenInterface $token, ?LoggerInterface $logger, callable $starAuthenticationCallback): bool;
+    public function handle(ExceptionEvent $event, AccessDeniedException $exception, AuthenticationTrustResolverInterface $trustResolver, ?TokenInterface $token, ?LoggerInterface $logger, callable $starAuthenticationCallback): bool;
 }

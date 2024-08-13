@@ -127,8 +127,7 @@ class ExceptionListener
         $event->setThrowable(new AccessDeniedHttpException($exception->getMessage(), $exception));
         $token = $this->tokenStorage->getToken();
 
-        if($this->notFullFledgedHandler?->handle($event, $exception,$this->authenticationTrustResolver, $token, $this->logger, function ($request, $exception) {return $this->startAuthentication($request, $exception);} ))
-        {
+        if ($this->notFullFledgedHandler?->handle($event, $exception, $this->authenticationTrustResolver, $token, $this->logger, function ($request, $exception) {return $this->startAuthentication($request, $exception); })) {
             return;
         }
 

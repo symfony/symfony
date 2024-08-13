@@ -767,6 +767,12 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
                                 $class = null;
                             }
                         }
+                    } elseif ($t instanceof ObjectType) {
+                        $typeIdentifier = TypeIdentifier::OBJECT;
+                        $class = $t->getClassName();
+                    } else {
+                        $typeIdentifier = $t->getTypeIdentifier();
+                        $class = null;
                     }
                 } else {
                     if ($t instanceof ObjectType) {

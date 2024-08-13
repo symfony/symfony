@@ -556,6 +556,8 @@ trait HttpClientTrait
      */
     private static function resolveUrl(array $url, ?array $base, array $queryDefaults = []): array
     {
+        $givenUrl = $url;
+
         if (null !== $base && '' === ($base['scheme'] ?? '').($base['authority'] ?? '')) {
             throw new InvalidArgumentException(\sprintf('Invalid "base_uri" option: host or scheme is missing in "%s".', implode('', $base)));
         }
@@ -607,6 +609,10 @@ trait HttpClientTrait
 
         if ('?' === ($url['query'] ?? '')) {
             $url['query'] = null;
+        }
+
+        if (null !== $url['scheme'] && null === $url['authority']) {
+            throw new InvalidArgumentException(\sprintf('Invalid URL: host is missing in "%s".', implode('', $givenUrl)));
         }
 
         return $url;

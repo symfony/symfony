@@ -134,6 +134,16 @@ class MessageTest extends TestCase
         $message->generateMessageId();
     }
 
+    public function testGenerateMessageIdThrowsWhenNeitherFromNorSenderIsPresent()
+    {
+        $message = new Message();
+
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('An email must have a "From" or a "Sender" header.');
+
+        $message->generateMessageId();
+    }
+
     public function testToString()
     {
         $message = new Message();

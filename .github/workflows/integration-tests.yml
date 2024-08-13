@@ -44,6 +44,13 @@ jobs:
           LDAP_PORT_NUMBER: 3389
           LDAP_USERS: a
           LDAP_PASSWORDS: a
+      ftp:
+        image: onekilo79/ftpd_test
+        ports:
+          - 21:21
+          - 30000-30009:30000-30009
+        volumes:
+          - ./:/hostmount
       redis:
         image: redis:6.2.8
         ports:
@@ -144,6 +151,11 @@ jobs:
           curl -s -u Administrator:111111 -X POST http://localhost:8091/pools/default/buckets -d 'ramQuotaMB=100&bucketType=ephemeral&name=cache'
           curl -s -u Administrator:111111 -X POST  http://localhost:8091/pools/default -d 'memoryQuota=256'
 
+      - name: Create FTP fixtures
+        run: |
+          mkdir -p ./ftpusers/test/pub
+          touch ./ftpusers/test/pub/example ./ftpusers/test/readme.txt
+
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
@@ -196,6 +208,7 @@ jobs:
       - name: Run tests
         run: ./phpunit --group integration -v
         env:
+          INTEGRATION_FTP_URL: 'ftp://test:test@localhost'
           REDIS_HOST: 'localhost:16379'
           REDIS_AUTHENTICATED_HOST: 'localhost:16380'
           REDIS_CLUSTER_HOSTS: 'localhost:7000 localhost:7001 localhost:7002 localhost:7003 localhost:7004 localhost:7005'

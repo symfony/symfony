@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+7.2
+---
+
+ * Add the `inputDefinition` option to configure arguments and options in the `AsCommand` attribute
+
 7.1
 ---
 

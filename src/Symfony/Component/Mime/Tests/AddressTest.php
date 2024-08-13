@@ -13,6 +13,8 @@ namespace Symfony\Component\Mime\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Mime\Address;
+use Symfony\Component\Mime\Exception\InvalidArgumentException;
+use Symfony\Component\Mime\Exception\RfcComplianceException;
 
 class AddressTest extends TestCase
 {
@@ -32,7 +34,7 @@ class AddressTest extends TestCase
 
     public function testConstructorWithInvalidAddress()
     {
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(RfcComplianceException::class);
         new Address('fab   pot@symfony.com');
     }
 

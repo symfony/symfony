@@ -38,9 +38,9 @@ final class Week extends Constraint
         public ?string $min = null,
         public ?string $max = null,
         public string $invalidFormatMessage = 'This value does not represent a valid week in the ISO 8601 format.',
-        public string $invalidWeekNumberMessage = 'The week "{{ value }}" is not a valid week.',
-        public string $tooLowMessage = 'The value should not be before week "{{ min }}".',
-        public string $tooHighMessage = 'The value should not be after week "{{ max }}".',
+        public string $invalidWeekNumberMessage = 'This value is not a valid week.',
+        public string $tooLowMessage = 'This value should not be before week "{{ min }}".',
+        public string $tooHighMessage = 'This value should not be after week "{{ max }}".',
         ?array $groups = null,
         mixed $payload = null,
     ) {
@@ -55,8 +55,8 @@ final class Week extends Constraint
         }
 
         if (null !== $min && null !== $max) {
-            [$minYear, $minWeekNumber] = \explode('-W', $min, 2);
-            [$maxYear, $maxWeekNumber] = \explode('-W', $max, 2);
+            [$minYear, $minWeekNumber] = explode('-W', $min, 2);
+            [$maxYear, $maxWeekNumber] = explode('-W', $max, 2);
 
             if ($minYear > $maxYear || ($minYear === $maxYear && $minWeekNumber > $maxWeekNumber)) {
                 throw new ConstraintDefinitionException(\sprintf('The "%s" constraint requires the min week to be less than or equal to the max week.', __CLASS__));

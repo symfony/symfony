@@ -61,6 +61,19 @@ class UrlValidatorTest extends ConstraintValidatorTestCase
     }
 
     /**
+     * @dataProvider getValidUrls
+     */
+    public function testValidUrlsWithNewLine($url)
+    {
+        $this->validator->validate($url."\n", new Url());
+
+        $this->buildViolation('This value is not a valid URL.')
+            ->setParameter('{{ value }}', '"'.$url."\n".'"')
+            ->setCode(Url::INVALID_URL_ERROR)
+            ->assertRaised();
+    }
+
+    /**
      * @dataProvider getValidUrlsWithWhitespaces
      */
     public function testValidUrlsWithWhitespaces($url)
@@ -87,6 +100,24 @@ class UrlValidatorTest extends ConstraintValidatorTestCase
         $this->validator->validate($url, $constraint);
 
         $this->assertNoViolation();
+    }
+
+    /**
+     * @dataProvider getValidRelativeUrls
+     * @dataProvider getValidUrls
+     */
+    public function testValidRelativeUrlWithNewLine(string $url)
+    {
+        $constraint = new Url([
+            'relativeProtocol' => true,
+        ]);
+
+        $this->validator->validate($url."\n", $constraint);
+
+        $this->buildViolation('This value is not a valid URL.')
+            ->setParameter('{{ value }}', '"'.$url."\n".'"')
+            ->setCode(Url::INVALID_URL_ERROR)
+            ->assertRaised();
     }
 
     public static function getValidRelativeUrls()

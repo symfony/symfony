@@ -33,7 +33,7 @@ class WeekValidatorTest extends ConstraintValidatorTestCase
         $this->validator->validate($value, $constraint);
 
         if ($expectedViolation) {
-            $this->buildViolation('The week "{{ value }}" is not a valid week.')
+            $this->buildViolation('This value is not a valid week.')
                 ->setCode(Week::INVALID_WEEK_NUMBER_ERROR)
                 ->setParameter('{{ value }}', $value)
                 ->assertRaised();
@@ -68,7 +68,7 @@ class WeekValidatorTest extends ConstraintValidatorTestCase
         $constraint = new Week(min: '2015-W10');
 
         $this->validator->validate('2015-W08', $constraint);
-        $this->buildViolation('The value should not be before week "{{ min }}".')
+        $this->buildViolation('This value should not be before week "{{ min }}".')
             ->setInvalidValue('2015-W08')
             ->setParameter('{{ min }}', '2015-W10')
             ->setCode(Week::TOO_LOW_ERROR)

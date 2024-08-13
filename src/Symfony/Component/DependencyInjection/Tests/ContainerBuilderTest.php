@@ -212,8 +212,18 @@ class ContainerBuilderTest extends TestCase
     {
         $builder = new ContainerBuilder();
         $builder->register('foo', 'Bar\FooClass');
-        $this->assertTrue($builder->hasDefinition('foo'), '->register() registers a new service definition');
-        $this->assertInstanceOf(Definition::class, $builder->getDefinition('foo'), '->register() returns the newly created Definition instance');
+        $this->assertTrue($builder->hasDefinition('foo'), '->hasDefinition() returns true if a service definition exists');
+        $this->assertInstanceOf(Definition::class, $builder->getDefinition('foo'), '->getDefinition() returns an instance of Definition');
+    }
+
+    public function testRegisterChild()
+    {
+        $builder = new ContainerBuilder();
+        $builder->register('foo', 'Bar\FooClass');
+        $builder->registerChild('bar', 'foo');
+        $this->assertTrue($builder->hasDefinition('bar'), '->hasDefinition() returns true if a service definition exists');
+        $this->assertInstanceOf(ChildDefinition::class, $definition = $builder->getDefinition('bar'), '->getDefinition() returns an instance of Definition');
+        $this->assertSame('foo', $definition->getParent(), '->getParent() returns the id of the parent service');
     }
 
     public function testAutowire()

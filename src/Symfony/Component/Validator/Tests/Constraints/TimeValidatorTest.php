@@ -94,6 +94,19 @@ class TimeValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
+    /**
+     * @dataProvider getValidTimesWithoutSeconds
+     */
+    public function testValidTimesWithoutSecondsWithNewLine(string $time)
+    {
+        $this->validator->validate($time."\n", new Time(withSeconds: false));
+
+        $this->buildViolation('This value is not a valid time.')
+            ->setParameter('{{ value }}', '"'.$time."\n".'"')
+            ->setCode(Time::INVALID_FORMAT_ERROR)
+            ->assertRaised();
+    }
+
     public static function getValidTimesWithoutSeconds()
     {
         return [

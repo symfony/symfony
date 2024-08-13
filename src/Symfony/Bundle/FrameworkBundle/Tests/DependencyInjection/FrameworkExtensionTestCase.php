@@ -873,6 +873,7 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $this->assertEquals([
             'alias' => 'failure_transport_1',
             'is_failure_transport' => true,
+            'priority' => 0,
         ], $failureTransport1Tags);
 
         $failureTransport3Definition = $container->getDefinition('messenger.transport.failure_transport_3');
@@ -881,6 +882,7 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $this->assertEquals([
             'alias' => 'failure_transport_3',
             'is_failure_transport' => true,
+            'priority' => 0,
         ], $failureTransport3Tags);
 
         // transport 2 exists but does not appear in the mapping
@@ -913,6 +915,7 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $this->assertEquals([
             'alias' => 'failure_transport_1',
             'is_failure_transport' => true,
+            'priority' => 0,
         ], $failureTransport1Tags);
 
         $failureTransport3Definition = $container->getDefinition('messenger.transport.failure_transport_3');
@@ -921,6 +924,7 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $this->assertEquals([
             'alias' => 'failure_transport_3',
             'is_failure_transport' => true,
+            'priority' => 0,
         ], $failureTransport3Tags);
 
         $failureTransportsByTransportNameServiceLocator = $container->getDefinition('messenger.failure.send_failed_message_to_failure_transport_listener')->getArgument(0);
@@ -947,14 +951,25 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $container = $this->createContainerFromFile('messenger_transports');
         $this->assertTrue($container->hasDefinition('messenger.transport.default'));
         $this->assertTrue($container->getDefinition('messenger.transport.default')->hasTag('messenger.receiver'));
-        $this->assertEquals([
-            ['alias' => 'default', 'is_failure_transport' => false], ], $container->getDefinition('messenger.transport.default')->getTag('messenger.receiver'));
+        $this->assertEquals([[
+            'alias' => 'default',
+            'is_failure_transport' => false,
+            'priority' => 0,
+        ]], $container->getDefinition('messenger.transport.default')->getTag('messenger.receiver'));
         $transportArguments = $container->getDefinition('messenger.transport.default')->getArguments();
         $this->assertEquals(new Reference('messenger.default_serializer'), $transportArguments[2]);
 
         $this->assertTrue($container->hasDefinition('messenger.transport.customised'));
         $transportFactory = $container->getDefinition('messenger.transport.customised')->getFactory();
         $transportArguments = $container->getDefinition('messenger.transport.customised')->getArguments();
+
+        $this->assertTrue($container->hasDefinition('messenger.transport.prioritized'));
+        $this->assertTrue($container->getDefinition('messenger.transport.prioritized')->hasTag('messenger.receiver'));
+        $this->assertEquals([[
+            'alias' => 'prioritized',
+            'is_failure_transport' => false,
+            'priority' => 10,
+        ]], $container->getDefinition('messenger.transport.prioritized')->getTag('messenger.receiver'));
 
         $this->assertEquals([new Reference('messenger.transport_factory'), 'createTransport'], $transportFactory);
         $this->assertCount(3, $transportArguments);
@@ -1000,6 +1015,7 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $failureTransportsByTransportNameServiceLocator = $container->getDefinition('messenger.failure.send_failed_message_to_failure_transport_listener')->getArgument(0);
         $failureTransports = $container->getDefinition((string) $failureTransportsByTransportNameServiceLocator)->getArgument(0);
         $expectedTransportsByFailureTransports = [
+            'prioritized' => new Reference('messenger.transport.failed'),
             'beanstalkd' => new Reference('messenger.transport.failed'),
             'customised' => new Reference('messenger.transport.failed'),
             'default' => new Reference('messenger.transport.failed'),

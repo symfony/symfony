@@ -242,6 +242,8 @@ class MessengerPass implements CompilerPassInterface
     {
         $receiverMapping = [];
         $failureTransportsMap = [];
+        $receiverPriority = [];
+
         if ($container->hasDefinition('console.command.messenger_failed_messages_retry')) {
             $commandDefinition = $container->getDefinition('console.command.messenger_failed_messages_retry');
             $globalReceiverName = $commandDefinition->getArgument(0);
@@ -263,14 +265,22 @@ class MessengerPass implements CompilerPassInterface
             $receiverMapping[$id] = new Reference($id);
 
             foreach ($tags as $tag) {
+                $receiverPriority[$id] = max($tag['priority'] ?? 0, $receiverPriority[$id] ?? PHP_INT_MIN);
+
                 if (isset($tag['alias'])) {
                     $receiverMapping[$tag['alias']] = $receiverMapping[$id];
+                    $receiverPriority[$tag['alias']] = max($tag['priority'] ?? 0, $receiverPriority[$tag['alias']] ?? PHP_INT_MIN);
+
                     if ($tag['is_failure_transport'] ?? false) {
                         $failureTransportsMap[$tag['alias']] = $receiverMapping[$id];
                     }
                 }
             }
         }
+
+        $prioritySorter = fn (string $a, string $b): int => $receiverPriority[$b] <=> $receiverPriority[$a];
+        uksort($receiverMapping, $prioritySorter);
+        uksort($failureTransportsMap, $prioritySorter);
 
         $receiverNames = [];
         foreach ($receiverMapping as $name => $reference) {

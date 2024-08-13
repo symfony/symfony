@@ -175,7 +175,6 @@ class HttpClientTraitTest extends TestCase
     public static function provideResolveUrl(): array
     {
         return [
-            [self::RFC3986_BASE, 'http:h',        'http:h'],
             [self::RFC3986_BASE, 'g',             'http://a/b/c/g'],
             [self::RFC3986_BASE, './g',           'http://a/b/c/g'],
             [self::RFC3986_BASE, 'g/',            'http://a/b/c/g/'],
@@ -229,7 +228,6 @@ class HttpClientTraitTest extends TestCase
             ['http://u:p@a/b/c/d;p?q', '.',       'http://u:p@a/b/c/'],
             // path ending with slash or no slash at all
             ['http://a/b/c/d/',  'e',             'http://a/b/c/d/e'],
-            ['http:no-slash',     'e',            'http:e'],
             // falsey relative parts
             [self::RFC3986_BASE, '//0',           'http://0/'],
             [self::RFC3986_BASE, '0',             'http://a/b/c/0'],

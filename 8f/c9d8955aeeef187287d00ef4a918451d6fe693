@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-08-13T07:56:51Z
+
+I'd go with a bugfix personally. WDYT @symfony/mergers ?
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2024-08-13T08:01:34Z
+
+I agree with a bugfix as it also ensures some kind of security also IMHO
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2024-08-13T08:10:21Z
+
+👍 for treating this as a bugfix
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2024-08-13T09:19:01Z
+
+Alright, I rebased on 5.4. The merger may encounter a few conflicts during upmerge, especially with the Time constraint where a new regex is added in upper branches. If necessary, I'll provide a follw-up PR for it and add the relevant test case

@@ -80,7 +80,7 @@ class WeekValidatorTest extends ConstraintValidatorTestCase
         $constraint = new Week(max: '2016-W25');
 
         $this->validator->validate('2016-W30', $constraint);
-        $this->buildViolation('The value should not be after week "{{ max }}".')
+        $this->buildViolation('This value should not be after week "{{ max }}".')
             ->setInvalidValue('2016-W30')
             ->setParameter('{{ max }}', '2016-W25')
             ->setCode(Week::TOO_HIGH_ERROR)

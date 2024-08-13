@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\DependencyInjection;
 
+use Composer\Autoload\ClassLoader;
 use Composer\InstalledVersions;
 use Symfony\Component\Config\Resource\ClassExistenceResource;
 use Symfony\Component\Config\Resource\ComposerResource;
@@ -46,6 +47,7 @@ use Symfony\Component\DependencyInjection\LazyProxy\Instantiator\RealServiceInst
 use Symfony\Component\DependencyInjection\ParameterBag\EnvPlaceholderParameterBag;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
+use Symfony\Component\ErrorHandler\DebugClassLoader;
 use Symfony\Component\ExpressionLanguage\Expression;
 use Symfony\Component\ExpressionLanguage\ExpressionFunctionProviderInterface;
 
@@ -117,7 +119,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     private array $vendors;
 
     /**
-     * @var array<string, bool> the cache for paths being in vendor directories
+     * @var array<string, bool> whether a path is in a vendor directory
      */
     private array $pathsInVendor = [];
 
@@ -261,6 +263,53 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
 
         if ($resource instanceof GlobResource && $this->inVendors($resource->getPrefix())) {
             return $this;
+        }
+        if ($resource instanceof FileExistenceResource && $this->inVendors($resource->getResource())) {
+            return $this;
+        }
+        if ($resource instanceof FileResource && $this->inVendors($resource->getResource())) {
+            return $this;
+        }
+        if ($resource instanceof DirectoryResource && $this->inVendors($resource->getResource())) {
+            return $this;
+        }
+        if ($resource instanceof ClassExistenceResource) {
+            $class = $resource->getResource();
+
+            $inVendor = false;
+            foreach (spl_autoload_functions() as $autoloader) {
+                if (!\is_array($autoloader)) {
+                    continue;
+                }
+
+                if ($autoloader[0] instanceof DebugClassLoader) {
+                    $autoloader = $autoloader[0]->getClassLoader();
+                }
+
+                if (!\is_array($autoloader) || !$autoloader[0] instanceof ClassLoader || !$autoloader[0]->findFile(__CLASS__)) {
+                    continue;
+                }
+
+                foreach ($autoloader[0]->getPrefixesPsr4() as $prefix => $dirs) {
+                    if ('' === $prefix || !str_starts_with($class, $prefix)) {
+                        continue;
+                    }
+
+                    foreach ($dirs as $dir) {
+                        if (!$dir = realpath($dir)) {
+                            continue;
+                        }
+
+                        if (!$inVendor = $this->inVendors($dir)) {
+                            break 3;
+                        }
+                    }
+                }
+            }
+
+            if ($inVendor) {
+                return $this;
+            }
         }
 
         $this->resources[(string) $resource] = $resource;
@@ -1693,8 +1742,10 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
         }
 
         foreach ($this->vendors as $vendor) {
-            if (str_starts_with($path, $vendor) && false !== strpbrk(substr($path, \strlen($vendor), 1), '/'.\DIRECTORY_SEPARATOR)) {
+            if (\in_array($path[\strlen($vendor)] ?? '', ['/', \DIRECTORY_SEPARATOR], true) && str_starts_with($path, $vendor)) {
+                $this->pathsInVendor[$vendor.'/composer'] = false;
                 $this->addResource(new FileResource($vendor.'/composer/installed.json'));
+                $this->pathsInVendor[$vendor.'/composer'] = true;
 
                 return $this->pathsInVendor[$path] = true;
             }

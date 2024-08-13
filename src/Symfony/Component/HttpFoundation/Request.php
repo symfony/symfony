@@ -193,8 +193,7 @@ class Request
         self::HEADER_X_FORWARDED_PREFIX => 'X_FORWARDED_PREFIX',
     ];
 
-    /** @var bool */
-    private $isIisRewrite = false;
+    private bool $isIisRewrite = false;
 
     /**
      * @param array                $query      The GET parameters

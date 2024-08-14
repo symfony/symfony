@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2024-08-08T07:05:07Z
+
+@fabpot I didn't want to confuse readers of the code by using the term serializer for two different things (the Serializer component and the part that I named encoder here). But I am open for other names.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2024-08-13T16:47:21Z
+
+Serialization and encoding are two different concepts. Having `SerializerInterface|PayloadEncoderInterface` looks weird to me. I would use `PayloadSerializerInterface` instead.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2024-08-13T19:35:51Z
+
+@fabpot I renamed the new classes

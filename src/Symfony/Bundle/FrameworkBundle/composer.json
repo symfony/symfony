@@ -71,6 +71,7 @@
         "symfony/property-info": "^6.4|^7.0",
         "symfony/uid": "^6.4|^7.0",
         "symfony/web-link": "^6.4|^7.0",
+        "symfony/webhook": "^7.2",
         "phpdocumentor/reflection-docblock": "^3.0|^4.0|^5.0",
         "twig/twig": "^3.0.4"
     },
@@ -102,6 +103,7 @@
         "symfony/twig-bundle": "<6.4",
         "symfony/validator": "<6.4",
         "symfony/web-profiler-bundle": "<6.4",
+        "symfony/webhook": "<7.2",
         "symfony/workflow": "<6.4"
     },
     "autoload": {

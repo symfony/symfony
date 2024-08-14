@@ -2370,7 +2370,7 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $this->assertSame(RequestParser::class, $container->getDefinition('webhook.request_parser')->getClass());
 
         $this->assertFalse($container->getDefinition('webhook.transport')->hasErrors());
-        $this->assertFalse($container->getDefinition('webhook.body_configurator.json')->hasErrors());
+        $this->assertEquals('webhook.payload_serializer.serializer', $container->getDefinition('webhook.body_configurator.json')->getArgument(0));
     }
 
     public function testWebhookWithoutSerializer()
@@ -2382,11 +2382,7 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $container = $this->createContainerFromFile('webhook_without_serializer');
 
         $this->assertFalse($container->getDefinition('webhook.transport')->hasErrors());
-        $this->assertTrue($container->getDefinition('webhook.body_configurator.json')->hasErrors());
-        $this->assertSame(
-            ['You cannot use the "webhook transport" service since the Serializer component is not enabled. Try setting "framework.serializer.enabled" to true.'],
-            $container->getDefinition('webhook.body_configurator.json')->getErrors()
-        );
+        $this->assertEquals('webhook.payload_serializer.json', $container->getDefinition('webhook.body_configurator.json')->getArgument(0));
     }
 
     public function testAssetMapperWithoutAssets()

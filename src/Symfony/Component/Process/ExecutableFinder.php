@@ -54,7 +54,7 @@ class ExecutableFinder
         );
 
         if ($openBaseDir = \ini_get('open_basedir')) {
-            $searchPath = array_merge(explode(\PATH_SEPARATOR, $openBaseDir));
+            $searchPath = explode(\PATH_SEPARATOR, $openBaseDir);
             foreach ($searchPath as $path) {
                 // Silencing against https://bugs.php.net/69240
                 if (@is_dir($path)) {

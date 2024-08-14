@@ -938,6 +938,15 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     }
 
     /**
+     * This method provides a fluid interface for easily registering a child
+     * service definition of the given parent service.
+     */
+    public function registerChild(string $id, string $parent): ChildDefinition
+    {
+        return $this->setDefinition($id, new ChildDefinition($parent));
+    }
+
+    /**
      * Registers an autowired service definition.
      *
      * This method implements a shortcut for using setDefinition() with

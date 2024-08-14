@@ -869,7 +869,7 @@ class PhpStanExtractorTest extends TestCase
     public static function pseudoTypesProvider(): iterable
     {
         yield ['classString', Type::string()];
-        yield ['classStringGeneric', Type::generic(Type::string(), Type::object(\stdClass::class))];
+        yield ['classStringGeneric', Type::string()];
         yield ['htmlEscapedString', Type::string()];
         yield ['lowercaseString', Type::string()];
         yield ['nonEmptyLowercaseString', Type::string()];

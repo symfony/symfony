@@ -22,21 +22,17 @@ class ObjectTypeTest extends TestCase
         $this->assertSame(self::class, (string) new ObjectType(self::class));
     }
 
-    public function testIsNullable()
+    public function testIsIdentifiedBy()
     {
-        $this->assertFalse((new ObjectType(self::class))->isNullable());
-    }
+        $this->assertFalse((new ObjectType(self::class))->isIdentifiedBy(TypeIdentifier::ARRAY));
+        $this->assertTrue((new ObjectType(self::class))->isIdentifiedBy(TypeIdentifier::OBJECT));
 
-    public function testGetBaseType()
-    {
-        $this->assertEquals(new ObjectType(self::class), (new ObjectType(self::class))->getBaseType());
-    }
+        $this->assertFalse((new ObjectType(self::class))->isIdentifiedBy('array'));
+        $this->assertTrue((new ObjectType(self::class))->isIdentifiedBy('object'));
 
-    public function testIsA()
-    {
-        $this->assertFalse((new ObjectType(self::class))->isA(TypeIdentifier::ARRAY));
-        $this->assertTrue((new ObjectType(self::class))->isA(TypeIdentifier::OBJECT));
-        $this->assertTrue((new ObjectType(self::class))->isA(self::class));
-        $this->assertFalse((new ObjectType(self::class))->isA(\stdClass::class));
+        $this->assertTrue((new ObjectType(self::class))->isIdentifiedBy(self::class));
+        $this->assertFalse((new ObjectType(self::class))->isIdentifiedBy(\stdClass::class));
+
+        $this->assertTrue((new ObjectType(self::class))->isIdentifiedBy('array', 'object'));
     }
 }

@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\TypeInfo\Type;
 
-use Symfony\Component\TypeInfo\Exception\LogicException;
+use Symfony\Component\TypeInfo\Exception\InvalidArgumentException;
 use Symfony\Component\TypeInfo\Type;
 use Symfony\Component\TypeInfo\TypeIdentifier;
 
@@ -21,49 +21,80 @@ use Symfony\Component\TypeInfo\TypeIdentifier;
  *
  * @template T of Type
  *
+ * @implements CompositeTypeInterface<T>
+ *
  * @experimental
  */
-final class UnionType extends Type
+class UnionType extends Type implements CompositeTypeInterface
 {
     /**
-     * @use CompositeTypeTrait<T>
+     * @var list<T>
      */
-    use CompositeTypeTrait;
+    private readonly array $types;
 
-    public function is(callable $callable): bool
+    /**
+     * @param list<T> $types
+     */
+    public function __construct(Type ...$types)
     {
-        return $this->atLeastOneTypeIs($callable);
+        if (\count($types) < 2) {
+            throw new InvalidArgumentException(\sprintf('"%s" expects at least 2 types.', self::class));
+        }
+
+        foreach ($types as $type) {
+            if ($type instanceof self) {
+                throw new InvalidArgumentException(\sprintf('Cannot set "%s" as a "%1$s" part.', self::class));
+            }
+
+            if ($type instanceof BuiltinType) {
+                if ($type->getTypeIdentifier() === TypeIdentifier::NULL && !is_a(static::class, NullableType::class, allow_string: true)) {
+                    throw new InvalidArgumentException(\sprintf('Cannot create union with "null", please use "%s" instead.', NullableType::class));
+                }
+
+                if ($type->getTypeIdentifier()->isStandalone()) {
+                    throw new InvalidArgumentException(\sprintf('Cannot create union with "%s" standalone type.', $type));
+                }
+            }
+        }
+
+        usort($types, fn (Type $a, Type $b): int => (string) $a <=> (string) $b);
+        $this->types = array_values(array_unique($types));
+
+        $builtinTypesIdentifiers = array_map(
+            fn (BuiltinType $t): TypeIdentifier => $t->getTypeIdentifier(),
+            array_filter($this->types, fn (Type $t): bool => $t instanceof BuiltinType),
+        );
+
+        if ((\in_array(TypeIdentifier::TRUE, $builtinTypesIdentifiers, true) || \in_array(TypeIdentifier::FALSE, $builtinTypesIdentifiers, true)) && \in_array(TypeIdentifier::BOOL, $builtinTypesIdentifiers, true)) {
+            throw new InvalidArgumentException('Cannot create union with redundant boolean type.');
+        }
+
+        if (\in_array(TypeIdentifier::TRUE, $builtinTypesIdentifiers, true) && \in_array(TypeIdentifier::FALSE, $builtinTypesIdentifiers, true)) {
+            throw new InvalidArgumentException('Cannot create union with both "true" and "false", "bool" should be used instead.');
+        }
+
+        if (\in_array(TypeIdentifier::OBJECT, $builtinTypesIdentifiers, true) && \count(array_filter($this->types, fn (Type $t): bool => $t instanceof ObjectType))) {
+            throw new InvalidArgumentException('Cannot create union with both "object" and class type.');
+        }
     }
 
     /**
-     * @throws LogicException
+     * @return list<T>
      */
-    public function getBaseType(): BuiltinType|ObjectType
+    public function getTypes(): array
     {
-        $nonNullableType = $this->asNonNullable();
-        if (!$nonNullableType instanceof self) {
-            return $nonNullableType->getBaseType();
-        }
-
-        throw new LogicException(\sprintf('Cannot get base type on "%s" compound type.', $this));
+        return $this->types;
     }
 
-    public function asNonNullable(): Type
+    public function composedTypesAreSatisfiedBy(callable $specification): bool
     {
-        $nonNullableTypes = [];
-        foreach ($this->getTypes() as $type) {
-            if ($type->isA(TypeIdentifier::NULL)) {
-                continue;
+        foreach ($this->types as $type) {
+            if ($type->isSatisfiedBy($specification)) {
+                return true;
             }
-
-            $nonNullableType = $type->asNonNullable();
-            $nonNullableTypes = [
-                ...$nonNullableTypes,
-                ...($nonNullableType instanceof self ? $nonNullableType->getTypes() : [$nonNullableType]),
-            ];
         }
 
-        return \count($nonNullableTypes) > 1 ? new self(...$nonNullableTypes) : $nonNullableTypes[0];
+        return false;
     }
 
     public function __toString(): string
@@ -72,30 +103,10 @@ final class UnionType extends Type
         $glue = '';
 
         foreach ($this->types as $t) {
-            $string .= $glue.($t instanceof IntersectionType ? '('.$t.')' : $t);
+            $string .= $glue.($t instanceof CompositeTypeInterface ? '('.$t.')' : $t);
             $glue = '|';
         }
 
         return $string;
-    }
-
-    /**
-     * Proxies all method calls to the original non-nullable type.
-     *
-     * @param list<mixed> $arguments
-     */
-    public function __call(string $method, array $arguments): mixed
-    {
-        $nonNullableType = $this->asNonNullable();
-
-        if (!$nonNullableType instanceof self) {
-            if (!method_exists($nonNullableType, $method)) {
-                throw new LogicException(\sprintf('Method "%s" doesn\'t exist on "%s" type.', $method, $nonNullableType));
-            }
-
-            return $nonNullableType->{$method}(...$arguments);
-        }
-
-        throw new LogicException(\sprintf('Cannot call "%s" on "%s" compound type.', $method, $this));
     }
 }

@@ -771,7 +771,7 @@ class ReflectionExtractorTest extends TestCase
         yield ['foo', Type::nullable(Type::array())];
         yield ['bar', Type::nullable(Type::int())];
         yield ['timeout', Type::union(Type::int(), Type::float())];
-        yield ['optional', Type::union(Type::nullable(Type::int()), Type::nullable(Type::float()))];
+        yield ['optional', Type::nullable(Type::union(Type::float(), Type::int()))];
         yield ['string', Type::union(Type::string(), Type::object(\Stringable::class))];
         yield ['payload', Type::mixed()];
         yield ['data', Type::mixed()];

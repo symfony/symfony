@@ -6,6 +6,7 @@ CHANGELOG
 
  * Add `$token` argument to `UserCheckerInterface::checkPostAuth()`
  * Deprecate argument `$secret` of `RememberMeToken`
+ * Deprecate returning an empty string in `UserInterface::getUserIdentifier()`
 
 7.0
 ---

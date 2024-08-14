@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\TypeInfo\Type;
 
+use Symfony\Component\TypeInfo\Exception\InvalidArgumentException;
 use Symfony\Component\TypeInfo\TypeIdentifier;
 
 /**
@@ -34,6 +35,10 @@ final class BackedEnumType extends EnumType
         string $className,
         private readonly BuiltinType $backingType,
     ) {
+        if (TypeIdentifier::INT !== $backingType->getTypeIdentifier() && TypeIdentifier::STRING !== $backingType->getTypeIdentifier()) {
+            throw new InvalidArgumentException(\sprintf('Cannot create "%s" with "%s" backing type.', self::class, $backingType));
+        }
+
         parent::__construct($className);
     }
 

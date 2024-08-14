@@ -39,7 +39,7 @@
         "symfony/property-access": "^6.4|^7.0",
         "symfony/property-info": "^6.4|^7.0",
         "symfony/translation": "^6.4.3|^7.0.3",
-        "symfony/type-info": "^7.1",
+        "symfony/type-info": "^7.2",
         "egulias/email-validator": "^2.1.10|^3|^4"
     },
     "conflict": {

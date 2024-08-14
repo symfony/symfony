@@ -18,16 +18,16 @@ use Symfony\Component\TypeInfo\TypeIdentifier;
 /**
  * Represents a key/value collection type.
  *
- * It proxies every method to the main type and adds methods related to key and value types.
- *
  * @author Mathias Arlaud <mathias.arlaud@gmail.com>
  * @author Baptiste Leduc <baptiste.leduc@gmail.com>
  *
  * @template T of BuiltinType<TypeIdentifier::ARRAY>|BuiltinType<TypeIdentifier::ITERABLE>|ObjectType|GenericType
  *
+ * @implements WrappingTypeInterface<T>
+ *
  * @experimental
  */
-final class CollectionType extends Type
+final class CollectionType extends Type implements WrappingTypeInterface
 {
     /**
      * @param T $type
@@ -36,6 +36,10 @@ final class CollectionType extends Type
         private readonly BuiltinType|ObjectType|GenericType $type,
         private readonly bool $isList = false,
     ) {
+        if ($type instanceof BuiltinType && TypeIdentifier::ARRAY !== $type->getTypeIdentifier() && TypeIdentifier::ITERABLE !== $type->getTypeIdentifier()) {
+            throw new InvalidArgumentException(\sprintf('Cannot create "%s" with "%s" type.', self::class, $type));
+        }
+
         if ($this->isList()) {
             $keyType = $this->getCollectionKeyType();
 
@@ -45,32 +49,14 @@ final class CollectionType extends Type
         }
     }
 
-    public function getBaseType(): BuiltinType|ObjectType
-    {
-        return $this->getType()->getBaseType();
-    }
-
-    /**
-     * @return T
-     */
-    public function getType(): BuiltinType|ObjectType|GenericType
+    public function getWrappedType(): Type
     {
         return $this->type;
-    }
-
-    public function isA(TypeIdentifier|string $subject): bool
-    {
-        return $this->getType()->isA($subject);
     }
 
     public function isList(): bool
     {
         return $this->isList;
-    }
-
-    public function asNonNullable(): self
-    {
-        return $this;
     }
 
     public function getCollectionKeyType(): Type
@@ -103,18 +89,13 @@ final class CollectionType extends Type
         return $defaultCollectionValueType;
     }
 
+    public function wrappedTypeIsSatisfiedBy(callable $specification): bool
+    {
+        return $this->getWrappedType()->isSatisfiedBy($specification);
+    }
+
     public function __toString(): string
     {
         return (string) $this->type;
-    }
-
-    /**
-     * Proxies all method calls to the original type.
-     *
-     * @param list<mixed> $arguments
-     */
-    public function __call(string $method, array $arguments): mixed
-    {
-        return $this->type->{$method}(...$arguments);
     }
 }

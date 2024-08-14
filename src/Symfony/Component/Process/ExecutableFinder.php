@@ -48,9 +48,14 @@ class ExecutableFinder
      */
     public function find(string $name, ?string $default = null, array $extraDirs = [])
     {
+        $dirs = array_merge(
+            explode(\PATH_SEPARATOR, getenv('PATH') ?: getenv('Path')),
+            $extraDirs
+        );
+
         if (\ini_get('open_basedir')) {
             $searchPath = array_merge(explode(\PATH_SEPARATOR, \ini_get('open_basedir')), $extraDirs);
-            $dirs = [];
+
             foreach ($searchPath as $path) {
                 // Silencing against https://bugs.php.net/69240
                 if (@is_dir($path)) {
@@ -61,11 +66,6 @@ class ExecutableFinder
                     }
                 }
             }
-        } else {
-            $dirs = array_merge(
-                explode(\PATH_SEPARATOR, getenv('PATH') ?: getenv('Path')),
-                $extraDirs
-            );
         }
 
         $suffixes = [''];

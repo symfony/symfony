@@ -109,7 +109,13 @@ class ExecutableFinderTest extends TestCase
             $this->markTestSkipped('Cannot test when open_basedir is set');
         }
 
-        $initialOpenBaseDir = ini_set('open_basedir', \dirname(\PHP_BINARY).\PATH_SEPARATOR.'/');
+        $openBaseDir = \dirname(\PHP_BINARY).\PATH_SEPARATOR.sys_get_temp_dir().\PATH_SEPARATOR.getcwd();
+
+        if ($_SERVER['SYMFONY_PHPUNIT_DIR'] ?? null) {
+            $openBaseDir .= \PATH_SEPARATOR.$_SERVER['SYMFONY_PHPUNIT_DIR'];
+        }
+
+        $initialOpenBaseDir = ini_set('open_basedir', $openBaseDir);
 
         try {
             $finder = new ExecutableFinder();
@@ -119,6 +125,38 @@ class ExecutableFinderTest extends TestCase
         } finally {
             ini_set('open_basedir', $initialOpenBaseDir);
         }
+    }
+
+    /**
+     * @runInSeparateProcess
+     */
+    public function testFindWithSubdirectoryOfOpenBaseDir()
+    {
+        if (\ini_get('open_basedir')) {
+            $this->markTestSkipped('Cannot test when open_basedir is set');
+        }
+
+        $paths = explode(\PATH_SEPARATOR, getenv('PATH'));
+        $phpBinaryPath = \dirname(\PHP_BINARY);
+
+        if (!in_array($phpBinaryPath, $paths, true)) {
+            $paths[] = $phpBinaryPath;
+        }
+
+        $this->setPath(implode(\PATH_SEPARATOR, $paths));
+
+        $openBaseDir = \dirname(\dirname(\PHP_BINARY)).\PATH_SEPARATOR.sys_get_temp_dir().\PATH_SEPARATOR.getcwd();
+
+        if ($_SERVER['SYMFONY_PHPUNIT_DIR'] ?? null) {
+            $openBaseDir .= \PATH_SEPARATOR.$_SERVER['SYMFONY_PHPUNIT_DIR'];
+        }
+
+        ini_set('open_basedir', $openBaseDir);
+
+        $finder = new ExecutableFinder();
+        $result = $finder->find($this->getPhpBinaryName());
+
+        $this->assertSamePath(\PHP_BINARY, $result);
     }
 
     /**

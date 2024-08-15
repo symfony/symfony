@@ -135,7 +135,7 @@ class Connection
      *     * flags: Queue flags (Default: AMQP_DURABLE)
      *     * arguments: Extra arguments
      *   * exchange:
-     *     * name: Name of the exchange
+     *     * name: Name of the exchange. An empty string (name: '') can be used to use the default exchange
      *     * type: Type of exchange (Default: fanout)
      *     * default_publish_routing_key: Routing key to use when publishing, if none is specified on the message
      *     * flags: Exchange flags (Default: AMQP_DURABLE)

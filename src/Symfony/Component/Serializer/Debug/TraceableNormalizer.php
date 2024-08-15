@@ -24,7 +24,7 @@ use Symfony\Component\Serializer\SerializerInterface;
  *
  * @author Mathias Arlaud <mathias.arlaud@gmail.com>
  *
- * @internal
+ * @final
  */
 class TraceableNormalizer implements NormalizerInterface, DenormalizerInterface, SerializerAwareInterface, NormalizerAwareInterface, DenormalizerAwareInterface
 {

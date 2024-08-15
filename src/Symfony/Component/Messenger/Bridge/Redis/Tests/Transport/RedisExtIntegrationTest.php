@@ -363,6 +363,9 @@ class RedisExtIntegrationTest extends TestCase
         }
     }
 
+    /**
+     * @group transient-on-windows
+     */
     public function testGetAfterReject()
     {
         $redis = $this->createRedisClient();

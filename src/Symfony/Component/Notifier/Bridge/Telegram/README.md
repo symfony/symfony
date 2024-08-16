@@ -22,7 +22,7 @@ with the desired domain/IP address of your local API server. You may also want t
 disable the notifier default behavior of using `https` protocol as local API servers
 can only accept `http` traffic.
 
-DSN Example:
+Example:
 ```
 TELEGRAM_DSN=telegram://TOKEN@localhost:5001?channel=CHAT_ID&disable_https=1
 ```

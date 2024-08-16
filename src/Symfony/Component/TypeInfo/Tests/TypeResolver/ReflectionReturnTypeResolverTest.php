@@ -44,6 +44,16 @@ class ReflectionReturnTypeResolverTest extends TestCase
         $this->resolver->resolve($reflectionFunction);
     }
 
+    public function testCannotResolveReflectionFunctionWithoutType()
+    {
+        $reflectionFunction = new \ReflectionFunction('fopen');
+
+        $this->expectException(UnsupportedException::class);
+        $this->expectExceptionMessage('Cannot resolve type for "fopen()".');
+
+        $this->resolver->resolve($reflectionFunction);
+    }
+
     public function testResolve()
     {
         $reflectionClass = new \ReflectionClass(ReflectionExtractableDummy::class);

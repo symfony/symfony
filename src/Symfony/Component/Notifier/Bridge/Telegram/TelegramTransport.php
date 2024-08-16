@@ -50,9 +50,9 @@ final class TelegramTransport extends AbstractTransport
     public function __construct(
         #[\SensitiveParameter] private string $token,
         private ?string $chatChannel = null,
-        private readonly bool $useHttpProtocol = false,
         ?HttpClientInterface $client = null,
         ?EventDispatcherInterface $dispatcher = null,
+        private readonly bool $disableHttps = false,
     ) {
         parent::__construct($client, $dispatcher);
     }
@@ -60,7 +60,7 @@ final class TelegramTransport extends AbstractTransport
     public function __toString(): string
     {
         $toString = \sprintf('telegram://%s', $this->getEndpoint());
-        $formattedOptions = http_build_query(['channel' => $this->chatChannel, 'use_http_protocol' => $this->useHttpProtocol ?: null]);
+        $formattedOptions = http_build_query(['channel' => $this->chatChannel, 'disable_https' => $this->disableHttps ?: null]);
 
         if ($formattedOptions) {
             $toString .= \sprintf('?%s', $formattedOptions);
@@ -108,7 +108,7 @@ final class TelegramTransport extends AbstractTransport
         $method = $this->getPath($options);
         $this->ensureExclusiveOptionsNotDuplicated($options);
         $options = $this->expandOptions($options, 'contact', 'location', 'venue');
-        $protocolSchema = $this->useHttpProtocol ? 'http' : 'https';
+        $protocolSchema = $this->disableHttps ? 'http' : 'https';
 
         $endpoint = \sprintf('%s://%s/bot%s/%s', $protocolSchema, $this->getEndpoint(), $this->token, $method);
 

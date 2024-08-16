@@ -4,7 +4,7 @@ CHANGELOG
 7.2
 ---
 
- * Add a DSN option to allow making the transport use `http` protocol instead of default `https`
+ * Add a DSN option/flag to allow disabling of `https` protocol
 
 6.4
 ---

@@ -31,7 +31,7 @@ final class TelegramTransportFactory extends AbstractTransportFactory
         $channel = $dsn->getOption('channel');
         $host = 'default' === $dsn->getHost() ? null : $dsn->getHost();
         $port = $dsn->getPort();
-        $disableHttps = $this->isHttpsDisabled($dsn);
+        $disableHttps = filter_var($dsn->getOption('disable_https'), FILTER_VALIDATE_BOOLEAN);
 
         return (new TelegramTransport($token, $channel, $this->client, $this->dispatcher, $disableHttps))->setHost($host)->setPort($port);
     }
@@ -52,18 +52,5 @@ final class TelegramTransportFactory extends AbstractTransportFactory
         }
 
         return \sprintf('%s:%s', $dsn->getUser(), $dsn->getPassword());
-    }
-
-    private function isHttpsDisabled(Dsn $dsn): bool
-    {
-        if (!$disableHttpsOption = $dsn->getOption('disable_https')) {
-            return false;
-        }
-
-        if (!\in_array($disableHttpsOption, [0, 1])) {
-            throw new IncompleteDsnException(\sprintf('Only 1 or 0 are allowed as a value for option "disable_https", "%s" given.', $disableHttpsOption), \sprintf('telegram://%s', $dsn->getHost()));
-        }
-
-        return (bool) $disableHttpsOption;
     }
 }

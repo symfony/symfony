@@ -138,22 +138,48 @@ class ResponseCacheStrategyTest extends TestCase
     {
         $cacheStrategy = new ResponseCacheStrategy();
 
+        $mainResponse = new Response();
+        $mainResponse->setLastModified(new \DateTimeImmutable('-2 hour'));
+
         $embeddedDate = new \DateTimeImmutable('-1 hour');
-
-        // This master response uses the "validation" model
-        $masterResponse = new Response();
-        $masterResponse->setLastModified(new \DateTimeImmutable('-2 hour'));
-        $masterResponse->setEtag('foo');
-
-        // Embedded response uses "expiry" model
         $embeddedResponse = new Response();
         $embeddedResponse->setLastModified($embeddedDate);
+
         $cacheStrategy->add($embeddedResponse);
+        $cacheStrategy->update($mainResponse);
 
-        $cacheStrategy->update($masterResponse);
+        $this->assertTrue($mainResponse->headers->has('Last-Modified'));
+        $this->assertSame($embeddedDate->getTimestamp(), $mainResponse->getLastModified()->getTimestamp());
+    }
 
-        $this->assertTrue($masterResponse->isValidateable());
-        $this->assertSame($embeddedDate->getTimestamp(), $masterResponse->getLastModified()->getTimestamp());
+    public function testLastModifiedIsRemovedWhenEmbeddedResponseHasNoLastModified()
+    {
+        $cacheStrategy = new ResponseCacheStrategy();
+
+        $mainResponse = new Response();
+        $mainResponse->setLastModified(new \DateTimeImmutable('-2 hour'));
+
+        $embeddedResponse = new Response();
+
+        $cacheStrategy->add($embeddedResponse);
+        $cacheStrategy->update($mainResponse);
+
+        $this->assertFalse($mainResponse->headers->has('Last-Modified'));
+    }
+
+    public function testLastModifiedIsNotAddedWhenMainResponseHasNoLastModified()
+    {
+        $cacheStrategy = new ResponseCacheStrategy();
+
+        $mainResponse = new Response();
+
+        $embeddedResponse = new Response();
+        $embeddedResponse->setLastModified(new \DateTimeImmutable('-2 hour'));
+
+        $cacheStrategy->add($embeddedResponse);
+        $cacheStrategy->update($mainResponse);
+
+        $this->assertFalse($mainResponse->headers->has('Last-Modified'));
     }
 
     public function testMainResponseIsNotCacheableWhenEmbeddedResponseIsNotCacheable()

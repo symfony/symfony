@@ -13,6 +13,7 @@ namespace Symfony\Bridge\Twig\Tests\Node;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Twig\Node\SearchAndRenderBlockNode;
+use Twig\Attribute\FirstClassTwigCallableReady;
 use Twig\Compiler;
 use Twig\Environment;
 use Twig\Extension\CoreExtension;
@@ -22,6 +23,7 @@ use Twig\Node\Expression\ConditionalExpression;
 use Twig\Node\Expression\ConstantExpression;
 use Twig\Node\Expression\NameExpression;
 use Twig\Node\Node;
+use Twig\TwigFunction;
 
 class SearchAndRenderBlockNodeTest extends TestCase
 {
@@ -31,7 +33,11 @@ class SearchAndRenderBlockNodeTest extends TestCase
             new NameExpression('form', 0),
         ]);
 
-        $node = new SearchAndRenderBlockNode('form_widget', $arguments, 0);
+        if (class_exists(FirstClassTwigCallableReady::class)) {
+            $node = new SearchAndRenderBlockNode(new TwigFunction('form_widget'), $arguments, 0);
+        } else {
+            $node = new SearchAndRenderBlockNode('form_widget', $arguments, 0);
+        }
 
         $compiler = new Compiler(new Environment($this->createMock(LoaderInterface::class)));
 
@@ -54,7 +60,11 @@ class SearchAndRenderBlockNodeTest extends TestCase
             ], 0),
         ]);
 
-        $node = new SearchAndRenderBlockNode('form_widget', $arguments, 0);
+        if (class_exists(FirstClassTwigCallableReady::class)) {
+            $node = new SearchAndRenderBlockNode(new TwigFunction('form_widget'), $arguments, 0);
+        } else {
+            $node = new SearchAndRenderBlockNode('form_widget', $arguments, 0);
+        }
 
         $compiler = new Compiler(new Environment($this->createMock(LoaderInterface::class)));
 
@@ -74,7 +84,11 @@ class SearchAndRenderBlockNodeTest extends TestCase
             new ConstantExpression('my label', 0),
         ]);
 
-        $node = new SearchAndRenderBlockNode('form_label', $arguments, 0);
+        if (class_exists(FirstClassTwigCallableReady::class)) {
+            $node = new SearchAndRenderBlockNode(new TwigFunction('form_label'), $arguments, 0);
+        } else {
+            $node = new SearchAndRenderBlockNode('form_label', $arguments, 0);
+        }
 
         $compiler = new Compiler(new Environment($this->createMock(LoaderInterface::class)));
 
@@ -94,7 +108,11 @@ class SearchAndRenderBlockNodeTest extends TestCase
             new ConstantExpression(null, 0),
         ]);
 
-        $node = new SearchAndRenderBlockNode('form_label', $arguments, 0);
+        if (class_exists(FirstClassTwigCallableReady::class)) {
+            $node = new SearchAndRenderBlockNode(new TwigFunction('form_label'), $arguments, 0);
+        } else {
+            $node = new SearchAndRenderBlockNode('form_label', $arguments, 0);
+        }
 
         $compiler = new Compiler(new Environment($this->createMock(LoaderInterface::class)));
 
@@ -116,7 +134,11 @@ class SearchAndRenderBlockNodeTest extends TestCase
             new ConstantExpression('', 0),
         ]);
 
-        $node = new SearchAndRenderBlockNode('form_label', $arguments, 0);
+        if (class_exists(FirstClassTwigCallableReady::class)) {
+            $node = new SearchAndRenderBlockNode(new TwigFunction('form_label'), $arguments, 0);
+        } else {
+            $node = new SearchAndRenderBlockNode('form_label', $arguments, 0);
+        }
 
         $compiler = new Compiler(new Environment($this->createMock(LoaderInterface::class)));
 
@@ -137,7 +159,11 @@ class SearchAndRenderBlockNodeTest extends TestCase
             new NameExpression('form', 0),
         ]);
 
-        $node = new SearchAndRenderBlockNode('form_label', $arguments, 0);
+        if (class_exists(FirstClassTwigCallableReady::class)) {
+            $node = new SearchAndRenderBlockNode(new TwigFunction('form_label'), $arguments, 0);
+        } else {
+            $node = new SearchAndRenderBlockNode('form_label', $arguments, 0);
+        }
 
         $compiler = new Compiler(new Environment($this->createMock(LoaderInterface::class)));
 
@@ -161,7 +187,11 @@ class SearchAndRenderBlockNodeTest extends TestCase
             ], 0),
         ]);
 
-        $node = new SearchAndRenderBlockNode('form_label', $arguments, 0);
+        if (class_exists(FirstClassTwigCallableReady::class)) {
+            $node = new SearchAndRenderBlockNode(new TwigFunction('form_label'), $arguments, 0);
+        } else {
+            $node = new SearchAndRenderBlockNode('form_label', $arguments, 0);
+        }
 
         $compiler = new Compiler(new Environment($this->createMock(LoaderInterface::class)));
 
@@ -190,7 +220,11 @@ class SearchAndRenderBlockNodeTest extends TestCase
             ], 0),
         ]);
 
-        $node = new SearchAndRenderBlockNode('form_label', $arguments, 0);
+        if (class_exists(FirstClassTwigCallableReady::class)) {
+            $node = new SearchAndRenderBlockNode(new TwigFunction('form_label'), $arguments, 0);
+        } else {
+            $node = new SearchAndRenderBlockNode('form_label', $arguments, 0);
+        }
 
         $compiler = new Compiler(new Environment($this->createMock(LoaderInterface::class)));
 
@@ -218,7 +252,11 @@ class SearchAndRenderBlockNodeTest extends TestCase
             ),
         ]);
 
-        $node = new SearchAndRenderBlockNode('form_label', $arguments, 0);
+        if (class_exists(FirstClassTwigCallableReady::class)) {
+            $node = new SearchAndRenderBlockNode(new TwigFunction('form_label'), $arguments, 0);
+        } else {
+            $node = new SearchAndRenderBlockNode('form_label', $arguments, 0);
+        }
 
         $compiler = new Compiler(new Environment($this->createMock(LoaderInterface::class)));
 
@@ -256,7 +294,11 @@ class SearchAndRenderBlockNodeTest extends TestCase
             ], 0),
         ]);
 
-        $node = new SearchAndRenderBlockNode('form_label', $arguments, 0);
+        if (class_exists(FirstClassTwigCallableReady::class)) {
+            $node = new SearchAndRenderBlockNode(new TwigFunction('form_label'), $arguments, 0);
+        } else {
+            $node = new SearchAndRenderBlockNode('form_label', $arguments, 0);
+        }
 
         $compiler = new Compiler(new Environment($this->createMock(LoaderInterface::class)));
 

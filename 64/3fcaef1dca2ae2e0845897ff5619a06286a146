@@ -1,0 +1,22 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-08-16T08:49:42Z
+
+I'd go with a bugfix on my side. The side-effect of reverting this on 6.4 would be that requests won't be marked as stateless anymore for some, and that should be fine since this is just adding a safeguard, isn't it?
+
+---------------------------------------------------------------------------
+
+by chalasr at 2024-08-16T09:08:45Z
+
+I agree with reverting this on 6.4.
+About re-introducing this but opt-in, after all I don't think we need much more than what we have already with the session usage panel in the profiler. Maybe some kind of more visible warning could be added there or in the toolbar when the session is used under a stateless firewall.
+
+---------------------------------------------------------------------------
+
+by MatTheCat at 2024-08-16T09:17:07Z
+
+Rebased on 6.4 and updated the description accordingly.
+
+@nicolas-grekas yes the only impact is that you’ll no longer be warned about session usage from a route configured as stateless under a stateless firewall.
+
+@chalasr not sure about what you’re proposing, but I guess that would be another PR anyway!

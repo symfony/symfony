@@ -1,0 +1,41 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-08-16T08:50:23Z
+
+Do we keep one as `@group legacy` for testing purposes?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2024-08-16T08:51:24Z
+
+none of the tests actually depends on the value of the escape character, not sure if we want to add a new test covering it explicitly
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-08-16T09:28:57Z
+
+@chalasr see #57827
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2024-08-16T09:28:58Z
+
+@chalasr I think @alexandre-daubois should have that covered in #57827
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2024-08-16T09:36:25Z
+
+Indeed, I'll address the remaining comment in a couple of days. Thanks for this complementary PR!
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-08-16T09:42:37Z
+
+Isn't the failing test related?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2024-08-16T10:29:55Z
+
+indeed, fixed

@@ -40,7 +40,7 @@ $type->getCollectionValueType()->isNullable(); // returns true
 
 Resources
 ---------
-
+ * [Documentation](https://symfony.com/doc/current/components/type_info.html)
  * [Contributing](https://symfony.com/doc/current/contributing/index.html)
  * [Report issues](https://github.com/symfony/symfony/issues) and
    [send Pull Requests](https://github.com/symfony/symfony/pulls)

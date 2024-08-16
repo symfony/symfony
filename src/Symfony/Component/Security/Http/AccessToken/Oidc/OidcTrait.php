@@ -36,15 +36,15 @@ trait OidcTrait
             $claims[u($claim)->camel()->toString()] = $value;
         }
 
-        if (isset($claims['updatedAt']) && '' !== $claims['updatedAt']) {
+        if ('' !== ($claims['updatedAt'] ?? '')) {
             $claims['updatedAt'] = (new \DateTimeImmutable())->setTimestamp($claims['updatedAt']);
         }
 
-        if (\array_key_exists('emailVerified', $claims) && null !== $claims['emailVerified'] && '' !== $claims['emailVerified']) {
+        if ('' !== ($claims['emailVerified'] ?? '')) {
             $claims['emailVerified'] = (bool) $claims['emailVerified'];
         }
 
-        if (\array_key_exists('phoneNumberVerified', $claims) && null !== $claims['phoneNumberVerified'] && '' !== $claims['phoneNumberVerified']) {
+        if ('' !== ($claims['phoneNumberVerified'] ?? '')) {
             $claims['phoneNumberVerified'] = (bool) $claims['phoneNumberVerified'];
         }
 

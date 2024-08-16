@@ -6,6 +6,7 @@ CHANGELOG
 
  * Pass the current token to the `checkPostAuth()` method of user checkers
  * Deprecate argument `$secret` of `RememberMeAuthenticator`
+ * Add `OAuth2TokenHandler` with OAuth2 Token Introspection support for `AccessTokenAuthenticator`
 
 7.1
 ---

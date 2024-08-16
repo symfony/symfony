@@ -27,7 +27,6 @@ use Symfony\Component\Clock\Clock;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 use Symfony\Component\Security\Http\AccessToken\AccessTokenHandlerInterface;
 use Symfony\Component\Security\Http\AccessToken\Oidc\Exception\InvalidSignatureException;
-use Symfony\Component\Security\Http\AccessToken\Oidc\Exception\MissingClaimException;
 use Symfony\Component\Security\Http\Authenticator\FallbackUserLoader;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
 
@@ -85,19 +84,16 @@ final class OidcTokenHandler implements AccessTokenHandlerInterface
             $headerCheckerManager->check($jws, 0);
 
             // Verify the claims
-            $checkers = [
+            (new ClaimCheckerManager([
                 new Checker\IssuedAtChecker(clock: $this->clock, allowedTimeDrift: 0, protectedHeaderOnly: false),
                 new Checker\NotBeforeChecker(clock: $this->clock, allowedTimeDrift: 0, protectedHeaderOnly: false),
                 new Checker\ExpirationTimeChecker(clock: $this->clock, allowedTimeDrift: 0, protectedHeaderOnly: false),
                 new Checker\AudienceChecker($this->audience),
                 new Checker\IssuerChecker($this->issuers),
-            ];
-            $claimCheckerManager = new ClaimCheckerManager($checkers);
-            // if this check fails, an InvalidClaimException is thrown
-            $claimCheckerManager->check($claims);
+            ]))->check($claims);
 
             if (empty($claims[$this->claim])) {
-                throw new MissingClaimException(\sprintf('"%s" claim not found.', $this->claim));
+                throw new BadCredentialsException(\sprintf('"%s" claim not found.', $this->claim));
             }
 
             // UserLoader argument can be overridden by a UserProvider on AccessTokenAuthenticator::authenticate

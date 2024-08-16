@@ -1,0 +1,15 @@
+---------------------------------------------------------------------------
+
+by mpdude at 2024-08-14T15:13:22Z
+
+Inviting @aschempp as the author of #42355 for a review.
+
+Background: I'm currently investigating a bug where ESI responses miss content. It might be that the change from #42355 – which I think is correct in itself :+1: – creates the condition where the bug appears.
+
+---------------------------------------------------------------------------
+
+by mpdude at 2024-08-15T10:27:45Z
+
+> Sounds like `HttpCache` returns a `304` response without content (which is according to specs), while trying to merge ESI fragments into the main response 🤔
+
+See #58015.

@@ -13,6 +13,7 @@ namespace Symfony\Bridge\Twig\Tests\NodeVisitor;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Twig\NodeVisitor\TranslationNodeVisitor;
+use Twig\Attribute\FirstClassTwigCallableReady;
 use Twig\Environment;
 use Twig\Loader\LoaderInterface;
 use Twig\Node\Expression\ArrayExpression;
@@ -20,6 +21,8 @@ use Twig\Node\Expression\ConstantExpression;
 use Twig\Node\Expression\FilterExpression;
 use Twig\Node\Expression\NameExpression;
 use Twig\Node\Node;
+use Twig\TwigFilter;
+use Twig\TwigFunction;
 
 class TranslationNodeVisitorTest extends TestCase
 {
@@ -38,15 +41,27 @@ class TranslationNodeVisitorTest extends TestCase
     {
         $message = 'new key';
 
-        $node = new FilterExpression(
-            new ConstantExpression($message, 0),
-            new ConstantExpression('trans', 0),
-            new Node([
-                new ArrayExpression([], 0),
-                new NameExpression('variable', 0),
-            ]),
-            0
-        );
+        if (class_exists(FirstClassTwigCallableReady::class)) {
+            $node = new FilterExpression(
+                new ConstantExpression($message, 0),
+                new TwigFilter('trans'),
+                new Node([
+                    new ArrayExpression([], 0),
+                    new NameExpression('variable', 0),
+                ]),
+                0
+            );
+        } else {
+            $node = new FilterExpression(
+                new ConstantExpression($message, 0),
+                new ConstantExpression('trans', 0),
+                new Node([
+                    new ArrayExpression([], 0),
+                    new NameExpression('variable', 0),
+                ]),
+                0
+            );
+        }
 
         $this->testMessagesExtraction($node, [[$message, TranslationNodeVisitor::UNDEFINED_DOMAIN]]);
     }

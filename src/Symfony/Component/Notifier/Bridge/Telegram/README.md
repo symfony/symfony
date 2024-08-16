@@ -17,7 +17,7 @@ where:
 Interacting with local API server instead of official Telegram API
 ------------------------------------------------------------------
 
-If such a case is needed, you can simply replace the `default` keyword in the DSN
+If such a case is needed, you can replace the `default` keyword in the DSN
 with the desired domain/IP address of your local API server. You may also want to
 disable the notifier default behavior of using `https` protocol as local API servers
 can only accept `http` traffic.

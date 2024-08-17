@@ -149,7 +149,7 @@ CSV
         $this->encoder = new CsvEncoder([
             CsvEncoder::DELIMITER_KEY => ';',
             CsvEncoder::ENCLOSURE_KEY => "'",
-            CsvEncoder::ESCAPE_CHAR_KEY => \PHP_VERSION_ID < 70400 ? '|' : '',
+            CsvEncoder::ESCAPE_CHAR_KEY => '',
             CsvEncoder::KEY_SEPARATOR_KEY => '-',
         ]);
 
@@ -175,7 +175,7 @@ CSV
             , $this->encoder->encode($value, 'csv', [
                 CsvEncoder::DELIMITER_KEY => ';',
                 CsvEncoder::ENCLOSURE_KEY => "'",
-                CsvEncoder::ESCAPE_CHAR_KEY => \PHP_VERSION_ID < 70400 ? '|' : '',
+                CsvEncoder::ESCAPE_CHAR_KEY => '',
                 CsvEncoder::KEY_SEPARATOR_KEY => '-',
             ]));
     }
@@ -185,7 +185,7 @@ CSV
         $encoder = new CsvEncoder([
             CsvEncoder::DELIMITER_KEY => ';',
             CsvEncoder::ENCLOSURE_KEY => "'",
-            CsvEncoder::ESCAPE_CHAR_KEY => \PHP_VERSION_ID < 70400 ? '|' : '',
+            CsvEncoder::ESCAPE_CHAR_KEY => '',
             CsvEncoder::KEY_SEPARATOR_KEY => '-',
         ]);
         $value = ['a' => 'he\'llo', 'c' => ['d' => 'foo']];
@@ -574,7 +574,7 @@ CSV
         $this->encoder = new CsvEncoder([
             CsvEncoder::DELIMITER_KEY => ';',
             CsvEncoder::ENCLOSURE_KEY => "'",
-            CsvEncoder::ESCAPE_CHAR_KEY => \PHP_VERSION_ID < 70400 ? '|' : '',
+            CsvEncoder::ESCAPE_CHAR_KEY => '',
             CsvEncoder::KEY_SEPARATOR_KEY => '-',
         ]);
 
@@ -596,7 +596,7 @@ CSV
             , 'csv', [
                 CsvEncoder::DELIMITER_KEY => ';',
                 CsvEncoder::ENCLOSURE_KEY => "'",
-                CsvEncoder::ESCAPE_CHAR_KEY => \PHP_VERSION_ID < 70400 ? '|' : '',
+                CsvEncoder::ESCAPE_CHAR_KEY => '',
                 CsvEncoder::KEY_SEPARATOR_KEY => '-',
             ]));
     }
@@ -606,7 +606,7 @@ CSV
         $encoder = new CsvEncoder([
             CsvEncoder::DELIMITER_KEY => ';',
             CsvEncoder::ENCLOSURE_KEY => "'",
-            CsvEncoder::ESCAPE_CHAR_KEY => \PHP_VERSION_ID < 70400 ? '|' : '',
+            CsvEncoder::ESCAPE_CHAR_KEY => '',
             CsvEncoder::KEY_SEPARATOR_KEY => '-',
             CsvEncoder::AS_COLLECTION_KEY => true, // Can be removed in 5.0
         ]);

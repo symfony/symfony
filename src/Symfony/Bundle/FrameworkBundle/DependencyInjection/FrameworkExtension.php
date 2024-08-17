@@ -550,7 +550,7 @@ class FrameworkExtension extends Extension
         if ($this->readConfigEnabled('webhook', $container, $config['webhook'])) {
             $this->registerWebhookConfiguration($config['webhook'], $container, $loader, $this->readConfigEnabled('serializer', $container, $config['serializer']));
 
-            // If Webhook is installed but the HttpClient or Serializer components are not available, we should throw an error
+            // If Webhook is installed but the HttpClient component is not available, we should throw an error
             if (!$this->readConfigEnabled('http_client', $container, $config['http_client'])) {
                 $container->getDefinition('webhook.transport')
                     ->setArguments([])

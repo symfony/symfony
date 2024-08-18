@@ -66,7 +66,7 @@ class ClassExistenceResource implements SelfCheckingResourceInterface
                 throw new \ReflectionException($exists[1]);
             }
         } elseif ([false, null] === $exists = [$loaded, null]) {
-            $thrower = fn(string $name) => (__CLASS__.'::throwOnRequiredClass')($name);
+            $thrower = fn(string $name) => self::throwOnRequiredClass($name);
             if (!self::$autoloadLevel++) {
                 spl_autoload_register($thrower);
             }

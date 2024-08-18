@@ -33,6 +33,34 @@ class AbstractRequestRateLimiterTest extends TestCase
         $this->assertSame($expected, $rateLimiter->consume(new Request()));
     }
 
+    public function testConsumeWithoutLimiterAddsSpecialNoLimiter()
+    {
+        $rateLimiter = new MockAbstractRequestRateLimiter([]);
+
+        try {
+            $this->assertSame(\PHP_INT_MAX, $rateLimiter->consume(new Request())->getLimit());
+        } catch (\TypeError $error) {
+            if (str_contains($error->getMessage(), 'RateLimit::__construct(): Argument #1 ($availableTokens) must be of type int, float given')) {
+                $this->markTestSkipped('This test cannot be run on a version of the RateLimiter component that uses \INF instead of \PHP_INT_MAX in NoLimiter.');
+            }
+
+            throw $error;
+        }
+    }
+
+    public function testResetLimiters()
+    {
+        $rateLimiter = new MockAbstractRequestRateLimiter([
+            $limiter1 = $this->createMock(LimiterInterface::class),
+            $limiter2 = $this->createMock(LimiterInterface::class),
+        ]);
+
+        $limiter1->expects($this->once())->method('reset');
+        $limiter2->expects($this->once())->method('reset');
+
+        $rateLimiter->reset(new Request());
+    }
+
     public static function provideRateLimits()
     {
         $now = new \DateTimeImmutable();

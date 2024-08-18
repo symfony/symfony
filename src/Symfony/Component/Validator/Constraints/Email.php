@@ -62,6 +62,10 @@ class Email extends Constraint
             throw new InvalidArgumentException('The "mode" parameter value is not valid.');
         }
 
+        if (null !== $mode && !\in_array($mode, self::VALIDATION_MODES, true)) {
+            throw new InvalidArgumentException('The "mode" parameter value is not valid.');
+        }
+
         parent::__construct($options, $groups, $payload);
 
         $this->message = $message ?? $this->message;
@@ -69,11 +73,11 @@ class Email extends Constraint
         $this->normalizer = $normalizer ?? $this->normalizer;
 
         if (self::VALIDATION_MODE_STRICT === $this->mode && !class_exists(StrictEmailValidator::class)) {
-            throw new LogicException(sprintf('The "egulias/email-validator" component is required to use the "%s" constraint in strict mode. Try running "composer require egulias/email-validator".', __CLASS__));
+            throw new LogicException(\sprintf('The "egulias/email-validator" component is required to use the "%s" constraint in strict mode. Try running "composer require egulias/email-validator".', __CLASS__));
         }
 
         if (null !== $this->normalizer && !\is_callable($this->normalizer)) {
-            throw new InvalidArgumentException(sprintf('The "normalizer" option must be a valid callable ("%s" given).', get_debug_type($this->normalizer)));
+            throw new InvalidArgumentException(\sprintf('The "normalizer" option must be a valid callable ("%s" given).', get_debug_type($this->normalizer)));
         }
     }
 }

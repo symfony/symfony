@@ -29,6 +29,9 @@ use Symfony\Component\Process\PhpProcess;
  * you need to also implement the getScript() method.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @template TRequest of object
+ * @template TResponse of object
  */
 abstract class AbstractBrowser
 {
@@ -36,8 +39,10 @@ abstract class AbstractBrowser
     protected CookieJar $cookieJar;
     protected array $server = [];
     protected Request $internalRequest;
+    /** @psalm-var TRequest */
     protected object $request;
     protected Response $internalResponse;
+    /** @psalm-var TResponse */
     protected object $response;
     protected Crawler $crawler;
     protected bool $useHtml5Parser = true;
@@ -192,7 +197,7 @@ abstract class AbstractBrowser
      */
     public function getCrawler(): Crawler
     {
-        return $this->crawler ?? throw new BadMethodCallException(sprintf('The "request()" method must be called before "%s()".', __METHOD__));
+        return $this->crawler ?? throw new BadMethodCallException(\sprintf('The "request()" method must be called before "%s()".', __METHOD__));
     }
 
     /**
@@ -212,7 +217,7 @@ abstract class AbstractBrowser
      */
     public function getInternalResponse(): Response
     {
-        return $this->internalResponse ?? throw new BadMethodCallException(sprintf('The "request()" method must be called before "%s()".', __METHOD__));
+        return $this->internalResponse ?? throw new BadMethodCallException(\sprintf('The "request()" method must be called before "%s()".', __METHOD__));
     }
 
     /**
@@ -221,11 +226,13 @@ abstract class AbstractBrowser
      * The origin response is the response instance that is returned
      * by the code that handles requests.
      *
+     * @psalm-return TResponse
+     *
      * @see doRequest()
      */
     public function getResponse(): object
     {
-        return $this->response ?? throw new BadMethodCallException(sprintf('The "request()" method must be called before "%s()".', __METHOD__));
+        return $this->response ?? throw new BadMethodCallException(\sprintf('The "request()" method must be called before "%s()".', __METHOD__));
     }
 
     /**
@@ -233,7 +240,7 @@ abstract class AbstractBrowser
      */
     public function getInternalRequest(): Request
     {
-        return $this->internalRequest ?? throw new BadMethodCallException(sprintf('The "request()" method must be called before "%s()".', __METHOD__));
+        return $this->internalRequest ?? throw new BadMethodCallException(\sprintf('The "request()" method must be called before "%s()".', __METHOD__));
     }
 
     /**
@@ -242,11 +249,13 @@ abstract class AbstractBrowser
      * The origin request is the request instance that is sent
      * to the code that handles requests.
      *
+     * @psalm-return TRequest
+     *
      * @see doRequest()
      */
     public function getRequest(): object
     {
-        return $this->request ?? throw new BadMethodCallException(sprintf('The "request()" method must be called before "%s()".', __METHOD__));
+        return $this->request ?? throw new BadMethodCallException(\sprintf('The "request()" method must be called before "%s()".', __METHOD__));
     }
 
     /**
@@ -271,7 +280,7 @@ abstract class AbstractBrowser
      */
     public function clickLink(string $linkText, array $serverParameters = []): Crawler
     {
-        $crawler = $this->crawler ?? throw new BadMethodCallException(sprintf('The "request()" method must be called before "%s()".', __METHOD__));
+        $crawler = $this->crawler ?? throw new BadMethodCallException(\sprintf('The "request()" method must be called before "%s()".', __METHOD__));
 
         return $this->click($crawler->selectLink($linkText)->link(), $serverParameters);
     }
@@ -300,11 +309,11 @@ abstract class AbstractBrowser
      */
     public function submitForm(string $button, array $fieldValues = [], string $method = 'POST', array $serverParameters = []): Crawler
     {
-        $crawler = $this->crawler ?? throw new BadMethodCallException(sprintf('The "request()" method must be called before "%s()".', __METHOD__));
+        $crawler = $this->crawler ?? throw new BadMethodCallException(\sprintf('The "request()" method must be called before "%s()".', __METHOD__));
         $buttonNode = $crawler->selectButton($button);
 
         if (0 === $buttonNode->count()) {
-            throw new InvalidArgumentException(sprintf('There is no button with "%s" as its content, id, value or name.', $button));
+            throw new InvalidArgumentException(\sprintf('There is no button with "%s" as its content, id, value or name.', $button));
         }
 
         $form = $buttonNode->form($fieldValues, $method);
@@ -402,7 +411,9 @@ abstract class AbstractBrowser
     /**
      * Makes a request in another process.
      *
-     * @return object
+     * @psalm-param TRequest $request
+     *
+     * @psalm-return TResponse
      *
      * @throws \RuntimeException When processing returns exit code
      */
@@ -428,7 +439,7 @@ abstract class AbstractBrowser
         }
 
         if (!$process->isSuccessful() || !preg_match('/^O\:\d+\:/', $process->getOutput())) {
-            throw new RuntimeException(sprintf('OUTPUT: %s ERROR OUTPUT: %s.', $process->getOutput(), $process->getErrorOutput()));
+            throw new RuntimeException(\sprintf('OUTPUT: %s ERROR OUTPUT: %s.', $process->getOutput(), $process->getErrorOutput()));
         }
 
         return unserialize($process->getOutput());
@@ -437,12 +448,16 @@ abstract class AbstractBrowser
     /**
      * Makes a request.
      *
-     * @return object
+     * @psalm-param TRequest $request
+     *
+     * @psalm-return TResponse
      */
     abstract protected function doRequest(object $request);
 
     /**
      * Returns the script to execute when the request must be insulated.
+     *
+     * @psalm-param TRequest $request
      *
      * @param object $request An origin request instance
      *
@@ -459,6 +474,8 @@ abstract class AbstractBrowser
      * Filters the BrowserKit request to the origin one.
      *
      * @return object
+     *
+     * @psalm-return TRequest
      */
     protected function filterRequest(Request $request)
     {
@@ -467,6 +484,8 @@ abstract class AbstractBrowser
 
     /**
      * Filters the origin response to the BrowserKit one.
+     *
+     * @psalm-param TResponse $response
      *
      * @return Response
      */
@@ -531,14 +550,14 @@ abstract class AbstractBrowser
      */
     public function followRedirect(): Crawler
     {
-        if (empty($this->redirect)) {
+        if (!$this->redirect) {
             throw new LogicException('The request was not redirected.');
         }
 
         if (-1 !== $this->maxRedirects) {
             if ($this->redirectCount > $this->maxRedirects) {
                 $this->redirectCount = 0;
-                throw new LogicException(sprintf('The maximum number (%d) of redirections was reached.', $this->maxRedirects));
+                throw new LogicException(\sprintf('The maximum number (%d) of redirections was reached.', $this->maxRedirects));
             }
         }
 
@@ -612,7 +631,7 @@ abstract class AbstractBrowser
         if (!$this->history->isEmpty()) {
             $currentUri = $this->history->current()->getUri();
         } else {
-            $currentUri = sprintf('http%s://%s/',
+            $currentUri = \sprintf('http%s://%s/',
                 isset($this->server['HTTPS']) ? 's' : '',
                 $this->server['HTTP_HOST'] ?? 'localhost'
             );

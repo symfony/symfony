@@ -39,21 +39,19 @@ use Symfony\Contracts\Service\ServiceProviderInterface;
 #[AsCommand(name: 'messenger:failed:retry', description: 'Retry one or more messages from the failure transport')]
 class FailedMessagesRetryCommand extends AbstractFailedMessagesCommand implements SignalableCommandInterface
 {
-    private EventDispatcherInterface $eventDispatcher;
-    private MessageBusInterface $messageBus;
-    private ?LoggerInterface $logger;
-    private ?array $signals;
     private bool $shouldStop = false;
     private bool $forceExit = false;
     private ?Worker $worker = null;
 
-    public function __construct(?string $globalReceiverName, ServiceProviderInterface $failureTransports, MessageBusInterface $messageBus, EventDispatcherInterface $eventDispatcher, ?LoggerInterface $logger = null, ?PhpSerializer $phpSerializer = null, ?array $signals = null)
-    {
-        $this->eventDispatcher = $eventDispatcher;
-        $this->messageBus = $messageBus;
-        $this->logger = $logger;
-        $this->signals = $signals;
-
+    public function __construct(
+        ?string $globalReceiverName,
+        ServiceProviderInterface $failureTransports,
+        private MessageBusInterface $messageBus,
+        private EventDispatcherInterface $eventDispatcher,
+        private ?LoggerInterface $logger = null,
+        ?PhpSerializer $phpSerializer = null,
+        private ?array $signals = null,
+    ) {
         parent::__construct($globalReceiverName, $failureTransports, $phpSerializer);
     }
 
@@ -109,7 +107,7 @@ EOF
         $receiver = $this->getReceiver($failureTransportName);
         $this->printPendingMessagesMessage($receiver, $io);
 
-        $io->writeln(sprintf('To retry all the messages, run <comment>messenger:consume %s</comment>', $failureTransportName));
+        $io->writeln(\sprintf('To retry all the messages, run <comment>messenger:consume %s</comment>', $failureTransportName));
 
         $shouldForce = $input->getOption('force');
         $ids = $input->getArgument('id');
@@ -134,7 +132,7 @@ EOF
 
     public function getSubscribedSignals(): array
     {
-        return $this->signals ?? (\extension_loaded('pcntl') ? [\SIGTERM, \SIGINT] : []);
+        return $this->signals ?? (\extension_loaded('pcntl') ? [\SIGTERM, \SIGINT, \SIGQUIT] : []);
     }
 
     public function handleSignal(int $signal, int|false $previousExitCode = 0): int|false
@@ -201,7 +199,7 @@ EOF
             $this->displaySingleMessage($envelope, $io);
 
             if ($envelope->last(MessageDecodingFailedStamp::class)) {
-                throw new \RuntimeException(sprintf('The message with id "%s" could not decoded, it can only be shown or removed.', $this->getMessageId($envelope) ?? '?'));
+                throw new \RuntimeException(\sprintf('The message with id "%s" could not decoded, it can only be shown or removed.', $this->getMessageId($envelope) ?? '?'));
             }
 
             $this->forceExit = true;
@@ -242,7 +240,7 @@ EOF
         $receiver = $this->getReceiver($failureTransportName);
 
         if (!$receiver instanceof ListableReceiverInterface) {
-            throw new RuntimeException(sprintf('The "%s" receiver does not support retrying messages by id.', $failureTransportName));
+            throw new RuntimeException(\sprintf('The "%s" receiver does not support retrying messages by id.', $failureTransportName));
         }
 
         foreach ($ids as $id) {
@@ -253,7 +251,7 @@ EOF
                 $this->phpSerializer?->rejectPhpIncompleteClass();
             }
             if (null === $envelope) {
-                throw new RuntimeException(sprintf('The message "%s" was not found.', $id));
+                throw new RuntimeException(\sprintf('The message "%s" was not found.', $id));
             }
 
             $singleReceiver = new SingleMessageReceiver($receiver, $envelope);

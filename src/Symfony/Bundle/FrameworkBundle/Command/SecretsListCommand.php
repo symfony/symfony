@@ -62,7 +62,7 @@ EOF
         $io->comment('Use <info>"%env(<name>)%"</info> to reference a secret in a config file.');
 
         if (!$reveal = $input->getOption('reveal')) {
-            $io->comment(sprintf('To reveal the secrets run <info>php %s %s --reveal</info>', $_SERVER['PHP_SELF'], $this->getName()));
+            $io->comment(\sprintf('To reveal the secrets run <info>php %s %s --reveal</info>', $_SERVER['PHP_SELF'], $this->getName()));
         }
 
         $secrets = $this->vault->list($reveal);

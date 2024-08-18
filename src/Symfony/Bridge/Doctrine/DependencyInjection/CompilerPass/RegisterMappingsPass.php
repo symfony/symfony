@@ -33,41 +33,6 @@ use Symfony\Component\DependencyInjection\Reference;
 abstract class RegisterMappingsPass implements CompilerPassInterface
 {
     /**
-     * DI object for the driver to use, either a service definition for a
-     * private service or a reference for a public service.
-     */
-    protected Definition|Reference $driver;
-
-    /**
-     * List of namespaces handled by the driver.
-     *
-     * @var string[]
-     */
-    protected array $namespaces;
-
-    /**
-     * List of potential container parameters that hold the object manager name
-     * to register the mappings with the correct metadata driver, for example
-     * ['acme.manager', 'doctrine.default_entity_manager'].
-     *
-     * @var string[]
-     */
-    protected array $managerParameters;
-
-    /**
-     * Naming pattern of the metadata chain driver service ids, for example
-     * 'doctrine.orm.%s_metadata_driver'.
-     */
-    protected string $driverPattern;
-
-    /**
-     * A name for a parameter in the container. If set, this compiler pass will
-     * only do anything if the parameter is present. (But regardless of the
-     * value of that parameter.
-     */
-    protected string|false $enabledParameter;
-
-    /**
      * The $managerParameters is an ordered list of container parameters that could provide the
      * name of the manager to register these namespaces and alias on. The first non-empty name
      * is used, the others skipped.
@@ -79,10 +44,10 @@ abstract class RegisterMappingsPass implements CompilerPassInterface
      * @param string[]             $namespaces              List of namespaces handled by $driver
      * @param string[]             $managerParameters       list of container parameters that could
      *                                                      hold the manager name
-     * @param string               $driverPattern           Pattern for the metadata driver service name
+     * @param string               $driverPattern           Pattern for the metadata chain driver service ids (e.g. "doctrine.orm.%s_metadata_driver")
      * @param string|false         $enabledParameter        Service container parameter that must be
-     *                                                      present to enable the mapping. Set to false
-     *                                                      to not do any check, optional.
+     *                                                      present to enable the mapping (regardless of the
+     *                                                      parameter value). Pass false to not do any check.
      * @param string               $configurationPattern    Pattern for the Configuration service name,
      *                                                      for example 'doctrine.orm.%s_configuration'.
      * @param string               $registerAliasMethodName Method name to call on the configuration service. This
@@ -91,21 +56,15 @@ abstract class RegisterMappingsPass implements CompilerPassInterface
      * @param string[]             $aliasMap                Map of alias to namespace
      */
     public function __construct(
-        Definition|Reference $driver,
-        array $namespaces,
-        array $managerParameters,
-        string $driverPattern,
-        string|false $enabledParameter = false,
+        protected Definition|Reference $driver,
+        protected array $namespaces,
+        protected array $managerParameters,
+        protected string $driverPattern,
+        protected string|false $enabledParameter = false,
         private readonly string $configurationPattern = '',
         private readonly string $registerAliasMethodName = '',
         private readonly array $aliasMap = [],
     ) {
-        $this->driver = $driver;
-        $this->namespaces = $namespaces;
-        $this->managerParameters = $managerParameters;
-        $this->driverPattern = $driverPattern;
-        $this->enabledParameter = $enabledParameter;
-
         if ($aliasMap && (!$configurationPattern || !$registerAliasMethodName)) {
             throw new \InvalidArgumentException('configurationPattern and registerAliasMethodName are required to register namespace alias.');
         }
@@ -149,7 +108,7 @@ abstract class RegisterMappingsPass implements CompilerPassInterface
      */
     protected function getChainDriverServiceName(ContainerBuilder $container): string
     {
-        return sprintf($this->driverPattern, $this->getManagerName($container));
+        return \sprintf($this->driverPattern, $this->getManagerName($container));
     }
 
     /**
@@ -171,7 +130,7 @@ abstract class RegisterMappingsPass implements CompilerPassInterface
      */
     private function getConfigurationServiceName(ContainerBuilder $container): string
     {
-        return sprintf($this->configurationPattern, $this->getManagerName($container));
+        return \sprintf($this->configurationPattern, $this->getManagerName($container));
     }
 
     /**
@@ -193,7 +152,7 @@ abstract class RegisterMappingsPass implements CompilerPassInterface
             }
         }
 
-        throw new InvalidArgumentException(sprintf('Could not find the manager name parameter in the container. Tried the following parameter names: "%s".', implode('", "', $this->managerParameters)));
+        throw new InvalidArgumentException(\sprintf('Could not find the manager name parameter in the container. Tried the following parameter names: "%s".', implode('", "', $this->managerParameters)));
     }
 
     /**

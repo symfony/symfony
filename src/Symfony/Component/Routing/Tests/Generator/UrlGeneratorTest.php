@@ -13,7 +13,7 @@ namespace Symfony\Component\Routing\Tests\Generator;
 
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
-use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
+use Symfony\Bridge\PhpUnit\ExpectUserDeprecationMessageTrait;
 use Symfony\Component\Routing\Exception\InvalidParameterException;
 use Symfony\Component\Routing\Exception\MissingMandatoryParametersException;
 use Symfony\Component\Routing\Exception\RouteCircularReferenceException;
@@ -26,7 +26,7 @@ use Symfony\Component\Routing\RouteCollection;
 
 class UrlGeneratorTest extends TestCase
 {
-    use ExpectDeprecationTrait;
+    use ExpectUserDeprecationMessageTrait;
 
     public function testAbsoluteUrlWithPort80()
     {
@@ -811,7 +811,7 @@ class UrlGeneratorTest extends TestCase
      */
     public function testDeprecatedAlias()
     {
-        $this->expectDeprecation('Since foo/bar 1.0.0: The "b" route alias is deprecated. You should stop using it, as it will be removed in the future.');
+        $this->expectUserDeprecationMessage('Since foo/bar 1.0.0: The "b" route alias is deprecated. You should stop using it, as it will be removed in the future.');
 
         $routes = new RouteCollection();
         $routes->add('a', new Route('/foo'));
@@ -826,7 +826,7 @@ class UrlGeneratorTest extends TestCase
      */
     public function testDeprecatedAliasWithCustomMessage()
     {
-        $this->expectDeprecation('Since foo/bar 1.0.0: foo b.');
+        $this->expectUserDeprecationMessage('Since foo/bar 1.0.0: foo b.');
 
         $routes = new RouteCollection();
         $routes->add('a', new Route('/foo'));
@@ -841,7 +841,7 @@ class UrlGeneratorTest extends TestCase
      */
     public function testTargettingADeprecatedAliasShouldTriggerDeprecation()
     {
-        $this->expectDeprecation('Since foo/bar 1.0.0: foo b.');
+        $this->expectUserDeprecationMessage('Since foo/bar 1.0.0: foo b.');
 
         $routes = new RouteCollection();
         $routes->add('a', new Route('/foo'));
@@ -1076,7 +1076,7 @@ class UrlGeneratorTest extends TestCase
 
 class StringableObject
 {
-    public function __toString()
+    public function __toString(): string
     {
         return 'bar';
     }
@@ -1086,7 +1086,7 @@ class StringableObjectWithPublicProperty
 {
     public $foo = 'property';
 
-    public function __toString()
+    public function __toString(): string
     {
         return 'bar';
     }

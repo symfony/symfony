@@ -66,7 +66,7 @@ class RedisTagAwareAdapter extends AbstractTagAwareAdapter
         ?MarshallerInterface $marshaller = null,
     ) {
         if ($redis instanceof \Predis\ClientInterface && $redis->getConnection() instanceof ClusterInterface && !$redis->getConnection() instanceof PredisCluster) {
-            throw new InvalidArgumentException(sprintf('Unsupported Predis cluster connection: only "%s" is, "%s" given.', PredisCluster::class, get_debug_type($redis->getConnection())));
+            throw new InvalidArgumentException(\sprintf('Unsupported Predis cluster connection: only "%s" is, "%s" given.', PredisCluster::class, get_debug_type($redis->getConnection())));
         }
 
         $isRelay = $redis instanceof Relay;
@@ -75,7 +75,7 @@ class RedisTagAwareAdapter extends AbstractTagAwareAdapter
 
             foreach (\is_array($compression) ? $compression : [$compression] as $c) {
                 if ($isRelay ? Relay::COMPRESSION_NONE : \Redis::COMPRESSION_NONE !== $c) {
-                    throw new InvalidArgumentException(sprintf('redis compression must be disabled when using "%s", use "%s" instead.', static::class, DeflateMarshaller::class));
+                    throw new InvalidArgumentException(\sprintf('redis compression must be disabled when using "%s", use "%s" instead.', static::class, DeflateMarshaller::class));
                 }
             }
         }
@@ -87,7 +87,7 @@ class RedisTagAwareAdapter extends AbstractTagAwareAdapter
     {
         $eviction = $this->getRedisEvictionPolicy();
         if ('noeviction' !== $eviction && !str_starts_with($eviction, 'volatile-')) {
-            throw new LogicException(sprintf('Redis maxmemory-policy setting "%s" is *not* supported by RedisTagAwareAdapter, use "noeviction" or "volatile-*" eviction policies.', $eviction));
+            throw new LogicException(\sprintf('Redis maxmemory-policy setting "%s" is *not* supported by RedisTagAwareAdapter, use "noeviction" or "volatile-*" eviction policies.', $eviction));
         }
 
         // serialize values

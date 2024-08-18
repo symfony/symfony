@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Serializer\Normalizer;
 
-use Symfony\Component\PropertyInfo\Type;
 use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
 
@@ -51,11 +50,7 @@ final class DateTimeNormalizer implements NormalizerInterface, DenormalizerInter
 
     public function getSupportedTypes(?string $format): array
     {
-        return [
-            \DateTimeInterface::class => true,
-            \DateTimeImmutable::class => true,
-            \DateTime::class => true,
-        ];
+        return self::SUPPORTED_TYPES;
     }
 
     /**
@@ -94,13 +89,17 @@ final class DateTimeNormalizer implements NormalizerInterface, DenormalizerInter
     {
         if (\is_int($data) || \is_float($data)) {
             switch ($context[self::FORMAT_KEY] ?? $this->defaultContext[self::FORMAT_KEY] ?? null) {
-                case 'U': $data = sprintf('%d', $data); break;
-                case 'U.u': $data = sprintf('%.6F', $data); break;
+                case 'U':
+                    $data = \sprintf('%d', $data);
+                    break;
+                case 'U.u':
+                    $data = \sprintf('%.6F', $data);
+                    break;
             }
         }
 
         if (!\is_string($data) || '' === trim($data)) {
-            throw NotNormalizableValueException::createForUnexpectedDataType('The data is either not an string, an empty string, or null; you should pass a string that can be parsed with the passed format or a valid DateTime string.', $data, [Type::BUILTIN_TYPE_STRING], $context['deserialization_path'] ?? null, true);
+            throw NotNormalizableValueException::createForUnexpectedDataType('The data is either not an string, an empty string, or null; you should pass a string that can be parsed with the passed format or a valid DateTime string.', $data, ['string'], $context['deserialization_path'] ?? null, true);
         }
 
         try {
@@ -118,7 +117,7 @@ final class DateTimeNormalizer implements NormalizerInterface, DenormalizerInter
 
                 $dateTimeErrors = $type::getLastErrors();
 
-                throw NotNormalizableValueException::createForUnexpectedDataType(sprintf('Parsing datetime string "%s" using format "%s" resulted in %d errors: ', $data, $dateTimeFormat, $dateTimeErrors['error_count'])."\n".implode("\n", $this->formatDateTimeErrors($dateTimeErrors['errors'])), $data, [Type::BUILTIN_TYPE_STRING], $context['deserialization_path'] ?? null, true);
+                throw NotNormalizableValueException::createForUnexpectedDataType(\sprintf('Parsing datetime string "%s" using format "%s" resulted in %d errors: ', $data, $dateTimeFormat, $dateTimeErrors['error_count'])."\n".implode("\n", $this->formatDateTimeErrors($dateTimeErrors['errors'])), $data, ['string'], $context['deserialization_path'] ?? null, true);
             }
 
             $defaultDateTimeFormat = $this->defaultContext[self::FORMAT_KEY] ?? null;
@@ -133,7 +132,7 @@ final class DateTimeNormalizer implements NormalizerInterface, DenormalizerInter
         } catch (NotNormalizableValueException $e) {
             throw $e;
         } catch (\Exception $e) {
-            throw NotNormalizableValueException::createForUnexpectedDataType($e->getMessage(), $data, [Type::BUILTIN_TYPE_STRING], $context['deserialization_path'] ?? null, false, $e->getCode(), $e);
+            throw NotNormalizableValueException::createForUnexpectedDataType($e->getMessage(), $data, ['string'], $context['deserialization_path'] ?? null, false, $e->getCode(), $e);
         }
     }
 
@@ -152,7 +151,7 @@ final class DateTimeNormalizer implements NormalizerInterface, DenormalizerInter
         $formattedErrors = [];
 
         foreach ($errors as $pos => $message) {
-            $formattedErrors[] = sprintf('at position %d: %s', $pos, $message);
+            $formattedErrors[] = \sprintf('at position %d: %s', $pos, $message);
         }
 
         return $formattedErrors;

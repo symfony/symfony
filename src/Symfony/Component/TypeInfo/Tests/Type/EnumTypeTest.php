@@ -23,6 +23,11 @@ class EnumTypeTest extends TestCase
         $this->assertSame(DummyEnum::class, (string) new EnumType(DummyEnum::class));
     }
 
+    public function testGetBaseType()
+    {
+        $this->assertEquals(new EnumType(DummyEnum::class), (new EnumType(DummyEnum::class))->getBaseType());
+    }
+
     public function testIsNullable()
     {
         $this->assertFalse((new EnumType(DummyEnum::class))->isNullable());
@@ -39,5 +44,8 @@ class EnumTypeTest extends TestCase
     {
         $this->assertFalse((new EnumType(DummyEnum::class))->isA(TypeIdentifier::ARRAY));
         $this->assertTrue((new EnumType(DummyEnum::class))->isA(TypeIdentifier::OBJECT));
+        $this->assertTrue((new EnumType(DummyEnum::class))->isA(DummyEnum::class));
+        $this->assertTrue((new EnumType(DummyEnum::class))->isA(\UnitEnum::class));
+        $this->assertFalse((new EnumType(DummyEnum::class))->isA(\BackedEnum::class));
     }
 }

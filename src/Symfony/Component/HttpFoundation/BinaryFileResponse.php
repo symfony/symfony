@@ -70,7 +70,7 @@ class BinaryFileResponse extends Response
             if ($file instanceof \SplFileInfo) {
                 $file = new File($file->getPathname(), !$isTemporaryFile);
             } else {
-                $file = new File((string) $file);
+                $file = new File($file);
             }
         }
 
@@ -110,8 +110,8 @@ class BinaryFileResponse extends Response
      */
     public function setChunkSize(int $chunkSize): static
     {
-        if ($chunkSize < 1 || $chunkSize > \PHP_INT_MAX) {
-            throw new \LogicException('The chunk size of a BinaryFileResponse cannot be less than 1 or greater than PHP_INT_MAX.');
+        if ($chunkSize < 1) {
+            throw new \InvalidArgumentException('The chunk size of a BinaryFileResponse cannot be less than 1.');
         }
 
         $this->chunkSize = $chunkSize;
@@ -256,13 +256,13 @@ class BinaryFileResponse extends Response
                         $end = min($end, $fileSize - 1);
                         if ($start < 0 || $start > $end) {
                             $this->setStatusCode(416);
-                            $this->headers->set('Content-Range', sprintf('bytes */%s', $fileSize));
+                            $this->headers->set('Content-Range', \sprintf('bytes */%s', $fileSize));
                         } elseif ($end - $start < $fileSize - 1) {
                             $this->maxlen = $end < $fileSize ? $end - $start + 1 : -1;
                             $this->offset = $start;
 
                             $this->setStatusCode(206);
-                            $this->headers->set('Content-Range', sprintf('bytes %s-%s/%s', $start, $end, $fileSize));
+                            $this->headers->set('Content-Range', \sprintf('bytes %s-%s/%s', $start, $end, $fileSize));
                             $this->headers->set('Content-Length', $end - $start + 1);
                         }
                     }

@@ -40,23 +40,15 @@ class WebDebugToolbarListener implements EventSubscriberInterface
     public const DISABLED = 1;
     public const ENABLED = 2;
 
-    private Environment $twig;
-    private ?UrlGeneratorInterface $urlGenerator;
-    private bool $interceptRedirects;
-    private int $mode;
-    private string $excludedAjaxPaths;
-    private ?ContentSecurityPolicyHandler $cspHandler;
-    private ?DumpDataCollector $dumpDataCollector;
-
-    public function __construct(Environment $twig, bool $interceptRedirects = false, int $mode = self::ENABLED, ?UrlGeneratorInterface $urlGenerator = null, string $excludedAjaxPaths = '^/bundles|^/_wdt', ?ContentSecurityPolicyHandler $cspHandler = null, ?DumpDataCollector $dumpDataCollector = null)
-    {
-        $this->twig = $twig;
-        $this->urlGenerator = $urlGenerator;
-        $this->interceptRedirects = $interceptRedirects;
-        $this->mode = $mode;
-        $this->excludedAjaxPaths = $excludedAjaxPaths;
-        $this->cspHandler = $cspHandler;
-        $this->dumpDataCollector = $dumpDataCollector;
+    public function __construct(
+        private Environment $twig,
+        private bool $interceptRedirects = false,
+        private int $mode = self::ENABLED,
+        private ?UrlGeneratorInterface $urlGenerator = null,
+        private string $excludedAjaxPaths = '^/bundles|^/_wdt',
+        private ?ContentSecurityPolicyHandler $cspHandler = null,
+        private ?DumpDataCollector $dumpDataCollector = null,
+    ) {
     }
 
     public function isEnabled(): bool
@@ -67,7 +59,7 @@ class WebDebugToolbarListener implements EventSubscriberInterface
     public function setMode(int $mode): void
     {
         if (self::DISABLED !== $mode && self::ENABLED !== $mode) {
-            throw new \InvalidArgumentException(sprintf('Invalid value provided for mode, use one of "%s::DISABLED" or "%s::ENABLED".', self::class, self::class));
+            throw new \InvalidArgumentException(\sprintf('Invalid value provided for mode, use one of "%s::DISABLED" or "%s::ENABLED".', self::class, self::class));
         }
 
         $this->mode = $mode;

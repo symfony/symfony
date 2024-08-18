@@ -74,6 +74,10 @@
                 <source>Too many failed login attempts, please try again in %minutes% minute.</source>
                 <target>Превише неуспешних покушаја пријављивања, молим покушајте поново за %minutes% минут.</target>
             </trans-unit>
+            <trans-unit id="20">
+                <source>Too many failed login attempts, please try again in %minutes% minutes.</source>
+                <target state="needs-review-translation">Превише неуспешних покушаја пријављивања, покушајте поново за %minutes% минут.|Превише неуспешних покушаја пријављивања, покушајте поново за %minutes% минута.|Превише неуспешних покушаја пријављивања, покушајте поново за %minutes% минута.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

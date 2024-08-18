@@ -51,7 +51,7 @@ class HandleMessageMiddlewareTest extends MiddlewareTestCase
     {
         $message = new DummyMessage('Hey');
         $envelope = new Envelope($message);
-        $handler = new class() {
+        $handler = new class {
             public function __invoke()
             {
                 throw new \Exception('failed');
@@ -100,7 +100,7 @@ class HandleMessageMiddlewareTest extends MiddlewareTestCase
 
     public static function itAddsHandledStampsProvider(): iterable
     {
-        $first = new class() extends HandleMessageMiddlewareTestCallable {
+        $first = new class extends HandleMessageMiddlewareTestCallable {
             public function __invoke()
             {
                 return 'first result';
@@ -108,7 +108,7 @@ class HandleMessageMiddlewareTest extends MiddlewareTestCase
         };
         $firstClass = $first::class;
 
-        $second = new class() extends HandleMessageMiddlewareTestCallable {
+        $second = new class extends HandleMessageMiddlewareTestCallable {
             public function __invoke()
             {
                 return null;
@@ -116,7 +116,7 @@ class HandleMessageMiddlewareTest extends MiddlewareTestCase
         };
         $secondClass = $second::class;
 
-        $failing = new class() extends HandleMessageMiddlewareTestCallable {
+        $failing = new class extends HandleMessageMiddlewareTestCallable {
             public function __invoke()
             {
                 throw new \Exception('handler failed.');
@@ -199,7 +199,7 @@ class HandleMessageMiddlewareTest extends MiddlewareTestCase
 
     public function testBatchHandler()
     {
-        $handler = new class() implements BatchHandlerInterface {
+        $handler = new class implements BatchHandlerInterface {
             public array $processedMessages;
 
             use BatchHandlerTrait;
@@ -255,7 +255,7 @@ class HandleMessageMiddlewareTest extends MiddlewareTestCase
 
     public function testBatchHandlerNoAck()
     {
-        $handler = new class() implements BatchHandlerInterface {
+        $handler = new class implements BatchHandlerInterface {
             use BatchHandlerTrait;
 
             public function __invoke(DummyMessage $message, ?Acknowledger $ack = null)
@@ -290,7 +290,7 @@ class HandleMessageMiddlewareTest extends MiddlewareTestCase
 
     public function testBatchHandlerNoBatch()
     {
-        $handler = new class() implements BatchHandlerInterface {
+        $handler = new class implements BatchHandlerInterface {
             public array $processedMessages;
 
             use BatchHandlerTrait;

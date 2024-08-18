@@ -20,14 +20,16 @@
         "ext-intl": "*"
     },
     "require-dev": {
-        "symfony/filesystem": "^6.4|^7.0",
+        "symfony/filesystem": "^7.1",
         "symfony/finder": "^6.4|^7.0",
         "symfony/var-exporter": "^6.4|^7.0"
     },
     "autoload": {
         "psr-4": { "Symfony\\Component\\Emoji\\": "" },
         "exclude-from-classmap": [
-            "/Tests/"
+            "/Tests/",
+            "/Resources/data/",
+            "/Resources/bin/"
         ]
     },
     "minimum-stability": "dev"

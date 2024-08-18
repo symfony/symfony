@@ -285,7 +285,7 @@ abstract class BaseNode implements NodeInterface
     final public function merge(mixed $leftSide, mixed $rightSide): mixed
     {
         if (!$this->allowOverwrite) {
-            throw new ForbiddenOverwriteException(sprintf('Configuration path "%s" cannot be overwritten. You have to define all options for this path, and any of its sub-paths in one configuration section.', $this->getPath()));
+            throw new ForbiddenOverwriteException(\sprintf('Configuration path "%s" cannot be overwritten. You have to define all options for this path, and any of its sub-paths in one configuration section.', $this->getPath()));
         }
 
         if ($leftSide !== $leftPlaceholders = self::resolvePlaceholderValue($leftSide)) {
@@ -404,7 +404,7 @@ abstract class BaseNode implements NodeInterface
 
                 throw $e;
             } catch (\Exception $e) {
-                throw new InvalidConfigurationException(sprintf('Invalid configuration for path "%s": ', $this->getPath()).$e->getMessage(), $e->getCode(), $e);
+                throw new InvalidConfigurationException(\sprintf('Invalid configuration for path "%s": ', $this->getPath()).$e->getMessage(), $e->getCode(), $e);
             }
         }
 
@@ -477,7 +477,7 @@ abstract class BaseNode implements NodeInterface
     private function doValidateType(mixed $value): void
     {
         if (null !== $this->handlingPlaceholder && !$this->allowPlaceholders()) {
-            $e = new InvalidTypeException(sprintf('A dynamic value is not compatible with a "%s" node type at path "%s".', static::class, $this->getPath()));
+            $e = new InvalidTypeException(\sprintf('A dynamic value is not compatible with a "%s" node type at path "%s".', static::class, $this->getPath()));
             $e->setPath($this->getPath());
 
             throw $e;
@@ -493,7 +493,7 @@ abstract class BaseNode implements NodeInterface
         $validTypes = $this->getValidPlaceholderTypes();
 
         if ($validTypes && array_diff($knownTypes, $validTypes)) {
-            $e = new InvalidTypeException(sprintf(
+            $e = new InvalidTypeException(\sprintf(
                 'Invalid type for path "%s". Expected %s, but got %s.',
                 $this->getPath(),
                 1 === \count($validTypes) ? '"'.reset($validTypes).'"' : 'one of "'.implode('", "', $validTypes).'"',

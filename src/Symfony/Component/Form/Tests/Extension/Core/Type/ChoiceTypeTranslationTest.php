@@ -12,12 +12,13 @@
 namespace Symfony\Component\Form\Tests\Extension\Core\Type;
 
 use Symfony\Component\Form\Extension\Core\CoreExtension;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Test\TypeTestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ChoiceTypeTranslationTest extends TypeTestCase
 {
-    public const TESTED_TYPE = 'Symfony\Component\Form\Extension\Core\Type\ChoiceType';
+    public const TESTED_TYPE = ChoiceType::class;
 
     private array $choices = [
         'Bernhard' => 'a',
@@ -27,11 +28,11 @@ class ChoiceTypeTranslationTest extends TypeTestCase
         'Roman' => 'e',
     ];
 
-    protected function getExtensions()
+    protected function getExtensions(): array
     {
         $translator = $this->createMock(TranslatorInterface::class);
         $translator->expects($this->any())->method('trans')
-            ->willReturnCallback(fn ($key, $params) => strtr(sprintf('Translation of: %s', $key), $params)
+            ->willReturnCallback(fn ($key, $params) => strtr(\sprintf('Translation of: %s', $key), $params)
             );
 
         return array_merge(parent::getExtensions(), [new CoreExtension(null, null, $translator)]);

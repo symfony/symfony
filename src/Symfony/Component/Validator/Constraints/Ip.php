@@ -126,11 +126,11 @@ class Ip extends Constraint
         $this->normalizer = $normalizer ?? $this->normalizer;
 
         if (!\in_array($this->version, static::VERSIONS, true)) {
-            throw new ConstraintDefinitionException(sprintf('The option "version" must be one of "%s".', implode('", "', static::VERSIONS)));
+            throw new ConstraintDefinitionException(\sprintf('The option "version" must be one of "%s".', implode('", "', static::VERSIONS)));
         }
 
         if (null !== $this->normalizer && !\is_callable($this->normalizer)) {
-            throw new InvalidArgumentException(sprintf('The "normalizer" option must be a valid callable ("%s" given).', get_debug_type($this->normalizer)));
+            throw new InvalidArgumentException(\sprintf('The "normalizer" option must be a valid callable ("%s" given).', get_debug_type($this->normalizer)));
         }
     }
 }

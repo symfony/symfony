@@ -40,7 +40,7 @@ class KazInfoTehTransport extends AbstractTransport
 
     public function __toString(): string
     {
-        return sprintf('kaz-info-teh://%s?sender=%s', $this->getEndpoint(), $this->sender);
+        return \sprintf('kaz-info-teh://%s?sender=%s', $this->getEndpoint(), $this->sender);
     }
 
     public function supports(MessageInterface $message): bool
@@ -57,7 +57,7 @@ class KazInfoTehTransport extends AbstractTransport
             throw new UnsupportedMessageTypeException(__CLASS__, SmsMessage::class, $message);
         }
 
-        $endpoint = sprintf('http://%s/api', $this->getEndpoint());
+        $endpoint = \sprintf('http://%s/api', $this->getEndpoint());
         $response = $this->client->request('POST', $endpoint, [
             'query' => [
                 'action' => 'sendmessage',
@@ -85,7 +85,7 @@ class KazInfoTehTransport extends AbstractTransport
         if (200 !== $statusCode || '0' !== (string) $content->statuscode) {
             $error = (string) $content->statusmessage ?: $content->errormessage ?: 'unknown error';
 
-            throw new TransportException(sprintf('Unable to send the SMS: "%s".', $error), $response);
+            throw new TransportException(\sprintf('Unable to send the SMS: "%s".', $error), $response);
         }
 
         return new SentMessage($message, (string) $this);

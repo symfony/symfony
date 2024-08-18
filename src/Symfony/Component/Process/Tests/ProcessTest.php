@@ -191,7 +191,7 @@ class ProcessTest extends TestCase
         // another byte which will never be read.
         $expectedOutputSize = PipesInterface::CHUNK_SIZE * 2 + 2;
 
-        $code = sprintf('echo str_repeat(\'*\', %d);', $expectedOutputSize);
+        $code = \sprintf('echo str_repeat(\'*\', %d);', $expectedOutputSize);
         $p = $this->getProcessForCode($code);
 
         $p->start();
@@ -384,7 +384,7 @@ class ProcessTest extends TestCase
      */
     public function testChainedCommandsOutput($expected, $operator, $input)
     {
-        $process = $this->getProcess(sprintf('echo %s %s echo %s', $input, $operator, $input));
+        $process = $this->getProcess(\sprintf('echo %s %s echo %s', $input, $operator, $input));
         $process->run();
         $this->assertEquals($expected, $process->getOutput());
     }
@@ -992,7 +992,7 @@ class ProcessTest extends TestCase
         $process = $this->getProcess('foo');
 
         $this->expectException(LogicException::class);
-        $this->expectExceptionMessage(sprintf('Process must be started before calling "%s()".', $method));
+        $this->expectExceptionMessage(\sprintf('Process must be started before calling "%s()".', $method));
 
         $process->{$method}();
     }
@@ -1492,7 +1492,7 @@ class ProcessTest extends TestCase
 
     public function testRawCommandLine()
     {
-        $p = Process::fromShellCommandline(sprintf('"%s" -r %s "a" "" "b"', self::$phpBin, escapeshellarg('print_r($argv);')));
+        $p = Process::fromShellCommandline(\sprintf('"%s" -r %s "a" "" "b"', self::$phpBin, escapeshellarg('print_r($argv);')));
         $p->run();
 
         $expected = "Array\n(\n    [0] => -\n    [1] => a\n    [2] => \n    [3] => b\n)\n";
@@ -1661,6 +1661,36 @@ class ProcessTest extends TestCase
         $process->setTimeout(2);
         $process->wait();
         $this->assertFalse($process->isRunning());
+    }
+
+    public function testIgnoringSignal()
+    {
+        if (!\function_exists('pcntl_signal')) {
+            $this->markTestSkipped('pnctl extension is required.');
+        }
+
+        $process = $this->getProcess(['sleep', '10']);
+        $process->setIgnoredSignals([\SIGTERM]);
+
+        $process->start();
+        $process->stop(timeout: 0.2);
+
+        $this->assertNotSame(\SIGTERM, $process->getTermSignal());
+    }
+
+    // This test ensure that the previous test is reliable, in case of the sleep command ignoring the SIGTERM signal
+    public function testNotIgnoringSignal()
+    {
+        if (!\function_exists('pcntl_signal')) {
+            $this->markTestSkipped('pnctl extension is required.');
+        }
+
+        $process = $this->getProcess(['sleep', '10']);
+
+        $process->start();
+        $process->stop(timeout: 0.2);
+
+        $this->assertSame(\SIGTERM, $process->getTermSignal());
     }
 
     private function getProcess(string|array $commandline, ?string $cwd = null, ?array $env = null, mixed $input = null, ?int $timeout = 60): Process

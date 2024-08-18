@@ -75,11 +75,11 @@ class RegisterEventListenersAndSubscribersPass implements CompilerPassInterface
                 ? [$container->getParameterBag()->resolveValue($tag['connection'])]
                 : array_keys($this->connections);
             if (!isset($tag['event'])) {
-                throw new InvalidArgumentException(sprintf('Doctrine event listener "%s" must specify the "event" attribute.', $id));
+                throw new InvalidArgumentException(\sprintf('Doctrine event listener "%s" must specify the "event" attribute.', $id));
             }
             foreach ($connections as $con) {
                 if (!isset($this->connections[$con])) {
-                    throw new RuntimeException(sprintf('The Doctrine connection "%s" referenced in service "%s" does not exist. Available connections names: "%s".', $con, $id, implode('", "', array_keys($this->connections))));
+                    throw new RuntimeException(\sprintf('The Doctrine connection "%s" referenced in service "%s" does not exist. Available connections names: "%s".', $con, $id, implode('", "', array_keys($this->connections))));
                 }
 
                 if (!isset($managerDefs[$con])) {
@@ -110,7 +110,7 @@ class RegisterEventListenersAndSubscribersPass implements CompilerPassInterface
     private function getEventManagerDef(ContainerBuilder $container, string $name): Definition
     {
         if (!isset($this->eventManagers[$name])) {
-            $this->eventManagers[$name] = $container->getDefinition(sprintf($this->managerTemplate, $name));
+            $this->eventManagers[$name] = $container->getDefinition(\sprintf($this->managerTemplate, $name));
         }
 
         return $this->eventManagers[$name];

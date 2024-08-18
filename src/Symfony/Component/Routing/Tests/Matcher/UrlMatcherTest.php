@@ -1000,6 +1000,23 @@ class UrlMatcherTest extends TestCase
         $this->assertEquals(['_route' => 'foo', 'bär' => 'baz', 'bäz' => 'foo'], $matcher->match('/foo/baz'));
     }
 
+    public function testMapping()
+    {
+        $collection = new RouteCollection();
+        $collection->add('a', new Route('/conference/{slug:conference}'));
+
+        $matcher = $this->getUrlMatcher($collection);
+
+        $expected = [
+            '_route' => 'a',
+            'slug' => 'vienna-2024',
+            '_route_mapping' => [
+                'slug' => 'conference',
+            ],
+        ];
+        $this->assertEquals($expected, $matcher->match('/conference/vienna-2024'));
+    }
+
     protected function getUrlMatcher(RouteCollection $routes, ?RequestContext $context = null)
     {
         return new UrlMatcher($routes, $context ?? new RequestContext());

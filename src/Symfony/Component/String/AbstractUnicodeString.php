@@ -124,7 +124,7 @@ abstract class AbstractUnicodeString extends AbstractString
                         }
 
                         if (null === $transliterator) {
-                            throw new InvalidArgumentException(sprintf('Unknown transliteration rule "%s".', $rule));
+                            throw new InvalidArgumentException(\sprintf('Unknown transliteration rule "%s".', $rule));
                         }
 
                         self::$transliterators['any-latin/bgn'] = $transliterator;
@@ -139,7 +139,7 @@ abstract class AbstractUnicodeString extends AbstractString
                     $c = (string) iconv('UTF-8', 'ASCII//TRANSLIT', $c[0]);
 
                     if ('' === $c && '' === iconv('UTF-8', 'ASCII//TRANSLIT', '²')) {
-                        throw new \LogicException(sprintf('"%s" requires a translit-able iconv implementation, try installing "gnu-libiconv" if you\'re using Alpine Linux.', static::class));
+                        throw new \LogicException(\sprintf('"%s" requires a translit-able iconv implementation, try installing "gnu-libiconv" if you\'re using Alpine Linux.', static::class));
                     }
 
                     return 1 < \strlen($c) ? ltrim($c, '\'`"^~') : ('' !== $c ? $c : '?');
@@ -155,7 +155,7 @@ abstract class AbstractUnicodeString extends AbstractString
     public function camel(): static
     {
         $str = clone $this;
-        $str->string = str_replace(' ', '', preg_replace_callback('/\b.(?![A-Z]{2,})/u', static function ($m) {
+        $str->string = str_replace(' ', '', preg_replace_callback('/\b.(?!\p{Lu})/u', static function ($m) {
             static $i = 0;
 
             return 1 === ++$i ? ('İ' === $m[0] ? 'i̇' : mb_strtolower($m[0], 'UTF-8')) : mb_convert_case($m[0], \MB_CASE_TITLE, 'UTF-8');
@@ -190,7 +190,7 @@ abstract class AbstractUnicodeString extends AbstractString
 
         if (!$compat || !\defined('Normalizer::NFKC_CF')) {
             $str->string = normalizer_normalize($str->string, $compat ? \Normalizer::NFKC : \Normalizer::NFC);
-            $str->string = mb_strtolower(str_replace(self::FOLD_FROM, self::FOLD_TO, $this->string), 'UTF-8');
+            $str->string = mb_strtolower(str_replace(self::FOLD_FROM, self::FOLD_TO, $str->string), 'UTF-8');
         } else {
             $str->string = normalizer_normalize($str->string, \Normalizer::NFKC_CF);
         }

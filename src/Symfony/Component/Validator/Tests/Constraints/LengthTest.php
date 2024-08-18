@@ -58,7 +58,7 @@ class LengthTest extends TestCase
     public function testInvalidCountUnitThrowsException()
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage(sprintf('The "countUnit" option must be one of the "%s"::COUNT_* constants ("%s" given).', Length::class, 'nonExistentCountUnit'));
+        $this->expectExceptionMessage(\sprintf('The "countUnit" option must be one of the "%s"::COUNT_* constants ("%s" given).', Length::class, 'nonExistentCountUnit'));
         new Length(['min' => 0, 'max' => 10, 'countUnit' => 'nonExistentCountUnit']);
     }
 

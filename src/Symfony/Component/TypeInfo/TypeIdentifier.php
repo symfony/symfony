@@ -16,6 +16,8 @@ namespace Symfony\Component\TypeInfo;
  *
  * @author Mathias Arlaud <mathias.arlaud@gmail.com>
  * @author Baptiste Leduc <baptiste.leduc@gmail.com>
+ *
+ * @experimental
  */
 enum TypeIdentifier: string
 {
@@ -34,4 +36,12 @@ enum TypeIdentifier: string
     case TRUE = 'true';
     case NEVER = 'never';
     case VOID = 'void';
+
+    /**
+     * @return list<string>
+     */
+    public static function values(): array
+    {
+        return array_column(self::cases(), 'value');
+    }
 }

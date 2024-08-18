@@ -70,6 +70,19 @@ class EmailValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
+    /**
+     * @dataProvider getValidEmails
+     */
+    public function testValidEmailsWithNewLine($email)
+    {
+        $this->validator->validate($email."\n", new Email());
+
+        $this->buildViolation('This value is not a valid email address.')
+            ->setParameter('{{ value }}', '"'.$email."\n\"")
+            ->setCode(Email::INVALID_FORMAT_ERROR)
+            ->assertRaised();
+    }
+
     public static function getValidEmails()
     {
         return [
@@ -180,7 +193,7 @@ class EmailValidatorTest extends ConstraintValidatorTestCase
             [' example@example.com '],
             [' example @example .com '],
             ['example@-example.com'],
-            [sprintf('example@%s.com', str_repeat('a', 64))],
+            [\sprintf('example@%s.com', str_repeat('a', 64))],
         ];
     }
 

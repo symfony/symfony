@@ -1,13 +1,23 @@
 CHANGELOG
 =========
 
+7.2
+---
+
+ * `WrappedExceptionsInterface` now extends PHP's `Throwable` interface
+ * Add `#[AsMessage]` attribute with `$transport` parameter for message routing
+ * Add `--format` option to the `messenger:stats` command
+ * Add `getRetryDelay()` method to `RecoverableExceptionInterface`
+
 7.1
 ---
 
+ * `InMemoryTransportFactory` creates the `InMemoryTransport` with a clock (if configured in the factory)
  * Add option `redis_sentinel` as an alias for `sentinel_master`
  * Add `--all` option to the `messenger:consume` command
- * Make `#[AsMessageHandler]` final
  * Add parameter `$jitter` to `MultiplierRetryStrategy` in order to randomize delay and prevent the thundering herd effect
+ * Add `SIGQUIT` signal among list of signals that gracefully shut down `messenger:consume` and `messenger:failed:retry` commands
+ * Add `EnvelopeAwareExceptionInterface` for exceptions thrown from middlewares to prevent stamps added by previous middlewares being dropped
 
 7.0
 ---
@@ -30,7 +40,6 @@ CHANGELOG
  * Add `HandlerDescriptor::getOptions`
  * Add support for multiple Redis Sentinel hosts
  * Add `--all` option to the `messenger:failed:remove` command
- * `RejectRedeliveredMessageException` implements `UnrecoverableExceptionInterface` in order to not be retried
  * Add `WrappedExceptionsInterface` interface for exceptions that hold multiple individual exceptions
  * Deprecate `HandlerFailedException::getNestedExceptions()`, `HandlerFailedException::getNestedExceptionsOfClass()`
    and `DelayedMessageHandlingException::getExceptions()` which are replaced by a new `getWrappedExceptions()` method

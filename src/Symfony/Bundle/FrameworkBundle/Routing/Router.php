@@ -35,16 +35,21 @@ use Symfony\Contracts\Service\ServiceSubscriberInterface;
  */
 class Router extends BaseRouter implements WarmableInterface, ServiceSubscriberInterface
 {
-    private ContainerInterface $container;
     private array $collectedParameters = [];
     private \Closure $paramFetcher;
 
     /**
      * @param mixed $resource The main resource to load
      */
-    public function __construct(ContainerInterface $container, mixed $resource, array $options = [], ?RequestContext $context = null, ?ContainerInterface $parameters = null, ?LoggerInterface $logger = null, ?string $defaultLocale = null)
-    {
-        $this->container = $container;
+    public function __construct(
+        private ContainerInterface $container,
+        mixed $resource,
+        array $options = [],
+        ?RequestContext $context = null,
+        ?ContainerInterface $parameters = null,
+        ?LoggerInterface $logger = null,
+        ?string $defaultLocale = null,
+    ) {
         $this->resource = $resource;
         $this->context = $context ?? new RequestContext();
         $this->logger = $logger;
@@ -55,7 +60,7 @@ class Router extends BaseRouter implements WarmableInterface, ServiceSubscriberI
         } elseif ($container instanceof SymfonyContainerInterface) {
             $this->paramFetcher = $container->getParameter(...);
         } else {
-            throw new \LogicException(sprintf('You should either pass a "%s" instance or provide the $parameters argument of the "%s" method.', SymfonyContainerInterface::class, __METHOD__));
+            throw new \LogicException(\sprintf('You should either pass a "%s" instance or provide the $parameters argument of the "%s" method.', SymfonyContainerInterface::class, __METHOD__));
         }
 
         $this->defaultLocale = $defaultLocale;
@@ -69,7 +74,7 @@ class Router extends BaseRouter implements WarmableInterface, ServiceSubscriberI
             $this->collection->addResource(new ContainerParametersResource($this->collectedParameters));
 
             try {
-                $containerFile = ($this->paramFetcher)('kernel.cache_dir').'/'.($this->paramFetcher)('kernel.container_class').'.php';
+                $containerFile = ($this->paramFetcher)('kernel.build_dir').'/'.($this->paramFetcher)('kernel.container_class').'.php';
                 if (file_exists($containerFile)) {
                     $this->collection->addResource(new FileResource($containerFile));
                 } else {
@@ -84,14 +89,12 @@ class Router extends BaseRouter implements WarmableInterface, ServiceSubscriberI
 
     public function warmUp(string $cacheDir, ?string $buildDir = null): array
     {
-        if (!$buildDir) {
-            return [];
+        if (null === $currentDir = $this->getOption('cache_dir')) {
+            return []; // skip warmUp when router doesn't use cache
         }
 
-        $currentDir = $this->getOption('cache_dir');
-
-        // force cache generation in build_dir
-        $this->setOption('cache_dir', $buildDir);
+        // force cache generation
+        $this->setOption('cache_dir', $buildDir ?? $cacheDir);
         $this->getMatcher();
         $this->getGenerator();
 
@@ -168,7 +171,7 @@ class Router extends BaseRouter implements WarmableInterface, ServiceSubscriberI
             }
 
             if (preg_match('/^env\((?:\w++:)*+\w++\)$/', $match[1])) {
-                throw new RuntimeException(sprintf('Using "%%%s%%" is not allowed in routing configuration.', $match[1]));
+                throw new RuntimeException(\sprintf('Using "%%%s%%" is not allowed in routing configuration.', $match[1]));
             }
 
             $resolved = ($this->paramFetcher)($match[1]);
@@ -185,7 +188,7 @@ class Router extends BaseRouter implements WarmableInterface, ServiceSubscriberI
                 }
             }
 
-            throw new RuntimeException(sprintf('The container parameter "%s", used in the route configuration value "%s", must be a string or numeric, but it is of type "%s".', $match[1], $value, get_debug_type($resolved)));
+            throw new RuntimeException(\sprintf('The container parameter "%s", used in the route configuration value "%s", must be a string or numeric, but it is of type "%s".', $match[1], $value, get_debug_type($resolved)));
         }, $value);
 
         return str_replace('%%', '%', $escapedValue);

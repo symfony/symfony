@@ -48,7 +48,7 @@ final class SmsmodeTransportTest extends TransportTestCase
         $transport = $this->createTransport(null, $from);
 
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage(sprintf('The "From" value "%s" is not a valid sender ID.', $from));
+        $this->expectExceptionMessage(\sprintf('The "From" value "%s" is not a valid sender ID.', $from));
 
         $transport->send(new SmsMessage('+33612345678', 'Hello!'));
     }

@@ -103,7 +103,7 @@ class StopwatchEvent
      */
     public function isStarted(): bool
     {
-        return !empty($this->started);
+        return (bool) $this->started;
     }
 
     /**
@@ -134,6 +134,18 @@ class StopwatchEvent
     public function getPeriods(): array
     {
         return $this->periods;
+    }
+
+    /**
+     * Gets the last event period.
+     */
+    public function getLastPeriod(): ?StopwatchPeriod
+    {
+        if ([] === $this->periods) {
+            return null;
+        }
+
+        return $this->periods[array_key_last($this->periods)];
     }
 
     /**
@@ -225,6 +237,6 @@ class StopwatchEvent
 
     public function __toString(): string
     {
-        return sprintf('%s/%s: %.2F MiB - %d ms', $this->getCategory(), $this->getName(), $this->getMemory() / 1024 / 1024, $this->getDuration());
+        return \sprintf('%s/%s: %.2F MiB - %d ms', $this->getCategory(), $this->getName(), $this->getMemory() / 1024 / 1024, $this->getDuration());
     }
 }

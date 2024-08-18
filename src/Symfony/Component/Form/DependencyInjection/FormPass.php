@@ -89,7 +89,7 @@ class FormPass implements CompilerPassInterface
                 }
 
                 if (!$extendsTypes) {
-                    throw new InvalidArgumentException(sprintf('The getExtendedTypes() method for service "%s" does not return any extended types.', $serviceId));
+                    throw new InvalidArgumentException(\sprintf('The getExtendedTypes() method for service "%s" does not return any extended types.', $serviceId));
                 }
             }
         }

@@ -27,11 +27,9 @@ class ZookeeperStore implements PersistingStoreInterface
 {
     use ExpiringStoreTrait;
 
-    private \Zookeeper $zookeeper;
-
-    public function __construct(\Zookeeper $zookeeper)
-    {
-        $this->zookeeper = $zookeeper;
+    public function __construct(
+        private \Zookeeper $zookeeper,
+    ) {
     }
 
     public static function createConnection(#[\SensitiveParameter] string $dsn): \Zookeeper

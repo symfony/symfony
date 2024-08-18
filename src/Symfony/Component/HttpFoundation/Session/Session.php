@@ -134,7 +134,7 @@ class Session implements FlashBagAwareSessionInterface, \IteratorAggregate, \Cou
             }
         }
         foreach ($this->data as &$data) {
-            if (!empty($data)) {
+            if ($data) {
                 return false;
             }
         }

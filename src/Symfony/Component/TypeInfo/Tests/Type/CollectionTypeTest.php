@@ -74,6 +74,11 @@ class CollectionTypeTest extends TestCase
         $this->assertEquals('array<string,bool>', (string) $type);
     }
 
+    public function testGetBaseType()
+    {
+        $this->assertEquals(Type::int(), Type::collection(Type::generic(Type::int(), Type::string()))->getBaseType());
+    }
+
     public function testIsNullable()
     {
         $this->assertFalse((new CollectionType(Type::generic(Type::builtin(TypeIdentifier::ARRAY), Type::int())))->isNullable());
@@ -95,5 +100,18 @@ class CollectionTypeTest extends TestCase
         $this->assertTrue($type->isA(TypeIdentifier::ARRAY));
         $this->assertFalse($type->isA(TypeIdentifier::STRING));
         $this->assertFalse($type->isA(TypeIdentifier::INT));
+        $this->assertFalse($type->isA(self::class));
+
+        $type = new CollectionType(new GenericType(Type::object(self::class), Type::string(), Type::bool()));
+
+        $this->assertFalse($type->isA(TypeIdentifier::ARRAY));
+        $this->assertTrue($type->isA(TypeIdentifier::OBJECT));
+        $this->assertTrue($type->isA(self::class));
+    }
+
+    public function testProxiesMethodsToBaseType()
+    {
+        $type = new CollectionType(Type::generic(Type::builtin(TypeIdentifier::ARRAY), Type::string(), Type::bool()));
+        $this->assertEquals([Type::string(), Type::bool()], $type->getVariableTypes());
     }
 }

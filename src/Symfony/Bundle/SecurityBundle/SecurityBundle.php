@@ -104,6 +104,6 @@ class SecurityBundle extends Bundle
         )));
 
         // must be registered before DecoratorServicePass
-        $container->addCompilerPass(new MakeFirewallsEventDispatcherTraceablePass(), PassConfig::TYPE_OPTIMIZE, 10);
+        $container->addCompilerPass(new MakeFirewallsEventDispatcherTraceablePass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, 10);
     }
 }

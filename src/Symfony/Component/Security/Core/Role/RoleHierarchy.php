@@ -21,15 +21,12 @@ class RoleHierarchy implements RoleHierarchyInterface
     /** @var array<string, list<string>> */
     protected array $map;
 
-    private array $hierarchy;
-
     /**
      * @param array<string, list<string>> $hierarchy
      */
-    public function __construct(array $hierarchy)
-    {
-        $this->hierarchy = $hierarchy;
-
+    public function __construct(
+        private array $hierarchy,
+    ) {
         $this->buildRoleMap();
     }
 

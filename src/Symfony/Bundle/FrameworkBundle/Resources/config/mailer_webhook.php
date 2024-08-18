@@ -19,6 +19,8 @@ use Symfony\Component\Mailer\Bridge\Mailgun\RemoteEvent\MailgunPayloadConverter;
 use Symfony\Component\Mailer\Bridge\Mailgun\Webhook\MailgunRequestParser;
 use Symfony\Component\Mailer\Bridge\Mailjet\RemoteEvent\MailjetPayloadConverter;
 use Symfony\Component\Mailer\Bridge\Mailjet\Webhook\MailjetRequestParser;
+use Symfony\Component\Mailer\Bridge\Mailomat\RemoteEvent\MailomatPayloadConverter;
+use Symfony\Component\Mailer\Bridge\Mailomat\Webhook\MailomatRequestParser;
 use Symfony\Component\Mailer\Bridge\Postmark\RemoteEvent\PostmarkPayloadConverter;
 use Symfony\Component\Mailer\Bridge\Postmark\Webhook\PostmarkRequestParser;
 use Symfony\Component\Mailer\Bridge\Resend\RemoteEvent\ResendPayloadConverter;
@@ -47,6 +49,11 @@ return static function (ContainerConfigurator $container) {
         ->set('mailer.webhook.request_parser.mailjet', MailjetRequestParser::class)
             ->args([service('mailer.payload_converter.mailjet')])
         ->alias(MailjetRequestParser::class, 'mailer.webhook.request_parser.mailjet')
+
+        ->set('mailer.payload_converter.mailomat', MailomatPayloadConverter::class)
+        ->set('mailer.webhook.request_parser.mailomat', MailomatRequestParser::class)
+            ->args([service('mailer.payload_converter.mailomat')])
+        ->alias(MailomatRequestParser::class, 'mailer.webhook.request_parser.mailomat')
 
         ->set('mailer.payload_converter.postmark', PostmarkPayloadConverter::class)
         ->set('mailer.webhook.request_parser.postmark', PostmarkRequestParser::class)

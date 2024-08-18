@@ -179,11 +179,11 @@ class WebProfilerExtensionTest extends TestCase
     public static function getInterceptRedirectsToolbarConfig()
     {
         return [
-             [
-                 'toolbarEnabled' => false,
-                 'interceptRedirects' => true,
-                 'listenerInjected' => true,
-                 'listenerEnabled' => false,
+            [
+                'toolbarEnabled' => false,
+                'interceptRedirects' => true,
+                'listenerInjected' => true,
+                'listenerEnabled' => false,
             ],
             [
                 'toolbarEnabled' => false,

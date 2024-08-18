@@ -287,7 +287,7 @@ class MessageGeneratorTest extends TestCase
                 '22:12:01' => [],
             ],
             'schedule' => [
-                RecurringMessage::trigger(new class() implements TriggerInterface {
+                RecurringMessage::trigger(new class implements TriggerInterface {
                     public function __toString(): string
                     {
                         return 'foo';
@@ -318,7 +318,7 @@ class MessageGeneratorTest extends TestCase
                 } elseif ($lastTick == $tick && $count < 2) {
                     $ticks = [$lastTick, ++$count];
                 } else {
-                    $this->fail(sprintf('Invalid tick %s', $lastTick->format(\DateTimeImmutable::RFC3339_EXTENDED)));
+                    $this->fail(\sprintf('Invalid tick %s', $lastTick->format(\DateTimeImmutable::RFC3339_EXTENDED)));
                 }
 
                 foreach ($runs as $run) {
@@ -327,7 +327,7 @@ class MessageGeneratorTest extends TestCase
                     }
                 }
 
-                $this->fail(sprintf('There is no next run for tick %s', $lastTick->format(\DateTimeImmutable::RFC3339_EXTENDED)));
+                $this->fail(\sprintf('There is no next run for tick %s', $lastTick->format(\DateTimeImmutable::RFC3339_EXTENDED)));
             });
 
         return RecurringMessage::trigger($trigger, $message);

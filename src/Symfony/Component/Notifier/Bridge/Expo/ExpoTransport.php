@@ -39,7 +39,7 @@ final class ExpoTransport extends AbstractTransport
 
     public function __toString(): string
     {
-        return sprintf('expo://%s', $this->getEndpoint());
+        return \sprintf('expo://%s', $this->getEndpoint());
     }
 
     public function supports(MessageInterface $message): bool
@@ -56,12 +56,12 @@ final class ExpoTransport extends AbstractTransport
             throw new UnsupportedMessageTypeException(__CLASS__, PushMessage::class, $message);
         }
 
-        $endpoint = sprintf('https://%s', $this->getEndpoint());
+        $endpoint = \sprintf('https://%s', $this->getEndpoint());
         $options = $message->getOptions()?->toArray() ?? [];
         $options['to'] ??= $message->getRecipientId();
 
         if (!$options['to']) {
-            throw new InvalidArgumentException(sprintf('The "%s" transport required the "to" option to be set.', __CLASS__));
+            throw new InvalidArgumentException(\sprintf('The "%s" transport required the "to" option to be set.', __CLASS__));
         }
 
         $options['title'] = $message->getSubject();
@@ -70,7 +70,7 @@ final class ExpoTransport extends AbstractTransport
 
         $response = $this->client->request('POST', $endpoint, [
             'headers' => [
-                'Authorization' => $this->token ? sprintf('Bearer %s', $this->token) : null,
+                'Authorization' => $this->token ? \sprintf('Bearer %s', $this->token) : null,
             ],
             'json' => array_filter($options),
         ]);
@@ -93,7 +93,7 @@ final class ExpoTransport extends AbstractTransport
         $result ??= $response->toArray(false);
 
         if ('error' === $result['data']['status']) {
-            throw new TransportException(sprintf('Unable to post the Expo message: "%s" (%s)', $result['data']['message'], $result['data']['details']['error']), $response);
+            throw new TransportException(\sprintf('Unable to post the Expo message: "%s" (%s)', $result['data']['message'], $result['data']['details']['error']), $response);
         }
 
         $sentMessage = new SentMessage($message, (string) $this);

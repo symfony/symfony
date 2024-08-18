@@ -12,8 +12,11 @@
 namespace Symfony\Component\Notifier\Bridge\Bluesky\Tests;
 
 use Psr\Log\NullLogger;
+use Symfony\Component\Clock\MockClock;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\Response\JsonMockResponse;
+use Symfony\Component\Mime\Part\File;
+use Symfony\Component\Notifier\Bridge\Bluesky\BlueskyOptions;
 use Symfony\Component\Notifier\Bridge\Bluesky\BlueskyTransport;
 use Symfony\Component\Notifier\Exception\LogicException;
 use Symfony\Component\Notifier\Message\ChatMessage;
@@ -25,9 +28,16 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 final class BlueskyTransportTest extends TransportTestCase
 {
+    private static $clock;
+
+    protected function setUp(): void
+    {
+        self::$clock = new MockClock(new \DateTimeImmutable('@1714293617'));
+    }
+
     public static function createTransport(?HttpClientInterface $client = null): BlueskyTransport
     {
-        $blueskyTransport = new BlueskyTransport('username', 'password', new NullLogger(), $client ?? new MockHttpClient());
+        $blueskyTransport = new BlueskyTransport('username', 'password', new NullLogger(), $client ?? new MockHttpClient(), null, self::$clock);
         $blueskyTransport->setHost('bsky.social');
 
         return $blueskyTransport;
@@ -262,6 +272,48 @@ final class BlueskyTransportTest extends TransportTestCase
             ],
         ];
         $this->assertEquals($expected, $this->parseFacets($input));
+    }
+
+    public function testWithMedia()
+    {
+        $transport = $this->createTransport(new MockHttpClient((function () {
+            yield function (string $method, string $url, array $options) {
+                $this->assertSame('POST', $method);
+                $this->assertSame('https://bsky.social/xrpc/com.atproto.server.createSession', $url);
+
+                return new JsonMockResponse(['accessJwt' => 'foo']);
+            };
+
+            yield function (string $method, string $url, array $options) {
+                $this->assertSame('POST', $method);
+                $this->assertSame('https://bsky.social/xrpc/com.atproto.repo.uploadBlob', $url);
+                $this->assertArrayHasKey('authorization', $options['normalized_headers']);
+
+                return new JsonMockResponse(['blob' => [
+                    '$type' => 'blob',
+                    'ref' => [
+                        '$link' => 'bafkreibabalobzn6cd366ukcsjycp4yymjymgfxcv6xczmlgpemzkz3cfa',
+                    ],
+                    'mimeType' => 'image/png',
+                    'size' => 760898,
+                ]]);
+            };
+
+            yield function (string $method, string $url, array $options) {
+                $this->assertSame('POST', $method);
+                $this->assertSame('https://bsky.social/xrpc/com.atproto.repo.createRecord', $url);
+                $this->assertArrayHasKey('authorization', $options['normalized_headers']);
+                $this->assertSame('{"repo":null,"collection":"app.bsky.feed.post","record":{"$type":"app.bsky.feed.post","text":"Hello World!","createdAt":"2024-04-28T08:40:17.000000Z","embed":{"$type":"app.bsky.embed.images","images":[{"alt":"A fixture","image":{"$type":"blob","ref":{"$link":"bafkreibabalobzn6cd366ukcsjycp4yymjymgfxcv6xczmlgpemzkz3cfa"},"mimeType":"image\/png","size":760898}}]}}}', $options['body']);
+
+                return new JsonMockResponse(['cid' => '103254962155278888']);
+            };
+        })()));
+
+        $options = (new BlueskyOptions())
+            ->attachMedia(new File(__DIR__.'/fixtures.gif'), 'A fixture');
+        $result = $transport->send(new ChatMessage('Hello World!', $options));
+
+        $this->assertSame('103254962155278888', $result->getMessageId());
     }
 
     /**

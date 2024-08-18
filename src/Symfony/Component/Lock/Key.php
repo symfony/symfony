@@ -20,14 +20,13 @@ use Symfony\Component\Lock\Exception\UnserializableKeyException;
  */
 final class Key
 {
-    private string $resource;
     private ?float $expiringTime = null;
     private array $state = [];
     private bool $serializable = true;
 
-    public function __construct(string $resource)
-    {
-        $this->resource = $resource;
+    public function __construct(
+        private string $resource,
+    ) {
     }
 
     public function __toString(): string

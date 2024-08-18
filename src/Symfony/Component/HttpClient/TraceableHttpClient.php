@@ -26,14 +26,12 @@ use Symfony\Contracts\Service\ResetInterface;
  */
 final class TraceableHttpClient implements HttpClientInterface, ResetInterface, LoggerAwareInterface
 {
-    private HttpClientInterface $client;
-    private ?Stopwatch $stopwatch;
     private \ArrayObject $tracedRequests;
 
-    public function __construct(HttpClientInterface $client, ?Stopwatch $stopwatch = null)
-    {
-        $this->client = $client;
-        $this->stopwatch = $stopwatch;
+    public function __construct(
+        private HttpClientInterface $client,
+        private ?Stopwatch $stopwatch = null,
+    ) {
         $this->tracedRequests = new \ArrayObject();
     }
 
@@ -89,8 +87,13 @@ final class TraceableHttpClient implements HttpClientInterface, ResetInterface, 
         $this->tracedRequests->exchangeArray([]);
     }
 
+    /**
+     * @deprecated since Symfony 7.1, configure the logger on the wrapper HTTP client directly instead
+     */
     public function setLogger(LoggerInterface $logger): void
     {
+        trigger_deprecation('symfony/http-client', '7.1', 'Configure the logger on the wrapper HTTP client directly instead.');
+
         if ($this->client instanceof LoggerAwareInterface) {
             $this->client->setLogger($logger);
         }

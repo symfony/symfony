@@ -44,7 +44,7 @@ class FormLoginAuthenticatorTest extends TestCase
 
     public function testHandleWhenUsernameEmpty()
     {
-        $this->expectException(BadRequestHttpException::class);
+        $this->expectException(BadCredentialsException::class);
         $this->expectExceptionMessage('The key "_username" must be a non-empty string.');
 
         $request = Request::create('/login_check', 'POST', ['_username' => '', '_password' => 's$cr$t']);
@@ -56,7 +56,7 @@ class FormLoginAuthenticatorTest extends TestCase
 
     public function testHandleWhenPasswordEmpty()
     {
-        $this->expectException(BadRequestHttpException::class);
+        $this->expectException(BadCredentialsException::class);
         $this->expectExceptionMessage('The key "_password" must be a non-empty string.');
 
         $request = Request::create('/login_check', 'POST', ['_username' => 'foo', '_password' => '']);
@@ -175,8 +175,8 @@ class FormLoginAuthenticatorTest extends TestCase
      */
     public function testHandleNonStringPasswordWithToString(bool $postOnly)
     {
-        $passwordObject = new class() {
-            public function __toString()
+        $passwordObject = new class {
+            public function __toString(): string
             {
                 return 's$cr$t';
             }
@@ -191,6 +191,54 @@ class FormLoginAuthenticatorTest extends TestCase
         /** @var PasswordCredentials $credentialsBadge */
         $credentialsBadge = $passport->getBadge(PasswordCredentials::class);
         $this->assertSame('s$cr$t', $credentialsBadge->getPassword());
+    }
+
+    /**
+     * @dataProvider postOnlyDataProvider
+     */
+    public function testHandleNonStringCsrfTokenWithArray($postOnly)
+    {
+        $request = Request::create('/login_check', 'POST', ['_username' => 'foo', '_password' => 'bar', '_csrf_token' => []]);
+        $request->setSession($this->createSession());
+
+        $this->setUpAuthenticator(['post_only' => $postOnly]);
+
+        $this->expectException(BadRequestHttpException::class);
+        $this->expectExceptionMessage('The key "_csrf_token" must be a string, "array" given.');
+
+        $this->authenticator->authenticate($request);
+    }
+
+    /**
+     * @dataProvider postOnlyDataProvider
+     */
+    public function testHandleNonStringCsrfTokenWithInt($postOnly)
+    {
+        $request = Request::create('/login_check', 'POST', ['_username' => 'foo', '_password' => 'bar', '_csrf_token' => 42]);
+        $request->setSession($this->createSession());
+
+        $this->setUpAuthenticator(['post_only' => $postOnly]);
+
+        $this->expectException(BadRequestHttpException::class);
+        $this->expectExceptionMessage('The key "_csrf_token" must be a string, "integer" given.');
+
+        $this->authenticator->authenticate($request);
+    }
+
+    /**
+     * @dataProvider postOnlyDataProvider
+     */
+    public function testHandleNonStringCsrfTokenWithObject($postOnly)
+    {
+        $request = Request::create('/login_check', 'POST', ['_username' => 'foo', '_password' => 'bar', '_csrf_token' => new \stdClass()]);
+        $request->setSession($this->createSession());
+
+        $this->setUpAuthenticator(['post_only' => $postOnly]);
+
+        $this->expectException(BadRequestHttpException::class);
+        $this->expectExceptionMessage('The key "_csrf_token" must be a string, "object" given.');
+
+        $this->authenticator->authenticate($request);
     }
 
     public static function postOnlyDataProvider()

@@ -1183,6 +1183,7 @@ return [
     '👩‍👧' => 'pamilya: babae, batang babae',
     '😶‍🌫' => 'mukhang nasa ulap',
     '😮‍💨' => 'mukhang humihinga palabas',
+    '🙂‍↔' => 'gumagalaw na mukha pahalang',
     '🙂‍↕' => 'gumagalaw na mukha paayon',
     '😵‍💫' => 'mukang may spiral na mata',
     '❤‍🔥' => 'pusong nasa apoy',

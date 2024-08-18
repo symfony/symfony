@@ -17,7 +17,7 @@ use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\LazyProxy\Instantiator\RealServiceInstantiator;
 
 /**
- * Tests for {@see \Symfony\Component\DependencyInjection\LazyProxy\Instantiator\RealServiceInstantiator}.
+ * Tests for {@see RealServiceInstantiator}.
  *
  * @author Marco Pivetta <ocramius@gmail.com>
  */

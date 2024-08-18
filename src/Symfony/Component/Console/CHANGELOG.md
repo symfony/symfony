@@ -1,6 +1,16 @@
 CHANGELOG
 =========
 
+7.2
+---
+
+ * Add support for `FORCE_COLOR` environment variable
+
+7.1
+---
+
+ * Add `ArgvInput::getRawTokens()`
+
 7.0
 ---
 

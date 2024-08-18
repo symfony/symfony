@@ -23,11 +23,9 @@ use Symfony\Component\Routing\RequestContextAwareInterface;
  */
 class RouterContextMiddleware implements MiddlewareInterface
 {
-    private RequestContextAwareInterface $router;
-
-    public function __construct(RequestContextAwareInterface $router)
-    {
-        $this->router = $router;
+    public function __construct(
+        private RequestContextAwareInterface $router,
+    ) {
     }
 
     public function handle(Envelope $envelope, StackInterface $stack): Envelope

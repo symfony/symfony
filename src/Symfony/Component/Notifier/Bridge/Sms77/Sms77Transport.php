@@ -33,14 +33,13 @@ final class Sms77Transport extends AbstractTransport
         private ?string $from = null,
         ?HttpClientInterface $client = null,
         ?EventDispatcherInterface $dispatcher = null,
-)
-    {
+    ) {
         parent::__construct($client, $dispatcher);
     }
 
     public function __toString(): string
     {
-        return sprintf('sms77://%s%s', $this->getEndpoint(), null !== $this->from ? '?from='.$this->from : '');
+        return \sprintf('sms77://%s%s', $this->getEndpoint(), null !== $this->from ? '?from='.$this->from : '');
     }
 
     public function supports(MessageInterface $message): bool
@@ -54,7 +53,7 @@ final class Sms77Transport extends AbstractTransport
             throw new UnsupportedMessageTypeException(__CLASS__, SmsMessage::class, $message);
         }
 
-        $endpoint = sprintf('https://%s/api/sms', $this->getEndpoint());
+        $endpoint = \sprintf('https://%s/api/sms', $this->getEndpoint());
         $response = $this->client->request('POST', $endpoint, [
             'headers' => [
                 'Content-Type' => 'application/json',
@@ -78,13 +77,13 @@ final class Sms77Transport extends AbstractTransport
         if (200 !== $statusCode) {
             $error = $response->toArray(false);
 
-            throw new TransportException(sprintf('Unable to send the SMS: "%s" (%s).', $error['description'], $error['code']), $response);
+            throw new TransportException(\sprintf('Unable to send the SMS: "%s" (%s).', $error['description'], $error['code']), $response);
         }
 
         $success = $response->toArray(false);
 
         if (false === \in_array($success['success'], [100, 101])) {
-            throw new TransportException(sprintf('Unable to send the SMS: "%s".', $success['success']), $response);
+            throw new TransportException(\sprintf('Unable to send the SMS: "%s".', $success['success']), $response);
         }
 
         $sentMessage = new SentMessage($message, (string) $this);

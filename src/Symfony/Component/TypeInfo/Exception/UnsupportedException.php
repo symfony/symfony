@@ -14,6 +14,8 @@ namespace Symfony\Component\TypeInfo\Exception;
 /**
  * @author Mathias Arlaud <mathias.arlaud@gmail.com>
  * @author Baptiste Leduc <baptiste.leduc@gmail.com>
+ *
+ * @experimental
  */
 class UnsupportedException extends \LogicException implements ExceptionInterface
 {
@@ -21,7 +23,7 @@ class UnsupportedException extends \LogicException implements ExceptionInterface
         string $message,
         public readonly mixed $subject,
         int $code = 0,
-        \Throwable $previous = null,
+        ?\Throwable $previous = null,
     ) {
         parent::__construct($message, $code, $previous);
     }

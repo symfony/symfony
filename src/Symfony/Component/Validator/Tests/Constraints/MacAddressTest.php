@@ -37,11 +37,16 @@ class MacAddressTest extends TestCase
         [$aConstraint] = $metadata->properties['a']->getConstraints();
         self::assertSame('myMessage', $aConstraint->message);
         self::assertEquals(trim(...), $aConstraint->normalizer);
+        self::assertSame(MacAddress::ALL, $aConstraint->type);
         self::assertSame(['Default', 'MacAddressDummy'], $aConstraint->groups);
 
         [$bConstraint] = $metadata->properties['b']->getConstraints();
-        self::assertSame(['my_group'], $bConstraint->groups);
-        self::assertSame('some attached data', $bConstraint->payload);
+        self::assertSame(MacAddress::LOCAL_UNICAST, $bConstraint->type);
+        self::assertSame(['Default', 'MacAddressDummy'], $bConstraint->groups);
+
+        [$cConstraint] = $metadata->properties['c']->getConstraints();
+        self::assertSame(['my_group'], $cConstraint->groups);
+        self::assertSame('some attached data', $cConstraint->payload);
     }
 }
 
@@ -50,6 +55,9 @@ class MacAddressDummy
     #[MacAddress(message: 'myMessage', normalizer: 'trim')]
     private $a;
 
-    #[MacAddress(groups: ['my_group'], payload: 'some attached data')]
+    #[MacAddress(type: MacAddress::LOCAL_UNICAST)]
     private $b;
+
+    #[MacAddress(groups: ['my_group'], payload: 'some attached data')]
+    private $c;
 }

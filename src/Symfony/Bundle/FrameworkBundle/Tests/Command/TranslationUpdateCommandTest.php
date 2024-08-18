@@ -78,11 +78,6 @@ class TranslationUpdateCommandTest extends TestCase
 
     public function testDumpMessagesAndCleanInRootDirectory()
     {
-        $this->fs->remove($this->translationDir);
-        $this->translationDir = sys_get_temp_dir().'/'.uniqid('sf_translation', true);
-        $this->fs->mkdir($this->translationDir.'/translations');
-        $this->fs->mkdir($this->translationDir.'/templates');
-
         $tester = $this->createCommandTester(['messages' => ['foo' => 'foo']], [], null, [$this->translationDir.'/trans'], [$this->translationDir.'/views']);
         $tester->execute(['command' => 'translation:extract', 'locale' => 'en', '--dump-messages' => true, '--clean' => true]);
         $this->assertMatchesRegularExpression('/foo/', $tester->getDisplay());
@@ -115,11 +110,6 @@ class TranslationUpdateCommandTest extends TestCase
 
     public function testWriteMessagesInRootDirectory()
     {
-        $this->fs->remove($this->translationDir);
-        $this->translationDir = sys_get_temp_dir().'/'.uniqid('sf_translation', true);
-        $this->fs->mkdir($this->translationDir.'/translations');
-        $this->fs->mkdir($this->translationDir.'/templates');
-
         $tester = $this->createCommandTester(['messages' => ['foo' => 'foo']]);
         $tester->execute(['command' => 'translation:extract', 'locale' => 'en', '--force' => true]);
         $this->assertMatchesRegularExpression('/Translation files were successfully updated./', $tester->getDisplay());
@@ -174,7 +164,8 @@ class TranslationUpdateCommandTest extends TestCase
     protected function setUp(): void
     {
         $this->fs = new Filesystem();
-        $this->translationDir = sys_get_temp_dir().'/'.uniqid('sf_translation', true);
+        $this->translationDir = tempnam(sys_get_temp_dir(), 'sf_translation_');
+        $this->fs->remove($this->translationDir);
         $this->fs->mkdir($this->translationDir.'/translations');
         $this->fs->mkdir($this->translationDir.'/templates');
     }

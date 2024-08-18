@@ -19,7 +19,15 @@ namespace Symfony\Component\Process;
  */
 class ExecutableFinder
 {
-    private array $suffixes = ['.exe', '.bat', '.cmd', '.com'];
+    private array $suffixes = [];
+
+    public function __construct()
+    {
+        // Set common extensions on Windows.
+        if ('\\' === \DIRECTORY_SEPARATOR) {
+            $this->suffixes = ['.exe', '.bat', '.cmd', '.com'];
+        }
+    }
 
     /**
      * Replaces default suffixes of executable.
@@ -30,7 +38,10 @@ class ExecutableFinder
     }
 
     /**
-     * Adds new possible suffix to check for executable.
+     * Adds new possible suffix to check for executable, including the dot (.).
+     *
+     *     $finder = new ExecutableFinder();
+     *     $finder->addSuffix('.foo');
      */
     public function addSuffix(string $suffix): void
     {
@@ -52,10 +63,10 @@ class ExecutableFinder
         );
 
         $suffixes = [''];
-        if ('\\' === \DIRECTORY_SEPARATOR) {
-            $pathExt = getenv('PATHEXT');
-            $suffixes = array_merge($pathExt ? explode(\PATH_SEPARATOR, $pathExt) : $this->suffixes, $suffixes);
+        if ('\\' === \DIRECTORY_SEPARATOR && $pathExt = getenv('PATHEXT')) {
+            $suffixes = array_merge(explode(\PATH_SEPARATOR, $pathExt), $suffixes);
         }
+        $suffixes = array_merge($suffixes, $this->suffixes);
         foreach ($suffixes as $suffix) {
             foreach ($dirs as $dir) {
                 if (@is_file($file = $dir.\DIRECTORY_SEPARATOR.$name.$suffix) && ('\\' === \DIRECTORY_SEPARATOR || @is_executable($file))) {
@@ -68,8 +79,14 @@ class ExecutableFinder
             }
         }
 
+        if (!\function_exists('exec')) {
+            return $default;
+        }
+
         $command = '\\' === \DIRECTORY_SEPARATOR ? 'where' : 'command -v --';
-        if (\function_exists('exec') && ($executablePath = strtok(@exec($command.' '.escapeshellarg($name)), \PHP_EOL)) && @is_executable($executablePath)) {
+        $execResult = @exec($command.' '.escapeshellarg($name));
+
+        if (($executablePath = substr($execResult, 0, strpos($execResult, \PHP_EOL) ?: null)) && @is_executable($executablePath)) {
             return $executablePath;
         }
 

@@ -21,6 +21,7 @@ use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
 use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
+use Symfony\Component\DependencyInjection\Loader\UndefinedExtensionHandler;
 use Symfony\Component\ExpressionLanguage\Expression;
 
 /**
@@ -30,22 +31,18 @@ class ContainerConfigurator extends AbstractConfigurator
 {
     public const FACTORY = 'container';
 
-    private ContainerBuilder $container;
-    private PhpFileLoader $loader;
     private array $instanceof;
-    private string $path;
-    private string $file;
     private int $anonymousCount = 0;
-    private ?string $env;
 
-    public function __construct(ContainerBuilder $container, PhpFileLoader $loader, array &$instanceof, string $path, string $file, ?string $env = null)
-    {
-        $this->container = $container;
-        $this->loader = $loader;
+    public function __construct(
+        private ContainerBuilder $container,
+        private PhpFileLoader $loader,
+        array &$instanceof,
+        private string $path,
+        private string $file,
+        private ?string $env = null,
+    ) {
         $this->instanceof = &$instanceof;
-        $this->path = $path;
-        $this->file = $file;
-        $this->env = $env;
     }
 
     final public function extension(string $namespace, array $config, bool $prepend = false): void
@@ -58,7 +55,7 @@ class ContainerConfigurator extends AbstractConfigurator
 
         if (!$this->container->hasExtension($namespace)) {
             $extensions = array_filter(array_map(fn (ExtensionInterface $ext) => $ext->getAlias(), $this->container->getExtensions()));
-            throw new InvalidArgumentException(sprintf('There is no extension able to load the configuration for "%s" (in "%s"). Looked for namespace "%s", found "%s".', $namespace, $this->file, $namespace, $extensions ? implode('", "', $extensions) : 'none'));
+            throw new InvalidArgumentException(UndefinedExtensionHandler::getErrorMessage($namespace, $this->file, $namespace, $extensions));
         }
 
         $this->container->loadFromExtension($namespace, static::processValue($config));

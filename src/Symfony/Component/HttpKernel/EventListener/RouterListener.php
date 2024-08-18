@@ -110,19 +110,45 @@ class RouterListener implements EventSubscriberInterface
                 'method' => $request->getMethod(),
             ]);
 
-            $request->attributes->add($parameters);
+            $attributes = $parameters;
+            if ($mapping = $parameters['_route_mapping'] ?? false) {
+                unset($parameters['_route_mapping']);
+                $mappedAttributes = [];
+                $attributes = [];
+
+                foreach ($parameters as $parameter => $value) {
+                    $attribute = $mapping[$parameter] ?? $parameter;
+
+                    if (!isset($mappedAttributes[$attribute])) {
+                        $attributes[$attribute] = $value;
+                        $mappedAttributes[$attribute] = $parameter;
+                    } elseif ('' !== $mappedAttributes[$attribute]) {
+                        $attributes[$attribute] = [
+                            $mappedAttributes[$attribute] => $attributes[$attribute],
+                            $parameter => $value,
+                        ];
+                        $mappedAttributes[$attribute] = '';
+                    } else {
+                        $attributes[$attribute][$parameter] = $value;
+                    }
+                }
+
+                $attributes['_route_mapping'] = $mapping;
+            }
+
+            $request->attributes->add($attributes);
             unset($parameters['_route'], $parameters['_controller']);
             $request->attributes->set('_route_params', $parameters);
         } catch (ResourceNotFoundException $e) {
-            $message = sprintf('No route found for "%s %s"', $request->getMethod(), $request->getUriForPath($request->getPathInfo()));
+            $message = \sprintf('No route found for "%s %s"', $request->getMethod(), $request->getUriForPath($request->getPathInfo()));
 
             if ($referer = $request->headers->get('referer')) {
-                $message .= sprintf(' (from "%s")', $referer);
+                $message .= \sprintf(' (from "%s")', $referer);
             }
 
             throw new NotFoundHttpException($message, $e);
         } catch (MethodNotAllowedException $e) {
-            $message = sprintf('No route found for "%s %s": Method Not Allowed (Allow: %s)', $request->getMethod(), $request->getUriForPath($request->getPathInfo()), implode(', ', $e->getAllowedMethods()));
+            $message = \sprintf('No route found for "%s %s": Method Not Allowed (Allow: %s)', $request->getMethod(), $request->getUriForPath($request->getPathInfo()), implode(', ', $e->getAllowedMethods()));
 
             throw new MethodNotAllowedHttpException($e->getAllowedMethods(), $message, $e);
         }

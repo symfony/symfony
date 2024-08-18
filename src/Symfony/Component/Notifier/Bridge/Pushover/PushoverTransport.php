@@ -44,7 +44,7 @@ final class PushoverTransport extends AbstractTransport
 
     public function __toString(): string
     {
-        return sprintf('pushover://%s', $this->getEndpoint());
+        return \sprintf('pushover://%s', $this->getEndpoint());
     }
 
     protected function doSend(MessageInterface $message): SentMessage
@@ -59,7 +59,7 @@ final class PushoverTransport extends AbstractTransport
         $options['token'] = $this->appToken;
         $options['user'] = $this->userKey;
 
-        $endpoint = sprintf('https://%s/1/messages.json', $this->getEndpoint());
+        $endpoint = \sprintf('https://%s/1/messages.json', $this->getEndpoint());
         $response = $this->client->request('POST', $endpoint, [
             'body' => $options,
         ]);
@@ -71,13 +71,13 @@ final class PushoverTransport extends AbstractTransport
         }
 
         if (200 !== $statusCode) {
-            throw new TransportException(sprintf('Unable to send the Pushover push notification: "%s".', $response->getContent(false)), $response);
+            throw new TransportException(\sprintf('Unable to send the Pushover push notification: "%s".', $response->getContent(false)), $response);
         }
 
         $result = $response->toArray(false);
 
         if (!isset($result['request'])) {
-            throw new TransportException(sprintf('Unable to find the message id within the Pushover response: "%s".', $response->getContent(false)), $response);
+            throw new TransportException(\sprintf('Unable to find the message id within the Pushover response: "%s".', $response->getContent(false)), $response);
         }
 
         $sentMessage = new SentMessage($message, (string) $this);

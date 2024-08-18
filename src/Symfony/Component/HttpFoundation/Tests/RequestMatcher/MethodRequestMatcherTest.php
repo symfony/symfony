@@ -27,6 +27,13 @@ class MethodRequestMatcherTest extends TestCase
         $this->assertSame($isMatch, $matcher->matches($request));
     }
 
+    public function testAlwaysMatchesOnEmptyMethod()
+    {
+        $matcher = new MethodRequestMatcher([]);
+        $request = Request::create('https://example.com', 'POST');
+        $this->assertTrue($matcher->matches($request));
+    }
+
     public static function getData()
     {
         return [

@@ -13,77 +13,47 @@ namespace Symfony\Component\TypeInfo;
 
 use Symfony\Component\TypeInfo\Exception\LogicException;
 use Symfony\Component\TypeInfo\Type\BuiltinType;
-use Symfony\Component\TypeInfo\Type\CollectionType;
-use Symfony\Component\TypeInfo\Type\GenericType;
-use Symfony\Component\TypeInfo\Type\IntersectionType;
 use Symfony\Component\TypeInfo\Type\ObjectType;
-use Symfony\Component\TypeInfo\Type\UnionType;
 
 /**
  * @author Mathias Arlaud <mathias.arlaud@gmail.com>
  * @author Baptiste Leduc <baptiste.leduc@gmail.com>
+ *
+ * @experimental
  */
 abstract class Type implements \Stringable
 {
     use TypeFactoryTrait;
 
-    public function getBaseType(): BuiltinType|ObjectType
-    {
-        if ($this instanceof UnionType || $this instanceof IntersectionType) {
-            throw new LogicException(sprintf('Cannot get base type on "%s" compound type.', (string) $this));
-        }
+    abstract public function getBaseType(): BuiltinType|ObjectType;
 
-        $baseType = $this;
+    /**
+     * @param TypeIdentifier|class-string $subject
+     */
+    abstract public function isA(TypeIdentifier|string $subject): bool;
 
-        if ($baseType instanceof CollectionType) {
-            $baseType = $baseType->getType();
-        }
-
-        if ($baseType instanceof GenericType) {
-            $baseType = $baseType->getType();
-        }
-
-        return $baseType;
-    }
+    abstract public function asNonNullable(): self;
 
     /**
      * @param callable(Type): bool $callable
      */
     public function is(callable $callable): bool
     {
-        return match(true) {
-            $this instanceof UnionType => $this->atLeastOneTypeIs($callable),
-            $this instanceof IntersectionType => $this->everyTypeIs($callable),
-            default => $callable($this),
-        };
-    }
-
-    public function isA(TypeIdentifier $typeIdentifier): bool
-    {
-        return $this->testIdentifier(fn (TypeIdentifier $i): bool => $typeIdentifier === $i);
+        return $callable($this);
     }
 
     public function isNullable(): bool
     {
-        return $this->testIdentifier(fn (TypeIdentifier $i): bool => TypeIdentifier::NULL === $i || TypeIdentifier::MIXED === $i);
+        return $this->is(fn (Type $t): bool => $t->isA(TypeIdentifier::NULL) || $t->isA(TypeIdentifier::MIXED));
     }
 
-    abstract public function asNonNullable(): self;
-
     /**
-     * @param callable(TypeIdentifier): bool $test
+     * Graceful fallback for unexisting methods.
+     *
+     * @param list<mixed> $arguments
      */
-    private function testIdentifier(callable $test): bool
+    public function __call(string $method, array $arguments): mixed
     {
-        $callable = function (self $t) use ($test, &$callable): bool {
-            // unwrap compound type to forward type identifier check
-            if ($t instanceof UnionType || $t instanceof IntersectionType) {
-                return $t->is($callable);
-            }
-
-            return $test($t->getBaseType()->getTypeIdentifier());
-        };
-
-        return $this->is($callable);
+        throw new LogicException(\sprintf('Cannot call "%s" on "%s" type.', $method, $this));
     }
 }

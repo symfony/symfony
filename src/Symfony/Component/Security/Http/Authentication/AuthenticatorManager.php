@@ -46,28 +46,19 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
  */
 class AuthenticatorManager implements AuthenticatorManagerInterface, UserAuthenticatorInterface
 {
-    private iterable $authenticators;
-    private TokenStorageInterface $tokenStorage;
-    private EventDispatcherInterface $eventDispatcher;
-    private bool $eraseCredentials;
-    private ?LoggerInterface $logger;
-    private string $firewallName;
-    private bool $hideUserNotFoundExceptions;
-    private array $requiredBadges;
-
     /**
      * @param iterable<mixed, AuthenticatorInterface> $authenticators
      */
-    public function __construct(iterable $authenticators, TokenStorageInterface $tokenStorage, EventDispatcherInterface $eventDispatcher, string $firewallName, ?LoggerInterface $logger = null, bool $eraseCredentials = true, bool $hideUserNotFoundExceptions = true, array $requiredBadges = [])
-    {
-        $this->authenticators = $authenticators;
-        $this->tokenStorage = $tokenStorage;
-        $this->eventDispatcher = $eventDispatcher;
-        $this->firewallName = $firewallName;
-        $this->logger = $logger;
-        $this->eraseCredentials = $eraseCredentials;
-        $this->hideUserNotFoundExceptions = $hideUserNotFoundExceptions;
-        $this->requiredBadges = $requiredBadges;
+    public function __construct(
+        private iterable $authenticators,
+        private TokenStorageInterface $tokenStorage,
+        private EventDispatcherInterface $eventDispatcher,
+        private string $firewallName,
+        private ?LoggerInterface $logger = null,
+        private bool $eraseCredentials = true,
+        private bool $hideUserNotFoundExceptions = true,
+        private array $requiredBadges = [],
+    ) {
     }
 
     /**
@@ -105,7 +96,7 @@ class AuthenticatorManager implements AuthenticatorManagerInterface, UserAuthent
             $this->logger?->debug('Checking support on authenticator.', ['firewall_name' => $this->firewallName, 'authenticator' => $authenticator::class]);
 
             if (!$authenticator instanceof AuthenticatorInterface) {
-                throw new \InvalidArgumentException(sprintf('Authenticator "%s" must implement "%s".', get_debug_type($authenticator), AuthenticatorInterface::class));
+                throw new \InvalidArgumentException(\sprintf('Authenticator "%s" must implement "%s".', get_debug_type($authenticator), AuthenticatorInterface::class));
             }
 
             if (false !== $supports = $authenticator->supports($request)) {
@@ -117,12 +108,12 @@ class AuthenticatorManager implements AuthenticatorManagerInterface, UserAuthent
             }
         }
 
+        $request->attributes->set('_security_skipped_authenticators', $skippedAuthenticators);
+        $request->attributes->set('_security_authenticators', $authenticators);
+
         if (!$authenticators) {
             return false;
         }
-
-        $request->attributes->set('_security_authenticators', $authenticators);
-        $request->attributes->set('_security_skipped_authenticators', $skippedAuthenticators);
 
         return $lazy ? null : true;
     }
@@ -183,7 +174,7 @@ class AuthenticatorManager implements AuthenticatorManagerInterface, UserAuthent
             $resolvedBadges = [];
             foreach ($passport->getBadges() as $badge) {
                 if (!$badge->isResolved()) {
-                    throw new BadCredentialsException(sprintf('Authentication failed: Security badge "%s" is not resolved, did you forget to register the correct listeners?', get_debug_type($badge)));
+                    throw new BadCredentialsException(\sprintf('Authentication failed: Security badge "%s" is not resolved, did you forget to register the correct listeners?', get_debug_type($badge)));
                 }
 
                 $resolvedBadges[] = $badge::class;
@@ -191,7 +182,7 @@ class AuthenticatorManager implements AuthenticatorManagerInterface, UserAuthent
 
             $missingRequiredBadges = array_diff($this->requiredBadges, $resolvedBadges);
             if ($missingRequiredBadges) {
-                throw new BadCredentialsException(sprintf('Authentication failed; Some badges marked as required by the firewall config are not available on the passport: "%s".', implode('", "', $missingRequiredBadges)));
+                throw new BadCredentialsException(\sprintf('Authentication failed; Some badges marked as required by the firewall config are not available on the passport: "%s".', implode('", "', $missingRequiredBadges)));
             }
 
             // create the authentication token

@@ -58,15 +58,18 @@ class UserCheckerListenerTest extends TestCase
         $this->listener->postCheckCredentials(new AuthenticationSuccessEvent(new PostAuthenticationToken($this->user, 'main', [])));
     }
 
+    public function testTokenIsPassedToPost()
+    {
+        $token = new PostAuthenticationToken($this->user, 'main', []);
+        $this->userChecker->expects($this->once())->method('checkPostAuth')->with($this->user, $token);
+
+        $this->listener->postCheckCredentials(new AuthenticationSuccessEvent($token));
+    }
+
     private function createCheckPassportEvent($passport = null)
     {
         $passport ??= new SelfValidatingPassport(new UserBadge('test', fn () => $this->user));
 
         return new CheckPassportEvent($this->createMock(AuthenticatorInterface::class), $passport);
-    }
-
-    private function createAuthenticationSuccessEvent()
-    {
-        return new AuthenticationSuccessEvent(new PostAuthenticationToken($this->user, 'main', []));
     }
 }

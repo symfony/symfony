@@ -21,6 +21,8 @@ use Symfony\Component\TypeInfo\TypeIdentifier;
  * @template U of BuiltinType<TypeIdentifier::INT>|BuiltinType<TypeIdentifier::STRING>
  *
  * @extends EnumType<T>
+ *
+ * @experimental
  */
 final class BackedEnumType extends EnumType
 {

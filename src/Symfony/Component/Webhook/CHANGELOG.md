@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+7.2
+---
+
+ * Add `PayloadSerializerInterface` with implementations to decouple the remote event handling from the Serializer component
+
 6.4
 ---
 

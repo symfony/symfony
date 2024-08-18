@@ -20,6 +20,7 @@
         "symfony/polyfill-ctype": "~1.8",
         "symfony/polyfill-mbstring": "~1.0",
         "symfony/polyfill-php83": "^1.27",
+        "symfony/deprecation-contracts": "^2.5|^3",
         "symfony/translation-contracts": "^2.5|^3"
     },
     "require-dev": {
@@ -38,6 +39,7 @@
         "symfony/property-access": "^6.4|^7.0",
         "symfony/property-info": "^6.4|^7.0",
         "symfony/translation": "^6.4.3|^7.0.3",
+        "symfony/type-info": "^7.1",
         "egulias/email-validator": "^2.1.10|^3|^4"
     },
     "conflict": {
@@ -54,7 +56,8 @@
     "autoload": {
         "psr-4": { "Symfony\\Component\\Validator\\": "" },
         "exclude-from-classmap": [
-            "/Tests/"
+            "/Tests/",
+            "/Resources/bin/"
         ]
     },
     "minimum-stability": "dev"

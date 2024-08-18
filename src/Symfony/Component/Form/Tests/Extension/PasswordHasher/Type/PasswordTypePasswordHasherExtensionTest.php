@@ -40,7 +40,7 @@ class PasswordTypePasswordHasherExtensionTest extends TypeTestCase
         parent::setUp();
     }
 
-    protected function getExtensions()
+    protected function getExtensions(): array
     {
         return array_merge(parent::getExtensions(), [
             new PasswordHasherExtension(new PasswordHasherListener($this->passwordHasher)),

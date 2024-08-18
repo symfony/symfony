@@ -94,7 +94,7 @@ class Compiler implements ResetInterface
      */
     public function string(string $value): static
     {
-        $this->source .= sprintf('"%s"', addcslashes($value, "\0\t\"\$\\"));
+        $this->source .= \sprintf('"%s"', addcslashes($value, "\0\t\"\$\\"));
 
         return $this;
     }

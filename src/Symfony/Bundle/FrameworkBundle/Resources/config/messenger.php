@@ -135,6 +135,9 @@ return static function (ContainerConfigurator $container) {
             ->tag('messenger.transport_factory')
 
         ->set('messenger.transport.in_memory.factory', InMemoryTransportFactory::class)
+            ->args([
+                service('clock')->nullOnInvalid(),
+            ])
             ->tag('messenger.transport_factory')
             ->tag('kernel.reset', ['method' => 'reset'])
 

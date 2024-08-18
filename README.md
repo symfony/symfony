@@ -19,12 +19,23 @@ Sponsor
 
 Symfony 7.1 is [backed][27] by
 - [Rector][29]
+- [JoliCode][30]
+- [Les-Tilleuls.coop][31]
 
 **Rector** helps successful and growing companies to get the most of the code
 they already have. Including upgrading to the latest Symfony LTS. They deliver
 automated refactoring, reduce maintenance costs, speed up feature delivery, and
 transform legacy code into a strategic asset. They can handle the dirty work,
 so you can focus on the features.
+
+**JoliCode** is a team of passionate developers and open-source lovers, with a
+strong expertise in PHP & Symfony technologies. They can help you build your
+projects using state-of-the-art practices.
+
+**Les-Tilleuls.coop** is a team of 70+ Symfony experts who can help you design, develop and
+fix your projects. They provide a wide range of professional services including development,
+consulting, coaching, training and audits. They also are highly skilled in JS, Go and DevOps.
+They are a worker cooperative!
 
 Help Symfony by [sponsoring][28] its development!
 
@@ -91,3 +102,5 @@ and supported by [Symfony contributors][19].
 [27]: https://symfony.com/backers
 [28]: https://symfony.com/sponsor
 [29]: https://getrector.com
+[30]: https://jolicode.com
+[31]: https://les-tilleuls.coop

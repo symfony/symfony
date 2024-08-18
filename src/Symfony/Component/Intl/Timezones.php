@@ -78,7 +78,7 @@ final class Timezones extends ResourceBundle
         $offset = self::getRawOffset($timezone, $timestamp);
         $abs = abs($offset);
 
-        return sprintf(self::readEntry(['Meta', 'GmtFormat'], $displayLocale), sprintf(self::readEntry(['Meta', 'HourFormat'.(0 <= $offset ? 'Pos' : 'Neg')], $displayLocale), $abs / 3600, $abs / 60 % 60));
+        return \sprintf(self::readEntry(['Meta', 'GmtFormat'], $displayLocale), \sprintf(self::readEntry(['Meta', 'HourFormat'.(0 <= $offset ? 'Pos' : 'Neg')], $displayLocale), $abs / 3600, $abs / 60 % 60));
     }
 
     /**
@@ -102,7 +102,7 @@ final class Timezones extends ResourceBundle
             }
 
             if (Countries::exists(strtoupper($country))) {
-                throw new MissingResourceException(sprintf('Country codes must be in uppercase, but "%s" was passed. Try with "%s" country code instead.', $country, strtoupper($country)));
+                throw new MissingResourceException(\sprintf('Country codes must be in uppercase, but "%s" was passed. Try with "%s" country code instead.', $country, strtoupper($country)));
             }
 
             throw $e;

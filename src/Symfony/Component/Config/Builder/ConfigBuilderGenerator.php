@@ -114,7 +114,7 @@ public function NAME(): string
                 $child instanceof PrototypedArrayNode => $this->handlePrototypedArrayNode($child, $class, $namespace),
                 $child instanceof VariableNode => $this->handleVariableNode($child, $class),
                 $child instanceof ArrayNode => $this->handleArrayNode($child, $class, $namespace),
-                default => throw new \RuntimeException(sprintf('Unknown node "%s".', $child::class)),
+                default => throw new \RuntimeException(\sprintf('Unknown node "%s".', $child::class)),
             };
         }
     }
@@ -129,9 +129,9 @@ public function NAME(): string
         $hasNormalizationClosures = $this->hasNormalizationClosures($node);
         $comment = $this->getComment($node);
         if ($hasNormalizationClosures) {
-            $comment = sprintf(" * @template TValue\n * @param TValue \$value\n%s", $comment);
-            $comment .= sprintf(' * @return %s|$this'."\n", $childClass->getFqcn());
-            $comment .= sprintf(' * @psalm-return (TValue is array ? %s : static)'."\n ", $childClass->getFqcn());
+            $comment = \sprintf(" * @template TValue\n * @param TValue \$value\n%s", $comment);
+            $comment .= \sprintf(' * @return %s|$this'."\n", $childClass->getFqcn());
+            $comment .= \sprintf(' * @psalm-return (TValue is array ? %s : static)'."\n ", $childClass->getFqcn());
         }
         if ('' !== $comment) {
             $comment = "/**\n$comment*/\n";
@@ -281,9 +281,9 @@ public function NAME(string $VAR, TYPE $VALUE): static
 
         $comment = $this->getComment($node);
         if ($hasNormalizationClosures) {
-            $comment = sprintf(" * @template TValue\n * @param TValue \$value\n%s", $comment);
-            $comment .= sprintf(' * @return %s|$this'."\n", $childClass->getFqcn());
-            $comment .= sprintf(' * @psalm-return (TValue is array ? %s : static)'."\n ", $childClass->getFqcn());
+            $comment = \sprintf(" * @template TValue\n * @param TValue \$value\n%s", $comment);
+            $comment .= \sprintf(' * @return %s|$this'."\n", $childClass->getFqcn());
+            $comment .= \sprintf(' * @psalm-return (TValue is array ? %s : static)'."\n ", $childClass->getFqcn());
         }
         if ('' !== $comment) {
             $comment = "/**\n$comment*/\n";
@@ -425,7 +425,7 @@ public function NAME($value): static
             }
 
             if ($node instanceof EnumNode) {
-                $comment .= sprintf(' * @param ParamConfigurator|%s $value', implode('|', array_unique(array_map(fn ($a) => !$a instanceof \UnitEnum ? var_export($a, true) : '\\'.ltrim(var_export($a, true), '\\'), $node->getValues()))))."\n";
+                $comment .= \sprintf(' * @param ParamConfigurator|%s $value', implode('|', array_unique(array_map(fn ($a) => !$a instanceof \UnitEnum ? var_export($a, true) : '\\'.ltrim(var_export($a, true), '\\'), $node->getValues()))))."\n";
             } else {
                 $parameterTypes = $this->getParameterTypes($node);
                 $comment .= ' * @param ParamConfigurator|'.implode('|', $parameterTypes).' $value'."\n";
@@ -578,7 +578,7 @@ public function NAME(string $key, mixed $value): static
 
     private function getSubNamespace(ClassBuilder $rootClass): string
     {
-        return sprintf('%s\\%s', $rootClass->getNamespace(), substr($rootClass->getName(), 0, -6));
+        return \sprintf('%s\\%s', $rootClass->getNamespace(), substr($rootClass->getName(), 0, -6));
     }
 
     private function hasNormalizationClosures(NodeInterface $node): bool

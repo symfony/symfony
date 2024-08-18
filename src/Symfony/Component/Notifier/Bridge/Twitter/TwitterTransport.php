@@ -43,14 +43,13 @@ final class TwitterTransport extends AbstractTransport
         #[\SensitiveParameter] private string $accessSecret,
         ?HttpClientInterface $client = null,
         ?EventDispatcherInterface $dispatcher = null,
-)
-    {
+    ) {
         parent::__construct($client, $dispatcher);
     }
 
     public function __toString(): string
     {
-        return sprintf('twitter://%s', $this->getEndpoint());
+        return \sprintf('twitter://%s', $this->getEndpoint());
     }
 
     public function supports(MessageInterface $message): bool

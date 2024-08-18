@@ -46,6 +46,19 @@ class CardSchemeValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
+    /**
+     * @dataProvider getValidNumbers
+     */
+    public function testValidNumbersWithNewLine($scheme, $number)
+    {
+        $this->validator->validate($number."\n", new CardScheme(['schemes' => $scheme, 'message' => 'myMessage']));
+
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ value }}', '"'.$number."\n\"")
+            ->setCode(CardScheme::INVALID_FORMAT_ERROR)
+            ->assertRaised();
+    }
+
     public function testValidNumberWithOrderedArguments()
     {
         $this->validator->validate(

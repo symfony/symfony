@@ -30,7 +30,7 @@ class SmsMessage implements MessageInterface, FromNotificationInterface
         private ?MessageOptionsInterface $options = null,
     ) {
         if ('' === $phone) {
-            throw new InvalidArgumentException(sprintf('"%s" needs a phone number, it cannot be empty.', __CLASS__));
+            throw new InvalidArgumentException(\sprintf('"%s" needs a phone number, it cannot be empty.', __CLASS__));
         }
     }
 
@@ -48,7 +48,7 @@ class SmsMessage implements MessageInterface, FromNotificationInterface
     public function phone(string $phone): static
     {
         if ('' === $phone) {
-            throw new InvalidArgumentException(sprintf('"%s" needs a phone number, it cannot be empty.', static::class));
+            throw new InvalidArgumentException(\sprintf('"%s" needs a phone number, it cannot be empty.', static::class));
         }
 
         $this->phone = $phone;

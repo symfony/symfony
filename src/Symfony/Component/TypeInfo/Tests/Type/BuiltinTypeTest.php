@@ -24,6 +24,11 @@ class BuiltinTypeTest extends TestCase
         $this->assertSame('int', (string) new BuiltinType(TypeIdentifier::INT));
     }
 
+    public function testGetBaseType()
+    {
+        $this->assertEquals(new BuiltinType(TypeIdentifier::INT), (new BuiltinType(TypeIdentifier::INT))->getBaseType());
+    }
+
     public function testIsNullable()
     {
         $this->assertFalse((new BuiltinType(TypeIdentifier::INT))->isNullable());
@@ -61,5 +66,8 @@ class BuiltinTypeTest extends TestCase
     {
         $this->assertFalse((new BuiltinType(TypeIdentifier::INT))->isA(TypeIdentifier::ARRAY));
         $this->assertTrue((new BuiltinType(TypeIdentifier::INT))->isA(TypeIdentifier::INT));
+        $this->assertFalse((new BuiltinType(TypeIdentifier::INT))->isA('array'));
+        $this->assertTrue((new BuiltinType(TypeIdentifier::INT))->isA('int'));
+        $this->assertFalse((new BuiltinType(TypeIdentifier::INT))->isA(self::class));
     }
 }

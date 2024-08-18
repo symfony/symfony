@@ -53,6 +53,19 @@ final class CssColorValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
+    /**
+     * @dataProvider getValidAnyColor
+     */
+    public function testValidAnyColorWithNewLine($cssColor)
+    {
+        $this->validator->validate($cssColor."\n", new CssColor([], 'myMessage'));
+
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ value }}', '"'.$cssColor."\n\"")
+            ->setCode(CssColor::INVALID_FORMAT_ERROR)
+            ->assertRaised();
+    }
+
     public static function getValidAnyColor(): array
     {
         return [
@@ -403,7 +416,7 @@ final class CssColorValidatorTest extends ConstraintValidatorTestCase
     }
 
     /**
-     * @dataProvider getInvalidHSL
+     * @dataProvider getInvalidHSLA
      */
     public function testInvalidHSLA($cssColor)
     {

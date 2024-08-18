@@ -17,8 +17,8 @@ use Symfony\Component\Form\Extension\Core\Type\PercentType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Csrf\CsrfExtension;
 use Symfony\Component\Form\FormError;
+use Symfony\Component\Form\FormExtensionInterface;
 use Symfony\Component\Form\FormView;
-use Symfony\Component\Form\Tests\VersionAwareTest;
 use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 use Symfony\Component\Translation\TranslatableMessage;
 use Symfony\Contracts\Translation\TranslatableInterface;
@@ -26,8 +26,6 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 abstract class AbstractLayoutTestCase extends FormLayoutTestCase
 {
-    use VersionAwareTest;
-
     protected MockObject&CsrfTokenManagerInterface $csrfTokenManager;
     protected array $testableFeatures = [];
 
@@ -47,6 +45,9 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
         parent::setUp();
     }
 
+    /**
+     * @return FormExtensionInterface[]
+     */
     protected function getExtensions()
     {
         return [
@@ -313,8 +314,8 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
     public function testLabelWithoutTranslationOnButton()
     {
         $form = $this->factory->createNamedBuilder('myform', 'Symfony\Component\Form\Extension\Core\Type\FormType', null, [
-                'translation_domain' => false,
-            ])
+            'translation_domain' => false,
+        ])
             ->add('mybutton', 'Symfony\Component\Form\Extension\Core\Type\ButtonType')
             ->getForm();
         $view = $form->get('mybutton')->createView();
@@ -672,8 +673,6 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
 
     public function testSingleChoiceWithPreferred()
     {
-        $this->requiresFeatureSet(404);
-
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\ChoiceType', '&a', [
             'choices' => ['Choice&A' => '&a', 'Choice&B' => '&b'],
             'preferred_choices' => ['&b'],
@@ -698,8 +697,6 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
 
     public function testSingleChoiceWithPreferredAndNoSeparator()
     {
-        $this->requiresFeatureSet(404);
-
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\ChoiceType', '&a', [
             'choices' => ['Choice&A' => '&a', 'Choice&B' => '&b'],
             'preferred_choices' => ['&b'],
@@ -723,8 +720,6 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
 
     public function testSingleChoiceWithPreferredAndBlankSeparator()
     {
-        $this->requiresFeatureSet(404);
-
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\ChoiceType', '&a', [
             'choices' => ['Choice&A' => '&a', 'Choice&B' => '&b'],
             'preferred_choices' => ['&b'],
@@ -749,8 +744,6 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
 
     public function testChoiceWithOnlyPreferred()
     {
-        $this->requiresFeatureSet(404);
-
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\ChoiceType', '&a', [
             'choices' => ['Choice&A' => '&a', 'Choice&B' => '&b'],
             'preferred_choices' => ['&a', '&b'],
@@ -1814,8 +1807,6 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
 
     public function testRenderNumberWithHtml5NumberType()
     {
-        $this->requiresFeatureSet(403);
-
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\NumberType', 1234.56, [
             'html5' => true,
         ]);
@@ -1832,8 +1823,6 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
 
     public function testRenderNumberWithHtml5NumberTypeAndStepAttribute()
     {
-        $this->requiresFeatureSet(403);
-
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\NumberType', 1234.56, [
             'html5' => true,
             'attr' => ['step' => '0.1'],
@@ -1908,8 +1897,6 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
 
     public function testPercentNoSymbol()
     {
-        $this->requiresFeatureSet(403);
-
         $form = $this->factory->createNamed('name', PercentType::class, 0.1, ['symbol' => false, 'rounding_mode' => \NumberFormatter::ROUND_CEILING]);
         $this->assertWidgetMatchesXpath($form->createView(), [],
             '/input
@@ -1923,8 +1910,6 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
 
     public function testPercentCustomSymbol()
     {
-        $this->requiresFeatureSet(403);
-
         $form = $this->factory->createNamed('name', PercentType::class, 0.1, ['symbol' => '‱', 'rounding_mode' => \NumberFormatter::ROUND_CEILING]);
         $this->assertWidgetMatchesXpath($form->createView(), [],
             '/input
@@ -2412,9 +2397,9 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
     public function testStartTagForMultipartForm()
     {
         $form = $this->factory->createBuilder('Symfony\Component\Form\Extension\Core\Type\FormType', null, [
-                'method' => 'get',
-                'action' => 'http://example.com/directory',
-            ])
+            'method' => 'get',
+            'action' => 'http://example.com/directory',
+        ])
             ->add('file', 'Symfony\Component\Form\Extension\Core\Type\FileType')
             ->getForm();
 
@@ -2559,8 +2544,8 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
     public function testAttributesNotTranslatedWhenTranslationDomainIsFalse()
     {
         $view = $this->factory->createNamedBuilder('name', 'Symfony\Component\Form\Extension\Core\Type\FormType', null, [
-                'translation_domain' => false,
-            ])
+            'translation_domain' => false,
+        ])
             ->add('firstName', 'Symfony\Component\Form\Extension\Core\Type\TextType', ['attr' => ['title' => 'Foo']])
             ->add('lastName', 'Symfony\Component\Form\Extension\Core\Type\TextType', ['attr' => ['placeholder' => 'Bar']])
             ->getForm()
@@ -2602,8 +2587,6 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
 
     public function testLabelWithTranslationParameters()
     {
-        $this->requiresFeatureSet(403);
-
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType');
         $html = $this->renderLabel($form->createView(), 'Address is %address%', [
             'label_translation_parameters' => [
@@ -2621,8 +2604,6 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
 
     public function testHelpWithTranslationParameters()
     {
-        $this->requiresFeatureSet(403);
-
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType', null, [
             'help' => 'for company %company%',
             'help_translation_parameters' => [
@@ -2671,7 +2652,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
 
     public function testHelpWithTranslatableInterface()
     {
-        $message = new class() implements TranslatableInterface {
+        $message = new class implements TranslatableInterface {
             public function trans(TranslatorInterface $translator, ?string $locale = null): string
             {
                 return $translator->trans('foo');
@@ -2693,8 +2674,6 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
 
     public function testAttributesWithTranslationParameters()
     {
-        $this->requiresFeatureSet(403);
-
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType', null, [
             'attr' => [
                 'title' => 'Message to %company%',
@@ -2716,8 +2695,6 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
 
     public function testButtonWithTranslationParameters()
     {
-        $this->requiresFeatureSet(403);
-
         $form = $this->factory->createNamedBuilder('myform')
             ->add('mybutton', 'Symfony\Component\Form\Extension\Core\Type\ButtonType', [
                 'label' => 'Submit to %company%',
@@ -2741,8 +2718,6 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
      */
     public function testSubmitFormNoValidate(bool $validate)
     {
-        $this->requiresFeatureSet(404);
-
         $form = $this->factory->create(SubmitType::class, null, [
             'validate' => $validate,
         ]);
@@ -2772,8 +2747,6 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
 
     public function testWeekSingleText()
     {
-        $this->requiresFeatureSet(404);
-
         $form = $this->factory->createNamed('holidays', 'Symfony\Component\Form\Extension\Core\Type\WeekType', '1970-W01', [
             'input' => 'string',
             'widget' => 'single_text',
@@ -2791,8 +2764,6 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
 
     public function testWeekSingleTextNoHtml5()
     {
-        $this->requiresFeatureSet(404);
-
         $form = $this->factory->createNamed('holidays', 'Symfony\Component\Form\Extension\Core\Type\WeekType', '1970-W01', [
             'input' => 'string',
             'widget' => 'single_text',
@@ -2811,8 +2782,6 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
 
     public function testWeekChoices()
     {
-        $this->requiresFeatureSet(404);
-
         $data = ['year' => (int) date('Y'), 'week' => 1];
 
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\WeekType', $data, [
@@ -2837,8 +2806,6 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
 
     public function testWeekText()
     {
-        $this->requiresFeatureSet(404);
-
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\WeekType', '2000-W01', [
             'input' => 'string',
             'widget' => 'text',

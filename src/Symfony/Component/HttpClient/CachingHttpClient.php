@@ -35,17 +35,18 @@ class CachingHttpClient implements HttpClientInterface, ResetInterface
 {
     use HttpClientTrait;
 
-    private HttpClientInterface $client;
     private HttpCache $cache;
     private array $defaultOptions = self::OPTIONS_DEFAULTS;
 
-    public function __construct(HttpClientInterface $client, StoreInterface $store, array $defaultOptions = [])
-    {
+    public function __construct(
+        private HttpClientInterface $client,
+        StoreInterface $store,
+        array $defaultOptions = [],
+    ) {
         if (!class_exists(HttpClientKernel::class)) {
-            throw new \LogicException(sprintf('Using "%s" requires that the HttpKernel component version 4.3 or higher is installed, try running "composer require symfony/http-kernel:^5.4".', __CLASS__));
+            throw new \LogicException(\sprintf('Using "%s" requires that the HttpKernel component version 4.3 or higher is installed, try running "composer require symfony/http-kernel:^5.4".', __CLASS__));
         }
 
-        $this->client = $client;
         $kernel = new HttpClientKernel($client);
         $this->cache = new HttpCache($kernel, $store, null, $defaultOptions);
 

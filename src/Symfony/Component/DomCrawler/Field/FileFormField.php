@@ -29,7 +29,7 @@ class FileFormField extends FormField
     {
         $codes = [\UPLOAD_ERR_INI_SIZE, \UPLOAD_ERR_FORM_SIZE, \UPLOAD_ERR_PARTIAL, \UPLOAD_ERR_NO_FILE, \UPLOAD_ERR_NO_TMP_DIR, \UPLOAD_ERR_CANT_WRITE, \UPLOAD_ERR_EXTENSION];
         if (!\in_array($error, $codes)) {
-            throw new \InvalidArgumentException(sprintf('The error code "%s" is not valid.', $error));
+            throw new \InvalidArgumentException(\sprintf('The error code "%s" is not valid.', $error));
         }
 
         $this->value = ['name' => '', 'type' => '', 'tmp_name' => '', 'error' => $error, 'size' => 0];
@@ -55,8 +55,9 @@ class FileFormField extends FormField
             $name = $info['basename'];
 
             // copy to a tmp location
-            $tmp = sys_get_temp_dir().'/'.strtr(substr(base64_encode(hash('xxh128', uniqid(mt_rand(), true), true)), 0, 7), '/', '_');
+            $tmp = tempnam(sys_get_temp_dir(), $name);
             if (\array_key_exists('extension', $info)) {
+                unlink($tmp);
                 $tmp .= '.'.$info['extension'];
             }
             if (is_file($tmp)) {
@@ -90,11 +91,11 @@ class FileFormField extends FormField
     protected function initialize(): void
     {
         if ('input' !== $this->node->nodeName) {
-            throw new \LogicException(sprintf('A FileFormField can only be created from an input tag (%s given).', $this->node->nodeName));
+            throw new \LogicException(\sprintf('A FileFormField can only be created from an input tag (%s given).', $this->node->nodeName));
         }
 
         if ('file' !== strtolower($this->node->getAttribute('type'))) {
-            throw new \LogicException(sprintf('A FileFormField can only be created from an input tag with a type of file (given type is "%s").', $this->node->getAttribute('type')));
+            throw new \LogicException(\sprintf('A FileFormField can only be created from an input tag with a type of file (given type is "%s").', $this->node->getAttribute('type')));
         }
 
         $this->setValue(null);

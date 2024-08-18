@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+7.2
+---
+
+ * Remove `@internal` flag and add `@final` to `ServicesResetter`
+
 7.1
 ---
 
@@ -8,6 +13,12 @@ CHANGELOG
  * Add `HttpException::fromStatusCode()`
  * Add `$validationFailedStatusCode` argument to `#[MapQueryParameter]` that allows setting a custom HTTP status code when validation fails
  * Add `NearMissValueResolverException` to let value resolvers report when an argument could be under their watch but failed to be resolved
+ * Add `$type` argument to `#[MapRequestPayload]` that allows mapping a list of items
+ * The `Extension` class is marked as internal, extend the `Extension` class from the DependencyInjection component instead
+ * Deprecate `Extension::addAnnotatedClassesToCompile()`
+ * Deprecate `AddAnnotatedClassesToCachePass`
+ * Deprecate the `setAnnotatedClassCache()` and `getAnnotatedClassesToCompile()` methods of the `Kernel` class
+ * Add `#[MapUploadedFile]` attribute to fetch, validate, and inject uploaded files into controller arguments
 
 7.0
 ---

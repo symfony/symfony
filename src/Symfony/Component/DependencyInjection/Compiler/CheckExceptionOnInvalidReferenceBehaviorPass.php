@@ -47,7 +47,7 @@ class CheckExceptionOnInvalidReferenceBehaviorPass extends AbstractRecursivePass
         if (!$value instanceof Reference) {
             return parent::processValue($value, $isRoot);
         }
-        if (ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE < $value->getInvalidBehavior() || $this->container->has($id = (string) $value)) {
+        if (ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE < $value->getInvalidBehavior() || $this->container->has((string) $value)) {
             return $value;
         }
 
@@ -83,7 +83,7 @@ class CheckExceptionOnInvalidReferenceBehaviorPass extends AbstractRecursivePass
         $this->throwServiceNotFoundException($value, $currentId, $value);
     }
 
-    private function throwServiceNotFoundException(Reference $ref, string $sourceId, $value): void
+    private function throwServiceNotFoundException(Reference $ref, string $sourceId, mixed $value): void
     {
         $id = (string) $ref;
         $alternatives = [];
@@ -98,7 +98,7 @@ class CheckExceptionOnInvalidReferenceBehaviorPass extends AbstractRecursivePass
             }
         }
 
-        $pass = new class() extends AbstractRecursivePass {
+        $pass = new class extends AbstractRecursivePass {
             public Reference $ref;
             public string $sourceId;
             public array $alternatives;

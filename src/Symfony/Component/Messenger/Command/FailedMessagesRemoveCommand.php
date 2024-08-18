@@ -78,7 +78,7 @@ EOF
         $shouldDisplayMessages = $input->getOption('show-messages') || 1 === $idsCount;
 
         if (!$receiver instanceof ListableReceiverInterface) {
-            throw new RuntimeException(sprintf('The "%s" receiver does not support removing specific messages.', $failureTransportName));
+            throw new RuntimeException(\sprintf('The "%s" receiver does not support removing specific messages.', $failureTransportName));
         }
 
         if ($shouldDeleteAllMessages) {
@@ -101,7 +101,7 @@ EOF
             }
 
             if (null === $envelope) {
-                $io->error(sprintf('The message with id "%s" was not found.', $id));
+                $io->error(\sprintf('The message with id "%s" was not found.', $id));
                 continue;
             }
 
@@ -112,9 +112,9 @@ EOF
             if ($shouldForce || $io->confirm('Do you want to permanently remove this message?', false)) {
                 $receiver->reject($envelope);
 
-                $io->success(sprintf('Message with id %s removed.', $id));
+                $io->success(\sprintf('Message with id %s removed.', $id));
             } else {
-                $io->note(sprintf('Message with id %s not removed.', $id));
+                $io->note(\sprintf('Message with id %s not removed.', $id));
             }
         }
     }
@@ -123,7 +123,7 @@ EOF
     {
         if (!$shouldForce) {
             if ($receiver instanceof MessageCountAwareInterface) {
-                $question = sprintf('Do you want to permanently remove all (%d) messages?', $receiver->getMessageCount());
+                $question = \sprintf('Do you want to permanently remove all (%d) messages?', $receiver->getMessageCount());
             } else {
                 $question = 'Do you want to permanently remove all failed messages?';
             }
@@ -143,6 +143,6 @@ EOF
             ++$count;
         }
 
-        $io->note(sprintf('%d messages were removed.', $count));
+        $io->note(\sprintf('%d messages were removed.', $count));
     }
 }

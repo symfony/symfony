@@ -30,23 +30,19 @@ use Twig\Environment;
  */
 class RouterController
 {
-    private ?Profiler $profiler;
-    private Environment $twig;
-    private ?UrlMatcherInterface $matcher;
-    private ?RouteCollection $routes;
-
     /**
-     * @var ExpressionFunctionProviderInterface[]
+     * @param ExpressionFunctionProviderInterface[] $expressionLanguageProviders
      */
-    private iterable $expressionLanguageProviders;
-
-    public function __construct(?Profiler $profiler, Environment $twig, ?UrlMatcherInterface $matcher = null, ?RouteCollection $routes = null, iterable $expressionLanguageProviders = [])
-    {
-        $this->profiler = $profiler;
-        $this->twig = $twig;
-        $this->matcher = $matcher;
-        $this->routes = (null === $routes && $matcher instanceof RouterInterface) ? $matcher->getRouteCollection() : $routes;
-        $this->expressionLanguageProviders = $expressionLanguageProviders;
+    public function __construct(
+        private ?Profiler $profiler,
+        private Environment $twig,
+        private ?UrlMatcherInterface $matcher = null,
+        private ?RouteCollection $routes = null,
+        private iterable $expressionLanguageProviders = [],
+    ) {
+        if ($this->matcher instanceof RouterInterface) {
+            $this->routes ??= $this->matcher->getRouteCollection();
+        }
     }
 
     /**
@@ -83,10 +79,10 @@ class RouterController
      */
     private function getTraces(RequestDataCollector $request, string $method): array
     {
-        $traceRequest = Request::create(
-            $request->getPathInfo(),
-            $request->getRequestServer(true)->get('REQUEST_METHOD'),
-            \in_array($request->getMethod(), ['DELETE', 'PATCH', 'POST', 'PUT'], true) ? $request->getRequestRequest()->all() : $request->getRequestQuery()->all(),
+        $traceRequest = new Request(
+            $request->getRequestQuery()->all(),
+            $request->getRequestRequest()->all(),
+            $request->getRequestAttributes()->all(),
             $request->getRequestCookies(true)->all(),
             [],
             $request->getRequestServer(true)->all()

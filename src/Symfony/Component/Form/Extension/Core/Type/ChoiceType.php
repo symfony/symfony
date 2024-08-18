@@ -51,16 +51,16 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class ChoiceType extends AbstractType
 {
     private ChoiceListFactoryInterface $choiceListFactory;
-    private ?TranslatorInterface $translator;
 
-    public function __construct(?ChoiceListFactoryInterface $choiceListFactory = null, ?TranslatorInterface $translator = null)
-    {
+    public function __construct(
+        ?ChoiceListFactoryInterface $choiceListFactory = null,
+        private ?TranslatorInterface $translator = null,
+    ) {
         $this->choiceListFactory = $choiceListFactory ?? new CachingFactoryDecorator(
             new PropertyAccessDecorator(
                 new DefaultChoiceListFactory()
             )
         );
-        $this->translator = $translator;
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
@@ -141,9 +141,9 @@ class ChoiceType extends AbstractType
                             $knownValues[$child->getName()] = $value;
                             unset($unknownValues[$value]);
                             continue;
-                        } else {
-                            $knownValues[$child->getName()] = null;
                         }
+
+                        $knownValues[$child->getName()] = null;
                     }
                 } else {
                     foreach ($choiceList->getChoicesForValues($data) as $key => $choice) {
@@ -158,7 +158,7 @@ class ChoiceType extends AbstractType
 
                 // Throw exception if unknown values were submitted (multiple choices will be handled in a different event listener below)
                 if (\count($unknownValues) > 0 && !$options['multiple']) {
-                    throw new TransformationFailedException(sprintf('The choices "%s" do not exist in the choice list.', implode('", "', array_keys($unknownValues))));
+                    throw new TransformationFailedException(\sprintf('The choices "%s" do not exist in the choice list.', implode('", "', array_keys($unknownValues))));
                 }
 
                 $event->setData($knownValues);
@@ -182,7 +182,7 @@ class ChoiceType extends AbstractType
                         $message = strtr($messageTemplate, ['{{ value }}' => $clientDataAsString]);
                     }
 
-                    $form->addError(new FormError($message, $messageTemplate, ['{{ value }}' => $clientDataAsString], null, new TransformationFailedException(sprintf('The choices "%s" do not exist in the choice list.', $clientDataAsString))));
+                    $form->addError(new FormError($message, $messageTemplate, ['{{ value }}' => $clientDataAsString], null, new TransformationFailedException(\sprintf('The choices "%s" do not exist in the choice list.', $clientDataAsString))));
                 }
             });
 

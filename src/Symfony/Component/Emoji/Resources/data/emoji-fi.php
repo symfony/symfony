@@ -1183,6 +1183,7 @@ return [
     '👩‍👧' => 'perhe: nainen, tyttö',
     '😶‍🌫' => 'naama pilvissä',
     '😮‍💨' => 'hämmästynyt',
+    '🙂‍↔' => 'ravistaa päätä vaakasuunnassa',
     '🙂‍↕' => 'ravistaa päätä pystysuunnassa',
     '😵‍💫' => 'naama jolla spiraalisilmät',
     '❤‍🔥' => 'palava sydän',

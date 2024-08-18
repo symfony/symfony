@@ -1183,6 +1183,7 @@ return [
     '👩‍👧' => 'familia: emakumea eta neska',
     '😶‍🌫' => 'hodei artean dagoen aurpegia',
     '😮‍💨' => 'arnasa botatzen ari den aurpegia',
+    '🙂‍↔' => 'horizontalki mugitzen ari den burua',
     '🙂‍↕' => 'bertikalki mugitzen ari den burua',
     '😵‍💫' => 'kiribil-begiak dituen aurpegia',
     '❤‍🔥' => 'sutan dagoen bihotza',

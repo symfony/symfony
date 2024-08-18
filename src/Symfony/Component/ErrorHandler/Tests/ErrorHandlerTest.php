@@ -31,6 +31,13 @@ use Symfony\Component\ErrorHandler\Tests\Fixtures\LoggerThatSetAnErrorHandler;
  */
 class ErrorHandlerTest extends TestCase
 {
+    protected function tearDown(): void
+    {
+        $r = new \ReflectionProperty(ErrorHandler::class, 'exitCode');
+        $r->setAccessible(true);
+        $r->setValue(null, 0);
+    }
+
     public function testRegister()
     {
         $handler = ErrorHandler::register();
@@ -154,7 +161,7 @@ class ErrorHandlerTest extends TestCase
             $this->assertSame('Undefined variable $foo', $e->getMessage());
             $this->assertSame(__FILE__, $e->getFile());
             $this->assertSame(0, $e->getCode());
-            $this->assertSame('Symfony\Component\ErrorHandler\{closure}', $trace[0]['function']);
+            $this->assertStringMatchesFormat('%A{closure%A}', $trace[0]['function']);
             $this->assertSame(ErrorHandler::class, $trace[0]['class']);
             $this->assertSame('triggerNotice', $trace[1]['function']);
             $this->assertSame(__CLASS__, $trace[1]['class']);
@@ -194,13 +201,12 @@ class ErrorHandlerTest extends TestCase
             $loggers = [
                 \E_DEPRECATED => [null, LogLevel::INFO],
                 \E_USER_DEPRECATED => [null, LogLevel::INFO],
-                \E_NOTICE => [$logger, LogLevel::WARNING],
+                \E_NOTICE => [$logger, LogLevel::ERROR],
                 \E_USER_NOTICE => [$logger, LogLevel::CRITICAL],
-                \E_STRICT => [null, LogLevel::WARNING],
-                \E_WARNING => [null, LogLevel::WARNING],
-                \E_USER_WARNING => [null, LogLevel::WARNING],
-                \E_COMPILE_WARNING => [null, LogLevel::WARNING],
-                \E_CORE_WARNING => [null, LogLevel::WARNING],
+                \E_WARNING => [null, LogLevel::ERROR],
+                \E_USER_WARNING => [null, LogLevel::ERROR],
+                \E_COMPILE_WARNING => [null, LogLevel::ERROR],
+                \E_CORE_WARNING => [null, LogLevel::ERROR],
                 \E_USER_ERROR => [null, LogLevel::CRITICAL],
                 \E_RECOVERABLE_ERROR => [null, LogLevel::CRITICAL],
                 \E_COMPILE_ERROR => [null, LogLevel::CRITICAL],
@@ -208,6 +214,11 @@ class ErrorHandlerTest extends TestCase
                 \E_ERROR => [null, LogLevel::CRITICAL],
                 \E_CORE_ERROR => [null, LogLevel::CRITICAL],
             ];
+
+            if (\PHP_VERSION_ID < 80400) {
+                $loggers[\E_STRICT] = [null, LogLevel::ERROR];
+            }
+
             $this->assertSame($loggers, $handler->setLoggers([]));
         } finally {
             restore_error_handler();
@@ -322,7 +333,7 @@ class ErrorHandlerTest extends TestCase
 
     public function testHandleErrorWithAnonymousClass()
     {
-        $anonymousObject = new class() extends \stdClass {
+        $anonymousObject = new class extends \stdClass {
         };
 
         $handler = ErrorHandler::register();
@@ -411,7 +422,7 @@ class ErrorHandlerTest extends TestCase
             ['Uncaught Exception: foo', new \Exception('foo')],
             ['Uncaught Exception: foo', new class('foo') extends \RuntimeException {
             }],
-            ['Uncaught Exception: foo stdClass@anonymous bar', new \RuntimeException('foo '.(new class() extends \stdClass {
+            ['Uncaught Exception: foo stdClass@anonymous bar', new \RuntimeException('foo '.(new class extends \stdClass {
             })::class.' bar')],
             ['Uncaught Error: bar', new \Error('bar')],
             ['Uncaught ccc', new \ErrorException('ccc')],
@@ -431,13 +442,12 @@ class ErrorHandlerTest extends TestCase
         $loggers = [
             \E_DEPRECATED => [$bootLogger, LogLevel::INFO],
             \E_USER_DEPRECATED => [$bootLogger, LogLevel::INFO],
-            \E_NOTICE => [$bootLogger, LogLevel::WARNING],
-            \E_USER_NOTICE => [$bootLogger, LogLevel::WARNING],
-            \E_STRICT => [$bootLogger, LogLevel::WARNING],
-            \E_WARNING => [$bootLogger, LogLevel::WARNING],
-            \E_USER_WARNING => [$bootLogger, LogLevel::WARNING],
-            \E_COMPILE_WARNING => [$bootLogger, LogLevel::WARNING],
-            \E_CORE_WARNING => [$bootLogger, LogLevel::WARNING],
+            \E_NOTICE => [$bootLogger, LogLevel::ERROR],
+            \E_USER_NOTICE => [$bootLogger, LogLevel::ERROR],
+            \E_WARNING => [$bootLogger, LogLevel::ERROR],
+            \E_USER_WARNING => [$bootLogger, LogLevel::ERROR],
+            \E_COMPILE_WARNING => [$bootLogger, LogLevel::ERROR],
+            \E_CORE_WARNING => [$bootLogger, LogLevel::ERROR],
             \E_USER_ERROR => [$bootLogger, LogLevel::CRITICAL],
             \E_RECOVERABLE_ERROR => [$bootLogger, LogLevel::CRITICAL],
             \E_COMPILE_ERROR => [$bootLogger, LogLevel::CRITICAL],
@@ -445,6 +455,10 @@ class ErrorHandlerTest extends TestCase
             \E_ERROR => [$bootLogger, LogLevel::CRITICAL],
             \E_CORE_ERROR => [$bootLogger, LogLevel::CRITICAL],
         ];
+
+        if (\PHP_VERSION_ID < 80400) {
+            $loggers[\E_STRICT] = [$bootLogger, LogLevel::ERROR];
+        }
 
         $this->assertSame($loggers, $handler->setLoggers([]));
 
@@ -658,7 +672,7 @@ class ErrorHandlerTest extends TestCase
 
         $logs = $logger->cleanLogs();
 
-        $this->assertSame('warning', $logs[0][0]);
+        $this->assertSame('error', $logs[0][0]);
         $this->assertSame('Warning: assert(): assert(false) failed', $logs[0][1]);
     }
 

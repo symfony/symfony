@@ -113,7 +113,7 @@ final class HttplugClient implements ClientInterface, HttpAsyncClient, RequestFa
     public function sendAsyncRequest(RequestInterface $request): HttplugPromise
     {
         if (!$promisePool = $this->promisePool) {
-            throw new \LogicException(sprintf('You cannot use "%s()" as the "guzzlehttp/promises" package is not installed. Try running "composer require guzzlehttp/promises".', __METHOD__));
+            throw new \LogicException(\sprintf('You cannot use "%s()" as the "guzzlehttp/promises" package is not installed. Try running "composer require guzzlehttp/promises".', __METHOD__));
         }
 
         try {
@@ -160,7 +160,7 @@ final class HttplugClient implements ClientInterface, HttpAsyncClient, RequestFa
         } elseif (class_exists(Request::class)) {
             $request = new Request($method, $uri);
         } else {
-            throw new \LogicException(sprintf('You cannot use "%s()" as no PSR-17 factories have been found. Try running "composer require php-http/discovery psr/http-factory-implementation:*".', __METHOD__));
+            throw new \LogicException(\sprintf('You cannot use "%s()" as no PSR-17 factories have been found. Try running "composer require php-http/discovery psr/http-factory-implementation:*".', __METHOD__));
         }
 
         return $request;
@@ -195,7 +195,7 @@ final class HttplugClient implements ClientInterface, HttpAsyncClient, RequestFa
             return new Uri($uri);
         }
 
-        throw new \LogicException(sprintf('You cannot use "%s()" as no PSR-17 factories have been found. Try running "composer require php-http/discovery psr/http-factory-implementation:*".', __METHOD__));
+        throw new \LogicException(\sprintf('You cannot use "%s()" as no PSR-17 factories have been found. Try running "composer require php-http/discovery psr/http-factory-implementation:*".', __METHOD__));
     }
 
     public function __sleep(): array

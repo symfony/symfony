@@ -41,7 +41,7 @@ class MailerTest extends TestCase
 
     public function testSendMessageToBus()
     {
-        $bus = new class() implements MessageBusInterface {
+        $bus = new class implements MessageBusInterface {
             public array $messages = [];
             public array $stamps = [];
 
@@ -86,6 +86,8 @@ class MailerTest extends TestCase
 
     public function testRejectMessage()
     {
+        $this->expectNotToPerformAssertions();
+
         $dispatcher = new EventDispatcher();
         $dispatcher->addListener(MessageEvent::class, fn (MessageEvent $event) => $event->reject(), 255);
         $dispatcher->addListener(MessageEvent::class, fn () => throw new \RuntimeException('Should never be called.'));
@@ -111,6 +113,5 @@ class MailerTest extends TestCase
         $message = new RawMessage('');
         $envelope = new MailerEnvelope(new Address('fabien@example.com'), [new Address('helene@example.com')]);
         $mailer->send($message, $envelope);
-        $this->assertTrue(true);
     }
 }

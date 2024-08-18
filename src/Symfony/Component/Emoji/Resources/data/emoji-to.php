@@ -1180,6 +1180,7 @@ return [
     '👩‍👧' => 'fāmili: fefine mo e taʻahine',
     '😶‍🌫' => 'mata ʻihe ʻao',
     '😮‍💨' => 'mata hō',
+    '🙂‍↔' => 'mata kalokalo',
     '🙂‍↕' => 'mata kamokamo',
     '😵‍💫' => 'mata takatakai',
     '❤‍🔥' => 'mafu afi',

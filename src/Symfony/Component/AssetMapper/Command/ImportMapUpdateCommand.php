@@ -64,7 +64,7 @@ EOT
         $this->renderVersionProblems($this->importMapVersionChecker, $output);
 
         if (0 < \count($packages)) {
-            $io->success(sprintf(
+            $io->success(\sprintf(
                 'Updated %s package%s in importmap.php.',
                 implode(', ', array_map(static fn (ImportMapEntry $entry): string => $entry->importName, $updatedPackages)),
                 1 < \count($updatedPackages) ? 's' : '',

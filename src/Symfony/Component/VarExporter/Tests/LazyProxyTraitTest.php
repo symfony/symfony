@@ -12,6 +12,9 @@
 namespace Symfony\Component\VarExporter\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactory;
+use Symfony\Component\Serializer\Mapping\Loader\AttributeLoader;
+use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\VarExporter\Exception\LogicException;
 use Symfony\Component\VarExporter\LazyProxyTrait;
 use Symfony\Component\VarExporter\ProxyHelper;
@@ -22,6 +25,7 @@ use Symfony\Component\VarExporter\Tests\Fixtures\LazyProxy\TestClass;
 use Symfony\Component\VarExporter\Tests\Fixtures\LazyProxy\TestOverwritePropClass;
 use Symfony\Component\VarExporter\Tests\Fixtures\LazyProxy\TestUnserializeClass;
 use Symfony\Component\VarExporter\Tests\Fixtures\LazyProxy\TestWakeupClass;
+use Symfony\Component\VarExporter\Tests\Fixtures\SimpleObject;
 
 class LazyProxyTraitTest extends TestCase
 {
@@ -201,7 +205,7 @@ class LazyProxyTraitTest extends TestCase
 
     public function testWither()
     {
-        $obj = new class() {
+        $obj = new class {
             public $foo = 123;
 
             public function withFoo($foo): static
@@ -222,7 +226,7 @@ class LazyProxyTraitTest extends TestCase
 
     public function testFluent()
     {
-        $obj = new class() {
+        $obj = new class {
             public $foo = 123;
 
             public function setFoo($foo): static
@@ -240,7 +244,7 @@ class LazyProxyTraitTest extends TestCase
 
     public function testIndirectModification()
     {
-        $obj = new class() {
+        $obj = new class {
             public array $foo;
         };
         $proxy = $this->createLazyProxy($obj::class, fn () => $obj);
@@ -264,7 +268,7 @@ class LazyProxyTraitTest extends TestCase
 
     public function testLazyDecoratorClass()
     {
-        $obj = new class() extends TestClass {
+        $obj = new class extends TestClass {
             use LazyProxyTrait {
                 createLazyProxy as private;
             }
@@ -276,6 +280,19 @@ class LazyProxyTraitTest extends TestCase
         };
 
         $this->assertSame(['foo' => 123], (array) $obj->getDep());
+    }
+
+    public function testNormalization()
+    {
+        $object = $this->createLazyProxy(SimpleObject::class, fn () => new SimpleObject());
+
+        $loader = new AttributeLoader();
+        $metadataFactory = new ClassMetadataFactory($loader);
+        $serializer = new ObjectNormalizer($metadataFactory);
+
+        $output = $serializer->normalize($object);
+
+        $this->assertSame(['property' => 'property', 'method' => 'method'], $output);
     }
 
     /**

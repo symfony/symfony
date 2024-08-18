@@ -47,6 +47,11 @@ class Dummy extends ParentDummy
     public $collection;
 
     /**
+     * @var DummyCollection<int, string>
+     */
+    public $collectionAsObject;
+
+    /**
      * @var string[][]
      */
     public $nestedCollection;
@@ -167,6 +172,14 @@ class Dummy extends ParentDummy
      */
     public $parentAnnotation;
 
+    /**
+     * @var \BackedEnum<string>
+     */
+    public $genericInterface;
+
+    /** @var Dummy[]|null  */
+    public $nullableTypedCollection = null;
+
     public static function getStatic()
     {
     }
@@ -196,7 +209,7 @@ class Dummy extends ParentDummy
      *
      * @param ParentDummy|null $parent
      */
-    public function setB(ParentDummy $parent = null)
+    public function setB(?ParentDummy $parent = null)
     {
     }
 
@@ -257,6 +270,10 @@ class Dummy extends ParentDummy
     }
 
     public function hasElement(string $element): bool
+    {
+    }
+
+    public function addNullableTypedCollection(Dummy $dummy): void
     {
     }
 }

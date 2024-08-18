@@ -184,7 +184,7 @@ class ArgumentResolverTest extends TestCase
         $controller = (new ArgumentResolverTestController())->controllerWithFoo(...);
 
         $this->expectException(\RuntimeException::class);
-        $this->expectExceptionMessage('Controller "Closure" requires the "$foo" argument that could not be resolved. Either the argument is nullable and no null value has been provided, no default value has been provided or there is a non-optional argument after this one.');
+        $this->expectExceptionMessage('Controller "'.ArgumentResolverTestController::class.'::controllerWithFoo" requires the "$foo" argument that could not be resolved. Either the argument is nullable and no null value has been provided, no default value has been provided or there is a non-optional argument after this one.');
         self::getResolver()->getArguments($request, $controller);
     }
 
@@ -350,7 +350,7 @@ class ArgumentResolverTest extends TestCase
 
     public function testResolversChainCompletionWhenResolverThrowsSpecialException()
     {
-        $failingValueResolver = new class() implements ValueResolverInterface {
+        $failingValueResolver = new class implements ValueResolverInterface {
             public function resolve(Request $request, ArgumentMetadata $argument): iterable
             {
                 throw new NearMissValueResolverException('This resolver throws an exception');
@@ -370,7 +370,7 @@ class ArgumentResolverTest extends TestCase
 
     public function testExceptionListSingle()
     {
-        $failingValueResolverOne = new class() implements ValueResolverInterface {
+        $failingValueResolverOne = new class implements ValueResolverInterface {
             public function resolve(Request $request, ArgumentMetadata $argument): iterable
             {
                 throw new NearMissValueResolverException('Some reason why value could not be resolved.');
@@ -388,13 +388,13 @@ class ArgumentResolverTest extends TestCase
 
     public function testExceptionListMultiple()
     {
-        $failingValueResolverOne = new class() implements ValueResolverInterface {
+        $failingValueResolverOne = new class implements ValueResolverInterface {
             public function resolve(Request $request, ArgumentMetadata $argument): iterable
             {
                 throw new NearMissValueResolverException('Some reason why value could not be resolved.');
             }
         };
-        $failingValueResolverTwo = new class() implements ValueResolverInterface {
+        $failingValueResolverTwo = new class implements ValueResolverInterface {
             public function resolve(Request $request, ArgumentMetadata $argument): iterable
             {
                 throw new NearMissValueResolverException('Another reason why value could not be resolved.');

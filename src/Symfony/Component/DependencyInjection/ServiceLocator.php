@@ -46,11 +46,11 @@ class ServiceLocator implements ServiceCollectionInterface
         try {
             return $this->doGet($id);
         } catch (RuntimeException $e) {
-            $what = sprintf('service "%s" required by "%s"', $id, $this->externalId);
+            $what = \sprintf('service "%s" required by "%s"', $id, $this->externalId);
             $message = preg_replace('/service "\.service_locator\.[^"]++"/', $what, $e->getMessage());
 
             if ($e->getMessage() === $message) {
-                $message = sprintf('Cannot resolve %s: %s', $what, $message);
+                $message = \sprintf('Cannot resolve %s: %s', $what, $message);
             }
 
             $r = new \ReflectionProperty($e, 'message');
@@ -92,7 +92,7 @@ class ServiceLocator implements ServiceCollectionInterface
     private function createNotFoundException(string $id): NotFoundExceptionInterface
     {
         if ($this->loading) {
-            $msg = sprintf('The service "%s" has a dependency on a non-existent service "%s". This locator %s', end($this->loading), $id, $this->formatAlternatives());
+            $msg = \sprintf('The service "%s" has a dependency on a non-existent service "%s". This locator %s', end($this->loading), $id, $this->formatAlternatives());
 
             return new ServiceNotFoundException($id, end($this->loading) ?: null, null, [], $msg);
         }
@@ -102,7 +102,7 @@ class ServiceLocator implements ServiceCollectionInterface
         $externalId = $this->externalId ?: $class;
 
         $msg = [];
-        $msg[] = sprintf('Service "%s" not found:', $id);
+        $msg[] = \sprintf('Service "%s" not found:', $id);
 
         if (!$this->container) {
             $class = null;
@@ -114,22 +114,22 @@ class ServiceLocator implements ServiceCollectionInterface
                 $class = null;
             } catch (ServiceNotFoundException $e) {
                 if ($e->getAlternatives()) {
-                    $msg[] = sprintf('did you mean %s? Anyway,', $this->formatAlternatives($e->getAlternatives(), 'or'));
+                    $msg[] = \sprintf('did you mean %s? Anyway,', $this->formatAlternatives($e->getAlternatives(), 'or'));
                 } else {
                     $class = null;
                 }
             }
         }
         if ($externalId) {
-            $msg[] = sprintf('the container inside "%s" is a smaller service locator that %s', $externalId, $this->formatAlternatives());
+            $msg[] = \sprintf('the container inside "%s" is a smaller service locator that %s', $externalId, $this->formatAlternatives());
         } else {
-            $msg[] = sprintf('the current service locator %s', $this->formatAlternatives());
+            $msg[] = \sprintf('the current service locator %s', $this->formatAlternatives());
         }
 
         if (!$class) {
             // no-op
         } elseif (is_subclass_of($class, ServiceSubscriberInterface::class)) {
-            $msg[] = sprintf('Unless you need extra laziness, try using dependency injection instead. Otherwise, you need to declare it using "%s::getSubscribedServices()".', preg_replace('/([^\\\\]++\\\\)++/', '', $class));
+            $msg[] = \sprintf('Unless you need extra laziness, try using dependency injection instead. Otherwise, you need to declare it using "%s::getSubscribedServices()".', preg_replace('/([^\\\\]++\\\\)++/', '', $class));
         } else {
             $msg[] = 'Try using dependency injection instead.';
         }
@@ -149,10 +149,10 @@ class ServiceLocator implements ServiceCollectionInterface
             if (!$alternatives = array_keys($this->factories)) {
                 return 'is empty...';
             }
-            $format = sprintf('only knows about the %s service%s.', $format, 1 < \count($alternatives) ? 's' : '');
+            $format = \sprintf('only knows about the %s service%s.', $format, 1 < \count($alternatives) ? 's' : '');
         }
         $last = array_pop($alternatives);
 
-        return sprintf($format, $alternatives ? implode('", "', $alternatives) : $last, $alternatives ? sprintf(' %s "%s"', $separator, $last) : '');
+        return \sprintf($format, $alternatives ? implode('", "', $alternatives) : $last, $alternatives ? \sprintf(' %s "%s"', $separator, $last) : '');
     }
 }

@@ -46,7 +46,7 @@ class SesHttpAsyncAwsTransport extends AbstractTransport
             $host = $configuration->get('region');
         }
 
-        return sprintf('ses+https://%s@%s', $configuration->get('accessKeyId'), $host);
+        return \sprintf('ses+https://%s@%s', $configuration->get('accessKeyId'), $host);
     }
 
     protected function doSend(SentMessage $message): void
@@ -58,7 +58,7 @@ class SesHttpAsyncAwsTransport extends AbstractTransport
             $message->setMessageId($result->getMessageId());
             $message->appendDebug($response->getInfo('debug') ?? '');
         } catch (HttpException $e) {
-            $exception = new HttpTransportException(sprintf('Unable to send an email: %s (code %s).', $e->getAwsMessage() ?: $e->getMessage(), $e->getAwsCode() ?: $e->getCode()), $e->getResponse(), $e->getCode(), $e);
+            $exception = new HttpTransportException(\sprintf('Unable to send an email: %s (code %s).', $e->getAwsMessage() ?: $e->getMessage(), $e->getAwsCode() ?: $e->getCode()), $e->getResponse(), $e->getCode(), $e);
             $exception->appendDebug($e->getResponse()->getInfo('debug') ?? '');
 
             throw $exception;
@@ -78,16 +78,20 @@ class SesHttpAsyncAwsTransport extends AbstractTransport
             ],
         ];
 
-        if (($message->getOriginalMessage() instanceof Message)
-            && $configurationSetHeader = $message->getOriginalMessage()->getHeaders()->get('X-SES-CONFIGURATION-SET')) {
-            $request['ConfigurationSetName'] = $configurationSetHeader->getBodyAsString();
-        }
-        if (($message->getOriginalMessage() instanceof Message)
-            && $sourceArnHeader = $message->getOriginalMessage()->getHeaders()->get('X-SES-SOURCE-ARN')) {
-            $request['FromEmailAddressIdentityArn'] = $sourceArnHeader->getBodyAsString();
-        }
-        if ($message->getOriginalMessage() instanceof Message) {
-            foreach ($message->getOriginalMessage()->getHeaders()->all() as $header) {
+        $originalMessage = $message->getOriginalMessage();
+        if ($originalMessage instanceof Message) {
+            if ($configurationSetHeader = $message->getOriginalMessage()->getHeaders()->get('X-SES-CONFIGURATION-SET')) {
+                $request['ConfigurationSetName'] = $configurationSetHeader->getBodyAsString();
+            }
+            if ($sourceArnHeader = $message->getOriginalMessage()->getHeaders()->get('X-SES-SOURCE-ARN')) {
+                $request['FromEmailAddressIdentityArn'] = $sourceArnHeader->getBodyAsString();
+            }
+            if ($header = $message->getOriginalMessage()->getHeaders()->get('X-SES-LIST-MANAGEMENT-OPTIONS')) {
+                if (preg_match('/^(contactListName=)*(?<ContactListName>[^;]+)(;\s?topicName=(?<TopicName>.+))?$/ix', $header->getBodyAsString(), $listManagementOptions)) {
+                    $request['ListManagementOptions'] = array_filter($listManagementOptions, fn ($e) => \in_array($e, ['ContactListName', 'TopicName']), \ARRAY_FILTER_USE_KEY);
+                }
+            }
+            foreach ($originalMessage->getHeaders()->all() as $header) {
                 if ($header instanceof MetadataHeader) {
                     $request['EmailTags'][] = ['Name' => $header->getKey(), 'Value' => $header->getValue()];
                 }

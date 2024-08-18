@@ -108,6 +108,8 @@ foreach (['Security/Core' => 'security', 'Form' => 'validators', 'Validator' => 
             if ($catalogue->defines($resname, $domain)) {
                 $translation = $catalogue->get($resname, $domain);
                 $metadata = $catalogue->getMetadata($resname, $domain);
+            } else {
+                $translation = $source;
             }
             $metadata['id'] = $enCatalogue->getMetadata($resname, $domain)['id'];
             if ($resname !== $source) {

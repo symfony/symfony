@@ -344,7 +344,7 @@ class BinaryFileResponseTest extends ResponseTestCase
         $this->assertEquals('none', $response->headers->get('Accept-Ranges'));
     }
 
-    public function testAcceptRangeNotOverriden()
+    public function testAcceptRangeNotOverridden()
     {
         $request = Request::create('/', 'POST');
         $response = new BinaryFileResponse(__DIR__.'/File/Fixtures/test.gif', 200, ['Content-Type' => 'application/octet-stream']);
@@ -454,5 +454,15 @@ class BinaryFileResponseTest extends ResponseTestCase
         $response->sendContent();
         $string = ob_get_clean();
         $this->assertSame('foo,bar', $string);
+    }
+
+    public function testSetChunkSizeTooSmall()
+    {
+        $response = new BinaryFileResponse(__DIR__.'/File/Fixtures/test.gif');
+
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('The chunk size of a BinaryFileResponse cannot be less than 1.');
+
+        $response->setChunkSize(0);
     }
 }

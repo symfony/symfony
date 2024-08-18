@@ -74,6 +74,10 @@
                 <source>Too many failed login attempts, please try again in %minutes% minute.</source>
                 <target>Per daug nepavykusių prisijungimo bandymų, pabandykite dar kartą po %minutes% minutės.</target>
             </trans-unit>
+            <trans-unit id="20">
+                <source>Too many failed login attempts, please try again in %minutes% minutes.</source>
+                <target state="needs-review-translation">Per daug nesėkmingų prisijungimo bandymų, bandykite vėl po %minutes% minutės.|Per daug nesėkmingų prisijungimo bandymų, bandykite vėl po %minutes% minučių.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

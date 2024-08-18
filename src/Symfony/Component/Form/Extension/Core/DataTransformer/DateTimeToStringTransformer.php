@@ -101,12 +101,16 @@ class DateTimeToStringTransformer extends BaseDateTimeTransformer
      */
     public function reverseTransform(mixed $value): ?\DateTime
     {
-        if (empty($value)) {
+        if (!$value) {
             return null;
         }
 
         if (!\is_string($value)) {
             throw new TransformationFailedException('Expected a string.');
+        }
+
+        if (str_contains($value, "\0")) {
+            throw new TransformationFailedException('Null bytes not allowed');
         }
 
         $outputTz = new \DateTimeZone($this->outputTimezone);

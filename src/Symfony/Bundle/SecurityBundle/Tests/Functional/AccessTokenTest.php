@@ -378,7 +378,7 @@ class AccessTokenTest extends AbstractWebTestCase
         );
 
         $client = $this->createClient(['test_case' => 'AccessToken', 'root_config' => 'config_oidc.yml']);
-        $client->request('GET', '/foo', [], [], ['HTTP_AUTHORIZATION' => sprintf('Bearer %s', $token)]);
+        $client->request('GET', '/foo', [], [], ['HTTP_AUTHORIZATION' => \sprintf('Bearer %s', $token)]);
         $response = $client->getResponse();
 
         $this->assertInstanceOf(Response::class, $response);

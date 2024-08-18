@@ -71,7 +71,7 @@ class CookieJar
     {
         $path ??= '/';
 
-        if (empty($domain)) {
+        if (!$domain) {
             // an empty domain means any domain
             // this should never happen but it allows for a better BC
             $domains = array_keys($this->cookieJar);

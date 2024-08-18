@@ -133,7 +133,7 @@ class Profiler implements ResetInterface
             return null;
         }
 
-        $profile = new Profile(substr(hash('xxh128', uniqid(mt_rand(), true)), 0, 6));
+        $profile = new Profile(bin2hex(random_bytes(3)));
         $profile->setTime(time());
         $profile->setUrl($request->getUri());
         $profile->setMethod($request->getMethod());
@@ -221,7 +221,7 @@ class Profiler implements ResetInterface
     public function get(string $name): DataCollectorInterface
     {
         if (!isset($this->collectors[$name])) {
-            throw new \InvalidArgumentException(sprintf('Collector "%s" does not exist.', $name));
+            throw new \InvalidArgumentException(\sprintf('Collector "%s" does not exist.', $name));
         }
 
         return $this->collectors[$name];

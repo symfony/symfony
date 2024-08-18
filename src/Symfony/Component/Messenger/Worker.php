@@ -22,8 +22,7 @@ use Symfony\Component\Messenger\Event\WorkerRateLimitedEvent;
 use Symfony\Component\Messenger\Event\WorkerRunningEvent;
 use Symfony\Component\Messenger\Event\WorkerStartedEvent;
 use Symfony\Component\Messenger\Event\WorkerStoppedEvent;
-use Symfony\Component\Messenger\Exception\DelayedMessageHandlingException;
-use Symfony\Component\Messenger\Exception\HandlerFailedException;
+use Symfony\Component\Messenger\Exception\EnvelopeAwareExceptionInterface;
 use Symfony\Component\Messenger\Exception\RejectRedeliveredMessageException;
 use Symfony\Component\Messenger\Exception\RuntimeException;
 use Symfony\Component\Messenger\Stamp\AckStamp;
@@ -88,7 +87,7 @@ class Worker
             // if queue names are specified, all receivers must implement the QueueReceiverInterface
             foreach ($this->receivers as $transportName => $receiver) {
                 if (!$receiver instanceof QueueReceiverInterface) {
-                    throw new RuntimeException(sprintf('Receiver for "%s" does not implement "%s".', $transportName, QueueReceiverInterface::class));
+                    throw new RuntimeException(\sprintf('Receiver for "%s" does not implement "%s".', $transportName, QueueReceiverInterface::class));
                 }
             }
         }
@@ -190,7 +189,7 @@ class Worker
                     $receiver->reject($envelope);
                 }
 
-                if ($e instanceof HandlerFailedException || ($e instanceof DelayedMessageHandlingException && null !== $e->getEnvelope())) {
+                if ($e instanceof EnvelopeAwareExceptionInterface && null !== $e->getEnvelope()) {
                     $envelope = $e->getEnvelope();
                 }
 

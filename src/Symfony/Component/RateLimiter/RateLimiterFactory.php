@@ -27,14 +27,12 @@ use Symfony\Component\RateLimiter\Storage\StorageInterface;
 final class RateLimiterFactory
 {
     private array $config;
-    private StorageInterface $storage;
-    private ?LockFactory $lockFactory;
 
-    public function __construct(array $config, StorageInterface $storage, ?LockFactory $lockFactory = null)
-    {
-        $this->storage = $storage;
-        $this->lockFactory = $lockFactory;
-
+    public function __construct(
+        array $config,
+        private StorageInterface $storage,
+        private ?LockFactory $lockFactory = null,
+    ) {
         $options = new OptionsResolver();
         self::configureOptions($options);
 
@@ -51,7 +49,7 @@ final class RateLimiterFactory
             'fixed_window' => new FixedWindowLimiter($id, $this->config['limit'], $this->config['interval'], $this->storage, $lock),
             'sliding_window' => new SlidingWindowLimiter($id, $this->config['limit'], $this->config['interval'], $this->storage, $lock),
             'no_limit' => new NoLimiter(),
-            default => throw new \LogicException(sprintf('Limiter policy "%s" does not exists, it must be either "token_bucket", "sliding_window", "fixed_window" or "no_limit".', $this->config['policy'])),
+            default => throw new \LogicException(\sprintf('Limiter policy "%s" does not exists, it must be either "token_bucket", "sliding_window", "fixed_window" or "no_limit".', $this->config['policy'])),
         };
     }
 
@@ -65,7 +63,7 @@ final class RateLimiterFactory
                     throw $e;
                 }
 
-                throw new \LogicException(sprintf('Cannot parse interval "%s", please use a valid unit as described on https://www.php.net/datetime.formats.relative.', $m[1]));
+                throw new \LogicException(\sprintf('Cannot parse interval "%s", please use a valid unit as described on https://www.php.net/datetime.formats.relative.', $m[1]));
             }
         };
 

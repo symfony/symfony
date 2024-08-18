@@ -20,7 +20,6 @@ final class PseudoLocalizationTranslator implements TranslatorInterface
 {
     private const EXPANSION_CHARACTER = '~';
 
-    private TranslatorInterface $translator;
     private bool $accents;
     private float $expansionFactor;
     private bool $brackets;
@@ -64,8 +63,10 @@ final class PseudoLocalizationTranslator implements TranslatorInterface
      *      description: the list of HTML attributes whose values can be altered - it is only useful when the "parse_html" option is set to true
      *      example: if ["title"], and with the "accents" option set to true, "<a href="#" title="Go to your profile">Profile</a>" => "<a href="#" title="Ĝö ţö ýöûŕ þŕöƒîļé">Þŕöƒîļé</a>" - if "title" was not in the "localizable_html_attributes" list, the title attribute data would be left unchanged.
      */
-    public function __construct(TranslatorInterface $translator, array $options = [])
-    {
+    public function __construct(
+        private TranslatorInterface $translator,
+        array $options = [],
+    ) {
         $this->translator = $translator;
         $this->accents = $options['accents'] ?? true;
 

@@ -16,6 +16,7 @@ return static function (ContainerConfigurator $container) {
             'envelope' => [
                 'sender' => 'sender@example.org',
                 'recipients' => ['redirected@example.org', 'redirected1@example.org'],
+                'allowed_recipients' => ['foobar@example\.org', '.*@example\.com'],
             ],
             'headers' => [
                 'from' => 'from@example.org',

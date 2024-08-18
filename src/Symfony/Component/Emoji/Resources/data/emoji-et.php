@@ -1183,6 +1183,7 @@ return [
     '👩‍👧' => 'perekond: naine, tüdruk',
     '😶‍🌫' => 'nägu pilvedes',
     '😮‍💨' => 'väljahingav nägu',
+    '🙂‍↔' => 'pearaputus',
     '🙂‍↕' => 'peanoogutus',
     '😵‍💫' => 'spiraalsilmadega nägu',
     '❤‍🔥' => 'leegitsev süda',

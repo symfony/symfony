@@ -25,17 +25,15 @@ use Symfony\Component\Routing\RouteCollection;
  */
 class AttributeFileLoader extends FileLoader
 {
-    protected AttributeClassLoader $loader;
-
-    public function __construct(FileLocatorInterface $locator, AttributeClassLoader $loader)
-    {
+    public function __construct(
+        FileLocatorInterface $locator,
+        protected AttributeClassLoader $loader,
+    ) {
         if (!\function_exists('token_get_all')) {
             throw new \LogicException('The Tokenizer extension is required for the routing attribute loader.');
         }
 
         parent::__construct($locator);
-
-        $this->loader = $loader;
     }
 
     /**
@@ -78,7 +76,7 @@ class AttributeFileLoader extends FileLoader
         $tokens = token_get_all(file_get_contents($file));
 
         if (1 === \count($tokens) && \T_INLINE_HTML === $tokens[0][0]) {
-            throw new \InvalidArgumentException(sprintf('The file "%s" does not contain PHP code. Did you forgot to add the "<?php" start tag at the beginning of the file?', $file));
+            throw new \InvalidArgumentException(\sprintf('The file "%s" does not contain PHP code. Did you forgot to add the "<?php" start tag at the beginning of the file?', $file));
         }
 
         $nsTokens = [\T_NS_SEPARATOR => true, \T_STRING => true];

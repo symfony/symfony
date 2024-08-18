@@ -66,7 +66,7 @@ final class NtfyTransport extends AbstractTransport
         }
 
         if ($message->getOptions() && !$message->getOptions() instanceof NtfyOptions) {
-            throw new LogicException(sprintf('The "%s" transport only supports instances of "%s" for options.', __CLASS__, NtfyOptions::class));
+            throw new LogicException(\sprintf('The "%s" transport only supports instances of "%s" for options.', __CLASS__, NtfyOptions::class));
         }
 
         if (!($opts = $message->getOptions()) && $notification = $message->getNotification()) {
@@ -104,13 +104,13 @@ final class NtfyTransport extends AbstractTransport
         }
 
         if (200 !== $statusCode) {
-            throw new TransportException(sprintf('Unable to send the Ntfy push notification: "%s".', $response->getContent(false)), $response);
+            throw new TransportException(\sprintf('Unable to send the Ntfy push notification: "%s".', $response->getContent(false)), $response);
         }
 
         $result = $response->toArray(false);
 
         if (empty($result['id'])) {
-            throw new TransportException(sprintf('Unable to send the Ntfy push notification: "%s".', $response->getContent(false)), $response);
+            throw new TransportException(\sprintf('Unable to send the Ntfy push notification: "%s".', $response->getContent(false)), $response);
         }
 
         $sentMessage = new SentMessage($message, (string) $this);
@@ -127,6 +127,6 @@ final class NtfyTransport extends AbstractTransport
 
     public function __toString(): string
     {
-        return sprintf('ntfy://%s/%s', $this->getEndpoint(), $this->getTopic());
+        return \sprintf('ntfy://%s/%s', $this->getEndpoint(), $this->getTopic());
     }
 }

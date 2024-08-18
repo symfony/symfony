@@ -14,6 +14,7 @@ namespace Symfony\Component\Validator\Tests\Constraints;
 use Symfony\Component\Validator\Constraints\AtLeastOneOf;
 use Symfony\Component\Validator\Constraints\AtLeastOneOfValidator;
 use Symfony\Component\Validator\Constraints\Choice;
+use Symfony\Component\Validator\Constraints\Collection;
 use Symfony\Component\Validator\Constraints\Count;
 use Symfony\Component\Validator\Constraints\Country;
 use Symfony\Component\Validator\Constraints\DivisibleBy;
@@ -27,9 +28,11 @@ use Symfony\Component\Validator\Constraints\Language;
 use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\LessThan;
 use Symfony\Component\Validator\Constraints\Negative;
+use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\NotNull;
 use Symfony\Component\Validator\Constraints\Range;
 use Symfony\Component\Validator\Constraints\Regex;
+use Symfony\Component\Validator\Constraints\Type;
 use Symfony\Component\Validator\Constraints\Unique;
 use Symfony\Component\Validator\Constraints\Valid;
 use Symfony\Component\Validator\ConstraintViolation;
@@ -107,12 +110,12 @@ class AtLeastOneOfValidatorTest extends ConstraintValidatorTestCase
         $i = 0;
 
         foreach ($constraints as $constraint) {
-            $message[] = sprintf(' [%d] %s', ++$i, $validator->validate($value, $constraint)->get(0)->getMessage());
+            $message[] = \sprintf(' [%d] %s', ++$i, $validator->validate($value, $constraint)->get(0)->getMessage());
         }
 
         $violations = $validator->validate($value, $atLeastOneOf);
 
-        $this->assertCount(1, $violations, sprintf('1 violation expected. Got %u.', \count($violations)));
+        $this->assertCount(1, $violations, \sprintf('1 violation expected. Got %u.', \count($violations)));
         $this->assertEquals(new ConstraintViolation(implode('', $message), implode('', $message), [], $value, '', $value, null, AtLeastOneOf::AT_LEAST_ONE_OF_ERROR, $atLeastOneOf), $violations->get(0));
     }
 
@@ -125,7 +128,7 @@ class AtLeastOneOfValidatorTest extends ConstraintValidatorTestCase
 
         $violations = Validation::createValidator()->validate($value, $atLeastOneOf);
 
-        $this->assertCount(1, $violations, sprintf('1 violation expected. Got %u.', \count($violations)));
+        $this->assertCount(1, $violations, \sprintf('1 violation expected. Got %u.', \count($violations)));
         $this->assertEquals(new ConstraintViolation('foo', 'foo', [], $value, '', $value, null, AtLeastOneOf::AT_LEAST_ONE_OF_ERROR, $atLeastOneOf), $violations->get(0));
     }
 
@@ -189,7 +192,7 @@ class AtLeastOneOfValidatorTest extends ConstraintValidatorTestCase
     public function testContextIsPropagatedToNestedConstraints()
     {
         $validator = Validation::createValidatorBuilder()
-            ->setMetadataFactory(new class() implements MetadataFactoryInterface {
+            ->setMetadataFactory(new class implements MetadataFactoryInterface {
                 public function getMetadataFor($classOrObject): MetadataInterface
                 {
                     return (new ClassMetadata(ExpressionConstraintNested::class))
@@ -215,7 +218,7 @@ class AtLeastOneOfValidatorTest extends ConstraintValidatorTestCase
     public function testEmbeddedMessageTakenFromFailingConstraint()
     {
         $validator = Validation::createValidatorBuilder()
-            ->setMetadataFactory(new class() implements MetadataFactoryInterface {
+            ->setMetadataFactory(new class implements MetadataFactoryInterface {
                 public function getMetadataFor($classOrObject): MetadataInterface
                 {
                     return (new ClassMetadata(Data::class))
@@ -265,7 +268,7 @@ class AtLeastOneOfValidatorTest extends ConstraintValidatorTestCase
 
     public function testTranslatorIsCalledOnConstraintBaseMessageAndViolations()
     {
-        $translator = new class() implements TranslatorInterface, LocaleAwareInterface {
+        $translator = new class implements TranslatorInterface, LocaleAwareInterface {
             use TranslatorTrait;
 
             public function trans(?string $id, array $parameters = [], ?string $domain = null, ?string $locale = null): string
@@ -295,6 +298,35 @@ class AtLeastOneOfValidatorTest extends ConstraintValidatorTestCase
 
         $this->assertCount(1, $violations);
         $this->assertSame('Dummy translation: [1] Dummy violation.', $violations->get(0)->getMessage());
+    }
+
+    public function testValidateNestedAtLeaseOneOfConstraints()
+    {
+        $data = [
+            'foo' => [
+                'bar' => 'foo.bar',
+                'baz' => 'foo.baz',
+            ],
+        ];
+
+        $constraints = new Collection([
+            'foo' => new AtLeastOneOf([
+                new Collection([
+                    'bar' => new AtLeastOneOf([
+                        new Type('int'),
+                        new Choice(['test1', 'test2'])
+                    ]),
+                ]),
+                new Collection([
+                    'baz' => new Type('int'),
+                ]),
+            ]),
+        ]);
+
+        $validator = Validation::createValidator();
+        $violations = $validator->validate($data, $constraints);
+
+        self::assertCount(1, $violations);
     }
 }
 

@@ -95,6 +95,15 @@ class UuidTest extends TestCase
         $this->assertSame('3499710062d0', $uuid->getNode());
     }
 
+    public function testV1IsLowerCase()
+    {
+        $uuid = new UuidV1();
+        $this->assertSame(strtolower((string) $uuid), (string) $uuid);
+
+        $uuid = new UuidV1('D9E7A184-5D5B-11EA-A62A-3499710062D0');
+        $this->assertSame(strtolower((string) $uuid), (string) $uuid);
+    }
+
     public function testV3()
     {
         $uuid = Uuid::v3(new UuidV4(self::A_UUID_V4), 'the name');
@@ -204,6 +213,38 @@ class UuidTest extends TestCase
         $this->assertTrue(UuidV4::isValid(self::A_UUID_V4));
     }
 
+    public function testIsValidWithVariousFormat()
+    {
+        $uuid = Uuid::v4();
+
+        $this->assertTrue(Uuid::isValid($uuid->toBase32(), Uuid::FORMAT_BASE_32));
+        $this->assertFalse(Uuid::isValid($uuid->toBase58(), Uuid::FORMAT_BASE_32));
+        $this->assertFalse(Uuid::isValid($uuid->toBinary(), Uuid::FORMAT_BASE_32));
+        $this->assertFalse(Uuid::isValid($uuid->toRfc4122(), Uuid::FORMAT_BASE_32));
+
+        $this->assertFalse(Uuid::isValid($uuid->toBase32(), Uuid::FORMAT_BASE_58));
+        $this->assertTrue(Uuid::isValid($uuid->toBase58(), Uuid::FORMAT_BASE_58));
+        $this->assertFalse(Uuid::isValid($uuid->toBinary(), Uuid::FORMAT_BASE_58));
+        $this->assertFalse(Uuid::isValid($uuid->toRfc4122(), Uuid::FORMAT_BASE_58));
+
+        $this->assertFalse(Uuid::isValid($uuid->toBase32(), Uuid::FORMAT_BINARY));
+        $this->assertFalse(Uuid::isValid($uuid->toBase58(), Uuid::FORMAT_BINARY));
+        $this->assertTrue(Uuid::isValid($uuid->toBinary(), Uuid::FORMAT_BINARY));
+        $this->assertFalse(Uuid::isValid($uuid->toRfc4122(), Uuid::FORMAT_BINARY));
+
+        $this->assertFalse(Uuid::isValid($uuid->toBase32(), Uuid::FORMAT_RFC_4122));
+        $this->assertFalse(Uuid::isValid($uuid->toBase58(), Uuid::FORMAT_RFC_4122));
+        $this->assertFalse(Uuid::isValid($uuid->toBinary(), Uuid::FORMAT_RFC_4122));
+        $this->assertTrue(Uuid::isValid($uuid->toRfc4122(), Uuid::FORMAT_RFC_4122));
+
+        $this->assertTrue(Uuid::isValid($uuid->toBase32(), Uuid::FORMAT_ALL));
+        $this->assertTrue(Uuid::isValid($uuid->toBase58(), Uuid::FORMAT_ALL));
+        $this->assertTrue(Uuid::isValid($uuid->toBinary(), Uuid::FORMAT_ALL));
+        $this->assertTrue(Uuid::isValid($uuid->toRfc4122(), Uuid::FORMAT_ALL));
+
+        $this->assertFalse(Uuid::isValid('30J7CNpDMfXPZrCsn4Cgey', Uuid::FORMAT_BASE_58), 'Fake base-58 string with the "O" forbidden char is not valid');
+    }
+
     public function testIsValidWithNilUuid()
     {
         $this->assertTrue(Uuid::isValid('00000000-0000-0000-0000-000000000000'));
@@ -246,6 +287,29 @@ class UuidTest extends TestCase
         yield [self::A_UUID_V1];
         yield [self::A_UUID_V4];
         yield [new \stdClass()];
+    }
+
+    public function testHashable()
+    {
+        $uuid1 = new UuidV4(self::A_UUID_V4);
+        $uuid2 = new UuidV4(self::A_UUID_V4);
+
+        $this->assertSame($uuid1->hash(), $uuid2->hash());
+    }
+
+    /** @requires extension ds */
+    public function testDsCompatibility()
+    {
+        $uuid1 = new UuidV4(self::A_UUID_V4);
+        $uuid2 = new UuidV4(self::A_UUID_V4);
+
+        $set = new \Ds\Set();
+        $set->add($uuid1);
+        $set->add($uuid2);
+
+        $this->assertTrue($set->contains($uuid1));
+        $this->assertTrue($set->contains($uuid2));
+        $this->assertCount(1, $set);
     }
 
     public function testCompare()

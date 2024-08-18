@@ -12,7 +12,7 @@
 namespace Symfony\Component\DependencyInjection\Tests\Compiler;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
+use Symfony\Bridge\PhpUnit\ExpectUserDeprecationMessageTrait;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\Compiler\ResolveReferencesToAliasesPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -22,7 +22,7 @@ use Symfony\Component\DependencyInjection\Reference;
 
 class ResolveReferencesToAliasesPassTest extends TestCase
 {
-    use ExpectDeprecationTrait;
+    use ExpectUserDeprecationMessageTrait;
 
     public function testProcess()
     {
@@ -92,7 +92,7 @@ class ResolveReferencesToAliasesPassTest extends TestCase
      */
     public function testDeprecationNoticeWhenReferencedByAlias()
     {
-        $this->expectDeprecation('Since foobar 1.2.3.4: The "deprecated_foo_alias" service alias is deprecated. You should stop using it, as it will be removed in the future. It is being referenced by the "alias" alias.');
+        $this->expectUserDeprecationMessage('Since foobar 1.2.3.4: The "deprecated_foo_alias" service alias is deprecated. You should stop using it, as it will be removed in the future. It is being referenced by the "alias" alias.');
         $container = new ContainerBuilder();
 
         $container->register('foo', 'stdClass');
@@ -114,7 +114,7 @@ class ResolveReferencesToAliasesPassTest extends TestCase
      */
     public function testDeprecationNoticeWhenReferencedByDefinition()
     {
-        $this->expectDeprecation('Since foobar 1.2.3.4: The "foo_aliased" service alias is deprecated. You should stop using it, as it will be removed in the future. It is being referenced by the "definition" service.');
+        $this->expectUserDeprecationMessage('Since foobar 1.2.3.4: The "foo_aliased" service alias is deprecated. You should stop using it, as it will be removed in the future. It is being referenced by the "definition" service.');
         $container = new ContainerBuilder();
 
         $container->register('foo', 'stdClass');

@@ -1183,6 +1183,7 @@ return [
     '👩‍👧' => 'porodica: žena i djevojčica',
     '😶‍🌫' => 'lice u oblacima',
     '😮‍💨' => 'lice izdiše',
+    '🙂‍↔' => 'vrti glavom lijevo desno',
     '🙂‍↕' => 'klima glavom',
     '😵‍💫' => 'lice sa sprialnim očima',
     '❤‍🔥' => 'zapaljeno srce',

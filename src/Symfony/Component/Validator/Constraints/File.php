@@ -44,6 +44,7 @@ class File extends Constraint
         self::EMPTY_ERROR => 'EMPTY_ERROR',
         self::TOO_LARGE_ERROR => 'TOO_LARGE_ERROR',
         self::INVALID_MIME_TYPE_ERROR => 'INVALID_MIME_TYPE_ERROR',
+        self::INVALID_EXTENSION_ERROR => 'INVALID_EXTENSION_ERROR',
         self::FILENAME_TOO_LONG => 'FILENAME_TOO_LONG',
     ];
 
@@ -189,7 +190,7 @@ class File extends Constraint
             $this->maxSize = $matches[1] * $factors[$unit = strtolower($matches[2])];
             $this->binaryFormat ??= 2 === \strlen($unit);
         } else {
-            throw new ConstraintDefinitionException(sprintf('"%s" is not a valid maximum size.', $maxSize));
+            throw new ConstraintDefinitionException(\sprintf('"%s" is not a valid maximum size.', $maxSize));
         }
     }
 }

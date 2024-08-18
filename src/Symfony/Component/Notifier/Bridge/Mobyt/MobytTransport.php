@@ -48,7 +48,7 @@ final class MobytTransport extends AbstractTransport
 
     public function __toString(): string
     {
-        return sprintf('mobyt://%s?from=%s&type_quality=%s', $this->getEndpoint(), $this->from, $this->typeQuality);
+        return \sprintf('mobyt://%s?from=%s&type_quality=%s', $this->getEndpoint(), $this->from, $this->typeQuality);
     }
 
     public function supports(MessageInterface $message): bool
@@ -83,13 +83,13 @@ final class MobytTransport extends AbstractTransport
         }
 
         if (401 === $statusCode || 404 === $statusCode) {
-            throw new TransportException(sprintf('Unable to send the SMS: "%s". Check your credentials.', $message->getSubject()), $response);
+            throw new TransportException(\sprintf('Unable to send the SMS: "%s". Check your credentials.', $message->getSubject()), $response);
         }
 
         if (201 !== $statusCode) {
             $error = $response->toArray(false);
 
-            throw new TransportException(sprintf('Unable to send the SMS: "%s".', $error['result']), $response);
+            throw new TransportException(\sprintf('Unable to send the SMS: "%s".', $error['result']), $response);
         }
 
         $success = $response->toArray(false);

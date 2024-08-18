@@ -20,7 +20,7 @@ class InputBagTest extends TestCase
 {
     public function testGet()
     {
-        $bag = new InputBag(['foo' => 'bar', 'null' => null, 'int' => 1, 'float' => 1.0, 'bool' => false, 'stringable' => new class() implements \Stringable {
+        $bag = new InputBag(['foo' => 'bar', 'null' => null, 'int' => 1, 'float' => 1.0, 'bool' => false, 'stringable' => new class implements \Stringable {
             public function __toString(): string
             {
                 return 'strval';
@@ -58,7 +58,7 @@ class InputBagTest extends TestCase
 
     public function testGetString()
     {
-        $bag = new InputBag(['integer' => 123, 'bool_true' => true, 'bool_false' => false, 'string' => 'abc', 'stringable' => new class() implements \Stringable {
+        $bag = new InputBag(['integer' => 123, 'bool_true' => true, 'bool_false' => false, 'string' => 'abc', 'stringable' => new class implements \Stringable {
             public function __toString(): string
             {
                 return 'strval';
@@ -152,6 +152,24 @@ class InputBagTest extends TestCase
 
         $bag = new InputBag(['foo' => ['bar', 'baz']]);
         $bag->filter('foo', \FILTER_VALIDATE_INT);
+    }
+
+    public function testAdd()
+    {
+        $bag = new InputBag(['foo' => 'bar']);
+        $bag->add(['baz' => 'qux']);
+
+        $this->assertSame('bar', $bag->get('foo'), '->add() does not remove existing parameters');
+        $this->assertSame('qux', $bag->get('baz'), '->add() adds new parameters');
+    }
+
+    public function testReplace()
+    {
+        $bag = new InputBag(['foo' => 'bar']);
+        $bag->replace(['baz' => 'qux']);
+
+        $this->assertNull($bag->get('foo'), '->replace() removes existing parameters');
+        $this->assertSame('qux', $bag->get('baz'), '->replace() adds new parameters');
     }
 
     public function testGetEnum()

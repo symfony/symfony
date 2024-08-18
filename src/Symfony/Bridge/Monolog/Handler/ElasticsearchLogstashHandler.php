@@ -46,28 +46,28 @@ final class ElasticsearchLogstashHandler extends AbstractHandler
     use FormattableHandlerTrait;
     use ProcessableHandlerTrait;
 
-    private string $endpoint;
-    private string $index;
     private HttpClientInterface $client;
-    private string $elasticsearchVersion;
 
     /**
      * @var \SplObjectStorage<ResponseInterface, null>
      */
     private \SplObjectStorage $responses;
 
-    public function __construct(string $endpoint = 'http://127.0.0.1:9200', string $index = 'monolog', ?HttpClientInterface $client = null, string|int|Level $level = Level::Debug, bool $bubble = true, string $elasticsearchVersion = '1.0.0')
-    {
+    public function __construct(
+        private string $endpoint = 'http://127.0.0.1:9200',
+        private string $index = 'monolog',
+        ?HttpClientInterface $client = null,
+        string|int|Level $level = Level::Debug,
+        bool $bubble = true,
+        private string $elasticsearchVersion = '1.0.0',
+    ) {
         if (!interface_exists(HttpClientInterface::class)) {
-            throw new \LogicException(sprintf('The "%s" handler needs an HTTP client. Try running "composer require symfony/http-client".', __CLASS__));
+            throw new \LogicException(\sprintf('The "%s" handler needs an HTTP client. Try running "composer require symfony/http-client".', __CLASS__));
         }
 
         parent::__construct($level, $bubble);
-        $this->endpoint = $endpoint;
-        $this->index = $index;
         $this->client = $client ?: HttpClient::create(['timeout' => 1]);
         $this->responses = new \SplObjectStorage();
-        $this->elasticsearchVersion = $elasticsearchVersion;
     }
 
     public function handle(LogRecord $record): bool
@@ -168,7 +168,7 @@ final class ElasticsearchLogstashHandler extends AbstractHandler
                 }
             } catch (ExceptionInterface $e) {
                 $this->responses->detach($response);
-                error_log(sprintf("Could not push logs to Elasticsearch:\n%s", (string) $e));
+                error_log(\sprintf("Could not push logs to Elasticsearch:\n%s", (string) $e));
             }
         }
     }

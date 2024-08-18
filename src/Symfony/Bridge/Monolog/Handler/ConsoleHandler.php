@@ -44,7 +44,6 @@ use Symfony\Component\VarDumper\Dumper\CliDumper;
  */
 final class ConsoleHandler extends AbstractProcessingHandler implements EventSubscriberInterface
 {
-    private ?OutputInterface $output;
     private array $verbosityLevelMap = [
         OutputInterface::VERBOSITY_QUIET => Level::Error,
         OutputInterface::VERBOSITY_NORMAL => Level::Warning,
@@ -52,7 +51,6 @@ final class ConsoleHandler extends AbstractProcessingHandler implements EventSub
         OutputInterface::VERBOSITY_VERY_VERBOSE => Level::Info,
         OutputInterface::VERBOSITY_DEBUG => Level::Debug,
     ];
-    private array $consoleFormatterOptions;
 
     /**
      * @param OutputInterface|null $output            The console output to use (the handler remains disabled when passing null
@@ -61,16 +59,17 @@ final class ConsoleHandler extends AbstractProcessingHandler implements EventSub
      * @param array                $verbosityLevelMap Array that maps the OutputInterface verbosity to a minimum logging
      *                                                level (leave empty to use the default mapping)
      */
-    public function __construct(?OutputInterface $output = null, bool $bubble = true, array $verbosityLevelMap = [], array $consoleFormatterOptions = [])
-    {
+    public function __construct(
+        private ?OutputInterface $output = null,
+        bool $bubble = true,
+        array $verbosityLevelMap = [],
+        private array $consoleFormatterOptions = [],
+    ) {
         parent::__construct(Level::Debug, $bubble);
-        $this->output = $output;
 
         if ($verbosityLevelMap) {
             $this->verbosityLevelMap = $verbosityLevelMap;
         }
-
-        $this->consoleFormatterOptions = $consoleFormatterOptions;
     }
 
     public function isHandling(LogRecord $record): bool

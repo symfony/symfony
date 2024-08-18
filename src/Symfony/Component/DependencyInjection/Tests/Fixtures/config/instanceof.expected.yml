@@ -16,6 +16,9 @@ services:
 
         shared: false
         configurator: c
+    Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype\NotFoo:
+        class: Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype\NotFoo
+        public: true
     foo:
         class: App\FooService
         public: true

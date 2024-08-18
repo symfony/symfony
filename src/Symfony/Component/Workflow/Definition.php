@@ -86,7 +86,7 @@ final class Definition
 
         foreach ($places as $place) {
             if (!isset($this->places[$place])) {
-                throw new LogicException(sprintf('Place "%s" cannot be the initial place as it does not exist.', $place));
+                throw new LogicException(\sprintf('Place "%s" cannot be the initial place as it does not exist.', $place));
             }
         }
 

@@ -336,7 +336,7 @@ class PhpFileLoaderTest extends TestCase
         new LoaderResolver([
             $loader = new PhpFileLoader($locator),
             new Psr4DirectoryLoader($locator),
-            new class() extends AttributeClassLoader {
+            new class extends AttributeClassLoader {
                 protected function configureRoute(Route $route, \ReflectionClass $class, \ReflectionMethod $method, object $annot): void
                 {
                     $route->setDefault('_controller', $class->getName().'::'.$method->getName());
@@ -361,7 +361,7 @@ class PhpFileLoaderTest extends TestCase
     {
         new LoaderResolver([
             $loader = new PhpFileLoader(new FileLocator(\dirname(__DIR__).'/Fixtures')),
-            new class() extends AttributeClassLoader {
+            new class extends AttributeClassLoader {
                 protected function configureRoute(Route $route, \ReflectionClass $class, \ReflectionMethod $method, object $annot): void
                 {
                     $route->setDefault('_controller', $class->getName().'::'.$method->getName());

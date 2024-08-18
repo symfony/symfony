@@ -13,6 +13,7 @@ namespace Symfony\Component\TypeInfo\Tests\Type;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\TypeInfo\Exception\InvalidArgumentException;
+use Symfony\Component\TypeInfo\Exception\LogicException;
 use Symfony\Component\TypeInfo\Type;
 use Symfony\Component\TypeInfo\Type\BuiltinType;
 use Symfony\Component\TypeInfo\Type\UnionType;
@@ -66,6 +67,14 @@ class UnionTypeTest extends TestCase
         ], $type->asNonNullable()->getTypes());
     }
 
+    public function testGetBaseType()
+    {
+        $this->assertEquals(Type::string(), (new UnionType(Type::string(), Type::null()))->getBaseType());
+
+        $this->expectException(LogicException::class);
+        (new UnionType(Type::string(), Type::int(), Type::null()))->getBaseType();
+    }
+
     public function testAtLeastOneTypeIs()
     {
         $type = new UnionType(Type::int(), Type::string(), Type::bool());
@@ -113,5 +122,24 @@ class UnionTypeTest extends TestCase
 
         $type = new UnionType(Type::string(), Type::intersection(Type::int(), Type::int()));
         $this->assertTrue($type->isA(TypeIdentifier::INT));
+    }
+
+    public function testProxiesMethodsToNonNullableType()
+    {
+        $this->assertEquals(Type::string(), (new UnionType(Type::list(Type::string()), Type::null()))->getCollectionValueType());
+
+        try {
+            (new UnionType(Type::int(), Type::null()))->getCollectionValueType();
+            $this->fail();
+        } catch (LogicException) {
+            $this->addToAssertionCount(1);
+        }
+
+        try {
+            (new UnionType(Type::list(Type::string()), Type::string()))->getCollectionValueType();
+            $this->fail();
+        } catch (LogicException) {
+            $this->addToAssertionCount(1);
+        }
     }
 }

@@ -1183,6 +1183,7 @@ return [
     '👩‍👧' => 'umndeni: umama, intombazane',
     '😶‍🌫' => 'ubuso obusemafini',
     '😮‍💨' => 'ubuso obudonsa umoya',
+    '🙂‍↔' => 'ikhanda elibuka le nale',
     '🙂‍↕' => 'ukunikina ikhanda phansi naphezulu',
     '😵‍💫' => 'ubuso obunamehlo anendingiliza',
     '❤‍🔥' => 'inhliziyo ebhakuzayo',

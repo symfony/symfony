@@ -53,7 +53,7 @@ class DebugCommand extends Command
                 new InputArgument('class', InputArgument::OPTIONAL, 'The form type class'),
                 new InputArgument('option', InputArgument::OPTIONAL, 'The form type option'),
                 new InputOption('show-deprecated', null, InputOption::VALUE_NONE, 'Display deprecated options in form types'),
-                new InputOption('format', null, InputOption::VALUE_REQUIRED, sprintf('The output format ("%s")', implode('", "', $this->getAvailableFormatOptions())), 'txt'),
+                new InputOption('format', null, InputOption::VALUE_REQUIRED, \sprintf('The output format ("%s")', implode('", "', $this->getAvailableFormatOptions())), 'txt'),
             ])
             ->setHelp(<<<'EOF'
 The <info>%command.name%</info> command displays information about form types.
@@ -114,7 +114,7 @@ EOF
                 $object = $resolvedType->getOptionsResolver();
 
                 if (!$object->isDefined($option)) {
-                    $message = sprintf('Option "%s" is not defined in "%s".', $option, $resolvedType->getInnerType()::class);
+                    $message = \sprintf('Option "%s" is not defined in "%s".', $option, $resolvedType->getInnerType()::class);
 
                     if ($alternatives = $this->findAlternatives($option, $object->getDefinedOptions())) {
                         if (1 === \count($alternatives)) {
@@ -148,7 +148,7 @@ EOF
         $classes = $this->getFqcnTypeClasses($shortClassName);
 
         if (0 === $count = \count($classes)) {
-            $message = sprintf("Could not find type \"%s\" into the following namespaces:\n    %s", $shortClassName, implode("\n    ", $this->namespaces));
+            $message = \sprintf("Could not find type \"%s\" into the following namespaces:\n    %s", $shortClassName, implode("\n    ", $this->namespaces));
 
             $allTypes = array_merge($this->getCoreTypes(), $this->types);
             if ($alternatives = $this->findAlternatives($shortClassName, $allTypes)) {
@@ -166,10 +166,10 @@ EOF
             return $classes[0];
         }
         if (!$input->isInteractive()) {
-            throw new InvalidArgumentException(sprintf("The type \"%s\" is ambiguous.\n\nDid you mean one of these?\n    %s.", $shortClassName, implode("\n    ", $classes)));
+            throw new InvalidArgumentException(\sprintf("The type \"%s\" is ambiguous.\n\nDid you mean one of these?\n    %s.", $shortClassName, implode("\n    ", $classes)));
         }
 
-        return $io->choice(sprintf("The type \"%s\" is ambiguous.\n\nSelect one of the following form types to display its information:", $shortClassName), $classes, $classes[0]);
+        return $io->choice(\sprintf("The type \"%s\" is ambiguous.\n\nSelect one of the following form types to display its information:", $shortClassName), $classes, $classes[0]);
     }
 
     private function getFqcnTypeClasses(string $shortClassName): array
@@ -272,6 +272,7 @@ EOF
         $suggestions->suggestValues($resolvedType->getOptionsResolver()->getDefinedOptions());
     }
 
+    /** @return string[] */
     private function getAvailableFormatOptions(): array
     {
         return (new DescriptorHelper())->getFormats();

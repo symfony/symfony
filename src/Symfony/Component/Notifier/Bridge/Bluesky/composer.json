@@ -22,9 +22,13 @@
     "require": {
         "php": ">=8.2",
         "psr/log": "^1|^2|^3",
+        "symfony/clock": "^6.4|^7.0",
         "symfony/http-client": "^6.4|^7.0",
-        "symfony/notifier": "^7.1",
+        "symfony/notifier": "^7.2",
         "symfony/string": "^6.4|^7.0"
+    },
+    "require-dev": {
+        "symfony/mime": "^6.4|^7.0"
     },
     "autoload": {
         "psr-4": { "Symfony\\Component\\Notifier\\Bridge\\Bluesky\\": "" },

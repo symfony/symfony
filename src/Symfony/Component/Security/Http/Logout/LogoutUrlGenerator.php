@@ -24,18 +24,15 @@ use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
  */
 class LogoutUrlGenerator
 {
-    private ?RequestStack $requestStack;
-    private ?UrlGeneratorInterface $router;
-    private ?TokenStorageInterface $tokenStorage;
     private array $listeners = [];
     private ?string $currentFirewallName = null;
     private ?string $currentFirewallContext = null;
 
-    public function __construct(?RequestStack $requestStack = null, ?UrlGeneratorInterface $router = null, ?TokenStorageInterface $tokenStorage = null)
-    {
-        $this->requestStack = $requestStack;
-        $this->router = $router;
-        $this->tokenStorage = $tokenStorage;
+    public function __construct(
+        private ?RequestStack $requestStack = null,
+        private ?UrlGeneratorInterface $router = null,
+        private ?TokenStorageInterface $tokenStorage = null,
+    ) {
     }
 
     /**
@@ -124,7 +121,7 @@ class LogoutUrlGenerator
                 return $this->listeners[$key];
             }
 
-            throw new \InvalidArgumentException(sprintf('No LogoutListener found for firewall key "%s".', $key));
+            throw new \InvalidArgumentException(\sprintf('No LogoutListener found for firewall key "%s".', $key));
         }
 
         // Fetch the current provider key from token, if possible

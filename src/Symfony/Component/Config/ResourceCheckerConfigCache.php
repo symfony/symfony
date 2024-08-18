@@ -134,7 +134,7 @@ class ResourceCheckerConfigCache implements ConfigCacheInterface
     private function safelyUnserialize(string $file): mixed
     {
         $meta = false;
-        $content = file_get_contents($file);
+        $content = (new Filesystem())->readFile($file);
         $signalingException = new \UnexpectedValueException();
         $prevUnserializeHandler = ini_set('unserialize_callback_func', self::class.'::handleUnserializeCallback');
         $prevErrorHandler = set_error_handler(function ($type, $msg, $file, $line, $context = []) use (&$prevErrorHandler, $signalingException) {

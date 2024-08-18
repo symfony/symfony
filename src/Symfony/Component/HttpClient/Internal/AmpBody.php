@@ -140,7 +140,7 @@ class AmpBody implements RequestBody, InputStream
         }
 
         if (!\is_string($data)) {
-            throw new TransportException(sprintf('Return value of the "body" option callback must be string, "%s" returned.', get_debug_type($data)));
+            throw new TransportException(\sprintf('Return value of the "body" option callback must be string, "%s" returned.', get_debug_type($data)));
         }
 
         return new Success($data);

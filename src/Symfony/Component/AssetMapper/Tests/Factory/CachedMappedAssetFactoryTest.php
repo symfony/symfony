@@ -131,7 +131,7 @@ class CachedMappedAssetFactoryTest extends TestCase
     {
         $cachedPath = $this->getConfigCachePath($mappedAsset).'.meta';
 
-        return unserialize(file_get_contents($cachedPath));
+        return unserialize($this->filesystem->readFile($cachedPath));
     }
 
     private function saveConfigCache(MappedAsset $mappedAsset): void

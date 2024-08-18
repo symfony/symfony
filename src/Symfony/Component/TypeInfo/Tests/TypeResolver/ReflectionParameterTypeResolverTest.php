@@ -44,6 +44,17 @@ class ReflectionParameterTypeResolverTest extends TestCase
         $this->resolver->resolve($reflectionParameter);
     }
 
+    public function testCannotResolveReflectionParameterWithoutTypeOnFunction()
+    {
+        $reflectionFunction = new \ReflectionFunction('fclose');
+        $reflectionParameter = $reflectionFunction->getParameters()[0];
+
+        $this->expectException(UnsupportedException::class);
+        $this->expectExceptionMessage('Cannot resolve type for "fclose($stream)".');
+
+        $this->resolver->resolve($reflectionParameter);
+    }
+
     public function testResolve()
     {
         $reflectionClass = new \ReflectionClass(ReflectionExtractableDummy::class);

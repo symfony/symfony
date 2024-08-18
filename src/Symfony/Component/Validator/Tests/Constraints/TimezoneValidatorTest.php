@@ -136,7 +136,7 @@ class TimezoneValidatorTest extends ConstraintValidatorTestCase
         $this->validator->validate($timezone, $constraint);
 
         $this->buildViolation('myMessage')
-            ->setParameter('{{ value }}', sprintf('"%s"', $timezone))
+            ->setParameter('{{ value }}', \sprintf('"%s"', $timezone))
             ->setCode(Timezone::TIMEZONE_IDENTIFIER_ERROR)
             ->assertRaised();
     }
@@ -162,7 +162,7 @@ class TimezoneValidatorTest extends ConstraintValidatorTestCase
         $this->validator->validate($timezone, $constraint);
 
         $this->buildViolation('myMessage')
-            ->setParameter('{{ value }}', sprintf('"%s"', $timezone))
+            ->setParameter('{{ value }}', \sprintf('"%s"', $timezone))
             ->setCode(Timezone::TIMEZONE_IDENTIFIER_IN_ZONE_ERROR)
             ->assertRaised();
     }
@@ -243,7 +243,7 @@ class TimezoneValidatorTest extends ConstraintValidatorTestCase
         $this->validator->validate($timezone, $constraint);
 
         $this->buildViolation('myMessage')
-            ->setParameter('{{ value }}', sprintf('"%s"', $timezone))
+            ->setParameter('{{ value }}', \sprintf('"%s"', $timezone))
             ->setCode(Timezone::TIMEZONE_IDENTIFIER_IN_COUNTRY_ERROR)
             ->assertRaised();
     }
@@ -297,7 +297,7 @@ class TimezoneValidatorTest extends ConstraintValidatorTestCase
         $this->validator->validate($timezone, $constraint);
 
         $this->buildViolation('myMessage')
-            ->setParameter('{{ value }}', sprintf('"%s"', $timezone))
+            ->setParameter('{{ value }}', \sprintf('"%s"', $timezone))
             ->setCode(Timezone::TIMEZONE_IDENTIFIER_ERROR)
             ->assertRaised();
     }

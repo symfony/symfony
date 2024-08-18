@@ -48,6 +48,10 @@ class UnsupportedSchemeException extends LogicException
             'class' => Bridge\Mailjet\Transport\MailjetTransportFactory::class,
             'package' => 'symfony/mailjet-mailer',
         ],
+        'mailomat' => [
+            'class' => Bridge\Mailomat\Transport\MailomatTransportFactory::class,
+            'package' => 'symfony/mailomat-mailer',
+        ],
         'mailpace' => [
             'class' => Bridge\MailPace\Transport\MailPaceTransportFactory::class,
             'package' => 'symfony/mail-pace-mailer',
@@ -55,6 +59,10 @@ class UnsupportedSchemeException extends LogicException
         'mandrill' => [
             'class' => Bridge\Mailchimp\Transport\MandrillTransportFactory::class,
             'package' => 'symfony/mailchimp-mailer',
+        ],
+        'postal' => [
+            'class' => Bridge\Postal\Transport\PostalTransportFactory::class,
+            'package' => 'symfony/postal-mailer',
         ],
         'postmark' => [
             'class' => Bridge\Postmark\Transport\PostmarkTransportFactory::class,
@@ -86,14 +94,14 @@ class UnsupportedSchemeException extends LogicException
         }
         $package = self::SCHEME_TO_PACKAGE_MAP[$provider] ?? null;
         if ($package && !class_exists($package['class'])) {
-            parent::__construct(sprintf('Unable to send emails via "%s" as the bridge is not installed. Try running "composer require %s".', $provider, $package['package']));
+            parent::__construct(\sprintf('Unable to send emails via "%s" as the bridge is not installed. Try running "composer require %s".', $provider, $package['package']));
 
             return;
         }
 
-        $message = sprintf('The "%s" scheme is not supported', $dsn->getScheme());
+        $message = \sprintf('The "%s" scheme is not supported', $dsn->getScheme());
         if ($name && $supported) {
-            $message .= sprintf('; supported schemes for mailer "%s" are: "%s"', $name, implode('", "', $supported));
+            $message .= \sprintf('; supported schemes for mailer "%s" are: "%s"', $name, implode('", "', $supported));
         }
 
         parent::__construct($message.'.');

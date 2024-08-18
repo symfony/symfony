@@ -70,7 +70,7 @@ class ComposerPlugin implements PluginInterface, EventSubscriberInterface
             }
 
             if (!is_file($autoloadTemplate)) {
-                throw new \InvalidArgumentException(sprintf('File "%s" defined under "extra.runtime.autoload_template" in your composer.json file not found.', $this->composer->getPackage()->getExtra()['runtime']['autoload_template']));
+                throw new \InvalidArgumentException(\sprintf('File "%s" defined under "extra.runtime.autoload_template" in your composer.json file not found.', $this->composer->getPackage()->getExtra()['runtime']['autoload_template']));
             }
         }
 
@@ -83,7 +83,7 @@ class ComposerPlugin implements PluginInterface, EventSubscriberInterface
         }
 
         if (!$nestingLevel) {
-            $projectDir = '__'.'DIR__.'.var_export('/'.$projectDir, true);
+            $projectDir = '__DIR__.'.var_export('/'.$projectDir, true);
         } else {
             $projectDir = 'dirname(__'."DIR__, $nestingLevel)".('' !== $projectDir ? '.'.var_export('/'.$projectDir, true) : '');
         }

@@ -1183,6 +1183,7 @@ return [
     '👩‍👧' => 'familie: femeie, fată',
     '😶‍🌫' => 'față în nori',
     '😮‍💨' => 'față care expiră',
+    '🙂‍↔' => 'cap care se clatină pe orizontală',
     '🙂‍↕' => 'cap care se clatină pe verticală',
     '😵‍💫' => 'față cu ochi în spirală',
     '❤‍🔥' => 'inimă în flăcări',

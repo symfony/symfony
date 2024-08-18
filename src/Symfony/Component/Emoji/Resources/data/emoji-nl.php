@@ -1183,6 +1183,7 @@ return [
     '👩‍👧' => 'gezin: vrouw, meisje',
     '😶‍🌫' => 'gezicht in de wolken',
     '😮‍💨' => 'gezicht dat uitademt',
+    '🙂‍↔' => 'hoofd dat horizontaal beweegt',
     '🙂‍↕' => 'hoofd dat verticaal beweegt',
     '😵‍💫' => 'gezicht met spiraalvormige ogen',
     '❤‍🔥' => 'hart in vuur en vlam',

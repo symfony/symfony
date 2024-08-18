@@ -25,6 +25,7 @@ class Unique extends Constraint
     public const IS_NOT_UNIQUE = '7911c98d-b845-4da0-94b7-a8dac36bc55a';
 
     public array|string $fields = [];
+    public ?string $errorPath = null;
 
     protected const ERROR_NAMES = [
         self::IS_NOT_UNIQUE => 'IS_NOT_UNIQUE',
@@ -46,15 +47,17 @@ class Unique extends Constraint
         ?array $groups = null,
         mixed $payload = null,
         array|string|null $fields = null,
+        ?string $errorPath = null,
     ) {
         parent::__construct($options, $groups, $payload);
 
         $this->message = $message ?? $this->message;
         $this->normalizer = $normalizer ?? $this->normalizer;
         $this->fields = $fields ?? $this->fields;
+        $this->errorPath = $errorPath ?? $this->errorPath;
 
         if (null !== $this->normalizer && !\is_callable($this->normalizer)) {
-            throw new InvalidArgumentException(sprintf('The "normalizer" option must be a valid callable ("%s" given).', get_debug_type($this->normalizer)));
+            throw new InvalidArgumentException(\sprintf('The "normalizer" option must be a valid callable ("%s" given).', get_debug_type($this->normalizer)));
         }
     }
 }

@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+7.2
+---
+
+ * Add `lint:translations` command
+
 7.1
 ---
 

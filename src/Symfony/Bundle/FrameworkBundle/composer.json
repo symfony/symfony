@@ -21,14 +21,14 @@
         "ext-xml": "*",
         "symfony/cache": "^6.4|^7.0",
         "symfony/config": "^6.4|^7.0",
-        "symfony/dependency-injection": "^6.4|^7.0",
+        "symfony/dependency-injection": "^7.1",
         "symfony/deprecation-contracts": "^2.5|^3",
         "symfony/error-handler": "^6.4|^7.0",
         "symfony/event-dispatcher": "^6.4|^7.0",
         "symfony/http-foundation": "^6.4|^7.0",
         "symfony/http-kernel": "^6.4|^7.0",
         "symfony/polyfill-mbstring": "~1.0",
-        "symfony/filesystem": "^6.4|^7.0",
+        "symfony/filesystem": "^7.1",
         "symfony/finder": "^6.4|^7.0",
         "symfony/routing": "^6.4|^7.0"
     },
@@ -71,6 +71,7 @@
         "symfony/property-info": "^6.4|^7.0",
         "symfony/uid": "^6.4|^7.0",
         "symfony/web-link": "^6.4|^7.0",
+        "symfony/webhook": "^7.2",
         "phpdocumentor/reflection-docblock": "^3.0|^4.0|^5.0",
         "twig/twig": "^3.0.4"
     },
@@ -102,6 +103,7 @@
         "symfony/twig-bundle": "<6.4",
         "symfony/validator": "<6.4",
         "symfony/web-profiler-bundle": "<6.4",
+        "symfony/webhook": "<7.2",
         "symfony/workflow": "<6.4"
     },
     "autoload": {

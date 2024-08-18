@@ -24,7 +24,8 @@
     ],
     "require": {
         "php": ">=8.2",
-        "symfony/string": "^6.4|^7.0"
+        "symfony/string": "^6.4|^7.0",
+        "symfony/type-info": "^7.1"
     },
     "require-dev": {
         "symfony/serializer": "^6.4|^7.0",

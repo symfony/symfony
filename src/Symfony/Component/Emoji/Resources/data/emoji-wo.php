@@ -854,6 +854,7 @@ return [
     '👩‍👧' => 'bokk famiy: jigéen, xale bu jigéen',
     '😶‍🌫' => 'kanam ci niir yi',
     '😮‍💨' => 'kanam guy nooyi',
+    '🙂‍↔' => 'bopp buy yëngu ci anam gu tëdd',
     '🙂‍↕' => 'yëngal sa bop ci anam gu taxaw',
     '😵‍💫' => 'kanam gu am ay gêt yu rod',
     '❤‍🔥' => 'xolu safara',

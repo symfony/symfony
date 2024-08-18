@@ -70,7 +70,7 @@ class IntlTimeZoneToStringTransformer implements DataTransformerInterface
         $intlTimeZone = \IntlTimeZone::createTimeZone($value);
 
         if ('Etc/Unknown' === $intlTimeZone->getID()) {
-            throw new TransformationFailedException(sprintf('Unknown timezone identifier "%s".', $value));
+            throw new TransformationFailedException(\sprintf('Unknown timezone identifier "%s".', $value));
         }
 
         return $intlTimeZone;

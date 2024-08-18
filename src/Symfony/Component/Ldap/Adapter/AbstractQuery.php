@@ -19,13 +19,14 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 abstract class AbstractQuery implements QueryInterface
 {
-    protected ConnectionInterface $connection;
-    protected string $dn;
-    protected string $query;
     protected array $options;
 
-    public function __construct(ConnectionInterface $connection, string $dn, string $query, array $options = [])
-    {
+    public function __construct(
+        protected ConnectionInterface $connection,
+        protected string $dn,
+        protected string $query,
+        array $options = [],
+    ) {
         $resolver = new OptionsResolver();
         $resolver->setDefaults([
             'filter' => '*',
@@ -42,9 +43,6 @@ abstract class AbstractQuery implements QueryInterface
 
         $resolver->setNormalizer('filter', fn (Options $options, $value) => \is_array($value) ? $value : [$value]);
 
-        $this->connection = $connection;
-        $this->dn = $dn;
-        $this->query = $query;
         $this->options = $resolver->resolve($options);
     }
 }

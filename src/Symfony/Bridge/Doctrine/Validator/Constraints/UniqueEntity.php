@@ -35,6 +35,7 @@ class UniqueEntity extends Constraint
     public array|string $fields = [];
     public ?string $errorPath = null;
     public bool|array|string $ignoreNull = true;
+    public array $identifierFieldNames = [];
 
     /**
      * @param array|string         $fields           The combination of fields that must contain unique values or a set of options
@@ -54,13 +55,14 @@ class UniqueEntity extends Constraint
         ?string $repositoryMethod = null,
         ?string $errorPath = null,
         bool|string|array|null $ignoreNull = null,
+        ?array $identifierFieldNames = null,
         ?array $groups = null,
         $payload = null,
         array $options = [],
     ) {
-        if (\is_array($fields) && \is_string(key($fields))) {
+        if (\is_array($fields) && \is_string(key($fields)) && [] === array_diff(array_keys($fields), array_merge(array_keys(get_class_vars(static::class)), ['value']))) {
             $options = array_merge($fields, $options);
-        } elseif (null !== $fields) {
+        } else {
             $options['fields'] = $fields;
         }
 
@@ -73,6 +75,7 @@ class UniqueEntity extends Constraint
         $this->repositoryMethod = $repositoryMethod ?? $this->repositoryMethod;
         $this->errorPath = $errorPath ?? $this->errorPath;
         $this->ignoreNull = $ignoreNull ?? $this->ignoreNull;
+        $this->identifierFieldNames = $identifierFieldNames ?? $this->identifierFieldNames;
     }
 
     public function getRequiredOptions(): array

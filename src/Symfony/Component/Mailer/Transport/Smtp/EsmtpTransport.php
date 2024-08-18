@@ -142,10 +142,10 @@ class EsmtpTransport extends SmtpTransport
     private function doEhloCommand(): string
     {
         try {
-            $response = $this->executeCommand(sprintf("EHLO %s\r\n", $this->getLocalDomain()), [250]);
+            $response = $this->executeCommand(\sprintf("EHLO %s\r\n", $this->getLocalDomain()), [250]);
         } catch (TransportExceptionInterface $e) {
             try {
-                return parent::executeCommand(sprintf("HELO %s\r\n", $this->getLocalDomain()), [250]);
+                return parent::executeCommand(\sprintf("HELO %s\r\n", $this->getLocalDomain()), [250]);
             } catch (TransportExceptionInterface $ex) {
                 if (!$ex->getCode()) {
                     throw $e;
@@ -169,7 +169,7 @@ class EsmtpTransport extends SmtpTransport
                 throw new TransportException('Unable to connect with STARTTLS.');
             }
 
-            $response = $this->executeCommand(sprintf("EHLO %s\r\n", $this->getLocalDomain()), [250]);
+            $response = $this->executeCommand(\sprintf("EHLO %s\r\n", $this->getLocalDomain()), [250]);
             $this->capabilities = $this->parseCapabilities($response);
         }
 
@@ -231,12 +231,12 @@ class EsmtpTransport extends SmtpTransport
         }
 
         if (!$authNames) {
-            throw new TransportException(sprintf('Failed to find an authenticator supported by the SMTP server, which currently supports: "%s".', implode('", "', $modes)), $code ?: 504);
+            throw new TransportException(\sprintf('Failed to find an authenticator supported by the SMTP server, which currently supports: "%s".', implode('", "', $modes)), $code ?: 504);
         }
 
-        $message = sprintf('Failed to authenticate on SMTP server with username "%s" using the following authenticators: "%s".', $this->username, implode('", "', $authNames));
+        $message = \sprintf('Failed to authenticate on SMTP server with username "%s" using the following authenticators: "%s".', $this->username, implode('", "', $authNames));
         foreach ($errors as $name => $error) {
-            $message .= sprintf(' Authenticator "%s" returned "%s".', $name, $error);
+            $message .= \sprintf(' Authenticator "%s" returned "%s".', $name, $error);
         }
 
         throw new TransportException($message, $code ?: 535);

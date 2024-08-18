@@ -106,7 +106,7 @@ class JsonDecode implements DecoderInterface
         }
 
         if (!class_exists(JsonParser::class)) {
-            throw new UnsupportedException(sprintf('Enabling "%s" serializer option requires seld/jsonlint. Try running "composer require seld/jsonlint".', self::DETAILED_ERROR_MESSAGES));
+            throw new UnsupportedException(\sprintf('Enabling "%s" serializer option requires seld/jsonlint. Try running "composer require seld/jsonlint".', self::DETAILED_ERROR_MESSAGES));
         }
 
         throw new NotEncodableValueException((new JsonParser())->lint($data)?->getMessage() ?: $errorMessage);

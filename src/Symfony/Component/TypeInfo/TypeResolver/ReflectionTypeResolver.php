@@ -32,7 +32,7 @@ final class ReflectionTypeResolver implements TypeResolverInterface
      */
     private static array $reflectionEnumCache = [];
 
-    public function resolve(mixed $subject, TypeContext $typeContext = null): Type
+    public function resolve(mixed $subject, ?TypeContext $typeContext = null): Type
     {
         if ($subject instanceof \ReflectionUnionType) {
             return Type::union(...array_map(fn (mixed $t): Type => $this->resolve($t, $typeContext), $subject->getTypes()));
@@ -43,7 +43,7 @@ final class ReflectionTypeResolver implements TypeResolverInterface
         }
 
         if (!$subject instanceof \ReflectionNamedType) {
-            throw new UnsupportedException(sprintf('Expected subject to be a "ReflectionNamedType", a "ReflectionUnionType" or a "ReflectionIntersectionType", "%s" given.', get_debug_type($subject)), $subject);
+            throw new UnsupportedException(\sprintf('Expected subject to be a "ReflectionNamedType", a "ReflectionUnionType" or a "ReflectionIntersectionType", "%s" given.', get_debug_type($subject)), $subject);
         }
 
         $identifier = $subject->getName();
@@ -72,7 +72,7 @@ final class ReflectionTypeResolver implements TypeResolverInterface
         }
 
         if (\in_array(strtolower($identifier), ['self', 'static', 'parent'], true) && !$typeContext) {
-            throw new InvalidArgumentException(sprintf('A "%s" must be provided to resolve "%s".', TypeContext::class, strtolower($identifier)));
+            throw new InvalidArgumentException(\sprintf('A "%s" must be provided to resolve "%s".', TypeContext::class, strtolower($identifier)));
         }
 
         /** @var class-string $className */

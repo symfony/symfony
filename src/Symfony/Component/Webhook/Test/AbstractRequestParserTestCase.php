@@ -32,6 +32,9 @@ abstract class AbstractRequestParserTestCase extends TestCase
         $this->assertEquals($expected, $wh);
     }
 
+    /**
+     * @return iterable<array{string, RemoteEvent}>
+     */
     public static function getPayloads(): iterable
     {
         $currentDir = \dirname((new \ReflectionClass(static::class))->getFileName());
@@ -43,7 +46,7 @@ abstract class AbstractRequestParserTestCase extends TestCase
 
             yield $filename => [
                 file_get_contents($file),
-                include(str_replace('.'.static::getFixtureExtension(), '.php', $file->getPathname())),
+                include (str_replace('.'.static::getFixtureExtension(), '.php', $file->getPathname())),
             ];
         }
     }

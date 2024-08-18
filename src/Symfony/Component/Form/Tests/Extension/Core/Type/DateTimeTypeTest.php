@@ -12,12 +12,13 @@
 namespace Symfony\Component\Form\Tests\Extension\Core\Type;
 
 use Symfony\Component\Form\Exception\LogicException;
+use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormInterface;
 
 class DateTimeTypeTest extends BaseTypeTestCase
 {
-    public const TESTED_TYPE = 'Symfony\Component\Form\Extension\Core\Type\DateTimeType';
+    public const TESTED_TYPE = DateTimeType::class;
 
     private string $defaultLocale;
 

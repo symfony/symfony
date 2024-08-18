@@ -28,19 +28,18 @@ use Symfony\Component\Notifier\Recipient\SmsRecipientInterface;
  */
 class LoginLinkNotification extends Notification implements EmailNotificationInterface, SmsNotificationInterface
 {
-    private LoginLinkDetails $loginLinkDetails;
-
-    public function __construct(LoginLinkDetails $loginLinkDetails, string $subject, array $channels = [])
-    {
+    public function __construct(
+        private LoginLinkDetails $loginLinkDetails,
+        string $subject,
+        array $channels = [],
+    ) {
         parent::__construct($subject, $channels);
-
-        $this->loginLinkDetails = $loginLinkDetails;
     }
 
     public function asEmailMessage(EmailRecipientInterface $recipient, ?string $transport = null): ?EmailMessage
     {
         if (!class_exists(NotificationEmail::class)) {
-            throw new \LogicException(sprintf('The "%s" method requires "symfony/twig-bridge:>4.4".', __METHOD__));
+            throw new \LogicException(\sprintf('The "%s" method requires "symfony/twig-bridge:>4.4".', __METHOD__));
         }
 
         $email = NotificationEmail::asPublicEmail()
@@ -66,6 +65,6 @@ class LoginLinkNotification extends Notification implements EmailNotificationInt
             $durationString = floor($hours).' hour'.($hours >= 2 ? 's' : '');
         }
 
-        return sprintf('Click on the %s to confirm you want to sign in. This link will expire in %s.', $target, $durationString);
+        return \sprintf('Click on the %s to confirm you want to sign in. This link will expire in %s.', $target, $durationString);
     }
 }

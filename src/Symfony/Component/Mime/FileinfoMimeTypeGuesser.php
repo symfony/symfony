@@ -21,16 +21,14 @@ use Symfony\Component\Mime\Exception\LogicException;
  */
 class FileinfoMimeTypeGuesser implements MimeTypeGuesserInterface
 {
-    private ?string $magicFile;
-
     /**
      * @param string|null $magicFile A magic file to use with the finfo instance
      *
      * @see http://www.php.net/manual/en/function.finfo-open.php
      */
-    public function __construct(?string $magicFile = null)
-    {
-        $this->magicFile = $magicFile;
+    public function __construct(
+        private ?string $magicFile = null,
+    ) {
     }
 
     public function isGuesserSupported(): bool
@@ -41,11 +39,11 @@ class FileinfoMimeTypeGuesser implements MimeTypeGuesserInterface
     public function guessMimeType(string $path): ?string
     {
         if (!is_file($path) || !is_readable($path)) {
-            throw new InvalidArgumentException(sprintf('The "%s" file does not exist or is not readable.', $path));
+            throw new InvalidArgumentException(\sprintf('The "%s" file does not exist or is not readable.', $path));
         }
 
         if (!$this->isGuesserSupported()) {
-            throw new LogicException(sprintf('The "%s" guesser is not supported.', __CLASS__));
+            throw new LogicException(\sprintf('The "%s" guesser is not supported.', __CLASS__));
         }
 
         if (false === $finfo = new \finfo(\FILEINFO_MIME_TYPE, $this->magicFile)) {

@@ -43,7 +43,7 @@ final class MastodonTransport extends AbstractTransport
 
     public function __toString(): string
     {
-        return sprintf('mastodon://%s', $this->getEndpoint());
+        return \sprintf('mastodon://%s', $this->getEndpoint());
     }
 
     public function supports(MessageInterface $message): bool
@@ -53,7 +53,7 @@ final class MastodonTransport extends AbstractTransport
 
     public function request(string $method, string $url, array $options): ResponseInterface
     {
-        $url = sprintf('https://%s%s', $this->getEndpoint(), $url);
+        $url = \sprintf('https://%s%s', $this->getEndpoint(), $url);
 
         $options['auth_bearer'] = $this->accessToken;
 
@@ -91,7 +91,7 @@ final class MastodonTransport extends AbstractTransport
         }
 
         if (200 !== $statusCode) {
-            throw new TransportException(sprintf('Unable to post the Mastodon message: "%s" (%s).', $result['error_description'], $result['error']), $response);
+            throw new TransportException(\sprintf('Unable to post the Mastodon message: "%s" (%s).', $result['error_description'], $result['error']), $response);
         }
 
         $sentMessage = new SentMessage($message, (string) $this);
@@ -139,7 +139,7 @@ final class MastodonTransport extends AbstractTransport
                 $result = $response->toArray(false);
 
                 if (300 <= $response->getStatusCode()) {
-                    throw new TransportException(sprintf('Unable to upload media as attachment: "%s" (%s).', $result['error_description'], $result['error']), $response);
+                    throw new TransportException(\sprintf('Unable to upload media as attachment: "%s" (%s).', $result['error_description'], $result['error']), $response);
                 }
 
                 $mediaIds[] = $result['id'];

@@ -32,7 +32,7 @@ class Psr16CacheTest extends SimpleCacheTest
 
         $pool = $this->createSimpleCache();
         if ($pool instanceof Psr16Cache) {
-            $pool = ((array) $pool)[sprintf("\0%s\0pool", Psr16Cache::class)];
+            $pool = ((array) $pool)[\sprintf("\0%s\0pool", Psr16Cache::class)];
         }
 
         if (!$pool instanceof PruneableInterface) {
@@ -167,7 +167,7 @@ class Psr16CacheTest extends SimpleCacheTest
             $this->fail('Test classes for pruneable caches must implement `isPruned($cache, $name)` method.');
         }
 
-        $pool = ((array) $cache)[sprintf("\0%s\0pool", Psr16Cache::class)];
+        $pool = ((array) $cache)[\sprintf("\0%s\0pool", Psr16Cache::class)];
         $getFileMethod = (new \ReflectionObject($pool))->getMethod('getFile');
 
         return !file_exists($getFileMethod->invoke($pool, $name));

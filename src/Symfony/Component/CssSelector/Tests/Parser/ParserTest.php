@@ -70,7 +70,7 @@ class ParserTest extends TestCase
     public function testParseSeries($series, $a, $b)
     {
         $parser = new Parser();
-        $selectors = $parser->parse(sprintf(':nth-child(%s)', $series));
+        $selectors = $parser->parse(\sprintf(':nth-child(%s)', $series));
         $this->assertCount(1, $selectors);
 
         /** @var FunctionNode $function */
@@ -82,7 +82,7 @@ class ParserTest extends TestCase
     public function testParseSeriesException($series)
     {
         $parser = new Parser();
-        $selectors = $parser->parse(sprintf(':nth-child(%s)', $series));
+        $selectors = $parser->parse(\sprintf(':nth-child(%s)', $series));
         $this->assertCount(1, $selectors);
 
         /** @var FunctionNode $function */

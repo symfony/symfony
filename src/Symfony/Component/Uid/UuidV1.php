@@ -25,7 +25,7 @@ class UuidV1 extends Uuid implements TimeBasedUidInterface
     public function __construct(?string $uuid = null)
     {
         if (null === $uuid) {
-            $this->uid = uuid_create(static::TYPE);
+            $this->uid = strtolower(uuid_create(static::TYPE));
         } else {
             parent::__construct($uuid, true);
         }
@@ -66,7 +66,7 @@ class UuidV1 extends Uuid implements TimeBasedUidInterface
                 $seq = substr($uuid, 19, 4);
 
                 do {
-                    self::$clockSeq = sprintf('%04x', random_int(0, 0x3FFF) | 0x8000);
+                    self::$clockSeq = \sprintf('%04x', random_int(0, 0x3FFF) | 0x8000);
                 } while ($seq === self::$clockSeq);
 
                 $seq = self::$clockSeq;

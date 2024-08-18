@@ -64,6 +64,11 @@ class EmojiTransliteratorTest extends TestCase
             $specialArrowInput,
             '↔ - :left_right_arrow:',
         ];
+        yield [
+            'gitlab',
+            '🤼',
+            ':wrestlers:',
+        ];
 
         yield [
             'strip',
@@ -164,6 +169,10 @@ class EmojiTransliteratorTest extends TestCase
     {
         $tr = EmojiTransliterator::create('emoji-github', EmojiTransliterator::REVERSE);
         $this->assertSame('github-emoji', $tr->id);
+        $this->assertSame('🎉', $tr->transliterate(':tada:'));
+
+        $tr = EmojiTransliterator::create('emoji-gitlab', EmojiTransliterator::REVERSE);
+        $this->assertSame('gitlab-emoji', $tr->id);
         $this->assertSame('🎉', $tr->transliterate(':tada:'));
 
         $tr = EmojiTransliterator::create('emoji-slack');

@@ -338,6 +338,7 @@ return [
     '👩‍👧' => 'tawacult: tameṭṭut, taqcict',
     '😶‍🌫' => 'udem deg usigna',
     '😮‍💨' => 'udem ittenferrihen',
+    '🙂‍↔' => 'ahuzzu aglawan n uqerru',
     '🙂‍↕' => 'ahuzzu aratak n uqerru',
     '😵‍💫' => 'udem s wallen idewwiren',
     '❤‍🔥' => 'ul tecɛel deg-s tmes',

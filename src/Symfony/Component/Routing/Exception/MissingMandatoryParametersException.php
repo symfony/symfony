@@ -29,7 +29,7 @@ class MissingMandatoryParametersException extends \InvalidArgumentException impl
     {
         $this->routeName = $routeName;
         $this->missingParameters = $missingParameters;
-        $message = sprintf('Some mandatory parameters are missing ("%s") to generate a URL for route "%s".', implode('", "', $missingParameters), $routeName);
+        $message = \sprintf('Some mandatory parameters are missing ("%s") to generate a URL for route "%s".', implode('", "', $missingParameters), $routeName);
 
         parent::__construct($message, $code, $previous);
     }

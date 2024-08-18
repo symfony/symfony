@@ -23,6 +23,8 @@ use Symfony\Component\TypeInfo\TypeIdentifier;
  * @author Baptiste Leduc <baptiste.leduc@gmail.com>
  *
  * @template T of BuiltinType<TypeIdentifier::ARRAY>|BuiltinType<TypeIdentifier::ITERABLE>|ObjectType
+ *
+ * @experimental
  */
 final class GenericType extends Type
 {
@@ -41,12 +43,22 @@ final class GenericType extends Type
         $this->variableTypes = $variableTypes;
     }
 
+    public function getBaseType(): BuiltinType|ObjectType
+    {
+        return $this->getType();
+    }
+
     /**
      * @return T
      */
     public function getType(): BuiltinType|ObjectType
     {
         return $this->type;
+    }
+
+    public function isA(TypeIdentifier|string $subject): bool
+    {
+        return $this->getType()->isA($subject);
     }
 
     public function asNonNullable(): self
@@ -69,7 +81,7 @@ final class GenericType extends Type
         $variableTypesString = '';
         $glue = '';
         foreach ($this->variableTypes as $t) {
-            $variableTypesString .= $glue.((string) $t);
+            $variableTypesString .= $glue.$t;
             $glue = ',';
         }
 

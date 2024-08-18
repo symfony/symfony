@@ -44,6 +44,6 @@ class SpecificityAdjustmentNode extends AbstractNode
             $this->arguments,
         );
 
-        return sprintf('%s[%s:where(%s)]', $this->getNodeName(), $this->selector, implode(', ', $selectorArguments));
+        return \sprintf('%s[%s:where(%s)]', $this->getNodeName(), $this->selector, implode(', ', $selectorArguments));
     }
 }

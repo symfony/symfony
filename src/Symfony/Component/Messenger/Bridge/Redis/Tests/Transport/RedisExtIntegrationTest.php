@@ -237,7 +237,7 @@ class RedisExtIntegrationTest extends TestCase
 
         $connection = Connection::fromDsn($dsn,
             ['delete_after_ack' => true,
-             $sentinelOptionName => getenv('MESSENGER_REDIS_SENTINEL_MASTER') ?: null,
+                $sentinelOptionName => getenv('MESSENGER_REDIS_SENTINEL_MASTER') ?: null,
             ], $this->redis);
 
         $connection->add('1', []);
@@ -262,8 +262,8 @@ class RedisExtIntegrationTest extends TestCase
     {
         $connection = Connection::fromDsn(getenv('MESSENGER_REDIS_DSN'),
             ['lazy' => true,
-             'delete_after_ack' => true,
-             'sentinel_master' => getenv('MESSENGER_REDIS_SENTINEL_MASTER') ?: null,
+                'delete_after_ack' => true,
+                'sentinel_master' => getenv('MESSENGER_REDIS_SENTINEL_MASTER') ?: null,
             ], $this->redis);
 
         $connection->add('1', []);
@@ -353,6 +353,9 @@ class RedisExtIntegrationTest extends TestCase
         }
     }
 
+    /**
+     * @group transient-on-windows
+     */
     public function testGetNonBlocking()
     {
         $redis = $this->createRedisClient();
@@ -369,6 +372,9 @@ class RedisExtIntegrationTest extends TestCase
         }
     }
 
+    /**
+     * @group transient-on-windows
+     */
     public function testGetAfterReject()
     {
         $redis = $this->createRedisClient();
@@ -388,6 +394,9 @@ class RedisExtIntegrationTest extends TestCase
         }
     }
 
+    /**
+     * @group transient-on-windows
+     */
     public function testItProperlyHandlesEmptyMessages()
     {
         $redisReceiver = new RedisReceiver($this->connection, new Serializer());

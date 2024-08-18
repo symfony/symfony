@@ -29,22 +29,19 @@ final class FakeChatEmailTransport extends AbstractTransport
 {
     protected const HOST = 'default';
 
-    private MailerInterface $mailer;
-    private string $to;
-    private string $from;
-
-    public function __construct(MailerInterface $mailer, string $to, string $from, ?HttpClientInterface $client = null, ?EventDispatcherInterface $dispatcher = null)
-    {
-        $this->mailer = $mailer;
-        $this->to = $to;
-        $this->from = $from;
-
+    public function __construct(
+        private MailerInterface $mailer,
+        private string $to,
+        private string $from,
+        ?HttpClientInterface $client = null,
+        ?EventDispatcherInterface $dispatcher = null,
+    ) {
         parent::__construct($client, $dispatcher);
     }
 
     public function __toString(): string
     {
-        return sprintf('fakechat+email://%s?to=%s&from=%s', $this->getEndpoint(), $this->to, $this->from);
+        return \sprintf('fakechat+email://%s?to=%s&from=%s', $this->getEndpoint(), $this->to, $this->from);
     }
 
     public function supports(MessageInterface $message): bool
@@ -65,7 +62,7 @@ final class FakeChatEmailTransport extends AbstractTransport
 
         $subject = 'New Chat message without specified recipient!';
         if (null !== $message->getRecipientId()) {
-            $subject = sprintf('New Chat message for recipient: %s', $message->getRecipientId());
+            $subject = \sprintf('New Chat message for recipient: %s', $message->getRecipientId());
         }
 
         $email = (new Email())

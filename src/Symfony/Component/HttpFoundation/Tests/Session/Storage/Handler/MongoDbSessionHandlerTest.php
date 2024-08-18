@@ -51,7 +51,7 @@ class MongoDbSessionHandlerTest extends TestCase
         try {
             $this->manager->executeCommand(self::DABASE_NAME, new Command(['ping' => 1]));
         } catch (ConnectionException $e) {
-            $this->markTestSkipped(sprintf('MongoDB Server "%s" not running: %s', getenv('MONGODB_HOST'), $e->getMessage()));
+            $this->markTestSkipped(\sprintf('MongoDB Server "%s" not running: %s', getenv('MONGODB_HOST'), $e->getMessage()));
         }
 
         $this->options = [

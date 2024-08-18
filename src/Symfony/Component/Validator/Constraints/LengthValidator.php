@@ -76,7 +76,7 @@ class LengthValidator extends ConstraintValidator
                 ->setParameter('{{ limit }}', $constraint->max)
                 ->setParameter('{{ value_length }}', $length)
                 ->setInvalidValue($value)
-                ->setPlural((int) $constraint->max)
+                ->setPlural($constraint->max)
                 ->setCode($exactlyOptionEnabled ? Length::NOT_EQUAL_LENGTH_ERROR : Length::TOO_LONG_ERROR)
                 ->addViolation();
 
@@ -91,7 +91,7 @@ class LengthValidator extends ConstraintValidator
                 ->setParameter('{{ limit }}', $constraint->min)
                 ->setParameter('{{ value_length }}', $length)
                 ->setInvalidValue($value)
-                ->setPlural((int) $constraint->min)
+                ->setPlural($constraint->min)
                 ->setCode($exactlyOptionEnabled ? Length::NOT_EQUAL_LENGTH_ERROR : Length::TOO_SHORT_ERROR)
                 ->addViolation();
         }

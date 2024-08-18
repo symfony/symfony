@@ -1180,6 +1180,7 @@ return [
     '👩‍👧' => 'swójba: žona, holca',
     '😶‍🌫' => 'wobličo w mróčelach',
     '😮‍💨' => 'wobličo, kiž wudycha',
+    '🙂‍↔' => 'wobličo, kiž z hłowu wije',
     '🙂‍↕' => 'wobličo, kiž nyga',
     '😵‍💫' => 'wobličo ze spiralojtymaj wočomaj',
     '❤‍🔥' => 'wutrobička so pali',

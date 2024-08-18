@@ -30,14 +30,14 @@ class RedisSenderTest extends TestCase
         $connection->expects($this->once())->method('add')->with($encoded['body'], $encoded['headers'])->willReturn('THE_MESSAGE_ID');
 
         $serializer = $this->createMock(SerializerInterface::class);
-        $serializer->method('encode')->with($envelope)->willReturnOnConsecutiveCalls($encoded);
+        $serializer->method('encode')->with($envelope)->willReturn($encoded);
 
         $sender = new RedisSender($connection, $serializer);
 
         /** @var TransportMessageIdStamp $stamp */
         $stamp = $sender->send($envelope)->last(TransportMessageIdStamp::class);
 
-        $this->assertNotNull($stamp, sprintf('A "%s" stamp should be added', TransportMessageIdStamp::class));
+        $this->assertNotNull($stamp, \sprintf('A "%s" stamp should be added', TransportMessageIdStamp::class));
         $this->assertSame('THE_MESSAGE_ID', $stamp->getId());
     }
 }

@@ -35,14 +35,13 @@ final class TwilioTransport extends AbstractTransport
         private string $from,
         ?HttpClientInterface $client = null,
         ?EventDispatcherInterface $dispatcher = null,
-)
-    {
+    ) {
         parent::__construct($client, $dispatcher);
     }
 
     public function __toString(): string
     {
-        return sprintf('twilio://%s?from=%s', $this->getEndpoint(), $this->from);
+        return \sprintf('twilio://%s?from=%s', $this->getEndpoint(), $this->from);
     }
 
     public function supports(MessageInterface $message): bool
@@ -59,10 +58,10 @@ final class TwilioTransport extends AbstractTransport
         $from = $message->getFrom() ?: $this->from;
 
         if (!preg_match('/^[a-zA-Z0-9\s]{2,11}$/', $from) && !preg_match('/^\+[1-9]\d{1,14}$/', $from)) {
-            throw new InvalidArgumentException(sprintf('The "From" number "%s" is not a valid phone number, shortcode, or alphanumeric sender ID.', $from));
+            throw new InvalidArgumentException(\sprintf('The "From" number "%s" is not a valid phone number, shortcode, or alphanumeric sender ID.', $from));
         }
 
-        $endpoint = sprintf('https://%s/2010-04-01/Accounts/%s/Messages.json', $this->getEndpoint(), $this->accountSid);
+        $endpoint = \sprintf('https://%s/2010-04-01/Accounts/%s/Messages.json', $this->getEndpoint(), $this->accountSid);
         $options = $message->getOptions()?->toArray() ?? [];
         $body = [
             'From' => $from,
@@ -86,7 +85,7 @@ final class TwilioTransport extends AbstractTransport
         if (201 !== $statusCode) {
             $error = $response->toArray(false);
 
-            throw new TransportException('Unable to send the SMS: '.$error['message'].sprintf(' (see %s).', $error['more_info']), $response);
+            throw new TransportException('Unable to send the SMS: '.$error['message'].\sprintf(' (see %s).', $error['more_info']), $response);
         }
 
         $success = $response->toArray(false);

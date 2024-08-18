@@ -23,8 +23,8 @@ class CompiledAssetMapperConfigReaderTest extends TestCase
     protected function setUp(): void
     {
         $this->filesystem = new Filesystem();
-        $this->writableRoot = __DIR__.'/../Fixtures/importmaps_for_writing';
-        if (!file_exists(__DIR__.'/../Fixtures/importmaps_for_writing')) {
+        $this->writableRoot = __DIR__.'/../Fixtures/compiled_asset_mapper_config_reader';
+        if (!file_exists(__DIR__.'/../Fixtures/compiled_asset_mapper_config_reader')) {
             $this->filesystem->mkdir($this->writableRoot);
         }
         // realpath to help path comparisons in the tests
@@ -55,7 +55,7 @@ class CompiledAssetMapperConfigReaderTest extends TestCase
     {
         $reader = new CompiledAssetMapperConfigReader($this->writableRoot);
         $this->assertEquals($this->writableRoot.\DIRECTORY_SEPARATOR.'foo.json', realpath($reader->saveConfig('foo.json', ['foo' => 'bar'])));
-        $this->assertEquals(['foo' => 'bar'], json_decode(file_get_contents($this->writableRoot.'/foo.json'), true));
+        $this->assertEquals(['foo' => 'bar'], json_decode($this->filesystem->readFile($this->writableRoot.'/foo.json'), true));
     }
 
     public function testRemoveConfig()

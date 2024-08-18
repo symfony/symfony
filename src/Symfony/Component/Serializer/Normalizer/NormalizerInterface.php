@@ -22,9 +22,9 @@ use Symfony\Component\Serializer\Exception\LogicException;
 interface NormalizerInterface
 {
     /**
-     * Normalizes an object into a set of arrays/scalars.
+     * Normalizes data into a set of arrays/scalars.
      *
-     * @param mixed       $object  Object to normalize
+     * @param mixed       $data    Data to normalize
      * @param string|null $format  Format the normalization result will be encoded as
      * @param array       $context Context options for the normalizer
      *
@@ -36,7 +36,7 @@ interface NormalizerInterface
      * @throws LogicException             Occurs when the normalizer is not called in an expected context
      * @throws ExceptionInterface         Occurs for all the other cases of errors
      */
-    public function normalize(mixed $object, ?string $format = null, array $context = []): array|string|int|float|bool|\ArrayObject|null;
+    public function normalize(mixed $data, ?string $format = null, array $context = []): array|string|int|float|bool|\ArrayObject|null;
 
     /**
      * Checks whether the given class is supported for normalization by this normalizer.

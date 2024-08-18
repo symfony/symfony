@@ -85,6 +85,31 @@ class ExecutableFinderTest extends TestCase
         $this->assertSamePath(\PHP_BINARY, $result);
     }
 
+    public function testFindWithoutSuffix()
+    {
+        $fixturesDir = __DIR__.\DIRECTORY_SEPARATOR.'Fixtures';
+        $name = 'executable_without_suffix';
+
+        $finder = new ExecutableFinder();
+        $result = $finder->find($name, null, [$fixturesDir]);
+
+        $this->assertSamePath($fixturesDir.\DIRECTORY_SEPARATOR.$name, $result);
+    }
+
+    public function testFindWithAddedSuffixes()
+    {
+        $fixturesDir = __DIR__.\DIRECTORY_SEPARATOR.'Fixtures';
+        $name = 'executable_with_added_suffix';
+        $suffix = '.foo';
+
+        $finder = new ExecutableFinder();
+        $finder->addSuffix($suffix);
+
+        $result = $finder->find($name, null, [$fixturesDir]);
+
+        $this->assertSamePath($fixturesDir.\DIRECTORY_SEPARATOR.$name.$suffix, $result);
+    }
+
     /**
      * @runInSeparateProcess
      */
@@ -99,12 +124,16 @@ class ExecutableFinderTest extends TestCase
         }
 
         putenv('PATH='.\dirname(\PHP_BINARY));
-        $this->iniSet('open_basedir', \dirname(\PHP_BINARY).\PATH_SEPARATOR.'/');
+        $initialOpenBaseDir = ini_set('open_basedir', \dirname(\PHP_BINARY).\PATH_SEPARATOR.'/');
 
-        $finder = new ExecutableFinder();
-        $result = $finder->find($this->getPhpBinaryName());
+        try {
+            $finder = new ExecutableFinder();
+            $result = $finder->find($this->getPhpBinaryName());
 
-        $this->assertSamePath(\PHP_BINARY, $result);
+            $this->assertSamePath(\PHP_BINARY, $result);
+        } finally {
+            ini_set('open_basedir', $initialOpenBaseDir);
+        }
     }
 
     public function testFindBatchExecutableOnWindows()

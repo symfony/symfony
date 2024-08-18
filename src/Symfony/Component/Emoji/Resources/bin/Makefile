@@ -4,6 +4,7 @@
 update: ## Update sources
 	@composer update
 	@curl https://api.github.com/emojis > vendor/github-emojis.json
+	@curl https://gitlab.com/gitlab-org/gitlab/-/raw/master/fixtures/emojis/index.json > vendor/gitlab-emojis.json
 	@curl https://raw.githubusercontent.com/iamcal/emoji-data/master/emoji.json > vendor/slack-emojis.json
 	@curl -L https://unicode.org/Public/emoji/latest/emoji-test.txt > vendor/emoji-test.txt
 

@@ -23,7 +23,7 @@ final class ResponseHeaderLocationSame extends Constraint
 
     public function toString(): string
     {
-        return sprintf('has header "Location" matching "%s"', $this->expectedValue);
+        return \sprintf('has header "Location" matching "%s"', $this->expectedValue);
     }
 
     protected function matches($other): bool
@@ -53,7 +53,7 @@ final class ResponseHeaderLocationSame extends Constraint
         }
 
         if (str_starts_with($url, '//')) {
-            return sprintf('%s:%s', $this->request->getScheme(), $url);
+            return \sprintf('%s:%s', $this->request->getScheme(), $url);
         }
 
         if (str_starts_with($url, '/')) {

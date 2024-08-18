@@ -5,6 +5,7 @@ CHANGELOG
 ---
 
  * Add `ServiceCollectionInterface`
+ * Deprecate `ServiceSubscriberTrait`, use `ServiceMethodsSubscriberTrait` instead
 
 3.4
 ---

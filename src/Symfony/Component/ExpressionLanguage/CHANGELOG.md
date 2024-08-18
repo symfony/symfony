@@ -1,6 +1,13 @@
 CHANGELOG
 =========
 
+7.2
+---
+
+ * Add support for null-coalescing unknown variables
+ * Add support for comments using `/*` & `*/`
+ * Allow passing any iterable as `$providers` list to `ExpressionLanguage` constructor
+
 7.1
 ---
 

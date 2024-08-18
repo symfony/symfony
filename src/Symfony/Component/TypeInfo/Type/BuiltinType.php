@@ -20,6 +20,8 @@ use Symfony\Component\TypeInfo\TypeIdentifier;
  * @author Baptiste Leduc <baptiste.leduc@gmail.com>
  *
  * @template T of TypeIdentifier
+ *
+ * @experimental
  */
 final class BuiltinType extends Type
 {
@@ -31,12 +33,30 @@ final class BuiltinType extends Type
     ) {
     }
 
+    public function getBaseType(): self|ObjectType
+    {
+        return $this;
+    }
+
     /**
      * @return T
      */
     public function getTypeIdentifier(): TypeIdentifier
     {
         return $this->typeIdentifier;
+    }
+
+    public function isA(TypeIdentifier|string $subject): bool
+    {
+        if ($subject instanceof TypeIdentifier) {
+            return $this->getTypeIdentifier() === $subject;
+        }
+
+        try {
+            return TypeIdentifier::from($subject) === $this->getTypeIdentifier();
+        } catch (\ValueError) {
+            return false;
+        }
     }
 
     /**

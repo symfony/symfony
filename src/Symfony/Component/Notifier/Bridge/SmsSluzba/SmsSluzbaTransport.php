@@ -40,7 +40,7 @@ final class SmsSluzbaTransport extends AbstractTransport
 
     public function __toString(): string
     {
-        return sprintf('sms-sluzba://%s', $this->getEndpoint());
+        return \sprintf('sms-sluzba://%s', $this->getEndpoint());
     }
 
     public function supports(MessageInterface $message): bool
@@ -54,7 +54,7 @@ final class SmsSluzbaTransport extends AbstractTransport
             throw new UnsupportedMessageTypeException(__CLASS__, SmsMessage::class, $message);
         }
 
-        $endpoint = sprintf(
+        $endpoint = \sprintf(
             'https://%s/apixml30/receiver?login=%s&password=%s',
             $this->getEndpoint(),
             $this->username,
@@ -87,7 +87,7 @@ final class SmsSluzbaTransport extends AbstractTransport
         $responseXml = $xmlEncoder->decode($response->getContent(), 'xml');
 
         if (isset($responseXml['message']) && \is_string($responseXml['message'])) {
-            throw new TransportException(sprintf('Unable to send the SMS: "%s" (%s).', $responseXml['message'], (int) substr($responseXml['id'], 0, 3)), $response);
+            throw new TransportException(\sprintf('Unable to send the SMS: "%s" (%s).', $responseXml['message'], (int) substr($responseXml['id'], 0, 3)), $response);
         }
 
         $sentMessage = new SentMessage($message, (string) $this);

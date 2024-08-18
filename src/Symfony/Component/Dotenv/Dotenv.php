@@ -461,7 +461,7 @@ final class Dotenv
             try {
                 $process->mustRun();
             } catch (ProcessException) {
-                throw $this->createFormatException(sprintf('Issue expanding a command (%s)', $process->getErrorOutput()));
+                throw $this->createFormatException(\sprintf('Issue expanding a command (%s)', $process->getErrorOutput()));
             }
 
             return rtrim($process->getOutput(), "\n\r");
@@ -485,7 +485,7 @@ final class Dotenv
             (?P<closing_brace>\})?             # optional closing brace
         /x';
 
-        $value = preg_replace_callback($regex, function ($matches) use ($loadedVars) {
+        return preg_replace_callback($regex, function ($matches) use ($loadedVars) {
             // odd number of backslashes means the $ character is escaped
             if (1 === \strlen($matches['backslashes']) % 2) {
                 return substr($matches[0], 1);
@@ -516,7 +516,7 @@ final class Dotenv
             if ('' === $value && isset($matches['default_value']) && '' !== $matches['default_value']) {
                 $unsupportedChars = strpbrk($matches['default_value'], '\'"{$');
                 if (false !== $unsupportedChars) {
-                    throw $this->createFormatException(sprintf('Unsupported character "%s" found in the default value of variable "$%s".', $unsupportedChars[0], $name));
+                    throw $this->createFormatException(\sprintf('Unsupported character "%s" found in the default value of variable "$%s".', $unsupportedChars[0], $name));
                 }
 
                 $value = substr($matches['default_value'], 2);
@@ -532,8 +532,6 @@ final class Dotenv
 
             return $matches['backslashes'].$value;
         }, $value);
-
-        return $value;
     }
 
     private function moveCursor(string $text): void

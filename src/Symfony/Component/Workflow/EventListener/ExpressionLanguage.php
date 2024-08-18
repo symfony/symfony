@@ -26,9 +26,9 @@ class ExpressionLanguage extends BaseExpressionLanguage
     {
         parent::registerFunctions();
 
-        $this->register('is_granted', fn ($attributes, $object = 'null') => sprintf('$auth_checker->isGranted(%s, %s)', $attributes, $object), fn (array $variables, $attributes, $object = null) => $variables['auth_checker']->isGranted($attributes, $object));
+        $this->register('is_granted', fn ($attributes, $object = 'null') => \sprintf('$auth_checker->isGranted(%s, %s)', $attributes, $object), fn (array $variables, $attributes, $object = null) => $variables['auth_checker']->isGranted($attributes, $object));
 
-        $this->register('is_valid', fn ($object = 'null', $groups = 'null') => sprintf('0 === count($validator->validate(%s, null, %s))', $object, $groups), function (array $variables, $object = null, $groups = null) {
+        $this->register('is_valid', fn ($object = 'null', $groups = 'null') => \sprintf('0 === count($validator->validate(%s, null, %s))', $object, $groups), function (array $variables, $object = null, $groups = null) {
             if (!$variables['validator'] instanceof ValidatorInterface) {
                 throw new RuntimeException('"is_valid" cannot be used as the Validator component is not installed. Try running "composer require symfony/validator".');
             }

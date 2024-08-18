@@ -86,9 +86,8 @@ class ObjectLoaderTest extends TestCase
 
     public function testExceptionOnMethodNotReturningCollection()
     {
-        $service = $this->getMockBuilder(\stdClass::class)
-            ->addMethods(['loadRoutes'])
-            ->getMock();
+        $service = $this->createMock(CustomRouteLoader::class);
+
         $service->expects($this->once())
             ->method('loadRoutes')
             ->willReturn('NOT_A_COLLECTION');
@@ -117,6 +116,11 @@ class TestObjectLoader extends ObjectLoader
     }
 }
 
+interface CustomRouteLoader
+{
+    public function loadRoutes();
+}
+
 class TestObjectLoaderRouteService
 {
     private RouteCollection $collection;
@@ -131,7 +135,7 @@ class TestObjectLoaderRouteService
     public function loadRoutes(TestObjectLoader $loader, ?string $env = null)
     {
         if ($this->env !== $env) {
-            throw new \InvalidArgumentException(sprintf('Expected env "%s", "%s" given.', $this->env, $env));
+            throw new \InvalidArgumentException(\sprintf('Expected env "%s", "%s" given.', $this->env, $env));
         }
 
         return $this->collection;

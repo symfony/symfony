@@ -38,7 +38,7 @@ class SesApiAsyncAwsTransport extends SesHttpAsyncAwsTransport
             $host = $configuration->get('region');
         }
 
-        return sprintf('ses+api://%s@%s', $configuration->get('accessKeyId'), $host);
+        return \sprintf('ses+api://%s@%s', $configuration->get('accessKeyId'), $host);
     }
 
     protected function getRequest(SentMessage $message): SendEmailRequest
@@ -46,7 +46,7 @@ class SesApiAsyncAwsTransport extends SesHttpAsyncAwsTransport
         try {
             $email = MessageConverter::toEmail($message->getOriginalMessage());
         } catch (\Exception $e) {
-            throw new RuntimeException(sprintf('Unable to send message with the "%s" transport: ', __CLASS__).$e->getMessage(), 0, $e);
+            throw new RuntimeException(\sprintf('Unable to send message with the "%s" transport: ', __CLASS__).$e->getMessage(), 0, $e);
         }
 
         if ($email->getAttachments()) {
@@ -98,6 +98,11 @@ class SesApiAsyncAwsTransport extends SesHttpAsyncAwsTransport
         if ($header = $email->getHeaders()->get('X-SES-SOURCE-ARN')) {
             $request['FromEmailAddressIdentityArn'] = $header->getBodyAsString();
         }
+        if ($header = $email->getHeaders()->get('X-SES-LIST-MANAGEMENT-OPTIONS')) {
+            if (preg_match('/^(contactListName=)*(?<ContactListName>[^;]+)(;\s?topicName=(?<TopicName>.+))?$/ix', $header->getBodyAsString(), $listManagementOptions)) {
+                $request['ListManagementOptions'] = array_filter($listManagementOptions, fn ($e) => \in_array($e, ['ContactListName', 'TopicName']), \ARRAY_FILTER_USE_KEY);
+            }
+        }
         if ($email->getReturnPath()) {
             $request['FeedbackForwardingEmailAddress'] = $email->getReturnPath()->toString();
         }
@@ -127,7 +132,7 @@ class SesApiAsyncAwsTransport extends SesHttpAsyncAwsTransport
     {
         // AWS does not support UTF-8 address
         if (preg_match('~[\x00-\x08\x10-\x19\x7F-\xFF\r\n]~', $name = $a->getName())) {
-            return sprintf('=?UTF-8?B?%s?= <%s>',
+            return \sprintf('=?UTF-8?B?%s?= <%s>',
                 base64_encode($name),
                 $a->getEncodedAddress()
             );

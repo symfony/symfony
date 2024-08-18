@@ -23,6 +23,8 @@ class_exists(Section::class);
  */
 class Stopwatch implements ResetInterface
 {
+    public const ROOT = '__root__';
+
     /**
      * @var Section[]
      */
@@ -62,7 +64,7 @@ class Stopwatch implements ResetInterface
         $current = end($this->activeSections);
 
         if (null !== $id && null === $current->get($id)) {
-            throw new \LogicException(sprintf('The section "%s" has been started at an other level and cannot be opened.', $id));
+            throw new \LogicException(\sprintf('The section "%s" has been started at an other level and cannot be opened.', $id));
         }
 
         $this->start('__section__.child', 'section');
@@ -138,7 +140,17 @@ class Stopwatch implements ResetInterface
      */
     public function getSectionEvents(string $id): array
     {
-        return isset($this->sections[$id]) ? $this->sections[$id]->getEvents() : [];
+        return $this->sections[$id]->getEvents() ?? [];
+    }
+
+    /**
+     * Gets all events for the root section.
+     *
+     * @return StopwatchEvent[]
+     */
+    public function getRootSectionEvents(): array
+    {
+        return $this->sections[self::ROOT]->getEvents() ?? [];
     }
 
     /**
@@ -146,6 +158,6 @@ class Stopwatch implements ResetInterface
      */
     public function reset(): void
     {
-        $this->sections = $this->activeSections = ['__root__' => new Section(null, $this->morePrecision)];
+        $this->sections = $this->activeSections = [self::ROOT => new Section(null, $this->morePrecision)];
     }
 }

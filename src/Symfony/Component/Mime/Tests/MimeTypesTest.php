@@ -28,7 +28,7 @@ class MimeTypesTest extends AbstractMimeTypeGuesserTestCase
     public function testUnsupportedGuesser()
     {
         $guesser = $this->getGuesser();
-        $guesser->registerGuesser(new class() implements MimeTypeGuesserInterface {
+        $guesser->registerGuesser(new class implements MimeTypeGuesserInterface {
             public function isGuesserSupported(): bool
             {
                 return false;

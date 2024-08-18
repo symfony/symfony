@@ -1274,6 +1274,175 @@ class HttpCacheTest extends HttpCacheTestCase
         $this->assertEquals(100, $this->response->getTtl());
     }
 
+    public function testEsiCacheIncludesEmbeddedResponseContentWhenMainResponseFailsRevalidationAndEmbeddedResponseIsFresh()
+    {
+        $this->setNextResponses([
+            [
+                'status' => 200,
+                'body' => 'main <esi:include src="/foo" />',
+                'headers' => [
+                    'Cache-Control' => 's-maxage=0', // goes stale immediately
+                    'Surrogate-Control' => 'content="ESI/1.0"',
+                    'Last-Modified' => 'Mon, 12 Aug 2024 10:00:00 +0000',
+                ],
+            ],
+            [
+                'status' => 200,
+                'body' => 'embedded',
+                'headers' => [
+                    'Cache-Control' => 's-maxage=10', // stays fresh
+                    'Last-Modified' => 'Mon, 12 Aug 2024 10:05:00 +0000',
+                ]
+            ],
+        ]);
+
+        // prime the cache
+        $this->request('GET', '/', [], [], true);
+        $this->assertSame(200, $this->response->getStatusCode());
+        $this->assertSame('main embedded', $this->response->getContent());
+        $this->assertSame('Mon, 12 Aug 2024 10:05:00 +0000', $this->response->getLastModified()->format(\DATE_RFC2822)); // max of both values
+
+        $this->setNextResponses([
+            [
+                // On the next request, the main response has an updated Last-Modified (main page was modified)...
+                'status' => 200,
+                'body' => 'main <esi:include src="/foo" />',
+                'headers' => [
+                    'Cache-Control' => 's-maxage=0',
+                    'Surrogate-Control' => 'content="ESI/1.0"',
+                    'Last-Modified' => 'Mon, 12 Aug 2024 10:10:00 +0000',
+                ],
+            ],
+            // no revalidation request happens for the embedded response, since it is still fresh
+        ]);
+
+        // Re-request with Last-Modified time that we received when the cache was primed
+        $this->request('GET', '/', ['HTTP_IF_MODIFIED_SINCE' => 'Mon, 12 Aug 2024 10:05:00 +0000'], [], true);
+
+        $this->assertSame(200, $this->response->getStatusCode());
+
+        // The cache should use the content ("embedded") from the cached entry
+        $this->assertSame('main embedded', $this->response->getContent());
+
+        $traces = $this->cache->getTraces();
+        $this->assertSame(['stale', 'invalid', 'store'], $traces['GET /']);
+
+        // The embedded resource was still fresh
+        $this->assertSame(['fresh'], $traces['GET /foo']);
+    }
+
+    public function testEsiCacheIncludesEmbeddedResponseContentWhenMainResponseFailsRevalidationAndEmbeddedResponseIsValid()
+    {
+        $this->setNextResponses([
+            [
+                'status' => 200,
+                'body' => 'main <esi:include src="/foo" />',
+                'headers' => [
+                    'Cache-Control' => 's-maxage=0', // goes stale immediately
+                    'Surrogate-Control' => 'content="ESI/1.0"',
+                    'Last-Modified' => 'Mon, 12 Aug 2024 10:00:00 +0000',
+                ],
+            ],
+            [
+                'status' => 200,
+                'body' => 'embedded',
+                'headers' => [
+                    'Cache-Control' => 's-maxage=0', // goes stale immediately
+                    'Last-Modified' => 'Mon, 12 Aug 2024 10:05:00 +0000',
+                ]
+            ],
+        ]);
+
+        // prime the cache
+        $this->request('GET', '/', [], [], true);
+        $this->assertSame(200, $this->response->getStatusCode());
+        $this->assertSame('main embedded', $this->response->getContent());
+        $this->assertSame('Mon, 12 Aug 2024 10:05:00 +0000', $this->response->getLastModified()->format(\DATE_RFC2822)); // max of both values
+
+        $this->setNextResponses([
+            [
+                // On the next request, the main response has an updated Last-Modified (main page was modified)...
+                'status' => 200,
+                'body' => 'main <esi:include src="/foo" />',
+                'headers' => [
+                    'Cache-Control' => 's-maxage=0',
+                    'Surrogate-Control' => 'content="ESI/1.0"',
+                    'Last-Modified' => 'Mon, 12 Aug 2024 10:10:00 +0000',
+                ],
+            ],
+            [
+                // We have a stale cache entry for the embedded response which will be revalidated.
+                // Let's assume the resource did not change, so the controller sends a 304 without content body.
+                'status' => 304,
+                'body' => '',
+                'headers' => [
+                    'Cache-Control' => 's-maxage=0',
+                ],
+            ],
+        ]);
+
+        // Re-request with Last-Modified time that we received when the cache was primed
+        $this->request('GET', '/', ['HTTP_IF_MODIFIED_SINCE' => 'Mon, 12 Aug 2024 10:05:00 +0000'], [], true);
+
+        $this->assertSame(200, $this->response->getStatusCode());
+
+        // The cache should use the content ("embedded") from the cached entry
+        $this->assertSame('main embedded', $this->response->getContent());
+
+        $traces = $this->cache->getTraces();
+        $this->assertSame(['stale', 'invalid', 'store'], $traces['GET /']);
+
+        // Check that the embedded resource was successfully revalidated
+        $this->assertSame(['stale', 'valid', 'store'], $traces['GET /foo']);
+    }
+
+    public function testEsiCacheIncludesEmbeddedResponseContentWhenMainAndEmbeddedResponseAreFresh()
+    {
+        $this->setNextResponses([
+            [
+                'status' => 200,
+                'body' => 'main <esi:include src="/foo" />',
+                'headers' => [
+                    'Cache-Control' => 's-maxage=10',
+                    'Surrogate-Control' => 'content="ESI/1.0"',
+                    'Last-Modified' => 'Mon, 12 Aug 2024 10:05:00 +0000',
+                ],
+            ],
+            [
+                'status' => 200,
+                'body' => 'embedded',
+                'headers' => [
+                    'Cache-Control' => 's-maxage=10',
+                    'Last-Modified' => 'Mon, 12 Aug 2024 10:00:00 +0000',
+                ]
+            ],
+        ]);
+
+        // prime the cache
+        $this->request('GET', '/', [], [], true);
+        $this->assertSame(200, $this->response->getStatusCode());
+        $this->assertSame('main embedded', $this->response->getContent());
+        $this->assertSame('Mon, 12 Aug 2024 10:05:00 +0000', $this->response->getLastModified()->format(\DATE_RFC2822));
+
+        // Assume that a client received 'Mon, 12 Aug 2024 10:00:00 +0000' as last-modified information in the past. This may, for example,
+        // be the case when the "main" response at that point had an older Last-Modified time, so the embedded response's Last-Modified time
+        // governed the result for the combined response. In other words, the client received a Last-Modified time that still validates the
+        // embedded response as of now, but no longer matches the Last-Modified time of the "main" resource.
+        // Now this client does a revalidation request.
+        $this->request('GET', '/', ['HTTP_IF_MODIFIED_SINCE' => 'Mon, 12 Aug 2024 10:00:00 +0000'], [], true);
+
+        $this->assertSame(200, $this->response->getStatusCode());
+
+        // The cache should use the content ("embedded") from the cached entry
+        $this->assertSame('main embedded', $this->response->getContent());
+
+        $traces = $this->cache->getTraces();
+        $this->assertSame(['fresh'], $traces['GET /']);
+
+        // Check that the embedded resource was successfully revalidated
+        $this->assertSame(['fresh'], $traces['GET /foo']);
+    }
+
     public function testEsiCacheForceValidation()
     {
         $responses = [

@@ -35,14 +35,13 @@ final class VonageTransport extends AbstractTransport
         private string $from,
         ?HttpClientInterface $client = null,
         ?EventDispatcherInterface $dispatcher = null,
-)
-    {
+    ) {
         parent::__construct($client, $dispatcher);
     }
 
     public function __toString(): string
     {
-        return sprintf('vonage://%s?from=%s', $this->getEndpoint(), $this->from);
+        return \sprintf('vonage://%s?from=%s', $this->getEndpoint(), $this->from);
     }
 
     public function supports(MessageInterface $message): bool
@@ -74,7 +73,7 @@ final class VonageTransport extends AbstractTransport
 
         foreach ($result['messages'] as $msg) {
             if ($msg['status'] ?? false) {
-                throw new TransportException('Unable to send the SMS: '.$msg['error-text'].sprintf(' (code %s).', $msg['status']), $response);
+                throw new TransportException('Unable to send the SMS: '.$msg['error-text'].\sprintf(' (code %s).', $msg['status']), $response);
             }
         }
 

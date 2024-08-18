@@ -55,7 +55,7 @@ final class VonageRequestParser extends AbstractRequestParser
         }
 
         if ('sms' !== $payload['channel']) {
-            throw new RejectWebhookException(406, sprintf('Unsupported channel "%s".', $payload['channel']));
+            throw new RejectWebhookException(406, \sprintf('Unsupported channel "%s".', $payload['channel']));
         }
 
         $name = match ($payload['status']) {
@@ -63,7 +63,7 @@ final class VonageRequestParser extends AbstractRequestParser
             'rejected' => SmsEvent::FAILED,
             'submitted' => null,
             'undeliverable' => SmsEvent::FAILED,
-            default => throw new RejectWebhookException(406, sprintf('Unsupported event "%s".', $payload['status'])),
+            default => throw new RejectWebhookException(406, \sprintf('Unsupported event "%s".', $payload['status'])),
         };
         if (!$name) {
             return null;

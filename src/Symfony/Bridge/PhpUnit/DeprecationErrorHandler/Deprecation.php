@@ -149,8 +149,6 @@ class Deprecation
         if (($test instanceof TestCase || $test instanceof TestSuite) && ('trigger_error' !== $trace[$i - 2]['function'] || isset($trace[$i - 2]['class']))) {
             $this->originClass = \get_class($test);
             $this->originMethod = $test->getName();
-
-            return;
         }
     }
 
@@ -313,7 +311,7 @@ class Deprecation
             }
         }
 
-        throw new \RuntimeException(sprintf('No vendors found for path "%s".', $path));
+        throw new \RuntimeException(\sprintf('No vendors found for path "%s".', $path));
     }
 
     /**

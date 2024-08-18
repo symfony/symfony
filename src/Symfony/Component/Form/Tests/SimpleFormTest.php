@@ -503,9 +503,9 @@ class SimpleFormTest extends TestCase
     {
         $form = $this->getBuilder()
             ->addModelTransformer(new FixedDataTransformer([
-            '' => '',
-            1 => 23,
-        ]))
+                '' => '',
+                1 => 23,
+            ]))
             ->getForm();
 
         $form->setData(1);

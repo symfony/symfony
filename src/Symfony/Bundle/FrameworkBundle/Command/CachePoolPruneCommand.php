@@ -52,7 +52,7 @@ EOF
         $io = new SymfonyStyle($input, $output);
 
         foreach ($this->pools as $name => $pool) {
-            $io->comment(sprintf('Pruning cache pool: <info>%s</info>', $name));
+            $io->comment(\sprintf('Pruning cache pool: <info>%s</info>', $name));
             $pool->prune();
         }
 

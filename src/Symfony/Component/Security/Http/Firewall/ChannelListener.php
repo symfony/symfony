@@ -27,17 +27,12 @@ use Symfony\Component\Security\Http\AccessMapInterface;
  */
 class ChannelListener extends AbstractListener
 {
-    private AccessMapInterface $map;
-    private ?LoggerInterface $logger;
-    private int $httpPort;
-    private int $httpsPort;
-
-    public function __construct(AccessMapInterface $map, ?LoggerInterface $logger = null, int $httpPort = 80, int $httpsPort = 443)
-    {
-        $this->map = $map;
-        $this->logger = $logger;
-        $this->httpPort = $httpPort;
-        $this->httpsPort = $httpsPort;
+    public function __construct(
+        private AccessMapInterface $map,
+        private ?LoggerInterface $logger = null,
+        private int $httpPort = 80,
+        private int $httpsPort = 443,
+    ) {
     }
 
     /**

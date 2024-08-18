@@ -16,7 +16,6 @@ use Symfony\Component\Messenger\Transport\Receiver\ReceiverInterface;
 
 class DummyReceiver implements ReceiverInterface
 {
-    private array $deliveriesOfEnvelopes;
     private array $acknowledgedEnvelopes = [];
     private array $rejectedEnvelopes = [];
     private int $acknowledgeCount = 0;
@@ -25,9 +24,9 @@ class DummyReceiver implements ReceiverInterface
     /**
      * @param Envelope[][] $deliveriesOfEnvelopes
      */
-    public function __construct(array $deliveriesOfEnvelopes)
-    {
-        $this->deliveriesOfEnvelopes = $deliveriesOfEnvelopes;
+    public function __construct(
+        private array $deliveriesOfEnvelopes,
+    ) {
     }
 
     public function get(): iterable

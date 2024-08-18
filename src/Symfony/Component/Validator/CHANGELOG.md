@@ -1,16 +1,31 @@
 CHANGELOG
 =========
 
+7.2
+---
+
+ * `IbanValidator` accepts IBANs containing non-breaking and narrow non-breaking spaces
+ * Make `PasswordStrengthValidator::estimateStrength()` public
+ * Add the `Yaml` constraint for validating YAML content
+ * Add `errorPath` to Unique constraint
+ * Add the `format` option to the `Ulid` constraint to allow accepting different ULID formats
+ * Add the `WordCount` constraint
+ * Add the `Week` constraint
+ * Add the `BackedEnumValue` constraint
+
 7.1
 ---
 
+ * Deprecate not passing a value for the `requireTld` option to the `Url` constraint (the default value will become `true` in 8.0)
+ * Add the calculated strength to violations in `PasswordStrengthValidator`
  * Add support for `Stringable` values when using the `Cidr`, `CssColor`, `ExpressionSyntax` and `PasswordStrength` constraints
  * Add `MacAddress` constraint
  * Add `*_NO_PUBLIC`, `*_ONLY_PRIVATE` and `*_ONLY_RESERVED` versions to `Ip` constraint
  * Possibility to use all `Ip` constraint versions for `Cidr` constraint
  * Add `list` and `associative_array` types to `Type` constraint
  * Add the `Charset` constraint
- * Add the `BackedEnumValue` constraint
+ * Add the `requireTld` option to the `Url` constraint
+ * Deprecate `Bic::INVALID_BANK_CODE_ERROR`
 
 7.0
 ---

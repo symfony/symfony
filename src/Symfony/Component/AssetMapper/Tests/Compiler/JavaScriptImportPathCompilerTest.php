@@ -49,7 +49,7 @@ class JavaScriptImportPathCompilerTest extends TestCase
                 return match ($path) {
                     './vendor/module_in_importmap_remote.js' => '/project/assets/vendor/module_in_importmap_remote.js',
                     '/project/assets/vendor/@popperjs/core.js' => '/project/assets/vendor/@popperjs/core.js',
-                    default => throw new \RuntimeException(sprintf('Unexpected path "%s"', $path)),
+                    default => throw new \RuntimeException(\sprintf('Unexpected path "%s"', $path)),
                 };
             });
 
@@ -398,7 +398,7 @@ class JavaScriptImportPathCompilerTest extends TestCase
                     '/project/assets/other.js' => new MappedAsset('other.js', '/can/be/anything.js', publicPathWithoutDigest: '/assets/other.js'),
                     '/project/assets/subdir/foo.js' => new MappedAsset('subdir/foo.js', '/can/be/anything.js', publicPathWithoutDigest: '/assets/subdir/foo.js'),
                     '/project/root_asset.js' => new MappedAsset('root_asset.js', '/can/be/anything.js', publicPathWithoutDigest: '/assets/root_asset.js'),
-                    default => throw new \RuntimeException(sprintf('Unexpected source path "%s"', $path)),
+                    default => throw new \RuntimeException(\sprintf('Unexpected source path "%s"', $path)),
                 };
             });
 
@@ -431,7 +431,7 @@ class JavaScriptImportPathCompilerTest extends TestCase
                     'C://project/assets/other.js' => new MappedAsset('other.js', '/can/be/anything.js', publicPathWithoutDigest: '/assets/other.js'),
                     'C://project/assets/subdir/foo.js' => new MappedAsset('subdir/foo.js', '/can/be/anything.js', publicPathWithoutDigest: '/assets/subdir/foo.js'),
                     'C://project/root_asset.js' => new MappedAsset('root_asset.js', '/can/be/anything.js', publicPathWithoutDigest: '/assets/root_asset.js'),
-                    default => throw new \RuntimeException(sprintf('Unexpected source path "%s"', $path)),
+                    default => throw new \RuntimeException(\sprintf('Unexpected source path "%s"', $path)),
                 };
             });
 

@@ -78,7 +78,8 @@ class Connection extends AbstractConnection
                 case self::LDAP_ALREADY_EXISTS:
                     throw new AlreadyExistsException($error);
             }
-            throw new ConnectionException($error);
+            ldap_get_option($this->connection, LDAP_OPT_DIAGNOSTIC_MESSAGE, $diagnostic_message);
+            throw new ConnectionException($error.' '.$diagnostic_message);
         }
 
         $this->bound = true;
@@ -95,14 +96,14 @@ class Connection extends AbstractConnection
     public function setOption(string $name, array|string|int|bool $value): void
     {
         if (!@ldap_set_option($this->connection, ConnectionOptions::getOption($name), $value)) {
-            throw new LdapException(sprintf('Could not set value "%s" for option "%s".', $value, $name));
+            throw new LdapException(\sprintf('Could not set value "%s" for option "%s".', $value, $name));
         }
     }
 
     public function getOption(string $name): array|string|int|null
     {
         if (!@ldap_get_option($this->connection, ConnectionOptions::getOption($name), $ret)) {
-            throw new LdapException(sprintf('Could not retrieve value for option "%s".', $name));
+            throw new LdapException(\sprintf('Could not retrieve value for option "%s".', $name));
         }
 
         return $ret;
@@ -148,9 +149,9 @@ class Connection extends AbstractConnection
 
         if (false === $connection = ldap_connect($this->config['connection_string'])) {
             throw new LdapException('Invalid connection string: '.$this->config['connection_string']);
-        } else {
-            $this->connection = $connection;
         }
+
+        $this->connection = $connection;
 
         foreach ($this->config['options'] as $name => $value) {
             if (!\in_array(ConnectionOptions::getOption($name), self::PRECONNECT_OPTIONS, true)) {

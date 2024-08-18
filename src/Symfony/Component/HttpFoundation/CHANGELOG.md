@@ -1,13 +1,22 @@
 CHANGELOG
 =========
 
+7.2
+---
+
+ * Add optional `$requests` argument to `RequestStack::__construct()`
+
 7.1
 ---
 
+ * Add optional `$expirationParameter` argument to `UriSigner::__construct()`
+ * Add optional `$expiration` argument to `UriSigner::sign()`
+ * Rename `$parameter` argument of `UriSigner::__construct()` to `$hashParameter`
  * Add `UploadedFile::getClientOriginalPath()`
  * Add `QueryParameterRequestMatcher`
  * Add `HeaderRequestMatcher`
  * Add support for `\SplTempFileObject` in `BinaryFileResponse`
+ * Add `verbose` argument to response test constraints
 
 7.0
 ---

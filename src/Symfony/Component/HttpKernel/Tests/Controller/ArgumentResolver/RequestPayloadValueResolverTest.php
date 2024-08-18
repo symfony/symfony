@@ -20,11 +20,13 @@ use Symfony\Component\HttpKernel\Controller\ArgumentResolver\RequestPayloadValue
 use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
 use Symfony\Component\HttpKernel\Event\ControllerArgumentsEvent;
 use Symfony\Component\HttpKernel\Exception\HttpException;
+use Symfony\Component\HttpKernel\Exception\NearMissValueResolverException;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Encoder\XmlEncoder;
 use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
 use Symfony\Component\Serializer\Exception\PartialDenormalizationException;
+use Symfony\Component\Serializer\Normalizer\ArrayDenormalizer;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\Serializer\Serializer;
@@ -171,7 +173,7 @@ class RequestPayloadValueResolverTest extends TestCase
 
         try {
             $resolver->onKernelControllerArguments($event);
-            $this->fail(sprintf('Expected "%s" to be thrown.', HttpException::class));
+            $this->fail(\sprintf('Expected "%s" to be thrown.', HttpException::class));
         } catch (HttpException $e) {
             $this->assertSame(422, $e->getStatusCode());
         }
@@ -196,7 +198,7 @@ class RequestPayloadValueResolverTest extends TestCase
 
         try {
             $resolver->onKernelControllerArguments($event);
-            $this->fail(sprintf('Expected "%s" to be thrown.', HttpException::class));
+            $this->fail(\sprintf('Expected "%s" to be thrown.', HttpException::class));
         } catch (HttpException $e) {
             $this->assertSame(404, $e->getStatusCode());
         }
@@ -220,7 +222,7 @@ class RequestPayloadValueResolverTest extends TestCase
 
         try {
             $resolver->onKernelControllerArguments($event);
-            $this->fail(sprintf('Expected "%s" to be thrown.', HttpException::class));
+            $this->fail(\sprintf('Expected "%s" to be thrown.', HttpException::class));
         } catch (HttpException $e) {
             $this->assertInstanceOf(PartialDenormalizationException::class, $e->getPrevious());
         }
@@ -248,7 +250,7 @@ class RequestPayloadValueResolverTest extends TestCase
 
         try {
             $resolver->onKernelControllerArguments($event);
-            $this->fail(sprintf('Expected "%s" to be thrown.', HttpException::class));
+            $this->fail(\sprintf('Expected "%s" to be thrown.', HttpException::class));
         } catch (HttpException $e) {
             $validationFailedException = $e->getPrevious();
             $this->assertSame(422, $e->getStatusCode());
@@ -279,7 +281,7 @@ class RequestPayloadValueResolverTest extends TestCase
 
         try {
             $resolver->onKernelControllerArguments($event);
-            $this->fail(sprintf('Expected "%s" to be thrown.', HttpException::class));
+            $this->fail(\sprintf('Expected "%s" to be thrown.', HttpException::class));
         } catch (HttpException $e) {
             $validationFailedException = $e->getPrevious();
             $this->assertInstanceOf(ValidationFailedException::class, $validationFailedException);
@@ -304,7 +306,7 @@ class RequestPayloadValueResolverTest extends TestCase
 
         try {
             $resolver->onKernelControllerArguments($event);
-            $this->fail(sprintf('Expected "%s" to be thrown.', HttpException::class));
+            $this->fail(\sprintf('Expected "%s" to be thrown.', HttpException::class));
         } catch (HttpException $e) {
             $this->assertSame(415, $e->getStatusCode());
         }
@@ -421,6 +423,74 @@ class RequestPayloadValueResolverTest extends TestCase
         $this->assertEquals([$payload], $event->getArguments());
     }
 
+    public function testRequestArrayDenormalization()
+    {
+        $input = [
+            ['price' => '50'],
+            ['price' => '23'],
+        ];
+        $payload = [
+            new RequestPayload(50),
+            new RequestPayload(23),
+        ];
+
+        $serializer = new Serializer([new ArrayDenormalizer(), new ObjectNormalizer()], ['json' => new JsonEncoder()]);
+
+        $validator = $this->createMock(ValidatorInterface::class);
+        $validator->expects($this->once())
+            ->method('validate')
+            ->willReturn(new ConstraintViolationList());
+
+        $resolver = new RequestPayloadValueResolver($serializer, $validator);
+
+        $argument = new ArgumentMetadata('prices', 'array', false, false, null, false, [
+            MapRequestPayload::class => new MapRequestPayload(type: RequestPayload::class),
+        ]);
+        $request = Request::create('/', 'POST', $input);
+
+        $kernel = $this->createMock(HttpKernelInterface::class);
+        $arguments = $resolver->resolve($request, $argument);
+        $event = new ControllerArgumentsEvent($kernel, function () {}, $arguments, $request, HttpKernelInterface::MAIN_REQUEST);
+
+        $resolver->onKernelControllerArguments($event);
+
+        $this->assertEquals([$payload], $event->getArguments());
+    }
+
+    public function testItThrowsOnMissingAttributeType()
+    {
+        $serializer = new Serializer();
+        $validator = $this->createMock(ValidatorInterface::class);
+        $resolver = new RequestPayloadValueResolver($serializer, $validator);
+
+        $argument = new ArgumentMetadata('prices', 'array', false, false, null, false, [
+            MapRequestPayload::class => new MapRequestPayload(),
+        ]);
+        $request = Request::create('/', 'POST');
+        $request->attributes->set('_controller', 'App\Controller\SomeController::someMethod');
+
+        $this->expectException(NearMissValueResolverException::class);
+        $this->expectExceptionMessage('Please set the $type argument of the #[Symfony\Component\HttpKernel\Attribute\MapRequestPayload] attribute to the type of the objects in the expected array.');
+        $resolver->resolve($request, $argument);
+    }
+
+    public function testItThrowsOnInvalidAttributeTypeUsage()
+    {
+        $serializer = new Serializer();
+        $validator = $this->createMock(ValidatorInterface::class);
+        $resolver = new RequestPayloadValueResolver($serializer, $validator);
+
+        $argument = new ArgumentMetadata('prices', null, false, false, null, false, [
+            MapRequestPayload::class => new MapRequestPayload(type: RequestPayload::class),
+        ]);
+        $request = Request::create('/', 'POST');
+        $request->attributes->set('_controller', 'App\Controller\SomeController::someMethod');
+
+        $this->expectException(NearMissValueResolverException::class);
+        $this->expectExceptionMessage('Please set its type to "array" when using argument $type of #[Symfony\Component\HttpKernel\Attribute\MapRequestPayload].');
+        $resolver->resolve($request, $argument);
+    }
+
     public function testItThrowsOnVariadicArgument()
     {
         $serializer = new Serializer();
@@ -522,7 +592,7 @@ class RequestPayloadValueResolverTest extends TestCase
 
         try {
             $resolver->onKernelControllerArguments($event);
-            $this->fail(sprintf('Expected "%s" to be thrown.', HttpException::class));
+            $this->fail(\sprintf('Expected "%s" to be thrown.', HttpException::class));
         } catch (HttpException $e) {
             $this->assertSame(415, $e->getStatusCode());
             $this->assertSame($expectedExceptionMessage, $e->getMessage());
@@ -618,7 +688,7 @@ class RequestPayloadValueResolverTest extends TestCase
 
         try {
             $resolver->onKernelControllerArguments($event);
-            $this->fail(sprintf('Expected "%s" to be thrown.', HttpException::class));
+            $this->fail(\sprintf('Expected "%s" to be thrown.', HttpException::class));
         } catch (HttpException $e) {
             $validationFailedException = $e->getPrevious();
             $this->assertInstanceOf(ValidationFailedException::class, $validationFailedException);
@@ -683,7 +753,7 @@ class RequestPayloadValueResolverTest extends TestCase
 
         try {
             $resolver->onKernelControllerArguments($event);
-            $this->fail(sprintf('Expected "%s" to be thrown.', HttpException::class));
+            $this->fail(\sprintf('Expected "%s" to be thrown.', HttpException::class));
         } catch (HttpException $e) {
             $validationFailedException = $e->getPrevious();
             $this->assertSame(400, $e->getStatusCode());
@@ -714,13 +784,95 @@ class RequestPayloadValueResolverTest extends TestCase
 
         try {
             $resolver->onKernelControllerArguments($event);
-            $this->fail(sprintf('Expected "%s" to be thrown.', HttpException::class));
+            $this->fail(\sprintf('Expected "%s" to be thrown.', HttpException::class));
         } catch (HttpException $e) {
             $validationFailedException = $e->getPrevious();
             $this->assertSame(400, $e->getStatusCode());
             $this->assertInstanceOf(ValidationFailedException::class, $validationFailedException);
             $this->assertSame('This value should be of type string.', $validationFailedException->getViolations()[0]->getMessage());
         }
+    }
+
+    /**
+     * @dataProvider provideBoolArgument
+     */
+    public function testBoolArgumentInQueryString(mixed $expectedValue, ?string $parameterValue)
+    {
+        $serializer = new Serializer([new ObjectNormalizer()]);
+        $validator = $this->createMock(ValidatorInterface::class);
+        $resolver = new RequestPayloadValueResolver($serializer, $validator);
+
+        $argument = new ArgumentMetadata('filtered', ObjectWithBoolArgument::class, false, false, null, false, [
+            MapQueryString::class => new MapQueryString(),
+        ]);
+        $request = Request::create('/', 'GET', ['value' => $parameterValue]);
+
+        $kernel = $this->createMock(HttpKernelInterface::class);
+        $arguments = $resolver->resolve($request, $argument);
+        $event = new ControllerArgumentsEvent($kernel, function () {}, $arguments, $request, HttpKernelInterface::MAIN_REQUEST);
+
+        $resolver->onKernelControllerArguments($event);
+
+        $this->assertSame($expectedValue, $event->getArguments()[0]->value);
+    }
+
+    /**
+     * @dataProvider provideBoolArgument
+     */
+    public function testBoolArgumentInBody(mixed $expectedValue, ?string $parameterValue)
+    {
+        $serializer = new Serializer([new ObjectNormalizer()]);
+        $validator = $this->createMock(ValidatorInterface::class);
+        $resolver = new RequestPayloadValueResolver($serializer, $validator);
+
+        $argument = new ArgumentMetadata('filtered', ObjectWithBoolArgument::class, false, false, null, false, [
+            MapRequestPayload::class => new MapRequestPayload(),
+        ]);
+        $request = Request::create('/', 'POST', ['value' => $parameterValue], server: ['CONTENT_TYPE' => 'multipart/form-data']);
+
+        $kernel = $this->createMock(HttpKernelInterface::class);
+        $arguments = $resolver->resolve($request, $argument);
+        $event = new ControllerArgumentsEvent($kernel, function () {}, $arguments, $request, HttpKernelInterface::MAIN_REQUEST);
+
+        $resolver->onKernelControllerArguments($event);
+
+        $this->assertSame($expectedValue, $event->getArguments()[0]->value);
+    }
+
+    public static function provideBoolArgument()
+    {
+        yield 'default value' => [null, null];
+        yield '"0"' => [false, '0'];
+        yield '"false"' => [false, 'false'];
+        yield '"no"' => [false, 'no'];
+        yield '"off"' => [false, 'off'];
+        yield '"1"' => [true, '1'];
+        yield '"true"' => [true, 'true'];
+        yield '"yes"' => [true, 'yes'];
+        yield '"on"' => [true, 'on'];
+    }
+
+    /**
+     * Boolean filtering must be disabled for content types other than form data.
+     */
+    public function testBoolArgumentInJsonBody()
+    {
+        $serializer = new Serializer([new ObjectNormalizer()]);
+        $validator = $this->createMock(ValidatorInterface::class);
+        $resolver = new RequestPayloadValueResolver($serializer, $validator);
+
+        $argument = new ArgumentMetadata('filtered', ObjectWithBoolArgument::class, false, false, null, false, [
+            MapRequestPayload::class => new MapRequestPayload(),
+        ]);
+        $request = Request::create('/', 'POST', ['value' => 'off'], server: ['CONTENT_TYPE' => 'application/json']);
+
+        $kernel = $this->createMock(HttpKernelInterface::class);
+        $arguments = $resolver->resolve($request, $argument);
+        $event = new ControllerArgumentsEvent($kernel, function () {}, $arguments, $request, HttpKernelInterface::MAIN_REQUEST);
+
+        $resolver->onKernelControllerArguments($event);
+
+        $this->assertTrue($event->getArguments()[0]->value);
     }
 }
 
@@ -763,5 +915,12 @@ class User
     public function getPassword(): string
     {
         return $this->password;
+    }
+}
+
+class ObjectWithBoolArgument
+{
+    public function __construct(public readonly ?bool $value = null)
+    {
     }
 }

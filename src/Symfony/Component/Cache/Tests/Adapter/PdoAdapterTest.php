@@ -134,7 +134,7 @@ class PdoAdapterTest extends AdapterTestCase
 
         /** @var \PDOStatement $select */
         $select = $getPdoConn->invoke($cache)->prepare('SELECT 1 FROM cache_items WHERE item_id LIKE :id');
-        $select->bindValue(':id', sprintf('%%%s', $name));
+        $select->bindValue(':id', \sprintf('%%%s', $name));
         $select->execute();
 
         return 1 !== (int) $select->fetch(\PDO::FETCH_COLUMN);

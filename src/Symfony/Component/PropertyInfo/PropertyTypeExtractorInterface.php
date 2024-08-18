@@ -11,17 +11,22 @@
 
 namespace Symfony\Component\PropertyInfo;
 
+use Symfony\Component\PropertyInfo\Type as LegacyType;
+use Symfony\Component\TypeInfo\Type;
+
 /**
  * Type Extractor Interface.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
+ *
+ * @method Type|null getType(string $class, string $property, array $context = [])
  */
 interface PropertyTypeExtractorInterface
 {
     /**
      * Gets types of a property.
      *
-     * @return Type[]|null
+     * @return LegacyType[]|null
      */
     public function getTypes(string $class, string $property, array $context = []): ?array;
 }

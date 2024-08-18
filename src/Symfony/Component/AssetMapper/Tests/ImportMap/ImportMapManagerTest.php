@@ -32,18 +32,14 @@ class ImportMapManagerTest extends TestCase
     private PackageResolverInterface&MockObject $packageResolver;
     private ImportMapConfigReader&MockObject $configReader;
     private RemotePackageDownloader&MockObject $remotePackageDownloader;
-    private ImportMapManager $importMapManager;
 
     private Filesystem $filesystem;
-    private static string $writableRoot = __DIR__.'/../Fixtures/importmaps_for_writing';
+    private static string $writableRoot = __DIR__.'/../Fixtures/importmap_manager';
 
     protected function setUp(): void
     {
         $this->filesystem = new Filesystem();
-        if (!file_exists(__DIR__.'/../Fixtures/importmaps_for_writing')) {
-            $this->filesystem->mkdir(self::$writableRoot);
-        }
-        if (!file_exists(__DIR__.'/../Fixtures/importmaps_for_writing/assets')) {
+        if (!file_exists(__DIR__.'/../Fixtures/importmap_manager/assets')) {
             $this->filesystem->mkdir(self::$writableRoot.'/assets');
         }
     }
@@ -81,14 +77,14 @@ class ImportMapManagerTest extends TestCase
                     return '/path/to/assets/some_file.js';
                 }
 
-                throw new \Exception(sprintf('Unexpected path "%s"', $path));
+                throw new \Exception(\sprintf('Unexpected path "%s"', $path));
             });
         $this->configReader->expects($this->any())
             ->method('convertFilesystemPathToPath')
             ->willReturnCallback(function ($path) {
                 return match ($path) {
                     '/path/to/assets/some_file.js' => './assets/some_file.js',
-                    default => throw new \Exception(sprintf('Unexpected path "%s"', $path)),
+                    default => throw new \Exception(\sprintf('Unexpected path "%s"', $path)),
                 };
             });
         $this->configReader->expects($this->once())
@@ -201,15 +197,15 @@ class ImportMapManagerTest extends TestCase
         ];
 
         yield 'single_package_with_a_path' => [
-        'packages' => [new PackageRequireOptions('some/module', path: self::$writableRoot.'/assets/some_file.js')],
-        'expectedProviderPackageArgumentCount' => 0,
-        'resolvedPackages' => [],
-        'expectedImportMap' => [
-            'some/module' => [
-                // converted to relative path
-                'path' => './assets/some_file.js',
+            'packages' => [new PackageRequireOptions('some/module', path: self::$writableRoot.'/assets/some_file.js')],
+            'expectedProviderPackageArgumentCount' => 0,
+            'resolvedPackages' => [],
+            'expectedImportMap' => [
+                'some/module' => [
+                    // converted to relative path
+                    'path' => './assets/some_file.js',
+                ],
             ],
-        ],
         ];
     }
 
@@ -386,7 +382,7 @@ class ImportMapManagerTest extends TestCase
                 return ImportMapEntry::createRemote($importName, $type, $path, $version, $packageModuleSpecifier, $isEntrypoint);
             });
 
-        return $this->importMapManager = new ImportMapManager(
+        return new ImportMapManager(
             $this->assetMapper,
             $this->configReader,
             $this->remotePackageDownloader,

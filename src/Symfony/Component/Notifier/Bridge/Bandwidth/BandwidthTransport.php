@@ -44,7 +44,7 @@ final class BandwidthTransport extends AbstractTransport
 
     public function __toString(): string
     {
-        return sprintf('bandwidth://%s?from=%s&account_id=%s&application_id=%s%s', $this->getEndpoint(), $this->from, $this->accountId, $this->applicationId, null !== $this->priority ? '&priority='.$this->priority : '');
+        return \sprintf('bandwidth://%s?from=%s&account_id=%s&application_id=%s%s', $this->getEndpoint(), $this->from, $this->accountId, $this->applicationId, null !== $this->priority ? '&priority='.$this->priority : '');
     }
 
     public function supports(MessageInterface $message): bool
@@ -69,13 +69,13 @@ final class BandwidthTransport extends AbstractTransport
         $options['priority'] ??= $this->priority;
 
         if (!preg_match('/^\+[1-9]\d{1,14}$/', $options['from'])) {
-            throw new InvalidArgumentException(sprintf('The "From" number "%s" is not a valid phone number. The number must be in E.164 format.', $options['from']));
+            throw new InvalidArgumentException(\sprintf('The "From" number "%s" is not a valid phone number. The number must be in E.164 format.', $options['from']));
         }
 
         if (!preg_match('/^\+[1-9]\d{1,14}$/', $options['to'][0])) {
-            throw new InvalidArgumentException(sprintf('The "To" number "%s" is not a valid phone number. The number must be in E.164 format.', $options['to'][0]));
+            throw new InvalidArgumentException(\sprintf('The "To" number "%s" is not a valid phone number. The number must be in E.164 format.', $options['to'][0]));
         }
-        $endpoint = sprintf('https://%s/api/v2/users/%s/messages', $this->getEndpoint(), $options['accountId']);
+        $endpoint = \sprintf('https://%s/api/v2/users/%s/messages', $this->getEndpoint(), $options['accountId']);
         unset($options['accountId']);
 
         $response = $this->client->request('POST', $endpoint, [
@@ -91,7 +91,7 @@ final class BandwidthTransport extends AbstractTransport
 
         if (202 !== $statusCode) {
             $error = $response->toArray(false);
-            throw new TransportException(sprintf('Unable to send the SMS - "%s" - "%s".', $error['type'], $error['description']), $response);
+            throw new TransportException(\sprintf('Unable to send the SMS - "%s" - "%s".', $error['type'], $error['description']), $response);
         }
 
         $success = $response->toArray(false);

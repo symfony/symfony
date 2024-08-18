@@ -20,6 +20,8 @@ use Symfony\Component\TypeInfo\TypeContext\TypeContext;
  *
  * @author Mathias Arlaud <mathias.arlaud@gmail.com>
  * @author Baptiste Leduc <baptiste.leduc@gmail.com>
+ *
+ * @experimental
  */
 interface TypeResolverInterface
 {
@@ -29,5 +31,5 @@ interface TypeResolverInterface
      *
      * @throws UnsupportedException
      */
-    public function resolve(mixed $subject, TypeContext $typeContext = null): Type;
+    public function resolve(mixed $subject, ?TypeContext $typeContext = null): Type;
 }

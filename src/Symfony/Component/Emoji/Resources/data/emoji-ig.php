@@ -1180,6 +1180,7 @@ return [
     '👩‍👧' => 'ezinaụlọ: nwanyị na nwata nwaanyị',
     '😶‍🌫' => 'ihu nọ n’ígwé',
     '😮‍💨' => 'ihu na-ekuda ume',
+    '🙂‍↔' => 'efufe isi site n’aka nri ga n’aka ekpe',
     '🙂‍↕' => 'ekwe n’isi site n’elu ga n’ala',
     '😵‍💫' => 'ihu nwere anya na-agba gburugburu',
     '❤‍🔥' => 'mkpụrụobi n’ere ọkụ',

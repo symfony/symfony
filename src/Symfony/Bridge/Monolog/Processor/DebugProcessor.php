@@ -22,11 +22,10 @@ class DebugProcessor implements DebugLoggerInterface, ResetInterface
 {
     private array $records = [];
     private array $errorCount = [];
-    private ?RequestStack $requestStack;
 
-    public function __construct(?RequestStack $requestStack = null)
-    {
-        $this->requestStack = $requestStack;
+    public function __construct(
+        private ?RequestStack $requestStack = null,
+    ) {
     }
 
     public function __invoke(LogRecord $record): LogRecord

@@ -55,7 +55,6 @@ class ErrorHandler
         \E_USER_DEPRECATED => 'User Deprecated',
         \E_NOTICE => 'Notice',
         \E_USER_NOTICE => 'User Notice',
-        \E_STRICT => 'Runtime Notice',
         \E_WARNING => 'Warning',
         \E_USER_WARNING => 'User Warning',
         \E_COMPILE_WARNING => 'Compile Warning',
@@ -71,13 +70,12 @@ class ErrorHandler
     private array $loggers = [
         \E_DEPRECATED => [null, LogLevel::INFO],
         \E_USER_DEPRECATED => [null, LogLevel::INFO],
-        \E_NOTICE => [null, LogLevel::WARNING],
-        \E_USER_NOTICE => [null, LogLevel::WARNING],
-        \E_STRICT => [null, LogLevel::WARNING],
-        \E_WARNING => [null, LogLevel::WARNING],
-        \E_USER_WARNING => [null, LogLevel::WARNING],
-        \E_COMPILE_WARNING => [null, LogLevel::WARNING],
-        \E_CORE_WARNING => [null, LogLevel::WARNING],
+        \E_NOTICE => [null, LogLevel::ERROR],
+        \E_USER_NOTICE => [null, LogLevel::ERROR],
+        \E_WARNING => [null, LogLevel::ERROR],
+        \E_USER_WARNING => [null, LogLevel::ERROR],
+        \E_COMPILE_WARNING => [null, LogLevel::ERROR],
+        \E_CORE_WARNING => [null, LogLevel::ERROR],
         \E_USER_ERROR => [null, LogLevel::CRITICAL],
         \E_RECOVERABLE_ERROR => [null, LogLevel::CRITICAL],
         \E_COMPILE_ERROR => [null, LogLevel::CRITICAL],
@@ -92,7 +90,6 @@ class ErrorHandler
     private int $screamedErrors = 0x55; // E_ERROR + E_CORE_ERROR + E_COMPILE_ERROR + E_PARSE
     private int $loggedErrors = 0;
     private \Closure $configureException;
-    private bool $debug;
 
     private bool $isRecursive = false;
     private bool $isRoot = false;
@@ -179,8 +176,15 @@ class ErrorHandler
         }
     }
 
-    public function __construct(?BufferingLogger $bootstrappingLogger = null, bool $debug = false)
-    {
+    public function __construct(
+        ?BufferingLogger $bootstrappingLogger = null,
+        private bool $debug = false,
+    ) {
+        if (\PHP_VERSION_ID < 80400) {
+            $this->levels[\E_STRICT] = 'Runtime Notice';
+            $this->loggers[\E_STRICT] = [null, LogLevel::ERROR];
+        }
+
         if ($bootstrappingLogger) {
             $this->bootstrappingLogger = $bootstrappingLogger;
             $this->setDefaultLogger($bootstrappingLogger);
@@ -190,9 +194,8 @@ class ErrorHandler
             $traceReflector->setValue($e, $trace);
             $e->file = $file ?? $e->file;
             $e->line = $line ?? $e->line;
-        }, null, new class() extends \Exception {
+        }, null, new class extends \Exception {
         });
-        $this->debug = $debug;
     }
 
     /**
@@ -432,7 +435,7 @@ class ErrorHandler
                 return true;
             }
         } else {
-            if (PHP_VERSION_ID < 80303 && str_contains($message, '@anonymous')) {
+            if (\PHP_VERSION_ID < 80303 && str_contains($message, '@anonymous')) {
                 $backtrace = debug_backtrace(false, 5);
 
                 for ($i = 1; isset($backtrace[$i]); ++$i) {
@@ -448,7 +451,7 @@ class ErrorHandler
                 }
             }
 
-            if (false !== strpos($message, "@anonymous\0")) {
+            if (str_contains($message, "@anonymous\0")) {
                 $message = $this->parseAnonymousClass($message);
                 $logMessage = $this->levels[$type].': '.$message;
             }
@@ -595,6 +598,10 @@ class ErrorHandler
             set_exception_handler($h);
         }
         if (!$handler) {
+            if (null === $error && $exitCode = self::$exitCode) {
+                register_shutdown_function('register_shutdown_function', function () use ($exitCode) { exit($exitCode); });
+            }
+
             return;
         }
         if ($handler !== $h) {
@@ -630,8 +637,7 @@ class ErrorHandler
             // Ignore this re-throw
         }
 
-        if ($exit && self::$exitCode) {
-            $exitCode = self::$exitCode;
+        if ($exit && $exitCode = self::$exitCode) {
             register_shutdown_function('register_shutdown_function', function () use ($exitCode) { exit($exitCode); });
         }
     }

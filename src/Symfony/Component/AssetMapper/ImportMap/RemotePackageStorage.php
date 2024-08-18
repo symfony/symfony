@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\AssetMapper\ImportMap;
 
+use Symfony\Component\AssetMapper\Exception\RuntimeException;
+
 /**
  * Manages the local storage of remote/vendor importmap packages.
  */
@@ -28,7 +30,7 @@ class RemotePackageStorage
     public function isDownloaded(ImportMapEntry $entry): bool
     {
         if (!$entry->isRemotePackage()) {
-            throw new \InvalidArgumentException(sprintf('The entry "%s" is not a remote package.', $entry->importName));
+            throw new \InvalidArgumentException(\sprintf('The entry "%s" is not a remote package.', $entry->importName));
         }
 
         return is_file($this->getDownloadPath($entry->packageModuleSpecifier, $entry->type));
@@ -37,7 +39,7 @@ class RemotePackageStorage
     public function isExtraFileDownloaded(ImportMapEntry $entry, string $extraFilename): bool
     {
         if (!$entry->isRemotePackage()) {
-            throw new \InvalidArgumentException(sprintf('The entry "%s" is not a remote package.', $entry->importName));
+            throw new \InvalidArgumentException(\sprintf('The entry "%s" is not a remote package.', $entry->importName));
         }
 
         return is_file($this->getExtraFileDownloadPath($entry, $extraFilename));
@@ -46,25 +48,29 @@ class RemotePackageStorage
     public function save(ImportMapEntry $entry, string $contents): void
     {
         if (!$entry->isRemotePackage()) {
-            throw new \InvalidArgumentException(sprintf('The entry "%s" is not a remote package.', $entry->importName));
+            throw new \InvalidArgumentException(\sprintf('The entry "%s" is not a remote package.', $entry->importName));
         }
 
         $vendorPath = $this->getDownloadPath($entry->packageModuleSpecifier, $entry->type);
 
         @mkdir(\dirname($vendorPath), 0777, true);
-        file_put_contents($vendorPath, $contents);
+        if (false === @file_put_contents($vendorPath, $contents)) {
+            throw new RuntimeException(error_get_last()['message'] ?? \sprintf('Failed to write file "%s".', $vendorPath));
+        }
     }
 
     public function saveExtraFile(ImportMapEntry $entry, string $extraFilename, string $contents): void
     {
         if (!$entry->isRemotePackage()) {
-            throw new \InvalidArgumentException(sprintf('The entry "%s" is not a remote package.', $entry->importName));
+            throw new \InvalidArgumentException(\sprintf('The entry "%s" is not a remote package.', $entry->importName));
         }
 
         $vendorPath = $this->getExtraFileDownloadPath($entry, $extraFilename);
 
         @mkdir(\dirname($vendorPath), 0777, true);
-        file_put_contents($vendorPath, $contents);
+        if (false === @file_put_contents($vendorPath, $contents)) {
+            throw new RuntimeException(error_get_last()['message'] ?? \sprintf('Failed to write file "%s".', $vendorPath));
+        }
     }
 
     /**

@@ -39,7 +39,7 @@ final class FirebaseTransport extends AbstractTransport
 
     public function __toString(): string
     {
-        return sprintf('firebase://%s', $this->getEndpoint());
+        return \sprintf('firebase://%s', $this->getEndpoint());
     }
 
     public function supports(MessageInterface $message): bool
@@ -53,19 +53,19 @@ final class FirebaseTransport extends AbstractTransport
             throw new UnsupportedMessageTypeException(__CLASS__, ChatMessage::class, $message);
         }
 
-        $endpoint = sprintf('https://%s', $this->getEndpoint());
+        $endpoint = \sprintf('https://%s', $this->getEndpoint());
         $options = $message->getOptions()?->toArray() ?? [];
         $options['to'] = $message->getRecipientId();
 
         if (!$options['to']) {
-            throw new InvalidArgumentException(sprintf('The "%s" transport required the "to" option to be set.', __CLASS__));
+            throw new InvalidArgumentException(\sprintf('The "%s" transport required the "to" option to be set.', __CLASS__));
         }
         $options['notification']['body'] = $message->getSubject();
         $options['data'] ??= [];
 
         $response = $this->client->request('POST', $endpoint, [
             'headers' => [
-                'Authorization' => sprintf('key=%s', $this->token),
+                'Authorization' => \sprintf('key=%s', $this->token),
             ],
             'json' => array_filter($options),
         ]);

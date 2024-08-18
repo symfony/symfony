@@ -184,8 +184,8 @@ class FormValidatorTest extends ConstraintValidatorTestCase
         $object = new \stdClass();
 
         $form = $this->getBuilder('name', '\stdClass', [
-                'validation_groups' => [],
-            ])
+            'validation_groups' => [],
+        ])
             ->setData($object)
             ->setCompound(true)
             ->setDataMapper(new DataMapper())
@@ -256,12 +256,12 @@ class FormValidatorTest extends ConstraintValidatorTestCase
         $object = new \stdClass();
 
         $form = $this->getBuilder('name', '\stdClass', [
-                'invalid_message' => 'invalid_message_key',
-                // Invalid message parameters must be supported, because the
-                // invalid message can be a translation key
-                // see https://github.com/symfony/symfony/issues/5144
-                'invalid_message_parameters' => ['{{ foo }}' => 'bar'],
-            ])
+            'invalid_message' => 'invalid_message_key',
+            // Invalid message parameters must be supported, because the
+            // invalid message can be a translation key
+            // see https://github.com/symfony/symfony/issues/5144
+            'invalid_message_parameters' => ['{{ foo }}' => 'bar'],
+        ])
             ->setData($object)
             ->addViewTransformer(new CallbackTransformer(
                 static fn ($data) => $data,
@@ -292,13 +292,13 @@ class FormValidatorTest extends ConstraintValidatorTestCase
         $object = new \stdClass();
 
         $form = $this->getBuilder('name', '\stdClass', [
-                'invalid_message' => 'invalid_message_key',
-                // Invalid message parameters must be supported, because the
-                // invalid message can be a translation key
-                // see https://github.com/symfony/symfony/issues/5144
-                'invalid_message_parameters' => ['{{ foo }}' => 'bar'],
-                'validation_groups' => [],
-            ])
+            'invalid_message' => 'invalid_message_key',
+            // Invalid message parameters must be supported, because the
+            // invalid message can be a translation key
+            // see https://github.com/symfony/symfony/issues/5144
+            'invalid_message_parameters' => ['{{ foo }}' => 'bar'],
+            'validation_groups' => [],
+        ])
             ->setData($object)
             ->addViewTransformer(new CallbackTransformer(
                 static fn ($data) => $data,

@@ -22,7 +22,7 @@
         "symfony/http-kernel": "^6.4|^7.0",
         "symfony/routing": "^6.4|^7.0",
         "symfony/twig-bundle": "^6.4|^7.0",
-        "twig/twig": "^3.0.4"
+        "twig/twig": "^3.10"
     },
     "require-dev": {
         "symfony/browser-kit": "^6.4|^7.0",

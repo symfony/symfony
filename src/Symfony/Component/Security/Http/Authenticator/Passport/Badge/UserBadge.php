@@ -30,11 +30,9 @@ class UserBadge implements BadgeInterface
 {
     public const MAX_USERNAME_LENGTH = 4096;
 
-    private string $userIdentifier;
     /** @var callable|null */
     private $userLoader;
     private UserInterface $user;
-    private ?array $attributes;
 
     /**
      * Initializes the user badge.
@@ -49,15 +47,16 @@ class UserBadge implements BadgeInterface
      * is thrown). If this is not set, the default user provider will be used with
      * $userIdentifier as username.
      */
-    public function __construct(string $userIdentifier, ?callable $userLoader = null, ?array $attributes = null)
-    {
+    public function __construct(
+        private string $userIdentifier,
+        ?callable $userLoader = null,
+        private ?array $attributes = null,
+    ) {
         if (\strlen($userIdentifier) > self::MAX_USERNAME_LENGTH) {
             throw new BadCredentialsException('Username too long.');
         }
 
-        $this->userIdentifier = $userIdentifier;
         $this->userLoader = $userLoader;
-        $this->attributes = $attributes;
     }
 
     public function getUserIdentifier(): string
@@ -80,7 +79,7 @@ class UserBadge implements BadgeInterface
         }
 
         if (null === $this->userLoader) {
-            throw new \LogicException(sprintf('No user loader is configured, did you forget to register the "%s" listener?', UserProviderListener::class));
+            throw new \LogicException(\sprintf('No user loader is configured, did you forget to register the "%s" listener?', UserProviderListener::class));
         }
 
         if (null === $this->getAttributes()) {
@@ -98,7 +97,7 @@ class UserBadge implements BadgeInterface
         }
 
         if (!$user instanceof UserInterface) {
-            throw new AuthenticationServiceException(sprintf('The user provider must return a UserInterface object, "%s" given.', get_debug_type($user)));
+            throw new AuthenticationServiceException(\sprintf('The user provider must return a UserInterface object, "%s" given.', get_debug_type($user)));
         }
 
         return $this->user = $user;

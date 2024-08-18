@@ -90,7 +90,7 @@ class LogoutTest extends AbstractWebTestCase
 
         $eventDispatcher->addListener(KernelEvents::REQUEST, $wrappedCallable);
         try {
-            $client->request('GET', '/'.uniqid('', true));
+            $client->request('GET', '/not-existent');
         } finally {
             $eventDispatcher->removeListener(KernelEvents::REQUEST, $wrappedCallable);
         }

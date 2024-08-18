@@ -34,23 +34,24 @@ class Connection
         'ttr' => 90,
     ];
 
+    private string $tube;
+    private int $timeout;
+    private int $ttr;
+
     /**
-     * Available options:.
+     * Constructor.
+     *
+     * Available options:
      *
      * * tube_name: name of the tube
      * * timeout: message reservation timeout (in seconds)
      * * ttr: the message time to run before it is put back in the ready queue (in seconds)
      */
-    private array $configuration;
-    private PheanstalkInterface $client;
-    private string $tube;
-    private int $timeout;
-    private int $ttr;
-
-    public function __construct(array $configuration, PheanstalkInterface $client)
-    {
+    public function __construct(
+        private array $configuration,
+        private PheanstalkInterface $client,
+    ) {
         $this->configuration = array_replace_recursive(self::DEFAULT_OPTIONS, $configuration);
-        $this->client = $client;
         $this->tube = $this->configuration['tube_name'];
         $this->timeout = $this->configuration['timeout'];
         $this->ttr = $this->configuration['ttr'];
@@ -78,13 +79,13 @@ class Connection
         // check for extra keys in options
         $optionsExtraKeys = array_diff(array_keys($options), array_keys(self::DEFAULT_OPTIONS));
         if (0 < \count($optionsExtraKeys)) {
-            throw new InvalidArgumentException(sprintf('Unknown option found : [%s]. Allowed options are [%s].', implode(', ', $optionsExtraKeys), implode(', ', array_keys(self::DEFAULT_OPTIONS))));
+            throw new InvalidArgumentException(\sprintf('Unknown option found : [%s]. Allowed options are [%s].', implode(', ', $optionsExtraKeys), implode(', ', array_keys(self::DEFAULT_OPTIONS))));
         }
 
         // check for extra keys in options
         $queryExtraKeys = array_diff(array_keys($query), array_keys(self::DEFAULT_OPTIONS));
         if (0 < \count($queryExtraKeys)) {
-            throw new InvalidArgumentException(sprintf('Unknown option found in DSN: [%s]. Allowed options are [%s].', implode(', ', $queryExtraKeys), implode(', ', array_keys(self::DEFAULT_OPTIONS))));
+            throw new InvalidArgumentException(\sprintf('Unknown option found in DSN: [%s]. Allowed options are [%s].', implode(', ', $queryExtraKeys), implode(', ', array_keys(self::DEFAULT_OPTIONS))));
         }
 
         return new self(

@@ -75,7 +75,7 @@ EOF
         $workflowName = $input->getArgument('name');
 
         if (!$this->workflows->has($workflowName)) {
-            throw new InvalidArgumentException(sprintf('The workflow named "%s" cannot be found.', $workflowName));
+            throw new InvalidArgumentException(\sprintf('The workflow named "%s" cannot be found.', $workflowName));
         }
         $workflow = $this->workflows->get($workflowName);
         $type = $workflow instanceof StateMachine ? 'state_machine' : 'workflow';

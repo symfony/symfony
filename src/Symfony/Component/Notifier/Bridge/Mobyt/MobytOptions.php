@@ -24,15 +24,12 @@ final class MobytOptions implements MessageOptionsInterface
     public const MESSAGE_TYPE_QUALITY_MEDIUM = 'L';
     public const MESSAGE_TYPE_QUALITY_LOW = 'LL';
 
-    private array $options;
-
-    public function __construct(array $options = [])
-    {
+    public function __construct(
+        private array $options = [],
+    ) {
         if (isset($options['message_type'])) {
             self::validateMessageType($options['message_type']);
         }
-
-        $this->options = $options;
     }
 
     public static function fromNotification(Notification $notification): self
@@ -73,7 +70,7 @@ final class MobytOptions implements MessageOptionsInterface
     public static function validateMessageType(string $type): string
     {
         if (!\in_array($type, $supported = [self::MESSAGE_TYPE_QUALITY_HIGH, self::MESSAGE_TYPE_QUALITY_MEDIUM, self::MESSAGE_TYPE_QUALITY_LOW], true)) {
-            throw new InvalidArgumentException(sprintf('The message type "%s" is not supported; supported message types are: "%s"', $type, implode('", "', $supported)));
+            throw new InvalidArgumentException(\sprintf('The message type "%s" is not supported; supported message types are: "%s"', $type, implode('", "', $supported)));
         }
 
         return $type;

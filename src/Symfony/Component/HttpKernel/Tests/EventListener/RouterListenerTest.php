@@ -264,4 +264,64 @@ class RouterListenerTest extends TestCase
         $listener = new RouterListener($urlMatcher, new RequestStack());
         $listener->onKernelRequest($event);
     }
+
+    /**
+     * @dataProvider provideRouteMapping
+     */
+    public function testRouteMapping(array $expected, array $parameters)
+    {
+        $kernel = $this->createMock(HttpKernelInterface::class);
+        $request = Request::create('http://localhost/');
+        $event = new RequestEvent($kernel, $request, HttpKernelInterface::MAIN_REQUEST);
+
+        $requestMatcher = $this->createMock(RequestMatcherInterface::class);
+        $requestMatcher->expects($this->any())
+                       ->method('matchRequest')
+                       ->with($this->isInstanceOf(Request::class))
+                       ->willReturn($parameters);
+
+        $listener = new RouterListener($requestMatcher, new RequestStack(), new RequestContext());
+        $listener->onKernelRequest($event);
+
+        $expected['_route_mapping'] = $parameters['_route_mapping'];
+        unset($parameters['_route_mapping']);
+        $expected['_route_params'] = $parameters;
+
+        $this->assertEquals($expected, $request->attributes->all());
+    }
+
+    public static function provideRouteMapping(): iterable
+    {
+        yield [
+            [
+                'conference' => 'vienna-2024',
+            ],
+            [
+                'slug' => 'vienna-2024',
+                '_route_mapping' => [
+                    'slug' => 'conference',
+                ],
+            ],
+        ];
+
+        yield [
+            [
+                'article' => [
+                    'id' => 'abc123',
+                    'date' => '2024-04-24',
+                    'slug' => 'symfony-rocks',
+                ],
+            ],
+            [
+                'id' => 'abc123',
+                'date' => '2024-04-24',
+                'slug' => 'symfony-rocks',
+                '_route_mapping' => [
+                    'id' => 'article',
+                    'date' => 'article',
+                    'slug' => 'article',
+                ],
+            ],
+        ];
+    }
 }

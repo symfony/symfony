@@ -88,7 +88,7 @@ class OrderedHashMap implements \ArrayAccess, \IteratorAggregate, \Countable
     /**
      * Creates a new map.
      *
-     * @param TValue[] $elements The initial elements of the map, indexed by their keys.
+     * @param TValue[] $elements The initial elements of the map, indexed by their keys
      */
     public function __construct(
         private array $elements = [],
@@ -105,7 +105,7 @@ class OrderedHashMap implements \ArrayAccess, \IteratorAggregate, \Countable
     public function offsetGet(mixed $key): mixed
     {
         if (!isset($this->elements[$key])) {
-            throw new \OutOfBoundsException(sprintf('The offset "%s" does not exist.', $key));
+            throw new \OutOfBoundsException(\sprintf('The offset "%s" does not exist.', $key));
         }
 
         return $this->elements[$key];

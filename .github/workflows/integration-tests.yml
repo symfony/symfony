@@ -44,6 +44,13 @@ jobs:
           LDAP_PORT_NUMBER: 3389
           LDAP_USERS: a
           LDAP_PASSWORDS: a
+      ftp:
+        image: onekilo79/ftpd_test
+        ports:
+          - 21:21
+          - 30000-30009:30000-30009
+        volumes:
+          - ./:/hostmount
       redis:
         image: redis:6.2.8
         ports:
@@ -99,17 +106,18 @@ jobs:
         ports:
           - 4566:4566
       zookeeper:
-        image: wurstmeister/zookeeper:3.4.6
+        image: zookeeper
       kafka:
-        image: wurstmeister/kafka:2.12-2.0.1
+        image: bitnami/kafka:3.7
         ports:
           - 9092:9092
         env:
-          KAFKA_AUTO_CREATE_TOPICS_ENABLE: false
-          KAFKA_CREATE_TOPICS: 'test-topic:1:1:compact'
-          KAFKA_ADVERTISED_HOST_NAME: 127.0.0.1
-          KAFKA_ZOOKEEPER_CONNECT: 'zookeeper:2181'
-          KAFKA_ADVERTISED_PORT: 9092
+          KAFKA_CFG_AUTO_CREATE_TOPICS_ENABLE: false
+          ALLOW_PLAINTEXT_LISTENER: 'yes'
+          KAFKA_CFG_ADVERTISED_LISTENERS: 'PLAINTEXT://127.0.0.1:9092'
+          KAFKA_CFG_LISTENERS: 'PLAINTEXT://:9092'
+          KAFKA_CFG_ZOOKEEPER_CONNECT: 'zookeeper:2181'
+        options: --name=kafka
       frankenphp:
         image: dunglas/frankenphp:1.1.0
         ports:
@@ -124,6 +132,12 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Init Kafka topics
+        run: |
+          docker exec kafka /opt/bitnami/kafka/bin/kafka-topics.sh --create --topic test-topic --bootstrap-server kafka:9092
 
       - name: Install system dependencies
         run: |
@@ -154,6 +168,11 @@ jobs:
           curl -s -X POST http://localhost:8091/settings/web -d 'username=Administrator&password=111111%40&port=SAME'
           curl -s -u Administrator:111111@ -X POST http://localhost:8091/pools/default/buckets -d 'ramQuotaMB=100&bucketType=ephemeral&name=cache'
           curl -s -u Administrator:111111@ -X POST http://localhost:8091/pools/default -d 'memoryQuota=256'
+
+      - name: Create FTP fixtures
+        run: |
+          mkdir -p ./ftpusers/test/pub
+          touch ./ftpusers/test/pub/example ./ftpusers/test/readme.txt
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
@@ -190,9 +209,22 @@ jobs:
           ./phpunit install
           echo "::endgroup::"
 
+      - name: Check for changes in translation files
+        id: changed-translation-files
+        run: |
+          echo 'changed='$((git diff --quiet HEAD~1 HEAD -- 'src/**/Resources/translations/*.xlf' || (echo 'true' && exit 1)) && echo 'false') >> $GITHUB_OUTPUT
+
+      - name: Check Translation Status
+        if: steps.changed-translation-files.outputs.changed == 'true'
+        run: |
+          php src/Symfony/Component/Translation/Resources/bin/translation-status.php -v
+          php .github/sync-translations.php
+          git diff --exit-code src/ || (echo '::error::Run "php .github/sync-translations.php" to fix XLIFF files.' && exit 1)
+
       - name: Run tests
         run: ./phpunit --group integration -v
         env:
+          INTEGRATION_FTP_URL: 'ftp://test:test@localhost'
           REDIS_HOST: 'localhost:16379'
           REDIS_AUTHENTICATED_HOST: 'localhost:16380'
           REDIS_CLUSTER_HOSTS: 'localhost:7000 localhost:7001 localhost:7002 localhost:7003 localhost:7004 localhost:7005'
@@ -214,13 +246,3 @@ jobs:
       #    docker run --rm -e COMPOSER_ROOT_VERSION -v $(pwd):/app -v $(which composer):/usr/local/bin/composer -v $(which vulcain):/usr/local/bin/vulcain -w /app php:8.1-alpine ./phpunit src/Symfony/Component/HttpClient/Tests/CurlHttpClientTest.php --filter testHttp2Push
       #    sudo rm -rf .phpunit
       #    [ -d .phpunit.bak ] && mv .phpunit.bak .phpunit
-
-      - uses: marceloprado/has-changed-path@v1.0.1
-        id: changed-translation-files
-        with:
-          paths: src/**/Resources/translations/*.xlf
-
-      - name: Check Translation Status
-        if: steps.changed-translation-files.outputs.changed == 'true'
-        run: |
-          php src/Symfony/Component/Translation/Resources/bin/translation-status.php -v

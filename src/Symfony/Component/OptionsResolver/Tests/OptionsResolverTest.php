@@ -610,7 +610,7 @@ class OptionsResolverTest extends TestCase
                     ->setAllowedTypes('foo', ['null', 'string', \stdClass::class])
                     ->setDeprecated('foo', 'vendor/package', '1.1', function (Options $options, $value) {
                         if ($value instanceof \stdClass) {
-                            return sprintf('Passing an instance of "%s" to option "foo" is deprecated, pass its FQCN instead.', \stdClass::class);
+                            return \sprintf('Passing an instance of "%s" to option "foo" is deprecated, pass its FQCN instead.', \stdClass::class);
                         }
 
                         return '';

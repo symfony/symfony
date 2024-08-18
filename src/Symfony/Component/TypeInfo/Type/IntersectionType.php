@@ -19,6 +19,8 @@ use Symfony\Component\TypeInfo\Type;
  * @author Baptiste Leduc <baptiste.leduc@gmail.com>
  *
  * @template T of Type
+ *
+ * @experimental
  */
 final class IntersectionType extends Type
 {
@@ -27,23 +29,39 @@ final class IntersectionType extends Type
      */
     use CompositeTypeTrait;
 
+    public function is(callable $callable): bool
+    {
+        return $this->everyTypeIs($callable);
+    }
+
     public function __toString(): string
     {
         $string = '';
         $glue = '';
 
         foreach ($this->types as $t) {
-            $string .= $glue.($t instanceof UnionType ? '('.((string) $t).')' : ((string) $t));
+            $string .= $glue.($t instanceof UnionType ? '('.$t.')' : $t);
             $glue = '&';
         }
 
         return $string;
     }
 
+    /**
+     * @throws LogicException
+     */
+    public function getBaseType(): BuiltinType|ObjectType
+    {
+        throw new LogicException(\sprintf('Cannot get base type on "%s" compound type.', $this));
+    }
+
+    /**
+     * @throws LogicException
+     */
     public function asNonNullable(): self
     {
         if ($this->isNullable()) {
-            throw new LogicException(sprintf('"%s cannot be turned as non nullable.', (string) $this));
+            throw new LogicException(\sprintf('"%s cannot be turned as non nullable.', (string) $this));
         }
 
         return $this;

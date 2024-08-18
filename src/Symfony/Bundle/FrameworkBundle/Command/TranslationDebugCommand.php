@@ -145,7 +145,7 @@ EOF
                 $codePaths = [$path.'/templates'];
 
                 if (!is_dir($transPaths[0])) {
-                    throw new InvalidArgumentException(sprintf('"%s" is neither an enabled bundle nor a directory.', $transPaths[0]));
+                    throw new InvalidArgumentException(\sprintf('"%s" is neither an enabled bundle nor a directory.', $transPaths[0]));
                 }
             }
         } elseif ($input->getOption('all')) {
@@ -171,10 +171,10 @@ EOF
 
         // No defined or extracted messages
         if (!$allMessages || null !== $domain && empty($allMessages[$domain])) {
-            $outputMessage = sprintf('No defined or extracted messages for locale "%s"', $locale);
+            $outputMessage = \sprintf('No defined or extracted messages for locale "%s"', $locale);
 
             if (null !== $domain) {
-                $outputMessage .= sprintf(' and domain "%s"', $domain);
+                $outputMessage .= \sprintf(' and domain "%s"', $domain);
             }
 
             $io->getErrorStyle()->warning($outputMessage);
@@ -186,9 +186,9 @@ EOF
         $fallbackCatalogues = $this->loadFallbackCatalogues($locale, $transPaths);
 
         // Display header line
-        $headers = ['State', 'Domain', 'Id', sprintf('Message Preview (%s)', $locale)];
+        $headers = ['State', 'Domain', 'Id', \sprintf('Message Preview (%s)', $locale)];
         foreach ($fallbackCatalogues as $fallbackCatalogue) {
-            $headers[] = sprintf('Fallback Message Preview (%s)', $fallbackCatalogue->getLocale());
+            $headers[] = \sprintf('Fallback Message Preview (%s)', $fallbackCatalogue->getLocale());
         }
         $rows = [];
         // Iterate all message ids and determine their state
@@ -310,7 +310,7 @@ EOF
 
     private function formatId(string $id): string
     {
-        return sprintf('<fg=cyan;options=bold>%s</>', $id);
+        return \sprintf('<fg=cyan;options=bold>%s</>', $id);
     }
 
     private function sanitizeString(string $string, int $length = 40): string

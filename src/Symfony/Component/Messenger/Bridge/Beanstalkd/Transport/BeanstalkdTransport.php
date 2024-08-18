@@ -22,14 +22,14 @@ use Symfony\Component\Messenger\Transport\TransportInterface;
  */
 class BeanstalkdTransport implements TransportInterface, MessageCountAwareInterface
 {
-    private Connection $connection;
     private SerializerInterface $serializer;
     private BeanstalkdReceiver $receiver;
     private BeanstalkdSender $sender;
 
-    public function __construct(Connection $connection, ?SerializerInterface $serializer = null)
-    {
-        $this->connection = $connection;
+    public function __construct(
+        private Connection $connection,
+        ?SerializerInterface $serializer = null,
+    ) {
         $this->serializer = $serializer ?? new PhpSerializer();
     }
 

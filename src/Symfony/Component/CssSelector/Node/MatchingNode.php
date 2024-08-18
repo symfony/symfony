@@ -50,6 +50,6 @@ class MatchingNode extends AbstractNode
             $this->arguments,
         );
 
-        return sprintf('%s[%s:is(%s)]', $this->getNodeName(), $this->selector, implode(', ', $selectorArguments));
+        return \sprintf('%s[%s:is(%s)]', $this->getNodeName(), $this->selector, implode(', ', $selectorArguments));
     }
 }

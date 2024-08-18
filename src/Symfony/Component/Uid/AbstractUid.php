@@ -14,7 +14,7 @@ namespace Symfony\Component\Uid;
 /**
  * @author Nicolas Grekas <p@tchwork.com>
  */
-abstract class AbstractUid implements \JsonSerializable, \Stringable
+abstract class AbstractUid implements \JsonSerializable, \Stringable, HashableInterface
 {
     /**
      * The identifier in its canonic representation.
@@ -93,7 +93,7 @@ abstract class AbstractUid implements \JsonSerializable, \Stringable
      */
     public function toBase58(): string
     {
-        return strtr(sprintf('%022s', BinaryUtil::toBase($this->toBinary(), BinaryUtil::BASE58)), '0', '1');
+        return strtr(\sprintf('%022s', BinaryUtil::toBase($this->toBinary(), BinaryUtil::BASE58)), '0', '1');
     }
 
     /**
@@ -106,7 +106,7 @@ abstract class AbstractUid implements \JsonSerializable, \Stringable
     public function toBase32(): string
     {
         $uid = bin2hex($this->toBinary());
-        $uid = sprintf('%02s%04s%04s%04s%04s%04s%04s',
+        $uid = \sprintf('%02s%04s%04s%04s%04s%04s%04s',
             base_convert(substr($uid, 0, 2), 16, 32),
             base_convert(substr($uid, 2, 5), 16, 32),
             base_convert(substr($uid, 7, 5), 16, 32),
@@ -157,6 +157,11 @@ abstract class AbstractUid implements \JsonSerializable, \Stringable
         }
 
         return $this->uid === $other->uid;
+    }
+
+    public function hash(): string
+    {
+        return $this->uid;
     }
 
     public function compare(self $other): int

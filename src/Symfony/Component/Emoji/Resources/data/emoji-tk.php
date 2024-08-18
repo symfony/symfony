@@ -1183,6 +1183,7 @@ return [
     '👩‍👧' => 'maşgala: zenan, gyz',
     '😶‍🌫' => 'bulutlaryň içinde ýüz',
     '😮‍💨' => 'bugarýan ýüz',
+    '🙂‍↔' => 'saga-çepe sallanýan kelle',
     '🙂‍↕' => 'aşak-ýokaryk sallanýan kelle',
     '😵‍💫' => 'spiral gözli ýüz',
     '❤‍🔥' => 'ýanyp duran ýürek',

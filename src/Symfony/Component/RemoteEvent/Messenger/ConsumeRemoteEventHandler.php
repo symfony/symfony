@@ -28,12 +28,12 @@ class ConsumeRemoteEventHandler
     public function __invoke(ConsumeRemoteEventMessage $message): void
     {
         if (!$this->consumers->has($message->getType())) {
-            throw new LogicException(sprintf('Unable to find a consumer for message of type "%s".', $message->getType()));
+            throw new LogicException(\sprintf('Unable to find a consumer for message of type "%s".', $message->getType()));
         }
         $consumer = $this->consumers->get($message->getType());
 
         if (!$consumer instanceof ConsumerInterface) {
-            throw new LogicException(sprintf('The consumer "%s" for message of type "%s" must implement "%s".', get_debug_type($consumer), $message->getType(), ConsumerInterface::class));
+            throw new LogicException(\sprintf('The consumer "%s" for message of type "%s" must implement "%s".', get_debug_type($consumer), $message->getType(), ConsumerInterface::class));
         }
 
         $consumer->consume($message->getEvent());

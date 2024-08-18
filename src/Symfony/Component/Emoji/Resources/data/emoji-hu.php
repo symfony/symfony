@@ -1183,6 +1183,7 @@ return [
     '👩‍👧' => 'család: nő és lány',
     '😶‍🌫' => 'arc a felhőben',
     '😮‍💨' => 'levegőt kifújó arc',
+    '🙂‍↔' => 'vízszintesen rázkódó arc',
     '🙂‍↕' => 'függőlegesen rázkódó arc',
     '😵‍💫' => 'spirálszemű arc',
     '❤‍🔥' => 'lángoló szív',

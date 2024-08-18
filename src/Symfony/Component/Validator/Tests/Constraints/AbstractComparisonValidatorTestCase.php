@@ -16,6 +16,7 @@ use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Constraints\AbstractComparison;
 use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
+use Symfony\Component\Validator\Tests\Constraints\Fixtures\TypedDummy;
 
 class ComparisonTest_Class
 {
@@ -155,7 +156,7 @@ abstract class AbstractComparisonValidatorTestCase extends ConstraintValidatorTe
         $constraint = $this->createConstraint(['propertyPath' => 'foo']);
 
         $this->expectException(ConstraintDefinitionException::class);
-        $this->expectExceptionMessage(sprintf('Invalid property path "foo" provided to "%s" constraint', $constraint::class));
+        $this->expectExceptionMessage(\sprintf('Invalid property path "foo" provided to "%s" constraint', $constraint::class));
 
         $object = new ComparisonTest_Class(5);
 
@@ -232,8 +233,8 @@ abstract class AbstractComparisonValidatorTestCase extends ConstraintValidatorTe
         ]);
 
         return [
-            [$constraint, sprintf('The compared value "foo" could not be converted to a "DateTimeImmutable" instance in the "%s" constraint.', $constraint::class), new \DateTimeImmutable()],
-            [$constraint, sprintf('The compared value "foo" could not be converted to a "DateTime" instance in the "%s" constraint.', $constraint::class), new \DateTime()],
+            [$constraint, \sprintf('The compared value "foo" could not be converted to a "DateTimeImmutable" instance in the "%s" constraint.', $constraint::class), new \DateTimeImmutable()],
+            [$constraint, \sprintf('The compared value "foo" could not be converted to a "DateTime" instance in the "%s" constraint.', $constraint::class), new \DateTime()],
         ];
     }
 
@@ -249,6 +250,31 @@ abstract class AbstractComparisonValidatorTestCase extends ConstraintValidatorTe
         $this->setObject($object);
 
         $this->validator->validate($dirtyValue, $constraint);
+
+        if ($isValid) {
+            $this->assertNoViolation();
+        } else {
+            $this->buildViolation('Constraint Message')
+                ->setParameter('{{ value }}', $dirtyValueAsString)
+                ->setParameter('{{ compared_value }}', 'null')
+                ->setParameter('{{ compared_value_type }}', 'null')
+                ->setParameter('{{ compared_value_path }}', 'value')
+                ->setCode($this->getErrorCode())
+                ->assertRaised();
+        }
+    }
+
+    /**
+     * @dataProvider provideComparisonsToNullValueAtPropertyPath
+     */
+    public function testCompareWithUninitializedPropertyAtPropertyPath($dirtyValue, $dirtyValueAsString, $isValid)
+    {
+        $this->setObject(new TypedDummy());
+
+        $this->validator->validate($dirtyValue, $this->createConstraint([
+            'message' => 'Constraint Message',
+            'propertyPath' => 'value',
+        ]));
 
         if ($isValid) {
             $this->assertNoViolation();

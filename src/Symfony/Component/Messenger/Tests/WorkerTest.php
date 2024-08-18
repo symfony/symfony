@@ -48,7 +48,6 @@ use Symfony\Component\Messenger\Transport\Receiver\ReceiverInterface;
 use Symfony\Component\Messenger\Worker;
 use Symfony\Component\RateLimiter\RateLimiterFactory;
 use Symfony\Component\RateLimiter\Storage\InMemoryStorage;
-use Symfony\Contracts\Service\ResetInterface;
 
 /**
  * @group time-sensitive
@@ -73,7 +72,7 @@ class WorkerTest extends TestCase
                 return $envelopes[] = $envelope;
             });
 
-        $dispatcher = new class() implements EventDispatcherInterface {
+        $dispatcher = new class implements EventDispatcherInterface {
             private StopWorkerOnMessageLimitListener $listener;
 
             public function __construct()
@@ -385,7 +384,7 @@ class WorkerTest extends TestCase
             ->method('get')
         ;
 
-        $bus = $this->getMockBuilder(MessageBusInterface::class)->getMock();
+        $bus = $this->createMock(MessageBusInterface::class);
 
         $dispatcher = new EventDispatcher();
         $dispatcher->addSubscriber(new StopWorkerOnMessageLimitListener(1));
@@ -399,11 +398,11 @@ class WorkerTest extends TestCase
         $receiver1 = $this->createMock(QueueReceiverInterface::class);
         $receiver2 = $this->createMock(ReceiverInterface::class);
 
-        $bus = $this->getMockBuilder(MessageBusInterface::class)->getMock();
+        $bus = $this->createMock(MessageBusInterface::class);
 
         $worker = new Worker(['transport1' => $receiver1, 'transport2' => $receiver2], $bus, clock: new MockClock());
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage(sprintf('Receiver for "transport2" does not implement "%s".', QueueReceiverInterface::class));
+        $this->expectExceptionMessage(\sprintf('Receiver for "transport2" does not implement "%s".', QueueReceiverInterface::class));
         $worker->run(['queues' => ['foo']]);
     }
 
@@ -418,7 +417,7 @@ class WorkerTest extends TestCase
         $eventDispatcher = new EventDispatcher();
         $eventDispatcher->addSubscriber(new StopWorkerOnMessageLimitListener(1));
 
-        $stamp = new class() implements StampInterface {
+        $stamp = new class implements StampInterface {
         };
         $listener = function (WorkerMessageReceivedEvent $event) use ($stamp) {
             $event->addStamps($stamp);

@@ -49,7 +49,7 @@ class EventDispatcherDebugCommand extends Command
             ->setDefinition([
                 new InputArgument('event', InputArgument::OPTIONAL, 'An event name or a part of the event name'),
                 new InputOption('dispatcher', null, InputOption::VALUE_REQUIRED, 'To view events of a specific event dispatcher', self::DEFAULT_DISPATCHER),
-                new InputOption('format', null, InputOption::VALUE_REQUIRED, sprintf('The output format ("%s")', implode('", "', $this->getAvailableFormatOptions())), 'txt'),
+                new InputOption('format', null, InputOption::VALUE_REQUIRED, \sprintf('The output format ("%s")', implode('", "', $this->getAvailableFormatOptions())), 'txt'),
                 new InputOption('raw', null, InputOption::VALUE_NONE, 'To output raw description'),
             ])
             ->setHelp(<<<'EOF'
@@ -60,6 +60,10 @@ The <info>%command.name%</info> command displays all configured listeners:
 To get specific listeners for an event, specify its name:
 
   <info>php %command.full_name% kernel.request</info>
+
+The <info>--format</info> option specifies the format of the command output:
+
+  <info>php %command.full_name% --format=json</info>
 EOF
             )
         ;
@@ -75,7 +79,7 @@ EOF
         $options = [];
         $dispatcherServiceName = $input->getOption('dispatcher');
         if (!$this->dispatchers->has($dispatcherServiceName)) {
-            $io->getErrorStyle()->error(sprintf('Event dispatcher "%s" is not available.', $dispatcherServiceName));
+            $io->getErrorStyle()->error(\sprintf('Event dispatcher "%s" is not available.', $dispatcherServiceName));
 
             return 1;
         }
@@ -89,7 +93,7 @@ EOF
                 // if there is no direct match, try find partial matches
                 $events = $this->searchForEvent($dispatcher, $event);
                 if (0 === \count($events)) {
-                    $io->getErrorStyle()->warning(sprintf('The event "%s" does not have any registered listeners.', $event));
+                    $io->getErrorStyle()->warning(\sprintf('The event "%s" does not have any registered listeners.', $event));
 
                     return 0;
                 } elseif (1 === \count($events)) {
@@ -153,6 +157,7 @@ EOF
         return $output;
     }
 
+    /** @return string[] */
     private function getAvailableFormatOptions(): array
     {
         return (new DescriptorHelper())->getFormats();

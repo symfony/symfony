@@ -75,13 +75,36 @@ class RawMessageTest extends TestCase
         }
     }
 
+    public function testToIterableOnResourceRewindsAndYieldsLines()
+    {
+        $handle = \fopen('php://memory', 'r+');
+        \fwrite($handle, "line1\nline2\nline3\n");
+
+        $message = new RawMessage($handle);
+        $this->assertSame("line1\nline2\nline3\n", implode('', iterator_to_array($message->toIterable())));
+    }
+
+    public function testDestructClosesResource()
+    {
+        $handle = fopen('php://memory', 'r+');
+
+        $message = new RawMessage($handle);
+        unset($message);
+
+        $this->assertIsClosedResource($handle);
+    }
+
     public static function provideMessages(): array
     {
         return [
             'string' => ['some string', true],
             'traversable' => [new \ArrayObject(['some', ' ', 'string']), true],
             'array' => [['some', ' ', 'string'], true],
-            'generator' => [(function () { yield 'some'; yield ' '; yield 'string'; })(), false],
+            'generator' => [(function () {
+                yield 'some';
+                yield ' ';
+                yield 'string';
+            })(), false],
         ];
     }
 }

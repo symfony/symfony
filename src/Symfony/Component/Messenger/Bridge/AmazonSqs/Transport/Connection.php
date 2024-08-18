@@ -56,13 +56,14 @@ class Connection
     private ?ReceiveMessageResult $currentResponse = null;
     /** @var array[] */
     private array $buffer = [];
-    private ?string $queueUrl;
 
-    public function __construct(array $configuration, ?SqsClient $client = null, ?string $queueUrl = null)
-    {
+    public function __construct(
+        array $configuration,
+        ?SqsClient $client = null,
+        private ?string $queueUrl = null,
+    ) {
         $this->configuration = array_replace_recursive(self::DEFAULT_OPTIONS, $configuration);
         $this->client = $client ?? new SqsClient([]);
-        $this->queueUrl = $queueUrl;
     }
 
     public function __sleep(): array
@@ -114,13 +115,13 @@ class Connection
         // check for extra keys in options
         $optionsExtraKeys = array_diff(array_keys($options), array_keys(self::DEFAULT_OPTIONS));
         if (0 < \count($optionsExtraKeys)) {
-            throw new InvalidArgumentException(sprintf('Unknown option found: [%s]. Allowed options are [%s].', implode(', ', $optionsExtraKeys), implode(', ', array_keys(self::DEFAULT_OPTIONS))));
+            throw new InvalidArgumentException(\sprintf('Unknown option found: [%s]. Allowed options are [%s].', implode(', ', $optionsExtraKeys), implode(', ', array_keys(self::DEFAULT_OPTIONS))));
         }
 
         // check for extra keys in options
         $queryExtraKeys = array_diff(array_keys($query), array_keys(self::DEFAULT_OPTIONS));
         if (0 < \count($queryExtraKeys)) {
-            throw new InvalidArgumentException(sprintf('Unknown option found in DSN: [%s]. Allowed options are [%s].', implode(', ', $queryExtraKeys), implode(', ', array_keys(self::DEFAULT_OPTIONS))));
+            throw new InvalidArgumentException(\sprintf('Unknown option found in DSN: [%s]. Allowed options are [%s].', implode(', ', $queryExtraKeys), implode(', ', array_keys(self::DEFAULT_OPTIONS))));
         }
 
         $options = $query + $options + self::DEFAULT_OPTIONS;
@@ -147,7 +148,7 @@ class Connection
         unset($query['region']);
 
         if ('default' !== ($params['host'] ?? 'default')) {
-            $clientConfiguration['endpoint'] = sprintf('%s://%s%s', ($query['sslmode'] ?? null) === 'disable' ? 'http' : 'https', $params['host'], ($params['port'] ?? null) ? ':'.$params['port'] : '');
+            $clientConfiguration['endpoint'] = \sprintf('%s://%s%s', ($options['sslmode'] ?? null) === 'disable' ? 'http' : 'https', $params['host'], ($params['port'] ?? null) ? ':'.$params['port'] : '');
             if (preg_match(';^sqs\.([^\.]++)\.amazonaws\.com$;', $params['host'], $matches)) {
                 $clientConfiguration['region'] = $matches[1];
             }
@@ -156,7 +157,7 @@ class Connection
         }
 
         $parsedPath = explode('/', ltrim($params['path'] ?? '/', '/'));
-        if (\count($parsedPath) > 0 && !empty($queueName = end($parsedPath))) {
+        if ($queueName = end($parsedPath)) {
             $configuration['queue_name'] = $queueName;
         }
         $configuration['account'] = 2 === \count($parsedPath) ? $parsedPath[0] : $options['account'] ?? self::DEFAULT_OPTIONS['account'];
@@ -202,7 +203,7 @@ class Connection
      */
     private function getPendingMessages(): \Generator
     {
-        while (!empty($this->buffer)) {
+        while ($this->buffer) {
             yield array_shift($this->buffer);
         }
     }
@@ -274,7 +275,7 @@ class Connection
         }
 
         if (null !== $this->configuration['account']) {
-            throw new InvalidArgumentException(sprintf('The Amazon SQS queue "%s" does not exist (or you don\'t have permissions on it), and can\'t be created when an account is provided.', $this->configuration['queue_name']));
+            throw new InvalidArgumentException(\sprintf('The Amazon SQS queue "%s" does not exist (or you don\'t have permissions on it), and can\'t be created when an account is provided.', $this->configuration['queue_name']));
         }
 
         $parameters = ['QueueName' => $this->configuration['queue_name']];
@@ -290,7 +291,7 @@ class Connection
         // Blocking call to wait for the queue to be created
         $exists->wait();
         if (!$exists->isSuccess()) {
-            throw new TransportException(sprintf('Failed to create the Amazon SQS queue "%s".', $this->configuration['queue_name']));
+            throw new TransportException(\sprintf('Failed to create the Amazon SQS queue "%s".', $this->configuration['queue_name']));
         }
         $this->queueUrl = null;
     }

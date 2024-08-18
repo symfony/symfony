@@ -11,9 +11,11 @@
 
 namespace Symfony\Component\Form\Tests\Extension\Core\Type;
 
+use Symfony\Component\Form\Extension\Core\Type\TextType;
+
 class TextTypeTest extends BaseTypeTestCase
 {
-    public const TESTED_TYPE = 'Symfony\Component\Form\Extension\Core\Type\TextType';
+    public const TESTED_TYPE = TextType::class;
 
     public function testSubmitNull($expected = null, $norm = null, $view = null)
     {

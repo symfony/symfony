@@ -14,7 +14,7 @@ namespace Symfony\Component\Emoji;
 use Symfony\Component\Emoji\Util\GzipStreamWrapper;
 
 if (!class_exists(\Transliterator::class)) {
-    throw new \LogicException(sprintf('You cannot use the "%s\EmojiTransliterator" class as the "intl" extension is not installed. See https://php.net/intl.', __NAMESPACE__));
+    throw new \LogicException(\sprintf('You cannot use the "%s\EmojiTransliterator" class as the "intl" extension is not installed. See https://php.net/intl.', __NAMESPACE__));
 }
 
 final class EmojiTransliterator extends \Transliterator
@@ -22,9 +22,13 @@ final class EmojiTransliterator extends \Transliterator
     private const QUICK_CHECK = "\xA9\xAE\xE2\xE3\xF0";
     private const REVERSEABLE_IDS = [
         'emoji-github' => 'github-emoji',
+        'emoji-gitlab' => 'gitlab-emoji',
         'emoji-slack' => 'slack-emoji',
+        'emoji-text' => 'text-emoji',
         'github-emoji' => 'emoji-github',
+        'gitlab-emoji' => 'emoji-gitlab',
         'slack-emoji' => 'emoji-slack',
+        'text-emoji' => 'emoji-text',
     ];
 
     public readonly string $id;
@@ -117,7 +121,7 @@ final class EmojiTransliterator extends \Transliterator
         }
 
         // Here we rely on intl to validate the $string, $start and $end arguments
-        // and to slice the string. Slicing is done by replacing the part if $string
+        // and to slice the string. Slicing is done by replacing the part of $string
         // between $start and $end by a unique cookie that can be reliably used to
         // identify which part of $string should be transliterated.
 

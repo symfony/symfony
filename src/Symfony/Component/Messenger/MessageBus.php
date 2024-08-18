@@ -36,12 +36,11 @@ class MessageBus implements MessageBusInterface
             // $this->middlewareAggregate should be an instance of IteratorAggregate.
             // When $middlewareHandlers is an Iterator, we wrap it to ensure it is lazy-loaded and can be rewound.
             $this->middlewareAggregate = new class($middlewareHandlers) implements \IteratorAggregate {
-                private \Traversable $middlewareHandlers;
                 private \ArrayObject $cachedIterator;
 
-                public function __construct(\Traversable $middlewareHandlers)
-                {
-                    $this->middlewareHandlers = $middlewareHandlers;
+                public function __construct(
+                    private \Traversable $middlewareHandlers,
+                ) {
                 }
 
                 public function getIterator(): \Traversable

@@ -34,13 +34,10 @@ use Symfony\Component\HttpKernel\KernelInterface;
  */
 class ConfigBuilderCacheWarmer implements CacheWarmerInterface
 {
-    private KernelInterface $kernel;
-    private ?LoggerInterface $logger;
-
-    public function __construct(KernelInterface $kernel, ?LoggerInterface $logger = null)
-    {
-        $this->kernel = $kernel;
-        $this->logger = $logger;
+    public function __construct(
+        private KernelInterface $kernel,
+        private ?LoggerInterface $logger = null,
+    ) {
     }
 
     public function warmUp(string $cacheDir, ?string $buildDir = null): array

@@ -22,6 +22,7 @@ use Doctrine\DBAL\Platforms\PostgreSQLPlatform;
 use Doctrine\DBAL\Query\ForUpdate\ConflictResolutionMode;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\DBAL\Result;
+use Doctrine\DBAL\Schema\AbstractAsset;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Schema\Table;
 use Doctrine\DBAL\Types\Types;
@@ -48,8 +49,13 @@ class Connection implements ResetInterface
         'auto_setup' => true,
     ];
 
+    protected ?float $queueEmptiedAt = null;
+
+    private bool $autoSetup;
+    private bool $doMysqlCleanup = false;
+
     /**
-     * Configuration of the connection.
+     * Constructor.
      *
      * Available options:
      *
@@ -59,22 +65,18 @@ class Connection implements ResetInterface
      * * redeliver_timeout: Timeout before redeliver messages still in handling state (i.e: delivered_at is not null and message is still in table). Default: 3600
      * * auto_setup: Whether the table should be created automatically during send / get. Default: true
      */
-    protected array $configuration;
-    protected DBALConnection $driverConnection;
-    protected ?float $queueEmptiedAt = null;
-
-    private bool $autoSetup;
-
-    public function __construct(array $configuration, DBALConnection $driverConnection)
-    {
+    public function __construct(
+        protected array $configuration,
+        protected DBALConnection $driverConnection,
+    ) {
         $this->configuration = array_replace_recursive(static::DEFAULT_OPTIONS, $configuration);
-        $this->driverConnection = $driverConnection;
         $this->autoSetup = $this->configuration['auto_setup'];
     }
 
     public function reset(): void
     {
         $this->queueEmptiedAt = null;
+        $this->doMysqlCleanup = false;
     }
 
     public function getConfiguration(): array
@@ -101,13 +103,13 @@ class Connection implements ResetInterface
         // check for extra keys in options
         $optionsExtraKeys = array_diff(array_keys($options), array_keys(static::DEFAULT_OPTIONS));
         if (0 < \count($optionsExtraKeys)) {
-            throw new InvalidArgumentException(sprintf('Unknown option found: [%s]. Allowed options are [%s].', implode(', ', $optionsExtraKeys), implode(', ', array_keys(static::DEFAULT_OPTIONS))));
+            throw new InvalidArgumentException(\sprintf('Unknown option found: [%s]. Allowed options are [%s].', implode(', ', $optionsExtraKeys), implode(', ', array_keys(static::DEFAULT_OPTIONS))));
         }
 
         // check for extra keys in options
         $queryExtraKeys = array_diff(array_keys($query), array_keys(static::DEFAULT_OPTIONS));
         if (0 < \count($queryExtraKeys)) {
-            throw new InvalidArgumentException(sprintf('Unknown option found in DSN: [%s]. Allowed options are [%s].', implode(', ', $queryExtraKeys), implode(', ', array_keys(static::DEFAULT_OPTIONS))));
+            throw new InvalidArgumentException(\sprintf('Unknown option found in DSN: [%s]. Allowed options are [%s].', implode(', ', $queryExtraKeys), implode(', ', array_keys(static::DEFAULT_OPTIONS))));
         }
 
         return $configuration;
@@ -123,7 +125,7 @@ class Connection implements ResetInterface
     public function send(string $body, array $headers, int $delay = 0): string
     {
         $now = new \DateTimeImmutable('UTC');
-        $availableAt = $now->modify(sprintf('%+d seconds', $delay / 1000));
+        $availableAt = $now->modify(\sprintf('%+d seconds', $delay / 1000));
 
         $queryBuilder = $this->driverConnection->createQueryBuilder()
             ->insert($this->configuration['table_name'])
@@ -152,11 +154,16 @@ class Connection implements ResetInterface
 
     public function get(): ?array
     {
-        if ($this->driverConnection->getDatabasePlatform() instanceof AbstractMySQLPlatform) {
+        if ($this->doMysqlCleanup && $this->driverConnection->getDatabasePlatform() instanceof AbstractMySQLPlatform) {
             try {
                 $this->driverConnection->delete($this->configuration['table_name'], ['delivered_at' => '9999-12-31 23:59:59']);
+                $this->doMysqlCleanup = false;
             } catch (DriverException $e) {
                 // Ignore the exception
+            } catch (TableNotFoundException $e) {
+                if ($this->autoSetup) {
+                    $this->setup();
+                }
             }
         }
 
@@ -186,11 +193,11 @@ class Connection implements ResetInterface
             if (method_exists(QueryBuilder::class, 'forUpdate')) {
                 $sql = $this->addLockMode($query, $sql);
             } else {
-                if (preg_match('/FROM (.+) WHERE/', (string) $sql, $matches)) {
+                if (preg_match('/FROM (.+) WHERE/', $sql, $matches)) {
                     $fromClause = $matches[1];
                     $sql = str_replace(
-                        sprintf('FROM %s WHERE', $fromClause),
-                        sprintf('FROM %s WHERE', $this->driverConnection->getDatabasePlatform()->appendLockHint($fromClause, LockMode::PESSIMISTIC_WRITE)),
+                        \sprintf('FROM %s WHERE', $fromClause),
+                        \sprintf('FROM %s WHERE', $this->driverConnection->getDatabasePlatform()->appendLockHint($fromClause, LockMode::PESSIMISTIC_WRITE)),
                         $sql
                     );
                 }
@@ -248,7 +255,11 @@ class Connection implements ResetInterface
     {
         try {
             if ($this->driverConnection->getDatabasePlatform() instanceof AbstractMySQLPlatform) {
-                return $this->driverConnection->update($this->configuration['table_name'], ['delivered_at' => '9999-12-31 23:59:59'], ['id' => $id]) > 0;
+                if ($updated = $this->driverConnection->update($this->configuration['table_name'], ['delivered_at' => '9999-12-31 23:59:59'], ['id' => $id]) > 0) {
+                    $this->doMysqlCleanup = true;
+                }
+
+                return $updated;
             }
 
             return $this->driverConnection->delete($this->configuration['table_name'], ['id' => $id]) > 0;
@@ -261,7 +272,11 @@ class Connection implements ResetInterface
     {
         try {
             if ($this->driverConnection->getDatabasePlatform() instanceof AbstractMySQLPlatform) {
-                return $this->driverConnection->update($this->configuration['table_name'], ['delivered_at' => '9999-12-31 23:59:59'], ['id' => $id]) > 0;
+                if ($updated = $this->driverConnection->update($this->configuration['table_name'], ['delivered_at' => '9999-12-31 23:59:59'], ['id' => $id]) > 0) {
+                    $this->doMysqlCleanup = true;
+                }
+
+                return $updated;
             }
 
             return $this->driverConnection->delete($this->configuration['table_name'], ['id' => $id]) > 0;
@@ -274,7 +289,17 @@ class Connection implements ResetInterface
     {
         $configuration = $this->driverConnection->getConfiguration();
         $assetFilter = $configuration->getSchemaAssetsFilter();
-        $configuration->setSchemaAssetsFilter(static fn () => true);
+        $configuration->setSchemaAssetsFilter(function ($tableName) {
+            if ($tableName instanceof AbstractAsset) {
+                $tableName = $tableName->getName();
+            }
+
+            if (!\is_string($tableName)) {
+                throw new \TypeError(\sprintf('The table name must be an instance of "%s" or a string ("%s" given).', AbstractAsset::class, get_debug_type($tableName)));
+            }
+
+            return $tableName === $this->configuration['table_name'];
+        });
         $this->updateSchema();
         $configuration->setSchemaAssetsFilter($assetFilter);
         $this->autoSetup = false;
@@ -340,7 +365,7 @@ class Connection implements ResetInterface
     private function createAvailableMessagesQueryBuilder(): QueryBuilder
     {
         $now = new \DateTimeImmutable('UTC');
-        $redeliverLimit = $now->modify(sprintf('-%d seconds', $this->configuration['redeliver_timeout']));
+        $redeliverLimit = $now->modify(\sprintf('-%d seconds', $this->configuration['redeliver_timeout']));
 
         return $this->createQueryBuilder()
             ->where('m.queue_name = ?')

@@ -35,18 +35,17 @@ final class TelnyxTransport extends AbstractTransport
         private ?string $messagingProfileId,
         ?HttpClientInterface $client = null,
         ?EventDispatcherInterface $dispatcher = null,
-)
-    {
+    ) {
         parent::__construct($client, $dispatcher);
     }
 
     public function __toString(): string
     {
         if (null !== $this->messagingProfileId) {
-            return sprintf('telnyx://%s?from=%s&messaging_profile_id=%s', $this->getEndpoint(), $this->from, $this->messagingProfileId);
+            return \sprintf('telnyx://%s?from=%s&messaging_profile_id=%s', $this->getEndpoint(), $this->from, $this->messagingProfileId);
         }
 
-        return sprintf('telnyx://%s?from=%s', $this->getEndpoint(), $this->from);
+        return \sprintf('telnyx://%s?from=%s', $this->getEndpoint(), $this->from);
     }
 
     public function supports(MessageInterface $message): bool
@@ -74,7 +73,7 @@ final class TelnyxTransport extends AbstractTransport
             }
         }
 
-        $endpoint = sprintf('https://%s/v2/messages', $this->getEndpoint());
+        $endpoint = \sprintf('https://%s/v2/messages', $this->getEndpoint());
         $response = $this->client->request('POST', $endpoint, [
             'auth_bearer' => $this->apiKey,
             'json' => [

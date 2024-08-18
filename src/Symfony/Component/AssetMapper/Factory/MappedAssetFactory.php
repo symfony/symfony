@@ -16,6 +16,7 @@ use Symfony\Component\AssetMapper\Exception\CircularAssetsException;
 use Symfony\Component\AssetMapper\Exception\RuntimeException;
 use Symfony\Component\AssetMapper\MappedAsset;
 use Symfony\Component\AssetMapper\Path\PublicAssetsPathResolverInterface;
+use Symfony\Component\Filesystem\Filesystem;
 
 /**
  * Creates MappedAsset objects by reading their contents & passing it through compilers.
@@ -23,6 +24,7 @@ use Symfony\Component\AssetMapper\Path\PublicAssetsPathResolverInterface;
 class MappedAssetFactory implements MappedAssetFactoryInterface
 {
     private const PREDIGESTED_REGEX = '/-([0-9a-zA-Z]{7,128}\.digested)/';
+    private const PUBLIC_DIGEST_LENGTH = 7;
 
     private array $assetsCache = [];
     private array $assetsBeingCreated = [];
@@ -37,7 +39,7 @@ class MappedAssetFactory implements MappedAssetFactoryInterface
     public function createMappedAsset(string $logicalPath, string $sourcePath): ?MappedAsset
     {
         if (isset($this->assetsBeingCreated[$logicalPath])) {
-            throw new CircularAssetsException($this->assetsCache[$logicalPath], sprintf('Circular reference detected while creating asset for "%s": "%s".', $logicalPath, implode(' -> ', $this->assetsBeingCreated).' -> '.$logicalPath));
+            throw new CircularAssetsException($this->assetsCache[$logicalPath], \sprintf('Circular reference detected while creating asset for "%s": "%s".', $logicalPath, implode(' -> ', $this->assetsBeingCreated).' -> '.$logicalPath));
         }
         $this->assetsBeingCreated[$logicalPath] = $logicalPath;
 
@@ -88,23 +90,20 @@ class MappedAssetFactory implements MappedAssetFactoryInterface
             return [hash('xxh128', $content), false];
         }
 
-        return [
-            hash_file('xxh128', $asset->sourcePath),
-            false,
-        ];
+        return [hash_file('xxh128', $asset->sourcePath), false];
     }
 
     private function compileContent(MappedAsset $asset): ?string
     {
         if (!is_file($asset->sourcePath)) {
-            throw new RuntimeException(sprintf('Asset source path "%s" could not be found.', $asset->sourcePath));
+            throw new RuntimeException(\sprintf('Asset source path "%s" could not be found.', $asset->sourcePath));
         }
 
         if (!$this->compiler->supports($asset)) {
             return null;
         }
 
-        $content = file_get_contents($asset->sourcePath);
+        $content = (new Filesystem())->readFile($asset->sourcePath);
         $compiled = $this->compiler->compile($content, $asset);
 
         return $compiled !== $content ? $compiled : null;
@@ -117,8 +116,10 @@ class MappedAssetFactory implements MappedAssetFactoryInterface
         if ($isPredigested) {
             return $this->assetsPathResolver->resolvePublicPath($asset->logicalPath);
         }
-
-        $digestedPath = preg_replace_callback('/\.(\w+)$/', fn ($matches) => "-{$digest}{$matches[0]}", $asset->logicalPath);
+        $digest = base64_encode(hex2bin($digest));
+        $digest = substr($digest, 0, self::PUBLIC_DIGEST_LENGTH);
+        $digest = strtr($digest, '+/', '-_');
+        $digestedPath = preg_replace('/\.(\w+)$/', "-{$digest}\\0", $asset->logicalPath);
 
         return $this->assetsPathResolver->resolvePublicPath($digestedPath);
     }

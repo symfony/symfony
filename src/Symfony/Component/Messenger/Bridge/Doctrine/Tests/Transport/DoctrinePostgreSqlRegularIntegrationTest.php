@@ -57,6 +57,20 @@ class DoctrinePostgreSqlRegularIntegrationTest extends TestCase
         $this->assertNull($this->connection->get());
     }
 
+    public function testSendAndGetWithSkipLockedEnabled()
+    {
+        $connection = new Connection(['table_name' => 'queue_table', 'skip_locked' => true], $this->driverConnection);
+        $connection->setup();
+
+        $connection->send('{"message": "Hi"}', ['type' => DummyMessage::class]);
+
+        $encoded = $connection->get();
+        $this->assertSame('{"message": "Hi"}', $encoded['body']);
+        $this->assertSame(['type' => DummyMessage::class], $encoded['headers']);
+
+        $this->assertNull($this->connection->get());
+    }
+
     protected function setUp(): void
     {
         if (!$host = getenv('POSTGRES_HOST')) {

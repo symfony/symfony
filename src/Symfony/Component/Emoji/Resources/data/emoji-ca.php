@@ -1183,6 +1183,7 @@ return [
     '👩‍👧' => 'família: dona i noia',
     '😶‍🌫' => 'cara entre núvols',
     '😮‍💨' => 'cara que exhala',
+    '🙂‍↔' => 'cap que tremola horitzontalment',
     '🙂‍↕' => 'cap que tremola verticalment',
     '😵‍💫' => 'cara amb ulls d’espiral',
     '❤‍🔥' => 'cor en flames',

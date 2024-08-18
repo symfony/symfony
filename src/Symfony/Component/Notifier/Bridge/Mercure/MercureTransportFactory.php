@@ -25,13 +25,12 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
  */
 final class MercureTransportFactory extends AbstractTransportFactory
 {
-    private HubRegistry $registry;
-
-    public function __construct(HubRegistry $registry, ?EventDispatcherInterface $dispatcher = null, ?HttpClientInterface $client = null)
-    {
+    public function __construct(
+        private HubRegistry $registry,
+        ?EventDispatcherInterface $dispatcher = null,
+        ?HttpClientInterface $client = null,
+    ) {
         parent::__construct($dispatcher, $client);
-
-        $this->registry = $registry;
     }
 
     public function create(Dsn $dsn): MercureTransport
@@ -46,7 +45,7 @@ final class MercureTransportFactory extends AbstractTransportFactory
         try {
             $hub = $this->registry->getHub($hubId);
         } catch (InvalidArgumentException) {
-            throw new IncompleteDsnException(sprintf('Hub "%s" not found. Did you mean one of: "%s"?', $hubId, implode('", "', array_keys($this->registry->all()))));
+            throw new IncompleteDsnException(\sprintf('Hub "%s" not found. Did you mean one of: "%s"?', $hubId, implode('", "', array_keys($this->registry->all()))));
         }
 
         return new MercureTransport($hub, $hubId, $topic, $this->client, $this->dispatcher);

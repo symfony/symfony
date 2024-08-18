@@ -27,9 +27,27 @@ class ResponseIsRedirectedTest extends TestCase
         $this->assertFalse($constraint->evaluate(new Response(), '', true));
 
         try {
-            $constraint->evaluate(new Response());
+            $constraint->evaluate(new Response('Body content'));
         } catch (ExpectationFailedException $e) {
-            $this->assertStringContainsString("Failed asserting that the Response is redirected.\nHTTP/1.0 200 OK", TestFailure::exceptionToString($e));
+            $exceptionMessage = TestFailure::exceptionToString($e);
+            $this->assertStringContainsString("Failed asserting that the Response is redirected.\nHTTP/1.0 200 OK", $exceptionMessage);
+            $this->assertStringContainsString('Body content', $exceptionMessage);
+
+            return;
+        }
+
+        $this->fail();
+    }
+
+    public function testReducedVerbosity()
+    {
+        $constraint = new ResponseIsRedirected(verbose: false);
+        try {
+            $constraint->evaluate(new Response('Body content'));
+        } catch (ExpectationFailedException $e) {
+            $exceptionMessage = TestFailure::exceptionToString($e);
+            $this->assertStringContainsString("Failed asserting that the Response is redirected.\nHTTP/1.0 200 OK", $exceptionMessage);
+            $this->assertStringNotContainsString('Body content', $exceptionMessage);
 
             return;
         }

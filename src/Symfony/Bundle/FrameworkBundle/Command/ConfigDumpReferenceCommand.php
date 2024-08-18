@@ -39,14 +39,11 @@ class ConfigDumpReferenceCommand extends AbstractConfigCommand
 {
     protected function configure(): void
     {
-        $commentedHelpFormats = array_map(fn ($format) => sprintf('<comment>%s</comment>', $format), $this->getAvailableFormatOptions());
-        $helpFormats = implode('", "', $commentedHelpFormats);
-
         $this
             ->setDefinition([
                 new InputArgument('name', InputArgument::OPTIONAL, 'The Bundle name or the extension alias'),
                 new InputArgument('path', InputArgument::OPTIONAL, 'The configuration option path'),
-                new InputOption('format', null, InputOption::VALUE_REQUIRED, sprintf('The output format ("%s")', implode('", "', $this->getAvailableFormatOptions())), 'yaml'),
+                new InputOption('format', null, InputOption::VALUE_REQUIRED, \sprintf('The output format ("%s")', implode('", "', $this->getAvailableFormatOptions())), 'yaml'),
             ])
             ->setHelp(<<<EOF
 The <info>%command.name%</info> command dumps the default configuration for an
@@ -57,10 +54,9 @@ Either the extension alias or bundle name can be used:
   <info>php %command.full_name% framework</info>
   <info>php %command.full_name% FrameworkBundle</info>
 
-The <info>--format</info> option specifies the format of the configuration,
-these are "{$helpFormats}".
+The <info>--format</info> option specifies the format of the command output:
 
-  <info>php %command.full_name% FrameworkBundle --format=xml</info>
+  <info>php %command.full_name% FrameworkBundle --format=json</info>
 
 For dumping a specific option, add its path as second argument (only available for the yaml format):
 
@@ -118,27 +114,27 @@ EOF
         }
 
         if ($name === $extension->getAlias()) {
-            $message = sprintf('Default configuration for extension with alias: "%s"', $name);
+            $message = \sprintf('Default configuration for extension with alias: "%s"', $name);
         } else {
-            $message = sprintf('Default configuration for "%s"', $name);
+            $message = \sprintf('Default configuration for "%s"', $name);
         }
 
         if (null !== $path) {
-            $message .= sprintf(' at path "%s"', $path);
+            $message .= \sprintf(' at path "%s"', $path);
         }
 
         switch ($format) {
             case 'yaml':
-                $io->writeln(sprintf('# %s', $message));
+                $io->writeln(\sprintf('# %s', $message));
                 $dumper = new YamlReferenceDumper();
                 break;
             case 'xml':
-                $io->writeln(sprintf('<!-- %s -->', $message));
+                $io->writeln(\sprintf('<!-- %s -->', $message));
                 $dumper = new XmlReferenceDumper();
                 break;
             default:
                 $io->writeln($message);
-                throw new InvalidArgumentException(sprintf('Supported formats are "%s".', implode('", "', $this->getAvailableFormatOptions())));
+                throw new InvalidArgumentException(\sprintf('Supported formats are "%s".', implode('", "', $this->getAvailableFormatOptions())));
         }
 
         $io->writeln(null === $path ? $dumper->dump($configuration, $extension->getNamespace()) : $dumper->dumpAtPath($configuration, $path));
@@ -181,6 +177,7 @@ EOF
         return $bundles;
     }
 
+    /** @return string[] */
     private function getAvailableFormatOptions(): array
     {
         return ['yaml', 'xml'];

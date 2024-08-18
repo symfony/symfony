@@ -28,21 +28,19 @@ class LazyObjectState
     public const STATUS_INITIALIZED_PARTIAL = 4;
 
     /**
-     * @var array<string, true>
-     */
-    public readonly array $skippedProperties;
-
-    /**
      * @var self::STATUS_*
      */
-    public int $status = 0;
+    public int $status = self::STATUS_UNINITIALIZED_FULL;
 
     public object $realInstance;
 
-    public function __construct(public readonly \Closure $initializer, $skippedProperties = [])
-    {
-        $this->skippedProperties = $skippedProperties;
-        $this->status = self::STATUS_UNINITIALIZED_FULL;
+    /**
+     * @param array<string, true> $skippedProperties
+     */
+    public function __construct(
+        public readonly \Closure $initializer,
+        public readonly array $skippedProperties = [],
+    ) {
     }
 
     public function initialize($instance, $propertyName, $propertyScope)
@@ -86,6 +84,12 @@ class LazyObjectState
 
         foreach (LazyObjectRegistry::$classResetters[$class] as $reset) {
             $reset($instance, $skippedProperties);
+        }
+
+        foreach ((array) $instance as $name => $value) {
+            if ("\0" !== ($name[0] ?? '') && !\array_key_exists($name, $skippedProperties)) {
+                unset($instance->$name);
+            }
         }
 
         $this->status = self::STATUS_UNINITIALIZED_FULL;

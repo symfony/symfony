@@ -66,7 +66,7 @@ class QueryParameterValueResolverTest extends TestCase
         try {
             $this->resolver->resolve($request, $metadata);
 
-            $this->fail(sprintf('Expected "%s" to be thrown.', HttpException::class));
+            $this->fail(\sprintf('Expected "%s" to be thrown.', HttpException::class));
         } catch (HttpException $exception) {
             $this->assertSame($expectedException->getMessage(), $exception->getMessage());
             $this->assertSame($expectedException->getStatusCode(), $exception->getStatusCode());

@@ -22,14 +22,12 @@ use Symfony\Component\Messenger\Envelope;
  */
 class SingleMessageReceiver implements ReceiverInterface
 {
-    private ReceiverInterface $receiver;
-    private Envelope $envelope;
     private bool $hasReceived = false;
 
-    public function __construct(ReceiverInterface $receiver, Envelope $envelope)
-    {
-        $this->receiver = $receiver;
-        $this->envelope = $envelope;
+    public function __construct(
+        private ReceiverInterface $receiver,
+        private Envelope $envelope,
+    ) {
     }
 
     public function get(): iterable

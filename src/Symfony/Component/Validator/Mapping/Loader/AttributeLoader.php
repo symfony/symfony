@@ -37,6 +37,7 @@ class AttributeLoader implements LoaderInterface
             if ($constraint instanceof GroupSequence) {
                 $metadata->setGroupSequence($constraint->groups);
             } elseif ($constraint instanceof GroupSequenceProvider) {
+                $metadata->setGroupProvider($constraint->provider);
                 $metadata->setGroupSequenceProvider(true);
             } elseif ($constraint instanceof Constraint) {
                 $metadata->addConstraint($constraint);
@@ -68,7 +69,7 @@ class AttributeLoader implements LoaderInterface
                         if (preg_match('/^(get|is|has)(.+)$/i', $method->name, $matches)) {
                             $metadata->addGetterMethodConstraint(lcfirst($matches[2]), $matches[0], $constraint);
                         } else {
-                            throw new MappingException(sprintf('The constraint on "%s::%s()" cannot be added. Constraints can only be added on methods beginning with "get", "is" or "has".', $className, $method->name));
+                            throw new MappingException(\sprintf('The constraint on "%s::%s()" cannot be added. Constraints can only be added on methods beginning with "get", "is" or "has".', $className, $method->name));
                         }
                     }
 

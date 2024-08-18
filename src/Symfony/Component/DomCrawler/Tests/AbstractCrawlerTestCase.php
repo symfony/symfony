@@ -184,6 +184,10 @@ abstract class AbstractCrawlerTestCase extends TestCase
         $crawler = $this->createCrawler();
         $crawler->addContent($this->getDoctype().'<html><meta http-equiv="Content-Type" content="text/html; charset=unicode" /><div class="foo"></html></html>');
         $this->assertEquals('foo', $crawler->filterXPath('//div')->attr('class'), '->addContent() ignores bad charset');
+
+        $crawler = $this->createCrawler();
+        $crawler->addContent($this->getDoctype().'<html><script>var foo = "bär";</script></html>', 'text/html; charset=UTF-8');
+        $this->assertEquals('var foo = "bär";', $crawler->filterXPath('//script')->text(), '->addContent() does not interfere with script content');
     }
 
     /**

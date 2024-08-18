@@ -16,6 +16,7 @@ use Symfony\Component\Validator\Constraints\Range;
 use Symfony\Component\Validator\Constraints\RangeValidator;
 use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
+use Symfony\Component\Validator\Tests\Constraints\Fixtures\MinMaxTyped;
 use Symfony\Component\Validator\Tests\IcuCompatibilityTrait;
 
 class RangeValidatorTest extends ConstraintValidatorTestCase
@@ -1020,6 +1021,28 @@ class RangeValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
+    public function testMinPropertyPathReferencingUninitializedProperty()
+    {
+        $object = new MinMaxTyped();
+        $object->max = 5;
+        $this->setObject($object);
+
+        $this->validator->validate(5, new Range(['minPropertyPath' => 'min', 'maxPropertyPath' => 'max']));
+
+        $this->assertNoViolation();
+    }
+
+    public function testMaxPropertyPathReferencingUninitializedProperty()
+    {
+        $object = new MinMaxTyped();
+        $object->min = 5;
+        $this->setObject($object);
+
+        $this->validator->validate(5, new Range(['minPropertyPath' => 'min', 'maxPropertyPath' => 'max']));
+
+        $this->assertNoViolation();
+    }
+
     public static function provideMessageIfMinAndMaxSet(): array
     {
         $notInRangeMessage = (new Range(['min' => '']))->notInRangeMessage;
@@ -1035,30 +1058,6 @@ class RangeValidatorTest extends ConstraintValidatorTestCase
                 ['notInRangeMessage' => 'not_in_range_message'],
                 12,
                 'not_in_range_message',
-                Range::NOT_IN_RANGE_ERROR,
-            ],
-            [
-                ['minMessage' => 'min_message'],
-                0,
-                $notInRangeMessage,
-                Range::NOT_IN_RANGE_ERROR,
-            ],
-            [
-                ['maxMessage' => 'max_message'],
-                0,
-                $notInRangeMessage,
-                Range::NOT_IN_RANGE_ERROR,
-            ],
-            [
-                ['minMessage' => 'min_message'],
-                15,
-                $notInRangeMessage,
-                Range::NOT_IN_RANGE_ERROR,
-            ],
-            [
-                ['maxMessage' => 'max_message'],
-                15,
-                $notInRangeMessage,
                 Range::NOT_IN_RANGE_ERROR,
             ],
         ];

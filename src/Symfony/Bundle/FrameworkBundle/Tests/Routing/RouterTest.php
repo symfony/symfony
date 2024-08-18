@@ -530,7 +530,9 @@ class RouterTest extends TestCase
      */
     public function testCacheValidityWithContainerParameters($parameter)
     {
-        $cacheDir = sys_get_temp_dir().\DIRECTORY_SEPARATOR.uniqid('router_', true);
+        $cacheDir = tempnam(sys_get_temp_dir(), 'sf_router_');
+        unlink($cacheDir);
+        mkdir($cacheDir);
 
         try {
             $container = new Container();

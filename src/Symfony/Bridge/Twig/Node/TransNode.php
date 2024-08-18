@@ -55,10 +55,8 @@ final class TransNode extends Node
             $vars = null;
         }
         [$msg, $defaults] = $this->compileString($this->getNode('body'), $defaults, (bool) $vars);
-        $display = class_exists(YieldReady::class) ? 'yield' : 'echo';
-
         $compiler
-            ->write($display.' $this->env->getExtension(\'Symfony\Bridge\Twig\Extension\TranslationExtension\')->trans(')
+            ->write('yield $this->env->getExtension(\'Symfony\Bridge\Twig\Extension\TranslationExtension\')->trans(')
             ->subcompile($msg)
         ;
 

@@ -12,6 +12,9 @@
 namespace Symfony\Component\Notifier\Bridge\Bluesky;
 
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Clock\Clock;
+use Symfony\Component\Clock\ClockInterface;
+use Symfony\Component\Mime\Part\File;
 use Symfony\Component\Notifier\Exception\TransportException;
 use Symfony\Component\Notifier\Exception\UnsupportedMessageTypeException;
 use Symfony\Component\Notifier\Message\ChatMessage;
@@ -31,6 +34,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 final class BlueskyTransport extends AbstractTransport
 {
     private array $authSession = [];
+    private ClockInterface $clock;
 
     public function __construct(
         #[\SensitiveParameter] private string $user,
@@ -38,13 +42,16 @@ final class BlueskyTransport extends AbstractTransport
         private LoggerInterface $logger,
         ?HttpClientInterface $client = null,
         ?EventDispatcherInterface $dispatcher = null,
+        ?ClockInterface $clock = null,
     ) {
         parent::__construct($client, $dispatcher);
+
+        $this->clock = $clock ?? Clock::get();
     }
 
     public function __toString(): string
     {
-        return sprintf('bluesky://%s', $this->getEndpoint());
+        return \sprintf('bluesky://%s', $this->getEndpoint());
     }
 
     public function supports(MessageInterface $message): bool
@@ -65,19 +72,28 @@ final class BlueskyTransport extends AbstractTransport
         $post = [
             '$type' => 'app.bsky.feed.post',
             'text' => $message->getSubject(),
-            'createdAt' => (new \DateTimeImmutable())->format('Y-m-d\\TH:i:s.u\\Z'),
+            'createdAt' => $this->clock->now()->format('Y-m-d\\TH:i:s.u\\Z'),
         ];
         if ([] !== $facets = $this->parseFacets($post['text'])) {
             $post['facets'] = $facets;
         }
 
-        $response = $this->client->request('POST', sprintf('https://%s/xrpc/com.atproto.repo.createRecord', $this->getEndpoint()), [
+        $options = $message->getOptions()?->toArray() ?? [];
+        $options['repo'] = $this->authSession['did'] ?? null;
+        $options['collection'] = 'app.bsky.feed.post';
+        $options['record'] = $post;
+
+        if (isset($options['attach'])) {
+            $options['record']['embed'] = [
+                '$type' => 'app.bsky.embed.images',
+                'images' => $this->uploadMedia($options['attach']),
+            ];
+            unset($options['attach']);
+        }
+
+        $response = $this->client->request('POST', \sprintf('https://%s/xrpc/com.atproto.repo.createRecord', $this->getEndpoint()), [
             'auth_bearer' => $this->authSession['accessJwt'] ?? null,
-            'json' => [
-                'repo' => $this->authSession['did'] ?? null,
-                'collection' => 'app.bsky.feed.post',
-                'record' => $post,
-            ],
+            'json' => $options,
         ]);
 
         try {
@@ -103,12 +119,12 @@ final class BlueskyTransport extends AbstractTransport
         $title = $content['error'] ?? '';
         $errorDescription = $content['message'] ?? '';
 
-        throw new TransportException(sprintf('Unable to send message to Bluesky: Status code %d (%s) with message "%s".', $statusCode, $title, $errorDescription), $response);
+        throw new TransportException(\sprintf('Unable to send message to Bluesky: Status code %d (%s) with message "%s".', $statusCode, $title, $errorDescription), $response);
     }
 
     private function authenticate(): void
     {
-        $response = $this->client->request('POST', sprintf('https://%s/xrpc/com.atproto.server.createSession', $this->getEndpoint()), [
+        $response = $this->client->request('POST', \sprintf('https://%s/xrpc/com.atproto.server.createSession', $this->getEndpoint()), [
             'json' => [
                 'identifier' => $this->user,
                 'password' => $this->password,
@@ -140,7 +156,7 @@ final class BlueskyTransport extends AbstractTransport
         // regex based on: https://bluesky.com/specs/handle#handle-identifier-syntax
         $regex = '#[$|\W](@([a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)#';
         foreach ($this->getMatchAndPosition($text, $regex) as $match) {
-            $response = $this->client->request('GET', sprintf('https://%s/xrpc/com.atproto.identity.resolveHandle', $this->getEndpoint()), [
+            $response = $this->client->request('GET', \sprintf('https://%s/xrpc/com.atproto.identity.resolveHandle', $this->getEndpoint()), [
                 'query' => [
                     'handle' => ltrim($match['match'], '@'),
                 ],
@@ -221,5 +237,52 @@ final class BlueskyTransport extends AbstractTransport
         }
 
         return $output;
+    }
+
+    /**
+     * @param array<array{file: File, description: string}> $media
+     *
+     * @return array<array{alt: string, image: array{$type: string, ref: array{$link: string}, mimeType: string, size: int}}>
+     */
+    private function uploadMedia(array $media): array
+    {
+        $pool = [];
+
+        foreach ($media as ['file' => $file, 'description' => $description]) {
+            $pool[] = [
+                'description' => $description,
+                'response' => $this->client->request('POST', \sprintf('https://%s/xrpc/com.atproto.repo.uploadBlob', $this->getEndpoint()), [
+                    'auth_bearer' => $this->authSession['accessJwt'] ?? null,
+                    'headers' => [
+                        'Content-Type: '.$file->getContentType(),
+                    ],
+                    'body' => fopen($file->getPath(), 'r'),
+                ]),
+            ];
+        }
+
+        $embeds = [];
+
+        try {
+            foreach ($pool as $i => ['description' => $description, 'response' => $response]) {
+                unset($pool[$i]);
+                $result = $response->toArray(false);
+
+                if (300 <= $response->getStatusCode()) {
+                    throw new TransportException('Unable to embed medias.', $response);
+                }
+
+                $embeds[] = [
+                    'alt' => $description,
+                    'image' => $result['blob'],
+                ];
+            }
+        } finally {
+            foreach ($pool as ['response' => $response]) {
+                $response->cancel();
+            }
+        }
+
+        return $embeds;
     }
 }

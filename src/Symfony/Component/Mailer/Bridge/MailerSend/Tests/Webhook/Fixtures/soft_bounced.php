@@ -7,6 +7,6 @@ $wh->setRecipientEmail('test@example.com');
 $wh->setTags(["test-tag"]);
 $wh->setMetadata([]);
 $wh->setReason('Unknown reason');
-$wh->setDate(\DateTimeImmutable::createFromFormat('Y-m-d\TH:i:s.u\Z', '2024-01-01T12:00:00.000000Z'));
+$wh->setDate(\DateTimeImmutable::createFromFormat('Y-m-d\TH:i:s.uP', '2024-01-01T12:00:00.000000Z'));
 
 return $wh;

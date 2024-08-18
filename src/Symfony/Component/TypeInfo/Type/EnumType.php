@@ -18,6 +18,8 @@ namespace Symfony\Component\TypeInfo\Type;
  * @template T of class-string<\UnitEnum>
  *
  * @extends ObjectType<T>
+ *
+ * @experimental
  */
 class EnumType extends ObjectType
 {

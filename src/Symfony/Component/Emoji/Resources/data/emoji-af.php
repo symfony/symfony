@@ -1183,6 +1183,7 @@ return [
     '👩‍👧' => 'gesin: vrou en meisie',
     '😶‍🌫' => 'gesig in wolke',
     '😮‍💨' => 'gesig asem uit',
+    '🙂‍↔' => 'kop wat horisontaal skud',
     '🙂‍↕' => 'kop wat vertikaal skud',
     '😵‍💫' => 'gesig met spiraaloë',
     '❤‍🔥' => 'hart wat brand',

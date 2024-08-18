@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\VarExporter;
 
+use Symfony\Component\Serializer\Attribute\Ignore;
 use Symfony\Component\VarExporter\Internal\Hydrator;
 use Symfony\Component\VarExporter\Internal\LazyObjectRegistry as Registry;
 use Symfony\Component\VarExporter\Internal\LazyObjectState;
@@ -35,15 +36,24 @@ trait LazyGhostTrait
     {
         if (self::class !== $class = $instance ? $instance::class : static::class) {
             $skippedProperties["\0".self::class."\0lazyObjectState"] = true;
-        } elseif (\defined($class.'::LAZY_OBJECT_PROPERTY_SCOPES')) {
-            Hydrator::$propertyScopes[$class] ??= $class::LAZY_OBJECT_PROPERTY_SCOPES;
         }
 
-        $instance ??= (Registry::$classReflectors[$class] ??= new \ReflectionClass($class))->newInstanceWithoutConstructor();
-        Registry::$defaultProperties[$class] ??= (array) $instance;
+        if (!isset(Registry::$defaultProperties[$class])) {
+            Registry::$classReflectors[$class] ??= new \ReflectionClass($class);
+            $instance ??= Registry::$classReflectors[$class]->newInstanceWithoutConstructor();
+            Registry::$defaultProperties[$class] ??= (array) $instance;
+            Registry::$classResetters[$class] ??= Registry::getClassResetters($class);
+
+            if (self::class === $class && \defined($class.'::LAZY_OBJECT_PROPERTY_SCOPES')) {
+                Hydrator::$propertyScopes[$class] ??= $class::LAZY_OBJECT_PROPERTY_SCOPES;
+            }
+        } else {
+            $instance ??= Registry::$classReflectors[$class]->newInstanceWithoutConstructor();
+        }
+
         $instance->lazyObjectState = new LazyObjectState($initializer, $skippedProperties ??= []);
 
-        foreach (Registry::$classResetters[$class] ??= Registry::getClassResetters($class) as $reset) {
+        foreach (Registry::$classResetters[$class] as $reset) {
             $reset($instance, $skippedProperties);
         }
 
@@ -55,6 +65,7 @@ trait LazyGhostTrait
      *
      * @param $partial Whether partially initialized objects should be considered as initialized
      */
+    #[Ignore]
     public function isLazyObjectInitialized(bool $partial = false): bool
     {
         if (!$state = $this->lazyObjectState ?? null) {
@@ -132,7 +143,7 @@ trait LazyGhostTrait
 
         if (null === $class) {
             $frame = debug_backtrace(\DEBUG_BACKTRACE_IGNORE_ARGS, 1)[0];
-            trigger_error(sprintf('Undefined property: %s::$%s in %s on line %s', $this::class, $name, $frame['file'], $frame['line']), \E_USER_NOTICE);
+            trigger_error(\sprintf('Undefined property: %s::$%s in %s on line %s', $this::class, $name, $frame['file'], $frame['line']), \E_USER_NOTICE);
         }
 
         get_in_scope:
@@ -309,7 +320,7 @@ trait LazyGhostTrait
             $value = $properties[$k = $name] ?? $properties[$k = "\0*\0$name"] ?? $properties[$k = "\0$class\0$name"] ?? $properties[$k = "\0$scope\0$name"] ?? $k = null;
 
             if (null === $k) {
-                trigger_error(sprintf('serialize(): "%s" returned as member variable from __sleep() but does not exist', $name), \E_USER_NOTICE);
+                trigger_error(\sprintf('serialize(): "%s" returned as member variable from __sleep() but does not exist', $name), \E_USER_NOTICE);
             } else {
                 $data[$k] = $value;
             }
@@ -331,6 +342,7 @@ trait LazyGhostTrait
         }
     }
 
+    #[Ignore]
     private function setLazyObjectAsInitialized(bool $initialized): void
     {
         if ($state = $this->lazyObjectState ?? null) {

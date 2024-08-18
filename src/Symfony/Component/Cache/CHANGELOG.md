@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+7.2
+---
+
+ * `igbinary_serialize()` is not used by default when the igbinary extension is installed
+ * Add optional `Psr\Clock\ClockInterface` parameter to `ArrayAdapter`
+
 7.1
 ---
 
@@ -8,6 +14,7 @@ CHANGELOG
  * Deprecate `CouchbaseBucketAdapter`, use `CouchbaseCollectionAdapter`
  * Add support for URL encoded characters in Couchbase DSN
  * Add support for using DSN with PDOAdapter
+ * The algorithm for the default cache namespace changed from SHA256 to XXH128
 
 7.0
 ---

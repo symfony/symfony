@@ -1183,6 +1183,7 @@ return [
     '👩‍👧' => 'rodina: žena, dievča',
     '😶‍🌫' => 'tvár v oblakoch',
     '😮‍💨' => 'vydychujúca tvár',
+    '🙂‍↔' => 'hlava krútiaca sa zo strany na stranu',
     '🙂‍↕' => 'prikyvujúca hlava',
     '😵‍💫' => 'tvár so špirálovými očami',
     '❤‍🔥' => 'horiace srdce',

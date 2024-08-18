@@ -1150,6 +1150,7 @@ return [
     '👩‍👧' => 'iyali: mace, yarinya',
     '😶‍🌫' => 'Fuska a sama',
     '😮‍💨' => 'numfashin fuska',
+    '🙂‍↔' => 'girgiza kai a kwance',
     '🙂‍↕' => 'Girgiza kai a tsaye',
     '😵‍💫' => 'fuska da ido karkatace',
     '❤‍🔥' => 'zuciya na wuna',

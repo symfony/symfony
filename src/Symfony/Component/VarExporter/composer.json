@@ -19,6 +19,8 @@
         "php": ">=8.2"
     },
     "require-dev": {
+        "symfony/property-access": "^6.4|^7.0",
+        "symfony/serializer": "^6.4|^7.0",
         "symfony/var-dumper": "^6.4|^7.0"
     },
     "autoload": {

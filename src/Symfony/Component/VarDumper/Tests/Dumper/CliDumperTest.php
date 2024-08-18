@@ -90,7 +90,7 @@ array:25 [
     +foo: ""…3
     +"bar": "bar"
   }
-  "closure" => Closure(\$a, PDO &\$b = null) {#%d
+  "closure" => Closure(\$a, ?PDO &\$b = null) {#%d
     class: "Symfony\Component\VarDumper\Tests\Dumper\CliDumperTest"
     this: Symfony\Component\VarDumper\Tests\Dumper\CliDumperTest {#%d …}
     file: "%s%eTests%eFixtures%edumb-var.php"
@@ -503,7 +503,7 @@ EOTXT
     public function testFileLinkFormat()
     {
         if (!class_exists(FileLinkFormatter::class)) {
-            $this->markTestSkipped(sprintf('Class "%s" is required to run this test.', FileLinkFormatter::class));
+            $this->markTestSkipped(\sprintf('Class "%s" is required to run this test.', FileLinkFormatter::class));
         }
 
         $data = new Data([

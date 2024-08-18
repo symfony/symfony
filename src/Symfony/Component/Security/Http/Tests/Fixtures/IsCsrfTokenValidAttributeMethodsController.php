@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Security\Http\Tests\Fixtures;
 
+use Symfony\Component\ExpressionLanguage\Expression;
 use Symfony\Component\Security\Http\Attribute\IsCsrfTokenValid;
 
 class IsCsrfTokenValidAttributeMethodsController
@@ -21,6 +22,16 @@ class IsCsrfTokenValidAttributeMethodsController
 
     #[IsCsrfTokenValid('foo')]
     public function withDefaultTokenKey()
+    {
+    }
+
+    #[IsCsrfTokenValid(new Expression('"foo_" ~ args.id'))]
+    public function withCustomExpressionId(string $id)
+    {
+    }
+
+    #[IsCsrfTokenValid(new Expression('"foo_" ~ args.slug'))]
+    public function withInvalidExpressionId(string $id)
     {
     }
 

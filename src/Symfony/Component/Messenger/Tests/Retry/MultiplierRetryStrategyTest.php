@@ -60,6 +60,14 @@ class MultiplierRetryStrategyTest extends TestCase
         $this->assertSame($expectedDelay, $strategy->getWaitingTime($envelope));
     }
 
+    public function testGetWaitTimeWithOverflowingDelay()
+    {
+        $strategy = new MultiplierRetryStrategy(512, \PHP_INT_MAX, 2, 0, 1);
+        $envelope = new Envelope(new \stdClass(), [new RedeliveryStamp(10)]);
+
+        $this->assertSame(\PHP_INT_MAX, $strategy->getWaitingTime($envelope));
+    }
+
     public static function getWaitTimeTests(): iterable
     {
         // delay, multiplier, maxDelay, retries, expectedDelay

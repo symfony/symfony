@@ -26,13 +26,12 @@ class DefaultsConfigurator extends AbstractServiceConfigurator
 
     public const FACTORY = 'defaults';
 
-    private ?string $path;
-
-    public function __construct(ServicesConfigurator $parent, Definition $definition, ?string $path = null)
-    {
+    public function __construct(
+        ServicesConfigurator $parent,
+        Definition $definition,
+        private ?string $path = null,
+    ) {
         parent::__construct($parent, $definition, null, []);
-
-        $this->path = $path;
     }
 
     /**
@@ -70,7 +69,7 @@ class DefaultsConfigurator extends AbstractServiceConfigurator
                 $this->validateAttributes($tag, $value, [...$path, $name]);
             } elseif (!\is_scalar($value ?? '')) {
                 $name = implode('.', [...$path, $name]);
-                throw new InvalidArgumentException(sprintf('Tag "%s", attribute "%s" in "_defaults" must be of a scalar-type or an array of scalar-type.', $tag, $name));
+                throw new InvalidArgumentException(\sprintf('Tag "%s", attribute "%s" in "_defaults" must be of a scalar-type or an array of scalar-type.', $tag, $name));
             }
         }
     }

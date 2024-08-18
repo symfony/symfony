@@ -40,7 +40,7 @@ class ContextTest extends TestCase
     public function testInvalidGroupOption()
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage(sprintf('Parameter "groups" given to "%s" must be a string or an array of strings, "stdClass" given', Context::class));
+        $this->expectExceptionMessage(\sprintf('Parameter "groups" given to "%s" must be a string or an array of strings, "stdClass" given', Context::class));
 
         new Context(context: ['foo' => 'bar'], groups: ['fine', new \stdClass()]);
     }
@@ -133,7 +133,7 @@ Symfony\Component\Serializer\Attribute\Context {
 DUMP
         ];
 
-        yield 'named arguemnts: with groups option as array' => [
+        yield 'named arguments: with groups option as array' => [
             fn () => new Context(context: ['foo' => 'bar'], groups: ['a', 'b']),
             <<<DUMP
 Symfony\Component\Serializer\Attribute\Context {

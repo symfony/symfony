@@ -64,11 +64,11 @@
             </trans-unit>
             <trans-unit id="16">
                 <source>The file is too large ({{ size }} {{ suffix }}). Allowed maximum size is {{ limit }} {{ suffix }}.</source>
-                <target>Het bestand is te groot ({{ size }} {{ suffix }}). Toegestane maximum grootte is {{ limit }} {{ suffix }}.</target>
+                <target>Het bestand is te groot ({{ size }} {{ suffix }}). De maximale grootte is {{ limit }} {{ suffix }}.</target>
             </trans-unit>
             <trans-unit id="17">
                 <source>The mime type of the file is invalid ({{ type }}). Allowed mime types are {{ types }}.</source>
-                <target>Het mime type van het bestand is ongeldig ({{ type }}). Toegestane mime types zijn {{ types }}.</target>
+                <target>Het mediatype van het bestand is ongeldig ({{ type }}). De toegestane mediatypes zijn {{ types }}.</target>
             </trans-unit>
             <trans-unit id="18">
                 <source>This value should be {{ limit }} or less.</source>
@@ -116,7 +116,7 @@
             </trans-unit>
             <trans-unit id="32">
                 <source>The file is too large. Allowed maximum size is {{ limit }} {{ suffix }}.</source>
-                <target>Het bestand is te groot. Toegestane maximum grootte is {{ limit }} {{ suffix }}.</target>
+                <target>Het bestand is te groot. De maximale grootte is {{ limit }} {{ suffix }}.</target>
             </trans-unit>
             <trans-unit id="33">
                 <source>The file is too large.</source>
@@ -144,7 +144,7 @@
             </trans-unit>
             <trans-unit id="39">
                 <source>This value is not a valid locale.</source>
-                <target>Deze waarde is geen geldige locale.</target>
+                <target>Deze waarde is geen geldige landinstelling.</target>
             </trans-unit>
             <trans-unit id="40">
                 <source>This value is not a valid country.</source>
@@ -160,7 +160,7 @@
             </trans-unit>
             <trans-unit id="43">
                 <source>The image width is too big ({{ width }}px). Allowed maximum width is {{ max_width }}px.</source>
-                <target>De afbeelding is te breed ({{ width }}px). De maximaal toegestane breedte is {{ max_width }}px.</target>
+                <target>De afbeelding is te breed ({{ width }}px). De maximaal breedte is {{ max_width }}px.</target>
             </trans-unit>
             <trans-unit id="44">
                 <source>The image width is too small ({{ width }}px). Minimum width expected is {{ min_width }}px.</source>
@@ -168,7 +168,7 @@
             </trans-unit>
             <trans-unit id="45">
                 <source>The image height is too big ({{ height }}px). Allowed maximum height is {{ max_height }}px.</source>
-                <target>De afbeelding is te hoog ({{ height }}px). De maximaal toegestane hoogte is {{ max_height }}px.</target>
+                <target>De afbeelding is te hoog ({{ height }}px). De maximaal hoogte is {{ max_height }}px.</target>
             </trans-unit>
             <trans-unit id="46">
                 <source>The image height is too small ({{ height }}px). Minimum height expected is {{ min_height }}px.</source>
@@ -280,11 +280,11 @@
             </trans-unit>
             <trans-unit id="73">
                 <source>The image ratio is too big ({{ ratio }}). Allowed maximum ratio is {{ max_ratio }}.</source>
-                <target>De afbeeldingsverhouding is te groot ({{ ratio }}). Maximale verhouding is {{ max_ratio }}.</target>
+                <target>De afbeeldingsverhouding is te groot ({{ ratio }}). De maximale verhouding is {{ max_ratio }}.</target>
             </trans-unit>
             <trans-unit id="74">
                 <source>The image ratio is too small ({{ ratio }}). Minimum ratio expected is {{ min_ratio }}.</source>
-                <target>De afbeeldingsverhouding is te klein ({{ ratio }}). Minimale verhouding is {{ min_ratio }}.</target>
+                <target>De afbeeldingsverhouding is te klein ({{ ratio }}). De minimale verhouding is {{ min_ratio }}.</target>
             </trans-unit>
             <trans-unit id="75">
                 <source>The image is square ({{ width }}x{{ height }}px). Square images are not allowed.</source>
@@ -324,7 +324,7 @@
             </trans-unit>
             <trans-unit id="84">
                 <source>This value should be a multiple of {{ compared_value }}.</source>
-                <target>Deze waarde zou een meervoud van {{ compared_value }} moeten zijn.</target>
+                <target>Deze waarde moet een meervoud van {{ compared_value }} zijn.</target>
             </trans-unit>
             <trans-unit id="85">
                 <source>This Business Identifier Code (BIC) is not associated with IBAN {{ iban }}.</source>
@@ -336,7 +336,7 @@
             </trans-unit>
             <trans-unit id="87">
                 <source>This collection should contain only unique elements.</source>
-                <target>Deze collectie moet alleen unieke elementen bevatten.</target>
+                <target>Deze collectie mag alleen unieke elementen bevatten.</target>
             </trans-unit>
             <trans-unit id="88">
                 <source>This value should be positive.</source>
@@ -396,7 +396,7 @@
             </trans-unit>
             <trans-unit id="102">
                 <source>This value is not a valid CIDR notation.</source>
-                <target>Deze waarde is geen geldige CIDR notatie.</target>
+                <target>Deze waarde is geen geldige CIDR-notatie.</target>
             </trans-unit>
             <trans-unit id="103">
                 <source>The value of the netmask should be between {{ min }} and {{ max }}.</source>
@@ -404,11 +404,11 @@
             </trans-unit>
             <trans-unit id="104">
                 <source>The filename is too long. It should have {{ filename_max_length }} character or less.|The filename is too long. It should have {{ filename_max_length }} characters or less.</source>
-                <target>De bestandsnaam is te lang. Het moet {{ filename_max_length }} karakter of minder zijn.</target>
+                <target>De bestandsnaam is te lang. Het moet {{ filename_max_length }} karakter of minder zijn.|De bestandsnaam is te lang. Het moet {{ filename_max_length }} karakters of minder zijn.</target>
             </trans-unit>
             <trans-unit id="105">
                 <source>The password strength is too low. Please use a stronger password.</source>
-                <target>De wachtwoordsterkte is te laag. Gebruik alstublieft een sterker wachtwoord.</target>
+                <target>Het wachtwoord is niet sterk genoeg. Probeer een sterker wachtwoord.</target>
             </trans-unit>
             <trans-unit id="106">
                 <source>This value contains characters that are not allowed by the current restriction-level.</source>
@@ -428,15 +428,43 @@
             </trans-unit>
             <trans-unit id="110">
                 <source>The extension of the file is invalid ({{ extension }}). Allowed extensions are {{ extensions }}.</source>
-                <target>De extensie van het bestand is ongeldig ({{ extension }}). Toegestane extensies zijn {{ extensions }}.</target>
+                <target>De bestandsextensie is ongeldig ({{ extension }}). De toegestane extensies zijn {{ extensions }}.</target>
             </trans-unit>
             <trans-unit id="111">
                 <source>The detected character encoding is invalid ({{ detected }}). Allowed encodings are {{ encodings }}.</source>
-                <target>De gedetecteerde karaktercodering is ongeldig ({{ detected }}). Toegestane coderingen zijn {{ encodings }}.</target>
+                <target>De gedetecteerde karaktercodering is ongeldig ({{ detected }}). De toegestane coderingen zijn {{ encodings }}.</target>
             </trans-unit>
             <trans-unit id="112">
                 <source>This value is not a valid MAC address.</source>
                 <target>Deze waarde is geen geldig MAC-adres.</target>
+            </trans-unit>
+            <trans-unit id="113">
+                <source>This URL is missing a top-level domain.</source>
+                <target>Deze URL mist een top-level domein.</target>
+            </trans-unit>
+            <trans-unit id="114">
+                <source>This value is too short. It should contain at least one word.|This value is too short. It should contain at least {{ min }} words.</source>
+                <target>Deze waarde is te kort. Het moet ten minste één woord bevatten.|Deze waarde is te kort. Het moet ten minste {{ min }} woorden bevatten.</target>
+            </trans-unit>
+            <trans-unit id="115">
+                <source>This value is too long. It should contain one word.|This value is too long. It should contain {{ max }} words or less.</source>
+                <target>Deze waarde is te lang. Het moet één woord zijn.|Deze waarde is te lang. Het mag maximaal {{ max }} woorden bevatten.</target>
+            </trans-unit>
+            <trans-unit id="116">
+                <source>This value does not represent a valid week in the ISO 8601 format.</source>
+                <target state="needs-translation">This value does not represent a valid week in the ISO 8601 format.</target>
+            </trans-unit>
+            <trans-unit id="117">
+                <source>This value is not a valid week.</source>
+                <target state="needs-translation">This value is not a valid week.</target>
+            </trans-unit>
+            <trans-unit id="118">
+                <source>This value should not be before week "{{ min }}".</source>
+                <target state="needs-translation">This value should not be before week "{{ min }}".</target>
+            </trans-unit>
+            <trans-unit id="119">
+                <source>This value should not be after week "{{ max }}".</source>
+                <target state="needs-translation">This value should not be after week "{{ max }}".</target>
             </trans-unit>
         </body>
     </file>

@@ -36,16 +36,13 @@ class MainConfiguration implements ConfigurationInterface
     /** @internal */
     public const STRATEGY_PRIORITY = 'priority';
 
-    private array $factories;
-    private array $userProviderFactories;
-
     /**
      * @param array<AuthenticatorFactoryInterface> $factories
      */
-    public function __construct(array $factories, array $userProviderFactories)
-    {
-        $this->factories = $factories;
-        $this->userProviderFactories = $userProviderFactories;
+    public function __construct(
+        private array $factories,
+        private array $userProviderFactories,
+    ) {
     }
 
     /**
@@ -193,7 +190,7 @@ class MainConfiguration implements ConfigurationInterface
             ->scalarNode('pattern')
                 ->beforeNormalization()
                     ->ifArray()
-                    ->then(fn ($v) => sprintf('(?:%s)', implode('|', $v)))
+                    ->then(fn ($v) => \sprintf('(?:%s)', implode('|', $v)))
                 ->end()
             ->end()
             ->scalarNode('host')->end()
@@ -211,7 +208,7 @@ class MainConfiguration implements ConfigurationInterface
             ->scalarNode('access_denied_url')->end()
             ->scalarNode('access_denied_handler')->end()
             ->scalarNode('entry_point')
-                ->info(sprintf('An enabled authenticator name or a service id that implements "%s"', AuthenticationEntryPointInterface::class))
+                ->info(\sprintf('An enabled authenticator name or a service id that implements "%s"', AuthenticationEntryPointInterface::class))
             ->end()
             ->scalarNode('provider')->end()
             ->booleanNode('stateless')->defaultFalse()->end()
@@ -297,7 +294,7 @@ class MainConfiguration implements ConfigurationInterface
                                 }
                             }
 
-                            throw new InvalidConfigurationException(sprintf('Undefined security Badge class "%s" set in "security.firewall.required_badges".', $requiredBadge));
+                            throw new InvalidConfigurationException(\sprintf('Undefined security Badge class "%s" set in "security.firewall.required_badges".', $requiredBadge));
                         }, $requiredBadges);
                     })
                 ->end()
@@ -331,7 +328,7 @@ class MainConfiguration implements ConfigurationInterface
                         }
 
                         if (str_contains($firewall[$k]['check_path'], '/') && !preg_match('#'.$firewall['pattern'].'#', $firewall[$k]['check_path'])) {
-                            throw new \LogicException(sprintf('The check_path "%s" for login method "%s" is not matched by the firewall pattern "%s".', $firewall[$k]['check_path'], $k, $firewall['pattern']));
+                            throw new \LogicException(\sprintf('The check_path "%s" for login method "%s" is not matched by the firewall pattern "%s".', $firewall[$k]['check_path'], $k, $firewall['pattern']));
                         }
                     }
 

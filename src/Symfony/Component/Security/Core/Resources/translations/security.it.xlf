@@ -74,6 +74,10 @@
                 <source>Too many failed login attempts, please try again in %minutes% minute.</source>
                 <target>Troppi tentativi di login falliti, riprova tra %minutes% minuto.</target>
             </trans-unit>
+            <trans-unit id="20">
+                <source>Too many failed login attempts, please try again in %minutes% minutes.</source>
+                <target state="needs-review-translation">Troppi tentativi di accesso falliti, riprova tra %minutes% minuti.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

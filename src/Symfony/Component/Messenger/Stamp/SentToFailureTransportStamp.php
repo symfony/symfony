@@ -18,11 +18,9 @@ namespace Symfony\Component\Messenger\Stamp;
  */
 final class SentToFailureTransportStamp implements StampInterface
 {
-    private string $originalReceiverName;
-
-    public function __construct(string $originalReceiverName)
-    {
-        $this->originalReceiverName = $originalReceiverName;
+    public function __construct(
+        private string $originalReceiverName,
+    ) {
     }
 
     public function getOriginalReceiverName(): string

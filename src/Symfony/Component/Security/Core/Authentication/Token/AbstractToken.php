@@ -125,7 +125,7 @@ abstract class AbstractToken implements TokenInterface, \Serializable
     public function getAttribute(string $name): mixed
     {
         if (!\array_key_exists($name, $this->attributes)) {
-            throw new \InvalidArgumentException(sprintf('This token has no "%s" attribute.', $name));
+            throw new \InvalidArgumentException(\sprintf('This token has no "%s" attribute.', $name));
         }
 
         return $this->attributes[$name];
@@ -146,7 +146,7 @@ abstract class AbstractToken implements TokenInterface, \Serializable
             $roles[] = $role;
         }
 
-        return sprintf('%s(user="%s", roles="%s")', $class, $this->getUserIdentifier(), implode(', ', $roles));
+        return \sprintf('%s(user="%s", roles="%s")', $class, $this->getUserIdentifier(), implode(', ', $roles));
     }
 
     /**

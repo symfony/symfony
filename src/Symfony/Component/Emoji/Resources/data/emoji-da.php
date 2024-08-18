@@ -1180,6 +1180,7 @@ return [
     '👩‍👧' => 'familie: kvinde og pige',
     '😶‍🌫' => 'ansigt i sky',
     '😮‍💨' => 'udåndende ansigt',
+    '🙂‍↔' => 'ryster på hovedet vandret',
     '🙂‍↕' => 'ryster på hovedet lodret',
     '😵‍💫' => 'ansigt med spiraløjne',
     '❤‍🔥' => 'brændende hjerte',

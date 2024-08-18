@@ -12,7 +12,6 @@
 namespace Symfony\Component\TypeInfo\Tests\TypeResolver;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\TypeInfo\Exception\UnsupportedException;
 use Symfony\Component\TypeInfo\Tests\Fixtures\Dummy;
 use Symfony\Component\TypeInfo\Type;
@@ -38,7 +37,7 @@ class TypeResolverTest extends TestCase
         $this->expectException(UnsupportedException::class);
         $this->expectExceptionMessage('Cannot find any resolver for "int" type.');
 
-        $resolver = new TypeResolver(new ServiceLocator([]));
+        $resolver = TypeResolver::create([]);
         $resolver->resolve(1);
     }
 
@@ -59,13 +58,13 @@ class TypeResolverTest extends TestCase
         $reflectionReturnTypeResolver = $this->createMock(TypeResolverInterface::class);
         $reflectionReturnTypeResolver->method('resolve')->willReturn(Type::template('REFLECTION_RETURN_TYPE'));
 
-        $resolver = new TypeResolver(new ServiceLocator([
-            'string' => fn () => $stringResolver,
-            \ReflectionType::class => fn () => $reflectionTypeResolver,
-            \ReflectionParameter::class => fn () => $reflectionParameterResolver,
-            \ReflectionProperty::class => fn () => $reflectionPropertyResolver,
-            \ReflectionFunctionAbstract::class => fn () => $reflectionReturnTypeResolver,
-        ]));
+        $resolver = TypeResolver::create([
+            'string' => $stringResolver,
+            \ReflectionType::class => $reflectionTypeResolver,
+            \ReflectionParameter::class => $reflectionParameterResolver,
+            \ReflectionProperty::class => $reflectionPropertyResolver,
+            \ReflectionFunctionAbstract::class => $reflectionReturnTypeResolver,
+        ]);
 
         $this->assertEquals(Type::template('STRING'), $resolver->resolve('foo'));
         $this->assertEquals(

@@ -45,7 +45,6 @@ final class UnsupportedSchemeExceptionTest extends TestCase
             Bridge\FortySixElks\FortySixElksTransportFactory::class => false,
             Bridge\FreeMobile\FreeMobileTransportFactory::class => false,
             Bridge\GatewayApi\GatewayApiTransportFactory::class => false,
-            Bridge\Gitter\GitterTransportFactory::class => false,
             Bridge\GoIp\GoIpTransportFactory::class => false,
             Bridge\GoogleChat\GoogleChatTransportFactory::class => false,
             Bridge\Infobip\InfobipTransportFactory::class => false,
@@ -55,6 +54,7 @@ final class UnsupportedSchemeExceptionTest extends TestCase
             Bridge\LightSms\LightSmsTransportFactory::class => false,
             Bridge\LineNotify\LineNotifyTransportFactory::class => false,
             Bridge\LinkedIn\LinkedInTransportFactory::class => false,
+            Bridge\Lox24\Lox24TransportFactory::class => false,
             Bridge\Mailjet\MailjetTransportFactory::class => false,
             Bridge\Mastodon\MastodonTransportFactory::class => false,
             Bridge\Mattermost\MattermostTransportFactory::class => false,
@@ -71,6 +71,7 @@ final class UnsupportedSchemeExceptionTest extends TestCase
             Bridge\OvhCloud\OvhCloudTransportFactory::class => false,
             Bridge\PagerDuty\PagerDutyTransportFactory::class => false,
             Bridge\Plivo\PlivoTransportFactory::class => false,
+            Bridge\Primotexto\PrimotextoTransportFactory::class => false,
             Bridge\Pushover\PushoverTransportFactory::class => false,
             Bridge\Pushy\PushyTransportFactory::class => false,
             Bridge\Redlink\RedlinkTransportFactory::class => false,
@@ -78,6 +79,7 @@ final class UnsupportedSchemeExceptionTest extends TestCase
             Bridge\RocketChat\RocketChatTransportFactory::class => false,
             Bridge\Sendberry\SendberryTransportFactory::class => false,
             Bridge\Sevenio\SevenIoTransportFactory::class => false,
+            Bridge\Sipgate\SipgateTransportFactory::class => false,
             Bridge\SimpleTextin\SimpleTextinTransportFactory::class => false,
             Bridge\Sinch\SinchTransportFactory::class => false,
             Bridge\Slack\SlackTransportFactory::class => false,
@@ -110,10 +112,10 @@ final class UnsupportedSchemeExceptionTest extends TestCase
      */
     public function testMessageWhereSchemeIsPartOfSchemeToPackageMap(string $scheme, string $package)
     {
-        $dsn = new Dsn(sprintf('%s://localhost', $scheme));
+        $dsn = new Dsn(\sprintf('%s://localhost', $scheme));
 
         $this->assertSame(
-            sprintf('Unable to send notification via "%s" as the bridge is not installed. Try running "composer require %s".', $scheme, $package),
+            \sprintf('Unable to send notification via "%s" as the bridge is not installed. Try running "composer require %s".', $scheme, $package),
             (new UnsupportedSchemeException($dsn))->getMessage()
         );
     }
@@ -125,24 +127,29 @@ final class UnsupportedSchemeExceptionTest extends TestCase
         yield ['bandwidth', 'symfony/bandwidth-notifier'];
         yield ['bluesky', 'symfony/bluesky-notifier'];
         yield ['brevo', 'symfony/brevo-notifier'];
+        yield ['chatwork', 'symfony/chatwork-notifier'];
         yield ['clickatell', 'symfony/clickatell-notifier'];
         yield ['clicksend', 'symfony/click-send-notifier'];
         yield ['contact-everyone', 'symfony/contact-everyone-notifier'];
         yield ['discord', 'symfony/discord-notifier'];
+        yield ['engagespot', 'symfony/engagespot-notifier'];
         yield ['esendex', 'symfony/esendex-notifier'];
+        yield ['expo', 'symfony/expo-notifier'];
         yield ['fakechat', 'symfony/fake-chat-notifier'];
         yield ['fakesms', 'symfony/fake-sms-notifier'];
         yield ['firebase', 'symfony/firebase-notifier'];
+        yield ['forty-six-elks', 'symfony/forty-six-elks-notifier'];
         yield ['freemobile', 'symfony/free-mobile-notifier'];
         yield ['gatewayapi', 'symfony/gateway-api-notifier'];
-        yield ['gitter', 'symfony/gitter-notifier'];
         yield ['googlechat', 'symfony/google-chat-notifier'];
         yield ['infobip', 'symfony/infobip-notifier'];
         yield ['iqsms', 'symfony/iqsms-notifier'];
         yield ['isendpro', 'symfony/isendpro-notifier'];
+        yield ['kaz-info-teh', 'symfony/kaz-info-teh-notifier'];
         yield ['lightsms', 'symfony/light-sms-notifier'];
         yield ['linenotify', 'symfony/line-notify-notifier'];
         yield ['linkedin', 'symfony/linked-in-notifier'];
+        yield ['lox24', 'symfony/lox24-notifier'];
         yield ['mailjet', 'symfony/mailjet-notifier'];
         yield ['mastodon', 'symfony/mastodon-notifier'];
         yield ['mattermost', 'symfony/mattermost-notifier'];
@@ -155,13 +162,18 @@ final class UnsupportedSchemeExceptionTest extends TestCase
         yield ['ntfy', 'symfony/ntfy-notifier'];
         yield ['octopush', 'symfony/octopush-notifier'];
         yield ['onesignal', 'symfony/one-signal-notifier'];
+        yield ['orange-sms', 'symfony/orange-sms-notifier'];
         yield ['ovhcloud', 'symfony/ovh-cloud-notifier'];
+        yield ['pagerduty', 'symfony/pager-duty-notifier'];
         yield ['plivo', 'symfony/plivo-notifier'];
+        yield ['primotexto', 'symfony/primotexto-notifier'];
+        yield ['pushover', 'symfony/pushover-notifier'];
         yield ['redlink', 'symfony/redlink-notifier'];
         yield ['ringcentral', 'symfony/ring-central-notifier'];
         yield ['rocketchat', 'symfony/rocket-chat-notifier'];
         yield ['sendberry', 'symfony/sendberry-notifier'];
         yield ['sevenio', 'symfony/sevenio-notifier'];
+        yield ['sipgate', 'symfony/sipgate-notifier'];
         yield ['simpletextin', 'symfony/simple-textin-notifier'];
         yield ['sinch', 'symfony/sinch-notifier'];
         yield ['slack', 'symfony/slack-notifier'];
@@ -179,6 +191,8 @@ final class UnsupportedSchemeExceptionTest extends TestCase
         yield ['twilio', 'symfony/twilio-notifier'];
         yield ['twitter', 'symfony/twitter-notifier'];
         yield ['unifonic', 'symfony/unifonic-notifier'];
+        yield ['vonage', 'symfony/vonage-notifier'];
+        yield ['yunpian', 'symfony/yunpian-notifier'];
         yield ['zendesk', 'symfony/zendesk-notifier'];
         yield ['zulip', 'symfony/zulip-notifier'];
         yield ['goip', 'symfony/go-ip-notifier'];

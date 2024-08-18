@@ -38,7 +38,7 @@ trait CacheTrait
     private function doGet(CacheItemPoolInterface $pool, string $key, callable $callback, ?float $beta, ?array &$metadata = null, ?LoggerInterface $logger = null): mixed
     {
         if (0 > $beta ??= 1.0) {
-            throw new class(sprintf('Argument "$beta" provided to "%s::get()" must be a positive number, %f given.', static::class, $beta)) extends \InvalidArgumentException implements InvalidArgumentException {};
+            throw new class(\sprintf('Argument "$beta" provided to "%s::get()" must be a positive number, %f given.', static::class, $beta)) extends \InvalidArgumentException implements InvalidArgumentException {};
         }
 
         $item = $pool->getItem($key);
@@ -54,7 +54,7 @@ trait CacheTrait
                 $item->expiresAt(null);
                 $logger?->info('Item "{key}" elected for early recomputation {delta}s before its expiration', [
                     'key' => $key,
-                    'delta' => sprintf('%.1f', $expiry - $now),
+                    'delta' => \sprintf('%.1f', $expiry - $now),
                 ]);
             }
         }

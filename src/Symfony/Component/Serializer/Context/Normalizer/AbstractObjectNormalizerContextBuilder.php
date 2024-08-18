@@ -47,7 +47,7 @@ abstract class AbstractObjectNormalizerContextBuilder extends AbstractNormalizer
         preg_match_all('/(?<!%)(?:%{2})*%(?<specifier>[a-z])/', $depthKeyPattern, $matches);
 
         if (2 !== \count($matches['specifier']) || 's' !== $matches['specifier'][0] || 's' !== $matches['specifier'][1]) {
-            throw new InvalidArgumentException(sprintf('The depth key pattern "%s" is not valid. You must set exactly two string placeholders.', $depthKeyPattern));
+            throw new InvalidArgumentException(\sprintf('The depth key pattern "%s" is not valid. You must set exactly two string placeholders.', $depthKeyPattern));
         }
 
         return $this->with(AbstractObjectNormalizer::DEPTH_KEY_PATTERN, $depthKeyPattern);

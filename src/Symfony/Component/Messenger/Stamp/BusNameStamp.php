@@ -18,11 +18,9 @@ namespace Symfony\Component\Messenger\Stamp;
  */
 final class BusNameStamp implements StampInterface
 {
-    private string $busName;
-
-    public function __construct(string $busName)
-    {
-        $this->busName = $busName;
+    public function __construct(
+        private string $busName,
+    ) {
     }
 
     public function getBusName(): string

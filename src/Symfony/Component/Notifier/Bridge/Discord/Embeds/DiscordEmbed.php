@@ -28,7 +28,7 @@ final class DiscordEmbed extends AbstractDiscordEmbed
     public function title(string $title): static
     {
         if (\strlen($title) > self::TITLE_LIMIT) {
-            throw new LengthException(sprintf('Maximum length for the title is %d characters.', self::TITLE_LIMIT));
+            throw new LengthException(\sprintf('Maximum length for the title is %d characters.', self::TITLE_LIMIT));
         }
 
         $this->options['title'] = $title;
@@ -42,7 +42,7 @@ final class DiscordEmbed extends AbstractDiscordEmbed
     public function description(string $description): static
     {
         if (\strlen($description) > self::DESCRIPTION_LIMIT) {
-            throw new LengthException(sprintf('Maximum length for the description is %d characters.', self::DESCRIPTION_LIMIT));
+            throw new LengthException(\sprintf('Maximum length for the description is %d characters.', self::DESCRIPTION_LIMIT));
         }
 
         $this->options['description'] = $description;
@@ -126,7 +126,7 @@ final class DiscordEmbed extends AbstractDiscordEmbed
     public function addField(DiscordFieldEmbedObject $field): static
     {
         if (self::FIELDS_LIMIT === \count($this->options['fields'] ?? [])) {
-            throw new LengthException(sprintf('Maximum number of fields should not exceed %d.', self::FIELDS_LIMIT));
+            throw new LengthException(\sprintf('Maximum number of fields should not exceed %d.', self::FIELDS_LIMIT));
         }
 
         if (!isset($this->options['fields'])) {

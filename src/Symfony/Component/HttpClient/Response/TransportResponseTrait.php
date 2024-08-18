@@ -181,7 +181,7 @@ trait TransportResponseTrait
                         unset($responses[$j]);
                         continue;
                     } elseif ($elapsedTimeout >= $timeoutMax) {
-                        $multi->handlesActivity[$j] = [new ErrorChunk($response->offset, sprintf('Idle timeout reached for "%s".', $response->getInfo('url')))];
+                        $multi->handlesActivity[$j] = [new ErrorChunk($response->offset, \sprintf('Idle timeout reached for "%s".', $response->getInfo('url')))];
                         $multi->lastTimeout ??= $lastActivity;
                     } else {
                         continue;
@@ -193,12 +193,12 @@ trait TransportResponseTrait
 
                         if (\is_string($chunk = array_shift($multi->handlesActivity[$j]))) {
                             if (null !== $response->inflate && false === $chunk = @inflate_add($response->inflate, $chunk)) {
-                                $multi->handlesActivity[$j] = [null, new TransportException(sprintf('Error while processing content unencoding for "%s".', $response->getInfo('url')))];
+                                $multi->handlesActivity[$j] = [null, new TransportException(\sprintf('Error while processing content unencoding for "%s".', $response->getInfo('url')))];
                                 continue;
                             }
 
                             if ('' !== $chunk && null !== $response->content && \strlen($chunk) !== fwrite($response->content, $chunk)) {
-                                $multi->handlesActivity[$j] = [null, new TransportException(sprintf('Failed writing %d bytes to the response buffer.', \strlen($chunk)))];
+                                $multi->handlesActivity[$j] = [null, new TransportException(\sprintf('Failed writing %d bytes to the response buffer.', \strlen($chunk)))];
                                 continue;
                             }
 
@@ -231,7 +231,7 @@ trait TransportResponseTrait
                         } elseif ($chunk instanceof FirstChunk) {
                             if ($response->logger) {
                                 $info = $response->getInfo();
-                                $response->logger->info(sprintf('Response: "%s %s"', $info['http_code'], $info['url']));
+                                $response->logger->info(\sprintf('Response: "%s %s"', $info['http_code'], $info['url']));
                             }
 
                             $response->inflate = \extension_loaded('zlib') && $response->inflate && 'gzip' === ($response->headers['content-encoding'][0] ?? null) ? inflate_init(\ZLIB_ENCODING_GZIP) : null;

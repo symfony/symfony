@@ -45,7 +45,7 @@ final class CrowdinProviderFactory extends AbstractProviderFactory
         $endpoint = preg_replace('/(^|\.)default$/', '\1'.self::HOST, $dsn->getHost());
         $endpoint .= $dsn->getPort() ? ':'.$dsn->getPort() : '';
 
-        $client = ScopingHttpClient::forBaseUri($this->client, sprintf('https://%s/api/v2/projects/%d/', $endpoint, $this->getUser($dsn)), [
+        $client = ScopingHttpClient::forBaseUri($this->client, \sprintf('https://%s/api/v2/projects/%d/', $endpoint, $this->getUser($dsn)), [
             'auth_bearer' => $this->getPassword($dsn),
         ], preg_quote('https://'.$endpoint.'/api/v2/'));
 

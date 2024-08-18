@@ -34,10 +34,14 @@ class NativeSessionStorageTest extends TestCase
 {
     private string $savePath;
 
+    private $initialSessionSaveHandler;
+    private $initialSessionSavePath;
+
     protected function setUp(): void
     {
-        $this->iniSet('session.save_handler', 'files');
-        $this->iniSet('session.save_path', $this->savePath = sys_get_temp_dir().'/sftest');
+        $this->initialSessionSaveHandler = ini_set('session.save_handler', 'files');
+        $this->initialSessionSavePath = ini_set('session.save_path', $this->savePath = sys_get_temp_dir().'/sftest');
+
         if (!is_dir($this->savePath)) {
             mkdir($this->savePath);
         }
@@ -50,6 +54,9 @@ class NativeSessionStorageTest extends TestCase
         if (is_dir($this->savePath)) {
             @rmdir($this->savePath);
         }
+
+        ini_set('session.save_handler', $this->initialSessionSaveHandler);
+        ini_set('session.save_path', $this->initialSessionSavePath);
     }
 
     protected function getStorage(array $options = []): NativeSessionStorage
@@ -152,18 +159,26 @@ class NativeSessionStorageTest extends TestCase
 
     public function testDefaultSessionCacheLimiter()
     {
-        $this->iniSet('session.cache_limiter', 'nocache');
+        $initialLimiter = ini_set('session.cache_limiter', 'nocache');
 
-        new NativeSessionStorage();
-        $this->assertEquals('', \ini_get('session.cache_limiter'));
+        try {
+            new NativeSessionStorage();
+            $this->assertEquals('', \ini_get('session.cache_limiter'));
+        } finally {
+            ini_set('session.cache_limiter', $initialLimiter);
+        }
     }
 
     public function testExplicitSessionCacheLimiter()
     {
-        $this->iniSet('session.cache_limiter', 'nocache');
+        $initialLimiter = ini_set('session.cache_limiter', 'nocache');
 
-        new NativeSessionStorage(['cache_limiter' => 'public']);
-        $this->assertEquals('public', \ini_get('session.cache_limiter'));
+        try {
+            new NativeSessionStorage(['cache_limiter' => 'public']);
+            $this->assertEquals('public', \ini_get('session.cache_limiter'));
+        } finally {
+            ini_set('session.cache_limiter', $initialLimiter);
+        }
     }
 
     public function testCookieOptions()
@@ -203,18 +218,23 @@ class NativeSessionStorageTest extends TestCase
 
     public function testSetSaveHandler()
     {
-        $this->iniSet('session.save_handler', 'files');
-        $storage = $this->getStorage();
-        $storage->setSaveHandler(null);
-        $this->assertInstanceOf(SessionHandlerProxy::class, $storage->getSaveHandler());
-        $storage->setSaveHandler(new SessionHandlerProxy(new NativeFileSessionHandler()));
-        $this->assertInstanceOf(SessionHandlerProxy::class, $storage->getSaveHandler());
-        $storage->setSaveHandler(new NativeFileSessionHandler());
-        $this->assertInstanceOf(SessionHandlerProxy::class, $storage->getSaveHandler());
-        $storage->setSaveHandler(new SessionHandlerProxy(new NullSessionHandler()));
-        $this->assertInstanceOf(SessionHandlerProxy::class, $storage->getSaveHandler());
-        $storage->setSaveHandler(new NullSessionHandler());
-        $this->assertInstanceOf(SessionHandlerProxy::class, $storage->getSaveHandler());
+        $initialSaveHandler = ini_set('session.save_handler', 'files');
+
+        try {
+            $storage = $this->getStorage();
+            $storage->setSaveHandler(null);
+            $this->assertInstanceOf(SessionHandlerProxy::class, $storage->getSaveHandler());
+            $storage->setSaveHandler(new SessionHandlerProxy(new NativeFileSessionHandler()));
+            $this->assertInstanceOf(SessionHandlerProxy::class, $storage->getSaveHandler());
+            $storage->setSaveHandler(new NativeFileSessionHandler());
+            $this->assertInstanceOf(SessionHandlerProxy::class, $storage->getSaveHandler());
+            $storage->setSaveHandler(new SessionHandlerProxy(new NullSessionHandler()));
+            $this->assertInstanceOf(SessionHandlerProxy::class, $storage->getSaveHandler());
+            $storage->setSaveHandler(new NullSessionHandler());
+            $this->assertInstanceOf(SessionHandlerProxy::class, $storage->getSaveHandler());
+        } finally {
+            ini_set('session.save_handler', $initialSaveHandler);
+        }
     }
 
     public function testStarted()

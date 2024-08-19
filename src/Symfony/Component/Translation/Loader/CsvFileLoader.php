@@ -22,6 +22,9 @@ class CsvFileLoader extends FileLoader
 {
     private string $delimiter = ';';
     private string $enclosure = '"';
+    /**
+     * @deprecated since Symfony 7.2, to be removed in 8.0
+     */
     private string $escape = '';
 
     protected function loadResource(string $resource): array
@@ -57,6 +60,10 @@ class CsvFileLoader extends FileLoader
     {
         $this->delimiter = $delimiter;
         $this->enclosure = $enclosure;
+        if ('' !== $escape) {
+            trigger_deprecation('symfony/translation', '7.2', 'The "escape" parameter of the "%s" method is deprecated. It will be removed in 8.0.', __METHOD__);
+        }
+
         $this->escape = $escape;
     }
 }

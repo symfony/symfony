@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+7.2
+---
+
+ * Deprecate the `csv_escape_char` context option of `CsvEncoder` and the `CsvEncoder::ESCAPE_CHAR_KEY` constant
+ * Deprecate `CsvEncoderContextBuilder::withEscapeChar()` method
+
 7.1
 ---
 

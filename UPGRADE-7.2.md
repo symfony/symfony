@@ -42,6 +42,12 @@ Security
  * Deprecate passing an empty string as `$userIdentifier` argument to `UserBadge` constructor
  * Deprecate returning an empty string in `UserInterface::getUserIdentifier()`
 
+Serializer
+----------
+
+ * Deprecate the `csv_escape_char` context option of `CsvEncoder` and the `CsvEncoder::ESCAPE_CHAR_KEY` constant
+ * Deprecate `CsvEncoderContextBuilder::withEscapeChar()` method
+
 String
 ------
 
@@ -49,6 +55,11 @@ String
    * `TruncateMode::Char` is equivalent to `true` value ;
    * `TruncateMode::WordAfter` is equivalent to `false` value ;
    * `TruncateMode::WordBefore` is a new mode that will cut the sentence on the last word before the limit is reached.
+
+Translation
+-----------
+
+ * Deprecate passing an escape character to `CsvFileLoader::setCsvControl()`
 
 Yaml
 ----

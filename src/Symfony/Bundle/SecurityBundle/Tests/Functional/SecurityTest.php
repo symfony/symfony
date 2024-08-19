@@ -47,6 +47,24 @@ class SecurityTest extends AbstractWebTestCase
         $this->assertSame('main', $firewallConfig->getName());
     }
 
+    public function testUserAuthorizationChecker()
+    {
+        $kernel = self::createKernel(['test_case' => 'SecurityHelper', 'root_config' => 'config.yml']);
+        $kernel->boot();
+        $container = $kernel->getContainer();
+
+        $loggedInUser = new InMemoryUser('foo', 'pass', ['ROLE_USER', 'ROLE_FOO']);
+        $offlineUser = new InMemoryUser('bar', 'pass', ['ROLE_USER', 'ROLE_BAR']);
+        $token = new UsernamePasswordToken($loggedInUser, 'provider', $loggedInUser->getRoles());
+        $container->get('functional.test.security.token_storage')->setToken($token);
+
+        $security = $container->get('functional_test.security.helper');
+        $this->assertTrue($security->isGranted('ROLE_FOO'));
+        $this->assertFalse($security->isGranted('ROLE_BAR'));
+        $this->assertTrue($security->userIsGranted($offlineUser, 'ROLE_BAR'));
+        $this->assertFalse($security->userIsGranted($offlineUser, 'ROLE_FOO'));
+    }
+
     /**
      * @dataProvider userWillBeMarkedAsChangedIfRolesHasChangedProvider
      */

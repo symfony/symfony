@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+7.2
+---
+
+ * Add support for amphp/http-client v5 on PHP 8.4+
+
 7.1
 ---
 

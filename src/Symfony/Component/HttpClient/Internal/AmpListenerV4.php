@@ -23,7 +23,7 @@ use Symfony\Component\HttpClient\Exception\TransportException;
  *
  * @internal
  */
-class AmpListener implements EventListener
+class AmpListenerV4 implements EventListener
 {
     private array $info;
 

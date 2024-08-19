@@ -40,8 +40,13 @@ class MapRequestPayload extends ValueResolver
         public readonly string|GroupSequence|array|null $validationGroups = null,
         string $resolver = RequestPayloadValueResolver::class,
         public readonly int $validationFailedStatusCode = Response::HTTP_UNPROCESSABLE_ENTITY,
+        /** @deprecated since Symfony 7.2 */
         public readonly ?string $type = null,
     ) {
+        if ($type) {
+            trigger_deprecation('symfony/http-kernel', '7.2', 'The "type" parameter of the #[MapRequestPayload] attribute is deprecated and will be removed in Symfony 8.0. Try running "composer require symfony/type-info phpstan/phpdoc-parser" to get automatic type detection instead.');
+        }
+
         parent::__construct($resolver);
     }
 }

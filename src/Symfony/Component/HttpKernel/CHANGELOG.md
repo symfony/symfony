@@ -5,6 +5,7 @@ CHANGELOG
 ---
 
  * Remove `@internal` flag and add `@final` to `ServicesResetter`
+ * Deprecate the `$type` parameter of `#[MapRequestPayload]`, use the TypeInfo component for automatic type detection instead
 
 7.1
 ---

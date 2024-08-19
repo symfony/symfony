@@ -83,6 +83,7 @@ class RequestPayloadValueResolver implements ValueResolverInterface, EventSubscr
             throw new \LogicException(\sprintf('Mapping variadic argument "$%s" is not supported.', $argument->getName()));
         }
 
+        // @deprecated since Symfony 7.2, remove the if statement in 8.0
         if ($attribute instanceof MapRequestPayload) {
             if ('array' === $argument->getType()) {
                 if (!$attribute->type) {
@@ -202,6 +203,8 @@ class RequestPayloadValueResolver implements ValueResolverInterface, EventSubscr
             throw new UnsupportedMediaTypeHttpException(\sprintf('Unsupported format, expects "%s", but "%s" given.', implode('", "', (array) $attribute->acceptFormat), $format));
         }
 
+        // @deprecated since Symfony 7.2. In 8.0, replace the whole if/else block by:
+        // $type = $argument->getType();
         if ('array' === $argument->getType() && null !== $attribute->type) {
             $type = $attribute->type.'[]';
         } else {

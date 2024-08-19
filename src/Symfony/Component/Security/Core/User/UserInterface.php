@@ -56,6 +56,8 @@ interface UserInterface
 
     /**
      * Returns the identifier for this user (e.g. username or email address).
+     *
+     * @return non-empty-string
      */
     public function getUserIdentifier(): string;
 }

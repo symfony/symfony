@@ -39,6 +39,8 @@ Security
 
  * Add `$token` argument to `UserCheckerInterface::checkPostAuth()`
  * Deprecate argument `$secret` of `RememberMeToken` and `RememberMeAuthenticator`
+ * Deprecate passing an empty string as `$userIdentifier` argument to `UserBadge` constructor
+ * Deprecate returning an empty string in `UserInterface::getUserIdentifier()`
 
 String
 ------

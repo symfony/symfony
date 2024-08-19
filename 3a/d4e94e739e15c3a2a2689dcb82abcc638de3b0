@@ -1,0 +1,15 @@
+---------------------------------------------------------------------------
+
+by eltharin at 2024-08-16T10:14:54Z
+
+I agree at 99% but don't you thinkk skipMissedRuns make people think that there is not more than one?
+
+What do you think to groupMissedRuns(bool) / shouldGroupMissedRuns(): bool
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2024-08-16T15:42:10Z
+
+processLastMissedRun / shouldProcessLastMissedRun
+
+?

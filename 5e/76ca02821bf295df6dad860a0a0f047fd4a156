@@ -1,0 +1,53 @@
+---------------------------------------------------------------------------
+
+by yceruto at 2024-06-28T12:55:34Z
+
+To help others understand the context of this PR, it would be great if you update the title as a new proposal, rather than focusing on it as an issue. Also, a good description is very appreciated, as it will help document the feature later on.
+
+---------------------------------------------------------------------------
+
+by yceruto at 2024-06-28T14:18:56Z
+
+I think what you have achieved here is a better error message when an empty query string or an empty request payload is sent, and the targeted parameter is not nullable and doesn’t have a default value. In this case, the Serializer denormalizes the empty input as an empty object instead of just returning null, thus triggering the validation with a detailed error message.​
+
+This is the critical code:
+```php
+class Controller
+{
+    public function __invoke(#[MapQueryString] FooDto $foo) {}
+}
+```
+Before -> Exception without message
+After -> Exception with detailed message
+
+---------------------------------------------------------------------------
+
+by unixslayer at 2024-06-28T15:55:32Z
+
+@yceruto your last comment made me realize I may not achieved what I was hoping for. I have to clear out test cases and get back to you next week.
+
+---------------------------------------------------------------------------
+
+by unixslayer at 2024-07-04T10:30:24Z
+
+Hi @yceruto, sorry for delay and possible confusion. I had to review test cases if they cover expected scenarios.
+
+---------------------------------------------------------------------------
+
+by unixslayer at 2024-07-04T20:02:12Z
+
+@yceruto how do you guys deal with random test fails (8.4) or tests that fails only with one pipeline (8.2, low-deps)?
+
+---------------------------------------------------------------------------
+
+by unixslayer at 2024-07-05T08:41:21Z
+
+@yceruto @GromNaN what about 8.4? Is that fail irrelevant for now?
+
+---------------------------------------------------------------------------
+
+by yceruto at 2024-07-05T18:21:37Z
+
+>@yceruto @GromNaN what about 8.4? Is that fail irrelevant for now?
+
+They are unrelated, so you can ignore them.

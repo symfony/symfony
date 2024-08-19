@@ -12,6 +12,7 @@
 namespace Symfony\Component\AssetMapper\ImportMap;
 
 use Symfony\Component\AssetMapper\Exception\RuntimeException;
+use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Filesystem\Path;
 use Symfony\Component\VarExporter\VarExporter;
 
@@ -23,11 +24,13 @@ use Symfony\Component\VarExporter\VarExporter;
 class ImportMapConfigReader
 {
     private ImportMapEntries $rootImportMapEntries;
+    private readonly Filesystem $filesystem;
 
     public function __construct(
         private readonly string $importMapConfigPath,
         private readonly RemotePackageStorage $remotePackageStorage,
     ) {
+        $this->filesystem = new Filesystem();
     }
 
     public function getEntries(): ImportMapEntries
@@ -101,7 +104,7 @@ class ImportMapConfigReader
         }
 
         $map = class_exists(VarExporter::class) ? VarExporter::export($importMapConfig) : var_export($importMapConfig, true);
-        file_put_contents($this->importMapConfigPath, <<<EOF
+        $this->filesystem->dumpFile($this->importMapConfigPath, <<<EOF
         <?php
 
         /**

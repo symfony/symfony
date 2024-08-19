@@ -12,6 +12,7 @@
 namespace Symfony\Component\AssetMapper\ImportMap;
 
 use Symfony\Component\AssetMapper\ImportMap\Resolver\PackageResolverInterface;
+use Symfony\Component\Filesystem\Filesystem;
 
 /**
  * @final
@@ -20,11 +21,14 @@ class RemotePackageDownloader
 {
     private array $installed;
 
+    private readonly Filesystem $filesystem;
+
     public function __construct(
         private readonly RemotePackageStorage $remotePackageStorage,
         private readonly ImportMapConfigReader $importMapConfigReader,
         private readonly PackageResolverInterface $packageResolver,
     ) {
+        $this->filesystem = new Filesystem();
     }
 
     /**
@@ -146,7 +150,10 @@ class RemotePackageDownloader
     private function saveInstalled(array $installed): void
     {
         $this->installed = $installed;
-        file_put_contents($this->remotePackageStorage->getStorageDir().'/installed.php', \sprintf('<?php return %s;', var_export($installed, true)));
+        $this->filesystem->dumpFile(
+            $this->remotePackageStorage->getStorageDir().'/installed.php',
+            '<?php return '.var_export($installed, true).';',
+        );
     }
 
     private function areAllExtraFilesDownloaded(ImportMapEntry $entry, array $extraFilenames): bool

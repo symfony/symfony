@@ -47,12 +47,12 @@ class BackedEnumValue extends Constraint
         parent::__construct([], $groups, $payload);
 
         if (!is_a($type, \BackedEnum::class, true)) {
-            throw new ConstraintDefinitionException(sprintf('The "type" must be a \BackedEnum, got "%s".', get_debug_type($type)));
+            throw new ConstraintDefinitionException(\sprintf('The "type" must be a \BackedEnum, got "%s".', get_debug_type($type)));
         }
 
         foreach ($except as $exceptValue) {
             if (!is_a($exceptValue, $type)) {
-                throw new ConstraintDefinitionException(sprintf('The "except" values must be cases of enum "%s", got "%s".', $type, get_debug_type($exceptValue)));
+                throw new ConstraintDefinitionException(\sprintf('The "except" values must be cases of enum "%s", got "%s".', $type, get_debug_type($exceptValue)));
             }
         }
     }

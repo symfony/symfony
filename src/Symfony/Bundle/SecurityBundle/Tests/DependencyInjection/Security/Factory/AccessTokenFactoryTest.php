@@ -113,7 +113,7 @@ class AccessTokenFactoryTest extends TestCase
         $factory = new AccessTokenFactory($this->createTokenHandlerFactories());
 
         $this->expectException(InvalidConfigurationException::class);
-        $this->expectExceptionMessage('The child config "keyset" under "access_token.token_handler.oidc" must be configured: JSON-encoded JWKSet used to sign the token (must contain a list of valid keys).');
+        $this->expectExceptionMessage('You must set either "discovery" or "key" or "keyset".');
 
         $this->processConfig($config, $factory);
     }
@@ -257,6 +257,58 @@ class AccessTokenFactoryTest extends TestCase
         $this->assertEquals($expected, $container->getDefinition('security.access_token_handler.firewall1')->getArguments());
     }
 
+    public function testOidcTokenHandlerConfigurationWithDiscovery()
+    {
+        $container = new ContainerBuilder();
+        $jwkset = '{"keys":[{"kty":"EC","crv":"P-256","x":"FtgMtrsKDboRO-Zo0XC7tDJTATHVmwuf9GK409kkars","y":"rWDE0ERU2SfwGYCo1DWWdgFEbZ0MiAXLRBBOzBgs_jY","d":"4G7bRIiKih0qrFxc0dtvkHUll19tTyctoCR3eIbOrO0"},{"kty":"EC","crv":"P-256","x":"0QEAsI1wGI-dmYatdUZoWSRWggLEpyzopuhwk-YUnA4","y":"KYl-qyZ26HobuYwlQh-r0iHX61thfP82qqEku7i0woo","d":"iA_TV2zvftni_9aFAQwFO_9aypfJFCSpcCyevDvz220"}]}';
+        $config = [
+            'token_handler' => [
+                'oidc' => [
+                    'discovery' => [
+                        'base_uri' => 'https://www.example.com/realms/demo/',
+                        'cache' => [
+                            'id' => 'oidc_cache',
+                        ],
+                    ],
+                    'algorithms' => ['RS256', 'ES256'],
+                    'issuers' => ['https://www.example.com'],
+                    'audience' => 'audience',
+                ],
+            ],
+        ];
+
+        $factory = new AccessTokenFactory($this->createTokenHandlerFactories());
+        $finalizedConfig = $this->processConfig($config, $factory);
+
+        $factory->createAuthenticator($container, 'firewall1', $finalizedConfig, 'userprovider');
+
+        $this->assertTrue($container->hasDefinition('security.authenticator.access_token.firewall1'));
+        $this->assertTrue($container->hasDefinition('security.access_token_handler.firewall1'));
+
+        $expectedArgs = [
+            'index_0' => (new ChildDefinition('security.access_token_handler.oidc.signature'))
+                ->replaceArgument(0, ['RS256', 'ES256']),
+            'index_1' => null,
+            'index_2' => 'audience',
+            'index_3' => ['https://www.example.com'],
+            'index_4' => 'sub',
+        ];
+        $expectedCalls = [
+            [
+                'enableDiscovery',
+                [
+                    new Reference('oidc_cache'),
+                    (new ChildDefinition('security.access_token_handler.oidc_discovery.http_client'))
+                        ->replaceArgument(0, ['base_uri' => 'https://www.example.com/realms/demo/']),
+                    'security.access_token_handler.firewall1.oidc_configuration',
+                    'security.access_token_handler.firewall1.oidc_jwk_set',
+                ]
+            ],
+        ];
+        $this->assertEquals($expectedArgs, $container->getDefinition('security.access_token_handler.firewall1')->getArguments());
+        $this->assertEquals($expectedCalls, $container->getDefinition('security.access_token_handler.firewall1')->getMethodCalls());
+    }
+
     public function testOidcUserInfoTokenHandlerConfigurationWithExistingClient()
     {
         $container = new ContainerBuilder();
@@ -322,6 +374,48 @@ class AccessTokenFactoryTest extends TestCase
     {
         yield [['base_uri' => 'https://www.example.com/realms/demo/protocol/openid-connect/userinfo']];
         yield ['https://www.example.com/realms/demo/protocol/openid-connect/userinfo'];
+    }
+
+    public function testOidcUserInfoTokenHandlerConfigurationWithDiscovery()
+    {
+        $container = new ContainerBuilder();
+        $config = [
+            'token_handler' => [
+                'oidc_user_info' => [
+                    'discovery' => [
+                        'cache' => [
+                            'id' => 'oidc_cache',
+                        ],
+                    ],
+                    'base_uri' => 'https://www.example.com/realms/demo/protocol/openid-connect/userinfo',
+                ],
+            ],
+        ];
+
+        $factory = new AccessTokenFactory($this->createTokenHandlerFactories());
+        $finalizedConfig = $this->processConfig($config, $factory);
+
+        $factory->createAuthenticator($container, 'firewall1', $finalizedConfig, 'userprovider');
+
+        $this->assertTrue($container->hasDefinition('security.authenticator.access_token.firewall1'));
+        $this->assertTrue($container->hasDefinition('security.access_token_handler.firewall1'));
+
+        $expectedArgs = [
+            'index_0' => (new ChildDefinition('security.access_token_handler.oidc_user_info.http_client'))
+                ->replaceArgument(0, ['base_uri' => 'https://www.example.com/realms/demo/protocol/openid-connect/userinfo']),
+            'index_2' => 'sub',
+        ];
+        $expectedCalls = [
+            [
+                'enableDiscovery',
+                [
+                    new Reference('oidc_cache'),
+                    'security.access_token_handler.firewall1.oidc_configuration',
+                ]
+            ],
+        ];
+        $this->assertEquals($expectedArgs, $container->getDefinition('security.access_token_handler.firewall1')->getArguments());
+        $this->assertEquals($expectedCalls, $container->getDefinition('security.access_token_handler.firewall1')->getMethodCalls());
     }
 
     public function testMultipleTokenHandlersSet()

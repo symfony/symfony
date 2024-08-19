@@ -5,6 +5,7 @@ CHANGELOG
 ---
 
  * Allow configuring the secret used to sign login links
+ * Add discovery support to `OidcTokenHandler` and `OidcUserInfoTokenHandler`
 
 7.1
 ---

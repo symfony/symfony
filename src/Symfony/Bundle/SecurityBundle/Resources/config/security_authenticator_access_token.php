@@ -82,6 +82,11 @@ return static function (ContainerConfigurator $container) {
                 service('clock'),
             ])
 
+        ->set('security.access_token_handler.oidc_discovery.http_client', HttpClientInterface::class)
+            ->abstract()
+            ->factory([service('http_client'), 'withOptions'])
+            ->args([abstract_arg('http client options')])
+
         ->set('security.access_token_handler.oidc.jwk', JWK::class)
             ->abstract()
             ->deprecate('symfony/security-http', '7.1', 'The "%service_id%" service is deprecated. Please use "security.access_token_handler.oidc.jwkset" instead')

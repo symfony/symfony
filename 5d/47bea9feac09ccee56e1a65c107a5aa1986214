@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2024-08-05T07:04:37Z
+
+For the record, the deprecation poll is closed and it has been confirmed for 8.4: https://wiki.php.net/rfc/deprecations_php_8_4#deprecate_proprietary_csv_escaping_mechanism

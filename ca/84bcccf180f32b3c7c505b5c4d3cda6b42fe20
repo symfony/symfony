@@ -1,0 +1,185 @@
+---------------------------------------------------------------------------
+
+by wouterj at 2024-06-22T11:43:18Z
+
+Uh-oh, this sounds like a really tricky situation. Breaking changes on an LTS version is a no-go, but we have to fix this somehow.
+
+While searching for `xsd:any` in the code-base, as I'm sure more places are affected, I came across the Xliff 1.2 schema. It uses `<xsd:any maxOccurs="unbounded" minOccurs="0" namespace="##other" processContents="skip"/>` (processContent=skip is the relevant bit). Can you maybe verify if this could fix the issue in a BC way?
+
+---------------------------------------------------------------------------
+
+by MatTheCat at 2024-06-22T12:20:13Z
+
+I clarified the PR description: BC break would impact users configuring custom user providers and/or authenticators using XML, while the issue will impact users configuring security using XML (meaning e.g. `XmlCompleteConfigurationTest` will always fail once it is tested against an up-to-date libxml).
+
+`processContents="skip"` is the same than `lax` when you don’t have an XSD so that wouldn’t change anything (confirmed after testing).
+
+For completeness, I thought about two others solutions which would keep BC (in a sub-optimal way):
+
+- remove all provider and authenticator types from the XSD. You wouldn’t get any validation or code autocompletion anymore but this would allow to keep `namespace="##any"` while being deterministic.
+- disable validation in the `XmlFileLoader`. No validation => no validation error… Config would still be validated though.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-06-24T15:28:42Z
+
+If there is no other choice than this BC break, then at least it happens at compile time so that it's going to be easy to spot, isn't it?
+Then, we should make the solution super obvious, with clear explanations, before/after example, anything that can help make the situation actionable. Can you think of ways to do that?
+
+---------------------------------------------------------------------------
+
+by MatTheCat at 2024-06-24T16:45:56Z
+
+I clarified that the two other solutions I thought of (removing types from the XSD or disabling XML validation) would keep BC, so maybe they should be preferred?
+
+If not, the simplest fix is to add a namespace to custom providers/authenticators, like
+
+```diff
+<provider name="default">
+-    <my-provider />
++    <custom:my-provider xmlns:custom="my.custom.namespace" />
+</provider>
+```
+
+Thanks to `processContents="lax"` you don’t need an XSD, but thanks to this PR you could now reference one:
+
+```diff
++ xmlns:custom="my.custom.namespace"
+  xsi:schemaLocation="http://symfony.com/schema/dic/services
+     https://symfony.com/schema/dic/services/services-1.0.xsd
+     http://symfony.com/schema/dic/security
+-    https://symfony.com/schema/dic/security/security-1.0.xsd">
++    https://symfony.com/schema/dic/security/security-1.0.xsd
++    my.custom.namespace
++    /path/to/my.xsd
+
+    <config>
+        <provider name="default">
+-          <my-provider />
++          <custom:my-provider  />
+        </provider>
+    </config>
+</srv:container>
+```
+
+Don’t really know how to advertise this; I guess the upgrade guide and a blog post would be a good start. Surely there have been similar cases in the past?
+
+---------------------------------------------------------------------------
+
+by stof at 2024-06-24T17:16:17Z
+
+Given that any bundle can register extra settings for the security-bundle configuration (it has an extension config) and we were not requiring a custom namespace until now (and they probably never documented using one), I don't think we can require one (especially not in a patch version of an old LTS)
+
+---------------------------------------------------------------------------
+
+by wouterj at 2024-06-24T17:30:28Z
+
+I'm leaning towards going for "remove all provider and authenticator types from the XSD". This means we'll loose validation and autocompletion of build-in user provider configuration, but it is not a BC break.
+
+Then, maybe we can find a nice upgrade path to reintroduce this in Symfony 8 (e.g. first deprecating custom user providers/authenticators without namespace?).
+
+---------------------------------------------------------------------------
+
+by stof at 2024-06-24T17:42:25Z
+
+note that we don't loose all validation. We loose the XSD-based validation, but we still process the config with the Configuration class.
+
+---------------------------------------------------------------------------
+
+by MatTheCat at 2024-06-25T07:59:47Z
+
+In fact if we’re going to disable validation, we can make our XSD valid as well. That way there is no BC break and users are free to make their config valid or not. Updated the PR this way.
+
+It would be even better to check for validation errors related to custom providers/authenticators (and trigger a deprecation?) but I’m not sure it is possible yet.
+
+---------------------------------------------------------------------------
+
+by stof at 2024-06-25T09:16:56Z
+
+I don't think disabling XML validation in the XmlFileLoader is a good idea (this won't be only for the SecurityBundle configuration but for any configuration). And I don't think the answer about IDEs is right: they would report any configuration for third-party providers as invalid, which will confuse developers.
+
+This would also make it even more likely to have outdated XSD files for our bundle configuration schemas as they would not be validated anymore (which would also lead to bad IDE support for them if they are based on XSD files).
+
+---------------------------------------------------------------------------
+
+by MatTheCat at 2024-06-25T09:30:16Z
+
+> [IDEs] would report any configuration for third-party providers as invalid, which will confuse developers.
+
+Only as long as they stay invalid. Once we offer the possibility to namespace them, developers should update them so that they aren’t invalid anymore. But this means we must support these invalid.
+
+If we can detect these cases when validating, we could allow them and trigger a deprecation or something to tell the user to update its config (for now I managed to detect invalid providers from the exception message, but not authenticators yet).
+
+Would that be a viable solution?
+
+---------------------------------------------------------------------------
+
+by stof at 2024-06-25T09:30:50Z
+
+@MatTheCat you disabled validation for **all** XML configuration affecting **all** bundles of the ecosystem.
+
+---------------------------------------------------------------------------
+
+by MatTheCat at 2024-06-25T09:31:53Z
+
+@stof yes this is the PR actual state while I’m investigating how to implement the idea I presented.
+
+---------------------------------------------------------------------------
+
+by MatTheCat at 2024-06-25T10:43:31Z
+
+Okay I re-enabled Symfony’s XML validation while allowing invalid providers/authenticators; these will only trigger a deprecation.
+
+Not sure this is the best way and it’s missing tests, but do you agree with this solution?
+
+---------------------------------------------------------------------------
+
+by MatTheCat at 2024-07-22T10:43:11Z
+
+Ubuntu will join impacted systems on October 10 when 24.10 is released.
+
+---------------------------------------------------------------------------
+
+by MatTheCat at 2024-08-16T14:36:54Z
+
+Will add some
+
+---------------------------------------------------------------------------
+
+by MatTheCat at 2024-08-17T07:51:48Z
+
+Hm not sure what to do because there are changes both in `symfony/dependency-injection` and `symfony/security-bundle` :thinking:
+
+Should I make `symfony/security-bundle` a dev dependency of `symfony/dependency-injection`, or is there a way to restrict the version of `symfony/dependency-injection` when testing `symfony/security-bundle`?
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2024-08-17T08:14:52Z
+
+Just for testing or in general? In this case a conflict rule could help, or do I miss sth?
+
+---------------------------------------------------------------------------
+
+by MatTheCat at 2024-08-17T10:04:17Z
+
+This PR’s SecurityBundle changes require the DependencyInjection’s (but not the other way around), so I would need a way to force this dependency to be up-to-date, even though those changes are not part of any version yet (I think high and low-deps failures are related) :thinking:
+
+---------------------------------------------------------------------------
+
+by stof at 2024-08-17T17:50:39Z
+
+Bumping the min version of the `symfony/dependency-injection` requirement in security-bundle is valid as a way to fix the lowest-deps job (this is usually the way to go). The highest-deps job will probably be solved once the change in DI is merged up in 6.4.
+
+---------------------------------------------------------------------------
+
+by MatTheCat at 2024-08-19T07:18:37Z
+
+> Bumping the min version of the `symfony/dependency-injection` requirement in security-bundle is valid as a way to fix the lowest-deps job (this is usually the way to go).
+
+But here the required changes are not part of any release yet; how can I bump the min version to “this PR”?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2024-08-19T07:55:12Z
+
+use the next patch release version (i.e. `^5.4.43|^6.4.11`)

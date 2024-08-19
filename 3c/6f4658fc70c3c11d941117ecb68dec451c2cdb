@@ -1,0 +1,27 @@
+---------------------------------------------------------------------------
+
+by stof at 2024-08-17T16:13:49Z
+
+Make a test using an actual Twig instance, with a template that has a `{% error %}` tag in its top-level content (so that rendering the full template triggers an error). This way, you will be sure that it was not rendered in full.
+
+---------------------------------------------------------------------------
+
+by smnandre at 2024-08-17T16:33:26Z
+
+Thank you @stof!
+
+> Make a test using an actual Twig instance, with a template that has a `{% error %}` tag in its top-level content (so that rendering the full template triggers an error). This way, you will be sure that it was not rendered in full.
+
+had to remove the error tag (kept some ERROR text)... as the parsing of the tag made compilation fail.
+
+---------------------------------------------------------------------------
+
+by stof at 2024-08-17T16:38:10Z
+
+ah sorry. We don't have the `{% error %}` in core, only the `{% deprecated %}` tag. I confused them.
+
+---------------------------------------------------------------------------
+
+by smnandre at 2024-08-17T17:03:18Z
+
+Thank you for the help ;)

@@ -1,0 +1,27 @@
+---------------------------------------------------------------------------
+
+by smnandre at 2024-08-12T12:00:59Z
+
+I _think_ all the failures are Mime related
+
+---------------------------------------------------------------------------
+
+by smnandre at 2024-08-15T11:24:16Z
+
+@nicolas-grekas Used _windows-only_ method to test exception & came back to simpler (not test-related) code in the RemotePackageStorage file
+
+---
+
+AppVeyor had a problem during AssetMapper tests ..
+
+```
+Testing C:\projects\symfony\src\Symfony\Component\AssetMapper
+.
+Fatal error: Out of memory (allocated 1879048192 bytes) (tried to allocate 262144 bytes) in C:\projects\symfony\src\Symfony\Component\DependencyInjection\ContainerBuilder.php on line 1747
+```
+
+Can we re-run them to see ?
+
+---
+
+Unit tests failures unrelated (AssetMapper ones pass)

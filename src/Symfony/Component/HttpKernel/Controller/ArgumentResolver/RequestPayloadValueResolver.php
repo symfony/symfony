@@ -185,7 +185,7 @@ class RequestPayloadValueResolver implements ValueResolverInterface, EventSubscr
 
     private function mapQueryString(Request $request, ArgumentMetadata $argument, MapQueryString $attribute): ?object
     {
-        if (!$data = $request->query->all()) {
+        if (!($data = $request->query->all()) && ($argument->isNullable() || $argument->hasDefaultValue())) {
             return null;
         }
 
@@ -212,7 +212,7 @@ class RequestPayloadValueResolver implements ValueResolverInterface, EventSubscr
             return $this->serializer->denormalize($data, $type, null, $attribute->serializationContext + self::CONTEXT_DENORMALIZE + ('form' === $format ? ['filter_bool' => true] : []));
         }
 
-        if ('' === $data = $request->getContent()) {
+        if ('' === ($data = $request->getContent()) && ($argument->isNullable() || $argument->hasDefaultValue())) {
             return null;
         }
 

@@ -1,0 +1,24 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2024-07-05T06:35:39Z
+
+@welcoMattic Can we finish this PR without webhook support?
+Another PR that would add more features like webhook support would be fine.
+
+---------------------------------------------------------------------------
+
+by welcoMattic at 2024-08-05T13:10:53Z
+
+> @welcoMattic Can we finish this PR without webhook support? Another PR that would add more features like webhook support would be fine.
+
+Sorry for the delay. This PR is still WIP, I'm in touch with Sweego engineers to implement their webhooks. I plan to work on it during august.
+
+---------------------------------------------------------------------------
+
+by welcoMattic at 2024-08-15T17:18:53Z
+
+The bridge is ready for review!
+
+However, I did not implement all webhooks since I need to discuss in detail with Sweego team (plus, they plan to add webhook signature. We will discuss the timing to be able or not to implement it for 7.2).
+
+(CI failures seems unrelated)

@@ -92,7 +92,7 @@
             <xsd:element name="memory" type="memory" />
             <xsd:element name="ldap" type="ldap" />
             <!-- allow factories to use dynamic elements -->
-            <xsd:any processContents="lax" />
+            <xsd:any processContents="lax" namespace="##other" />
         </xsd:choice>
         <xsd:attribute name="name" type="xsd:string" use="required" />
         <xsd:attribute name="id" type="xsd:string" />
@@ -151,7 +151,7 @@
             <xsd:element name="x509" type="x509" minOccurs="0" maxOccurs="1" />
             <xsd:element name="required-badge" type="xsd:string" minOccurs="0" maxOccurs="unbounded" />
             <!-- allow factories to use dynamic elements -->
-            <xsd:any processContents="lax" minOccurs="0" maxOccurs="unbounded" />
+            <xsd:any processContents="lax" minOccurs="0" maxOccurs="unbounded" namespace="##other" />
         </xsd:choice>
         <xsd:attribute name="name" type="xsd:string" use="required" />
         <xsd:attribute name="pattern" type="xsd:string" />

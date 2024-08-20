@@ -48,7 +48,6 @@ CHANGELOG
  * Add `ControllerResolver::allowControllers()` to define which callables are legit controllers when the `_check_controller_is_allowed` request attribute is set
  * Add `#[MapRequestHeader]` and `#[MapRequestHeaders]` to map and validate request header from `Request::$headers`
 
-
 6.3
 ---
 

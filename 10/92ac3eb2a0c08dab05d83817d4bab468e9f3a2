@@ -1,0 +1,31 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2024-08-16T12:59:38Z
+
+see https://github.com/symfony/symfony/actions/runs/10419496931/job/28858239102#step:16:76
+
+---------------------------------------------------------------------------
+
+by derrabus at 2024-08-16T14:25:29Z
+
+Shall we bump even further? Postgres 12 will reach its EOL later this year. The current stable branch is 16.
+
+ref: https://www.postgresql.org/support/versioning/
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2024-08-17T08:34:00Z
+
+Oh, I updated the PR title and didn't recognize you are still playing with the version number, sorry
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-08-19T08:12:30Z
+
+The failure is likely related; my guess: localhost is resolved to ::1, but the server listens to 127.0.0.1?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2024-08-20T09:47:07Z
+
+build fixed, everything green with Postgres 16

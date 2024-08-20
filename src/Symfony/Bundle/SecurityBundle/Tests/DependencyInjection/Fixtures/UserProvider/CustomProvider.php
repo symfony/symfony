@@ -8,7 +8,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 class CustomProvider implements UserProviderFactoryInterface
 {
-    public function create(ContainerBuilder $container, string $id, array $config)
+    public function create(ContainerBuilder $container, string $id, array $config): void
     {
     }
 
@@ -17,7 +17,7 @@ class CustomProvider implements UserProviderFactoryInterface
         return 'custom';
     }
 
-    public function addConfiguration(NodeDefinition $builder)
+    public function addConfiguration(NodeDefinition $builder): void
     {
         $builder
             ->children()

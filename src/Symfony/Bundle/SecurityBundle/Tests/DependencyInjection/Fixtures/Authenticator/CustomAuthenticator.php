@@ -18,7 +18,7 @@ class CustomAuthenticator implements AuthenticatorFactoryInterface
         return 'custom';
     }
 
-    public function addConfiguration(NodeDefinition $builder)
+    public function addConfiguration(NodeDefinition $builder): void
     {
     }
 

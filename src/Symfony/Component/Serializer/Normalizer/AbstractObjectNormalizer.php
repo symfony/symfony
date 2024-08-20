@@ -37,6 +37,7 @@ use Symfony\Component\TypeInfo\Type;
 use Symfony\Component\TypeInfo\Type\CollectionType;
 use Symfony\Component\TypeInfo\Type\IntersectionType;
 use Symfony\Component\TypeInfo\Type\ObjectType;
+use Symfony\Component\TypeInfo\Type\TemplateType;
 use Symfony\Component\TypeInfo\Type\UnionType;
 use Symfony\Component\TypeInfo\TypeIdentifier;
 
@@ -659,12 +660,17 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
         foreach ($types as $t) {
             if (null === $data && $type->isNullable()) {
                 return null;
+            } elseif ($t instanceof TemplateType) {
+                $t = $t->getBound();
             }
 
             $collectionKeyType = $collectionValueType = null;
             if ($t instanceof CollectionType) {
                 $collectionKeyType = $t->getCollectionKeyType();
                 $collectionValueType = $t->getCollectionValueType();
+                if ($collectionValueType instanceof TemplateType) {
+                    $collectionValueType = $collectionValueType->getBound();
+                }
             }
 
             $t = $t->getBaseType();

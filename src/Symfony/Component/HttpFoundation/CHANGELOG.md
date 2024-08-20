@@ -4,7 +4,8 @@ CHANGELOG
 7.2
 ---
 
- * Add optional `$requests` argument to `RequestStack::__construct()`
+ * Add optional `$requests` parameter to `RequestStack::__construct()`
+ * Add optional `$v4Bytes` and `$v6Bytes` parameters to `IpUtils::anonymize()`
 
 7.1
 ---

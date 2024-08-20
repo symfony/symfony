@@ -151,6 +151,70 @@ class IpUtilsTest extends TestCase
     }
 
     /**
+     * @dataProvider anonymizedIpDataWithBytes
+     */
+    public function testAnonymizeWithBytes($ip, $expected, $bytesForV4, $bytesForV6)
+    {
+        $this->assertSame($expected, IpUtils::anonymize($ip, $bytesForV4, $bytesForV6));
+    }
+
+    public static function anonymizedIpDataWithBytes(): array
+    {
+        return [
+            ['192.168.1.1', '192.168.0.0', 2, 8],
+            ['192.168.1.1', '192.0.0.0', 3, 8],
+            ['192.168.1.1', '0.0.0.0', 4, 8],
+            ['1.2.3.4', '1.2.3.0', 1, 8],
+            ['1.2.3.4', '1.2.3.4', 0, 8],
+            ['2a01:198:603:0:396e:4789:8e99:890f', '2a01:198:603:0:396e:4789:8e99:890f', 1, 0],
+            ['2a01:198:603:0:396e:4789:8e99:890f', '2a01:198:603:0:396e:4789::', 1, 4],
+            ['2a01:198:603:10:396e:4789:8e99:890f', '2a01:198:603:10:396e:4700::', 1, 5],
+            ['2a01:198:603:10:396e:4789:8e99:890f', '2a00::', 1, 15],
+            ['2a01:198:603:10:396e:4789:8e99:890f', '::', 1, 16],
+            ['::1', '::', 1, 1],
+            ['0:0:0:0:0:0:0:1', '::', 1, 1],
+            ['1:0:0:0:0:0:0:1', '1::', 1, 1],
+            ['0:0:603:50:396e:4789:8e99:0001', '0:0:603::', 1, 10],
+            ['[0:0:603:50:396e:4789:8e99:0001]', '[::603:50:396e:4789:8e00:0]', 1, 3],
+            ['[2a01:198::3]', '[2a01:198::]', 1, 2],
+            ['::ffff:123.234.235.236', '::ffff:123.234.235.0', 1, 8], // IPv4-mapped IPv6 addresses
+            ['::123.234.235.236', '::123.234.0.0', 2, 8], // deprecated IPv4-compatible IPv6 address
+        ];
+    }
+
+    public function testAnonymizeV4WithNegativeBytes()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Cannot anonymize less than 0 bytes.');
+
+        IpUtils::anonymize('anything', -1, 8);
+    }
+
+    public function testAnonymizeV6WithNegativeBytes()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Cannot anonymize less than 0 bytes.');
+
+        IpUtils::anonymize('anything', 1, -1);
+    }
+
+    public function testAnonymizeV4WithTooManyBytes()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Cannot anonymize more than 4 bytes for IPv4 and 16 bytes for IPv6.');
+
+        IpUtils::anonymize('anything', 5, 8);
+    }
+
+    public function testAnonymizeV6WithTooManyBytes()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Cannot anonymize more than 4 bytes for IPv4 and 16 bytes for IPv6.');
+
+        IpUtils::anonymize('anything', 1, 17);
+    }
+
+    /**
      * @dataProvider getIp4SubnetMaskZeroData
      */
     public function testIp4SubnetMaskZero($matches, $remoteAddr, $cidr)

@@ -68,7 +68,7 @@ class UploadedFileValueResolverTest extends TestCase
         $attribute = new MapUploadedFile();
         $argument = new ArgumentMetadata(
             'qux',
-            "array",
+            'array',
             false,
             false,
             null,

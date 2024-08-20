@@ -171,10 +171,10 @@ class RequestPayloadValueResolver implements ValueResolverInterface, EventSubscr
             }
 
             if ($argument->metadata->isVariadic()) {
-                if (!(is_array($payload) && array_is_list($payload))) {
-                    throw HttpException::fromStatusCode(422);
+                if (!\is_array($payload) || !\array_is_list($payload)) {
+                    throw HttpException::fromStatusCode($validationFailedCode);
                 }
-                array_splice($arguments, $i, count($payload), $payload);
+                \array_splice($arguments, $i, \count($payload), $payload);
             } else {
                 $arguments[$i] = $payload;
             }
@@ -241,7 +241,7 @@ class RequestPayloadValueResolver implements ValueResolverInterface, EventSubscr
     private function mapUploadedFile(Request $request, ArgumentMetadata $argument, MapUploadedFile $attribute): UploadedFile|array|null
     {
         $default = null;
-        if ($argument->isVariadic() || "array" === $argument->getType()) {
+        if ($argument->isVariadic() || 'array' === $argument->getType()) {
             $default = [];
         }
 

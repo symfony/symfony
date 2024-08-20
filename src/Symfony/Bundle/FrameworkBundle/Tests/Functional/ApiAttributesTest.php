@@ -52,129 +52,106 @@ class ApiAttributesTest extends AbstractWebTestCase
         yield 'valid query string mapping nullable attribute' => [
             'uri' => '/map-query-string-to-nullable-attribute.json',
             'query' => ['filter' => ['status' => 'approved', 'quantity' => '4']],
-            'expectedResponse' => <<<'JSON'
-                {
-                    "filter": {
-                        "status": "approved",
-                        "quantity": 4
-                    }
-                }
-                JSON,
+            'expectedResponse' => json_encode([
+                'filter' => ['status' => 'approved', 'quantity' => 4],
+            ]),
             'expectedStatusCode' => 200,
         ];
 
         yield 'invalid query string mapping nullable attribute' => [
             'uri' => '/map-query-string-to-nullable-attribute.json',
             'query' => ['filter' => ['status' => 'approved', 'quantity' => '200']],
-            'expectedResponse' => <<<'JSON'
-                {
-                    "type": "https:\/\/symfony.com\/errors\/validation",
-                    "title": "Validation Failed",
-                    "status": 404,
-                    "detail": "filter.quantity: This value should be less than 10.",
-                    "violations": [
-                        {
-                            "propertyPath": "filter.quantity",
-                            "title": "This value should be less than 10.",
-                            "template": "This value should be less than {{ compared_value }}.",
-                            "parameters": {
-                                "{{ value }}": "200",
-                                "{{ compared_value }}": "10",
-                                "{{ compared_value_type }}": "int"
-                            },
-                            "type": "urn:uuid:079d7420-2d13-460c-8756-de810eeb37d2"
-                        }
-                    ]
-                }
-                JSON,
+            'expectedResponse' => json_encode([
+                'type' => 'https://symfony.com/errors/validation',
+                'title' => 'Validation Failed',
+                'status' => 404,
+                'detail' => 'filter.quantity: This value should be less than 10.',
+                'violations' => [
+                    [
+                        'propertyPath' => 'filter.quantity',
+                        'title' => 'This value should be less than 10.',
+                        'template' => 'This value should be less than {{ compared_value }}.',
+                        'parameters' => [
+                            '{{ value }}' => '200',
+                            '{{ compared_value }}' => '10',
+                            '{{ compared_value_type }}' => 'int',
+                        ],
+                        'type' => 'urn:uuid:079d7420-2d13-460c-8756-de810eeb37d2',
+                    ],
+                ],
+            ]),
             'expectedStatusCode' => 404,
         ];
 
         yield 'empty query string mapping attribute with default value' => [
             'uri' => '/map-query-string-to-attribute-with-default-value.json',
             'query' => [],
-            'expectedResponse' => <<<'JSON'
-                {
-                    "filter": {
-                        "status": "approved",
-                        "quantity": 5
-                    }
-                }
-                JSON,
+            'expectedResponse' => json_encode([
+                'filter' => ['status' => 'approved', 'quantity' => 5],
+            ]),
             'expectedStatusCode' => 200,
         ];
 
         yield 'valid query string mapping attribute with default value' => [
             'uri' => '/map-query-string-to-attribute-with-default-value.json',
             'query' => ['filter' => ['status' => 'approved', 'quantity' => '4']],
-            'expectedResponse' => <<<'JSON'
-                {
-                    "filter": {
-                        "status": "approved",
-                        "quantity": 4
-                    }
-                }
-                JSON,
+            'expectedResponse' => json_encode([
+                'filter' => ['status' => 'approved', 'quantity' => 4],
+            ]),
             'expectedStatusCode' => 200,
         ];
 
         yield 'invalid query string mapping attribute with default value' => [
             'uri' => '/map-query-string-to-attribute-with-default-value.json',
             'query' => ['filter' => ['status' => 'approved', 'quantity' => '200']],
-            'expectedResponse' => <<<'JSON'
-                {
-                    "type": "https:\/\/symfony.com\/errors\/validation",
-                    "title": "Validation Failed",
-                    "status": 404,
-                    "detail": "filter.quantity: This value should be less than 10.",
-                    "violations": [
-                        {
-                            "propertyPath": "filter.quantity",
-                            "title": "This value should be less than 10.",
-                            "template": "This value should be less than {{ compared_value }}.",
-                            "parameters": {
-                                "{{ value }}": "200",
-                                "{{ compared_value }}": "10",
-                                "{{ compared_value_type }}": "int"
-                            },
-                            "type": "urn:uuid:079d7420-2d13-460c-8756-de810eeb37d2"
-                        }
-                    ]
-                }
-                JSON,
+            'expectedResponse' => json_encode([
+                'type' => 'https://symfony.com/errors/validation',
+                'title' => 'Validation Failed',
+                'status' => 404,
+                'detail' => 'filter.quantity: This value should be less than 10.',
+                'violations' => [
+                    [
+                        'propertyPath' => 'filter.quantity',
+                        'title' => 'This value should be less than 10.',
+                        'template' => 'This value should be less than {{ compared_value }}.',
+                        'parameters' => [
+                            '{{ value }}' => '200',
+                            '{{ compared_value }}' => '10',
+                            '{{ compared_value_type }}' => 'int',
+                        ],
+                        'type' => 'urn:uuid:079d7420-2d13-460c-8756-de810eeb37d2',
+                    ],
+                ],
+            ]),
             'expectedStatusCode' => 404,
         ];
 
-        $expectedResponse = <<<'JSON'
-                {
-                    "type": "https:\/\/symfony.com\/errors\/validation",
-                    "title": "Validation Failed",
-                    "status": 404,
-                    "detail": "filter: This value should be of type Symfony\\Bundle\\FrameworkBundle\\Tests\\Functional\\Filter.",
-                    "violations": [
-                        {
-                            "parameters": {
-                                "hint": "Failed to create object because the class misses the \"filter\" property.",
-                                "{{ type }}": "Symfony\\Bundle\\FrameworkBundle\\Tests\\Functional\\Filter"
-                            },
-                            "propertyPath": "filter",
-                            "template": "This value should be of type {{ type }}.",
-                            "title": "This value should be of type Symfony\\Bundle\\FrameworkBundle\\Tests\\Functional\\Filter."
-                        }
-                    ]
-                }
-                JSON;
+        $expectedResponse = json_encode([
+            'type' => 'https://symfony.com/errors/validation',
+            'title' => 'Validation Failed',
+            'status' => 404,
+            'detail' => 'filter: This value should be of type Symfony\Bundle\FrameworkBundle\Tests\Functional\Filter.',
+            'violations' => [
+                [
+                    'parameters' => [
+                        'hint' => 'Failed to create object because the class misses the "filter" property.',
+                        '{{ type }}' => 'Symfony\Bundle\FrameworkBundle\Tests\Functional\Filter',
+                    ],
+                    'propertyPath' => 'filter',
+                    'template' => 'This value should be of type {{ type }}.',
+                    'title' => 'This value should be of type Symfony\Bundle\FrameworkBundle\Tests\Functional\Filter.',
+                ],
+            ],
+        ]);
 
         $httpKernelVersion = InstalledVersions::getVersion('symfony/http-kernel');
         if ($httpKernelVersion && version_compare($httpKernelVersion, '7.2.0', '<')) {
-            $expectedResponse = <<<'JSON'
-                {
-                    "type": "https:\/\/tools.ietf.org\/html\/rfc2616#section-10",
-                    "title": "An error occurred",
-                    "status": 404,
-                    "detail": "Not Found"
-                }
-                JSON;
+            $expectedResponse = json_encode([
+                'type' => 'https://tools.ietf.org/html/rfc2616#section-10',
+                'title' => 'An error occurred',
+                'status' => 404,
+                'detail' => 'Not Found',
+            ]);
         }
 
         yield 'empty query string mapping non-nullable attribute without default value' => [
@@ -187,41 +164,34 @@ class ApiAttributesTest extends AbstractWebTestCase
         yield 'valid query string mapping non-nullable attribute without default value' => [
             'uri' => '/map-query-string-to-non-nullable-attribute-without-default-value.json',
             'query' => ['filter' => ['status' => 'approved', 'quantity' => '4']],
-            'expectedResponse' => <<<'JSON'
-                {
-                    "filter": {
-                        "status": "approved",
-                        "quantity": 4
-                    }
-                }
-                JSON,
+            'expectedResponse' => json_encode([
+                'filter' => ['status' => 'approved', 'quantity' => 4],
+            ]),
             'expectedStatusCode' => 200,
         ];
 
         yield 'invalid query string mapping non-nullable attribute without default value' => [
             'uri' => '/map-query-string-to-non-nullable-attribute-without-default-value.json',
             'query' => ['filter' => ['status' => 'approved', 'quantity' => '11']],
-            'expectedResponse' => <<<'JSON'
-                {
-                    "type": "https:\/\/symfony.com\/errors\/validation",
-                    "title": "Validation Failed",
-                    "status": 404,
-                    "detail": "filter.quantity: This value should be less than 10.",
-                    "violations": [
-                        {
-                            "propertyPath": "filter.quantity",
-                            "title": "This value should be less than 10.",
-                            "template": "This value should be less than {{ compared_value }}.",
-                            "parameters": {
-                                "{{ value }}": "11",
-                                "{{ compared_value }}": "10",
-                                "{{ compared_value_type }}": "int"
-                            },
-                            "type": "urn:uuid:079d7420-2d13-460c-8756-de810eeb37d2"
-                        }
-                    ]
-                }
-                JSON,
+            'expectedResponse' => json_encode([
+                'type' => 'https://symfony.com/errors/validation',
+                'title' => 'Validation Failed',
+                'status' => 404,
+                'detail' => 'filter.quantity: This value should be less than 10.',
+                'violations' => [
+                    [
+                        'propertyPath' => 'filter.quantity',
+                        'title' => 'This value should be less than 10.',
+                        'template' => 'This value should be less than {{ compared_value }}.',
+                        'parameters' => [
+                            '{{ value }}' => '11',
+                            '{{ compared_value }}' => '10',
+                            '{{ compared_value_type }}' => 'int',
+                        ],
+                        'type' => 'urn:uuid:079d7420-2d13-460c-8756-de810eeb37d2',
+                    ],
+                ],
+            ]),
             'expectedStatusCode' => 404,
         ];
     }
@@ -276,18 +246,14 @@ class ApiAttributesTest extends AbstractWebTestCase
             'uri' => '/map-request-to-nullable-attribute.json',
             'format' => 'json',
             'parameters' => [],
-            'content' => <<<'JSON'
-                {
-                    "comment": "Hello everyone!",
-                    "approved": false
-                }
-                JSON,
-            'expectedResponse' => <<<'JSON'
-                {
-                    "comment": "Hello everyone!",
-                    "approved": false
-                }
-                JSON,
+            'content' => json_encode([
+                'comment' => 'Hello everyone!',
+                'approved' => false,
+            ]),
+            'expectedResponse' => json_encode([
+                'comment' => 'Hello everyone!',
+                'approved' => false,
+            ]),
             'expectedStatusCode' => 200,
         ];
 
@@ -315,12 +281,10 @@ class ApiAttributesTest extends AbstractWebTestCase
             'format' => 'json',
             'parameters' => ['comment' => 'Hello everyone!', 'approved' => '0'],
             'content' => null,
-            'expectedResponse' => <<<'JSON'
-                {
-                    "comment": "Hello everyone!",
-                    "approved": false
-                }
-                JSON,
+            'expectedResponse' => json_encode([
+                'comment' => 'Hello everyone!',
+                'approved' => false,
+            ]),
             'expectedStatusCode' => 200,
         ];
 
@@ -328,20 +292,16 @@ class ApiAttributesTest extends AbstractWebTestCase
             'uri' => '/map-request-to-nullable-attribute.json',
             'format' => 'json',
             'parameters' => [],
-            'content' => <<<'JSON'
-                {
-                    "comment": "Hello everyone!",
-                    "approved": false,
-                }
-                JSON,
-            'expectedResponse' => <<<'JSON'
-                {
-                    "type": "https:\/\/tools.ietf.org\/html\/rfc2616#section-10",
-                    "title": "An error occurred",
-                    "status": 400,
-                    "detail": "Bad Request"
-                }
-                JSON,
+            'content' => json_encode([
+                'comment' => 'Hello everyone!',
+                'approved' => false,
+            ]),
+            'expectedResponse' => json_encode([
+                'type' => 'https://tools.ietf.org/html/rfc2616#section-10',
+                'title' => 'An error occurred',
+                'status' => 400,
+                'detail' => 'Bad Request',
+            ]),
             'expectedStatusCode' => 400,
         ];
 
@@ -358,30 +318,26 @@ class ApiAttributesTest extends AbstractWebTestCase
             'uri' => '/map-request-to-nullable-attribute.json',
             'format' => 'json',
             'parameters' => [],
-            'content' => <<<'JSON'
-                {
-                    "comment": "Hello everyone!",
-                    "approved": "string instead of bool"
-                }
-                JSON,
-            'expectedResponse' => <<<'JSON'
-                {
-                    "type": "https:\/\/symfony.com\/errors\/validation",
-                    "title": "Validation Failed",
-                    "status": 422,
-                    "detail": "approved: This value should be of type bool.",
-                    "violations": [
-                        {
-                            "propertyPath": "approved",
-                            "title": "This value should be of type bool.",
-                            "template": "This value should be of type {{ type }}.",
-                            "parameters": {
-                                "{{ type }}": "bool"
-                            }
-                        }
-                    ]
-                }
-                JSON,
+            'content' => json_encode([
+                'comment' => 'Hello everyone!',
+                'approved' => 'string instead of bool',
+            ]),
+            'expectedResponse' => json_encode([
+                'type' => 'https://symfony.com/errors/validation',
+                'title' => 'Validation Failed',
+                'status' => 422,
+                'detail' => 'approved: This value should be of type bool.',
+                'violations' => [
+                    [
+                        'propertyPath' => 'approved',
+                        'title' => 'This value should be of type bool.',
+                        'template' => 'This value should be of type {{ type }}.',
+                        'parameters' => [
+                            '{{ type }}' => 'bool',
+                        ],
+                    ],
+                ],
+            ]),
             'expectedStatusCode' => 422,
         ];
 
@@ -389,42 +345,38 @@ class ApiAttributesTest extends AbstractWebTestCase
             'uri' => '/map-request-to-nullable-attribute.json',
             'format' => 'json',
             'parameters' => [],
-            'content' => <<<'JSON'
-                {
-                    "comment": "",
-                    "approved": true
-                }
-                JSON,
-            'expectedResponse' => <<<'JSON'
-                {
-                    "type": "https:\/\/symfony.com\/errors\/validation",
-                    "title": "Validation Failed",
-                    "status": 422,
-                    "detail": "comment: This value should not be blank.\ncomment: This value is too short. It should have 10 characters or more.",
-                    "violations": [
-                        {
-                            "propertyPath": "comment",
-                            "title": "This value should not be blank.",
-                            "template": "This value should not be blank.",
-                            "parameters": {
-                                "{{ value }}": "\"\""
-                            },
-                            "type": "urn:uuid:c1051bb4-d103-4f74-8988-acbcafc7fdc3"
-                        },
-                        {
-                            "propertyPath": "comment",
-                            "title": "This value is too short. It should have 10 characters or more.",
-                            "template": "This value is too short. It should have {{ limit }} character or more.|This value is too short. It should have {{ limit }} characters or more.",
-                            "parameters": {
-                                "{{ value }}": "\"\"",
-                                "{{ limit }}": "10",
-                                "{{ value_length }}": "0"
-                            },
-                            "type": "urn:uuid:9ff3fdc4-b214-49db-8718-39c315e33d45"
-                        }
-                    ]
-                }
-                JSON,
+            'content' => json_encode([
+                'comment' => '',
+                'approved' => true,
+            ]),
+            'expectedResponse' => json_encode([
+                'type' => 'https://symfony.com/errors/validation',
+                'title' => 'Validation Failed',
+                'status' => 422,
+                'detail' => 'comment: This value should not be blank.',
+                'violations' => [
+                    [
+                        'propertyPath' => 'comment',
+                        'title' => 'This value should not be blank.',
+                        'template' => 'This value should not be blank.',
+                        'parameters' => [
+                            '{{ value }}' => '""',
+                        ],
+                        'type' => 'urn:uuid:c1051bb4-d103-4f74-8988-acbcafc7fdc3',
+                    ],
+                    [
+                        'propertyPath' => 'comment',
+                        'title' => 'This value is too short. It should have 10 characters or more.',
+                        'template' => 'This value is too short. It should have {{ limit }} character or more.|This value is too short. It should have {{ limit }} characters or more.',
+                        'parameters' => [
+                            '{{ value }}' => '""',
+                            '{{ limit }}' => '10',
+                            '{{ value_length }}' => '0',
+                        ],
+                        'type' => 'urn:uuid:9ff3fdc4-b214-49db-8718-39c315e33d45',
+                    ],
+                ],
+            ]),
             'expectedStatusCode' => 422,
         ];
 
@@ -466,36 +418,34 @@ class ApiAttributesTest extends AbstractWebTestCase
             'format' => 'json',
             'parameters' => ['comment' => '', 'approved' => '1'],
             'content' => null,
-            'expectedResponse' => <<<'JSON'
-                {
-                    "type": "https:\/\/symfony.com\/errors\/validation",
-                    "title": "Validation Failed",
-                    "status": 422,
-                    "detail": "comment: This value should not be blank.\ncomment: This value is too short. It should have 10 characters or more.",
-                    "violations": [
-                        {
-                            "propertyPath": "comment",
-                            "title": "This value should not be blank.",
-                            "template": "This value should not be blank.",
-                            "parameters": {
-                                "{{ value }}": "\"\""
-                            },
-                            "type": "urn:uuid:c1051bb4-d103-4f74-8988-acbcafc7fdc3"
-                        },
-                        {
-                            "propertyPath": "comment",
-                            "title": "This value is too short. It should have 10 characters or more.",
-                            "template": "This value is too short. It should have {{ limit }} character or more.|This value is too short. It should have {{ limit }} characters or more.",
-                            "parameters": {
-                                "{{ value }}": "\"\"",
-                                "{{ limit }}": "10",
-                                "{{ value_length }}": "0"
-                            },
-                            "type": "urn:uuid:9ff3fdc4-b214-49db-8718-39c315e33d45"
-                        }
-                    ]
-                }
-                JSON,
+            'expectedResponse' => json_encode([
+                'type' => 'https://symfony.com/errors/validation',
+                'title' => 'Validation Failed',
+                'status' => 422,
+                'detail' => 'comment: This value should not be blank.',
+                'violations' => [
+                    [
+                        'propertyPath' => 'comment',
+                        'title' => 'This value should not be blank.',
+                        'template' => 'This value should not be blank.',
+                        'parameters' => [
+                            '{{ value }}' => '""',
+                        ],
+                        'type' => 'urn:uuid:c1051bb4-d103-4f74-8988-acbcafc7fdc3',
+                    ],
+                    [
+                        'propertyPath' => 'comment',
+                        'title' => 'This value is too short. It should have 10 characters or more.',
+                        'template' => 'This value is too short. It should have {{ limit }} character or more.|This value is too short. It should have {{ limit }} characters or more.',
+                        'parameters' => [
+                            '{{ value }}' => '""',
+                            '{{ limit }}' => '10',
+                            '{{ value_length }}' => '0',
+                        ],
+                        'type' => 'urn:uuid:9ff3fdc4-b214-49db-8718-39c315e33d45',
+                    ],
+                ],
+            ]),
             'expectedStatusCode' => 422,
         ];
 
@@ -504,12 +454,10 @@ class ApiAttributesTest extends AbstractWebTestCase
             'format' => 'json',
             'parameters' => [],
             'content' => '',
-            'expectedResponse' => <<<'JSON'
-                {
-                    "comment": "Hello everyone!",
-                    "approved": false
-                }
-                JSON,
+            'expectedResponse' => json_encode([
+                'comment' => 'Hello everyone!',
+                'approved' => false,
+            ]),
             'expectedStatusCode' => 200,
         ];
 
@@ -517,18 +465,14 @@ class ApiAttributesTest extends AbstractWebTestCase
             'uri' => '/map-request-to-attribute-with-default-value.json',
             'format' => 'json',
             'parameters' => [],
-            'content' => <<<'JSON'
-                {
-                    "comment": "Hello everyone!",
-                    "approved": false
-                }
-                JSON,
-            'expectedResponse' => <<<'JSON'
-                {
-                    "comment": "Hello everyone!",
-                    "approved": false
-                }
-                JSON,
+            'content' => json_encode([
+                'comment' => 'Hello everyone!',
+                'approved' => false,
+            ]),
+            'expectedResponse' => json_encode([
+                'comment' => 'Hello everyone!',
+                'approved' => false,
+            ]),
             'expectedStatusCode' => 200,
         ];
 
@@ -556,12 +500,10 @@ class ApiAttributesTest extends AbstractWebTestCase
             'format' => 'json',
             'parameters' => ['comment' => 'Hello everyone!', 'approved' => '0'],
             'content' => null,
-            'expectedResponse' => <<<'JSON'
-                {
-                    "comment": "Hello everyone!",
-                    "approved": false
-                }
-                JSON,
+            'expectedResponse' => json_encode([
+                'comment' => 'Hello everyone!',
+                'approved' => false,
+            ]),
             'expectedStatusCode' => 200,
         ];
 
@@ -569,20 +511,16 @@ class ApiAttributesTest extends AbstractWebTestCase
             'uri' => '/map-request-to-attribute-with-default-value.json',
             'format' => 'json',
             'parameters' => [],
-            'content' => <<<'JSON'
-                {
-                    "comment": "Hello everyone!",
-                    "approved": false,
-                }
-                JSON,
-            'expectedResponse' => <<<'JSON'
-                {
-                    "type": "https:\/\/tools.ietf.org\/html\/rfc2616#section-10",
-                    "title": "An error occurred",
-                    "status": 400,
-                    "detail": "Bad Request"
-                }
-                JSON,
+            'content' => json_encode([
+                'comment' => 'Hello everyone!',
+                'approved' => false,
+            ]),
+            'expectedResponse' => json_encode([
+                'type' => 'https://tools.ietf.org/html/rfc2616#section-10',
+                'title' => 'An error occurred',
+                'status' => 400,
+                'detail' => 'Bad Request',
+            ]),
             'expectedStatusCode' => 400,
         ];
 
@@ -599,30 +537,26 @@ class ApiAttributesTest extends AbstractWebTestCase
             'uri' => '/map-request-to-attribute-with-default-value.json',
             'format' => 'json',
             'parameters' => [],
-            'content' => <<<'JSON'
-                {
-                    "comment": "Hello everyone!",
-                    "approved": "string instead of bool"
-                }
-                JSON,
-            'expectedResponse' => <<<'JSON'
-                {
-                    "type": "https:\/\/symfony.com\/errors\/validation",
-                    "title": "Validation Failed",
-                    "status": 422,
-                    "detail": "approved: This value should be of type bool.",
-                    "violations": [
-                        {
-                            "propertyPath": "approved",
-                            "title": "This value should be of type bool.",
-                            "template": "This value should be of type {{ type }}.",
-                            "parameters": {
-                                "{{ type }}": "bool"
-                            }
-                        }
-                    ]
-                }
-                JSON,
+            'content' => json_encode([
+                'comment' => 'Hello everyone!',
+                'approved' => 'string instead of bool',
+            ]),
+            'expectedResponse' => json_encode([
+                'type' => 'https://symfony.com/errors/validation',
+                'title' => 'Validation Failed',
+                'status' => 422,
+                'detail' => 'approved: This value should be of type bool.',
+                'violations' => [
+                    [
+                        'propertyPath' => 'approved',
+                        'title' => 'This value should be of type bool.',
+                        'template' => 'This value should be of type {{ type }}.',
+                        'parameters' => [
+                            '{{ type }}' => 'bool',
+                        ],
+                    ],
+                ],
+            ]),
             'expectedStatusCode' => 422,
         ];
 
@@ -630,42 +564,38 @@ class ApiAttributesTest extends AbstractWebTestCase
             'uri' => '/map-request-to-attribute-with-default-value.json',
             'format' => 'json',
             'parameters' => [],
-            'content' => <<<'JSON'
-                {
-                    "comment": "",
-                    "approved": true
-                }
-                JSON,
-            'expectedResponse' => <<<'JSON'
-                {
-                    "type": "https:\/\/symfony.com\/errors\/validation",
-                    "title": "Validation Failed",
-                    "status": 422,
-                    "detail": "comment: This value should not be blank.\ncomment: This value is too short. It should have 10 characters or more.",
-                    "violations": [
-                        {
-                            "propertyPath": "comment",
-                            "title": "This value should not be blank.",
-                            "template": "This value should not be blank.",
-                            "parameters": {
-                                "{{ value }}": "\"\""
-                            },
-                            "type": "urn:uuid:c1051bb4-d103-4f74-8988-acbcafc7fdc3"
-                        },
-                        {
-                            "propertyPath": "comment",
-                            "title": "This value is too short. It should have 10 characters or more.",
-                            "template": "This value is too short. It should have {{ limit }} character or more.|This value is too short. It should have {{ limit }} characters or more.",
-                            "parameters": {
-                                "{{ value }}": "\"\"",
-                                "{{ limit }}": "10",
-                                "{{ value_length }}": "0"
-                            },
-                            "type": "urn:uuid:9ff3fdc4-b214-49db-8718-39c315e33d45"
-                        }
-                    ]
-                }
-                JSON,
+            'content' => json_encode([
+                'comment' => '',
+                'approved' => true,
+            ]),
+            'expectedResponse' => json_encode([
+                'type' => 'https://symfony.com/errors/validation',
+                'title' => 'Validation Failed',
+                'status' => 422,
+                'detail' => 'comment: This value should not be blank.',
+                'violations' => [
+                    [
+                        'propertyPath' => 'comment',
+                        'title' => 'This value should not be blank.',
+                        'template' => 'This value should not be blank.',
+                        'parameters' => [
+                            '{{ value }}' => '""',
+                        ],
+                        'type' => 'urn:uuid:c1051bb4-d103-4f74-8988-acbcafc7fdc3',
+                    ],
+                    [
+                        'propertyPath' => 'comment',
+                        'title' => 'This value is too short. It should have 10 characters or more.',
+                        'template' => 'This value is too short. It should have {{ limit }} character or more.|This value is too short. It should have {{ limit }} characters or more.',
+                        'parameters' => [
+                            '{{ value }}' => '""',
+                            '{{ limit }}' => '10',
+                            '{{ value_length }}' => '0',
+                        ],
+                        'type' => 'urn:uuid:9ff3fdc4-b214-49db-8718-39c315e33d45',
+                    ],
+                ],
+            ]),
             'expectedStatusCode' => 422,
         ];
 
@@ -707,60 +637,54 @@ class ApiAttributesTest extends AbstractWebTestCase
             'format' => 'json',
             'input' => ['comment' => '', 'approved' => '1'],
             'content' => null,
-            'expectedResponse' => <<<'JSON'
-                {
-                    "type": "https:\/\/symfony.com\/errors\/validation",
-                    "title": "Validation Failed",
-                    "status": 422,
-                    "detail": "comment: This value should not be blank.\ncomment: This value is too short. It should have 10 characters or more.",
-                    "violations": [
-                        {
-                            "propertyPath": "comment",
-                            "title": "This value should not be blank.",
-                            "template": "This value should not be blank.",
-                            "parameters": {
-                                "{{ value }}": "\"\""
-                            },
-                            "type": "urn:uuid:c1051bb4-d103-4f74-8988-acbcafc7fdc3"
-                        },
-                        {
-                            "propertyPath": "comment",
-                            "title": "This value is too short. It should have 10 characters or more.",
-                            "template": "This value is too short. It should have {{ limit }} character or more.|This value is too short. It should have {{ limit }} characters or more.",
-                            "parameters": {
-                                "{{ value }}": "\"\"",
-                                "{{ limit }}": "10",
-                                "{{ value_length }}": "0"
-                            },
-                            "type": "urn:uuid:9ff3fdc4-b214-49db-8718-39c315e33d45"
-                        }
-                    ]
-                }
-                JSON,
+            'expectedResponse' => json_encode([
+                'type' => 'https://symfony.com/errors/validation',
+                'title' => 'Validation Failed',
+                'status' => 422,
+                'detail' => 'comment: This value should not be blank.',
+                'violations' => [
+                    [
+                        'propertyPath' => 'comment',
+                        'title' => 'This value should not be blank.',
+                        'template' => 'This value should not be blank.',
+                        'parameters' => [
+                            '{{ value }}' => '""',
+                        ],
+                        'type' => 'urn:uuid:c1051bb4-d103-4f74-8988-acbcafc7fdc3',
+                    ],
+                    [
+                        'propertyPath' => 'comment',
+                        'title' => 'This value is too short. It should have 10 characters or more.',
+                        'template' => 'This value is too short. It should have {{ limit }} character or more.|This value is too short. It should have {{ limit }} characters or more.',
+                        'parameters' => [
+                            '{{ value }}' => '""',
+                            '{{ limit }}' => '10',
+                            '{{ value_length }}' => '0',
+                        ],
+                        'type' => 'urn:uuid:9ff3fdc4-b214-49db-8718-39c315e33d45',
+                    ],
+                ],
+            ]),
             'expectedStatusCode' => 422,
         ];
 
         $expectedStatusCode = 400;
-        $expectedResponse = <<<'JSON'
-                {
-                  "type":"https:\/\/tools.ietf.org\/html\/rfc2616#section-10",
-                  "title":"An error occurred",
-                  "status":400,
-                  "detail":"Bad Request"
-                }
-                JSON;
+        $expectedResponse = json_encode([
+            'type' => 'https://tools.ietf.org/html/rfc2616#section-10',
+            'title' => 'An error occurred',
+            'status' => 400,
+            'detail' => 'Bad Request',
+        ]);
 
         $httpKernelVersion = InstalledVersions::getVersion('symfony/http-kernel');
         if ($httpKernelVersion && version_compare($httpKernelVersion, '7.2.0', '<')) {
             $expectedStatusCode = 422;
-            $expectedResponse = <<<'JSON'
-                {
-                    "type": "https:\/\/tools.ietf.org\/html\/rfc2616#section-10",
-                    "title": "An error occurred",
-                    "status": 422,
-                    "detail": "Unprocessable Content"
-                }
-                JSON;
+            $expectedResponse = json_encode([
+                'type' => 'https://tools.ietf.org/html/rfc2616#section-10',
+                'title' => 'An error occurred',
+                'status' => 422,
+                'detail' => 'Unprocessable Content',
+            ]);
         }
 
         yield 'empty request mapping non-nullable attribute without default value' => [
@@ -776,18 +700,14 @@ class ApiAttributesTest extends AbstractWebTestCase
             'uri' => '/map-request-to-non-nullable-attribute-without-default-value.json',
             'format' => 'json',
             'parameters' => [],
-            'content' => <<<'JSON'
-                {
-                    "comment": "Hello everyone!",
-                    "approved": false
-                }
-                JSON,
-            'expectedResponse' => <<<'JSON'
-                {
-                    "comment": "Hello everyone!",
-                    "approved": false
-                }
-                JSON,
+            'content' => json_encode([
+                'comment' => 'Hello everyone!',
+                'approved' => false,
+            ]),
+            'expectedResponse' => json_encode([
+                'comment' => 'Hello everyone!',
+                'approved' => false,
+            ]),
             'expectedStatusCode' => 200,
         ];
 
@@ -815,12 +735,10 @@ class ApiAttributesTest extends AbstractWebTestCase
             'format' => 'json',
             'parameters' => ['comment' => 'Hello everyone!', 'approved' => '0'],
             'content' => null,
-            'expectedResponse' => <<<'JSON'
-                {
-                    "comment": "Hello everyone!",
-                    "approved": false
-                }
-                JSON,
+            'expectedResponse' => json_encode([
+                'comment' => 'Hello everyone!',
+                'approved' => false,
+            ]),
             'expectedStatusCode' => 200,
         ];
 
@@ -828,20 +746,16 @@ class ApiAttributesTest extends AbstractWebTestCase
             'uri' => '/map-request-to-non-nullable-attribute-without-default-value.json',
             'format' => 'json',
             'parameters' => [],
-            'content' => <<<'JSON'
-                {
-                    "comment": "Hello everyone!",
-                    "approved": false,
-                }
-                JSON,
-            'expectedResponse' => <<<'JSON'
-                {
-                    "type": "https:\/\/tools.ietf.org\/html\/rfc2616#section-10",
-                    "title": "An error occurred",
-                    "status": 400,
-                    "detail": "Bad Request"
-                }
-                JSON,
+            'content' => json_encode([
+                'comment' => 'Hello everyone!',
+                'approved' => false,
+            ]),
+            'expectedResponse' => json_encode([
+                'type' => 'https://tools.ietf.org/html/rfc2616#section-10',
+                'title' => 'An error occurred',
+                'status' => 400,
+                'detail' => 'Bad Request',
+            ]),
             'expectedStatusCode' => 400,
         ];
 
@@ -858,30 +772,26 @@ class ApiAttributesTest extends AbstractWebTestCase
             'uri' => '/map-request-to-non-nullable-attribute-without-default-value.json',
             'format' => 'json',
             'parameters' => [],
-            'content' => <<<'JSON'
-                {
-                    "comment": "Hello everyone!",
-                    "approved": "string instead of bool"
-                }
-                JSON,
-            'expectedResponse' => <<<'JSON'
-                {
-                    "type": "https:\/\/symfony.com\/errors\/validation",
-                    "title": "Validation Failed",
-                    "status": 422,
-                    "detail": "approved: This value should be of type bool.",
-                    "violations": [
-                        {
-                            "propertyPath": "approved",
-                            "title": "This value should be of type bool.",
-                            "template": "This value should be of type {{ type }}.",
-                            "parameters": {
-                                "{{ type }}": "bool"
-                            }
-                        }
-                    ]
-                }
-                JSON,
+            'content' => json_encode([
+                'comment' => 'Hello everyone!',
+                'approved' => 'string instead of bool',
+            ]),
+            'expectedResponse' => json_encode([
+                'type' => 'https://symfony.com/errors/validation',
+                'title' => 'Validation Failed',
+                'status' => 422,
+                'detail' => 'approved: This value should be of type bool.',
+                'violations' => [
+                    [
+                        'propertyPath' => 'approved',
+                        'title' => 'This value should be of type bool.',
+                        'template' => 'This value should be of type {{ type }}.',
+                        'parameters' => [
+                            '{{ type }}' => 'bool',
+                        ],
+                    ],
+                ],
+            ]),
             'expectedStatusCode' => 422,
         ];
 
@@ -889,42 +799,38 @@ class ApiAttributesTest extends AbstractWebTestCase
             'uri' => '/map-request-to-non-nullable-attribute-without-default-value.json',
             'format' => 'json',
             'parameters' => [],
-            'content' => <<<'JSON'
-                {
-                    "comment": "",
-                    "approved": true
-                }
-                JSON,
-            'expectedResponse' => <<<'JSON'
-                {
-                    "type": "https:\/\/symfony.com\/errors\/validation",
-                    "title": "Validation Failed",
-                    "status": 422,
-                    "detail": "comment: This value should not be blank.\ncomment: This value is too short. It should have 10 characters or more.",
-                    "violations": [
-                        {
-                            "propertyPath": "comment",
-                            "title": "This value should not be blank.",
-                            "template": "This value should not be blank.",
-                            "parameters": {
-                                "{{ value }}": "\"\""
-                            },
-                            "type": "urn:uuid:c1051bb4-d103-4f74-8988-acbcafc7fdc3"
-                        },
-                        {
-                            "propertyPath": "comment",
-                            "title": "This value is too short. It should have 10 characters or more.",
-                            "template": "This value is too short. It should have {{ limit }} character or more.|This value is too short. It should have {{ limit }} characters or more.",
-                            "parameters": {
-                                "{{ value }}": "\"\"",
-                                "{{ limit }}": "10",
-                                "{{ value_length }}": "0"
-                            },
-                            "type": "urn:uuid:9ff3fdc4-b214-49db-8718-39c315e33d45"
-                        }
-                    ]
-                }
-                JSON,
+            'content' => json_encode([
+                'comment' => '',
+                'approved' => true,
+            ]),
+            'expectedResponse' => json_encode([
+                'type' => 'https://symfony.com/errors/validation',
+                'title' => 'Validation Failed',
+                'status' => 422,
+                'detail' => 'comment: This value should not be blank.',
+                'violations' => [
+                    [
+                        'propertyPath' => 'comment',
+                        'title' => 'This value should not be blank.',
+                        'template' => 'This value should not be blank.',
+                        'parameters' => [
+                            '{{ value }}' => '""',
+                        ],
+                        'type' => 'urn:uuid:c1051bb4-d103-4f74-8988-acbcafc7fdc3',
+                    ],
+                    [
+                        'propertyPath' => 'comment',
+                        'title' => 'This value is too short. It should have 10 characters or more.',
+                        'template' => 'This value is too short. It should have {{ limit }} character or more.|This value is too short. It should have {{ limit }} characters or more.',
+                        'parameters' => [
+                            '{{ value }}' => '""',
+                            '{{ limit }}' => '10',
+                            '{{ value_length }}' => '0',
+                        ],
+                        'type' => 'urn:uuid:9ff3fdc4-b214-49db-8718-39c315e33d45',
+                    ],
+                ],
+            ]),
             'expectedStatusCode' => 422,
         ];
 
@@ -966,36 +872,34 @@ class ApiAttributesTest extends AbstractWebTestCase
             'format' => 'json',
             'input' => ['comment' => '', 'approved' => '1'],
             'content' => null,
-            'expectedResponse' => <<<'JSON'
-                {
-                    "type": "https:\/\/symfony.com\/errors\/validation",
-                    "title": "Validation Failed",
-                    "status": 422,
-                    "detail": "comment: This value should not be blank.\ncomment: This value is too short. It should have 10 characters or more.",
-                    "violations": [
-                        {
-                            "propertyPath": "comment",
-                            "title": "This value should not be blank.",
-                            "template": "This value should not be blank.",
-                            "parameters": {
-                                "{{ value }}": "\"\""
-                            },
-                            "type": "urn:uuid:c1051bb4-d103-4f74-8988-acbcafc7fdc3"
-                        },
-                        {
-                            "propertyPath": "comment",
-                            "title": "This value is too short. It should have 10 characters or more.",
-                            "template": "This value is too short. It should have {{ limit }} character or more.|This value is too short. It should have {{ limit }} characters or more.",
-                            "parameters": {
-                                "{{ value }}": "\"\"",
-                                "{{ limit }}": "10",
-                                "{{ value_length }}": "0"
-                            },
-                            "type": "urn:uuid:9ff3fdc4-b214-49db-8718-39c315e33d45"
-                        }
-                    ]
-                }
-                JSON,
+            'expectedResponse' => json_encode([
+                'type' => 'https://symfony.com/errors/validation',
+                'title' => 'Validation Failed',
+                'status' => 422,
+                'detail' => 'comment: This value should not be blank.',
+                'violations' => [
+                    [
+                        'propertyPath' => 'comment',
+                        'title' => 'This value should not be blank.',
+                        'template' => 'This value should not be blank.',
+                        'parameters' => [
+                            '{{ value }}' => '""',
+                        ],
+                        'type' => 'urn:uuid:c1051bb4-d103-4f74-8988-acbcafc7fdc3',
+                    ],
+                    [
+                        'propertyPath' => 'comment',
+                        'title' => 'This value is too short. It should have 10 characters or more.',
+                        'template' => 'This value is too short. It should have {{ limit }} character or more.|This value is too short. It should have {{ limit }} characters or more.',
+                        'parameters' => [
+                            '{{ value }}' => '""',
+                            '{{ limit }}' => '10',
+                            '{{ value_length }}' => '0',
+                        ],
+                        'type' => 'urn:uuid:9ff3fdc4-b214-49db-8718-39c315e33d45',
+                    ],
+                ],
+            ]),
             'expectedStatusCode' => 422,
         ];
     }

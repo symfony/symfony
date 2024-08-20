@@ -455,8 +455,9 @@ class YamlFileLoader extends FileLoader
             return $return ? $alias : $this->container->setAlias($id, $alias);
         }
 
+        $changes = [];
         if (null !== $definition) {
-            // no-op
+            $changes = $definition->getChanges();
         } elseif ($this->isLoadingInstanceof) {
             $definition = new ChildDefinition('');
         } elseif (isset($service['parent'])) {
@@ -479,7 +480,7 @@ class YamlFileLoader extends FileLoader
             $definition->setAutoconfigured($defaults['autoconfigure']);
         }
 
-        $definition->setChanges([]);
+        $definition->setChanges($changes);
 
         if (isset($service['class'])) {
             $definition->setClass($service['class']);

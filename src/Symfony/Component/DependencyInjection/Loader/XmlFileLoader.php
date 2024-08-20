@@ -458,7 +458,33 @@ class XmlFileLoader extends FileLoader
         try {
             $dom = XmlUtils::loadFile($file, $this->validateSchema(...));
         } catch (\InvalidArgumentException $e) {
-            throw new InvalidArgumentException(sprintf('Unable to parse file "%s": ', $file).$e->getMessage(), $e->getCode(), $e);
+            $invalidSecurityElements = [];
+            $errors = explode("\n", $e->getMessage());
+            foreach ($errors as $i => $error) {
+                if (preg_match("#^\[ERROR 1871] Element '\{http://symfony\.com/schema/dic/security}([^']+)'#", $error, $matches)) {
+                    $invalidSecurityElements[$i] = $matches[1];
+                }
+            }
+            if ($invalidSecurityElements) {
+                $dom = XmlUtils::loadFile($file);
+
+                foreach ($invalidSecurityElements as $errorIndex => $tagName) {
+                    foreach ($dom->getElementsByTagNameNS('http://symfony.com/schema/dic/security', $tagName) as $element) {
+                        if (!$parent = $element->parentNode) {
+                            continue;
+                        }
+                        if ('http://symfony.com/schema/dic/security' !== $parent->namespaceURI) {
+                            continue;
+                        }
+                        if ('provider' === $parent->localName || 'firewall' === $parent->localName) {
+                            unset($errors[$errorIndex]);
+                        }
+                    }
+                }
+            }
+            if ($errors) {
+                throw new InvalidArgumentException(sprintf('Unable to parse file "%s": ', $file).implode("/n", $errors), $e->getCode(), $e);
+            }
         }
 
         $this->validateExtensions($dom, $file);
@@ -855,6 +881,6 @@ EOF
      */
     public static function convertDomElementToArray(\DOMElement $element): mixed
     {
-        return XmlUtils::convertDomElementToArray($element);
+        return XmlUtils::convertDomElementToArray($element, false);
     }
 }

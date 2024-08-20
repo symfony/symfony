@@ -70,19 +70,67 @@ class Connection extends AbstractConnection
 
         if (false === @ldap_bind($this->connection, $dn, $password)) {
             $error = ldap_error($this->connection);
-            switch (ldap_errno($this->connection)) {
-                case self::LDAP_INVALID_CREDENTIALS:
-                    throw new InvalidCredentialsException($error);
-                case self::LDAP_TIMEOUT:
-                    throw new ConnectionTimeoutException($error);
-                case self::LDAP_ALREADY_EXISTS:
-                    throw new AlreadyExistsException($error);
-            }
-            ldap_get_option($this->connection, LDAP_OPT_DIAGNOSTIC_MESSAGE, $diagnostic_message);
-            throw new ConnectionException($error.' '.$diagnostic_message);
+            ldap_get_option($this->connection, LDAP_OPT_DIAGNOSTIC_MESSAGE, $diagnostic);
+
+            throw match (ldap_errno($this->connection)) {
+                self::LDAP_INVALID_CREDENTIALS => new InvalidCredentialsException($error),
+                self::LDAP_TIMEOUT => new ConnectionTimeoutException($error),
+                self::LDAP_ALREADY_EXISTS => new AlreadyExistsException($error),
+                default => new ConnectionException($error.' '.$diagnostic),
+            };
         }
 
         $this->bound = true;
+    }
+
+    /**
+     * @param string $password WARNING: When the LDAP server allows unauthenticated binds, a blank $password will always be valid
+     */
+    public function saslBind(?string $dn = null, #[\SensitiveParameter] ?string $password = null, ?string $mech = null, ?string $realm = null, ?string $authcId = null, ?string $authzId = null, ?string $props = null): void
+    {
+        if (!\function_exists('ldap_sasl_bind')) {
+            throw new LdapException('The LDAP extension is missing SASL support.');
+        }
+
+        if (!$this->connection) {
+            $this->connect();
+        }
+
+        if (false === @ldap_sasl_bind($this->connection, $dn, $password, $mech, $realm, $authcId, $authzId, $props)) {
+            $error = ldap_error($this->connection);
+            ldap_get_option($this->connection, LDAP_OPT_DIAGNOSTIC_MESSAGE, $diagnostic);
+
+            throw match (ldap_errno($this->connection)) {
+                self::LDAP_INVALID_CREDENTIALS => new InvalidCredentialsException($error),
+                self::LDAP_TIMEOUT => new ConnectionTimeoutException($error),
+                self::LDAP_ALREADY_EXISTS => new AlreadyExistsException($error),
+                default => new ConnectionException($error.' '.$diagnostic),
+            };
+        }
+
+        $this->bound = true;
+    }
+
+    /**
+     * ldap_exop_whoami accessor, returns authenticated DN.
+     */
+    public function whoami(): string
+    {
+        if (false === $authzId = ldap_exop_whoami($this->connection)) {
+            throw new LdapException(ldap_error($this->connection));
+        }
+
+        $parts = explode(':', $authzId, 2);
+        if ('dn' !== $parts[0]) {
+            /*
+             * We currently do not handle u:login authzId, which
+             * would require a configuration-dependent LDAP search
+             * to be turned into a DN
+             */
+            throw new LdapException(\sprintf('Unsupported authzId "%s".', $authzId));
+        }
+
+        return $parts[1];
     }
 
     /**

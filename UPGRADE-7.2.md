@@ -29,6 +29,11 @@ FrameworkBundle
 
  * [BC BREAK] The `secrets:decrypt-to-local` command terminates with a non-zero exit code when a secret could not be read
 
+Ldap
+----
+
+ * Add methods for `saslBind()` and `whoami()` to `ConnectionInterface` and `LdapInterface`
+
 Messenger
 ---------
 

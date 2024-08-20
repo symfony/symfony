@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+7.2
+---
+
+ * Add methods for `saslBind()` and `whoami()` to `ConnectionInterface` and `LdapInterface`
+
 7.1
 ---
 

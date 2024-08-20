@@ -37,6 +37,17 @@ class AdapterTest extends LdapTestCase
     /**
      * @group functional
      */
+    public function testSaslBind()
+    {
+        $ldap = new Adapter($this->getLdapConfig());
+
+        $ldap->getConnection()->saslBind('cn=admin,dc=symfony,dc=com', 'symfony');
+        $this->assertEquals('cn=admin,dc=symfony,dc=com', $ldap->getConnection()->whoami());
+    }
+
+    /**
+     * @group functional
+     */
     public function testLdapQuery()
     {
         $ldap = new Adapter($this->getLdapConfig());

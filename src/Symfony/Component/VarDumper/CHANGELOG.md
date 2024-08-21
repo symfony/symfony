@@ -5,6 +5,7 @@ CHANGELOG
 ---
 
  * Add support for `FORCE_COLOR` environment variable
+ * Add support of options when using `dd()` and `dump()`
 
 7.1
 ---

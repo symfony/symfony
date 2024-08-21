@@ -22,6 +22,7 @@ use Symfony\Component\VarDumper\Command\Descriptor\CliDescriptor;
 use Symfony\Component\VarDumper\Command\Descriptor\HtmlDescriptor;
 use Symfony\Component\VarDumper\Command\ServerDumpCommand;
 use Symfony\Component\VarDumper\Dumper\CliDumper;
+use Symfony\Component\VarDumper\Dumper\ContextProvider\BacktraceContextProvider;
 use Symfony\Component\VarDumper\Dumper\ContextProvider\CliContextProvider;
 use Symfony\Component\VarDumper\Dumper\ContextProvider\RequestContextProvider;
 use Symfony\Component\VarDumper\Dumper\ContextProvider\SourceContextProvider;
@@ -34,6 +35,21 @@ return static function (ContainerConfigurator $container) {
     $container->parameters()
         ->set('env(VAR_DUMPER_SERVER)', '127.0.0.1:9912')
     ;
+
+    $contextProviders = [
+        'source' => inline_service(SourceContextProvider::class)->args([
+            param('kernel.charset'),
+            param('kernel.project_dir'),
+            service('debug.file_link_formatter')->nullOnInvalid(),
+        ]),
+    ];
+
+    if (class_exists(BacktraceContextProvider::class)) {
+        $contextProviders['backtrace'] = inline_service(BacktraceContextProvider::class)->args([
+            0,
+            service('var_dump.cloner')->nullOnInvalid(),
+        ]);
+    }
 
     $container->services()
 
@@ -81,13 +97,7 @@ return static function (ContainerConfigurator $container) {
             ->decorate('var_dumper.cli_dumper')
             ->args([
                 service('var_dumper.contextualized_cli_dumper.inner'),
-                [
-                    'source' => inline_service(SourceContextProvider::class)->args([
-                        param('kernel.charset'),
-                        param('kernel.project_dir'),
-                        service('debug.file_link_formatter')->nullOnInvalid(),
-                    ]),
-                ],
+                $contextProviders,
             ])
 
         ->set('var_dumper.html_dumper', HtmlDumper::class)
@@ -104,11 +114,7 @@ return static function (ContainerConfigurator $container) {
             ->args([
                 '', // server host
                 [
-                    'source' => inline_service(SourceContextProvider::class)->args([
-                        param('kernel.charset'),
-                        param('kernel.project_dir'),
-                        service('debug.file_link_formatter')->nullOnInvalid(),
-                    ]),
+                    ...$contextProviders,
                     'request' => inline_service(RequestContextProvider::class)->args([service('request_stack')]),
                     'cli' => inline_service(CliContextProvider::class),
                 ],

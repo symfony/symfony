@@ -35,6 +35,8 @@ class BinaryNodeTest extends AbstractNodeTestCase
             [0, new BinaryNode('&', new ConstantNode(2), new ConstantNode(4))],
             [6, new BinaryNode('|', new ConstantNode(2), new ConstantNode(4))],
             [6, new BinaryNode('^', new ConstantNode(2), new ConstantNode(4))],
+            [32, new BinaryNode('<<', new ConstantNode(2), new ConstantNode(4))],
+            [2, new BinaryNode('>>', new ConstantNode(32), new ConstantNode(4))],
 
             [true, new BinaryNode('<', new ConstantNode(1), new ConstantNode(2))],
             [true, new BinaryNode('<=', new ConstantNode(1), new ConstantNode(2))],
@@ -90,6 +92,8 @@ class BinaryNodeTest extends AbstractNodeTestCase
             ['(2 & 4)', new BinaryNode('&', new ConstantNode(2), new ConstantNode(4))],
             ['(2 | 4)', new BinaryNode('|', new ConstantNode(2), new ConstantNode(4))],
             ['(2 ^ 4)', new BinaryNode('^', new ConstantNode(2), new ConstantNode(4))],
+            ['(2 << 4)', new BinaryNode('<<', new ConstantNode(2), new ConstantNode(4))],
+            ['(32 >> 4)', new BinaryNode('>>', new ConstantNode(32), new ConstantNode(4))],
 
             ['(1 < 2)', new BinaryNode('<', new ConstantNode(1), new ConstantNode(2))],
             ['(1 <= 2)', new BinaryNode('<=', new ConstantNode(1), new ConstantNode(2))],
@@ -142,6 +146,8 @@ class BinaryNodeTest extends AbstractNodeTestCase
             ['(2 & 4)', new BinaryNode('&', new ConstantNode(2), new ConstantNode(4))],
             ['(2 | 4)', new BinaryNode('|', new ConstantNode(2), new ConstantNode(4))],
             ['(2 ^ 4)', new BinaryNode('^', new ConstantNode(2), new ConstantNode(4))],
+            ['(2 << 4)', new BinaryNode('<<', new ConstantNode(2), new ConstantNode(4))],
+            ['(32 >> 4)', new BinaryNode('>>', new ConstantNode(32), new ConstantNode(4))],
 
             ['(1 < 2)', new BinaryNode('<', new ConstantNode(1), new ConstantNode(2))],
             ['(1 <= 2)', new BinaryNode('<=', new ConstantNode(1), new ConstantNode(2))],

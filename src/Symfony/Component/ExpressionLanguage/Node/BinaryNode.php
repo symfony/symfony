@@ -130,6 +130,10 @@ class BinaryNode extends Node
                 return $left ^ $right;
             case '&':
                 return $left & $right;
+            case '<<':
+                return $left << $right;
+            case '>>':
+                return $left >> $right;
             case '==':
                 return $left == $right;
             case '===':

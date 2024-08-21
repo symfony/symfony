@@ -686,6 +686,13 @@ EOF,
                 ['datatables.net-select', '1.7.0'],
             ],
         ];
+
+        yield 'import with name containing a dollar sign' => [
+            'import jQuery$1 from "/npm/jquery@3.7.0/+esm";',
+            [
+                ['jquery', '3.7.0'],
+            ],
+        ];
     }
 
     private static function createRemoteEntry(string $importName, string $version, ImportMapType $type = ImportMapType::JS, ?string $packageSpecifier = null): ImportMapEntry

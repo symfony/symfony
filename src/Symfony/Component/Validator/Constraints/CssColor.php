@@ -62,9 +62,9 @@ class CssColor extends Constraint
     public array|string $formats;
 
     /**
-     * @param string[]|string|array<string,mixed> $formats The types of CSS colors allowed ({@see https://symfony.com/doc/current/reference/constraints/CssColor.html#formats})
-     * @param string[]|null                       $groups
-     * @param array<string,mixed>|null            $options
+     * @param non-empty-string[]|non-empty-string|array<string,mixed> $formats The types of CSS colors allowed ({@see https://symfony.com/doc/current/reference/constraints/CssColor.html#formats})
+     * @param string[]|null                                           $groups
+     * @param array<string,mixed>|null                                $options
      */
     public function __construct(array|string $formats = [], ?string $message = null, ?array $groups = null, $payload = null, ?array $options = null)
     {

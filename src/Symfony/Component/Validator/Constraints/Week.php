@@ -33,6 +33,10 @@ final class Week extends Constraint
         self::TOO_HIGH_ERROR => 'TOO_HIGH_ERROR',
     ];
 
+    /**
+     * @param non-empty-string|null $min
+     * @param non-empty-string|null $max
+     */
     #[HasNamedArguments]
     public function __construct(
         public ?string $min = null,

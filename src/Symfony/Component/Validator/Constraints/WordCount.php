@@ -30,6 +30,10 @@ final class WordCount extends Constraint
         self::TOO_LONG_ERROR => 'TOO_LONG_ERROR',
     ];
 
+    /**
+     * @param int<0, max>|null  $min
+     * @param positive-int|null $max
+     */
     #[HasNamedArguments]
     public function __construct(
         public ?int $min = null,

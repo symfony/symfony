@@ -47,9 +47,9 @@ class CardScheme extends Constraint
     public array|string|null $schemes = null;
 
     /**
-     * @param string|string[]|array<string,mixed>|null $schemes Name(s) of the number scheme(s) used to validate the credit card number
-     * @param string[]|null                            $groups
-     * @param array<string,mixed>                      $options
+     * @param non-empty-string|non-empty-string[]|array<string,mixed>|null $schemes Name(s) of the number scheme(s) used to validate the credit card number
+     * @param string[]|null                                                $groups
+     * @param array<string,mixed>                                          $options
      */
     public function __construct(array|string|null $schemes, ?string $message = null, ?array $groups = null, mixed $payload = null, array $options = [])
     {

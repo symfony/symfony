@@ -73,10 +73,10 @@ class File extends Constraint
 
     /**
      * @param array<string,mixed>|null           $options
-     * @param int|string|null                    $maxSize                     The max size of the underlying file
+     * @param positive-int|string|null           $maxSize                     The max size of the underlying file
      * @param bool|null                          $binaryFormat                Pass true to use binary-prefixed units (KiB, MiB, etc.) or false to use SI-prefixed units (kB, MB) in displayed messages. Pass null to guess the format from the maxSize option. (defaults to null)
      * @param string[]|string|null               $mimeTypes                   Acceptable media type(s). Prefer the extensions option that also enforce the file's extension consistency.
-     * @param int|null                           $filenameMaxLength           Maximum length of the file name
+     * @param positive-int|null                  $filenameMaxLength           Maximum length of the file name
      * @param string|null                        $disallowEmptyMessage        Enable empty upload validation with this message in case of error
      * @param string|null                        $uploadIniSizeErrorMessage   Message if the file size exceeds the max size configured in php.ini
      * @param string|null                        $uploadFormSizeErrorMessage  Message if the file size exceeds the max size configured in the HTML input field

@@ -61,9 +61,9 @@ class CamelCaseToSnakeCaseNameConverterTest extends TestCase
     public function testDenormalizeWithContext()
     {
         $nameConverter = new CamelCaseToSnakeCaseNameConverter(null, true);
-        $denormalizedValue = $nameConverter->denormalize('last_name', null, null, [CamelCaseToSnakeCaseNameConverter::REQUIRE_SNAKE_CASE_PROPERTIES]);
+        $denormalizedValue = $nameConverter->denormalize('last_name', null, null, [CamelCaseToSnakeCaseNameConverter::REQUIRE_SNAKE_CASE_PROPERTIES => true]);
 
-        $this->assertSame($denormalizedValue, 'lastName');
+        $this->assertSame('lastName', $denormalizedValue);
     }
 
     public function testErrorDenormalizeWithContext()

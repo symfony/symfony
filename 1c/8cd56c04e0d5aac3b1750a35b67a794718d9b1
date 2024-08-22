@@ -1,0 +1,31 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2024-08-13T07:00:12Z
+
+@alexandre-daubois In #53894 I raised the question if we really need to be able to change the calendar. For the initial issue being able to control the locale was sufficient. Do you see other use cases where we have a need for being able to control the calendar?
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2024-08-13T07:08:40Z
+
+Yes. I'm not sure there's a need to switch between Gregorian and Julian calendars. But there's also other calendars that may be used like the Arabic Calendar for instance. I also think the test cases reflect (at least) why I would use this option the most: it is particularly useful when dealing with different first day of week, i.e. Sunday in the USA, Monday in Europe, etc.
+
+I think that if you couple this with #57908, this definitely makes even more sense.
+
+Overall, I think it brings more flexibility so anyone is up to use the calendar of their choice, without being limited by the locale. It doesn't bring that much complexity to the code. I think handling a locale instead of a calendar would require more boilerplate than there is now for less flexibility.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-08-13T10:04:37Z
+
+About locales, it looks like they can embed the calendar? e.g. `ja_JP@calendar=japanese`
+I'm thus wondering if "calendar" isn't a subset of "locale"?
+Sorry I know very little on the topic.
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2024-08-19T09:53:01Z
+
+When using a locale like `ja_JP@calendar=japanese` or `zh_TW@calendar=roc`, you must also use the `IntlDateFormatter::TRADITIONAL` constant when creating the instance of `IntlDateFormatter`. This means that if we support the `locale` option, we should also support the `calendar` option in `DateType` to pass something else than `IntlDateFormatter::GREGORIAN` (which is currently hardcoded).
+
+At the end of the day, it requires on more option to support and less flexibility than being able to pass an IntlCalendar directly. I think that the current solution is more flexible, as well as easier to understand with less boilerplate.

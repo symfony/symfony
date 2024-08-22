@@ -19,13 +19,14 @@ namespace Symfony\Component\Messenger\Exception;
 interface WrappedExceptionsInterface extends \Throwable
 {
     /**
-     * @template TClass of class-string<\Throwable>
+     * @template TClass of \Throwable
+     * @template T of class-string<TClass>|null
      *
-     * @param TClass|null $class
+     * @param T $class
      *
      * @return \Throwable[]
      *
-     * @psalm-return (TClass is null ? \Throwable[] : TClass[])
+     * @psalm-return (T is null ? \Throwable[] : TClass[])
      */
     public function getWrappedExceptions(?string $class = null, bool $recursive = false): array;
 }

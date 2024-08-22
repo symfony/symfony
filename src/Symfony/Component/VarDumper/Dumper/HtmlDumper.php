@@ -29,6 +29,7 @@ class HtmlDumper extends CliDumper
             'default' => 'background-color:#18171B; color:#FF8400; line-height:1.2em; font:12px Menlo, Monaco, Consolas, monospace; word-wrap: break-word; white-space: pre-wrap; position:relative; z-index:99999; word-break: break-all',
             'num' => 'font-weight:bold; color:#1299DA',
             'const' => 'font-weight:bold',
+            'virtual' => 'font-style:italic',
             'str' => 'font-weight:bold; color:#56DB3A',
             'note' => 'color:#1299DA',
             'ref' => 'color:#A0A0A0',
@@ -45,6 +46,7 @@ class HtmlDumper extends CliDumper
             'default' => 'background:none; color:#CC7832; line-height:1.2em; font:12px Menlo, Monaco, Consolas, monospace; word-wrap: break-word; white-space: pre-wrap; position:relative; z-index:99999; word-break: break-all',
             'num' => 'font-weight:bold; color:#1299DA',
             'const' => 'font-weight:bold',
+            'virtual' => 'font-style:italic',
             'str' => 'font-weight:bold; color:#629755;',
             'note' => 'color:#6897BB',
             'ref' => 'color:#6E6E6E',
@@ -920,6 +922,9 @@ EOHTML
         }
         if ('label' === $style) {
             $v .= ' ';
+        }
+        if ($attr['virtual'] ?? false) {
+            $v = '<span class=sf-dump-virtual>'.$v.'</span>';
         }
 
         return $v;

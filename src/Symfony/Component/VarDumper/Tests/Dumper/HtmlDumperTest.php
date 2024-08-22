@@ -15,6 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\VarDumper\Caster\ImgStub;
 use Symfony\Component\VarDumper\Cloner\VarCloner;
 use Symfony\Component\VarDumper\Dumper\HtmlDumper;
+use Symfony\Component\VarDumper\Tests\Fixtures\VirtualProperty;
 
 /**
  * @author Nicolas Grekas <p@tchwork.com>
@@ -115,6 +116,30 @@ EOTXT
 
             $out
         );
+    }
+
+    /**
+     * @requires PHP 8.4
+     */
+    public function testVirtualProperties()
+    {
+        $dumper = new HtmlDumper('php://output');
+        $dumper->setDumpHeader('<foo></foo>');
+        $dumper->setDumpBoundaries('<bar>', '</bar>');
+        $cloner = new VarCloner();
+
+        $data = $cloner->cloneVar(new VirtualProperty());
+        $out = $dumper->dump($data, true);
+
+        $this->assertStringMatchesFormat(<<<EODUMP
+            <foo></foo><bar><span class=sf-dump-note>Symfony\Component\VarDumper\Tests\Fixtures\VirtualProperty</span> {<a class=sf-dump-ref>#%i</a><samp data-depth=1 class=sf-dump-expanded>
+              +<span class=sf-dump-public title="Public property">firstName</span>: "<span class=sf-dump-str title="4 characters">John</span>"
+              +<span class=sf-dump-public title="Public property">lastName</span>: "<span class=sf-dump-str title="3 characters">Doe</span>"
+              +<span class=sf-dump-virtual><span class=sf-dump-public title="Public property">fullName</span></span>: <span class=sf-dump-virtual><span class=sf-dump-const title="Virtual property">~ string</span></span>
+              -<span class=sf-dump-virtual><span class=sf-dump-private title="Private property defined in class:&#10;`Symfony\Component\VarDumper\Tests\Fixtures\VirtualProperty`">noType</span></span>: <span class=sf-dump-virtual><span class=sf-dump-const title="Virtual property">~</span></span>
+            </samp>}
+            </bar>
+            EODUMP, $out);
     }
 
     public function testCharset()

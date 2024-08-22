@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Form\Tests\Extension\Core\DataTransformer;
 
+use Symfony\Component\Form\Exception\InvalidArgumentException;
 use Symfony\Component\Form\Exception\TransformationFailedException;
 use Symfony\Component\Form\Extension\Core\DataTransformer\BaseDateTimeTransformer;
 use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeToLocalizedStringTransformer;
@@ -444,6 +445,14 @@ class DateTimeToLocalizedStringTransformerTest extends BaseDateTimeTransformerTe
             (new DateTimeToLocalizedStringTransformer(calendar: \IntlDateFormatter::GREGORIAN, pattern: "y-MM-dd y'w'w"))->transform($now),
             (new DateTimeToLocalizedStringTransformer(pattern: "y-MM-dd y'w'w"))->transform($now),
         );
+    }
+
+    public function testInvalidCalendar()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('The "calendar" option should be either an \IntlDateFormatter constant or an \IntlCalendar instance.');
+
+        new DateTimeToLocalizedStringTransformer(calendar: 123456);
     }
 
     protected function createDateTimeTransformer(?string $inputTimezone = null, ?string $outputTimezone = null): BaseDateTimeTransformer

@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by derrabus at 2024-08-22T10:15:57Z
+
+cc @alexandre-daubois
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2024-08-22T11:39:30Z
+
+Nice! I wondered if this should also be added to the new `CompoundConstraintTestCase` but I don't think that would be useful, right?

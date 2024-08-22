@@ -42,11 +42,11 @@ final class WebhookController
         $parser = $this->parsers[$type]['parser'];
 
         if (!$event = $parser->parse($request, $this->parsers[$type]['secret'])) {
-            return $parser->createRejectedResponse('Unable to parse the webhook payload.');
+            return $parser->createRejectedResponse('Unable to parse the webhook payload.', $request);
         }
 
         $this->bus->dispatch(new ConsumeRemoteEventMessage($type, $event));
 
-        return $parser->createSuccessfulResponse();
+        return $parser->createSuccessfulResponse($request);
     }
 }

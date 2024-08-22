@@ -26,6 +26,24 @@ class CompoundTest extends TestCase
         new EmptyCompound(['constraints' => [new NotBlank()]]);
     }
 
+    public function testGroupsAndPayload()
+    {
+        $payload = new \stdClass();
+        $compound = new EmptyCompound(groups: ['my-group', 'my-other-group'], payload: $payload);
+
+        $this->assertSame(['my-group', 'my-other-group'], $compound->groups);
+        $this->assertSame($payload, $compound->payload);
+    }
+
+    public function testGroupsAndPayloadInOptionsArray()
+    {
+        $payload = new \stdClass();
+        $compound = new EmptyCompound(['groups' => ['my-group', 'my-other-group'], 'payload' => $payload]);
+
+        $this->assertSame(['my-group', 'my-other-group'], $compound->groups);
+        $this->assertSame($payload, $compound->payload);
+    }
+
     public function testCanDependOnNormalizedOptions()
     {
         $constraint = new ForwardingOptionCompound($min = 3);

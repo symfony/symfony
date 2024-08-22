@@ -1159,6 +1159,8 @@ class DateTypeTest extends BaseTypeTestCase
 
     public function testSubmitWithCustomCalendarOption()
     {
+        IntlTestHelper::requireFullIntl($this);
+
         // Creates a new form using the "roc" (Republic Of China) calendar. This calendar starts in 1912, the year 2024 in
         // the Gregorian calendar is the year 113 in the "roc" calendar.
         $form = $this->factory->create(static::TESTED_TYPE, options: [
@@ -1178,6 +1180,8 @@ class DateTypeTest extends BaseTypeTestCase
 
     public function testSetDataWithCustomCalendarOption()
     {
+        IntlTestHelper::requireFullIntl($this);
+
         // Creates a new form using the "roc" (Republic Of China) calendar. This calendar starts in 1912, the year 2024 in
         // the Gregorian calendar is the year 113 in the "roc" calendar.
         $form = $this->factory->create(static::TESTED_TYPE, options: [

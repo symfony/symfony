@@ -1,0 +1,25 @@
+---------------------------------------------------------------------------
+
+by sylfabre at 2023-07-28T09:40:13Z
+
+Hello @alexandre-daubois
+Thank you for tackling this issue 👍
+Are you still working on this PR?
+
+If not (I totally understand), @stof @nicolas-grekas @xabbuh I suggest making `ConstraintValidatorTestCase` throw an exception when used with the `Compound` constraint with a link to this PR. Right now it is very misleading:
+- A test may actually pass without any check
+- A test may be false without reason
+
+I lost about two hours yesterday because of that (not blaming anyone) 😬
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2023-08-07T14:13:35Z
+
+Hi, thanks for the interest in this PR! I'd still love to see this happen in the framework. I'll rebase it on 6.4 :slightly_smiling_face:
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2024-08-02T11:26:41Z
+
+I just rebased in 7.2, if anyone wants to have a look :slightly_smiling_face:

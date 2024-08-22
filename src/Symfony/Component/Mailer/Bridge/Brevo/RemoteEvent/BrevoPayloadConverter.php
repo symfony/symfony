@@ -41,6 +41,7 @@ final class BrevoPayloadConverter implements PayloadConverterInterface
                 'unique_opened' => MailerEngagementEvent::OPEN,
                 'opened' => MailerEngagementEvent::OPEN,
                 'proxy_open' => MailerEngagementEvent::OPEN,
+                'unique_proxy_open' => MailerEngagementEvent::OPEN,
                 'complaint' => MailerEngagementEvent::SPAM,
                 default => throw new ParseException(\sprintf('Unsupported event "%s".', $payload['event'])),
             };

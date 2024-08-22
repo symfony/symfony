@@ -615,7 +615,11 @@ class XmlFileLoaderTest extends TestCase
         $loader->load('extensions/services1.xml');
 
         $expected = [
-            ['foo' => 'ping'],
+            [
+                'foo' => 'ping',
+                'another' => null,
+                'another2' => '%project.parameter.foo%',
+            ],
             ['foo' => 'bar'],
         ];
         $this->assertSame($expected, $container->getExtensionConfig('http://www.example.com/schema/project'));

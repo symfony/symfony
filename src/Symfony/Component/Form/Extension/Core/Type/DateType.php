@@ -323,7 +323,7 @@ class DateType extends AbstractType
         $resolver->setAllowedTypes('input_format', 'string');
         $resolver->setAllowedTypes('calendar', ['null', \IntlCalendar::class]);
 
-        $resolver->setInfo('calendar', 'The calendar to use for formatting and parsing the date. The value should be one of the \IntlDateFormatter calendar constants or an instance of the \IntlCalendar to use.');
+        $resolver->setInfo('calendar', 'The calendar to use for formatting and parsing the date. The value should be an instance of \IntlCalendar. By default, the Gregorian calendar with the default locale is used.');
 
         $resolver->setNormalizer('html5', static function (Options $options, $html5) {
             if ($html5 && 'single_text' === $options['widget'] && self::HTML5_FORMAT !== $options['format']) {

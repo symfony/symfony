@@ -58,14 +58,14 @@ class Length extends Constraint
     public string $countUnit = self::COUNT_CODEPOINTS;
 
     /**
-     * @param int|array<string,mixed>|null $exactly    The exact expected length
-     * @param int|null                     $min        The minimum expected length
-     * @param int|null                     $max        The maximum expected length
-     * @param string|null                  $charset    The charset to be used when computing value's length (defaults to UTF-8)
-     * @param callable|null                $normalizer A callable to normalize value before it is validated
-     * @param self::COUNT_*|null           $countUnit  The character count unit for the length check (defaults to {@see Length::COUNT_CODEPOINTS})
-     * @param string[]|null                $groups
-     * @param array<string,mixed>          $options
+     * @param positive-int|array<string,mixed>|null $exactly    The exact expected length
+     * @param int<0, max>|null                      $min        The minimum expected length
+     * @param positive-int|null                     $max        The maximum expected length
+     * @param string|null                           $charset    The charset to be used when computing value's length (defaults to UTF-8)
+     * @param callable|null                         $normalizer A callable to normalize value before it is validated
+     * @param self::COUNT_*|null                    $countUnit  The character count unit for the length check (defaults to {@see Length::COUNT_CODEPOINTS})
+     * @param string[]|null                         $groups
+     * @param array<string,mixed>                   $options
      */
     public function __construct(
         int|array|null $exactly = null,

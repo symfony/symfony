@@ -54,8 +54,8 @@ class Choice extends Constraint
      * @param callable|string|null $callback Callback method to use instead of the choice option to get the choices
      * @param bool|null            $multiple Whether to expect the value to be an array of valid choices (defaults to false)
      * @param bool|null            $strict   This option defaults to true and should not be used
-     * @param int|null             $min      Minimum of valid choices if multiple values are expected
-     * @param int|null             $max      Maximum of valid choices if multiple values are expected
+     * @param int<0, max>|null     $min      Minimum of valid choices if multiple values are expected
+     * @param positive-int|null    $max      Maximum of valid choices if multiple values are expected
      * @param string[]|null        $groups
      * @param bool|null            $match    Whether to validate the values are part of the choices or not (defaults to true)
      */

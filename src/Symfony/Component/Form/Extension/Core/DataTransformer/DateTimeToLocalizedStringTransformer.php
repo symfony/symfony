@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Form\Extension\Core\DataTransformer;
 
+use Symfony\Component\Form\Exception\InvalidArgumentException;
 use Symfony\Component\Form\Exception\TransformationFailedException;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
 
@@ -58,6 +59,10 @@ class DateTimeToLocalizedStringTransformer extends BaseDateTimeTransformer
 
         if (!\in_array($timeFormat, self::$formats, true)) {
             throw new UnexpectedTypeException($timeFormat, implode('", "', self::$formats));
+        }
+
+        if (\is_int($calendar) && !\in_array($calendar, [\IntlDateFormatter::GREGORIAN, \IntlDateFormatter::TRADITIONAL], true)) {
+            throw new InvalidArgumentException('The "calendar" option should be either an \IntlDateFormatter constant or an \IntlCalendar instance.');
         }
 
         $this->dateFormat = $dateFormat;
@@ -157,8 +162,6 @@ class DateTimeToLocalizedStringTransformer extends BaseDateTimeTransformer
      * Returns a preconfigured IntlDateFormatter instance.
      *
      * @param bool $ignoreTimezone Use UTC regardless of the configured timezone
-     *
-     * @throws TransformationFailedException in case the date formatter cannot be constructed
      */
     protected function getIntlDateFormatter(bool $ignoreTimezone = false): \IntlDateFormatter
     {
@@ -170,12 +173,6 @@ class DateTimeToLocalizedStringTransformer extends BaseDateTimeTransformer
         $pattern = $this->pattern;
 
         $intlDateFormatter = new \IntlDateFormatter(\Locale::getDefault(), $dateFormat, $timeFormat, $timezone, $calendar, $pattern ?? '');
-
-        // new \intlDateFormatter may return null instead of false in case of failure, see https://bugs.php.net/66323
-        if (!$intlDateFormatter) {
-            throw new TransformationFailedException(intl_get_error_message(), intl_get_error_code());
-        }
-
         $intlDateFormatter->setLenient(false);
 
         return $intlDateFormatter;

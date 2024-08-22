@@ -19,6 +19,9 @@ use Symfony\Component\Validator\Constraints\Regex;
 use Symfony\Component\Validator\Test\CompoundConstraintTestCase;
 use Symfony\Component\Validator\Tests\Fixtures\DummyCompoundConstraint;
 
+/**
+ * @extends CompoundConstraintTestCase<DummyCompoundConstraint>
+ */
 class CompoundConstraintTestCaseTest extends CompoundConstraintTestCase
 {
     protected function createCompound(): Compound

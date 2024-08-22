@@ -27,6 +27,8 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  * A test case to ease testing Compound Constraints.
  *
  * @author Alexandre Daubois <alex.daubois@gmail.com>
+ *
+ * @template T of Compound
  */
 abstract class CompoundConstraintTestCase extends TestCase
 {
@@ -119,5 +121,8 @@ abstract class CompoundConstraintTestCase extends TestCase
         $this->assertSame(0, $violationsCount, \sprintf('No violation expected. Got %d.', $violationsCount));
     }
 
+    /**
+     * @return T
+     */
     abstract protected function createCompound(): Compound;
 }

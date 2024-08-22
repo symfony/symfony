@@ -1,0 +1,7 @@
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2024-08-22T09:25:25Z
+
+For `DateType`, the error situation cannot really happen because it is protected by the OptionsResolver anyway.
+
+In `DateTimeToLocalizedStringTransformer` however, I propose to add a check in the constructor to ensure the validity of `calendar` when it is an integer just like the timezones, date format and time format. By doing so, we prevent any exception to be thrown when creating IntlDateFormatter.

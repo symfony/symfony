@@ -21,7 +21,13 @@ trait WrappedExceptionsTrait
     private array $exceptions;
 
     /**
+     * @template TClass of class-string<\Throwable>
+     *
+     * @param TClass|null $class
+     *
      * @return \Throwable[]
+     *
+     * @psalm-return (TClass is null ? \Throwable[] : TClass[])
      */
     public function getWrappedExceptions(?string $class = null, bool $recursive = false): array
     {

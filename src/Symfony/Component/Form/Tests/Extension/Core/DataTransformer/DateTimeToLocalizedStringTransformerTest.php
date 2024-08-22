@@ -392,6 +392,60 @@ class DateTimeToLocalizedStringTransformerTest extends BaseDateTimeTransformerTe
         }
     }
 
+    public function testTransformDateTimeWithCustomCalendar()
+    {
+        $dateTime = new \DateTimeImmutable('2024-03-31');
+
+        $weekBeginsOnSunday = \IntlCalendar::createInstance();
+        $weekBeginsOnSunday->setFirstDayOfWeek(\IntlCalendar::DOW_SUNDAY);
+
+        $this->assertSame(
+            '2024-03-31 2024w14',
+            (new DateTimeToLocalizedStringTransformer(calendar: $weekBeginsOnSunday, pattern: "y-MM-dd y'w'w"))->transform($dateTime),
+        );
+
+        $weekBeginsOnMonday = \IntlCalendar::createInstance();
+        $weekBeginsOnMonday->setFirstDayOfWeek(\IntlCalendar::DOW_MONDAY);
+
+        $this->assertSame(
+            '2024-03-31 2024w13',
+            (new DateTimeToLocalizedStringTransformer(calendar: $weekBeginsOnMonday, pattern: "y-MM-dd y'w'w"))->transform($dateTime),
+        );
+    }
+
+    public function testReverseTransformDateTimeWithCustomCalendar()
+    {
+        $weekBeginsOnSunday = \IntlCalendar::createInstance();
+        $weekBeginsOnSunday->setFirstDayOfWeek(\IntlCalendar::DOW_SUNDAY);
+
+        $this->assertSame(
+            '2024-03-31',
+            (new DateTimeToLocalizedStringTransformer(calendar: $weekBeginsOnSunday, pattern: "y-MM-dd y'w'w"))
+                ->reverseTransform('2024-03-31 2024w14')
+                ->format('Y-m-d'),
+        );
+
+        $weekBeginsOnMonday = \IntlCalendar::createInstance();
+        $weekBeginsOnMonday->setFirstDayOfWeek(\IntlCalendar::DOW_MONDAY);
+
+        $this->assertSame(
+            '2024-03-31',
+            (new DateTimeToLocalizedStringTransformer(calendar: $weekBeginsOnMonday, pattern: "y-MM-dd y'w'w"))
+                ->reverseTransform('2024-03-31 2024w13')
+                ->format('Y-m-d'),
+        );
+    }
+
+    public function testDefaultCalendarIsGregorian()
+    {
+        $now = new \DateTimeImmutable();
+
+        $this->assertSame(
+            (new DateTimeToLocalizedStringTransformer(calendar: \IntlDateFormatter::GREGORIAN, pattern: "y-MM-dd y'w'w"))->transform($now),
+            (new DateTimeToLocalizedStringTransformer(pattern: "y-MM-dd y'w'w"))->transform($now),
+        );
+    }
+
     protected function createDateTimeTransformer(?string $inputTimezone = null, ?string $outputTimezone = null): BaseDateTimeTransformer
     {
         return new DateTimeToLocalizedStringTransformer($inputTimezone, $outputTimezone);

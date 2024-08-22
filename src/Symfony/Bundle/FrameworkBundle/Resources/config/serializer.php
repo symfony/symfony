@@ -31,6 +31,7 @@ use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
 use Symfony\Component\Serializer\Mapping\Loader\LoaderChain;
 use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter;
 use Symfony\Component\Serializer\NameConverter\MetadataAwareNameConverter;
+use Symfony\Component\Serializer\NameConverter\SnakeCaseToCamelCaseNameConverter;
 use Symfony\Component\Serializer\Normalizer\ArrayDenormalizer;
 use Symfony\Component\Serializer\Normalizer\BackedEnumNormalizer;
 use Symfony\Component\Serializer\Normalizer\ConstraintViolationListNormalizer;
@@ -186,8 +187,9 @@ return static function (ContainerConfigurator $container) {
         ->set('serializer.encoder.csv', CsvEncoder::class)
             ->tag('serializer.encoder')
 
-        // Name converter
+        // Name converters
         ->set('serializer.name_converter.camel_case_to_snake_case', CamelCaseToSnakeCaseNameConverter::class)
+        ->set('serializer.name_converter.snake_case_to_camel_case', SnakeCaseToCamelCaseNameConverter::class)
 
         ->set('serializer.name_converter.metadata_aware', MetadataAwareNameConverter::class)
             ->args([service('serializer.mapping.class_metadata_factory')])

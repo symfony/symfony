@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2024-08-21T20:46:09Z
+
+What's the use case?
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2024-08-21T21:06:46Z
+
+The idea it to have all necessary tools to deal with bitfields in expression language. That would allow for example to use bitfields in YAML files thanks to expressions. This is based [on an idea](https://github.com/symfony/symfony/pull/57522#issuecomment-2302462105) from Nicolas, especially for the "binary not".

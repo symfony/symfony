@@ -1,0 +1,21 @@
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2024-08-13T20:09:57Z
+
+I agree with you! I wasn't a big fan of the current render. I updated the description with this screenshot, looks nice!
+
+![image](https://github.com/user-attachments/assets/2a3e9fc9-1a43-4d62-a6d1-845074ee368a)
+
+Not sure of `(no type)`, but I couldn't come up with another wording for now
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2024-08-20T14:27:43Z
+
+I pushed a revision containing the following changes (see https://github.com/symfony/symfony/compare/f73c776c1ad8add7b96f1ca557e7b2ff5d43b144..68c9ae6d3c1bd6f03fa185e144ae6e5f31fedafe):
+- Check for color support to display italic
+- Use `~` to identify a virtual property (for the record, this character is already used with `Caster::PREFIX_VIRTUAL`)
+- Added a few tests for CliDumper and HtmlDumper
+- Description updated :framed_picture:
+
+Thank you for helping me fix the implementation!

@@ -11,11 +11,9 @@
 
 namespace Symfony\Component\Validator\Tests\Constraints;
 
-use Symfony\Component\Validator\Constraints\Compound;
 use Symfony\Component\Validator\Constraints\CompoundValidator;
-use Symfony\Component\Validator\Constraints\Length;
-use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
+use Symfony\Component\Validator\Tests\Fixtures\DummyCompoundConstraint;
 
 class CompoundValidatorTest extends ConstraintValidatorTestCase
 {
@@ -41,16 +39,5 @@ class CompoundValidatorTest extends ConstraintValidatorTestCase
         $this->validator->validate($value, $constraint);
 
         $this->assertNoViolation();
-    }
-}
-
-class DummyCompoundConstraint extends Compound
-{
-    protected function getConstraints(array $options): array
-    {
-        return [
-            new NotBlank(),
-            new Length(['max' => 3]),
-        ];
     }
 }

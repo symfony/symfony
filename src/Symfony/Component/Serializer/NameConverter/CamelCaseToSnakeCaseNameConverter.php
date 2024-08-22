@@ -27,8 +27,8 @@ class CamelCaseToSnakeCaseNameConverter implements NameConverterInterface
     public const REQUIRE_SNAKE_CASE_PROPERTIES = 'require_snake_case_properties';
 
     /**
-     * @param array|null $attributes     The list of attributes to rename or null for all attributes
-     * @param bool       $lowerCamelCase Use lowerCamelCase style
+     * @param string[]|null $attributes     The list of attributes to rename or null for all attributes
+     * @param bool          $lowerCamelCase Use lowerCamelCase style
      */
     public function __construct(
         private ?array $attributes = null,

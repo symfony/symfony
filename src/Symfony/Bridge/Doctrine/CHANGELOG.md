@@ -5,6 +5,7 @@ CHANGELOG
 ---
 
  * Accept `ReadableCollection` in `CollectionToArrayTransformer`
+ * Add `Transactional` attribute and `DoctrineTransactionDecorator`
 
 7.1
 ---

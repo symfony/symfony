@@ -7,6 +7,7 @@ CHANGELOG
  * Add support for assets pre-compression
  * Rename `TranslationUpdateCommand` to `TranslationExtractCommand`
  * Add JsonEncoder services and configuration
+ * Add CallableWrapper services and support
 
 7.2
 ---

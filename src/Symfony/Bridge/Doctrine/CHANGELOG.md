@@ -5,6 +5,7 @@ CHANGELOG
 ---
 
  * Accept `ReadableCollection` in `CollectionToArrayTransformer`
+ * Add `Transactional` attribute and `TransactionalCallableWrapper`
 
 7.1
 ---

@@ -1,0 +1,34 @@
+{
+    "name": "symfony/callable-wrapper",
+    "type": "library",
+    "description": "Wrap the functionality of other functions",
+    "keywords": ["wrapper", "decorator"],
+    "homepage": "https://symfony.com",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Yonel Ceruto",
+            "email": "open@yceruto.dev"
+        },
+        {
+            "name": "Symfony Community",
+            "homepage": "https://symfony.com/contributors"
+        }
+    ],
+    "require": {
+        "php": ">=8.2",
+        "psr/container": "^1.1|^2.0",
+        "symfony/service-contracts": "^2.5|^3"
+    },
+    "require-dev": {
+        "psr/log": "^1|^2|^3",
+        "symfony/dependency-injection": "^7.3"
+    },
+    "autoload": {
+        "psr-4": { "Symfony\\Component\\CallableWrapper\\": "" },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
+    },
+    "minimum-stability": "dev"
+}

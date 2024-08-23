@@ -30,6 +30,7 @@ use Symfony\Component\Cache\DependencyInjection\CacheCollectorPass;
 use Symfony\Component\Cache\DependencyInjection\CachePoolClearerPass;
 use Symfony\Component\Cache\DependencyInjection\CachePoolPass;
 use Symfony\Component\Cache\DependencyInjection\CachePoolPrunerPass;
+use Symfony\Component\CallableWrapper\DependencyInjection\CallableWrappersPass;
 use Symfony\Component\Config\Resource\ClassExistenceResource;
 use Symfony\Component\Console\ConsoleEvents;
 use Symfony\Component\Console\DependencyInjection\AddConsoleCommandPass;
@@ -181,6 +182,7 @@ class FrameworkBundle extends Bundle
         // must be registered after MonologBundle's LoggerChannelPass
         $container->addCompilerPass(new ErrorLoggerCompilerPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, -32);
         $container->addCompilerPass(new VirtualRequestStackPass());
+        $this->addCompilerPassIfExists($container, CallableWrappersPass::class);
 
         if ($container->getParameter('kernel.debug')) {
             $container->addCompilerPass(new AddDebugLogProcessorPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, 2);

@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+7.3
+---
+
+ * Add support for callable wrappers in message handlers
+
 7.2
 ---
 

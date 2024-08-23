@@ -12,6 +12,7 @@
 namespace Symfony\Component\Messenger\Middleware;
 
 use Psr\Log\LoggerAwareTrait;
+use Symfony\Component\CallableWrapper\CallableWrapperInterface;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\HandlerFailedException;
 use Symfony\Component\Messenger\Exception\LogicException;
@@ -35,6 +36,7 @@ class HandleMessageMiddleware implements MiddlewareInterface
     public function __construct(
         private HandlersLocatorInterface $handlersLocator,
         private bool $allowNoHandlers = false,
+        private ?CallableWrapperInterface $wrapper = null,
     ) {
     }
 
@@ -147,6 +149,10 @@ class HandleMessageMiddleware implements MiddlewareInterface
         }
         if (null !== $handlerArgumentsStamp) {
             $arguments = [...$arguments, ...$handlerArgumentsStamp->getAdditionalArguments()];
+        }
+
+        if ($this->wrapper) {
+            $handler = $this->wrapper->wrap($handler(...));
         }
 
         return $handler(...$arguments);

@@ -41,6 +41,7 @@ use Symfony\Component\Cache\Adapter\TagAwareAdapter;
 use Symfony\Component\Cache\DependencyInjection\CachePoolPass;
 use Symfony\Component\Cache\Marshaller\MarshallerInterface;
 use Symfony\Component\Cache\ResettableInterface;
+use Symfony\Component\CallableWrapper\CallableWrapperInterface;
 use Symfony\Component\Clock\ClockInterface;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\Config\FileLocator;
@@ -234,6 +235,10 @@ class FrameworkExtension extends Extension
         $loader->load('services.php');
         $loader->load('fragment_renderer.php');
         $loader->load('error_renderer.php');
+
+        if (ContainerBuilder::willBeAvailable('symfony/callable-wrapper', CallableWrapperInterface::class, ['symfony/framework-bundle'])) {
+            $loader->load('callable_wrapper.php');
+        }
 
         if (!ContainerBuilder::willBeAvailable('symfony/clock', ClockInterface::class, ['symfony/framework-bundle'])) {
             $container->removeDefinition('clock');
@@ -683,6 +688,8 @@ class FrameworkExtension extends Extension
             ->addTag('mime.mime_type_guesser');
         $container->registerForAutoconfiguration(LoggerAwareInterface::class)
             ->addMethodCall('setLogger', [new Reference('logger')]);
+        $container->registerForAutoconfiguration(CallableWrapperInterface::class)
+            ->addTag('callable_wrapper');
 
         $container->registerAttributeForAutoconfiguration(AsEventListener::class, static function (ChildDefinition $definition, AsEventListener $attribute, \ReflectionClass|\ReflectionMethod $reflector) {
             $tagAttributes = get_object_vars($attribute);

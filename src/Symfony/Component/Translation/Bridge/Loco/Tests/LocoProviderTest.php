@@ -30,9 +30,9 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
 
 class LocoProviderTest extends ProviderTestCase
 {
-    public static function createProvider(HttpClientInterface $client, LoaderInterface $loader, LoggerInterface $logger, string $defaultLocale, string $endpoint, ?TranslatorBagInterface $translatorBag = null): ProviderInterface
+    public static function createProvider(HttpClientInterface $client, LoaderInterface $loader, LoggerInterface $logger, string $defaultLocale, string $endpoint, ?TranslatorBagInterface $translatorBag = null, ?string $restrictToStatus = null): ProviderInterface
     {
-        return new LocoProvider($client, $loader, $logger, $defaultLocale, $endpoint, $translatorBag ?? new TranslatorBag());
+        return new LocoProvider($client, $loader, $logger, $defaultLocale, $endpoint, $translatorBag ?? new TranslatorBag(), $restrictToStatus);
     }
 
     public static function toStringProvider(): iterable
@@ -1169,5 +1169,35 @@ XLIFF
 
             yield [$locales, $domains, $responseContents, $lastModifieds, $expectedTranslatorBag];
         }
+    }
+
+    public function testReadWithRestrictToStatus()
+    {
+        $loader = $this->getLoader();
+
+        $loader
+            ->expects($this->once())
+            ->method('load')
+            ->willReturn($this->createMock(MessageCatalogue::class));
+
+        $provider = self::createProvider(
+            new MockHttpClient([
+                function (string $method, string $url, array $options = []): ResponseInterface {
+                    $this->assertSame('GET', $method);
+                    $this->assertSame('https://localise.biz/api/export/locale/de.xlf?filter=messages&status=translated%2Cprovisional', $url);
+                    $this->assertSame(['filter' => 'messages', 'status' => 'translated,provisional'], $options['query']);
+
+                    return new MockResponse();
+                },
+            ], 'https://localise.biz/api/'),
+            $this->getLoader(),
+            $this->getLogger(),
+            $this->getDefaultLocale(),
+            'localise.biz/api/',
+            null,
+            'translated,provisional'
+        );
+
+        $this->translatorBag = $provider->read(['messages'], ['de']);
     }
 }

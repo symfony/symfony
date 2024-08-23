@@ -84,6 +84,16 @@ class SessionParameterValueResolverTest extends TestCase
             new ArgumentMetadata('MySessionObject', SessionParameterInterface::class, false, false, false, attributes: [new MapSessionParameter()]),
             '#[MapSessionParameter] cannot be used on controller argument "$MySessionObject": "Symfony\Component\HttpKernel\Tests\Controller\ArgumentResolver\SessionParameterInterface" is an interface, you need to make the parameter nullable or provide a default value.',
         ];
+
+        yield 'union type' => [
+            new ArgumentMetadata('MySessionObject', BasicSessionParameter::class.'|'.EmptySessionParameter::class, false, false, false, attributes: [new MapSessionParameter()]),
+            '#[MapSessionParameter] cannot be used on controller argument "$MySessionObject": "Symfony\Component\HttpKernel\Tests\Controller\ArgumentResolver\BasicSessionParameter|Symfony\Component\HttpKernel\Tests\Controller\ArgumentResolver\EmptySessionParameter" is an union or intersection type, you need to make the parameter nullable or provide a default value.',
+        ];
+
+        yield 'intersection type' => [
+            new ArgumentMetadata('MySessionObject', BasicSessionParameter::class.'&'.EmptySessionParameter::class, false, false, false, attributes: [new MapSessionParameter()]),
+            '#[MapSessionParameter] cannot be used on controller argument "$MySessionObject": "Symfony\Component\HttpKernel\Tests\Controller\ArgumentResolver\BasicSessionParameter&Symfony\Component\HttpKernel\Tests\Controller\ArgumentResolver\EmptySessionParameter" is an union or intersection type, you need to make the parameter nullable or provide a default value.',
+        ];
     }
 
     /**
@@ -131,11 +141,35 @@ class SessionParameterValueResolverTest extends TestCase
             null,
         ];
         yield 'nullable interface without default value' => [
+            new ArgumentMetadata('MySessionObject', SessionParameterInterface::class, false, false, null, true, attributes: [new MapSessionParameter()]),
+            null,
+        ];
+        yield 'nullable interface defaulting to null' => [
             new ArgumentMetadata('MySessionObject', SessionParameterInterface::class, false, true, null, true, attributes: [new MapSessionParameter()]),
             null,
         ];
         yield 'interface with default value' => [
             new ArgumentMetadata('MySessionObject', SessionParameterInterface::class, false, true, new BasicSessionParameter(), false, attributes: [new MapSessionParameter()]),
+            BasicSessionParameter::class,
+        ];
+
+        yield 'nullable union type without default value' => [
+            new ArgumentMetadata('MySessionObject', BasicSessionParameter::class.'|'.EmptySessionParameter::class, false, true, null, attributes: [new MapSessionParameter()]),
+            null,
+        ];
+
+        yield 'nullable intersection type without default value' => [
+            new ArgumentMetadata('MySessionObject', BasicSessionParameter::class.'&'.EmptySessionParameter::class, false, true, null, attributes: [new MapSessionParameter()]),
+            null,
+        ];
+
+        yield 'union type with default value' => [
+            new ArgumentMetadata('MySessionObject', BasicSessionParameter::class.'|'.EmptySessionParameter::class, false, true, new BasicSessionParameter(), attributes: [new MapSessionParameter()]),
+            BasicSessionParameter::class,
+        ];
+
+        yield 'intersection type with default value' => [
+            new ArgumentMetadata('MySessionObject', BasicSessionParameter::class.'&'.EmptySessionParameter::class, false, true, new BasicSessionParameter(), attributes: [new MapSessionParameter()]),
             BasicSessionParameter::class,
         ];
     }
@@ -186,6 +220,24 @@ class SessionParameterValueResolverTest extends TestCase
 
         $this->assertCount(1, $result);
         $this->assertInstanceOf(SessionParameterInterface::class, $result[0]);
+    }
+
+    public function testResolvingCorrectUnionSuccessfully()
+    {
+        $this->request->getSession()->set('MySessionObject', new BasicSessionParameter());
+        $result = $this->resolver->resolve($this->request, new ArgumentMetadata('MySessionObject', SessionParameterInterface::class.'|'.EmptySessionParameter::class, false, false, false, isNullable: true, attributes: [new MapSessionParameter()]));
+
+        $this->assertCount(1, $result);
+        $this->assertInstanceOf(BasicSessionParameter::class, $result[0]);
+    }
+
+    public function testResolvingCorrectIntersectionSuccessfully()
+    {
+        $this->request->getSession()->set('MySessionObject', new BasicSessionParameter());
+        $result = $this->resolver->resolve($this->request, new ArgumentMetadata('MySessionObject', SessionParameterInterface::class.'&'.BasicSessionParameter::class, false, false, false, isNullable: true, attributes: [new MapSessionParameter()]));
+
+        $this->assertCount(1, $result);
+        $this->assertInstanceOf(BasicSessionParameter::class, $result[0]);
     }
 
     public function testResolvingIncorrectTypeFailure()

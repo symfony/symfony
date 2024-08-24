@@ -32,7 +32,12 @@ class CsrfTokenClearingLogoutListener implements EventSubscriberInterface
 
     public function onLogout(LogoutEvent $event): void
     {
-        if ($this->csrfTokenStorage instanceof SessionTokenStorage && !$event->getRequest()->hasPreviousSession()) {
+        $request = $event->getRequest();
+
+        if (
+            $this->csrfTokenStorage instanceof SessionTokenStorage
+            && ($request->attributes->getBoolean('_stateless') || !$request->hasPreviousSession())
+        ) {
             return;
         }
 

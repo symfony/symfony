@@ -28,7 +28,7 @@ class TwigNodeProvider
     public static function getModule($content)
     {
         return new ModuleNode(
-            new ConstantExpression($content, 0),
+            new BodyNode([new ConstantExpression($content, 0)]),
             null,
             new ArrayExpression([], 0),
             new ArrayExpression([], 0),

@@ -477,6 +477,8 @@ class XmlFileLoader extends FileLoader
                             continue;
                         }
                         if ('provider' === $parent->localName || 'firewall' === $parent->localName) {
+                            trigger_deprecation('symfony/security-bundle', '7.2', 'Custom %s must now be namespaced; please update your security configuration "%s" tag.', 'provider' === $parent->localName ? 'providers' : 'authenticators', $tagName);
+
                             unset($errors[$errorIndex]);
                         }
                     }

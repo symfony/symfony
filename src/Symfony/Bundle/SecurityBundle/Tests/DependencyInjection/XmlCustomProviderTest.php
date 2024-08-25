@@ -12,6 +12,7 @@
 namespace Symfony\Bundle\SecurityBundle\Tests\DependencyInjection;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\SecurityExtension;
 use Symfony\Bundle\SecurityBundle\Tests\DependencyInjection\Fixtures\UserProvider\CustomProvider;
 use Symfony\Component\Config\FileLocator;
@@ -20,10 +21,12 @@ use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 
 class XmlCustomProviderTest extends TestCase
 {
+    use ExpectDeprecationTrait;
+
     /**
-     * @dataProvider provideXmlConfigurationFile
+     * @group legacy
      */
-    public function testCustomProviderElement(string $configurationFile)
+    public function testCustomProviderElementUnderSecurityNamespace()
     {
         $container = new ContainerBuilder();
         $container->setParameter('kernel.debug', false);
@@ -33,18 +36,30 @@ class XmlCustomProviderTest extends TestCase
         $security->addUserProviderFactory(new CustomProvider());
         $container->registerExtension($security);
 
-        (new XmlFileLoader($container, new FileLocator(__DIR__.'/Fixtures/xml')))->load($configurationFile);
+        $this->expectDeprecation('Since symfony/security-bundle 7.2: Custom providers must now be namespaced; please update your security configuration "custom" tag.');
+        (new XmlFileLoader($container, new FileLocator(__DIR__.'/Fixtures/xml')))->load('custom_provider_under_security_namespace.xml');
+
+        $container->getCompilerPassConfig()->setRemovingPasses([]);
+        $container->getCompilerPassConfig()->setAfterRemovingPasses([]);
+        $container->compile();
+    }
+
+    public function testCustomProviderElementUnderOwnNamespace()
+    {
+        $container = new ContainerBuilder();
+        $container->setParameter('kernel.debug', false);
+        $container->register('cache.system', \stdClass::class);
+
+        $security = new SecurityExtension();
+        $security->addUserProviderFactory(new CustomProvider());
+        $container->registerExtension($security);
+
+        (new XmlFileLoader($container, new FileLocator(__DIR__.'/Fixtures/xml')))->load('custom_provider_under_own_namespace.xml');
 
         $container->getCompilerPassConfig()->setRemovingPasses([]);
         $container->getCompilerPassConfig()->setAfterRemovingPasses([]);
         $container->compile();
 
         $this->addToAssertionCount(1);
-    }
-
-    public static function provideXmlConfigurationFile(): iterable
-    {
-        yield 'Custom provider element under SecurityBundle’s namespace' => ['custom_provider_under_security_namespace.xml'];
-        yield 'Custom provider element under its own namespace' => ['custom_provider_under_own_namespace.xml'];
     }
 }

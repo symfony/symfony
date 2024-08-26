@@ -153,6 +153,9 @@ class PriorityTaggedServiceTraitTest extends TestCase
 
         $container->register('service4', HelloInterface::class)->addTag('my_custom_tag');
 
+        $definition = $container->register('debug.service5', \stdClass::class)->addTag('my_custom_tag');
+        $definition->addTag('container.decorator', ['id' => 'service5']);
+
         $priorityTaggedServiceTraitImplementation = new PriorityTaggedServiceTraitImplementation();
 
         $tag = new TaggedIteratorArgument('my_custom_tag', 'foo', 'getFooBar');
@@ -161,6 +164,7 @@ class PriorityTaggedServiceTraitTest extends TestCase
             'service1' => new TypedReference('service1', FooTagClass::class),
             '10' => new TypedReference('service3', IntTagClass::class),
             'service4' => new TypedReference('service4', HelloInterface::class),
+            'service5' => new TypedReference('debug.service5', \stdClass::class),
         ];
         $services = $priorityTaggedServiceTraitImplementation->test($tag, $container);
         $this->assertSame(array_keys($expected), array_keys($services));

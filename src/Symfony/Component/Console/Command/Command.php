@@ -664,11 +664,11 @@ class Command
                     $optionNames[] = '-'.$inputOption->getShortcut();
                 }
                 if ($input->hasParameterOption($optionNames, true)) {
-                    $deprecationMessages[] = sprintf('The option "%s" is deprecated.', implode('|', $optionNames));
+                    $deprecationMessages[] = \sprintf('The option "%s" is deprecated.', implode('|', $optionNames));
                 }
             }
         }
-        if (!empty($deprecationMessages)) {
+        if ($deprecationMessages) {
             /** @var FormatterHelper $formatter */
             $formatter = $this->getHelper('formatter');
             $output->writeln($formatter->formatBlock($deprecationMessages, 'fg=black;bg=yellow', true));

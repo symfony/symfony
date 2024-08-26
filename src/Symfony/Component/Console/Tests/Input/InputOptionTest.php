@@ -143,7 +143,7 @@ class InputOptionTest extends TestCase
     public static function privideInvalidModeData()
     {
         yield 'negative mode' => [-1, 'Option mode "-1" is not valid.'];
-        yield 'invalid bit mask value' => [InputOption::HIDDEN << 1, sprintf('Option mode "%d" is not valid.', InputOption::HIDDEN << 1)];
+        yield 'invalid bit mask value' => [InputOption::HIDDEN << 1, \sprintf('Option mode "%d" is not valid.', InputOption::HIDDEN << 1)];
     }
 
     public function testEmptyNameIsInvalid()

@@ -86,8 +86,7 @@ class MarkdownDescriptor extends Descriptor
             }
         }
 
-        $inputOptions = $this->removeHiddenOptions($definition->getOptions(), $options);
-        if (!empty($inputOptions)) {
+        if ($inputOptions = $this->removeHiddenOptions($definition->getOptions(), $options)) {
             if ($showArguments) {
                 $this->write("\n\n");
             }

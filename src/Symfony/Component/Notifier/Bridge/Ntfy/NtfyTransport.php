@@ -87,7 +87,7 @@ final class NtfyTransport extends AbstractTransport
         $headers = [];
 
         if (null !== $this->user && null !== $this->password) {
-            $headers['Authorization'] = 'Basic '.rtrim(base64_encode($this->user.':'.$this->password), '=');
+            $headers['Authorization'] = 'Basic '.base64_encode($this->user.':'.$this->password);
         } elseif (null !== $this->password) {
             $headers['Authorization'] = 'Bearer '.$this->password;
         }

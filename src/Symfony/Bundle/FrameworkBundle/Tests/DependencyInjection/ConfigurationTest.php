@@ -715,13 +715,18 @@ class ConfigurationTest extends TestCase
             'trusted_proxies' => ['%env(default::SYMFONY_TRUSTED_PROXIES)%'],
             'trusted_headers' => ['%env(default::SYMFONY_TRUSTED_HEADERS)%'],
             'csrf_protection' => [
-                'enabled' => false,
+                'enabled' => null,
+                'cookie_name' => 'csrf-token',
+                'check_header' => false,
+                'stateless_token_ids' => [],
             ],
             'form' => [
                 'enabled' => !class_exists(FullStack::class),
                 'csrf_protection' => [
                     'enabled' => null, // defaults to csrf_protection.enabled
                     'field_name' => '_token',
+                    'field_attr' => ['data-controller' => 'csrf-protection'],
+                    'token_id' => null,
                 ],
             ],
             'esi' => ['enabled' => false],

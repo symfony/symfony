@@ -45,7 +45,7 @@ class ExpressionLanguageProvider implements ExpressionFunctionProviderInterface
 
             new ExpressionFunction('env', fn ($arg) => sprintf('$container->getEnv(%s)', $arg), function (array $variables, $value) {
                 if (!$this->getEnv) {
-                    throw new LogicException('You need to pass a getEnv closure to the expression langage provider to use the "env" function.');
+                    throw new LogicException('You need to pass a getEnv closure to the expression language provider to use the "env" function.');
                 }
 
                 return ($this->getEnv)($value);

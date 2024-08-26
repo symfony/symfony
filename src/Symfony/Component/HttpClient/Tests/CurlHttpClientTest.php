@@ -122,4 +122,20 @@ class CurlHttpClientTest extends HttpClientTestCase
             ],
         ]);
     }
+
+    public function testKeepAuthorizationHeaderOnRedirectToSameHostWithConfiguredHostToIpAddressMapping()
+    {
+        $httpClient = $this->getHttpClient(__FUNCTION__);
+        $response = $httpClient->request('POST', 'http://127.0.0.1:8057/301', [
+            'headers' => [
+                'Authorization' => 'Basic Zm9vOmJhcg==',
+            ],
+            'resolve' => [
+                'symfony.com' => '10.10.10.10',
+            ],
+        ]);
+
+        $this->assertSame(200, $response->getStatusCode());
+        $this->assertSame('/302', $response->toArray()['REQUEST_URI'] ?? null);
+    }
 }

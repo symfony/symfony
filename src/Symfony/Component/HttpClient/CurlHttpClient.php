@@ -188,10 +188,10 @@ final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface,
                 $multi->reset();
             }
 
-            foreach ($options['resolve'] as $host => $ip) {
-                $resolve[] = null === $ip ? "-$host:$port" : "$host:$port:$ip";
-                $multi->dnsCache->hostnames[$host] = $ip;
-                $multi->dnsCache->removals["-$host:$port"] = "-$host:$port";
+            foreach ($options['resolve'] as $resolveHost => $ip) {
+                $resolve[] = null === $ip ? "-$resolveHost:$port" : "$resolveHost:$port:$ip";
+                $multi->dnsCache->hostnames[$resolveHost] = $ip;
+                $multi->dnsCache->removals["-$resolveHost:$port"] = "-$resolveHost:$port";
             }
 
             $curlopts[\CURLOPT_RESOLVE] = $resolve;

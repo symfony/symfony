@@ -40,7 +40,7 @@ class JsonResponse extends Response
     {
         parent::__construct('', $status, $headers);
 
-        if ($json && !\is_string($data) && !is_numeric($data) && !\is_callable([$data, '__toString'])) {
+        if ($json && !\is_string($data) && !is_numeric($data) && !$data instanceof \Stringable) {
             throw new \TypeError(\sprintf('"%s": If $json is set to true, argument $data must be a string or object implementing __toString(), "%s" given.', __METHOD__, get_debug_type($data)));
         }
 

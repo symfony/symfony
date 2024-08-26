@@ -85,7 +85,7 @@ class TraceableAccessDecisionManager implements AccessDecisionManagerInterface
         if (null === $this->strategy) {
             return '-';
         }
-        if (method_exists($this->strategy, '__toString')) {
+        if ($this->strategy instanceof \Stringable) {
             return (string) $this->strategy;
         }
 

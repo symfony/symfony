@@ -323,6 +323,18 @@ class ConnectionTest extends TestCase
         $connection->add('1', []);
     }
 
+    public function testDontApproximateMaxEntries()
+    {
+        $redis = $this->createMock(\Redis::class);
+
+        $redis->expects($this->exactly(1))->method('xadd')
+            ->with('queue', '*', ['message' => '{"body":"1","headers":[]}'], 20000, false)
+            ->willReturn('1');
+
+        $connection = Connection::fromDsn('redis://localhost/queue?stream_max_entries=20000&approximate_max_entries=false', [], $redis);
+        $connection->add('1', []);
+    }
+
     public function testDeleteAfterAck()
     {
         $redis = $this->createMock(\Redis::class);

@@ -9,6 +9,7 @@ CHANGELOG
  * Add `#[AsMessage]` attribute with `$transport` parameter for message routing
  * Add `--format` option to the `messenger:stats` command
  * Add `getRetryDelay()` method to `RecoverableExceptionInterface`
+ * Add support for the `approximate_max_entries` option in the Redis transport
 
 7.1
 ---

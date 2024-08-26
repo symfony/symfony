@@ -39,7 +39,8 @@ class Connection
         'auto_setup' => true,
         'delete_after_ack' => true,
         'delete_after_reject' => true,
-        'stream_max_entries' => 0, // any value higher than 0 defines an approximate maximum number of stream entries
+        'stream_max_entries' => 0,
+        'approximate_max_entries' => true, // whether to approximate the max entries or not, which is more efficient if enabled
         'dbindex' => 0,
         'redeliver_timeout' => 3600, // Timeout before redeliver messages still in pending state (seconds)
         'claim_interval' => 60000, // Interval by which pending/abandoned messages should be checked
@@ -62,6 +63,7 @@ class Connection
     private string $consumer;
     private bool $autoSetup;
     private int $maxEntries;
+    private bool $approximateMaxEntries;
     private int $redeliverTimeout;
     private float $nextClaim = 0.0;
     private float $claimInterval;
@@ -177,6 +179,7 @@ class Connection
         $this->queue = $this->stream.'__queue';
         $this->autoSetup = $options['auto_setup'];
         $this->maxEntries = $options['stream_max_entries'];
+        $this->approximateMaxEntries = $options['approximate_max_entries'];
         $this->deleteAfterAck = $options['delete_after_ack'];
         $this->deleteAfterReject = $options['delete_after_reject'];
         $this->redeliverTimeout = $options['redeliver_timeout'] * 1000;
@@ -556,7 +559,7 @@ class Connection
                 }
 
                 if ($this->maxEntries) {
-                    $added = $redis->xadd($this->stream, '*', ['message' => $message], $this->maxEntries, true);
+                    $added = $redis->xadd($this->stream, '*', ['message' => $message], $this->maxEntries, $this->approximateMaxEntries);
                 } else {
                     $added = $redis->xadd($this->stream, '*', ['message' => $message]);
                 }

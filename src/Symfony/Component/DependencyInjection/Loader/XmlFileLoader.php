@@ -560,6 +560,21 @@ class XmlFileLoader extends FileLoader
                 $key = $arg->getAttribute('key');
             }
 
+            switch ($arg->getAttribute('key-type')) {
+                case 'binary':
+                    if (false === $key = base64_decode($key, true)) {
+                        throw new InvalidArgumentException(\sprintf('Tag "<%s>" with key-type="binary" does not have a valid base64 encoded key in "%s".', $name, $file));
+                    }
+                    break;
+                case 'constant':
+                    try {
+                        $key = \constant(trim($key));
+                    } catch (\Error) {
+                        throw new InvalidArgumentException(\sprintf('The key "%s" is not a valid constant in "%s".', $key, $file));
+                    }
+                    break;
+            }
+
             $trim = $arg->hasAttribute('trim') && XmlUtils::phpize($arg->getAttribute('trim'));
             $onInvalid = $arg->getAttribute('on-invalid');
             $invalidBehavior = ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE;

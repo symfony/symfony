@@ -1284,6 +1284,54 @@ class XmlFileLoaderTest extends TestCase
         $loader->load('static_constructor_and_factory.xml');
     }
 
+    public function testArgumentKeyType()
+    {
+        $container = new ContainerBuilder();
+        $loader = new XmlFileLoader($container, new FileLocator(self::$fixturesPath.'/xml'));
+        $loader->load('key_type_argument.xml');
+
+        $definition = $container->getDefinition('foo');
+        $this->assertSame([
+            \PHP_INT_MAX => 'Value 1',
+            'PHP_INT_MAX' => 'Value 2',
+            "\x01\x02\x03" => 'Value 3',
+        ], $definition->getArgument(0));
+    }
+
+    public function testPropertyKeyType()
+    {
+        $container = new ContainerBuilder();
+        $loader = new XmlFileLoader($container, new FileLocator(self::$fixturesPath.'/xml'));
+        $loader->load('key_type_property.xml');
+
+        $definition = $container->getDefinition('foo');
+        $this->assertSame([
+            \PHP_INT_MAX => 'Value 1',
+            'PHP_INT_MAX' => 'Value 2',
+            "\x01\x02\x03" => 'Value 3',
+        ], $definition->getProperties()['quz']);
+    }
+
+    public function testInvalidBinaryKeyType()
+    {
+        $container = new ContainerBuilder();
+        $loader = new XmlFileLoader($container, new FileLocator(self::$fixturesPath.'/xml'));
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage(\sprintf('Tag "<property>" with key-type="binary" does not have a valid base64 encoded key in "%s".', self::$fixturesPath.'/xml/key_type_incorrect_bin.xml'));
+        $loader->load('key_type_incorrect_bin.xml');
+    }
+
+    public function testUnknownConstantAsKey()
+    {
+        $container = new ContainerBuilder();
+        $loader = new XmlFileLoader($container, new FileLocator(self::$fixturesPath.'/xml'));
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage(\sprintf('The key "PHP_Unknown_CONST" is not a valid constant in "%s".', self::$fixturesPath.'/xml/key_type_wrong_constant.xml'));
+        $loader->load('key_type_wrong_constant.xml');
+    }
+
     /**
      * @group legacy
      */

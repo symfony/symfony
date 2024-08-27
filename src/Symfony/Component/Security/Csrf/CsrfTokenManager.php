@@ -47,7 +47,7 @@ class CsrfTokenManager implements CsrfTokenManagerInterface
         if (null === $namespace) {
             $this->namespace = $superGlobalNamespaceGenerator;
         } elseif ($namespace instanceof RequestStack) {
-            $this->namespace = function () use ($namespace, $superGlobalNamespaceGenerator) {
+            $this->namespace = static function () use ($namespace, $superGlobalNamespaceGenerator) {
                 if ($request = $namespace->getMainRequest()) {
                     return $request->isSecure() ? 'https-' : '';
                 }

@@ -46,7 +46,12 @@ class ExpressionVoter implements CacheableVoterInterface
 
     public function vote(TokenInterface $token, mixed $subject, array $attributes): int
     {
-        $result = VoterInterface::ACCESS_ABSTAIN;
+        return $this->getVote($token, $subject, $attributes)->getAccess();
+    }
+
+    public function getVote(TokenInterface $token, mixed $subject, array $attributes): VoteInterface
+    {
+        $result = new Vote(VoterInterface::ACCESS_ABSTAIN);
         $variables = null;
         foreach ($attributes as $attribute) {
             if (!$attribute instanceof Expression) {
@@ -55,9 +60,9 @@ class ExpressionVoter implements CacheableVoterInterface
 
             $variables ??= $this->getVariables($token, $subject);
 
-            $result = VoterInterface::ACCESS_DENIED;
+            $result = new Vote(VoterInterface::ACCESS_DENIED);
             if ($this->expressionLanguage->evaluate($attribute, $variables)) {
-                return VoterInterface::ACCESS_GRANTED;
+                return new Vote(VoterInterface::ACCESS_GRANTED);
             }
         }
 

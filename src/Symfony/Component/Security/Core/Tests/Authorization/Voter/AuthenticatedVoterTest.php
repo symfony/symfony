@@ -35,6 +35,16 @@ class AuthenticatedVoterTest extends TestCase
         $this->assertSame($expected, $voter->vote($this->getToken($authenticated), null, $attributes));
     }
 
+    /**
+     * @dataProvider getVoteTests
+     */
+    public function testGetVote($authenticated, $attributes, $expected)
+    {
+        $voter = new AuthenticatedVoter(new AuthenticationTrustResolver());
+
+        $this->assertSame($expected, $voter->getVote($this->getToken($authenticated), null, $attributes)->getAccess());
+    }
+
     public static function getVoteTests()
     {
         return [

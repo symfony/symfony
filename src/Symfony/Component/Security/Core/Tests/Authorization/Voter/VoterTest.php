@@ -63,11 +63,26 @@ class VoterTest extends TestCase
         $this->assertEquals($expectedVote, $voter->vote($this->token, $object, $attributes), $message);
     }
 
+    /**
+     * @dataProvider getTests
+     */
+    public function testGetVote(VoterInterface $voter, array $attributes, $expectedVote, $object, $message)
+    {
+        $this->assertEquals($expectedVote, $voter->getVote($this->token, $object, $attributes)->getAccess(), $message);
+    }
+
     public function testVoteWithTypeError()
     {
         $this->expectException(\TypeError::class);
         $this->expectExceptionMessage('Should error');
         (new TypeErrorVoterTest_Voter())->vote($this->token, new \stdClass(), ['EDIT']);
+    }
+
+    public function testGetVoteWithTypeError()
+    {
+        $this->expectException(\TypeError::class);
+        $this->expectExceptionMessage('Should error');
+        (new TypeErrorVoterTest_Voter())->getVote($this->token, new \stdClass(), ['EDIT']);
     }
 }
 

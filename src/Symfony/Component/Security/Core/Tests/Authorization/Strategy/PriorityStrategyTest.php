@@ -26,19 +26,35 @@ class PriorityStrategyTest extends AccessDecisionStrategyTestCase
             self::getVoter(VoterInterface::ACCESS_GRANTED),
             self::getVoter(VoterInterface::ACCESS_DENIED),
             self::getVoter(VoterInterface::ACCESS_DENIED),
-        ], true];
+        ], self::getAccessDecision(true, [
+            VoterInterface::ACCESS_ABSTAIN,
+            VoterInterface::ACCESS_GRANTED,
+        ])];
 
         yield [$strategy, [
             self::getVoter(VoterInterface::ACCESS_ABSTAIN),
             self::getVoter(VoterInterface::ACCESS_DENIED),
             self::getVoter(VoterInterface::ACCESS_GRANTED),
             self::getVoter(VoterInterface::ACCESS_GRANTED),
-        ], false];
+        ], self::getAccessDecision(false, [
+            VoterInterface::ACCESS_ABSTAIN,
+            VoterInterface::ACCESS_DENIED,
+        ])];
 
-        yield [$strategy, self::getVoters(0, 0, 2), false];
+        yield [$strategy, self::getVoters(0, 0, 2), self::getAccessDecision(false, [
+            VoterInterface::ACCESS_ABSTAIN,
+            VoterInterface::ACCESS_ABSTAIN,
+            VoterInterface::ACCESS_ABSTAIN,
+            VoterInterface::ACCESS_ABSTAIN
+        ])];
 
         $strategy = new PriorityStrategy(true);
 
-        yield [$strategy, self::getVoters(0, 0, 2), true];
+        yield [$strategy, self::getVoters(0, 0, 2), self::getAccessDecision(true, [
+            VoterInterface::ACCESS_ABSTAIN,
+            VoterInterface::ACCESS_ABSTAIN,
+            VoterInterface::ACCESS_ABSTAIN,
+            VoterInterface::ACCESS_ABSTAIN,
+        ])];
     }
 }

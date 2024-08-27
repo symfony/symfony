@@ -100,7 +100,7 @@ class ErrorListenerTest extends TestCase
         }
 
         $this->assertEquals(3, $logger->countErrors());
-        $logs = $logger->getLogs('critical');
+        $logs = $logger->getLogsForLevel('critical');
         $this->assertCount(3, $logs);
         $this->assertStringStartsWith('Uncaught PHP Exception Exception: "foo" at ErrorListenerTest.php line', $logs[0]);
         $this->assertStringStartsWith('Uncaught PHP Exception Exception: "foo" at ErrorListenerTest.php line', $logs[1]);
@@ -124,8 +124,8 @@ class ErrorListenerTest extends TestCase
         $this->assertEquals(new Response('foo', 401), $event->getResponse());
 
         $this->assertEquals(0, $logger->countErrors());
-        $this->assertCount(0, $logger->getLogs('critical'));
-        $this->assertCount(1, $logger->getLogs('warning'));
+        $this->assertCount(0, $logger->getLogsForLevel('critical'));
+        $this->assertCount(1, $logger->getLogsForLevel('warning'));
     }
 
     public function testHandleWithLogLevelAttribute()
@@ -139,8 +139,8 @@ class ErrorListenerTest extends TestCase
         $l->onKernelException($event);
 
         $this->assertEquals(0, $logger->countErrors());
-        $this->assertCount(0, $logger->getLogs('critical'));
-        $this->assertCount(1, $logger->getLogs('warning'));
+        $this->assertCount(0, $logger->getLogsForLevel('critical'));
+        $this->assertCount(1, $logger->getLogsForLevel('warning'));
     }
 
     public function testHandleClassImplementingInterfaceWithLogLevelAttribute()
@@ -154,8 +154,8 @@ class ErrorListenerTest extends TestCase
         $l->onKernelException($event);
 
         $this->assertEquals(0, $logger->countErrors());
-        $this->assertCount(0, $logger->getLogs('critical'));
-        $this->assertCount(1, $logger->getLogs('warning'));
+        $this->assertCount(0, $logger->getLogsForLevel('critical'));
+        $this->assertCount(1, $logger->getLogsForLevel('warning'));
     }
 
     public function testHandleWithLogLevelAttributeAndCustomConfiguration()
@@ -173,8 +173,8 @@ class ErrorListenerTest extends TestCase
         $l->onKernelException($event);
 
         $this->assertEquals(0, $logger->countErrors());
-        $this->assertCount(0, $logger->getLogs('warning'));
-        $this->assertCount(1, $logger->getLogs('info'));
+        $this->assertCount(0, $logger->getLogsForLevel('warning'));
+        $this->assertCount(1, $logger->getLogsForLevel('info'));
     }
 
     /**
@@ -326,6 +326,11 @@ class TestLogger extends Logger implements DebugLoggerInterface
     public function countErrors(?Request $request = null): int
     {
         return \count($this->logs['critical']);
+    }
+
+    public function getLogs(?Request $request = null): array
+    {
+        return [];
     }
 }
 

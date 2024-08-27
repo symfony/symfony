@@ -18,7 +18,7 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  *
- * method Vote getVote(TokenInterface $token, mixed $subject, array $attributes)
+ * @method VoteInterface getVote(TokenInterface $token, mixed $subject, array $attributes)
  */
 interface VoterInterface
 {

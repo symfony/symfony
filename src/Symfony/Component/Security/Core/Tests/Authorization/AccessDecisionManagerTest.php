@@ -354,6 +354,11 @@ class AccessDecisionManagerTest extends TestCase
             {
                 return $this->vote;
             }
+
+            public function __call($function, $args)
+            {
+                throw new LogicException('This function must not be acceded.');
+            }
         };
     }
 

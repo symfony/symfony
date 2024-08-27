@@ -1,0 +1,38 @@
+{
+    "name": "symfony/joli-notif-notifier",
+    "type": "symfony-notifier-bridge",
+    "description": "Symfony JoliNotif Notifier Bridge",
+    "keywords": [
+        "joli-notif",
+        "desktop-notifications",
+        "notifier"
+    ],
+    "homepage": "https://symfony.com",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Ahmed Ghanem",
+            "email": "ahmedghanem7361@gmail.com",
+            "homepage": "https://github.com/ahmedghanem00"
+        },
+        {
+            "name": "Symfony Community",
+            "homepage": "https://symfony.com/contributors"
+        }
+    ],
+    "require": {
+        "php": ">=8.2",
+        "jolicode/jolinotif": "^2.7.2",
+        "symfony/http-client": "^7.2",
+        "symfony/notifier": "^7.2"
+    },
+    "autoload": {
+        "psr-4": {
+            "Symfony\\Component\\Notifier\\Bridge\\JoliNotif\\": ""
+        },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
+    },
+    "minimum-stability": "dev"
+}

@@ -52,6 +52,7 @@ final class Transport
         Bridge\Infobip\InfobipTransportFactory::class,
         Bridge\Iqsms\IqsmsTransportFactory::class,
         Bridge\Isendpro\IsendproTransportFactory::class,
+        Bridge\JoliNotif\JoliNotifTransportFactory::class,
         Bridge\KazInfoTeh\KazInfoTehTransportFactory::class,
         Bridge\LightSms\LightSmsTransportFactory::class,
         Bridge\LineNotify\LineNotifyTransportFactory::class,

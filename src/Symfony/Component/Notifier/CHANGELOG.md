@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+7.2
+---
+
+ * Add `Desktop` channel
+
 6.3
 ---
 

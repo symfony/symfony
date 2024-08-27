@@ -112,6 +112,10 @@ class UnsupportedSchemeException extends LogicException
             'class' => Bridge\Isendpro\IsendproTransportFactory::class,
             'package' => 'symfony/isendpro-notifier',
         ],
+        'jolinotif' => [
+            'class' => Bridge\JoliNotif\JoliNotifTransportFactory::class,
+            'package' => 'symfony/joli-notif-notifier',
+        ],
         'kaz-info-teh' => [
             'class' => Bridge\KazInfoTeh\KazInfoTehTransportFactory::class,
             'package' => 'symfony/kaz-info-teh-notifier',

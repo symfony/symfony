@@ -1,0 +1,119 @@
+---------------------------------------------------------------------------
+
+by ahmedghanem00 at 2024-07-10T17:23:05Z
+
+> Here are some CS comments. I'm also wondering if we need another channel type or if we could go with the push channel. WDYT?
+
+I actually prefer to create a new channel for this, as sending notifications here relies on executable binaries (some of which exist natively in the OS, and some are shipped portably with the underlying package). So, there are no API calls or network activity involved. And this is quite different for me (at least) from what the `PushChannel` usually does.
+
+Maybe naming it as `DesktopChannel` is not the best or most convenient name. But, I think this new bridge, or any similar bridge that may come in the future, should be grouped and tied to a different channel.
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2024-07-10T19:04:58Z
+
+> Maybe naming it as DesktopChannel is not the best or most convenient name. But, I think this new bridge, or any similar bridge that may come in the future, should be grouped and tied to a different channel.
+
+Maybe `LocalChannel`, `OfflineChannel` or `SystemChannel`?
+
+---------------------------------------------------------------------------
+
+by ahmedghanem00 at 2024-07-10T23:50:38Z
+
+`SystemChannel` sounds more accurate, as `Desktop` phrase might understood by some as the desktop-push-notification offered by some online services.
+
+I'll wait for some time before updating to make sure there are no objections or points raised.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-07-11T09:12:45Z
+
+Are there any technical implications related to using Push or Desktop for channels? (Desktop looks fine to me if we need to go with another channel)
+
+---------------------------------------------------------------------------
+
+by ahmedghanem00 at 2024-07-11T12:04:51Z
+
+No, at least for the current bridge we're adding. I've tested it with PushChannel and it worked normally. Going for another channel was just for consistency as this bridge behaving slightly different from the other bridges.
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2024-07-26T18:00:13Z
+
+Can you please open a docs PR? Thanks
+
+---------------------------------------------------------------------------
+
+by ahmedghanem00 at 2024-07-26T20:41:55Z
+
+> Can you please open a docs PR? Thanks
+
+Will do it
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2024-08-02T19:14:55Z
+
+Can you please check the failing related tests? Thanks
+
+---------------------------------------------------------------------------
+
+by ahmedghanem00 at 2024-08-02T19:47:20Z
+
+I've checked but didn't catch anything related. Most of them are because of this PR has not been merged yet.
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2024-08-03T04:53:59Z
+
+![image](https://github.com/user-attachments/assets/28e756f1-5582-478e-926b-b6edaa67fd97)
+
+That's weird
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2024-08-06T06:48:29Z
+
+`jolicode/jolinotif` would probably have to be added to the `require-dev` section of the root `composer.json` file.
+
+---------------------------------------------------------------------------
+
+by ahmedghanem00 at 2024-08-09T18:28:34Z
+
+ `Invalid handler service "texter.messenger.desktop_handler": class or interface "Symfony\Component\Notifier\Message\DesktopMessage" declared in your tag attribute "handles" not found.`
+
+Not sure why this class does not get detected during the remaining test (8.2, low-deps).
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2024-08-11T06:57:34Z
+
+Can you please create a docs PR and a recipe PR? Thanks
+
+---------------------------------------------------------------------------
+
+by ahmedghanem00 at 2024-08-11T06:58:25Z
+
+> Can you please create a docs PR and a recipe PR? Thanks
+
+They are already created above :)
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2024-08-11T07:02:29Z
+
+> Not sure why this class does not get detected during the remaining test (8.2, low-deps).
+
+The reason is that on this job an older version of the Notifier component is installed. Then, the desktop notifier is not present. We need to make sure that inside the `FrameworkExtension` we remove service definitions for which the necessary classes do not exist.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2024-08-23T11:45:36Z
+
+@ahmedghanem00 Can you rebase to get rid of the merge commit?
+
+---------------------------------------------------------------------------
+
+by ahmedghanem00 at 2024-08-23T13:08:56Z
+
+@fabpot Done?

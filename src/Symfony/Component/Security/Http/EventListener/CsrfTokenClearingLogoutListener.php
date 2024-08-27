@@ -12,6 +12,7 @@
 namespace Symfony\Component\Security\Http\EventListener;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\Security\Csrf\TokenStorage\ClearableTokenStorageInterface;
 use Symfony\Component\Security\Csrf\TokenStorage\SessionTokenStorage;
 use Symfony\Component\Security\Http\Event\LogoutEvent;
@@ -34,7 +35,16 @@ class CsrfTokenClearingLogoutListener implements EventSubscriberInterface
             return;
         }
 
-        $this->csrfTokenStorage->clear();
+        // Don't consider clearing the CSRF token storage as a stateful operation - it's only opportunistic
+        $session = $event->getRequest()->getSession();
+        $usageIndexValue = $session instanceof Session ? $usageIndexReference = &$session->getUsageIndex() : 0;
+        $usageIndexReference = \PHP_INT_MIN;
+
+        try {
+            $this->csrfTokenStorage->clear();
+        } finally {
+            $usageIndexReference = $usageIndexValue;
+        }
     }
 
     public static function getSubscribedEvents(): array

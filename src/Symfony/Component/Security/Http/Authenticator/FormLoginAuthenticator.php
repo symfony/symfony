@@ -133,7 +133,7 @@ class FormLoginAuthenticator extends AbstractLoginFormAuthenticator
 
         $request->getSession()->set(SecurityRequestAttributes::LAST_USERNAME, $credentials['username']);
 
-        if (!\is_string($credentials['password']) && (!\is_object($credentials['password']) || !method_exists($credentials['password'], '__toString'))) {
+        if (!\is_string($credentials['password']) && !$credentials['password'] instanceof \Stringable) {
             throw new BadRequestHttpException(\sprintf('The key "%s" must be a string, "%s" given.', $this->options['password_parameter'], \gettype($credentials['password'])));
         }
 
@@ -141,7 +141,7 @@ class FormLoginAuthenticator extends AbstractLoginFormAuthenticator
             throw new BadCredentialsException(\sprintf('The key "%s" must be a non-empty string.', $this->options['password_parameter']));
         }
 
-        if (!\is_string($credentials['csrf_token'] ?? '') && (!\is_object($credentials['csrf_token']) || !method_exists($credentials['csrf_token'], '__toString'))) {
+        if (!\is_string($credentials['csrf_token'] ?? '') && !$credentials['csrf_token'] instanceof \Stringable) {
             throw new BadRequestHttpException(\sprintf('The key "%s" must be a string, "%s" given.', $this->options['csrf_parameter'], \gettype($credentials['csrf_token'])));
         }
 

@@ -12,14 +12,12 @@
 namespace Symfony\Component\Security\Core\Authorization\Voter;
 
 /**
- * A VoteInterface Object contain information about vote, access/score, messages.
+ * A VoteInterface object contain information about vote, access/score, messages.
  *
  * @author Roman JOLY <eltharin18@outlook.fr>
  */
 interface VoteInterface
 {
-    public function __construct(int $access, string|array $messages = [], array $context = []);
-
     public function __debugInfo(): array;
 
     public function getAccess(): int;

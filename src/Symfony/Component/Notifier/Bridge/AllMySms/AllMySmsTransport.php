@@ -85,6 +85,7 @@ final class AllMySmsTransport extends AbstractTransport
 
         $sentMessage = new SentMessage($message, (string) $this);
         $sentMessage->setMessageId($success['smsId']);
+        $sentMessage->setDebugData(['response' => $response]);
 
         return $sentMessage;
     }

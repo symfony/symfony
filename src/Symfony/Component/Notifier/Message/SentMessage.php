@@ -17,6 +17,7 @@ namespace Symfony\Component\Notifier\Message;
 class SentMessage
 {
     private ?string $messageId = null;
+    private ?array $debugData = null;
 
     public function __construct(
         private MessageInterface $original,
@@ -42,5 +43,15 @@ class SentMessage
     public function getMessageId(): ?string
     {
         return $this->messageId;
+    }
+
+    public function getDebugData(): ?array
+    {
+        return $this->debugData;
+    }
+
+    public function setDebugData(array $data): void
+    {
+        $this->debugData = $data;
     }
 }

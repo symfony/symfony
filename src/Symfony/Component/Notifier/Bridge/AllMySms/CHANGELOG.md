@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+6.4
+---
+
+* Include the http response in the returned `SentMessage` object
+
 6.3
 ---
 

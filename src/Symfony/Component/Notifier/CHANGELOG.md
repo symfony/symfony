@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+6.4
+---
+
+* Add `debugData` property to `SentMessage` class
+
 6.3
 ---
 

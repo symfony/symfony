@@ -13,6 +13,7 @@ namespace Symfony\Component\Security\Core\Authorization\Strategy;
 
 use Symfony\Component\Security\Core\Authorization\AccessDecision;
 use Symfony\Component\Security\Core\Authorization\Voter\Vote;
+use Symfony\Component\Security\Core\Authorization\Voter\VoteInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 
 /**
@@ -41,7 +42,7 @@ final class AffirmativeStrategy implements AccessDecisionStrategyInterface, \Str
         $currentVotes = [];
         $deny = 0;
 
-        /** @var Vote $vote */
+        /** @var VoteInterface $vote */
         foreach ($votes as $vote) {
             $currentVotes[] = $vote;
 

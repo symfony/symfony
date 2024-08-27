@@ -11,8 +11,7 @@
 
 namespace Symfony\Component\Security\Core\Authorization;
 
-use Symfony\Component\Security\Core\Authorization\Voter\Vote;
-use Symfony\Component\Security\Core\Authorization\Voter\Voter;
+use Symfony\Component\Security\Core\Authorization\Voter\VoteInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 
 /**
@@ -24,8 +23,8 @@ use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 final class AccessDecision
 {
     /**
-     * @param int $access One of the VoterInterface constants (ACCESS_GRANTED, ACCESS_ABSTAIN, ACCESS_DENIED)
-     * @param Vote[] $votes
+     * @param int             $access One of the VoterInterface constants (ACCESS_GRANTED, ACCESS_ABSTAIN, ACCESS_DENIED)
+     * @param VoteInterface[] $votes
      */
     public function __construct(
         private readonly int $access,
@@ -60,7 +59,7 @@ final class AccessDecision
     }
 
     /**
-     * @return Vote[]
+     * @return VoteInterface[]
      */
     public function getVotes(): array
     {
@@ -68,34 +67,34 @@ final class AccessDecision
     }
 
     /**
-     * @return Vote[]
+     * @return VoteInterface[]
      */
     public function getGrantedVotes(): array
     {
-        return $this->getVotesByAccess(Voter::ACCESS_GRANTED);
+        return $this->getVotesByAccess(VoterInterface::ACCESS_GRANTED);
     }
 
     /**
-     * @return Vote[]
+     * @return VoteInterface[]
      */
     public function getAbstainedVotes(): array
     {
-        return $this->getVotesByAccess(Voter::ACCESS_ABSTAIN);
+        return $this->getVotesByAccess(VoterInterface::ACCESS_ABSTAIN);
     }
 
     /**
-     * @return Vote[]
+     * @return VoteInterface[]
      */
     public function getDeniedVotes(): array
     {
-        return $this->getVotesByAccess(Voter::ACCESS_DENIED);
+        return $this->getVotesByAccess(VoterInterface::ACCESS_DENIED);
     }
 
     /**
-     * @return Vote[]
+     * @return VoteInterface[]
      */
     private function getVotesByAccess(int $access): array
     {
-        return array_filter($this->votes, static fn (Vote $vote): bool => $vote->getAccess() === $access);
+        return array_filter($this->votes, static fn (VoteInterface $vote): bool => $vote->getAccess() === $access);
     }
 }

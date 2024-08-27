@@ -19,6 +19,7 @@ use Symfony\Component\Security\Core\Authorization\AccessDecisionManager;
 use Symfony\Component\Security\Core\Authorization\Strategy\AccessDecisionStrategyInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\Vote;
 use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
+use Symfony\Component\Security\Core\Exception\LogicException;
 
 /**
  * Abstract test case for access decision strategies.
@@ -92,6 +93,11 @@ abstract class AccessDecisionStrategyTestCase extends TestCase
             public function vote(TokenInterface $token, $subject, array $attributes): int
             {
                 return $this->vote;
+            }
+
+            public function __call($function, $args)
+            {
+                throw new LogicException('This function must not be acceded.');
             }
         };
     }

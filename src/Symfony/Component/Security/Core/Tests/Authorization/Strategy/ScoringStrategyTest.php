@@ -11,6 +11,7 @@ use Symfony\Component\Security\Core\Authorization\Strategy\ScoringStrategy;
 use Symfony\Component\Security\Core\Authorization\Voter\Vote;
 use Symfony\Component\Security\Core\Authorization\Voter\Voter;
 use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
+use Symfony\Component\Security\Core\Exception\LogicException;
 
 class ScoringStrategyTest extends TestCase
 {
@@ -99,6 +100,11 @@ class ScoringStrategyTest extends TestCase
             public function vote(TokenInterface $token, $subject, array $attributes): int
             {
                 return $this->vote;
+            }
+
+            public function __call($function, $args)
+            {
+                throw new LogicException('This function must not be acceded.');
             }
         };
     }

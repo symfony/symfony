@@ -25,15 +25,15 @@ use Symfony\Contracts\EventDispatcher\Event;
  */
 final class VoteEvent extends Event
 {
+    private VoteInterface $vote;
+
     public function __construct(
         private VoterInterface $voter,
         private mixed $subject,
         private array $attributes,
-        private Vote|int $vote,
+        VoteInterface|int $vote,
     ) {
-        if (!$vote instanceof Vote) {
-            $this->vote = new Vote($vote);
-        }
+        $this->vote = $vote instanceof VoteInterface ? $vote : new Vote($vote);
     }
 
     public function getVoter(): VoterInterface

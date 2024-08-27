@@ -5,6 +5,7 @@ CHANGELOG
 ---
 
  * Remove `@internal` flag and add `@final` to `ServicesResetter`
+ * Add method `buildConfigCache` to `Kernel` that allow custom implementation in final project
 
 7.1
 ---

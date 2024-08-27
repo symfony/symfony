@@ -383,6 +383,14 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
     }
 
     /**
+     * Build the ConfigCache instance used to test id the service container is fresh or not.
+     */
+    protected function buildConfigCache(string $file): ConfigCache
+    {
+        return new ConfigCache($file, $this->debug);
+    }
+
+    /**
      * Initializes the service container.
      *
      * The built version of the service container is used when fresh, otherwise the
@@ -392,7 +400,7 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
     {
         $class = $this->getContainerClass();
         $buildDir = $this->warmupDir ?: $this->getBuildDir();
-        $cache = new ConfigCache($buildDir.'/'.$class.'.php', $this->debug);
+        $cache = $this->buildConfigCache($buildDir.'/'.$class.'.php');
         $cachePath = $cache->getPath();
 
         // Silence E_WARNING to ignore "include" failures - don't use "@" to prevent silencing fatal errors

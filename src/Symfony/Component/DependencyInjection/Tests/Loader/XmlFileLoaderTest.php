@@ -1318,7 +1318,7 @@ class XmlFileLoaderTest extends TestCase
         $loader = new XmlFileLoader($container, new FileLocator(self::$fixturesPath.'/xml'));
 
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage(\sprintf('Tag "<property>" with key-type="binary" does not have a valid base64 encoded key in "%s".', self::$fixturesPath.'/xml/key_type_incorrect_bin.xml'));
+        $this->expectExceptionMessage(\sprintf('Tag "<property>" with key-type="binary" does not have a valid base64 encoded key in "%s/xml%skey_type_incorrect_bin.xml".', self::$fixturesPath, \DIRECTORY_SEPARATOR));
         $loader->load('key_type_incorrect_bin.xml');
     }
 
@@ -1328,7 +1328,7 @@ class XmlFileLoaderTest extends TestCase
         $loader = new XmlFileLoader($container, new FileLocator(self::$fixturesPath.'/xml'));
 
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage(\sprintf('The key "PHP_Unknown_CONST" is not a valid constant in "%s".', self::$fixturesPath.'/xml/key_type_wrong_constant.xml'));
+        $this->expectExceptionMessage(\sprintf('The key "PHP_Unknown_CONST" is not a valid constant in "%s/xml%skey_type_wrong_constant.xml".', self::$fixturesPath, \DIRECTORY_SEPARATOR));
         $loader->load('key_type_wrong_constant.xml');
     }
 

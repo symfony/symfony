@@ -124,7 +124,7 @@ class Uuid extends AbstractUid
     /**
      * @param int-mask-of<Uuid::FORMAT_*> $format
      */
-    public static function isValid(string $uuid /*, int $format = self::FORMAT_RFC_4122 */): bool
+    public static function isValid(string $uuid /* , int $format = self::FORMAT_RFC_4122 */): bool
     {
         $format = 1 < \func_num_args() ? func_get_arg(1) : self::FORMAT_RFC_4122;
 
@@ -132,7 +132,9 @@ class Uuid extends AbstractUid
             return false;
         }
 
-        $uuid = self::transformToRfc4122($uuid, $format);
+        if (false === $uuid = self::transformToRfc4122($uuid, $format)) {
+            return false;
+        }
 
         if (self::NIL === $uuid && \in_array(static::class, [__CLASS__, NilUuid::class], true)) {
             return true;
@@ -190,10 +192,11 @@ class Uuid extends AbstractUid
      *
      * @param int-mask-of<Uuid::FORMAT_*> $format
      *
-     * @return non-empty-string
+     * @return string|false The RFC4122 string or false if the format doesn't match the input
      */
-    private static function transformToRfc4122(string $uuid, int $format): string
+    private static function transformToRfc4122(string $uuid, int $format): string|false
     {
+        $inputUuid = $uuid;
         $fromBase58 = false;
         if (22 === \strlen($uuid) && 22 === strspn($uuid, BinaryUtil::BASE58['']) && $format & self::FORMAT_BASE_58) {
             $uuid = str_pad(BinaryUtil::fromBase($uuid, BinaryUtil::BASE58), 16, "\0", \STR_PAD_LEFT);
@@ -212,6 +215,11 @@ class Uuid extends AbstractUid
             $ulid = new NilUlid();
             $ulid->uid = strtoupper($uuid);
             $uuid = $ulid->toRfc4122();
+        }
+
+        if ($inputUuid === $uuid && !($format & self::FORMAT_RFC_4122)) {
+            // input format doesn't match the input string
+            return false;
         }
 
         return $uuid;

@@ -35,6 +35,8 @@ class MainConfiguration implements ConfigurationInterface
     public const STRATEGY_UNANIMOUS = 'unanimous';
     /** @internal */
     public const STRATEGY_PRIORITY = 'priority';
+    /** @internal */
+    public const STRATEGY_SCORING = 'scoring';
 
     /**
      * @param array<AuthenticatorFactoryInterface> $factories
@@ -455,6 +457,7 @@ class MainConfiguration implements ConfigurationInterface
             self::STRATEGY_CONSENSUS,
             self::STRATEGY_UNANIMOUS,
             self::STRATEGY_PRIORITY,
+            self::STRATEGY_SCORING,
         ];
     }
 }

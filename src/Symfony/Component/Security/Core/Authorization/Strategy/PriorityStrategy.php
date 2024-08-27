@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Security\Core\Authorization\Strategy;
 
+use Symfony\Component\Security\Core\Authorization\AccessDecision;
+use Symfony\Component\Security\Core\Authorization\Voter\Vote;
 use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 
 /**
@@ -32,17 +34,26 @@ final class PriorityStrategy implements AccessDecisionStrategyInterface, \String
 
     public function decide(\Traversable $results): bool
     {
-        foreach ($results as $result) {
-            if (VoterInterface::ACCESS_GRANTED === $result) {
-                return true;
+        return $this->getDecision(new \ArrayIterator(array_map(fn ($vote) => new Vote($vote), iterator_to_array($results))))->isGranted();
+    }
+
+    public function getDecision(\Traversable $votes): AccessDecision
+    {
+        $currentVotes = [];
+
+        /** @var Vote $vote */
+        foreach ($votes as $vote) {
+            $currentVotes[] = $vote;
+            if ($vote->isGranted()) {
+                return new AccessDecision(VoterInterface::ACCESS_GRANTED, $currentVotes);
             }
 
-            if (VoterInterface::ACCESS_DENIED === $result) {
-                return false;
+            if ($vote->isDenied()) {
+                return new AccessDecision(VoterInterface::ACCESS_DENIED, $currentVotes);
             }
         }
 
-        return $this->allowIfAllAbstainDecisions;
+        return new AccessDecision($this->allowIfAllAbstainDecisions ? VoterInterface::ACCESS_GRANTED : VoterInterface::ACCESS_DENIED, $currentVotes);
     }
 
     public function __toString(): string

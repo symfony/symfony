@@ -16,27 +16,17 @@ use Symfony\Component\Security\Core\Authorization\Voter\Vote;
 use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 
 /**
- * Grants access if there is consensus of granted against denied responses.
- *
- * Consensus means majority-rule (ignoring abstains) rather than unanimous
- * agreement (ignoring abstains). If you require unanimity, see
- * UnanimousBased.
- *
- * If there were an equal number of grant and deny votes, the decision will
- * be based on the allowIfEqualGrantedDeniedDecisions property value
- * (defaults to true).
+ * Grants access if vote results greated than 0.
  *
  * If all voters abstained from voting, the decision will be based on the
  * allowIfAllAbstainDecisions property value (defaults to false).
  *
- * @author Fabien Potencier <fabien@symfony.com>
- * @author Alexander M. Turek <me@derrabus.de>
+ * @author Roman JOLY <eltharin18@outlook.fr>
  */
-final class ConsensusStrategy implements AccessDecisionStrategyInterface, \Stringable
+final class ScoringStrategy implements AccessDecisionStrategyInterface, \Stringable
 {
     public function __construct(
         private bool $allowIfAllAbstainDecisions = false,
-        private bool $allowIfEqualGrantedDeniedDecisions = true,
     ) {
     }
 
@@ -48,29 +38,20 @@ final class ConsensusStrategy implements AccessDecisionStrategyInterface, \Strin
     public function getDecision(\Traversable $votes): AccessDecision
     {
         $currentVotes = [];
-        $grant = 0;
-        $deny = 0;
+        $score = 0;
 
         /** @var Vote $vote */
         foreach ($votes as $vote) {
             $currentVotes[] = $vote;
-            if ($vote->isGranted()) {
-                ++$grant;
-            } elseif ($vote->isDenied()) {
-                ++$deny;
-            }
+            $score += $vote->getAccess();
         }
 
-        if ($grant > $deny) {
-            return new AccessDecision(VoterInterface::ACCESS_GRANTED, $currentVotes);
+        if ($score > 0) {
+            return new AccessDecision(VoterInterface::ACCESS_GRANTED, $currentVotes, 'score = '.$score);
         }
 
-        if ($deny > $grant) {
-            return new AccessDecision(VoterInterface::ACCESS_DENIED, $currentVotes);
-        }
-
-        if ($grant > 0) {
-            return new AccessDecision($this->allowIfEqualGrantedDeniedDecisions ? VoterInterface::ACCESS_GRANTED : VoterInterface::ACCESS_DENIED, $currentVotes);
+        if ($score < 0) {
+            return new AccessDecision(VoterInterface::ACCESS_DENIED, $currentVotes, 'score = '.$score);
         }
 
         return new AccessDecision($this->allowIfAllAbstainDecisions ? VoterInterface::ACCESS_GRANTED : VoterInterface::ACCESS_DENIED, $currentVotes);
@@ -78,6 +59,6 @@ final class ConsensusStrategy implements AccessDecisionStrategyInterface, \Strin
 
     public function __toString(): string
     {
-        return 'consensus';
+        return 'scoring';
     }
 }

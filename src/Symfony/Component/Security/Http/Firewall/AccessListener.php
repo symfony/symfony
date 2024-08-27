@@ -15,8 +15,10 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\Security\Core\Authentication\Token\NullToken;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Symfony\Component\Security\Core\Authorization\AccessDecision;
 use Symfony\Component\Security\Core\Authorization\AccessDecisionManagerInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\AuthenticatedVoter;
+use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\Security\Http\AccessMapInterface;
 use Symfony\Component\Security\Http\Event\LazyResponseEvent;
@@ -73,16 +75,26 @@ class AccessListener extends AbstractListener
 
         $token = $this->tokenStorage->getToken() ?? new NullToken();
 
-        if (!$this->accessDecisionManager->decide($token, $attributes, $request, true)) {
-            throw $this->createAccessDeniedException($request, $attributes);
+        if (method_exists($this->accessDecisionManager, 'getDecision')) {
+            $decision = $this->accessDecisionManager->getDecision($token, $attributes, $request, true);
+        } else {
+            $decision = new AccessDecision(
+                $this->accessDecisionManager->decide($token, $attributes, $request, true)
+                    ? VoterInterface::ACCESS_GRANTED : VoterInterface::ACCESS_DENIED
+            );
+        }
+
+        if ($decision->isDenied()) {
+            throw $this->createAccessDeniedException($request, $attributes, $decision);
         }
     }
 
-    private function createAccessDeniedException(Request $request, array $attributes): AccessDeniedException
+    private function createAccessDeniedException(Request $request, array $attributes, AccessDecision $accessDecision): AccessDeniedException
     {
         $exception = new AccessDeniedException();
         $exception->setAttributes($attributes);
         $exception->setSubject($request);
+        $exception->setAccessDecision($accessDecision);
 
         return $exception;
     }

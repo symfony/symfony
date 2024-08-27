@@ -53,6 +53,30 @@ class TraceableVoterTest extends TestCase
         $this->assertSame(VoterInterface::ACCESS_DENIED, $result);
     }
 
+    public function testGetVote()
+    {
+        $voter = $this->createMock(VoterInterface::class);
+
+        $eventDispatcher = $this->createMock(EventDispatcherInterface::class);
+        $token = $this->createStub(TokenInterface::class);
+
+        $voter
+            ->expects($this->once())
+            ->method('vote')
+            ->with($token, 'anysubject', ['attr1'])
+            ->willReturn(VoterInterface::ACCESS_DENIED);
+
+        $eventDispatcher
+            ->expects($this->once())
+            ->method('dispatch')
+            ->with(new VoteEvent($voter, 'anysubject', ['attr1'], VoterInterface::ACCESS_DENIED), 'debug.security.authorization.vote');
+
+        $sut = new TraceableVoter($voter, $eventDispatcher);
+        $result = $sut->getVote($token, 'anysubject', ['attr1']);
+
+        $this->assertSame(VoterInterface::ACCESS_DENIED, $result->getAccess());
+    }
+
     public function testSupportsAttributeOnCacheable()
     {
         $voter = $this->createMock(CacheableVoterInterface::class);

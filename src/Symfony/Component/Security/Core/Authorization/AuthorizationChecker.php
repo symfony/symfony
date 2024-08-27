@@ -13,6 +13,7 @@ namespace Symfony\Component\Security\Core\Authorization;
 
 use Symfony\Component\Security\Core\Authentication\Token\NullToken;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 
 /**
  * AuthorizationChecker is the main authorization point of the Security component.
@@ -32,12 +33,21 @@ class AuthorizationChecker implements AuthorizationCheckerInterface
 
     final public function isGranted(mixed $attribute, mixed $subject = null): bool
     {
+        return $this->getDecision($attribute, $subject)->isGranted();
+    }
+
+    final public function getDecision($attribute, $subject = null): AccessDecision
+    {
         $token = $this->tokenStorage->getToken();
 
         if (!$token || !$token->getUser()) {
             $token = new NullToken();
         }
 
-        return $this->accessDecisionManager->decide($token, [$attribute], $subject);
+        if (!method_exists($this->accessDecisionManager, 'getDecision')) {
+            return new AccessDecision($this->accessDecisionManager->decide($token, [$attribute], $subject) ? VoterInterface::ACCESS_GRANTED : VoterInterface::ACCESS_DENIED);
+        }
+
+        return $this->accessDecisionManager->getDecision($token, [$attribute], $subject);
     }
 }

@@ -30,6 +30,16 @@ class RoleVoterTest extends TestCase
         $this->assertSame($expected, $voter->vote($this->getTokenWithRoleNames($roles), null, $attributes));
     }
 
+    /**
+     * @dataProvider getVoteTests
+     */
+    public function testGetVoteUsingTokenThatReturnsRoleNames($roles, $attributes, $expected)
+    {
+        $voter = new RoleVoter();
+
+        $this->assertSame($expected, $voter->getVote($this->getTokenWithRoleNames($roles), null, $attributes)->getAccess());
+    }
+
     public static function getVoteTests()
     {
         return [

@@ -132,12 +132,14 @@ return static function (ContainerConfigurator $container) {
             ->args([service('texter.transports')])
             ->tag('messenger.message_handler', ['handles' => PushMessage::class])
 
-        ->set('texter.messenger.desktop_handler', MessageHandler::class)
-            ->args([service('texter.transports')])
-            ->tag('messenger.message_handler', ['handles' => DesktopMessage::class])
-
         ->set('notifier.notification_logger_listener', NotificationLoggerListener::class)
             ->tag('kernel.event_subscriber')
-
     ;
+
+    if (class_exists(DesktopMessage::class)) {
+        $container->services()
+            ->set('texter.messenger.desktop_handler', MessageHandler::class)
+                ->args([service('texter.transports')])
+                ->tag('messenger.message_handler', ['handles' => DesktopMessage::class]);
+    }
 };

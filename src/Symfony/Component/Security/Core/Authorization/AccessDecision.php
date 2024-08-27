@@ -24,11 +24,14 @@ use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 final class AccessDecision
 {
     /**
-     * @param int    $access One of the VoterInterface::ACCESS_* constants
+     * @param int $access One of the VoterInterface constants (ACCESS_GRANTED, ACCESS_ABSTAIN, ACCESS_DENIED)
      * @param Vote[] $votes
      */
-    public function __construct(private readonly int $access, private readonly array $votes = [], private readonly string $message = '')
-    {
+    public function __construct(
+        private readonly int $access,
+        private readonly array $votes = [],
+        private readonly string $message = '',
+    ) {
     }
 
     public function getAccess(): int

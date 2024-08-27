@@ -29,10 +29,15 @@ class Vote implements VoteInterface
     private array $messages;
 
     /**
-     * @param int $access One of the VoterInterface::ACCESS_* constants if scoring is false
+     * @param int $access One of the VoterInterface constants (ACCESS_GRANTED, ACCESS_ABSTAIN, ACCESS_DENIED)
+     *                    or an integer when scoring is false
      */
-    public function __construct(private int $access, string|array $messages = [], private array $context = [], private $scoring = false)
-    {
+    public function __construct(
+        private int $access,
+        string|array $messages = [],
+        private array $context = [],
+        private $scoring = false,
+    ) {
         if (!$scoring && !\in_array($access, [VoterInterface::ACCESS_GRANTED, VoterInterface::ACCESS_ABSTAIN, VoterInterface::ACCESS_DENIED], true)) {
             throw new \LogicException(\sprintf('"$access" must return one of "%s" constants ("ACCESS_GRANTED", "ACCESS_DENIED" or "ACCESS_ABSTAIN") when "$scoring" is false, "%s" returned.', VoterInterface::class, $access));
         }

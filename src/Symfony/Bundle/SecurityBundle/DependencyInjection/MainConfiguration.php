@@ -141,7 +141,7 @@ class MainConfiguration implements ConfigurationInterface
                             ->scalarNode('host')->defaultNull()->end()
                             ->integerNode('port')->defaultNull()->end()
                             ->arrayNode('ips')
-                                ->beforeNormalization()->ifString()->then(fn ($v) => [$v])->end()
+                                ->beforeNormalization()->castToArray()->end()
                                 ->prototype('scalar')->end()
                             ->end()
                             ->arrayNode('attributes')

@@ -48,10 +48,7 @@ final class AccessTokenFactory extends AbstractFactory implements StatelessAuthe
             ->scalarNode('realm')->defaultNull()->end()
             ->arrayNode('token_extractors')
                 ->fixXmlConfig('token_extractors')
-                ->beforeNormalization()
-                    ->ifString()
-                    ->then(fn ($v) => [$v])
-                ->end()
+                ->beforeNormalization()->castToArray()->end()
                 ->cannotBeEmpty()
                 ->defaultValue([
                     'security.access_token_extractor.header',

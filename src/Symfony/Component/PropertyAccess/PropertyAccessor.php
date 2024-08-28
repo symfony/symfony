@@ -150,7 +150,7 @@ class PropertyAccessor implements PropertyAccessorInterface
             self::VALUE => $objectOrArray,
         ];
 
-        if (\is_object($objectOrArray) && false === strpbrk((string) $propertyPath, '.[')) {
+        if (\is_object($objectOrArray) && (false === strpbrk((string) $propertyPath, '.[') || $objectOrArray instanceof \stdClass && property_exists($objectOrArray, $propertyPath))) {
             return $this->readProperty($zval, $propertyPath, $this->ignoreInvalidProperty)[self::VALUE];
         }
 
@@ -166,7 +166,7 @@ class PropertyAccessor implements PropertyAccessorInterface
      */
     public function setValue(&$objectOrArray, $propertyPath, $value)
     {
-        if (\is_object($objectOrArray) && false === strpbrk((string) $propertyPath, '.[')) {
+        if (\is_object($objectOrArray) && (false === strpbrk((string) $propertyPath, '.[') || $objectOrArray instanceof \stdClass && property_exists($objectOrArray, $propertyPath))) {
             $zval = [
                 self::VALUE => $objectOrArray,
             ];
@@ -293,7 +293,13 @@ class PropertyAccessor implements PropertyAccessorInterface
             $zval = [
                 self::VALUE => $objectOrArray,
             ];
-            $this->readPropertiesUntil($zval, $propertyPath, $propertyPath->getLength(), $this->ignoreInvalidIndices);
+
+            // handle stdClass with properties with a dot in the name
+            if ($objectOrArray instanceof \stdClass && str_contains($propertyPath, '.')  && property_exists($objectOrArray, $propertyPath)) {
+                $this->readProperty($zval, $propertyPath, $this->ignoreInvalidProperty);
+            } else {
+                $this->readPropertiesUntil($zval, $propertyPath, $propertyPath->getLength(), $this->ignoreInvalidIndices);
+            }
 
             return true;
         } catch (AccessException $e) {
@@ -314,6 +320,14 @@ class PropertyAccessor implements PropertyAccessorInterface
             $zval = [
                 self::VALUE => $objectOrArray,
             ];
+
+            // handle stdClass with properties with a dot in the name
+            if ($objectOrArray instanceof \stdClass && str_contains($propertyPath, '.') && property_exists($objectOrArray, $propertyPath)) {
+                $this->readProperty($zval, $propertyPath, $this->ignoreInvalidProperty);
+
+                return true;
+            }
+
             $propertyValues = $this->readPropertiesUntil($zval, $propertyPath, $propertyPath->getLength() - 1);
 
             for ($i = \count($propertyValues) - 1; 0 <= $i; --$i) {

@@ -60,7 +60,7 @@ class Vote implements VoteInterface
 
     public function isGranted(): bool
     {
-        return true === $this->access || $this->access > 0;
+        return $this->access > 0;
     }
 
     public function isAbstain(): bool
@@ -70,7 +70,7 @@ class Vote implements VoteInterface
 
     public function isDenied(): bool
     {
-        return false === $this->access || $this->access < 0;
+        return $this->access < 0;
     }
 
     /**

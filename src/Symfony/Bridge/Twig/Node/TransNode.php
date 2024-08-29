@@ -11,6 +11,7 @@
 
 namespace Symfony\Bridge\Twig\Node;
 
+use Twig\Attribute\FirstClassTwigCallableReady;
 use Twig\Attribute\YieldReady;
 use Twig\Compiler;
 use Twig\Node\Expression\AbstractExpression;
@@ -42,7 +43,11 @@ final class TransNode extends Node
             $nodes['locale'] = $locale;
         }
 
-        parent::__construct($nodes, [], $lineno, $tag);
+        if (class_exists(FirstClassTwigCallableReady::class)) {
+            parent::__construct($nodes, [], $lineno);
+        } else {
+            parent::__construct($nodes, [], $lineno, $tag);
+        }
     }
 
     public function compile(Compiler $compiler): void

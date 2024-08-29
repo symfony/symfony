@@ -14,6 +14,7 @@ namespace Symfony\Bridge\Twig\Tests\TokenParser;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Twig\Node\FormThemeNode;
 use Symfony\Bridge\Twig\TokenParser\FormThemeTokenParser;
+use Twig\Attribute\FirstClassTwigCallableReady;
 use Twig\Environment;
 use Twig\Loader\LoaderInterface;
 use Twig\Node\Expression\ArrayExpression;
@@ -34,6 +35,10 @@ class FormThemeTokenParserTest extends TestCase
         $source = new Source($source, '');
         $stream = $env->tokenize($source);
         $parser = new Parser($env);
+
+        if (class_exists(FirstClassTwigCallableReady::class)) {
+            $expected->setNodeTag('form_theme');
+        }
 
         $expected->setSourceContext($source);
 

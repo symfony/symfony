@@ -5,6 +5,7 @@ CHANGELOG
 ---
 
  * Allow configuring the secret used to sign login links
+ * Disallow using legacy hash algorithms for password hashing when migrating passwords
 
 7.1
 ---

@@ -71,6 +71,12 @@ use Symfony\Flex\Command\InstallRecipesCommand;
  */
 class SecurityExtension extends Extension implements PrependExtensionInterface
 {
+    /**
+     * Legacy hash algorithms that should not be used when migrating
+     * from old password hashers.
+     */
+    private const LEGACY_HASHES_REGEX = '/^(md\d+|sha[12]\d{0,2}|sha512|plaintext)$/';
+
     private array $requestMatchers = [];
     private array $expressions = [];
     private array $contextListeners = [];
@@ -719,10 +725,18 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
     {
         // a custom hasher service
         if (isset($config['id'])) {
-            return $config['migrate_from'] ?? false ? [
-                'instance' => new Reference($config['id']),
-                'migrate_from' => $config['migrate_from'],
-            ] : new Reference($config['id']);
+            if ($config['migrate_from'] ?? false) {
+                if (preg_match(self::LEGACY_HASHES_REGEX, $config['algorithm'] ?? '')) {
+                    throw new InvalidConfigurationException('The algorithm should not be a legacy hash algorithm when migrating from another hasher.');
+                }
+
+                return [
+                    'instance' => new Reference($config['id']),
+                    'migrate_from' => $config['migrate_from'],
+                ];
+            }
+
+            return new Reference($config['id']);
         }
 
         if ($config['migrate_from'] ?? false) {

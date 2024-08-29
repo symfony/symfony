@@ -900,6 +900,28 @@ class SecurityExtensionTest extends TestCase
         ]);
     }
 
+    public function testMigrateToLegacyHasherThrows()
+    {
+        $container = $this->getRawContainer();
+
+        $container->loadFromExtension('security', [
+            'password_hashers' => [
+                'legacy' => 'md5',
+                'App\User' => [
+                    'id' => 'App\Security\CustomHasher',
+                    'algorithm' => 'sha256',
+                    'migrate_from' => 'legacy',
+                ],
+            ],
+            'firewalls' => ['main' => ['http_basic' => true]],
+        ]);
+
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessage('The algorithm should not be a legacy hash algorithm when migrating from another hasher.');
+
+        $container->compile();
+    }
+
     protected function getRawContainer()
     {
         $container = new ContainerBuilder();

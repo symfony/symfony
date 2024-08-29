@@ -77,7 +77,7 @@ class ImportMapRendererTest extends TestCase
 
         $this->assertStringContainsString('<script type="importmap">', $html);
         // polyfill is rendered as a normal script tag
-        $this->assertStringContainsString('<script async src="https://ga.jspm.io/npm:es-module-shims"></script>', $html);
+        $this->assertStringContainsString("script.src = 'https://ga.jspm.io/npm:es-module-shims';", $html);
         // and is hidden from the import map
         $this->assertStringNotContainsString('"es-module-shim"', $html);
         $this->assertStringContainsString('import \'app\';', $html);
@@ -120,8 +120,8 @@ class ImportMapRendererTest extends TestCase
             polyfillImportName: 'es-module-shims',
         );
         $html = $renderer->render(['app']);
-        $this->assertStringContainsString('<script async src="https://ga.jspm.io/npm:es-module-shims@', $html);
-        $this->assertStringContainsString('es-module-shims.js" crossorigin="anonymous" integrity="sha384-', $html);
+        $this->assertStringContainsString("script.src = 'https://ga.jspm.io/npm:es-module-shims@", $html);
+        $this->assertStringContainsString("script.setAttribute('crossorigin', 'anonymous');\n    script.setAttribute('integrity', 'sha384-", $html);
     }
 
     public function testCustomScriptAttributes()
@@ -132,7 +132,13 @@ class ImportMapRendererTest extends TestCase
         ]);
         $html = $renderer->render([]);
         $this->assertStringContainsString('<script type="importmap" something data-turbo-track="reload">', $html);
-        $this->assertStringContainsString('<script async src="https://polyfillUrl.example" something data-turbo-track="reload"></script>', $html);
+        $this->assertStringContainsString('<script async something data-turbo-track="reload">', $html);
+        $this->assertStringContainsString(<<<EOTXT
+            script.src = 'https://polyfillUrl.example';
+            script.setAttribute('async', 'async');
+            script.setAttribute('something', 'something');
+            script.setAttribute('data-turbo-track', 'reload');
+        EOTXT, $html);
     }
 
     public function testWithEntrypoint()

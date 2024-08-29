@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+7.2
+---
+
+ * Deprecate passing a tag to the constructor of `FormThemeNode`
+
 7.1
 ---
 

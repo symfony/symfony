@@ -11,7 +11,6 @@
 
 namespace Symfony\Bridge\Twig\Node;
 
-use Twig\Attribute\FirstClassTwigCallableReady;
 use Twig\Attribute\YieldReady;
 use Twig\Compiler;
 use Twig\Node\Expression\AbstractExpression;
@@ -27,7 +26,7 @@ use Twig\Node\TextNode;
 #[YieldReady]
 final class TransNode extends Node
 {
-    public function __construct(Node $body, ?Node $domain = null, ?AbstractExpression $count = null, ?AbstractExpression $vars = null, ?AbstractExpression $locale = null, int $lineno = 0, ?string $tag = null)
+    public function __construct(Node $body, ?Node $domain = null, ?AbstractExpression $count = null, ?AbstractExpression $vars = null, ?AbstractExpression $locale = null, int $lineno = 0)
     {
         $nodes = ['body' => $body];
         if (null !== $domain) {
@@ -43,11 +42,7 @@ final class TransNode extends Node
             $nodes['locale'] = $locale;
         }
 
-        if (class_exists(FirstClassTwigCallableReady::class)) {
-            parent::__construct($nodes, [], $lineno);
-        } else {
-            parent::__construct($nodes, [], $lineno, $tag);
-        }
+        parent::__construct($nodes, [], $lineno);
     }
 
     public function compile(Compiler $compiler): void

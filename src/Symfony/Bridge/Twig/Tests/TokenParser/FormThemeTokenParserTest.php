@@ -14,7 +14,6 @@ namespace Symfony\Bridge\Twig\Tests\TokenParser;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Twig\Node\FormThemeNode;
 use Symfony\Bridge\Twig\TokenParser\FormThemeTokenParser;
-use Twig\Attribute\FirstClassTwigCallableReady;
 use Twig\Environment;
 use Twig\Loader\LoaderInterface;
 use Twig\Node\Expression\ArrayExpression;
@@ -36,10 +35,7 @@ class FormThemeTokenParserTest extends TestCase
         $stream = $env->tokenize($source);
         $parser = new Parser($env);
 
-        if (class_exists(FirstClassTwigCallableReady::class)) {
-            $expected->setNodeTag('form_theme');
-        }
-
+        $expected->setNodeTag('form_theme');
         $expected->setSourceContext($source);
 
         $this->assertEquals($expected, $parser->parse($stream)->getNode('body')->getNode(0));
@@ -56,8 +52,7 @@ class FormThemeTokenParserTest extends TestCase
                         new ConstantExpression(0, 1),
                         new ConstantExpression('tpl1', 1),
                     ], 1),
-                    1,
-                    'form_theme'
+                    1
                 ),
             ],
             [
@@ -70,8 +65,7 @@ class FormThemeTokenParserTest extends TestCase
                         new ConstantExpression(1, 1),
                         new ConstantExpression('tpl2', 1),
                     ], 1),
-                    1,
-                    'form_theme'
+                    1
                 ),
             ],
             [
@@ -79,8 +73,7 @@ class FormThemeTokenParserTest extends TestCase
                 new FormThemeNode(
                     new NameExpression('form', 1),
                     new ConstantExpression('tpl1', 1),
-                    1,
-                    'form_theme'
+                    1
                 ),
             ],
             [
@@ -91,8 +84,7 @@ class FormThemeTokenParserTest extends TestCase
                         new ConstantExpression(0, 1),
                         new ConstantExpression('tpl1', 1),
                     ], 1),
-                    1,
-                    'form_theme'
+                    1
                 ),
             ],
             [
@@ -105,8 +97,7 @@ class FormThemeTokenParserTest extends TestCase
                         new ConstantExpression(1, 1),
                         new ConstantExpression('tpl2', 1),
                     ], 1),
-                    1,
-                    'form_theme'
+                    1
                 ),
             ],
             [
@@ -120,7 +111,6 @@ class FormThemeTokenParserTest extends TestCase
                         new ConstantExpression('tpl2', 1),
                     ], 1),
                     1,
-                    'form_theme',
                     true
                 ),
             ],

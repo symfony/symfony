@@ -13,7 +13,6 @@ namespace Symfony\Bridge\Twig\Tests\NodeVisitor;
 
 use Symfony\Bridge\Twig\Node\TransDefaultDomainNode;
 use Symfony\Bridge\Twig\Node\TransNode;
-use Twig\Attribute\FirstClassTwigCallableReady;
 use Twig\Node\BodyNode;
 use Twig\Node\Expression\ArrayExpression;
 use Twig\Node\Expression\ConstantExpression;
@@ -45,15 +44,6 @@ class TwigNodeProvider
                 new ArrayExpression([], 0),
                 new ConstantExpression($domain, 0),
             ] : [];
-        }
-
-        if (!class_exists(FirstClassTwigCallableReady::class)) {
-            return new FilterExpression(
-                new ConstantExpression($message, 0),
-                new ConstantExpression('trans', 0),
-                new Node($arguments),
-                0
-            );
         }
 
         return new FilterExpression(

@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Security\Guard\Firewall;
 
+use Exception;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -51,12 +52,13 @@ class GuardAuthenticationListener extends AbstractListener
     private $rememberMeServices;
     private $hideUserNotFoundExceptions;
     private $tokenStorage;
+    private $showAccountStatusExceptions;
 
     /**
      * @param string                                      $providerKey         The provider (i.e. firewall) key
      * @param iterable<array-key, AuthenticatorInterface> $guardAuthenticators The authenticators, with keys that match what's passed to GuardAuthenticationProvider
      */
-    public function __construct(GuardAuthenticatorHandler $guardHandler, AuthenticationManagerInterface $authenticationManager, string $providerKey, iterable $guardAuthenticators, ?LoggerInterface $logger = null, bool $hideUserNotFoundExceptions = true, ?TokenStorageInterface $tokenStorage = null)
+    public function __construct(GuardAuthenticatorHandler $guardHandler, AuthenticationManagerInterface $authenticationManager, string $providerKey, iterable $guardAuthenticators, ?LoggerInterface $logger = null, bool $hideUserNotFoundExceptions = true, ?TokenStorageInterface $tokenStorage = null, bool $showAccountStatusExceptions = false)
     {
         if (empty($providerKey)) {
             throw new \InvalidArgumentException('$providerKey must not be empty.');
@@ -69,6 +71,7 @@ class GuardAuthenticationListener extends AbstractListener
         $this->logger = $logger;
         $this->hideUserNotFoundExceptions = $hideUserNotFoundExceptions;
         $this->tokenStorage = $tokenStorage;
+        $this->showAccountStatusExceptions = $showAccountStatusExceptions;
     }
 
     /**
@@ -180,7 +183,7 @@ class GuardAuthenticationListener extends AbstractListener
 
             // Avoid leaking error details in case of invalid user (e.g. user not found or invalid account status)
             // to prevent user enumeration via response content
-            if ($this->hideUserNotFoundExceptions && ($e instanceof UsernameNotFoundException || ($e instanceof AccountStatusException && !$e instanceof CustomUserMessageAccountStatusException))) {
+            if ($this->isFilteredException($e)) {
                 $e = new BadCredentialsException('Bad credentials.', 0, $e);
             }
 
@@ -246,5 +249,22 @@ class GuardAuthenticationListener extends AbstractListener
         }
 
         $this->rememberMeServices->loginSuccess($request, $response, $token);
+    }
+
+    private function isFilteredException(Exception $exception): bool
+    {
+        if (!$this->hideUserNotFoundExceptions) {
+            return false;
+        }
+
+        if ($exception instanceof UsernameNotFoundException) {
+            return true;
+        }
+
+        if ($this->showAccountStatusExceptions) {
+            return false;
+        }
+
+        return $exception instanceof AccountStatusException && !$exception instanceof CustomUserMessageAccountStatusException;
     }
 }

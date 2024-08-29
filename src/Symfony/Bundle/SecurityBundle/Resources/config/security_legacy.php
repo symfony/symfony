@@ -122,6 +122,7 @@ return static function (ContainerConfigurator $container) {
                 abstract_arg('Provider-shared Key'),
                 service('security.password_hasher_factory'),
                 param('security.authentication.hide_user_not_found'),
+                param('security.authentication.show_account_status_exceptions'),
             ])
             ->deprecate('symfony/security-bundle', '5.3', 'The "%service_id%" service is deprecated, use the new authenticator system instead.')
 
@@ -136,6 +137,7 @@ return static function (ContainerConfigurator $container) {
                 param('security.authentication.hide_user_not_found'),
                 abstract_arg('search dn'),
                 abstract_arg('search password'),
+                param('security.authentication.show_account_status_exceptions'),
             ])
             ->deprecate('symfony/security-bundle', '5.3', 'The "%service_id%" service is deprecated, use the new authenticator system instead.')
 

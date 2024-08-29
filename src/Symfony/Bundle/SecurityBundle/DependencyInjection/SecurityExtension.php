@@ -170,6 +170,7 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
 
         $container->setParameter('security.access.always_authenticate_before_granting', $config['always_authenticate_before_granting']);
         $container->setParameter('security.authentication.hide_user_not_found', $config['hide_user_not_found']);
+        $container->setParameter('security.authentication.show_account_status_exceptions', $config['show_account_status_exceptions']);
 
         if (class_exists(Application::class)) {
             $loader->load('debug_console.php');

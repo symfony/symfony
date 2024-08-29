@@ -46,6 +46,7 @@ return static function (ContainerConfigurator $container) {
                 param('security.authentication.manager.erase_credentials'),
                 param('security.authentication.hide_user_not_found'),
                 abstract_arg('required badges'),
+                param('security.authentication.show_account_status_exceptions'),
             ])
             ->tag('monolog.logger', ['channel' => 'security'])
 

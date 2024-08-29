@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Security\Core\Authentication\Provider;
 
+use Exception;
 use Symfony\Component\Security\Core\Authentication\Token\SwitchUserToken;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
@@ -37,11 +38,12 @@ abstract class UserAuthenticationProvider implements AuthenticationProviderInter
     private $hideUserNotFoundExceptions;
     private $userChecker;
     private $providerKey;
+    private $showAccountStatusExceptions;
 
     /**
      * @throws \InvalidArgumentException
      */
-    public function __construct(UserCheckerInterface $userChecker, string $providerKey, bool $hideUserNotFoundExceptions = true)
+    public function __construct(UserCheckerInterface $userChecker, string $providerKey, bool $hideUserNotFoundExceptions = true, bool $showAccountStatusExceptions = false)
     {
         if (empty($providerKey)) {
             throw new \InvalidArgumentException('$providerKey must not be empty.');
@@ -50,6 +52,7 @@ abstract class UserAuthenticationProvider implements AuthenticationProviderInter
         $this->userChecker = $userChecker;
         $this->providerKey = $providerKey;
         $this->hideUserNotFoundExceptions = $hideUserNotFoundExceptions;
+        $this->showAccountStatusExceptions = $showAccountStatusExceptions;
     }
 
     /**
@@ -86,7 +89,7 @@ abstract class UserAuthenticationProvider implements AuthenticationProviderInter
             $this->checkAuthentication($user, $token);
             $this->userChecker->checkPostAuth($user);
         } catch (AccountStatusException|BadCredentialsException $e) {
-            if ($this->hideUserNotFoundExceptions && !$e instanceof CustomUserMessageAccountStatusException) {
+            if ($this->isFilteredException($e)) {
                 throw new BadCredentialsException('Bad credentials.', 0, $e);
             }
 
@@ -131,4 +134,17 @@ abstract class UserAuthenticationProvider implements AuthenticationProviderInter
      * @throws AuthenticationException if the credentials could not be validated
      */
     abstract protected function checkAuthentication(UserInterface $user, UsernamePasswordToken $token);
+
+    private function isFilteredException(Exception $exception): bool
+    {
+        if (!$this->hideUserNotFoundExceptions) {
+            return false;
+        }
+
+        if ($this->showAccountStatusExceptions) {
+            return false;
+        }
+
+        return !$exception instanceof CustomUserMessageAccountStatusException;
+    }
 }

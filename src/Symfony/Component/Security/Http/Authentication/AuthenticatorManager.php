@@ -54,11 +54,12 @@ class AuthenticatorManager implements AuthenticatorManagerInterface, UserAuthent
     private $firewallName;
     private $hideUserNotFoundExceptions;
     private $requiredBadges;
+    private $showAccountStatusExceptions;
 
     /**
      * @param iterable<mixed, AuthenticatorInterface> $authenticators
      */
-    public function __construct(iterable $authenticators, TokenStorageInterface $tokenStorage, EventDispatcherInterface $eventDispatcher, string $firewallName, ?LoggerInterface $logger = null, bool $eraseCredentials = true, bool $hideUserNotFoundExceptions = true, array $requiredBadges = [])
+    public function __construct(iterable $authenticators, TokenStorageInterface $tokenStorage, EventDispatcherInterface $eventDispatcher, string $firewallName, ?LoggerInterface $logger = null, bool $eraseCredentials = true, bool $hideUserNotFoundExceptions = true, array $requiredBadges = [], bool $showAccountStatusExceptions = false)
     {
         $this->authenticators = $authenticators;
         $this->tokenStorage = $tokenStorage;
@@ -68,6 +69,7 @@ class AuthenticatorManager implements AuthenticatorManagerInterface, UserAuthent
         $this->eraseCredentials = $eraseCredentials;
         $this->hideUserNotFoundExceptions = $hideUserNotFoundExceptions;
         $this->requiredBadges = $requiredBadges;
+        $this->showAccountStatusExceptions = $showAccountStatusExceptions;
     }
 
     /**
@@ -269,7 +271,7 @@ class AuthenticatorManager implements AuthenticatorManagerInterface, UserAuthent
 
         // Avoid leaking error details in case of invalid user (e.g. user not found or invalid account status)
         // to prevent user enumeration via response content comparison
-        if ($this->hideUserNotFoundExceptions && ($authenticationException instanceof UserNotFoundException || ($authenticationException instanceof AccountStatusException && !$authenticationException instanceof CustomUserMessageAccountStatusException))) {
+        if ($this->isFilteredException($authenticationException)) {
             $authenticationException = new BadCredentialsException('Bad credentials.', 0, $authenticationException);
         }
 
@@ -282,5 +284,22 @@ class AuthenticatorManager implements AuthenticatorManagerInterface, UserAuthent
 
         // returning null is ok, it means they want the request to continue
         return $loginFailureEvent->getResponse();
+    }
+
+    private function isFilteredException(AuthenticationException $exception): bool
+    {
+        if (!$this->hideUserNotFoundExceptions) {
+            return false;
+        }
+
+        if ($exception instanceof UserNotFoundException) {
+            return true;
+        }
+
+        if ($this->showAccountStatusExceptions) {
+            return false;
+        }
+
+        return $exception instanceof AccountStatusException && !$exception instanceof CustomUserMessageAccountStatusException;
     }
 }

@@ -91,6 +91,7 @@ class MainConfiguration implements ConfigurationInterface
                     ->defaultValue(SessionAuthenticationStrategy::MIGRATE)
                 ->end()
                 ->booleanNode('hide_user_not_found')->defaultTrue()->end()
+                ->booleanNode('show_account_status_exceptions')->defaultFalse()->end()
                 ->booleanNode('always_authenticate_before_granting')
                     ->defaultFalse()
                     ->setDeprecated('symfony/security-bundle', '5.4')

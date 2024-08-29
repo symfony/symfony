@@ -257,11 +257,63 @@ class GuardAuthenticationListenerTest extends TestCase
         $listener($this->event);
     }
 
+    /**
+     * @dataProvider exceptionsToHide
+     */
+    public function testHandleHidesInvalidUserExceptionsShowAccountStatusException(AuthenticationException $exceptionToHide, bool $accountStatusException)
+    {
+        $authenticator = $this->createMock(AuthenticatorInterface::class);
+        $providerKey = 'my_firewall2';
+
+        $authenticator
+            ->expects($this->once())
+            ->method('supports')
+            ->willReturn(true);
+        $authenticator
+            ->expects($this->once())
+            ->method('getCredentials')
+            ->willReturn(['username' => 'robin', 'password' => 'hood']);
+
+        $this->authenticationManager
+            ->expects($this->once())
+            ->method('authenticate')
+            ->willThrowException($exceptionToHide);
+
+        if ($accountStatusException) {
+            $this->guardAuthenticatorHandler
+                ->expects($this->once())
+                ->method('handleAuthenticationFailure')
+                ->with($this->callback(function ($e) use ($exceptionToHide) {
+                    return $e === $exceptionToHide;
+                }), $this->request, $authenticator, $providerKey);
+        } else {
+            $this->guardAuthenticatorHandler
+                ->expects($this->once())
+                ->method('handleAuthenticationFailure')
+                ->with($this->callback(function ($e) use ($exceptionToHide) {
+                    return $e instanceof BadCredentialsException && $exceptionToHide === $e->getPrevious();
+                }), $this->request, $authenticator, $providerKey);
+        }
+
+        $listener = new GuardAuthenticationListener(
+            $this->guardAuthenticatorHandler,
+            $this->authenticationManager,
+            $providerKey,
+            [$authenticator],
+            $this->logger,
+            true,
+            null,
+            true
+        );
+
+        $listener($this->event);
+    }
+
     public static function exceptionsToHide()
     {
         return [
-            [new UserNotFoundException()],
-            [new LockedException()],
+            [new UserNotFoundException(), false],
+            [new LockedException(), true],
         ];
     }
 

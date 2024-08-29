@@ -42,9 +42,9 @@ class DaoAuthenticationProvider extends UserAuthenticationProvider
     /**
      * @param PasswordHasherFactoryInterface $hasherFactory
      */
-    public function __construct(UserProviderInterface $userProvider, UserCheckerInterface $userChecker, string $providerKey, $hasherFactory, bool $hideUserNotFoundExceptions = true)
+    public function __construct(UserProviderInterface $userProvider, UserCheckerInterface $userChecker, string $providerKey, $hasherFactory, bool $hideUserNotFoundExceptions = true, bool $showAccountStatusExceptions = false)
     {
-        parent::__construct($userChecker, $providerKey, $hideUserNotFoundExceptions);
+        parent::__construct($userChecker, $providerKey, $hideUserNotFoundExceptions, $showAccountStatusExceptions);
 
         if ($hasherFactory instanceof EncoderFactoryInterface) {
             trigger_deprecation('symfony/security-core', '5.3', 'Passing a "%s" instance to the "%s" constructor is deprecated, use "%s" instead.', EncoderFactoryInterface::class, __CLASS__, PasswordHasherFactoryInterface::class);

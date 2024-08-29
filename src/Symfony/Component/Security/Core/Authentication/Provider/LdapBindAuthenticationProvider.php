@@ -42,9 +42,9 @@ class LdapBindAuthenticationProvider extends UserAuthenticationProvider
     private $searchDn;
     private $searchPassword;
 
-    public function __construct(UserProviderInterface $userProvider, UserCheckerInterface $userChecker, string $providerKey, LdapInterface $ldap, string $dnString = '{user_identifier}', bool $hideUserNotFoundExceptions = true, string $searchDn = '', string $searchPassword = '')
+    public function __construct(UserProviderInterface $userProvider, UserCheckerInterface $userChecker, string $providerKey, LdapInterface $ldap, string $dnString = '{user_identifier}', bool $hideUserNotFoundExceptions = true, string $searchDn = '', string $searchPassword = '', bool $showAccountStatusExceptions = false)
     {
-        parent::__construct($userChecker, $providerKey, $hideUserNotFoundExceptions);
+        parent::__construct($userChecker, $providerKey, $hideUserNotFoundExceptions, $showAccountStatusExceptions);
 
         $this->userProvider = $userProvider;
         $this->ldap = $ldap;

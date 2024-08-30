@@ -1,0 +1,80 @@
+---------------------------------------------------------------------------
+
+by newQuery at 2024-08-30T02:00:24Z
+
+I'd suggest to create two separate methods `formatAttributes` & `generateAttributeScript` to simplify the code
+
+<details>
+
+```php
+if ($polyfillPath) {
+    $polyfillAttributes = array_merge([
+        'src' => $polyfillPath,
+        'async' => true,
+    ], $attributes, $this->scriptAttributes);
+
+    // Add security attributes if using the default polyfill
+    if ($polyfillPath === self::DEFAULT_ES_MODULE_SHIMS_POLYFILL_URL) {
+        $polyfillAttributes = array_merge([
+            'crossorigin' => 'anonymous',
+            'integrity' => self::DEFAULT_ES_MODULE_SHIMS_POLYFILL_INTEGRITY,
+        ], $polyfillAttributes);
+    }
+
+    $output .= '<script async' . $this->formatAttributes($scriptAttributes) . '>
+        if (!HTMLScriptElement.supports("importmap")) {
+            (function() {
+                const script = document.createElement("script");
+                ' . $this->generateAttributeScript($polyfillAttributes) . '
+                document.head.appendChild(script);
+            })();
+        }
+    </script>';
+}
+```
+
+The methods:
+
+```php
+private function formatAttributes(array $attributes): string
+{
+    $formatted = '';
+    foreach ($attributes as $name => $value) {
+        $formatted .= ' ' . htmlspecialchars($name, \ENT_NOQUOTES) . '="' . htmlspecialchars($value, \ENT_NOQUOTES) . '"';
+    }
+    return $formatted;
+}
+
+private function generateAttributeScript(array $attributes): string
+{
+    $script = '';
+    foreach ($attributes as $name => $value) {
+        $name = addslashes(htmlspecialchars($name, \ENT_NOQUOTES));
+        $value = addslashes(htmlspecialchars($value, \ENT_NOQUOTES));
+        $script .= "\n    script.setAttribute('{$name}', '{$value}');";
+    }
+    return $script;
+}
+```
+
+</details>
+
+Improve code readability, maintainability, and reusability
+
+---------------------------------------------------------------------------
+
+by newQuery at 2024-08-30T02:01:40Z
+
+I would also allow developers to configure whether es-module-shims should be loaded, providing more flexibility
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-08-30T13:19:56Z
+
+> I'd suggest to create two separate methods formatAttributes & generateAttributeScript to simplify the code
+
+Factorized: I leveraged the already existing method createAttributeString
+
+> I would also allow developers to configure whether es-module-shims should be loaded, providing more flexibility
+
+Not sure this would provide any benefits. Options are complexity. Anyway, that's a discussion for another PR/ issue.

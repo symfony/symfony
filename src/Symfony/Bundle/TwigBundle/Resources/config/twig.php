@@ -36,7 +36,9 @@ use Symfony\Bridge\Twig\Translation\TwigExtractor;
 use Symfony\Bundle\TwigBundle\CacheWarmer\TemplateCacheWarmer;
 use Symfony\Bundle\TwigBundle\DependencyInjection\Configurator\EnvironmentConfigurator;
 use Symfony\Bundle\TwigBundle\TemplateIterator;
+use Twig\Cache\ChainCache;
 use Twig\Cache\FilesystemCache;
+use Twig\Cache\ReadOnlyFilesystemCache;
 use Twig\Environment;
 use Twig\Extension\CoreExtension;
 use Twig\Extension\DebugExtension;
@@ -79,8 +81,24 @@ return static function (ContainerConfigurator $container) {
         ->set('twig.template_iterator', TemplateIterator::class)
             ->args([service('kernel'), abstract_arg('Twig paths'), param('twig.default_path'), abstract_arg('File name pattern')])
 
+        ->set('twig.template_cache.runtime_cache', FilesystemCache::class)
+            ->args([param('kernel.cache_dir').'/twig', abstract_arg('Twig filesystem cache options')])
+
+        ->set('twig.template_cache.readonly_cache', ReadOnlyFilesystemCache::class)
+            ->args([param('kernel.build_dir').'/twig'])
+
+        ->set('twig.template_cache.warmup_cache', FilesystemCache::class)
+            ->args([param('kernel.build_dir').'/twig'])
+
+        ->set('twig.template_cache.chain', ChainCache::class)
+            ->args([[service('twig.template_cache.runtime_cache'), service('twig.template_cache.readonly_cache')]])
+
         ->set('twig.template_cache_warmer', TemplateCacheWarmer::class)
-            ->args([service(ContainerInterface::class), service('twig.template_iterator')])
+            ->args([
+                service(ContainerInterface::class),
+                service('twig.template_iterator'),
+                service('twig.template_cache.warmup_cache'),
+            ])
             ->tag('kernel.cache_warmer')
             ->tag('container.service_subscriber', ['id' => 'twig'])
 

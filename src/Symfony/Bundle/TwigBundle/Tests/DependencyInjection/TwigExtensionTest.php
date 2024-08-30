@@ -47,7 +47,7 @@ class TwigExtensionTest extends TestCase
 
         // Twig options
         $options = $container->getDefinition('twig')->getArgument(1);
-        $this->assertEquals('%kernel.cache_dir%/twig', $options['cache'], '->load() sets default value for cache option');
+        $this->assertEquals(new Reference('twig.template_cache.chain'), $options['cache'], '->load() sets default value for cache option');
         $this->assertEquals('%kernel.charset%', $options['charset'], '->load() sets default value for charset option');
         $this->assertEquals('%kernel.debug%', $options['debug'], '->load() sets default value for debug option');
 
@@ -95,7 +95,7 @@ class TwigExtensionTest extends TestCase
         $this->assertTrue($options['auto_reload'], '->load() sets the auto_reload option');
         $this->assertSame('name', $options['autoescape'], '->load() sets the autoescape option');
         $this->assertArrayNotHasKey('base_template_class', $options, '->load() does not set the base_template_class if none is provided');
-        $this->assertEquals('/tmp', $options['cache'], '->load() sets the cache option');
+        $this->assertEquals(new Reference('twig.template_cache.chain'), $options['cache'], '->load() sets the cache option');
         $this->assertEquals('ISO-8859-1', $options['charset'], '->load() sets the charset option');
         $this->assertTrue($options['debug'], '->load() sets the debug option');
         $this->assertTrue($options['strict_variables'], '->load() sets the strict_variables option');

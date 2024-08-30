@@ -574,7 +574,7 @@ class DebugClassLoader
             $returnType = self::$returnTypes[$class][$method->name] ?? null;
             if (null !== $returnType && isset(self::$returnTypesWillChange[$returnType[2]][$method->name]) && !$method->hasReturnType() && !isset($doc['deprecated'])) {
                 [$normalizedType, $returnType, $declaringClass, $declaringFile] = $returnType;
-                $when = is_bool(self::$returnTypesWillChange[$declaringClass][$method->name]) ? 'in the future' : 'in version ' . self::$returnTypesWillChange[$declaringClass][$method->name];
+                $when = is_bool(self::$returnTypesWillChange[$declaringClass][$method->name]) ? 'in the future' : 'in version '.self::$returnTypesWillChange[$declaringClass][$method->name];
                 $deprecations[] = \sprintf('Method "%s::%s()" will add "%s" as a native return type declaration %s. Do the same in %s "%s" now to avoid errors.', $declaringClass, $method->name, $normalizedType, $when, interface_exists($declaringClass) ? 'implementation' : 'child class', $className);
             }
 

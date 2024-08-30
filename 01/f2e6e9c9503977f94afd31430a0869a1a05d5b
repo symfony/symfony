@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by derrabus at 2024-08-30T12:50:52Z
+
+Do we need to bump Twig everywhere? It's only the bridge that we change in an incompatible manner, isn't it?
+
+---------------------------------------------------------------------------
+
+by stof at 2024-08-30T12:53:18Z
+
+Half of the other places are in dev requirements only, not in requirements. And the other places are places that have a requirement on twig-bridge (either directly or through twig-bundle)

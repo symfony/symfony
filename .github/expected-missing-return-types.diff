@@ -1,5 +1,5 @@
 # Run these steps to update this file:
-sed -i 's/ *"\*\*\/Tests\/"//' composer.json
+sed -i 's/ *"\*\*\/Tests\/",//' composer.json
 composer u -o
 SYMFONY_PATCH_TYPE_DECLARATIONS='force=2&php=8.1' php .github/patch-types.php
 head=$(sed '/^diff /Q' .github/expected-missing-return-types.diff)
@@ -7063,7 +7063,7 @@ diff --git a/src/Symfony/Component/HttpClient/DecoratorTrait.php b/src/Symfony/C
 diff --git a/src/Symfony/Component/HttpClient/HttpClientTrait.php b/src/Symfony/Component/HttpClient/HttpClientTrait.php
 --- a/src/Symfony/Component/HttpClient/HttpClientTrait.php
 +++ b/src/Symfony/Component/HttpClient/HttpClientTrait.php
-@@ -679,5 +679,5 @@ trait HttpClientTrait
+@@ -685,5 +685,5 @@ trait HttpClientTrait
       * @return string
       */
 -    private static function removeDotSegments(string $path)
@@ -8457,28 +8457,28 @@ diff --git a/src/Symfony/Component/HttpKernel/HttpCache/Esi.php b/src/Symfony/Co
 diff --git a/src/Symfony/Component/HttpKernel/HttpCache/HttpCache.php b/src/Symfony/Component/HttpKernel/HttpCache/HttpCache.php
 --- a/src/Symfony/Component/HttpKernel/HttpCache/HttpCache.php
 +++ b/src/Symfony/Component/HttpKernel/HttpCache/HttpCache.php
-@@ -246,5 +246,5 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
+@@ -248,5 +248,5 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
       * @return void
       */
 -    public function terminate(Request $request, Response $response)
 +    public function terminate(Request $request, Response $response): void
      {
          // Do not call any listeners in case of a cache hit.
-@@ -466,5 +466,5 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
+@@ -468,5 +468,5 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
       * @return Response
       */
 -    protected function forward(Request $request, bool $catch = false, ?Response $entry = null)
 +    protected function forward(Request $request, bool $catch = false, ?Response $entry = null): Response
      {
          $this->surrogate?->addSurrogateCapability($request);
-@@ -600,5 +600,5 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
+@@ -602,5 +602,5 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
       * @throws \Exception
       */
 -    protected function store(Request $request, Response $response)
 +    protected function store(Request $request, Response $response): void
      {
          try {
-@@ -678,5 +678,5 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
+@@ -680,5 +680,5 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
       * @return void
       */
 -    protected function processResponseBody(Request $request, Response $response)
@@ -9943,7 +9943,7 @@ diff --git a/src/Symfony/Component/Mime/Part/TextPart.php b/src/Symfony/Componen
 diff --git a/src/Symfony/Component/Mime/RawMessage.php b/src/Symfony/Component/Mime/RawMessage.php
 --- a/src/Symfony/Component/Mime/RawMessage.php
 +++ b/src/Symfony/Component/Mime/RawMessage.php
-@@ -97,5 +97,5 @@ class RawMessage
+@@ -100,5 +100,5 @@ class RawMessage
       * @throws LogicException if the message is not valid
       */
 -    public function ensureValidity()
@@ -10147,7 +10147,7 @@ diff --git a/src/Symfony/Component/PropertyAccess/PropertyAccessor.php b/src/Sym
 -    public function setValue(object|array &$objectOrArray, string|PropertyPathInterface $propertyPath, mixed $value)
 +    public function setValue(object|array &$objectOrArray, string|PropertyPathInterface $propertyPath, mixed $value): void
      {
-         if (\is_object($objectOrArray) && false === strpbrk((string) $propertyPath, '.[')) {
+         if (\is_object($objectOrArray) && (false === strpbrk((string) $propertyPath, '.[') || $objectOrArray instanceof \stdClass && property_exists($objectOrArray, $propertyPath))) {
 diff --git a/src/Symfony/Component/PropertyAccess/PropertyAccessorInterface.php b/src/Symfony/Component/PropertyAccess/PropertyAccessorInterface.php
 --- a/src/Symfony/Component/PropertyAccess/PropertyAccessorInterface.php
 +++ b/src/Symfony/Component/PropertyAccess/PropertyAccessorInterface.php
@@ -12808,7 +12808,7 @@ diff --git a/src/Symfony/Component/Validator/Constraints/HostnameValidator.php b
 diff --git a/src/Symfony/Component/Validator/Constraints/IbanValidator.php b/src/Symfony/Component/Validator/Constraints/IbanValidator.php
 --- a/src/Symfony/Component/Validator/Constraints/IbanValidator.php
 +++ b/src/Symfony/Component/Validator/Constraints/IbanValidator.php
-@@ -167,5 +167,5 @@ class IbanValidator extends ConstraintValidator
+@@ -171,5 +171,5 @@ class IbanValidator extends ConstraintValidator
       * @return void
       */
 -    public function validate(mixed $value, Constraint $constraint)

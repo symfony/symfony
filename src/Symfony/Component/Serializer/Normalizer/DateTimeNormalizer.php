@@ -138,7 +138,7 @@ final class DateTimeNormalizer implements NormalizerInterface, DenormalizerInter
 
     public function supportsDenormalization(mixed $data, string $type, ?string $format = null, array $context = []): bool
     {
-        return isset(self::SUPPORTED_TYPES[$type]);
+        return is_a($type, \DateTimeInterface::class, true);
     }
 
     /**

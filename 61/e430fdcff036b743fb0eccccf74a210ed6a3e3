@@ -1,0 +1,191 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2024-07-22T08:22:24Z
+
+Hey!
+
+I see that this is your first PR. That is great! Welcome!
+
+Symfony has a [contribution guide](https://symfony.com/doc/current/contributing/index.html) which I suggest you to read.
+
+In short:
+- Always add tests
+- Keep backward compatibility (see https://symfony.com/bc).
+- Bug fixes must be submitted against the lowest maintained branch where they apply (see https://symfony.com/releases)
+- Features and deprecations must be submitted against the 7.2 branch.
+
+Review the GitHub status checks of your pull request and try to solve the reported issues. If some tests are failing, try to see if they are failing because of this change.
+
+When two Symfony core team members approve this change, it will be merged and you will become an official Symfony contributor!
+If this PR is merged in a lower version branch, it will be merged up to all maintained branches within a few days.
+
+I am going to sit back now and wait for the reviews.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by amcsi at 2024-07-22T12:23:44Z
+
+@derrabus I understand the need to be as fast as possible.
+As an alternative, I could instead implement this by allowing to override the supported types via constructor option, as was suggested by you in the Issue.
+Would you have any preferences in the name/key of the option in this case?
+
+---------------------------------------------------------------------------
+
+by amcsi at 2024-07-22T12:56:42Z
+
+Made the change.
+
+---------------------------------------------------------------------------
+
+by amcsi at 2024-07-24T08:12:03Z
+
+@derrabus @xabbuh changes ready
+
+---------------------------------------------------------------------------
+
+by amcsi at 2024-08-06T10:20:06Z
+
+@derrabus @xabbuh anything else?
+
+---------------------------------------------------------------------------
+
+by stof at 2024-08-06T10:24:23Z
+
+I don't think this is the right fix. `getSupportedTypes` does not need any change because of the way this API works (supporting a type means supporting all its subtypes).
+The *only* thing that should change is the implementation of `supportsDenormalization` to properly handle subclasses.
+
+---------------------------------------------------------------------------
+
+by amcsi at 2024-08-07T13:09:53Z
+
+@stof Literally my first implementation was changing the `supportsDenormalization()` method's behavior to iterate the `SUPPORTED_TYPES` constant's types and do additional `is_subclass_of()` checks against the passed `$type`, but @derrabus  told me not to do it, because it would make `supportsDenormalization()` slower.
+
+I could potentially cache each result if I remove the context support for supported types that I added, but then I would be concerned about memory leaks (the supported-types true/false values array keeping on getting bigger and bigger). I'm not sure the performance would be overall better, though.
+
+This first checking the supported types from the `$context` and then falling back to checking the default context to me sounds like the best compromise, all things considered.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2024-08-11T15:19:58Z
+
+@stof has a point with regards to the cachability of the normalizer. I think, we should not use the context for this piece of configuration. We could inject the list of supported classes via the constructor. This way, it is set once when we build the serializer and the decisions of the voter become cacheable again.
+
+---------------------------------------------------------------------------
+
+by amcsi at 2024-08-11T18:05:05Z
+
+@derrabus, ok, then I'll change the behavior to make the list of supported classes configurable in the constructor, but use a separate property from the context's to store/read them.
+
+---------------------------------------------------------------------------
+
+by amcsi at 2024-08-12T21:19:31Z
+
+@derrabus Done. Note that I made the `DEFAULT_SUPPORTED_TYPES` const public so that you could easily do an `array_replace()``/array_merge()` with the default supported types when overriding them in the constructor.
+
+---------------------------------------------------------------------------
+
+by stof at 2024-08-13T12:49:24Z
+
+having a slower `supportsDenormalization` is not an issue if it stays cacheable as it would run only once for each type (and we can keep the existing `isset` check as a first check for a fast path for code using the PHP core classes and not subtypes)
+
+---------------------------------------------------------------------------
+
+by stof at 2024-08-13T12:50:22Z
+
+and no need for a caching in DateTimeNormalizer: we already have caching in Serializer
+
+---------------------------------------------------------------------------
+
+by amcsi at 2024-08-14T10:17:39Z
+
+@stof you need to come to some agreement with @derrabus, because he didn't like it when I wrote it to the way you are suggesting.
+The only difference was that I didn't put an `isset()` check in the beginning, but...
+1. most of the time the incoming type will not be a date class type, so isset will return false most of the time and we would have to fall back to the loop with the `is_subclass_of()` logic.
+2. adding an `isset()` check in the the beginning of `supportsNormalization()` wouldn't really matter anyway if what you claim is true that `Serializer` already caches the results of `supportsNormalization()` per normalizer.
+
+---------------------------------------------------------------------------
+
+by stof at 2024-08-14T10:21:49Z
+
+> 1. most of the time the incoming type will not be a date class type, so isset will return false most of the time
+
+why that ? The `supportsDenormalization` method will be called only for cases where `getSupportedTypes` reports that it may be supported (otherwise, the Serializer will skip calling it at all, which is the source of the main performance gain provided by `getSupportedTypes`).
+So unless you use custom subclasses, the `isset` check will actually be the common path.
+
+But indeed, keeping the `isset` check would still be a micro-optimization given we have the caching in Serializer
+
+---------------------------------------------------------------------------
+
+by derrabus at 2024-08-14T10:30:28Z
+
+What is your actual proposal @stof? Maybe I did not fully understand what you'd like to be changed.
+
+---------------------------------------------------------------------------
+
+by stof at 2024-08-14T10:34:32Z
+
+@derrabus always supporting all subtypes of DateTimeInterface, by making `supportsDenormalization` report that properly (`getSupportedTypes` already does), without any need for configuration.
+
+The only reason denormalization does not support subclasses is because `supportsDenormalization` does not account for subclasses in its check (the implementation would be correct if DateTime and DateTimeImmutable were final classes).
+
+The implementation could be `is_a($type, \DateTimeInterface::class, true)`
+
+---------------------------------------------------------------------------
+
+by derrabus at 2024-08-14T10:42:45Z
+
+> The implementation could be `is_a($type, \DateTimeInterface::class, true)`
+
+And the cache warmup via `getSupportedTypes()` would only happen for the built-in classes then?
+
+---------------------------------------------------------------------------
+
+by stof at 2024-08-14T10:48:21Z
+
+@derrabus `getSupportedTypes` is not about cache warmup. It is about filtering early unsupported types. But the implementation of this filtering works with types properly (meaning that reporting a type as supported considers its subtypes as supported as well there).
+
+Note that the implementation of `getSupportedTypes` reporting DateTime and DateTimeImmutable in addition to DateTimeInterface (with the same cacheability value) is probably redundant.
+
+---------------------------------------------------------------------------
+
+by amcsi at 2024-08-28T15:49:22Z
+
+Alright, I've added the simplified `is_a()` check that was mentioned.
+Note that maybe `getSupportedTypes()` should also just return [DateTimeInterface::class] without the (built-in) subclasses redundantly? And then maybe we could do away with the SUPPORTED_TYPES constant entirely as well. [Here's what that commit would look like.](https://github.com/amcsi/symfony/commit/94ef6103dff08e06def25342bb0da6711ad8e198)
+
+---------------------------------------------------------------------------
+
+by stof at 2024-08-28T15:56:16Z
+
+@amcsi your suggested commit removing the constant is broken. It does not return the right array structure.
+
+---------------------------------------------------------------------------
+
+by amcsi at 2024-08-28T16:05:29Z
+
+@stof what do you mean? here are the square brackets.
+![image](https://github.com/user-attachments/assets/86064e28-83ae-463f-beb6-ba12ae19d83c)
+
+---------------------------------------------------------------------------
+
+by derrabus at 2024-08-28T19:35:46Z
+
+> @stof what do you mean? here are the square brackets.
+
+The returned array is supposed to be keyed by the supported classes. You however return them as values.
+
+---------------------------------------------------------------------------
+
+by amcsi at 2024-08-28T21:56:58Z
+
+@derrabus damn, I totally forgot. But you did approve, so I'm assuming my intended additional change is not needed.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2024-08-29T06:09:24Z
+
+I think, we're good. 🙂

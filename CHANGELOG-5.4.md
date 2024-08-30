@@ -7,6 +7,34 @@ in 5.4 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v5.4.0...v5.4.1
 
+* 5.4.43 (2024-08-30)
+
+ * bug #58110 [PropertyAccess] Fix handling property names with a `.` (alexandre-daubois)
+ * bug #58127 [Validator] synchronize IBAN formats (xabbuh)
+ * bug #58112 fix Twig 3.12 compatibility (xabbuh)
+ * bug #58078 [TwigBridge] Fix Twig deprecation notice (yceruto)
+ * bug #58000 [DependencyInjection] Fix issue between decorator and service locator index (lyrixx)
+ * bug #58044 [HttpClient] Do not overwrite the host to request when using option "resolve" (xabbuh)
+ * bug #57298 [DependencyInjection] Fix handling of repeated `#[Autoconfigure]` attributes (alexandre-daubois)
+ * bug #57493 [SecurityBundle] Make security schema deterministic (MatTheCat)
+ * bug #58020 [TwigBridge] fix compatibility with Twig 3.12 and 4.0 (xabbuh)
+ * bug #58002 [Security] Revert stateless check for ContextListener (VincentLanglet)
+ * bug #57853 [Console] Fix side-effects from running bash completions (Seldaek)
+ * bug #57997 [Console][PhpUnitBridge][VarDumper] Fix handling NO_COLOR env var (nicolas-grekas)
+ * bug #57984 [Validator] Add `D` regex modifier in relevant validators (alexandre-daubois)
+ * bug #57981 [HttpClient] reject malformed URLs with a meaningful exception (xabbuh)
+ * bug #57968 [Yaml] :bug: throw ParseException on invalid date (homersimpsons)
+ * bug #57925 [Validator] reset the validation context after validating nested constraints (xabbuh)
+ * bug #57920 [Form] Fix handling empty data in ValueToDuplicatesTransformer (xabbuh)
+ * bug #57917 [HttpKernel] [WebProfileBundle] Fix Routing panel for URLs with a colon (akeylimepie)
+ * bug #57861 [Form] NumberType: Fix parsing of numbers in exponential notation with negative exponent (jbtronics)
+ * bug #57921 [Finder] do not duplicate directory separators (xabbuh)
+ * bug #57895 [Finder] do not duplicate directory separators (xabbuh)
+ * bug #57905 [Validator] allow more unicode characters in URL paths (xabbuh)
+ * bug #57899 [String] [EnglishInflector] Fix words ending with `le`, e.g., `articles` (aleho)
+ * bug #57887 [Uid] Ensure UuidV1 is created in lowercase (smnandre)
+ * bug #57870 [HttpClient] Disable HTTP/2 PUSH by default when using curl (nicolas-grekas)
+
 * 5.4.42 (2024-07-26)
 
  * bug #57815 [Console][PhpUnitBridge][VarDumper] Fix `NO_COLOR` empty value handling (alexandre-daubois)

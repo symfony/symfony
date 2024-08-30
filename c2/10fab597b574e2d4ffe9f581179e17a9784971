@@ -1,0 +1,34 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2024-08-28T09:04:19Z
+
+Shouldn't the dot be escaped in the property path instead?
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2024-08-28T09:07:10Z
+
+For the minimal reproducer, yes, but it doesn't help with the original issue where the author uses Serializer and doesn't have the hand on the underlying property paths.
+
+Inevitably, this is closely linked to stdClass, hence the hard check in the code to make sure you're dealing with stdClass.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2024-08-28T09:08:49Z
+
+Can this not be fixed inside the Serializer component?
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2024-08-28T09:11:35Z
+
+Actually, escaping the dot seems only to work with array accesses. The following code breaks:
+
+```php
+$stdclass = (object) ['bankAccount.iban' => 'NL16TEST0436169118', 'bankSummary' => ''];
+$accessor = PropertyAccess::createPropertyAccessor();
+
+dump($accessor->getValue($stdclass, 'bankAccount\.iban')); // throws NoSuchPropertyException
+```
+
+Or maybe I'm using the wrong syntax?

@@ -189,13 +189,13 @@ diff --git a/src/Symfony/Component/EventDispatcher/EventSubscriberInterface.php 
 diff --git a/src/Symfony/Component/ExpressionLanguage/ExpressionLanguage.php b/src/Symfony/Component/ExpressionLanguage/ExpressionLanguage.php
 --- a/src/Symfony/Component/ExpressionLanguage/ExpressionLanguage.php
 +++ b/src/Symfony/Component/ExpressionLanguage/ExpressionLanguage.php
-@@ -139,5 +139,5 @@ class ExpressionLanguage
+@@ -149,5 +149,5 @@ class ExpressionLanguage
       * @return void
       */
 -    protected function registerFunctions()
 +    protected function registerFunctions(): void
      {
-         $this->addFunction(ExpressionFunction::fromPhp('constant'));
+         $basicPhpFunctions = ['constant', 'min', 'max'];
 diff --git a/src/Symfony/Component/Form/AbstractType.php b/src/Symfony/Component/Form/AbstractType.php
 --- a/src/Symfony/Component/Form/AbstractType.php
 +++ b/src/Symfony/Component/Form/AbstractType.php

@@ -5,6 +5,7 @@ CHANGELOG
 ---
 
  * Remove `@internal` flag and add `@final` to `ServicesResetter`
+ * Add `#[MapSessionParameter]` to pass a session parameter to a controller argument
 
 7.1
 ---

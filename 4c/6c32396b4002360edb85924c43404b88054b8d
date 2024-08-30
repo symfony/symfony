@@ -1,0 +1,54 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2024-08-20T11:54:41Z
+
+Hey!
+
+I see that this is your first PR. That is great! Welcome!
+
+Symfony has a [contribution guide](https://symfony.com/doc/current/contributing/index.html) which I suggest you to read.
+
+In short:
+- Always add tests
+- Keep backward compatibility (see https://symfony.com/bc).
+- Bug fixes must be submitted against the lowest maintained branch where they apply (see https://symfony.com/releases)
+- Features and deprecations must be submitted against the 7.2 branch.
+
+Review the GitHub status checks of your pull request and try to solve the reported issues. If some tests are failing, try to see if they are failing because of this change.
+
+When two Symfony core team members approve this change, it will be merged and you will become an official Symfony contributor!
+If this PR is merged in a lower version branch, it will be merged up to all maintained branches within a few days.
+
+I am going to sit back now and wait for the reviews.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-08-22T07:20:55Z
+
+I was wondering: would it make sense to remove the whoami method and make saslBind return it instead? Would that cover the related use cases or would that be restrictive?
+
+---------------------------------------------------------------------------
+
+by manu0401 at 2024-08-22T12:15:38Z
+
+Thank you for committing. I would leave saslBind and whoami as distinct methods. Code transitioning from native PHP function calls to Symfony will be easier to port if you stick to the original functions behavior.
+
+---------------------------------------------------------------------------
+
+by stof at 2024-08-22T13:55:31Z
+
+If `whoami` only works after sasl_bind and is the logical next step (which I'm not sure about as I never used those), I would favor the idea of @nicolas-grekas. Adding an API for that in symfony/ldap gives us a chance to expose an API with an easier DX instead of copying the ext-ldap API.
+
+Code won't magically be compatible with symfony/ldap and ext-ldap APIs anyway even if the method names are similar to the ext-ldap API.
+
+---------------------------------------------------------------------------
+
+by manu0401 at 2024-08-22T15:49:57Z
+
+> If `whoami` only works after sasl_bind and is the logical next step
+
+I am not sure it is carved into stone that authz_id cannot change without a new sasl_bind(). One could imagine that the server grants you a proxy identity for only one operation, for instance. I do not know if the use case exists, but at least it would be possible to do it.

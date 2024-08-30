@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Messenger\Bridge\Doctrine\Tests\Transport;
 
-use Doctrine\DBAL\Cache\ArrayResult;
+use Doctrine\DBAL\Driver\Result as DriverResult;
 use Doctrine\DBAL\Platforms\PostgreSQLPlatform;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\DBAL\Result;
@@ -84,10 +84,13 @@ class PostgreSqlConnectionTest extends TestCase
             ->method('getNativeConnection')
             ->willReturn($wrappedConnection);
 
+        $driverResult = $this->createMock(DriverResult::class);
+        $driverResult->method('fetchAssociative')
+            ->willReturn(false);
         $driverConnection
             ->expects(self::any())
             ->method('executeQuery')
-            ->willReturn(new Result(new ArrayResult([]), $driverConnection));
+            ->willReturn(new Result($driverResult, $driverConnection));
 
         $connection = new PostgreSqlConnection(['table_name' => 'queue_table'], $driverConnection);
 

@@ -10,7 +10,7 @@ git checkout composer.json src/
 diff --git a/src/Symfony/Bridge/Twig/Tests/Extension/AbstractLayoutTestCase.php b/src/Symfony/Bridge/Twig/Tests/Extension/AbstractLayoutTestCase.php
 --- a/src/Symfony/Bridge/Twig/Tests/Extension/AbstractLayoutTestCase.php
 +++ b/src/Symfony/Bridge/Twig/Tests/Extension/AbstractLayoutTestCase.php
-@@ -52,5 +52,5 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
+@@ -49,5 +49,5 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
       * @return FormExtensionInterface[]
       */
 -    protected function getExtensions()
@@ -20,35 +20,21 @@ diff --git a/src/Symfony/Bridge/Twig/Tests/Extension/AbstractLayoutTestCase.php 
 diff --git a/src/Symfony/Component/BrowserKit/AbstractBrowser.php b/src/Symfony/Component/BrowserKit/AbstractBrowser.php
 --- a/src/Symfony/Component/BrowserKit/AbstractBrowser.php
 +++ b/src/Symfony/Component/BrowserKit/AbstractBrowser.php
-@@ -407,5 +407,5 @@ abstract class AbstractBrowser
-      * @throws \RuntimeException When processing returns exit code
-      */
--    protected function doRequestInProcess(object $request)
-+    protected function doRequestInProcess(object $request): object
-     {
-         $deprecationsFile = tempnam(sys_get_temp_dir(), 'deprec');
-@@ -440,5 +440,5 @@ abstract class AbstractBrowser
-      * @return object
-      */
--    abstract protected function doRequest(object $request);
-+    abstract protected function doRequest(object $request): object;
- 
-     /**
-@@ -451,5 +451,5 @@ abstract class AbstractBrowser
+@@ -466,5 +466,5 @@ abstract class AbstractBrowser
       * @throws LogicException When this abstract class is not implemented
       */
 -    protected function getScript(object $request)
 +    protected function getScript(object $request): string
      {
          throw new LogicException('To insulate requests, you need to override the getScript() method.');
-@@ -461,5 +461,5 @@ abstract class AbstractBrowser
-      * @return object
+@@ -478,5 +478,5 @@ abstract class AbstractBrowser
+      * @psalm-return TRequest
       */
 -    protected function filterRequest(Request $request)
 +    protected function filterRequest(Request $request): object
      {
          return $request;
-@@ -471,5 +471,5 @@ abstract class AbstractBrowser
+@@ -490,5 +490,5 @@ abstract class AbstractBrowser
       * @return Response
       */
 -    protected function filterResponse(object $response)
@@ -408,7 +394,7 @@ diff --git a/src/Symfony/Component/HttpKernel/Bundle/BundleInterface.php b/src/S
 diff --git a/src/Symfony/Component/HttpKernel/DataCollector/DataCollector.php b/src/Symfony/Component/HttpKernel/DataCollector/DataCollector.php
 --- a/src/Symfony/Component/HttpKernel/DataCollector/DataCollector.php
 +++ b/src/Symfony/Component/HttpKernel/DataCollector/DataCollector.php
-@@ -113,5 +113,5 @@ abstract class DataCollector implements DataCollectorInterface
+@@ -111,5 +111,5 @@ abstract class DataCollector implements DataCollectorInterface
       * @return void
       */
 -    public function reset()
@@ -542,6 +528,16 @@ diff --git a/src/Symfony/Component/Security/Http/Firewall.php b/src/Symfony/Comp
 +    protected function callListeners(RequestEvent $event, iterable $listeners): void
      {
          foreach ($listeners as $listener) {
+diff --git a/src/Symfony/Component/Serializer/Tests/Encoder/XmlEncoderTest.php b/src/Symfony/Component/Serializer/Tests/Encoder/XmlEncoderTest.php
+--- a/src/Symfony/Component/Serializer/Tests/Encoder/XmlEncoderTest.php
++++ b/src/Symfony/Component/Serializer/Tests/Encoder/XmlEncoderTest.php
+@@ -820,5 +820,5 @@ XML;
+      * @return Dummy
+      */
+-    protected static function getObject(): object
++    protected static function getObject(): Dummy
+     {
+         $obj = new Dummy();
 diff --git a/src/Symfony/Component/Translation/Extractor/ExtractorInterface.php b/src/Symfony/Component/Translation/Extractor/ExtractorInterface.php
 --- a/src/Symfony/Component/Translation/Extractor/ExtractorInterface.php
 +++ b/src/Symfony/Component/Translation/Extractor/ExtractorInterface.php
@@ -558,6 +554,16 @@ diff --git a/src/Symfony/Component/Translation/Extractor/ExtractorInterface.php 
 -    public function setPrefix(string $prefix);
 +    public function setPrefix(string $prefix): void;
  }
+diff --git a/src/Symfony/Component/TypeInfo/Tests/Fixtures/DummyWithPhpDoc.php b/src/Symfony/Component/TypeInfo/Tests/Fixtures/DummyWithPhpDoc.php
+--- a/src/Symfony/Component/TypeInfo/Tests/Fixtures/DummyWithPhpDoc.php
++++ b/src/Symfony/Component/TypeInfo/Tests/Fixtures/DummyWithPhpDoc.php
+@@ -15,5 +15,5 @@ final class DummyWithPhpDoc
+      * @return Dummy
+      */
+-    public function getNextDummy(mixed $dummy): mixed
++    public function getNextDummy(mixed $dummy): Dummy
+     {
+         throw new \BadMethodCallException(sprintf('"%s" is not implemented.', __METHOD__));
 diff --git a/src/Symfony/Component/Validator/ConstraintValidatorInterface.php b/src/Symfony/Component/Validator/ConstraintValidatorInterface.php
 --- a/src/Symfony/Component/Validator/ConstraintValidatorInterface.php
 +++ b/src/Symfony/Component/Validator/ConstraintValidatorInterface.php
@@ -588,14 +594,14 @@ diff --git a/src/Symfony/Component/VarExporter/Tests/ProxyHelperTest.php b/src/S
 +++ b/src/Symfony/Component/VarExporter/Tests/ProxyHelperTest.php
 @@ -172,5 +172,5 @@ class ProxyHelperTest extends TestCase
      {
-         yield 'not type hinted __unserialize method' => [new class() {
+         yield 'not type hinted __unserialize method' => [new class {
 -            public function __unserialize($array)
 +            public function __unserialize($array): void
              {
              }
 @@ -192,5 +192,5 @@ class ProxyHelperTest extends TestCase
  
-         yield 'type hinted __unserialize method' => [new class() {
+         yield 'type hinted __unserialize method' => [new class {
 -            public function __unserialize(array $array)
 +            public function __unserialize(array $array): void
              {

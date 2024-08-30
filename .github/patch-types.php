@@ -59,6 +59,7 @@ foreach ($loader->getClassMap() as $class => $file) {
         case false !== strpos($file, '/src/Symfony/Component/VarDumper/Tests/Fixtures/NotLoadableClass.php'):
         case false !== strpos($file, '/src/Symfony/Component/VarDumper/Tests/Fixtures/ReflectionIntersectionTypeFixture.php'):
         case false !== strpos($file, '/src/Symfony/Component/VarDumper/Tests/Fixtures/ReflectionUnionTypeWithIntersectionFixture.php'):
+        case false !== strpos($file, '/src/Symfony/Component/VarDumper/Tests/Fixtures/VirtualProperty.php'):
         case false !== strpos($file, '/src/Symfony/Component/VarExporter/Internal'):
         case false !== strpos($file, '/src/Symfony/Component/VarExporter/Tests/Fixtures/'):
         case false !== strpos($file, '/src/Symfony/Component/Cache/Traits/RelayProxy.php'):

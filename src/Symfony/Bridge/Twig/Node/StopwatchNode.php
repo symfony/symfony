@@ -11,7 +11,6 @@
 
 namespace Symfony\Bridge\Twig\Node;
 
-use Twig\Attribute\FirstClassTwigCallableReady;
 use Twig\Attribute\YieldReady;
 use Twig\Compiler;
 use Twig\Node\Expression\AssignNameExpression;
@@ -25,13 +24,9 @@ use Twig\Node\Node;
 #[YieldReady]
 final class StopwatchNode extends Node
 {
-    public function __construct(Node $name, Node $body, AssignNameExpression $var, int $lineno = 0, ?string $tag = null)
+    public function __construct(Node $name, Node $body, AssignNameExpression $var, int $lineno = 0)
     {
-        if (class_exists(FirstClassTwigCallableReady::class)) {
-            parent::__construct(['body' => $body, 'name' => $name, 'var' => $var], [], $lineno);
-        } else {
-            parent::__construct(['body' => $body, 'name' => $name, 'var' => $var], [], $lineno, $tag);
-        }
+        parent::__construct(['body' => $body, 'name' => $name, 'var' => $var], [], $lineno);
     }
 
     public function compile(Compiler $compiler): void

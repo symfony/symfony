@@ -11,7 +11,6 @@
 
 namespace Symfony\Bridge\Twig\Node;
 
-use Twig\Attribute\FirstClassTwigCallableReady;
 use Twig\Attribute\YieldReady;
 use Twig\Compiler;
 use Twig\Node\Node;
@@ -26,18 +25,13 @@ final class DumpNode extends Node
         private string $varPrefix,
         ?Node $values,
         int $lineno,
-        ?string $tag = null,
     ) {
         $nodes = [];
         if (null !== $values) {
             $nodes['values'] = $values;
         }
 
-        if (class_exists(FirstClassTwigCallableReady::class)) {
-            parent::__construct($nodes, [], $lineno);
-        } else {
-            parent::__construct($nodes, [], $lineno, $tag);
-        }
+        parent::__construct($nodes, [], $lineno);
     }
 
     public function compile(Compiler $compiler): void

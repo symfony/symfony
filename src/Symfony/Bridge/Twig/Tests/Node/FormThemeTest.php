@@ -68,7 +68,7 @@ class FormThemeTest extends TestCase
             trim($compiler->compile($node)->getSource())
         );
 
-        $node = new FormThemeNode($form, $resources, 0, null, true);
+        $node = new FormThemeNode($form, $resources, 0, true);
 
         $this->assertEquals(
             \sprintf(
@@ -90,7 +90,7 @@ class FormThemeTest extends TestCase
             trim($compiler->compile($node)->getSource())
         );
 
-        $node = new FormThemeNode($form, $resources, 0, null, true);
+        $node = new FormThemeNode($form, $resources, 0, true);
 
         $this->assertEquals(
             \sprintf(

@@ -61,6 +61,11 @@ Translation
 
  * Deprecate passing an escape character to `CsvFileLoader::setCsvControl()`
 
+TwigBridge
+----------
+
+ * Deprecate passing a tag to the constructor of `FormThemeNode`
+
 Yaml
 ----
 

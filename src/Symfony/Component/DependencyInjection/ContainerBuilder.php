@@ -1752,9 +1752,9 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
 
         foreach ($this->vendors as $vendor) {
             if (\in_array($path[\strlen($vendor)] ?? '', ['/', \DIRECTORY_SEPARATOR], true) && str_starts_with($path, $vendor)) {
-                $this->pathsInVendor[$vendor.'/composer'] = false;
-                $this->addResource(new FileResource($vendor.'/composer/installed.json'));
-                $this->pathsInVendor[$vendor.'/composer'] = true;
+                $this->pathsInVendor[$vendor.\DIRECTORY_SEPARATOR.'composer'] = false;
+                $this->addResource(new FileResource($vendor.\DIRECTORY_SEPARATOR.'composer'.\DIRECTORY_SEPARATOR.'installed.json'));
+                $this->pathsInVendor[$vendor.\DIRECTORY_SEPARATOR.'composer'] = true;
 
                 return $this->pathsInVendor[$path] = true;
             }

@@ -11,6 +11,9 @@
 
 namespace Symfony\Component\HttpKernel\ControllerMetadata;
 
+use Symfony\Component\TypeInfo\Type\CollectionType;
+use Symfony\Component\TypeInfo\TypeResolver\TypeResolverInterface;
+
 /**
  * Builds {@see ArgumentMetadata} objects based on the given Controller.
  *
@@ -18,6 +21,10 @@ namespace Symfony\Component\HttpKernel\ControllerMetadata;
  */
 final class ArgumentMetadataFactory implements ArgumentMetadataFactoryInterface
 {
+    public function __construct(private readonly ?TypeResolverInterface $typeResolver = null)
+    {
+    }
+
     public function createArgumentMetadata(string|object|array $controller, ?\ReflectionFunctionAbstract $reflector = null): array
     {
         $arguments = [];
@@ -46,6 +53,17 @@ final class ArgumentMetadataFactory implements ArgumentMetadataFactoryInterface
         if (!$type = $parameter->getType()) {
             return null;
         }
+
+        if ($this->typeResolver) {
+            $type = $this->typeResolver->resolve($parameter);
+
+            if ($type instanceof CollectionType) {
+                return (string) $type->getCollectionValueType().'[]';
+            }
+
+            return $type->getBaseType()->getTypeIdentifier()->value;
+        }
+
         $name = $type instanceof \ReflectionNamedType ? $type->getName() : (string) $type;
 
         return match (strtolower($name)) {

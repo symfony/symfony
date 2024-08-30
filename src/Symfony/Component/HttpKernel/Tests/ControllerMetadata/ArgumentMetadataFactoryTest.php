@@ -20,6 +20,7 @@ use Symfony\Component\HttpKernel\Tests\Fixtures\Controller\AttributeController;
 use Symfony\Component\HttpKernel\Tests\Fixtures\Controller\BasicTypesController;
 use Symfony\Component\HttpKernel\Tests\Fixtures\Controller\NullableController;
 use Symfony\Component\HttpKernel\Tests\Fixtures\Controller\VariadicController;
+use Symfony\Component\TypeInfo\TypeResolver\TypeResolver;
 
 class ArgumentMetadataFactoryTest extends TestCase
 {
@@ -151,6 +152,24 @@ class ArgumentMetadataFactoryTest extends TestCase
         ], $arguments);
     }
 
+    public function testListOfObjectsWithTypeInfo()
+    {
+        $arguments = (new ArgumentMetadataFactory(TypeResolver::create()))->createArgumentMetadata([$this, 'listOfObjects']);
+        $this->assertEquals([
+            new ArgumentMetadata('products', DummyProduct::class.'[]', false, false, null, false, [], controllerName: $this::class.'::listOfObjects'),
+            new ArgumentMetadata('bar', null, false, true, null, controllerName: $this::class.'::listOfObjects'),
+        ], $arguments);
+    }
+
+    public function testListOfObjectsWithoutTypeInfo()
+    {
+        $arguments = $this->factory->createArgumentMetadata([$this, 'listOfObjects']);
+        $this->assertEquals([
+            new ArgumentMetadata('products', 'array', false, false, null, false, [], controllerName: $this::class.'::listOfObjects'),
+            new ArgumentMetadata('bar', null, false, true, null, controllerName: $this::class.'::listOfObjects'),
+        ], $arguments);
+    }
+
     public function signature1(self $foo, array $bar, callable $baz)
     {
     }
@@ -170,4 +189,16 @@ class ArgumentMetadataFactoryTest extends TestCase
     public function signature5(?array $foo = null, $bar = null)
     {
     }
+
+    /**
+     * @param DummyProduct[] $products
+     */
+    public function listOfObjects(array $products, $bar = null)
+    {
+    }
+}
+
+class DummyProduct
+{
+    public $price;
 }

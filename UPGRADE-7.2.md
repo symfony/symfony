@@ -29,6 +29,11 @@ FrameworkBundle
 
  * [BC BREAK] The `secrets:decrypt-to-local` command terminates with a non-zero exit code when a secret could not be read
 
+HttpKernel
+----------
+
+ * Deprecate the `$type` parameter of `#[MapRequestPayload]`, use the TypeInfo component for automatic type detection instead
+
 Messenger
 ---------
 

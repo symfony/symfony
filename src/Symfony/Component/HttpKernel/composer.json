@@ -25,6 +25,7 @@
         "psr/log": "^1|^2|^3"
     },
     "require-dev": {
+        "phpstan/phpdoc-parser": "^1.0",
         "symfony/browser-kit": "^6.4|^7.0",
         "symfony/clock": "^6.4|^7.0",
         "symfony/config": "^6.4|^7.0",
@@ -42,6 +43,7 @@
         "symfony/stopwatch": "^6.4|^7.0",
         "symfony/translation": "^6.4|^7.0",
         "symfony/translation-contracts": "^2.5|^3",
+        "symfony/type-info": "^7.2",
         "symfony/uid": "^6.4|^7.0",
         "symfony/validator": "^6.4|^7.0",
         "symfony/var-dumper": "^6.4|^7.0",
@@ -67,6 +69,7 @@
         "symfony/translation": "<6.4",
         "symfony/translation-contracts": "<2.5",
         "symfony/twig-bridge": "<6.4",
+        "symfony/type-info": "<7.2",
         "symfony/validator": "<6.4",
         "symfony/var-dumper": "<6.4",
         "twig/twig": "<3.0.4"

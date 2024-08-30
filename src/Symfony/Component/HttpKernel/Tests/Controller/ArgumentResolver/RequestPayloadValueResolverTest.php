@@ -12,6 +12,7 @@
 namespace Symfony\Component\HttpKernel\Tests\Controller\ArgumentResolver;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Attribute\MapQueryString;
 use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
@@ -40,6 +41,8 @@ use Symfony\Component\Validator\ValidatorBuilder;
 
 class RequestPayloadValueResolverTest extends TestCase
 {
+    use ExpectDeprecationTrait;
+
     public function testNotTypedArgument()
     {
         $resolver = new RequestPayloadValueResolver(
@@ -423,6 +426,45 @@ class RequestPayloadValueResolverTest extends TestCase
         $this->assertEquals([$payload], $event->getArguments());
     }
 
+    /**
+     * @group legacy
+     */
+    public function testRequestArrayDenormalizationWithLegacyType()
+    {
+        $input = [
+            ['price' => '50'],
+            ['price' => '23'],
+        ];
+        $payload = [
+            new RequestPayload(50),
+            new RequestPayload(23),
+        ];
+
+        $serializer = new Serializer([new ArrayDenormalizer(), new ObjectNormalizer()], ['json' => new JsonEncoder()]);
+
+        $validator = $this->createMock(ValidatorInterface::class);
+        $validator->expects($this->once())
+            ->method('validate')
+            ->willReturn(new ConstraintViolationList());
+
+        $resolver = new RequestPayloadValueResolver($serializer, $validator);
+
+        $this->expectDeprecation('Since symfony/http-kernel 7.2: The "type" parameter of the #[MapRequestPayload] attribute is deprecated and will be removed in Symfony 8.0. Try running "composer require symfony/type-info phpstan/phpdoc-parser" to get automatic type detection instead.');
+
+        $argument = new ArgumentMetadata('prices', 'array', false, false, null, false, [
+            MapRequestPayload::class => new MapRequestPayload(type: RequestPayload::class),
+        ]);
+        $request = Request::create('/', 'POST', $input);
+
+        $kernel = $this->createMock(HttpKernelInterface::class);
+        $arguments = $resolver->resolve($request, $argument);
+        $event = new ControllerArgumentsEvent($kernel, function () {}, $arguments, $request, HttpKernelInterface::MAIN_REQUEST);
+
+        $resolver->onKernelControllerArguments($event);
+
+        $this->assertEquals([$payload], $event->getArguments());
+    }
+
     public function testRequestArrayDenormalization()
     {
         $input = [
@@ -443,8 +485,8 @@ class RequestPayloadValueResolverTest extends TestCase
 
         $resolver = new RequestPayloadValueResolver($serializer, $validator);
 
-        $argument = new ArgumentMetadata('prices', 'array', false, false, null, false, [
-            MapRequestPayload::class => new MapRequestPayload(type: RequestPayload::class),
+        $argument = new ArgumentMetadata('prices', RequestPayload::class.'[]', false, false, null, false, [
+            MapRequestPayload::class => new MapRequestPayload(),
         ]);
         $request = Request::create('/', 'POST', $input);
 
@@ -457,6 +499,9 @@ class RequestPayloadValueResolverTest extends TestCase
         $this->assertEquals([$payload], $event->getArguments());
     }
 
+    /**
+     * @group legacy
+     */
     public function testItThrowsOnMissingAttributeType()
     {
         $serializer = new Serializer();
@@ -474,6 +519,9 @@ class RequestPayloadValueResolverTest extends TestCase
         $resolver->resolve($request, $argument);
     }
 
+    /**
+     * @group legacy
+     */
     public function testItThrowsOnInvalidAttributeTypeUsage()
     {
         $serializer = new Serializer();

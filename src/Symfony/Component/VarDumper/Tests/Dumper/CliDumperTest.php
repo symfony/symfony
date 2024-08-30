@@ -343,7 +343,7 @@ stream resource {@{$ref}
     #message: "Unexpected Exception thrown from a caster: Foobar"
     trace: {
       %sTwig.php:2 {
-        __TwigTemplate_VarDumperFixture_u75a09->doDisplay(array \$context, array \$blocks = [])
+        __TwigTemplate_VarDumperFixture_u75a09->doDisplay(array \$context, array \$blocks = []): array
         › foo bar
         ›   twig source
         › 

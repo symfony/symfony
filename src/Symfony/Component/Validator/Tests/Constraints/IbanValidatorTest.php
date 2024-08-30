@@ -86,6 +86,7 @@ class IbanValidatorTest extends ConstraintValidatorTestCase
             ['CZ65 0800 0000 1920 0014 5399'], // Czech Republic
             ['DK50 0040 0440 1162 43'], // Denmark
             ['EE38 2200 2210 2014 5685'], // Estonia
+            ['FK12 SC98 7654 3210 98'], // Falkland Islands
             ['FO97 5432 0388 8999 44'], // Faroe Islands
             ['FI21 1234 5600 0007 85'], // Finland
             ['FR14 2004 1010 0505 0001 3M02 606'], // France
@@ -109,9 +110,11 @@ class IbanValidatorTest extends ConstraintValidatorTestCase
             ['MU17 BOMM 0101 1010 3030 0200 000M UR'], // Mauritius
             ['MD24 AG00 0225 1000 1310 4168'], // Moldova
             ['MC93 2005 2222 1001 1223 3M44 555'], // Monaco
+            ['MN14 0005 0051 6384 7716'], // Mongolia
             ['ME25 5050 0001 2345 6789 51'], // Montenegro
             ['NL39 RABO 0300 0652 64'], // Netherlands
             ['NO93 8601 1117 947'], // Norway
+            ['OM04 0280 0000 1234 5678 901'], // Oman
             ['PK36 SCBL 0000 0011 2345 6702'], // Pakistan
             ['PL60 1020 1026 0000 0422 7020 1111'], // Poland
             ['PT50 0002 0123 1234 5678 9015 4'], // Portugal
@@ -128,6 +131,7 @@ class IbanValidatorTest extends ConstraintValidatorTestCase
             ['TR33 0006 1005 1978 6457 8413 26'], // Turkey
             ['AE07 0331 2345 6789 0123 456'], // UAE
             ['GB12 CPBK 0892 9965 0449 91'], // United Kingdom
+            ['YE09 CBKU 0000 0000 0000 1234 5601 01'], // Yemen
 
             ['DJ21 0001 0000 0001 5400 0100 186'], // Djibouti
             ['EG38 0019 0005 0000 0000 2631 8000 2'], // Egypt

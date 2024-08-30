@@ -280,6 +280,17 @@ class LazyGhostTraitTest extends TestCase
         $this->assertSame(['property' => 'property', 'method' => 'method'], $output);
     }
 
+    public function testReinitLazyGhost()
+    {
+        $object = TestClass::createLazyGhost(function ($p) { $p->public = 2; });
+
+        $this->assertSame(2, $object->public);
+
+        TestClass::createLazyGhost(function ($p) { $p->public = 3; }, null, $object);
+
+        $this->assertSame(3, $object->public);
+    }
+
     /**
      * @template T
      *

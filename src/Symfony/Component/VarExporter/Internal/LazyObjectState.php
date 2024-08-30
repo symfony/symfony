@@ -38,8 +38,8 @@ class LazyObjectState
      * @param array<string, true> $skippedProperties
      */
     public function __construct(
-        public readonly \Closure $initializer,
-        public readonly array $skippedProperties = [],
+        public \Closure $initializer,
+        public array $skippedProperties = [],
     ) {
     }
 

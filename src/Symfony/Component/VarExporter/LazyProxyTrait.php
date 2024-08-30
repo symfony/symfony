@@ -47,6 +47,13 @@ trait LazyProxyTrait
             $instance ??= Registry::$classReflectors[$class]->newInstanceWithoutConstructor();
         }
 
+        if (isset($instance->lazyObjectState)) {
+            $instance->lazyObjectState->initializer = $initializer;
+            unset($instance->lazyObjectState->realInstance);
+
+            return $instance;
+        }
+
         $instance->lazyObjectState = new LazyObjectState($initializer);
 
         foreach (Registry::$classResetters[$class] as $reset) {

@@ -674,6 +674,7 @@ class PropertyAccessorTest extends TestCase
             [['firstName' => 'Bernhard'], '[firstName]', 'Bernhard'],
             [['index' => ['firstName' => 'Bernhard']], '[index][firstName]', 'Bernhard'],
             [(object) ['firstName' => 'Bernhard'], 'firstName', 'Bernhard'],
+            [(object) ['first.Name' => 'Bernhard'], 'first.Name', 'Bernhard'],
             [(object) ['property' => ['firstName' => 'Bernhard']], 'property[firstName]', 'Bernhard'],
             [['index' => (object) ['firstName' => 'Bernhard']], '[index].firstName', 'Bernhard'],
             [(object) ['property' => (object) ['firstName' => 'Bernhard']], 'property.firstName', 'Bernhard'],

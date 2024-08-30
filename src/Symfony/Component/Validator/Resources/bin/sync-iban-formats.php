@@ -168,7 +168,7 @@ final class WikipediaIbanProvider
         $formats = [];
 
         foreach ($this->readIbanFormatsTable() as $item) {
-            if (!preg_match('/^([A-Z]{2})/', $item['Example'], $matches)) {
+            if (!preg_match('/^([A-Z]{2})/', $item['IBAN Fields'], $matches)) {
                 continue;
             }
 

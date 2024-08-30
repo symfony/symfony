@@ -413,6 +413,8 @@ abstract class AbstractBrowser
      *
      * @psalm-param TRequest $request
      *
+     * @return object
+     *
      * @psalm-return TResponse
      *
      * @throws \RuntimeException When processing returns exit code
@@ -449,6 +451,8 @@ abstract class AbstractBrowser
      * Makes a request.
      *
      * @psalm-param TRequest $request
+     *
+     * @return object
      *
      * @psalm-return TResponse
      */

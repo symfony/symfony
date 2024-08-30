@@ -11,7 +11,9 @@
 
 namespace Symfony\Component\Config;
 
+use Symfony\Component\Config\Resource\ResourceInterface;
 use Symfony\Component\Config\Resource\SelfCheckingResourceChecker;
+use Symfony\Component\Config\Resource\SkippingResourceChecker;
 
 /**
  * ConfigCache caches arbitrary content in files on disk.
@@ -26,18 +28,23 @@ use Symfony\Component\Config\Resource\SelfCheckingResourceChecker;
 class ConfigCache extends ResourceCheckerConfigCache
 {
     /**
-     * @param string      $file     The absolute cache path
-     * @param bool        $debug    Whether debugging is enabled or not
-     * @param string|null $metaFile The absolute path to the meta file
+     * @param string                                 $file                 The absolute cache path
+     * @param bool                                   $debug                Whether debugging is enabled or not
+     * @param string|null                            $metaFile             The absolute path to the meta file
+     * @param class-string<ResourceInterface>[]|null $skippedResourceTypes
      */
     public function __construct(
         string $file,
         private bool $debug,
         ?string $metaFile = null,
+        array|null $skippedResourceTypes = null,
     ) {
         $checkers = [];
-        if (true === $this->debug) {
-            $checkers = [new SelfCheckingResourceChecker()];
+        if ($this->debug) {
+            if (null !== $skippedResourceTypes) {
+                $checkers[] = new SkippingResourceChecker($skippedResourceTypes);
+            }
+            $checkers[] = new SelfCheckingResourceChecker();
         }
 
         parent::__construct($file, $checkers, $metaFile);

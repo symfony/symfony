@@ -22,7 +22,7 @@ final class LotsOfAttributes
 
     #[MyAttribute('two')]
     public function someMethod(
-        #[MyAttribute('three')] string $someParameter
+        #[MyAttribute('three')] string $someParameter,
     ): void {
     }
 }

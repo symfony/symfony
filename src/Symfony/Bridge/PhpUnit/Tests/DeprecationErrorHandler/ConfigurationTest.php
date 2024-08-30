@@ -474,7 +474,7 @@ class ConfigurationTest extends TestCase
         $trace[2] = [
             'class' => DebugClassLoader::class,
             'function' => 'testBaselineGenerationWithDeprecationTriggeredByDebugClassLoader',
-            'args' => [self::class]
+            'args' => [self::class],
         ];
 
         $deprecation = new Deprecation('Deprecation by debug class loader', $trace, '');

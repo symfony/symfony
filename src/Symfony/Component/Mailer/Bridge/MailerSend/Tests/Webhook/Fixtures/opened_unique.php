@@ -6,7 +6,7 @@ $wh = new MailerEngagementEvent(MailerEngagementEvent::OPEN, '62fb66bef54a112e92
 $wh->setRecipientEmail('test@example.com');
 $wh->setTags(["test-tag"]);
 $wh->setMetadata([
-    'ip' => '127.0.0.1'
+    'ip' => '127.0.0.1',
 ]);
 $wh->setDate(\DateTimeImmutable::createFromFormat('Y-m-d\TH:i:s.uP', '2024-01-01T12:00:00.000000Z'));
 

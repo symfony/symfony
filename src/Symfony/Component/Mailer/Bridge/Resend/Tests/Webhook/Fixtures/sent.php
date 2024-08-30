@@ -12,7 +12,7 @@ $wh->setMetadata([
     'headers' => [
         [
             'name' => 'Sender',
-            'value' => 'test@resend.com'
+            'value' => 'test@resend.com',
         ],
     ],
     'subject' => 'Test subject',

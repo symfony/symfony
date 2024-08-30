@@ -9,7 +9,7 @@ $container->loadFromExtension('framework', [
     'handle_all_throwables' => true,
     'php_errors' => ['log' => true],
     'messenger' => [
-        'enabled' => true
+        'enabled' => true,
     ],
     'mailer' => [
         'dsn' => 'smtp://example.com',
@@ -18,10 +18,10 @@ $container->loadFromExtension('framework', [
         'enabled' => true,
         'notification_on_failed_messages' => true,
         'chatter_transports' => [
-            'slack' => 'null'
+            'slack' => 'null',
         ],
         'texter_transports' => [
-            'twilio' => 'null'
+            'twilio' => 'null',
         ],
         'channel_policy' => [
             'low' => ['slack'],
@@ -29,6 +29,6 @@ $container->loadFromExtension('framework', [
         ],
         'admin_recipients' => [
             ['email' => 'test@test.de', 'phone' => '+490815',],
-        ]
+        ],
     ],
 ]);

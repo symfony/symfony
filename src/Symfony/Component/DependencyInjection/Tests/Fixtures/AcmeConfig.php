@@ -29,7 +29,7 @@ class AcmeConfig implements ConfigBuilderInterface
     public function toArray(): array
     {
         return [
-            'color' => $this->color
+            'color' => $this->color,
         ];
     }
 

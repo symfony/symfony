@@ -7,7 +7,7 @@ $wh->setRecipientEmail('test@example.com');
 $wh->setTags(["test-tag"]);
 $wh->setMetadata([
     'reason' => 'NO_LONGER_WANT',
-    'readable_reason' => 'I no longer want to receive these emails'
+    'readable_reason' => 'I no longer want to receive these emails',
 ]);
 $wh->setDate(\DateTimeImmutable::createFromFormat('Y-m-d\TH:i:s.uP', '2024-01-01T12:00:00.000000Z'));
 

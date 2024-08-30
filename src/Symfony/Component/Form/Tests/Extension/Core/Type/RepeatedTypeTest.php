@@ -199,7 +199,7 @@ class RepeatedTypeTest extends BaseTypeTestCase
             'type' => TextType::class,
             'options' => [
                 'empty_data' => $emptyData,
-            ]
+            ],
         ]);
         $form->submit($submittedData);
 

@@ -51,6 +51,17 @@ trait LazyGhostTrait
             $instance ??= Registry::$classReflectors[$class]->newInstanceWithoutConstructor();
         }
 
+        if (isset($instance->lazyObjectState)) {
+            $instance->lazyObjectState->initializer = $initializer;
+            $instance->lazyObjectState->skippedProperties = $skippedProperties ??= [];
+
+            if (LazyObjectState::STATUS_UNINITIALIZED_FULL !== $instance->lazyObjectState->status) {
+                $instance->lazyObjectState->reset($instance);
+            }
+
+            return $instance;
+        }
+
         $instance->lazyObjectState = new LazyObjectState($initializer, $skippedProperties ??= []);
 
         foreach (Registry::$classResetters[$class] as $reset) {

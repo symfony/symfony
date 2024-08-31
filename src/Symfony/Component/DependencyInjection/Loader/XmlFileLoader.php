@@ -458,6 +458,8 @@ class XmlFileLoader extends FileLoader
         try {
             $dom = XmlUtils::loadFile($file, $this->validateSchema(...));
         } catch (\InvalidArgumentException $e) {
+            // When starting the 8.0 branch, this whole catch block should be replaced by the line below:
+            // throw new InvalidArgumentException(\sprintf('Unable to parse file "%s": ', $file).$e->getMessage(), $e->getCode(), $e);
             $invalidSecurityElements = [];
             $errors = explode("\n", $e->getMessage());
             foreach ($errors as $i => $error) {

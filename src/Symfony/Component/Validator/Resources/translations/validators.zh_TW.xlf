@@ -4,415 +4,415 @@
         <body>
             <trans-unit id="1">
                 <source>This value should be false.</source>
-                <target>該變數的值應為 false 。</target>
+                <target>這個數值應為 false。</target>
             </trans-unit>
             <trans-unit id="2">
                 <source>This value should be true.</source>
-                <target>該變數的值應為 true 。</target>
+                <target>這個數值應為 true。</target>
             </trans-unit>
             <trans-unit id="3">
                 <source>This value should be of type {{ type }}.</source>
-                <target>該變數的類型應為 {{ type }} 。</target>
+                <target>這個數值的類型應為 {{ type }}。</target>
             </trans-unit>
             <trans-unit id="4">
                 <source>This value should be blank.</source>
-                <target>該變數應為空。</target>
+                <target>這個數值應該留白。</target>
             </trans-unit>
             <trans-unit id="5">
                 <source>The value you selected is not a valid choice.</source>
-                <target>選定變數的值不是有效的選項。</target>
+                <target>選取的值不是有效的選項。</target>
             </trans-unit>
             <trans-unit id="6">
                 <source>You must select at least {{ limit }} choice.|You must select at least {{ limit }} choices.</source>
-                <target>您至少要選擇 {{ limit }} 個選項。</target>
+                <target>至少需要選 {{ limit }} 項。|至少需要選 {{ limit }} 項。</target>
             </trans-unit>
             <trans-unit id="7">
                 <source>You must select at most {{ limit }} choice.|You must select at most {{ limit }} choices.</source>
-                <target>您最多能選擇 {{ limit }} 個選項。</target>
+                <target>至多只能選 {{ limit }} 項。|至多只能選 {{ limit }} 項。</target>
             </trans-unit>
             <trans-unit id="8">
                 <source>One or more of the given values is invalid.</source>
-                <target>一個或者多個給定的值無效。</target>
+                <target>一或多個填入的數值無效。</target>
             </trans-unit>
             <trans-unit id="9">
                 <source>This field was not expected.</source>
-                <target>此字段是沒有預料到。</target>
+                <target>這個欄位不在預期之內。</target>
             </trans-unit>
             <trans-unit id="10">
                 <source>This field is missing.</source>
-                <target>此字段缺失。</target>
+                <target>缺少這個欄位。</target>
             </trans-unit>
             <trans-unit id="11">
                 <source>This value is not a valid date.</source>
-                <target>該值不是一個有效的日期（date）。</target>
+                <target>這個數值不是有效的日期。</target>
             </trans-unit>
             <trans-unit id="12">
                 <source>This value is not a valid datetime.</source>
-                <target>該值不是一個有效的日期時間（datetime）。</target>
+                <target>這個數值不是有效的日期時間組合。</target>
             </trans-unit>
             <trans-unit id="13">
                 <source>This value is not a valid email address.</source>
-                <target>該值不是一個有效的郵件地址。</target>
+                <target>這個數值不是有效的電子郵件格式。</target>
             </trans-unit>
             <trans-unit id="14">
                 <source>The file could not be found.</source>
-                <target>找不到檔案。</target>
+                <target>找不到這個檔案。</target>
             </trans-unit>
             <trans-unit id="15">
                 <source>The file is not readable.</source>
-                <target>無法讀取檔案。</target>
+                <target>無法讀取這個檔案。</target>
             </trans-unit>
             <trans-unit id="16">
                 <source>The file is too large ({{ size }} {{ suffix }}). Allowed maximum size is {{ limit }} {{ suffix }}.</source>
-                <target>檔案太大 ({{ size }} {{ suffix }})。檔案大小不可以超過 {{ limit }} {{ suffix }} 。</target>
+                <target>這個檔案過大（{{ size }} {{ suffix }}）。允許的大小上限是 {{ limit }} {{ suffix }}。</target>
             </trans-unit>
             <trans-unit id="17">
                 <source>The mime type of the file is invalid ({{ type }}). Allowed mime types are {{ types }}.</source>
-                <target>無效的檔案類型 ({{ type }}) 。允許的檔案類型有 {{ types }} 。</target>
+                <target>這個檔案的 MIME 類型無效（{{ type }}）。允許的 MIME 類型有 {{ types }}。</target>
             </trans-unit>
             <trans-unit id="18">
                 <source>This value should be {{ limit }} or less.</source>
-                <target>這個變數的值應該小於或等於 {{ limit }}。</target>
+                <target>這個數值必須小於等於 {{ limit }}。</target>
             </trans-unit>
             <trans-unit id="19">
                 <source>This value is too long. It should have {{ limit }} character or less.|This value is too long. It should have {{ limit }} characters or less.</source>
-                <target>字串太長，長度不可超過 {{ limit }} 個字元。</target>
+                <target>這個數值過長。最多只能有 {{ limit }} 個字元。|這個數值過長。最多只能有 {{ limit }} 個字元。</target>
             </trans-unit>
             <trans-unit id="20">
                 <source>This value should be {{ limit }} or more.</source>
-                <target>該變數的值應該大於或等於 {{ limit }}。</target>
+                <target>這個數值必須大於等於 {{ limit }}。</target>
             </trans-unit>
             <trans-unit id="21">
                 <source>This value is too short. It should have {{ limit }} character or more.|This value is too short. It should have {{ limit }} characters or more.</source>
-                <target>字串太短，長度不可少於 {{ limit }} 個字元。</target>
+                <target>這個數值過短。最少要有 {{ limit }} 個字元。|這個數值過短。最少要有 {{ limit }} 個字元。</target>
             </trans-unit>
             <trans-unit id="22">
                 <source>This value should not be blank.</source>
-                <target>該變數不應為空白。</target>
+                <target>這個數值不允許留白。</target>
             </trans-unit>
             <trans-unit id="23">
                 <source>This value should not be null.</source>
-                <target>該值不應為 null 。</target>
+                <target>這個數值不能為空值（null）。</target>
             </trans-unit>
             <trans-unit id="24">
                 <source>This value should be null.</source>
-                <target>該值應為 null 。</target>
+                <target>這個數值應為空值（null）。</target>
             </trans-unit>
             <trans-unit id="25">
                 <source>This value is not valid.</source>
-                <target>無效的數值 。</target>
+                <target>這個數值無效。</target>
             </trans-unit>
             <trans-unit id="26">
                 <source>This value is not a valid time.</source>
-                <target>該值不是一個有效的時間。</target>
+                <target>這個數值不是有效的時間。</target>
             </trans-unit>
             <trans-unit id="27">
                 <source>This value is not a valid URL.</source>
-                <target>該值不是一個有效的 URL 。</target>
+                <target>這個數值不是 URL 格式。</target>
             </trans-unit>
             <trans-unit id="31">
                 <source>The two values should be equal.</source>
-                <target>這兩個變數的值應該相等。</target>
+                <target>這兩個數值應該相同。</target>
             </trans-unit>
             <trans-unit id="32">
                 <source>The file is too large. Allowed maximum size is {{ limit }} {{ suffix }}.</source>
-                <target>檔案太大，檔案大小不可以超過 {{ limit }} {{ suffix }}。 </target>
+                <target>這個檔案過大。允許的大小上限為 {{ limit }} {{ suffix }}。</target>
             </trans-unit>
             <trans-unit id="33">
                 <source>The file is too large.</source>
-                <target>檔案太大。</target>
+                <target>這個檔案過大。</target>
             </trans-unit>
             <trans-unit id="34">
                 <source>The file could not be uploaded.</source>
-                <target>無法上傳此檔案。</target>
+                <target>無法上傳檔案。</target>
             </trans-unit>
             <trans-unit id="35">
                 <source>This value should be a valid number.</source>
-                <target>該值應該為有效的數字。</target>
+                <target>這個數值不是有效的數字。</target>
             </trans-unit>
             <trans-unit id="36">
                 <source>This file is not a valid image.</source>
-                <target>該檔案不是有效的圖片。</target>
+                <target>這個檔案不是有效的影像。</target>
             </trans-unit>
             <trans-unit id="37" resname="This is not a valid IP address.">
                 <source>This value is not a valid IP address.</source>
-                <target state="needs-review-translation">此值不是有效的IP地址。</target>
+                <target>這個數值不是有效的 IP 地址。</target>
             </trans-unit>
             <trans-unit id="38">
                 <source>This value is not a valid language.</source>
-                <target>該值不是有效的語言名。</target>
+                <target>這個數值不是有效的語言。</target>
             </trans-unit>
             <trans-unit id="39">
                 <source>This value is not a valid locale.</source>
-                <target>該值不是有效的區域值（locale）。</target>
+                <target>這個數值不是有效的地區。</target>
             </trans-unit>
             <trans-unit id="40">
                 <source>This value is not a valid country.</source>
-                <target>該值不是有效的國家名。</target>
+                <target>這個數值不是有效的國家。</target>
             </trans-unit>
             <trans-unit id="41">
                 <source>This value is already used.</source>
-                <target>該值已經被使用。</target>
+                <target>已經用過這個數值。</target>
             </trans-unit>
             <trans-unit id="42">
                 <source>The size of the image could not be detected.</source>
-                <target>不能解析圖片大小。</target>
+                <target>無法偵測這個影像的大小。</target>
             </trans-unit>
             <trans-unit id="43">
                 <source>The image width is too big ({{ width }}px). Allowed maximum width is {{ max_width }}px.</source>
-                <target>圖片太寬 ({{ width }}px)，最大寬度為 {{ max_width }}px 。</target>
+                <target>影像過寬（{{ width }}px）。允許的寬度上限是 {{ max_width }}px。</target>
             </trans-unit>
             <trans-unit id="44">
                 <source>The image width is too small ({{ width }}px). Minimum width expected is {{ min_width }}px.</source>
-                <target>圖片寬度不夠 ({{ width }}px)，最小寬度為 {{ min_width }}px 。</target>
+                <target>影像過窄（{{ width }}px）。允許的寬度下限是 {{ max_width }}px。</target>
             </trans-unit>
             <trans-unit id="45">
                 <source>The image height is too big ({{ height }}px). Allowed maximum height is {{ max_height }}px.</source>
-                <target>圖片太高 ({{ height }}px)，最大高度為 {{ max_height }}px 。</target>
+                <target>影像過長（{{ height }}px）。允許的長度上限是 {{ max_height }}px。</target>
             </trans-unit>
             <trans-unit id="46">
                 <source>The image height is too small ({{ height }}px). Minimum height expected is {{ min_height }}px.</source>
-                <target>圖片高度不夠 ({{ height }}px)，最小高度為 {{ min_height }}px 。</target>
+                <target>影像過短（{{ height }}px）。允許的長度下限是 {{ max_height }}px。</target>
             </trans-unit>
             <trans-unit id="47">
                 <source>This value should be the user's current password.</source>
-                <target>該變數的值應為用戶目前的密碼。</target>
+                <target>這個數值應為使用者目前使用的密碼。</target>
             </trans-unit>
             <trans-unit id="48">
                 <source>This value should have exactly {{ limit }} character.|This value should have exactly {{ limit }} characters.</source>
-                <target>該變數應為 {{ limit }} 個字元。</target>
+                <target>這個數值應剛好為 {{ limit }} 個字元長。|這個數值應剛好為 {{ limit }} 個字元長。</target>
             </trans-unit>
             <trans-unit id="49">
                 <source>The file was only partially uploaded.</source>
-                <target>該檔案的上傳不完整。</target>
+                <target>檔案只上傳了一部分。</target>
             </trans-unit>
             <trans-unit id="50">
                 <source>No file was uploaded.</source>
-                <target>沒有上傳任何檔案。</target>
+                <target>未上傳檔案。</target>
             </trans-unit>
             <trans-unit id="51" resname="No temporary folder was configured in php.ini.">
                 <source>No temporary folder was configured in php.ini, or the configured folder does not exist.</source>
-                <target state="needs-review-translation">php.ini 中沒有配置臨時文件夾，或配置的文件夾不存在。</target>
+                <target>未在 php.ini 設定暫存資料夾，或者是暫存資料夾不存在。</target>
             </trans-unit>
             <trans-unit id="52">
                 <source>Cannot write temporary file to disk.</source>
-                <target>暫存檔寫入磁碟失敗。</target>
+                <target>無法將暫存檔寫入磁碟。</target>
             </trans-unit>
             <trans-unit id="53">
                 <source>A PHP extension caused the upload to fail.</source>
-                <target>某個 PHP 擴展造成上傳失敗。</target>
+                <target>有個 PHP 擴充套件導致上傳失敗。</target>
             </trans-unit>
             <trans-unit id="54">
                 <source>This collection should contain {{ limit }} element or more.|This collection should contain {{ limit }} elements or more.</source>
-                <target>該集合最少應包含 {{ limit }} 個元素。</target>
+                <target>這個集合應該至少有 {{ limit }} 個元素。|這個集合應該至少有 {{ limit }} 個元素。</target>
             </trans-unit>
             <trans-unit id="55">
                 <source>This collection should contain {{ limit }} element or less.|This collection should contain {{ limit }} elements or less.</source>
-                <target>該集合最多包含 {{ limit }} 個元素。</target>
+                <target>這個集合最多只能有 {{ limit }} 個元素。|這個集合最多只能有 {{ limit }} 個元素。</target>
             </trans-unit>
             <trans-unit id="56">
                 <source>This collection should contain exactly {{ limit }} element.|This collection should contain exactly {{ limit }} elements.</source>
-                <target>該集合應包含 {{ limit }} 個元素 element 。</target>
+                <target>這個集合只能有剛好 {{ limit }} 個元素。|這個集合只能有剛好 {{ limit }} 個元素。</target>
             </trans-unit>
             <trans-unit id="57">
                 <source>Invalid card number.</source>
-                <target>無效的信用卡號。</target>
+                <target>卡號無效。</target>
             </trans-unit>
             <trans-unit id="58">
                 <source>Unsupported card type or invalid card number.</source>
-                <target>不支援的信用卡類型或無效的信用卡號。</target>
+                <target>不支援這個卡片類型，或卡號不正確。</target>
             </trans-unit>
             <trans-unit id="59" resname="This is not a valid International Bank Account Number (IBAN).">
                 <source>This value is not a valid International Bank Account Number (IBAN).</source>
-                <target state="needs-review-translation">此值不是有效的國際銀行帳戶號碼（IBAN）。</target>
+                <target>這個數值的格式不是國際銀行帳戶號碼（IBAN）。</target>
             </trans-unit>
             <trans-unit id="60">
                 <source>This value is not a valid ISBN-10.</source>
-                <target>該值不是有效的10位國際標準書號（ISBN-10）。</target>
+                <target>這個數值的格式不是 ISBN-10。</target>
             </trans-unit>
             <trans-unit id="61">
                 <source>This value is not a valid ISBN-13.</source>
-                <target>該值不是有效的13位國際標準書號（ISBN-13）。</target>
+                <target>這個數值的格式不是 ISBN-13。</target>
             </trans-unit>
             <trans-unit id="62">
                 <source>This value is neither a valid ISBN-10 nor a valid ISBN-13.</source>
-                <target>該值不是有效的國際標準書號（ISBN-10 或 ISBN-13）。</target>
+                <target>這個數值的格式不是 ISBN-10 或 ISBN-13。</target>
             </trans-unit>
             <trans-unit id="63">
                 <source>This value is not a valid ISSN.</source>
-                <target>該值不是有效的國際標準期刊號（ISSN）。</target>
+                <target>這個數值的格式不是 ISSN。</target>
             </trans-unit>
             <trans-unit id="64">
                 <source>This value is not a valid currency.</source>
-                <target>該值不是有效的貨幣名（currency）。</target>
+                <target>這個數值不是有效的貨幣。</target>
             </trans-unit>
             <trans-unit id="65">
                 <source>This value should be equal to {{ compared_value }}.</source>
-                <target>該值應等於 {{ compared_value }} 。</target>
+                <target>這個數值應等於 {{ compared_value }}。</target>
             </trans-unit>
             <trans-unit id="66">
                 <source>This value should be greater than {{ compared_value }}.</source>
-                <target>該值應大於 {{ compared_value }} 。</target>
+                <target>這個數值應大於 {{ compared_value }}。</target>
             </trans-unit>
             <trans-unit id="67">
                 <source>This value should be greater than or equal to {{ compared_value }}.</source>
-                <target>該值應大於或等於 {{ compared_value }} 。</target>
+                <target>這個數值應大於等於 {{ compared_value }}。</target>
             </trans-unit>
             <trans-unit id="68">
                 <source>This value should be identical to {{ compared_value_type }} {{ compared_value }}.</source>
-                <target>該值應與 {{ compared_value_type }} {{ compared_value }} 相同。</target>
+                <target>這個數值應等於 {{ compared_value_type }} {{ compared_value }}。</target>
             </trans-unit>
             <trans-unit id="69">
                 <source>This value should be less than {{ compared_value }}.</source>
-                <target>該值應小於 {{ compared_value }} 。</target>
+                <target>這個數值應小於 {{ compared_value }}。</target>
             </trans-unit>
             <trans-unit id="70">
                 <source>This value should be less than or equal to {{ compared_value }}.</source>
-                <target>該值應小於或等於 {{ compared_value }} 。</target>
+                <target>這個數值應小於等於 {{ compared_value }}。</target>
             </trans-unit>
             <trans-unit id="71">
                 <source>This value should not be equal to {{ compared_value }}.</source>
-                <target>該值應不等於 {{ compared_value }} 。</target>
+                <target>這個數值不應等於 {{ compared_value }}。</target>
             </trans-unit>
             <trans-unit id="72">
                 <source>This value should not be identical to {{ compared_value_type }} {{ compared_value }}.</source>
-                <target>該值不應與 {{ compared_value_type }} {{ compared_value }} 相同。</target>
+                <target>這個數值不應等於 {{ compared_value_type }} {{ compared_value }}。</target>
             </trans-unit>
             <trans-unit id="73">
                 <source>The image ratio is too big ({{ ratio }}). Allowed maximum ratio is {{ max_ratio }}.</source>
-                <target>圖像格式過大 ({{ ratio }})。 最大允許尺寸 {{ max_ratio }}。</target>
+                <target>影像的比例過大（{{ ratio }}）。允許的最大比例是 {{ max_ratio }}。</target>
             </trans-unit>
             <trans-unit id="74">
                 <source>The image ratio is too small ({{ ratio }}). Minimum ratio expected is {{ min_ratio }}.</source>
-                <target>圖像格式過小 ({{ ratio }})。最小尺寸 {{ min_ratio }}。</target>
+                <target>影像的比例過小（{{ ratio }}）。允許的最小比例是 {{ min_ratio }}。</target>
             </trans-unit>
             <trans-unit id="75">
                 <source>The image is square ({{ width }}x{{ height }}px). Square images are not allowed.</source>
-                <target>方形圖像 ({{ width }}x{{ height }}px)。不接受方形圖像。</target>
+                <target>影像為正方形（{{ width }}x{{ height }}px）。不允許使用正方形影像。</target>
             </trans-unit>
             <trans-unit id="76">
                 <source>The image is landscape oriented ({{ width }}x{{ height }}px). Landscape oriented images are not allowed.</source>
-                <target>紀念冊布局圖像 ({{ width }}x{{ height }}px)。 不接受紀念冊布局圖像。</target>
+                <target>影像為橫向（{{ width }}x{{ height }}px）。不允許使用橫向影像。</target>
             </trans-unit>
             <trans-unit id="77">
                 <source>The image is portrait oriented ({{ width }}x{{ height }}px). Portrait oriented images are not allowed.</source>
-                <target>書籍布局圖像 ({{ width }}x{{ height }}px)。不接受圖像書籍布局。</target>
+                <target>影像為縱向（{{ width }}x{{ height }}px）。不允許使用縱向影像。</target>
             </trans-unit>
             <trans-unit id="78">
                 <source>An empty file is not allowed.</source>
-                <target>不接受空白文件。</target>
+                <target>不允許空白檔案。</target>
             </trans-unit>
             <trans-unit id="79">
                 <source>The host could not be resolved.</source>
-                <target>未找到服務器。</target>
+                <target>無法解析主機。</target>
             </trans-unit>
             <trans-unit id="80">
                 <source>This value does not match the expected {{ charset }} charset.</source>
-                <target>該數值不符合預期 {{ charset }} 符號編碼。</target>
+                <target>這個數值不符合預期的 {{ charset }} 字元集。</target>
             </trans-unit>
             <trans-unit id="81" resname="This is not a valid Business Identifier Code (BIC).">
                 <source>This value is not a valid Business Identifier Code (BIC).</source>
-                <target state="needs-review-translation">此值不是有效的業務識別碼（BIC）。</target>
+                <target>這個數值不是有效的商業識別碼（BIC）。</target>
             </trans-unit>
             <trans-unit id="82">
                 <source>Error</source>
-                <target>錯誤。</target>
+                <target>錯誤</target>
             </trans-unit>
             <trans-unit id="83" resname="This is not a valid UUID.">
                 <source>This value is not a valid UUID.</source>
-                <target state="needs-review-translation">此值不是有效的UUID。</target>
+                <target>這個數值不是有效的 UUID。</target>
             </trans-unit>
             <trans-unit id="84">
                 <source>This value should be a multiple of {{ compared_value }}.</source>
-                <target>該值必須是倍數 {{ compared_value }}。</target>
+                <target>這個數值應為 {{ compared_value }} 的倍數。</target>
             </trans-unit>
             <trans-unit id="85">
                 <source>This Business Identifier Code (BIC) is not associated with IBAN {{ iban }}.</source>
-                <target>該企業識別碼 (BIC) 與銀行賬戶國際編號不壹致 (IBAN) {{ iban }}。</target>
+                <target>這個商業識別碼（BIC）與 IBAN {{ iban }} 沒有關聯。</target>
             </trans-unit>
             <trans-unit id="86">
                 <source>This value should be valid JSON.</source>
-                <target>該數值必須序列化為JSON格式。</target>
+                <target>這個數值應為有效的 JSON。</target>
             </trans-unit>
             <trans-unit id="87">
                 <source>This collection should contain only unique elements.</source>
-                <target>該集合應僅包含唯壹元素。</target>
+                <target>這個集合不允許有重複元素。</target>
             </trans-unit>
             <trans-unit id="88">
                 <source>This value should be positive.</source>
-                <target>數值應為正數。</target>
+                <target>這個數值應為正數。</target>
             </trans-unit>
             <trans-unit id="89">
                 <source>This value should be either positive or zero.</source>
-                <target>數值應是正數，或為零。</target>
+                <target>這個數值應為正數或 0。</target>
             </trans-unit>
             <trans-unit id="90">
                 <source>This value should be negative.</source>
-                <target>數值應為負數。</target>
+                <target>這個數值應為負數。</target>
             </trans-unit>
             <trans-unit id="91">
                 <source>This value should be either negative or zero.</source>
-                <target>數值應是負數，或為零。</target>
+                <target>這個數值應為負數或 0。</target>
             </trans-unit>
             <trans-unit id="92">
                 <source>This value is not a valid timezone.</source>
-                <target>無效時區。</target>
+                <target>這個數值不是有效的時區。</target>
             </trans-unit>
             <trans-unit id="93">
                 <source>This password has been leaked in a data breach, it must not be used. Please use another password.</source>
-                <target>此密碼已被泄露，切勿使用。請更換密碼。</target>
+                <target>這個密碼已在資料洩露中曝光，不應再使用。請使用其他密碼。</target>
             </trans-unit>
             <trans-unit id="94">
                 <source>This value should be between {{ min }} and {{ max }}.</source>
-                <target>該數值應在 {{ min }} 和 {{ max }} 之間。</target>
+                <target>這個數值應介於 {{ min }} 和 {{ max }} 之間。</target>
             </trans-unit>
             <trans-unit id="95">
                 <source>This value is not a valid hostname.</source>
-                <target>該數值不是有效的主機名稱。</target>
+                <target>這個數值不是有效的主機名稱。</target>
             </trans-unit>
             <trans-unit id="96">
                 <source>The number of elements in this collection should be a multiple of {{ compared_value }}.</source>
-                <target>該集合內的元素數量得是 {{ compared_value }} 的倍數。</target>
+                <target>這個集合中的元素數量應為 {{ compared_value }} 的倍數。</target>
             </trans-unit>
             <trans-unit id="97">
                 <source>This value should satisfy at least one of the following constraints:</source>
-                <target>該數值需符合以下其中一個約束：</target>
+                <target>這個數值應滿足以下至少一項限制：</target>
             </trans-unit>
             <trans-unit id="98">
                 <source>Each element of this collection should satisfy its own set of constraints.</source>
-                <target>該集合內的每個元素需符合元素本身規定的約束。</target>
+                <target>這個集合中的每個元素應滿足其自身的約束條件。</target>
             </trans-unit>
             <trans-unit id="99">
                 <source>This value is not a valid International Securities Identification Number (ISIN).</source>
-                <target>該數值不是有效的國際證券識別碼 （ISIN）。</target>
+                <target>這個數值不是有效的國際證券識別號碼（ISIN）。</target>
             </trans-unit>
             <trans-unit id="100">
                 <source>This value should be a valid expression.</source>
-                <target>該值需為一個有效的表達式。</target>
+                <target>這個數值應為有效的表達式。</target>
             </trans-unit>
             <trans-unit id="101">
                 <source>This value is not a valid CSS color.</source>
-                <target>該值不是有效的CSS顏色。</target>
+                <target>這個數值不是有效的 CSS 顏色。</target>
             </trans-unit>
             <trans-unit id="102">
                 <source>This value is not a valid CIDR notation.</source>
-                <target>該值不是一個有效的CIDR表示。</target>
+                <target>這個數值不是有效的 CIDR 表示法。</target>
             </trans-unit>
             <trans-unit id="103">
                 <source>The value of the netmask should be between {{ min }} and {{ max }}.</source>
-                <target>網絡掩碼的值應當在 {{ min }} 和 {{ max }} 之間。</target>
+                <target>網路遮罩的值應介於 {{ min }} 和 {{ max }} 之間。</target>
             </trans-unit>
             <trans-unit id="104">
                 <source>The filename is too long. It should have {{ filename_max_length }} character or less.|The filename is too long. It should have {{ filename_max_length }} characters or less.</source>
-                <target>該檔名長度太長，長度不可超過 {{ filename_max_length }} 個字元。</target>
+                <target>檔案名稱過長。應最多有 {{ filename_max_length }} 個字元。|檔案名稱過長。應最多有 {{ filename_max_length }} 個字元。</target>
             </trans-unit>
             <trans-unit id="105">
                 <source>The password strength is too low. Please use a stronger password.</source>
-                <target>該密碼強度太低，請使用更高強度的密碼。</target>
+                <target>密碼強度太低。請使用更強的密碼。</target>
             </trans-unit>
             <trans-unit id="106">
                 <source>This value contains characters that are not allowed by the current restriction-level.</source>
-                <target>該值包含了目前限制等級不允許的字元。</target>
+                <target>這個數值包含目前限制級別不允許的字元。</target>
             </trans-unit>
             <trans-unit id="107">
                 <source>Using invisible characters is not allowed.</source>
@@ -420,7 +420,7 @@
             </trans-unit>
             <trans-unit id="108">
                 <source>Mixing numbers from different scripts is not allowed.</source>
-                <target>不允許混合來自不同語系的數字。</target>
+                <target>不允許混合來自不同文字的數字。</target>
             </trans-unit>
             <trans-unit id="109">
                 <source>Using hidden overlay characters is not allowed.</source>
@@ -428,43 +428,43 @@
             </trans-unit>
             <trans-unit id="110">
                 <source>The extension of the file is invalid ({{ extension }}). Allowed extensions are {{ extensions }}.</source>
-                <target>無效的副檔名 ({{ extension }}). 允許的副檔名有 {{ extensions }}.</target>
+                <target>檔案的副檔名無效（{{ extension }}）。允許的副檔名有 {{ extensions }}。</target>
             </trans-unit>
             <trans-unit id="111">
                 <source>The detected character encoding is invalid ({{ detected }}). Allowed encodings are {{ encodings }}.</source>
-                <target state="needs-review-translation">偵測到的字元編碼無效 ({{ detected }})。允許的編碼為 {{ encodings }}。</target>
+                <target>偵測到的字元編碼無效（{{ detected }}）。允許的編碼有 {{ encodings }}。</target>
             </trans-unit>
             <trans-unit id="112">
                 <source>This value is not a valid MAC address.</source>
-                <target state="needs-review-translation">這不是一個有效的MAC地址。</target>
+                <target>這個數值不是有效的 MAC 位址。</target>
             </trans-unit>
             <trans-unit id="113">
                 <source>This URL is missing a top-level domain.</source>
-                <target state="needs-review-translation">此URL缺少頂級域名。</target>
+                <target>這個 URL 缺少頂級域名。</target>
             </trans-unit>
             <trans-unit id="114">
                 <source>This value is too short. It should contain at least one word.|This value is too short. It should contain at least {{ min }} words.</source>
-                <target state="needs-translation">This value is too short. It should contain at least one word.|This value is too short. It should contain at least {{ min }} words.</target>
+                <target>這個數值過短。應至少包含 1 個單字。|這個數值過短。應至少包含 {{ min }} 個單字。</target>
             </trans-unit>
             <trans-unit id="115">
                 <source>This value is too long. It should contain one word.|This value is too long. It should contain {{ max }} words or less.</source>
-                <target state="needs-translation">This value is too long. It should contain one word.|This value is too long. It should contain {{ max }} words or less.</target>
+                <target>這個數值過長。應包含 1 個單字。|這個數值過長。應最多包含 {{ max }} 個單字。</target>
             </trans-unit>
             <trans-unit id="116">
                 <source>This value does not represent a valid week in the ISO 8601 format.</source>
-                <target state="needs-translation">This value does not represent a valid week in the ISO 8601 format.</target>
+                <target>這個數值不符合 ISO 8601 格式的有效週。</target>
             </trans-unit>
             <trans-unit id="117">
                 <source>This value is not a valid week.</source>
-                <target state="needs-translation">This value is not a valid week.</target>
+                <target>這個數值不是有效的週。</target>
             </trans-unit>
             <trans-unit id="118">
                 <source>This value should not be before week "{{ min }}".</source>
-                <target state="needs-translation">This value should not be before week "{{ min }}".</target>
+                <target>這個數值不應早於第「{{ min }}」週。</target>
             </trans-unit>
             <trans-unit id="119">
                 <source>This value should not be after week "{{ max }}".</source>
-                <target state="needs-translation">This value should not be after week "{{ max }}".</target>
+                <target>這個數值不應晚於第「{{ max }}」週。</target>
             </trans-unit>
         </body>
     </file>

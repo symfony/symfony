@@ -91,8 +91,8 @@ SecurityBundle
         http://symfony.com/schema/dic/security
    -    https://symfony.com/schema/dic/security/security-1.0.xsd">
    +    https://symfony.com/schema/dic/security/security-1.0.xsd
-   +    http://example.com/schema
-   +    http://example.com/schema.xsd">
+   +    http://example.com/schema http://example.com/schema.xsd">
+   +    <!-- the line above can be omitted if the schema does not have a definition -->
 
         <config>
            <provider name="custom_provider">

@@ -14,10 +14,10 @@ $container->loadFromExtension('framework', [
     'notifier' => [
         'message_bus' => 'app.another_bus',
         'chatter_transports' => [
-            'test' => 'null'
+            'test' => 'null',
         ],
         'texter_transports' => [
-            'test' => 'null'
+            'test' => 'null',
         ],
     ],
 ]);

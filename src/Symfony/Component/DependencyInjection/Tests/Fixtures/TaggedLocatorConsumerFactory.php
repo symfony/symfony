@@ -18,7 +18,7 @@ final class TaggedLocatorConsumerFactory
 {
     public function __invoke(
         #[AutowireLocator('foo_bar', indexAttribute: 'key')]
-        ContainerInterface $locator
+        ContainerInterface $locator,
     ): TaggedLocatorConsumer {
         return new TaggedLocatorConsumer($locator);
     }

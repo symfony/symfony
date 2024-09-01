@@ -14,7 +14,7 @@ namespace Symfony\Bridge\Doctrine\Tests\Fixtures\Type;
 class StringWrapper
 {
     public function __construct(
-        private readonly ?string $string = null
+        private readonly ?string $string = null,
     ) {
     }
 

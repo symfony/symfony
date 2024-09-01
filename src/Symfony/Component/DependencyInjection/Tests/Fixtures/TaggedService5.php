@@ -27,6 +27,6 @@ final class TaggedService5
     #[CustomChildAttribute]
     public function fooAction(
         #[CustomChildAttribute]
-        string $param1
+        string $param1,
     ) {}
 }

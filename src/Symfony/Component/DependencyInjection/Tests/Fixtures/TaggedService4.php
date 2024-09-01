@@ -29,7 +29,7 @@ final class TaggedService4
         private string $param1,
         #[CustomAnyAttribute]
         #[CustomParameterAttribute(someAttribute: "on param2 in constructor")]
-        string $param2
+        string $param2,
     ) {}
 
     #[CustomAnyAttribute]
@@ -37,7 +37,7 @@ final class TaggedService4
     public function fooAction(
         #[CustomAnyAttribute]
         #[CustomParameterAttribute(someAttribute: "on param1 in fooAction")]
-        string $param1
+        string $param1,
     ) {}
 
     #[CustomAnyAttribute]

@@ -10,7 +10,7 @@ final readonly class DummyPropertyAndGetterWithDifferentTypes
         /**
          * @var string
          */
-        private string $foo
+        private string $foo,
     ) {
     }
 

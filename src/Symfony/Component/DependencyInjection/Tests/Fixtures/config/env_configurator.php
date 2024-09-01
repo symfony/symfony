@@ -9,6 +9,6 @@ return function (ContainerConfigurator $configurator): void {
         ->set('foo', \stdClass::class)
         ->public()
         ->args([
-            env('CCC')->int()
+            env('CCC')->int(),
         ]);
 };

@@ -133,7 +133,7 @@ class AutowireNestedAttributes implements AsDecoratorInterface
             'decorated' => new AutowireDecorated(),
             'iterator' => new AutowireIterator('foo'),
             'locator' => new AutowireLocator('foo'),
-            'service' => new Autowire(service: 'bar')
+            'service' => new Autowire(service: 'bar'),
         ])] array $options)
     {
     }

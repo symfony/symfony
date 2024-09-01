@@ -17,7 +17,7 @@ class WithTargetAnonymous
 {
     public function __construct(
         #[Target]
-        BarInterface $baz
+        BarInterface $baz,
     ) {
     }
 }

@@ -1292,7 +1292,7 @@ class HttpCacheTest extends HttpCacheTestCase
                 'headers' => [
                     'Cache-Control' => 's-maxage=10', // stays fresh
                     'Last-Modified' => 'Mon, 12 Aug 2024 10:05:00 +0000',
-                ]
+                ],
             ],
         ]);
 
@@ -1349,7 +1349,7 @@ class HttpCacheTest extends HttpCacheTestCase
                 'headers' => [
                     'Cache-Control' => 's-maxage=0', // goes stale immediately
                     'Last-Modified' => 'Mon, 12 Aug 2024 10:05:00 +0000',
-                ]
+                ],
             ],
         ]);
 
@@ -1414,7 +1414,7 @@ class HttpCacheTest extends HttpCacheTestCase
                 'headers' => [
                     'Cache-Control' => 's-maxage=10',
                     'Last-Modified' => 'Mon, 12 Aug 2024 10:00:00 +0000',
-                ]
+                ],
             ],
         ]);
 

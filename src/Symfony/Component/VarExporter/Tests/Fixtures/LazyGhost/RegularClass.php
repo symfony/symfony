@@ -14,7 +14,7 @@ namespace Symfony\Component\VarExporter\Tests\Fixtures\LazyGhost;
 class RegularClass
 {
     public function __construct(
-        public int $foo
+        public int $foo,
     ) {
     }
 }

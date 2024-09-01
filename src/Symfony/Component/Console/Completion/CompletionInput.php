@@ -109,6 +109,7 @@ final class CompletionInput extends ArgvInput
         // complete argument value
         $this->completionType = self::TYPE_ARGUMENT_VALUE;
 
+        $acceptedIndex = 0;
         foreach ($this->definition->getArguments() as $argumentName => $argument) {
             if (!isset($this->arguments[$argumentName])) {
                 break;
@@ -118,8 +119,10 @@ final class CompletionInput extends ArgvInput
             $this->completionName = $argumentName;
             if (\is_array($argumentValue)) {
                 $this->completionValue = $argumentValue ? $argumentValue[array_key_last($argumentValue)] : null;
+                $acceptedIndex += \count($argumentValue);
             } else {
                 $this->completionValue = $argumentValue;
+                ++$acceptedIndex;
             }
         }
 
@@ -133,6 +136,15 @@ final class CompletionInput extends ArgvInput
                 $this->completionName = null;
                 $this->completionValue = '';
             }
+
+            return;
+        }
+
+        if ($this->currentIndex > $acceptedIndex) {
+            // edge case: the user is trying to complete more arguments than the command accepts, stop suggesting anything
+            $this->completionType = self::TYPE_NONE;
+            $this->completionName = null;
+            $this->completionValue = '';
         }
     }
 

@@ -43,6 +43,7 @@ final class LocoProviderFactory extends AbstractProviderFactory
 
         $endpoint = 'default' === $dsn->getHost() ? self::HOST : $dsn->getHost();
         $endpoint .= $dsn->getPort() ? ':'.$dsn->getPort() : '';
+        $restrictToStatus = $dsn->getOption('status');
 
         $client = $this->client->withOptions([
             'base_uri' => 'https://'.$endpoint.'/api/',
@@ -51,7 +52,7 @@ final class LocoProviderFactory extends AbstractProviderFactory
             ],
         ]);
 
-        return new LocoProvider($client, $this->loader, $this->logger, $this->defaultLocale, $endpoint, $this->translatorBag);
+        return new LocoProvider($client, $this->loader, $this->logger, $this->defaultLocale, $endpoint, $this->translatorBag, $restrictToStatus);
     }
 
     protected function getSupportedSchemes(): array

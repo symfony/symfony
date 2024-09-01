@@ -38,11 +38,16 @@ final class LocoProvider implements ProviderInterface
         private string $defaultLocale,
         private string $endpoint,
         private ?TranslatorBagInterface $translatorBag = null,
+        private ?string $restrictToStatus = null,
     ) {
     }
 
     public function __toString(): string
     {
+        if ($this->restrictToStatus) {
+            return \sprintf('loco://%s?status=%s', $this->endpoint, $this->restrictToStatus);
+        }
+
         return \sprintf('loco://%s', $this->endpoint);
     }
 
@@ -96,7 +101,7 @@ final class LocoProvider implements ProviderInterface
                 $response = $this->client->request('GET', \sprintf('export/locale/%s.xlf', rawurlencode($locale)), [
                     'query' => [
                         'filter' => $domain,
-                        'status' => 'translated,blank-translation',
+                        'status' => $this->restrictToStatus ?? 'translated,blank-translation',
                     ],
                     'headers' => [
                         'If-Modified-Since' => $previousCatalogue instanceof CatalogueMetadataAwareInterface ? $previousCatalogue->getCatalogueMetadata('last-modified', $domain) : null,

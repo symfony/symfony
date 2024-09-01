@@ -8,7 +8,7 @@ DSN example
 
 ```
 // .env file
-LOCO_DSN=loco://API_KEY@default
+LOCO_DSN=loco://API_KEY@default?status=translated,blank-translation
 ```
 
 where:

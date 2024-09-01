@@ -5,6 +5,7 @@ CHANGELOG
 ---
 
  * Allow configuring the secret used to sign login links
+ * Add encryption support to `OidcTokenHandler` (JWE)
 
 7.1
 ---

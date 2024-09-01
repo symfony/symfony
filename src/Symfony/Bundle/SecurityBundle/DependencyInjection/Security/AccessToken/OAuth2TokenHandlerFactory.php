@@ -61,7 +61,7 @@ class OAuth2TokenHandlerFactory implements TokenHandlerFactoryInterface
                           ->isRequired()
                         ->beforeNormalization()
                             ->ifString()
-                           ->then(static function ($v): array { return ['id' => $v]; })
+                            ->then(static fn ($v) => ['id' => $v])
                         ->end()
                         ->prototype('scalar')->end()
                     ->end()

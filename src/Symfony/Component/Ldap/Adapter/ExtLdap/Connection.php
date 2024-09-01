@@ -18,6 +18,7 @@ use Symfony\Component\Ldap\Exception\ConnectionException;
 use Symfony\Component\Ldap\Exception\ConnectionTimeoutException;
 use Symfony\Component\Ldap\Exception\InvalidCredentialsException;
 use Symfony\Component\Ldap\Exception\LdapException;
+use Symfony\Component\Ldap\Exception\NotBoundException;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -116,6 +117,10 @@ class Connection extends AbstractConnection
      */
     public function whoami(): string
     {
+        if (!$this->connection) {
+            throw new NotBoundException(\sprintf('Cannot execute "%s()" before calling "%s::saslBind()".', __METHOD__, __CLASS__));
+        }
+
         if (false === $authzId = ldap_exop_whoami($this->connection)) {
             throw new LdapException(ldap_error($this->connection));
         }

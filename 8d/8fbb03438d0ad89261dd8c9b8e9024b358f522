@@ -1,0 +1,20 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2024-09-02T12:25:26Z
+
+looks like not all of our code is ready for Twig 4, I'm looking into it
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2024-09-02T12:45:38Z
+
+accessing the key or value of an invalid iterator is a bug in Twig itself: twigphp/Twig#4260
+
+---------------------------------------------------------------------------
+
+by stof at 2024-09-02T12:52:37Z
+
+Looks like we only have 2 issues in Symfony itself (not counting the Twig bug):
+
+- the DebugCommand needs to be updated as it cannot use `Environment::getGlobals()` anymore
+- `TransNodeTest` needs to be adapted for the new way Twig compiles variable access

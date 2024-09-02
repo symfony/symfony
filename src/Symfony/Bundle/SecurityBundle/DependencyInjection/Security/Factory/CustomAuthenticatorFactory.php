@@ -38,7 +38,7 @@ class CustomAuthenticatorFactory implements AuthenticatorFactoryInterface
     public function addConfiguration(NodeDefinition $builder): void
     {
         $builder
-            ->info('An array of service ids for all of your "authenticators"')
+            ->info('An array of service ids for all of your "authenticators".')
             ->requiresAtLeastOneElement()
             ->prototype('scalar')->end();
 

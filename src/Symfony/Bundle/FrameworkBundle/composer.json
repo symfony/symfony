@@ -73,7 +73,7 @@
         "symfony/web-link": "^6.4|^7.0",
         "symfony/webhook": "^7.2",
         "phpdocumentor/reflection-docblock": "^3.0|^4.0|^5.0",
-        "twig/twig": "^3.12"
+        "twig/twig": "^3.12|^4.0"
     },
     "conflict": {
         "doctrine/persistence": "<1.3",

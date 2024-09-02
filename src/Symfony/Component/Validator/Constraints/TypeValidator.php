@@ -72,12 +72,8 @@ class TypeValidator extends ConstraintValidator
 
         foreach ($types as $type) {
             $type = strtolower($type);
-            if (isset(self::VALIDATION_FUNCTIONS[$type]) && match ($type) {
-                'finite-float' => \is_float($value) && is_finite($value),
-                'finite-number' => \is_int($value) || \is_float($value) && is_finite($value),
-                'number' => \is_int($value) || \is_float($value) && !is_nan($value),
-                default => self::VALIDATION_FUNCTIONS[$type]($value),
-            }) {
+
+            if ($this->isValidByFunction($type, $value)) {
                 return;
             }
 
@@ -91,5 +87,33 @@ class TypeValidator extends ConstraintValidator
             ->setParameter('{{ type }}', implode('|', $types))
             ->setCode(Type::INVALID_TYPE_ERROR)
             ->addViolation();
+    }
+
+
+    private function isValidByFunction(string $type, mixed $value): bool
+    {
+        $validationFunction = self::VALIDATION_FUNCTIONS[$type] ?? null;
+
+        if (null === $validationFunction) {
+            return false;
+        }
+
+        // string argument is expected for ctype_* functions
+        if (str_starts_with($validationFunction, 'ctype_')) {
+            if (!is_string($value)) {
+                return false;
+            }
+        }
+
+        if (!match ($type) {
+            'finite-float' => \is_float($value) && is_finite($value),
+            'finite-number' => \is_int($value) || \is_float($value) && is_finite($value),
+            'number' => \is_int($value) || \is_float($value) && !is_nan($value),
+            default => $validationFunction($value),
+        }) {
+            return false;
+        }
+
+        return true;
     }
 }

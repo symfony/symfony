@@ -55,11 +55,23 @@ if (!function_exists('dd')) {
             exit(1);
         }
 
+        $acceptHeader = $_SERVER['HTTP_ACCEPT'] ?? '---';
+
+        if (
+            str_contains($acceptHeader, '*/*') ||
+            str_contains($acceptHeader, 'text/html') ||
+            \in_array(\PHP_SAPI, ['cli', 'phpdbg', 'embed'], true)
+        ) {
+            dump($vars);
+
+            exit(1);
+        }
+
         if (array_key_exists(0, $vars) && 1 === count($vars)) {
-            VarDumper::dump($vars[0]);
+            var_dump($vars[0]);
         } else {
-            foreach ($vars as $k => $v) {
-                VarDumper::dump($v, is_int($k) ? 1 + $k : $k);
+            foreach ($vars as $var) {
+                var_dump($var);
             }
         }
 

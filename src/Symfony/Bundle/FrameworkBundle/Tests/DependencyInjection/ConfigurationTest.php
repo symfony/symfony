@@ -814,7 +814,6 @@ class ConfigurationTest extends TestCase
                 'cookie_httponly' => true,
                 'cookie_samesite' => 'lax',
                 'cookie_secure' => 'auto',
-                'gc_probability' => 1,
                 'metadata_update_threshold' => 0,
             ],
             'request' => [

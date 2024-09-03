@@ -233,6 +233,9 @@ class Filesystem
     /**
      * Change the owner of an array of files or directories.
      *
+     * This method always throws on Windows, as the underlying PHP function is not supported.
+     * @see https://www.php.net/chown
+     *
      * @param string|iterable $files     A filename, an array of files, or a \Traversable instance to change owner
      * @param string|int      $user      A user name or number
      * @param bool            $recursive Whether change the owner recursively or not
@@ -259,6 +262,9 @@ class Filesystem
 
     /**
      * Change the group of an array of files or directories.
+     *
+     * This method always throws on Windows, as the underlying PHP function is not supported.
+     * @see https://www.php.net/chgrp
      *
      * @param string|iterable $files     A filename, an array of files, or a \Traversable instance to change group
      * @param string|int      $group     A group name or number

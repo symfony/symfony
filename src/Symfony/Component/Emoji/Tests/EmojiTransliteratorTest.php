@@ -135,34 +135,42 @@ class EmojiTransliteratorTest extends TestCase
     {
         $tr = EmojiTransliterator::create('emoji-en');
 
-        $this->iniSet('intl.use_exceptions', 0);
+        $oldUseExceptionsValue = ini_set('intl.use_exceptions', 0);
 
-        $this->assertFalse($tr->transliterate("Not \xE9 UTF-8"));
-        $this->assertSame('String conversion of string to UTF-16 failed: U_INVALID_CHAR_FOUND', intl_get_error_message());
+        try {
+            $this->assertFalse($tr->transliterate("Not \xE9 UTF-8"));
+            $this->assertSame('String conversion of string to UTF-16 failed: U_INVALID_CHAR_FOUND', intl_get_error_message());
 
-        $this->iniSet('intl.use_exceptions', 1);
+            ini_set('intl.use_exceptions', 1);
 
-        $this->expectException(\IntlException::class);
-        $this->expectExceptionMessage('String conversion of string to UTF-16 failed');
+            $this->expectException(\IntlException::class);
+            $this->expectExceptionMessage('String conversion of string to UTF-16 failed');
 
-        $tr->transliterate("Not \xE9 UTF-8");
+            $tr->transliterate("Not \xE9 UTF-8");
+        } finally {
+            ini_set('intl.use_exceptions', $oldUseExceptionsValue);
+        }
     }
 
     public function testBadOffsets()
     {
         $tr = EmojiTransliterator::create('emoji-en');
 
-        $this->iniSet('intl.use_exceptions', 0);
+        $oldUseExceptionsValue = ini_set('intl.use_exceptions', 0);
 
-        $this->assertFalse($tr->transliterate('Abc', 1, 5));
-        $this->assertSame('transliterator_transliterate: Neither "start" nor the "end" arguments can exceed the number of UTF-16 code units (in this case, 3): U_ILLEGAL_ARGUMENT_ERROR', intl_get_error_message());
+        try {
+            $this->assertFalse($tr->transliterate('Abc', 1, 5));
+            $this->assertSame('transliterator_transliterate: Neither "start" nor the "end" arguments can exceed the number of UTF-16 code units (in this case, 3): U_ILLEGAL_ARGUMENT_ERROR', intl_get_error_message());
 
-        $this->iniSet('intl.use_exceptions', 1);
+            ini_set('intl.use_exceptions', 1);
 
-        $this->expectException(\IntlException::class);
-        $this->expectExceptionMessage('transliterator_transliterate: Neither "start" nor the "end" arguments can exceed the number of UTF-16 code units (in this case, 3)');
+            $this->expectException(\IntlException::class);
+            $this->expectExceptionMessage('transliterator_transliterate: Neither "start" nor the "end" arguments can exceed the number of UTF-16 code units (in this case, 3)');
 
-        $this->assertFalse($tr->transliterate('Abc', 1, 5));
+            $this->assertFalse($tr->transliterate('Abc', 1, 5));
+        } finally {
+            ini_set('intl.use_exceptions', $oldUseExceptionsValue);
+        }
     }
 
     public function testReverse()

@@ -64,20 +64,25 @@ class UriSignerTest extends TestCase
 
     public function testCheckWithDifferentArgSeparator()
     {
-        $this->iniSet('arg_separator.output', '&amp;');
-        $signer = new UriSigner('foobar');
+        $oldArgSeparatorOutputValue = ini_set('arg_separator.output', '&amp;');
 
-        $this->assertSame(
-            'http://example.com/foo?_hash=rIOcC%2FF3DoEGo%2FvnESjSp7uU9zA9S%2F%2BOLhxgMexoPUM%3D&baz=bay&foo=bar',
-            $signer->sign('http://example.com/foo?foo=bar&baz=bay')
-        );
-        $this->assertTrue($signer->check($signer->sign('http://example.com/foo?foo=bar&baz=bay')));
+        try {
+            $signer = new UriSigner('foobar');
 
-        $this->assertSame(
-            'http://example.com/foo?_expiration=2145916800&_hash=xLhnPMzV3KqqHaaUffBUJvtRDAZ4%2FZ9Y8Sw%2BgmS%2B82Q%3D&baz=bay&foo=bar',
-            $signer->sign('http://example.com/foo?foo=bar&baz=bay', new \DateTimeImmutable('2038-01-01 00:00:00', new \DateTimeZone('UTC')))
-        );
-        $this->assertTrue($signer->check($signer->sign('http://example.com/foo?foo=bar&baz=bay', new \DateTimeImmutable('2099-01-01 00:00:00'))));
+            $this->assertSame(
+                'http://example.com/foo?_hash=rIOcC%2FF3DoEGo%2FvnESjSp7uU9zA9S%2F%2BOLhxgMexoPUM%3D&baz=bay&foo=bar',
+                $signer->sign('http://example.com/foo?foo=bar&baz=bay')
+            );
+            $this->assertTrue($signer->check($signer->sign('http://example.com/foo?foo=bar&baz=bay')));
+
+            $this->assertSame(
+                'http://example.com/foo?_expiration=2145916800&_hash=xLhnPMzV3KqqHaaUffBUJvtRDAZ4%2FZ9Y8Sw%2BgmS%2B82Q%3D&baz=bay&foo=bar',
+                $signer->sign('http://example.com/foo?foo=bar&baz=bay', new \DateTimeImmutable('2038-01-01 00:00:00', new \DateTimeZone('UTC')))
+            );
+            $this->assertTrue($signer->check($signer->sign('http://example.com/foo?foo=bar&baz=bay', new \DateTimeImmutable('2099-01-01 00:00:00'))));
+        } finally {
+            ini_set('arg_separator.output', $oldArgSeparatorOutputValue);
+        }
     }
 
     public function testCheckWithRequest()

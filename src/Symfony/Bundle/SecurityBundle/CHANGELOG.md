@@ -5,6 +5,7 @@ CHANGELOG
 ---
 
  * Allow configuring the secret used to sign login links
+ * Allow passing optional passport attributes to `Security::login()`
 
 7.1
 ---

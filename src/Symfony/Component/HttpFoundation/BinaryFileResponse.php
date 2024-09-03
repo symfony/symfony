@@ -26,6 +26,7 @@ use Symfony\Component\HttpFoundation\File\File;
 class BinaryFileResponse extends Response
 {
     protected static bool $trustXSendfileTypeHeader = false;
+    protected static ?string $xSendfileHeader = null;
 
     protected File $file;
     protected ?\SplTempFileObject $tempFileObject = null;
@@ -208,9 +209,10 @@ class BinaryFileResponse extends Response
             $this->headers->set('Accept-Ranges', $request->isMethodSafe() ? 'bytes' : 'none');
         }
 
-        if (self::$trustXSendfileTypeHeader && $request->headers->has('X-Sendfile-Type')) {
+        $type = self::$trustXSendfileTypeHeader && $request->headers->has('X-Sendfile-Type') ? $request->headers->get('X-Sendfile-Type') : self::$xSendfileHeader;
+
+        if (null !== $type) {
             // Use X-Sendfile, do not send any content.
-            $type = $request->headers->get('X-Sendfile-Type');
             $path = $this->file->getRealPath();
             // Fall back to scheme://path for stream wrapped locations.
             if (false === $path) {
@@ -368,6 +370,14 @@ class BinaryFileResponse extends Response
     public static function trustXSendfileTypeHeader(): void
     {
         self::$trustXSendfileTypeHeader = true;
+    }
+
+    /**
+     * Trust X-Sendfile header and the likes.
+     */
+    public static function setXSendfileHeader(string $name): void
+    {
+        self::$xSendfileHeader = $name;
     }
 
     /**

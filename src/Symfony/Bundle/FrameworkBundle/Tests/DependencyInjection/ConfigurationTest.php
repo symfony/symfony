@@ -705,6 +705,7 @@ class ConfigurationTest extends TestCase
             'http_method_override' => false,
             'handle_all_throwables' => true,
             'trust_x_sendfile_type_header' => '%env(bool:default::SYMFONY_TRUST_X_SENDFILE_TYPE_HEADER)%',
+            'x_sendfile_header' => '%env(default::SYMFONY_X_SENDFILE_HEADER)%',
             'ide' => '%env(default::SYMFONY_IDE)%',
             'default_locale' => 'en',
             'enabled_locales' => [],

@@ -312,6 +312,7 @@ class FrameworkExtension extends Extension
 
         $container->setParameter('kernel.http_method_override', $config['http_method_override']);
         $container->setParameter('kernel.trust_x_sendfile_type_header', $config['trust_x_sendfile_type_header']);
+        $container->setParameter('kernel.x_sendfile_header', $config['x_sendfile_header']);
         $container->setParameter('kernel.trusted_hosts', [0] === array_keys($config['trusted_hosts']) ? $config['trusted_hosts'][0] : $config['trusted_hosts']);
         $container->setParameter('kernel.default_locale', $config['default_locale']);
         $container->setParameter('kernel.enabled_locales', $config['enabled_locales']);

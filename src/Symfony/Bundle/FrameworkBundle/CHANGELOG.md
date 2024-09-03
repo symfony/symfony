@@ -13,6 +13,7 @@ CHANGELOG
  * Enable `json_decode_detailed_errors` in the default serializer context in debug mode by default when `seld/jsonlint` is installed
  * Register `Symfony\Component\Serializer\NameConverter\SnakeCaseToCamelCaseNameConverter` as a service named `serializer.name_converter.snake_case_to_camel_case` if available
  * Add support for `SYMFONY_TRUSTED_PROXIES`, `SYMFONY_TRUSTED_HEADERS`, `SYMFONY_TRUST_X_SENDFILE_TYPE_HEADER` and `SYMFONY_TRUSTED_HOSTS` env vars
+ * Add option `framework.x_sendfile_header` to configure the name of the header that should be used for file uploads acceleration, if supported by the web-server
 
 7.1
 ---

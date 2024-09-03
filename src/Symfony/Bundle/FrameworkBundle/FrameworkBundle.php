@@ -106,6 +106,10 @@ class FrameworkBundle extends Bundle
         if ($this->container->hasParameter('kernel.trust_x_sendfile_type_header') && $this->container->getParameter('kernel.trust_x_sendfile_type_header')) {
             BinaryFileResponse::trustXSendfileTypeHeader();
         }
+
+        if ($this->container->hasParameter('kernel.x_sendfile_header') && $header = $this->container->getParameter('kernel.x_sendfile_header')) {
+            BinaryFileResponse::setXSendfileHeader($header);
+        }
     }
 
     public function build(ContainerBuilder $container): void

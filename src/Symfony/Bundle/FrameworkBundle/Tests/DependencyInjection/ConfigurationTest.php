@@ -704,19 +704,16 @@ class ConfigurationTest extends TestCase
         return [
             'http_method_override' => false,
             'handle_all_throwables' => true,
-            'trust_x_sendfile_type_header' => false,
+            'trust_x_sendfile_type_header' => '%env(bool:default::SYMFONY_TRUST_X_SENDFILE_TYPE_HEADER)%',
             'ide' => '%env(default::SYMFONY_IDE)%',
             'default_locale' => 'en',
             'enabled_locales' => [],
             'set_locale_from_accept_language' => false,
             'set_content_language_from_locale' => false,
             'secret' => 's3cr3t',
-            'trusted_hosts' => [],
-            'trusted_headers' => [
-                'x-forwarded-for',
-                'x-forwarded-port',
-                'x-forwarded-proto',
-            ],
+            'trusted_hosts' => ['%env(default::SYMFONY_TRUSTED_HOSTS)%'],
+            'trusted_proxies' => ['%env(default::SYMFONY_TRUSTED_PROXIES)%'],
+            'trusted_headers' => ['%env(default::SYMFONY_TRUSTED_HEADERS)%'],
             'csrf_protection' => [
                 'enabled' => false,
             ],

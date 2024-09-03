@@ -393,7 +393,7 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
         $class = $this->getContainerClass();
         $buildDir = $this->warmupDir ?: $this->getBuildDir();
         $skip = $_SERVER['SYMFONY_DISABLE_RESOURCE_TRACKING'] ?? '';
-        $skip = filter_var($skip, \FILTER_VALIDATE_BOOLEAN,  \FILTER_NULL_ON_FAILURE) ?? explode(',', $skip);
+        $skip = filter_var($skip, \FILTER_VALIDATE_BOOLEAN, \FILTER_NULL_ON_FAILURE) ?? explode(',', $skip);
         $cache = new ConfigCache($buildDir.'/'.$class.'.php', $this->debug, null, \is_array($skip) && ['*'] !== $skip ? $skip : ($skip ? [] : null));
 
         $cachePath = $cache->getPath();
@@ -745,11 +745,30 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
         $container = $this->container;
 
         if ($container->hasParameter('kernel.trusted_hosts') && $trustedHosts = $container->getParameter('kernel.trusted_hosts')) {
-            Request::setTrustedHosts($trustedHosts);
+            Request::setTrustedHosts(\is_array($trustedHosts) ? $trustedHosts : preg_split('/\s*+,\s*+(?![^{]*})/', $trustedHosts));
         }
 
         if ($container->hasParameter('kernel.trusted_proxies') && $container->hasParameter('kernel.trusted_headers') && $trustedProxies = $container->getParameter('kernel.trusted_proxies')) {
-            Request::setTrustedProxies(\is_array($trustedProxies) ? $trustedProxies : array_map('trim', explode(',', $trustedProxies)), $container->getParameter('kernel.trusted_headers'));
+            $trustedHeaders = $container->getParameter('kernel.trusted_headers');
+
+            if (\is_string($trustedHeaders)) {
+                $trustedHeaders = array_map('trim', explode(',', $trustedHeaders));
+            }
+
+            if (\is_array($trustedHeaders)) {
+                $trustedHeaderSet = 0;
+
+                foreach ($trustedHeaders as $header) {
+                    if (!\defined($const = Request::class.'::HEADER_'.strtr(strtoupper($header), '-', '_'))) {
+                        throw new \InvalidArgumentException(\sprintf('The trusted header "%s" is not supported.', $header));
+                    }
+                    $trustedHeaderSet |= \constant($const);
+                }
+            } else {
+                $trustedHeaderSet = $trustedHeaders ?? (Request::HEADER_X_FORWARDED_FOR | Request::HEADER_X_FORWARDED_PORT | Request::HEADER_X_FORWARDED_PROTO);
+            }
+
+            Request::setTrustedProxies(\is_array($trustedProxies) ? $trustedProxies : array_map('trim', explode(',', $trustedProxies)), $trustedHeaderSet);
         }
 
         return $container;

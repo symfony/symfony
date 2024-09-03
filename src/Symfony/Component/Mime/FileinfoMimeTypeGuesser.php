@@ -50,6 +50,7 @@ class FileinfoMimeTypeGuesser implements MimeTypeGuesserInterface
             return null;
         }
         $mimeType = $finfo->file($path);
+        finfo_close($finfo);
 
         if ($mimeType && 0 === (\strlen($mimeType) % 2)) {
             $mimeStart = substr($mimeType, 0, \strlen($mimeType) >> 1);

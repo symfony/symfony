@@ -34,7 +34,6 @@ class ErrorHandlerTest extends TestCase
     protected function tearDown(): void
     {
         $r = new \ReflectionProperty(ErrorHandler::class, 'exitCode');
-        $r->setAccessible(true);
         $r->setValue(null, 0);
     }
 

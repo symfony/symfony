@@ -169,7 +169,12 @@ OUTPUT;
 
     public function testLoadEnvFilesFromSubdirectory()
     {
-        $output = $this->executeCommand(__DIR__.'/Fixtures/Scenario4', 'dev', 'config/.env');
+        $projectDirectory = __DIR__.'/Fixtures/Scenario4';
+        file_put_contents($projectDirectory.'/composer.json', '{"extra":{"runtime":{"dotenv_path": "config/.env"}}}');
+
+        $output = $this->executeCommand($projectDirectory, 'dev', 'config/.env');
+
+        @unlink($projectDirectory.'/composer.json');
 
         // Scanned Files
         $this->assertStringContainsString('⨯ config/.env.local.php', $output);

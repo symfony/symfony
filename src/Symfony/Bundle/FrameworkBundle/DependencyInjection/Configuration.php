@@ -673,7 +673,7 @@ class Configuration implements ConfigurationInterface
                         ->enumNode('cookie_samesite')->values([null, Cookie::SAMESITE_LAX, Cookie::SAMESITE_STRICT, Cookie::SAMESITE_NONE])->defaultValue('lax')->end()
                         ->booleanNode('use_cookies')->end()
                         ->scalarNode('gc_divisor')->end()
-                        ->scalarNode('gc_probability')->defaultValue(1)->end()
+                        ->scalarNode('gc_probability')->end()
                         ->scalarNode('gc_maxlifetime')->end()
                         ->scalarNode('save_path')
                             ->info('Defaults to "%kernel.cache_dir%/sessions" if the "handler_id" option is not null')

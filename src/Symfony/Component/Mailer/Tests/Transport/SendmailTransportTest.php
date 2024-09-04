@@ -94,8 +94,8 @@ class SendmailTransportTest extends TestCase
         $sendmailTransport->send($mail, $envelope);
 
         $streamProperty = new \ReflectionProperty(SendmailTransport::class, 'stream');
-        $streamProperty->setAccessible(true);
         $stream = $streamProperty->getValue($sendmailTransport);
+
         $this->assertNull($stream->stream);
     }
 
@@ -112,10 +112,9 @@ class SendmailTransportTest extends TestCase
         }
 
         $streamProperty = new \ReflectionProperty(SendmailTransport::class, 'stream');
-        $streamProperty->setAccessible(true);
         $stream = $streamProperty->getValue($sendmailTransport);
         $innerStreamProperty = new \ReflectionProperty(ProcessStream::class, 'stream');
-        $innerStreamProperty->setAccessible(true);
+
         $this->assertNull($innerStreamProperty->getValue($stream));
     }
 
@@ -127,7 +126,6 @@ class SendmailTransportTest extends TestCase
 
         $sendmailTransport = new SendmailTransport(self::FAKE_INTERACTIVE_SENDMAIL);
         $transportProperty = new \ReflectionProperty(SendmailTransport::class, 'transport');
-        $transportProperty->setAccessible(true);
 
         // Replace the transport with an anonymous consumer that trigger the stream methods
         $transportProperty->setValue($sendmailTransport, new class($transportProperty->getValue($sendmailTransport)->getStream()) extends SmtpTransport {

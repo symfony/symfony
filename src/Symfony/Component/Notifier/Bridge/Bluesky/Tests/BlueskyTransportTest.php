@@ -323,7 +323,6 @@ final class BlueskyTransportTest extends TransportTestCase
     {
         $class = new \ReflectionClass(BlueskyTransport::class);
         $method = $class->getMethod('parseFacets');
-        $method->setAccessible(true);
 
         $object = $class->newInstance('user', 'pass', new NullLogger(), $httpClient ?? new MockHttpClient([]));
 

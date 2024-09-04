@@ -167,10 +167,22 @@ OUTPUT;
         $this->assertStringContainsString('[WARNING] Due to existing dump file (.env.local.php)', $output);
     }
 
-    private function executeCommand(string $projectDirectory, string $env): string
+    public function testLoadEnvFilesFromSubdirectory()
+    {
+        $output = $this->executeCommand(__DIR__.'/Fixtures/Scenario4', 'dev', 'config/.env');
+
+        // Scanned Files
+        $this->assertStringContainsString('⨯ config/.env.local.php', $output);
+        $this->assertStringContainsString('⨯ config/.env.dev.local', $output);
+        $this->assertStringContainsString('⨯ config/.env.dev', $output);
+        $this->assertStringContainsString('✓ config/.env.local', $output);
+        $this->assertStringContainsString('✓ config/.env'.\PHP_EOL, $output);
+    }
+
+    private function executeCommand(string $projectDirectory, string $env, string $envPath = '.env'): string
     {
         $_SERVER['TEST_ENV_KEY'] = $env;
-        (new Dotenv('TEST_ENV_KEY'))->bootEnv($projectDirectory.'/.env');
+        (new Dotenv('TEST_ENV_KEY'))->bootEnv($projectDirectory.'/'.$envPath);
 
         $command = new DebugCommand($env, $projectDirectory);
         $command->setHelperSet(new HelperSet([new FormatterHelper()]));

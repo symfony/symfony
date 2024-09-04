@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2024-09-04T15:52:27Z
+
+Just asking so we can properly document this: the change means that the new default value of Symfony's `session.gc_probability` option (https://symfony.com/doc/current/reference/configuration/framework.html#gc-probability) is the value of the PHP's `session. gc_probability` INI setting (https://www.php.net/manual/en/session.configuration.php#ini.session.gc-probability)?

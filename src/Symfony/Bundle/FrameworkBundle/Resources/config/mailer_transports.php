@@ -46,7 +46,6 @@ return static function (ContainerConfigurator $container) {
             ->tag('monolog.logger', ['channel' => 'mailer']);
 
     $factories = [
-        'amazon' => SesTransportFactory::class,
         'azure' => AzureTransportFactory::class,
         'brevo' => BrevoTransportFactory::class,
         'gmail' => GmailTransportFactory::class,
@@ -75,4 +74,10 @@ return static function (ContainerConfigurator $container) {
                 ->parent('mailer.transport_factory.abstract')
                 ->tag('mailer.transport_factory');
     }
+
+    $container->services()
+        ->set('mailer.transport_factory.amazon', SesTransportFactory::class)
+            ->parent('mailer.transport_factory.abstract')
+            ->arg('$sesClient', service('async_aws.client.ses')->ignoreOnInvalid())
+            ->tag('mailer.transport_factory');
 };

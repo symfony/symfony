@@ -13,10 +13,13 @@ namespace Symfony\Component\Mailer\Bridge\Amazon\Transport;
 
 use AsyncAws\Core\Configuration;
 use AsyncAws\Ses\SesClient;
+use Psr\EventDispatcher\EventDispatcherInterface;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Mailer\Exception\UnsupportedSchemeException;
 use Symfony\Component\Mailer\Transport\AbstractTransportFactory;
 use Symfony\Component\Mailer\Transport\Dsn;
 use Symfony\Component\Mailer\Transport\TransportInterface;
+use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
  * @author Konstantin Myakshin <molodchick@gmail.com>
@@ -24,6 +27,15 @@ use Symfony\Component\Mailer\Transport\TransportInterface;
  */
 final class SesTransportFactory extends AbstractTransportFactory
 {
+    public function __construct(
+        ?EventDispatcherInterface $dispatcher = null,
+        ?HttpClientInterface $client = null,
+        ?LoggerInterface $logger = null,
+        private ?SesClient $sesClient = null,
+    ) {
+        parent::__construct($dispatcher, $client, $logger);
+    }
+
     public function create(Dsn $dsn): TransportInterface
     {
         $scheme = $dsn->getScheme();
@@ -56,7 +68,7 @@ final class SesTransportFactory extends AbstractTransportFactory
                     null === $dsn->getOption('session_token') ? [] : ['sessionToken' => $dsn->getOption('session_token')]
                 );
 
-                return new $class(new SesClient(Configuration::create($options), null, $this->client, $this->logger), $this->dispatcher, $this->logger);
+                return new $class($this->sesClient ?? new SesClient(Configuration::create($options), null, $this->client, $this->logger), $this->dispatcher, $this->logger);
         }
 
         throw new UnsupportedSchemeException($dsn, 'ses', $this->getSupportedSchemes());

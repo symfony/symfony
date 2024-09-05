@@ -1826,6 +1826,22 @@ class FilesystemTest extends FilesystemTestCase
         $this->assertFilePermissions(745, $filename);
     }
 
+    public function testDumpFileCleansUpAfterFailure()
+    {
+        $targetFile = $this->workspace.'/dump-file';
+        $this->filesystem->touch($targetFile);
+        $this->filesystem->chmod($targetFile, 0444);
+
+        try {
+            $this->filesystem->dumpFile($targetFile, 'any content');
+        } catch (IOException $e) {
+        } finally {
+            $this->filesystem->chmod($targetFile, 0666);
+        }
+
+        $this->assertSame([$targetFile], glob($this->workspace.'/*'));
+    }
+
     public function testCopyShouldKeepExecutionPermission()
     {
         $this->markAsSkippedIfChmodIsMissing();

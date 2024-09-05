@@ -358,6 +358,11 @@ class Process implements \IteratorAggregate
 
         try {
             $process = @proc_open($commandline, $descriptors, $this->processPipes->pipes, $this->cwd, $envPairs, $this->options);
+
+            // Ensure array vs string commands behave the same
+            if (!$process && \is_array($commandline)) {
+                $process = @proc_open('exec '.$this->buildShellCommandline($commandline), $descriptors, $this->processPipes->pipes, $this->cwd, $envPairs, $this->options);
+            }
         } finally {
             if ($this->ignoredSignals && \function_exists('pcntl_sigprocmask')) {
                 // we restore the signal mask here to avoid any side effects

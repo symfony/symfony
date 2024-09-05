@@ -72,13 +72,8 @@ class ProcessTest extends TestCase
      */
     public function testInvalidCommand(Process $process)
     {
-        try {
-            $this->assertSame('\\' === \DIRECTORY_SEPARATOR ? 1 : 127, $process->run());
-        } catch (ProcessStartFailedException $e) {
-            // An invalid command might already fail during start since PHP 8.3 for platforms
-            // supporting posix_spawn(), see https://github.com/php/php-src/issues/12589
-            $this->assertStringContainsString('No such file or directory', $e->getMessage());
-        }
+        // An invalid command should not fail during start
+        $this->assertSame('\\' === \DIRECTORY_SEPARATOR ? 1 : 127, $process->run());
     }
 
     public function invalidProcessProvider()

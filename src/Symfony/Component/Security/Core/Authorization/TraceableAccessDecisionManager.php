@@ -110,7 +110,6 @@ class TraceableAccessDecisionManager implements AccessDecisionManagerInterface, 
 
     public function reset(): void
     {
-        $this->voters = [];
         $this->decisionLog = [];
         $this->currentLog = [];
     }

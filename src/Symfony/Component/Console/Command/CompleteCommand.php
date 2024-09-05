@@ -98,19 +98,29 @@ final class CompleteCommand extends Command
             ]);
 
             $command = $this->findCommand($completionInput, $output);
+            if (null !== $command && !$completionInput->mustSuggestArgumentValuesFor('command')) {
+                $command->mergeApplicationDefinition();
+                $completionInput->bind($command->getDefinition());
+            }
+
             if (null === $command) {
                 $this->log('  No command found, completing using the Application class.');
 
                 $this->getApplication()->complete($completionInput, $suggestions);
             } elseif (
                 $completionInput->mustSuggestArgumentValuesFor('command')
-                && $command->getName() !== $completionInput->getCompletionValue()
-                && !\in_array($completionInput->getCompletionValue(), $command->getAliases(), true)
             ) {
-                $this->log('  No command found, completing using the Application class.');
+                $this->log('  Command found, completing command name.');
 
                 // expand shortcut names ("cache:cl<TAB>") into their full name ("cache:clear")
-                $suggestions->suggestValues(array_filter(array_merge([$command->getName()], $command->getAliases())));
+                $commandNames = array_filter(array_merge([$command->getName()], $command->getAliases()));
+                foreach ($commandNames as $name) {
+                    if (str_starts_with($name, $completionInput->getCompletionValue())) {
+                        $commandNames = [$name];
+                        break;
+                    }
+                }
+                $suggestions->suggestValues($commandNames);
             } else {
                 $command->mergeApplicationDefinition();
                 $completionInput->bind($command->getDefinition());

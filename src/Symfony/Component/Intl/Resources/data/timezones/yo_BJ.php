@@ -39,7 +39,6 @@ return [
         'America/Cuiaba' => 'Àkókò Amásɔ́nì (Cuiaba)',
         'America/Curacao' => 'Àkókò Àtìláńtíìkì (ìlú Kurashao)',
         'America/Dawson' => 'Àkókò Yúkɔ́nì (ìlú Dawson)',
-        'America/Godthab' => 'Àkókò Ìwɔ̀ oorùn Greenland (ìlú Nuuk)',
         'America/Hermosillo' => 'Àkókò Pásífíìkì Mɛ́shíkò (ìlú Hermosilo)',
         'America/Indiana/Knox' => 'àkókò àárín gbùngbùn (ìlú nɔ́sì)',
         'America/Indiana/Marengo' => 'Àkókò ìhà ìlà oòrùn (ìlú Marɛ́ngo)',

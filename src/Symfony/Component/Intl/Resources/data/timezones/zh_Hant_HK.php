@@ -121,6 +121,7 @@ return [
         'America/Whitehorse' => '育空地區時間（白馬市）',
         'America/Winnipeg' => '北美中部時間（溫尼伯）',
         'America/Yakutat' => '阿拉斯加時間（亞庫塔特）',
+        'Antarctica/Casey' => '澳洲西部時間（凱西站）',
         'Antarctica/Davis' => '戴維斯時間（戴維斯站）',
         'Antarctica/DumontDUrville' => '迪蒙迪維爾時間（杜蒙迪維爾站）',
         'Antarctica/Macquarie' => '澳洲東部時間（麥夸里）',

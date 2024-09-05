@@ -4,6 +4,7 @@ CHANGELOG
 7.2
 ---
 
+ * Make `ProviderFactoryTestCase` and `ProviderTestCase` compatible with PHPUnit 10+
  * Add `lint:translations` command
  * Deprecate passing an escape character to `CsvFileLoader::setCsvControl()`
 

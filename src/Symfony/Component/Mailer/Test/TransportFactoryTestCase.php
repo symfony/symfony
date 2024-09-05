@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Mailer\Test;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Mailer\Exception\IncompleteDsnException;
@@ -66,6 +67,7 @@ abstract class TransportFactoryTestCase extends TestCase
     /**
      * @dataProvider supportsProvider
      */
+    #[DataProvider('supportsProvider')]
     public function testSupports(Dsn $dsn, bool $supports)
     {
         $factory = $this->getFactory();
@@ -76,6 +78,7 @@ abstract class TransportFactoryTestCase extends TestCase
     /**
      * @dataProvider createProvider
      */
+    #[DataProvider('createProvider')]
     public function testCreate(Dsn $dsn, TransportInterface $transport)
     {
         $factory = $this->getFactory();
@@ -89,6 +92,7 @@ abstract class TransportFactoryTestCase extends TestCase
     /**
      * @dataProvider unsupportedSchemeProvider
      */
+    #[DataProvider('unsupportedSchemeProvider')]
     public function testUnsupportedSchemeException(Dsn $dsn, ?string $message = null)
     {
         $factory = $this->getFactory();
@@ -104,6 +108,7 @@ abstract class TransportFactoryTestCase extends TestCase
     /**
      * @dataProvider incompleteDsnProvider
      */
+    #[DataProvider('incompleteDsnProvider')]
     public function testIncompleteDsnException(Dsn $dsn)
     {
         $factory = $this->getFactory();

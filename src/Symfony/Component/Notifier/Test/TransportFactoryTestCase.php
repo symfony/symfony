@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Notifier\Test;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Notifier\Exception\IncompleteDsnException;
 use Symfony\Component\Notifier\Exception\MissingRequiredOptionException;
@@ -65,6 +66,7 @@ abstract class TransportFactoryTestCase extends TestCase
     /**
      * @dataProvider supportsProvider
      */
+    #[DataProvider('supportsProvider')]
     public function testSupports(bool $expected, string $dsn)
     {
         $factory = $this->createFactory();
@@ -75,6 +77,7 @@ abstract class TransportFactoryTestCase extends TestCase
     /**
      * @dataProvider createProvider
      */
+    #[DataProvider('createProvider')]
     public function testCreate(string $expected, string $dsn)
     {
         $factory = $this->createFactory();
@@ -86,6 +89,7 @@ abstract class TransportFactoryTestCase extends TestCase
     /**
      * @dataProvider unsupportedSchemeProvider
      */
+    #[DataProvider('unsupportedSchemeProvider')]
     public function testUnsupportedSchemeException(string $dsn, ?string $message = null)
     {
         $factory = $this->createFactory();
@@ -103,6 +107,7 @@ abstract class TransportFactoryTestCase extends TestCase
     /**
      * @dataProvider incompleteDsnProvider
      */
+    #[DataProvider('incompleteDsnProvider')]
     public function testIncompleteDsnException(string $dsn, ?string $message = null)
     {
         $factory = $this->createFactory();
@@ -120,6 +125,7 @@ abstract class TransportFactoryTestCase extends TestCase
     /**
      * @dataProvider missingRequiredOptionProvider
      */
+    #[DataProvider('missingRequiredOptionProvider')]
     public function testMissingRequiredOptionException(string $dsn, ?string $message = null)
     {
         $factory = $this->createFactory();

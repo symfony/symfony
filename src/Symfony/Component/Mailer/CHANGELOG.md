@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+7.2
+---
+
+ * Make `TransportFactoryTestCase` compatible with PHPUnit 10+
+
 7.1
 ---
 

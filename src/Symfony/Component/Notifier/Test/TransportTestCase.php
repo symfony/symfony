@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Notifier\Test;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Notifier\Exception\UnsupportedMessageTypeException;
 use Symfony\Component\Notifier\Message\MessageInterface;
@@ -47,6 +48,7 @@ abstract class TransportTestCase extends TestCase
     /**
      * @dataProvider toStringProvider
      */
+    #[DataProvider('toStringProvider')]
     public function testToString(string $expected, TransportInterface $transport)
     {
         $this->assertSame($expected, (string) $transport);
@@ -55,6 +57,7 @@ abstract class TransportTestCase extends TestCase
     /**
      * @dataProvider supportedMessagesProvider
      */
+    #[DataProvider('supportedMessagesProvider')]
     public function testSupportedMessages(MessageInterface $message, ?TransportInterface $transport = null)
     {
         $transport ??= $this->createTransport();
@@ -65,6 +68,7 @@ abstract class TransportTestCase extends TestCase
     /**
      * @dataProvider unsupportedMessagesProvider
      */
+    #[DataProvider('unsupportedMessagesProvider')]
     public function testUnsupportedMessages(MessageInterface $message, ?TransportInterface $transport = null)
     {
         $transport ??= $this->createTransport();
@@ -75,6 +79,7 @@ abstract class TransportTestCase extends TestCase
     /**
      * @dataProvider unsupportedMessagesProvider
      */
+    #[DataProvider('unsupportedMessagesProvider')]
     public function testUnsupportedMessagesTrowUnsupportedMessageTypeExceptionWhenSend(MessageInterface $message, ?TransportInterface $transport = null)
     {
         $transport ??= $this->createTransport();

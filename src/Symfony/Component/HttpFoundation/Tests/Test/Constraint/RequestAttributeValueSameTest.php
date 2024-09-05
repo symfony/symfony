@@ -13,7 +13,6 @@ namespace Symfony\Component\HttpFoundation\Tests\Test\Constraint;
 
 use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Framework\TestCase;
-use PHPUnit\Framework\TestFailure;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Test\Constraint\RequestAttributeValueSame;
 
@@ -28,14 +27,9 @@ class RequestAttributeValueSameTest extends TestCase
         $constraint = new RequestAttributeValueSame('bar', 'foo');
         $this->assertFalse($constraint->evaluate($request, '', true));
 
-        try {
-            $constraint->evaluate($request);
-        } catch (ExpectationFailedException $e) {
-            $this->assertEquals("Failed asserting that the Request has attribute \"bar\" with value \"foo\".\n", TestFailure::exceptionToString($e));
+        $this->expectException(ExpectationFailedException::class);
+        $this->expectExceptionMessage('Failed asserting that the Request has attribute "bar" with value "foo".');
 
-            return;
-        }
-
-        $this->fail();
+        $constraint->evaluate($request);
     }
 }

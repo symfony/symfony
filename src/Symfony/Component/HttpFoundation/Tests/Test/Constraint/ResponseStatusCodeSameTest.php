@@ -13,7 +13,6 @@ namespace Symfony\Component\HttpFoundation\Tests\Test\Constraint;
 
 use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Framework\TestCase;
-use PHPUnit\Framework\TestFailure;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Test\Constraint\ResponseStatusCodeSame;
 
@@ -28,17 +27,11 @@ class ResponseStatusCodeSameTest extends TestCase
         $this->assertTrue($constraint->evaluate(new Response('', 404), '', true));
 
         $constraint = new ResponseStatusCodeSame(200);
-        try {
-            $constraint->evaluate(new Response('Response body', 404));
-        } catch (ExpectationFailedException $e) {
-            $exceptionMessage = TestFailure::exceptionToString($e);
-            $this->assertStringContainsString("Failed asserting that the Response status code is 200.\nHTTP/1.0 404 Not Found", TestFailure::exceptionToString($e));
-            $this->assertStringContainsString('Response body', $exceptionMessage);
 
-            return;
-        }
+        $this->expectException(ExpectationFailedException::class);
+        $this->expectExceptionMessageMatches('/Failed asserting that the Response status code is 200.\nHTTP\/1.0 404 Not Found.+Response body/s');
 
-        $this->fail();
+        $constraint->evaluate(new Response('Response body', 404));
     }
 
     public function testReducedVerbosity()
@@ -48,9 +41,8 @@ class ResponseStatusCodeSameTest extends TestCase
         try {
             $constraint->evaluate(new Response('Response body', 404));
         } catch (ExpectationFailedException $e) {
-            $exceptionMessage = TestFailure::exceptionToString($e);
-            $this->assertStringContainsString("Failed asserting that the Response status code is 200.\nHTTP/1.0 404 Not Found", TestFailure::exceptionToString($e));
-            $this->assertStringNotContainsString('Response body', $exceptionMessage);
+            $this->assertStringContainsString("Failed asserting that the Response status code is 200.\nHTTP/1.0 404 Not Found", $e->getMessage());
+            $this->assertStringNotContainsString('Response body', $e->getMessage());
 
             return;
         }

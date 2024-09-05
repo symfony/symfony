@@ -13,7 +13,6 @@ namespace Symfony\Component\HttpFoundation\Tests\Test\Constraint;
 
 use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Framework\TestCase;
-use PHPUnit\Framework\TestFailure;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Test\Constraint\ResponseIsUnprocessable;
 
@@ -26,17 +25,10 @@ class ResponseIsUnprocessableTest extends TestCase
         $this->assertTrue($constraint->evaluate(new Response('', 422), '', true));
         $this->assertFalse($constraint->evaluate(new Response(), '', true));
 
-        try {
-            $constraint->evaluate(new Response('Response body'));
-        } catch (ExpectationFailedException $e) {
-            $exceptionMessage = TestFailure::exceptionToString($e);
-            $this->assertStringContainsString("Failed asserting that the Response is unprocessable.\nHTTP/1.0 200 OK", $exceptionMessage);
-            $this->assertStringContainsString('Response body', $exceptionMessage);
+        $this->expectException(ExpectationFailedException::class);
+        $this->expectExceptionMessageMatches('/Failed asserting that the Response is unprocessable.\nHTTP\/1.0 200 OK.+Response body/s');
 
-            return;
-        }
-
-        $this->fail();
+        $constraint->evaluate(new Response('Response body'));
     }
 
     public function testReducedVerbosity()
@@ -46,9 +38,8 @@ class ResponseIsUnprocessableTest extends TestCase
         try {
             $constraint->evaluate(new Response('Response body'));
         } catch (ExpectationFailedException $e) {
-            $exceptionMessage = TestFailure::exceptionToString($e);
-            $this->assertStringContainsString("Failed asserting that the Response is unprocessable.\nHTTP/1.0 200 OK", $exceptionMessage);
-            $this->assertStringNotContainsString('Response body', $exceptionMessage);
+            $this->assertStringContainsString("Failed asserting that the Response is unprocessable.\nHTTP/1.0 200 OK", $e->getMessage());
+            $this->assertStringNotContainsString('Response body', $e->getMessage());
 
             return;
         }

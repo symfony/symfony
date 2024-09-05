@@ -13,7 +13,6 @@ namespace Symfony\Component\HttpFoundation\Tests\Test\Constraint;
 
 use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Framework\TestCase;
-use PHPUnit\Framework\TestFailure;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Test\Constraint\ResponseIsRedirected;
 
@@ -26,17 +25,10 @@ class ResponseIsRedirectedTest extends TestCase
         $this->assertTrue($constraint->evaluate(new Response('', 301), '', true));
         $this->assertFalse($constraint->evaluate(new Response(), '', true));
 
-        try {
-            $constraint->evaluate(new Response('Body content'));
-        } catch (ExpectationFailedException $e) {
-            $exceptionMessage = TestFailure::exceptionToString($e);
-            $this->assertStringContainsString("Failed asserting that the Response is redirected.\nHTTP/1.0 200 OK", $exceptionMessage);
-            $this->assertStringContainsString('Body content', $exceptionMessage);
+        $this->expectException(ExpectationFailedException::class);
+        $this->expectExceptionMessageMatches('/Failed asserting that the Response is redirected.\nHTTP\/1.0 200 OK.+Body content/s');
 
-            return;
-        }
-
-        $this->fail();
+        $constraint->evaluate(new Response('Body content'));
     }
 
     public function testReducedVerbosity()
@@ -45,9 +37,8 @@ class ResponseIsRedirectedTest extends TestCase
         try {
             $constraint->evaluate(new Response('Body content'));
         } catch (ExpectationFailedException $e) {
-            $exceptionMessage = TestFailure::exceptionToString($e);
-            $this->assertStringContainsString("Failed asserting that the Response is redirected.\nHTTP/1.0 200 OK", $exceptionMessage);
-            $this->assertStringNotContainsString('Body content', $exceptionMessage);
+            $this->assertStringContainsString("Failed asserting that the Response is redirected.\nHTTP/1.0 200 OK", $e->getMessage());
+            $this->assertStringNotContainsString('Body content', $e->getMessage());
 
             return;
         }

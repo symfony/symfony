@@ -62,9 +62,7 @@ class RemotePackageStorageTest extends TestCase
             $storage->save($entry, 'any content');
         } finally {
             if ('\\' === \DIRECTORY_SEPARATOR) {
-                foreach (glob($vendorDir.'/module_specifier/*') as $file) {
-                    $this->filesystem->chmod($file, 0777);
-                }
+                $this->filesystem->chmod($vendorDir.'/module_specifier/module_specifier.index.js', 0777);
             } else {
                 $this->filesystem->chmod($vendorDir.'/module_specifier/', 0777);
             }

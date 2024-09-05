@@ -13,7 +13,6 @@ namespace Symfony\Component\HttpFoundation\Tests\Test\Constraint;
 
 use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Framework\TestCase;
-use PHPUnit\Framework\TestFailure;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Test\Constraint\ResponseCookieValueSame;
@@ -31,15 +30,10 @@ class ResponseCookieValueSameTest extends TestCase
         $constraint = new ResponseCookieValueSame('foo', 'babar', '/path');
         $this->assertFalse($constraint->evaluate($response, '', true));
 
-        try {
-            $constraint->evaluate($response);
-        } catch (ExpectationFailedException $e) {
-            $this->assertEquals("Failed asserting that the Response has cookie \"foo\" with path \"/path\" with value \"babar\".\n", TestFailure::exceptionToString($e));
+        $this->expectException(ExpectationFailedException::class);
+        $this->expectExceptionMessage('Failed asserting that the Response has cookie "foo" with path "/path" with value "babar".');
 
-            return;
-        }
-
-        $this->fail();
+        $constraint->evaluate($response);
     }
 
     public function testCookieWithNullValueIsComparedAsEmptyString()

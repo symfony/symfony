@@ -13,7 +13,6 @@ namespace Symfony\Component\Console\Tests\Tester\Constraint;
 
 use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Framework\TestCase;
-use PHPUnit\Framework\TestFailure;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Tester\Constraint\CommandIsSuccessful;
 
@@ -35,16 +34,9 @@ final class CommandIsSuccessfulTest extends TestCase
     {
         $constraint = new CommandIsSuccessful();
 
-        try {
-            $constraint->evaluate($exitCode);
-        } catch (ExpectationFailedException $e) {
-            $this->assertStringContainsString('Failed asserting that the command is successful.', TestFailure::exceptionToString($e));
-            $this->assertStringContainsString($expectedException, TestFailure::exceptionToString($e));
-
-            return;
-        }
-
-        $this->fail();
+        $this->expectException(ExpectationFailedException::class);
+        $this->expectExceptionMessageMatches('/Failed asserting that the command is successful\..*'.$expectedException.'/s');
+        $constraint->evaluate($exitCode);
     }
 
     public static function providesUnsuccessful(): iterable

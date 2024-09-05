@@ -54,5 +54,7 @@ class ResponseStatusCodeSameTest extends TestCase
 
             return;
         }
+
+        $this->fail();
     }
 }

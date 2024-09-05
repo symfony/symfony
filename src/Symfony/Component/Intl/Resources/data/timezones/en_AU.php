@@ -9,6 +9,7 @@ return [
         'Africa/Kampala' => 'Eastern Africa Time (Kampala)',
         'Africa/Mogadishu' => 'Eastern Africa Time (Mogadishu)',
         'Africa/Nairobi' => 'Eastern Africa Time (Nairobi)',
+        'Antarctica/Casey' => 'Australian Western Time (Casey)',
         'Antarctica/Macquarie' => 'Australian Eastern Time (Macquarie)',
         'Asia/Aden' => 'Arabia Time (Aden)',
         'Asia/Baghdad' => 'Arabia Time (Baghdad)',

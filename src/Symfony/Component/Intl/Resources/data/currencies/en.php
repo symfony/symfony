@@ -1086,6 +1086,10 @@ return [
             'EC$',
             'East Caribbean Dollar',
         ],
+        'XCG' => [
+            'Cg.',
+            'Caribbean guilder',
+        ],
         'XEU' => [
             'XEU',
             'European Currency Unit',

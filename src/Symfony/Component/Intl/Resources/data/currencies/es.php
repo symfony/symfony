@@ -1006,6 +1006,10 @@ return [
             'XCD',
             'dólar del Caribe Oriental',
         ],
+        'XCG' => [
+            'Cg.',
+            'florín caribeño',
+        ],
         'XEU' => [
             'XEU',
             'unidad de moneda europea',

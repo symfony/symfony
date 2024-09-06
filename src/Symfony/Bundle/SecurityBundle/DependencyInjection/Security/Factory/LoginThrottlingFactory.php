@@ -52,7 +52,7 @@ class LoginThrottlingFactory implements AuthenticatorFactoryInterface
                 ->scalarNode('limiter')->info(\sprintf('A service id implementing "%s".', RequestRateLimiterInterface::class))->end()
                 ->integerNode('max_attempts')->defaultValue(5)->end()
                 ->scalarNode('interval')->defaultValue('1 minute')->end()
-                ->scalarNode('lock_factory')->info('The service ID of the lock factory used by the login rate limiter (or null to disable locking)')->defaultNull()->end()
+                ->scalarNode('lock_factory')->info('The service ID of the lock factory used by the login rate limiter (or null to disable locking).')->defaultNull()->end()
             ->end();
     }
 

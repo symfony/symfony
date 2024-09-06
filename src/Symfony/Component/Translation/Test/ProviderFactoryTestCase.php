@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Translation\Test;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
@@ -69,6 +70,7 @@ abstract class ProviderFactoryTestCase extends TestCase
     /**
      * @dataProvider supportsProvider
      */
+    #[DataProvider('supportsProvider')]
     public function testSupports(bool $expected, string $dsn)
     {
         $factory = $this->createFactory();
@@ -79,6 +81,7 @@ abstract class ProviderFactoryTestCase extends TestCase
     /**
      * @dataProvider createProvider
      */
+    #[DataProvider('createProvider')]
     public function testCreate(string $expected, string $dsn)
     {
         $factory = $this->createFactory();
@@ -90,6 +93,7 @@ abstract class ProviderFactoryTestCase extends TestCase
     /**
      * @dataProvider unsupportedSchemeProvider
      */
+    #[DataProvider('unsupportedSchemeProvider')]
     public function testUnsupportedSchemeException(string $dsn, ?string $message = null)
     {
         $factory = $this->createFactory();
@@ -107,6 +111,7 @@ abstract class ProviderFactoryTestCase extends TestCase
     /**
      * @dataProvider incompleteDsnProvider
      */
+    #[DataProvider('incompleteDsnProvider')]
     public function testIncompleteDsnException(string $dsn, ?string $message = null)
     {
         $factory = $this->createFactory();

@@ -4,6 +4,7 @@ CHANGELOG
 7.2
 ---
 
+ * Make `TransportFactoryTestCase` and `TransportTestCase` compatible with PHPUnit 10+
  * Add `Desktop` channel
 
 6.3

@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Translation\Test;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
@@ -45,6 +46,7 @@ abstract class ProviderTestCase extends TestCase
     /**
      * @dataProvider toStringProvider
      */
+    #[DataProvider('toStringProvider')]
     public function testToString(ProviderInterface $provider, string $expected)
     {
         $this->assertSame($expected, (string) $provider);

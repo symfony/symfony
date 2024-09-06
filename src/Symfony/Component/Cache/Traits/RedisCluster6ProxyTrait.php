@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Cache\Traits;
 
-if (version_compare(phpversion('redis'), '6.1.0', '>')) {
+if (version_compare(phpversion('redis'), '6.1.0-dev', '>')) {
     /**
      * @internal
      */

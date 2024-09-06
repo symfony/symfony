@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Cache\Traits;
 
-if (version_compare(phpversion('redis'), '6.1.0', '>=')) {
+if (version_compare(phpversion('redis'), '6.1.0-dev', '>=')) {
     /**
      * @internal
      */
@@ -27,7 +27,7 @@ if (version_compare(phpversion('redis'), '6.1.0', '>=')) {
             return ($this->lazyObjectState->realInstance ??= ($this->lazyObjectState->initializer)())->hRandField(...\func_get_args());
         }
 
-        public function hSet($key, $fields_and_vals): \Redis|false|int
+        public function hSet($key, ...$fields_and_vals): \Redis|false|int
         {
             return ($this->lazyObjectState->realInstance ??= ($this->lazyObjectState->initializer)())->hSet(...\func_get_args());
         }

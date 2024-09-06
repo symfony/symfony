@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2024-09-05T10:58:30Z
+
+I think we can ignore them.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2024-09-05T11:58:38Z
+
+Currently we install PHPUnit 9.6 in our Psalm CI job. We might as well just bump that version.

@@ -101,9 +101,7 @@ class SetupTransportsCommandTest extends TestCase
         $serviceLocator = $this->createMock(ServiceLocator::class);
         $serviceLocator->expects($this->exactly(1))
             ->method('get')
-            ->will($this->onConsecutiveCalls(
-                $amqpTransport
-            ));
+            ->willReturn($amqpTransport);
         $serviceLocator
             ->method('has')
             ->willReturn(true);

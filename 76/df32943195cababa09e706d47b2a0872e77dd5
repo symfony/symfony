@@ -1,0 +1,40 @@
+---------------------------------------------------------------------------
+
+by derrabus at 2024-09-04T11:52:25Z
+
+Version 6.1.0 hasn't been released yet, which basically means that the maintainers could decide to release an RC2 which will again break the logic that you're proposing. Is that correct?
+
+In that case, I wouldn't do anything here. The problem will resolve itself with the next release of ext-redis.
+
+---------------------------------------------------------------------------
+
+by cedric-anne at 2024-09-04T11:55:00Z
+
+> Version 6.1.0 hasn't been released yet, which basically means that the maintainers could decide to release an RC2 which will again break the logic that you're proposing. Is that correct?
+
+An RC2 would still use the new signature. Comparing the version with `>= 6.1.0-dev` would include any 6.1.0 pre-release, and every future releases.
+
+>
+> In that case, I wouldn't do anything here. The problem will resolve itself with the next release of ext-redis.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2024-09-04T12:03:28Z
+
+Oh right. I misunderstood your initial message. LGTM then.
+
+---------------------------------------------------------------------------
+
+by cedric-anne at 2024-09-04T12:31:33Z
+
+> Oh right. I misunderstood your initial message. LGTM then.
+
+It was not really clear. My bad.
+
+---------------------------------------------------------------------------
+
+by cedric-anne at 2024-09-04T14:16:17Z
+
+I pushed a new commit as the signature was not correct. I had the following error: `Compile Error: Declaration of Symfony\Component\Cache\Traits\Redis6ProxyTrait::hSet($key, $fields_and_vals): Redis|int|false must be compatible with Redis::hSet(string $key, mixed ...$fields_and_vals): Redis|int|false`
+
+After applying the patch, this error is gone.

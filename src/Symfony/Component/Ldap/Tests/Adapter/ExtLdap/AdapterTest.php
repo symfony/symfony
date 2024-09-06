@@ -39,10 +39,37 @@ class AdapterTest extends LdapTestCase
      */
     public function testSaslBind()
     {
+        $h = @ldap_connect(getenv('LDAP_HOST'), getenv('LDAP_PORT'));
+        @ldap_set_option($h, \LDAP_OPT_PROTOCOL_VERSION, 3);
+
+        if (!$h || !@ldap_bind($h)) {
+            $this->markTestSkipped('No server is listening on LDAP_HOST:LDAP_PORT');
+        }
+
+        if (!@ldap_start_tls($h)) {
+            ldap_unbind($h);
+            $this->markTestSkipped('Cannot establish an encrypted connection');
+        }
+
+        ldap_unbind($h);
+
         $ldap = new Adapter($this->getLdapConfig());
 
         $ldap->getConnection()->saslBind('cn=admin,dc=symfony,dc=com', 'symfony');
         $this->assertEquals('cn=admin,dc=symfony,dc=com', $ldap->getConnection()->whoami());
+    }
+
+    /**
+     * @group functional
+     */
+    public function testWhoamiWithoutSaslBind()
+    {
+        $ldap = new Adapter($this->getLdapConfig());
+
+        $this->expectException(NotBoundException::class);
+        $this->expectExceptionMessage('Cannot execute "Symfony\Component\Ldap\Adapter\ExtLdap\Connection::whoami()" before calling "Symfony\Component\Ldap\Adapter\ExtLdap\Connection::saslBind()".');
+
+        $ldap->getConnection()->whoami();
     }
 
     /**

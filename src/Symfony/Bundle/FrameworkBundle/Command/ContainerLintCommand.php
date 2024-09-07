@@ -17,6 +17,7 @@ use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Exception\RuntimeException;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\DependencyInjection\Compiler\CheckAliasValidityPass;
@@ -39,6 +40,7 @@ final class ContainerLintCommand extends Command
     {
         $this
             ->setHelp('This command parses service definitions and ensures that injected values match the type declarations of each services\' class.')
+            ->addOption('resolve-env-vars', null, InputOption::VALUE_NONE, 'Resolve environment variables and fail if one is missing.')
         ;
     }
 
@@ -58,7 +60,7 @@ final class ContainerLintCommand extends Command
         $container->setParameter('container.build_time', time());
 
         try {
-            $container->compile();
+            $container->compile((bool) $input->getOption('resolve-env-vars'));
         } catch (InvalidArgumentException $e) {
             $errorIo->error($e->getMessage());
 

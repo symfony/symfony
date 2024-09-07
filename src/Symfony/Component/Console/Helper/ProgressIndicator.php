@@ -54,7 +54,6 @@ class ProgressIndicator
         private int $indicatorChangeInterval = 100,
         ?array $indicatorValues = null,
     ) {
-
         $format ??= $this->determineBestFormat();
         $indicatorValues ??= ['-', '\\', '|', '/'];
         $indicatorValues = array_values($indicatorValues);

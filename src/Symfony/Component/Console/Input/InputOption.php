@@ -114,7 +114,7 @@ class InputOption
         if (null === $mode) {
             $mode = self::VALUE_NONE;
         } elseif ($mode >= (self::VALUE_NEGATABLE << 1) || $mode < 1) {
-            throw new InvalidArgumentException(sprintf('Option mode "%s" is not valid.', $mode));
+            throw new InvalidArgumentException(\sprintf('Option mode "%s" is not valid.', $mode));
         }
 
         $this->name = $name;

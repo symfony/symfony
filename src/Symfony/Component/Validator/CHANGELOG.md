@@ -12,6 +12,7 @@ CHANGELOG
  * Add the `WordCount` constraint
  * Add the `Week` constraint
  * Add `CompoundConstraintTestCase` to ease testing Compound Constraints
+ * Add the `DataUri` constraint for validating Data URI content
 
 7.1
 ---

@@ -57,9 +57,9 @@ class RoundRobinTransportTest extends TestCase
     public function testSendAllDead()
     {
         $t1 = $this->createMock(TransportInterface::class);
-        $t1->expects($this->once())->method('send')->will($this->throwException(new TransportException()));
+        $t1->expects($this->once())->method('send')->willThrowException(new TransportException());
         $t2 = $this->createMock(TransportInterface::class);
-        $t2->expects($this->once())->method('send')->will($this->throwException(new TransportException()));
+        $t2->expects($this->once())->method('send')->willThrowException(new TransportException());
         $t = new RoundRobinTransport([$t1, $t2]);
         $p = new \ReflectionProperty($t, 'cursor');
         $p->setAccessible(true);
@@ -81,7 +81,7 @@ class RoundRobinTransportTest extends TestCase
     public function testSendOneDead()
     {
         $t1 = $this->createMock(TransportInterface::class);
-        $t1->expects($this->once())->method('send')->will($this->throwException(new TransportException()));
+        $t1->expects($this->once())->method('send')->willThrowException(new TransportException());
         $t2 = $this->createMock(TransportInterface::class);
         $t2->expects($this->exactly(3))->method('send');
         $t = new RoundRobinTransport([$t1, $t2]);
@@ -101,7 +101,7 @@ class RoundRobinTransportTest extends TestCase
         $t1 = $this->createMock(TransportInterface::class);
         $t1->expects($this->exactly(4))->method('send');
         $t2 = $this->createMock(TransportInterface::class);
-        $t2->expects($this->once())->method('send')->will($this->throwException(new TransportException()));
+        $t2->expects($this->once())->method('send')->willThrowException(new TransportException());
         $t = new RoundRobinTransport([$t1, $t2], 60);
         $p = new \ReflectionProperty($t, 'cursor');
         $p->setAccessible(true);
@@ -152,13 +152,13 @@ class RoundRobinTransportTest extends TestCase
         $t1 = $this->createMock(TransportInterface::class);
         $e1 = new TransportException();
         $e1->appendDebug('Debug message 1');
-        $t1->expects($this->once())->method('send')->will($this->throwException($e1));
+        $t1->expects($this->once())->method('send')->willThrowException($e1);
         $t1->expects($this->once())->method('__toString')->willReturn('t1');
 
         $t2 = $this->createMock(TransportInterface::class);
         $e2 = new TransportException();
         $e2->appendDebug('Debug message 2');
-        $t2->expects($this->once())->method('send')->will($this->throwException($e2));
+        $t2->expects($this->once())->method('send')->willThrowException($e2);
         $t2->expects($this->once())->method('__toString')->willReturn('t2');
 
         $t = new RoundRobinTransport([$t1, $t2]);

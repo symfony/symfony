@@ -17,6 +17,8 @@ use Symfony\Component\Notifier\Transport\Dsn;
 
 /**
  * @author André Matthies <matthiez@gmail.com>
+ * 
+ * @deprecated since Symfony 7.2, use the Seven.io bridge instead.
  */
 final class Sms77TransportFactory extends AbstractTransportFactory
 {

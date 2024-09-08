@@ -100,7 +100,6 @@ return static function (ContainerConfigurator $container) {
         'sms-biuras' => Bridge\SmsBiuras\SmsBiurasTransportFactory::class,
         'sms-factor' => Bridge\SmsFactor\SmsFactorTransportFactory::class,
         'sms-sluzba' => Bridge\SmsSluzba\SmsSluzbaTransportFactory::class,
-        'sms77' => Bridge\Sms77\Sms77TransportFactory::class,
         'smsapi' => Bridge\Smsapi\SmsapiTransportFactory::class,
         'smsbox' => Bridge\Smsbox\SmsboxTransportFactory::class,
         'smsc' => Bridge\Smsc\SmscTransportFactory::class,
@@ -133,5 +132,11 @@ return static function (ContainerConfigurator $container) {
             ->parent('notifier.transport_factory.abstract')
             ->tag('chatter.transport_factory')
             ->tag('texter.transport_factory')
+
+            ->set('notifier.transport_factory.sms77', Bridge\Sms77\Sms77TransportFactory::class)
+            ->parent('notifier.transport_factory.abstract')
+            ->tag('texter.transport_factory')
+            ->deprecate('symfony/framework-bundle', '7.2', 'The "%service_id% service is deprecated, use
+"notifier.transport_factory.sevenio" instead.')
     ;
 };

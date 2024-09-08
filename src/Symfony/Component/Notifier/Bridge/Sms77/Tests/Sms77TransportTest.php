@@ -19,6 +19,9 @@ use Symfony\Component\Notifier\Test\TransportTestCase;
 use Symfony\Component\Notifier\Tests\Transport\DummyMessage;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
+/**
+ * @group legacy
+ */
 final class Sms77TransportTest extends TransportTestCase
 {
     public static function createTransport(?HttpClientInterface $client = null, ?string $from = null): Sms77Transport

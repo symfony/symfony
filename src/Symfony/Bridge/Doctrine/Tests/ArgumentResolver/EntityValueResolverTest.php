@@ -173,7 +173,7 @@ class EntityValueResolverTest extends TestCase
         $repository->expects($this->once())
             ->method('find')
             ->with('test')
-            ->will($this->throwException(new ConversionException()));
+            ->willThrowException(new ConversionException());
 
         $manager->expects($this->once())
             ->method('getRepository')
@@ -381,7 +381,7 @@ class EntityValueResolverTest extends TestCase
 
         $language->expects($this->once())
             ->method('evaluate')
-            ->will($this->throwException(new SyntaxError('syntax error message', 10)));
+            ->willThrowException(new SyntaxError('syntax error message', 10));
 
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('syntax error message around position 10');

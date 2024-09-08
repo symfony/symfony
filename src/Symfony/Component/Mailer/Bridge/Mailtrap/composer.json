@@ -1,0 +1,33 @@
+{
+    "name": "symfony/mailtrap-mailer",
+    "type": "symfony-mailer-bridge",
+    "description": "Symfony Mailtrap Mailer Bridge",
+    "keywords": [],
+    "homepage": "https://symfony.com",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Fabien Potencier",
+            "email": "fabien@symfony.com"
+        },
+        {
+            "name": "Symfony Community",
+            "homepage": "https://symfony.com/contributors"
+        }
+    ],
+    "require": {
+        "php": ">=8.2",
+        "psr/event-dispatcher": "^1",
+        "symfony/mailer": "^7.2"
+    },
+    "require-dev": {
+        "symfony/http-client": "^6.4|^7.0"
+    },
+    "autoload": {
+        "psr-4": { "Symfony\\Component\\Mailer\\Bridge\\Mailtrap\\": "" },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
+    },
+    "minimum-stability": "dev"
+}

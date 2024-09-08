@@ -79,7 +79,7 @@ class Logger extends AbstractLogger implements DebugLoggerInterface
 
         $this->minLevelIndex = self::LEVELS[$minLevel];
         $this->formatter = null !== $formatter ? $formatter(...) : $this->format(...);
-        if ($output && false === $this->handle = \is_resource($output) ? $output : @fopen($output, 'a')) {
+        if ($output && false === $this->handle = \is_string($output) ? @fopen($output, 'a') : $output) {
             throw new InvalidArgumentException(sprintf('Unable to open "%s".', $output));
         }
         $this->debug = $debug;

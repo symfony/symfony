@@ -80,11 +80,11 @@ class FailoverTransportTest extends TestCase
 
         $t1 = $this->createMock(TransportInterface::class);
         $t1->method('supports')->with($message)->willReturn(true);
-        $t1->expects($this->once())->method('send')->with($message)->will($this->throwException($this->createMock(TransportExceptionInterface::class)));
+        $t1->expects($this->once())->method('send')->with($message)->willThrowException($this->createMock(TransportExceptionInterface::class));
 
         $t2 = $this->createMock(TransportInterface::class);
         $t2->method('supports')->with($message)->willReturn(true);
-        $t2->expects($this->once())->method('send')->with($message)->will($this->throwException($this->createMock(TransportExceptionInterface::class)));
+        $t2->expects($this->once())->method('send')->with($message)->willThrowException($this->createMock(TransportExceptionInterface::class));
 
         $t = new FailoverTransport([$t1, $t2]);
 
@@ -100,7 +100,7 @@ class FailoverTransportTest extends TestCase
 
         $t1 = $this->createMock(TransportInterface::class);
         $t1->method('supports')->with($message)->willReturn(true);
-        $t1->expects($this->once())->method('send')->will($this->throwException($this->createMock(TransportExceptionInterface::class)));
+        $t1->expects($this->once())->method('send')->willThrowException($this->createMock(TransportExceptionInterface::class));
 
         $t2 = $this->createMock(TransportInterface::class);
         $t2->method('supports')->with($message)->willReturn(true);
@@ -117,7 +117,7 @@ class FailoverTransportTest extends TestCase
 
         $t1 = $this->createMock(TransportInterface::class);
         $t1->method('supports')->with($message)->willReturn(true);
-        $t1->method('send')->will($this->throwException($this->createMock(TransportExceptionInterface::class)));
+        $t1->method('send')->willThrowException($this->createMock(TransportExceptionInterface::class));
         $t1->expects($this->once())->method('send');
         $t2 = $this->createMock(TransportInterface::class);
         $t2->method('supports')->with($message)->willReturn(true);

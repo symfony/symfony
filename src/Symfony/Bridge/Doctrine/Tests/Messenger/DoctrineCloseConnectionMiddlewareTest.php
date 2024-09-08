@@ -63,7 +63,7 @@ class DoctrineCloseConnectionMiddlewareTest extends MiddlewareTestCase
         $managerRegistry
             ->method('getManager')
             ->with('unknown_manager')
-            ->will($this->throwException(new \InvalidArgumentException()));
+            ->willThrowException(new \InvalidArgumentException());
 
         $middleware = new DoctrineCloseConnectionMiddleware($managerRegistry, 'unknown_manager');
 

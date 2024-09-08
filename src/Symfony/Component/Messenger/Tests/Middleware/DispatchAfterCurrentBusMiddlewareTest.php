@@ -68,7 +68,7 @@ class DispatchAfterCurrentBusMiddlewareTest extends TestCase
             ->with($this->callback(function (Envelope $envelope) use (&$series) {
                 return $envelope->getMessage() === array_shift($series);
             }))
-            ->will($this->willHandleMessage());
+            ->willReturnCallback($this->handleMessageCallback());
 
         $messageBus->dispatch($message);
     }
@@ -278,7 +278,7 @@ class DispatchAfterCurrentBusMiddlewareTest extends TestCase
         $handlingMiddleware
             ->method('handle')
             ->with($this->expectHandledMessage($event))
-            ->will($this->willHandleMessage());
+            ->willReturnCallback($this->handleMessageCallback());
 
         $eventBus = new MessageBus([
             $middleware,
@@ -295,9 +295,9 @@ class DispatchAfterCurrentBusMiddlewareTest extends TestCase
         return $this->callback(fn (Envelope $envelope) => $envelope->getMessage() === $message);
     }
 
-    private function willHandleMessage(): ReturnCallback
+    private function handleMessageCallback(): \Closure
     {
-        return $this->returnCallback(fn ($envelope, StackInterface $stack) => $stack->next()->handle($envelope, $stack));
+        return fn ($envelope, StackInterface $stack) => $stack->next()->handle($envelope, $stack);
     }
 }
 

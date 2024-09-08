@@ -18,6 +18,7 @@ use Symfony\Component\Validator\Exception\UnexpectedValueException;
 
 /**
  * @author Kev <https://github.com/symfonyaml>
+ *
  * @see https://datatracker.ietf.org/doc/html/rfc2397
  */
 class DataUriValidator extends ConstraintValidator
@@ -54,8 +55,8 @@ class DataUriValidator extends ConstraintValidator
         }
 
         if (!preg_match(static::PATTERN, $value)) {
-            if (strlen($value) > self::MAX_MESSAGE_VALUE_LENGTH) {
-                $value = sprintf('%s (truncated)', $this->formatValue(substr($value, 0, self::MAX_MESSAGE_VALUE_LENGTH) . '...'));
+            if (\strlen($value) > self::MAX_MESSAGE_VALUE_LENGTH) {
+                $value = \sprintf('%s (truncated)', $this->formatValue(substr($value, 0, self::MAX_MESSAGE_VALUE_LENGTH).'...'));
             } else {
                 $value = $this->formatValue($value);
             }

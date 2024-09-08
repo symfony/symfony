@@ -57,9 +57,9 @@ class FailoverTransportTest extends TestCase
     public function testSendAllDead()
     {
         $t1 = $this->createMock(TransportInterface::class);
-        $t1->expects($this->once())->method('send')->will($this->throwException(new TransportException()));
+        $t1->expects($this->once())->method('send')->willThrowException(new TransportException());
         $t2 = $this->createMock(TransportInterface::class);
-        $t2->expects($this->once())->method('send')->will($this->throwException(new TransportException()));
+        $t2->expects($this->once())->method('send')->willThrowException(new TransportException());
         $t = new FailoverTransport([$t1, $t2]);
         $this->expectException(TransportException::class);
         $this->expectExceptionMessage('All transports failed.');
@@ -70,7 +70,7 @@ class FailoverTransportTest extends TestCase
     public function testSendOneDead()
     {
         $t1 = $this->createMock(TransportInterface::class);
-        $t1->expects($this->once())->method('send')->will($this->throwException(new TransportException()));
+        $t1->expects($this->once())->method('send')->willThrowException(new TransportException());
         $t2 = $this->createMock(TransportInterface::class);
         $t2->expects($this->exactly(3))->method('send');
         $t = new FailoverTransport([$t1, $t2]);

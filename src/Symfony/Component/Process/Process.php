@@ -372,7 +372,7 @@ class Process implements \IteratorAggregate
             restore_error_handler();
         }
 
-        if (!\is_resource($process)) {
+        if (!$process) {
             throw new ProcessStartFailedException($this, $lastError);
         }
         $this->process = $process;
@@ -1434,8 +1434,9 @@ class Process implements \IteratorAggregate
     private function close(): int
     {
         $this->processPipes->close();
-        if (\is_resource($this->process)) {
+        if ($this->process) {
             proc_close($this->process);
+            $this->process = null;
         }
         $this->exitcode = $this->processInformation['exitcode'];
         $this->status = self::STATUS_TERMINATED;

@@ -44,7 +44,7 @@ class TwigRendererEngine extends AbstractRendererEngine
     {
         $cacheKey = $view->vars[self::CACHE_KEY_VAR];
 
-        $context = $this->environment->mergeGlobals($variables);
+        $context = $variables + $this->environment->getGlobals();
 
         ob_start();
 
@@ -164,7 +164,7 @@ class TwigRendererEngine extends AbstractRendererEngine
         // theme is a reference and we don't want to change it.
         $currentTheme = $theme;
 
-        $context = $this->environment->mergeGlobals([]);
+        $context = $this->environment->getGlobals();
 
         // The do loop takes care of template inheritance.
         // Add blocks from all templates in the inheritance tree, but avoid

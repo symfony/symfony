@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by derrabus at 2024-09-09T07:26:17Z
+
+The test failure on high-deps is the test suite of Symfony 4.4 failing with current Symfony 5.4 deps and Twig 3.12 and later. These failures happen without my changes as well.

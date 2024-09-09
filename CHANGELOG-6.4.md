@@ -1,3 +1,4 @@
+
 CHANGELOG for 6.4.x
 ===================
 
@@ -9,6 +10,7 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
 
 * 6.4.11 (2024-08-30)
 
+ * bug #58214 [Dotenv] Fix can not load BOM-signed env files (hosni)
  * bug #58110 [PropertyAccess] Fix handling property names with a `.` (alexandre-daubois)
  * bug #58127 [Validator] synchronize IBAN formats (xabbuh)
  * bug #58112 fix Twig 3.12 compatibility (xabbuh)

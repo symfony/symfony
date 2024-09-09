@@ -228,7 +228,7 @@ final class Dotenv
     public function parse(string $data, string $path = '.env'): array
     {
         $this->path = $path;
-        $this->data = str_replace(["\r\n", "\r"], "\n", $data);
+        $this->data = $this->normalizeString($data);
         $this->lineno = 1;
         $this->cursor = 0;
         $this->end = \strlen($this->data);
@@ -262,6 +262,25 @@ final class Dotenv
             $this->values = [];
             unset($this->path, $this->cursor, $this->lineno, $this->data, $this->end);
         }
+    }
+
+    private function normalizeString(string $data): string
+    {
+        /**
+         * Remove BOM charachters from first of the string
+         * The order of the if statements is important due to the varying lengths of BOM characters (4, 3, or 2 bytes).
+         * @see https://github.com/symfony/symfony/issues/58214
+         * @see https://en.wikipedia.org/wiki/Byte_order_mark
+         */
+        if (\substr($data, 0, 4) == "\x00\x00\xFE\xFF" || \substr($data, 0, 4) == "\xFF\xFE\x00\x00") { // UTF-32 (big-endian|little-endian)
+            $data = \substr($data, 4);
+        } elseif (\substr($data, 0, 3) == "\xEF\xBB\xBF") { // UTF-8
+            $data = \substr($data, 3);
+        } elseif (\substr($data, 0, 2) == "\xFE\xFF" || \substr($data, 0, 2) == "\xFF\xFE") { // UTF-16 (big-endian|little-endian)
+            $data = \substr($data, 2);
+        }
+
+        return str_replace(["\r\n", "\r"], "\n", $data);
     }
 
     private function lexVarname(): string

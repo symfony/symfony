@@ -180,6 +180,13 @@ class DotenvTest extends TestCase
             // underscores
             ['_FOO=BAR', ['_FOO' => 'BAR']],
             ['_FOO_BAR=FOOBAR', ['_FOO_BAR' => 'FOOBAR']],
+
+            // BOM charachters
+            ["\xEF\xBB\xBFFOO=BAR", ['FOO' => 'BAR']], // UTF-8
+            ["\xFE\xFFFOO=BAR", ['FOO' => 'BAR']], // UTF-16 (big-endian)
+            ["\xFF\xFEFOO=BAR", ['FOO' => 'BAR']], // UTF-16 (little-endian)
+            ["\x00\x00\xFE\xFFFOO=BAR", ['FOO' => 'BAR']], // UTF-32 (big-endian)
+            ["\xFF\xFE\x00\x00FOO=BAR", ['FOO' => 'BAR']], // UTF-32 (little-endian)
         ];
 
         if ('\\' !== \DIRECTORY_SEPARATOR) {

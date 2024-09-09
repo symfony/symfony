@@ -90,18 +90,18 @@ class RedisTraitTest extends TestCase
     public function testPconnectSelectsCorrectDatabase()
     {
         if (!class_exists(\Redis::class)) {
-            throw new SkippedTestSuiteError('The "Redis" class is required.');
+            self::markTestSkipped('The "Redis" class is required.');
         }
         if (!getenv('REDIS_HOST')) {
-            throw new SkippedTestSuiteError('REDIS_HOST env var is not defined.');
+            self::markTestSkipped('REDIS_HOST env var is not defined.');
         }
         if (!\ini_get('redis.pconnect.pooling_enabled')) {
-            throw new SkippedTestSuiteError('The bug only occurs when pooling is enabled.');
+            self::markTestSkipped('The bug only occurs when pooling is enabled.');
         }
 
         // Limit the connection pool size to 1:
         if (false === $prevPoolSize = ini_set('redis.pconnect.connection_limit', 1)) {
-            throw new SkippedTestSuiteError('Unable to set pool size');
+            self::markTestSkipped('Unable to set pool size');
         }
 
         try {

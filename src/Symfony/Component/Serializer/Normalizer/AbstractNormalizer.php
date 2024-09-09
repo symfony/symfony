@@ -59,6 +59,8 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
      */
     public const GROUPS = 'groups';
 
+    public const IGNORED_GROUPS = 'ignored_groups';
+
     /**
      * Limit (de)normalize to the specified names.
      *
@@ -229,6 +231,9 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
         $groupsHasBeenDefined = [] !== $groups;
         $groups = array_merge($groups, ['Default', (false !== $nsSep = strrpos($class, '\\')) ? substr($class, $nsSep + 1) : $class]);
 
+        $ignoredGroups = $this->getIgnoredGroups($context);
+        $ignoreGroupsHasBeenDefined = [] !== $ignoredGroups;
+
         $allowedAttributes = [];
         $ignoreUsed = false;
 
@@ -242,12 +247,13 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
                 !$ignore
                 && (!$groupsHasBeenDefined || array_intersect(array_merge($attributeMetadata->getGroups(), ['*']), $groups))
                 && $this->isAllowedAttribute($classOrObject, $name = $attributeMetadata->getName(), null, $context)
+                && 0 === \count(array_intersect($attributeMetadata->getGroups(), $ignoredGroups))
             ) {
                 $allowedAttributes[] = $attributesAsString ? $name : $attributeMetadata;
             }
         }
 
-        if (!$ignoreUsed && !$groupsHasBeenDefined && $allowExtraAttributes) {
+        if (!$ignoreUsed && !$groupsHasBeenDefined && !$ignoreGroupsHasBeenDefined && $allowExtraAttributes) {
             // Backward Compatibility with the code using this method written before the introduction of @Ignore
             return false;
         }
@@ -258,6 +264,13 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
     protected function getGroups(array $context): array
     {
         $groups = $context[self::GROUPS] ?? $this->defaultContext[self::GROUPS] ?? [];
+
+        return \is_scalar($groups) ? (array) $groups : $groups;
+    }
+
+    protected function getIgnoredGroups(array $context): array
+    {
+        $groups = $context[self::IGNORED_GROUPS] ?? $this->defaultContext[self::IGNORED_GROUPS] ?? [];
 
         return \is_scalar($groups) ? (array) $groups : $groups;
     }

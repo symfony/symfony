@@ -17,7 +17,7 @@ use Symfony\Component\Security\Core\Authorization\Voter\VoteInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 
 /**
- * Grants access if vote results greated than 0.
+ * Grants access if the sum of vote results is greater than 0.
  *
  * If all voters abstained from voting, the decision will be based on the
  * allowIfAllAbstainDecisions property value (defaults to false).

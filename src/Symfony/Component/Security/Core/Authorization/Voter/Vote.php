@@ -14,7 +14,7 @@ namespace Symfony\Component\Security\Core\Authorization\Voter;
 use Symfony\Component\Security\Core\Exception\InvalidArgumentException;
 
 /**
- * A Vote is returned by a Voter and contains the access (granted, abstain or denied).
+ * A Vote is returned by a Voter and contains the access result (granted, abstain or denied).
  * It can also contain one or multiple messages explaining the vote decision.
  *
  * @author Dany Maillard <danymaillard93b@gmail.com>

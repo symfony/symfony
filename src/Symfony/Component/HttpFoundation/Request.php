@@ -355,7 +355,11 @@ class Request
         $server['PATH_INFO'] = '';
         $server['REQUEST_METHOD'] = strtoupper($method);
 
-        $components = parse_url($uri);
+        if (false === ($components = parse_url($uri)) && '/' === ($uri[0] ?? '')) {
+            $components = parse_url($uri.'#');
+            unset($components['fragment']);
+        }
+
         if (isset($components['host'])) {
             $server['SERVER_NAME'] = $components['host'];
             $server['HTTP_HOST'] = $components['host'];

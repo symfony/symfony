@@ -65,6 +65,7 @@ class RequestPayloadValueResolver implements ValueResolverInterface, EventSubscr
         private readonly SerializerInterface&DenormalizerInterface $serializer,
         private readonly ?ValidatorInterface $validator = null,
         private readonly ?TranslatorInterface $translator = null,
+        private string $translationDomain = 'validators',
     ) {
     }
 
@@ -137,7 +138,7 @@ class RequestPayloadValueResolver implements ValueResolverInterface, EventSubscr
                         if ($error->canUseMessageForUser()) {
                             $parameters['hint'] = $error->getMessage();
                         }
-                        $message = $trans($template, $parameters, 'validators');
+                        $message = $trans($template, $parameters, $this->translationDomain);
                         $violations->add(new ConstraintViolation($message, $template, $parameters, null, $error->getPath(), null));
                     }
                     $payload = $e->getData();

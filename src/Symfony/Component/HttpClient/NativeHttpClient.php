@@ -416,7 +416,7 @@ final class NativeHttpClient implements HttpClientInterface, LoggerAwareInterfac
 
             [$host, $port] = self::parseHostPort($url, $info);
 
-            if (false !== (parse_url($location, \PHP_URL_HOST) ?? false)) {
+            if (false !== (parse_url($location.'#', \PHP_URL_HOST) ?? false)) {
                 // Authorization and Cookie headers MUST NOT follow except for the initial host name
                 $requestHeaders = $redirectHeaders['host'] === $host ? $redirectHeaders['with_auth'] : $redirectHeaders['no_auth'];
                 $requestHeaders[] = 'Host: '.$host.$port;

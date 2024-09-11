@@ -1,0 +1,32 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2024-09-06T12:24:59Z
+
+Hey!
+
+Thanks for your PR. You are targeting branch "7.1" but it seems your PR description refers to branch "5.4, 6.4, and 7.1 for bug fixes".
+Could you update the PR description or change target branch? This helps core maintainers a lot.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by stof at 2024-09-06T12:31:50Z
+
+It would be great to have a test covering that case to prevent regressions.
+
+---------------------------------------------------------------------------
+
+by M-arcus at 2024-09-06T12:48:30Z
+
+The change is inside a private function and is based on the configuration of the environment PHPUnit is executed in.
+
+I know some ways on how to create this test, but what would be the correct Symfony way to do this? Are there other similar tests I can adapt from?
+
+---------------------------------------------------------------------------
+
+by stof at 2024-09-06T12:59:04Z
+
+Well, maybe it involve a test running a separate PHP process (passing a specific php.ini so that it does not depend on the config of the host running PHPUnit) using a PHP script using that PhpSubprocess class. That's already the way other PhpSubprocess tests are written.

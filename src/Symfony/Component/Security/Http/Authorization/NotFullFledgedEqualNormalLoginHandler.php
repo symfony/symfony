@@ -29,15 +29,15 @@ use Symfony\Component\Security\Core\Exception\InsufficientAuthenticationExceptio
  */
 class NotFullFledgedEqualNormalLoginHandler implements NotFullFledgedHandlerInterface
 {
-    public function handle(ExceptionEvent $event, AccessDeniedException $exception, AuthenticationTrustResolverInterface $trustResolver, ?TokenInterface $token, ?LoggerInterface $logger, callable $starAuthenticationCallback): bool
+    public function handle(ExceptionEvent $event, AccessDeniedException $exception, AuthenticationTrustResolverInterface $trustResolver, ?TokenInterface $token, ?LoggerInterface $logger, callable $startAuthenticationCallback): bool
     {
         if (!$trustResolver->isAuthenticated($token)) {
-            $this->reauthenticate($starAuthenticationCallback, $event, $token, $exception, $logger);
+            $this->reauthenticate($startAuthenticationCallback, $event, $token, $exception, $logger);
         }
 
         foreach ($exception->getAttributes() as $attribute) {
             if (\in_array($attribute, [AuthenticatedVoter::IS_AUTHENTICATED_FULLY])) {
-                $this->reauthenticate($starAuthenticationCallback, $event, $token, $exception, $logger);
+                $this->reauthenticate($startAuthenticationCallback, $event, $token, $exception, $logger);
 
                 return true;
             }
@@ -46,7 +46,7 @@ class NotFullFledgedEqualNormalLoginHandler implements NotFullFledgedHandlerInte
         return false;
     }
 
-    private function reauthenticate(callable $starAuthenticationCallback, ExceptionEvent $event, ?TokenInterface $token, AccessDeniedException $exception, ?LoggerInterface $logger): void
+    private function reauthenticate(callable $startAuthenticationCallback, ExceptionEvent $event, ?TokenInterface $token, AccessDeniedException $exception, ?LoggerInterface $logger): void
     {
         $logger?->debug('Access denied, the user is not fully authenticated; redirecting to authentication entry point.', ['exception' => $exception]);
 
@@ -56,7 +56,7 @@ class NotFullFledgedEqualNormalLoginHandler implements NotFullFledgedHandlerInte
                 $insufficientAuthenticationException->setToken($token);
             }
 
-            $event->setResponse($starAuthenticationCallback($event->getRequest(), $insufficientAuthenticationException));
+            $event->setResponse($startAuthenticationCallback($event->getRequest(), $insufficientAuthenticationException));
         } catch (\Exception $e) {
             $event->setThrowable($e);
         }

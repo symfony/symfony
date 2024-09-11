@@ -27,7 +27,7 @@ use Symfony\Component\Security\Core\Exception\InsufficientAuthenticationExceptio
  */
 class NotFullFledgedRedirectToStartAuthenticationHandler implements NotFullFledgedHandlerInterface
 {
-    public function handle(ExceptionEvent $event, AccessDeniedException $exception, AuthenticationTrustResolverInterface $trustResolver, ?TokenInterface $token, ?LoggerInterface $logger, callable $starAuthenticationCallback): bool
+    public function handle(ExceptionEvent $event, AccessDeniedException $exception, AuthenticationTrustResolverInterface $trustResolver, ?TokenInterface $token, ?LoggerInterface $logger, callable $startAuthenticationCallback): bool
     {
         if (!$trustResolver->isFullFledged($token)) {
             $logger?->debug('Access denied, the user is not fully authenticated; redirecting to authentication entry point.', ['exception' => $exception]);
@@ -38,7 +38,7 @@ class NotFullFledgedRedirectToStartAuthenticationHandler implements NotFullFledg
                     $insufficientAuthenticationException->setToken($token);
                 }
 
-                $event->setResponse($starAuthenticationCallback($event->getRequest(), $insufficientAuthenticationException));
+                $event->setResponse($startAuthenticationCallback($event->getRequest(), $insufficientAuthenticationException));
             } catch (\Exception $e) {
                 $event->setThrowable($e);
             }

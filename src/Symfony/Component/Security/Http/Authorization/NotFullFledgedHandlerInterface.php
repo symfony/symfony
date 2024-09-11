@@ -30,9 +30,9 @@ interface NotFullFledgedHandlerInterface
      * This function can make checks and event / exception changes to change the Response
      * It returns a boolean for break or not after that or continue the ExceptionListener process to decorate Exception and their response.
      *
-     * @param $starAuthenticationCallback callable for call start function from
+     * @param $startAuthenticationCallback callable for call start function from
      *
      * @return bool break handleAccessDeniedException function in ExceptionListener after handle
      */
-    public function handle(ExceptionEvent $event, AccessDeniedException $exception, AuthenticationTrustResolverInterface $trustResolver, ?TokenInterface $token, ?LoggerInterface $logger, callable $starAuthenticationCallback): bool;
+    public function handle(ExceptionEvent $event, AccessDeniedException $exception, AuthenticationTrustResolverInterface $trustResolver, ?TokenInterface $token, ?LoggerInterface $logger, callable $startAuthenticationCallback): bool;
 }

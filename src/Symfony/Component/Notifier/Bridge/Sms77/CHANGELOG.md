@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+7.2
+---
+
+ * Deprecate the `Sms77Transport` class, use `SevenIoTransport`instead
+
 6.2
 ---
 

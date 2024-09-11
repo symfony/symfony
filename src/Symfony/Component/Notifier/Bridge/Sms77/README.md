@@ -3,6 +3,17 @@ sms77 Notifier
 
 The sms77 bridge is deprecated, use the Seven.io bridge instead.
 
+DSN example
+-----------
+
+```
+SMS77_DSN=sms77://API_KEY@default?from=FROM
+```
+
+where:
+ - `API_KEY` is your sms77 API key
+ - `FROM` is your sender (optional, default: SMS)
+
 Resources
 ---------
 

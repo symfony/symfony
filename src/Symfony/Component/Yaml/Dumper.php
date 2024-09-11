@@ -46,6 +46,10 @@ class Dumper
      */
     public function dump(mixed $input, int $inline = 0, int $indent = 0, int $flags = 0): string
     {
+        if ($flags & Yaml::DUMP_NULL_AS_TILDE && $flags & Yaml::DUMP_NULL_AS_EMPTY) {
+            throw new \InvalidArgumentException('The Yaml::DUMP_NULL_AS_TILDE and Yaml::DUMP_NULL_AS_EMPTY flags cannot be used together.');
+        }
+
         $output = '';
         $prefix = $indent ? str_repeat(' ', $indent) : '';
         $dumpObjectAsInlineMap = true;

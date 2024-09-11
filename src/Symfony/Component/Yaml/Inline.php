@@ -259,6 +259,10 @@ class Inline
             return '~';
         }
 
+        if (Yaml::DUMP_NULL_AS_EMPTY & $flags) {
+            return '';
+        }
+
         return 'null';
     }
 

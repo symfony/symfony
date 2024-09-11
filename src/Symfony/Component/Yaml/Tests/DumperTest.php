@@ -853,6 +853,11 @@ YAML;
         $this->assertSame('{ foo: ~ }', $this->dumper->dump(['foo' => null], 0, 0, Yaml::DUMP_NULL_AS_TILDE));
     }
 
+    public function testDumpNullAsEmpty()
+    {
+        $this->assertSame('{ foo:  }', $this->dumper->dump(['foo' => null], 0, 0, Yaml::DUMP_NULL_AS_EMPTY));
+    }
+
     /**
      * @dataProvider getNumericKeyData
      */
@@ -1011,6 +1016,14 @@ YAML;
             var_export($expected, true),
             var_export($actual, true)
         );
+    }
+
+    public function testUseDumpAsTildeAndDumpAsEmptyFlagsTogether()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('The Yaml::DUMP_NULL_AS_TILDE and Yaml::DUMP_NULL_AS_EMPTY flags cannot be used together.');
+
+        $this->dumper->dump(['foo' => null], 0, 0, Yaml::DUMP_NULL_AS_TILDE | Yaml::DUMP_NULL_AS_EMPTY);
     }
 }
 

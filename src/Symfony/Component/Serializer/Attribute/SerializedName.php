@@ -22,8 +22,8 @@ class SerializedName
     private array $groups;
 
     /**
-     * @param string $serializedName The name of the property as it will be serialized
-     * @param string|string[] $groups The groups to use when serializing or deserializing
+     * @param string          $serializedName The name of the property as it will be serialized
+     * @param string|string[] $groups         The groups to use when serializing or deserializing
      */
     public function __construct(private readonly string $serializedName, string|array $groups = [])
     {

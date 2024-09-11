@@ -26,8 +26,8 @@ class SerializedPath
     private array $groups;
 
     /**
-     * @param string $serializedPath A path using a valid PropertyAccess syntax where the value is stored in a normalized representation
-     * @param string|string[] $groups The groups to use when serializing or deserializing
+     * @param string          $serializedPath A path using a valid PropertyAccess syntax where the value is stored in a normalized representation
+     * @param string|string[] $groups         The groups to use when serializing or deserializing
      */
     public function __construct(string $serializedPath, string|array $groups = [])
     {

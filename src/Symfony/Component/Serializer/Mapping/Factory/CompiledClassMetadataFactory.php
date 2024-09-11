@@ -35,7 +35,7 @@ final class CompiledClassMetadataFactory implements ClassMetadataFactoryInterfac
 
         $compiledClassMetadata = require $compiledClassMetadataFile;
         if (!\is_array($compiledClassMetadata)) {
-            throw new \RuntimeException(\sprintf('Compiled metadata must be of the type array, %s given.', \gettype($compiledClassMetadata)));
+            throw new \RuntimeException(\sprintf('Compiled metadata must be of the type array, "%s" given.', \gettype($compiledClassMetadata)));
         }
 
         $this->compiledClassMetadata = $compiledClassMetadata;
@@ -55,8 +55,8 @@ final class CompiledClassMetadataFactory implements ClassMetadataFactoryInterfac
                 $classMetadata->attributesMetadata[$name] = $attributeMetadata = new AttributeMetadata($name);
                 [$attributeMetadata->groups, $attributeMetadata->maxDepth, $serializedNames] = $compiledAttributesMetadata;
                 $attributeMetadata->serializedNames = match (true) {
-                    is_array($serializedNames) => $serializedNames,
-                    is_null($serializedNames) => [],
+                    \is_array($serializedNames) => $serializedNames,
+                    null === $serializedNames => [],
                     default => ['*' => $serializedNames],
                 };
             }

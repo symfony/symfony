@@ -106,7 +106,7 @@ class PhpSubprocess extends Process
                 throw new RuntimeException('Unable to read ini: '.$file);
             }
             // Check and remove directives after HOST and PATH sections
-            if (preg_match('/^\s*\[(?:PATH|HOST)\s*=/mi', $data, $matches)) {
+            if (preg_match('/^\s*\[(?:PATH|HOST)\s*=/mi', $data, $matches, \PREG_OFFSET_CAPTURE)) {
                 $data = substr($data, 0, $matches[0][1]);
             }
 

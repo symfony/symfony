@@ -244,6 +244,9 @@ class RequestTest extends TestCase
         // Fragment should not be included in the URI
         $request = Request::create('http://test.com/foo#bar');
         $this->assertEquals('http://test.com/foo', $request->getUri());
+
+        $request = Request::create('/foo:123');
+        $this->assertEquals('http://localhost/foo:123', $request->getUri());
     }
 
     public function testCreateWithRequestUri()

@@ -18,6 +18,7 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Tester\CommandCompletionTester;
 use Symfony\Component\Console\Tester\CommandTester;
+use Twig\DeprecatedCallableInfo;
 use Twig\Environment;
 use Twig\Loader\FilesystemLoader;
 use Twig\TwigFilter;
@@ -163,9 +164,14 @@ class LintCommandTest extends TestCase
     private function createCommand(): Command
     {
         $environment = new Environment(new FilesystemLoader(\dirname(__DIR__).'/Fixtures/templates/'));
+        if (class_exists(DeprecatedCallableInfo::class)) {
+            $options = ['deprecation_info' => new DeprecatedCallableInfo('foo/bar', '1.1')];
+        } else {
+            $options = ['deprecated' => true];
+        }
         $environment->addFilter(new TwigFilter('deprecated_filter', function ($v) {
             return $v;
-        }, ['deprecated' => true]));
+        }, $options));
 
         $command = new LintCommand($environment);
 

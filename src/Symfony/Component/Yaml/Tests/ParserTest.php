@@ -52,6 +52,33 @@ class ParserTest extends TestCase
         $this->assertSameData($expected, $data);
     }
 
+    public function testEmptyValueInExpandedMappingIsSupported()
+    {
+        $yml = <<<'YAML'
+foo:
+    bar:
+    baz: qux
+YAML;
+
+        $data = $this->parser->parse($yml);
+        $expected = ['foo' => ['bar' => null, 'baz' => 'qux']];
+        $this->assertSameData($expected, $data);
+    }
+
+    public function testEmptyValueInExpandedSequenceIsSupported()
+    {
+        $yml = <<<'YAML'
+foo:
+    - bar
+    -
+    - baz
+YAML;
+
+        $data = $this->parser->parse($yml);
+        $expected = ['foo' => ['bar', null, 'baz']];
+        $this->assertSameData($expected, $data);
+    }
+
     public function testTaggedValueTopLevelNumber()
     {
         $yml = '!number 5';

@@ -103,6 +103,26 @@ class YamlFileLoader extends FileLoader
                     $attributeMetadata->setIgnore($data['ignore']);
                 }
 
+                foreach ($data['mappings'] ?? [] as $line) {
+                    $groups = $line['groups'] ?? [];
+
+                    if ($serializedName = $line['serialized_name'] ?? false) {
+                        if (!\is_string($serializedName) || '' === $serializedName) {
+                            throw new MappingException(\sprintf('The "serialized_name" value must be a non-empty string in "%s" for the attribute "%s" of the class "%s".', $this->file, $attribute, $classMetadata->getName()));
+                        }
+
+                        $attributeMetadata->setSerializedName($serializedName, $groups);
+                    }
+
+                    if ($serializedPath = $line['serialized_path'] ?? false) {
+                        try {
+                            $attributeMetadata->setSerializedPath(new PropertyPath((string) $serializedPath), $groups);
+                        } catch (InvalidPropertyPathException) {
+                            throw new MappingException(\sprintf('The "serialized_path" value must be a valid property path in "%s" for the attribute "%s" of the class "%s".', $this->file, $attribute, $classMetadata->getName()));
+                        }
+                    }
+                }
+
                 foreach ($data['contexts'] ?? [] as $line) {
                     $groups = $line['groups'] ?? [];
 

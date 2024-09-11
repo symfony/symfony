@@ -28,6 +28,14 @@ class SerializedNameTest extends TestCase
         new SerializedName('');
     }
 
+    public function testInvalidGroupOption()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage(\sprintf('Parameter "groups" given to "%s" must be a string or an array of strings, "stdClass" given', SerializedName::class));
+
+        new SerializedName('foo', ['fine', new \stdClass()]);
+    }
+
     public function testSerializedNameParameters()
     {
         $foo = new SerializedName('foo');

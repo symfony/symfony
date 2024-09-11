@@ -8,6 +8,7 @@ CHANGELOG
  * Deprecate `CsvEncoderContextBuilder::withEscapeChar()` method
  * Add `SnakeCaseToCamelCaseNameConverter`
  * Support subclasses of `\DateTime` and `\DateTimeImmutable` for denormalization
+ * Support serialized names and paths configuration per group
 
 7.1
 ---

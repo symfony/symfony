@@ -78,6 +78,22 @@ class XmlFileLoader extends FileLoader
                     $attributeMetadata->setIgnore(XmlUtils::phpize($attribute['ignore']));
                 }
 
+                foreach ($attribute->serialized as $mapping) {
+                    $groups = (array) $mapping->group;
+
+                    if (isset($mapping['name'])) {
+                        $attributeMetadata->setSerializedName((string) $mapping['name'], $groups);
+                    }
+
+                    if (isset($mapping['path'])) {
+                        try {
+                            $attributeMetadata->setSerializedPath(new PropertyPath((string) $mapping['path']), $groups);
+                        } catch (InvalidPropertyPathException) {
+                            throw new MappingException(\sprintf('The "path" value must be a valid property path for the attribute "%s" of the class "%s".', $attributeName, $classMetadata->getName()));
+                        }
+                    }
+                }
+
                 foreach ($attribute->context as $node) {
                     $groups = (array) $node->group;
                     $context = $this->parseContext($node->entry);

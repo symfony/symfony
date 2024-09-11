@@ -17,6 +17,8 @@ class SerializedPathInConstructorDummy
 {
     public function __construct(
         #[SerializedPath('[one][two]')] public $three,
+        #[SerializedPath('[five][six]'), SerializedPath('[six][five]', 'a')]
+        public $eleven,
     ) {
     }
 }

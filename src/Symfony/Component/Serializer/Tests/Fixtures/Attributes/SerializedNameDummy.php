@@ -25,6 +25,9 @@ class SerializedNameDummy
 
     public $quux;
 
+    #[SerializedName('duxi'), SerializedName('duxa', 'a')]
+    public $duux;
+
     /**
      * @var self
      */

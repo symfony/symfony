@@ -23,6 +23,9 @@ class SerializedPathDummy
 
     public $seven;
 
+    #[SerializedPath('[five][six]'), SerializedPath('[six][five]', 'a')]
+    public $eleven;
+
     #[SerializedPath('[three][four]')]
     public function getSeven()
     {

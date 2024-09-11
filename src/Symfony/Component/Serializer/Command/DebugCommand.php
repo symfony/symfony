@@ -101,8 +101,12 @@ class DebugCommand extends Command
             $data[$attributeMetadata->getName()] = [
                 'groups' => $attributeMetadata->getGroups(),
                 'maxDepth' => $attributeMetadata->getMaxDepth(),
-                'serializedName' => $attributeMetadata->getSerializedName(),
-                'serializedPath' => $attributeMetadata->getSerializedPath() ? (string) $attributeMetadata->getSerializedPath() : null,
+                'serializedNames' => method_exists($attributeMetadata, 'getSerializedNames')
+                    ? $attributeMetadata->getSerializedNames()
+                    : array_filter(['*' => $attributeMetadata->getSerializedName()]),
+                'serializedPaths' => method_exists($attributeMetadata, 'getSerializedPaths')
+                    ? array_map('strval', $attributeMetadata->getSerializedPaths())
+                    : array_filter(['*' => (string) $attributeMetadata->getSerializedPath()]),
                 'ignore' => $attributeMetadata->isIgnored(),
                 'normalizationContexts' => $attributeMetadata->getNormalizationContexts(),
                 'denormalizationContexts' => $attributeMetadata->getDenormalizationContexts(),

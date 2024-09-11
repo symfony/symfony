@@ -100,9 +100,9 @@ class AttributeLoader implements LoaderInterface
                     } elseif ($annotation instanceof MaxDepth) {
                         $attributesMetadata[$property->name]->setMaxDepth($annotation->getMaxDepth());
                     } elseif ($annotation instanceof SerializedName) {
-                        $attributesMetadata[$property->name]->setSerializedName($annotation->getSerializedName());
+                        $this->setAttributeSerializedNameForGroups($annotation, $attributesMetadata[$property->name]);
                     } elseif ($annotation instanceof SerializedPath) {
-                        $attributesMetadata[$property->name]->setSerializedPath($annotation->getSerializedPath());
+                        $this->setAttributeSerializedPathForGroups($annotation, $attributesMetadata[$property->name]);
                     } elseif ($annotation instanceof Ignore) {
                         $attributesMetadata[$property->name]->setIgnore(true);
                     } elseif ($annotation instanceof Context) {
@@ -155,13 +155,13 @@ class AttributeLoader implements LoaderInterface
                         throw new MappingException(\sprintf('SerializedName on "%s::%s()" cannot be added. SerializedName can only be added on methods beginning with "get", "is", "has" or "set".', $className, $method->name));
                     }
 
-                    $attributeMetadata->setSerializedName($annotation->getSerializedName());
+                    $this->setAttributeSerializedNameForGroups($annotation, $attributeMetadata);
                 } elseif ($annotation instanceof SerializedPath) {
                     if (!$accessorOrMutator) {
                         throw new MappingException(\sprintf('SerializedPath on "%s::%s()" cannot be added. SerializedPath can only be added on methods beginning with "get", "is", "has" or "set".', $className, $method->name));
                     }
 
-                    $attributeMetadata->setSerializedPath($annotation->getSerializedPath());
+                    $this->setAttributeSerializedPathForGroups($annotation, $attributeMetadata);
                 } elseif ($annotation instanceof Ignore) {
                     if ($accessorOrMutator) {
                         $attributeMetadata->setIgnore(true);
@@ -202,6 +202,16 @@ class AttributeLoader implements LoaderInterface
                 }
             }
         }
+    }
+
+    private function setAttributeSerializedNameForGroups(SerializedName $annotation, AttributeMetadataInterface $attributeMetadata): void
+    {
+        $attributeMetadata->setSerializedName($annotation->getSerializedName(), $annotation->getGroups());
+    }
+
+    private function setAttributeSerializedPathForGroups(SerializedPath $annotation, AttributeMetadataInterface $attributeMetadata): void
+    {
+        $attributeMetadata->setSerializedPath($annotation->getSerializedPath(), $annotation->getGroups());
     }
 
     private function setAttributeContextsForGroups(Context $annotation, AttributeMetadataInterface $attributeMetadata): void

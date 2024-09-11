@@ -40,18 +40,22 @@ class AttributeMetadata implements AttributeMetadataInterface
     public ?int $maxDepth = null;
 
     /**
+     * @var string[] Serialized names per group name ("*" applies to all groups)
+     *
      * @internal This property is public in order to reduce the size of the
      *           class' serialized representation. Do not access it. Use
-     *           {@link getSerializedName()} instead.
+     *           {@link getSerializedNames()} instead.
      */
-    public ?string $serializedName = null;
+    public array $serializedNames = [];
 
     /**
+     * @var PropertyPath[] Serialized paths per group name ("*" applies to all groups)
+     *
      * @internal This property is public in order to reduce the size of the
      *           class' serialized representation. Do not access it. Use
-     *           {@link getSerializedPath()} instead.
+     *           {@link getSerializedPaths()} instead.
      */
-    public ?PropertyPath $serializedPath = null;
+    public array $serializedPaths = [];
 
     /**
      * @internal This property is public in order to reduce the size of the
@@ -110,24 +114,66 @@ class AttributeMetadata implements AttributeMetadataInterface
         return $this->maxDepth;
     }
 
-    public function setSerializedName(?string $serializedName): void
+    public function setSerializedName(?string $serializedName, /* array $groups = [] */): void
     {
-        $this->serializedName = $serializedName;
+        $groups = 2 <= \func_num_args() ? \func_get_arg(1) : [];
+
+        if (!$groups) {
+            $this->serializedNames['*'] = $serializedName;
+        }
+
+        foreach ($groups as $group) {
+            $this->serializedNames[$group] = $serializedName;
+        }
     }
 
-    public function getSerializedName(): ?string
+    public function getSerializedName(/* array $groups = [] */): ?string
     {
-        return $this->serializedName;
+        $groups = 1 <= \func_num_args() ? \func_get_arg(0) : [];
+
+        foreach ($groups as $group) {
+            if (isset($this->serializedNames[$group])) {
+                return $this->serializedNames[$group];
+            }
+        }
+
+        return $this->serializedNames['*'] ?? null;
     }
 
-    public function setSerializedPath(?PropertyPath $serializedPath = null): void
+    public function getSerializedNames(): array
     {
-        $this->serializedPath = $serializedPath;
+        return $this->serializedNames;
     }
 
-    public function getSerializedPath(): ?PropertyPath
+    public function setSerializedPath(?PropertyPath $serializedPath = null, /* array $groups = [] */): void
     {
-        return $this->serializedPath;
+        $groups = 2 <= \func_num_args() ? \func_get_arg(1) : [];
+
+        if (!$groups) {
+            $this->serializedPaths['*'] = $serializedPath;
+        }
+
+        foreach ($groups as $group) {
+            $this->serializedPaths[$group] = $serializedPath;
+        }
+    }
+
+    public function getSerializedPath(/* array $groups = [] */): ?PropertyPath
+    {
+        $groups = 1 <= \func_num_args() ? \func_get_arg(0) : [];
+
+        foreach ($groups as $group) {
+            if (isset($this->serializedPaths[$group])) {
+                return $this->serializedPaths[$group];
+            }
+        }
+
+        return $this->serializedPaths['*'] ?? null;
+    }
+
+    public function getSerializedPaths(): array
+    {
+        return $this->serializedPaths;
     }
 
     public function setIgnore(bool $ignore): void
@@ -200,8 +246,16 @@ class AttributeMetadata implements AttributeMetadataInterface
 
         // Overwrite only if not defined
         $this->maxDepth ??= $attributeMetadata->getMaxDepth();
-        $this->serializedName ??= $attributeMetadata->getSerializedName();
-        $this->serializedPath ??= $attributeMetadata->getSerializedPath();
+
+        // Overwrite only if both serialized names and paths are empty
+        if (!$this->serializedNames && !$this->serializedPaths) {
+            $this->serializedNames = method_exists($attributeMetadata, 'getSerializedNames')
+                ? $attributeMetadata->getSerializedNames()
+                : array_filter(['*' => $attributeMetadata->getSerializedName()]);
+            $this->serializedPaths = method_exists($attributeMetadata, 'getSerializedPaths')
+                ? $attributeMetadata->getSerializedPaths()
+                : array_filter(['*' => $attributeMetadata->getSerializedPaths()]);
+        }
 
         // Overwrite only if both contexts are empty
         if (!$this->normalizationContexts && !$this->denormalizationContexts) {
@@ -221,6 +275,6 @@ class AttributeMetadata implements AttributeMetadataInterface
      */
     public function __sleep(): array
     {
-        return ['name', 'groups', 'maxDepth', 'serializedName', 'serializedPath', 'ignore', 'normalizationContexts', 'denormalizationContexts'];
+        return ['name', 'groups', 'maxDepth', 'serializedNames', 'serializedPaths', 'ignore', 'normalizationContexts', 'denormalizationContexts'];
     }
 }

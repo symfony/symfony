@@ -21,6 +21,9 @@ use Symfony\Component\PropertyAccess\PropertyPath;
  * @internal
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
+ *
+ * @method string[] getSerializedNames() Gets all the serialized names per group ("*" being the base name applied to all groups).
+ * @method PropertyPath[] getSerializedPaths() Gets all the serialized paths per group ("*" being the base path applied to all groups).
  */
 interface AttributeMetadataInterface
 {
@@ -53,17 +56,31 @@ interface AttributeMetadataInterface
 
     /**
      * Sets the serialization name for this attribute.
+     *
+     * @param string[] $groups
      */
-    public function setSerializedName(?string $serializedName): void;
+    public function setSerializedName(?string $serializedName, /* array $groups = [] */): void;
 
     /**
      * Gets the serialization name for this attribute.
+     *
+     * @param string[] $groups
      */
-    public function getSerializedName(): ?string;
+    public function getSerializedName(/* array $groups = [] */): ?string;
 
-    public function setSerializedPath(?PropertyPath $serializedPath): void;
+    /**
+     * Sets the serialization path for this attribute.
+     *
+     * @param string[] $groups
+     */
+    public function setSerializedPath(?PropertyPath $serializedPath, /* array $groups = [] */): void;
 
-    public function getSerializedPath(): ?PropertyPath;
+    /**
+     * Gets the serialization path for this attribute.
+     *
+     * @param string[] $groups
+     */
+    public function getSerializedPath(/* array $groups = [] */): ?PropertyPath;
 
     /**
      * Sets if this attribute must be ignored or not.

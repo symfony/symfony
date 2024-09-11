@@ -14,7 +14,7 @@ namespace Symfony\Component\Serializer\Annotation;
 class_exists(\Symfony\Component\Serializer\Attribute\SerializedPath::class);
 
 if (false) {
-    #[\Attribute(\Attribute::TARGET_METHOD | \Attribute::TARGET_PROPERTY)]
+    #[\Attribute(\Attribute::TARGET_METHOD | \Attribute::TARGET_PROPERTY | \Attribute::IS_REPEATABLE)]
     class SerializedPath extends \Symfony\Component\Serializer\Attribute\SerializedPath
     {
     }

@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-09-03T08:27:57Z
+
+On Windows, they will throw an exception, isn't it? I'd rather keep these as is if yes. Maybe they can be supported in the future.
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2024-09-03T09:35:34Z
+
+Alright. I propose to still add the comment with the link to PHP doc. I think it is always nice for the DX to have this kind of info next to the method.

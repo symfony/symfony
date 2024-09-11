@@ -78,6 +78,8 @@ abstract class AbstractUid implements \JsonSerializable
     }
 
     /**
+     * @param string $uid A valid RFC 9562/4122 uid
+     *
      * @return static
      *
      * @throws \InvalidArgumentException When the passed value is not valid
@@ -124,7 +126,7 @@ abstract class AbstractUid implements \JsonSerializable
     }
 
     /**
-     * Returns the identifier as a RFC4122 case insensitive string.
+     * Returns the identifier as a RFC 9562/4122 case insensitive string.
      */
     public function toRfc4122(): string
     {

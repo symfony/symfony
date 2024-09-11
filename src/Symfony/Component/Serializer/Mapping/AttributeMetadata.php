@@ -40,7 +40,7 @@ class AttributeMetadata implements AttributeMetadataInterface
     public ?int $maxDepth = null;
 
     /**
-     * @var string[] Serialized names per group name ("*" applies to all groups)
+     * @var array<string, string|null> Serialized names per group name ("*" applies to all groups)
      *
      * @internal This property is public in order to reduce the size of the
      *           class' serialized representation. Do not access it. Use
@@ -49,7 +49,7 @@ class AttributeMetadata implements AttributeMetadataInterface
     public array $serializedNames = [];
 
     /**
-     * @var PropertyPath[] Serialized paths per group name ("*" applies to all groups)
+     * @var array<string, PropertyPath|null> Serialized paths per group name ("*" applies to all groups)
      *
      * @internal This property is public in order to reduce the size of the
      *           class' serialized representation. Do not access it. Use
@@ -254,7 +254,7 @@ class AttributeMetadata implements AttributeMetadataInterface
                 : array_filter(['*' => $attributeMetadata->getSerializedName()]);
             $this->serializedPaths = method_exists($attributeMetadata, 'getSerializedPaths')
                 ? $attributeMetadata->getSerializedPaths()
-                : array_filter(['*' => $attributeMetadata->getSerializedPaths()]);
+                : array_filter(['*' => $attributeMetadata->getSerializedPath()]);
         }
 
         // Overwrite only if both contexts are empty

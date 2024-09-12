@@ -299,7 +299,6 @@ class Container implements ContainerInterface, ResetInterface
     public function reset()
     {
         $services = $this->services + $this->privates;
-        $this->services = $this->factories = $this->privates = [];
 
         foreach ($services as $service) {
             try {
@@ -310,6 +309,8 @@ class Container implements ContainerInterface, ResetInterface
                 continue;
             }
         }
+
+        $this->services = $this->factories = $this->privates = [];
     }
 
     /**

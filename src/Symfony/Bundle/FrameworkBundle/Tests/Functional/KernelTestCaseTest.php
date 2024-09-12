@@ -15,6 +15,7 @@ use Symfony\Bundle\FrameworkBundle\Test\TestContainer;
 use Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\TestServiceContainer\NonPublicService;
 use Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\TestServiceContainer\PrivateService;
 use Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\TestServiceContainer\PublicService;
+use Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\TestServiceContainer\ResettableService;
 use Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\TestServiceContainer\UnusedPrivateService;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -40,5 +41,15 @@ class KernelTestCaseTest extends AbstractWebTestCase
         $this->assertTrue($container->has(PrivateService::class));
         $this->assertTrue($container->has('private_service'));
         $this->assertFalse($container->has(UnusedPrivateService::class));
+    }
+
+    public function testServicesAreResetOnEnsureKernelShutdown()
+    {
+        static::bootKernel(['test_case' => 'TestServiceContainer']);
+
+        $resettableService = static::getContainer()->get(ResettableService::class);
+
+        self::ensureKernelShutdown();
+        self::assertSame(1, $resettableService->getCount());
     }
 }

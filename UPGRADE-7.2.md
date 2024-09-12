@@ -29,6 +29,11 @@ FrameworkBundle
 
  * [BC BREAK] The `secrets:decrypt-to-local` command terminates with a non-zero exit code when a secret could not be read
 
+HttpFoundation
+--------------
+
+ * Deprecate passing `referer_check`, `use_only_cookies`, `use_trans_sid`, `trans_sid_hosts` and `trans_sid_tags` options to `NativeSessionStorage`
+
 Ldap
 ----
 

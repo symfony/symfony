@@ -250,6 +250,34 @@
                     </p>
                 </label>
             </div>
+
+            <h4>Follow Browser</h4>
+
+            <div class="settings-group">
+                <label for="settings-follow-nothing">
+                    <input class="config-option" type="radio" name="follow" value="nothing" id="settings-follow-nothing">
+                    <p>
+                        {{ source('@WebProfiler/Icon/settings-follow-nothing.svg') }}
+                        <span>Don't follow</span>
+                    </p>
+                </label>
+
+                <label for="settings-follow-main">
+                    <input class="config-option" type="radio" name="follow" value="main" id="settings-follow-main">
+                    <p>
+                        {{ source('@WebProfiler/Icon/settings-follow-main.svg') }}
+                        <span>Follow main pages</span>
+                    </p>
+                </label>
+
+                <label for="settings-follow-all">
+                    <input class="config-option" type="radio" name="follow" value="all" id="settings-follow-all">
+                    <p>
+                        {{ source('@WebProfiler/Icon/settings-follow-all.svg') }}
+                        <span>Follow main pages and ajax</span>
+                    </p>
+                </label>
+            </div>
         </div>
     </div>
 </div>
@@ -295,6 +323,7 @@
     openModalButton.addEventListener('click', function(event) {
         document.getElementById('settings-' + (localStorage.getItem('symfony/profiler/theme') || 'theme-auto')).checked = 'checked';
         document.getElementById('settings-' + (localStorage.getItem('symfony/profiler/width') || 'width-normal')).checked = 'checked';
+        document.getElementById('settings-' + (localStorage.getItem('symfony/profiler/follow') || 'follow-main')).checked = 'checked';
 
         modalWindow.classList.toggle('visible');
         setTimeout(() => closeModalButton.focus(), 30);

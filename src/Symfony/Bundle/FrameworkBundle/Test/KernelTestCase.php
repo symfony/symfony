@@ -160,6 +160,11 @@ abstract class KernelTestCase extends TestCase
             static::$kernel->shutdown();
             static::$booted = false;
 
+            if ($container->has('services_resetter')) {
+                // Instantiate the service because Container::reset() only resets services that have been used
+                $container->get('services_resetter');
+            }
+
             if ($container instanceof ResetInterface) {
                 $container->reset();
             }

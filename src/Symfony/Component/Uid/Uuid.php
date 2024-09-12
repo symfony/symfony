@@ -27,6 +27,7 @@ class Uuid extends AbstractUid
     public const FORMAT_BASE_32 = 1 << 1;
     public const FORMAT_BASE_58 = 1 << 2;
     public const FORMAT_RFC_4122 = 1 << 3;
+    public const FORMAT_RFC_9562 = self::FORMAT_RFC_4122;
     public const FORMAT_ALL = -1;
 
     protected const TYPE = 0;
@@ -50,7 +51,7 @@ class Uuid extends AbstractUid
 
     public static function fromString(string $uuid): static
     {
-        $uuid = self::transformToRfc4122($uuid, self::FORMAT_ALL);
+        $uuid = self::transformToRfc9562($uuid, self::FORMAT_ALL);
 
         if (__CLASS__ !== static::class || 36 !== \strlen($uuid)) {
             return new static($uuid);
@@ -124,15 +125,15 @@ class Uuid extends AbstractUid
     /**
      * @param int-mask-of<Uuid::FORMAT_*> $format
      */
-    public static function isValid(string $uuid /* , int $format = self::FORMAT_RFC_4122 */): bool
+    public static function isValid(string $uuid /* , int $format = self::FORMAT_RFC_9562 */): bool
     {
-        $format = 1 < \func_num_args() ? func_get_arg(1) : self::FORMAT_RFC_4122;
+        $format = 1 < \func_num_args() ? func_get_arg(1) : self::FORMAT_RFC_9562;
 
-        if (36 === \strlen($uuid) && !($format & self::FORMAT_RFC_4122)) {
+        if (36 === \strlen($uuid) && !($format & self::FORMAT_RFC_9562)) {
             return false;
         }
 
-        if (false === $uuid = self::transformToRfc4122($uuid, $format)) {
+        if (false === $uuid = self::transformToRfc9562($uuid, $format)) {
             return false;
         }
 
@@ -188,13 +189,13 @@ class Uuid extends AbstractUid
     }
 
     /**
-     * Transforms a binary string, a base-32 string or a base-58 string to a RFC4122 string.
+     * Transforms a binary string, a base-32 string or a base-58 string to a RFC9562 string.
      *
      * @param int-mask-of<Uuid::FORMAT_*> $format
      *
-     * @return string|false The RFC4122 string or false if the format doesn't match the input
+     * @return string|false The RFC9562 string or false if the format doesn't match the input
      */
-    private static function transformToRfc4122(string $uuid, int $format): string|false
+    private static function transformToRfc9562(string $uuid, int $format): string|false
     {
         $inputUuid = $uuid;
         $fromBase58 = false;
@@ -217,7 +218,7 @@ class Uuid extends AbstractUid
             $uuid = $ulid->toRfc4122();
         }
 
-        if ($inputUuid === $uuid && !($format & self::FORMAT_RFC_4122)) {
+        if ($inputUuid === $uuid && !($format & self::FORMAT_RFC_9562)) {
             // input format doesn't match the input string
             return false;
         }

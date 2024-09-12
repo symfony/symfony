@@ -237,6 +237,11 @@ class UuidTest extends TestCase
         $this->assertFalse(Uuid::isValid($uuid->toBinary(), Uuid::FORMAT_RFC_4122));
         $this->assertTrue(Uuid::isValid($uuid->toRfc4122(), Uuid::FORMAT_RFC_4122));
 
+        $this->assertFalse(Uuid::isValid($uuid->toBase32(), Uuid::FORMAT_RFC_9562));
+        $this->assertFalse(Uuid::isValid($uuid->toBase58(), Uuid::FORMAT_RFC_9562));
+        $this->assertFalse(Uuid::isValid($uuid->toBinary(), Uuid::FORMAT_RFC_9562));
+        $this->assertTrue(Uuid::isValid($uuid->toRfc4122(), Uuid::FORMAT_RFC_9562));
+
         $this->assertTrue(Uuid::isValid($uuid->toBase32(), Uuid::FORMAT_ALL));
         $this->assertTrue(Uuid::isValid($uuid->toBase58(), Uuid::FORMAT_ALL));
         $this->assertTrue(Uuid::isValid($uuid->toBinary(), Uuid::FORMAT_ALL));

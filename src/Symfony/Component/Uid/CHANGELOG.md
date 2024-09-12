@@ -6,6 +6,7 @@ CHANGELOG
 
  * Make `AbstractUid` implement `Ds\Hashable` if available
  * Add support for binary, base-32 and base-58 representations in `Uuid::isValid()`
+ * Add the `Uuid::FORMAT_RFC_9562` constant to validate UUIDs in the RFC 9562 format
 
 7.1
 ---

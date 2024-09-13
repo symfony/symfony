@@ -84,6 +84,15 @@ TwigBridge
 
  * Deprecate passing a tag to the constructor of `FormThemeNode`
 
+Webhook
+-------
+
+ * [BC BREAK] `RequestParserInterface::parse()` return type changed from
+   `?RemoteEvent` to `RemoteEvent|array<RemoteEvent>|null`. Classes already
+   implementing this interface are unaffected but consumers of this method
+   will need to be updated to handle the new return type. Projects relying on
+   the `WebhookController` of the component are not affected by the BC break
+
 Yaml
 ----
 

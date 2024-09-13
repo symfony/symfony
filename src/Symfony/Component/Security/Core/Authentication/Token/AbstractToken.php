@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Security\Core\Authentication\Token;
 
-use Lcobucci\JWT\Token\Plain;
 use Symfony\Component\Security\Core\User\InMemoryUser;
 use Symfony\Component\Security\Core\User\PlaintextCredentialUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;

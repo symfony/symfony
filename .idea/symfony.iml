@@ -1,0 +1,285 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module type="WEB_MODULE" version="4">
+  <component name="NewModuleRootManager">
+    <content url="file://$MODULE_DIR$">
+      <sourceFolder url="file://$MODULE_DIR$/src/Symfony/Bridge/Doctrine" isTestSource="false" packagePrefix="Symfony\Bridge\Doctrine\" />
+      <sourceFolder url="file://$MODULE_DIR$/src/Symfony/Bridge/Doctrine/" isTestSource="false" packagePrefix="Symfony\Bridge\Doctrine\" />
+      <sourceFolder url="file://$MODULE_DIR$/src/Symfony/Bridge/Monolog" isTestSource="false" packagePrefix="Symfony\Bridge\Monolog\" />
+      <sourceFolder url="file://$MODULE_DIR$/src/Symfony/Bridge/Monolog/" isTestSource="false" packagePrefix="Symfony\Bridge\Monolog\" />
+      <sourceFolder url="file://$MODULE_DIR$/src/Symfony/Bridge/PhpUnit/" isTestSource="false" packagePrefix="Symfony\Bridge\PhpUnit\" />
+      <sourceFolder url="file://$MODULE_DIR$/src/Symfony/Bridge/PsrHttpMessage" isTestSource="false" packagePrefix="Symfony\Bridge\PsrHttpMessage\" />
+      <sourceFolder url="file://$MODULE_DIR$/src/Symfony/Bridge/PsrHttpMessage/" isTestSource="false" packagePrefix="Symfony\Bridge\PsrHttpMessage\" />
+      <sourceFolder url="file://$MODULE_DIR$/src/Symfony/Bridge/Twig" isTestSource="false" packagePrefix="Symfony\Bridge\Twig\" />
+      <sourceFolder url="file://$MODULE_DIR$/src/Symfony/Bridge/Twig/" isTestSource="false" packagePrefix="Symfony\Bridge\Twig\" />
+      <sourceFolder url="file://$MODULE_DIR$/src/Symfony/Bundle" isTestSource="false" packagePrefix="Symfony\Bundle\" />
+      <sourceFolder url="file://$MODULE_DIR$/src/Symfony/Bundle/DebugBundle/" isTestSource="false" packagePrefix="Symfony\Bundle\DebugBundle\" />
+      <sourceFolder url="file://$MODULE_DIR$/src/Symfony/Bundle/FrameworkBundle/" isTestSource="false" packagePrefix="Symfony\Bundle\FrameworkBundle\" />
+      <sourceFolder url="file://$MODULE_DIR$/src/Symfony/Bundle/SecurityBundle/" isTestSource="false" packagePrefix="Symfony\Bundle\SecurityBundle\" />
+      <sourceFolder url="file://$MODULE_DIR$/src/Symfony/Bundle/TwigBundle/" isTestSource="false" packagePrefix="Symfony\Bundle\TwigBundle\" />
+      <sourceFolder url="file://$MODULE_DIR$/src/Symfony/Bundle/WebProfilerBundle/" isTestSource="false" packagePrefix="Symfony\Bundle\WebProfilerBundle\" />
+      <sourceFolder url="file://$MODULE_DIR$/src/Symfony/Component" isTestSource="false" packagePrefix="Symfony\Component\" />
+      <sourceFolder url="file://$MODULE_DIR$/src/Symfony/Component/Asset/" isTestSource="false" packagePrefix="Symfony\Component\Asset\" />
+      <sourceFolder url="file://$MODULE_DIR$/src/Symfony/Component/AssetMapper/" isTestSource="false" packagePrefix="Symfony\Component\AssetMapper\" />
+      <sourceFolder url="file://$MODULE_DIR$/src/Symfony/Component/BrowserKit/" isTestSource="false" packagePrefix="Symfony\Component\BrowserKit\" />
+      <sourceFolder url="file://$MODULE_DIR$/src/Symfony/Component/Cache/" isTestSource="false" packagePrefix="Symfony\Component\Cache\" />
+      <sourceFolder url="file://$MODULE_DIR$/src/Symfony/Component/Clock/" isTestSource="false" packagePrefix="Symfony\Component\Clock\" />
+      <sourceFolder url="file://$MODULE_DIR$/src/Symfony/Component/Config/" isTestSource="false" packagePrefix="Symfony\Component\Config\" />
+      <sourceFolder url="file://$MODULE_DIR$/src/Symfony/Component/Console/" isTestSource="false" packagePrefix="Symfony\Component\Console\" />
+      <sourceFolder url="file://$MODULE_DIR$/src/Symfony/Component/CssSelector/" isTestSource="false" packagePrefix="Symfony\Component\CssSelector\" />
+      <sourceFolder url="file://$MODULE_DIR$/src/Symfony/Component/DependencyInjection/" isTestSource="false" packagePrefix="Symfony\Component\DependencyInjection\" />
+      <sourceFolder url="file://$MODULE_DIR$/src/Symfony/Component/DomCrawler/" isTestSource="false" packagePrefix="Symfony\Component\DomCrawler\" />
+      <sourceFolder url="file://$MODULE_DIR$/src/Symfony/Component/Dotenv/" isTestSource="false" packagePrefix="Symfony\Component\Dotenv\" />
+      <sourceFolder url="file://$MODULE_DIR$/src/Symfony/Component/Emoji/" isTestSource="false" packagePrefix="Symfony\Component\Emoji\" />
+      <sourceFolder url="file://$MODULE_DIR$/src/Symfony/Component/ErrorHandler/" isTestSource="false" packagePrefix="Symfony\Component\ErrorHandler\" />
+      <sourceFolder url="file://$MODULE_DIR$/src/Symfony/Component/EventDispatcher/" isTestSource="false" packagePrefix="Symfony\Component\EventDispatcher\" />
+      <sourceFolder url="file://$MODULE_DIR$/src/Symfony/Component/ExpressionLanguage/" isTestSource="false" packagePrefix="Symfony\Component\ExpressionLanguage\" />
+      <sourceFolder url="file://$MODULE_DIR$/src/Symfony/Component/Filesystem/" isTestSource="false" packagePrefix="Symfony\Component\Filesystem\" />
+      <sourceFolder url="file://$MODULE_DIR$/src/Symfony/Component/Finder/" isTestSource="false" packagePrefix="Symfony\Component\Finder\" />
+      <sourceFolder url="file://$MODULE_DIR$/src/Symfony/Component/Form/" isTestSource="false" packagePrefix="Symfony\Component\Form\" />
+      <sourceFolder url="file://$MODULE_DIR$/src/Symfony/Component/HtmlSanitizer/" isTestSource="false" packagePrefix="Symfony\Component\HtmlSanitizer\" />
+      <sourceFolder url="file://$MODULE_DIR$/src/Symfony/Component/HttpClient/" isTestSource="false" packagePrefix="Symfony\Component\HttpClient\" />
+      <sourceFolder url="file://$MODULE_DIR$/src/Symfony/Component/HttpFoundation/" isTestSource="false" packagePrefix="Symfony\Component\HttpFoundation\" />
+      <sourceFolder url="file://$MODULE_DIR$/src/Symfony/Component/HttpKernel/" isTestSource="false" packagePrefix="Symfony\Component\HttpKernel\" />
+      <sourceFolder url="file://$MODULE_DIR$/src/Symfony/Component/Intl/" isTestSource="false" packagePrefix="Symfony\Component\Intl\" />
+      <sourceFolder url="file://$MODULE_DIR$/src/Symfony/Component/Ldap/" isTestSource="false" packagePrefix="Symfony\Component\Ldap\" />
+      <sourceFolder url="file://$MODULE_DIR$/src/Symfony/Component/Lock/" isTestSource="false" packagePrefix="Symfony\Component\Lock\" />
+      <sourceFolder url="file://$MODULE_DIR$/src/Symfony/Component/Mailer/" isTestSource="false" packagePrefix="Symfony\Component\Mailer\" />
+      <sourceFolder url="file://$MODULE_DIR$/src/Symfony/Component/Mailer/Bridge/Amazon/" isTestSource="false" packagePrefix="Symfony\Component\Mailer\Bridge\Amazon\" />
+      <sourceFolder url="file://$MODULE_DIR$/src/Symfony/Component/Mailer/Bridge/Azure/" isTestSource="false" packagePrefix="Symfony\Component\Mailer\Bridge\Azure\" />
+      <sourceFolder url="file://$MODULE_DIR$/src/Symfony/Component/Mailer/Bridge/Brevo/" isTestSource="false" packagePrefix="Symfony\Component\Mailer\Bridge\Brevo\" />
+      <sourceFolder url="file://$MODULE_DIR$/src/Symfony/Component/Mailer/Bridge/Google/" isTestSource="false" packagePrefix="Symfony\Component\Mailer\Bridge\Google\" />
+      <sourceFolder url="file://$MODULE_DIR$/src/Symfony/Component/Mailer/Bridge/Infobip/" isTestSource="false" packagePrefix="Symfony\Component\Mailer\Bridge\Infobip\" />
+      <sourceFolder url="file://$MODULE_DIR$/src/Symfony/Component/Mailer/Bridge/MailPace/" isTestSource="false" packagePrefix="Symfony\Component\Mailer\Bridge\MailPace\" />
+      <sourceFolder url="file://$MODULE_DIR$/src/Symfony/Component/Mailer/Bridge/Mailchimp/" isTestSource="false" packagePrefix="Symfony\Component\Mailer\Bridge\Mailchimp\" />
+      <sourceFolder url="file://$MODULE_DIR$/src/Symfony/Component/Mailer/Bridge/MailerSend/" isTestSource="false" packagePrefix="Symfony\Component\Mailer\Bridge\MailerSend\" />
+      <sourceFolder url="file://$MODULE_DIR$/src/Symfony/Component/Mailer/Bridge/Mailgun/" isTestSource="false" packagePrefix="Symfony\Component\Mailer\Bridge\Mailgun\" />
+      <sourceFolder url="file://$MODULE_DIR$/src/Symfony/Component/Mailer/Bridge/Mailjet/" isTestSource="false" packagePrefix="Symfony\Component\Mailer\Bridge\Mailjet\" />
+      <sourceFolder url="file://$MODULE_DIR$/src/Symfony/Component/Mailer/Bridge/Mailomat/" isTestSource="false" packagePrefix="Symfony\Component\Mailer\Bridge\Mailomat\" />
+      <sourceFolder url="file://$MODULE_DIR$/src/Symfony/Component/Mailer/Bridge/Postal/" isTestSource="false" packagePrefix="Symfony\Component\Mailer\Bridge\Postal\" />
+      <sourceFolder url="file://$MODULE_DIR$/src/Symfony/Component/Mailer/Bridge/Postmark/" isTestSource="false" packagePrefix="Symfony\Component\Mailer\Bridge\Postmark\" />
+      <sourceFolder url="file://$MODULE_DIR$/src/Symfony/Component/Mailer/Bridge/Resend/" isTestSource="false" packagePrefix="Symfony\Component\Mailer\Bridge\Resend\" />
+      <sourceFolder url="file://$MODULE_DIR$/src/Symfony/Component/Mailer/Bridge/Scaleway/" isTestSource="false" packagePrefix="Symfony\Component\Mailer\Bridge\Scaleway\" />
+      <sourceFolder url="file://$MODULE_DIR$/src/Symfony/Component/Mailer/Bridge/Sendgrid/" isTestSource="false" packagePrefix="Symfony\Component\Mailer\Bridge\Sendgrid\" />
+      <sourceFolder url="file://$MODULE_DIR$/src/Symfony/Component/Mailer/Bridge/Sweego/" isTestSource="false" packagePrefix="Symfony\Component\Mailer\Bridge\Sweego\" />
+      <sourceFolder url="file://$MODULE_DIR$/src/Symfony/Component/Messenger/" isTestSource="false" packagePrefix="Symfony\Component\Messenger\" />
+      <sourceFolder url="file://$MODULE_DIR$/src/Symfony/Component/Messenger/Bridge/AmazonSqs/" isTestSource="false" packagePrefix="Symfony\Component\Messenger\Bridge\AmazonSqs\" />
+      <sourceFolder url="file://$MODULE_DIR$/src/Symfony/Component/Messenger/Bridge/Amqp/" isTestSource="false" packagePrefix="Symfony\Component\Messenger\Bridge\Amqp\" />
+      <sourceFolder url="file://$MODULE_DIR$/src/Symfony/Component/Messenger/Bridge/Beanstalkd/" isTestSource="false" packagePrefix="Symfony\Component\Messenger\Bridge\Beanstalkd\" />
+      <sourceFolder url="file://$MODULE_DIR$/src/Symfony/Component/Messenger/Bridge/Doctrine/" isTestSource="false" packagePrefix="Symfony\Component\Messenger\Bridge\Doctrine\" />
+      <sourceFolder url="file://$MODULE_DIR$/src/Symfony/Component/Messenger/Bridge/Redis/" isTestSource="false" packagePrefix="Symfony\Component\Messenger\Bridge\Redis\" />
+      <sourceFolder url="file://$MODULE_DIR$/src/Symfony/Component/Mime/" isTestSource="false" packagePrefix="Symfony\Component\Mime\" />
+      <sourceFolder url="file://$MODULE_DIR$/src/Symfony/Component/Notifier/" isTestSource="false" packagePrefix="Symfony\Component\Notifier\" />
+      <sourceFolder url="file://$MODULE_DIR$/src/Symfony/Component/Notifier/Bridge/AllMySms/" isTestSource="false" packagePrefix="Symfony\Component\Notifier\Bridge\AllMySms\" />
+      <sourceFolder url="file://$MODULE_DIR$/src/Symfony/Component/Notifier/Bridge/AmazonSns/" isTestSource="false" packagePrefix="Symfony\Component\Notifier\Bridge\AmazonSns\" />
+      <sourceFolder url="file://$MODULE_DIR$/src/Symfony/Component/Notifier/Bridge/Bandwidth/" isTestSource="false" packagePrefix="Symfony\Component\Notifier\Bridge\Bandwidth\" />
+      <sourceFolder url="file://$MODULE_DIR$/src/Symfony/Component/Notifier/Bridge/Bluesky/" isTestSource="false" packagePrefix="Symfony\Component\Notifier\Bridge\Bluesky\" />
+      <sourceFolder url="file://$MODULE_DIR$/src/Symfony/Component/Notifier/Bridge/Brevo/" isTestSource="false" packagePrefix="Symfony\Component\Notifier\Bridge\Brevo\" />
+      <sourceFolder url="file://$MODULE_DIR$/src/Symfony/Component/Notifier/Bridge/Chatwork/" isTestSource="false" packagePrefix="Symfony\Component\Notifier\Bridge\Chatwork\" />
+      <sourceFolder url="file://$MODULE_DIR$/src/Symfony/Component/Notifier/Bridge/ClickSend/" isTestSource="false" packagePrefix="Symfony\Component\Notifier\Bridge\ClickSend\" />
+      <sourceFolder url="file://$MODULE_DIR$/src/Symfony/Component/Notifier/Bridge/Clickatell/" isTestSource="false" packagePrefix="Symfony\Component\Notifier\Bridge\Clickatell\" />
+      <sourceFolder url="file://$MODULE_DIR$/src/Symfony/Component/Notifier/Bridge/ContactEveryone/" isTestSource="false" packagePrefix="Symfony\Component\Notifier\Bridge\ContactEveryone\" />
+      <sourceFolder url="file://$MODULE_DIR$/src/Symfony/Component/Notifier/Bridge/Discord/" isTestSource="false" packagePrefix="Symfony\Component\Notifier\Bridge\Discord\" />
+      <sourceFolder url="file://$MODULE_DIR$/src/Symfony/Component/Notifier/Bridge/Engagespot/" isTestSource="false" packagePrefix="Symfony\Component\Notifier\Bridge\Engagespot\" />
+      <sourceFolder url="file://$MODULE_DIR$/src/Symfony/Component/Notifier/Bridge/Esendex/" isTestSource="false" packagePrefix="Symfony\Component\Notifier\Bridge\Esendex\" />
+      <sourceFolder url="file://$MODULE_DIR$/src/Symfony/Component/Notifier/Bridge/Expo/" isTestSource="false" packagePrefix="Symfony\Component\Notifier\Bridge\Expo\" />
+      <sourceFolder url="file://$MODULE_DIR$/src/Symfony/Component/Notifier/Bridge/FakeChat/" isTestSource="false" packagePrefix="Symfony\Component\Notifier\Bridge\FakeChat\" />
+      <sourceFolder url="file://$MODULE_DIR$/src/Symfony/Component/Notifier/Bridge/FakeSms/" isTestSource="false" packagePrefix="Symfony\Component\Notifier\Bridge\FakeSms\" />
+      <sourceFolder url="file://$MODULE_DIR$/src/Symfony/Component/Notifier/Bridge/Firebase/" isTestSource="false" packagePrefix="Symfony\Component\Notifier\Bridge\Firebase\" />
+      <sourceFolder url="file://$MODULE_DIR$/src/Symfony/Component/Notifier/Bridge/FortySixElks/" isTestSource="false" packagePrefix="Symfony\Component\Notifier\Bridge\FortySixElks\" />
+      <sourceFolder url="file://$MODULE_DIR$/src/Symfony/Component/Notifier/Bridge/FreeMobile/" isTestSource="false" packagePrefix="Symfony\Component\Notifier\Bridge\FreeMobile\" />
+      <sourceFolder url="file://$MODULE_DIR$/src/Symfony/Component/Notifier/Bridge/GatewayApi/" isTestSource="false" packagePrefix="Symfony\Component\Notifier\Bridge\GatewayApi\" />
+      <sourceFolder url="file://$MODULE_DIR$/src/Symfony/Component/Notifier/Bridge/GoIp/" isTestSource="false" packagePrefix="Symfony\Component\Notifier\Bridge\GoIp\" />
+      <sourceFolder url="file://$MODULE_DIR$/src/Symfony/Component/Notifier/Bridge/GoogleChat/" isTestSource="false" packagePrefix="Symfony\Component\Notifier\Bridge\GoogleChat\" />
+      <sourceFolder url="file://$MODULE_DIR$/src/Symfony/Component/Notifier/Bridge/Infobip/" isTestSource="false" packagePrefix="Symfony\Component\Notifier\Bridge\Infobip\" />
+      <sourceFolder url="file://$MODULE_DIR$/src/Symfony/Component/Notifier/Bridge/Iqsms/" isTestSource="false" packagePrefix="Symfony\Component\Notifier\Bridge\Iqsms\" />
+      <sourceFolder url="file://$MODULE_DIR$/src/Symfony/Component/Notifier/Bridge/Isendpro/" isTestSource="false" packagePrefix="Symfony\Component\Notifier\Bridge\Isendpro\" />
+      <sourceFolder url="file://$MODULE_DIR$/src/Symfony/Component/Notifier/Bridge/JoliNotif/" isTestSource="false" packagePrefix="Symfony\Component\Notifier\Bridge\JoliNotif\" />
+      <sourceFolder url="file://$MODULE_DIR$/src/Symfony/Component/Notifier/Bridge/KazInfoTeh/" isTestSource="false" packagePrefix="Symfony\Component\Notifier\Bridge\KazInfoTeh\" />
+      <sourceFolder url="file://$MODULE_DIR$/src/Symfony/Component/Notifier/Bridge/LightSms/" isTestSource="false" packagePrefix="Symfony\Component\Notifier\Bridge\LightSms\" />
+      <sourceFolder url="file://$MODULE_DIR$/src/Symfony/Component/Notifier/Bridge/LineNotify/" isTestSource="false" packagePrefix="Symfony\Component\Notifier\Bridge\LineNotify\" />
+      <sourceFolder url="file://$MODULE_DIR$/src/Symfony/Component/Notifier/Bridge/LinkedIn/" isTestSource="false" packagePrefix="Symfony\Component\Notifier\Bridge\LinkedIn\" />
+      <sourceFolder url="file://$MODULE_DIR$/src/Symfony/Component/Notifier/Bridge/Lox24/" isTestSource="false" packagePrefix="Symfony\Component\Notifier\Bridge\Lox24\" />
+      <sourceFolder url="file://$MODULE_DIR$/src/Symfony/Component/Notifier/Bridge/Mailjet/" isTestSource="false" packagePrefix="Symfony\Component\Notifier\Bridge\Mailjet\" />
+      <sourceFolder url="file://$MODULE_DIR$/src/Symfony/Component/Notifier/Bridge/Mastodon/" isTestSource="false" packagePrefix="Symfony\Component\Notifier\Bridge\Mastodon\" />
+      <sourceFolder url="file://$MODULE_DIR$/src/Symfony/Component/Notifier/Bridge/Mattermost/" isTestSource="false" packagePrefix="Symfony\Component\Notifier\Bridge\Mattermost\" />
+      <sourceFolder url="file://$MODULE_DIR$/src/Symfony/Component/Notifier/Bridge/Mercure/" isTestSource="false" packagePrefix="Symfony\Component\Notifier\Bridge\Mercure\" />
+      <sourceFolder url="file://$MODULE_DIR$/src/Symfony/Component/Notifier/Bridge/MessageBird/" isTestSource="false" packagePrefix="Symfony\Component\Notifier\Bridge\MessageBird\" />
+      <sourceFolder url="file://$MODULE_DIR$/src/Symfony/Component/Notifier/Bridge/MessageMedia/" isTestSource="false" packagePrefix="Symfony\Component\Notifier\Bridge\MessageMedia\" />
+      <sourceFolder url="file://$MODULE_DIR$/src/Symfony/Component/Notifier/Bridge/MicrosoftTeams/" isTestSource="false" packagePrefix="Symfony\Component\Notifier\Bridge\MicrosoftTeams\" />
+      <sourceFolder url="file://$MODULE_DIR$/src/Symfony/Component/Notifier/Bridge/Mobyt/" isTestSource="false" packagePrefix="Symfony\Component\Notifier\Bridge\Mobyt\" />
+      <sourceFolder url="file://$MODULE_DIR$/src/Symfony/Component/Notifier/Bridge/Novu/" isTestSource="false" packagePrefix="Symfony\Component\Notifier\Bridge\Novu\" />
+      <sourceFolder url="file://$MODULE_DIR$/src/Symfony/Component/Notifier/Bridge/Ntfy/" isTestSource="false" packagePrefix="Symfony\Component\Notifier\Bridge\Ntfy\" />
+      <sourceFolder url="file://$MODULE_DIR$/src/Symfony/Component/Notifier/Bridge/Octopush/" isTestSource="false" packagePrefix="Symfony\Component\Notifier\Bridge\Octopush\" />
+      <sourceFolder url="file://$MODULE_DIR$/src/Symfony/Component/Notifier/Bridge/OneSignal/" isTestSource="false" packagePrefix="Symfony\Component\Notifier\Bridge\OneSignal\" />
+      <sourceFolder url="file://$MODULE_DIR$/src/Symfony/Component/Notifier/Bridge/OrangeSms/" isTestSource="false" packagePrefix="Symfony\Component\Notifier\Bridge\OrangeSms\" />
+      <sourceFolder url="file://$MODULE_DIR$/src/Symfony/Component/Notifier/Bridge/OvhCloud/" isTestSource="false" packagePrefix="Symfony\Component\Notifier\Bridge\OvhCloud\" />
+      <sourceFolder url="file://$MODULE_DIR$/src/Symfony/Component/Notifier/Bridge/PagerDuty/" isTestSource="false" packagePrefix="Symfony\Component\Notifier\Bridge\PagerDuty\" />
+      <sourceFolder url="file://$MODULE_DIR$/src/Symfony/Component/Notifier/Bridge/Plivo/" isTestSource="false" packagePrefix="Symfony\Component\Notifier\Bridge\Plivo\" />
+      <sourceFolder url="file://$MODULE_DIR$/src/Symfony/Component/Notifier/Bridge/Primotexto/" isTestSource="false" packagePrefix="Symfony\Component\Notifier\Bridge\Primotexto\" />
+      <sourceFolder url="file://$MODULE_DIR$/src/Symfony/Component/Notifier/Bridge/Pushover/" isTestSource="false" packagePrefix="Symfony\Component\Notifier\Bridge\Pushover\" />
+      <sourceFolder url="file://$MODULE_DIR$/src/Symfony/Component/Notifier/Bridge/Pushy/" isTestSource="false" packagePrefix="Symfony\Component\Notifier\Bridge\Pushy\" />
+      <sourceFolder url="file://$MODULE_DIR$/src/Symfony/Component/Notifier/Bridge/Redlink/" isTestSource="false" packagePrefix="Symfony\Component\Notifier\Bridge\Redlink\" />
+      <sourceFolder url="file://$MODULE_DIR$/src/Symfony/Component/Notifier/Bridge/RingCentral/" isTestSource="false" packagePrefix="Symfony\Component\Notifier\Bridge\RingCentral\" />
+      <sourceFolder url="file://$MODULE_DIR$/src/Symfony/Component/Notifier/Bridge/RocketChat/" isTestSource="false" packagePrefix="Symfony\Component\Notifier\Bridge\RocketChat\" />
+      <sourceFolder url="file://$MODULE_DIR$/src/Symfony/Component/Notifier/Bridge/Sendberry/" isTestSource="false" packagePrefix="Symfony\Component\Notifier\Bridge\Sendberry\" />
+      <sourceFolder url="file://$MODULE_DIR$/src/Symfony/Component/Notifier/Bridge/Sevenio/" isTestSource="false" packagePrefix="Symfony\Component\Notifier\Bridge\Sevenio\" />
+      <sourceFolder url="file://$MODULE_DIR$/src/Symfony/Component/Notifier/Bridge/SimpleTextin/" isTestSource="false" packagePrefix="Symfony\Component\Notifier\Bridge\SimpleTextin\" />
+      <sourceFolder url="file://$MODULE_DIR$/src/Symfony/Component/Notifier/Bridge/Sinch/" isTestSource="false" packagePrefix="Symfony\Component\Notifier\Bridge\Sinch\" />
+      <sourceFolder url="file://$MODULE_DIR$/src/Symfony/Component/Notifier/Bridge/Sipgate/" isTestSource="false" packagePrefix="Symfony\Component\Notifier\Bridge\Sipgate\" />
+      <sourceFolder url="file://$MODULE_DIR$/src/Symfony/Component/Notifier/Bridge/Slack/" isTestSource="false" packagePrefix="Symfony\Component\Notifier\Bridge\Slack\" />
+      <sourceFolder url="file://$MODULE_DIR$/src/Symfony/Component/Notifier/Bridge/Sms77/" isTestSource="false" packagePrefix="Symfony\Component\Notifier\Bridge\Sms77\" />
+      <sourceFolder url="file://$MODULE_DIR$/src/Symfony/Component/Notifier/Bridge/SmsBiuras/" isTestSource="false" packagePrefix="Symfony\Component\Notifier\Bridge\SmsBiuras\" />
+      <sourceFolder url="file://$MODULE_DIR$/src/Symfony/Component/Notifier/Bridge/SmsFactor/" isTestSource="false" packagePrefix="Symfony\Component\Notifier\Bridge\SmsFactor\" />
+      <sourceFolder url="file://$MODULE_DIR$/src/Symfony/Component/Notifier/Bridge/SmsSluzba/" isTestSource="false" packagePrefix="Symfony\Component\Notifier\Bridge\SmsSluzba\" />
+      <sourceFolder url="file://$MODULE_DIR$/src/Symfony/Component/Notifier/Bridge/Smsapi/" isTestSource="false" packagePrefix="Symfony\Component\Notifier\Bridge\Smsapi\" />
+      <sourceFolder url="file://$MODULE_DIR$/src/Symfony/Component/Notifier/Bridge/Smsbox/" isTestSource="false" packagePrefix="Symfony\Component\Notifier\Bridge\Smsbox\" />
+      <sourceFolder url="file://$MODULE_DIR$/src/Symfony/Component/Notifier/Bridge/Smsc/" isTestSource="false" packagePrefix="Symfony\Component\Notifier\Bridge\Smsc\" />
+      <sourceFolder url="file://$MODULE_DIR$/src/Symfony/Component/Notifier/Bridge/Smsense/" isTestSource="false" packagePrefix="Symfony\Component\Notifier\Bridge\Smsense\" />
+      <sourceFolder url="file://$MODULE_DIR$/src/Symfony/Component/Notifier/Bridge/Smsmode/" isTestSource="false" packagePrefix="Symfony\Component\Notifier\Bridge\Smsmode\" />
+      <sourceFolder url="file://$MODULE_DIR$/src/Symfony/Component/Notifier/Bridge/SpotHit/" isTestSource="false" packagePrefix="Symfony\Component\Notifier\Bridge\SpotHit\" />
+      <sourceFolder url="file://$MODULE_DIR$/src/Symfony/Component/Notifier/Bridge/Telegram/" isTestSource="false" packagePrefix="Symfony\Component\Notifier\Bridge\Telegram\" />
+      <sourceFolder url="file://$MODULE_DIR$/src/Symfony/Component/Notifier/Bridge/Telnyx/" isTestSource="false" packagePrefix="Symfony\Component\Notifier\Bridge\Telnyx\" />
+      <sourceFolder url="file://$MODULE_DIR$/src/Symfony/Component/Notifier/Bridge/Termii/" isTestSource="false" packagePrefix="Symfony\Component\Notifier\Bridge\Termii\" />
+      <sourceFolder url="file://$MODULE_DIR$/src/Symfony/Component/Notifier/Bridge/TurboSms/" isTestSource="false" packagePrefix="Symfony\Component\Notifier\Bridge\TurboSms\" />
+      <sourceFolder url="file://$MODULE_DIR$/src/Symfony/Component/Notifier/Bridge/Twilio/" isTestSource="false" packagePrefix="Symfony\Component\Notifier\Bridge\Twilio\" />
+      <sourceFolder url="file://$MODULE_DIR$/src/Symfony/Component/Notifier/Bridge/Twitter/" isTestSource="false" packagePrefix="Symfony\Component\Notifier\Bridge\Twitter\" />
+      <sourceFolder url="file://$MODULE_DIR$/src/Symfony/Component/Notifier/Bridge/Unifonic/" isTestSource="false" packagePrefix="Symfony\Component\Notifier\Bridge\Unifonic\" />
+      <sourceFolder url="file://$MODULE_DIR$/src/Symfony/Component/Notifier/Bridge/Vonage/" isTestSource="false" packagePrefix="Symfony\Component\Notifier\Bridge\Vonage\" />
+      <sourceFolder url="file://$MODULE_DIR$/src/Symfony/Component/Notifier/Bridge/Yunpian/" isTestSource="false" packagePrefix="Symfony\Component\Notifier\Bridge\Yunpian\" />
+      <sourceFolder url="file://$MODULE_DIR$/src/Symfony/Component/Notifier/Bridge/Zendesk/" isTestSource="false" packagePrefix="Symfony\Component\Notifier\Bridge\Zendesk\" />
+      <sourceFolder url="file://$MODULE_DIR$/src/Symfony/Component/Notifier/Bridge/Zulip/" isTestSource="false" packagePrefix="Symfony\Component\Notifier\Bridge\Zulip\" />
+      <sourceFolder url="file://$MODULE_DIR$/src/Symfony/Component/OptionsResolver/" isTestSource="false" packagePrefix="Symfony\Component\OptionsResolver\" />
+      <sourceFolder url="file://$MODULE_DIR$/src/Symfony/Component/PasswordHasher/" isTestSource="false" packagePrefix="Symfony\Component\PasswordHasher\" />
+      <sourceFolder url="file://$MODULE_DIR$/src/Symfony/Component/Process/" isTestSource="false" packagePrefix="Symfony\Component\Process\" />
+      <sourceFolder url="file://$MODULE_DIR$/src/Symfony/Component/PropertyAccess/" isTestSource="false" packagePrefix="Symfony\Component\PropertyAccess\" />
+      <sourceFolder url="file://$MODULE_DIR$/src/Symfony/Component/PropertyInfo/" isTestSource="false" packagePrefix="Symfony\Component\PropertyInfo\" />
+      <sourceFolder url="file://$MODULE_DIR$/src/Symfony/Component/RateLimiter/" isTestSource="false" packagePrefix="Symfony\Component\RateLimiter\" />
+      <sourceFolder url="file://$MODULE_DIR$/src/Symfony/Component/RemoteEvent/" isTestSource="false" packagePrefix="Symfony\Component\RemoteEvent\" />
+      <sourceFolder url="file://$MODULE_DIR$/src/Symfony/Component/Routing/" isTestSource="false" packagePrefix="Symfony\Component\Routing\" />
+      <sourceFolder url="file://$MODULE_DIR$/src/Symfony/Component/Runtime/" isTestSource="false" packagePrefix="Symfony\Component\Runtime\" />
+      <sourceFolder url="file://$MODULE_DIR$/src/Symfony/Component/Runtime/Internal" isTestSource="false" packagePrefix="Symfony\Runtime\Symfony\Component\" />
+      <sourceFolder url="file://$MODULE_DIR$/src/Symfony/Component/Scheduler/" isTestSource="false" packagePrefix="Symfony\Component\Scheduler\" />
+      <sourceFolder url="file://$MODULE_DIR$/src/Symfony/Component/Security/Core/" isTestSource="false" packagePrefix="Symfony\Component\Security\Core\" />
+      <sourceFolder url="file://$MODULE_DIR$/src/Symfony/Component/Security/Csrf/" isTestSource="false" packagePrefix="Symfony\Component\Security\Csrf\" />
+      <sourceFolder url="file://$MODULE_DIR$/src/Symfony/Component/Security/Http/" isTestSource="false" packagePrefix="Symfony\Component\Security\Http\" />
+      <sourceFolder url="file://$MODULE_DIR$/src/Symfony/Component/Semaphore/" isTestSource="false" packagePrefix="Symfony\Component\Semaphore\" />
+      <sourceFolder url="file://$MODULE_DIR$/src/Symfony/Component/Serializer/" isTestSource="false" packagePrefix="Symfony\Component\Serializer\" />
+      <sourceFolder url="file://$MODULE_DIR$/src/Symfony/Component/Stopwatch/" isTestSource="false" packagePrefix="Symfony\Component\Stopwatch\" />
+      <sourceFolder url="file://$MODULE_DIR$/src/Symfony/Component/String/" isTestSource="false" packagePrefix="Symfony\Component\String\" />
+      <sourceFolder url="file://$MODULE_DIR$/src/Symfony/Component/Translation/" isTestSource="false" packagePrefix="Symfony\Component\Translation\" />
+      <sourceFolder url="file://$MODULE_DIR$/src/Symfony/Component/Translation/Bridge/Crowdin/" isTestSource="false" packagePrefix="Symfony\Component\Translation\Bridge\Crowdin\" />
+      <sourceFolder url="file://$MODULE_DIR$/src/Symfony/Component/Translation/Bridge/Loco/" isTestSource="false" packagePrefix="Symfony\Component\Translation\Bridge\Loco\" />
+      <sourceFolder url="file://$MODULE_DIR$/src/Symfony/Component/Translation/Bridge/Lokalise/" isTestSource="false" packagePrefix="Symfony\Component\Translation\Bridge\Lokalise\" />
+      <sourceFolder url="file://$MODULE_DIR$/src/Symfony/Component/Translation/Bridge/Phrase/" isTestSource="false" packagePrefix="Symfony\Component\Translation\Bridge\Phrase\" />
+      <sourceFolder url="file://$MODULE_DIR$/src/Symfony/Component/TypeInfo/" isTestSource="false" packagePrefix="Symfony\Component\TypeInfo\" />
+      <sourceFolder url="file://$MODULE_DIR$/src/Symfony/Component/Uid/" isTestSource="false" packagePrefix="Symfony\Component\Uid\" />
+      <sourceFolder url="file://$MODULE_DIR$/src/Symfony/Component/Validator/" isTestSource="false" packagePrefix="Symfony\Component\Validator\" />
+      <sourceFolder url="file://$MODULE_DIR$/src/Symfony/Component/VarDumper/" isTestSource="false" packagePrefix="Symfony\Component\VarDumper\" />
+      <sourceFolder url="file://$MODULE_DIR$/src/Symfony/Component/VarExporter/" isTestSource="false" packagePrefix="Symfony\Component\VarExporter\" />
+      <sourceFolder url="file://$MODULE_DIR$/src/Symfony/Component/WebLink/" isTestSource="false" packagePrefix="Symfony\Component\WebLink\" />
+      <sourceFolder url="file://$MODULE_DIR$/src/Symfony/Component/Webhook/" isTestSource="false" packagePrefix="Symfony\Component\Webhook\" />
+      <sourceFolder url="file://$MODULE_DIR$/src/Symfony/Component/Workflow/" isTestSource="false" packagePrefix="Symfony\Component\Workflow\" />
+      <sourceFolder url="file://$MODULE_DIR$/src/Symfony/Component/Yaml/" isTestSource="false" packagePrefix="Symfony\Component\Yaml\" />
+      <sourceFolder url="file://$MODULE_DIR$/src/Symfony/Contracts/" isTestSource="false" packagePrefix="Symfony\Contracts\" />
+      <sourceFolder url="file://$MODULE_DIR$/src/Symfony/Contracts/Cache/" isTestSource="false" packagePrefix="Symfony\Contracts\Cache\" />
+      <sourceFolder url="file://$MODULE_DIR$/src/Symfony/Contracts/EventDispatcher/" isTestSource="false" packagePrefix="Symfony\Contracts\EventDispatcher\" />
+      <sourceFolder url="file://$MODULE_DIR$/src/Symfony/Contracts/HttpClient/" isTestSource="false" packagePrefix="Symfony\Contracts\HttpClient\" />
+      <sourceFolder url="file://$MODULE_DIR$/src/Symfony/Contracts/Service/" isTestSource="false" packagePrefix="Symfony\Contracts\Service\" />
+      <sourceFolder url="file://$MODULE_DIR$/src/Symfony/Contracts/Translation/" isTestSource="false" packagePrefix="Symfony\Contracts\Translation\" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/amphp/amp" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/amphp/byte-stream" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/amphp/cache" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/amphp/dns" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/amphp/hpack" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/amphp/http" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/amphp/http-client" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/amphp/http-tunnel" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/amphp/parser" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/amphp/process" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/amphp/serialization" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/amphp/socket" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/amphp/sync" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/amphp/windows-registry" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/async-aws/core" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/async-aws/ses" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/async-aws/sns" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/async-aws/sqs" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/bin/.phpunit" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/brick/math" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/cache/integration-tests" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/composer" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/daverandom/libdns" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/doctrine/collections" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/doctrine/data-fixtures" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/doctrine/dbal" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/doctrine/deprecations" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/doctrine/event-manager" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/doctrine/inflector" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/doctrine/instantiator" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/doctrine/lexer" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/doctrine/orm" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/doctrine/persistence" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/dragonmantank/cron-expression" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/egulias/email-validator" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/guzzlehttp/promises" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/jolicode/jolinotif" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/jolicode/php-os-helper" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/kelunik/certificate" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/lcobucci/jwt" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/league/html-to-markdown" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/league/uri" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/league/uri-interfaces" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/league/uri-parser" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/lorenzo/pinky" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/masterminds/html5" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/monolog/monolog" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/nikic/php-parser" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/nyholm/psr7" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/pda/pheanstalk" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/php-http/discovery" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/php-http/httplug" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/php-http/promise" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/phpdocumentor/reflection-common" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/phpdocumentor/reflection-docblock" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/phpdocumentor/type-resolver" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/phpstan/phpdoc-parser" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/predis/predis" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/psr/cache" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/psr/clock" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/psr/container" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/psr/event-dispatcher" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/psr/http-client" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/psr/http-factory" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/psr/http-message" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/psr/link" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/psr/log" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/psr/simple-cache" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/seld/jsonlint" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/spomky-labs/pki-framework" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/symfony/mercure" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/symfony/mercure-bundle" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/symfony/phpunit-bridge" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/symfony/polyfill-ctype" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/symfony/polyfill-intl-grapheme" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/symfony/polyfill-intl-icu" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/symfony/polyfill-intl-idn" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/symfony/polyfill-intl-normalizer" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/symfony/polyfill-mbstring" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/symfony/polyfill-php80" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/symfony/polyfill-php81" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/symfony/polyfill-php83" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/symfony/polyfill-php84" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/symfony/polyfill-uuid" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/symfony/security-acl" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/tijsverkoyen/css-to-inline-styles" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/twig/cssinliner-extra" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/twig/inky-extra" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/twig/markdown-extra" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/twig/twig" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/web-token/jwt-library" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/webmozart/assert" />
+    </content>
+    <orderEntry type="inheritedJdk" />
+    <orderEntry type="sourceFolder" forTests="false" />
+  </component>
+</module>

@@ -1,0 +1,169 @@
+---------------------------------------------------------------------------
+
+by derrabus at 2024-09-05T12:27:07Z
+
+Looks like our tests need an update as well.
+
+---------------------------------------------------------------------------
+
+by llupa at 2024-09-05T17:15:58Z
+
+hey @derrabus I had a look at fabbot.io and I am not sure if I have to apply the typos? These are taken out of ICU and I'd assume no, but let me know if I need to apply them.
+
+Additionally for the license headers, it seems it wants to apply headers only on **some** of the data-dump files, not all of them. Here I have the same question, just apply or ignore?
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2024-09-05T19:49:57Z
+
+fabbot.io should probably exclude `src/Symfony/Component/Intl/Resources/data/`
+
+moreover, i was wondering about https://github.com/symfony/symfony/blob/6896976123a70cf56c9e2576773400486f30e80f/src/Symfony/Component/Intl/Intl.php#L118-L120
+
+we have a tendency to update it :) https://github.com/symfony/symfony/commit/0b094554f63963ff52cfe442f4468a545f0d29de
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2024-09-05T19:51:16Z
+
+> we have a tendency to update it :)
+
+Could be done by the bin script automatically 😃
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2024-09-05T19:56:26Z
+
+or forward to `getIcuDataVersion` :thinking:
+
+we could also deprecate it and use `getIcuDataVersion` in [CI](https://github.com/search?q=repo%3Asymfony%2Fsymfony%20getIcuStubVersion&type=code) (which is the only internal use case anyway)
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2024-09-05T19:58:24Z
+
+basically, im not sure who's checking if the stubs are up2date :sweat_smile:
+
+edit: `Intl/Resources/stubs` was removed in 6.4, i believe we should deprecate `getIcuStubVersion`
+
+---------------------------------------------------------------------------
+
+by llupa at 2024-09-06T09:15:38Z
+
+@ro0NL say I deprecate it and say that this will be removed in Sf6, does it mean I have to update the docs for transitioning from Sf5 to Sf6 too?
+
+I just want to know how much work and what exactly do I have to do to have this bump merged :D I can also just update the reference you said above and do the mentioned deprecation* in another PR so I keep them separate.
+
+What does the team think?
+
+---------------------------------------------------------------------------
+
+by stof at 2024-09-06T09:17:28Z
+
+you cannot introduce a deprecation in 5.x or 6.x as we already released their next major version. New deprecations can only be introduced in the next minor version of Symfony (i.e. 7.2 currently).
+
+---------------------------------------------------------------------------
+
+by llupa at 2024-09-06T09:18:34Z
+
+So I just update the reference and leave at it then ;)
+
+---------------------------------------------------------------------------
+
+by llupa at 2024-09-06T12:56:47Z
+
+hm, when I updated Intl::getIcuStubVersion() GHA for intl-data job broke:
+
+<img width="984" alt="Screenshot 2024-09-06 at 14 08 52" src="https://github.com/user-attachments/assets/898621a6-b7b3-4d46-931c-33c72977e9eb">
+
+So it seems this* breaks tests. And above it was commented that the stub has been removed in v6. Maybe a general checkup for this for 7.X is needed as a followup
+
+---------------------------------------------------------------------------
+
+by stof at 2024-09-06T13:04:29Z
+
+This might be because the `setup-php` action does not support ICU 75.1 yet: https://github.com/shivammathur/icu-intl#icu4c-builds
+
+So you should first contribute there to make ICU 75.1 available in our CI.
+Skipping the update of the ICU version to make the CI use an older version is not an option as this will cause issues due to ICU version mismatches
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2024-09-06T13:15:36Z
+
+it's confusing: https://github.com/shivammathur/icu-intl/commit/56da265dc2a22e118dad1f7ecbe335095fc98b41
+
+to me this is just a data update, no stubs involved
+
+but perhaps it indicates this should be done in 6.x or above
+
+---------------------------------------------------------------------------
+
+by stof at 2024-09-06T13:48:12Z
+
+hmm, indeed. Looks like they added support for building the new ICU version but without updating the readme.
+
+---------------------------------------------------------------------------
+
+by stof at 2024-09-06T13:49:46Z
+
+hmm, they have a failed workflow run at https://github.com/shivammathur/icu-intl/actions/runs/10023485108/job/27704440277 so maybe the build did not work
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2024-09-10T17:39:49Z
+
+to move forward long-term, we could build a local image from `jakzal/docker-symfony-intl`, so we control the ICU/PHP version pair used for compiling and running tests: https://github.com/jakzal/docker-symfony-intl?tab=readme-ov-file#image-development
+
+this way we decouple from upstream GitHub actions
+
+> The changes were generated by simply running
+> $ php src/Symfony/Component/Intl/Resources/bin/update-data.php
+
+im not sure what the implications are, but we keep the ICU version during compile in sync as well :sweat_smile:  https://github.com/symfony/symfony/blob/a13836096a832ec185ccc0ba520433772e9e2c9f/src/Symfony/Component/Intl/Resources/bin/compile#L12
+
+hence `Resources/bin/compress` should be used instead
+
+---------------------------------------------------------------------------
+
+by stof at 2024-09-11T09:16:52Z
+
+Building a local image would likely be much slower than using the pre-built image of the setup-php action. And if we prebuild the image, we have to maintain that prebuilt image to keep it uptodate, essentially duplicating the work done by the setup-php maintainers (or more likely we will end up *not* updating it regularly, making the situation worse than the current status quo).
+
+We *already* control the ICU version used in GHA thanks to the dedicated option of the setup-php action.
+
+---------------------------------------------------------------------------
+
+by stof at 2024-09-11T09:26:26Z
+
+Looking at the setup-php intl-icu repo, it looks like ICU 75.1 is available for PHP 8+ (even though the readme has not been updated) while it is missing for PHP 7 due to the failed builds. I opened https://github.com/shivammathur/icu-intl/issues/8 to clarify that.
+
+right now, our `.github/workflows/intl-data-tests.yml` workflow uses PHP 7.4 in the 5.4 branch and so it fail to get the intl build once updating the ICU version being requested. I would suggest updating that workflow to use PHP 8, which should then work when updating the requested version properly.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2024-09-11T09:41:56Z
+
+understood, IIUC eventually we also need a new release at https://github.com/jakzal/docker-symfony-intl to keep the ICU version during compile in sync
+
+it looks like quite some dependency maintenance overall, but OK :)
+
+---------------------------------------------------------------------------
+
+by stof at 2024-09-11T23:14:20Z
+
+AFAIK, the `update-icu-data` script needs the intl extension but does not care about which version of ICU this extension uses (it does not read the ICU and CLDR data from the extension, as the extension does not expose the full data anyway, which is precisely the reason why `symfony/intl` needs to exist). So it is not an issue if it uses a slightly older version (btw, it currently uses ICU 73, while symfony/intl already ships ICU 74 data)
+
+---------------------------------------------------------------------------
+
+by llupa at 2024-09-13T10:06:55Z
+
+@ro0NL Now I am in doubt if this PR is even needed? Because jakzal supports up to 74.1. Do I have to _push_ that image to have 75.1 better? Or the PR is ok :D
+
+---------------------------------------------------------------------------
+
+by fabpot at 2024-09-13T12:13:28Z
+
+> @fabpot fabbot.io should probably exclude src/Symfony/Component/Intl/Resources/data/
+
+Done. fabbot is green now on this PR.

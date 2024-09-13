@@ -52,6 +52,8 @@ class BinaryNode extends Node
         if ('matches' == $operator) {
             if ($this->nodes['right'] instanceof ConstantNode) {
                 $this->evaluateMatches($this->nodes['right']->evaluate([], []), '');
+            } elseif ($this->nodes['right'] instanceof self && '~' !== $this->nodes['right']->attributes['operator']) {
+                throw new SyntaxError('The regex passed to "matches" must be a string.');
             }
 
             $compiler

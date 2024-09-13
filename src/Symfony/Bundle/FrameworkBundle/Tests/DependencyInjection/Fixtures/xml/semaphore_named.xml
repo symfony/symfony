@@ -5,19 +5,12 @@
     xsi:schemaLocation="http://symfony.com/schema/dic/services https://symfony.com/schema/dic/services/services-1.0.xsd
         http://symfony.com/schema/dic/symfony https://symfony.com/schema/dic/symfony/symfony-1.0.xsd">
 
-    <parameters>
-        <parameter key="env(REDIS_URL)">redis://paas.com</parameter>
-    </parameters>
-
     <framework:config http-method-override="false" handle-all-throwables="true">
         <framework:annotations enabled="false" />
         <framework:php-errors log="true" />
-        <framework:lock>
-            <framework:resource name="foo">semaphore</framework:resource>
-            <framework:resource name="bar">flock</framework:resource>
-            <framework:resource name="baz">semaphore</framework:resource>
-            <framework:resource name="baz">flock</framework:resource>
+        <framework:semaphore>
+            <framework:resource name="foo">redis://paas.com</framework:resource>
             <framework:resource name="qux">%env(REDIS_DSN)%</framework:resource>
-        </framework:lock>
+        </framework:semaphore>
     </framework:config>
 </container>

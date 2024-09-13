@@ -33,7 +33,7 @@ class RedisAdapterSentinelTest extends AbstractRedisAdapterTestCase
             throw new SkippedTestSuiteError('REDIS_SENTINEL_SERVICE env var is not defined.');
         }
 
-        self::$redis = AbstractAdapter::createConnection('redis:?host['.str_replace(' ', ']&host[', $hosts).']', ['redis_sentinel' => $service, 'prefix' => 'prefix_']);
+        self::$redis = AbstractAdapter::createConnection('redis:?host['.str_replace(' ', ']&host[', $hosts).']&timeout=0&retry_interval=0&read_timeout=0', ['redis_sentinel' => $service, 'prefix' => 'prefix_']);
     }
 
     public function testInvalidDSNHasBothClusterAndSentinel()

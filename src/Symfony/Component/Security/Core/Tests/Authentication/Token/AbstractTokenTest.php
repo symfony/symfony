@@ -65,7 +65,6 @@ class AbstractTokenTest extends TestCase
      */
     public function testItDoesNotCallEraseCredentials()
     {
-        (new YouClassUnderTest())->doSomething();
         $token = new ConcreteToken(['ROLE_FOO']);
         $token->setUser(new SimpleUser());
         $token->eraseCredentials();

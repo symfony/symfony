@@ -5,7 +5,7 @@ return [
         'Africa/Bujumbura' => 'hora de África central (Buyumbura)',
         'Africa/Dar_es_Salaam' => 'hora de África oriental (Dar es-Salaam)',
         'America/Rio_Branco' => 'Hora de Acre (Rio Branco)',
-        'Asia/Almaty' => 'hora de Kazajistán oriental (Almatý)',
+        'Asia/Almaty' => 'hora de Kazajistán occidental (Almatý)',
         'Asia/Aqtobe' => 'hora de Kazajistán occidental (Aktobé)',
         'Asia/Atyrau' => 'hora de Kazajistán occidental (Atirau)',
         'Atlantic/Stanley' => 'hora de Islas Malvinas (Stanley)',

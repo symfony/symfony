@@ -231,10 +231,6 @@ final class UserWithoutEquatable implements UserInterface, PasswordAuthenticated
     {
         return $this->enabled;
     }
-
-    public function eraseCredentials(): void
-    {
-    }
 }
 
 class ForceLoginController

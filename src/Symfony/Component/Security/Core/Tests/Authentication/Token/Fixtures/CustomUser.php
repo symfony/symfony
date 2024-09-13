@@ -36,8 +36,4 @@ final class CustomUser implements UserInterface
     {
         return null;
     }
-
-    public function eraseCredentials(): void
-    {
-    }
 }

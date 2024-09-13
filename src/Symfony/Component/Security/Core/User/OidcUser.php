@@ -71,10 +71,6 @@ class OidcUser implements UserInterface
         return (string) ($this->userIdentifier ?? $this->getSub());
     }
 
-    public function eraseCredentials(): void
-    {
-    }
-
     public function getSub(): ?string
     {
         return $this->sub;

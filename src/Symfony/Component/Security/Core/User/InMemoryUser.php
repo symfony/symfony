@@ -74,10 +74,6 @@ final class InMemoryUser implements UserInterface, PasswordAuthenticatedUserInte
         return $this->enabled;
     }
 
-    public function eraseCredentials(): void
-    {
-    }
-
     public function isEqualTo(UserInterface $user): bool
     {
         if (!$user instanceof self) {

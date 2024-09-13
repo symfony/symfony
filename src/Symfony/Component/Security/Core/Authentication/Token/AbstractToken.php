@@ -11,7 +11,9 @@
 
 namespace Symfony\Component\Security\Core\Authentication\Token;
 
+use Lcobucci\JWT\Token\Plain;
 use Symfony\Component\Security\Core\User\InMemoryUser;
+use Symfony\Component\Security\Core\User\PlaintextCredentialUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
@@ -60,8 +62,25 @@ abstract class AbstractToken implements TokenInterface, \Serializable
 
     public function eraseCredentials(): void
     {
-        if ($this->getUser() instanceof UserInterface) {
-            $this->getUser()->eraseCredentials();
+        $user = $this->getUser();
+
+        if ($user instanceof PlaintextCredentialUserInterface) {
+            $user->eraseCredentials();
+
+            return;
+        }
+
+        if (method_exists($user, 'eraseCredentials')) {
+            trigger_deprecation(
+                'symfony/security',
+                '7.2',
+                'Implementing the method "%s" through the "%s" is deprecated. Use "%s" instead or remove the method from your User if it is empty.',
+                'eraseCredentials',
+                UserInterface::class,
+                PlaintextCredentialUserInterface::class,
+            );
+
+            $user->eraseCredentials();
         }
     }
 
@@ -154,7 +173,7 @@ abstract class AbstractToken implements TokenInterface, \Serializable
      */
     final public function serialize(): string
     {
-        throw new \BadMethodCallException('Cannot serialize '.__CLASS__);
+        throw new \BadMethodCallException('Cannot serialize ' . __CLASS__);
     }
 
     /**

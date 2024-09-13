@@ -53,13 +53,6 @@ class InMemoryUserTest extends TestCase
         $this->assertFalse($user->isEnabled());
     }
 
-    public function testEraseCredentials()
-    {
-        $user = new InMemoryUser('fabien', 'superpass');
-        $user->eraseCredentials();
-        $this->assertEquals('superpass', $user->getPassword());
-    }
-
     public function testToString()
     {
         $user = new InMemoryUser('fabien', 'superpass');

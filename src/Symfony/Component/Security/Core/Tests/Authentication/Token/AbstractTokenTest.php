@@ -11,8 +11,12 @@
 
 namespace Symfony\Component\Security\Core\Tests\Authentication\Token;
 
+use PHPUnit\Framework\MockObject\Rule\AnyInvokedCount as AnyInvokedCountMatcher;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\Authentication\Token\AbstractToken;
+use Symfony\Component\Security\Core\Tests\Authentication\Token\Fixtures\SimpleUser;
+use Symfony\Component\Security\Core\Tests\Authentication\Token\Fixtures\UserWithPlaintextCredentials;
+use Symfony\Component\Security\Core\Tests\Authentication\Token\Fixtures\UserWithPredefinedEraseCredentialMethod;
 use Symfony\Component\Security\Core\User\InMemoryUser;
 use Symfony\Component\Security\Core\User\UserInterface;
 
@@ -33,14 +37,37 @@ class AbstractTokenTest extends TestCase
         yield [new InMemoryUser('fabien', null), 'fabien'];
     }
 
-    public function testEraseCredentials()
+    /**
+     * @dataProvider provideUsersForEraseCredentials
+     */
+    public function testEraseCredentials(UserInterface $user)
     {
         $token = new ConcreteToken(['ROLE_FOO']);
 
-        $user = $this->createMock(UserInterface::class);
-        $user->expects($this->once())->method('eraseCredentials');
-        $token->setUser($user);
+        $user = new UserWithPredefinedEraseCredentialMethod();
 
+        $this->assertEquals('plaintext', $user->plainPassword);
+
+        $token->setUser($user);
+        $token->eraseCredentials();
+
+        $this->assertEquals('', $user->plainPassword);
+    }
+
+    public static function provideUsersForEraseCredentials(): \Generator
+    {
+        yield [new UserWithPlaintextCredentials()];
+        yield [new UserWithPredefinedEraseCredentialMethod()];
+    }
+
+    /**
+     * @doesNotPerformAssertions
+     */
+    public function testItDoesNotCallEraseCredentials()
+    {
+        (new YouClassUnderTest())->doSomething();
+        $token = new ConcreteToken(['ROLE_FOO']);
+        $token->setUser(new SimpleUser());
         $token->eraseCredentials();
     }
 

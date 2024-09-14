@@ -12,6 +12,7 @@ CHANGELOG
  * Deprecate making `cache.app` adapter taggable, use the `cache.app.taggable` adapter instead
  * Enable `json_decode_detailed_errors` in the default serializer context in debug mode by default when `seld/jsonlint` is installed
  * Register `Symfony\Component\Serializer\NameConverter\SnakeCaseToCamelCaseNameConverter` as a service named `serializer.name_converter.snake_case_to_camel_case` if available
+ * Add flag to sort `debug:router` output in alphabetical order, according to column name
 
 7.1
 ---

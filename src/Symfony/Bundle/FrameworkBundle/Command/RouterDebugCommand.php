@@ -55,6 +55,7 @@ class RouterDebugCommand extends Command
                 new InputOption('show-aliases', null, InputOption::VALUE_NONE, 'Show aliases in overview'),
                 new InputOption('format', null, InputOption::VALUE_REQUIRED, \sprintf('The output format ("%s")', implode('", "', $this->getAvailableFormatOptions())), 'txt'),
                 new InputOption('raw', null, InputOption::VALUE_NONE, 'To output raw route(s)'),
+                new InputOption('sort', null, InputOption::VALUE_REQUIRED, 'Sort by column name'),
             ])
             ->setHelp(<<<'EOF'
 The <info>%command.name%</info> displays the configured routes:
@@ -117,9 +118,14 @@ EOF
                 'container' => $container,
             ]);
         } else {
+            $sortBy = $input->getOption('sort');
+            if ($sortBy) {
+                $routes = $this->sortBy($routes, \strtolower($sortBy));
+            }
             $helper->describe($io, $routes, [
                 'format' => $input->getOption('format'),
                 'raw_text' => $input->getOption('raw'),
+                'sort' => $input->getOption('sort'),
                 'show_controllers' => $input->getOption('show-controllers'),
                 'show_aliases' => $input->getOption('show-aliases'),
                 'output' => $io,
@@ -171,5 +177,60 @@ EOF
     private function getAvailableFormatOptions(): array
     {
         return (new DescriptorHelper())->getFormats();
+    }
+
+    private function sortBy(RouteCollection $routeCollection, string $column): RouteCollection
+    {
+        $routesArray = $routeCollection->all();
+        $sortedRoutes = new RouteCollection();
+
+        if ('name' === $column) {
+            \ksort($routesArray);
+            foreach ($routesArray as $name => $route) {
+                $sortedRoutes->add($name, $route);
+                $sortedRoutes->addAlias($route->getDefault('_controller'), $name);
+            }
+
+            return $sortedRoutes;
+        }
+
+        $helperArray = [];
+
+        if ('method' === $column) {
+            foreach ($routesArray as $name => $route) {
+                $methods = empty($route->getMethods()) ? 'ANY' : \implode('|', $route->getMethods());
+                $helperArray[$methods][$name] = $route;
+            }
+        }
+
+        if ('scheme' === $column) {
+            foreach ($routesArray as $name => $route) {
+                $scheme = empty($route->getSchemes()) ? 'ANY' : \implode('|', $route->getSchemes());
+                $helperArray[$scheme][$name] = $route;
+            }
+        }
+
+        if ('host' === $column) {
+            foreach ($routesArray as $name => $route) {
+                $helperArray[$route->getHost()][$name] = $route;
+
+            }
+        }
+
+        if ('path' === $column) {
+            foreach ($routesArray as $name => $route) {
+                $helperArray[$route->getPath()][$name] = $route;
+            }
+        }
+
+        \ksort($helperArray);
+        foreach ($helperArray as $array) {
+            foreach ($array as $name => $route) {
+                $sortedRoutes->add($name, $route);
+                $sortedRoutes->addAlias($route->getDefault('_controller'), $name);
+            }
+        }
+
+        return $sortedRoutes;
     }
 }

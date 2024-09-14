@@ -1,0 +1,34 @@
+{
+    "events": [
+        {
+            "event": "bounce",
+            "category": "Password reset",
+            "custom_variables": {
+                "variable_a": "value",
+                "variable_b": "value2"
+            },
+            "message_id": "00000000-0000-0000-0000-000000000001",
+            "email": "receiver@example.com",
+            "timestamp": 1726358034,
+            "event_id": "bede7236-2284-43d6-a953-1fdcafd0fdbc",
+            "response": "[CS01] Message rejected due to local policy",
+            "response_code": 555,
+            "bounce_category": "spam"
+        },
+        {
+            "event": "click",
+            "category": "Password reset",
+            "custom_variables": {
+                "variable_a": "value",
+                "variable_b": "value2"
+            },
+            "message_id": "00000000-0000-0000-0000-000000000002",
+            "email": "receiver@example.com",
+            "timestamp": 1726358034,
+            "event_id": "bede7236-2284-43d6-a953-1fdcafd0fdbc",
+            "ip": "142.86.27.2",
+            "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.0.0 Safari/537.36",
+            "url": "https://mailtrap.io/email-api"
+        }
+    ]
+}

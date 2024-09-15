@@ -336,12 +336,12 @@ class FileProfilerStorageTest extends TestCase
 
         $handle = fopen($this->tmpDir.'/index.csv', 'r');
         for ($i = 0; $i < $iteration; ++$i) {
-            $row = fgetcsv($handle);
+            $row = fgetcsv($handle, null, ',', '"', '\\');
             $this->assertEquals('token'.$i, $row[0]);
             $this->assertEquals('127.0.0.'.$i, $row[1]);
             $this->assertEquals('http://foo.bar/'.$i, $row[3]);
         }
-        $this->assertFalse(fgetcsv($handle));
+        $this->assertFalse(fgetcsv($handle, null, ',', '"', '\\'));
     }
 
     public function testReadLineFromFile()

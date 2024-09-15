@@ -119,12 +119,16 @@ class RedirectController
             $statusCode = $permanent ? 301 : 302;
         }
 
+        $scheme ??= $request->getScheme();
+
+        if (str_starts_with($path, '//')) {
+            $path = $scheme.':'.$path;
+        }
+
         // redirect if the path is a full URL
         if (parse_url($path, \PHP_URL_SCHEME)) {
             return new RedirectResponse($path, $statusCode);
         }
-
-        $scheme ??= $request->getScheme();
 
         if ($qs = $request->server->get('QUERY_STRING') ?: $request->getQueryString()) {
             if (!str_contains($path, '?')) {

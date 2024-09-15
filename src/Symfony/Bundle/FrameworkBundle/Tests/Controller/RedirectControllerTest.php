@@ -183,6 +183,20 @@ class RedirectControllerTest extends TestCase
         $this->assertEquals(307, $returnResponse->getStatusCode());
     }
 
+    public function testProtocolRelative()
+    {
+        $request = new Request();
+        $controller = new RedirectController();
+
+        $returnResponse = $controller->urlRedirectAction($request, '//foo.bar/');
+        $this->assertRedirectUrl($returnResponse, 'http://foo.bar/');
+        $this->assertSame(302, $returnResponse->getStatusCode());
+
+        $returnResponse = $controller->urlRedirectAction($request, '//foo.bar/', false, 'https');
+        $this->assertRedirectUrl($returnResponse, 'https://foo.bar/');
+        $this->assertSame(302, $returnResponse->getStatusCode());
+    }
+
     public function testUrlRedirectDefaultPorts()
     {
         $host = 'www.example.com';

@@ -14,6 +14,7 @@ namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Bundle\FrameworkBundle\Controller\ControllerResolver;
 use Symfony\Bundle\FrameworkBundle\Controller\TemplateController;
+use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use Symfony\Component\HttpKernel\Controller\ArgumentResolver;
 use Symfony\Component\HttpKernel\Controller\ArgumentResolver\BackedEnumValueResolver;
 use Symfony\Component\HttpKernel\Controller\ArgumentResolver\DateTimeValueResolver;
@@ -72,6 +73,7 @@ return static function (ContainerConfigurator $container) {
                 service('validator')->nullOnInvalid(),
                 service('translator')->nullOnInvalid(),
                 param('validator.translation_domain'),
+                service('controller.expression_language')->nullOnInvalid(),
             ])
             ->tag('controller.targeted_value_resolver', ['name' => RequestPayloadValueResolver::class])
             ->tag('kernel.event_subscriber')
@@ -145,5 +147,11 @@ return static function (ContainerConfigurator $container) {
         ->set('controller.cache_attribute_listener', CacheAttributeListener::class)
             ->tag('kernel.event_subscriber')
 
+        ->set('controller.expression_language', ExpressionLanguage::class)
+            ->args([service('cache.request_payload_value_resolver_expression_language')->nullOnInvalid()])
+
+        ->set('cache.request_payload_value_resolver_expression_language')
+            ->parent('cache.system')
+            ->tag('cache.pool')
     ;
 };

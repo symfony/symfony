@@ -12,6 +12,8 @@
 namespace Symfony\Component\HttpKernel\Controller\ArgumentResolver;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\ExpressionLanguage\Expression;
+use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Attribute\MapQueryString;
@@ -32,6 +34,7 @@ use Symfony\Component\Serializer\Exception\UnsupportedFormatException;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Validator\Constraints\GroupSequence;
 use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\Validator\ConstraintViolationList;
 use Symfony\Component\Validator\Exception\ValidationFailedException;
@@ -66,6 +69,7 @@ class RequestPayloadValueResolver implements ValueResolverInterface, EventSubscr
         private readonly ?ValidatorInterface $validator = null,
         private readonly ?TranslatorInterface $translator = null,
         private string $translationDomain = 'validators',
+        private readonly ?ExpressionLanguage $expressionLanguage = null,
     ) {
     }
 
@@ -149,7 +153,8 @@ class RequestPayloadValueResolver implements ValueResolverInterface, EventSubscr
                     if (\is_array($payload) && !empty($constraints) && !$constraints instanceof Assert\All) {
                         $constraints = new Assert\All($constraints);
                     }
-                    $violations->addAll($this->validator->validate($payload, $constraints, $argument->validationGroups ?? null));
+                    $groups = $this->resolveValidationGroups($argument->validationGroups, $event);
+                    $violations->addAll($this->validator->validate($payload, $constraints, $groups));
                 }
 
                 if (\count($violations)) {
@@ -235,5 +240,47 @@ class RequestPayloadValueResolver implements ValueResolverInterface, EventSubscr
     private function mapUploadedFile(Request $request, ArgumentMetadata $argument, MapUploadedFile $attribute): UploadedFile|array|null
     {
         return $request->files->get($attribute->name ?? $argument->getName(), []);
+    }
+
+    /**
+     * @param Expression|string|GroupSequence|array<string|Expression>|null $validationGroups
+     *
+     * @return string|GroupSequence|array<string>|null
+     */
+    private function resolveValidationGroups(
+        Expression|string|GroupSequence|array|null $validationGroups,
+        ControllerArgumentsEvent $event,
+    ): string|GroupSequence|array|null {
+        if ($validationGroups instanceof Expression) {
+            return $this->resolveExpression($validationGroups, $event);
+        }
+
+        if (\is_array($validationGroups)) {
+            return array_map(
+                function (string|Expression $validationGroup) use ($event) {
+                    if ($validationGroup instanceof Expression) {
+                        return $this->resolveExpression($validationGroup, $event);
+                    }
+
+                    return $validationGroup;
+                },
+                $validationGroups
+            );
+        }
+
+        return $validationGroups;
+    }
+
+    private function resolveExpression(Expression $expression, ControllerArgumentsEvent $event): string
+    {
+        return $this->getExpressionLanguage()->evaluate($expression, [
+            'request' => $event->getRequest(),
+            'args' => $event->getNamedArguments(),
+        ]);
+    }
+
+    private function getExpressionLanguage(): ExpressionLanguage
+    {
+        return $this->expressionLanguage ?? new ExpressionLanguage();
     }
 }

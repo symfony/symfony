@@ -5,6 +5,7 @@ CHANGELOG
 ---
 
  * Add support for amphp/http-client v5 on PHP 8.4+
+ * Allow setting max persistent connections in `CurlHttpClient`
 
 7.1
 ---

@@ -20,17 +20,17 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
  */
 class CurlHttpClientTest extends HttpClientTestCase
 {
-    protected function getHttpClient(string $testCase): HttpClientInterface
+    protected function getHttpClient(string $testCase, array $options = []): HttpClientInterface
     {
         if (!str_contains($testCase, 'Push')) {
-            return new CurlHttpClient(['verify_peer' => false, 'verify_host' => false]);
+            return new CurlHttpClient(['verify_peer' => false, 'verify_host' => false] + $options);
         }
 
         if (!\defined('CURLMOPT_PUSHFUNCTION') || 0x073D00 > ($v = curl_version())['version_number'] || !(\CURL_VERSION_HTTP2 & $v['features'])) {
             $this->markTestSkipped('curl <7.61 is used or it is not compiled with support for HTTP/2 PUSH');
         }
 
-        return new CurlHttpClient(['verify_peer' => false, 'verify_host' => false], 6, 50);
+        return new CurlHttpClient(['verify_peer' => false, 'verify_host' => false] + $options, 6, 50);
     }
 
     public function testBindToPort()
@@ -137,5 +137,59 @@ class CurlHttpClientTest extends HttpClientTestCase
 
         $this->assertSame(200, $response->getStatusCode());
         $this->assertSame('/302', $response->toArray()['REQUEST_URI'] ?? null);
+    }
+
+    /**
+     * @group integration
+     *
+     * @dataProvider provideMaxConnectionCases
+     */
+    public function testMaxConnections(?int $maxConnections, array $expectedResults)
+    {
+        foreach ($ports = [80, 8081, 8082] as $port) {
+            if (!($fp = @fsockopen('localhost', $port, $errorCode, $errorMessage, 2))) {
+                self::markTestSkipped('FrankenPHP is not running');
+            }
+            fclose($fp);
+        }
+
+        $httpClient = $this->getHttpClient(__FUNCTION__, ['extra' => ['max_connections' => $maxConnections]]);
+
+        foreach ($expectedResults as $expectedResult) {
+            foreach ($ports as $i => $port) {
+                $response = $httpClient->request('GET', \sprintf('http://localhost:%s/http-client', $port));
+                $response->getContent();
+
+                self::assertSame($expectedResult[$i], str_contains($response->getInfo('debug'), 'Re-using existing connection'));
+            }
+        }
+    }
+
+    public static function provideMaxConnectionCases(): iterable
+    {
+        yield 'default' => [
+            null,
+            [
+                [false, false, false],
+                [true, true, true],
+                [true, true, true],
+            ],
+        ];
+        yield 'one' => [
+            1,
+            [
+                [false, false, false],
+                [false, false, false],
+                [false, false, false],
+            ],
+        ];
+        yield 'exact' => [
+            3,
+            [
+                [false, false, false],
+                [true, true, true],
+                [true, true, true],
+            ],
+        ];
     }
 }

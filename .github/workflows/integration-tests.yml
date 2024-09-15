@@ -122,11 +122,17 @@ jobs:
         image: dunglas/frankenphp:1.1.0
         ports:
           - 80:80
+          - 8081:81
+          - 8082:82
         volumes:
           - ${{ github.workspace }}:/symfony
         env:
-          SERVER_NAME: 'http://localhost'
+          SERVER_NAME: 'http://localhost http://localhost:81 http://localhost:82'
           CADDY_SERVER_EXTRA_DIRECTIVES: |
+            route /http-client* {
+              root * /symfony/src/Symfony/Component/HttpClient/Tests/Fixtures/response-functional/
+              php_server
+            }
             root * /symfony/src/Symfony/Component/HttpFoundation/Tests/Fixtures/response-functional/
 
     steps:

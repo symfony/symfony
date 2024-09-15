@@ -37,7 +37,7 @@ final class CurlClientState extends ClientState
 
     public static array $curlVersion;
 
-    public function __construct(int $maxHostConnections, int $maxPendingPushes)
+    public function __construct(int $maxHostConnections, int $maxPendingPushes, ?int $maxConnections = null)
     {
         self::$curlVersion ??= curl_version();
 
@@ -52,8 +52,8 @@ final class CurlClientState extends ClientState
         if (\defined('CURLMOPT_MAX_HOST_CONNECTIONS')) {
             $maxHostConnections = curl_multi_setopt($this->handle, \CURLMOPT_MAX_HOST_CONNECTIONS, 0 < $maxHostConnections ? $maxHostConnections : \PHP_INT_MAX) ? 0 : $maxHostConnections;
         }
-        if (\defined('CURLMOPT_MAXCONNECTS') && 0 < $maxHostConnections) {
-            curl_multi_setopt($this->handle, \CURLMOPT_MAXCONNECTS, $maxHostConnections);
+        if (\defined('CURLMOPT_MAXCONNECTS') && null !== $maxConnections ??= 0 < $maxHostConnections ? $maxHostConnections : null) {
+            curl_multi_setopt($this->handle, \CURLMOPT_MAXCONNECTS, $maxConnections);
         }
 
         // Skip configuring HTTP/2 push when it's unsupported or buggy, see https://bugs.php.net/77535

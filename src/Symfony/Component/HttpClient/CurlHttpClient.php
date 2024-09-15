@@ -45,6 +45,7 @@ final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface,
                              //   password as the second one; or string like username:password - enabling NTLM auth
         'extra' => [
             'curl' => [],    // A list of extra curl options indexed by their corresponding CURLOPT_*
+            'max_connections' => null, // The maximum amount of simultaneously open connections, corresponds to CURLMOPT_MAXCONNECTS
         ],
     ];
     private static array $emptyDefaults = self::OPTIONS_DEFAULTS + ['auth_ntlm' => null];
@@ -450,7 +451,7 @@ final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface,
     private function ensureState(): CurlClientState
     {
         if (!isset($this->multi)) {
-            $this->multi = new CurlClientState($this->maxHostConnections, $this->maxPendingPushes);
+            $this->multi = new CurlClientState($this->maxHostConnections, $this->maxPendingPushes, $this->defaultOptions['extra']['max_connections'] ?? null);
             $this->multi->logger = $this->logger;
         }
 

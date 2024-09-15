@@ -51,7 +51,12 @@ final class VoteEvent extends Event
         return $this->attributes;
     }
 
-    public function getVote(): VoteInterface
+    public function getVote(): int
+    {
+        return $this->vote->getAccess();
+    }
+
+    public function getVoteObject(): VoteInterface
     {
         return $this->vote;
     }

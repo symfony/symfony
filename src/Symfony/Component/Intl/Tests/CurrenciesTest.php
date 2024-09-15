@@ -293,6 +293,7 @@ class CurrenciesTest extends ResourceBundleTestCase
         'WST',
         'XAF',
         'XCD',
+        'XCG',
         'XEU',
         'XFO',
         'XFU',

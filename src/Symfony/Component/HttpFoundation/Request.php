@@ -302,6 +302,7 @@ class Request
         if (false === $components) {
             throw new \InvalidArgumentException(sprintf('Malformed URI "%s".', $uri));
         }
+
         if (isset($components['host'])) {
             $server['SERVER_NAME'] = $components['host'];
             $server['HTTP_HOST'] = $components['host'];

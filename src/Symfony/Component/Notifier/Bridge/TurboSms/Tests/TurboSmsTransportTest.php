@@ -93,6 +93,43 @@ final class TurboSmsTransportTest extends TransportTestCase
         self::assertSame('f83f8868-5e46-c6cf-e4fb-615e5a293754', $sentMessage->getMessageId());
     }
 
+    public function testFailedSendWithPartialAccepted()
+    {
+        $response = $this->createMock(ResponseInterface::class);
+        $response
+            ->expects(self::exactly(2))
+            ->method('getStatusCode')
+            ->willReturn(200)
+        ;
+        $response
+            ->expects(self::once())
+            ->method('getContent')
+            ->willReturn(json_encode([
+                'response_code' => 0,
+                'response_status' => 'OK',
+                'response_result' => [
+                    [
+                        'phone' => '380931234567',
+                        'response_code' => 406,
+                        'message_id' => null,
+                        'response_status' => 'NOT_ALLOWED_RECIPIENT_COUNTRY',
+                    ],
+                ],
+            ]))
+        ;
+
+        $client = new MockHttpClient(static fn() => $response);
+
+        $message = new SmsMessage('380931234567', 'Test');
+
+        $transport = self::createTransport($client);
+
+        $this->expectException(TransportException::class);
+        $this->expectExceptionMessage('Unable to send SMS with TurboSMS: Error code 406 with message "NOT_ALLOWED_RECIPIENT_COUNTRY".');
+
+        $transport->send($message);
+    }
+
     public function testFailedSend()
     {
         $response = $this->createMock(ResponseInterface::class);

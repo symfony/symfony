@@ -153,7 +153,7 @@ class RequestPayloadValueResolver implements ValueResolverInterface, EventSubscr
                     if (\is_array($payload) && !empty($constraints) && !$constraints instanceof Assert\All) {
                         $constraints = new Assert\All($constraints);
                     }
-                    $groups = $this->resolveValidationGroups($argument->validationGroups, $event);
+                    $groups = $this->resolveValidationGroups($argument->validationGroups ?? null, $event);
                     $violations->addAll($this->validator->validate($payload, $constraints, $groups));
                 }
 

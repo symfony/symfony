@@ -129,7 +129,7 @@ final class SwiftRegistryIbanProvider
         array_shift($lines);
 
         foreach ($lines as $line) {
-            $columns = str_getcsv($line, "\t");
+            $columns = str_getcsv($line, "\t", '"', '\\');
             $propertyLabel = array_shift($columns);
 
             if (!isset($properties[$propertyLabel])) {

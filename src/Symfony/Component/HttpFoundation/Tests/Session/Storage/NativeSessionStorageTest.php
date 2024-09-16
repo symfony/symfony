@@ -203,17 +203,37 @@ class NativeSessionStorageTest extends TestCase
         $this->assertEquals($options, $gco);
     }
 
-    public function testSessionOptions()
+    public function testCacheExpireOption()
     {
         $options = [
-            'trans_sid_tags' => 'a=href',
             'cache_expire' => '200',
         ];
 
         $this->getStorage($options);
 
-        $this->assertSame('a=href', \ini_get('session.trans_sid_tags'));
         $this->assertSame('200', \ini_get('session.cache_expire'));
+    }
+
+    /**
+     * The test must only be removed when the "session.trans_sid_tags" option is removed from PHP or when the "trans_sid_tags" option is no longer supported by the native session storage.
+     */
+    public function testTransSidTagsOption()
+    {
+        $previousErrorHandler = set_error_handler(function ($errno, $errstr) use (&$previousErrorHandler) {
+            if ('ini_set(): Usage of session.trans_sid_tags INI setting is deprecated' !== $errstr) {
+                return $previousErrorHandler ? $previousErrorHandler(...\func_get_args()) : false;
+            }
+        });
+
+        try {
+            $this->getStorage([
+                'trans_sid_tags' => 'a=href',
+            ]);
+        } finally {
+            restore_error_handler();
+        }
+
+        $this->assertSame('a=href', \ini_get('session.trans_sid_tags'));
     }
 
     public function testSetSaveHandler()

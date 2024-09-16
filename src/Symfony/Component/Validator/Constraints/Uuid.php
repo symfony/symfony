@@ -39,7 +39,7 @@ class Uuid extends Constraint
         self::INVALID_VARIANT_ERROR => 'INVALID_VARIANT_ERROR',
     ];
 
-    // Possible versions defined by RFC 4122
+    // Possible versions defined by RFC 9562/4122
     public const V1_MAC = 1;
     public const V2_DCE = 2;
     public const V3_MD5 = 3;
@@ -64,7 +64,7 @@ class Uuid extends Constraint
     public $message = 'This is not a valid UUID.';
 
     /**
-     * Strict mode only allows UUIDs that meet the formal definition and formatting per RFC 4122.
+     * Strict mode only allows UUIDs that meet the formal definition and formatting per RFC 9562/4122.
      *
      * Set this to `false` to allow legacy formats with different dash positioning or wrapping characters
      *

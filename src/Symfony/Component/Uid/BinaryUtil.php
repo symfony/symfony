@@ -36,7 +36,7 @@ class BinaryUtil
         'u' => 52, 'v' => 53, 'w' => 54, 'x' => 55, 'y' => 56, 'z' => 57,
     ];
 
-    // https://tools.ietf.org/html/rfc4122#section-4.1.4
+    // https://datatracker.ietf.org/doc/html/rfc9562#section-5.1
     // 0x01b21dd213814000 is the number of 100-ns intervals between the
     // UUID epoch 1582-10-15 00:00:00 and the Unix epoch 1970-01-01 00:00:00.
     private const TIME_OFFSET_INT = 0x01B21DD213814000;

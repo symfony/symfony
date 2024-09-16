@@ -604,4 +604,14 @@ class DotenvTest extends TestCase
         $resetContext();
         rmdir($tmpdir);
     }
+
+    public function testExceptionWithBom()
+    {
+        $dotenv = new Dotenv();
+
+        $this->expectException(FormatException::class);
+        $this->expectExceptionMessage('Loading files starting with a byte-order-mark (BOM) is not supported.');
+
+        $dotenv->load(__DIR__.'/fixtures/file_with_bom');
+    }
 }

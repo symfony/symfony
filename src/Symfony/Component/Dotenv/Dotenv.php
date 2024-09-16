@@ -553,7 +553,13 @@ final class Dotenv
                 throw new PathException($path);
             }
 
-            $this->populate($this->parse(file_get_contents($path), $path), $overrideExistingVars);
+            $data = file_get_contents($path);
+
+            if ("\xEF\xBB\xBF" === substr($data, 0, 3)) {
+                throw new FormatException('Loading files starting with a byte-order-mark (BOM) is not supported.', new FormatExceptionContext($data, $path, 1, 0));
+            }
+
+            $this->populate($this->parse($data, $path), $overrideExistingVars);
         }
     }
 }

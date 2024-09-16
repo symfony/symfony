@@ -2396,6 +2396,62 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $this->assertFalse($container->has('assets._default_package'));
     }
 
+    public function testDefaultLock()
+    {
+        $container = $this->createContainerFromFile('lock');
+
+        self::assertTrue($container->hasDefinition('lock.default.factory'));
+        $storeDef = $container->getDefinition($container->getDefinition('lock.default.factory')->getArgument(0));
+        self::assertEquals(new Reference('semaphore'), $storeDef->getArgument(0));
+    }
+
+    public function testNamedLocks()
+    {
+        $container = $this->createContainerFromFile('lock_named');
+
+        self::assertTrue($container->hasDefinition('lock.foo.factory'));
+        $storeDef = $container->getDefinition($container->getDefinition('lock.foo.factory')->getArgument(0));
+        self::assertEquals(new Reference('semaphore'), $storeDef->getArgument(0));
+
+        self::assertTrue($container->hasDefinition('lock.bar.factory'));
+        $storeDef = $container->getDefinition($container->getDefinition('lock.bar.factory')->getArgument(0));
+        self::assertEquals(new Reference('flock'), $storeDef->getArgument(0));
+
+        self::assertTrue($container->hasDefinition('lock.baz.factory'));
+        $storeDef = $container->getDefinition($container->getDefinition('lock.baz.factory')->getArgument(0));
+        self::assertIsArray($storeDefArg = $storeDef->getArgument(0));
+        $storeDef1 = $container->getDefinition($storeDefArg[0]);
+        $storeDef2 = $container->getDefinition($storeDefArg[1]);
+        self::assertEquals(new Reference('semaphore'), $storeDef1->getArgument(0));
+        self::assertEquals(new Reference('flock'), $storeDef2->getArgument(0));
+
+        self::assertTrue($container->hasDefinition('lock.qux.factory'));
+        $storeDef = $container->getDefinition($container->getDefinition('lock.qux.factory')->getArgument(0));
+        self::assertStringContainsString('REDIS_DSN', $storeDef->getArgument(0));
+    }
+
+    public function testDefaultSemaphore()
+    {
+        $container = $this->createContainerFromFile('semaphore');
+
+        self::assertTrue($container->hasDefinition('semaphore.default.factory'));
+        $storeDef = $container->getDefinition($container->getDefinition('semaphore.default.factory')->getArgument(0));
+        self::assertSame('redis://localhost', $storeDef->getArgument(0));
+    }
+
+    public function testNamedSemaphores()
+    {
+        $container = $this->createContainerFromFile('semaphore_named');
+
+        self::assertTrue($container->hasDefinition('semaphore.foo.factory'));
+        $storeDef = $container->getDefinition($container->getDefinition('semaphore.foo.factory')->getArgument(0));
+        self::assertSame('redis://paas.com', $storeDef->getArgument(0));
+
+        self::assertTrue($container->hasDefinition('semaphore.qux.factory'));
+        $storeDef = $container->getDefinition($container->getDefinition('semaphore.qux.factory')->getArgument(0));
+        self::assertStringContainsString('REDIS_DSN', $storeDef->getArgument(0));
+    }
+
     protected function createContainer(array $data = [])
     {
         return new ContainerBuilder(new EnvPlaceholderParameterBag(array_merge([

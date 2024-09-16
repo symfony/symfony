@@ -49,7 +49,10 @@ class DOMCasterTest extends TestCase
         );
     }
 
-    public function testCastNode()
+    /**
+     * @requires PHP < 8.4
+     */
+    public function testCastNodePriorToPhp84()
     {
         $doc = new \DOMDocument();
         $doc->loadXML('<foo><bar/></foo>');
@@ -70,6 +73,27 @@ class DOMCasterTest extends TestCase
     /**
      * @requires PHP 8.4
      */
+    public function testCastNode()
+    {
+        $doc = new \DOMDocument();
+        $doc->loadXML('<foo><bar/></foo>');
+        $node = $doc->documentElement->firstChild;
+
+        $this->assertDumpMatchesFormat(<<<'EODUMP'
+            DOMElement {%A
+              +ownerDocument: ~ ?DOMDocument
+              +namespaceURI: ~ ?string
+              +prefix: ~ string
+              +localName: ~ ?string
+            %A}
+            EODUMP,
+            $node
+        );
+    }
+
+    /**
+     * @requires PHP 8.4
+     */
     public function testCastModernNode()
     {
         $doc = \Dom\XMLDocument::createFromString('<foo><bar/></foo>');
@@ -77,9 +101,9 @@ class DOMCasterTest extends TestCase
 
         $this->assertDumpMatchesFormat(<<<'EODUMP'
             Dom\Element {%A
-              +baseURI: ? string
-              +isConnected: ? bool
-              +ownerDocument: ? ?Dom\Document
+              +baseURI: ~ string
+              +isConnected: ~ bool
+              +ownerDocument: ~ ?Dom\Document
             %A}
             EODUMP,
             $node
@@ -142,7 +166,10 @@ class DOMCasterTest extends TestCase
         );
     }
 
-    public function testCastText()
+    /**
+     * @requires PHP < 8.4
+     */
+    public function testCastTextPriorToPhp84()
     {
         $doc = new \DOMText('foo');
 
@@ -158,19 +185,38 @@ class DOMCasterTest extends TestCase
     /**
      * @requires PHP 8.4
      */
+    public function testCastText()
+    {
+        $doc = new \DOMText('foo');
+
+        $this->assertDumpMatchesFormat(<<<'EODUMP'
+            DOMText {%A
+              +wholeText: ~ string
+            }
+            EODUMP,
+            $doc
+        );
+    }
+
+    /**
+     * @requires PHP 8.4
+     */
     public function testCastModernText()
     {
         $text = \Dom\HTMLDocument::createEmpty()->createTextNode('foo');
         $this->assertDumpMatchesFormat(<<<'EODUMP'
             Dom\Text {%A
-              +wholeText: ? string
+              +wholeText: ~ string
             }
             EODUMP,
             $text
         );
     }
 
-    public function testCastAttr()
+    /**
+     * @requires PHP < 8.4
+     */
+    public function testCastAttrPriorToPhp84()
     {
         $attr = new \DOMAttr('attr', 'value');
 
@@ -190,23 +236,66 @@ class DOMCasterTest extends TestCase
     /**
      * @requires PHP 8.4
      */
-    public function testCastModernAttr()
+    public function testCastAttr()
     {
-        $attr = \Dom\HTMLDocument::createEmpty()->createAttribute('attr');
+        $attr = new \DOMAttr('attr', 'value');
 
         $this->assertDumpMatchesFormat(<<<'EODUMP'
-            Dom\Attr {%A
-              +name: ? string
-              +value: ? string
-              +ownerElement: ? ?Dom\Element
-              +specified: true
+            DOMAttr {%A
+              +name: ~ string
+              +specified: ~ bool
+              +value: ~ string
+              +ownerElement: ~ ?DOMElement
+              +schemaTypeInfo: ~ mixed
             }
             EODUMP,
             $attr
         );
     }
 
-    public function testCastElement()
+    /**
+     * @requires PHP 8.4
+     */
+    public function testCastAttrPrior()
+    {
+        $attr = new \DOMAttr('attr', 'value');
+
+        $this->assertDumpMatchesFormat(<<<'EODUMP'
+            DOMAttr {%A
+              +name: ~ string
+              +specified: ~ bool
+              +value: ~ string
+              +ownerElement: ~ ?DOMElement
+              +schemaTypeInfo: ~ mixed
+            }
+            EODUMP,
+            $attr
+        );
+    }
+
+    /**
+     * @requires PHP 8.4
+     */
+    public function testCastModernAttr()
+    {
+        $attr = \Dom\HTMLDocument::createEmpty()->createAttribute('attr');
+
+        $this->assertDumpMatchesFormat(<<<'EODUMP'
+            Dom\Attr {%A
+              +name: ~ string
+              +value: ~ string
+              +ownerElement: ~ ?Dom\Element
+              +specified: ~ bool
+            }
+            EODUMP,
+            $attr
+        );
+    }
+
+    /**
+     * @requires PHP < 8.4
+     */
+    public function testCastElementPriorToPhp84()
     {
         $attr = new \DOMElement('foo');
 
@@ -222,20 +311,39 @@ class DOMCasterTest extends TestCase
     /**
      * @requires PHP 8.4
      */
-    public function testCastModernElement()
+    public function testCastElement()
     {
-        $attr = \Dom\HTMLDocument::createEmpty()->createElement('foo');
+        $attr = new \DOMElement('foo');
 
         $this->assertDumpMatchesFormat(<<<'EODUMP'
-            Dom\HTMLElement {%A
-              +tagName: ? string
+            DOMElement {%A
+              +tagName: ~ string
             %A}
             EODUMP,
             $attr
         );
     }
 
-    public function testCastDocumentType()
+    /**
+     * @requires PHP 8.4
+     */
+    public function testCastModernElement()
+    {
+        $attr = \Dom\HTMLDocument::createEmpty()->createElement('foo');
+
+        $this->assertDumpMatchesFormat(<<<'EODUMP'
+            Dom\HTMLElement {%A
+              +tagName: ~ string
+            %A}
+            EODUMP,
+            $attr
+        );
+    }
+
+    /**
+     * @requires PHP < 8.4
+     */
+    public function testCastDocumentTypePriorToPhp84()
     {
         $implementation = new \DOMImplementation();
         $type = $implementation->createDocumentType('html', 'publicId', 'systemId');
@@ -257,6 +365,28 @@ class DOMCasterTest extends TestCase
     /**
      * @requires PHP 8.4
      */
+    public function testCastDocumentType()
+    {
+        $implementation = new \DOMImplementation();
+        $type = $implementation->createDocumentType('html', 'publicId', 'systemId');
+
+        $this->assertDumpMatchesFormat(<<<'EODUMP'
+            DOMDocumentType {%A
+              +name: ~ string
+              +entities: ~ DOMNamedNodeMap
+              +notations: ~ DOMNamedNodeMap
+              +publicId: ~ string
+              +systemId: ~ string
+              +internalSubset: ~ ?string
+            }
+            EODUMP,
+            $type
+        );
+    }
+
+    /**
+     * @requires PHP 8.4
+     */
     public function testCastModernDocumentType()
     {
         $implementation = new \Dom\Implementation();
@@ -264,19 +394,22 @@ class DOMCasterTest extends TestCase
 
         $this->assertDumpMatchesFormat(<<<'EODUMP'
             Dom\DocumentType {%A
-              +name: ? string
-              +entities: ? Dom\DtdNamedNodeMap
-              +notations: ? Dom\DtdNamedNodeMap
-              +publicId: ? string
-              +systemId: ? string
-              +internalSubset: ? ?string
+              +name: ~ string
+              +entities: ~ Dom\DtdNamedNodeMap
+              +notations: ~ Dom\DtdNamedNodeMap
+              +publicId: ~ string
+              +systemId: ~ string
+              +internalSubset: ~ ?string
             }
             EODUMP,
             $type
         );
     }
 
-    public function testCastProcessingInstruction()
+    /**
+     * @requires PHP < 8.4
+     */
+    public function testCastProcessingInstructionPriorToPhp84()
     {
         $entity = new \DOMProcessingInstruction('target', 'data');
 
@@ -293,22 +426,42 @@ class DOMCasterTest extends TestCase
     /**
      * @requires PHP 8.4
      */
-    public function testCastModernProcessingInstruction()
+    public function testCastProcessingInstruction()
     {
-        $entity = \Dom\HTMLDocument::createEmpty()->createProcessingInstruction('target', 'data');
+        $entity = new \DOMProcessingInstruction('target', 'data');
 
         $this->assertDumpMatchesFormat(<<<'EODUMP'
-            Dom\ProcessingInstruction {%A
-              +data: ? string
-              +length: ? int
-              +target: ? string
+            DOMProcessingInstruction {%A
+              +target: ~ string
+              +data: ~ string
             }
             EODUMP,
             $entity
         );
     }
 
-    public function testCastXPath()
+    /**
+     * @requires PHP 8.4
+     */
+    public function testCastModernProcessingInstruction()
+    {
+        $entity = \Dom\HTMLDocument::createEmpty()->createProcessingInstruction('target', 'data');
+
+        $this->assertDumpMatchesFormat(<<<'EODUMP'
+            Dom\ProcessingInstruction {%A
+              +data: ~ string
+              +length: ~ int
+              +target: ~ string
+            }
+            EODUMP,
+            $entity
+        );
+    }
+
+    /**
+     * @requires PHP < 8.4
+     */
+    public function testCastXPathPriorToPhp84()
     {
         $xpath = new \DOMXPath(new \DOMDocument());
 
@@ -325,14 +478,31 @@ class DOMCasterTest extends TestCase
     /**
      * @requires PHP 8.4
      */
+    public function testCastXPath()
+    {
+        $xpath = new \DOMXPath(new \DOMDocument());
+
+        $this->assertDumpEquals(<<<'EODUMP'
+            DOMXPath {
+              +document: ~ DOMDocument
+              +registerNodeNamespaces: ~ bool
+            }
+            EODUMP,
+            $xpath
+        );
+    }
+
+    /**
+     * @requires PHP 8.4
+     */
     public function testCastModernXPath()
     {
         $entity = new \Dom\XPath(\Dom\HTMLDocument::createEmpty());
 
         $this->assertDumpEquals(<<<'EODUMP'
             Dom\XPath {
-              +document: ? Dom\Document
-              +registerNodeNamespaces: ? bool
+              +document: ~ Dom\Document
+              +registerNodeNamespaces: ~ bool
             }
             EODUMP,
             $entity

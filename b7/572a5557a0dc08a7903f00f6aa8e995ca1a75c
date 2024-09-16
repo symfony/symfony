@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by stof at 2024-09-13T11:04:34Z
+
+The comment on the previous PR also suggested adding the alias constant for the serializer component.
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2024-09-13T12:51:58Z
+
+That's right, let's take advantage of this PR to introduce it as well

@@ -1,0 +1,29 @@
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2024-08-05T07:06:32Z
+
+For the record, the deprecation poll is closed and it has been confirmed for 8.4: https://wiki.php.net/rfc/deprecations_php_8_4#sessionsid_length_and_sessionsid_bits_per_character
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-08-13T14:37:27Z
+
+NativeSessionStorage also has references to these ini options. Can you please have a look and advise what we should do there?
+
+---------------------------------------------------------------------------
+
+by stof at 2024-08-13T15:19:06Z
+
+NativeSessionStorage should also trigger a deprecation when those options are passed (not just FrameworkBundle)
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2024-08-18T18:33:31Z
+
+PR updated so NativeSessionStorage also throws a deprecation warning
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2024-09-16T15:15:45Z
+
+Rebased after the merge of #58244

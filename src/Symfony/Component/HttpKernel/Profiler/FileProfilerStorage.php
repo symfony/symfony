@@ -334,7 +334,7 @@ class FileProfilerStorage implements ProfilerStorageInterface
         }
 
         while ($line = fgets($handle)) {
-            $values = str_getcsv($line);
+            $values = str_getcsv($line, ',', '"', '\\');
 
             if (7 > \count($values)) {
                 // skip invalid lines

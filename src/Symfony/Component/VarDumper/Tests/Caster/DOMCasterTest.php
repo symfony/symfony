@@ -170,7 +170,10 @@ class DOMCasterTest extends TestCase
         );
     }
 
-    public function testCastAttr()
+    /**
+     * @requires PHP < 8.4
+     */
+    public function testCastAttrPriorToPhp84()
     {
         $attr = new \DOMAttr('attr', 'value');
 
@@ -190,6 +193,26 @@ class DOMCasterTest extends TestCase
     /**
      * @requires PHP 8.4
      */
+    public function testCastAttr()
+    {
+        $attr = new \DOMAttr('attr', 'value');
+
+        $this->assertDumpMatchesFormat(<<<'EODUMP'
+            DOMAttr {%A
+              +name: ? string
+              +specified: ? bool
+              +value: ? string
+              +ownerElement: ? ?DOMElement
+              +schemaTypeInfo: ? mixed
+            }
+            EODUMP,
+            $attr
+        );
+    }
+
+    /**
+     * @requires PHP 8.4
+     */
     public function testCastModernAttr()
     {
         $attr = \Dom\HTMLDocument::createEmpty()->createAttribute('attr');
@@ -199,7 +222,7 @@ class DOMCasterTest extends TestCase
               +name: ? string
               +value: ? string
               +ownerElement: ? ?Dom\Element
-              +specified: true
+              +specified: ? bool
             }
             EODUMP,
             $attr

@@ -42,18 +42,26 @@ final class ImportMapInstallCommand extends Command
         $finishedCount = 0;
         $progressBar = new ProgressBar($output);
         $progressBar->setFormat('<info>%current%/%max%</info> %bar% %url%');
-        $downloadedPackages = $this->packageDownloader->downloadPackages(function (string $package, string $event, ResponseInterface $response, int $totalPackages) use (&$finishedCount, $progressBar) {
-            $progressBar->setMessage($response->getInfo('url'), 'url');
-            if (0 === $progressBar->getMaxSteps()) {
-                $progressBar->setMaxSteps($totalPackages);
-                $progressBar->start();
-            }
 
-            if ('finished' === $event) {
-                ++$finishedCount;
-                $progressBar->advance();
-            }
-        });
+        try {
+            $downloadedPackages = $this->packageDownloader->downloadPackages(function (string $package, string $event, ResponseInterface $response, int $totalPackages) use (&$finishedCount, $progressBar) {
+                $progressBar->setMessage($response->getInfo('url'), 'url');
+                if (0 === $progressBar->getMaxSteps()) {
+                    $progressBar->setMaxSteps($totalPackages);
+                    $progressBar->start();
+                }
+
+                if ('finished' === $event) {
+                    ++$finishedCount;
+                    $progressBar->advance();
+                }
+            });
+        } catch (\Throwable $throwable) {
+            $io->error($throwable->getMessage());
+
+            return Command::FAILURE;
+        }
+
         $progressBar->finish();
         $progressBar->clear();
 

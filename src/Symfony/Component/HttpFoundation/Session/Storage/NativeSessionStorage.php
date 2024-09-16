@@ -62,16 +62,16 @@ class NativeSessionStorage implements SessionStorageInterface
      * gc_probability, "1"
      * lazy_write, "1"
      * name, "PHPSESSID"
-     * referer_check, ""
+     * referer_check, "" (deprecated since Symfony 7.2, to be removed in Symfony 8.0)
      * serialize_handler, "php"
      * use_strict_mode, "1"
      * use_cookies, "1"
-     * use_only_cookies, "1"
-     * use_trans_sid, "0"
+     * use_only_cookies, "1" (deprecated since Symfony 7.2, to be removed in Symfony 8.0)
+     * use_trans_sid, "0" (deprecated since Symfony 7.2, to be removed in Symfony 8.0)
      * sid_length, "32"
      * sid_bits_per_character, "5"
-     * trans_sid_hosts, $_SERVER['HTTP_HOST']
-     * trans_sid_tags, "a=href,area=href,frame=src,form="
+     * trans_sid_hosts, $_SERVER['HTTP_HOST'] (deprecated since Symfony 7.2, to be removed in Symfony 8.0)
+     * trans_sid_tags, "a=href,area=href,frame=src,form=" (deprecated since Symfony 7.2, to be removed in Symfony 8.0)
      */
     public function __construct(array $options = [], AbstractProxy|\SessionHandlerInterface|null $handler = null, ?MetadataBag $metaBag = null)
     {
@@ -328,6 +328,10 @@ class NativeSessionStorage implements SessionStorageInterface
         ]);
 
         foreach ($options as $key => $value) {
+            if (\in_array($key, ['referer_check', 'use_only_cookies', 'use_trans_sid', 'trans_sid_hosts', 'trans_sid_tags'], true)) {
+                trigger_deprecation('symfony/http-foundation', '7.2', 'NativeSessionStorage\'s "%s" option is deprecated and will be ignored in Symfony 8.0.', $key);
+            }
+
             if (isset($validOptions[$key])) {
                 if ('cookie_secure' === $key && 'auto' === $value) {
                     continue;

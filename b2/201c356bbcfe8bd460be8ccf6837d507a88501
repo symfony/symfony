@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2024-09-13T21:07:14Z
+
+Isn’t the test failure on PHP 8.2 related?
+
+---------------------------------------------------------------------------
+
+by HypeMC at 2024-09-13T21:20:32Z
+
+> Isn’t the test failure on PHP 8.2 related?
+
+@xabbuh Yes, but that's high-deps and if I'm not mistaking, that'll get resolved when merged upstream.

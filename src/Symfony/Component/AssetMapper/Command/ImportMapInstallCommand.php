@@ -56,7 +56,7 @@ final class ImportMapInstallCommand extends Command
                     $progressBar->advance();
                 }
             });
-        } catch (\Throwable $throwable) {
+        } catch (\LogicException $throwable) {
             $io->error($throwable->getMessage());
 
             return Command::FAILURE;

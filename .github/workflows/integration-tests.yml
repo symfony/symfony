@@ -118,6 +118,23 @@ jobs:
           KAFKA_CFG_LISTENERS: 'PLAINTEXT://:9092'
           KAFKA_CFG_ZOOKEEPER_CONNECT: 'zookeeper:2181'
         options: --name=kafka
+      frankenphp:
+        image: dunglas/frankenphp:1.1.0
+        ports:
+          - 80:80
+          - 8681:81
+          - 8682:82
+          - 8683:83
+          - 8684:84
+        volumes:
+          - ${{ github.workspace }}:/symfony
+        env:
+          SERVER_NAME: 'http://localhost http://localhost:81 http://localhost:82 http://localhost:83 http://localhost:84'
+          CADDY_SERVER_EXTRA_DIRECTIVES: |
+            route /http-client* {
+              root * /symfony/src/Symfony/Component/HttpClient/Tests/Fixtures/response-functional/
+              php_server
+            }
 
     steps:
       - name: Checkout

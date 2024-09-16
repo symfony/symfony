@@ -8,6 +8,7 @@ CHANGELOG
  * Deprecate `CsvEncoderContextBuilder::withEscapeChar()` method
  * Add `SnakeCaseToCamelCaseNameConverter`
  * Support subclasses of `\DateTime` and `\DateTimeImmutable` for denormalization
+ * Add the `UidNormalizer::NORMALIZATION_FORMAT_RFC9562` constant
 
 7.1
 ---

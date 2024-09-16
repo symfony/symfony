@@ -1,27 +1,31 @@
 <?php
 
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Symfony\Bridge\Doctrine\Tests\Form\Validation;
 
 use Doctrine\ORM\EntityManager;
-use Doctrine\ORM\Tools\SchemaTool;
 use Doctrine\Persistence\ManagerRegistry;
 use PHPUnit\Framework\MockObject\MockObject;
-use Symfony\Bridge\Doctrine\Form\DoctrineOrmExtension;
 use Symfony\Bridge\Doctrine\Tests\DoctrineTestHelper;
 use Symfony\Bridge\Doctrine\Tests\Fixtures\UniqueFieldFormValidationEntity;
-use Symfony\Bridge\Doctrine\Tests\Fixtures\UniqueGroupFieldsEntity;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntityValidator;
 use Symfony\Component\Form\Extension\Validator\ValidatorExtension;
 use Symfony\Component\Form\Extension\Validator\ViolationMapper\ViolationMapper;
-use Symfony\Component\Form\Forms;
-use Symfony\Component\Form\Tests\Extension\Core\Type\BaseTypeTestCase;
+use Symfony\Component\Form\Test\TypeTestCase;
 use Symfony\Component\Form\Tests\Extension\Core\Type\FormTypeTest;
 use Symfony\Component\Form\Tests\Extension\Core\Type\TextTypeTest;
 use Symfony\Component\Validator\ConstraintValidatorFactory;
 use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\Validator\Validation;
-use Symfony\Component\Form\Test\TypeTestCase;
 
 class UniqueFieldEntityFormValidationTest extends TypeTestCase
 {
@@ -46,10 +50,11 @@ class UniqueFieldEntityFormValidationTest extends TypeTestCase
 
         return $registry;
     }
+
     protected function getExtensions(): array
     {
         $factory = new ConstraintValidatorFactory([
-            'doctrine.orm.validator.unique' => new UniqueEntityValidator($this->emRegistry)
+            'doctrine.orm.validator.unique' => new UniqueEntityValidator($this->emRegistry),
         ]);
 
         $validator = Validation::createValidatorBuilder()

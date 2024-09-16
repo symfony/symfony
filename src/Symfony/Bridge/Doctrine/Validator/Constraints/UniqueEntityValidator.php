@@ -208,7 +208,7 @@ class UniqueEntityValidator extends ConstraintValidator
         }
 
         $errorPath = $constraint->errorPath ?? implode(', ', array_keys($criteria));
-        $invalidValue = $criteria[$errorPath] ?? implode(', ', array_map(fn ($o) => is_object($o) ? '"object"' : $o, $criteria));
+        $invalidValue = $criteria[$errorPath] ?? implode(', ', array_map(fn ($o) => \is_object($o) ? '"object"' : $o, $criteria));
 
         $violation = $this->context->buildViolation($constraint->message)
             ->atPath($errorPath)
@@ -217,8 +217,8 @@ class UniqueEntityValidator extends ConstraintValidator
             ->setCode(UniqueEntity::NOT_UNIQUE_ERROR)
             ->setCause($result);
 
-        if(\is_array($criteria) && \count($criteria) > 1) {
-            foreach($criteria as $field => $value) {
+        if (\is_array($criteria) && \count($criteria) > 1) {
+            foreach ($criteria as $field => $value) {
                 $violation->setParameter('{{ '.$field.' value }}', $this->formatWithIdentifiers($em, $class, $value));
             }
         }

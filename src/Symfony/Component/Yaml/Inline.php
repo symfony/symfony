@@ -355,11 +355,18 @@ class Inline
         ++$i;
 
         // [foo, bar, ...]
+        $lastToken = null;
         while ($i < $len) {
             if (']' === $sequence[$i]) {
                 return $output;
             }
             if (',' === $sequence[$i] || ' ' === $sequence[$i]) {
+                if (',' === $sequence[$i] && (null === $lastToken || 'separator' === $lastToken)) {
+                    $output[] = null;
+                } elseif (',' === $sequence[$i]) {
+                    $lastToken = 'separator';
+                }
+
                 ++$i;
 
                 continue;
@@ -403,6 +410,7 @@ class Inline
 
             $output[] = $value;
 
+            $lastToken = 'value';
             ++$i;
         }
 

@@ -291,16 +291,16 @@ class PdoAdapter extends AbstractTagAwareAdapter implements PruneableInterface
                 $sql = $insertSql.' ON DUPLICATE KEY IGNORE';
                 break;
             case 'oci' === $driver:
-                throw new LogicException('oci driver support must be added'); // TODO: I need help here
+                throw new LogicException('oci driver support must be added.'); // TODO: I need help here
                 break;
             case 'sqlsrv' === $driver && version_compare($this->getServerVersion(), '10', '>='):
-                throw new LogicException('sqlsrv driver support must be added'); // TODO: I need help here
+                throw new LogicException('sqlsrv driver support must be added.'); // TODO: I need help here
                 break;
             case 'sqlite' === $driver:
                 $sql = 'INSERT OR REPLACE'.substr($insertSql, 6);
                 break;
             case 'pgsql' === $driver && version_compare($this->getServerVersion(), '9.5', '>='):
-                throw new LogicException('pgsql driver support must be added'); // TODO: I need help here
+                throw new LogicException('pgsql driver support must be added.'); // TODO: I need help here
                 break;
             default:
                 $driver = null;

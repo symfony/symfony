@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\AssetMapper\Command;
 
+use Symfony\Component\AssetMapper\Exception\LogicException;
 use Symfony\Component\AssetMapper\ImportMap\RemotePackageDownloader;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
@@ -56,7 +57,7 @@ final class ImportMapInstallCommand extends Command
                     $progressBar->advance();
                 }
             });
-        } catch (\LogicException $throwable) {
+        } catch (LogicException $throwable) {
             $io->error($throwable->getMessage());
 
             return Command::FAILURE;

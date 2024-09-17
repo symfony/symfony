@@ -138,4 +138,34 @@ class CurlHttpClientTest extends HttpClientTestCase
         $this->assertSame(200, $response->getStatusCode());
         $this->assertSame('/302', $response->toArray()['REQUEST_URI'] ?? null);
     }
+
+    /**
+     * @group integration
+     */
+    public function testMaxConnections()
+    {
+        foreach ($ports = [80, 8681, 8682, 8683, 8684] as $port) {
+            if (!($fp = @fsockopen('localhost', $port, $errorCode, $errorMessage, 2))) {
+                self::markTestSkipped('FrankenPHP is not running');
+            }
+            fclose($fp);
+        }
+
+        $httpClient = $this->getHttpClient(__FUNCTION__);
+
+        $expectedResults = [
+            [false, false, false, false, false],
+            [true, true, true, true, true],
+            [true, true, true, true, true],
+        ];
+
+        foreach ($expectedResults as $expectedResult) {
+            foreach ($ports as $i => $port) {
+                $response = $httpClient->request('GET', \sprintf('http://localhost:%s/http-client', $port));
+                $response->getContent();
+
+                self::assertSame($expectedResult[$i], str_contains($response->getInfo('debug'), 'Re-using existing connection'));
+            }
+        }
+    }
 }

@@ -22,7 +22,7 @@ final class UidNormalizer implements NormalizerInterface, DenormalizerInterface
     public const NORMALIZATION_FORMAT_CANONICAL = 'canonical';
     public const NORMALIZATION_FORMAT_BASE58 = 'base58';
     public const NORMALIZATION_FORMAT_BASE32 = 'base32';
-    public const NORMALIZATION_FORMAT_RFC4122 = 'rfc4122';
+    public const NORMALIZATION_FORMAT_RFC4122 = 'rfc4122'; // RFC 9562 obsoleted RFC 4122 but the format is the same
     public const NORMALIZATION_FORMATS = [
         self::NORMALIZATION_FORMAT_CANONICAL,
         self::NORMALIZATION_FORMAT_BASE58,

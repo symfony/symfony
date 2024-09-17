@@ -52,6 +52,7 @@ use Symfony\Component\HttpClient\ScopingHttpClient;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\HttpKernel\DependencyInjection\LoggerPass;
 use Symfony\Component\HttpKernel\Fragment\FragmentUriGeneratorInterface;
+use Symfony\Component\Lock\Store\SemaphoreStore;
 use Symfony\Component\Messenger\Transport\TransportFactory;
 use Symfony\Component\Notifier\ChatterInterface;
 use Symfony\Component\Notifier\TexterInterface;
@@ -2078,6 +2079,20 @@ abstract class FrameworkExtensionTestCase extends TestCase
         foreach ((new Finder())->in(\dirname(__DIR__, 4).'/Component/Notifier/Bridge')->directories()->depth(0)->exclude('Mercure') as $bridgeDirectory) {
             $transportFactoryName = strtolower(preg_replace('/(.)([A-Z])/', '$1-$2', $bridgeDirectory->getFilename()));
             $this->assertTrue($container->hasDefinition('notifier.transport_factory.'.$transportFactoryName), sprintf('Did you forget to add the "%s" TransportFactory to the $classToServices array in FrameworkExtension?', $bridgeDirectory->getFilename()));
+        }
+    }
+
+    public function testDefaultLock()
+    {
+        $container = $this->createContainerFromFile('lock');
+
+        self::assertTrue($container->hasDefinition('lock.default.factory'));
+        $storeDef = $container->getDefinition($container->getDefinition('lock.default.factory')->getArgument(0));
+
+        if (class_exists(SemaphoreStore::class) && SemaphoreStore::isSupported()) {
+            self::assertEquals(new Reference('semaphore'), $storeDef->getArgument(0));
+        } else {
+            self::assertEquals(new Reference('flock'), $storeDef->getArgument(0));
         }
     }
 

@@ -13,9 +13,13 @@ namespace Symfony\Bundle\SecurityBundle\Tests\Functional;
 
 use Jose\Component\Core\AlgorithmManager;
 use Jose\Component\Core\JWK;
+use Jose\Component\Encryption\Algorithm\ContentEncryption\A128GCM;
+use Jose\Component\Encryption\Algorithm\KeyEncryption\ECDHES;
+use Jose\Component\Encryption\JWEBuilder;
+use Jose\Component\Encryption\Serializer\CompactSerializer as JweCompactSerializer;
 use Jose\Component\Signature\Algorithm\ES256;
 use Jose\Component\Signature\JWSBuilder;
-use Jose\Component\Signature\Serializer\CompactSerializer;
+use Jose\Component\Signature\Serializer\CompactSerializer as JwsCompactSerializer;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\Response\MockResponse;
@@ -349,34 +353,11 @@ class AccessTokenTest extends AbstractWebTestCase
 
     /**
      * @requires extension openssl
+     *
+     * @dataProvider validAccessTokens
      */
-    public function testOidcSuccess()
+    public function testOidcSuccess(string $token)
     {
-        $time = time();
-        $claims = [
-            'iat' => $time,
-            'nbf' => $time,
-            'exp' => $time + 3600,
-            'iss' => 'https://www.example.com',
-            'aud' => 'Symfony OIDC',
-            'sub' => 'e21bf182-1538-406e-8ccb-e25a17aba39f',
-            'username' => 'dunglas',
-        ];
-        $token = (new CompactSerializer())->serialize((new JWSBuilder(new AlgorithmManager([
-            new ES256(),
-        ])))->create()
-            ->withPayload(json_encode($claims))
-            // tip: use https://mkjwk.org/ to generate a JWK
-            ->addSignature(new JWK([
-                'kty' => 'EC',
-                'crv' => 'P-256',
-                'x' => '0QEAsI1wGI-dmYatdUZoWSRWggLEpyzopuhwk-YUnA4',
-                'y' => 'KYl-qyZ26HobuYwlQh-r0iHX61thfP82qqEku7i0woo',
-                'd' => 'iA_TV2zvftni_9aFAQwFO_9aypfJFCSpcCyevDvz220',
-            ]), ['alg' => 'ES256'])
-            ->build()
-        );
-
         $client = $this->createClient(['test_case' => 'AccessToken', 'root_config' => 'config_oidc.yml']);
         $client->request('GET', '/foo', [], [], ['HTTP_AUTHORIZATION' => \sprintf('Bearer %s', $token)]);
         $response = $client->getResponse();
@@ -384,6 +365,45 @@ class AccessTokenTest extends AbstractWebTestCase
         $this->assertInstanceOf(Response::class, $response);
         $this->assertSame(200, $response->getStatusCode());
         $this->assertSame(['message' => 'Welcome @dunglas!'], json_decode($response->getContent(), true));
+    }
+
+    /**
+     * @requires extension openssl
+     *
+     * @dataProvider invalidAccessTokens
+     */
+    public function testOidcFailure(string $token)
+    {
+        $client = $this->createClient(['test_case' => 'AccessToken', 'root_config' => 'config_oidc.yml']);
+        $client->request('GET', '/foo', [], [], ['HTTP_AUTHORIZATION' => \sprintf('Bearer %s', $token)]);
+        $response = $client->getResponse();
+
+        $this->assertInstanceOf(Response::class, $response);
+        $this->assertSame(401, $response->getStatusCode());
+        $this->assertSame('Bearer realm="My API",error="invalid_token",error_description="Invalid credentials."', $response->headers->get('WWW-Authenticate'));
+    }
+
+    /**
+     * @requires extension openssl
+     */
+    public function testOidcFailureWithJweEnforced()
+    {
+        $client = $this->createClient(['test_case' => 'AccessToken', 'root_config' => 'config_oidc_jwe.yml']);
+        $token = self::createJws([
+            'iat' => time() - 1,
+            'nbf' => time() - 1,
+            'exp' => time() + 3600,
+            'iss' => 'https://www.example.com',
+            'aud' => 'Symfony OIDC',
+            'sub' => 'e21bf182-1538-406e-8ccb-e25a17aba39f',
+            'username' => 'dunglas',
+        ]);
+        $client->request('GET', '/foo', [], [], ['HTTP_AUTHORIZATION' => \sprintf('Bearer %s', $token)]);
+        $response = $client->getResponse();
+
+        $this->assertInstanceOf(Response::class, $response);
+        $this->assertSame(401, $response->getStatusCode());
+        $this->assertSame('Bearer realm="My API",error="invalid_token",error_description="Invalid credentials."', $response->headers->get('WWW-Authenticate'));
     }
 
     public function testCasSuccess()
@@ -407,5 +427,92 @@ class AccessTokenTest extends AbstractWebTestCase
         $this->assertInstanceOf(Response::class, $response);
         $this->assertSame(200, $response->getStatusCode());
         $this->assertSame(['message' => 'Welcome @dunglas!'], json_decode($response->getContent(), true));
+    }
+
+    public function validAccessTokens(): array
+    {
+        $time = time();
+        $claims = [
+            'iat' => $time,
+            'nbf' => $time,
+            'exp' => $time + 3600,
+            'iss' => 'https://www.example.com',
+            'aud' => 'Symfony OIDC',
+            'sub' => 'e21bf182-1538-406e-8ccb-e25a17aba39f',
+            'username' => 'dunglas',
+        ];
+        $jws = $this->createJws($claims);
+        $jwe = $this->createJwe($jws);
+
+        return [
+            [$jws],
+            [$jwe],
+        ];
+    }
+
+    public static function invalidAccessTokens(): array
+    {
+        $time = time();
+        $claims = [
+            'iat' => $time,
+            'nbf' => $time,
+            'exp' => $time + 3600,
+            'iss' => 'https://www.example.com',
+            'aud' => 'Symfony OIDC',
+            'sub' => 'e21bf182-1538-406e-8ccb-e25a17aba39f',
+            'username' => 'dunglas',
+        ];
+
+        return [
+            [self::createJws([...$claims, 'aud' => 'Invalid Audience'])],
+            [self::createJws([...$claims, 'iss' => 'Invalid Issuer'])],
+            [self::createJws([...$claims, 'exp' => $time - 3600])],
+            [self::createJws([...$claims, 'nbf' => $time + 3600])],
+            [self::createJws([...$claims, 'iat' => $time + 3600])],
+            [self::createJws([...$claims, 'username' => 'Invalid Username'])],
+            [self::createJwe(self::createJws($claims), ['exp' => $time - 3600])],
+            [self::createJwe(self::createJws($claims), ['cty' => 'x-specific'])],
+        ];
+    }
+
+    private static function createJws(array $claims, array $header = []): string
+    {
+        return (new JwsCompactSerializer())->serialize((new JWSBuilder(new AlgorithmManager([
+            new ES256(),
+        ])))->create()
+            ->withPayload(json_encode($claims))
+            // tip: use https://mkjwk.org/ to generate a JWK
+            ->addSignature(new JWK([
+                'kty' => 'EC',
+                'crv' => 'P-256',
+                'x' => '0QEAsI1wGI-dmYatdUZoWSRWggLEpyzopuhwk-YUnA4',
+                'y' => 'KYl-qyZ26HobuYwlQh-r0iHX61thfP82qqEku7i0woo',
+                'd' => 'iA_TV2zvftni_9aFAQwFO_9aypfJFCSpcCyevDvz220',
+            ]), [...$header, 'alg' => 'ES256'])
+            ->build()
+        );
+    }
+
+    private static function createJwe(string $input, array $header = []): string
+    {
+        $jwk = new JWK([
+            'kty' => 'EC',
+            'use' => 'enc',
+            'crv' => 'P-256',
+            'kid' => 'enc-1720876375',
+            'x' => '4P27-OB2s5ZP3Zt5ExxQ9uFrgnGaMK6wT1oqd5bJozQ',
+            'y' => 'CNh-ZbKJBvz6hJ8JOulXclACP2OuoO2PtqT6WC8tLcU',
+        ]);
+
+        return (new JweCompactSerializer())->serialize(
+            (new JWEBuilder(new AlgorithmManager([
+                new ECDHES(), new A128GCM(),
+            ])))->create()
+                ->withPayload($input)
+                ->withSharedProtectedHeader(['alg' => 'ECDH-ES', 'enc' => 'A128GCM', ...$header])
+                // tip: use https://mkjwk.org/ to generate a JWK
+                ->addRecipient($jwk)
+                ->build()
+        );
     }
 }

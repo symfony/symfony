@@ -41,6 +41,22 @@ class OidcTokenHandlerFactory implements TokenHandlerFactoryInterface
         $tokenHandlerDefinition->replaceArgument(1, (new ChildDefinition('security.access_token_handler.oidc.jwkset'))
             ->replaceArgument(0, $config['keyset'])
         );
+
+        if ($config['encryption']['enabled']) {
+            $algorithmManager = (new ChildDefinition('security.access_token_handler.oidc.encryption'))
+                ->replaceArgument(0, $config['encryption']['algorithms']);
+            $keyset = (new ChildDefinition('security.access_token_handler.oidc.jwkset'))
+                ->replaceArgument(0, $config['encryption']['keyset']);
+
+            $tokenHandlerDefinition->addMethodCall(
+                'enabledJweSupport',
+                [
+                    $keyset,
+                    $algorithmManager,
+                    $config['encryption']['enforce'],
+                ]
+            );
+        }
     }
 
     public function getKey(): string
@@ -112,8 +128,27 @@ class OidcTokenHandlerFactory implements TokenHandlerFactoryInterface
                         ->setDeprecated('symfony/security-bundle', '7.1', 'The "%node%" option is deprecated and will be removed in 8.0. Use the "keyset" option instead.')
                     ->end()
                     ->scalarNode('keyset')
-                        ->info('JSON-encoded JWKSet used to sign the token (must contain a list of valid keys).')
+                        ->info('JSON-encoded JWKSet used to sign the token (must contain a list of valid public keys).')
                         ->isRequired()
+                    ->end()
+                    ->arrayNode('encryption')
+                        ->canBeEnabled()
+                        ->children()
+                            ->booleanNode('enforce')
+                                ->info('When enabled, the token shall be encrypted.')
+                                ->defaultFalse()
+                            ->end()
+                            ->arrayNode('algorithms')
+                                ->info('Algorithms used to decrypt the token.')
+                                ->isRequired()
+                                ->requiresAtLeastOneElement()
+                                ->scalarPrototype()->end()
+                            ->end()
+                            ->scalarNode('keyset')
+                                ->info('JSON-encoded JWKSet used to decrypt the token (must contain a list of valid private keys).')
+                                ->isRequired()
+                            ->end()
+                        ->end()
                     ->end()
                 ->end()
             ->end()

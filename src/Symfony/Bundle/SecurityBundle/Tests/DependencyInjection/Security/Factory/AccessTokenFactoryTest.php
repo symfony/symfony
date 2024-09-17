@@ -113,7 +113,7 @@ class AccessTokenFactoryTest extends TestCase
         $factory = new AccessTokenFactory($this->createTokenHandlerFactories());
 
         $this->expectException(InvalidConfigurationException::class);
-        $this->expectExceptionMessage('The child config "keyset" under "access_token.token_handler.oidc" must be configured: JSON-encoded JWKSet used to sign the token (must contain a list of valid keys).');
+        $this->expectExceptionMessage('The child config "keyset" under "access_token.token_handler.oidc" must be configured: JSON-encoded JWKSet used to sign the token (must contain a list of valid public keys).');
 
         $this->processConfig($config, $factory);
     }
@@ -255,6 +255,88 @@ class AccessTokenFactoryTest extends TestCase
             'index_4' => 'sub',
         ];
         $this->assertEquals($expected, $container->getDefinition('security.access_token_handler.firewall1')->getArguments());
+    }
+
+    public function testOidcTokenHandlerConfigurationWithEncryption()
+    {
+        $container = new ContainerBuilder();
+        $jwkset = '{"keys":[{"kty":"EC","crv":"P-256","x":"FtgMtrsKDboRO-Zo0XC7tDJTATHVmwuf9GK409kkars","y":"rWDE0ERU2SfwGYCo1DWWdgFEbZ0MiAXLRBBOzBgs_jY","d":"4G7bRIiKih0qrFxc0dtvkHUll19tTyctoCR3eIbOrO0"},{"kty":"EC","crv":"P-256","x":"0QEAsI1wGI-dmYatdUZoWSRWggLEpyzopuhwk-YUnA4","y":"KYl-qyZ26HobuYwlQh-r0iHX61thfP82qqEku7i0woo","d":"iA_TV2zvftni_9aFAQwFO_9aypfJFCSpcCyevDvz220"}]}';
+        $config = [
+            'token_handler' => [
+                'oidc' => [
+                    'algorithms' => ['RS256', 'ES256'],
+                    'issuers' => ['https://www.example.com'],
+                    'audience' => 'audience',
+                    'keyset' => $jwkset,
+                    'encryption' => [
+                        'enabled' => true,
+                        'keyset' => $jwkset,
+                        'algorithms' => ['RSA-OAEP', 'RSA1_5'],
+                    ],
+                ],
+            ],
+        ];
+
+        $factory = new AccessTokenFactory($this->createTokenHandlerFactories());
+        $finalizedConfig = $this->processConfig($config, $factory);
+
+        $factory->createAuthenticator($container, 'firewall1', $finalizedConfig, 'userprovider');
+
+        $this->assertTrue($container->hasDefinition('security.authenticator.access_token.firewall1'));
+        $this->assertTrue($container->hasDefinition('security.access_token_handler.firewall1'));
+    }
+
+    public function testInvalidOidcTokenHandlerConfigurationMissingEncryptionKeyset()
+    {
+        $jwkset = '{"keys":[{"kty":"EC","crv":"P-256","x":"FtgMtrsKDboRO-Zo0XC7tDJTATHVmwuf9GK409kkars","y":"rWDE0ERU2SfwGYCo1DWWdgFEbZ0MiAXLRBBOzBgs_jY","d":"4G7bRIiKih0qrFxc0dtvkHUll19tTyctoCR3eIbOrO0"},{"kty":"EC","crv":"P-256","x":"0QEAsI1wGI-dmYatdUZoWSRWggLEpyzopuhwk-YUnA4","y":"KYl-qyZ26HobuYwlQh-r0iHX61thfP82qqEku7i0woo","d":"iA_TV2zvftni_9aFAQwFO_9aypfJFCSpcCyevDvz220"}]}';
+        $config = [
+            'token_handler' => [
+                'oidc' => [
+                    'algorithms' => ['RS256', 'ES256'],
+                    'issuers' => ['https://www.example.com'],
+                    'audience' => 'audience',
+                    'keyset' => $jwkset,
+                    'encryption' => [
+                        'enabled' => true,
+                        'algorithms' => ['RSA-OAEP', 'RSA1_5'],
+                    ],
+                ],
+            ],
+        ];
+
+        $factory = new AccessTokenFactory($this->createTokenHandlerFactories());
+
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessage('The child config "keyset" under "access_token.token_handler.oidc.encryption" must be configured: JSON-encoded JWKSet used to decrypt the token (must contain a list of valid private keys).');
+
+        $this->processConfig($config, $factory);
+    }
+
+    public function testInvalidOidcTokenHandlerConfigurationMissingAlgorithm()
+    {
+        $jwkset = '{"keys":[{"kty":"EC","crv":"P-256","x":"FtgMtrsKDboRO-Zo0XC7tDJTATHVmwuf9GK409kkars","y":"rWDE0ERU2SfwGYCo1DWWdgFEbZ0MiAXLRBBOzBgs_jY","d":"4G7bRIiKih0qrFxc0dtvkHUll19tTyctoCR3eIbOrO0"},{"kty":"EC","crv":"P-256","x":"0QEAsI1wGI-dmYatdUZoWSRWggLEpyzopuhwk-YUnA4","y":"KYl-qyZ26HobuYwlQh-r0iHX61thfP82qqEku7i0woo","d":"iA_TV2zvftni_9aFAQwFO_9aypfJFCSpcCyevDvz220"}]}';
+        $config = [
+            'token_handler' => [
+                'oidc' => [
+                    'algorithms' => ['RS256', 'ES256'],
+                    'issuers' => ['https://www.example.com'],
+                    'audience' => 'audience',
+                    'keyset' => $jwkset,
+                    'encryption' => [
+                        'enabled' => true,
+                        'keyset' => $jwkset,
+                        'algorithms' => [],
+                    ],
+                ],
+            ],
+        ];
+
+        $factory = new AccessTokenFactory($this->createTokenHandlerFactories());
+
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessage('The path "access_token.token_handler.oidc.encryption.algorithms" should have at least 1 element(s) defined.');
+
+        $this->processConfig($config, $factory);
     }
 
     public function testOidcUserInfoTokenHandlerConfigurationWithExistingClient()

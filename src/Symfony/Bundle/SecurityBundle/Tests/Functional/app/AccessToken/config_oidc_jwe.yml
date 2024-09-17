@@ -29,6 +29,7 @@ security:
                         keyset: '{"keys":[{"kty":"EC","d":"iA_TV2zvftni_9aFAQwFO_9aypfJFCSpcCyevDvz220","crv":"P-256","x":"0QEAsI1wGI-dmYatdUZoWSRWggLEpyzopuhwk-YUnA4","y":"KYl-qyZ26HobuYwlQh-r0iHX61thfP82qqEku7i0woo"}]}'
                         encryption:
                             enabled: true
+                            enforce: true
                             algorithms: ['ECDH-ES', 'A128GCM']
                             keyset: '{"keys": [{"kty": "EC","d": "YG0HnRsaYv2cUj7TpgHcRX1poL9l4cskIuOi1gXv0Dg","use": "enc","crv": "P-256","kid": "enc-1720876375","x": "4P27-OB2s5ZP3Zt5ExxQ9uFrgnGaMK6wT1oqd5bJozQ","y": "CNh-ZbKJBvz6hJ8JOulXclACP2OuoO2PtqT6WC8tLcU","alg": "ECDH-ES"}]}'
                 token_extractors: 'header'

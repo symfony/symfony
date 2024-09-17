@@ -136,6 +136,8 @@ jobs:
               php_server
             }
 
+            root * /symfony/src/Symfony/Component/HttpFoundation/Tests/Fixtures/response-functional/
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4

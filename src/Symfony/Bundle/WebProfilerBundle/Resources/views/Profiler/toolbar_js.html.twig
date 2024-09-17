@@ -9,9 +9,7 @@
     }) }}
 </div>
 
-<style{% if csp_style_nonce %} nonce="{{ csp_style_nonce }}"{% endif %}>
-    {{ include('@WebProfiler/Profiler/toolbar.css.twig') }}
-</style>
+<link rel="stylesheet"{% if csp_style_nonce %} nonce="{{ csp_style_nonce }}"{% endif %} href="{{ url('_wdt_stylesheet') }}" />
 
 {# CAUTION: the contents of this file are processed by Twig before loading
             them as JavaScript source code. Always use '/*' comments instead

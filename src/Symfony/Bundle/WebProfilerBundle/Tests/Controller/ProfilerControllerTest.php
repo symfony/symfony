@@ -137,6 +137,33 @@ class ProfilerControllerTest extends WebTestCase
         $this->assertEquals(200, $response->getStatusCode());
     }
 
+    public function testToolbarStylesheetActionWithProfilerDisabled()
+    {
+        $urlGenerator = $this->createMock(UrlGeneratorInterface::class);
+        $twig = $this->createMock(Environment::class);
+
+        $controller = new ProfilerController($urlGenerator, null, $twig, []);
+
+        $this->expectException(NotFoundHttpException::class);
+        $this->expectExceptionMessage('The profiler must be enabled.');
+
+        $controller->toolbarStylesheetAction();
+    }
+
+    public function testToolbarStylesheetAction()
+    {
+        $urlGenerator = $this->createMock(UrlGeneratorInterface::class);
+        $twig = $this->createMock(Environment::class);
+        $profiler = $this->createMock(Profiler::class);
+
+        $controller = new ProfilerController($urlGenerator, $profiler, $twig, []);
+
+        $response = $controller->toolbarStylesheetAction();
+        $this->assertSame(200, $response->getStatusCode());
+        $this->assertSame('text/css', $response->headers->get('Content-Type'));
+        $this->assertSame('max-age=600, private', $response->headers->get('Cache-Control'));
+    }
+
     public static function getEmptyTokenCases()
     {
         return [

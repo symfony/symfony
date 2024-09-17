@@ -9,6 +9,7 @@ CHANGELOG
  * [BC BREAK] Add silent verbosity (`--silent`/`SHELL_VERBOSITY=-2`) to suppress all output, including errors
  * Add `OutputInterface::isSilent()`, `Output::isSilent()`, `OutputStyle::isSilent()` methods
  * Add a configurable finished indicator to the progress indicator to show that the progress is finished
+ * Add ability to schedule alarm signals and a `ConsoleAlarmEvent`
 
 7.1
 ---

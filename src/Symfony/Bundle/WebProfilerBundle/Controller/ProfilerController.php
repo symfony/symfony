@@ -15,6 +15,7 @@ use Symfony\Bundle\FullStack;
 use Symfony\Bundle\WebProfilerBundle\Csp\ContentSecurityPolicyHandler;
 use Symfony\Bundle\WebProfilerBundle\Profiler\TemplateManager;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -376,6 +377,23 @@ class ProfilerController
             'file' => $file,
             'line' => $line,
         ]);
+    }
+
+    public function clearSessionAction(Request $request): Response
+    {
+        $this->denyAccessIfProfilerDisabled();
+
+        $token = $request->get('token');
+
+        session_start();
+        session_unset();
+        session_destroy();
+
+        if (null !== $token) {
+            return new RedirectResponse($this->generator->generate('_profiler', ['token' => $token]), 302, ['Content-Type' => 'text/html']);
+        }
+
+        return new JsonResponse(['success' => true], Response::HTTP_OK);
     }
 
     protected function getTemplateManager(): TemplateManager

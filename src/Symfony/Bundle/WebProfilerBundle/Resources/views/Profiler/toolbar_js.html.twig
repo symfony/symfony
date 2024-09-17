@@ -619,6 +619,15 @@
                                     dumpInfo.style.minHeight = '';
                                 });
                             }
+
+                            var clearSessionLinks = [...document.querySelectorAll('.clear-session')];
+                            clearSessionLinks.forEach(function (link) {
+                                addEventListener(link, 'click', function (event) {
+                                    event.preventDefault();
+
+                                    request(link.href, function () {}, function () {}, {}, {method: 'POST'});
+                                });
+                            });
                         },
                         function(xhr) {
                             if (xhr.status !== 0 && !options.stop) {

@@ -551,7 +551,7 @@
 
     <xsd:complexType name="lock">
         <xsd:sequence>
-            <xsd:element name="resource" type="lock_resource" minOccurs="1" maxOccurs="unbounded" />
+            <xsd:element name="resource" type="lock_resource" minOccurs="0" maxOccurs="unbounded" />
         </xsd:sequence>
         <xsd:attribute name="enabled" type="xsd:boolean" />
     </xsd:complexType>

@@ -288,7 +288,7 @@ class PdoAdapter extends AbstractTagAwareAdapter implements PruneableInterface
 
         switch (true) {
             case 'mysql' === $driver:
-                $sql = $insertSql." ON DUPLICATE KEY IGNORE";
+                $sql = $insertSql.' ON DUPLICATE KEY IGNORE';
                 break;
             case 'oci' === $driver:
                 throw new LogicException('oci driver support must be added'); // TODO: I need help here
@@ -502,7 +502,7 @@ class PdoAdapter extends AbstractTagAwareAdapter implements PruneableInterface
     protected function doDeleteTagRelations(array $tagData): bool
     {
         foreach ($tagData as $tagId => $idList) {
-            $placeholders = implode(',', array_fill(0, count($idList), '?'));
+            $placeholders = implode(',', array_fill(0, \count($idList), '?'));
             $stmt = $this->prepareStatementWithFallback("DELETE FROM $this->tagsTable WHERE $this->tagCol=:tagId AND $this->idCol IN ($placeholders);", function () {
                 $this->createTagsTable();
             });
@@ -520,7 +520,7 @@ class PdoAdapter extends AbstractTagAwareAdapter implements PruneableInterface
 
     protected function doInvalidate(array $tagIds): bool
     {
-        $placeholders = implode(',', array_fill(0, count($tagIds), '?'));
+        $placeholders = implode(',', array_fill(0, \count($tagIds), '?'));
         $stmt = $this->prepareStatementWithFallback("DELETE FROM $this->table WHERE $this->idCol IN (SELECT $this->idCol FROM $this->tagsTable WHERE $this->tagCol IN ($placeholders));", function () {
             $this->createTagsTable();
         });

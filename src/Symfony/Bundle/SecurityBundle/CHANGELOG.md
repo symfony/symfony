@@ -5,6 +5,7 @@ CHANGELOG
 ---
 
  * Allow configuring the secret used to sign login links
+ * Change Exception thrown by IsCsrfTokenValid Attribute
 
 7.1
 ---

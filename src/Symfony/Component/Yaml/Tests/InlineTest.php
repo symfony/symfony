@@ -1128,4 +1128,11 @@ YAML;
 
         $this->assertSame(['&foo', '&bar', '&baz'], Inline::parse($yaml));
     }
+
+    public function testParseSequenceWithEmptyElement()
+    {
+        $this->assertSame(['foo', null, 'bar'], Inline::parse('[foo, , bar]'));
+        $this->assertSame([null, 'foo', 'bar'], Inline::parse('[, foo, bar]'));
+        $this->assertSame(['foo', 'bar'], Inline::parse('[foo, bar, ]'));
+    }
 }

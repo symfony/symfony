@@ -82,6 +82,7 @@ class DebugHandlersListener implements EventSubscriberInterface
             return;
         }
         $this->firstCall = $this->hasTerminatedWithException = false;
+        $hasRun = null;
 
         $handler = set_exception_handler('is_int');
         $handler = \is_array($handler) ? $handler[0] : null;
@@ -144,6 +145,19 @@ class DebugHandlersListener implements EventSubscriberInterface
         if ($this->exceptionHandler) {
             if ($handler instanceof ErrorHandler) {
                 $handler->setExceptionHandler($this->exceptionHandler);
+                if (null !== $hasRun) {
+                    $throwAt = $handler->throwAt(0) | \E_ERROR | \E_CORE_ERROR | \E_COMPILE_ERROR | \E_USER_ERROR | \E_RECOVERABLE_ERROR | \E_PARSE;
+                    $loggers = [];
+
+                    foreach ($handler->setLoggers([]) as $type => $log) {
+                        if ($type & $throwAt) {
+                            $loggers[$type] = [null, $log[1]];
+                        }
+                    }
+
+                    // Assume $kernel->terminateWithException() will log uncaught exceptions appropriately
+                    $handler->setLoggers($loggers);
+                }
             }
             $this->exceptionHandler = null;
         }

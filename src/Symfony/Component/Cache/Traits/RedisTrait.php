@@ -238,10 +238,10 @@ trait RedisTrait
                             $options = [
                                 'host' => $host,
                                 'port' => $port,
-                                'connectTimeout' => $params['timeout'],
+                                'connectTimeout' => (float) $params['timeout'],
                                 'persistent' => $params['persistent_id'],
-                                'retryInterval' => $params['retry_interval'],
-                                'readTimeout' => $params['read_timeout'],
+                                'retryInterval' => (int) $params['retry_interval'],
+                                'readTimeout' => (float) $params['read_timeout'],
                             ];
 
                             if ($passAuth) {

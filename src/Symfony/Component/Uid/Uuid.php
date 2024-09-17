@@ -14,7 +14,7 @@ namespace Symfony\Component\Uid;
 /**
  * @author Grégoire Pineau <lyrixx@lyrixx.info>
  *
- * @see https://tools.ietf.org/html/rfc4122#appendix-C for details about namespaces
+ * @see https://datatracker.ietf.org/doc/html/rfc9562/#section-6.6 for details about namespaces
  */
 class Uuid extends AbstractUid
 {

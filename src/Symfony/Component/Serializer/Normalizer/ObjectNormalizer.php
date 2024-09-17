@@ -88,14 +88,19 @@ final class ObjectNormalizer extends AbstractObjectNormalizer
             $name = $reflMethod->name;
             $attributeName = null;
 
-            if (str_starts_with($name, 'get') || str_starts_with($name, 'has') || str_starts_with($name, 'can')) {
+            if (3 < \strlen($name) && match ($name[0]) {
+                'g' => str_starts_with($name, 'get'),
+                'h' => str_starts_with($name, 'has'),
+                'c' => str_starts_with($name, 'can'),
+                default => false,
+            }) {
                 // getters, hassers and canners
                 $attributeName = substr($name, 3);
 
                 if (!$reflClass->hasProperty($attributeName)) {
                     $attributeName = lcfirst($attributeName);
                 }
-            } elseif (str_starts_with($name, 'is')) {
+            } elseif ('is' !== $name && str_starts_with($name, 'is')) {
                 // issers
                 $attributeName = substr($name, 2);
 

@@ -21,7 +21,7 @@
         "ext-xml": "*",
         "symfony/cache": "^6.4|^7.0",
         "symfony/config": "^6.4|^7.0",
-        "symfony/dependency-injection": "^7.1",
+        "symfony/dependency-injection": "^7.1.5",
         "symfony/deprecation-contracts": "^2.5|^3",
         "symfony/error-handler": "^6.4|^7.0",
         "symfony/event-dispatcher": "^6.4|^7.0",

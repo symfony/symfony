@@ -106,14 +106,14 @@ if (!function_exists('dumph')) {
 if (!function_exists('ddh')) {
     function ddh(mixed ...$vars): never
     {
-        // CORS for SPA apps like.
-        header("Access-Control-Allow-Origin: " . $_SERVER['HTTP_ORIGIN'] ?? '*');
-        header('Access-Control-Allow-Methods: *');
-        header('Access-Control-Allow-Headers: *');
-        header('Access-Control-Allow-Credentials: true');
-
         if (!\in_array(\PHP_SAPI, ['cli', 'phpdbg', 'embed'], true) && !headers_sent()) {
             header('HTTP/1.1 500 Internal Server Error');
+
+            // CORS for SPA apps like.
+            header("Access-Control-Allow-Origin: " . $_SERVER['HTTP_ORIGIN'] ?? '*');
+            header('Access-Control-Allow-Methods: *');
+            header('Access-Control-Allow-Headers: *');
+            header('Access-Control-Allow-Credentials: true');
         }
 
         if (!$vars) {

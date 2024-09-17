@@ -22,6 +22,8 @@ use Symfony\Component\Cache\Adapter\PdoAdapter;
  */
 class PdoAdapterTest extends AdapterTestCase
 {
+    use TagAwareTestTrait;
+
     protected static string $dbFile;
 
     public static function setUpBeforeClass(): void

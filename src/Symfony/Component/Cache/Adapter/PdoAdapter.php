@@ -12,13 +12,15 @@
 namespace Symfony\Component\Cache\Adapter;
 
 use Symfony\Component\Cache\Exception\InvalidArgumentException;
+use Symfony\Component\Cache\Exception\LogicException;
 use Symfony\Component\Cache\Marshaller\DefaultMarshaller;
 use Symfony\Component\Cache\Marshaller\MarshallerInterface;
 use Symfony\Component\Cache\PruneableInterface;
 
-class PdoAdapter extends AbstractAdapter implements PruneableInterface
+class PdoAdapter extends AbstractTagAwareAdapter implements PruneableInterface
 {
     private const MAX_KEY_LENGTH = 255;
+    protected const NS_SEPARATOR = ':';
 
     private MarshallerInterface $marshaller;
     private \PDO $conn;
@@ -26,10 +28,12 @@ class PdoAdapter extends AbstractAdapter implements PruneableInterface
     private string $driver;
     private string $serverVersion;
     private string $table = 'cache_items';
+    private string $tagsTable = 'cache_tags';
     private string $idCol = 'item_id';
     private string $dataCol = 'item_data';
     private string $lifetimeCol = 'item_lifetime';
     private string $timeCol = 'item_time';
+    private string $tagCol = 'item_tag';
     private ?string $username = null;
     private ?string $password = null;
     private array $connectionOptions = [];
@@ -129,6 +133,31 @@ class PdoAdapter extends AbstractAdapter implements PruneableInterface
         $this->getConnection()->exec($sql);
     }
 
+    /**
+     * Creates the tags table to store tag items which can be called once for setup.
+     *
+     * Both, cache ID and tag ID are saved in a column of maximum length 255 respecitvely.
+     *
+     * @throws \PDOException    When the table already exists
+     * @throws \DomainException When an unsupported PDO driver is used
+     */
+    public function createTagsTable(): void
+    {
+        $sql = match ($driver = $this->getDriver()) {
+            // We use varbinary for the ID column because it prevents unwanted conversions:
+            // - character set conversions between server and client
+            // - trailing space removal
+            // - case-insensitivity
+            // - language processing like é == e
+            'mysql' => "CREATE TABLE $this->tagsTable ($this->idCol VARBINARY(255) NOT NULL, $this->tagCol VARBINARY(255) NOT NULL, PRIMARY KEY($this->idCol, $this->tagCol), INDEX idx_id_col ($this->idCol), INDEX idx_tag_col ($this->tagCol)) COLLATE utf8mb4_bin, ENGINE = InnoDB",
+            'sqlite' => "CREATE TABLE $this->tagsTable ($this->idCol TEXT NOT NULL, $this->tagCol TEXT NOT NULL, PRIMARY KEY ($this->idCol, $this->tagCol));CREATE INDEX idx_id_col ON $this->tagsTable($this->idCol);CREATE INDEX idx_tag_col ON $this->tagsTable($this->tagCol);",
+            // TODO: Need help for oci, sqlsrv and pgsql here
+            default => throw new \DomainException(\sprintf('Creating the cache table is currently not implemented for PDO driver "%s".', $driver)),
+        };
+
+        $this->getConnection()->exec($sql);
+    }
+
     public function prune(): bool
     {
         $deleteSql = "DELETE FROM $this->table WHERE $this->lifetimeCol + $this->timeCol <= :time";
@@ -154,6 +183,8 @@ class PdoAdapter extends AbstractAdapter implements PruneableInterface
         } catch (\PDOException) {
             return true;
         }
+
+        $this->pruneOrphanedTags();
     }
 
     protected function doFetch(array $ids): iterable
@@ -248,7 +279,79 @@ class PdoAdapter extends AbstractAdapter implements PruneableInterface
         return true;
     }
 
-    protected function doSave(array $values, int $lifetime): array|bool
+    protected function doSave(array $values, int $lifetime, array $addTagData = [], array $removeTagData = []): array
+    {
+        $failed = $this->doSaveCache($values, $lifetime);
+
+        $driver = $this->getDriver();
+        $insertSql = "INSERT INTO $this->tagsTable ($this->idCol, $this->tagCol) VALUES (:id, :tagId)";
+
+        switch (true) {
+            case 'mysql' === $driver:
+                $sql = $insertSql." ON DUPLICATE KEY IGNORE";
+                break;
+            case 'oci' === $driver:
+                throw new LogicException('oci driver support must be added'); // TODO: I need help here
+                break;
+            case 'sqlsrv' === $driver && version_compare($this->getServerVersion(), '10', '>='):
+                throw new LogicException('sqlsrv driver support must be added'); // TODO: I need help here
+                break;
+            case 'sqlite' === $driver:
+                $sql = 'INSERT OR REPLACE'.substr($insertSql, 6);
+                break;
+            case 'pgsql' === $driver && version_compare($this->getServerVersion(), '9.5', '>='):
+                throw new LogicException('pgsql driver support must be added'); // TODO: I need help here
+                break;
+            default:
+                $driver = null;
+        }
+
+        foreach ($addTagData as $tagId => $ids) {
+            foreach ($ids as $id) {
+                if ($failed && \in_array($id, $failed, true)) {
+                    continue;
+                }
+
+                try {
+                    $stmt = $this->prepareStatementWithFallback($sql, function () {
+                        $this->createTagsTable();
+                    });
+
+                    $stmt->bindParam(':id', $id);
+                    $stmt->bindParam(':tagId', $tagId);
+                    $stmt->execute();
+                } catch (\PDOException $e) {
+                    $failed[] = $id;
+                }
+            }
+        }
+
+        foreach ($removeTagData as $tagId => $ids) {
+            foreach ($ids as $id) {
+                if ($failed && \in_array($id, $failed, true)) {
+                    continue;
+                }
+
+                $sql = "DELETE FROM $this->tagsTable WHERE $this->idCol=:id AND $this->tagCol=:tagId";
+
+                try {
+                    $stmt = $this->prepareStatementWithFallback($sql, function () {
+                        $this->createTagsTable();
+                    });
+
+                    $stmt->bindParam(':id', $id);
+                    $stmt->bindParam(':tagId', $tagId);
+                    $stmt->execute();
+                } catch (\PDOException $e) {
+                    $failed[] = $id;
+                }
+            }
+        }
+
+        return $failed;
+    }
+
+    protected function doSaveCache(array $values, int $lifetime): array|bool
     {
         if (!$values = $this->marshaller->marshall($values, $failed)) {
             return $failed;
@@ -394,5 +497,63 @@ class PdoAdapter extends AbstractAdapter implements PruneableInterface
             'mysql' => 1146 === $code,
             default => false,
         };
+    }
+
+    protected function doDeleteTagRelations(array $tagData): bool
+    {
+        foreach ($tagData as $tagId => $idList) {
+            $placeholders = implode(',', array_fill(0, count($idList), '?'));
+            $stmt = $this->prepareStatementWithFallback("DELETE FROM $this->tagsTable WHERE $this->tagCol=:tagId AND $this->idCol IN ($placeholders);", function () {
+                $this->createTagsTable();
+            });
+
+            $stmt->bindValue(1, $tagId, \PDO::PARAM_STR);
+
+            foreach ($idList as $index => $value) {
+                $stmt->bindValue($index + 2, $value, \PDO::PARAM_STR);
+            }
+            $stmt->execute();
+        }
+
+        return true;
+    }
+
+    protected function doInvalidate(array $tagIds): bool
+    {
+        $placeholders = implode(',', array_fill(0, count($tagIds), '?'));
+        $stmt = $this->prepareStatementWithFallback("DELETE FROM $this->table WHERE $this->idCol IN (SELECT $this->idCol FROM $this->tagsTable WHERE $this->tagCol IN ($placeholders));", function () {
+            $this->createTagsTable();
+        });
+
+        foreach ($tagIds as $index => $value) {
+            $stmt->bindValue($index + 1, $value, \PDO::PARAM_STR);
+        }
+        $stmt->execute();
+
+        return true;
+    }
+
+    private function prepareStatementWithFallback(string $query, \Closure $createTable): \PDOStatement
+    {
+        $driver = $this->getDriver();
+        $conn = $this->getConnection();
+
+        try {
+            return $conn->prepare($query);
+        } catch (\PDOException $e) {
+            if ($this->isTableMissing($e) && (!$conn->inTransaction() || \in_array($driver, ['pgsql', 'sqlite', 'sqlsrv'], true))) {
+                $createTable();
+            }
+
+            return $conn->prepare($query);
+        }
+    }
+
+    /**
+     * Prunes the tags table and removes all tags that are not used anywhere anymore.
+     */
+    private function pruneOrphanedTags(): void
+    {
+        // TODO: implement me
     }
 }

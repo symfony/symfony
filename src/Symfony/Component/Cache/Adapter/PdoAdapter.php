@@ -12,7 +12,6 @@
 namespace Symfony\Component\Cache\Adapter;
 
 use Symfony\Component\Cache\Exception\InvalidArgumentException;
-use Symfony\Component\Cache\Exception\LogicException;
 use Symfony\Component\Cache\Marshaller\DefaultMarshaller;
 use Symfony\Component\Cache\Marshaller\MarshallerInterface;
 use Symfony\Component\Cache\PruneableInterface;
@@ -287,6 +286,10 @@ class PdoAdapter extends AbstractTagAwareAdapter implements PruneableInterface
     {
         $failed = $this->doSaveCache($values, $lifetime);
 
+        if (!\is_array($failed)) {
+            return array_keys($values);
+        }
+
         $driver = $this->getDriver();
         $insertSql = "INSERT INTO $this->tagsTable ($this->idCol, $this->tagCol) VALUES (:id, :tagId)";
 
@@ -314,12 +317,12 @@ class PdoAdapter extends AbstractTagAwareAdapter implements PruneableInterface
                 $sql = $insertSql." ON CONFLICT ($this->idCol, $this->tagCol) DO UPDATE SET ($this->idCol, $this->tagCol) = (EXCLUDED.$this->idCol, EXCLUDED.$this->tagCol)";
                 break;
             default:
-                $driver = null;
+                throw new \DomainException(\sprintf('Caching support is currently not implemented for PDO driver "%s".', $driver));
         }
 
         foreach ($addTagData as $tagId => $ids) {
             foreach ($ids as $id) {
-                if ($failed && \in_array($id, $failed, true)) {
+                if (in_array($id, $failed, true)) {
                     continue;
                 }
 
@@ -342,7 +345,7 @@ class PdoAdapter extends AbstractTagAwareAdapter implements PruneableInterface
 
         foreach ($removeTagData as $tagId => $ids) {
             foreach ($ids as $id) {
-                if ($failed && \in_array($id, $failed, true)) {
+                if (\in_array($id, $failed, true)) {
                     continue;
                 }
 
@@ -581,7 +584,7 @@ class PdoAdapter extends AbstractTagAwareAdapter implements PruneableInterface
     {
         $conn = $this->getConnection();
 
-        $stmt =  $conn->prepare("DELETE FROM $this->tagsTable WHERE $this->idCol NOT IN (SELECT $this->idCol FROM $this->table)");
+        $stmt = $conn->prepare("DELETE FROM $this->tagsTable WHERE $this->idCol NOT IN (SELECT $this->idCol FROM $this->table)");
         $stmt->execute();
 
         return true;

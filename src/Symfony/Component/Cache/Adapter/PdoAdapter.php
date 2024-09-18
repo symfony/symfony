@@ -150,8 +150,9 @@ class PdoAdapter extends AbstractTagAwareAdapter implements PruneableInterface
             // - case-insensitivity
             // - language processing like é == e
             'mysql' => "CREATE TABLE $this->tagsTable ($this->idCol VARBINARY(255) NOT NULL, $this->tagCol VARBINARY(255) NOT NULL, PRIMARY KEY($this->idCol, $this->tagCol), INDEX idx_id_col ($this->idCol), INDEX idx_tag_col ($this->tagCol)) COLLATE utf8mb4_bin, ENGINE = InnoDB",
-            'sqlite' => "CREATE TABLE $this->tagsTable ($this->idCol TEXT NOT NULL, $this->tagCol TEXT NOT NULL, PRIMARY KEY ($this->idCol, $this->tagCol));CREATE INDEX idx_id_col ON $this->tagsTable($this->idCol);CREATE INDEX idx_tag_col ON $this->tagsTable($this->tagCol);",
-            // TODO: Need help for oci, sqlsrv and pgsql here
+            'sqlite' => "CREATE TABLE $this->tagsTable ($this->idCol TEXT NOT NULL, $this->tagCol TEXT NOT NULL, PRIMARY KEY ($this->idCol, $this->tagCol));CREATE INDEX idx_id_col ON $this->tagsTable($this->idCol);CREATE INDEX idx_tag_col ON $this->tagsTable($this->tagCol)",
+            'pgsql', 'sqlsrv' => "CREATE TABLE $this->tagsTable ($this->idCol VARCHAR(255) NOT NULL, $this->tagCol VARCHAR(255) NOT NULL, PRIMARY KEY($this->idCol, $this->tagCol);CREATE INDEX idx_id_col ON $this->tagsTable($this->idCol);CREATE INDEX idx_tag_col ON $this->tagsTable($this->tagCol)",
+            'oci' => "CREATE TABLE $this->tagsTable ($this->idCol VARCHAR2(255) NOT NULL, $this->tagCol VARCHAR2(255) NOT NULL, PRIMARY KEY($this->idCol, $this->tagCol);CREATE INDEX idx_id_col ON $this->tagsTable($this->idCol);CREATE INDEX idx_tag_col ON $this->tagsTable($this->tagCol)",
             default => throw new \DomainException(\sprintf('Creating the cache table is currently not implemented for PDO driver "%s".', $driver)),
         };
 
@@ -159,6 +160,11 @@ class PdoAdapter extends AbstractTagAwareAdapter implements PruneableInterface
     }
 
     public function prune(): bool
+    {
+        return $this->pruneExpiredItems() && $this->pruneOrphanedTags();
+    }
+
+    public function pruneExpiredItems(): bool
     {
         $deleteSql = "DELETE FROM $this->table WHERE $this->lifetimeCol + $this->timeCol <= :time";
 
@@ -183,8 +189,6 @@ class PdoAdapter extends AbstractTagAwareAdapter implements PruneableInterface
         } catch (\PDOException) {
             return true;
         }
-
-        $this->pruneOrphanedTags();
     }
 
     protected function doFetch(array $ids): iterable
@@ -288,19 +292,26 @@ class PdoAdapter extends AbstractTagAwareAdapter implements PruneableInterface
 
         switch (true) {
             case 'mysql' === $driver:
-                $sql = $insertSql.' ON DUPLICATE KEY IGNORE';
+                $sql = $insertSql." ON DUPLICATE KEY UPDATE $this->idCol = VALUES($this->idCol), $this->tagCol = VALUES($this->tagCol)";
                 break;
             case 'oci' === $driver:
-                throw new LogicException('oci driver support must be added.'); // TODO: I need help here
+                // DUAL is Oracle specific dummy table
+                $sql = "MERGE INTO $this->tagsTable USING DUAL ON ($this->idCol = :id, $this->tagCol = :tagId) ".
+                    "WHEN NOT MATCHED THEN INSERT ($this->idCol, $this->tagCol) VALUES (:id, :tagId) ".
+                    "WHEN MATCHED THEN UPDATE SET $this->idCol = :id, $this->tagCol = :tagId";
                 break;
             case 'sqlsrv' === $driver && version_compare($this->getServerVersion(), '10', '>='):
-                throw new LogicException('sqlsrv driver support must be added.'); // TODO: I need help here
+                // MERGE is only available since SQL Server 2008 and must be terminated by semicolon
+                // It also requires HOLDLOCK according to http://weblogs.sqlteam.com/dang/archive/2009/01/31/UPSERT-Race-Condition-With-MERGE.aspx
+                $sql = "MERGE INTO $this->tagsTable WITH (HOLDLOCK) USING (SELECT 1 AS dummy) AS src ON ($this->idCol = :id, $this->tagCol = :tagId) ".
+                    "WHEN NOT MATCHED THEN INSERT ($this->idCol, $this->tagCol) VALUES (:id, :tagId) ".
+                    "WHEN MATCHED THEN UPDATE SET $this->idCol = :id, $this->tagCol = :tagId;";
                 break;
             case 'sqlite' === $driver:
                 $sql = 'INSERT OR REPLACE'.substr($insertSql, 6);
                 break;
             case 'pgsql' === $driver && version_compare($this->getServerVersion(), '9.5', '>='):
-                throw new LogicException('pgsql driver support must be added.'); // TODO: I need help here
+                $sql = $insertSql." ON CONFLICT ($this->idCol, $this->tagCol) DO UPDATE SET ($this->idCol, $this->tagCol) = (EXCLUDED.$this->idCol, EXCLUDED.$this->tagCol)";
                 break;
             default:
                 $driver = null;
@@ -319,7 +330,10 @@ class PdoAdapter extends AbstractTagAwareAdapter implements PruneableInterface
 
                     $stmt->bindParam(':id', $id);
                     $stmt->bindParam(':tagId', $tagId);
-                    $stmt->execute();
+
+                    $this->executeStatementWithFallback($stmt, function () {
+                        $this->createTagsTable();
+                    });
                 } catch (\PDOException $e) {
                     $failed[] = $id;
                 }
@@ -341,7 +355,10 @@ class PdoAdapter extends AbstractTagAwareAdapter implements PruneableInterface
 
                     $stmt->bindParam(':id', $id);
                     $stmt->bindParam(':tagId', $tagId);
-                    $stmt->execute();
+
+                    $this->executeStatementWithFallback($stmt, function () {
+                        $this->createTagsTable();
+                    });
                 } catch (\PDOException $e) {
                     $failed[] = $id;
                 }
@@ -393,14 +410,10 @@ class PdoAdapter extends AbstractTagAwareAdapter implements PruneableInterface
 
         $now = time();
         $lifetime = $lifetime ?: null;
-        try {
-            $stmt = $conn->prepare($sql);
-        } catch (\PDOException $e) {
-            if ($this->isTableMissing($e) && (!$conn->inTransaction() || \in_array($driver, ['pgsql', 'sqlite', 'sqlsrv'], true))) {
-                $this->createTable();
-            }
-            $stmt = $conn->prepare($sql);
-        }
+
+        $stmt = $this->prepareStatementWithFallback($sql, function () {
+            $this->createTable();
+        });
 
         // $id and $data are defined later in the loop. Binding is done by reference, values are read on execution.
         if ('sqlsrv' === $driver || 'oci' === $driver) {
@@ -428,14 +441,10 @@ class PdoAdapter extends AbstractTagAwareAdapter implements PruneableInterface
         }
 
         foreach ($values as $id => $data) {
-            try {
-                $stmt->execute();
-            } catch (\PDOException $e) {
-                if ($this->isTableMissing($e) && (!$conn->inTransaction() || \in_array($driver, ['pgsql', 'sqlite', 'sqlsrv'], true))) {
-                    $this->createTable();
-                }
-                $stmt->execute();
-            }
+            $this->executeStatementWithFallback($stmt, function () {
+                $this->createTagsTable();
+            });
+
             if (null === $driver && !$stmt->rowCount()) {
                 try {
                     $insertStmt->execute();
@@ -549,11 +558,32 @@ class PdoAdapter extends AbstractTagAwareAdapter implements PruneableInterface
         }
     }
 
+    private function executeStatementWithFallback(\PDOStatement $statement, \Closure $createTable): void
+    {
+        $driver = $this->getDriver();
+        $conn = $this->getConnection();
+
+        try {
+            $statement->execute();
+        } catch (\PDOException $e) {
+            if ($this->isTableMissing($e) && (!$conn->inTransaction() || \in_array($driver, ['pgsql', 'sqlite', 'sqlsrv'], true))) {
+                $createTable();
+            }
+
+            $statement->execute();
+        }
+    }
+
     /**
      * Prunes the tags table and removes all tags that are not used anywhere anymore.
      */
-    private function pruneOrphanedTags(): void
+    private function pruneOrphanedTags(): bool
     {
-        // TODO: implement me
+        $conn = $this->getConnection();
+
+        $stmt =  $conn->prepare("DELETE FROM $this->tagsTable WHERE $this->idCol NOT IN (SELECT $this->idCol FROM $this->table)");
+        $stmt->execute();
+
+        return true;
     }
 }

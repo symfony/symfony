@@ -40,7 +40,7 @@ trait PdoTrait
     private array $connectionOptions = [];
     private string $namespace;
 
-    private function init(#[\SensitiveParameter] \PDO|string $connOrDsn, string $namespace = '', int $defaultLifetime = 0, array $options = [], ?MarshallerInterface $marshaller = null)
+    private function init(#[\SensitiveParameter] \PDO|string $connOrDsn, string $namespace = '', int $defaultLifetime = 0, array $options = [], ?MarshallerInterface $marshaller = null): void
     {
         if (\is_string($connOrDsn) && str_contains($connOrDsn, '://')) {
             throw new InvalidArgumentException(\sprintf('Usage of Doctrine DBAL URL with "%s" is not supported. Use a PDO DSN or "%s" instead.', __CLASS__, DoctrineDbalAdapter::class));

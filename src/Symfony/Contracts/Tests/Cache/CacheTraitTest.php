@@ -71,7 +71,7 @@ class CacheTraitTest extends TestCase
             ->method('save');
 
         $callback = function (CacheItemInterface $item) {
-            $this->assertTrue(false, 'This code should never be reached');
+            $this->fail('This code should never be reached');
         };
 
         $cache->get('key', $callback);

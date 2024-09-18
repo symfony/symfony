@@ -160,43 +160,37 @@ class AdapterTest extends LdapTestCase
         $ldap->getConnection()->bind('cn=admin,dc=symfony,dc=com', 'symfony');
         $entries = $this->setupTestUsers($ldap);
 
-        $unpaged_query = $ldap->createQuery('dc=symfony,dc=com', '(&(objectClass=applicationProcess)(cn=user*))', [
+        $unpagedQuery = $ldap->createQuery('dc=symfony,dc=com', '(&(objectClass=applicationProcess)(cn=user*))', [
             'scope' => Query::SCOPE_ONE,
         ]);
-        $fully_paged_query = $ldap->createQuery('dc=symfony,dc=com', '(&(objectClass=applicationProcess)(cn=user*))', [
+        $fullyPagedQuery = $ldap->createQuery('dc=symfony,dc=com', '(&(objectClass=applicationProcess)(cn=user*))', [
             'scope' => Query::SCOPE_ONE,
             'pageSize' => 25,
         ]);
-        $paged_query = $ldap->createQuery('dc=symfony,dc=com', '(&(objectClass=applicationProcess)(cn=user*))', [
+        $pagedQuery = $ldap->createQuery('dc=symfony,dc=com', '(&(objectClass=applicationProcess)(cn=user*))', [
             'scope' => Query::SCOPE_ONE,
             'pageSize' => 5,
         ]);
 
         try {
-            $unpaged_results = $unpaged_query->execute();
-            $fully_paged_results = $fully_paged_query->execute();
-            $paged_results = $paged_query->execute();
-
             // All four of the above queries should result in the 25 'users' being returned
-            $this->assertEquals($unpaged_results->count(), 25);
-            $this->assertEquals($fully_paged_results->count(), 25);
-            $this->assertEquals($paged_results->count(), 25);
+            $this->assertCount(25, $unpagedQuery->execute());
+            $this->assertCount(25, $fullyPagedQuery->execute());
+            $this->assertCount(25, $pagedQuery->execute());
 
             // They should also result in 1 or 25 / pageSize results
-            $this->assertEquals(\count($unpaged_query->getResources()), 1);
-            $this->assertEquals(\count($fully_paged_query->getResources()), 1);
-            $this->assertEquals(\count($paged_query->getResources()), 5);
+            $this->assertCount(1, $unpagedQuery->getResources());
+            $this->assertCount(1, $fullyPagedQuery->getResources());
+            $this->assertCount(5, $pagedQuery->getResources());
 
             // This last query is to ensure that we haven't botched the state of our connection
             // by not resetting pagination properly.
-            $final_query = $ldap->createQuery('dc=symfony,dc=com', '(&(objectClass=applicationProcess)(cn=user*))', [
+            $finalQuery = $ldap->createQuery('dc=symfony,dc=com', '(&(objectClass=applicationProcess)(cn=user*))', [
                 'scope' => Query::SCOPE_ONE,
             ]);
 
-            $final_results = $final_query->execute();
-
-            $this->assertEquals($final_results->count(), 25);
-            $this->assertEquals(\count($final_query->getResources()), 1);
+            $this->assertCount(25, $finalQuery->execute());
+            $this->assertCount(1, $finalQuery->getResources());
         } catch (LdapException $exc) {
             $this->markTestSkipped('Test LDAP server does not support pagination');
         }
@@ -241,26 +235,23 @@ class AdapterTest extends LdapTestCase
 
         $entries = $this->setupTestUsers($ldap);
 
-        $low_max_query = $ldap->createQuery('dc=symfony,dc=com', '(&(objectClass=applicationProcess)(cn=user*))', [
+        $lowMaxQuery = $ldap->createQuery('dc=symfony,dc=com', '(&(objectClass=applicationProcess)(cn=user*))', [
             'scope' => Query::SCOPE_ONE,
             'pageSize' => 10,
             'maxItems' => 5,
         ]);
-        $high_max_query = $ldap->createQuery('dc=symfony,dc=com', '(&(objectClass=applicationProcess)(cn=user*))', [
+        $highMaxQuery = $ldap->createQuery('dc=symfony,dc=com', '(&(objectClass=applicationProcess)(cn=user*))', [
             'scope' => Query::SCOPE_ONE,
             'pageSize' => 10,
             'maxItems' => 13,
         ]);
 
         try {
-            $low_max_results = $low_max_query->execute();
-            $high_max_results = $high_max_query->execute();
+            $this->assertCount(5, $lowMaxQuery->execute());
+            $this->assertCount(13, $highMaxQuery->execute());
 
-            $this->assertEquals($low_max_results->count(), 5);
-            $this->assertEquals($high_max_results->count(), 13);
-
-            $this->assertEquals(\count($low_max_query->getResources()), 1);
-            $this->assertEquals(\count($high_max_query->getResources()), 2);
+            $this->assertCount(1, $lowMaxQuery->getResources());
+            $this->assertCount(2, $highMaxQuery->getResources());
         } catch (LdapException $exc) {
             $this->markTestSkipped('Test LDAP server does not support pagination');
         }

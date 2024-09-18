@@ -57,6 +57,7 @@ use Symfony\Component\HttpClient\ThrottlingHttpClient;
 use Symfony\Component\HttpFoundation\IpUtils;
 use Symfony\Component\HttpKernel\DependencyInjection\LoggerPass;
 use Symfony\Component\HttpKernel\Fragment\FragmentUriGeneratorInterface;
+use Symfony\Component\Lock\Store\SemaphoreStore;
 use Symfony\Component\Messenger\Bridge\AmazonSqs\Transport\AmazonSqsTransportFactory;
 use Symfony\Component\Messenger\Bridge\Amqp\Transport\AmqpTransportFactory;
 use Symfony\Component\Messenger\Bridge\Beanstalkd\Transport\BeanstalkdTransportFactory;
@@ -2399,7 +2400,12 @@ abstract class FrameworkExtensionTestCase extends TestCase
 
         self::assertTrue($container->hasDefinition('lock.default.factory'));
         $storeDef = $container->getDefinition($container->getDefinition('lock.default.factory')->getArgument(0));
-        self::assertEquals(new Reference('semaphore'), $storeDef->getArgument(0));
+
+        if (class_exists(SemaphoreStore::class) && SemaphoreStore::isSupported()) {
+            self::assertEquals(new Reference('semaphore'), $storeDef->getArgument(0));
+        } else {
+            self::assertEquals(new Reference('flock'), $storeDef->getArgument(0));
+        }
     }
 
     public function testNamedLocks()

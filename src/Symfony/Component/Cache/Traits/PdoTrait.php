@@ -14,8 +14,6 @@ namespace Symfony\Component\Cache\Traits;
 use Symfony\Component\Cache\Adapter\DoctrineDbalAdapter;
 use Symfony\Component\Cache\Marshaller\DefaultMarshaller;
 use Symfony\Component\Cache\Marshaller\MarshallerInterface;
-use Symfony\Component\Cache\PruneableInterface;
-use Symfony\Contracts\Service\ResetInterface;
 
 /**
  * @internal
@@ -88,7 +86,6 @@ trait PdoTrait
 
         return $pdo;
     }
-
 
     /**
      * Creates the table to store cache items which can be called once for setup.
@@ -174,7 +171,6 @@ trait PdoTrait
 
         return (bool) $stmt->fetchColumn();
     }
-
 
     protected function doSave(array $values, int $lifetime): array|bool
     {
@@ -377,7 +373,6 @@ trait PdoTrait
             return true;
         }
     }
-
 
     private function prepareStatementWithFallback(string $query, \Closure $createTable): \PDOStatement
     {

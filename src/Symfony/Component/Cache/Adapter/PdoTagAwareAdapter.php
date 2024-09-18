@@ -12,7 +12,6 @@
 namespace Symfony\Component\Cache\Adapter;
 
 use Symfony\Component\Cache\Exception\InvalidArgumentException;
-use Symfony\Component\Cache\Marshaller\DefaultMarshaller;
 use Symfony\Component\Cache\Marshaller\MarshallerInterface;
 use Symfony\Component\Cache\PruneableInterface;
 use Symfony\Component\Cache\Traits\PdoTrait;
@@ -22,6 +21,7 @@ class PdoTagAwareAdapter extends AbstractTagAwareAdapter implements PruneableInt
     use PdoTrait {
         doSave as public doSaveItem;
     }
+
     /**
      * You can either pass an existing database connection as PDO instance or
      * a DSN string that will be used to lazy-connect to the database when the
@@ -132,7 +132,7 @@ class PdoTagAwareAdapter extends AbstractTagAwareAdapter implements PruneableInt
 
         foreach ($addTagData as $tagId => $ids) {
             foreach ($ids as $id) {
-                if (in_array($id, $failed, true)) {
+                if (\in_array($id, $failed, true)) {
                     continue;
                 }
 

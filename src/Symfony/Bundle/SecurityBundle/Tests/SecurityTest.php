@@ -33,6 +33,7 @@ use Symfony\Component\Security\Csrf\CsrfToken;
 use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 use Symfony\Component\Security\Http\Authentication\UserAuthenticatorInterface;
 use Symfony\Component\Security\Http\Authenticator\AuthenticatorInterface;
+use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
 use Symfony\Component\Security\Http\Event\LogoutEvent;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\Service\ServiceProviderInterface;
@@ -135,6 +136,7 @@ class SecurityTest extends TestCase
         $userAuthenticator = $this->createMock(UserAuthenticatorInterface::class);
         $user = $this->createMock(UserInterface::class);
         $userChecker = $this->createMock(UserCheckerInterface::class);
+        $badge = new UserBadge('foo');
 
         $container = new Container();
         $container->set('request_stack', $requestStack);
@@ -143,7 +145,7 @@ class SecurityTest extends TestCase
         $container->set('security.user_checker_locator', $this->createContainer('main', $userChecker));
 
         $firewallMap->expects($this->once())->method('getFirewallConfig')->willReturn($firewall);
-        $userAuthenticator->expects($this->once())->method('authenticateUser')->with($user, $authenticator, $request);
+        $userAuthenticator->expects($this->once())->method('authenticateUser')->with($user, $authenticator, $request, [$badge], ['foo' => 'bar']);
         $userChecker->expects($this->once())->method('checkPreAuth')->with($user);
 
         $firewallAuthenticatorLocator = $this->createMock(ServiceProviderInterface::class);
@@ -161,7 +163,7 @@ class SecurityTest extends TestCase
 
         $security = new Security($container, ['main' => $firewallAuthenticatorLocator]);
 
-        $security->login($user);
+        $security->login($user, badges: [$badge], attributes: ['foo' => 'bar']);
     }
 
     public function testLoginReturnsAuthenticatorResponse()

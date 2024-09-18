@@ -38,8 +38,8 @@ class UserAuthenticator implements UserAuthenticatorInterface
         $this->requestStack = $requestStack;
     }
 
-    public function authenticateUser(UserInterface $user, AuthenticatorInterface $authenticator, Request $request, array $badges = []): ?Response
+    public function authenticateUser(UserInterface $user, AuthenticatorInterface $authenticator, Request $request, array $badges = [], array $attributes = []): ?Response
     {
-        return $this->getForFirewall()->authenticateUser($user, $authenticator, $request, $badges);
+        return $this->getForFirewall()->authenticateUser($user, $authenticator, $request, $badges, $attributes);
     }
 }

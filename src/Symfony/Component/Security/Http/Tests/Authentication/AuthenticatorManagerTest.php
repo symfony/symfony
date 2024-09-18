@@ -232,13 +232,24 @@ class AuthenticatorManagerTest extends TestCase
     public function testAuthenticateUser()
     {
         $authenticator = $this->createAuthenticator();
-        $authenticator->expects($this->any())->method('createToken')->willReturn($this->token);
         $authenticator->expects($this->any())->method('onAuthenticationSuccess')->willReturn($this->response);
+
+        $badge = new UserBadge('alex');
+
+        $authenticator
+            ->expects($this->any())
+            ->method('createToken')
+            ->willReturnCallback(function (Passport $passport) use ($badge) {
+                $this->assertSame(['attr' => 'foo', 'attr2' => 'bar'], $passport->getAttributes());
+                $this->assertSame([UserBadge::class => $badge], $passport->getBadges());
+
+                return $this->token;
+            });
 
         $this->tokenStorage->expects($this->once())->method('setToken')->with($this->token);
 
         $manager = $this->createManager([$authenticator]);
-        $manager->authenticateUser($this->user, $authenticator, $this->request);
+        $manager->authenticateUser($this->user, $authenticator, $this->request, [$badge], ['attr' => 'foo', 'attr2' => 'bar']);
     }
 
     public function testAuthenticateUserCanModifyTokenFromEvent()

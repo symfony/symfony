@@ -1230,7 +1230,7 @@ class FrameworkExtension extends Extension
             }
             $container->resolveEnvPlaceholders($config['handler_id'], null, $usedEnvs);
 
-            if ($usedEnvs || preg_match('#^[a-z]++://#', $config['handler_id'])) {
+            if ($usedEnvs || str_contains($config['handler_id'], '://')) {
                 $id = '.cache_connection.'.ContainerBuilder::hash($config['handler_id']);
 
                 $container->getDefinition('session.abstract_handler')
@@ -2004,6 +2004,9 @@ class FrameworkExtension extends Extension
             $storeDefinitions = [];
             foreach ($resourceStores as $resourceStore) {
                 $storeDsn = $container->resolveEnvPlaceholders($resourceStore, null, $usedEnvs);
+                if (!$usedEnvs && !str_contains($resourceStore, '://')) {
+                    $resourceStore = new Reference($resourceStore);
+                }
                 $storeDefinition = new Definition(PersistingStoreInterface::class);
                 $storeDefinition
                     ->setFactory([StoreFactory::class, 'createStore'])
@@ -2045,6 +2048,9 @@ class FrameworkExtension extends Extension
 
         foreach ($config['resources'] as $resourceName => $resourceStore) {
             $storeDsn = $container->resolveEnvPlaceholders($resourceStore, null, $usedEnvs);
+            if (!$usedEnvs && !str_contains($resourceStore, '://')) {
+                $resourceStore = new Reference($resourceStore);
+            }
             $storeDefinition = new Definition(SemaphoreStoreInterface::class);
             $storeDefinition->setFactory([SemaphoreStoreFactory::class, 'createStore']);
             $storeDefinition->setArguments([$resourceStore]);

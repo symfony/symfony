@@ -22,6 +22,7 @@ use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInt
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
+use Symfony\Component\Security\Core\Exception\LockedException;
 use Symfony\Component\Security\Core\Exception\UserNotFoundException;
 use Symfony\Component\Security\Core\User\InMemoryUser;
 use Symfony\Component\Security\Http\Authentication\AuthenticatorManager;
@@ -333,6 +334,42 @@ class AuthenticatorManagerTest extends TestCase
         $this->assertSame($this->response, $response);
     }
 
+    public function testAuthenticateRequestShowsAccountStatusException()
+    {
+        $invalidUserException = new LockedException();
+        $authenticator = $this->createMock(TestInteractiveAuthenticator::class);
+        $this->request->attributes->set('_security_authenticators', [$authenticator]);
+
+        $authenticator->expects($this->any())->method('authenticate')->willThrowException($invalidUserException);
+
+        $authenticator->expects($this->any())
+            ->method('onAuthenticationFailure')
+            ->with($this->equalTo($this->request), $this->callback(fn ($e) => $e === $invalidUserException))
+            ->willReturn($this->response);
+
+        $manager = $this->createManager([$authenticator], hideAccountStatusExceptions: false);
+        $response = $manager->authenticateRequest($this->request);
+        $this->assertSame($this->response, $response);
+    }
+
+    public function testAuthenticateRequestHidesInvalidAccountStatusExceptiot()
+    {
+        $invalidUserException = new LockedException();
+        $authenticator = $this->createMock(TestInteractiveAuthenticator::class);
+        $this->request->attributes->set('_security_authenticators', [$authenticator]);
+
+        $authenticator->expects($this->any())->method('authenticate')->willThrowException($invalidUserException);
+
+        $authenticator->expects($this->any())
+            ->method('onAuthenticationFailure')
+            ->with($this->equalTo($this->request), $this->callback(fn ($e) => $e instanceof BadCredentialsException && $invalidUserException === $e->getPrevious()))
+            ->willReturn($this->response);
+
+        $manager = $this->createManager([$authenticator]);
+        $response = $manager->authenticateRequest($this->request);
+        $this->assertSame($this->response, $response);
+    }
+
     public function testLogsUseTheDecoratedAuthenticatorWhenItIsTraceable()
     {
         $authenticator = $this->createMock(TestInteractiveAuthenticator::class);
@@ -384,9 +421,9 @@ class AuthenticatorManagerTest extends TestCase
         return new DummySupportsAuthenticator($supports);
     }
 
-    private function createManager($authenticators, $firewallName = 'main', $eraseCredentials = true, array $requiredBadges = [], ?LoggerInterface $logger = null)
+    private function createManager($authenticators, $firewallName = 'main', $eraseCredentials = true, array $requiredBadges = [], ?LoggerInterface $logger = null, bool $hideAccountStatusExceptions = true)
     {
-        return new AuthenticatorManager($authenticators, $this->tokenStorage, $this->eventDispatcher, $firewallName, $logger, $eraseCredentials, true, $requiredBadges);
+        return new AuthenticatorManager($authenticators, $this->tokenStorage, $this->eventDispatcher, $firewallName, $logger, $eraseCredentials, true, $requiredBadges, hideAccountStatusExceptions: $hideAccountStatusExceptions);
     }
 }
 

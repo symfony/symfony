@@ -15,12 +15,15 @@ use Psr\Log\NullLogger;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\Mailer\Bridge\Postal\Transport\PostalApiTransport;
 use Symfony\Component\Mailer\Bridge\Postal\Transport\PostalTransportFactory;
-use Symfony\Component\Mailer\Test\TransportFactoryTestCase;
+use Symfony\Component\Mailer\Test\AbstractTransportFactoryTestCase;
+use Symfony\Component\Mailer\Test\IncompleteDsnTestTrait;
 use Symfony\Component\Mailer\Transport\Dsn;
 use Symfony\Component\Mailer\Transport\TransportFactoryInterface;
 
-class PostalTransportFactoryTest extends TransportFactoryTestCase
+class PostalTransportFactoryTest extends AbstractTransportFactoryTestCase
 {
+    use IncompleteDsnTestTrait;
+
     public function getFactory(): TransportFactoryInterface
     {
         return new PostalTransportFactory(null, new MockHttpClient(), new NullLogger());
@@ -45,12 +48,12 @@ class PostalTransportFactoryTest extends TransportFactoryTestCase
 
         yield [
             new Dsn('postal+api', 'postal.localhost', null, self::PASSWORD),
-            (new PostalApiTransport(self::PASSWORD, 'postal.localhost', new MockHttpClient(), null, $logger)),
+            new PostalApiTransport(self::PASSWORD, 'postal.localhost', new MockHttpClient(), null, $logger),
         ];
 
         yield [
             new Dsn('postal', 'postal.localhost', null, self::PASSWORD),
-            (new PostalApiTransport(self::PASSWORD, 'postal.localhost', new MockHttpClient(), null, $logger)),
+            new PostalApiTransport(self::PASSWORD, 'postal.localhost', new MockHttpClient(), null, $logger),
         ];
     }
 

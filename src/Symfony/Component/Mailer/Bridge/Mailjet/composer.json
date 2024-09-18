@@ -17,7 +17,7 @@
     ],
     "require": {
         "php": ">=8.2",
-        "symfony/mailer": "^6.4|^7.0"
+        "symfony/mailer": "^7.2"
     },
     "require-dev": {
         "symfony/http-client": "^6.4|^7.0",

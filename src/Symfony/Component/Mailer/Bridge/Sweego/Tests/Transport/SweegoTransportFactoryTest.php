@@ -16,12 +16,15 @@ use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\Mailer\Bridge\Sweego\Transport\SweegoApiTransport;
 use Symfony\Component\Mailer\Bridge\Sweego\Transport\SweegoSmtpTransport;
 use Symfony\Component\Mailer\Bridge\Sweego\Transport\SweegoTransportFactory;
-use Symfony\Component\Mailer\Test\TransportFactoryTestCase;
+use Symfony\Component\Mailer\Test\AbstractTransportFactoryTestCase;
+use Symfony\Component\Mailer\Test\IncompleteDsnTestTrait;
 use Symfony\Component\Mailer\Transport\Dsn;
 use Symfony\Component\Mailer\Transport\TransportFactoryInterface;
 
-class SweegoTransportFactoryTest extends TransportFactoryTestCase
+class SweegoTransportFactoryTest extends AbstractTransportFactoryTestCase
 {
+    use IncompleteDsnTestTrait;
+
     public function getFactory(): TransportFactoryInterface
     {
         return new SweegoTransportFactory(null, new MockHttpClient(), new NullLogger());

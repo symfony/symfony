@@ -11,14 +11,8 @@
 
 namespace Symfony\Component\Mailer\Test;
 
-use PHPUnit\Framework\Attributes\DataProvider;
-use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\Mailer\Exception\IncompleteDsnException;
-use Symfony\Component\Mailer\Exception\UnsupportedSchemeException;
 use Symfony\Component\Mailer\Transport\Dsn;
-use Symfony\Component\Mailer\Transport\TransportFactoryInterface;
-use Symfony\Component\Mailer\Transport\TransportInterface;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
@@ -26,27 +20,16 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
  * A test case to ease testing Transport Factory.
  *
  * @author Konstantin Myakshin <molodchick@gmail.com>
+ *
+ * @deprecated since Symfony 7.2, use AbstractTransportFactoryTestCase instead
  */
-abstract class TransportFactoryTestCase extends TestCase
+abstract class TransportFactoryTestCase extends AbstractTransportFactoryTestCase
 {
-    protected const USER = 'u$er';
-    protected const PASSWORD = 'pa$s';
+    use IncompleteDsnTestTrait;
 
     protected EventDispatcherInterface $dispatcher;
     protected HttpClientInterface $client;
     protected LoggerInterface $logger;
-
-    abstract public function getFactory(): TransportFactoryInterface;
-
-    /**
-     * @psalm-return iterable<array{0: Dsn, 1: bool}>
-     */
-    abstract public static function supportsProvider(): iterable;
-
-    /**
-     * @psalm-return iterable<array{0: Dsn, 1: TransportInterface}>
-     */
-    abstract public static function createProvider(): iterable;
 
     /**
      * @psalm-return iterable<array{0: Dsn, 1?: string|null}>
@@ -62,59 +45,6 @@ abstract class TransportFactoryTestCase extends TestCase
     public static function incompleteDsnProvider(): iterable
     {
         return [];
-    }
-
-    /**
-     * @dataProvider supportsProvider
-     */
-    #[DataProvider('supportsProvider')]
-    public function testSupports(Dsn $dsn, bool $supports)
-    {
-        $factory = $this->getFactory();
-
-        $this->assertSame($supports, $factory->supports($dsn));
-    }
-
-    /**
-     * @dataProvider createProvider
-     */
-    #[DataProvider('createProvider')]
-    public function testCreate(Dsn $dsn, TransportInterface $transport)
-    {
-        $factory = $this->getFactory();
-
-        $this->assertEquals($transport, $factory->create($dsn));
-        if (str_contains('smtp', $dsn->getScheme())) {
-            $this->assertStringMatchesFormat($dsn->getScheme().'://%S'.$dsn->getHost().'%S', (string) $transport);
-        }
-    }
-
-    /**
-     * @dataProvider unsupportedSchemeProvider
-     */
-    #[DataProvider('unsupportedSchemeProvider')]
-    public function testUnsupportedSchemeException(Dsn $dsn, ?string $message = null)
-    {
-        $factory = $this->getFactory();
-
-        $this->expectException(UnsupportedSchemeException::class);
-        if (null !== $message) {
-            $this->expectExceptionMessage($message);
-        }
-
-        $factory->create($dsn);
-    }
-
-    /**
-     * @dataProvider incompleteDsnProvider
-     */
-    #[DataProvider('incompleteDsnProvider')]
-    public function testIncompleteDsnException(Dsn $dsn)
-    {
-        $factory = $this->getFactory();
-
-        $this->expectException(IncompleteDsnException::class);
-        $factory->create($dsn);
     }
 
     protected function getDispatcher(): EventDispatcherInterface

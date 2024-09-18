@@ -16,12 +16,15 @@ use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\Mailer\Bridge\Mailtrap\Transport\MailtrapApiTransport;
 use Symfony\Component\Mailer\Bridge\Mailtrap\Transport\MailtrapSmtpTransport;
 use Symfony\Component\Mailer\Bridge\Mailtrap\Transport\MailtrapTransportFactory;
-use Symfony\Component\Mailer\Test\TransportFactoryTestCase;
+use Symfony\Component\Mailer\Test\AbstractTransportFactoryTestCase;
+use Symfony\Component\Mailer\Test\IncompleteDsnTestTrait;
 use Symfony\Component\Mailer\Transport\Dsn;
 use Symfony\Component\Mailer\Transport\TransportFactoryInterface;
 
-class MailtrapTransportFactoryTest extends TransportFactoryTestCase
+class MailtrapTransportFactoryTest extends AbstractTransportFactoryTestCase
 {
+    use IncompleteDsnTestTrait;
+
     public function getFactory(): TransportFactoryInterface
     {
         return new MailtrapTransportFactory(null, new MockHttpClient(), new NullLogger());

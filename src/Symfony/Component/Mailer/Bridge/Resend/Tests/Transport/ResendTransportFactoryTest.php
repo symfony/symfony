@@ -16,12 +16,15 @@ use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\Mailer\Bridge\Resend\Transport\ResendApiTransport;
 use Symfony\Component\Mailer\Bridge\Resend\Transport\ResendSmtpTransport;
 use Symfony\Component\Mailer\Bridge\Resend\Transport\ResendTransportFactory;
-use Symfony\Component\Mailer\Test\TransportFactoryTestCase;
+use Symfony\Component\Mailer\Test\AbstractTransportFactoryTestCase;
+use Symfony\Component\Mailer\Test\IncompleteDsnTestTrait;
 use Symfony\Component\Mailer\Transport\Dsn;
 use Symfony\Component\Mailer\Transport\TransportFactoryInterface;
 
-class ResendTransportFactoryTest extends TransportFactoryTestCase
+class ResendTransportFactoryTest extends AbstractTransportFactoryTestCase
 {
+    use IncompleteDsnTestTrait;
+
     public function getFactory(): TransportFactoryInterface
     {
         return new ResendTransportFactory(null, new MockHttpClient(), new NullLogger());

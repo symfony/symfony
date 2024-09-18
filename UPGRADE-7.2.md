@@ -47,6 +47,14 @@ Ldap
 
  * Add methods for `saslBind()` and `whoami()` to `ConnectionInterface` and `LdapInterface`
 
+Mailer
+------
+
+* Deprecate `TransportFactoryTestCase`, extend `AbstractTransportFactoryTestCase` instead
+
+  The `testIncompleteDsnException()` test is no longer provided by default. If you make use of it by implementing the `incompleteDsnProvider()` data providers,
+  you now need to use the `IncompleteDsnTestTrait`.
+
 Messenger
 ---------
 

@@ -12,9 +12,9 @@
 namespace Symfony\Component\Notifier\Bridge\Pushy\Tests;
 
 use Symfony\Component\Notifier\Bridge\Pushy\PushyTransportFactory;
-use Symfony\Component\Notifier\Test\TransportFactoryTestCase;
+use Symfony\Component\Notifier\Test\AbstractTransportFactoryTestCase;
 
-final class PushyTransportFactoryTest extends TransportFactoryTestCase
+final class PushyTransportFactoryTest extends AbstractTransportFactoryTestCase
 {
     public function createFactory(): PushyTransportFactory
     {

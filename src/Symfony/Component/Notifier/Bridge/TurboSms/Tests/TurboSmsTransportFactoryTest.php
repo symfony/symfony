@@ -12,10 +12,15 @@
 namespace Symfony\Component\Notifier\Bridge\TurboSms\Tests;
 
 use Symfony\Component\Notifier\Bridge\TurboSms\TurboSmsTransportFactory;
-use Symfony\Component\Notifier\Test\TransportFactoryTestCase;
+use Symfony\Component\Notifier\Test\AbstractTransportFactoryTestCase;
+use Symfony\Component\Notifier\Test\IncompleteDsnTestTrait;
+use Symfony\Component\Notifier\Test\MissingRequiredOptionTestTrait;
 
-final class TurboSmsTransportFactoryTest extends TransportFactoryTestCase
+final class TurboSmsTransportFactoryTest extends AbstractTransportFactoryTestCase
 {
+    use IncompleteDsnTestTrait;
+    use MissingRequiredOptionTestTrait;
+
     public function createFactory(): TurboSmsTransportFactory
     {
         return new TurboSmsTransportFactory();
@@ -49,5 +54,10 @@ final class TurboSmsTransportFactoryTest extends TransportFactoryTestCase
     {
         yield ['somethingElse://authToken@default?from=acme'];
         yield ['somethingElse://authToken@default'];
+    }
+
+    public static function incompleteDsnProvider(): iterable
+    {
+        yield ['turbosms://default?from=acme'];
     }
 }

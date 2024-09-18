@@ -12,10 +12,13 @@
 namespace Symfony\Component\Notifier\Bridge\Telegram\Tests;
 
 use Symfony\Component\Notifier\Bridge\Telegram\TelegramTransportFactory;
-use Symfony\Component\Notifier\Test\TransportFactoryTestCase;
+use Symfony\Component\Notifier\Test\AbstractTransportFactoryTestCase;
+use Symfony\Component\Notifier\Test\IncompleteDsnTestTrait;
 
-final class TelegramTransportFactoryTest extends TransportFactoryTestCase
+final class TelegramTransportFactoryTest extends AbstractTransportFactoryTestCase
 {
+    use IncompleteDsnTestTrait;
+
     public function createFactory(): TelegramTransportFactory
     {
         return new TelegramTransportFactory();

@@ -12,10 +12,15 @@
 namespace Symfony\Component\Notifier\Bridge\Sendberry\Tests;
 
 use Symfony\Component\Notifier\Bridge\Sendberry\SendberryTransportFactory;
-use Symfony\Component\Notifier\Test\TransportFactoryTestCase;
+use Symfony\Component\Notifier\Test\AbstractTransportFactoryTestCase;
+use Symfony\Component\Notifier\Test\IncompleteDsnTestTrait;
+use Symfony\Component\Notifier\Test\MissingRequiredOptionTestTrait;
 
-final class SendberryTransportFactoryTest extends TransportFactoryTestCase
+final class SendberryTransportFactoryTest extends AbstractTransportFactoryTestCase
 {
+    use IncompleteDsnTestTrait;
+    use MissingRequiredOptionTestTrait;
+
     public function createFactory(): SendberryTransportFactory
     {
         return new SendberryTransportFactory();
@@ -45,5 +50,10 @@ final class SendberryTransportFactoryTest extends TransportFactoryTestCase
     {
         yield ['somethingElse://api_key@default?from=+0611223344'];
         yield ['somethingElse://api_key@default']; // missing "from" option
+    }
+
+    public static function incompleteDsnProvider(): iterable
+    {
+        yield ['sendberry://default?from=%2B0611223344'];
     }
 }

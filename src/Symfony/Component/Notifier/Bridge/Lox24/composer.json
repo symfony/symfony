@@ -12,7 +12,7 @@
     "require": {
         "php": ">=8.1",
         "symfony/http-client": "^6.4|^7.0",
-        "symfony/notifier": "^7.1"
+        "symfony/notifier": "^7.2"
     },
     "require-dev": {
         "symfony/webhook": "^6.4|^7.0"

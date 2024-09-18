@@ -12,14 +12,19 @@
 namespace Symfony\Component\Notifier\Bridge\GatewayApi\Tests;
 
 use Symfony\Component\Notifier\Bridge\GatewayApi\GatewayApiTransportFactory;
-use Symfony\Component\Notifier\Test\TransportFactoryTestCase;
+use Symfony\Component\Notifier\Test\AbstractTransportFactoryTestCase;
+use Symfony\Component\Notifier\Test\IncompleteDsnTestTrait;
+use Symfony\Component\Notifier\Test\MissingRequiredOptionTestTrait;
 
 /**
  * @author Piergiuseppe Longo <piergiuseppe.longo@gmail.com>
  * @author Oskar Stark <oskarstark@googlemail.com>
  */
-final class GatewayApiTransportFactoryTest extends TransportFactoryTestCase
+final class GatewayApiTransportFactoryTest extends AbstractTransportFactoryTestCase
 {
+    use IncompleteDsnTestTrait;
+    use MissingRequiredOptionTestTrait;
+
     public function createFactory(): GatewayApiTransportFactory
     {
         return new GatewayApiTransportFactory();
@@ -47,5 +52,10 @@ final class GatewayApiTransportFactoryTest extends TransportFactoryTestCase
     public static function missingRequiredOptionProvider(): iterable
     {
         yield 'missing option: from' => ['gatewayapi://token@host.test'];
+    }
+
+    public static function unsupportedSchemeProvider(): iterable
+    {
+        yield ['somethingElse://login:apiKey@default'];
     }
 }

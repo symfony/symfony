@@ -12,10 +12,13 @@
 namespace Symfony\Component\Notifier\Bridge\FortySixElks\Tests;
 
 use Symfony\Component\Notifier\Bridge\FortySixElks\FortySixElksTransportFactory;
-use Symfony\Component\Notifier\Test\TransportFactoryTestCase;
+use Symfony\Component\Notifier\Test\AbstractTransportFactoryTestCase;
+use Symfony\Component\Notifier\Test\IncompleteDsnTestTrait;
 
-class FortySixElksTransportFactoryTest extends TransportFactoryTestCase
+class FortySixElksTransportFactoryTest extends AbstractTransportFactoryTestCase
 {
+    use IncompleteDsnTestTrait;
+
     public function createFactory(): FortySixElksTransportFactory
     {
         return new FortySixElksTransportFactory();
@@ -38,5 +41,10 @@ class FortySixElksTransportFactoryTest extends TransportFactoryTestCase
     public static function unsupportedSchemeProvider(): iterable
     {
         yield ['somethingElse://api_key@default'];
+    }
+
+    public static function incompleteDsnProvider(): iterable
+    {
+        yield ['forty-six-elks://default'];
     }
 }

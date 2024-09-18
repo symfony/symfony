@@ -12,10 +12,15 @@
 namespace Symfony\Component\Notifier\Bridge\Twilio\Tests;
 
 use Symfony\Component\Notifier\Bridge\Twilio\TwilioTransportFactory;
-use Symfony\Component\Notifier\Test\TransportFactoryTestCase;
+use Symfony\Component\Notifier\Test\AbstractTransportFactoryTestCase;
+use Symfony\Component\Notifier\Test\IncompleteDsnTestTrait;
+use Symfony\Component\Notifier\Test\MissingRequiredOptionTestTrait;
 
-final class TwilioTransportFactoryTest extends TransportFactoryTestCase
+final class TwilioTransportFactoryTest extends AbstractTransportFactoryTestCase
 {
+    use IncompleteDsnTestTrait;
+    use MissingRequiredOptionTestTrait;
+
     public function createFactory(): TwilioTransportFactory
     {
         return new TwilioTransportFactory();
@@ -44,5 +49,11 @@ final class TwilioTransportFactoryTest extends TransportFactoryTestCase
     {
         yield ['somethingElse://accountSid:authToken@default?from=0611223344'];
         yield ['somethingElse://accountSid:authToken@default']; // missing "from" option
+    }
+
+    public static function incompleteDsnProvider(): iterable
+    {
+        yield ['twilio://:authToken@default?from=0611223344'];
+        yield ['twilio://accountSid:@default?from=0611223344'];
     }
 }

@@ -7,6 +7,8 @@ CHANGELOG
  * Make `ProviderFactoryTestCase` and `ProviderTestCase` compatible with PHPUnit 10+
  * Add `lint:translations` command
  * Deprecate passing an escape character to `CsvFileLoader::setCsvControl()`
+ * Make Xliff 2.0 attributes in segment element available as `segment-attributes`
+   metadata returned by `XliffFileLoader` and make `XliffFileDumper` write them to the file
 
 7.1
 ---

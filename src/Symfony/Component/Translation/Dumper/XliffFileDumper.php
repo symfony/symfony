@@ -193,6 +193,12 @@ class XliffFileDumper extends FileDumper
 
             $segment = $translation->appendChild($dom->createElement('segment'));
 
+            if ($this->hasMetadataArrayInfo('segment-attributes', $metadata)) {
+                foreach ($metadata['segment-attributes'] as $name => $value) {
+                    $segment->setAttribute($name, $value);
+                }
+            }
+
             $s = $segment->appendChild($dom->createElement('source'));
             $s->appendChild($dom->createTextNode($source));
 

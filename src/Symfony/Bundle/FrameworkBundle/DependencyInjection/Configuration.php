@@ -1033,6 +1033,9 @@ class Configuration implements ConfigurationInterface
                                 ->end()
                             ->end()
                         ->end()
+                        ->booleanNode('disable_translation')
+                            ->defaultFalse()
+                        ->end()
                         ->arrayNode('auto_mapping')
                             ->info('A collection of namespaces for which auto-mapping will be enabled by default, or null to opt-in with the EnableAutoMapping constraint.')
                             ->example([

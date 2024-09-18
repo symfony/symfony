@@ -107,7 +107,7 @@ class ExecutionContext implements ExecutionContextInterface
         private ValidatorInterface $validator,
         private mixed $root,
         private TranslatorInterface $translator,
-        private ?string $translationDomain = null,
+        private string|false|null $translationDomain = null,
     ) {
         $this->violations = new ConstraintViolationList();
         $this->cachedObjectsRefs = new \SplObjectStorage();

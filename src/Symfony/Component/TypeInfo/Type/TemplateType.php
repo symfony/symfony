@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\TypeInfo\Type;
 
-use Symfony\Component\TypeInfo\Exception\LogicException;
 use Symfony\Component\TypeInfo\Type;
 use Symfony\Component\TypeInfo\TypeIdentifier;
 
@@ -33,7 +32,7 @@ final class TemplateType extends Type
 
     public function getBaseType(): BuiltinType|ObjectType
     {
-        throw new LogicException(sprintf('Cannot get base type on "%s" template type.', $this));
+        return $this->bound->getBaseType();
     }
 
     public function isA(TypeIdentifier|string $subject): bool

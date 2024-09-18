@@ -77,6 +77,11 @@ String
 Translation
 -----------
 
+ * Deprecate `ProviderFactoryTestCase`, extend `AbstractTransportFactoryTestCase` instead
+
+   The `testIncompleteDsnException()` test is no longer provided by default. If you make use of it by implementing the `incompleteDsnProvider()` data providers,
+   you now need to use the `IncompleteDsnTestTrait`.
+
  * Deprecate passing an escape character to `CsvFileLoader::setCsvControl()`
 
 TwigBridge

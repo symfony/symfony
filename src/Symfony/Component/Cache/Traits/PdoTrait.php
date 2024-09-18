@@ -12,6 +12,7 @@
 namespace Symfony\Component\Cache\Traits;
 
 use Symfony\Component\Cache\Adapter\DoctrineDbalAdapter;
+use Symfony\Component\Cache\Exception\InvalidArgumentException;
 use Symfony\Component\Cache\Marshaller\DefaultMarshaller;
 use Symfony\Component\Cache\Marshaller\MarshallerInterface;
 
@@ -246,7 +247,7 @@ trait PdoTrait
 
         foreach ($values as $id => $data) {
             $this->executeStatementWithFallback($stmt, function () {
-                $this->createTagsTable();
+                $this->createTable();
             });
 
             if (null === $driver && !$stmt->rowCount()) {

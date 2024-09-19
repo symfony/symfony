@@ -217,7 +217,7 @@ trait PdoTrait
         $lifetime = $lifetime ?: null;
 
         $stmt = $this->prepareStatementWithFallback($sql, function () {
-            $this->createTable();
+            $this->createItemsTable();
         });
 
         // $id and $data are defined later in the loop. Binding is done by reference, values are read on execution.
@@ -247,7 +247,7 @@ trait PdoTrait
 
         foreach ($values as $id => $data) {
             $this->executeStatementWithFallback($stmt, function () {
-                $this->createTable();
+                $this->createItemsTable();
             });
 
             if (null === $driver && !$stmt->rowCount()) {

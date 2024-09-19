@@ -16,12 +16,20 @@ use Symfony\Component\Cache\Marshaller\MarshallerInterface;
 use Symfony\Component\Cache\PruneableInterface;
 use Symfony\Component\Cache\Traits\PdoTrait;
 
+/**
+ * @author Yanick Witschi <yanick.witschi@terminal42.ch>
+ */
 class PdoTagAwareAdapter extends AbstractTagAwareAdapter implements PruneableInterface
 {
     use PdoTrait {
         doSave as public doSaveItem;
         prune as public pruneItems;
     }
+
+    /**
+     * No need for a prefix here, should improve lookup time.
+     */
+    protected const TAGS_PREFIX = '';
 
     /**
      * You can either pass an existing database connection as PDO instance or

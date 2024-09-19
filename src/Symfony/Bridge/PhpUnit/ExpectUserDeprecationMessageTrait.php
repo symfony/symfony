@@ -20,7 +20,7 @@ if (version_compare(Version::id(), '11.0.0', '<')) {
 
         final protected function expectUserDeprecationMessage(string $expectedUserDeprecationMessage): void
         {
-            $this->expectDeprecation($expectedUserDeprecationMessage);
+            $this->expectDeprecation(str_replace('%', '%%', $expectedUserDeprecationMessage));
         }
     }
 } else {

@@ -34,7 +34,7 @@ class PackageUpdateInfoTest extends TestCase
         $this->assertSame($updateType, $packageUpdateInfo->updateType);
     }
 
-    public function provideValidConstructorArguments()
+    public static function provideValidConstructorArguments(): iterable
     {
         return [
             ['@hotwired/stimulus', '5.2.1', 'string', 'downgrade'],
@@ -57,7 +57,7 @@ class PackageUpdateInfoTest extends TestCase
         $this->assertSame($expectUpdate, $packageUpdateInfo->hasUpdate());
     }
 
-    public function provideHasUpdateArguments()
+    public static function provideHasUpdateArguments(): iterable
     {
         return [
             ['downgrade', false],

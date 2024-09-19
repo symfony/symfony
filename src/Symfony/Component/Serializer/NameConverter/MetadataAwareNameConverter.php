@@ -81,6 +81,7 @@ final class MetadataAwareNameConverter implements NameConverterInterface
         }
 
         $contextGroups = (array) ($context[AbstractNormalizer::GROUPS] ?? []);
+        $contextGroups = array_merge($contextGroups, ['Default', (false !== $nsSep = strrpos($class, '\\')) ? substr($class, $nsSep + 1) : $class]);
 
         if (null !== $attributesMetadata[$propertyName]->getSerializedName($contextGroups) && null !== $attributesMetadata[$propertyName]->getSerializedPath($contextGroups)) {
             throw new LogicException(\sprintf('Found SerializedName and SerializedPath attributes on property "%s" of class "%s".', $propertyName, $class));

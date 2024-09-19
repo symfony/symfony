@@ -9,6 +9,8 @@
  * file that was distributed with this source code.
  */
 
+namespace Symfony\Component\Notifier\Bridge\Lox24\Tests;
+
 use Symfony\Component\Notifier\Bridge\Lox24\Lox24TransportFactory;
 use Symfony\Component\Notifier\Test\TransportFactoryTestCase;
 use Symfony\Component\Notifier\Transport\TransportFactoryInterface;

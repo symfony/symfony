@@ -13,7 +13,7 @@ namespace Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection;
 
 use Psr\Cache\CacheItemPoolInterface;
 use Psr\Log\LoggerAwareInterface;
-use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
+use Symfony\Bridge\PhpUnit\ExpectUserDeprecationMessageTrait;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\FrameworkExtension;
 use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
 use Symfony\Bundle\FrameworkBundle\Tests\Fixtures\Messenger\DummyMessage;
@@ -98,7 +98,7 @@ use Symfony\Contracts\Cache\TagAwareCacheInterface;
 
 abstract class FrameworkExtensionTestCase extends TestCase
 {
-    use ExpectDeprecationTrait;
+    use ExpectUserDeprecationMessageTrait;
 
     private static array $containerCache = [];
 
@@ -1863,7 +1863,7 @@ abstract class FrameworkExtensionTestCase extends TestCase
      */
     public function testTaggableCacheAppIsDeprecated()
     {
-        $this->expectDeprecation('Since symfony/framework-bundle 7.2: Using the "tags" option with the "cache.app" adapter is deprecated. You can use the "cache.app.taggable" adapter instead (aliased to the TagAwareCacheInterface for autowiring).');
+        $this->expectUserDeprecationMessage('Since symfony/framework-bundle 7.2: Using the "tags" option with the "cache.app" adapter is deprecated. You can use the "cache.app.taggable" adapter instead (aliased to the TagAwareCacheInterface for autowiring).');
 
         $this->createContainerFromFile('cache_cacheapp_tagaware');
     }

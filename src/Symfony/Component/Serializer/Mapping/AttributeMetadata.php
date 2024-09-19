@@ -267,9 +267,13 @@ class AttributeMetadata implements AttributeMetadataInterface
         // Overwrite only if not defined
         $this->maxDepth ??= $attributeMetadata->getMaxDepth();
 
-        // Overwrite only if both serialized names and paths are empty
-        if (!$this->serializedNames && !$this->serializedPaths) {
+        // Overwrite only if serialized names are empty
+        if (!$this->serializedNames) {
             $this->serializedNames = self::getSerializedNamesFromAttributeMetadata($attributeMetadata);
+        }
+
+        // Overwrite only if serialized paths are empty
+        if (!$this->serializedPaths) {
             $this->serializedPaths = self::getSerializedPathsFromAttributeMetadata($attributeMetadata);
         }
 

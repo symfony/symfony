@@ -1,0 +1,144 @@
+---------------------------------------------------------------------------
+
+by yceruto at 2024-07-01T14:42:35Z
+
+> I was wondering if we couldn't go with another API, namely a new argument to the constructor of the Parameter class?
+>
+>`new Parameter(string $id, string $errorOnEmpty = null)`
+
+Looks good to me. I guess this error message would override the general one since it's more specific, right?
+
+> Independently:
+The name $container->requireParameter() made me think this would be checked ahead of time, not just before it's needed. In this regard, the naming is confusing to me because any parameter is required.
+
+Yeah, I wasn’t 100% convinced about this name/method. Following your previous idea, I think that adding `$errorOnEmpty` to the `$container->setParameter()` instead would be better?
+```php
+$container->setParamater('kernel.secret', $value, 'A non-empty secret is required.');
+```
+
+>We could keep both approaches at once, but is it worth it?
+
+I think so. I’ll give it a try and see
+
+---------------------------------------------------------------------------
+
+by stof at 2024-07-01T15:14:00Z
+
+I would not add this in `setParameter()` as this would mean that each place setting the value of a parameter would have to define the proper validation (while in many cases, it could instead run the validation).
+
+Adding this in the `Parameter` constructor would not help IMO. Most usages of this constructor are implicit through the `%kernel.secret%` syntax to reference parameters in argument values.
+And this would also loose the benefit mentioned by @yceruto about automatically validating empty secrets for all third-party bundles using the parameter without any change on their side, because it would require them to opt-in for validation when referencing the parameter.
+
+---------------------------------------------------------------------------
+
+by yceruto at 2024-07-01T15:49:43Z
+
+>I would not add this in setParameter() as this would mean that each place setting the value of a parameter would have to define the proper validation (while in many cases, it could instead run the validation).
+
+I was thinking of setting it to null by default (programmatically, for BC) which maintains the current behavior. In other words, the non-empty validation will only run with a custom message if it's set. This means the third (optional) argument in `setParameter()` will serve two purposes: enabling non-empty validation and providing a custom error message. I'm not sure if this is intuitive or clear enough, though.
+
+> Adding this in the Parameter constructor would not help IMO. Most usages of this constructor are implicit through the %kernel.secret% syntax to reference parameters in argument values.
+
+I agree, although some PHP definitions could benefit from it as well. Anyway, I'll explore that further once the initial proposal is solid.
+
+---------------------------------------------------------------------------
+
+by stof at 2024-07-01T16:04:29Z
+
+@yceruto but this `setParameter` method is called by file loaders when they find parameter definitions (and it is **not** called by FrameworkBundle). this puts the validation responsibility in the wrong place (if you ask end-user to enable validation, you could also ask them to pass a valid value instead, with the same effectiveness at catching the issue)
+
+---------------------------------------------------------------------------
+
+by yceruto at 2024-07-01T16:34:21Z
+
+@stof I see your point. That brings me back to the current proposal of a separate method that enables this validation, no matter how/where the parameter is defined.
+
+I'm open to hearing other alternative names for `requireParameter()`... `nonEmptyParameter()` ?
+
+---------------------------------------------------------------------------
+
+by yceruto at 2024-07-02T04:53:07Z
+
+I updated the proposal terminology from "require" to "non-empty". Hopefully it's clearer now.
+
+---------------------------------------------------------------------------
+
+by yceruto at 2024-07-09T13:21:48Z
+
+@symfony/mergers any objection to move forward in this direction? more [changes in PhpDumper](https://github.com/symfony/symfony/pull/57611#discussion_r1661832710) are coming...
+
+---------------------------------------------------------------------------
+
+by yceruto at 2024-07-10T12:48:43Z
+
+>LGTM, what about the TODO note?
+
+will be addressed in this same PR
+
+>I'm also wondering about what we consider empty?
+PHP has an empty() "function" that encompasses false, 0, '0' and [] in addition to null and ''. Shouldn't we use that function instead of going with our own definition?
+
+it works for me, for consistency mainly 👍
+
+---------------------------------------------------------------------------
+
+by yceruto at 2024-07-10T13:54:08Z
+
+This is ready for final review. Note that some changes in `PhpDumper` impact unrelated fixtures when non-empty parameters aren't tested.
+
+---------------------------------------------------------------------------
+
+by yceruto at 2024-08-04T01:08:52Z
+
+Hey @nicolas-grekas, just a friendly ping to see if there’s anything else needed here?
+
+---------------------------------------------------------------------------
+
+by yceruto at 2024-08-17T00:13:20Z
+
+Comments addressed (Windows failures look unrelated).
+
+---------------------------------------------------------------------------
+
+by yceruto at 2024-09-18T12:49:40Z
+
+Just rebased
+
+---------------------------------------------------------------------------
+
+by fabpot at 2024-09-18T16:16:43Z
+
+Are we sure we want to use `empty()`? The `"0"` string is probably a valid non-empty value, right? At least, this is how we're dealing with empty values everywhere else in the framework (routing comes to mind).
+
+---------------------------------------------------------------------------
+
+by mtarld at 2024-09-18T16:44:59Z
+
+Agreed, `empty` is returning true for `false` and `0` value as well, and that can sometimes be considered as a valid parameter values.
+
+IMHO, the valid "empty" parameters values could be:
+- `''`
+- `[]`
+- `null`
+
+WDYT?
+
+---------------------------------------------------------------------------
+
+by yceruto at 2024-09-18T17:43:22Z
+
+Agreed! I've updated it to consider only `null`, `''`, and `[]` as empty parameter values.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-09-18T19:00:44Z
+
+I'd add false personally. `0` is ok but false?
+
+---------------------------------------------------------------------------
+
+by yceruto at 2024-09-19T02:57:23Z
+
+After reconsidering, I don’t see `false` or `0` as empty values within their respective data types. For instance, a container parameter used as a toggle to enable or disable a feature would have `false` as a valid value in that context.
+
+However, `null` (absence of value), an empty string `''` (absence of chars), and an empty array `[]` (absence of elements).  I can't reasoning the same way for bool, int or float data types.

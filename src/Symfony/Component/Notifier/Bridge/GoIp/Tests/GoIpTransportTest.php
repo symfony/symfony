@@ -82,7 +82,7 @@ final class GoIpTransportTest extends TransportTestCase
         self::createTransport($mockClient)->send(new SmsMessage('1', 'Test'));
     }
 
-    public function goipErrorsProvider(): iterable
+    public static function goipErrorsProvider(): iterable
     {
         yield ['ERROR,L10 GSM logout'];
     }

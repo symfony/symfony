@@ -20,27 +20,38 @@ use Symfony\Component\Notifier\Transport\Dsn;
 
 final class FakeChatTransportFactoryTest extends TransportFactoryTestCase
 {
-    /**
-     * @dataProvider missingRequiredDependencyProvider
-     */
-    public function testMissingRequiredDependency(?MailerInterface $mailer, ?LoggerInterface $logger, string $dsn, string $message)
+    public function testMissingRequiredMailerDependency()
     {
         $this->expectException(LogicException::class);
-        $this->expectExceptionMessage($message);
+        $this->expectExceptionMessage('Cannot create a transport for scheme "fakechat+email" without providing an implementation of "Symfony\Component\Mailer\MailerInterface".');
 
-        $factory = new FakeChatTransportFactory($mailer, $logger);
-        $factory->create(new Dsn($dsn));
+        $factory = new FakeChatTransportFactory(null, $this->createStub(LoggerInterface::class));
+        $factory->create(new Dsn('fakechat+email://default?to=recipient@email.net&from=sender@email.net'));
     }
 
-    /**
-     * @dataProvider missingOptionalDependencyProvider
-     */
-    public function testMissingOptionalDependency(?MailerInterface $mailer, ?LoggerInterface $logger, string $dsn)
+    public function testMissingRequiredLoggerDependency()
     {
-        $factory = new FakeChatTransportFactory($mailer, $logger);
-        $transport = $factory->create(new Dsn($dsn));
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('Cannot create a transport for scheme "fakechat+logger" without providing an implementation of "Psr\Log\LoggerInterface".');
 
-        $this->assertSame($dsn, (string) $transport);
+        $factory = new FakeChatTransportFactory($this->createStub(MailerInterface::class));
+        $factory->create(new Dsn('fakechat+logger://default'));
+    }
+
+    public function testMissingOptionalLoggerDependency()
+    {
+        $factory = new FakeChatTransportFactory($this->createStub(MailerInterface::class));
+        $transport = $factory->create(new Dsn('fakechat+email://default?to=recipient@email.net&from=sender@email.net'));
+
+        $this->assertSame('fakechat+email://default?to=recipient@email.net&from=sender@email.net', (string) $transport);
+    }
+
+    public function testMissingOptionalMailerDependency()
+    {
+        $factory = new FakeChatTransportFactory(null, $this->createStub(LoggerInterface::class));
+        $transport = $factory->create(new Dsn('fakechat+logger://default'));
+
+        $this->assertSame('fakechat+logger://default', (string) $transport);
     }
 
     public function createFactory(): FakeChatTransportFactory
@@ -87,36 +98,5 @@ final class FakeChatTransportFactoryTest extends TransportFactoryTestCase
     public static function unsupportedSchemeProvider(): iterable
     {
         yield ['somethingElse://default?to=recipient@email.net&from=sender@email.net'];
-    }
-
-    public function missingRequiredDependencyProvider(): iterable
-    {
-        $exceptionMessage = 'Cannot create a transport for scheme "%s" without providing an implementation of "%s".';
-        yield 'missing mailer' => [
-            null,
-            $this->createMock(LoggerInterface::class),
-            'fakechat+email://default?to=recipient@email.net&from=sender@email.net',
-            sprintf($exceptionMessage, 'fakechat+email', MailerInterface::class),
-        ];
-        yield 'missing logger' => [
-            $this->createMock(MailerInterface::class),
-            null,
-            'fakechat+logger://default',
-            sprintf($exceptionMessage, 'fakechat+logger', LoggerInterface::class),
-        ];
-    }
-
-    public function missingOptionalDependencyProvider(): iterable
-    {
-        yield 'missing logger' => [
-            $this->createMock(MailerInterface::class),
-            null,
-            'fakechat+email://default?to=recipient@email.net&from=sender@email.net',
-        ];
-        yield 'missing mailer' => [
-            null,
-            $this->createMock(LoggerInterface::class),
-            'fakechat+logger://default',
-        ];
     }
 }

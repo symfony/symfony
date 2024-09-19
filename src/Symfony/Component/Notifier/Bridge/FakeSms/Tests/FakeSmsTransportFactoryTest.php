@@ -20,27 +20,38 @@ use Symfony\Component\Notifier\Transport\Dsn;
 
 final class FakeSmsTransportFactoryTest extends TransportFactoryTestCase
 {
-    /**
-     * @dataProvider missingRequiredDependencyProvider
-     */
-    public function testMissingRequiredDependency(?MailerInterface $mailer, ?LoggerInterface $logger, string $dsn, string $message)
+    public function testMissingRequiredMailerDependency()
     {
         $this->expectException(LogicException::class);
-        $this->expectExceptionMessage($message);
+        $this->expectExceptionMessage('Cannot create a transport for scheme "fakesms+email" without providing an implementation of "Symfony\Component\Mailer\MailerInterface".');
 
-        $factory = new FakeSmsTransportFactory($mailer, $logger);
-        $factory->create(new Dsn($dsn));
+        $factory = new FakeSmsTransportFactory(null, $this->createStub(LoggerInterface::class));
+        $factory->create(new Dsn('fakesms+email://default?to=recipient@email.net&from=sender@email.net'));
     }
 
-    /**
-     * @dataProvider missingOptionalDependencyProvider
-     */
-    public function testMissingOptionalDependency(?MailerInterface $mailer, ?LoggerInterface $logger, string $dsn)
+    public function testMissingRequiredDependency()
     {
-        $factory = new FakeSmsTransportFactory($mailer, $logger);
-        $transport = $factory->create(new Dsn($dsn));
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('Cannot create a transport for scheme "fakesms+logger" without providing an implementation of "Psr\Log\LoggerInterface".');
 
-        $this->assertSame($dsn, (string) $transport);
+        $factory = new FakeSmsTransportFactory($this->createStub(MailerInterface::class));
+        $factory->create(new Dsn('fakesms+logger://default'));
+    }
+
+    public function testMissingOptionalLoggerDependency()
+    {
+        $factory = new FakeSmsTransportFactory($this->createStub(MailerInterface::class));
+        $transport = $factory->create(new Dsn('fakesms+email://default?to=recipient@email.net&from=sender@email.net'));
+
+        $this->assertSame('fakesms+email://default?to=recipient@email.net&from=sender@email.net', (string) $transport);
+    }
+
+    public function testMissingOptionalMailerDependency()
+    {
+        $factory = new FakeSmsTransportFactory(null, $this->createStub(LoggerInterface::class));
+        $transport = $factory->create(new Dsn('fakesms+logger://default'));
+
+        $this->assertSame('fakesms+logger://default', (string) $transport);
     }
 
     public function createFactory(): FakeSmsTransportFactory
@@ -87,36 +98,5 @@ final class FakeSmsTransportFactoryTest extends TransportFactoryTestCase
     public static function unsupportedSchemeProvider(): iterable
     {
         yield ['somethingElse://default?to=recipient@email.net&from=sender@email.net'];
-    }
-
-    public function missingRequiredDependencyProvider(): iterable
-    {
-        $exceptionMessage = 'Cannot create a transport for scheme "%s" without providing an implementation of "%s".';
-        yield 'missing mailer' => [
-            null,
-            $this->createMock(LoggerInterface::class),
-            'fakesms+email://default?to=recipient@email.net&from=sender@email.net',
-            sprintf($exceptionMessage, 'fakesms+email', MailerInterface::class),
-        ];
-        yield 'missing logger' => [
-            $this->createMock(MailerInterface::class),
-            null,
-            'fakesms+logger://default',
-            sprintf($exceptionMessage, 'fakesms+logger', LoggerInterface::class),
-        ];
-    }
-
-    public function missingOptionalDependencyProvider(): iterable
-    {
-        yield 'missing logger' => [
-            $this->createMock(MailerInterface::class),
-            null,
-            'fakesms+email://default?to=recipient@email.net&from=sender@email.net',
-        ];
-        yield 'missing mailer' => [
-            null,
-            $this->createMock(LoggerInterface::class),
-            'fakesms+logger://default',
-        ];
     }
 }

@@ -29,7 +29,7 @@ final class PlivoTransportTest extends TransportTestCase
         return new PlivoTransport('authId', 'authToken', $from, $client ?? new MockHttpClient());
     }
 
-    public function invalidFromProvider(): iterable
+    public static function invalidFromProvider(): iterable
     {
         yield 'too short' => ['a'];
         yield 'too long' => ['abcdefghijkl'];

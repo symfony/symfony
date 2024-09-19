@@ -59,28 +59,28 @@ interface AttributeMetadataInterface
      *
      * @param string[] $groups
      */
-    public function setSerializedName(?string $serializedName /* , array $groups = [] */): void;
+    public function setSerializedName(?string $serializedName /* , array $groups = ['*'] */): void;
 
     /**
      * Gets the serialization name for this attribute.
      *
      * @param string[] $groups
      */
-    public function getSerializedName(/* array $groups = [] */): ?string;
+    public function getSerializedName(/* array $groups = ['*'] */): ?string;
 
     /**
      * Sets the serialization path for this attribute.
      *
      * @param string[] $groups
      */
-    public function setSerializedPath(?PropertyPath $serializedPath /* , array $groups = [] */): void;
+    public function setSerializedPath(?PropertyPath $serializedPath /* , array $groups = ['*'] */): void;
 
     /**
      * Gets the serialization path for this attribute.
      *
      * @param string[] $groups
      */
-    public function getSerializedPath(/* array $groups = [] */): ?PropertyPath;
+    public function getSerializedPath(/* array $groups = ['*'] */): ?PropertyPath;
 
     /**
      * Sets if this attribute must be ignored or not.

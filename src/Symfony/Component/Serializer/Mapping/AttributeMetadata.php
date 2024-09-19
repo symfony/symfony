@@ -114,9 +114,9 @@ class AttributeMetadata implements AttributeMetadataInterface
         return $this->maxDepth;
     }
 
-    public function setSerializedName(?string $serializedName /* , array $groups = [] */): void
+    public function setSerializedName(?string $serializedName /* , array $groups = ['*'] */): void
     {
-        $groups = 2 <= \func_num_args() ? func_get_arg(1) : [];
+        $groups = 2 <= \func_num_args() ? func_get_arg(1) : ['*'];
 
         if (!$groups) {
             $this->serializedNames['*'] = $serializedName;
@@ -127,9 +127,9 @@ class AttributeMetadata implements AttributeMetadataInterface
         }
     }
 
-    public function getSerializedName(/* array $groups = [] */): ?string
+    public function getSerializedName(/* array $groups = ['*'] */): ?string
     {
-        $groups = 1 <= \func_num_args() ? func_get_arg(0) : [];
+        $groups = 1 <= \func_num_args() ? func_get_arg(0) : ['*'];
 
         foreach ($groups as $group) {
             if (isset($this->serializedNames[$group])) {
@@ -145,9 +145,9 @@ class AttributeMetadata implements AttributeMetadataInterface
         return $this->serializedNames;
     }
 
-    public function setSerializedPath(?PropertyPath $serializedPath = null /* , array $groups = [] */): void
+    public function setSerializedPath(?PropertyPath $serializedPath = null /* , array $groups = ['*'] */): void
     {
-        $groups = 2 <= \func_num_args() ? func_get_arg(1) : [];
+        $groups = 2 <= \func_num_args() ? func_get_arg(1) : ['*'];
 
         if (!$groups) {
             $this->serializedPaths['*'] = $serializedPath;
@@ -158,9 +158,9 @@ class AttributeMetadata implements AttributeMetadataInterface
         }
     }
 
-    public function getSerializedPath(/* array $groups = [] */): ?PropertyPath
+    public function getSerializedPath(/* array $groups = ['*'] */): ?PropertyPath
     {
-        $groups = 1 <= \func_num_args() ? func_get_arg(0) : [];
+        $groups = 1 <= \func_num_args() ? func_get_arg(0) : ['*'];
 
         foreach ($groups as $group) {
             if (isset($this->serializedPaths[$group])) {

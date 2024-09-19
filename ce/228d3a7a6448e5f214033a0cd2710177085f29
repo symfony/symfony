@@ -1,0 +1,100 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2024-05-20T06:41:04Z
+
+Hey!
+
+Thanks for your PR. You are targeting branch "7.1" but it seems your PR description refers to branch "7.2".
+Could you update the PR description or change target branch? This helps core maintainers a lot.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by dunglas at 2024-08-13T09:39:00Z
+
+Good work! This will help improve performance and reduce the complexity of projects needing multiple serializers to deal with different contexts (ex: serializing data exposed through a public API and deserializing data coming from a third-party service). I'm +1 to merge this.
+
+> `autoconfigure: false # This is needed so that it's not included in the default serializer`
+
+Maybe could we tweak the autoconfigurator to automatically exclude definitions already having an explicit `serializer` tag? This will improve the DX a bit.
+
+---------------------------------------------------------------------------
+
+by stof at 2024-08-14T17:03:14Z
+
+Reusing the same normalizer instances is a very bad idea as it would break for any normalizer implementing any of the `*Aware` interfaces of the component (as instantiating the second serializer would replace the instance that those shared normalizers are aware of)
+
+---------------------------------------------------------------------------
+
+by dunglas at 2024-08-14T20:34:21Z
+
+Good catch @stof, as usual. Having extra instances will be cleaner and will likely have a negligible overhead anyway, so let's simplify!
+
+---------------------------------------------------------------------------
+
+by HypeMC at 2024-08-14T20:56:20Z
+
+> > `autoconfigure: false # This is needed so that it's not included in the default serializer`
+>
+> Maybe could we tweak the autoconfigurator to automatically exclude definitions already having an explicit `serializer` tag? This will improve the DX a bit.
+
+@dunglas I agree, but this issue isn't limited to just this tag. I've encountered it many times. Whenever a service is manually tagged, and it has an autoconfigured tag, multiple tags are added to the definition.
+
+> Just a quick question, why mixing up `standard` and `default` as name describing default stuff? Shouldn't we stick to `default` only?
+
+@mtarld It didn't make sense to use the same name for two different concepts. `standard` normalizers/encoders aren't linked to the `default` serializer. They are services added to all serializer instances, not just the default one, unless the `include_standard_*` options are set to false.
+
+> Reusing the same normalizer instances is a very bad idea as it would break for any normalizer implementing any of the `*Aware` interfaces of the component (as instantiating the second serializer would replace the instance that those shared normalizers are aware of)
+
+@stof Tnx, I wasn't aware of those interfaces. I thought it would be a good idea to minimize the number of child services, but knowing this now, it's best to register new ones for each serializer instance. Fixed in https://github.com/symfony/symfony/compare/764b46f4ceee50b8f4148a7daab7f122d058b1c0..7b7d33f45e0d355aac0741de216b96e1853a151b
+
+---------------------------------------------------------------------------
+
+by chalasr at 2024-08-14T21:29:27Z
+
+> @mtarld It didn't make sense to use the same name for two different concepts. standard normalizers/encoders aren't linked to the default serializer. They are services added to all serializer instances, not just the default one, unless the include_standard_* options are set to false.
+
+Not sure about the `standard` term either. Those are *built-in* encoders/normalizers as per the [docs](https://symfony.com/doc/current/components/serializer.html#built-in-normalizers). The term `default` looks also more appropriate in case it makes things simpler and I don't think the risk of ambiguity between the default serializer and those is worth caring - but `built-in` is certainly the best choice.
+
+---------------------------------------------------------------------------
+
+by HypeMC at 2024-08-14T22:28:50Z
+
+> > @mtarld It didn't make sense to use the same name for two different concepts. standard normalizers/encoders aren't linked to the default serializer. They are services added to all serializer instances, not just the default one, unless the include_standard_* options are set to false.
+>
+> Not sure about the `standard` term either. Those are _built-in_ encoders/normalizers as per the [docs](https://symfony.com/doc/current/components/serializer.html#built-in-normalizers). The term `default` looks also more appropriate in case it makes things simpler and I don't think the risk of ambiguity between the default serializer and those is worth caring - but `built-in` is certainly the best choice.
+
+@chalasr I replaced `standard` with `built-in`. I still think it makes sense to not use `default` as it might cause confusion, but if needed, I can change it to that instead.
+
+https://github.com/symfony/symfony/compare/7b7d33f45e0d355aac0741de216b96e1853a151b..9e76b020d77ccb4d42ef0c00598221598e1e28e5
+
+---------------------------------------------------------------------------
+
+by chalasr at 2024-08-15T22:55:36Z
+
+Rebase needed after https://github.com/symfony/symfony/pull/58013
+
+---------------------------------------------------------------------------
+
+by HypeMC at 2024-08-15T22:58:54Z
+
+> Rebase needed after #58013
+
+@chalasr Done
+
+---------------------------------------------------------------------------
+
+by chalasr at 2024-09-18T15:57:29Z
+
+fabbot's suggestion looks legit, can you apply it?
+
+---------------------------------------------------------------------------
+
+by HypeMC at 2024-09-18T16:06:23Z
+
+> fabbot's suggestion looks legit, can you apply it?
+
+@chalasr Done, https://github.com/symfony/symfony/compare/d9ceb8521073610eff9d338eea2a5558d3edbbc5..03534988f5e9cef66798ab9b36d38cdf3770e671

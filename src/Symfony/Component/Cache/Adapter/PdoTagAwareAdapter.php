@@ -198,6 +198,10 @@ class PdoTagAwareAdapter extends AbstractTagAwareAdapter implements PruneableInt
     protected function doDeleteTagRelations(array $tagData): bool
     {
         foreach ($tagData as $tagId => $idList) {
+            if ([] === $idList) {
+                continue;
+            }
+
             $placeholders = implode(',', array_fill(0, \count($idList), '?'));
             $stmt = $this->prepareStatementWithFallback("DELETE FROM $this->tagsTable WHERE $this->tagCol=:tagId AND $this->idCol IN ($placeholders);", function () {
                 $this->createTagsTable();

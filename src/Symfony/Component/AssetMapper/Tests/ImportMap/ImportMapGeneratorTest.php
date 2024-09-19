@@ -275,7 +275,7 @@ class ImportMapGeneratorTest extends TestCase
         $this->assertEquals($expectedData, $manager->getRawImportMapData());
     }
 
-    public function getRawImportMapDataTests(): iterable
+    public static function getRawImportMapDataTests(): iterable
     {
         yield 'it returns remote downloaded entry' => [
             [
@@ -610,7 +610,7 @@ class ImportMapGeneratorTest extends TestCase
         $this->assertEquals($expected, $manager->findEagerEntrypointImports('the_entrypoint_name'));
     }
 
-    public function getEagerEntrypointImportsTests(): iterable
+    public static function getEagerEntrypointImportsTests(): iterable
     {
         yield 'an entry with no dependencies' => [
             new MappedAsset(

@@ -29,7 +29,7 @@ final class BandwidthTransportTest extends TransportTestCase
         return new BandwidthTransport('username', 'password', $from, 'account_id', 'application_id', 'priority', $client ?? new MockHttpClient());
     }
 
-    public function invalidFromProvider(): iterable
+    public static function invalidFromProvider(): iterable
     {
         yield 'no zero at start if phone number' => ['+0'];
         yield 'phone number too short' => ['+1'];

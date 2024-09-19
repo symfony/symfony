@@ -40,7 +40,7 @@ class AttributeMetadata implements AttributeMetadataInterface
     public ?int $maxDepth = null;
 
     /**
-     * @var array<string, string|null> Serialized names per group name ("*" applies to all groups)
+     * @var array<string, string> Serialized names per group name ("*" applies to all groups)
      *
      * @internal This property is public in order to reduce the size of the
      *           class' serialized representation. Do not access it. Use
@@ -49,7 +49,7 @@ class AttributeMetadata implements AttributeMetadataInterface
     public array $serializedNames = [];
 
     /**
-     * @var array<string, PropertyPath|null> Serialized paths per group name ("*" applies to all groups)
+     * @var array<string, PropertyPath> Serialized paths per group name ("*" applies to all groups)
      *
      * @internal This property is public in order to reduce the size of the
      *           class' serialized representation. Do not access it. Use
@@ -119,11 +119,21 @@ class AttributeMetadata implements AttributeMetadataInterface
         $groups = 2 <= \func_num_args() ? func_get_arg(1) : ['*'];
 
         if (!$groups) {
-            $this->serializedNames['*'] = $serializedName;
+            if (isset($serializedName)) {
+                $this->serializedNames['*'] = $serializedName;
+            } else {
+                unset($this->serializedNames['*']);
+            }
         }
 
-        foreach ($groups as $group) {
-            $this->serializedNames[$group] = $serializedName;
+        if (isset($serializedName)) {
+            foreach ($groups as $group) {
+                $this->serializedNames[$group] = $serializedName;
+            }
+        } else {
+            foreach ($groups as $group) {
+                unset($this->serializedNames[$group]);
+            }
         }
     }
 
@@ -150,11 +160,21 @@ class AttributeMetadata implements AttributeMetadataInterface
         $groups = 2 <= \func_num_args() ? func_get_arg(1) : ['*'];
 
         if (!$groups) {
-            $this->serializedPaths['*'] = $serializedPath;
+            if (isset($serializedPath)) {
+                $this->serializedPaths['*'] = $serializedPath;
+            } else {
+                unset($this->serializedPaths['*']);
+            }
         }
 
-        foreach ($groups as $group) {
-            $this->serializedPaths[$group] = $serializedPath;
+        if (isset($serializedPath)) {
+            foreach ($groups as $group) {
+                $this->serializedPaths[$group] = $serializedPath;
+            }
+        } else {
+            foreach ($groups as $group) {
+                unset($this->serializedPaths[$group]);
+            }
         }
     }
 

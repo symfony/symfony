@@ -116,15 +116,7 @@ class AttributeMetadata implements AttributeMetadataInterface
 
     public function setSerializedName(?string $serializedName /* , array $groups = ['*'] */): void
     {
-        $groups = 2 <= \func_num_args() ? func_get_arg(1) : ['*'];
-
-        if (!$groups) {
-            if (isset($serializedName)) {
-                $this->serializedNames['*'] = $serializedName;
-            } else {
-                unset($this->serializedNames['*']);
-            }
-        }
+        $groups = 2 <= \func_num_args() ? (func_get_arg(1) ?: ['*']) : ['*'];
 
         if (isset($serializedName)) {
             foreach ($groups as $group) {
@@ -157,15 +149,7 @@ class AttributeMetadata implements AttributeMetadataInterface
 
     public function setSerializedPath(?PropertyPath $serializedPath = null /* , array $groups = ['*'] */): void
     {
-        $groups = 2 <= \func_num_args() ? func_get_arg(1) : ['*'];
-
-        if (!$groups) {
-            if (isset($serializedPath)) {
-                $this->serializedPaths['*'] = $serializedPath;
-            } else {
-                unset($this->serializedPaths['*']);
-            }
-        }
+        $groups = 2 <= \func_num_args() ? (func_get_arg(1) ?: ['*']) : ['*'];
 
         if (isset($serializedPath)) {
             foreach ($groups as $group) {

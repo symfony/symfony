@@ -348,7 +348,7 @@ trait PdoTrait
         };
     }
 
-    private function pruneExpiredItems(): bool
+    public function prune(): bool
     {
         $deleteSql = "DELETE FROM $this->table WHERE $this->lifetimeCol + $this->timeCol <= :time";
 

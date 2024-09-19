@@ -45,9 +45,4 @@ class PdoAdapter extends AbstractAdapter implements PruneableInterface
     {
         $this->init($connOrDsn, $namespace, $defaultLifetime, $options, $marshaller);
     }
-
-    public function prune(): bool
-    {
-        return $this->pruneExpiredItems();
-    }
 }

@@ -20,6 +20,7 @@ class PdoTagAwareAdapter extends AbstractTagAwareAdapter implements PruneableInt
 {
     use PdoTrait {
         doSave as public doSaveItem;
+        prune as public pruneItems;
     }
 
     /**
@@ -89,7 +90,7 @@ class PdoTagAwareAdapter extends AbstractTagAwareAdapter implements PruneableInt
 
     public function prune(): bool
     {
-        return $this->pruneExpiredItems() && $this->pruneOrphanedTags();
+        return $this->pruneItems() && $this->pruneOrphanedTags();
     }
 
     protected function doSave(array $values, int $lifetime, array $addTagData = [], array $removeTagData = []): array

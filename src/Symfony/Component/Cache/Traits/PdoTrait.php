@@ -30,12 +30,10 @@ trait PdoTrait
     private string $driver;
     private string $serverVersion;
     private string $table = 'cache_items';
-    private string $tagsTable = 'cache_tags';
     private string $idCol = 'item_id';
     private string $dataCol = 'item_data';
     private string $lifetimeCol = 'item_lifetime';
     private string $timeCol = 'item_time';
-    private string $tagCol = 'item_tag';
     private ?string $username = null;
     private ?string $password = null;
     private array $connectionOptions = [];

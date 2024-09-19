@@ -22,14 +22,19 @@ use Symfony\Component\Cache\Traits\PdoTrait;
 class PdoTagAwareAdapter extends AbstractTagAwareAdapter implements PruneableInterface
 {
     use PdoTrait {
-        doSave as public doSaveItem;
-        prune as public pruneItems;
+        doSave as private doSaveItem;
+        prune as private pruneItems;
     }
 
     /**
      * No need for a prefix here, should improve lookup time.
      */
     protected const TAGS_PREFIX = '';
+
+    private string $tagsTable = 'cache_tags';
+    private string $tagCol = 'item_tag';
+    private string $tagIdxName = 'idx_cache_tags_item_tag';
+
 
     /**
      * You can either pass an existing database connection as PDO instance or
@@ -71,10 +76,10 @@ class PdoTagAwareAdapter extends AbstractTagAwareAdapter implements PruneableInt
             // - trailing space removal
             // - case-insensitivity
             // - language processing like é == e
-            'mysql' => "CREATE TABLE $this->tagsTable ($this->idCol VARBINARY(255) NOT NULL, $this->tagCol VARBINARY(255) NOT NULL, PRIMARY KEY($this->idCol, $this->tagCol), INDEX idx_id_col ($this->idCol), INDEX idx_tag_col ($this->tagCol)) COLLATE utf8mb4_bin, ENGINE = InnoDB",
-            'sqlite' => "CREATE TABLE $this->tagsTable ($this->idCol TEXT NOT NULL, $this->tagCol TEXT NOT NULL, PRIMARY KEY ($this->idCol, $this->tagCol));CREATE INDEX idx_id_col ON $this->tagsTable($this->idCol);CREATE INDEX idx_tag_col ON $this->tagsTable($this->tagCol)",
-            'pgsql', 'sqlsrv' => "CREATE TABLE $this->tagsTable ($this->idCol VARCHAR(255) NOT NULL, $this->tagCol VARCHAR(255) NOT NULL, PRIMARY KEY($this->idCol, $this->tagCol);CREATE INDEX idx_id_col ON $this->tagsTable($this->idCol);CREATE INDEX idx_tag_col ON $this->tagsTable($this->tagCol)",
-            'oci' => "CREATE TABLE $this->tagsTable ($this->idCol VARCHAR2(255) NOT NULL, $this->tagCol VARCHAR2(255) NOT NULL, PRIMARY KEY($this->idCol, $this->tagCol);CREATE INDEX idx_id_col ON $this->tagsTable($this->idCol);CREATE INDEX idx_tag_col ON $this->tagsTable($this->tagCol)",
+            'mysql' => "CREATE TABLE $this->tagsTable ($this->idCol VARBINARY(255) NOT NULL, $this->tagCol VARBINARY(255) NOT NULL, PRIMARY KEY($this->idCol, $this->tagCol), INDEX $this->tagIdxName($this->tagCol)) COLLATE utf8mb4_bin, ENGINE = InnoDB",
+            'sqlite' => "CREATE TABLE $this->tagsTable ($this->idCol TEXT NOT NULL, $this->tagCol TEXT NOT NULL, PRIMARY KEY ($this->idCol, $this->tagCol));CREATE INDEX $this->tagIdxName ON $this->tagsTable($this->tagCol)",
+            'pgsql', 'sqlsrv' => "CREATE TABLE $this->tagsTable ($this->idCol VARCHAR(255) NOT NULL, $this->tagCol VARCHAR(255) NOT NULL, PRIMARY KEY($this->idCol, $this->tagCol);CREATE INDEX $this->tagIdxName ON $this->tagsTable($this->tagCol)",
+            'oci' => "CREATE TABLE $this->tagsTable ($this->idCol VARCHAR2(255) NOT NULL, $this->tagCol VARCHAR2(255) NOT NULL, PRIMARY KEY($this->idCol, $this->tagCol);CREATE INDEX $this->tagIdxName ON $this->tagsTable($this->tagCol)",
             default => throw new \DomainException(\sprintf('Creating the cache table is currently not implemented for PDO driver "%s".', $driver)),
         };
 

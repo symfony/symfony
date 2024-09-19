@@ -25,13 +25,13 @@ class SerializedName
      * @param string          $serializedName The name of the property as it will be serialized
      * @param string|string[] $groups         The groups to use when serializing or deserializing
      */
-    public function __construct(private readonly string $serializedName, string|array $groups = [])
+    public function __construct(private readonly string $serializedName, string|array $groups = ['*'])
     {
         if ('' === $serializedName) {
             throw new InvalidArgumentException(\sprintf('Parameter given to "%s" must be a non-empty string.', self::class));
         }
 
-        $this->groups = (array) $groups;
+        $this->groups = ((array) $groups) ?: ['*'];
 
         foreach ($this->groups as $group) {
             if (!\is_string($group)) {

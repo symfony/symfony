@@ -29,7 +29,7 @@ class SerializedPath
      * @param string          $serializedPath A path using a valid PropertyAccess syntax where the value is stored in a normalized representation
      * @param string|string[] $groups         The groups to use when serializing or deserializing
      */
-    public function __construct(string $serializedPath, string|array $groups = [])
+    public function __construct(string $serializedPath, string|array $groups = ['*'])
     {
         try {
             $this->serializedPath = new PropertyPath($serializedPath);
@@ -37,7 +37,7 @@ class SerializedPath
             throw new InvalidArgumentException(\sprintf('Parameter given to "%s" must be a valid property path.', self::class));
         }
 
-        $this->groups = (array) $groups;
+        $this->groups = ((array) $groups) ?: ['*'];
 
         foreach ($this->groups as $group) {
             if (!\is_string($group)) {

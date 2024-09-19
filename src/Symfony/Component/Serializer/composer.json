@@ -26,7 +26,7 @@
         "symfony/cache": "^6.4|^7.0",
         "symfony/config": "^6.4|^7.0",
         "symfony/console": "^6.4|^7.0",
-        "symfony/dependency-injection": "^6.4|^7.0",
+        "symfony/dependency-injection": "^7.2",
         "symfony/error-handler": "^6.4|^7.0",
         "symfony/filesystem": "^6.4|^7.0",
         "symfony/form": "^6.4|^7.0",

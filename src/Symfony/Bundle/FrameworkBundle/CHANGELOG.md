@@ -15,6 +15,7 @@ CHANGELOG
  * Register `Symfony\Component\Serializer\NameConverter\SnakeCaseToCamelCaseNameConverter` as a service named `serializer.name_converter.snake_case_to_camel_case` if available
  * Deprecate `session.sid_length` and `session.sid_bits_per_character` config options
  * Add the ability to use an existing service as a lock/semaphore resource
+ * Add support for configuring multiple serializer instances via the configuration
 
 7.1
 ---

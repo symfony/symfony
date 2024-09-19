@@ -511,6 +511,27 @@ class PhpDumperTest extends TestCase
         $this->assertStringMatchesFormatFile(self::$fixturesPath.'/php/services_deprecated_parameters_as_files.txt', $dump);
     }
 
+    public function testNonEmptyParameters()
+    {
+        $container = include self::$fixturesPath.'/containers/container_nonempty_parameters.php';
+        $container->compile();
+
+        $dumper = new PhpDumper($container);
+
+        $this->assertStringEqualsFile(self::$fixturesPath.'/php/services_nonempty_parameters.php', $dumper->dump());
+    }
+
+    public function testNonEmptyParametersAsFiles()
+    {
+        $container = include self::$fixturesPath.'/containers/container_nonempty_parameters.php';
+        $container->compile();
+
+        $dumper = new PhpDumper($container);
+        $dump = print_r($dumper->dump(['as_files' => true, 'file' => __DIR__, 'inline_factories_parameter' => false, 'inline_class_loader_parameter' => false]), true);
+
+        $this->assertStringMatchesFormatFile(self::$fixturesPath.'/php/services_nonempty_parameters_as_files.txt', $dump);
+    }
+
     public function testEnvInId()
     {
         $container = include self::$fixturesPath.'/containers/container_env_in_id.php';

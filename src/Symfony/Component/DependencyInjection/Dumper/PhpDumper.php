@@ -1258,6 +1258,8 @@ class $class extends $baseClass
 {
     private const DEPRECATED_PARAMETERS = [];
 
+    private const NONEMPTY_PARAMETERS = [];
+
     protected \$parameters = [];
 
     public function __construct()
@@ -1265,6 +1267,8 @@ class $class extends $baseClass
 
 EOF;
         $code = str_replace("    private const DEPRECATED_PARAMETERS = [];\n\n", $this->addDeprecatedParameters(), $code);
+        $code = str_replace("    private const NONEMPTY_PARAMETERS = [];\n\n", $this->addNonEmptyParameters(), $code);
+
         if ($this->asFiles) {
             $code = str_replace('__construct()', '__construct(private array $buildParameters = [], protected string $containerDir = __DIR__)', $code);
 
@@ -1429,6 +1433,24 @@ EOF;
         return "    private const DEPRECATED_PARAMETERS = [\n{$code}    ];\n\n";
     }
 
+    private function addNonEmptyParameters(): string
+    {
+        if (!($bag = $this->container->getParameterBag()) instanceof ParameterBag) {
+            return '';
+        }
+
+        if (!$nonEmpty = $bag->allNonEmpty()) {
+            return '';
+        }
+        $code = '';
+        ksort($nonEmpty);
+        foreach ($nonEmpty as $param => $message) {
+            $code .= '        '.$this->doExport($param).' => '.$this->doExport($message).",\n";
+        }
+
+        return "    private const NONEMPTY_PARAMETERS = [\n{$code}    ];\n\n";
+    }
+
     private function addMethodMap(): string
     {
         $code = '';
@@ -1563,14 +1585,16 @@ EOF;
 
     private function addDefaultParametersMethod(): string
     {
-        if (!$this->container->getParameterBag()->all()) {
+        $bag = $this->container->getParameterBag();
+
+        if (!$bag->all() && (!$bag instanceof ParameterBag || !$bag->allNonEmpty())) {
             return '';
         }
 
         $php = [];
         $dynamicPhp = [];
 
-        foreach ($this->container->getParameterBag()->all() as $key => $value) {
+        foreach ($bag->all() as $key => $value) {
             if ($key !== $resolvedKey = $this->container->resolveEnvPlaceholders($key)) {
                 throw new InvalidArgumentException(\sprintf('Parameter name cannot use env parameters: "%s".', $resolvedKey));
             }
@@ -1600,13 +1624,20 @@ EOF;
         }
 
         if (!(isset($this->parameters[$name]) || isset($this->loadedDynamicParameters[$name]) || \array_key_exists($name, $this->parameters))) {
-            throw new ParameterNotFoundException($name);
-        }
-        if (isset($this->loadedDynamicParameters[$name])) {
-            return $this->loadedDynamicParameters[$name] ? $this->dynamicParameters[$name] : $this->getDynamicParameter($name);
+            throw new ParameterNotFoundException($name, extraMessage: self::NONEMPTY_PARAMETERS[$name] ?? null);
         }
 
-        return $this->parameters[$name];
+        if (isset($this->loadedDynamicParameters[$name])) {
+            $value = $this->loadedDynamicParameters[$name] ? $this->dynamicParameters[$name] : $this->getDynamicParameter($name);
+        } else {
+            $value = $this->parameters[$name];
+        }
+
+        if (isset(self::NONEMPTY_PARAMETERS[$name]) && (null === $value || '' === $value || [] === $value)) {
+            throw new \Symfony\Component\DependencyInjection\Exception\EmptyParameterValueException(self::NONEMPTY_PARAMETERS[$name]);
+        }
+
+        return $value;
     }
 
     public function hasParameter(string $name): bool
@@ -1633,7 +1664,7 @@ EOF;
             foreach ($this->buildParameters as $name => $value) {
                 $parameters[$name] = $value;
             }
-            $this->parameterBag = new FrozenParameterBag($parameters, self::DEPRECATED_PARAMETERS);
+            $this->parameterBag = new FrozenParameterBag($parameters, self::DEPRECATED_PARAMETERS, self::NONEMPTY_PARAMETERS);
         }
 
         return $this->parameterBag;
@@ -1645,9 +1676,15 @@ EOF;
             $code = preg_replace('/^.*buildParameters.*\n.*\n.*\n\n?/m', '', $code);
         }
 
-        if (!($bag = $this->container->getParameterBag()) instanceof ParameterBag || !$bag->allDeprecated()) {
+        if (!$bag instanceof ParameterBag || !$bag->allDeprecated()) {
             $code = preg_replace("/\n.*DEPRECATED_PARAMETERS.*\n.*\n.*\n/m", '', $code, 1);
-            $code = str_replace(', self::DEPRECATED_PARAMETERS', '', $code);
+            $code = str_replace(', self::DEPRECATED_PARAMETERS', ', []', $code);
+        }
+
+        if (!$bag instanceof ParameterBag || !$bag->allNonEmpty()) {
+            $code = str_replace(', extraMessage: self::NONEMPTY_PARAMETERS[$name] ?? null', '', $code);
+            $code = str_replace(', self::NONEMPTY_PARAMETERS', '', $code);
+            $code = preg_replace("/\n.*NONEMPTY_PARAMETERS.*\n.*\n.*\n/m", '', $code, 1);
         }
 
         if ($dynamicPhp) {

@@ -28,7 +28,7 @@ final class SimpleTextinTransportTest extends TransportTestCase
         return new SimpleTextinTransport('test_api_key', $from, $client ?? new MockHttpClient());
     }
 
-    public function invalidFromProvider(): iterable
+    public static function invalidFromProvider(): iterable
     {
         yield 'no zero at start if phone number' => ['+0'];
         yield 'phone number too short' => ['+1'];
@@ -87,7 +87,7 @@ final class SimpleTextinTransportTest extends TransportTestCase
         yield [new DummyMessage()];
     }
 
-    public function validFromProvider(): iterable
+    public static function validFromProvider(): iterable
     {
         yield ['+11'];
         yield ['+112'];

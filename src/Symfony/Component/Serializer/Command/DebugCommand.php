@@ -19,6 +19,7 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
+use Symfony\Component\Serializer\Mapping\AttributeMetadata;
 use Symfony\Component\Serializer\Mapping\ClassMetadataInterface;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
 
@@ -101,12 +102,8 @@ class DebugCommand extends Command
             $data[$attributeMetadata->getName()] = [
                 'groups' => $attributeMetadata->getGroups(),
                 'maxDepth' => $attributeMetadata->getMaxDepth(),
-                'serializedNames' => method_exists($attributeMetadata, 'getSerializedNames')
-                    ? $attributeMetadata->getSerializedNames()
-                    : array_filter(['*' => $attributeMetadata->getSerializedName()]),
-                'serializedPaths' => method_exists($attributeMetadata, 'getSerializedPaths')
-                    ? array_map('strval', $attributeMetadata->getSerializedPaths())
-                    : array_filter(['*' => (string) $attributeMetadata->getSerializedPath()]),
+                'serializedNames' => AttributeMetadata::getSerializedNamesFromAttributeMetadata($attributeMetadata),
+                'serializedPaths' => array_map('strval', AttributeMetadata::getSerializedPathsFromAttributeMetadata($attributeMetadata)),
                 'ignore' => $attributeMetadata->isIgnored(),
                 'normalizationContexts' => $attributeMetadata->getNormalizationContexts(),
                 'denormalizationContexts' => $attributeMetadata->getDenormalizationContexts(),

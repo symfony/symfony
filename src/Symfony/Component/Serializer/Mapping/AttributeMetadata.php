@@ -269,12 +269,8 @@ class AttributeMetadata implements AttributeMetadataInterface
 
         // Overwrite only if both serialized names and paths are empty
         if (!$this->serializedNames && !$this->serializedPaths) {
-            $this->serializedNames = method_exists($attributeMetadata, 'getSerializedNames')
-                ? $attributeMetadata->getSerializedNames()
-                : array_filter(['*' => $attributeMetadata->getSerializedName()]);
-            $this->serializedPaths = method_exists($attributeMetadata, 'getSerializedPaths')
-                ? $attributeMetadata->getSerializedPaths()
-                : array_filter(['*' => $attributeMetadata->getSerializedPath()]);
+            $this->serializedNames = self::getSerializedNamesFromAttributeMetadata($attributeMetadata);
+            $this->serializedPaths = self::getSerializedPathsFromAttributeMetadata($attributeMetadata);
         }
 
         // Overwrite only if both contexts are empty
@@ -286,6 +282,42 @@ class AttributeMetadata implements AttributeMetadataInterface
         if ($ignore = $attributeMetadata->isIgnored()) {
             $this->ignore = $ignore;
         }
+    }
+
+    /**
+     * @internal
+     *
+     * @return array<string, string>
+     */
+    public static function getSerializedNamesFromAttributeMetadata(AttributeMetadataInterface $attributeMetadata): array
+    {
+        if (method_exists($attributeMetadata, 'getSerializedNames')) {
+            return $attributeMetadata->getSerializedNames();
+        }
+
+        if (null !== $serializedName = $attributeMetadata->getSerializedName()) {
+            return ['*' => $serializedName];
+        }
+
+        return [];
+    }
+
+    /**
+     * @internal
+     *
+     * @return array<string, PropertyPath>
+     */
+    public static function getSerializedPathsFromAttributeMetadata(AttributeMetadataInterface $attributeMetadata): array
+    {
+        if (method_exists($attributeMetadata, 'getSerializedPaths')) {
+            return $attributeMetadata->getSerializedPaths();
+        }
+
+        if (null !== $serializedPath = $attributeMetadata->getSerializedPath()) {
+            return ['*' => $serializedPath];
+        }
+
+        return [];
     }
 
     /**

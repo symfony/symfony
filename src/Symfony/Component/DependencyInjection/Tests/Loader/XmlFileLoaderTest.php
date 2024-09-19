@@ -12,7 +12,7 @@
 namespace Symfony\Component\DependencyInjection\Tests\Loader;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
+use Symfony\Bridge\PhpUnit\ExpectUserDeprecationMessageTrait;
 use Symfony\Component\Config\Exception\FileLocatorFileNotFoundException;
 use Symfony\Component\Config\Exception\LoaderLoadException;
 use Symfony\Component\Config\FileLocator;
@@ -49,7 +49,7 @@ use Symfony\Component\ExpressionLanguage\Expression;
 
 class XmlFileLoaderTest extends TestCase
 {
-    use ExpectDeprecationTrait;
+    use ExpectUserDeprecationMessageTrait;
 
     protected static string $fixturesPath;
 
@@ -1340,7 +1340,7 @@ class XmlFileLoaderTest extends TestCase
         $container = new ContainerBuilder();
         $loader = new XmlFileLoader($container, new FileLocator(self::$fixturesPath.'/xml'));
 
-        $this->expectDeprecation(\sprintf('Since symfony/dependency-injection 7.2: Type "tagged" is deprecated for tag <argument>, use "tagged_iterator" instead in "%s/xml%sservices_with_deprecated_tagged.xml".', self::$fixturesPath, \DIRECTORY_SEPARATOR));
+        $this->expectUserDeprecationMessage(\sprintf('Since symfony/dependency-injection 7.2: Type "tagged" is deprecated for tag <argument>, use "tagged_iterator" instead in "%s/xml%sservices_with_deprecated_tagged.xml".', self::$fixturesPath, \DIRECTORY_SEPARATOR));
 
         $loader->load('services_with_deprecated_tagged.xml');
     }

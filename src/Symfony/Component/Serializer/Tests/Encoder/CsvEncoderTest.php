@@ -12,7 +12,7 @@
 namespace Symfony\Component\Serializer\Tests\Encoder;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
+use Symfony\Bridge\PhpUnit\ExpectUserDeprecationMessageTrait;
 use Symfony\Component\Serializer\Encoder\CsvEncoder;
 use Symfony\Component\Serializer\Exception\UnexpectedValueException;
 
@@ -21,7 +21,7 @@ use Symfony\Component\Serializer\Exception\UnexpectedValueException;
  */
 class CsvEncoderTest extends TestCase
 {
-    use ExpectDeprecationTrait;
+    use ExpectUserDeprecationMessageTrait;
 
     private CsvEncoder $encoder;
 
@@ -713,7 +713,7 @@ CSV;
      */
     public function testPassingNonEmptyEscapeCharIsDeprecated()
     {
-        $this->expectDeprecation('Since symfony/serializer 7.2: Setting the "csv_escape_char" option is deprecated. The option will be removed in 8.0.');
+        $this->expectUserDeprecationMessage('Since symfony/serializer 7.2: Setting the "csv_escape_char" option is deprecated. The option will be removed in 8.0.');
         $encoder = new CsvEncoder(['csv_escape_char' => '@']);
 
         $this->assertSame(

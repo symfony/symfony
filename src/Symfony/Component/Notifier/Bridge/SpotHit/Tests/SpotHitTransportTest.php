@@ -67,26 +67,26 @@ final class SpotHitTransportTest extends TransportTestCase
         $transport->send(new SmsMessage('0611223344', 'Hello!'));
     }
 
-    public function argumentsProvider(): \Generator
+    public static function argumentsProvider(): \Generator
     {
         yield [
-            function (SpotHitTransport $transport) { $transport->setSmsLong(true); },
-            function (array $bodyArguments) { $this->assertSame('1', $bodyArguments['smslong']); },
+            static function (SpotHitTransport $transport) { $transport->setSmsLong(true); },
+            static function (array $bodyArguments) { self::assertSame('1', $bodyArguments['smslong']); },
         ];
 
         yield [
-            function (SpotHitTransport $transport) { $transport->setLongNBr(3); },
-            function (array $bodyArguments) { $this->assertSame('3', $bodyArguments['smslongnbr']); },
+            static function (SpotHitTransport $transport) { $transport->setLongNBr(3); },
+            static function (array $bodyArguments) { self::assertSame('3', $bodyArguments['smslongnbr']); },
         ];
 
         yield [
-            function (SpotHitTransport $transport) {
+            static function (SpotHitTransport $transport) {
                 $transport->setSmsLong(true);
                 $transport->setLongNBr(3);
             },
-            function (array $bodyArguments) {
-                $this->assertSame('1', $bodyArguments['smslong']);
-                $this->assertSame('3', $bodyArguments['smslongnbr']);
+            static function (array $bodyArguments) {
+                self::assertSame('1', $bodyArguments['smslong']);
+                self::assertSame('3', $bodyArguments['smslongnbr']);
             },
         ];
     }

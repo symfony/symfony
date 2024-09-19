@@ -1,0 +1,29 @@
+---------------------------------------------------------------------------
+
+by stof at 2024-09-19T08:16:24Z
+
+Please work first on making this a proper polyfill before migrating to it (so that you don't hide cases where the test would pass only because of the non-standard behavior of the polyfill). See the discussion on the PR adding that trait.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2024-09-19T08:37:01Z
+
+This is not a blocker. We already *have* migrated to the new polyfill. This PR merely fixes an inconsistency and the polyfill works good enough for our tests.
+
+---------------------------------------------------------------------------
+
+by stof at 2024-09-19T08:40:34Z
+
+@derrabus the polyfill works for our tests because it behaves like `ExpectDeprecationTrait` and so does not change the behavior of the method. And that's precisely the issue: it does **not** ensure the test will work with PHPunit 11 because it does not apply the PHPUnit 11 behavior.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2024-09-19T08:49:11Z
+
+Well, we make zero use of that fuzzy matching feature, so the behavior is the same for our tests. You're right that we need to fix the polyfill, but it's not a blocker for this PR.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2024-09-19T08:50:36Z
+
+But here you go: #58317

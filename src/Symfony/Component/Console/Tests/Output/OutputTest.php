@@ -164,6 +164,7 @@ class OutputTest extends TestCase
     public static function verbosityProvider()
     {
         return [
+            [Output::VERBOSITY_SILENT, '', '->write() in SILENT mode never outputs'],
             [Output::VERBOSITY_QUIET, '2', '->write() in QUIET mode only outputs when an explicit QUIET verbosity is passed'],
             [Output::VERBOSITY_NORMAL, '123', '->write() in NORMAL mode outputs anything below an explicit VERBOSE verbosity'],
             [Output::VERBOSITY_VERBOSE, '1234', '->write() in VERBOSE mode outputs anything below an explicit VERY_VERBOSE verbosity'],

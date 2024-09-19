@@ -54,12 +54,17 @@ class NullOutput implements OutputInterface
 
     public function getVerbosity(): int
     {
-        return self::VERBOSITY_QUIET;
+        return self::VERBOSITY_SILENT;
+    }
+
+    public function isSilent(): bool
+    {
+        return true;
     }
 
     public function isQuiet(): bool
     {
-        return true;
+        return false;
     }
 
     public function isVerbose(): bool

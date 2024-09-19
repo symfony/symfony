@@ -851,11 +851,14 @@ class ApplicationTest extends TestCase
         putenv('COLUMNS=120');
         $tester = new ApplicationTester($application);
 
-        $tester->run(['command' => 'foo'], ['decorated' => false, 'capture_stderr_separately' => true]);
+        $tester->run(['command' => 'foo'], ['decorated' => false, 'verbosity' => Output::VERBOSITY_QUIET, 'capture_stderr_separately' => true]);
         $this->assertStringEqualsFile(self::$fixturesPath.'/application_renderexception1.txt', $tester->getErrorOutput(true), '->renderException() renders a pretty exception');
 
         $tester->run(['command' => 'foo'], ['decorated' => false, 'verbosity' => Output::VERBOSITY_VERBOSE, 'capture_stderr_separately' => true]);
         $this->assertStringContainsString('Exception trace', $tester->getErrorOutput(), '->renderException() renders a pretty exception with a stack trace when verbosity is verbose');
+
+        $tester->run(['command' => 'foo'], ['decorated' => false, 'verbosity' => Output::VERBOSITY_SILENT, 'capture_stderr_separately' => true]);
+        $this->assertSame('', $tester->getErrorOutput(true), '->renderException() renders nothing in SILENT verbosity');
 
         $tester->run(['command' => 'list', '--foo' => true], ['decorated' => false, 'capture_stderr_separately' => true]);
         $this->assertStringEqualsFile(self::$fixturesPath.'/application_renderexception2.txt', $tester->getErrorOutput(true), '->renderException() renders the command synopsis when an exception occurs in the context of a command');

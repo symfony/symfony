@@ -1211,7 +1211,7 @@ class AbstractObjectNormalizerTest extends TestCase
         $this->assertSame($expectedFoo, $dummy->foo);
     }
 
-    public function provideDenormalizeWithFilterBoolData(): array
+    public static function provideDenormalizeWithFilterBoolData(): array
     {
         return [
             [['foo' => 'true'], true],

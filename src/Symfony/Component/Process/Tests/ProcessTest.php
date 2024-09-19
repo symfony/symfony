@@ -76,7 +76,7 @@ class ProcessTest extends TestCase
         $this->assertSame('\\' === \DIRECTORY_SEPARATOR ? 1 : 127, $process->run());
     }
 
-    public function invalidProcessProvider()
+    public static function invalidProcessProvider(): array
     {
         return [
             [new Process(['invalid'])],

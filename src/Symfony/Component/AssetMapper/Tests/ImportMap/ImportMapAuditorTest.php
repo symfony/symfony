@@ -119,7 +119,7 @@ class ImportMapAuditorTest extends TestCase
         $this->assertSame($expectMatch, 0 < \count($audit[0]->vulnerabilities));
     }
 
-    public function provideAuditWithVersionRange(): iterable
+    public static function provideAuditWithVersionRange(): iterable
     {
         yield [true, '1.0.0', null];
         yield [true, '1.0.0', '>= *'];

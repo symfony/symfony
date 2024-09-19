@@ -9,6 +9,8 @@
  * file that was distributed with this source code.
  */
 
+namespace Symfony\Component\Notifier\Bridge\Lox24\Tests;
+
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Notifier\Bridge\Lox24\Lox24Options;
 use Symfony\Component\Notifier\Bridge\Lox24\Type;
@@ -21,7 +23,7 @@ class Lox24OptionsTest extends TestCase
 {
     public function testDeliveryAtWithNotNull()
     {
-        $options = (new Lox24Options())->deliveryAt((new DateTimeImmutable())->setTimestamp(123));
+        $options = (new Lox24Options())->deliveryAt((new \DateTimeImmutable())->setTimestamp(123));
         $this->assertSame(123, $options->toArray()['delivery_at']);
     }
 

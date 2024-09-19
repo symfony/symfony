@@ -9,6 +9,8 @@
  * file that was distributed with this source code.
  */
 
+namespace Symfony\Component\Notifier\Bridge\Lox24\Tests;
+
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\Response\JsonMockResponse;
 use Symfony\Component\HttpClient\Response\MockResponse;
@@ -166,7 +168,7 @@ class Lox24TransportTest extends TransportTestCase
         ], [], 201, ['uuid' => '123456']);
         $transport = new Lox24Transport('user', 'token', 'testFrom', [], $client);
 
-        $options = (new Lox24Options())->deliveryAt((new DateTimeImmutable())->setTimestamp(1000000000));
+        $options = (new Lox24Options())->deliveryAt((new \DateTimeImmutable())->setTimestamp(1000000000));
         $message = new SmsMessage('+1411111111', 'test text');
         $message->options($options);
 

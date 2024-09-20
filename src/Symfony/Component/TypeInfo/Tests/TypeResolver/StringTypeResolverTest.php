@@ -60,7 +60,7 @@ class StringTypeResolverTest extends TestCase
     /**
      * @return iterable<array{0: Type, 1: string, 2?: TypeContext}>
      */
-    public function resolveDataProvider(): iterable
+    public static function resolveDataProvider(): iterable
     {
         $typeContextFactory = new TypeContextFactory(new StringTypeResolver());
 

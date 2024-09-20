@@ -177,7 +177,7 @@ class AccessTokenAuthenticatorTest extends TestCase
         $this->assertEquals($expectedToken, $token);
     }
 
-    public function provideAccessTokenHeaderRegex(): array
+    public static function provideAccessTokenHeaderRegex(): array
     {
         return [
             ['Bearer token', 'token'],

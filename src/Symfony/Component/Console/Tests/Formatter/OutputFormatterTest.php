@@ -199,7 +199,7 @@ class OutputFormatterTest extends TestCase
         ];
     }
 
-    public function provideInlineStyleTagsWithUnknownOptions()
+    public static function provideInlineStyleTagsWithUnknownOptions()
     {
         return [
             ['<options=abc;>', 'abc'],

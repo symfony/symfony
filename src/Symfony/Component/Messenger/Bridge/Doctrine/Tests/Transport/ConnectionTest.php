@@ -665,7 +665,7 @@ class ConnectionTest extends TestCase
         $connection->findAll(50);
     }
 
-    public function provideFindAllSqlGeneratedByPlatform(): iterable
+    public static function provideFindAllSqlGeneratedByPlatform(): iterable
     {
         yield 'MySQL' => [
             class_exists(MySQLPlatform::class) ? new MySQLPlatform() : new MySQL57Platform(),

@@ -50,7 +50,7 @@ END'],
         $this->assertSame('Dieser Wert sollte grOEsser oder gleich', (string) $s->ascii([$rule]));
     }
 
-    public function provideCreateFromCodePoint(): array
+    public static function provideCreateFromCodePoint(): array
     {
         return [
             ['', []],

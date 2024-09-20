@@ -1080,7 +1080,7 @@ class AbstractObjectNormalizerTest extends TestCase
         $normalizer->denormalize($data, $type);
     }
 
-    public function provideBooleanTypesData()
+    public static function provideBooleanTypesData()
     {
         return [
             [['foo' => true], FalsePropertyDummy::class],

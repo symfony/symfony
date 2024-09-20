@@ -12,7 +12,7 @@
 namespace Symfony\Component\Serializer\Tests\Context\Encoder;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
+use Symfony\Bridge\PhpUnit\ExpectUserDeprecationMessageTrait;
 use Symfony\Component\Serializer\Context\Encoder\CsvEncoderContextBuilder;
 use Symfony\Component\Serializer\Encoder\CsvEncoder;
 use Symfony\Component\Serializer\Exception\InvalidArgumentException;
@@ -22,7 +22,7 @@ use Symfony\Component\Serializer\Exception\InvalidArgumentException;
  */
 class CsvEncoderContextBuilderTest extends TestCase
 {
-    use ExpectDeprecationTrait;
+    use ExpectUserDeprecationMessageTrait;
 
     private CsvEncoderContextBuilder $contextBuilder;
 
@@ -127,7 +127,7 @@ class CsvEncoderContextBuilderTest extends TestCase
      */
     public function testCannotSetMultipleBytesAsEscapeChar()
     {
-        $this->expectDeprecation('Since symfony/serializer 7.2: The "Symfony\Component\Serializer\Context\Encoder\CsvEncoderContextBuilder::withEscapeChar" method is deprecated. It will be removed in 8.0.');
+        $this->expectUserDeprecationMessage('Since symfony/serializer 7.2: The "Symfony\Component\Serializer\Context\Encoder\CsvEncoderContextBuilder::withEscapeChar" method is deprecated. It will be removed in 8.0.');
 
         $this->expectException(InvalidArgumentException::class);
         $this->contextBuilder->withEscapeChar('ọ');
@@ -138,7 +138,7 @@ class CsvEncoderContextBuilderTest extends TestCase
      */
     public function testWithEscapeCharIsDeprecated()
     {
-        $this->expectDeprecation('Since symfony/serializer 7.2: The "Symfony\Component\Serializer\Context\Encoder\CsvEncoderContextBuilder::withEscapeChar" method is deprecated. It will be removed in 8.0.');
+        $this->expectUserDeprecationMessage('Since symfony/serializer 7.2: The "Symfony\Component\Serializer\Context\Encoder\CsvEncoderContextBuilder::withEscapeChar" method is deprecated. It will be removed in 8.0.');
         $context = $this->contextBuilder->withEscapeChar('\\');
 
         $this->assertSame(['csv_escape_char' => '\\'], $context->toArray());

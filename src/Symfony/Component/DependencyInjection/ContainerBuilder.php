@@ -671,6 +671,10 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
             foreach ($otherBag->allDeprecated() as $name => $deprecated) {
                 $parameterBag->deprecate($name, ...$deprecated);
             }
+
+            foreach ($otherBag->allNonEmpty() as $name => $message) {
+                $parameterBag->nonEmpty($name, $message);
+            }
         }
 
         if ($this->trackResources) {
@@ -762,6 +766,15 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
         }
 
         $this->parameterBag->deprecate($name, $package, $version, $message);
+    }
+
+    public function nonEmptyParameter(string $name, string $message): void
+    {
+        if (!$this->parameterBag instanceof ParameterBag) {
+            throw new BadMethodCallException(\sprintf('The parameter bag must be an instance of "%s" to call "%s()".', ParameterBag::class, __METHOD__));
+        }
+
+        $this->parameterBag->nonEmpty($name, $message);
     }
 
     /**

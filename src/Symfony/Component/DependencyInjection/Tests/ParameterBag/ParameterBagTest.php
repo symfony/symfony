@@ -14,6 +14,7 @@ namespace Symfony\Component\DependencyInjection\Tests\ParameterBag;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\PhpUnit\ExpectUserDeprecationMessageTrait;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
+use Symfony\Component\DependencyInjection\Exception\EmptyParameterValueException;
 use Symfony\Component\DependencyInjection\Exception\ParameterCircularReferenceException;
 use Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
@@ -194,6 +195,42 @@ class ParameterBagTest extends TestCase
         $this->expectExceptionMessage('You have requested a non-existent parameter "foo".');
 
         $bag->deprecate('foo', 'symfony/test', '6.3');
+    }
+
+    public function testGetMissingRequiredParameter()
+    {
+        $bag = new ParameterBag();
+
+        $bag->nonEmpty('bar', 'Did you forget to configure the "foo.bar" option?');
+
+        $this->expectException(ParameterNotFoundException::class);
+        $this->expectExceptionMessage('You have requested a non-existent parameter "bar". Did you forget to configure the "foo.bar" option?');
+
+        $bag->get('bar');
+    }
+
+    public function testGetNonEmptyParameterThrowsWhenNullValue()
+    {
+        $bag = new ParameterBag();
+        $bag->set('bar', null);
+        $bag->nonEmpty('bar', 'Did you forget to configure the "foo.bar" option?');
+
+        $this->expectException(EmptyParameterValueException::class);
+        $this->expectExceptionMessage('Did you forget to configure the "foo.bar" option?');
+
+        $bag->get('bar');
+    }
+
+    public function testGetNonEmptyParameterThrowsWhenEmptyStringValue()
+    {
+        $bag = new ParameterBag();
+        $bag->set('bar', '');
+        $bag->nonEmpty('bar', 'Did you forget to configure the "foo.bar" option?');
+
+        $this->expectException(EmptyParameterValueException::class);
+        $this->expectExceptionMessage('Did you forget to configure the "foo.bar" option?');
+
+        $bag->get('bar');
     }
 
     public function testHas()

@@ -74,14 +74,15 @@ class Security implements AuthorizationCheckerInterface
     }
 
     /**
-     * @param UserInterface    $user              The user to authenticate
-     * @param string|null      $authenticatorName The authenticator name (e.g. "form_login") or service id (e.g. SomeApiKeyAuthenticator::class) - required only if multiple authenticators are configured
-     * @param string|null      $firewallName      The firewall name - required only if multiple firewalls are configured
-     * @param BadgeInterface[] $badges            Badges to add to the user's passport
+     * @param UserInterface        $user              The user to authenticate
+     * @param string|null          $authenticatorName The authenticator name (e.g. "form_login") or service id (e.g. SomeApiKeyAuthenticator::class) - required only if multiple authenticators are configured
+     * @param string|null          $firewallName      The firewall name - required only if multiple firewalls are configured
+     * @param BadgeInterface[]     $badges            Badges to add to the user's passport
+     * @param array<string, mixed> $attributes        Attributes to add to the user's passport
      *
      * @return Response|null The authenticator success response if any
      */
-    public function login(UserInterface $user, ?string $authenticatorName = null, ?string $firewallName = null, array $badges = []): ?Response
+    public function login(UserInterface $user, ?string $authenticatorName = null, ?string $firewallName = null, array $badges = [], array $attributes = []): ?Response
     {
         $request = $this->container->get('request_stack')->getCurrentRequest();
         if (null === $request) {
@@ -99,7 +100,7 @@ class Security implements AuthorizationCheckerInterface
         $userCheckerLocator = $this->container->get('security.user_checker_locator');
         $userCheckerLocator->get($firewallName)->checkPreAuth($user);
 
-        return $this->container->get('security.authenticator.managers_locator')->get($firewallName)->authenticateUser($user, $authenticator, $request, $badges);
+        return $this->container->get('security.authenticator.managers_locator')->get($firewallName)->authenticateUser($user, $authenticator, $request, $badges, $attributes);
     }
 
     /**

@@ -127,7 +127,7 @@ class ImportMapUpdateCheckerTest extends TestCase
         }
     }
 
-    private function provideImportMapEntry()
+    public static function provideImportMapEntry(): iterable
     {
         yield [
             [self::createRemoteEntry(

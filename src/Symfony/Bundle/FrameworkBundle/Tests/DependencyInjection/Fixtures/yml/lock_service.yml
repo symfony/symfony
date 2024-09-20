@@ -1,0 +1,14 @@
+services:
+    my_service:
+        class: \Redis
+    factory_public_alias:
+        alias: lock.default.factory
+        public: true
+
+framework:
+    annotations: false
+    http_method_override: false
+    handle_all_throwables: true
+    php_errors:
+        log: true
+    lock: my_service

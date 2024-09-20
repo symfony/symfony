@@ -86,7 +86,8 @@ class Container implements ContainerInterface, ResetInterface
 
         $this->parameterBag = new FrozenParameterBag(
             $this->parameterBag->all(),
-            $this->parameterBag instanceof ParameterBag ? $this->parameterBag->allDeprecated() : []
+            $this->parameterBag instanceof ParameterBag ? $this->parameterBag->allDeprecated() : [],
+            $this->parameterBag instanceof ParameterBag ? $this->parameterBag->allNonEmpty() : [],
         );
 
         $this->compiled = true;
@@ -276,7 +277,6 @@ class Container implements ContainerInterface, ResetInterface
     public function reset(): void
     {
         $services = $this->services + $this->privates;
-        $this->services = $this->factories = $this->privates = [];
 
         foreach ($services as $service) {
             try {
@@ -288,7 +288,7 @@ class Container implements ContainerInterface, ResetInterface
             }
         }
 
-        $this->envCache = [];
+        $this->envCache = $this->services = $this->factories = $this->privates = [];
     }
 
     /**

@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\DependencyInjection\ParameterBag;
 
+use Symfony\Component\DependencyInjection\Exception\EmptyParameterValueException;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Exception\ParameterCircularReferenceException;
 use Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException;
@@ -26,6 +27,7 @@ class ParameterBag implements ParameterBagInterface
     protected array $parameters = [];
     protected bool $resolved = false;
     protected array $deprecatedParameters = [];
+    protected array $nonEmptyParameters = [];
 
     public function __construct(array $parameters = [])
     {
@@ -54,11 +56,20 @@ class ParameterBag implements ParameterBagInterface
         return $this->deprecatedParameters;
     }
 
+    public function allNonEmpty(): array
+    {
+        return $this->nonEmptyParameters;
+    }
+
     public function get(string $name): array|bool|string|int|float|\UnitEnum|null
     {
         if (!\array_key_exists($name, $this->parameters)) {
             if (!$name) {
                 throw new ParameterNotFoundException($name);
+            }
+
+            if (\array_key_exists($name, $this->nonEmptyParameters)) {
+                throw new ParameterNotFoundException($name, extraMessage: $this->nonEmptyParameters[$name]);
             }
 
             $alternatives = [];
@@ -92,6 +103,10 @@ class ParameterBag implements ParameterBagInterface
             trigger_deprecation(...$this->deprecatedParameters[$name]);
         }
 
+        if (\array_key_exists($name, $this->nonEmptyParameters) && (null === $this->parameters[$name] || '' === $this->parameters[$name] || [] === $this->parameters[$name])) {
+            throw new EmptyParameterValueException($this->nonEmptyParameters[$name]);
+        }
+
         return $this->parameters[$name];
     }
 
@@ -118,6 +133,11 @@ class ParameterBag implements ParameterBagInterface
         $this->deprecatedParameters[$name] = [$package, $version, $message, $name];
     }
 
+    public function nonEmpty(string $name, string $message): void
+    {
+        $this->nonEmptyParameters[$name] = $message;
+    }
+
     public function has(string $name): bool
     {
         return \array_key_exists($name, $this->parameters);
@@ -125,7 +145,7 @@ class ParameterBag implements ParameterBagInterface
 
     public function remove(string $name): void
     {
-        unset($this->parameters[$name], $this->deprecatedParameters[$name]);
+        unset($this->parameters[$name], $this->deprecatedParameters[$name], $this->nonEmptyParameters[$name]);
     }
 
     public function resolve(): void

@@ -362,4 +362,29 @@ XLIFF;
 
         $this->assertEquals(['foo' => 'bar', 'bar' => 'baz', 'baz' => 'foo', 'qux' => 'qux source'], $catalogue->all('domain1'));
     }
+
+    public function testLoadVersion2WithSegmentAttributes()
+    {
+        $loader = new XliffFileLoader();
+        $resource = __DIR__.'/../Fixtures/resources-2.0-segment-attributes.xlf';
+        $catalogue = $loader->load($resource, 'en', 'domain1');
+
+        // test for "foo" metadata
+        $this->assertTrue($catalogue->defines('foo', 'domain1'));
+        $metadata = $catalogue->getMetadata('foo', 'domain1');
+        $this->assertNotEmpty($metadata);
+        $this->assertCount(1, $metadata['segment-attributes']);
+        $this->assertArrayHasKey('state', $metadata['segment-attributes']);
+        $this->assertSame('translated', $metadata['segment-attributes']['state']);
+
+        // test for "key" metadata
+        $this->assertTrue($catalogue->defines('key', 'domain1'));
+        $metadata = $catalogue->getMetadata('key', 'domain1');
+        $this->assertNotEmpty($metadata);
+        $this->assertCount(2, $metadata['segment-attributes']);
+        $this->assertArrayHasKey('state', $metadata['segment-attributes']);
+        $this->assertSame('translated', $metadata['segment-attributes']['state']);
+        $this->assertArrayHasKey('subState', $metadata['segment-attributes']);
+        $this->assertSame('My Value', $metadata['segment-attributes']['subState']);
+    }
 }

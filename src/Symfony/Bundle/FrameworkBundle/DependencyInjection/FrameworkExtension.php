@@ -309,6 +309,7 @@ class FrameworkExtension extends Extension
         if (isset($config['secret'])) {
             $container->setParameter('kernel.secret', $config['secret']);
         }
+        $container->nonEmptyParameter('kernel.secret', 'A non-empty value for the parameter "kernel.secret" is required. Did you forget to configure the "framework.secret" option?');
 
         $container->setParameter('kernel.http_method_override', $config['http_method_override']);
         $container->setParameter('kernel.trust_x_sendfile_type_header', $config['trust_x_sendfile_type_header']);
@@ -1230,7 +1231,7 @@ class FrameworkExtension extends Extension
             }
             $container->resolveEnvPlaceholders($config['handler_id'], null, $usedEnvs);
 
-            if ($usedEnvs || preg_match('#^[a-z]++://#', $config['handler_id'])) {
+            if ($usedEnvs || str_contains($config['handler_id'], '://')) {
                 $id = '.cache_connection.'.ContainerBuilder::hash($config['handler_id']);
 
                 $container->getDefinition('session.abstract_handler')
@@ -1905,6 +1906,7 @@ class FrameworkExtension extends Extension
         $container->getDefinition('serializer.mapping.cache_warmer')->replaceArgument(0, $serializerLoaders);
 
         if (isset($config['name_converter']) && $config['name_converter']) {
+            $container->setParameter('.serializer.name_converter', $config['name_converter']);
             $container->getDefinition('serializer.name_converter.metadata_aware')->setArgument(1, new Reference($config['name_converter']));
         }
 
@@ -1933,6 +1935,8 @@ class FrameworkExtension extends Extension
         $container->getDefinition('serializer.normalizer.object')->setArgument(6, $context);
 
         $container->getDefinition('serializer.normalizer.property')->setArgument(5, $defaultContext);
+
+        $container->setParameter('.serializer.named_serializers', $config['named_serializers'] ?? []);
     }
 
     private function registerPropertyInfoConfiguration(ContainerBuilder $container, PhpFileLoader $loader): void
@@ -2004,6 +2008,9 @@ class FrameworkExtension extends Extension
             $storeDefinitions = [];
             foreach ($resourceStores as $resourceStore) {
                 $storeDsn = $container->resolveEnvPlaceholders($resourceStore, null, $usedEnvs);
+                if (!$usedEnvs && !str_contains($resourceStore, '://')) {
+                    $resourceStore = new Reference($resourceStore);
+                }
                 $storeDefinition = new Definition(PersistingStoreInterface::class);
                 $storeDefinition
                     ->setFactory([StoreFactory::class, 'createStore'])
@@ -2045,6 +2052,9 @@ class FrameworkExtension extends Extension
 
         foreach ($config['resources'] as $resourceName => $resourceStore) {
             $storeDsn = $container->resolveEnvPlaceholders($resourceStore, null, $usedEnvs);
+            if (!$usedEnvs && !str_contains($resourceStore, '://')) {
+                $resourceStore = new Reference($resourceStore);
+            }
             $storeDefinition = new Definition(SemaphoreStoreInterface::class);
             $storeDefinition->setFactory([SemaphoreStoreFactory::class, 'createStore']);
             $storeDefinition->setArguments([$resourceStore]);
@@ -2647,6 +2657,7 @@ class FrameworkExtension extends Extension
             MailerBridge\Mailchimp\Transport\MandrillTransportFactory::class => 'mailer.transport_factory.mailchimp',
             MailerBridge\Postal\Transport\PostalTransportFactory::class => 'mailer.transport_factory.postal',
             MailerBridge\Postmark\Transport\PostmarkTransportFactory::class => 'mailer.transport_factory.postmark',
+            MailerBridge\Mailtrap\Transport\MailtrapTransportFactory::class => 'mailer.transport_factory.mailtrap',
             MailerBridge\Resend\Transport\ResendTransportFactory::class => 'mailer.transport_factory.resend',
             MailerBridge\Scaleway\Transport\ScalewayTransportFactory::class => 'mailer.transport_factory.scaleway',
             MailerBridge\Sendgrid\Transport\SendgridTransportFactory::class => 'mailer.transport_factory.sendgrid',

@@ -7,7 +7,7 @@ CHANGELOG
  * Add optional `$requests` parameter to `RequestStack::__construct()`
  * Add optional `$v4Bytes` and `$v6Bytes` parameters to `IpUtils::anonymize()`
  * Add `PRIVATE_SUBNETS` as a shortcut for private IP address ranges to `Request::setTrustedProxies()`
- * Deprecate passing `referer_check`, `use_only_cookies`, `use_trans_sid`, `trans_sid_hosts` and `trans_sid_tags` options to `NativeSessionStorage`
+ * Deprecate passing `referer_check`, `use_only_cookies`, `use_trans_sid`, `trans_sid_hosts`, `trans_sid_tags`, `sid_bits_per_character` and `sid_length` options to `NativeSessionStorage`
 
 7.1
 ---

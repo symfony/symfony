@@ -13,7 +13,7 @@ namespace Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection;
 
 use Psr\Cache\CacheItemPoolInterface;
 use Psr\Log\LoggerAwareInterface;
-use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
+use Symfony\Bridge\PhpUnit\ExpectUserDeprecationMessageTrait;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\FrameworkExtension;
 use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
 use Symfony\Bundle\FrameworkBundle\Tests\Fixtures\Messenger\DummyMessage;
@@ -34,6 +34,7 @@ use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
 use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
 use Symfony\Component\DependencyInjection\ChildDefinition;
+use Symfony\Component\DependencyInjection\Compiler\ResolveChildDefinitionsPass;
 use Symfony\Component\DependencyInjection\Compiler\ResolveInstanceofConditionalsPass;
 use Symfony\Component\DependencyInjection\Compiler\ResolveTaggedIteratorArgumentPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -57,6 +58,8 @@ use Symfony\Component\HttpClient\ThrottlingHttpClient;
 use Symfony\Component\HttpFoundation\IpUtils;
 use Symfony\Component\HttpKernel\DependencyInjection\LoggerPass;
 use Symfony\Component\HttpKernel\Fragment\FragmentUriGeneratorInterface;
+use Symfony\Component\Lock\LockFactory;
+use Symfony\Component\Lock\Store\SemaphoreStore;
 use Symfony\Component\Messenger\Bridge\AmazonSqs\Transport\AmazonSqsTransportFactory;
 use Symfony\Component\Messenger\Bridge\Amqp\Transport\AmqpTransportFactory;
 use Symfony\Component\Messenger\Bridge\Beanstalkd\Transport\BeanstalkdTransportFactory;
@@ -66,6 +69,7 @@ use Symfony\Component\Notifier\ChatterInterface;
 use Symfony\Component\Notifier\TexterInterface;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\Security\Core\AuthenticationEvents;
+use Symfony\Component\Semaphore\SemaphoreFactory;
 use Symfony\Component\Serializer\Mapping\Loader\AttributeLoader;
 use Symfony\Component\Serializer\Mapping\Loader\XmlFileLoader;
 use Symfony\Component\Serializer\Mapping\Loader\YamlFileLoader;
@@ -94,7 +98,7 @@ use Symfony\Contracts\Cache\TagAwareCacheInterface;
 
 abstract class FrameworkExtensionTestCase extends TestCase
 {
-    use ExpectDeprecationTrait;
+    use ExpectUserDeprecationMessageTrait;
 
     private static array $containerCache = [];
 
@@ -676,8 +680,6 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $this->assertEquals(108, $options['gc_divisor']);
         $this->assertEquals(1, $options['gc_probability']);
         $this->assertEquals(90000, $options['gc_maxlifetime']);
-        $this->assertEquals(22, $options['sid_length']);
-        $this->assertEquals(4, $options['sid_bits_per_character']);
 
         $this->assertEquals('/path/to/sessions', $container->getParameter('session.save_path'));
     }
@@ -1461,6 +1463,26 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $this->assertFalse($container->hasDefinition('serializer.normalizer.translatable'));
     }
 
+    public function testSerializerDefaultParameters()
+    {
+        $container = $this->createContainerFromFile('serializer_enabled');
+        $this->assertFalse($container->hasParameter('.serializer.name_converter'));
+        $this->assertFalse($container->hasParameter('serializer.default_context'));
+        $this->assertTrue($container->hasParameter('.serializer.named_serializers'));
+        $this->assertSame([], $container->getParameter('.serializer.named_serializers'));
+    }
+
+    public function testSerializerParametersAreSet()
+    {
+        $container = $this->createContainerFromFile('full');
+        $this->assertTrue($container->hasParameter('.serializer.name_converter'));
+        $this->assertSame('serializer.name_converter.camel_case_to_snake_case', $container->getParameter('.serializer.name_converter'));
+        $this->assertTrue($container->hasParameter('serializer.default_context'));
+        $this->assertSame(['enable_max_depth' => true], $container->getParameter('serializer.default_context'));
+        $this->assertTrue($container->hasParameter('.serializer.named_serializers'));
+        $this->assertSame(['api' => ['include_built_in_normalizers' => true, 'include_built_in_encoders' => true, 'default_context' => ['enable_max_depth' => false]]], $container->getParameter('.serializer.named_serializers'));
+    }
+
     public function testRegisterSerializerExtractor()
     {
         $container = $this->createContainerFromFile('full');
@@ -1841,7 +1863,7 @@ abstract class FrameworkExtensionTestCase extends TestCase
      */
     public function testTaggableCacheAppIsDeprecated()
     {
-        $this->expectDeprecation('Since symfony/framework-bundle 7.2: Using the "tags" option with the "cache.app" adapter is deprecated. You can use the "cache.app.taggable" adapter instead (aliased to the TagAwareCacheInterface for autowiring).');
+        $this->expectUserDeprecationMessage('Since symfony/framework-bundle 7.2: Using the "tags" option with the "cache.app" adapter is deprecated. You can use the "cache.app.taggable" adapter instead (aliased to the TagAwareCacheInterface for autowiring).');
 
         $this->createContainerFromFile('cache_cacheapp_tagaware');
     }
@@ -2393,6 +2415,93 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $this->assertFalse($container->has('asset_mapper.asset_package'));
         $this->assertFalse($container->has('assets.packages'));
         $this->assertFalse($container->has('assets._default_package'));
+    }
+
+    public function testDefaultLock()
+    {
+        $container = $this->createContainerFromFile('lock');
+
+        self::assertTrue($container->hasDefinition('lock.default.factory'));
+        $storeDef = $container->getDefinition($container->getDefinition('lock.default.factory')->getArgument(0));
+
+        if (class_exists(SemaphoreStore::class) && SemaphoreStore::isSupported()) {
+            self::assertEquals(new Reference('semaphore'), $storeDef->getArgument(0));
+        } else {
+            self::assertEquals(new Reference('flock'), $storeDef->getArgument(0));
+        }
+    }
+
+    public function testNamedLocks()
+    {
+        $container = $this->createContainerFromFile('lock_named');
+
+        self::assertTrue($container->hasDefinition('lock.foo.factory'));
+        $storeDef = $container->getDefinition($container->getDefinition('lock.foo.factory')->getArgument(0));
+        self::assertEquals(new Reference('semaphore'), $storeDef->getArgument(0));
+
+        self::assertTrue($container->hasDefinition('lock.bar.factory'));
+        $storeDef = $container->getDefinition($container->getDefinition('lock.bar.factory')->getArgument(0));
+        self::assertEquals(new Reference('flock'), $storeDef->getArgument(0));
+
+        self::assertTrue($container->hasDefinition('lock.baz.factory'));
+        $storeDef = $container->getDefinition($container->getDefinition('lock.baz.factory')->getArgument(0));
+        self::assertIsArray($storeDefArg = $storeDef->getArgument(0));
+        $storeDef1 = $container->getDefinition($storeDefArg[0]);
+        $storeDef2 = $container->getDefinition($storeDefArg[1]);
+        self::assertEquals(new Reference('semaphore'), $storeDef1->getArgument(0));
+        self::assertEquals(new Reference('flock'), $storeDef2->getArgument(0));
+
+        self::assertTrue($container->hasDefinition('lock.qux.factory'));
+        $storeDef = $container->getDefinition($container->getDefinition('lock.qux.factory')->getArgument(0));
+        self::assertStringContainsString('REDIS_DSN', $storeDef->getArgument(0));
+    }
+
+    public function testLockWithService()
+    {
+        $container = $this->createContainerFromFile('lock_service', [], true, false);
+        $container->getCompilerPassConfig()->setOptimizationPasses([new ResolveChildDefinitionsPass()]);
+        $container->compile();
+
+        self::assertTrue($container->hasDefinition('lock.default.factory'));
+        $storeDef = $container->getDefinition($container->getDefinition('lock.default.factory')->getArgument(0));
+        self::assertEquals(new Reference('my_service'), $storeDef->getArgument(0));
+
+        self::assertInstanceOf(LockFactory::class, $container->get('factory_public_alias'));
+    }
+
+    public function testDefaultSemaphore()
+    {
+        $container = $this->createContainerFromFile('semaphore');
+
+        self::assertTrue($container->hasDefinition('semaphore.default.factory'));
+        $storeDef = $container->getDefinition($container->getDefinition('semaphore.default.factory')->getArgument(0));
+        self::assertSame('redis://localhost', $storeDef->getArgument(0));
+    }
+
+    public function testNamedSemaphores()
+    {
+        $container = $this->createContainerFromFile('semaphore_named');
+
+        self::assertTrue($container->hasDefinition('semaphore.foo.factory'));
+        $storeDef = $container->getDefinition($container->getDefinition('semaphore.foo.factory')->getArgument(0));
+        self::assertSame('redis://paas.com', $storeDef->getArgument(0));
+
+        self::assertTrue($container->hasDefinition('semaphore.qux.factory'));
+        $storeDef = $container->getDefinition($container->getDefinition('semaphore.qux.factory')->getArgument(0));
+        self::assertStringContainsString('REDIS_DSN', $storeDef->getArgument(0));
+    }
+
+    public function testSemaphoreWithService()
+    {
+        $container = $this->createContainerFromFile('semaphore_service', [], true, false);
+        $container->getCompilerPassConfig()->setOptimizationPasses([new ResolveChildDefinitionsPass()]);
+        $container->compile();
+
+        self::assertTrue($container->hasDefinition('semaphore.default.factory'));
+        $storeDef = $container->getDefinition($container->getDefinition('semaphore.default.factory')->getArgument(0));
+        self::assertEquals(new Reference('my_service'), $storeDef->getArgument(0));
+
+        self::assertInstanceOf(SemaphoreFactory::class, $container->get('factory_public_alias'));
     }
 
     protected function createContainer(array $data = [])

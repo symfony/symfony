@@ -784,6 +784,7 @@ class ConfigurationTest extends TestCase
                 'enabled' => true,
                 'enable_attributes' => !class_exists(FullStack::class),
                 'mapping' => ['paths' => []],
+                'named_serializers' => [],
             ],
             'property_access' => [
                 'enabled' => true,
@@ -957,5 +958,22 @@ class ConfigurationTest extends TestCase
                 'enabled' => !class_exists(FullStack::class) && class_exists(RemoteEvent::class),
             ],
         ];
+    }
+
+    public function testNamedSerializersReservedName()
+    {
+        $processor = new Processor();
+        $configuration = new Configuration(true);
+
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessage('Invalid configuration for path "framework.serializer.named_serializers": "default" is a reserved name.');
+
+        $processor->processConfiguration($configuration, [[
+            'serializer' => [
+                'named_serializers' => [
+                    'default' => ['include_built_in_normalizers' => false],
+                ],
+            ],
+        ]]);
     }
 }

@@ -68,8 +68,8 @@ class NativeSessionStorage implements SessionStorageInterface
      * use_cookies, "1"
      * use_only_cookies, "1" (deprecated since Symfony 7.2, to be removed in Symfony 8.0)
      * use_trans_sid, "0" (deprecated since Symfony 7.2, to be removed in Symfony 8.0)
-     * sid_length, "32"
-     * sid_bits_per_character, "5"
+     * sid_length, "32" (@deprecated since Symfony 7.2, to be removed in 8.0)
+     * sid_bits_per_character, "5" (@deprecated since Symfony 7.2, to be removed in 8.0)
      * trans_sid_hosts, $_SERVER['HTTP_HOST'] (deprecated since Symfony 7.2, to be removed in Symfony 8.0)
      * trans_sid_tags, "a=href,area=href,frame=src,form=" (deprecated since Symfony 7.2, to be removed in Symfony 8.0)
      */
@@ -126,8 +126,8 @@ class NativeSessionStorage implements SessionStorageInterface
          * See https://www.php.net/manual/en/session.configuration.php#ini.session.sid-bits-per-character.
          * Allowed values are integers such as:
          * - 4 for range `a-f0-9`
-         * - 5 for range `a-v0-9`
-         * - 6 for range `a-zA-Z0-9,-`
+         * - 5 for range `a-v0-9` (@deprecated since Symfony 7.2, it will default to 4 and the option will be ignored in Symfony 8.0)
+         * - 6 for range `a-zA-Z0-9,-` (@deprecated since Symfony 7.2, it will default to 4 and the option will be ignored in Symfony 8.0)
          *
          * ---------- Part 2
          *
@@ -138,6 +138,8 @@ class NativeSessionStorage implements SessionStorageInterface
          * Where does the 250 come from?
          * - The length of Windows and Linux filenames is limited to 255 bytes. Then the max must not exceed 255.
          * - The session filename prefix is `sess_`, a 5 bytes string. Then the max must not exceed 255 - 5 = 250.
+         *
+         * This is @deprecated since Symfony 7.2, the sid length will default to 32 and the option will be ignored in Symfony 8.0.
          *
          * ---------- Conclusion
          *
@@ -328,7 +330,7 @@ class NativeSessionStorage implements SessionStorageInterface
         ]);
 
         foreach ($options as $key => $value) {
-            if (\in_array($key, ['referer_check', 'use_only_cookies', 'use_trans_sid', 'trans_sid_hosts', 'trans_sid_tags'], true)) {
+            if (\in_array($key, ['referer_check', 'use_only_cookies', 'use_trans_sid', 'trans_sid_hosts', 'trans_sid_tags', 'sid_length', 'sid_bits_per_character'], true)) {
                 trigger_deprecation('symfony/http-foundation', '7.2', 'NativeSessionStorage\'s "%s" option is deprecated and will be ignored in Symfony 8.0.', $key);
             }
 

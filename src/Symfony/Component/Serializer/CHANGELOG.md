@@ -9,6 +9,9 @@ CHANGELOG
  * Add `SnakeCaseToCamelCaseNameConverter`
  * Support subclasses of `\DateTime` and `\DateTimeImmutable` for denormalization
  * Add the `UidNormalizer::NORMALIZATION_FORMAT_RFC9562` constant
+ * Add support for configuring multiple serializer instances with different
+   default contexts, name converters, sets of normalizers and encoders
+ * Add support for collection profiles of multiple serializer instances
  * Support serialized names and paths configuration per group
 
 7.1

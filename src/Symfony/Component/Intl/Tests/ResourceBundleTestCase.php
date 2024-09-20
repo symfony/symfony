@@ -779,7 +779,7 @@ abstract class ResourceBundleTestCase extends TestCase
     {
         return array_map(
             fn ($locale) => [$locale],
-            $this->getRootLocales()
+            static::getRootLocales()
         );
     }
 

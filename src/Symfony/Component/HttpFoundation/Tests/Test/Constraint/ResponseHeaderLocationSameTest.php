@@ -36,7 +36,7 @@ class ResponseHeaderLocationSameTest extends TestCase
         self::assertTrue($constraint->evaluate($response, '', true));
     }
 
-    public function provideSuccessCases(): iterable
+    public static function provideSuccessCases(): iterable
     {
         yield ['http://example.com', 'http://example.com', 'http://example.com'];
         yield ['http://example.com', 'http://example.com', '//example.com'];
@@ -112,7 +112,7 @@ class ResponseHeaderLocationSameTest extends TestCase
         $constraint->evaluate($response);
     }
 
-    public function provideFailureCases(): iterable
+    public static function provideFailureCases(): iterable
     {
         yield ['http://example.com', null, 'http://example.com'];
         yield ['http://example.com', null, '//example.com'];

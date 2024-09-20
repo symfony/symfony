@@ -51,8 +51,10 @@ class PhraseProviderTest extends TestCase
     /**
      * @dataProvider toStringProvider
      */
-    public function testToString(ProviderInterface $provider, string $expected)
+    public function testToString(?string $endpoint, string $expected)
     {
+        $provider = $this->createProvider(endpoint: $endpoint);
+
         self::assertSame($expected, (string) $provider);
     }
 
@@ -332,7 +334,7 @@ class PhraseProviderTest extends TestCase
         $provider->read(['messages'], ['en_GB']);
     }
 
-    public function cacheItemProvider(): \Generator
+    public static function cacheItemProvider(): \Generator
     {
         yield 'null value' => [
             'cached_value' => null,
@@ -347,7 +349,7 @@ class PhraseProviderTest extends TestCase
         ];
     }
 
-    public function cacheKeyProvider(): \Generator
+    public static function cacheKeyProvider(): \Generator
     {
         yield 'sortorder one' => [
             'options' => [
@@ -787,7 +789,7 @@ class PhraseProviderTest extends TestCase
         $provider->write($bag);
     }
 
-    public function writeProvider(): \Generator
+    public static function writeProvider(): \Generator
     {
         $expectedEnglishXliff = <<<'XLIFF'
 <?xml version="1.0" encoding="utf-8"?>
@@ -869,84 +871,66 @@ XLIFF;
         ];
     }
 
-    public function toStringProvider(): \Generator
+    public static function toStringProvider(): \Generator
     {
         yield 'default endpoint' => [
-            'provider' => $this->createProvider(httpClient: $this->getHttpClient()->withOptions([
-                'base_uri' => 'https://api.phrase.com/api/v2/projects/PROJECT_ID/',
-                'headers' => [
-                    'Authorization' => 'token API_TOKEN',
-                    'User-Agent' => 'myProject',
-                ],
-            ])),
+            'endpoint' => null,
             'expected' => 'phrase://api.phrase.com',
         ];
 
         yield 'custom endpoint' => [
-            'provider' => $this->createProvider(httpClient: $this->getHttpClient()->withOptions([
-                'base_uri' => 'https://api.us.app.phrase.com/api/v2/projects/PROJECT_ID/',
-                'headers' => [
-                    'Authorization' => 'token API_TOKEN',
-                    'User-Agent' => 'myProject',
-                ],
-            ]), endpoint: 'api.us.app.phrase.com'),
+            'endpoint' => 'api.us.app.phrase.com',
             'expected' => 'phrase://api.us.app.phrase.com',
         ];
 
         yield 'custom endpoint with port' => [
-            'provider' => $this->createProvider(httpClient: $this->getHttpClient()->withOptions([
-                'base_uri' => 'https://api.us.app.phrase.com:8080/api/v2/projects/PROJECT_ID/',
-                'headers' => [
-                    'Authorization' => 'token API_TOKEN',
-                    'User-Agent' => 'myProject',
-                ],
-            ]), endpoint: 'api.us.app.phrase.com:8080'),
+            'endpoint' => 'api.us.app.phrase.com:8080',
             'expected' => 'phrase://api.us.app.phrase.com:8080',
         ];
     }
 
-    public function deleteExceptionsProvider(): array
+    public static function deleteExceptionsProvider(): array
     {
-        return $this->getExceptionResponses(
+        return self::getExceptionResponses(
             exceptionMessage: 'Unable to delete key in phrase.',
             loggerMessage: 'Unable to delete key "key.to.delete" in phrase: "provider error".',
             statusCode: 500
         );
     }
 
-    public function writeExceptionsProvider(): array
+    public static function writeExceptionsProvider(): array
     {
-        return $this->getExceptionResponses(
+        return self::getExceptionResponses(
             exceptionMessage: 'Unable to upload translations to phrase.',
             loggerMessage: 'Unable to upload translations for domain "messages" to phrase: "provider error".'
         );
     }
 
-    public function createLocalesExceptionsProvider(): array
+    public static function createLocalesExceptionsProvider(): array
     {
-        return $this->getExceptionResponses(
+        return self::getExceptionResponses(
             exceptionMessage: 'Unable to create locale phrase.',
             loggerMessage: 'Unable to create locale "nl-NL" in phrase: "provider error".'
         );
     }
 
-    public function initLocalesExceptionsProvider(): array
+    public static function initLocalesExceptionsProvider(): array
     {
-        return $this->getExceptionResponses(
+        return self::getExceptionResponses(
             exceptionMessage: 'Unable to get locales from phrase.',
             loggerMessage: 'Unable to get locales from phrase: "provider error".'
         );
     }
 
-    public function readProviderExceptionsProvider(): array
+    public static function readProviderExceptionsProvider(): array
     {
-        return $this->getExceptionResponses(
+        return self::getExceptionResponses(
             exceptionMessage: 'Unable to get translations from phrase.',
             loggerMessage: 'Unable to get translations for locale "en_GB" from phrase: "provider error".'
         );
     }
 
-    public function readProvider(): \Generator
+    public static function readProvider(): \Generator
     {
         $bag = new TranslatorBag();
         $catalogue = new MessageCatalogue('en_GB', [
@@ -1045,7 +1029,7 @@ XLIFF,
         ];
     }
 
-    private function getExceptionResponses(string $exceptionMessage, string $loggerMessage, int $statusCode = 400): array
+    private static function getExceptionResponses(string $exceptionMessage, string $loggerMessage, int $statusCode = 400): array
     {
         return [
             'bad request' => [

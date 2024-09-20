@@ -13,14 +13,10 @@ namespace Symfony\Component\Notifier\Bridge\Telnyx\Tests;
 
 use Symfony\Component\Notifier\Bridge\Telnyx\TelnyxTransportFactory;
 use Symfony\Component\Notifier\Test\TransportFactoryTestCase;
-use Symfony\Component\Notifier\Transport\TransportFactoryInterface;
 
 final class TelnyxTransportFactoryTest extends TransportFactoryTestCase
 {
-    /**
-     * @return TelnyxTransportFactory
-     */
-    public function createFactory(): TransportFactoryInterface
+    public function createFactory(): TelnyxTransportFactory
     {
         return new TelnyxTransportFactory();
     }

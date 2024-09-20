@@ -18,16 +18,14 @@ namespace Symfony\Component\HttpFoundation\Session\Storage\Handler;
  */
 class StrictSessionHandler extends AbstractSessionHandler
 {
-    private $handler;
-    private $doDestroy;
+    private bool $doDestroy;
 
-    public function __construct(\SessionHandlerInterface $handler)
-    {
+    public function __construct(
+        private \SessionHandlerInterface $handler,
+    ) {
         if ($handler instanceof \SessionUpdateTimestampHandlerInterface) {
-            throw new \LogicException(sprintf('"%s" is already an instance of "SessionUpdateTimestampHandlerInterface", you cannot wrap it with "%s".', get_debug_type($handler), self::class));
+            throw new \LogicException(\sprintf('"%s" is already an instance of "SessionUpdateTimestampHandlerInterface", you cannot wrap it with "%s".', get_debug_type($handler), self::class));
         }
-
-        $this->handler = $handler;
     }
 
     /**
@@ -40,47 +38,29 @@ class StrictSessionHandler extends AbstractSessionHandler
         return $this->handler instanceof \SessionHandler;
     }
 
-    /**
-     * @return bool
-     */
-    #[\ReturnTypeWillChange]
-    public function open($savePath, $sessionName)
+    public function open(string $savePath, string $sessionName): bool
     {
         parent::open($savePath, $sessionName);
 
         return $this->handler->open($savePath, $sessionName);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function doRead(string $sessionId)
+    protected function doRead(#[\SensitiveParameter] string $sessionId): string
     {
         return $this->handler->read($sessionId);
     }
 
-    /**
-     * @return bool
-     */
-    #[\ReturnTypeWillChange]
-    public function updateTimestamp($sessionId, $data)
+    public function updateTimestamp(#[\SensitiveParameter] string $sessionId, string $data): bool
     {
         return $this->write($sessionId, $data);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function doWrite(string $sessionId, string $data)
+    protected function doWrite(#[\SensitiveParameter] string $sessionId, string $data): bool
     {
         return $this->handler->write($sessionId, $data);
     }
 
-    /**
-     * @return bool
-     */
-    #[\ReturnTypeWillChange]
-    public function destroy($sessionId)
+    public function destroy(#[\SensitiveParameter] string $sessionId): bool
     {
         $this->doDestroy = true;
         $destroyed = parent::destroy($sessionId);
@@ -88,30 +68,19 @@ class StrictSessionHandler extends AbstractSessionHandler
         return $this->doDestroy ? $this->doDestroy($sessionId) : $destroyed;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function doDestroy(string $sessionId)
+    protected function doDestroy(#[\SensitiveParameter] string $sessionId): bool
     {
         $this->doDestroy = false;
 
         return $this->handler->destroy($sessionId);
     }
 
-    /**
-     * @return bool
-     */
-    #[\ReturnTypeWillChange]
-    public function close()
+    public function close(): bool
     {
         return $this->handler->close();
     }
 
-    /**
-     * @return int|false
-     */
-    #[\ReturnTypeWillChange]
-    public function gc($maxlifetime)
+    public function gc(int $maxlifetime): int|false
     {
         return $this->handler->gc($maxlifetime);
     }

@@ -24,7 +24,7 @@ final class SlackHeaderBlock extends AbstractSlackBlock
     public function __construct(string $text)
     {
         if (\strlen($text) > self::TEXT_LIMIT) {
-            throw new LengthException(sprintf('Maximum length for the text is %d characters.', self::TEXT_LIMIT));
+            throw new LengthException(\sprintf('Maximum length for the text is %d characters.', self::TEXT_LIMIT));
         }
 
         $this->options = [
@@ -39,10 +39,10 @@ final class SlackHeaderBlock extends AbstractSlackBlock
     /**
      * @return $this
      */
-    public function id(string $id): self
+    public function id(string $id): static
     {
         if (\strlen($id) > self::ID_LIMIT) {
-            throw new LengthException(sprintf('Maximum length for the block id is %d characters.', self::ID_LIMIT));
+            throw new LengthException(\sprintf('Maximum length for the block id is %d characters.', self::ID_LIMIT));
         }
 
         $this->options['block_id'] = $id;

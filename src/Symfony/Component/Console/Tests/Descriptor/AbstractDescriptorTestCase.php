@@ -48,6 +48,9 @@ abstract class AbstractDescriptorTestCase extends TestCase
     /** @dataProvider getDescribeApplicationTestData */
     public function testDescribeApplication(Application $application, $expectedDescription)
     {
+        // the "completion" command has dynamic help information depending on the shell
+        $application->find('completion')->setHelp('');
+
         $this->assertDescription($expectedDescription, $application);
     }
 
@@ -84,7 +87,7 @@ abstract class AbstractDescriptorTestCase extends TestCase
     {
         $data = [];
         foreach ($objects as $name => $object) {
-            $description = file_get_contents(sprintf('%s/../Fixtures/%s.%s', __DIR__, $name, static::getFormat()));
+            $description = file_get_contents(\sprintf('%s/../Fixtures/%s.%s', __DIR__, $name, static::getFormat()));
             $data[] = [$object, $description];
         }
 

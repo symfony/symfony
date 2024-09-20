@@ -20,8 +20,7 @@ namespace Symfony\Component\Config\Resource;
  */
 class DirectoryResource implements SelfCheckingResourceInterface
 {
-    private $resource;
-    private $pattern;
+    private string $resource;
 
     /**
      * @param string      $resource The file path to the resource
@@ -29,19 +28,22 @@ class DirectoryResource implements SelfCheckingResourceInterface
      *
      * @throws \InvalidArgumentException
      */
-    public function __construct(string $resource, ?string $pattern = null)
-    {
-        $this->resource = realpath($resource) ?: (file_exists($resource) ? $resource : false);
-        $this->pattern = $pattern;
+    public function __construct(
+        string $resource,
+        private ?string $pattern = null,
+    ) {
+        $resolvedResource = realpath($resource) ?: (file_exists($resource) ? $resource : false);
 
-        if (false === $this->resource || !is_dir($this->resource)) {
-            throw new \InvalidArgumentException(sprintf('The directory "%s" does not exist.', $resource));
+        if (false === $resolvedResource || !is_dir($resolvedResource)) {
+            throw new \InvalidArgumentException(\sprintf('The directory "%s" does not exist.', $resource));
         }
+
+        $this->resource = $resolvedResource;
     }
 
     public function __toString(): string
     {
-        return md5(serialize([$this->resource, $this->pattern]));
+        return hash('xxh128', serialize([$this->resource, $this->pattern]));
     }
 
     public function getResource(): string
@@ -54,9 +56,6 @@ class DirectoryResource implements SelfCheckingResourceInterface
         return $this->pattern;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function isFresh(int $timestamp): bool
     {
         if (!is_dir($this->resource)) {
@@ -82,7 +81,7 @@ class DirectoryResource implements SelfCheckingResourceInterface
             // for broken links
             try {
                 $fileMTime = $file->getMTime();
-            } catch (\RuntimeException $e) {
+            } catch (\RuntimeException) {
                 continue;
             }
 

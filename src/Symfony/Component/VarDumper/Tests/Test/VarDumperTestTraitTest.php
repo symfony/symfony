@@ -25,7 +25,7 @@ class VarDumperTestTraitTest extends TestCase
         $howMany = 700;
         $data = array_fill_keys(range(0, $howMany), ['a', 'b', 'c', 'd']);
 
-        $expected = sprintf("array:%d [\n", $howMany + 1);
+        $expected = \sprintf("array:%d [\n", $howMany + 1);
         for ($i = 0; $i <= $howMany; ++$i) {
             $expected .= <<<EODUMP
   $i => array:4 [
@@ -50,7 +50,7 @@ EODUMP;
     {
         $this->setUpVarDumper($casters = [
             \DateTimeInterface::class => static function (\DateTimeInterface $date, array $a, Stub $stub): array {
-                $stub->class = 'DateTime';
+                $stub->class = 'DateTimeImmutable';
 
                 return ['date' => $date->format('d/m/Y')];
             },
@@ -63,12 +63,12 @@ EODUMP;
 [
   1,
   2,
-  DateTime {
+  DateTimeImmutable {
     +date: "09/07/2019"
   }
 ]
 DUMP
-            , [1, 2, new \DateTime('2019-07-09T0:00:00+00:00')]);
+            , [1, 2, new \DateTimeImmutable('2019-07-09T0:00:00+00:00')]);
 
         $this->tearDownVarDumper();
 

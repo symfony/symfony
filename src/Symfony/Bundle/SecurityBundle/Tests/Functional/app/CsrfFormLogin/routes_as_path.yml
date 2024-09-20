@@ -2,7 +2,6 @@ imports:
     - { resource: ./config.yml }
 
 security:
-    enable_authenticator_manager: true
     firewalls:
         default:
             form_login:

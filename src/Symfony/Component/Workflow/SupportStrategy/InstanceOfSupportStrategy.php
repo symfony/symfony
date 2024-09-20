@@ -19,16 +19,11 @@ use Symfony\Component\Workflow\WorkflowInterface;
  */
 final class InstanceOfSupportStrategy implements WorkflowSupportStrategyInterface
 {
-    private $className;
-
-    public function __construct(string $className)
-    {
-        $this->className = $className;
+    public function __construct(
+        private string $className,
+    ) {
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function supports(WorkflowInterface $workflow, object $subject): bool
     {
         return $subject instanceof $this->className;

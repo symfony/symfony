@@ -29,22 +29,11 @@ abstract class UserPasswordValidatorTestCase extends ConstraintValidatorTestCase
     private const PASSWORD = 's3Cr3t';
     private const SALT = '^S4lt$';
 
-    /**
-     * @var TokenStorageInterface
-     */
-    protected $tokenStorage;
+    protected TokenStorageInterface $tokenStorage;
+    protected PasswordHasherInterface $hasher;
+    protected PasswordHasherFactoryInterface $hasherFactory;
 
-    /**
-     * @var PasswordHasherInterface
-     */
-    protected $hasher;
-
-    /**
-     * @var PasswordHasherFactoryInterface
-     */
-    protected $hasherFactory;
-
-    protected function createValidator()
+    protected function createValidator(): UserPasswordValidator
     {
         return new UserPasswordValidator($this->tokenStorage, $this->hasherFactory);
     }
@@ -87,6 +76,7 @@ abstract class UserPasswordValidatorTestCase extends ConstraintValidatorTestCase
         $this->validator->validate('secret', $constraint);
 
         $this->buildViolation('myMessage')
+            ->setCode(UserPassword::INVALID_PASSWORD_ERROR)
             ->assertRaised();
     }
 
@@ -94,9 +84,7 @@ abstract class UserPasswordValidatorTestCase extends ConstraintValidatorTestCase
     {
         yield 'Doctrine style' => [new UserPassword(['message' => 'myMessage'])];
 
-        if (\PHP_VERSION_ID >= 80000) {
-            yield 'named arguments' => [eval('return new \Symfony\Component\Security\Core\Validator\Constraints\UserPassword(message: "myMessage");')];
-        }
+        yield 'named arguments' => [new UserPassword(message: 'myMessage')];
     }
 
     /**
@@ -111,6 +99,7 @@ abstract class UserPasswordValidatorTestCase extends ConstraintValidatorTestCase
         $this->validator->validate($password, $constraint);
 
         $this->buildViolation('myMessage')
+            ->setCode(UserPassword::INVALID_PASSWORD_ERROR)
             ->assertRaised();
     }
 
@@ -124,12 +113,13 @@ abstract class UserPasswordValidatorTestCase extends ConstraintValidatorTestCase
 
     public function testUserIsNotValid()
     {
-        $this->expectException(ConstraintDefinitionException::class);
         $user = new \stdClass();
 
         $this->tokenStorage = $this->createTokenStorage($user);
         $this->validator = $this->createValidator();
         $this->validator->initialize($this->context);
+
+        $this->expectException(ConstraintDefinitionException::class);
 
         $this->validator->validate('secret', new UserPassword());
     }

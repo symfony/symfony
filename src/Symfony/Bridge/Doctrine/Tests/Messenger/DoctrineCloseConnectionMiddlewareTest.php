@@ -14,6 +14,7 @@ namespace Symfony\Bridge\Doctrine\Tests\Messenger;
 use Doctrine\DBAL\Connection;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Bridge\Doctrine\Messenger\DoctrineCloseConnectionMiddleware;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\UnrecoverableMessageHandlingException;
@@ -22,11 +23,11 @@ use Symfony\Component\Messenger\Test\Middleware\MiddlewareTestCase;
 
 class DoctrineCloseConnectionMiddlewareTest extends MiddlewareTestCase
 {
-    private $connection;
-    private $entityManager;
-    private $managerRegistry;
-    private $middleware;
-    private $entityManagerName = 'default';
+    private MockObject&Connection $connection;
+    private MockObject&EntityManagerInterface $entityManager;
+    private MockObject&ManagerRegistry $managerRegistry;
+    private DoctrineCloseConnectionMiddleware $middleware;
+    private string $entityManagerName = 'default';
 
     protected function setUp(): void
     {
@@ -62,7 +63,7 @@ class DoctrineCloseConnectionMiddlewareTest extends MiddlewareTestCase
         $managerRegistry
             ->method('getManager')
             ->with('unknown_manager')
-            ->will($this->throwException(new \InvalidArgumentException()));
+            ->willThrowException(new \InvalidArgumentException());
 
         $middleware = new DoctrineCloseConnectionMiddleware($managerRegistry, 'unknown_manager');
 

@@ -6,7 +6,9 @@
            xsi:schemaLocation="http://symfony.com/schema/dic/services https://symfony.com/schema/dic/services/services-1.0.xsd
                         http://symfony.com/schema/dic/symfony https://symfony.com/schema/dic/symfony/symfony-1.0.xsd">
 
-    <framework:config>
+    <framework:config http-method-override="false" handle-all-throwables="true">
+        <framework:annotations enabled="false" />
+        <framework:php-errors log="true" />
         <framework:mailer>
             <framework:transport name="transport1">smtp://example1.com</framework:transport>
             <framework:transport name="transport2">smtp://example2.com</framework:transport>
@@ -14,6 +16,8 @@
                 <framework:sender>sender@example.org</framework:sender>
                 <framework:recipient>redirected@example.org</framework:recipient>
                 <framework:recipient>redirected1@example.org</framework:recipient>
+                <framework:allowed-recipient>foobar@example\.org</framework:allowed-recipient>
+                <framework:allowed-recipient>.*@example\.com</framework:allowed-recipient>
             </framework:envelope>
             <framework:header name="from">from@example.org</framework:header>
             <framework:header name="bcc">bcc1@example.org</framework:header>

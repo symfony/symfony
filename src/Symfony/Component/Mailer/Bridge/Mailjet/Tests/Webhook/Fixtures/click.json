@@ -1,0 +1,16 @@
+{
+    "event": "click",
+    "time": 1685519224,
+    "MessageID": 93449692684977140,
+    "Message_GUID": "245e4120-9d53-41b7-91f5-9aac8fda3cb0",
+    "email": "event-click@hotmail.com",
+    "mj_campaign_id": 0,
+    "mj_contact_id": 1000,
+    "customcampaign": "",
+    "url": "https://mailjet.com",
+    "ip": "127.0.0.1",
+    "geo": "FR",
+    "agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/113.0.0.0 Safari/537.36 CCleaner/113.0.21244.129",
+    "CustomID": "helloworld",
+    "Payload": ""
+}

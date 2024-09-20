@@ -13,7 +13,6 @@ namespace Symfony\Component\HttpFoundation\Tests\Test\Constraint;
 
 use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Framework\TestCase;
-use PHPUnit\Framework\TestFailure;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Test\Constraint\ResponseHasCookie;
@@ -29,14 +28,9 @@ class ResponseHasCookieTest extends TestCase
         $constraint = new ResponseHasCookie('bar');
         $this->assertFalse($constraint->evaluate($response, '', true));
 
-        try {
-            $constraint->evaluate($response);
-        } catch (ExpectationFailedException $e) {
-            $this->assertEquals("Failed asserting that the Response has cookie \"bar\".\n", TestFailure::exceptionToString($e));
+        $this->expectException(ExpectationFailedException::class);
+        $this->expectExceptionMessage('Failed asserting that the Response has cookie "bar".');
 
-            return;
-        }
-
-        $this->fail();
+        $constraint->evaluate($response);
     }
 }

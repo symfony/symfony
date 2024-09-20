@@ -12,6 +12,7 @@
 namespace Symfony\Component\Serializer\Tests\Mapping;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\PropertyAccess\PropertyPath;
 use Symfony\Component\Serializer\Mapping\AttributeMetadata;
 use Symfony\Component\Serializer\Mapping\AttributeMetadataInterface;
 
@@ -56,6 +57,15 @@ class AttributeMetadataTest extends TestCase
         $attributeMetadata->setSerializedName('serialized_name');
 
         $this->assertEquals('serialized_name', $attributeMetadata->getSerializedName());
+    }
+
+    public function testSerializedPath()
+    {
+        $attributeMetadata = new AttributeMetadata('path');
+        $serializedPath = new PropertyPath('[serialized][path]');
+        $attributeMetadata->setSerializedPath($serializedPath);
+
+        $this->assertEquals($serializedPath, $attributeMetadata->getSerializedPath());
     }
 
     public function testIgnore()
@@ -119,6 +129,7 @@ class AttributeMetadataTest extends TestCase
 
     public function testMerge()
     {
+        $serializedPath = new PropertyPath('[a4][a5]');
         $attributeMetadata1 = new AttributeMetadata('a1');
         $attributeMetadata1->addGroup('a');
         $attributeMetadata1->addGroup('b');
@@ -128,6 +139,7 @@ class AttributeMetadataTest extends TestCase
         $attributeMetadata2->addGroup('c');
         $attributeMetadata2->setMaxDepth(2);
         $attributeMetadata2->setSerializedName('a3');
+        $attributeMetadata2->setSerializedPath($serializedPath);
         $attributeMetadata2->setNormalizationContextForGroups(['foo' => 'bar'], ['a']);
         $attributeMetadata2->setDenormalizationContextForGroups(['baz' => 'qux'], ['c']);
 
@@ -138,6 +150,7 @@ class AttributeMetadataTest extends TestCase
         $this->assertEquals(['a', 'b', 'c'], $attributeMetadata1->getGroups());
         $this->assertEquals(2, $attributeMetadata1->getMaxDepth());
         $this->assertEquals('a3', $attributeMetadata1->getSerializedName());
+        $this->assertEquals($serializedPath, $attributeMetadata1->getSerializedPath());
         $this->assertSame(['a' => ['foo' => 'bar']], $attributeMetadata1->getNormalizationContexts());
         $this->assertSame(['c' => ['baz' => 'qux']], $attributeMetadata1->getDenormalizationContexts());
         $this->assertTrue($attributeMetadata1->isIgnored());
@@ -166,6 +179,8 @@ class AttributeMetadataTest extends TestCase
         $attributeMetadata->addGroup('b');
         $attributeMetadata->setMaxDepth(3);
         $attributeMetadata->setSerializedName('serialized_name');
+        $serializedPath = new PropertyPath('[serialized][path]');
+        $attributeMetadata->setSerializedPath($serializedPath);
 
         $serialized = serialize($attributeMetadata);
         $this->assertEquals($attributeMetadata, unserialize($serialized));

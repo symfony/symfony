@@ -11,16 +11,12 @@
 
 namespace Symfony\Component\Notifier\Bridge\MicrosoftTeams\Tests\Action\Input;
 
-use Symfony\Component\Notifier\Bridge\MicrosoftTeams\Action\Input\AbstractInput;
 use Symfony\Component\Notifier\Bridge\MicrosoftTeams\Action\Input\DateInput;
 use Symfony\Component\Notifier\Bridge\MicrosoftTeams\Test\Action\Input\AbstractInputTestCase;
 
 final class DateInputTest extends AbstractInputTestCase
 {
-    /**
-     * @return DateInput
-     */
-    public function createInput(): AbstractInput
+    public function createInput(): DateInput
     {
         return new DateInput();
     }

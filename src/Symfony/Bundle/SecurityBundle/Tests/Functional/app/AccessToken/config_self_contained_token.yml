@@ -1,0 +1,26 @@
+imports:
+    - { resource: ./../config/framework.yml }
+
+framework:
+    http_method_override: false
+    serializer: ~
+
+security:
+    password_hashers:
+        Symfony\Component\Security\Core\User\InMemoryUser: plaintext
+
+    firewalls:
+        main:
+            pattern: ^/
+            stateless: true
+            access_token:
+                token_handler: access_token.access_token_handler
+                token_extractors: 'header'
+                realm: 'My API'
+
+    access_control:
+        - { path: ^/foo, roles: ROLE_USER }
+
+services:
+    access_token.access_token_handler:
+        class: Symfony\Bundle\SecurityBundle\Tests\Functional\Bundle\AccessTokenBundle\Security\Handler\AccessTokenHandler

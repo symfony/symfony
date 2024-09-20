@@ -32,10 +32,8 @@ interface QueryInterface
     /**
      * Executes a query and returns the list of Ldap entries.
      *
-     * @return CollectionInterface
-     *
      * @throws NotBoundException
      * @throws LdapException
      */
-    public function execute();
+    public function execute(): CollectionInterface;
 }

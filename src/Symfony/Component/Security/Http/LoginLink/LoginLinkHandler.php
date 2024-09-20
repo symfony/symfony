@@ -28,30 +28,27 @@ use Symfony\Component\Security\Http\LoginLink\Exception\InvalidLoginLinkExceptio
  */
 final class LoginLinkHandler implements LoginLinkHandlerInterface
 {
-    private $urlGenerator;
-    private $userProvider;
-    private $options;
-    private $signatureHasher;
+    private array $options;
 
-    public function __construct(UrlGeneratorInterface $urlGenerator, UserProviderInterface $userProvider, SignatureHasher $signatureHasher, array $options)
-    {
-        $this->urlGenerator = $urlGenerator;
-        $this->userProvider = $userProvider;
-        $this->signatureHasher = $signatureHasher;
+    public function __construct(
+        private UrlGeneratorInterface $urlGenerator,
+        private UserProviderInterface $userProvider,
+        private SignatureHasher $signatureHasher,
+        array $options,
+    ) {
         $this->options = array_merge([
             'route_name' => null,
             'lifetime' => 600,
         ], $options);
     }
 
-    public function createLoginLink(UserInterface $user, ?Request $request = null): LoginLinkDetails
+    public function createLoginLink(UserInterface $user, ?Request $request = null, ?int $lifetime = null): LoginLinkDetails
     {
-        $expires = time() + $this->options['lifetime'];
+        $expires = time() + ($lifetime ?: $this->options['lifetime']);
         $expiresAt = new \DateTimeImmutable('@'.$expires);
 
         $parameters = [
-            // @deprecated since Symfony 5.3, change to $user->getUserIdentifier() in 6.0
-            'user' => method_exists($user, 'getUserIdentifier') ? $user->getUserIdentifier() : $user->getUsername(),
+            'user' => $user->getUserIdentifier(),
             'expires' => $expires,
             'hash' => $this->signatureHasher->computeSignatureHash($user, $expires),
         ];
@@ -94,14 +91,7 @@ final class LoginLinkHandler implements LoginLinkHandlerInterface
         try {
             $this->signatureHasher->acceptSignatureHash($userIdentifier, $expires, $hash);
 
-            // @deprecated since Symfony 5.3, change to $this->userProvider->loadUserByIdentifier() in 6.0
-            if (method_exists($this->userProvider, 'loadUserByIdentifier')) {
-                $user = $this->userProvider->loadUserByIdentifier($userIdentifier);
-            } else {
-                trigger_deprecation('symfony/security-core', '5.3', 'Not implementing method "loadUserByIdentifier()" in user provider "%s" is deprecated. This method will replace "loadUserByUsername()" in Symfony 6.0.', get_debug_type($this->userProvider));
-
-                $user = $this->userProvider->loadUserByUsername($userIdentifier);
-            }
+            $user = $this->userProvider->loadUserByIdentifier($userIdentifier);
 
             $this->signatureHasher->verifySignatureHash($user, $expires, $hash);
         } catch (UserNotFoundException $e) {

@@ -1,0 +1,4 @@
+services:
+    static_constructor:
+        class: stdClass
+        constructor: 'create'

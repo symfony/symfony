@@ -19,7 +19,7 @@ class TypeValidatorTest extends ConstraintValidatorTestCase
 {
     protected static $file;
 
-    protected function createValidator()
+    protected function createValidator(): TypeValidator
     {
         return new TypeValidator();
     }
@@ -88,8 +88,19 @@ class TypeValidatorTest extends ConstraintValidatorTestCase
             ['1.5', 'numeric'],
             [0, 'integer'],
             [1.5, 'float'],
+            [\NAN, 'float'],
+            [\INF, 'float'],
+            [1.5, 'finite-float'],
+            [0, 'number'],
+            [1.5, 'number'],
+            [\INF, 'number'],
+            [1.5, 'finite-number'],
             ['12345', 'string'],
             [[], 'array'],
+            [[], 'list'],
+            [[1, 2, 3], 'list'],
+            [['abc' => 1], 'associative_array'],
+            [[1 => 1], 'associative_array'],
             [$object, 'object'],
             [$object, 'stdClass'],
             [$file, 'resource'],
@@ -135,7 +146,17 @@ class TypeValidatorTest extends ConstraintValidatorTestCase
             ['foobar', 'numeric', '"foobar"'],
             ['foobar', 'boolean', '"foobar"'],
             ['0', 'integer', '"0"'],
+            [\NAN, 'integer', 'NAN'],
+            [\INF, 'integer', 'INF'],
             ['1.5', 'float', '"1.5"'],
+            ['1.5', 'finite-float', '"1.5"'],
+            [\NAN, 'finite-float', 'NAN'],
+            [\INF, 'finite-float', 'INF'],
+            ['0', 'number', '"0"'],
+            [\NAN, 'number', 'NAN'],
+            ['0', 'finite-number', '"0"'],
+            [\NAN, 'finite-number', 'NAN'],
+            [\INF, 'finite-number', 'INF'],
             [12345, 'string', '12345'],
             [$object, 'boolean', 'object'],
             [$object, 'numeric', 'object'],
@@ -149,6 +170,12 @@ class TypeValidatorTest extends ConstraintValidatorTestCase
             [$file, 'float', 'resource'],
             [$file, 'string', 'resource'],
             [$file, 'object', 'resource'],
+            [[1 => 1], 'list', 'array'],
+            [['abc' => 1], 'list', 'array'],
+            ['abcd1', 'list', '"abcd1"'],
+            [[], 'associative_array', 'array'],
+            [[1, 2, 3], 'associative_array', 'array'],
+            ['abcd1', 'associative_array', '"abcd1"'],
             ['12a34', 'digit', '"12a34"'],
             ['1a#23', 'alnum', '"1a#23"'],
             ['abcd1', 'alpha', '"abcd1"'],
@@ -203,10 +230,7 @@ class TypeValidatorTest extends ConstraintValidatorTestCase
             'type' => ['boolean', 'array'],
             'message' => 'myMessage',
         ])];
-
-        if (\PHP_VERSION_ID >= 80000) {
-            yield 'named arguments' => [eval('return new \Symfony\Component\Validator\Constraints\Type(type: ["boolean", "array"], message: "myMessage");')];
-        }
+        yield 'named arguments' => [new Type(type: ['boolean', 'array'], message: 'myMessage')];
     }
 
     protected static function createFile()

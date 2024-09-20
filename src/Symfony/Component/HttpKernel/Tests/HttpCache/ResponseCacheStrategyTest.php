@@ -5,10 +5,6 @@
  *
  * (c) Fabien Potencier <fabien@symfony.com>
  *
- * This code is partially based on the Rack-Cache library by Ryan Tomayko,
- * which is released under the MIT license.
- * (based on commit 02d2b48d75bcb63cf1c0c7149c077ad256542801)
- *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -81,7 +77,7 @@ class ResponseCacheStrategyTest extends TestCase
         $cacheStrategy = new ResponseCacheStrategy();
 
         $embeddedResponse = new Response();
-        $embeddedResponse->setLastModified(new \DateTime());
+        $embeddedResponse->setLastModified(new \DateTimeImmutable());
         $cacheStrategy->add($embeddedResponse);
 
         $mainResponse = new Response();
@@ -99,7 +95,7 @@ class ResponseCacheStrategyTest extends TestCase
 
         // This main response uses the "validation" model
         $mainResponse = new Response();
-        $mainResponse->setLastModified(new \DateTime());
+        $mainResponse->setLastModified(new \DateTimeImmutable());
         $mainResponse->setEtag('foo');
 
         // Embedded response uses "expiry" model
@@ -121,7 +117,7 @@ class ResponseCacheStrategyTest extends TestCase
         $cacheStrategy = new ResponseCacheStrategy();
 
         $mainResponse = new Response();
-        $mainResponse->setLastModified(new \DateTime());
+        $mainResponse->setLastModified(new \DateTimeImmutable());
         $cacheStrategy->update($mainResponse);
 
         $this->assertTrue($mainResponse->isValidateable());
@@ -136,6 +132,54 @@ class ResponseCacheStrategyTest extends TestCase
         $cacheStrategy->update($mainResponse);
 
         $this->assertTrue($mainResponse->isFresh());
+    }
+
+    public function testLastModifiedIsMergedWithEmbeddedResponse()
+    {
+        $cacheStrategy = new ResponseCacheStrategy();
+
+        $mainResponse = new Response();
+        $mainResponse->setLastModified(new \DateTimeImmutable('-2 hour'));
+
+        $embeddedDate = new \DateTimeImmutable('-1 hour');
+        $embeddedResponse = new Response();
+        $embeddedResponse->setLastModified($embeddedDate);
+
+        $cacheStrategy->add($embeddedResponse);
+        $cacheStrategy->update($mainResponse);
+
+        $this->assertTrue($mainResponse->headers->has('Last-Modified'));
+        $this->assertSame($embeddedDate->getTimestamp(), $mainResponse->getLastModified()->getTimestamp());
+    }
+
+    public function testLastModifiedIsRemovedWhenEmbeddedResponseHasNoLastModified()
+    {
+        $cacheStrategy = new ResponseCacheStrategy();
+
+        $mainResponse = new Response();
+        $mainResponse->setLastModified(new \DateTimeImmutable('-2 hour'));
+
+        $embeddedResponse = new Response();
+
+        $cacheStrategy->add($embeddedResponse);
+        $cacheStrategy->update($mainResponse);
+
+        $this->assertFalse($mainResponse->headers->has('Last-Modified'));
+    }
+
+    public function testLastModifiedIsNotAddedWhenMainResponseHasNoLastModified()
+    {
+        $cacheStrategy = new ResponseCacheStrategy();
+
+        $mainResponse = new Response();
+
+        $embeddedResponse = new Response();
+        $embeddedResponse->setLastModified(new \DateTimeImmutable('-2 hour'));
+
+        $cacheStrategy->add($embeddedResponse);
+        $cacheStrategy->update($mainResponse);
+
+        $this->assertFalse($mainResponse->headers->has('Last-Modified'));
     }
 
     public function testMainResponseIsNotCacheableWhenEmbeddedResponseIsNotCacheable()
@@ -226,7 +270,7 @@ class ResponseCacheStrategyTest extends TestCase
         $mainResponse = new Response();
         $mainResponse->setSharedMaxAge(3600);
         $mainResponse->setEtag('foo');
-        $mainResponse->setLastModified(new \DateTime());
+        $mainResponse->setLastModified(new \DateTimeImmutable());
 
         $embeddedResponse = new Response();
         $embeddedResponse->setSharedMaxAge(60);
@@ -298,14 +342,14 @@ class ResponseCacheStrategyTest extends TestCase
             } elseif ('age' === $key) {
                 $this->assertSame($value, $response->getAge());
             } elseif (true === $value) {
-                $this->assertTrue($response->headers->hasCacheControlDirective($key), sprintf('Cache-Control header must have "%s" flag', $key));
+                $this->assertTrue($response->headers->hasCacheControlDirective($key), \sprintf('Cache-Control header must have "%s" flag', $key));
             } elseif (false === $value) {
                 $this->assertFalse(
                     $response->headers->hasCacheControlDirective($key),
-                    sprintf('Cache-Control header must NOT have "%s" flag', $key)
+                    \sprintf('Cache-Control header must NOT have "%s" flag', $key)
                 );
             } else {
-                $this->assertSame($value, $response->headers->getCacheControlDirective($key), sprintf('Cache-Control flag "%s" should be "%s"', $key, $value));
+                $this->assertSame($value, $response->headers->getCacheControlDirective($key), \sprintf('Cache-Control flag "%s" should be "%s"', $key, $value));
             }
         }
     }

@@ -15,7 +15,7 @@ use Symfony\Component\Security\Core\Authorization\AccessDecisionManagerInterface
 
 class AutowiredServices
 {
-    private $accessDecisionManager;
+    private AccessDecisionManagerInterface $accessDecisionManager;
 
     public function __construct(AccessDecisionManagerInterface $accessDecisionManager)
     {

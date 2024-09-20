@@ -22,10 +22,8 @@ trait BlockingStoreTestTrait
 {
     /**
      * @see AbstractStoreTestCase::getStore()
-     *
-     * @return PersistingStoreInterface
      */
-    abstract protected function getStore();
+    abstract protected function getStore(): PersistingStoreInterface;
 
     /**
      * Tests blocking locks thanks to pcntl.
@@ -45,7 +43,7 @@ trait BlockingStoreTestTrait
         // Amount of microseconds we should wait without slowing things down too much
         $clockDelay = 50000;
 
-        $key = new Key(uniqid(__METHOD__, true));
+        $key = new Key(__METHOD__);
         $parentPID = posix_getpid();
 
         // Block SIGHUP signal

@@ -7,7 +7,7 @@ DSN example
 -----------
 
 ```
-OVHCLOUD_DSN=ovhcloud://APPLICATION_KEY:APPLICATION_SECRET@default?consumer_key=CONSUMER_KEY&service_name=SERVICE_NAME&sender=SENDER
+OVHCLOUD_DSN=ovhcloud://APPLICATION_KEY:APPLICATION_SECRET@default?consumer_key=CONSUMER_KEY&service_name=SERVICE_NAME&sender=SENDER&no_stop_clause=NO_STOP_CLAUSE
 ```
 
 where:
@@ -16,6 +16,8 @@ where:
  - `CONSUMER_KEY` is your OvhCloud consumer key
  - `SERVICE_NAME` is your OvhCloud service name
  - `SENDER` is your sender (optional)
+ - `NO_STOP_CLAUSE` setting this parameter to "1" (default "0") allow removing "STOP clause" at the end of the message for non-commercial use (optional)
+
 
 Resources
 ---------

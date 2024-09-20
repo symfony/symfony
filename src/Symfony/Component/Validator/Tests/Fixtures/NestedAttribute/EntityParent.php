@@ -22,7 +22,7 @@ class EntityParent implements EntityInterfaceA
     private $child;
 
     #[NotNull]
-    protected $other;
+    protected ?int $other;
 
     public function getData()
     {

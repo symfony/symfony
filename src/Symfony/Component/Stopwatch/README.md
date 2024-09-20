@@ -6,8 +6,8 @@ The Stopwatch component provides a way to profile code.
 Getting Started
 ---------------
 
-```
-$ composer require symfony/stopwatch
+```bash
+composer require symfony/stopwatch
 ```
 
 ```php

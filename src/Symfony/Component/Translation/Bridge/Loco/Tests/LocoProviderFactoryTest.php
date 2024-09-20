@@ -34,6 +34,11 @@ class LocoProviderFactoryTest extends ProviderFactoryTestCase
             'loco://localise.biz',
             'loco://API_KEY@default',
         ];
+
+        yield [
+            'loco://localise.biz?status=translated,provisional',
+            'loco://API_KEY@default?status=translated,provisional',
+        ];
     }
 
     public static function incompleteDsnProvider(): iterable
@@ -43,6 +48,6 @@ class LocoProviderFactoryTest extends ProviderFactoryTestCase
 
     public function createFactory(): ProviderFactoryInterface
     {
-        return new LocoProviderFactory($this->getClient(), $this->getLogger(), $this->getDefaultLocale(), $this->getLoader());
+        return new LocoProviderFactory($this->getClient(), $this->getLogger(), $this->getDefaultLocale(), $this->getLoader(), $this->getTranslatorBag());
     }
 }

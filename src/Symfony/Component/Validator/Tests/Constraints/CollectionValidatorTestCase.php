@@ -22,7 +22,7 @@ use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
 abstract class CollectionValidatorTestCase extends ConstraintValidatorTestCase
 {
-    protected function createValidator()
+    protected function createValidator(): CollectionValidator
     {
         return new CollectionValidator();
     }

@@ -21,7 +21,7 @@ use Symfony\Component\Routing\RouteCollection;
  */
 trait PrefixTrait
 {
-    final protected function addPrefix(RouteCollection $routes, $prefix, bool $trailingSlashOnRoot)
+    final protected function addPrefix(RouteCollection $routes, string|array $prefix, bool $trailingSlashOnRoot): void
     {
         if (\is_array($prefix)) {
             foreach ($prefix as $locale => $localePrefix) {
@@ -40,7 +40,7 @@ trait PrefixTrait
                         $routes->add($name.'.'.$locale, $localizedRoute, $priority);
                     }
                 } elseif (!isset($prefix[$locale])) {
-                    throw new \InvalidArgumentException(sprintf('Route "%s" with locale "%s" is missing a corresponding prefix in its parent collection.', $name, $locale));
+                    throw new \InvalidArgumentException(\sprintf('Route "%s" with locale "%s" is missing a corresponding prefix in its parent collection.', $name, $locale));
                 } else {
                     $route->setPath($prefix[$locale].(!$trailingSlashOnRoot && '/' === $route->getPath() ? '' : $route->getPath()));
                     $routes->add($name, $route, $routes->getPriority($name) ?? 0);

@@ -12,21 +12,26 @@
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
 use Symfony\Bundle\SecurityBundle\RememberMe\FirewallAwareRememberMeHandler;
+use Symfony\Component\DependencyInjection\Parameter;
 use Symfony\Component\Security\Core\Signature\SignatureHasher;
 use Symfony\Component\Security\Http\Authenticator\RememberMeAuthenticator;
 use Symfony\Component\Security\Http\EventListener\CheckRememberMeConditionsListener;
 use Symfony\Component\Security\Http\EventListener\RememberMeListener;
 use Symfony\Component\Security\Http\RememberMe\PersistentRememberMeHandler;
 use Symfony\Component\Security\Http\RememberMe\RememberMeHandlerInterface;
+use Symfony\Component\Security\Http\RememberMe\ResponseListener;
 use Symfony\Component\Security\Http\RememberMe\SignatureRememberMeHandler;
 
 return static function (ContainerConfigurator $container) {
     $container->services()
+        ->set('security.rememberme.response_listener', ResponseListener::class)
+            ->tag('kernel.event_subscriber')
+
         ->set('security.authenticator.remember_me_signature_hasher', SignatureHasher::class)
             ->args([
                 service('property_accessor'),
                 abstract_arg('signature properties'),
-                '%kernel.secret%',
+                new Parameter('kernel.secret'),
                 null,
                 null,
             ])
@@ -46,7 +51,6 @@ return static function (ContainerConfigurator $container) {
             ->abstract()
             ->args([
                 abstract_arg('token provider'),
-                param('kernel.secret'),
                 abstract_arg('user provider'),
                 service('request_stack'),
                 abstract_arg('options'),
@@ -82,7 +86,6 @@ return static function (ContainerConfigurator $container) {
             ->abstract()
             ->args([
                 abstract_arg('remember me handler'),
-                param('kernel.secret'),
                 service('security.token_storage'),
                 abstract_arg('options'),
                 service('logger')->nullOnInvalid(),

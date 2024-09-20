@@ -23,7 +23,7 @@ use Symfony\Component\Translation\IdentityTranslator;
 
 class FormTypeCsrfExtensionTest_ChildType extends AbstractType
 {
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         // The form needs a child in order to trigger CSRF protection by
         // default
@@ -33,10 +33,7 @@ class FormTypeCsrfExtensionTest_ChildType extends AbstractType
 
 class FormTypeCsrfExtensionTest extends TypeTestCase
 {
-    /**
-     * @var MockObject&CsrfTokenManagerInterface
-     */
-    protected $tokenManager;
+    protected MockObject&CsrfTokenManagerInterface $tokenManager;
 
     protected function setUp(): void
     {
@@ -45,7 +42,7 @@ class FormTypeCsrfExtensionTest extends TypeTestCase
         parent::setUp();
     }
 
-    protected function getExtensions()
+    protected function getExtensions(): array
     {
         return array_merge(parent::getExtensions(), [
             new CsrfExtension($this->tokenManager, new IdentityTranslator()),

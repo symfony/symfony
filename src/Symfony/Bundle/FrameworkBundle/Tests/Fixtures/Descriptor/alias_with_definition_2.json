@@ -12,6 +12,7 @@
         "abstract": false,
         "autowire": false,
         "autoconfigure": false,
+        "deprecated": false,
         "file": "\/path\/to\/file",
         "factory_service": "factory.service",
         "factory_method": "get",
@@ -35,7 +36,28 @@
             {
                 "name": "tag2",
                 "parameters": []
+            },
+            {
+                "name": "tag3",
+                "parameters": {
+                    "array_attr": [
+                        "foo",
+                        "bar",
+                        [
+                            [
+                                [
+                                    [
+                                        "ccc"
+                                    ]
+                                ]
+                            ]
+                        ]
+                    ]
+                }
             }
+        ],
+        "usages": [
+          ".alias_2"
         ]
     }
 ]

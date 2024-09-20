@@ -21,7 +21,7 @@ use Symfony\Component\Security\Core\User\UserProviderInterface;
 class ArrayUserProvider implements UserProviderInterface
 {
     /** @var UserInterface[] */
-    private $users = [];
+    private array $users = [];
 
     public function addUser(UserInterface $user)
     {
@@ -48,7 +48,7 @@ class ArrayUserProvider implements UserProviderInterface
         $user = $this->getUser($identifier);
 
         if (null === $user) {
-            $e = new UserNotFoundException(sprintf('User "%s" not found.', $identifier));
+            $e = new UserNotFoundException(\sprintf('User "%s" not found.', $identifier));
             $e->setUsername($identifier);
 
             throw $e;
@@ -60,11 +60,11 @@ class ArrayUserProvider implements UserProviderInterface
     public function refreshUser(UserInterface $user): UserInterface
     {
         if (!$user instanceof UserInterface) {
-            throw new UnsupportedUserException(sprintf('Instances of "%s" are not supported.', get_debug_type($user)));
+            throw new UnsupportedUserException(\sprintf('Instances of "%s" are not supported.', get_debug_type($user)));
         }
 
         $storedUser = $this->getUser($user->getUserIdentifier());
-        $class = \get_class($storedUser);
+        $class = $storedUser::class;
 
         return new $class($storedUser->getUserIdentifier(), $storedUser->getPassword(), $storedUser->getRoles(), $storedUser->isEnabled());
     }

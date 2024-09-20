@@ -47,7 +47,7 @@ class CallbackValidatorTest_Object
 
 class CallbackValidatorTest extends ConstraintValidatorTestCase
 {
-    protected function createValidator()
+    protected function createValidator(): CallbackValidator
     {
         return new CallbackValidator();
     }
@@ -205,7 +205,7 @@ class CallbackValidatorTest extends ConstraintValidatorTestCase
         $this->assertEquals($targets, $constraint->getTargets());
     }
 
-    // Should succeed. Needed when defining constraints as annotations.
+    // Should succeed. Needed when defining constraints as attributes.
     public function testNoConstructorArguments()
     {
         $constraint = new Callback();
@@ -213,14 +213,14 @@ class CallbackValidatorTest extends ConstraintValidatorTestCase
         $this->assertSame([Constraint::CLASS_CONSTRAINT, Constraint::PROPERTY_CONSTRAINT], $constraint->getTargets());
     }
 
-    public function testAnnotationInvocationSingleValued()
+    public function testAttributeInvocationSingleValued()
     {
         $constraint = new Callback(['value' => 'validateStatic']);
 
         $this->assertEquals(new Callback('validateStatic'), $constraint);
     }
 
-    public function testAnnotationInvocationMultiValued()
+    public function testAttributeInvocationMultiValued()
     {
         $constraint = new Callback(['value' => [__CLASS__.'_Class', 'validateCallback']]);
 
@@ -242,13 +242,11 @@ class CallbackValidatorTest extends ConstraintValidatorTestCase
         $this->validator->validate($object, $constraint);
         $this->assertEquals('Hello world!', $payloadCopy);
 
-        if (\PHP_VERSION_ID >= 80000) {
-            $payloadCopy = 'Replace me!';
-            $constraint = eval('return new \Symfony\Component\Validator\Constraints\Callback(callback: $callback, payload: "Hello world!");');
-            $this->validator->validate($object, $constraint);
-            $this->assertEquals('Hello world!', $payloadCopy);
-            $payloadCopy = 'Replace me!';
-        }
+        $payloadCopy = 'Replace me!';
+        $constraint = new Callback(callback: $callback, payload: 'Hello world!');
+        $this->validator->validate($object, $constraint);
+        $this->assertEquals('Hello world!', $payloadCopy);
+        $payloadCopy = 'Replace me!';
 
         $payloadCopy = 'Replace me!';
         $constraint = new Callback([

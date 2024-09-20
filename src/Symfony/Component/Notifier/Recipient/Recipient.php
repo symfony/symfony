@@ -25,7 +25,7 @@ class Recipient implements EmailRecipientInterface, SmsRecipientInterface
     public function __construct(string $email = '', string $phone = '')
     {
         if ('' === $email && '' === $phone) {
-            throw new InvalidArgumentException(sprintf('"%s" needs an email or a phone but both cannot be empty.', static::class));
+            throw new InvalidArgumentException(\sprintf('"%s" needs an email or a phone but both cannot be empty.', static::class));
         }
 
         $this->email = $email;
@@ -35,7 +35,7 @@ class Recipient implements EmailRecipientInterface, SmsRecipientInterface
     /**
      * @return $this
      */
-    public function email(string $email): self
+    public function email(string $email): static
     {
         $this->email = $email;
 
@@ -47,7 +47,7 @@ class Recipient implements EmailRecipientInterface, SmsRecipientInterface
      *
      * @return $this
      */
-    public function phone(string $phone): self
+    public function phone(string $phone): static
     {
         $this->phone = $phone;
 

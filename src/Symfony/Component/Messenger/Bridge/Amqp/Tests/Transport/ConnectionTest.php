@@ -12,7 +12,6 @@
 namespace Symfony\Component\Messenger\Bridge\Amqp\Tests\Transport;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\Messenger\Bridge\Amqp\Tests\Fixtures\DummyMessage;
 use Symfony\Component\Messenger\Bridge\Amqp\Transport\AmqpFactory;
 use Symfony\Component\Messenger\Bridge\Amqp\Transport\AmqpStamp;
@@ -26,8 +25,6 @@ use Symfony\Component\Messenger\Exception\InvalidArgumentException;
  */
 class ConnectionTest extends TestCase
 {
-    use ExpectDeprecationTrait;
-
     private const DEFAULT_EXCHANGE_NAME = 'messages';
 
     public function testItCannotBeConstructedWithAWrongDsn()
@@ -125,39 +122,27 @@ class ConnectionTest extends TestCase
         );
     }
 
-    /**
-     * @group legacy
-     */
-    public function testDeprecationIfInvalidOptionIsPassedWithDsn()
+    public function testExceptionIfInvalidOptionIsPassedWithDsn()
     {
-        $this->expectDeprecation('Since symfony/messenger 5.1: Invalid option(s) "foo" passed to the AMQP Messenger transport. Passing invalid options is deprecated.');
+        $this->expectExceptionMessage('Invalid option(s) "foo" passed to the AMQP Messenger transport.');
         Connection::fromDsn('amqp://host?foo=bar');
     }
 
-    /**
-     * @group legacy
-     */
-    public function testDeprecationIfInvalidOptionIsPassedAsArgument()
+    public function testExceptionIfInvalidOptionIsPassedAsArgument()
     {
-        $this->expectDeprecation('Since symfony/messenger 5.1: Invalid option(s) "foo" passed to the AMQP Messenger transport. Passing invalid options is deprecated.');
+        $this->expectExceptionMessage('Invalid option(s) "foo" passed to the AMQP Messenger transport.');
         Connection::fromDsn('amqp://host', ['foo' => 'bar']);
     }
 
-    /**
-     * @group legacy
-     */
-    public function testDeprecationIfInvalidQueueOptionIsPassed()
+    public function testExceptionIfInvalidQueueOptionIsPassed()
     {
-        $this->expectDeprecation('Since symfony/messenger 5.1: Invalid queue option(s) "foo" passed to the AMQP Messenger transport. Passing invalid queue options is deprecated.');
+        $this->expectExceptionMessage('Invalid queue option(s) "foo" passed to the AMQP Messenger transport.');
         Connection::fromDsn('amqp://host', ['queues' => ['queueName' => ['foo' => 'bar']]]);
     }
 
-    /**
-     * @group legacy
-     */
-    public function testDeprecationIfInvalidExchangeOptionIsPassed()
+    public function testExceptionIfInvalidExchangeOptionIsPassed()
     {
-        $this->expectDeprecation('Since symfony/messenger 5.1: Invalid exchange option(s) "foo" passed to the AMQP Messenger transport. Passing invalid exchange options is deprecated.');
+        $this->expectExceptionMessage('Invalid exchange option(s) "foo" passed to the AMQP Messenger transport.');
         Connection::fromDsn('amqp://host', ['exchange' => ['foo' => 'bar']]);
     }
 
@@ -198,6 +183,12 @@ class ConnectionTest extends TestCase
                         'x-max-length-bytes' => '300',
                         'x-max-priority' => '4',
                     ],
+                ],
+            ],
+            'delay' => [
+                'arguments' => [
+                    'x-queue-type' => 'classic',
+                    'x-message-deduplication' => true,
                 ],
             ],
             'exchange' => [
@@ -468,28 +459,6 @@ class ConnectionTest extends TestCase
         $connection = Connection::fromDsn('amqp://localhost', ['auto_setup' => true], $factory);
         $connection->publish('body');
         $connection->publish('body');
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testSetChannelPrefetchWhenSetup()
-    {
-        $factory = new TestAmqpFactory(
-            $amqpConnection = $this->createMock(\AMQPConnection::class),
-            $amqpChannel = $this->createMock(\AMQPChannel::class),
-            $amqpQueue = $this->createMock(\AMQPQueue::class),
-            $amqpExchange = $this->createMock(\AMQPExchange::class)
-        );
-
-        // makes sure the channel looks connected, so it's not re-created
-        $amqpChannel->expects($this->any())->method('isConnected')->willReturn(true);
-
-        $amqpChannel->expects($this->never())->method('setPrefetchCount');
-
-        $this->expectDeprecation('Since symfony/messenger 5.3: The "prefetch_count" option passed to the AMQP Messenger transport has no effect and should not be used.');
-        $connection = Connection::fromDsn('amqp://localhost?prefetch_count=2', [], $factory);
-        $connection->setup();
     }
 
     public function testAutoSetupWithDelayDeclaresExchangeQueuesAndDelay()
@@ -813,6 +782,73 @@ class ConnectionTest extends TestCase
         );
     }
 
+    public function testItCanRetryPublishWhenAMQPConnectionExceptionIsThrown()
+    {
+        $factory = new TestAmqpFactory(
+            $amqpConnection = $this->createMock(\AMQPConnection::class),
+            $amqpChannel = $this->createMock(\AMQPChannel::class),
+            $amqpQueue = $this->createMock(\AMQPQueue::class),
+            $amqpExchange = $this->createMock(\AMQPExchange::class)
+        );
+
+        $amqpExchange->expects($this->exactly(2))
+            ->method('publish')
+            ->willReturnOnConsecutiveCalls(
+                $this->throwException(new \AMQPConnectionException('a socket error occurred')),
+                null
+            );
+
+        $connection = Connection::fromDsn('amqp://localhost', [], $factory);
+        $connection->publish('body');
+    }
+
+    public function testItCanRetryPublishWithDelayWhenAMQPConnectionExceptionIsThrown()
+    {
+        $factory = new TestAmqpFactory(
+            $amqpConnection = $this->createMock(\AMQPConnection::class),
+            $amqpChannel = $this->createMock(\AMQPChannel::class),
+            $amqpQueue = $this->createMock(\AMQPQueue::class),
+            $amqpExchange = $this->createMock(\AMQPExchange::class)
+        );
+
+        $amqpExchange->expects($this->exactly(2))
+            ->method('publish')
+            ->willReturnOnConsecutiveCalls(
+                $this->throwException(new \AMQPConnectionException('a socket error occurred')),
+                null
+            );
+
+        $connection = Connection::fromDsn('amqp://localhost', [], $factory);
+        $connection->publish('body', [], 5000);
+    }
+
+    public function testItWillRetryMaxThreeTimesWhenAMQPConnectionExceptionIsThrown()
+    {
+        $factory = new TestAmqpFactory(
+            $amqpConnection = $this->createMock(\AMQPConnection::class),
+            $amqpChannel = $this->createMock(\AMQPChannel::class),
+            $amqpQueue = $this->createMock(\AMQPQueue::class),
+            $amqpExchange = $this->createMock(\AMQPExchange::class)
+        );
+
+        $exception = new \AMQPConnectionException('a socket error occurred');
+
+        $amqpExchange->expects($this->exactly(4))
+            ->method('publish')
+            ->willReturnOnConsecutiveCalls(
+                $this->throwException($exception),
+                $this->throwException($exception),
+                $this->throwException($exception),
+                $this->throwException($exception),
+            );
+
+        self::expectException($exception::class);
+        self::expectExceptionMessage($exception->getMessage());
+
+        $connection = Connection::fromDsn('amqp://localhost', [], $factory);
+        $connection->publish('body');
+    }
+
     private function createDelayOrRetryConnection(\AMQPExchange $delayExchange, string $deadLetterExchangeName, string $delayQueueName): Connection
     {
         $amqpConnection = $this->createMock(\AMQPConnection::class);
@@ -843,17 +879,12 @@ class ConnectionTest extends TestCase
 
 class TestAmqpFactory extends AmqpFactory
 {
-    private $connection;
-    private $channel;
-    private $queue;
-    private $exchange;
-
-    public function __construct(\AMQPConnection $connection, \AMQPChannel $channel, \AMQPQueue $queue, \AMQPExchange $exchange)
-    {
-        $this->connection = $connection;
-        $this->channel = $channel;
-        $this->queue = $queue;
-        $this->exchange = $exchange;
+    public function __construct(
+        private \AMQPConnection $connection,
+        private \AMQPChannel $channel,
+        private \AMQPQueue $queue,
+        private \AMQPExchange $exchange,
+    ) {
     }
 
     public function createConnection(array $credentials): \AMQPConnection

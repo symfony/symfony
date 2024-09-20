@@ -13,9 +13,7 @@ namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
 use Symfony\Bundle\SecurityBundle\Security\UserAuthenticator;
 use Symfony\Component\DependencyInjection\ServiceLocator;
-use Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface;
 use Symfony\Component\Security\Http\Authentication\AuthenticatorManager;
-use Symfony\Component\Security\Http\Authentication\NoopAuthenticationManager;
 use Symfony\Component\Security\Http\Authentication\UserAuthenticatorInterface;
 use Symfony\Component\Security\Http\Authenticator\FormLoginAuthenticator;
 use Symfony\Component\Security\Http\Authenticator\HttpBasicAuthenticator;
@@ -60,10 +58,6 @@ return static function (ContainerConfigurator $container) {
             ])
         ->alias(UserAuthenticatorInterface::class, 'security.user_authenticator')
 
-        ->set('security.authentication.manager', NoopAuthenticationManager::class)
-        ->alias(AuthenticationManagerInterface::class, 'security.authentication.manager')
-            ->deprecate('symfony/security-bundle', '5.3', 'The "%alias_id%" alias is deprecated, use the new authenticator system instead.')
-
         ->set('security.firewall.authenticator', AuthenticatorManagerListener::class)
             ->abstract()
             ->args([
@@ -73,7 +67,7 @@ return static function (ContainerConfigurator $container) {
         // Listeners
         ->set('security.listener.check_authenticator_credentials', CheckCredentialsListener::class)
             ->args([
-               service('security.password_hasher_factory'),
+                service('security.password_hasher_factory'),
             ])
             ->tag('kernel.event_subscriber')
 
@@ -155,6 +149,7 @@ return static function (ContainerConfigurator $container) {
                 abstract_arg('user key'),
                 abstract_arg('credentials key'),
                 service('logger')->nullOnInvalid(),
+                abstract_arg('credentials user identifier'),
             ])
             ->tag('monolog.logger', ['channel' => 'security'])
 

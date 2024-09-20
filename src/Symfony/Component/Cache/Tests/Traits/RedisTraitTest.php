@@ -11,8 +11,8 @@
 
 namespace Symfony\Component\Cache\Tests\Traits;
 
-use PHPUnit\Framework\SkippedTestSuiteError;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Cache\Exception\InvalidArgumentException;
 use Symfony\Component\Cache\Traits\RedisTrait;
 
 /**
@@ -26,13 +26,13 @@ class RedisTraitTest extends TestCase
     public function testCreateConnection(string $dsn, string $expectedClass)
     {
         if (!class_exists($expectedClass)) {
-            throw new SkippedTestSuiteError(sprintf('The "%s" class is required.', $expectedClass));
+            self::markTestSkipped(\sprintf('The "%s" class is required.', $expectedClass));
         }
         if (!getenv('REDIS_CLUSTER_HOSTS')) {
-            throw new SkippedTestSuiteError('REDIS_CLUSTER_HOSTS env var is not defined.');
+            self::markTestSkipped('REDIS_CLUSTER_HOSTS env var is not defined.');
         }
 
-        $mock = new class () {
+        $mock = new class {
             use RedisTrait;
         };
         $connection = $mock::createConnection($dsn);
@@ -46,7 +46,7 @@ class RedisTraitTest extends TestCase
             self::markTestSkipped('REDIS_AUTHENTICATED_HOST env var is not defined.');
         }
 
-        $mock = new class () {
+        $mock = new class {
             use RedisTrait;
         };
         $connection = $mock::createConnection('redis://:p%40ssword@'.getenv('REDIS_AUTHENTICATED_HOST'));
@@ -57,23 +57,23 @@ class RedisTraitTest extends TestCase
 
     public static function provideCreateConnection(): array
     {
-        $hosts = array_map(function ($host) { return sprintf('host[%s]', $host); }, explode(' ', getenv('REDIS_CLUSTER_HOSTS')));
+        $hosts = array_map(fn ($host) => \sprintf('host[%s]', $host), explode(' ', getenv('REDIS_CLUSTER_HOSTS')));
 
         return [
             [
-                sprintf('redis:?%s&redis_cluster=1', $hosts[0]),
+                \sprintf('redis:?%s&redis_cluster=1', $hosts[0]),
                 'RedisCluster',
             ],
             [
-                sprintf('redis:?%s&redis_cluster=true', $hosts[0]),
+                \sprintf('redis:?%s&redis_cluster=true', $hosts[0]),
                 'RedisCluster',
             ],
             [
-                sprintf('redis:?%s', $hosts[0]),
+                \sprintf('redis:?%s', $hosts[0]),
                 'Redis',
             ],
             [
-                'dsn' => sprintf('redis:?%s', implode('&', \array_slice($hosts, 0, 2))),
+                'dsn' => \sprintf('redis:?%s', implode('&', \array_slice($hosts, 0, 2))),
                 'RedisArray',
             ],
         ];
@@ -90,22 +90,22 @@ class RedisTraitTest extends TestCase
     public function testPconnectSelectsCorrectDatabase()
     {
         if (!class_exists(\Redis::class)) {
-            throw new SkippedTestSuiteError('The "Redis" class is required.');
+            self::markTestSkipped('The "Redis" class is required.');
         }
         if (!getenv('REDIS_HOST')) {
-            throw new SkippedTestSuiteError('REDIS_HOST env var is not defined.');
+            self::markTestSkipped('REDIS_HOST env var is not defined.');
         }
         if (!\ini_get('redis.pconnect.pooling_enabled')) {
-            throw new SkippedTestSuiteError('The bug only occurs when pooling is enabled.');
+            self::markTestSkipped('The bug only occurs when pooling is enabled.');
         }
 
         // Limit the connection pool size to 1:
         if (false === $prevPoolSize = ini_set('redis.pconnect.connection_limit', 1)) {
-            throw new SkippedTestSuiteError('Unable to set pool size');
+            self::markTestSkipped('Unable to set pool size');
         }
 
         try {
-            $mock = new class () {
+            $mock = new class {
                 use RedisTrait;
             };
 
@@ -132,5 +132,79 @@ class RedisTraitTest extends TestCase
         } finally {
             ini_set('redis.pconnect.connection_limit', $prevPoolSize);
         }
+    }
+
+    /**
+     * @dataProvider provideDbIndexDsnParameter
+     */
+    public function testDbIndexDsnParameter(string $dsn, int $expectedDb)
+    {
+        if (!getenv('REDIS_AUTHENTICATED_HOST')) {
+            self::markTestSkipped('REDIS_AUTHENTICATED_HOST env var is not defined.');
+        }
+
+        $mock = new class {
+            use RedisTrait;
+        };
+        $connection = $mock::createConnection($dsn);
+        self::assertSame($expectedDb, $connection->getDbNum());
+    }
+
+    public static function provideDbIndexDsnParameter(): array
+    {
+        return [
+            [
+                'redis://:p%40ssword@'.getenv('REDIS_AUTHENTICATED_HOST'),
+                0,
+            ],
+            [
+                'redis:?host['.getenv('REDIS_HOST').']',
+                0,
+            ],
+            [
+                'redis:?host['.getenv('REDIS_HOST').']&dbindex=1',
+                1,
+            ],
+            [
+                'redis://:p%40ssword@'.getenv('REDIS_AUTHENTICATED_HOST').'?dbindex=2',
+                2,
+            ],
+            [
+                'redis://:p%40ssword@'.getenv('REDIS_AUTHENTICATED_HOST').'/4',
+                4,
+            ],
+            [
+                'redis://:p%40ssword@'.getenv('REDIS_AUTHENTICATED_HOST').'/?dbindex=5',
+                5,
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider provideInvalidDbIndexDsnParameter
+     */
+    public function testInvalidDbIndexDsnParameter(string $dsn)
+    {
+        if (!getenv('REDIS_AUTHENTICATED_HOST')) {
+            self::markTestSkipped('REDIS_AUTHENTICATED_HOST env var is not defined.');
+        }
+        $this->expectException(InvalidArgumentException::class);
+
+        $mock = new class {
+            use RedisTrait;
+        };
+        $mock::createConnection($dsn);
+    }
+
+    public static function provideInvalidDbIndexDsnParameter(): array
+    {
+        return [
+            [
+                'redis://:p%40ssword@'.getenv('REDIS_AUTHENTICATED_HOST').'/abc',
+            ],
+            [
+                'redis://:p%40ssword@'.getenv('REDIS_AUTHENTICATED_HOST').'/3?dbindex=6',
+            ],
+        ];
     }
 }

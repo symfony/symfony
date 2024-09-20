@@ -16,13 +16,10 @@ namespace Symfony\Component\Security\Http\LoginLink;
  */
 class LoginLinkDetails
 {
-    private $url;
-    private $expiresAt;
-
-    public function __construct(string $url, \DateTimeImmutable $expiresAt)
-    {
-        $this->url = $url;
-        $this->expiresAt = $expiresAt;
+    public function __construct(
+        private string $url,
+        private \DateTimeImmutable $expiresAt,
+    ) {
     }
 
     public function getUrl(): string
@@ -35,7 +32,7 @@ class LoginLinkDetails
         return $this->expiresAt;
     }
 
-    public function __toString()
+    public function __toString(): string
     {
         return $this->url;
     }

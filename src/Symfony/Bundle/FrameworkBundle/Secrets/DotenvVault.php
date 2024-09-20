@@ -13,15 +13,12 @@ namespace Symfony\Bundle\FrameworkBundle\Secrets;
 
 /**
  * @author Nicolas Grekas <p@tchwork.com>
- *
- * @internal
  */
 class DotenvVault extends AbstractVault
 {
-    private $dotenvFile;
-
-    public function __construct(string $dotenvFile)
-    {
+    public function __construct(
+        private string $dotenvFile,
+    ) {
         $this->dotenvFile = strtr($dotenvFile, '/', \DIRECTORY_SEPARATOR);
     }
 
@@ -47,17 +44,17 @@ class DotenvVault extends AbstractVault
 
         file_put_contents($this->dotenvFile, $content);
 
-        $this->lastMessage = sprintf('Secret "%s" %s in "%s".', $name, $count ? 'added' : 'updated', $this->getPrettyPath($this->dotenvFile));
+        $this->lastMessage = \sprintf('Secret "%s" %s in "%s".', $name, $count ? 'added' : 'updated', $this->getPrettyPath($this->dotenvFile));
     }
 
     public function reveal(string $name): ?string
     {
         $this->lastMessage = null;
         $this->validateName($name);
-        $v = \is_string($_SERVER[$name] ?? null) && !str_starts_with($name, 'HTTP_') ? $_SERVER[$name] : ($_ENV[$name] ?? null);
+        $v = $_ENV[$name] ?? (str_starts_with($name, 'HTTP_') ? null : ($_SERVER[$name] ?? null));
 
-        if (null === $v) {
-            $this->lastMessage = sprintf('Secret "%s" not found in "%s".', $name, $this->getPrettyPath($this->dotenvFile));
+        if ('' === ($v ?? '')) {
+            $this->lastMessage = \sprintf('Secret "%s" not found in "%s".', $name, $this->getPrettyPath($this->dotenvFile));
 
             return null;
         }
@@ -75,12 +72,12 @@ class DotenvVault extends AbstractVault
 
         if ($count) {
             file_put_contents($this->dotenvFile, $content);
-            $this->lastMessage = sprintf('Secret "%s" removed from file "%s".', $name, $this->getPrettyPath($this->dotenvFile));
+            $this->lastMessage = \sprintf('Secret "%s" removed from file "%s".', $name, $this->getPrettyPath($this->dotenvFile));
 
             return true;
         }
 
-        $this->lastMessage = sprintf('Secret "%s" not found in "%s".', $name, $this->getPrettyPath($this->dotenvFile));
+        $this->lastMessage = \sprintf('Secret "%s" not found in "%s".', $name, $this->getPrettyPath($this->dotenvFile));
 
         return false;
     }
@@ -91,13 +88,13 @@ class DotenvVault extends AbstractVault
         $secrets = [];
 
         foreach ($_ENV as $k => $v) {
-            if (preg_match('/^\w+$/D', $k)) {
+            if ('' !== ($v ?? '') && preg_match('/^\w+$/D', $k)) {
                 $secrets[$k] = $reveal ? $v : null;
             }
         }
 
         foreach ($_SERVER as $k => $v) {
-            if (\is_string($v) && preg_match('/^\w+$/D', $k)) {
+            if ('' !== ($v ?? '') && preg_match('/^\w+$/D', $k)) {
                 $secrets[$k] = $reveal ? $v : null;
             }
         }

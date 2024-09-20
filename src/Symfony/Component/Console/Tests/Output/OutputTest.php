@@ -175,14 +175,14 @@ class OutputTest extends TestCase
 
 class TestOutput extends Output
 {
-    public $output = '';
+    public string $output = '';
 
     public function clear()
     {
         $this->output = '';
     }
 
-    protected function doWrite(string $message, bool $newline)
+    protected function doWrite(string $message, bool $newline): void
     {
         $this->output .= $message.($newline ? "\n" : '');
     }

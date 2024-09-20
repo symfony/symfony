@@ -11,17 +11,16 @@
 
 namespace Symfony\Component\Serializer\Tests\Fixtures;
 
-use Symfony\Component\Serializer\Annotation\DiscriminatorMap;
+use Symfony\Component\Serializer\Attribute\DiscriminatorMap;
 
 /**
- * @DiscriminatorMap(typeProperty="type", mapping={
- *    "one"="Symfony\Component\Serializer\Tests\Fixtures\DummyMessageNumberOne",
- *    "two"="Symfony\Component\Serializer\Tests\Fixtures\DummyMessageNumberTwo",
- *    "three"="Symfony\Component\Serializer\Tests\Fixtures\DummyMessageNumberThree"
- * })
- *
  * @author Samuel Roze <samuel.roze@gmail.com>
  */
+#[DiscriminatorMap(typeProperty: 'type', mapping: [
+    'one' => DummyMessageNumberOne::class,
+    'two' => DummyMessageNumberTwo::class,
+    'three' => DummyMessageNumberThree::class,
+])]
 interface DummyMessageInterface
 {
 }

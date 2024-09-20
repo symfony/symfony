@@ -12,6 +12,7 @@
 namespace Symfony\Component\Security\Http\Authentication;
 
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 
 /**
@@ -19,23 +20,19 @@ use Symfony\Component\Security\Core\Exception\AuthenticationException;
  */
 class CustomAuthenticationFailureHandler implements AuthenticationFailureHandlerInterface
 {
-    private $handler;
-
     /**
      * @param array $options Options for processing a successful authentication attempt
      */
-    public function __construct(AuthenticationFailureHandlerInterface $handler, array $options)
-    {
-        $this->handler = $handler;
+    public function __construct(
+        private AuthenticationFailureHandlerInterface $handler,
+        array $options,
+    ) {
         if (method_exists($handler, 'setOptions')) {
             $this->handler->setOptions($options);
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function onAuthenticationFailure(Request $request, AuthenticationException $exception)
+    public function onAuthenticationFailure(Request $request, AuthenticationException $exception): Response
     {
         return $this->handler->onAuthenticationFailure($request, $exception);
     }

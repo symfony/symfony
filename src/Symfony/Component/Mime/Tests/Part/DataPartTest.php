@@ -138,20 +138,20 @@ class DataPartTest extends TestCase
 
     public function testFromPathWithUrl()
     {
-        if (!\in_array('http', stream_get_wrappers())) {
+        if (!\in_array('http', stream_get_wrappers(), true)) {
             $this->markTestSkipped('"http" stream wrapper is not enabled.');
         }
 
         $finder = new PhpExecutableFinder();
-        $process = new Process(array_merge([$finder->find(false)], $finder->findArguments(), ['-dopcache.enable=0', '-dvariables_order=EGPCS', '-S', 'localhost:8057']));
+        $process = new Process(array_merge([$finder->find(false)], $finder->findArguments(), ['-dopcache.enable=0', '-dvariables_order=EGPCS', '-S', 'localhost:8856']));
         $process->setWorkingDirectory(__DIR__.'/../Fixtures/web');
         $process->start();
 
         try {
             do {
                 usleep(50000);
-            } while (!@fopen('http://localhost:8057', 'r'));
-            $p = DataPart::fromPath($file = 'http://localhost:8057/logo_symfony_header.png');
+            } while (!@fopen('http://localhost:8856', 'r'));
+            $p = DataPart::fromPath($file = 'http://localhost:8856/logo_symfony_header.png');
             $content = file_get_contents($file);
             $this->assertEquals($content, $p->getBody());
             $maxLineLength = 76;
@@ -175,6 +175,40 @@ class DataPartTest extends TestCase
         $this->assertFalse($p->hasContentId());
         $p->getContentId();
         $this->assertTrue($p->hasContentId());
+    }
+
+    public function testSetContentId()
+    {
+        $p = new DataPart('content');
+        $p->setContentId('test@test');
+        $this->assertTrue($p->hasContentId());
+        $this->assertSame('test@test', $p->getContentId());
+    }
+
+    public function testSetContentIdInvalid()
+    {
+        $this->expectException(InvalidArgumentException::class);
+
+        $p = new DataPart('content');
+        $p->setContentId('test');
+    }
+
+    public function testGetFilename()
+    {
+        $p = new DataPart('content', null);
+        self::assertNull($p->getFilename());
+
+        $p = new DataPart('content', 'filename');
+        self::assertSame('filename', $p->getFilename());
+    }
+
+    public function testGetContentType()
+    {
+        $p = new DataPart('content');
+        self::assertSame('application/octet-stream', $p->getContentType());
+
+        $p = new DataPart('content', null, 'application/pdf');
+        self::assertSame('application/pdf', $p->getContentType());
     }
 
     public function testSerialize()

@@ -18,11 +18,12 @@ use Symfony\Component\DependencyInjection\Attribute\Autoconfigure;
         ['another_tag' => ['attr' => 234]],
     ],
     calls: [
-        ['setBar' => [2, 3]]
+        ['setBar' => [2, 3]],
     ],
     bind: [
         '$bar' => 1,
     ],
+    constructor: 'create'
 )]
 class AutoconfigureAttributed
 {

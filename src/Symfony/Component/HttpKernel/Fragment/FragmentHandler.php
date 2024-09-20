@@ -29,27 +29,27 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
  */
 class FragmentHandler
 {
-    private $debug;
-    private $renderers = [];
-    private $requestStack;
+    /** @var array<string, FragmentRendererInterface> */
+    private array $renderers = [];
 
     /**
      * @param FragmentRendererInterface[] $renderers An array of FragmentRendererInterface instances
      * @param bool                        $debug     Whether the debug mode is enabled or not
      */
-    public function __construct(RequestStack $requestStack, array $renderers = [], bool $debug = false)
-    {
-        $this->requestStack = $requestStack;
+    public function __construct(
+        private RequestStack $requestStack,
+        array $renderers = [],
+        private bool $debug = false,
+    ) {
         foreach ($renderers as $renderer) {
             $this->addRenderer($renderer);
         }
-        $this->debug = $debug;
     }
 
     /**
      * Adds a renderer.
      */
-    public function addRenderer(FragmentRendererInterface $renderer)
+    public function addRenderer(FragmentRendererInterface $renderer): void
     {
         $this->renderers[$renderer->getName()] = $renderer;
     }
@@ -61,21 +61,17 @@ class FragmentHandler
      *
      *  * ignore_errors: true to return an empty string in case of an error
      *
-     * @param string|ControllerReference $uri A URI as a string or a ControllerReference instance
-     *
-     * @return string|null
-     *
      * @throws \InvalidArgumentException when the renderer does not exist
      * @throws \LogicException           when no main request is being handled
      */
-    public function render($uri, string $renderer = 'inline', array $options = [])
+    public function render(string|ControllerReference $uri, string $renderer = 'inline', array $options = []): ?string
     {
         if (!isset($options['ignore_errors'])) {
             $options['ignore_errors'] = !$this->debug;
         }
 
         if (!isset($this->renderers[$renderer])) {
-            throw new \InvalidArgumentException(sprintf('The "%s" renderer does not exist.', $renderer));
+            throw new \InvalidArgumentException(\sprintf('The "%s" renderer does not exist.', $renderer));
         }
 
         if (!$request = $this->requestStack->getCurrentRequest()) {
@@ -95,11 +91,11 @@ class FragmentHandler
      *
      * @throws \RuntimeException when the Response is not successful
      */
-    protected function deliver(Response $response)
+    protected function deliver(Response $response): ?string
     {
         if (!$response->isSuccessful()) {
             $responseStatusCode = $response->getStatusCode();
-            throw new \RuntimeException(sprintf('Error when rendering "%s" (Status code is %d).', $this->requestStack->getCurrentRequest()->getUri(), $responseStatusCode), 0, new HttpException($responseStatusCode));
+            throw new \RuntimeException(\sprintf('Error when rendering "%s" (Status code is %d).', $this->requestStack->getCurrentRequest()->getUri(), $responseStatusCode), 0, new HttpException($responseStatusCode));
         }
 
         if (!$response instanceof StreamedResponse) {

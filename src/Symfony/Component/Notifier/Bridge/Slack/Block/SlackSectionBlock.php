@@ -24,29 +24,45 @@ final class SlackSectionBlock extends AbstractSlackBlock
     /**
      * @return $this
      */
-    public function text(string $text, bool $markdown = true): self
+    public function text(string $text, bool $markdown = true, bool $emoji = true, bool $verbatim = false): static
     {
         $this->options['text'] = [
             'type' => $markdown ? 'mrkdwn' : 'plain_text',
             'text' => $text,
         ];
 
+        // verbatim is only available for markdown
+        if ($markdown) {
+            $this->options['text']['verbatim'] = $verbatim;
+        } else {
+            $this->options['text']['emoji'] = $emoji;
+        }
+
         return $this;
     }
 
     /**
      * @return $this
      */
-    public function field(string $text, bool $markdown = true): self
+    public function field(string $text, bool $markdown = true, bool $emoji = true, bool $verbatim = false): static
     {
         if (10 === \count($this->options['fields'] ?? [])) {
             throw new \LogicException('Maximum number of fields should not exceed 10.');
         }
 
-        $this->options['fields'][] = [
+        $field = [
             'type' => $markdown ? 'mrkdwn' : 'plain_text',
             'text' => $text,
         ];
+
+        // verbatim is only available for markdown
+        if ($markdown) {
+            $field['verbatim'] = $verbatim;
+        } else {
+            $field['emoji'] = $emoji;
+        }
+
+        $this->options['fields'][] = $field;
 
         return $this;
     }
@@ -54,7 +70,7 @@ final class SlackSectionBlock extends AbstractSlackBlock
     /**
      * @return $this
      */
-    public function accessory(SlackBlockElementInterface $element): self
+    public function accessory(SlackBlockElementInterface $element): static
     {
         $this->options['accessory'] = $element->toArray();
 

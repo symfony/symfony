@@ -21,7 +21,7 @@ use Symfony\Component\Validator\Exception\UnexpectedValueException;
  */
 class DivisibleByValidatorTest extends AbstractComparisonValidatorTestCase
 {
-    protected function createValidator()
+    protected function createValidator(): DivisibleByValidator
     {
         return new DivisibleByValidator();
     }
@@ -36,9 +36,6 @@ class DivisibleByValidatorTest extends AbstractComparisonValidatorTestCase
         return DivisibleBy::NOT_DIVISIBLE_BY;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public static function provideValidComparisons(): array
     {
         return [
@@ -65,9 +62,6 @@ class DivisibleByValidatorTest extends AbstractComparisonValidatorTestCase
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public static function provideValidComparisonsToPropertyPath(): array
     {
         return [
@@ -75,9 +69,6 @@ class DivisibleByValidatorTest extends AbstractComparisonValidatorTestCase
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public static function provideInvalidComparisons(): array
     {
         return [
@@ -97,7 +88,7 @@ class DivisibleByValidatorTest extends AbstractComparisonValidatorTestCase
     public function testThrowsOnNonNumericValues(string $expectedGivenType, $value, $comparedValue)
     {
         $this->expectException(UnexpectedValueException::class);
-        $this->expectExceptionMessage(sprintf('Expected argument of type "numeric", "%s" given', $expectedGivenType));
+        $this->expectExceptionMessage(\sprintf('Expected argument of type "numeric", "%s" given', $expectedGivenType));
 
         $this->validator->validate($value, $this->createConstraint([
             'value' => $comparedValue,

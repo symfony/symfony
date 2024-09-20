@@ -39,7 +39,7 @@ class DoctrineTransactionMiddleware extends AbstractDoctrineMiddleware
             if ($exception instanceof HandlerFailedException) {
                 // Remove all HandledStamp from the envelope so the retry will execute all handlers again.
                 // When a handler fails, the queries of allegedly successful previous handlers just got rolled back.
-                throw new HandlerFailedException($exception->getEnvelope()->withoutAll(HandledStamp::class), $exception->getNestedExceptions());
+                throw new HandlerFailedException($exception->getEnvelope()->withoutAll(HandledStamp::class), $exception->getWrappedExceptions());
             }
 
             throw $exception;

@@ -18,6 +18,7 @@ use Symfony\Component\Validator\Constraints\NotNull;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 use Symfony\Component\Validator\Exception\UnexpectedValueException;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
+use Symfony\Component\Validator\Tests\Constraints\Fixtures\StringableValue;
 
 class CidrValidatorTest extends ConstraintValidatorTestCase
 {
@@ -83,7 +84,7 @@ class CidrValidatorTest extends ConstraintValidatorTestCase
     /**
      * @dataProvider getValid
      */
-    public function testValidCidr(string $cidr, string $version)
+    public function testValidCidr(string|\Stringable $cidr, string $version)
     {
         $this->validator->validate($cidr, new Cidr(['version' => $version]));
 
@@ -93,7 +94,7 @@ class CidrValidatorTest extends ConstraintValidatorTestCase
     /**
      * @dataProvider getWithInvalidMasksAndIps
      */
-    public function testInvalidIpAddressAndNetmask(string $cidr)
+    public function testInvalidIpAddressAndNetmask(string|\Stringable $cidr)
     {
         $this->validator->validate($cidr, new Cidr());
         $this
@@ -195,6 +196,7 @@ class CidrValidatorTest extends ConstraintValidatorTestCase
             ['::255.255.255.255/32', Ip::V6],
             ['::123.45.67.178/120', Ip::V6],
             ['::123.45.67.178/120', Ip::ALL],
+            [new StringableValue('::123.45.67.178/120'), Ip::ALL],
         ];
     }
 
@@ -203,7 +205,6 @@ class CidrValidatorTest extends ConstraintValidatorTestCase
         return [
             ['192.168.1.0/-1'],
             ['0.0.0.0/foobar'],
-            ['10.0.0.0/128'],
             ['123.45.67.178/aaa'],
             ['172.16.0.0//'],
             ['255.255.255.255/1/4'],
@@ -221,7 +222,6 @@ class CidrValidatorTest extends ConstraintValidatorTestCase
     {
         return [
             ['0.0.0.0/foobar'],
-            ['10.0.0.0/128'],
             ['123.45.67.178/aaa'],
             ['172.16.0.0//'],
             ['172.16.0.0/a/'],
@@ -233,6 +233,7 @@ class CidrValidatorTest extends ConstraintValidatorTestCase
             ['::0.0.0/a/'],
             ['::256.0.0.0/-1aa'],
             ['::0.256.0.0/1b'],
+            [new StringableValue('::0.256.0.0/1b')],
         ];
     }
 
@@ -240,6 +241,7 @@ class CidrValidatorTest extends ConstraintValidatorTestCase
     {
         return [
             ['10.0.0.0/24', Ip::V4, 10, 20],
+            ['10.0.0.0/128'],
             ['2001:0DB8:85A3:0000:0000:8A2E:0370:7334/24', Ip::V6, 10, 20],
         ];
     }
@@ -252,5 +254,18 @@ class CidrValidatorTest extends ConstraintValidatorTestCase
             ['10.0.0.0/24', Ip::V6],
             ['2001:0db8:85a3:0000:0000:8a2e:0370:7334/13', Ip::V4],
         ];
+    }
+
+    public function testDoesNotModifyContextBetweenValidations()
+    {
+        $constraint = new Cidr();
+
+        $this->validator->validate('1.2.3.4/28', $constraint);
+
+        $this->assertNoViolation();
+
+        $this->validator->validate('::1/64', $constraint);
+
+        $this->assertNoViolation();
     }
 }

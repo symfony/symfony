@@ -26,7 +26,12 @@ use Symfony\Component\Security\Http\EventListener\CheckRememberMeConditionsListe
  */
 class RememberMeBadge implements BadgeInterface
 {
-    private $enabled = false;
+    private bool $enabled = false;
+
+    public function __construct(
+        public readonly array $parameters = [],
+    ) {
+    }
 
     /**
      * Enables remember-me cookie creation.
@@ -37,7 +42,7 @@ class RememberMeBadge implements BadgeInterface
      *
      * @return $this
      */
-    public function enable(): self
+    public function enable(): static
     {
         $this->enabled = true;
 
@@ -52,7 +57,7 @@ class RememberMeBadge implements BadgeInterface
      *
      * @return $this
      */
-    public function disable(): self
+    public function disable(): static
     {
         $this->enabled = false;
 

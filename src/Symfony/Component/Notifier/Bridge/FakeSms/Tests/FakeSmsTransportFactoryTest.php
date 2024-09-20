@@ -14,15 +14,47 @@ namespace Symfony\Component\Notifier\Bridge\FakeSms\Tests;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Notifier\Bridge\FakeSms\FakeSmsTransportFactory;
+use Symfony\Component\Notifier\Exception\LogicException;
 use Symfony\Component\Notifier\Test\TransportFactoryTestCase;
-use Symfony\Component\Notifier\Transport\TransportFactoryInterface;
+use Symfony\Component\Notifier\Transport\Dsn;
 
 final class FakeSmsTransportFactoryTest extends TransportFactoryTestCase
 {
-    /**
-     * @return FakeSmsTransportFactory
-     */
-    public function createFactory(): TransportFactoryInterface
+    public function testMissingRequiredMailerDependency()
+    {
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('Cannot create a transport for scheme "fakesms+email" without providing an implementation of "Symfony\Component\Mailer\MailerInterface".');
+
+        $factory = new FakeSmsTransportFactory(null, $this->createStub(LoggerInterface::class));
+        $factory->create(new Dsn('fakesms+email://default?to=recipient@email.net&from=sender@email.net'));
+    }
+
+    public function testMissingRequiredDependency()
+    {
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('Cannot create a transport for scheme "fakesms+logger" without providing an implementation of "Psr\Log\LoggerInterface".');
+
+        $factory = new FakeSmsTransportFactory($this->createStub(MailerInterface::class));
+        $factory->create(new Dsn('fakesms+logger://default'));
+    }
+
+    public function testMissingOptionalLoggerDependency()
+    {
+        $factory = new FakeSmsTransportFactory($this->createStub(MailerInterface::class));
+        $transport = $factory->create(new Dsn('fakesms+email://default?to=recipient@email.net&from=sender@email.net'));
+
+        $this->assertSame('fakesms+email://default?to=recipient@email.net&from=sender@email.net', (string) $transport);
+    }
+
+    public function testMissingOptionalMailerDependency()
+    {
+        $factory = new FakeSmsTransportFactory(null, $this->createStub(LoggerInterface::class));
+        $transport = $factory->create(new Dsn('fakesms+logger://default'));
+
+        $this->assertSame('fakesms+logger://default', (string) $transport);
+    }
+
+    public function createFactory(): FakeSmsTransportFactory
     {
         return new FakeSmsTransportFactory($this->createMock(MailerInterface::class), $this->createMock(LoggerInterface::class));
     }

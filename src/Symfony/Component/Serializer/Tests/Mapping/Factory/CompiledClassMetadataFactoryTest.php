@@ -16,7 +16,7 @@ use Symfony\Component\Serializer\Mapping\AttributeMetadata;
 use Symfony\Component\Serializer\Mapping\ClassMetadata;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
 use Symfony\Component\Serializer\Mapping\Factory\CompiledClassMetadataFactory;
-use Symfony\Component\Serializer\Tests\Fixtures\Annotations\SerializedNameDummy;
+use Symfony\Component\Serializer\Tests\Fixtures\Attributes\SerializedNameDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\Dummy;
 
 /**
@@ -34,19 +34,21 @@ final class CompiledClassMetadataFactoryTest extends TestCase
 
     public function testItThrowAnExceptionWhenCacheFileIsNotFound()
     {
+        $classMetadataFactory = $this->createMock(ClassMetadataFactoryInterface::class);
+
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessageMatches('#File ".*/Fixtures/not-found-serializer.class.metadata.php" could not be found.#');
 
-        $classMetadataFactory = $this->createMock(ClassMetadataFactoryInterface::class);
         new CompiledClassMetadataFactory(__DIR__.'/../../Fixtures/not-found-serializer.class.metadata.php', $classMetadataFactory);
     }
 
     public function testItThrowAnExceptionWhenMetadataIsNotOfTypeArray()
     {
+        $classMetadataFactory = $this->createMock(ClassMetadataFactoryInterface::class);
+
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('Compiled metadata must be of the type array, object given.');
 
-        $classMetadataFactory = $this->createMock(ClassMetadataFactoryInterface::class);
         new CompiledClassMetadataFactory(__DIR__.'/../../Fixtures/object-metadata.php', $classMetadataFactory);
     }
 

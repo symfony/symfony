@@ -24,11 +24,11 @@ use Symfony\Component\Security\Http\Authentication\AuthenticationSuccessHandlerI
 /**
  * @internal
  */
-class LoginLinkFactory extends AbstractFactory implements AuthenticatorFactoryInterface
+class LoginLinkFactory extends AbstractFactory
 {
     public const PRIORITY = -20;
 
-    public function addConfiguration(NodeDefinition $node)
+    public function addConfiguration(NodeDefinition $node): void
     {
         /** @var NodeBuilder $builder */
         $builder = $node->fixXmlConfig('signature_property', 'signature_properties')->children();
@@ -61,13 +61,17 @@ class LoginLinkFactory extends AbstractFactory implements AuthenticatorFactoryIn
                 ->info('Cache service id used to expired links of max_uses is set.')
             ->end()
             ->scalarNode('success_handler')
-                ->info(sprintf('A service id that implements %s.', AuthenticationSuccessHandlerInterface::class))
+                ->info(\sprintf('A service id that implements %s.', AuthenticationSuccessHandlerInterface::class))
             ->end()
             ->scalarNode('failure_handler')
-                ->info(sprintf('A service id that implements %s.', AuthenticationFailureHandlerInterface::class))
+                ->info(\sprintf('A service id that implements %s.', AuthenticationFailureHandlerInterface::class))
             ->end()
             ->scalarNode('provider')
                 ->info('The user provider to load users from.')
+            ->end()
+            ->scalarNode('secret')
+                ->cannotBeEmpty()
+                ->defaultValue('%kernel.secret%')
             ->end()
         ;
 
@@ -113,6 +117,7 @@ class LoginLinkFactory extends AbstractFactory implements AuthenticatorFactoryIn
         $container
             ->setDefinition($signatureHasherId, new ChildDefinition('security.authenticator.abstract_login_link_signature_hasher'))
             ->replaceArgument(1, $config['signature_properties'])
+            ->replaceArgument(2, $config['secret'])
             ->replaceArgument(3, $expiredStorageId ? new Reference($expiredStorageId) : null)
             ->replaceArgument(4, $config['max_uses'] ?? null)
         ;
@@ -147,30 +152,5 @@ class LoginLinkFactory extends AbstractFactory implements AuthenticatorFactoryIn
     public function getPriority(): int
     {
         return self::PRIORITY;
-    }
-
-    public function getPosition(): string
-    {
-        return 'form';
-    }
-
-    protected function createAuthProvider(ContainerBuilder $container, string $id, array $config, string $userProviderId): string
-    {
-        throw new \Exception('The old authentication system is not supported with login_link.');
-    }
-
-    protected function getListenerId(): string
-    {
-        throw new \Exception('The old authentication system is not supported with login_link.');
-    }
-
-    protected function createListener(ContainerBuilder $container, string $id, array $config, string $userProvider)
-    {
-        throw new \Exception('The old authentication system is not supported with login_link.');
-    }
-
-    protected function createEntryPoint(ContainerBuilder $container, string $id, array $config, ?string $defaultEntryPointId): ?string
-    {
-        throw new \Exception('The old authentication system is not supported with login_link.');
     }
 }

@@ -4,21 +4,24 @@ use Symfony\Bundle\FrameworkBundle\Tests\Fixtures\Messenger\BarMessage;
 use Symfony\Bundle\FrameworkBundle\Tests\Fixtures\Messenger\FooMessage;
 
 $container->loadFromExtension('framework', [
+    'annotations' => false,
+    'http_method_override' => false,
+    'handle_all_throwables' => true,
+    'php_errors' => ['log' => true],
     'mailer' => [
         'enabled' => false,
     ],
     'messenger' => [
         'enabled' => true,
-        'reset_on_message' =>  true,
     ],
     'notifier' => [
         'enabled' => true,
         'notification_on_failed_messages' => true,
         'chatter_transports' => [
-            'slack' => 'null'
+            'slack' => 'null',
         ],
         'texter_transports' => [
-            'twilio' => 'null'
+            'twilio' => 'null',
         ],
         'channel_policy' => [
             'low' => ['slack'],
@@ -26,6 +29,6 @@ $container->loadFromExtension('framework', [
         ],
         'admin_recipients' => [
             ['email' => 'test@test.de', 'phone' => '+490815',],
-        ]
+        ],
     ],
 ]);

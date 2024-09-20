@@ -20,7 +20,7 @@ use Symfony\Component\VarDumper\Cloner\Stub;
  */
 class ArgsStub extends EnumStub
 {
-    private static $parameters = [];
+    private static array $parameters = [];
 
     public function __construct(array $args, string $function, ?string $class)
     {
@@ -42,10 +42,9 @@ class ArgsStub extends EnumStub
             $params[] = $variadic;
         }
         if (['...'] === $params) {
-            $this->dumpKeys = false;
-            $this->value = $values[0]->value;
+            parent::__construct($values[0]->value, false);
         } else {
-            $this->value = array_combine($params, $values);
+            parent::__construct(array_combine($params, $values));
         }
     }
 
@@ -57,7 +56,7 @@ class ArgsStub extends EnumStub
 
         try {
             $r = null !== $class ? new \ReflectionMethod($class, $function) : new \ReflectionFunction($function);
-        } catch (\ReflectionException $e) {
+        } catch (\ReflectionException) {
             return [null, null];
         }
 

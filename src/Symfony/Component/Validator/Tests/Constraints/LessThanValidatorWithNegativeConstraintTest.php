@@ -12,7 +12,6 @@
 namespace Symfony\Component\Validator\Tests\Constraints;
 
 use Symfony\Component\Validator\Constraint;
-use Symfony\Component\Validator\Constraints\AbstractComparison;
 use Symfony\Component\Validator\Constraints\Negative;
 use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 
@@ -23,12 +22,9 @@ class LessThanValidatorWithNegativeConstraintTest extends LessThanValidatorTest
 {
     protected static function createConstraint(?array $options = null): Constraint
     {
-        return new Negative();
+        return new Negative($options);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public static function provideValidComparisons(): array
     {
         return [
@@ -39,9 +35,6 @@ class LessThanValidatorWithNegativeConstraintTest extends LessThanValidatorTest
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public static function provideInvalidComparisons(): array
     {
         return [
@@ -73,15 +66,11 @@ class LessThanValidatorWithNegativeConstraintTest extends LessThanValidatorTest
      */
     public function testThrowsConstraintExceptionIfNoValueOrPropertyPath($options)
     {
-        $this->expectException(ConstraintDefinitionException::class);
-        $this->expectExceptionMessage('requires either the "value" or "propertyPath" option to be set.');
         $this->markTestSkipped('Value option always set for Negative constraint');
     }
 
     public function testThrowsConstraintExceptionIfBothValueAndPropertyPath()
     {
-        $this->expectException(ConstraintDefinitionException::class);
-        $this->expectExceptionMessage('requires only one of the "value" or "propertyPath" options to be set, not both.');
         $this->markTestSkipped('Value option is set for Negative constraint automatically');
     }
 
@@ -95,6 +84,11 @@ class LessThanValidatorWithNegativeConstraintTest extends LessThanValidatorTest
         $this->markTestSkipped('PropertyPath option is not used in Negative constraint');
     }
 
+    public static function provideAllValidComparisons(): array
+    {
+        self::markTestSkipped('The "value" option cannot be used in the Negative constraint');
+    }
+
     /**
      * @dataProvider provideValidComparisonsToPropertyPath
      */
@@ -103,12 +97,9 @@ class LessThanValidatorWithNegativeConstraintTest extends LessThanValidatorTest
         $this->markTestSkipped('PropertyPath option is not used in Negative constraint');
     }
 
-    /**
-     * @dataProvider throwsOnInvalidStringDatesProvider
-     */
-    public function testThrowsOnInvalidStringDates(AbstractComparison $constraint, $expectedMessage, $value)
+    public static function throwsOnInvalidStringDatesProvider(): array
     {
-        $this->markTestSkipped('The compared value cannot be an invalid string date because it is hardcoded to 0.');
+        self::markTestSkipped('The "value" option cannot be used in the Negative constraint');
     }
 
     /**
@@ -119,8 +110,21 @@ class LessThanValidatorWithNegativeConstraintTest extends LessThanValidatorTest
         $this->markTestSkipped('PropertyPath option is not used in Negative constraint');
     }
 
+    /**
+     * @dataProvider provideComparisonsToNullValueAtPropertyPath
+     */
+    public function testCompareWithUninitializedPropertyAtPropertyPath($dirtyValue, $dirtyValueAsString, $isValid)
+    {
+        $this->markTestSkipped('PropertyPath option is not used in Negative constraint');
+    }
+
     public function testInvalidComparisonToPropertyPathAddsPathAsParameter()
     {
         $this->markTestSkipped('PropertyPath option is not used in Negative constraint');
+    }
+
+    public static function provideAllInvalidComparisons(): array
+    {
+        self::markTestSkipped('The "value" option cannot be used in the Negative constraint');
     }
 }

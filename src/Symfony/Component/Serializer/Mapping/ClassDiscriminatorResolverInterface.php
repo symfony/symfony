@@ -20,13 +20,7 @@ interface ClassDiscriminatorResolverInterface
 {
     public function getMappingForClass(string $class): ?ClassDiscriminatorMapping;
 
-    /**
-     * @param object|string $object
-     */
-    public function getMappingForMappedObject($object): ?ClassDiscriminatorMapping;
+    public function getMappingForMappedObject(object|string $object): ?ClassDiscriminatorMapping;
 
-    /**
-     * @param object|string $object
-     */
-    public function getTypeForMappedObject($object): ?string;
+    public function getTypeForMappedObject(object|string $object): ?string;
 }

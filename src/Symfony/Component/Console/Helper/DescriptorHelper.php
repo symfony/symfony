@@ -14,6 +14,7 @@ namespace Symfony\Component\Console\Helper;
 use Symfony\Component\Console\Descriptor\DescriptorInterface;
 use Symfony\Component\Console\Descriptor\JsonDescriptor;
 use Symfony\Component\Console\Descriptor\MarkdownDescriptor;
+use Symfony\Component\Console\Descriptor\ReStructuredTextDescriptor;
 use Symfony\Component\Console\Descriptor\TextDescriptor;
 use Symfony\Component\Console\Descriptor\XmlDescriptor;
 use Symfony\Component\Console\Exception\InvalidArgumentException;
@@ -29,7 +30,7 @@ class DescriptorHelper extends Helper
     /**
      * @var DescriptorInterface[]
      */
-    private $descriptors = [];
+    private array $descriptors = [];
 
     public function __construct()
     {
@@ -38,6 +39,7 @@ class DescriptorHelper extends Helper
             ->register('xml', new XmlDescriptor())
             ->register('json', new JsonDescriptor())
             ->register('md', new MarkdownDescriptor())
+            ->register('rst', new ReStructuredTextDescriptor())
         ;
     }
 
@@ -50,7 +52,7 @@ class DescriptorHelper extends Helper
      *
      * @throws InvalidArgumentException when the given format is not supported
      */
-    public function describe(OutputInterface $output, ?object $object, array $options = [])
+    public function describe(OutputInterface $output, ?object $object, array $options = []): void
     {
         $options = array_merge([
             'raw_text' => false,
@@ -58,7 +60,7 @@ class DescriptorHelper extends Helper
         ], $options);
 
         if (!isset($this->descriptors[$options['format']])) {
-            throw new InvalidArgumentException(sprintf('Unsupported format "%s".', $options['format']));
+            throw new InvalidArgumentException(\sprintf('Unsupported format "%s".', $options['format']));
         }
 
         $descriptor = $this->descriptors[$options['format']];
@@ -70,17 +72,14 @@ class DescriptorHelper extends Helper
      *
      * @return $this
      */
-    public function register(string $format, DescriptorInterface $descriptor)
+    public function register(string $format, DescriptorInterface $descriptor): static
     {
         $this->descriptors[$format] = $descriptor;
 
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getName()
+    public function getName(): string
     {
         return 'descriptor';
     }

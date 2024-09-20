@@ -6,5 +6,7 @@
 - Abstract: yes
 - Autowired: no
 - Autoconfigured: no
+- Deprecated: no
 - Factory Class: `Full\Qualified\FactoryClass`
 - Factory Method: `get`
+- Usages: none

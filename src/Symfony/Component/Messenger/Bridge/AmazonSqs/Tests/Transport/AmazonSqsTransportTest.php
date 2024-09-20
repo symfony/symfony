@@ -30,30 +30,14 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
 
 class AmazonSqsTransportTest extends TestCase
 {
-    /**
-     * @var MockObject|Connection
-     */
-    private $connection;
-
-    /**
-     * @var MockObject|ReceiverInterface
-     */
-    private $receiver;
-
-    /**
-     * @var MockObject|SenderInterface|MessageCountAwareInterface
-     */
-    private $sender;
-
-    /**
-     * @var AmazonSqsTransport
-     */
-    private $transport;
+    private MockObject&Connection $connection;
+    private MockObject&ReceiverInterface $receiver;
+    private MockObject&SenderInterface $sender;
+    private AmazonSqsTransport $transport;
 
     protected function setUp(): void
     {
         $this->connection = $this->createMock(Connection::class);
-        // Mocking the concrete receiver class because mocking multiple interfaces is deprecated
         $this->receiver = $this->createMock(AmazonSqsReceiver::class);
         $this->sender = $this->createMock(SenderInterface::class);
 
@@ -169,8 +153,8 @@ class AmazonSqsTransportTest extends TestCase
 
     private function getTransport(?SerializerInterface $serializer = null, ?Connection $connection = null)
     {
-        $serializer = $serializer ?? $this->createMock(SerializerInterface::class);
-        $connection = $connection ?? $this->createMock(Connection::class);
+        $serializer ??= $this->createMock(SerializerInterface::class);
+        $connection ??= $this->createMock(Connection::class);
 
         return new AmazonSqsTransport($connection, $serializer);
     }

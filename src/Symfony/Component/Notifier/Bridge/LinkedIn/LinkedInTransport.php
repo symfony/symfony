@@ -30,24 +30,20 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
  */
 final class LinkedInTransport extends AbstractTransport
 {
-    protected const PROTOCOL_VERSION = '2.0.0';
-    protected const PROTOCOL_HEADER = 'X-Restli-Protocol-Version';
     protected const HOST = 'api.linkedin.com';
 
-    private $authToken;
-    private $accountId;
-
-    public function __construct(string $authToken, string $accountId, ?HttpClientInterface $client = null, ?EventDispatcherInterface $dispatcher = null)
-    {
-        $this->authToken = $authToken;
-        $this->accountId = $accountId;
-
+    public function __construct(
+        #[\SensitiveParameter] private string $authToken,
+        private string $accountId,
+        ?HttpClientInterface $client = null,
+        ?EventDispatcherInterface $dispatcher = null,
+    ) {
         parent::__construct($client, $dispatcher);
     }
 
     public function __toString(): string
     {
-        return sprintf('linkedin://%s', $this->getEndpoint());
+        return \sprintf('linkedin://%s', $this->getEndpoint());
     }
 
     public function supports(MessageInterface $message): bool
@@ -64,21 +60,21 @@ final class LinkedInTransport extends AbstractTransport
             throw new UnsupportedMessageTypeException(__CLASS__, ChatMessage::class, $message);
         }
 
-        if ($message->getOptions() && !$message->getOptions() instanceof LinkedInOptions) {
-            throw new LogicException(sprintf('The "%s" transport only supports instances of "%s" for options.', __CLASS__, LinkedInOptions::class));
+        if (($options = $message->getOptions()) && !$options instanceof LinkedInOptions) {
+            throw new LogicException(\sprintf('The "%s" transport only supports instances of "%s" for options.', __CLASS__, LinkedInOptions::class));
         }
 
-        if (!($opts = $message->getOptions()) && $notification = $message->getNotification()) {
-            $opts = LinkedInOptions::fromNotification($notification);
-            $opts->author(new AuthorShare($this->accountId));
+        if (!$options && $notification = $message->getNotification()) {
+            $options = LinkedInOptions::fromNotification($notification);
+            $options->author(new AuthorShare($this->accountId));
         }
 
-        $endpoint = sprintf('https://%s/v2/ugcPosts', $this->getEndpoint());
+        $endpoint = \sprintf('https://%s/v2/ugcPosts', $this->getEndpoint());
 
         $response = $this->client->request('POST', $endpoint, [
             'auth_bearer' => $this->authToken,
-            'headers' => [self::PROTOCOL_HEADER => self::PROTOCOL_VERSION],
-            'json' => array_filter($opts ? $opts->toArray() : $this->bodyFromMessageWithNoOption($message)),
+            'headers' => ['X-Restli-Protocol-Version' => '2.0.0'],
+            'json' => array_filter($options?->toArray() ?? $this->bodyFromMessageWithNoOption($message)),
         ]);
 
         try {
@@ -88,13 +84,13 @@ final class LinkedInTransport extends AbstractTransport
         }
 
         if (201 !== $statusCode) {
-            throw new TransportException(sprintf('Unable to post the Linkedin message: "%s".', $response->getContent(false)), $response);
+            throw new TransportException(\sprintf('Unable to post the Linkedin message: "%s".', $response->getContent(false)), $response);
         }
 
         $result = $response->toArray(false);
 
         if (!$result['id']) {
-            throw new TransportException(sprintf('Unable to post the Linkedin message: "%s".', $result['error']), $response);
+            throw new TransportException(\sprintf('Unable to post the Linkedin message: "%s".', $result['error']), $response);
         }
 
         $sentMessage = new SentMessage($message, (string) $this);
@@ -119,7 +115,7 @@ final class LinkedInTransport extends AbstractTransport
                 'com.linkedin.ugc.MemberNetworkVisibility' => 'PUBLIC',
             ],
             'lifecycleState' => 'PUBLISHED',
-            'author' => sprintf('urn:li:person:%s', $this->accountId),
+            'author' => \sprintf('urn:li:person:%s', $this->accountId),
         ];
     }
 }

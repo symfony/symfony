@@ -23,18 +23,18 @@ namespace Symfony\Component\CssSelector\Parser\Tokenizer;
  */
 class TokenizerPatterns
 {
-    private $unicodeEscapePattern;
-    private $simpleEscapePattern;
-    private $newLineEscapePattern;
-    private $escapePattern;
-    private $stringEscapePattern;
-    private $nonAsciiPattern;
-    private $nmCharPattern;
-    private $nmStartPattern;
-    private $identifierPattern;
-    private $hashPattern;
-    private $numberPattern;
-    private $quotedStringPattern;
+    private string $unicodeEscapePattern;
+    private string $simpleEscapePattern;
+    private string $newLineEscapePattern;
+    private string $escapePattern;
+    private string $stringEscapePattern;
+    private string $nonAsciiPattern;
+    private string $nmCharPattern;
+    private string $nmStartPattern;
+    private string $identifierPattern;
+    private string $hashPattern;
+    private string $numberPattern;
+    private string $quotedStringPattern;
 
     public function __construct()
     {
@@ -84,6 +84,6 @@ class TokenizerPatterns
 
     public function getQuotedStringPattern(string $quote): string
     {
-        return '~^'.sprintf($this->quotedStringPattern, $quote).'~i';
+        return '~^'.\sprintf($this->quotedStringPattern, $quote).'~i';
     }
 }

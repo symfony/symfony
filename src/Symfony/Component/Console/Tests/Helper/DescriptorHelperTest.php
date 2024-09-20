@@ -24,6 +24,7 @@ class DescriptorHelperTest extends TestCase
             'xml',
             'json',
             'md',
+            'rst',
         ];
         $this->assertSame($expectedFormats, $helper->getFormats());
     }

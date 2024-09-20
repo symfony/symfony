@@ -20,11 +20,9 @@ use Symfony\Component\Notifier\Message\MessageOptionsInterface;
  */
 final class DiscordOptions implements MessageOptionsInterface
 {
-    private $options = [];
-
-    public function __construct(array $options = [])
-    {
-        $this->options = $options;
+    public function __construct(
+        private array $options = [],
+    ) {
     }
 
     public function toArray(): array
@@ -40,7 +38,7 @@ final class DiscordOptions implements MessageOptionsInterface
     /**
      * @return $this
      */
-    public function username(string $username): self
+    public function username(string $username): static
     {
         $this->options['username'] = $username;
 
@@ -50,7 +48,7 @@ final class DiscordOptions implements MessageOptionsInterface
     /**
      * @return $this
      */
-    public function avatarUrl(string $avatarUrl): self
+    public function avatarUrl(string $avatarUrl): static
     {
         $this->options['avatar_url'] = $avatarUrl;
 
@@ -60,7 +58,7 @@ final class DiscordOptions implements MessageOptionsInterface
     /**
      * @return $this
      */
-    public function tts(bool $tts): self
+    public function tts(bool $tts): static
     {
         $this->options['tts'] = $tts;
 
@@ -70,14 +68,14 @@ final class DiscordOptions implements MessageOptionsInterface
     /**
      * @return $this
      */
-    public function addEmbed(DiscordEmbedInterface $embed): self
+    public function addEmbed(DiscordEmbedInterface $embed): static
     {
         if (!isset($this->options['embeds'])) {
             $this->options['embeds'] = [];
         }
 
         if (\count($this->options['embeds']) >= 10) {
-            throw new LogicException(sprintf('The "%s" only supports max 10 embeds.', __CLASS__));
+            throw new LogicException(\sprintf('The "%s" only supports max 10 embeds.', __CLASS__));
         }
 
         $this->options['embeds'][] = $embed->toArray();

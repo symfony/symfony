@@ -20,30 +20,16 @@ use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
 
 class NotTaggedControllerValueResolverTest extends TestCase
 {
-    public function testDoSupportWhenControllerDoNotExists()
-    {
-        $resolver = new NotTaggedControllerValueResolver(new ServiceLocator([]));
-        $argument = new ArgumentMetadata('dummy', \stdClass::class, false, false, null);
-        $request = $this->requestWithAttributes(['_controller' => 'my_controller']);
-
-        $this->assertTrue($resolver->supports($request, $argument));
-    }
-
     public function testDoNotSupportWhenControllerExists()
     {
         $resolver = new NotTaggedControllerValueResolver(new ServiceLocator([
-            'App\\Controller\\Mine::method' => function () {
-                return new ServiceLocator([
-                    'dummy' => function () {
-                        return new \stdClass();
-                    },
-                ]);
-            },
+            'App\\Controller\\Mine::method' => fn () => new ServiceLocator([
+                'dummy' => fn () => new \stdClass(),
+            ]),
         ]));
         $argument = new ArgumentMetadata('dummy', \stdClass::class, false, false, null);
         $request = $this->requestWithAttributes(['_controller' => 'App\\Controller\\Mine::method']);
-
-        $this->assertFalse($resolver->supports($request, $argument));
+        $this->assertSame([], $resolver->resolve($request, $argument));
     }
 
     public function testDoNotSupportEmptyController()
@@ -51,7 +37,7 @@ class NotTaggedControllerValueResolverTest extends TestCase
         $resolver = new NotTaggedControllerValueResolver(new ServiceLocator([]));
         $argument = new ArgumentMetadata('dummy', \stdClass::class, false, false, null);
         $request = $this->requestWithAttributes(['_controller' => '']);
-        $this->assertFalse($resolver->supports($request, $argument));
+        $this->assertSame([], $resolver->resolve($request, $argument));
     }
 
     public function testController()
@@ -61,7 +47,6 @@ class NotTaggedControllerValueResolverTest extends TestCase
         $resolver = new NotTaggedControllerValueResolver(new ServiceLocator([]));
         $argument = new ArgumentMetadata('dummy', \stdClass::class, false, false, null);
         $request = $this->requestWithAttributes(['_controller' => 'App\\Controller\\Mine::method']);
-        $this->assertTrue($resolver->supports($request, $argument));
         $resolver->resolve($request, $argument);
     }
 
@@ -72,7 +57,6 @@ class NotTaggedControllerValueResolverTest extends TestCase
         $resolver = new NotTaggedControllerValueResolver(new ServiceLocator([]));
         $argument = new ArgumentMetadata('dummy', \stdClass::class, false, false, null);
         $request = $this->requestWithAttributes(['_controller' => '\\App\\Controller\\Mine::method']);
-        $this->assertTrue($resolver->supports($request, $argument));
         $resolver->resolve($request, $argument);
     }
 
@@ -83,7 +67,6 @@ class NotTaggedControllerValueResolverTest extends TestCase
         $resolver = new NotTaggedControllerValueResolver(new ServiceLocator([]));
         $argument = new ArgumentMetadata('dummy', \stdClass::class, false, false, null);
         $request = $this->requestWithAttributes(['_controller' => 'App\\Controller\\Mine::Method']);
-        $this->assertTrue($resolver->supports($request, $argument));
         $resolver->resolve($request, $argument);
     }
 
@@ -94,7 +77,6 @@ class NotTaggedControllerValueResolverTest extends TestCase
         $resolver = new NotTaggedControllerValueResolver(new ServiceLocator([]));
         $argument = new ArgumentMetadata('dummy', \stdClass::class, false, false, null);
         $request = $this->requestWithAttributes(['_controller' => ['App\\Controller\\Mine', 'method']]);
-        $this->assertTrue($resolver->supports($request, $argument));
         $resolver->resolve($request, $argument);
     }
 
@@ -105,7 +87,6 @@ class NotTaggedControllerValueResolverTest extends TestCase
         $resolver = new NotTaggedControllerValueResolver(new ServiceLocator([]));
         $argument = new ArgumentMetadata('dummy', \stdClass::class, false, false, null);
         $request = $this->requestWithAttributes(['_controller' => 'App\Controller\Mine']);
-        $this->assertTrue($resolver->supports($request, $argument));
         $resolver->resolve($request, $argument);
     }
 

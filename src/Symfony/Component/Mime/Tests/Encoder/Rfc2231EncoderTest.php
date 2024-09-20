@@ -16,7 +16,7 @@ use Symfony\Component\Mime\Encoder\Rfc2231Encoder;
 
 class Rfc2231EncoderTest extends TestCase
 {
-    private $rfc2045Token = '/^[\x21\x23-\x27\x2A\x2B\x2D\x2E\x30-\x39\x41-\x5A\x5E-\x7E]+$/D';
+    private string $rfc2045Token = '/^[\x21\x23-\x27\x2A\x2B\x2D\x2E\x30-\x39\x41-\x5A\x5E-\x7E]+$/D';
 
     /* --
     This algorithm is described in RFC 2231, but is barely touched upon except
@@ -102,7 +102,7 @@ class Rfc2231EncoderTest extends TestCase
         $dir = realpath(__DIR__.'/../Fixtures/samples/charsets');
         $sampleFp = opendir($dir);
         while (false !== $encoding = readdir($sampleFp)) {
-            if ('.' == substr($encoding, 0, 1)) {
+            if (str_starts_with($encoding, '.')) {
                 continue;
             }
 
@@ -110,7 +110,7 @@ class Rfc2231EncoderTest extends TestCase
             if (is_dir($dir.'/'.$encoding)) {
                 $fileFp = opendir($dir.'/'.$encoding);
                 while (false !== $sampleFile = readdir($fileFp)) {
-                    if ('.' == substr($sampleFile, 0, 1)) {
+                    if (str_starts_with($sampleFile, '.')) {
                         continue;
                     }
 

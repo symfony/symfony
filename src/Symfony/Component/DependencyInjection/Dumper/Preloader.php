@@ -19,22 +19,22 @@ final class Preloader
     public static function append(string $file, array $list): void
     {
         if (!file_exists($file)) {
-            throw new \LogicException(sprintf('File "%s" does not exist.', $file));
+            throw new \LogicException(\sprintf('File "%s" does not exist.', $file));
         }
 
         $cacheDir = \dirname($file);
         $classes = [];
 
         foreach ($list as $item) {
-            if (0 === strpos($item, $cacheDir)) {
-                file_put_contents($file, sprintf("require_once __DIR__.%s;\n", var_export(strtr(substr($item, \strlen($cacheDir)), \DIRECTORY_SEPARATOR, '/'), true)), \FILE_APPEND);
+            if (str_starts_with($item, $cacheDir)) {
+                file_put_contents($file, \sprintf("require_once __DIR__.%s;\n", var_export(strtr(substr($item, \strlen($cacheDir)), \DIRECTORY_SEPARATOR, '/'), true)), \FILE_APPEND);
                 continue;
             }
 
-            $classes[] = sprintf("\$classes[] = %s;\n", var_export($item, true));
+            $classes[] = \sprintf("\$classes[] = %s;\n", var_export($item, true));
         }
 
-        file_put_contents($file, sprintf("\n\$classes = [];\n%s\$preloaded = Preloader::preload(\$classes, \$preloaded);\n", implode('', $classes)), \FILE_APPEND);
+        file_put_contents($file, \sprintf("\n\$classes = [];\n%s\$preloaded = Preloader::preload(\$classes, \$preloaded);\n", implode('', $classes)), \FILE_APPEND);
     }
 
     public static function preload(array $classes, array $preloaded = []): array
@@ -90,10 +90,8 @@ final class Preloader
             $r->getConstants();
             $r->getDefaultProperties();
 
-            if (\PHP_VERSION_ID >= 70400) {
-                foreach ($r->getProperties(\ReflectionProperty::IS_PUBLIC) as $p) {
-                    self::preloadType($p->getType(), $preloaded);
-                }
+            foreach ($r->getProperties(\ReflectionProperty::IS_PUBLIC) as $p) {
+                self::preloadType($p->getType(), $preloaded);
             }
 
             foreach ($r->getMethods(\ReflectionMethod::IS_PUBLIC) as $m) {
@@ -111,7 +109,7 @@ final class Preloader
 
                 self::preloadType($m->getReturnType(), $preloaded);
             }
-        } catch (\Throwable $e) {
+        } catch (\Throwable) {
             // ignore missing classes
         }
     }

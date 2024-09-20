@@ -20,23 +20,9 @@ use Symfony\Component\RateLimiter\LimiterStateInterface;
  */
 final class TokenBucket implements LimiterStateInterface
 {
-    private $id;
-    private $rate;
-
-    /**
-     * @var int
-     */
-    private $tokens;
-
-    /**
-     * @var int
-     */
-    private $burstSize;
-
-    /**
-     * @var float
-     */
-    private $timer;
+    private int $tokens;
+    private int $burstSize;
+    private float $timer;
 
     /**
      * @param string     $id            unique identifier for this bucket
@@ -44,10 +30,14 @@ final class TokenBucket implements LimiterStateInterface
      * @param Rate       $rate          the fill rate and time of this bucket
      * @param float|null $timer         the current timer of the bucket, defaulting to microtime(true)
      */
-    public function __construct(string $id, int $initialTokens, Rate $rate, ?float $timer = null)
-    {
+    public function __construct(
+        private string $id,
+        int $initialTokens,
+        private Rate $rate,
+        ?float $timer = null,
+    ) {
         if ($initialTokens < 1) {
-            throw new \InvalidArgumentException(sprintf('Cannot set the limit of "%s" to 0, as that would never accept any hit.', TokenBucketLimiter::class));
+            throw new \InvalidArgumentException(\sprintf('Cannot set the limit of "%s" to 0, as that would never accept any hit.', TokenBucketLimiter::class));
         }
 
         $this->id = $id;
@@ -120,20 +110,5 @@ final class TokenBucket implements LimiterStateInterface
         $this->rate = Rate::fromString($rate);
         $this->burstSize = unpack('Na', $pack)['a'];
         $this->id = substr($pack, 4);
-    }
-
-    public function __sleep(): array
-    {
-        $this->stringRate = (string) $this->rate;
-
-        return ['id', 'tokens', 'timer', 'burstSize', 'stringRate'];
-    }
-
-    public function __wakeup(): void
-    {
-        if (\is_string($rate = $this->stringRate ?? null)) {
-            $this->rate = Rate::fromString($rate);
-            unset($this->stringRate);
-        }
     }
 }

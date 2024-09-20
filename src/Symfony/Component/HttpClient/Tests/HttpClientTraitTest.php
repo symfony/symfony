@@ -13,6 +13,7 @@ namespace Symfony\Component\HttpClient\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpClient\Exception\InvalidArgumentException;
+use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Component\HttpClient\HttpClientTrait;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
@@ -49,6 +50,117 @@ class HttpClientTraitTest extends TestCase
         yield ['http://example.com/?b=', 'http://example.com/', ['a' => null, 'b' => '']];
     }
 
+    public function testPrepareRequestWithBodyIsArray()
+    {
+        $defaults = [
+            'base_uri' => 'http://example.com?c=c',
+            'query' => ['a' => 1, 'b' => 'b'],
+            'body' => [],
+        ];
+        [, $defaults] = self::prepareRequest(null, null, $defaults);
+
+        [,$options] = self::prepareRequest(null, 'http://example.com', [
+            'body' => [1, 2],
+            'headers' => [
+                'Content-Type' => 'application/x-www-form-urlencoded; charset=utf-8',
+            ],
+        ], $defaults);
+
+        $this->assertContains('Content-Type: application/x-www-form-urlencoded; charset=utf-8', $options['headers']);
+    }
+
+    public function testNormalizeBodyMultipart()
+    {
+        $file = fopen('php://memory', 'r+');
+        stream_context_set_option($file, 'http', 'filename', 'test.txt');
+        stream_context_set_option($file, 'http', 'content_type', 'text/plain');
+        fwrite($file, 'foobarbaz');
+        rewind($file);
+
+        $headers = [
+            'content-type' => ['Content-Type: multipart/form-data; boundary=ABCDEF'],
+        ];
+        $body = [
+            'foo[]' => 'bar',
+            'bar' => [
+                $file,
+            ],
+        ];
+
+        $body = self::normalizeBody($body, $headers);
+
+        $result = '';
+        while ('' !== $data = $body(self::$CHUNK_SIZE)) {
+            $result .= $data;
+        }
+
+        $expected = <<<'EOF'
+            --ABCDEF
+            Content-Disposition: form-data; name="foo[]"
+
+            bar
+            --ABCDEF
+            Content-Disposition: form-data; name="bar[0]"; filename="test.txt"
+            Content-Type: text/plain
+
+            foobarbaz
+            --ABCDEF--
+
+            EOF;
+        $expected = str_replace("\n", "\r\n", $expected);
+
+        $this->assertSame($expected, $result);
+    }
+
+    /**
+     * @group network
+     *
+     * @requires extension openssl
+     *
+     * @dataProvider provideNormalizeBodyMultipartForwardStream
+     */
+    public function testNormalizeBodyMultipartForwardStream($stream)
+    {
+        $body = [
+            'logo' => $stream,
+        ];
+
+        $headers = [];
+        $body = self::normalizeBody($body, $headers);
+
+        $result = '';
+        while ('' !== $data = $body(self::$CHUNK_SIZE)) {
+            $result .= $data;
+        }
+
+        $this->assertSame(1, preg_match('/^Content-Type: multipart\/form-data; boundary=(?<boundary>.+)$/', $headers['content-type'][0], $matches));
+        $this->assertSame('Content-Length: 3086', $headers['content-length'][0]);
+        $this->assertSame(3086, \strlen($result));
+
+        $expected = <<<EOF
+            --{$matches['boundary']}
+            Content-Disposition: form-data; name="logo"; filename="1f44d.png"
+            Content-Type: image/png
+
+            %A
+            --{$matches['boundary']}--
+
+            EOF;
+        $expected = str_replace("\n", "\r\n", $expected);
+
+        $this->assertStringMatchesFormat($expected, $result);
+    }
+
+    public static function provideNormalizeBodyMultipartForwardStream()
+    {
+        if (!\extension_loaded('openssl')) {
+            throw self::markTestSkipped('Extension openssl required.');
+        }
+
+        yield 'native' => [fopen('https://github.githubassets.com/images/icons/emoji/unicode/1f44d.png', 'r')];
+        yield 'symfony' => [HttpClient::create()->request('GET', 'https://github.githubassets.com/images/icons/emoji/unicode/1f44d.png')->toStream()];
+    }
+
     /**
      * @dataProvider provideResolveUrl
      */
@@ -63,7 +175,6 @@ class HttpClientTraitTest extends TestCase
     public static function provideResolveUrl(): array
     {
         return [
-            [self::RFC3986_BASE, 'http:h',        'http:h'],
             [self::RFC3986_BASE, 'g',             'http://a/b/c/g'],
             [self::RFC3986_BASE, './g',           'http://a/b/c/g'],
             [self::RFC3986_BASE, 'g/',            'http://a/b/c/g/'],
@@ -117,7 +228,6 @@ class HttpClientTraitTest extends TestCase
             ['http://u:p@a/b/c/d;p?q', '.',       'http://u:p@a/b/c/'],
             // path ending with slash or no slash at all
             ['http://a/b/c/d/',  'e',             'http://a/b/c/d/e'],
-            ['http:no-slash',     'e',            'http:e'],
             // falsey relative parts
             [self::RFC3986_BASE, '//0',           'http://0/'],
             [self::RFC3986_BASE, '0',             'http://a/b/c/0'],

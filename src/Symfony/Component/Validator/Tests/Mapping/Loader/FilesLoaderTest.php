@@ -14,8 +14,8 @@ namespace Symfony\Component\Validator\Tests\Mapping\Loader;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Mapping\Loader\LoaderInterface;
-use Symfony\Component\Validator\Tests\Fixtures\Annotation\Entity;
 use Symfony\Component\Validator\Tests\Fixtures\FilesLoader;
+use Symfony\Component\Validator\Tests\Fixtures\NestedAttribute\Entity;
 
 class FilesLoaderTest extends TestCase
 {
@@ -36,11 +36,11 @@ class FilesLoaderTest extends TestCase
 
     public function getFilesLoader(LoaderInterface $loader)
     {
-        return $this->getMockForAbstractClass(FilesLoader::class, [[
+        return new class([
             __DIR__.'/constraint-mapping.xml',
             __DIR__.'/constraint-mapping.yaml',
             __DIR__.'/constraint-mapping.test',
             __DIR__.'/constraint-mapping.txt',
-        ], $loader]);
+        ], $loader) extends FilesLoader {};
     }
 }

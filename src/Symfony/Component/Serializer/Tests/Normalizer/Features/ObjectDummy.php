@@ -22,6 +22,7 @@ class ObjectDummy
     private $baz;
     protected $camelCase;
     protected $object;
+    private $go;
 
     public function getFoo()
     {
@@ -71,5 +72,15 @@ class ObjectDummy
     public function getObject()
     {
         return $this->object;
+    }
+
+    public function setGo($go)
+    {
+        $this->go = $go;
+    }
+
+    public function canGo()
+    {
+        return $this->go;
     }
 }

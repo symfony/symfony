@@ -38,7 +38,7 @@ class MessageTest extends TestCase
         $this->assertNull($m->getBody());
         $this->assertEquals(new Headers(), $m->getHeaders());
 
-        $m = new Message($h = (new Headers())->addDateHeader('Date', new \DateTime()), $b = new TextPart('content'));
+        $m = new Message($h = (new Headers())->addDateHeader('Date', new \DateTimeImmutable()), $b = new TextPart('content'));
         $this->assertSame($b, $m->getBody());
         $this->assertEquals($h, $m->getHeaders());
 
@@ -134,6 +134,16 @@ class MessageTest extends TestCase
         $message->generateMessageId();
     }
 
+    public function testGenerateMessageIdThrowsWhenNeitherFromNorSenderIsPresent()
+    {
+        $message = new Message();
+
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('An email must have a "From" or a "Sender" header.');
+
+        $message->generateMessageId();
+    }
+
     public function testToString()
     {
         $message = new Message();
@@ -211,7 +221,7 @@ EOF;
                         "subtype": "plain",
                         "disposition": null,
                         "name": null,
-                        "encoding": "quoted-printable",
+                        "encoding": "quoted-printable",%A
                         "headers": [],
                         "class": "Symfony\\\\Component\\\\Mime\\\\Part\\\TextPart"
                     },
@@ -221,7 +231,7 @@ EOF;
                         "subtype": "html",
                         "disposition": null,
                         "name": null,
-                        "encoding": "quoted-printable",
+                        "encoding": "quoted-printable",%A
                         "headers": [],
                         "class": "Symfony\\\\Component\\\\Mime\\\\Part\\\\TextPart"
                     }
@@ -231,13 +241,13 @@ EOF;
             },
             {
                 "filename": "text.txt",
-                "mediaType": "application",
+                "mediaType": "application",%A
                 "body": "text data",
                 "charset": null,
                 "subtype": "octet-stream",
                 "disposition": "attachment",
                 "name": "text.txt",
-                "encoding": "base64",
+                "encoding": "base64",%A
                 "headers": [],
                 "class": "Symfony\\\\Component\\\\Mime\\\\Part\\\\DataPart"
             }
@@ -268,12 +278,79 @@ EOF;
         ], [new JsonEncoder()]);
 
         $serialized = $serializer->serialize($e, 'json');
-        $this->assertSame($expectedJson, json_encode(json_decode($serialized), \JSON_PRETTY_PRINT | \JSON_UNESCAPED_SLASHES));
+        $this->assertStringMatchesFormat($expectedJson, json_encode(json_decode($serialized), \JSON_PRETTY_PRINT | \JSON_UNESCAPED_SLASHES));
 
         $n = $serializer->deserialize($serialized, Message::class, 'json');
         $this->assertEquals($expected, $n);
 
         $serialized = $serializer->serialize($e, 'json');
-        $this->assertSame($expectedJson, json_encode(json_decode($serialized), \JSON_PRETTY_PRINT | \JSON_UNESCAPED_SLASHES));
+        $this->assertStringMatchesFormat($expectedJson, json_encode(json_decode($serialized), \JSON_PRETTY_PRINT | \JSON_UNESCAPED_SLASHES));
+    }
+
+    /**
+     * @dataProvider ensureValidityProvider
+     */
+    public function testEnsureValidity(array $headers, ?string $exceptionClass, ?string $exceptionMessage)
+    {
+        if ($exceptionClass) {
+            $this->expectException($exceptionClass);
+            $this->expectExceptionMessage($exceptionMessage);
+        } else {
+            $this->expectNotToPerformAssertions();
+        }
+
+        $m = new Message();
+        foreach ($headers as $headerName => $headerValue) {
+            $m->getHeaders()->addMailboxListHeader($headerName, $headerValue);
+        }
+        $m->ensureValidity();
+    }
+
+    public static function ensureValidityProvider(): array
+    {
+        return [
+            'Valid address fields' => [
+                [
+                    'To' => ['dummy@symfony.com'],
+                    'From' => ['test@symfony.com'],
+                ],
+                null,
+                null,
+            ],
+
+            'No destination address fields' => [
+                [
+                    'From' => ['test@symfony.com'],
+                ],
+                LogicException::class,
+                'An email must have a "To", "Cc", or "Bcc" header.',
+            ],
+
+            'Empty destination address fields' => [
+                [
+                    'To' => [],
+                    'From' => ['test@symfony.com'],
+                ],
+                LogicException::class,
+                'An email must have a "To", "Cc", or "Bcc" header.',
+            ],
+
+            'No originator fields' => [
+                [
+                    'To' => ['dummy@symfony.com'],
+                ],
+                LogicException::class,
+                'An email must have a "From" or a "Sender" header.',
+            ],
+
+            'Empty originator fields' => [
+                [
+                    'To' => ['dummy@symfony.com'],
+                    'From' => [],
+                ],
+                LogicException::class,
+                'An email must have a "From" or a "Sender" header.',
+            ],
+        ];
     }
 }

@@ -24,35 +24,28 @@ class ApplicationDescription
 {
     public const GLOBAL_NAMESPACE = '_global';
 
-    private $application;
-    private $namespace;
-    private $showHidden;
-
-    /**
-     * @var array
-     */
-    private $namespaces;
+    private array $namespaces;
 
     /**
      * @var array<string, Command>
      */
-    private $commands;
+    private array $commands;
 
     /**
      * @var array<string, Command>
      */
-    private $aliases;
+    private array $aliases = [];
 
-    public function __construct(Application $application, ?string $namespace = null, bool $showHidden = false)
-    {
-        $this->application = $application;
-        $this->namespace = $namespace;
-        $this->showHidden = $showHidden;
+    public function __construct(
+        private Application $application,
+        private ?string $namespace = null,
+        private bool $showHidden = false,
+    ) {
     }
 
     public function getNamespaces(): array
     {
-        if (null === $this->namespaces) {
+        if (!isset($this->namespaces)) {
             $this->inspectApplication();
         }
 
@@ -64,7 +57,7 @@ class ApplicationDescription
      */
     public function getCommands(): array
     {
-        if (null === $this->commands) {
+        if (!isset($this->commands)) {
             $this->inspectApplication();
         }
 
@@ -77,13 +70,13 @@ class ApplicationDescription
     public function getCommand(string $name): Command
     {
         if (!isset($this->commands[$name]) && !isset($this->aliases[$name])) {
-            throw new CommandNotFoundException(sprintf('Command "%s" does not exist.', $name));
+            throw new CommandNotFoundException(\sprintf('Command "%s" does not exist.', $name));
         }
 
         return $this->commands[$name] ?? $this->aliases[$name];
     }
 
-    private function inspectApplication()
+    private function inspectApplication(): void
     {
         $this->commands = [];
         $this->namespaces = [];

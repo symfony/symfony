@@ -14,20 +14,18 @@ namespace Symfony\Component\String\Resources;
 use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Component\String\Exception\RuntimeException;
 use Symfony\Component\VarExporter\VarExporter;
+use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
  * @internal
  */
 final class WcswidthDataGenerator
 {
-    private $outDir;
+    private HttpClientInterface $client;
 
-    private $client;
-
-    public function __construct(string $outDir)
-    {
-        $this->outDir = $outDir;
-
+    public function __construct(
+        private string $outDir,
+    ) {
         $this->client = HttpClient::createForBaseUri('https://www.unicode.org/Public/UNIDATA/');
     }
 
@@ -73,7 +71,7 @@ final class WcswidthDataGenerator
         $content = $this->getHeader($version).'return '.VarExporter::export($this->format($rawData)).";\n";
 
         if (!file_put_contents($this->outDir.'/'.$fileName, $content)) {
-            throw new RuntimeException(sprintf('The "%s" file could not be written.', $fileName));
+            throw new RuntimeException(\sprintf('The "%s" file could not be written.', $fileName));
         }
     }
 
@@ -104,9 +102,7 @@ EOT;
             return [hexdec($start), hexdec($end)];
         }, $rawData);
 
-        usort($data, static function (array $a, array $b): int {
-            return $a[0] - $b[0];
-        });
+        usort($data, static fn (array $a, array $b): int => $a[0] - $b[0]);
 
         return $data;
     }

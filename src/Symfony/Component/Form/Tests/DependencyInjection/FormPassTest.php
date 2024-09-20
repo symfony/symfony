@@ -64,8 +64,8 @@ class FormPassTest extends TestCase
             (new Definition(ServiceLocator::class, [[
                 __CLASS__.'_Type1' => new ServiceClosureArgument(new Reference('my.type1')),
                 __CLASS__.'_Type2' => new ServiceClosureArgument(new Reference('my.type2')),
-            ]]))->addTag('container.service_locator')->setPublic(false),
-            $locator->setPublic(false)
+            ]]))->addTag('container.service_locator'),
+            $locator
         );
     }
 

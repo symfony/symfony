@@ -18,6 +18,7 @@ use Symfony\Component\Config\Definition\Builder\NodeDefinition;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\Config\Loader\LoaderInterface;
+use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Extension\Extension;
@@ -32,12 +33,13 @@ use Symfony\Component\HttpKernel\KernelInterface;
 
 class ConfigBuilderCacheWarmerTest extends TestCase
 {
-    private $varDir;
+    private string $varDir;
 
     protected function setUp(): void
     {
-        $this->varDir = sys_get_temp_dir().'/'.uniqid();
         $fs = new Filesystem();
+        $this->varDir = tempnam(sys_get_temp_dir(), 'sf_var_');
+        $fs->remove($this->varDir);
         $fs->mkdir($this->varDir);
     }
 
@@ -53,8 +55,16 @@ class ConfigBuilderCacheWarmerTest extends TestCase
         $kernel = new TestKernel($this->varDir);
         $kernel->boot();
 
+        self::assertDirectoryDoesNotExist($kernel->getBuildDir().'/Symfony');
+        self::assertDirectoryDoesNotExist($kernel->getCacheDir().'/Symfony');
+
         $warmer = new ConfigBuilderCacheWarmer($kernel);
         $warmer->warmUp($kernel->getCacheDir());
+
+        self::assertDirectoryDoesNotExist($kernel->getBuildDir().'/Symfony');
+        self::assertDirectoryDoesNotExist($kernel->getCacheDir().'/Symfony');
+
+        $warmer->warmUp($kernel->getCacheDir(), $kernel->getBuildDir());
 
         self::assertDirectoryExists($kernel->getBuildDir().'/Symfony');
         self::assertDirectoryDoesNotExist($kernel->getCacheDir().'/Symfony');
@@ -158,7 +168,7 @@ class ConfigBuilderCacheWarmerTest extends TestCase
 
             public function getLogDir(): string
             {
-                return $this->varDir.'/cache';
+                return $this->varDir.'/log';
             }
 
             public function getCharset(): string
@@ -169,7 +179,7 @@ class ConfigBuilderCacheWarmerTest extends TestCase
         $kernel->boot();
 
         $warmer = new ConfigBuilderCacheWarmer($kernel);
-        $warmer->warmUp($kernel->getCacheDir());
+        $warmer->warmUp($kernel->getCacheDir(), $kernel->getBuildDir());
 
         self::assertFileExists($kernel->getBuildDir().'/Symfony/Config/FrameworkConfig.php');
     }
@@ -179,7 +189,7 @@ class ConfigBuilderCacheWarmerTest extends TestCase
         $kernel = new class($this->varDir) extends TestKernel {
             protected function build(ContainerBuilder $container): void
             {
-                $container->registerExtension(new class() extends Extension implements ConfigurationInterface {
+                $container->registerExtension(new class extends Extension implements ConfigurationInterface {
                     public function load(array $configs, ContainerBuilder $container): void
                     {
                     }
@@ -208,7 +218,7 @@ class ConfigBuilderCacheWarmerTest extends TestCase
         $kernel->boot();
 
         $warmer = new ConfigBuilderCacheWarmer($kernel);
-        $warmer->warmUp($kernel->getCacheDir());
+        $warmer->warmUp($kernel->getCacheDir(), $kernel->getBuildDir());
 
         self::assertFileExists($kernel->getBuildDir().'/Symfony/Config/FrameworkConfig.php');
         self::assertFileExists($kernel->getBuildDir().'/Symfony/Config/AppConfig.php');
@@ -221,7 +231,7 @@ class ConfigBuilderCacheWarmerTest extends TestCase
             {
             }
 
-            public function getXsdValidationBasePath()
+            public function getXsdValidationBasePath(): string|false
             {
                 return false;
             }
@@ -253,7 +263,7 @@ class ConfigBuilderCacheWarmerTest extends TestCase
         $kernel->boot();
 
         $warmer = new ConfigBuilderCacheWarmer($kernel);
-        $warmer->warmUp($kernel->getCacheDir());
+        $warmer->warmUp($kernel->getCacheDir(), $kernel->getBuildDir());
 
         self::assertFileExists($kernel->getBuildDir().'/Symfony/Config/FrameworkConfig.php');
         self::assertFileExists($kernel->getBuildDir().'/Symfony/Config/KernelConfig.php');
@@ -266,7 +276,7 @@ class ConfigBuilderCacheWarmerTest extends TestCase
             {
                 /** @var TestSecurityExtension $extension */
                 $extension = $container->getExtension('test_security');
-                $extension->addAuthenticatorFactory(new class() implements TestAuthenticatorFactoryInterface {
+                $extension->addAuthenticatorFactory(new class implements TestAuthenticatorFactoryInterface {
                     public function getKey(): string
                     {
                         return 'token';
@@ -282,19 +292,19 @@ class ConfigBuilderCacheWarmerTest extends TestCase
             {
                 yield from parent::registerBundles();
 
-                yield new class() extends Bundle {
+                yield new class extends Bundle {
                     public function getContainerExtension(): ExtensionInterface
                     {
                         return new TestSecurityExtension();
                     }
                 };
 
-                yield new class() extends Bundle {
+                yield new class extends Bundle {
                     public function build(ContainerBuilder $container): void
                     {
                         /** @var TestSecurityExtension $extension */
                         $extension = $container->getExtension('test_security');
-                        $extension->addAuthenticatorFactory(new class() implements TestAuthenticatorFactoryInterface {
+                        $extension->addAuthenticatorFactory(new class implements TestAuthenticatorFactoryInterface {
                             public function getKey(): string
                             {
                                 return 'form-login';
@@ -316,7 +326,7 @@ class ConfigBuilderCacheWarmerTest extends TestCase
         $kernel->boot();
 
         $warmer = new ConfigBuilderCacheWarmer($kernel);
-        $warmer->warmUp($kernel->getCacheDir());
+        $warmer->warmUp($kernel->getCacheDir(), $kernel->getBuildDir());
 
         self::assertFileExists($kernel->getBuildDir().'/Symfony/Config/FrameworkConfig.php');
         self::assertFileExists($kernel->getBuildDir().'/Symfony/Config/SecurityConfig.php');
@@ -326,7 +336,7 @@ class ConfigBuilderCacheWarmerTest extends TestCase
     }
 }
 
-class TestKernel extends Kernel
+class TestKernel extends Kernel implements CompilerPassInterface
 {
     private $varDir;
 
@@ -354,6 +364,19 @@ class TestKernel extends Kernel
 
     public function registerContainerConfiguration(LoaderInterface $loader): void
     {
+        $loader->load(static function (ContainerBuilder $container) {
+            $container->loadFromExtension('framework', [
+                'annotations' => false,
+                'handle_all_throwables' => true,
+                'http_method_override' => false,
+                'php_errors' => ['log' => true],
+            ]);
+        });
+    }
+
+    public function process(ContainerBuilder $container): void
+    {
+        $container->removeDefinition('config_builder.warmer');
     }
 }
 

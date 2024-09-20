@@ -18,9 +18,6 @@ use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 
-/**
- * @requires function \Symfony\Component\Routing\Matcher\CompiledUrlMatcher::match
- */
 class RedirectableCompiledUrlMatcherTest extends TestCase
 {
     public function testRedirectWhenNoSlash()
@@ -30,7 +27,8 @@ class RedirectableCompiledUrlMatcherTest extends TestCase
 
         $matcher = $this->getMatcher($routes, $context = new RequestContext());
 
-        $this->assertEquals([
+        $this->assertEquals(
+            [
                 '_controller' => 'Symfony\Bundle\FrameworkBundle\Controller\RedirectController::urlRedirectAction',
                 'path' => '/foo/',
                 'permanent' => true,
@@ -50,7 +48,8 @@ class RedirectableCompiledUrlMatcherTest extends TestCase
 
         $matcher = $this->getMatcher($routes, $context = new RequestContext());
 
-        $this->assertEquals([
+        $this->assertEquals(
+            [
                 '_controller' => 'Symfony\Bundle\FrameworkBundle\Controller\RedirectController::urlRedirectAction',
                 'path' => '/foo',
                 'permanent' => true,

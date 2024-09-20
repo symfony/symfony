@@ -9,10 +9,12 @@
             "abstract": true,
             "autowire": false,
             "autoconfigure": false,
+            "deprecated": false,
             "file": null,
             "factory_class": "Full\\Qualified\\FactoryClass",
             "factory_method": "get",
-            "tags": []
+            "tags": [],
+            "usages": []
         },
         "definition_without_class": {
             "class": "",
@@ -23,8 +25,10 @@
             "abstract": false,
             "autowire": false,
             "autoconfigure": false,
+            "deprecated": false,
             "file": null,
-            "tags": []
+            "tags": [],
+            "usages": []
         },
         "service_container": {
             "class": "Symfony\\Component\\DependencyInjection\\ContainerInterface",
@@ -35,9 +39,11 @@
             "abstract": false,
             "autowire": false,
             "autoconfigure": false,
+            "deprecated": false,
             "description": "ContainerInterface is the interface implemented by service container classes.",
             "file": null,
-            "tags": []
+            "tags": [],
+            "usages": []
         }
     },
     "aliases": {

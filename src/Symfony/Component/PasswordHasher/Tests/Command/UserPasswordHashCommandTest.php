@@ -24,9 +24,8 @@ use Symfony\Component\Security\Core\User\InMemoryUser;
 
 class UserPasswordHashCommandTest extends TestCase
 {
-    /** @var CommandTester */
-    private $passwordHasherCommandTester;
-    private $colSize;
+    private ?CommandTester $passwordHasherCommandTester = null;
+    private string|false $colSize;
 
     public function testEncodePasswordEmptySalt()
     {
@@ -278,10 +277,11 @@ EOTXT
 
     public function testThrowsExceptionOnNoConfiguredHashers()
     {
+        $tester = new CommandTester(new UserPasswordHashCommand($this->getMockBuilder(PasswordHasherFactoryInterface::class)->getMock(), []));
+
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('There are no configured password hashers for the "security" extension.');
 
-        $tester = new CommandTester(new UserPasswordHashCommand($this->getMockBuilder(PasswordHasherFactoryInterface::class)->getMock(), []));
         $tester->execute([
             'password' => 'password',
         ], ['interactive' => false]);
@@ -292,10 +292,6 @@ EOTXT
      */
     public function testCompletionSuggestions(array $input, array $expectedSuggestions)
     {
-        if (!class_exists(CommandCompletionTester::class)) {
-            $this->markTestSkipped('Test command completion requires symfony/console 5.4+.');
-        }
-
         $command = new UserPasswordHashCommand($this->createMock(PasswordHasherFactoryInterface::class), ['App\Entity\User']);
         $tester = new CommandCompletionTester($command);
 

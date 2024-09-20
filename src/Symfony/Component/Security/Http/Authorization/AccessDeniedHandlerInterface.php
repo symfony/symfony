@@ -25,8 +25,6 @@ interface AccessDeniedHandlerInterface
 {
     /**
      * Handles an access denied failure.
-     *
-     * @return Response|null
      */
-    public function handle(Request $request, AccessDeniedException $accessDeniedException);
+    public function handle(Request $request, AccessDeniedException $accessDeniedException): ?Response;
 }

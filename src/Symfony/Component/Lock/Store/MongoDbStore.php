@@ -14,8 +14,12 @@ namespace Symfony\Component\Lock\Store;
 use MongoDB\BSON\UTCDateTime;
 use MongoDB\Client;
 use MongoDB\Collection;
+use MongoDB\Database;
+use MongoDB\Driver\BulkWrite;
+use MongoDB\Driver\Command;
 use MongoDB\Driver\Exception\WriteException;
-use MongoDB\Driver\ReadPreference;
+use MongoDB\Driver\Manager;
+use MongoDB\Driver\Query;
 use MongoDB\Exception\DriverRuntimeException;
 use MongoDB\Exception\InvalidArgumentException as MongoInvalidArgumentException;
 use MongoDB\Exception\UnsupportedException;
@@ -44,27 +48,27 @@ use Symfony\Component\Lock\PersistingStoreInterface;
  * @see https://docs.mongodb.com/manual/reference/limits/#Index-Key-Limit
  *
  * @author Joe Bennett <joe@assimtech.com>
+ * @author Jérôme Tamarelle <jerome@tamarelle.net>
  */
 class MongoDbStore implements PersistingStoreInterface
 {
     use ExpiringStoreTrait;
 
-    private $collection;
-    private $client;
-    private $uri;
-    private $options;
-    private $initialTtl;
+    private Manager $manager;
+    private string $namespace;
+    private string $uri;
+    private array $options;
 
     /**
-     * @param Collection|Client|string $mongo      An instance of a Collection or Client or URI @see https://docs.mongodb.com/manual/reference/connection-string/
-     * @param array                    $options    See below
-     * @param float                    $initialTtl The expiration delay of locks in seconds
+     * @param Collection|Client|Manager|string $mongo      An instance of a Collection or Client or URI @see https://docs.mongodb.com/manual/reference/connection-string/
+     * @param array                            $options    See below
+     * @param float                            $initialTtl The expiration delay of locks in seconds
      *
      * @throws InvalidArgumentException If required options are not provided
      * @throws InvalidTtlException      When the initial ttl is not valid
      *
      * Options:
-     *      gcProbablity:  Should a TTL Index be created expressed as a probability from 0.0 to 1.0 [default: 0.001]
+     *      gcProbability: Should a TTL Index be created expressed as a probability from 0.0 to 1.0 [default: 0.001]
      *      database:      The name of the database [required when $mongo is a Client]
      *      collection:    The name of the collection [required when $mongo is a Client]
      *      uriOptions:    Array of uri options. [used when $mongo is a URI]
@@ -78,9 +82,9 @@ class MongoDbStore implements PersistingStoreInterface
      *
      * @see https://docs.mongodb.com/php-library/current/reference/method/MongoDBClient__construct/
      *
-     * If gcProbablity is set to a value greater than 0.0 there is a chance
+     * If gcProbability is set to a value greater than 0.0 there is a chance
      * this store will attempt to create a TTL index on self::save().
-     * If you prefer to create your TTL Index manually you can set gcProbablity
+     * If you prefer to create your TTL Index manually you can set gcProbability
      * to 0.0 and optionally leverage
      * self::createTtlIndex(int $expireAfterSeconds = 0).
      *
@@ -88,43 +92,48 @@ class MongoDbStore implements PersistingStoreInterface
      * readPreference is primary for all queries.
      * @see https://docs.mongodb.com/manual/applications/replication/
      */
-    public function __construct($mongo, array $options = [], float $initialTtl = 300.0)
-    {
+    public function __construct(
+        Collection|Database|Client|Manager|string $mongo,
+        array $options = [],
+        private float $initialTtl = 300.0,
+    ) {
         $this->options = array_merge([
-            'gcProbablity' => 0.001,
+            'gcProbability' => 0.001,
             'database' => null,
             'collection' => null,
             'uriOptions' => [],
             'driverOptions' => [],
         ], $options);
 
-        $this->initialTtl = $initialTtl;
-
         if ($mongo instanceof Collection) {
-            $this->collection = $mongo;
+            $this->options['database'] ??= $mongo->getDatabaseName();
+            $this->options['collection'] ??= $mongo->getCollectionName();
+            $this->manager = $mongo->getManager();
+        } elseif ($mongo instanceof Database) {
+            $this->options['database'] ??= $mongo->getDatabaseName();
+            $this->manager = $mongo->getManager();
         } elseif ($mongo instanceof Client) {
-            $this->client = $mongo;
-        } elseif (\is_string($mongo)) {
-            $this->uri = $this->skimUri($mongo);
+            $this->manager = $mongo->getManager();
+        } elseif ($mongo instanceof Manager) {
+            $this->manager = $mongo;
         } else {
-            throw new InvalidArgumentException(sprintf('"%s()" requires "%s" or "%s" or URI as first argument, "%s" given.', __METHOD__, Collection::class, Client::class, get_debug_type($mongo)));
+            $this->uri = $this->skimUri($mongo);
         }
 
-        if (!($mongo instanceof Collection)) {
-            if (null === $this->options['database']) {
-                throw new InvalidArgumentException(sprintf('"%s()" requires the "database" in the URI path or option.', __METHOD__));
-            }
-            if (null === $this->options['collection']) {
-                throw new InvalidArgumentException(sprintf('"%s()" requires the "collection" in the URI querystring or option.', __METHOD__));
-            }
+        if (null === $this->options['database']) {
+            throw new InvalidArgumentException(\sprintf('"%s()" requires the "database" in the URI path or option.', __METHOD__));
         }
+        if (null === $this->options['collection']) {
+            throw new InvalidArgumentException(\sprintf('"%s()" requires the "collection" in the URI querystring or option.', __METHOD__));
+        }
+        $this->namespace = $this->options['database'].'.'.$this->options['collection'];
 
-        if ($this->options['gcProbablity'] < 0.0 || $this->options['gcProbablity'] > 1.0) {
-            throw new InvalidArgumentException(sprintf('"%s()" gcProbablity must be a float from 0.0 to 1.0, "%f" given.', __METHOD__, $this->options['gcProbablity']));
+        if ($this->options['gcProbability'] < 0.0 || $this->options['gcProbability'] > 1.0) {
+            throw new InvalidArgumentException(\sprintf('"%s()" gcProbability must be a float from 0.0 to 1.0, "%f" given.', __METHOD__, $this->options['gcProbability']));
         }
 
         if ($this->initialTtl <= 0) {
-            throw new InvalidTtlException(sprintf('"%s()" expects a strictly positive TTL, got "%d".', __METHOD__, $this->initialTtl));
+            throw new InvalidTtlException(\sprintf('"%s()" expects a strictly positive TTL, got "%d".', __METHOD__, $this->initialTtl));
         }
     }
 
@@ -137,8 +146,12 @@ class MongoDbStore implements PersistingStoreInterface
      */
     private function skimUri(string $uri): string
     {
+        if (!str_starts_with($uri, 'mongodb://') && !str_starts_with($uri, 'mongodb+srv://')) {
+            throw new InvalidArgumentException(\sprintf('The given MongoDB Connection URI "%s" is invalid. Expecting "mongodb://" or "mongodb+srv://".', $uri));
+        }
+
         if (false === $params = parse_url($uri)) {
-            throw new InvalidArgumentException(sprintf('The given MongoDB Connection URI "%s" is invalid.', $uri));
+            throw new InvalidArgumentException(\sprintf('The given MongoDB Connection URI "%s" is invalid.', $uri));
         }
         $pathDb = ltrim($params['path'] ?? '', '/') ?: null;
         if (null !== $pathDb) {
@@ -161,7 +174,7 @@ class MongoDbStore implements PersistingStoreInterface
     /**
      * Creates a TTL index to automatically remove expired locks.
      *
-     * If the gcProbablity option is set higher than 0.0 (defaults to 0.001);
+     * If the gcProbability option is set higher than 0.0 (defaults to 0.001);
      * there is a chance this will be called on self::save().
      *
      * Otherwise; this should be called once manually during database setup.
@@ -186,24 +199,27 @@ class MongoDbStore implements PersistingStoreInterface
      * @throws MongoInvalidArgumentException for parameter/option parsing errors
      * @throws DriverRuntimeException        for other driver errors (e.g. connection errors)
      */
-    public function createTtlIndex(int $expireAfterSeconds = 0)
+    public function createTtlIndex(int $expireAfterSeconds = 0): void
     {
-        $this->getCollection()->createIndex(
-            [ // key
-                'expires_at' => 1,
+        $server = $this->getManager()->selectServer();
+        $server->executeCommand($this->options['database'], new Command([
+            'createIndexes' => $this->options['collection'],
+            'indexes' => [
+                [
+                    'key' => [
+                        'expires_at' => 1,
+                    ],
+                    'name' => 'expires_at_1',
+                    'expireAfterSeconds' => $expireAfterSeconds,
+                ],
             ],
-            [ // options
-                'expireAfterSeconds' => $expireAfterSeconds,
-            ]
-        );
+        ]));
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @throws LockExpiredException when save is called on an expired lock
      */
-    public function save(Key $key)
+    public function save(Key $key): void
     {
         $key->reduceLifetime($this->initialTtl);
 
@@ -216,7 +232,7 @@ class MongoDbStore implements PersistingStoreInterface
             throw new LockAcquiringException('Failed to acquire lock.', 0, $e);
         }
 
-        if ($this->options['gcProbablity'] > 0.0 && (1.0 === $this->options['gcProbablity'] || (random_int(0, \PHP_INT_MAX) / \PHP_INT_MAX) <= $this->options['gcProbablity'])) {
+        if ($this->options['gcProbability'] > 0.0 && (1.0 === $this->options['gcProbability'] || (random_int(0, \PHP_INT_MAX) / \PHP_INT_MAX) <= $this->options['gcProbability'])) {
             $this->createTtlIndex();
         }
 
@@ -224,12 +240,10 @@ class MongoDbStore implements PersistingStoreInterface
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @throws LockStorageException
      * @throws LockExpiredException
      */
-    public function putOffExpiration(Key $key, float $ttl)
+    public function putOffExpiration(Key $key, float $ttl): void
     {
         $key->reduceLifetime($ttl);
 
@@ -245,31 +259,37 @@ class MongoDbStore implements PersistingStoreInterface
         $this->checkNotExpired($key);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function delete(Key $key)
+    public function delete(Key $key): void
     {
-        $this->getCollection()->deleteOne([ // filter
-            '_id' => (string) $key,
-            'token' => $this->getUniqueToken($key),
-        ]);
+        $write = new BulkWrite();
+        $write->delete(
+            [
+                '_id' => (string) $key,
+                'token' => $this->getUniqueToken($key),
+            ],
+            ['limit' => 1]
+        );
+
+        $this->getManager()->executeBulkWrite($this->namespace, $write);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function exists(Key $key): bool
     {
-        return null !== $this->getCollection()->findOne([ // filter
-            '_id' => (string) $key,
-            'token' => $this->getUniqueToken($key),
-            'expires_at' => [
-                '$gt' => $this->createMongoDateTime(microtime(true)),
+        $cursor = $this->manager->executeQuery($this->namespace, new Query(
+            [
+                '_id' => (string) $key,
+                'token' => $this->getUniqueToken($key),
+                'expires_at' => [
+                    '$gt' => $this->createMongoDateTime(microtime(true)),
+                ],
             ],
-        ], [
-            'readPreference' => new ReadPreference(\defined(ReadPreference::PRIMARY) ? ReadPreference::PRIMARY : ReadPreference::RP_PRIMARY),
-        ]);
+            [
+                'limit' => 1,
+                'projection' => ['_id' => 1],
+            ]
+        ));
+
+        return [] !== $cursor->toArray();
     }
 
     /**
@@ -277,13 +297,14 @@ class MongoDbStore implements PersistingStoreInterface
      *
      * @param float $ttl Expiry in seconds from now
      */
-    private function upsert(Key $key, float $ttl)
+    private function upsert(Key $key, float $ttl): void
     {
         $now = microtime(true);
         $token = $this->getUniqueToken($key);
 
-        $this->getCollection()->updateOne(
-            [ // filter
+        $write = new BulkWrite();
+        $write->update(
+            [
                 '_id' => (string) $key,
                 '$or' => [
                     [
@@ -296,17 +317,19 @@ class MongoDbStore implements PersistingStoreInterface
                     ],
                 ],
             ],
-            [ // update
+            [
                 '$set' => [
                     '_id' => (string) $key,
                     'token' => $token,
                     'expires_at' => $this->createMongoDateTime($now + $ttl),
                 ],
             ],
-            [ // options
+            [
                 'upsert' => true,
             ]
         );
+
+        $this->getManager()->executeBulkWrite($this->namespace, $write);
     }
 
     private function isDuplicateKeyException(WriteException $e): bool
@@ -322,22 +345,9 @@ class MongoDbStore implements PersistingStoreInterface
         return 11000 === $code;
     }
 
-    private function getCollection(): Collection
+    private function getManager(): Manager
     {
-        if (null !== $this->collection) {
-            return $this->collection;
-        }
-
-        if (null === $this->client) {
-            $this->client = new Client($this->uri, $this->options['uriOptions'], $this->options['driverOptions']);
-        }
-
-        $this->collection = $this->client->selectCollection(
-            $this->options['database'],
-            $this->options['collection']
-        );
-
-        return $this->collection;
+        return $this->manager ??= new Manager($this->uri, $this->options['uriOptions'], $this->options['driverOptions']);
     }
 
     /**
@@ -349,7 +359,7 @@ class MongoDbStore implements PersistingStoreInterface
     }
 
     /**
-     * Retrieves an unique token for the given key namespaced to this store.
+     * Retrieves a unique token for the given key namespaced to this store.
      *
      * @param Key $key lock state container
      */

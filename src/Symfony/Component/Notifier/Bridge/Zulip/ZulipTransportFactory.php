@@ -14,17 +14,13 @@ namespace Symfony\Component\Notifier\Bridge\Zulip;
 use Symfony\Component\Notifier\Exception\UnsupportedSchemeException;
 use Symfony\Component\Notifier\Transport\AbstractTransportFactory;
 use Symfony\Component\Notifier\Transport\Dsn;
-use Symfony\Component\Notifier\Transport\TransportInterface;
 
 /**
  * @author Mohammad Emran Hasan <phpfour@gmail.com>
  */
 final class ZulipTransportFactory extends AbstractTransportFactory
 {
-    /**
-     * @return ZulipTransport
-     */
-    public function create(Dsn $dsn): TransportInterface
+    public function create(Dsn $dsn): ZulipTransport
     {
         $scheme = $dsn->getScheme();
 

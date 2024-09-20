@@ -28,35 +28,39 @@ final class OvhCloudTransport extends AbstractTransport
 {
     protected const HOST = 'eu.api.ovh.com';
 
-    private $applicationKey;
-    private $applicationSecret;
-    private $consumerKey;
-    private $serviceName;
-    private $sender;
+    private ?string $sender = null;
+    private bool $noStopClause = false;
 
-    public function __construct(string $applicationKey, string $applicationSecret, string $consumerKey, string $serviceName, ?HttpClientInterface $client = null, ?EventDispatcherInterface $dispatcher = null)
-    {
-        $this->applicationKey = $applicationKey;
-        $this->applicationSecret = $applicationSecret;
-        $this->consumerKey = $consumerKey;
-        $this->serviceName = $serviceName;
-
+    public function __construct(
+        #[\SensitiveParameter] private string $applicationKey,
+        #[\SensitiveParameter] private string $applicationSecret,
+        #[\SensitiveParameter] private string $consumerKey,
+        private string $serviceName,
+        ?HttpClientInterface $client = null,
+        ?EventDispatcherInterface $dispatcher = null,
+    ) {
         parent::__construct($client, $dispatcher);
     }
 
     public function __toString(): string
     {
-        if (null !== $this->sender) {
-            return sprintf('ovhcloud://%s?service_name=%s&sender=%s', $this->getEndpoint(), $this->serviceName, $this->sender);
-        }
-
-        return sprintf('ovhcloud://%s?service_name=%s', $this->getEndpoint(), $this->serviceName);
+        return \sprintf('ovhcloud://%s?service_name=%s%s', $this->getEndpoint(), $this->serviceName, $this->sender ? '&sender='.$this->sender : '');
     }
 
     /**
      * @return $this
      */
-    public function setSender(?string $sender): self
+    public function setNoStopClause(bool $noStopClause): static
+    {
+        $this->noStopClause = $noStopClause;
+
+        return $this;
+    }
+
+    /**
+     * @return $this
+     */
+    public function setSender(?string $sender): static
     {
         $this->sender = $sender;
 
@@ -74,7 +78,7 @@ final class OvhCloudTransport extends AbstractTransport
             throw new UnsupportedMessageTypeException(__CLASS__, SmsMessage::class, $message);
         }
 
-        $endpoint = sprintf('https://%s/1.0/sms/%s/jobs', $this->getEndpoint(), $this->serviceName);
+        $endpoint = \sprintf('https://%s/1.0/sms/%s/jobs', $this->getEndpoint(), $this->serviceName);
 
         $content = [
             'charset' => 'UTF-8',
@@ -82,11 +86,13 @@ final class OvhCloudTransport extends AbstractTransport
             'coding' => '8bit',
             'message' => $message->getSubject(),
             'receivers' => [$message->getPhone()],
-            'noStopClause' => false,
+            'noStopClause' => $this->noStopClause,
             'priority' => 'medium',
         ];
 
-        if ($this->sender) {
+        if ('' !== $message->getFrom()) {
+            $content['sender'] = $message->getFrom();
+        } elseif ($this->sender) {
             $content['sender'] = $this->sender;
         } else {
             $content['senderForResponse'] = true;
@@ -116,13 +122,13 @@ final class OvhCloudTransport extends AbstractTransport
         if (200 !== $statusCode) {
             $error = $response->toArray(false);
 
-            throw new TransportException(sprintf('Unable to send the SMS: %s.', $error['message']), $response);
+            throw new TransportException(\sprintf('Unable to send the SMS: %s.', $error['message']), $response);
         }
 
         $success = $response->toArray(false);
 
         if (!isset($success['ids'][0])) {
-            throw new TransportException(sprintf('Attempt to send the SMS to invalid receivers: "%s".', implode(',', $success['invalidReceivers'])), $response);
+            throw new TransportException(\sprintf('Attempt to send the SMS to invalid receivers: "%s".', implode(',', $success['invalidReceivers'])), $response);
         }
 
         $sentMessage = new SentMessage($message, (string) $this);
@@ -136,7 +142,7 @@ final class OvhCloudTransport extends AbstractTransport
      */
     private function calculateTimeDelta(): int
     {
-        $endpoint = sprintf('https://%s/1.0/auth/time', $this->getEndpoint());
+        $endpoint = \sprintf('https://%s/1.0/auth/time', $this->getEndpoint());
         $response = $this->client->request('GET', $endpoint);
 
         return $response->getContent() - time();

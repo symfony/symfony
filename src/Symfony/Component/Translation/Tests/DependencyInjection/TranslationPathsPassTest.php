@@ -18,11 +18,11 @@ use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\Translation\DependencyInjection\TranslatorPathsPass;
-use Symfony\Component\Translation\Tests\DependencyInjection\fixtures\ControllerArguments;
-use Symfony\Component\Translation\Tests\DependencyInjection\fixtures\ServiceArguments;
-use Symfony\Component\Translation\Tests\DependencyInjection\fixtures\ServiceMethodCalls;
-use Symfony\Component\Translation\Tests\DependencyInjection\fixtures\ServiceProperties;
-use Symfony\Component\Translation\Tests\DependencyInjection\fixtures\ServiceSubscriber;
+use Symfony\Component\Translation\Tests\DependencyInjection\Fixtures\ControllerArguments;
+use Symfony\Component\Translation\Tests\DependencyInjection\Fixtures\ServiceArguments;
+use Symfony\Component\Translation\Tests\DependencyInjection\Fixtures\ServiceMethodCalls;
+use Symfony\Component\Translation\Tests\DependencyInjection\Fixtures\ServiceProperties;
+use Symfony\Component\Translation\Tests\DependencyInjection\Fixtures\ServiceSubscriber;
 
 class TranslationPathsPassTest extends TestCase
 {

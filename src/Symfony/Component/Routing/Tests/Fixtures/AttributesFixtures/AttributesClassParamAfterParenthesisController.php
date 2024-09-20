@@ -8,7 +8,7 @@ use Symfony\Component\Routing\Tests\Fixtures\Attributes\FooAttributes;
     class: \stdClass::class,
     foo: [
         'bar' => ['foo','bar'],
-        'foo'
+        'foo',
     ]
 )]
 class AttributesClassParamAfterParenthesisController

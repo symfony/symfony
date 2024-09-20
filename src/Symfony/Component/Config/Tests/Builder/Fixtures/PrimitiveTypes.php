@@ -13,6 +13,7 @@ namespace Symfony\Component\Config\Tests\Builder\Fixtures;
 
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
+use Symfony\Component\Config\Tests\Fixtures\TestEnum;
 
 class PrimitiveTypes implements ConfigurationInterface
 {
@@ -23,7 +24,7 @@ class PrimitiveTypes implements ConfigurationInterface
         $rootNode
             ->children()
                 ->booleanNode('boolean_node')->end()
-                ->enumNode('enum_node')->values(['foo', 'bar', 'baz'])->end()
+                ->enumNode('enum_node')->values(['foo', 'bar', 'baz', TestEnum::Bar])->end()
                 ->floatNode('float_node')->end()
                 ->integerNode('integer_node')->end()
                 ->scalarNode('scalar_node')->end()

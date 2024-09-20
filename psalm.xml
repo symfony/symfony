@@ -17,6 +17,8 @@
             <directory name="src/Symfony/*/*/Tests" />
             <directory name="src/Symfony/*/*/*/Tests" />
             <directory name="src/Symfony/*/*/*/*/Tests" />
+            <directory name="src/Symfony/Component/Intl/Resources/data/" />
+            <directory name="src/Symfony/Component/Emoji/Resources/data/" />
             <directory name="vendor" />
         </ignoreFiles>
     </projectFiles>
@@ -28,6 +30,8 @@
                 <referencedClass name="BackedEnum"/>
                 <referencedClass name="ReflectionIntersectionType"/>
                 <referencedClass name="UnitEnum"/>
+                <!-- These classes have been added in PHP 8.2 -->
+                <referencedClass name="Random\*"/>
             </errorLevel>
         </UndefinedClass>
         <UndefinedDocblockClass>
@@ -56,5 +60,15 @@
                 <directory name="src/Symfony" />
             </errorLevel>
         </UnusedConstructor>
+        <UndefinedAttributeClass>
+            <errorLevel type="suppress">
+                <!-- These classes have been added in PHP 8.2 -->
+                <referencedClass name="SensitiveParameter"/>
+            </errorLevel>
+        </UndefinedAttributeClass>
     </issueHandlers>
+
+    <forbiddenFunctions>
+        <function name="empty"/>
+    </forbiddenFunctions>
 </psalm>

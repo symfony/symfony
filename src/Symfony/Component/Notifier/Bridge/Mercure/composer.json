@@ -16,11 +16,10 @@
         }
     ],
     "require": {
-        "php": ">=7.2.5",
-        "ext-json": "*",
+        "php": ">=8.2",
         "symfony/mercure": "^0.5.2|^0.6",
-        "symfony/notifier": "^5.4.21|^6.2.7",
-        "symfony/service-contracts": "^1.10|^2|^3"
+        "symfony/notifier": "^6.4|^7.0",
+        "symfony/service-contracts": "^2.5|^3"
     },
     "autoload": {
         "psr-4": { "Symfony\\Component\\Notifier\\Bridge\\Mercure\\": "" },

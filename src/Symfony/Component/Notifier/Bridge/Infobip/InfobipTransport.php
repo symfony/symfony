@@ -27,20 +27,18 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
  */
 final class InfobipTransport extends AbstractTransport
 {
-    private $authToken;
-    private $from;
-
-    public function __construct(string $authToken, string $from, ?HttpClientInterface $client = null, ?EventDispatcherInterface $dispatcher = null)
-    {
-        $this->authToken = $authToken;
-        $this->from = $from;
-
+    public function __construct(
+        #[\SensitiveParameter] private string $authToken,
+        private string $from,
+        ?HttpClientInterface $client = null,
+        ?EventDispatcherInterface $dispatcher = null,
+    ) {
         parent::__construct($client, $dispatcher);
     }
 
     public function __toString(): string
     {
-        return sprintf('infobip://%s?from=%s', $this->getEndpoint(), $this->from);
+        return \sprintf('infobip://%s?from=%s', $this->getEndpoint(), $this->from);
     }
 
     public function supports(MessageInterface $message): bool
@@ -54,7 +52,7 @@ final class InfobipTransport extends AbstractTransport
             throw new UnsupportedMessageTypeException(__CLASS__, SmsMessage::class, $message);
         }
 
-        $endpoint = sprintf('https://%s/sms/2/text/advanced', $this->getEndpoint());
+        $endpoint = \sprintf('https://%s/sms/2/text/advanced', $this->getEndpoint());
 
         $response = $this->client->request('POST', $endpoint, [
             'headers' => [
@@ -63,7 +61,7 @@ final class InfobipTransport extends AbstractTransport
             'json' => [
                 'messages' => [
                     [
-                        'from' => $this->from,
+                        'from' => $message->getFrom() ?: $this->from,
                         'destinations' => [
                             [
                                 'to' => $message->getPhone(),
@@ -86,7 +84,7 @@ final class InfobipTransport extends AbstractTransport
             $errorMessage = $content['requestError']['serviceException']['messageId'] ?? '';
             $errorInfo = $content['requestError']['serviceException']['text'] ?? '';
 
-            throw new TransportException(sprintf('Unable to send the SMS: '.$errorMessage.' (%s).', $errorInfo), $response);
+            throw new TransportException(\sprintf('Unable to send the SMS: '.$errorMessage.' (%s).', $errorInfo), $response);
         }
 
         return new SentMessage($message, (string) $this);

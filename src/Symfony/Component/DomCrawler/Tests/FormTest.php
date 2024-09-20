@@ -207,7 +207,7 @@ class FormTest extends TestCase
             $values,
             array_map(
                 function ($field) {
-                    $class = \get_class($field);
+                    $class = $field::class;
 
                     return [substr($class, strrpos($class, '\\') + 1), $field->getValue()];
                 },
@@ -252,7 +252,7 @@ class FormTest extends TestCase
                 'appends the submitted button value but not other submit buttons',
                 '<input type="submit" name="bar" value="bar" />
                  <input type="submit" name="foobar" value="foobar" />',
-                 ['foobar' => ['InputFormField', 'foobar']],
+                ['foobar' => ['InputFormField', 'foobar']],
             ],
             [
                 'turns an image input into x and y fields',
@@ -263,38 +263,38 @@ class FormTest extends TestCase
                 'returns textareas',
                 '<textarea name="foo">foo</textarea>
                  <input type="submit" />',
-                 ['foo' => ['TextareaFormField', 'foo']],
+                ['foo' => ['TextareaFormField', 'foo']],
             ],
             [
                 'returns inputs',
                 '<input type="text" name="foo" value="foo" />
                  <input type="submit" />',
-                 ['foo' => ['InputFormField', 'foo']],
+                ['foo' => ['InputFormField', 'foo']],
             ],
             [
                 'returns checkboxes',
                 '<input type="checkbox" name="foo" value="foo" checked="checked" />
                  <input type="submit" />',
-                 ['foo' => ['ChoiceFormField', 'foo']],
+                ['foo' => ['ChoiceFormField', 'foo']],
             ],
             [
                 'returns not-checked checkboxes',
                 '<input type="checkbox" name="foo" value="foo" />
                  <input type="submit" />',
-                 ['foo' => ['ChoiceFormField', false]],
+                ['foo' => ['ChoiceFormField', false]],
             ],
             [
                 'returns radio buttons',
                 '<input type="radio" name="foo" value="foo" />
                  <input type="radio" name="foo" value="bar" checked="bar" />
                  <input type="submit" />',
-                 ['foo' => ['ChoiceFormField', 'bar']],
+                ['foo' => ['ChoiceFormField', 'bar']],
             ],
             [
                 'returns file inputs',
                 '<input type="file" name="foo" />
                  <input type="submit" />',
-                 ['foo' => ['FileFormField', ['name' => '', 'type' => '', 'tmp_name' => '', 'error' => 4, 'size' => 0]]],
+                ['foo' => ['FileFormField', ['name' => '', 'type' => '', 'tmp_name' => '', 'error' => 4, 'size' => 0]]],
             ],
         ];
     }
@@ -432,6 +432,9 @@ class FormTest extends TestCase
         $form = $this->createForm('<form><template><input type="text" name="foo" value="foo" /></template><input type="text" name="bar" value="bar" /><input type="submit" /></form>');
         $this->assertEquals(['bar' => 'bar'], $form->getValues(), '->getValues() does not include template fields');
         $this->assertFalse($form->has('foo'));
+
+        $form = $this->createForm('<turbo-stream><template><form><input type="text" name="foo[bar]" value="foo" /><input type="text" name="bar" value="bar" /><select multiple="multiple" name="baz[]"></select><input type="submit" /></form></template></turbo-stream>');
+        $this->assertEquals(['foo[bar]' => 'foo', 'bar' => 'bar', 'baz' => []], $form->getValues(), '->getValues() returns all form field values from template field inside a turbo-stream');
     }
 
     public function testSetValues()
@@ -486,6 +489,9 @@ class FormTest extends TestCase
         $form = $this->createForm('<form method="post"><template><input type="file" name="foo"/></template><input type="text" name="bar" value="bar"/><input type="submit"/></form>');
         $this->assertEquals([], $form->getFiles(), '->getFiles() does not include template file fields');
         $this->assertFalse($form->has('foo'));
+
+        $form = $this->createForm('<turbo-stream><template><form method="post"><input type="file" name="foo[bar]" /><input type="text" name="bar" value="bar" /><input type="submit" /></form></template></turbo-stream>');
+        $this->assertEquals(['foo[bar]' => ['name' => '', 'type' => '', 'tmp_name' => '', 'error' => 4, 'size' => 0]], $form->getFiles(), '->getFiles() return files fields from template inside turbo-stream');
     }
 
     public function testGetPhpFiles()
@@ -824,7 +830,7 @@ class FormTest extends TestCase
             3 => 3,
             'bar' => [
                 'baz' => 'fbb',
-             ],
+            ],
         ]);
     }
 
@@ -902,9 +908,7 @@ class FormTest extends TestCase
         $xPath = new \DOMXPath($dom);
         $nodes = $xPath->query('//input | //button');
 
-        if (null === $currentUri) {
-            $currentUri = 'http://example.com/';
-        }
+        $currentUri ??= 'http://example.com/';
 
         return new Form($nodes->item($nodes->length - 1), $currentUri, $method);
     }

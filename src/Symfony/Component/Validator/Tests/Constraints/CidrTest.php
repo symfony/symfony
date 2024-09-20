@@ -16,7 +16,7 @@ use Symfony\Component\Validator\Constraints\Cidr;
 use Symfony\Component\Validator\Constraints\Ip;
 use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
-use Symfony\Component\Validator\Mapping\Loader\AnnotationLoader;
+use Symfony\Component\Validator\Mapping\Loader\AttributeLoader;
 
 class CidrTest extends TestCase
 {
@@ -49,10 +49,18 @@ class CidrTest extends TestCase
 
     public function testWithInvalidVersion()
     {
-        $availableVersions = [Ip::ALL, Ip::V4, Ip::V6];
+        $availableVersions = [
+            Ip::V4, Ip::V6, Ip::ALL,
+            Ip::V4_NO_PUBLIC, Ip::V6_NO_PUBLIC, Ip::ALL_NO_PUBLIC,
+            Ip::V4_NO_PRIVATE, Ip::V6_NO_PRIVATE, Ip::ALL_NO_PRIVATE,
+            Ip::V4_NO_RESERVED, Ip::V6_NO_RESERVED, Ip::ALL_NO_RESERVED,
+            Ip::V4_ONLY_PUBLIC, Ip::V6_ONLY_PUBLIC, Ip::ALL_ONLY_PUBLIC,
+            Ip::V4_ONLY_PRIVATE, Ip::V6_ONLY_PRIVATE, Ip::ALL_ONLY_PRIVATE,
+            Ip::V4_ONLY_RESERVED, Ip::V6_ONLY_RESERVED, Ip::ALL_ONLY_RESERVED,
+        ];
 
         self::expectException(ConstraintDefinitionException::class);
-        self::expectExceptionMessage(sprintf('The option "version" must be one of "%s".', implode('", "', $availableVersions)));
+        self::expectExceptionMessage(\sprintf('The option "version" must be one of "%s".', implode('", "', $availableVersions)));
 
         new Cidr(['version' => '8']);
     }
@@ -81,7 +89,7 @@ class CidrTest extends TestCase
         $expectedMax = Ip::V4 == $ipVersion ? 32 : 128;
 
         self::expectException(ConstraintDefinitionException::class);
-        self::expectExceptionMessage(sprintf('The netmask range must be between 0 and %d.', $expectedMax));
+        self::expectExceptionMessage(\sprintf('The netmask range must be between 0 and %d.', $expectedMax));
 
         new Cidr([
             'version' => $ipVersion,
@@ -120,13 +128,10 @@ class CidrTest extends TestCase
         ];
     }
 
-    /**
-     * @requires PHP 8
-     */
     public function testAttributes()
     {
         $metadata = new ClassMetadata(CidrDummy::class);
-        $loader = new AnnotationLoader();
+        $loader = new AttributeLoader();
         self::assertTrue($loader->loadClassMetadata($metadata));
 
         [$aConstraint] = $metadata->properties['a']->getConstraints();

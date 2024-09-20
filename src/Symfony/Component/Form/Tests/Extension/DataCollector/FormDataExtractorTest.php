@@ -26,6 +26,7 @@ use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\ResolvedFormType;
 use Symfony\Component\Form\ResolvedFormTypeFactory;
 use Symfony\Component\Form\Tests\Fixtures\FixedDataTransformer;
+use Symfony\Component\Validator\Constraints\WordCount;
 use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\VarDumper\Test\VarDumperTestTrait;
 
@@ -36,10 +37,7 @@ class FormDataExtractorTest extends TestCase
 {
     use VarDumperTestTrait;
 
-    /**
-     * @var FormDataExtractor
-     */
-    private $dataExtractor;
+    private FormDataExtractor $dataExtractor;
 
     protected function setUp(): void
     {
@@ -303,36 +301,68 @@ class FormDataExtractorTest extends TestCase
         $form->addError(new FormError('Invalid!', null, [], null, $violation));
         $origin = spl_object_hash($form);
 
-        $this->assertDumpMatchesFormat(<<<EODUMP
-array:3 [
-  "submitted_data" => array:1 [
-    "norm" => "Foobar"
-  ]
-  "errors" => array:1 [
-    0 => array:3 [
-      "message" => "Invalid!"
-      "origin" => "$origin"
-      "trace" => array:2 [
-        0 => Symfony\Component\Validator\ConstraintViolation {
-          -message: "Foo"
-          -messageTemplate: "Foo"
-          -parameters: []
-          -plural: null
-          -root: "Root"
-          -propertyPath: "property.path"
-          -invalidValue: "Invalid!"
-          -constraint: null
-          -code: null
-          -cause: Exception {%A}
+        if (class_exists(WordCount::class)) {
+            $expectedFormat = <<<"EODUMP"
+                array:3 [
+                  "submitted_data" => array:1 [
+                    "norm" => "Foobar"
+                  ]
+                  "errors" => array:1 [
+                    0 => array:3 [
+                      "message" => "Invalid!"
+                      "origin" => "$origin"
+                      "trace" => array:2 [
+                        0 => Symfony\Component\Validator\ConstraintViolation {
+                          -message: "Foo"
+                          -messageTemplate: "Foo"
+                          -parameters: []
+                          -root: "Root"
+                          -propertyPath: "property.path"
+                          -invalidValue: "Invalid!"
+                          -plural: null
+                          -code: null
+                          -constraint: null
+                          -cause: Exception {%A}
+                        }
+                        1 => Exception {#1}
+                      ]
+                    ]
+                  ]
+                  "synchronized" => true
+                ]
+                EODUMP;
+        } else {
+            $expectedFormat = <<<"EODUMP"
+                array:3 [
+                  "submitted_data" => array:1 [
+                    "norm" => "Foobar"
+                  ]
+                  "errors" => array:1 [
+                    0 => array:3 [
+                      "message" => "Invalid!"
+                      "origin" => "$origin"
+                      "trace" => array:2 [
+                        0 => Symfony\Component\Validator\ConstraintViolation {
+                          -message: "Foo"
+                          -messageTemplate: "Foo"
+                          -parameters: []
+                          -plural: null
+                          -root: "Root"
+                          -propertyPath: "property.path"
+                          -invalidValue: "Invalid!"
+                          -constraint: null
+                          -code: null
+                          -cause: Exception {%A}
+                        }
+                        1 => Exception {#1}
+                      ]
+                    ]
+                  ]
+                  "synchronized" => true
+                ]
+                EODUMP;
         }
-        1 => Exception {#1}
-      ]
-    ]
-  ]
-  "synchronized" => true
-]
-EODUMP
-            ,
+        $this->assertDumpMatchesFormat($expectedFormat,
             $this->dataExtractor->extractSubmittedData($form)
         );
     }

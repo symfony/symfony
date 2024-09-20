@@ -22,7 +22,7 @@ use Symfony\Component\Cache\Adapter\ArrayAdapter;
  */
 class ExternalAdapter implements CacheItemPoolInterface
 {
-    private $cache;
+    private ArrayAdapter $cache;
 
     public function __construct(int $defaultLifetime = 0)
     {

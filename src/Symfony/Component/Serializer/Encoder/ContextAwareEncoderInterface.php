@@ -19,9 +19,7 @@ namespace Symfony\Component\Serializer\Encoder;
 interface ContextAwareEncoderInterface extends EncoderInterface
 {
     /**
-     * {@inheritdoc}
-     *
      * @param array $context options that encoders have access to
      */
-    public function supportsEncoding(string $format, array $context = []);
+    public function supportsEncoding(string $format, array $context = []): bool;
 }

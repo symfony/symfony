@@ -30,6 +30,7 @@ use Symfony\Component\HttpKernel\HttpKernel;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\Kernel;
 use Symfony\Component\HttpKernel\Tests\Fixtures\KernelForTest;
+use Symfony\Component\HttpKernel\Tests\Fixtures\KernelForTestWithLoadClassCache;
 use Symfony\Component\HttpKernel\Tests\Fixtures\KernelWithoutBundles;
 use Symfony\Component\HttpKernel\Tests\Fixtures\ResettableService;
 
@@ -58,7 +59,7 @@ class KernelTest extends TestCase
     public function testEmptyEnv()
     {
         $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage(sprintf('Invalid environment provided to "%s": the environment cannot be empty.', KernelForTest::class));
+        $this->expectExceptionMessage(\sprintf('Invalid environment provided to "%s": the environment cannot be empty.', KernelForTest::class));
 
         new KernelForTest('', false);
     }
@@ -99,7 +100,7 @@ class KernelTest extends TestCase
         $kernel = new CustomProjectDirKernel();
         $kernel->boot();
 
-        $containerDir = __DIR__.'/Fixtures/var/cache/custom/'.substr(\get_class($kernel->getContainer()), 0, 16);
+        $containerDir = __DIR__.'/Fixtures/var/cache/custom/'.substr($kernel->getContainer()::class, 0, 16);
         $this->assertTrue(unlink(__DIR__.'/Fixtures/var/cache/custom/Symfony_Component_HttpKernel_Tests_CustomProjectDirKernelCustomDebugContainer.php.meta'));
         $this->assertFileExists($containerDir);
         $this->assertFileDoesNotExist($containerDir.'.legacy');
@@ -148,7 +149,7 @@ class KernelTest extends TestCase
 
     public function testClassCacheIsNotLoadedByDefault()
     {
-        $kernel = $this->getKernel(['initializeBundles'], [], false, ['doLoadClassCache']);
+        $kernel = $this->getKernel(['initializeBundles', 'doLoadClassCache'], [], false, KernelForTestWithLoadClassCache::class);
         $kernel->expects($this->never())
             ->method('doLoadClassCache');
 
@@ -241,107 +242,6 @@ class KernelTest extends TestCase
         $kernel->handle($request, $type, $catch);
     }
 
-    /**
-     * @dataProvider getStripCommentsCodes
-     */
-    public function testStripComments(string $source, string $expected)
-    {
-        $output = Kernel::stripComments($source);
-
-        // Heredocs are preserved, making the output mixing Unix and Windows line
-        // endings, switching to "\n" everywhere on Windows to avoid failure.
-        if ('\\' === \DIRECTORY_SEPARATOR) {
-            $expected = str_replace("\r\n", "\n", $expected);
-            $output = str_replace("\r\n", "\n", $output);
-        }
-
-        $this->assertEquals($expected, $output);
-    }
-
-    public static function getStripCommentsCodes(): array
-    {
-        return [
-            ['<?php echo foo();', '<?php echo foo();'],
-            ['<?php echo/**/foo();', '<?php echo foo();'],
-            ['<?php echo/** bar */foo();', '<?php echo foo();'],
-            ['<?php /**/echo foo();', '<?php echo foo();'],
-            ['<?php echo \foo();', '<?php echo \foo();'],
-            ['<?php echo/**/\foo();', '<?php echo \foo();'],
-            ['<?php echo/** bar */\foo();', '<?php echo \foo();'],
-            ['<?php /**/echo \foo();', '<?php echo \foo();'],
-            [<<<'EOF'
-<?php
-include_once \dirname(__DIR__).'/foo.php';
-
-$string = 'string should not be   modified';
-
-$string = 'string should not be
-
-modified';
-
-
-$heredoc = <<<HD
-
-
-Heredoc should not be   modified {$a[1+$b]}
-
-
-HD;
-
-$nowdoc = <<<'ND'
-
-
-Nowdoc should not be   modified
-
-
-ND;
-
-/**
- * some class comments to strip
- */
-class TestClass
-{
-    /**
-     * some method comments to strip
-     */
-    public function doStuff()
-    {
-        // inline comment
-    }
-}
-EOF
-, <<<'EOF'
-<?php
-include_once \dirname(__DIR__).'/foo.php';
-$string = 'string should not be   modified';
-$string = 'string should not be
-
-modified';
-$heredoc = <<<HD
-
-
-Heredoc should not be   modified {$a[1+$b]}
-
-
-HD;
-$nowdoc = <<<'ND'
-
-
-Nowdoc should not be   modified
-
-
-ND;
-class TestClass
-{
-    public function doStuff()
-    {
-        }
-}
-EOF
-            ],
-        ];
-    }
-
     public function testSerialize()
     {
         $env = 'test_env';
@@ -400,7 +300,7 @@ EOF
         $kernel
             ->expects($this->exactly(2))
             ->method('getBundle')
-            ->willReturn($this->getBundle(__DIR__.'/Fixtures/Bundle1Bundle', null, null, 'Bundle1Bundle'))
+            ->willReturn($this->getBundle(__DIR__.'/Fixtures/Bundle1Bundle', null, 'Bundle1Bundle'))
         ;
 
         $this->assertEquals(
@@ -417,8 +317,8 @@ EOF
     {
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('Trying to register two bundles with the same name "DuplicateName"');
-        $fooBundle = $this->getBundle(__DIR__.'/Fixtures/FooBundle', null, 'FooBundle', 'DuplicateName');
-        $barBundle = $this->getBundle(__DIR__.'/Fixtures/BarBundle', null, 'BarBundle', 'DuplicateName');
+        $fooBundle = $this->getBundle(__DIR__.'/Fixtures/FooBundle', 'FooBundle', 'DuplicateName');
+        $barBundle = $this->getBundle(__DIR__.'/Fixtures/BarBundle', 'BarBundle', 'DuplicateName');
 
         $kernel = $this->getKernel([], [$fooBundle, $barBundle]);
         $kernel->boot();
@@ -491,7 +391,7 @@ EOF
         $kernel = new CustomProjectDirKernel();
         $kernel->boot();
 
-        $containerClass = \get_class($kernel->getContainer());
+        $containerClass = $kernel->getContainer()::class;
         $containerFile = (new \ReflectionClass($kernel->getContainer()))->getFileName();
         unlink(__DIR__.'/Fixtures/var/cache/custom/Symfony_Component_HttpKernel_Tests_CustomProjectDirKernelCustomDebugContainer.php.meta');
 
@@ -512,8 +412,8 @@ EOF
 
     public function testKernelExtension()
     {
-        $kernel = new class() extends CustomProjectDirKernel implements ExtensionInterface {
-            public function load(array $configs, ContainerBuilder $container)
+        $kernel = new class extends CustomProjectDirKernel implements ExtensionInterface {
+            public function load(array $configs, ContainerBuilder $container): void
             {
                 $container->setParameter('test.extension-registered', true);
             }
@@ -523,10 +423,7 @@ EOF
                 return '';
             }
 
-            /**
-             * @return string|false
-             */
-            public function getXsdValidationBasePath()
+            public function getXsdValidationBasePath(): string|false
             {
                 return false;
             }
@@ -555,6 +452,7 @@ EOF
         $kernel->boot();
 
         $this->assertTrue($kernel->warmedUp);
+        $this->assertSame(realpath($kernel->getBuildDir()), $kernel->warmedUpBuildDir);
     }
 
     public function testServicesResetter()
@@ -628,11 +526,10 @@ EOF
     /**
      * Returns a mock for the BundleInterface.
      */
-    protected function getBundle($dir = null, $parent = null, $className = null, $bundleName = null): BundleInterface
+    protected function getBundle($dir = null, $className = null, $bundleName = null): BundleInterface
     {
         $bundle = $this
             ->getMockBuilder(BundleInterface::class)
-            ->onlyMethods(['getPath', 'getName'])
             ->disableOriginalConstructor()
         ;
 
@@ -640,12 +537,12 @@ EOF
             $bundle->setMockClassName($className);
         }
 
-        $bundle = $bundle->getMockForAbstractClass();
+        $bundle = $bundle->getMock();
 
         $bundle
             ->expects($this->any())
             ->method('getName')
-            ->willReturn($bundleName ?? \get_class($bundle))
+            ->willReturn($bundleName ?? $bundle::class)
         ;
 
         $bundle
@@ -663,19 +560,15 @@ EOF
      * @param array $methods Additional methods to mock (besides the abstract ones)
      * @param array $bundles Bundles to register
      */
-    protected function getKernel(array $methods = [], array $bundles = [], bool $debug = false, array $methodsToAdd = []): Kernel
+    protected function getKernel(array $methods = [], array $bundles = [], bool $debug = false, string $kernelClass = KernelForTest::class): Kernel
     {
         $methods[] = 'registerBundles';
 
         $kernelMockBuilder = $this
-            ->getMockBuilder(KernelForTest::class)
+            ->getMockBuilder($kernelClass)
             ->onlyMethods($methods)
             ->setConstructorArgs(['test', $debug])
         ;
-
-        if (0 !== \count($methodsToAdd)) {
-            $kernelMockBuilder->addMethods($methodsToAdd);
-        }
 
         $kernel = $kernelMockBuilder->getMock();
         $kernel->expects($this->any())
@@ -689,9 +582,9 @@ EOF
 
 class TestKernel implements HttpKernelInterface
 {
-    public $terminateCalled = false;
+    public bool $terminateCalled = false;
 
-    public function terminate()
+    public function terminate(): void
     {
         $this->terminateCalled = true;
     }
@@ -708,17 +601,16 @@ class TestKernel implements HttpKernelInterface
 
 class CustomProjectDirKernel extends Kernel implements WarmableInterface
 {
-    public $warmedUp = false;
-    private $baseDir;
-    private $buildContainer;
-    private $httpKernel;
+    public bool $warmedUp = false;
 
-    public function __construct(?\Closure $buildContainer = null, ?HttpKernelInterface $httpKernel = null, $env = 'custom')
-    {
+    public ?string $warmedUpBuildDir = null;
+
+    public function __construct(
+        private readonly ?\Closure $buildContainer = null,
+        private readonly ?HttpKernelInterface $httpKernel = null,
+        $env = 'custom',
+    ) {
         parent::__construct($env, true);
-
-        $this->buildContainer = $buildContainer;
-        $this->httpKernel = $httpKernel;
     }
 
     public function registerBundles(): iterable
@@ -726,7 +618,7 @@ class CustomProjectDirKernel extends Kernel implements WarmableInterface
         return [];
     }
 
-    public function registerContainerConfiguration(LoaderInterface $loader)
+    public function registerContainerConfiguration(LoaderInterface $loader): void
     {
     }
 
@@ -735,14 +627,15 @@ class CustomProjectDirKernel extends Kernel implements WarmableInterface
         return __DIR__.'/Fixtures';
     }
 
-    public function warmUp(string $cacheDir): array
+    public function warmUp(string $cacheDir, ?string $buildDir = null): array
     {
         $this->warmedUp = true;
+        $this->warmedUpBuildDir = $buildDir;
 
         return [];
     }
 
-    protected function build(ContainerBuilder $container)
+    protected function build(ContainerBuilder $container): void
     {
         if ($build = $this->buildContainer) {
             $build($container);
@@ -763,7 +656,7 @@ class PassKernel extends CustomProjectDirKernel implements CompilerPassInterface
         Kernel::__construct('pass', true);
     }
 
-    public function process(ContainerBuilder $container)
+    public function process(ContainerBuilder $container): void
     {
         $container->setParameter('test.processed', true);
     }

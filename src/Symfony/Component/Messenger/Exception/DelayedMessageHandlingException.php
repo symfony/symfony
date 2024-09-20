@@ -11,38 +11,36 @@
 
 namespace Symfony\Component\Messenger\Exception;
 
+use Symfony\Component\Messenger\Envelope;
+
 /**
  * When handling queued messages from {@link DispatchAfterCurrentBusMiddleware},
  * some handlers caused an exception. This exception contains all those handler exceptions.
  *
  * @author Tobias Nyholm <tobias.nyholm@gmail.com>
  */
-class DelayedMessageHandlingException extends RuntimeException
+class DelayedMessageHandlingException extends RuntimeException implements WrappedExceptionsInterface, EnvelopeAwareExceptionInterface
 {
-    private $exceptions;
+    use EnvelopeAwareExceptionTrait;
+    use WrappedExceptionsTrait;
 
-    public function __construct(array $exceptions)
-    {
+    public function __construct(
+        private array $exceptions,
+        ?Envelope $envelope = null,
+    ) {
+        $this->envelope = $envelope;
+
         $exceptionMessages = implode(", \n", array_map(
-            function (\Throwable $e) {
-                return \get_class($e).': '.$e->getMessage();
-            },
+            fn (\Throwable $e) => $e::class.': '.$e->getMessage(),
             $exceptions
         ));
 
         if (1 === \count($exceptions)) {
-            $message = sprintf("A delayed message handler threw an exception: \n\n%s", $exceptionMessages);
+            $message = \sprintf("A delayed message handler threw an exception: \n\n%s", $exceptionMessages);
         } else {
-            $message = sprintf("Some delayed message handlers threw an exception: \n\n%s", $exceptionMessages);
+            $message = \sprintf("Some delayed message handlers threw an exception: \n\n%s", $exceptionMessages);
         }
 
-        $this->exceptions = $exceptions;
-
-        parent::__construct($message, 0, $exceptions[0]);
-    }
-
-    public function getExceptions(): array
-    {
-        return $this->exceptions;
+        parent::__construct($message, 0, $exceptions[array_key_first($exceptions)]);
     }
 }

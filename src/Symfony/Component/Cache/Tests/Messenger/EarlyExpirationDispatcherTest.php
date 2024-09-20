@@ -26,9 +26,6 @@ use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\MessageBusInterface;
 
-/**
- * @requires function Symfony\Component\DependencyInjection\ReverseContainer::__construct
- */
 class EarlyExpirationDispatcherTest extends TestCase
 {
     public static function tearDownAfterClass(): void
@@ -44,7 +41,7 @@ class EarlyExpirationDispatcherTest extends TestCase
 
         $item = $pool->getItem('foo');
 
-        $computationService = new class() {
+        $computationService = new class {
             public function __invoke(CacheItem $item)
             {
                 return 123;
@@ -70,7 +67,7 @@ class EarlyExpirationDispatcherTest extends TestCase
             }
         });
 
-        $this->assertSame(345, $pool->get('foo', function () { return 345; }));
+        $this->assertSame(345, $pool->get('foo', fn () => 345));
         $this->assertTrue($saveResult);
 
         $expected = [
@@ -93,7 +90,7 @@ class EarlyExpirationDispatcherTest extends TestCase
         $pool->save($item->set(789));
         $item = $pool->getItem('foo');
 
-        $computationService = new class() {
+        $computationService = new class {
             public function __invoke(CacheItem $item)
             {
                 return 123;
@@ -135,7 +132,7 @@ class EarlyExpirationDispatcherTest extends TestCase
 
 final class TestLogger extends AbstractLogger
 {
-    public $records = [];
+    public array $records = [];
 
     public function log($level, $message, array $context = []): void
     {

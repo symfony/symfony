@@ -16,7 +16,7 @@ use Symfony\Component\Notifier\DataCollector\NotificationDataCollector;
 return static function (ContainerConfigurator $container) {
     $container->services()
         ->set('notifier.data_collector', NotificationDataCollector::class)
-            ->args([service('notifier.logger_notification_listener')])
+            ->args([service('notifier.notification_logger_listener')])
             ->tag('data_collector', ['template' => '@WebProfiler/Collector/notifier.html.twig', 'id' => 'notifier'])
     ;
 };

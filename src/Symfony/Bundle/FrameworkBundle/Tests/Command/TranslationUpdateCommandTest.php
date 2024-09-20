@@ -26,16 +26,8 @@ use Symfony\Component\Translation\Writer\TranslationWriter;
 
 class TranslationUpdateCommandTest extends TestCase
 {
-    private $fs;
-    private $translationDir;
-
-    public function testDumpMessagesAndCleanWithDeprecatedCommandName()
-    {
-        $tester = $this->createCommandTester(['messages' => ['foo' => 'foo']]);
-        $tester->execute(['command' => 'translation:update', 'locale' => 'en', 'bundle' => 'foo', '--dump-messages' => true, '--clean' => true]);
-        $this->assertMatchesRegularExpression('/foo/', $tester->getDisplay());
-        $this->assertMatchesRegularExpression('/1 message was successfully extracted/', $tester->getDisplay());
-    }
+    private Filesystem $fs;
+    private string $translationDir;
 
     public function testDumpMessagesAndClean()
     {
@@ -86,11 +78,6 @@ class TranslationUpdateCommandTest extends TestCase
 
     public function testDumpMessagesAndCleanInRootDirectory()
     {
-        $this->fs->remove($this->translationDir);
-        $this->translationDir = sys_get_temp_dir().'/'.uniqid('sf_translation', true);
-        $this->fs->mkdir($this->translationDir.'/translations');
-        $this->fs->mkdir($this->translationDir.'/templates');
-
         $tester = $this->createCommandTester(['messages' => ['foo' => 'foo']], [], null, [$this->translationDir.'/trans'], [$this->translationDir.'/views']);
         $tester->execute(['command' => 'translation:extract', 'locale' => 'en', '--dump-messages' => true, '--clean' => true]);
         $this->assertMatchesRegularExpression('/foo/', $tester->getDisplay());
@@ -123,11 +110,6 @@ class TranslationUpdateCommandTest extends TestCase
 
     public function testWriteMessagesInRootDirectory()
     {
-        $this->fs->remove($this->translationDir);
-        $this->translationDir = sys_get_temp_dir().'/'.uniqid('sf_translation', true);
-        $this->fs->mkdir($this->translationDir.'/translations');
-        $this->fs->mkdir($this->translationDir.'/templates');
-
         $tester = $this->createCommandTester(['messages' => ['foo' => 'foo']]);
         $tester->execute(['command' => 'translation:extract', 'locale' => 'en', '--force' => true]);
         $this->assertMatchesRegularExpression('/Translation files were successfully updated./', $tester->getDisplay());
@@ -168,7 +150,6 @@ class TranslationUpdateCommandTest extends TestCase
         $command = $this->createMock(TranslationUpdateCommand::class);
 
         $method = new \ReflectionMethod(TranslationUpdateCommand::class, 'filterDuplicateTransPaths');
-        $method->setAccessible(true);
 
         $filteredTransPaths = $method->invoke($command, $transPaths);
 
@@ -183,7 +164,8 @@ class TranslationUpdateCommandTest extends TestCase
     protected function setUp(): void
     {
         $this->fs = new Filesystem();
-        $this->translationDir = sys_get_temp_dir().'/'.uniqid('sf_translation', true);
+        $this->translationDir = tempnam(sys_get_temp_dir(), 'sf_translation_');
+        $this->fs->remove($this->translationDir);
         $this->fs->mkdir($this->translationDir.'/translations');
         $this->fs->mkdir($this->translationDir.'/templates');
     }

@@ -18,7 +18,6 @@ use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Http\Authenticator\AuthenticatorInterface;
 use Symfony\Component\Security\Http\Authenticator\InteractiveAuthenticatorInterface;
 use Symfony\Component\Security\Http\Authenticator\Passport\Passport;
-use Symfony\Component\Security\Http\Authenticator\Passport\PassportInterface;
 use Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface;
 use Symfony\Component\Security\Http\EntryPoint\Exception\NotAnEntryPointException;
 
@@ -35,21 +34,14 @@ use Symfony\Component\Security\Http\EntryPoint\Exception\NotAnEntryPointExceptio
  */
 class LdapAuthenticator implements AuthenticationEntryPointInterface, InteractiveAuthenticatorInterface
 {
-    private $authenticator;
-    private $ldapServiceId;
-    private $dnString;
-    private $searchDn;
-    private $searchPassword;
-    private $queryString;
-
-    public function __construct(AuthenticatorInterface $authenticator, string $ldapServiceId, string $dnString = '{username}', string $searchDn = '', string $searchPassword = '', string $queryString = '')
-    {
-        $this->authenticator = $authenticator;
-        $this->ldapServiceId = $ldapServiceId;
-        $this->dnString = $dnString;
-        $this->searchDn = $searchDn;
-        $this->searchPassword = $searchPassword;
-        $this->queryString = $queryString;
+    public function __construct(
+        private AuthenticatorInterface $authenticator,
+        private string $ldapServiceId,
+        private string $dnString = '{user_identifier}',
+        private string $searchDn = '',
+        private string $searchPassword = '',
+        private string $queryString = '',
+    ) {
     }
 
     public function supports(Request $request): ?bool
@@ -65,23 +57,9 @@ class LdapAuthenticator implements AuthenticationEntryPointInterface, Interactiv
         return $passport;
     }
 
-    /**
-     * @deprecated since Symfony 5.4, use {@link createToken()} instead
-     */
-    public function createAuthenticatedToken(PassportInterface $passport, string $firewallName): TokenInterface
-    {
-        trigger_deprecation('symfony/ldap', '5.4', 'Method "%s()" is deprecated, use "%s::createToken()" instead.', __METHOD__, __CLASS__);
-
-        return $this->createToken($passport, $firewallName);
-    }
-
     public function createToken(Passport $passport, string $firewallName): TokenInterface
     {
-        // @deprecated since Symfony 5.4, in 6.0 change to:
-        // return $this->authenticator->createToken($passport, $firewallName);
-        return method_exists($this->authenticator, 'createToken')
-            ? $this->authenticator->createToken($passport, $firewallName)
-            : $this->authenticator->createAuthenticatedToken($passport, $firewallName);
+        return $this->authenticator->createToken($passport, $firewallName);
     }
 
     public function onAuthenticationSuccess(Request $request, TokenInterface $token, string $firewallName): ?Response
@@ -97,7 +75,7 @@ class LdapAuthenticator implements AuthenticationEntryPointInterface, Interactiv
     public function start(Request $request, ?AuthenticationException $authException = null): Response
     {
         if (!$this->authenticator instanceof AuthenticationEntryPointInterface) {
-            throw new NotAnEntryPointException(sprintf('Decorated authenticator "%s" does not implement interface "%s".', get_debug_type($this->authenticator), AuthenticationEntryPointInterface::class));
+            throw new NotAnEntryPointException(\sprintf('Decorated authenticator "%s" does not implement interface "%s".', get_debug_type($this->authenticator), AuthenticationEntryPointInterface::class));
         }
 
         return $this->authenticator->start($request, $authException);

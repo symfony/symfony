@@ -3,8 +3,8 @@
 use Symfony\Component\DependencyInjection\Argument\RewindableGenerator;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Container;
-use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Exception\LogicException;
+use Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\ParameterBag\FrozenParameterBag;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
@@ -37,24 +37,16 @@ class Symfony_DI_PhpDumper_Test_Deep_Graph extends Container
         return true;
     }
 
-    public function getRemovedIds(): array
-    {
-        return [
-            'Psr\\Container\\ContainerInterface' => true,
-            'Symfony\\Component\\DependencyInjection\\ContainerInterface' => true,
-        ];
-    }
-
     /**
      * Gets the public 'bar' shared service.
      *
      * @return \stdClass
      */
-    protected function getBarService()
+    protected static function getBarService($container)
     {
-        $this->services['bar'] = $instance = new \stdClass();
+        $container->services['bar'] = $instance = new \stdClass();
 
-        $instance->p5 = new \stdClass(($this->services['foo'] ?? $this->getFooService()));
+        $instance->p5 = new \stdClass(($container->services['foo'] ?? self::getFooService($container)));
 
         return $instance;
     }
@@ -64,12 +56,12 @@ class Symfony_DI_PhpDumper_Test_Deep_Graph extends Container
      *
      * @return \Symfony\Component\DependencyInjection\Tests\Dumper\FooForDeepGraph
      */
-    protected function getFooService()
+    protected static function getFooService($container)
     {
-        $a = ($this->services['bar'] ?? $this->getBarService());
+        $a = ($container->services['bar'] ?? self::getBarService($container));
 
-        if (isset($this->services['foo'])) {
-            return $this->services['foo'];
+        if (isset($container->services['foo'])) {
+            return $container->services['foo'];
         }
         $b = new \stdClass();
 
@@ -78,6 +70,6 @@ class Symfony_DI_PhpDumper_Test_Deep_Graph extends Container
 
         $b->p2 = $c;
 
-        return $this->services['foo'] = new \Symfony\Component\DependencyInjection\Tests\Dumper\FooForDeepGraph($a, $b);
+        return $container->services['foo'] = new \Symfony\Component\DependencyInjection\Tests\Dumper\FooForDeepGraph($a, $b);
     }
 }

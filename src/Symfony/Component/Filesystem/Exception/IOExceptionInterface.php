@@ -20,8 +20,6 @@ interface IOExceptionInterface extends ExceptionInterface
 {
     /**
      * Returns the associated path for the exception.
-     *
-     * @return string|null
      */
-    public function getPath();
+    public function getPath(): ?string;
 }

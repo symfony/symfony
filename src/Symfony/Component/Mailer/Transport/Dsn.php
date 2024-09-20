@@ -18,24 +18,17 @@ use Symfony\Component\Mailer\Exception\InvalidArgumentException;
  */
 final class Dsn
 {
-    private $scheme;
-    private $host;
-    private $user;
-    private $password;
-    private $port;
-    private $options;
-
-    public function __construct(string $scheme, string $host, ?string $user = null, ?string $password = null, ?int $port = null, array $options = [])
-    {
-        $this->scheme = $scheme;
-        $this->host = $host;
-        $this->user = $user;
-        $this->password = $password;
-        $this->port = $port;
-        $this->options = $options;
+    public function __construct(
+        private string $scheme,
+        private string $host,
+        private ?string $user = null,
+        #[\SensitiveParameter] private ?string $password = null,
+        private ?int $port = null,
+        private array $options = [],
+    ) {
     }
 
-    public static function fromString(string $dsn): self
+    public static function fromString(#[\SensitiveParameter] string $dsn): self
     {
         if (false === $params = parse_url($dsn)) {
             throw new InvalidArgumentException('The mailer DSN is invalid.');
@@ -82,7 +75,7 @@ final class Dsn
         return $this->port ?? $default;
     }
 
-    public function getOption(string $key, $default = null)
+    public function getOption(string $key, mixed $default = null): mixed
     {
         return $this->options[$key] ?? $default;
     }

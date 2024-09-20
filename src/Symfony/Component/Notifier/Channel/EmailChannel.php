@@ -15,6 +15,7 @@ use Symfony\Component\Mailer\Envelope;
 use Symfony\Component\Mailer\Messenger\SendEmailMessage;
 use Symfony\Component\Mailer\Transport\TransportInterface;
 use Symfony\Component\Messenger\MessageBusInterface;
+use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Email;
 use Symfony\Component\Notifier\Exception\LogicException;
 use Symfony\Component\Notifier\Message\EmailMessage;
@@ -28,23 +29,24 @@ use Symfony\Component\Notifier\Recipient\RecipientInterface;
  */
 class EmailChannel implements ChannelInterface
 {
-    private $transport;
-    private $bus;
-    private $from;
-    private $envelope;
+    private string|Address|null $from;
 
-    public function __construct(?TransportInterface $transport = null, ?MessageBusInterface $bus = null, ?string $from = null, ?Envelope $envelope = null)
-    {
+    public function __construct(
+        private ?TransportInterface $transport = null,
+        private ?MessageBusInterface $bus = null,
+        ?string $from = null,
+        private ?Envelope $envelope = null,
+    ) {
         if (null === $transport && null === $bus) {
-            throw new LogicException(sprintf('"%s" needs a Transport or a Bus but both cannot be "null".', static::class));
+            throw new LogicException(\sprintf('"%s" needs a Transport or a Bus but both cannot be "null".', static::class));
         }
 
-        $this->transport = $transport;
-        $this->bus = $bus;
-        $this->from = $from ?: ($envelope ? $envelope->getSender() : null);
-        $this->envelope = $envelope;
+        $this->from = $from ?: $envelope?->getSender();
     }
 
+    /**
+     * @param EmailRecipientInterface $recipient
+     */
     public function notify(Notification $notification, RecipientInterface $recipient, ?string $transportName = null): void
     {
         $message = null;
@@ -52,12 +54,12 @@ class EmailChannel implements ChannelInterface
             $message = $notification->asEmailMessage($recipient, $transportName);
         }
 
-        $message = $message ?: EmailMessage::fromNotification($notification, $recipient, $transportName);
+        $message ??= EmailMessage::fromNotification($notification, $recipient, $transportName);
         $email = $message->getMessage();
         if ($email instanceof Email) {
             if (!$email->getFrom()) {
                 if (null === $this->from) {
-                    throw new LogicException(sprintf('To send the "%s" notification by email, you must configure a "from" header by either setting a sender in the global "envelope" of the mailer configuration or by setting a "from" header in the "asEmailMessage()" method.', get_debug_type($notification)));
+                    throw new LogicException(\sprintf('To send the "%s" notification by email, you must configure a "from" header by either setting a sender in the global "envelope" of the mailer configuration or by setting a "from" header in the "asEmailMessage()" method.', get_debug_type($notification)));
                 }
 
                 $email->from($this->from);

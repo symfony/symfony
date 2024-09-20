@@ -9,7 +9,7 @@ class FoobarCommand extends Command
     public $input;
     public $output;
 
-    protected function configure()
+    protected function configure(): void
     {
         $this
             ->setName('foobar:foo')

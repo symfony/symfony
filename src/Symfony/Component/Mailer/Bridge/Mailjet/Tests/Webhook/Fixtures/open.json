@@ -1,0 +1,15 @@
+{
+    "event": "open",
+    "time": 1685519055,
+    "MessageID": 102175416994919440,
+    "Message_GUID": "982f91f1-4417-4ab1-9777-a2410e1bde36",
+    "email": "event-open@gmail.com",
+    "mj_campaign_id": 0,
+    "mj_contact_id": 1000,
+    "customcampaign": "",
+    "ip": "127.0.0.1",
+    "geo": "EU",
+    "agent": "Mozilla/5.0 (Windows NT 5.1; rv:11.0) Gecko Firefox/11.0 (via ggpht.com GoogleImageProxy)",
+    "CustomID": "helloworld",
+    "Payload": ""
+}

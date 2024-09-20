@@ -27,18 +27,17 @@ final class FakeSmsLoggerTransport extends AbstractTransport
 {
     protected const HOST = 'default';
 
-    private $logger;
-
-    public function __construct(LoggerInterface $logger, ?HttpClientInterface $client = null, ?EventDispatcherInterface $dispatcher = null)
-    {
-        $this->logger = $logger;
-
+    public function __construct(
+        private LoggerInterface $logger,
+        ?HttpClientInterface $client = null,
+        ?EventDispatcherInterface $dispatcher = null,
+    ) {
         parent::__construct($client, $dispatcher);
     }
 
     public function __toString(): string
     {
-        return sprintf('fakesms+logger://%s', $this->getEndpoint());
+        return \sprintf('fakesms+logger://%s', $this->getEndpoint());
     }
 
     public function supports(MessageInterface $message): bool
@@ -55,7 +54,7 @@ final class FakeSmsLoggerTransport extends AbstractTransport
             throw new UnsupportedMessageTypeException(__CLASS__, SmsMessage::class, $message);
         }
 
-        $this->logger->info(sprintf('New SMS on phone number: %s', $message->getPhone()));
+        $this->logger->info(\sprintf('New SMS on phone number: %s', $message->getPhone()));
 
         return new SentMessage($message, (string) $this);
     }

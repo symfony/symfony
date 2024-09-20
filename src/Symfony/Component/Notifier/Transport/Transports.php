@@ -21,14 +21,16 @@ use Symfony\Component\Notifier\Message\SentMessage;
  */
 final class Transports implements TransportInterface
 {
-    private $transports;
+    /**
+     * @var array<string, TransportInterface>
+     */
+    private array $transports = [];
 
     /**
-     * @param TransportInterface[] $transports
+     * @param iterable<string, TransportInterface> $transports
      */
     public function __construct(iterable $transports)
     {
-        $this->transports = [];
         foreach ($transports as $name => $transport) {
             $this->transports[$name] = $transport;
         }
@@ -53,20 +55,20 @@ final class Transports implements TransportInterface
     public function send(MessageInterface $message): SentMessage
     {
         if (!$transport = $message->getTransport()) {
-            foreach ($this->transports as $transportName => $transport) {
+            foreach ($this->transports as $transport) {
                 if ($transport->supports($message)) {
                     return $transport->send($message);
                 }
             }
-            throw new LogicException(sprintf('None of the available transports support the given message (available transports: "%s").', implode('", "', array_keys($this->transports))));
+            throw new LogicException(\sprintf('None of the available transports support the given message (available transports: "%s").', implode('", "', array_keys($this->transports))));
         }
 
         if (!isset($this->transports[$transport])) {
-            throw new InvalidArgumentException(sprintf('The "%s" transport does not exist (available transports: "%s").', $transport, implode('", "', array_keys($this->transports))));
+            throw new InvalidArgumentException(\sprintf('The "%s" transport does not exist (available transports: "%s").', $transport, implode('", "', array_keys($this->transports))));
         }
 
         if (!$this->transports[$transport]->supports($message)) {
-            throw new LogicException(sprintf('The "%s" transport does not support the given message.', $transport));
+            throw new LogicException(\sprintf('The "%s" transport does not support the given message.', $transport));
         }
 
         return $this->transports[$transport]->send($message);

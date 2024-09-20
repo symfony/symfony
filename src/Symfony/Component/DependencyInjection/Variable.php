@@ -26,17 +26,12 @@ namespace Symfony\Component\DependencyInjection;
  */
 class Variable
 {
-    private $name;
-
-    public function __construct(string $name)
-    {
-        $this->name = $name;
+    public function __construct(
+        private string $name,
+    ) {
     }
 
-    /**
-     * @return string
-     */
-    public function __toString()
+    public function __toString(): string
     {
         return $this->name;
     }

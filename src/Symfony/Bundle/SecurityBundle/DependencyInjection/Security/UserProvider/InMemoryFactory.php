@@ -24,7 +24,7 @@ use Symfony\Component\DependencyInjection\Parameter;
  */
 class InMemoryFactory implements UserProviderFactoryInterface
 {
-    public function create(ContainerBuilder $container, string $id, array $config)
+    public function create(ContainerBuilder $container, string $id, array $config): void
     {
         $definition = $container->setDefinition($id, new ChildDefinition('security.user.provider.in_memory'));
         $defaultPassword = new Parameter('container.build_id');
@@ -37,12 +37,12 @@ class InMemoryFactory implements UserProviderFactoryInterface
         $definition->addArgument($users);
     }
 
-    public function getKey()
+    public function getKey(): string
     {
         return 'memory';
     }
 
-    public function addConfiguration(NodeDefinition $node)
+    public function addConfiguration(NodeDefinition $node): void
     {
         $node
             ->fixXmlConfig('user')
@@ -50,33 +50,11 @@ class InMemoryFactory implements UserProviderFactoryInterface
                 ->arrayNode('users')
                     ->useAttributeAsKey('identifier')
                     ->normalizeKeys(false)
-                    ->beforeNormalization()
-                        ->always()
-                        ->then(function ($v) {
-                            $deprecation = false;
-                            foreach ($v as $i => $child) {
-                                if (!isset($child['name'])) {
-                                    continue;
-                                }
-
-                                $deprecation = true;
-
-                                $v[$i]['identifier'] = $child['name'];
-                                unset($v[$i]['name']);
-                            }
-
-                            if ($deprecation) {
-                                trigger_deprecation('symfony/security-bundle', '5.3', 'The "in_memory.user.name" option is deprecated, use "identifier" instead.');
-                            }
-
-                            return $v;
-                        })
-                    ->end()
                     ->prototype('array')
                         ->children()
                             ->scalarNode('password')->defaultNull()->end()
                             ->arrayNode('roles')
-                                ->beforeNormalization()->ifString()->then(function ($v) { return preg_split('/\s*,\s*/', $v); })->end()
+                                ->beforeNormalization()->ifString()->then(fn ($v) => preg_split('/\s*,\s*/', $v))->end()
                                 ->prototype('scalar')->end()
                             ->end()
                         ->end()

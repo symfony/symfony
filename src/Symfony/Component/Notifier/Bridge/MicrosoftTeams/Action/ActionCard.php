@@ -21,12 +21,12 @@ use Symfony\Component\Notifier\Bridge\MicrosoftTeams\Action\Input\InputInterface
  */
 final class ActionCard implements ActionInterface
 {
-    private $options = [];
+    private array $options = [];
 
     /**
      * @return $this
      */
-    public function name(string $name): self
+    public function name(string $name): static
     {
         $this->options['name'] = $name;
 
@@ -36,7 +36,7 @@ final class ActionCard implements ActionInterface
     /**
      * @return $this
      */
-    public function input(InputInterface $inputAction): self
+    public function input(InputInterface $inputAction): static
     {
         $this->options['inputs'][] = $inputAction->toArray();
 
@@ -46,7 +46,7 @@ final class ActionCard implements ActionInterface
     /**
      * @return $this
      */
-    public function action(ActionCardCompatibleActionInterface $action): self
+    public function action(ActionCardCompatibleActionInterface $action): static
     {
         $this->options['actions'][] = $action->toArray();
 

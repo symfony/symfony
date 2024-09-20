@@ -29,26 +29,23 @@ final class TelnyxTransport extends AbstractTransport
 {
     protected const HOST = 'api.telnyx.com';
 
-    private $apiKey;
-    private $from;
-    private $messagingProfileId;
-
-    public function __construct(string $apiKey, string $from, ?string $messagingProfileId, ?HttpClientInterface $client = null, ?EventDispatcherInterface $dispatcher = null)
-    {
-        $this->apiKey = $apiKey;
-        $this->from = $from;
-        $this->messagingProfileId = $messagingProfileId;
-
+    public function __construct(
+        #[\SensitiveParameter] private string $apiKey,
+        private string $from,
+        private ?string $messagingProfileId,
+        ?HttpClientInterface $client = null,
+        ?EventDispatcherInterface $dispatcher = null,
+    ) {
         parent::__construct($client, $dispatcher);
     }
 
     public function __toString(): string
     {
         if (null !== $this->messagingProfileId) {
-            return sprintf('telnyx://%s?from=%s&messaging_profile_id=%s', $this->getEndpoint(), $this->from, $this->messagingProfileId);
+            return \sprintf('telnyx://%s?from=%s&messaging_profile_id=%s', $this->getEndpoint(), $this->from, $this->messagingProfileId);
         }
 
-        return sprintf('telnyx://%s?from=%s', $this->getEndpoint(), $this->from);
+        return \sprintf('telnyx://%s?from=%s', $this->getEndpoint(), $this->from);
     }
 
     public function supports(MessageInterface $message): bool
@@ -62,23 +59,25 @@ final class TelnyxTransport extends AbstractTransport
             throw new UnsupportedMessageTypeException(__CLASS__, SmsMessage::class, $message);
         }
 
-        if (!preg_match('/^[+]+[1-9][0-9]{9,14}$/', $this->from)) {
-            if ('' === $this->from) {
+        $from = $message->getFrom() ?: $this->from;
+
+        if (!preg_match('/^[+]+[1-9][0-9]{9,14}$/', $from)) {
+            if ('' === $from) {
                 throw new IncompleteDsnException('This phone number is invalid.');
-            } elseif ('' !== $this->from && null === $this->messagingProfileId) {
+            } elseif (null === $this->messagingProfileId) {
                 throw new IncompleteDsnException('The sending messaging profile must be specified.');
             }
 
-            if (!preg_match('/^[a-zA-Z0-9 ]+$/', $this->from)) {
+            if (!preg_match('/^[a-zA-Z0-9 ]+$/', $from)) {
                 throw new IncompleteDsnException('The Sender ID is invalid.');
             }
         }
 
-        $endpoint = sprintf('https://%s/v2/messages', $this->getEndpoint());
+        $endpoint = \sprintf('https://%s/v2/messages', $this->getEndpoint());
         $response = $this->client->request('POST', $endpoint, [
             'auth_bearer' => $this->apiKey,
             'json' => [
-                'from' => $this->from,
+                'from' => $from,
                 'to' => $message->getPhone(),
                 'text' => $message->getSubject(),
                 'messaging_profile_id' => $this->messagingProfileId ?? '',

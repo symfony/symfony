@@ -14,7 +14,6 @@ namespace Symfony\Component\Messenger\Bridge\Doctrine\Tests\Transport;
 use Doctrine\DBAL\Configuration;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\DriverManager;
-use Doctrine\DBAL\Schema\AbstractSchemaManager;
 use Doctrine\DBAL\Schema\DefaultSchemaManagerFactory;
 use Doctrine\DBAL\Tools\DsnParser;
 use PHPUnit\Framework\TestCase;
@@ -28,10 +27,8 @@ use Symfony\Component\Messenger\Bridge\Doctrine\Transport\PostgreSqlConnection;
  */
 class DoctrinePostgreSqlIntegrationTest extends TestCase
 {
-    /** @var Connection */
-    private $driverConnection;
-    /** @var PostgreSqlConnection */
-    private $connection;
+    private Connection $driverConnection;
+    private PostgreSqlConnection $connection;
 
     protected function setUp(): void
     {
@@ -40,7 +37,7 @@ class DoctrinePostgreSqlIntegrationTest extends TestCase
         }
 
         $url = "pdo-pgsql://postgres:password@$host";
-        $params = class_exists(DsnParser::class) ? (new DsnParser())->parse($url) : ['url' => $url];
+        $params = (new DsnParser())->parse($url);
         $config = new Configuration();
         if (class_exists(DefaultSchemaManagerFactory::class)) {
             $config->setSchemaManagerFactory(new DefaultSchemaManagerFactory());
@@ -53,7 +50,7 @@ class DoctrinePostgreSqlIntegrationTest extends TestCase
 
     protected function tearDown(): void
     {
-        $this->createSchemaManager()->dropTable('queue_table');
+        $this->driverConnection->createSchemaManager()->dropTable('queue_table');
         $this->driverConnection->close();
     }
 
@@ -68,10 +65,16 @@ class DoctrinePostgreSqlIntegrationTest extends TestCase
         $this->assertNull($this->connection->get());
     }
 
-    private function createSchemaManager(): AbstractSchemaManager
+    public function testSkipLocked()
     {
-        return method_exists($this->driverConnection, 'createSchemaManager')
-            ? $this->driverConnection->createSchemaManager()
-            : $this->driverConnection->getSchemaManager();
+        $connection = new PostgreSqlConnection(['table_name' => 'queue_table', 'skip_locked' => true], $this->driverConnection);
+
+        $connection->send('{"message": "Hi"}', ['type' => DummyMessage::class]);
+
+        $encoded = $connection->get();
+        $this->assertEquals('{"message": "Hi"}', $encoded['body']);
+        $this->assertEquals(['type' => DummyMessage::class], $encoded['headers']);
+
+        $this->assertNull($connection->get());
     }
 }

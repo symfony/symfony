@@ -22,8 +22,6 @@ trait SkipUninitializedValuesTestTrait
     abstract protected function getNormalizerForSkipUninitializedValues(): AbstractObjectNormalizer;
 
     /**
-     * @requires PHP 7.4
-     *
      * @dataProvider skipUninitializedValuesFlagProvider
      */
     public function testSkipUninitializedValues(array $context)
@@ -44,15 +42,12 @@ trait SkipUninitializedValuesTestTrait
         $this->assertSame('value', $objectToPopulate->getUninitialized());
     }
 
-    public function skipUninitializedValuesFlagProvider(): iterable
+    public static function skipUninitializedValuesFlagProvider(): iterable
     {
         yield 'passed manually' => [['skip_uninitialized_values' => true, 'groups' => ['foo']]];
         yield 'using default context value' => [['groups' => ['foo']]];
     }
 
-    /**
-     * @requires PHP 7.4
-     */
     public function testWithoutSkipUninitializedValues()
     {
         $object = new TypedPropertiesObjectWithGetters();

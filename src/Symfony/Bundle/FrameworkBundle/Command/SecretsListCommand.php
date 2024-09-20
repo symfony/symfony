@@ -12,6 +12,7 @@
 namespace Symfony\Bundle\FrameworkBundle\Command;
 
 use Symfony\Bundle\FrameworkBundle\Secrets\AbstractVault;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\Dumper;
 use Symfony\Component\Console\Input\InputInterface;
@@ -27,26 +28,19 @@ use Symfony\Component\Console\Style\SymfonyStyle;
  *
  * @internal
  */
+#[AsCommand(name: 'secrets:list', description: 'List all secrets')]
 final class SecretsListCommand extends Command
 {
-    protected static $defaultName = 'secrets:list';
-    protected static $defaultDescription = 'List all secrets';
-
-    private $vault;
-    private $localVault;
-
-    public function __construct(AbstractVault $vault, ?AbstractVault $localVault = null)
-    {
-        $this->vault = $vault;
-        $this->localVault = $localVault;
-
+    public function __construct(
+        private AbstractVault $vault,
+        private ?AbstractVault $localVault = null,
+    ) {
         parent::__construct();
     }
 
-    protected function configure()
+    protected function configure(): void
     {
         $this
-            ->setDescription(self::$defaultDescription)
             ->addOption('reveal', 'r', InputOption::VALUE_NONE, 'Display decrypted values alongside names')
             ->setHelp(<<<'EOF'
 The <info>%command.name%</info> command list all stored secrets.
@@ -68,18 +62,16 @@ EOF
         $io->comment('Use <info>"%env(<name>)%"</info> to reference a secret in a config file.');
 
         if (!$reveal = $input->getOption('reveal')) {
-            $io->comment(sprintf('To reveal the secrets run <info>php %s %s --reveal</info>', $_SERVER['PHP_SELF'], $this->getName()));
+            $io->comment(\sprintf('To reveal the secrets run <info>php %s %s --reveal</info>', $_SERVER['PHP_SELF'], $this->getName()));
         }
 
         $secrets = $this->vault->list($reveal);
-        $localSecrets = null !== $this->localVault ? $this->localVault->list($reveal) : null;
+        $localSecrets = $this->localVault?->list($reveal);
 
         $rows = [];
 
         $dump = new Dumper($output);
-        $dump = static function (?string $v) use ($dump) {
-            return null === $v ? '******' : $dump($v);
-        };
+        $dump = fn ($v) => null === $v ? '******' : $dump($v);
 
         foreach ($secrets as $name => $value) {
             $rows[$name] = [$name, $dump($value)];

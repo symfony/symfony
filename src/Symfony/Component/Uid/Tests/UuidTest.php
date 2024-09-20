@@ -12,6 +12,7 @@
 namespace Symfony\Component\Uid\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Uid\MaxUuid;
 use Symfony\Component\Uid\NilUuid;
 use Symfony\Component\Uid\Tests\Fixtures\CustomUuid;
 use Symfony\Component\Uid\Ulid;
@@ -21,11 +22,13 @@ use Symfony\Component\Uid\UuidV3;
 use Symfony\Component\Uid\UuidV4;
 use Symfony\Component\Uid\UuidV5;
 use Symfony\Component\Uid\UuidV6;
+use Symfony\Component\Uid\UuidV7;
 
 class UuidTest extends TestCase
 {
     private const A_UUID_V1 = 'd9e7a184-5d5b-11ea-a62a-3499710062d0';
     private const A_UUID_V4 = 'd6b3345b-2905-4048-a83c-b5988e765d98';
+    private const A_UUID_V7 = '017f22e2-79b0-7cc3-98c4-dc0c0c07398f';
 
     /**
      * @dataProvider provideInvalidUuids
@@ -68,6 +71,8 @@ class UuidTest extends TestCase
         yield ['8dac64d3-937a-4e7c-fa1d-d5d6c06a61f5'];
         yield ['8dac64d3-937a-5e7c-fa1d-d5d6c06a61f5'];
         yield ['8dac64d3-937a-6e7c-fa1d-d5d6c06a61f5'];
+        yield ['8dac64d3-937a-7e7c-fa1d-d5d6c06a61f5'];
+        yield ['8dac64d3-937a-8e7c-fa1d-d5d6c06a61f5'];
     }
 
     public function testConstructorWithValidUuid()
@@ -88,6 +93,15 @@ class UuidTest extends TestCase
 
         $this->assertEquals(\DateTimeImmutable::createFromFormat('U.u', '1583245966.746458'), $uuid->getDateTime());
         $this->assertSame('3499710062d0', $uuid->getNode());
+    }
+
+    public function testV1IsLowerCase()
+    {
+        $uuid = new UuidV1();
+        $this->assertSame(strtolower((string) $uuid), (string) $uuid);
+
+        $uuid = new UuidV1('D9E7A184-5D5B-11EA-A62A-3499710062D0');
+        $this->assertSame(strtolower((string) $uuid), (string) $uuid);
     }
 
     public function testV3()
@@ -133,6 +147,28 @@ class UuidTest extends TestCase
         $this->assertNotSame(substr($uuidV1, 24), substr($uuidV6, 24));
     }
 
+    public function testV7()
+    {
+        $uuid = Uuid::fromString(self::A_UUID_V7);
+
+        $this->assertInstanceOf(UuidV7::class, $uuid);
+        $this->assertSame(1645557742, $uuid->getDateTime()->getTimeStamp());
+
+        $prev = UuidV7::generate();
+
+        for ($i = 0; $i < 25; ++$i) {
+            $uuid = UuidV7::generate();
+            $now = gmdate('Y-m-d H:i');
+            $this->assertGreaterThan($prev, $uuid);
+            $prev = $uuid;
+        }
+
+        $this->assertTrue(Uuid::isValid($uuid));
+        $uuid = Uuid::fromString($uuid);
+        $this->assertInstanceOf(UuidV7::class, $uuid);
+        $this->assertSame($now, $uuid->getDateTime()->format('Y-m-d H:i'));
+    }
+
     public function testBinary()
     {
         $uuid = new UuidV4(self::A_UUID_V4);
@@ -140,6 +176,13 @@ class UuidTest extends TestCase
 
         $this->assertInstanceOf(UuidV4::class, $uuid);
         $this->assertSame(self::A_UUID_V4, (string) $uuid);
+    }
+
+    public function testHex()
+    {
+        $uuid = new UuidV4(self::A_UUID_V4);
+
+        $this->assertSame('0xd6b3345b29054048a83cb5988e765d98', $uuid->toHex());
     }
 
     public function testFromUlid()
@@ -168,6 +211,43 @@ class UuidTest extends TestCase
         $this->assertTrue(Uuid::isValid(self::A_UUID_V4));
         $this->assertFalse(UuidV4::isValid(self::A_UUID_V1));
         $this->assertTrue(UuidV4::isValid(self::A_UUID_V4));
+    }
+
+    public function testIsValidWithVariousFormat()
+    {
+        $uuid = Uuid::v4();
+
+        $this->assertTrue(Uuid::isValid($uuid->toBase32(), Uuid::FORMAT_BASE_32));
+        $this->assertFalse(Uuid::isValid($uuid->toBase58(), Uuid::FORMAT_BASE_32));
+        $this->assertFalse(Uuid::isValid($uuid->toBinary(), Uuid::FORMAT_BASE_32));
+        $this->assertFalse(Uuid::isValid($uuid->toRfc4122(), Uuid::FORMAT_BASE_32));
+
+        $this->assertFalse(Uuid::isValid($uuid->toBase32(), Uuid::FORMAT_BASE_58));
+        $this->assertTrue(Uuid::isValid($uuid->toBase58(), Uuid::FORMAT_BASE_58));
+        $this->assertFalse(Uuid::isValid($uuid->toBinary(), Uuid::FORMAT_BASE_58));
+        $this->assertFalse(Uuid::isValid($uuid->toRfc4122(), Uuid::FORMAT_BASE_58));
+
+        $this->assertFalse(Uuid::isValid($uuid->toBase32(), Uuid::FORMAT_BINARY));
+        $this->assertFalse(Uuid::isValid($uuid->toBase58(), Uuid::FORMAT_BINARY));
+        $this->assertTrue(Uuid::isValid($uuid->toBinary(), Uuid::FORMAT_BINARY));
+        $this->assertFalse(Uuid::isValid($uuid->toRfc4122(), Uuid::FORMAT_BINARY));
+
+        $this->assertFalse(Uuid::isValid($uuid->toBase32(), Uuid::FORMAT_RFC_4122));
+        $this->assertFalse(Uuid::isValid($uuid->toBase58(), Uuid::FORMAT_RFC_4122));
+        $this->assertFalse(Uuid::isValid($uuid->toBinary(), Uuid::FORMAT_RFC_4122));
+        $this->assertTrue(Uuid::isValid($uuid->toRfc4122(), Uuid::FORMAT_RFC_4122));
+
+        $this->assertFalse(Uuid::isValid($uuid->toBase32(), Uuid::FORMAT_RFC_9562));
+        $this->assertFalse(Uuid::isValid($uuid->toBase58(), Uuid::FORMAT_RFC_9562));
+        $this->assertFalse(Uuid::isValid($uuid->toBinary(), Uuid::FORMAT_RFC_9562));
+        $this->assertTrue(Uuid::isValid($uuid->toRfc4122(), Uuid::FORMAT_RFC_9562));
+
+        $this->assertTrue(Uuid::isValid($uuid->toBase32(), Uuid::FORMAT_ALL));
+        $this->assertTrue(Uuid::isValid($uuid->toBase58(), Uuid::FORMAT_ALL));
+        $this->assertTrue(Uuid::isValid($uuid->toBinary(), Uuid::FORMAT_ALL));
+        $this->assertTrue(Uuid::isValid($uuid->toRfc4122(), Uuid::FORMAT_ALL));
+
+        $this->assertFalse(Uuid::isValid('30J7CNpDMfXPZrCsn4Cgey', Uuid::FORMAT_BASE_58), 'Fake base-58 string with the "O" forbidden char is not valid');
     }
 
     public function testIsValidWithNilUuid()
@@ -214,6 +294,29 @@ class UuidTest extends TestCase
         yield [new \stdClass()];
     }
 
+    public function testHashable()
+    {
+        $uuid1 = new UuidV4(self::A_UUID_V4);
+        $uuid2 = new UuidV4(self::A_UUID_V4);
+
+        $this->assertSame($uuid1->hash(), $uuid2->hash());
+    }
+
+    /** @requires extension ds */
+    public function testDsCompatibility()
+    {
+        $uuid1 = new UuidV4(self::A_UUID_V4);
+        $uuid2 = new UuidV4(self::A_UUID_V4);
+
+        $set = new \Ds\Set();
+        $set->add($uuid1);
+        $set->add($uuid2);
+
+        $this->assertTrue($set->contains($uuid1));
+        $this->assertTrue($set->contains($uuid2));
+        $this->assertCount(1, $set);
+    }
+
     public function testCompare()
     {
         $uuids = [];
@@ -225,9 +328,7 @@ class UuidTest extends TestCase
 
         $this->assertNotSame([$a, $b, $c, $d], $uuids);
 
-        usort($uuids, static function (Uuid $a, Uuid $b): int {
-            return $a->compare($b);
-        });
+        usort($uuids, static fn (Uuid $a, Uuid $b): int => $a->compare($b));
 
         $this->assertSame([$a, $b, $c, $d], $uuids);
     }
@@ -248,6 +349,23 @@ class UuidTest extends TestCase
     public function testNewNilUuid()
     {
         $this->assertSame('00000000-0000-0000-0000-000000000000', (string) new NilUuid());
+    }
+
+    /**
+     * @testWith    ["ffffffff-ffff-ffff-ffff-ffffffffffff"]
+     *              ["7zzzzzzzzzzzzzzzzzzzzzzzzz"]
+     */
+    public function testMaxUuid(string $uuid)
+    {
+        $uuid = Uuid::fromString($uuid);
+
+        $this->assertInstanceOf(MaxUuid::class, $uuid);
+        $this->assertSame('ffffffff-ffff-ffff-ffff-ffffffffffff', (string) $uuid);
+    }
+
+    public function testNewMaxUuid()
+    {
+        $this->assertSame('ffffffff-ffff-ffff-ffff-ffffffffffff', (string) new MaxUuid());
     }
 
     public function testFromBinary()
@@ -377,5 +495,54 @@ class UuidTest extends TestCase
     public function testFromStringBase58Padding()
     {
         $this->assertInstanceOf(Uuid::class, Uuid::fromString('111111111u9QRyVM94rdmZ'));
+    }
+
+    public function testV1ToV6()
+    {
+        $uuidV1 = new UuidV1('8189d3de-9670-11ee-b9d1-0242ac120002');
+        $uuidV6 = $uuidV1->toV6();
+
+        $this->assertEquals($uuidV1->getDateTime(), $uuidV6->getDateTime());
+        $this->assertSame($uuidV1->getNode(), $uuidV6->getNode());
+        $this->assertEquals($uuidV6, $uuidV1->toV6());
+    }
+
+    public function testV1ToV7BeforeUnixEpochThrows()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Cannot convert UUID to v7: its timestamp is before the Unix epoch.');
+
+        (new UuidV1('9aba8000-ff00-11b0-b3db-3b3fc83afdfc'))->toV7(); // Timestamp is 1969-01-01 00:00:00.0000000
+    }
+
+    public function testV1ToV7()
+    {
+        $uuidV1 = new UuidV1('eb248d80-ea4f-11ec-9d2a-839425e6fb88');
+        $sameUuidV1100NanosecondsLater = new UuidV1('eb248d81-ea4f-11ec-9d2a-839425e6fb88');
+        $uuidV7 = $uuidV1->toV7();
+        $sameUuidV7100NanosecondsLater = $sameUuidV1100NanosecondsLater->toV7();
+
+        $this->assertSame($uuidV1->getDateTime()->format('Uv'), $uuidV7->getDateTime()->format('Uv'));
+        $this->assertEquals($uuidV7, $uuidV1->toV7());
+        $this->assertNotEquals($uuidV7, $sameUuidV7100NanosecondsLater);
+        $this->assertSame(hexdec('0'.substr($uuidV7, -2)) + 1, hexdec('0'.substr($sameUuidV7100NanosecondsLater, -2)));
+    }
+
+    public function testV1ToV7WhenExtraTimeEntropyOverflows()
+    {
+        $uuidV1 = new UuidV1('10e7718f-2d4f-11be-bfed-cdd35907e584');
+        $sameUuidV1100NanosecondsLater = new UuidV1('10e77190-2d4f-11be-bfed-cdd35907e584');
+        $uuidV7 = $uuidV1->toV7();
+        $sameUuidV7100NanosecondsLater = $sameUuidV1100NanosecondsLater->toV7();
+
+        $this->assertSame($uuidV1->getDateTime()->format('Uv'), $uuidV7->getDateTime()->format('Uv'));
+        $this->assertEquals($uuidV7, $uuidV1->toV7());
+        $this->assertNotEquals($uuidV7, $sameUuidV7100NanosecondsLater);
+        $this->assertSame(hexdec('0'.substr($uuidV7, -2)) + 1, hexdec('0'.substr($sameUuidV7100NanosecondsLater, -2)));
+    }
+
+    public function testToString()
+    {
+        $this->assertSame('a45a8538-77a9-4335-bd30-236f59b81b81', (new UuidV4('a45a8538-77a9-4335-bd30-236f59b81b81'))->toString());
     }
 }

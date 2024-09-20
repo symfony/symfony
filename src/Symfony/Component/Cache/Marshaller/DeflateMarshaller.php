@@ -20,29 +20,20 @@ use Symfony\Component\Cache\Exception\CacheException;
  */
 class DeflateMarshaller implements MarshallerInterface
 {
-    private $marshaller;
-
-    public function __construct(MarshallerInterface $marshaller)
-    {
+    public function __construct(
+        private MarshallerInterface $marshaller,
+    ) {
         if (!\function_exists('gzdeflate')) {
             throw new CacheException('The "zlib" PHP extension is not loaded.');
         }
-
-        $this->marshaller = $marshaller;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function marshall(array $values, ?array &$failed): array
     {
         return array_map('gzdeflate', $this->marshaller->marshall($values, $failed));
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function unmarshall(string $value)
+    public function unmarshall(string $value): mixed
     {
         if (false !== $inflatedValue = @gzinflate($value)) {
             $value = $inflatedValue;

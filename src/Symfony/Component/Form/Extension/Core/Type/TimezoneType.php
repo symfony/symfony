@@ -25,10 +25,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class TimezoneType extends AbstractType
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         if ('datetimezone' === $options['input']) {
             $builder->addModelTransformer(new DateTimeZoneToStringTransformer($options['multiple']));
@@ -37,10 +34,7 @@ class TimezoneType extends AbstractType
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
             'intl' => false,
@@ -49,35 +43,27 @@ class TimezoneType extends AbstractType
 
                 if ($options['intl']) {
                     if (!class_exists(Intl::class)) {
-                        throw new LogicException(sprintf('The "symfony/intl" component is required to use "%s" with option "intl=true". Try running "composer require symfony/intl".', static::class));
+                        throw new LogicException(\sprintf('The "symfony/intl" component is required to use "%s" with option "intl=true". Try running "composer require symfony/intl".', static::class));
                     }
 
                     $choiceTranslationLocale = $options['choice_translation_locale'];
 
-                    return ChoiceList::loader($this, new IntlCallbackChoiceLoader(function () use ($input, $choiceTranslationLocale) {
-                        return self::getIntlTimezones($input, $choiceTranslationLocale);
-                    }), [$input, $choiceTranslationLocale]);
+                    return ChoiceList::loader($this, new IntlCallbackChoiceLoader(static fn () => self::getIntlTimezones($input, $choiceTranslationLocale)), [$input, $choiceTranslationLocale]);
                 }
 
-                return ChoiceList::lazy($this, function () use ($input) {
-                    return self::getPhpTimezones($input);
-                }, $input);
+                return ChoiceList::lazy($this, static fn () => self::getPhpTimezones($input), $input);
             },
             'choice_translation_domain' => false,
             'choice_translation_locale' => null,
             'input' => 'string',
-            'invalid_message' => function (Options $options, $previousValue) {
-                return ($options['legacy_error_messages'] ?? true)
-                    ? $previousValue
-                    : 'Please select a valid timezone.';
-            },
+            'invalid_message' => 'Please select a valid timezone.',
             'regions' => \DateTimeZone::ALL,
         ]);
 
         $resolver->setAllowedTypes('intl', ['bool']);
 
         $resolver->setAllowedTypes('choice_translation_locale', ['null', 'string']);
-        $resolver->setNormalizer('choice_translation_locale', function (Options $options, $value) {
+        $resolver->setNormalizer('choice_translation_locale', static function (Options $options, $value) {
             if (null !== $value && !$options['intl']) {
                 throw new LogicException('The "choice_translation_locale" option can only be used if the "intl" option is set to true.');
             }
@@ -86,7 +72,7 @@ class TimezoneType extends AbstractType
         });
 
         $resolver->setAllowedValues('input', ['string', 'datetimezone', 'intltimezone']);
-        $resolver->setNormalizer('input', function (Options $options, $value) {
+        $resolver->setNormalizer('input', static function (Options $options, $value) {
             if ('intltimezone' === $value && !class_exists(\IntlTimeZone::class)) {
                 throw new LogicException('Cannot use "intltimezone" input because the PHP intl extension is not available.');
             }
@@ -95,18 +81,12 @@ class TimezoneType extends AbstractType
         });
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getParent()
+    public function getParent(): ?string
     {
         return ChoiceType::class;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'timezone';
     }

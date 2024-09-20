@@ -26,39 +26,34 @@ use Symfony\Contracts\Service\ServiceSubscriberInterface;
  */
 class RouterCacheWarmer implements CacheWarmerInterface, ServiceSubscriberInterface
 {
-    private $container;
-
-    public function __construct(ContainerInterface $container)
-    {
-        // As this cache warmer is optional, dependencies should be lazy-loaded, that's why a container should be injected.
-        $this->container = $container;
+    /**
+     * As this cache warmer is optional, dependencies should be lazy-loaded, that's why a container should be injected.
+     */
+    public function __construct(
+        private ContainerInterface $container,
+    ) {
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function warmUp(string $cacheDir): array
+    public function warmUp(string $cacheDir, ?string $buildDir = null): array
     {
+        if (!$buildDir) {
+            return [];
+        }
+
         $router = $this->container->get('router');
 
         if ($router instanceof WarmableInterface) {
-            return (array) $router->warmUp($cacheDir);
+            return $router->warmUp($cacheDir, $buildDir);
         }
 
-        throw new \LogicException(sprintf('The router "%s" cannot be warmed up because it does not implement "%s".', get_debug_type($router), WarmableInterface::class));
+        throw new \LogicException(\sprintf('The router "%s" cannot be warmed up because it does not implement "%s".', get_debug_type($router), WarmableInterface::class));
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function isOptional(): bool
     {
         return true;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public static function getSubscribedServices(): array
     {
         return [

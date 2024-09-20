@@ -12,7 +12,6 @@
 namespace Symfony\Bundle\FrameworkBundle\Tests\Kernel;
 
 use Psr\Log\NullLogger;
-use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
 use Symfony\Bundle\FrameworkBundle\Kernel\MicroKernelTrait;
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -27,7 +26,7 @@ class ConcreteMicroKernel extends Kernel implements EventSubscriberInterface
 {
     use MicroKernelTrait;
 
-    private $cacheDir;
+    private string $cacheDir;
 
     public function onKernelException(ExceptionEvent $event)
     {
@@ -46,13 +45,6 @@ class ConcreteMicroKernel extends Kernel implements EventSubscriberInterface
         throw new Danger();
     }
 
-    public function registerBundles(): iterable
-    {
-        return [
-            new FrameworkBundle(),
-        ];
-    }
-
     public function getCacheDir(): string
     {
         return $this->cacheDir = sys_get_temp_dir().'/sf_micro_kernel';
@@ -68,7 +60,7 @@ class ConcreteMicroKernel extends Kernel implements EventSubscriberInterface
         throw new \BadMethodCallException('Cannot serialize '.__CLASS__);
     }
 
-    public function __wakeup()
+    public function __wakeup(): void
     {
         throw new \BadMethodCallException('Cannot unserialize '.__CLASS__);
     }
@@ -83,6 +75,10 @@ class ConcreteMicroKernel extends Kernel implements EventSubscriberInterface
     {
         $c->register('logger', NullLogger::class);
         $c->loadFromExtension('framework', [
+            'annotations' => false,
+            'http_method_override' => false,
+            'handle_all_throwables' => true,
+            'php_errors' => ['log' => true],
             'secret' => '$ecret',
             'router' => ['utf8' => true],
         ]);
@@ -91,9 +87,6 @@ class ConcreteMicroKernel extends Kernel implements EventSubscriberInterface
         $c->register('halloween', 'stdClass')->setPublic(true);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public static function getSubscribedEvents(): array
     {
         return [

@@ -14,12 +14,10 @@ $container
 
 $container
     ->register('foo2', 'stdClass')
-    ->setPublic(false)
 ;
 
 $container
     ->register('foo3', 'stdClass')
-    ->setPublic(false)
 ;
 
 $container

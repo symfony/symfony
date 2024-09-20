@@ -11,18 +11,13 @@
 
 namespace Symfony\Component\Messenger\Handler;
 
-use Symfony\Component\Messenger\Exception\LogicException;
-
 /**
  * @author Nicolas Grekas <p@tchwork.com>
  */
 trait BatchHandlerTrait
 {
-    private $jobs = [];
+    private array $jobs = [];
 
-    /**
-     * {@inheritdoc}
-     */
     public function flush(bool $force): void
     {
         if ($jobs = $this->jobs) {
@@ -38,7 +33,7 @@ trait BatchHandlerTrait
      * @return mixed The number of pending messages in the batch if $ack is not null,
      *               the result from handling the message otherwise
      */
-    private function handle(object $message, ?Acknowledger $ack)
+    private function handle(object $message, ?Acknowledger $ack): mixed
     {
         if (null === $ack) {
             $ack = new Acknowledger(get_debug_type($this));
@@ -60,7 +55,7 @@ trait BatchHandlerTrait
 
     private function shouldFlush(): bool
     {
-        return 10 <= \count($this->jobs);
+        return $this->getBatchSize() <= \count($this->jobs);
     }
 
     /**
@@ -68,8 +63,10 @@ trait BatchHandlerTrait
      *
      * @param list<array{0: object, 1: Acknowledger}> $jobs A list of pairs of messages and their corresponding acknowledgers
      */
-    private function process(array $jobs): void
+    abstract private function process(array $jobs): void;
+
+    private function getBatchSize(): int
     {
-        throw new LogicException(sprintf('"%s" should implement abstract method "process()".', get_debug_type($this)));
+        return 10;
     }
 }

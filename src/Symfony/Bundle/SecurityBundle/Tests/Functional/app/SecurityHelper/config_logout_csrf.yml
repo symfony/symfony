@@ -1,0 +1,46 @@
+imports:
+    - { resource: ./../config/framework.yml }
+
+services:
+    functional_test.security.helper:
+        alias: security.helper
+        public: true
+
+    functional.test.security.token_storage:
+        alias: security.token_storage
+        public: true
+
+    Symfony\Bundle\SecurityBundle\Tests\Functional\ForceLoginController:
+        arguments: ['@security.helper']
+        public: true
+
+    Symfony\Bundle\SecurityBundle\Tests\Functional\LogoutController:
+        arguments: ['@security.helper']
+        public: true
+
+    Symfony\Bundle\SecurityBundle\Tests\Functional\LoggedInController:
+        arguments: ['@security.helper']
+        public: true
+
+    Symfony\Bundle\SecurityBundle\Tests\Functional\Bundle\AuthenticatorBundle\ApiAuthenticator: ~
+
+security:
+    providers:
+        main:
+            memory:
+                users:
+                    chalasr: { password: the-password, roles: ['ROLE_FOO'] }
+                    no-role-username: { password: the-password, roles: [] }
+
+    firewalls:
+        main:
+            pattern: ^/main
+            form_login:
+                check_path: /main/login/check
+            custom_authenticators:
+                - 'Symfony\Bundle\SecurityBundle\Tests\Functional\Bundle\AuthenticatorBundle\ApiAuthenticator'
+            provider: main
+
+    access_control:
+        - { path: '^/main/logged-in$', roles: IS_AUTHENTICATED_FULLY }
+        - { path: '^/main/force-logout$', roles: IS_AUTHENTICATED_FULLY }

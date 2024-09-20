@@ -11,8 +11,8 @@
 
 namespace Symfony\Component\HttpClient\Tests;
 
-use PHPUnit\Framework\SkippedTestSuiteError;
 use Symfony\Component\HttpClient\Exception\ClientException;
+use Symfony\Component\HttpClient\Exception\InvalidArgumentException;
 use Symfony\Component\HttpClient\Exception\TransportException;
 use Symfony\Component\HttpClient\Internal\ClientState;
 use Symfony\Component\HttpClient\Response\StreamWrapper;
@@ -21,6 +21,7 @@ use Symfony\Component\Process\Process;
 use Symfony\Contracts\HttpClient\Exception\RedirectionExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\Test\HttpClientTestCase as BaseHttpClientTestCase;
+use Symfony\Contracts\HttpClient\Test\TestHttpServer;
 
 /*
 Tests for HTTP2 Push need a recent version of both PHP and curl. This docker command should run them:
@@ -30,7 +31,7 @@ The vulcain binary can be found at https://github.com/symfony/binary-utils/relea
 
 abstract class HttpClientTestCase extends BaseHttpClientTestCase
 {
-    private static $vulcainStarted = false;
+    private static bool $vulcainStarted = false;
 
     public function testTimeoutOnDestruct()
     {
@@ -317,11 +318,7 @@ abstract class HttpClientTestCase extends BaseHttpClientTestCase
         }
 
         if ('\\' === \DIRECTORY_SEPARATOR) {
-            throw new SkippedTestSuiteError('Testing with the "vulcain" is not supported on Windows.');
-        }
-
-        if (['application/json'] !== $client->request('GET', 'http://127.0.0.1:8057/json')->getHeaders()['content-type']) {
-            throw new SkippedTestSuiteError('symfony/http-client-contracts >= 2.0.1 required');
+            self::markTestSkipped('Testing with the "vulcain" is not supported on Windows.');
         }
 
         $process = new Process(['vulcain'], null, [
@@ -331,21 +328,26 @@ abstract class HttpClientTestCase extends BaseHttpClientTestCase
             'KEY_FILE' => __DIR__.'/Fixtures/tls/server.key',
             'CERT_FILE' => __DIR__.'/Fixtures/tls/server.crt',
         ]);
-        $process->start();
 
-        register_shutdown_function([$process, 'stop']);
+        try {
+            $process->start();
+        } catch (ProcessFailedException $e) {
+            self::markTestSkipped('vulcain failed: '.$e->getMessage());
+        }
+
+        register_shutdown_function($process->stop(...));
         sleep('\\' === \DIRECTORY_SEPARATOR ? 10 : 1);
 
         if (!$process->isRunning()) {
             if ('\\' !== \DIRECTORY_SEPARATOR && 127 === $process->getExitCode()) {
-                throw new SkippedTestSuiteError('vulcain binary is missing');
+                self::markTestSkipped('vulcain binary is missing');
             }
 
             if ('\\' !== \DIRECTORY_SEPARATOR && 126 === $process->getExitCode()) {
-                throw new SkippedTestSuiteError('vulcain binary is not executable');
+                self::markTestSkipped('vulcain binary is not executable');
             }
 
-            throw new SkippedTestSuiteError((new ProcessFailedException($process))->getMessage());
+            self::markTestSkipped((new ProcessFailedException($process))->getMessage());
         }
 
         self::$vulcainStarted = true;
@@ -365,7 +367,6 @@ abstract class HttpClientTestCase extends BaseHttpClientTestCase
             unset($e);
 
             $r = new \ReflectionProperty($client, 'multi');
-            $r->setAccessible(true);
             /** @var ClientState $clientState */
             $clientState = $r->getValue($client);
 
@@ -442,7 +443,7 @@ abstract class HttpClientTestCase extends BaseHttpClientTestCase
         ]);
 
         $this->assertSame(200, $response->getStatusCode());
-        $this->assertStringContainsString("\r\nContent-Length: ", $response->getInfo('debug'));
+        $this->assertStringContainsStringIgnoringCase("\r\nContent-Length: ", $response->getInfo('debug'));
     }
 
     public function testNullBody()
@@ -454,5 +455,69 @@ abstract class HttpClientTestCase extends BaseHttpClientTestCase
         ]);
 
         $this->expectNotToPerformAssertions();
+    }
+
+    public function testMisspelledScheme()
+    {
+        $httpClient = $this->getHttpClient(__FUNCTION__);
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Invalid URL: host is missing in "http:/localhost:8057/".');
+
+        $httpClient->request('GET', 'http:/localhost:8057/');
+    }
+
+    /**
+     * @dataProvider getRedirectWithAuthTests
+     */
+    public function testRedirectWithAuth(string $url, bool $redirectWithAuth)
+    {
+        $p = TestHttpServer::start(8067);
+
+        try {
+            $client = $this->getHttpClient(__FUNCTION__);
+
+            $response = $client->request('GET', $url, [
+                'headers' => [
+                    'cookie' => 'foo=bar',
+                ],
+            ]);
+            $body = $response->toArray();
+        } finally {
+            $p->stop();
+        }
+
+        if ($redirectWithAuth) {
+            $this->assertArrayHasKey('HTTP_COOKIE', $body);
+        } else {
+            $this->assertArrayNotHasKey('HTTP_COOKIE', $body);
+        }
+    }
+
+    public static function getRedirectWithAuthTests()
+    {
+        return [
+            'same host and port' => ['url' => 'http://localhost:8057/302', 'redirectWithAuth' => true],
+            'other port' => ['url' => 'http://localhost:8067/302', 'redirectWithAuth' => false],
+            'other host' => ['url' => 'http://127.0.0.1:8057/302', 'redirectWithAuth' => false],
+        ];
+    }
+
+    public function testDefaultContentType()
+    {
+        $client = $this->getHttpClient(__FUNCTION__);
+        $client = $client->withOptions(['headers' => ['Content-Type: application/json']]);
+
+        $response = $client->request('POST', 'http://localhost:8057/post', [
+            'body' => ['abc' => 'def'],
+        ]);
+
+        $this->assertSame(['abc' => 'def', 'REQUEST_METHOD' => 'POST'], $response->toArray());
+
+        $response = $client->request('POST', 'http://localhost:8057/post', [
+            'body' => '{"abc": "def"}',
+        ]);
+
+        $this->assertSame(['abc' => 'def', 'content-type' => 'application/json', 'REQUEST_METHOD' => 'POST'], $response->toArray());
     }
 }

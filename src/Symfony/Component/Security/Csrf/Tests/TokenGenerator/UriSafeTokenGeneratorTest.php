@@ -23,15 +23,10 @@ class UriSafeTokenGeneratorTest extends TestCase
 
     /**
      * A non alpha-numeric byte string.
-     *
-     * @var string
      */
-    private static $bytes;
+    private static string $bytes;
 
-    /**
-     * @var UriSafeTokenGenerator
-     */
-    private $generator;
+    private UriSafeTokenGenerator $generator;
 
     public static function setUpBeforeClass(): void
     {
@@ -43,19 +38,12 @@ class UriSafeTokenGeneratorTest extends TestCase
         $this->generator = new UriSafeTokenGenerator(self::ENTROPY);
     }
 
-    protected function tearDown(): void
-    {
-        $this->generator = null;
-    }
-
     public function testGenerateToken()
     {
         $token = $this->generator->generateToken();
 
         $this->assertTrue(ctype_print($token), 'is printable');
-        $this->assertStringNotMatchesFormat('%S+%S', $token, 'is URI safe');
-        $this->assertStringNotMatchesFormat('%S/%S', $token, 'is URI safe');
-        $this->assertStringNotMatchesFormat('%S=%S', $token, 'is URI safe');
+        $this->assertDoesNotMatchRegularExpression('#.+([+/=]).+#', $token, 'is URI safe');
     }
 
     /**

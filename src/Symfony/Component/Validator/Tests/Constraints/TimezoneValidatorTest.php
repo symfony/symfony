@@ -136,7 +136,7 @@ class TimezoneValidatorTest extends ConstraintValidatorTestCase
         $this->validator->validate($timezone, $constraint);
 
         $this->buildViolation('myMessage')
-            ->setParameter('{{ value }}', sprintf('"%s"', $timezone))
+            ->setParameter('{{ value }}', \sprintf('"%s"', $timezone))
             ->setCode(Timezone::TIMEZONE_IDENTIFIER_ERROR)
             ->assertRaised();
     }
@@ -162,7 +162,7 @@ class TimezoneValidatorTest extends ConstraintValidatorTestCase
         $this->validator->validate($timezone, $constraint);
 
         $this->buildViolation('myMessage')
-            ->setParameter('{{ value }}', sprintf('"%s"', $timezone))
+            ->setParameter('{{ value }}', \sprintf('"%s"', $timezone))
             ->setCode(Timezone::TIMEZONE_IDENTIFIER_IN_ZONE_ERROR)
             ->assertRaised();
     }
@@ -180,12 +180,9 @@ class TimezoneValidatorTest extends ConstraintValidatorTestCase
         yield ['Etc/UTC', \DateTimeZone::EUROPE];
     }
 
-    /**
-     * @requires PHP 8
-     */
     public function testInvalidGroupedTimezoneNamed()
     {
-        $constraint = eval('return new \Symfony\Component\Validator\Constraints\Timezone(zone: \DateTimeZone::AMERICA, message: "myMessage");');
+        $constraint = new Timezone(zone: \DateTimeZone::AMERICA, message: 'myMessage');
 
         $this->validator->validate('Europe/Berlin', $constraint);
 
@@ -246,7 +243,7 @@ class TimezoneValidatorTest extends ConstraintValidatorTestCase
         $this->validator->validate($timezone, $constraint);
 
         $this->buildViolation('myMessage')
-            ->setParameter('{{ value }}', sprintf('"%s"', $timezone))
+            ->setParameter('{{ value }}', \sprintf('"%s"', $timezone))
             ->setCode(Timezone::TIMEZONE_IDENTIFIER_IN_COUNTRY_ERROR)
             ->assertRaised();
     }
@@ -300,7 +297,7 @@ class TimezoneValidatorTest extends ConstraintValidatorTestCase
         $this->validator->validate($timezone, $constraint);
 
         $this->buildViolation('myMessage')
-            ->setParameter('{{ value }}', sprintf('"%s"', $timezone))
+            ->setParameter('{{ value }}', \sprintf('"%s"', $timezone))
             ->setCode(Timezone::TIMEZONE_IDENTIFIER_ERROR)
             ->assertRaised();
     }

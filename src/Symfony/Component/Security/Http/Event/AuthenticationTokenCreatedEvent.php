@@ -13,7 +13,6 @@ namespace Symfony\Component\Security\Http\Event;
 
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Http\Authenticator\Passport\Passport;
-use Symfony\Component\Security\Http\Authenticator\Passport\PassportInterface;
 use Symfony\Contracts\EventDispatcher\Event;
 
 /**
@@ -23,33 +22,23 @@ use Symfony\Contracts\EventDispatcher\Event;
  */
 class AuthenticationTokenCreatedEvent extends Event
 {
-    private $authenticatedToken;
-    private $passport;
-
-    /**
-     * @param Passport $passport
-     */
-    public function __construct(TokenInterface $token, PassportInterface $passport)
-    {
-        if (!$passport instanceof Passport) {
-            trigger_deprecation('symfony/security-http', '5.4', 'Not passing an instance of "%s" as "$passport" argument of "%s()" is deprecated, "%s" given.', Passport::class, __METHOD__, get_debug_type($passport));
-        }
-
-        $this->authenticatedToken = $token;
-        $this->passport = $passport;
+    public function __construct(
+        private TokenInterface $token,
+        private Passport $passport,
+    ) {
     }
 
     public function getAuthenticatedToken(): TokenInterface
     {
-        return $this->authenticatedToken;
+        return $this->token;
     }
 
     public function setAuthenticatedToken(TokenInterface $authenticatedToken): void
     {
-        $this->authenticatedToken = $authenticatedToken;
+        $this->token = $authenticatedToken;
     }
 
-    public function getPassport(): PassportInterface
+    public function getPassport(): Passport
     {
         return $this->passport;
     }

@@ -33,24 +33,41 @@ final class SpotHitTransport extends AbstractTransport
 {
     protected const HOST = 'spot-hit.fr';
 
-    private $token;
-    private $from;
+    private ?bool $smsLong = null;
+    private ?int $smsLongNBr = null;
 
-    public function __construct(string $token, ?string $from = null, ?HttpClientInterface $client = null, ?EventDispatcherInterface $dispatcher = null)
-    {
-        $this->token = $token;
-        $this->from = $from;
-
+    public function __construct(
+        #[\SensitiveParameter] private string $token,
+        private ?string $from = null,
+        ?HttpClientInterface $client = null,
+        ?EventDispatcherInterface $dispatcher = null,
+    ) {
         parent::__construct($client, $dispatcher);
     }
 
     public function __toString(): string
     {
-        if (!$this->from) {
-            return sprintf('spothit://%s', $this->getEndpoint());
-        }
+        $query = http_build_query([
+            'from' => $this->from,
+            'smslong' => $this->smsLong,
+            'smslongnbr' => $this->smsLongNBr,
+        ]);
 
-        return sprintf('spothit://%s?from=%s', $this->getEndpoint(), $this->from);
+        return \sprintf('spothit://%s', $this->getEndpoint()).('' !== $query ? '?'.$query : '');
+    }
+
+    public function setSmsLong(?bool $smsLong): self
+    {
+        $this->smsLong = $smsLong;
+
+        return $this;
+    }
+
+    public function setLongNBr(?int $smsLongNBr): self
+    {
+        $this->smsLongNBr = $smsLongNBr;
+
+        return $this;
     }
 
     public function supports(MessageInterface $message): bool
@@ -72,14 +89,16 @@ final class SpotHitTransport extends AbstractTransport
             throw new UnsupportedMessageTypeException(__CLASS__, SmsMessage::class, $message);
         }
 
-        $endpoint = sprintf('https://www.%s/api/envoyer/sms', $this->getEndpoint());
+        $endpoint = \sprintf('https://www.%s/api/envoyer/sms', $this->getEndpoint());
         $response = $this->client->request('POST', $endpoint, [
             'body' => [
                 'key' => $this->token,
                 'destinataires' => $message->getPhone(),
                 'type' => 'premium',
                 'message' => $message->getSubject(),
-                'expediteur' => $this->from,
+                'expediteur' => $message->getFrom() ?: $this->from,
+                'smslong' => $this->smsLong,
+                'smslongnbr' => $this->smsLongNBr,
             ],
         ]);
 
@@ -93,7 +112,7 @@ final class SpotHitTransport extends AbstractTransport
 
         if (!$data['resultat']) {
             $errors = \is_array($data['erreurs']) ? implode(',', $data['erreurs']) : $data['erreurs'];
-            throw new TransportException(sprintf('[HTTP %d] Unable to send the SMS: error(s) "%s".', $response->getStatusCode(), $errors), $response);
+            throw new TransportException(\sprintf('[HTTP %d] Unable to send the SMS: error(s) "%s".', $response->getStatusCode(), $errors), $response);
         }
 
         $sentMessage = new SentMessage($message, (string) $this);

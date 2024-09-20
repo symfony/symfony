@@ -17,7 +17,7 @@ class WithTarget
 {
     public function __construct(
         #[Target('image.storage')]
-        BarInterface $bar
+        BarInterface $bar,
     ) {
     }
 }

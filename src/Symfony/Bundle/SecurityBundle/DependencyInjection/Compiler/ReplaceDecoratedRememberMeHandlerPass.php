@@ -26,9 +26,6 @@ final class ReplaceDecoratedRememberMeHandlerPass implements CompilerPassInterfa
 {
     private const HANDLER_TAG = 'security.remember_me_handler';
 
-    /**
-     * {@inheritdoc}
-     */
     public function process(ContainerBuilder $container): void
     {
         $handledFirewalls = [];
@@ -41,7 +38,7 @@ final class ReplaceDecoratedRememberMeHandlerPass implements CompilerPassInterfa
             // get the actual custom remember me handler definition (passed to the decorator)
             $realRememberMeHandler = $container->findDefinition((string) $definition->getArgument(0));
             if (null === $realRememberMeHandler) {
-                throw new \LogicException(sprintf('Invalid service definition for custom remember me handler; no service found with ID "%s".', (string) $definition->getArgument(0)));
+                throw new \LogicException(\sprintf('Invalid service definition for custom remember me handler; no service found with ID "%s".', (string) $definition->getArgument(0)));
             }
 
             foreach ($rememberMeHandlerTags as $rememberMeHandlerTag) {

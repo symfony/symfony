@@ -12,18 +12,19 @@
 namespace Symfony\Component\Form\Test;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Form\FormExtensionInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\Forms;
+use Symfony\Component\Form\FormTypeExtensionInterface;
+use Symfony\Component\Form\FormTypeGuesserInterface;
+use Symfony\Component\Form\FormTypeInterface;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
 abstract class FormIntegrationTestCase extends TestCase
 {
-    /**
-     * @var FormFactoryInterface
-     */
-    protected $factory;
+    protected FormFactoryInterface $factory;
 
     protected function setUp(): void
     {
@@ -35,21 +36,33 @@ abstract class FormIntegrationTestCase extends TestCase
             ->getFormFactory();
     }
 
+    /**
+     * @return FormExtensionInterface[]
+     */
     protected function getExtensions()
     {
         return [];
     }
 
+    /**
+     * @return FormTypeExtensionInterface[]
+     */
     protected function getTypeExtensions()
     {
         return [];
     }
 
+    /**
+     * @return FormTypeInterface[]
+     */
     protected function getTypes()
     {
         return [];
     }
 
+    /**
+     * @return FormTypeGuesserInterface[]
+     */
     protected function getTypeGuessers()
     {
         return [];

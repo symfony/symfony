@@ -11,10 +11,12 @@
 
 namespace Symfony\Bridge\Monolog\Tests\Handler;
 
+use Monolog\Level;
 use Monolog\Logger;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Monolog\Formatter\ConsoleFormatter;
 use Symfony\Bridge\Monolog\Handler\ConsoleHandler;
+use Symfony\Bridge\Monolog\Tests\RecordFactory;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\ConsoleEvents;
 use Symfony\Component\Console\Event\ConsoleCommandEvent;
@@ -41,7 +43,7 @@ class ConsoleHandlerTest extends TestCase
     public function testIsHandling()
     {
         $handler = new ConsoleHandler();
-        $this->assertFalse($handler->isHandling([]), '->isHandling returns false when no output is set');
+        $this->assertFalse($handler->isHandling(RecordFactory::create()), '->isHandling returns false when no output is set');
     }
 
     /**
@@ -56,13 +58,13 @@ class ConsoleHandlerTest extends TestCase
             ->willReturn($verbosity)
         ;
         $handler = new ConsoleHandler($output, true, $map);
-        $this->assertSame($isHandling, $handler->isHandling(['level' => $level]),
+        $this->assertSame($isHandling, $handler->isHandling(RecordFactory::create($level)),
             '->isHandling returns correct value depending on console verbosity and log level'
         );
 
         // check that the handler actually outputs the record if it handles it
         $levelName = Logger::getLevelName($level);
-        $levelName = sprintf('%-9s', $levelName);
+        $levelName = \sprintf('%-9s', $levelName);
 
         $realOutput = $this->getMockBuilder(Output::class)->onlyMethods(['doWrite'])->getMock();
         $realOutput->setVerbosity($verbosity);
@@ -77,36 +79,28 @@ class ConsoleHandlerTest extends TestCase
             ->with($log, false);
         $handler = new ConsoleHandler($realOutput, true, $map);
 
-        $infoRecord = [
-            'message' => 'My info message',
-            'context' => [],
-            'level' => $level,
-            'level_name' => Logger::getLevelName($level),
-            'channel' => 'app',
-            'datetime' => new \DateTime('2013-05-29 16:21:54'),
-            'extra' => [],
-        ];
+        $infoRecord = RecordFactory::create($level, 'My info message', 'app', datetime: new \DateTimeImmutable('2013-05-29 16:21:54'));
         $this->assertFalse($handler->handle($infoRecord), 'The handler finished handling the log.');
     }
 
     public static function provideVerbosityMappingTests(): array
     {
         return [
-            [OutputInterface::VERBOSITY_QUIET, Logger::ERROR, true],
-            [OutputInterface::VERBOSITY_QUIET, Logger::WARNING, false],
-            [OutputInterface::VERBOSITY_NORMAL, Logger::WARNING, true],
-            [OutputInterface::VERBOSITY_NORMAL, Logger::NOTICE, false],
-            [OutputInterface::VERBOSITY_VERBOSE, Logger::NOTICE, true],
-            [OutputInterface::VERBOSITY_VERBOSE, Logger::INFO, false],
-            [OutputInterface::VERBOSITY_VERY_VERBOSE, Logger::INFO, true],
-            [OutputInterface::VERBOSITY_VERY_VERBOSE, Logger::DEBUG, false],
-            [OutputInterface::VERBOSITY_DEBUG, Logger::DEBUG, true],
-            [OutputInterface::VERBOSITY_DEBUG, Logger::EMERGENCY, true],
-            [OutputInterface::VERBOSITY_NORMAL, Logger::NOTICE, true, [
-                OutputInterface::VERBOSITY_NORMAL => Logger::NOTICE,
+            [OutputInterface::VERBOSITY_QUIET, Level::Error, true],
+            [OutputInterface::VERBOSITY_QUIET, Level::Warning, false],
+            [OutputInterface::VERBOSITY_NORMAL, Level::Warning, true],
+            [OutputInterface::VERBOSITY_NORMAL, Level::Notice, false],
+            [OutputInterface::VERBOSITY_VERBOSE, Level::Notice, true],
+            [OutputInterface::VERBOSITY_VERBOSE, Level::Info, false],
+            [OutputInterface::VERBOSITY_VERY_VERBOSE, Level::Info, true],
+            [OutputInterface::VERBOSITY_VERY_VERBOSE, Level::Debug, false],
+            [OutputInterface::VERBOSITY_DEBUG, Level::Debug, true],
+            [OutputInterface::VERBOSITY_DEBUG, Level::Emergency, true],
+            [OutputInterface::VERBOSITY_NORMAL, Level::Notice, true, [
+                OutputInterface::VERBOSITY_NORMAL => Level::Notice,
             ]],
-            [OutputInterface::VERBOSITY_DEBUG, Logger::NOTICE, true, [
-                OutputInterface::VERBOSITY_NORMAL => Logger::NOTICE,
+            [OutputInterface::VERBOSITY_DEBUG, Level::Notice, true, [
+                OutputInterface::VERBOSITY_NORMAL => Level::Notice,
             ]],
         ];
     }
@@ -120,10 +114,10 @@ class ConsoleHandlerTest extends TestCase
             ->willReturn(OutputInterface::VERBOSITY_QUIET, OutputInterface::VERBOSITY_DEBUG)
         ;
         $handler = new ConsoleHandler($output);
-        $this->assertFalse($handler->isHandling(['level' => Logger::NOTICE]),
+        $this->assertFalse($handler->isHandling(RecordFactory::create(Level::Notice)),
             'when verbosity is set to quiet, the handler does not handle the log'
         );
-        $this->assertTrue($handler->isHandling(['level' => Logger::NOTICE]),
+        $this->assertTrue($handler->isHandling(RecordFactory::create(Level::Notice)),
             'since the verbosity of the output increased externally, the handler is now handling the log'
         );
     }
@@ -154,15 +148,7 @@ class ConsoleHandlerTest extends TestCase
         $handler = new ConsoleHandler(null, false);
         $handler->setOutput($output);
 
-        $infoRecord = [
-            'message' => 'My info message',
-            'context' => [],
-            'level' => Logger::INFO,
-            'level_name' => Logger::getLevelName(Logger::INFO),
-            'channel' => 'app',
-            'datetime' => new \DateTime('2013-05-29 16:21:54'),
-            'extra' => [],
-        ];
+        $infoRecord = RecordFactory::create(Level::Info, 'My info message', 'app', datetime: new \DateTimeImmutable('2013-05-29 16:21:54'));
 
         $this->assertTrue($handler->handle($infoRecord), 'The handler finished handling the log as bubble is false.');
     }

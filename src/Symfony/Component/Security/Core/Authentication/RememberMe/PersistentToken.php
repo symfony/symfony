@@ -18,50 +18,34 @@ namespace Symfony\Component\Security\Core\Authentication\RememberMe;
  */
 final class PersistentToken implements PersistentTokenInterface
 {
-    private $class;
-    private $userIdentifier;
-    private $series;
-    private $tokenValue;
-    private $lastUsed;
+    private \DateTimeImmutable $lastUsed;
 
-    public function __construct(string $class, string $userIdentifier, string $series, string $tokenValue, \DateTime $lastUsed)
-    {
-        if (empty($class)) {
+    public function __construct(
+        private string $class,
+        private string $userIdentifier,
+        private string $series,
+        #[\SensitiveParameter] private string $tokenValue,
+        \DateTimeInterface $lastUsed,
+    ) {
+        if (!$class) {
             throw new \InvalidArgumentException('$class must not be empty.');
         }
         if ('' === $userIdentifier) {
             throw new \InvalidArgumentException('$userIdentifier must not be empty.');
         }
-        if (empty($series)) {
+        if (!$series) {
             throw new \InvalidArgumentException('$series must not be empty.');
         }
-        if (empty($tokenValue)) {
+        if (!$tokenValue) {
             throw new \InvalidArgumentException('$tokenValue must not be empty.');
         }
 
-        $this->class = $class;
-        $this->userIdentifier = $userIdentifier;
-        $this->series = $series;
-        $this->tokenValue = $tokenValue;
-        $this->lastUsed = $lastUsed;
+        $this->lastUsed = \DateTimeImmutable::createFromInterface($lastUsed);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getClass(): string
     {
         return $this->class;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getUsername(): string
-    {
-        trigger_deprecation('symfony/security-core', '5.3', 'Method "%s()" is deprecated, use getUserIdentifier() instead.', __METHOD__);
-
-        return $this->userIdentifier;
     }
 
     public function getUserIdentifier(): string
@@ -69,27 +53,18 @@ final class PersistentToken implements PersistentTokenInterface
         return $this->userIdentifier;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getSeries(): string
     {
         return $this->series;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getTokenValue(): string
     {
         return $this->tokenValue;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getLastUsed(): \DateTime
     {
-        return $this->lastUsed;
+        return \DateTime::createFromImmutable($this->lastUsed);
     }
 }

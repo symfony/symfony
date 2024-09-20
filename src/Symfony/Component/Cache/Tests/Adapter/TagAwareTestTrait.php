@@ -22,9 +22,11 @@ trait TagAwareTestTrait
 {
     public function testInvalidTag()
     {
-        $this->expectException(\Psr\Cache\InvalidArgumentException::class);
         $pool = $this->createCachePool();
         $item = $pool->getItem('foo');
+
+        $this->expectException(\Psr\Cache\InvalidArgumentException::class);
+
         $item->tag(':');
     }
 

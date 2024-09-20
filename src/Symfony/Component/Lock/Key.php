@@ -20,14 +20,13 @@ use Symfony\Component\Lock\Exception\UnserializableKeyException;
  */
 final class Key
 {
-    private $resource;
-    private $expiringTime;
-    private $state = [];
-    private $serializable = true;
+    private ?float $expiringTime = null;
+    private array $state = [];
+    private bool $serializable = true;
 
-    public function __construct(string $resource)
-    {
-        $this->resource = $resource;
+    public function __construct(
+        private string $resource,
+    ) {
     }
 
     public function __toString(): string
@@ -40,7 +39,7 @@ final class Key
         return isset($this->state[$stateKey]);
     }
 
-    public function setState(string $stateKey, $state): void
+    public function setState(string $stateKey, mixed $state): void
     {
         $this->state[$stateKey] = $state;
     }
@@ -50,7 +49,7 @@ final class Key
         unset($this->state[$stateKey]);
     }
 
-    public function getState(string $stateKey)
+    public function getState(string $stateKey): mixed
     {
         return $this->state[$stateKey];
     }
@@ -60,7 +59,7 @@ final class Key
         $this->serializable = false;
     }
 
-    public function resetLifetime()
+    public function resetLifetime(): void
     {
         $this->expiringTime = null;
     }
@@ -68,7 +67,7 @@ final class Key
     /**
      * @param float $ttl the expiration delay of locks in seconds
      */
-    public function reduceLifetime(float $ttl)
+    public function reduceLifetime(float $ttl): void
     {
         $newTime = microtime(true) + $ttl;
 

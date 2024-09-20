@@ -13,39 +13,17 @@ namespace Symfony\Bridge\Doctrine\Tests\Fixtures;
 
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * @ORM\Entity
- */
 #[ORM\Entity]
 class AssociationEntity
 {
-    /**
-     * @var int
-     * @ORM\Id @ORM\GeneratedValue
-     * @ORM\Column(type="integer")
-     */
-    #[ORM\Id, ORM\GeneratedValue, ORM\Column(type: 'integer')]
-    private $id;
+    #[ORM\Id, ORM\GeneratedValue, ORM\Column]
+    private ?int $id = null;
 
-    /**
-     * @ORM\ManyToOne(targetEntity="SingleIntIdEntity")
-     *
-     * @var \Symfony\Bridge\Doctrine\Tests\Fixtures\SingleIntIdEntity
-     */
-    #[ORM\ManyToOne(targetEntity: SingleIntIdEntity::class)]
-    public $single;
+    #[ORM\ManyToOne]
+    public ?SingleIntIdEntity $single = null;
 
-    /**
-     * @ORM\ManyToOne(targetEntity="CompositeIntIdEntity")
-     * @ORM\JoinColumns({
-     *  @ORM\JoinColumn(name="composite_id1", referencedColumnName="id1"),
-     *  @ORM\JoinColumn(name="composite_id2", referencedColumnName="id2")
-     * })
-     *
-     * @var \Symfony\Bridge\Doctrine\Tests\Fixtures\CompositeIntIdEntity
-     */
-    #[ORM\ManyToOne(targetEntity: CompositeIntIdEntity::class)]
+    #[ORM\ManyToOne]
     #[ORM\JoinColumn(name: 'composite_id1', referencedColumnName: 'id1')]
     #[ORM\JoinColumn(name: 'composite_id2', referencedColumnName: 'id2')]
-    public $composite;
+    public ?CompositeIntIdEntity $composite = null;
 }

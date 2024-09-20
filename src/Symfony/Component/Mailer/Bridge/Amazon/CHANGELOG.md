@@ -1,6 +1,23 @@
 CHANGELOG
 =========
 
+7.1
+---
+
+* Add support for `X-SES-LIST-MANAGEMENT-OPTIONS`
+
+6.1
+---
+
+ * Add support for `X-SES-MESSAGE-TAGS`
+ * Add support for custom ses+smtp hosts
+
+6.0
+---
+
+ * Remove the `SesApiTransport` class, use `SesApiAsyncAwsTransport` instead
+ * Remove the `SesHttpTransport` class, use `SesHttpAsyncAwsTransport` instead
+
 5.3
 ---
 

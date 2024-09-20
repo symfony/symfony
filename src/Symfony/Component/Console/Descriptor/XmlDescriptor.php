@@ -120,42 +120,27 @@ class XmlDescriptor extends Descriptor
         return $dom;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function describeInputArgument(InputArgument $argument, array $options = [])
+    protected function describeInputArgument(InputArgument $argument, array $options = []): void
     {
         $this->writeDocument($this->getInputArgumentDocument($argument));
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function describeInputOption(InputOption $option, array $options = [])
+    protected function describeInputOption(InputOption $option, array $options = []): void
     {
         $this->writeDocument($this->getInputOptionDocument($option));
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function describeInputDefinition(InputDefinition $definition, array $options = [])
+    protected function describeInputDefinition(InputDefinition $definition, array $options = []): void
     {
         $this->writeDocument($this->getInputDefinitionDocument($definition));
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function describeCommand(Command $command, array $options = [])
+    protected function describeCommand(Command $command, array $options = []): void
     {
         $this->writeDocument($this->getCommandDocument($command, $options['short'] ?? false));
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function describeApplication(Application $application, array $options = [])
+    protected function describeApplication(Application $application, array $options = []): void
     {
         $this->writeDocument($this->getApplicationDocument($application, $options['namespace'] ?? null, $options['short'] ?? false));
     }
@@ -163,7 +148,7 @@ class XmlDescriptor extends Descriptor
     /**
      * Appends document children to parent node.
      */
-    private function appendDocument(\DOMNode $parentNode, \DOMNode $importedParent)
+    private function appendDocument(\DOMNode $parentNode, \DOMNode $importedParent): void
     {
         foreach ($importedParent->childNodes as $childNode) {
             $parentNode->appendChild($parentNode->ownerDocument->importNode($childNode, true));
@@ -173,7 +158,7 @@ class XmlDescriptor extends Descriptor
     /**
      * Writes DOM document.
      */
-    private function writeDocument(\DOMDocument $dom)
+    private function writeDocument(\DOMDocument $dom): void
     {
         $dom->formatOutput = true;
         $this->write($dom->saveXML());
@@ -223,11 +208,9 @@ class XmlDescriptor extends Descriptor
             $defaults = \is_array($option->getDefault()) ? $option->getDefault() : (\is_bool($option->getDefault()) ? [var_export($option->getDefault(), true)] : ($option->getDefault() ? [$option->getDefault()] : []));
             $objectXML->appendChild($defaultsXML = $dom->createElement('defaults'));
 
-            if (!empty($defaults)) {
-                foreach ($defaults as $default) {
-                    $defaultsXML->appendChild($defaultXML = $dom->createElement('default'));
-                    $defaultXML->appendChild($dom->createTextNode($default));
-                }
+            foreach ($defaults as $default) {
+                $defaultsXML->appendChild($defaultXML = $dom->createElement('default'));
+                $defaultXML->appendChild($dom->createTextNode($default));
             }
         }
 

@@ -15,6 +15,7 @@ use Symfony\Component\HttpClient\AsyncDecoratorTrait;
 use Symfony\Component\HttpClient\DecoratorTrait;
 use Symfony\Component\HttpClient\Exception\TransportException;
 use Symfony\Component\HttpClient\HttpClient;
+use Symfony\Component\HttpClient\NativeHttpClient;
 use Symfony\Component\HttpClient\Response\AsyncContext;
 use Symfony\Component\HttpClient\Response\AsyncResponse;
 use Symfony\Contracts\HttpClient\ChunkInterface;
@@ -35,16 +36,15 @@ class AsyncDecoratorTraitTest extends NativeHttpClientTest
             return HttpClient::create();
         }
 
-        $chunkFilter = $chunkFilter ?? static function (ChunkInterface $chunk, AsyncContext $context) { yield $chunk; };
+        $chunkFilter ??= static function (ChunkInterface $chunk, AsyncContext $context) { yield $chunk; };
 
         return new class($decoratedClient ?? parent::getHttpClient($testCase), $chunkFilter) implements HttpClientInterface {
             use AsyncDecoratorTrait;
 
-            private $chunkFilter;
-
-            public function __construct(HttpClientInterface $client, ?\Closure $chunkFilter = null)
-            {
-                $this->chunkFilter = $chunkFilter;
+            public function __construct(
+                HttpClientInterface $client,
+                private ?\Closure $chunkFilter = null,
+            ) {
                 $this->client = $client;
             }
 
@@ -235,8 +235,8 @@ class AsyncDecoratorTraitTest extends NativeHttpClientTest
 
     public function testRetryTimeout()
     {
-        $cpt = 0;
-        $client = $this->getHttpClient(__FUNCTION__, function (ChunkInterface $chunk, AsyncContext $context) use (&$cpt) {
+        $client = $this->getHttpClient(__FUNCTION__, function (ChunkInterface $chunk, AsyncContext $context) {
+            static $cpt = 0;
             try {
                 $this->assertTrue($chunk->isTimeout());
                 yield $chunk;
@@ -301,8 +301,8 @@ class AsyncDecoratorTraitTest extends NativeHttpClientTest
 
     public function testMultipleYieldInInitializer()
     {
-        $first = null;
-        $client = $this->getHttpClient(__FUNCTION__, function (ChunkInterface $chunk, AsyncContext $context) use (&$first) {
+        $client = $this->getHttpClient(__FUNCTION__, function (ChunkInterface $chunk, AsyncContext $context) {
+            static $first;
             if ($chunk->isFirst()) {
                 $first = $chunk;
 
@@ -343,8 +343,8 @@ class AsyncDecoratorTraitTest extends NativeHttpClientTest
 
     public function testMaxDuration()
     {
-        $sawFirst = false;
-        $client = $this->getHttpClient(__FUNCTION__, function (ChunkInterface $chunk, AsyncContext $context) use (&$sawFirst) {
+        $client = $this->getHttpClient(__FUNCTION__, function (ChunkInterface $chunk, AsyncContext $context) {
+            static $sawFirst = false;
             try {
                 if (!$chunk->isFirst() || !$sawFirst) {
                     $sawFirst = $sawFirst || $chunk->isFirst();

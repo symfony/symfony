@@ -43,10 +43,7 @@ class DateIntervalType extends AbstractType
         'choice' => ChoiceType::class,
     ];
 
-    /**
-     * {@inheritdoc}
-     */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         if (!$options['with_years'] && !$options['with_months'] && !$options['with_weeks'] && !$options['with_days'] && !$options['with_hours'] && !$options['with_minutes'] && !$options['with_seconds']) {
             throw new InvalidConfigurationException('You must enable at least one interval field.');
@@ -148,10 +145,7 @@ class DateIntervalType extends AbstractType
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function buildView(FormView $view, FormInterface $form, array $options)
+    public function buildView(FormView $view, FormInterface $form, array $options): void
     {
         $vars = [
             'widget' => $options['widget'],
@@ -163,23 +157,14 @@ class DateIntervalType extends AbstractType
         $view->vars = array_replace($view->vars, $vars);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
-        $compound = function (Options $options) {
-            return 'single_text' !== $options['widget'];
-        };
-        $emptyData = function (Options $options) {
-            return 'single_text' === $options['widget'] ? '' : [];
-        };
+        $compound = static fn (Options $options) => 'single_text' !== $options['widget'];
+        $emptyData = static fn (Options $options) => 'single_text' === $options['widget'] ? '' : [];
 
-        $placeholderDefault = function (Options $options) {
-            return $options['required'] ? null : '';
-        };
+        $placeholderDefault = static fn (Options $options) => $options['required'] ? null : '';
 
-        $placeholderNormalizer = function (Options $options, $placeholder) use ($placeholderDefault) {
+        $placeholderNormalizer = static function (Options $options, $placeholder) use ($placeholderDefault) {
             if (\is_array($placeholder)) {
                 $default = $placeholderDefault($options);
 
@@ -189,20 +174,16 @@ class DateIntervalType extends AbstractType
             return array_fill_keys(self::TIME_PARTS, $placeholder);
         };
 
-        $labelsNormalizer = function (Options $options, array $labels) {
-            return array_replace([
-                'years' => null,
-                'months' => null,
-                'days' => null,
-                'weeks' => null,
-                'hours' => null,
-                'minutes' => null,
-                'seconds' => null,
-                'invert' => 'Negative interval',
-            ], array_filter($labels, function ($label) {
-                return null !== $label;
-            }));
-        };
+        $labelsNormalizer = static fn (Options $options, array $labels) => array_replace([
+            'years' => null,
+            'months' => null,
+            'days' => null,
+            'weeks' => null,
+            'hours' => null,
+            'minutes' => null,
+            'seconds' => null,
+            'invert' => 'Negative interval',
+        ], array_filter($labels, static fn ($label) => null !== $label));
 
         $resolver->setDefaults([
             'with_years' => true,
@@ -233,11 +214,7 @@ class DateIntervalType extends AbstractType
             'compound' => $compound,
             'empty_data' => $emptyData,
             'labels' => [],
-            'invalid_message' => function (Options $options, $previousValue) {
-                return ($options['legacy_error_messages'] ?? true)
-                    ? $previousValue
-                    : 'Please choose a valid date interval.';
-            },
+            'invalid_message' => 'Please choose a valid date interval.',
         ]);
         $resolver->setNormalizer('placeholder', $placeholderNormalizer);
         $resolver->setNormalizer('labels', $labelsNormalizer);
@@ -281,10 +258,7 @@ class DateIntervalType extends AbstractType
         $resolver->setAllowedTypes('labels', 'array');
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'dateinterval';
     }

@@ -29,19 +29,13 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 abstract class BaseType extends AbstractType
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->setDisabled($options['disabled']);
         $builder->setAutoInitialize($options['auto_initialize']);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function buildView(FormView $view, FormInterface $form, array $options)
+    public function buildView(FormView $view, FormInterface $form, array $options): void
     {
         $name = $form->getName();
         $blockName = $options['block_name'] ?: $form->getName();
@@ -52,18 +46,16 @@ abstract class BaseType extends AbstractType
 
         if ($view->parent) {
             if ('' !== ($parentFullName = $view->parent->vars['full_name'])) {
-                $id = sprintf('%s_%s', $view->parent->vars['id'], $name);
-                $fullName = sprintf('%s[%s]', $parentFullName, $name);
-                $uniqueBlockPrefix = sprintf('%s_%s', $view->parent->vars['unique_block_prefix'], $blockName);
+                $id = \sprintf('%s_%s', $view->parent->vars['id'], $name);
+                $fullName = \sprintf('%s[%s]', $parentFullName, $name);
+                $uniqueBlockPrefix = \sprintf('%s_%s', $view->parent->vars['unique_block_prefix'], $blockName);
             } else {
                 $id = $name;
                 $fullName = $name;
                 $uniqueBlockPrefix = '_'.$blockName;
             }
 
-            if (null === $translationDomain) {
-                $translationDomain = $view->parent->vars['translation_domain'];
-            }
+            $translationDomain ??= $view->parent->vars['translation_domain'];
 
             $labelTranslationParameters = array_merge($view->parent->vars['label_translation_parameters'], $labelTranslationParameters);
             $attrTranslationParameters = array_merge($view->parent->vars['attr_translation_parameters'], $attrTranslationParameters);
@@ -127,10 +119,7 @@ abstract class BaseType extends AbstractType
         ]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
             'block_name' => null,

@@ -27,23 +27,21 @@ class RoundRobinTransport implements TransportInterface
     /**
      * @var \SplObjectStorage<TransportInterface, float>
      */
-    private $deadTransports;
-    private $transports = [];
-    private $retryPeriod;
-    private $cursor = -1;
+    private \SplObjectStorage $deadTransports;
+    private int $cursor = -1;
 
     /**
      * @param TransportInterface[] $transports
      */
-    public function __construct(array $transports, int $retryPeriod = 60)
-    {
+    public function __construct(
+        private array $transports,
+        private int $retryPeriod = 60,
+    ) {
         if (!$transports) {
-            throw new TransportException(sprintf('"%s" must have at least one transport configured.', static::class));
+            throw new TransportException(\sprintf('"%s" must have at least one transport configured.', static::class));
         }
 
-        $this->transports = $transports;
         $this->deadTransports = new \SplObjectStorage();
-        $this->retryPeriod = $retryPeriod;
     }
 
     public function send(RawMessage $message, ?Envelope $envelope = null): ?SentMessage
@@ -54,8 +52,8 @@ class RoundRobinTransport implements TransportInterface
             try {
                 return $transport->send($message, $envelope);
             } catch (TransportExceptionInterface $e) {
-                $exception = $exception ?? new TransportException('All transports failed.');
-                $exception->appendDebug(sprintf("Transport \"%s\": %s\n", $transport, $e->getDebug()));
+                $exception ??= new TransportException('All transports failed.');
+                $exception->appendDebug(\sprintf("Transport \"%s\": %s\n", $transport, $e->getDebug()));
                 $this->deadTransports[$transport] = microtime(true);
             }
         }

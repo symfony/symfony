@@ -21,15 +21,16 @@ use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 use Symfony\Component\Validator\Exception\GroupDefinitionException;
 use Symfony\Component\Validator\Mapping\CascadingStrategy;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
-use Symfony\Component\Validator\Tests\Fixtures\Annotation\Entity;
-use Symfony\Component\Validator\Tests\Fixtures\Annotation\EntityParent;
-use Symfony\Component\Validator\Tests\Fixtures\Annotation\GroupSequenceProviderEntity;
 use Symfony\Component\Validator\Tests\Fixtures\CascadingEntity;
 use Symfony\Component\Validator\Tests\Fixtures\CascadingEntityIntersection;
 use Symfony\Component\Validator\Tests\Fixtures\CascadingEntityUnion;
 use Symfony\Component\Validator\Tests\Fixtures\ClassConstraint;
 use Symfony\Component\Validator\Tests\Fixtures\ConstraintA;
 use Symfony\Component\Validator\Tests\Fixtures\ConstraintB;
+use Symfony\Component\Validator\Tests\Fixtures\GroupSequenceProviderChildEntity;
+use Symfony\Component\Validator\Tests\Fixtures\NestedAttribute\Entity;
+use Symfony\Component\Validator\Tests\Fixtures\NestedAttribute\EntityParent;
+use Symfony\Component\Validator\Tests\Fixtures\NestedAttribute\GroupSequenceProviderEntity;
 use Symfony\Component\Validator\Tests\Fixtures\PropertyConstraint;
 
 class ClassMetadataTest extends TestCase
@@ -37,18 +38,13 @@ class ClassMetadataTest extends TestCase
     private const CLASSNAME = Entity::class;
     private const PARENTCLASS = EntityParent::class;
     private const PROVIDERCLASS = GroupSequenceProviderEntity::class;
-    private const PROVIDERCHILDCLASS = 'Symfony\Component\Validator\Tests\Fixtures\GroupSequenceProviderChildEntity';
+    private const PROVIDERCHILDCLASS = GroupSequenceProviderChildEntity::class;
 
-    protected $metadata;
+    protected ClassMetadata $metadata;
 
     protected function setUp(): void
     {
         $this->metadata = new ClassMetadata(self::CLASSNAME);
-    }
-
-    protected function tearDown(): void
-    {
-        $this->metadata = null;
     }
 
     public function testAddConstraintDoesNotAcceptValid()
@@ -285,17 +281,21 @@ class ClassMetadataTest extends TestCase
 
     public function testGroupSequenceFailsIfGroupSequenceProviderIsSet()
     {
-        $this->expectException(GroupDefinitionException::class);
         $metadata = new ClassMetadata(self::PROVIDERCLASS);
         $metadata->setGroupSequenceProvider(true);
+
+        $this->expectException(GroupDefinitionException::class);
+
         $metadata->setGroupSequence(['GroupSequenceProviderEntity', 'Foo']);
     }
 
     public function testGroupSequenceProviderFailsIfGroupSequenceIsSet()
     {
-        $this->expectException(GroupDefinitionException::class);
         $metadata = new ClassMetadata(self::PROVIDERCLASS);
         $metadata->setGroupSequence(['GroupSequenceProviderEntity', 'Foo']);
+
+        $this->expectException(GroupDefinitionException::class);
+
         $metadata->setGroupSequenceProvider(true);
     }
 
@@ -332,22 +332,6 @@ class ClassMetadataTest extends TestCase
         $this->assertCount(0, $this->metadata->getPropertyMetadata('foo'), '->getPropertyMetadata() returns an empty collection if no metadata is configured for the given property');
     }
 
-    /**
-     * @requires PHP < 7.4
-     */
-    public function testCascadeConstraintIsNotAvailable()
-    {
-        $metadata = new ClassMetadata(CascadingEntity::class);
-
-        $this->expectException(ConstraintDefinitionException::class);
-        $this->expectExceptionMessage('The constraint "Symfony\Component\Validator\Constraints\Cascade" requires PHP 7.4.');
-
-        $metadata->addConstraint(new Cascade());
-    }
-
-    /**
-     * @requires PHP 7.4
-     */
     public function testCascadeConstraint()
     {
         $metadata = new ClassMetadata(CascadingEntity::class);
@@ -364,9 +348,6 @@ class ClassMetadataTest extends TestCase
         ], $metadata->getConstrainedProperties());
     }
 
-    /**
-     * @requires PHP 8.0
-     */
     public function testCascadeConstraintWithUnionTypeProperties()
     {
         $metadata = new ClassMetadata(CascadingEntityUnion::class);
@@ -383,9 +364,6 @@ class ClassMetadataTest extends TestCase
         ], $metadata->getConstrainedProperties());
     }
 
-    /**
-     * @requires PHP 8.1
-     */
     public function testCascadeConstraintWithIntersectionTypeProperties()
     {
         $metadata = new ClassMetadata(CascadingEntityIntersection::class);
@@ -395,6 +373,20 @@ class ClassMetadataTest extends TestCase
         $this->assertCount(1, $metadata->properties);
         $this->assertSame([
             'classes',
+        ], $metadata->getConstrainedProperties());
+    }
+
+    public function testCascadeConstraintWithExcludedProperties()
+    {
+        $metadata = new ClassMetadata(CascadingEntity::class);
+
+        $metadata->addConstraint(new Cascade(exclude: ['requiredChild', 'optionalChild']));
+
+        $this->assertSame(CascadingStrategy::CASCADE, $metadata->getCascadingStrategy());
+        $this->assertCount(2, $metadata->properties);
+        $this->assertSame([
+            'staticChild',
+            'children',
         ], $metadata->getConstrainedProperties());
     }
 }
@@ -413,7 +405,7 @@ class ClassCompositeConstraint extends Composite
         return 'nested';
     }
 
-    public function getTargets()
+    public function getTargets(): string|array
     {
         return [self::CLASS_CONSTRAINT];
     }

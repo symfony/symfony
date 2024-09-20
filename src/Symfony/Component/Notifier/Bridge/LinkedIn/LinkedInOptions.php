@@ -23,11 +23,9 @@ use Symfony\Component\Notifier\Notification\Notification;
  */
 final class LinkedInOptions implements MessageOptionsInterface
 {
-    private $options = [];
-
-    public function __construct(array $options = [])
-    {
-        $this->options = $options;
+    public function __construct(
+        private array $options = [],
+    ) {
     }
 
     public function toArray(): array
@@ -58,7 +56,7 @@ final class LinkedInOptions implements MessageOptionsInterface
     /**
      * @return $this
      */
-    public function contentCertificationRecord(string $contentCertificationRecord): self
+    public function contentCertificationRecord(string $contentCertificationRecord): static
     {
         $this->options['contentCertificationRecord'] = $contentCertificationRecord;
 
@@ -68,7 +66,7 @@ final class LinkedInOptions implements MessageOptionsInterface
     /**
      * @return $this
      */
-    public function firstPublishedAt(int $firstPublishedAt): self
+    public function firstPublishedAt(int $firstPublishedAt): static
     {
         $this->options['firstPublishedAt'] = $firstPublishedAt;
 
@@ -78,7 +76,7 @@ final class LinkedInOptions implements MessageOptionsInterface
     /**
      * @return $this
      */
-    public function lifecycleState(LifecycleStateShare $lifecycleStateOption): self
+    public function lifecycleState(LifecycleStateShare $lifecycleStateOption): static
     {
         $this->options['lifecycleState'] = $lifecycleStateOption->lifecycleState();
 
@@ -88,7 +86,7 @@ final class LinkedInOptions implements MessageOptionsInterface
     /**
      * @return $this
      */
-    public function origin(string $origin): self
+    public function origin(string $origin): static
     {
         $this->options['origin'] = $origin;
 
@@ -98,7 +96,7 @@ final class LinkedInOptions implements MessageOptionsInterface
     /**
      * @return $this
      */
-    public function ugcOrigin(string $ugcOrigin): self
+    public function ugcOrigin(string $ugcOrigin): static
     {
         $this->options['ugcOrigin'] = $ugcOrigin;
 
@@ -108,7 +106,7 @@ final class LinkedInOptions implements MessageOptionsInterface
     /**
      * @return $this
      */
-    public function versionTag(string $versionTag): self
+    public function versionTag(string $versionTag): static
     {
         $this->options['versionTag'] = $versionTag;
 
@@ -118,7 +116,7 @@ final class LinkedInOptions implements MessageOptionsInterface
     /**
      * @return $this
      */
-    public function specificContent(ShareContentShare $specificContent): self
+    public function specificContent(ShareContentShare $specificContent): static
     {
         $this->options['specificContent']['com.linkedin.ugc.ShareContent'] = $specificContent->toArray();
 
@@ -128,7 +126,7 @@ final class LinkedInOptions implements MessageOptionsInterface
     /**
      * @return $this
      */
-    public function author(AuthorShare $authorOption): self
+    public function author(AuthorShare $authorOption): static
     {
         $this->options['author'] = $authorOption->author();
 
@@ -138,7 +136,7 @@ final class LinkedInOptions implements MessageOptionsInterface
     /**
      * @return $this
      */
-    public function visibility(VisibilityShare $visibilityOption): self
+    public function visibility(VisibilityShare $visibilityOption): static
     {
         $this->options['visibility'] = $visibilityOption->toArray();
 

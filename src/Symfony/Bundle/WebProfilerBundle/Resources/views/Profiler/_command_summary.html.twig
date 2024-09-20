@@ -1,0 +1,50 @@
+{% set status_code = profile.statuscode|default(0) %}
+{% set interrupted = command_collector is same as false ? null : command_collector.interruptedBySignal %}
+{% set css_class = status_code == 113 or interrupted is not null ? 'status-warning' : status_code > 0 ? 'status-error' : 'status-success' %}
+
+<div class="terminal status {{ css_class }}">
+    <div class="container">
+        <h2>
+            <span class="status-request-method">
+                {{ profile.method|upper }}
+            </span>
+
+            <span class="status-command">
+                {{ profile.url }}
+            </span>
+        </h2>
+
+        <dl class="metadata">
+            {% if interrupted %}
+                <span class="status-response-status-code">Interrupted</span>
+                <dt>Signal</dt>
+                <dd class="status-response-status-text">{{ interrupted }}</dd>
+
+                <dt>Exit code</dt>
+                <dd class="status-response-status-text">{{ status_code }}</dd>
+            {% elseif status_code == 0 %}
+                <span class="status-response-status-code">Success</span>
+            {% elseif status_code > 0 %}
+                <span class="status-response-status-code">Error</span>
+                <dt>Exit code</dt>
+                <dd class="status-response-status-text"><span class="status-response-status-code">{{ status_code }}</span></dd>
+            {% endif %}
+
+            {% if request_collector.requestserver.has('SYMFONY_CLI_BINARY_NAME') %}
+                <dt>Symfony CLI</dt>
+                <dd>v{{ request_collector.requestserver.get('SYMFONY_CLI_VERSION') }}</dd>
+            {% endif %}
+
+            <dt>Application</dt>
+            <dd>
+                <a href="{{ path('_profiler_search_results', { token: token, limit: 10, ip: profile.ip, type: 'command' }) }}">{{ profile.ip }}</a>
+            </dd>
+
+            <dt>Profiled on</dt>
+            <dd><time data-convert-to-user-timezone data-render-as-datetime datetime="{{ profile.time|date('c') }}">{{ profile.time|date('r') }}</time></dd>
+
+            <dt>Token</dt>
+            <dd>{{ profile.token }}</dd>
+        </dl>
+    </div>
+</div>

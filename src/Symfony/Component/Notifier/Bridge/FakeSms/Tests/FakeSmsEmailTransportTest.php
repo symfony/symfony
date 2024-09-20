@@ -19,12 +19,11 @@ use Symfony\Component\Notifier\Message\SmsMessage;
 use Symfony\Component\Notifier\Test\TransportTestCase;
 use Symfony\Component\Notifier\Tests\Mailer\DummyMailer;
 use Symfony\Component\Notifier\Tests\Transport\DummyMessage;
-use Symfony\Component\Notifier\Transport\TransportInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 final class FakeSmsEmailTransportTest extends TransportTestCase
 {
-    public static function createTransport(?HttpClientInterface $client = null, ?string $transportName = null): TransportInterface
+    public static function createTransport(?HttpClientInterface $client = null, ?string $transportName = null): FakeSmsEmailTransport
     {
         $transport = (new FakeSmsEmailTransport(new DummyMailer(), 'recipient@email.net', 'sender@email.net', $client ?? new MockHttpClient()));
 
@@ -71,7 +70,7 @@ final class FakeSmsEmailTransportTest extends TransportTestCase
         $this->assertInstanceOf(Email::class, $sentEmail);
         $this->assertSame($to, $sentEmail->getTo()[0]->getEncodedAddress());
         $this->assertSame($from, $sentEmail->getFrom()[0]->getEncodedAddress());
-        $this->assertSame(sprintf('New SMS on phone number: %s', $phone), $sentEmail->getSubject());
+        $this->assertSame(\sprintf('New SMS on phone number: %s', $phone), $sentEmail->getSubject());
         $this->assertSame($subject, $sentEmail->getTextBody());
         $this->assertFalse($sentEmail->getHeaders()->has('X-Transport'));
     }
@@ -94,7 +93,7 @@ final class FakeSmsEmailTransportTest extends TransportTestCase
         $this->assertInstanceOf(Email::class, $sentEmail);
         $this->assertSame($to, $sentEmail->getTo()[0]->getEncodedAddress());
         $this->assertSame($from, $sentEmail->getFrom()[0]->getEncodedAddress());
-        $this->assertSame(sprintf('New SMS on phone number: %s', $phone), $sentEmail->getSubject());
+        $this->assertSame(\sprintf('New SMS on phone number: %s', $phone), $sentEmail->getSubject());
         $this->assertSame($subject, $sentEmail->getTextBody());
         $this->assertTrue($sentEmail->getHeaders()->has('X-Transport'));
         $this->assertSame($transportName, $sentEmail->getHeaders()->get('X-Transport')->getBody());

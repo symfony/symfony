@@ -14,6 +14,7 @@ namespace Symfony\Bridge\Doctrine\Tests\Messenger;
 use Doctrine\DBAL\Connection;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
+use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Log\AbstractLogger;
 use Symfony\Bridge\Doctrine\Messenger\DoctrineOpenTransactionLoggerMiddleware;
 use Symfony\Component\Messenger\Envelope;
@@ -21,15 +22,15 @@ use Symfony\Component\Messenger\Test\Middleware\MiddlewareTestCase;
 
 class DoctrineOpenTransactionLoggerMiddlewareTest extends MiddlewareTestCase
 {
-    private $logger;
-    private $connection;
-    private $entityManager;
-    private $middleware;
+    private AbstractLogger $logger;
+    private MockObject&Connection $connection;
+    private MockObject&EntityManagerInterface $entityManager;
+    private DoctrineOpenTransactionLoggerMiddleware $middleware;
 
     protected function setUp(): void
     {
-        $this->logger = new class() extends AbstractLogger {
-            public $logs = [];
+        $this->logger = new class extends AbstractLogger {
+            public array $logs = [];
 
             public function log($level, $message, $context = []): void
             {
@@ -50,9 +51,9 @@ class DoctrineOpenTransactionLoggerMiddlewareTest extends MiddlewareTestCase
 
     public function testMiddlewareWrapsInTransactionAndFlushes()
     {
-        $this->connection->expects($this->exactly(1))
-            ->method('isTransactionActive')
-            ->willReturn(true, true, false)
+        $this->connection->expects($this->exactly(2))
+            ->method('getTransactionNestingLevel')
+            ->willReturn(0, 1)
         ;
 
         $this->middleware->handle(new Envelope(new \stdClass()), $this->getStackMock());

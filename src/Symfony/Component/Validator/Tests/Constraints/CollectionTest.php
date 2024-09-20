@@ -25,14 +25,6 @@ use Symfony\Component\Validator\Exception\InvalidOptionsException;
  */
 class CollectionTest extends TestCase
 {
-    public function testRejectInvalidFieldsOption()
-    {
-        $this->expectException(ConstraintDefinitionException::class);
-        new Collection([
-            'fields' => 'foo',
-        ]);
-    }
-
     public function testRejectNonConstraints()
     {
         $this->expectException(InvalidOptionsException::class);

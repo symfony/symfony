@@ -15,6 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\VarDumper\Caster\ImgStub;
 use Symfony\Component\VarDumper\Cloner\VarCloner;
 use Symfony\Component\VarDumper\Dumper\HtmlDumper;
+use Symfony\Component\VarDumper\Tests\Fixtures\VirtualProperty;
 
 /**
  * @author Nicolas Grekas <p@tchwork.com>
@@ -54,7 +55,7 @@ class HtmlDumperTest extends TestCase
 
         $this->assertStringMatchesFormat(
             <<<EOTXT
-<foo></foo><bar><span class=sf-dump-note>array:24</span> [<samp data-depth=1 class=sf-dump-expanded>
+<foo></foo><bar><span class=sf-dump-note>array:25</span> [<samp data-depth=1 class=sf-dump-expanded>
   "<span class=sf-dump-key>number</span>" => <span class=sf-dump-num>1</span>
   <span class=sf-dump-key>0</span> => <a class=sf-dump-ref href=#{$dumpId}-ref01 title="2 occurrences">&amp;1</a> <span class=sf-dump-const>null</span>
   "<span class=sf-dump-key>const</span>" => <span class=sf-dump-num>1.1</span>
@@ -69,6 +70,7 @@ class HtmlDumperTest extends TestCase
     <span class=sf-dump-str title="11 binary or non-UTF-8 characters">&#233;<span class="sf-dump-default">\\x01</span>test<span class="sf-dump-default">\\t</span><span class="sf-dump-default sf-dump-ns">\\n</span></span>
     <span class=sf-dump-str title="11 binary or non-UTF-8 characters">ing</span>
     """
+  "<span class=sf-dump-key>bo<span class=sf-dump-default>\\u{FEFF}</span>m</span>" => "<span class=sf-dump-str title="5 characters">te<span class=sf-dump-default>\\u{FEFF}</span>st</span>"
   "<span class=sf-dump-key>[]</span>" => []
   "<span class=sf-dump-key>res</span>" => <span class=sf-dump-note>stream resource</span> <a class=sf-dump-ref>@{$res}</a><samp data-depth=2 class=sf-dump-compact>
 %A  <span class=sf-dump-meta>wrapper_type</span>: "<span class=sf-dump-str title="9 characters">plainfile</span>"
@@ -114,6 +116,30 @@ EOTXT
 
             $out
         );
+    }
+
+    /**
+     * @requires PHP 8.4
+     */
+    public function testVirtualProperties()
+    {
+        $dumper = new HtmlDumper('php://output');
+        $dumper->setDumpHeader('<foo></foo>');
+        $dumper->setDumpBoundaries('<bar>', '</bar>');
+        $cloner = new VarCloner();
+
+        $data = $cloner->cloneVar(new VirtualProperty());
+        $out = $dumper->dump($data, true);
+
+        $this->assertStringMatchesFormat(<<<EODUMP
+            <foo></foo><bar><span class=sf-dump-note>Symfony\Component\VarDumper\Tests\Fixtures\VirtualProperty</span> {<a class=sf-dump-ref>#%i</a><samp data-depth=1 class=sf-dump-expanded>
+              +<span class=sf-dump-public title="Public property">firstName</span>: "<span class=sf-dump-str title="4 characters">John</span>"
+              +<span class=sf-dump-public title="Public property">lastName</span>: "<span class=sf-dump-str title="3 characters">Doe</span>"
+              +<span class=sf-dump-virtual><span class=sf-dump-public title="Public property">fullName</span></span>: <span class=sf-dump-virtual><span class=sf-dump-const title="Virtual property">~ string</span></span>
+              -<span class=sf-dump-virtual><span class=sf-dump-private title="Private property defined in class:&#10;`Symfony\Component\VarDumper\Tests\Fixtures\VirtualProperty`">noType</span></span>: <span class=sf-dump-virtual><span class=sf-dump-const title="Virtual property">~</span></span>
+            </samp>}
+            </bar>
+            EODUMP, $out);
     }
 
     public function testCharset()

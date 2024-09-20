@@ -12,7 +12,6 @@
 namespace Symfony\Component\RateLimiter;
 
 use Symfony\Component\Lock\LockFactory;
-use Symfony\Component\Lock\NoLock;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\RateLimiter\Policy\FixedWindowLimiter;
@@ -27,15 +26,13 @@ use Symfony\Component\RateLimiter\Storage\StorageInterface;
  */
 final class RateLimiterFactory
 {
-    private $config;
-    private $storage;
-    private $lockFactory;
+    private array $config;
 
-    public function __construct(array $config, StorageInterface $storage, ?LockFactory $lockFactory = null)
-    {
-        $this->storage = $storage;
-        $this->lockFactory = $lockFactory;
-
+    public function __construct(
+        array $config,
+        private StorageInterface $storage,
+        private ?LockFactory $lockFactory = null,
+    ) {
         $options = new OptionsResolver();
         self::configureOptions($options);
 
@@ -45,24 +42,15 @@ final class RateLimiterFactory
     public function create(?string $key = null): LimiterInterface
     {
         $id = $this->config['id'].'-'.$key;
-        $lock = $this->lockFactory ? $this->lockFactory->createLock($id) : new NoLock();
+        $lock = $this->lockFactory?->createLock($id);
 
-        switch ($this->config['policy']) {
-            case 'token_bucket':
-                return new TokenBucketLimiter($id, $this->config['limit'], $this->config['rate'], $this->storage, $lock);
-
-            case 'fixed_window':
-                return new FixedWindowLimiter($id, $this->config['limit'], $this->config['interval'], $this->storage, $lock);
-
-            case 'sliding_window':
-                return new SlidingWindowLimiter($id, $this->config['limit'], $this->config['interval'], $this->storage, $lock);
-
-            case 'no_limit':
-                return new NoLimiter();
-
-            default:
-                throw new \LogicException(sprintf('Limiter policy "%s" does not exists, it must be either "token_bucket", "sliding_window", "fixed_window" or "no_limit".', $this->config['policy']));
-        }
+        return match ($this->config['policy']) {
+            'token_bucket' => new TokenBucketLimiter($id, $this->config['limit'], $this->config['rate'], $this->storage, $lock),
+            'fixed_window' => new FixedWindowLimiter($id, $this->config['limit'], $this->config['interval'], $this->storage, $lock),
+            'sliding_window' => new SlidingWindowLimiter($id, $this->config['limit'], $this->config['interval'], $this->storage, $lock),
+            'no_limit' => new NoLimiter(),
+            default => throw new \LogicException(\sprintf('Limiter policy "%s" does not exists, it must be either "token_bucket", "sliding_window", "fixed_window" or "no_limit".', $this->config['policy'])),
+        };
     }
 
     protected static function configureOptions(OptionsResolver $options): void
@@ -75,7 +63,7 @@ final class RateLimiterFactory
                     throw $e;
                 }
 
-                throw new \LogicException(sprintf('Cannot parse interval "%s", please use a valid unit as described on https://www.php.net/datetime.formats.relative.', $m[1]));
+                throw new \LogicException(\sprintf('Cannot parse interval "%s", please use a valid unit as described on https://www.php.net/datetime.formats.relative.', $m[1]));
             }
         };
 

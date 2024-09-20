@@ -17,7 +17,6 @@ use Doctrine\ORM\Mapping\FieldMapping;
 use Doctrine\ORM\Mapping\MappingException as OrmMappingException;
 use Doctrine\Persistence\Mapping\MappingException;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
-use Symfony\Component\PropertyInfo\Type;
 use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\Valid;
 use Symfony\Component\Validator\Mapping\AutoMappingStrategy;
@@ -34,24 +33,18 @@ final class DoctrineLoader implements LoaderInterface
 {
     use AutoMappingTrait;
 
-    private $entityManager;
-    private $classValidatorRegexp;
-
-    public function __construct(EntityManagerInterface $entityManager, ?string $classValidatorRegexp = null)
-    {
-        $this->entityManager = $entityManager;
-        $this->classValidatorRegexp = $classValidatorRegexp;
+    public function __construct(
+        private readonly EntityManagerInterface $entityManager,
+        private readonly ?string $classValidatorRegexp = null,
+    ) {
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function loadClassMetadata(ClassMetadata $metadata): bool
     {
         $className = $metadata->getClassName();
         try {
             $doctrineMetadata = $this->entityManager->getClassMetadata($className);
-        } catch (MappingException|OrmMappingException $exception) {
+        } catch (MappingException|OrmMappingException) {
             return false;
         }
 
@@ -140,12 +133,7 @@ final class DoctrineLoader implements LoaderInterface
         return $fields;
     }
 
-    /**
-     * @param array|FieldMapping $mapping
-     *
-     * @return mixed
-     */
-    private static function getFieldMappingValue($mapping, string $key)
+    private static function getFieldMappingValue(array|FieldMapping $mapping, string $key): mixed
     {
         if ($mapping instanceof FieldMapping) {
             return $mapping->$key ?? null;

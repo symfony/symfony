@@ -3,6 +3,9 @@ Uid Component
 
 The UID component provides an object-oriented API to generate and represent UIDs.
 
+It provides implementations that work on 32-bit and 64-bit CPUs
+for ULIDs and for UUIDs version 1 and versions 3 to 8.
+
 Resources
 ---------
 

@@ -13,8 +13,6 @@ namespace Symfony\Component\Messenger\Bridge\Doctrine\Tests\Transport;
 
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Platforms\PostgreSQLPlatform;
-use Doctrine\DBAL\Schema\AbstractSchemaManager;
-use Doctrine\DBAL\Schema\SchemaConfig;
 use Doctrine\Persistence\ConnectionRegistry;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Messenger\Bridge\Doctrine\Transport\Connection;
@@ -23,9 +21,6 @@ use Symfony\Component\Messenger\Bridge\Doctrine\Transport\DoctrineTransportFacto
 use Symfony\Component\Messenger\Bridge\Doctrine\Transport\PostgreSqlConnection;
 use Symfony\Component\Messenger\Exception\TransportException;
 use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
-
-// Doctrine DBAL 2 compatibility
-class_exists(\Doctrine\DBAL\Platforms\PostgreSqlPlatform::class);
 
 class DoctrineTransportFactoryTest extends TestCase
 {
@@ -42,15 +37,7 @@ class DoctrineTransportFactoryTest extends TestCase
     public function testCreateTransport()
     {
         $driverConnection = $this->createMock(\Doctrine\DBAL\Connection::class);
-        $schemaManager = $this->createMock(AbstractSchemaManager::class);
-        $schemaConfig = $this->createMock(SchemaConfig::class);
         $platform = $this->createMock(AbstractPlatform::class);
-        $schemaManager->method('createSchemaConfig')->willReturn($schemaConfig);
-        $driverConnection->method(
-            method_exists(\Doctrine\DBAL\Connection::class, 'createSchemaManager')
-                ? 'createSchemaManager'
-                : 'getSchemaManager'
-        )->willReturn($schemaManager);
         $driverConnection->method('getDatabasePlatform')->willReturn($platform);
         $registry = $this->createMock(ConnectionRegistry::class);
 
@@ -70,16 +57,9 @@ class DoctrineTransportFactoryTest extends TestCase
     public function testCreateTransportNotifyWithPostgreSQLPlatform()
     {
         $driverConnection = $this->createMock(\Doctrine\DBAL\Connection::class);
-        $schemaManager = $this->createMock(AbstractSchemaManager::class);
-        $schemaConfig = $this->createMock(SchemaConfig::class);
         $platform = $this->createMock(PostgreSQLPlatform::class);
-        $schemaManager->method('createSchemaConfig')->willReturn($schemaConfig);
-        $driverConnection->method(
-            method_exists(\Doctrine\DBAL\Connection::class, 'createSchemaManager')
-                ? 'createSchemaManager'
-                : 'getSchemaManager'
-        )->willReturn($schemaManager);
         $driverConnection->method('getDatabasePlatform')->willReturn($platform);
+        $driverConnection->method('executeStatement')->willReturn(1);
         $registry = $this->createMock(ConnectionRegistry::class);
 
         $registry->expects($this->once())

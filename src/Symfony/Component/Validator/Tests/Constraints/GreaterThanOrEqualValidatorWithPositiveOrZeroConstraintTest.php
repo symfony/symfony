@@ -23,12 +23,9 @@ class GreaterThanOrEqualValidatorWithPositiveOrZeroConstraintTest extends Greate
 {
     protected static function createConstraint(?array $options = null): Constraint
     {
-        return new PositiveOrZero();
+        return new PositiveOrZero($options);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public static function provideValidComparisons(): array
     {
         return [
@@ -42,9 +39,6 @@ class GreaterThanOrEqualValidatorWithPositiveOrZeroConstraintTest extends Greate
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public static function provideInvalidComparisons(): array
     {
         return [
@@ -75,15 +69,11 @@ class GreaterThanOrEqualValidatorWithPositiveOrZeroConstraintTest extends Greate
      */
     public function testThrowsConstraintExceptionIfNoValueOrPropertyPath($options)
     {
-        $this->expectException(ConstraintDefinitionException::class);
-        $this->expectExceptionMessage('requires either the "value" or "propertyPath" option to be set.');
         $this->markTestSkipped('Value option always set for PositiveOrZero constraint');
     }
 
     public function testThrowsConstraintExceptionIfBothValueAndPropertyPath()
     {
-        $this->expectException(ConstraintDefinitionException::class);
-        $this->expectExceptionMessage('requires only one of the "value" or "propertyPath" options to be set, not both.');
         $this->markTestSkipped('Value option is set for PositiveOrZero constraint automatically');
     }
 
@@ -92,10 +82,20 @@ class GreaterThanOrEqualValidatorWithPositiveOrZeroConstraintTest extends Greate
         $this->markTestSkipped('PropertyPath option is not used in PositiveOrZero constraint');
     }
 
+    public static function provideAllValidComparisons(): array
+    {
+        self::markTestSkipped('The "value" option cannot be used in the PositiveOrZero constraint');
+    }
+
     /**
      * @dataProvider provideValidComparisonsToPropertyPath
      */
     public function testValidComparisonToPropertyPath($comparedValue)
+    {
+        $this->markTestSkipped('PropertyPath option is not used in PositiveOrZero constraint');
+    }
+
+    public function testNoViolationOnNullObjectWithPropertyPath()
     {
         $this->markTestSkipped('PropertyPath option is not used in PositiveOrZero constraint');
     }
@@ -111,5 +111,20 @@ class GreaterThanOrEqualValidatorWithPositiveOrZeroConstraintTest extends Greate
     public function testInvalidComparisonToPropertyPathAddsPathAsParameter()
     {
         $this->markTestSkipped('PropertyPath option is not used in PositiveOrZero constraint');
+    }
+
+    public static function throwsOnInvalidStringDatesProvider(): array
+    {
+        self::markTestSkipped('The "value" option cannot be used in the PositiveOrZero constraint');
+    }
+
+    public static function provideAllInvalidComparisons(): array
+    {
+        self::markTestSkipped('The "value" option cannot be used in the Negative constraint');
+    }
+
+    public static function provideComparisonsToNullValueAtPropertyPath(): array
+    {
+        self::markTestSkipped('PropertyPath option is not used in PositiveOrZero constraint');
     }
 }

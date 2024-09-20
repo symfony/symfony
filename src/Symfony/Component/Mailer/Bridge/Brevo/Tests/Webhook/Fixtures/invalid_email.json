@@ -1,0 +1,14 @@
+{
+    "event": "invalid_email",
+    "email": "example@gmail.com",
+    "id": 625895,
+    "date": "2020-10-09 00:00:00",
+    "ts": 1604933619,
+    "message-id": "<201798300811.5787683@smtp-relay.mailin.fr>",
+    "ts_event": 1604933654,
+    "subject": "My first Transactional",
+    "X-Mailin-custom": "some_custom_header",
+    "template_id": 22,
+    "tags": ["transac_messages"],
+    "ts_epoch": 1604933623
+}

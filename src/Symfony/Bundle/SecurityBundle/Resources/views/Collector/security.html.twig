@@ -2,11 +2,91 @@
 
 {% block page_title 'Security' %}
 
+{% block head %}
+    {{ parent() }}
+
+    <style>
+        #collector-content .decision-log .voter_result td {
+            border-top-width: 1px;
+            border-bottom-width: 0;
+            padding-bottom: 0;
+        }
+
+        #collector-content .decision-log .voter_details td {
+            border-top-width: 0;
+            border-bottom-width: 1px;
+            padding-bottom: 0;
+        }
+
+        #collector-content .decision-log .voter_details table {
+            border: 0;
+            margin: 0;
+            box-shadow: unset;
+        }
+
+        #collector-content .decision-log .voter_details table td {
+            border: 0;
+            padding: 0 0 8px 0;
+        }
+
+        #collector-content .authenticator-name {
+            align-items: center;
+            display: flex;
+            gap: 16px;
+        }
+
+        #collector-content .authenticators .toggle-button {
+            margin-left: auto;
+        }
+        #collector-content .authenticators .sf-toggle-on .toggle-button {
+            transform: rotate(180deg);
+        }
+        #collector-content .authenticators .toggle-button svg {
+            display: block;
+        }
+
+        #collector-content .authenticators th,
+        #collector-content .authenticators td {
+            vertical-align: baseline;
+        }
+        #collector-content .authenticators th,
+        #collector-content .authenticators td {
+            vertical-align: baseline;
+        }
+
+        #collector-content .authenticators .label {
+            display: block;
+            text-align: center;
+        }
+
+        #collector-content .authenticator-data {
+            box-shadow: none;
+            margin: 0;
+        }
+
+        #collector-content .authenticator-data tr:first-child th,
+        #collector-content .authenticator-data tr:first-child td {
+            border-top: 0;
+        }
+
+        #collector-content .authenticators .badge {
+            color: var(--white);
+            display: inline-block;
+            margin: 4px 0;
+        }
+        #collector-content .authenticators .badge.badge-resolved {
+            background-color: var(--green-500);
+        }
+        #collector-content .authenticators .badge.badge-not_resolved {
+            background-color: var(--yellow-500);
+        }
+    </style>
+{% endblock %}
+
 {% block toolbar %}
     {% if collector.firewall %}
-        {% set color_code = collector.enabled and not collector.authenticatorManagerEnabled ? 'yellow' %}
         {% set icon %}
-            {{ include('@Security/Collector/icon.svg') }}
+            {{ source('@Security/Collector/icon.svg') }}
             <span class="sf-toolbar-value">{{ collector.user|default('n/a') }}</span>
         {% endset %}
 
@@ -47,6 +127,26 @@
                             </span>
                         </div>
 
+                        {% if collector.supportsRoleHierarchy %}
+                            <div class="sf-toolbar-info-piece">
+                                <b>Inherited Roles</b>
+                                <span>
+                                    {% if collector.inheritedRoles is empty %}
+                                        none
+                                    {% else %}
+                                        {% set remainingRoles = collector.inheritedRoles|slice(1) %}
+                                        {{ collector.inheritedRoles|first }}
+                                        {% if remainingRoles is not empty %}
+                                            +
+                                            <abbr title="{{ remainingRoles|join(', ') }}">
+                                                {{ remainingRoles|length }} more
+                                            </abbr>
+                                        {% endif %}
+                                    {% endif %}
+                                </span>
+                            </div>
+                        {% endif %}
+
                         <div class="sf-toolbar-info-piece">
                             <b>Token class</b>
                             <span>{{ collector.tokenClass|abbr_class }}</span>
@@ -84,13 +184,13 @@
             </div>
         {% endset %}
 
-        {{ include('@WebProfiler/Profiler/toolbar_item.html.twig', { link: profiler_url, status: color_code }) }}
+        {{ include('@WebProfiler/Profiler/toolbar_item.html.twig', { link: profiler_url }) }}
     {% endif %}
 {% endblock %}
 
 {% block menu %}
     <span class="label {{ not collector.firewall or not collector.token ? 'disabled' }}">
-        <span class="icon">{{ include('@Security/Collector/icon.svg') }}</span>
+        <span class="icon">{{ source('@Security/Collector/icon.svg') }}</span>
         <strong>Security</strong>
     </span>
 {% endblock %}
@@ -106,14 +206,25 @@
                     {% if collector.token %}
                         <div class="metrics">
                             <div class="metric">
-                                <span class="value">{{ collector.user == 'anon.' ? 'Anonymous' : collector.user }}</span>
+                                <span class="value">{{ collector.user }}</span>
                                 <span class="label">Username</span>
                             </div>
 
                             <div class="metric">
-                                <span class="value">{{ include('@WebProfiler/Icon/' ~ (collector.authenticated ? 'yes' : 'no') ~ '.svg') }}</span>
+                                <span class="value">{{ source('@WebProfiler/Icon/' ~ (collector.authenticated ? 'yes' : 'no') ~ '.svg') }}</span>
                                 <span class="label">Authenticated</span>
                             </div>
+
+                            {% if collector.authProfileToken %}
+                                <div class="metric">
+                                    <span class="value">
+                                        <a href="{{ path('_profiler', {token: collector.authProfileToken, panel: 'security'}) }}">
+                                            {{- collector.authProfileToken -}}
+                                        </a>
+                                    </span>
+                                    <span class="label">From</span>
+                                </div>
+                            {% endif %}
                         </div>
 
                         <table>
@@ -152,13 +263,21 @@
                         </table>
                     {% elseif collector.enabled %}
                         <div class="empty">
-                            <p>There is no security token.</p>
+                            <p>
+                                There is no security token.
+                                {% if collector.deauthProfileToken %}
+                                    It was removed in
+                                    <a href="{{ path('_profiler', {token: collector.deauthProfileToken, panel: 'security'}) }}">
+                                        {{- collector.deauthProfileToken -}}
+                                    </a>.
+                                {% endif %}
+                            </p>
                         </div>
                     {% endif %}
                 </div>
             </div>
 
-            <div class="tab {{ collector.firewall.security_enabled is empty ? 'disabled' }}">
+            <div class="tab {{ (not collector.firewall or collector.firewall.security_enabled is empty) ? 'disabled' }}">
                 <h3 class="tab-title">Firewall</h3>
                 <div class="tab-content">
                     {% if collector.firewall %}
@@ -168,19 +287,13 @@
                                 <span class="label">Name</span>
                             </div>
                             <div class="metric">
-                                <span class="value">{{ include('@WebProfiler/Icon/' ~ (collector.firewall.security_enabled ? 'yes' : 'no') ~ '.svg') }}</span>
+                                <span class="value">{{ source('@WebProfiler/Icon/' ~ (collector.firewall.security_enabled ? 'yes' : 'no') ~ '.svg') }}</span>
                                 <span class="label">Security enabled</span>
                             </div>
                             <div class="metric">
-                                <span class="value">{{ include('@WebProfiler/Icon/' ~ (collector.firewall.stateless ? 'yes' : 'no') ~ '.svg') }}</span>
+                                <span class="value">{{ source('@WebProfiler/Icon/' ~ (collector.firewall.stateless ? 'yes' : 'no') ~ '.svg') }}</span>
                                 <span class="label">Stateless</span>
                             </div>
-                            {% if collector.authenticatorManagerEnabled == false %}
-                                <div class="metric">
-                                    <span class="value">{{ include('@WebProfiler/Icon/' ~ (collector.firewall.allows_anonymous ? 'yes' : 'no') ~ '.svg') }}</span>
-                                    <span class="label">Allows anonymous</span>
-                                </div>
-                            {% endif %}
                         </div>
 
                         {% if collector.firewall.security_enabled %}
@@ -217,17 +330,10 @@
                                         <th>access_denied_url</th>
                                         <td>{{ collector.firewall.access_denied_url ?: '(none)' }}</td>
                                     </tr>
-                                    {% if collector.authenticatorManagerEnabled %}
-                                        <tr>
-                                            <th>authenticators</th>
-                                            <td>{{ collector.firewall.authenticators is empty ? '(none)' : profiler_dump(collector.firewall.authenticators, maxDepth=1) }}</td>
-                                        </tr>
-                                    {% else %}
-                                        <tr>
-                                            <th>listeners</th>
-                                            <td>{{ collector.firewall.listeners is empty ? '(none)' : profiler_dump(collector.firewall.listeners, maxDepth=1) }}</td>
-                                        </tr>
-                                    {% endif %}
+                                    <tr>
+                                        <th>authenticators</th>
+                                        <td>{{ collector.firewall.authenticators is empty ? '(none)' : profiler_dump(collector.firewall.authenticators, maxDepth=1) }}</td>
+                                    </tr>
                                 </tbody>
                             </table>
                         {% endif %}
@@ -258,14 +364,13 @@
                                     {% if not loop.first %}
                                         </tbody>
                                     {% endif %}
-
                                     <tbody>
                                     {% set previous_event = listener %}
                                 {% endif %}
 
                                 <tr>
                                     <td class="font-normal">{{ profiler_dump(listener.stub) }}</td>
-                                    <td class="no-wrap">{{ '%0.2f'|format(listener.time * 1000) }} ms</td>
+                                    <td class="no-wrap">{{ listener.time is null ? '(none)' : '%0.2f ms'|format(listener.time * 1000) }}</td>
                                     <td class="font-normal">{{ listener.response ? profiler_dump(listener.response) : '(none)' }}</td>
                                 </tr>
 
@@ -282,37 +387,91 @@
                 <h3 class="tab-title">Authenticators</h3>
                 <div class="tab-content">
                     {% if collector.authenticators|default([]) is not empty %}
-                        <table>
+                        <table class="authenticators">
+                            <colgroup>
+                                <col>
+                                <col style="width: 100%">
+                            </colgroup>
                             <thead>
                             <tr>
-                                <th>Authenticator</th>
-                                <th>Supports</th>
-                                <th>Duration</th>
-                                <th>Passport</th>
+                                <th scope="col">Status</th>
+                                <th scope="col">Authenticator</th>
                             </tr>
                             </thead>
-
-                            {% set previous_event = (collector.listeners|first) %}
-                            {% for authenticator in collector.authenticators %}
-                                {% if loop.first or authenticator != previous_event %}
-                                    {% if not loop.first %}
-                                        </tbody>
-                                    {% endif %}
-
-                                    <tbody>
-                                    {% set previous_event = authenticator %}
-                                {% endif %}
-
-                                <tr>
-                                    <td class="font-normal">{{ profiler_dump(authenticator.stub) }}</td>
-                                    <td class="no-wrap">{{ include('@WebProfiler/Icon/' ~ (authenticator.supports ? 'yes' : 'no') ~ '.svg') }}</td>
-                                    <td class="no-wrap">{{ '%0.2f'|format(authenticator.duration * 1000) }} ms</td>
-                                    <td class="font-normal">{{ authenticator.passport ? profiler_dump(authenticator.passport) : '(none)' }}</td>
+                            {% for i, authenticator in collector.authenticators %}
+                                <tr class="sf-toggle"
+                                    data-toggle-selector="#authenticator-{{ i }}"
+                                    data-toggle-initial="{{ authenticator.authenticated is not null ? 'display' }}"
+                                >
+                                    <td class="font-normal text-small">
+                                        {% if authenticator.authenticated %}
+                                            {% set status_text, label_status = 'success', 'success' %}
+                                        {% elseif authenticator.authenticated is null %}
+                                            {% set status_text, label_status = 'skipped', false %}
+                                        {% else %}
+                                            {% set status_text, label_status = 'failure', 'error' %}
+                                        {% endif %}
+                                        <span class="label {{ label_status ? 'status-' ~ label_status }}">{{ status_text }}</span>
+                                    </td>
+                                    <td>
+                                        <span class="authenticator-name">
+                                            {{ profiler_dump(authenticator.stub) }}
+                                            <button class="btn btn-link toggle-button" type="button">
+                                                {{ source('@WebProfiler/Icon/chevron-down.svg') }}
+                                            </button>
+                                        </span>
+                                        <div id="authenticator-{{ i }}" class="font-normal">
+                                            {% if authenticator.supports is same as(false) %}
+                                                <div class="empty">
+                                                    <p>This authenticator did not support the request.</p>
+                                                </div>
+                                            {% elseif authenticator.authenticated is null %}
+                                                <div class="empty">
+                                                    <p>An authenticator ran before this one.</p>
+                                                </div>
+                                            {% else %}
+                                                <table class="authenticator-data">
+                                                    <colgroup>
+                                                        <col>
+                                                        <col style="width: 100%">
+                                                    </colgroup>
+                                                    <tr>
+                                                        <th scope="row">Lazy</th>
+                                                        <td>{{ authenticator.supports is null ? 'yes' : 'no' }}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th scope="row">Duration</th>
+                                                        <td>{{ '%0.2f ms'|format(authenticator.duration * 1000) }}</td>
+                                                    </tr>
+                                                    {% if authenticator.passport %}
+                                                        <tr>
+                                                            <th scope="row">Passport</th>
+                                                            <td>{{ profiler_dump(authenticator.passport) }}</td>
+                                                        </tr>
+                                                    {% endif %}
+                                                    {% if authenticator.badges %}
+                                                        <tr>
+                                                            <th scope="row">Badges</th>
+                                                            <td>
+                                                                {% for badge in authenticator.badges %}
+                                                                    <span class="badge badge-{{ badge.resolved ? 'resolved' : 'not_resolved' }}">
+                                                                        {{ badge.stub|abbr_class }}
+                                                                    </span>
+                                                                {% endfor %}
+                                                            </td>
+                                                        </tr>
+                                                    {% endif %}
+                                                    {% if authenticator.exception %}
+                                                        <tr>
+                                                            <th scope="row">Exception</th>
+                                                            <td>{{ profiler_dump(authenticator.exception) }}</td>
+                                                        </tr>
+                                                    {% endif %}
+                                                </table>
+                                            {% endif %}
+                                        </div>
+                                    </td>
                                 </tr>
-
-                                {% if loop.last %}
-                                    </tbody>
-                                {% endif %}
                             {% endfor %}
                         </table>
                     {% else %}

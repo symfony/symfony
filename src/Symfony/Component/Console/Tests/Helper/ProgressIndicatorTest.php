@@ -118,10 +118,12 @@ class ProgressIndicatorTest extends TestCase
 
     public function testCannotStartAlreadyStartedIndicator()
     {
-        $this->expectException(\LogicException::class);
-        $this->expectExceptionMessage('Progress indicator already started.');
         $bar = new ProgressIndicator($this->getOutputStream());
         $bar->start('Starting...');
+
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('Progress indicator already started.');
+
         $bar->start('Starting Again.');
     }
 
@@ -177,6 +179,6 @@ class ProgressIndicatorTest extends TestCase
     {
         $count = substr_count($expected, "\n");
 
-        return "\x0D\x1B[2K".($count ? sprintf("\033[%dA", $count) : '').$expected;
+        return "\x0D\x1B[2K".($count ? \sprintf("\033[%dA", $count) : '').$expected;
     }
 }

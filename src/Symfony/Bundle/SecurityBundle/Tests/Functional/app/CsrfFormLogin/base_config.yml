@@ -15,7 +15,6 @@ services:
             - { name: container.service_subscriber }
 
 security:
-    enable_authenticator_manager: true
     password_hashers:
         Symfony\Component\Security\Core\User\InMemoryUser: plaintext
 
@@ -44,7 +43,7 @@ security:
             logout:
                 path: /logout_path
                 target: /
-                csrf_token_generator: security.csrf.token_manager
+                csrf_token_manager: security.csrf.token_manager
 
     access_control:
         - { path: .*, roles: IS_AUTHENTICATED_FULLY }

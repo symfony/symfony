@@ -45,7 +45,7 @@ class HeaderBagTest extends TestCase
     {
         $bag = new HeaderBag(['foo' => 'Tue, 4 Sep 2012 20:00:00 +0200']);
         $headerDate = $bag->getDate('foo');
-        $this->assertInstanceOf(\DateTime::class, $headerDate);
+        $this->assertInstanceOf(\DateTimeImmutable::class, $headerDate);
     }
 
     public function testGetDateNull()
@@ -92,7 +92,7 @@ class HeaderBagTest extends TestCase
     {
         $bag = new HeaderBag(['foo' => 'bar', 'fuzz' => 'bizz']);
         $this->assertEquals('bar', $bag->get('foo'), '->get return current value');
-        $this->assertEquals('bar', $bag->get('FoO'), '->get key in case insensitive');
+        $this->assertEquals('bar', $bag->get('FoO'), '->get key in case-insensitive');
         $this->assertEquals(['bar'], $bag->all('foo'), '->get return the value as array');
 
         // defaults

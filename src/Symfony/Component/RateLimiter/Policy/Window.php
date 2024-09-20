@@ -20,20 +20,16 @@ use Symfony\Component\RateLimiter\LimiterStateInterface;
  */
 final class Window implements LimiterStateInterface
 {
-    private $id;
-    private $hitCount = 0;
-    private $intervalInSeconds;
-    private $maxSize;
+    private int $hitCount = 0;
+    private int $maxSize;
+    private float $timer;
 
-    /**
-     * @var float
-     */
-    private $timer;
-
-    public function __construct(string $id, int $intervalInSeconds, int $windowSize, ?float $timer = null)
-    {
-        $this->id = $id;
-        $this->intervalInSeconds = $intervalInSeconds;
+    public function __construct(
+        private string $id,
+        private int $intervalInSeconds,
+        int $windowSize,
+        ?float $timer = null,
+    ) {
         $this->maxSize = $windowSize;
         $this->timer = $timer ?? microtime(true);
     }
@@ -48,9 +44,9 @@ final class Window implements LimiterStateInterface
         return $this->intervalInSeconds;
     }
 
-    public function add(int $hits = 1, ?float $now = null)
+    public function add(int $hits = 1, ?float $now = null): void
     {
-        $now = $now ?? microtime(true);
+        $now ??= microtime(true);
         if (($now - $this->timer) > $this->intervalInSeconds) {
             // reset window
             $this->timer = $now;
@@ -65,7 +61,7 @@ final class Window implements LimiterStateInterface
         return $this->hitCount;
     }
 
-    public function getAvailableTokens(float $now)
+    public function getAvailableTokens(float $now): int
     {
         // if now is more than the window interval in the past, all tokens are available
         if (($now - $this->timer) > $this->intervalInSeconds) {

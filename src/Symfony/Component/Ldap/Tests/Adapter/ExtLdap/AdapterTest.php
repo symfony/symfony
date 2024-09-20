@@ -37,6 +37,44 @@ class AdapterTest extends LdapTestCase
     /**
      * @group functional
      */
+    public function testSaslBind()
+    {
+        $h = @ldap_connect('ldap://'.getenv('LDAP_HOST').':'.getenv('LDAP_PORT'));
+        @ldap_set_option($h, \LDAP_OPT_PROTOCOL_VERSION, 3);
+
+        if (!$h || !@ldap_bind($h)) {
+            $this->markTestSkipped('No server is listening on LDAP_HOST:LDAP_PORT');
+        }
+
+        if (!@ldap_start_tls($h)) {
+            ldap_unbind($h);
+            $this->markTestSkipped('Cannot establish an encrypted connection');
+        }
+
+        ldap_unbind($h);
+
+        $ldap = new Adapter($this->getLdapConfig());
+
+        $ldap->getConnection()->saslBind('cn=admin,dc=symfony,dc=com', 'symfony');
+        $this->assertEquals('cn=admin,dc=symfony,dc=com', $ldap->getConnection()->whoami());
+    }
+
+    /**
+     * @group functional
+     */
+    public function testWhoamiWithoutSaslBind()
+    {
+        $ldap = new Adapter($this->getLdapConfig());
+
+        $this->expectException(NotBoundException::class);
+        $this->expectExceptionMessage('Cannot execute "Symfony\Component\Ldap\Adapter\ExtLdap\Connection::whoami()" before calling "Symfony\Component\Ldap\Adapter\ExtLdap\Connection::saslBind()".');
+
+        $ldap->getConnection()->whoami();
+    }
+
+    /**
+     * @group functional
+     */
     public function testLdapQuery()
     {
         $ldap = new Adapter($this->getLdapConfig());
@@ -150,8 +188,7 @@ class AdapterTest extends LdapTestCase
             $this->assertEquals(\count($paged_query->getResources()), 5);
 
             // This last query is to ensure that we haven't botched the state of our connection
-            // by not resetting pagination properly. extldap <= PHP 7.1 do not implement the necessary
-            // bits to work around an implementation flaw, so we simply can't guarantee this to work there.
+            // by not resetting pagination properly.
             $final_query = $ldap->createQuery('dc=symfony,dc=com', '(&(objectClass=applicationProcess)(cn=user*))', [
                 'scope' => Query::SCOPE_ONE,
             ]);
@@ -174,8 +211,8 @@ class AdapterTest extends LdapTestCase
         // Create 25 'users' that we'll query for in different page sizes
         $em = $ldap->getEntryManager();
         for ($i = 0; $i < 25; ++$i) {
-            $cn = sprintf('user%d', $i);
-            $entry = new Entry(sprintf('cn=%s,dc=symfony,dc=com', $cn));
+            $cn = \sprintf('user%d', $i);
+            $entry = new Entry(\sprintf('cn=%s,dc=symfony,dc=com', $cn));
             $entry->setAttribute('objectClass', ['applicationProcess']);
             $entry->setAttribute('cn', [$cn]);
             try {

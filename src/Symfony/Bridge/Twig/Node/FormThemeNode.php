@@ -22,9 +22,19 @@ use Twig\Node\Node;
 #[YieldReady]
 final class FormThemeNode extends Node
 {
-    public function __construct(Node $form, Node $resources, int $lineno, ?string $tag = null, bool $only = false)
+    /**
+     * @param bool $only
+     */
+    public function __construct(Node $form, Node $resources, int $lineno, $only = false)
     {
-        parent::__construct(['form' => $form, 'resources' => $resources], ['only' => $only], $lineno, $tag);
+        if (null === $only || \is_string($only)) {
+            trigger_deprecation('symfony/twig-bridge', '3.12', 'Passing a tag to %s() is deprecated.', __METHOD__);
+            $only = \func_num_args() > 4 ? func_get_arg(4) : true;
+        } elseif (!\is_bool($only)) {
+            throw new \TypeError(\sprintf('Argument 4 passed to "%s()" must be a boolean, "%s" given.', __METHOD__, get_debug_type($only)));
+        }
+
+        parent::__construct(['form' => $form, 'resources' => $resources], ['only' => $only], $lineno);
     }
 
     public function compile(Compiler $compiler): void

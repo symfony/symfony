@@ -30,18 +30,15 @@ use Symfony\Component\CssSelector\XPath\XPathExpr;
  */
 class FunctionExtension extends AbstractExtension
 {
-    /**
-     * {@inheritdoc}
-     */
     public function getFunctionTranslators(): array
     {
         return [
-            'nth-child' => [$this, 'translateNthChild'],
-            'nth-last-child' => [$this, 'translateNthLastChild'],
-            'nth-of-type' => [$this, 'translateNthOfType'],
-            'nth-last-of-type' => [$this, 'translateNthLastOfType'],
-            'contains' => [$this, 'translateContains'],
-            'lang' => [$this, 'translateLang'],
+            'nth-child' => $this->translateNthChild(...),
+            'nth-last-child' => $this->translateNthLastChild(...),
+            'nth-of-type' => $this->translateNthOfType(...),
+            'nth-last-of-type' => $this->translateNthLastOfType(...),
+            'contains' => $this->translateContains(...),
+            'lang' => $this->translateLang(...),
         ];
     }
 
@@ -53,7 +50,7 @@ class FunctionExtension extends AbstractExtension
         try {
             [$a, $b] = Parser::parseSeries($function->getArguments());
         } catch (SyntaxErrorException $e) {
-            throw new ExpressionErrorException(sprintf('Invalid series: "%s".', implode('", "', $function->getArguments())), 0, $e);
+            throw new ExpressionErrorException(\sprintf('Invalid series: "%s".', implode('", "', $function->getArguments())), 0, $e);
         }
 
         $xpath->addStarPrefix();
@@ -86,10 +83,10 @@ class FunctionExtension extends AbstractExtension
             $expr .= ' - '.$b;
         }
 
-        $conditions = [sprintf('%s %s 0', $expr, $sign)];
+        $conditions = [\sprintf('%s %s 0', $expr, $sign)];
 
         if (1 !== $a && -1 !== $a) {
-            $conditions[] = sprintf('(%s) mod %d = 0', $expr, $a);
+            $conditions[] = \sprintf('(%s) mod %d = 0', $expr, $a);
         }
 
         return $xpath->addCondition(implode(' and ', $conditions));
@@ -137,7 +134,7 @@ class FunctionExtension extends AbstractExtension
             }
         }
 
-        return $xpath->addCondition(sprintf(
+        return $xpath->addCondition(\sprintf(
             'contains(string(.), %s)',
             Translator::getXpathLiteral($arguments[0]->getValue())
         ));
@@ -155,15 +152,12 @@ class FunctionExtension extends AbstractExtension
             }
         }
 
-        return $xpath->addCondition(sprintf(
+        return $xpath->addCondition(\sprintf(
             'lang(%s)',
             Translator::getXpathLiteral($arguments[0]->getValue())
         ));
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getName(): string
     {
         return 'function';

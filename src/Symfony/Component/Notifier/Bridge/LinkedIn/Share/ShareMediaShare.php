@@ -54,8 +54,8 @@ class ShareMediaShare extends AbstractLinkedInShare
         }
 
         if (null !== $landingPageTitle) {
-            if (!\in_array($landingPageTitle, self::ALL)) {
-                throw new LogicException(sprintf('"%s" is not valid option, available options are "%s".', $landingPageTitle, implode(', ', self::ALL)));
+            if (!\in_array($landingPageTitle, self::ALL, true)) {
+                throw new LogicException(\sprintf('"%s" is not valid option, available options are "%s".', $landingPageTitle, implode(', ', self::ALL)));
             }
 
             $this->options['landingPage']['landingPageTitle'] = $landingPageTitle;

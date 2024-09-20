@@ -23,7 +23,7 @@ use Symfony\Component\Messenger\EventListener\SendFailedMessageForRetryListener;
 use Symfony\Component\Messenger\EventListener\SendFailedMessageToFailureTransportListener;
 use Symfony\Component\Messenger\EventListener\StopWorkerOnCustomStopExceptionListener;
 use Symfony\Component\Messenger\EventListener\StopWorkerOnRestartSignalListener;
-use Symfony\Component\Messenger\EventListener\StopWorkerOnSigtermSignalListener;
+use Symfony\Component\Messenger\Handler\RedispatchMessageHandler;
 use Symfony\Component\Messenger\Middleware\AddBusNameStampMiddleware;
 use Symfony\Component\Messenger\Middleware\DispatchAfterCurrentBusMiddleware;
 use Symfony\Component\Messenger\Middleware\FailedMessageProcessingMiddleware;
@@ -35,7 +35,7 @@ use Symfony\Component\Messenger\Middleware\TraceableMiddleware;
 use Symfony\Component\Messenger\Middleware\ValidationMiddleware;
 use Symfony\Component\Messenger\Retry\MultiplierRetryStrategy;
 use Symfony\Component\Messenger\RoutableMessageBus;
-use Symfony\Component\Messenger\Transport\InMemoryTransportFactory;
+use Symfony\Component\Messenger\Transport\InMemory\InMemoryTransportFactory;
 use Symfony\Component\Messenger\Transport\Sender\SendersLocator;
 use Symfony\Component\Messenger\Transport\Serialization\Normalizer\FlattenExceptionNormalizer;
 use Symfony\Component\Messenger\Transport\Serialization\PhpSerializer;
@@ -55,6 +55,7 @@ return static function (ContainerConfigurator $container) {
                 abstract_arg('senders service locator'),
             ])
         ->set('messenger.middleware.send_message', SendMessageMiddleware::class)
+            ->abstract()
             ->args([
                 service('messenger.senders_locator'),
                 service('event_dispatcher'),
@@ -71,9 +72,10 @@ return static function (ContainerConfigurator $container) {
             ])
 
         ->set('serializer.normalizer.flatten_exception', FlattenExceptionNormalizer::class)
-            ->tag('serializer.normalizer', ['priority' => -880])
+            ->tag('serializer.normalizer', ['built_in' => true, 'priority' => -880])
 
         ->set('messenger.transport.native_php_serializer', PhpSerializer::class)
+        ->alias('messenger.default_serializer', 'messenger.transport.native_php_serializer')
 
         // Middleware
         ->set('messenger.middleware.handle_message', HandleMessageMiddleware::class)
@@ -133,6 +135,9 @@ return static function (ContainerConfigurator $container) {
             ->tag('messenger.transport_factory')
 
         ->set('messenger.transport.in_memory.factory', InMemoryTransportFactory::class)
+            ->args([
+                service('clock')->nullOnInvalid(),
+            ])
             ->tag('messenger.transport_factory')
             ->tag('kernel.reset', ['method' => 'reset'])
 
@@ -158,7 +163,13 @@ return static function (ContainerConfigurator $container) {
                 abstract_arg('delay ms'),
                 abstract_arg('multiplier'),
                 abstract_arg('max delay ms'),
+                abstract_arg('jitter'),
             ])
+
+        // rate limiter
+        ->set('messenger.rate_limiter_locator', ServiceLocator::class)
+            ->args([[]])
+            ->tag('container.service_locator')
 
         // worker event listener
         ->set('messenger.retry.send_failed_message_for_retry_listener', SendFailedMessageForRetryListener::class)
@@ -193,13 +204,6 @@ return static function (ContainerConfigurator $container) {
             ->tag('kernel.event_subscriber')
             ->tag('monolog.logger', ['channel' => 'messenger'])
 
-        ->set('messenger.listener.stop_worker_on_sigterm_signal_listener', StopWorkerOnSigtermSignalListener::class)
-            ->args([
-                service('logger')->ignoreOnInvalid(),
-            ])
-            ->tag('kernel.event_subscriber')
-            ->tag('monolog.logger', ['channel' => 'messenger'])
-
         ->set('messenger.listener.stop_worker_on_stop_exception_listener', StopWorkerOnCustomStopExceptionListener::class)
             ->tag('kernel.event_subscriber')
 
@@ -213,5 +217,11 @@ return static function (ContainerConfigurator $container) {
                 abstract_arg('message bus locator'),
                 service('messenger.default_bus'),
             ])
+
+        ->set('messenger.redispatch_message_handler', RedispatchMessageHandler::class)
+            ->args([
+                service('messenger.default_bus'),
+            ])
+            ->tag('messenger.message_handler')
     ;
 };

@@ -11,14 +11,15 @@
 
 namespace Symfony\Component\HttpFoundation\Tests\Session\Storage\Handler;
 
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Session\Storage\Handler\MigratingSessionHandler;
 
 class MigratingSessionHandlerTest extends TestCase
 {
-    private $dualHandler;
-    private $currentHandler;
-    private $writeOnlyHandler;
+    private MigratingSessionHandler $dualHandler;
+    private MockObject&\SessionHandlerInterface $currentHandler;
+    private MockObject&\SessionHandlerInterface $writeOnlyHandler;
 
     protected function setUp(): void
     {

@@ -15,7 +15,7 @@ abstract class AbstractBootstrap3HorizontalLayoutTestCase extends AbstractBootst
 {
     public function testLabelOnForm()
     {
-        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\DateType');
+        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\DateType', null, ['widget' => 'choice']);
         $view = $form->createView();
         $this->renderWidget($view, ['label' => 'foo']);
         $html = $this->renderLabel($view);
@@ -163,9 +163,9 @@ abstract class AbstractBootstrap3HorizontalLayoutTestCase extends AbstractBootst
     public function testStartTagForMultipartForm()
     {
         $form = $this->factory->createBuilder('Symfony\Component\Form\Extension\Core\Type\FormType', null, [
-                'method' => 'get',
-                'action' => 'http://example.com/directory',
-            ])
+            'method' => 'get',
+            'action' => 'http://example.com/directory',
+        ])
             ->add('file', 'Symfony\Component\Form\Extension\Core\Type\FileType')
             ->getForm();
 

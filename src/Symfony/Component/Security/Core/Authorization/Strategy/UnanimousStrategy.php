@@ -24,16 +24,11 @@ use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
  */
 final class UnanimousStrategy implements AccessDecisionStrategyInterface, \Stringable
 {
-    private $allowIfAllAbstainDecisions;
-
-    public function __construct(bool $allowIfAllAbstainDecisions = false)
-    {
-        $this->allowIfAllAbstainDecisions = $allowIfAllAbstainDecisions;
+    public function __construct(
+        private bool $allowIfAllAbstainDecisions = false,
+    ) {
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function decide(\Traversable $results): bool
     {
         $grant = 0;

@@ -13,7 +13,7 @@ namespace Symfony\Component\Mailer\Bridge\Mailgun\Tests\Transport;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpClient\MockHttpClient;
-use Symfony\Component\HttpClient\Response\MockResponse;
+use Symfony\Component\HttpClient\Response\JsonMockResponse;
 use Symfony\Component\Mailer\Bridge\Mailgun\Transport\MailgunHttpTransport;
 use Symfony\Component\Mailer\Exception\HttpTransportException;
 use Symfony\Component\Mailer\Header\MetadataHeader;
@@ -71,7 +71,7 @@ class MailgunHttpTransportTest extends TestCase
             $this->assertStringContainsString('From: Fabien <fabpot@symfony.com>', $content);
             $this->assertStringContainsString('Hello There!', $content);
 
-            return new MockResponse(json_encode(['id' => 'foobar']), [
+            return new JsonMockResponse(['id' => 'foobar'], [
                 'http_code' => 200,
             ]);
         });
@@ -96,11 +96,8 @@ class MailgunHttpTransportTest extends TestCase
             $this->assertSame('https://api.mailgun.net:8984/v3/symfony/messages.mime', $url);
             $this->assertStringContainsString('Basic YXBpOkFDQ0VTU19LRVk=', $options['headers'][2] ?? $options['request_headers'][1]);
 
-            return new MockResponse(json_encode(['message' => 'i\'m a teapot']), [
+            return new JsonMockResponse(['message' => 'i\'m a teapot'], [
                 'http_code' => 418,
-                'response_headers' => [
-                    'content-type' => 'application/json',
-                ],
             ]);
         });
         $transport = new MailgunHttpTransport('ACCESS_KEY', 'symfony', 'us', $client);
@@ -122,17 +119,20 @@ class MailgunHttpTransportTest extends TestCase
         $email = new Email();
         $email->getHeaders()->addTextHeader('foo', 'bar');
         $email->getHeaders()->add(new TagHeader('password-reset'));
+        $email->getHeaders()->add(new TagHeader('product-name'));
         $email->getHeaders()->add(new MetadataHeader('Color', 'blue'));
         $email->getHeaders()->add(new MetadataHeader('Client-ID', '12345'));
 
         $transport = new MailgunHttpTransport('key', 'domain');
         $method = new \ReflectionMethod(MailgunHttpTransport::class, 'addMailgunHeaders');
-        $method->setAccessible(true);
         $method->invoke($transport, $email);
 
-        $this->assertCount(3, $email->getHeaders()->toArray());
+        $this->assertCount(4, $email->getHeaders()->toArray());
         $this->assertSame('foo: bar', $email->getHeaders()->get('foo')->toString());
-        $this->assertSame('X-Mailgun-Tag: password-reset', $email->getHeaders()->get('X-Mailgun-Tag')->toString());
+        $tagHeaders = iterator_to_array($email->getHeaders()->all('X-Mailgun-Tag'));
+        $this->assertCount(2, $tagHeaders);
+        $this->assertSame('X-Mailgun-Tag: password-reset', $tagHeaders[0]->toString());
+        $this->assertSame('X-Mailgun-Tag: product-name', $tagHeaders[1]->toString());
         $this->assertSame('X-Mailgun-Variables: '.json_encode(['Color' => 'blue', 'Client-ID' => '12345']), $email->getHeaders()->get('X-Mailgun-Variables')->toString());
     }
 }

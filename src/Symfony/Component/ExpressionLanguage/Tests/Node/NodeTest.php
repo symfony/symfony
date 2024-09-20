@@ -12,6 +12,7 @@
 namespace Symfony\Component\ExpressionLanguage\Tests\Node;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\ExpressionLanguage\Compiler;
 use Symfony\Component\ExpressionLanguage\Node\ConstantNode;
 use Symfony\Component\ExpressionLanguage\Node\Node;
 
@@ -37,5 +38,34 @@ EOF
         $unserializedNode = unserialize($serializedNode);
 
         $this->assertEquals($node, $unserializedNode);
+    }
+
+    public function testCompileActuallyCompilesAllNodes()
+    {
+        $nodes = [];
+        foreach (range(1, 10) as $ignored) {
+            $node = $this->createMock(Node::class);
+            $node->expects($this->once())->method('compile');
+
+            $nodes[] = $node;
+        }
+
+        $node = new Node($nodes);
+        $node->compile($this->createMock(Compiler::class));
+    }
+
+    public function testEvaluateActuallyEvaluatesAllNodes()
+    {
+        $nodes = [];
+        foreach (range(1, 3) as $i) {
+            $node = $this->createMock(Node::class);
+            $node->expects($this->once())->method('evaluate')
+                ->willReturn($i);
+
+            $nodes[] = $node;
+        }
+
+        $node = new Node($nodes);
+        $this->assertSame([1, 2, 3], $node->evaluate([], []));
     }
 }

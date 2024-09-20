@@ -23,32 +23,19 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class UploadValidatorExtension extends AbstractTypeExtension
 {
-    private $translator;
-    private $translationDomain;
-
-    public function __construct(TranslatorInterface $translator, ?string $translationDomain = null)
-    {
-        $this->translator = $translator;
-        $this->translationDomain = $translationDomain;
+    public function __construct(
+        private TranslatorInterface $translator,
+        private ?string $translationDomain = null,
+    ) {
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $translator = $this->translator;
         $translationDomain = $this->translationDomain;
-        $resolver->setNormalizer('upload_max_size_message', function (Options $options, $message) use ($translator, $translationDomain) {
-            return function () use ($translator, $translationDomain, $message) {
-                return $translator->trans($message(), [], $translationDomain);
-            };
-        });
+        $resolver->setNormalizer('upload_max_size_message', static fn (Options $options, $message) => static fn () => $translator->trans($message(), [], $translationDomain));
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public static function getExtendedTypes(): iterable
     {
         return [FormType::class];

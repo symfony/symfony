@@ -19,7 +19,7 @@ namespace Symfony\Component\Process;
  */
 class PhpExecutableFinder
 {
-    private $executableFinder;
+    private ExecutableFinder $executableFinder;
 
     public function __construct()
     {
@@ -28,15 +28,18 @@ class PhpExecutableFinder
 
     /**
      * Finds The PHP executable.
-     *
-     * @return string|false
      */
-    public function find(bool $includeArgs = true)
+    public function find(bool $includeArgs = true): string|false
     {
         if ($php = getenv('PHP_BINARY')) {
             if (!is_executable($php)) {
+                if (!\function_exists('exec')) {
+                    return false;
+                }
+
                 $command = '\\' === \DIRECTORY_SEPARATOR ? 'where' : 'command -v --';
-                if ($php = strtok(exec($command.' '.escapeshellarg($php)), \PHP_EOL)) {
+                $execResult = exec($command.' '.escapeshellarg($php));
+                if ($php = substr($execResult, 0, strpos($execResult, \PHP_EOL) ?: null)) {
                     if (!is_executable($php)) {
                         return false;
                     }
@@ -83,15 +86,17 @@ class PhpExecutableFinder
             $dirs[] = 'C:\xampp\php\\';
         }
 
+        if ($herdPath = getenv('HERD_HOME')) {
+            $dirs[] = $herdPath.\DIRECTORY_SEPARATOR.'bin';
+        }
+
         return $this->executableFinder->find('php', false, $dirs);
     }
 
     /**
      * Finds the PHP executable arguments.
-     *
-     * @return array
      */
-    public function findArguments()
+    public function findArguments(): array
     {
         $arguments = [];
         if ('phpdbg' === \PHP_SAPI) {

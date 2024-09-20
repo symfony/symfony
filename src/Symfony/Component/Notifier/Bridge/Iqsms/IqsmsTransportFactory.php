@@ -14,17 +14,13 @@ namespace Symfony\Component\Notifier\Bridge\Iqsms;
 use Symfony\Component\Notifier\Exception\UnsupportedSchemeException;
 use Symfony\Component\Notifier\Transport\AbstractTransportFactory;
 use Symfony\Component\Notifier\Transport\Dsn;
-use Symfony\Component\Notifier\Transport\TransportInterface;
 
 /**
  * @author Oleksandr Barabolia <alexandrbarabolya@gmail.com>
  */
 final class IqsmsTransportFactory extends AbstractTransportFactory
 {
-    /**
-     * @return IqsmsTransport
-     */
-    public function create(Dsn $dsn): TransportInterface
+    public function create(Dsn $dsn): IqsmsTransport
     {
         $scheme = $dsn->getScheme();
 

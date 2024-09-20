@@ -20,38 +20,30 @@ final class BoundArgument implements ArgumentInterface
     public const DEFAULTS_BINDING = 1;
     public const INSTANCEOF_BINDING = 2;
 
-    private static $sequence = 0;
+    private static int $sequence = 0;
 
-    private $value;
-    private $identifier;
-    private $used;
-    private $type;
-    private $file;
+    private ?int $identifier = null;
+    private ?bool $used = null;
 
-    public function __construct($value, bool $trackUsage = true, int $type = 0, ?string $file = null)
-    {
-        $this->value = $value;
+    public function __construct(
+        private mixed $value,
+        bool $trackUsage = true,
+        private int $type = 0,
+        private ?string $file = null,
+    ) {
         if ($trackUsage) {
             $this->identifier = ++self::$sequence;
         } else {
             $this->used = true;
         }
-        $this->type = $type;
-        $this->file = $file;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getValues(): array
     {
         return [$this->value, $this->identifier, $this->used, $this->type, $this->file];
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function setValues(array $values)
+    public function setValues(array $values): void
     {
         if (5 === \count($values)) {
             [$this->value, $this->identifier, $this->used, $this->type, $this->file] = $values;

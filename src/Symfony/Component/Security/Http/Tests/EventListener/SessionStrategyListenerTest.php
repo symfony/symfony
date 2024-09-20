@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Security\Http\Tests\EventListener;
 
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
@@ -26,10 +27,10 @@ use Symfony\Component\Security\Http\Session\SessionAuthenticationStrategyInterfa
 
 class SessionStrategyListenerTest extends TestCase
 {
-    private $sessionAuthenticationStrategy;
-    private $listener;
-    private $request;
-    private $token;
+    private MockObject&SessionAuthenticationStrategyInterface $sessionAuthenticationStrategy;
+    private SessionStrategyListener $listener;
+    private Request $request;
+    private NullToken $token;
 
     protected function setUp(): void
     {
@@ -104,7 +105,7 @@ class SessionStrategyListenerTest extends TestCase
 
     private function createEvent($firewallName)
     {
-        return new LoginSuccessEvent($this->createMock(AuthenticatorInterface::class), new SelfValidatingPassport(new UserBadge('test', function ($username) { return new InMemoryUser($username, null); })), $this->token, $this->request, null, $firewallName);
+        return new LoginSuccessEvent($this->createMock(AuthenticatorInterface::class), new SelfValidatingPassport(new UserBadge('test', fn ($username) => new InMemoryUser($username, null))), $this->token, $this->request, null, $firewallName);
     }
 
     private function configurePreviousSession()

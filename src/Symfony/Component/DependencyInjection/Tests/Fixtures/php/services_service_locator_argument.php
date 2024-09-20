@@ -3,8 +3,8 @@
 use Symfony\Component\DependencyInjection\Argument\RewindableGenerator;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Container;
-use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Exception\LogicException;
+use Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\ParameterBag\FrozenParameterBag;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
@@ -15,11 +15,10 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 class Symfony_DI_PhpDumper_Service_Locator_Argument extends Container
 {
     protected $parameters = [];
-    protected $getService;
+    protected \Closure $getService;
 
     public function __construct()
     {
-        $this->getService = \Closure::fromCallable([$this, 'getService']);
         $this->services = $this->privates = [];
         $this->syntheticIds = [
             'foo5' => true,
@@ -45,9 +44,6 @@ class Symfony_DI_PhpDumper_Service_Locator_Argument extends Container
     public function getRemovedIds(): array
     {
         return [
-            '.service_locator.ZP1tNYN' => true,
-            'Psr\\Container\\ContainerInterface' => true,
-            'Symfony\\Component\\DependencyInjection\\ContainerInterface' => true,
             'foo2' => true,
             'foo3' => true,
             'foo4' => true,
@@ -59,11 +55,11 @@ class Symfony_DI_PhpDumper_Service_Locator_Argument extends Container
      *
      * @return \stdClass
      */
-    protected function getBarService()
+    protected static function getBarService($container)
     {
-        $this->services['bar'] = $instance = new \stdClass();
+        $container->services['bar'] = $instance = new \stdClass();
 
-        $instance->locator = new \Symfony\Component\DependencyInjection\Argument\ServiceLocator($this->getService, [
+        $instance->locator = new \Symfony\Component\DependencyInjection\Argument\ServiceLocator($container->getService ??= $container->getService(...), [
             'foo1' => ['services', 'foo1', 'getFoo1Service', false],
             'foo2' => ['privates', 'foo2', 'getFoo2Service', false],
             'foo3' => [false, 'foo3', 'getFoo3Service', false],
@@ -85,9 +81,9 @@ class Symfony_DI_PhpDumper_Service_Locator_Argument extends Container
      *
      * @return \stdClass
      */
-    protected function getFoo1Service()
+    protected static function getFoo1Service($container)
     {
-        return $this->services['foo1'] = new \stdClass();
+        return $container->services['foo1'] = new \stdClass();
     }
 
     /**
@@ -95,9 +91,9 @@ class Symfony_DI_PhpDumper_Service_Locator_Argument extends Container
      *
      * @return \stdClass
      */
-    protected function getFoo2Service()
+    protected static function getFoo2Service($container)
     {
-        return $this->privates['foo2'] = new \stdClass();
+        return $container->privates['foo2'] = new \stdClass();
     }
 
     /**
@@ -105,13 +101,13 @@ class Symfony_DI_PhpDumper_Service_Locator_Argument extends Container
      *
      * @return \stdClass
      */
-    protected function getFoo3Service()
+    protected static function getFoo3Service($container)
     {
-        $this->factories['service_container']['foo3'] = function () {
+        $container->factories['service_container']['foo3'] = function ($container) {
             return new \stdClass();
         };
 
-        return $this->factories['service_container']['foo3']();
+        return $container->factories['service_container']['foo3']($container);
     }
 
     /**
@@ -119,13 +115,8 @@ class Symfony_DI_PhpDumper_Service_Locator_Argument extends Container
      *
      * @return \stdClass
      */
-    protected function getFoo4Service()
+    protected static function getFoo4Service($container)
     {
-        $this->throw('BOOM');
-    }
-
-    protected function throw($message)
-    {
-        throw new RuntimeException($message);
+        throw new RuntimeException('BOOM');
     }
 }

@@ -25,10 +25,7 @@ use Symfony\Component\Uid\UuidV6;
 
 class UidNormalizerTest extends TestCase
 {
-    /**
-     * @var UidNormalizer
-     */
-    private $normalizer;
+    private UidNormalizer $normalizer;
 
     protected function setUp(): void
     {
@@ -50,8 +47,8 @@ class UidNormalizerTest extends TestCase
     {
         $uidFormats = [null, 'canonical', 'base58', 'base32', 'rfc4122'];
         $data = [
-             [
-                 UuidV1::fromString('9b7541de-6f87-11ea-ab3c-9da9a81562fc'),
+            [
+                UuidV1::fromString('9b7541de-6f87-11ea-ab3c-9da9a81562fc'),
                 '9b7541de-6f87-11ea-ab3c-9da9a81562fc',
                 '9b7541de-6f87-11ea-ab3c-9da9a81562fc',
                 'LCQS8f2p5SDSiAt9V7ZYnF',
@@ -145,7 +142,7 @@ class UidNormalizerTest extends TestCase
 
     public function testSupportOurAbstractUid()
     {
-        $this->assertTrue($this->normalizer->supportsDenormalization('1ea6ecef-eb9a-66fe-b62b-957b45f17e43', AbstractUid::class));
+        $this->assertFalse($this->normalizer->supportsDenormalization('1ea6ecef-eb9a-66fe-b62b-957b45f17e43', AbstractUid::class));
     }
 
     public function testSupportCustomAbstractUid()
@@ -163,11 +160,17 @@ class UidNormalizerTest extends TestCase
 
     public function testDenormalizeOurAbstractUid()
     {
+        $this->expectException(\Error::class);
+        $this->expectExceptionMessage('Cannot call abstract method Symfony\Component\Uid\AbstractUid::fromString()');
+
         $this->assertEquals(Uuid::fromString($uuidString = '1ea6ecef-eb9a-66fe-b62b-957b45f17e43'), $this->normalizer->denormalize($uuidString, AbstractUid::class));
     }
 
     public function testDenormalizeCustomAbstractUid()
     {
+        $this->expectException(\Error::class);
+        $this->expectExceptionMessage('Cannot instantiate abstract class Symfony\Component\Serializer\Tests\Normalizer\TestAbstractCustomUid');
+
         $this->assertEquals(Uuid::fromString($uuidString = '1ea6ecef-eb9a-66fe-b62b-957b45f17e43'), $this->normalizer->denormalize($uuidString, TestAbstractCustomUid::class));
     }
 

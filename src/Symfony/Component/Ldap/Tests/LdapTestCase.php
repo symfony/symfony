@@ -17,7 +17,7 @@ class LdapTestCase extends TestCase
 {
     protected function getLdapConfig()
     {
-        $h = @ldap_connect(getenv('LDAP_HOST'), getenv('LDAP_PORT'));
+        $h = @ldap_connect('ldap://'.getenv('LDAP_HOST').':'.getenv('LDAP_PORT'));
         @ldap_set_option($h, \LDAP_OPT_PROTOCOL_VERSION, 3);
 
         if (!$h || !@ldap_bind($h)) {

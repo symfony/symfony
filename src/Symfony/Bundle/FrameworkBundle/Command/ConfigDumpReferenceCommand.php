@@ -14,6 +14,7 @@ namespace Symfony\Bundle\FrameworkBundle\Command;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\Config\Definition\Dumper\XmlReferenceDumper;
 use Symfony\Component\Config\Definition\Dumper\YamlReferenceDumper;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Completion\CompletionInput;
 use Symfony\Component\Console\Completion\CompletionSuggestions;
 use Symfony\Component\Console\Exception\InvalidArgumentException;
@@ -33,24 +34,18 @@ use Symfony\Component\Yaml\Yaml;
  *
  * @final
  */
+#[AsCommand(name: 'config:dump-reference', description: 'Dump the default configuration for an extension')]
 class ConfigDumpReferenceCommand extends AbstractConfigCommand
 {
-    protected static $defaultName = 'config:dump-reference';
-    protected static $defaultDescription = 'Dump the default configuration for an extension';
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function configure()
+    protected function configure(): void
     {
         $this
             ->setDefinition([
                 new InputArgument('name', InputArgument::OPTIONAL, 'The Bundle name or the extension alias'),
                 new InputArgument('path', InputArgument::OPTIONAL, 'The configuration option path'),
-                new InputOption('format', null, InputOption::VALUE_REQUIRED, 'The output format (yaml or xml)', 'yaml'),
+                new InputOption('format', null, InputOption::VALUE_REQUIRED, \sprintf('The output format ("%s")', implode('", "', $this->getAvailableFormatOptions())), 'yaml'),
             ])
-            ->setDescription(self::$defaultDescription)
-            ->setHelp(<<<'EOF'
+            ->setHelp(<<<EOF
 The <info>%command.name%</info> command dumps the default configuration for an
 extension/bundle.
 
@@ -59,11 +54,9 @@ Either the extension alias or bundle name can be used:
   <info>php %command.full_name% framework</info>
   <info>php %command.full_name% FrameworkBundle</info>
 
-With the <info>--format</info> option specifies the format of the configuration,
-this is either <comment>yaml</comment> or <comment>xml</comment>.
-When the option is not provided, <comment>yaml</comment> is used.
+The <info>--format</info> option specifies the format of the command output:
 
-  <info>php %command.full_name% FrameworkBundle --format=xml</info>
+  <info>php %command.full_name% FrameworkBundle --format=json</info>
 
 For dumping a specific option, add its path as second argument (only available for the yaml format):
 
@@ -75,8 +68,6 @@ EOF
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @throws \LogicException
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -123,27 +114,27 @@ EOF
         }
 
         if ($name === $extension->getAlias()) {
-            $message = sprintf('Default configuration for extension with alias: "%s"', $name);
+            $message = \sprintf('Default configuration for extension with alias: "%s"', $name);
         } else {
-            $message = sprintf('Default configuration for "%s"', $name);
+            $message = \sprintf('Default configuration for "%s"', $name);
         }
 
         if (null !== $path) {
-            $message .= sprintf(' at path "%s"', $path);
+            $message .= \sprintf(' at path "%s"', $path);
         }
 
         switch ($format) {
             case 'yaml':
-                $io->writeln(sprintf('# %s', $message));
+                $io->writeln(\sprintf('# %s', $message));
                 $dumper = new YamlReferenceDumper();
                 break;
             case 'xml':
-                $io->writeln(sprintf('<!-- %s -->', $message));
+                $io->writeln(\sprintf('<!-- %s -->', $message));
                 $dumper = new XmlReferenceDumper();
                 break;
             default:
                 $io->writeln($message);
-                throw new InvalidArgumentException('Only the yaml and xml formats are supported.');
+                throw new InvalidArgumentException(\sprintf('Supported formats are "%s".', implode('", "', $this->getAvailableFormatOptions())));
         }
 
         $io->writeln(null === $path ? $dumper->dump($configuration, $extension->getNamespace()) : $dumper->dumpAtPath($configuration, $path));
@@ -186,6 +177,7 @@ EOF
         return $bundles;
     }
 
+    /** @return string[] */
     private function getAvailableFormatOptions(): array
     {
         return ['yaml', 'xml'];

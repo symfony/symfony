@@ -13,6 +13,7 @@ namespace Symfony\Component\Config\Tests\Fixtures\Configuration;
 
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
+use Symfony\Component\Config\Tests\Fixtures\TestEnum;
 
 class ExampleConfiguration implements ConfigurationInterface
 {
@@ -38,7 +39,7 @@ class ExampleConfiguration implements ConfigurationInterface
                 ->scalarNode('scalar_deprecated_with_message')->setDeprecated('vendor/package', '1.1', 'Deprecation custom message for "%node%" at "%path%"')->end()
                 ->scalarNode('node_with_a_looong_name')->end()
                 ->enumNode('enum_with_default')->values(['this', 'that'])->defaultValue('this')->end()
-                ->enumNode('enum')->values(['this', 'that'])->end()
+                ->enumNode('enum')->values(['this', 'that', TestEnum::Ccc])->end()
                 ->arrayNode('array')
                     ->info('some info')
                     ->canBeUnset()

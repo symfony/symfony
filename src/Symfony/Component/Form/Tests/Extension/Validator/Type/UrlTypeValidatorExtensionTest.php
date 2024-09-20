@@ -11,18 +11,16 @@
 
 namespace Symfony\Component\Form\Tests\Extension\Validator\Type;
 
-use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\Form\Extension\Core\Type\UrlType;
 use Symfony\Component\Form\Test\Traits\ValidatorExtensionTrait;
 
 class UrlTypeValidatorExtensionTest extends BaseValidatorExtensionTestCase
 {
-    use ExpectDeprecationTrait;
     use ValidatorExtensionTrait;
 
     protected function createForm(array $options = [])
     {
-        return $this->factory->create(UrlType::class, null, $options);
+        return $this->factory->create(UrlType::class, null, $options + ['default_protocol' => 'http']);
     }
 
     public function testInvalidMessage()
@@ -30,19 +28,5 @@ class UrlTypeValidatorExtensionTest extends BaseValidatorExtensionTestCase
         $form = $this->createForm();
 
         $this->assertSame('Please enter a valid URL.', $form->getConfig()->getOption('invalid_message'));
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testLegacyInvalidMessage()
-    {
-        $this->expectDeprecation('Since symfony/form 5.2: Setting the "legacy_error_messages" option to "true" is deprecated. It will be disabled in Symfony 6.0.');
-
-        $form = $this->createForm([
-            'legacy_error_messages' => true,
-        ]);
-
-        $this->assertSame('This value is not valid.', $form->getConfig()->getOption('invalid_message'));
     }
 }

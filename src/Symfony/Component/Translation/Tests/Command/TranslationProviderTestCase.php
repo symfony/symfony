@@ -22,10 +22,10 @@ use Symfony\Component\Translation\Provider\TranslationProviderCollection;
  */
 abstract class TranslationProviderTestCase extends TestCase
 {
-    protected $fs;
-    protected $translationAppDir;
-    protected $files;
-    protected $defaultLocale;
+    protected Filesystem $fs;
+    protected string $translationAppDir;
+    protected array $files;
+    protected string $defaultLocale;
 
     protected function setUp(): void
     {
@@ -33,7 +33,8 @@ abstract class TranslationProviderTestCase extends TestCase
         $this->defaultLocale = \Locale::getDefault();
         \Locale::setDefault('en');
         $this->fs = new Filesystem();
-        $this->translationAppDir = sys_get_temp_dir().'/'.uniqid('sf_translation', true);
+        $this->translationAppDir = tempnam(sys_get_temp_dir(), 'sf_translation_');
+        $this->fs->remove($this->translationAppDir);
         $this->fs->mkdir($this->translationAppDir.'/translations');
     }
 
@@ -53,6 +54,22 @@ abstract class TranslationProviderTestCase extends TestCase
         }
 
         return new TranslationProviderCollection($collection);
+    }
+
+    protected function createYamlFile(array $messages = ['node' => 'NOTE'], $targetLanguage = 'en', $fileNamePattern = 'messages.%locale%.yml'): string
+    {
+        $yamlContent = '';
+        foreach ($messages as $key => $value) {
+            $yamlContent .= "$key: $value\n";
+        }
+        $yamlContent .= "\n";
+
+        $filename = \sprintf('%s/%s', $this->translationAppDir.'/translations', str_replace('%locale%', $targetLanguage, $fileNamePattern));
+        file_put_contents($filename, $yamlContent);
+
+        $this->files[] = $filename;
+
+        return $filename;
     }
 
     protected function createFile(array $messages = ['note' => 'NOTE'], $targetLanguage = 'en', $fileNamePattern = 'messages.%locale%.xlf', string $xlfVersion = 'xlf12'): string
@@ -99,7 +116,7 @@ XLIFF;
 XLIFF;
         }
 
-        $filename = sprintf('%s/%s', $this->translationAppDir.'/translations', str_replace('%locale%', $targetLanguage, $fileNamePattern));
+        $filename = \sprintf('%s/%s', $this->translationAppDir.'/translations', str_replace('%locale%', $targetLanguage, $fileNamePattern));
         file_put_contents($filename, $xliffContent);
 
         $this->files[] = $filename;

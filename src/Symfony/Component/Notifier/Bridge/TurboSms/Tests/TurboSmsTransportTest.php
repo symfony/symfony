@@ -12,6 +12,7 @@
 namespace Symfony\Component\Notifier\Bridge\TurboSms\Tests;
 
 use Symfony\Component\HttpClient\MockHttpClient;
+use Symfony\Component\HttpClient\Response\JsonMockResponse;
 use Symfony\Component\Notifier\Bridge\TurboSms\TurboSmsTransport;
 use Symfony\Component\Notifier\Exception\LengthException;
 use Symfony\Component\Notifier\Exception\TransportException;
@@ -20,16 +21,12 @@ use Symfony\Component\Notifier\Message\SentMessage;
 use Symfony\Component\Notifier\Message\SmsMessage;
 use Symfony\Component\Notifier\Test\TransportTestCase;
 use Symfony\Component\Notifier\Tests\Transport\DummyMessage;
-use Symfony\Component\Notifier\Transport\TransportInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 
 final class TurboSmsTransportTest extends TransportTestCase
 {
-    /**
-     * @return TurboSmsTransport
-     */
-    public static function createTransport(?HttpClientInterface $client = null): TransportInterface
+    public static function createTransport(?HttpClientInterface $client = null): TurboSmsTransport
     {
         return new TurboSmsTransport('authToken', 'sender', $client ?? new MockHttpClient());
     }
@@ -52,30 +49,29 @@ final class TurboSmsTransportTest extends TransportTestCase
 
     public function testSuccessfulSend()
     {
-        $response = $this->createMock(ResponseInterface::class);
-        $response
-            ->expects(self::exactly(2))
-            ->method('getStatusCode')
-            ->willReturn(200)
-        ;
-        $response
-            ->expects(self::once())
-            ->method('getContent')
-            ->willReturn(json_encode([
-                'response_code' => 0,
-                'response_status' => 'OK',
-                'response_result' => [
-                    [
-                        'phone' => '380931234567',
-                        'response_code' => 0,
-                        'message_id' => 'f83f8868-5e46-c6cf-e4fb-615e5a293754',
-                        'response_status' => 'OK',
-                    ],
+        $response = new JsonMockResponse(body: [
+            'response_code' => 0,
+            'response_status' => 'OK',
+            'response_result' => [
+                [
+                    'phone' => '380931234567',
+                    'response_code' => 0,
+                    'message_id' => 'f83f8868-5e46-c6cf-e4fb-615e5a293754',
+                    'response_status' => 'OK',
                 ],
-            ]))
-        ;
+            ],
+        ], info: ['http_code' => 200]);
 
-        $client = new MockHttpClient(static function () use ($response): ResponseInterface {
+        $client = new MockHttpClient(static function (string $method, string $url, array $options) use ($response): ResponseInterface {
+            $body = json_decode($options['body'], true);
+            self::assertSame([
+                'sms' => [
+                    'sender' => 'sender',
+                    'recipients' => ['380931234567'],
+                    'text' => 'Тест/Test',
+                ],
+            ], $body);
+
             return $response;
         });
 
@@ -88,27 +84,42 @@ final class TurboSmsTransportTest extends TransportTestCase
         self::assertSame('f83f8868-5e46-c6cf-e4fb-615e5a293754', $sentMessage->getMessageId());
     }
 
+    public function testFailedSendWithPartialAccepted()
+    {
+        $response = new JsonMockResponse(body: [
+            'response_code' => 0,
+            'response_status' => 'OK',
+            'response_result' => [
+                [
+                    'phone' => '380931234567',
+                    'response_code' => 406,
+                    'message_id' => null,
+                    'response_status' => 'NOT_ALLOWED_RECIPIENT_COUNTRY',
+                ],
+            ],
+        ], info: ['http_code' => 200]);
+
+        $client = new MockHttpClient(static fn() => $response);
+
+        $message = new SmsMessage('380931234567', 'Test');
+
+        $transport = self::createTransport($client);
+
+        $this->expectException(TransportException::class);
+        $this->expectExceptionMessage('Unable to send SMS with TurboSMS: Error code 406 with message "NOT_ALLOWED_RECIPIENT_COUNTRY".');
+
+        $transport->send($message);
+    }
+
     public function testFailedSend()
     {
-        $response = $this->createMock(ResponseInterface::class);
-        $response
-            ->expects(self::exactly(2))
-            ->method('getStatusCode')
-            ->willReturn(400)
-        ;
-        $response
-            ->expects(self::once())
-            ->method('getContent')
-            ->willReturn(json_encode([
-                'response_code' => 103,
-                'response_status' => 'REQUIRED_TOKEN',
-                'response_result' => null,
-            ]))
-        ;
+        $response = new JsonMockResponse(body: [
+            'response_code' => 103,
+            'response_status' => 'REQUIRED_TOKEN',
+            'response_result' => null,
+        ], info: ['http_code' => 400]);
 
-        $client = new MockHttpClient(static function () use ($response): ResponseInterface {
-            return $response;
-        });
+        $client = new MockHttpClient(static fn (): ResponseInterface => $response);
 
         $message = new SmsMessage('380931234567', 'Тест/Test');
 
@@ -125,10 +136,7 @@ final class TurboSmsTransportTest extends TransportTestCase
         $this->expectException(LengthException::class);
         $this->expectExceptionMessage('The sender length of a TurboSMS message must not exceed 20 characters.');
 
-        $message = new SmsMessage('380931234567', 'Hello!');
-        $transport = new TurboSmsTransport('authToken', 'abcdefghijklmnopqrstu', $this->createMock(HttpClientInterface::class));
-
-        $transport->send($message);
+        new TurboSmsTransport('authToken', 'abcdefghijklmnopqrstu', $this->createMock(HttpClientInterface::class));
     }
 
     public function testInvalidSubjectWithLatinSymbols()
@@ -151,5 +159,15 @@ final class TurboSmsTransportTest extends TransportTestCase
         $this->expectExceptionMessage('The subject length for "cyrillic" symbols of a TurboSMS message must not exceed 661 characters.');
 
         $transport->send($message);
+    }
+
+    public function testSmsMessageWithInvalidFrom()
+    {
+        $transport = $this->createTransport();
+
+        $this->expectException(LengthException::class);
+        $this->expectExceptionMessage('The sender length of a TurboSMS message must not exceed 20 characters.');
+
+        $transport->send(new SmsMessage('380931234567', 'test', 'abcdefghijklmnopqrstu'));
     }
 }

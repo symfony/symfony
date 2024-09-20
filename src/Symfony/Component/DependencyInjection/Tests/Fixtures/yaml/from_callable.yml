@@ -1,0 +1,4 @@
+services:
+    from_callable:
+        class: stdClass
+        from_callable: ['@bar', 'do']

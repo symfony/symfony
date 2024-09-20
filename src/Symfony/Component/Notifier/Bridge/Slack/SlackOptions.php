@@ -21,18 +21,15 @@ use Symfony\Component\Notifier\Notification\Notification;
 /**
  * @author Fabien Potencier <fabien@symfony.com>
  */
-final class SlackOptions implements MessageOptionsInterface
+class SlackOptions implements MessageOptionsInterface
 {
     private const MAX_BLOCKS = 50;
 
-    private $options;
-
-    public function __construct(array $options = [])
-    {
-        $this->options = $options;
-
+    public function __construct(
+        private array $options = [],
+    ) {
         if (\count($this->options['blocks'] ?? []) > self::MAX_BLOCKS) {
-            throw new LogicException(sprintf('Maximum number of "blocks" has been reached (%d).', self::MAX_BLOCKS));
+            throw new LogicException(\sprintf('Maximum number of "blocks" has been reached (%d).', self::MAX_BLOCKS));
         }
     }
 
@@ -66,23 +63,11 @@ final class SlackOptions implements MessageOptionsInterface
     }
 
     /**
-     * @return $this
-     *
-     * @deprecated since Symfony 5.1, use recipient() instead.
-     */
-    public function channel(string $channel): self
-    {
-        trigger_deprecation('symfony/slack-notifier', '5.1', 'The "%s()" method is deprecated, use "recipient()" instead.', __METHOD__);
-
-        return $this;
-    }
-
-    /**
      * @param string $id The hook id (anything after https://hooks.slack.com/services/)
      *
      * @return $this
      */
-    public function recipient(string $id): self
+    public function recipient(string $id): static
     {
         $this->options['recipient_id'] = $id;
 
@@ -92,7 +77,7 @@ final class SlackOptions implements MessageOptionsInterface
     /**
      * @return $this
      */
-    public function asUser(bool $bool): self
+    public function asUser(bool $bool): static
     {
         $this->options['as_user'] = $bool;
 
@@ -102,10 +87,20 @@ final class SlackOptions implements MessageOptionsInterface
     /**
      * @return $this
      */
-    public function block(SlackBlockInterface $block): self
+    public function postAt(\DateTime $timestamp): static
+    {
+        $this->options['post_at'] = $timestamp->getTimestamp();
+
+        return $this;
+    }
+
+    /**
+     * @return $this
+     */
+    public function block(SlackBlockInterface $block): static
     {
         if (\count($this->options['blocks'] ?? []) >= self::MAX_BLOCKS) {
-            throw new LogicException(sprintf('Maximum number of "blocks" has been reached (%d).', self::MAX_BLOCKS));
+            throw new LogicException(\sprintf('Maximum number of "blocks" has been reached (%d).', self::MAX_BLOCKS));
         }
 
         $this->options['blocks'][] = $block->toArray();
@@ -116,7 +111,7 @@ final class SlackOptions implements MessageOptionsInterface
     /**
      * @return $this
      */
-    public function iconEmoji(string $emoji): self
+    public function iconEmoji(string $emoji): static
     {
         $this->options['icon_emoji'] = $emoji;
 
@@ -126,7 +121,7 @@ final class SlackOptions implements MessageOptionsInterface
     /**
      * @return $this
      */
-    public function iconUrl(string $url): self
+    public function iconUrl(string $url): static
     {
         $this->options['icon_url'] = $url;
 
@@ -136,7 +131,7 @@ final class SlackOptions implements MessageOptionsInterface
     /**
      * @return $this
      */
-    public function linkNames(bool $bool): self
+    public function linkNames(bool $bool): static
     {
         $this->options['link_names'] = $bool;
 
@@ -146,7 +141,7 @@ final class SlackOptions implements MessageOptionsInterface
     /**
      * @return $this
      */
-    public function mrkdwn(bool $bool): self
+    public function mrkdwn(bool $bool): static
     {
         $this->options['mrkdwn'] = $bool;
 
@@ -156,7 +151,7 @@ final class SlackOptions implements MessageOptionsInterface
     /**
      * @return $this
      */
-    public function parse(string $parse): self
+    public function parse(string $parse): static
     {
         $this->options['parse'] = $parse;
 
@@ -166,7 +161,7 @@ final class SlackOptions implements MessageOptionsInterface
     /**
      * @return $this
      */
-    public function unfurlLinks(bool $bool): self
+    public function unfurlLinks(bool $bool): static
     {
         $this->options['unfurl_links'] = $bool;
 
@@ -176,7 +171,7 @@ final class SlackOptions implements MessageOptionsInterface
     /**
      * @return $this
      */
-    public function unfurlMedia(bool $bool): self
+    public function unfurlMedia(bool $bool): static
     {
         $this->options['unfurl_media'] = $bool;
 
@@ -186,7 +181,7 @@ final class SlackOptions implements MessageOptionsInterface
     /**
      * @return $this
      */
-    public function username(string $username): self
+    public function username(string $username): static
     {
         $this->options['username'] = $username;
 
@@ -196,7 +191,7 @@ final class SlackOptions implements MessageOptionsInterface
     /**
      * @return $this
      */
-    public function threadTs(string $threadTs): self
+    public function threadTs(string $threadTs): static
     {
         $this->options['thread_ts'] = $threadTs;
 

@@ -18,19 +18,13 @@ use Symfony\Component\Messenger\Stamp\NonSendableStampInterface;
  */
 class DoctrineReceivedStamp implements NonSendableStampInterface
 {
-    private $id;
-
-    public function __construct(string $id)
-    {
-        $this->id = $id;
+    public function __construct(
+        private string $id,
+    ) {
     }
 
     public function getId(): string
     {
         return $this->id;
     }
-}
-
-if (!class_exists(\Symfony\Component\Messenger\Transport\Doctrine\DoctrineReceivedStamp::class, false)) {
-    class_alias(DoctrineReceivedStamp::class, \Symfony\Component\Messenger\Transport\Doctrine\DoctrineReceivedStamp::class);
 }

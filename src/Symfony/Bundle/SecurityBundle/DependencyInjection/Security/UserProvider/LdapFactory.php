@@ -24,7 +24,7 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 class LdapFactory implements UserProviderFactoryInterface
 {
-    public function create(ContainerBuilder $container, string $id, array $config)
+    public function create(ContainerBuilder $container, string $id, array $config): void
     {
         $container
             ->setDefinition($id, new ChildDefinition('security.user.provider.ldap'))
@@ -40,12 +40,12 @@ class LdapFactory implements UserProviderFactoryInterface
         ;
     }
 
-    public function getKey()
+    public function getKey(): string
     {
         return 'ldap';
     }
 
-    public function addConfiguration(NodeDefinition $node)
+    public function addConfiguration(NodeDefinition $node): void
     {
         $node
             ->fixXmlConfig('extra_field')
@@ -59,12 +59,12 @@ class LdapFactory implements UserProviderFactoryInterface
                     ->prototype('scalar')->end()
                 ->end()
                 ->arrayNode('default_roles')
-                    ->beforeNormalization()->ifString()->then(function ($v) { return preg_split('/\s*,\s*/', $v); })->end()
+                    ->beforeNormalization()->ifString()->then(fn ($v) => preg_split('/\s*,\s*/', $v))->end()
                     ->requiresAtLeastOneElement()
                     ->prototype('scalar')->end()
                 ->end()
                 ->scalarNode('uid_key')->defaultValue('sAMAccountName')->end()
-                ->scalarNode('filter')->defaultValue('({uid_key}={username})')->end()
+                ->scalarNode('filter')->defaultValue('({uid_key}={user_identifier})')->end()
                 ->scalarNode('password_attribute')->defaultNull()->end()
             ->end()
         ;

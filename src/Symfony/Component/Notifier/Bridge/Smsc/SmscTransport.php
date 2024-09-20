@@ -30,22 +30,19 @@ final class SmscTransport extends AbstractTransport
 {
     protected const HOST = 'smsc.ru';
 
-    private $login;
-    private $password;
-    private $from;
-
-    public function __construct(string $login, string $password, string $from, ?HttpClientInterface $client = null, ?EventDispatcherInterface $dispatcher = null)
-    {
-        $this->login = $login;
-        $this->password = $password;
-        $this->from = $from;
-
+    public function __construct(
+        private string $login,
+        #[\SensitiveParameter] private string $password,
+        private string $from,
+        ?HttpClientInterface $client = null,
+        ?EventDispatcherInterface $dispatcher = null,
+    ) {
         parent::__construct($client, $dispatcher);
     }
 
     public function __toString(): string
     {
-        return sprintf('smsc://%s?from=%s', $this->getEndpoint(), $this->from);
+        return \sprintf('smsc://%s?from=%s', $this->getEndpoint(), $this->from);
     }
 
     public function supports(MessageInterface $message): bool
@@ -62,7 +59,7 @@ final class SmscTransport extends AbstractTransport
         $body = [
             'login' => $this->login,
             'psw' => $this->password,
-            'sender' => $this->from,
+            'sender' => $message->getFrom() ?: $this->from,
             'phones' => $message->getPhone(),
             'mes' => $message->getSubject(),
             'fmt' => 3, // response as JSON
@@ -70,7 +67,7 @@ final class SmscTransport extends AbstractTransport
             'time' => '0-24',
         ];
 
-        $endpoint = sprintf('https://%s/sys/send.php', $this->getEndpoint());
+        $endpoint = \sprintf('https://%s/sys/send.php', $this->getEndpoint());
         $response = $this->client->request('POST', $endpoint, ['body' => $body]);
 
         try {
@@ -84,7 +81,7 @@ final class SmscTransport extends AbstractTransport
         }
 
         if (\array_key_exists('error', $result)) {
-            throw new TransportException(sprintf('Unable to send the SMS: code = %d, message = "%s".', $result['error_code'], $result['error']), $response);
+            throw new TransportException(\sprintf('Unable to send the SMS: code = %d, message = "%s".', $result['error_code'], $result['error']), $response);
         }
 
         $sentMessage = new SentMessage($message, (string) $this);

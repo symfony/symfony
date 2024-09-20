@@ -17,7 +17,6 @@ use Symfony\Component\Notifier\Exception\IncompleteDsnException;
 use Symfony\Component\Notifier\Exception\UnsupportedSchemeException;
 use Symfony\Component\Notifier\Transport\AbstractTransportFactory;
 use Symfony\Component\Notifier\Transport\Dsn;
-use Symfony\Component\Notifier\Transport\TransportInterface;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
@@ -26,19 +25,15 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
  */
 final class MercureTransportFactory extends AbstractTransportFactory
 {
-    private $registry;
-
-    public function __construct(HubRegistry $registry, ?EventDispatcherInterface $dispatcher = null, ?HttpClientInterface $client = null)
-    {
+    public function __construct(
+        private HubRegistry $registry,
+        ?EventDispatcherInterface $dispatcher = null,
+        ?HttpClientInterface $client = null,
+    ) {
         parent::__construct($dispatcher, $client);
-
-        $this->registry = $registry;
     }
 
-    /**
-     * @return MercureTransport
-     */
-    public function create(Dsn $dsn): TransportInterface
+    public function create(Dsn $dsn): MercureTransport
     {
         if ('mercure' !== $dsn->getScheme()) {
             throw new UnsupportedSchemeException($dsn, 'mercure', $this->getSupportedSchemes());
@@ -49,8 +44,8 @@ final class MercureTransportFactory extends AbstractTransportFactory
 
         try {
             $hub = $this->registry->getHub($hubId);
-        } catch (InvalidArgumentException $exception) {
-            throw new IncompleteDsnException(sprintf('Hub "%s" not found. Did you mean one of: "%s"?', $hubId, implode('", "', array_keys($this->registry->all()))));
+        } catch (InvalidArgumentException) {
+            throw new IncompleteDsnException(\sprintf('Hub "%s" not found. Did you mean one of: "%s"?', $hubId, implode('", "', array_keys($this->registry->all()))));
         }
 
         return new MercureTransport($hub, $hubId, $topic, $this->client, $this->dispatcher);

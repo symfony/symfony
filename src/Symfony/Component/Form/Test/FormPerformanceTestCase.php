@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Form\Test;
 
-use Symfony\Component\Form\Test\Traits\RunTestTrait;
 use Symfony\Component\Form\Tests\VersionAwareTest;
 
 /**
@@ -24,25 +23,18 @@ use Symfony\Component\Form\Tests\VersionAwareTest;
  */
 abstract class FormPerformanceTestCase extends FormIntegrationTestCase
 {
-    use RunTestTrait;
     use VersionAwareTest;
 
-    /**
-     * @var int
-     */
-    protected $maxRunningTime = 0;
+    protected int $maxRunningTime = 0;
 
-    /**
-     * @return mixed
-     */
-    private function doRunTest()
+    protected function runTest(): mixed
     {
         $s = microtime(true);
         $result = parent::runTest();
         $time = microtime(true) - $s;
 
         if (0 != $this->maxRunningTime && $time > $this->maxRunningTime) {
-            $this->fail(sprintf('expected running time: <= %s but was: %s', $this->maxRunningTime, $time));
+            $this->fail(\sprintf('expected running time: <= %s but was: %s', $this->maxRunningTime, $time));
         }
 
         return $result;
@@ -51,7 +43,7 @@ abstract class FormPerformanceTestCase extends FormIntegrationTestCase
     /**
      * @throws \InvalidArgumentException
      */
-    public function setMaxRunningTime(int $maxRunningTime)
+    public function setMaxRunningTime(int $maxRunningTime): void
     {
         if ($maxRunningTime < 0) {
             throw new \InvalidArgumentException();
@@ -60,10 +52,7 @@ abstract class FormPerformanceTestCase extends FormIntegrationTestCase
         $this->maxRunningTime = $maxRunningTime;
     }
 
-    /**
-     * @return int
-     */
-    public function getMaxRunningTime()
+    public function getMaxRunningTime(): int
     {
         return $this->maxRunningTime;
     }

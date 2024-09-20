@@ -18,64 +18,34 @@ namespace Symfony\Component\Form\Util;
  *
  * @internal
  *
- * @template-covariant TKey of array-key
  * @template-covariant TValue
  *
- * @implements \Iterator<TKey, TValue>
+ * @implements \Iterator<string, TValue>
  */
 class OrderedHashMapIterator implements \Iterator
 {
-    /**
-     * @var array<TKey, TValue>
-     */
-    private $elements;
+    private int $cursor = 0;
+    private int $cursorId;
+    private ?string $key = null;
+    /** @var TValue|null */
+    private mixed $current = null;
 
     /**
-     * @var list<TKey>
+     * @param TValue[]        $elements       The elements of the map, indexed by their
+     *                                        keys
+     * @param list<string>    $orderedKeys    The keys of the map in the order in which
+     *                                        they should be iterated
+     * @param array<int, int> $managedCursors An array from which to reference the
+     *                                        iterator's cursor as long as it is alive.
+     *                                        This array is managed by the corresponding
+     *                                        {@link OrderedHashMap} instance to support
+     *                                        recognizing the deletion of elements.
      */
-    private $orderedKeys;
-
-    /**
-     * @var int
-     */
-    private $cursor = 0;
-
-    /**
-     * @var int
-     */
-    private $cursorId;
-
-    /**
-     * @var array<int, int>
-     */
-    private $managedCursors;
-
-    /**
-     * @var TKey|null
-     */
-    private $key;
-
-    /**
-     * @var TValue|null
-     */
-    private $current;
-
-    /**
-     * @param array<TKey, TValue> $elements       The elements of the map, indexed by their
-     *                                            keys
-     * @param list<TKey>          $orderedKeys    The keys of the map in the order in which
-     *                                            they should be iterated
-     * @param array<int, int>     $managedCursors An array from which to reference the
-     *                                            iterator's cursor as long as it is alive.
-     *                                            This array is managed by the corresponding
-     *                                            {@link OrderedHashMap} instance to support
-     *                                            recognizing the deletion of elements.
-     */
-    public function __construct(array &$elements, array &$orderedKeys, array &$managedCursors)
-    {
-        $this->elements = &$elements;
-        $this->orderedKeys = &$orderedKeys;
-        $this->managedCursors = &$managedCursors;
+    public function __construct(
+        private array &$elements,
+        private array &$orderedKeys,
+        private array &$managedCursors,
+    ) {
         $this->cursorId = \count($managedCursors);
 
         $this->managedCursors[$this->cursorId] = &$this->cursor;
@@ -86,7 +56,7 @@ class OrderedHashMapIterator implements \Iterator
         throw new \BadMethodCallException('Cannot serialize '.__CLASS__);
     }
 
-    public function __wakeup()
+    public function __wakeup(): void
     {
         throw new \BadMethodCallException('Cannot unserialize '.__CLASS__);
     }
@@ -102,20 +72,11 @@ class OrderedHashMapIterator implements \Iterator
         array_splice($this->managedCursors, $this->cursorId, 1);
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * @return mixed
-     */
-    #[\ReturnTypeWillChange]
-    public function current()
+    public function current(): mixed
     {
         return $this->current;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function next(): void
     {
         ++$this->cursor;
@@ -129,34 +90,16 @@ class OrderedHashMapIterator implements \Iterator
         }
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * @return mixed
-     */
-    #[\ReturnTypeWillChange]
-    public function key()
+    public function key(): mixed
     {
-        if (null === $this->key) {
-            return null;
-        }
-
-        $array = [$this->key => null];
-
-        return key($array);
+        return $this->key;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function valid(): bool
     {
         return null !== $this->key;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function rewind(): void
     {
         $this->cursor = 0;

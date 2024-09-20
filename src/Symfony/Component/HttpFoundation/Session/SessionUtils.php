@@ -25,11 +25,11 @@ final class SessionUtils
      * Finds the session header amongst the headers that are to be sent, removes it, and returns
      * it so the caller can process it further.
      */
-    public static function popSessionCookie(string $sessionName, string $sessionId): ?string
+    public static function popSessionCookie(string $sessionName, #[\SensitiveParameter] string $sessionId): ?string
     {
         $sessionCookie = null;
-        $sessionCookiePrefix = sprintf(' %s=', urlencode($sessionName));
-        $sessionCookieWithId = sprintf('%s%s;', $sessionCookiePrefix, urlencode($sessionId));
+        $sessionCookiePrefix = \sprintf(' %s=', urlencode($sessionName));
+        $sessionCookieWithId = \sprintf('%s%s;', $sessionCookiePrefix, urlencode($sessionId));
         $otherCookies = [];
         foreach (headers_list() as $h) {
             if (0 !== stripos($h, 'Set-Cookie:')) {

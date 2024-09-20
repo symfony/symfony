@@ -16,8 +16,9 @@ use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Exception\LogicException;
 
 /**
- * @Annotation
- * @Target({"PROPERTY", "METHOD", "ANNOTATION"})
+ * Validates that a value is a valid 3-letter ISO 4217 currency name.
+ *
+ * @see https://en.wikipedia.org/wiki/ISO_4217
  *
  * @author Miha Vrhovnik <miha.vrhovnik@pagein.si>
  * @author Bernhard Schussek <bschussek@gmail.com>
@@ -27,13 +28,17 @@ class Currency extends Constraint
 {
     public const NO_SUCH_CURRENCY_ERROR = '69945ac1-2db4-405f-bec7-d2772f73df52';
 
-    protected static $errorNames = [
+    protected const ERROR_NAMES = [
         self::NO_SUCH_CURRENCY_ERROR => 'NO_SUCH_CURRENCY_ERROR',
     ];
 
-    public $message = 'This value is not a valid currency.';
+    public string $message = 'This value is not a valid currency.';
 
-    public function __construct(?array $options = null, ?string $message = null, ?array $groups = null, $payload = null)
+    /**
+     * @param array<string,mixed>|null $options
+     * @param string[]|null            $groups
+     */
+    public function __construct(?array $options = null, ?string $message = null, ?array $groups = null, mixed $payload = null)
     {
         if (!class_exists(Currencies::class)) {
             throw new LogicException('The Intl component is required to use the Currency constraint. Try running "composer require symfony/intl".');

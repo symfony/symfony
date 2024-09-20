@@ -27,22 +27,22 @@ class CustomNode implements NodeInterface
         return true;
     }
 
-    public function getDefaultValue()
+    public function getDefaultValue(): mixed
     {
         return true;
     }
 
-    public function normalize($value)
+    public function normalize(mixed $value): mixed
     {
         return $value;
     }
 
-    public function merge($leftSide, $rightSide)
+    public function merge(mixed $leftSide, mixed $rightSide): mixed
     {
         return array_merge($leftSide, $rightSide);
     }
 
-    public function finalize($value)
+    public function finalize(mixed $value): mixed
     {
         return $value;
     }

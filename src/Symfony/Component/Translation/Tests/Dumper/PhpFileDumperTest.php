@@ -24,6 +24,6 @@ class PhpFileDumperTest extends TestCase
 
         $dumper = new PhpFileDumper();
 
-        $this->assertStringEqualsFile(__DIR__.'/../fixtures/resources.php', $dumper->formatCatalogue($catalogue, 'messages'));
+        $this->assertStringEqualsFile(__DIR__.'/../Fixtures/resources.php', $dumper->formatCatalogue($catalogue, 'messages'));
     }
 }

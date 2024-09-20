@@ -11,7 +11,6 @@
 
 namespace Symfony\Bundle\FrameworkBundle\CacheWarmer;
 
-use Doctrine\Common\Annotations\AnnotationException;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Cache\Adapter\PhpArrayAdapter;
 use Symfony\Component\Validator\Mapping\Factory\LazyLoadingMetadataFactory;
@@ -25,29 +24,23 @@ use Symfony\Component\Validator\ValidatorBuilder;
  * Warms up XML and YAML validator metadata.
  *
  * @author Titouan Galopin <galopintitouan@gmail.com>
+ *
+ * @final since Symfony 7.1
  */
 class ValidatorCacheWarmer extends AbstractPhpFileCacheWarmer
 {
-    private $validatorBuilder;
-
     /**
      * @param string $phpArrayFile The PHP file where metadata are cached
      */
-    public function __construct(ValidatorBuilder $validatorBuilder, string $phpArrayFile)
-    {
+    public function __construct(
+        private ValidatorBuilder $validatorBuilder,
+        string $phpArrayFile,
+    ) {
         parent::__construct($phpArrayFile);
-        $this->validatorBuilder = $validatorBuilder;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function doWarmUp(string $cacheDir, ArrayAdapter $arrayAdapter)
+    protected function doWarmUp(string $cacheDir, ArrayAdapter $arrayAdapter, ?string $buildDir = null): bool
     {
-        if (!method_exists($this->validatorBuilder, 'getLoaders')) {
-            return false;
-        }
-
         $loaders = $this->validatorBuilder->getLoaders();
         $metadataFactory = new LazyLoadingMetadataFactory(new LoaderChain($loaders), $arrayAdapter);
 
@@ -57,8 +50,6 @@ class ValidatorCacheWarmer extends AbstractPhpFileCacheWarmer
                     if ($metadataFactory->hasMetadataFor($mappedClass)) {
                         $metadataFactory->getMetadataFor($mappedClass);
                     }
-                } catch (AnnotationException $e) {
-                    // ignore failing annotations
                 } catch (\Exception $e) {
                     $this->ignoreAutoloadException($mappedClass, $e);
                 }
@@ -71,10 +62,10 @@ class ValidatorCacheWarmer extends AbstractPhpFileCacheWarmer
     /**
      * @return string[] A list of classes to preload on PHP 7.4+
      */
-    protected function warmUpPhpArrayAdapter(PhpArrayAdapter $phpArrayAdapter, array $values)
+    protected function warmUpPhpArrayAdapter(PhpArrayAdapter $phpArrayAdapter, array $values): array
     {
         // make sure we don't cache null values
-        $values = array_filter($values, function ($val) { return null !== $val; });
+        $values = array_filter($values, fn ($val) => null !== $val);
 
         return parent::warmUpPhpArrayAdapter($phpArrayAdapter, $values);
     }

@@ -13,7 +13,6 @@ namespace Symfony\Bundle\FrameworkBundle\Tests\Kernel;
 
 use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
-use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
 use Symfony\Bundle\FrameworkBundle\Kernel\MicroKernelTrait;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
@@ -26,11 +25,12 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\Kernel;
 use Symfony\Component\Routing\Loader\Configurator\RoutingConfigurator;
 
+require_once __DIR__.'/default/src/DefaultKernel.php';
 require_once __DIR__.'/flex-style/src/FlexStyleMicroKernel.php';
 
 class MicroKernelTraitTest extends TestCase
 {
-    private $kernel;
+    private ?Kernel $kernel = null;
 
     protected function tearDown(): void
     {
@@ -89,6 +89,16 @@ class MicroKernelTraitTest extends TestCase
         $response = $kernel->handle($request);
 
         $this->assertEquals('Have a great day!', $response->getContent());
+
+        $request = Request::create('/h');
+        $response = $kernel->handle($request);
+
+        $this->assertEquals('Have a great day!', $response->getContent());
+
+        $request = Request::create('/easter');
+        $response = $kernel->handle($request);
+
+        $this->assertSame('easter', $response->getContent());
     }
 
     public function testSecretLoadedFromExtension()
@@ -110,6 +120,10 @@ class MicroKernelTraitTest extends TestCase
             protected function configureContainer(ContainerConfigurator $c): void
             {
                 $c->extension('framework', [
+                    'annotations' => false,
+                    'http_method_override' => false,
+                    'handle_all_throwables' => true,
+                    'php_errors' => ['log' => true],
                     'router' => ['utf8' => true],
                 ]);
                 $c->services()->set('logger', NullLogger::class);
@@ -117,7 +131,7 @@ class MicroKernelTraitTest extends TestCase
 
             protected function configureRoutes(RoutingConfigurator $routes): void
             {
-                $routes->add('hello', '/')->controller([$this, 'helloAction']);
+                $routes->add('hello', '/')->controller($this->helloAction(...));
             }
         };
 
@@ -126,24 +140,43 @@ class MicroKernelTraitTest extends TestCase
 
         $this->assertSame('Hello World!', $response->getContent());
     }
+
+    public function testSimpleKernel()
+    {
+        $kernel = $this->kernel = new SimpleKernel('simple_kernel');
+        $kernel->boot();
+
+        $request = Request::create('/');
+        $response = $kernel->handle($request, HttpKernelInterface::MAIN_REQUEST, false);
+
+        $this->assertSame('Hello World!', $response->getContent());
+    }
+
+    public function testDefaultKernel()
+    {
+        $kernel = $this->kernel = new DefaultKernel('test', false);
+        $kernel->boot();
+
+        $this->assertTrue($kernel->getContainer()->has('foo_service'));
+
+        $request = Request::create('/');
+        $response = $kernel->handle($request, HttpKernelInterface::MAIN_REQUEST, false);
+
+        $this->assertSame('OK', $response->getContent());
+    }
 }
 
 abstract class MinimalKernel extends Kernel
 {
     use MicroKernelTrait;
 
-    private $cacheDir;
+    private string $cacheDir;
 
     public function __construct(string $cacheDir)
     {
         parent::__construct('test', false);
 
         $this->cacheDir = sys_get_temp_dir().'/'.$cacheDir;
-    }
-
-    public function registerBundles(): iterable
-    {
-        yield new FrameworkBundle();
     }
 
     public function getCacheDir(): string

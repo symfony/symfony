@@ -27,74 +27,51 @@ interface NodeInterface
 {
     /**
      * Returns the name of the node.
-     *
-     * @return string
      */
-    public function getName();
+    public function getName(): string;
 
     /**
      * Returns the path of the node.
-     *
-     * @return string
      */
-    public function getPath();
+    public function getPath(): string;
 
     /**
      * Returns true when the node is required.
-     *
-     * @return bool
      */
-    public function isRequired();
+    public function isRequired(): bool;
 
     /**
      * Returns true when the node has a default value.
-     *
-     * @return bool
      */
-    public function hasDefaultValue();
+    public function hasDefaultValue(): bool;
 
     /**
      * Returns the default value of the node.
      *
-     * @return mixed
-     *
      * @throws \RuntimeException if the node has no default value
      */
-    public function getDefaultValue();
+    public function getDefaultValue(): mixed;
 
     /**
      * Normalizes a value.
      *
-     * @param mixed $value The value to normalize
-     *
-     * @return mixed
-     *
      * @throws InvalidTypeException if the value type is invalid
      */
-    public function normalize($value);
+    public function normalize(mixed $value): mixed;
 
     /**
      * Merges two values together.
      *
-     * @param mixed $leftSide
-     * @param mixed $rightSide
-     *
-     * @return mixed
-     *
      * @throws ForbiddenOverwriteException if the configuration path cannot be overwritten
      * @throws InvalidTypeException        if the value type is invalid
      */
-    public function merge($leftSide, $rightSide);
+    public function merge(mixed $leftSide, mixed $rightSide): mixed;
 
     /**
      * Finalizes a value.
      *
-     * @param mixed $value The value to finalize
-     *
-     * @return mixed
-     *
      * @throws InvalidTypeException          if the value type is invalid
      * @throws InvalidConfigurationException if the value is invalid configuration
      */
-    public function finalize($value);
+    public function finalize(mixed $value): mixed;
 }

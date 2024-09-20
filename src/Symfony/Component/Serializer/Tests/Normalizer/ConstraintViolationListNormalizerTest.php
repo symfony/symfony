@@ -24,7 +24,7 @@ use Symfony\Component\Validator\ConstraintViolationList;
  */
 class ConstraintViolationListNormalizerTest extends TestCase
 {
-    private $normalizer;
+    private ConstraintViolationListNormalizer $normalizer;
 
     protected function setUp(): void
     {
@@ -50,21 +50,23 @@ class ConstraintViolationListNormalizerTest extends TestCase
             'detail' => 'd: a
 4: 1',
             'violations' => [
-                    [
-                        'propertyPath' => 'd',
-                        'title' => 'a',
-                        'type' => 'urn:uuid:f',
-                        'parameters' => [
-                            'value' => 'foo',
-                        ],
-                    ],
-                    [
-                        'propertyPath' => '4',
-                        'title' => '1',
-                        'type' => 'urn:uuid:6',
-                        'parameters' => [],
+                [
+                    'propertyPath' => 'd',
+                    'title' => 'a',
+                    'template' => 'b',
+                    'type' => 'urn:uuid:f',
+                    'parameters' => [
+                        'value' => 'foo',
                     ],
                 ],
+                [
+                    'propertyPath' => '4',
+                    'title' => '1',
+                    'template' => '2',
+                    'type' => 'urn:uuid:6',
+                    'parameters' => [],
+                ],
+            ],
         ];
 
         $this->assertEquals($expected, $this->normalizer->normalize($list));
@@ -75,9 +77,9 @@ class ConstraintViolationListNormalizerTest extends TestCase
         $normalizer = new ConstraintViolationListNormalizer([], new CamelCaseToSnakeCaseNameConverter());
 
         $list = new ConstraintViolationList([
-            new ConstraintViolation('too short', 'a', [], 'c', 'shortDescription', ''),
+            new ConstraintViolation('too short', 'a', [], '3', 'shortDescription', ''),
             new ConstraintViolation('too long', 'b', [], '3', 'product.shortDescription', 'Lorem ipsum dolor sit amet'),
-            new ConstraintViolation('error', 'b', [], '3', '', ''),
+            new ConstraintViolation('error', 'c', [], '3', '', ''),
         ]);
 
         $expected = [
@@ -90,16 +92,19 @@ error',
                 [
                     'propertyPath' => 'short_description',
                     'title' => 'too short',
+                    'template' => 'a',
                     'parameters' => [],
                 ],
                 [
                     'propertyPath' => 'product.short_description',
                     'title' => 'too long',
+                    'template' => 'b',
                     'parameters' => [],
                 ],
                 [
                     'propertyPath' => '',
                     'title' => 'error',
+                    'template' => 'c',
                     'parameters' => [],
                 ],
             ],

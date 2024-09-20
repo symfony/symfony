@@ -74,6 +74,10 @@
                 <source>Too many failed login attempts, please try again in %minutes% minute.</source>
                 <target>Забагато невдалих спроб входу. Будь ласка, спробуйте знову через %minutes% хвилину.</target>
             </trans-unit>
+            <trans-unit id="20">
+                <source>Too many failed login attempts, please try again in %minutes% minutes.</source>
+                <target>Забагато невдалих спроб входу, будь ласка, спробуйте ще раз через %minutes% хвилину.|Забагато невдалих спроб входу, будь ласка, спробуйте ще раз через %minutes% хвилини.|Забагато невдалих спроб входу, будь ласка, спробуйте ще раз через %minutes% хвилин.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

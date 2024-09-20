@@ -24,6 +24,6 @@ class MoFileDumperTest extends TestCase
 
         $dumper = new MoFileDumper();
 
-        $this->assertStringEqualsFile(__DIR__.'/../fixtures/resources.mo', $dumper->formatCatalogue($catalogue, 'messages'));
+        $this->assertStringEqualsFile(__DIR__.'/../Fixtures/resources.mo', $dumper->formatCatalogue($catalogue, 'messages'));
     }
 }

@@ -18,16 +18,10 @@ use Symfony\Component\Notifier\Message\MessageOptionsInterface;
  */
 final class ZulipOptions implements MessageOptionsInterface
 {
-    /** @var string|null */
-    private $topic;
-
-    /** @var string|null */
-    private $recipient;
-
-    public function __construct(?string $topic = null, ?string $recipient = null)
-    {
-        $this->topic = $topic;
-        $this->recipient = $recipient;
+    public function __construct(
+        private ?string $topic = null,
+        private ?string $recipient = null,
+    ) {
     }
 
     public function toArray(): array
@@ -46,7 +40,7 @@ final class ZulipOptions implements MessageOptionsInterface
     /**
      * @return $this
      */
-    public function topic(string $topic): self
+    public function topic(string $topic): static
     {
         $this->topic = $topic;
 

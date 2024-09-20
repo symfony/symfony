@@ -1,20 +1,23 @@
 <?php
 
 $container->loadFromExtension('framework', [
+    'annotations' => false,
+    'http_method_override' => false,
+    'handle_all_throwables' => true,
+    'php_errors' => ['log' => true],
     'messenger' => [
-        'reset_on_message' =>  true,
         'transports' => [
             'transport_1' => [
                 'dsn' => 'null://',
-                'failure_transport' => 'failure_transport_1'
+                'failure_transport' => 'failure_transport_1',
             ],
             'transport_2' => 'null://',
             'transport_3' => [
                 'dsn' => 'null://',
-                'failure_transport' => 'failure_transport_3'
+                'failure_transport' => 'failure_transport_3',
             ],
             'failure_transport_1' => 'null://',
-            'failure_transport_3' => 'null://'
+            'failure_transport_3' => 'null://',
         ],
     ],
 ]);

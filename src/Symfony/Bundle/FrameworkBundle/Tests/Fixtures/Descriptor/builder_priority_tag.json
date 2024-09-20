@@ -9,6 +9,7 @@
             "abstract": false,
             "autowire": false,
             "autoconfigure": false,
+            "deprecated": false,
             "file": "\/path\/to\/file",
             "tags": [
                 {
@@ -26,7 +27,8 @@
                         "priority": 0
                     }
                 }
-            ]
+            ],
+            "usages": []
         },
         "definition_1": {
             "class": "Full\\Qualified\\Class1",
@@ -37,6 +39,7 @@
             "abstract": false,
             "autowire": false,
             "autoconfigure": false,
+            "deprecated": false,
             "file": "\/path\/to\/file",
             "factory_service": "factory.service",
             "factory_method": "get",
@@ -61,7 +64,8 @@
                     "name": "tag2",
                     "parameters": []
                 }
-            ]
+            ],
+            "usages": []
         },
         "definition_4": {
             "class": "Full\\Qualified\\Class4",
@@ -72,6 +76,7 @@
             "abstract": false,
             "autowire": false,
             "autoconfigure": false,
+            "deprecated": false,
             "file": "\/path\/to\/file",
             "tags": [
                 {
@@ -80,7 +85,8 @@
                         "priority": 0
                     }
                 }
-            ]
+            ],
+            "usages": []
         },
         "definition_2": {
             "class": "Full\\Qualified\\Class2",
@@ -91,6 +97,7 @@
             "abstract": false,
             "autowire": false,
             "autoconfigure": false,
+            "deprecated": false,
             "file": "\/path\/to\/file",
             "tags": [
                 {
@@ -101,7 +108,8 @@
                         "priority": -20
                     }
                 }
-            ]
+            ],
+            "usages": []
         }
     },
     "aliases": [],

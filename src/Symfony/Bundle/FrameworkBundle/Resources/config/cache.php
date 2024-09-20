@@ -16,7 +16,6 @@ use Symfony\Component\Cache\Adapter\AbstractAdapter;
 use Symfony\Component\Cache\Adapter\AdapterInterface;
 use Symfony\Component\Cache\Adapter\ApcuAdapter;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
-use Symfony\Component\Cache\Adapter\DoctrineAdapter;
 use Symfony\Component\Cache\Adapter\DoctrineDbalAdapter;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use Symfony\Component\Cache\Adapter\MemcachedAdapter;
@@ -40,6 +39,7 @@ return static function (ContainerConfigurator $container) {
 
         ->set('cache.app.taggable', TagAwareAdapter::class)
             ->args([service('cache.app')])
+            ->tag('cache.taggable', ['pool' => 'cache.app'])
 
         ->set('cache.system')
             ->parent('cache.adapter.system')
@@ -56,17 +56,22 @@ return static function (ContainerConfigurator $container) {
             ->private()
             ->tag('cache.pool')
 
-        ->set('cache.annotations')
-            ->parent('cache.system')
-            ->private()
-            ->tag('cache.pool')
-
         ->set('cache.property_info')
             ->parent('cache.system')
             ->private()
             ->tag('cache.pool')
 
+        ->set('cache.asset_mapper')
+            ->parent('cache.system')
+            ->private()
+            ->tag('cache.pool')
+
         ->set('cache.messenger.restart_workers_signal')
+            ->parent('cache.app')
+            ->private()
+            ->tag('cache.pool')
+
+        ->set('cache.scheduler')
             ->parent('cache.app')
             ->private()
             ->tag('cache.pool')
@@ -78,7 +83,7 @@ return static function (ContainerConfigurator $container) {
                 '', // namespace
                 0, // default lifetime
                 abstract_arg('version'),
-                sprintf('%s/pools/system', param('kernel.cache_dir')),
+                \sprintf('%s/pools/system', param('kernel.cache_dir')),
                 service('logger')->ignoreOnInvalid(),
             ])
             ->tag('cache.pool', ['clearer' => 'cache.system_clearer', 'reset' => 'reset'])
@@ -95,28 +100,12 @@ return static function (ContainerConfigurator $container) {
             ->tag('cache.pool', ['clearer' => 'cache.default_clearer', 'reset' => 'reset'])
             ->tag('monolog.logger', ['channel' => 'cache'])
 
-        ->set('cache.adapter.doctrine', DoctrineAdapter::class)
-            ->abstract()
-            ->args([
-                abstract_arg('Doctrine provider service'),
-                '', // namespace
-                0, // default lifetime
-            ])
-            ->call('setLogger', [service('logger')->ignoreOnInvalid()])
-            ->tag('cache.pool', [
-                'provider' => 'cache.default_doctrine_provider',
-                'clearer' => 'cache.default_clearer',
-                'reset' => 'reset',
-            ])
-            ->tag('monolog.logger', ['channel' => 'cache'])
-            ->deprecate('symfony/framework-bundle', '5.4', 'The "%service_id%" service inherits from "cache.adapter.doctrine" which is deprecated.')
-
         ->set('cache.adapter.filesystem', FilesystemAdapter::class)
             ->abstract()
             ->args([
                 '', // namespace
                 0, // default lifetime
-                sprintf('%s/pools/app', param('kernel.cache_dir')),
+                \sprintf('%s/pools/app', param('kernel.cache_dir')),
                 service('cache.default_marshaller')->ignoreOnInvalid(),
             ])
             ->call('setLogger', [service('logger')->ignoreOnInvalid()])
@@ -256,9 +245,6 @@ return static function (ContainerConfigurator $container) {
             ->public()
 
         ->alias(CacheItemPoolInterface::class, 'cache.app')
-
-        ->alias(AdapterInterface::class, 'cache.app')
-            ->deprecate('symfony/framework-bundle', '5.4', sprintf('The "%%alias_id%%" alias is deprecated, use "%s" instead.', CacheItemPoolInterface::class))
 
         ->alias(CacheInterface::class, 'cache.app')
 

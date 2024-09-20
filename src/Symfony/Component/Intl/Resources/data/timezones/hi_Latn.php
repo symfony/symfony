@@ -71,7 +71,7 @@ return [
         'Antarctica/DumontDUrville' => 'ड्यूमोंट डी अर्विले समय (DumontDUrville)',
         'Asia/Aqtau' => 'पश्चिम कज़ाखस्तान समय (Aqtau)',
         'Asia/Macau' => 'चीन समय (Macau)',
-        'Asia/Qostanay' => 'पूर्व कज़ाखस्तान समय (Qostanay)',
+        'Asia/Qostanay' => 'पश्चिम कज़ाखस्तान समय (Qostanay)',
         'Asia/Saigon' => 'इंडोचाइना समय (Saigon)',
         'Atlantic/Faeroe' => 'पश्चिमी यूरोपीय समय (Faeroe)',
         'CST6CDT' => 'North America Central Time',

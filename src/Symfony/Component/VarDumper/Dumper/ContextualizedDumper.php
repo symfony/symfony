@@ -19,25 +19,22 @@ use Symfony\Component\VarDumper\Dumper\ContextProvider\ContextProviderInterface;
  */
 class ContextualizedDumper implements DataDumperInterface
 {
-    private $wrappedDumper;
-    private $contextProviders;
-
     /**
      * @param ContextProviderInterface[] $contextProviders
      */
-    public function __construct(DataDumperInterface $wrappedDumper, array $contextProviders)
-    {
-        $this->wrappedDumper = $wrappedDumper;
-        $this->contextProviders = $contextProviders;
+    public function __construct(
+        private DataDumperInterface $wrappedDumper,
+        private array $contextProviders,
+    ) {
     }
 
-    public function dump(Data $data)
+    public function dump(Data $data): ?string
     {
-        $context = [];
+        $context = $data->getContext();
         foreach ($this->contextProviders as $contextProvider) {
-            $context[\get_class($contextProvider)] = $contextProvider->getContext();
+            $context[$contextProvider::class] = $contextProvider->getContext();
         }
 
-        $this->wrappedDumper->dump($data->withContext($context));
+        return $this->wrappedDumper->dump($data->withContext($context));
     }
 }

@@ -18,27 +18,20 @@ use Psr\Cache\CacheItemPoolInterface;
  */
 class CacheTokenVerifier implements TokenVerifierInterface
 {
-    private $cache;
-    private $outdatedTokenTtl;
-    private $cacheKeyPrefix;
-
     /**
      * @param int $outdatedTokenTtl How long the outdated token should still be considered valid. Defaults
      *                              to 60, which matches how often the PersistentRememberMeHandler will at
      *                              most refresh tokens. Increasing to more than that is not recommended,
      *                              but you may use a lower value.
      */
-    public function __construct(CacheItemPoolInterface $cache, int $outdatedTokenTtl = 60, string $cacheKeyPrefix = 'rememberme-stale-')
-    {
-        $this->cache = $cache;
-        $this->outdatedTokenTtl = $outdatedTokenTtl;
-        $this->cacheKeyPrefix = $cacheKeyPrefix;
+    public function __construct(
+        private CacheItemPoolInterface $cache,
+        private int $outdatedTokenTtl = 60,
+        private string $cacheKeyPrefix = 'rememberme-stale-',
+    ) {
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function verifyToken(PersistentTokenInterface $token, string $tokenValue): bool
+    public function verifyToken(PersistentTokenInterface $token, #[\SensitiveParameter] string $tokenValue): bool
     {
         if (hash_equals($token->getTokenValue(), $tokenValue)) {
             return true;
@@ -55,10 +48,7 @@ class CacheTokenVerifier implements TokenVerifierInterface
         return hash_equals($outdatedToken, $tokenValue);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function updateExistingToken(PersistentTokenInterface $token, string $tokenValue, \DateTimeInterface $lastUsed): void
+    public function updateExistingToken(PersistentTokenInterface $token, #[\SensitiveParameter] string $tokenValue, \DateTimeInterface $lastUsed): void
     {
         // When a token gets updated, persist the outdated token for $outdatedTokenTtl seconds so we can
         // still accept it as valid in verifyToken

@@ -6,7 +6,7 @@
 
   <namespace prefix="custom">Symfony\Component\Validator\Tests\Fixtures\</namespace>
 
-  <class name="Symfony\Component\Validator\Tests\Fixtures\Annotation\Entity">
+  <class name="Symfony\Component\Validator\Tests\Fixtures\NestedAttribute\Entity">
 
     <group-sequence>
        <value>Foo</value>
@@ -34,6 +34,22 @@
     <!-- Traverse with boolean default option -->
     <constraint name="Traverse">
         false
+    </constraint>
+
+    <!-- Constraint with named arguments support with scalar value -->
+    <constraint name="Symfony\Component\Validator\Tests\Mapping\Loader\Fixtures\ConstraintWithNamedArguments">
+      foo
+    </constraint>
+
+    <!-- Constraint with named arguments support with array value -->
+    <constraint name="Symfony\Component\Validator\Tests\Mapping\Loader\Fixtures\ConstraintWithNamedArguments">
+      <value>foo</value>
+      <value>bar</value>
+    </constraint>
+
+    <!-- Constraint with named arguments support with exactly one group -->
+    <constraint name="Symfony\Component\Validator\Tests\Mapping\Loader\Fixtures\ConstraintWithoutValueWithNamedArguments">
+      <option name="groups">foo</option>
     </constraint>
 
     <!-- PROPERTY CONSTRAINTS -->
@@ -115,10 +131,16 @@
     </getter>
   </class>
 
-  <class name="Symfony\Component\Validator\Tests\Fixtures\Annotation\GroupSequenceProviderEntity">
+  <class name="Symfony\Component\Validator\Tests\Fixtures\NestedAttribute\GroupSequenceProviderEntity">
 
     <!-- GROUP SEQUENCE PROVIDER -->
     <group-sequence-provider />
 
+  </class>
+
+  <class name="Symfony\Component\Validator\Tests\Fixtures\Attribute\GroupProviderDto">
+    <group-sequence-provider>
+      <value>Symfony\Component\Validator\Tests\Dummy\DummyGroupProvider</value>
+    </group-sequence-provider>
   </class>
 </constraint-mapping>

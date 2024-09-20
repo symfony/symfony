@@ -30,17 +30,17 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 class GraphvizDumper extends Dumper
 {
-    private $nodes;
-    private $edges;
+    private array $nodes;
+    private array $edges;
     // All values should be strings
-    private $options = [
-            'graph' => ['ratio' => 'compress'],
-            'node' => ['fontsize' => '11', 'fontname' => 'Arial', 'shape' => 'record'],
-            'edge' => ['fontsize' => '9', 'fontname' => 'Arial', 'color' => 'grey', 'arrowhead' => 'open', 'arrowsize' => '0.5'],
-            'node.instance' => ['fillcolor' => '#9999ff', 'style' => 'filled'],
-            'node.definition' => ['fillcolor' => '#eeeeee'],
-            'node.missing' => ['fillcolor' => '#ff9999', 'style' => 'filled'],
-        ];
+    private array $options = [
+        'graph' => ['ratio' => 'compress'],
+        'node' => ['fontsize' => '11', 'fontname' => 'Arial', 'shape' => 'record'],
+        'edge' => ['fontsize' => '9', 'fontname' => 'Arial', 'color' => 'grey', 'arrowhead' => 'open', 'arrowsize' => '0.5'],
+        'node.instance' => ['fillcolor' => '#9999ff', 'style' => 'filled'],
+        'node.definition' => ['fillcolor' => '#eeeeee'],
+        'node.missing' => ['fillcolor' => '#ff9999', 'style' => 'filled'],
+    ];
 
     /**
      * Dumps the service container as a graphviz graph.
@@ -53,10 +53,8 @@ class GraphvizDumper extends Dumper
      *  * node.instance: The default options for services that are defined directly by object instances
      *  * node.definition: The default options for services that are defined via service definition instances
      *  * node.missing: The default options for missing services
-     *
-     * @return string
      */
-    public function dump(array $options = [])
+    public function dump(array $options = []): string
     {
         foreach (['graph', 'node', 'edge', 'node.instance', 'node.definition', 'node.missing'] as $key) {
             if (isset($options[$key])) {
@@ -90,7 +88,7 @@ class GraphvizDumper extends Dumper
         foreach ($this->nodes as $id => $node) {
             $aliases = $this->getAliases($id);
 
-            $code .= sprintf("  node_%s [label=\"%s\\n%s\\n\", shape=%s%s];\n", $this->dotize($id), $id.($aliases ? ' ('.implode(', ', $aliases).')' : ''), $node['class'], $this->options['node']['shape'], $this->addAttributes($node['attributes']));
+            $code .= \sprintf("  node_%s [label=\"%s\\n%s\\n\", shape=%s%s];\n", $this->dotize($id), $id.($aliases ? ' ('.implode(', ', $aliases).')' : ''), $node['class'], $this->options['node']['shape'], $this->addAttributes($node['attributes']));
         }
 
         return $code;
@@ -101,7 +99,7 @@ class GraphvizDumper extends Dumper
         $code = '';
         foreach ($this->edges as $id => $edges) {
             foreach ($edges as $edge) {
-                $code .= sprintf("  node_%s -> node_%s [label=\"%s\" style=\"%s\"%s];\n", $this->dotize($id), $this->dotize($edge['to']), $edge['name'], $edge['required'] ? 'filled' : 'dashed', $edge['lazy'] ? ' color="#9999ff"' : '');
+                $code .= \sprintf("  node_%s -> node_%s [label=\"%s\" style=\"%s\"%s];\n", $this->dotize($id), $this->dotize($edge['to']), $edge['name'], $edge['required'] ? 'filled' : 'dashed', $edge['lazy'] ? ' color="#9999ff"' : '');
             }
         }
 
@@ -157,13 +155,13 @@ class GraphvizDumper extends Dumper
         foreach ($container->getDefinitions() as $id => $definition) {
             $class = $definition->getClass();
 
-            if ('\\' === substr($class, 0, 1)) {
+            if (str_starts_with($class, '\\')) {
                 $class = substr($class, 1);
             }
 
             try {
                 $class = $this->container->getParameterBag()->resolveValue($class);
-            } catch (ParameterNotFoundException $e) {
+            } catch (ParameterNotFoundException) {
             }
 
             $nodes[$id] = ['class' => str_replace('\\', '\\\\', $class), 'attributes' => array_merge($this->options['node.definition'], ['style' => $definition->isShared() ? 'filled' : 'dotted'])];
@@ -176,7 +174,7 @@ class GraphvizDumper extends Dumper
             }
 
             if (!$container->hasDefinition($id)) {
-                $nodes[$id] = ['class' => str_replace('\\', '\\\\', \get_class($container->get($id))), 'attributes' => $this->options['node.instance']];
+                $nodes[$id] = ['class' => str_replace('\\', '\\\\', $container->get($id)::class), 'attributes' => $this->options['node.instance']];
             }
         }
 
@@ -200,7 +198,7 @@ class GraphvizDumper extends Dumper
 
     private function startDot(): string
     {
-        return sprintf("digraph sc {\n  %s\n  node [%s];\n  edge [%s];\n\n",
+        return \sprintf("digraph sc {\n  %s\n  node [%s];\n  edge [%s];\n\n",
             $this->addOptions($this->options['graph']),
             $this->addOptions($this->options['node']),
             $this->addOptions($this->options['edge'])
@@ -216,7 +214,7 @@ class GraphvizDumper extends Dumper
     {
         $code = [];
         foreach ($attributes as $k => $v) {
-            $code[] = sprintf('%s="%s"', $k, $v);
+            $code[] = \sprintf('%s="%s"', $k, $v);
         }
 
         return $code ? ', '.implode(', ', $code) : '';
@@ -226,7 +224,7 @@ class GraphvizDumper extends Dumper
     {
         $code = [];
         foreach ($options as $k => $v) {
-            $code[] = sprintf('%s="%s"', $k, $v);
+            $code[] = \sprintf('%s="%s"', $k, $v);
         }
 
         return implode(' ', $code);

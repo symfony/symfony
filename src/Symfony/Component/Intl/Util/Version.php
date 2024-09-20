@@ -36,11 +36,9 @@ class Version
      * @param int|null $precision The number of components to compare. Pass
      *                            NULL to compare the versions unchanged.
      *
-     * @return bool
-     *
      * @see normalize()
      */
-    public static function compare(string $version1, string $version2, string $operator, ?int $precision = null)
+    public static function compare(string $version1, string $version2, string $operator, ?int $precision = null): bool
     {
         $version1 = self::normalize($version1, $precision);
         $version2 = self::normalize($version2, $precision);
@@ -62,10 +60,8 @@ class Version
      *
      * @param int|null $precision The number of components to include. Pass
      *                            NULL to return the version unchanged.
-     *
-     * @return string|null
      */
-    public static function normalize(string $version, ?int $precision)
+    public static function normalize(string $version, ?int $precision): ?string
     {
         if (null === $precision) {
             return $version;
@@ -74,7 +70,7 @@ class Version
         $pattern = '[^\.]+';
 
         for ($i = 2; $i <= $precision; ++$i) {
-            $pattern = sprintf('[^\.]+(\.%s)?', $pattern);
+            $pattern = \sprintf('[^\.]+(\.%s)?', $pattern);
         }
 
         if (!preg_match('/^'.$pattern.'/', $version, $matches)) {

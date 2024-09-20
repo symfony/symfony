@@ -15,7 +15,7 @@ class MockFileListIterator extends \ArrayIterator
 {
     public function __construct(array $filesArray = [])
     {
-        $files = array_map(function ($file) { return new MockSplFileInfo($file); }, $filesArray);
+        $files = array_map(fn ($file) => new MockSplFileInfo($file), $filesArray);
         parent::__construct($files);
     }
 }

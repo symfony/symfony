@@ -11,6 +11,7 @@
 
 namespace Symfony\Bridge\Twig\Command;
 
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\CI\GithubActionReporter;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Completion\CompletionInput;
@@ -35,32 +36,26 @@ use Twig\Source;
  * @author Marc Weistroff <marc.weistroff@sensiolabs.com>
  * @author Jérôme Tamarelle <jerome@tamarelle.net>
  */
+#[AsCommand(name: 'lint:twig', description: 'Lint a Twig template and outputs encountered errors')]
 class LintCommand extends Command
 {
-    protected static $defaultName = 'lint:twig';
-    protected static $defaultDescription = 'Lint a Twig template and outputs encountered errors';
+    private array $excludes;
+    private string $format;
 
-    private $twig;
-
-    /**
-     * @var string|null
-     */
-    private $format;
-
-    public function __construct(Environment $twig)
-    {
+    public function __construct(
+        private Environment $twig,
+        private array $namePatterns = ['*.twig'],
+    ) {
         parent::__construct();
-
-        $this->twig = $twig;
     }
 
-    protected function configure()
+    protected function configure(): void
     {
         $this
-            ->setDescription(self::$defaultDescription)
-            ->addOption('format', null, InputOption::VALUE_REQUIRED, 'The output format')
+            ->addOption('format', null, InputOption::VALUE_REQUIRED, \sprintf('The output format ("%s")', implode('", "', $this->getAvailableFormatOptions())))
             ->addOption('show-deprecations', null, InputOption::VALUE_NONE, 'Show deprecations as errors')
             ->addArgument('filename', InputArgument::IS_ARRAY, 'A file, a directory or "-" for reading from STDIN')
+            ->addOption('excludes', null, InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY, 'Excluded directories', [])
             ->setHelp(<<<'EOF'
 The <info>%command.name%</info> command lints a template and outputs to STDOUT
 the first encountered syntax error.
@@ -76,26 +71,25 @@ Or the syntax of a file:
 Or of a whole directory:
 
   <info>php %command.full_name% dirname</info>
-  <info>php %command.full_name% dirname --format=json</info>
 
+The <info>--format</info> option specifies the format of the command output:
+
+  <info>php %command.full_name% dirname --format=json</info>
 EOF
             )
         ;
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);
         $filenames = $input->getArgument('filename');
         $showDeprecations = $input->getOption('show-deprecations');
-        $this->format = $input->getOption('format');
-
-        if (null === $this->format) {
-            $this->format = GithubActionReporter::isGithubActionEnvironment() ? 'github' : 'txt';
-        }
+        $this->excludes = $input->getOption('excludes');
+        $this->format = $input->getOption('format') ?? (GithubActionReporter::isGithubActionEnvironment() ? 'github' : 'txt');
 
         if (['-'] === $filenames) {
-            return $this->display($input, $output, $io, [$this->validate(file_get_contents('php://stdin'), uniqid('sf_', true))]);
+            return $this->display($input, $output, $io, [$this->validate(file_get_contents('php://stdin'), 'Standard Input')]);
         }
 
         if (!$filenames) {
@@ -151,15 +145,15 @@ EOF
         return $filesInfo;
     }
 
-    protected function findFiles(string $filename)
+    protected function findFiles(string $filename): iterable
     {
         if (is_file($filename)) {
             return [$filename];
         } elseif (is_dir($filename)) {
-            return Finder::create()->files()->in($filename)->name('*.twig');
+            return Finder::create()->files()->in($filename)->name($this->namePatterns)->exclude($this->excludes);
         }
 
-        throw new RuntimeException(sprintf('File or directory "%s" is not readable.', $filename));
+        throw new RuntimeException(\sprintf('File or directory "%s" is not readable.', $filename));
     }
 
     private function validate(string $template, string $file): array
@@ -180,28 +174,24 @@ EOF
         return ['template' => $template, 'file' => $file, 'valid' => true];
     }
 
-    private function display(InputInterface $input, OutputInterface $output, SymfonyStyle $io, array $files)
+    private function display(InputInterface $input, OutputInterface $output, SymfonyStyle $io, array $files): int
     {
-        switch ($this->format) {
-            case 'txt':
-                return $this->displayTxt($output, $io, $files);
-            case 'json':
-                return $this->displayJson($output, $files);
-            case 'github':
-                return $this->displayTxt($output, $io, $files, true);
-            default:
-                throw new InvalidArgumentException(sprintf('The format "%s" is not supported.', $input->getOption('format')));
-        }
+        return match ($this->format) {
+            'txt' => $this->displayTxt($output, $io, $files),
+            'json' => $this->displayJson($output, $files),
+            'github' => $this->displayTxt($output, $io, $files, true),
+            default => throw new InvalidArgumentException(\sprintf('Supported formats are "%s".', implode('", "', $this->getAvailableFormatOptions()))),
+        };
     }
 
-    private function displayTxt(OutputInterface $output, SymfonyStyle $io, array $filesInfo, bool $errorAsGithubAnnotations = false)
+    private function displayTxt(OutputInterface $output, SymfonyStyle $io, array $filesInfo, bool $errorAsGithubAnnotations = false): int
     {
         $errors = 0;
         $githubReporter = $errorAsGithubAnnotations ? new GithubActionReporter($output) : null;
 
         foreach ($filesInfo as $info) {
             if ($info['valid'] && $output->isVerbose()) {
-                $io->comment('<info>OK</info>'.($info['file'] ? sprintf(' in %s', $info['file']) : ''));
+                $io->comment('<info>OK</info>'.($info['file'] ? \sprintf(' in %s', $info['file']) : ''));
             } elseif (!$info['valid']) {
                 ++$errors;
                 $this->renderException($io, $info['template'], $info['exception'], $info['file'], $githubReporter);
@@ -209,15 +199,15 @@ EOF
         }
 
         if (0 === $errors) {
-            $io->success(sprintf('All %d Twig files contain valid syntax.', \count($filesInfo)));
+            $io->success(\sprintf('All %d Twig files contain valid syntax.', \count($filesInfo)));
         } else {
-            $io->warning(sprintf('%d Twig files have valid syntax and %d contain errors.', \count($filesInfo) - $errors, $errors));
+            $io->warning(\sprintf('%d Twig files have valid syntax and %d contain errors.', \count($filesInfo) - $errors, $errors));
         }
 
         return min($errors, 1);
     }
 
-    private function displayJson(OutputInterface $output, array $filesInfo)
+    private function displayJson(OutputInterface $output, array $filesInfo): int
     {
         $errors = 0;
 
@@ -236,42 +226,40 @@ EOF
         return min($errors, 1);
     }
 
-    private function renderException(SymfonyStyle $output, string $template, Error $exception, ?string $file = null, ?GithubActionReporter $githubReporter = null)
+    private function renderException(SymfonyStyle $output, string $template, Error $exception, ?string $file = null, ?GithubActionReporter $githubReporter = null): void
     {
         $line = $exception->getTemplateLine();
 
-        if ($githubReporter) {
-            $githubReporter->error($exception->getRawMessage(), $file, $line <= 0 ? null : $line);
-        }
+        $githubReporter?->error($exception->getRawMessage(), $file, $line <= 0 ? null : $line);
 
         if ($file) {
-            $output->text(sprintf('<error> ERROR </error> in %s (line %s)', $file, $line));
+            $output->text(\sprintf('<error> ERROR </error> in %s (line %s)', $file, $line));
         } else {
-            $output->text(sprintf('<error> ERROR </error> (line %s)', $line));
+            $output->text(\sprintf('<error> ERROR </error> (line %s)', $line));
         }
 
         // If the line is not known (this might happen for deprecations if we fail at detecting the line for instance),
         // we render the message without context, to ensure the message is displayed.
         if ($line <= 0) {
-            $output->text(sprintf('<error> >> %s</error> ', $exception->getRawMessage()));
+            $output->text(\sprintf('<error> >> %s</error> ', $exception->getRawMessage()));
 
             return;
         }
 
         foreach ($this->getContext($template, $line) as $lineNumber => $code) {
-            $output->text(sprintf(
+            $output->text(\sprintf(
                 '%s %-6s %s',
                 $lineNumber === $line ? '<error> >> </error>' : '    ',
                 $lineNumber,
                 $code
             ));
             if ($lineNumber === $line) {
-                $output->text(sprintf('<error> >> %s</error> ', $exception->getRawMessage()));
+                $output->text(\sprintf('<error> >> %s</error> ', $exception->getRawMessage()));
             }
         }
     }
 
-    private function getContext(string $template, int $line, int $context = 3)
+    private function getContext(string $template, int $line, int $context = 3): array
     {
         $lines = explode("\n", $template);
 
@@ -290,7 +278,13 @@ EOF
     public function complete(CompletionInput $input, CompletionSuggestions $suggestions): void
     {
         if ($input->mustSuggestOptionValuesFor('format')) {
-            $suggestions->suggestValues(['txt', 'json', 'github']);
+            $suggestions->suggestValues($this->getAvailableFormatOptions());
         }
+    }
+
+    /** @return string[] */
+    private function getAvailableFormatOptions(): array
+    {
+        return ['txt', 'json', 'github'];
     }
 }

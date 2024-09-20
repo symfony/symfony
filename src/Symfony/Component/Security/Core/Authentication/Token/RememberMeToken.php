@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Security\Core\Authentication\Token;
 
+use Symfony\Component\Security\Core\Exception\InvalidArgumentException;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
@@ -20,95 +21,50 @@ use Symfony\Component\Security\Core\User\UserInterface;
  */
 class RememberMeToken extends AbstractToken
 {
-    private $secret;
-    private $firewallName;
+    private ?string $secret = null;
 
     /**
-     * @param string $secret A secret used to make sure the token is created by the app and not by a malicious client
-     *
      * @throws \InvalidArgumentException
      */
-    public function __construct(UserInterface $user, string $firewallName, string $secret)
-    {
+    public function __construct(
+        UserInterface $user,
+        private string $firewallName,
+    ) {
         parent::__construct($user->getRoles());
 
-        if (empty($secret)) {
-            throw new \InvalidArgumentException('$secret must not be empty.');
+        if (\func_num_args() > 2) {
+            trigger_deprecation('symfony/security-core', '7.2', 'The "$secret" argument of "%s()" is deprecated.', __METHOD__);
+            $this->secret = func_get_arg(2);
         }
 
-        if ('' === $firewallName) {
-            throw new \InvalidArgumentException('$firewallName must not be empty.');
+        if (!$firewallName) {
+            throw new InvalidArgumentException('$firewallName must not be empty.');
         }
-
-        $this->firewallName = $firewallName;
-        $this->secret = $secret;
 
         $this->setUser($user);
-        parent::setAuthenticated(true, false);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setAuthenticated(bool $authenticated)
-    {
-        if ($authenticated) {
-            throw new \LogicException('You cannot set this token to authenticated after creation.');
-        }
-
-        parent::setAuthenticated(false, false);
-    }
-
-    /**
-     * Returns the provider secret.
-     *
-     * @return string The provider secret
-     *
-     * @deprecated since Symfony 5.2, use getFirewallName() instead
-     */
-    public function getProviderKey()
-    {
-        if (1 !== \func_num_args() || true !== func_get_arg(0)) {
-            trigger_deprecation('symfony/security-core', '5.2', 'Method "%s()" is deprecated, use "getFirewallName()" instead.', __METHOD__);
-        }
-
-        return $this->firewallName;
     }
 
     public function getFirewallName(): string
     {
-        return $this->getProviderKey(true);
+        return $this->firewallName;
     }
 
     /**
-     * @return string
+     * @deprecated since Symfony 7.2
      */
-    public function getSecret()
+    public function getSecret(): string
     {
-        return $this->secret;
+        trigger_deprecation('symfony/security-core', '7.2', 'The "%s()" method is deprecated.', __METHOD__);
+
+        return $this->secret ??= base64_encode(random_bytes(8));
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getCredentials()
-    {
-        trigger_deprecation('symfony/security-core', '5.4', 'Method "%s()" is deprecated.', __METHOD__);
-
-        return '';
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function __serialize(): array
     {
+        // $this->firewallName should be kept at index 1 for compatibility with payloads generated before Symfony 8
         return [$this->secret, $this->firewallName, parent::__serialize()];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function __unserialize(array $data): void
     {
         [$this->secret, $this->firewallName, $parentData] = $data;

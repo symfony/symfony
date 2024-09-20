@@ -430,16 +430,16 @@ class DotenvTest extends TestCase
         $this->assertSame('http_value', $_SERVER['HTTP_TEST_ENV_VAR']);
     }
 
-    public function testEnvVarIsOverriden()
+    public function testEnvVarIsOverridden()
     {
-        putenv('TEST_ENV_VAR_OVERRIDEN=original_value');
+        putenv('TEST_ENV_VAR_OVERRIDDEN=original_value');
 
         $dotenv = (new Dotenv())->usePutenv();
-        $dotenv->populate(['TEST_ENV_VAR_OVERRIDEN' => 'new_value'], true);
+        $dotenv->populate(['TEST_ENV_VAR_OVERRIDDEN' => 'new_value'], true);
 
-        $this->assertSame('new_value', getenv('TEST_ENV_VAR_OVERRIDEN'));
-        $this->assertSame('new_value', $_ENV['TEST_ENV_VAR_OVERRIDEN']);
-        $this->assertSame('new_value', $_SERVER['TEST_ENV_VAR_OVERRIDEN']);
+        $this->assertSame('new_value', getenv('TEST_ENV_VAR_OVERRIDDEN'));
+        $this->assertSame('new_value', $_ENV['TEST_ENV_VAR_OVERRIDDEN']);
+        $this->assertSame('new_value', $_SERVER['TEST_ENV_VAR_OVERRIDDEN']);
     }
 
     public function testMemorizingLoadedVarsNamesInSpecialVar()
@@ -603,5 +603,15 @@ class DotenvTest extends TestCase
 
         $resetContext();
         rmdir($tmpdir);
+    }
+
+    public function testExceptionWithBom()
+    {
+        $dotenv = new Dotenv();
+
+        $this->expectException(FormatException::class);
+        $this->expectExceptionMessage('Loading files starting with a byte-order-mark (BOM) is not supported.');
+
+        $dotenv->load(__DIR__.'/fixtures/file_with_bom');
     }
 }

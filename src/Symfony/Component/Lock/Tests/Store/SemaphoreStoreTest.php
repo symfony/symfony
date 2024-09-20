@@ -25,9 +25,6 @@ class SemaphoreStoreTest extends AbstractStoreTestCase
     use BlockingStoreTestTrait;
     use UnserializableTestTrait;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function getStore(): PersistingStoreInterface
     {
         return new SemaphoreStore();
@@ -37,7 +34,7 @@ class SemaphoreStoreTest extends AbstractStoreTestCase
     {
         $initialCount = $this->getOpenedSemaphores();
         $store = new SemaphoreStore();
-        $key = new Key(uniqid(__METHOD__, true));
+        $key = new Key(__METHOD__);
         $store->waitAndSave($key);
 
         $this->assertGreaterThan($initialCount, $this->getOpenedSemaphores(), 'Semaphores should have been created');

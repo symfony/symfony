@@ -12,6 +12,7 @@
 namespace Symfony\Bundle\FrameworkBundle\Tests\Functional;
 
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase as BaseWebTestCase;
+use Symfony\Bundle\FrameworkBundle\Tests\Functional\app\AppKernel;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpKernel\KernelInterface;
 
@@ -47,12 +48,12 @@ abstract class AbstractWebTestCase extends BaseWebTestCase
     {
         require_once __DIR__.'/app/AppKernel.php';
 
-        return 'Symfony\Bundle\FrameworkBundle\Tests\Functional\app\AppKernel';
+        return AppKernel::class;
     }
 
     protected static function createKernel(array $options = []): KernelInterface
     {
-        $class = self::getKernelClass();
+        $class = static::getKernelClass();
 
         if (!isset($options['test_case'])) {
             throw new \InvalidArgumentException('The option "test_case" must be set.');

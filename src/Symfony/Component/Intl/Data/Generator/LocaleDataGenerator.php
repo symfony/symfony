@@ -29,13 +29,10 @@ class LocaleDataGenerator extends AbstractDataGenerator
 {
     use FallbackTrait;
 
-    private $locales = [];
-    private $localeAliases = [];
-    private $localeParents = [];
+    private array $locales = [];
+    private array $localeAliases = [];
+    private array $localeParents = [];
 
-    /**
-     * {@inheritdoc}
-     */
     protected function scanLocales(LocaleScanner $scanner, string $sourceDir): array
     {
         $this->locales = $scanner->scanLocales($sourceDir.'/locales');
@@ -45,10 +42,7 @@ class LocaleDataGenerator extends AbstractDataGenerator
         return $this->locales;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function compileTemporaryBundles(BundleCompilerInterface $compiler, string $sourceDir, string $tempDir)
+    protected function compileTemporaryBundles(BundleCompilerInterface $compiler, string $sourceDir, string $tempDir): void
     {
         $filesystem = new Filesystem();
         $filesystem->mkdir([
@@ -59,10 +53,7 @@ class LocaleDataGenerator extends AbstractDataGenerator
         $compiler->compile($sourceDir.'/region', $tempDir.'/region');
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function preGenerate()
+    protected function preGenerate(): void
     {
         // Write parents locale file for the Translation component
         file_put_contents(
@@ -71,9 +62,6 @@ class LocaleDataGenerator extends AbstractDataGenerator
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function generateDataForLocale(BundleEntryReaderInterface $reader, string $tempDir, string $displayLocale): ?array
     {
         // Don't generate aliases, as they are resolved during runtime
@@ -100,7 +88,7 @@ class LocaleDataGenerator extends AbstractDataGenerator
                 // Script, Region and Variants are optional. If none of them is
                 // available, the braces are not printed.
                 $localeNames[$locale] = $this->generateLocaleName($reader, $tempDir, $locale, $displayLocale, $pattern, $separator);
-            } catch (MissingResourceException $e) {
+            } catch (MissingResourceException) {
                 // Silently ignore incomplete locale names
                 // In this case one should configure at least one fallback locale that is complete (e.g. English) during
                 // runtime. Alternatively a translation for the missing resource can be proposed upstream.
@@ -130,17 +118,11 @@ class LocaleDataGenerator extends AbstractDataGenerator
         return $data;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function generateDataForRoot(BundleEntryReaderInterface $reader, string $tempDir): ?array
     {
         return null;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function generateDataForMeta(BundleEntryReaderInterface $reader, string $tempDir): ?array
     {
         return [
@@ -165,7 +147,7 @@ class LocaleDataGenerator extends AbstractDataGenerator
         // i.e. in de_AT, "AT" is the region
         if ($region = \Locale::getRegion($locale)) {
             if (ctype_alpha($region) && !RegionDataGenerator::isValidCountryCode($region)) {
-                throw new MissingResourceException(sprintf('Skipping "%s" due an invalid country.', $locale));
+                throw new MissingResourceException(\sprintf('Skipping "%s" due an invalid country.', $locale));
             }
 
             $extras[] = str_replace(['(', ')'], ['[', ']'], $reader->readEntry($tempDir.'/region', $displayLocale, ['Countries', $region]));

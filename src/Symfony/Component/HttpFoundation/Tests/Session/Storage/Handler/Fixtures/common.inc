@@ -28,7 +28,6 @@ ini_set('session.cookie_domain', '');
 ini_set('session.cookie_secure', '');
 ini_set('session.cookie_httponly', '');
 ini_set('session.use_cookies', 1);
-ini_set('session.use_only_cookies', 1);
 ini_set('session.cache_expire', 180);
 ini_set('session.cookie_path', '/');
 ini_set('session.cookie_domain', '');
@@ -54,7 +53,7 @@ ob_start();
 class TestSessionHandler extends AbstractSessionHandler
 {
     private $data;
-    private $sessionId;
+    private ?string $sessionId;
 
     public function __construct($data = '', $sessionId = null)
     {
@@ -62,33 +61,27 @@ class TestSessionHandler extends AbstractSessionHandler
         $this->sessionId = $sessionId;
     }
 
-    public function open($path, $name): bool
+    public function open(string $path, string $name): bool
     {
         echo __FUNCTION__, "\n";
 
         return parent::open($path, $name);
     }
 
-    public function validateId($sessionId): bool
+    public function validateId(string $sessionId): bool
     {
         echo __FUNCTION__, "\n";
 
         return parent::validateId($sessionId);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function read($sessionId): string
+    public function read(string $sessionId): string
     {
         echo __FUNCTION__, "\n";
 
         return parent::read($sessionId);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function updateTimestamp($sessionId, $data): bool
     {
         echo __FUNCTION__, "\n";
@@ -96,20 +89,14 @@ class TestSessionHandler extends AbstractSessionHandler
         return true;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function write($sessionId, $data): bool
+    public function write(string $sessionId, string $data): bool
     {
         echo __FUNCTION__, "\n";
 
         return parent::write($sessionId, $data);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function destroy($sessionId): bool
+    public function destroy(string $sessionId): bool
     {
         echo __FUNCTION__, "\n";
 
@@ -123,8 +110,7 @@ class TestSessionHandler extends AbstractSessionHandler
         return true;
     }
 
-    #[\ReturnTypeWillChange]
-    public function gc($maxLifetime)
+    public function gc($maxLifetime): int|false
     {
         echo __FUNCTION__, "\n";
 

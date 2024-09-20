@@ -12,7 +12,7 @@
 namespace Symfony\Component\HttpKernel\Controller\ArgumentResolver;
 
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\Controller\ArgumentValueResolverInterface;
+use Symfony\Component\HttpKernel\Controller\ValueResolverInterface;
 use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
 
 /**
@@ -20,21 +20,10 @@ use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
  *
  * @author Iltar van der Berg <kjarli@gmail.com>
  */
-final class RequestAttributeValueResolver implements ArgumentValueResolverInterface
+final class RequestAttributeValueResolver implements ValueResolverInterface
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function supports(Request $request, ArgumentMetadata $argument): bool
+    public function resolve(Request $request, ArgumentMetadata $argument): array
     {
-        return !$argument->isVariadic() && $request->attributes->has($argument->getName());
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function resolve(Request $request, ArgumentMetadata $argument): iterable
-    {
-        yield $request->attributes->get($argument->getName());
+        return !$argument->isVariadic() && $request->attributes->has($argument->getName()) ? [$request->attributes->get($argument->getName())] : [];
     }
 }

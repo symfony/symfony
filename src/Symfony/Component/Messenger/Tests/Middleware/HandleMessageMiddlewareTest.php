@@ -24,6 +24,7 @@ use Symfony\Component\Messenger\Middleware\HandleMessageMiddleware;
 use Symfony\Component\Messenger\Middleware\StackMiddleware;
 use Symfony\Component\Messenger\Stamp\AckStamp;
 use Symfony\Component\Messenger\Stamp\HandledStamp;
+use Symfony\Component\Messenger\Stamp\HandlerArgumentsStamp;
 use Symfony\Component\Messenger\Stamp\NoAutoAckStamp;
 use Symfony\Component\Messenger\Test\Middleware\MiddlewareTestCase;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
@@ -44,6 +45,36 @@ class HandleMessageMiddlewareTest extends MiddlewareTestCase
         $handler->expects($this->once())->method('__invoke')->with($message);
 
         $middleware->handle($envelope, $this->getStackMock());
+    }
+
+    public function testItKeysTheHandlerFailedNestedExceptionsByHandlerDescription()
+    {
+        $message = new DummyMessage('Hey');
+        $envelope = new Envelope($message);
+        $handler = new class {
+            public function __invoke()
+            {
+                throw new \Exception('failed');
+            }
+        };
+
+        $middleware = new HandleMessageMiddleware(new HandlersLocator([
+            DummyMessage::class => [$handler],
+        ]));
+
+        try {
+            $middleware->handle($envelope, $this->getStackMock(false));
+        } catch (HandlerFailedException $e) {
+            $key = (new HandlerDescriptor($handler))->getName();
+
+            $this->assertCount(1, $e->getWrappedExceptions());
+            $this->assertArrayHasKey($key, $e->getWrappedExceptions());
+            $this->assertSame('failed', $e->getWrappedExceptions()[$key]->getMessage());
+
+            return;
+        }
+
+        $this->fail('Exception not thrown.');
     }
 
     /**
@@ -69,23 +100,23 @@ class HandleMessageMiddlewareTest extends MiddlewareTestCase
 
     public static function itAddsHandledStampsProvider(): iterable
     {
-        $first = new class() extends HandleMessageMiddlewareTestCallable {
+        $first = new class extends HandleMessageMiddlewareTestCallable {
             public function __invoke()
             {
                 return 'first result';
             }
         };
-        $firstClass = \get_class($first);
+        $firstClass = $first::class;
 
-        $second = new class() extends HandleMessageMiddlewareTestCallable {
+        $second = new class extends HandleMessageMiddlewareTestCallable {
             public function __invoke()
             {
                 return null;
             }
         };
-        $secondClass = \get_class($second);
+        $secondClass = $second::class;
 
-        $failing = new class() extends HandleMessageMiddlewareTestCallable {
+        $failing = new class extends HandleMessageMiddlewareTestCallable {
             public function __invoke()
             {
                 throw new \Exception('handler failed.');
@@ -168,8 +199,8 @@ class HandleMessageMiddlewareTest extends MiddlewareTestCase
 
     public function testBatchHandler()
     {
-        $handler = new class() implements BatchHandlerInterface {
-            public $processedMessages;
+        $handler = new class implements BatchHandlerInterface {
+            public array $processedMessages;
 
             use BatchHandlerTrait;
 
@@ -178,9 +209,9 @@ class HandleMessageMiddlewareTest extends MiddlewareTestCase
                 return $this->handle($message, $ack);
             }
 
-            private function shouldFlush()
+            private function getBatchSize(): int
             {
-                return 2 <= \count($this->jobs);
+                return 2;
             }
 
             private function process(array $jobs): void
@@ -224,7 +255,7 @@ class HandleMessageMiddlewareTest extends MiddlewareTestCase
 
     public function testBatchHandlerNoAck()
     {
-        $handler = new class() implements BatchHandlerInterface {
+        $handler = new class implements BatchHandlerInterface {
             use BatchHandlerTrait;
 
             public function __invoke(DummyMessage $message, ?Acknowledger $ack = null)
@@ -259,8 +290,8 @@ class HandleMessageMiddlewareTest extends MiddlewareTestCase
 
     public function testBatchHandlerNoBatch()
     {
-        $handler = new class() implements BatchHandlerInterface {
-            public $processedMessages;
+        $handler = new class implements BatchHandlerInterface {
+            public array $processedMessages;
 
             use BatchHandlerTrait;
 
@@ -291,11 +322,52 @@ class HandleMessageMiddlewareTest extends MiddlewareTestCase
 
         $this->assertSame([$message], $handler->processedMessages);
     }
+
+    public function testHandlerArgumentsStamp()
+    {
+        $message = new DummyMessage('Hey');
+        $envelope = new Envelope($message);
+        $envelope = $envelope->with(new HandlerArgumentsStamp(['additional argument']));
+
+        $handler = $this->createPartialMock(HandleMessageMiddlewareTestCallable::class, ['__invoke']);
+
+        $middleware = new HandleMessageMiddleware(new HandlersLocator([
+            DummyMessage::class => [$handler],
+        ]));
+
+        $handler->expects($this->once())->method('__invoke')->with($message, 'additional argument');
+
+        $middleware->handle($envelope, $this->getStackMock());
+    }
+
+    public function testHandlerArgumentsStampNamedArgument()
+    {
+        $message = new DummyMessage('Hey');
+        $envelope = new Envelope($message);
+        $envelope = $envelope->with(new HandlerArgumentsStamp(['namedArgument' => 'additional named argument']));
+
+        $handler = $this->createPartialMock(HandleMessageMiddlewareNamedArgumentTestCallable::class, ['__invoke']);
+
+        $middleware = new HandleMessageMiddleware(new HandlersLocator([
+            DummyMessage::class => [$handler],
+        ]));
+
+        $handler->expects($this->once())->method('__invoke')->with($message, 'additional named argument');
+
+        $middleware->handle($envelope, $this->getStackMock());
+    }
 }
 
 class HandleMessageMiddlewareTestCallable
 {
     public function __invoke()
+    {
+    }
+}
+
+class HandleMessageMiddlewareNamedArgumentTestCallable
+{
+    public function __invoke(object $message, $namedArgument)
     {
     }
 }

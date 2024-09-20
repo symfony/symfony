@@ -12,7 +12,6 @@
 namespace Symfony\Component\DomCrawler\Tests;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\DomCrawler\Form;
 use Symfony\Component\DomCrawler\Image;
@@ -20,13 +19,11 @@ use Symfony\Component\DomCrawler\Link;
 
 abstract class AbstractCrawlerTestCase extends TestCase
 {
-    use ExpectDeprecationTrait;
-
     abstract public static function getDoctype(): string;
 
-    protected function createCrawler($node = null, ?string $uri = null, ?string $baseHref = null)
+    protected function createCrawler($node = null, ?string $uri = null, ?string $baseHref = null, bool $useHtml5Parser = true)
     {
-        return new Crawler($node, $uri, $baseHref);
+        return new Crawler($node, $uri, $baseHref, $useHtml5Parser);
     }
 
     public function testConstructor()
@@ -80,13 +77,6 @@ abstract class AbstractCrawlerTestCase extends TestCase
         $crawler = $this->createCrawler();
         $crawler->add($this->getDoctype().'<html><body>Foo</body></html>');
         $this->assertEquals('Foo', $crawler->filterXPath('//body')->text(), '->add() adds nodes from a string');
-    }
-
-    public function testAddInvalidType()
-    {
-        $this->expectException(\InvalidArgumentException::class);
-        $crawler = $this->createCrawler();
-        $crawler->add(1);
     }
 
     public function testAddMultipleDocumentNode()
@@ -276,9 +266,7 @@ abstract class AbstractCrawlerTestCase extends TestCase
 
     public function testEach()
     {
-        $data = $this->createTestCrawler()->filterXPath('//ul[1]/li')->each(function ($node, $i) {
-            return $i.'-'.$node->text();
-        });
+        $data = $this->createTestCrawler()->filterXPath('//ul[1]/li')->each(fn ($node, $i) => $i.'-'.$node->text());
 
         $this->assertEquals(['0-One', '1-Two', '2-Three'], $data, '->each() executes an anonymous function on each node of the list');
     }
@@ -304,9 +292,7 @@ abstract class AbstractCrawlerTestCase extends TestCase
     public function testReduce()
     {
         $crawler = $this->createTestCrawler()->filterXPath('//ul[1]/li');
-        $nodes = $crawler->reduce(function ($node, $i) {
-            return 1 !== $i;
-        });
+        $nodes = $crawler->reduce(fn ($node, $i) => 1 !== $i);
         $this->assertNotSame($nodes, $crawler, '->reduce() returns a new instance of a crawler');
         $this->assertInstanceOf(Crawler::class, $nodes, '->reduce() returns a new instance of a crawler');
 
@@ -323,6 +309,9 @@ abstract class AbstractCrawlerTestCase extends TestCase
         } catch (\InvalidArgumentException $e) {
             $this->assertTrue(true, '->attr() throws an \InvalidArgumentException if the node list is empty');
         }
+
+        $this->assertSame('my value', $this->createTestCrawler()->filterXPath('//notexists')->attr('class', 'my value'));
+        $this->assertSame('my value', $this->createTestCrawler()->filterXPath('//li')->attr('attr-not-exists', 'my value'));
     }
 
     public function testMissingAttrValueIsNull()
@@ -362,12 +351,62 @@ abstract class AbstractCrawlerTestCase extends TestCase
         $this->assertSame('my value', $this->createTestCrawler(null)->filterXPath('//ol')->text('my value'));
     }
 
-    public function testInnerText()
+    public static function provideInnerTextExamples()
     {
-        self::assertCount(1, $crawler = $this->createTestCrawler()->filterXPath('//*[@id="complex-element"]'));
+        return [
+            [
+                '//*[@id="complex-elements"]/*[@class="one"]',     // XPath query
+                'Parent text Child text',                       // Result of Crawler::text()
+                'Parent text',                                  // Result of Crawler::innerText()
+                ' Parent text ',                                // Result of Crawler::innerText(false)
+            ],
+            [
+                '//*[@id="complex-elements"]/*[@class="two"]',
+                'Child text Parent text',
+                'Parent text',
+                ' ',
+            ],
+            [
+                '//*[@id="complex-elements"]/*[@class="three"]',
+                'Parent text Child text Parent text',
+                'Parent text',
+                ' Parent text ',
+            ],
+            [
+                '//*[@id="complex-elements"]/*[@class="four"]',
+                'Child text',
+                '',
+                '  ',
+            ],
+            [
+                '//*[@id="complex-elements"]/*[@class="five"]',
+                'Child text Another child',
+                '',
+                '  ',
+            ],
+            [
+                '//*[@id="complex-elements"]/*[@class="six"]',
+                'console.log("Test JavaScript content");',
+                'console.log("Test JavaScript content");',
+                ' console.log("Test JavaScript content"); ',
+            ],
+        ];
+    }
 
-        self::assertSame('Parent text Child text', $crawler->text());
-        self::assertSame('Parent text', $crawler->innerText());
+    /**
+     * @dataProvider provideInnerTextExamples
+     */
+    public function testInnerText(
+        string $xPathQuery,
+        string $expectedText,
+        string $expectedInnerText,
+        string $expectedInnerTextNormalizeWhitespaceFalse,
+    ) {
+        self::assertCount(1, $crawler = $this->createTestCrawler()->filterXPath($xPathQuery));
+
+        self::assertSame($expectedText, $crawler->text());
+        self::assertSame($expectedInnerText, $crawler->innerText());
+        self::assertSame($expectedInnerTextNormalizeWhitespaceFalse, $crawler->innerText(false));
     }
 
     public function testHtml()
@@ -1109,31 +1148,6 @@ HTML;
         $this->assertEquals(1, $foo->children('.ipsum')->count());
     }
 
-    /**
-     * @group legacy
-     */
-    public function testParents()
-    {
-        $this->expectDeprecation('Since symfony/dom-crawler 5.3: The Symfony\Component\DomCrawler\Crawler::parents() method is deprecated, use ancestors() instead.');
-
-        $crawler = $this->createTestCrawler()->filterXPath('//li[1]');
-        $this->assertNotSame($crawler, $crawler->parents(), '->parents() returns a new instance of a crawler');
-        $this->assertInstanceOf(Crawler::class, $crawler->parents(), '->parents() returns a new instance of a crawler');
-
-        $nodes = $crawler->parents();
-        $this->assertEquals(3, $nodes->count());
-
-        $nodes = $this->createTestCrawler()->filterXPath('//html')->parents();
-        $this->assertEquals(0, $nodes->count());
-
-        try {
-            $this->createTestCrawler()->filterXPath('//ol')->parents();
-            $this->fail('->parents() throws an \InvalidArgumentException if the node list is empty');
-        } catch (\InvalidArgumentException $e) {
-            $this->assertTrue(true, '->parents() throws an \InvalidArgumentException if the node list is empty');
-        }
-    }
-
     public function testAncestors()
     {
         $crawler = $this->createTestCrawler()->filterXPath('//li[1]');
@@ -1304,9 +1318,13 @@ HTML;
                         <div id="child2" xmlns:foo="http://example.com"></div>
                     </div>
                     <div id="sibling"><img /></div>
-                    <div id="complex-element">
-                        Parent text
-                        <span>Child text</span>
+                    <div id="complex-elements">
+                        <div class="one"> Parent text <span>Child text</span> </div>
+                        <div class="two"> <span>Child text</span> Parent text </div>
+                        <div class="three"> Parent text <span>Child text</span> Parent text </div>
+                        <div class="four">  <span>Child text</span>  </div>
+                        <div class="five"><span>Child text</span>  <span>Another child</span></div>
+                        <script class="six" type="text/javascript"> console.log("Test JavaScript content"); </script>
                     </div>
                 </body>
             </html>

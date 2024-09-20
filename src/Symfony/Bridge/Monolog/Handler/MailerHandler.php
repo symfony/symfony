@@ -15,56 +15,48 @@ use Monolog\Formatter\FormatterInterface;
 use Monolog\Formatter\HtmlFormatter;
 use Monolog\Formatter\LineFormatter;
 use Monolog\Handler\AbstractProcessingHandler;
-use Monolog\Logger;
+use Monolog\Level;
+use Monolog\LogRecord;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Email;
 
 /**
  * @author Alexander Borisov <boshurik@gmail.com>
  */
-class MailerHandler extends AbstractProcessingHandler
+final class MailerHandler extends AbstractProcessingHandler
 {
-    private $mailer;
+    private \Closure|Email $messageTemplate;
 
-    private $messageTemplate;
-
-    /**
-     * @param callable|Email $messageTemplate
-     * @param string|int     $level           The minimum logging level at which this handler will be triggered
-     */
-    public function __construct(MailerInterface $mailer, $messageTemplate, $level = Logger::DEBUG, bool $bubble = true)
-    {
+    public function __construct(
+        private MailerInterface $mailer,
+        callable|Email $messageTemplate,
+        string|int|Level $level = Level::Debug,
+        bool $bubble = true,
+    ) {
         parent::__construct($level, $bubble);
 
-        $this->mailer = $mailer;
-        $this->messageTemplate = $messageTemplate;
+        $this->messageTemplate = $messageTemplate instanceof Email ? $messageTemplate : $messageTemplate(...);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function handleBatch(array $records): void
     {
         $messages = [];
 
         foreach ($records as $record) {
-            if ($record['level'] < $this->level) {
+            if ($record->level->isLowerThan($this->level)) {
                 continue;
             }
             $messages[] = $this->processRecord($record);
         }
 
-        if (!empty($messages)) {
+        if ($messages) {
             $this->send((string) $this->getFormatter()->formatBatch($messages), $messages);
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function write(array $record): void
+    protected function write(LogRecord $record): void
     {
-        $this->send((string) $record['formatted'], [$record]);
+        $this->send((string) $record->formatted, [$record]);
     }
 
     /**
@@ -73,7 +65,7 @@ class MailerHandler extends AbstractProcessingHandler
      * @param string $content formatted email body to be sent
      * @param array  $records the array of log records that formed this content
      */
-    protected function send(string $content, array $records)
+    protected function send(string $content, array $records): void
     {
         $this->mailer->send($this->buildMessage($content, $records));
     }
@@ -96,13 +88,12 @@ class MailerHandler extends AbstractProcessingHandler
      */
     protected function buildMessage(string $content, array $records): Email
     {
-        $message = null;
         if ($this->messageTemplate instanceof Email) {
             $message = clone $this->messageTemplate;
         } elseif (\is_callable($this->messageTemplate)) {
-            $message = \call_user_func($this->messageTemplate, $content, $records);
+            $message = ($this->messageTemplate)($content, $records);
             if (!$message instanceof Email) {
-                throw new \InvalidArgumentException(sprintf('Could not resolve message from a callable. Instance of "%s" is expected.', Email::class));
+                throw new \InvalidArgumentException(\sprintf('Could not resolve message from a callable. Instance of "%s" is expected.', Email::class));
             }
         } else {
             throw new \InvalidArgumentException('Could not resolve message as instance of Email or a callable returning it.');
@@ -130,11 +121,11 @@ class MailerHandler extends AbstractProcessingHandler
         return $message;
     }
 
-    protected function getHighestRecord(array $records): array
+    protected function getHighestRecord(array $records): LogRecord
     {
         $highestRecord = null;
         foreach ($records as $record) {
-            if (null === $highestRecord || $highestRecord['level'] < $record['level']) {
+            if (null === $highestRecord || $highestRecord->level->isLowerThan($record->level)) {
                 $highestRecord = $record;
             }
         }

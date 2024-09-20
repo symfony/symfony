@@ -172,6 +172,6 @@ class TraceableMessageBusTest extends TestCase
 
         $this->expectExceptionObject($exception);
 
-        array_map([$traceableBus, 'dispatch'], [$message]);
+        array_map($traceableBus->dispatch(...), [$message]);
     }
 }

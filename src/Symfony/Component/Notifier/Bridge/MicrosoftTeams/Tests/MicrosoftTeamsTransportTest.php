@@ -21,16 +21,12 @@ use Symfony\Component\Notifier\Message\SmsMessage;
 use Symfony\Component\Notifier\Notification\Notification;
 use Symfony\Component\Notifier\Test\TransportTestCase;
 use Symfony\Component\Notifier\Tests\Transport\DummyMessage;
-use Symfony\Component\Notifier\Transport\TransportInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 
 final class MicrosoftTeamsTransportTest extends TransportTestCase
 {
-    /**
-     * @return MicrosoftTeamsTransport
-     */
-    public static function createTransport(?HttpClientInterface $client = null): TransportInterface
+    public static function createTransport(?HttpClientInterface $client = null): MicrosoftTeamsTransport
     {
         return (new MicrosoftTeamsTransport('/testPath', $client ?? new MockHttpClient()))->setHost('host.test');
     }
@@ -53,9 +49,7 @@ final class MicrosoftTeamsTransportTest extends TransportTestCase
 
     public function testSendWithErrorResponseThrows()
     {
-        $client = new MockHttpClient(function (string $method, string $url, array $options = []): ResponseInterface {
-            return new MockResponse('testErrorMessage', ['response_headers' => ['request-id' => ['testRequestId']], 'http_code' => 400]);
-        });
+        $client = new MockHttpClient(fn (string $method, string $url, array $options = []): ResponseInterface => new MockResponse('testErrorMessage', ['response_headers' => ['request-id' => ['testRequestId']], 'http_code' => 400]));
 
         $transport = self::createTransport($client);
 

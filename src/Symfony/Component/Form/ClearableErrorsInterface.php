@@ -25,5 +25,5 @@ interface ClearableErrorsInterface
      *
      * @return $this
      */
-    public function clearErrors(bool $deep = false);
+    public function clearErrors(bool $deep = false): static;
 }

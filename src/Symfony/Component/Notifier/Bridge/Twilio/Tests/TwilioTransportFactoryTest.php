@@ -13,14 +13,10 @@ namespace Symfony\Component\Notifier\Bridge\Twilio\Tests;
 
 use Symfony\Component\Notifier\Bridge\Twilio\TwilioTransportFactory;
 use Symfony\Component\Notifier\Test\TransportFactoryTestCase;
-use Symfony\Component\Notifier\Transport\TransportFactoryInterface;
 
 final class TwilioTransportFactoryTest extends TransportFactoryTestCase
 {
-    /**
-     * @return TwilioTransportFactory
-     */
-    public function createFactory(): TransportFactoryInterface
+    public function createFactory(): TwilioTransportFactory
     {
         return new TwilioTransportFactory();
     }

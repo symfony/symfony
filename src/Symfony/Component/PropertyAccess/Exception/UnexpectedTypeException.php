@@ -24,9 +24,9 @@ class UnexpectedTypeException extends RuntimeException
      * @param mixed $value     The unexpected value found while traversing property path
      * @param int   $pathIndex The property path index when the unexpected value was found
      */
-    public function __construct($value, PropertyPathInterface $path, int $pathIndex)
+    public function __construct(mixed $value, PropertyPathInterface $path, int $pathIndex)
     {
-        $message = sprintf(
+        $message = \sprintf(
             'PropertyAccessor requires a graph of objects or arrays to operate on, '.
             'but it found type "%s" while trying to traverse path "%s" at property "%s".',
             \gettype($value),

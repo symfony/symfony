@@ -27,12 +27,9 @@ class FormValidator extends ConstraintValidator
     /**
      * @var \SplObjectStorage<FormInterface, array<int, string|string[]|GroupSequence>>
      */
-    private $resolvedGroups;
+    private \SplObjectStorage $resolvedGroups;
 
-    /**
-     * {@inheritdoc}
-     */
-    public function validate($form, Constraint $formConstraint)
+    public function validate(mixed $form, Constraint $formConstraint): void
     {
         if (!$formConstraint instanceof Form) {
             throw new UnexpectedTypeException($formConstraint, Form::class);
@@ -95,7 +92,7 @@ class FormValidator extends ConstraintValidator
                             $fieldFormConstraint = new Form();
                             $fieldFormConstraint->groups = $group;
                             $this->context->setNode($this->context->getValue(), $field, $this->context->getMetadata(), $this->context->getPropertyPath());
-                            $validator->atPath(sprintf('children[%s]', $field->getName()))->validate($field, $fieldFormConstraint, $group);
+                            $validator->atPath(\sprintf('children[%s]', $field->getName()))->validate($field, $fieldFormConstraint, $group);
                         }
                     }
 
@@ -123,7 +120,7 @@ class FormValidator extends ConstraintValidator
                     // Otherwise validate a constraint only once for the first
                     // matching group
                     foreach ($groups as $group) {
-                        if (\in_array($group, $constraint->groups)) {
+                        if (\in_array($group, $constraint->groups, true)) {
                             $groupedConstraints[$group][] = $constraint;
 
                             // Prevent duplicate validation
@@ -142,7 +139,7 @@ class FormValidator extends ConstraintValidator
                     if ($field->isSubmitted()) {
                         $this->resolvedGroups[$field] = $groups;
                         $this->context->setNode($this->context->getValue(), $field, $this->context->getMetadata(), $this->context->getPropertyPath());
-                        $validator->atPath(sprintf('children[%s]', $field->getName()))->validate($field, $formConstraint);
+                        $validator->atPath(\sprintf('children[%s]', $field->getName()))->validate($field, $formConstraint);
                     }
                 }
             }
@@ -159,7 +156,7 @@ class FormValidator extends ConstraintValidator
                 if (!$child->isSynchronized()) {
                     $childrenSynchronized = false;
                     $this->context->setNode($this->context->getValue(), $child, $this->context->getMetadata(), $this->context->getPropertyPath());
-                    $validator->atPath(sprintf('children[%s]', $child->getName()))->validate($child, $formConstraint);
+                    $validator->atPath(\sprintf('children[%s]', $child->getName()))->validate($child, $formConstraint);
                 }
             }
 
@@ -208,7 +205,7 @@ class FormValidator extends ConstraintValidator
      *
      * @return string|GroupSequence|array<string|GroupSequence>
      */
-    private function getValidationGroups(FormInterface $form)
+    private function getValidationGroups(FormInterface $form): string|GroupSequence|array
     {
         // Determine the clicked button of the complete form tree
         $clickedButton = null;
@@ -249,7 +246,7 @@ class FormValidator extends ConstraintValidator
      *
      * @return GroupSequence|array<string|GroupSequence>
      */
-    private static function resolveValidationGroups($groups, FormInterface $form)
+    private static function resolveValidationGroups(string|GroupSequence|array|callable $groups, FormInterface $form): GroupSequence|array
     {
         if (!\is_string($groups) && \is_callable($groups)) {
             $groups = $groups($form);
@@ -262,7 +259,7 @@ class FormValidator extends ConstraintValidator
         return (array) $groups;
     }
 
-    private static function getConstraintsInGroups($constraints, $group)
+    private static function getConstraintsInGroups(array $constraints, string|array $group): array
     {
         $groups = (array) $group;
 

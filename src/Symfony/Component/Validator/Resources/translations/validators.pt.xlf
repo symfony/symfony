@@ -88,7 +88,7 @@
             </trans-unit>
             <trans-unit id="22">
                 <source>This value should not be blank.</source>
-                <target>Este valor não deveria ser branco/vazio.</target>
+                <target>Este valor não deveria ser vazio.</target>
             </trans-unit>
             <trans-unit id="23">
                 <source>This value should not be null.</source>
@@ -108,7 +108,7 @@
             </trans-unit>
             <trans-unit id="27">
                 <source>This value is not a valid URL.</source>
-                <target>Este valor não é um URL válido.</target>
+                <target>Este valor não é uma URL válida.</target>
             </trans-unit>
             <trans-unit id="31">
                 <source>The two values should be equal.</source>
@@ -120,11 +120,11 @@
             </trans-unit>
             <trans-unit id="33">
                 <source>The file is too large.</source>
-                <target>O ficheiro é muito grande.</target>
+                <target>O arquivo é muito grande.</target>
             </trans-unit>
             <trans-unit id="34">
                 <source>The file could not be uploaded.</source>
-                <target>Não foi possível carregar o ficheiro.</target>
+                <target>Não foi possível enviar o arquivo.</target>
             </trans-unit>
             <trans-unit id="35">
                 <source>This value should be a valid number.</source>
@@ -132,7 +132,7 @@
             </trans-unit>
             <trans-unit id="36">
                 <source>This file is not a valid image.</source>
-                <target>Este ficheiro não é uma imagem.</target>
+                <target>Este arquivo não é uma imagem.</target>
             </trans-unit>
             <trans-unit id="37" resname="This is not a valid IP address.">
                 <source>This value is not a valid IP address.</source>
@@ -144,11 +144,11 @@
             </trans-unit>
             <trans-unit id="39">
                 <source>This value is not a valid locale.</source>
-                <target>Este valor não é um 'locale' válido.</target>
+                <target>Este valor não é uma localidade válida.</target>
             </trans-unit>
             <trans-unit id="40">
                 <source>This value is not a valid country.</source>
-                <target>Este valor não é um País válido.</target>
+                <target>Este valor não é um país válido.</target>
             </trans-unit>
             <trans-unit id="41">
                 <source>This value is already used.</source>
@@ -156,7 +156,7 @@
             </trans-unit>
             <trans-unit id="42">
                 <source>The size of the image could not be detected.</source>
-                <target>O tamanho da imagem não foi detetado.</target>
+                <target>O tamanho da imagem não foi detectado.</target>
             </trans-unit>
             <trans-unit id="43">
                 <source>The image width is too big ({{ width }}px). Allowed maximum width is {{ max_width }}px.</source>
@@ -164,7 +164,7 @@
             </trans-unit>
             <trans-unit id="44">
                 <source>The image width is too small ({{ width }}px). Minimum width expected is {{ min_width }}px.</source>
-                <target>A largura da imagem ({{ width }}px) é muito pequena. A largura miníma da imagem é de: {{ min_width }}px.</target>
+                <target>A largura da imagem ({{ width }}px) é muito pequena. A largura mínima da imagem é de: {{ min_width }}px.</target>
             </trans-unit>
             <trans-unit id="45">
                 <source>The image height is too big ({{ height }}px). Allowed maximum height is {{ max_height }}px.</source>
@@ -172,7 +172,7 @@
             </trans-unit>
             <trans-unit id="46">
                 <source>The image height is too small ({{ height }}px). Minimum height expected is {{ min_height }}px.</source>
-                <target>A altura da imagem ({{ height }}px) é muito pequena. A altura miníma da imagem é de: {{ min_height }}px.</target>
+                <target>A altura da imagem ({{ height }}px) é muito pequena. A altura mínima da imagem é de: {{ min_height }}px.</target>
             </trans-unit>
             <trans-unit id="47">
                 <source>This value should be the user's current password.</source>
@@ -180,7 +180,7 @@
             </trans-unit>
             <trans-unit id="48">
                 <source>This value should have exactly {{ limit }} character.|This value should have exactly {{ limit }} characters.</source>
-                <target>Este valor deve possuir exatamente {{ limit }} caracteres.</target>
+                <target>Este valor deve possuir exatamente {{ limit }} caractere.|Este valor deve possuir exatamente {{ limit }} caracteres.</target>
             </trans-unit>
             <trans-unit id="49">
                 <source>The file was only partially uploaded.</source>
@@ -308,7 +308,7 @@
             </trans-unit>
             <trans-unit id="80">
                 <source>This value does not match the expected {{ charset }} charset.</source>
-                <target>O valor não corresponde ao conjunto de caracteres {{ charset }} esperado.</target>
+                <target>Este valor não corresponde ao conjunto de caracteres {{ charset }} esperado.</target>
             </trans-unit>
             <trans-unit id="81" resname="This is not a valid Business Identifier Code (BIC).">
                 <source>This value is not a valid Business Identifier Code (BIC).</source>
@@ -340,7 +340,7 @@
             </trans-unit>
             <trans-unit id="88">
                 <source>This value should be positive.</source>
-                <target>Este valor deve ser estritamente positivo.</target>
+                <target>Este valor deve ser positivo.</target>
             </trans-unit>
             <trans-unit id="89">
                 <source>This value should be either positive or zero.</source>
@@ -348,7 +348,7 @@
             </trans-unit>
             <trans-unit id="90">
                 <source>This value should be negative.</source>
-                <target>Este valor deve ser estritamente negativo.</target>
+                <target>Este valor deve ser negativo.</target>
             </trans-unit>
             <trans-unit id="91">
                 <source>This value should be either negative or zero.</source>
@@ -360,11 +360,11 @@
             </trans-unit>
             <trans-unit id="93">
                 <source>This password has been leaked in a data breach, it must not be used. Please use another password.</source>
-                <target>Esta senha foi divulgada durante uma fuga de dados, não deve ser usada de novamente. Por favor usar uma senha outra.</target>
+                <target>Esta senha foi divulgada durante um vazamento de dados, não deve ser usada de novamente. Por favor usar uma senha outra.</target>
             </trans-unit>
             <trans-unit id="94">
                 <source>This value should be between {{ min }} and {{ max }}.</source>
-                <target>Este valor deve situar-se entre {{ min }} e {{ max }}.</target>
+                <target>Este valor deve estar entre {{ min }} e {{ max }}.</target>
             </trans-unit>
             <trans-unit id="95">
                 <source>This value is not a valid hostname.</source>
@@ -376,7 +376,7 @@
             </trans-unit>
             <trans-unit id="97">
                 <source>This value should satisfy at least one of the following constraints:</source>
-                <target>Este valor deve satisfazer pelo menos uma das seguintes restrições :</target>
+                <target>Este valor deve satisfazer pelo menos uma das seguintes restrições:</target>
             </trans-unit>
             <trans-unit id="98">
                 <source>Each element of this collection should satisfy its own set of constraints.</source>
@@ -428,11 +428,11 @@
             </trans-unit>
             <trans-unit id="110">
                 <source>The extension of the file is invalid ({{ extension }}). Allowed extensions are {{ extensions }}.</source>
-                <target>A extensão do ficheiro é inválida ({{ extension }}). As extensões permitidas são {{ extensions }}.</target>
+                <target>A extensão do arquivo é inválida ({{ extension }}). As extensões permitidas são {{ extensions }}.</target>
             </trans-unit>
             <trans-unit id="111">
                 <source>The detected character encoding is invalid ({{ detected }}). Allowed encodings are {{ encodings }}.</source>
-                <target>A codificação de carateres detetada é inválida ({{ detected }}). As codificações permitidas são {{ encodings }}.</target>
+                <target>A codificação de carateres detectada é inválida ({{ detected }}). As codificações permitidas são {{ encodings }}.</target>
             </trans-unit>
             <trans-unit id="112">
                 <source>This value is not a valid MAC address.</source>
@@ -440,7 +440,31 @@
             </trans-unit>
             <trans-unit id="113">
                 <source>This URL is missing a top-level domain.</source>
-                <target state="needs-review-translation">Esta URL está faltando um domínio de topo.</target>
+                <target>Esta URL está faltando o domínio de nível superior.</target>
+            </trans-unit>
+            <trans-unit id="114">
+                <source>This value is too short. It should contain at least one word.|This value is too short. It should contain at least {{ min }} words.</source>
+                <target state="needs-translation">This value is too short. It should contain at least one word.|This value is too short. It should contain at least {{ min }} words.</target>
+            </trans-unit>
+            <trans-unit id="115">
+                <source>This value is too long. It should contain one word.|This value is too long. It should contain {{ max }} words or less.</source>
+                <target state="needs-translation">This value is too long. It should contain one word.|This value is too long. It should contain {{ max }} words or less.</target>
+            </trans-unit>
+            <trans-unit id="116">
+                <source>This value does not represent a valid week in the ISO 8601 format.</source>
+                <target state="needs-translation">This value does not represent a valid week in the ISO 8601 format.</target>
+            </trans-unit>
+            <trans-unit id="117">
+                <source>This value is not a valid week.</source>
+                <target state="needs-translation">This value is not a valid week.</target>
+            </trans-unit>
+            <trans-unit id="118">
+                <source>This value should not be before week "{{ min }}".</source>
+                <target state="needs-translation">This value should not be before week "{{ min }}".</target>
+            </trans-unit>
+            <trans-unit id="119">
+                <source>This value should not be after week "{{ max }}".</source>
+                <target state="needs-translation">This value should not be after week "{{ max }}".</target>
             </trans-unit>
         </body>
     </file>

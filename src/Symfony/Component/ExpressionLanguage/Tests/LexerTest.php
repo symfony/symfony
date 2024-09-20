@@ -19,10 +19,7 @@ use Symfony\Component\ExpressionLanguage\TokenStream;
 
 class LexerTest extends TestCase
 {
-    /**
-     * @var Lexer
-     */
-    private $lexer;
+    private Lexer $lexer;
 
     protected function setUp(): void
     {
@@ -100,8 +97,11 @@ class LexerTest extends TestCase
                     new Token('punctuation', ']', 27),
                     new Token('operator', '-', 29),
                     new Token('number', 1990, 31),
+                    new Token('operator', '+', 39),
+                    new Token('operator', '~', 41),
+                    new Token('name', 'qux', 42),
                 ],
-                '(3 + 5) ~ foo("bar").baz[4] - 1.99E+3',
+                '(3 + 5) ~ foo("bar").baz[4] - 1.99E+3 + ~qux',
             ],
             [
                 [new Token('operator', '..', 1)],
@@ -134,6 +134,53 @@ class LexerTest extends TestCase
                     new Token('punctuation', ']', 16),
                 ],
                 'foo.not in [bar]',
+            ],
+            [
+                [new Token('number', 0.787, 1)],
+                '0.787',
+            ],
+            [
+                [new Token('number', 0.1234, 1)],
+                '.1234',
+            ],
+            [
+                [new Token('number', 188165.1178, 1)],
+                '188_165.1_178',
+            ],
+            [
+                [
+                    new Token('operator', '-', 1),
+                    new Token('number', 7189000000.0, 2),
+                ],
+                '-.7_189e+10',
+            ],
+            [
+                [
+                    new Token('number', 65536, 1),
+                ],
+                '65536 /* this is 2^16 */',
+            ],
+            [
+                [
+                    new Token('number', 2, 1),
+                    new Token('operator', '*', 21),
+                    new Token('number', 4, 23),
+                ],
+                '2 /* /* comment1 */ * 4',
+            ],
+            [
+                [
+                    new Token('string', '/* this is', 1),
+                    new Token('operator', '~', 14),
+                    new Token('string', 'not a comment */', 16),
+                ],
+                '"/* this is" ~ "not a comment */"',
+            ],
+            [
+                [
+                    new Token('string', '/* this is not a comment */', 1),
+                ],
+                '"/* this is not a comment */"',
             ],
         ];
     }

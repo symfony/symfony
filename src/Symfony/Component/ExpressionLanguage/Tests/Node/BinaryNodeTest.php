@@ -35,6 +35,8 @@ class BinaryNodeTest extends AbstractNodeTestCase
             [0, new BinaryNode('&', new ConstantNode(2), new ConstantNode(4))],
             [6, new BinaryNode('|', new ConstantNode(2), new ConstantNode(4))],
             [6, new BinaryNode('^', new ConstantNode(2), new ConstantNode(4))],
+            [32, new BinaryNode('<<', new ConstantNode(2), new ConstantNode(4))],
+            [2, new BinaryNode('>>', new ConstantNode(32), new ConstantNode(4))],
 
             [true, new BinaryNode('<', new ConstantNode(1), new ConstantNode(2))],
             [true, new BinaryNode('<=', new ConstantNode(1), new ConstantNode(2))],
@@ -65,6 +67,10 @@ class BinaryNodeTest extends AbstractNodeTestCase
 
             [[1, 2, 3], new BinaryNode('..', new ConstantNode(1), new ConstantNode(3))],
 
+            [true, new BinaryNode('starts with', new ConstantNode('abc'), new ConstantNode('a'))],
+            [false, new BinaryNode('starts with', new ConstantNode('abc'), new ConstantNode('b'))],
+            [true, new BinaryNode('ends with', new ConstantNode('abc'), new ConstantNode('c'))],
+            [false, new BinaryNode('ends with', new ConstantNode('abc'), new ConstantNode('b'))],
             [1, new BinaryNode('matches', new ConstantNode('abc'), new ConstantNode('/^[a-z]+$/'))],
             [0, new BinaryNode('matches', new ConstantNode(''), new ConstantNode('/^[a-z]+$/'))],
             [0, new BinaryNode('matches', new ConstantNode(null), new ConstantNode('/^[a-z]+$/'))],
@@ -86,6 +92,8 @@ class BinaryNodeTest extends AbstractNodeTestCase
             ['(2 & 4)', new BinaryNode('&', new ConstantNode(2), new ConstantNode(4))],
             ['(2 | 4)', new BinaryNode('|', new ConstantNode(2), new ConstantNode(4))],
             ['(2 ^ 4)', new BinaryNode('^', new ConstantNode(2), new ConstantNode(4))],
+            ['(2 << 4)', new BinaryNode('<<', new ConstantNode(2), new ConstantNode(4))],
+            ['(32 >> 4)', new BinaryNode('>>', new ConstantNode(32), new ConstantNode(4))],
 
             ['(1 < 2)', new BinaryNode('<', new ConstantNode(1), new ConstantNode(2))],
             ['(1 <= 2)', new BinaryNode('<=', new ConstantNode(1), new ConstantNode(2))],
@@ -109,14 +117,17 @@ class BinaryNodeTest extends AbstractNodeTestCase
             ['pow(5, 2)', new BinaryNode('**', new ConstantNode(5), new ConstantNode(2))],
             ['("a" . "b")', new BinaryNode('~', new ConstantNode('a'), new ConstantNode('b'))],
 
-            ['in_array("a", [0 => "a", 1 => "b"])', new BinaryNode('in', new ConstantNode('a'), $array)],
-            ['in_array("c", [0 => "a", 1 => "b"])', new BinaryNode('in', new ConstantNode('c'), $array)],
-            ['!in_array("c", [0 => "a", 1 => "b"])', new BinaryNode('not in', new ConstantNode('c'), $array)],
-            ['!in_array("a", [0 => "a", 1 => "b"])', new BinaryNode('not in', new ConstantNode('a'), $array)],
+            ['\in_array("a", [0 => "a", 1 => "b"], true)', new BinaryNode('in', new ConstantNode('a'), $array)],
+            ['\in_array("c", [0 => "a", 1 => "b"], true)', new BinaryNode('in', new ConstantNode('c'), $array)],
+            ['!\in_array("c", [0 => "a", 1 => "b"], true)', new BinaryNode('not in', new ConstantNode('c'), $array)],
+            ['!\in_array("a", [0 => "a", 1 => "b"], true)', new BinaryNode('not in', new ConstantNode('a'), $array)],
 
             ['range(1, 3)', new BinaryNode('..', new ConstantNode(1), new ConstantNode(3))],
 
-            ['(static function ($regexp, $str) { set_error_handler(function ($t, $m) use ($regexp, $str) { throw new \Symfony\Component\ExpressionLanguage\SyntaxError(sprintf(\'Regexp "%s" passed to "matches" is not valid\', $regexp).substr($m, 12)); }); try { return preg_match($regexp, (string) $str); } finally { restore_error_handler(); } })("/^[a-z]+\$/", "abc")', new BinaryNode('matches', new ConstantNode('abc'), new ConstantNode('/^[a-z]+$/'))],
+            ['(static function ($regexp, $str) { set_error_handler(static fn ($t, $m) => throw new \Symfony\Component\ExpressionLanguage\SyntaxError(sprintf(\'Regexp "%s" passed to "matches" is not valid\', $regexp).substr($m, 12))); try { return preg_match($regexp, (string) $str); } finally { restore_error_handler(); } })("/^[a-z]+\$/", "abc")', new BinaryNode('matches', new ConstantNode('abc'), new ConstantNode('/^[a-z]+$/'))],
+
+            ['str_starts_with("abc", "a")', new BinaryNode('starts with', new ConstantNode('abc'), new ConstantNode('a'))],
+            ['str_ends_with("abc", "a")', new BinaryNode('ends with', new ConstantNode('abc'), new ConstantNode('a'))],
         ];
     }
 
@@ -135,6 +146,8 @@ class BinaryNodeTest extends AbstractNodeTestCase
             ['(2 & 4)', new BinaryNode('&', new ConstantNode(2), new ConstantNode(4))],
             ['(2 | 4)', new BinaryNode('|', new ConstantNode(2), new ConstantNode(4))],
             ['(2 ^ 4)', new BinaryNode('^', new ConstantNode(2), new ConstantNode(4))],
+            ['(2 << 4)', new BinaryNode('<<', new ConstantNode(2), new ConstantNode(4))],
+            ['(32 >> 4)', new BinaryNode('>>', new ConstantNode(32), new ConstantNode(4))],
 
             ['(1 < 2)', new BinaryNode('<', new ConstantNode(1), new ConstantNode(2))],
             ['(1 <= 2)', new BinaryNode('<=', new ConstantNode(1), new ConstantNode(2))],
@@ -206,5 +219,40 @@ class BinaryNodeTest extends AbstractNodeTestCase
         $compiler = new Compiler([]);
         $node->compile($compiler);
         eval('$regexp = "this is not a regexp"; '.$compiler->getSource().';');
+    }
+
+    public function testDivisionByZero()
+    {
+        $node = new BinaryNode('/', new ConstantNode(1), new ConstantNode(0));
+
+        $this->expectException(\DivisionByZeroError::class);
+        $this->expectExceptionMessage('Division by zero.');
+
+        $node->evaluate([], []);
+    }
+
+    public function testModuloByZero()
+    {
+        $node = new BinaryNode('%', new ConstantNode(1), new ConstantNode(0));
+
+        $this->expectException(\DivisionByZeroError::class);
+        $this->expectExceptionMessage('Modulo by zero.');
+
+        $node->evaluate([], []);
+    }
+
+    /**
+     * @testWith [1]
+     *           ["true"]
+     */
+    public function testInOperatorStrictness(mixed $value)
+    {
+        $array = new ArrayNode();
+        $array->addElement(new ConstantNode('1'));
+        $array->addElement(new ConstantNode(true));
+
+        $node = new BinaryNode('in', new ConstantNode($value), $array);
+
+        $this->assertFalse($node->evaluate([], []));
     }
 }

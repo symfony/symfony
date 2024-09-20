@@ -14,34 +14,30 @@ namespace Symfony\Component\HttpKernel\Controller\ArgumentResolver;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\Controller\ArgumentValueResolverInterface;
+use Symfony\Component\HttpKernel\Controller\ValueResolverInterface;
 use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
+use Symfony\Component\HttpKernel\Exception\NearMissValueResolverException;
 
 /**
  * Yields a service keyed by _controller and argument name.
  *
  * @author Nicolas Grekas <p@tchwork.com>
  */
-final class ServiceValueResolver implements ArgumentValueResolverInterface
+final class ServiceValueResolver implements ValueResolverInterface
 {
-    private $container;
-
-    public function __construct(ContainerInterface $container)
-    {
-        $this->container = $container;
+    public function __construct(
+        private ContainerInterface $container,
+    ) {
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function supports(Request $request, ArgumentMetadata $argument): bool
+    public function resolve(Request $request, ArgumentMetadata $argument): array
     {
         $controller = $request->attributes->get('_controller');
 
         if (\is_array($controller) && \is_callable($controller, true) && \is_string($controller[0])) {
             $controller = $controller[0].'::'.$controller[1];
         } elseif (!\is_string($controller) || '' === $controller) {
-            return false;
+            return [];
         }
 
         if ('\\' === $controller[0]) {
@@ -52,42 +48,23 @@ final class ServiceValueResolver implements ArgumentValueResolverInterface
             $controller = substr($controller, 0, $i).strtolower(substr($controller, $i));
         }
 
-        return $this->container->has($controller) && $this->container->get($controller)->has($argument->getName());
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function resolve(Request $request, ArgumentMetadata $argument): iterable
-    {
-        if (\is_array($controller = $request->attributes->get('_controller'))) {
-            $controller = $controller[0].'::'.$controller[1];
-        }
-
-        if ('\\' === $controller[0]) {
-            $controller = ltrim($controller, '\\');
-        }
-
-        if (!$this->container->has($controller)) {
-            $i = strrpos($controller, ':');
-            $controller = substr($controller, 0, $i).strtolower(substr($controller, $i));
+        if (!$this->container->has($controller) || !$this->container->get($controller)->has($argument->getName())) {
+            return [];
         }
 
         try {
-            yield $this->container->get($controller)->get($argument->getName());
+            return [$this->container->get($controller)->get($argument->getName())];
         } catch (RuntimeException $e) {
-            $what = sprintf('argument $%s of "%s()"', $argument->getName(), $controller);
-            $message = preg_replace('/service "\.service_locator\.[^"]++"/', $what, $e->getMessage());
+            $what = 'argument $'.$argument->getName();
+            $message = str_replace(\sprintf('service "%s"', $argument->getName()), $what, $e->getMessage());
+            $what .= \sprintf(' of "%s()"', $controller);
+            $message = preg_replace('/service "\.service_locator\.[^"]++"/', $what, $message);
 
             if ($e->getMessage() === $message) {
-                $message = sprintf('Cannot resolve %s: %s', $what, $message);
+                $message = \sprintf('Cannot resolve %s: %s', $what, $message);
             }
 
-            $r = new \ReflectionProperty($e, 'message');
-            $r->setAccessible(true);
-            $r->setValue($e, $message);
-
-            throw $e;
+            throw new NearMissValueResolverException($message, $e->getCode(), $e);
         }
     }
 }

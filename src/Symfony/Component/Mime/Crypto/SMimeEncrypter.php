@@ -19,21 +19,21 @@ use Symfony\Component\Mime\Message;
  */
 final class SMimeEncrypter extends SMime
 {
-    private $certs;
-    private $cipher;
+    private string|array $certs;
+    private int $cipher;
 
     /**
      * @param string|string[] $certificate The path (or array of paths) of the file(s) containing the X.509 certificate(s)
      * @param int|null        $cipher      A set of algorithms used to encrypt the message. Must be one of these PHP constants: https://www.php.net/manual/en/openssl.ciphers.php
      */
-    public function __construct($certificate, ?int $cipher = null)
+    public function __construct(string|array $certificate, ?int $cipher = null)
     {
         if (!\extension_loaded('openssl')) {
             throw new \LogicException('PHP extension "openssl" is required to use SMime.');
         }
 
         if (\is_array($certificate)) {
-            $this->certs = array_map([$this, 'normalizeFilePath'], $certificate);
+            $this->certs = array_map($this->normalizeFilePath(...), $certificate);
         } else {
             $this->certs = $this->normalizeFilePath($certificate);
         }
@@ -49,7 +49,7 @@ final class SMimeEncrypter extends SMime
         $this->iteratorToFile($message->toIterable(), $bufferFile);
 
         if (!@openssl_pkcs7_encrypt(stream_get_meta_data($bufferFile)['uri'], stream_get_meta_data($outputFile)['uri'], $this->certs, [], 0, $this->cipher)) {
-            throw new RuntimeException(sprintf('Failed to encrypt S/Mime message. Error: "%s".', openssl_error_string()));
+            throw new RuntimeException(\sprintf('Failed to encrypt S/Mime message. Error: "%s".', openssl_error_string()));
         }
 
         $mimePart = $this->convertMessageToSMimePart($outputFile, 'application', 'pkcs7-mime');

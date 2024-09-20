@@ -20,31 +20,22 @@ use Symfony\Component\Notifier\Message\MessageOptionsInterface;
  */
 final class ExpoOptions implements MessageOptionsInterface
 {
-    private $to;
-
     /**
-     * @see https://docs.expo.dev/push-notifications/sending-notifications/#message-request-format
+     * @param array $options @see https://docs.expo.dev/push-notifications/sending-notifications/#message-request-format
      */
-    protected $options;
-
-    private $data;
-
-    public function __construct(string $to, array $options = [], array $data = [])
-    {
-        $this->to = $to;
-        $this->options = $options;
-        $this->data = $data;
+    public function __construct(
+        private string $to,
+        private array $options = [],
+        private array $data = [],
+    ) {
     }
 
     public function toArray(): array
     {
-        return array_merge(
-            $this->options,
-            [
-                'to' => $this->to,
-                'data' => $this->data,
-            ]
-        );
+        return array_merge($this->options, [
+            'to' => $this->to,
+            'data' => $this->data,
+        ]);
     }
 
     public function getRecipientId(): ?string
@@ -55,7 +46,7 @@ final class ExpoOptions implements MessageOptionsInterface
     /**
      * @return $this
      */
-    public function title(string $title): self
+    public function title(string $title): static
     {
         $this->options['title'] = $title;
 
@@ -65,7 +56,7 @@ final class ExpoOptions implements MessageOptionsInterface
     /**
      * @return $this
      */
-    public function subtitle(string $subtitle): self
+    public function subtitle(string $subtitle): static
     {
         $this->options['subtitle'] = $subtitle;
 
@@ -75,7 +66,7 @@ final class ExpoOptions implements MessageOptionsInterface
     /**
      * @return $this
      */
-    public function priority(string $priority): self
+    public function priority(string $priority): static
     {
         $this->options['priority'] = $priority;
 
@@ -85,7 +76,7 @@ final class ExpoOptions implements MessageOptionsInterface
     /**
      * @return $this
      */
-    public function sound(string $sound): self
+    public function sound(string $sound): static
     {
         $this->options['sound'] = $sound;
 
@@ -95,7 +86,7 @@ final class ExpoOptions implements MessageOptionsInterface
     /**
      * @return $this
      */
-    public function badge(int $badge): self
+    public function badge(int $badge): static
     {
         $this->options['badge'] = $badge;
 
@@ -105,7 +96,7 @@ final class ExpoOptions implements MessageOptionsInterface
     /**
      * @return $this
      */
-    public function channelId(string $channelId): self
+    public function channelId(string $channelId): static
     {
         $this->options['channelId'] = $channelId;
 
@@ -115,7 +106,7 @@ final class ExpoOptions implements MessageOptionsInterface
     /**
      * @return $this
      */
-    public function categoryId(string $categoryId): self
+    public function categoryId(string $categoryId): static
     {
         $this->options['categoryId'] = $categoryId;
 
@@ -125,7 +116,7 @@ final class ExpoOptions implements MessageOptionsInterface
     /**
      * @return $this
      */
-    public function mutableContent(bool $mutableContent): self
+    public function mutableContent(bool $mutableContent): static
     {
         $this->options['mutableContent'] = $mutableContent;
 
@@ -135,7 +126,7 @@ final class ExpoOptions implements MessageOptionsInterface
     /**
      * @return $this
      */
-    public function body(string $body): self
+    public function body(string $body): static
     {
         $this->options['body'] = $body;
 
@@ -145,7 +136,7 @@ final class ExpoOptions implements MessageOptionsInterface
     /**
      * @return $this
      */
-    public function ttl(int $ttl): self
+    public function ttl(int $ttl): static
     {
         $this->options['ttl'] = $ttl;
 
@@ -155,7 +146,7 @@ final class ExpoOptions implements MessageOptionsInterface
     /**
      * @return $this
      */
-    public function expiration(int $expiration): self
+    public function expiration(int $expiration): static
     {
         $this->options['expiration'] = $expiration;
 
@@ -165,7 +156,7 @@ final class ExpoOptions implements MessageOptionsInterface
     /**
      * @return $this
      */
-    public function data(array $data): self
+    public function data(array $data): static
     {
         $this->data = $data;
 

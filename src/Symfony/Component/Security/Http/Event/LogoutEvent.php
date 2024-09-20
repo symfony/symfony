@@ -21,14 +21,12 @@ use Symfony\Contracts\EventDispatcher\Event;
  */
 class LogoutEvent extends Event
 {
-    private $request;
-    private $response;
-    private $token;
+    private ?Response $response = null;
 
-    public function __construct(Request $request, ?TokenInterface $token)
-    {
-        $this->request = $request;
-        $this->token = $token;
+    public function __construct(
+        private Request $request,
+        private ?TokenInterface $token,
+    ) {
     }
 
     public function getRequest(): Request

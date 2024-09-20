@@ -19,21 +19,14 @@ use Symfony\Component\Form\FormInterface;
  */
 class MappingRule
 {
-    private $origin;
-    private $propertyPath;
-    private $targetPath;
-
-    public function __construct(FormInterface $origin, string $propertyPath, string $targetPath)
-    {
-        $this->origin = $origin;
-        $this->propertyPath = $propertyPath;
-        $this->targetPath = $targetPath;
+    public function __construct(
+        private FormInterface $origin,
+        private string $propertyPath,
+        private string $targetPath,
+    ) {
     }
 
-    /**
-     * @return FormInterface
-     */
-    public function getOrigin()
+    public function getOrigin(): FormInterface
     {
         return $this->origin;
     }
@@ -43,20 +36,16 @@ class MappingRule
      *
      * If the rule matches, the form mapped by the rule is returned.
      * Otherwise this method returns false.
-     *
-     * @return FormInterface|null
      */
-    public function match(string $propertyPath)
+    public function match(string $propertyPath): ?FormInterface
     {
         return $propertyPath === $this->propertyPath ? $this->getTarget() : null;
     }
 
     /**
      * Matches a property path against a prefix of the rule path.
-     *
-     * @return bool
      */
-    public function isPrefix(string $propertyPath)
+    public function isPrefix(string $propertyPath): bool
     {
         $length = \strlen($propertyPath);
         $prefix = substr($this->propertyPath, 0, $length);
@@ -66,18 +55,16 @@ class MappingRule
     }
 
     /**
-     * @return FormInterface
-     *
      * @throws ErrorMappingException
      */
-    public function getTarget()
+    public function getTarget(): FormInterface
     {
         $childNames = explode('.', $this->targetPath);
         $target = $this->origin;
 
         foreach ($childNames as $childName) {
             if (!$target->has($childName)) {
-                throw new ErrorMappingException(sprintf('The child "%s" of "%s" mapped by the rule "%s" in "%s" does not exist.', $childName, $target->getName(), $this->targetPath, $this->origin->getName()));
+                throw new ErrorMappingException(\sprintf('The child "%s" of "%s" mapped by the rule "%s" in "%s" does not exist.', $childName, $target->getName(), $this->targetPath, $this->origin->getName()));
             }
             $target = $target->get($childName);
         }

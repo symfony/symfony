@@ -21,35 +21,17 @@ use Symfony\Component\RateLimiter\LimiterStateInterface;
  */
 final class SlidingWindow implements LimiterStateInterface
 {
-    private $id;
+    private int $hitCount = 0;
+    private int $hitCountForLastWindow = 0;
+    private float $windowEndAt;
 
-    /**
-     * @var int
-     */
-    private $hitCount = 0;
-
-    /**
-     * @var int
-     */
-    private $hitCountForLastWindow = 0;
-
-    /**
-     * @var int how long a time frame is
-     */
-    private $intervalInSeconds;
-
-    /**
-     * @var float the unix timestamp when the current window ends
-     */
-    private $windowEndAt;
-
-    public function __construct(string $id, int $intervalInSeconds)
-    {
+    public function __construct(
+        private string $id,
+        private int $intervalInSeconds,
+    ) {
         if ($intervalInSeconds < 1) {
-            throw new InvalidIntervalException(sprintf('The interval must be positive integer, "%d" given.', $intervalInSeconds));
+            throw new InvalidIntervalException(\sprintf('The interval must be positive integer, "%d" given.', $intervalInSeconds));
         }
-        $this->id = $id;
-        $this->intervalInSeconds = $intervalInSeconds;
         $this->windowEndAt = microtime(true) + $intervalInSeconds;
     }
 
@@ -84,7 +66,7 @@ final class SlidingWindow implements LimiterStateInterface
         return microtime(true) > $this->windowEndAt;
     }
 
-    public function add(int $hits = 1)
+    public function add(int $hits = 1): void
     {
         $this->hitCount += $hits;
     }
@@ -100,9 +82,26 @@ final class SlidingWindow implements LimiterStateInterface
         return (int) floor($this->hitCountForLastWindow * (1 - $percentOfCurrentTimeFrame) + $this->hitCount);
     }
 
-    public function getRetryAfter(): \DateTimeImmutable
+    public function calculateTimeForTokens(int $maxSize, int $tokens): float
     {
-        return \DateTimeImmutable::createFromFormat('U.u', sprintf('%.6F', $this->windowEndAt));
+        $remaining = $maxSize - $this->getHitCount();
+        if ($remaining >= $tokens) {
+            return 0;
+        }
+
+        $time = microtime(true);
+        $startOfWindow = $this->windowEndAt - $this->intervalInSeconds;
+        $timePassed = $time - $startOfWindow;
+        $windowPassed = min($timePassed / $this->intervalInSeconds, 1);
+        $releasable = max(1, $maxSize - floor($this->hitCountForLastWindow * (1 - $windowPassed)));
+        $remainingWindow = $this->intervalInSeconds - $timePassed;
+        $needed = $tokens - $remaining;
+
+        if ($releasable >= $needed) {
+            return $needed * ($remainingWindow / max(1, $releasable));
+        }
+
+        return ($this->windowEndAt - $time) + ($needed - $releasable) * ($this->intervalInSeconds / $maxSize);
     }
 
     public function __serialize(): array

@@ -13,51 +13,30 @@ namespace Symfony\Bridge\Monolog\Handler;
 
 use Monolog\Formatter\FormatterInterface;
 use Monolog\Handler\AbstractProcessingHandler;
-use Monolog\Handler\FormattableHandlerTrait;
-use Monolog\Logger;
+use Monolog\Level;
+use Monolog\LogRecord;
 use Symfony\Bridge\Monolog\Formatter\VarDumperFormatter;
-
-if (trait_exists(FormattableHandlerTrait::class)) {
-    class ServerLogHandler extends AbstractProcessingHandler
-    {
-        use ServerLogHandlerTrait;
-
-        /**
-         * {@inheritdoc}
-         */
-        protected function getDefaultFormatter(): FormatterInterface
-        {
-            return new VarDumperFormatter();
-        }
-    }
-} else {
-    class ServerLogHandler extends AbstractProcessingHandler
-    {
-        use ServerLogHandlerTrait;
-
-        /**
-         * {@inheritdoc}
-         */
-        protected function getDefaultFormatter()
-        {
-            return new VarDumperFormatter();
-        }
-    }
-}
 
 /**
  * @author Grégoire Pineau <lyrixx@lyrixx.info>
+ *
+ * @internal
  */
-trait ServerLogHandlerTrait
+final class ServerLogHandler extends AbstractProcessingHandler
 {
-    private $host;
-    private $context;
-    private $socket;
+    private string $host;
 
     /**
-     * @param string|int $level The minimum logging level at which this handler will be triggered
+     * @var resource
      */
-    public function __construct(string $host, $level = Logger::DEBUG, bool $bubble = true, array $context = [])
+    private $context;
+
+    /**
+     * @var resource|null
+     */
+    private $socket;
+
+    public function __construct(string $host, string|int|Level $level = Level::Debug, bool $bubble = true, array $context = [])
     {
         parent::__construct($level, $bubble);
 
@@ -69,16 +48,13 @@ trait ServerLogHandlerTrait
         $this->context = stream_context_create($context);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function handle(array $record): bool
+    public function handle(LogRecord $record): bool
     {
         if (!$this->isHandling($record)) {
             return false;
         }
 
-        set_error_handler(self::class.'::nullErrorHandler');
+        set_error_handler(static fn () => null);
 
         try {
             if (!$this->socket = $this->socket ?: $this->createSocket()) {
@@ -91,11 +67,11 @@ trait ServerLogHandlerTrait
         return parent::handle($record);
     }
 
-    protected function write(array $record): void
+    protected function write(LogRecord $record): void
     {
         $recordFormatted = $this->formatRecord($record);
 
-        set_error_handler(self::class.'::nullErrorHandler');
+        set_error_handler(static fn () => null);
 
         try {
             if (-1 === stream_socket_sendto($this->socket, $recordFormatted)) {
@@ -111,18 +87,14 @@ trait ServerLogHandlerTrait
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function getDefaultFormatter(): FormatterInterface
     {
         return new VarDumperFormatter();
     }
 
-    private static function nullErrorHandler()
-    {
-    }
-
+    /**
+     * @return resource
+     */
     private function createSocket()
     {
         $socket = stream_socket_client($this->host, $errno, $errstr, 0, \STREAM_CLIENT_CONNECT | \STREAM_CLIENT_ASYNC_CONNECT | \STREAM_CLIENT_PERSISTENT, $this->context);
@@ -134,13 +106,13 @@ trait ServerLogHandlerTrait
         return $socket;
     }
 
-    private function formatRecord(array $record): string
+    private function formatRecord(LogRecord $record): string
     {
-        $recordFormatted = $record['formatted'];
+        $recordFormatted = $record->formatted;
 
         foreach (['log_uuid', 'uuid', 'uid'] as $key) {
-            if (isset($record['extra'][$key])) {
-                $recordFormatted['log_id'] = $record['extra'][$key];
+            if (isset($record->extra[$key])) {
+                $recordFormatted['log_id'] = $record->extra[$key];
                 break;
             }
         }

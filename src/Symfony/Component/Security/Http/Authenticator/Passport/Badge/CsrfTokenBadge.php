@@ -24,19 +24,17 @@ use Symfony\Component\Security\Http\EventListener\CsrfProtectionListener;
  */
 class CsrfTokenBadge implements BadgeInterface
 {
-    private $resolved = false;
-    private $csrfTokenId;
-    private $csrfToken;
+    private bool $resolved = false;
 
     /**
      * @param string      $csrfTokenId An arbitrary string used to generate the value of the CSRF token.
      *                                 Using a different string for each authenticator improves its security.
      * @param string|null $csrfToken   The CSRF token presented in the request, if any
      */
-    public function __construct(string $csrfTokenId, ?string $csrfToken)
-    {
-        $this->csrfTokenId = $csrfTokenId;
-        $this->csrfToken = $csrfToken;
+    public function __construct(
+        private string $csrfTokenId,
+        #[\SensitiveParameter] private ?string $csrfToken,
+    ) {
     }
 
     public function getCsrfTokenId(): string

@@ -13,6 +13,7 @@ namespace Symfony\Bundle\FrameworkBundle\Command;
 
 use Psr\Container\ContainerInterface;
 use Symfony\Bundle\FrameworkBundle\Console\Helper\DescriptorHelper;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Completion\CompletionInput;
 use Symfony\Component\Console\Completion\CompletionSuggestions;
@@ -31,34 +32,26 @@ use Symfony\Contracts\Service\ServiceProviderInterface;
  *
  * @final
  */
+#[AsCommand(name: 'debug:event-dispatcher', description: 'Display configured listeners for an application')]
 class EventDispatcherDebugCommand extends Command
 {
     private const DEFAULT_DISPATCHER = 'event_dispatcher';
 
-    protected static $defaultName = 'debug:event-dispatcher';
-    protected static $defaultDescription = 'Display configured listeners for an application';
-    private $dispatchers;
-
-    public function __construct(ContainerInterface $dispatchers)
-    {
+    public function __construct(
+        private ContainerInterface $dispatchers,
+    ) {
         parent::__construct();
-
-        $this->dispatchers = $dispatchers;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function configure()
+    protected function configure(): void
     {
         $this
             ->setDefinition([
                 new InputArgument('event', InputArgument::OPTIONAL, 'An event name or a part of the event name'),
                 new InputOption('dispatcher', null, InputOption::VALUE_REQUIRED, 'To view events of a specific event dispatcher', self::DEFAULT_DISPATCHER),
-                new InputOption('format', null, InputOption::VALUE_REQUIRED, 'The output format  (txt, xml, json, or md)', 'txt'),
+                new InputOption('format', null, InputOption::VALUE_REQUIRED, \sprintf('The output format ("%s")', implode('", "', $this->getAvailableFormatOptions())), 'txt'),
                 new InputOption('raw', null, InputOption::VALUE_NONE, 'To output raw description'),
             ])
-            ->setDescription(self::$defaultDescription)
             ->setHelp(<<<'EOF'
 The <info>%command.name%</info> command displays all configured listeners:
 
@@ -67,14 +60,16 @@ The <info>%command.name%</info> command displays all configured listeners:
 To get specific listeners for an event, specify its name:
 
   <info>php %command.full_name% kernel.request</info>
+
+The <info>--format</info> option specifies the format of the command output:
+
+  <info>php %command.full_name% --format=json</info>
 EOF
             )
         ;
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @throws \LogicException
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -84,7 +79,7 @@ EOF
         $options = [];
         $dispatcherServiceName = $input->getOption('dispatcher');
         if (!$this->dispatchers->has($dispatcherServiceName)) {
-            $io->getErrorStyle()->error(sprintf('Event dispatcher "%s" is not available.', $dispatcherServiceName));
+            $io->getErrorStyle()->error(\sprintf('Event dispatcher "%s" is not available.', $dispatcherServiceName));
 
             return 1;
         }
@@ -98,7 +93,7 @@ EOF
                 // if there is no direct match, try find partial matches
                 $events = $this->searchForEvent($dispatcher, $event);
                 if (0 === \count($events)) {
-                    $io->getErrorStyle()->warning(sprintf('The event "%s" does not have any registered listeners.', $event));
+                    $io->getErrorStyle()->warning(\sprintf('The event "%s" does not have any registered listeners.', $event));
 
                     return 0;
                 } elseif (1 === \count($events)) {
@@ -144,7 +139,7 @@ EOF
         }
 
         if ($input->mustSuggestOptionValuesFor('format')) {
-            $suggestions->suggestValues((new DescriptorHelper())->getFormats());
+            $suggestions->suggestValues($this->getAvailableFormatOptions());
         }
     }
 
@@ -160,5 +155,11 @@ EOF
         }
 
         return $output;
+    }
+
+    /** @return string[] */
+    private function getAvailableFormatOptions(): array
+    {
+        return (new DescriptorHelper())->getFormats();
     }
 }

@@ -21,8 +21,7 @@ use Symfony\Component\VarDumper\Dumper\ContextProvider\ContextProviderInterface;
  */
 class Connection
 {
-    private $host;
-    private $contextProviders;
+    private string $host;
 
     /**
      * @var resource|null
@@ -33,14 +32,15 @@ class Connection
      * @param string                     $host             The server host
      * @param ContextProviderInterface[] $contextProviders Context providers indexed by context name
      */
-    public function __construct(string $host, array $contextProviders = [])
-    {
+    public function __construct(
+        string $host,
+        private array $contextProviders = [],
+    ) {
         if (!str_contains($host, '://')) {
             $host = 'tcp://'.$host;
         }
 
         $this->host = $host;
-        $this->contextProviders = $contextProviders;
     }
 
     public function getContextProviders(): array
@@ -62,7 +62,7 @@ class Connection
         $context = array_filter($context);
         $encodedPayload = base64_encode(serialize([$data, $context]))."\n";
 
-        set_error_handler([self::class, 'nullErrorHandler']);
+        set_error_handler(static fn () => null);
         try {
             if (-1 !== stream_socket_sendto($this->socket, $encodedPayload)) {
                 return true;
@@ -82,16 +82,14 @@ class Connection
         return false;
     }
 
-    private static function nullErrorHandler(int $t, string $m)
-    {
-        // no-op
-    }
-
+    /**
+     * @return resource|null
+     */
     private function createSocket()
     {
-        set_error_handler([self::class, 'nullErrorHandler']);
+        set_error_handler(static fn () => null);
         try {
-            return stream_socket_client($this->host, $errno, $errstr, 3);
+            return stream_socket_client($this->host, $errno, $errstr, 3) ?: null;
         } finally {
             restore_error_handler();
         }

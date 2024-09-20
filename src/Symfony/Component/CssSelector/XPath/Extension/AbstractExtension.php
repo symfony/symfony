@@ -23,41 +23,26 @@ namespace Symfony\Component\CssSelector\XPath\Extension;
  */
 abstract class AbstractExtension implements ExtensionInterface
 {
-    /**
-     * {@inheritdoc}
-     */
     public function getNodeTranslators(): array
     {
         return [];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getCombinationTranslators(): array
     {
         return [];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getFunctionTranslators(): array
     {
         return [];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getPseudoClassTranslators(): array
     {
         return [];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getAttributeMatchingTranslators(): array
     {
         return [];

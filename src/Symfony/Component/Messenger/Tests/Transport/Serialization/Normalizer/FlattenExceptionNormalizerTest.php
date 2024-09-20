@@ -21,10 +21,7 @@ use Symfony\Component\Messenger\Transport\Serialization\Serializer;
  */
 class FlattenExceptionNormalizerTest extends TestCase
 {
-    /**
-     * @var FlattenExceptionNormalizer
-     */
-    private $normalizer;
+    private FlattenExceptionNormalizer $normalizer;
 
     protected function setUp(): void
     {

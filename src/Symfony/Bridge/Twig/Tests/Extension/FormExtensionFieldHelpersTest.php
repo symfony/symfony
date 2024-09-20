@@ -22,22 +22,11 @@ use Symfony\Component\Form\Test\FormIntegrationTestCase;
 
 class FormExtensionFieldHelpersTest extends FormIntegrationTestCase
 {
-    /**
-     * @var FormExtension
-     */
-    private $rawExtension;
+    private FormExtension $rawExtension;
+    private FormExtension $translatorExtension;
+    private FormView $view;
 
-    /**
-     * @var FormExtension
-     */
-    private $translatorExtension;
-
-    /**
-     * @var FormView
-     */
-    private $view;
-
-    protected function getTypes()
+    protected function getTypes(): array
     {
         return [new TextType(), new ChoiceType()];
     }

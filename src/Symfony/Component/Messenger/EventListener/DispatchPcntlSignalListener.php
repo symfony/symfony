@@ -21,10 +21,14 @@ class DispatchPcntlSignalListener implements EventSubscriberInterface
 {
     public function onWorkerRunning(): void
     {
+        if (!\function_exists('pcntl_signal_dispatch')) {
+            return;
+        }
+
         pcntl_signal_dispatch();
     }
 
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         if (!\function_exists('pcntl_signal_dispatch')) {
             return [];

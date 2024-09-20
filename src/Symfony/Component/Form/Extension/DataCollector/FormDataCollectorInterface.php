@@ -26,27 +26,27 @@ interface FormDataCollectorInterface extends DataCollectorInterface
     /**
      * Stores configuration data of the given form and its children.
      */
-    public function collectConfiguration(FormInterface $form);
+    public function collectConfiguration(FormInterface $form): void;
 
     /**
      * Stores the default data of the given form and its children.
      */
-    public function collectDefaultData(FormInterface $form);
+    public function collectDefaultData(FormInterface $form): void;
 
     /**
      * Stores the submitted data of the given form and its children.
      */
-    public function collectSubmittedData(FormInterface $form);
+    public function collectSubmittedData(FormInterface $form): void;
 
     /**
      * Stores the view variables of the given form view and its children.
      */
-    public function collectViewVariables(FormView $view);
+    public function collectViewVariables(FormView $view): void;
 
     /**
      * Specifies that the given objects represent the same conceptual form.
      */
-    public function associateFormWithView(FormInterface $form, FormView $view);
+    public function associateFormWithView(FormInterface $form, FormView $view): void;
 
     /**
      * Assembles the data collected about the given form and its children as
@@ -54,7 +54,7 @@ interface FormDataCollectorInterface extends DataCollectorInterface
      *
      * The result can be queried using {@link getData()}.
      */
-    public function buildPreliminaryFormTree(FormInterface $form);
+    public function buildPreliminaryFormTree(FormInterface $form): void;
 
     /**
      * Assembles the data collected about the given form and its children as
@@ -74,12 +74,10 @@ interface FormDataCollectorInterface extends DataCollectorInterface
      * corresponding {@link FormInterface} exists otherwise, call
      * {@link associateFormWithView()} before calling this method.
      */
-    public function buildFinalFormTree(FormInterface $form, FormView $view);
+    public function buildFinalFormTree(FormInterface $form, FormView $view): void;
 
     /**
      * Returns all collected data.
-     *
-     * @return array|Data
      */
-    public function getData();
+    public function getData(): array|Data;
 }

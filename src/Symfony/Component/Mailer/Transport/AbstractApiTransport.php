@@ -31,16 +31,17 @@ abstract class AbstractApiTransport extends AbstractHttpTransport
         try {
             $email = MessageConverter::toEmail($message->getOriginalMessage());
         } catch (\Exception $e) {
-            throw new RuntimeException(sprintf('Unable to send message with the "%s" transport: ', __CLASS__).$e->getMessage(), 0, $e);
+            throw new RuntimeException(\sprintf('Unable to send message with the "%s" transport: ', __CLASS__).$e->getMessage(), 0, $e);
         }
 
         return $this->doSendApi($message, $email, $message->getEnvelope());
     }
 
+    /**
+     * @return Address[]
+     */
     protected function getRecipients(Email $email, Envelope $envelope): array
     {
-        return array_filter($envelope->getRecipients(), function (Address $address) use ($email) {
-            return false === \in_array($address, array_merge($email->getCc(), $email->getBcc()), true);
-        });
+        return array_filter($envelope->getRecipients(), fn (Address $address) => false === \in_array($address, array_merge($email->getCc(), $email->getBcc()), true));
     }
 }

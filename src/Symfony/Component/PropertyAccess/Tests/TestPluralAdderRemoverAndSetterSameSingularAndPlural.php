@@ -13,7 +13,7 @@ namespace Symfony\Component\PropertyAccess\Tests;
 
 class TestPluralAdderRemoverAndSetterSameSingularAndPlural
 {
-    private $aircraft = [];
+    private array $aircraft = [];
 
     public function getAircraft()
     {

@@ -1,0 +1,249 @@
+{% extends '@WebProfiler/Profiler/layout.html.twig' %}
+
+{% block menu %}
+    <span class="label">
+        <span class="icon">{{ source('@WebProfiler/Icon/command.svg') }}</span>
+        <strong>Console Command</strong>
+    </span>
+{% endblock %}
+
+{% block panel %}
+    <h2>
+        {% set command = collector.command %}
+        <a href="{{ command.file|file_link(command.line) }}">
+            {% if command.executor is defined %}
+                {{ command.executor|abbr_method }}
+            {% else %}
+                {{ command.class|abbr_class }}
+            {% endif %}
+        </a>
+    </h2>
+
+    <div class="sf-tabs">
+        <div class="tab">
+            <h3 class="tab-title">Command</h3>
+
+            <div class="tab-content">
+                <div class="metrics">
+                    <div class="metric">
+                        <span class="value">{{ collector.duration }}</span>
+                        <span class="label">Duration</span>
+                    </div>
+
+                    <div class="metric">
+                        <span class="value">{{ collector.maxMemoryUsage }}</span>
+                        <span class="label">Peak Memory Usage</span>
+                    </div>
+
+                    <div class="metric">
+                        <span class="value">{{ collector.verbosityLevel }}</span>
+                        <span class="label">Verbosity Level</span>
+                    </div>
+                </div>
+
+                <div class="metrics">
+                    <div class="metric">
+                        <span class="value">{{ source('@WebProfiler/Icon/' ~ (collector.signalable is not empty ? 'yes' : 'no') ~ '.svg') }}</span>
+                        <span class="label">Signalable</span>
+                    </div>
+
+                    <div class="metric">
+                        <span class="value">{{ source('@WebProfiler/Icon/' ~ (collector.interactive ? 'yes' : 'no') ~ '.svg') }}</span>
+                        <span class="label">Interactive</span>
+                    </div>
+
+                    <div class="metric">
+                        <span class="value">{{ source('@WebProfiler/Icon/' ~ (collector.validateInput ? 'yes' : 'no') ~ '.svg') }}</span>
+                        <span class="label">Validate Input</span>
+                    </div>
+
+                    <div class="metric">
+                        <span class="value">{{ source('@WebProfiler/Icon/' ~ (collector.enabled ? 'yes' : 'no') ~ '.svg') }}</span>
+                        <span class="label">Enabled</span>
+                    </div>
+
+                    <div class="metric">
+                        <span class="value">{{ source('@WebProfiler/Icon/' ~ (collector.visible ? 'yes' : 'no') ~ '.svg') }}</span>
+                        <span class="label">Visible</span>
+                    </div>
+                </div>
+
+                <h3>Arguments</h3>
+
+                {% if collector.arguments is empty %}
+                    <div class="empty">
+                        <p>No arguments were set</p>
+                    </div>
+                {% else %}
+                    {{ include('@WebProfiler/Profiler/table.html.twig', { data: collector.arguments, labels: ['Argument', 'Value'], maxDepth: 2 }, with_context=false) }}
+                {% endif %}
+
+                <h3>Options</h3>
+
+                {% if collector.options is empty %}
+                    <div class="empty">
+                        <p>No options were set</p>
+                    </div>
+                {% else %}
+                    {{ include('@WebProfiler/Profiler/table.html.twig', { data: collector.options, labels: ['Option', 'Value'], maxDepth: 2 }, with_context=false) }}
+                {% endif %}
+
+                {% if collector.interactive %}
+                    <h3>Interactive Inputs</h3>
+
+                    <p class="help">
+                        The values which have been set interactively.
+                    </p>
+
+                    {% if collector.interactiveInputs is empty %}
+                        <div class="empty">
+                            <p>No inputs were set</p>
+                        </div>
+                    {% else %}
+                        {{ include('@WebProfiler/Profiler/table.html.twig', { data: collector.interactiveInputs, labels: ['Input', 'Value'], maxDepth: 2 }, with_context=false) }}
+                    {% endif %}
+                {% endif %}
+
+                <h3>Application inputs</h3>
+
+                {% if collector.applicationInputs is empty %}
+                    <div class="empty">
+                        <p>No application inputs are set</p>
+                    </div>
+                {% else %}
+                    {{ include('@WebProfiler/Profiler/table.html.twig', { data: collector.applicationInputs, labels: ['Input', 'Value'], maxDepth: 2 }, with_context=false) }}
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="tab">
+            <h3 class="tab-title">Input / Output</h3>
+
+            <div class="tab-content">
+                <table>
+                    <tr>
+                        <td class="font-normal">Input</td>
+                        <td class="font-normal">{{ profiler_dump(collector.input) }}</td>
+                    </tr>
+                    <tr>
+                        <td class="font-normal">Output</td>
+                        <td class="font-normal">{{ profiler_dump(collector.output) }}</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        <div class="tab">
+            <h3 class="tab-title">Helper Set</h3>
+
+            <div class="tab-content">
+                {% if collector.helperSet is empty %}
+                    <div class="empty">
+                        <p>No helpers</p>
+                    </div>
+                {% else %}
+                    <table class="{{ class|default('') }}">
+                        <thead>
+                        <tr>
+                            <th scope="col">Helpers</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for helper in collector.helperSet|sort %}
+                            <tr>
+                                <td>{{ profiler_dump(helper) }}</td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="tab">
+            {% set request_collector = profile.collectors.request %}
+            <h3 class="tab-title">Server Parameters</h3>
+            <div class="tab-content">
+                <h3>Server Parameters</h3>
+                <h4>Defined in .env</h4>
+                {{ include('@WebProfiler/Profiler/bag.html.twig', { bag: request_collector.dotenvvars }, with_context = false) }}
+
+                <h4>Defined as regular env variables</h4>
+                {% set requestserver = [] %}
+                {% for key, value in request_collector.requestserver|filter((_, key) => key not in request_collector.dotenvvars.keys) %}
+                    {% set requestserver = requestserver|merge({(key): value}) %}
+                {% endfor %}
+                {{ include('@WebProfiler/Profiler/table.html.twig', { data: requestserver }, with_context = false) }}
+            </div>
+        </div>
+
+        {% if collector.signalable is not empty %}
+            <div class="tab">
+                <h3 class="tab-title">Signals</h3>
+
+                <div class="tab-content">
+                    <h3>Subscribed signals</h3>
+                    {{ collector.signalable|join(', ') }}
+
+                    <h3>Handled signals</h3>
+                    {% if collector.handledSignals is empty %}
+                        <div class="empty">
+                            <p>No signals handled</p>
+                        </div>
+                    {% else %}
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Signal</th>
+                                    <th>Times handled</th>
+                                    <th>Total execution time</th>
+                                    <th>Memory peak</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for signal, data in collector.handledSignals %}
+                                    <tr>
+                                        <td>{{ signal }}</td>
+                                        <td>{{ data.handled }}</td>
+                                        <td>{{ data.duration }} ms</td>
+                                        <td>{{ data.memory }} MiB</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    {% endif %}
+                </div>
+            </div>
+        {% endif %}
+
+        {% if profile.parent %}
+            <div class="tab">
+                <h3 class="tab-title">Parent Command</h3>
+
+                <div class="tab-content">
+                    <h3>
+                        <a href="{{ path('_profiler', { token: profile.parent.token }) }}">Return to parent command</a>
+                        <small>(token = {{ profile.parent.token }})</small>
+                    </h3>
+
+                    {{ profile.parent.url }}
+                </div>
+            </div>
+        {% endif %}
+
+        {% if profile.children|length %}
+            <div class="tab">
+                <h3 class="tab-title">Sub Commands <span class="badge">{{ profile.children|length }}</span></h3>
+
+                <div class="tab-content">
+                    {% for child in profile.children %}
+                        <h3>
+                            {{ child.url }}
+                            <small>(token = <a href="{{ path('_profiler', { token: child.token }) }}">{{ child.token }}</a>)</small>
+                        </h3>
+                    {% endfor %}
+                </div>
+            </div>
+        {% endif %}
+    </div>
+{% endblock %}

@@ -1,6 +1,22 @@
 CHANGELOG
 =========
 
+7.2
+---
+
+ * Add `SlackButtonBlockElement` to add button as accessory to a section block
+ * Add `emoji` and `verbatim` options to `text` and `field` methods in `SlackSectionBlock`
+
+6.3
+---
+
+ * Allow to update Slack messages
+
+6.0
+---
+
+ * Remove `SlackOptions::channel()`, use `SlackOptions::recipient()` instead
+
 5.3
 ---
 

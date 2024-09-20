@@ -27,14 +27,12 @@ class ZookeeperStore implements PersistingStoreInterface
 {
     use ExpiringStoreTrait;
 
-    private $zookeeper;
-
-    public function __construct(\Zookeeper $zookeeper)
-    {
-        $this->zookeeper = $zookeeper;
+    public function __construct(
+        private \Zookeeper $zookeeper,
+    ) {
     }
 
-    public static function createConnection(string $dsn): \Zookeeper
+    public static function createConnection(#[\SensitiveParameter] string $dsn): \Zookeeper
     {
         if (!str_starts_with($dsn, 'zookeeper:')) {
             throw new InvalidArgumentException('Unsupported DSN for Zookeeper.');
@@ -45,17 +43,18 @@ class ZookeeperStore implements PersistingStoreInterface
         }
 
         $host = $params['host'] ?? '';
-        if (isset($params['port'])) {
-            $host .= ':'.$params['port'];
+        $hosts = explode(',', $host);
+
+        foreach ($hosts as $index => $host) {
+            if (isset($params['port'])) {
+                $hosts[$index] = $host.':'.$params['port'];
+            }
         }
 
-        return new \Zookeeper($host);
+        return new \Zookeeper(implode(',', $hosts));
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function save(Key $key)
+    public function save(Key $key): void
     {
         if ($this->exists($key)) {
             return;
@@ -70,10 +69,7 @@ class ZookeeperStore implements PersistingStoreInterface
         $this->checkNotExpired($key);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function delete(Key $key)
+    public function delete(Key $key): void
     {
         if (!$this->exists($key)) {
             return;
@@ -88,23 +84,17 @@ class ZookeeperStore implements PersistingStoreInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function exists(Key $key): bool
     {
         $resource = $this->getKeyResource($key);
         try {
             return $this->zookeeper->get($resource) === $this->getUniqueToken($key);
-        } catch (\ZookeeperException $ex) {
+        } catch (\ZookeeperException) {
             return false;
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function putOffExpiration(Key $key, float $ttl)
+    public function putOffExpiration(Key $key, float $ttl): void
     {
         // do nothing, zookeeper locks forever.
     }
@@ -118,7 +108,7 @@ class ZookeeperStore implements PersistingStoreInterface
      * @throws LockConflictedException
      * @throws LockAcquiringException
      */
-    private function createNewLock(string $node, string $value)
+    private function createNewLock(string $node, string $value): void
     {
         // Default Node Permissions
         $acl = [['perms' => \Zookeeper::PERM_ALL, 'scheme' => 'world', 'id' => 'anyone']];

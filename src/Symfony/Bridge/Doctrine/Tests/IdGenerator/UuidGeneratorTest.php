@@ -19,9 +19,6 @@ use Symfony\Component\Uid\Uuid;
 use Symfony\Component\Uid\UuidV4;
 use Symfony\Component\Uid\UuidV6;
 
-/**
- * @requires function \Symfony\Component\Uid\Factory\UuidFactory::create
- */
 class UuidGeneratorTest extends TestCase
 {
     public function testUuidCanBeGenerated()

@@ -31,6 +31,7 @@ use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
 use Symfony\Component\Serializer\Mapping\Loader\LoaderChain;
 use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter;
 use Symfony\Component\Serializer\NameConverter\MetadataAwareNameConverter;
+use Symfony\Component\Serializer\NameConverter\SnakeCaseToCamelCaseNameConverter;
 use Symfony\Component\Serializer\Normalizer\ArrayDenormalizer;
 use Symfony\Component\Serializer\Normalizer\BackedEnumNormalizer;
 use Symfony\Component\Serializer\Normalizer\ConstraintViolationListNormalizer;
@@ -46,6 +47,7 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\Serializer\Normalizer\ProblemNormalizer;
 use Symfony\Component\Serializer\Normalizer\PropertyNormalizer;
+use Symfony\Component\Serializer\Normalizer\TranslatableNormalizer;
 use Symfony\Component\Serializer\Normalizer\UidNormalizer;
 use Symfony\Component\Serializer\Normalizer\UnwrappingDenormalizer;
 use Symfony\Component\Serializer\Serializer;
@@ -58,9 +60,7 @@ return static function (ContainerConfigurator $container) {
 
     $container->services()
         ->set('serializer', Serializer::class)
-            ->public()
             ->args([[], []])
-            ->tag('container.private', ['package' => 'symfony/framework-bundle', 'version' => '5.2'])
 
         ->alias(SerializerInterface::class, 'serializer')
         ->alias(NormalizerInterface::class, 'serializer')
@@ -80,42 +80,46 @@ return static function (ContainerConfigurator $container) {
         ->set('serializer.normalizer.constraint_violation_list', ConstraintViolationListNormalizer::class)
             ->args([1 => service('serializer.name_converter.metadata_aware')])
             ->autowire(true)
-            ->tag('serializer.normalizer', ['priority' => -915])
+            ->tag('serializer.normalizer', ['built_in' => true, 'priority' => -915])
 
         ->set('serializer.normalizer.mime_message', MimeMessageNormalizer::class)
             ->args([service('serializer.normalizer.property')])
-            ->tag('serializer.normalizer', ['priority' => -915])
+            ->tag('serializer.normalizer', ['built_in' => true, 'priority' => -915])
 
         ->set('serializer.normalizer.datetimezone', DateTimeZoneNormalizer::class)
-            ->tag('serializer.normalizer', ['priority' => -915])
+            ->tag('serializer.normalizer', ['built_in' => true, 'priority' => -915])
 
         ->set('serializer.normalizer.dateinterval', DateIntervalNormalizer::class)
-            ->tag('serializer.normalizer', ['priority' => -915])
+            ->tag('serializer.normalizer', ['built_in' => true, 'priority' => -915])
 
         ->set('serializer.normalizer.data_uri', DataUriNormalizer::class)
             ->args([service('mime_types')->nullOnInvalid()])
-            ->tag('serializer.normalizer', ['priority' => -920])
+            ->tag('serializer.normalizer', ['built_in' => true, 'priority' => -920])
 
         ->set('serializer.normalizer.datetime', DateTimeNormalizer::class)
-            ->tag('serializer.normalizer', ['priority' => -910])
+            ->tag('serializer.normalizer', ['built_in' => true, 'priority' => -910])
 
         ->set('serializer.normalizer.json_serializable', JsonSerializableNormalizer::class)
             ->args([null, null])
-            ->tag('serializer.normalizer', ['priority' => -950])
+            ->tag('serializer.normalizer', ['built_in' => true, 'priority' => -950])
 
         ->set('serializer.normalizer.problem', ProblemNormalizer::class)
-            ->args([param('kernel.debug')])
-            ->tag('serializer.normalizer', ['priority' => -890])
+            ->args([param('kernel.debug'), '$translator' => service('translator')->nullOnInvalid()])
+            ->tag('serializer.normalizer', ['built_in' => true, 'priority' => -890])
 
         ->set('serializer.denormalizer.unwrapping', UnwrappingDenormalizer::class)
             ->args([service('serializer.property_accessor')])
-            ->tag('serializer.normalizer', ['priority' => 1000])
+            ->tag('serializer.normalizer', ['built_in' => true, 'priority' => 1000])
 
         ->set('serializer.normalizer.uid', UidNormalizer::class)
-            ->tag('serializer.normalizer', ['priority' => -890])
+            ->tag('serializer.normalizer', ['built_in' => true, 'priority' => -890])
+
+        ->set('serializer.normalizer.translatable', TranslatableNormalizer::class)
+            ->args(['$translator' => service('translator')])
+            ->tag('serializer.normalizer', ['built_in' => true, 'priority' => -920])
 
         ->set('serializer.normalizer.form_error', FormErrorNormalizer::class)
-            ->tag('serializer.normalizer', ['priority' => -915])
+            ->tag('serializer.normalizer', ['built_in' => true, 'priority' => -915])
 
         ->set('serializer.normalizer.object', ObjectNormalizer::class)
             ->args([
@@ -128,9 +132,7 @@ return static function (ContainerConfigurator $container) {
                 null,
                 service('property_info')->ignoreOnInvalid(),
             ])
-            ->tag('serializer.normalizer', ['priority' => -1000])
-
-        ->alias(ObjectNormalizer::class, 'serializer.normalizer.object')
+            ->tag('serializer.normalizer', ['built_in' => true, 'priority' => -1000])
 
         ->set('serializer.normalizer.property', PropertyNormalizer::class)
             ->args([
@@ -139,13 +141,10 @@ return static function (ContainerConfigurator $container) {
                 service('property_info')->ignoreOnInvalid(),
                 service('serializer.mapping.class_discriminator_resolver')->ignoreOnInvalid(),
                 null,
-                [],
             ])
 
-        ->alias(PropertyNormalizer::class, 'serializer.normalizer.property')
-
         ->set('serializer.denormalizer.array', ArrayDenormalizer::class)
-            ->tag('serializer.normalizer', ['priority' => -990])
+            ->tag('serializer.normalizer', ['built_in' => true, 'priority' => -990])
 
         // Loader
         ->set('serializer.mapping.chain_loader', LoaderChain::class)
@@ -175,24 +174,29 @@ return static function (ContainerConfigurator $container) {
 
         // Encoders
         ->set('serializer.encoder.xml', XmlEncoder::class)
-            ->tag('serializer.encoder')
+            ->tag('serializer.encoder', ['built_in' => true])
 
         ->set('serializer.encoder.json', JsonEncoder::class)
             ->args([null, null])
-            ->tag('serializer.encoder')
+            ->tag('serializer.encoder', ['built_in' => true])
 
         ->set('serializer.encoder.yaml', YamlEncoder::class)
             ->args([null, null])
-            ->tag('serializer.encoder')
+            ->tag('serializer.encoder', ['built_in' => true])
 
         ->set('serializer.encoder.csv', CsvEncoder::class)
-            ->tag('serializer.encoder')
+            ->tag('serializer.encoder', ['built_in' => true])
 
-        // Name converter
+        // Name converters
         ->set('serializer.name_converter.camel_case_to_snake_case', CamelCaseToSnakeCaseNameConverter::class)
+        ->set('serializer.name_converter.snake_case_to_camel_case', SnakeCaseToCamelCaseNameConverter::class)
 
-        ->set('serializer.name_converter.metadata_aware', MetadataAwareNameConverter::class)
+        ->set('serializer.name_converter.metadata_aware.abstract', MetadataAwareNameConverter::class)
+            ->abstract()
             ->args([service('serializer.mapping.class_metadata_factory')])
+
+        ->set('serializer.name_converter.metadata_aware')
+            ->parent('serializer.name_converter.metadata_aware.abstract')
 
         // PropertyInfo extractor
         ->set('property_info.serializer_extractor', SerializerExtractor::class)
@@ -214,12 +218,8 @@ return static function (ContainerConfigurator $container) {
                     ->factory([HtmlErrorRenderer::class, 'isDebug'])
                     ->args([service('request_stack'), param('kernel.debug')]),
             ])
-    ;
 
-    if (interface_exists(\BackedEnum::class)) {
-        $container->services()
-            ->set('serializer.normalizer.backed_enum', BackedEnumNormalizer::class)
-            ->tag('serializer.normalizer', ['priority' => -915])
-        ;
-    }
+        ->set('serializer.normalizer.backed_enum', BackedEnumNormalizer::class)
+            ->tag('serializer.normalizer', ['built_in' => true, 'priority' => -915])
+    ;
 };

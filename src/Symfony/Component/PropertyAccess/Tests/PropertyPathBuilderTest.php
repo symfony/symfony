@@ -22,10 +22,7 @@ class PropertyPathBuilderTest extends TestCase
 {
     private const PREFIX = 'old1[old2].old3[old4][old5].old6';
 
-    /**
-     * @var PropertyPathBuilder
-     */
-    private $builder;
+    private PropertyPathBuilder $builder;
 
     protected function setUp(): void
     {
@@ -188,7 +185,7 @@ class PropertyPathBuilderTest extends TestCase
     /**
      * @dataProvider provideInvalidOffsets
      */
-    public function testReplaceDoesNotAllowInvalidOffsets($offset)
+    public function testReplaceDoesNotAllowInvalidOffsets(int $offset)
     {
         $this->expectException(\OutOfBoundsException::class);
         $this->builder->replace($offset, 1, new PropertyPath('new1[new2].new3'));

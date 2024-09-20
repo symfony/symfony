@@ -8,8 +8,6 @@ class ArrayChoiceLoader extends CallbackChoiceLoader
 {
     public function __construct(array $choices = [])
     {
-        parent::__construct(static function () use ($choices): array {
-            return $choices;
-        });
+        parent::__construct(static fn (): array => $choices);
     }
 }

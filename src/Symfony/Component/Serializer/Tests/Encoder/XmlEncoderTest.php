@@ -29,12 +29,8 @@ use Symfony\Component\Serializer\Tests\Fixtures\ScalarDummy;
 
 class XmlEncoderTest extends TestCase
 {
-    /**
-     * @var XmlEncoder
-     */
-    private $encoder;
-
-    private $exampleDateTimeString = '2017-02-19T15:16:08+0300';
+    private XmlEncoder $encoder;
+    private string $exampleDateTimeString = '2017-02-19T15:16:08+0300';
 
     protected function setUp(): void
     {
@@ -43,46 +39,39 @@ class XmlEncoderTest extends TestCase
         $this->encoder->setSerializer($serializer);
     }
 
-    public function testEncodeScalar()
+    /**
+     * @dataProvider validEncodeProvider
+     */
+    public function testEncode(string $expected, mixed $data, array $context = [])
+    {
+        $this->assertSame($expected, $this->encoder->encode($data, 'xml', $context));
+    }
+
+    /**
+     * @return iterable<array{0: string, 1: mixed, 2?: array}>
+     */
+    public static function validEncodeProvider(): iterable
     {
         $obj = new ScalarDummy();
         $obj->xmlFoo = 'foo';
 
-        $expected = '<?xml version="1.0"?>'."\n".
-            '<response>foo</response>'."\n";
+        yield 'encode scalar' => [
+            '<?xml version="1.0"?>'."\n"
+            .'<response>foo</response>'."\n",
+            $obj,
+        ];
 
-        $this->assertEquals($expected, $this->encoder->encode($obj, 'xml'));
-    }
+        yield 'encode array object' => [
+            '<?xml version="1.0"?>'."\n"
+            .'<response><foo>bar</foo></response>'."\n",
+            new \ArrayObject(['foo' => 'bar']),
+        ];
 
-    public function testEncodeArrayObject()
-    {
-        $obj = new \ArrayObject(['foo' => 'bar']);
+        yield 'encode empty array object' => [
+            '<?xml version="1.0"?>'."\n".'<response/>'."\n",
+            new \ArrayObject(),
+        ];
 
-        $expected = '<?xml version="1.0"?>'."\n".
-            '<response><foo>bar</foo></response>'."\n";
-
-        $this->assertEquals($expected, $this->encoder->encode($obj, 'xml'));
-    }
-
-    public function testEncodeEmptyArrayObject()
-    {
-        $obj = new \ArrayObject();
-
-        $expected = '<?xml version="1.0"?>'."\n".
-            '<response/>'."\n";
-
-        $this->assertEquals($expected, $this->encoder->encode($obj, 'xml'));
-    }
-
-    public function testDocTypeIsNotAllowed()
-    {
-        $this->expectException(UnexpectedValueException::class);
-        $this->expectExceptionMessage('Document types are not allowed.');
-        $this->encoder->decode('<?xml version="1.0"?><!DOCTYPE foo><foo></foo>', 'foo');
-    }
-
-    public function testAttributes()
-    {
         $obj = new ScalarDummy();
         $obj->xmlFoo = [
             'foo-bar' => [
@@ -104,7 +93,9 @@ class XmlEncoderTest extends TestCase
                 '@sring' => 'a',
             ],
         ];
-        $expected = '<?xml version="1.0"?>'."\n".
+
+        yield 'attributes' => [
+            '<?xml version="1.0"?>'."\n".
             '<response>'.
             '<foo-bar id="1" name="Bar"/>'.
             '<Foo Type="test"><Bar>Test</Bar></Foo>'.
@@ -114,12 +105,10 @@ class XmlEncoderTest extends TestCase
             '<Bar>3</Bar>'.
             '<a>b</a>'.
             '<scalars bool-true="1" bool-false="0" int="3" float="3.4" sring="a"/>'.
-            '</response>'."\n";
-        $this->assertEquals($expected, $this->encoder->encode($obj, 'xml'));
-    }
+            '</response>'."\n",
+            $obj,
+        ];
 
-    public function testElementNameValid()
-    {
         $obj = new ScalarDummy();
         $obj->xmlFoo = [
             'foo-bar' => 'a',
@@ -127,134 +116,195 @@ class XmlEncoderTest extends TestCase
             'föo_bär' => 'a',
         ];
 
-        $expected = '<?xml version="1.0"?>'."\n".
+        yield 'element name valid' => [
+            '<?xml version="1.0"?>'."\n".
             '<response>'.
             '<foo-bar>a</foo-bar>'.
             '<foo_bar>a</foo_bar>'.
             '<föo_bär>a</föo_bär>'.
-            '</response>'."\n";
-
-        $this->assertEquals($expected, $this->encoder->encode($obj, 'xml'));
-    }
-
-    public function testEncodeSimpleXML()
-    {
-        $xml = simplexml_load_string('<firstname>Peter</firstname>');
-        $array = ['person' => $xml];
-
-        $expected = '<?xml version="1.0"?>'."\n".
-            '<response><person><firstname>Peter</firstname></person></response>'."\n";
-
-        $this->assertEquals($expected, $this->encoder->encode($array, 'xml'));
-    }
-
-    public function testEncodeXmlAttributes()
-    {
-        $xml = simplexml_load_string('<firstname>Peter</firstname>');
-        $array = ['person' => $xml];
-
-        $expected = '<?xml version="1.1" encoding="utf-8" standalone="yes"?>'."\n".
-            '<response><person><firstname>Peter</firstname></person></response>'."\n";
-
-        $context = [
-            'xml_version' => '1.1',
-            'xml_encoding' => 'utf-8',
-            'xml_standalone' => true,
+            '</response>'."\n",
+            $obj,
         ];
 
-        $this->assertSame($expected, $this->encoder->encode($array, 'xml', $context));
-    }
+        $xml = simplexml_load_string('<firstname>Peter</firstname>');
+        $array = ['person' => $xml];
 
-    public function testEncodeRemovingEmptyTags()
-    {
-        $array = ['person' => ['firstname' => 'Peter', 'lastname' => null]];
+        yield 'encode SimpleXML' => [
+            '<?xml version="1.0"?>'."\n".
+            '<response><person><firstname>Peter</firstname></person></response>'."\n",
+            $array,
+        ];
 
-        $expected = '<?xml version="1.0"?>'."\n".
-            '<response><person><firstname>Peter</firstname></person></response>'."\n";
+        $xml = simplexml_load_string('<firstname>Peter</firstname>');
+        $array = ['person' => $xml];
 
-        $context = ['remove_empty_tags' => true];
+        yield 'encode XML attributes' => [
+            '<?xml version="1.1" encoding="utf-8" standalone="yes"?>'."\n".
+            '<response><person><firstname>Peter</firstname></person></response>'."\n",
+            $array,
+            [
+                'xml_version' => '1.1',
+                'xml_encoding' => 'utf-8',
+                'xml_standalone' => true,
+            ],
+        ];
 
-        $this->assertSame($expected, $this->encoder->encode($array, 'xml', $context));
-    }
+        yield 'encode remvoing empty tags' => [
+            '<?xml version="1.0"?>'."\n".
+            '<response><person><firstname>Peter</firstname></person></response>'."\n",
+            ['person' => ['firstname' => 'Peter', 'lastname' => null]],
+            ['remove_empty_tags' => true],
+        ];
 
-    public function testEncodeNotRemovingEmptyTags()
-    {
-        $array = ['person' => ['firstname' => 'Peter', 'lastname' => null]];
+        yield 'encode not removing empty tags' => [
+            '<?xml version="1.0"?>'."\n".
+            '<response><person><firstname>Peter</firstname><lastname/></person></response>'."\n",
+            ['person' => ['firstname' => 'Peter', 'lastname' => null]],
+        ];
 
-        $expected = '<?xml version="1.0"?>'."\n".
-            '<response><person><firstname>Peter</firstname><lastname/></person></response>'."\n";
-
-        $this->assertSame($expected, $this->encoder->encode($array, 'xml'));
-    }
-
-    public function testContext()
-    {
-        $array = ['person' => ['name' => 'George Abitbol']];
-        $expected = <<<'XML'
+        yield 'encode with context' => [
+            <<<'XML'
 <?xml version="1.0"?>
 <response>
   <person>
     <name>George Abitbol</name>
+    <age></age>
   </person>
 </response>
 
-XML;
-
-        $context = [
-            'xml_format_output' => true,
+XML,
+            ['person' => ['name' => 'George Abitbol', 'age' => null]],
+            [
+                'xml_format_output' => true,
+                'save_options' => \LIBXML_NOEMPTYTAG,
+            ],
         ];
 
-        $this->assertSame($expected, $this->encoder->encode($array, 'xml', $context));
-    }
-
-    public function testEncodeScalarRootAttributes()
-    {
-        $array = [
-            '#' => 'Paul',
-            '@eye-color' => 'brown',
+        yield 'encode scalar root attributes' => [
+            '<?xml version="1.0"?>'."\n".
+            '<response eye-color="brown">Paul</response>'."\n",
+            [
+                '#' => 'Paul',
+                '@eye-color' => 'brown',
+            ],
         ];
 
-        $expected = '<?xml version="1.0"?>'."\n".
-            '<response eye-color="brown">Paul</response>'."\n";
-
-        $this->assertEquals($expected, $this->encoder->encode($array, 'xml'));
-    }
-
-    public function testEncodeRootAttributes()
-    {
-        $array = [
-            'firstname' => 'Paul',
-            '@eye-color' => 'brown',
+        yield 'encode root attributes' => [
+            '<?xml version="1.0"?>'."\n".
+            '<response eye-color="brown"><firstname>Paul</firstname></response>'."\n",
+            [
+                'firstname' => 'Paul',
+                '@eye-color' => 'brown',
+            ],
         ];
 
-        $expected = '<?xml version="1.0"?>'."\n".
-            '<response eye-color="brown"><firstname>Paul</firstname></response>'."\n";
-
-        $this->assertEquals($expected, $this->encoder->encode($array, 'xml'));
-    }
-
-    public function testEncodeCdataWrapping()
-    {
-        $array = [
-            'firstname' => 'Paul <or Me>',
+        yield 'encode with CDATA wrapping with default pattern #1' => [
+            '<?xml version="1.0"?>'."\n".
+            '<response><firstname><![CDATA[Paul & Martha <or Me>]]></firstname></response>'."\n",
+            ['firstname' => 'Paul & Martha <or Me>'],
         ];
 
-        $expected = '<?xml version="1.0"?>'."\n".
-            '<response><firstname><![CDATA[Paul <or Me>]]></firstname></response>'."\n";
+        yield 'encode with CDATA wrapping with default pattern #2' => [
+            '<?xml version="1.0"?>'."\n".
+            '<response><lastname>O\'Donnel</lastname></response>'."\n",
+            ['lastname' => 'O\'Donnel'],
+        ];
 
-        $this->assertEquals($expected, $this->encoder->encode($array, 'xml'));
+        yield 'encode with CDATA wrapping with default pattern #3' => [
+            '<?xml version="1.0"?>'."\n".
+            '<response><firstname><![CDATA[Paul & Martha]]></firstname></response>'."\n",
+            ['firstname' => 'Paul & Martha'],
+        ];
+
+        yield 'encode with CDATA wrapping with custom pattern #1' => [
+            '<?xml version="1.0"?>'."\n".
+            '<response><firstname><![CDATA[Paul & Martha <or Me>]]></firstname></response>'."\n",
+            ['firstname' => 'Paul & Martha <or Me>'],
+            ['cdata_wrapping_pattern' => '/[<>&"\']/'],
+        ];
+
+        yield 'encode with CDATA wrapping with custom pattern #2' => [
+            '<?xml version="1.0"?>'."\n".
+            '<response><lastname><![CDATA[O\'Donnel]]></lastname></response>'."\n",
+            ['lastname' => 'O\'Donnel'],
+            ['cdata_wrapping_pattern' => '/[<>&"\']/'],
+        ];
+
+        yield 'encode with CDATA wrapping with custom pattern #3' => [
+            '<?xml version="1.0"?>'."\n".
+            '<response><firstname>Paul and Martha</firstname></response>'."\n",
+            ['firstname' => 'Paul and Martha'],
+            ['cdata_wrapping_pattern' => '/[<>&"\']/'],
+        ];
+
+        yield 'enable CDATA wrapping' => [
+            '<?xml version="1.0"?>'."\n".
+            '<response><firstname><![CDATA[Paul & Martha <or Me>]]></firstname></response>'."\n",
+            ['firstname' => 'Paul & Martha <or Me>'],
+            ['cdata_wrapping' => true],
+        ];
+
+        yield 'disable CDATA wrapping' => [
+            '<?xml version="1.0"?>'."\n".
+            '<response><firstname>Paul &amp; Martha &lt;or Me&gt;</firstname></response>'."\n",
+            ['firstname' => 'Paul & Martha <or Me>'],
+            ['cdata_wrapping' => false],
+        ];
+
+        yield 'encode scalar with attribute' => [
+            '<?xml version="1.0"?>'."\n".
+            '<response><person eye-color="brown">Peter</person></response>'."\n",
+            ['person' => ['@eye-color' => 'brown', '#' => 'Peter']],
+        ];
+
+        yield 'encode' => [
+            self::getXmlSource(),
+            self::getObject(),
+        ];
+
+        yield 'encode with namespace' => [
+            self::getNamespacedXmlSource(),
+            self::getNamespacedArray(),
+        ];
     }
 
-    public function testEncodeScalarWithAttribute()
+    public function testEncodeSerializerXmlRootNodeNameOption()
     {
+        $options = ['xml_root_node_name' => 'test'];
+        $this->encoder = new XmlEncoder();
+        $serializer = new Serializer([], ['xml' => new XmlEncoder()]);
+        $this->encoder->setSerializer($serializer);
+
         $array = [
             'person' => ['@eye-color' => 'brown', '#' => 'Peter'],
         ];
 
         $expected = '<?xml version="1.0"?>'."\n".
-            '<response><person eye-color="brown">Peter</person></response>'."\n";
+            '<test><person eye-color="brown">Peter</person></test>'."\n";
 
-        $this->assertEquals($expected, $this->encoder->encode($array, 'xml'));
+        $this->assertSame($expected, $serializer->serialize($array, 'xml', $options));
+    }
+
+    public function testEncodeTraversableWhenNormalizable()
+    {
+        $this->encoder = new XmlEncoder();
+        $serializer = new Serializer([new CustomNormalizer()], ['xml' => new XmlEncoder()]);
+        $this->encoder->setSerializer($serializer);
+
+        $expected = <<<'XML'
+<?xml version="1.0"?>
+<response><foo>normalizedFoo</foo><bar>normalizedBar</bar></response>
+
+XML;
+
+        $this->assertSame($expected, $serializer->serialize(new NormalizableTraversableDummy(), 'xml'));
+    }
+
+    public function testDocTypeIsNotAllowed()
+    {
+        $this->expectException(UnexpectedValueException::class);
+        $this->expectExceptionMessage('Document types are not allowed.');
+        $this->encoder->decode('<?xml version="1.0"?><!DOCTYPE foo><foo></foo>', 'foo');
     }
 
     public function testDecodeScalar()
@@ -262,7 +312,7 @@ XML;
         $source = '<?xml version="1.0"?>'."\n".
             '<response>foo</response>'."\n";
 
-        $this->assertEquals('foo', $this->encoder->decode($source, 'xml'));
+        $this->assertSame('foo', $this->encoder->decode($source, 'xml'));
     }
 
     public function testDecodeBigDigitAttributes()
@@ -363,52 +413,10 @@ XML;
         $this->assertSame('018', $data['@a']);
     }
 
-    public function testEncode()
+    public function testEncodeException()
     {
-        $source = $this->getXmlSource();
-        $obj = $this->getObject();
-
-        $this->assertEquals($source, $this->encoder->encode($obj, 'xml'));
-    }
-
-    public function testEncodeWithNamespace()
-    {
-        $source = $this->getNamespacedXmlSource();
-        $array = $this->getNamespacedArray();
-
-        $this->assertEquals($source, $this->encoder->encode($array, 'xml'));
-    }
-
-    public function testEncodeSerializerXmlRootNodeNameOption()
-    {
-        $options = ['xml_root_node_name' => 'test'];
-        $this->encoder = new XmlEncoder();
-        $serializer = new Serializer([], ['xml' => new XmlEncoder()]);
-        $this->encoder->setSerializer($serializer);
-
-        $array = [
-            'person' => ['@eye-color' => 'brown', '#' => 'Peter'],
-        ];
-
-        $expected = '<?xml version="1.0"?>'."\n".
-            '<test><person eye-color="brown">Peter</person></test>'."\n";
-
-        $this->assertEquals($expected, $serializer->serialize($array, 'xml', $options));
-    }
-
-    public function testEncodeTraversableWhenNormalizable()
-    {
-        $this->encoder = new XmlEncoder();
-        $serializer = new Serializer([new CustomNormalizer()], ['xml' => new XmlEncoder()]);
-        $this->encoder->setSerializer($serializer);
-
-        $expected = <<<'XML'
-<?xml version="1.0"?>
-<response><foo>normalizedFoo</foo><bar>normalizedBar</bar></response>
-
-XML;
-
-        $this->assertEquals($expected, $serializer->serialize(new NormalizableTraversableDummy(), 'xml'));
+        $this->expectException(NotEncodableValueException::class);
+        $this->encoder->encode('Invalid character: '.\chr(7), 'xml');
     }
 
     public function testDecode()
@@ -603,8 +611,8 @@ XML;
 XML;
 
         $expected = ['person' => [
-          ['firstname' => 'Benjamin', 'lastname' => 'Alexandre'],
-          ['firstname' => 'Damien', 'lastname' => 'Clay'],
+            ['firstname' => 'Benjamin', 'lastname' => 'Alexandre'],
+            ['firstname' => 'Damien', 'lastname' => 'Clay'],
         ]];
 
         $this->assertEquals($expected, $this->encoder->decode($source, 'xml'));
@@ -627,8 +635,8 @@ XML;
 </people>
 XML;
         $expected = ['person' => [
-          ['firstname' => 'Benjamin', 'lastname' => 'Alexandre'],
-          ['firstname' => 'Damien', 'lastname' => 'Clay'],
+            ['firstname' => 'Benjamin', 'lastname' => 'Alexandre'],
+            ['firstname' => 'Damien', 'lastname' => 'Clay'],
         ]];
         $this->assertEquals($expected, $this->encoder->decode(
             $source,
@@ -662,8 +670,8 @@ XML;
         $this->encoder->setSerializer($serializer);
 
         $expected = ['person' => [
-          ['firstname' => 'Benjamin', 'lastname' => 'Alexandre', '#comment' => ' This comment should be decoded. '],
-          ['firstname' => 'Damien', 'lastname' => 'Clay'],
+            ['firstname' => 'Benjamin', 'lastname' => 'Alexandre', '#comment' => ' This comment should be decoded. '],
+            ['firstname' => 'Damien', 'lastname' => 'Clay'],
         ]];
 
         $this->assertEquals($expected, $this->encoder->decode($source, 'xml'));
@@ -748,7 +756,7 @@ XML;
         $this->encoder->decode(' ', 'xml');
     }
 
-    protected function getXmlSource()
+    protected static function getXmlSource(): string
     {
         return '<?xml version="1.0"?>'."\n".
             '<response>'.
@@ -761,7 +769,7 @@ XML;
             '</response>'."\n";
     }
 
-    protected function getNamespacedXmlSource()
+    protected static function getNamespacedXmlSource(): string
     {
         return '<?xml version="1.0"?>'."\n".
             '<response xmlns="http://www.w3.org/2005/Atom" xmlns:app="http://www.w3.org/2007/app" xmlns:media="http://search.yahoo.com/mrss/" xmlns:gd="http://schemas.google.com/g/2005" xmlns:yt="http://gdata.youtube.com/schemas/2007">'.
@@ -774,7 +782,7 @@ XML;
             '</response>'."\n";
     }
 
-    protected function getNamespacedArray()
+    protected static function getNamespacedArray(): array
     {
         return [
             '@xmlns' => 'http://www.w3.org/2005/Atom',
@@ -808,7 +816,10 @@ XML;
         ];
     }
 
-    protected function getObject()
+    /**
+     * @return Dummy
+     */
+    protected static function getObject(): object
     {
         $obj = new Dummy();
         $obj->foo = 'foo';
@@ -850,7 +861,7 @@ XML;
     {
         $xmlEncoder = $this->createXmlEncoderWithDateTimeNormalizer();
 
-        $actualXml = $xmlEncoder->encode(['dateTime' => new \DateTime($this->exampleDateTimeString)], 'xml');
+        $actualXml = $xmlEncoder->encode(['dateTime' => new \DateTimeImmutable($this->exampleDateTimeString)], 'xml');
 
         $this->assertEquals($this->createXmlWithDateTime(), $actualXml);
     }
@@ -859,7 +870,7 @@ XML;
     {
         $xmlEncoder = $this->createXmlEncoderWithDateTimeNormalizer();
 
-        $actualXml = $xmlEncoder->encode(['foo' => ['@dateTime' => new \DateTime($this->exampleDateTimeString)]], 'xml');
+        $actualXml = $xmlEncoder->encode(['foo' => ['@dateTime' => new \DateTimeImmutable($this->exampleDateTimeString)]], 'xml');
 
         $this->assertEquals($this->createXmlWithDateTimeField(), $actualXml);
     }
@@ -956,23 +967,25 @@ XML;
         return $encoder;
     }
 
-    /**
-     * @return MockObject&NormalizerInterface
-     */
-    private function createMockDateTimeNormalizer(): NormalizerInterface
+    private function createMockDateTimeNormalizer(): MockObject&NormalizerInterface
     {
-        $mock = $this->createMock(CustomNormalizer::class);
+        $mock = $this->createMock(NormalizerInterface::class);
 
         $mock
             ->expects($this->once())
             ->method('normalize')
-            ->with(new \DateTime($this->exampleDateTimeString), 'xml', [])
+            ->with(new \DateTimeImmutable($this->exampleDateTimeString), 'xml', [])
             ->willReturn($this->exampleDateTimeString);
 
         $mock
             ->expects($this->once())
+            ->method('getSupportedTypes')
+            ->willReturn([\DateTimeImmutable::class => true]);
+
+        $mock
+            ->expects($this->once())
             ->method('supportsNormalization')
-            ->with(new \DateTime($this->exampleDateTimeString), 'xml')
+            ->with(new \DateTimeImmutable($this->exampleDateTimeString), 'xml')
             ->willReturn(true);
 
         return $mock;
@@ -980,14 +993,14 @@ XML;
 
     private function createXmlWithDateTime(): string
     {
-        return sprintf('<?xml version="1.0"?>
+        return \sprintf('<?xml version="1.0"?>
 <response><dateTime>%s</dateTime></response>
 ', $this->exampleDateTimeString);
     }
 
     private function createXmlWithDateTimeField(): string
     {
-        return sprintf('<?xml version="1.0"?>
+        return \sprintf('<?xml version="1.0"?>
 <response><foo dateTime="%s"/></response>
 ', $this->exampleDateTimeString);
     }

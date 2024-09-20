@@ -12,6 +12,7 @@ services:
             - name: kernel.cache_clearer
 
 framework:
+    http_method_override: false
     cache:
         pools:
             cache.private_pool: ~

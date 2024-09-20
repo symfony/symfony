@@ -23,7 +23,7 @@ trait TargetPathTrait
      *
      * Usually, you do not need to set this directly.
      */
-    private function saveTargetPath(SessionInterface $session, string $firewallName, string $uri)
+    private function saveTargetPath(SessionInterface $session, string $firewallName, string $uri): void
     {
         $session->set('_security.'.$firewallName.'.target_path', $uri);
     }
@@ -39,7 +39,7 @@ trait TargetPathTrait
     /**
      * Removes the target path from the session.
      */
-    private function removeTargetPath(SessionInterface $session, string $firewallName)
+    private function removeTargetPath(SessionInterface $session, string $firewallName): void
     {
         $session->remove('_security.'.$firewallName.'.target_path');
     }

@@ -1,6 +1,18 @@
 CHANGELOG
 =========
 
+7.1
+---
+
+ * Add `Process::setIgnoredSignals()` to disable signal propagation to the child process
+
+6.4
+---
+
+ * Add `PhpSubprocess` to handle PHP subprocesses that take over the
+   configuration from their parent
+ * Add `RunProcessMessage` and `RunProcessMessageHandler`
+
 5.2.0
 -----
 

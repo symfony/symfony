@@ -30,6 +30,7 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
     private const QUERY_FRAGMENT_DECODED = [
         // RFC 3986 explicitly allows those in the query/fragment to reference other URIs unencoded
         '%2F' => '/',
+        '%252F' => '%2F',
         '%3F' => '?',
         // reserved chars that have no special meaning for HTTP URIs in a query or fragment
         // this excludes esp. "&", "=" and also "+" because PHP would treat it as a space (form-encoded)
@@ -41,17 +42,7 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
         '%2A' => '*',
     ];
 
-    protected $routes;
-    protected $context;
-
-    /**
-     * @var bool|null
-     */
-    protected $strictRequirements = true;
-
-    protected $logger;
-
-    private $defaultLocale;
+    protected ?bool $strictRequirements = true;
 
     /**
      * This array defines the characters (besides alphanumeric ones) that will not be percent-encoded in the path segment of the generated URL.
@@ -61,7 +52,7 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
      * "?" and "#" (would be interpreted wrongly as query and fragment identifier),
      * "'" and """ (are used as delimiters in HTML).
      */
-    protected $decodedChars = [
+    protected array $decodedChars = [
         // the slash can be used to designate a hierarchical structure and we want allow using it with this meaning
         // some webservers don't allow the slash in encoded form in the path for security reasons anyway
         // see http://stackoverflow.com/questions/4069002/http-400-if-2f-part-of-get-url-in-jboss
@@ -82,55 +73,38 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
         '%7C' => '|',
     ];
 
-    public function __construct(RouteCollection $routes, RequestContext $context, ?LoggerInterface $logger = null, ?string $defaultLocale = null)
-    {
-        $this->routes = $routes;
-        $this->context = $context;
-        $this->logger = $logger;
-        $this->defaultLocale = $defaultLocale;
+    public function __construct(
+        protected RouteCollection $routes,
+        protected RequestContext $context,
+        protected ?LoggerInterface $logger = null,
+        private ?string $defaultLocale = null,
+    ) {
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function setContext(RequestContext $context)
+    public function setContext(RequestContext $context): void
     {
         $this->context = $context;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getContext()
+    public function getContext(): RequestContext
     {
         return $this->context;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function setStrictRequirements(?bool $enabled)
+    public function setStrictRequirements(?bool $enabled): void
     {
         $this->strictRequirements = $enabled;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function isStrictRequirements()
+    public function isStrictRequirements(): ?bool
     {
         return $this->strictRequirements;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function generate(string $name, array $parameters = [], int $referenceType = self::ABSOLUTE_PATH)
+    public function generate(string $name, array $parameters = [], int $referenceType = self::ABSOLUTE_PATH): string
     {
         $route = null;
-        $locale = $parameters['_locale']
-            ?? $this->context->getParameter('_locale')
-            ?: $this->defaultLocale;
+        $locale = $parameters['_locale'] ?? $this->context->getParameter('_locale') ?: $this->defaultLocale;
 
         if (null !== $locale) {
             do {
@@ -140,8 +114,8 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
             } while (false !== $locale = strstr($locale, '_', true));
         }
 
-        if (null === $route = $route ?? $this->routes->get($name)) {
-            throw new RouteNotFoundException(sprintf('Unable to generate a URL for the named route "%s" as such route does not exist.', $name));
+        if (null === $route ??= $this->routes->get($name)) {
+            throw new RouteNotFoundException(\sprintf('Unable to generate a URL for the named route "%s" as such route does not exist.', $name));
         }
 
         // the Route has a cache of its own and is not recompiled as long as it does not get modified
@@ -162,20 +136,18 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
     }
 
     /**
-     * @return string
-     *
      * @throws MissingMandatoryParametersException When some parameters are missing that are mandatory for the route
      * @throws InvalidParameterException           When a parameter value for a placeholder is not correct because
      *                                             it does not match the requirement
      */
-    protected function doGenerate(array $variables, array $defaults, array $requirements, array $tokens, array $parameters, string $name, int $referenceType, array $hostTokens, array $requiredSchemes = [])
+    protected function doGenerate(array $variables, array $defaults, array $requirements, array $tokens, array $parameters, string $name, int $referenceType, array $hostTokens, array $requiredSchemes = []): string
     {
         $variables = array_flip($variables);
         $mergedParams = array_replace($defaults, $this->context->getParameters(), $parameters);
 
         // all params must be given
         if ($diff = array_diff_key($variables, $mergedParams)) {
-            throw new MissingMandatoryParametersException(sprintf('Some mandatory parameters are missing ("%s") to generate a URL for route "%s".', implode('", "', array_keys($diff)), $name));
+            throw new MissingMandatoryParametersException($name, array_keys($diff));
         }
 
         $url = '';
@@ -194,9 +166,7 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
                             throw new InvalidParameterException(strtr($message, ['{parameter}' => $varName, '{route}' => $name, '{expected}' => $token[2], '{given}' => $mergedParams[$varName]]));
                         }
 
-                        if ($this->logger) {
-                            $this->logger->error($message, ['parameter' => $varName, 'route' => $name, 'expected' => $token[2], 'given' => $mergedParams[$varName]]);
-                        }
+                        $this->logger?->error($message, ['parameter' => $varName, 'route' => $name, 'expected' => $token[2], 'given' => $mergedParams[$varName]]);
 
                         return '';
                     }
@@ -249,9 +219,7 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
                             throw new InvalidParameterException(strtr($message, ['{parameter}' => $token[3], '{route}' => $name, '{expected}' => $token[2], '{given}' => $mergedParams[$token[3]]]));
                         }
 
-                        if ($this->logger) {
-                            $this->logger->error($message, ['parameter' => $token[3], 'route' => $name, 'expected' => $token[2], 'given' => $mergedParams[$token[3]]]);
-                        }
+                        $this->logger?->error($message, ['parameter' => $token[3], 'route' => $name, 'expected' => $token[2], 'given' => $mergedParams[$token[3]]]);
 
                         return '';
                     }
@@ -291,16 +259,14 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
         }
 
         // add a query string if needed
-        $extra = array_udiff_assoc(array_diff_key($parameters, $variables), $defaults, function ($a, $b) {
-            return $a == $b ? 0 : 1;
-        });
+        $extra = array_udiff_assoc(array_diff_key($parameters, $variables), $defaults, fn ($a, $b) => $a == $b ? 0 : 1);
 
         array_walk_recursive($extra, $caster = static function (&$v) use (&$caster) {
             if (\is_object($v)) {
                 if ($vars = get_object_vars($v)) {
                     array_walk_recursive($vars, $caster);
                     $v = $vars;
-                } elseif (method_exists($v, '__toString')) {
+                } elseif ($v instanceof \Stringable) {
                     $v = (string) $v;
                 }
             }
@@ -342,10 +308,8 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
      *
      * @param string $basePath   The base path
      * @param string $targetPath The target path
-     *
-     * @return string
      */
-    public static function getRelativePath(string $basePath, string $targetPath)
+    public static function getRelativePath(string $basePath, string $targetPath): string
     {
         if ($basePath === $targetPath) {
             return '';

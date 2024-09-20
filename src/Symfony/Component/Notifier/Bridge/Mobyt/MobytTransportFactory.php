@@ -14,17 +14,13 @@ namespace Symfony\Component\Notifier\Bridge\Mobyt;
 use Symfony\Component\Notifier\Exception\UnsupportedSchemeException;
 use Symfony\Component\Notifier\Transport\AbstractTransportFactory;
 use Symfony\Component\Notifier\Transport\Dsn;
-use Symfony\Component\Notifier\Transport\TransportInterface;
 
 /**
  * @author Bastien Durand <bdurand-dev@outlook.com>
  */
 final class MobytTransportFactory extends AbstractTransportFactory
 {
-    /**
-     * @return MobytTransport
-     */
-    public function create(Dsn $dsn): TransportInterface
+    public function create(Dsn $dsn): MobytTransport
     {
         $scheme = $dsn->getScheme();
 

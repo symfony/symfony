@@ -19,11 +19,9 @@ use Symfony\Component\Runtime\RunnerInterface;
  */
 class ResponseRunner implements RunnerInterface
 {
-    private $response;
-
-    public function __construct(Response $response)
-    {
-        $this->response = $response;
+    public function __construct(
+        private readonly Response $response,
+    ) {
     }
 
     public function run(): int

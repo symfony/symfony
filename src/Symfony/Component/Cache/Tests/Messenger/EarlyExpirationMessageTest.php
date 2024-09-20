@@ -19,9 +19,6 @@ use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\ReverseContainer;
 use Symfony\Component\DependencyInjection\ServiceLocator;
 
-/**
- * @requires function Symfony\Component\DependencyInjection\ReverseContainer::__construct
- */
 class EarlyExpirationMessageTest extends TestCase
 {
     public function testCreate()
@@ -30,7 +27,7 @@ class EarlyExpirationMessageTest extends TestCase
         $item = $pool->getItem('foo');
         $item->set(234);
 
-        $computationService = new class() {
+        $computationService = new class {
             public function __invoke(CacheItem $item)
             {
                 return 123;

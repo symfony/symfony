@@ -18,7 +18,7 @@ use Symfony\Component\Routing\RouteCollection;
  */
 trait HostTrait
 {
-    final protected function addHost(RouteCollection $routes, $hosts)
+    final protected function addHost(RouteCollection $routes, string|array $hosts): void
     {
         if (!$hosts || !\is_array($hosts)) {
             $routes->setHost($hosts ?: '');
@@ -38,7 +38,7 @@ trait HostTrait
                     $routes->add($name.'.'.$locale, $localizedRoute);
                 }
             } elseif (!isset($hosts[$locale])) {
-                throw new \InvalidArgumentException(sprintf('Route "%s" with locale "%s" is missing a corresponding host in its parent collection.', $name, $locale));
+                throw new \InvalidArgumentException(\sprintf('Route "%s" with locale "%s" is missing a corresponding host in its parent collection.', $name, $locale));
             } else {
                 $route->setHost($hosts[$locale]);
                 $route->setRequirement('_locale', preg_quote($locale));

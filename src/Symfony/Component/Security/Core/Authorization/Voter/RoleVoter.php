@@ -20,17 +20,12 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
  */
 class RoleVoter implements CacheableVoterInterface
 {
-    private $prefix;
-
-    public function __construct(string $prefix = 'ROLE_')
-    {
-        $this->prefix = $prefix;
+    public function __construct(
+        private string $prefix = 'ROLE_',
+    ) {
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function vote(TokenInterface $token, $subject, array $attributes)
+    public function vote(TokenInterface $token, mixed $subject, array $attributes): int
     {
         $result = VoterInterface::ACCESS_ABSTAIN;
         $roles = $this->extractRoles($token);
@@ -40,15 +35,9 @@ class RoleVoter implements CacheableVoterInterface
                 continue;
             }
 
-            if ('ROLE_PREVIOUS_ADMIN' === $attribute) {
-                trigger_deprecation('symfony/security-core', '5.1', 'The ROLE_PREVIOUS_ADMIN role is deprecated and will be removed in version 6.0, use the IS_IMPERSONATOR attribute instead.');
-            }
-
             $result = VoterInterface::ACCESS_DENIED;
-            foreach ($roles as $role) {
-                if ($attribute === $role) {
-                    return VoterInterface::ACCESS_GRANTED;
-                }
+            if (\in_array($attribute, $roles, true)) {
+                return VoterInterface::ACCESS_GRANTED;
             }
         }
 
@@ -65,7 +54,7 @@ class RoleVoter implements CacheableVoterInterface
         return true;
     }
 
-    protected function extractRoles(TokenInterface $token)
+    protected function extractRoles(TokenInterface $token): array
     {
         return $token->getRoleNames();
     }

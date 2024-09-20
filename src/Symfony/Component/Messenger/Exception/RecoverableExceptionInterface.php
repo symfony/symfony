@@ -18,6 +18,8 @@ namespace Symfony\Component\Messenger\Exception;
  * and the message should be retried, a handler can throw such an exception.
  *
  * @author Jérémy Derussé <jeremy@derusse.com>
+ *
+ * @method int|null getRetryDelay() The time to wait in milliseconds
  */
 interface RecoverableExceptionInterface extends \Throwable
 {

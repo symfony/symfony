@@ -24,20 +24,17 @@ use Symfony\Component\Security\Http\Authenticator\Passport\Badge\BadgeInterface;
  */
 class LdapBadge implements BadgeInterface
 {
-    private $resolved = false;
-    private $ldapServiceId;
-    private $dnString;
-    private $searchDn;
-    private $searchPassword;
-    private $queryString;
+    private bool $resolved = false;
+    private string $queryString;
 
-    public function __construct(string $ldapServiceId, string $dnString = '{username}', string $searchDn = '', string $searchPassword = '', ?string $queryString = null)
-    {
-        $this->ldapServiceId = $ldapServiceId;
-        $this->dnString = $dnString;
-        $this->searchDn = $searchDn;
-        $this->searchPassword = $searchPassword;
-        $this->queryString = $queryString;
+    public function __construct(
+        private string $ldapServiceId,
+        private string $dnString = '{user_identifier}',
+        private string $searchDn = '',
+        private string $searchPassword = '',
+        ?string $queryString = null,
+    ) {
+        $this->queryString = $queryString ?? '';
     }
 
     public function getLdapServiceId(): string
@@ -60,7 +57,7 @@ class LdapBadge implements BadgeInterface
         return $this->searchPassword;
     }
 
-    public function getQueryString(): ?string
+    public function getQueryString(): string
     {
         return $this->queryString;
     }

@@ -15,6 +15,7 @@ use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
+use Symfony\Component\Mime\HtmlToTextConverter\HtmlToTextConverterInterface;
 
 /**
  * TwigExtension configuration structure.
@@ -25,16 +26,14 @@ class Configuration implements ConfigurationInterface
 {
     /**
      * Generates the configuration tree builder.
-     *
-     * @return TreeBuilder
      */
-    public function getConfigTreeBuilder()
+    public function getConfigTreeBuilder(): TreeBuilder
     {
         $treeBuilder = new TreeBuilder('twig');
         $rootNode = $treeBuilder->getRootNode();
 
         $rootNode->beforeNormalization()
-            ->ifTrue(function ($v) { return \is_array($v) && \array_key_exists('exception_controller', $v); })
+            ->ifTrue(fn ($v) => \is_array($v) && \array_key_exists('exception_controller', $v))
             ->then(function ($v) {
                 if (isset($v['exception_controller'])) {
                     throw new InvalidConfigurationException('Option "exception_controller" under "twig" must be null or unset, use "error_controller" under "framework" instead.');
@@ -50,11 +49,12 @@ class Configuration implements ConfigurationInterface
         $this->addGlobalsSection($rootNode);
         $this->addTwigOptions($rootNode);
         $this->addTwigFormatOptions($rootNode);
+        $this->addMailerSection($rootNode);
 
         return $treeBuilder;
     }
 
-    private function addFormThemesSection(ArrayNodeDefinition $rootNode)
+    private function addFormThemesSection(ArrayNodeDefinition $rootNode): void
     {
         $rootNode
             ->fixXmlConfig('form_theme')
@@ -64,17 +64,15 @@ class Configuration implements ConfigurationInterface
                     ->prototype('scalar')->defaultValue('form_div_layout.html.twig')->end()
                     ->example(['@My/form.html.twig'])
                     ->validate()
-                        ->ifTrue(function ($v) { return !\in_array('form_div_layout.html.twig', $v); })
-                        ->then(function ($v) {
-                            return array_merge(['form_div_layout.html.twig'], $v);
-                        })
+                        ->ifTrue(fn ($v) => !\in_array('form_div_layout.html.twig', $v, true))
+                        ->then(fn ($v) => array_merge(['form_div_layout.html.twig'], $v))
                     ->end()
                 ->end()
             ->end()
         ;
     }
 
-    private function addGlobalsSection(ArrayNodeDefinition $rootNode)
+    private function addGlobalsSection(ArrayNodeDefinition $rootNode): void
     {
         $rootNode
             ->fixXmlConfig('global')
@@ -86,7 +84,7 @@ class Configuration implements ConfigurationInterface
                     ->prototype('array')
                         ->normalizeKeys(false)
                         ->beforeNormalization()
-                            ->ifTrue(function ($v) { return \is_string($v) && str_starts_with($v, '@'); })
+                            ->ifTrue(fn ($v) => \is_string($v) && str_starts_with($v, '@'))
                             ->then(function ($v) {
                                 if (str_starts_with($v, '@@')) {
                                     return substr($v, 1);
@@ -106,7 +104,7 @@ class Configuration implements ConfigurationInterface
 
                                 return true;
                             })
-                            ->then(function ($v) { return ['value' => $v]; })
+                            ->then(fn ($v) => ['value' => $v])
                         ->end()
                         ->children()
                             ->scalarNode('id')->end()
@@ -124,15 +122,18 @@ class Configuration implements ConfigurationInterface
         ;
     }
 
-    private function addTwigOptions(ArrayNodeDefinition $rootNode)
+    private function addTwigOptions(ArrayNodeDefinition $rootNode): void
     {
         $rootNode
             ->fixXmlConfig('path')
             ->children()
-                ->variableNode('autoescape')->defaultValue('name')->end()
                 ->scalarNode('autoescape_service')->defaultNull()->end()
                 ->scalarNode('autoescape_service_method')->defaultNull()->end()
-                ->scalarNode('base_template_class')->example('Twig\Template')->cannotBeEmpty()->end()
+                ->scalarNode('base_template_class')
+                    ->setDeprecated('symfony/twig-bundle', '7.1')
+                    ->example('Twig\Template')
+                    ->cannotBeEmpty()
+                ->end()
                 ->scalarNode('cache')->defaultValue('%kernel.cache_dir%/twig')->end()
                 ->scalarNode('charset')->defaultValue('%kernel.charset%')->end()
                 ->booleanNode('debug')->defaultValue('%kernel.debug%')->end()
@@ -140,8 +141,17 @@ class Configuration implements ConfigurationInterface
                 ->scalarNode('auto_reload')->end()
                 ->integerNode('optimizations')->min(-1)->end()
                 ->scalarNode('default_path')
-                    ->info('The default path used to load templates')
+                    ->info('The default path used to load templates.')
                     ->defaultValue('%kernel.project_dir%/templates')
+                ->end()
+                ->arrayNode('file_name_pattern')
+                    ->example('*.twig')
+                    ->info('Pattern of file name used for cache warmer and linter.')
+                    ->beforeNormalization()
+                        ->ifString()
+                            ->then(fn ($value) => [$value])
+                        ->end()
+                    ->prototype('scalar')->end()
                 ->end()
                 ->arrayNode('paths')
                     ->normalizeKeys(false)
@@ -175,29 +185,45 @@ class Configuration implements ConfigurationInterface
         ;
     }
 
-    private function addTwigFormatOptions(ArrayNodeDefinition $rootNode)
+    private function addTwigFormatOptions(ArrayNodeDefinition $rootNode): void
     {
         $rootNode
             ->children()
                 ->arrayNode('date')
-                    ->info('The default format options used by the date filter')
+                    ->info('The default format options used by the date filter.')
                     ->addDefaultsIfNotSet()
                     ->children()
                         ->scalarNode('format')->defaultValue('F j, Y H:i')->end()
                         ->scalarNode('interval_format')->defaultValue('%d days')->end()
                         ->scalarNode('timezone')
-                            ->info('The timezone used when formatting dates, when set to null, the timezone returned by date_default_timezone_get() is used')
+                            ->info('The timezone used when formatting dates, when set to null, the timezone returned by date_default_timezone_get() is used.')
                             ->defaultNull()
                         ->end()
                     ->end()
                 ->end()
                 ->arrayNode('number_format')
-                    ->info('The default format options for the number_format filter')
+                    ->info('The default format options for the number_format filter.')
                     ->addDefaultsIfNotSet()
                     ->children()
                         ->integerNode('decimals')->defaultValue(0)->end()
                         ->scalarNode('decimal_point')->defaultValue('.')->end()
                         ->scalarNode('thousands_separator')->defaultValue(',')->end()
+                    ->end()
+                ->end()
+            ->end()
+        ;
+    }
+
+    private function addMailerSection(ArrayNodeDefinition $rootNode): void
+    {
+        $rootNode
+            ->children()
+                ->arrayNode('mailer')
+                    ->children()
+                        ->scalarNode('html_to_text_converter')
+                            ->info(\sprintf('A service implementing the "%s".', HtmlToTextConverterInterface::class))
+                            ->defaultNull()
+                        ->end()
                     ->end()
                 ->end()
             ->end()

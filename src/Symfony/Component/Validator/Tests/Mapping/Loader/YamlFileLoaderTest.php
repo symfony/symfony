@@ -21,10 +21,16 @@ use Symfony\Component\Validator\Constraints\NotNull;
 use Symfony\Component\Validator\Constraints\Range;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Mapping\Loader\YamlFileLoader;
-use Symfony\Component\Validator\Tests\Fixtures\Annotation\Entity;
-use Symfony\Component\Validator\Tests\Fixtures\Annotation\GroupSequenceProviderEntity;
+use Symfony\Component\Validator\Tests\Dummy\DummyGroupProvider;
+use Symfony\Component\Validator\Tests\Fixtures\Attribute\GroupProviderDto;
 use Symfony\Component\Validator\Tests\Fixtures\ConstraintA;
 use Symfony\Component\Validator\Tests\Fixtures\ConstraintB;
+use Symfony\Component\Validator\Tests\Fixtures\ConstraintWithRequiredArgument;
+use Symfony\Component\Validator\Tests\Fixtures\Entity_81;
+use Symfony\Component\Validator\Tests\Fixtures\NestedAttribute\Entity;
+use Symfony\Component\Validator\Tests\Fixtures\NestedAttribute\GroupSequenceProviderEntity;
+use Symfony\Component\Validator\Tests\Mapping\Loader\Fixtures\ConstraintWithNamedArguments;
+use Symfony\Component\Validator\Tests\Mapping\Loader\Fixtures\ConstraintWithoutValueWithNamedArguments;
 
 class YamlFileLoaderTest extends TestCase
 {
@@ -36,7 +42,6 @@ class YamlFileLoaderTest extends TestCase
         $this->assertFalse($loader->loadClassMetadata($metadata));
 
         $r = new \ReflectionProperty($loader, 'classes');
-        $r->setAccessible(true);
         $this->assertSame([], $r->getValue($loader));
     }
 
@@ -45,9 +50,10 @@ class YamlFileLoaderTest extends TestCase
      */
     public function testInvalidYamlFiles($path)
     {
-        $this->expectException(\InvalidArgumentException::class);
         $loader = new YamlFileLoader(__DIR__.'/'.$path);
         $metadata = new ClassMetadata(Entity::class);
+
+        $this->expectException(\InvalidArgumentException::class);
 
         $loader->loadClassMetadata($metadata);
     }
@@ -106,6 +112,9 @@ class YamlFileLoaderTest extends TestCase
         $expected->addConstraint(new Callback('validateMe'));
         $expected->addConstraint(new Callback('validateMeStatic'));
         $expected->addConstraint(new Callback(['Symfony\Component\Validator\Tests\Fixtures\CallbackClass', 'callback']));
+        $expected->addConstraint(new ConstraintWithoutValueWithNamedArguments());
+        $expected->addConstraint(new ConstraintWithNamedArguments('foo'));
+        $expected->addConstraint(new ConstraintWithNamedArguments(['foo', 'bar']));
         $expected->addPropertyConstraint('firstName', new NotNull());
         $expected->addPropertyConstraint('firstName', new Range(['min' => 3]));
         $expected->addPropertyConstraint('firstName', new Choice(['A', 'B']));
@@ -139,6 +148,19 @@ class YamlFileLoaderTest extends TestCase
         $this->assertEquals($expected, $metadata);
     }
 
+    public function testLoadClassMetadataWithRequiredArguments()
+    {
+        $loader = new YamlFileLoader(__DIR__.'/constraint-mapping-required-arg.yml');
+        $metadata = new ClassMetadata(Entity_81::class);
+
+        $loader->loadClassMetadata($metadata);
+
+        $expected = new ClassMetadata(Entity_81::class);
+        $expected->addPropertyConstraint('title', new ConstraintWithRequiredArgument('X'));
+
+        $this->assertEquals($expected, $metadata);
+    }
+
     public function testLoadGroupSequenceProvider()
     {
         $loader = new YamlFileLoader(__DIR__.'/constraint-mapping.yml');
@@ -147,6 +169,20 @@ class YamlFileLoaderTest extends TestCase
         $loader->loadClassMetadata($metadata);
 
         $expected = new ClassMetadata(GroupSequenceProviderEntity::class);
+        $expected->setGroupSequenceProvider(true);
+
+        $this->assertEquals($expected, $metadata);
+    }
+
+    public function testLoadGroupProvider()
+    {
+        $loader = new YamlFileLoader(__DIR__.'/constraint-mapping.yml');
+        $metadata = new ClassMetadata(GroupProviderDto::class);
+
+        $loader->loadClassMetadata($metadata);
+
+        $expected = new ClassMetadata(GroupProviderDto::class);
+        $expected->setGroupProvider(DummyGroupProvider::class);
         $expected->setGroupSequenceProvider(true);
 
         $this->assertEquals($expected, $metadata);

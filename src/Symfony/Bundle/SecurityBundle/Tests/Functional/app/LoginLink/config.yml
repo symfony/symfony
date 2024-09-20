@@ -2,8 +2,6 @@ imports:
     - { resource: ./../config/framework.yml }
 
 security:
-    enable_authenticator_manager: true
-
     providers:
         in_memory:
             memory:

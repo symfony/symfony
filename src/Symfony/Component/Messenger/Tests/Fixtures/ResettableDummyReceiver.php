@@ -15,9 +15,9 @@ use Symfony\Contracts\Service\ResetInterface;
 
 class ResettableDummyReceiver extends DummyReceiver implements ResetInterface
 {
-    private $hasBeenReset = false;
+    private bool $hasBeenReset = false;
 
-    public function reset()
+    public function reset(): void
     {
         $this->hasBeenReset = true;
     }

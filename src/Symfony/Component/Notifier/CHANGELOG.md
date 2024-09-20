@@ -1,6 +1,28 @@
 CHANGELOG
 =========
 
+7.2
+---
+
+ * Make `TransportFactoryTestCase` and `TransportTestCase` compatible with PHPUnit 10+
+ * Add `Desktop` channel
+
+6.3
+---
+
+ * Introduce `FromNotificationInterface` for `MessageInterface` implementations
+
+6.2
+---
+
+ * Add PHPUnit constraints
+ * Add `from` property in `SmsMessage`
+
+6.1
+---
+
+ * Use importance level to set flash message type
+
 5.4.21
 ------
 

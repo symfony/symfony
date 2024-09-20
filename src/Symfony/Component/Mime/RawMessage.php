@@ -16,19 +16,23 @@ use Symfony\Component\Mime\Exception\LogicException;
 /**
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class RawMessage implements \Serializable
+class RawMessage
 {
-    /**
-     * @var iterable|string
-     */
-    private $message;
+    private bool $isGeneratorClosed;
 
     /**
-     * @param iterable|string $message
+     * @param iterable<string>|string|resource $message
      */
-    public function __construct($message)
+    public function __construct(
+        private $message,
+    ) {
+    }
+
+    public function __destruct()
     {
-        $this->message = $message;
+        if (\is_resource($this->message)) {
+            fclose($this->message);
+        }
     }
 
     public function toString(): string
@@ -36,50 +40,62 @@ class RawMessage implements \Serializable
         if (\is_string($this->message)) {
             return $this->message;
         }
-        if ($this->message instanceof \Traversable) {
-            $this->message = iterator_to_array($this->message, false);
+
+        if (\is_resource($this->message)) {
+            return stream_get_contents($this->message, -1, 0);
         }
 
-        return $this->message = implode('', $this->message);
+        $message = '';
+        foreach ($this->message as $chunk) {
+            $message .= $chunk;
+        }
+
+        return $this->message = $message;
     }
 
     public function toIterable(): iterable
     {
+        if ($this->isGeneratorClosed ?? false) {
+            throw new LogicException('Unable to send the email as its generator is already closed.');
+        }
+
         if (\is_string($this->message)) {
             yield $this->message;
 
             return;
         }
 
-        $message = '';
+        if (\is_resource($this->message)) {
+            rewind($this->message);
+            while ($line = fgets($this->message)) {
+                yield $line;
+            }
+
+            return;
+        }
+
+        if ($this->message instanceof \Generator) {
+            $message = fopen('php://temp', 'w+');
+            foreach ($this->message as $chunk) {
+                fwrite($message, $chunk);
+                yield $chunk;
+            }
+            $this->isGeneratorClosed = !$this->message->valid();
+            $this->message = $message;
+
+            return;
+        }
+
         foreach ($this->message as $chunk) {
-            $message .= $chunk;
             yield $chunk;
         }
-        $this->message = $message;
     }
 
     /**
      * @throws LogicException if the message is not valid
      */
-    public function ensureValidity()
+    public function ensureValidity(): void
     {
-    }
-
-    /**
-     * @internal
-     */
-    final public function serialize(): string
-    {
-        return serialize($this->__serialize());
-    }
-
-    /**
-     * @internal
-     */
-    final public function unserialize($serialized)
-    {
-        $this->__unserialize(unserialize($serialized));
     }
 
     public function __serialize(): array

@@ -16,7 +16,7 @@ use Symfony\Bundle\FrameworkBundle\Console\Descriptor\MarkdownDescriptor;
 use Symfony\Bundle\FrameworkBundle\Console\Descriptor\TextDescriptor;
 use Symfony\Bundle\FrameworkBundle\Console\Descriptor\XmlDescriptor;
 use Symfony\Component\Console\Helper\DescriptorHelper as BaseDescriptorHelper;
-use Symfony\Component\HttpKernel\Debug\FileLinkFormatter;
+use Symfony\Component\ErrorHandler\ErrorRenderer\FileLinkFormatter;
 
 /**
  * @author Jean-François Simon <jeanfrancois.simon@sensiolabs.com>

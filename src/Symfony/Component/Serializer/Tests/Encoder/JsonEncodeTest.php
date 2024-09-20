@@ -18,7 +18,7 @@ use Symfony\Component\Serializer\Exception\UnexpectedValueException;
 
 class JsonEncodeTest extends TestCase
 {
-    private $encode;
+    private JsonEncode $encode;
 
     protected function setUp(): void
     {

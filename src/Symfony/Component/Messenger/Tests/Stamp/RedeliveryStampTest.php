@@ -12,13 +12,10 @@
 namespace Symfony\Component\Messenger\Tests\Stamp;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\Messenger\Stamp\RedeliveryStamp;
 
 class RedeliveryStampTest extends TestCase
 {
-    use ExpectDeprecationTrait;
-
     public function testGetters()
     {
         $stamp = new RedeliveryStamp(10);
@@ -36,17 +33,6 @@ class RedeliveryStampTest extends TestCase
     {
         $redeliveredAt = new \DateTimeImmutable('+2minutes');
         $stamp = new RedeliveryStamp(10, $redeliveredAt);
-        $this->assertSame($redeliveredAt, $stamp->getRedeliveredAt());
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testLegacyRedeliveryAt()
-    {
-        $this->expectDeprecation('Since symfony/messenger 5.2: Using parameters "$exceptionMessage" or "$flattenException" of class "Symfony\Component\Messenger\Stamp\RedeliveryStamp" is deprecated, use "Symfony\Component\Messenger\Stamp\ErrorDetailsStamp" instead and/or pass "$redeliveredAt" as parameter #2.');
-        $redeliveredAt = new \DateTimeImmutable('+2minutes');
-        $stamp = new RedeliveryStamp(10, null, null, $redeliveredAt);
         $this->assertSame($redeliveredAt, $stamp->getRedeliveredAt());
     }
 }

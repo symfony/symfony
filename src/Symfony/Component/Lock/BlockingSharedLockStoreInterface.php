@@ -23,5 +23,5 @@ interface BlockingSharedLockStoreInterface extends SharedLockStoreInterface
      *
      * @throws LockConflictedException
      */
-    public function waitAndSaveRead(Key $key);
+    public function waitAndSaveRead(Key $key): void;
 }

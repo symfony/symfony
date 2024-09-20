@@ -22,16 +22,14 @@ trait UnserializableTestTrait
 {
     /**
      * @see AbstractStoreTestCase::getStore()
-     *
-     * @return PersistingStoreInterface
      */
-    abstract protected function getStore();
+    abstract protected function getStore(): PersistingStoreInterface;
 
     public function testUnserializableKey()
     {
         $store = $this->getStore();
 
-        $key = new Key(uniqid(__METHOD__, true));
+        $key = new Key(__METHOD__);
 
         $store->save($key);
         $this->assertTrue($store->exists($key));

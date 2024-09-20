@@ -15,14 +15,13 @@ use AsyncAws\Sns\SnsClient;
 use Symfony\Component\Notifier\Exception\UnsupportedSchemeException;
 use Symfony\Component\Notifier\Transport\AbstractTransportFactory;
 use Symfony\Component\Notifier\Transport\Dsn;
-use Symfony\Component\Notifier\Transport\TransportInterface;
 
 /**
  * @author Adrien Chinour <github@chinour.fr>
  */
 final class AmazonSnsTransportFactory extends AbstractTransportFactory
 {
-    public function create(Dsn $dsn): TransportInterface
+    public function create(Dsn $dsn): AmazonSnsTransport
     {
         $scheme = $dsn->getScheme();
 
@@ -32,8 +31,9 @@ final class AmazonSnsTransportFactory extends AbstractTransportFactory
 
         $host = 'default' === $dsn->getHost() ? null : $dsn->getHost();
         $port = $dsn->getPort();
+        $protocol = 'disable' === $dsn->getOption('sslmode') ? 'http' : 'https';
 
-        $options = null === $host ? [] : ['endpoint' => 'https://'.$host.($port ? ':'.$port : '')];
+        $options = null === $host ? [] : ['endpoint' => $protocol.'://'.$host.($port ? ':'.$port : '')];
 
         if ($dsn->getUser()) {
             $options += [

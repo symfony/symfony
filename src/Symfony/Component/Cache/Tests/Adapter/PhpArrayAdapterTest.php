@@ -59,7 +59,7 @@ class PhpArrayAdapterTest extends AdapterTestCase
         'testPrune' => 'PhpArrayAdapter just proxies',
     ];
 
-    protected static $file;
+    protected static string $file;
 
     public static function setUpBeforeClass(): void
     {
@@ -148,7 +148,7 @@ class PhpArrayAdapterTest extends AdapterTestCase
 
 class PhpArrayAdapterWrapper extends PhpArrayAdapter
 {
-    protected $data = [];
+    protected array $data = [];
 
     public function save(CacheItemInterface $item): bool
     {

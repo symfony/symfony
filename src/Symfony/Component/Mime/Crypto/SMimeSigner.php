@@ -19,10 +19,10 @@ use Symfony\Component\Mime\Message;
  */
 final class SMimeSigner extends SMime
 {
-    private $signCertificate;
-    private $signPrivateKey;
-    private $signOptions;
-    private $extraCerts;
+    private string $signCertificate;
+    private string|array $signPrivateKey;
+    private int $signOptions;
+    private ?string $extraCerts;
 
     /**
      * @param string      $certificate          The path of the file containing the signing certificate (in PEM format)
@@ -57,7 +57,7 @@ final class SMimeSigner extends SMime
         $this->iteratorToFile($message->getBody()->toIterable(), $bufferFile);
 
         if (!@openssl_pkcs7_sign(stream_get_meta_data($bufferFile)['uri'], stream_get_meta_data($outputFile)['uri'], $this->signCertificate, $this->signPrivateKey, [], $this->signOptions, $this->extraCerts)) {
-            throw new RuntimeException(sprintf('Failed to sign S/Mime message. Error: "%s".', openssl_error_string()));
+            throw new RuntimeException(\sprintf('Failed to sign S/Mime message. Error: "%s".', openssl_error_string()));
         }
 
         return new Message($message->getHeaders(), $this->convertMessageToSMimePart($outputFile, 'multipart', 'signed'));

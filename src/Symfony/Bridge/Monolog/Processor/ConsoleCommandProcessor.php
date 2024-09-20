@@ -11,6 +11,7 @@
 
 namespace Symfony\Bridge\Monolog\Processor;
 
+use Monolog\LogRecord;
 use Symfony\Component\Console\ConsoleEvents;
 use Symfony\Component\Console\Event\ConsoleEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -21,33 +22,31 @@ use Symfony\Contracts\Service\ResetInterface;
  *
  * @author Piotr Stankowski <git@trakos.pl>
  */
-class ConsoleCommandProcessor implements EventSubscriberInterface, ResetInterface
+final class ConsoleCommandProcessor implements EventSubscriberInterface, ResetInterface
 {
-    private $commandData;
-    private $includeArguments;
-    private $includeOptions;
+    private array $commandData;
 
-    public function __construct(bool $includeArguments = true, bool $includeOptions = false)
-    {
-        $this->includeArguments = $includeArguments;
-        $this->includeOptions = $includeOptions;
+    public function __construct(
+        private bool $includeArguments = true,
+        private bool $includeOptions = false,
+    ) {
     }
 
-    public function __invoke(array $records)
+    public function __invoke(LogRecord $record): LogRecord
     {
-        if (null !== $this->commandData && !isset($records['extra']['command'])) {
-            $records['extra']['command'] = $this->commandData;
+        if (isset($this->commandData) && !isset($record->extra['command'])) {
+            $record->extra['command'] = $this->commandData;
         }
 
-        return $records;
+        return $record;
     }
 
-    public function reset()
+    public function reset(): void
     {
-        $this->commandData = null;
+        unset($this->commandData);
     }
 
-    public function addCommandData(ConsoleEvent $event)
+    public function addCommandData(ConsoleEvent $event): void
     {
         $this->commandData = [
             'name' => $event->getCommand()->getName(),
@@ -60,7 +59,7 @@ class ConsoleCommandProcessor implements EventSubscriberInterface, ResetInterfac
         }
     }
 
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             ConsoleEvents::COMMAND => ['addCommandData', 1],

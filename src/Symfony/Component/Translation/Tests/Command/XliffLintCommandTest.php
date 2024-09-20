@@ -26,7 +26,7 @@ use Symfony\Component\Translation\Command\XliffLintCommand;
  */
 class XliffLintCommandTest extends TestCase
 {
-    private $files;
+    private array $files;
 
     public function testLintCorrectFile()
     {
@@ -120,10 +120,11 @@ class XliffLintCommandTest extends TestCase
 
     public function testLintFileNotReadable()
     {
-        $this->expectException(\RuntimeException::class);
         $tester = $this->createCommandTester();
         $filename = $this->createFile();
         unlink($filename);
+
+        $this->expectException(\RuntimeException::class);
 
         $tester->execute(['filename' => $filename], ['decorated' => false]);
     }
@@ -135,8 +136,10 @@ class XliffLintCommandTest extends TestCase
 Or of a whole directory:
 
   <info>php %command.full_name% dirname</info>
-  <info>php %command.full_name% dirname --format=json</info>
 
+The <info>--format</info> option specifies the format of the command output:
+
+  <info>php %command.full_name% dirname --format=json</info>
 EOF;
 
         $this->assertStringContainsString($expected, $command->getHelp());
@@ -172,7 +175,7 @@ EOF;
     public function testPassingClosureAndCallableToConstructor()
     {
         $command = new XliffLintCommand('translation:xliff:lint',
-            \Closure::fromCallable([$this, 'testPassingClosureAndCallableToConstructor']),
+            $this->testPassingClosureAndCallableToConstructor(...),
             [$this, 'testPassingClosureAndCallableToConstructor']
         );
 
@@ -195,7 +198,7 @@ EOF;
 </xliff>
 XLIFF;
 
-        $filename = sprintf('%s/translation-xliff-lint-test/%s', sys_get_temp_dir(), str_replace('%locale%', 'en', $fileNamePattern));
+        $filename = \sprintf('%s/translation-xliff-lint-test/%s', sys_get_temp_dir(), str_replace('%locale%', 'en', $fileNamePattern));
         file_put_contents($filename, $xliffContent);
 
         $this->files[] = $filename;

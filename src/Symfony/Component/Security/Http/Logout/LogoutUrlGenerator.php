@@ -13,7 +13,6 @@ namespace Symfony\Component\Security\Http\Logout;
 
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
-use Symfony\Component\Security\Core\Authentication\Token\AnonymousToken;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 
@@ -25,20 +24,15 @@ use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
  */
 class LogoutUrlGenerator
 {
-    private $requestStack;
-    private $router;
-    private $tokenStorage;
-    private $listeners = [];
-    /** @var string|null */
-    private $currentFirewallName;
-    /** @var string|null */
-    private $currentFirewallContext;
+    private array $listeners = [];
+    private ?string $currentFirewallName = null;
+    private ?string $currentFirewallContext = null;
 
-    public function __construct(?RequestStack $requestStack = null, ?UrlGeneratorInterface $router = null, ?TokenStorageInterface $tokenStorage = null)
-    {
-        $this->requestStack = $requestStack;
-        $this->router = $router;
-        $this->tokenStorage = $tokenStorage;
+    public function __construct(
+        private ?RequestStack $requestStack = null,
+        private ?UrlGeneratorInterface $router = null,
+        private ?TokenStorageInterface $tokenStorage = null,
+    ) {
     }
 
     /**
@@ -50,32 +44,28 @@ class LogoutUrlGenerator
      * @param string|null $csrfParameter The CSRF token parameter name
      * @param string|null $context       The listener context
      */
-    public function registerListener(string $key, string $logoutPath, ?string $csrfTokenId, ?string $csrfParameter, ?CsrfTokenManagerInterface $csrfTokenManager = null, ?string $context = null)
+    public function registerListener(string $key, string $logoutPath, ?string $csrfTokenId, ?string $csrfParameter, ?CsrfTokenManagerInterface $csrfTokenManager = null, ?string $context = null): void
     {
         $this->listeners[$key] = [$logoutPath, $csrfTokenId, $csrfParameter, $csrfTokenManager, $context];
     }
 
     /**
      * Generates the absolute logout path for the firewall.
-     *
-     * @return string
      */
-    public function getLogoutPath(?string $key = null)
+    public function getLogoutPath(?string $key = null): string
     {
         return $this->generateLogoutUrl($key, UrlGeneratorInterface::ABSOLUTE_PATH);
     }
 
     /**
      * Generates the absolute logout URL for the firewall.
-     *
-     * @return string
      */
-    public function getLogoutUrl(?string $key = null)
+    public function getLogoutUrl(?string $key = null): string
     {
         return $this->generateLogoutUrl($key, UrlGeneratorInterface::ABSOLUTE_URL);
     }
 
-    public function setCurrentFirewall(?string $key, ?string $context = null)
+    public function setCurrentFirewall(?string $key, ?string $context = null): void
     {
         $this->currentFirewallName = $key;
         $this->currentFirewallContext = $context;
@@ -107,7 +97,7 @@ class LogoutUrlGenerator
 
             $url = UrlGeneratorInterface::ABSOLUTE_URL === $referenceType ? $request->getUriForPath($logoutPath) : $request->getBaseUrl().$logoutPath;
 
-            if (!empty($parameters)) {
+            if ($parameters) {
                 $url .= '?'.http_build_query($parameters, '', '&');
             }
         } else {
@@ -131,26 +121,15 @@ class LogoutUrlGenerator
                 return $this->listeners[$key];
             }
 
-            throw new \InvalidArgumentException(sprintf('No LogoutListener found for firewall key "%s".', $key));
+            throw new \InvalidArgumentException(\sprintf('No LogoutListener found for firewall key "%s".', $key));
         }
 
         // Fetch the current provider key from token, if possible
         if (null !== $this->tokenStorage) {
             $token = $this->tokenStorage->getToken();
 
-            // @deprecated since Symfony 5.4
-            if ($token instanceof AnonymousToken) {
-                throw new \InvalidArgumentException('Unable to generate a logout url for an anonymous token.');
-            }
-
-            if (null !== $token) {
-                if (method_exists($token, 'getFirewallName')) {
-                    $key = $token->getFirewallName();
-                } elseif (method_exists($token, 'getProviderKey')) {
-                    trigger_deprecation('symfony/security-http', '5.2', 'Method "%s::getProviderKey()" has been deprecated, rename it to "getFirewallName()" instead.', \get_class($token));
-
-                    $key = $token->getProviderKey();
-                }
+            if (null !== $token && method_exists($token, 'getFirewallName')) {
+                $key = $token->getFirewallName();
 
                 if (isset($this->listeners[$key])) {
                     return $this->listeners[$key];
@@ -169,6 +148,10 @@ class LogoutUrlGenerator
             }
         }
 
-        throw new \InvalidArgumentException('Unable to find the current firewall LogoutListener, please provide the provider key manually.');
+        if (null === $this->currentFirewallName) {
+            throw new \InvalidArgumentException('This request is not behind a firewall, pass the firewall name manually to generate a logout URL.');
+        }
+
+        throw new \InvalidArgumentException('Unable to find logout in the current firewall, pass the firewall name manually to generate a logout URL.');
     }
 }

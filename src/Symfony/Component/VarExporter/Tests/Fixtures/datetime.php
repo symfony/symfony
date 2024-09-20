@@ -7,7 +7,7 @@ return \Symfony\Component\VarExporter\Internal\Hydrator::hydrate(
         clone ($p['DateTimeZone'] ?? \Symfony\Component\VarExporter\Internal\Registry::p('DateTimeZone')),
         clone ($p['DateInterval'] ?? \Symfony\Component\VarExporter\Internal\Registry::p('DateInterval')),
         clone ($p['DatePeriod'] ?? \Symfony\Component\VarExporter\Internal\Registry::p('DatePeriod')),
-        clone $p['DateTime'],
+        clone $p['DateTimeImmutable'],
         clone $p['DateInterval'],
     ],
     null,

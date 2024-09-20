@@ -18,26 +18,24 @@ namespace Symfony\Component\Messenger\Handler;
  */
 final class HandlerDescriptor
 {
-    private $handler;
-    private $name;
-    private $batchHandler;
-    private $options;
+    private \Closure $handler;
+    private string $name;
+    private ?BatchHandlerInterface $batchHandler = null;
 
-    public function __construct(callable $handler, array $options = [])
-    {
-        if (!$handler instanceof \Closure) {
-            $handler = \Closure::fromCallable($handler);
-        }
+    public function __construct(
+        callable $handler,
+        private array $options = [],
+    ) {
+        $handler = $handler(...);
 
         $this->handler = $handler;
-        $this->options = $options;
 
         $r = new \ReflectionFunction($handler);
 
-        if (str_contains($r->name, '{closure')) {
+        if ($r->isAnonymous()) {
             $this->name = 'Closure';
         } elseif (!$handler = $r->getClosureThis()) {
-            $class = \PHP_VERSION_ID >= 80111 ? $r->getClosureCalledClass() : $r->getClosureScopeClass();
+            $class = $r->getClosureCalledClass();
 
             $this->name = ($class ? $class->name.'::' : '').$r->name;
         } else {
@@ -45,7 +43,7 @@ final class HandlerDescriptor
                 $this->batchHandler = $handler;
             }
 
-            $this->name = \get_class($handler).'::'.$r->name;
+            $this->name = $handler::class.'::'.$r->name;
         }
     }
 
@@ -71,8 +69,13 @@ final class HandlerDescriptor
         return $this->batchHandler;
     }
 
-    public function getOption(string $option)
+    public function getOption(string $option): mixed
     {
         return $this->options[$option] ?? null;
+    }
+
+    public function getOptions(): array
+    {
+        return $this->options;
     }
 }

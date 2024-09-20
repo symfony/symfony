@@ -14,17 +14,13 @@ namespace Symfony\Component\Notifier\Bridge\GatewayApi;
 use Symfony\Component\Notifier\Exception\UnsupportedSchemeException;
 use Symfony\Component\Notifier\Transport\AbstractTransportFactory;
 use Symfony\Component\Notifier\Transport\Dsn;
-use Symfony\Component\Notifier\Transport\TransportInterface;
 
 /**
  * @author Piergiuseppe Longo <piergiuseppe.longo@gmail.com>
  */
 final class GatewayApiTransportFactory extends AbstractTransportFactory
 {
-    /**
-     * @return GatewayApiTransport
-     */
-    public function create(Dsn $dsn): TransportInterface
+    public function create(Dsn $dsn): GatewayApiTransport
     {
         $scheme = $dsn->getScheme();
 

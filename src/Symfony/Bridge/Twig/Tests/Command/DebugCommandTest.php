@@ -299,10 +299,6 @@ TXT
      */
     public function testComplete(array $input, array $expectedSuggestions)
     {
-        if (!class_exists(CommandCompletionTester::class)) {
-            $this->markTestSkipped('Test command completion requires symfony/console 5.4+.');
-        }
-
         $projectDir = \dirname(__DIR__).\DIRECTORY_SEPARATOR.'Fixtures';
         $loader = new FilesystemLoader([], $projectDir);
         $environment = new Environment($loader);
@@ -318,7 +314,7 @@ TXT
     public static function provideCompletionSuggestions(): iterable
     {
         yield 'name' => [['email'], []];
-        yield 'option --format' => [['--format', ''], ['text', 'json']];
+        yield 'option --format' => [['--format', ''], ['txt', 'json']];
     }
 
     private function createCommandTester(array $paths = [], array $bundleMetadata = [], ?string $defaultPath = null, bool $useChainLoader = false, array $globals = []): CommandTester

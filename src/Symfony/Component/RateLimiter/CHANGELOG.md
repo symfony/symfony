@@ -1,6 +1,16 @@
 CHANGELOG
 =========
 
+6.4
+---
+
+ * Add `SlidingWindowLimiter::reserve()`
+
+6.2
+---
+
+ * Move `symfony/lock` to dev dependency in `composer.json`
+
 5.4
 ---
 

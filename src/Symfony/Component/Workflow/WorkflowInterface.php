@@ -12,65 +12,57 @@
 namespace Symfony\Component\Workflow;
 
 use Symfony\Component\Workflow\Exception\LogicException;
+use Symfony\Component\Workflow\Exception\UndefinedTransitionException;
 use Symfony\Component\Workflow\MarkingStore\MarkingStoreInterface;
 use Symfony\Component\Workflow\Metadata\MetadataStoreInterface;
 
 /**
+ * Describes a workflow instance.
+ *
  * @author Amrouche Hamza <hamza.simperfit@gmail.com>
+ *
+ * @method Transition|null getEnabledTransition(object $subject, string $name)
  */
 interface WorkflowInterface
 {
     /**
      * Returns the object's Marking.
      *
-     * @return Marking
-     *
      * @throws LogicException
      */
-    public function getMarking(object $subject);
+    public function getMarking(object $subject): Marking;
 
     /**
      * Returns true if the transition is enabled.
-     *
-     * @return bool
      */
-    public function can(object $subject, string $transitionName);
+    public function can(object $subject, string $transitionName): bool;
 
     /**
      * Builds a TransitionBlockerList to know why a transition is blocked.
+     *
+     * @throws UndefinedTransitionException If the transition is not defined
      */
     public function buildTransitionBlockerList(object $subject, string $transitionName): TransitionBlockerList;
 
     /**
      * Fire a transition.
      *
-     * @return Marking
-     *
      * @throws LogicException If the transition is not applicable
      */
-    public function apply(object $subject, string $transitionName, array $context = []);
+    public function apply(object $subject, string $transitionName, array $context = []): Marking;
 
     /**
      * Returns all enabled transitions.
      *
      * @return Transition[]
      */
-    public function getEnabledTransitions(object $subject);
+    public function getEnabledTransitions(object $subject): array;
 
-    /**
-     * @return string
-     */
-    public function getName();
+    public function getName(): string;
 
-    /**
-     * @return Definition
-     */
-    public function getDefinition();
+    public function getDefinition(): Definition;
 
-    /**
-     * @return MarkingStoreInterface
-     */
-    public function getMarkingStore();
+    public function getMarkingStore(): MarkingStoreInterface;
 
     public function getMetadataStore(): MetadataStoreInterface;
 }

@@ -102,7 +102,7 @@ acme_root:
     scalar_deprecated_with_message: ~ # Deprecated (Since vendor/package 1.1: Deprecation custom message for "scalar_deprecated_with_message" at "acme_root")
     node_with_a_looong_name: ~
     enum_with_default:    this # One of "this"; "that"
-    enum:                 ~ # One of "this"; "that"
+    enum:                 ~ # One of "this"; "that"; Symfony\Component\Config\Tests\Fixtures\TestEnum::Ccc
 
     # some info
     array:

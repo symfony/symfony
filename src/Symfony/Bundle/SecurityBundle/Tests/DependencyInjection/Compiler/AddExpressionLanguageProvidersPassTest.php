@@ -24,11 +24,11 @@ class AddExpressionLanguageProvidersPassTest extends TestCase
         $container = new ContainerBuilder();
         $container->addCompilerPass(new AddExpressionLanguageProvidersPass());
 
-        $definition = new Definition('\stdClass');
+        $definition = new Definition(\stdClass::class);
         $definition->addTag('security.expression_language_provider');
         $container->setDefinition('some_security_provider', $definition->setPublic(true));
 
-        $container->register('security.expression_language', '\stdClass')->setPublic(true);
+        $container->register('security.expression_language', \stdClass::class)->setPublic(true);
         $container->compile();
 
         $calls = $container->getDefinition('security.expression_language')->getMethodCalls();
@@ -42,11 +42,11 @@ class AddExpressionLanguageProvidersPassTest extends TestCase
         $container = new ContainerBuilder();
         $container->addCompilerPass(new AddExpressionLanguageProvidersPass());
 
-        $definition = new Definition('\stdClass');
+        $definition = new Definition(\stdClass::class);
         $definition->addTag('security.expression_language_provider');
         $container->setDefinition('some_security_provider', $definition->setPublic(true));
 
-        $container->register('my_security.expression_language', '\stdClass')->setPublic(true);
+        $container->register('my_security.expression_language', \stdClass::class)->setPublic(true);
         $container->setAlias('security.expression_language', 'my_security.expression_language');
         $container->compile();
 

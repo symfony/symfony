@@ -24,16 +24,17 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
  */
 abstract class AbstractHttpTransport extends AbstractTransport
 {
-    protected $host;
-    protected $port;
-    protected $client;
+    protected ?string $host = null;
+    protected ?int $port = null;
 
-    public function __construct(?HttpClientInterface $client = null, ?EventDispatcherInterface $dispatcher = null, ?LoggerInterface $logger = null)
-    {
-        $this->client = $client;
+    public function __construct(
+        protected ?HttpClientInterface $client = null,
+        ?EventDispatcherInterface $dispatcher = null,
+        ?LoggerInterface $logger = null,
+    ) {
         if (null === $client) {
             if (!class_exists(HttpClient::class)) {
-                throw new \LogicException(sprintf('You cannot use "%s" as the HttpClient component is not installed. Try running "composer require symfony/http-client".', __CLASS__));
+                throw new \LogicException(\sprintf('You cannot use "%s" as the HttpClient component is not installed. Try running "composer require symfony/http-client".', __CLASS__));
             }
 
             $this->client = HttpClient::create();
@@ -45,7 +46,7 @@ abstract class AbstractHttpTransport extends AbstractTransport
     /**
      * @return $this
      */
-    public function setHost(?string $host)
+    public function setHost(?string $host): static
     {
         $this->host = $host;
 
@@ -55,7 +56,7 @@ abstract class AbstractHttpTransport extends AbstractTransport
     /**
      * @return $this
      */
-    public function setPort(?int $port)
+    public function setPort(?int $port): static
     {
         $this->port = $port;
 
@@ -66,7 +67,6 @@ abstract class AbstractHttpTransport extends AbstractTransport
 
     protected function doSend(SentMessage $message): void
     {
-        $response = null;
         try {
             $response = $this->doSendHttp($message);
             $message->appendDebug($response->getInfo('debug') ?? '');

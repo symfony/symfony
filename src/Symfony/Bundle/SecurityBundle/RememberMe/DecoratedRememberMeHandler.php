@@ -24,32 +24,21 @@ use Symfony\Component\Security\Http\RememberMe\RememberMeHandlerInterface;
  */
 final class DecoratedRememberMeHandler implements RememberMeHandlerInterface
 {
-    private $handler;
-
-    public function __construct(RememberMeHandlerInterface $handler)
-    {
-        $this->handler = $handler;
+    public function __construct(
+        private RememberMeHandlerInterface $handler,
+    ) {
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function createRememberMeCookie(UserInterface $user): void
     {
         $this->handler->createRememberMeCookie($user);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function consumeRememberMeCookie(RememberMeDetails $rememberMeDetails): UserInterface
     {
         return $this->handler->consumeRememberMeCookie($rememberMeDetails);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function clearRememberMeCookie(): void
     {
         $this->handler->clearRememberMeCookie();

@@ -1,9 +1,13 @@
 framework:
+    annotations: false
+    http_method_override: false
+    handle_all_throwables: true
+    php_errors:
+        log: true
     mailer:
         enabled: false
     messenger:
         enabled: true
-        reset_on_message: true
     notifier:
         enabled: true
         notification_on_failed_messages: true

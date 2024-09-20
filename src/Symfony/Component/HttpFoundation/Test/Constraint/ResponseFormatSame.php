@@ -22,18 +22,13 @@ use Symfony\Component\HttpFoundation\Response;
  */
 final class ResponseFormatSame extends Constraint
 {
-    private $request;
-    private $format;
-
-    public function __construct(Request $request, ?string $format)
-    {
-        $this->request = $request;
-        $this->format = $format;
+    public function __construct(
+        private Request $request,
+        private ?string $format,
+        private readonly bool $verbose = true,
+    ) {
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function toString(): string
     {
         return 'format is '.($this->format ?? 'null');
@@ -41,8 +36,6 @@ final class ResponseFormatSame extends Constraint
 
     /**
      * @param Response $response
-     *
-     * {@inheritdoc}
      */
     protected function matches($response): bool
     {
@@ -51,8 +44,6 @@ final class ResponseFormatSame extends Constraint
 
     /**
      * @param Response $response
-     *
-     * {@inheritdoc}
      */
     protected function failureDescription($response): string
     {
@@ -61,11 +52,9 @@ final class ResponseFormatSame extends Constraint
 
     /**
      * @param Response $response
-     *
-     * {@inheritdoc}
      */
     protected function additionalFailureDescription($response): string
     {
-        return (string) $response;
+        return $this->verbose ? (string) $response : explode("\r\n\r\n", (string) $response)[0];
     }
 }

@@ -15,9 +15,13 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Twig\Mime\BodyRenderer;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Component\Mime\Exception\InvalidArgumentException;
+use Symfony\Component\Mime\HtmlToTextConverter\DefaultHtmlToTextConverter;
+use Symfony\Component\Mime\HtmlToTextConverter\HtmlToTextConverterInterface;
 use Symfony\Component\Mime\Part\Multipart\AlternativePart;
+use Symfony\Component\Translation\LocaleSwitcher;
 use Twig\Environment;
 use Twig\Loader\ArrayLoader;
+use Twig\TwigFunction;
 
 class BodyRendererTest extends TestCase
 {
@@ -27,14 +31,24 @@ class BodyRendererTest extends TestCase
         $this->assertEquals('Text', $email->getBody()->bodyToString());
     }
 
-    public function testRenderHtmlOnly()
+    public function testRenderHtmlOnlyWithDefaultConverter()
     {
-        $html = '<head>head</head><b>HTML</b><style type="text/css">css</style>';
-        $email = $this->prepareEmail(null, $html);
+        $html = '<head><meta charset="utf-8"></head><b>HTML</b><style>css</style>';
+        $email = $this->prepareEmail(null, $html, [], new DefaultHtmlToTextConverter());
         $body = $email->getBody();
         $this->assertInstanceOf(AlternativePart::class, $body);
         $this->assertEquals('HTML', $body->getParts()[0]->bodyToString());
-        $this->assertEquals(str_replace('=', '=3D', $html), $body->getParts()[1]->bodyToString());
+        $this->assertEquals(str_replace(['=', "\n"], ['=3D', "\r\n"], $html), $body->getParts()[1]->bodyToString());
+    }
+
+    public function testRenderHtmlOnlyWithLeagueConverter()
+    {
+        $html = '<head><meta charset="utf-8"></head><b>HTML</b><style>css</style>';
+        $email = $this->prepareEmail(null, $html);
+        $body = $email->getBody();
+        $this->assertInstanceOf(AlternativePart::class, $body);
+        $this->assertEquals('**HTML**', $body->getParts()[0]->bodyToString());
+        $this->assertEquals(str_replace(['=', "\n"], ['=3D', "\r\n"], $html), $body->getParts()[1]->bodyToString());
     }
 
     public function testRenderMultiLineHtmlOnly()
@@ -50,7 +64,7 @@ HTML;
         $email = $this->prepareEmail(null, $html);
         $body = $email->getBody();
         $this->assertInstanceOf(AlternativePart::class, $body);
-        $this->assertEquals('HTML', str_replace(["\r", "\n"], '', $body->getParts()[0]->bodyToString()));
+        $this->assertEquals('**HTML**', str_replace(["\r", "\n"], '', $body->getParts()[0]->bodyToString()));
         $this->assertEquals(str_replace(['=', "\n"], ['=3D', "\r\n"], $html), $body->getParts()[1]->bodyToString());
     }
 
@@ -112,16 +126,26 @@ HTML;
         ;
         $email->textTemplate('text');
         $email->context([
-            'foo' => static function () {
-                return 'bar';
-            },
+            'foo' => static fn () => 'bar',
         ]);
 
         $renderer->render($email);
         $this->assertEquals('Text', $email->getTextBody());
     }
 
-    private function prepareEmail(?string $text, ?string $html, array $context = []): TemplatedEmail
+    /**
+     * @requires extension intl
+     */
+    public function testRenderWithLocale()
+    {
+        $localeSwitcher = new LocaleSwitcher('en', []);
+        $email = $this->prepareEmail(null, 'Locale: {{ locale_switcher_locale() }}', [], new DefaultHtmlToTextConverter(), $localeSwitcher, 'fr');
+
+        $this->assertEquals('Locale: fr', $email->getTextBody());
+        $this->assertEquals('Locale: fr', $email->getHtmlBody());
+    }
+
+    private function prepareEmail(?string $text, ?string $html, array $context = [], ?HtmlToTextConverterInterface $converter = null, ?LocaleSwitcher $localeSwitcher = null, ?string $locale = null): TemplatedEmail
     {
         $twig = new Environment(new ArrayLoader([
             'text' => $text,
@@ -129,12 +153,19 @@ HTML;
             'document.txt' => 'Some text document...',
             'image.jpg' => 'Some image data',
         ]));
-        $renderer = new BodyRenderer($twig);
+
+        if ($localeSwitcher instanceof LocaleSwitcher) {
+            $twig->addFunction(new TwigFunction('locale_switcher_locale', [$localeSwitcher, 'getLocale']));
+        }
+
+        $renderer = new BodyRenderer($twig, [], $converter, $localeSwitcher);
         $email = (new TemplatedEmail())
             ->to('fabien@symfony.com')
             ->from('helene@symfony.com')
+            ->locale($locale)
             ->context($context)
         ;
+
         if (null !== $text) {
             $email->textTemplate('text');
         }

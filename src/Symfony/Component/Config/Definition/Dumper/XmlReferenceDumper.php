@@ -13,10 +13,14 @@ namespace Symfony\Component\Config\Definition\Dumper;
 
 use Symfony\Component\Config\Definition\ArrayNode;
 use Symfony\Component\Config\Definition\BaseNode;
+use Symfony\Component\Config\Definition\BooleanNode;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\Config\Definition\EnumNode;
+use Symfony\Component\Config\Definition\FloatNode;
+use Symfony\Component\Config\Definition\IntegerNode;
 use Symfony\Component\Config\Definition\NodeInterface;
 use Symfony\Component\Config\Definition\PrototypedArrayNode;
+use Symfony\Component\Config\Definition\ScalarNode;
 
 /**
  * Dumps an XML reference configuration for the given configuration/node instance.
@@ -25,14 +29,14 @@ use Symfony\Component\Config\Definition\PrototypedArrayNode;
  */
 class XmlReferenceDumper
 {
-    private $reference;
+    private ?string $reference = null;
 
-    public function dump(ConfigurationInterface $configuration, ?string $namespace = null)
+    public function dump(ConfigurationInterface $configuration, ?string $namespace = null): string
     {
         return $this->dumpNode($configuration->getConfigTreeBuilder()->buildTree(), $namespace);
     }
 
-    public function dumpNode(NodeInterface $node, ?string $namespace = null)
+    public function dumpNode(NodeInterface $node, ?string $namespace = null): string
     {
         $this->reference = '';
         $this->writeNode($node, 0, true, $namespace);
@@ -42,16 +46,14 @@ class XmlReferenceDumper
         return $ref;
     }
 
-    private function writeNode(NodeInterface $node, int $depth = 0, bool $root = false, ?string $namespace = null)
+    private function writeNode(NodeInterface $node, int $depth = 0, bool $root = false, ?string $namespace = null): void
     {
         $rootName = ($root ? 'config' : $node->getName());
         $rootNamespace = ($namespace ?: ($root ? 'http://example.org/schema/dic/'.$node->getName() : null));
 
         // xml remapping
         if ($node->getParent()) {
-            $remapping = array_filter($node->getParent()->getXmlRemappings(), function (array $mapping) use ($rootName) {
-                return $rootName === $mapping[1];
-            });
+            $remapping = array_filter($node->getParent()->getXmlRemappings(), fn (array $mapping) => $rootName === $mapping[1]);
 
             if (\count($remapping)) {
                 [$singular] = current($remapping);
@@ -100,27 +102,14 @@ class XmlReferenceDumper
                     if ($prototype->hasDefaultValue()) {
                         $prototypeValue = $prototype->getDefaultValue();
                     } else {
-                        switch (\get_class($prototype)) {
-                            case 'Symfony\Component\Config\Definition\ScalarNode':
-                                $prototypeValue = 'scalar value';
-                                break;
-
-                            case 'Symfony\Component\Config\Definition\FloatNode':
-                            case 'Symfony\Component\Config\Definition\IntegerNode':
-                                $prototypeValue = 'numeric value';
-                                break;
-
-                            case 'Symfony\Component\Config\Definition\BooleanNode':
-                                $prototypeValue = 'true|false';
-                                break;
-
-                            case 'Symfony\Component\Config\Definition\EnumNode':
-                                $prototypeValue = implode('|', array_map('json_encode', $prototype->getValues()));
-                                break;
-
-                            default:
-                                $prototypeValue = 'value';
-                        }
+                        $prototypeValue = match ($prototype::class) {
+                            ScalarNode::class => 'scalar value',
+                            FloatNode::class,
+                            IntegerNode::class => 'numeric value',
+                            BooleanNode::class => 'true|false',
+                            EnumNode::class => $prototype->getPermissibleValues('|'),
+                            default => 'value',
+                        };
                     }
                 }
             }
@@ -156,11 +145,11 @@ class XmlReferenceDumper
 
                 if ($child instanceof BaseNode && $child->isDeprecated()) {
                     $deprecation = $child->getDeprecation($child->getName(), $node->getPath());
-                    $comments[] = sprintf('Deprecated (%s)', ($deprecation['package'] || $deprecation['version'] ? "Since {$deprecation['package']} {$deprecation['version']}: " : '').$deprecation['message']);
+                    $comments[] = \sprintf('Deprecated (%s)', ($deprecation['package'] || $deprecation['version'] ? "Since {$deprecation['package']} {$deprecation['version']}: " : '').$deprecation['message']);
                 }
 
                 if ($child instanceof EnumNode) {
-                    $comments[] = 'One of '.implode('; ', array_map('json_encode', $child->getValues()));
+                    $comments[] = 'One of '.$child->getPermissibleValues('; ');
                 }
 
                 if (\count($comments)) {
@@ -210,7 +199,7 @@ class XmlReferenceDumper
         $rootOpenTag = '<'.$rootName;
         if (1 >= ($attributesCount = \count($rootAttributes))) {
             if (1 === $attributesCount) {
-                $rootOpenTag .= sprintf(' %s="%s"', current(array_keys($rootAttributes)), $this->writeValue(current($rootAttributes)));
+                $rootOpenTag .= \sprintf(' %s="%s"', current(array_keys($rootAttributes)), $this->writeValue(current($rootAttributes)));
             }
 
             $rootOpenTag .= $rootIsEmptyTag ? ' />' : '>';
@@ -226,7 +215,7 @@ class XmlReferenceDumper
             $i = 1;
 
             foreach ($rootAttributes as $attrName => $attrValue) {
-                $attr = sprintf('%s="%s"', $attrName, $this->writeValue($attrValue));
+                $attr = \sprintf('%s="%s"', $attrName, $this->writeValue($attrValue));
 
                 $this->writeLine($attr, $depth + 4);
 
@@ -258,20 +247,18 @@ class XmlReferenceDumper
     /**
      * Outputs a single config reference line.
      */
-    private function writeLine(string $text, int $indent = 0)
+    private function writeLine(string $text, int $indent = 0): void
     {
         $indent = \strlen($text) + $indent;
         $format = '%'.$indent.'s';
 
-        $this->reference .= sprintf($format, $text).\PHP_EOL;
+        $this->reference .= \sprintf($format, $text).\PHP_EOL;
     }
 
     /**
      * Renders the string conversion of the value.
-     *
-     * @param mixed $value
      */
-    private function writeValue($value): string
+    private function writeValue(mixed $value): string
     {
         if ('%%%%not_defined%%%%' === $value) {
             return '';
@@ -293,7 +280,7 @@ class XmlReferenceDumper
             return 'null';
         }
 
-        if (empty($value)) {
+        if (!$value) {
             return '';
         }
 

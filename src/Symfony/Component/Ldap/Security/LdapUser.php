@@ -23,23 +23,16 @@ use Symfony\Component\Security\Core\User\UserInterface;
  */
 class LdapUser implements UserInterface, PasswordAuthenticatedUserInterface, EquatableInterface
 {
-    private $entry;
-    private $username;
-    private $password;
-    private $roles;
-    private $extraFields;
-
-    public function __construct(Entry $entry, string $username, ?string $password, array $roles = [], array $extraFields = [])
-    {
-        if (!$username) {
+    public function __construct(
+        private Entry $entry,
+        private string $identifier,
+        #[\SensitiveParameter] private ?string $password,
+        private array $roles = [],
+        private array $extraFields = [],
+    ) {
+        if (!$identifier) {
             throw new \InvalidArgumentException('The username cannot be empty.');
         }
-
-        $this->entry = $entry;
-        $this->username = $username;
-        $this->password = $password;
-        $this->roles = $roles;
-        $this->extraFields = $extraFields;
     }
 
     public function getEntry(): Entry
@@ -47,49 +40,27 @@ class LdapUser implements UserInterface, PasswordAuthenticatedUserInterface, Equ
         return $this->entry;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getRoles(): array
     {
         return $this->roles;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getPassword(): ?string
     {
         return $this->password;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getSalt(): ?string
     {
         return null;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getUsername(): string
-    {
-        trigger_deprecation('symfony/ldap', '5.3', 'Method "%s()" is deprecated and will be removed in 6.0, use getUserIdentifier() instead.', __METHOD__);
-
-        return $this->username;
-    }
-
     public function getUserIdentifier(): string
     {
-        return $this->username;
+        return $this->identifier;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function eraseCredentials()
+    public function eraseCredentials(): void
     {
         $this->password = null;
     }
@@ -99,14 +70,11 @@ class LdapUser implements UserInterface, PasswordAuthenticatedUserInterface, Equ
         return $this->extraFields;
     }
 
-    public function setPassword(string $password)
+    public function setPassword(#[\SensitiveParameter] string $password): void
     {
         $this->password = $password;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function isEqualTo(UserInterface $user): bool
     {
         if (!$user instanceof self) {

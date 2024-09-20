@@ -32,7 +32,7 @@ class TableCellStyle
         'right' => \STR_PAD_LEFT,
     ];
 
-    private $options = [
+    private array $options = [
         'fg' => 'default',
         'bg' => 'default',
         'options' => null,
@@ -43,11 +43,11 @@ class TableCellStyle
     public function __construct(array $options = [])
     {
         if ($diff = array_diff(array_keys($options), array_keys($this->options))) {
-            throw new InvalidArgumentException(sprintf('The TableCellStyle does not support the following options: \'%s\'.', implode('\', \'', $diff)));
+            throw new InvalidArgumentException(\sprintf('The TableCellStyle does not support the following options: \'%s\'.', implode('\', \'', $diff)));
         }
 
         if (isset($options['align']) && !\array_key_exists($options['align'], self::ALIGN_MAP)) {
-            throw new InvalidArgumentException(sprintf('Wrong align value. Value must be following: \'%s\'.', implode('\', \'', array_keys(self::ALIGN_MAP))));
+            throw new InvalidArgumentException(\sprintf('Wrong align value. Value must be following: \'%s\'.', implode('\', \'', array_keys(self::ALIGN_MAP))));
         }
 
         $this->options = array_merge($this->options, $options);
@@ -63,21 +63,16 @@ class TableCellStyle
      *
      * @return string[]
      */
-    public function getTagOptions()
+    public function getTagOptions(): array
     {
         return array_filter(
             $this->getOptions(),
-            function ($key) {
-                return \in_array($key, self::TAG_OPTIONS) && isset($this->options[$key]);
-            },
+            fn ($key) => \in_array($key, self::TAG_OPTIONS, true) && isset($this->options[$key]),
             \ARRAY_FILTER_USE_KEY
         );
     }
 
-    /**
-     * @return int
-     */
-    public function getPadByAlign()
+    public function getPadByAlign(): int
     {
         return self::ALIGN_MAP[$this->getOptions()['align']];
     }

@@ -24,16 +24,13 @@ use Symfony\Component\Routing\RouteCollection;
 
 class CompiledUrlMatcherDumperTest extends TestCase
 {
-    /**
-     * @var string
-     */
-    private $dumpPath;
+    private string $dumpPath;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        $this->dumpPath = sys_get_temp_dir().\DIRECTORY_SEPARATOR.'php_matcher.'.uniqid('CompiledUrlMatcher').'.php';
+        $this->dumpPath = tempnam(sys_get_temp_dir(), 'sf_matcher_');
     }
 
     protected function tearDown(): void
@@ -296,6 +293,10 @@ class CompiledUrlMatcherDumperTest extends TestCase
         $route = new Route('/with-condition');
         $route->setCondition('context.getMethod() == "GET"');
         $rootprefixCollection->add('with-condition', $route);
+        $route = new Route('/with-condition/{id}');
+        $route->setRequirement('id', '\d+');
+        $route->setCondition("params['id'] < 100");
+        $rootprefixCollection->add('with-condition-dynamic', $route);
 
         /* test case 4 */
         $headMatchCasesCollection = new RouteCollection();
@@ -492,11 +493,13 @@ class CompiledUrlMatcherDumperTest extends TestCase
 
     public function testGenerateDumperMatcherWithObject()
     {
-        $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('Symfony\Component\Routing\Route cannot contain objects');
         $routeCollection = new RouteCollection();
         $routeCollection->add('_', new Route('/', [new \stdClass()]));
         $dumper = new CompiledUrlMatcherDumper($routeCollection);
+
+        $this->expectExceptionMessage('Symfony\Component\Routing\Route cannot contain objects');
+        $this->expectException(\InvalidArgumentException::class);
+
         $dumper->dump();
     }
 }

@@ -16,6 +16,7 @@ use Symfony\Bridge\PhpUnit\ClassExistsMock;
 use Symfony\Component\Translation\Bridge\Crowdin\CrowdinProviderFactory;
 use Symfony\Component\Translation\Bridge\Loco\LocoProviderFactory;
 use Symfony\Component\Translation\Bridge\Lokalise\LokaliseProviderFactory;
+use Symfony\Component\Translation\Bridge\Phrase\PhraseProviderFactory;
 use Symfony\Component\Translation\Exception\UnsupportedSchemeException;
 use Symfony\Component\Translation\Provider\Dsn;
 
@@ -31,6 +32,7 @@ final class UnsupportedSchemeExceptionTest extends TestCase
             CrowdinProviderFactory::class => false,
             LocoProviderFactory::class => false,
             LokaliseProviderFactory::class => false,
+            PhraseProviderFactory::class => false,
         ]);
     }
 
@@ -39,10 +41,10 @@ final class UnsupportedSchemeExceptionTest extends TestCase
      */
     public function testMessageWhereSchemeIsPartOfSchemeToPackageMap(string $scheme, string $package)
     {
-        $dsn = new Dsn(sprintf('%s://localhost', $scheme));
+        $dsn = new Dsn(\sprintf('%s://localhost', $scheme));
 
         $this->assertSame(
-            sprintf('Unable to synchronize translations via "%s" as the provider is not installed; try running "composer require %s".', $scheme, $package),
+            \sprintf('Unable to synchronize translations via "%s" as the provider is not installed. Try running "composer require %s".', $scheme, $package),
             (new UnsupportedSchemeException($dsn))->getMessage()
         );
     }
@@ -52,6 +54,7 @@ final class UnsupportedSchemeExceptionTest extends TestCase
         yield ['crowdin', 'symfony/crowdin-translation-provider'];
         yield ['loco', 'symfony/loco-translation-provider'];
         yield ['lokalise', 'symfony/lokalise-translation-provider'];
+        yield ['phrase', 'symfony/phrase-translation-provider'];
     }
 
     /**

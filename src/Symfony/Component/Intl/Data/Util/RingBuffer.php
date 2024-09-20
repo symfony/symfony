@@ -31,52 +31,32 @@ use Symfony\Component\Intl\Exception\OutOfBoundsException;
  */
 class RingBuffer implements \ArrayAccess
 {
-    /**
-     * @var array<int, TValue>
-     */
-    private $values = [];
+    /** @var array<int, TValue> */
+    private array $values = [];
+    /** @var array<TKey, int> */
+    private array $indices = [];
+    private int $cursor = 0;
 
-    /**
-     * @var array<TKey, int>
-     */
-    private $indices = [];
-
-    private $cursor = 0;
-
-    private $size;
-
-    public function __construct(int $size)
-    {
-        $this->size = $size;
+    public function __construct(
+        private int $size,
+    ) {
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function offsetExists($key): bool
+    public function offsetExists(mixed $key): bool
     {
         return isset($this->indices[$key]);
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * @return mixed
-     */
-    #[\ReturnTypeWillChange]
-    public function offsetGet($key)
+    public function offsetGet(mixed $key): mixed
     {
         if (!isset($this->indices[$key])) {
-            throw new OutOfBoundsException(sprintf('The index "%s" does not exist.', $key));
+            throw new OutOfBoundsException(\sprintf('The index "%s" does not exist.', $key));
         }
 
         return $this->values[$this->indices[$key]];
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function offsetSet($key, $value): void
+    public function offsetSet(mixed $key, mixed $value): void
     {
         if (false !== ($keyToRemove = array_search($this->cursor, $this->indices))) {
             unset($this->indices[$keyToRemove]);
@@ -88,10 +68,7 @@ class RingBuffer implements \ArrayAccess
         $this->cursor = ($this->cursor + 1) % $this->size;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function offsetUnset($key): void
+    public function offsetUnset(mixed $key): void
     {
         if (isset($this->indices[$key])) {
             $this->values[$this->indices[$key]] = null;

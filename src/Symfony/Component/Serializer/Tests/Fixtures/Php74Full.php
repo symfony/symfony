@@ -36,7 +36,6 @@ final class Php74Full
     public $anotherCollection;
 }
 
-
 final class Php74FullWithConstructor
 {
     public function __construct($constructorArgument)

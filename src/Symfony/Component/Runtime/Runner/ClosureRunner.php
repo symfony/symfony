@@ -18,11 +18,9 @@ use Symfony\Component\Runtime\RunnerInterface;
  */
 class ClosureRunner implements RunnerInterface
 {
-    private $closure;
-
-    public function __construct(\Closure $closure)
-    {
-        $this->closure = $closure;
+    public function __construct(
+        private readonly \Closure $closure,
+    ) {
     }
 
     public function run(): int
@@ -38,7 +36,7 @@ class ClosureRunner implements RunnerInterface
         if (null !== $exitStatus && !\is_int($exitStatus)) {
             $r = new \ReflectionFunction($this->closure);
 
-            throw new \TypeError(sprintf('Unexpected value of type "%s" returned, "string|int|null" expected from "%s" on line "%d".', get_debug_type($exitStatus), $r->getFileName(), $r->getStartLine()));
+            throw new \TypeError(\sprintf('Unexpected value of type "%s" returned, "string|int|null" expected from "%s" on line "%d".', get_debug_type($exitStatus), $r->getFileName(), $r->getStartLine()));
         }
 
         return $exitStatus ?? 0;

@@ -41,6 +41,8 @@ class AcceptHeaderTest extends TestCase
     {
         return [
             ['', []],
+            [';;;', []],
+            ['0', [new AcceptHeaderItem('0')]],
             ['gzip', [new AcceptHeaderItem('gzip')]],
             ['gzip,deflate,sdch', [new AcceptHeaderItem('gzip'), new AcceptHeaderItem('deflate'), new AcceptHeaderItem('sdch')]],
             ["gzip, deflate\t,sdch", [new AcceptHeaderItem('gzip'), new AcceptHeaderItem('deflate'), new AcceptHeaderItem('sdch')]],

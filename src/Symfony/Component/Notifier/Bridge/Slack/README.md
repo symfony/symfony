@@ -29,7 +29,7 @@ SLACK_DSN=slack://xoxb-......@default?channel=fabien
 Adding Interactions to a Message
 --------------------------------
 
-With a Slack message, you can use the `SlackOptions` class to add some 
+With a Slack message, you can use the `SlackOptions` class to add some
 interactive options called [Block elements](https://api.slack.com/reference/block-kit/block-elements).
 
 ```php
@@ -74,6 +74,46 @@ $chatMessage->options($slackOptions);
 $chatter->send($chatMessage);
 ```
 
+Alternatively, a single button can be added to a section using the `accessory()` method and the `SlackButtonBlockElement` class.
+
+```php
+use Symfony\Component\Notifier\Bridge\Slack\Block\SlackButtonBlockElement;
+use Symfony\Component\Notifier\Bridge\Slack\Block\SlackDividerBlock;
+use Symfony\Component\Notifier\Bridge\Slack\Block\SlackSectionBlock;
+use Symfony\Component\Notifier\Bridge\Slack\SlackOptions;
+use Symfony\Component\Notifier\Message\ChatMessage;
+
+$chatMessage = new ChatMessage('Contribute To Symfony');
+
+$slackOptions = (new SlackOptions())
+    ->block((new SlackSectionBlock())
+        ->text('Symfony Framework')
+        ->accessory(
+            new SlackButtonBlockElement(
+                'Report bugs',
+                'https://symfony.com/doc/current/contributing/code/bugs.html',
+                'danger'
+            )
+        )
+    )
+    ->block(new SlackDividerBlock())
+    ->block((new SlackSectionBlock())
+        ->text('Symfony Documentation')
+        ->accessory(
+            new SlackButtonBlockElement(
+                'Improve Documentation',
+                'https://symfony.com/doc/current/contributing/documentation/standards.html',
+                'primary'
+            )
+        )
+    );
+
+// Add the custom options to the chat message and send the message
+$chatMessage->options($slackOptions);
+
+$chatter->send($chatMessage);
+```
+
 Adding Fields and Values to a Message
 -------------------------------------
 
@@ -103,6 +143,34 @@ $chatMessage->options($options);
 
 $chatter->send($chatMessage);
 ```
+
+Define text objects properties
+------------------------------
+
+[Text objects properties](https://api.slack.com/reference/block-kit/composition-objects#text) can be set on any `text()` or `field()` method :
+
+```php
+use Symfony\Component\Notifier\Bridge\Slack\Block\SlackSectionBlock;
+use Symfony\Component\Notifier\Bridge\Slack\SlackOptions;
+use Symfony\Component\Notifier\Message\ChatMessage;
+
+$chatMessage = new ChatMessage('Slack Notifier');
+
+$options = (new SlackOptions())
+    ->block(
+        (new SlackSectionBlock())
+            ->field('My **Markdown** content with clickable URL : symfony.com') // Markdown content (default)
+            ->field('*Plain text content*', markdown: false) // Plain text content
+            ->field('Not clickable URL : symfony.com', verbatim: true) // Only for markdown content
+            ->field('Thumbs up emoji code is :thumbsup: ', emoji: false) // Only for plain text content
+    );
+
+// Add the custom options to the chat message and send the message
+$chatMessage->options($options);
+
+$chatter->send($chatMessage);
+```
+
 
 Adding a Header to a Message
 ----------------------------
@@ -177,7 +245,7 @@ $chatter->send($chatMessage);
 Sending a Message as a Reply
 ----------------------------
 
-To send your slack message as a reply in a thread use the `threadTs()` method.
+To send your Slack message as a reply in a thread use the `threadTs()` method.
 
 ```php
 use Symfony\Component\Notifier\Bridge\Slack\Block\SlackSectionBlock;
@@ -192,6 +260,52 @@ $options = (new SlackOptions())
 ;
 
 // Add the custom options to the chat message and send the message
+$chatMessage->options($options);
+
+$chatter->send($chatMessage);
+```
+
+Updating a Slack Message
+------------------------
+
+First, save the message ID and channel ID when sending a message:
+
+```php
+use Symfony\Component\Notifier\Bridge\Slack\SlackSentMessage;
+use Symfony\Component\Notifier\Message\ChatMessage;
+
+$sentMessage = $chatter->send(new ChatMessage('Original message'));
+
+// Make sure that Slack transport was used
+if ($sentMessage instanceOf SlackSentMessage) {
+    $messageId = $sentMessage->getMessageId();
+    $channelId = $sentMessage->getChannelId();
+}
+```
+
+Then, use that message ID and channel ID to create a new
+``UpdateMessageSlackOptions`` class:
+
+```php
+use Symfony\Component\Notifier\Bridge\Slack\UpdateMessageSlackOptions;
+use Symfony\Component\Notifier\Message\ChatMessage;
+
+$options = new UpdateMessageSlackOptions($channelId, $messageId);
+$chatter->send(new ChatMessage('Updated message', $options));
+```
+
+Scheduling a Slack Message
+--------------------------
+
+To schedule a message to be sent at a later time, use the `postAt()` method:
+
+```php
+use Symfony\Component\Notifier\Bridge\Slack\SlackOptions;
+use Symfony\Component\Notifier\Message\ChatMessage;
+
+$options = (new SlackOptions())->postAt(new \DateTime('+1 day'));
+
+$chatMessage = new ChatMessage('Symfony Feature');
 $chatMessage->options($options);
 
 $chatter->send($chatMessage);

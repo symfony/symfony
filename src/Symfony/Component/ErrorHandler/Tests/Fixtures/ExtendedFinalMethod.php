@@ -6,9 +6,6 @@ class ExtendedFinalMethod extends FinalMethod
 {
     use FinalMethod2Trait;
 
-    /**
-     * {@inheritdoc}
-     */
     public function finalMethod()
     {
     }

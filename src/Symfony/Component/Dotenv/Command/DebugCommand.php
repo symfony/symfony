@@ -11,8 +11,12 @@
 
 namespace Symfony\Component\Dotenv\Command;
 
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Completion\CompletionInput;
+use Symfony\Component\Console\Completion\CompletionSuggestions;
 use Symfony\Component\Console\Formatter\OutputFormatter;
+use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
@@ -23,20 +27,43 @@ use Symfony\Component\Dotenv\Dotenv;
  *
  * @author Christopher Hertel <mail@christopher-hertel.de>
  */
+#[AsCommand(name: 'debug:dotenv', description: 'List all dotenv files with variables and values')]
 final class DebugCommand extends Command
 {
+    /**
+     * @deprecated since Symfony 6.1
+     */
     protected static $defaultName = 'debug:dotenv';
-    protected static $defaultDescription = 'Lists all dotenv files with variables and values';
 
-    private $kernelEnvironment;
-    private $projectDirectory;
+    /**
+     * @deprecated since Symfony 6.1
+     */
+    protected static $defaultDescription = 'List all dotenv files with variables and values';
 
-    public function __construct(string $kernelEnvironment, string $projectDirectory)
-    {
-        $this->kernelEnvironment = $kernelEnvironment;
-        $this->projectDirectory = $projectDirectory;
-
+    public function __construct(
+        private string $kernelEnvironment,
+        private string $projectDirectory,
+    ) {
         parent::__construct();
+    }
+
+    protected function configure(): void
+    {
+        $this
+            ->setDefinition([
+                new InputArgument('filter', InputArgument::OPTIONAL, 'The name of an environment variable or a filter.', null, $this->getAvailableVars(...)),
+            ])
+            ->setHelp(<<<'EOT'
+The <info>%command.full_name%</info> command displays all the environment variables configured by dotenv:
+
+  <info>php %command.full_name%</info>
+
+To get specific variables, specify its full or partial name:
+
+    <info>php %command.full_name% FOO_BAR</info>
+
+EOT
+            );
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -50,39 +77,51 @@ final class DebugCommand extends Command
             return 1;
         }
 
-        $filePath = $this->projectDirectory.\DIRECTORY_SEPARATOR.'.env';
+        $filePath = $_SERVER['SYMFONY_DOTENV_PATH'] ?? $this->projectDirectory.\DIRECTORY_SEPARATOR.'.env';
+
         $envFiles = $this->getEnvFiles($filePath);
         $availableFiles = array_filter($envFiles, 'is_file');
 
-        if (\in_array(sprintf('%s.local.php', $filePath), $availableFiles, true)) {
-            $io->warning('Due to existing dump file (.env.local.php) all other dotenv files are skipped.');
+        if (\in_array(\sprintf('%s.local.php', $filePath), $availableFiles, true)) {
+            $io->warning(\sprintf('Due to existing dump file (%s.local.php) all other dotenv files are skipped.', $this->getRelativeName($filePath)));
         }
 
-        if (is_file($filePath) && is_file(sprintf('%s.dist', $filePath))) {
-            $io->warning(sprintf('The file %s.dist gets skipped due to the existence of %1$s.', $this->getRelativeName($filePath)));
+        if (is_file($filePath) && is_file(\sprintf('%s.dist', $filePath))) {
+            $io->warning(\sprintf('The file %s.dist gets skipped due to the existence of %1$s.', $this->getRelativeName($filePath)));
         }
 
         $io->section('Scanned Files (in descending priority)');
-        $io->listing(array_map(function (string $envFile) use ($availableFiles) {
-            return \in_array($envFile, $availableFiles, true)
-                ? sprintf('<fg=green>✓</> %s', $this->getRelativeName($envFile))
-                : sprintf('<fg=red>⨯</> %s', $this->getRelativeName($envFile));
-        }, $envFiles));
+        $io->listing(array_map(fn (string $envFile) => \in_array($envFile, $availableFiles, true)
+            ? \sprintf('<fg=green>✓</> %s', $this->getRelativeName($envFile))
+            : \sprintf('<fg=red>⨯</> %s', $this->getRelativeName($envFile)), $envFiles));
 
-        $variables = $this->getVariables($availableFiles);
+        $nameFilter = $input->getArgument('filter');
+        $variables = $this->getVariables($availableFiles, $nameFilter);
 
         $io->section('Variables');
-        $io->table(
-            array_merge(['Variable', 'Value'], array_map([$this, 'getRelativeName'], $availableFiles)),
-            $variables
-        );
 
-        $io->comment('Note that values might be different between web and CLI.');
+        if ($variables || null === $nameFilter) {
+            $io->table(
+                array_merge(['Variable', 'Value'], array_map($this->getRelativeName(...), $availableFiles)),
+                $variables
+            );
+
+            $io->comment('Note that values might be different between web and CLI.');
+        } else {
+            $io->warning(\sprintf('No variables match the given filter "%s".', $nameFilter));
+        }
 
         return 0;
     }
 
-    private function getVariables(array $envFiles): array
+    public function complete(CompletionInput $input, CompletionSuggestions $suggestions): void
+    {
+        if ($input->mustSuggestArgumentValuesFor('filter')) {
+            $suggestions->suggestValues($this->getAvailableVars());
+        }
+    }
+
+    private function getVariables(array $envFiles, ?string $nameFilter): array
     {
         $variables = [];
         $fileValues = [];
@@ -94,6 +133,11 @@ final class DebugCommand extends Command
         }
 
         foreach ($variables as $var => $varDetails) {
+            if (null !== $nameFilter && 0 !== stripos($var, $nameFilter)) {
+                unset($variables[$var]);
+                continue;
+            }
+
             $realValue = $_SERVER[$var] ?? '';
             $varDetails = [$var, '<fg=green>'.OutputFormatter::escape($realValue).'</>'];
             $varSeen = !isset($dotenvVars[$var]);
@@ -117,20 +161,28 @@ final class DebugCommand extends Command
         return $variables;
     }
 
+    private function getAvailableVars(): array
+    {
+        $filePath = $_SERVER['SYMFONY_DOTENV_PATH'] ?? $this->projectDirectory.\DIRECTORY_SEPARATOR.'.env';
+        $envFiles = $this->getEnvFiles($filePath);
+
+        return array_keys($this->getVariables(array_filter($envFiles, 'is_file'), null));
+    }
+
     private function getEnvFiles(string $filePath): array
     {
         $files = [
-            sprintf('%s.local.php', $filePath),
-            sprintf('%s.%s.local', $filePath, $this->kernelEnvironment),
-            sprintf('%s.%s', $filePath, $this->kernelEnvironment),
+            \sprintf('%s.local.php', $filePath),
+            \sprintf('%s.%s.local', $filePath, $this->kernelEnvironment),
+            \sprintf('%s.%s', $filePath, $this->kernelEnvironment),
         ];
 
         if ('test' !== $this->kernelEnvironment) {
-            $files[] = sprintf('%s.local', $filePath);
+            $files[] = \sprintf('%s.local', $filePath);
         }
 
-        if (!is_file($filePath) && is_file(sprintf('%s.dist', $filePath))) {
-            $files[] = sprintf('%s.dist', $filePath);
+        if (!is_file($filePath) && is_file(\sprintf('%s.dist', $filePath))) {
+            $files[] = \sprintf('%s.dist', $filePath);
         } else {
             $files[] = $filePath;
         }

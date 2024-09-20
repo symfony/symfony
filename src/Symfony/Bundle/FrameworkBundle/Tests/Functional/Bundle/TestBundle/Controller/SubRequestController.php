@@ -11,15 +11,16 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\Controller;
 
-use Symfony\Component\DependencyInjection\ContainerAwareInterface;
-use Symfony\Component\DependencyInjection\ContainerAwareTrait;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Controller\ControllerReference;
 
-class SubRequestController implements ContainerAwareInterface
+class SubRequestController
 {
-    use ContainerAwareTrait;
+    public function __construct(private ContainerInterface $container)
+    {
+    }
 
     public function indexAction($handler)
     {

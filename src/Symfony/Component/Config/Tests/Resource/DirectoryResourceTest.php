@@ -16,7 +16,7 @@ use Symfony\Component\Config\Resource\DirectoryResource;
 
 class DirectoryResourceTest extends TestCase
 {
-    protected $directory;
+    protected string $directory;
 
     protected function setUp(): void
     {

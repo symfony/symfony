@@ -18,7 +18,7 @@ final class WebNotification extends FirebaseOptions
     /**
      * @return $this
      */
-    public function icon(string $icon): self
+    public function icon(string $icon): static
     {
         $this->options['icon'] = $icon;
 
@@ -28,7 +28,7 @@ final class WebNotification extends FirebaseOptions
     /**
      * @return $this
      */
-    public function clickAction(string $clickAction): self
+    public function clickAction(string $clickAction): static
     {
         $this->options['click_action'] = $clickAction;
 

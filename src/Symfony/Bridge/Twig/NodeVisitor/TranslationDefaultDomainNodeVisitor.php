@@ -30,7 +30,9 @@ use Twig\NodeVisitor\NodeVisitorInterface;
  */
 final class TranslationDefaultDomainNodeVisitor implements NodeVisitorInterface
 {
-    private $scope;
+    private const INTERNAL_VAR_NAME = '__internal_trans_default_domain';
+
+    private Scope $scope;
 
     public function __construct()
     {
@@ -48,20 +50,19 @@ final class TranslationDefaultDomainNodeVisitor implements NodeVisitorInterface
                 $this->scope->set('domain', $node->getNode('expr'));
 
                 return $node;
-            } else {
-                $var = $this->getVarName();
-                $name = new AssignNameExpression($var, $node->getTemplateLine());
-                $this->scope->set('domain', new NameExpression($var, $node->getTemplateLine()));
-
-                return new SetNode(false, new Node([$name]), new Node([$node->getNode('expr')]), $node->getTemplateLine());
             }
+
+            $name = new AssignNameExpression(self::INTERNAL_VAR_NAME, $node->getTemplateLine());
+            $this->scope->set('domain', new NameExpression(self::INTERNAL_VAR_NAME, $node->getTemplateLine()));
+
+            return new SetNode(false, new Node([$name]), new Node([$node->getNode('expr')]), $node->getTemplateLine());
         }
 
         if (!$this->scope->has('domain')) {
             return $node;
         }
 
-        if ($node instanceof FilterExpression && 'trans' === $node->getNode('filter')->getAttribute('value')) {
+        if ($node instanceof FilterExpression && 'trans' === ($node->hasAttribute('twig_callable') ? $node->getAttribute('twig_callable')->getName() : $node->getNode('filter')->getAttribute('value'))) {
             $arguments = $node->getNode('arguments');
             if ($this->isNamedArguments($arguments)) {
                 if (!$arguments->hasNode('domain') && !$arguments->hasNode(1)) {
@@ -96,9 +97,6 @@ final class TranslationDefaultDomainNodeVisitor implements NodeVisitorInterface
         return $node;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getPriority(): int
     {
         return -10;
@@ -113,10 +111,5 @@ final class TranslationDefaultDomainNodeVisitor implements NodeVisitorInterface
         }
 
         return false;
-    }
-
-    private function getVarName(): string
-    {
-        return sprintf('__internal_%s', hash('sha256', uniqid(mt_rand(), true), false));
     }
 }

@@ -19,20 +19,32 @@ use Symfony\Component\Cache\Adapter\DoctrineAdapter;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Config\Definition\Processor;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\HtmlSanitizer\HtmlSanitizer;
 use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Component\Lock\Store\SemaphoreStore;
 use Symfony\Component\Mailer\Mailer;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Notifier\Notifier;
 use Symfony\Component\RateLimiter\Policy\TokenBucketLimiter;
+use Symfony\Component\RemoteEvent\RemoteEvent;
+use Symfony\Component\Scheduler\Messenger\SchedulerTransportFactory;
+use Symfony\Component\Serializer\Encoder\JsonDecode;
+use Symfony\Component\TypeInfo\Type;
 use Symfony\Component\Uid\Factory\UuidFactory;
+use Symfony\Component\Webhook\Controller\WebhookController;
 
 class ConfigurationTest extends TestCase
 {
     public function testDefaultConfig()
     {
         $processor = new Processor();
-        $config = $processor->processConfiguration(new Configuration(true), [['secret' => 's3cr3t']]);
+        $config = $processor->processConfiguration(new Configuration(true), [[
+            'http_method_override' => false,
+            'handle_all_throwables' => true,
+            'php_errors' => ['log' => true],
+            'secret' => 's3cr3t',
+            'serializer' => ['default_context' => ['foo' => 'bar']],
+        ]]);
 
         $this->assertEquals(self::getBundleDefaultConfig(), $config);
     }
@@ -52,11 +64,18 @@ class ConfigurationTest extends TestCase
      */
     public function testInvalidSessionName($sessionName)
     {
-        $this->expectException(InvalidConfigurationException::class);
         $processor = new Processor();
+
+        $this->expectException(InvalidConfigurationException::class);
+
         $processor->processConfiguration(
             new Configuration(true),
-            [['session' => ['name' => $sessionName]]]
+            [[
+                'http_method_override' => false,
+                'handle_all_throwables' => true,
+                'php_errors' => ['log' => true],
+                'session' => ['name' => $sessionName, 'cookie_secure' => 'auto', 'cookie_samesite' => 'lax'],
+            ]]
         );
     }
 
@@ -76,7 +95,12 @@ class ConfigurationTest extends TestCase
     {
         $processor = new Processor();
         $configuration = new Configuration(true);
-        $config = $processor->processConfiguration($configuration, [['assets' => null]]);
+        $config = $processor->processConfiguration($configuration, [[
+            'http_method_override' => false,
+            'handle_all_throwables' => true,
+            'php_errors' => ['log' => true],
+            'assets' => null,
+        ]]);
 
         $defaultConfig = [
             'enabled' => true,
@@ -93,6 +117,71 @@ class ConfigurationTest extends TestCase
         $this->assertEquals($defaultConfig, $config['assets']);
     }
 
+    public function testAssetMapperCanBeEnabled()
+    {
+        $processor = new Processor();
+        $configuration = new Configuration(true);
+        $config = $processor->processConfiguration($configuration, [[
+            'http_method_override' => false,
+            'handle_all_throwables' => true,
+            'php_errors' => ['log' => true],
+            'asset_mapper' => null,
+        ]]);
+
+        $defaultConfig = [
+            'enabled' => true,
+            'paths' => [],
+            'excluded_patterns' => [],
+            'server' => true,
+            'public_prefix' => '/assets/',
+            'missing_import_mode' => 'warn',
+            'extensions' => [],
+            'importmap_path' => '%kernel.project_dir%/importmap.php',
+            'importmap_polyfill' => 'es-module-shims',
+            'vendor_dir' => '%kernel.project_dir%/assets/vendor',
+            'importmap_script_attributes' => [],
+            'exclude_dotfiles' => true,
+        ];
+
+        $this->assertEquals($defaultConfig, $config['asset_mapper']);
+    }
+
+    /**
+     * @dataProvider provideImportmapPolyfillTests
+     */
+    public function testAssetMapperPolyfillValue(mixed $polyfillValue, bool $isValid, mixed $expected)
+    {
+        $processor = new Processor();
+        $configuration = new Configuration(true);
+
+        if (!$isValid) {
+            $this->expectException(InvalidConfigurationException::class);
+            $this->expectExceptionMessage($expected);
+        }
+
+        $config = $processor->processConfiguration($configuration, [[
+            'http_method_override' => false,
+            'handle_all_throwables' => true,
+            'php_errors' => ['log' => true],
+            'asset_mapper' => null === $polyfillValue ? [] : [
+                'importmap_polyfill' => $polyfillValue,
+            ],
+        ]]);
+
+        if ($isValid) {
+            $this->assertEquals($expected, $config['asset_mapper']['importmap_polyfill']);
+        }
+    }
+
+    public static function provideImportmapPolyfillTests()
+    {
+        yield [true, false, 'Must be either an importmap name or false.'];
+        yield [null, true, 'es-module-shims'];
+        yield ['es-module-shims', true, 'es-module-shims'];
+        yield ['foo', true, 'foo'];
+        yield [false, true, false];
+    }
+
     /**
      * @dataProvider provideValidAssetsPackageNameConfigurationTests
      */
@@ -102,6 +191,9 @@ class ConfigurationTest extends TestCase
         $configuration = new Configuration(true);
         $config = $processor->processConfiguration($configuration, [
             [
+                'http_method_override' => false,
+                'handle_all_throwables' => true,
+                'php_errors' => ['log' => true],
                 'assets' => [
                     'packages' => [
                         $packageName => [],
@@ -127,30 +219,32 @@ class ConfigurationTest extends TestCase
      */
     public function testInvalidAssetsConfiguration(array $assetConfig, $expectedMessage)
     {
+        $processor = new Processor();
+        $configuration = new Configuration(true);
+
         $this->expectException(InvalidConfigurationException::class);
         $this->expectExceptionMessage($expectedMessage);
 
-        $processor = new Processor();
-        $configuration = new Configuration(true);
         $processor->processConfiguration($configuration, [
-                [
-                    'assets' => $assetConfig,
-                ],
-            ]);
+            [
+                'http_method_override' => false,
+                'handle_all_throwables' => true,
+                'php_errors' => ['log' => true],
+                'assets' => $assetConfig,
+            ],
+        ]);
     }
 
     public static function provideInvalidAssetConfigurationTests(): iterable
     {
         // helper to turn config into embedded package config
-        $createPackageConfig = function (array $packageConfig) {
-            return [
-                'base_urls' => '//example.com',
-                'version' => 1,
-                'packages' => [
-                    'foo' => $packageConfig,
-                ],
-            ];
-        };
+        $createPackageConfig = fn (array $packageConfig) => [
+            'base_urls' => '//example.com',
+            'version' => 1,
+            'packages' => [
+                'foo' => $packageConfig,
+            ],
+        ];
 
         $config = [
             'version' => 1,
@@ -183,6 +277,9 @@ class ConfigurationTest extends TestCase
         $configuration = new Configuration(true);
         $config = $processor->processConfiguration($configuration, [
             [
+                'http_method_override' => false,
+                'handle_all_throwables' => true,
+                'php_errors' => ['log' => true],
                 'lock' => $lockConfig,
             ],
         ]);
@@ -243,11 +340,17 @@ class ConfigurationTest extends TestCase
         $configuration = new Configuration(true);
         $config = $processor->processConfiguration($configuration, [
             [
+                'http_method_override' => false,
+                'handle_all_throwables' => true,
+                'php_errors' => ['log' => true],
                 'lock' => [
                     'payload' => 'flock',
                 ],
             ],
             [
+                'http_method_override' => false,
+                'handle_all_throwables' => true,
+                'php_errors' => ['log' => true],
                 'lock' => [
                     'payload' => 'semaphore',
                 ],
@@ -265,6 +368,60 @@ class ConfigurationTest extends TestCase
         );
     }
 
+    /**
+     * @dataProvider provideValidSemaphoreConfigurationTests
+     */
+    public function testValidSemaphoreConfiguration($semaphoreConfig, $processedConfig)
+    {
+        $processor = new Processor();
+        $configuration = new Configuration(true);
+        $config = $processor->processConfiguration($configuration, [
+            [
+                'http_method_override' => false,
+                'handle_all_throwables' => true,
+                'php_errors' => ['log' => true],
+                'semaphore' => $semaphoreConfig,
+            ],
+        ]);
+
+        $this->assertArrayHasKey('semaphore', $config);
+
+        $this->assertEquals($processedConfig, $config['semaphore']);
+    }
+
+    public static function provideValidSemaphoreConfigurationTests()
+    {
+        yield [null, ['enabled' => true, 'resources' => []]];
+
+        yield ['redis://default', ['enabled' => true, 'resources' => ['default' => 'redis://default']]];
+        yield [['foo' => 'redis://foo', 'bar' => 'redis://bar'], ['enabled' => true, 'resources' => ['foo' => 'redis://foo', 'bar' => 'redis://bar']]];
+        yield [['default' => 'redis://default'], ['enabled' => true, 'resources' => ['default' => 'redis://default']]];
+
+        yield [['enabled' => false, 'redis://default'], ['enabled' => false, 'resources' => ['default' => 'redis://default']]];
+        yield [['enabled' => false, 'foo' => 'redis://foo', 'bar' => 'redis://bar'], ['enabled' => false, 'resources' => ['foo' => 'redis://foo', 'bar' => 'redis://bar']]];
+        yield [['enabled' => false, 'default' => 'redis://default'], ['enabled' => false, 'resources' => ['default' => 'redis://default']]];
+
+        yield [['resources' => 'redis://default'], ['enabled' => true, 'resources' => ['default' => 'redis://default']]];
+        yield [['resources' => ['foo' => 'redis://foo', 'bar' => 'redis://bar']], ['enabled' => true, 'resources' => ['foo' => 'redis://foo', 'bar' => 'redis://bar']]];
+        yield [['resources' => ['default' => 'redis://default']], ['enabled' => true, 'resources' => ['default' => 'redis://default']]];
+
+        yield [['enabled' => false, 'resources' => 'redis://default'], ['enabled' => false, 'resources' => ['default' => 'redis://default']]];
+        yield [['enabled' => false, 'resources' => ['foo' => 'redis://foo', 'bar' => 'redis://bar']], ['enabled' => false, 'resources' => ['foo' => 'redis://foo', 'bar' => 'redis://bar']]];
+        yield [['enabled' => false, 'resources' => ['default' => 'redis://default']], ['enabled' => false, 'resources' => ['default' => 'redis://default']]];
+
+        // xml
+
+        yield [['resource' => ['redis://default']], ['enabled' => true, 'resources' => ['default' => 'redis://default']]];
+        yield [['resource' => ['redis://default', ['name' => 'foo', 'value' => 'redis://default']]], ['enabled' => true, 'resources' => ['default' => 'redis://default', 'foo' => 'redis://default']]];
+        yield [['resource' => [['name' => 'foo', 'value' => 'redis://default']]], ['enabled' => true, 'resources' => ['foo' => 'redis://default']]];
+        yield [['resource' => [['name' => 'foo', 'value' => 'redis://default'], ['name' => 'bar', 'value' => 'redis://default']]], ['enabled' => true, 'resources' => ['foo' => 'redis://default', 'bar' => 'redis://default']]];
+
+        yield [['enabled' => false, 'resource' => ['redis://default']], ['enabled' => false, 'resources' => ['default' => 'redis://default']]];
+        yield [['enabled' => false, 'resource' => ['redis://default', ['name' => 'foo', 'value' => 'redis://default']]], ['enabled' => false, 'resources' => ['default' => 'redis://default', 'foo' => 'redis://default']]];
+        yield [['enabled' => false, 'resource' => [['name' => 'foo', 'value' => 'redis://default']]], ['enabled' => false, 'resources' => ['foo' => 'redis://default']]];
+        yield [['enabled' => false, 'resource' => [['name' => 'foo', 'value' => 'redis://foo'], ['name' => 'bar', 'value' => 'redis://bar']]], ['enabled' => false, 'resources' => ['foo' => 'redis://foo', 'bar' => 'redis://bar']]];
+    }
+
     public function testItShowANiceMessageIfTwoMessengerBusesAreConfiguredButNoDefaultBus()
     {
         $expectedMessage = 'You must specify the "default_bus" if you define more than one bus.';
@@ -275,6 +432,9 @@ class ConfigurationTest extends TestCase
 
         $processor->processConfiguration($configuration, [
             'framework' => [
+                'http_method_override' => false,
+                'handle_all_throwables' => true,
+                'php_errors' => ['log' => true],
                 'messenger' => [
                     'default_bus' => null,
                     'buses' => [
@@ -292,6 +452,9 @@ class ConfigurationTest extends TestCase
         $configuration = new Configuration(true);
         $config = $processor->processConfiguration($configuration, [
             [
+                'http_method_override' => false,
+                'handle_all_throwables' => true,
+                'php_errors' => ['log' => true],
                 'messenger' => [
                     'default_bus' => 'existing_bus',
                     'buses' => [
@@ -306,6 +469,9 @@ class ConfigurationTest extends TestCase
                 ],
             ],
             [
+                'http_method_override' => false,
+                'handle_all_throwables' => true,
+                'php_errors' => ['log' => true],
                 'messenger' => [
                     'buses' => [
                         'common_bus' => [
@@ -322,19 +488,19 @@ class ConfigurationTest extends TestCase
         $this->assertEquals(
             [
                 'existing_bus' => [
-                    'default_middleware' => true,
+                    'default_middleware' => ['enabled' => true, 'allow_no_handlers' => false, 'allow_no_senders' => true],
                     'middleware' => [
                         ['id' => 'existing_bus.middleware', 'arguments' => []],
                     ],
                 ],
                 'common_bus' => [
-                    'default_middleware' => false,
+                    'default_middleware' => ['enabled' => false, 'allow_no_handlers' => false, 'allow_no_senders' => true],
                     'middleware' => [
                         ['id' => 'common_bus.new_middleware', 'arguments' => []],
                     ],
                 ],
                 'new_bus' => [
-                    'default_middleware' => true,
+                    'default_middleware' => ['enabled' => true, 'allow_no_handlers' => false, 'allow_no_senders' => true],
                     'middleware' => [
                         ['id' => 'new_bus.middleware', 'arguments' => []],
                     ],
@@ -354,6 +520,9 @@ class ConfigurationTest extends TestCase
 
         $processor->processConfiguration($configuration, [
             [
+                'http_method_override' => false,
+                'handle_all_throwables' => true,
+                'php_errors' => ['log' => true],
                 'messenger' => [
                     'default_bus' => 'foo',
                     'buses' => [
@@ -371,7 +540,12 @@ class ConfigurationTest extends TestCase
         $configuration = new Configuration(true);
 
         $config = $processor->processConfiguration($configuration, [
-            ['lock' => ['enabled' => false]],
+            [
+                'http_method_override' => false,
+                'handle_all_throwables' => true,
+                'php_errors' => ['log' => true],
+                'lock' => ['enabled' => false],
+            ],
         ]);
 
         $this->assertFalse($config['lock']['enabled']);
@@ -386,15 +560,152 @@ class ConfigurationTest extends TestCase
         $this->expectExceptionMessage('Invalid configuration for path "framework.lock": At least one resource must be defined.');
 
         $processor->processConfiguration($configuration, [
-            ['lock' => ['enabled' => true]],
+            [
+                'http_method_override' => false,
+                'handle_all_throwables' => true,
+                'php_errors' => ['log' => true],
+                'lock' => ['enabled' => true],
+            ],
         ]);
+    }
+
+    public function testSerializerJsonDetailedErrorMessagesEnabledWhenDefaultContextIsConfigured()
+    {
+        $processor = new Processor();
+        $config = $processor->processConfiguration(new Configuration(true), [
+            [
+                'http_method_override' => false,
+                'handle_all_throwables' => true,
+                'php_errors' => ['log' => true],
+                'serializer' => [
+                    'default_context' => [
+                        'foo' => 'bar',
+                    ],
+                ],
+            ],
+        ]);
+
+        $this->assertSame(['foo' => 'bar', JsonDecode::DETAILED_ERROR_MESSAGES => true], $config['serializer']['default_context'] ?? []);
+    }
+
+    public function testSerializerJsonDetailedErrorMessagesInDefaultContextCanBeDisabled()
+    {
+        $processor = new Processor();
+        $config = $processor->processConfiguration(new Configuration(true), [
+            [
+                'http_method_override' => false,
+                'handle_all_throwables' => true,
+                'php_errors' => ['log' => true],
+                'serializer' => [
+                    'default_context' => [
+                        'foo' => 'bar',
+                        JsonDecode::DETAILED_ERROR_MESSAGES => false,
+                    ],
+                ],
+            ],
+        ]);
+
+        $this->assertSame(['foo' => 'bar', JsonDecode::DETAILED_ERROR_MESSAGES => false], $config['serializer']['default_context'] ?? []);
+    }
+
+    public function testSerializerJsonDetailedErrorMessagesInDefaultContextCanBeDisabledWithSeveralConfigsBeingMerged()
+    {
+        $processor = new Processor();
+        $config = $processor->processConfiguration(new Configuration(true), [
+            [
+                'http_method_override' => false,
+                'handle_all_throwables' => true,
+                'php_errors' => ['log' => true],
+                'serializer' => [
+                    'default_context' => [
+                        'foo' => 'bar',
+                        JsonDecode::DETAILED_ERROR_MESSAGES => false,
+                    ],
+                ],
+            ],
+            [
+                'serializer' => [
+                    'default_context' => [
+                        'foobar' => 'baz',
+                    ],
+                ],
+            ],
+        ]);
+
+        $this->assertSame(['foo' => 'bar', JsonDecode::DETAILED_ERROR_MESSAGES => false, 'foobar' => 'baz'], $config['serializer']['default_context'] ?? []);
+    }
+
+    public function testScopedHttpClientsInheritRateLimiterAndRetryFailedConfiguration()
+    {
+        $processor = new Processor();
+        $configuration = new Configuration(true);
+
+        $config = $processor->processConfiguration($configuration, [[
+            'http_client' => [
+                'default_options' => ['rate_limiter' => 'default_limiter', 'retry_failed' => ['max_retries' => 77]],
+                'scoped_clients' => [
+                    'foo' => ['base_uri' => 'http://example.com'],
+                    'bar' => ['base_uri' => 'http://example.com', 'rate_limiter' => true, 'retry_failed' => true],
+                    'baz' => ['base_uri' => 'http://example.com', 'rate_limiter' => false, 'retry_failed' => false],
+                    'qux' => ['base_uri' => 'http://example.com', 'rate_limiter' => 'foo_limiter', 'retry_failed' => ['max_retries' => 88, 'delay' => 999]],
+                ],
+            ],
+        ]]);
+
+        $scopedClients = $config['http_client']['scoped_clients'];
+
+        $this->assertSame('default_limiter', $scopedClients['foo']['rate_limiter']);
+        $this->assertTrue($scopedClients['foo']['retry_failed']['enabled']);
+        $this->assertSame(77, $scopedClients['foo']['retry_failed']['max_retries']);
+        $this->assertSame(1000, $scopedClients['foo']['retry_failed']['delay']);
+
+        $this->assertSame('default_limiter', $scopedClients['bar']['rate_limiter']);
+        $this->assertTrue($scopedClients['bar']['retry_failed']['enabled']);
+        $this->assertSame(77, $scopedClients['bar']['retry_failed']['max_retries']);
+        $this->assertSame(1000, $scopedClients['bar']['retry_failed']['delay']);
+
+        $this->assertNull($scopedClients['baz']['rate_limiter']);
+        $this->assertFalse($scopedClients['baz']['retry_failed']['enabled']);
+        $this->assertSame(3, $scopedClients['baz']['retry_failed']['max_retries']);
+        $this->assertSame(1000, $scopedClients['baz']['retry_failed']['delay']);
+
+        $this->assertSame('foo_limiter', $scopedClients['qux']['rate_limiter']);
+        $this->assertTrue($scopedClients['qux']['retry_failed']['enabled']);
+        $this->assertSame(88, $scopedClients['qux']['retry_failed']['max_retries']);
+        $this->assertSame(999, $scopedClients['qux']['retry_failed']['delay']);
+    }
+
+    public function testSerializerJsonDetailedErrorMessagesEnabledByDefaultWithDebugEnabled()
+    {
+        $processor = new Processor();
+        $config = $processor->processConfiguration(new Configuration(true), [
+            [
+                'serializer' => null,
+            ],
+        ]);
+
+        $this->assertSame([JsonDecode::DETAILED_ERROR_MESSAGES => true], $config['serializer']['default_context'] ?? []);
+    }
+
+    public function testSerializerJsonDetailedErrorMessagesNotSetByDefaultWithDebugDisabled()
+    {
+        $processor = new Processor();
+        $config = $processor->processConfiguration(new Configuration(false), [
+            [
+                'serializer' => null,
+            ],
+        ]);
+
+        $this->assertSame([], $config['serializer']['default_context'] ?? []);
     }
 
     protected static function getBundleDefaultConfig()
     {
         return [
-            'http_method_override' => true,
-            'ide' => null,
+            'http_method_override' => false,
+            'handle_all_throwables' => true,
+            'trust_x_sendfile_type_header' => false,
+            'ide' => '%env(default::SYMFONY_IDE)%',
             'default_locale' => 'en',
             'enabled_locales' => [],
             'set_locale_from_accept_language' => false,
@@ -415,7 +726,6 @@ class ConfigurationTest extends TestCase
                     'enabled' => null, // defaults to csrf_protection.enabled
                     'field_name' => '_token',
                 ],
-                'legacy_error_messages' => true,
             ],
             'esi' => ['enabled' => false],
             'ssi' => ['enabled' => false],
@@ -427,11 +737,11 @@ class ConfigurationTest extends TestCase
             'profiler' => [
                 'enabled' => false,
                 'only_exceptions' => false,
-                'only_master_requests' => false,
                 'only_main_requests' => false,
                 'dsn' => 'file:%kernel.cache_dir%/profiler',
                 'collect' => true,
                 'collect_parameter' => null,
+                'collect_serializer_data' => false,
             ],
             'translator' => [
                 'enabled' => !class_exists(FullStack::class),
@@ -441,7 +751,6 @@ class ConfigurationTest extends TestCase
                 'formatter' => 'translator.formatter.default',
                 'paths' => [],
                 'default_path' => '%kernel.project_dir%/translations',
-                'enabled_locales' => [],
                 'pseudo_localization' => [
                     'enabled' => false,
                     'accents' => true,
@@ -454,7 +763,7 @@ class ConfigurationTest extends TestCase
             ],
             'validation' => [
                 'enabled' => !class_exists(FullStack::class),
-                'enable_annotations' => !class_exists(FullStack::class),
+                'enable_attributes' => !class_exists(FullStack::class),
                 'static_method' => ['loadValidatorMetadata'],
                 'translation_domain' => 'validators',
                 'mapping' => [
@@ -465,18 +774,17 @@ class ConfigurationTest extends TestCase
                     'enabled' => true,
                     'endpoint' => null,
                 ],
+                'email_validation_mode' => 'html5',
             ],
             'annotations' => [
-                'cache' => 'php_array',
-                'file_cache_dir' => '%kernel.cache_dir%/annotations',
-                'debug' => true,
-                'enabled' => true,
+                'enabled' => false,
             ],
             'serializer' => [
-                'default_context' => [],
-                'enabled' => !class_exists(FullStack::class),
-                'enable_annotations' => !class_exists(FullStack::class),
+                'default_context' => ['foo' => 'bar', JsonDecode::DETAILED_ERROR_MESSAGES => true],
+                'enabled' => true,
+                'enable_attributes' => !class_exists(FullStack::class),
                 'mapping' => ['paths' => []],
+                'named_serializers' => [],
             ],
             'property_access' => [
                 'enabled' => true,
@@ -485,6 +793,9 @@ class ConfigurationTest extends TestCase
                 'magic_set' => true,
                 'throw_exception_on_invalid_index' => false,
                 'throw_exception_on_invalid_property_path' => true,
+            ],
+            'type_info' => [
+                'enabled' => !class_exists(FullStack::class) && class_exists(Type::class),
             ],
             'property_info' => [
                 'enabled' => !class_exists(FullStack::class),
@@ -495,17 +806,15 @@ class ConfigurationTest extends TestCase
                 'http_port' => 80,
                 'https_port' => 443,
                 'strict_requirements' => true,
-                'utf8' => null,
+                'utf8' => true,
+                'cache_dir' => '%kernel.build_dir%',
             ],
             'session' => [
                 'enabled' => false,
-                'storage_id' => 'session.storage.native',
-                'storage_factory_id' => null,
-                'handler_id' => 'session.handler.native_file',
+                'storage_factory_id' => 'session.storage.factory.native',
                 'cookie_httponly' => true,
-                'cookie_samesite' => null,
-                'gc_probability' => 1,
-                'save_path' => '%kernel.cache_dir%/sessions',
+                'cookie_samesite' => 'lax',
+                'cookie_secure' => 'auto',
                 'metadata_update_threshold' => 0,
             ],
             'request' => [
@@ -522,6 +831,20 @@ class ConfigurationTest extends TestCase
                 'packages' => [],
                 'json_manifest_path' => null,
                 'strict_mode' => false,
+            ],
+            'asset_mapper' => [
+                'enabled' => !class_exists(FullStack::class),
+                'paths' => [],
+                'excluded_patterns' => [],
+                'server' => true,
+                'public_prefix' => '/assets/',
+                'missing_import_mode' => 'warn',
+                'extensions' => [],
+                'importmap_path' => '%kernel.project_dir%/importmap.php',
+                'importmap_polyfill' => 'es-module-shims',
+                'vendor_dir' => '%kernel.project_dir%/assets/vendor',
+                'importmap_script_attributes' => [],
+                'exclude_dotfiles' => true,
             ],
             'cache' => [
                 'pools' => [],
@@ -553,6 +876,11 @@ class ConfigurationTest extends TestCase
                     ],
                 ],
             ],
+            'semaphore' => [
+                'enabled' => !class_exists(FullStack::class),
+                'resources' => [
+                ],
+            ],
             'messenger' => [
                 'enabled' => !class_exists(FullStack::class) && interface_exists(MessageBusInterface::class),
                 'routing' => [],
@@ -566,8 +894,8 @@ class ConfigurationTest extends TestCase
                     ],
                 ],
                 'default_bus' => null,
-                'buses' => ['messenger.bus.default' => ['default_middleware' => true, 'middleware' => []]],
-                'reset_on_message' => null,
+                'buses' => ['messenger.bus.default' => ['default_middleware' => ['enabled' => true, 'allow_no_handlers' => false, 'allow_no_senders' => true], 'middleware' => []]],
+                'stop_worker_on_signals' => [],
             ],
             'disallow_search_engine_index' => true,
             'http_client' => [
@@ -583,6 +911,7 @@ class ConfigurationTest extends TestCase
             ],
             'notifier' => [
                 'enabled' => !class_exists(FullStack::class) && class_exists(Notifier::class),
+                'message_bus' => null,
                 'chatter_transports' => [],
                 'texter_transports' => [],
                 'channel_policy' => [],
@@ -600,6 +929,7 @@ class ConfigurationTest extends TestCase
                 'enabled' => false,
                 'debug' => '%kernel.debug%',
                 'private_headers' => [],
+                'skip_response_headers' => [],
             ],
             'rate_limiter' => [
                 'enabled' => !class_exists(FullStack::class) && class_exists(TokenBucketLimiter::class),
@@ -607,11 +937,43 @@ class ConfigurationTest extends TestCase
             ],
             'uid' => [
                 'enabled' => !class_exists(FullStack::class) && class_exists(UuidFactory::class),
-                'default_uuid_version' => 6,
+                'default_uuid_version' => 7,
                 'name_based_uuid_version' => 5,
-                'time_based_uuid_version' => 6,
+                'time_based_uuid_version' => 7,
+            ],
+            'html_sanitizer' => [
+                'enabled' => !class_exists(FullStack::class) && class_exists(HtmlSanitizer::class),
+                'sanitizers' => [],
+            ],
+            'scheduler' => [
+                'enabled' => !class_exists(FullStack::class) && class_exists(SchedulerTransportFactory::class),
             ],
             'exceptions' => [],
+            'webhook' => [
+                'enabled' => !class_exists(FullStack::class) && class_exists(WebhookController::class),
+                'routing' => [],
+                'message_bus' => 'messenger.default_bus',
+            ],
+            'remote-event' => [
+                'enabled' => !class_exists(FullStack::class) && class_exists(RemoteEvent::class),
+            ],
         ];
+    }
+
+    public function testNamedSerializersReservedName()
+    {
+        $processor = new Processor();
+        $configuration = new Configuration(true);
+
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessage('Invalid configuration for path "framework.serializer.named_serializers": "default" is a reserved name.');
+
+        $processor->processConfiguration($configuration, [[
+            'serializer' => [
+                'named_serializers' => [
+                    'default' => ['include_built_in_normalizers' => false],
+                ],
+            ],
+        ]]);
     }
 }

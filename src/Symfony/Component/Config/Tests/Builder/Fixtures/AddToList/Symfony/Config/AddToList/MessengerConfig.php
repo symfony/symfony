@@ -39,13 +39,13 @@ class MessengerConfig
     {
         if (array_key_exists('routing', $value)) {
             $this->_usedProperties['routing'] = true;
-            $this->routing = array_map(function ($v) { return new \Symfony\Config\AddToList\Messenger\RoutingConfig($v); }, $value['routing']);
+            $this->routing = array_map(fn ($v) => new \Symfony\Config\AddToList\Messenger\RoutingConfig($v), $value['routing']);
             unset($value['routing']);
         }
 
         if (array_key_exists('receiving', $value)) {
             $this->_usedProperties['receiving'] = true;
-            $this->receiving = array_map(function ($v) { return new \Symfony\Config\AddToList\Messenger\ReceivingConfig($v); }, $value['receiving']);
+            $this->receiving = array_map(fn ($v) => new \Symfony\Config\AddToList\Messenger\ReceivingConfig($v), $value['receiving']);
             unset($value['receiving']);
         }
 
@@ -58,10 +58,10 @@ class MessengerConfig
     {
         $output = [];
         if (isset($this->_usedProperties['routing'])) {
-            $output['routing'] = array_map(function ($v) { return $v->toArray(); }, $this->routing);
+            $output['routing'] = array_map(fn ($v) => $v->toArray(), $this->routing);
         }
         if (isset($this->_usedProperties['receiving'])) {
-            $output['receiving'] = array_map(function ($v) { return $v->toArray(); }, $this->receiving);
+            $output['receiving'] = array_map(fn ($v) => $v->toArray(), $this->receiving);
         }
 
         return $output;

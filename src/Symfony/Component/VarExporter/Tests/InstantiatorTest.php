@@ -51,12 +51,19 @@ class InstantiatorTest extends TestCase
         $this->assertEquals(new \ArrayObject([123]), Instantiator::instantiate(\ArrayObject::class, ["\0" => [[123]]]));
 
         $expected = [
+            "\0*\0prot" => 345,
             "\0".__NAMESPACE__."\Bar\0priv" => 123,
             "\0".__NAMESPACE__."\Foo\0priv" => 234,
-            'dyn' => 345,
+            'dyn' => 456,
+            'ro' => 567,
         ];
 
-        $actual = (array) Instantiator::instantiate(Bar::class, ['dyn' => 345, 'priv' => 123], [Foo::class => ['priv' => 234]]);
+        $actual = (array) Instantiator::instantiate(Bar::class, ['dyn' => 456, 'ro' => 567, 'prot' => 345, 'priv' => 123], [Foo::class => ['priv' => 234]]);
+        ksort($actual);
+
+        $this->assertSame($expected, $actual);
+
+        $actual = (array) Instantiator::instantiate(Bar::class, $expected);
         ksort($actual);
 
         $this->assertSame($expected, $actual);
@@ -65,11 +72,28 @@ class InstantiatorTest extends TestCase
 
         $this->assertSame([234], $e->getTrace());
     }
+
+    public function testPhpReferences()
+    {
+        $properties = ['p1' => 1];
+        $properties['p2'] = &$properties['p1'];
+
+        $obj = Instantiator::instantiate('stdClass', $properties);
+
+        $this->assertSame($properties, (array) $obj);
+
+        $properties['p1'] = 2;
+        $this->assertSame(2, $properties['p2']);
+        $this->assertSame(2, $obj->p1);
+        $this->assertSame(2, $obj->p2);
+    }
 }
 
 class Foo
 {
+    protected $prot;
     private $priv;
+    public readonly int $ro;
 }
 
 #[\AllowDynamicProperties]

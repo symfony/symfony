@@ -32,9 +32,6 @@ final class SuggestMissingPackageSubscriber implements EventSubscriberInterface
             'mongodb' => ['DoctrineMongoDBBundle', 'doctrine/mongodb-odm-bundle'],
             '_default' => ['Doctrine ORM', 'symfony/orm-pack'],
         ],
-        'generate' => [
-            '_default' => ['SensioGeneratorBundle', 'sensio/generator-bundle'],
-        ],
         'make' => [
             '_default' => ['MakerBundle', 'symfony/maker-bundle --dev'],
         ],
@@ -69,7 +66,7 @@ final class SuggestMissingPackageSubscriber implements EventSubscriberInterface
             return;
         }
 
-        $message = sprintf("%s\n\nYou may be looking for a command provided by the \"%s\" which is currently not installed. Try running \"composer require %s\".", $error->getMessage(), $suggestion[0], $suggestion[1]);
+        $message = \sprintf("%s\n\nYou may be looking for a command provided by the \"%s\" which is currently not installed. Try running \"composer require %s\".", $error->getMessage(), $suggestion[0], $suggestion[1]);
         $event->setError(new CommandNotFoundException($message));
     }
 

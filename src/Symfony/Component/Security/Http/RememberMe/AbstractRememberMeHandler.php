@@ -23,15 +23,14 @@ use Symfony\Component\Security\Core\User\UserProviderInterface;
  */
 abstract class AbstractRememberMeHandler implements RememberMeHandlerInterface
 {
-    private $userProvider;
-    protected $requestStack;
-    protected $options;
-    protected $logger;
+    protected array $options;
 
-    public function __construct(UserProviderInterface $userProvider, RequestStack $requestStack, array $options = [], ?LoggerInterface $logger = null)
-    {
-        $this->userProvider = $userProvider;
-        $this->requestStack = $requestStack;
+    public function __construct(
+        private UserProviderInterface $userProvider,
+        protected RequestStack $requestStack,
+        array $options = [],
+        protected ?LoggerInterface $logger = null,
+    ) {
         $this->options = $options + [
             'name' => 'REMEMBERME',
             'lifetime' => 31536000,
@@ -43,7 +42,6 @@ abstract class AbstractRememberMeHandler implements RememberMeHandlerInterface
             'always_remember_me' => false,
             'remember_me_parameter' => '_remember_me',
         ];
-        $this->logger = $logger;
     }
 
     /**
@@ -57,46 +55,19 @@ abstract class AbstractRememberMeHandler implements RememberMeHandlerInterface
      */
     abstract protected function processRememberMe(RememberMeDetails $rememberMeDetails, UserInterface $user): void;
 
-    /**
-     * {@inheritdoc}
-     */
     public function consumeRememberMeCookie(RememberMeDetails $rememberMeDetails): UserInterface
     {
-        try {
-            // @deprecated since Symfony 5.3, change to $this->userProvider->loadUserByIdentifier() in 6.0
-            $method = 'loadUserByIdentifier';
-            if (!method_exists($this->userProvider, 'loadUserByIdentifier')) {
-                trigger_deprecation('symfony/security-core', '5.3', 'Not implementing method "loadUserByIdentifier()" in user provider "%s" is deprecated. This method will replace "loadUserByUsername()" in Symfony 6.0.', get_debug_type($this->userProvider));
-
-                $method = 'loadUserByUsername';
-            }
-
-            $user = $this->userProvider->$method($rememberMeDetails->getUserIdentifier());
-        } catch (AuthenticationException $e) {
-            throw $e;
-        }
-
-        if (!$user instanceof UserInterface) {
-            throw new \LogicException(sprintf('The UserProviderInterface implementation must return an instance of UserInterface, but returned "%s".', get_debug_type($user)));
-        }
-
+        $user = $this->userProvider->loadUserByIdentifier($rememberMeDetails->getUserIdentifier());
         $this->processRememberMe($rememberMeDetails, $user);
 
-        if (null !== $this->logger) {
-            $this->logger->info('Remember-me cookie accepted.');
-        }
+        $this->logger?->info('Remember-me cookie accepted.');
 
         return $user;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function clearRememberMeCookie(): void
     {
-        if (null !== $this->logger) {
-            $this->logger->debug('Clearing remember-me cookie.', ['name' => $this->options['name']]);
-        }
+        $this->logger?->debug('Clearing remember-me cookie.', ['name' => $this->options['name']]);
 
         $this->createCookie(null);
     }
@@ -106,7 +77,7 @@ abstract class AbstractRememberMeHandler implements RememberMeHandlerInterface
      *
      * @param RememberMeDetails|null $rememberMeDetails The details for the cookie, or null to clear the remember-me cookie
      */
-    protected function createCookie(?RememberMeDetails $rememberMeDetails)
+    protected function createCookie(?RememberMeDetails $rememberMeDetails): void
     {
         $request = $this->requestStack->getMainRequest();
         if (!$request) {
@@ -116,8 +87,8 @@ abstract class AbstractRememberMeHandler implements RememberMeHandlerInterface
         // the ResponseListener configures the cookie saved in this attribute on the final response object
         $request->attributes->set(ResponseListener::COOKIE_ATTR_NAME, new Cookie(
             $this->options['name'],
-            $rememberMeDetails ? $rememberMeDetails->toString() : null,
-            $rememberMeDetails ? $rememberMeDetails->getExpires() : 1,
+            $rememberMeDetails?->toString(),
+            $rememberMeDetails?->getExpires() ?? 1,
             $this->options['path'],
             $this->options['domain'],
             $this->options['secure'] ?? $request->isSecure(),

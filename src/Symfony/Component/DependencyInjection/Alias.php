@@ -17,22 +17,18 @@ class Alias
 {
     private const DEFAULT_DEPRECATION_TEMPLATE = 'The "%alias_id%" service alias is deprecated. You should stop using it, as it will be removed in the future.';
 
-    private $id;
-    private $public;
-    private $deprecation = [];
+    private array $deprecation = [];
 
-    public function __construct(string $id, bool $public = false)
-    {
-        $this->id = $id;
-        $this->public = $public;
+    public function __construct(
+        private string $id,
+        private bool $public = false,
+    ) {
     }
 
     /**
      * Checks if this DI Alias should be public or not.
-     *
-     * @return bool
      */
-    public function isPublic()
+    public function isPublic(): bool
     {
         return $this->public;
     }
@@ -42,7 +38,7 @@ class Alias
      *
      * @return $this
      */
-    public function setPublic(bool $boolean)
+    public function setPublic(bool $boolean): static
     {
         $this->public = $boolean;
 
@@ -50,25 +46,9 @@ class Alias
     }
 
     /**
-     * Sets if this Alias is private.
-     *
-     * @return $this
-     *
-     * @deprecated since Symfony 5.2, use setPublic() instead
-     */
-    public function setPrivate(bool $boolean)
-    {
-        trigger_deprecation('symfony/dependency-injection', '5.2', 'The "%s()" method is deprecated, use "setPublic()" instead.', __METHOD__);
-
-        return $this->setPublic(!$boolean);
-    }
-
-    /**
      * Whether this alias is private.
-     *
-     * @return bool
      */
-    public function isPrivate()
+    public function isPrivate(): bool
     {
         return !$this->public;
     }
@@ -85,28 +65,8 @@ class Alias
      *
      * @throws InvalidArgumentException when the message template is invalid
      */
-    public function setDeprecated(/* string $package, string $version, string $message */)
+    public function setDeprecated(string $package, string $version, string $message): static
     {
-        $args = \func_get_args();
-
-        if (\func_num_args() < 3) {
-            trigger_deprecation('symfony/dependency-injection', '5.1', 'The signature of method "%s()" requires 3 arguments: "string $package, string $version, string $message", not defining them is deprecated.', __METHOD__);
-
-            $status = $args[0] ?? true;
-
-            if (!$status) {
-                trigger_deprecation('symfony/dependency-injection', '5.1', 'Passing a null message to un-deprecate a node is deprecated.');
-            }
-
-            $message = (string) ($args[1] ?? null);
-            $package = $version = '';
-        } else {
-            $status = true;
-            $package = (string) $args[0];
-            $version = (string) $args[1];
-            $message = (string) $args[2];
-        }
-
         if ('' !== $message) {
             if (preg_match('#[\r\n]|\*/#', $message)) {
                 throw new InvalidArgumentException('Invalid characters found in deprecation template.');
@@ -117,7 +77,7 @@ class Alias
             }
         }
 
-        $this->deprecation = $status ? ['package' => $package, 'version' => $version, 'message' => $message ?: self::DEFAULT_DEPRECATION_TEMPLATE] : [];
+        $this->deprecation = ['package' => $package, 'version' => $version, 'message' => $message ?: self::DEFAULT_DEPRECATION_TEMPLATE];
 
         return $this;
     }
@@ -125,16 +85,6 @@ class Alias
     public function isDeprecated(): bool
     {
         return (bool) $this->deprecation;
-    }
-
-    /**
-     * @deprecated since Symfony 5.1, use "getDeprecation()" instead.
-     */
-    public function getDeprecationMessage(string $id): string
-    {
-        trigger_deprecation('symfony/dependency-injection', '5.1', 'The "%s()" method is deprecated, use "getDeprecation()" instead.', __METHOD__);
-
-        return $this->getDeprecation($id)['message'];
     }
 
     /**
@@ -149,12 +99,7 @@ class Alias
         ];
     }
 
-    /**
-     * Returns the Id of this alias.
-     *
-     * @return string
-     */
-    public function __toString()
+    public function __toString(): string
     {
         return $this->id;
     }

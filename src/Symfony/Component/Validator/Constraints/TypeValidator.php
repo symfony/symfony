@@ -29,10 +29,15 @@ class TypeValidator extends ConstraintValidator
         'float' => 'is_float',
         'double' => 'is_float',
         'real' => 'is_float',
+        'number' => 'is_int || is_float && !is_nan',
+        'finite-float' => 'is_float && is_finite',
+        'finite-number' => 'is_int || is_float && is_finite',
         'numeric' => 'is_numeric',
         'string' => 'is_string',
         'scalar' => 'is_scalar',
         'array' => 'is_array',
+        'list' => 'is_array && array_is_list',
+        'associative_array' => 'is_array && !array_is_list',
         'iterable' => 'is_iterable',
         'countable' => 'is_countable',
         'callable' => 'is_callable',
@@ -52,10 +57,7 @@ class TypeValidator extends ConstraintValidator
         'xdigit' => 'ctype_xdigit',
     ];
 
-    /**
-     * {@inheritdoc}
-     */
-    public function validate($value, Constraint $constraint)
+    public function validate(mixed $value, Constraint $constraint): void
     {
         if (!$constraint instanceof Type) {
             throw new UnexpectedTypeException($constraint, Type::class);
@@ -69,7 +71,14 @@ class TypeValidator extends ConstraintValidator
 
         foreach ($types as $type) {
             $type = strtolower($type);
-            if (isset(self::VALIDATION_FUNCTIONS[$type]) && self::VALIDATION_FUNCTIONS[$type]($value)) {
+            if (isset(self::VALIDATION_FUNCTIONS[$type]) && match ($type) {
+                'finite-float' => \is_float($value) && is_finite($value),
+                'finite-number' => \is_int($value) || \is_float($value) && is_finite($value),
+                'number' => \is_int($value) || \is_float($value) && !is_nan($value),
+                'list' => \is_array($value) && array_is_list($value),
+                'associative_array' => \is_array($value) && !array_is_list($value),
+                default => self::VALIDATION_FUNCTIONS[$type]($value),
+            }) {
                 return;
             }
 

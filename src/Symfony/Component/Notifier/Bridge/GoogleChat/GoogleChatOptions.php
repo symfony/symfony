@@ -20,12 +20,11 @@ use Symfony\Component\Notifier\Notification\Notification;
  */
 final class GoogleChatOptions implements MessageOptionsInterface
 {
-    private $threadKey;
-    private $options = [];
+    private ?string $threadKey = null;
 
-    public function __construct(array $options = [])
-    {
-        $this->options = $options;
+    public function __construct(
+        private array $options = [],
+    ) {
     }
 
     public static function fromNotification(Notification $notification): self
@@ -39,7 +38,7 @@ final class GoogleChatOptions implements MessageOptionsInterface
         }
 
         if ($exception = $notification->getExceptionAsString()) {
-            $text .= "\r\n".'```'.$notification->getExceptionAsString().'```';
+            $text .= "\r\n".'```'.$exception.'```';
         }
 
         $options->text($text);
@@ -64,9 +63,9 @@ final class GoogleChatOptions implements MessageOptionsInterface
     /**
      * @return $this
      */
-    public function card(array $card): self
+    public function cardV2(array $card): static
     {
-        $this->options['cards'][] = $card;
+        $this->options['cardsV2'][] = $card;
 
         return $this;
     }
@@ -74,7 +73,7 @@ final class GoogleChatOptions implements MessageOptionsInterface
     /**
      * @return $this
      */
-    public function text(string $text): self
+    public function text(string $text): static
     {
         $this->options['text'] = $text;
 
@@ -84,7 +83,7 @@ final class GoogleChatOptions implements MessageOptionsInterface
     /**
      * @return $this
      */
-    public function setThreadKey(?string $threadKey): self
+    public function setThreadKey(?string $threadKey): static
     {
         $this->threadKey = $threadKey;
 

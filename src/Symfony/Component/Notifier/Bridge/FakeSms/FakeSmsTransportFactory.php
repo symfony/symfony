@@ -13,10 +13,10 @@ namespace Symfony\Component\Notifier\Bridge\FakeSms;
 
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Component\Notifier\Exception\LogicException;
 use Symfony\Component\Notifier\Exception\UnsupportedSchemeException;
 use Symfony\Component\Notifier\Transport\AbstractTransportFactory;
 use Symfony\Component\Notifier\Transport\Dsn;
-use Symfony\Component\Notifier\Transport\TransportInterface;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
@@ -27,25 +27,24 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
  */
 final class FakeSmsTransportFactory extends AbstractTransportFactory
 {
-    protected $mailer;
-    protected $logger;
-
-    public function __construct(MailerInterface $mailer, LoggerInterface $logger, ?EventDispatcherInterface $dispatcher = null, ?HttpClientInterface $client = null)
-    {
+    public function __construct(
+        private ?MailerInterface $mailer = null,
+        private ?LoggerInterface $logger = null,
+        ?EventDispatcherInterface $dispatcher = null,
+        ?HttpClientInterface $client = null,
+    ) {
         parent::__construct($dispatcher, $client);
-
-        $this->mailer = $mailer;
-        $this->logger = $logger;
     }
 
-    /**
-     * @return FakeSmsEmailTransport|FakeSmsLoggerTransport
-     */
-    public function create(Dsn $dsn): TransportInterface
+    public function create(Dsn $dsn): FakeSmsEmailTransport|FakeSmsLoggerTransport
     {
         $scheme = $dsn->getScheme();
 
         if ('fakesms+email' === $scheme) {
+            if (null === $this->mailer) {
+                $this->throwMissingDependencyException($scheme, MailerInterface::class, 'symfony/mailer');
+            }
+
             $mailerTransport = $dsn->getHost();
             $to = $dsn->getRequiredOption('to');
             $from = $dsn->getRequiredOption('from');
@@ -54,6 +53,10 @@ final class FakeSmsTransportFactory extends AbstractTransportFactory
         }
 
         if ('fakesms+logger' === $scheme) {
+            if (null === $this->logger) {
+                $this->throwMissingDependencyException($scheme, LoggerInterface::class, 'psr/log');
+            }
+
             return new FakeSmsLoggerTransport($this->logger, $this->client, $this->dispatcher);
         }
 
@@ -63,5 +66,10 @@ final class FakeSmsTransportFactory extends AbstractTransportFactory
     protected function getSupportedSchemes(): array
     {
         return ['fakesms+email', 'fakesms+logger'];
+    }
+
+    private function throwMissingDependencyException(string $scheme, string $missingDependency, string $suggestedPackage): void
+    {
+        throw new LogicException(\sprintf('Cannot create a transport for scheme "%s" without providing an implementation of "%s". Try running "composer require "%s"".', $scheme, $missingDependency, $suggestedPackage));
     }
 }

@@ -28,7 +28,7 @@ use Symfony\Component\Security\Csrf\CsrfTokenManager;
 
 abstract class AbstractDescriptorTestCase extends TestCase
 {
-    private $colSize;
+    private string|false $colSize;
 
     protected function setUp(): void
     {
@@ -153,13 +153,13 @@ abstract class AbstractDescriptorTestCase extends TestCase
 
     private function getFixtureFilename($name)
     {
-        return sprintf('%s/../../Fixtures/Descriptor/%s.%s', __DIR__, $name, $this->getFormat());
+        return \sprintf('%s/../../Fixtures/Descriptor/%s.%s', __DIR__, $name, $this->getFormat());
     }
 }
 
 class FooType extends AbstractType
 {
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setRequired('foo');
         $resolver->setDefined('bar');
@@ -167,14 +167,10 @@ class FooType extends AbstractType
         $resolver->setDefault('empty_data', function (Options $options, $value) {
             $foo = $options['foo'];
 
-            return function (FormInterface $form) use ($foo) {
-                return $form->getConfig()->getCompound() ? [$foo] : $foo;
-            };
+            return fn (FormInterface $form) => $form->getConfig()->getCompound() ? [$foo] : $foo;
         });
         $resolver->setAllowedTypes('foo', 'string');
         $resolver->setAllowedValues('foo', ['bar', 'baz']);
-        $resolver->setNormalizer('foo', function (Options $options, $value) {
-            return (string) $value;
-        });
+        $resolver->setNormalizer('foo', fn (Options $options, $value) => (string) $value);
     }
 }

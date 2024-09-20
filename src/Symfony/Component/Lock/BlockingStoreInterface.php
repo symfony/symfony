@@ -23,5 +23,5 @@ interface BlockingStoreInterface extends PersistingStoreInterface
      *
      * @throws LockConflictedException
      */
-    public function waitAndSave(Key $key);
+    public function waitAndSave(Key $key): void;
 }

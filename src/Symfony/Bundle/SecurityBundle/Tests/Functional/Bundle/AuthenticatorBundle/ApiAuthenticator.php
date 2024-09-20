@@ -25,7 +25,7 @@ use Symfony\Component\Security\Http\Authenticator\Passport\SelfValidatingPasspor
 
 class ApiAuthenticator extends AbstractAuthenticator
 {
-    private $selfLoadingUser = false;
+    private bool $selfLoadingUser;
 
     public function __construct(bool $selfLoadingUser = false)
     {
@@ -40,13 +40,13 @@ class ApiAuthenticator extends AbstractAuthenticator
     public function authenticate(Request $request): Passport
     {
         $email = $request->headers->get('X-USER-EMAIL');
-        if (false === strpos($email, '@')) {
+        if (!str_contains($email, '@')) {
             throw new BadCredentialsException('Email is not a valid email address.');
         }
 
         $userLoader = null;
         if ($this->selfLoadingUser) {
-            $userLoader = function ($username) { return new InMemoryUser($username, 'test', ['ROLE_USER']); };
+            $userLoader = fn ($username) => new InMemoryUser($username, 'test', ['ROLE_USER']);
         }
 
         return new SelfValidatingPassport(new UserBadge($email, $userLoader));

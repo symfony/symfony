@@ -14,18 +14,20 @@ namespace Symfony\Component\Ldap\Adapter;
 use Symfony\Component\Ldap\Exception\AlreadyExistsException;
 use Symfony\Component\Ldap\Exception\ConnectionTimeoutException;
 use Symfony\Component\Ldap\Exception\InvalidCredentialsException;
+use Symfony\Component\Ldap\Exception\LdapException;
 
 /**
  * @author Charles Sarrazin <charles@sarraz.in>
+ *
+ * @method void   saslBind(?string $dn = null, #[\SensitiveParameter] ?string $password = null, ?string $mech = null, ?string $realm = null, ?string $authcId = null, ?string $authzId = null, ?string $props =  null)
+ * @method string whoami()
  */
 interface ConnectionInterface
 {
     /**
      * Checks whether the connection was already bound or not.
-     *
-     * @return bool
      */
-    public function isBound();
+    public function isBound(): bool;
 
     /**
      * Binds the connection against a user's DN and password.
@@ -34,5 +36,20 @@ interface ConnectionInterface
      * @throws ConnectionTimeoutException  When the connection can't be created because of an LDAP_TIMEOUT error
      * @throws InvalidCredentialsException When the connection can't be created because of an LDAP_INVALID_CREDENTIALS error
      */
-    public function bind(?string $dn = null, ?string $password = null);
+    public function bind(?string $dn = null, #[\SensitiveParameter] ?string $password = null): void;
+
+    /*
+     * Binds the connection against a user's DN and password using SASL.
+     *
+     * @throws LdapException               When SASL support is not available
+     * @throws AlreadyExistsException      When the connection can't be created because of an LDAP_ALREADY_EXISTS error
+     * @throws ConnectionTimeoutException  When the connection can't be created because of an LDAP_TIMEOUT error
+     * @throws InvalidCredentialsException When the connection can't be created because of an LDAP_INVALID_CREDENTIALS error
+     */
+     // public function saslBind(?string $dn = null, #[\SensitiveParameter] ?string $password = null, ?string $mech = null, ?string $realm = null, ?string $authcId = null, ?string $authzId = null, ?string $props = null): void;
+
+    /*
+     * Return authenticated and authorized (for SASL) DN.
+     */
+     // public function whoami(): string;
 }

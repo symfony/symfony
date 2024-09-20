@@ -18,13 +18,14 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Tester\CommandCompletionTester;
 use Symfony\Component\Console\Tester\CommandTester;
+use Twig\DeprecatedCallableInfo;
 use Twig\Environment;
 use Twig\Loader\FilesystemLoader;
 use Twig\TwigFilter;
 
 class LintCommandTest extends TestCase
 {
-    private $files;
+    private array $files;
 
     public function testLintCorrectFile()
     {
@@ -141,10 +142,6 @@ class LintCommandTest extends TestCase
      */
     public function testComplete(array $input, array $expectedSuggestions)
     {
-        if (!class_exists(CommandCompletionTester::class)) {
-            $this->markTestSkipped('Test command completion requires symfony/console 5.4+.');
-        }
-
         $tester = new CommandCompletionTester($this->createCommand());
 
         $this->assertSame($expectedSuggestions, $tester->complete($input));
@@ -163,9 +160,12 @@ class LintCommandTest extends TestCase
     private function createCommand(): Command
     {
         $environment = new Environment(new FilesystemLoader(\dirname(__DIR__).'/Fixtures/templates/'));
-        $environment->addFilter(new TwigFilter('deprecated_filter', function ($v) {
-            return $v;
-        }, ['deprecated' => true]));
+        if (class_exists(DeprecatedCallableInfo::class)) {
+            $options = ['deprecation_info' => new DeprecatedCallableInfo('foo/bar', '1.1')];
+        } else {
+            $options = ['deprecated' => true];
+        }
+        $environment->addFilter(new TwigFilter('deprecated_filter', fn ($v) => $v, $options));
 
         $command = new LintCommand($environment);
 

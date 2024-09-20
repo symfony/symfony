@@ -13,7 +13,9 @@ namespace Symfony\Component\HttpKernel\Tests\Controller;
 
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\HttpFoundation\Exception\BadRequestException;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\Attribute\AsController;
 use Symfony\Component\HttpKernel\Controller\ControllerResolver;
 
 class ControllerResolverTest extends TestCase
@@ -116,9 +118,7 @@ class ControllerResolverTest extends TestCase
     {
         $resolver = $this->createControllerResolver();
 
-        $closure = function () {
-            return 'test';
-        };
+        $closure = fn () => 'test';
 
         $request = Request::create('/');
         $request->attributes->set('_controller', $closure);
@@ -170,9 +170,9 @@ class ControllerResolverTest extends TestCase
         $controller = new ControllerTest();
 
         return [
-            ['foo', \Error::class, \PHP_VERSION_ID < 80000 ? 'Class \'foo\' not found' : 'Class "foo" not found'],
-            ['oof::bar', \Error::class, \PHP_VERSION_ID < 80000 ? 'Class \'oof\' not found' : 'Class "oof" not found'],
-            [['oof', 'bar'], \Error::class, \PHP_VERSION_ID < 80000 ? 'Class \'oof\' not found' : 'Class "oof" not found'],
+            ['foo', \Error::class, 'Class "foo" not found'],
+            ['oof::bar', \Error::class, 'Class "oof" not found'],
+            [['oof', 'bar'], \Error::class, 'Class "oof" not found'],
             ['Symfony\Component\HttpKernel\Tests\Controller\ControllerTest::staticsAction', \InvalidArgumentException::class, 'The controller for URI "/" is not callable: Expected method "staticsAction" on class "Symfony\Component\HttpKernel\Tests\Controller\ControllerTest", did you mean "staticAction"?'],
             ['Symfony\Component\HttpKernel\Tests\Controller\ControllerTest::privateAction', \InvalidArgumentException::class, 'The controller for URI "/" is not callable: Method "privateAction" on class "Symfony\Component\HttpKernel\Tests\Controller\ControllerTest" should be public and non-abstract'],
             ['Symfony\Component\HttpKernel\Tests\Controller\ControllerTest::protectedAction', \InvalidArgumentException::class, 'The controller for URI "/" is not callable: Method "protectedAction" on class "Symfony\Component\HttpKernel\Tests\Controller\ControllerTest" should be public and non-abstract'],
@@ -187,12 +187,77 @@ class ControllerResolverTest extends TestCase
         ];
     }
 
+    public function testAllowedControllerTypes()
+    {
+        $resolver = $this->createControllerResolver();
+
+        $request = Request::create('/');
+        $controller = new ControllerTest();
+        $request->attributes->set('_controller', [$controller, 'publicAction']);
+        $request->attributes->set('_check_controller_is_allowed', true);
+
+        try {
+            $resolver->getController($request);
+            $this->expectException(BadRequestException::class);
+        } catch (BadRequestException) {
+            // expected
+        }
+
+        $resolver->allowControllers(types: [ControllerTest::class]);
+
+        $this->assertSame([$controller, 'publicAction'], $resolver->getController($request));
+
+        $request->attributes->set('_controller', $action = $controller->publicAction(...));
+        $this->assertSame($action, $resolver->getController($request));
+    }
+
+    public function testAllowedControllerAttributes()
+    {
+        $resolver = $this->createControllerResolver();
+
+        $request = Request::create('/');
+        $controller = some_controller_function(...);
+        $request->attributes->set('_controller', $controller);
+        $request->attributes->set('_check_controller_is_allowed', true);
+
+        try {
+            $resolver->getController($request);
+            $this->expectException(BadRequestException::class);
+        } catch (BadRequestException) {
+            // expected
+        }
+
+        $resolver->allowControllers(attributes: [DummyController::class]);
+
+        $this->assertSame($controller, $resolver->getController($request));
+
+        $controller = some_controller_function::class;
+        $request->attributes->set('_controller', $controller);
+        $this->assertSame($controller, $resolver->getController($request));
+    }
+
+    public function testAllowedAsControllerAttribute()
+    {
+        $resolver = $this->createControllerResolver();
+
+        $request = Request::create('/');
+        $controller = new InvokableController();
+        $request->attributes->set('_controller', [$controller, '__invoke']);
+        $request->attributes->set('_check_controller_is_allowed', true);
+
+        $this->assertSame([$controller, '__invoke'], $resolver->getController($request));
+
+        $request->attributes->set('_controller', $controller);
+        $this->assertSame($controller, $resolver->getController($request));
+    }
+
     protected function createControllerResolver(?LoggerInterface $logger = null)
     {
         return new ControllerResolver($logger);
     }
 }
 
+#[DummyController]
 function some_controller_function($foo, $foobar)
 {
 }
@@ -225,6 +290,7 @@ class ControllerTest
     }
 }
 
+#[AsController]
 class InvokableController
 {
     public function __invoke($foo, $bar = null)

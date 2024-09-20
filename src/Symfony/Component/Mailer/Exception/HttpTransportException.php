@@ -18,19 +18,13 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
  */
 class HttpTransportException extends TransportException
 {
-    private $response;
-
-    public function __construct(?string $message, ResponseInterface $response, int $code = 0, ?\Throwable $previous = null)
-    {
-        if (null === $message) {
-            trigger_deprecation('symfony/mailer', '5.3', 'Passing null as $message to "%s()" is deprecated, pass an empty string instead.', __METHOD__);
-
-            $message = '';
-        }
-
+    public function __construct(
+        string $message,
+        private ResponseInterface $response,
+        int $code = 0,
+        ?\Throwable $previous = null,
+    ) {
         parent::__construct($message, $code, $previous);
-
-        $this->response = $response;
     }
 
     public function getResponse(): ResponseInterface

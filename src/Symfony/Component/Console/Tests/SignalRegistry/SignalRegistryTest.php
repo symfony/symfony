@@ -22,6 +22,9 @@ class SignalRegistryTest extends TestCase
     protected function tearDown(): void
     {
         pcntl_async_signals(false);
+        // We reset all signals to their default value to avoid side effects
+        pcntl_signal(\SIGINT, \SIG_DFL);
+        pcntl_signal(\SIGTERM, \SIG_DFL);
         pcntl_signal(\SIGUSR1, \SIG_DFL);
         pcntl_signal(\SIGUSR2, \SIG_DFL);
     }

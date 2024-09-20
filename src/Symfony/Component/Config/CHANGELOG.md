@@ -1,6 +1,48 @@
 CHANGELOG
 =========
 
+7.2
+---
+
+ * Add `#[WhenNot]` attribute to prevent service from being registered in a specific environment
+ * Generate a meta file in JSON format for resource tracking
+ * Add `SkippingResourceChecker`
+
+7.1
+---
+
+ * Allow custom meta location in `ResourceCheckerConfigCache`
+ * Allow custom meta location in `ConfigCache`
+
+7.0
+---
+
+ * Require explicit argument when calling `NodeBuilder::setParent()`
+
+6.3
+---
+
+ * Allow enum values in `EnumNode`
+
+6.2
+---
+
+ * Deprecate calling `NodeBuilder::setParent()` without any arguments
+ * Add a more accurate typehint in generated PHP config
+
+6.1
+---
+
+ * Allow using environment variables in `EnumNode`
+ * Add Node's information in generated Config
+ * Add `DefinitionFileLoader` class to load a TreeBuilder definition from an external file
+ * Add `DefinitionConfigurator` helper
+
+6.0
+---
+
+ * Remove `BaseNode::getDeprecationMessage()`
+
 5.3.0
 -----
 

@@ -14,6 +14,7 @@ namespace Symfony\Bundle\SecurityBundle\Command;
 use Psr\Container\ContainerInterface;
 use Symfony\Bundle\SecurityBundle\Security\FirewallContext;
 use Symfony\Bundle\SecurityBundle\Security\LazyFirewallContext;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Completion\CompletionInput;
 use Symfony\Component\Console\Completion\CompletionSuggestions;
@@ -24,37 +25,24 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Security\Http\Authenticator\AuthenticatorInterface;
+use Symfony\Component\Security\Http\Authenticator\Debug\TraceableAuthenticator;
 
 /**
  * @author Timo Bakx <timobakx@gmail.com>
  */
+#[AsCommand(name: 'debug:firewall', description: 'Display information about your security firewall(s)')]
 final class DebugFirewallCommand extends Command
 {
-    protected static $defaultName = 'debug:firewall';
-    protected static $defaultDescription = 'Display information about your security firewall(s)';
-
-    private $firewallNames;
-    private $contexts;
-    private $eventDispatchers;
-    private $authenticators;
-    private $authenticatorManagerEnabled;
-
     /**
      * @param string[]                   $firewallNames
      * @param AuthenticatorInterface[][] $authenticators
      */
-    public function __construct(array $firewallNames, ContainerInterface $contexts, ContainerInterface $eventDispatchers, array $authenticators, bool $authenticatorManagerEnabled)
-    {
-        if (!$authenticatorManagerEnabled) {
-            trigger_deprecation('symfony/security-bundle', '5.4', 'Setting the $authenticatorManagerEnabled argument of "%s" to "false" is deprecated, use the new authenticator system instead.', __METHOD__);
-        }
-
-        $this->firewallNames = $firewallNames;
-        $this->contexts = $contexts;
-        $this->eventDispatchers = $eventDispatchers;
-        $this->authenticators = $authenticators;
-        $this->authenticatorManagerEnabled = $authenticatorManagerEnabled;
-
+    public function __construct(
+        private array $firewallNames,
+        private ContainerInterface $contexts,
+        private ContainerInterface $eventDispatchers,
+        private array $authenticators,
+    ) {
         parent::__construct();
     }
 
@@ -63,7 +51,6 @@ final class DebugFirewallCommand extends Command
         $exampleName = $this->getExampleName();
 
         $this
-            ->setDescription(self::$defaultDescription)
             ->setHelp(<<<EOF
 The <info>%command.name%</info> command displays the firewalls that are configured
 in your application:
@@ -83,7 +70,7 @@ To include all events and event listeners for a specific firewall, use the
 EOF
             )
             ->setDefinition([
-                new InputArgument('name', InputArgument::OPTIONAL, sprintf('A firewall name (for example "%s")', $exampleName)),
+                new InputArgument('name', InputArgument::OPTIONAL, \sprintf('A firewall name (for example "%s")', $exampleName)),
                 new InputOption('events', null, InputOption::VALUE_NONE, 'Include a list of event listeners (only available in combination with the "name" argument)'),
             ]);
     }
@@ -100,10 +87,10 @@ EOF
             return 0;
         }
 
-        $serviceId = sprintf('security.firewall.map.context.%s', $name);
+        $serviceId = \sprintf('security.firewall.map.context.%s', $name);
 
         if (!$this->contexts->has($serviceId)) {
-            $io->error(sprintf('Firewall %s was not found. Available firewalls are: %s', $name, implode(', ', $this->firewallNames)));
+            $io->error(\sprintf('Firewall %s was not found. Available firewalls are: %s', $name, implode(', ', $this->firewallNames)));
 
             return 1;
         }
@@ -111,7 +98,7 @@ EOF
         /** @var FirewallContext $context */
         $context = $this->contexts->get($serviceId);
 
-        $io->title(sprintf('Firewall "%s"', $name));
+        $io->title(\sprintf('Firewall "%s"', $name));
 
         $this->displayFirewallSummary($name, $context, $io);
 
@@ -121,9 +108,7 @@ EOF
             $this->displayEventListeners($name, $context, $io);
         }
 
-        if ($this->authenticatorManagerEnabled) {
-            $this->displayAuthenticators($name, $io);
-        }
+        $this->displayAuthenticators($name, $io);
 
         return 0;
     }
@@ -135,7 +120,7 @@ EOF
 
         $io->listing($this->firewallNames);
 
-        $io->comment(sprintf('To view details of a specific firewall, re-run this command with a firewall name. (e.g. <comment>debug:firewall %s</comment>)', $this->getExampleName()));
+        $io->comment(\sprintf('To view details of a specific firewall, re-run this command with a firewall name. (e.g. <comment>debug:firewall %s</comment>)', $this->getExampleName()));
     }
 
     protected function displayFirewallSummary(string $name, FirewallContext $context, SymfonyStyle $io): void
@@ -162,7 +147,7 @@ EOF
         );
     }
 
-    private function displaySwitchUser(FirewallContext $context, SymfonyStyle $io)
+    private function displaySwitchUser(FirewallContext $context, SymfonyStyle $io): void
     {
         if ((null === $config = $context->getConfig()) || (null === $switchUser = $config->getSwitchUser())) {
             return;
@@ -179,9 +164,9 @@ EOF
 
     protected function displayEventListeners(string $name, FirewallContext $context, SymfonyStyle $io): void
     {
-        $io->title(sprintf('Event listeners for firewall "%s"', $name));
+        $io->title(\sprintf('Event listeners for firewall "%s"', $name));
 
-        $dispatcherId = sprintf('security.event_dispatcher.%s', $name);
+        $dispatcherId = \sprintf('security.event_dispatcher.%s', $name);
 
         if (!$this->eventDispatchers->has($dispatcherId)) {
             $io->text('No event dispatcher has been registered for this firewall.');
@@ -193,12 +178,12 @@ EOF
         $dispatcher = $this->eventDispatchers->get($dispatcherId);
 
         foreach ($dispatcher->getListeners() as $event => $listeners) {
-            $io->section(sprintf('"%s" event', $event));
+            $io->section(\sprintf('"%s" event', $event));
 
             $rows = [];
             foreach ($listeners as $order => $listener) {
                 $rows[] = [
-                    sprintf('#%d', $order + 1),
+                    \sprintf('#%d', $order + 1),
                     $this->formatCallable($listener),
                     $dispatcher->getListenerPriority($event, $listener),
                 ];
@@ -213,7 +198,7 @@ EOF
 
     private function displayAuthenticators(string $name, SymfonyStyle $io): void
     {
-        $io->title(sprintf('Authenticators for firewall "%s"', $name));
+        $io->title(\sprintf('Authenticators for firewall "%s"', $name));
 
         $authenticators = $this->authenticators[$name] ?? [];
 
@@ -226,44 +211,40 @@ EOF
         $io->table(
             ['Classname'],
             array_map(
-                static function ($authenticator) {
-                    return [
-                        \get_class($authenticator),
-                    ];
-                },
+                fn ($authenticator) => [($authenticator instanceof TraceableAuthenticator ? $authenticator->getAuthenticator() : $authenticator)::class],
                 $authenticators
             )
         );
     }
 
-    private function formatCallable($callable): string
+    private function formatCallable(mixed $callable): string
     {
         if (\is_array($callable)) {
             if (\is_object($callable[0])) {
-                return sprintf('%s::%s()', \get_class($callable[0]), $callable[1]);
+                return \sprintf('%s::%s()', $callable[0]::class, $callable[1]);
             }
 
-            return sprintf('%s::%s()', $callable[0], $callable[1]);
+            return \sprintf('%s::%s()', $callable[0], $callable[1]);
         }
 
         if (\is_string($callable)) {
-            return sprintf('%s()', $callable);
+            return \sprintf('%s()', $callable);
         }
 
         if ($callable instanceof \Closure) {
             $r = new \ReflectionFunction($callable);
-            if (str_contains($r->name, '{closure')) {
+            if ($r->isAnonymous()) {
                 return 'Closure()';
             }
-            if ($class = \PHP_VERSION_ID >= 80111 ? $r->getClosureCalledClass() : $r->getClosureScopeClass()) {
-                return sprintf('%s::%s()', $class->name, $r->name);
+            if ($class = $r->getClosureCalledClass()) {
+                return \sprintf('%s::%s()', $class->name, $r->name);
             }
 
             return $r->name.'()';
         }
 
         if (method_exists($callable, '__invoke')) {
-            return sprintf('%s::__invoke()', \get_class($callable));
+            return \sprintf('%s::__invoke()', $callable::class);
         }
 
         throw new \InvalidArgumentException('Callable is not describable.');

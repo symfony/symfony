@@ -48,6 +48,7 @@ EOF;
                     $attributeMetadata->getGroups(),
                     $attributeMetadata->getMaxDepth(),
                     $attributeMetadata->getSerializedName(),
+                    $attributeMetadata->getSerializedPath(),
                 ];
             }
 
@@ -56,7 +57,7 @@ EOF;
                 $classMetadata->getClassDiscriminatorMapping()->getTypesMapping(),
             ] : null;
 
-            $compiled .= sprintf("\n'%s' => %s,", $classMetadata->getName(), VarExporter::export([
+            $compiled .= \sprintf("\n'%s' => %s,", $classMetadata->getName(), VarExporter::export([
                 $attributesMetadata,
                 $classDiscriminatorMapping,
             ]));

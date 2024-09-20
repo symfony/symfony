@@ -16,29 +16,20 @@ use Symfony\Component\DomCrawler\Crawler;
 
 final class CrawlerSelectorAttributeValueSame extends Constraint
 {
-    private $selector;
-    private $attribute;
-    private $expectedText;
-
-    public function __construct(string $selector, string $attribute, string $expectedText)
-    {
-        $this->selector = $selector;
-        $this->attribute = $attribute;
-        $this->expectedText = $expectedText;
+    public function __construct(
+        private string $selector,
+        private string $attribute,
+        private string $expectedText,
+    ) {
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function toString(): string
     {
-        return sprintf('has a node matching selector "%s" with attribute "%s" of value "%s"', $this->selector, $this->attribute, $this->expectedText);
+        return \sprintf('has a node matching selector "%s" with attribute "%s" of value "%s"', $this->selector, $this->attribute, $this->expectedText);
     }
 
     /**
      * @param Crawler $crawler
-     *
-     * {@inheritdoc}
      */
     protected function matches($crawler): bool
     {
@@ -52,8 +43,6 @@ final class CrawlerSelectorAttributeValueSame extends Constraint
 
     /**
      * @param Crawler $crawler
-     *
-     * {@inheritdoc}
      */
     protected function failureDescription($crawler): string
     {

@@ -20,30 +20,18 @@ use Doctrine\DBAL\Types\Type;
  */
 class DoctrineFooType extends Type
 {
-    /**
-     * Type name.
-     */
     private const NAME = 'foo';
 
-    /**
-     * {@inheritdoc}
-     */
     public function getName(): string
     {
         return self::NAME;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getSQLDeclaration(array $fieldDeclaration, AbstractPlatform $platform): string
     {
         return $platform->getClobTypeDeclarationSQL([]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function convertToDatabaseValue($value, AbstractPlatform $platform): ?string
     {
         if (null === $value) {
@@ -56,9 +44,6 @@ class DoctrineFooType extends Type
         return $foo->bar;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function convertToPHPValue($value, AbstractPlatform $platform): ?Foo
     {
         if (null === $value) {
@@ -74,9 +59,6 @@ class DoctrineFooType extends Type
         return $foo;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function requiresSQLCommentHint(AbstractPlatform $platform): bool
     {
         return true;

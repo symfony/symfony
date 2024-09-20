@@ -155,14 +155,14 @@ class FileLoaderTest extends TestCase
 
 class TestFileLoader extends FileLoader
 {
-    private $supports = true;
+    private bool $supports = true;
 
-    public function load($resource, ?string $type = null)
+    public function load(mixed $resource, ?string $type = null): mixed
     {
         return $resource;
     }
 
-    public function supports($resource, ?string $type = null): bool
+    public function supports(mixed $resource, ?string $type = null): bool
     {
         return $this->supports;
     }

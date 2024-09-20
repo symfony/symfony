@@ -30,7 +30,7 @@ class StaticVersionStrategyTest extends TestCase
     public function testApplyVersion($path, $version, $format)
     {
         $staticVersionStrategy = new StaticVersionStrategy($version, $format);
-        $formatted = sprintf($format ?: '%s?%s', $path, $version);
+        $formatted = \sprintf($format ?: '%s?%s', $path, $version);
         $this->assertSame($formatted, $staticVersionStrategy->applyVersion($path));
     }
 

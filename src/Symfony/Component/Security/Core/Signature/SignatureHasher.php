@@ -12,6 +12,7 @@
 namespace Symfony\Component\Security\Core\Signature;
 
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
+use Symfony\Component\Security\Core\Exception\InvalidArgumentException;
 use Symfony\Component\Security\Core\Signature\Exception\ExpiredSignatureException;
 use Symfony\Component\Security\Core\Signature\Exception\InvalidSignatureException;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -24,24 +25,21 @@ use Symfony\Component\Security\Core\User\UserInterface;
  */
 class SignatureHasher
 {
-    private $propertyAccessor;
-    private $signatureProperties;
-    private $secret;
-    private $expiredSignaturesStorage;
-    private $maxUses;
-
     /**
      * @param array                        $signatureProperties      Properties of the User; the hash is invalidated if these properties change
      * @param ExpiredSignatureStorage|null $expiredSignaturesStorage If provided, secures a sequence of hashes that are expired
      * @param int|null                     $maxUses                  Used together with $expiredSignatureStorage to allow a maximum usage of a hash
      */
-    public function __construct(PropertyAccessorInterface $propertyAccessor, array $signatureProperties, string $secret, ?ExpiredSignatureStorage $expiredSignaturesStorage = null, ?int $maxUses = null)
-    {
-        $this->propertyAccessor = $propertyAccessor;
-        $this->signatureProperties = $signatureProperties;
-        $this->secret = $secret;
-        $this->expiredSignaturesStorage = $expiredSignaturesStorage;
-        $this->maxUses = $maxUses;
+    public function __construct(
+        private PropertyAccessorInterface $propertyAccessor,
+        private array $signatureProperties,
+        #[\SensitiveParameter] private string $secret,
+        private ?ExpiredSignatureStorage $expiredSignaturesStorage = null,
+        private ?int $maxUses = null,
+    ) {
+        if (!$secret) {
+            throw new InvalidArgumentException('A non-empty secret is required.');
+        }
     }
 
     /**
@@ -89,7 +87,7 @@ class SignatureHasher
 
         if ($this->expiredSignaturesStorage && $this->maxUses) {
             if ($this->expiredSignaturesStorage->countUsages($hash) >= $this->maxUses) {
-                throw new ExpiredSignatureException(sprintf('Signature can only be used "%d" times.', $this->maxUses));
+                throw new ExpiredSignatureException(\sprintf('Signature can only be used "%d" times.', $this->maxUses));
             }
 
             $this->expiredSignaturesStorage->incrementUsages($hash);
@@ -103,7 +101,7 @@ class SignatureHasher
      */
     public function computeSignatureHash(UserInterface $user, int $expires): string
     {
-        $userIdentifier = method_exists($user, 'getUserIdentifier') ? $user->getUserIdentifier() : $user->getUsername();
+        $userIdentifier = $user->getUserIdentifier();
         $fieldsHash = hash_init('sha256');
 
         foreach ($this->signatureProperties as $property) {
@@ -112,8 +110,8 @@ class SignatureHasher
                 $value = $value->format('c');
             }
 
-            if (!\is_scalar($value) && !(\is_object($value) && method_exists($value, '__toString'))) {
-                throw new \InvalidArgumentException(sprintf('The property path "%s" on the user object "%s" must return a value that can be cast to a string, but "%s" was returned.', $property, \get_class($user), get_debug_type($value)));
+            if (!\is_scalar($value) && !$value instanceof \Stringable) {
+                throw new \InvalidArgumentException(\sprintf('The property path "%s" on the user object "%s" must return a value that can be cast to a string, but "%s" was returned.', $property, $user::class, get_debug_type($value)));
             }
             hash_update($fieldsHash, ':'.base64_encode($value));
         }

@@ -11,8 +11,8 @@
 
 namespace Symfony\Component\HttpClient;
 
-use Amp\Http\Client\Connection\ConnectionLimitingPool;
-use Amp\Promise;
+use Amp\Http\Client\Request as AmpRequest;
+use Amp\Http\HttpMessage;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
@@ -31,18 +31,18 @@ final class HttpClient
      */
     public static function create(array $defaultOptions = [], int $maxHostConnections = 6, int $maxPendingPushes = 50): HttpClientInterface
     {
-        if ($amp = class_exists(ConnectionLimitingPool::class) && interface_exists(Promise::class)) {
+        if ($amp = class_exists(AmpRequest::class) && (\PHP_VERSION_ID >= 80400 || !is_subclass_of(AmpRequest::class, HttpMessage::class))) {
             if (!\extension_loaded('curl')) {
                 return new AmpHttpClient($defaultOptions, null, $maxHostConnections, $maxPendingPushes);
             }
 
             // Skip curl when HTTP/2 push is unsupported or buggy, see https://bugs.php.net/77535
-            if (\PHP_VERSION_ID < 70217 || (\PHP_VERSION_ID >= 70300 && \PHP_VERSION_ID < 70304) || !\defined('CURLMOPT_PUSHFUNCTION')) {
+            if (!\defined('CURLMOPT_PUSHFUNCTION')) {
                 return new AmpHttpClient($defaultOptions, null, $maxHostConnections, $maxPendingPushes);
             }
 
             static $curlVersion = null;
-            $curlVersion = $curlVersion ?? curl_version();
+            $curlVersion ??= curl_version();
 
             // HTTP/2 push crashes before curl 7.61
             if (0x073D00 > $curlVersion['version_number'] || !(\CURL_VERSION_HTTP2 & $curlVersion['features'])) {

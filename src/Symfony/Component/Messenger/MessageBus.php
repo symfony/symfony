@@ -21,7 +21,7 @@ use Symfony\Component\Messenger\Middleware\StackMiddleware;
  */
 class MessageBus implements MessageBusInterface
 {
-    private $middlewareAggregate;
+    private \IteratorAggregate $middlewareAggregate;
 
     /**
      * @param iterable<mixed, MiddlewareInterface> $middlewareHandlers
@@ -36,29 +36,21 @@ class MessageBus implements MessageBusInterface
             // $this->middlewareAggregate should be an instance of IteratorAggregate.
             // When $middlewareHandlers is an Iterator, we wrap it to ensure it is lazy-loaded and can be rewound.
             $this->middlewareAggregate = new class($middlewareHandlers) implements \IteratorAggregate {
-                private $middlewareHandlers;
-                private $cachedIterator;
+                private \ArrayObject $cachedIterator;
 
-                public function __construct(\Traversable $middlewareHandlers)
-                {
-                    $this->middlewareHandlers = $middlewareHandlers;
+                public function __construct(
+                    private \Traversable $middlewareHandlers,
+                ) {
                 }
 
                 public function getIterator(): \Traversable
                 {
-                    if (null === $this->cachedIterator) {
-                        $this->cachedIterator = new \ArrayObject(iterator_to_array($this->middlewareHandlers, false));
-                    }
-
-                    return $this->cachedIterator;
+                    return $this->cachedIterator ??= new \ArrayObject(iterator_to_array($this->middlewareHandlers, false));
                 }
             };
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function dispatch(object $message, array $stamps = []): Envelope
     {
         $envelope = Envelope::wrap($message, $stamps);

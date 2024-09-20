@@ -14,17 +14,13 @@ namespace Symfony\Component\Notifier\Bridge\Expo;
 use Symfony\Component\Notifier\Exception\UnsupportedSchemeException;
 use Symfony\Component\Notifier\Transport\AbstractTransportFactory;
 use Symfony\Component\Notifier\Transport\Dsn;
-use Symfony\Component\Notifier\Transport\TransportInterface;
 
 /**
  * @author Imad ZAIRIG <https://github.com/zairigimad>
  */
 final class ExpoTransportFactory extends AbstractTransportFactory
 {
-    /**
-     * @return ExpoTransport
-     */
-    public function create(Dsn $dsn): TransportInterface
+    public function create(Dsn $dsn): ExpoTransport
     {
         $scheme = $dsn->getScheme();
 
@@ -32,7 +28,7 @@ final class ExpoTransportFactory extends AbstractTransportFactory
             throw new UnsupportedSchemeException($dsn, 'expo', $this->getSupportedSchemes());
         }
 
-        $token = $dsn->getUser($dsn);
+        $token = $dsn->getUser();
         $host = 'default' === $dsn->getHost() ? null : $dsn->getHost();
         $port = $dsn->getPort();
 

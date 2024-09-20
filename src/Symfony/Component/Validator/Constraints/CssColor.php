@@ -15,8 +15,7 @@ use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Exception\InvalidArgumentException;
 
 /**
- * @Annotation
- * @Target({"PROPERTY", "METHOD", "ANNOTATION"})
+ * Validates that a value is a valid CSS color.
  *
  * @author Mathieu Santostefano <msantostefano@protonmail.com>
  */
@@ -37,14 +36,14 @@ class CssColor extends Constraint
     public const HSLA = 'hsla';
     public const INVALID_FORMAT_ERROR = '454ab47b-aacf-4059-8f26-184b2dc9d48d';
 
-    protected static $errorNames = [
+    protected const ERROR_NAMES = [
         self::INVALID_FORMAT_ERROR => 'INVALID_FORMAT_ERROR',
     ];
 
     /**
      * @var string[]
      */
-    private static $validationModes = [
+    private static array $validationModes = [
         self::HEX_LONG,
         self::HEX_LONG_WITH_ALPHA,
         self::HEX_SHORT,
@@ -59,13 +58,15 @@ class CssColor extends Constraint
         self::HSLA,
     ];
 
-    public $message = 'This value is not a valid CSS color.';
-    public $formats;
+    public string $message = 'This value is not a valid CSS color.';
+    public array|string $formats;
 
     /**
-     * @param array|string $formats The types of CSS colors allowed (e.g. hexadecimal only, RGB and HSL only, etc.).
+     * @param non-empty-string[]|non-empty-string|array<string,mixed> $formats The types of CSS colors allowed ({@see https://symfony.com/doc/current/reference/constraints/CssColor.html#formats})
+     * @param string[]|null                                           $groups
+     * @param array<string,mixed>|null                                $options
      */
-    public function __construct($formats = [], ?string $message = null, ?array $groups = null, $payload = null, ?array $options = null)
+    public function __construct(array|string $formats = [], ?string $message = null, ?array $groups = null, $payload = null, ?array $options = null)
     {
         $validationModesAsString = implode(', ', self::$validationModes);
 
@@ -75,13 +76,13 @@ class CssColor extends Constraint
             $options = array_merge($formats, $options ?? []);
         } elseif (\is_array($formats)) {
             if ([] === array_intersect(self::$validationModes, $formats)) {
-                throw new InvalidArgumentException(sprintf('The "formats" parameter value is not valid. It must contain one or more of the following values: "%s".', $validationModesAsString));
+                throw new InvalidArgumentException(\sprintf('The "formats" parameter value is not valid. It must contain one or more of the following values: "%s".', $validationModesAsString));
             }
 
             $options['value'] = $formats;
         } elseif (\is_string($formats)) {
-            if (!\in_array($formats, self::$validationModes)) {
-                throw new InvalidArgumentException(sprintf('The "formats" parameter value is not valid. It must contain one or more of the following values: "%s".', $validationModesAsString));
+            if (!\in_array($formats, self::$validationModes, true)) {
+                throw new InvalidArgumentException(\sprintf('The "formats" parameter value is not valid. It must contain one or more of the following values: "%s".', $validationModesAsString));
             }
 
             $options['value'] = [$formats];

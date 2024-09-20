@@ -18,7 +18,7 @@ use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
 class DateValidatorTest extends ConstraintValidatorTestCase
 {
-    protected function createValidator()
+    protected function createValidator(): DateValidator
     {
         return new DateValidator();
     }
@@ -53,6 +53,19 @@ class DateValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
+    /**
+     * @dataProvider getValidDates
+     */
+    public function testValidDatesWithNewLine(string $date)
+    {
+        $this->validator->validate($date."\n", new Date(['message' => 'myMessage']));
+
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ value }}', '"'.$date."\n\"")
+            ->setCode(Date::INVALID_FORMAT_ERROR)
+            ->assertRaised();
+    }
+
     public static function getValidDates()
     {
         return [
@@ -79,12 +92,9 @@ class DateValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    /**
-     * @requires PHP 8
-     */
     public function testInvalidDateNamed()
     {
-        $constraint = eval('return new \Symfony\Component\Validator\Constraints\Date(message: "myMessage");');
+        $constraint = new Date(message: 'myMessage');
 
         $this->validator->validate('foobar', $constraint);
 

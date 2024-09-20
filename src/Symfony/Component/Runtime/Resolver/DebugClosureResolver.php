@@ -16,9 +16,6 @@ namespace Symfony\Component\Runtime\Resolver;
  */
 class DebugClosureResolver extends ClosureResolver
 {
-    /**
-     * {@inheritdoc}
-     */
     public function resolve(): array
     {
         [$closure, $arguments] = parent::resolve();
@@ -31,7 +28,7 @@ class DebugClosureResolver extends ClosureResolver
 
                 $r = new \ReflectionFunction($closure);
 
-                throw new \TypeError(sprintf('Unexpected value of type "%s" returned, "object" expected from "%s" on line "%d".', get_debug_type($app), $r->getFileName(), $r->getStartLine()));
+                throw new \TypeError(\sprintf('Unexpected value of type "%s" returned, "object" expected from "%s" on line "%d".', get_debug_type($app), $r->getFileName(), $r->getStartLine()));
             },
             $arguments,
         ];

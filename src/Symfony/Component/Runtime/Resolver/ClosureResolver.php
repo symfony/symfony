@@ -18,18 +18,12 @@ use Symfony\Component\Runtime\ResolverInterface;
  */
 class ClosureResolver implements ResolverInterface
 {
-    private $closure;
-    private $arguments;
-
-    public function __construct(\Closure $closure, \Closure $arguments)
-    {
-        $this->closure = $closure;
-        $this->arguments = $arguments;
+    public function __construct(
+        private readonly \Closure $closure,
+        private readonly \Closure $arguments,
+    ) {
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function resolve(): array
     {
         return [$this->closure, ($this->arguments)()];

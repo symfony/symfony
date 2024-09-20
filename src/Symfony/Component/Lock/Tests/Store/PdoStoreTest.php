@@ -25,7 +25,7 @@ class PdoStoreTest extends AbstractStoreTestCase
 {
     use ExpiringStoreTestTrait;
 
-    protected static $dbFile;
+    protected static string $dbFile;
 
     public static function setUpBeforeClass(): void
     {
@@ -40,17 +40,11 @@ class PdoStoreTest extends AbstractStoreTestCase
         @unlink(self::$dbFile);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function getClockDelay()
+    protected function getClockDelay(): int
     {
         return 1000000;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getStore(): PersistingStoreInterface
     {
         return new PdoStore('sqlite:'.self::$dbFile);
@@ -80,7 +74,7 @@ class PdoStoreTest extends AbstractStoreTestCase
      */
     public function testDsnWithSQLite(string $dsn, ?string $file = null)
     {
-        $key = new Key(uniqid(__METHOD__, true));
+        $key = new Key(__METHOD__);
 
         try {
             $store = new PdoStore($dsn);
@@ -112,7 +106,7 @@ class PdoStoreTest extends AbstractStoreTestCase
             $this->markTestSkipped('Missing POSTGRES_HOST env variable');
         }
 
-        $key = new Key(uniqid(__METHOD__, true));
+        $key = new Key(__METHOD__);
 
         $dsn = 'pgsql:host='.$host.';user=postgres;password=password';
 

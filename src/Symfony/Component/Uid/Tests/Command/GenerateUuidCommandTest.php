@@ -237,10 +237,6 @@ final class GenerateUuidCommandTest extends TestCase
      */
     public function testComplete(array $input, array $expectedSuggestions)
     {
-        if (!class_exists(CommandCompletionTester::class)) {
-            $this->markTestSkipped('Test command completion requires symfony/console 5.4+.');
-        }
-
         $application = new Application();
         $application->add(new GenerateUuidCommand());
         $tester = new CommandCompletionTester($application->get('uuid:generate'));

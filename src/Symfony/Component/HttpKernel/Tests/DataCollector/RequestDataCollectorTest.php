@@ -89,7 +89,7 @@ class RequestDataCollectorTest extends TestCase
         $c->collect($request, $response);
         $c->lateCollect();
 
-        $this->assertSame($expected, $c->getController()->getValue(true), sprintf('Testing: %s', $name));
+        $this->assertSame($expected, $c->getController()->getValue(true), \sprintf('Testing: %s', $name));
     }
 
     public static function provideControllerCallables(): array
@@ -116,9 +116,9 @@ class RequestDataCollectorTest extends TestCase
 
             [
                 'Closure',
-                function () { return 'foo'; },
+                fn () => 'foo',
                 [
-                    'class' => \PHP_VERSION_ID >= 80400 ? sprintf('{closure:%s():%d}', __METHOD__, __LINE__ - 2) : __NAMESPACE__.'\{closure}',
+                    'class' => \PHP_VERSION_ID >= 80400 ? \sprintf('{closure:%s():%d}', __METHOD__, __LINE__ - 2) : __NAMESPACE__.'\{closure}',
                     'method' => null,
                     'file' => __FILE__,
                     'line' => __LINE__ - 5,
@@ -127,7 +127,7 @@ class RequestDataCollectorTest extends TestCase
 
             [
                 'First-class callable closure',
-                \PHP_VERSION_ID >= 80100 ? eval('return $controller->regularCallable(...);') : [$controller, 'regularCallable'],
+                $controller->regularCallable(...),
                 [
                     'class' => DummyController::class,
                     'method' => 'regularCallable',
@@ -301,7 +301,7 @@ class RequestDataCollectorTest extends TestCase
         $this->assertSame('getMetadataBag', $trace[0]['function']);
         $this->assertSame(self::class, $class = $trace[1]['class']);
 
-        $this->assertSame(sprintf('%s:%s', $class, $line), $usages[0]['name']);
+        $this->assertSame(\sprintf('%s:%s', $class, $line), $usages[0]['name']);
     }
 
     public function testStatelessCheck()
@@ -387,7 +387,7 @@ class RequestDataCollectorTest extends TestCase
         $response->headers->set('Content-Type', 'application/json');
         $response->headers->set('X-Foo-Bar', null);
         $response->headers->setCookie(new Cookie('foo', 'bar', 1, '/foo', 'localhost', true, true, false, null));
-        $response->headers->setCookie(new Cookie('bar', 'foo', new \DateTime('@946684800'), '/', null, false, true, false, null));
+        $response->headers->setCookie(new Cookie('bar', 'foo', new \DateTimeImmutable('@946684800'), '/', null, false, true, false, null));
         $response->headers->setCookie(new Cookie('bazz', 'foo', '2000-12-12', '/', null, false, true, false, null));
 
         return $response;
@@ -412,7 +412,7 @@ class RequestDataCollectorTest extends TestCase
             }
         }
 
-        throw new \InvalidArgumentException(sprintf('Cookie named "%s" is not in response', $name));
+        throw new \InvalidArgumentException(\sprintf('Cookie named "%s" is not in response', $name));
     }
 
     /**

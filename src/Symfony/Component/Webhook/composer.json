@@ -1,0 +1,36 @@
+{
+    "name": "symfony/webhook",
+    "type": "library",
+    "description": "Eases sending and consuming webhooks",
+    "keywords": ["webhook"],
+    "homepage": "https://symfony.com",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Fabien Potencier",
+            "email": "fabien@symfony.com"
+        },
+        {
+            "name": "Symfony Community",
+            "homepage": "https://symfony.com/contributors"
+        }
+    ],
+    "require": {
+        "php": ">=8.2",
+        "symfony/http-foundation": "^6.4|^7.0",
+        "symfony/http-kernel": "^6.4|^7.0",
+        "symfony/messenger": "^6.4|^7.0",
+        "symfony/remote-event": "^6.4|^7.0"
+    },
+    "require-dev": {
+        "symfony/http-client": "^6.4|^7.0",
+        "symfony/serializer": "^6.4|^7.0"
+    },
+    "autoload": {
+        "psr-4": { "Symfony\\Component\\Webhook\\": "" },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
+    },
+    "minimum-stability": "dev"
+}

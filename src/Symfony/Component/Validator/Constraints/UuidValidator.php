@@ -19,13 +19,13 @@ use Symfony\Component\Validator\Exception\UnexpectedValueException;
 /**
  * Validates whether the value is a valid UUID (also known as GUID).
  *
- * Strict validation will allow a UUID as specified per RFC 4122.
+ * Strict validation will allow a UUID as specified per RFC 9562/4122.
  * Loose validation will allow any type of UUID.
  *
  * @author Colin O'Dell <colinodell@gmail.com>
  * @author Bernhard Schussek <bschussek@gmail.com>
  *
- * @see http://tools.ietf.org/html/rfc4122
+ * @see https://datatracker.ietf.org/doc/html/rfc9562
  * @see https://en.wikipedia.org/wiki/Universally_unique_identifier
  */
 class UuidValidator extends ConstraintValidator
@@ -35,7 +35,7 @@ class UuidValidator extends ConstraintValidator
 
     // Roughly speaking:
     // x = any hexadecimal character
-    // M = any allowed version {1..6}
+    // M = any allowed version {1..8}
     // N = any allowed variant {8, 9, a, b}
 
     public const STRICT_LENGTH = 36;
@@ -59,10 +59,7 @@ class UuidValidator extends ConstraintValidator
     public const LOOSE_MAX_LENGTH = 39;
     public const LOOSE_FIRST_HYPHEN_POSITION = 4;
 
-    /**
-     * {@inheritdoc}
-     */
-    public function validate($value, Constraint $constraint)
+    public function validate(mixed $value, Constraint $constraint): void
     {
         if (!$constraint instanceof Uuid) {
             throw new UnexpectedTypeException($constraint, Uuid::class);
@@ -72,7 +69,7 @@ class UuidValidator extends ConstraintValidator
             return;
         }
 
-        if (!\is_scalar($value) && !(\is_object($value) && method_exists($value, '__toString'))) {
+        if (!\is_scalar($value) && !$value instanceof \Stringable) {
             throw new UnexpectedValueException($value, 'string');
         }
 
@@ -91,7 +88,7 @@ class UuidValidator extends ConstraintValidator
         $this->validateLoose($value, $constraint);
     }
 
-    private function validateLoose(string $value, Uuid $constraint)
+    private function validateLoose(string $value, Uuid $constraint): void
     {
         // Error priority:
         // 1. ERROR_INVALID_CHARACTERS
@@ -162,7 +159,7 @@ class UuidValidator extends ConstraintValidator
         }
     }
 
-    private function validateStrict(string $value, Uuid $constraint)
+    private function validateStrict(string $value, Uuid $constraint): void
     {
         // Error priority:
         // 1. ERROR_INVALID_CHARACTERS
@@ -238,9 +235,11 @@ class UuidValidator extends ConstraintValidator
 
         // Check version
         if (!\in_array($value[self::STRICT_VERSION_POSITION], $constraint->versions)) {
+            $code = Uuid::TIME_BASED_VERSIONS === $constraint->versions ? Uuid::INVALID_TIME_BASED_VERSION_ERROR : Uuid::INVALID_VERSION_ERROR;
+
             $this->context->buildViolation($constraint->message)
                 ->setParameter('{{ value }}', $this->formatValue($value))
-                ->setCode(Uuid::INVALID_VERSION_ERROR)
+                ->setCode($code)
                 ->addViolation();
         }
 

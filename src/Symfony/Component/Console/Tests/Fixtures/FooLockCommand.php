@@ -9,7 +9,7 @@ class FooLockCommand extends Command
 {
     use LockableTrait;
 
-    protected function configure()
+    protected function configure(): void
     {
         $this->setName('foo:lock');
     }

@@ -13,18 +13,14 @@ namespace Symfony\Component\Form\Tests\Fixtures;
 
 class Map implements \ArrayAccess
 {
-    private $data = [];
+    private array $data = [];
 
     public function offsetExists($offset): bool
     {
         return isset($this->data[$offset]);
     }
 
-    /**
-     * @return mixed
-     */
-    #[\ReturnTypeWillChange]
-    public function offsetGet($offset)
+    public function offsetGet($offset): mixed
     {
         return $this->data[$offset];
     }

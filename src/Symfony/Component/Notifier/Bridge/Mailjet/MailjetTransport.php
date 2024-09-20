@@ -28,20 +28,18 @@ final class MailjetTransport extends AbstractTransport
 {
     protected const HOST = 'api.mailjet.com';
 
-    private $authToken;
-    private $from;
-
-    public function __construct(string $authToken, string $from, ?HttpClientInterface $client = null, ?EventDispatcherInterface $dispatcher = null)
-    {
-        $this->authToken = $authToken;
-        $this->from = $from;
-
+    public function __construct(
+        #[\SensitiveParameter] private string $authToken,
+        private string $from,
+        ?HttpClientInterface $client = null,
+        ?EventDispatcherInterface $dispatcher = null,
+    ) {
         parent::__construct($client, $dispatcher);
     }
 
     public function __toString(): string
     {
-        return sprintf('mailjet://%s@%s', $this->from, $this->getEndpoint());
+        return \sprintf('mailjet://%s@%s', $this->from, $this->getEndpoint());
     }
 
     public function supports(MessageInterface $message): bool
@@ -55,12 +53,12 @@ final class MailjetTransport extends AbstractTransport
             throw new UnsupportedMessageTypeException(__CLASS__, SmsMessage::class, $message);
         }
 
-        $endpoint = sprintf('https://%s/v4/sms-send', $this->getEndpoint());
+        $endpoint = \sprintf('https://%s/v4/sms-send', $this->getEndpoint());
 
         $response = $this->client->request('POST', $endpoint, [
             'auth_bearer' => $this->authToken,
             'json' => [
-                'From' => $this->from,
+                'From' => $message->getFrom() ?: $this->from,
                 'To' => $message->getPhone(),
                 'Text' => $message->getSubject(),
             ],
@@ -77,7 +75,7 @@ final class MailjetTransport extends AbstractTransport
             $errorMessage = $content['requestError']['serviceException']['messageId'] ?? '';
             $errorInfo = $content['requestError']['serviceException']['text'] ?? '';
 
-            throw new TransportException(sprintf('Unable to send the SMS: '.$errorMessage.' (%s).', $errorInfo), $response);
+            throw new TransportException(\sprintf('Unable to send the SMS: '.$errorMessage.' (%s).', $errorInfo), $response);
         }
 
         return new SentMessage($message, (string) $this);

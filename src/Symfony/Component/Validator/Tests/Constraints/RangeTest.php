@@ -12,15 +12,12 @@
 namespace Symfony\Component\Validator\Tests\Constraints;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\Validator\Constraints\Range;
 use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 use Symfony\Component\Validator\Exception\MissingOptionsException;
 
 class RangeTest extends TestCase
 {
-    use ExpectDeprecationTrait;
-
     public function testThrowsConstraintExceptionIfBothMinLimitAndPropertyPath()
     {
         $this->expectException(ConstraintDefinitionException::class);
@@ -31,14 +28,11 @@ class RangeTest extends TestCase
         ]);
     }
 
-    /**
-     * @requires PHP 8
-     */
     public function testThrowsConstraintExceptionIfBothMinLimitAndPropertyPathNamed()
     {
-        $this->expectException(\Symfony\Component\Validator\Exception\ConstraintDefinitionException::class);
+        $this->expectException(ConstraintDefinitionException::class);
         $this->expectExceptionMessage('requires only one of the "min" or "minPropertyPath" options to be set, not both.');
-        eval('new \Symfony\Component\Validator\Constraints\Range(min: "min", minPropertyPath: "minPropertyPath");');
+        new Range(min: 'min', minPropertyPath: 'minPropertyPath');
     }
 
     public function testThrowsConstraintExceptionIfBothMaxLimitAndPropertyPath()
@@ -51,14 +45,11 @@ class RangeTest extends TestCase
         ]);
     }
 
-    /**
-     * @requires PHP 8
-     */
     public function testThrowsConstraintExceptionIfBothMaxLimitAndPropertyPathNamed()
     {
-        $this->expectException(\Symfony\Component\Validator\Exception\ConstraintDefinitionException::class);
+        $this->expectException(ConstraintDefinitionException::class);
         $this->expectExceptionMessage('requires only one of the "max" or "maxPropertyPath" options to be set, not both.');
-        eval('new \Symfony\Component\Validator\Constraints\Range(max: "max", maxPropertyPath: "maxPropertyPath");');
+        new Range(max: 'max', maxPropertyPath: 'maxPropertyPath');
     }
 
     public function testThrowsConstraintExceptionIfNoLimitNorPropertyPath()
@@ -74,45 +65,58 @@ class RangeTest extends TestCase
         new Range('value');
     }
 
-    public static function provideDeprecationTriggeredIfMinMaxAndMinMessageOrMaxMessageSet(): array
+    public function testThrowsConstraintDefinitionExceptionIfBothMinAndMaxAndMinMessageAndMaxMessage()
     {
-        return [
-            [['min' => 1, 'max' => 10, 'minMessage' => 'my_min_message'], true, false],
-            [['min' => 1, 'max' => 10, 'maxMessage' => 'my_max_message'], false, true],
-            [['min' => 1, 'max' => 10, 'minMessage' => 'my_min_message', 'maxMessage' => 'my_max_message'], true, true],
-        ];
+        $this->expectException(ConstraintDefinitionException::class);
+        $this->expectExceptionMessage('can not use "minMessage" and "maxMessage" when the "min" and "max" options are both set. Use "notInRangeMessage" instead.');
+        new Range(min: 'min', max: 'max', minMessage: 'minMessage', maxMessage: 'maxMessage');
     }
 
-    /**
-     * @group legacy
-     *
-     * @dataProvider provideDeprecationTriggeredIfMinMaxAndMinMessageOrMaxMessageSet
-     */
-    public function testDeprecationTriggeredIfMinMaxAndMinMessageOrMaxMessageSet(array $options, bool $expectedDeprecatedMinMessageSet, bool $expectedDeprecatedMaxMessageSet)
+    public function testThrowsConstraintDefinitionExceptionIfBothMinAndMaxAndMinMessage()
     {
-        $this->expectDeprecation('Since symfony/validator 4.4: "minMessage" and "maxMessage" are deprecated when the "min" and "max" options are both set. Use "notInRangeMessage" instead.');
-
-        $sut = new Range($options);
-        $this->assertEquals($expectedDeprecatedMinMessageSet, $sut->deprecatedMinMessageSet);
-        $this->assertEquals($expectedDeprecatedMaxMessageSet, $sut->deprecatedMaxMessageSet);
+        $this->expectException(ConstraintDefinitionException::class);
+        $this->expectExceptionMessage('can not use "minMessage" and "maxMessage" when the "min" and "max" options are both set. Use "notInRangeMessage" instead.');
+        new Range(min: 'min', max: 'max', minMessage: 'minMessage');
     }
 
-    public static function provideDeprecationNotTriggeredIfNotMinMaxOrNotMinMessageNorMaxMessageSet(): array
+    public function testThrowsConstraintDefinitionExceptionIfBothMinAndMaxAndMaxMessage()
     {
-        return [
-            [['min' => 1, 'minMessage' => 'my_min_message', 'maxMessage' => 'my_max_message']],
-            [['max' => 10, 'minMessage' => 'my_min_message', 'maxMessage' => 'my_max_message']],
-            [['min' => 1, 'max' => 10, 'notInRangeMessage' => 'my_message']],
-        ];
+        $this->expectException(ConstraintDefinitionException::class);
+        $this->expectExceptionMessage('can not use "minMessage" and "maxMessage" when the "min" and "max" options are both set. Use "notInRangeMessage" instead.');
+        new Range(min: 'min', max: 'max', maxMessage: 'maxMessage');
     }
 
-    /**
-     * @doesNotPerformAssertions
-     *
-     * @dataProvider provideDeprecationNotTriggeredIfNotMinMaxOrNotMinMessageNorMaxMessageSet
-     */
-    public function testDeprecationNotTriggeredIfNotMinMaxOrNotMinMessageNorMaxMessageSet(array $options)
+    public function testThrowsConstraintDefinitionExceptionIfBothMinAndMaxAndMinMessageAndMaxMessageOptions()
     {
-        new Range($options);
+        $this->expectException(ConstraintDefinitionException::class);
+        $this->expectExceptionMessage('can not use "minMessage" and "maxMessage" when the "min" and "max" options are both set. Use "notInRangeMessage" instead.');
+        new Range([
+            'min' => 'min',
+            'minMessage' => 'minMessage',
+            'max' => 'max',
+            'maxMessage' => 'maxMessage',
+        ]);
+    }
+
+    public function testThrowsConstraintDefinitionExceptionIfBothMinAndMaxAndMinMessageOptions()
+    {
+        $this->expectException(ConstraintDefinitionException::class);
+        $this->expectExceptionMessage('can not use "minMessage" and "maxMessage" when the "min" and "max" options are both set. Use "notInRangeMessage" instead.');
+        new Range([
+            'min' => 'min',
+            'minMessage' => 'minMessage',
+            'max' => 'max',
+        ]);
+    }
+
+    public function testThrowsConstraintDefinitionExceptionIfBothMinAndMaxAndMaxMessageOptions()
+    {
+        $this->expectException(ConstraintDefinitionException::class);
+        $this->expectExceptionMessage('can not use "minMessage" and "maxMessage" when the "min" and "max" options are both set. Use "notInRangeMessage" instead.');
+        new Range([
+            'min' => 'min',
+            'max' => 'max',
+            'maxMessage' => 'maxMessage',
+        ]);
     }
 }

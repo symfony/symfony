@@ -13,6 +13,7 @@ namespace Symfony\Component\Security\Http\EventListener;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Security\Csrf\TokenStorage\ClearableTokenStorageInterface;
+use Symfony\Component\Security\Csrf\TokenStorage\SessionTokenStorage;
 use Symfony\Component\Security\Http\Event\LogoutEvent;
 
 /**
@@ -22,15 +23,17 @@ use Symfony\Component\Security\Http\Event\LogoutEvent;
  */
 class CsrfTokenClearingLogoutListener implements EventSubscriberInterface
 {
-    private $csrfTokenStorage;
-
-    public function __construct(ClearableTokenStorageInterface $csrfTokenStorage)
-    {
-        $this->csrfTokenStorage = $csrfTokenStorage;
+    public function __construct(
+        private ClearableTokenStorageInterface $csrfTokenStorage,
+    ) {
     }
 
     public function onLogout(LogoutEvent $event): void
     {
+        if ($this->csrfTokenStorage instanceof SessionTokenStorage && !$event->getRequest()->hasPreviousSession()) {
+            return;
+        }
+
         $this->csrfTokenStorage->clear();
     }
 

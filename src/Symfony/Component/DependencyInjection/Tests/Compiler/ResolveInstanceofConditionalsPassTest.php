@@ -380,7 +380,7 @@ class ResolveInstanceofConditionalsPassTest extends TestCase
 
 class DecoratorWithBehavior implements ResetInterface, ResourceCheckerInterface, ServiceSubscriberInterface
 {
-    public function reset()
+    public function reset(): void
     {
     }
 

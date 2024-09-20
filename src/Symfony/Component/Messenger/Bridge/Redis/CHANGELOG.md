@@ -1,6 +1,23 @@
 CHANGELOG
 =========
 
+6.3
+---
+
+ * Add support for Relay PHP extension for Redis
+
+6.1
+---
+
+ * Add support for Redis Sentinel
+
+6.0
+---
+
+ * Remove option `tls`
+ * Using invalid options will throw a `LogicException`
+ * The `delete_after_ack` config option now defaults to `true`
+
 5.4
 ---
 

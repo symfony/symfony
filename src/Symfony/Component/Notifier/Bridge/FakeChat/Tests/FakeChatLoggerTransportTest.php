@@ -20,12 +20,11 @@ use Symfony\Component\Notifier\Message\SmsMessage;
 use Symfony\Component\Notifier\Test\TransportTestCase;
 use Symfony\Component\Notifier\Tests\Fixtures\TestOptions;
 use Symfony\Component\Notifier\Tests\Transport\DummyMessage;
-use Symfony\Component\Notifier\Transport\TransportInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 final class FakeChatLoggerTransportTest extends TransportTestCase
 {
-    public static function createTransport(?HttpClientInterface $client = null, ?LoggerInterface $logger = null): TransportInterface
+    public static function createTransport(?HttpClientInterface $client = null, ?LoggerInterface $logger = null): FakeChatLoggerTransport
     {
         return new FakeChatLoggerTransport($logger ?? new NullLogger(), $client ?? new MockHttpClient());
     }
@@ -62,10 +61,10 @@ final class FakeChatLoggerTransportTest extends TransportTestCase
         $this->assertNotEmpty($logs);
 
         $log1 = $logs[0];
-        $this->assertSame(sprintf('New Chat message for recipient: %s: %s', $recipient1, $subject1), $log1['message']);
+        $this->assertSame(\sprintf('New Chat message for recipient: %s: %s', $recipient1, $subject1), $log1['message']);
         $this->assertSame('info', $log1['level']);
 
         $log2 = $logs[1];
-        $this->assertSame(sprintf('New Chat message without specified recipient!: %s', $subject2), $log2['message']);
+        $this->assertSame(\sprintf('New Chat message without specified recipient!: %s', $subject2), $log2['message']);
     }
 }

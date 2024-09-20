@@ -22,5 +22,5 @@ interface InputAwareInterface
     /**
      * Sets the Console Input.
      */
-    public function setInput(InputInterface $input);
+    public function setInput(InputInterface $input): void;
 }

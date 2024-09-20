@@ -18,7 +18,7 @@ use Symfony\Component\Intl\Util\IntlTestHelper;
 
 class NumberToLocalizedStringTransformerTest extends TestCase
 {
-    private $defaultLocale;
+    private string $defaultLocale;
 
     protected function setUp(): void
     {
@@ -631,5 +631,34 @@ class NumberToLocalizedStringTransformerTest extends TestCase
         $transformer = new NumberToLocalizedStringTransformer(null, true);
 
         $this->assertSame(1.0, $transformer->reverseTransform('1'));
+    }
+
+    /**
+     * @dataProvider eNotationProvider
+     */
+    public function testReverseTransformENotation($output, $input)
+    {
+        IntlTestHelper::requireFullIntl($this);
+
+        \Locale::setDefault('en');
+
+        $transformer = new NumberToLocalizedStringTransformer();
+
+        $this->assertSame($output, $transformer->reverseTransform($input));
+    }
+
+    public static function eNotationProvider(): array
+    {
+        return [
+            [0.001, '1E-3'],
+            [0.001, '1.0E-3'],
+            [0.001, '1e-3'],
+            [0.001, '1.0e-03'],
+            [1000.0, '1E3'],
+            [1000.0, '1.0E3'],
+            [1000.0, '1e3'],
+            [1000.0, '1.0e3'],
+            [1232.0, '1.232e3'],
+        ];
     }
 }

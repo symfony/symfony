@@ -13,7 +13,6 @@ namespace Symfony\Component\Validator\Tests\Fixtures\NestedAttribute;
 
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
-use Symfony\Component\Validator\Tests\Fixtures\Attribute\EntityParent;
 use Symfony\Component\Validator\Tests\Fixtures\EntityInterfaceB;
 use Symfony\Component\Validator\Tests\Fixtures\CallbackClass;
 use Symfony\Component\Validator\Tests\Fixtures\ConstraintA;
@@ -23,7 +22,7 @@ use Symfony\Component\Validator\Tests\Fixtures\ConstraintA;
     Assert\GroupSequence(['Foo', 'Entity']),
     Assert\Callback([CallbackClass::class, 'callback']),
     Assert\Sequentially([
-        new Assert\Expression('this.getFirstName() != null')
+        new Assert\Expression('this.getFirstName() != null'),
     ])
 ]
 class Entity extends EntityParent implements EntityInterfaceB
@@ -79,7 +78,7 @@ class Entity extends EntityParent implements EntityInterfaceB
     public $data = 'Overridden data';
     public $initialized = false;
     #[Assert\Type('integer')]
-    protected $other;
+    protected ?int $other;
 
     public function __construct($internal = null)
     {

@@ -20,20 +20,22 @@ use Symfony\Component\Config\Exception\FileLocatorFileNotFoundException;
  */
 class FileLocator implements FileLocatorInterface
 {
-    protected $paths;
+    protected array $paths;
 
     /**
      * @param string|string[] $paths A path or an array of paths where to look for resources
      */
-    public function __construct($paths = [])
+    public function __construct(string|array $paths = [])
     {
         $this->paths = (array) $paths;
     }
 
     /**
-     * {@inheritdoc}
+     * @return string|string[]
+     *
+     * @psalm-return ($first is true ? string : string[])
      */
-    public function locate(string $name, ?string $currentPath = null, bool $first = true)
+    public function locate(string $name, ?string $currentPath = null, bool $first = true): string|array
     {
         if ('' === $name) {
             throw new \InvalidArgumentException('An empty file name is not valid to be located.');
@@ -41,7 +43,7 @@ class FileLocator implements FileLocatorInterface
 
         if ($this->isAbsolutePath($name)) {
             if (!file_exists($name)) {
-                throw new FileLocatorFileNotFoundException(sprintf('The file "%s" does not exist.', $name), 0, null, [$name]);
+                throw new FileLocatorFileNotFoundException(\sprintf('The file "%s" does not exist.', $name), 0, null, [$name]);
             }
 
             return $name;
@@ -68,7 +70,7 @@ class FileLocator implements FileLocatorInterface
         }
 
         if (!$filepaths) {
-            throw new FileLocatorFileNotFoundException(sprintf('The file "%s" does not exist (in: "%s").', $name, implode('", "', $paths)), 0, null, $notfound);
+            throw new FileLocatorFileNotFoundException(\sprintf('The file "%s" does not exist (in: "%s").', $name, implode('", "', $paths)), 0, null, $notfound);
         }
 
         return $filepaths;

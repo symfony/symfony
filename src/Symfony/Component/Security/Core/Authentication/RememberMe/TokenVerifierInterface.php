@@ -23,10 +23,10 @@ interface TokenVerifierInterface
      *
      * Do not forget to implement token comparisons using hash_equals for a secure implementation.
      */
-    public function verifyToken(PersistentTokenInterface $token, string $tokenValue): bool;
+    public function verifyToken(PersistentTokenInterface $token, #[\SensitiveParameter] string $tokenValue): bool;
 
     /**
      * Updates an existing token with a new token value and lastUsed time.
      */
-    public function updateExistingToken(PersistentTokenInterface $token, string $tokenValue, \DateTimeInterface $lastUsed): void;
+    public function updateExistingToken(PersistentTokenInterface $token, #[\SensitiveParameter] string $tokenValue, \DateTimeInterface $lastUsed): void;
 }

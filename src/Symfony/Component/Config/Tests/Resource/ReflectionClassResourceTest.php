@@ -14,7 +14,6 @@ namespace Symfony\Component\Config\Tests\Resource;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\Resource\ReflectionClassResource;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\Messenger\Handler\MessageSubscriberInterface;
 use Symfony\Contracts\Service\ServiceSubscriberInterface;
 
 class ReflectionClassResourceTest extends TestCase
@@ -64,7 +63,7 @@ class ReflectionClassResourceTest extends TestCase
     /**
      * @dataProvider provideHashedSignature
      */
-    public function testHashedSignature(bool $changeExpected, int $changedLine, ?string $changedCode, ?\Closure $setContext = null)
+    public function testHashedSignature(bool $changeExpected, int $changedLine, ?string $changedCode, int $resourceClassNameSuffix, ?\Closure $setContext = null)
     {
         if ($setContext) {
             $setContext();
@@ -95,10 +94,9 @@ EOPHP;
         static $expectedSignature, $generateSignature;
 
         if (null === $expectedSignature) {
-            eval(sprintf($code, $class = 'Foo'.str_replace('.', '_', uniqid('', true))));
+            eval(\sprintf($code, $class = 'Foo'.(string) $resourceClassNameSuffix));
             $r = new \ReflectionClass(ReflectionClassResource::class);
             $generateSignature = $r->getMethod('generateSignature');
-            $generateSignature->setAccessible(true);
             $generateSignature = $generateSignature->getClosure($r->newInstanceWithoutConstructor());
             $expectedSignature = implode("\n", iterator_to_array($generateSignature(new \ReflectionClass($class))));
         }
@@ -107,7 +105,7 @@ EOPHP;
         if (null !== $changedCode) {
             $code[$changedLine] = $changedCode;
         }
-        eval(sprintf(implode("\n", $code), $class = 'Foo'.str_replace('.', '_', uniqid('', true))));
+        eval(\sprintf(implode("\n", $code), $class = 'Bar'.(string) $resourceClassNameSuffix));
         $signature = implode("\n", iterator_to_array($generateSignature(new \ReflectionClass($class))));
 
         if ($changeExpected) {
@@ -119,73 +117,50 @@ EOPHP;
 
     public static function provideHashedSignature(): iterable
     {
-        yield [false, 0, "// line change\n\n"];
-        yield [true, 0, '/** class docblock */'];
+        $i = 0;
+        yield [false, 0, "// line change\n\n", ++$i];
+        yield [true, 0, '/** class docblock */', ++$i];
+        yield [true, 0, '#[Foo]', ++$i];
+        yield [true, 0, '#[Foo(new MissingClass)]', ++$i];
+        yield [true, 1, 'abstract class %s', ++$i];
+        yield [true, 1, 'final class %s', ++$i];
+        yield [true, 1, 'class %s extends Exception', ++$i];
+        yield [true, 1, 'class %s implements '.DummyInterface::class, ++$i];
+        yield [true, 3, 'const FOO = 456;', ++$i];
+        yield [true, 3, 'const BAR = 123;', ++$i];
+        yield [true, 4, '/** pub docblock */', ++$i];
+        yield [true, 5, 'protected $pub = [];', ++$i];
+        yield [true, 5, 'public $pub = [123];', ++$i];
+        yield [true, 5, '#[Foo(new MissingClass)] public $pub = [];', ++$i];
+        yield [true, 6, '/** prot docblock */', ++$i];
+        yield [true, 7, 'private $prot;', ++$i];
+        yield [false, 8, '/** priv docblock */', ++$i];
+        yield [false, 9, 'private $priv = 123;', ++$i];
+        yield [true, 10, '/** pub docblock */', ++$i];
+        yield [true, 11, 'public function pub(...$arg) {}', ++$i];
+        yield [true, 11, 'public function pub($arg = null): Foo {}', ++$i];
+        yield [false, 11, "public function pub(\$arg = null) {\nreturn 123;\n}", ++$i];
+        yield [true, 12, '/** prot docblock */', ++$i];
+        yield [true, 13, 'protected function prot($a = [123]) {}', ++$i];
+        yield [true, 13, '#[Foo] protected function prot($a = []) {}', ++$i];
+        yield [true, 13, 'protected function prot(#[Foo] $a = []) {}', ++$i];
+        yield [true, 13, '#[Foo(new MissingClass)] protected function prot($a = []) {}', ++$i];
+        yield [true, 13, 'protected function prot(#[Foo(new MissingClass)] $a = []) {}', ++$i];
+        yield [false, 14, '/** priv docblock */', ++$i];
+        yield [false, 15, null, ++$i];
 
-        if (\PHP_VERSION_ID >= 80000) {
-            yield [true, 0, '#[Foo]'];
-        }
-
-        if (\PHP_VERSION_ID >= 80100) {
-            yield [true, 0, '#[Foo(new MissingClass)]'];
-        }
-
-        yield [true, 1, 'abstract class %s'];
-        yield [true, 1, 'final class %s'];
-        yield [true, 1, 'class %s extends Exception'];
-        yield [true, 1, 'class %s implements '.DummyInterface::class];
-        yield [true, 3, 'const FOO = 456;'];
-        yield [true, 3, 'const BAR = 123;'];
-        yield [true, 4, '/** pub docblock */'];
-        yield [true, 5, 'protected $pub = [];'];
-        yield [true, 5, 'public $pub = [123];'];
-
-        if (\PHP_VERSION_ID >= 80100) {
-            yield [true, 5, '#[Foo(new MissingClass)] public $pub = [];'];
-        }
-
-        yield [true, 6, '/** prot docblock */'];
-        yield [true, 7, 'private $prot;'];
-        yield [false, 8, '/** priv docblock */'];
-        yield [false, 9, 'private $priv = 123;'];
-        yield [true, 10, '/** pub docblock */'];
-        yield [true, 11, 'public function pub(...$arg) {}'];
-        yield [true, 11, 'public function pub($arg = null): Foo {}'];
-        yield [false, 11, "public function pub(\$arg = null) {\nreturn 123;\n}"];
-        yield [true, 12, '/** prot docblock */'];
-        yield [true, 13, 'protected function prot($a = [123]) {}'];
-
-        if (\PHP_VERSION_ID >= 80000) {
-            yield [true, 13, '#[Foo] protected function prot($a = []) {}'];
-            yield [true, 13, 'protected function prot(#[Foo] $a = []) {}'];
-        }
-
-        if (\PHP_VERSION_ID >= 80100) {
-            yield [true, 13, '#[Foo(new MissingClass)] protected function prot($a = []) {}'];
-            yield [true, 13, 'protected function prot(#[Foo(new MissingClass)] $a = []) {}'];
-        }
-
-        yield [false, 14, '/** priv docblock */'];
-        yield [false, 15, ''];
-
-        if (\PHP_VERSION_ID >= 70400) {
-            // PHP7.4 typed properties without default value are
-            // undefined, make sure this doesn't throw an error
-            yield [true, 5, 'public array $pub;'];
-            yield [false, 7, 'protected int $prot;'];
-            yield [false, 9, 'private string $priv;'];
-        }
-
-        if (\PHP_VERSION_ID >= 80100) {
-            yield [true, 17, 'public function __construct(private $bar = new \stdClass()) {}'];
-            yield [true, 17, 'public function ccc($bar = new \stdClass()) {}'];
-            yield [true, 17, 'public function ccc($bar = new MissingClass()) {}'];
-        }
-
-        yield [true, 17, 'public function ccc($bar = 187) {}'];
-        yield [true, 17, 'public function ccc($bar = ANOTHER_ONE_THAT_WILL_NEVER_BE_DEFINED_CCCCCCCCC) {}'];
-        yield [true, 17, 'public function ccc($bar = parent::BOOM) {}'];
-        yield [\PHP_VERSION_ID < 80100, 17, null, static function () { \define('A_CONSTANT_THAT_FOR_SURE_WILL_NEVER_BE_DEFINED_CCCCCC', 'foo'); }];
+        // PHP7.4 typed properties without default value are
+        // undefined, make sure this doesn't throw an error
+        yield [true, 5, 'public array $pub;', ++$i];
+        yield [false, 7, 'protected int $prot;', ++$i];
+        yield [false, 9, 'private string $priv;', ++$i];
+        yield [true, 17, 'public function __construct(private $bar = new \stdClass()) {}', ++$i];
+        yield [true, 17, 'public function ccc($bar = new \stdClass()) {}', ++$i];
+        yield [true, 17, 'public function ccc($bar = new MissingClass()) {}', ++$i];
+        yield [true, 17, 'public function ccc($bar = 187) {}', ++$i];
+        yield [true, 17, 'public function ccc($bar = ANOTHER_ONE_THAT_WILL_NEVER_BE_DEFINED_CCCCCCCCC) {}', ++$i];
+        yield [true, 17, 'public function ccc($bar = parent::BOOM) {}', ++$i];
+        yield [false, 17, null, ++$i, static function () { \define('A_CONSTANT_THAT_FOR_SURE_WILL_NEVER_BE_DEFINED_CCCCCC', 'foo'); }];
     }
 
     public function testEventSubscriber()
@@ -197,24 +172,6 @@ EOPHP;
         $this->assertFalse($res->isFresh(0));
 
         $res = new ReflectionClassResource(new \ReflectionClass(TestEventSubscriber::class));
-        $this->assertTrue($res->isFresh(0));
-    }
-
-    public function testMessageSubscriber()
-    {
-        $res = new ReflectionClassResource(new \ReflectionClass(TestMessageSubscriber::class));
-        $this->assertTrue($res->isFresh(0));
-
-        TestMessageSubscriberConfigHolder::$handledMessages = ['SomeMessageClass' => []];
-        $this->assertFalse($res->isFresh(0));
-
-        $res = new ReflectionClassResource(new \ReflectionClass(TestMessageSubscriber::class));
-        $this->assertTrue($res->isFresh(0));
-
-        TestMessageSubscriberConfigHolder::$handledMessages = ['OtherMessageClass' => []];
-        $this->assertFalse($res->isFresh(0));
-
-        $res = new ReflectionClassResource(new \ReflectionClass(TestMessageSubscriber::class));
         $this->assertTrue($res->isFresh(0));
     }
 
@@ -254,23 +211,9 @@ class TestEventSubscriber implements EventSubscriberInterface
     }
 }
 
-class TestMessageSubscriber implements MessageSubscriberInterface
-{
-    public static function getHandledMessages(): iterable
-    {
-        foreach (TestMessageSubscriberConfigHolder::$handledMessages as $key => $subscribedMessage) {
-            yield $key => $subscribedMessage;
-        }
-    }
-}
-class TestMessageSubscriberConfigHolder
-{
-    public static $handledMessages = [];
-}
-
 class TestServiceSubscriber implements ServiceSubscriberInterface
 {
-    public static $subscribedServices = [];
+    public static array $subscribedServices = [];
 
     public static function getSubscribedServices(): array
     {
@@ -280,5 +223,5 @@ class TestServiceSubscriber implements ServiceSubscriberInterface
 
 class TestServiceWithStaticProperty
 {
-    public static $initializedObject;
+    public static object $initializedObject;
 }

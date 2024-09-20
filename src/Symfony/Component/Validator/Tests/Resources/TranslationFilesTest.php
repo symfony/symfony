@@ -26,7 +26,7 @@ class TranslationFilesTest extends TestCase
 
         $errors = XliffUtils::validateSchema($document);
 
-        $this->assertCount(0, $errors, sprintf('"%s" is invalid:%s', $filePath, \PHP_EOL.implode(\PHP_EOL, array_column($errors, 'message'))));
+        $this->assertCount(0, $errors, \sprintf('"%s" is invalid:%s', $filePath, \PHP_EOL.implode(\PHP_EOL, array_column($errors, 'message'))));
     }
 
     /**
@@ -36,19 +36,16 @@ class TranslationFilesTest extends TestCase
     {
         $document = new \DOMDocument();
         $document->loadXML(file_get_contents($filePath));
-        if (\LIBXML_VERSION < 20900) {
-            libxml_disable_entity_loader(true);
-        }
 
         $errors = XliffUtils::validateSchema($document);
 
-        $this->assertCount(0, $errors, sprintf('"%s" is invalid:%s', $filePath, \PHP_EOL.implode(\PHP_EOL, array_column($errors, 'message'))));
+        $this->assertCount(0, $errors, \sprintf('"%s" is invalid:%s', $filePath, \PHP_EOL.implode(\PHP_EOL, array_column($errors, 'message'))));
     }
 
     public static function provideTranslationFiles()
     {
         return array_map(
-            function ($filePath) { return (array) $filePath; },
+            fn ($filePath) => (array) $filePath,
             glob(\dirname(__DIR__, 2).'/Resources/translations/*.xlf')
         );
     }

@@ -64,7 +64,7 @@ class FormTest_AuthorWithoutRefSetter
 
 class FormTypeTest extends BaseTypeTestCase
 {
-    public const TESTED_TYPE = 'Symfony\Component\Form\Extension\Core\Type\FormType';
+    public const TESTED_TYPE = FormType::class;
 
     public function testCreateFormInstances()
     {
@@ -156,24 +156,24 @@ class FormTypeTest extends BaseTypeTestCase
     {
         $this->assertInstanceOf(
             FormBuilderInterface::class, $this->factory->createBuilder(static::TESTED_TYPE, null, [
-            'data_class' => null,
-        ]));
+                'data_class' => null,
+            ]));
     }
 
     public function testDataClassMayBeAbstractClass()
     {
         $this->assertInstanceOf(
             FormBuilderInterface::class, $this->factory->createBuilder(static::TESTED_TYPE, null, [
-            'data_class' => 'Symfony\Component\Form\Tests\Fixtures\AbstractAuthor',
-        ]));
+                'data_class' => 'Symfony\Component\Form\Tests\Fixtures\AbstractAuthor',
+            ]));
     }
 
     public function testDataClassMayBeInterface()
     {
         $this->assertInstanceOf(
             FormBuilderInterface::class, $this->factory->createBuilder(static::TESTED_TYPE, null, [
-            'data_class' => 'Symfony\Component\Form\Tests\Fixtures\AuthorInterface',
-        ]));
+                'data_class' => 'Symfony\Component\Form\Tests\Fixtures\AuthorInterface',
+            ]));
     }
 
     public function testDataClassMustBeValidClassOrInterface()
@@ -402,7 +402,7 @@ class FormTypeTest extends BaseTypeTestCase
             // referenceCopy has a getter that returns a copy
             'referenceCopy' => [
                 'firstName' => 'Foo',
-        ],
+            ],
         ]);
 
         $this->assertEquals('Foo', $author->getReferenceCopy()->firstName);
@@ -439,9 +439,8 @@ class FormTypeTest extends BaseTypeTestCase
         $builder->add('referenceCopy', static::TESTED_TYPE);
         $builder->get('referenceCopy')->addViewTransformer(new CallbackTransformer(
             function () {},
-            function ($value) { // reverseTransform
-                return 'foobar';
-            }
+            fn ($value) => // reverseTransform
+'foobar'
         ));
         $form = $builder->getForm();
 
@@ -464,9 +463,8 @@ class FormTypeTest extends BaseTypeTestCase
         $builder->add('referenceCopy', static::TESTED_TYPE);
         $builder->get('referenceCopy')->addViewTransformer(new CallbackTransformer(
             function () {},
-            function ($value) use ($ref2) { // reverseTransform
-                return $ref2;
-            }
+            fn ($value) => // reverseTransform
+$ref2
         ));
         $form = $builder->getForm();
 
@@ -682,8 +680,8 @@ class FormTypeTest extends BaseTypeTestCase
     public function testPassZeroLabelToView()
     {
         $view = $this->factory->create(static::TESTED_TYPE, null, [
-                'label' => '0',
-            ])
+            'label' => '0',
+        ])
             ->createView();
 
         $this->assertSame('0', $view->vars['label']);
@@ -885,14 +883,14 @@ class Money
 
 class MoneyDataMapper implements DataMapperInterface
 {
-    public function mapDataToForms($data, $forms)
+    public function mapDataToForms(mixed $viewData, \Traversable $forms): void
     {
         $forms = iterator_to_array($forms);
-        $forms['amount']->setData($data ? $data->getAmount() : 0);
-        $forms['currency']->setData($data ? $data->getCurrency() : 'EUR');
+        $forms['amount']->setData($viewData ? $viewData->getAmount() : 0);
+        $forms['currency']->setData($viewData ? $viewData->getCurrency() : 'EUR');
     }
 
-    public function mapFormsToData($forms, &$data)
+    public function mapFormsToData(\Traversable $forms, mixed &$viewData): void
     {
         $forms = iterator_to_array($forms);
 
@@ -904,7 +902,7 @@ class MoneyDataMapper implements DataMapperInterface
             throw $failure;
         }
 
-        $data = new Money(
+        $viewData = new Money(
             $forms['amount']->getData(),
             $forms['currency']->getData()
         );

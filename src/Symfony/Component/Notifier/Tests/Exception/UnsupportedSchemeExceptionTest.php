@@ -13,49 +13,7 @@ namespace Symfony\Component\Notifier\Tests\Exception;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\PhpUnit\ClassExistsMock;
-use Symfony\Component\Notifier\Bridge\AllMySms\AllMySmsTransportFactory;
-use Symfony\Component\Notifier\Bridge\AmazonSns\AmazonSnsTransportFactory;
-use Symfony\Component\Notifier\Bridge\Clickatell\ClickatellTransportFactory;
-use Symfony\Component\Notifier\Bridge\Discord\DiscordTransportFactory;
-use Symfony\Component\Notifier\Bridge\Esendex\EsendexTransportFactory;
-use Symfony\Component\Notifier\Bridge\FakeChat\FakeChatTransportFactory;
-use Symfony\Component\Notifier\Bridge\FakeSms\FakeSmsTransportFactory;
-use Symfony\Component\Notifier\Bridge\Firebase\FirebaseTransportFactory;
-use Symfony\Component\Notifier\Bridge\FreeMobile\FreeMobileTransportFactory;
-use Symfony\Component\Notifier\Bridge\GatewayApi\GatewayApiTransportFactory;
-use Symfony\Component\Notifier\Bridge\Gitter\GitterTransportFactory;
-use Symfony\Component\Notifier\Bridge\GoogleChat\GoogleChatTransportFactory;
-use Symfony\Component\Notifier\Bridge\Infobip\InfobipTransportFactory;
-use Symfony\Component\Notifier\Bridge\Iqsms\IqsmsTransportFactory;
-use Symfony\Component\Notifier\Bridge\LightSms\LightSmsTransportFactory;
-use Symfony\Component\Notifier\Bridge\LinkedIn\LinkedInTransportFactory;
-use Symfony\Component\Notifier\Bridge\Mailjet\MailjetTransportFactory;
-use Symfony\Component\Notifier\Bridge\Mattermost\MattermostTransportFactory;
-use Symfony\Component\Notifier\Bridge\Mercure\MercureTransportFactory;
-use Symfony\Component\Notifier\Bridge\MessageBird\MessageBirdTransportFactory;
-use Symfony\Component\Notifier\Bridge\MessageMedia\MessageMediaTransportFactory;
-use Symfony\Component\Notifier\Bridge\MicrosoftTeams\MicrosoftTeamsTransportFactory;
-use Symfony\Component\Notifier\Bridge\Mobyt\MobytTransportFactory;
-use Symfony\Component\Notifier\Bridge\Nexmo\NexmoTransportFactory;
-use Symfony\Component\Notifier\Bridge\Octopush\OctopushTransportFactory;
-use Symfony\Component\Notifier\Bridge\OneSignal\OneSignalTransportFactory;
-use Symfony\Component\Notifier\Bridge\OvhCloud\OvhCloudTransportFactory;
-use Symfony\Component\Notifier\Bridge\RocketChat\RocketChatTransportFactory;
-use Symfony\Component\Notifier\Bridge\Sendinblue\SendinblueTransportFactory;
-use Symfony\Component\Notifier\Bridge\Sinch\SinchTransportFactory;
-use Symfony\Component\Notifier\Bridge\Slack\SlackTransportFactory;
-use Symfony\Component\Notifier\Bridge\Sms77\Sms77TransportFactory;
-use Symfony\Component\Notifier\Bridge\Smsapi\SmsapiTransportFactory;
-use Symfony\Component\Notifier\Bridge\SmsBiuras\SmsBiurasTransportFactory;
-use Symfony\Component\Notifier\Bridge\Smsc\SmscTransportFactory;
-use Symfony\Component\Notifier\Bridge\SpotHit\SpotHitTransportFactory;
-use Symfony\Component\Notifier\Bridge\Telegram\TelegramTransportFactory;
-use Symfony\Component\Notifier\Bridge\Telnyx\TelnyxTransportFactory;
-use Symfony\Component\Notifier\Bridge\TurboSms\TurboSmsTransportFactory;
-use Symfony\Component\Notifier\Bridge\Twilio\TwilioTransportFactory;
-use Symfony\Component\Notifier\Bridge\Vonage\VonageTransportFactory;
-use Symfony\Component\Notifier\Bridge\Yunpian\YunpianTransportFactory;
-use Symfony\Component\Notifier\Bridge\Zulip\ZulipTransportFactory;
+use Symfony\Component\Notifier\Bridge;
 use Symfony\Component\Notifier\Exception\UnsupportedSchemeException;
 use Symfony\Component\Notifier\Transport\Dsn;
 
@@ -68,49 +26,84 @@ final class UnsupportedSchemeExceptionTest extends TestCase
     {
         ClassExistsMock::register(__CLASS__);
         ClassExistsMock::withMockedClasses([
-            AllMySmsTransportFactory::class => false,
-            AmazonSnsTransportFactory::class => false,
-            ClickatellTransportFactory::class => false,
-            DiscordTransportFactory::class => false,
-            EsendexTransportFactory::class => false,
-            FakeChatTransportFactory::class => false,
-            FakeSmsTransportFactory::class => false,
-            FirebaseTransportFactory::class => false,
-            FreeMobileTransportFactory::class => false,
-            GatewayApiTransportFactory::class => false,
-            GitterTransportFactory::class => false,
-            GoogleChatTransportFactory::class => false,
-            InfobipTransportFactory::class => false,
-            IqsmsTransportFactory::class => false,
-            LightSmsTransportFactory::class => false,
-            LinkedInTransportFactory::class => false,
-            MailjetTransportFactory::class => false,
-            MattermostTransportFactory::class => false,
-            MercureTransportFactory::class => false,
-            MessageBirdTransportFactory::class => false,
-            MessageMediaTransportFactory::class => false,
-            MicrosoftTeamsTransportFactory::class => false,
-            MobytTransportFactory::class => false,
-            NexmoTransportFactory::class => false,
-            OctopushTransportFactory::class => false,
-            OneSignalTransportFactory::class => false,
-            OvhCloudTransportFactory::class => false,
-            RocketChatTransportFactory::class => false,
-            SendinblueTransportFactory::class => false,
-            SinchTransportFactory::class => false,
-            SlackTransportFactory::class => false,
-            Sms77TransportFactory::class => false,
-            SmsapiTransportFactory::class => false,
-            SmsBiurasTransportFactory::class => false,
-            SmscTransportFactory::class => false,
-            SpotHitTransportFactory::class => false,
-            TelegramTransportFactory::class => false,
-            TelnyxTransportFactory::class => false,
-            TurboSmsTransportFactory::class => false,
-            TwilioTransportFactory::class => false,
-            VonageTransportFactory::class => false,
-            YunpianTransportFactory::class => false,
-            ZulipTransportFactory::class => false,
+            Bridge\AllMySms\AllMySmsTransportFactory::class => false,
+            Bridge\AmazonSns\AmazonSnsTransportFactory::class => false,
+            Bridge\Bandwidth\BandwidthTransportFactory::class => false,
+            Bridge\Bluesky\BlueskyTransportFactory::class => false,
+            Bridge\Brevo\BrevoTransportFactory::class => false,
+            Bridge\Chatwork\ChatworkTransportFactory::class => false,
+            Bridge\ClickSend\ClickSendTransportFactory::class => false,
+            Bridge\Clickatell\ClickatellTransportFactory::class => false,
+            Bridge\ContactEveryone\ContactEveryoneTransportFactory::class => false,
+            Bridge\Discord\DiscordTransportFactory::class => false,
+            Bridge\Engagespot\EngagespotTransportFactory::class => false,
+            Bridge\Esendex\EsendexTransportFactory::class => false,
+            Bridge\Expo\ExpoTransportFactory::class => false,
+            Bridge\FakeChat\FakeChatTransportFactory::class => false,
+            Bridge\FakeSms\FakeSmsTransportFactory::class => false,
+            Bridge\Firebase\FirebaseTransportFactory::class => false,
+            Bridge\FortySixElks\FortySixElksTransportFactory::class => false,
+            Bridge\FreeMobile\FreeMobileTransportFactory::class => false,
+            Bridge\GatewayApi\GatewayApiTransportFactory::class => false,
+            Bridge\GoIp\GoIpTransportFactory::class => false,
+            Bridge\GoogleChat\GoogleChatTransportFactory::class => false,
+            Bridge\Infobip\InfobipTransportFactory::class => false,
+            Bridge\Iqsms\IqsmsTransportFactory::class => false,
+            Bridge\Isendpro\IsendproTransportFactory::class => false,
+            Bridge\KazInfoTeh\KazInfoTehTransportFactory::class => false,
+            Bridge\LightSms\LightSmsTransportFactory::class => false,
+            Bridge\LineNotify\LineNotifyTransportFactory::class => false,
+            Bridge\LinkedIn\LinkedInTransportFactory::class => false,
+            Bridge\Lox24\Lox24TransportFactory::class => false,
+            Bridge\Mailjet\MailjetTransportFactory::class => false,
+            Bridge\Mastodon\MastodonTransportFactory::class => false,
+            Bridge\Mattermost\MattermostTransportFactory::class => false,
+            Bridge\Mercure\MercureTransportFactory::class => false,
+            Bridge\MessageBird\MessageBirdTransportFactory::class => false,
+            Bridge\MessageMedia\MessageMediaTransportFactory::class => false,
+            Bridge\MicrosoftTeams\MicrosoftTeamsTransportFactory::class => false,
+            Bridge\Mobyt\MobytTransportFactory::class => false,
+            Bridge\Novu\NovuTransportFactory::class => false,
+            Bridge\Ntfy\NtfyTransportFactory::class => false,
+            Bridge\Octopush\OctopushTransportFactory::class => false,
+            Bridge\OneSignal\OneSignalTransportFactory::class => false,
+            Bridge\OrangeSms\OrangeSmsTransportFactory::class => false,
+            Bridge\OvhCloud\OvhCloudTransportFactory::class => false,
+            Bridge\PagerDuty\PagerDutyTransportFactory::class => false,
+            Bridge\Plivo\PlivoTransportFactory::class => false,
+            Bridge\Primotexto\PrimotextoTransportFactory::class => false,
+            Bridge\Pushover\PushoverTransportFactory::class => false,
+            Bridge\Pushy\PushyTransportFactory::class => false,
+            Bridge\Redlink\RedlinkTransportFactory::class => false,
+            Bridge\RingCentral\RingCentralTransportFactory::class => false,
+            Bridge\RocketChat\RocketChatTransportFactory::class => false,
+            Bridge\Sendberry\SendberryTransportFactory::class => false,
+            Bridge\Sevenio\SevenIoTransportFactory::class => false,
+            Bridge\Sipgate\SipgateTransportFactory::class => false,
+            Bridge\SimpleTextin\SimpleTextinTransportFactory::class => false,
+            Bridge\Sinch\SinchTransportFactory::class => false,
+            Bridge\Slack\SlackTransportFactory::class => false,
+            Bridge\Sms77\Sms77TransportFactory::class => false,
+            Bridge\SmsBiuras\SmsBiurasTransportFactory::class => false,
+            Bridge\SmsFactor\SmsFactorTransportFactory::class => false,
+            Bridge\Smsapi\SmsapiTransportFactory::class => false,
+            Bridge\Smsbox\SmsboxTransportFactory::class => false,
+            Bridge\Smsc\SmscTransportFactory::class => false,
+            Bridge\Smsense\SmsenseTransportFactory::class => false,
+            Bridge\Smsmode\SmsmodeTransportFactory::class => false,
+            Bridge\SmsSluzba\SmsSluzbaTransportFactory::class => false,
+            Bridge\SpotHit\SpotHitTransportFactory::class => false,
+            Bridge\Telegram\TelegramTransportFactory::class => false,
+            Bridge\Telnyx\TelnyxTransportFactory::class => false,
+            Bridge\Termii\TermiiTransportFactory::class => false,
+            Bridge\TurboSms\TurboSmsTransportFactory::class => false,
+            Bridge\Twilio\TwilioTransportFactory::class => false,
+            Bridge\Twitter\TwitterTransportFactory::class => false,
+            Bridge\Unifonic\UnifonicTransportFactory::class => false,
+            Bridge\Vonage\VonageTransportFactory::class => false,
+            Bridge\Yunpian\YunpianTransportFactory::class => false,
+            Bridge\Zendesk\ZendeskTransportFactory::class => false,
+            Bridge\Zulip\ZulipTransportFactory::class => false,
         ]);
     }
 
@@ -119,10 +112,10 @@ final class UnsupportedSchemeExceptionTest extends TestCase
      */
     public function testMessageWhereSchemeIsPartOfSchemeToPackageMap(string $scheme, string $package)
     {
-        $dsn = new Dsn(sprintf('%s://localhost', $scheme));
+        $dsn = new Dsn(\sprintf('%s://localhost', $scheme));
 
         $this->assertSame(
-            sprintf('Unable to send notification via "%s" as the bridge is not installed; try running "composer require %s".', $scheme, $package),
+            \sprintf('Unable to send notification via "%s" as the bridge is not installed. Try running "composer require %s".', $scheme, $package),
             (new UnsupportedSchemeException($dsn))->getMessage()
         );
     }
@@ -131,45 +124,78 @@ final class UnsupportedSchemeExceptionTest extends TestCase
     {
         yield ['allmysms', 'symfony/all-my-sms-notifier'];
         yield ['sns', 'symfony/amazon-sns-notifier'];
+        yield ['bandwidth', 'symfony/bandwidth-notifier'];
+        yield ['bluesky', 'symfony/bluesky-notifier'];
+        yield ['brevo', 'symfony/brevo-notifier'];
+        yield ['chatwork', 'symfony/chatwork-notifier'];
         yield ['clickatell', 'symfony/clickatell-notifier'];
+        yield ['clicksend', 'symfony/click-send-notifier'];
+        yield ['contact-everyone', 'symfony/contact-everyone-notifier'];
         yield ['discord', 'symfony/discord-notifier'];
+        yield ['engagespot', 'symfony/engagespot-notifier'];
         yield ['esendex', 'symfony/esendex-notifier'];
+        yield ['expo', 'symfony/expo-notifier'];
         yield ['fakechat', 'symfony/fake-chat-notifier'];
         yield ['fakesms', 'symfony/fake-sms-notifier'];
         yield ['firebase', 'symfony/firebase-notifier'];
+        yield ['forty-six-elks', 'symfony/forty-six-elks-notifier'];
         yield ['freemobile', 'symfony/free-mobile-notifier'];
         yield ['gatewayapi', 'symfony/gateway-api-notifier'];
-        yield ['gitter', 'symfony/gitter-notifier'];
         yield ['googlechat', 'symfony/google-chat-notifier'];
         yield ['infobip', 'symfony/infobip-notifier'];
         yield ['iqsms', 'symfony/iqsms-notifier'];
+        yield ['isendpro', 'symfony/isendpro-notifier'];
+        yield ['kaz-info-teh', 'symfony/kaz-info-teh-notifier'];
         yield ['lightsms', 'symfony/light-sms-notifier'];
+        yield ['linenotify', 'symfony/line-notify-notifier'];
         yield ['linkedin', 'symfony/linked-in-notifier'];
+        yield ['lox24', 'symfony/lox24-notifier'];
         yield ['mailjet', 'symfony/mailjet-notifier'];
+        yield ['mastodon', 'symfony/mastodon-notifier'];
         yield ['mattermost', 'symfony/mattermost-notifier'];
         yield ['mercure', 'symfony/mercure-notifier'];
         yield ['messagebird', 'symfony/message-bird-notifier'];
         yield ['messagemedia', 'symfony/message-media-notifier'];
         yield ['microsoftteams', 'symfony/microsoft-teams-notifier'];
         yield ['mobyt', 'symfony/mobyt-notifier'];
-        yield ['nexmo', 'symfony/nexmo-notifier'];
+        yield ['novu', 'symfony/novu-notifier'];
+        yield ['ntfy', 'symfony/ntfy-notifier'];
         yield ['octopush', 'symfony/octopush-notifier'];
         yield ['onesignal', 'symfony/one-signal-notifier'];
+        yield ['orange-sms', 'symfony/orange-sms-notifier'];
         yield ['ovhcloud', 'symfony/ovh-cloud-notifier'];
+        yield ['pagerduty', 'symfony/pager-duty-notifier'];
+        yield ['plivo', 'symfony/plivo-notifier'];
+        yield ['primotexto', 'symfony/primotexto-notifier'];
+        yield ['pushover', 'symfony/pushover-notifier'];
+        yield ['redlink', 'symfony/redlink-notifier'];
+        yield ['ringcentral', 'symfony/ring-central-notifier'];
         yield ['rocketchat', 'symfony/rocket-chat-notifier'];
-        yield ['sendinblue', 'symfony/sendinblue-notifier'];
+        yield ['sendberry', 'symfony/sendberry-notifier'];
+        yield ['sevenio', 'symfony/sevenio-notifier'];
+        yield ['sipgate', 'symfony/sipgate-notifier'];
+        yield ['simpletextin', 'symfony/simple-textin-notifier'];
         yield ['sinch', 'symfony/sinch-notifier'];
         yield ['slack', 'symfony/slack-notifier'];
         yield ['sms77', 'symfony/sms77-notifier'];
         yield ['smsapi', 'symfony/smsapi-notifier'];
         yield ['smsbiuras', 'symfony/sms-biuras-notifier'];
         yield ['smsc', 'symfony/smsc-notifier'];
+        yield ['sms-factor', 'symfony/sms-factor-notifier'];
+        yield ['smsmode', 'symfony/smsmode-notifier'];
         yield ['spothit', 'symfony/spot-hit-notifier'];
         yield ['telegram', 'symfony/telegram-notifier'];
         yield ['telnyx', 'symfony/telnyx-notifier'];
+        yield ['termii', 'symfony/termii-notifier'];
         yield ['turbosms', 'symfony/turbo-sms-notifier'];
         yield ['twilio', 'symfony/twilio-notifier'];
+        yield ['twitter', 'symfony/twitter-notifier'];
+        yield ['unifonic', 'symfony/unifonic-notifier'];
+        yield ['vonage', 'symfony/vonage-notifier'];
+        yield ['yunpian', 'symfony/yunpian-notifier'];
+        yield ['zendesk', 'symfony/zendesk-notifier'];
         yield ['zulip', 'symfony/zulip-notifier'];
+        yield ['goip', 'symfony/go-ip-notifier'];
     }
 
     /**

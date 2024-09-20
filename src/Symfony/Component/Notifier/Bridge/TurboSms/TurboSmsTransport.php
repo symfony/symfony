@@ -34,22 +34,20 @@ final class TurboSmsTransport extends AbstractTransport
     private const SUBJECT_CYRILLIC_LIMIT = 661;
     private const SENDER_LIMIT = 20;
 
-    private $authToken;
-    private $from;
-
-    public function __construct(string $authToken, string $from, ?HttpClientInterface $client = null, ?EventDispatcherInterface $dispatcher = null)
-    {
+    public function __construct(
+        #[\SensitiveParameter] private string $authToken,
+        private string $from,
+        ?HttpClientInterface $client = null,
+        ?EventDispatcherInterface $dispatcher = null,
+    ) {
         $this->assertValidFrom($from);
-
-        $this->authToken = $authToken;
-        $this->from = $from;
 
         parent::__construct($client, $dispatcher);
     }
 
     public function __toString(): string
     {
-        return sprintf('turbosms://%s?from=%s', $this->getEndpoint(), urlencode($this->from));
+        return \sprintf('turbosms://%s?from=%s', $this->getEndpoint(), urlencode($this->from));
     }
 
     public function supports(MessageInterface $message): bool
@@ -65,12 +63,21 @@ final class TurboSmsTransport extends AbstractTransport
 
         $this->assertValidSubject($message->getSubject());
 
-        $endpoint = sprintf('https://%s/message/send.json', $this->getEndpoint());
+        $fromMessage = $message->getFrom();
+
+        if ($fromMessage) {
+            $this->assertValidFrom($fromMessage);
+            $from = $fromMessage;
+        } else {
+            $from = $this->from;
+        }
+
+        $endpoint = \sprintf('https://%s/message/send.json', $this->getEndpoint());
         $response = $this->client->request('POST', $endpoint, [
             'auth_bearer' => $this->authToken,
             'json' => [
                 'sms' => [
-                    'sender' => $this->from,
+                    'sender' => $from,
                     'recipients' => [$message->getPhone()],
                     'text' => $message->getSubject(),
                 ],
@@ -80,28 +87,34 @@ final class TurboSmsTransport extends AbstractTransport
         if (200 === $response->getStatusCode()) {
             $success = $response->toArray(false);
 
+            if (null === $messageId = $success['response_result'][0]['message_id']) {
+                $responseResult = $success['response_result'][0];
+
+                throw new TransportException(sprintf('Unable to send SMS with TurboSMS: Error code %d with message "%s".', (int) $responseResult['response_code'], $responseResult['response_status']), $response);
+            }
+
             $sentMessage = new SentMessage($message, (string) $this);
-            $sentMessage->setMessageId($success['response_result'][0]['message_id']);
+            $sentMessage->setMessageId($messageId);
 
             return $sentMessage;
         }
 
         $error = $response->toArray(false);
 
-        throw new TransportException(sprintf('Unable to send SMS with TurboSMS: Error code %d with message "%s".', (int) $error['response_code'], $error['response_status']), $response);
+        throw new TransportException(\sprintf('Unable to send SMS with TurboSMS: Error code %d with message "%s".', (int) $error['response_code'], $error['response_status']), $response);
     }
 
     private function assertValidFrom(string $from): void
     {
         if (mb_strlen($from, 'UTF-8') > self::SENDER_LIMIT) {
-            throw new LengthException(sprintf('The sender length of a TurboSMS message must not exceed %d characters.', self::SENDER_LIMIT));
+            throw new LengthException(\sprintf('The sender length of a TurboSMS message must not exceed %d characters.', self::SENDER_LIMIT));
         }
     }
 
     private function assertValidSubject(string $subject): void
     {
         // Detect if there is at least one cyrillic symbol in the text
-        if (1 === preg_match("/\p{Cyrillic}/u", $subject)) {
+        if (preg_match('/\p{Cyrillic}/u', $subject)) {
             $subjectLimit = self::SUBJECT_CYRILLIC_LIMIT;
             $symbols = 'cyrillic';
         } else {
@@ -110,7 +123,7 @@ final class TurboSmsTransport extends AbstractTransport
         }
 
         if (mb_strlen($subject, 'UTF-8') > $subjectLimit) {
-            throw new LengthException(sprintf('The subject length for "%s" symbols of a TurboSMS message must not exceed %d characters.', $symbols, $subjectLimit));
+            throw new LengthException(\sprintf('The subject length for "%s" symbols of a TurboSMS message must not exceed %d characters.', $symbols, $subjectLimit));
         }
     }
 }

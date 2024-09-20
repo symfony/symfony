@@ -12,7 +12,6 @@
 namespace Symfony\Component\Notifier\Bridge\Slack\Tests;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\Notifier\Bridge\Slack\Block\SlackDividerBlock;
 use Symfony\Component\Notifier\Bridge\Slack\Block\SlackSectionBlock;
 use Symfony\Component\Notifier\Bridge\Slack\SlackOptions;
@@ -24,8 +23,6 @@ use Symfony\Component\Notifier\Notification\Notification;
  */
 final class SlackOptionsTest extends TestCase
 {
-    use ExpectDeprecationTrait;
-
     /**
      * @dataProvider toArrayProvider
      * @dataProvider toArraySimpleOptionsProvider
@@ -125,16 +122,6 @@ final class SlackOptionsTest extends TestCase
     }
 
     /**
-     * @group legacy
-     */
-    public function testChannelMethodRaisesDeprecation()
-    {
-        $this->expectDeprecation('Since symfony/slack-notifier 5.1: The "Symfony\Component\Notifier\Bridge\Slack\SlackOptions::channel()" method is deprecated, use "recipient()" instead.');
-
-        (new SlackOptions())->channel('channel');
-    }
-
-    /**
      * @dataProvider fromNotificationProvider
      */
     public function testFromNotification(array $expected, Notification $notification)
@@ -159,6 +146,7 @@ final class SlackOptionsTest extends TestCase
                         'text' => [
                             'type' => 'mrkdwn',
                             'text' => $subject,
+                            'verbatim' => false,
                         ],
                     ],
                 ],
@@ -175,6 +163,7 @@ final class SlackOptionsTest extends TestCase
                         'text' => [
                             'type' => 'mrkdwn',
                             'text' => $subject,
+                            'verbatim' => false,
                         ],
                     ],
                     [
@@ -182,6 +171,7 @@ final class SlackOptionsTest extends TestCase
                         'text' => [
                             'type' => 'mrkdwn',
                             'text' => $content,
+                            'verbatim' => false,
                         ],
                     ],
                 ],
@@ -192,7 +182,7 @@ final class SlackOptionsTest extends TestCase
 
     public function testConstructWithMaximumBlocks()
     {
-        $options = new SlackOptions(['blocks' => array_map(static function () { return ['type' => 'divider']; }, range(0, 49))]);
+        $options = new SlackOptions(['blocks' => array_map(static fn () => ['type' => 'divider'], range(0, 49))]);
 
         $this->assertCount(50, $options->toArray()['blocks']);
     }
@@ -202,7 +192,7 @@ final class SlackOptionsTest extends TestCase
         $this->expectException(LogicException::class);
         $this->expectExceptionMessage('Maximum number of "blocks" has been reached (50).');
 
-        new SlackOptions(['blocks' => array_map(static function () { return ['type' => 'divider']; }, range(0, 50))]);
+        new SlackOptions(['blocks' => array_map(static fn () => ['type' => 'divider'], range(0, 50))]);
     }
 
     public function testAddMaximumBlocks()

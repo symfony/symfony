@@ -1,7 +1,6 @@
 <?php
 
 $container->loadFromExtension('security', [
-    'enable_authenticator_manager' => true,
     'providers' => [
         'default' => [
             'memory' => [

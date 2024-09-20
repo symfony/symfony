@@ -32,18 +32,18 @@ class MandrillApiTransport extends AbstractApiTransport
 {
     private const HOST = 'mandrillapp.com';
 
-    private $key;
-
-    public function __construct(string $key, ?HttpClientInterface $client = null, ?EventDispatcherInterface $dispatcher = null, ?LoggerInterface $logger = null)
-    {
-        $this->key = $key;
-
+    public function __construct(
+        #[\SensitiveParameter] private string $key,
+        ?HttpClientInterface $client = null,
+        ?EventDispatcherInterface $dispatcher = null,
+        ?LoggerInterface $logger = null,
+    ) {
         parent::__construct($client, $dispatcher, $logger);
     }
 
     public function __toString(): string
     {
-        return sprintf('mandrill+api://%s', $this->getEndpoint());
+        return \sprintf('mandrill+api://%s', $this->getEndpoint());
     }
 
     protected function doSendApi(SentMessage $sentMessage, Email $email, Envelope $envelope): ResponseInterface
@@ -55,18 +55,18 @@ class MandrillApiTransport extends AbstractApiTransport
         try {
             $statusCode = $response->getStatusCode();
             $result = $response->toArray(false);
-        } catch (DecodingExceptionInterface $e) {
-            throw new HttpTransportException('Unable to send an email: '.$response->getContent(false).sprintf(' (code %d).', $statusCode), $response);
+        } catch (DecodingExceptionInterface) {
+            throw new HttpTransportException('Unable to send an email: '.$response->getContent(false).\sprintf(' (code %d).', $statusCode), $response);
         } catch (TransportExceptionInterface $e) {
             throw new HttpTransportException('Could not reach the remote Mandrill server.', $response, 0, $e);
         }
 
         if (200 !== $statusCode) {
             if ('error' === ($result['status'] ?? false)) {
-                throw new HttpTransportException('Unable to send an email: '.$result['message'].sprintf(' (code %d).', $result['code']), $response);
+                throw new HttpTransportException('Unable to send an email: '.$result['message'].\sprintf(' (code %d).', $result['code']), $response);
             }
 
-            throw new HttpTransportException(sprintf('Unable to send an email (code %d).', $result['code']), $response);
+            throw new HttpTransportException(\sprintf('Unable to send an email (code %d).', $result['code']), $response);
         }
 
         $firstRecipient = reset($result);
@@ -89,7 +89,7 @@ class MandrillApiTransport extends AbstractApiTransport
                 'text' => $email->getTextBody(),
                 'subject' => $email->getSubject(),
                 'from_email' => $envelope->getSender()->getAddress(),
-                'to' => $this->getRecipients($email, $envelope),
+                'to' => $this->getRecipientsPayload($email, $envelope),
             ],
         ];
 
@@ -144,7 +144,7 @@ class MandrillApiTransport extends AbstractApiTransport
         return $payload;
     }
 
-    protected function getRecipients(Email $email, Envelope $envelope): array
+    private function getRecipientsPayload(Email $email, Envelope $envelope): array
     {
         $recipients = [];
         foreach ($envelope->getRecipients() as $recipient) {

@@ -20,7 +20,7 @@ use Symfony\Component\HttpKernel\Event\RequestEvent;
  */
 abstract class AbstractListener implements FirewallListenerInterface
 {
-    final public function __invoke(RequestEvent $event)
+    final public function __invoke(RequestEvent $event): void
     {
         if (false !== $this->supports($event->getRequest())) {
             $this->authenticate($event);

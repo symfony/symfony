@@ -12,6 +12,7 @@
 namespace Symfony\Bundle\FrameworkBundle\Command;
 
 use Symfony\Bundle\FrameworkBundle\Secrets\AbstractVault;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Completion\CompletionInput;
 use Symfony\Component\Console\Completion\CompletionSuggestions;
@@ -29,26 +30,19 @@ use Symfony\Component\Console\Style\SymfonyStyle;
  *
  * @internal
  */
+#[AsCommand(name: 'secrets:set', description: 'Set a secret in the vault')]
 final class SecretsSetCommand extends Command
 {
-    protected static $defaultName = 'secrets:set';
-    protected static $defaultDescription = 'Set a secret in the vault';
-
-    private $vault;
-    private $localVault;
-
-    public function __construct(AbstractVault $vault, ?AbstractVault $localVault = null)
-    {
-        $this->vault = $vault;
-        $this->localVault = $localVault;
-
+    public function __construct(
+        private AbstractVault $vault,
+        private ?AbstractVault $localVault = null,
+    ) {
         parent::__construct();
     }
 
-    protected function configure()
+    protected function configure(): void
     {
         $this
-            ->setDescription(self::$defaultDescription)
             ->addArgument('name', InputArgument::REQUIRED, 'The name of the secret')
             ->addArgument('file', InputArgument::OPTIONAL, 'A file where to read the secret from or "-" for reading from STDIN')
             ->addOption('local', 'l', InputOption::VALUE_NONE, 'Update the local vault.')
@@ -90,7 +84,7 @@ EOF
         }
 
         if ($this->localVault === $vault && !\array_key_exists($name, $this->vault->list())) {
-            $io->error(sprintf('Secret "%s" does not exist in the vault, you cannot override it locally.', $name));
+            $io->error(\sprintf('Secret "%s" does not exist in the vault, you cannot override it locally.', $name));
 
             return 1;
         }
@@ -109,9 +103,9 @@ EOF
         } elseif (is_file($file) && is_readable($file)) {
             $value = file_get_contents($file);
         } elseif (!is_file($file)) {
-            throw new \InvalidArgumentException(sprintf('File not found: "%s".', $file));
+            throw new \InvalidArgumentException(\sprintf('File not found: "%s".', $file));
         } elseif (!is_readable($file)) {
-            throw new \InvalidArgumentException(sprintf('File is not readable: "%s".', $file));
+            throw new \InvalidArgumentException(\sprintf('File is not readable: "%s".', $file));
         }
 
         if ($vault->generateKeys()) {

@@ -13,12 +13,12 @@ namespace Symfony\Bridge\Twig\Tests\Node;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Twig\Node\TransNode;
-use Twig\Attribute\YieldReady;
 use Twig\Compiler;
 use Twig\Environment;
 use Twig\Loader\LoaderInterface;
 use Twig\Node\Expression\NameExpression;
 use Twig\Node\TextNode;
+use Twig\Runtime\LoopIterator;
 
 /**
  * @author Asmir Mustafic <goetas@gmail.com>
@@ -35,9 +35,8 @@ class TransNodeTest extends TestCase
         $compiler = new Compiler($env);
 
         $this->assertEquals(
-            sprintf(
-                '%s $this->env->getExtension(\'Symfony\Bridge\Twig\Extension\TranslationExtension\')->trans("trans %%var%%", array_merge(["%%var%%" => %s], %s), "messages");',
-                class_exists(YieldReady::class) ? 'yield' : 'echo',
+            \sprintf(
+                'yield $this->env->getExtension(\'Symfony\Bridge\Twig\Extension\TranslationExtension\')->trans("trans %%var%%", array_merge(["%%var%%" => %s], %s), "messages");',
                 $this->getVariableGetterWithoutStrictCheck('var'),
                 $this->getVariableGetterWithStrictCheck('foo')
             ),
@@ -47,15 +46,16 @@ class TransNodeTest extends TestCase
 
     protected function getVariableGetterWithoutStrictCheck($name)
     {
-        return sprintf('($context["%s"] ?? null)', $name);
+        return \sprintf('($context["%s"] ?? null)', $name);
     }
 
     protected function getVariableGetterWithStrictCheck($name)
     {
-        if (Environment::MAJOR_VERSION >= 2) {
-            return sprintf('(isset($context["%1$s"]) || array_key_exists("%1$s", $context) ? $context["%1$s"] : (function () { throw new %2$s(\'Variable "%1$s" does not exist.\', 0, $this->source); })())', $name, Environment::VERSION_ID >= 20700 ? 'RuntimeError' : 'Twig_Error_Runtime');
+        if (class_exists(LoopIterator::class)) {
+            return \sprintf('(array_key_exists("%1$s", $context) ? $context["%1$s"] : throw new RuntimeError(\'Variable "%1$s" does not exist.\', 0, $this->source))', $name);
         }
 
-        return sprintf('($context["%s"] ?? $this->getContext($context, "%1$s"))', $name);
+        // for Twig 3 and older, can be removed when support for Twig 3 is dropped
+        return \sprintf('(isset($context["%1$s"]) || array_key_exists("%1$s", $context) ? $context["%1$s"] : (function () { throw new RuntimeError(\'Variable "%1$s" does not exist.\', 0, $this->source); })())', $name);
     }
 }

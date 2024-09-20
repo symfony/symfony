@@ -72,7 +72,7 @@ class XmlUtilsTest extends TestCase
             XmlUtils::loadFile($fixtures.'invalid_schema.xml', 'invalid_callback_or_file');
             $this->fail();
         } catch (\InvalidArgumentException $e) {
-            $this->assertStringContainsString('XSD file or callable', $e->getMessage());
+            $this->assertStringContainsString('Invalid XSD file: "invalid_callback_or_file".', $e->getMessage());
         }
 
         $mock = $this->createMock(Validator::class);
@@ -92,12 +92,13 @@ class XmlUtilsTest extends TestCase
 
     public function testParseWithInvalidValidatorCallable()
     {
-        $this->expectException(InvalidXmlException::class);
-        $this->expectExceptionMessage('The XML is not valid');
         $fixtures = __DIR__.'/../Fixtures/Util/';
 
         $mock = $this->createMock(Validator::class);
         $mock->expects($this->once())->method('validate')->willReturn(false);
+
+        $this->expectException(InvalidXmlException::class);
+        $this->expectExceptionMessage('The XML is not valid');
 
         XmlUtils::parse(file_get_contents($fixtures.'valid.xml'), [$mock, 'validate']);
     }
@@ -195,7 +196,7 @@ class XmlUtilsTest extends TestCase
         $file = __DIR__.'/../Fixtures/foo.xml';
 
         $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage(sprintf('File "%s" does not contain valid XML, it is empty.', $file));
+        $this->expectExceptionMessage(\sprintf('File "%s" does not contain valid XML, it is empty.', $file));
 
         XmlUtils::loadFile($file);
     }
@@ -203,9 +204,6 @@ class XmlUtilsTest extends TestCase
     // test for issue https://github.com/symfony/symfony/issues/9731
     public function testLoadWrongEmptyXMLWithErrorHandler()
     {
-        if (\LIBXML_VERSION < 20900) {
-            $originalDisableEntities = libxml_disable_entity_loader(false);
-        }
         $errorReporting = error_reporting(-1);
 
         set_error_handler(function ($errno, $errstr) {
@@ -218,19 +216,11 @@ class XmlUtilsTest extends TestCase
                 XmlUtils::loadFile($file);
                 $this->fail('An exception should have been raised');
             } catch (\InvalidArgumentException $e) {
-                $this->assertEquals(sprintf('File "%s" does not contain valid XML, it is empty.', $file), $e->getMessage());
+                $this->assertEquals(\sprintf('File "%s" does not contain valid XML, it is empty.', $file), $e->getMessage());
             }
         } finally {
             restore_error_handler();
             error_reporting($errorReporting);
-        }
-
-        if (\LIBXML_VERSION < 20900) {
-            $disableEntities = libxml_disable_entity_loader(true);
-            libxml_disable_entity_loader($disableEntities);
-
-            libxml_disable_entity_loader($originalDisableEntities);
-            $this->assertFalse($disableEntities);
         }
 
         // should not throw an exception

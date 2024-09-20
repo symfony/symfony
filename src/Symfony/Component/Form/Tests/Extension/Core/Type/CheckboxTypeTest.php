@@ -12,11 +12,12 @@
 namespace Symfony\Component\Form\Tests\Extension\Core\Type;
 
 use Symfony\Component\Form\CallbackTransformer;
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
 
 class CheckboxTypeTest extends BaseTypeTestCase
 {
-    public const TESTED_TYPE = 'Symfony\Component\Form\Extension\Core\Type\CheckboxType';
+    public const TESTED_TYPE = CheckboxType::class;
 
     public function testDataIsFalseByDefault()
     {
@@ -146,12 +147,8 @@ class CheckboxTypeTest extends BaseTypeTestCase
     {
         // present a binary status field as a checkbox
         $transformer = new CallbackTransformer(
-            function ($value) {
-                return 'checked' == $value;
-            },
-            function ($value) {
-                return $value ? 'checked' : 'unchecked';
-            }
+            fn ($value) => 'checked' == $value,
+            fn ($value) => $value ? 'checked' : 'unchecked'
         );
 
         $form = $this->factory->createBuilder(static::TESTED_TYPE)

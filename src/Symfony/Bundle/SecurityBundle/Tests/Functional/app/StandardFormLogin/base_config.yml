@@ -6,7 +6,6 @@ parameters:
     env(APP_IPS): '127.0.0.1, ::1'
 
 security:
-    enable_authenticator_manager: true
     password_hashers:
         Symfony\Component\Security\Core\User\InMemoryUser: plaintext
 

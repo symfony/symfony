@@ -13,6 +13,7 @@ namespace Symfony\Component\Form\Tests\Extension\Core\EventListener;
 
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Form\FormBuilder;
+use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormFactoryBuilder;
 
 class MergeCollectionListenerArrayTest extends MergeCollectionListenerTestCase
@@ -22,7 +23,7 @@ class MergeCollectionListenerArrayTest extends MergeCollectionListenerTestCase
         return $data;
     }
 
-    protected function getBuilder($name = 'name')
+    protected function getBuilder($name = 'name'): FormBuilderInterface
     {
         return new FormBuilder($name, null, new EventDispatcher(), (new FormFactoryBuilder())->getFormFactory());
     }

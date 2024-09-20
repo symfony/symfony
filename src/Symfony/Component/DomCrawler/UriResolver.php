@@ -32,8 +32,12 @@ class UriResolver
     {
         $uri = trim($uri);
 
+        if (false === ($scheme = parse_url($uri, \PHP_URL_SCHEME)) && '/' === ($uri[0] ?? '')) {
+            $scheme = parse_url($uri.'#', \PHP_URL_SCHEME);
+        }
+
         // absolute URL?
-        if (null !== parse_url($uri, \PHP_URL_SCHEME)) {
+        if (null !== $scheme) {
             return $uri;
         }
 
@@ -58,7 +62,7 @@ class UriResolver
         }
 
         // absolute URL with relative schema
-        if (0 === strpos($uri, '//')) {
+        if (str_starts_with($uri, '//')) {
             return preg_replace('#^([^/]*)//.*$#', '$1', $baseUriCleaned).$uri;
         }
 
@@ -85,7 +89,7 @@ class UriResolver
             return $path;
         }
 
-        if ('.' === substr($path, -1)) {
+        if (str_ends_with($path, '.')) {
             $path .= '/';
         }
 

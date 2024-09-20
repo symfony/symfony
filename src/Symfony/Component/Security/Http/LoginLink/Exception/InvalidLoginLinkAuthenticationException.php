@@ -20,10 +20,7 @@ use Symfony\Component\Security\Core\Exception\AuthenticationException;
  */
 class InvalidLoginLinkAuthenticationException extends AuthenticationException
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function getMessageKey()
+    public function getMessageKey(): string
     {
         return 'Invalid or expired login link.';
     }

@@ -18,14 +18,14 @@ namespace Symfony\Component\HttpFoundation;
  */
 class RedirectResponse extends Response
 {
-    protected $targetUrl;
+    protected string $targetUrl;
 
     /**
      * Creates a redirect response so that it conforms to the rules defined for a redirect status code.
      *
      * @param string $url     The URL to redirect to. The URL should be a full URL, with schema etc.,
      *                        but practically every browser redirects on paths only as well
-     * @param int    $status  The status code (302 by default)
+     * @param int    $status  The HTTP status code (302 "Found" by default)
      * @param array  $headers The headers (Location is always set to the given URL)
      *
      * @throws \InvalidArgumentException
@@ -39,7 +39,7 @@ class RedirectResponse extends Response
         $this->setTargetUrl($url);
 
         if (!$this->isRedirect()) {
-            throw new \InvalidArgumentException(sprintf('The HTTP status code is not a redirect ("%s" given).', $status));
+            throw new \InvalidArgumentException(\sprintf('The HTTP status code is not a redirect ("%s" given).', $status));
         }
 
         if (301 == $status && !\array_key_exists('cache-control', array_change_key_case($headers, \CASE_LOWER))) {
@@ -48,27 +48,9 @@ class RedirectResponse extends Response
     }
 
     /**
-     * Factory method for chainability.
-     *
-     * @param string $url The URL to redirect to
-     *
-     * @return static
-     *
-     * @deprecated since Symfony 5.1, use __construct() instead.
-     */
-    public static function create($url = '', int $status = 302, array $headers = [])
-    {
-        trigger_deprecation('symfony/http-foundation', '5.1', 'The "%s()" method is deprecated, use "new %s()" instead.', __METHOD__, static::class);
-
-        return new static($url, $status, $headers);
-    }
-
-    /**
      * Returns the target URL.
-     *
-     * @return string
      */
-    public function getTargetUrl()
+    public function getTargetUrl(): string
     {
         return $this->targetUrl;
     }
@@ -80,7 +62,7 @@ class RedirectResponse extends Response
      *
      * @throws \InvalidArgumentException
      */
-    public function setTargetUrl(string $url)
+    public function setTargetUrl(string $url): static
     {
         if ('' === $url) {
             throw new \InvalidArgumentException('Cannot redirect to an empty URL.');
@@ -89,7 +71,7 @@ class RedirectResponse extends Response
         $this->targetUrl = $url;
 
         $this->setContent(
-            sprintf('<!DOCTYPE html>
+            \sprintf('<!DOCTYPE html>
 <html>
     <head>
         <meta charset="UTF-8" />

@@ -20,34 +20,21 @@ use Symfony\Component\Ldap\Exception\LdapException;
  */
 class Collection implements CollectionInterface
 {
-    private $connection;
-    private $search;
-    /** @var list<Entry>|null */
-    private $entries;
+    /** @var list<Entry> */
+    private array $entries;
 
-    public function __construct(Connection $connection, Query $search)
-    {
-        $this->connection = $connection;
-        $this->search = $search;
+    public function __construct(
+        private Connection $connection,
+        private Query $search,
+    ) {
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function toArray()
+    public function toArray(): array
     {
-        if (null === $this->entries) {
-            $this->entries = iterator_to_array($this->getIterator(), false);
-        }
-
-        return $this->entries;
+        return $this->entries ??= iterator_to_array($this->getIterator(), false);
     }
 
-    /**
-     * @return int
-     */
-    #[\ReturnTypeWillChange]
-    public function count()
+    public function count(): int
     {
         $con = $this->connection->getResource();
         $searches = $this->search->getResources();
@@ -63,11 +50,7 @@ class Collection implements CollectionInterface
         return $count;
     }
 
-    /**
-     * @return \Traversable<int, Entry>
-     */
-    #[\ReturnTypeWillChange]
-    public function getIterator()
+    public function getIterator(): \Traversable
     {
         if (0 === $this->count()) {
             return;
@@ -90,44 +73,28 @@ class Collection implements CollectionInterface
         }
     }
 
-    /**
-     * @return bool
-     */
-    #[\ReturnTypeWillChange]
-    public function offsetExists($offset)
+    public function offsetExists(mixed $offset): bool
     {
         $this->toArray();
 
         return isset($this->entries[$offset]);
     }
 
-    /**
-     * @return Entry|null
-     */
-    #[\ReturnTypeWillChange]
-    public function offsetGet($offset)
+    public function offsetGet(mixed $offset): ?Entry
     {
         $this->toArray();
 
         return $this->entries[$offset] ?? null;
     }
 
-    /**
-     * @return void
-     */
-    #[\ReturnTypeWillChange]
-    public function offsetSet($offset, $value)
+    public function offsetSet(mixed $offset, mixed $value): void
     {
         $this->toArray();
 
         $this->entries[$offset] = $value;
     }
 
-    /**
-     * @return void
-     */
-    #[\ReturnTypeWillChange]
-    public function offsetUnset($offset)
+    public function offsetUnset($offset): void
     {
         $this->toArray();
 
@@ -156,9 +123,9 @@ class Collection implements CollectionInterface
     private function cleanupAttributes(array $entry): array
     {
         $attributes = array_diff_key($entry, array_flip(range(0, $entry['count'] - 1)) + [
-                'count' => null,
-                'dn' => null,
-            ]);
+            'count' => null,
+            'dn' => null,
+        ]);
         array_walk($attributes, function (&$value) {
             unset($value['count']);
         });

@@ -3,7 +3,6 @@ imports:
 - { resource: ./security.yml }
 
 security:
-    enable_authenticator_manager: true
     firewalls:
         api:
             pattern: /

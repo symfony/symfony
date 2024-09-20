@@ -1,0 +1,15 @@
+{
+    "event_type": "email_sent",
+    "timestamp": "2024-08-15T16:05:59+00:00",
+    "swg_uid": "02-0d4affd0-1183-43b1-a980-ab30b3374dd3",
+    "event_id": "97cf3afe-f63a-4d92-abac-bde9c7e6523e",
+    "channel": "email",
+    "headers": {
+        "x-transaction-id": "d4fbec9d-eed9-44d5-af47-c1126467a5ca"
+    },
+    "campaign_tags": null,
+    "campaign_type": "transac",
+    "campaign_id": "transac",
+    "recipient": "recipient@example.com",
+    "domain_from": "example.org"
+}

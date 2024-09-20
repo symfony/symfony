@@ -32,8 +32,8 @@ class TraceableMiddlewareTest extends MiddlewareTestCase
         $busId = 'command_bus';
         $envelope = new Envelope(new DummyMessage('Hello'));
 
-        $middleware = new class() implements MiddlewareInterface {
-            public $calls = 0;
+        $middleware = new class implements MiddlewareInterface {
+            public int $calls = 0;
 
             public function handle(Envelope $envelope, StackInterface $stack): Envelope
             {
@@ -118,12 +118,11 @@ class TraceableMiddlewareTest extends MiddlewareTestCase
         $stopwatch = new Stopwatch();
 
         $middleware = new class($stopwatch) implements MiddlewareInterface {
-            public $calls = 0;
-            private $stopwatch;
+            public int $calls = 0;
 
-            public function __construct(Stopwatch $stopwatch)
-            {
-                $this->stopwatch = $stopwatch;
+            public function __construct(
+                private Stopwatch $stopwatch,
+            ) {
             }
 
             public function handle(Envelope $envelope, StackInterface $stack): Envelope

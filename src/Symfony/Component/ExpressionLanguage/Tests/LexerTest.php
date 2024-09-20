@@ -182,6 +182,14 @@ class LexerTest extends TestCase
                 ],
                 '"/* this is not a comment */"',
             ],
+            [
+                [
+                    new Token('name', 'foo', 1),
+                    new Token('operator', 'xor', 5),
+                    new Token('name', 'bar', 9),
+                ],
+                'foo xor bar',
+            ],
         ];
     }
 

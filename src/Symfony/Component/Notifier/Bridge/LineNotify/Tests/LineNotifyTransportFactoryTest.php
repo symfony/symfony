@@ -9,6 +9,8 @@
  * file that was distributed with this source code.
  */
 
+namespace Symfony\Component\Notifier\Bridge\LineNotify\Tests;
+
 use Symfony\Component\Notifier\Bridge\LineNotify\LineNotifyTransportFactory;
 use Symfony\Component\Notifier\Test\TransportFactoryTestCase;
 

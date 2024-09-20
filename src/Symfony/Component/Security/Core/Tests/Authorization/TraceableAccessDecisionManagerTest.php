@@ -116,7 +116,7 @@ class TraceableAccessDecisionManagerTest extends TestCase
                 'result' => true,
                 'voterDetails' => [],
             ]],
-            'attributes' => [12],
+            [12],
             12345,
             [],
             true,

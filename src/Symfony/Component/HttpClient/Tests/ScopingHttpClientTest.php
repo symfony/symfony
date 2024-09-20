@@ -49,16 +49,16 @@ class ScopingHttpClientTest extends TestCase
         $this->assertSame($options[$regexp]['case'], $requestedOptions['case']);
     }
 
-    public static function provideMatchingUrls()
+    public static function provideMatchingUrls(): iterable
     {
         $defaultOptions = [
             '.*/foo-bar' => ['case' => 1],
             '.*' => ['case' => 2],
         ];
 
-        yield ['regexp' => '.*/foo-bar', 'url' => 'http://example.com/foo-bar', 'default_options' => $defaultOptions];
-        yield ['regexp' => '.*', 'url' => 'http://example.com/bar-foo', 'default_options' => $defaultOptions];
-        yield ['regexp' => '.*', 'url' => 'http://example.com/foobar', 'default_options' => $defaultOptions];
+        yield ['regexp' => '.*/foo-bar', 'url' => 'http://example.com/foo-bar', 'options' => $defaultOptions];
+        yield ['regexp' => '.*', 'url' => 'http://example.com/bar-foo', 'options' => $defaultOptions];
+        yield ['regexp' => '.*', 'url' => 'http://example.com/foobar', 'options' => $defaultOptions];
     }
 
     public function testMatchingUrlsAndOptions()

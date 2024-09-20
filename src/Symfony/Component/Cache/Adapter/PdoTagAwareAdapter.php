@@ -87,10 +87,10 @@ class PdoTagAwareAdapter extends AbstractTagAwareAdapter implements PruneableInt
     }
 
     /**
-     * Creates the table to store cache items which can be called once for setup.
+     * Creates the tables to store cache items which can be called once for setup.
      *
-     * Cache ID are saved in a column of maximum length 255. Cache data is
-     * saved in a BLOB.
+     * Cache IDs are saved in a column of maximum length 255.
+     * Cache data is saved in a BLOB.
      *
      * @throws \PDOException    When the table already exists
      * @throws \DomainException When an unsupported PDO driver is used

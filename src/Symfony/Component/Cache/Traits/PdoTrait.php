@@ -89,7 +89,7 @@ trait PdoTrait
     /**
      * Creates the table to store cache items which can be called once for setup.
      *
-     * Cache ID are saved in a column of maximum length 255. Cache data is
+     * Cache IDs are saved in a column of maximum length 255. Cache data is
      * saved in a BLOB.
      *
      * @throws \PDOException    When the table already exists

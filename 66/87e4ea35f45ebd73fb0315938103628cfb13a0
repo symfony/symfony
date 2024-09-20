@@ -1,0 +1,21 @@
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2024-09-20T07:59:52Z
+
+Just saw @derrabus had the same idea in #58323 😄
+
+This one targets 5.4
+
+---------------------------------------------------------------------------
+
+by derrabus at 2024-09-20T08:04:09Z
+
+Yeah, I don't think we need to do this on 5.4. We likely won't ever run those tests with PHPUnit 11.
+
+My current strategy is: Fix incompatibilities on 7.2 and if the patch applies cleanly on 6.4, backport it there.
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2024-09-20T08:06:13Z
+
+Noted for the next ones. Thanks!

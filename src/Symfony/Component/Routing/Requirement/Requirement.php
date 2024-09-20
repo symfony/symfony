@@ -24,6 +24,7 @@ enum Requirement
     public const UID_BASE32 = '[0-9A-HJKMNP-TV-Z]{26}';
     public const UID_BASE58 = '[1-9A-HJ-NP-Za-km-z]{22}';
     public const UID_RFC4122 = '[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}';
+    public const UID_RFC9562 = self::UID_RFC4122;
     public const ULID = '[0-7][0-9A-HJKMNP-TV-Z]{25}';
     public const UUID = '[0-9a-f]{8}-[0-9a-f]{4}-[13-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}';
     public const UUID_V1 = '[0-9a-f]{8}-[0-9a-f]{4}-1[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}';

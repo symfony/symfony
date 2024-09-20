@@ -80,8 +80,8 @@ class XmlFileLoaderTest extends TestCase
         $attributesMetadata = $classMetadata->getAttributesMetadata();
         $this->assertEquals('baz', $attributesMetadata['foo']->getSerializedName());
         $this->assertEquals('qux', $attributesMetadata['bar']->getSerializedName());
-        $this->assertEquals('duxi', $attributesMetadata['duux']->getSerializedName());
-        $this->assertEquals('duxa', $attributesMetadata['duux']->getSerializedName(['a']));
+        $this->assertSame('duxi', $attributesMetadata['duux']->getSerializedName());
+        $this->assertSame('duxa', $attributesMetadata['duux']->getSerializedName(['a']));
     }
 
     public function testSerializedPath()
@@ -92,8 +92,8 @@ class XmlFileLoaderTest extends TestCase
         $attributesMetadata = $classMetadata->getAttributesMetadata();
         $this->assertEquals('[one][two]', $attributesMetadata['three']->getSerializedPath());
         $this->assertEquals('[three][four]', $attributesMetadata['seven']->getSerializedPath());
-        $this->assertEquals('[five][six]', $attributesMetadata['eleven']->getSerializedPath());
-        $this->assertEquals('[six][five]', $attributesMetadata['eleven']->getSerializedPath(['a']));
+        $this->assertSame('[five][six]', $attributesMetadata['eleven']->getSerializedPath());
+        $this->assertSame('[six][five]', $attributesMetadata['eleven']->getSerializedPath(['a']));
     }
 
     public function testSerializedPathInConstructor()
@@ -103,8 +103,8 @@ class XmlFileLoaderTest extends TestCase
 
         $attributesMetadata = $classMetadata->getAttributesMetadata();
         $this->assertEquals('[one][two]', $attributesMetadata['three']->getSerializedPath());
-        $this->assertEquals('[five][six]', $attributesMetadata['eleven']->getSerializedPath());
-        $this->assertEquals('[six][five]', $attributesMetadata['eleven']->getSerializedPath(['a']));
+        $this->assertSame('[five][six]', $attributesMetadata['eleven']->getSerializedPath());
+        $this->assertSame('[six][five]', $attributesMetadata['eleven']->getSerializedPath(['a']));
     }
 
     public function testLoadDiscriminatorMap()

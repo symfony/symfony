@@ -145,7 +145,7 @@ final class MetadataAwareNameConverterTest extends TestCase
 
         $nameConverter = new MetadataAwareNameConverter($classMetadataFactory, $fallback);
 
-        $this->assertEquals($expected, $nameConverter->normalize($propertyName, OtherSerializedNameDummy::class, null, $context));
+        $this->assertSame($expected, $nameConverter->normalize($propertyName, OtherSerializedNameDummy::class, null, $context));
     }
 
     /**
@@ -175,7 +175,7 @@ final class MetadataAwareNameConverterTest extends TestCase
 
         $nameConverter = new MetadataAwareNameConverter($classMetadataFactory, $fallback);
 
-        $this->assertEquals($expected, $nameConverter->denormalize($propertyName, OtherSerializedNameDummy::class, null, $context));
+        $this->assertSame($expected, $nameConverter->denormalize($propertyName, OtherSerializedNameDummy::class, null, $context));
     }
 
     public static function attributeAndContextProvider(): array
@@ -255,7 +255,7 @@ final class MetadataAwareNameConverterTest extends TestCase
     {
         $classMetadataFactory = new ClassMetadataFactory(new AttributeLoader());
         $nameConverter = new MetadataAwareNameConverter($classMetadataFactory);
-        $this->assertEquals('baz', $nameConverter->denormalize('eleven', NestedPathAndNameDifferentGroups::class, null, ['groups' => 'a']));
+        $this->assertSame('baz', $nameConverter->denormalize('eleven', NestedPathAndNameDifferentGroups::class, null, ['groups' => 'a']));
     }
 
     public function testNormalizeWithNestedPathAndName()
@@ -280,7 +280,7 @@ final class MetadataAwareNameConverterTest extends TestCase
     {
         $classMetadataFactory = new ClassMetadataFactory(new AttributeLoader());
         $nameConverter = new MetadataAwareNameConverter($classMetadataFactory);
-        $this->assertEquals('eleven', $nameConverter->normalize('baz', NestedPathAndNameDifferentGroups::class, null, ['groups' => 'a']));
+        $this->assertSame('eleven', $nameConverter->normalize('baz', NestedPathAndNameDifferentGroups::class, null, ['groups' => 'a']));
     }
 }
 

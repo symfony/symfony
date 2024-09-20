@@ -92,7 +92,7 @@ END'],
         $this->assertSame($expected, (string) $instance);
     }
 
-    public function provideCreateFromCodePoint(): array
+    public static function provideCreateFromCodePoint(): array
     {
         return [
             ['', []],

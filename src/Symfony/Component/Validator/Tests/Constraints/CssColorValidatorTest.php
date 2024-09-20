@@ -433,7 +433,7 @@ final class CssColorValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    public function getInvalidHSLA(): array
+    public static function getInvalidHSLA(): array
     {
         return [
             ['hsla(1000, 1000%, 20000%, 999)'],

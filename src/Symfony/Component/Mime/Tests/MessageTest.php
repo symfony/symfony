@@ -306,7 +306,7 @@ EOF;
         $m->ensureValidity();
     }
 
-    public function ensureValidityProvider()
+    public static function ensureValidityProvider(): array
     {
         return [
             'Valid address fields' => [

@@ -577,7 +577,7 @@ class CachingFactoryDecoratorTest extends TestCase
         ];
     }
 
-    public function provideSameKeyChoices()
+    public static function provideSameKeyChoices()
     {
         // Only test types here that can be used as array keys
         return [
@@ -588,7 +588,7 @@ class CachingFactoryDecoratorTest extends TestCase
         ];
     }
 
-    public function provideDistinguishedKeyChoices()
+    public static function provideDistinguishedKeyChoices()
     {
         // Only test types here that can be used as array keys
         return [

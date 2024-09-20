@@ -623,7 +623,7 @@ final class TelegramTransportTest extends TransportTestCase
     }
 
     /**
-     * @return array<array<string, array{messageOptions: TelegramOptions, endpoint: string, fileOption: string, expectedBody: array<mixed>, responseContent: array<mixed>}>>
+     * @return array<array<string, array{messageOptions: TelegramOptions, endpoint: string, fileOption: string, expectedParameters: array<mixed>, responseContent: array<mixed>}>>
      */
     public static function sendFileByUploadProvider(): array
     {
@@ -632,7 +632,7 @@ final class TelegramTransportTest extends TransportTestCase
                 'messageOptions' => (new TelegramOptions())->uploadPhoto(self::FIXTURE_FILE)->hasSpoiler(true),
                 'endpoint' => 'sendPhoto',
                 'fileOption' => 'photo',
-                'expectedBody' => [
+                'expectedParameters' => [
                     'has_spoiler' => true,
                     'chat_id' => 'testChannel',
                     'parse_mode' => 'MarkdownV2',
@@ -654,7 +654,7 @@ final class TelegramTransportTest extends TransportTestCase
                 'messageOptions' => (new TelegramOptions())->uploadVideo(self::FIXTURE_FILE),
                 'endpoint' => 'sendVideo',
                 'fileOption' => 'video',
-                'expectedBody' => [
+                'expectedParameters' => [
                     'chat_id' => 'testChannel',
                     'parse_mode' => 'MarkdownV2',
                     'video' => self::FIXTURE_FILE,
@@ -673,7 +673,7 @@ final class TelegramTransportTest extends TransportTestCase
                 'messageOptions' => (new TelegramOptions())->uploadAnimation(self::FIXTURE_FILE),
                 'endpoint' => 'sendAnimation',
                 'fileOption' => 'animation',
-                'expectedBody' => [
+                'expectedParameters' => [
                     'chat_id' => 'testChannel',
                     'parse_mode' => 'MarkdownV2',
                     'animation' => self::FIXTURE_FILE,
@@ -692,7 +692,7 @@ final class TelegramTransportTest extends TransportTestCase
                 'messageOptions' => (new TelegramOptions())->uploadAudio(self::FIXTURE_FILE),
                 'endpoint' => 'sendAudio',
                 'fileOption' => 'audio',
-                'expectedBody' => [
+                'expectedParameters' => [
                     'chat_id' => 'testChannel',
                     'parse_mode' => 'MarkdownV2',
                     'audio' => self::FIXTURE_FILE,
@@ -711,7 +711,7 @@ final class TelegramTransportTest extends TransportTestCase
                 'messageOptions' => (new TelegramOptions())->uploadDocument(self::FIXTURE_FILE),
                 'endpoint' => 'sendDocument',
                 'fileOption' => 'document',
-                'expectedBody' => [
+                'expectedParameters' => [
                     'chat_id' => 'testChannel',
                     'parse_mode' => 'MarkdownV2',
                     'document' => self::FIXTURE_FILE,
@@ -732,7 +732,7 @@ final class TelegramTransportTest extends TransportTestCase
                 'messageOptions' => (new TelegramOptions())->uploadSticker(self::FIXTURE_FILE, '🤖'),
                 'endpoint' => 'sendSticker',
                 'fileOption' => 'sticker',
-                'expectedBody' => [
+                'expectedParameters' => [
                     'emoji' => '🤖',
                     'chat_id' => 'testChannel',
                     'parse_mode' => 'MarkdownV2',
@@ -757,7 +757,7 @@ final class TelegramTransportTest extends TransportTestCase
                 'messageOptions' => (new TelegramOptions())->uploadSticker(self::FIXTURE_FILE),
                 'endpoint' => 'sendSticker',
                 'fileOption' => 'sticker',
-                'expectedBody' => [
+                'expectedParameters' => [
                     'chat_id' => 'testChannel',
                     'parse_mode' => 'MarkdownV2',
                     'sticker' => self::FIXTURE_FILE,

@@ -21,12 +21,12 @@ class LocalesTest extends ResourceBundleTestCase
 {
     public function testGetLocales()
     {
-        $this->assertSame($this->getLocales(), Locales::getLocales());
+        $this->assertSame(static::getLocales(), Locales::getLocales());
     }
 
     public function testGetAliases()
     {
-        $this->assertSame($this->getLocaleAliases(), Locales::getAliases());
+        $this->assertSame(static::getLocaleAliases(), Locales::getAliases());
     }
 
     /**
@@ -41,7 +41,7 @@ class LocalesTest extends ResourceBundleTestCase
         // We can't assert on exact list of locale, as there's too many variations.
         // The best we can do is to make sure getNames() returns a subset of what getLocales() returns.
         $this->assertNotEmpty($locales);
-        $this->assertEmpty(array_diff($locales, $this->getLocales()));
+        $this->assertEmpty(array_diff($locales, static::getLocales()));
     }
 
     public function testGetNamesDefaultLocale()

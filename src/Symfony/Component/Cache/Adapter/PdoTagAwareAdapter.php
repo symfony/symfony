@@ -42,7 +42,7 @@ class PdoTagAwareAdapter extends AbstractTagAwareAdapter implements PruneableInt
      * cache is actually used.
      *
      * List of available options:
-     *  * db_table: The name of the table [default: cache_items]
+     *  * db_table: The name of the cache item table [default: cache_items]
      *  * db_id_col: The column where to store the cache id [default: item_id]
      *  * db_data_col: The column where to store the cache data [default: item_data]
      *  * db_lifetime_col: The column where to store the lifetime [default: item_lifetime]
@@ -50,6 +50,9 @@ class PdoTagAwareAdapter extends AbstractTagAwareAdapter implements PruneableInt
      *  * db_username: The username when lazy-connect [default: '']
      *  * db_password: The password when lazy-connect [default: '']
      *  * db_connection_options: An array of driver-specific connection options [default: []]
+     *  * db_tags_table: The name of the tags table [default: cache_tags]
+     *  * db_tags_col: The column where to store the tags [default: item_tag]
+     *  * db_tags_tag_index_name: The index name for the tags column [default: idx_cache_tags_item_tag]
      *
      * @throws InvalidArgumentException When first argument is not PDO nor Connection nor string
      * @throws InvalidArgumentException When PDO error mode is not PDO::ERRMODE_EXCEPTION
@@ -57,6 +60,10 @@ class PdoTagAwareAdapter extends AbstractTagAwareAdapter implements PruneableInt
      */
     public function __construct(#[\SensitiveParameter] \PDO|string $connOrDsn, string $namespace = '', int $defaultLifetime = 0, array $options = [], ?MarshallerInterface $marshaller = null)
     {
+        $this->tagsTable = $options['db_tags_table'] ?? $this->tagsTable;
+        $this->tagCol = $options['db_tags_col'] ?? $this->tagCol;
+        $this->tagIdxName = $options['db_tags_tag_index_name'] ?? $this->tagIdxName;
+
         $this->init($connOrDsn, $namespace, $defaultLifetime, $options, $marshaller);
     }
 

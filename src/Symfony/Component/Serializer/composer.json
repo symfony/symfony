@@ -22,6 +22,7 @@
     },
     "require-dev": {
         "phpdocumentor/reflection-docblock": "^3.2|^4.0|^5.0",
+        "phpstan/phpdoc-parser": "^1.0",
         "seld/jsonlint": "^1.10",
         "symfony/cache": "^6.4|^7.0",
         "symfony/config": "^6.4|^7.0",
@@ -37,7 +38,7 @@
         "symfony/property-access": "^6.4|^7.0",
         "symfony/property-info": "^6.4|^7.0",
         "symfony/translation-contracts": "^2.5|^3",
-        "symfony/type-info": "^7.1",
+        "symfony/type-info": "^7.1.5",
         "symfony/uid": "^6.4|^7.0",
         "symfony/validator": "^6.4|^7.0",
         "symfony/var-dumper": "^6.4|^7.0",
@@ -50,6 +51,7 @@
         "symfony/dependency-injection": "<6.4",
         "symfony/property-access": "<6.4",
         "symfony/property-info": "<6.4",
+        "symfony/type-info": "<7.1.5",
         "symfony/uid": "<6.4",
         "symfony/validator": "<6.4",
         "symfony/yaml": "<6.4"

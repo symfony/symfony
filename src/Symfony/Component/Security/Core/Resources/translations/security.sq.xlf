@@ -20,7 +20,7 @@
             </trans-unit>
             <trans-unit id="5">
                 <source>Cookie has already been used by someone else.</source>
-                <target>Cookie është përdorur tashmë nga dikush tjetër.</target>
+                <target>“Cookie” është përdorur tashmë nga dikush tjetër.</target>
             </trans-unit>
             <trans-unit id="6">
                 <source>Not privileged to request the resource.</source>
@@ -76,7 +76,7 @@
             </trans-unit>
             <trans-unit id="20">
                 <source>Too many failed login attempts, please try again in %minutes% minutes.</source>
-                <target state="needs-review-translation">Shumë përpjekje të pasuksesshme për t'u identifikuar, ju lutemi provoni përsëri pas %minutes% minutash.</target>
+                <target>Shumë përpjekje të dështuara për identifikim, ju lutemi provoni përsëri pas %minutes% minutash.</target>
             </trans-unit>
         </body>
     </file>

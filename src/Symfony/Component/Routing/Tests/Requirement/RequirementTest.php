@@ -224,10 +224,7 @@ class RequirementTest extends TestCase
     }
 
     /**
-     * @testWith    ["00000000-0000-0000-0000-000000000000"]
-     *              ["ffffffff-ffff-ffff-ffff-ffffffffffff"]
-     *              ["01802c4e-c409-9f07-863c-f025ca7766a0"]
-     *              ["056654ca-0699-4e16-9895-e60afca090d7"]
+     * @dataProvider provideUidRfc4122
      */
     public function testUidRfc4122OK(string $uid)
     {
@@ -238,11 +235,7 @@ class RequirementTest extends TestCase
     }
 
     /**
-     * @testWith    [""]
-     *              ["foo"]
-     *              ["01802c4e-c409-9f07-863c-f025ca7766a"]
-     *              ["01802c4e-c409-9f07-863c-f025ca7766ag"]
-     *              ["01802c4ec4099f07863cf025ca7766a0"]
+     * @dataProvider provideUidRfc4122KO
      */
     public function testUidRfc4122KO(string $uid)
     {
@@ -250,6 +243,45 @@ class RequirementTest extends TestCase
             (new Route('/{uid}', [], ['uid' => Requirement::UID_RFC4122]))->compile()->getRegex(),
             '/'.$uid,
         );
+    }
+
+    /**
+     * @dataProvider provideUidRfc4122
+     */
+    public function testUidRfc9562OK(string $uid)
+    {
+        $this->assertMatchesRegularExpression(
+            (new Route('/{uid}', [], ['uid' => Requirement::UID_RFC9562]))->compile()->getRegex(),
+            '/'.$uid,
+        );
+    }
+
+    /**
+     * @dataProvider provideUidRfc4122KO
+     */
+    public function testUidRfc9562KO(string $uid)
+    {
+        $this->assertDoesNotMatchRegularExpression(
+            (new Route('/{uid}', [], ['uid' => Requirement::UID_RFC9562]))->compile()->getRegex(),
+            '/'.$uid,
+        );
+    }
+
+    public static function provideUidRfc4122(): iterable
+    {
+        yield ['00000000-0000-0000-0000-000000000000'];
+        yield ['ffffffff-ffff-ffff-ffff-ffffffffffff'];
+        yield ['01802c4e-c409-9f07-863c-f025ca7766a0'];
+        yield ['056654ca-0699-4e16-9895-e60afca090d7'];
+    }
+
+    public static function provideUidRfc4122KO(): iterable
+    {
+        yield [''];
+        yield ['foo'];
+        yield ['01802c4e-c409-9f07-863c-f025ca7766a'];
+        yield ['01802c4e-c409-9f07-863c-f025ca7766ag'];
+        yield ['01802c4ec4099f07863cf025ca7766a0'];
     }
 
     /**

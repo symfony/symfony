@@ -913,6 +913,9 @@ class Application implements ResetInterface
         }
 
         switch ($shellVerbosity = (int) getenv('SHELL_VERBOSITY')) {
+            case -2:
+                $output->setVerbosity(OutputInterface::VERBOSITY_SILENT);
+                break;
             case -1:
                 $output->setVerbosity(OutputInterface::VERBOSITY_QUIET);
                 break;
@@ -930,7 +933,10 @@ class Application implements ResetInterface
                 break;
         }
 
-        if (true === $input->hasParameterOption(['--quiet', '-q'], true)) {
+        if (true === $input->hasParameterOption(['--silent'], true)) {
+            $output->setVerbosity(OutputInterface::VERBOSITY_SILENT);
+            $shellVerbosity = -2;
+        } elseif (true === $input->hasParameterOption(['--quiet', '-q'], true)) {
             $output->setVerbosity(OutputInterface::VERBOSITY_QUIET);
             $shellVerbosity = -1;
         } else {
@@ -946,7 +952,7 @@ class Application implements ResetInterface
             }
         }
 
-        if (-1 === $shellVerbosity) {
+        if (0 > $shellVerbosity) {
             $input->setInteractive(false);
         }
 
@@ -1082,7 +1088,8 @@ class Application implements ResetInterface
         return new InputDefinition([
             new InputArgument('command', InputArgument::REQUIRED, 'The command to execute'),
             new InputOption('--help', '-h', InputOption::VALUE_NONE, 'Display help for the given command. When no command is given display help for the <info>'.$this->defaultCommand.'</info> command'),
-            new InputOption('--quiet', '-q', InputOption::VALUE_NONE, 'Do not output any message'),
+            new InputOption('--silent', null, InputOption::VALUE_NONE, 'Do not output any message'),
+            new InputOption('--quiet', '-q', InputOption::VALUE_NONE, 'Only errors are displayed. All other output is suppressed'),
             new InputOption('--verbose', '-v|vv|vvv', InputOption::VALUE_NONE, 'Increase the verbosity of messages: 1 for normal output, 2 for more verbose output and 3 for debug'),
             new InputOption('--version', '-V', InputOption::VALUE_NONE, 'Display this application version'),
             new InputOption('--ansi', '', InputOption::VALUE_NEGATABLE, 'Force (or disable --no-ansi) ANSI output', null),

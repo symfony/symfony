@@ -5,7 +5,8 @@ MbString åpplicätion
 
 <comment>Options:</comment>
   <info>-h, --help</info>            Display help for the given command. When no command is given display help for the <info>list</info> command
-  <info>-q, --quiet</info>           Do not output any message
+  <info>    --silent</info>          Do not output any message
+  <info>-q, --quiet</info>           Only errors are displayed. All other output is suppressed
   <info>-V, --version</info>         Display this application version
   <info>    --ansi|--no-ansi</info>  Force (or disable --no-ansi) ANSI output
   <info>-n, --no-interaction</info>  Do not ask any interactive question

@@ -14,6 +14,13 @@ Cache
  * `igbinary_serialize()` is not used by default when the igbinary extension is installed
  * Deprecate making `cache.app` adapter taggable, use the `cache.app.taggable` adapter instead
 
+Console
+-------
+
+ * [BC BREAK] Add ``--silent`` global option to enable the silent verbosity mode (suppressing all output, including errors)
+   If a custom command defines the `silent` option, it must be renamed before upgrading.
+ * Add `isSilent()` method to `OutputInterface`
+
 DependencyInjection
 -------------------
 

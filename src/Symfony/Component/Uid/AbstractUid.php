@@ -124,7 +124,7 @@ abstract class AbstractUid implements \JsonSerializable, \Stringable
     /**
      * Returns the identifier as a RFC 9562/4122 case-insensitive string.
      *
-     * @see https://tools.ietf.org/html/rfc4122#section-3
+     * @see https://datatracker.ietf.org/doc/html/rfc9562/#section-4
      *
      * @example 09748193-048a-4bfb-b825-8528cf74fdc1 (len=36)
      */

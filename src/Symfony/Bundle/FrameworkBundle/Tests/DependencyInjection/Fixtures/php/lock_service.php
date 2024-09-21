@@ -1,8 +1,6 @@
 <?php
 
 $container->register('my_service', \Redis::class);
-$container->setAlias('factory_public_alias', 'lock.default.factory')
-    ->setPublic(true);
 
 $container->loadFromExtension('framework', [
     'annotations' => false,

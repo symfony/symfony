@@ -7,7 +7,6 @@
 
     <services>
         <service id="my_service" class="\Redis" />
-        <service id="factory_public_alias" alias="lock.default.factory" public="true" />
     </services>
 
     <framework:config http-method-override="false" handle-all-throwables="true">

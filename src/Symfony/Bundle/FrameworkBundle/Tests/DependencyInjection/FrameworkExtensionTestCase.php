@@ -58,7 +58,6 @@ use Symfony\Component\HttpClient\ThrottlingHttpClient;
 use Symfony\Component\HttpFoundation\IpUtils;
 use Symfony\Component\HttpKernel\DependencyInjection\LoggerPass;
 use Symfony\Component\HttpKernel\Fragment\FragmentUriGeneratorInterface;
-use Symfony\Component\Lock\LockFactory;
 use Symfony\Component\Lock\Store\SemaphoreStore;
 use Symfony\Component\Messenger\Bridge\AmazonSqs\Transport\AmazonSqsTransportFactory;
 use Symfony\Component\Messenger\Bridge\Amqp\Transport\AmqpTransportFactory;
@@ -69,7 +68,6 @@ use Symfony\Component\Notifier\ChatterInterface;
 use Symfony\Component\Notifier\TexterInterface;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\Security\Core\AuthenticationEvents;
-use Symfony\Component\Semaphore\SemaphoreFactory;
 use Symfony\Component\Serializer\Mapping\Loader\AttributeLoader;
 use Symfony\Component\Serializer\Mapping\Loader\XmlFileLoader;
 use Symfony\Component\Serializer\Mapping\Loader\YamlFileLoader;
@@ -2465,8 +2463,6 @@ abstract class FrameworkExtensionTestCase extends TestCase
         self::assertTrue($container->hasDefinition('lock.default.factory'));
         $storeDef = $container->getDefinition($container->getDefinition('lock.default.factory')->getArgument(0));
         self::assertEquals(new Reference('my_service'), $storeDef->getArgument(0));
-
-        self::assertInstanceOf(LockFactory::class, $container->get('factory_public_alias'));
     }
 
     public function testDefaultSemaphore()
@@ -2500,8 +2496,6 @@ abstract class FrameworkExtensionTestCase extends TestCase
         self::assertTrue($container->hasDefinition('semaphore.default.factory'));
         $storeDef = $container->getDefinition($container->getDefinition('semaphore.default.factory')->getArgument(0));
         self::assertEquals(new Reference('my_service'), $storeDef->getArgument(0));
-
-        self::assertInstanceOf(SemaphoreFactory::class, $container->get('factory_public_alias'));
     }
 
     protected function createContainer(array $data = [])

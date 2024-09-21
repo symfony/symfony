@@ -1,0 +1,136 @@
+---------------------------------------------------------------------------
+
+by wouterj at 2024-01-27T12:27:04Z
+
+I'm not sure, I don't think we want to call this a BC break (or tag it as such) to give the wrong impression that command output is considered within the BC promise.
+
+Let's also friendly ping @Seldaek who implemented the existing logic of showing errors during quiet verbosity. Do you remember a use-case for this? (something with Composer maybe?) Is there something we should take in mind before merging this PR?
+
+---------------------------------------------------------------------------
+
+by Seldaek at 2024-01-28T12:42:23Z
+
+IMO it is better to keep displaying it at least if you have a ConsoleOutputInterface where you can output on stderr. Any machine readable output would generally be expected on stdout. By default it will output to stderr so it won't disturb anything.
+
+So I personally would close this, because yes when running quiet in some script/CI and something major breaks and you do not see it at all, it sucks. But that's just my view of course.
+
+---------------------------------------------------------------------------
+
+by Seldaek at 2024-01-28T12:48:00Z
+
+Note: I see the point about logging duplicating things, that's not great indeed. I am not sure how else this could be mitigated. I don't really see a way to safely do this, and IMO duplicating uncaught exception sure not great but still better as not seeing them at all.
+
+---------------------------------------------------------------------------
+
+by wouterj at 2024-01-30T21:29:56Z
+
+I get your point about stderr, however both stderr and stdout of processes are redirected to a container's output. So in hosting relying on containers, this is still an issue.
+
+There are utils/techniques you can apply to hide the output of a command, but still get errors (based on exit codes). E.g. in the past, I've used the little [`chronic`](https://joeyh.name/code/moreutils/) bash utility for this in our CI. And you can also use bash one-liners like ``output=`mycommand 2>&1` || echo $output`` to accomplish this.
+
+---------------------------------------------------------------------------
+
+by Seldaek at 2024-01-31T08:57:05Z
+
+Ok, then I guess all I can ask is to maybe make this optional so that apps that are pure CLI apps like Composer and not 12-factor style symfony envs with full logger config could maybe retain the quiet-level output?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-08-22T09:35:47Z
+
+Let's resume this PR?
+
+---------------------------------------------------------------------------
+
+by wouterj at 2024-09-06T11:40:23Z
+
+Yes please :)
+
+We need to make a decision (@symfony/mergers):
+
+A) **Make `--quiet` completely silent, also for errors** (the current state of this PR).
+This is a bit troubling for applications currently relying on seeing errors when running with quiet verbosity.
+It however is much more compatible with 99% of the CLI tools in the world. Only getting output on error is still possible using the techniques I shared before.
+
+B) **Add a new verbosity (e.g. `SHELL_VERBOSITY=-2`) that disables error output**.
+No change of existing behavior, but introduces more work (and also requires discoverability) to get truly silent output like you get with other CLI tools.
+Optionally, we might add some code in the `bin/console` recipe to default to `-2` when using `--quiet` to remove this extra barrier for upgraded applications.
+
+---------------------------------------------------------------------------
+
+by stof at 2024-09-06T12:20:48Z
+
+@wouterj using `2 > &1` and then complaining that it screws the processing of the output is void, as the screwing comes from the `2 > &1`, not from using stderr propertly in the first place.
+
+Thus, cases that want to process the command output programmatically are probably not using `--quiet` anyway (as there would be not output to process)
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2024-09-18T09:20:03Z
+
+@wouter I looked in other projects and some commands use special options for this:
+
+* Google Cloud command has `--quiet` to hide interactive messages and `--no-user-output-enabled` to suppress printing anything in stdout or stderr (https://cloud.google.com/sdk/gcloud#suppressing_prompting_writing_to_the_terminal_and_logging)
+* AWS commands have `--quiet` to not output information and `--only-show-errors` to suppress all output except errors and warnings (https://awscli.amazonaws.com/v2/documentation/api/latest/reference/s3/cp.html?highlight=quiet)
+
+About your proposals, I like this one --> **Add a new verbosity (e.g. SHELL_VERBOSITY=-2) that disables error output**
+
+But, I wouldn't do this:
+
+> Optionally, we might add some code in the bin/console recipe to default to -2 when using --quiet to remove this extra barrier for upgraded applications.
+
+Having `--quiet` silently associated to a new verbosity different than quiet might look convenient but it might bite us in the future.
+
+About possible naming of this new constant, AI suggested `silent` because "quiet" means that makes little or no noise and "silent" means that all noise is suppressed:
+
+| Console option | SHELL_VERBOSITY value | Equivalent PHP constant
+| -------------- | --------------------- | -----------------------
+| `--silent` | `-2` | `OutputInterface::VERBOSITY_SILENT`
+| `-q` or `--quiet` | `-1` | `OutputInterface::VERBOSITY_QUIET`
+| (none) | `0` | `OutputInterface::VERBOSITY_NORMAL`
+| `-v` | `1` | `OutputInterface::VERBOSITY_VERBOSE`
+| `-vv` | `2` | `OutputInterface::VERBOSITY_VERY_VERBOSE`
+| `-vvv` | `3` | `OutputInterface::VERBOSITY_DEBUG`
+
+---------------------------------------------------------------------------
+
+by kbond at 2024-09-18T09:29:01Z
+
+> About possible naming of this new constant, AI suggested silent because "quiet" means that makes little or no noise and "silent" means that all noise is suppressed:
+
+This makes sense to me. +1 for `--silent` from me.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2024-09-19T07:46:32Z
+
+Funnily enough, I encountered this issue yesterday. I was annoyed by the fact `--quiet` still displays the error. I wanted to remove all output and just rely on `$?/$status` to understand if the command failed.
+
+Having a new `--silent` flag sounds like a good compromise. I'm 👍
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2024-09-19T11:13:09Z
+
+silent 🤫 is better wording 👌🏻
+
+---------------------------------------------------------------------------
+
+by wouterj at 2024-09-19T12:38:58Z
+
+Thanks for the feedback everyone!
+
+PR is now updated with a new `--silent` option. Decided to not add a shortcut (`-s`), as this can be quite conflicting with shortcut options defined by commands (and Symfony itself already uses it in the `CompleteCommand`). Besides, when reading this discussion, the new mode is a special programmatic case anyways and we recommend people running commands manually to keep using `-q` instead.
+
+---------------------------------------------------------------------------
+
+by wouterj at 2024-09-19T13:32:08Z
+
+Low deps failure is unrelated, flipped test failure will be fixed by #58320 if I understand correctly.
+
+---------------------------------------------------------------------------
+
+by wouterj at 2024-09-19T13:47:39Z
+
+@kbond adding a new global option is always a BC break, as it'll break commands that defined this option before (you'll get an exception when registering that command).
+I consider it a "minor backwards compatibility" that we allow in minor versions, but I thought it was good to flag it as BC break in the UPGRADE guide for better visibility.

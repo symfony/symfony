@@ -7,6 +7,31 @@ in 6.4 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v6.4.0...v6.4.1
 
+* 6.4.12 (2024-09-21)
+
+ * bug #58339 [Notifier] allow the Novu bridge to be used with symfony/notifier 7.x (xabbuh)
+ * bug #58327 [FrameworkBundle] Do not access the container when the kernel is shut down (jderusse)
+ * bug #58316 [Form] Don't call the constructor of LogicalOr (derrabus)
+ * bug #58290 [FrameworkBundle] fix XSD to allow to configure locks without resources (xabbuh)
+ * bug #58291 [Process] Fix finding executables independently of open_basedir (BlackbitDevs)
+ * bug #58279 [Yaml] parse empty sequence elements as null (xabbuh)
+ * bug #58289 [HttpKernel] Skip logging uncaught exceptions in `ErrorHandler`, assume `$kernel->terminateWithException()` will do it (nicolas-grekas)
+ * bug #58185 [Filesystem] make sure temp files can be cleaned up on Windows (xabbuh)
+ * bug #58226 [Serializer] Fix for method named `get()` (mihai-stancu)
+ * bug #58242 [Notifier][TurboSMS] Process partial accepted response from transport (ZhukV)
+ * bug #58260 [Cache] Fix RedisSentinel param types (Paweł Stasicki)
+ * bug #58278 [HttpClient] Fix setting `CURLMOPT_MAXCONNECTS` (HypeMC)
+ * bug #58274 [Dotenv] throw a meaningful exception when parsing dotenv files with BOM (xabbuh)
+ * bug #58240 [FrameworkBundle] Fix service reset between tests (HypeMC)
+ * bug #58266 [HttpKernel] pass CSV escape characters explicitly (xabbuh)
+ * bug #58181 [HttpFoundation] Update links for `X-Accel-Redirect` and fail properly when `X-Accel-Mapping` is missing (nicolas-grekas)
+ * bug #58195 [Process] Fix the removal of host-specific configuration when managing the ini settings in `PhpSubprocess` (M-arcus)
+ * bug #58218 Work around `parse_url()` bug (nicolas-grekas)
+ * bug #58207 [TwigBridge] Avoid calling deprecated mergeGlobals() (derrabus)
+ * bug #58198 [TwigBundle] Add support for resetting globals between HTTP requests (fabpot)
+ * bug #58169 [Cache] Fix compatibility with Redis 6.1.0 pre-releases (cedric-anne)
+ * bug #58143 [Ldap] Fix extension deprecation (alexandre-daubois)
+
 * 6.4.11 (2024-08-30)
 
  * bug #58110 [PropertyAccess] Fix handling property names with a `.` (alexandre-daubois)

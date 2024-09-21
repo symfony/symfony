@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Command;
+namespace Symfony\Component\Translation\Tests\Command;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Application;
@@ -34,8 +34,8 @@ class XliffUpdateSourcesCommandTest extends TestCase
     protected function setUp(): void
     {
         $this->fs = new Filesystem();
-        $this->translationAppDir = sprintf('%s/translation-xliff-update-source-test', sys_get_temp_dir());
-        $this->fs->mkdir(sprintf('%s/translations', $this->translationAppDir));
+        $this->translationAppDir = \sprintf('%s/translation-xliff-update-source-test', sys_get_temp_dir());
+        $this->fs->mkdir(\sprintf('%s/translations', $this->translationAppDir));
     }
 
     protected function tearDown(): void
@@ -108,7 +108,7 @@ class XliffUpdateSourcesCommandTest extends TestCase
 
     public function testFilesAreUpdatedInOtherTranslationPaths()
     {
-        $otherPath = sprintf('%s/other', $this->translationAppDir);
+        $otherPath = \sprintf('%s/other', $this->translationAppDir);
         $this->fs->mkdir($otherPath);
 
         $originalContent = $this->createXliff1('en', 'foo', 'foo', 'bar-en');
@@ -120,7 +120,7 @@ class XliffUpdateSourcesCommandTest extends TestCase
 
         $tester->assertCommandIsSuccessful();
 
-        $this->assertStringContainsString(sprintf('Updating XLIFF files in %s...', $otherPath), $tester->getDisplay());
+        $this->assertStringContainsString(\sprintf('Updating XLIFF files in %s...', $otherPath), $tester->getDisplay());
 
         $expectedContent = $this->createXliff1('en', 'foo', 'bar-en', 'bar-en');
 
@@ -128,14 +128,14 @@ class XliffUpdateSourcesCommandTest extends TestCase
         $this->assertStringEqualsFile($enFileInOtherDir, $expectedContent);
 
         // translations/messages.en.xlf should be updated
-        $this->assertStringContainsString(sprintf('Updating XLIFF files in %s/translations...', $this->translationAppDir), $tester->getDisplay());
+        $this->assertStringContainsString(\sprintf('Updating XLIFF files in %s/translations...', $this->translationAppDir), $tester->getDisplay());
         $this->assertStringEqualsFile($enFileInDefaultDir, $expectedContent);
     }
 
     public function testFilesAreUpdatedOnlyForPathsArgument()
     {
-        $fooDir = sprintf('%s/foo', $this->translationAppDir);
-        $barDir = sprintf('%s/bar', $this->translationAppDir);
+        $fooDir = \sprintf('%s/foo', $this->translationAppDir);
+        $barDir = \sprintf('%s/bar', $this->translationAppDir);
 
         $this->fs->mkdir([$fooDir, $barDir]);
 
@@ -150,11 +150,11 @@ class XliffUpdateSourcesCommandTest extends TestCase
 
         // foo/messages.en.xlf should be updated
         $updatedContent = $this->createXliff1('en', 'foo', 'bar-en', 'bar-en');
-        $this->assertStringContainsString(sprintf('Updating XLIFF files in %s...', $fooDir), $tester->getDisplay());
+        $this->assertStringContainsString(\sprintf('Updating XLIFF files in %s...', $fooDir), $tester->getDisplay());
         $this->assertStringEqualsFile($fileInFooDir, $updatedContent);
 
         // translations/messages.en.xlf shouldn't be updated
-        $this->assertStringNotContainsString(sprintf('Updating XLIFF files in %s/translations...', $this->translationAppDir), $tester->getDisplay());
+        $this->assertStringNotContainsString(\sprintf('Updating XLIFF files in %s/translations...', $this->translationAppDir), $tester->getDisplay());
         $this->assertStringEqualsFile($fileInDefaultDir, $originalContent);
     }
 
@@ -241,7 +241,7 @@ class XliffUpdateSourcesCommandTest extends TestCase
 
         foreach ($domainsByLocale as $locale => $domains) {
             foreach ($domains as $domain) {
-                $this->createFile($this->createXliff1($locale, 'foo', 'foo', 'bar'), sprintf('%s.%s.xlf', $domain, $locale));
+                $this->createFile($this->createXliff1($locale, 'foo', 'foo', 'bar'), \sprintf('%s.%s.xlf', $domain, $locale));
             }
         }
 
@@ -274,7 +274,7 @@ class XliffUpdateSourcesCommandTest extends TestCase
         $reader->addLoader('xlf', new XliffFileLoader());
         $writer = new TranslationWriter();
         $writer->addDumper('xlf', new XliffFileDumper());
-        $transPaths[] = sprintf('%s/translations', $this->translationAppDir);
+        $transPaths[] = \sprintf('%s/translations', $this->translationAppDir);
 
         $command = new XliffUpdateSourcesCommand($writer, $reader, 'en', $transPaths, $enabledLocales);
         $application->add($command);
@@ -323,7 +323,7 @@ XLIFF;
 
     private function createFile(string $content, string $filename, string $directory = 'translations'): string
     {
-        $filename = sprintf('%s/%s/%s', $this->translationAppDir, $directory, $filename);
+        $filename = \sprintf('%s/%s/%s', $this->translationAppDir, $directory, $filename);
         file_put_contents($filename, $content);
 
         return $filename;

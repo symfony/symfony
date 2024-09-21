@@ -58,7 +58,7 @@ class XliffUpdateSourcesCommand extends Command
                 new InputOption('locales', null, InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY, 'Specify the locale to update.', $this->enabledLocales),
             ])
             ->setHelp(<<<EOF
-The <info>%command.name%</info> command updates the source tags in XLIFF files with the default locale translation if available.
+The <info>%command.name%</info> command updates the source tags in XLIFF files with the default translation locale if available.
 
 You can specify directories to update in the command arguments:
 
@@ -84,7 +84,7 @@ EOF
         $format = $input->getOption('format');
 
         if (!\array_key_exists($format, self::FORMATS)) {
-            $io->error(sprintf('Unknown format "%s". Available formats are: %s.', $format, implode(', ', array_map(fn ($f) => '"'.$f.'"', array_keys(self::FORMATS)))));
+            $io->error(\sprintf('Unknown format "%s". Available formats are: %s.', $format, implode(', ', array_map(fn ($f) => '"'.$f.'"', array_keys(self::FORMATS)))));
 
             return self::INVALID;
         }
@@ -112,14 +112,14 @@ EOF
         $io->title('XLIFF Source Tag Updater');
 
         foreach ($transPaths as $transPath) {
-            $io->comment(sprintf('Updating XLIFF files in <info>%s</info>...', $transPath));
+            $io->comment(\sprintf('Updating XLIFF files in <info>%s</info>...', $transPath));
 
             $translatorBag = $this->readLocalTranslations(array_unique(array_merge($locales, [$this->defaultLocale])), $domains, [$transPath]);
 
             $defaultLocaleCatalogue = $translatorBag->getCatalogue($this->defaultLocale);
 
             if (!$defaultLocaleCatalogue instanceof MetadataAwareInterface) {
-                $io->error(sprintf('The default locale catalogue must implement "%s" to be used in this tool.', MetadataAwareInterface::class));
+                $io->error(\sprintf('The default locale catalogue must implement "%s" to be used by this command.', MetadataAwareInterface::class));
 
                 return self::FAILURE;
             }
@@ -128,13 +128,13 @@ EOF
                 $currentCatalogue = $translatorBag->getCatalogue($locale);
 
                 if (!$currentCatalogue instanceof MessageCatalogue) {
-                    $io->warning(sprintf('The catalogue for locale "%s" must be an instance of "%s" to be used in this tool.', $locale, MessageCatalogue::class));
+                    $io->warning(\sprintf('The catalogue for locale "%s" must be an instance of "%s" to be used by this command.', $locale, MessageCatalogue::class));
 
                     continue;
                 }
 
                 if (!\count($currentCatalogue->getDomains())) {
-                    $io->warning(sprintf('No messages found for locale "%s".', $locale));
+                    $io->warning(\sprintf('No messages found for locale "%s".', $locale));
 
                     continue;
                 }
@@ -161,9 +161,9 @@ EOF
                 $this->writer->write($currentCatalogue, $format, ['path' => $transPath, 'default_locale' => $this->defaultLocale, 'xliff_version' => $xliffVersion]);
 
                 if (0 === $updateSourceCount) {
-                    $message = sprintf('All source tags are already up-to-date for locale "%s".', $locale);
+                    $message = \sprintf('All source tags are already up-to-date for locale "%s".', $locale);
                 } else {
-                    $message = sprintf('Updated %d source tag%s for locale "%s".', $updateSourceCount, $updateSourceCount > 1 ? 's' : '', $locale);
+                    $message = \sprintf('Updated %d source tag%s for locale "%s".', $updateSourceCount, $updateSourceCount > 1 ? 's' : '', $locale);
                 }
 
                 $io->info($message);

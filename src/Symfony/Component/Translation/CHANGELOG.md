@@ -9,11 +9,11 @@ CHANGELOG
  * Deprecate passing an escape character to `CsvFileLoader::setCsvControl()`
  * Make Xliff 2.0 attributes in segment element available as `segment-attributes`
    metadata returned by `XliffFileLoader` and make `XliffFileDumper` write them to the file
+ * `XliffFileDumper` now uses the `source` metadata to create the `source` tag if available
 
 7.1
 ---
 
- * `XliffFileDumper` now uses the `source` metadata to create the `source` tag if available 
  * Mark class `DataCollectorTranslator` as `final`
 
 7.0

@@ -17,6 +17,7 @@ use Symfony\Component\HttpKernel\Attribute\MapRequestHeaders;
 use Symfony\Component\HttpKernel\Controller\ValueResolverInterface;
 use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
 use Symfony\Component\HttpKernel\Exception\HttpException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Serializer\Exception\PartialDenormalizationException;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\SerializerInterface;
@@ -67,21 +68,26 @@ class RequestHeaderValueResolver implements ValueResolverInterface
     {
         $type = $argument->getType();
 
-        if ('string' === $type || 'array' === $type) {
-            $name = $attribute->name ?? $argument->getName();
-
-            if (!isset($headers[$name])) {
-                return [null];
-            }
-
-            if ('string' === $type) {
-                return [$headers[$name]];
-            }
-
-            return [explode(',', $headers[$name])];
+        if ('string' !== $type && 'array' !== $type) {
+            throw new \LogicException(\sprintf('Could not resolve the argument typed "%s". Valid values types are "array" or "string".', $type));
         }
 
-        throw new \LogicException(sprintf('Could not resolve the argument typed "%s". Valid values types are "array" or "string".', $type));
+        $name = $attribute->name ?? $argument->getName();
+        $value = $headers[$name] ?? null;
+
+        if ($value === null) {
+            if (!$argument->isNullable()){
+                throw new NotFoundHttpException(\sprintf('Argument named "%s" not found.', $name));
+            }
+
+            return 'string' === $type ? [$value] : [[]];
+        }
+
+        if ('string' === $type) {
+            return [$value];
+        }
+
+        return [explode(',', $value)];
     }
 
     private function mapHeaderValuesToObject(array $headers, ArgumentMetadata $argument, MapRequestHeaders $attribute): array

@@ -19,6 +19,7 @@ use Symfony\Component\HttpKernel\Controller\ArgumentResolver\RequestHeaderValueR
 use Symfony\Component\HttpKernel\Controller\ValueResolverInterface;
 use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
 use Symfony\Component\HttpKernel\Exception\HttpException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -42,6 +43,19 @@ class RequestHeaderValueResolverTest extends TestCase
         $validator = (new ValidatorBuilder())->enableAttributeMapping()->getValidator();
         $this->resolver = new RequestHeaderValueResolver($serializer, $validator);
     }
+
+    public static function provideNoValueNullable(): iterable
+    {
+        yield 'with array type' => ['array', [[]]];
+        yield 'with string type' => ['string', [null]];
+    }
+
+    public static function provideNoValueNotNullable(): iterable
+    {
+        yield 'with array type' => ['array'];
+        yield 'with string type' => ['string'];
+    }
+
 
     public function testWithStringType()
     {
@@ -69,15 +83,33 @@ class RequestHeaderValueResolverTest extends TestCase
         }
     }
 
-    public function testWithNoValue()
+    /**
+     * @dataProvider provideNoValueNullable
+     */
+    public function testWithNoValueNullable(string $type, array $expected): void
     {
-        $metadata = new ArgumentMetadata('variableName', 'string', false, false, null, false, [
+        $metadata = new ArgumentMetadata('variableName', $type, false, false, null, true, [
             MapRequestHeader::class => new MapRequestHeader(),
         ]);
 
         $arguments = $this->resolver->resolve(Request::create('/'), $metadata);
 
-        self::assertEquals([null], $arguments);
+        self::assertEquals($expected, $arguments);
+    }
+
+    /**
+     * @dataProvider provideNoValueNotNullable
+     */
+    public function testWithNoValueNotNullable(string $type): void
+    {
+        self::expectException(NotFoundHttpException::class);
+        self::expectExceptionMessage('Argument named "variableName" not found.');
+
+        $metadata = new ArgumentMetadata('variableName', $type, false, false, null, false, [
+            MapRequestHeader::class => new MapRequestHeader(),
+        ]);
+
+        $this->resolver->resolve(Request::create('/'), $metadata);
     }
 
     public function testWithDtoAndErrorWithValidationGroups()

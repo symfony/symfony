@@ -126,6 +126,7 @@ class PropertyInfoLoaderTest extends TestCase
                 true,
                 true,
                 false,
+                true,
                 true
             )
         ;

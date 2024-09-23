@@ -119,7 +119,6 @@ final class Address
     }
 
     /**
-
       * Returns true if this address' localpart contains at least one
       * non-ASCII character, and false if it is only ASCII (or empty).
       *
@@ -133,8 +132,6 @@ final class Address
       * then it is possible to to send the message using IDN encoding
       * instead of SMTPUTF8. The most common software will display the
       * message as intended.
-      *
-      * @return bool
       */
     public function hasUnicodeLocalpart(): bool
     {

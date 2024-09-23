@@ -85,4 +85,17 @@ class Envelope
     {
         return $this->recipients;
     }
+
+    /**
+      * @return bool
+      */
+    public function anyAddressHasUnicodeLocalpart(): bool
+    {
+        if($this->sender->hasUnicodeLocalpart())
+            return true;
+        foreach($this->recipients as $r)
+            if($r->hasUnicodeLocalpart())
+                return true;
+        return false;
+    }
 }

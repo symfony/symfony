@@ -127,6 +127,19 @@ class EnvelopeTest extends TestCase
         $this->assertEquals([new Address('to@symfony.com'), new Address('cc@symfony.com'), new Address('bcc@symfony.com')], $e->getRecipients());
     }
 
+    public function testUnicodeLocalparts()
+    {
+        /* dømi means example and is reserved by the .fo registry */
+        $i = new Address('info@dømi.fo');
+        $d = new Address('dømi@dømi.fo');
+        $e = new Envelope($i, [$i]);
+        $this->assertFalse($e->anyAddressHasUnicodeLocalpart());
+        $e = new Envelope($i, [$d]);
+        $this->assertTrue($e->anyAddressHasUnicodeLocalpart());
+        $e = new Envelope($i, [$i, $d]);
+        $this->assertTrue($e->anyAddressHasUnicodeLocalpart());
+    }
+
     public function testRecipientsFromHeadersWithNames()
     {
         $headers = new Headers();

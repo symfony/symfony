@@ -29,13 +29,6 @@ class EnvelopeTest extends TestCase
         $this->assertEquals(new Address('fabien@symfony.com'), $e->getSender());
     }
 
-    public function testConstructorWithAddressSenderAndNonAsciiCharactersInLocalPartOfAddress()
-    {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Invalid sender "fabièn@symfony.com": non-ASCII characters not supported in local-part of email.');
-        new Envelope(new Address('fabièn@symfony.com'), [new Address('thomas@symfony.com')]);
-    }
-
     public function testConstructorWithNamedAddressSender()
     {
         $e = new Envelope($sender = new Address('fabien@symfony.com', 'Fabien'), [new Address('thomas@symfony.com')]);
@@ -79,14 +72,6 @@ class EnvelopeTest extends TestCase
         $headers->addMailboxListHeader('To', ['to@symfony.com']);
         $e = Envelope::create(new Message($headers));
         $this->assertEquals($from, $e->getSender());
-    }
-
-    public function testSenderFromHeadersFailsWithNonAsciiCharactersInLocalPart()
-    {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Invalid sender "fabièn@symfony.com": non-ASCII characters not supported in local-part of email.');
-        $message = new Message(new Headers(new PathHeader('Return-Path', new Address('fabièn@symfony.com'))));
-        Envelope::create($message)->getSender();
     }
 
     public function testSenderFromHeadersWithoutFrom()

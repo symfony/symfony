@@ -55,9 +55,9 @@ class FrozenParameterBag extends ParameterBag
         throw new LogicException('Impossible to call deprecate() on a frozen ParameterBag.');
     }
 
-    public function nonEmpty(string $name, string $message = 'A non-empty parameter "%s" is required.'): never
+    public function cannotBeEmpty(string $name, string $message = 'A non-empty parameter "%s" is required.'): never
     {
-        throw new LogicException('Impossible to call nonEmpty() on a frozen ParameterBag.');
+        throw new LogicException('Impossible to call cannotBeEmpty() on a frozen ParameterBag.');
     }
 
     public function remove(string $name): never

@@ -136,10 +136,10 @@ class Connection
 
                                 $sentinel = new \RedisSentinel($params);
                             } else {
-                                $sentinel = new $sentinelClass($host, $port, $options['timeout'], $options['persistent_id'], $options['retry_interval'], $options['read_timeout']);
+                                $sentinel = @new $sentinelClass($host, $port, $options['timeout'], $options['persistent_id'], $options['retry_interval'], $options['read_timeout']);
                             }
 
-                            if ($address = $sentinel->getMasterAddrByName($sentinelMaster)) {
+                            if ($address = @$sentinel->getMasterAddrByName($sentinelMaster)) {
                                 [$host, $port] = $address;
                             }
                         } catch (\RedisException|\Relay\Exception $redisException) {

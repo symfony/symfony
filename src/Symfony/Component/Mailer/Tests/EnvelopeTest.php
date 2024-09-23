@@ -83,7 +83,7 @@ class EnvelopeTest extends TestCase
         $this->assertEquals($from, $e->getSender());
     }
 
-    public function testSenderFromHeadersWithMulitpleHeaders()
+    public function testSenderFromHeadersWithMultipleHeaders()
     {
         $headers = new Headers();
         $headers->addMailboxListHeader('From', [new Address('from@symfony.com', 'from'), 'some@symfony.com']);

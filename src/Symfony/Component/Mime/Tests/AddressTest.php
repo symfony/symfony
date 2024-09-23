@@ -85,7 +85,7 @@ class AddressTest extends TestCase
     {
         /* dømi means example and is reserved by the .fo registry */
         $this->assertFalse((new Address('info@dømi.fo'))->hasUnicodeLocalpart());
-        $this->assertTrue((new Address('info@dømi.fo'))->hasUnicodeLocalpart());
+        $this->assertTrue((new Address('dømi@dømi.fo'))->hasUnicodeLocalpart());
     }
 
     public function testCreateArrayWrongArg()

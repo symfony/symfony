@@ -245,7 +245,7 @@ class SmtpTransport extends AbstractTransport
         }
     }
 
-    protected function serverSupportsSmtputf8(): bool
+    protected function serverSupportsSmtpUtf8(): bool
     {
         return false;
     }
@@ -257,7 +257,7 @@ class SmtpTransport extends AbstractTransport
 
     private function doMailFromCommand(string $address, bool $smtputf8): void
     {
-        if($smtputf8 && !$this->serverSupportsSmtputf8()) {
+        if($smtputf8 && !$this->serverSupportsSmtpUtf8()) {
             throw new InvalidArgumentException('Invalid addresses: non-ASCII characters not supported in local-part of email.');
         }
         $this->executeCommand(sprintf("MAIL FROM:<%s>%s\r\n", $address, ($smtputf8 ? " SMTPUTF8" : "")), [250]);

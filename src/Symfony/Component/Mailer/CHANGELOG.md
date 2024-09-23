@@ -5,7 +5,7 @@ CHANGELOG
 ---
 
  * Make `TransportFactoryTestCase` compatible with PHPUnit 10+
- * Support unicode email addresses such as "dømi@dømi.fo", no client changes needed
+ * Support unicode email addresses such as "dømi@dømi.fo"
 
 7.1
 ---

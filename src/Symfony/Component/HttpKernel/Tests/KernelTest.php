@@ -29,8 +29,6 @@ use Symfony\Component\HttpKernel\DependencyInjection\ServicesResetter;
 use Symfony\Component\HttpKernel\HttpKernel;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\Kernel;
-use Symfony\Component\HttpKernel\Tests\Fixtures\KernelForTest;
-use Symfony\Component\HttpKernel\Tests\Fixtures\KernelForTestWithLoadClassCache;
 use Symfony\Component\HttpKernel\Tests\Fixtures\KernelWithoutBundles;
 use Symfony\Component\HttpKernel\Tests\Fixtures\ResettableService;
 
@@ -247,7 +245,7 @@ class KernelTest extends TestCase
         $env = 'test_env';
         $debug = true;
         $kernel = new KernelForTest($env, $debug);
-        $expected = "O:57:\"Symfony\Component\HttpKernel\Tests\Fixtures\KernelForTest\":2:{s:14:\"\0*\0environment\";s:8:\"test_env\";s:8:\"\0*\0debug\";b:1;}";
+        $expected = \sprintf("O:48:\"%s\":2:{s:14:\"\0*\0environment\";s:8:\"test_env\";s:8:\"\0*\0debug\";b:1;}", KernelForTest::class);
         $this->assertEquals($expected, serialize($kernel));
     }
 
@@ -659,5 +657,53 @@ class PassKernel extends CustomProjectDirKernel implements CompilerPassInterface
     public function process(ContainerBuilder $container): void
     {
         $container->setParameter('test.processed', true);
+    }
+}
+
+class KernelForTest extends Kernel
+{
+    public function __construct(string $environment, bool $debug, private readonly bool $fakeContainer = true)
+    {
+        parent::__construct($environment, $debug);
+    }
+
+    public function getBundleMap(): array
+    {
+        return [];
+    }
+
+    public function registerBundles(): iterable
+    {
+        return [];
+    }
+
+    public function registerContainerConfiguration(LoaderInterface $loader): void
+    {
+    }
+
+    public function isBooted(): bool
+    {
+        return $this->booted;
+    }
+
+    public function getProjectDir(): string
+    {
+        return __DIR__;
+    }
+
+    protected function initializeContainer(): void
+    {
+        if ($this->fakeContainer) {
+            $this->container = new ContainerBuilder();
+        } else {
+            parent::initializeContainer();
+        }
+    }
+}
+
+class KernelForTestWithLoadClassCache extends KernelForTest
+{
+    public function doLoadClassCache(): void
+    {
     }
 }

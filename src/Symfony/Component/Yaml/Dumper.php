@@ -23,17 +23,13 @@ use Symfony\Component\Yaml\Tag\TaggedValue;
 class Dumper
 {
     /**
-     * The amount of spaces to use for indentation of nested nodes.
+     * @param int $indentation The amount of spaces to use for indentation of nested nodes
      */
-    private int $indentation;
-
-    public function __construct(int $indentation = 4)
+    public function __construct(private int $indentation = 4)
     {
         if ($indentation < 1) {
             throw new \InvalidArgumentException('The indentation must be greater than zero.');
         }
-
-        $this->indentation = $indentation;
     }
 
     /**

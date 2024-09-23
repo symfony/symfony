@@ -12,15 +12,20 @@
 namespace Symfony\Component\Validator\Tests\Constraints;
 
 use Symfony\Component\Validator\Constraint;
-use Symfony\Component\Validator\Constraints\AbstractComparison;
+use Symfony\Component\Validator\Constraints\GreaterThanValidator;
 use Symfony\Component\Validator\Constraints\Positive;
 use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 
 /**
  * @author Jan Schädlich <jan.schaedlich@sensiolabs.de>
  */
-class GreaterThanValidatorWithPositiveConstraintTest extends GreaterThanValidatorTest
+class GreaterThanValidatorWithPositiveConstraintTest extends AbstractComparisonValidatorTestCase
 {
+    protected function createValidator(): GreaterThanValidator
+    {
+        return new GreaterThanValidator();
+    }
+
     protected static function createConstraint(?array $options = null): Constraint
     {
         return new Positive($options);
@@ -33,6 +38,13 @@ class GreaterThanValidatorWithPositiveConstraintTest extends GreaterThanValidato
             [2.5, 0],
             ['333', '0'],
             [null, 0],
+        ];
+    }
+
+    public static function provideValidComparisonsToPropertyPath(): array
+    {
+        return [
+            [6],
         ];
     }
 
@@ -85,11 +97,6 @@ class GreaterThanValidatorWithPositiveConstraintTest extends GreaterThanValidato
         $this->markTestSkipped('PropertyPath option is not used in Positive constraint');
     }
 
-    public static function provideAllValidComparisons(): array
-    {
-        self::markTestSkipped('The "value" option cannot be used in the Positive constraint');
-    }
-
     /**
      * @dataProvider provideValidComparisonsToPropertyPath
      */
@@ -98,31 +105,8 @@ class GreaterThanValidatorWithPositiveConstraintTest extends GreaterThanValidato
         $this->markTestSkipped('PropertyPath option is not used in Positive constraint');
     }
 
-    /**
-     * @dataProvider throwsOnInvalidStringDatesProvider
-     */
-    public function testThrowsOnInvalidStringDates(AbstractComparison $constraint, $expectedMessage, $value)
-    {
-        $this->markTestSkipped('The compared value cannot be an invalid string date because it is hardcoded to 0.');
-    }
-
     public function testInvalidComparisonToPropertyPathAddsPathAsParameter()
     {
         $this->markTestSkipped('PropertyPath option is not used in Positive constraint');
-    }
-
-    public static function throwsOnInvalidStringDatesProvider(): array
-    {
-        self::markTestSkipped('The "value" option cannot be used in the Positive constraint');
-    }
-
-    public static function provideAllInvalidComparisons(): array
-    {
-        self::markTestSkipped('The "value" option cannot be used in the Positive constraint');
-    }
-
-    public static function provideComparisonsToNullValueAtPropertyPath(): array
-    {
-        self::markTestSkipped('PropertyPath option is not used in PositiveOrZero constraint');
     }
 }

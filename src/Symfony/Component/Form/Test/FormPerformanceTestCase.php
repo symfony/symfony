@@ -25,19 +25,25 @@ abstract class FormPerformanceTestCase extends FormIntegrationTestCase
 {
     use VersionAwareTest;
 
+    private float $startTime;
     protected int $maxRunningTime = 0;
 
-    protected function runTest(): mixed
+    protected function setUp(): void
     {
-        $s = microtime(true);
-        $result = parent::runTest();
-        $time = microtime(true) - $s;
+        parent::setUp();
+
+        $this->startTime = microtime(true);
+    }
+
+    protected function assertPostConditions(): void
+    {
+        parent::assertPostConditions();
+
+        $time = microtime(true) - $this->startTime;
 
         if (0 != $this->maxRunningTime && $time > $this->maxRunningTime) {
             $this->fail(\sprintf('expected running time: <= %s but was: %s', $this->maxRunningTime, $time));
         }
-
-        return $result;
     }
 
     /**

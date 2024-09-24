@@ -133,7 +133,7 @@ class DoctrineExtractor implements PropertyListExtractorInterface, PropertyTypeE
 
         // DBAL 4 has a special fallback strategy for BINGINT (int -> string)
         if (Types::BIGINT === $typeOfField && !method_exists(BigIntType::class, 'getName')) {
-            return Type::collection(Type::int(), Type::string());
+            return $nullable ? Type::nullable(Type::union(Type::int(), Type::string())) : Type::union(Type::int(), Type::string());
         }
 
         $enumType = null;

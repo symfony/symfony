@@ -286,7 +286,7 @@ class DoctrineExtractorTest extends TestCase
     {
         // DBAL 4 has a special fallback strategy for BINGINT (int -> string)
         if (!method_exists(BigIntType::class, 'getName')) {
-            $expectedBigIntType = Type::collection(Type::int(), Type::string());
+            $expectedBigIntType = Type::union(Type::int(), Type::string());
         } else {
             $expectedBigIntType = Type::string();
         }

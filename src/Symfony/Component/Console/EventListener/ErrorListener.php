@@ -37,7 +37,7 @@ class ErrorListener implements EventSubscriberInterface
 
         $error = $event->getError();
 
-        if (!$inputString = $this->getInputString($event)) {
+        if (!$inputString = self::getInputString($event)) {
             $this->logger->critical('An error occurred while using the console. Message: "{message}"', ['exception' => $error, 'message' => $error->getMessage()]);
 
             return;
@@ -58,7 +58,7 @@ class ErrorListener implements EventSubscriberInterface
             return;
         }
 
-        if (!$inputString = $this->getInputString($event)) {
+        if (!$inputString = self::getInputString($event)) {
             $this->logger->debug('The console exited with code "{code}"', ['code' => $exitCode]);
 
             return;

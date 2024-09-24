@@ -1572,7 +1572,7 @@ class Request
         $this->languages = [];
         foreach ($languages as $acceptHeaderItem) {
             $lang = $acceptHeaderItem->getValue();
-            $this->languages[] = $this->formatLocale($lang);
+            $this->languages[] = self::formatLocale($lang);
         }
         $this->languages = array_unique($this->languages);
 

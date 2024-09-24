@@ -88,7 +88,7 @@ final class MethodMarkingStore implements MarkingStoreInterface
         $property = $this->property;
         $method = 'get'.ucfirst($property);
 
-        return match ($this->getters[$subject::class] ??= $this->getType($subject, $property, $method)) {
+        return match ($this->getters[$subject::class] ??= self::getType($subject, $property, $method)) {
             MarkingStoreMethod::METHOD => $subject->{$method}(...),
             MarkingStoreMethod::PROPERTY => static fn () => $subject->{$property},
         };
@@ -99,7 +99,7 @@ final class MethodMarkingStore implements MarkingStoreInterface
         $property = $this->property;
         $method = 'set'.ucfirst($property);
 
-        return match ($this->setters[$subject::class] ??= $this->getType($subject, $property, $method)) {
+        return match ($this->setters[$subject::class] ??= self::getType($subject, $property, $method)) {
             MarkingStoreMethod::METHOD => $subject->{$method}(...),
             MarkingStoreMethod::PROPERTY => static fn ($marking) => $subject->{$property} = $marking,
         };

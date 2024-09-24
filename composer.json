@@ -182,10 +182,7 @@
     },
     "autoload": {
         "psr-4": {
-            "Symfony\\Bridge\\Doctrine\\": "src/Symfony/Bridge/Doctrine/",
-            "Symfony\\Bridge\\Monolog\\": "src/Symfony/Bridge/Monolog/",
-            "Symfony\\Bridge\\PsrHttpMessage\\": "src/Symfony/Bridge/PsrHttpMessage/",
-            "Symfony\\Bridge\\Twig\\": "src/Symfony/Bridge/Twig/",
+            "Symfony\\Bridge\\": "src/Symfony/Bridge/",
             "Symfony\\Bundle\\": "src/Symfony/Bundle/",
             "Symfony\\Component\\": "src/Symfony/Component/",
             "Symfony\\Runtime\\Symfony\\Component\\": "src/Symfony/Component/Runtime/Internal/"

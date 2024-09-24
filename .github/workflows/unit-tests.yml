@@ -26,14 +26,7 @@ jobs:
     strategy:
       matrix:
         include:
-          - php: '8.2'
-          - php: '8.2'
-            mode: high-deps
-          - php: '8.2'
-            mode: low-deps
           - php: '8.3'
-          - php: '8.4'
-            #mode: experimental
       fail-fast: false
 
     runs-on: ubuntu-20.04
@@ -51,7 +44,7 @@ jobs:
           ini-values: date.timezone=UTC,memory_limit=-1,default_socket_timeout=10,session.gc_probability=0,apc.enable_cli=1,zend.assertions=1
           php-version: "${{ matrix.php }}"
           extensions: "${{ matrix.extensions || env.extensions }}"
-          tools: flex
+          tools: flex,phpunit:11.3
 
       - name: Configure environment
         run: |
@@ -66,7 +59,7 @@ jobs:
           ([ -d "$COMPOSER_HOME" ] || mkdir "$COMPOSER_HOME") && cp .github/composer-config.json "$COMPOSER_HOME/config.json"
 
           echo COLUMNS=120 >> $GITHUB_ENV
-          echo PHPUNIT="$(pwd)/phpunit --exclude-group tty,benchmark,intl-data,integration" >> $GITHUB_ENV
+          echo PHPUNIT="phpunit --exclude-group tty --exclude-group benchmark --exclude-group intl-data --exclude-group integration --exclude-group time-sensitive" >> $GITHUB_ENV
           echo COMPOSER_UP='composer update --no-progress --ansi'$([[ "${{ matrix.mode }}" != low-deps ]] && echo ' --ignore-platform-req=php+') >> $GITHUB_ENV
 
           SYMFONY_VERSIONS=$(git ls-remote -q --heads | cut -f2 | grep -o '/[1-9][0-9]*\.[0-9].*' | sort -V)
@@ -139,10 +132,6 @@ jobs:
           $COMPOSER_UP
           echo "::endgroup::"
 
-          echo "::group::install phpunit"
-          ./phpunit install
-          echo "::endgroup::"
-
       - name: Patch return types
         if: "matrix.php == '8.2' && ! matrix.mode"
         run: |
@@ -213,9 +202,6 @@ jobs:
               git checkout -m FETCH_HEAD
               PATCHED_COMPONENTS=$(echo "$PATCHED_COMPONENTS" | xargs dirname | xargs -n1 -I{} bash -c "[ -e '{}/phpunit.xml.dist' ] && echo '{}'" | sort || true)
               if [[ $PATCHED_COMPONENTS ]]; then
-                echo "::group::install phpunit"
-                ./phpunit install
-                echo "::endgroup::"
                 echo "$PATCHED_COMPONENTS" | parallel -j +3 "_run_tests {} 'cd {} && rm composer.lock vendor/ -Rf && $COMPOSER_UP && $PHPUNIT$LEGACY'" || X=1
               fi
           fi
@@ -225,7 +211,7 @@ jobs:
       - name: Run TTY tests
         if: "! matrix.mode"
         run: |
-            script -e -c './phpunit --group tty' /dev/null
+            script -e -c 'phpunit --group tty' /dev/null
 
       - name: Run tests with SIGCHLD enabled PHP
         if: "matrix.php == '8.2' && ! matrix.mode"

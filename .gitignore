@@ -7,4 +7,7 @@ phpunit.xml
 composer.phar
 package.tar
 /packages.json
+/phpunit.phar
 /.phpunit
+/.phpunit.cache
+/.phpunit.result.cache

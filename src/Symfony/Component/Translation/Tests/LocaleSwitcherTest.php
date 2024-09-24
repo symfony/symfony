@@ -25,15 +25,11 @@ class LocaleSwitcherTest extends TestCase
 
     protected function setUp(): void
     {
-        parent::setUp();
-
         $this->intlLocale = \Locale::getDefault();
     }
 
     protected function tearDown(): void
     {
-        parent::tearDown();
-
         \Locale::setDefault($this->intlLocale);
     }
 

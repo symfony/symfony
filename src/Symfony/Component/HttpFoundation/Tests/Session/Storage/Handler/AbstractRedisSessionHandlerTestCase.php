@@ -31,8 +31,6 @@ abstract class AbstractRedisSessionHandlerTestCase extends TestCase
 
     protected function setUp(): void
     {
-        parent::setUp();
-
         if (!\extension_loaded('redis')) {
             self::markTestSkipped('Extension redis required.');
         }

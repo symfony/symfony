@@ -28,8 +28,6 @@ class DoctrineExtensionTest extends TestCase
 
     protected function setUp(): void
     {
-        parent::setUp();
-
         $this->extension = $this
             ->getMockBuilder(AbstractDoctrineExtension::class)
             ->onlyMethods([

@@ -28,15 +28,11 @@ class CompiledUrlMatcherDumperTest extends TestCase
 
     protected function setUp(): void
     {
-        parent::setUp();
-
         $this->dumpPath = tempnam(sys_get_temp_dir(), 'sf_matcher_');
     }
 
     protected function tearDown(): void
     {
-        parent::tearDown();
-
         @unlink($this->dumpPath);
     }
 

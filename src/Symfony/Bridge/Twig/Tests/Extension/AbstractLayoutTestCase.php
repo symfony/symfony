@@ -58,8 +58,6 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
     protected function tearDown(): void
     {
         \Locale::setDefault($this->defaultLocale);
-
-        parent::tearDown();
     }
 
     protected function assertWidgetMatchesXpath(FormView $view, array $vars, $xpath)

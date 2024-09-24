@@ -31,8 +31,6 @@ class DateTimeToLocalizedStringTransformerTest extends BaseDateTimeTransformerTe
 
     protected function setUp(): void
     {
-        parent::setUp();
-
         // Normalize intl. configuration settings.
         if (\extension_loaded('intl')) {
             $this->initialTestCaseUseException = ini_set('intl.use_exceptions', 0);

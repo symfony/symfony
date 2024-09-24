@@ -38,8 +38,6 @@ class MiddlewareTest extends TestCase
 
     protected function setUp(): void
     {
-        parent::setUp();
-
         if (!interface_exists(MiddlewareInterface::class)) {
             $this->markTestSkipped(\sprintf('%s needed to run this test', MiddlewareInterface::class));
         }

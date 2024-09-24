@@ -33,8 +33,6 @@ class MoneyTypeTest extends BaseTypeTestCase
 
     protected function tearDown(): void
     {
-        parent::tearDown();
-
         \Locale::setDefault($this->defaultLocale);
     }
 

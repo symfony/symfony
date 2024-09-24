@@ -21,7 +21,7 @@
         "psr/event-dispatcher": "^1",
         "psr/log": "^1|^2|^3",
         "symfony/event-dispatcher": "^6.4|^7.0",
-        "symfony/mime": "^6.4|^7.0",
+        "symfony/mime": "^7.2",
         "symfony/service-contracts": "^2.5|^3"
     },
     "require-dev": {

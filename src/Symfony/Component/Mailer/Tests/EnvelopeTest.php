@@ -13,11 +13,9 @@ namespace Symfony\Component\Mailer\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Mailer\Envelope;
-use Symfony\Component\Mailer\Exception\InvalidArgumentException;
 use Symfony\Component\Mailer\Exception\LogicException;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Header\Headers;
-use Symfony\Component\Mime\Header\PathHeader;
 use Symfony\Component\Mime\Message;
 use Symfony\Component\Mime\RawMessage;
 

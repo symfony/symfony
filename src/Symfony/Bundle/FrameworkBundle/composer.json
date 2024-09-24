@@ -86,6 +86,7 @@
         "symfony/mime": "<4.4",
         "symfony/property-info": "<4.4",
         "symfony/property-access": "<5.3",
+        "symfony/runtime": "<5.4.45|>=6.0,<6.4.13|>=7.0,<7.1.6",
         "symfony/serializer": "<5.2",
         "symfony/service-contracts": ">=3.0",
         "symfony/security-csrf": "<5.3",

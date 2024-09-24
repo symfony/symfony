@@ -1,0 +1,30 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2024-09-24T08:12:06Z
+
+Hey!
+
+Thanks for your PR. You are targeting branch "7.2" but it seems your PR description refers to branch "7.1".
+Could you update the PR description or change target branch? This helps core maintainers a lot.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2024-09-24T08:26:24Z
+
+Is there a way to cover this case with tests?
+
+---------------------------------------------------------------------------
+
+by mtarld at 2024-09-24T08:28:58Z
+
+This case was already covered with tests, but tests were wrong as well (see https://github.com/symfony/symfony/pull/58371/files#diff-9c2d5e331a5ea6faf2c82cd0cbccf084d3b38ad9d640a8c0f88dc1ab0975ededL289)
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2024-09-24T08:36:01Z
+
+Ah yes, I didn't see that the line came from a test. Nice 👍

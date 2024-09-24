@@ -57,7 +57,7 @@ class DebugHandlersListener implements EventSubscriberInterface
             $deprecationLogger = $fileLinkFormat;
         }
 
-        $handler = set_exception_handler('is_int');
+        $handler = set_exception_handler('var_dump');
         $this->earlyHandler = \is_array($handler) ? $handler[0] : null;
         restore_exception_handler();
 
@@ -84,7 +84,7 @@ class DebugHandlersListener implements EventSubscriberInterface
         $this->firstCall = $this->hasTerminatedWithException = false;
         $hasRun = null;
 
-        $handler = set_exception_handler('is_int');
+        $handler = set_exception_handler('var_dump');
         $handler = \is_array($handler) ? $handler[0] : null;
         restore_exception_handler();
 

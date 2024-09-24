@@ -60,6 +60,7 @@ use Symfony\Component\Messenger\DependencyInjection\MessengerPass;
 use Symfony\Component\Mime\DependencyInjection\AddMimeTypeGuesserPass;
 use Symfony\Component\PropertyInfo\DependencyInjection\PropertyInfoPass;
 use Symfony\Component\Routing\DependencyInjection\RoutingResolverPass;
+use Symfony\Component\Runtime\SymfonyRuntime;
 use Symfony\Component\Serializer\DependencyInjection\SerializerPass;
 use Symfony\Component\Translation\DependencyInjection\TranslationDumperPass;
 use Symfony\Component\Translation\DependencyInjection\TranslationExtractorPass;
@@ -91,7 +92,16 @@ class FrameworkBundle extends Bundle
 {
     public function boot()
     {
-        ErrorHandler::register(null, false)->throwAt($this->container->getParameter('debug.error_handler.throw_at'), true);
+        if (class_exists(SymfonyRuntime::class)) {
+            $handler = set_error_handler('var_dump');
+            restore_error_handler();
+        } else {
+            $handler = [ErrorHandler::register(null, false)];
+        }
+
+        if (\is_array($handler) && $handler[0] instanceof ErrorHandler) {
+            $handler[0]->throwAt($this->container->getParameter('debug.error_handler.throw_at'), true);
+        }
 
         if ($this->container->getParameter('kernel.http_method_override')) {
             Request::enableHttpMethodParameterOverride();

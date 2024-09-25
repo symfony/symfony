@@ -57,6 +57,7 @@ use Symfony\Component\Mime\DependencyInjection\AddMimeTypeGuesserPass;
 use Symfony\Component\PropertyInfo\DependencyInjection\PropertyInfoPass;
 use Symfony\Component\Routing\DependencyInjection\AddExpressionLanguageProvidersPass;
 use Symfony\Component\Routing\DependencyInjection\RoutingResolverPass;
+use Symfony\Component\Runtime\SymfonyRuntime;
 use Symfony\Component\Scheduler\DependencyInjection\AddScheduleMessengerPass;
 use Symfony\Component\Serializer\DependencyInjection\SerializerPass;
 use Symfony\Component\Translation\DependencyInjection\DataCollectorTranslatorPass;
@@ -95,9 +96,16 @@ class FrameworkBundle extends Bundle
     {
         $_ENV['DOCTRINE_DEPRECATIONS'] = $_SERVER['DOCTRINE_DEPRECATIONS'] ??= 'trigger';
 
-        $handler = ErrorHandler::register(null, false);
+        if (class_exists(SymfonyRuntime::class)) {
+            $handler = set_error_handler('var_dump');
+            restore_error_handler();
+        } else {
+            $handler = [ErrorHandler::register(null, false)];
+        }
 
-        $this->container->get('debug.error_handler_configurator')->configure($handler);
+        if (\is_array($handler) && $handler[0] instanceof ErrorHandler) {
+            $this->container->get('debug.error_handler_configurator')->configure($handler[0]);
+        }
 
         if ($this->container->getParameter('kernel.http_method_override')) {
             Request::enableHttpMethodParameterOverride();

@@ -1,5 +1,5 @@
 <!-- START of Symfony Web Debug Toolbar -->
-<div id="sfwdt{{ token }}" class="sf-toolbar sf-toolbar-closed" role="region" aria-label="Symfony Web Debug Toolbar">
+<div id="sfwdt{{ token }}" class="sf-toolbar sf-toolbar-opened" role="region" aria-label="Symfony Web Debug Toolbar">
     {{ include('@WebProfiler/Profiler/toolbar.html.twig', {
         templates: {
             'request': '@WebProfiler/Profiler/cancel.html.twig'
@@ -9,7 +9,6 @@
         profiler_markup_version: 3,
     }) }}
 </div>
-<!-- END of Symfony Web Debug Toolbar -->
 
 <style{% if csp_style_nonce %} nonce="{{ csp_style_nonce }}"{% endif %}>
     {{ include('@WebProfiler/Profiler/toolbar.css.twig') }}
@@ -459,18 +458,18 @@
                     var sfwdt = this.getSfwdt(token);
 
                     if ('closed' === getPreference('toolbar/displayState')) {
-                        sfwdt.classList.add('sf-toolbar-closed');
-                        sfwdt.classList.remove('sf-toolbar-opened');
+                        addClass(sfwdt, 'sf-toolbar-closed');
+                        removeClass(sfwdt, 'sf-toolbar-opened');
                     } else {
-                        sfwdt.classList.add('sf-toolbar-opened');
-                        sfwdt.classList.remove('sf-toolbar-closed');
+                        addClass(sfwdt, 'sf-toolbar-opened');
+                        removeClass(sfwdt, 'sf-toolbar-closed');
                     }
                 },
 
                 hideToolbar: function(token) {
                     var sfwdt = this.getSfwdt(token);
-                    sfwdt.classList.add('sf-toolbar-closed');
-                    sfwdt.classList.remove('sf-toolbar-opened');
+                    addClass(sfwdt, 'sf-toolbar-closed');
+                    removeClass(sfwdt, 'sf-toolbar-opened');
                 },
 
                 initToolbar: function(token) {
@@ -631,3 +630,4 @@
 
     Sfjs.loadToolbar('{{ token }}');
 /*]]>*/</script>
+<!-- END of Symfony Web Debug Toolbar -->

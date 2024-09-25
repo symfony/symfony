@@ -92,6 +92,7 @@
         "symfony/mime": "<6.4",
         "symfony/property-info": "<6.4",
         "symfony/property-access": "<6.4",
+        "symfony/runtime": "<6.4.13|>=7.0,<7.1.6",
         "symfony/scheduler": "<6.4.4|>=7.0.0,<7.0.4",
         "symfony/serializer": "<6.4",
         "symfony/security-csrf": "<6.4",

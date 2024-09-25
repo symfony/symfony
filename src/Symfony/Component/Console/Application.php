@@ -161,9 +161,9 @@ class Application implements ResetInterface
             }
         }
 
-        $this->configureIO($input, $output);
-
         try {
+            $this->configureIO($input, $output);
+
             $exitCode = $this->doRun($input, $output);
         } catch (\Throwable $e) {
             if ($e instanceof \Exception && !$this->catchExceptions) {

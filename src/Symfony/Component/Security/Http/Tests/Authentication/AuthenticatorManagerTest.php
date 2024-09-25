@@ -368,7 +368,7 @@ class AuthenticatorManagerTest extends TestCase
         $manager = $this->createManager([$authenticator], 'main', true, [], $logger);
         $response = $manager->authenticateRequest($this->request);
         $this->assertSame($this->response, $response);
-        $this->assertStringContainsString('Mock_TestInteractiveAuthenticator', $logger->logContexts[0]['authenticator']);
+        $this->assertStringContainsString($authenticator::class, $logger->logContexts[0]['authenticator']);
     }
 
     private function createAuthenticator(?bool $supports = true)

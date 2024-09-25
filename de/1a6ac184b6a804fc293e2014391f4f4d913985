@@ -1,0 +1,45 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2024-09-24T11:32:43Z
+
+@derrabus FYI as you used the same workaround for Twig
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-09-24T13:12:02Z
+
+I'm wondering about merging this in 6.4 :thinking:
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-09-24T13:42:16Z
+
+Rebased on 6.4
+
+---------------------------------------------------------------------------
+
+by derrabus at 2024-09-25T08:07:20Z
+
+Thank you. I'm a bit reluctant to merge this as a bugfix because of the change in behavior though.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2024-09-25T08:14:43Z
+
+Then again, not having this change on 6.4 means we need to keep those bootstrap files for low-deps testing. Difficult decision. 🙈
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2024-09-25T12:21:26Z
+
+The test failures are related, aren't they?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-09-25T13:37:06Z
+
+> The test failures are related, aren't they?
+
+yes they are, this line is deprecated indeed when $debug = false: `ini_set('assert.active', $debug);`
+
+PR updated

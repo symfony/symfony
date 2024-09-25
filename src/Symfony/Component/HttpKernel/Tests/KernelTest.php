@@ -523,6 +523,25 @@ class KernelTest extends TestCase
         $this->assertMatchesRegularExpression('/^[a-zA-Z_\x80-\xff][a-zA-Z0-9_\x80-\xff]*TestDebugContainer$/', $kernel->getContainerClass());
     }
 
+    public function testTrustedParameters()
+    {
+        $kernel = new CustomProjectDirKernel(function (ContainerBuilder $container) {
+            $container->setParameter('kernel.trusted_hosts', '^a{2,3}.com$, ^b{2,}.com$');
+            $container->setParameter('kernel.trusted_proxies', 'a,b');
+            $container->setParameter('kernel.trusted_headers', 'x-forwarded-for');
+        });
+        $kernel->boot();
+
+        try {
+            $this->assertSame(['{^a{2,3}.com$}i', '{^b{2,}.com$}i'], Request::getTrustedHosts());
+            $this->assertSame(['a', 'b'], Request::getTrustedProxies());
+            $this->assertSame(Request::HEADER_X_FORWARDED_FOR, Request::getTrustedHeaderSet());
+        } finally {
+            Request::setTrustedHosts([]);
+            Request::setTrustedProxies([], 0);
+        }
+    }
+
     /**
      * Returns a mock for the BundleInterface.
      */

@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-09-23T09:48:07Z
+
+From https://docs.github.com/en/actions/managing-workflow-runs-and-deployments/managing-workflow-runs/approving-workflow-runs-from-public-forks
+
+>Workflows triggered by pull_request_target events are run in the context of the base branch. Since the base branch is considered trusted, workflows triggered by these events will always run, regardless of approval settings. For more information about the pull_request_target event, see "[Events that trigger workflows](https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#pull_request_target)."
+
+I'm not sure why this didn't work. We might try on a dummy repo to confirm which approachs works?
+
+---------------------------------------------------------------------------
+
+by dunglas at 2024-09-23T10:36:57Z
+
+For API Platform, we use https://github.com/superbrothers/close-pull-request.
+
+Laravel uses the same action. It works well.
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2024-09-23T11:29:49Z
+
+Adding the close-pull-request action, as it seems to work even for new contributor. On the other hand, @nicolas-grekas your script was expecting the GitHub credentials, that could explain why it's blocked for new contributors.

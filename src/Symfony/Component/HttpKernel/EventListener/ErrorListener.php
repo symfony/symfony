@@ -104,11 +104,11 @@ class ErrorListener implements EventSubscriberInterface
 
         $throwable = $event->getThrowable();
 
-        if ($exceptionHandler = set_exception_handler(var_dump(...))) {
-            restore_exception_handler();
-            if (\is_array($exceptionHandler) && $exceptionHandler[0] instanceof ErrorHandler) {
-                $throwable = $exceptionHandler[0]->enhanceError($event->getThrowable());
-            }
+        $exceptionHandler = set_exception_handler('var_dump');
+        restore_exception_handler();
+
+        if (\is_array($exceptionHandler) && $exceptionHandler[0] instanceof ErrorHandler) {
+            $throwable = $exceptionHandler[0]->enhanceError($event->getThrowable());
         }
 
         $request = $this->duplicateRequest($throwable, $event->getRequest());

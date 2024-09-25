@@ -24,12 +24,31 @@ class SymfonyErrorHandler
 {
     public static function register(bool $debug): void
     {
-        BasicErrorHandler::register($debug);
+        if (!class_exists(ErrorHandler::class)) {
+            BasicErrorHandler::register($debug);
 
-        if (class_exists(ErrorHandler::class)) {
-            DebugClassLoader::enable();
-            restore_error_handler();
-            ErrorHandler::register(new ErrorHandler(new BufferingLogger(), $debug));
+            return;
         }
+
+        error_reporting(-1);
+
+        if (!\in_array(\PHP_SAPI, ['cli', 'phpdbg', 'embed'], true)) {
+            ini_set('display_errors', $debug);
+        } elseif (!filter_var(\ini_get('log_errors'), \FILTER_VALIDATE_BOOL) || \ini_get('error_log')) {
+            // CLI - display errors only if they're not already logged to STDERR
+            ini_set('display_errors', 1);
+        }
+
+        if (0 <= \ini_get('zend.assertions')) {
+            ini_set('zend.assertions', (int) $debug);
+        }
+        ini_set('assert.active', 1);
+        ini_set('assert.exception', 1);
+
+        if ($debug) {
+            DebugClassLoader::enable();
+        }
+
+        ErrorHandler::register(new ErrorHandler(new BufferingLogger(), $debug));
     }
 }

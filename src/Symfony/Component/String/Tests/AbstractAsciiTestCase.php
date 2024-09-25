@@ -1090,6 +1090,35 @@ abstract class AbstractAsciiTestCase extends TestCase
     }
 
     /**
+     * @dataProvider provideKebab
+     */
+    public function testKebab(string $expectedString, string $origin)
+    {
+        $instance = static::createFromString($origin)->kebab();
+
+        $this->assertEquals(static::createFromString($expectedString), $instance);
+        $this->assertNotSame($origin, $instance, 'Strings should be immutable');
+    }
+
+    public static function provideKebab(): array
+    {
+        return [
+            ['', ''],
+            ['x-y', 'x_y'],
+            ['x-y', 'X_Y'],
+            ['xu-yo', 'xu_yo'],
+            ['symfony-is-great', 'symfonyIsGreat'],
+            ['symfony123-is-great', 'symfony123IsGreat'],
+            ['symfony123is-great', 'symfony123isGreat'],
+            ['symfony-is-great', 'Symfony is great'],
+            ['symfony-is-a-great-framework', 'symfonyIsAGreatFramework'],
+            ['symfony-is-great', 'symfonyIsGREAT'],
+            ['symfony-is-really-great', 'symfonyIsREALLYGreat'],
+            ['symfony', 'SYMFONY'],
+        ];
+    }
+
+    /**
      * @dataProvider provideStartsWith
      */
     public function testStartsWith(bool $expected, string $origin, $prefix, ?int $form = null)

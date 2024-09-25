@@ -433,6 +433,11 @@ abstract class AbstractString implements \Stringable, \JsonSerializable
 
     abstract public function snake(): static;
 
+    public function kebab(): static
+    {
+        return $this->snake()->replace('_', '-');
+    }
+
     abstract public function splice(string $replacement, int $start = 0, ?int $length = null): static;
 
     /**

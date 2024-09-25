@@ -665,6 +665,15 @@ END'],
         );
     }
 
+    public static function provideKebab(): array
+    {
+        return [
+            ...parent::provideKebab(),
+            ['symfony-ist-äußerst-cool', 'symfonyIstÄußerstCool'],
+            ['symfony-with-emojis', 'Symfony with 😃 emojis'],
+        ];
+    }
+
     public static function provideEqualsTo()
     {
         return array_merge(

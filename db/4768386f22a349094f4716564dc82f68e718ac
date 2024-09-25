@@ -1,0 +1,9 @@
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2024-09-25T07:36:13Z
+
+> All the PHPUnit assertions are static methods called on $this
+
+Unfortunately, this is not exactly true. There are more than 1200 occurrences of `self::assert` in the codebase. I know there's a will to make this consistent, once there's a way to automate the change in the CI (with fabbot for instance). I can't find the discussion again though.
+
+But this is why I didn't make the change on tests. There are just too many and the decision hasn't been fully made. I think however that it's always good thing to be fully accurate on (non) static calls elsewhere in sources, especially since there are only 8 occurrences of "wrong" calls.

@@ -12,6 +12,7 @@
 namespace Symfony\Component\Serializer\Tests\NameConverter;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Serializer\Attribute\SerializedName;
 use Symfony\Component\Serializer\Attribute\SerializedPath;
 use Symfony\Component\Serializer\Exception\LogicException;
@@ -101,6 +102,7 @@ final class MetadataAwareNameConverterTest extends TestCase
             ['foo', 'baz'],
             ['bar', 'qux'],
             ['quux', 'quux'],
+            ['duux', 'duxi'],
             [0, 0],
         ];
     }
@@ -111,6 +113,7 @@ final class MetadataAwareNameConverterTest extends TestCase
             ['foo', 'baz'],
             ['bar', 'qux'],
             ['quux', 'QUUX'],
+            ['duux', 'duxi'],
             [0, 0],
         ];
     }
@@ -128,6 +131,24 @@ final class MetadataAwareNameConverterTest extends TestCase
     }
 
     /**
+     * @dataProvider fallbackAttributeAndContextProvider
+     */
+    public function testNormalizeWithGroupsAndFallback(string $propertyName, string $expected, array $context = [])
+    {
+        $classMetadataFactory = new ClassMetadataFactory(new AttributeLoader());
+
+        $fallback = $this->createMock(NameConverterInterface::class);
+        $fallback
+            ->method('normalize')
+            ->willReturnCallback(static fn ($propertyName) => strtoupper($propertyName))
+        ;
+
+        $nameConverter = new MetadataAwareNameConverter($classMetadataFactory, $fallback);
+
+        $this->assertSame($expected, $nameConverter->normalize($propertyName, OtherSerializedNameDummy::class, null, $context));
+    }
+
+    /**
      * @dataProvider attributeAndContextProvider
      */
     public function testDenormalizeWithGroups(string $expected, string $propertyName, array $context = [])
@@ -137,6 +158,24 @@ final class MetadataAwareNameConverterTest extends TestCase
         $nameConverter = new MetadataAwareNameConverter($classMetadataFactory);
 
         $this->assertEquals($expected, $nameConverter->denormalize($propertyName, OtherSerializedNameDummy::class, null, $context));
+    }
+
+    /**
+     * @dataProvider fallbackAttributeAndContextProvider
+     */
+    public function testDenormalizeWithGroupsAndFallback(string $expected, string $propertyName, array $context = [])
+    {
+        $classMetadataFactory = new ClassMetadataFactory(new AttributeLoader());
+
+        $fallback = $this->createMock(NameConverterInterface::class);
+        $fallback
+            ->method('denormalize')
+            ->willReturnCallback(static fn ($propertyName) => strtolower($propertyName))
+        ;
+
+        $nameConverter = new MetadataAwareNameConverter($classMetadataFactory, $fallback);
+
+        $this->assertSame($expected, $nameConverter->denormalize($propertyName, OtherSerializedNameDummy::class, null, $context));
     }
 
     public static function attributeAndContextProvider(): array
@@ -149,6 +188,37 @@ final class MetadataAwareNameConverterTest extends TestCase
             ['buz', 'buz', ['groups' => ['c']]],
             ['buz', 'buz', []],
             ['buzForExport', 'buz', ['groups' => ['*']]],
+            ['duux', 'duxi', []],
+            ['duux', 'duxi', ['groups' => ['*']]],
+            ['duux', 'duxa', ['groups' => ['a']]],
+            ['duux', 'duxi', ['groups' => ['z']]],
+            ['puux', 'puux', []],
+            ['puux', 'puux', ['groups' => ['*']]],
+            ['puux', 'puxi', ['groups' => ['i']]],
+            ['puux', 'puxa', ['groups' => ['a']]],
+            ['puux', 'puux', ['groups' => ['z']]],
+        ];
+    }
+
+    public static function fallbackAttributeAndContextProvider(): array
+    {
+        return [
+            ['buz', 'BUZ', ['groups' => ['a']]],
+            ['buzForExport', 'buz', ['groups' => ['b']]],
+            ['buz', 'BUZ', ['groups' => 'a']],
+            ['buzForExport', 'buz', ['groups' => 'b']],
+            ['buz', 'BUZ', ['groups' => ['c']]],
+            ['buz', 'BUZ', []],
+            ['buzForExport', 'buz', ['groups' => ['*']]],
+            ['duux', 'duxi', []],
+            ['duux', 'duxi', ['groups' => ['*']]],
+            ['duux', 'duxa', ['groups' => ['a']]],
+            ['duux', 'duxi', ['groups' => ['z']]],
+            ['puux', 'PUUX', []],
+            ['puux', 'PUUX', ['groups' => ['*']]],
+            ['puux', 'puxi', ['groups' => ['i']]],
+            ['puux', 'puxa', ['groups' => ['a']]],
+            ['puux', 'PUUX', ['groups' => ['z']]],
         ];
     }
 
@@ -169,7 +239,23 @@ final class MetadataAwareNameConverterTest extends TestCase
         $nameConverter = new MetadataAwareNameConverter($classMetadataFactory);
         $this->expectException(LogicException::class);
         $this->expectExceptionMessage('Found SerializedName and SerializedPath attributes on property "foo" of class "Symfony\Component\Serializer\Tests\NameConverter\NestedPathAndName".');
-        $nameConverter->denormalize('foo', NestedPathAndName::class);
+        $nameConverter->denormalize('five', NestedPathAndName::class);
+    }
+
+    public function testDenormalizeWithNestedPathAndNameSameGroup()
+    {
+        $classMetadataFactory = new ClassMetadataFactory(new AttributeLoader());
+        $nameConverter = new MetadataAwareNameConverter($classMetadataFactory);
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('Found SerializedName and SerializedPath attributes on property "bar" of class "Symfony\Component\Serializer\Tests\NameConverter\NestedPathAndNameSameGroup".');
+        $nameConverter->denormalize('eight', NestedPathAndNameSameGroup::class, null, ['groups' => 'a']);
+    }
+
+    public function testDenormalizeWithNestedPathAndNameDifferentGroups()
+    {
+        $classMetadataFactory = new ClassMetadataFactory(new AttributeLoader());
+        $nameConverter = new MetadataAwareNameConverter($classMetadataFactory);
+        $this->assertSame('baz', $nameConverter->denormalize('eleven', NestedPathAndNameDifferentGroups::class, null, ['groups' => 'a']));
     }
 
     public function testNormalizeWithNestedPathAndName()
@@ -180,10 +266,38 @@ final class MetadataAwareNameConverterTest extends TestCase
         $this->expectExceptionMessage('Found SerializedName and SerializedPath attributes on property "foo" of class "Symfony\Component\Serializer\Tests\NameConverter\NestedPathAndName".');
         $nameConverter->normalize('foo', NestedPathAndName::class);
     }
+
+    public function testNormalizeWithNestedPathAndNameSameGroup()
+    {
+        $classMetadataFactory = new ClassMetadataFactory(new AttributeLoader());
+        $nameConverter = new MetadataAwareNameConverter($classMetadataFactory);
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('Found SerializedName and SerializedPath attributes on property "bar" of class "Symfony\Component\Serializer\Tests\NameConverter\NestedPathAndNameSameGroup".');
+        $nameConverter->normalize('bar', NestedPathAndNameSameGroup::class, null, ['groups' => 'a']);
+    }
+
+    public function testNormalizeWithNestedPathAndNameDifferentGroups()
+    {
+        $classMetadataFactory = new ClassMetadataFactory(new AttributeLoader());
+        $nameConverter = new MetadataAwareNameConverter($classMetadataFactory);
+        $this->assertSame('eleven', $nameConverter->normalize('baz', NestedPathAndNameDifferentGroups::class, null, ['groups' => 'a']));
+    }
 }
 
 class NestedPathAndName
 {
     #[SerializedName('five'), SerializedPath('[one][two][three]')]
     public $foo;
+}
+
+class NestedPathAndNameSameGroup
+{
+    #[Groups(['a']), SerializedName('eight', 'a'), SerializedPath('[four][five][six]', 'a')]
+    public $bar;
+}
+
+class NestedPathAndNameDifferentGroups
+{
+    #[Groups(['a', 'b']), SerializedName('eleven', 'a'), SerializedPath('[seven][eight][nine]', 'b')]
+    public $baz;
 }

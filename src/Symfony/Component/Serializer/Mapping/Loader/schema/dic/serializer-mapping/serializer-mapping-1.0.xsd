@@ -62,6 +62,7 @@
         </xsd:annotation>
         <xsd:choice minOccurs="0" maxOccurs="unbounded">
             <xsd:element name="group" type="xsd:string" maxOccurs="unbounded" />
+            <xsd:element name="serialized" type="serialized" maxOccurs="unbounded" />
             <xsd:element name="context" type="context" maxOccurs="unbounded" />
             <xsd:element name="normalization_context" type="context" maxOccurs="unbounded" />
             <xsd:element name="denormalization_context" type="context" maxOccurs="unbounded" />
@@ -74,21 +75,17 @@
                 </xsd:restriction>
             </xsd:simpleType>
         </xsd:attribute>
-        <xsd:attribute name="serialized-name">
-            <xsd:simpleType>
-                <xsd:restriction base="xsd:string">
-                    <xsd:minLength value="1" />
-                </xsd:restriction>
-            </xsd:simpleType>
-        </xsd:attribute>
-        <xsd:attribute name="serialized-path">
-            <xsd:simpleType>
-                <xsd:restriction base="xsd:string">
-                    <xsd:minLength value="1" />
-                </xsd:restriction>
-            </xsd:simpleType>
-        </xsd:attribute>
+        <xsd:attribute name="serialized-name" type="serialized-name-or-path" />
+        <xsd:attribute name="serialized-path" type="serialized-name-or-path" />
         <xsd:attribute name="ignore" type="xsd:boolean" />
+    </xsd:complexType>
+
+    <xsd:complexType name="serialized">
+        <xsd:sequence minOccurs="0">
+            <xsd:element name="group" type="xsd:string" minOccurs="0" maxOccurs="unbounded" />
+        </xsd:sequence>
+        <xsd:attribute name="name" type="serialized-name-or-path" />
+        <xsd:attribute name="path" type="serialized-name-or-path" />
     </xsd:complexType>
 
     <xsd:complexType name="context">
@@ -111,5 +108,11 @@
         </xsd:sequence>
         <xsd:attribute type="xsd:string" name="name" />
     </xsd:complexType>
+
+    <xsd:simpleType name="serialized-name-or-path">
+        <xsd:restriction base="xsd:string">
+            <xsd:minLength value="1" />
+        </xsd:restriction>
+    </xsd:simpleType>
 
 </xsd:schema>

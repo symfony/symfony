@@ -36,43 +36,47 @@ class DebugCommandTest extends TestCase
             Symfony\Component\Serializer\Tests\Dummy\DummyClassOne
             ------------------------------------------------------
 
-            +----------+---------------------------------------+
-            | Property | Options                               |
-            +----------+---------------------------------------+
-            | code     | [                                     |
-            |          |   "groups" => [                       |
-            |          |     "book:read",                      |
-            |          |     "book:write"                      |
-            |          |   ],                                  |
-            |          |   "maxDepth" => 1,                    |
-            |          |   "serializedName" => "identifier",   |
-            |          |   "serializedPath" => null,           |
-            |          |   "ignore" => true,                   |
-            |          |   "normalizationContexts" => [        |
-            |          |     "*" => [                          |
-            |          |       "groups" => [                   |
-            |          |         "book:read"                   |
-            |          |       ]                               |
-            |          |     ]                                 |
-            |          |   ],                                  |
-            |          |   "denormalizationContexts" => [      |
-            |          |     "*" => [                          |
-            |          |       "groups" => [                   |
-            |          |         "book:write"                  |
-            |          |       ]                               |
-            |          |     ]                                 |
-            |          |   ]                                   |
-            |          | ]                                     |
-            | name     | [                                     |
-            |          |   "groups" => [],                     |
-            |          |   "maxDepth" => null,                 |
-            |          |   "serializedName" => null,           |
-            |          |   "serializedPath" => "[data][name]", |
-            |          |   "ignore" => false,                  |
-            |          |   "normalizationContexts" => [],      |
-            |          |   "denormalizationContexts" => []     |
-            |          | ]                                     |
-            +----------+---------------------------------------+
+            +----------+-----------------------------------+
+            | Property | Options                           |
+            +----------+-----------------------------------+
+            | code     | [                                 |
+            |          |   "groups" => [                   |
+            |          |     "book:read",                  |
+            |          |     "book:write"                  |
+            |          |   ],                              |
+            |          |   "maxDepth" => 1,                |
+            |          |   "serializedNames" => [          |
+            |          |     "*" => "identifier"           |
+            |          |   ],                              |
+            |          |   "serializedPaths" => [],        |
+            |          |   "ignore" => true,               |
+            |          |   "normalizationContexts" => [    |
+            |          |     "*" => [                      |
+            |          |       "groups" => [               |
+            |          |         "book:read"               |
+            |          |       ]                           |
+            |          |     ]                             |
+            |          |   ],                              |
+            |          |   "denormalizationContexts" => [  |
+            |          |     "*" => [                      |
+            |          |       "groups" => [               |
+            |          |         "book:write"              |
+            |          |       ]                           |
+            |          |     ]                             |
+            |          |   ]                               |
+            |          | ]                                 |
+            | name     | [                                 |
+            |          |   "groups" => [],                 |
+            |          |   "maxDepth" => null,             |
+            |          |   "serializedNames" => [],        |
+            |          |   "serializedPaths" => [          |
+            |          |     "*" => "[data][name]"         |
+            |          |   ],                              |
+            |          |   "ignore" => false,              |
+            |          |   "normalizationContexts" => [],  |
+            |          |   "denormalizationContexts" => [] |
+            |          | ]                                 |
+            +----------+-----------------------------------+
 
             TXT,
             $tester->getDisplay(true),

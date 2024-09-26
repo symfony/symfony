@@ -29,6 +29,14 @@ class SerializedPathTest extends TestCase
         new SerializedPath('');
     }
 
+    public function testInvalidGroupOption()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage(\sprintf('Parameter "groups" given to "%s" must be a string or an array of strings, "stdClass" given', SerializedPath::class));
+
+        new SerializedPath('foo', ['fine', new \stdClass()]);
+    }
+
     public function testSerializedPath()
     {
         $path = '[one][two]';

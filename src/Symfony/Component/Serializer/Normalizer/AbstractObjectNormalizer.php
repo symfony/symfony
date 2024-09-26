@@ -318,7 +318,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
 
         $mappedClass = $this->getMappedClass($normalizedData, $type, $context);
 
-        $nestedAttributes = $this->getNestedAttributes($mappedClass);
+        $nestedAttributes = $this->getNestedAttributes($mappedClass, $context);
         $nestedData = $originalNestedData = [];
         $propertyAccessor = PropertyAccess::createPropertyAccessor();
         foreach ($nestedAttributes as $property => $serializedPath) {
@@ -954,7 +954,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
             return $data;
         }
 
-        if (null !== $classMetadata && null !== $serializedPath = ($attributesMetadata[$attribute] ?? null)?->getSerializedPath()) {
+        if (null !== $classMetadata && null !== $serializedPath = ($attributesMetadata[$attribute] ?? null)?->getSerializedPath($this->getGroups($context))) {
             $propertyAccessor = PropertyAccess::createPropertyAccessor();
             if ($propertyAccessor->isReadable($data, $serializedPath) && null !== $propertyAccessor->getValue($data, $serializedPath)) {
                 throw new LogicException(\sprintf('The element you are trying to set is already populated: "%s".', (string) $serializedPath));
@@ -1060,7 +1060,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
     /**
      * Returns all attributes with a SerializedPath attribute and the respective path.
      */
-    private function getNestedAttributes(string $class): array
+    private function getNestedAttributes(string $class, array $context): array
     {
         if (!$this->classMetadataFactory?->hasMetadataFor($class)) {
             return [];
@@ -1070,7 +1070,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
         $serializedPaths = [];
         $classMetadata = $this->classMetadataFactory->getMetadataFor($class);
         foreach ($classMetadata->getAttributesMetadata() as $name => $metadata) {
-            if (!$serializedPath = $metadata->getSerializedPath()) {
+            if (!$serializedPath = $metadata->getSerializedPath($this->getGroups($context))) {
                 continue;
             }
             $pathIdentifier = implode(',', $serializedPath->getElements());

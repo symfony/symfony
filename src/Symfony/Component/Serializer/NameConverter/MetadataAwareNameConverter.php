@@ -47,11 +47,12 @@ final class MetadataAwareNameConverter implements AdvancedNameConverterInterface
             return $this->normalizeFallback($propertyName, $class, $format, $context);
         }
 
-        if (!\array_key_exists($class, self::$normalizeCache) || !\array_key_exists($propertyName, self::$normalizeCache[$class])) {
-            self::$normalizeCache[$class][$propertyName] = $this->getCacheValueForNormalization($propertyName, $class);
+        $cacheKey = $this->getCacheKey($class, $context);
+        if (!\array_key_exists($cacheKey, self::$normalizeCache) || !\array_key_exists($propertyName, self::$normalizeCache[$cacheKey])) {
+            self::$normalizeCache[$cacheKey][$propertyName] = $this->getCacheValueForNormalization($propertyName, $class, $context);
         }
 
-        return self::$normalizeCache[$class][$propertyName] ?? $this->normalizeFallback($propertyName, $class, $format, $context);
+        return self::$normalizeCache[$cacheKey][$propertyName] ?? $this->normalizeFallback($propertyName, $class, $format, $context);
     }
 
     public function denormalize(string $propertyName, ?string $class = null, ?string $format = null, array $context = []): string
@@ -68,7 +69,7 @@ final class MetadataAwareNameConverter implements AdvancedNameConverterInterface
         return self::$denormalizeCache[$cacheKey][$propertyName] ?? $this->denormalizeFallback($propertyName, $class, $format, $context);
     }
 
-    private function getCacheValueForNormalization(string $propertyName, string $class): ?string
+    private function getCacheValueForNormalization(string $propertyName, string $class, array $context): ?string
     {
         if (!$this->metadataFactory->hasMetadataFor($class)) {
             return null;
@@ -79,11 +80,14 @@ final class MetadataAwareNameConverter implements AdvancedNameConverterInterface
             return null;
         }
 
-        if (null !== $attributesMetadata[$propertyName]->getSerializedName() && null !== $attributesMetadata[$propertyName]->getSerializedPath()) {
+        $contextGroups = (array) ($context[AbstractNormalizer::GROUPS] ?? []);
+        $contextGroups = array_merge($contextGroups, ['Default', (false !== $nsSep = strrpos($class, '\\')) ? substr($class, $nsSep + 1) : $class]);
+
+        if (null !== $attributesMetadata[$propertyName]->getSerializedName($contextGroups) && null !== $attributesMetadata[$propertyName]->getSerializedPath($contextGroups)) {
             throw new LogicException(\sprintf('Found SerializedName and SerializedPath attributes on property "%s" of class "%s".', $propertyName, $class));
         }
 
-        return $attributesMetadata[$propertyName]->getSerializedName() ?? null;
+        return $attributesMetadata[$propertyName]->getSerializedName($contextGroups) ?? null;
     }
 
     private function normalizeFallback(string $propertyName, ?string $class = null, ?string $format = null, array $context = []): string
@@ -117,21 +121,21 @@ final class MetadataAwareNameConverter implements AdvancedNameConverterInterface
 
         $classMetadata = $this->metadataFactory->getMetadataFor($class);
 
+        $contextGroups = (array) ($context[AbstractNormalizer::GROUPS] ?? []);
+        $contextGroupsHasBeenDefined = [] !== $contextGroups;
+        $contextGroups = array_merge($contextGroups, ['Default', (false !== $nsSep = strrpos($class, '\\')) ? substr($class, $nsSep + 1) : $class]);
+
         $cache = [];
         foreach ($classMetadata->getAttributesMetadata() as $name => $metadata) {
-            if (null === $metadata->getSerializedName()) {
+            if (null === $serializedName = $metadata->getSerializedName($contextGroups)) {
                 continue;
             }
 
-            if (null !== $metadata->getSerializedName() && null !== $metadata->getSerializedPath()) {
+            if (null !== $metadata->getSerializedPath($contextGroups)) {
                 throw new LogicException(\sprintf('Found SerializedName and SerializedPath attributes on property "%s" of class "%s".', $name, $class));
             }
 
             $metadataGroups = $metadata->getGroups();
-
-            $contextGroups = (array) ($context[AbstractNormalizer::GROUPS] ?? []);
-            $contextGroupsHasBeenDefined = [] !== $contextGroups;
-            $contextGroups = array_merge($contextGroups, ['Default', (false !== $nsSep = strrpos($class, '\\')) ? substr($class, $nsSep + 1) : $class]);
 
             if ($contextGroupsHasBeenDefined && !$metadataGroups) {
                 continue;
@@ -141,7 +145,7 @@ final class MetadataAwareNameConverter implements AdvancedNameConverterInterface
                 continue;
             }
 
-            $cache[$metadata->getSerializedName()] = $name;
+            $cache[$serializedName] = $name;
         }
 
         return $cache;

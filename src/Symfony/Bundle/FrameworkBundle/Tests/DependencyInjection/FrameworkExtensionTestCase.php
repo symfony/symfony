@@ -2143,20 +2143,63 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $this->assertEquals(new Reference('app.another_bus'), $container->getDefinition('mailer.mailer')->getArgument(1));
     }
 
+    public function testHttpClientNoMock()
+    {
+        $container = $this->createContainerFromFile('http_client_scoped_without_query_option');
+
+        $this->assertFalse($container->hasDefinition('http_client.mock_client.foo'));
+        $this->assertFalse($container->hasDefinition('http_client.mock_client'));
+
+    }
+
     public function testHttpClientMockResponseFactory()
     {
         $container = $this->createContainerFromFile('http_client_mock_response_factory');
 
-        $definition = $container->getDefinition('http_client.mock_client');
+        $this->assertFalse($container->hasDefinition('http_client.mock_client.notMocked'));
+
+        $definition = $container->getDefinition('http_client.mock_client.mocked');
 
         $this->assertSame(MockHttpClient::class, $definition->getClass());
         $this->assertCount(1, $definition->getArguments());
 
         $argument = $definition->getArgument(0);
-
         $this->assertInstanceOf(Reference::class, $argument);
         $this->assertSame('http_client.transport', current($definition->getDecoratedService()));
-        $this->assertSame('my_response_factory', (string) $argument);
+        $this->assertSame('my_factory', (string) $argument);
+
+        $definition = $container->getDefinition('http_client.mock_client.mocked_custom_factory');
+
+        $this->assertSame(MockHttpClient::class, $definition->getClass());
+        $this->assertCount(1, $definition->getArguments());
+
+        $argument = $definition->getArgument(0);
+        $this->assertInstanceOf(Reference::class, $argument);
+        $this->assertSame('http_client.transport', current($definition->getDecoratedService()));
+        $this->assertSame('my_other_factory', (string) $argument);
+    }
+
+    public function testHttpClientUseMockClientButOverrideInScopedClientsAndEnableFactories()
+    {
+        $container = $this->createContainerFromFile('http_client_mock');
+
+        $definition = $container->getDefinition('http_client.mock_client');
+
+        $this->assertSame(MockHttpClient::class, $definition->getClass());
+        $this->assertCount(0, $definition->getArguments());
+
+        $this->assertFalse($container->hasDefinition('http_client.mock_client.notMocked'));
+
+        $definition = $container->getDefinition('http_client.mock_client.mocked');
+
+        $this->assertSame(MockHttpClient::class, $definition->getClass());
+        $this->assertCount(0, $definition->getArguments());
+
+        $definition = $container->getDefinition('http_client.mock_client.mocked_with_factory');
+
+        $this->assertSame(MockHttpClient::class, $definition->getClass());
+        $this->assertCount(1, $definition->getArguments());
+
     }
 
     public function testRegisterParameterCollectingBehaviorDescribingTags()

@@ -897,6 +897,8 @@ class ConfigurationTest extends TestCase
             'disallow_search_engine_index' => true,
             'http_client' => [
                 'enabled' => !class_exists(FullStack::class) && class_exists(HttpClient::class),
+                'mock_client' => false,
+                'mock_response_factory' => null,
                 'scoped_clients' => [],
             ],
             'mailer' => [

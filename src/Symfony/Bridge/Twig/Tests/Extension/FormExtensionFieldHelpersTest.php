@@ -19,6 +19,7 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\Test\FormIntegrationTestCase;
+use Symfony\Component\Translation\TranslatableMessage;
 
 class FormExtensionFieldHelpersTest extends FormIntegrationTestCase
 {
@@ -80,6 +81,28 @@ class FormExtensionFieldHelpersTest extends FormIntegrationTestCase
                 'multiple' => true,
                 'expanded' => true,
                 'label' => false,
+            ])
+            ->add('parametrized_choice_label', ChoiceType::class, [
+                'choices' => [
+                    (object) ['value' => 'yes', 'label' => 'parametrized.%yes%'],
+                    (object) ['value' => 'no', 'label' => 'parametrized.%no%'],
+                ],
+                'choice_value' => 'value',
+                'choice_label' => 'label',
+                'choice_translation_domain' => 'forms',
+                'choice_translation_parameters' => [
+                    ['%yes%' => 'YES'],
+                    ['%no%' => 'NO'],
+                ],
+            ])
+            ->add('translatable_choice_label', ChoiceType::class, [
+                'choices' => [
+                    'yes',
+                    'no',
+                ],
+                'choice_label' => static function (string $choice) {
+                    return new TranslatableMessage('parametrized.%value%', ['%value%' => $choice], 'forms');
+                },
             ])
             ->getForm()
         ;
@@ -289,5 +312,41 @@ class FormExtensionFieldHelpersTest extends FormIntegrationTestCase
 
         $this->assertSame('salt', $choicesArray[1]['value']);
         $this->assertSame('[trans]base.salt[/trans]', $choicesArray[1]['label']);
+    }
+
+    public function testChoiceParametrizedLabel()
+    {
+        $choices = $this->translatorExtension->getFieldChoices($this->view->children['parametrized_choice_label']);
+
+        $choicesArray = [];
+        foreach ($choices as $label => $value) {
+            $choicesArray[] = ['label' => $label, 'value' => $value];
+        }
+
+        $this->assertCount(2, $choicesArray);
+
+        $this->assertSame('yes', $choicesArray[0]['value']);
+        $this->assertSame('[trans]parametrized.YES[/trans]', $choicesArray[0]['label']);
+
+        $this->assertSame('no', $choicesArray[1]['value']);
+        $this->assertSame('[trans]parametrized.NO[/trans]', $choicesArray[1]['label']);
+    }
+
+    public function testChoiceTranslatableLabel()
+    {
+        $choices = $this->translatorExtension->getFieldChoices($this->view->children['translatable_choice_label']);
+
+        $choicesArray = [];
+        foreach ($choices as $label => $value) {
+            $choicesArray[] = ['label' => $label, 'value' => $value];
+        }
+
+        $this->assertCount(2, $choicesArray);
+
+        $this->assertSame('yes', $choicesArray[0]['value']);
+        $this->assertSame('[trans]parametrized.yes[/trans]', $choicesArray[0]['label']);
+
+        $this->assertSame('no', $choicesArray[1]['value']);
+        $this->assertSame('[trans]parametrized.no[/trans]', $choicesArray[1]['label']);
     }
 }

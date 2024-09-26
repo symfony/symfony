@@ -118,12 +118,13 @@ class RoundRobinTransportTest extends TestCase
         $t1 = $this->createMock(TransportInterface::class);
         $t1->expects($this->exactly(3))->method('send');
 
-        $matcher = $this->exactly(2);
         $t2 = $this->createMock(TransportInterface::class);
-        $t2->expects($matcher)
+        $t2->expects($this->exactly(2))
             ->method('send')
-            ->willReturnCallback(function () use ($matcher) {
-                if (1 === $matcher->getInvocationCount()) {
+            ->willReturnCallback(function () {
+                static $call = 0;
+
+                if (1 === ++$call) {
                     throw new TransportException();
                 }
 

@@ -13,7 +13,6 @@ namespace Symfony\Component\Messenger\Tests\Middleware;
 
 use PHPUnit\Framework\AssertionFailedError;
 use PHPUnit\Framework\Constraint\Callback;
-use PHPUnit\Framework\MockObject\Stub\ReturnCallback;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\DelayedMessageHandlingException;
@@ -106,14 +105,15 @@ class DispatchAfterCurrentBusMiddlewareTest extends TestCase
             $secondEvent,
         ];
 
-        $matcher = $this->exactly(3);
-        $handlingMiddleware->expects($matcher)
+        $handlingMiddleware->expects($this->exactly(3))
             ->method('handle')
             ->with($this->callback(function (Envelope $envelope) use (&$series) {
                 return $envelope->getMessage() === array_shift($series);
             }))
-            ->willReturnCallback(function ($envelope, StackInterface $stack) use ($matcher) {
-                if (2 === $matcher->getInvocationCount()) {
+            ->willReturnCallback(function ($envelope, StackInterface $stack) {
+                static $call = 0;
+
+                if (2 === ++$call) {
                     throw new \RuntimeException('Some exception while handling first event');
                 }
 
@@ -175,14 +175,15 @@ class DispatchAfterCurrentBusMiddlewareTest extends TestCase
             // Note: $eventL3a should not be handled.
         ];
 
-        $matcher = $this->exactly(7);
-        $handlingMiddleware->expects($matcher)
+        $handlingMiddleware->expects($this->exactly(7))
             ->method('handle')
             ->with($this->callback(function (Envelope $envelope) use (&$series) {
                 return $envelope->getMessage() === array_shift($series);
             }))
-            ->willReturnCallback(function ($envelope, StackInterface $stack) use ($eventBus, $eventL2a, $eventL2b, $eventL3a, $eventL3b, $matcher) {
-                switch ($matcher->getInvocationCount()) {
+            ->willReturnCallback(function ($envelope, StackInterface $stack) use ($eventBus, $eventL2a, $eventL2b, $eventL3a, $eventL3b) {
+                static $call = 0;
+
+                switch (++$call) {
                     case 1:
                     case 2:
                     case 4:

@@ -19,6 +19,8 @@ use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
+use Symfony\Component\HttpClient\Exception\TimeoutException;
+use Symfony\Component\HttpClient\Exception\TransportException;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 
 /**
@@ -57,7 +59,7 @@ final class ImportMapInstallCommand extends Command
                     $progressBar->advance();
                 }
             });
-        } catch (LogicException $throwable) {
+        } catch (LogicException|TimeoutException|TransportException $throwable) {
             $io->error($throwable->getMessage());
 
             return Command::FAILURE;

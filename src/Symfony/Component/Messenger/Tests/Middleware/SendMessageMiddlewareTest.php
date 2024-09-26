@@ -44,7 +44,7 @@ class SendMessageMiddlewareTest extends MiddlewareTestCase
         /* @var SentStamp $stamp */
         $this->assertInstanceOf(SentStamp::class, $stamp = $envelope->last(SentStamp::class), 'it adds a sent stamp');
         $this->assertSame('my_sender', $stamp->getSenderAlias());
-        $this->assertStringMatchesFormat('Mock_SenderInterface_%s', $stamp->getSenderClass());
+        $this->assertStringMatchesFormat($sender::class, $stamp->getSenderClass());
     }
 
     public function testItSendsTheMessageToMultipleSenders()

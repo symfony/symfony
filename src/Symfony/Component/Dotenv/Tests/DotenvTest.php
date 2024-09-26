@@ -175,6 +175,14 @@ class DotenvTest extends TestCase
             ["FOO=BAR\nBAR=\${NOTDEFINED:=TEST}", ['FOO' => 'BAR', 'NOTDEFINED' => 'TEST', 'BAR' => 'TEST']],
             ["FOO=\nBAR=\${FOO:=TEST}", ['FOO' => 'TEST', 'BAR' => 'TEST']],
             ["FOO=\nBAR=\$FOO:=TEST}", ['FOO' => 'TEST', 'BAR' => 'TEST}']],
+            ["FOO=BAR\nBAR=\${FOO:-}", ['FOO' => 'BAR', 'BAR' => 'BAR']],
+            ["FOO=BAR\nBAR=\${NOTDEFINED:-}", ['FOO' => 'BAR', 'BAR' => '']],
+            ["FOO=\nBAR=\${FOO:-}", ['FOO' => '', 'BAR' => '']],
+            ["FOO=\nBAR=\$FOO:-}", ['FOO' => '', 'BAR' => '}']],
+            ["FOO=BAR\nBAR=\${FOO:=}", ['FOO' => 'BAR', 'BAR' => 'BAR']],
+            ["FOO=BAR\nBAR=\${NOTDEFINED:=}", ['FOO' => 'BAR', 'NOTDEFINED' => '', 'BAR' => '']],
+            ["FOO=\nBAR=\${FOO:=}", ['FOO' => '', 'BAR' => '']],
+            ["FOO=\nBAR=\$FOO:=}", ['FOO' => '', 'BAR' => '}']],
             ["FOO=foo\nFOOBAR=\${FOO}\${BAR}", ['FOO' => 'foo', 'FOOBAR' => 'foo']],
 
             // underscores

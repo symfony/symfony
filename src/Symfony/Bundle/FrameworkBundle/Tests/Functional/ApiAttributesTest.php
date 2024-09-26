@@ -705,7 +705,7 @@ class ApiAttributesTest extends AbstractWebTestCase
         yield 'invalid request mapping attribute with default value' => [
             'uri' => '/map-request-to-attribute-with-default-value.json',
             'format' => 'json',
-            'input' => ['comment' => '', 'approved' => '1'],
+            'parameters' => ['comment' => '', 'approved' => '1'],
             'content' => null,
             'expectedResponse' => <<<'JSON'
                 {
@@ -964,7 +964,7 @@ class ApiAttributesTest extends AbstractWebTestCase
         yield 'invalid request mapping non-nullable attribute without default value' => [
             'uri' => '/map-request-to-non-nullable-attribute-without-default-value.json',
             'format' => 'json',
-            'input' => ['comment' => '', 'approved' => '1'],
+            'parameters' => ['comment' => '', 'approved' => '1'],
             'content' => null,
             'expectedResponse' => <<<'JSON'
                 {

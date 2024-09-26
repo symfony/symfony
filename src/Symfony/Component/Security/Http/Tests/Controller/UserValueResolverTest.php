@@ -120,7 +120,7 @@ class UserValueResolverTest extends TestCase
         $metadata = new ArgumentMetadata('foo', InMemoryUser::class, false, false, null, false, [new CurrentUser()]);
 
         $this->expectException(AccessDeniedException::class);
-        $this->expectExceptionMessageMatches(\sprintf('/^The logged-in user is an instance of "%s" but a user of type "Symfony\\\\Component\\\\Security\\\\Core\\\\User\\\\InMemoryUser" is expected.$/', $user::class));
+        $this->expectExceptionMessage(\sprintf('The logged-in user is an instance of "%s" but a user of type "Symfony\Component\Security\Core\User\InMemoryUser" is expected.', $user::class));
         $resolver->resolve(Request::create('/'), $metadata);
     }
 

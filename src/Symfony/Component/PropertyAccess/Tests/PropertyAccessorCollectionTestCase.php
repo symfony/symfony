@@ -165,7 +165,7 @@ abstract class PropertyAccessorCollectionTestCase extends PropertyAccessorArrayA
             ->willReturn($axesBefore);
 
         $this->expectException(NoSuchPropertyException::class);
-        $this->expectExceptionMessageMatches(\sprintf('/Could not determine access type for property "axes" in class "%s"./', $car::class));
+        $this->expectExceptionMessage(\sprintf('Could not determine access type for property "axes" in class "%s".', $car::class));
 
         $this->propertyAccessor->setValue($car, 'axes', $axesAfter);
     }

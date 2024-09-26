@@ -77,7 +77,7 @@ trait ContextMetadataTestTrait
         self::assertEquals('2011-07-28', $dummy->date->format('Y-m-d'), 'a specific denormalization context is used for this group');
     }
 
-    public function contextMetadataDummyProvider(): array
+    public static function contextMetadataDummyProvider(): array
     {
         return [
             [ContextMetadataDummy::class],

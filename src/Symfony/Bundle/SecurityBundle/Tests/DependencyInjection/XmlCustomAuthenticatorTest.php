@@ -14,7 +14,6 @@ namespace Symfony\Bundle\SecurityBundle\Tests\DependencyInjection;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\SecurityExtension;
 use Symfony\Bundle\SecurityBundle\Tests\DependencyInjection\Fixtures\Authenticator\CustomAuthenticator;
-use Symfony\Bundle\SecurityBundle\Tests\DependencyInjection\Fixtures\UserProvider\CustomProvider;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;

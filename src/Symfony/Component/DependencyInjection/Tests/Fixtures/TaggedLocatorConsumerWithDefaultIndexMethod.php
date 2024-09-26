@@ -4,7 +4,6 @@ namespace Symfony\Component\DependencyInjection\Tests\Fixtures;
 
 use Psr\Container\ContainerInterface;
 use Symfony\Component\DependencyInjection\Attribute\AutowireLocator;
-use Symfony\Component\DependencyInjection\Attribute\TaggedLocator;
 
 final class TaggedLocatorConsumerWithDefaultIndexMethod
 {

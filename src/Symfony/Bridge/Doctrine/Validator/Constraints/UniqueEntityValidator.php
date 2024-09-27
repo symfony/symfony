@@ -210,13 +210,21 @@ class UniqueEntityValidator extends ConstraintValidator
         $errorPath = $constraint->errorPath ?? current($fields);
         $invalidValue = $criteria[$errorPath] ?? $criteria[current($fields)];
 
-        $this->context->buildViolation($constraint->message)
+        $constraintViolationBuilder = $this->context->buildViolation($constraint->message)
             ->atPath($errorPath)
             ->setParameter('{{ value }}', $this->formatWithIdentifiers($em, $class, $invalidValue))
             ->setInvalidValue($invalidValue)
             ->setCode(UniqueEntity::NOT_UNIQUE_ERROR)
             ->setCause($result)
-            ->addViolation();
+        ;
+        foreach ($fields as $field) {
+            $constraintViolationBuilder->setParameter(
+                sprintf('{{ %s }}', $field),
+                ($criteria[$field]) ? $this->formatWithIdentifiers($em, $class, $criteria[$field]) : ''
+            );
+        }
+
+        $constraintViolationBuilder->addViolation();
     }
 
     private function ignoreNullForField(UniqueEntity $constraint, string $fieldName): bool

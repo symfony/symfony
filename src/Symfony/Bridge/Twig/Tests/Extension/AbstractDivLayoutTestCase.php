@@ -619,6 +619,13 @@ abstract class AbstractDivLayoutTestCase extends AbstractLayoutTestCase
         );
     }
 
+    public static function themeBlockInheritanceProvider(): array
+    {
+        return [
+            [['theme.html.twig']],
+        ];
+    }
+
     /**
      * @dataProvider themeInheritanceProvider
      */
@@ -661,6 +668,13 @@ abstract class AbstractDivLayoutTestCase extends AbstractLayoutTestCase
     ]
 '
         );
+    }
+
+    public static function themeInheritanceProvider(): array
+    {
+        return [
+            [['parent_label.html.twig'], ['child_label.html.twig']],
+        ];
     }
 
     /**

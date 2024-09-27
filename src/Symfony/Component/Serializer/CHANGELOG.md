@@ -12,6 +12,7 @@ CHANGELOG
  * Add support for configuring multiple serializer instances with different
    default contexts, name converters, sets of normalizers and encoders
  * Add support for collection profiles of multiple serializer instances
+ * Deprecate `AdvancedNameConverterInterface`, use `NameConverterInterface` instead
 
 7.1
 ---

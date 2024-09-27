@@ -12,14 +12,14 @@
 namespace Symfony\Component\Form\Tests\Extension\Core\Type;
 
 use Symfony\Component\Form\Test\TypeTestCase;
-use Symfony\Component\Form\Tests\VersionAwareTest;
+use Symfony\Component\Form\Tests\VersionAwareTestTrait;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
 abstract class BaseTypeTestCase extends TypeTestCase
 {
-    use VersionAwareTest;
+    use VersionAwareTestTrait;
 
     public const TESTED_TYPE = '';
 

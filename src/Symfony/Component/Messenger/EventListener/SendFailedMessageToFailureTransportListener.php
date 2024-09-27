@@ -15,6 +15,7 @@ use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Messenger\Event\WorkerMessageFailedEvent;
+use Symfony\Component\Messenger\Event\WorkerMessageSkipEvent;
 use Symfony\Component\Messenger\Stamp\DelayStamp;
 use Symfony\Component\Messenger\Stamp\RedeliveryStamp;
 use Symfony\Component\Messenger\Stamp\SentToFailureTransportStamp;
@@ -65,10 +66,26 @@ class SendFailedMessageToFailureTransportListener implements EventSubscriberInte
         $failureSender->send($envelope);
     }
 
+    public function onMessageSkip(WorkerMessageSkipEvent $event): void
+    {
+        if (!$this->failureSenders->has($event->getReceiverName())) {
+            return;
+        }
+
+        $failureSender = $this->failureSenders->get($event->getReceiverName());
+        $envelope = $event->getEnvelope()->with(
+            new SentToFailureTransportStamp($event->getReceiverName()),
+            new DelayStamp(0),
+        );
+
+        $failureSender->send($envelope);
+    }
+
     public static function getSubscribedEvents(): array
     {
         return [
             WorkerMessageFailedEvent::class => ['onMessageFailed', -100],
+            WorkerMessageSkipEvent::class => ['onMessageSkip', -100],
         ];
     }
 }

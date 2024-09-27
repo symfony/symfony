@@ -23,9 +23,11 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Messenger\Event\WorkerMessageReceivedEvent;
+use Symfony\Component\Messenger\Event\WorkerMessageSkipEvent;
 use Symfony\Component\Messenger\EventListener\StopWorkerOnMessageLimitListener;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Messenger\Stamp\MessageDecodingFailedStamp;
+use Symfony\Component\Messenger\Stamp\SentToFailureTransportStamp;
 use Symfony\Component\Messenger\Transport\Receiver\ListableReceiverInterface;
 use Symfony\Component\Messenger\Transport\Receiver\ReceiverInterface;
 use Symfony\Component\Messenger\Transport\Receiver\SingleMessageReceiver;
@@ -68,8 +70,8 @@ The <info>%command.name%</info> retries message in the failure transport.
 
     <info>php %command.full_name%</info>
 
-The command will interactively ask if each message should be retried
-or discarded.
+The command will interactively ask if each message should be retried,
+discarded or skipped.
 
 Some transports support retrying a specific message id, which comes
 from the <info>messenger:failed:show</info> command.
@@ -204,13 +206,18 @@ EOF
 
             $this->forceExit = true;
             try {
-                $shouldHandle = $shouldForce || 'retry' === $io->choice('Please select an action', ['retry', 'delete'], 'retry');
+                $choice = $io->choice('Please select an action', ['retry', 'delete', 'skip'], 'retry');
+                $shouldHandle = $shouldForce || 'retry' === $choice;
             } finally {
                 $this->forceExit = false;
             }
 
             if ($shouldHandle) {
                 return;
+            }
+
+            if ('skip' === $choice) {
+                $this->eventDispatcher->dispatch(new WorkerMessageSkipEvent($envelope, $envelope->last(SentToFailureTransportStamp::class)->getOriginalReceiverName()));
             }
 
             $messageReceivedEvent->shouldHandle(false);

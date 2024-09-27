@@ -26,7 +26,7 @@ abstract class AbstractRequestParserTestCase extends TestCase
      * @dataProvider getPayloads
      */
     #[DataProvider('getPayloads')]
-    public function testParse(string $payload, RemoteEvent $expected)
+    public function testParse(string $payload, RemoteEvent|array $expected)
     {
         $request = $this->createRequest($payload);
         $parser = $this->createRequestParser();
@@ -35,7 +35,7 @@ abstract class AbstractRequestParserTestCase extends TestCase
     }
 
     /**
-     * @return iterable<array{string, RemoteEvent}>
+     * @return iterable<array{string, RemoteEvent|RemoteEvent[]}>
      */
     public static function getPayloads(): iterable
     {

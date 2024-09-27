@@ -12,10 +12,15 @@
 namespace Symfony\Component\Notifier\Bridge\Octopush\Tests;
 
 use Symfony\Component\Notifier\Bridge\Octopush\OctopushTransportFactory;
-use Symfony\Component\Notifier\Test\TransportFactoryTestCase;
+use Symfony\Component\Notifier\Test\AbstractTransportFactoryTestCase;
+use Symfony\Component\Notifier\Test\IncompleteDsnTestTrait;
+use Symfony\Component\Notifier\Test\MissingRequiredOptionTestTrait;
 
-final class OctopushTransportFactoryTest extends TransportFactoryTestCase
+final class OctopushTransportFactoryTest extends AbstractTransportFactoryTestCase
 {
+    use IncompleteDsnTestTrait;
+    use MissingRequiredOptionTestTrait;
+
     public function createFactory(): OctopushTransportFactory
     {
         return new OctopushTransportFactory();
@@ -45,5 +50,11 @@ final class OctopushTransportFactoryTest extends TransportFactoryTestCase
     {
         yield ['somethingElse://userLogin:apiKey@default?from=0611223344'];
         yield ['somethingElse://userLogin:apiKey@default']; // missing "from" option
+    }
+
+    public static function incompleteDsnProvider(): iterable
+    {
+        yield ['octopush://userLogin@default?from=Heyliot&type=FR'];
+        yield ['octopush://:apiKey@default?from=Heyliot&type=FR'];
     }
 }

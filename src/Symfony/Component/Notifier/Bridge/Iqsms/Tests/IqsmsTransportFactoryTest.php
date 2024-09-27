@@ -12,10 +12,15 @@
 namespace Symfony\Component\Notifier\Bridge\Iqsms\Tests;
 
 use Symfony\Component\Notifier\Bridge\Iqsms\IqsmsTransportFactory;
-use Symfony\Component\Notifier\Test\TransportFactoryTestCase;
+use Symfony\Component\Notifier\Test\AbstractTransportFactoryTestCase;
+use Symfony\Component\Notifier\Test\IncompleteDsnTestTrait;
+use Symfony\Component\Notifier\Test\MissingRequiredOptionTestTrait;
 
-final class IqsmsTransportFactoryTest extends TransportFactoryTestCase
+final class IqsmsTransportFactoryTest extends AbstractTransportFactoryTestCase
 {
+    use IncompleteDsnTestTrait;
+    use MissingRequiredOptionTestTrait;
+
     public function createFactory(): IqsmsTransportFactory
     {
         return new IqsmsTransportFactory();

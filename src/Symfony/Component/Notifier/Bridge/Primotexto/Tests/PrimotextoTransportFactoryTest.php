@@ -12,10 +12,13 @@
 namespace Symfony\Component\Notifier\Bridge\Primotexto\Tests;
 
 use Symfony\Component\Notifier\Bridge\Primotexto\PrimotextoTransportFactory;
-use Symfony\Component\Notifier\Test\TransportFactoryTestCase;
+use Symfony\Component\Notifier\Test\AbstractTransportFactoryTestCase;
+use Symfony\Component\Notifier\Test\IncompleteDsnTestTrait;
 
-final class PrimotextoTransportFactoryTest extends TransportFactoryTestCase
+final class PrimotextoTransportFactoryTest extends AbstractTransportFactoryTestCase
 {
+    use IncompleteDsnTestTrait;
+
     public function createFactory(): PrimotextoTransportFactory
     {
         return new PrimotextoTransportFactory();
@@ -43,5 +46,10 @@ final class PrimotextoTransportFactoryTest extends TransportFactoryTestCase
     public static function unsupportedSchemeProvider(): iterable
     {
         yield ['somethingElse://apiKey@default'];
+    }
+
+    public static function incompleteDsnProvider(): iterable
+    {
+        yield ['primotexto://default'];
     }
 }

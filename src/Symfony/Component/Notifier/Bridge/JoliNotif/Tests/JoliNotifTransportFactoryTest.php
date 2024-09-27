@@ -12,12 +12,12 @@
 namespace Symfony\Component\Notifier\Bridge\JoliNotif\Tests;
 
 use Symfony\Component\Notifier\Bridge\JoliNotif\JoliNotifTransportFactory;
-use Symfony\Component\Notifier\Test\TransportFactoryTestCase;
+use Symfony\Component\Notifier\Test\AbstractTransportFactoryTestCase;
 
 /**
  * @author Ahmed Ghanem <ahmedghanem7361@gmail.com>
  */
-final class JoliNotifTransportFactoryTest extends TransportFactoryTestCase
+final class JoliNotifTransportFactoryTest extends AbstractTransportFactoryTestCase
 {
     public static function createProvider(): iterable
     {

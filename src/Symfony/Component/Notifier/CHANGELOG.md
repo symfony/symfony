@@ -4,6 +4,11 @@ CHANGELOG
 7.2
 ---
 
+ * Deprecate `TransportFactoryTestCase`, extend `AbstractTransportFactoryTestCase` instead
+
+   The `testIncompleteDsnException()` and `testMissingRequiredOptionException()` tests are no longer provided by default. If you make use of them (i.e. by implementing the
+   `incompleteDsnProvider()` or `missingRequiredOptionProvider()` data providers), you now need to use the `IncompleteDsnTestTrait` or `MissingRequiredOptionTestTrait` respectively.
+
  * Make `TransportFactoryTestCase` and `TransportTestCase` compatible with PHPUnit 10+
  * Add `Desktop` channel
 

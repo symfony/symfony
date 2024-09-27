@@ -12,10 +12,13 @@
 namespace Symfony\Component\Notifier\Bridge\Bluesky\Tests;
 
 use Symfony\Component\Notifier\Bridge\Bluesky\BlueskyTransportFactory;
-use Symfony\Component\Notifier\Test\TransportFactoryTestCase;
+use Symfony\Component\Notifier\Test\AbstractTransportFactoryTestCase;
+use Symfony\Component\Notifier\Test\IncompleteDsnTestTrait;
 
-class BlueskyTransportFactoryTest extends TransportFactoryTestCase
+class BlueskyTransportFactoryTest extends AbstractTransportFactoryTestCase
 {
+    use IncompleteDsnTestTrait;
+
     public function createFactory(): BlueskyTransportFactory
     {
         return new BlueskyTransportFactory();

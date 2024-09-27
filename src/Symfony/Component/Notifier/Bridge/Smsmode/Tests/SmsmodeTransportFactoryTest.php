@@ -12,10 +12,15 @@
 namespace Symfony\Component\Notifier\Bridge\Smsmode\Tests;
 
 use Symfony\Component\Notifier\Bridge\Smsmode\SmsmodeTransportFactory;
-use Symfony\Component\Notifier\Test\TransportFactoryTestCase;
+use Symfony\Component\Notifier\Test\AbstractTransportFactoryTestCase;
+use Symfony\Component\Notifier\Test\IncompleteDsnTestTrait;
+use Symfony\Component\Notifier\Test\MissingRequiredOptionTestTrait;
 
-final class SmsmodeTransportFactoryTest extends TransportFactoryTestCase
+final class SmsmodeTransportFactoryTest extends AbstractTransportFactoryTestCase
 {
+    use IncompleteDsnTestTrait;
+    use MissingRequiredOptionTestTrait;
+
     public function createFactory(): SmsmodeTransportFactory
     {
         return new SmsmodeTransportFactory();

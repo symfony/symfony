@@ -12,10 +12,13 @@
 namespace Symfony\Component\Notifier\Bridge\Sipgate\Tests;
 
 use Symfony\Component\Notifier\Bridge\Sipgate\SipgateTransportFactory;
-use Symfony\Component\Notifier\Test\TransportFactoryTestCase;
+use Symfony\Component\Notifier\Test\AbstractTransportFactoryTestCase;
+use Symfony\Component\Notifier\Test\IncompleteDsnTestTrait;
 
-class SipgateTransportFactoryTest extends TransportFactoryTestCase
+class SipgateTransportFactoryTest extends AbstractTransportFactoryTestCase
 {
+    use IncompleteDsnTestTrait;
+
     public function createFactory(): SipgateTransportFactory
     {
         return new SipgateTransportFactory();
@@ -39,5 +42,11 @@ class SipgateTransportFactoryTest extends TransportFactoryTestCase
     {
         yield ['somethingElse://tokenId:token@host.test?senderId=s1'];
         yield ['somethingElse://tokenId:token@host.test']; // missing senderId
+    }
+
+    public static function incompleteDsnProvider(): iterable
+    {
+        yield ['sipgate://:token@host.test?senderId=s1'];
+        yield ['sipgate://tokenId@host.test?senderId=s1'];
     }
 }

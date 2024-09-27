@@ -39,7 +39,7 @@ final class SendgridPayloadConverter implements PayloadConverterInterface
                 'unsubscribe' => MailerEngagementEvent::UNSUBSCRIBE,
                 'open' => MailerEngagementEvent::OPEN,
                 'spamreport' => MailerEngagementEvent::SPAM,
-                default => throw new ParseException(sprintf('Unsupported event "%s".', $payload['unsubscribe'])),
+                default => throw new ParseException(sprintf('Unsupported event "%s".', $payload['event'])),
             };
             $event = new MailerEngagementEvent($name, $payload['sg_message_id'], $payload);
         }

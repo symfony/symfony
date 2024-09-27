@@ -21,7 +21,11 @@ use Symfony\Component\Validator\Tests\IcuCompatibilityTrait;
  */
 class LessThanValidatorTest extends AbstractComparisonValidatorTestCase
 {
+    use CompareWithNullValueAtPropertyAtTestTrait;
     use IcuCompatibilityTrait;
+    use InvalidComparisonToValueTestTrait;
+    use ThrowsOnInvalidStringDatesTestTrait;
+    use ValidComparisonToValueTrait;
 
     protected function createValidator(): LessThanValidator
     {
@@ -72,13 +76,6 @@ class LessThanValidatorTest extends AbstractComparisonValidatorTestCase
             [new ComparisonTest_Class(5), '5', new ComparisonTest_Class(5), '5', __NAMESPACE__.'\ComparisonTest_Class'],
             [new ComparisonTest_Class(6), '6', new ComparisonTest_Class(5), '5', __NAMESPACE__.'\ComparisonTest_Class'],
             ['333', '"333"', '22', '"22"', 'string'],
-        ];
-    }
-
-    public static function provideComparisonsToNullValueAtPropertyPath(): array
-    {
-        return [
-            [5, '5', true],
         ];
     }
 }

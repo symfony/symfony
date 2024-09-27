@@ -63,10 +63,10 @@ class EsmtpTransportTest extends TestCase
         $this->assertContains("RCPT TO:<recipient@example.org> NOTIFY=FAILURE\r\n", $stream->getCommands());
     }
 
-    public function testSmtputf8()
+    public function testSmtpUtf8()
     {
         $stream = new DummyStream();
-        $transport = new Smtputf8EsmtpTransport(stream: $stream);
+        $transport = new SmtpUtf8EsmtpTransport(stream: $stream);
 
         $message = new Email();
         $message->from('info@dømi.fo');
@@ -79,7 +79,7 @@ class EsmtpTransportTest extends TestCase
         $this->assertContains("RCPT TO:<dømi@xn--dmi-0na.fo>\r\n", $stream->getCommands());
     }
 
-    public function testMissingSmtputf8()
+    public function testMissingSmtpUtf8()
     {
         $stream = new DummyStream();
         $transport = new EsmtpTransport(stream: $stream);
@@ -92,6 +92,22 @@ class EsmtpTransportTest extends TestCase
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Invalid addresses: non-ASCII characters not supported in local-part of email.');
         $transport->send($message);
+    }
+
+    public function testSmtpUtf8FallbackToIDN()
+    {
+        $stream = new DummyStream();
+        $transport = new EsmtpTransport(stream: $stream);
+
+        $message = new Email();
+        $message->from('info@dømi.fo'); // UTF8 only in the domain
+        $message->addTo('example@example.com');
+        $message->text('.');
+
+        $transport->send($message);
+
+        $this->assertContains("MAIL FROM:<info@xn--dmi-0na.fo>\r\n", $stream->getCommands());
+        $this->assertContains("RCPT TO:<example@example.com>\r\n", $stream->getCommands());
     }
 
     public function testConstructorWithDefaultAuthenticators()
@@ -303,7 +319,7 @@ class CustomEsmtpTransport extends EsmtpTransport
     }
 }
 
-class Smtputf8EsmtpTransport extends EsmtpTransport
+class SmtpUtf8EsmtpTransport extends EsmtpTransport
 {
     public function executeCommand(string $command, array $codes): string
     {

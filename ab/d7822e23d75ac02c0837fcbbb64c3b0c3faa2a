@@ -1,0 +1,21 @@
+---------------------------------------------------------------------------
+
+by derrabus at 2024-09-20T11:22:29Z
+
+Does this really solve this problem? Implementers must not implement those methods by returning an empty array either. And if not providing any test cases is legitimate, what should the implementer do with those methods?
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2024-09-20T12:52:26Z
+
+> And if not providing any test cases is legitimate, what should the implementer do with those methods?
+
+I agree, back in time I raised this question to Sebastian, but with no luck. It makes things way more complicated than they have to be 🤷
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2024-09-20T15:13:27Z
+
+The new `AbstractTransportFactoryTestCase` defines just three tests (`testSupports()`, `testCreate()`, and `testUnsupportedSchemeException()`) for all which reasonable test data can be drafted for a transport factory.
+
+There were two tests (`testIncompleteDsnException()` and `MissingRequiredOptionTestTrait`) that do not make sense for all transport factories. Those have been moved into traits.

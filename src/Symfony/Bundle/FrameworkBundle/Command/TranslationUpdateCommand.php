@@ -76,7 +76,7 @@ class TranslationUpdateCommand extends Command
                 new InputOption('force', null, InputOption::VALUE_NONE, 'Should the extract be done'),
                 new InputOption('clean', null, InputOption::VALUE_NONE, 'Should clean not found messages'),
                 new InputOption('domain', null, InputOption::VALUE_OPTIONAL, 'Specify the domain to extract'),
-                new InputOption('sort', null, InputOption::VALUE_OPTIONAL, 'Return list of messages sorted alphabetically (only works with --dump-messages)', 'asc'),
+                new InputOption('sort', null, InputOption::VALUE_OPTIONAL, 'Return list of messages sorted alphabetically'),
                 new InputOption('as-tree', null, InputOption::VALUE_OPTIONAL, 'Dump the messages as a tree-like structure: The given value defines the level where to switch to inline YAML'),
             ])
             ->setHelp(<<<'EOF'
@@ -100,7 +100,7 @@ Example running against default messages directory
 You can sort the output with the <comment>--sort</> flag:
 
     <info>php %command.full_name% --dump-messages --sort=asc en AcmeBundle</info>
-    <info>php %command.full_name% --dump-messages --sort=desc fr</info>
+    <info>php %command.full_name% --force --sort=desc fr</info>
 
 You can dump a tree-like structure using the yaml format with <comment>--as-tree</> flag:
 
@@ -207,6 +207,15 @@ EOF
 
         $operation->moveMessagesToIntlDomainsIfPossible('new');
 
+        if ($sort = $input->getOption('sort')) {
+            $sort = strtolower($sort);
+            if (!\in_array($sort, self::SORT_ORDERS, true)) {
+                $errorIo->error(['Wrong sort order', 'Supported formats are: '.implode(', ', self::SORT_ORDERS).'.']);
+
+                return 1;
+            }
+        }
+
         // show compiled list of messages
         if (true === $input->getOption('dump-messages')) {
             $extractedMessagesCount = 0;
@@ -223,19 +232,10 @@ EOF
 
                 $domainMessagesCount = \count($list);
 
-                if ($sort = $input->getOption('sort')) {
-                    $sort = strtolower($sort);
-                    if (!\in_array($sort, self::SORT_ORDERS, true)) {
-                        $errorIo->error(['Wrong sort order', 'Supported formats are: '.implode(', ', self::SORT_ORDERS).'.']);
-
-                        return 1;
-                    }
-
-                    if (self::DESC === $sort) {
-                        rsort($list);
-                    } else {
-                        sort($list);
-                    }
+                if (self::DESC === $sort) {
+                    rsort($list);
+                } else {
+                    sort($list);
                 }
 
                 $io->section(\sprintf('Messages extracted for domain "<info>%s</info>" (%d message%s)', $domain, $domainMessagesCount, $domainMessagesCount > 1 ? 's' : ''));
@@ -266,7 +266,12 @@ EOF
                 $bundleTransPath = end($transPaths);
             }
 
-            $this->writer->write($operation->getResult(), $format, ['path' => $bundleTransPath, 'default_locale' => $this->defaultLocale, 'xliff_version' => $xliffVersion, 'as_tree' => $input->getOption('as-tree'), 'inline' => $input->getOption('as-tree') ?? 0]);
+            $operationResult = $operation->getResult();
+            if ($sort) {
+                $operationResult = $this->sortCatalogue($operationResult, $sort);
+            }
+
+            $this->writer->write($operationResult, $format, ['path' => $bundleTransPath, 'default_locale' => $this->defaultLocale, 'xliff_version' => $xliffVersion, 'as_tree' => $input->getOption('as-tree'), 'inline' => $input->getOption('as-tree') ?? 0]);
 
             if (true === $input->getOption('dump-messages')) {
                 $resultMessage .= ' and translation files were updated';
@@ -363,6 +368,54 @@ EOF
         }
 
         return $filteredCatalogue;
+    }
+
+    private function sortCatalogue(MessageCatalogue $catalogue, string $sort): MessageCatalogue
+    {
+        $sortedCatalogue = new MessageCatalogue($catalogue->getLocale());
+
+        foreach ($catalogue->getDomains() as $domain) {
+            // extract intl-icu messages only
+            $intlDomain = $domain.MessageCatalogueInterface::INTL_DOMAIN_SUFFIX;
+            if ($intlMessages = $catalogue->all($intlDomain)) {
+                if (self::DESC === $sort) {
+                    krsort($intlMessages);
+                } elseif (self::ASC === $sort) {
+                    ksort($intlMessages);
+                }
+
+                $sortedCatalogue->add($intlMessages, $intlDomain);
+            }
+
+            // extract all messages and subtract intl-icu messages
+            if ($messages = array_diff($catalogue->all($domain), $intlMessages)) {
+                if (self::DESC === $sort) {
+                    krsort($messages);
+                } elseif (self::ASC === $sort) {
+                    ksort($messages);
+                }
+
+                $sortedCatalogue->add($messages, $domain);
+            }
+
+            if ($metadata = $catalogue->getMetadata('', $intlDomain)) {
+                foreach ($metadata as $k => $v) {
+                    $sortedCatalogue->setMetadata($k, $v, $intlDomain);
+                }
+            }
+
+            if ($metadata = $catalogue->getMetadata('', $domain)) {
+                foreach ($metadata as $k => $v) {
+                    $sortedCatalogue->setMetadata($k, $v, $domain);
+                }
+            }
+        }
+
+        foreach ($catalogue->getResources() as $resource) {
+            $sortedCatalogue->addResource($resource);
+        }
+
+        return $sortedCatalogue;
     }
 
     private function extractMessages(string $locale, array $transPaths, string $prefix): MessageCatalogue

@@ -1,0 +1,107 @@
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2024-09-13T07:58:09Z
+
+Makes sense to me. I think I never came across a service that sends webhook events by batches like this. But to me, that's a nice idea if this exists. I'd be 👍 on this, especially since the implementation is pretty simple!
+
+---------------------------------------------------------------------------
+
+by kbond at 2024-09-13T13:37:25Z
+
+> I think I never came across a service that sends webhook events by batches like this.
+
+Until yesterday, I hadn't either. When working on #58252 I discovered Mailtrap does this and then saw https://github.com/symfony/symfony/pull/50324 is blocked because of this also.
+
+---------------------------------------------------------------------------
+
+by stof at 2024-09-13T15:20:21Z
+
+This is technically a BC break for *callers* of the parser (as the caller needs to be able to deal with an array).
+
+However, as the typical usage of this parser is to be called by the WebhookController of symfony/webhook (while external packages *implement* the interface), I would not oppose shipping that in a minor version of the component, with an explicit mention about that in the changelog and upgrade guide. But I'd like to know what other members of the core team think about it.
+
+---------------------------------------------------------------------------
+
+by stof at 2024-09-13T16:23:38Z
+
+Based on the comment in https://github.com/symfony/symfony/pull/50324#issuecomment-2028822948, it seems like Sendgrid also batches webhooks but our parser silently ignore all events except the first one.
+
+---------------------------------------------------------------------------
+
+by kbond at 2024-09-13T16:32:28Z
+
+> our parser silently ignore all events except the first one.
+
+😬
+
+Once multiple messages can be parsed in one request, what are your thoughts on what to do when just one fails? Each parser could do there own thing if I'm understanding correctly.
+
+---------------------------------------------------------------------------
+
+by stof at 2024-09-13T16:35:33Z
+
+Each parser can have its own logic to decide when it returns `null` (to ignore the webhook) and when it throws an exception
+
+---------------------------------------------------------------------------
+
+by kbond at 2024-09-14T18:22:40Z
+
+I've added tests, updated changelog and upgrade guide. If this minor BC Break is acceptable, I think this is good to go.
+
+> it seems like Sendgrid also batches webhooks but our parser silently ignore all events except the first one.
+
+When/if merged, I'll fix the sendgrid bridge.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2024-09-16T07:18:32Z
+
+As we already have 3 bridges that would work correctly without this change, I would consider this BC break as something we need to fix in 7.2.
+
+---------------------------------------------------------------------------
+
+by stof at 2024-09-16T15:11:02Z
+
+Adding a new method will be a BC break for all implementations . And right now, we have dozens of implementation, all in external packages (either in bridge components or third-party) while we have only 1 known caller in the webhook component itself (and so no impacted by a BC break as its update is shipped in the same package).
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-09-16T15:27:04Z
+
+With an `@method` of course.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-09-16T15:27:16Z
+
+Or a new interface / abstract class.
+
+---------------------------------------------------------------------------
+
+by stof at 2024-09-16T15:33:53Z
+
+but that would still force bridges to implement the parse method returning a single one (and so being broken for batched webhooks)
+
+---------------------------------------------------------------------------
+
+by mahono at 2024-09-17T11:51:48Z
+
+Just for curiosity: does this somehow allow streaming events to a webhook?
+
+---------------------------------------------------------------------------
+
+by kbond at 2024-09-17T12:46:05Z
+
+> Just for curiosity: does this somehow allow streaming events to a webhook?
+
+No, just accounts for some webhook providers that send multiple events in a single request.
+
+---------------------------------------------------------------------------
+
+by kbond at 2024-09-18T08:46:46Z
+
+> What about introducing a parseAll method?
+
+I thought about this and then, in `WebhookController`, use `parseAll` when available and `parse` if not (trigger deprecation in this case). I ran into the same thing that @stof describes - a lot more 3rd party code that would need updating.
+
+FYI, I did a search on packagist and couldn't find any open source code that _consumes_ parsers.

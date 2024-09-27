@@ -1,0 +1,18 @@
+---------------------------------------------------------------------------
+
+by smnandre at 2024-09-03T11:25:29Z
+
+AssetMapper Tests are green on AppVeyor 🍾
+* (failures on [Validator](https://ci.appveyor.com/project/fabpot/symfony/builds/50526188#L2026) / intl)
+
+PHPUnit Tests on 8.4 unrelated
+* (failures on [Processs](https://github.com/symfony/symfony/actions/runs/10681905005/job/29606537729?pr=58141#step:8:2788) / pty)
+
+Integration tests on 8.2 unrelated
+* (failures on [Ldap](https://github.com/symfony/symfony/actions/runs/10681905001/job/29606536133?pr=58141#step:16:84))
+
+---------------------------------------------------------------------------
+
+by smnandre at 2024-09-16T18:05:45Z
+
+Ping someone for 7.2 ? 😊

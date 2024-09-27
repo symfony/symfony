@@ -54,8 +54,6 @@ class WebProfilerExtensionTest extends TestCase
 
     protected function setUp(): void
     {
-        parent::setUp();
-
         $this->kernel = $this->createMock(KernelInterface::class);
 
         $profiler = $this->createMock(Profiler::class);
@@ -88,8 +86,6 @@ class WebProfilerExtensionTest extends TestCase
 
     protected function tearDown(): void
     {
-        parent::tearDown();
-
         $this->container = null;
     }
 

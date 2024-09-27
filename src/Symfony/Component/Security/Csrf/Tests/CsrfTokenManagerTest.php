@@ -546,8 +546,6 @@ class CsrfTokenManagerTest extends TestCase
 
     protected function tearDown(): void
     {
-        parent::tearDown();
-
         unset($_SERVER['HTTPS']);
     }
 }

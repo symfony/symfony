@@ -33,8 +33,6 @@ class CompiledUrlGeneratorDumperTest extends TestCase
 
     protected function setUp(): void
     {
-        parent::setUp();
-
         $this->routeCollection = new RouteCollection();
         $this->generatorDumper = new CompiledUrlGeneratorDumper($this->routeCollection);
         $this->testTmpFilepath = sys_get_temp_dir().'/php_generator.'.$this->getName().'.php';
@@ -45,8 +43,6 @@ class CompiledUrlGeneratorDumperTest extends TestCase
 
     protected function tearDown(): void
     {
-        parent::tearDown();
-
         @unlink($this->testTmpFilepath);
         @unlink($this->largeTestTmpFilepath);
     }

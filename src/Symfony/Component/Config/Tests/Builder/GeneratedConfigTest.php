@@ -40,8 +40,6 @@ class GeneratedConfigTest extends TestCase
 
     protected function setup(): void
     {
-        parent::setup();
-
         $this->tempDir = [];
     }
 
@@ -49,8 +47,6 @@ class GeneratedConfigTest extends TestCase
     {
         (new Filesystem())->remove($this->tempDir);
         $this->tempDir = [];
-
-        parent::tearDown();
     }
 
     public static function fixtureNames()

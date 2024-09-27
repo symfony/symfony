@@ -21,8 +21,6 @@ class Psr16CacheProxyTest extends SimpleCacheTest
 {
     protected function setUp(): void
     {
-        parent::setUp();
-
         try {
             \assert(false === true, new \Exception());
             $this->skippedTests['testGetInvalidKeys'] =

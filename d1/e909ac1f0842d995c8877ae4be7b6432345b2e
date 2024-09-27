@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by stof at 2024-09-23T15:40:27Z
+
+Why is this flagged as `WebProfilerBundle` when 99% of the PR is about the welcome page of HttpKernel instead ?
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2024-09-23T15:41:27Z
+
+@stof you are right. I fixed it.

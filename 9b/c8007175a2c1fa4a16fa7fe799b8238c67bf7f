@@ -1,0 +1,24 @@
+---------------------------------------------------------------------------
+
+by chalasr at 2024-09-21T12:11:21Z
+
+That interface looks indeed useless since 7.1. @xabbuh can you have a look as you were the one making NameConverterInterface methods' signatures the same as the `AdvancedNameConverterInterface` in 7.1?
+If this is what we want, we probably need to add `@param` phpdoc annotations to each method of `NameConverterInterface` for the new params, to leverage `DebugClassLoader`'s deprecation system.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2024-09-24T07:17:08Z
+
+👍 looks good to me
+
+---------------------------------------------------------------------------
+
+by mtarld at 2024-09-24T08:22:37Z
+
+@chalasr, the `@param` annotations are already on top of `NameConverterInterface` related methods.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2024-09-24T22:15:51Z
+
+Can you please rebase now that https://github.com/symfony/symfony/pull/58368 is merged to ensure tests keep passing despite an implementation exists in core?

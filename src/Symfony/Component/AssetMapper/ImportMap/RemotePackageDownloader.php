@@ -14,6 +14,8 @@ namespace Symfony\Component\AssetMapper\ImportMap;
 use Symfony\Component\AssetMapper\Exception\LogicException;
 use Symfony\Component\AssetMapper\ImportMap\Resolver\PackageResolverInterface;
 use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\HttpClient\Exception\TimeoutException;
+use Symfony\Component\HttpClient\Exception\TransportException;
 
 /**
  * @final
@@ -70,7 +72,11 @@ class RemotePackageDownloader
             return [];
         }
 
-        $contents = $this->packageResolver->downloadPackages($remoteEntriesToDownload, $progressCallback);
+        try {
+            $contents = $this->packageResolver->downloadPackages($remoteEntriesToDownload, $progressCallback);
+        } catch (TimeoutException|TransportException $exception) {
+            throw new LogicException($exception->getMessage());
+        }
         $downloadedPackages = [];
         foreach ($remoteEntriesToDownload as $package => $entry) {
             if (!isset($contents[$package])) {

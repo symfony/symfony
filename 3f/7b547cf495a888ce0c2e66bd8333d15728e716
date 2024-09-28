@@ -1,0 +1,74 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2024-09-26T09:50:15Z
+
+Hey!
+
+I see that this is your first PR. That is great! Welcome!
+
+Symfony has a [contribution guide](https://symfony.com/doc/current/contributing/index.html) which I suggest you to read.
+
+In short:
+- Always add tests
+- Keep backward compatibility (see https://symfony.com/bc).
+- Bug fixes must be submitted against the lowest maintained branch where they apply (see https://symfony.com/releases)
+- Features and deprecations must be submitted against the 7.2 branch.
+
+Review the GitHub status checks of your pull request and try to solve the reported issues. If some tests are failing, try to see if they are failing because of this change.
+
+When two Symfony core team members approve this change, it will be merged and you will become an official Symfony contributor!
+If this PR is merged in a lower version branch, it will be merged up to all maintained branches within a few days.
+
+I am going to sit back now and wait for the reviews.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by derrabus at 2024-09-26T09:55:32Z
+
+Can we add a test that covers this change?
+
+---------------------------------------------------------------------------
+
+by 7-zete-7 at 2024-09-26T10:55:08Z
+
+@derrabus, added a test that covers the issue.
+
+Is this the correct place for such a test or should it be extracted?
+
+---------------------------------------------------------------------------
+
+by derrabus at 2024-09-26T11:08:05Z
+
+I think, this is fine.
+
+---------------------------------------------------------------------------
+
+by 7-zete-7 at 2024-09-26T11:11:42Z
+
+Found another issue with `choice_translation_parameters`. Parameters are ignored when using the `TranslatableMessage` object for choice label.
+
+I'll make some more changes to fix problem.
+
+---------------------------------------------------------------------------
+
+by 7-zete-7 at 2024-09-26T11:23:05Z
+
+Added another test and a fix for the issue associated with it.
+
+---------------------------------------------------------------------------
+
+by stof at 2024-09-26T12:19:20Z
+
+the case of using a TranslatableMessage is expected though: the TranslatableMessage is embedding its own parameters.
+
+---------------------------------------------------------------------------
+
+by 7-zete-7 at 2024-09-26T12:39:05Z
+
+Yes, it turned out to be a PR covering behavior with different scopes of parameters (parent from `choice_translation_parameters` and its own from `TranslatableMesssage`).
+
+In both cases, the parameters were previously lost.

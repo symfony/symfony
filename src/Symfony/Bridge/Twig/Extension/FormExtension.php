@@ -19,6 +19,7 @@ use Symfony\Component\Form\ChoiceList\View\ChoiceView;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormRenderer;
 use Symfony\Component\Form\FormView;
+use Symfony\Contracts\Translation\TranslatableInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFilter;
@@ -147,23 +148,26 @@ final class FormExtension extends AbstractExtension
     private function createFieldChoicesList(iterable $choices, string|false|null $translationDomain): iterable
     {
         foreach ($choices as $choice) {
-            $translatableLabel = $this->createFieldTranslation($choice->label, [], $translationDomain);
-
             if ($choice instanceof ChoiceGroupView) {
+                $translatableLabel = $this->createFieldTranslation($choice->label, [], $translationDomain);
                 yield $translatableLabel => $this->createFieldChoicesList($choice, $translationDomain);
 
                 continue;
             }
 
             /* @var ChoiceView $choice */
+            $translatableLabel = $this->createFieldTranslation($choice->label, $choice->labelTranslationParameters, $translationDomain);
             yield $translatableLabel => $choice->value;
         }
     }
 
-    private function createFieldTranslation(?string $value, array $parameters, string|false|null $domain): ?string
+    private function createFieldTranslation(TranslatableInterface|string|null $value, array $parameters, string|false|null $domain): ?string
     {
         if (!$this->translator || !$value || false === $domain) {
-            return $value;
+            return null !== $value ? (string) $value : null;
+        }
+        if ($value instanceof TranslatableInterface) {
+            return $value->trans($this->translator);
         }
 
         return $this->translator->trans($value, $parameters, $domain);

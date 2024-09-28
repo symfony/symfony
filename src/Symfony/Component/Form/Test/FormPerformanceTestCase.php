@@ -23,8 +23,6 @@ use Symfony\Component\Form\Tests\VersionAwareTest;
  */
 abstract class FormPerformanceTestCase extends FormIntegrationTestCase
 {
-    use VersionAwareTest;
-
     protected int $maxRunningTime = 0;
 
     protected function runTest(): mixed

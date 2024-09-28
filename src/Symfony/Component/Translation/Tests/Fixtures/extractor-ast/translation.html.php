@@ -46,14 +46,14 @@ EOF
 
 <?php echo $view['translator']->trans('default domain', [], null); ?>
 
-<?php echo $view['translator']->trans(message: 'ordered-named-arguments-in-trans-method', parameters: [], domain: 'not_messages'); ?>
-<?php echo $view['translator']->trans(domain: 'not_messages', message: 'disordered-named-arguments-in-trans-method', parameters: []); ?>
+<?php echo $view['translator']->trans(id: 'ordered-named-arguments-in-trans-method', parameters: [], domain: 'not_messages'); ?>
+<?php echo $view['translator']->trans(domain: 'not_messages', id: 'disordered-named-arguments-in-trans-method', parameters: []); ?>
 
 <?php echo $view['translator']->trans($key = 'variable-assignation-inlined-in-trans-method-call1', $parameters = [], $domain = 'not_messages'); ?>
 <?php echo $view['translator']->trans('variable-assignation-inlined-in-trans-method-call2', $parameters = [], $domain = 'not_messages'); ?>
 <?php echo $view['translator']->trans('variable-assignation-inlined-in-trans-method-call3', [], $domain = 'not_messages'); ?>
 
-<?php echo $view['translator']->trans(domain: $domain = 'not_messages', message: $key = 'variable-assignation-inlined-with-named-arguments-in-trans-method', parameters: $parameters = []); ?>
+<?php echo $view['translator']->trans(domain: $domain = 'not_messages', id: $key = 'variable-assignation-inlined-with-named-arguments-in-trans-method', parameters: $parameters = []); ?>
 
 <?php echo $view['translator']->trans('mix-named-arguments', parameters: ['foo' => 'bar']); ?>
 <?php echo $view['translator']->trans('mix-named-arguments-locale', parameters: ['foo' => 'bar'], locale: 'de'); ?>

@@ -23,6 +23,7 @@ use Twig\Node\Expression\ArrayExpression;
 use Twig\Node\Expression\ConstantExpression;
 use Twig\Node\Expression\NameExpression;
 use Twig\Node\Node;
+use Twig\Node\Nodes;
 
 class FormThemeTest extends TestCase
 {
@@ -31,10 +32,17 @@ class FormThemeTest extends TestCase
     public function testConstructor()
     {
         $form = new NameExpression('form', 0);
-        $resources = new Node([
-            new ConstantExpression('tpl1', 0),
-            new ConstantExpression('tpl2', 0),
-        ]);
+        if (class_exists(Nodes::class)) {
+            $resources = new Nodes([
+                new ConstantExpression('tpl1', 0),
+                new ConstantExpression('tpl2', 0),
+            ]);
+        } else {
+            $resources = new Node([
+                new ConstantExpression('tpl1', 0),
+                new ConstantExpression('tpl2', 0),
+            ]);
+        }
 
         $node = new FormThemeNode($form, $resources, 0);
 

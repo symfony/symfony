@@ -13,14 +13,14 @@ namespace Symfony\Component\Mailer\Tests\Transport\Smtp;
 
 use Psr\Log\NullLogger;
 use Symfony\Component\HttpClient\MockHttpClient;
-use Symfony\Component\Mailer\Test\TransportFactoryTestCase;
+use Symfony\Component\Mailer\Test\AbstractTransportFactoryTestCase;
 use Symfony\Component\Mailer\Transport\Dsn;
 use Symfony\Component\Mailer\Transport\Smtp\EsmtpTransport;
 use Symfony\Component\Mailer\Transport\Smtp\EsmtpTransportFactory;
 use Symfony\Component\Mailer\Transport\Smtp\Stream\SocketStream;
 use Symfony\Component\Mailer\Transport\TransportFactoryInterface;
 
-class EsmtpTransportFactoryTest extends TransportFactoryTestCase
+class EsmtpTransportFactoryTest extends AbstractTransportFactoryTestCase
 {
     public function getFactory(): TransportFactoryInterface
     {
@@ -180,5 +180,10 @@ class EsmtpTransportFactoryTest extends TransportFactoryTestCase
             Dsn::fromString('smtp://:@example.com:465?auto_tls=false'),
             $transport,
         ];
+    }
+
+    public static function unsupportedSchemeProvider(): iterable
+    {
+        yield [new Dsn('null', '')];
     }
 }

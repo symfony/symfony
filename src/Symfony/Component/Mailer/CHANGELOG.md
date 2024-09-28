@@ -4,6 +4,11 @@ CHANGELOG
 7.2
 ---
 
+ * Deprecate `TransportFactoryTestCase`, extend `AbstractTransportFactoryTestCase` instead
+
+   The `testIncompleteDsnException()` test is no longer provided by default. If you make use of it by implementing the `incompleteDsnProvider()` data providers,
+   you now need to use the `IncompleteDsnTestTrait`.
+
  * Make `TransportFactoryTestCase` compatible with PHPUnit 10+
 
 7.1

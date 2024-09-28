@@ -13,13 +13,13 @@ namespace Symfony\Component\Mailer\Tests\Transport;
 
 use Psr\Log\NullLogger;
 use Symfony\Component\HttpClient\MockHttpClient;
-use Symfony\Component\Mailer\Test\TransportFactoryTestCase;
+use Symfony\Component\Mailer\Test\AbstractTransportFactoryTestCase;
 use Symfony\Component\Mailer\Transport\Dsn;
 use Symfony\Component\Mailer\Transport\SendmailTransport;
 use Symfony\Component\Mailer\Transport\SendmailTransportFactory;
 use Symfony\Component\Mailer\Transport\TransportFactoryInterface;
 
-class SendmailTransportFactoryTest extends TransportFactoryTestCase
+class SendmailTransportFactoryTest extends AbstractTransportFactoryTestCase
 {
     public function getFactory(): TransportFactoryInterface
     {

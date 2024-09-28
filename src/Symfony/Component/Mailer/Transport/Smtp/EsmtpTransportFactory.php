@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Mailer\Transport\Smtp;
 
+use Symfony\Component\Mailer\Exception\UnsupportedSchemeException;
 use Symfony\Component\Mailer\Transport\AbstractTransportFactory;
 use Symfony\Component\Mailer\Transport\Dsn;
 use Symfony\Component\Mailer\Transport\Smtp\Stream\SocketStream;
@@ -23,6 +24,10 @@ final class EsmtpTransportFactory extends AbstractTransportFactory
 {
     public function create(Dsn $dsn): TransportInterface
     {
+        if (!\in_array($dsn->getScheme(), $this->getSupportedSchemes(), true)) {
+            throw new UnsupportedSchemeException($dsn, 'smtp', $this->getSupportedSchemes());
+        }
+
         $autoTls = '' === $dsn->getOption('auto_tls') || filter_var($dsn->getOption('auto_tls', true), \FILTER_VALIDATE_BOOL);
         $tls = 'smtps' === $dsn->getScheme() ? true : ($autoTls ? null : false);
         $port = $dsn->getPort(0);

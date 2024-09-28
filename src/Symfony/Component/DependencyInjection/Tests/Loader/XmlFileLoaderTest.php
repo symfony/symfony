@@ -45,6 +45,9 @@ use Symfony\Component\DependencyInjection\Tests\Fixtures\FooUnitEnum;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\FooWithAbstractArgument;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\NamedArgumentsDummy;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\RemoteCaller;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\RemoteCallerHttp;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\RemoteCallerSocket;
 use Symfony\Component\ExpressionLanguage\Expression;
 
 class XmlFileLoaderTest extends TestCase
@@ -1262,10 +1265,25 @@ class XmlFileLoaderTest extends TestCase
     public function testStaticConstructorWithFactoryThrows()
     {
         $container = new ContainerBuilder();
-        $loader = new XmlFileLoader($container, new FileLocator(self::$fixturesPath.'/xml'));
+        $loader = new XmlFileLoader($container, new FileLocator(self::$fixturesPath . '/xml'));
 
         $this->expectException(LogicException::class);
         $this->expectExceptionMessage('The "static_constructor" service cannot declare a factory as well as a constructor.');
         $loader->load('static_constructor_and_factory.xml');
+    }
+
+    public function testLoadServicesWithEnvironment()
+    {
+        $container = new ContainerBuilder();
+
+        $loader = new XmlFileLoader($container, new FileLocator(self::$fixturesPath.'/xml'), 'prod');
+        $loader->load('when-env-services.xml');
+
+        self::assertInstanceOf(RemoteCallerHttp::class, $container->get(RemoteCaller::class));
+
+        $loader = new XmlFileLoader($container, new FileLocator(self::$fixturesPath.'/xml'), 'dev');
+        $loader->load('when-env-services.xml');
+
+        self::assertInstanceOf(RemoteCallerSocket::class, $container->get(RemoteCaller::class));
     }
 }

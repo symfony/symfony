@@ -19,6 +19,7 @@ use Twig\Node\Expression\ConstantExpression;
 use Twig\Node\Expression\FilterExpression;
 use Twig\Node\ModuleNode;
 use Twig\Node\Node;
+use Twig\Node\Nodes;
 use Twig\Source;
 use Twig\TwigFilter;
 
@@ -46,10 +47,16 @@ class TwigNodeProvider
             ] : [];
         }
 
+        if (class_exists(Nodes::class)) {
+            $args = new Nodes($arguments);
+        } else {
+            $args = new Node($arguments);
+        }
+
         return new FilterExpression(
             new ConstantExpression($message, 0),
             new TwigFilter('trans'),
-            new Node($arguments),
+            $args,
             0
         );
     }

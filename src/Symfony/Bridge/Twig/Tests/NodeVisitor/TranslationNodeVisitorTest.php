@@ -20,6 +20,7 @@ use Twig\Node\Expression\ConstantExpression;
 use Twig\Node\Expression\FilterExpression;
 use Twig\Node\Expression\NameExpression;
 use Twig\Node\Node;
+use Twig\Node\Nodes;
 use Twig\TwigFilter;
 
 class TranslationNodeVisitorTest extends TestCase
@@ -39,13 +40,22 @@ class TranslationNodeVisitorTest extends TestCase
     {
         $message = 'new key';
 
+        if (class_exists(Nodes::class)) {
+            $n = new Nodes([
+                new ArrayExpression([], 0),
+                new NameExpression('variable', 0),
+            ]);
+        } else {
+            $n = new Node([
+                new ArrayExpression([], 0),
+                new NameExpression('variable', 0),
+            ]);
+        }
+
         $node = new FilterExpression(
             new ConstantExpression($message, 0),
             new TwigFilter('trans'),
-            new Node([
-                new ArrayExpression([], 0),
-                new NameExpression('variable', 0),
-            ]),
+            $n,
             0
         );
 

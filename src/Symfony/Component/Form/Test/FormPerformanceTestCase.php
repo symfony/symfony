@@ -11,8 +11,6 @@
 
 namespace Symfony\Component\Form\Test;
 
-use Symfony\Component\Form\Tests\VersionAwareTestTrait;
-
 /**
  * Base class for performance tests.
  *
@@ -23,8 +21,6 @@ use Symfony\Component\Form\Tests\VersionAwareTestTrait;
  */
 abstract class FormPerformanceTestCase extends FormIntegrationTestCase
 {
-    use VersionAwareTestTrait;
-
     private float $startTime;
     protected int $maxRunningTime = 0;
 

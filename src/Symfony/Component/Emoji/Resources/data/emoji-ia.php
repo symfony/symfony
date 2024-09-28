@@ -94,6 +94,7 @@ return [
     '🇨🇳' => 'bandiera: China',
     '🇨🇴' => 'bandiera: Colombia',
     '🇨🇵' => 'bandiera: Insula Clipperton',
+    '🇨🇶' => 'bandiera: Sark',
     '🇨🇷' => 'bandiera: Costa Rica',
     '🇨🇺' => 'bandiera: Cuba',
     '🇨🇻' => 'bandiera: Capo Verde',

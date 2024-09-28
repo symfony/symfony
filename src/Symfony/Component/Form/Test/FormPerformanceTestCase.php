@@ -25,7 +25,6 @@ use Symfony\Component\Form\Tests\VersionAwareTest;
 abstract class FormPerformanceTestCase extends FormIntegrationTestCase
 {
     use RunTestTrait;
-    use VersionAwareTest;
 
     /**
      * @var int

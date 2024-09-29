@@ -16,6 +16,7 @@ use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\HandlerFailedException;
 use Symfony\Component\Messenger\Middleware\StackInterface;
 use Symfony\Component\Messenger\Stamp\HandledStamp;
+use Symfony\Component\Messenger\Stamp\ReceivedStamp;
 
 /**
  * Wraps all handlers in a single doctrine transaction.
@@ -26,15 +27,25 @@ class DoctrineTransactionMiddleware extends AbstractDoctrineMiddleware
 {
     protected function handleForManager(EntityManagerInterface $entityManager, Envelope $envelope, StackInterface $stack): Envelope
     {
-        $entityManager->getConnection()->beginTransaction();
+        $isReceiver = (null !== $envelope->last(ReceivedStamp::class));
+
+        if ($isReceiver) {
+            $entityManager->getConnection()->beginTransaction();
+        }
+
         try {
             $envelope = $stack->next()->handle($envelope, $stack);
-            $entityManager->flush();
-            $entityManager->getConnection()->commit();
+
+            if ($isReceiver) {
+                $entityManager->flush();
+                $entityManager->getConnection()->commit();
+            }
 
             return $envelope;
         } catch (\Throwable $exception) {
-            $entityManager->getConnection()->rollBack();
+            if ($isReceiver) {
+                $entityManager->getConnection()->rollBack();
+            }
 
             if ($exception instanceof HandlerFailedException) {
                 // Remove all HandledStamp from the envelope so the retry will execute all handlers again.

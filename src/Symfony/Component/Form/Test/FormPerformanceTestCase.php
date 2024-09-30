@@ -45,6 +45,8 @@ abstract class FormPerformanceTestCase extends FormIntegrationTestCase
             $this->fail(sprintf('expected running time: <= %s but was: %s', $this->maxRunningTime, $time));
         }
 
+        $this->expectNotToPerformAssertions();
+
         return $result;
     }
 

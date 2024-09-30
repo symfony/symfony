@@ -99,7 +99,7 @@ class CacheTraitTest extends TestCase
         $cache->expects($this->once())
             ->method('save');
 
-        $callback = fn(CacheItemInterface $item) => 'computed data';
+        $callback = fn (CacheItemInterface $item) => 'computed data';
 
         $cache->get('key', $callback, \INF);
     }
@@ -110,7 +110,7 @@ class CacheTraitTest extends TestCase
             ->onlyMethods(['getItem', 'save'])
             ->getMock();
 
-        $callback = fn(CacheItemInterface $item) => 'computed data';
+        $callback = fn (CacheItemInterface $item) => 'computed data';
 
         $this->expectException(\InvalidArgumentException::class);
         $cache->get('key', $callback, -2);

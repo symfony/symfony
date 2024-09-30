@@ -67,7 +67,7 @@ class AccessToken implements AccessTokenInterface
 
     public function getExpiresAt(): \DateTimeImmutable
     {
-        return $this->expiresAt ??= $this->issuedAt->add(new \DateInterval(sprintf('PT%dS', $this->expiresIn)));
+        return $this->expiresAt ??= $this->issuedAt->add(new \DateInterval(\sprintf('PT%dS', $this->expiresIn)));
     }
 
     public function hasExpired(): bool

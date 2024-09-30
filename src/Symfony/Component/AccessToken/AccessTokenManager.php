@@ -78,7 +78,7 @@ class AccessTokenManager implements AccessTokenManagerInterface
      */
     protected function getFactory(Dsn $dsn): FactoryInterface
     {
-        return $this->factories[$dsn->getScheme()] ?? throw new FactoryNotFoundException(sprintf('Credentials factory for scheme "%s" was not found.', $dsn->getScheme()));
+        return $this->factories[$dsn->getScheme()] ?? throw new FactoryNotFoundException(\sprintf('Credentials factory for scheme "%s" was not found.', $dsn->getScheme()));
     }
 
     /**
@@ -94,7 +94,7 @@ class AccessTokenManager implements AccessTokenManagerInterface
             }
         }
 
-        throw new ProviderNotFoundException(sprintf('Access token provider for credentials "%s" with class "%s" was not found.', $credentials->getId(), $credentials::class));
+        throw new ProviderNotFoundException(\sprintf('Access token provider for credentials "%s" with class "%s" was not found.', $credentials->getId(), $credentials::class));
     }
 
     /** @return array<string,FactoryInterface> */

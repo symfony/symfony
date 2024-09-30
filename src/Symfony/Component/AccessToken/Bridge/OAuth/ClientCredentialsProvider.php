@@ -52,7 +52,7 @@ class ClientCredentialsProvider extends AbstractProvider
     protected function fetchToken(CredentialsInterface $credentials): AccessTokenInterface
     {
         if (!$credentials instanceof ClientCredentials) {
-            throw new ProviderFetchException(sprintf('"%s" provider expects "%s" credentials instances.', self::class, ClientCredentials::class));
+            throw new ProviderFetchException(\sprintf('"%s" provider expects "%s" credentials instances.', self::class, ClientCredentials::class));
         }
 
         if (!$endpointUrl = ($credentials->getEndpoint() ?? $this->getDefaultEndpointUrl($credentials))) {
@@ -66,7 +66,7 @@ class ClientCredentialsProvider extends AbstractProvider
         ]);
 
         if (200 !== $response->getStatusCode()) {
-            throw new ProviderFetchException(sprintf('OAuth2 token could not be fetched from "%s": "%s".', $endpointUrl, $response->getContent(false)));
+            throw new ProviderFetchException(\sprintf('OAuth2 token could not be fetched from "%s": "%s".', $endpointUrl, $response->getContent(false)));
         }
 
         return $this->parseResponse($credentials, $response->getContent());
@@ -129,11 +129,11 @@ class ClientCredentialsProvider extends AbstractProvider
         try {
             $data = json_decode($body, true, 512, \JSON_THROW_ON_ERROR);
         } catch (\JsonException $e) {
-            throw new ProviderFetchException(sprintf('OAuth2 token response is not JSON: "%s".', $body), 0, $e);
+            throw new ProviderFetchException(\sprintf('OAuth2 token response is not JSON: "%s".', $body), 0, $e);
         }
 
         if (!isset($data['access_token'])) {
-            throw new ProviderFetchException(sprintf('OAuth2 token is missing from response: "%s".', $body));
+            throw new ProviderFetchException(\sprintf('OAuth2 token is missing from response: "%s".', $body));
         }
 
         return new AccessToken(

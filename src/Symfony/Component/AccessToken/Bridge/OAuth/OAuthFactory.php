@@ -67,6 +67,6 @@ class OAuthFactory implements FactoryInterface
             );
         }
 
-        throw new InvalidArgumentException(sprintf('"%s" grant type is unsupported for OAuth access token URL.', $grantType));
+        throw new InvalidArgumentException(\sprintf('"%s" grant type is unsupported for OAuth access token URL.', $grantType));
     }
 }

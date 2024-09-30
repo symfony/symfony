@@ -14,6 +14,7 @@ namespace Symfony\Bundle\FrameworkBundle\Tests\Secrets;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\FrameworkBundle\Secrets\SodiumVault;
 use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\String\LazyString;
 
 /**
  * @requires extension sodium
@@ -83,5 +84,18 @@ class SodiumVaultTest extends TestCase
         $vault->seal('FOO', 'bar');
 
         $this->assertSame(['FOO', 'MY_SECRET'], array_keys($vault->loadEnvVars()));
+    }
+
+    public function testEmptySecretEnvVar()
+    {
+        $vault = new SodiumVault($this->secretsDir, '', 'MY_SECRET');
+        $envVars = $vault->loadEnvVars();
+        $envVars['MY_SECRET'] = (string) $envVars['MY_SECRET'];
+        $this->assertSame(['MY_SECRET' => ''], $envVars);
+
+        $vault = new SodiumVault($this->secretsDir, LazyString::fromCallable(fn () => ''), 'MY_SECRET');
+        $envVars = $vault->loadEnvVars();
+        $envVars['MY_SECRET'] = (string) $envVars['MY_SECRET'];
+        $this->assertSame(['MY_SECRET' => ''], $envVars);
     }
 }

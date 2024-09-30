@@ -2035,6 +2035,10 @@ class ApplicationTest extends TestCase
      */
     public function testSignalableRestoresStty()
     {
+        if (!Process::isTtySupported()) {
+            $this->markTestSkipped('tty is not supported');
+        }
+
         if (!Terminal::hasSttyAvailable()) {
             $this->markTestSkipped('stty not available');
         }

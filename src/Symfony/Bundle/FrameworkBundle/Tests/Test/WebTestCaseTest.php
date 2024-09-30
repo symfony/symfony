@@ -13,282 +13,460 @@ namespace Symfony\Bundle\FrameworkBundle\Tests\Test;
 
 use PHPUnit\Framework\AssertionFailedError;
 use PHPUnit\Framework\ExpectationFailedException;
-use PHPUnit\Framework\TestCase;
-use Symfony\Bundle\FrameworkBundle\KernelBrowser;
-use Symfony\Bundle\FrameworkBundle\Test\WebTestAssertionsTrait;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
-use Symfony\Component\BrowserKit\Cookie;
-use Symfony\Component\BrowserKit\CookieJar;
-use Symfony\Component\DomCrawler\Crawler;
-use Symfony\Component\HttpFoundation\Cookie as HttpFoundationCookie;
+use Symfony\Bundle\FrameworkBundle\Tests\Test\Fixtures\Kernel;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\Test\Constraint\ResponseFormatSame;
 
-class WebTestCaseTest extends TestCase
+class WebTestCaseTest extends WebTestCase
 {
     public function testAssertResponseIsSuccessful()
     {
-        $this->getResponseTester(new Response())->assertResponseIsSuccessful();
+        $client = static::createClient();
+        $client->request('GET', '/200');
+
+        $this->assertResponseIsSuccessful();
+
+        $client->request('GET', '/404');
+
         $this->expectException(AssertionFailedError::class);
-        $this->expectExceptionMessage("Failed asserting that the Response is successful.\nHTTP/1.0 404 Not Found");
-        $this->getResponseTester(new Response('', 404))->assertResponseIsSuccessful();
+        $this->expectExceptionMessage("Failed asserting that the Response is successful.\nHTTP/1.1 404 Not Found");
+
+        $this->assertResponseIsSuccessful();
     }
 
     public function testAssertResponseStatusCodeSame()
     {
-        $this->getResponseTester(new Response())->assertResponseStatusCodeSame(200);
-        $this->getResponseTester(new Response('', 404))->assertResponseStatusCodeSame(404);
+        $client = static::createClient();
+        $client->request('GET', '/200');
+
+        $this->assertResponseStatusCodeSame(200);
+
+        $client->request('GET', '/404');
+
+        $this->assertResponseStatusCodeSame(404);
+
         $this->expectException(AssertionFailedError::class);
-        $this->expectExceptionMessage("Failed asserting that the Response status code is 200.\nHTTP/1.0 404 Not Found");
-        $this->getResponseTester(new Response('', 404))->assertResponseStatusCodeSame(200);
+        $this->expectExceptionMessage("Failed asserting that the Response status code is 200.\nHTTP/1.1 404 Not Found");
+
+        $this->assertResponseStatusCodeSame(200);
     }
 
     public function testAssertResponseRedirects()
     {
-        $this->getResponseTester(new Response('', 301))->assertResponseRedirects();
+        $client = static::createClient();
+        $client->request('GET', '/301');
+
+        $this->assertResponseRedirects();
+
+        $client->request('GET', '/200');
+
         $this->expectException(AssertionFailedError::class);
-        $this->expectExceptionMessage("Failed asserting that the Response is redirected.\nHTTP/1.0 200 OK");
-        $this->getResponseTester(new Response())->assertResponseRedirects();
+        $this->expectExceptionMessage("Failed asserting that the Response is redirected.\nHTTP/1.1 200 OK");
+
+        $this->assertResponseRedirects();
     }
 
     public function testAssertResponseRedirectsWithLocation()
     {
-        $this->getResponseTester(new Response('', 301, ['Location' => 'https://example.com/']))->assertResponseRedirects('https://example.com/');
+        $client = static::createClient();
+        $client->request('GET', '/301');
+
+        $this->assertResponseRedirects('https://example.com/');
+
+        $client->request('GET', '/200');
+
         $this->expectException(AssertionFailedError::class);
         $this->expectExceptionMessage('is redirected and has header "Location" with value "https://example.com/".');
-        $this->getResponseTester(new Response('', 301))->assertResponseRedirects('https://example.com/');
+
+        $this->assertResponseRedirects('https://example.com/');
     }
 
     public function testAssertResponseRedirectsWithStatusCode()
     {
-        $this->getResponseTester(new Response('', 302))->assertResponseRedirects(null, 302);
+        $client = static::createClient();
+        $client->request('GET', '/302');
+
+        $this->assertResponseRedirects(null, 302);
+
         $this->expectException(AssertionFailedError::class);
         $this->expectExceptionMessage('is redirected and status code is 301.');
-        $this->getResponseTester(new Response('', 302))->assertResponseRedirects(null, 301);
+
+        $this->assertResponseRedirects(null, 301);
     }
 
     public function testAssertResponseRedirectsWithLocationAndStatusCode()
     {
-        $this->getResponseTester(new Response('', 302, ['Location' => 'https://example.com/']))->assertResponseRedirects('https://example.com/', 302);
+        $client = static::createClient();
+        $client->request('GET', '/302');
+
+        $this->assertResponseRedirects('https://example.com/', 302);
+
         $this->expectException(AssertionFailedError::class);
         $this->expectExceptionMessageMatches('#(:?\( )?is redirected and has header "Location" with value "https://example\.com/" (:?\) )?and status code is 301\.#');
-        $this->getResponseTester(new Response('', 302))->assertResponseRedirects('https://example.com/', 301);
+
+        $this->assertResponseRedirects('https://example.com/', 301);
     }
 
     public function testAssertResponseFormat()
     {
-        if (!class_exists(ResponseFormatSame::class)) {
-            $this->markTestSkipped('Too old version of HttpFoundation.');
-        }
+        $client = static::createClient();
 
-        $this->getResponseTester(new Response('', 200, ['Content-Type' => 'application/vnd.myformat']))->assertResponseFormatSame('custom');
-        $this->getResponseTester(new Response('', 200, ['Content-Type' => 'application/ld+json']))->assertResponseFormatSame('jsonld');
-        $this->getResponseTester(new Response())->assertResponseFormatSame(null);
+        $request = new Request();
+        $request->setFormat('custom', ['application/vnd.myformat']);
+
+        $client->request('GET', '/custom-format');
+        $this->assertResponseFormatSame('custom');
+
+        $client->request('GET', '/jsonld-format');
+        $this->assertResponseFormatSame('jsonld');
+
+        $client->request('GET', '/no-format');
+        $this->assertResponseFormatSame(null);
+
+        $client->request('GET', '/no-format');
+
         $this->expectException(AssertionFailedError::class);
-        $this->expectExceptionMessage("Failed asserting that the Response format is jsonld.\nHTTP/1.0 200 OK");
-        $this->getResponseTester(new Response())->assertResponseFormatSame('jsonld');
+        $this->expectExceptionMessage("Failed asserting that the Response format is jsonld.\nHTTP/1.1 200 OK");
+
+        $this->assertResponseFormatSame('jsonld');
     }
 
     public function testAssertResponseHasHeader()
     {
-        $this->getResponseTester(new Response())->assertResponseHasHeader('Date');
+        $client = static::createClient();
+        $client->request('GET', '/200');
+
+        $this->assertResponseHasHeader('Date');
+
         $this->expectException(AssertionFailedError::class);
         $this->expectExceptionMessage('Failed asserting that the Response has header "X-Date".');
-        $this->getResponseTester(new Response())->assertResponseHasHeader('X-Date');
+
+        $this->assertResponseHasHeader('X-Date');
     }
 
     public function testAssertResponseNotHasHeader()
     {
-        $this->getResponseTester(new Response())->assertResponseNotHasHeader('X-Date');
+        $client = static::createClient();
+        $client->request('GET', '/200');
+
+        $this->assertResponseNotHasHeader('X-Date');
+
         $this->expectException(AssertionFailedError::class);
         $this->expectExceptionMessage('Failed asserting that the Response does not have header "Date".');
-        $this->getResponseTester(new Response())->assertResponseNotHasHeader('Date');
+
+        $this->assertResponseNotHasHeader('Date');
     }
 
     public function testAssertResponseHeaderSame()
     {
-        $this->getResponseTester(new Response())->assertResponseHeaderSame('Cache-Control', 'no-cache, private');
+        $client = static::createClient();
+        $client->request('GET', '/200');
+
+        $this->assertResponseHeaderSame('Cache-Control', 'no-cache, private');
+
         $this->expectException(AssertionFailedError::class);
         $this->expectExceptionMessage('Failed asserting that the Response has header "Cache-Control" with value "public".');
-        $this->getResponseTester(new Response())->assertResponseHeaderSame('Cache-Control', 'public');
+
+        $this->assertResponseHeaderSame('Cache-Control', 'public');
     }
 
     public function testAssertResponseHeaderNotSame()
     {
-        $this->getResponseTester(new Response())->assertResponseHeaderNotSame('Cache-Control', 'public');
+        $client = static::createClient();
+        $client->request('GET', '/200');
+
+        $this->assertResponseHeaderNotSame('Cache-Control', 'public');
+
         $this->expectException(AssertionFailedError::class);
         $this->expectExceptionMessage('Failed asserting that the Response does not have header "Cache-Control" with value "no-cache, private".');
-        $this->getResponseTester(new Response())->assertResponseHeaderNotSame('Cache-Control', 'no-cache, private');
+
+        $this->assertResponseHeaderNotSame('Cache-Control', 'no-cache, private');
     }
 
     public function testAssertResponseHasCookie()
     {
-        $response = new Response();
-        $response->headers->setCookie(HttpFoundationCookie::create('foo', 'bar'));
+        $client = static::createClient();
+        $client->request('GET', '/200');
 
-        $this->getResponseTester($response)->assertResponseHasCookie('foo');
+        $this->assertResponseHasCookie('foo');
+
         $this->expectException(AssertionFailedError::class);
         $this->expectExceptionMessage('Failed asserting that the Response has cookie "bar".');
-        $this->getResponseTester($response)->assertResponseHasCookie('bar');
+
+        $this->assertResponseHasCookie('bar');
     }
 
     public function testAssertResponseNotHasCookie()
     {
-        $response = new Response();
-        $response->headers->setCookie(HttpFoundationCookie::create('foo', 'bar'));
+        $client = static::createClient();
+        $client->request('GET', '/200');
 
-        $this->getResponseTester($response)->assertResponseNotHasCookie('bar');
+        $this->assertResponseNotHasCookie('bar');
+
         $this->expectException(AssertionFailedError::class);
         $this->expectExceptionMessage('Failed asserting that the Response does not have cookie "foo".');
-        $this->getResponseTester($response)->assertResponseNotHasCookie('foo');
+
+        $this->assertResponseNotHasCookie('foo');
     }
 
     public function testAssertResponseCookieValueSame()
     {
-        $response = new Response();
-        $response->headers->setCookie(HttpFoundationCookie::create('foo', 'bar'));
+        $client = static::createClient();
+        $client->request('GET', '/200');
 
-        $this->getResponseTester($response)->assertResponseCookieValueSame('foo', 'bar');
+        $this->assertResponseCookieValueSame('foo', 'bar');
+
         $this->expectException(AssertionFailedError::class);
         $this->expectExceptionMessage('has cookie "bar" and has cookie "bar" with value "bar".');
-        $this->getResponseTester($response)->assertResponseCookieValueSame('bar', 'bar');
+
+        $this->assertResponseCookieValueSame('bar', 'bar');
     }
 
     public function testAssertBrowserHasCookie()
     {
-        $this->getClientTester()->assertBrowserHasCookie('foo', '/path');
+        $client = static::createClient();
+        $client->request('GET', '/200');
+
+        $this->assertBrowserHasCookie('foo', '/path');
+
         $this->expectException(AssertionFailedError::class);
         $this->expectExceptionMessage('Failed asserting that the Browser has cookie "bar".');
-        $this->getClientTester()->assertBrowserHasCookie('bar');
+
+        $this->assertBrowserHasCookie('bar');
     }
 
     public function testAssertBrowserNotHasCookie()
     {
-        $this->getClientTester()->assertBrowserNotHasCookie('bar');
+        $client = static::createClient();
+        $client->request('GET', '/200');
+
+        $this->assertBrowserNotHasCookie('bar');
+
         $this->expectException(AssertionFailedError::class);
         $this->expectExceptionMessage('Failed asserting that the Browser does not have cookie "foo" with path "/path".');
-        $this->getClientTester()->assertBrowserNotHasCookie('foo', '/path');
+
+        $this->assertBrowserNotHasCookie('foo', '/path');
     }
 
     public function testAssertBrowserCookieValueSame()
     {
-        $this->getClientTester()->assertBrowserCookieValueSame('foo', 'bar', false, '/path');
+        $client = static::createClient();
+        $client->request('GET', '/200');
+
+        $this->assertBrowserCookieValueSame('foo', 'bar', false, '/path');
+
         $this->expectException(AssertionFailedError::class);
         $this->expectExceptionMessage('has cookie "foo" with path "/path" and has cookie "foo" with path "/path" with value "babar".');
-        $this->getClientTester()->assertBrowserCookieValueSame('foo', 'babar', false, '/path');
+
+        $this->assertBrowserCookieValueSame('foo', 'babar', false, '/path');
     }
 
     public function testAssertSelectorExists()
     {
-        $this->getCrawlerTester(new Crawler('<html><body><h1>'))->assertSelectorExists('body > h1');
+        $client = static::createClient();
+        $client->request('GET', sprintf('/crawler/%s', urlencode('<html><body><h1>')));
+
+        $this->assertSelectorExists('body > h1');
+
+        $client->request('GET', sprintf('/crawler/%s', urlencode('<html><head><title>Foo')));
+
         $this->expectException(AssertionFailedError::class);
         $this->expectExceptionMessage('matches selector "body > h1".');
-        $this->getCrawlerTester(new Crawler('<html><head><title>Foo'))->assertSelectorExists('body > h1');
+
+        $this->assertSelectorExists('body > h1');
     }
 
     public function testAssertSelectorNotExists()
     {
-        $this->getCrawlerTester(new Crawler('<html><head><title>Foo'))->assertSelectorNotExists('body > h1');
+        $client = static::createClient();
+        $client->request('GET', sprintf('/crawler/%s', urlencode('<html><head><title>Foo')));
+
+        $this->assertSelectorNotExists('body > h1');
+
+        $client->request('GET', sprintf('/crawler/%s', urlencode('<html><body><h1>')));
+
         $this->expectException(AssertionFailedError::class);
         $this->expectExceptionMessage('does not match selector "body > h1".');
-        $this->getCrawlerTester(new Crawler('<html><body><h1>'))->assertSelectorNotExists('body > h1');
+
+        $this->assertSelectorNotExists('body > h1');
     }
 
     public function testAssertSelectorTextNotContains()
     {
-        $this->getCrawlerTester(new Crawler('<html><body><h1>Foo'))->assertSelectorTextNotContains('body > h1', 'Bar');
+        $client = static::createClient();
+        $client->request('GET', sprintf('/crawler/%s', urlencode('<html><body><h1>Foo')));
+
+        $this->assertSelectorTextNotContains('body > h1', 'Bar');
+
+        $client->request('GET', sprintf('/crawler/%s', urlencode('<html><body><h1>Foo')));
+
         $this->expectException(AssertionFailedError::class);
         $this->expectExceptionMessage('matches selector "body > h1" and the text "Foo" of the node matching selector "body > h1" does not contain "Foo".');
-        $this->getCrawlerTester(new Crawler('<html><body><h1>Foo'))->assertSelectorTextNotContains('body > h1', 'Foo');
+
+        $this->assertSelectorTextNotContains('body > h1', 'Foo');
     }
 
     public function testAssertPageTitleSame()
     {
-        $this->getCrawlerTester(new Crawler('<html><head><title>Foo'))->assertPageTitleSame('Foo');
+        $client = static::createClient();
+        $client->request('GET', sprintf('/crawler/%s', urlencode('<html><head><title>Foo')));
+
+        $this->assertPageTitleSame('Foo');
+
+        $client->request('GET', sprintf('/crawler/%s', urlencode('<html><head><title>Foo')));
+
         $this->expectException(AssertionFailedError::class);
         $this->expectExceptionMessage('matches selector "title" and has a node matching selector "title" with content "Bar".');
-        $this->getCrawlerTester(new Crawler('<html><head><title>Foo'))->assertPageTitleSame('Bar');
+
+        $this->assertPageTitleSame('Bar');
     }
 
     public function testAssertPageTitleContains()
     {
-        $this->getCrawlerTester(new Crawler('<html><head><title>Foobar'))->assertPageTitleContains('Foo');
+        $client = static::createClient();
+        $client->request('GET', sprintf('/crawler/%s', urlencode('<html><head><title>Foobar')));
+
+        $this->assertPageTitleContains('Foo');
+
+        $client->request('GET', sprintf('/crawler/%s', urlencode('<html><head><title>Foo')));
+
         $this->expectException(AssertionFailedError::class);
         $this->expectExceptionMessage('matches selector "title" and the text "Foo" of the node matching selector "title" contains "Bar".');
-        $this->getCrawlerTester(new Crawler('<html><head><title>Foo'))->assertPageTitleContains('Bar');
+
+        $this->assertPageTitleContains('Bar');
     }
 
     public function testAssertInputValueSame()
     {
-        $this->getCrawlerTester(new Crawler('<html><body><form><input type="text" name="username" value="Fabien">'))->assertInputValueSame('username', 'Fabien');
+        $client = static::createClient();
+        $client->request('GET', sprintf('/crawler/%s', urlencode('<html><body><form><input type="text" name="username" value="Fabien">')));
+
+        $this->assertInputValueSame('username', 'Fabien');
+
+        $client->request('GET', sprintf('/crawler/%s', urlencode('<html><head><title>Foo')));
+
         $this->expectException(AssertionFailedError::class);
         $this->expectExceptionMessage('matches selector "input[name="password"]" and has a node matching selector "input[name="password"]" with attribute "value" of value "pa$$".');
-        $this->getCrawlerTester(new Crawler('<html><head><title>Foo'))->assertInputValueSame('password', 'pa$$');
+
+        $this->assertInputValueSame('password', 'pa$$');
     }
 
     public function testAssertInputValueNotSame()
     {
-        $this->getCrawlerTester(new Crawler('<html><body><input type="text" name="username" value="Helene">'))->assertInputValueNotSame('username', 'Fabien');
+        $client = static::createClient();
+        $client->request('GET', sprintf('/crawler/%s', urlencode('<html><body><input type="text" name="username" value="Helene">')));
+
+        $this->assertInputValueNotSame('username', 'Fabien');
+
+        $client->request('GET', sprintf('/crawler/%s', urlencode('<html><body><form><input type="text" name="password" value="pa$$">')));
+
         $this->expectException(AssertionFailedError::class);
         $this->expectExceptionMessage('matches selector "input[name="password"]" and does not have a node matching selector "input[name="password"]" with attribute "value" of value "pa$$".');
-        $this->getCrawlerTester(new Crawler('<html><body><form><input type="text" name="password" value="pa$$">'))->assertInputValueNotSame('password', 'pa$$');
+
+        $this->assertInputValueNotSame('password', 'pa$$');
     }
 
     public function testAssertCheckboxChecked()
     {
-        $this->getCrawlerTester(new Crawler('<html><body><form><input type="checkbox" name="rememberMe" checked>'))->assertCheckboxChecked('rememberMe');
-        $this->getCrawlerTester(new Crawler('<!DOCTYPE html><body><form><input type="checkbox" name="rememberMe" checked>'))->assertCheckboxChecked('rememberMe');
+        $client = static::createClient();
+        $client->request('GET', sprintf('/crawler/%s', urlencode('<html><body><form><input type="checkbox" name="rememberMe" checked>')));
+
+        $this->assertCheckboxChecked('rememberMe');
+
+        $client->request('GET', sprintf('/crawler/%s', urlencode('<!DOCTYPE html><body><form><input type="checkbox" name="rememberMe" checked>')));
+
+        $this->assertCheckboxChecked('rememberMe');
+
+        $client->request('GET', sprintf('/crawler/%s', urlencode('<html><body><form><input type="checkbox" name="rememberMe">')));
+
         $this->expectException(AssertionFailedError::class);
         $this->expectExceptionMessage('matches selector "input[name="rememberMe"]:checked".');
-        $this->getCrawlerTester(new Crawler('<html><body><form><input type="checkbox" name="rememberMe">'))->assertCheckboxChecked('rememberMe');
+
+        $this->assertCheckboxChecked('rememberMe');
     }
 
     public function testAssertCheckboxNotChecked()
     {
-        $this->getCrawlerTester(new Crawler('<html><body><form><input type="checkbox" name="rememberMe">'))->assertCheckboxNotChecked('rememberMe');
-        $this->getCrawlerTester(new Crawler('<!DOCTYPE html><body><form><input type="checkbox" name="rememberMe">'))->assertCheckboxNotChecked('rememberMe');
+        $client = static::createClient();
+        $client->request('GET', sprintf('/crawler/%s', urlencode('<html><body><form><input type="checkbox" name="rememberMe">')));
+
+        $this->assertCheckboxNotChecked('rememberMe');
+
+        $client->request('GET', sprintf('/crawler/%s', urlencode('<!DOCTYPE html><body><form><input type="checkbox" name="rememberMe">')));
+
+        $this->assertCheckboxNotChecked('rememberMe');
+
+        $client->request('GET', sprintf('/crawler/%s', urlencode('<html><body><form><input type="checkbox" name="rememberMe" checked>')));
+
         $this->expectException(AssertionFailedError::class);
         $this->expectExceptionMessage('does not match selector "input[name="rememberMe"]:checked".');
-        $this->getCrawlerTester(new Crawler('<html><body><form><input type="checkbox" name="rememberMe" checked>'))->assertCheckboxNotChecked('rememberMe');
+
+        $this->assertCheckboxNotChecked('rememberMe');
     }
 
     public function testAssertFormValue()
     {
-        $this->getCrawlerTester(new Crawler('<html><body><form id="form"><input type="text" name="username" value="Fabien">', 'http://localhost'))->assertFormValue('#form', 'username', 'Fabien');
+        $client = static::createClient();
+        $client->request('GET', sprintf('/crawler/%s', urlencode('<html><body><form id="form"><input type="text" name="username" value="Fabien">')));
+
+        $this->assertFormValue('#form', 'username', 'Fabien');
+
+        $client->request('GET', sprintf('/crawler/%s', urlencode('<html><body><form id="form"><input type="text" name="username" value="Fabien">')));
+
         $this->expectException(AssertionFailedError::class);
         $this->expectExceptionMessage('Failed asserting that two strings are identical.');
-        $this->getCrawlerTester(new Crawler('<html><body><form id="form"><input type="text" name="username" value="Fabien">', 'http://localhost'))->assertFormValue('#form', 'username', 'Jane');
+
+        $this->assertFormValue('#form', 'username', 'Jane');
     }
 
     public function testAssertNoFormValue()
     {
-        $this->getCrawlerTester(new Crawler('<html><body><form id="form"><input type="checkbox" name="rememberMe">', 'http://localhost'))->assertNoFormValue('#form', 'rememberMe');
+        $client = static::createClient();
+        $client->request('GET', sprintf('/crawler/%s', urlencode('<html><body><form id="form"><input type="checkbox" name="rememberMe">')));
+
+        $this->assertNoFormValue('#form', 'rememberMe');
+
+        $client->request('GET', sprintf('/crawler/%s', urlencode('<html><body><form id="form"><input type="checkbox" name="rememberMe" checked>')));
+
         $this->expectException(AssertionFailedError::class);
         $this->expectExceptionMessage('Field "rememberMe" has a value in form "#form".');
-        $this->getCrawlerTester(new Crawler('<html><body><form id="form"><input type="checkbox" name="rememberMe" checked>', 'http://localhost'))->assertNoFormValue('#form', 'rememberMe');
+
+        $this->assertNoFormValue('#form', 'rememberMe');
     }
 
     public function testAssertRequestAttributeValueSame()
     {
-        $this->getRequestTester()->assertRequestAttributeValueSame('foo', 'bar');
+        $client = static::createClient();
+        $client->request('GET', '/request-attribute');
+
+        $this->assertRequestAttributeValueSame('foo', 'bar');
+
         $this->expectException(AssertionFailedError::class);
         $this->expectExceptionMessage('Failed asserting that the Request has attribute "foo" with value "baz".');
-        $this->getRequestTester()->assertRequestAttributeValueSame('foo', 'baz');
+
+        $this->assertRequestAttributeValueSame('foo', 'baz');
     }
 
     public function testAssertRouteSame()
     {
-        $this->getRequestTester()->assertRouteSame('homepage', ['foo' => 'bar']);
+        $client = static::createClient();
+        $client->request('GET', '/homepage/bar');
+
+        $this->assertRouteSame('homepage', ['foo' => 'bar']);
+
         $this->expectException(AssertionFailedError::class);
         $this->expectExceptionMessage('Failed asserting that the Request has attribute "_route" with value "articles".');
-        $this->getRequestTester()->assertRouteSame('articles');
+
+        $this->assertRouteSame('articles');
     }
 
     public function testExceptionOnServerError()
     {
+        $client = static::createClient();
+        $client->request('GET', '/500');
+
         try {
-            $this->getResponseTester(new Response('', 500, ['X-Debug-Exception' => 'An exception has occurred', 'X-Debug-Exception-File' => '%2Fsrv%2Ftest.php:12']))->assertResponseIsSuccessful();
+            $this->assertResponseIsSuccessful();
         } catch (ExpectationFailedException $exception) {
             $this->assertSame('An exception has occurred', $exception->getPrevious()->getMessage());
             $this->assertSame('/srv/test.php', $exception->getPrevious()->getFile());
@@ -296,57 +474,8 @@ class WebTestCaseTest extends TestCase
         }
     }
 
-    private function getResponseTester(Response $response): WebTestCase
+    protected static function getKernelClass()
     {
-        $client = $this->createMock(KernelBrowser::class);
-        $client->expects($this->any())->method('getResponse')->willReturn($response);
-
-        $request = new Request();
-        $request->setFormat('custom', ['application/vnd.myformat']);
-        $client->expects($this->any())->method('getRequest')->willReturn($request);
-
-        return $this->getTester($client);
-    }
-
-    private function getCrawlerTester(Crawler $crawler): WebTestCase
-    {
-        $client = $this->createMock(KernelBrowser::class);
-        $client->expects($this->any())->method('getCrawler')->willReturn($crawler);
-
-        return $this->getTester($client);
-    }
-
-    private function getClientTester(): WebTestCase
-    {
-        $client = $this->createMock(KernelBrowser::class);
-        $jar = new CookieJar();
-        $jar->set(new Cookie('foo', 'bar', null, '/path', 'example.com'));
-        $client->expects($this->any())->method('getCookieJar')->willReturn($jar);
-
-        return $this->getTester($client);
-    }
-
-    private function getRequestTester(): WebTestCase
-    {
-        $client = $this->createMock(KernelBrowser::class);
-        $request = new Request();
-        $request->attributes->set('foo', 'bar');
-        $request->attributes->set('_route', 'homepage');
-        $client->expects($this->any())->method('getRequest')->willReturn($request);
-
-        return $this->getTester($client);
-    }
-
-    private function getTester(KernelBrowser $client): WebTestCase
-    {
-        $tester = new class() extends WebTestCase {
-            use WebTestAssertionsTrait {
-                getClient as public;
-            }
-        };
-
-        $tester::getClient($client);
-
-        return $tester;
+        return Kernel::class;
     }
 }

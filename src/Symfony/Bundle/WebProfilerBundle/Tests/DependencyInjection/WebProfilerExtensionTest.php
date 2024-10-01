@@ -23,8 +23,11 @@ use Symfony\Component\EventDispatcher\DependencyInjection\RegisterListenersPass;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpKernel\DataCollector\DumpDataCollector;
 use Symfony\Component\HttpKernel\KernelInterface;
+use Symfony\Component\HttpKernel\Profiler\Profile;
 use Symfony\Component\HttpKernel\Profiler\Profiler;
 use Symfony\Component\HttpKernel\Profiler\ProfilerStorageInterface;
+use Symfony\Component\Routing\RequestContext;
+use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Routing\RouterInterface;
 use Twig\Environment;
 use Twig\Loader\ArrayLoader;
@@ -56,15 +59,11 @@ class WebProfilerExtensionTest extends TestCase
     {
         $this->kernel = $this->createMock(KernelInterface::class);
 
-        $profiler = $this->createMock(Profiler::class);
-        $profilerStorage = $this->createMock(ProfilerStorageInterface::class);
-        $router = $this->createMock(RouterInterface::class);
-
         $this->container = new ContainerBuilder();
         $this->container->register('data_collector.dump', DumpDataCollector::class)->setPublic(true);
         $this->container->register('error_handler.error_renderer.html', HtmlErrorRenderer::class)->setPublic(true);
         $this->container->register('event_dispatcher', EventDispatcher::class)->setPublic(true);
-        $this->container->register('router', $router::class)->setPublic(true);
+        $this->container->register('router', Router::class)->setPublic(true);
         $this->container->register('twig', Environment::class)->setPublic(true);
         $this->container->register('twig_loader', ArrayLoader::class)->addArgument([])->setPublic(true);
         $this->container->register('twig', Environment::class)->addArgument(new Reference('twig_loader'))->setPublic(true);
@@ -76,9 +75,9 @@ class WebProfilerExtensionTest extends TestCase
         $this->container->setParameter('kernel.charset', 'UTF-8');
         $this->container->setParameter('debug.file_link_format', null);
         $this->container->setParameter('profiler.class', [Profiler::class]);
-        $this->container->register('profiler', $profiler::class)
+        $this->container->register('profiler', Profiler::class)
             ->setPublic(true)
-            ->addArgument(new Definition($profilerStorage::class));
+            ->addArgument(new Definition(NullProfilerStorage::class));
         $this->container->setParameter('data_collector.templates', []);
         $this->container->set('kernel', $this->kernel);
         $this->container->addCompilerPass(new RegisterListenersPass());
@@ -205,5 +204,56 @@ class WebProfilerExtensionTest extends TestCase
         $this->container->set('kernel', $this->kernel);
 
         return $this->container;
+    }
+}
+
+class Router implements RouterInterface
+{
+    private $context;
+
+    public function setContext(RequestContext $context): void
+    {
+        $this->context = $context;
+    }
+
+    public function getContext(): RequestContext
+    {
+        return $this->context;
+    }
+
+    public function getRouteCollection(): RouteCollection
+    {
+        return new RouteCollection();
+    }
+
+    public function generate(string $name, array $parameters = [], int $referenceType = self::ABSOLUTE_PATH): string
+    {
+    }
+
+    public function match(string $pathinfo): array
+    {
+        return [];
+    }
+}
+
+class NullProfilerStorage implements ProfilerStorageInterface
+{
+    public function find(?string $ip, ?string $url, ?int $limit, ?string $method, ?int $start = null, ?int $end = null): array
+    {
+        return [];
+    }
+
+    public function read(string $token): ?Profile
+    {
+        return null;
+    }
+
+    public function write(Profile $profile): bool
+    {
+        return true;
+    }
+
+    public function purge()
+    {
     }
 }

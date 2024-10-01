@@ -8,6 +8,7 @@ CHANGELOG
  * Generate a meta file in JSON format for resource tracking
  * Add `SkippingResourceChecker`
  * Add support for `defaultNull()` on `BooleanNode`
+ * Add `StringNode`
 
 7.1
 ---

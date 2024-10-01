@@ -30,7 +30,7 @@ class ApcuAdapterTest extends AdapterTestCase
             $this->markTestSkipped('APCu extension is required.');
         }
         if ('cli' === \PHP_SAPI && !filter_var(\ini_get('apc.enable_cli'), \FILTER_VALIDATE_BOOL)) {
-            if ('testWithCliSapi' !== $this->getName()) {
+            if ('testWithCliSapi' !== (method_exists($this, 'name') ? $this->name() : $this->getName())) {
                 $this->markTestSkipped('apc.enable_cli=1 is required.');
             }
         }

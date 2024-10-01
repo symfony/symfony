@@ -58,6 +58,16 @@ final class GatewayApiOptions implements MessageOptionsInterface
         return $this;
     }
 
+    /**
+     * @return $this
+     */
+    public function label(string $label): static
+    {
+        $this->options['label'] = $label;
+
+        return $this;
+    }
+
     public function toArray(): array
     {
         return $this->options;

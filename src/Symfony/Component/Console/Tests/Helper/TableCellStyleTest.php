@@ -12,6 +12,7 @@
 namespace Symfony\Component\Console\Tests\Helper;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Symfony\Component\Console\Helper\TableCellStyle;
 
 class TableCellStyleTest extends TestCase
@@ -21,7 +22,8 @@ class TableCellStyleTest extends TestCase
         $tableCellStyle = new TableCellStyle(['fg' => 'red']);
         $this->assertEquals('red', $tableCellStyle->getOptions()['fg']);
 
-        $this->expectException(\Symfony\Component\Console\Exception\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
+
         new TableCellStyle(['wrong_key' => null]);
     }
 }

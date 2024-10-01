@@ -253,7 +253,7 @@ class MemcachedAdapterTest extends AdapterTestCase
         $pool = $this->createCachePool(0, null, $namespace);
 
         /**
-         * Choose a key that is below {@see \Symfony\Component\Cache\Adapter\MemcachedAdapter::$maxIdLength} so that
+         * Choose a key that is below {@see MemcachedAdapter::$maxIdLength} so that
          * {@see \Symfony\Component\Cache\Traits\AbstractTrait::getId()} does not shorten the key but choose special
          * characters that would be encoded and therefore increase the key length over the Memcached limit.
          */

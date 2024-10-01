@@ -31,6 +31,7 @@ class NodeBuilder implements NodeParentInterface
             'float' => FloatNodeDefinition::class,
             'array' => ArrayNodeDefinition::class,
             'enum' => EnumNodeDefinition::class,
+            'string' => StringNodeDefinition::class,
         ];
     }
 
@@ -100,6 +101,14 @@ class NodeBuilder implements NodeParentInterface
     public function variableNode(string $name): VariableNodeDefinition
     {
         return $this->node($name, 'variable');
+    }
+
+    /**
+     * Creates a child string node.
+     */
+    public function stringNode(string $name): StringNodeDefinition
+    {
+        return $this->node($name, 'string');
     }
 
     /**

@@ -20,7 +20,7 @@ class StringNodeTest extends TestCase
     /**
      * @dataProvider getValidValues
      */
-    public function testNormalize(string $value): void
+    public function testNormalize(string $value)
     {
         $node = new StringNode('test');
         $this->assertSame($value, $node->normalize($value));
@@ -37,9 +37,8 @@ class StringNodeTest extends TestCase
     /**
      * @dataProvider getInvalidValues
      */
-    public function testNormalizeThrowsExceptionOnInvalidValues($value): void
+    public function testNormalizeThrowsExceptionOnInvalidValues($value)
     {
-
         $node = new StringNode('test');
 
         $this->expectException(InvalidTypeException::class);

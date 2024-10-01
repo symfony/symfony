@@ -23,7 +23,7 @@ class StringNode extends ScalarNode
     protected function validateType(mixed $value): void
     {
         if (!\is_string($value)) {
-            $ex = new InvalidTypeException(sprintf('Invalid type for path "%s". Expected "string", but got "%s".', $this->getPath(), get_debug_type($value)));
+            $ex = new InvalidTypeException(\sprintf('Invalid type for path "%s". Expected "string", but got "%s".', $this->getPath(), get_debug_type($value)));
             if ($hint = $this->getInfo()) {
                 $ex->addHint($hint);
             }

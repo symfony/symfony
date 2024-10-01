@@ -238,7 +238,7 @@ class Router implements RouterInterface
 
 class NullProfilerStorage implements ProfilerStorageInterface
 {
-    public function find(?string $ip, ?string $url, ?int $limit, ?string $method, ?int $start = null, ?int $end = null): array
+    public function find(?string $ip, ?string $url, ?int $limit, ?string $method, ?int $start = null, ?int $end = null, ?string $statusCode = null, ?\Closure $filter = null): array
     {
         return [];
     }
@@ -253,7 +253,7 @@ class NullProfilerStorage implements ProfilerStorageInterface
         return true;
     }
 
-    public function purge()
+    public function purge(): void
     {
     }
 }

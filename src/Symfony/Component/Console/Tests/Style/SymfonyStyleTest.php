@@ -96,6 +96,14 @@ class SymfonyStyleTest extends TestCase
         $this->assertStringEqualsFile($outputFilepath, $this->tester->getDisplay(true));
     }
 
+    public function testGetOutput()
+    {
+        $output = $this->createMock(OutputInterface::class);
+        $io = new SymfonyStyle($this->createMock(InputInterface::class), $output);
+
+        $this->assertSame($output, $io->getOutput());
+    }
+
     public function testGetErrorStyle()
     {
         $input = $this->createMock(InputInterface::class);

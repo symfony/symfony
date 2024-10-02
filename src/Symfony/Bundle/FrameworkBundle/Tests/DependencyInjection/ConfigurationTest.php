@@ -954,6 +954,9 @@ class ConfigurationTest extends TestCase
             'remote-event' => [
                 'enabled' => !class_exists(FullStack::class) && class_exists(RemoteEvent::class),
             ],
+            'clock' => [
+                'default_timezone' => null,
+            ],
         ];
     }
 

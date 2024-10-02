@@ -19,7 +19,6 @@ use phpDocumentor\Reflection\Types\ContextFactory;
 use PhpParser\Parser;
 use PHPStan\PhpDocParser\Parser\PhpDocParser;
 use Psr\Cache\CacheItemPoolInterface;
-use Psr\Clock\ClockInterface as PsrClockInterface;
 use Psr\Container\ContainerInterface as PsrContainerInterface;
 use Psr\Http\Client\ClientInterface;
 use Psr\Log\LoggerAwareInterface;
@@ -224,12 +223,6 @@ class FrameworkExtension extends Extension
         $loader->load('fragment_renderer.php');
         $loader->load('error_renderer.php');
 
-        if (!ContainerBuilder::willBeAvailable('symfony/clock', ClockInterface::class, ['symfony/framework-bundle'])) {
-            $container->removeDefinition('clock');
-            $container->removeAlias(ClockInterface::class);
-            $container->removeAlias(PsrClockInterface::class);
-        }
-
         $container->registerAliasForArgument('parameter_bag', PsrContainerInterface::class);
 
         $loader->load('process.php');
@@ -381,6 +374,10 @@ class FrameworkExtension extends Extension
         $this->registerRouterConfiguration($config['router'], $container, $loader, $config['enabled_locales']);
         $this->registerPropertyAccessConfiguration($config['property_access'], $container, $loader);
         $this->registerSecretsConfiguration($config['secrets'], $container, $loader, $config['secret'] ?? null);
+
+        if (ContainerBuilder::willBeAvailable('symfony/clock', ClockInterface::class, ['symfony/framework-bundle'])) {
+            $this->registerClockConfiguration($config['clock'], $container, $loader);
+        }
 
         $container->getDefinition('exception_listener')->replaceArgument(3, $config['exceptions']);
 
@@ -3113,6 +3110,14 @@ class FrameworkExtension extends Extension
                 $container->registerAliasForArgument($sanitizerId, HtmlSanitizerInterface::class, $sanitizerName);
             }
         }
+    }
+
+    private function registerClockConfiguration(mixed $config, ContainerBuilder $container, PhpFileLoader $loader): void
+    {
+        $loader->load('clock.php');
+
+        $container->getDefinition('clock')
+            ->setArgument('$timezone', $config['default_timezone']);
     }
 
     public function getXsdValidationBasePath(): string|false

@@ -2498,6 +2498,21 @@ abstract class FrameworkExtensionTestCase extends TestCase
         self::assertEquals(new Reference('my_service'), $storeDef->getArgument(0));
     }
 
+    public function testClockWithTimezone()
+    {
+        $container = $this->createContainerFromFile('clock_timezone');
+
+        $this->assertEquals(new \DateTimeZone('Europe/Paris'), $container->getDefinition('clock')->getArgument('$timezone'));
+    }
+
+    public function testClockWithInvalidTimeZone()
+    {
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessage('The "default_timezone" option must be a valid timezone.');
+
+        $this->createContainerFromFile('clock_invalid_timezone');
+    }
+
     protected function createContainer(array $data = [])
     {
         return new ContainerBuilder(new EnvPlaceholderParameterBag(array_merge([

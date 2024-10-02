@@ -143,6 +143,7 @@ class Configuration implements ConfigurationInterface
         $enableIfStandalone = fn (string $package, string $class) => !class_exists(FullStack::class) && $willBeAvailable($package, $class) ? 'canBeDisabled' : 'canBeEnabled';
 
         $this->addCsrfSection($rootNode);
+        $this->addClockSection($rootNode);
         $this->addFormSection($rootNode, $enableIfStandalone);
         $this->addHttpCacheSection($rootNode);
         $this->addEsiSection($rootNode);
@@ -212,6 +213,38 @@ class Configuration implements ConfigurationInterface
                     ->children()
                         // defaults to framework.session.enabled && !class_exists(FullStack::class) && interface_exists(CsrfTokenManagerInterface::class)
                         ->booleanNode('enabled')->defaultNull()->end()
+                    ->end()
+                ->end()
+            ->end()
+        ;
+    }
+
+    private function addClockSection(ArrayNodeDefinition $rootNode): void
+    {
+        $rootNode
+            ->children()
+                ->arrayNode('clock')
+                    ->info('Clock configuration')
+                    ->addDefaultsIfNotSet()
+                    ->children()
+                        ->scalarNode('default_timezone')
+                            ->defaultNull()
+                            ->validate()
+                                ->always(function ($v) {
+                                    if (null === $v) {
+                                        return null;
+                                    }
+
+                                    try {
+                                        return new \DateTimeZone($v);
+                                    } catch (\Exception) {
+                                        throw new InvalidConfigurationException('The "default_timezone" option must be a valid timezone.');
+                                    }
+                                })
+                            ->end()
+                            ->info('The timezone used by the Clock service. Defaults to using the PHP default timezone.')
+                            ->example('UTC')
+                        ->end()
                     ->end()
                 ->end()
             ->end()

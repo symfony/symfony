@@ -41,6 +41,7 @@ use Symfony\Component\Messenger\Stamp\ReceivedStamp;
 use Symfony\Component\Messenger\Stamp\SentStamp;
 use Symfony\Component\Messenger\Stamp\StampInterface;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
+use Symfony\Component\Messenger\Tests\Fixtures\DummyMessageInterface;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyReceiver;
 use Symfony\Component\Messenger\Tests\Fixtures\ResettableDummyReceiver;
 use Symfony\Component\Messenger\Transport\Receiver\QueueReceiverInterface;
@@ -668,7 +669,7 @@ class DummyBatchHandler implements BatchHandlerInterface
 
     private function shouldFlush(): bool
     {
-        return 5 <= \count($this->jobs);
+        return 2 <= \count($this->jobs);
     }
 
     private function process(array $jobs): void
@@ -707,8 +708,19 @@ Class SecondDummyBatchHandler implements BatchHandlerInterface
     }
 }
 
-class SecondHandlerDummyMessage extends DummyMessage
+class SecondHandlerDummyMessage implements DummyMessageInterface
 {
+    private string $message;
+
+    public function __construct(string $message)
+    {
+        $this->message = $message;
+    }
+
+    public function getMessage(): string
+    {
+        return $this->message;
+    }
 }
 
 class SecondMessageDummyReceiver extends DummyReceiver

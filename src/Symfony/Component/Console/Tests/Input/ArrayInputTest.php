@@ -12,7 +12,6 @@
 namespace Symfony\Component\Console\Tests\Input;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputDefinition;
@@ -180,8 +179,7 @@ class ArrayInputTest extends TestCase
         ArrayInput $input,
         ?array $parsedOptions,
         array $expected,
-    ): void
-    {
+    ) {
         if (null !== $inputDefinition) {
             $input->bind($inputDefinition);
         }
@@ -302,7 +300,7 @@ class ArrayInputTest extends TestCase
         $createSingleOptionScenario = static fn (
             InputOption $option,
             array $input,
-            array $expected
+            array $expected,
         ) => [
             new InputDefinition([$option]),
             new ArrayInput($input),
@@ -402,7 +400,7 @@ class ArrayInputTest extends TestCase
 
         $createEscapeOptionTokenScenario = static fn (
             string $optionValue,
-            ?string $expected
+            ?string $expected,
         ) => [
             new InputDefinition([
                 new InputOption(

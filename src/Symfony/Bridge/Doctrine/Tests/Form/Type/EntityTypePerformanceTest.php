@@ -24,7 +24,7 @@ use Symfony\Component\Form\Test\FormPerformanceTestCase;
  */
 class EntityTypePerformanceTest extends FormPerformanceTestCase
 {
-    private const ENTITY_CLASS = 'Symfony\Bridge\Doctrine\Tests\Fixtures\SingleIntIdEntity';
+    private const ENTITY_CLASS = SingleIntIdEntity::class;
 
     /**
      * @var \Doctrine\ORM\EntityManager

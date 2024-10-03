@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by aschempp at 2024-09-24T13:59:42Z
+
+BTW this will cause upstream merge issues because the `ResponseCacheStrategy` has received new features in Symfony 6 (see https://github.com/symfony/symfony/pull/42355). Not sure how to deal with that, should I open a second PR for Symfony 6?
+
+---------------------------------------------------------------------------
+
+by aschempp at 2024-09-24T14:07:55Z
+
+Failing test is unrelated (5.4 branch is failing without this PR as well)

@@ -11,12 +11,19 @@
 
 namespace Symfony\Component\Translation\Bridge\Loco\Tests;
 
+use Psr\Log\NullLogger;
+use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\Translation\Bridge\Loco\LocoProviderFactory;
+use Symfony\Component\Translation\Loader\LoaderInterface;
 use Symfony\Component\Translation\Provider\ProviderFactoryInterface;
-use Symfony\Component\Translation\Test\ProviderFactoryTestCase;
+use Symfony\Component\Translation\Test\AbstractProviderFactoryTestCase;
+use Symfony\Component\Translation\Test\IncompleteDsnTestTrait;
+use Symfony\Component\Translation\TranslatorBagInterface;
 
-class LocoProviderFactoryTest extends ProviderFactoryTestCase
+class LocoProviderFactoryTest extends AbstractProviderFactoryTestCase
 {
+    use IncompleteDsnTestTrait;
+
     public static function supportsProvider(): iterable
     {
         yield [true, 'loco://API_KEY@default'];
@@ -48,6 +55,6 @@ class LocoProviderFactoryTest extends ProviderFactoryTestCase
 
     public function createFactory(): ProviderFactoryInterface
     {
-        return new LocoProviderFactory($this->getClient(), $this->getLogger(), $this->getDefaultLocale(), $this->getLoader(), $this->getTranslatorBag());
+        return new LocoProviderFactory(new MockHttpClient(), new NullLogger(), 'en', $this->createMock(LoaderInterface::class), $this->createMock(TranslatorBagInterface::class));
     }
 }

@@ -46,4 +46,14 @@ class AutowireLocatorTest extends TestCase
             $locator->value,
         );
     }
+
+    public function testInvalidTypeLocator()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('"bool" is not a PHP type for key "stdClass".');
+
+        new AutowireLocator([
+            \stdClass::class => true,
+        ]);
+    }
 }

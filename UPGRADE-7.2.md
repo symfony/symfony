@@ -14,6 +14,13 @@ Cache
  * `igbinary_serialize()` is not used by default when the igbinary extension is installed
  * Deprecate making `cache.app` adapter taggable, use the `cache.app.taggable` adapter instead
 
+Console
+-------
+
+ * [BC BREAK] Add ``--silent`` global option to enable the silent verbosity mode (suppressing all output, including errors)
+   If a custom command defines the `silent` option, it must be renamed before upgrading.
+ * Add `isSilent()` method to `OutputInterface`
+
 DependencyInjection
 -------------------
 
@@ -40,10 +47,26 @@ Ldap
 
  * Add methods for `saslBind()` and `whoami()` to `ConnectionInterface` and `LdapInterface`
 
+Mailer
+------
+
+* Deprecate `TransportFactoryTestCase`, extend `AbstractTransportFactoryTestCase` instead
+
+  The `testIncompleteDsnException()` test is no longer provided by default. If you make use of it by implementing the `incompleteDsnProvider()` data providers,
+  you now need to use the `IncompleteDsnTestTrait`.
+
 Messenger
 ---------
 
  * Add `getRetryDelay()` method to `RecoverableExceptionInterface`
+
+Notifier
+--------
+
+ * Deprecate `TransportFactoryTestCase`, extend `AbstractTransportFactoryTestCase` instead
+
+   The `testIncompleteDsnException()` and `testMissingRequiredOptionException()` tests are no longer provided by default. If you make use of them (i.e. by implementing the
+   `incompleteDsnProvider()` or `missingRequiredOptionProvider()` data providers), you now need to use the `IncompleteDsnTestTrait` or `MissingRequiredOptionTestTrait` respectively.
 
 Security
 --------
@@ -58,6 +81,7 @@ Serializer
 
  * Deprecate the `csv_escape_char` context option of `CsvEncoder` and the `CsvEncoder::ESCAPE_CHAR_KEY` constant
  * Deprecate `CsvEncoderContextBuilder::withEscapeChar()` method
+ * Deprecate `AdvancedNameConverterInterface`, use `NameConverterInterface` instead
 
 String
 ------
@@ -70,12 +94,26 @@ String
 Translation
 -----------
 
+ * Deprecate `ProviderFactoryTestCase`, extend `AbstractTransportFactoryTestCase` instead
+
+   The `testIncompleteDsnException()` test is no longer provided by default. If you make use of it by implementing the `incompleteDsnProvider()` data providers,
+   you now need to use the `IncompleteDsnTestTrait`.
+
  * Deprecate passing an escape character to `CsvFileLoader::setCsvControl()`
 
 TwigBridge
 ----------
 
  * Deprecate passing a tag to the constructor of `FormThemeNode`
+
+Webhook
+-------
+
+ * [BC BREAK] `RequestParserInterface::parse()` return type changed from
+   `?RemoteEvent` to `RemoteEvent|array<RemoteEvent>|null`. Classes already
+   implementing this interface are unaffected but consumers of this method
+   will need to be updated to handle the new return type. Projects relying on
+   the `WebhookController` of the component are not affected by the BC break
 
 Yaml
 ----

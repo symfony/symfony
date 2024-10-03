@@ -230,7 +230,7 @@ class EnvVarProcessor implements EnvVarProcessorInterface, ResetInterface
                 return null;
             }
 
-            if (!isset($this->getProvidedTypes()[$prefix])) {
+            if (!isset(static::getProvidedTypes()[$prefix])) {
                 throw new RuntimeException(\sprintf('Unsupported env var prefix "%s".', $prefix));
             }
 

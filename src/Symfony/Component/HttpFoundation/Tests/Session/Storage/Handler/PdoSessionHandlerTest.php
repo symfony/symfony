@@ -30,7 +30,6 @@ class PdoSessionHandlerTest extends TestCase
         if ($this->dbFile) {
             @unlink($this->dbFile);
         }
-        parent::tearDown();
     }
 
     protected function getPersistentSqliteDsn()

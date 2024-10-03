@@ -12,10 +12,13 @@
 namespace Symfony\Component\Notifier\Bridge\Twitter\Tests;
 
 use Symfony\Component\Notifier\Bridge\Twitter\TwitterTransportFactory;
-use Symfony\Component\Notifier\Test\TransportFactoryTestCase;
+use Symfony\Component\Notifier\Test\AbstractTransportFactoryTestCase;
+use Symfony\Component\Notifier\Test\IncompleteDsnTestTrait;
 
-class TwitterTransportFactoryTest extends TransportFactoryTestCase
+class TwitterTransportFactoryTest extends AbstractTransportFactoryTestCase
 {
+    use IncompleteDsnTestTrait;
+
     public function createFactory(): TwitterTransportFactory
     {
         return new TwitterTransportFactory();

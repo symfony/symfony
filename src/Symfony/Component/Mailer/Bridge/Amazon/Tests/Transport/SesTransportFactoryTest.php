@@ -19,12 +19,15 @@ use Symfony\Component\Mailer\Bridge\Amazon\Transport\SesApiAsyncAwsTransport;
 use Symfony\Component\Mailer\Bridge\Amazon\Transport\SesHttpAsyncAwsTransport;
 use Symfony\Component\Mailer\Bridge\Amazon\Transport\SesSmtpTransport;
 use Symfony\Component\Mailer\Bridge\Amazon\Transport\SesTransportFactory;
-use Symfony\Component\Mailer\Test\TransportFactoryTestCase;
+use Symfony\Component\Mailer\Test\AbstractTransportFactoryTestCase;
+use Symfony\Component\Mailer\Test\IncompleteDsnTestTrait;
 use Symfony\Component\Mailer\Transport\Dsn;
 use Symfony\Component\Mailer\Transport\TransportFactoryInterface;
 
-class SesTransportFactoryTest extends TransportFactoryTestCase
+class SesTransportFactoryTest extends AbstractTransportFactoryTestCase
 {
+    use IncompleteDsnTestTrait;
+
     public function getFactory(): TransportFactoryInterface
     {
         return new SesTransportFactory(null, new MockHttpClient(), new NullLogger());

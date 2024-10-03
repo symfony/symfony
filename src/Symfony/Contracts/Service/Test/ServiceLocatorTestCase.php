@@ -75,10 +75,8 @@ abstract class ServiceLocatorTestCase extends TestCase
             'foo' => function () use (&$locator) { return $locator->get('bar'); },
         ]);
 
-        if (!$this->getExpectedException()) {
-            $this->expectException(NotFoundExceptionInterface::class);
-            $this->expectExceptionMessage('The service "foo" has a dependency on a non-existent service "bar". This locator only knows about the "foo" service.');
-        }
+        $this->expectException(NotFoundExceptionInterface::class);
+        $this->expectExceptionMessage('The service "foo" has a dependency on a non-existent service "bar". This locator only knows about the "foo" service.');
 
         $locator->get('foo');
     }

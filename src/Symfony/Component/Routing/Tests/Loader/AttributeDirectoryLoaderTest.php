@@ -27,8 +27,6 @@ class AttributeDirectoryLoaderTest extends TestCase
 
     protected function setUp(): void
     {
-        parent::setUp();
-
         $this->classLoader = new TraceableAttributeClassLoader();
         $this->loader = new AttributeDirectoryLoader(new FileLocator(), $this->classLoader);
     }

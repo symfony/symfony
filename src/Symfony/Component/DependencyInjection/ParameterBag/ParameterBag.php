@@ -133,7 +133,7 @@ class ParameterBag implements ParameterBagInterface
         $this->deprecatedParameters[$name] = [$package, $version, $message, $name];
     }
 
-    public function nonEmpty(string $name, string $message): void
+    public function cannotBeEmpty(string $name, string $message): void
     {
         $this->nonEmptyParameters[$name] = $message;
     }

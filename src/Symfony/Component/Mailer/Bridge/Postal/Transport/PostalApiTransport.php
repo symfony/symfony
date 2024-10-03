@@ -44,9 +44,7 @@ final class PostalApiTransport extends AbstractApiTransport
 
     protected function doSendApi(SentMessage $sentMessage, Email $email, Envelope $envelope): ResponseInterface
     {
-        $path = \sprintf('/api/v1/send/message');
-
-        $response = $this->client->request('POST', 'https://'.$this->getEndpoint().$path, [
+        $response = $this->client->request('POST', 'https://'.$this->getEndpoint().'/api/v1/send/message', [
             'json' => $this->getPayload($email, $envelope),
             'headers' => [
                 'X-Server-API-Key' => $this->apiToken,

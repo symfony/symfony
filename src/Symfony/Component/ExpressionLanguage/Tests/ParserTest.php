@@ -245,6 +245,15 @@ class ParserTest extends TestCase
                 ['foo'],
             ],
             [
+                new Node\BinaryNode(
+                    'xor',
+                    new Node\NameNode('foo'),
+                    new Node\NameNode('bar'),
+                ),
+                'foo xor bar',
+                ['foo', 'bar'],
+            ],
+            [
                 new Node\BinaryNode('..', new Node\ConstantNode(0), new Node\ConstantNode(3)),
                 '0..3',
             ],

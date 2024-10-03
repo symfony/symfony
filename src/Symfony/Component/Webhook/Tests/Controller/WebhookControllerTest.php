@@ -32,7 +32,10 @@ class WebhookControllerTest extends TestCase
         $this->assertSame(404, $response->getStatusCode());
     }
 
-    public function testParserRejectsPayload()
+    /**
+     * @dataProvider rejectedParseProvider
+     */
+    public function testParserRejectsPayload($return)
     {
         $secret = '1234';
         $request = new Request();
@@ -41,7 +44,7 @@ class WebhookControllerTest extends TestCase
             ->expects($this->once())
             ->method('parse')
             ->with($request, $secret)
-            ->willReturn(null);
+            ->willReturn($return);
         $parser
             ->expects($this->once())
             ->method('createRejectedResponse')
@@ -59,7 +62,13 @@ class WebhookControllerTest extends TestCase
         $this->assertSame('Unable to parse the webhook payload.', $response->getContent());
     }
 
-    public function testParserAcceptsPayload()
+    public static function rejectedParseProvider(): iterable
+    {
+        yield 'null' => [null];
+        yield 'empty array' => [[]];
+    }
+
+    public function testParserAcceptsPayloadAndReturnsSingleEvent()
     {
         $secret = '1234';
         $request = new Request();
@@ -96,5 +105,49 @@ class WebhookControllerTest extends TestCase
         $this->assertInstanceOf(ConsumeRemoteEventMessage::class, $bus->message);
         $this->assertSame('foo', $bus->message->getType());
         $this->assertEquals($event, $bus->message->getEvent());
+    }
+
+    public function testParserAcceptsPayloadAndReturnsMultipleEvents()
+    {
+        $secret = '1234';
+        $request = new Request();
+        $event1 = new RemoteEvent('name1', 'id1', ['payload1']);
+        $event2 = new RemoteEvent('name2', 'id2', ['payload2']);
+        $parser = $this->createMock(RequestParserInterface::class);
+        $parser
+            ->expects($this->once())
+            ->method('parse')
+            ->with($request, $secret)
+            ->willReturn([$event1, $event2]);
+        $parser
+            ->expects($this->once())
+            ->method('createSuccessfulResponse')
+            ->with($request)
+            ->willReturn(new Response('', 202));
+        $bus = new class implements MessageBusInterface {
+            public array $messages = [];
+
+            public function dispatch(object $message, array $stamps = []): Envelope
+            {
+                return new Envelope($this->messages[] = $message, $stamps);
+            }
+        };
+
+        $controller = new WebhookController(
+            ['foo' => ['parser' => $parser, 'secret' => $secret]],
+            $bus,
+        );
+
+        $response = $controller->handle('foo', $request);
+
+        $this->assertSame(202, $response->getStatusCode());
+        $this->assertSame('', $response->getContent());
+        $this->assertCount(2, $bus->messages);
+        $this->assertInstanceOf(ConsumeRemoteEventMessage::class, $bus->messages[0]);
+        $this->assertSame('foo', $bus->messages[0]->getType());
+        $this->assertEquals($event1, $bus->messages[0]->getEvent());
+        $this->assertInstanceOf(ConsumeRemoteEventMessage::class, $bus->messages[1]);
+        $this->assertSame('foo', $bus->messages[1]->getType());
+        $this->assertEquals($event2, $bus->messages[1]->getEvent());
     }
 }

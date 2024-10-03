@@ -19,6 +19,7 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Messenger\Command\FailedMessagesRetryCommand;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\MessageBusInterface;
+use Symfony\Component\Messenger\Stamp\SentToFailureTransportStamp;
 use Symfony\Component\Messenger\Stamp\TransportMessageIdStamp;
 use Symfony\Component\Messenger\Transport\Receiver\ListableReceiverInterface;
 
@@ -222,5 +223,41 @@ EOF;
         $suggestions = $tester->complete(['--transport', $anotherFailureReceiverName, ' ']);
 
         $this->assertSame(['2ab50dfa1fbf', '78c2da843723'], $suggestions);
+    }
+
+    public function testSkipRunWithServiceLocator()
+    {
+        $failureTransportName = 'failure_receiver';
+        $originalTransportName = 'original_receiver';
+
+        $serviceLocator = $this->createMock(ServiceLocator::class);
+        $receiver = $this->createMock(ListableReceiverInterface::class);
+
+        $dispatcher = new EventDispatcher();
+        $bus = $this->createMock(MessageBusInterface::class);
+
+        $serviceLocator->method('has')->willReturn(true);
+        $serviceLocator->method('get')->with($failureTransportName)->willReturn($receiver);
+
+        $receiver->expects($this->once())->method('find')
+            ->willReturn(Envelope::wrap(new \stdClass(), [
+                new SentToFailureTransportStamp($originalTransportName)
+            ]));
+
+        $receiver->expects($this->never())->method('ack');
+        $receiver->expects($this->once())->method('reject');
+
+        $command = new FailedMessagesRetryCommand(
+            $failureTransportName,
+            $serviceLocator,
+            $bus,
+            $dispatcher
+        );
+
+        $tester = new CommandTester($command);
+        $tester->setInputs(['skip']);
+
+        $tester->execute(['id' => ['10']]);
+        $this->assertStringContainsString('[OK]', $tester->getDisplay());
     }
 }

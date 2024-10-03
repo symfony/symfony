@@ -12,10 +12,15 @@
 namespace Symfony\Component\Notifier\Bridge\OrangeSms\Tests;
 
 use Symfony\Component\Notifier\Bridge\OrangeSms\OrangeSmsTransportFactory;
-use Symfony\Component\Notifier\Test\TransportFactoryTestCase;
+use Symfony\Component\Notifier\Test\AbstractTransportFactoryTestCase;
+use Symfony\Component\Notifier\Test\IncompleteDsnTestTrait;
+use Symfony\Component\Notifier\Test\MissingRequiredOptionTestTrait;
 
-final class OrangeSmsTransportFactoryTest extends TransportFactoryTestCase
+final class OrangeSmsTransportFactoryTest extends AbstractTransportFactoryTestCase
 {
+    use IncompleteDsnTestTrait;
+    use MissingRequiredOptionTestTrait;
+
     public function createFactory(): OrangeSmsTransportFactory
     {
         return new OrangeSmsTransportFactory();

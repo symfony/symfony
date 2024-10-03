@@ -27,7 +27,7 @@ class TransportNamesStampTest extends TestCase
         $configuredSenders = ['first_transport', 'second_transport', 'other_transport'];
         $stamp = new TransportNamesStamp($configuredSenders);
         $stampSenders = $stamp->getTransportNames();
-        $this->assertEquals(\count($configuredSenders), \count($stampSenders));
+        $this->assertSameSize($configuredSenders, $stampSenders);
 
         foreach ($configuredSenders as $key => $sender) {
             $this->assertSame($sender, $stampSenders[$key]);

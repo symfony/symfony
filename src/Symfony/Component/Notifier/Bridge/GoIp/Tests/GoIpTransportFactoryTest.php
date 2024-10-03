@@ -12,13 +12,18 @@
 namespace Symfony\Component\Notifier\Bridge\GoIp\Tests;
 
 use Symfony\Component\Notifier\Bridge\GoIp\GoIpTransportFactory;
-use Symfony\Component\Notifier\Test\TransportFactoryTestCase;
+use Symfony\Component\Notifier\Test\AbstractTransportFactoryTestCase;
+use Symfony\Component\Notifier\Test\IncompleteDsnTestTrait;
+use Symfony\Component\Notifier\Test\MissingRequiredOptionTestTrait;
 
 /**
  * @author Ahmed Ghanem <ahmedghanem7361@gmail.com>
  */
-final class GoIpTransportFactoryTest extends TransportFactoryTestCase
+final class GoIpTransportFactoryTest extends AbstractTransportFactoryTestCase
 {
+    use IncompleteDsnTestTrait;
+    use MissingRequiredOptionTestTrait;
+
     public static function createProvider(): iterable
     {
         yield [

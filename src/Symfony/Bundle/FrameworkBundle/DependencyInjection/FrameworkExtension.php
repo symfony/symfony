@@ -309,18 +309,18 @@ class FrameworkExtension extends Extension
         if (isset($config['secret'])) {
             $container->setParameter('kernel.secret', $config['secret']);
         }
-        $container->nonEmptyParameter('kernel.secret', 'A non-empty value for the parameter "kernel.secret" is required. Did you forget to configure the "framework.secret" option?');
+        $container->parameterCannotBeEmpty('kernel.secret', 'A non-empty value for the parameter "kernel.secret" is required. Did you forget to configure the "framework.secret" option?');
 
         $container->setParameter('kernel.http_method_override', $config['http_method_override']);
         $container->setParameter('kernel.trust_x_sendfile_type_header', $config['trust_x_sendfile_type_header']);
-        $container->setParameter('kernel.trusted_hosts', $config['trusted_hosts']);
+        $container->setParameter('kernel.trusted_hosts', [0] === array_keys($config['trusted_hosts']) ? $config['trusted_hosts'][0] : $config['trusted_hosts']);
         $container->setParameter('kernel.default_locale', $config['default_locale']);
         $container->setParameter('kernel.enabled_locales', $config['enabled_locales']);
         $container->setParameter('kernel.error_controller', $config['error_controller']);
 
         if (($config['trusted_proxies'] ?? false) && ($config['trusted_headers'] ?? false)) {
-            $container->setParameter('kernel.trusted_proxies', $config['trusted_proxies']);
-            $container->setParameter('kernel.trusted_headers', $this->resolveTrustedHeaders($config['trusted_headers']));
+            $container->setParameter('kernel.trusted_proxies', \is_array($config['trusted_proxies']) && [0] === array_keys($config['trusted_proxies']) ? $config['trusted_proxies'][0] : $config['trusted_proxies']);
+            $container->setParameter('kernel.trusted_headers', [0] === array_keys($config['trusted_headers']) ? $config['trusted_headers'][0] : $config['trusted_headers']);
         }
 
         if (!$container->hasParameter('debug.file_link_format')) {
@@ -2681,6 +2681,7 @@ class FrameworkExtension extends Extension
                 MailerBridge\Mailjet\Webhook\MailjetRequestParser::class => 'mailer.webhook.request_parser.mailjet',
                 MailerBridge\Mailomat\Webhook\MailomatRequestParser::class => 'mailer.webhook.request_parser.mailomat',
                 MailerBridge\Postmark\Webhook\PostmarkRequestParser::class => 'mailer.webhook.request_parser.postmark',
+                MailerBridge\Mailtrap\Webhook\MailtrapRequestParser::class => 'mailer.webhook.request_parser.mailtrap',
                 MailerBridge\Resend\Webhook\ResendRequestParser::class => 'mailer.webhook.request_parser.resend',
                 MailerBridge\Sendgrid\Webhook\SendgridRequestParser::class => 'mailer.webhook.request_parser.sendgrid',
                 MailerBridge\Sweego\Webhook\SweegoRequestParser::class => 'mailer.webhook.request_parser.sweego',
@@ -3112,25 +3113,6 @@ class FrameworkExtension extends Extension
                 $container->registerAliasForArgument($sanitizerId, HtmlSanitizerInterface::class, $sanitizerName);
             }
         }
-    }
-
-    private function resolveTrustedHeaders(array $headers): int
-    {
-        $trustedHeaders = 0;
-
-        foreach ($headers as $h) {
-            $trustedHeaders |= match ($h) {
-                'forwarded' => Request::HEADER_FORWARDED,
-                'x-forwarded-for' => Request::HEADER_X_FORWARDED_FOR,
-                'x-forwarded-host' => Request::HEADER_X_FORWARDED_HOST,
-                'x-forwarded-proto' => Request::HEADER_X_FORWARDED_PROTO,
-                'x-forwarded-port' => Request::HEADER_X_FORWARDED_PORT,
-                'x-forwarded-prefix' => Request::HEADER_X_FORWARDED_PREFIX,
-                default => 0,
-            };
-        }
-
-        return $trustedHeaders;
     }
 
     public function getXsdValidationBasePath(): string|false

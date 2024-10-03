@@ -7,7 +7,7 @@ CHANGELOG
  * Deprecate `!tagged` tag, use `!tagged_iterator` instead
  * Add a `ContainerBuilder::registerChild()` shortcut method for registering child definitions
  * Add support for `key-type` in `XmlFileLoader`
- * Enable non-empty parameters with `ParameterBag::nonEmpty()` and `ContainerBuilder::nonEmptyParameter()` methods
+ * Enable non-empty parameters with `ParameterBag::cannotBeEmpty()` and `ContainerBuilder::parameterCannotBeEmpty()` methods
 
 7.1
 ---

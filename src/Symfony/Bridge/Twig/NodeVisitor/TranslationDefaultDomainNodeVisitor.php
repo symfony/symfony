@@ -22,6 +22,7 @@ use Twig\Node\Expression\FilterExpression;
 use Twig\Node\Expression\NameExpression;
 use Twig\Node\ModuleNode;
 use Twig\Node\Node;
+use Twig\Node\Nodes;
 use Twig\Node\SetNode;
 use Twig\NodeVisitor\NodeVisitorInterface;
 
@@ -55,7 +56,12 @@ final class TranslationDefaultDomainNodeVisitor implements NodeVisitorInterface
             $name = new AssignNameExpression(self::INTERNAL_VAR_NAME, $node->getTemplateLine());
             $this->scope->set('domain', new NameExpression(self::INTERNAL_VAR_NAME, $node->getTemplateLine()));
 
-            return new SetNode(false, new Node([$name]), new Node([$node->getNode('expr')]), $node->getTemplateLine());
+
+            if (class_exists(Nodes::class)) {
+                return new SetNode(false, new Nodes([$name]), new Nodes([$node->getNode('expr')]), $node->getTemplateLine());
+            } else {
+                return new SetNode(false, new Node([$name]), new Node([$node->getNode('expr')]), $node->getTemplateLine());
+            }
         }
 
         if (!$this->scope->has('domain')) {

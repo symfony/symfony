@@ -72,6 +72,14 @@
     {% endset %}
 
     {% set text %}
+        {% if symfony_version_status %}
+            <div class="sf-toolbar-info-group">
+                <div class="sf-toolbar-info-piece">
+                    <span>{{ symfony_version_status }}</span>
+                </div>
+            </div>
+        {% endif %}
+
         <div class="sf-toolbar-info-group">
             <div class="sf-toolbar-info-piece">
                 <b>Profiler token</b>
@@ -149,7 +157,7 @@
         </div>
     {% endset %}
 
-    {{ include('@WebProfiler/Profiler/toolbar_item.html.twig', { link: true, name: 'config', status: block_status, additional_classes: 'sf-toolbar-block-right', block_attrs: 'title="' ~ symfony_version_status ~ '"' }) }}
+    {{ include('@WebProfiler/Profiler/toolbar_item.html.twig', { link: true, name: 'config', status: block_status, additional_classes: 'sf-toolbar-block-right' }) }}
 {% endblock %}
 
 {% block menu %}

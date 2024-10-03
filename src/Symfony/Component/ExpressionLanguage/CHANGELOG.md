@@ -8,6 +8,7 @@ CHANGELOG
  * Add support for comments using `/*` & `*/`
  * Allow passing any iterable as `$providers` list to `ExpressionLanguage` constructor
  * Add support for `<<`, `>>`, and `~` bitwise operators
+ * Add support for logical `xor` operator
 
 7.1
 ---

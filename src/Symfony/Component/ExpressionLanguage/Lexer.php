@@ -72,7 +72,7 @@ class Lexer
             } elseif (preg_match('{/\*.*?\*/}A', $expression, $match, 0, $cursor)) {
                 // comments
                 $cursor += \strlen($match[0]);
-            } elseif (preg_match('/(?<=^|[\s(])starts with(?=[\s(])|(?<=^|[\s(])ends with(?=[\s(])|(?<=^|[\s(])contains(?=[\s(])|(?<=^|[\s(])matches(?=[\s(])|(?<=^|[\s(])not in(?=[\s(])|(?<=^|[\s(])not(?=[\s(])|(?<=^|[\s(])and(?=[\s(])|\=\=\=|\!\=\=|(?<=^|[\s(])or(?=[\s(])|\|\||&&|\=\=|\!\=|\>\=|\<\=|(?<=^|[\s(])in(?=[\s(])|\.\.|\*\*|\!|\||\^|&|<<|>>|\<|\>|\+|\-|~|\*|\/|%/A', $expression, $match, 0, $cursor)) {
+            } elseif (preg_match('/(?<=^|[\s(])starts with(?=[\s(])|(?<=^|[\s(])ends with(?=[\s(])|(?<=^|[\s(])contains(?=[\s(])|(?<=^|[\s(])matches(?=[\s(])|(?<=^|[\s(])not in(?=[\s(])|(?<=^|[\s(])not(?=[\s(])|(?<=^|[\s(])xor(?=[\s(])|(?<=^|[\s(])and(?=[\s(])|\=\=\=|\!\=\=|(?<=^|[\s(])or(?=[\s(])|\|\||&&|\=\=|\!\=|\>\=|\<\=|(?<=^|[\s(])in(?=[\s(])|\.\.|\*\*|\<\<|\>\>|\!|\||\^|&|\<|\>|\+|\-|~|\*|\/|%/A', $expression, $match, 0, $cursor)) {
                 // operators
                 $tokens[] = new Token(Token::OPERATOR_TYPE, $match[0], $cursor + 1);
                 $cursor += \strlen($match[0]);

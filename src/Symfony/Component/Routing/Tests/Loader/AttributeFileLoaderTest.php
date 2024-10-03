@@ -33,8 +33,6 @@ class AttributeFileLoaderTest extends TestCase
 
     protected function setUp(): void
     {
-        parent::setUp();
-
         $this->classLoader = new TraceableAttributeClassLoader();
         $this->loader = new AttributeFileLoader(new FileLocator(), $this->classLoader);
     }

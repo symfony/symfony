@@ -252,10 +252,10 @@ trait RedisTrait
                         } else {
                             $extra = $passAuth ? [$params['auth']] : [];
 
-                            $sentinel = new $sentinelClass($host, $port, $params['timeout'], (string) $params['persistent_id'], $params['retry_interval'], $params['read_timeout'], ...$extra);
+                            $sentinel = @new $sentinelClass($host, $port, $params['timeout'], (string) $params['persistent_id'], $params['retry_interval'], $params['read_timeout'], ...$extra);
                         }
 
-                        if ($address = $sentinel->getMasterAddrByName($params['redis_sentinel'])) {
+                        if ($address = @$sentinel->getMasterAddrByName($params['redis_sentinel'])) {
                             [$host, $port] = $address;
                         }
                     } catch (\RedisException|\Relay\Exception $redisException) {

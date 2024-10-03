@@ -6,6 +6,8 @@ CHANGELOG
 
  * Add support for `FORCE_COLOR` environment variable
  * Add `verbosity` argument to `mustRun` process helper method
+ * [BC BREAK] Add silent verbosity (`--silent`/`SHELL_VERBOSITY=-2`) to suppress all output, including errors
+ * Add `OutputInterface::isSilent()`, `Output::isSilent()`, `OutputStyle::isSilent()` methods
 
 7.1
 ---

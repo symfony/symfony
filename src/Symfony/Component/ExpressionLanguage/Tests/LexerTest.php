@@ -182,6 +182,30 @@ class LexerTest extends TestCase
                 ],
                 '"/* this is not a comment */"',
             ],
+            [
+                [
+                    new Token('name', 'foo', 1),
+                    new Token('operator', 'xor', 5),
+                    new Token('name', 'bar', 9),
+                ],
+                'foo xor bar',
+            ],
         ];
+    }
+
+    public function testOperatorRegexWasGeneratedWithScript()
+    {
+        ob_start();
+        try {
+            require $script = \dirname(__DIR__).'/Resources/bin/generate_operator_regex.php';
+        } finally {
+            $output = ob_get_clean();
+        }
+
+        self::assertStringContainsString(
+            $output,
+            file_get_contents((new \ReflectionClass(Lexer::class))->getFileName()),
+            \sprintf('You need to run "%s" to generate the operator regex.', $script),
+        );
     }
 }

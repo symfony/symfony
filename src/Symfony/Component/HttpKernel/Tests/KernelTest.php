@@ -29,8 +29,6 @@ use Symfony\Component\HttpKernel\DependencyInjection\ServicesResetter;
 use Symfony\Component\HttpKernel\HttpKernel;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\Kernel;
-use Symfony\Component\HttpKernel\Tests\Fixtures\KernelForTest;
-use Symfony\Component\HttpKernel\Tests\Fixtures\KernelForTestWithLoadClassCache;
 use Symfony\Component\HttpKernel\Tests\Fixtures\KernelWithoutBundles;
 use Symfony\Component\HttpKernel\Tests\Fixtures\ResettableService;
 
@@ -247,7 +245,7 @@ class KernelTest extends TestCase
         $env = 'test_env';
         $debug = true;
         $kernel = new KernelForTest($env, $debug);
-        $expected = "O:57:\"Symfony\Component\HttpKernel\Tests\Fixtures\KernelForTest\":2:{s:14:\"\0*\0environment\";s:8:\"test_env\";s:8:\"\0*\0debug\";b:1;}";
+        $expected = \sprintf("O:48:\"%s\":2:{s:14:\"\0*\0environment\";s:8:\"test_env\";s:8:\"\0*\0debug\";b:1;}", KernelForTest::class);
         $this->assertEquals($expected, serialize($kernel));
     }
 
@@ -523,6 +521,25 @@ class KernelTest extends TestCase
         $this->assertMatchesRegularExpression('/^[a-zA-Z_\x80-\xff][a-zA-Z0-9_\x80-\xff]*TestDebugContainer$/', $kernel->getContainerClass());
     }
 
+    public function testTrustedParameters()
+    {
+        $kernel = new CustomProjectDirKernel(function (ContainerBuilder $container) {
+            $container->setParameter('kernel.trusted_hosts', '^a{2,3}.com$, ^b{2,}.com$');
+            $container->setParameter('kernel.trusted_proxies', 'a,b');
+            $container->setParameter('kernel.trusted_headers', 'x-forwarded-for');
+        });
+        $kernel->boot();
+
+        try {
+            $this->assertSame(['{^a{2,3}.com$}i', '{^b{2,}.com$}i'], Request::getTrustedHosts());
+            $this->assertSame(['a', 'b'], Request::getTrustedProxies());
+            $this->assertSame(Request::HEADER_X_FORWARDED_FOR, Request::getTrustedHeaderSet());
+        } finally {
+            Request::setTrustedHosts([]);
+            Request::setTrustedProxies([], 0);
+        }
+    }
+
     /**
      * Returns a mock for the BundleInterface.
      */
@@ -659,5 +676,53 @@ class PassKernel extends CustomProjectDirKernel implements CompilerPassInterface
     public function process(ContainerBuilder $container): void
     {
         $container->setParameter('test.processed', true);
+    }
+}
+
+class KernelForTest extends Kernel
+{
+    public function __construct(string $environment, bool $debug, private readonly bool $fakeContainer = true)
+    {
+        parent::__construct($environment, $debug);
+    }
+
+    public function getBundleMap(): array
+    {
+        return [];
+    }
+
+    public function registerBundles(): iterable
+    {
+        return [];
+    }
+
+    public function registerContainerConfiguration(LoaderInterface $loader): void
+    {
+    }
+
+    public function isBooted(): bool
+    {
+        return $this->booted;
+    }
+
+    public function getProjectDir(): string
+    {
+        return __DIR__;
+    }
+
+    protected function initializeContainer(): void
+    {
+        if ($this->fakeContainer) {
+            $this->container = new ContainerBuilder();
+        } else {
+            parent::initializeContainer();
+        }
+    }
+}
+
+class KernelForTestWithLoadClassCache extends KernelForTest
+{
+    public function doLoadClassCache(): void
+    {
     }
 }

@@ -12,7 +12,6 @@
 namespace Symfony\Component\Form\Extension\Core\Type;
 
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Event\PreSubmitEvent;
 use Symfony\Component\Form\Exception\InvalidConfigurationException;
 use Symfony\Component\Form\Exception\LogicException;
 use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeImmutableToDateTimeTransformer;

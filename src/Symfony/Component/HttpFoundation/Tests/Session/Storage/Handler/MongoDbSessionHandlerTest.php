@@ -44,8 +44,6 @@ class MongoDbSessionHandlerTest extends TestCase
 
     protected function setUp(): void
     {
-        parent::setUp();
-
         $this->manager = new Manager('mongodb://'.getenv('MONGODB_HOST'));
 
         try {

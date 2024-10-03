@@ -12,10 +12,13 @@
 namespace Symfony\Component\Notifier\Bridge\Unifonic\Tests;
 
 use Symfony\Component\Notifier\Bridge\Unifonic\UnifonicTransportFactory;
-use Symfony\Component\Notifier\Test\TransportFactoryTestCase;
+use Symfony\Component\Notifier\Test\AbstractTransportFactoryTestCase;
+use Symfony\Component\Notifier\Test\IncompleteDsnTestTrait;
 
-final class UnifonicTransportFactoryTest extends TransportFactoryTestCase
+final class UnifonicTransportFactoryTest extends AbstractTransportFactoryTestCase
 {
+    use IncompleteDsnTestTrait;
+
     public function createFactory(): UnifonicTransportFactory
     {
         return new UnifonicTransportFactory();

@@ -4,6 +4,7 @@ CHANGELOG
 7.2
 ---
 
+ * Add support for `--sort` option when extracting translations with `translation:extract` command and `--force` option
  * Add support for setting `headers` with `Symfony\Bundle\FrameworkBundle\Controller\TemplateController`
  * Add `--resolve-env-vars` option to `lint:container` command
  * Derivate `kernel.secret` from the decryption secret when its env var is not defined
@@ -16,6 +17,7 @@ CHANGELOG
  * Deprecate `session.sid_length` and `session.sid_bits_per_character` config options
  * Add the ability to use an existing service as a lock/semaphore resource
  * Add support for configuring multiple serializer instances via the configuration
+ * Add support for `SYMFONY_TRUSTED_PROXIES`, `SYMFONY_TRUSTED_HEADERS`, `SYMFONY_TRUST_X_SENDFILE_TYPE_HEADER` and `SYMFONY_TRUSTED_HOSTS` env vars
 
 7.1
 ---

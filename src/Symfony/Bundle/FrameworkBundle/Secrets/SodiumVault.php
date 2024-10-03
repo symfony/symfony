@@ -114,7 +114,7 @@ class SodiumVault extends AbstractVault implements EnvVarLoaderInterface
 
         $this->loadKeys();
 
-        if ('' === $this->decryptionKey) {
+        if ('' === $this->decryptionKey = (string) $this->decryptionKey) {
             $this->lastMessage = \sprintf('Secret "%s" cannot be revealed as no decryption key was found in "%s".', $name, $this->getPrettyPath(\dirname($this->pathPrefix).\DIRECTORY_SEPARATOR));
 
             return null;
@@ -181,8 +181,8 @@ class SodiumVault extends AbstractVault implements EnvVarLoaderInterface
         }
 
         if ($this->derivedSecretEnvVar && !\array_key_exists($this->derivedSecretEnvVar, $envs)) {
-            $decryptionKey = $this->decryptionKey;
-            $envs[$this->derivedSecretEnvVar] = LazyString::fromCallable(static fn () => base64_encode(hash('sha256', $decryptionKey, true)));
+            $k = $this->decryptionKey;
+            $envs[$this->derivedSecretEnvVar] = LazyString::fromCallable(static fn () => '' !== ($k = (string) $k) ? base64_encode(hash('sha256', $k, true)) : '');
         }
 
         return $envs;

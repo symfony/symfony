@@ -217,6 +217,7 @@ class ReStructuredTextDescriptor extends Descriptor
     {
         $globalOptions = [
             'help',
+            'silent',
             'quiet',
             'verbose',
             'version',

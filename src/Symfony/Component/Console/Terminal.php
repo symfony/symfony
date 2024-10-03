@@ -209,7 +209,7 @@ class Terminal
 
         $cp = \function_exists('sapi_windows_cp_set') ? sapi_windows_cp_get() : 0;
 
-        if (!$process = proc_open($command, $descriptorspec, $pipes, null, null, ['suppress_errors' => true])) {
+        if (!$process = @proc_open($command, $descriptorspec, $pipes, null, null, ['suppress_errors' => true])) {
             return null;
         }
 

@@ -12,9 +12,9 @@
 namespace Symfony\Component\Notifier\Bridge\Pushover\Tests;
 
 use Symfony\Component\Notifier\Bridge\Pushover\PushoverTransportFactory;
-use Symfony\Component\Notifier\Test\TransportFactoryTestCase;
+use Symfony\Component\Notifier\Test\AbstractTransportFactoryTestCase;
 
-final class PushoverTransportFactoryTest extends TransportFactoryTestCase
+final class PushoverTransportFactoryTest extends AbstractTransportFactoryTestCase
 {
     public function createFactory(): PushoverTransportFactory
     {

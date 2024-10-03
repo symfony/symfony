@@ -41,8 +41,6 @@ class NativeRequestHandlerTest extends AbstractRequestHandlerTestCase
 
     protected function tearDown(): void
     {
-        parent::tearDown();
-
         $_GET = [];
         $_POST = [];
         $_FILES = [];

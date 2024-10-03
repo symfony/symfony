@@ -12,15 +12,12 @@
 namespace Symfony\Component\Form\Tests\Extension\Core\Type;
 
 use Symfony\Component\Form\Test\TypeTestCase;
-use Symfony\Component\Form\Tests\VersionAwareTest;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
 abstract class BaseTypeTestCase extends TypeTestCase
 {
-    use VersionAwareTest;
-
     public const TESTED_TYPE = '';
 
     public function testPassDisabledAsOption()

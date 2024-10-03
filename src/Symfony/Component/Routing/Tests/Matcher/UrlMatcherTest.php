@@ -396,7 +396,7 @@ class UrlMatcherTest extends TestCase
 
     public function testExtraTrailingSlash()
     {
-        $this->getExpectedException() ?: $this->expectException(ResourceNotFoundException::class);
+        $this->expectException(ResourceNotFoundException::class);
         $coll = new RouteCollection();
         $coll->add('foo', new Route('/foo'));
 
@@ -406,7 +406,7 @@ class UrlMatcherTest extends TestCase
 
     public function testMissingTrailingSlashForNonSafeMethod()
     {
-        $this->getExpectedException() ?: $this->expectException(ResourceNotFoundException::class);
+        $this->expectException(ResourceNotFoundException::class);
         $coll = new RouteCollection();
         $coll->add('foo', new Route('/foo/'));
 
@@ -418,7 +418,7 @@ class UrlMatcherTest extends TestCase
 
     public function testExtraTrailingSlashForNonSafeMethod()
     {
-        $this->getExpectedException() ?: $this->expectException(ResourceNotFoundException::class);
+        $this->expectException(ResourceNotFoundException::class);
         $coll = new RouteCollection();
         $coll->add('foo', new Route('/foo'));
 
@@ -430,7 +430,7 @@ class UrlMatcherTest extends TestCase
 
     public function testSchemeRequirement()
     {
-        $this->getExpectedException() ?: $this->expectException(ResourceNotFoundException::class);
+        $this->expectException(ResourceNotFoundException::class);
         $coll = new RouteCollection();
         $coll->add('foo', new Route('/foo', [], [], [], '', ['https']));
         $matcher = $this->getUrlMatcher($coll);
@@ -439,7 +439,7 @@ class UrlMatcherTest extends TestCase
 
     public function testSchemeRequirementForNonSafeMethod()
     {
-        $this->getExpectedException() ?: $this->expectException(ResourceNotFoundException::class);
+        $this->expectException(ResourceNotFoundException::class);
         $coll = new RouteCollection();
         $coll->add('foo', new Route('/foo', [], [], [], '', ['https']));
 

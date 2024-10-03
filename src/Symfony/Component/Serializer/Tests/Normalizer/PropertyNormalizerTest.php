@@ -478,7 +478,7 @@ class PropertyNormalizerTest extends TestCase
             RootDummy::class,
             'any'
         );
-        $this->assertEquals($root::class, RootDummy::class);
+        $this->assertSame(RootDummy::class, $root::class);
 
         // children (two dimension array)
         $this->assertCount(1, $root->children);

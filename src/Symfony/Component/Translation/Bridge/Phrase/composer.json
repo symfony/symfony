@@ -20,7 +20,7 @@
         "psr/cache": "^3.0",
         "symfony/http-client": "^6.4|^7.0",
         "symfony/mime": "^6.4|^7.0",
-        "symfony/translation": "^6.4|^7.0"
+        "symfony/translation": "^7.2"
     },
     "autoload": {
         "psr-4": { "Symfony\\Component\\Translation\\Bridge\\Phrase\\": "" },

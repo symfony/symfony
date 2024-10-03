@@ -12,10 +12,13 @@
 namespace Symfony\Component\Notifier\Bridge\Smsc\Tests;
 
 use Symfony\Component\Notifier\Bridge\Smsc\SmscTransportFactory;
-use Symfony\Component\Notifier\Test\TransportFactoryTestCase;
+use Symfony\Component\Notifier\Test\AbstractTransportFactoryTestCase;
+use Symfony\Component\Notifier\Test\MissingRequiredOptionTestTrait;
 
-final class SmscTransportFactoryTest extends TransportFactoryTestCase
+final class SmscTransportFactoryTest extends AbstractTransportFactoryTestCase
 {
+    use MissingRequiredOptionTestTrait;
+
     public function createFactory(): SmscTransportFactory
     {
         return new SmscTransportFactory();

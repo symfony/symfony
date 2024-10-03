@@ -21,6 +21,10 @@ use Symfony\Component\Validator\Exception\UnexpectedValueException;
  */
 class DivisibleByValidatorTest extends AbstractComparisonValidatorTestCase
 {
+    use InvalidComparisonToValueTestTrait;
+    use ThrowsOnInvalidStringDatesTestTrait;
+    use ValidComparisonToValueTrait;
+
     protected function createValidator(): DivisibleByValidator
     {
         return new DivisibleByValidator();
@@ -101,10 +105,5 @@ class DivisibleByValidatorTest extends AbstractComparisonValidatorTestCase
             [\stdClass::class, 2, new \stdClass()],
             [\ArrayIterator::class, new \ArrayIterator(), 12],
         ];
-    }
-
-    public static function provideComparisonsToNullValueAtPropertyPath()
-    {
-        self::markTestSkipped('DivisibleByValidator rejects null values.');
     }
 }

@@ -22,7 +22,7 @@ use Symfony\Component\Webhook\Exception\RejectWebhookException;
  */
 abstract class AbstractRequestParser implements RequestParserInterface
 {
-    public function parse(Request $request, #[\SensitiveParameter] string $secret): ?RemoteEvent
+    public function parse(Request $request, #[\SensitiveParameter] string $secret): RemoteEvent|array|null
     {
         $this->validate($request);
 
@@ -47,7 +47,7 @@ abstract class AbstractRequestParser implements RequestParserInterface
 
     abstract protected function getRequestMatcher(): RequestMatcherInterface;
 
-    abstract protected function doParse(Request $request, #[\SensitiveParameter] string $secret): ?RemoteEvent;
+    abstract protected function doParse(Request $request, #[\SensitiveParameter] string $secret): RemoteEvent|array|null;
 
     protected function validate(Request $request): void
     {

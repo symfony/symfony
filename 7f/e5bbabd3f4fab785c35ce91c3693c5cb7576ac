@@ -1,0 +1,37 @@
+---------------------------------------------------------------------------
+
+by wallach-game at 2024-09-30T18:53:27Z
+
+@chalasr its failing because of some redis test.
+
+```
+Time: 00:57.463, Memory: 8.00 MB
+There was 1 failure:
+1) Symfony\Component\Lock\Tests\Store\RedisArrayStoreTest::testBackwardCompatibility
+Failed asserting that false is true.
+C:\projects\symfony\src\Symfony\Component\Lock\Tests\Store\AbstractRedisStoreTestCase.php:49
+FAILURES!
+Tests: 178, Assertions: 201, Failures: 1, Skipped: 124.
+KO src\Symfony/Component/Lock
+PHPUnit 9.6.21 by Sebastian Bergmann and contributors.
+
+```
+ any idea how to fix it ?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-10-01T08:13:16Z
+
+There are also translation to fix in https://github.com/symfony/symfony/blob/5.4/src/Symfony/Component/Validator/Resources/translations/validators.cs.xlf, could you please have a look?
+
+---------------------------------------------------------------------------
+
+by wallach-game at 2024-10-01T09:53:16Z
+
+I will check the translations and i can translate other messages, but any idea how to fix the build error ?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-10-01T09:54:39Z
+
+You can ignore it I think.

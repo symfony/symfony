@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2024-10-01T07:46:13Z
+
+Should we add this to the base `FormPerformanceTestCase` class where check that the max running time did not exceed?
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2024-10-01T10:57:28Z
+
+Suits me fine! PR updated

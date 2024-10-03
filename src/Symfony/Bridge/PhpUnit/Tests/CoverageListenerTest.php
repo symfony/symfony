@@ -13,6 +13,9 @@ namespace Symfony\Bridge\PhpUnit\Tests;
 
 use PHPUnit\Framework\TestCase;
 
+/**
+ * @requires PHPUnit < 10
+ */
 class CoverageListenerTest extends TestCase
 {
     public function test()

@@ -10,6 +10,8 @@ CHANGELOG
  * Add support for `defaultNull()` on `BooleanNode`
  * Add `StringNode`
  * Add `StringNode` and `StringNodeDefinition`
+ * Add `ArrayNodeDefinition::stringPrototype()` method
+ * Add `NodeBuilder::stringNode()` method
 
 7.1
 ---

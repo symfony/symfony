@@ -267,6 +267,12 @@ class ArrayNodeDefinitionTest extends TestCase
         $this->assertEquals($node->prototype('boolean'), $node->booleanPrototype());
     }
 
+    public function testPrototypeString()
+    {
+        $node = new ArrayNodeDefinition('root');
+        $this->assertEquals($node->prototype('string'), $node->stringPrototype());
+    }
+
     public function testPrototypeInteger()
     {
         $node = new ArrayNodeDefinition('root');

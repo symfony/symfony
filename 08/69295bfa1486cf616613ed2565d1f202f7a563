@@ -1,0 +1,25 @@
+---------------------------------------------------------------------------
+
+by OskarStark at 2024-10-02T17:18:07Z
+
+Can you please add an entry to the CHANGELOG? Thanks
+
+---------------------------------------------------------------------------
+
+by pyrech at 2024-10-02T19:29:24Z
+
+@OskarStark As the bridge was not yet released (it was added quite recently), do I really need to add a note on the Changelog? It only contains `* Add the bridge` in the 7.2 section at the moment, see https://github.com/symfony/symfony/blob/7.2/src/Symfony/Component/Notifier/Bridge/JoliNotif/CHANGELOG.md
+
+---------------------------------------------------------------------------
+
+by derrabus at 2024-10-02T19:45:13Z
+
+> @OskarStark As the bridge was not yet released (it was added quite recently), do I really need to add a note on the Changelog?
+
+No.
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2024-10-02T20:36:58Z
+
+You are right, no we don't need one then 👍🏻

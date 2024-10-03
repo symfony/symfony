@@ -22,7 +22,7 @@
     ],
     "require": {
         "php": ">=8.2",
-        "jolicode/jolinotif": "^2.7.2",
+        "jolicode/jolinotif": "^2.7.2|^3.0",
         "symfony/http-client": "^7.2",
         "symfony/notifier": "^7.2"
     },

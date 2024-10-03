@@ -9,6 +9,7 @@ CHANGELOG
  * Add `SkippingResourceChecker`
  * Add support for `defaultNull()` on `BooleanNode`
  * Add `StringNode`
+ * Add `StringNode` and `StringNodeDefinition`
 
 7.1
 ---

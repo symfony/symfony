@@ -152,10 +152,14 @@ class NumberToLocalizedStringTransformer implements DataTransformerInterface
                 : \NumberFormatter::TYPE_INT32;
         }
 
-        $result = $formatter->parse($value, $type, $position);
+        try {
+            $result = @$formatter->parse($value, $type, $position);
+        } catch (\IntlException $e) {
+            throw new TransformationFailedException($e->getMessage(), $e->getCode(), $e);
+        }
 
         if (intl_is_failure($formatter->getErrorCode())) {
-            throw new TransformationFailedException($formatter->getErrorMessage());
+            throw new TransformationFailedException($formatter->getErrorMessage(), $formatter->getErrorCode());
         }
 
         if ($result >= \PHP_INT_MAX || $result <= -\PHP_INT_MAX) {

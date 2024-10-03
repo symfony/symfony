@@ -4,6 +4,7 @@ CHANGELOG
 7.2
 ---
 
+ * Add a PHPUnit extension to register the clock mock and DNS mock
  * Add `ExpectUserDeprecationMessageTrait` with a polyfill of PHPUnit's `expectUserDeprecationMessage()`
 
 6.4

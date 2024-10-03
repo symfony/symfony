@@ -4,6 +4,7 @@ CHANGELOG
 7.2
 ---
 
+ * Add support for `--sort` option when extracting translations with `translation:extract` command and `--force` option
  * Add support for setting `headers` with `Symfony\Bundle\FrameworkBundle\Controller\TemplateController`
  * Add `--resolve-env-vars` option to `lint:container` command
  * Derivate `kernel.secret` from the decryption secret when its env var is not defined

@@ -59,9 +59,9 @@ final class TranslationDefaultDomainNodeVisitor implements NodeVisitorInterface
 
             if (class_exists(Nodes::class)) {
                 return new SetNode(false, new Nodes([$name]), new Nodes([$node->getNode('expr')]), $node->getTemplateLine());
-            } else {
-                return new SetNode(false, new Node([$name]), new Node([$node->getNode('expr')]), $node->getTemplateLine());
-            }
+            }  
+
+            return new SetNode(false, new Node([$name]), new Node([$node->getNode('expr')]), $node->getTemplateLine());
         }
 
         if (!$this->scope->has('domain')) {

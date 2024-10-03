@@ -25,9 +25,9 @@ class FlockStoreTest extends AbstractStoreTestCase
     use SharedLockStoreTestTrait;
     use UnserializableTestTrait;
 
-    protected function getStore(): PersistingStoreInterface
+    protected function getStore(?string $prefix = null): PersistingStoreInterface
     {
-        return new FlockStore();
+        return new FlockStore(null, $prefix);
     }
 
     public function testConstructWhenRepositoryCannotBeCreated()
@@ -89,6 +89,27 @@ class FlockStoreTest extends AbstractStoreTestCase
 
         $file = \sprintf(
             '%s/sf.Symfony-Component-Lock-Tests-Store-FlockStoreTestS.%s.lock',
+            sys_get_temp_dir(),
+            strtr(substr(base64_encode(hash('sha256', $key, true)), 0, 7), '/', '_')
+        );
+        // ensure the file does not exist before the store
+        @unlink($file);
+
+        $store->save($key);
+
+        $this->assertFileExists($file);
+
+        $store->delete($key);
+    }
+
+    public function testSavePrefix()
+    {
+        $store = $this->getStore('FlockSecret');
+
+        $key = new Key(__CLASS__);
+
+        $file = \sprintf(
+            '%s/sf.FlockSecret.Symfony-Component-Lock-Tests-Store-FlockStoreTest.%s.lock',
             sys_get_temp_dir(),
             strtr(substr(base64_encode(hash('sha256', $key, true)), 0, 7), '/', '_')
         );

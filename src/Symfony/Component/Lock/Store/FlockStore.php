@@ -32,12 +32,15 @@ class FlockStore implements BlockingStoreInterface, SharedLockStoreInterface
 {
     private ?string $lockPath;
 
+    private ?string $prefix;
+
     /**
      * @param string|null $lockPath the directory to store the lock, defaults to the system's temporary directory
+     * @param string|null $prefix   a prefix to add to the lock filenames to avoid collision
      *
      * @throws LockStorageException If the lock directory doesn’t exist or is not writable
      */
-    public function __construct(?string $lockPath = null)
+    public function __construct(?string $lockPath = null, ?string $prefix = null)
     {
         if (!is_dir($lockPath ??= sys_get_temp_dir())) {
             if (false === @mkdir($lockPath, 0777, true) && !is_dir($lockPath)) {
@@ -48,6 +51,7 @@ class FlockStore implements BlockingStoreInterface, SharedLockStoreInterface
         }
 
         $this->lockPath = $lockPath;
+        $this->prefix = $prefix;
     }
 
     public function save(Key $key): void
@@ -83,8 +87,9 @@ class FlockStore implements BlockingStoreInterface, SharedLockStoreInterface
         }
 
         if (!$handle) {
-            $fileName = \sprintf('%s/sf.%s.%s.lock',
+            $fileName = \sprintf('%s/sf.%s%s.%s.lock',
                 $this->lockPath,
+                $this->prefix ? $this->prefix.'.' : '',
                 substr(preg_replace('/[^a-z0-9\._-]+/i', '-', $key), 0, 50),
                 strtr(substr(base64_encode(hash('sha256', $key, true)), 0, 7), '/', '_')
             );

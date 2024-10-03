@@ -1,0 +1,65 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2024-09-13T11:38:55Z
+
+Hey!
+
+I see that this is your first PR. That is great! Welcome!
+
+Symfony has a [contribution guide](https://symfony.com/doc/current/contributing/index.html) which I suggest you to read.
+
+In short:
+- Always add tests
+- Keep backward compatibility (see https://symfony.com/bc).
+- Bug fixes must be submitted against the lowest maintained branch where they apply (see https://symfony.com/releases)
+- Features and deprecations must be submitted against the 7.2 branch.
+
+Review the GitHub status checks of your pull request and try to solve the reported issues. If some tests are failing, try to see if they are failing because of this change.
+
+When two Symfony core team members approve this change, it will be merged and you will become an official Symfony contributor!
+If this PR is merged in a lower version branch, it will be merged up to all maintained branches within a few days.
+
+I am going to sit back now and wait for the reviews.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by carsonbot at 2024-09-13T11:38:56Z
+
+Hey!
+
+Thanks for your PR. You are targeting branch "7.1" but it seems your PR description refers to branch "&gt;= 7.1.2".
+Could you update the PR description or change target branch? This helps core maintainers a lot.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2024-09-13T12:45:17Z
+
+Does this also affect 6.4?
+
+---------------------------------------------------------------------------
+
+by alaugks at 2024-09-13T13:06:23Z
+
+@xabbuh It also affects 6.4. I have tested it with v6.4.11.
+
+---------------------------------------------------------------------------
+
+by alaugks at 2024-09-13T13:13:05Z
+
+@alexandre-daubois try-catch is removed. However, I have left `expectNotToPerformAssertions()` in the test so that the test is not marked with "This test did not perform any assertions".
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2024-09-13T14:16:46Z
+
+> @xabbuh It also affects 6.4. I have tested it with v6.4.11.
+
+You may rebase your PR onto 6.4 and change the target branch of the PR. This way, the fix is available on all (still supported) affected branches

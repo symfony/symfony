@@ -12,5 +12,7 @@ $container->loadFromExtension('framework', [
         'bar' => 'flock',
         'baz' => ['semaphore', 'flock'],
         'qux' => '%env(REDIS_DSN)%',
+        'corge' => 'in-memory',
+        'grault' => 'mysql:host=localhost;dbname=test',
     ],
 ]);

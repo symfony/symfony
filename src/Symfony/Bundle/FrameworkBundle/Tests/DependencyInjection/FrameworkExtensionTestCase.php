@@ -2423,9 +2423,9 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $storeDef = $container->getDefinition($container->getDefinition('lock.default.factory')->getArgument(0));
 
         if (class_exists(SemaphoreStore::class) && SemaphoreStore::isSupported()) {
-            self::assertEquals(new Reference('semaphore'), $storeDef->getArgument(0));
+            self::assertSame('semaphore', $storeDef->getArgument(0));
         } else {
-            self::assertEquals(new Reference('flock'), $storeDef->getArgument(0));
+            self::assertSame('flock', $storeDef->getArgument(0));
         }
     }
 
@@ -2435,23 +2435,31 @@ abstract class FrameworkExtensionTestCase extends TestCase
 
         self::assertTrue($container->hasDefinition('lock.foo.factory'));
         $storeDef = $container->getDefinition($container->getDefinition('lock.foo.factory')->getArgument(0));
-        self::assertEquals(new Reference('semaphore'), $storeDef->getArgument(0));
+        self::assertSame('semaphore', $storeDef->getArgument(0));
 
         self::assertTrue($container->hasDefinition('lock.bar.factory'));
         $storeDef = $container->getDefinition($container->getDefinition('lock.bar.factory')->getArgument(0));
-        self::assertEquals(new Reference('flock'), $storeDef->getArgument(0));
+        self::assertSame('flock', $storeDef->getArgument(0));
 
         self::assertTrue($container->hasDefinition('lock.baz.factory'));
         $storeDef = $container->getDefinition($container->getDefinition('lock.baz.factory')->getArgument(0));
         self::assertIsArray($storeDefArg = $storeDef->getArgument(0));
         $storeDef1 = $container->getDefinition($storeDefArg[0]);
         $storeDef2 = $container->getDefinition($storeDefArg[1]);
-        self::assertEquals(new Reference('semaphore'), $storeDef1->getArgument(0));
-        self::assertEquals(new Reference('flock'), $storeDef2->getArgument(0));
+        self::assertSame('semaphore', $storeDef1->getArgument(0));
+        self::assertSame('flock', $storeDef2->getArgument(0));
 
         self::assertTrue($container->hasDefinition('lock.qux.factory'));
         $storeDef = $container->getDefinition($container->getDefinition('lock.qux.factory')->getArgument(0));
         self::assertStringContainsString('REDIS_DSN', $storeDef->getArgument(0));
+
+        self::assertTrue($container->hasDefinition('lock.corge.factory'));
+        $storeDef = $container->getDefinition($container->getDefinition('lock.corge.factory')->getArgument(0));
+        self::assertSame('in-memory', $storeDef->getArgument(0));
+
+        self::assertTrue($container->hasDefinition('lock.grault.factory'));
+        $storeDef = $container->getDefinition($container->getDefinition('lock.grault.factory')->getArgument(0));
+        self::assertSame('mysql:host=localhost;dbname=test', $storeDef->getArgument(0));
     }
 
     public function testLockWithService()

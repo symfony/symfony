@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2024-10-04T06:37:08Z
+
+This of is not exactly the same as the empty string would become an array with one element.
+
+---------------------------------------------------------------------------
+
+by stof at 2024-10-04T08:28:38Z
+
+@javiereguiluz only `trusted_hosts` and `trusted_headers` are impacted by that remark (as they don't perform a simple wrapping in array. Other changes in the PR are good.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2024-10-04T08:30:56Z
+
+@stof is right. I was reading the changes in my phone and didn’t realise that there were more changes.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2024-10-04T09:45:48Z
+
+Thanks for the review. I reverted the wrong changes.

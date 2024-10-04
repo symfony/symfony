@@ -54,6 +54,16 @@ class LexerTest extends TestCase
         $this->lexer->tokenize($expression);
     }
 
+    public function testTokenizeOnNotOpenedBracket()
+    {
+        $this->expectException(SyntaxError::class);
+        $this->expectExceptionMessage('Unexpected ")" around position 7 for expression `service)not.opened.expression.dummyMethod()`.');
+
+        $expression = 'service)not.opened.expression.dummyMethod()';
+
+        $this->lexer->tokenize($expression);
+    }
+
     public static function getTokenizeData()
     {
         return [

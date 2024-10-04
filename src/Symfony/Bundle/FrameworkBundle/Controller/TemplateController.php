@@ -71,8 +71,8 @@ class TemplateController
     /**
      * @param int $statusCode The HTTP status code (200 "OK" by default)
      */
-    public function __invoke(string $template, ?int $maxAge = null, ?int $sharedAge = null, ?bool $private = null, array $context = [], int $statusCode = 200): Response
+    public function __invoke(string $template, ?int $maxAge = null, ?int $sharedAge = null, ?bool $private = null, array $context = [], int $statusCode = 200, array $headers = []): Response
     {
-        return $this->templateAction($template, $maxAge, $sharedAge, $private, $context, $statusCode);
+        return $this->templateAction($template, $maxAge, $sharedAge, $private, $context, $statusCode, $headers);
     }
 }

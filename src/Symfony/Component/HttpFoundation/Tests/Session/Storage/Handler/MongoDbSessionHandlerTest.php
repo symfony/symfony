@@ -174,6 +174,8 @@ class MongoDbSessionHandlerTest extends TestCase
             ->method('deleteOne')
             ->with([$this->options['id_field'] => 'foo']);
 
+        $this->storage->open('test', 'test');
+
         $this->assertTrue($this->storage->destroy('foo'));
     }
 

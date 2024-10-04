@@ -292,7 +292,7 @@ trait HttpClientTrait
                 [$name, $values] = explode(':', $values, 2);
                 $values = [ltrim($values)];
             } elseif (!is_iterable($values)) {
-                if (\is_object($values)) {
+                if (!\is_string($values)) {
                     throw new InvalidArgumentException(\sprintf('Invalid value for header "%s": expected string, "%s" given.', $name, get_debug_type($values)));
                 }
 

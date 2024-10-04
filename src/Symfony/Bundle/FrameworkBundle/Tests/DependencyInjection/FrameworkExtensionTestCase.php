@@ -652,7 +652,7 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $this->assertNull($container->getParameter('session.save_path'));
         $this->assertSame('session.handler.native', (string) $container->getAlias('session.handler'));
 
-        $expected = ['session_factory', 'session', 'initialized_session', 'logger', 'session_collector'];
+        $expected = ['session_factory', 'session', 'initialized_session', 'logger', 'session_collector', 'request_stack'];
         $this->assertEquals($expected, array_keys($container->getDefinition('session_listener')->getArgument(0)->getValues()));
         $this->assertFalse($container->getDefinition('session.storage.factory.native')->getArgument(3));
     }
@@ -670,7 +670,7 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $this->assertNull($container->getParameter('session.save_path'));
         $this->assertSame('session.handler.native', (string) $container->getAlias('session.handler'));
 
-        $expected = ['session_factory', 'session', 'initialized_session', 'logger', 'session_collector'];
+        $expected = ['session_factory', 'session', 'initialized_session', 'logger', 'session_collector', 'request_stack'];
         $this->assertEquals($expected, array_keys($container->getDefinition('session_listener')->getArgument(0)->getValues()));
         $this->assertFalse($container->getDefinition('session.storage.factory.native')->getArgument(3));
     }
@@ -1801,7 +1801,7 @@ abstract class FrameworkExtensionTestCase extends TestCase
     {
         $container = $this->createContainerFromFile('session_cookie_secure_auto');
 
-        $expected = ['session_factory', 'session', 'initialized_session', 'logger', 'session_collector'];
+        $expected = ['session_factory', 'session', 'initialized_session', 'logger', 'session_collector', 'request_stack'];
         $this->assertEquals($expected, array_keys($container->getDefinition('session_listener')->getArgument(0)->getValues()));
     }
 
@@ -1814,7 +1814,7 @@ abstract class FrameworkExtensionTestCase extends TestCase
 
         $container = $this->createContainerFromFile('session_cookie_secure_auto_legacy');
 
-        $expected = ['session_factory', 'session', 'initialized_session', 'logger', 'session_collector', 'session_storage', 'request_stack'];
+        $expected = ['session_factory', 'session', 'initialized_session', 'logger', 'session_collector', 'request_stack', 'session_storage'];
         $this->assertEquals($expected, array_keys($container->getDefinition('session_listener')->getArgument(0)->getValues()));
     }
 

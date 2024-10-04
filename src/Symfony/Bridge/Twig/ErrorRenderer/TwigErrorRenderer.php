@@ -11,6 +11,7 @@
 
 namespace Symfony\Bridge\Twig\ErrorRenderer;
 
+use Symfony\Component\ErrorHandler\ErrorRenderer\CliErrorRenderer;
 use Symfony\Component\ErrorHandler\ErrorRenderer\ErrorRendererInterface;
 use Symfony\Component\ErrorHandler\ErrorRenderer\HtmlErrorRenderer;
 use Symfony\Component\ErrorHandler\Exception\FlattenException;
@@ -46,7 +47,9 @@ class TwigErrorRenderer implements ErrorRendererInterface
         $debug = \is_bool($this->debug) ? $this->debug : ($this->debug)($flattenException);
 
         if ($debug || !$template = $this->findTemplate($flattenException->getStatusCode())) {
-            return $this->fallbackErrorRenderer->render($exception);
+            $renderer = \in_array(\PHP_SAPI, ['cli', 'phpdbg', 'embed'], true) ? new CliErrorRenderer() : $this->fallbackErrorRenderer;
+
+            return $renderer->render($exception);
         }
 
         return $flattenException->setAsString($this->twig->render($template, [

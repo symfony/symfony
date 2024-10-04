@@ -45,6 +45,7 @@ class InputTest extends TestCase
         $input = new ArrayInput(['--name' => 'foo', '--bar' => null], new InputDefinition([new InputOption('name'), new InputOption('bar', '', InputOption::VALUE_OPTIONAL, '', 'default')]));
         $this->assertNull($input->getOption('bar'), '->getOption() returns null for options explicitly passed without value (or an empty value)');
         $this->assertEquals(['name' => 'foo', 'bar' => null], $input->getOptions(), '->getOptions() returns all option values');
+        $this->assertSame(['name' => 'foo', 'bar' => null], $input->getRawOptions(), '->getRawOptions() returns all option values');
 
         $input = new ArrayInput(['--name' => null], new InputDefinition([new InputOption('name', null, InputOption::VALUE_NEGATABLE)]));
         $this->assertTrue($input->hasOption('name'));
@@ -89,10 +90,12 @@ class InputTest extends TestCase
         $input->setArgument('name', 'bar');
         $this->assertEquals('bar', $input->getArgument('name'), '->setArgument() sets the value for a given argument');
         $this->assertEquals(['name' => 'bar'], $input->getArguments(), '->getArguments() returns all argument values');
+        $this->assertSame(['name' => 'bar'], $input->getRawArguments(), '->getRawArguments() returns all argument values');
 
         $input = new ArrayInput(['name' => 'foo'], new InputDefinition([new InputArgument('name'), new InputArgument('bar', InputArgument::OPTIONAL, '', 'default')]));
         $this->assertEquals('default', $input->getArgument('bar'), '->getArgument() returns the default value for optional arguments');
         $this->assertEquals(['name' => 'foo', 'bar' => 'default'], $input->getArguments(), '->getArguments() returns all argument values, even optional ones');
+        $this->assertSame(['name' => 'foo'], $input->getRawArguments(), '->getRawArguments() returns all argument values, excluding optional ones');
     }
 
     public function testSetInvalidArgument()

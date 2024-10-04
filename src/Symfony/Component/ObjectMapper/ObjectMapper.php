@@ -64,7 +64,7 @@ final class ObjectMapper implements ObjectMapperInterface
         }
 
         if (\is_string($target) && !class_exists($target)) {
-            throw new MappingException(sprintf('Mapping target "%s" not found.', $target));
+            throw new MappingException(\sprintf('Mapping target "%s" not found.', $target));
         }
 
         try {
@@ -83,7 +83,7 @@ final class ObjectMapper implements ObjectMapperInterface
         }
 
         if (!is_a($mappedTarget, $targetRefl->getName(), false)) {
-            throw new MappingException(sprintf('Expected the mapped object to be an instance of "%s".', $mappingToObject ? $mappedTarget::class : $mappedTarget));
+            throw new MappingException(\sprintf('Expected the mapped object to be an instance of "%s".', $mappingToObject ? $mappedTarget::class : $mappedTarget));
         }
 
         $objectMap[$source] = $mappedTarget;

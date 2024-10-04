@@ -20,7 +20,7 @@
         "psr/container": "^2.0"
     },
     "require-dev": {
-        "symfony/property-access": "^6.3"
+        "symfony/property-access": "^6.4"
     },
     "autoload": {
         "psr-4": {
@@ -29,8 +29,5 @@
         "exclude-from-classmap": [
             "/Tests/"
         ]
-    },
-    "suggest": {
-        "symfony/property-access": "To use getters and setters"
     }
 }

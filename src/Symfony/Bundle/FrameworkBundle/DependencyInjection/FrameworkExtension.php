@@ -1167,7 +1167,6 @@ class FrameworkExtension extends Extension
                 $locator = $container->getDefinition('session_listener')->getArgument(0);
                 $locator->setValues($locator->getValues() + [
                     'session_storage' => new Reference('session.storage', ContainerInterface::IGNORE_ON_INVALID_REFERENCE),
-                    'request_stack' => new Reference('request_stack'),
                 ]);
             } else {
                 $container->getDefinition('session.storage.factory.native')->replaceArgument(3, true);

@@ -258,4 +258,14 @@ class BinaryNodeTest extends AbstractNodeTestCase
 
         $this->assertFalse($node->evaluate([], []));
     }
+
+    public function testEvaluateUnsupportedOperator()
+    {
+        $node = new BinaryNode('unsupported', new ConstantNode(1), new ConstantNode(2));
+
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('"Symfony\Component\ExpressionLanguage\Node\BinaryNode" does not support the "unsupported" operator.');
+
+        $node->evaluate([], []);
+    }
 }

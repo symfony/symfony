@@ -21,26 +21,34 @@ require $vendor.'/vendor/autoload.php';
 
 class MyCommand extends Command implements SignalableCommandInterface
 {
+    protected function initialize(InputInterface $input, OutputInterface $output): void
+    {
+        $this->getApplication()->setAlarmInterval(1);
+    }
+
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        posix_kill(posix_getpid(), \SIGINT);
+        sleep(5);
 
         $output->writeln('should not be displayed');
 
         return 0;
     }
 
-
     public function getSubscribedSignals(): array
     {
-        return [\SIGINT];
+        return [\SIGALRM];
     }
 
     public function handleSignal(int $signal, int|false $previousExitCode = 0): int|false
     {
-        echo "Received signal!";
+        if (\SIGALRM === $signal) {
+            echo "Received alarm!";
 
-        return 0;
+            return 0;
+        }
+
+        return false;
     }
 }
 
@@ -53,4 +61,4 @@ $app
     ->run()
 ;
 --EXPECT--
-Received signal!
+Received alarm!

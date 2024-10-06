@@ -22,6 +22,7 @@ use Symfony\Component\Console\CommandLoader\CommandLoaderInterface;
 use Symfony\Component\Console\Completion\CompletionInput;
 use Symfony\Component\Console\Completion\CompletionSuggestions;
 use Symfony\Component\Console\Completion\Suggestion;
+use Symfony\Component\Console\Event\ConsoleAlarmEvent;
 use Symfony\Component\Console\Event\ConsoleCommandEvent;
 use Symfony\Component\Console\Event\ConsoleErrorEvent;
 use Symfony\Component\Console\Event\ConsoleSignalEvent;
@@ -88,6 +89,7 @@ class Application implements ResetInterface
     private bool $initialized = false;
     private ?SignalRegistry $signalRegistry = null;
     private array $signalsToDispatchEvent = [];
+    private ?int $alarmInterval = null;
 
     public function __construct(
         private string $name = 'UNKNOWN',
@@ -97,7 +99,7 @@ class Application implements ResetInterface
         $this->defaultCommand = 'list';
         if (\defined('SIGINT') && SignalRegistry::isSupported()) {
             $this->signalRegistry = new SignalRegistry();
-            $this->signalsToDispatchEvent = [\SIGINT, \SIGQUIT, \SIGTERM, \SIGUSR1, \SIGUSR2];
+            $this->signalsToDispatchEvent = [\SIGINT, \SIGQUIT, \SIGTERM, \SIGUSR1, \SIGUSR2, \SIGALRM];
         }
     }
 
@@ -126,6 +128,22 @@ class Application implements ResetInterface
     public function setSignalsToDispatchEvent(int ...$signalsToDispatchEvent): void
     {
         $this->signalsToDispatchEvent = $signalsToDispatchEvent;
+    }
+
+    /**
+     * Sets the interval to schedule a SIGALRM signal in seconds.
+     */
+    public function setAlarmInterval(?int $seconds): void
+    {
+        $this->alarmInterval = $seconds;
+        $this->scheduleAlarm();
+    }
+
+    private function scheduleAlarm(): void
+    {
+        if (null !== $this->alarmInterval) {
+            $this->getSignalRegistry()->scheduleAlarm($this->alarmInterval);
+        }
     }
 
     /**
@@ -981,34 +999,47 @@ class Application implements ResetInterface
 
         $commandSignals = $command instanceof SignalableCommandInterface ? $command->getSubscribedSignals() : [];
         if ($commandSignals || $this->dispatcher && $this->signalsToDispatchEvent) {
-            if (!$this->signalRegistry) {
-                throw new RuntimeException('Unable to subscribe to signal events. Make sure that the "pcntl" extension is installed and that "pcntl_*" functions are not disabled by your php.ini\'s "disable_functions" directive.');
-            }
+            $signalRegistry = $this->getSignalRegistry();
 
             if (Terminal::hasSttyAvailable()) {
                 $sttyMode = shell_exec('stty -g');
 
                 foreach ([\SIGINT, \SIGQUIT, \SIGTERM] as $signal) {
-                    $this->signalRegistry->register($signal, static fn () => shell_exec('stty '.$sttyMode));
+                    $signalRegistry->register($signal, static fn () => shell_exec('stty '.$sttyMode));
                 }
             }
 
             if ($this->dispatcher) {
                 // We register application signals, so that we can dispatch the event
                 foreach ($this->signalsToDispatchEvent as $signal) {
-                    $event = new ConsoleSignalEvent($command, $input, $output, $signal);
+                    $signalEvent = new ConsoleSignalEvent($command, $input, $output, $signal);
+                    $alarmEvent = \SIGALRM === $signal ? new ConsoleAlarmEvent($command, $input, $output) : null;
 
-                    $this->signalRegistry->register($signal, function ($signal) use ($event, $command, $commandSignals) {
-                        $this->dispatcher->dispatch($event, ConsoleEvents::SIGNAL);
-                        $exitCode = $event->getExitCode();
+                    $signalRegistry->register($signal, function ($signal) use ($signalEvent, $alarmEvent, $command, $commandSignals, $input, $output) {
+                        $this->dispatcher->dispatch($signalEvent, ConsoleEvents::SIGNAL);
+                        $exitCode = $signalEvent->getExitCode();
+
+                        if (null !== $alarmEvent) {
+                            if (false !== $exitCode) {
+                                $alarmEvent->setExitCode($exitCode);
+                            } else {
+                                $alarmEvent->abortExit();
+                            }
+                            $this->dispatcher->dispatch($alarmEvent);
+                            $exitCode = $alarmEvent->getExitCode();
+                        }
 
                         // If the command is signalable, we call the handleSignal() method
                         if (\in_array($signal, $commandSignals, true)) {
                             $exitCode = $command->handleSignal($signal, $exitCode);
                         }
 
+                        if (\SIGALRM === $signal) {
+                            $this->scheduleAlarm();
+                        }
+
                         if (false !== $exitCode) {
-                            $event = new ConsoleTerminateEvent($command, $event->getInput(), $event->getOutput(), $exitCode, $signal);
+                            $event = new ConsoleTerminateEvent($command, $input, $output, $exitCode, $signal);
                             $this->dispatcher->dispatch($event, ConsoleEvents::TERMINATE);
 
                             exit($event->getExitCode());
@@ -1021,7 +1052,11 @@ class Application implements ResetInterface
             }
 
             foreach ($commandSignals as $signal) {
-                $this->signalRegistry->register($signal, function (int $signal) use ($command): void {
+                $signalRegistry->register($signal, function (int $signal) use ($command): void {
+                    if (\SIGALRM === $signal) {
+                        $this->scheduleAlarm();
+                    }
+
                     if (false !== $exitCode = $command->handleSignal($signal)) {
                         exit($exitCode);
                     }

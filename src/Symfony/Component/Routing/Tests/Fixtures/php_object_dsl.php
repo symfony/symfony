@@ -2,7 +2,7 @@
 
 namespace Symfony\Component\Routing\Loader\Configurator;
 
-return new class() {
+return new class {
     public function __invoke(RoutingConfigurator $routes)
     {
         $routes

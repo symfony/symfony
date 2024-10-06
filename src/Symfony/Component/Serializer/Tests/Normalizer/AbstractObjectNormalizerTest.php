@@ -1230,7 +1230,7 @@ class AbstractObjectNormalizerTest extends TestCase
 
     public function testDenormalizeArrayObject()
     {
-        $normalizer = new class() extends AbstractObjectNormalizerDummy {
+        $normalizer = new class extends AbstractObjectNormalizerDummy {
             public function __construct()
             {
                 parent::__construct(null, null, new PhpDocExtractor());

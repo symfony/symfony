@@ -154,10 +154,6 @@ class BinaryNode extends Node
                 return $left >= $right;
             case '<=':
                 return $left <= $right;
-            case 'not in':
-                return !\in_array($left, $right, true);
-            case 'in':
-                return \in_array($left, $right, true);
             case '+':
                 return $left + $right;
             case '-':
@@ -181,6 +177,8 @@ class BinaryNode extends Node
             case 'matches':
                 return $this->evaluateMatches($right, $left);
         }
+
+        throw new \LogicException(\sprintf('"%s" does not support the "%s" operator.', __CLASS__, $operator));
     }
 
     public function toArray(): array

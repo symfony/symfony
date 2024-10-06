@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by BreyndotEchse at 2024-06-19T17:32:21Z
+
+Sorry guys, forgot about this PR and synced the fork... I didn't mean to request your review
+
+---------------------------------------------------------------------------
+
+by stof at 2024-06-19T18:04:26Z
+
+@BreyndotEchse that's why you should better use dedicated branches for PRs rather than working directly in your forked branch (btw, this also allows having *multiple* PRs opened)
+
+---------------------------------------------------------------------------
+
+by valtzu at 2024-08-12T14:45:30Z
+
+If one used environment variable parameter in the tag, would it be resolved build-time or runtime?
+
+edit: must be build-time since tags don't exist runtime

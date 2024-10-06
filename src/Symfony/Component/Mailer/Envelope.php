@@ -97,7 +97,7 @@ class Envelope
      * The SMTPUTF8 extension is strictly required if any address
      * contains a non-ASCII character in its localpart. If non-ASCII
      * is only used in domains (e.g. horst@freiherr-von-mühlhausen.de)
-     * then it is possible to to send the message using IDN encoding
+     * then it is possible to send the message using IDN encoding
      * instead of SMTPUTF8. The most common software will display the
      * message as intended.
      */

@@ -122,7 +122,7 @@ class HttpClientTraitTest extends TestCase
     public function testNormalizeBodyMultipartForwardStream($stream)
     {
         $body = [
-            'logo' => $stream,
+            'logo' => $stream(),
         ];
 
         $headers = [];
@@ -153,8 +153,8 @@ class HttpClientTraitTest extends TestCase
 
     public static function provideNormalizeBodyMultipartForwardStream()
     {
-        yield 'native' => [fopen('https://github.githubassets.com/images/icons/emoji/unicode/1f44d.png', 'r')];
-        yield 'symfony' => [HttpClient::create()->request('GET', 'https://github.githubassets.com/images/icons/emoji/unicode/1f44d.png')->toStream()];
+        yield 'native' => [static fn () => fopen('https://github.githubassets.com/images/icons/emoji/unicode/1f44d.png', 'r')];
+        yield 'symfony' => [static fn () => HttpClient::create()->request('GET', 'https://github.githubassets.com/images/icons/emoji/unicode/1f44d.png')->toStream()];
     }
 
     /**

@@ -195,6 +195,11 @@ class EsmtpTransport extends SmtpTransport
         return $capabilities;
     }
 
+    protected function serverSupportsSmtpUtf8(): bool
+    {
+        return \array_key_exists('SMTPUTF8', $this->capabilities);
+    }
+
     private function handleAuth(array $modes): void
     {
         if (!$this->username) {

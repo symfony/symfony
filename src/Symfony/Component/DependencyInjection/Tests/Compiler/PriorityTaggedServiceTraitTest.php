@@ -233,6 +233,34 @@ class PriorityTaggedServiceTraitTest extends TestCase
         $this->assertSame(array_keys($expected), array_keys($services));
         $this->assertEquals($expected, $priorityTaggedServiceTraitImplementation->test($tag, $container));
     }
+
+    public function testResolveIndexedTags()
+    {
+        $container = new ContainerBuilder();
+        $container->setParameter('custom_param_service1', 'bar');
+        $container->setParameter('custom_param_service2', 'baz');
+        $container->setParameter('custom_param_service2_empty', '');
+        $container->setParameter('custom_param_service2_null', null);
+        $container->register('service1')->addTag('my_custom_tag', ['foo' => '%custom_param_service1%']);
+
+        $definition = $container->register('service2', BarTagClass::class);
+        $definition->addTag('my_custom_tag', ['foo' => '%custom_param_service2%', 'priority' => 100]);
+        $definition->addTag('my_custom_tag', ['foo' => '%custom_param_service2_empty%']);
+        $definition->addTag('my_custom_tag', ['foo' => '%custom_param_service2_null%']);
+
+        $priorityTaggedServiceTraitImplementation = new PriorityTaggedServiceTraitImplementation();
+
+        $tag = new TaggedIteratorArgument('my_custom_tag', 'foo', 'getFooBar');
+        $expected = [
+            'baz' => new TypedReference('service2', BarTagClass::class),
+            'bar' => new Reference('service1'),
+            '' => new TypedReference('service2', BarTagClass::class),
+            'bar_tab_class_with_defaultmethod' => new TypedReference('service2', BarTagClass::class),
+        ];
+        $services = $priorityTaggedServiceTraitImplementation->test($tag, $container);
+        $this->assertSame(array_keys($expected), array_keys($services));
+        $this->assertEquals($expected, $priorityTaggedServiceTraitImplementation->test($tag, $container));
+    }
 }
 
 class PriorityTaggedServiceTraitImplementation

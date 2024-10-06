@@ -8,6 +8,7 @@ CHANGELOG
  * Add `verbosity` argument to `mustRun` process helper method
  * [BC BREAK] Add silent verbosity (`--silent`/`SHELL_VERBOSITY=-2`) to suppress all output, including errors
  * Add `OutputInterface::isSilent()`, `Output::isSilent()`, `OutputStyle::isSilent()` methods
+ * Add a configurable finished indicator to the progress indicator to show that the progress is finished
 
 7.1
 ---

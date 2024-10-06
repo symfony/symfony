@@ -92,10 +92,8 @@ class GetSetMethodNormalizerTest extends TestCase
         $obj->setObject($object);
 
         $this->serializer
-            ->expects($this->once())
             ->method('normalize')
-            ->with($object, 'any')
-            ->willReturn('string_object')
+            ->willReturnCallback(fn ($data) => $data === $object ? 'string_object' : $data)
         ;
 
         $this->assertEquals(
@@ -106,6 +104,29 @@ class GetSetMethodNormalizerTest extends TestCase
                 'fooBar' => 'foobar',
                 'camelCase' => 'camelcase',
                 'object' => 'string_object',
+            ],
+            $this->normalizer->normalize($obj, 'any')
+        );
+    }
+
+    public function testNormalizeWithoutSerializer()
+    {
+        $obj = new GetSetDummy();
+        $obj->setFoo('foo');
+        $obj->setBar('bar');
+        $obj->setBaz(true);
+        $obj->setCamelCase('camelcase');
+
+        $this->normalizer = new GetSetMethodNormalizer();
+
+        $this->assertEquals(
+            [
+                'foo' => 'foo',
+                'bar' => 'bar',
+                'baz' => true,
+                'fooBar' => 'foobar',
+                'camelCase' => 'camelcase',
+                'object' => null,
             ],
             $this->normalizer->normalize($obj, 'any')
         );
@@ -125,6 +146,7 @@ class GetSetMethodNormalizerTest extends TestCase
 
     public function testIgnoredAttributesInContext()
     {
+        $this->serializer->method('normalize')->willReturnArgument(0);
         $ignoredAttributes = ['foo', 'bar', 'baz', 'object'];
         $obj = new GetSetDummy();
         $obj->setFoo('foo');
@@ -281,6 +303,7 @@ class GetSetMethodNormalizerTest extends TestCase
 
     public function testGroupsNormalizeWithNameConverter()
     {
+        $this->serializer->method('normalize')->willReturnArgument(0);
         $classMetadataFactory = new ClassMetadataFactory(new AttributeLoader());
         $this->normalizer = new GetSetMethodNormalizer($classMetadataFactory, new CamelCaseToSnakeCaseNameConverter());
         $this->normalizer->setSerializer($this->serializer);
@@ -460,6 +483,7 @@ class GetSetMethodNormalizerTest extends TestCase
 
     public function testHasGetterNormalize()
     {
+        $this->serializer->method('normalize')->willReturnArgument(0);
         $obj = new ObjectWithHasGetterDummy();
         $obj->setFoo(true);
 
@@ -477,6 +501,7 @@ class GetSetMethodNormalizerTest extends TestCase
 
     public function testCallMagicMethodNormalize()
     {
+        $this->serializer->method('normalize')->willReturnArgument(0);
         $obj = new ObjectWithMagicMethod();
 
         $this->assertSame(
@@ -537,6 +562,7 @@ class GetSetMethodNormalizerTest extends TestCase
 
     public function testSupportsAndNormalizeWithOnlyParentGetter()
     {
+        $this->serializer->method('normalize')->willReturnArgument(0);
         $obj = new GetSetDummyChild();
         $obj->setFoo('foo');
 

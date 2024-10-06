@@ -112,10 +112,8 @@ class ObjectNormalizerTest extends TestCase
         $obj->setGo(true);
 
         $this->serializer
-            ->expects($this->once())
             ->method('normalize')
-            ->with($object, 'any')
-            ->willReturn('string_object')
+            ->willReturnCallback(static fn ($data) => $data === $object ? 'string_object' : $data)
         ;
 
         $this->assertEquals(
@@ -132,8 +130,35 @@ class ObjectNormalizerTest extends TestCase
         );
     }
 
+    public function testNormalizeWithoutSerializer()
+    {
+        $obj = new ObjectDummy();
+        $obj->setFoo('foo');
+        $obj->bar = 'bar';
+        $obj->setBaz(true);
+        $obj->setCamelCase('camelcase');
+        $obj->setObject(null);
+        $obj->setGo(true);
+
+        $this->normalizer = new ObjectNormalizer();
+
+        $this->assertEquals(
+            [
+                'foo' => 'foo',
+                'bar' => 'bar',
+                'baz' => true,
+                'fooBar' => 'foobar',
+                'camelCase' => 'camelcase',
+                'object' => null,
+                'go' => true,
+            ],
+            $this->normalizer->normalize($obj, 'any')
+        );
+    }
+
     public function testNormalizeObjectWithUninitializedProperties()
     {
+        $this->serializer->method('normalize')->willReturnArgument(0);
         $obj = new Php74Dummy();
         $this->assertEquals(
             ['initializedProperty' => 'defaultValue'],
@@ -153,6 +178,7 @@ class ObjectNormalizerTest extends TestCase
 
     public function testNormalizeObjectWithLazyProperties()
     {
+        $this->serializer->method('normalize')->willReturnArgument(0);
         $obj = new LazyObjectInner();
         unset($obj->foo);
         $this->assertEquals(
@@ -163,6 +189,7 @@ class ObjectNormalizerTest extends TestCase
 
     public function testNormalizeObjectWithUninitializedPrivateProperties()
     {
+        $this->serializer->method('normalize')->willReturnArgument(0);
         $obj = new Php74DummyPrivate();
         $this->assertEquals(
             ['initializedProperty' => 'defaultValue'],
@@ -172,6 +199,7 @@ class ObjectNormalizerTest extends TestCase
 
     public function testNormalizeObjectWithPrivatePropertyWithoutGetter()
     {
+        $this->serializer->method('normalize')->willReturnArgument(0);
         $obj = new DummyPrivatePropertyWithoutGetter();
         $this->assertEquals(
             ['bar' => 'bar'],
@@ -504,6 +532,7 @@ class ObjectNormalizerTest extends TestCase
 
     public function testGroupsNormalizeWithNameConverter()
     {
+        $this->serializer->method('normalize')->willReturnArgument(0);
         $classMetadataFactory = new ClassMetadataFactory(new AttributeLoader());
         $this->normalizer = new ObjectNormalizer($classMetadataFactory, new CamelCaseToSnakeCaseNameConverter());
         $this->normalizer->setSerializer($this->serializer);
@@ -687,11 +716,13 @@ class ObjectNormalizerTest extends TestCase
 
     public function testNormalizeStatic()
     {
+        $this->serializer->method('normalize')->willReturnArgument(0);
         $this->assertEquals(['foo' => 'K'], $this->normalizer->normalize(new ObjectWithStaticPropertiesAndMethods()));
     }
 
     public function testNormalizeUpperCaseAttributes()
     {
+        $this->serializer->method('normalize')->willReturnArgument(0);
         $this->assertEquals(['Foo' => 'Foo', 'Bar' => 'BarBar'], $this->normalizer->normalize(new ObjectWithUpperCaseAttributeNames()));
     }
 
@@ -877,6 +908,7 @@ class ObjectNormalizerTest extends TestCase
 
     public function testNormalizeStdClass()
     {
+        $this->serializer->method('normalize')->willReturnArgument(0);
         $o1 = new \stdClass();
         $o1->foo = 'f';
         $o1->bar = 'b';
@@ -962,7 +994,7 @@ class ObjectNormalizerTest extends TestCase
 
     protected function getNormalizerForAccessors($accessorPrefixes = null): ObjectNormalizer
     {
-        $accessorPrefixes = $accessorPrefixes ?? ReflectionExtractor::$defaultAccessorPrefixes;
+        $accessorPrefixes ??= ReflectionExtractor::$defaultAccessorPrefixes;
         $classMetadataFactory = new ClassMetadataFactory(new AttributeLoader());
         $propertyAccessorBuilder = (new PropertyAccessorBuilder())
             ->setReadInfoExtractor(

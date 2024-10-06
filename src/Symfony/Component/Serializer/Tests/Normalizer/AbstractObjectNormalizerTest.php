@@ -960,7 +960,7 @@ class AbstractObjectNormalizerTest extends TestCase
         $this->assertSame($firstChildContextCacheKey, $secondChildContextCacheKey);
     }
 
-    public function testChildContextKeepsOriginalContextCacheKey()
+    public function testChildContextChangesContextCacheKey()
     {
         $foobar = new Dummy();
         $foobar->foo = new EmptyDummy();
@@ -992,7 +992,7 @@ class AbstractObjectNormalizerTest extends TestCase
         $serializer = new Serializer([$normalizer]);
         $serializer->normalize($foobar, null, ['cache_key' => 'hardcoded', 'iri' => '/dummy/1']);
 
-        $this->assertSame('hardcoded-foo', $normalizer->childContextCacheKey);
+        $this->assertSame('hardcoded-baz', $normalizer->childContextCacheKey);
     }
 
     public function testChildContextCacheKeyStaysFalseWhenOriginalCacheKeyIsFalse()

@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-10-04T12:02:37Z
+
+> @requires have no effect on abstract classes
+
+how are `Redis*` tests skipped then?
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2024-10-04T12:32:11Z
+
+The extension is checked in the `setUp()` method of the abstract class in this case

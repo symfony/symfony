@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by valtzu at 2024-05-07T14:30:11Z
+
+Btw, `SIGALRM` has the same effect as any other signal – it interrupts `sleep` & `usleep`. According to docs, one should check based on return code if the `sleep` was interrupted but I doubt many do that – and `usleep`  returns `void` so for that it's impossible.
+
+So if a command logic f.e. includes `sleep(30);` or `$clock->sleep(30);`, it will only sleep until next alarm, potentially causing unexpected behavior.
+
+---
+
+Another (old) thing I found that using `SIGALRM` to provide timer functionality [may result in deadlock](https://nativeguru.wordpress.com/2015/02/19/why-you-should-avoid-using-sigalrm-for-timer/) – not sure if it's still relevant (or if it ever was, for php).

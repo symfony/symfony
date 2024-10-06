@@ -1,0 +1,121 @@
+---------------------------------------------------------------------------
+
+by derrabus at 2024-04-11T11:03:01Z
+
+> This will require the user to name their sequences seq_<table_name> or SEQ_<TABLE_NAME>
+
+Do we create this sequence during auto-setup?
+
+---------------------------------------------------------------------------
+
+by rjd22 at 2024-04-11T11:07:27Z
+
+> > This will require the user to name their sequences seq_<table_name> or SEQ_<TABLE_NAME>
+>
+> Do we create this sequence during auto-setup?
+
+I'm not sure auto setup works for Oracle. I had to setup the tables manually for them to work properly.
+
+Edit: retested the auto create and it indeed fails with an error because of the json data type.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-04-11T12:21:42Z
+
+It'd be great to fix the autosetup and let doctrine manage the sequence.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-04-11T15:17:17Z
+
+#54176 might be trying to fix the same issue. Can you please have a look in case this brings inspiration?
+
+---------------------------------------------------------------------------
+
+by rjd22 at 2024-04-11T15:41:32Z
+
+> #54176 might be trying to fix the same issue. Can you please have a look in case this brings inspiration?
+
+That PR solves a different issue that is not really an issue for Oracle versions higher than 12c. You can link the sequence to the id column as identity and it will auto increment the ID column just like the other databases.
+
+This PR solves the part to get the currval of the just inserted ID. I rather not change the method of insertion of the record because that would divert too much from the other implementations.
+
+Still there is some nice inspiration in that PR. And I will check if I can make the auto_setup work.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2024-08-19T09:23:16Z
+
+@rjd22 Any news?
+
+---------------------------------------------------------------------------
+
+by rjd22 at 2024-08-21T13:30:16Z
+
+@fabpot at this moment this is pending. I need to make some time to finish this and test this.
+
+---------------------------------------------------------------------------
+
+by rjd22 at 2024-09-13T11:51:05Z
+
+@fabpot Sorry it took me longer than expected. These changes should solve the messenger issues with Oracle and also help new users to setup the messenger table correcty.
+
+We could improve on this by splitting all Oracle changes off to an separate OracleConnection (like postgres) but this would also mean quite a rewrite of the Connection itself.
+
+---------------------------------------------------------------------------
+
+by rjd22 at 2024-09-17T14:42:56Z
+
+Would someone be willing to take a look for me?
+
+---------------------------------------------------------------------------
+
+by rjd22 at 2024-09-24T08:35:51Z
+
+@nicolas-grekas Sorry for pinging but can you mark this for review? This fixes quite a important block of an upgrade path for Oracle users using messenger.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2024-09-24T09:39:04Z
+
+The change itself looks good to me. Works be great to have some Oracle users give their feedback though.
+
+What I wonder though is: Will this break existing setups is they don’t add the sequence manually?
+
+---------------------------------------------------------------------------
+
+by rjd22 at 2024-09-24T09:41:22Z
+
+> The change itself looks good to me. Works be great to have some Oracle users give their feedback though.
+>
+> What I wonder though is: Will this break existing setups is they don’t add the sequence manually?
+
+Yes and no, all existing setups are already broken after 6.4.3 and to upgrade they have to manually migrate the table or remove it and make the script recreate it. The ones that already have a sequence connected with the correct name (I tried to use the most common name for it). Should start working correctly.
+
+Because of licensing Oracle testers are really hard to come by :).
+
+---------------------------------------------------------------------------
+
+by rjd22 at 2024-09-24T09:48:31Z
+
+For manual migration the users will have to run the following queries (please adapt to table name if using a different table name):
+
+```sql
+create sequence seq_messenger_messages
+```
+
+```sql
+alter table messenger_messages modify id default "seq_messenger_messages.nextval"
+```
+
+---------------------------------------------------------------------------
+
+by rjd22 at 2024-09-25T07:57:08Z
+
+@xabbuh lets wait for this week and if noone comes forward I recommend merging this and testing this in the field. If any things pop up then we will fix them. Atleast we have the advantage here that we can't make it worse.
+
+---------------------------------------------------------------------------
+
+by rjd22 at 2024-10-01T10:47:04Z
+
+@xabbuh well not much interest to test it sadly :(. Would it be okay to merge this?

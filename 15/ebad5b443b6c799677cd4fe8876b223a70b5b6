@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by stof at 2024-10-04T17:16:13Z
+
+Maybe we could add a test using Reflection to compare the signature of both methods, to avoid such mistake in the future when adding new features in it (as the test would force you to add the new argument in the other method)
+
+---------------------------------------------------------------------------
+
+by HypeMC at 2024-10-04T17:32:58Z
+
+> Maybe we could add a test using Reflection to compare the signature of both methods, to avoid such mistake in the future when adding new features in it (as the test would force you to add the new argument in the other method)
+
+@stof Good idea, done https://github.com/symfony/symfony/compare/a512c2fb64e896814844fb5e6344358f087043f6..90cb6b958a1dcadb80a5c08672e43a94d33ef99d

@@ -99,7 +99,7 @@ final class TurboSmsTransportTest extends TransportTestCase
             ],
         ], info: ['http_code' => 200]);
 
-        $client = new MockHttpClient(static fn() => $response);
+        $client = new MockHttpClient(static fn () => $response);
 
         $message = new SmsMessage('380931234567', 'Test');
 

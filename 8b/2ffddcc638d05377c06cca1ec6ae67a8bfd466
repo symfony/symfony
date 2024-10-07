@@ -1,0 +1,193 @@
+---------------------------------------------------------------------------
+
+by OskarStark at 2023-12-27T20:49:52Z
+
+Any plans to finish this PR @JohJohan ?
+
+---------------------------------------------------------------------------
+
+by JohJohan at 2024-01-04T10:50:52Z
+
+> Any plans to finish this PR @JohJohan ?
+
+Yes will wrap up today. For https://github.com/symfony/symfony/pull/50324#discussion_r1193644644 i will add the values in the test.json files and unset the values.
+
+---------------------------------------------------------------------------
+
+by johanadivare at 2024-01-04T12:15:37Z
+
+I see now MailChimp will send multiple events at once see https://mailchimp.com/developer/transactional/guides/track-respond-activity-webhooks/#handling-the-webhook-response-in-your-app
+
+I'm thinking to make a class `MailerDeliveriesEvent`  that contains `Symfony\Component\RemoteEvent\Event\Mailer\MailerDeliveryEvent` and will add `email` to `MailerDeliveryEvent` so you can handle each event. The concume should then look like:
+```php
+
+    public function consume(RemoteEvent|MailerDeliveriesEvent $event): void
+    {
+
+        foreach ($event as $deliveryEvent) {
+           // Handle the event based on email
+           $deliveryEvent->getEmail()
+        }
+    }
+```
+
+Maybe you also have other suggestion? I dont like it that `consume` function will have the naming for 1 or multiple events and that is probably not a good idea.
+
+---------------------------------------------------------------------------
+
+by alamirault at 2024-03-31T16:58:55Z
+
+> I see now MailChimp will send multiple events at once see https://mailchimp.com/developer/transactional/guides/track-respond-activity-webhooks/#handling-the-webhook-response-in-your-app
+>
+> I'm thinking to make a class `MailerDeliveriesEvent` that contains `Symfony\Component\RemoteEvent\Event\Mailer\MailerDeliveryEvent` and will add `email` to `MailerDeliveryEvent` so you can handle each event. The concume should then look like:
+>
+> ```
+>     public function consume(RemoteEvent|MailerDeliveriesEvent $event): void
+>     {
+>
+>         foreach ($event as $deliveryEvent) {
+>            // Handle the event based on email
+>            $deliveryEvent->getEmail()
+>         }
+>     }
+> ```
+>
+> Maybe you also have other suggestion? I dont like it that `consume` function will have the naming for 1 or multiple events and that is probably not a good idea.
+
+Indeed, bulk event in payload is complicated with this signature
+https://github.com/symfony/symfony/blob/3f2ed0fc4c41744991113185a619baf5d2f7590f/src/Symfony/Component/Webhook/Client/RequestParserInterface.php#L24-L31
+
+(Fore this case, SendgridRequestParser consume only the first event and ignore others :fearful:)
+
+I'm not sure if it's the best way, but changing signature (without BC break) to return an array could be cleaner
+```
+    /**
+     * Parses an HTTP Request and converts it into a RemoteEvent.
+     *
+     * @return array<RemoteEvent> Returns empty if the webhook must be ignored
+     *
+     * @throws RejectWebhookException When the payload is rejected (signature issue, parse issue, ...)
+     */
+    public function parse(Request $request, #[\SensitiveParameter] string $secret): array;
+```
+
+---------------------------------------------------------------------------
+
+by JohJohan at 2024-04-03T08:53:57Z
+
+> > I see now MailChimp will send multiple events at once see https://mailchimp.com/developer/transactional/guides/track-respond-activity-webhooks/#handling-the-webhook-response-in-your-app
+> > I'm thinking to make a class `MailerDeliveriesEvent` that contains `Symfony\Component\RemoteEvent\Event\Mailer\MailerDeliveryEvent` and will add `email` to `MailerDeliveryEvent` so you can handle each event. The concume should then look like:
+> > ```
+> >     public function consume(RemoteEvent|MailerDeliveriesEvent $event): void
+> >     {
+> >
+> >         foreach ($event as $deliveryEvent) {
+> >            // Handle the event based on email
+> >            $deliveryEvent->getEmail()
+> >         }
+> >     }
+> > ```
+> >
+> >
+> >
+> >
+> >
+> >
+> >
+> >
+> >
+> >
+> >
+> > Maybe you also have other suggestion? I dont like it that `consume` function will have the naming for 1 or multiple events and that is probably not a good idea.
+>
+> Indeed, bulk event in payload is complicated with this signature
+>
+> https://github.com/symfony/symfony/blob/3f2ed0fc4c41744991113185a619baf5d2f7590f/src/Symfony/Component/Webhook/Client/RequestParserInterface.php#L24-L31
+>
+> (Fore this case, SendgridRequestParser consume only the first event and ignore others 😨)
+>
+> I'm not sure if it's the best way, but changing signature (without BC break) to return an array could be cleaner
+>
+> ```
+>     /**
+>      * Parses an HTTP Request and converts it into a RemoteEvent.
+>      *
+>      * @return array<RemoteEvent> Returns empty if the webhook must be ignored
+>      *
+>      * @throws RejectWebhookException When the payload is rejected (signature issue, parse issue, ...)
+>      */
+>     public function parse(Request $request, #[\SensitiveParameter] string $secret): array;
+> ```
+
+Yes i think only parsing the first message is not an option as you will miss the rest and in our cases allot is bulked together so it would not be worth implementing that i think.
+
+Indeed updating `parse` to be able to return an `array` would be a solution but that will for sure bring complications and will be breaking right. @fabpot maybe you have some insights on what to do next?
+
+TLDR; The problem is that we get multiple message in one webhook request and the current interface allows for only parsing one message in a webhook request.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2024-09-27T08:43:21Z
+
+@JohJohan #58248 has been merged now.
+
+---------------------------------------------------------------------------
+
+by kbond at 2024-09-27T11:09:37Z
+
+@JohJohan check out https://github.com/symfony/symfony/pull/58403 to see how I implemented for Mailtrap. I suggest adding a `batch.json`/`batch.php` test that contains multiple events.
+
+---------------------------------------------------------------------------
+
+by JohJohan at 2024-10-01T14:13:05Z
+
+@kbond thanks for your implementation of https://github.com/symfony/symfony/pull/58403! i pushed my code i think it should be good now.
+
+---------------------------------------------------------------------------
+
+by carsonbot at 2024-10-01T14:13:30Z
+
+Hey!
+
+Thanks for your PR. You are targeting branch "7.2" but it seems your PR description refers to branch "7.1".
+Could you update the PR description or change target branch? This helps core maintainers a lot.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by JohJohan at 2024-10-02T06:11:53Z
+
+> Looks good @JohJohan! Could you add an entry in the bridge's `CHANGELOG.md`?
+
+Thanks for the feedback i updated `src/Symfony/Component/Mailer/Bridge/Mailchimp/CHANGELOG.md` and added:
+```md
+7.2
+---
+
+* Add support for webhook
+```
+
+---------------------------------------------------------------------------
+
+by JohJohan at 2024-10-07T09:12:34Z
+
+Its ready for review, i dont know why https://ci.appveyor.com/project/fabpot/symfony/builds/50744376 fails:
+
+```console
+Testing C:\projects\symfony\src\Symfony\Component\Lock
+SSSSSSSSSSSSSSSS..............SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS.  63 / 393 ( 16%)
+.S.........SSSSSSSSSSSSSSSSSSSSSSSSSSF..........SSSSSSSSSSS.... 126 / 393 ( 32%)
+..............SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS
+Time: 00:50.021, Memory: 8.00 MB
+There was 1 failure:
+1) Symfony\Component\Lock\Tests\Store\RedisArrayStoreTest::testBackwardCompatibility
+Failed asserting that false is true.
+C:\projects\symfony\src\Symfony\Component\Lock\Tests\Store\AbstractRedisStoreTestCase.php:49
+FAILURES!
+Tests: 178, Assertions: 201, Failures: 1, Skipped: 124.
+KO src\Symfony/Component/Lock
+PHPUnit 9.6.21 by Sebastian Bergmann and contributors.
+```

@@ -1,0 +1,31 @@
+---------------------------------------------------------------------------
+
+by valtzu at 2024-01-24T17:20:02Z
+
+I find this interesting since I've faced the issue you described with SQS.
+
+So to add this for SQS, we'd implement `KeepaliveReceiverInterface` on `AmazonSqsTransport` and call `ChangeMessageVisibility` with `visibility_timeout` in `AmazonSqsTransport::keepalive()`. Since this keep-alive mechanism is only used when `--keepalive` is provided to `messenger:consume`, it would not be a BC break even though `visibility_timeout` would have a slightly different meaning then. It would also mean in the configuration `visibility_timeout` should always be bigger than `--keepalive` – probably something to address in the documentation.
+
+---------------------------------------------------------------------------
+
+by valtzu at 2024-02-25T11:52:11Z
+
+Based on my previous comment, I have SQS implementation here https://github.com/valtzu/symfony/commit/59a77be3ffbe0c2744d1362a2a9187cb3ecd277b
+
+---------------------------------------------------------------------------
+
+by HypeMC at 2024-02-25T15:05:24Z
+
+@valtzu That's great, thank you for giving this feature a try and implementing it for SQS. Hopefully, it will prove useful if this PR gets merged.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2024-10-06T09:25:49Z
+
+@HypeMC Can you rebase now that #53533 has been merged? Thank you.
+
+---------------------------------------------------------------------------
+
+by HypeMC at 2024-10-06T10:18:48Z
+
+@fabpot Done

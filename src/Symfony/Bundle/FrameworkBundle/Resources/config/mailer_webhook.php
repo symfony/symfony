@@ -13,6 +13,8 @@ namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
 use Symfony\Component\Mailer\Bridge\Brevo\RemoteEvent\BrevoPayloadConverter;
 use Symfony\Component\Mailer\Bridge\Brevo\Webhook\BrevoRequestParser;
+use Symfony\Component\Mailer\Bridge\Mailchimp\RemoteEvent\MailchimpPayloadConverter;
+use Symfony\Component\Mailer\Bridge\Mailchimp\Webhook\MailchimpRequestParser;
 use Symfony\Component\Mailer\Bridge\MailerSend\RemoteEvent\MailerSendPayloadConverter;
 use Symfony\Component\Mailer\Bridge\MailerSend\Webhook\MailerSendRequestParser;
 use Symfony\Component\Mailer\Bridge\Mailgun\RemoteEvent\MailgunPayloadConverter;
@@ -83,5 +85,10 @@ return static function (ContainerConfigurator $container) {
         ->set('mailer.webhook.request_parser.sweego', SweegoRequestParser::class)
             ->args([service('mailer.payload_converter.sweego')])
         ->alias(SweegoRequestParser::class, 'mailer.webhook.request_parser.sweego')
+
+        ->set('mailer.payload_converter.mailchimp', MailchimpPayloadConverter::class)
+        ->set('mailer.webhook.request_parser.mailchimp', MailchimpRequestParser::class)
+            ->args([service('mailer.payload_converter.mailchimp')])
+        ->alias(MailchimpRequestParser::class, 'mailer.webhook.request_parser.mailchimp')
     ;
 };

@@ -1,0 +1,45 @@
+---------------------------------------------------------------------------
+
+by MrYamous at 2024-09-14T11:53:05Z
+
+I think I am missing something, I am in trouble with the failing test
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2024-09-14T13:01:07Z
+
+Do we need this? We can set it via the host, right?
+
+---------------------------------------------------------------------------
+
+by MrYamous at 2024-09-14T14:58:41Z
+
+> Do we need this? We can set it via the host, right?
+
+Probably yes (setting via the host). But this feel more convenient to use, and considering we are already providing this kind of interaction with host for some bridge (like Mailjet or Mailgun) I did not think it would be a problem
+
+---------------------------------------------------------------------------
+
+by ev-gor at 2024-09-14T19:55:11Z
+
+@MrYamous for EU region we should use 'api.eu.sendgrid.com', but according to your logic `'eu' !== ($this->region ?: 'eu')` for 'eu' region we get 'api.sendgrid.com' that should be returned for global region, not for EU. That's why the test failed.
+The same is true for smtp server.
+By the way, what about case sensitivity: 'EU' vs 'eu'.
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2024-09-30T11:32:15Z
+
+I think I am 👎 on this one, we can already achieve that by setting the correct host.
+
+---------------------------------------------------------------------------
+
+by stof at 2024-09-30T11:51:58Z
+
+@OskarStark for providers that have the concept of multiple regions, we support that natively in other bridges.
+
+---------------------------------------------------------------------------
+
+by MrYamous at 2024-10-04T04:32:36Z
+
+I will take care of that over the weekend :)

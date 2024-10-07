@@ -43,6 +43,8 @@ use Symfony\Component\Messenger\Worker;
 #[AsCommand(name: 'messenger:consume', description: 'Consume messages')]
 class ConsumeMessagesCommand extends Command implements SignalableCommandInterface
 {
+    private const DEFAULT_KEEPALIVE_INTERVAL = 5;
+
     private ?Worker $worker = null;
 
     public function __construct(
@@ -75,6 +77,7 @@ class ConsumeMessagesCommand extends Command implements SignalableCommandInterfa
                 new InputOption('queues', null, InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY, 'Limit receivers to only consume from the specified queues'),
                 new InputOption('no-reset', null, InputOption::VALUE_NONE, 'Do not reset container services after each message'),
                 new InputOption('all', null, InputOption::VALUE_NONE, 'Consume messages from all receivers'),
+                new InputOption('keepalive', null, InputOption::VALUE_OPTIONAL, 'Whether to use the transport\'s keepalive mechanism if implemented', self::DEFAULT_KEEPALIVE_INTERVAL),
             ])
             ->setHelp(<<<'EOF'
 The <info>%command.name%</info> command consumes messages and dispatches them to the message bus.
@@ -122,6 +125,13 @@ Use the --all option to consume from all receivers:
 EOF
             )
         ;
+    }
+
+    protected function initialize(InputInterface $input, OutputInterface $output): void
+    {
+        if ($input->hasParameterOption('--keepalive')) {
+            $this->getApplication()->setAlarmInterval((int) ($input->getOption('keepalive') ?? self::DEFAULT_KEEPALIVE_INTERVAL));
+        }
     }
 
     protected function interact(InputInterface $input, OutputInterface $output): void
@@ -264,12 +274,20 @@ EOF
 
     public function getSubscribedSignals(): array
     {
-        return $this->signals ?? (\extension_loaded('pcntl') ? [\SIGTERM, \SIGINT, \SIGQUIT] : []);
+        return $this->signals ?? (\extension_loaded('pcntl') ? [\SIGTERM, \SIGINT, \SIGQUIT, \SIGALRM] : []);
     }
 
     public function handleSignal(int $signal, int|false $previousExitCode = 0): int|false
     {
         if (!$this->worker) {
+            return false;
+        }
+
+        if (\SIGALRM === $signal) {
+            $this->logger?->info('Sending keepalive request.', ['transport_names' => $this->worker->getMetadata()->getTransportNames()]);
+
+            $this->worker->keepalive();
+
             return false;
         }
 

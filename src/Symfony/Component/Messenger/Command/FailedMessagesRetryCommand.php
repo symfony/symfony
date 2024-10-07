@@ -41,6 +41,8 @@ use Symfony\Contracts\Service\ServiceProviderInterface;
 #[AsCommand(name: 'messenger:failed:retry', description: 'Retry one or more messages from the failure transport')]
 class FailedMessagesRetryCommand extends AbstractFailedMessagesCommand implements SignalableCommandInterface
 {
+    private const DEFAULT_KEEPALIVE_INTERVAL = 5;
+
     private bool $shouldStop = false;
     private bool $forceExit = false;
     private ?Worker $worker = null;
@@ -64,6 +66,7 @@ class FailedMessagesRetryCommand extends AbstractFailedMessagesCommand implement
                 new InputArgument('id', InputArgument::IS_ARRAY, 'Specific message id(s) to retry'),
                 new InputOption('force', null, InputOption::VALUE_NONE, 'Force action without confirmation'),
                 new InputOption('transport', null, InputOption::VALUE_OPTIONAL, 'Use a specific failure transport', self::DEFAULT_TRANSPORT_OPTION),
+                new InputOption('keepalive', null, InputOption::VALUE_OPTIONAL, 'Whether to use the transport\'s keepalive mechanism if implemented', self::DEFAULT_KEEPALIVE_INTERVAL),
             ])
             ->setHelp(<<<'EOF'
 The <info>%command.name%</info> retries message in the failure transport.
@@ -85,6 +88,13 @@ Or pass multiple ids at once to process multiple messages:
 EOF
             )
         ;
+    }
+
+    protected function initialize(InputInterface $input, OutputInterface $output): void
+    {
+        if ($input->hasParameterOption('--keepalive')) {
+            $this->getApplication()->setAlarmInterval((int) ($input->getOption('keepalive') ?? self::DEFAULT_KEEPALIVE_INTERVAL));
+        }
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -134,12 +144,20 @@ EOF
 
     public function getSubscribedSignals(): array
     {
-        return $this->signals ?? (\extension_loaded('pcntl') ? [\SIGTERM, \SIGINT, \SIGQUIT] : []);
+        return $this->signals ?? (\extension_loaded('pcntl') ? [\SIGTERM, \SIGINT, \SIGQUIT, \SIGALRM] : []);
     }
 
     public function handleSignal(int $signal, int|false $previousExitCode = 0): int|false
     {
         if (!$this->worker) {
+            return false;
+        }
+
+        if (\SIGALRM === $signal) {
+            $this->logger?->info('Sending keepalive request.', ['transport_names' => $this->worker->getMetadata()->getTransportNames()]);
+
+            $this->worker->keepalive();
+
             return false;
         }
 

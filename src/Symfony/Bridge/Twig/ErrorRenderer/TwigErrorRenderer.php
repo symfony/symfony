@@ -37,7 +37,7 @@ class TwigErrorRenderer implements ErrorRendererInterface
         ?HtmlErrorRenderer $fallbackErrorRenderer = null,
         bool|callable $debug = false,
     ) {
-        $this->fallbackErrorRenderer = $fallbackErrorRenderer ?? new HtmlErrorRenderer();
+        $this->fallbackErrorRenderer = \in_array(\PHP_SAPI, ['cli', 'phpdbg', 'embed'], true) ? new CliErrorRenderer() : ($fallbackErrorRenderer ?? new HtmlErrorRenderer());
         $this->debug = \is_bool($debug) ? $debug : $debug(...);
     }
 
@@ -47,9 +47,7 @@ class TwigErrorRenderer implements ErrorRendererInterface
         $debug = \is_bool($this->debug) ? $this->debug : ($this->debug)($flattenException);
 
         if ($debug || !$template = $this->findTemplate($flattenException->getStatusCode())) {
-            $renderer = \in_array(\PHP_SAPI, ['cli', 'phpdbg', 'embed'], true) ? new CliErrorRenderer() : $this->fallbackErrorRenderer;
-
-            return $renderer->render($exception);
+            return $this->fallbackErrorRenderer->render($exception);
         }
 
         return $flattenException->setAsString($this->twig->render($template, [

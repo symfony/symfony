@@ -1,0 +1,33 @@
+{
+    "name": "symfony/line-bot-notifier",
+    "type": "symfony-notifier-bridge",
+    "description": "Provides LINE Bot (Messaging API) integration for Symfony Notifier.",
+    "keywords": ["line", "bot", "messaging", "chat"],
+    "homepage": "https://symfony.com",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Yi-Jyun Pan",
+            "email": "me@pan93.com"
+        },
+        {
+            "name": "Symfony Community",
+            "homepage": "https://symfony.com/contributors"
+        }
+    ],
+    "require": {
+        "php": ">=8.2",
+        "symfony/http-client": "^6.4|^7.0",
+        "symfony/notifier": "^7.2"
+    },
+    "require-dev": {
+        "symfony/event-dispatcher": "^6.4|^7.0"
+    },
+    "autoload": {
+        "psr-4": { "Symfony\\Component\\Notifier\\Bridge\\LineBot\\": "" },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
+    },
+    "minimum-stability": "dev"
+}

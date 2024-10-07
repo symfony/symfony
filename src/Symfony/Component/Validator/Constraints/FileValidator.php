@@ -143,7 +143,7 @@ class FileValidator extends ConstraintValidator
         $sizeInBytes = filesize($path);
         $basename = $value instanceof UploadedFile ? $value->getClientOriginalName() : basename($path);
 
-        if ($constraint->filenameMaxLength && $constraint->filenameMaxLength < $filenameLength = \mb_strlen($basename, 'UTF-8')) {
+        if ($constraint->filenameMaxLength && $constraint->filenameMaxLength < $filenameLength = mb_strlen($basename, 'UTF-8')) {
             $this->context->buildViolation($constraint->filenameTooLongMessage)
                 ->setParameter('{{ filename_max_length }}', $this->formatValue($constraint->filenameMaxLength))
                 ->setCode(File::FILENAME_TOO_LONG)

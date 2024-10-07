@@ -1,0 +1,34 @@
+---------------------------------------------------------------------------
+
+by OskarStark at 2024-07-28T08:21:20Z
+
+> the same is in webprofiler, it should be in sync
+
+After this comment 👍
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2024-08-02T19:13:11Z
+
+@JoppeDC open for finishing this PR? Thanks
+
+---------------------------------------------------------------------------
+
+by JoppeDC at 2024-08-02T19:25:58Z
+
+> @JoppeDC open for finishing this PR? Thanks
+
+Absolutely. I'll have a look at the profiler changes
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2024-10-03T14:39:33Z
+
+@JoppeDC if you have some time, we need some last effort from you to fix some minor issues here. Then, we'll merge this in time for Symfony 7.2 release. Thanks!
+
+---------------------------------------------------------------------------
+
+by JoppeDC at 2024-10-03T15:26:51Z
+
+@javiereguiluz I've quickly fixed the feedback issues that were still open.
+I have not had the time (and also i totally forgot) to check out the implementation in the Profiler tho

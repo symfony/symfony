@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\FrameworkBundle\DependencyInjection;
 
+use Amp\Parallel\Worker\Task;
 use Composer\InstalledVersions;
 use Http\Client\HttpAsyncClient;
 use Http\Client\HttpClient;
@@ -113,6 +114,7 @@ use Symfony\Component\Messenger\Handler\BatchHandlerInterface;
 use Symfony\Component\Messenger\MessageBus;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Messenger\Middleware\RouterContextMiddleware;
+use Symfony\Component\Messenger\ParallelMessageBus;
 use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
 use Symfony\Component\Messenger\Transport\TransportFactoryInterface as MessengerTransportFactoryInterface;
 use Symfony\Component\Messenger\Transport\TransportInterface;
@@ -2106,6 +2108,10 @@ class FrameworkExtension extends Extension
 
         $loader->load('messenger.php');
 
+        if (!class_exists(ParallelMessageBus::class)) {
+            $container->removeDefinition('parallel_bus');
+        }
+
         if (!interface_exists(DenormalizerInterface::class)) {
             $container->removeDefinition('serializer.normalizer.flatten_exception');
         }
@@ -2177,7 +2183,12 @@ class FrameworkExtension extends Extension
 
             if ($busId === $config['default_bus']) {
                 $container->setAlias('messenger.default_bus', $busId)->setPublic(true);
-                $container->setAlias(MessageBusInterface::class, $busId);
+
+                $messageBusAlias = $container->setAlias(MessageBusInterface::class, $busId);
+
+                if (class_exists(Task::class)) {
+                    $messageBusAlias->setPublic(true);
+                }
             } else {
                 $container->registerAliasForArgument($busId, MessageBusInterface::class);
             }

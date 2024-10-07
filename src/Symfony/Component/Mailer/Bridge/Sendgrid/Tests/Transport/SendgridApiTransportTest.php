@@ -40,6 +40,10 @@ class SendgridApiTransportTest extends TestCase
                 'sendgrid+api://api.sendgrid.com',
             ],
             [
+                new SendgridApiTransport('KEY', null, null, null, 'eu'),
+                'sendgrid+api://api.eu.sendgrid.com',
+            ],
+            [
                 (new SendgridApiTransport('KEY'))->setHost('example.com'),
                 'sendgrid+api://example.com',
             ],

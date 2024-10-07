@@ -60,16 +60,22 @@ class SendgridTransportFactoryTest extends AbstractTransportFactoryTestCase
 
     public static function createProvider(): iterable
     {
+        $client = new MockHttpClient();
         $logger = new NullLogger();
 
         yield [
             new Dsn('sendgrid+api', 'default', self::USER),
-            new SendgridApiTransport(self::USER, new MockHttpClient(), null, $logger),
+            new SendgridApiTransport(self::USER, $client, null, $logger),
+        ];
+
+        yield [
+            new Dsn('sendgrid+api', 'default', self::USER, '', null, ['region' => 'eu']),
+            new SendgridApiTransport(self::USER, $client, null, $logger, 'eu'),
         ];
 
         yield [
             new Dsn('sendgrid+api', 'example.com', self::USER, '', 8080),
-            (new SendgridApiTransport(self::USER, new MockHttpClient(), null, $logger))->setHost('example.com')->setPort(8080),
+            (new SendgridApiTransport(self::USER, $client, null, $logger))->setHost('example.com')->setPort(8080),
         ];
 
         yield [

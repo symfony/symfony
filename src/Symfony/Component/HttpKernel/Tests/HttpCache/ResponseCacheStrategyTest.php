@@ -102,7 +102,7 @@ class ResponseCacheStrategyTest extends TestCase
         $cacheStrategy = new ResponseCacheStrategy();
 
         $response1 = new Response();
-        $response1->setExpires(new \DateTime('+ 1 hour'));
+        $response1->setExpires(new \DateTime('+ 1 hour', new \DateTimeZone('UTC')));
         $response1->setPublic();
         $cacheStrategy->add($response1);
 
@@ -112,7 +112,7 @@ class ResponseCacheStrategyTest extends TestCase
 
         $this->assertSame('3600', $response->headers->getCacheControlDirective('max-age'));
         $this->assertNull($response->headers->getCacheControlDirective('s-maxage'));
-        $this->assertSame((new \DateTime('+ 1 hour'))->format('D, d M Y H:i:s').' GMT', $response->headers->get('Expires'));
+        $this->assertSame((new \DateTime('+ 1 hour', new \DateTimeZone('UTC')))->format('D, d M Y H:i:s').' GMT', $response->headers->get('Expires'));
     }
 
     public function testMaxAgeAndSharedMaxAgeUpdatedFromExpiresHeader()
@@ -120,7 +120,7 @@ class ResponseCacheStrategyTest extends TestCase
         $cacheStrategy = new ResponseCacheStrategy();
 
         $response1 = new Response();
-        $response1->setExpires(new \DateTime('+ 1 day'));
+        $response1->setExpires(new \DateTime('+ 1 day', new \DateTimeZone('UTC')));
         $response1->setPublic();
         $cacheStrategy->add($response1);
 
@@ -131,7 +131,7 @@ class ResponseCacheStrategyTest extends TestCase
 
         $this->assertSame('3600', $response->headers->getCacheControlDirective('max-age'));
         $this->assertSame('86400', $response->headers->getCacheControlDirective('s-maxage'));
-        $this->assertSame((new \DateTime('+ 1 hour'))->format('D, d M Y H:i:s').' GMT', $response->headers->get('Expires'));
+        $this->assertSame((new \DateTime('+ 1 hour', new \DateTimeZone('UTC')))->format('D, d M Y H:i:s').' GMT', $response->headers->get('Expires'));
     }
 
     public function testMainResponseNotCacheableWhenEmbeddedResponseRequiresValidation()

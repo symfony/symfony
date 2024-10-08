@@ -7,16 +7,6 @@ git checkout src/Symfony/Contracts/Service/ResetInterface.php
 (echo "$head" && echo && git diff -U2 src/ | grep '^index ' -v) > .github/expected-missing-return-types.diff
 git checkout composer.json src/
 
-diff --git a/src/Symfony/Bridge/Twig/Tests/Extension/AbstractLayoutTestCase.php b/src/Symfony/Bridge/Twig/Tests/Extension/AbstractLayoutTestCase.php
---- a/src/Symfony/Bridge/Twig/Tests/Extension/AbstractLayoutTestCase.php
-+++ b/src/Symfony/Bridge/Twig/Tests/Extension/AbstractLayoutTestCase.php
-@@ -49,5 +49,5 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
-      * @return FormExtensionInterface[]
-      */
--    protected function getExtensions()
-+    protected function getExtensions(): array
-     {
-         return [
 diff --git a/src/Symfony/Component/BrowserKit/AbstractBrowser.php b/src/Symfony/Component/BrowserKit/AbstractBrowser.php
 --- a/src/Symfony/Component/BrowserKit/AbstractBrowser.php
 +++ b/src/Symfony/Component/BrowserKit/AbstractBrowser.php

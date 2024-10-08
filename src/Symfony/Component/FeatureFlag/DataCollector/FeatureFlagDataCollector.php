@@ -12,7 +12,7 @@
 namespace Symfony\Component\FeatureFlag\DataCollector;
 
 use Symfony\Component\FeatureFlag\Debug\TraceableFeatureChecker;
-use Symfony\Component\FeatureFlag\FeatureRegistryInterface;
+use Symfony\Component\FeatureFlag\Provider\ProviderInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\DataCollector\DataCollector;
@@ -22,7 +22,7 @@ use Symfony\Component\VarDumper\Cloner\Data;
 final class FeatureFlagDataCollector extends DataCollector implements LateDataCollectorInterface
 {
     public function __construct(
-        private readonly FeatureRegistryInterface $featureRegistry,
+        private readonly ProviderInterface $provider,
         private readonly TraceableFeatureChecker $featureChecker,
     ) {
     }
@@ -42,6 +42,7 @@ final class FeatureFlagDataCollector extends DataCollector implements LateDataCo
         foreach ($this->featureChecker->getChecks() as $featureName => $checks) {
             $this->data['checks'][$featureName] = array_map(
                 fn (array $check): array => [
+                    'found' => $this->cloneVar($this->provider->has($featureName)),
                     'expected_value' => $this->cloneVar($check['expectedValue']),
                     'is_enabled' => $check['isEnabled'],
                     'calls' => $check['calls'],
@@ -50,7 +51,7 @@ final class FeatureFlagDataCollector extends DataCollector implements LateDataCo
             );
         }
 
-        $this->data['not_resolved'] = array_values(array_diff($this->featureRegistry->getNames(), array_keys($this->data['resolvedValues'])));
+        $this->data['not_resolved'] = array_values(array_diff($this->provider->getNames(), array_keys($this->data['resolvedValues'])));
     }
 
     /**
@@ -62,7 +63,7 @@ final class FeatureFlagDataCollector extends DataCollector implements LateDataCo
     }
 
     /**
-     * @return array<string, array{expected_value: Data, is_enabled: bool, calls: int}>
+     * @return array<string, array{found: Data, expected_value: Data, is_enabled: bool, calls: int}>
      */
     public function getChecks(): array
     {

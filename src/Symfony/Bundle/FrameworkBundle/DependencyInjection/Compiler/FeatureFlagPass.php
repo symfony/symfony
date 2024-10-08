@@ -56,7 +56,7 @@ class FeatureFlagPass implements CompilerPassInterface
             }
         }
 
-        $container->getDefinition('feature_flag.feature_registry')
+        $container->getDefinition('feature_flag.provider.in_memory')
             ->setArgument('$features', $features)
         ;
 

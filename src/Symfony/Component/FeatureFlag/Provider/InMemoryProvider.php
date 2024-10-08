@@ -9,17 +9,18 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\FeatureFlag;
+namespace Symfony\Component\FeatureFlag\Provider;
 
-use Symfony\Component\FeatureFlag\Exception\FeatureNotFoundException;
+use Symfony\Component\FeatureFlag\ArgumentResolver\ArgumentResolver;
 
-final class FeatureRegistry implements FeatureRegistryInterface
+final class InMemoryProvider implements ProviderInterface
 {
     /**
      * @param array<string, (\Closure(): mixed)> $features
      */
-    public function __construct(private readonly array $features)
-    {
+    public function __construct(
+        private readonly array $features,
+    ) {
     }
 
     public function has(string $featureName): bool
@@ -27,9 +28,9 @@ final class FeatureRegistry implements FeatureRegistryInterface
         return \array_key_exists($featureName, $this->features);
     }
 
-    public function get(string $featureName): callable
+    public function get(string $featureName): \Closure
     {
-        return $this->features[$featureName] ?? throw new FeatureNotFoundException(sprintf('Feature "%s" not found. Available features: "%s".', $featureName, implode(', ', $this->getNames())));
+        return $this->features[$featureName] ?? fn() => false;
     }
 
     public function getNames(): array

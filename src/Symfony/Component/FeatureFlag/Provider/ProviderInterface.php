@@ -9,21 +9,19 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\FeatureFlag;
+namespace Symfony\Component\FeatureFlag\Provider;
 
-use Symfony\Component\FeatureFlag\Exception\FeatureNotFoundException;
-
-interface FeatureRegistryInterface
+interface ProviderInterface
 {
     public function has(string $featureName): bool;
 
     /**
-     * @throws FeatureNotFoundException When the feature is not registered
+     * @return \Closure(): mixed
      */
-    public function get(string $featureName): callable;
+    public function get(string $featureName): \Closure;
 
     /**
-     * @return list<string> A list of all registered feature names
+     * @return list<string>
      */
     public function getNames(): array;
 }

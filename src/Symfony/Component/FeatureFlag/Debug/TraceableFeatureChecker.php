@@ -49,11 +49,6 @@ final class TraceableFeatureChecker implements FeatureCheckerInterface
         return $isEnabled;
     }
 
-    public function isDisabled(string $featureName, mixed $expectedValue = true): bool
-    {
-        return !$this->isEnabled($featureName, $expectedValue);
-    }
-
     public function getValue(string $featureName): mixed
     {
         return $this->resolvedValues[$featureName] = $this->decorated->getValue($featureName);

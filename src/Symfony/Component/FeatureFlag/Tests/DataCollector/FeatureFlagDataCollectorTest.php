@@ -15,13 +15,14 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\FeatureFlag\DataCollector\FeatureFlagDataCollector;
 use Symfony\Component\FeatureFlag\Debug\TraceableFeatureChecker;
 use Symfony\Component\FeatureFlag\FeatureChecker;
-use Symfony\Component\FeatureFlag\FeatureRegistry;
+use Symfony\Component\FeatureFlag\Provider\InMemoryProvider;
+use Symfony\Component\VarDumper\Cloner\Data;
 
 class FeatureFlagDataCollectorTest extends TestCase
 {
     public function testLateCollect()
     {
-        $featureRegistry = new FeatureRegistry([
+        $featureRegistry = new InMemoryProvider([
             'feature_true' => fn () => true,
             'feature_integer' => fn () => 42,
             'feature_random' => fn () => random_int(1, 42),
@@ -36,7 +37,7 @@ class FeatureFlagDataCollectorTest extends TestCase
 
         $dataCollector->lateCollect();
 
-        $data = array_map(fn ($v) => $v->getValue(), $dataCollector->getResolvedValues());
+        $data = array_map(fn (Data $v): mixed => $v->getValue(), $dataCollector->getResolvedValues());
         $this->assertSame(
             [
                 'feature_true' => true,
@@ -46,7 +47,8 @@ class FeatureFlagDataCollectorTest extends TestCase
         );
 
         $data = array_map(
-            fn ($checks) => array_map(function ($a) {
+            fn ($checks) => array_map(function (array $a): array {
+                $a['found'] = $a['found']->getValue();
                 $a['expected_value'] = $a['expected_value']->getValue();
 
                 return $a;
@@ -57,6 +59,7 @@ class FeatureFlagDataCollectorTest extends TestCase
             [
                 'feature_true' => [
                     [
+                        'found' => true,
                         'expected_value' => true,
                         'is_enabled' => true,
                         'calls' => 1,
@@ -64,6 +67,7 @@ class FeatureFlagDataCollectorTest extends TestCase
                 ],
                 'feature_integer' => [
                     [
+                        'found' => true,
                         'expected_value' => 1,
                         'is_enabled' => false,
                         'calls' => 1,

@@ -79,7 +79,7 @@
                                     {% for check in collector.checks[feature_name] %}
                                         {% set context_id = 'context-' ~ loop.parent.loop.index ~ '-' ~ loop.index %}
                                         <div>
-                                            {% set result = check['is_enabled'] ? 'enabled' : 'disabled' %}
+                                            {% set result = check.is_enabled ? 'enabled' : 'disabled' %}
                                             <span class="badge badge-{{ result }}">{{ result|capitalize }}</span>
                                             <span><button type="button" class="btn btn-link text-small sf-toggle" data-toggle-selector="#{{ context_id }}" data-toggle-alt-content="Hide details">Show details</button></span>
                                         </div>
@@ -87,16 +87,20 @@
                                         <div id="{{ context_id }}" class="context sf-toggle-content sf-toggle-hidden">
                                             <table>
                                                 <tr>
+                                                    <th>Found</th>
+                                                    <td>{{ profiler_dump(check.found) }}</td>
+                                                </tr>
+                                                <tr>
                                                     <th>Resolved</th>
                                                     <td>{{ profiler_dump(value, maxDepth=2) }}</td>
                                                 </tr>
                                                 <tr>
                                                     <th>Expected</th>
-                                                    <td>{{ profiler_dump(check['expected_value'], maxDepth=2) }}</td>
+                                                    <td>{{ profiler_dump(check.expected_value, maxDepth=2) }}</td>
                                                 </tr>
                                                 <tr>
                                                     <th>Calls</th>
-                                                    <td>{{ check['calls'] }}</td>
+                                                    <td>{{ check.calls }}</td>
                                                 </tr>
                                             </table>
                                         </div>

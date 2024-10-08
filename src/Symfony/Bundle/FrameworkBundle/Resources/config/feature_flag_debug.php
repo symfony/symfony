@@ -25,7 +25,7 @@ return static function (ContainerConfigurator $container) {
 
         ->set('feature_flag.data_collector', FeatureFlagDataCollector::class)
             ->args([
-                '$featureRegistry' => service('feature_flag.feature_registry'),
+                '$provider' => service('feature_flag.provider'),
                 '$featureChecker' => service('debug.feature_flag.feature_checker'),
             ])
             ->tag('data_collector', ['template' => '@WebProfiler/Collector/feature_flag.html.twig', 'id' => 'feature_flag'])

@@ -73,7 +73,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use Symfony\Component\FeatureFlag\Attribute\AsFeature;
 use Symfony\Component\FeatureFlag\FeatureChecker;
-use Symfony\Component\FeatureFlag\FeatureRegistryInterface;
+use Symfony\Component\FeatureFlag\Provider\ProviderInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\Glob;
@@ -3157,8 +3157,8 @@ class FrameworkExtension extends Extension
     {
         $loader->load('feature_flag.php');
 
-        $container->registerForAutoconfiguration(FeatureRegistryInterface::class)
-            ->addTag('feature_flag.feature_registry')
+        $container->registerForAutoconfiguration(ProviderInterface::class)
+            ->addTag('feature_flag.provider')
         ;
 
         $container->registerAttributeForAutoconfiguration(AsFeature::class,

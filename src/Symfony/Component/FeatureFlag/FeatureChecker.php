@@ -11,31 +11,24 @@
 
 namespace Symfony\Component\FeatureFlag;
 
+use Symfony\Component\FeatureFlag\Provider\ProviderInterface;
+
 final class FeatureChecker implements FeatureCheckerInterface
 {
     private array $cache = [];
 
     public function __construct(
-        private readonly FeatureRegistryInterface $featureRegistry,
+        private readonly ProviderInterface $provider,
     ) {
     }
 
     public function isEnabled(string $featureName, mixed $expectedValue = true): bool
     {
-        if (!$this->featureRegistry->has($featureName)) {
-            return false;
-        }
-
         return $this->getValue($featureName) === $expectedValue;
-    }
-
-    public function isDisabled(string $featureName, mixed $expectedValue = true): bool
-    {
-        return !$this->isEnabled($featureName, $expectedValue);
     }
 
     public function getValue(string $featureName): mixed
     {
-        return $this->cache[$featureName] ??= $this->featureRegistry->get($featureName)();
+        return $this->cache[$featureName] ??= $this->provider->get($featureName)();
     }
 }

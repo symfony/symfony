@@ -23,7 +23,7 @@ composer require symfony/feature-flag
 
 ```php
 use Symfony\Component\FeatureFlag\FeatureChecker;
-use Symfony\Component\FeatureFlag\FeatureRegistry;
+use Symfony\Component\FeatureFlag\Provider\InMemoryProvider;
 
 // Declare features
 final class XmasFeature
@@ -34,7 +34,7 @@ final class XmasFeature
     }
 }
 
-$features = new FeatureRegistry([
+$provider = new InMemoryProvider([
     'weekend' => fn() => date('N') >= 6,
     'xmas' => new XmasFeature(), // could be any callable
     'universe' => fn() => 42,
@@ -42,11 +42,10 @@ $features = new FeatureRegistry([
 ];
 
 // Create the feature checker
-$featureChecker = new FeatureChecker($features);
+$featureChecker = new FeatureChecker($provider);
 
 // Check if a feature is enabled
 $featureChecker->isEnabled('weekend'); // returns true on weekend
-$featureChecker->isDisabled('weekend'); // returns true from monday to friday
 
 // Check a not existing feature
 $featureChecker->isEnabled('not_a_feature'); // returns false

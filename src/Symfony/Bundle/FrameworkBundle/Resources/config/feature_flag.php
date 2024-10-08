@@ -13,21 +13,28 @@ namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
 use Symfony\Component\FeatureFlag\FeatureChecker;
 use Symfony\Component\FeatureFlag\FeatureCheckerInterface;
-use Symfony\Component\FeatureFlag\FeatureRegistry;
-use Symfony\Component\FeatureFlag\FeatureRegistryInterface;
+use Symfony\Component\FeatureFlag\Provider\ChainProvider;
+use Symfony\Component\FeatureFlag\Provider\InMemoryProvider;
+use Symfony\Component\FeatureFlag\Provider\ProviderInterface;
 
 return static function (ContainerConfigurator $container) {
     $container->services()
 
-        ->set('feature_flag.feature_registry', FeatureRegistry::class)
+        ->set('feature_flag.provider.in_memory', InMemoryProvider::class)
             ->args([
                 '$features' => abstract_arg('Defined in FeatureFlagPass.'),
             ])
-            ->alias(FeatureRegistryInterface::class, 'feature_flag.feature_registry')
+            ->tag('feature_flag.provider')
+
+        ->set('feature_flag.provider', ChainProvider::class)
+            ->args([
+                '$providers' => tagged_iterator('feature_flag.provider'),
+            ])
+            ->alias(ProviderInterface::class, 'feature_flag.provider')
 
         ->set('feature_flag.feature_checker', FeatureChecker::class)
             ->args([
-                '$featureRegistry' => service('feature_flag.feature_registry'),
+                '$provider' => service('feature_flag.provider'),
             ])
             ->alias(FeatureCheckerInterface::class, 'feature_flag.feature_checker')
     ;

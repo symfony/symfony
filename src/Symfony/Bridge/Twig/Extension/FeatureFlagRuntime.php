@@ -15,25 +15,25 @@ use Symfony\Component\FeatureFlag\FeatureCheckerInterface;
 
 final class FeatureFlagRuntime
 {
-    public function __construct(private readonly ?FeatureCheckerInterface $featureEnabledChecker = null)
+    public function __construct(private readonly ?FeatureCheckerInterface $featureChecker = null)
     {
     }
 
-    public function isFeatureEnabled(string $featureName, mixed $expectedValue = true): bool
+    public function isEnabled(string $featureName, mixed $expectedValue = true): bool
     {
-        if (null === $this->featureEnabledChecker) {
+        if (null === $this->featureChecker) {
             throw new \LogicException(sprintf('An instance of "%s" must be provided to use "%s()".', FeatureCheckerInterface::class, __METHOD__));
         }
 
-        return $this->featureEnabledChecker->isEnabled($featureName, $expectedValue);
+        return $this->featureChecker->isEnabled($featureName, $expectedValue);
     }
 
-    public function getFeatureValue(string $featureName): mixed
+    public function getValue(string $featureName): mixed
     {
-        if (null === $this->featureEnabledChecker) {
+        if (null === $this->featureChecker) {
             throw new \LogicException(sprintf('An instance of "%s" must be provided to use "%s()".', FeatureCheckerInterface::class, __METHOD__));
         }
 
-        return $this->featureEnabledChecker->getValue($featureName);
+        return $this->featureChecker->getValue($featureName);
     }
 }

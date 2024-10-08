@@ -5,6 +5,7 @@ CHANGELOG
 ---
 
  * Add `ExpectUserDeprecationMessageTrait` with a polyfill of PHPUnit's `expectUserDeprecationMessage()`
+ * Use `total` for asserting deprecation count when a group is not defined
 
 6.4
 ---

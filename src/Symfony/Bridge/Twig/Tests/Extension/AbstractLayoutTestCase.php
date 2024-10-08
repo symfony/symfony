@@ -48,7 +48,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
     /**
      * @return FormExtensionInterface[]
      */
-    protected function getExtensions()
+    protected function getExtensions(): array
     {
         return [
             new CsrfExtension($this->csrfTokenManager),

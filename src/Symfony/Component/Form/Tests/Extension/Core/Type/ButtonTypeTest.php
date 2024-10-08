@@ -51,8 +51,8 @@ class ButtonTypeTest extends BaseTypeTestCase
             ->getForm()
             ->createView();
         $this->assertArrayNotHasKey('form', $view->vars['attr']);
-        $this->assertSame($view->vars['id'], $view['child1']->vars['attr']['form']);
-        $this->assertSame($view->vars['id'], $view['child2']->vars['attr']['form']);
+        $this->assertSame($view->vars['row_attr']['id'], $view['child1']->vars['attr']['form']);
+        $this->assertSame($view->vars['row_attr']['id'], $view['child2']->vars['attr']['form']);
     }
 
     public function testFormAttrOnChild()
@@ -66,7 +66,7 @@ class ButtonTypeTest extends BaseTypeTestCase
             ->getForm()
             ->createView();
         $this->assertArrayNotHasKey('form', $view->vars['attr']);
-        $this->assertSame($view->vars['id'], $view['child1']->vars['attr']['form']);
+        $this->assertSame($view->vars['row_attr']['id'], $view['child1']->vars['attr']['form']);
         $this->assertArrayNotHasKey('form', $view['child2']->vars['attr']);
     }
 
@@ -96,8 +96,8 @@ class ButtonTypeTest extends BaseTypeTestCase
             ->getForm()
             ->createView();
         $this->assertArrayNotHasKey('form', $view->vars['attr']);
-        $this->assertSame($stringId, $view->vars['id']);
-        $this->assertSame($view->vars['id'], $view['child1']->vars['attr']['form']);
-        $this->assertSame($view->vars['id'], $view['child2']->vars['attr']['form']);
+        $this->assertSame($stringId, $view->vars['row_attr']['id']);
+        $this->assertSame($view->vars['row_attr']['id'], $view['child1']->vars['attr']['form']);
+        $this->assertSame($view->vars['row_attr']['id'], $view['child2']->vars['attr']['form']);
     }
 }

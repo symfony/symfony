@@ -20,7 +20,9 @@
         "symfony/security-core": "^6.4|^7.0"
     },
     "require-dev": {
-        "symfony/http-foundation": "^6.4|^7.0"
+        "psr/log": "^1|^2|^3",
+        "symfony/http-foundation": "^6.4|^7.0",
+        "symfony/http-kernel": "^6.4|^7.0"
     },
     "conflict": {
         "symfony/http-foundation": "<6.4"

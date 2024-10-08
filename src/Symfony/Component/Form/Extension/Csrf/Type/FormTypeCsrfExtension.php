@@ -19,6 +19,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\Util\ServerParams;
+use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -35,6 +36,8 @@ class FormTypeCsrfExtension extends AbstractTypeExtension
         private ?TranslatorInterface $translator = null,
         private ?string $translationDomain = null,
         private ?ServerParams $serverParams = null,
+        private array $fieldAttr = [],
+        private ?string $defaultTokenId = null,
     ) {
     }
 
@@ -73,6 +76,7 @@ class FormTypeCsrfExtension extends AbstractTypeExtension
             $csrfForm = $factory->createNamed($options['csrf_field_name'], HiddenType::class, $data, [
                 'block_prefix' => 'csrf_token',
                 'mapped' => false,
+                'attr' => $this->fieldAttr + ['autocomplete' => 'off'],
             ]);
 
             $view->children[$options['csrf_field_name']] = $csrfForm->createView($view);
@@ -81,13 +85,24 @@ class FormTypeCsrfExtension extends AbstractTypeExtension
 
     public function configureOptions(OptionsResolver $resolver): void
     {
+        if ($defaultTokenId = $this->defaultTokenId) {
+            $defaultTokenManager = $this->defaultTokenManager;
+            $defaultTokenId = static fn (Options $options) => $options['csrf_token_manager'] === $defaultTokenManager ? $defaultTokenId : null;
+        }
+
         $resolver->setDefaults([
             'csrf_protection' => $this->defaultEnabled,
             'csrf_field_name' => $this->defaultFieldName,
             'csrf_message' => 'The CSRF token is invalid. Please try to resubmit the form.',
             'csrf_token_manager' => $this->defaultTokenManager,
-            'csrf_token_id' => null,
+            'csrf_token_id' => $defaultTokenId,
         ]);
+
+        $resolver->setAllowedTypes('csrf_protection', 'bool');
+        $resolver->setAllowedTypes('csrf_field_name', 'string');
+        $resolver->setAllowedTypes('csrf_message', 'string');
+        $resolver->setAllowedTypes('csrf_token_manager', CsrfTokenManagerInterface::class);
+        $resolver->setAllowedTypes('csrf_token_id', ['null', 'string']);
     }
 
     public static function getExtendedTypes(): iterable

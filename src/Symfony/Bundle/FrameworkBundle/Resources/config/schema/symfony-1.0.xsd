@@ -71,12 +71,25 @@
     </xsd:complexType>
 
     <xsd:complexType name="form_csrf_protection">
+        <xsd:sequence>
+            <xsd:element name="field-attr" type="field_attr" minOccurs="0" maxOccurs="unbounded" />
+        </xsd:sequence>
         <xsd:attribute name="enabled" type="xsd:boolean" />
+        <xsd:attribute name="token-id" type="xsd:string" />
         <xsd:attribute name="field-name" type="xsd:string" />
     </xsd:complexType>
 
+    <xsd:complexType name="field_attr">
+        <xsd:attribute name="name" type="xsd:string" use="required"/>
+    </xsd:complexType>
+
     <xsd:complexType name="csrf_protection">
+        <xsd:sequence>
+            <xsd:element name="stateless-token-id" type="xsd:string" minOccurs="0" maxOccurs="unbounded" />
+        </xsd:sequence>
         <xsd:attribute name="enabled" type="xsd:boolean" />
+        <xsd:attribute name="check-header" type="xsd:string" />
+        <xsd:attribute name="cookie-name" type="xsd:string" />
     </xsd:complexType>
 
     <xsd:complexType name="esi">

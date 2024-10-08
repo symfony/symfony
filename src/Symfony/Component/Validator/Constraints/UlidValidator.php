@@ -43,10 +43,10 @@ class UlidValidator extends ConstraintValidator
 
         $value = (string) $value;
 
-        if (26 !== \strlen($value)) {
+        if (26 !== \mb_strlen($value)) {
             $this->context->buildViolation($constraint->message)
                 ->setParameter('{{ value }}', $this->formatValue($value))
-                ->setCode(26 > \strlen($value) ? Ulid::TOO_SHORT_ERROR : Ulid::TOO_LONG_ERROR)
+                ->setCode(26 > \mb_strlen($value) ? Ulid::TOO_SHORT_ERROR : Ulid::TOO_LONG_ERROR)
                 ->addViolation();
 
             return;

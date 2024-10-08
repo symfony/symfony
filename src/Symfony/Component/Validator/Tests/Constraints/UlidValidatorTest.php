@@ -95,4 +95,32 @@ class UlidValidatorTest extends ConstraintValidatorTestCase
             ->setCode(Ulid::TOO_SHORT_ERROR)
             ->assertRaised();
     }
+
+    public function testTooShortUlidWithUnicode()
+    {
+        $constraint = new Ulid([
+            'message' => 'testMessage',
+        ]);
+
+        $this->validator->validate('ÄÄÄÄÄÄÄÄÄÄÄÄÄ', $constraint); // 13 chars represented on 26 bytes
+
+        $this->buildViolation('testMessage')
+            ->setParameter('{{ value }}', '"ÄÄÄÄÄÄÄÄÄÄÄÄÄ"')
+            ->setCode(Ulid::TOO_SHORT_ERROR)
+            ->assertRaised();
+    }
+
+    public function testIllegalCharsUlidWithUnicode()
+    {
+        $constraint = new Ulid([
+            'message' => 'testMessage',
+        ]);
+
+        $this->validator->validate('01ARZ3NDEKTSV4RRFFQ69G5FÄV', $constraint);
+
+        $this->buildViolation('testMessage')
+            ->setParameter('{{ value }}', '"01ARZ3NDEKTSV4RRFFQ69G5FÄV"')
+            ->setCode(Ulid::INVALID_CHARACTERS_ERROR)
+            ->assertRaised();
+    }
 }

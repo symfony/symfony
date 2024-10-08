@@ -1,0 +1,721 @@
+---------------------------------------------------------------------------
+
+by smnandre at 2024-08-26T23:22:17Z
+
+(cc @tucksaun )
+
+---------------------------------------------------------------------------
+
+by jderusse at 2024-08-27T13:39:35Z
+
+AWASP discourage using this pattern and recommands using a hash/crypted value coupled to the session (or JWT lifetime) instead
+
+https://cheatsheetseries.owasp.org/cheatsheets/Cross-Site_Request_Forgery_Prevention_Cheat_Sheet.html#naive-double-submit-cookie-pattern-discouraged
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-08-27T13:49:53Z
+
+I've read that, and what I'm proposing here is significantly different from what they discourage to be considered seriously IMHO, esp with the new cookie attributes and with the style of double-submit I'm using here (which is not discussed on that page).
+
+Aka I'd be interested in an open-minded threat model analysis of what this protects against (and what are the drawbacks)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-08-27T14:18:42Z
+
+For additional background: the OWASP page links to https://owasp.org/www-chapter-london/assets/slides/David_Johansson-Double_Defeat_of_Double-Submit_Cookie.pdf to give more insights about vulnerabilities with the "naive double-submit".
+
+I read that doc too, and they don't apply to this PR:
+- MITM are ruled out by HTTPS nowadays (and no CSRF techniques can resist to MITM anyway)
+- HTTPS is enforced for cookies by the `__Host-` prefix, which prevents overriding them from HTTP
+- overriding the cookie isn't enough since the double-submit happens *via a custom header* (which is listed as a valid CSRF-protection on that PDF and on the OWASP page)
+- the Origin header is checked also when available
+
+Binding CSRF tokens to any server-side state is ruling out statelessness/cacheability of the strategy so I'm not looking for anything hashed/signed/etc.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-08-28T10:39:28Z
+
+> Is this double-submission mechanism compatible with form submissions that are not done by Turbo ?
+
+Yes it is. ChatGPT gives me this snippet, which is not perfect but is a good start.
+
+<details>
+
+```js
+document.addEventListener('DOMContentLoaded', () => {
+  const forms = document.querySelectorAll('form[data-csrf-protection]'); // Select forms that need CSRF protection
+
+  forms.forEach(form => {
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault(); // Prevent the default form submission
+
+      const csrfField = form.querySelector(`input[type="hidden"][data-csrf-protection]`);
+
+      if (!csrfField) {
+        form.submit(); // If no CSRF field is found, fallback to normal form submission
+        return;
+      }
+
+      const csrfHeader = csrfField.value;
+
+      if (!/^[-a-zA-Z0-9_]{12,}$/.test(csrfHeader)) {
+        return;
+      }
+
+      const csrfToken = Array.from((window.crypto || window.msCrypto).getRandomValues(new Uint8Array(16)), byte => ('0' + byte.toString(16)).slice(-2)).join('');
+
+      // Create a headers object and add the CSRF token
+      const headers = new Headers({
+        'X-Requested-With': 'XMLHttpRequest' // To signal this is an AJAX request
+      });
+      headers.append(csrfHeader, csrfToken);
+
+      const cookie = csrfHeader + "=" + csrfToken + '; path=/; samesite=strict';
+      document.cookie = window.location.protocol === 'https:' ? '__Host-' + cookie + '; secure' : cookie;
+
+      const formData = new FormData(form);
+
+      try {
+        const response = await fetch(form.action, {
+          method: form.method,
+          headers: headers,
+          body: formData,
+          credentials: 'same-origin'
+        });
+
+        // Check if response is a redirect
+        if (response.redirected) {
+          window.location.href = response.url;
+          return;
+        }
+
+        const contentType = response.headers.get('Content-Type');
+        if (response.ok) {
+          if (contentType && contentType.includes('application/json')) {
+            const data = await response.json();
+            handleSuccess(data);
+          } else {
+            const html = await response.text();
+            updatePageContent(html);
+          }
+        } else {
+          handleError(response);
+        }
+      } catch (error) {
+        console.error('Error submitting form:', error);
+        handleError(null);
+      }
+    });
+  });
+});
+
+function handleSuccess(data) {
+  // Handle success - for example, showing a success message or redirecting
+  console.log('Form submitted successfully:', data);
+}
+
+function handleError(response) {
+  if (response) {
+    console.error('Form submission failed:', response.statusText);
+  } else {
+    console.error('Form submission failed: unknown error');
+  }
+  // Optionally, show an error message to the user
+}
+
+function updatePageContent(html) {
+  // Update the current page content with the server response (full page replacement)
+  const parser = new DOMParser();
+  const newDocument = parser.parseFromString(html, 'text/html');
+
+  // Replace the body content with the new one
+  document.body.innerHTML = newDocument.body.innerHTML;
+
+  // Replace the document's title with the new one
+  document.title = newDocument.title;
+
+  // Optionally, trigger a navigation event or any other custom behavior
+}
+```
+
+</details>
+
+---------------------------------------------------------------------------
+
+by alexander-schranz at 2024-08-28T11:12:27Z
+
+Want to mention that we in Sulu Form Bundle are using a custom csrf token manager which does not generate a Token when rendering our `Dynamic Form` disabled csrf token manager, may a strange name it just disables generating (avoid session start) but still supports validating for the submit part:
+
+ - https://github.com/sulu/SuluFormBundle/blob/12d2df14f2af7ea2ec3e0c3cf1f1638c71325b20/Csrf/DisabledCsrfTokenManager.php#L58
+
+So th emain rendering does return a empty field and JS can via `render_js` / `render_hinclude` or via a custom stimulus or JS component which will then generate the token via a Endpoint with Symfony default token manager:
+
+ - https://github.com/sulu/SuluFormBundle/blob/12d2df14f2af7ea2ec3e0c3cf1f1638c71325b20/Controller/FormTokenController.php#L34
+
+Some older examples can be found here: https://github.com/sulu/SuluFormBundle/blob/2.5/Resources/doc/csrf.md#a-ajax-with-jquery.
+
+So generating the CSRF token is out of the main rendering and the main site is still being cached.
+
+Previously we even did do it in via `render_esi` but ESI does not support adding `headers` specially in case of varnish, and so a session (which is cookie based) can not be started. So it was important that we moved that part to JS. Also best as bots to then not generate useless sessions.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-08-28T11:39:34Z
+
+@alexander-schranz this is the CSRF-lazy strategy, which requires additional requests triggered by JS. These requests are a drawback that I'm looking to fix.
+
+---------------------------------------------------------------------------
+
+by alexander-schranz at 2024-08-28T12:16:11Z
+
+@nicolas-grekas If I understand we generate a token on JS based and submit it then via a Header?
+
+I think the Header should not be the case instead it is lot easier if we just prefill another or the hidden input of _token field with it. This make it easier use this mechanism with any `JS frameworks` which has there own submit validation handling and may not always support hack into the submitted headers:
+
+A out of the box solution with some inline JS could work this way:
+
+```html
+<form onsubmit="document.querySelector('[name*=_token]').value = Array.from((window.crypto || window.msCrypto).getRandomValues(new Uint8Array(16)), byte => ('0' + byte.toString(16)).slice(-2)).join('');">
+   <input id="token" type="text" />
+
+   <button>
+      Submit
+   </button>
+</form>
+```
+
+Still it could be an option if it is a header or a input field. But think the input part is a lot easier to handle in any js frameworks.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-08-28T14:02:34Z
+
+> Still it could be an option if it is a header or a input field. But think the input part is a lot easier to handle in any js frameworks.
+
+Good call, adding a header is trivial with Turbo, but not so-so in vanilla JS.
+
+I updated the implementation so that the header check is now optional, and we always validate that the token matches the cookie when there is one.
+
+I also updated the JS snippet in the PR description to show how easy this is to achieve now.
+
+---------------------------------------------------------------------------
+
+by smnandre at 2024-08-28T20:42:09Z
+
+## Recap on Symfony --webapp assets
+
+A fresh install of `symfony new --webapp` comes with
+* `symfony/ux-turbo`
+* `symfony/stimulus-bundle`
+
+(sInce Symfony 6.4 if i'm not wrong)
+
+# Assets
+
+The associated recipes install 3 important JS files
+* app.js
+* bootstrap.js
+* controller.js
+
+Note: the following points are valid for both  [AssetMapper](https://symfony.com/bundles/StimulusBundle/current/index.html#with-assetmapper) (installed per default) or [Webpack Encore](https://symfony.com/bundles/StimulusBundle/current/index.html#with-webpackencorebundle).
+
+## assets/app.js
+
+The "main" JS file / entrypoint for the app. It is included by default on everypage via the base template.
+
+This file loads the default `app.css` stylesheet for the app and imports... `'./bootstrap.js'`
+
+## assets/bootstrap.js
+
+This file (with a confusing name) require a package from `symfony/stimulus-bundle` (or `-bridge` for webpack but same idea).. and start the main Stimulus app.
+
+```js
+import { startStimulusApp } from '@symfony/stimulus-bundle';
+
+const app = startStimulusApp();
+```
+
+This is key, because this 'startStimulusApp' is the center of every Symfony UX package / controller, including... UX Turbo.
+
+## assets/controllers.js
+
+Quoting the doc here
+
+> StimulusBundle activates any 3rd party Stimulus controllers that are mentioned in your assets/controllers.json file. This file is updated whenever you install a UX package.
+
+> By default, all of your controllers (i.e. files in assets/controllers/ + controllers in assets/controllers.json) will be downloaded and loaded on every page.
+
+More details on "[how controllers are loaded](https://symfony.com/bundles/StimulusBundle/current/index.html#how-are-the-stimulus-controllers-loaded)"
+
+--
+
+So per default, any new Symfony webapp will load these files (via importmap, bundled with webpack ...)
+
+```html
+<link rel="stylesheet" href="/assets/styles/app.css">
+
+<!-- import map script -->
+
+<!-- ES Module Shims: -->
+
+<link rel="modulepreload" href="/assets/app.js">
+<link rel="modulepreload" href="/assets/bootstrap.js">
+<link rel="modulepreload" href="/assets/@symfony/stimulus-bundle/loader.js">
+<link rel="modulepreload" href="/assets/vendor/@hotwired/stimulus/stimulus.index.js">
+<link rel="modulepreload" href="/assets/@symfony/stimulus-bundle/controllers.js">
+<link rel="modulepreload" href="/assets/@symfony/ux-turbo/turbo_controller.js">
+<link rel="modulepreload" href="/assets/controllers/hello_controller.js">
+<link rel="modulepreload" href="/assets/vendor/@hotwired/turbo/turbo.index.js">
+```
+
+---------------------------------------------------------------------------
+
+by smnandre at 2024-08-28T23:47:33Z
+
+## The `csrf-protection` Script
+
+Given this, we now have numerous solutions available for adding the necessary JavaScript code to generate the header/cookie.
+
+However, it's very challenging to find a method that will work in every situation (as detailed in the next message).
+
+So let’s start with the _solutions_ before diving into the _challenges_ :)
+
+---
+
+## Turbo
+
+### Implementation
+* Use Turbo’s [event system](https://turbo.hotwired.dev/reference/events)
+* Hook into [turbo:before-fetch-request](https://turbo.hotwired.dev/reference/events#turbo%3Abefore-fetch-request) / [form:submit-start](https://turbo.hotwired.dev/reference/events#turbo%3Asubmit-start)
+* Modify the request to include the CSRF header
+
+### Code Inclusion
+- Multiple options via [symfony/ux-turbo](https://symfony.com/bundles/ux-turbo/current/index.html)
+- Directly in the `ux-turbo/turbo_controller.js` controller
+- A new controller configurable in `assets/controllers.js`
+- A new script module with no Stimulus dependency
+
+### Challenges
+- Turbo can be disabled (per page / div / ..)
+- Turbo can be installed without using `symfony/ux`
+- Other listeners may modify the events
+- Potentially a [large number](https://turbo.hotwired.dev/handbook/drive#prefetching-links-on-hover) of events
+
+---
+
+## Stimulus
+
+### Implementation
+- Dedicated Stimulus controller (better with a `data-controller` attribute)
+- Or listen to submit events on the document (less aligned with Stimulus philosophy)
+- Cookie generation / removal / listen
+- Simple for third-party scripts to interface with
+
+### Code Inclusion
+- A controller in [symfony/stimulus-bundle](https://symfony.com/bundles/stimulus-bundle/current/index.html)
+- .. or loaded from [framework-bundle](https://symfony.com/doc/current/frontend/ux.html#using-symfony-ux-without-symfony-flex)
+- Can hook into Twig/Form rendering (to add specific `data-*` Stimulus attributes)
+- Would ease integration with other Stimulus controllers
+
+### Advantages
+- Best for targeting form elements in the DOM
+- Handles DOM changes (added elements / JS insertions / attributes)
+- Can be lazy-loaded for performance
+- Lifecycle management, state, configuration handled by the form
+
+### Challenges
+- No submit transformation -> fetch by default
+- Other scripts / Stimulus controllers may interfere
+
+---
+
+## LiveComponent
+
+As LiveComponent deals a lot with forms, it will require custom code, but I'd love LiveComponent to support this new feature day one :)
+
+I'll try something next weekend
+
+---
+
+These options would allow great integration in Symfony apps using Turbo, Stimulus _bundridge_ (or LiveComponent), with all configuration possible "automatically" either via flex or automatic registration / loading of controllers.
+
+For each of them, the only question to me would be "should the code be in their bundle code or in the framework bundle?"  (as they have no synchronized version or release calendar)
+
+...
+
+Next (and last) part: the bad news :)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-08-29T16:06:03Z
+
+I added a package.json and a csrf_controller.js files to framework-bundle that follow some conventions provided by Symfony UX and all just works out of the box \o/
+
+I think what I did here is not exactly idiomatic so I'd be happy to follow suggestions while keeping the nice DX ;)
+
+---------------------------------------------------------------------------
+
+by alexander-schranz at 2024-08-29T16:20:57Z
+
+I find it quiet strange to have UX code in framework bundle. If we upgrade symfony ux packages to a new stimulus / turbo version can not do that without waiting for a new framework bundle major version. Not sure if there is any plan to synchronous the release cycle or add symfony/ux to symfony core packages.
+
+I would more create a ux package which ships csrf integration for turbo which may has a dependency to the framework bundle. Also the question is if its a standard behaviour defined somewhere does it really even now about the symfony framework bundle version and can just live as JS package for stimulus or/and turbo in the stimulus bundle or npm package.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-08-29T16:26:02Z
+
+Note that the turbo integration is optimal so this should not require it to work. Also this shouldn't require asset-mapper - using encore should be equally valid. At the moment that's the case. We should be looking for a package that's loaded seamlessly when either are installed, but without extra care (aka no extra package to install in addition to them). I didn't check if there's one already that fits these constraints.
+
+I'd also like the package to be usable by ppl not using stimulus. That's also the case at the moment.
+
+---------------------------------------------------------------------------
+
+by tugrul at 2024-08-30T09:12:03Z
+
+This work is unnecessary complicated.
+
+Don't miss my simple solution. https://github.com/symfony/symfony/pull/54705
+
+Double submit already is present by naturally if javascript not available.
+
+When user submit form with empty csrf token input. First submit going to be blocked by validator and session will initialized and this time form has filled with a csrf token.
+
+Also developer can implement its own fluent csrf token by javascript when no session and user on first touch to form.
+
+---------------------------------------------------------------------------
+
+by tugrul at 2024-08-30T10:47:04Z
+
+I published a basic symfony app it has CSRF lazy approaches. https://github.com/tugrul/symfony-csrf-lazy
+
+I see @alexander-schranz 's comment is similar idea.
+
+---------------------------------------------------------------------------
+
+by smnandre at 2024-09-01T00:30:50Z
+
+> I'd also like the package to be usable by ppl not using stimulus. That's also the case at the moment.
+
+I'm not sure to understand here. StimulusBundle is the one loading the csrf_controller.js file here, right ?
+
+So why not write a real stimulus controller ? This would allow us to make this script lazy
+(no need to load this file if there is no double csrf protected form in the page...)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-09-01T08:19:26Z
+
+> So why not write a real stimulus controller ? This would allow us to make this script lazy
+
+Good idea, I added the fetch: lazy.
+Still not a real stimulus controller because it makes the script usable without stimulus.
+Maybe this is not the proper way to do this. We could have a lib for standalone usage and a stimulus controller that imports and uses the lib.
+But in the end this is just front-end stuff, what matters is that it just works :) (I'd need help if this should be made another way)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-09-01T08:32:21Z
+
+Alternative idea: we ship the js file in a recipe - e.g. with the framework-bundle one or the security/csrf. This would free us from the versioning concerns and would allow a shorter data-controller name free from the "symfony--framework-bundle--" prefix.
+
+---------------------------------------------------------------------------
+
+by alquerci at 2024-09-01T13:29:59Z
+
+Hello there,
+
+I worked on that topic last month to fix this issue:
+With the Synchronizer Token Pattern, CSRF token is stored on the session.
+When session expires the CSRF token too.
+
+---
+
+Regarding this double-submit implementation.
+
+I am curious to know why choosing the discouraged version of that pattern, while the Signed version is recommended by OWASP?
+
+https://cheatsheetseries.owasp.org/cheatsheets/Cross-Site_Request_Forgery_Prevention_Cheat_Sheet.html#alternative-using-a-double-submit-cookie-pattern
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-09-01T16:11:03Z
+
+@alquerci I answered this question before, see
+https://github.com/symfony/symfony/pull/58095#issuecomment-2312706762
+
+---------------------------------------------------------------------------
+
+by alquerci at 2024-09-01T18:00:10Z
+
+@nicolas-grekas I am agreed regarding cross-site protection where:
+
+- cookie samesite=lax do a great part of the protection
+- "__Host-" cookie prefix forces secure, only same domain. Prevents that cookie is set on not protected subdomain.
+- The required custom header add another protection where CORS configuration are required.
+
+All this mitigations depends that user use a modern browser that supports them.
+
+The unsigned is good enough in that case.
+
+---
+
+I guess that the current Synchronizer Token Pattern that Symfony implements do a bit more than just cross-site protection. Otherwise "cookie samesite=lax" make it obsolete.
+
+If it is not the case, focus only on CSRF protection then this PR provide a good replacement that make homepages with form cachable without complex logic.
+
+It is as well an user experience game changer. No more need to refresh the page to submit a form.
+
+---------------------------------------------------------------------------
+
+by smnandre at 2024-09-01T20:09:12Z
+
+> Alternative idea: we ship the JS file in a recipe.
+
+This could offer the best of both worlds 👍
+
+We can then add specific rules targeting asset-mapper (if installed), webpack, etc.
+
+* A `csrf-controller.js` could be added automatically in `assets/controllers` (allowing for a shorter `data-controller="csrf"` attribute name).
+* A line of code can be added in the `app.js` file (or in the `bootstrap.js`) to load it by default.
+
+(See the [StimulusBundle](https://github.com/symfony/recipes/blob/csrf/symfony/stimulus-bundle/2.13/manifest.json) for reference.)
+
+And this will not require maintaining or exposing `package.json` or public assets in the framework bundle.
+
+---
+
+If not done in the FrameworkBundle, i think we will need to offer a real controller in the StimulusBundle, as most users will request it.
+
+Reasons:
+* acting globally on the `document` is not something we'd recommand
+* current implementation wont work as soon form are sent in "Ajax/JS" (event would probably be intercepted before the document listener)
+
+This was a reason to make the `data-` attribute configurable, as
+* you don't want to do things twice (custom and generic code)
+* It would allows Bundles or tailor-made App implementations in apps to be customized as needed
+
+An alternative approach here could be for Bundles or App code to create a custom `FormExtension` and change the view parameter name before rendering.
+
+---
+
+> But in the end, this is just front-end stuff; what matters is that it just works :)
+
+I agree, it just needs to work. And i too prefer simple-generic solutions.
+
+However, I’ve learned over the last 12 months how hard it is to assume _anything_ about the front-end tools, stacks, and libraries used in Symfony apps.
+
+So this goal is not always that easy to achieve, and sometimes the desire for "made-for-all" solution can backfire and create more frustration that it helps :)
+(not saying this is the case here.. we'll see; but this is something that happen 😅 )
+
+---------------------------------------------------------------------------
+
+by smnandre at 2024-09-01T20:16:39Z
+
+The Form component, as long as I can remember, never installed or even offered JS code.. that was yet needed to use `CollectionType` with `allow_add` or `allow_delete`.
+
+Instead, the documentation ("[How to embed a collection of form](https://symfony.com/doc/current/form/form_collections.html)") gave over the years various code snippets, easy for user to both understand the behaviour and decide to copy-paste it... or code their own.
+
+I do think we should offer a "ready-made" solution for basic scenario / use cases..
+
+But i won't be shocked at all if we chose a tactic similar to form collection, at least in a first step (time to get feedback and see user-land implementation challenges)
+
+---------------------------------------------------------------------------
+
+by alexander-schranz at 2024-09-02T07:29:19Z
+
+I'm still thinking that it would be nice if we can have lazy csrf token without the requirement for double submit strategy / cookie part. As cookies may always require special configurations in cache layers. Example we strip normally all cookies away which are not the Session Cookie in Varnish. Can we keep here something in mind which make the csrf generation lazy but may not require the double submit strategy? So some parts can still use a simple `render_hinclude` to load a correct csrf token.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-09-02T12:43:32Z
+
+> The CSRF Token is not a one-time token nor expires. It is not a weakness to reuse it.
+
+Reusing an existing token would open a door to cookie fixation attacks. Randomizing it closes that door.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-09-02T13:13:48Z
+
+> Example we strip normally all cookies away which are not the Session Cookie in Varnish.
+
+I added a mode where only the header is checked to cover this need.
+
+> Can we keep here something in mind which make the csrf generation lazy but may not require the double submit strategy? So some parts can still use a simple render_hinclude to load a correct csrf token.
+
+That's already doable. Lazy CSRF tokens are fine as an app-level strategy, but I don't think they fit at the framework level because they require too many pieces (JS part, token-retrieval endpoint, etc).
+You already implemented it so it's already achievable.
+
+---------------------------------------------------------------------------
+
+by alquerci at 2024-09-02T18:37:19Z
+
+> Reusing an existing token would open a door to cookie fixation attacks. Randomizing it closes that door.
+
+@nicolas-grekas I do not see any door open here when cookie and header must matches. The attacker needs to make request with header.
+
+Can we talk about concrete cases, in order to test the protection?
+
+If yes, what is the exact case/scenario/config where this door is open?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-09-02T19:01:37Z
+
+Let me ask the reverse question: why reuse tokens? This requires more code and poses questions about fixation issues.
+
+---------------------------------------------------------------------------
+
+by alquerci at 2024-09-02T19:24:20Z
+
+Reusing (no expiration) the token make the first implementation focus to do one thing and doing it well and simple.
+
+Focus on CSRF protection, not on other things like XSS where fixation issue can happen.
+
+The power of the double-submit is the double-submit "cookie and header" not the value of the token itself.
+
+And only use it on small scope like XHR form.
+As you said, this is an experiment.
+
+PS: **If it is the client-side code that generate the token. There is nothing that prevents reusing it.**
+PS 2: OWASP provide [CSRF Test suite](https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/06-Session_Management_Testing/05-Testing_for_Cross_Site_Request_Forgery)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-09-02T21:03:58Z
+
+There are many reasons why a fixation could happen. Setting a cookie from the server side is another possibility that doesn't necessarily involve XSS.
+I'm going to keep the implementation as is for this possible fixation issue and also because it makes things simpler to reason about since it eliminates a possible vector.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-09-06T08:52:54Z
+
+As far as I'm concerned, this PR is ready :)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-09-13T08:28:20Z
+
+I reworked the integration of the new CSRF token manager with the framework:
+
+Instead of replacing the existing one, we now decorate it, and we ask users to list the token-ids that should be managed using double-submit. This makes things way easier to integrate since we're back to one single manager.
+
+Here is the config I used on my test app to benefit from double-submit validation for all form submissions but also for form-login authentications and for logouts:
+
+```yaml
+framework:
+    form: { csrf_protection: { token_id: submit } }
+    csrf_protection:
+        double_submit_token_ids: [submit, authenticate, logout]
+```
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-09-16T16:39:31Z
+
+Calling for reviews (and approvals) from @symfony/mergers
+I think this is an important PR to make Symfony able to leverage the modern web (esp. the `Origin` header).
+Making the CSRF protection stateless is higly desirable to me (and should be the default for new apps, thus the recipe).
+As a reminder if you didn't notice already, the JS snippet is *optional*. The `Origin` check is enough to be safe.
+Yet, when one adds the JS snippet, they increase compatibility with so-called privacy company proxies that may remove it and with legacy browsers possibly.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2024-09-16T19:06:15Z
+
+This reminds me of https://github.com/dunglas/DunglasAngularCsrfBundle 👴
+
++1 to have this in core, but is the corporate proxy use case really relevant now that almost all the web uses HTTPS, HSTS etc?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-09-17T07:08:43Z
+
+> is the corporate proxy use case really relevant now that almost all the web uses HTTPS, HSTS etc?
+
+I think yes - MITM proxies are a thing at big companies even with HTTPS. And more importantly because that's one example where this can happen, the web is complex, so we need a solution that's generic enough to be enabled by default.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-09-17T07:20:36Z
+
+Another benefit of this PR: since it's stateless, end users won't loose their content if they take time to submit a form: even if the session is destroyed while they populate their form, remember-me will reconnect them and the form will be accepted.
+
+---------------------------------------------------------------------------
+
+by wouterj at 2024-09-17T14:50:21Z
+
+Fyi: I'm planning to look at this on Thursday. Need some focus time to properly digest all information in here :)
+
+I don't mind if this gets merged before it, there is enough time till feature freeze to tweak it in a follow up PR if necessary.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-09-25T16:17:16Z
+
+@wouterj this double-submit is not only a fallback. It's also a defense in-depth. What I mean is that if `Origin` is broken for any reasons, users won't be immediately exposed.
+
+About the naming, "double-submit" suits me, but I also wondered about naming this "same-origin": `SameOriginCsrfManager`, `same_origin_token_ids`, etc. I could change if that's the consensus.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-10-03T13:28:11Z
+
+Any other feedback @symfony/mergers ? I'm going to merge as is without any :)
+
+---------------------------------------------------------------------------
+
+by Tobion at 2024-10-03T14:32:54Z
+
+I agree that same-origin is a better name to me than double-submit because it's the main idea and is the better known term that is part of the http spec.
+
+---------------------------------------------------------------------------
+
+by wouterj at 2024-10-07T14:55:59Z
+
+I also prefer "same origin CSRF manager" over double-submit :+1:
+
+Other than that, this PR is fine with me. But we need to write detailed docs about the pros and cons of all CSRF protection mechanism during stabilization phase :)
+
+---------------------------------------------------------------------------
+
+by stof at 2024-10-07T15:08:05Z
+
+One argument for renaming: it will avoid getting more reports in the future from people telling us that OWASP discourages the double submit pattern, because they miss that they only discourage **naive** double-submit.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-10-08T07:45:31Z
+
+Renamed to `SameSiteCsrfTokenManager`.
+
+The option is named `stateless_token_ids`:
+
+```yaml
+framework:
+    csrf_protection:
+        stateless_token_ids: [my_stateless_token_id]
+```
+
+---------------------------------------------------------------------------
+
+by stof at 2024-10-08T10:17:39Z
+
+@nicolas-grekas is it same site or same origin ? Those have different meaning.
+
+---------------------------------------------------------------------------
+
+by wouterj at 2024-10-08T10:33:43Z
+
+Good one, I believe it's indeed same-origin (exact match of scheme+hostname, including subdomain).
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-10-08T12:56:51Z
+
+Indeed, good catch, fixed!

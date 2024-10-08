@@ -22,11 +22,12 @@ use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
  */
 class PassConfig
 {
-    public const TYPE_AFTER_REMOVING = 'afterRemoving';
+    // In the order of execution
     public const TYPE_BEFORE_OPTIMIZATION = 'beforeOptimization';
-    public const TYPE_BEFORE_REMOVING = 'beforeRemoving';
     public const TYPE_OPTIMIZE = 'optimization';
+    public const TYPE_BEFORE_REMOVING = 'beforeRemoving';
     public const TYPE_REMOVE = 'removing';
+    public const TYPE_AFTER_REMOVING = 'afterRemoving';
 
     private MergeExtensionConfigurationPass $mergePass;
     private array $afterRemovingPasses;

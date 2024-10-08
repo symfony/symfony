@@ -55,8 +55,8 @@ return static function (ContainerConfigurator $container) {
                 service('logger')->nullOnInvalid(),
                 service('.inner'),
                 abstract_arg('framework.csrf_protection.stateless_token_ids'),
-                abstract_arg('framework.csrf_protection.check_header'),
-                abstract_arg('framework.csrf_protection.cookie_name'),
+                param('framework.csrf_protection.check_header'),
+                param('framework.csrf_protection.cookie_name'),
             ])
             ->tag('monolog.logger', ['channel' => 'request'])
             ->tag('kernel.event_listener', ['event' => 'kernel.response', 'method' => 'onKernelResponse'])

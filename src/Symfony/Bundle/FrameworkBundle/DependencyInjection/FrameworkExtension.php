@@ -1836,10 +1836,11 @@ class FrameworkExtension extends Extension
             return;
         }
 
+        $container->setParameter('framework.csrf_protection.check_header', $config['check_header']);
+        $container->setParameter('framework.csrf_protection.cookie_name', $config['cookie_name']);
+
         $container->getDefinition('security.csrf.same_origin_token_manager')
-            ->replaceArgument(3, $config['stateless_token_ids'])
-            ->replaceArgument(4, $config['check_header'])
-            ->replaceArgument(5, $config['cookie_name']);
+            ->replaceArgument(3, $config['stateless_token_ids']);
 
         if (!$this->isInitializedConfigEnabled('session')) {
             $container->setAlias('security.csrf.token_manager', 'security.csrf.same_origin_token_manager');

@@ -12,7 +12,6 @@
 namespace Symfony\Component\Form\Test;
 
 use Symfony\Component\Form\Test\Traits\RunTestTrait;
-use Symfony\Component\Form\Tests\VersionAwareTest;
 
 /**
  * Base class for performance tests.

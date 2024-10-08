@@ -139,6 +139,7 @@ class CommandTesterTest extends TestCase
             'What\'s your name?',
             'How are you?',
             'Where do you come from?',
+            'How old are you?'
         ];
 
         $command = new Command('foo');
@@ -148,10 +149,11 @@ class CommandTesterTest extends TestCase
             $helper->ask($input, $output, new Question($questions[0], 'Bobby'));
             $helper->ask($input, $output, new Question($questions[1], 'Fine'));
             $helper->ask($input, $output, new Question($questions[2], 'France'));
+            $helper->ask($input, $output, new Question($questions[3], 21));
         });
 
         $tester = new CommandTester($command);
-        $tester->setInputs(['', '', '']);
+        $tester->setInputs(['', '', '', '']);
         $tester->execute([]);
 
         $tester->assertCommandIsSuccessful();

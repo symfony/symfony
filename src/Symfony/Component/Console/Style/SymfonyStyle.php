@@ -250,7 +250,7 @@ class SymfonyStyle extends OutputStyle
     /**
      * {@inheritdoc}
      */
-    public function ask(string $question, mixed $default = null, ?callable $validator = null)
+    public function ask(string $question, string|bool|int|float|null $default = null, ?callable $validator = null)
     {
         $question = new Question($question, $default);
         $question->setValidator($validator);

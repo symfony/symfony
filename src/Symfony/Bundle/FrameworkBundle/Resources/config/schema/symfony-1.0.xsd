@@ -770,6 +770,8 @@
             <xsd:element name="transport" type="mailer_transport" minOccurs="0" maxOccurs="unbounded" />
             <xsd:element name="envelope" type="mailer_envelope" minOccurs="0" maxOccurs="1" />
             <xsd:element name="header" type="header" minOccurs="0" maxOccurs="unbounded" />
+            <xsd:element name="dkim_signer" type="mailer_dkim_signer" minOccurs="0" />
+            <xsd:element name="smime_signer" type="mailer_smime_signer" minOccurs="0" />
         </xsd:sequence>
         <xsd:attribute name="enabled" type="xsd:boolean" />
         <xsd:attribute name="dsn" type="xsd:string" />
@@ -790,6 +792,30 @@
             <xsd:element name="recipient" type="xsd:string" minOccurs="0" maxOccurs="unbounded" />
             <xsd:element name="allowed-recipient" type="xsd:string" minOccurs="0" maxOccurs="unbounded" />
         </xsd:sequence>
+    </xsd:complexType>
+
+
+    <xsd:complexType name="mailer_dkim_signer">
+        <xsd:sequence>
+            <xsd:element name="options" type="metadata" minOccurs="0" maxOccurs="unbounded" />
+        </xsd:sequence>
+        <xsd:attribute name="key" type="xsd:string"/>
+        <xsd:attribute name="domain" type="xsd:string"/>
+        <xsd:attribute name="select" type="xsd:string"/>
+        <xsd:attribute name="passphrase" type="xsd:string" />
+    </xsd:complexType>
+
+    <xsd:complexType name="mailer_smime_signer">
+        <xsd:attribute name="key" type="xsd:string"/>
+        <xsd:attribute name="certificate" type="xsd:string"/>
+        <xsd:attribute name="passphrase" type ="xsd:string" />
+        <xsd:attribute name="extraCertificates" type  ="xsd:string" />
+        <xsd:attribute name="signOptions" type="xsd:integer" />
+    </xsd:complexType>
+
+    <xsd:complexType name="mailer_smime_encrypter">
+        <xsd:attribute name="certificate" type="xsd:string"/>
+        <xsd:attribute name="cipher" type="xsd:integer" />
     </xsd:complexType>
 
     <xsd:complexType name="http_cache">

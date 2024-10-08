@@ -2742,6 +2742,39 @@ class FrameworkExtension extends Extension
             $container->removeDefinition('mailer.messenger_transport_listener');
         }
 
+        if ($config['dkim_signer']['enabled']) {
+            $dkimSigner = $container->getDefinition('mailer.dkim_signer');
+            $dkimSigner->setArgument(0, $config['dkim_signer']['key']);
+            $dkimSigner->setArgument(1, $config['dkim_signer']['domain']);
+            $dkimSigner->setArgument(2, $config['dkim_signer']['select']);
+            $dkimSigner->setArgument(3, $config['dkim_signer']['options']);
+            $dkimSigner->setArgument(4, $config['dkim_signer']['passphrase']);
+        } else {
+            $container->removeDefinition('mailer.dkim_signer');
+            $container->removeDefinition('mailer.dkim_signer.listener');
+        }
+
+        if ($config['smime_signer']['enabled']) {
+            $smimeSigner = $container->getDefinition('mailer.smime_signer');
+            $smimeSigner->setArgument(0, $config['smime_signer']['key']);
+            $smimeSigner->setArgument(1, $config['smime_signer']['certificate']);
+            $smimeSigner->setArgument(2, $config['smime_signer']['passphrase']);
+            $smimeSigner->setArgument(3, $config['smime_signer']['extra_certificates']);
+            $smimeSigner->setArgument(4, $config['smime_signer']['sign_options']);
+        } else {
+            $container->removeDefinition('mailer.smime_signer');
+            $container->removeDefinition('mailer.smime_signer.listener');
+        }
+
+        if ($config['smime_encrypter']['enabled']) {
+            $smimeDecrypter = $container->getDefinition('mailer.smime_encrypter');
+            $smimeDecrypter->setArgument(0, $config['smime_encrypter']['certificate']);
+            $smimeDecrypter->setArgument(1, $config['smime_encrypter']['cipher']);
+        } else {
+            $container->removeDefinition('mailer.smime_encrypter');
+            $container->removeDefinition('mailer.smime_encrypter.listener');
+        }
+
         if ($webhookEnabled) {
             $loader->load('mailer_webhook.php');
         }

@@ -11,6 +11,7 @@ CHANGELOG
 
  * Make `TransportFactoryTestCase` compatible with PHPUnit 10+
  * Support unicode email addresses such as "dømi@dømi.fo"
+ * Enable the mailer to configure DKIM or SMIME signer
 
 7.1
 ---

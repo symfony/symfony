@@ -62,9 +62,9 @@ class SearchAndRenderBlockNodeTest extends TestCase
         if (class_exists(Nodes::class)) {
             $arguments = new Nodes([
                 new NameExpression('form', 0),
-            new ArrayExpression([
-                new ConstantExpression('foo', 0),
-                new ConstantExpression('bar', 0),
+                new ArrayExpression([
+                    new ConstantExpression('foo', 0),
+                    new ConstantExpression('bar', 0),
                 ], 0),
             ]);
         } else {
@@ -226,9 +226,9 @@ class SearchAndRenderBlockNodeTest extends TestCase
             $arguments = new Nodes([
                 new NameExpression('form', 0),
                 new ConstantExpression(null, 0),
-            new ArrayExpression([
-                new ConstantExpression('foo', 0),
-                new ConstantExpression('bar', 0),
+                new ArrayExpression([
+                    new ConstantExpression('foo', 0),
+                    new ConstantExpression('bar', 0),
                 ], 0),
             ]);
         } else {
@@ -268,11 +268,11 @@ class SearchAndRenderBlockNodeTest extends TestCase
             $arguments = new Nodes([
                 new NameExpression('form', 0),
                 new ConstantExpression('value in argument', 0),
-            new ArrayExpression([
-                new ConstantExpression('foo', 0),
-                new ConstantExpression('bar', 0),
-                new ConstantExpression('label', 0),
-                new ConstantExpression('value in attributes', 0),
+                new ArrayExpression([
+                    new ConstantExpression('foo', 0),
+                    new ConstantExpression('bar', 0),
+                    new ConstantExpression('label', 0),
+                    new ConstantExpression('value in attributes', 0),
                 ], 0),
             ]);
         } else {
@@ -310,14 +310,14 @@ class SearchAndRenderBlockNodeTest extends TestCase
         if (class_exists(Nodes::class)) {
             $arguments = new Nodes([
                 new NameExpression('form', 0),
-            new ConditionalExpression(
-                // if
-                new ConstantExpression(true, 0),
-                // then
-                new ConstantExpression(null, 0),
-                // else
-                new ConstantExpression(null, 0),
-                0
+                new ConditionalExpression(
+                    // if
+                    new ConstantExpression(true, 0),
+                    // then
+                    new ConstantExpression(null, 0),
+                    // else
+                    new ConstantExpression(null, 0),
+                    0
                 ),
             ]);
         } else {
@@ -361,20 +361,20 @@ class SearchAndRenderBlockNodeTest extends TestCase
         if (class_exists(Nodes::class)) {
             $arguments = new Nodes([
                 new NameExpression('form', 0),
-            new ConditionalExpression(
-                // if
-                new ConstantExpression(true, 0),
-                // then
-                new ConstantExpression(null, 0),
-                // else
-                new ConstantExpression(null, 0),
-                0
-            ),
-            new ArrayExpression([
-                new ConstantExpression('foo', 0),
-                new ConstantExpression('bar', 0),
-                new ConstantExpression('label', 0),
-                new ConstantExpression('value in attributes', 0),
+                new ConditionalExpression(
+                    // if
+                    new ConstantExpression(true, 0),
+                    // then
+                    new ConstantExpression(null, 0),
+                    // else
+                    new ConstantExpression(null, 0),
+                    0
+                ),
+                new ArrayExpression([
+                    new ConstantExpression('foo', 0),
+                    new ConstantExpression('bar', 0),
+                    new ConstantExpression('label', 0),
+                    new ConstantExpression('value in attributes', 0),
                 ], 0),
             ]);
         } else {

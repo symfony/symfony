@@ -278,10 +278,7 @@ abstract class Constraint
      * Returns whether the constraint can be put onto classes, properties or
      * both.
      *
-     * This method should return one or more of the constants
-     * Constraint::CLASS_CONSTRAINT and Constraint::PROPERTY_CONSTRAINT.
-     *
-     * @return string|string[] One or more constant values
+     * @return self::CLASS_CONSTRAINT|self::PROPERTY_CONSTRAINT|array<self::CLASS_CONSTRAINT|self::PROPERTY_CONSTRAINT>
      */
     public function getTargets(): string|array
     {

@@ -26,7 +26,7 @@
         "symfony/error-handler": "^6.4|^7.0",
         "symfony/event-dispatcher": "^6.4|^7.0",
         "symfony/http-foundation": "^6.4|^7.0",
-        "symfony/http-kernel": "^6.4|^7.0",
+        "symfony/http-kernel": "^6.4.13|^7.1.6",
         "symfony/polyfill-mbstring": "~1.0",
         "symfony/filesystem": "^7.1",
         "symfony/finder": "^6.4|^7.0",
@@ -35,6 +35,7 @@
     "require-dev": {
         "doctrine/persistence": "^1.3|^2|^3",
         "dragonmantank/cron-expression": "^3.1",
+        "nikic/php-parser": "^4.18|^5.0",
         "seld/jsonlint": "^1.10",
         "symfony/asset": "^6.4|^7.0",
         "symfony/asset-mapper": "^6.4|^7.0",
@@ -56,6 +57,7 @@
         "symfony/notifier": "^6.4|^7.0",
         "symfony/process": "^6.4|^7.0",
         "symfony/rate-limiter": "^6.4|^7.0",
+        "symfony/runtime": "^6.4.13|^7.1.6",
         "symfony/scheduler": "^6.4.4|^7.0.4",
         "symfony/security-bundle": "^6.4|^7.0",
         "symfony/semaphore": "^6.4|^7.0",
@@ -113,5 +115,10 @@
             "/Tests/"
         ]
     },
-    "minimum-stability": "dev"
+    "minimum-stability": "dev",
+    "config": {
+        "allow-plugins": {
+            "symfony/runtime": true
+        }
+    }
 }

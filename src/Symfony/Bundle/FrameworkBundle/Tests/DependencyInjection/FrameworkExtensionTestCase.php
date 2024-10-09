@@ -687,7 +687,7 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $this->assertNull($container->getParameter('session.save_path'));
         $this->assertSame('session.handler.native', (string) $container->getAlias('session.handler'));
 
-        $expected = ['session_factory', 'logger', 'session_collector'];
+        $expected = ['session_factory', 'logger', 'session_collector', 'request_stack'];
         $this->assertEquals($expected, array_keys($container->getDefinition('session_listener')->getArgument(0)->getValues()));
         $this->assertFalse($container->getDefinition('session.storage.factory.native')->getArgument(3));
     }
@@ -1894,7 +1894,7 @@ abstract class FrameworkExtensionTestCase extends TestCase
     {
         $container = $this->createContainerFromFile('session_cookie_secure_auto');
 
-        $expected = ['session_factory', 'logger', 'session_collector'];
+        $expected = ['session_factory', 'logger', 'session_collector', 'request_stack'];
         $this->assertEquals($expected, array_keys($container->getDefinition('session_listener')->getArgument(0)->getValues()));
     }
 

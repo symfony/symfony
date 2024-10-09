@@ -118,7 +118,7 @@ final class Transport
 
         $parsedUrl = parse_url($dsn);
         parse_str($parsedUrl['query'] ?? '', $query);
-        $retryPeriod = min((int)($query['retry_period'] ?? 60), 60);
+        $retryPeriod = min((int) ($query['retry_period'] ?? 60), 60);
 
         while (true) {
             foreach ($keywords as $name => $class) {
@@ -149,7 +149,7 @@ final class Transport
             }
 
             if (preg_match('{(\w+)\(}A', $dsn, $matches, 0, $offset)) {
-                throw new InvalidArgumentException(sprintf('The "%s" keyword is not valid (valid ones are "%s"), ', $matches[1], implode('", "', array_keys($keywords))));
+                throw new InvalidArgumentException(\sprintf('The "%s" keyword is not valid (valid ones are "%s"), ', $matches[1], implode('", "', array_keys($keywords))));
             }
 
             if ($pos = strcspn($dsn, ' )', $offset)) {

@@ -106,6 +106,9 @@ class StoreFactory
 
             case 'in-memory' === $connection:
                 return new InMemoryStore();
+
+            case 'null' === $connection:
+                return new NullStore();
         }
 
         throw new InvalidArgumentException(\sprintf('Unsupported Connection: "%s".', $connection));

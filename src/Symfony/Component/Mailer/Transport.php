@@ -118,11 +118,7 @@ final class Transport
 
         $parsedUrl = parse_url($dsn);
         parse_str($parsedUrl['query'] ?? '', $query);
-        if (isset($query['retry_period'])) {
-            $retryPeriod = min((int)$query['retry_period'], 60);
-        } else {
-            $retryPeriod = 60;
-        }
+        $retryPeriod = min((int)($query['retry_period'] ?? 60), 60);
 
         while (true) {
             foreach ($keywords as $name => $class) {

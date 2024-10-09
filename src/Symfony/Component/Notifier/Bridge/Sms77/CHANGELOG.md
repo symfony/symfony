@@ -4,7 +4,7 @@ CHANGELOG
 7.2
 ---
 
- * Deprecate the `Sms77Transport` class, use `SevenIoTransport`instead
+ * Deprecate the bridge
 
 6.2
 ---

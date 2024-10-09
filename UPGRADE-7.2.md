@@ -68,7 +68,7 @@ Notifier
    The `testIncompleteDsnException()` and `testMissingRequiredOptionException()` tests are no longer provided by default. If you make use of them (i.e. by implementing the
    `incompleteDsnProvider()` or `missingRequiredOptionProvider()` data providers), you now need to use the `IncompleteDsnTestTrait` or `MissingRequiredOptionTestTrait` respectively.
 
- * Deprecate the `Sms77Transport` class, use `SevenIoTransport`instead
+ * Deprecate the `Sms77` transport, use `SevenIo`instead
 
 Security
 --------

@@ -1,0 +1,166 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2023-11-08T21:24:32Z
+
+Hey!
+
+Thanks for your PR. You are targeting branch "7.0" but it seems your PR description refers to branch "7.1".
+Could you update the PR description or change target branch? This helps core maintainers a lot.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by yceruto at 2023-11-08T21:57:33Z
+
+Over there, there should be other special use cases, such as using API payloads against forms where the choice lists are not really necessary, so people work around with custom form types and special `EntityToIdDataTransformer`. Now they can use the `EntityType` directly with the `choice_lazy` option activated.
+
+---------------------------------------------------------------------------
+
+by Seb33300 at 2023-11-09T05:58:52Z
+
+> Over there, there should be other special use cases, such as using API payloads against forms where the choice lists are not really necessary, so people work around with custom form types and special `EntityToIdDataTransformer`. Now they can use the `EntityType` directly with the `extra_lazy` option activated.
+
++1
+
+I had a similar case few years ago with an API relying on a Symfony form with an EntityType loading thousands of choices.
+I ended by adding the EntityType field to the form with an event on submit and filtering the SQL query to select only the items submitted by the user.
+
+---------------------------------------------------------------------------
+
+by Pixelshaped at 2023-11-09T13:45:05Z
+
+Thank you I was already using this code from UX Autocomplete and I think it's the right move to make it part of Doctrine Bridge as this is a very common use case, even if part of the solution is front end (one would still need to implement a route to get a paginated list of entities and pass it to Select2 or whatever solution you're using).
+
+I had duplicated the ExtraLazyChoiceLoader in my project to not require UX Autocomplete (as I'm using Select2 already everywhere), and now I can use this and stay updated.
+
+Nice job.
+
+---------------------------------------------------------------------------
+
+by stof at 2023-11-09T14:57:58Z
+
+I'm not sure this `extra_lazy` option in the existing type extending ChoiceType is the right option. Such autocomplete type requires a totally different rendering than a choice type (and this autocomplete rendering might make sense with data sources that are not from doctrine).
+
+---------------------------------------------------------------------------
+
+by yceruto at 2023-11-09T20:17:07Z
+
+@stof certainly there's additional work required to create a fully-autocomplete type, which is not the goal of this PR btw. However, it does streamline implementations that previously needed custom/complex solutions. The `choice_lazy` option facilitates this for `DoctrineType` although its use is not restricted to that purpose alone.
+
+I believe the `LazyChoiceLoader` is the main feature here. It's compatible with any `ChoiceType` and you can wrap any data source (Local Storage, External APIs, ...) allowing it to load those data efficiently by following this "on-demand" approach.
+
+---------------------------------------------------------------------------
+
+by norkunas at 2023-12-07T12:07:11Z
+
+Something is not right with this solution. Coming from ux's autocomplete. Currently we are facing a problem that doctrine choice loader does an extra query without any criteria and tries to load 200k rows from our db before the autocomplete queries with criteria in this order:
+```
+SELECT ... FROM companies c0_
+SELECT COUNT(*) AS dctrn_count FROM (SELECT DISTINCT id_32 FROM (SELECT ... FROM companies c0_ WHERE c0_.supplier = ? ORDER BY c0_.created_at DESC) dctrn_result) dctrn_table
+SELECT DISTINCT id_32 FROM (SELECT DISTINCT id_32, created_at_30 FROM (SELECT ... FROM companies c0_ WHERE c0_.supplier = ?) dctrn_result_inner ORDER BY created_at_30 DESC) dctrn_result LIMIT 25
+SELECT ... FROM companies c0_ WHERE c0_.supplier = ? AND c0_.id IN (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ORDER BY c0_.created_at DESC
+```
+
+Backtrace for the first query:
+```
+1	Doctrine\DBAL\Connection->executeQuery (line 33)
+2	Doctrine\ORM\Query\Exec\SingleSelectExecutor->execute (line 327)
+3	Doctrine\ORM\Query->_doExecute (line 1212)
+4	Doctrine\ORM\AbstractQuery->executeIgnoreQueryCache (line 1166)
+5	Doctrine\ORM\AbstractQuery->execute (line 44)
+6	Symfony\Bridge\Doctrine\Form\ChoiceList\ORMQueryBuilderLoader->getEntities (line 56)
+7	Symfony\Bridge\Doctrine\Form\ChoiceList\DoctrineChoiceLoader->loadChoices (line 29)
+8	Symfony\Component\Form\ChoiceList\Loader\AbstractChoiceLoader->loadChoiceList (line 59)
+9	Symfony\Component\Form\ChoiceList\Loader\AbstractChoiceLoader->doLoadChoicesForValues (line 108)
+10	Symfony\Bridge\Doctrine\Form\ChoiceList\DoctrineChoiceLoader->doLoadChoicesForValues (line 38)
+11	Symfony\Component\Form\ChoiceList\Loader\AbstractChoiceLoader->loadChoicesForValues (line 36)
+12	Symfony\Component\Form\ChoiceList\Factory\Cache\ChoiceLoader->loadChoicesForValues (line 37)
+13	Symfony\UX\Autocomplete\Form\ChoiceList\Loader\ExtraLazyChoiceLoader->loadChoicesForValues (line 46)
+14	Symfony\UX\Autocomplete\Form\ChoiceList\Loader\ExtraLazyChoiceLoader->loadValuesForChoices (line 81)
+15	Symfony\Component\Form\ChoiceList\LazyChoiceList->getValuesForChoices (line 34)
+16	Symfony\Component\Form\Extension\Core\DataTransformer\ChoiceToValueTransformer->transform (line 992)
+17	Symfony\Component\Form\Form->normToView (line 301)
+18	Symfony\Component\Form\Form->setData (line 412)
+19	Symfony\Component\Form\Form->initialize (line 176)
+20	Symfony\Component\Form\FormBuilder->getForm (line 28)
+21	Symfony\Component\Form\FormFactory->create (line 142)
+22	Symfony\UX\Autocomplete\Form\WrappedEntityTypeAutocompleter->getForm (line 107)
+23	Symfony\UX\Autocomplete\Form\WrappedEntityTypeAutocompleter->isGranted (line 49)
+24	Symfony\UX\Autocomplete\AutocompleteResultsExecutor->fetchResults (line 44)
+25	Symfony\UX\Autocomplete\Controller\EntityAutocompleteController->__invoke (line 181)
+26	Symfony\Component\HttpKernel\HttpKernel->handleRaw (line 76)
+27	Symfony\Component\HttpKernel\HttpKernel->handle (line 197)
+28	Symfony\Component\HttpKernel\Kernel->handle (line 35)
+29	Symfony\Component\Runtime\Runner\Symfony\HttpKernelRunner->run (line 29)
+```
+
+Edit: okay, found the cause - autocomplete allows to configure `filter_query` which allows to query choices based on the user entered value, but then the query_builder is not configured and DoctrineChoiceLoader loads everything, so fix should be in symfony/ux
+
+---------------------------------------------------------------------------
+
+by yceruto at 2024-07-03T21:16:47Z
+
+>I'm not sure this extra_lazy option in the existing type extending ChoiceType is the right option. Such autocomplete type requires a totally different rendering than a choice type (and this autocomplete rendering might make sense with data sources that are not from doctrine).
+
+@stof how about adding the `lazy` option in `ChoiceType` instead, and requiring the `choice_loader` to be set when `lazy` is set to `true`? So, not only the `DoctrineType` could benefit from it, but any subtype of `ChoiceType` as well
+
+---------------------------------------------------------------------------
+
+by yceruto at 2024-07-03T22:00:20Z
+
+I renamed the option to `choice_lazy` and moved it to `ChoiceType` as a generic option. Now it's part of the family of `choice_*` options.
+
+---------------------------------------------------------------------------
+
+by yceruto at 2024-07-17T13:36:38Z
+
+Thanks @xabbuh for your review! I also added two test cases more about `multiple` option combined with `choice_lazy`.
+
+---------------------------------------------------------------------------
+
+by yceruto at 2024-08-04T01:21:04Z
+
+Just rebased to fix conflicts.
+
+---------------------------------------------------------------------------
+
+by stof at 2024-08-22T09:46:16Z
+
+@nicolas-grekas this lazy mode assumes that you have a form rendering that does not need the list of available choices (and so *not* rendering it as a `<select>` like the default rendering of a ChoiceType).
+
+This is the reason why I suggested that it may fit better as a *separate* form type instead (which would have a separate rendering).
+
+Making all choice loaders wrapped in this LazyChoiceLoader in ChoiceType itself would break it.
+
+---------------------------------------------------------------------------
+
+by yceruto at 2024-08-23T02:49:12Z
+
+>@nicolas-grekas this lazy mode assumes that you have a form rendering that does not need the list of available choices (and so not rendering it as a `<select>` like the default rendering of a ChoiceType).
+
+I can add that if there is data bound to that field (either default or submitted), it will render the choices as usual, rendering only the selected ones in this case.
+
+>This is the reason why I suggested that it may fit better as a separate form type instead (which would have a separate rendering).
+
+I might be missing your point here. Still wondering how it could be different from the current one and why... you can currently have different renderings for the same form type using `block_prefix` option.
+
+>Making all choice loaders wrapped in this LazyChoiceLoader in ChoiceType itself would break it.
+
+Sorry, I'm confused by this comment. Is it related to Nicolas' comment? Otherwise, could you please elaborate 🙏
+
+---------------------------------------------------------------------------
+
+by yceruto at 2024-08-23T02:58:19Z
+
+> Maybe stupid comment: can't we always behave lazily when choice_loader is set and get rid of the option altogether?
+
+You might still want to use a `choice_loader` even without lazy loading.
+
+---------------------------------------------------------------------------
+
+by yceruto at 2024-10-03T16:38:51Z
+
+This is ready on my side. @stof any blocker on your side?

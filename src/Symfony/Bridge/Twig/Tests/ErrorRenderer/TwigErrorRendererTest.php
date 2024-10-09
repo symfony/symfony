@@ -40,7 +40,7 @@ class TwigErrorRendererTest extends TestCase
         $exception = new NotFoundHttpException();
         $twig = new Environment(new ArrayLoader([]));
 
-        $exception = (new TwigErrorRenderer($twig, null, false))->render($exception);
+        $exception = (new TwigErrorRenderer($twig, new CliErrorRenderer(), false))->render($exception);
 
         $exceptionHeaders = $exception->getHeaders();
         if (isset($exceptionHeaders['Content-Type'])) {

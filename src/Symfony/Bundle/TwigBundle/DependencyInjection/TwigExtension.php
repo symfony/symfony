@@ -42,7 +42,6 @@ class TwigExtension extends Extension
     {
         $loader = new PhpFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
         $loader->load('twig.php');
-        $loader->load('twig_test.php');
 
         if (method_exists(Environment::class, 'resetGlobals')) {
             $container->getDefinition('twig')->addTag('kernel.reset', ['method' => 'resetGlobals']);

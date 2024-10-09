@@ -1,0 +1,36 @@
+---------------------------------------------------------------------------
+
+by wouterj at 2024-09-13T12:07:15Z
+
+As far as I know, we do not accept static analysis annotations that are not generally supported across Psalm, PHPStan and PhpStorm (see also the [list of accepted annotations in the Symfony standards](https://symfony.com/doc/current/contributing/code/standards.html#documentation)).
+
+It seems like `assert-if-true` is [not supported by, at least, Psalm](https://psalm.dev/r/d376298655). So I'm :-1: , although the added annotation is correct (it might be worth submitting this as a stub to the PHPStan Symfony plugin).
+
+---------------------------------------------------------------------------
+
+by stof at 2024-09-13T12:51:25Z
+
+Psalm does support the `assert-if-true` annotation. However, by default, Psalm does not memoize the type for getters, which is why it has no effect in your code snippet. See https://psalm.dev/docs/running_psalm/configuration/#memoizemethodcallresults for the configuration and https://psalm.dev/r/561c4c3a87 for the same code snippet with this setting turned on.
+
+phpstan has a different default than psalm regarding this option.
+
+---------------------------------------------------------------------------
+
+by wouterj at 2024-09-13T13:11:17Z
+
+Ah, of course. Thanks for correcting me, @stof.
+
+Let's do it then :+1: , but with the `@psalm-` prefix to be consistent with the other annotations in the Symfony code base (although the prefix doesn't change anything in behavior).
+
+---------------------------------------------------------------------------
+
+by stof at 2024-09-13T13:20:15Z
+
+The only change in behavior is for the case where you write something wrong in the tag: both phpstan and psalm are reporting errors when writing an invalid tag with their own prefix while they silently discard an invalid tag using the prefix of the other tool (because maybe this tag is actually valid in the other tool and they don't have feature parity).
+The recommended setup is to write annotation using the prefix of the tool that we use ourselves (and we are partially using psalm in our CI, which is why we use psalm prefixes)
+
+---------------------------------------------------------------------------
+
+by stof at 2024-09-13T13:22:49Z
+
+For reference, see https://psalm.dev/docs/annotating_code/adding_assertions/#asserting-return-values-of-methods for the Psalm documentation about the exact conditions for `@psalm-assert-if-true ... $this->someGetter()` to work. There are cases that work without `memoizeMethodCallResults` but this class does not correspond to those cases.

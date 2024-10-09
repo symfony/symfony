@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:noNamespaceSchemaLocation="http://schema.phpunit.de/9.3/phpunit.xsd"
+         xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/11.3/phpunit.xsd"
          backupGlobals="false"
          bootstrap="vendor/autoload.php"
          colors="true"
@@ -18,7 +18,7 @@
         </testsuite>
     </testsuites>
 
-    <coverage>
+    <source>
         <include>
             <directory>./</directory>
         </include>
@@ -26,15 +26,11 @@
             <directory>./Tests/</directory>
             <directory>./vendor/</directory>
         </exclude>
-    </coverage>
+    </source>
 
-    <listeners>
-        <listener class="Symfony\Bridge\PhpUnit\SymfonyTestsListener">
-            <arguments>
-                <array>
-                    <element key="time-sensitive"><string>Symfony\Component\Uid</string></element>
-                </array>
-            </arguments>
-        </listener>
-    </listeners>
+    <extensions>
+        <bootstrap class="Symfony\Bridge\PhpUnit\SymfonyExtension">
+            <parameter name="clock-mock-namespaces" value="Symfony\Component\Uid" />
+        </bootstrap>
+    </extensions>
 </phpunit>

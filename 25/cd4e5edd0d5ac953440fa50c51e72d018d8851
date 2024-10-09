@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-10-09T13:06:37Z
+
+Do we need some changes in config builders, like done in #58428?
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2024-10-09T13:19:53Z
+
+I don't think so, `booleanNode()` is already present in `NodeBuilder` and no change is required there to support nullable booleans.

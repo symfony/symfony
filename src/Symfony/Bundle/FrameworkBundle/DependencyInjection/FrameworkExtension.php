@@ -168,6 +168,7 @@ use Symfony\Component\String\Slugger\SluggerInterface;
 use Symfony\Component\Translation\Bridge as TranslationBridge;
 use Symfony\Component\Translation\Command\TranslationLintCommand as BaseTranslationLintCommand;
 use Symfony\Component\Translation\Command\XliffLintCommand as BaseXliffLintCommand;
+use Symfony\Component\Translation\DefaultParametersTranslator;
 use Symfony\Component\Translation\Extractor\PhpAstExtractor;
 use Symfony\Component\Translation\LocaleSwitcher;
 use Symfony\Component\Translation\PseudoLocalizationTranslator;
@@ -1576,6 +1577,16 @@ class FrameworkExtension extends Extension
             if (!$container->hasDefinition('http_client') || !ContainerBuilder::willBeAvailable(\sprintf('symfony/%s-translation-provider', $package), $class, $parentPackages)) {
                 $container->removeDefinition($service);
             }
+        }
+
+        if ([] !== $config['globals']) {
+            $container
+                ->register('translator.default_parameters', DefaultParametersTranslator::class)
+                ->setDecoratedService('translator', null, -1) // Lower priority than "translator.data_collector"
+                ->setArguments([
+                    new Reference('translator.default_parameters.inner'),
+                    $config['globals'],
+                ]);
         }
 
         if (!$config['providers']) {

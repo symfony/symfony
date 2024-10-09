@@ -19,6 +19,7 @@ CHANGELOG
 ---
 
  * Mark class `DataCollectorTranslator` as `final`
+ * Add `DefaultParametersTranslator` to allow defining default translation parameters
 
 7.0
 ---

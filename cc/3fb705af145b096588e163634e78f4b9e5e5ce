@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2024-10-08T12:22:32Z
+
+Can we add a test to prevent regressions?
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2024-10-08T12:51:12Z
+
+@xabbuh I don't think so, it is a language-level deprecation so I don't think we can really do anything here?
+
+---------------------------------------------------------------------------
+
+by stof at 2024-10-08T12:53:06Z
+
+you can write a test running that code without a User-Agent header (i.e. triggering the code path for which you solved the deprecation)

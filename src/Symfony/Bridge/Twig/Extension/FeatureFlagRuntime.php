@@ -22,7 +22,7 @@ final class FeatureFlagRuntime
     public function isEnabled(string $featureName, mixed $expectedValue = true): bool
     {
         if (null === $this->featureChecker) {
-            throw new \LogicException(sprintf('An instance of "%s" must be provided to use "%s()".', FeatureCheckerInterface::class, __METHOD__));
+            throw new \LogicException(\sprintf('An instance of "%s" must be provided to use "%s()".', FeatureCheckerInterface::class, __METHOD__));
         }
 
         return $this->featureChecker->isEnabled($featureName, $expectedValue);
@@ -31,7 +31,7 @@ final class FeatureFlagRuntime
     public function getValue(string $featureName): mixed
     {
         if (null === $this->featureChecker) {
-            throw new \LogicException(sprintf('An instance of "%s" must be provided to use "%s()".', FeatureCheckerInterface::class, __METHOD__));
+            throw new \LogicException(\sprintf('An instance of "%s" must be provided to use "%s()".', FeatureCheckerInterface::class, __METHOD__));
         }
 
         return $this->featureChecker->getValue($featureName);

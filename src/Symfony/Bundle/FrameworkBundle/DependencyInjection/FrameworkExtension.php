@@ -3173,7 +3173,7 @@ class FrameworkExtension extends Extension
                 } else {
                     $className = $reflector->getDeclaringClass()->getName();
                     if (null !== $attribute->method && $reflector->getName() !== $attribute->method) {
-                        throw new \LogicException(sprintf('Using the #[%s(method: "%s")] attribute on a method is not valid. Either remove the method value or move this to the top of the class (%s).', AsFeature::class, $attribute->method, $className));
+                        throw new \LogicException(\sprintf('Using the #[%s(method: "%s")] attribute on a method is not valid. Either remove the method value or move this to the top of the class (%s).', AsFeature::class, $attribute->method, $className));
                     }
 
                     $method = $reflector->getName();

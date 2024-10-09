@@ -32,18 +32,18 @@ class FeatureFlagPass implements CompilerPassInterface
             $r = $container->getReflectionClass($className);
 
             if (null === $r) {
-                throw new \RuntimeException(sprintf('Invalid service "%s": class "%s" does not exist.', $serviceId, $className));
+                throw new \RuntimeException(\sprintf('Invalid service "%s": class "%s" does not exist.', $serviceId, $className));
             }
 
             foreach ($tags as $tag) {
                 $featureName = ($tag['feature'] ?? '') ?: $className;
                 if (\array_key_exists($featureName, $features)) {
-                    throw new \RuntimeException(sprintf('Feature "%s" already defined.', $featureName));
+                    throw new \RuntimeException(\sprintf('Feature "%s" already defined.', $featureName));
                 }
 
                 $method = $tag['method'] ?? '__invoke';
                 if (!$r->hasMethod($method)) {
-                    throw new \RuntimeException(sprintf('Invalid feature method "%s": method "%s::%s()" does not exist.', $serviceId, $r->getName(), $method));
+                    throw new \RuntimeException(\sprintf('Invalid feature method "%s": method "%s::%s()" does not exist.', $serviceId, $r->getName(), $method));
                 }
 
                 $features[$featureName] = $container->setDefinition(

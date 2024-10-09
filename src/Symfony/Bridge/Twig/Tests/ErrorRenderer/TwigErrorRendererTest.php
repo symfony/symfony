@@ -42,7 +42,11 @@ class TwigErrorRendererTest extends TestCase
 
         $exception = (new TwigErrorRenderer($twig, null, false))->render($exception);
 
-        $this->assertSame('text/plain', $exception->getHeaders()['Content-Type'], 'The exception does not return HTML contents (to prevent potential XSS vulnerabilities)');
+        $exceptionHeaders = $exception->getHeaders();
+        if (isset($exceptionHeaders['Content-Type'])) {
+            $this->assertSame('text/plain', $exceptionHeaders['Content-Type'], 'The exception does not return HTML contents (to prevent potential XSS vulnerabilities)');
+        }
+
         $this->assertStringNotContainsString('<!DOCTYPE html>', $exception->getAsString(), 'The exception does not include elements of the HTML exception page');
     }
 

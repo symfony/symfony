@@ -252,20 +252,13 @@ class RequestPayloadValueResolver implements ValueResolverInterface, EventSubscr
             return $this->resolveExpression($validationGroups, $event);
         }
 
-        if (\is_array($validationGroups)) {
-            return array_map(
-                function (string|Expression $validationGroup) use ($event) {
-                    if ($validationGroup instanceof Expression) {
-                        return $this->resolveExpression($validationGroup, $event);
-                    }
-
-                    return $validationGroup;
-                },
-                $validationGroups
-            );
+        if (!\is_array($validationGroups)) {
+            return $validationGroups;
         }
 
-        return $validationGroups;
+        return array_map(fn ($group) => $group instanceof Expression ? $this->resolveExpression($group, $event) : $group, $validationGroups);
+        }
+
     }
 
     private function resolveExpression(Expression $expression, ControllerArgumentsEvent $event): string

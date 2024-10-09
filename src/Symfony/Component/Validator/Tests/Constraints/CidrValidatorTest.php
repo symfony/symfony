@@ -106,7 +106,7 @@ class CidrValidatorTest extends ConstraintValidatorTestCase
     /**
      * @dataProvider getOutOfRangeNetmask
      */
-    public function testOutOfRangeNetmask(string $cidr, ?string $version = null, ?int $min = null, ?int $max = null)
+    public function testOutOfRangeNetmask(string $cidr, int $maxExpected, ?string $version = null, ?int $min = null, ?int $max = null)
     {
         $cidrConstraint = new Cidr([
             'version' => $version,
@@ -118,7 +118,7 @@ class CidrValidatorTest extends ConstraintValidatorTestCase
         $this
             ->buildViolation('The value of the netmask should be between {{ min }} and {{ max }}.')
             ->setParameter('{{ min }}', $cidrConstraint->netmaskMin)
-            ->setParameter('{{ max }}', $cidrConstraint->netmaskMax)
+            ->setParameter('{{ max }}', $maxExpected)
             ->setCode(Cidr::OUT_OF_RANGE_ERROR)
             ->assertRaised();
     }
@@ -240,9 +240,9 @@ class CidrValidatorTest extends ConstraintValidatorTestCase
     public static function getOutOfRangeNetmask(): array
     {
         return [
-            ['10.0.0.0/24', Ip::V4, 10, 20],
-            ['10.0.0.0/128'],
-            ['2001:0DB8:85A3:0000:0000:8A2E:0370:7334/24', Ip::V6, 10, 20],
+            ['10.0.0.0/24', 20, Ip::V4, 10, 20],
+            ['10.0.0.0/128', 32],
+            ['2001:0DB8:85A3:0000:0000:8A2E:0370:7334/24', 20, Ip::V6, 10, 20],
         ];
     }
 

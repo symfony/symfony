@@ -81,7 +81,7 @@ class CidrValidator extends ConstraintValidator
             $this->context
                 ->buildViolation($constraint->netmaskRangeViolationMessage)
                 ->setParameter('{{ min }}', $constraint->netmaskMin)
-                ->setParameter('{{ max }}', $constraint->netmaskMax)
+                ->setParameter('{{ max }}', $netmaskMax)
                 ->setCode(Cidr::OUT_OF_RANGE_ERROR)
                 ->addViolation();
         }

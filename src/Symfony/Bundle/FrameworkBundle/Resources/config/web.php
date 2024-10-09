@@ -148,9 +148,9 @@ return static function (ContainerConfigurator $container) {
             ->tag('kernel.event_subscriber')
 
         ->set('controller.expression_language', ExpressionLanguage::class)
-            ->args([service('cache.request_payload_value_resolver_expression_language')->nullOnInvalid()])
+            ->args([service('cache.controller_expression_language')->nullOnInvalid()])
 
-        ->set('cache.request_payload_value_resolver_expression_language')
+        ->set('cache.controller_expression_language')
             ->parent('cache.system')
             ->tag('cache.pool')
     ;

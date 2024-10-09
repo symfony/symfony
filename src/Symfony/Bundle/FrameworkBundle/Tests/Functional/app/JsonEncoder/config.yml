@@ -1,0 +1,25 @@
+imports:
+    - { resource: ../config/default.yml }
+
+framework:
+    http_method_override: false
+    type_info: ~
+    json_encoder:
+        enabled: true
+        paths:
+            Symfony\Bundle\FrameworkBundle\Tests\Functional\app\JsonEncoder\Dto\: '../../Tests/Functional/app/JsonEncoder/Dto/*'
+
+services:
+    _defaults:
+        autoconfigure: true
+
+    json_encoder.encoder.alias:
+        alias: json_encoder.encoder
+        public: true
+
+    json_encoder.decoder.alias:
+        alias: json_encoder.decoder
+        public: true
+
+    Symfony\Bundle\FrameworkBundle\Tests\Functional\app\JsonEncoder\UppercaseNormalizer:
+    Symfony\Bundle\FrameworkBundle\Tests\Functional\app\JsonEncoder\LowercaseDenormalizer:

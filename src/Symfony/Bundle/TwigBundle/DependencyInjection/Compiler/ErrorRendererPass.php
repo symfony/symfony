@@ -11,21 +11,14 @@
 
 namespace Symfony\Bundle\TwigBundle\DependencyInjection\Compiler;
 
-use Symfony\Component\Asset\Packages;
-use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
-use Symfony\Component\Emoji\EmojiTransliterator;
 use Symfony\Component\ErrorHandler\ErrorRenderer\CliErrorRenderer;
-use Symfony\Component\ExpressionLanguage\Expression;
-use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
-use Symfony\Component\Workflow\Workflow;
-use Symfony\Component\Yaml\Yaml;
-use function Symfony\Component\DependencyInjection\Loader\Configurator\inline_service;
 
 /**
  * @author Javier Eguiluz <javier.eguiluz@gmail.com>
+ * @internal
  */
 class ErrorRendererPass implements CompilerPassInterface
 {

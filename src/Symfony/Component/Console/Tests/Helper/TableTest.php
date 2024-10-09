@@ -102,7 +102,7 @@ class TableTest extends TestCase
                 ['ISBN', 'Title', 'Author'],
                 $books,
                 'default',
-<<<'TABLE'
+                <<<'TABLE'
 +---------------+--------------------------+------------------+
 | ISBN          | Title                    | Author           |
 +---------------+--------------------------+------------------+
@@ -191,7 +191,7 @@ TABLE
                     ['80-902734-1-6', 'And Then There Were None', 'Agatha Christie'],
                 ],
                 'default',
-<<<'TABLE'
+                <<<'TABLE'
 +---------------+--------------------------+------------------+
 | ISBN          | Title                    |                  |
 +---------------+--------------------------+------------------+
@@ -212,7 +212,7 @@ TABLE
                     ['80-902734-1-6', 'And Then There Were None', 'Agatha Christie'],
                 ],
                 'default',
-<<<'TABLE'
+                <<<'TABLE'
 +---------------+--------------------------+------------------+
 | 99921-58-10-7 | Divine Comedy            | Dante Alighieri  |
 | 9971-5-0210-0 |                          |                  |
@@ -231,7 +231,7 @@ TABLE
                     ['960-425-059-0', 'The Lord of the Rings', "J. R. R.\nTolkien"],
                 ],
                 'default',
-<<<'TABLE'
+                <<<'TABLE'
 +---------------+----------------------------+-----------------+
 | ISBN          | Title                      | Author          |
 +---------------+----------------------------+-----------------+
@@ -251,7 +251,7 @@ TABLE
                 ['ISBN', 'Title'],
                 [],
                 'default',
-<<<'TABLE'
+                <<<'TABLE'
 +------+-------+
 | ISBN | Title |
 +------+-------+
@@ -271,7 +271,7 @@ TABLE
                     ['9971-5-0210-0', 'A Tale of Two Cities', '<info>Charles Dickens</>'],
                 ],
                 'default',
-<<<'TABLE'
+                <<<'TABLE'
 +---------------+----------------------+-----------------+
 | ISBN          | Title                | Author          |
 +---------------+----------------------+-----------------+
@@ -288,7 +288,7 @@ TABLE
                     ['9971-5-0210-0', 'A Tale of Two Cities', 'Charles Dickens'],
                 ],
                 'default',
-<<<'TABLE'
+                <<<'TABLE'
 +----------------------------------+----------------------+-----------------+
 | ISBN                             | Title                | Author          |
 +----------------------------------+----------------------+-----------------+
@@ -320,7 +320,7 @@ TABLE
                     ],
                 ],
                 'default',
-<<<'TABLE'
+                <<<'TABLE'
 +-------------------------------+-------------------------------+-----------------------------+
 | ISBN                          | Title                         | Author                      |
 +-------------------------------+-------------------------------+-----------------------------+
@@ -347,7 +347,7 @@ TABLE
                     ],
                 ],
                 'default',
-<<<'TABLE'
+                <<<'TABLE'
 +-----+-----+-----+
 | Foo | Bar | Baz |
 +-----+-----+-----+
@@ -366,7 +366,7 @@ TABLE
                     ],
                 ],
                 'default',
-<<<'TABLE'
+                <<<'TABLE'
 +-----+-----+------+
 | Foo | Bar | Baz  |
 +-----+-----+------+
@@ -392,7 +392,7 @@ TABLE
                     ['80-902734-1-7', 'Test'],
                 ],
                 'default',
-<<<'TABLE'
+                <<<'TABLE'
 +---------------+---------------+-----------------+
 | ISBN          | Title         | Author          |
 +---------------+---------------+-----------------+
@@ -425,7 +425,7 @@ TABLE
                     ['J. R. R'],
                 ],
                 'default',
-<<<'TABLE'
+                <<<'TABLE'
 +------------------+---------+-----------------+
 | ISBN             | Title   | Author          |
 +------------------+---------+-----------------+
@@ -460,7 +460,7 @@ TABLE
                     ],
                 ],
                 'default',
-<<<'TABLE'
+                <<<'TABLE'
 +-----------------+-------+-----------------+
 | ISBN            | Title | Author          |
 +-----------------+-------+-----------------+
@@ -497,7 +497,7 @@ TABLE
                     ['Charles Dickens'],
                 ],
                 'default',
-<<<'TABLE'
+                <<<'TABLE'
 +-----------------+-------+-----------------+
 | ISBN            | Title | Author          |
 +-----------------+-------+-----------------+
@@ -524,7 +524,7 @@ TABLE
                     ['Charles Dickens'],
                 ],
                 'default',
-<<<'TABLE'
+                <<<'TABLE'
 +---------------+-----------------+
 | ISBN          | Author          |
 +---------------+-----------------+
@@ -542,7 +542,7 @@ TABLE
                 ],
                 [],
                 'default',
-<<<'TABLE'
+                <<<'TABLE'
 +------+-------+--------+
 | Main title            |
 +------+-------+--------+
@@ -560,9 +560,9 @@ TABLE
                         new TableCell('3', ['colspan' => 2]),
                         new TableCell('4', ['colspan' => 2]),
                     ],
-        ],
+                ],
                 'default',
-<<<'TABLE'
+                <<<'TABLE'
 +---+--+--+---+--+---+--+---+--+
 | 1       | 2    | 3    | 4    |
 +---+--+--+---+--+---+--+---+--+
@@ -595,7 +595,7 @@ TABLE
 +-----------------+------------------+---------+
 
 TABLE
-            ,
+                ,
                 true,
             ],
             'Row with formatted cells containing a newline' => [
@@ -607,7 +607,7 @@ TABLE
                     new TableSeparator(),
                     [
                         'foo',
-                         new TableCell('<error>Dont break'."\n".'here</error>', ['rowspan' => 2]),
+                        new TableCell('<error>Dont break'."\n".'here</error>', ['rowspan' => 2]),
                     ],
                     [
                         'bar',
@@ -624,77 +624,77 @@ TABLE
 +-------+------------+
 
 TABLE
-            ,
+                ,
                 true,
             ],
             'TabeCellStyle with align. Also with rowspan and colspan > 1' => [
-               [
-                   new TableCell(
-                       'ISBN',
-                       [
-                           'style' => new TableCellStyle([
-                               'align' => 'right',
-                           ]),
-                       ]
-                   ),
-                   'Title',
-                   new TableCell(
-                       'Author',
-                       [
-                           'style' => new TableCellStyle([
-                               'align' => 'center',
-                           ]),
-                       ]
-                   ),
-               ],
-               [
-                   [
-                       new TableCell(
-                           '<fg=red>978</>',
-                           [
-                               'style' => new TableCellStyle([
-                                   'align' => 'center',
-                               ]),
-                           ]
-                       ),
-                       'De Monarchia',
-                       new TableCell(
-                           "Dante Alighieri \nspans multiple rows rows Dante Alighieri \nspans multiple rows rows",
-                           [
-                               'rowspan' => 2,
-                               'style' => new TableCellStyle([
-                                   'align' => 'center',
-                               ]),
-                           ]
-                       ),
-                   ],
-                   [
-                       '<info>99921-58-10-7</info>',
-                       'Divine Comedy',
-                   ],
-                   new TableSeparator(),
-                   [
-                       new TableCell(
-                           '<error>test</error>',
-                           [
-                               'colspan' => 2,
-                               'style' => new TableCellStyle([
-                                   'align' => 'center',
-                               ]),
-                           ]
-                       ),
-                       new TableCell(
-                           'tttt',
-                           [
-                               'style' => new TableCellStyle([
-                                   'align' => 'right',
-                               ]),
-                           ]
-                       ),
-                   ],
-               ],
-               'default',
-<<<'TABLE'
+                [
+                    new TableCell(
+                        'ISBN',
+                        [
+                            'style' => new TableCellStyle([
+                                'align' => 'right',
+                            ]),
+                        ]
+                    ),
+                    'Title',
+                    new TableCell(
+                        'Author',
+                        [
+                            'style' => new TableCellStyle([
+                                'align' => 'center',
+                            ]),
+                        ]
+                    ),
+                ],
+                [
+                    [
+                        new TableCell(
+                            '<fg=red>978</>',
+                            [
+                                'style' => new TableCellStyle([
+                                    'align' => 'center',
+                                ]),
+                            ]
+                        ),
+                        'De Monarchia',
+                        new TableCell(
+                            "Dante Alighieri \nspans multiple rows rows Dante Alighieri \nspans multiple rows rows",
+                            [
+                                'rowspan' => 2,
+                                'style' => new TableCellStyle([
+                                    'align' => 'center',
+                                ]),
+                            ]
+                        ),
+                    ],
+                    [
+                        '<info>99921-58-10-7</info>',
+                        'Divine Comedy',
+                    ],
+                    new TableSeparator(),
+                    [
+                        new TableCell(
+                            '<error>test</error>',
+                            [
+                                'colspan' => 2,
+                                'style' => new TableCellStyle([
+                                    'align' => 'center',
+                                ]),
+                            ]
+                        ),
+                        new TableCell(
+                            'tttt',
+                            [
+                                'style' => new TableCellStyle([
+                                    'align' => 'right',
+                                ]),
+                            ]
+                        ),
+                    ],
+                ],
+                'default',
+                <<<'TABLE'
 +---------------+---------------+-------------------------------------------+
 |          ISBN | Title         |                  Author                   |
 +---------------+---------------+-------------------------------------------+
@@ -706,66 +706,66 @@ TABLE
 +---------------+---------------+-------------------------------------------+
 
 TABLE
-               ,
-           ],
+                ,
+            ],
             'TabeCellStyle with fg,bg. Also with rowspan and colspan > 1' => [
                 [],
                 [
-                   [
-                       new TableCell(
-                           '<fg=red>978</>',
-                           [
-                               'style' => new TableCellStyle([
-                                   'fg' => 'black',
-                                   'bg' => 'green',
-                               ]),
-                           ]
-                       ),
-                       'De Monarchia',
-                       new TableCell(
-                           "Dante Alighieri \nspans multiple rows rows Dante Alighieri \nspans multiple rows rows",
-                           [
-                               'rowspan' => 2,
-                               'style' => new TableCellStyle([
-                                   'fg' => 'red',
-                                   'bg' => 'green',
-                                   'align' => 'center',
-                               ]),
-                           ]
-                       ),
-                   ],
+                    [
+                        new TableCell(
+                            '<fg=red>978</>',
+                            [
+                                'style' => new TableCellStyle([
+                                    'fg' => 'black',
+                                    'bg' => 'green',
+                                ]),
+                            ]
+                        ),
+                        'De Monarchia',
+                        new TableCell(
+                            "Dante Alighieri \nspans multiple rows rows Dante Alighieri \nspans multiple rows rows",
+                            [
+                                'rowspan' => 2,
+                                'style' => new TableCellStyle([
+                                    'fg' => 'red',
+                                    'bg' => 'green',
+                                    'align' => 'center',
+                                ]),
+                            ]
+                        ),
+                    ],
 
-                   [
-                       '<info>99921-58-10-7</info>',
-                       'Divine Comedy',
-                   ],
-                   new TableSeparator(),
-                   [
-                       new TableCell(
-                           '<error>test</error>',
-                           [
-                               'colspan' => 2,
-                               'style' => new TableCellStyle([
-                                   'fg' => 'red',
-                                   'bg' => 'green',
-                                   'align' => 'center',
-                               ]),
-                           ]
-                       ),
-                       new TableCell(
-                           'tttt',
-                           [
-                               'style' => new TableCellStyle([
-                                   'fg' => 'red',
-                                   'bg' => 'green',
-                                   'align' => 'right',
-                               ]),
-                           ]
-                       ),
-                   ],
+                    [
+                        '<info>99921-58-10-7</info>',
+                        'Divine Comedy',
+                    ],
+                    new TableSeparator(),
+                    [
+                        new TableCell(
+                            '<error>test</error>',
+                            [
+                                'colspan' => 2,
+                                'style' => new TableCellStyle([
+                                    'fg' => 'red',
+                                    'bg' => 'green',
+                                    'align' => 'center',
+                                ]),
+                            ]
+                        ),
+                        new TableCell(
+                            'tttt',
+                            [
+                                'style' => new TableCellStyle([
+                                    'fg' => 'red',
+                                    'bg' => 'green',
+                                    'align' => 'right',
+                                ]),
+                            ]
+                        ),
+                    ],
                 ],
                 'default',
-<<<'TABLE'
+                <<<'TABLE'
 +---------------+---------------+-------------------------------------------+
 [39;49m| [39;49m[31m978[39m[39;49m           | De Monarchia  |[39;49m[31;42m             Dante Alighieri               [39;49m[39;49m|[39;49m
 [39;49m| [39;49m[32m99921-58-10-7[39m[39;49m | Divine Comedy |[39;49m[31;42m spans multiple rows rows Dante Alighieri  [39;49m[39;49m|[39;49m
@@ -775,9 +775,9 @@ TABLE
 +---------------+---------------+-------------------------------------------+
 
 TABLE
-            ,
-            true,
-           ],
+                ,
+                true,
+            ],
             'TabeCellStyle with cellFormat. Also with rowspan and colspan > 1' => [
                 [
                     new TableCell(
@@ -820,7 +820,7 @@ TABLE
                     ],
                 ],
                 'default',
-<<<'TABLE'
+                <<<'TABLE'
 +----------------+---------------+---------------------+
 |[30;46m ISBN           [39;49m|[32m Title         [39m|[32m Author              [39m|
 +----------------+---------------+---------------------+
@@ -832,7 +832,7 @@ TABLE
 TABLE
                 ,
                 true,
-           ],
+            ],
         ];
     }
 
@@ -1288,7 +1288,7 @@ TABLE;
 TABLE
                 ,
                 true,
-           ],
+            ],
             'header contains multiple lines' => [
                 'Multiline'."\n".'header'."\n".'here',
                 'footer',
@@ -1558,18 +1558,18 @@ EOTXT;
         $table->setColumnMaxWidth(1, 15);
         $table->setColumnMaxWidth(2, 15);
         $table->setRows([
-                [new TableCell('Lorem ipsum dolor sit amet, <fg=white;bg=green>consectetur</> adipiscing elit, <fg=white;bg=red>sed</> do <fg=white;bg=red>eiusmod</> tempor', ['colspan' => 3])],
-                new TableSeparator(),
-                [new TableCell('Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor', ['colspan' => 3])],
-                new TableSeparator(),
-                [new TableCell('Lorem ipsum <fg=white;bg=red>dolor</> sit amet, consectetur ', ['colspan' => 2]), 'hello world'],
-                new TableSeparator(),
-                ['hello <fg=white;bg=green>world</>', new TableCell('Lorem ipsum dolor sit amet, <fg=white;bg=green>consectetur</> adipiscing elit', ['colspan' => 2])],
-                new TableSeparator(),
-                ['hello ', new TableCell('world', ['colspan' => 1]), 'Lorem ipsum dolor sit amet, consectetur'],
-                new TableSeparator(),
-                ['Symfony ', new TableCell('Test', ['colspan' => 1]), 'Lorem <fg=white;bg=green>ipsum</> dolor sit amet, consectetur'],
-            ])
+            [new TableCell('Lorem ipsum dolor sit amet, <fg=white;bg=green>consectetur</> adipiscing elit, <fg=white;bg=red>sed</> do <fg=white;bg=red>eiusmod</> tempor', ['colspan' => 3])],
+            new TableSeparator(),
+            [new TableCell('Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor', ['colspan' => 3])],
+            new TableSeparator(),
+            [new TableCell('Lorem ipsum <fg=white;bg=red>dolor</> sit amet, consectetur ', ['colspan' => 2]), 'hello world'],
+            new TableSeparator(),
+            ['hello <fg=white;bg=green>world</>', new TableCell('Lorem ipsum dolor sit amet, <fg=white;bg=green>consectetur</> adipiscing elit', ['colspan' => 2])],
+            new TableSeparator(),
+            ['hello ', new TableCell('world', ['colspan' => 1]), 'Lorem ipsum dolor sit amet, consectetur'],
+            new TableSeparator(),
+            ['Symfony ', new TableCell('Test', ['colspan' => 1]), 'Lorem <fg=white;bg=green>ipsum</> dolor sit amet, consectetur'],
+        ])
         ;
         $table->render();
 

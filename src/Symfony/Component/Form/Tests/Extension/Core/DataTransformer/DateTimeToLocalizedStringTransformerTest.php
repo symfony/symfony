@@ -54,7 +54,7 @@ class DateTimeToLocalizedStringTransformerTest extends BaseDateTimeTransformerTe
 
         if (\extension_loaded('intl')) {
             ini_set('intl.use_exceptions', $this->initialTestCaseUseException);
-            ini_set('intl.error_level', $this->initialTestCaseUseException);
+            ini_set('intl.error_level', $this->initialTestCaseErrorLevel);
         }
     }
 
@@ -339,12 +339,11 @@ class DateTimeToLocalizedStringTransformerTest extends BaseDateTimeTransformerTe
         $transformer->reverseTransform('20107-03-21 12:34:56');
     }
 
+    /**
+     * @requires extension intl
+     */
     public function testReverseTransformWrapsIntlErrorsWithErrorLevel()
     {
-        if (!\extension_loaded('intl')) {
-            $this->markTestSkipped('intl extension is not loaded');
-        }
-
         $errorLevel = ini_set('intl.error_level', \E_WARNING);
 
         try {
@@ -356,12 +355,11 @@ class DateTimeToLocalizedStringTransformerTest extends BaseDateTimeTransformerTe
         }
     }
 
+    /**
+     * @requires extension intl
+     */
     public function testReverseTransformWrapsIntlErrorsWithExceptions()
     {
-        if (!\extension_loaded('intl')) {
-            $this->markTestSkipped('intl extension is not loaded');
-        }
-
         $initialUseExceptions = ini_set('intl.use_exceptions', 1);
 
         try {
@@ -373,12 +371,11 @@ class DateTimeToLocalizedStringTransformerTest extends BaseDateTimeTransformerTe
         }
     }
 
+    /**
+     * @requires extension intl
+     */
     public function testReverseTransformWrapsIntlErrorsWithExceptionsAndErrorLevel()
     {
-        if (!\extension_loaded('intl')) {
-            $this->markTestSkipped('intl extension is not loaded');
-        }
-
         $initialUseExceptions = ini_set('intl.use_exceptions', 1);
         $initialErrorLevel = ini_set('intl.error_level', \E_WARNING);
 

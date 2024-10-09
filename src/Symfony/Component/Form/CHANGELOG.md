@@ -6,6 +6,7 @@ CHANGELOG
 
  * Deprecate the `VersionAwareTest` trait, use feature detection instead
  * Add support for the `calendar` option in `DateType`
+ * Add `LazyChoiceLoader` and `choice_lazy` option in `ChoiceType` for loading and rendering choices on demand
 
 7.1
 ---

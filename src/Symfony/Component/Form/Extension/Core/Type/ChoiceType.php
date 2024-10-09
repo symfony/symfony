@@ -27,10 +27,12 @@ use Symfony\Component\Form\ChoiceList\Factory\ChoiceListFactoryInterface;
 use Symfony\Component\Form\ChoiceList\Factory\DefaultChoiceListFactory;
 use Symfony\Component\Form\ChoiceList\Factory\PropertyAccessDecorator;
 use Symfony\Component\Form\ChoiceList\Loader\ChoiceLoaderInterface;
+use Symfony\Component\Form\ChoiceList\Loader\LazyChoiceLoader;
 use Symfony\Component\Form\ChoiceList\View\ChoiceGroupView;
 use Symfony\Component\Form\ChoiceList\View\ChoiceListView;
 use Symfony\Component\Form\ChoiceList\View\ChoiceView;
 use Symfony\Component\Form\Event\PreSubmitEvent;
+use Symfony\Component\Form\Exception\LogicException;
 use Symfony\Component\Form\Exception\TransformationFailedException;
 use Symfony\Component\Form\Extension\Core\DataMapper\CheckboxListMapper;
 use Symfony\Component\Form\Extension\Core\DataMapper\RadioListMapper;
@@ -333,11 +335,24 @@ class ChoiceType extends AbstractType
             return $choiceTranslationDomain;
         };
 
+        $choiceLoaderNormalizer = static function (Options $options, ?ChoiceLoaderInterface $choiceLoader) {
+            if (!$options['choice_lazy']) {
+                return $choiceLoader;
+            }
+
+            if (null === $choiceLoader) {
+                throw new LogicException('The "choice_lazy" option can only be used if the "choice_loader" option is set.');
+            }
+
+            return new LazyChoiceLoader($choiceLoader);
+        };
+
         $resolver->setDefaults([
             'multiple' => false,
             'expanded' => false,
             'choices' => [],
             'choice_filter' => null,
+            'choice_lazy' => false,
             'choice_loader' => null,
             'choice_label' => null,
             'choice_name' => null,
@@ -365,9 +380,11 @@ class ChoiceType extends AbstractType
 
         $resolver->setNormalizer('placeholder', $placeholderNormalizer);
         $resolver->setNormalizer('choice_translation_domain', $choiceTranslationDomainNormalizer);
+        $resolver->setNormalizer('choice_loader', $choiceLoaderNormalizer);
 
         $resolver->setAllowedTypes('choices', ['null', 'array', \Traversable::class]);
         $resolver->setAllowedTypes('choice_translation_domain', ['null', 'bool', 'string']);
+        $resolver->setAllowedTypes('choice_lazy', 'bool');
         $resolver->setAllowedTypes('choice_loader', ['null', ChoiceLoaderInterface::class, ChoiceLoader::class]);
         $resolver->setAllowedTypes('choice_filter', ['null', 'callable', 'string', PropertyPath::class, ChoiceFilter::class]);
         $resolver->setAllowedTypes('choice_label', ['null', 'bool', 'callable', 'string', PropertyPath::class, ChoiceLabel::class]);
@@ -381,6 +398,8 @@ class ChoiceType extends AbstractType
         $resolver->setAllowedTypes('separator_html', ['bool']);
         $resolver->setAllowedTypes('duplicate_preferred_choices', 'bool');
         $resolver->setAllowedTypes('group_by', ['null', 'callable', 'string', PropertyPath::class, GroupBy::class]);
+
+        $resolver->setInfo('choice_lazy', 'Load choices on demand. When set to true, only the selected choices are loaded and rendered.');
     }
 
     public function getBlockPrefix(): string

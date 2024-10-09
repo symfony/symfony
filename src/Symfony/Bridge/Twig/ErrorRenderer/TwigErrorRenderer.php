@@ -26,7 +26,7 @@ use Twig\Environment;
  */
 class TwigErrorRenderer implements ErrorRendererInterface
 {
-    private HtmlErrorRenderer $fallbackErrorRenderer;
+    private ErrorRendererInterface $fallbackErrorRenderer;
     private \Closure|bool $debug;
 
     /**

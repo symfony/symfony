@@ -483,7 +483,7 @@ class XmlFileLoader extends FileLoader
                 }
             }
             if ($errors) {
-                throw new InvalidArgumentException(\sprintf('Unable to parse file "%s": ', $file).implode('/n', $errors), $e->getCode(), $e);
+                throw new InvalidArgumentException(\sprintf('Unable to parse file "%s": ', $file).implode("\n", $errors), $e->getCode(), $e);
             }
         }
 

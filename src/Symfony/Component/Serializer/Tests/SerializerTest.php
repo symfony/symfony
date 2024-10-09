@@ -64,6 +64,8 @@ use Symfony\Component\Serializer\Tests\Fixtures\DummyNullableInt;
 use Symfony\Component\Serializer\Tests\Fixtures\DummyObjectWithEnumConstructor;
 use Symfony\Component\Serializer\Tests\Fixtures\DummyObjectWithEnumProperty;
 use Symfony\Component\Serializer\Tests\Fixtures\DummyWithObjectOrNull;
+use Symfony\Component\Serializer\Tests\Fixtures\DummyWithVariadicParameter;
+use Symfony\Component\Serializer\Tests\Fixtures\DummyWithVariadicProperty;
 use Symfony\Component\Serializer\Tests\Fixtures\FalseBuiltInDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\FooImplementationDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\FooInterfaceDummyDenormalizer;
@@ -1659,6 +1661,19 @@ class SerializerTest extends TestCase
         ];
 
         $this->assertSame($expected, $exceptionsAsArray);
+    }
+
+    public function testPartialDenormalizationWithInvalidVariadicParameter()
+    {
+        $json = '{"variadic": ["a random string"]}';
+
+        $serializer = new Serializer([new UidNormalizer(), new ObjectNormalizer()], ['json' => new JsonEncoder()]);
+
+        $this->expectException(PartialDenormalizationException::class);
+
+        $serializer->deserialize($json, DummyWithVariadicParameter::class, 'json', [
+            DenormalizerInterface::COLLECT_DENORMALIZATION_ERRORS => true,
+        ]);
     }
 }
 

@@ -85,6 +85,7 @@ abstract class AbstractRedisSessionHandlerTestCase extends TestCase
 
     public function testDestroySession()
     {
+        $this->storage->open('', '');
         $this->redisClient->set(self::PREFIX.'id', 'foo');
 
         $this->assertTrue((bool) $this->redisClient->exists(self::PREFIX.'id'));

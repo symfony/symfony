@@ -34,7 +34,7 @@ class TwigErrorRenderer implements ErrorRendererInterface
      */
     public function __construct(
         private Environment $twig,
-        ?HtmlErrorRenderer $fallbackErrorRenderer = null,
+        ?ErrorRendererInterface $fallbackErrorRenderer = null,
         bool|callable $debug = false,
     ) {
         $this->fallbackErrorRenderer = \in_array(\PHP_SAPI, ['cli', 'phpdbg', 'embed'], true) ? new CliErrorRenderer() : ($fallbackErrorRenderer ?? new HtmlErrorRenderer());

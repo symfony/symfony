@@ -247,7 +247,8 @@ class RequestPayloadValueResolver implements ValueResolverInterface, EventSubscr
      *
      * @return string|GroupSequence|array<string>|null
      */
-    private function resolveValidationGroups(Expression|string|GroupSequence|array|null $validationGroups, ControllerArgumentsEvent $event): string|GroupSequence|array|null {
+    private function resolveValidationGroups(Expression|string|GroupSequence|array|null $validationGroups, ControllerArgumentsEvent $event): string|GroupSequence|array|null
+    {
         if ($validationGroups instanceof Expression) {
             return $this->resolveExpression($validationGroups, $event);
         }
@@ -257,8 +258,6 @@ class RequestPayloadValueResolver implements ValueResolverInterface, EventSubscr
         }
 
         return array_map(fn ($group) => $group instanceof Expression ? $this->resolveExpression($group, $event) : $group, $validationGroups);
-        }
-
     }
 
     private function resolveExpression(Expression $expression, ControllerArgumentsEvent $event): string

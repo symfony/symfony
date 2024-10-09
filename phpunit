@@ -10,7 +10,8 @@ if (!file_exists(__DIR__.'/vendor/symfony/phpunit-bridge/bin/simple-phpunit')) {
     exit(1);
 }
 if (!getenv('SYMFONY_PHPUNIT_VERSION')) {
-    putenv('SYMFONY_PHPUNIT_VERSION=9.6');
+    putenv('SYMFONY_PHPUNIT_VERSION=11.3');
+    putenv('SYMFONY_DEPRECATIONS_HELPER=disabled');
 }
 if (!getenv('SYMFONY_PATCH_TYPE_DECLARATIONS')) {
     putenv('SYMFONY_PATCH_TYPE_DECLARATIONS=deprecations=1');

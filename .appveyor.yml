@@ -30,6 +30,7 @@ install:
     - echo date.timezone="America/Los_Angeles" >> php.ini-min
     - echo extension_dir=ext >> php.ini-min
     - echo extension=php_xsl.dll >> php.ini-min
+    - echo extension=php_mbstring.dll >> php.ini-min
     - copy /Y php.ini-min php.ini-max
     - echo zend_extension=php_opcache.dll >> php.ini-max
     - echo opcache.enable_cli=1 >> php.ini-max
@@ -39,7 +40,6 @@ install:
     - echo extension=php_redis.dll >> php.ini-max
     - echo apc.enable_cli=1 >> php.ini-max
     - echo extension=php_intl.dll >> php.ini-max
-    - echo extension=php_mbstring.dll >> php.ini-max
     - echo extension=php_fileinfo.dll >> php.ini-max
     - echo extension=php_pdo_sqlite.dll >> php.ini-max
     - echo extension=php_curl.dll >> php.ini-max
@@ -63,9 +63,9 @@ test_script:
     - copy /Y c:\php\php.ini-min c:\php\php.ini
     - IF %APPVEYOR_REPO_BRANCH:~-2% neq .x (rm -Rf src\Symfony\Bridge\PhpUnit)
     - mv src\Symfony\Component\HttpClient\phpunit.xml.dist src\Symfony\Component\HttpClient\phpunit.xml
-    - php phpunit src\Symfony --exclude-group tty,benchmark,intl-data,network,transient-on-windows || SET X=!errorlevel!
+    - php phpunit src\Symfony --exclude-group tty --exclude-group benchmark --exclude-group intl-data --exclude-group network --exclude-group transient-on-windows || SET X=!errorlevel!
     - php phpunit src\Symfony\Component\HttpClient || SET X=!errorlevel!
     - copy /Y c:\php\php.ini-max c:\php\php.ini
-    - php phpunit src\Symfony --exclude-group tty,benchmark,intl-data,network,transient-on-windows || SET X=!errorlevel!
+    - php phpunit src\Symfony --exclude-group tty --exclude-group benchmark --exclude-group intl-data --exclude-group network --exclude-group transient-on-windows || SET X=!errorlevel!
     - php phpunit src\Symfony\Component\HttpClient || SET X=!errorlevel!
     - exit %X%

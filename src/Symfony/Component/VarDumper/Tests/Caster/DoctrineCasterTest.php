@@ -40,7 +40,7 @@ class DoctrineCasterTest extends TestCase
                 %A
                   -backRefFieldName: null
                   -isDirty: false
-                  -em: $entityManagerClass { …3}
+                  -em: $entityManagerClass { …%d}
                   -typeClass: Doctrine\ORM\Mapping\ClassMetadata { …}
                 %A
                 EODUMP;
@@ -49,7 +49,7 @@ class DoctrineCasterTest extends TestCase
             $expected = <<<EODUMP
                 Doctrine\ORM\PersistentCollection {
                 %A
-                  -em: $entityManagerClass { …3}
+                  -em: $entityManagerClass { …%d}
                   -backRefFieldName: null
                   -typeClass: Doctrine\ORM\Mapping\ClassMetadata { …}
                 %A

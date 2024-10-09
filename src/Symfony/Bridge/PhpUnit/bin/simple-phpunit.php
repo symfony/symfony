@@ -152,6 +152,18 @@ if ('disabled' === $getEnvVar('SYMFONY_DEPRECATIONS_HELPER') || version_compare(
     putenv('SYMFONY_DEPRECATIONS_HELPER=disabled');
 }
 
+if (version_compare($PHPUNIT_VERSION, '11.0', '>=')) {
+    spl_autoload_register(function ($class) {
+        if (str_starts_with($class, 'Symfony\Bridge\PhpUnit\\')) {
+            $filename = sprintf('%s/../%s.php', __DIR__, strtr(substr($class, 23), '\\', '/'));
+
+            if (file_exists($filename)) {
+                require_once $filename;
+            }
+        }
+    });
+}
+
 if (!$getEnvVar('DOCTRINE_DEPRECATIONS')) {
     putenv('DOCTRINE_DEPRECATIONS=trigger');
     $_SERVER['DOCTRINE_DEPRECATIONS'] = $_ENV['DOCTRINE_DEPRECATIONS'] = 'trigger';

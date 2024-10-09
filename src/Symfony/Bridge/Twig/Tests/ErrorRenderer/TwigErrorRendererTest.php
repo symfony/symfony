@@ -14,25 +14,25 @@ namespace Symfony\Bridge\Twig\Tests\ErrorRenderer;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Twig\ErrorRenderer\TwigErrorRenderer;
 use Symfony\Component\ErrorHandler\ErrorRenderer\CliErrorRenderer;
+use Symfony\Component\ErrorHandler\ErrorRenderer\HtmlErrorRenderer;
+use Symfony\Component\ErrorHandler\Exception\FlattenException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Twig\Environment;
 use Twig\Loader\ArrayLoader;
 
 class TwigErrorRendererTest extends TestCase
 {
-    public function testDontUseNativeRenderInCliContext()
+    public function tesFallbackRenderer()
     {
-        $exception = new \Exception();
-
         $twig = $this->createMock(Environment::class);
-        $nativeRenderer = $this->createMock(CliErrorRenderer::class);
-        $nativeRenderer
-            ->expects($this->never())
-            ->method('render')
-            ->with($exception)
-        ;
+        $customRenderer = new class implements ErrorRendererInterface {
+            public function render(\Throwable $exception): FlattenException
+            {
+                return 'This is a custom error renderer.';
+            }
+        };
 
-        (new TwigErrorRenderer($twig, $nativeRenderer, true))->render(new \Exception());
+        $this->assertSame('This is a custom error renderer.', (new TwigErrorRenderer($twig, $customRenderer, true))->render(new \Exception()));
     }
 
     public function testCliRenderer()

@@ -37,7 +37,7 @@ class TwigErrorRenderer implements ErrorRendererInterface
         ?ErrorRendererInterface $fallbackErrorRenderer = null,
         bool|callable $debug = false,
     ) {
-        $this->fallbackErrorRenderer = \in_array(\PHP_SAPI, ['cli', 'phpdbg', 'embed'], true) ? new CliErrorRenderer() : ($fallbackErrorRenderer ?? new HtmlErrorRenderer());
+        $this->fallbackErrorRenderer = $fallbackErrorRenderer ?? new HtmlErrorRenderer();
         $this->debug = \is_bool($debug) ? $debug : $debug(...);
     }
 

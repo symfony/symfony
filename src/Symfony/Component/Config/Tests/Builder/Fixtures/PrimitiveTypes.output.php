@@ -12,6 +12,8 @@
 return [
     'boolean_node' => true,
     'enum_node' => 'foo',
+    'fqcn_enum_node' => 'bar',
+    'fqcn_unit_enum_node' => \Symfony\Component\Config\Tests\Fixtures\TestEnum::Bar,
     'float_node' => 47.11,
     'integer_node' => 1337,
     'scalar_node' => 'foobar',

@@ -13,6 +13,7 @@ namespace Symfony\Component\Config\Tests\Fixtures\Configuration;
 
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
+use Symfony\Component\Config\Tests\Fixtures\StringBackedTestEnum;
 use Symfony\Component\Config\Tests\Fixtures\TestEnum;
 
 class ExampleConfiguration implements ConfigurationInterface
@@ -40,6 +41,8 @@ class ExampleConfiguration implements ConfigurationInterface
                 ->scalarNode('node_with_a_looong_name')->end()
                 ->enumNode('enum_with_default')->values(['this', 'that'])->defaultValue('this')->end()
                 ->enumNode('enum')->values(['this', 'that', TestEnum::Ccc])->end()
+                ->enumNode('enum_with_class')->enumFqcn(StringBackedTestEnum::class)->end()
+                ->enumNode('unit_enum_with_class')->enumFqcn(TestEnum::class)->end()
                 ->arrayNode('array')
                     ->info('some info')
                     ->canBeUnset()

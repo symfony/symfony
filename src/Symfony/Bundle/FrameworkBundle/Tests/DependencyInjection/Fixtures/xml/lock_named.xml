@@ -20,6 +20,7 @@
             <framework:resource name="qux">%env(REDIS_DSN)%</framework:resource>
             <framework:resource name="corge">in-memory</framework:resource>
             <framework:resource name="grault">mysql:host=localhost;dbname=test</framework:resource>
+            <framework:resource name="garply">null</framework:resource>
         </framework:lock>
     </framework:config>
 </container>

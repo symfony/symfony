@@ -14,5 +14,6 @@ $container->loadFromExtension('framework', [
         'qux' => '%env(REDIS_DSN)%',
         'corge' => 'in-memory',
         'grault' => 'mysql:host=localhost;dbname=test',
+        'garply' => 'null',
     ],
 ]);

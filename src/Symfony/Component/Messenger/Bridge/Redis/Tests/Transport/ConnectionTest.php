@@ -107,6 +107,14 @@ class ConnectionTest extends TestCase
         );
     }
 
+    public function testFromDsnGeneratedConsumer()
+    {
+        $this->assertNotEquals(
+            Connection::fromDsn('redis://localhost/queue/group1/_GENERATED', [], $this->createMock(\Redis::class)),
+            Connection::fromDsn('redis://localhost/queue/group1/_GENERATED', [], $this->createMock(\Redis::class))
+        );
+    }
+
     public function testRedisClusterInstanceIsSupported()
     {
         $redis = $this->createMock(\RedisCluster::class);

@@ -173,7 +173,7 @@ class Connection
 
         $this->stream = $options['stream'];
         $this->group = $options['group'];
-        $this->consumer = $options['consumer'];
+        $this->consumer = '_GENERATED' === $options['consumer'] ? bin2hex(random_bytes(8)) : $options['consumer'];
         $this->queue = $this->stream.'__queue';
         $this->autoSetup = $options['auto_setup'];
         $this->maxEntries = $options['stream_max_entries'];

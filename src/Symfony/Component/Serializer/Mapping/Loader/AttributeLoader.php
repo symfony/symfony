@@ -65,8 +65,8 @@ class AttributeLoader implements LoaderInterface
         foreach ($this->loadAttributes($reflectionClass) as $annotation) {
             match (true) {
                 $annotation instanceof DiscriminatorMap => $classMetadata->setClassDiscriminatorMapping(new ClassDiscriminatorMapping($annotation->getTypeProperty(), $annotation->getMapping())),
-                $annotation instanceof Groups =>  $classGroups = $annotation->getGroups(),
-                $annotation instanceof Context =>  $classContextAnnotation = $annotation,
+                $annotation instanceof Groups => $classGroups = $annotation->getGroups(),
+                $annotation instanceof Context => $classContextAnnotation = $annotation,
                 default => null,
             };
         }

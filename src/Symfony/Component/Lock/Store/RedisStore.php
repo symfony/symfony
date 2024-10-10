@@ -248,7 +248,6 @@ class RedisStore implements SharedLockStoreInterface
                 if (null !== $err = $this->redis->getLastError()) {
                     throw new LockStorageException($err);
                 }
-
             }
 
             return $result;
@@ -280,12 +279,12 @@ class RedisStore implements SharedLockStoreInterface
         \assert($this->redis instanceof \Predis\ClientInterface);
 
         try {
-           return $this->redis->evalSha(...array_merge([$scriptSha, 1, $resource], $args));
+            return $this->redis->evalSha(...array_merge([$scriptSha, 1, $resource], $args));
         } catch (ServerException $e) {
             // Fallthrough only if we need to load the script
             if (self::NO_SCRIPT_ERROR_MESSAGE !== $e->getMessage()) {
                 throw new LockStorageException($e->getMessage(), $e->getCode(), $e);
-            } 
+            }
         }
 
         try {

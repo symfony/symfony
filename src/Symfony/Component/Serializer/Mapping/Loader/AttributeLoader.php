@@ -67,6 +67,7 @@ class AttributeLoader implements LoaderInterface
                 $annotation instanceof DiscriminatorMap => $classMetadata->setClassDiscriminatorMapping(new ClassDiscriminatorMapping($annotation->getTypeProperty(), $annotation->getMapping())),
                 $annotation instanceof Groups =>  $classGroups = $annotation->getGroups(),
                 $annotation instanceof Context =>  $classContextAnnotation = $annotation,
+                default => null,
             };
         }
 
@@ -103,6 +104,7 @@ class AttributeLoader implements LoaderInterface
                         $annotation instanceof SerializedPath => $attributeMetadata->setSerializedPath($annotation->getSerializedPath()),
                         $annotation instanceof Ignore => $attributeMetadata->setIgnore(true),
                         $annotation instanceof Context => $this->setAttributeContextsForGroups($annotation, $attributeMetadata),
+                        default => null,
                     };
                 }
             }

@@ -63,23 +63,11 @@ class AttributeLoader implements LoaderInterface
         $attributesMetadata = $classMetadata->getAttributesMetadata();
 
         foreach ($this->loadAttributes($reflectionClass) as $annotation) {
-            if ($annotation instanceof DiscriminatorMap) {
-                $classMetadata->setClassDiscriminatorMapping(new ClassDiscriminatorMapping(
-                    $annotation->getTypeProperty(),
-                    $annotation->getMapping()
-                ));
-                continue;
-            }
-
-            if ($annotation instanceof Groups) {
-                $classGroups = $annotation->getGroups();
-
-                continue;
-            }
-
-            if ($annotation instanceof Context) {
-                $classContextAnnotation = $annotation;
-            }
+            match (true) {
+                $annotation instanceof DiscriminatorMap => $classMetadata->setClassDiscriminatorMapping(new ClassDiscriminatorMapping($annotation->getTypeProperty(), $annotation->getMapping())),
+                $annotation instanceof Groups =>  $classGroups = $annotation->getGroups(),
+                $annotation instanceof Context =>  $classContextAnnotation = $annotation,
+            };
         }
 
         foreach ($reflectionClass->getProperties() as $property) {
@@ -88,19 +76,18 @@ class AttributeLoader implements LoaderInterface
                 $classMetadata->addAttributeMetadata($attributesMetadata[$property->name]);
             }
 
+            $attributeMetadata = $attributesMetadata[$property->name];
             if ($property->getDeclaringClass()->name === $className) {
                 if ($classContextAnnotation) {
-                    $this->setAttributeContextsForGroups($classContextAnnotation, $attributesMetadata[$property->name]);
+                    $this->setAttributeContextsForGroups($classContextAnnotation, $attributeMetadata);
                 }
 
                 foreach ($classGroups as $group) {
-                    $attributesMetadata[$property->name]->addGroup($group);
+                    $attributeMetadata->addGroup($group);
                 }
 
                 foreach ($this->loadAttributes($property) as $annotation) {
                     $loaded = true;
-
-                    $attributeMetadata = $attributesMetadata[$property->name];
 
                     if ($annotation instanceof Groups) {
                         foreach ($annotation->getGroups() as $group) {
@@ -109,7 +96,6 @@ class AttributeLoader implements LoaderInterface
 
                         continue;
                     }
-
 
                     match (true) {
                         $annotation instanceof MaxDepth => $attributeMetadata->setMaxDepth($annotation->getMaxDepth()),

@@ -401,6 +401,26 @@ class DebugClassLoaderTest extends TestCase
             'Method "Symfony\Component\ErrorHandler\Tests\Fixtures\ReturnTypeParent::true()" might add "true" as a native return type declaration in the future. Do the same in child class "Test\Symfony\Component\ErrorHandler\Tests\ReturnType" now to avoid errors or add an explicit @return annotation to suppress this message.',
             'Method "Symfony\Component\ErrorHandler\Tests\Fixtures\ReturnTypeParent::never()" might add "never" as a native return type declaration in the future. Do the same in child class "Test\Symfony\Component\ErrorHandler\Tests\ReturnType" now to avoid errors or add an explicit @return annotation to suppress this message.',
             'Method "Symfony\Component\ErrorHandler\Tests\Fixtures\ReturnTypeParent::null()" might add "null" as a native return type declaration in the future. Do the same in child class "Test\Symfony\Component\ErrorHandler\Tests\ReturnType" now to avoid errors or add an explicit @return annotation to suppress this message.',
+            'Method "Symfony\Component\ErrorHandler\Tests\Fixtures\ReturnTypeParent::classConstant()" might add "string" as a native return type declaration in the future. Do the same in child class "Test\Symfony\Component\ErrorHandler\Tests\ReturnType" now to avoid errors or add an explicit @return annotation to suppress this message.',
+        ], $deprecations);
+    }
+
+    /**
+     * @requires PHP >= 8.3
+     */
+    public function testReturnTypePhp83()
+    {
+        $deprecations = [];
+        set_error_handler(function ($type, $msg) use (&$deprecations) { $deprecations[] = $msg; });
+        $e = error_reporting(E_USER_DEPRECATED);
+
+        class_exists('Test\\'.ReturnTypePhp83::class, true);
+
+        error_reporting($e);
+        restore_error_handler();
+
+        $this->assertSame([
+            'Method "Symfony\Component\ErrorHandler\Tests\Fixtures\ReturnTypeParentPhp83::classConstantWithType()" might add "string" as a native return type declaration in the future. Do the same in child class "Test\Symfony\Component\ErrorHandler\Tests\ReturnTypePhp83" now to avoid errors or add an explicit @return annotation to suppress this message.',
         ], $deprecations);
     }
 
@@ -542,6 +562,8 @@ class ClassLoader
             }');
         } elseif ('Test\\'.ReturnType::class === $class) {
             return $fixtureDir.\DIRECTORY_SEPARATOR.'ReturnType.php';
+        } elseif ('Test\\'.ReturnTypePhp83::class === $class) {
+            return $fixtureDir.\DIRECTORY_SEPARATOR.'ReturnTypePhp83.php';
         } elseif ('Test\\'.Fixtures\OutsideInterface::class === $class) {
             return $fixtureDir.\DIRECTORY_SEPARATOR.'OutsideInterface.php';
         } elseif ('Test\\'.OverrideOutsideFinalProperty::class === $class) {

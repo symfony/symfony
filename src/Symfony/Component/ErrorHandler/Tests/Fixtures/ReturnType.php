@@ -51,4 +51,5 @@ class ReturnType extends ReturnTypeParent implements ReturnTypeInterface, Fixtur
     public function never() { }
     public function null() { }
     public function outsideMethod() { }
+    public function classConstant() { }
 }

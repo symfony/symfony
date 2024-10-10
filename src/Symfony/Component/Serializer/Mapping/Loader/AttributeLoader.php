@@ -100,20 +100,23 @@ class AttributeLoader implements LoaderInterface
                 foreach ($this->loadAttributes($property) as $annotation) {
                     $loaded = true;
 
+                    $attributeMetadata = $attributesMetadata[$property->name];
+
                     if ($annotation instanceof Groups) {
                         foreach ($annotation->getGroups() as $group) {
-                            $attributesMetadata[$property->name]->addGroup($group);
+                            $attributeMetadata->addGroup($group);
                         }
 
                         continue;
                     }
 
+
                     match (true) {
-                        $annotation instanceof MaxDepth => $attributesMetadata[$property->name]->setMaxDepth($annotation->getMaxDepth()),
-                        $annotation instanceof SerializedName => $attributesMetadata[$property->name]->setSerializedName($annotation->getSerializedName()),
-                        $annotation instanceof SerializedPath => $attributesMetadata[$property->name]->setSerializedPath($annotation->getSerializedPath()),
-                        $annotation instanceof Ignore => $attributesMetadata[$property->name]->setIgnore(true),
-                        $annotation instanceof Context => $this->setAttributeContextsForGroups($annotation, $attributesMetadata[$property->name]),
+                        $annotation instanceof MaxDepth => $attributeMetadata->setMaxDepth($annotation->getMaxDepth()),
+                        $annotation instanceof SerializedName => $attributeMetadata->setSerializedName($annotation->getSerializedName()),
+                        $annotation instanceof SerializedPath => $attributeMetadata->setSerializedPath($annotation->getSerializedPath()),
+                        $annotation instanceof Ignore => $attributeMetadata->setIgnore(true),
+                        $annotation instanceof Context => $this->setAttributeContextsForGroups($annotation, $attributeMetadata),
                     };
                 }
             }

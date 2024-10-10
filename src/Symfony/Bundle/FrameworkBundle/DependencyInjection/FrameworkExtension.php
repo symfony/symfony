@@ -2839,6 +2839,7 @@ class FrameworkExtension extends Extension
             NotifierBridge\JoliNotif\JoliNotifTransportFactory::class => 'notifier.transport_factory.joli-notif',
             NotifierBridge\KazInfoTeh\KazInfoTehTransportFactory::class => 'notifier.transport_factory.kaz-info-teh',
             NotifierBridge\LightSms\LightSmsTransportFactory::class => 'notifier.transport_factory.light-sms',
+            NotifierBridge\LineBot\LineBotTransportFactory::class => 'notifier.transport_factory.line-bot',
             NotifierBridge\LineNotify\LineNotifyTransportFactory::class => 'notifier.transport_factory.line-notify',
             NotifierBridge\LinkedIn\LinkedInTransportFactory::class => 'notifier.transport_factory.linked-in',
             NotifierBridge\Lox24\Lox24TransportFactory::class => 'notifier.transport_factory.lox24',

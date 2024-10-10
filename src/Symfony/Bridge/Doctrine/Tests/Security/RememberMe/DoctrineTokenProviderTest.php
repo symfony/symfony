@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Security\RememberMe;
+namespace Symfony\Bridge\Doctrine\Tests\Security\RememberMe;
 
 use Doctrine\DBAL\Configuration;
 use Doctrine\DBAL\DriverManager;
@@ -121,7 +121,7 @@ class DoctrineTokenProviderTest extends TestCase
     /**
      * @return DoctrineTokenProvider
      */
-    private function bootstrapProvider()
+    protected function bootstrapProvider()
     {
         $config = class_exists(ORMSetup::class) ? ORMSetup::createConfiguration(true) : new Configuration();
         if (class_exists(DefaultSchemaManagerFactory::class)) {

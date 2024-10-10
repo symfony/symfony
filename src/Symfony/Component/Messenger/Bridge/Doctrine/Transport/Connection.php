@@ -454,7 +454,7 @@ class Connection implements ResetInterface
                     throw new TransportException('no id was returned by PostgreSQL from RETURNING clause.');
                 }
             } elseif ($this->driverConnection->getDatabasePlatform() instanceof OraclePlatform) {
-                $sequenceName = 'seq_'.$this->configuration['table_name'];
+                $sequenceName = $this->configuration['table_name'].'_seq';
 
                 $this->driverConnection->executeStatement($sql, $parameters, $types);
 

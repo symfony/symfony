@@ -85,7 +85,7 @@ trait CommonResponseTrait
         }
 
         try {
-            $content = json_decode($content, true, 512, \JSON_BIGINT_AS_STRING | \JSON_THROW_ON_ERROR);
+            $content = json_decode($content, true, 512, \JSON_BIGINT_AS_STRING | \JSON_THROW_ON_ERROR | \JSON_INVALID_UTF8_IGNORE | \JSON_INVALID_UTF8_SUBSTITUTE);
         } catch (\JsonException $e) {
             throw new JsonException($e->getMessage().\sprintf(' for "%s".', $this->getInfo('url')), $e->getCode());
         }

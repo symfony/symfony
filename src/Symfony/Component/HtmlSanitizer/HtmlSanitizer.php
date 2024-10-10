@@ -25,15 +25,14 @@ final class HtmlSanitizer implements HtmlSanitizerInterface
     private ParserInterface $parser;
 
     /**
-     * @var array<string, DomVisitor>
+     * @var ?DomVisitor
      */
-    private array $domVisitors = [];
+    private ?DomVisitor $domVisitor = null;
 
     public function __construct(
         private HtmlSanitizerConfig $config,
         ?ParserInterface $parser = null,
     ) {
-        $this->config = $config;
         $this->parser = $parser ?? new MastermindsParser();
     }
 
@@ -58,7 +57,7 @@ final class HtmlSanitizer implements HtmlSanitizerInterface
         }
 
         // Other context: build a DOM visitor
-        $this->domVisitors[$context] ??= $this->createDomVisitorForContext($context);
+        $this->domVisitor ??= $this->createDomVisitor();
 
         // Prevent DOS attack induced by extremely long HTML strings
         if (-1 !== $this->config->getMaxInputLength() && \strlen($input) > $this->config->getMaxInputLength()) {
@@ -80,7 +79,9 @@ final class HtmlSanitizer implements HtmlSanitizerInterface
         }
 
         // Visit the DOM tree and render the sanitized nodes
-        return $this->domVisitors[$context]->visit($parsed)?->render() ?? '';
+        $sanitized = $this->domVisitor->visit($context, $parsed)?->render() ?? '';
+
+        return W3CReference::CONTEXT_DOCUMENT === $context ? '<!DOCTYPE html>'.$sanitized : $sanitized;
     }
 
     private function isValidUtf8(string $html): bool
@@ -89,50 +90,20 @@ final class HtmlSanitizer implements HtmlSanitizerInterface
         return '' === $html || preg_match('//u', $html);
     }
 
-    private function createDomVisitorForContext(string $context): DomVisitor
+    private function createDomVisitor(): DomVisitor
     {
         $elementsConfig = [];
 
-        // Head: only a few elements are allowed
-        if (W3CReference::CONTEXT_HEAD === $context) {
-            foreach ($this->config->getAllowedElements() as $allowedElement => $allowedAttributes) {
-                if (\array_key_exists($allowedElement, W3CReference::HEAD_ELEMENTS)) {
-                    $elementsConfig[$allowedElement] = $allowedAttributes;
-                }
-            }
-
-            foreach ($this->config->getBlockedElements() as $blockedElement => $v) {
-                if (\array_key_exists($blockedElement, W3CReference::HEAD_ELEMENTS)) {
-                    $elementsConfig[$blockedElement] = HtmlSanitizerAction::Block;
-                }
-            }
-
-            foreach ($this->config->getDroppedElements() as $droppedElement => $v) {
-                if (\array_key_exists($droppedElement, W3CReference::HEAD_ELEMENTS)) {
-                    $elementsConfig[$droppedElement] = HtmlSanitizerAction::Drop;
-                }
-            }
-
-            return new DomVisitor($this->config, $elementsConfig);
-        }
-
-        // Body: allow any configured element that isn't in <head>
         foreach ($this->config->getAllowedElements() as $allowedElement => $allowedAttributes) {
-            if (!\array_key_exists($allowedElement, W3CReference::HEAD_ELEMENTS)) {
-                $elementsConfig[$allowedElement] = $allowedAttributes;
-            }
+            $elementsConfig[$allowedElement] = $allowedAttributes;
         }
 
         foreach ($this->config->getBlockedElements() as $blockedElement => $v) {
-            if (!\array_key_exists($blockedElement, W3CReference::HEAD_ELEMENTS)) {
-                $elementsConfig[$blockedElement] = HtmlSanitizerAction::Block;
-            }
+            $elementsConfig[$blockedElement] = HtmlSanitizerAction::Block;
         }
 
         foreach ($this->config->getDroppedElements() as $droppedElement => $v) {
-            if (!\array_key_exists($droppedElement, W3CReference::HEAD_ELEMENTS)) {
-                $elementsConfig[$droppedElement] = HtmlSanitizerAction::Drop;
-            }
+            $elementsConfig[$droppedElement] = HtmlSanitizerAction::Drop;
         }
 
         return new DomVisitor($this->config, $elementsConfig);

@@ -32,6 +32,32 @@ class HtmlSanitizerAllTest extends TestCase
     }
 
     /**
+     * @dataProvider provideSanitizeDocument
+     */
+    public function testSanitizeDocument(string $input, string $expected)
+    {
+        $this->assertSame($expected, $this->createSanitizer()->sanitizeFor('document', $input));
+    }
+
+    public static function provideSanitizeDocument()
+    {
+        $heads = iterator_to_array(self::provideSanitizeHead());
+        $bodies = iterator_to_array(self::provideSanitizeBody());
+
+        $cases = [];
+        foreach ($heads as $head) {
+            foreach ($bodies as $body) {
+                $cases[] = [
+                    '<!DOCTYPE html><html><head>'.$head[0].'</head><body>'.$body[0].'</body></html>',
+                    '<!DOCTYPE html><html><head>'.$head[1].'</head><body>'.$body[1].'</body></html>',
+                ];
+            }
+        }
+
+        return $cases;
+    }
+
+    /**
      * @dataProvider provideSanitizeHead
      */
     public function testSanitizeHead(string $input, string $expected)

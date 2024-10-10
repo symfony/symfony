@@ -85,6 +85,31 @@ final class WhenValidatorTest extends ConstraintValidatorTestCase
         ]));
     }
 
+    public function testConstraintsAreExecutedWithNestedObject()
+    {
+        $parent = new \stdClass();
+        $parent->child = new \stdClass();
+        $parent->ok = true;
+
+        $number = new \stdClass();
+        $number->value = 1;
+
+        $this->setObject($parent);
+        $this->setPropertyPath('child.value');
+        $this->setRoot($parent);
+
+        $constraints = [
+            new PositiveOrZero(),
+        ];
+
+        $this->expectValidateValue(0, $number->value, $constraints);
+
+        $this->validator->validate($number->value, new When([
+            'expression' => 'context.getRoot().ok === true',
+            'constraints' => $constraints,
+        ]));
+    }
+
     public function testConstraintsAreExecutedWithValue()
     {
         $constraints = [

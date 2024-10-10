@@ -12,6 +12,7 @@ CHANGELOG
  * Add the `WordCount` constraint
  * Add the `Week` constraint
  * Add `CompoundConstraintTestCase` to ease testing Compound Constraints
+ * Add context variable to `WhenValidator`
 
 7.1
 ---

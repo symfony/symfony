@@ -8,6 +8,7 @@ CHANGELOG
  * Deprecate argument `$secret` of `RememberMeAuthenticator`
  * Deprecate passing an empty string as `$userIdentifier` argument to `UserBadge` constructor
  * Allow passing passport attributes to the `UserAuthenticatorInterface::authenticateUser()` method
+ * Add `$hideAccountStatusExceptions` argument to `AuthenticatorManager` constructor
 
 7.1
 ---

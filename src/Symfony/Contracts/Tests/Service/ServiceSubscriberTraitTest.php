@@ -56,6 +56,8 @@ class ServiceSubscriberTraitTest extends TestCase
         };
         $service = new class() extends ParentWithMagicCall {
             use ServiceSubscriberTrait;
+
+            private $container;
         };
 
         $this->assertNull($service->setContainer($container));
@@ -69,6 +71,8 @@ class ServiceSubscriberTraitTest extends TestCase
         };
         $service = new class() {
             use ServiceSubscriberTrait;
+
+            private $container;
         };
 
         $this->assertNull($service->setContainer($container));

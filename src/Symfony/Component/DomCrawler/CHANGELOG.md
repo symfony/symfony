@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+7.2
+---
+
+ * Add `NativeCrawler\*` classes to parse HTML and XML with native PHP parser
+
 7.0
 ---
 

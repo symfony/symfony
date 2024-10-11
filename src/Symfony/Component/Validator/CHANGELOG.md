@@ -13,6 +13,7 @@ CHANGELOG
  * Add the `Week` constraint
  * Add `CompoundConstraintTestCase` to ease testing Compound Constraints
  * Add context variable to `WhenValidator`
+ * Add the `Slug` constraint
 
 7.1
 ---

@@ -11,6 +11,9 @@
 
 namespace Symfony\Component\FeatureFlag\Exception;
 
+/**
+ * @experimental
+ */
 interface ExceptionInterface extends \Throwable
 {
 }

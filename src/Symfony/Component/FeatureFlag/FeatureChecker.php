@@ -13,6 +13,9 @@ namespace Symfony\Component\FeatureFlag;
 
 use Symfony\Component\FeatureFlag\Provider\ProviderInterface;
 
+/**
+ * @experimental
+ */
 final class FeatureChecker implements FeatureCheckerInterface
 {
     private array $cache = [];

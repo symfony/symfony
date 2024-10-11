@@ -11,6 +11,9 @@
 
 namespace Symfony\Component\FeatureFlag\Provider;
 
+/**
+ * @experimental
+ */
 interface ProviderInterface
 {
     public function has(string $featureName): bool;

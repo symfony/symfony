@@ -2,7 +2,7 @@
     "name": "symfony/feature-flag",
     "type": "library",
     "description": "Provides a feature flag mechanism",
-    "keywords": ["feature", "flag", "flags", "toggle"],
+    "keywords": ["feature", "flag", "flags", "toggle", "ab test", "rollout", "canary", "blue green", "kill switch"],
     "homepage": "https://symfony.com",
     "license": "MIT",
     "authors": [

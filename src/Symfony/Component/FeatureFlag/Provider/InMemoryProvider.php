@@ -13,6 +13,9 @@ namespace Symfony\Component\FeatureFlag\Provider;
 
 use Symfony\Component\FeatureFlag\ArgumentResolver\ArgumentResolver;
 
+/**
+ * @experimental
+ */
 final class InMemoryProvider implements ProviderInterface
 {
     /**

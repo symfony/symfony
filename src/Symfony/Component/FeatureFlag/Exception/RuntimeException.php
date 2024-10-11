@@ -11,6 +11,9 @@
 
 namespace Symfony\Component\FeatureFlag\Exception;
 
+/**
+ * @experimental
+ */
 class RuntimeException extends \RuntimeException implements ExceptionInterface
 {
 }

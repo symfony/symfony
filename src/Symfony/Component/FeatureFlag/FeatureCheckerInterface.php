@@ -11,6 +11,9 @@
 
 namespace Symfony\Component\FeatureFlag;
 
+/**
+ * @experimental
+ */
 interface FeatureCheckerInterface
 {
     /**

@@ -13,6 +13,9 @@ namespace Symfony\Component\FeatureFlag\Debug;
 
 use Symfony\Component\FeatureFlag\FeatureCheckerInterface;
 
+/**
+ * @experimental
+ */
 final class TraceableFeatureChecker implements FeatureCheckerInterface
 {
     /** @var array<string, list<array{expectedValue: mixed, isEnabled: bool, calls: int}>> */

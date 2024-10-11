@@ -19,6 +19,9 @@ use Symfony\Component\HttpKernel\DataCollector\DataCollector;
 use Symfony\Component\HttpKernel\DataCollector\LateDataCollectorInterface;
 use Symfony\Component\VarDumper\Cloner\Data;
 
+/**
+ * @experimental
+ */
 final class FeatureFlagDataCollector extends DataCollector implements LateDataCollectorInterface
 {
     public function __construct(

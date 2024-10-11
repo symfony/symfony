@@ -13,6 +13,8 @@ namespace Symfony\Component\FeatureFlag\Attribute;
 
 /**
  * Service tag to autoconfigure feature flags.
+ *
+ * @experimental
  */
 #[\Attribute(\Attribute::TARGET_CLASS | \Attribute::TARGET_METHOD | \Attribute::IS_REPEATABLE)]
 class AsFeature

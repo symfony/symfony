@@ -33,6 +33,8 @@ class LegacyTestService extends LegacyParentTestService implements ServiceSubscr
 {
     use ServiceSubscriberTrait;
 
+    protected $container;
+
     #[SubscribedService]
     public function aService(): Service2
     {

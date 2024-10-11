@@ -6,6 +6,7 @@ CHANGELOG
 
  * Add `TruncateMode` enum to handle more truncate methods
  * Add the `AbstractString::kebab()` method
+ * Add the `AbstractString::pascal()` method
 
 7.1
 ---

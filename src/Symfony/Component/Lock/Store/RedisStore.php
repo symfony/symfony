@@ -266,13 +266,7 @@ class RedisStore implements SharedLockStoreInterface
             if (null !== ($err = $client->getLastError()) && self::NO_SCRIPT_ERROR_MESSAGE === $err) {
                 $client->clearLastError();
 
-                if ($this->redis instanceof \RedisCluster) {
-                    foreach ($this->redis->_masters() as $master) {
-                        $this->redis->script($master, 'LOAD', $script);
-                    }
-                } else {
-                    $this->redis->script('LOAD', $script);
-                }
+                $client->script('LOAD', $script);
 
                 if (null !== ($err = $client->getLastError())) {
                     throw new LockStorageException($err);
@@ -291,7 +285,7 @@ class RedisStore implements SharedLockStoreInterface
         \assert($this->redis instanceof \Predis\ClientInterface);
 
         try {
-            return $this->redis->evalSha(...array_merge([$scriptSha, 1, $resource], $args));
+            return $this->redis->evalSha($scriptSha, 1, $resource, ...$args);
         } catch (ServerException $e) {
             // Fallthrough only if we need to load the script
             if (self::NO_SCRIPT_ERROR_MESSAGE !== $e->getMessage()) {
@@ -306,7 +300,7 @@ class RedisStore implements SharedLockStoreInterface
         }
 
         try {
-            return $this->redis->evalSha(...array_merge([$scriptSha, 1, $resource], $args));
+            return $this->redis->evalSha($scriptSha, 1, $resource, ...$args);
         } catch (ServerException $e) {
             throw new LockStorageException($e->getMessage(), $e->getCode(), $e);
         }

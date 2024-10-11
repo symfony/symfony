@@ -70,7 +70,30 @@ final class FakeSmsEmailTransportTest extends TransportTestCase
         $this->assertInstanceOf(Email::class, $sentEmail);
         $this->assertSame($to, $sentEmail->getTo()[0]->getEncodedAddress());
         $this->assertSame($from, $sentEmail->getFrom()[0]->getEncodedAddress());
-        $this->assertSame(sprintf('New SMS on phone number: %s', $phone), $sentEmail->getSubject());
+        $this->assertSame(\sprintf('New SMS to phone number %s', $phone), $sentEmail->getSubject());
+        $this->assertSame($subject, $sentEmail->getTextBody());
+        $this->assertFalse($sentEmail->getHeaders()->has('X-Transport'));
+    }
+
+    public function testSendWithFrom()
+    {
+        $transportName = null;
+
+        $message = new SmsMessage($phone = '0611223344', $subject = 'Hello!', $fromPhone = '0655667788');
+
+        $mailer = new DummyMailer();
+
+        $transport = (new FakeSmsEmailTransport($mailer, $to = 'recipient@email.net', $from = 'sender@email.net'));
+        $transport->setHost($transportName);
+
+        $transport->send($message);
+
+        /** @var Email $sentEmail */
+        $sentEmail = $mailer->getSentEmail();
+        $this->assertInstanceOf(Email::class, $sentEmail);
+        $this->assertSame($to, $sentEmail->getTo()[0]->getEncodedAddress());
+        $this->assertSame($from, $sentEmail->getFrom()[0]->getEncodedAddress());
+        $this->assertSame(\sprintf('New SMS to phone number %s from %s', $phone, $fromPhone), $sentEmail->getSubject());
         $this->assertSame($subject, $sentEmail->getTextBody());
         $this->assertFalse($sentEmail->getHeaders()->has('X-Transport'));
     }
@@ -93,7 +116,7 @@ final class FakeSmsEmailTransportTest extends TransportTestCase
         $this->assertInstanceOf(Email::class, $sentEmail);
         $this->assertSame($to, $sentEmail->getTo()[0]->getEncodedAddress());
         $this->assertSame($from, $sentEmail->getFrom()[0]->getEncodedAddress());
-        $this->assertSame(sprintf('New SMS on phone number: %s', $phone), $sentEmail->getSubject());
+        $this->assertSame(\sprintf('New SMS to phone number %s', $phone), $sentEmail->getSubject());
         $this->assertSame($subject, $sentEmail->getTextBody());
         $this->assertTrue($sentEmail->getHeaders()->has('X-Transport'));
         $this->assertSame($transportName, $sentEmail->getHeaders()->get('X-Transport')->getBody());

@@ -34,7 +34,7 @@
             <directory>./src/Symfony/Component/*/Tests/</directory>
             <directory>./src/Symfony/Component/*/*/Tests/</directory>
             <directory>./src/Symfony/Component/*/*/*/Tests/</directory>
-            <directory>./src/Symfony/Contract/*/Tests/</directory>
+            <directory>./src/Symfony/Contracts/*/Tests/</directory>
             <directory>./src/Symfony/Bundle/*/Tests/</directory>
         </testsuite>
     </testsuites>
@@ -63,7 +63,7 @@
             <directory>./src/Symfony/Bundle/*/vendor</directory>
             <directory>./src/Symfony/Component/*/vendor</directory>
             <directory>./src/Symfony/Component/*/*/vendor</directory>
-            <directory>./src/Symfony/Contract/*/vendor</directory>
+            <directory>./src/Symfony/Contracts/*/vendor</directory>
         </exclude>
     </coverage>
 

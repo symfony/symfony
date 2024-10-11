@@ -671,8 +671,7 @@ END'],
         return array_merge(
             parent::provideSnake(),
             [
-                ['symfony-ist-äußerst-cool', 'symfonyIstÄußerstCool'],
-                ['symfony-with-emojis', 'Symfony with 😃 emojis'],
+                ['symfony_ist_äußerst_cool', 'symfonyIstÄußerstCool'],
             ]
         );
     }

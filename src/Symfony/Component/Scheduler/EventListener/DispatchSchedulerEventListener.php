@@ -41,7 +41,7 @@ class DispatchSchedulerEventListener implements EventSubscriberInterface
             return;
         }
 
-        $result = $envelope->last(HandledStamp::class)->getResult();
+        $result = $envelope->last(HandledStamp::class)?->getResult();
 
         $this->eventDispatcher->dispatch(new PostRunEvent($this->scheduleProviderLocator->get($scheduledStamp->messageContext->name), $scheduledStamp->messageContext, $envelope->getMessage(), $result));
     }

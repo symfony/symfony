@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+7.2
+---
+
+* Introduce an --override option to specify whether to overwrite existing .env.local.php file
+
 7.1
 ---
 

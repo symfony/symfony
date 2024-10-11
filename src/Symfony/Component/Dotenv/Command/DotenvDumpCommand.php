@@ -76,7 +76,7 @@ EOT
 
         $override = $input->getOption('override');
 
-        if(!$override && \is_file($dotenvPath.'.local.php')) {
+        if (!$override && is_file($dotenvPath.'.local.php')) {
             $oldVars = require $dotenvPath.'.local.php';
             $vars = $oldVars + $vars;
         }

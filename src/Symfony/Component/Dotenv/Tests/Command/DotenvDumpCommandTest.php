@@ -83,7 +83,7 @@ EOF
         $this->assertSame([
             'TEST_EXISTING_VAR' => 'test',
             'COMPILED_FIRST' => 'this should not be overridden',
-            'APP_ENV' => 'test'
+            'APP_ENV' => 'test',
         ], $vars);
     }
 
@@ -101,7 +101,7 @@ EOF
         $this->assertSame([
             'APP_ENV' => 'test',
             'APP_SECRET' => 'abc123',
-            'COMPILED_FIRST' => 'test_override'
+            'COMPILED_FIRST' => 'test_override',
         ], $vars);
     }
 

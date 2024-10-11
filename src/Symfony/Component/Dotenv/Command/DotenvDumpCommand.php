@@ -73,6 +73,11 @@ EOT
             $env = $vars[$envKey];
         }
 
+        if(\is_file($dotenvPath.'.local.php')) {
+            $oldVars = require $dotenvPath.'.local.php';
+            $vars = $oldVars + $vars;
+        }
+
         $vars = var_export($vars, true);
         $vars = <<<EOF
 <?php
@@ -82,6 +87,7 @@ EOT
 return $vars;
 
 EOF;
+
         file_put_contents($dotenvPath.'.local.php', $vars, \LOCK_EX);
 
         $output->writeln(\sprintf('Successfully dumped .env files in <info>.env.local.php</> for the <info>%s</> environment.', $env));

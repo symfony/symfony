@@ -23,11 +23,22 @@ class DotenvDumpCommandTest extends TestCase
         file_put_contents(__DIR__.'/.env', <<<EOF
 APP_ENV=dev
 APP_SECRET=abc123
+COMPILED_FIRST=test_override
 EOF
         );
 
         file_put_contents(__DIR__.'/.env.local', <<<EOF
 APP_LOCAL=yes
+COMPILED_FIRST=test_override_local
+EOF
+        );
+
+        file_put_contents(__DIR__.'/.env.local.php', <<<EOF
+<?php
+return [
+    'TEST_EXISTING_VAR' => 'test',
+    'COMPILED_FIRST' => 'this should not be overridden',
+];
 EOF
         );
     }
@@ -51,6 +62,8 @@ EOF
 
         $vars = require __DIR__.'/.env.local.php';
         $this->assertSame([
+            'TEST_EXISTING_VAR' => 'test',
+            'COMPILED_FIRST' => 'this should not be overridden',
             'APP_ENV' => 'test',
             'APP_SECRET' => 'abc123',
         ], $vars);
@@ -67,7 +80,11 @@ EOF
         $this->assertFileExists(__DIR__.'/.env.local.php');
 
         $vars = require __DIR__.'/.env.local.php';
-        $this->assertSame(['APP_ENV' => 'test'], $vars);
+        $this->assertSame([
+            'TEST_EXISTING_VAR' => 'test',
+            'COMPILED_FIRST' => 'this should not be overridden',
+            'APP_ENV' => 'test'
+        ], $vars);
     }
 
     public function testExecuteTestEnvs()
@@ -86,6 +103,8 @@ EOF
 
         $vars = require __DIR__.'/.env.local.php';
         $this->assertSame([
+            'TEST_EXISTING_VAR' => 'test',
+            'COMPILED_FIRST' => 'this should not be overridden',
             'APP_ENV' => 'test',
             'APP_SECRET' => 'abc123',
             'APP_LOCAL' => 'yes',

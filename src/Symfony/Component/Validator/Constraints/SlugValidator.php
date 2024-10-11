@@ -37,7 +37,7 @@ class SlugValidator extends ConstraintValidator
 
         $value = (string) $value;
 
-        if(preg_match(Slug::SLUG_PATTERN, $value) === 0) {
+        if (0 === preg_match(Slug::SLUG_PATTERN, $value)) {
             $this->context->buildViolation($constraint->message)
                 ->setParameter('{{ value }}', $this->formatValue($value))
                 ->setCode(Slug::NOT_SLUG_ERROR)

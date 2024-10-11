@@ -30,7 +30,7 @@ class Slug extends Constraint
         ?array $options = null,
         ?string $message = null,
         ?array $groups = null,
-        mixed $payload = null
+        mixed $payload = null,
     ) {
         parent::__construct($options, $groups, $payload);
 

@@ -73,7 +73,7 @@ class RedisTraitTest extends TestCase
                 'Redis',
             ],
             [
-                'dsn' => sprintf('redis:?%s', implode('&', \array_slice($hosts, 0, 2))),
+                sprintf('redis:?%s', implode('&', \array_slice($hosts, 0, 2))),
                 'RedisArray',
             ],
         ];

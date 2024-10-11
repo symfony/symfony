@@ -1119,16 +1119,7 @@ abstract class AbstractAsciiTestCase extends TestCase
     }
 
     /**
-     * @testWith ["", ""]
-     *           ["XY", "x_y"]
-     *           ["XuYo", "xu_yo"]
-     *           ["SymfonyIsGreat", "symfony_is_great"]
-     *           ["Symfony5IsGreat", "symfony_5_is_great"]
-     *           ["SymfonyIsGreat", "Symfony is great"]
-     *           ["SYMFONYISGREAT", "SYMFONY_IS_GREAT"]
-     *           ["SymfonyIsAGreatFramework", "Symfony is a great framework"]
-     *           ["SymfonyIsGREAT", "*Symfony* is GREAT!!"]
-     *           ["SYMFONY", "SYMFONY"]
+     * @dataProvider providePascal
      */
     public function testPascal(string $expectedString, string $origin)
     {
@@ -1136,6 +1127,22 @@ abstract class AbstractAsciiTestCase extends TestCase
 
         $this->assertEquals(static::createFromString($expectedString), $instance);
         $this->assertNotSame($origin, $instance, 'Strings should be immutable');
+    }
+
+    public static function providePascal(): array
+    {
+        return [
+            ['', ''],
+            ['XY', 'x_y'],
+            ['XuYo', 'xu_yo'],
+            ['SymfonyIsGreat', 'symfony_is_great'],
+            ['Symfony5IsGreat', 'symfony_5_is_great'],
+            ['SymfonyIsGreat', 'Symfony is great'],
+            ['SYMFONYISGREAT', 'SYMFONY_IS_GREAT'],
+            ['SymfonyIsAGreatFramework', 'Symfony is a great framework'],
+            ['SymfonyIsGREAT', '*Symfony* is GREAT!!'],
+            ['SYMFONY', 'SYMFONY'],
+        ];
     }
 
     /**

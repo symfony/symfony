@@ -440,9 +440,7 @@ abstract class AbstractString implements \Stringable, \JsonSerializable
 
     public function pascal(): static
     {
-        $this->string = ucfirst($this->camel());
-
-        return $this;
+        return $this->camel()->title();
     }
 
     abstract public function splice(string $replacement, int $start = 0, ?int $length = null): static;

@@ -18,7 +18,8 @@ use Symfony\Component\Config\Definition\StringNode;
 class StringNodeTest extends TestCase
 {
     /**
-     * @dataProvider getValidValues
+     * @testWith [""]
+     *           ["valid string"]
      */
     public function testNormalize(string $value)
     {
@@ -26,16 +27,16 @@ class StringNodeTest extends TestCase
         $this->assertSame($value, $node->normalize($value));
     }
 
-    public static function getValidValues(): array
-    {
-        return [
-            [''],
-            ['valid string'],
-        ];
-    }
-
     /**
-     * @dataProvider getInvalidValues
+     * @testWith [null]
+     *           [false]
+     *           [true]
+     *           [0]
+     *           [1]
+     *           [0.0]
+     *           [0.1]
+     *           [{}]
+     *           [{"foo": "bar"}]
      */
     public function testNormalizeThrowsExceptionOnInvalidValues($value)
     {
@@ -44,21 +45,5 @@ class StringNodeTest extends TestCase
         $this->expectException(InvalidTypeException::class);
 
         $node->normalize($value);
-    }
-
-    public static function getInvalidValues(): array
-    {
-        return [
-            [null],
-            [false],
-            [true],
-            [0],
-            [1],
-            [0.0],
-            [0.1],
-            [[]],
-            [['foo' => 'bar']],
-            [new \stdClass()],
-        ];
     }
 }

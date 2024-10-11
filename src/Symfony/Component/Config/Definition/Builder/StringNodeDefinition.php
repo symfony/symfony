@@ -27,9 +27,6 @@ class StringNodeDefinition extends ScalarNodeDefinition
         $this->nullEquivalent = '';
     }
 
-    /**
-     * Instantiate a Node.
-     */
     protected function instantiateNode(): StringNode
     {
         return new StringNode($this->name, $this->parent, $this->pathSeparator);

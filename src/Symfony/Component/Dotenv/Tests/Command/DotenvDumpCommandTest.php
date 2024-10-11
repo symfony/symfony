@@ -87,6 +87,24 @@ EOF
         ], $vars);
     }
 
+    public function testExecuteOverride()
+    {
+        $command = $this->createCommand();
+        $command->execute([
+            'env' => 'test',
+            '--override' => true,
+        ]);
+
+        $this->assertFileExists(__DIR__.'/.env.local.php');
+
+        $vars = require __DIR__.'/.env.local.php';
+        $this->assertSame([
+            'APP_ENV' => 'test',
+            'APP_SECRET' => 'abc123',
+            'COMPILED_FIRST' => 'test_override'
+        ], $vars);
+    }
+
     public function testExecuteTestEnvs()
     {
         file_put_contents(__DIR__.'/composer.json', <<<EOF

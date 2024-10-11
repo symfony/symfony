@@ -826,9 +826,9 @@ class RequestTest extends TestCase
             // PHP also does not include them when building _GET.
             ['foo=bar&=a=b&=x=y', 'foo=bar', 'removes params with empty key'],
 
-            // Don't reorder nested query string keys
+            // Provide predictable ordering of nested query string keys.
             ['foo[]=Z&foo[]=A', 'foo%5B0%5D=Z&foo%5B1%5D=A', 'keeps order of values'],
-            ['foo[Z]=B&foo[A]=B', 'foo%5BZ%5D=B&foo%5BA%5D=B', 'keeps order of keys'],
+            ['foo[Z]=A&foo[A]=B', 'foo%5BA%5D=B&foo%5BZ%5D=A', 'nested keys are reordered but values are maintained'],
 
             ['utf8=✓', 'utf8=%E2%9C%93', 'encodes UTF-8'],
         ];

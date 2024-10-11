@@ -14,28 +14,28 @@ namespace Symfony\Component\Form\Tests\Extension\Core\EventListener;
 use Doctrine\Common\Collections\ArrayCollection;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Symfony\Component\Form\Extension\Core\DataMapper\DataMapper;
 use Symfony\Component\Form\Extension\Core\EventListener\ResizeFormListener;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilder;
+use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormFactoryBuilder;
 use Symfony\Component\Form\FormFactoryInterface;
-use Symfony\Component\Form\FormInterface;
 
 class ResizeFormListenerTest extends TestCase
 {
     private FormFactoryInterface $factory;
-    private FormInterface $form;
+    private FormBuilderInterface $builder;
 
     protected function setUp(): void
     {
         $this->factory = (new FormFactoryBuilder())->getFormFactory();
-        $this->form = $this->getBuilder()
+        $this->builder = $this->getBuilder()
             ->setCompound(true)
-            ->setDataMapper(new DataMapper())
-            ->getForm();
+            ->setDataMapper(new DataMapper());
     }
 
     protected function getBuilder($name = 'name')
@@ -43,142 +43,221 @@ class ResizeFormListenerTest extends TestCase
         return new FormBuilder($name, null, new EventDispatcher(), $this->factory);
     }
 
-    protected function getForm($name = 'name')
-    {
-        return $this->getBuilder($name)->getForm();
-    }
-
+    /**
+     * @group legacy
+     */
     public function testPreSetDataResizesForm()
     {
-        $this->form->add($this->getForm('0'));
-        $this->form->add($this->getForm('1'));
+        $this->builder->add($this->getBuilder('0'));
+        $this->builder->add($this->getBuilder('1'));
+        $this->builder->addEventSubscriber(new class(TextType::class, ['attr' => ['maxlength' => 10]], false, false) extends ResizeFormListener {
+            public function preSetData(FormEvent $event): void
+            {
+                parent::preSetData($event);
+            }
+        });
 
-        $data = [1 => 'string', 2 => 'string'];
-        $event = new FormEvent($this->form, $data);
-        $listener = new ResizeFormListener(TextType::class, ['attr' => ['maxlength' => 10]], false, false);
-        $listener->preSetData($event);
+        $form = $this->builder->getForm();
 
-        $this->assertFalse($this->form->has('0'));
-        $this->assertTrue($this->form->has('1'));
-        $this->assertTrue($this->form->has('2'));
+        $this->assertTrue($form->has('0'));
+
+        // initialize the form
+        $form->setData([1 => 'string', 2 => 'string']);
+
+        $this->assertFalse($form->has('0'));
+        $this->assertTrue($form->has('1'));
+        $this->assertTrue($form->has('2'));
+
+        $this->assertSame('string', $form->get('1')->getData());
+        $this->assertSame('string', $form->get('2')->getData());
     }
 
+    public function testPostSetDataResizesForm()
+    {
+        $this->builder->add($this->getBuilder('0'));
+        $this->builder->add($this->getBuilder('1'));
+        $this->builder->addEventSubscriber(new ResizeFormListener(TextType::class, ['attr' => ['maxlength' => 10]], false, false));
+
+        $form = $this->builder->getForm();
+
+        $this->assertTrue($form->has('0'));
+
+        // initialize the form
+        $form->setData([1 => 'string', 2 => 'string']);
+
+        $this->assertFalse($form->has('0'));
+        $this->assertTrue($form->has('1'));
+        $this->assertTrue($form->has('2'));
+
+        $this->assertSame('string', $form->get('1')->getData());
+        $this->assertSame('string', $form->get('2')->getData());
+    }
+
+    /**
+     * @group legacy
+     */
     public function testPreSetDataRequiresArrayOrTraversable()
     {
         $this->expectException(UnexpectedTypeException::class);
         $data = 'no array or traversable';
-        $event = new FormEvent($this->form, $data);
-        $listener = new ResizeFormListener('text', [], false, false);
+        $event = new FormEvent($this->builder->getForm(), $data);
+        $listener = new class(TextType::class, [], false, false) extends ResizeFormListener {
+            public function preSetData(FormEvent $event): void
+            {
+                parent::preSetData($event);
+            }
+        };
         $listener->preSetData($event);
     }
 
+    public function testPostSetDataRequiresArrayOrTraversable()
+    {
+        $this->expectException(UnexpectedTypeException::class);
+        $data = 'no array or traversable';
+        $event = new FormEvent($this->builder->getForm(), $data);
+        $listener = new ResizeFormListener(TextType::class, [], false, false);
+        $listener->postSetData($event);
+    }
+
+    /**
+     * @group legacy
+     */
     public function testPreSetDataDealsWithNullData()
     {
         $data = null;
-        $event = new FormEvent($this->form, $data);
-        $listener = new ResizeFormListener(TextType::class, [], false, false);
+        $event = new FormEvent($this->builder->getForm(), $data);
+        $listener = new class(TextType::class, [], false, false) extends ResizeFormListener {
+            public function preSetData(FormEvent $event): void
+            {
+                parent::preSetData($event);
+            }
+        };
         $listener->preSetData($event);
 
-        $this->assertSame(0, $this->form->count());
+        $this->assertSame(0, $this->builder->count());
+    }
+
+    public function testPostSetDataDealsWithNullData()
+    {
+        $data = null;
+        $event = new FormEvent($this->builder->getForm(), $data);
+        $listener = new ResizeFormListener(TextType::class, [], false, false);
+        $listener->postSetData($event);
+
+        $this->assertSame(0, $this->builder->count());
     }
 
     public function testPreSubmitResizesUpIfAllowAdd()
     {
-        $this->form->add($this->getForm('0'));
+        $this->builder->add($this->getBuilder('0'));
+        $this->builder->addEventSubscriber(new ResizeFormListener(TextType::class, ['attr' => ['maxlength' => 10]], true, false));
 
-        $data = [0 => 'string', 1 => 'string'];
-        $event = new FormEvent($this->form, $data);
-        $listener = new ResizeFormListener(TextType::class, ['attr' => ['maxlength' => 10]], true, false);
-        $listener->preSubmit($event);
+        $form = $this->builder->getForm();
 
-        $this->assertTrue($this->form->has('0'));
-        $this->assertTrue($this->form->has('1'));
+        $this->assertTrue($form->has('0'));
+        $this->assertFalse($form->has('1'));
+
+        $form->submit([0 => 'string', 1 => 'string']);
+
+        $this->assertTrue($form->has('0'));
+        $this->assertTrue($form->has('1'));
     }
 
     public function testPreSubmitResizesDownIfAllowDelete()
     {
-        $this->form->add($this->getForm('0'));
-        $this->form->add($this->getForm('1'));
+        $this->builder->add($this->getBuilder('0'));
+        $this->builder->add($this->getBuilder('1'));
+        $this->builder->addEventSubscriber(new ResizeFormListener(TextType::class, [], false, true));
 
-        $data = [0 => 'string'];
-        $event = new FormEvent($this->form, $data);
-        $listener = new ResizeFormListener('text', [], false, true);
-        $listener->preSubmit($event);
+        $form = $this->builder->getForm();
+        // initialize the form
+        $form->setData([0 => 'string', 1 => 'string']);
 
-        $this->assertTrue($this->form->has('0'));
-        $this->assertFalse($this->form->has('1'));
+        $this->assertTrue($form->has('0'));
+        $this->assertTrue($form->has('1'));
+
+        $form->submit([0 => 'string']);
+
+        $this->assertTrue($form->has('0'));
+        $this->assertFalse($form->has('1'));
     }
 
     // fix for https://github.com/symfony/symfony/pull/493
     public function testPreSubmitRemovesZeroKeys()
     {
-        $this->form->add($this->getForm('0'));
+        $this->builder->add($this->getBuilder('0'));
 
         $data = [];
-        $event = new FormEvent($this->form, $data);
-        $listener = new ResizeFormListener('text', [], false, true);
+        $form = $this->builder->getForm();
+        $event = new FormEvent($form, $data);
+        $listener = new ResizeFormListener(TextType::class, [], false, true);
         $listener->preSubmit($event);
 
-        $this->assertFalse($this->form->has('0'));
+        $this->assertFalse($form->has('0'));
     }
 
     public function testPreSubmitDoesNothingIfNotAllowAddNorAllowDelete()
     {
-        $this->form->add($this->getForm('0'));
-        $this->form->add($this->getForm('1'));
+        $this->builder->add($this->getBuilder('0'));
+        $this->builder->add($this->getBuilder('1'));
 
         $data = [0 => 'string', 2 => 'string'];
-        $event = new FormEvent($this->form, $data);
-        $listener = new ResizeFormListener('text', [], false, false);
+        $form = $this->builder->getForm();
+        $event = new FormEvent($form, $data);
+        $listener = new ResizeFormListener(TextType::class, [], false, false);
         $listener->preSubmit($event);
 
-        $this->assertTrue($this->form->has('0'));
-        $this->assertTrue($this->form->has('1'));
-        $this->assertFalse($this->form->has('2'));
+        $this->assertTrue($form->has('0'));
+        $this->assertTrue($form->has('1'));
+        $this->assertFalse($form->has('2'));
     }
 
     public function testPreSubmitDealsWithNoArrayOrTraversable()
     {
         $data = 'no array or traversable';
-        $event = new FormEvent($this->form, $data);
-        $listener = new ResizeFormListener('text', [], false, false);
+        $form = $this->builder->getForm();
+        $event = new FormEvent($form, $data);
+        $listener = new ResizeFormListener(TextType::class, [], false, false);
         $listener->preSubmit($event);
 
-        $this->assertFalse($this->form->has('1'));
+        $this->assertFalse($form->has('1'));
     }
 
     public function testPreSubmitDealsWithNullData()
     {
-        $this->form->add($this->getForm('1'));
+        $this->builder->add($this->getBuilder('1'));
 
         $data = null;
-        $event = new FormEvent($this->form, $data);
-        $listener = new ResizeFormListener('text', [], false, true);
+        $form = $this->builder->getForm();
+        $event = new FormEvent($form, $data);
+        $listener = new ResizeFormListener(TextType::class, [], false, true);
         $listener->preSubmit($event);
 
-        $this->assertFalse($this->form->has('1'));
+        $this->assertFalse($form->has('1'));
     }
 
     // fixes https://github.com/symfony/symfony/pull/40
     public function testPreSubmitDealsWithEmptyData()
     {
-        $this->form->add($this->getForm('1'));
+        $this->builder->add($this->getBuilder('1'));
 
         $data = '';
-        $event = new FormEvent($this->form, $data);
-        $listener = new ResizeFormListener('text', [], false, true);
+        $form = $this->builder->getForm();
+        $event = new FormEvent($form, $data);
+        $listener = new ResizeFormListener(TextType::class, [], false, true);
         $listener->preSubmit($event);
 
-        $this->assertFalse($this->form->has('1'));
+        $this->assertFalse($form->has('1'));
     }
 
     public function testOnSubmitNormDataRemovesEntriesMissingInTheFormIfAllowDelete()
     {
-        $this->form->add($this->getForm('1'));
+        $this->builder->add($this->getBuilder('1'));
 
         $data = [0 => 'first', 1 => 'second', 2 => 'third'];
-        $event = new FormEvent($this->form, $data);
-        $listener = new ResizeFormListener('text', [], false, true);
+        $form = $this->builder->getForm();
+        $event = new FormEvent($form, $data);
+        $listener = new ResizeFormListener(TextType::class, [], false, true);
         $listener->onSubmit($event);
 
         $this->assertEquals([1 => 'second'], $event->getData());
@@ -186,11 +265,12 @@ class ResizeFormListenerTest extends TestCase
 
     public function testOnSubmitNormDataDoesNothingIfNotAllowDelete()
     {
-        $this->form->add($this->getForm('1'));
+        $this->builder->add($this->getBuilder('1'));
 
         $data = [0 => 'first', 1 => 'second', 2 => 'third'];
-        $event = new FormEvent($this->form, $data);
-        $listener = new ResizeFormListener('text', [], false, false);
+        $form = $this->builder->getForm();
+        $event = new FormEvent($form, $data);
+        $listener = new ResizeFormListener(TextType::class, [], false, false);
         $listener->onSubmit($event);
 
         $this->assertEquals($data, $event->getData());
@@ -200,18 +280,18 @@ class ResizeFormListenerTest extends TestCase
     {
         $this->expectException(UnexpectedTypeException::class);
         $data = 'no array or traversable';
-        $event = new FormEvent($this->form, $data);
-        $listener = new ResizeFormListener('text', [], false, false);
+        $event = new FormEvent($this->builder->getForm(), $data);
+        $listener = new ResizeFormListener(TextType::class, [], false, false);
         $listener->onSubmit($event);
     }
 
     public function testOnSubmitNormDataDealsWithNullData()
     {
-        $this->form->add($this->getForm('1'));
+        $this->builder->add($this->getBuilder('1'));
 
         $data = null;
-        $event = new FormEvent($this->form, $data);
-        $listener = new ResizeFormListener('text', [], false, true);
+        $event = new FormEvent($this->builder->getForm(), $data);
+        $listener = new ResizeFormListener(TextType::class, [], false, true);
         $listener->onSubmit($event);
 
         $this->assertEquals([], $event->getData());
@@ -219,11 +299,11 @@ class ResizeFormListenerTest extends TestCase
 
     public function testOnSubmitDealsWithObjectBackedIteratorAggregate()
     {
-        $this->form->add($this->getForm('1'));
+        $this->builder->add($this->getBuilder('1'));
 
         $data = new \ArrayObject([0 => 'first', 1 => 'second', 2 => 'third']);
-        $event = new FormEvent($this->form, $data);
-        $listener = new ResizeFormListener('text', [], false, true);
+        $event = new FormEvent($this->builder->getForm(), $data);
+        $listener = new ResizeFormListener(TextType::class, [], false, true);
         $listener->onSubmit($event);
 
         $this->assertArrayNotHasKey(0, $event->getData());
@@ -232,11 +312,11 @@ class ResizeFormListenerTest extends TestCase
 
     public function testOnSubmitDealsWithArrayBackedIteratorAggregate()
     {
-        $this->form->add($this->getForm('1'));
+        $this->builder->add($this->getBuilder('1'));
 
         $data = new ArrayCollection([0 => 'first', 1 => 'second', 2 => 'third']);
-        $event = new FormEvent($this->form, $data);
-        $listener = new ResizeFormListener('text', [], false, true);
+        $event = new FormEvent($this->builder->getForm(), $data);
+        $listener = new ResizeFormListener(TextType::class, [], false, true);
         $listener->onSubmit($event);
 
         $this->assertArrayNotHasKey(0, $event->getData());
@@ -245,46 +325,37 @@ class ResizeFormListenerTest extends TestCase
 
     public function testOnSubmitDeleteEmptyNotCompoundEntriesIfAllowDelete()
     {
-        $this->form->setData(['0' => 'first', '1' => 'second']);
-        $this->form->add($this->getForm('0'));
-        $this->form->add($this->getForm('1'));
+        $this->builder->setData(['0' => 'first', '1' => 'second']);
+        $this->builder->add($this->getBuilder('0'));
+        $this->builder->add($this->getBuilder('1'));
+        $this->builder->addEventSubscriber(new ResizeFormListener(TextType::class, [], false, true, true));
 
-        $data = [0 => 'first', 1 => ''];
-        foreach ($data as $child => $dat) {
-            $this->form->get($child)->submit($dat);
-        }
-        $event = new FormEvent($this->form, $data);
-        $listener = new ResizeFormListener('text', [], false, true, true);
-        $listener->onSubmit($event);
+        $form = $this->builder->getForm();
 
-        $this->assertEquals([0 => 'first'], $event->getData());
+        $form->submit([0 => 'first', 1 => '']);
+
+        $this->assertEquals([0 => 'first'], $form->getData());
     }
 
     public function testOnSubmitDeleteEmptyCompoundEntriesIfAllowDelete()
     {
-        $this->form->setData(['0' => ['name' => 'John'], '1' => ['name' => 'Jane']]);
-        $form1 = $this->getBuilder('0')
-            ->setCompound(true)
-            ->setDataMapper(new DataMapper())
-            ->getForm();
-        $form1->add($this->getForm('name'));
-        $form2 = $this->getBuilder('1')
-            ->setCompound(true)
-            ->setDataMapper(new DataMapper())
-            ->getForm();
-        $form2->add($this->getForm('name'));
-        $this->form->add($form1);
-        $this->form->add($form2);
+        $this->builder->setData(['0' => ['name' => 'John'], '1' => ['name' => 'Jane']]);
+        $this->builder->add('0', NestedType::class);
+        $this->builder->add('1', NestedType::class);
+        $callback = fn ($data) => empty($data['name']);
+        $this->builder->addEventSubscriber(new ResizeFormListener(NestedType::class, [], false, true, $callback));
 
-        $data = ['0' => ['name' => 'John'], '1' => ['name' => '']];
-        foreach ($data as $child => $dat) {
-            $this->form->get($child)->submit($dat);
-        }
-        $event = new FormEvent($this->form, $data);
-        $callback = fn ($data) => null === $data['name'];
-        $listener = new ResizeFormListener('text', [], false, true, $callback);
-        $listener->onSubmit($event);
+        $form = $this->builder->getForm();
+        $form->submit(['0' => ['name' => 'John'], '1' => ['name' => '']]);
 
-        $this->assertEquals(['0' => ['name' => 'John']], $event->getData());
+        $this->assertEquals(['0' => ['name' => 'John']], $form->getData());
+    }
+}
+
+class NestedType extends AbstractType
+{
+    public function buildForm(FormBuilderInterface $builder, array $options): void
+    {
+        $builder->add('name');
     }
 }

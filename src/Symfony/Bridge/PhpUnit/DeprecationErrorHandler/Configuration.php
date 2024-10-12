@@ -96,7 +96,7 @@ class Configuration
         }
         foreach ($groups as $group) {
             if (!isset($this->thresholds[$group])) {
-                $this->thresholds[$group] = 999999;
+                $this->thresholds[$group] = $this->thresholds['total'] ?? 999999;
             }
         }
         $this->regex = $regex;

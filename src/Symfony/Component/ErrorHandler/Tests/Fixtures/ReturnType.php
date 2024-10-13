@@ -11,6 +11,8 @@ class ReturnType extends ReturnTypeParent implements ReturnTypeInterface, Fixtur
     public function returnTypeGrandParent() { }
     public function returnTypeParentInterface() { }
     public function returnTypeInterface() { }
+    public function returnTypeInterfaceWithWillChange() { }
+    public function returnTypeInterfaceWithWillChangeAndVersion() { }
     public function realReturnTypeMustBeThere(): string { }
     public function realReturnTypeIsAlreadyThere(): float { }
     public function realReturnTypeIsAlreadyThereWithNull(): ?iterable { }

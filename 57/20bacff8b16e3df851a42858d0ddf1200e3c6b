@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by OskarStark at 2024-10-13T08:34:16Z
+
+So more "throwing exception if invalid ...." ? It's the opposite from silencing to me 😂
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2024-10-13T08:40:41Z
+
+We silence the PHP warning and then throw an exception that we already throw when PHP 8.3+ is used.

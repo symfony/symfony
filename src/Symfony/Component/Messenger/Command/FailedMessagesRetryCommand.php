@@ -156,7 +156,7 @@ EOF
         if (\SIGALRM === $signal) {
             $this->logger?->info('Sending keepalive request.', ['transport_names' => $this->worker->getMetadata()->getTransportNames()]);
 
-            $this->worker->keepalive();
+            $this->worker->keepalive($this->getApplication()->getAlarmInterval());
 
             return false;
         }

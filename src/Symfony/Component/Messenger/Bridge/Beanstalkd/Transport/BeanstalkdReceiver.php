@@ -65,7 +65,7 @@ class BeanstalkdReceiver implements KeepaliveReceiverInterface, MessageCountAwar
         $this->connection->reject($this->findBeanstalkdReceivedStamp($envelope)->getId());
     }
 
-    public function keepalive(Envelope $envelope): void
+    public function keepalive(Envelope $envelope, ?int $seconds = null): void
     {
         $this->connection->keepalive($this->findBeanstalkdReceivedStamp($envelope)->getId());
     }

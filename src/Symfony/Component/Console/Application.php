@@ -139,6 +139,14 @@ class Application implements ResetInterface
         $this->scheduleAlarm();
     }
 
+    /**
+     * Gets the interval in seconds on which a SIGALRM signal is dispatched.
+     */
+    public function getAlarmInterval(): ?int
+    {
+        return $this->alarmInterval;
+    }
+
     private function scheduleAlarm(): void
     {
         if (null !== $this->alarmInterval) {

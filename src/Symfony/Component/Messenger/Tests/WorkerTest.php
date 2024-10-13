@@ -641,7 +641,7 @@ class WorkerTest extends TestCase
 
         try {
             $oldAsync = pcntl_async_signals(true);
-            pcntl_signal(\SIGALRM, fn () => $worker->keepalive());
+            pcntl_signal(\SIGALRM, fn () => $worker->keepalive(2));
             pcntl_alarm(2);
 
             $worker->run();
@@ -654,7 +654,7 @@ class WorkerTest extends TestCase
         $this->assertSame($expectedEnvelopes, $receiver->keepaliveEnvelopes);
 
         $receiver->keepaliveEnvelopes = [];
-        $worker->keepalive();
+        $worker->keepalive(2);
 
         $this->assertCount(0, $receiver->keepaliveEnvelopes);
     }
@@ -672,7 +672,7 @@ class DummyKeepaliveReceiver extends DummyReceiver implements KeepaliveReceiverI
 {
     public array $keepaliveEnvelopes = [];
 
-    public function keepalive(Envelope $envelope): void
+    public function keepalive(Envelope $envelope, ?int $seconds = null): void
     {
         $this->keepaliveEnvelopes[] = $envelope;
     }

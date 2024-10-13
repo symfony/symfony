@@ -499,6 +499,11 @@ class Filesystem
         // Construct $endPath from traversing to the common path, then to the remaining $endPath
         $relativePath = $traverser.('' !== $endPathRemainder ? $endPathRemainder.'/' : '');
 
+        // Remove ending "/" if $endPath points to existing file
+        if (file_exists($endPath) && !is_dir($endPath) && str_ends_with($relativePath, '/')) {
+            $relativePath = rtrim($relativePath, '/');
+        }
+
         return '' === $relativePath ? './' : $relativePath;
     }
 
@@ -688,7 +693,6 @@ class Filesystem
      * Appends content to an existing file.
      *
      * @param string|resource $content The content to append
-     * @param bool            $lock    Whether the file should be locked when writing to it
      *
      * @throws IOException If the file is not writable
      */

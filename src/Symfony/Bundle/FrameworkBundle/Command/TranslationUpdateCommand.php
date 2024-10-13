@@ -114,9 +114,6 @@ EOF
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);
-        $errorIo = $output instanceof ConsoleOutputInterface ? new SymfonyStyle($input, $output->getErrorOutput()) : $io;
-
-        $io = new SymfonyStyle($input, $output);
         $errorIo = $io->getErrorStyle();
 
         // check presence of force or dump-message

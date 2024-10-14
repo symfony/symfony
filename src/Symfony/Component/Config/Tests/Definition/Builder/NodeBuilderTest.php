@@ -15,6 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\Definition\Builder\FloatNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\IntegerNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\NodeBuilder as BaseNodeBuilder;
+use Symfony\Component\Config\Definition\Builder\StringNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\VariableNodeDefinition as BaseVariableNodeDefinition;
 
 class NodeBuilderTest extends TestCase
@@ -85,6 +86,14 @@ class NodeBuilderTest extends TestCase
 
         $node = $builder->floatNode('bar')->min(3.0)->max(5.0);
         $this->assertInstanceOf(FloatNodeDefinition::class, $node);
+    }
+
+    public function testStringNodeCreation()
+    {
+        $builder = new BaseNodeBuilder();
+
+        $node = $builder->stringNode('foo bar');
+        $this->assertInstanceOf(StringNodeDefinition::class, $node);
     }
 }
 

@@ -73,6 +73,11 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
         return $this->prototype('scalar');
     }
 
+    public function stringPrototype(): StringNodeDefinition
+    {
+        return $this->prototype('string');
+    }
+
     public function booleanPrototype(): BooleanNodeDefinition
     {
         return $this->prototype('boolean');

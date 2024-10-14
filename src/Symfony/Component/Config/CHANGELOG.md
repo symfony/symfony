@@ -8,6 +8,10 @@ CHANGELOG
  * Generate a meta file in JSON format for resource tracking
  * Add `SkippingResourceChecker`
  * Add support for `defaultNull()` on `BooleanNode`
+ * Add `StringNode`
+ * Add `StringNode` and `StringNodeDefinition`
+ * Add `ArrayNodeDefinition::stringPrototype()` method
+ * Add `NodeBuilder::stringNode()` method
 
 7.1
 ---

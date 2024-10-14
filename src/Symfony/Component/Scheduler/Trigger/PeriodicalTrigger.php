@@ -52,7 +52,11 @@ class PeriodicalTrigger implements StatefulTriggerInterface
             $i = $interval;
             if (\is_string($interval)) {
                 $this->description = \sprintf('every %s', $interval);
-                $i = \DateInterval::createFromDateString($interval);
+                $i = @\DateInterval::createFromDateString($interval);
+
+                if (false === $i) {
+                    throw new InvalidArgumentException(\sprintf('Invalid interval "%s": ', $interval).error_get_last()['message']);
+                }
             } else {
                 $a = (array) $interval;
                 $this->description = $a['from_string'] ? $a['date_string'] : 'DateInterval';

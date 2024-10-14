@@ -19,7 +19,9 @@ interface KeepaliveReceiverInterface extends ReceiverInterface
     /**
      * Informs the transport that the message is still being processed to avoid a timeout on the transport's side.
      *
+     * @param int|null $seconds The minimum duration the message should be kept alive
+     *
      * @throws TransportException If there is an issue communicating with the transport
      */
-    public function keepalive(Envelope $envelope): void;
+    public function keepalive(Envelope $envelope, ?int $seconds = null): void;
 }

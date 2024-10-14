@@ -2305,6 +2305,7 @@ class ApplicationTest extends TestCase
         $application = $this->createSignalableApplication($command, null);
 
         $this->assertSame(1, $application->run(new ArrayInput(['alarm'])));
+        $this->assertSame(1, $application->getAlarmInterval());
         $this->assertTrue($command->signaled);
     }
 

@@ -290,7 +290,7 @@ class Worker
         $this->shouldStop = true;
     }
 
-    public function keepalive(): void
+    public function keepalive(?int $seconds): void
     {
         foreach ($this->keepalives as $message) {
             [$transportName, $envelope] = $this->keepalives[$message];
@@ -303,7 +303,7 @@ class Worker
                 'transport' => $transportName,
                 'message_id' => $envelope->last(TransportMessageIdStamp::class)?->getId(),
             ]);
-            $this->receivers[$transportName]->keepalive($envelope);
+            $this->receivers[$transportName]->keepalive($envelope, $seconds);
         }
     }
 

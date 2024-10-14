@@ -49,9 +49,9 @@ class BeanstalkdTransport implements TransportInterface, KeepaliveReceiverInterf
         $this->getReceiver()->reject($envelope);
     }
 
-    public function keepalive(Envelope $envelope): void
+    public function keepalive(Envelope $envelope, ?int $seconds = null): void
     {
-        $this->getReceiver()->keepalive($envelope);
+        $this->getReceiver()->keepalive($envelope, $seconds);
     }
 
     public function getMessageCount(): int

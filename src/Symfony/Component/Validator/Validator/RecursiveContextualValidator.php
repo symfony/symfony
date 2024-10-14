@@ -261,11 +261,15 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
      */
     protected function normalizeGroups(string|GroupSequence|array $groups): array
     {
-        if (\is_array($groups)) {
-            return $groups;
+        if (!\is_array($groups)) {
+            $groups = [$groups];
         }
 
-        return [$groups];
+        if (\in_array(null, $groups, true)) {
+            throw new ValidatorException('Value in array of validation groups cannot be null.');
+        }
+
+        return $groups;
     }
 
     /**

@@ -1,0 +1,7 @@
+---------------------------------------------------------------------------
+
+by valtzu at 2024-10-13T19:44:18Z
+
+> The component changelog needs to mention the new method
+
+As this whole feature is not released yet, I thought the changes here would be covered by the initial changelog entries about adding keepalive / alarm support since from component user perspective it's a single new feature – but ok, I will add those. :+1:

@@ -75,14 +75,13 @@ class DebugCommand extends Command
             ];
         }
 
+        $io->section($title);
+
         if (!$rows) {
-            $io->section($title);
             $io->text('No Serializer data were found for this class.');
 
             return;
         }
-
-        $io->section($title);
 
         $table = new Table($output);
         $table->setHeaders(['Property', 'Options']);

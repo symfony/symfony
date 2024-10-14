@@ -259,6 +259,7 @@ return static function (ContainerConfigurator $container) {
                 abstract_arg('filter'),
                 abstract_arg('password_attribute'),
                 abstract_arg('extra_fields (email etc)'),
+                abstract_arg('role fetcher'),
             ])
 
         ->set('security.user.provider.chain', ChainUserProvider::class)

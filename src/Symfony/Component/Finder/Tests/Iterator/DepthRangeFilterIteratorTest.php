@@ -37,6 +37,7 @@ class DepthRangeFilterIteratorTest extends RealIteratorTestCase
             'test.py',
             'foo',
             'test.php',
+            'top',
             'toto',
             '.foo',
             '.bar',
@@ -57,6 +58,8 @@ class DepthRangeFilterIteratorTest extends RealIteratorTestCase
             'foo',
             'foo/bar.tmp',
             'test.php',
+            'top',
+            'top/foo',
             'toto',
             'toto/.git',
             '.foo',
@@ -76,7 +79,13 @@ class DepthRangeFilterIteratorTest extends RealIteratorTestCase
             'zebulon.php', 'Zephire.php',
         ];
 
-        $graterThanOrEqualTo1 = [
+        $greaterThanOrEqualTo2 = [
+            'top/foo/file.tmp',
+        ];
+
+        $greaterThanOrEqualTo1 = [
+            'top/foo',
+            'top/foo/file.tmp',
             'toto/.git',
             'foo/bar.tmp',
             '.foo/.bar',
@@ -86,6 +95,7 @@ class DepthRangeFilterIteratorTest extends RealIteratorTestCase
         ];
 
         $equalTo1 = [
+            'top/foo',
             'toto/.git',
             'foo/bar.tmp',
             '.foo/.bar',
@@ -97,8 +107,9 @@ class DepthRangeFilterIteratorTest extends RealIteratorTestCase
         return [
             [0, 0, self::toAbsolute($lessThan1)],
             [0, 1, self::toAbsolute($lessThanOrEqualTo1)],
-            [2, \PHP_INT_MAX, []],
-            [1, \PHP_INT_MAX, self::toAbsolute($graterThanOrEqualTo1)],
+            [3, \PHP_INT_MAX, []],
+            [2, \PHP_INT_MAX, self::toAbsolute($greaterThanOrEqualTo2)],
+            [1, \PHP_INT_MAX, self::toAbsolute($greaterThanOrEqualTo1)],
             [1, 1, self::toAbsolute($equalTo1)],
         ];
     }

@@ -275,7 +275,7 @@ class PropertyAccessor implements PropertyAccessorInterface
      * @throws UnexpectedTypeException if a value within the path is neither object nor array
      * @throws NoSuchIndexException    If a non-existing index is accessed
      */
-    private function readPropertiesUntil(array $zval, PropertyPathInterface $propertyPath, int $lastIndex, bool $ignoreInvalidIndices = true): array
+    private function readPropertiesUntil(array $zval, PropertyPathInterface $propertyPath, int $lastIndex, bool $ignoreInvalidIndices = true, int $startIndex = 0): array
     {
         if (!\is_object($zval[self::VALUE]) && !\is_array($zval[self::VALUE])) {
             throw new UnexpectedTypeException($zval[self::VALUE], $propertyPath, 0);
@@ -284,10 +284,18 @@ class PropertyAccessor implements PropertyAccessorInterface
         // Add the root object to the list
         $propertyValues = [$zval];
 
-        for ($i = 0; $i < $lastIndex; ++$i) {
+        for ($i = $startIndex; $i < $lastIndex; ++$i) {
             $property = $propertyPath->getElement($i);
             $isIndex = $propertyPath->isIndex($i);
             $isNullSafe = $propertyPath->isNullSafe($i);
+
+            $isWildcard = false;
+            if (method_exists($propertyPath, 'isWildcard')) {
+                // To be removed in Symfony 8 once we are sure isWildcard is always implemented.
+                $isWildcard = $propertyPath->isWildcard($i);
+            } else {
+                trigger_deprecation('symfony/property-access', '7.1', 'The "%s()" method in class "%s" needs to be implemented in version 8.0, not defining it is deprecated.', 'isWildcard', PropertyPathInterface::class);
+            }
 
             if ($isIndex) {
                 // Create missing nested arrays on demand
@@ -317,6 +325,40 @@ class PropertyAccessor implements PropertyAccessorInterface
                 }
 
                 $zval = $this->readIndex($zval, $property);
+            } elseif ($isWildcard) {
+                $newPropertyValues = [];
+
+                // replace wildcard with all posible values
+                // e.g. [*][foo] becomes [0][foo], [1][foo], ...
+                foreach (array_keys($zval[self::VALUE]) as $index) {
+                    $path = preg_replace('/\[\*\]/', "[$index]", (string) $propertyPath, 1);
+                    $subPath = $this->readPropertiesUntil($zval, $this->getPropertyPath($path), $lastIndex, $ignoreInvalidIndices, $i);
+
+                    // merge property values from all sub paths
+                    // skip first because it's same for all paths and is already in $propertyValues
+                    for ($j = 1; $j < \count($subPath); ++$j) {
+                        $newPropertyValues[$j][self::VALUE][] = $subPath[$j][self::VALUE];
+                    }
+                }
+
+                foreach ($newPropertyValues as &$newValue) {
+                    $shouldMerge = true;
+
+                    foreach ($newValue[self::VALUE] as $value) {
+                        $shouldMerge = \is_array($value) && array_is_list($value);
+
+                        if (!$shouldMerge) {
+                            break;
+                        }
+                    }
+
+                    if ($shouldMerge) {
+                        $newValue[self::VALUE] = array_merge(...$newValue[self::VALUE]);
+                    }
+                }
+
+                array_push($propertyValues, ...$newPropertyValues);
+                break;
             } elseif ($isNullSafe && !\is_object($zval[self::VALUE])) {
                 $zval[self::VALUE] = null;
             } else {

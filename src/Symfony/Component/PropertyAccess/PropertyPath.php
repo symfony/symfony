@@ -58,6 +58,14 @@ class PropertyPath implements \IteratorAggregate, PropertyPathInterface
     private array $isNullSafe = [];
 
     /**
+     * Contains a boolean for each property in $elements denoting whether this
+     * element is wildcard or not.
+     *
+     * @var array<bool>
+     */
+    private array $isWildcard = [];
+
+    /**
      * String representation of the path.
      */
     private string $pathAsString;
@@ -78,6 +86,7 @@ class PropertyPath implements \IteratorAggregate, PropertyPathInterface
             $this->isIndex = $propertyPath->isIndex;
             $this->isNullSafe = $propertyPath->isNullSafe;
             $this->pathAsString = $propertyPath->pathAsString;
+            $this->isWildcard = $propertyPath->isWildcard;
 
             return;
         }
@@ -97,9 +106,15 @@ class PropertyPath implements \IteratorAggregate, PropertyPathInterface
             if ('' !== $matches[2]) {
                 $element = $matches[2];
                 $this->isIndex[] = false;
+                $this->isWildcard[] = false;
+            } elseif ('[*]' === $matches[1]) {
+                $element = '*';
+                $this->isIndex[] = false;
+                $this->isWildcard[] = true;
             } else {
                 $element = $matches[3];
                 $this->isIndex[] = true;
+                $this->isWildcard[] = false;
             }
 
             // Mark as optional when last character is "?".
@@ -110,7 +125,7 @@ class PropertyPath implements \IteratorAggregate, PropertyPathInterface
                 $this->isNullSafe[] = false;
             }
 
-            $element = preg_replace('/\\\([.[])/', '$1', $element);
+            $element = preg_replace('/\\\([.[*])/', '$1', $element);
             if (str_ends_with($element, '\\\\')) {
                 $element = substr($element, 0, -1);
             }
@@ -151,6 +166,7 @@ class PropertyPath implements \IteratorAggregate, PropertyPathInterface
         array_pop($parent->elements);
         array_pop($parent->isIndex);
         array_pop($parent->isNullSafe);
+        array_pop($parent->isWildcard);
 
         return $parent;
     }
@@ -202,5 +218,14 @@ class PropertyPath implements \IteratorAggregate, PropertyPathInterface
         }
 
         return $this->isNullSafe[$index];
+    }
+
+    public function isWildcard(int $index): bool
+    {
+        if (!isset($this->isWildcard[$index])) {
+            throw new OutOfBoundsException(sprintf('The index "%s" is not within the property path.', $index));
+        }
+
+        return $this->isWildcard[$index];
     }
 }

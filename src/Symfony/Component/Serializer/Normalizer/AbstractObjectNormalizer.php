@@ -615,6 +615,21 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
             }
         }
 
+        if (is_numeric($data) && XmlEncoder::FORMAT === $format) {
+            // encoder parsed them wrong, so they might need to be transformed back
+            foreach ($types as $type) {
+                $builtinType = $type->getBuiltinType();
+                switch ($builtinType) {
+                    case Type::BUILTIN_TYPE_STRING:
+                        return (string) $data;
+                    case Type::BUILTIN_TYPE_FLOAT:
+                        return (float) $data;
+                    case Type::BUILTIN_TYPE_INT:
+                        return (int) $data;
+                }
+            }
+        }
+
         if ($isNullable) {
             return null;
         }

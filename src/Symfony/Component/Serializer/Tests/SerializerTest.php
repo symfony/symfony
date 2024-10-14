@@ -32,6 +32,7 @@ use Symfony\Component\Serializer\Mapping\ClassMetadataInterface;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactory;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
 use Symfony\Component\Serializer\Mapping\Loader\AttributeLoader;
+use Symfony\Component\Serializer\NameConverter\MetadataAwareNameConverter;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\Serializer\Normalizer\AbstractObjectNormalizer;
 use Symfony\Component\Serializer\Normalizer\ArrayDenormalizer;
@@ -51,6 +52,7 @@ use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Serializer\Tests\Fixtures\Attributes\AbstractDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\Attributes\AbstractDummyFirstChild;
 use Symfony\Component\Serializer\Tests\Fixtures\Attributes\AbstractDummySecondChild;
+use Symfony\Component\Serializer\Tests\Fixtures\Attributes\SerializedNameAttributeDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\DenormalizableDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\DummyFirstChildQuux;
 use Symfony\Component\Serializer\Tests\Fixtures\DummyMessageInterface;
@@ -765,6 +767,19 @@ class SerializerTest extends TestCase
         $this->assertInstanceOf(DummyNullableInt::class, $obj);
         $this->assertNull($obj->value);
     }
+
+    public function testDeserializeIntAsStringPropertyInXML()
+    {
+        $classMetadataFactory = new ClassMetadataFactory(new AttributeLoader());
+        $nameConverter = new MetadataAwareNameConverter($classMetadataFactory);
+        $extractor = new PropertyInfoExtractor([], [new ReflectionExtractor()]);
+        $serializer = new Serializer([new ObjectNormalizer($classMetadataFactory, $nameConverter, null, $extractor)], ['xml' => new XmlEncoder()]);
+
+        $obj = $serializer->deserialize('<?xml version="1.0" encoding="UTF-8"?><NameAttributeDummy foo="123" />', SerializedNameAttributeDummy::class, 'xml');
+
+        $this->assertSame('123', $obj->foo);
+    }
+
 
     public function testUnionTypeDeserializable()
     {

@@ -214,6 +214,13 @@ class RegisterListenersPassTest extends TestCase
             {
             }
         }))->addTag('kernel.event_listener', ['event' => 'foo.bar_zar']);
+        $container->register('typed_listener', InvokableListenerService::class)->addTag('kernel.event_listener', ['event' => CustomEvent::class]);
+        $container->register('aliased_event', InvokableListenerService::class)->addTag('kernel.event_listener', ['event' => 'aliased_event']);
+        $container->register('child_event', \get_class(new class {
+            public function __invoke(ParentEvent $event)
+            {
+            }
+        }))->addTag('kernel.event_listener', ['event' => ChildEvent::class]);
         $container->register('event_dispatcher', \stdClass::class);
 
         $registerListenersPass = new RegisterListenersPass();
@@ -253,18 +260,68 @@ class RegisterListenersPassTest extends TestCase
                     0,
                 ],
             ],
+            [
+                'addListener',
+                [
+                    CustomEvent::class,
+                    [new ServiceClosureArgument(new Reference('typed_listener')), 'onCustomEvent'],
+                    0,
+                ],
+            ],
+            [
+                'addListener',
+                [
+                    'aliased_event',
+                    [new ServiceClosureArgument(new Reference('aliased_event')), 'onAliasedEvent'],
+                    0,
+                ],
+            ],
+            [
+                'addListener',
+                [
+                    ChildEvent::class,
+                    [new ServiceClosureArgument(new Reference('child_event')), '__invoke'],
+                    0,
+                ],
+            ],
         ];
         $this->assertEquals($expectedCalls, $definition->getMethodCalls());
     }
 
-    public function testItThrowsAnExceptionIfTagIsMissingMethodAndClassHasNoValidMethod()
+    public function testItThrowsAnExceptionIfTagIsMissingMethodAndClassHasMultipleMethodsWithEvent()
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('None of the "onFooBar" or "__invoke" methods exist for the service "foo". Please define the "method" attribute on "kernel.event_listener" tags.');
+        $this->expectExceptionMessage('Service "foo" is missing a "method" attribute on "kernel.event_listener" tags.');
 
         $container = new ContainerBuilder();
 
-        $container->register('foo', \stdClass::class)->addTag('kernel.event_listener', ['event' => 'foo.bar']);
+        $container->register('foo', \get_class(new class {
+            public function doSomethingOnCustomEvent(CustomEvent $event)
+            {
+            }
+
+            public function doAnotherThingOnCustomEvent(CustomEvent $event)
+            {
+            }
+        }))->addTag('kernel.event_listener', ['event' => CustomEvent::class]);
+        $container->register('event_dispatcher', \stdClass::class);
+
+        $registerListenersPass = new RegisterListenersPass();
+        $registerListenersPass->process($container);
+    }
+
+    public function testItThrowsAnExceptionIfTagIsMissingMethodAndClassHasNoMethodWithEvent()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Service "foo" is missing a "method" attribute on "kernel.event_listener" tags.');
+
+        $container = new ContainerBuilder();
+
+        $container->register('foo', \get_class(new class {
+            public function doSomethingOnCustomEvent($event)
+            {
+            }
+        }))->addTag('kernel.event_listener', ['event' => CustomEvent::class]);
         $container->register('event_dispatcher', \stdClass::class);
 
         $registerListenersPass = new RegisterListenersPass();
@@ -524,6 +581,14 @@ class InvokableListenerService
     public function onEvent()
     {
     }
+
+    public function onCustomEvent(CustomEvent $event): void
+    {
+    }
+
+    public function onAliasedEvent(AliasedEvent $event): void
+    {
+    }
 }
 
 final class AliasedSubscriber implements EventSubscriberInterface
@@ -538,6 +603,14 @@ final class AliasedSubscriber implements EventSubscriberInterface
 }
 
 final class AliasedEvent
+{
+}
+
+class ParentEvent
+{
+}
+
+final class ChildEvent extends ParentEvent
 {
 }
 

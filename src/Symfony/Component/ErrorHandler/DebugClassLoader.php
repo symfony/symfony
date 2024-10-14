@@ -849,6 +849,30 @@ class DebugClassLoader
         $docTypes = [];
 
         foreach ($typesMap as $n => $t) {
+            if (str_contains($n, '::')) {
+                [$definingClass, $constantName] = explode('::', $n, 2);
+                $definingClass = match ($definingClass) {
+                    'self', 'static', 'parent' => $class,
+                    default => $definingClass,
+                };
+
+                if (!\defined($definingClass.'::'.$constantName)) {
+                    return;
+                }
+
+                $constant = new \ReflectionClassConstant($definingClass, $constantName);
+
+                if (\PHP_VERSION_ID >= 80300 && $constantType = $constant->getType()) {
+                    if ($constantType instanceof \ReflectionNamedType) {
+                        $n = $constantType->getName();
+                    } else {
+                        return;
+                    }
+                } else {
+                    $n = \gettype($constant->getValue());
+                }
+            }
+
             if ('null' === $n) {
                 $nullable = true;
                 continue;
@@ -872,7 +896,7 @@ class DebugClassLoader
                 continue;
             }
 
-            if (!isset($phpTypes[''])) {
+            if (!isset($phpTypes['']) && !\in_array($n, $phpTypes, true)) {
                 $phpTypes[] = $n;
             }
         }

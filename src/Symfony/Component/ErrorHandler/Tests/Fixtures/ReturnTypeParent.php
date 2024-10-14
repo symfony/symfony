@@ -4,6 +4,8 @@ namespace Symfony\Component\ErrorHandler\Tests\Fixtures;
 
 abstract class ReturnTypeParent extends ReturnTypeGrandParent implements ReturnTypeParentInterface
 {
+    const FOO = 'foo';
+
     /**
      * @return void
      */
@@ -252,6 +254,13 @@ abstract class ReturnTypeParent extends ReturnTypeGrandParent implements ReturnT
      * @return int
      */
     public function notExtended()
+    {
+    }
+
+    /**
+     * @return self::FOO
+     */
+    public function classConstant()
     {
     }
 }

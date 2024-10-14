@@ -25,6 +25,7 @@ CHANGELOG
 6.4
 ---
 
+ * Add the `debug:roles` command to debug role hierarchy
  * Deprecate `Security::ACCESS_DENIED_ERROR`, `AUTHENTICATION_ERROR` and `LAST_USERNAME` constants, use the ones on `SecurityRequestAttributes` instead
  * Allow an array of `pattern` in firewall configuration
  * Add `$badges` argument to `Security::login`

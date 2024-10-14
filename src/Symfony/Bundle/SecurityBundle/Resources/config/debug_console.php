@@ -12,6 +12,7 @@
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
 use Symfony\Bundle\SecurityBundle\Command\DebugFirewallCommand;
+use Symfony\Bundle\SecurityBundle\Command\DebugRolesCommand;
 
 return static function (ContainerConfigurator $container) {
     $container->services()
@@ -24,5 +25,10 @@ return static function (ContainerConfigurator $container) {
                 false,
             ])
             ->tag('console.command', ['command' => 'debug:firewall'])
+        ->set('security.command.debug_role_hierarchy', DebugRolesCommand::class)
+            ->args([
+                service('debug.security.role_hierarchy'),
+            ])
+            ->tag('console.command', ['command' => 'debug:roles'])
     ;
 };

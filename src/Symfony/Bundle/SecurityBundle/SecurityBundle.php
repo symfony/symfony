@@ -17,6 +17,7 @@ use Symfony\Bundle\SecurityBundle\DependencyInjection\Compiler\AddSessionDomainC
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Compiler\CleanRememberMeVerifierPass;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Compiler\MakeFirewallsEventDispatcherTraceablePass;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Compiler\RegisterCsrfFeaturesPass;
+use Symfony\Bundle\SecurityBundle\DependencyInjection\Compiler\RegisterDebugRoleHierarchyPass;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Compiler\RegisterEntryPointPass;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Compiler\RegisterGlobalSecurityEventListenersPass;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Compiler\RegisterLdapLocatorPass;
@@ -105,5 +106,7 @@ class SecurityBundle extends Bundle
 
         // must be registered before DecoratorServicePass
         $container->addCompilerPass(new MakeFirewallsEventDispatcherTraceablePass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, 10);
+
+        $container->addCompilerPass(new RegisterDebugRoleHierarchyPass(), PassConfig::TYPE_OPTIMIZE);
     }
 }

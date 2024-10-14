@@ -19,6 +19,7 @@ CHANGELOG
 6.4
 ---
 
+ * Allow using wildcards as placeholders in `RoleHierarchy` map's keys
  * Make `PersistentToken` immutable
  * Deprecate accepting only `DateTime` for `TokenProviderInterface::updateToken()`, use `DateTimeInterface` instead
 

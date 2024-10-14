@@ -215,8 +215,11 @@ class CommandTest extends TestCase
         $command = new \TestCommand();
         $command->addUsage('foo1');
         $command->addUsage('foo2');
+        $command->addUsages(['foo3', 'foo4']);
         $this->assertContains('namespace:name foo1', $command->getUsages());
         $this->assertContains('namespace:name foo2', $command->getUsages());
+        $this->assertContains('namespace:name foo3', $command->getUsages());
+        $this->assertContains('namespace:name foo4', $command->getUsages());
     }
 
     public function testGetHelper()

@@ -626,6 +626,20 @@ class Command
     }
 
     /**
+     * Adds a set of command usage examples.
+     *
+     * @param string[] $usages
+     */
+    public function addUsages(array $usages): static
+    {
+        foreach ($usages as $usage) {
+            $this->addUsage($usage);
+        }
+
+        return $this;
+    }
+
+    /**
      * Returns alternative usages of the command.
      */
     public function getUsages(): array

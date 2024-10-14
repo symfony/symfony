@@ -1,0 +1,47 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2024-10-10T10:09:54Z
+
+Hey!
+
+Thanks for your PR. You are targeting branch "7.2" but it seems your PR description refers to branch "7.2 for features / 5.4, 6.4, and 7.1 for bug fixes".
+Could you update the PR description or change target branch? This helps core maintainers a lot.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by pan93412 at 2024-10-10T10:51:12Z
+
+@OskarStark By the way, would you mind to clean up the labels? It might be related to the first description content of PR.
+
+Also, can I safely ignore the CI failure for `Verify Packages`? It seems that no bridge packages should be `replace`d.
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2024-10-11T06:06:41Z
+
+Can you please add a docs and a recipes PR, like done for the other bridges? Thanks
+
+---------------------------------------------------------------------------
+
+by pan93412 at 2024-10-11T06:28:54Z
+
+@OskarStark done:
+
+* https://github.com/symfony/recipes/pull/1346
+* https://github.com/symfony/symfony-docs/pull/20317
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2024-10-11T10:03:59Z
+
+Thanks
+
+---------------------------------------------------------------------------
+
+by pan93412 at 2024-10-14T01:11:01Z
+
+Commits are also rebased to the latest 7.2 branch.

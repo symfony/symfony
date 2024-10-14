@@ -1532,6 +1532,7 @@ class Configuration implements ConfigurationInterface
                     ->{$enableIfStandalone('symfony/messenger', MessageBusInterface::class)}()
                     ->fixXmlConfig('transport')
                     ->fixXmlConfig('bus', 'buses')
+                    ->fixXmlConfig('stop_worker_on_signal')
                     ->validate()
                         ->ifTrue(fn ($v) => isset($v['buses']) && \count($v['buses']) > 1 && null === $v['default_bus'])
                         ->thenInvalid('You must specify the "default_bus" if you define more than one bus.')
@@ -1664,7 +1665,18 @@ class Configuration implements ConfigurationInterface
                         ->arrayNode('stop_worker_on_signals')
                             ->defaultValue([])
                             ->info('A list of signals that should stop the worker; defaults to SIGTERM and SIGINT.')
-                            ->integerPrototype()->end()
+                            ->beforeNormalization()
+                                ->always(function ($v) {
+                                    return array_map(static function ($element): int {
+                                        if (\is_string($element) && str_starts_with($element, 'SIG') && \array_key_exists($element, get_defined_constants(true)['pcntl'])) {
+                                            return \constant($element);
+                                        }
+
+                                        return $element;
+                                    }, $v);
+                                })
+                            ->end()
+                            ->scalarPrototype()->end()
                         ->end()
                         ->scalarNode('default_bus')->defaultNull()->end()
                         ->arrayNode('buses')

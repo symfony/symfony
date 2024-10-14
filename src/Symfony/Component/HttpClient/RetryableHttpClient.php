@@ -39,12 +39,13 @@ class RetryableHttpClient implements HttpClientInterface, ResetInterface
     /**
      * @param int $maxRetries The maximum number of times to retry
      */
-    public function __construct(HttpClientInterface $client, ?RetryStrategyInterface $strategy = null, int $maxRetries = 3, ?LoggerInterface $logger = null)
+    public function __construct(HttpClientInterface $client, ?RetryStrategyInterface $strategy = null, int $maxRetries = 3, ?LoggerInterface $logger = null, array $baseUris = [])
     {
         $this->client = $client;
         $this->strategy = $strategy ?? new GenericRetryStrategy();
         $this->maxRetries = $maxRetries;
         $this->logger = $logger;
+        $this->baseUris = $baseUris;
     }
 
     public function withOptions(array $options): static

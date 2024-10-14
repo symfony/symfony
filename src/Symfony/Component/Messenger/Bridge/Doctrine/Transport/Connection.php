@@ -471,7 +471,7 @@ class Connection implements ResetInterface
                     throw new TransportException('no id was returned by PostgreSQL from RETURNING clause.');
                 }
             } elseif ($this->driverConnection->getDatabasePlatform() instanceof OraclePlatform) {
-                $sequenceName = 'seq_'.$this->configuration['table_name'];
+                $sequenceName = $this->configuration['table_name'].'_seq';
 
                 $this->driverConnection->executeStatement($sql, $parameters, $types);
 
@@ -542,9 +542,9 @@ class Connection implements ResetInterface
 
         // We need to create a sequence for Oracle and set the id column to get the correct nextval
         if ($this->driverConnection->getDatabasePlatform() instanceof OraclePlatform) {
-            $idColumn->setDefault('seq_'.$this->configuration['table_name'].'.nextval');
+            $idColumn->setDefault($this->configuration['table_name'].'_seq'.'.nextval');
 
-            $schema->createSequence('seq_'.$this->configuration['table_name']);
+            $schema->createSequence($this->configuration['table_name'].'_seq');
         }
     }
 

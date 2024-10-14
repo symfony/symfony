@@ -94,6 +94,7 @@ class DateTimeValidatorTest extends ConstraintValidatorTestCase
         ]);
 
         $this->validator->validate($dateTime, $constraint);
+
         $this->buildViolation('myMessage')
             ->setParameter('{{ value }}', '"'.$dateTime.'"')
             ->setParameter('{{ format }}', '"'.$format.'"')

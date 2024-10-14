@@ -11,8 +11,11 @@
 
 namespace Symfony\Component\AssetMapper\ImportMap;
 
+use Symfony\Component\AssetMapper\Exception\LogicException;
 use Symfony\Component\AssetMapper\ImportMap\Resolver\PackageResolverInterface;
 use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\HttpClient\Exception\TimeoutException;
+use Symfony\Component\HttpClient\Exception\TransportException;
 
 /**
  * @final
@@ -69,11 +72,15 @@ class RemotePackageDownloader
             return [];
         }
 
-        $contents = $this->packageResolver->downloadPackages($remoteEntriesToDownload, $progressCallback);
+        try {
+            $contents = $this->packageResolver->downloadPackages($remoteEntriesToDownload, $progressCallback);
+        } catch (TimeoutException|TransportException $exception) {
+            throw new LogicException($exception->getMessage());
+        }
         $downloadedPackages = [];
         foreach ($remoteEntriesToDownload as $package => $entry) {
             if (!isset($contents[$package])) {
-                throw new \LogicException(\sprintf('The package "%s" was not downloaded.', $package));
+                throw new LogicException(\sprintf('The package "%s" was not downloaded.', $package));
             }
 
             $this->remotePackageStorage->save($entry, $contents[$package]['content']);
@@ -92,7 +99,7 @@ class RemotePackageDownloader
         }
 
         if ($contents) {
-            throw new \LogicException(\sprintf('The following packages were unexpectedly downloaded: "%s".', implode('", "', array_keys($contents))));
+            throw new LogicException(\sprintf('The following packages were unexpectedly downloaded: "%s".', implode('", "', array_keys($contents))));
         }
 
         $this->saveInstalled($newInstalled);
@@ -136,7 +143,7 @@ class RemotePackageDownloader
             }
 
             if (!isset($data['dependencies'])) {
-                throw new \LogicException(\sprintf('The package "%s" is missing its dependencies.', $package));
+                throw new LogicException(\sprintf('The package "%s" is missing its dependencies.', $package));
             }
 
             if (!isset($data['extraFiles'])) {

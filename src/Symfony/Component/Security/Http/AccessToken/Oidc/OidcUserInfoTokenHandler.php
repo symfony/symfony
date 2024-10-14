@@ -46,6 +46,8 @@ final class OidcUserInfoTokenHandler implements AccessTokenHandlerInterface
                 throw new MissingClaimException(\sprintf('"%s" claim not found on OIDC server response.', $this->claim));
             }
 
+            $claims['userIdentifier'] = $claims[$this->claim];
+
             // UserLoader argument can be overridden by a UserProvider on AccessTokenAuthenticator::authenticate
             return new UserBadge($claims[$this->claim], new FallbackUserLoader(fn () => $this->createUser($claims)), $claims);
         } catch (\Exception $e) {

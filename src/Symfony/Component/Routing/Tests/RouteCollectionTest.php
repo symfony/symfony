@@ -262,7 +262,7 @@ class RouteCollectionTest extends TestCase
         $collection->setCondition('context.getMethod() == "POST"');
 
         $this->assertEquals('context.getMethod() == "POST"', $routea->getCondition());
-        $this->assertEquals('context.getMethod() == "POST"', $routeb->getCondition());
+        $this->assertEquals('(context.getMethod() == "GET") and (context.getMethod() == "POST")', $routeb->getCondition());
     }
 
     public function testClone()

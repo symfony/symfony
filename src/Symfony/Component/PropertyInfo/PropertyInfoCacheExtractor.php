@@ -21,7 +21,7 @@ use Symfony\Component\TypeInfo\Type;
  *
  * @final
  */
-class PropertyInfoCacheExtractor implements PropertyInfoExtractorInterface, PropertyInitializableExtractorInterface
+class PropertyInfoCacheExtractor implements PropertyInfoExtractorInterface, PropertyInitializableExtractorInterface, PropertyAttributesExtractorInterface
 {
     private array $arrayCache = [];
 
@@ -67,6 +67,11 @@ class PropertyInfoCacheExtractor implements PropertyInfoExtractorInterface, Prop
     public function getTypes(string $class, string $property, array $context = []): ?array
     {
         return $this->extract('getTypes', [$class, $property, $context]);
+    }
+
+    public function getAttributes(string $class, string $property, array $context = []): ?array
+    {
+        return $this->extract('getAttributes', [$class, $property, $context]);
     }
 
     public function isInitializable(string $class, string $property, array $context = []): ?bool

@@ -19,6 +19,8 @@ use Symfony\Component\PropertyInfo\Tests\Fixtures\AdderRemoverDummy;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\ConstructorDummy;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\DefaultValue;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\Dummy;
+use Symfony\Component\PropertyInfo\Tests\Fixtures\DummyAttribute;
+use Symfony\Component\PropertyInfo\Tests\Fixtures\DummyWithAttributes;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\NotInstantiable;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\ParentDummy;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\Php71Dummy;
@@ -498,6 +500,108 @@ class ReflectionExtractorTest extends TestCase
             [Php71DummyExtended2::class, 'intWithAccessor', true],
             [Php71DummyExtended2::class, 'intPrivate', false],
             [NotInstantiable::class, 'foo', false],
+        ];
+    }
+
+    /**
+     * @dataProvider attributesProvider
+     */
+    public function testGetAttributes(string $class, string $property, ?array $expected)
+    {
+        $this->assertSame($expected, $this->extractor->getAttributes($class, $property));
+    }
+
+    public static function attributesProvider(): array
+    {
+        return [
+            [
+                DummyWithAttributes::class,
+                'a',
+                [
+                    [
+                        'name' => DummyAttribute::class,
+                        'arguments' => [
+                            'type' => 'foo',
+                            'name' => 'nameA',
+                            'version' => 1,
+                        ],
+                    ],
+                ],
+            ],
+            [
+                DummyWithAttributes::class,
+                'b',
+                [
+                    [
+                        'name' => DummyAttribute::class,
+                        'arguments' => [
+                            'type' => 'bar',
+                            'name' => 'nameB',
+                            'version' => 2,
+                        ],
+                    ],
+                ],
+            ],
+            [
+                DummyWithAttributes::class,
+                'c',
+                [
+                    [
+                        'name' => DummyAttribute::class,
+                        'arguments' => [
+                            'type' => 'baz',
+                            'name' => 'nameC',
+                            'version' => 3,
+                        ],
+                    ],
+                ],
+            ],
+            [
+                DummyWithAttributes::class,
+                'd',
+                [
+                    [
+                        'name' => DummyAttribute::class,
+                        'arguments' => [
+                            0 => 'foo',
+                            1 => 'nameD',
+                            2 => 4,
+                        ],
+                    ],
+                ],
+            ],
+            [
+                DummyWithAttributes::class,
+                'e',
+                [
+                    [
+                        'name' => DummyAttribute::class,
+                        'arguments' => [
+                            'type' => 'foo',
+                            'name' => 'nameE1',
+                            'version' => 5,
+                        ],
+                    ],
+                    [
+                        'name' => DummyAttribute::class,
+                        'arguments' => [
+                            'type' => 'foo',
+                            'name' => 'nameE2',
+                            'version' => 10,
+                        ],
+                    ],
+                ],
+            ],
+            [
+                DummyWithAttributes::class,
+                'f',
+                [],
+            ],
+            [
+                DummyWithAttributes::class,
+                'nonExistentProperty',
+                null,
+            ],
         ];
     }
 

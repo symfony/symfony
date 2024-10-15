@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Messenger;
 
+use Symfony\Component\Messenger\Message\SelfStampableInterface;
 use Symfony\Component\Messenger\Middleware\MiddlewareInterface;
 use Symfony\Component\Messenger\Middleware\StackMiddleware;
 
@@ -53,6 +54,10 @@ class MessageBus implements MessageBusInterface
 
     public function dispatch(object $message, array $stamps = []): Envelope
     {
+        if ($message instanceof SelfStampableInterface) {
+            $stamps = array_merge($message->getStamps(), $stamps);
+        }
+
         $envelope = Envelope::wrap($message, $stamps);
         $middlewareIterator = $this->middlewareAggregate->getIterator();
 

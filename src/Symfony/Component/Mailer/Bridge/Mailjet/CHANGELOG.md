@@ -5,7 +5,6 @@ CHANGELOG
 ---
 
  * Add `RemoteEvent` and `Webhook` support
- * Fix `TrackClicks` and `TrackOpens` parameters
 
 6.3
 ---

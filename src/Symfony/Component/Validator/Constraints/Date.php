@@ -23,16 +23,14 @@ use Symfony\Component\Validator\Constraint;
 #[\Attribute(\Attribute::TARGET_PROPERTY | \Attribute::TARGET_METHOD | \Attribute::IS_REPEATABLE)]
 class Date extends Constraint
 {
-    public const ACCEPTED_DATE_FORMATS = [
-        'Y-m-d',
-        'm-d-Y',
-        'd-m-Y',
-        'Y/m/d',
-        'm/d/Y',
-        'd/m/Y',
-        'Y.m.d',
-        'm.d.Y',
-        'd.m.Y',
+    public const PATTERN_YMD = '/^Y(?<separator1>[.\-\/])m(?<separator2>[.\-\/])d$/D';
+    public const PATTERN_MDY = '/^m(?<separator1>[.\-\/])d(?<separator2>[.\-\/])Y$/D';
+    public const PATTERN_DMY = '/^d(?<separator1>[.\-\/])m(?<separator2>[.\-\/])Y$/D';
+
+    public const ACCEPTED_DATE_FORMATS_REGEX = [
+        'Y[.-/]m[.-/]d' => self::PATTERN_YMD,
+        'm[.-/]d[.-/]Y' => self::PATTERN_MDY,
+        'd[.-/]m[.-/]Y' => self::PATTERN_DMY,
     ];
 
     public const INVALID_FORMAT_ERROR = '69819696-02ac-4a99-9ff0-14e127c4d1bc';
@@ -47,7 +45,7 @@ class Date extends Constraint
 
     public string $format = 'Y-m-d';
     public string $message = 'This value is not a valid date.';
-    public string $messageDateFormatNotAccepted = 'This format "{{ value }}" is not supported, availabl : {{ formats }}.';
+    public string $messageDateFormatNotAccepted = 'Unsupported format "{{ value }}", only {{ formats }} are supported, with same separators.';
 
     /**
      * @param array<string,mixed>|null $options

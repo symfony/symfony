@@ -130,7 +130,7 @@ class DateValidatorTest extends ConstraintValidatorTestCase
 
         $this->buildViolation('myMessage')
             ->setParameter('{{ value }}', '"'.$format.'"')
-            ->setParameter('{{ formats }}', '"Y-m-d", "m-d-Y", "d-m-Y", "Y/m/d", "m/d/Y", "d/m/Y", "Y.m.d", "m.d.Y", "d.m.Y"')
+            ->setParameter('{{ formats }}', '"Y[.-/]m[.-/]d", "m[.-/]d[.-/]Y", "d[.-/]m[.-/]Y"')
             ->setCode($code)
             ->assertRaised();
     }
@@ -141,6 +141,9 @@ class DateValidatorTest extends ConstraintValidatorTestCase
             ['2010-12-20', Date::NOT_SUPPORTED_DATE_FORMAT_ERROR, 'Y-m-Y'],
             ['2010-04-30', Date::NOT_SUPPORTED_DATE_FORMAT_ERROR, 'm-m-Y'],
             ['2010-02-29', Date::NOT_SUPPORTED_DATE_FORMAT_ERROR, 'foo'],
+            ['01.05.2030', Date::NOT_SUPPORTED_DATE_FORMAT_ERROR, 'd.m/Y'],
+            ['01.05.2030', Date::NOT_SUPPORTED_DATE_FORMAT_ERROR, 'd/m-Y'],
+            ['01.05.2030', Date::NOT_SUPPORTED_DATE_FORMAT_ERROR, 'd/m.Y'],
         ];
     }
 

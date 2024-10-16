@@ -37,10 +37,21 @@ class DateValidator extends ConstraintValidator
 
         $value = (string) $value;
 
-        if (!\in_array($constraint->format, Date::ACCEPTED_DATE_FORMATS)) {
+        $formatValid = false;
+
+        foreach (Date::ACCEPTED_DATE_FORMATS_REGEX as $regexFormatAccepted) {
+            if (preg_match($regexFormatAccepted, $constraint->format, $matches)
+                && $matches['separator1'] === $matches['separator2']
+            ) {
+                $formatValid = true;
+                break;
+            }
+        }
+
+        if (false === $formatValid) {
             $this->context->buildViolation($constraint->messageDateFormatNotAccepted)
                 ->setParameter('{{ value }}', $this->formatValue($constraint->format))
-                ->setParameter('{{ formats }}', $this->formatValues(Date::ACCEPTED_DATE_FORMATS))
+                ->setParameter('{{ formats }}', $this->formatValues(array_keys(Date::ACCEPTED_DATE_FORMATS_REGEX)))
                 ->setCode(Date::NOT_SUPPORTED_DATE_FORMAT_ERROR)
                 ->addViolation();
 

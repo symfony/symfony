@@ -5,3 +5,4 @@ CHANGELOG
 ---
 
  * Add LINE Bot bridge
+ * Implement message sending options for LineBot

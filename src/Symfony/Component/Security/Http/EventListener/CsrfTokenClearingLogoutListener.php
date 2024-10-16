@@ -11,10 +11,12 @@
 
 namespace Symfony\Component\Security\Http\EventListener;
 
+use Symfony\Bundle\SecurityBundle\Security\FirewallMap;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Security\Csrf\TokenStorage\ClearableTokenStorageInterface;
 use Symfony\Component\Security\Csrf\TokenStorage\SessionTokenStorage;
 use Symfony\Component\Security\Http\Event\LogoutEvent;
+use Symfony\Component\Security\Http\FirewallMapInterface;
 
 /**
  * @author Christian Flothmann <christian.flothmann@sensiolabs.de>
@@ -24,15 +26,25 @@ use Symfony\Component\Security\Http\Event\LogoutEvent;
 class CsrfTokenClearingLogoutListener implements EventSubscriberInterface
 {
     private ClearableTokenStorageInterface $csrfTokenStorage;
+    private FirewallMapInterface $map;
 
-    public function __construct(ClearableTokenStorageInterface $csrfTokenStorage)
+    public function __construct(ClearableTokenStorageInterface $csrfTokenStorage, FirewallMapInterface $map)
     {
         $this->csrfTokenStorage = $csrfTokenStorage;
+        $this->map = $map;
     }
 
     public function onLogout(LogoutEvent $event): void
     {
-        if ($this->csrfTokenStorage instanceof SessionTokenStorage && !$event->getRequest()->hasPreviousSession()) {
+        $request = $event->getRequest();
+
+        if (
+            $this->csrfTokenStorage instanceof SessionTokenStorage
+            && (
+                ($this->map instanceof FirewallMap && $this->map->getFirewallConfig($request)->isStateless())
+                || !$request->hasPreviousSession()
+            )
+        ) {
             return;
         }
 

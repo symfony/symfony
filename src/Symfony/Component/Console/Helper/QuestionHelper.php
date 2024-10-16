@@ -18,11 +18,14 @@ use Symfony\Component\Console\Formatter\OutputFormatter;
 use Symfony\Component\Console\Formatter\OutputFormatterStyle;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\StreamableInputInterface;
+use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\Console\Output\ConsoleOutputInterface;
 use Symfony\Component\Console\Output\ConsoleSectionOutput;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Output\StreamOutput;
 use Symfony\Component\Console\Question\ChoiceQuestion;
 use Symfony\Component\Console\Question\Question;
+use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Console\Terminal;
 
 use function Symfony\Component\String\s;
@@ -34,6 +37,25 @@ use function Symfony\Component\String\s;
  */
 class QuestionHelper extends Helper
 {
+    private const KEY_ALT_B = "\033b";
+    private const KEY_ALT_F = "\033f";
+    private const KEY_ARROW_LEFT = "\033[D";
+    private const KEY_ARROW_RIGHT = "\033[C";
+    private const KEY_BACKSPACE = "\177";
+    private const KEY_CTRL_A = "\001";
+    private const KEY_CTRL_B = "\002";
+    private const KEY_CTRL_E = "\005";
+    private const KEY_CTRL_F = "\006";
+    private const KEY_CTRL_H = "\010";
+    private const KEY_CTRL_ARROW_LEFT = "\033[1;5D";
+    private const KEY_CTRL_ARROW_RIGHT = "\033[1;5C";
+    private const KEY_CTRL_SHIFT_ARROW_LEFT = "\033[1;6D";
+    private const KEY_CTRL_SHIFT_ARROW_RIGHT = "\033[1;6C";
+    private const KEY_DELETE = "\033[3~";
+    private const KEY_END = "\033[F";
+    private const KEY_ENTER = "\n";
+    private const KEY_HOME = "\033[H";
+
     private static bool $stty = true;
     private static bool $stdinIsInteractive;
 
@@ -122,7 +144,7 @@ class QuestionHelper extends Helper
                     stream_set_blocking($inputStream, true);
                 }
 
-                $ret = $this->readInput($inputStream, $question);
+                $ret = $this->readInput($inputStream, $question, $output);
 
                 if (!$isBlocked) {
                     stream_set_blocking($inputStream, false);
@@ -499,13 +521,12 @@ class QuestionHelper extends Helper
      * @param resource $inputStream The handler resource
      * @param Question $question    The question being asked
      */
-    private function readInput($inputStream, Question $question): string|false
+    private function readInput($inputStream, Question $question, OutputInterface $output): string|false
     {
         if (!$question->isMultiline()) {
             $cp = $this->setIOCodepage();
-            $ret = fgets($inputStream, 4096);
 
-            return $this->resetIOCodepage($cp, $ret);
+            return $this->resetIOCodepage($cp, $this->handleCliInput($inputStream, $output));
         }
 
         $multiLineStreamReader = $this->cloneInputStream($inputStream);
@@ -585,5 +606,163 @@ class QuestionHelper extends Helper
         }
 
         return $cloneStream;
+    }
+
+    /**
+     * @param resource $inputStream The handler resource
+     */
+    private function handleCliInput($inputStream, OutputInterface $output): string|false
+    {
+        if (!Terminal::hasSttyAvailable() || '/' !== \DIRECTORY_SEPARATOR) {
+            return fgets($inputStream, 4096);
+        }
+
+        // Memory not supported for stream_select
+        $isStdin = 'php://stdin' === (stream_get_meta_data($inputStream)['uri'] ?? null);
+        // Check for stdout and stderr because helpers are using stderr by default
+        $isOutputSupported = $output instanceof StreamOutput ? \in_array(stream_get_meta_data($output->getStream())['uri'] ?? null, ['php://stdout', 'php://stderr', 'php://output']) :
+            ($output instanceof SymfonyStyle && $output->getOutput() instanceof StreamOutput && \in_array(stream_get_meta_data($output->getOutput()->getStream())['uri'] ?? null, ['php://stdout', 'php://stderr', 'php://output']));
+        $sttyMode = shell_exec('stty -g');
+        // Disable icanon (so we can fread each keypress)
+        shell_exec('stty -icanon -echo');
+
+        if ($isOutputSupported) {
+            $originalOutput = $output;
+            // This is needed for the input handling, when a question is in a section because then the inout is handled after the section
+            // Verbosity level is set to normal to see the input because using quiet would not show in input
+            $output = new ConsoleOutput();
+        }
+
+        $cursor = new Cursor($output);
+        $startXPos = $cursor->getCurrentPosition()[0];
+        $pressedKey = false;
+        $ret = [];
+        $currentInputXPos = 0;
+
+        while (!feof($inputStream) && self::KEY_ENTER !== $pressedKey) {
+            $read = [$inputStream];
+            $write = $except = null;
+            while ($isStdin && 0 === @stream_select($read, $write, $except, 0, 100)) {
+                // Give signal handlers a chance to run
+                $read = [$inputStream];
+            }
+            $pressedKey = fread($inputStream, 1);
+
+            if ((false === $pressedKey || 0 === \ord($pressedKey)) && empty($ret)) {
+                // Reset stty so it behaves normally again
+                shell_exec('stty '.$sttyMode);
+
+                return false;
+            }
+
+            $unreadBytes = stream_get_meta_data($inputStream)['unread_bytes'];
+            if ("\033" === $pressedKey && 0 < $unreadBytes) {
+                $pressedKey .= fread($inputStream, 1);
+                if (91 === \ord($pressedKey[1]) && 1 < $unreadBytes) {
+                    // Ctrl keys / key combinations need at least 3 chars
+                    $pressedKey .= fread($inputStream, 1);
+                    if (isset($pressedKey[2]) && 51 === \ord($pressedKey[2]) && 2 < $unreadBytes) {
+                        // Del needs 4 chars
+                        $pressedKey .= fread($inputStream, 1);
+                    }
+                    if (isset($pressedKey[2]) && 49 === \ord($pressedKey[2]) && 2 < $unreadBytes) {
+                        // Ctrl + arrow left/right needs 6 chars
+                        $pressedKey .= fread($inputStream, 3);
+                    }
+                }
+            } elseif ("\303" === $pressedKey && 0 < $unreadBytes) {
+                // Special chars need 2 chars
+                $pressedKey .= fread($inputStream, 1);
+            }
+
+            switch (true) {
+                case self::KEY_ARROW_LEFT === $pressedKey && $currentInputXPos > 0:
+                case self::KEY_CTRL_B === $pressedKey && $currentInputXPos > 0:
+                    $cursor->moveLeft();
+                    --$currentInputXPos;
+                    break;
+                case self::KEY_ARROW_RIGHT === $pressedKey && $currentInputXPos < \count($ret):
+                case self::KEY_CTRL_F === $pressedKey && $currentInputXPos < \count($ret):
+                    $cursor->moveRight();
+                    ++$currentInputXPos;
+                    break;
+                case self::KEY_CTRL_ARROW_LEFT === $pressedKey && $currentInputXPos > 0:
+                case self::KEY_ALT_B === $pressedKey && $currentInputXPos > 0:
+                case self::KEY_CTRL_SHIFT_ARROW_LEFT === $pressedKey && $currentInputXPos > 0:
+                    do {
+                        $cursor->moveLeft();
+                        --$currentInputXPos;
+                    } while ($currentInputXPos > 0 && (1 < \strlen($ret[$currentInputXPos - 1]) || preg_match('/\w/', $ret[$currentInputXPos - 1])));
+                    break;
+                case self::KEY_CTRL_ARROW_RIGHT === $pressedKey && $currentInputXPos < \count($ret):
+                case self::KEY_ALT_F === $pressedKey && $currentInputXPos < \count($ret):
+                case self::KEY_CTRL_SHIFT_ARROW_RIGHT === $pressedKey && $currentInputXPos < \count($ret):
+                    do {
+                        $cursor->moveRight();
+                        ++$currentInputXPos;
+                    } while ($currentInputXPos < \count($ret) && (1 < \strlen($ret[$currentInputXPos]) || preg_match('/\w/', $ret[$currentInputXPos])));
+                    break;
+                case self::KEY_CTRL_H === $pressedKey && $currentInputXPos > 0:
+                case self::KEY_BACKSPACE === $pressedKey && $currentInputXPos > 0:
+                    array_splice($ret, $currentInputXPos - 1, 1);
+                    $cursor->moveToColumn($startXPos);
+                    if ($isOutputSupported) {
+                        $output->write(implode('', $ret));
+                    }
+                    $cursor->clearLineAfter()
+                        ->moveToColumn(($currentInputXPos + $startXPos) - 1);
+                    --$currentInputXPos;
+                    break;
+                case self::KEY_DELETE === $pressedKey && $currentInputXPos < \count($ret):
+                    array_splice($ret, $currentInputXPos, 1);
+                    $cursor->moveToColumn($startXPos);
+                    if ($isOutputSupported) {
+                        $output->write(implode('', $ret));
+                    }
+                    $cursor->clearLineAfter()
+                        ->moveToColumn($currentInputXPos + $startXPos);
+                    break;
+                case self::KEY_HOME === $pressedKey:
+                case self::KEY_CTRL_A === $pressedKey:
+                    $cursor->moveToColumn($startXPos);
+                    $currentInputXPos = 0;
+                    break;
+                case self::KEY_END === $pressedKey:
+                case self::KEY_CTRL_E === $pressedKey:
+                    $cursor->moveToColumn($startXPos + \count($ret));
+                    $currentInputXPos = \count($ret);
+                    break;
+                case !preg_match('@[[:cntrl:]]@', $pressedKey):
+                    if ($currentInputXPos >= 0 && $currentInputXPos < \count($ret)) {
+                        array_splice($ret, $currentInputXPos, 0, $pressedKey);
+                        $cursor->moveToColumn($startXPos);
+                        if ($isOutputSupported) {
+                            $output->write(implode('', $ret));
+                        }
+                        $cursor->clearLineAfter()
+                            ->moveToColumn($currentInputXPos + $startXPos + 1);
+                    } else {
+                        $ret[] = $pressedKey;
+                        if ($isOutputSupported) {
+                            $output->write($pressedKey);
+                        }
+                    }
+                    ++$currentInputXPos;
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        if ($isOutputSupported) {
+            // Clear the output to write it to the original output
+            $cursor->moveToColumn($startXPos)->clearLineAfter();
+            $originalOutput->writeln(implode('', $ret));
+        }
+
+        // Reset stty so it behaves normally again
+        shell_exec('stty '.$sttyMode);
+
+        return implode('', $ret);
     }
 }

@@ -15,6 +15,7 @@ use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\TransportException;
 use Symfony\Component\Messenger\Stamp\DelayStamp;
 use Symfony\Component\Messenger\Stamp\RedeliveryStamp;
+use Symfony\Component\Messenger\Stamp\SentToFailureTransportStamp;
 use Symfony\Component\Messenger\Transport\Sender\SenderInterface;
 use Symfony\Component\Messenger\Transport\Serialization\PhpSerializer;
 use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
@@ -59,7 +60,7 @@ class AmqpSender implements SenderInterface
             $amqpStamp = AmqpStamp::createFromAmqpEnvelope(
                 $amqpReceivedStamp->getAmqpEnvelope(),
                 $amqpStamp,
-                $envelope->last(RedeliveryStamp::class) ? $amqpReceivedStamp->getQueueName() : null
+                $this->getRetryRoutingKey($envelope, $amqpReceivedStamp)
             );
         }
 
@@ -75,5 +76,14 @@ class AmqpSender implements SenderInterface
         }
 
         return $envelope;
+    }
+
+    private function getRetryRoutingKey(Envelope $envelope, AmqpReceivedStamp $amqpReceivedStamp): ?string
+    {
+        if (1 === \count($envelope->all(SentToFailureTransportStamp::class))) {
+            return null;
+        }
+
+        return $envelope->last(RedeliveryStamp::class) ? $amqpReceivedStamp->getQueueName() : null;
     }
 }

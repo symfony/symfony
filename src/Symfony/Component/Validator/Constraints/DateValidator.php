@@ -21,18 +21,6 @@ use Symfony\Component\Validator\Exception\UnexpectedValueException;
  */
 class DateValidator extends ConstraintValidator
 {
-    public const PATTERN = '/^(?<year>\d{4})-(?<month>\d{2})-(?<day>\d{2})$/D';
-
-    /**
-     * Checks whether a date is valid.
-     *
-     * @internal
-     */
-    public static function checkDate(int $year, int $month, int $day): bool
-    {
-        return checkdate($month, $day, $year);
-    }
-
     public function validate(mixed $value, Constraint $constraint): void
     {
         if (!$constraint instanceof Date) {
@@ -49,20 +37,24 @@ class DateValidator extends ConstraintValidator
 
         $value = (string) $value;
 
-        if (!preg_match(static::PATTERN, $value, $matches)) {
-            $this->context->buildViolation($constraint->message)
-                ->setParameter('{{ value }}', $this->formatValue($value))
-                ->setCode(Date::INVALID_FORMAT_ERROR)
+        if (!\in_array($constraint->format, Date::ACCEPTED_DATE_FORMATS)) {
+            $this->context->buildViolation($constraint->messageDateFormatNotAccepted)
+                ->setParameter('{{ value }}', $this->formatValue($constraint->format))
+                ->setParameter('{{ formats }}', $this->formatValues(Date::ACCEPTED_DATE_FORMATS))
+                ->setCode(Date::NOT_SUPPORTED_DATE_FORMAT_ERROR)
                 ->addViolation();
 
             return;
         }
 
-        if (!self::checkDate(
-            $matches['year'] ?? $matches[1],
-            $matches['month'] ?? $matches[2],
-            $matches['day'] ?? $matches[3]
-        )) {
+        $asDateTimeImmutable = \DateTimeImmutable::createFromFormat($constraint->format, $value);
+
+        if (!$asDateTimeImmutable) {
+            $this->context->buildViolation($constraint->message)
+                ->setParameter('{{ value }}', $this->formatValue($value))
+                ->setCode(Date::INVALID_FORMAT_ERROR)
+                ->addViolation();
+        } elseif ($asDateTimeImmutable->format($constraint->format) !== $value) {
             $this->context->buildViolation($constraint->message)
                 ->setParameter('{{ value }}', $this->formatValue($value))
                 ->setCode(Date::INVALID_DATE_ERROR)

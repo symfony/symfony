@@ -115,12 +115,12 @@ class CachePoolPass implements CompilerPassInterface
                         $chainedPool->replaceArgument($i++, new Reference(static::getServiceProvider($container, $chainedTags[0]['provider'])));
                     }
 
-                    if (isset($tags[0]['namespace']) && !\in_array($adapter->getClass(), [ArrayAdapter::class, NullAdapter::class], true)) {
-                        $chainedPool->replaceArgument($i++, $tags[0]['namespace']);
+                    if (isset($chainedTags[0]['namespace']) && !\in_array($adapter->getClass(), [ArrayAdapter::class, NullAdapter::class], true)) {
+                        $chainedPool->replaceArgument($i++, $chainedTags[0]['namespace']);
                     }
 
-                    if (isset($tags[0]['default_lifetime'])) {
-                        $chainedPool->replaceArgument($i++, $tags[0]['default_lifetime']);
+                    if (isset($chainedTags[0]['default_lifetime'])) {
+                        $chainedPool->replaceArgument($i++, $chainedTags[0]['default_lifetime']);
                     }
 
                     $adapters[] = $chainedPool;

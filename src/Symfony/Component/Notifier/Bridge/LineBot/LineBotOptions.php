@@ -36,9 +36,9 @@ final class LineBotOptions implements MessageOptionsInterface
          */
         private ?bool $notificationDisabled = null,
         /**
-         * @var string[] $customAggregationUnits
+         * @var string[]|null $customAggregationUnits
          */
-        private array $customAggregationUnits = [],
+        private ?array $customAggregationUnits = null,
     ) {
     }
 
@@ -66,7 +66,7 @@ final class LineBotOptions implements MessageOptionsInterface
      *     to: string|null,
      *     messages: array<string, mixed>[],
      *     notificationDisabled: bool|null,
-     *     customAggregationUnits: string[],
+     *     customAggregationUnits: string[]|null,
      * }
      */
     public function toArray(): array
@@ -134,12 +134,16 @@ final class LineBotOptions implements MessageOptionsInterface
     /**
      * Name of aggregation unit.
      *
-     * @param string[] $units the name of the aggregation unit
+     * @param ?string[] $units the name of the aggregation unit
      *
      * @return $this
      */
-    public function customAggregationUnits(array $units): static
+    public function customAggregationUnits(?array $units): static
     {
+        if (null !== $units && 0 == \count($units)) {
+            throw new LogicException('You must provide at least one aggregation unit if units is not null.');
+        }
+
         $this->customAggregationUnits = $units;
 
         return $this;

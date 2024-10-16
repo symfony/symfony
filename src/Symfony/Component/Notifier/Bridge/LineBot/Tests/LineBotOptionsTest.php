@@ -13,6 +13,7 @@ namespace Symfony\Component\Notifier\Bridge\LineBot\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Notifier\Bridge\LineBot\LineBotOptions;
+use Symfony\Component\Notifier\Exception\LogicException;
 use Symfony\Component\Notifier\Notification\Notification;
 
 final class LineBotOptionsTest extends TestCase
@@ -78,7 +79,7 @@ final class LineBotOptionsTest extends TestCase
                     ],
                 ],
                 'notificationDisabled' => null,
-                'customAggregationUnits' => [],
+                'customAggregationUnits' => null,
             ],
         ];
 
@@ -99,7 +100,7 @@ final class LineBotOptionsTest extends TestCase
                     ],
                 ],
                 'notificationDisabled' => true,
-                'customAggregationUnits' => [],
+                'customAggregationUnits' => null,
             ],
         ];
 
@@ -170,7 +171,7 @@ final class LineBotOptionsTest extends TestCase
                     ],
                 ],
                 'notificationDisabled' => null,
-                'customAggregationUnits' => [],
+                'customAggregationUnits' => null,
             ],
         ];
 
@@ -199,7 +200,7 @@ final class LineBotOptionsTest extends TestCase
                     ],
                 ],
                 'notificationDisabled' => false,
-                'customAggregationUnits' => [],
+                'customAggregationUnits' => null,
             ],
         ];
     }
@@ -219,5 +220,48 @@ final class LineBotOptionsTest extends TestCase
     public function testToArray(LineBotOptions $options, array $expected)
     {
         $this->assertSame($expected, $options->toArray());
+    }
+
+    public function testOverFiveMessages()
+    {
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('You can only add up to 5 messages');
+
+        (new LineBotOptions())
+            ->to('test')
+            ->addMessage([
+                'type' => 'text',
+                'text' => 'Hello',
+            ])
+            ->addMessage([
+                'type' => 'text',
+                'text' => 'World',
+            ])
+            ->addMessage([
+                'type' => 'text',
+                'text' => 'Hello',
+            ])
+            ->addMessage([
+                'type' => 'text',
+                'text' => 'World',
+            ])
+            ->addMessage([
+                'type' => 'text',
+                'text' => 'Hello',
+            ])
+            ->addMessage([
+                'type' => 'text',
+                'text' => 'World',
+            ]);
+    }
+
+    public function testEmptyCustomAggregationUnits()
+    {
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('You must provide at least one aggregation unit if units is not null.');
+
+        (new LineBotOptions())
+            ->to('test')
+            ->customAggregationUnits([]);
     }
 }

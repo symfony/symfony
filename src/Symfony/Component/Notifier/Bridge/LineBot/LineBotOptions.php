@@ -23,10 +23,8 @@ use Symfony\Component\Notifier\Notification\Notification;
 final class LineBotOptions implements MessageOptionsInterface
 {
     /**
-     * @param string|null $to
      * @param array<string, mixed>[] $messages
-     * @param bool|null $notificationDisabled
-     * @param string[]|null $customAggregationUnits
+     * @param string[]|null          $customAggregationUnits
      */
     public function __construct(
         private ?string $to = null,

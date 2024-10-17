@@ -98,6 +98,12 @@ $sanitizer->sanitize($userInput);
 // Sanitize the given string for a usage in a <head> tag
 $sanitizer->sanitizeFor('head', $userInput);
 
+// Sanitize the given string for a usage in a <body> tag
+$sanitizer->sanitizeFor('body', $userInput);
+
+// Sanitize the given string as a whole document (including <head> and <body>)
+$sanitizer->sanitizeFor('document', $userInput);
+
 // Sanitize the given string for a usage in another tag
 $sanitizer->sanitizeFor('title', $userInput); // Will encode as HTML entities
 $sanitizer->sanitizeFor('textarea', $userInput); // Will encode as HTML entities

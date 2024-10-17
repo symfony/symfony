@@ -77,7 +77,7 @@ class KazInfoTehTransport extends AbstractTransport
         }
 
         try {
-            $content = new \SimpleXMLElement($response->getContent(false));
+            $content = @new \SimpleXMLElement($response->getContent(false));
         } catch (\Exception $e) {
             throw new TransportException('Unable to send the SMS: "Couldn\'t read response".', $response, previous: $e);
         }

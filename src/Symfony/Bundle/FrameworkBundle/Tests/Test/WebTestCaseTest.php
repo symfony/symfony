@@ -388,7 +388,7 @@ class WebTestCaseTest extends TestCase
 
     private function getTester(KernelBrowser $client): WebTestCase
     {
-        $tester = new class extends WebTestCase {
+        $tester = new class(method_exists($this, 'name') ? $this->name() : $this->getName()) extends WebTestCase {
             use WebTestAssertionsTrait {
                 getClient as public;
             }

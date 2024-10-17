@@ -25,13 +25,13 @@ class FinderTest extends Iterator\RealIteratorTestCase
     {
         $finder = $this->buildFinder();
         $this->assertSame($finder, $finder->directories());
-        $this->assertIterator($this->toAbsolute(['foo', 'qux', 'toto']), $finder->in(self::$tmpDir)->getIterator());
+        $this->assertIterator($this->toAbsolute(['foo', 'qux', 'toto', 'toto/foo']), $finder->in(self::$tmpDir)->getIterator());
 
         $finder = $this->buildFinder();
         $finder->directories();
         $finder->files();
         $finder->directories();
-        $this->assertIterator($this->toAbsolute(['foo', 'qux', 'toto']), $finder->in(self::$tmpDir)->getIterator());
+        $this->assertIterator($this->toAbsolute(['foo', 'qux', 'toto', 'toto/foo']), $finder->in(self::$tmpDir)->getIterator());
     }
 
     public function testFiles()
@@ -162,7 +162,8 @@ class FinderTest extends Iterator\RealIteratorTestCase
         $this->assertIterator($this->toAbsolute([
             'foo/bar.tmp',
             'qux/baz_100_1.py',
-            'qux/baz_1_2.py',
+	    'qux/baz_1_2.py',
+	    'toto/foo',
         ]), $finder->in(self::$tmpDir)->getIterator());
 
         $finder = $this->buildFinder();
@@ -178,6 +179,7 @@ class FinderTest extends Iterator\RealIteratorTestCase
             'foo/bar.tmp',
             'qux/baz_100_1.py',
             'qux/baz_1_2.py',
+	    'toto/foo',
         ]), $finder->in(self::$tmpDir)->getIterator());
     }
 
@@ -237,6 +239,7 @@ class FinderTest extends Iterator\RealIteratorTestCase
             'foo/bar.tmp',
             'test.py',
             'toto',
+	    'toto/foo',
             'foo bar',
             'qux',
             'qux/baz_100_1.py',
@@ -250,6 +253,7 @@ class FinderTest extends Iterator\RealIteratorTestCase
             'foo',
             'foo/bar.tmp',
             'toto',
+	    'toto/foo',
             'foo bar',
             'qux',
         ]), $finder->in(self::$tmpDir)->getIterator());
@@ -276,6 +280,7 @@ class FinderTest extends Iterator\RealIteratorTestCase
             'foo',
             'foo/bar.tmp',
             'toto',
+	    'toto/foo',
             'foo bar',
             'qux',
         ]), $finder->in(self::$tmpDir)->getIterator());
@@ -340,7 +345,47 @@ class FinderTest extends Iterator\RealIteratorTestCase
             'qux_10_2.php',
             'qux_12_0.php',
             'qux_2_0.php',
+	]), $finder->in(self::$tmpDir)->getIterator());
+
+        $finder = $this->buildFinder();
+        $this->assertSame($finder, $finder->exclude('/foo'));
+        $this->assertIterator($this->toAbsolute([
+            'test.php',
+            'test.py',
+            'toto',
+	    'toto/foo',
+            'foo bar',
+            'qux',
+            'qux/baz_100_1.py',
+            'qux/baz_1_2.py',
+            'qux_0_1.php',
+            'qux_1000_1.php',
+            'qux_1002_0.php',
+            'qux_10_2.php',
+            'qux_12_0.php',
+            'qux_2_0.php',
         ]), $finder->in(self::$tmpDir)->getIterator());
+
+	/* absolute folders lower than the "root" are not currently supported */
+        //$finder = $this->buildFinder();
+        //$this->assertSame($finder, $finder->exclude('/toto/foo'));
+        //$this->assertIterator($this->toAbsolute([
+        //   'foo',
+        //    'foo/bar.tmp',
+        //    'test.php',
+        //    'test.py',
+        //    'toto',
+        //    'foo bar',
+        //    'qux',
+        //    'qux/baz_100_1.py',
+        //    'qux/baz_1_2.py',
+        //    'qux_0_1.php',
+        //    'qux_1000_1.php',
+        //    'qux_1002_0.php',
+        //    'qux_10_2.php',
+        //    'qux_12_0.php',
+        //    'qux_2_0.php',
+        //]), $finder->in(self::$tmpDir)->getIterator());
     }
 
     public function testIgnoreVCS()
@@ -355,6 +400,7 @@ class FinderTest extends Iterator\RealIteratorTestCase
             'test.py',
             'toto',
             'toto/.git',
+	    'toto/foo',
             '.bar',
             '.foo',
             '.foo/.bar',
@@ -380,6 +426,7 @@ class FinderTest extends Iterator\RealIteratorTestCase
             'test.php',
             'test.py',
             'toto',
+	    'toto/foo',
             'toto/.git',
             '.bar',
             '.foo',
@@ -405,6 +452,7 @@ class FinderTest extends Iterator\RealIteratorTestCase
             'test.php',
             'test.py',
             'toto',
+	    'toto/foo',
             '.bar',
             '.foo',
             '.foo/.bar',
@@ -468,6 +516,7 @@ class FinderTest extends Iterator\RealIteratorTestCase
             'test.php',
             'test.py',
             'toto',
+	    'toto/foo',
             '.bar',
             '.foo',
             '.foo/.bar',
@@ -492,6 +541,7 @@ class FinderTest extends Iterator\RealIteratorTestCase
             'test.php',
             'test.py',
             'toto',
+	    'toto/foo',
             'toto/.git',
             '.bar',
             '.foo',
@@ -517,6 +567,7 @@ class FinderTest extends Iterator\RealIteratorTestCase
             'test.py',
             'toto',
             'toto/.git',
+	    'toto/foo',
             'foo bar',
             'qux',
             'qux/baz_100_1.py',
@@ -542,6 +593,7 @@ class FinderTest extends Iterator\RealIteratorTestCase
             'test.php',
             'test.py',
             'toto',
+	    'toto/foo',
             'toto/.git',
             'foo bar',
             'qux',
@@ -563,6 +615,7 @@ class FinderTest extends Iterator\RealIteratorTestCase
             'test.php',
             'test.py',
             'toto',
+	    'toto/foo',
             'foo bar',
             'qux',
             'qux/baz_100_1.py',
@@ -596,6 +649,7 @@ class FinderTest extends Iterator\RealIteratorTestCase
             'test.php',
             'test.py',
             'toto',
+	    'toto/foo',
             'foo bar',
         ]), $finder->getIterator());
 
@@ -615,6 +669,7 @@ class FinderTest extends Iterator\RealIteratorTestCase
             'test.php',
             'test.py',
             'toto',
+	    'toto/foo',
             '.bar',
             '.foo',
             '.foo/.bar',
@@ -643,6 +698,7 @@ class FinderTest extends Iterator\RealIteratorTestCase
             'test.php',
             'test.py',
             'toto',
+	    'toto/foo',
         ]), $finder->in(self::$tmpDir)->getIterator());
     }
 
@@ -654,6 +710,7 @@ class FinderTest extends Iterator\RealIteratorTestCase
             'foo',
             'qux',
             'toto',
+	    'toto/foo',
             'foo bar',
             'foo/bar.tmp',
             'qux/baz_100_1.py',
@@ -677,6 +734,7 @@ class FinderTest extends Iterator\RealIteratorTestCase
             'foo/bar.tmp',
             'test.php',
             'toto',
+	    'toto/foo',
             'test.py',
             'foo',
             'foo bar',
@@ -698,6 +756,7 @@ class FinderTest extends Iterator\RealIteratorTestCase
         $this->assertSame($finder, $finder->sortByChangedTime());
         $this->assertIterator($this->toAbsolute([
             'toto',
+	    'toto/foo',
             'test.py',
             'test.php',
             'foo/bar.tmp',
@@ -723,6 +782,7 @@ class FinderTest extends Iterator\RealIteratorTestCase
             'foo/bar.tmp',
             'test.php',
             'toto',
+	    'toto/foo',
             'test.py',
             'foo',
             'foo bar',
@@ -744,6 +804,7 @@ class FinderTest extends Iterator\RealIteratorTestCase
         $this->assertSame($finder, $finder->sortByName());
         $this->assertSame($finder, $finder->reverseSorting());
         $this->assertOrderedIteratorInForeach($this->toAbsolute([
+	    'toto/foo',
             'toto',
             'test.py',
             'test.php',
@@ -782,6 +843,7 @@ class FinderTest extends Iterator\RealIteratorTestCase
             'test.php',
             'test.py',
             'toto',
+	    'toto/foo',
         ]), $finder->in(self::$tmpDir)->getIterator());
 
         $finder = $this->buildFinder();
@@ -802,6 +864,7 @@ class FinderTest extends Iterator\RealIteratorTestCase
             'test.php',
             'test.py',
             'toto',
+	    'toto/foo',
         ]), $finder->in(self::$tmpDir)->getIterator());
     }
 
@@ -825,6 +888,7 @@ class FinderTest extends Iterator\RealIteratorTestCase
             'test.php',
             'test.py',
             'toto',
+	    'toto/foo',
         ]), $finder->in(self::$tmpDir)->getIterator());
     }
 
@@ -882,6 +946,7 @@ class FinderTest extends Iterator\RealIteratorTestCase
             'test.php',
             'test.py',
             'toto',
+	    'toto/foo',
             'foo bar',
             'qux',
             'qux/baz_100_1.py',
@@ -972,7 +1037,7 @@ class FinderTest extends Iterator\RealIteratorTestCase
             $dirs[] = (string) $dir;
         }
 
-        $expected = $this->toAbsolute(['foo', 'qux', 'toto']);
+        $expected = $this->toAbsolute(['foo', 'qux', 'toto', 'toto/foo']);
 
         sort($dirs);
         sort($expected);
@@ -980,7 +1045,7 @@ class FinderTest extends Iterator\RealIteratorTestCase
         $this->assertEquals($expected, $dirs, 'implements the \IteratorAggregate interface');
 
         $finder = $this->buildFinder();
-        $this->assertEquals(3, iterator_count($finder->directories()->in(self::$tmpDir)), 'implements the \IteratorAggregate interface');
+        $this->assertEquals(4, iterator_count($finder->directories()->in(self::$tmpDir)), 'implements the \IteratorAggregate interface');
 
         $finder = $this->buildFinder();
         $a = iterator_to_array($finder->directories()->in(self::$tmpDir));
@@ -999,7 +1064,7 @@ class FinderTest extends Iterator\RealIteratorTestCase
             $paths[] = $file->getRelativePath();
         }
 
-        $ref = ['', '', '', '', '', '', '', '', '', '', '', 'foo', 'qux', 'qux', ''];
+        $ref = ['', '', '', '', '', '', '', '', '', '', '', 'foo', 'qux', 'qux', '', 'toto'];
 
         sort($ref);
         sort($paths);
@@ -1020,6 +1085,7 @@ class FinderTest extends Iterator\RealIteratorTestCase
         $ref = [
             'test.php',
             'toto',
+            'toto/foo',
             'test.py',
             'foo',
             'foo'.\DIRECTORY_SEPARATOR.'bar.tmp',
@@ -1056,6 +1122,7 @@ class FinderTest extends Iterator\RealIteratorTestCase
             'toto',
             'test',
             'foo',
+            'foo',
             'bar',
             'foo bar',
             'qux',
@@ -1085,7 +1152,7 @@ class FinderTest extends Iterator\RealIteratorTestCase
 
         $finder = $finder->append($finder1);
 
-        $this->assertIterator($this->toAbsolute(['foo', 'foo/bar.tmp', 'qux', 'toto']), $finder->getIterator());
+        $this->assertIterator($this->toAbsolute(['foo', 'foo/bar.tmp', 'qux', 'toto', 'toto/foo']), $finder->getIterator());
     }
 
     public function testAppendWithAnArray()

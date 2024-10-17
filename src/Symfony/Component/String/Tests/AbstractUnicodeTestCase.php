@@ -655,6 +655,17 @@ END'],
         );
     }
 
+    public static function providePascal(): array
+    {
+        return array_merge(
+            parent::providePascal(),
+            [
+                ['SymfonyIstÄußerstCool', 'symfonyIstÄußerstCool'],
+                ['SymfonyWithEmojis', 'Symfony with 😃 emojis'],
+            ]
+        );
+    }
+
     public static function provideSnake()
     {
         return array_merge(

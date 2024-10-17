@@ -184,6 +184,7 @@ abstract class AbstractHeader implements HeaderInterface
             // whitespace(s) between 2 encoded tokens
             if (
                 0 < $i
+                && isset($tokens[$i + 1])
                 && preg_match('~^[\t ]+$~', $token)
                 && $this->tokenNeedsEncoding($tokens[$i - 1])
                 && $this->tokenNeedsEncoding($tokens[$i + 1])

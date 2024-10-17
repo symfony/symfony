@@ -11,7 +11,6 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Tests\Functional;
 
-use Composer\InstalledVersions;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -164,18 +163,6 @@ class ApiAttributesTest extends AbstractWebTestCase
                     ]
                 }
                 JSON;
-
-        $httpKernelVersion = InstalledVersions::getVersion('symfony/http-kernel');
-        if ($httpKernelVersion && version_compare($httpKernelVersion, '7.2.0', '<')) {
-            $expectedResponse = <<<'JSON'
-                {
-                    "type": "https:\/\/tools.ietf.org\/html\/rfc2616#section-10",
-                    "title": "An error occurred",
-                    "status": 404,
-                    "detail": "Not Found"
-                }
-                JSON;
-        }
 
         yield 'empty query string mapping non-nullable attribute without default value' => [
             'uri' => '/map-query-string-to-non-nullable-attribute-without-default-value.json',
@@ -749,19 +736,6 @@ class ApiAttributesTest extends AbstractWebTestCase
                   "detail":"Bad Request"
                 }
                 JSON;
-
-        $httpKernelVersion = InstalledVersions::getVersion('symfony/http-kernel');
-        if ($httpKernelVersion && version_compare($httpKernelVersion, '7.2.0', '<')) {
-            $expectedStatusCode = 422;
-            $expectedResponse = <<<'JSON'
-                {
-                    "type": "https:\/\/tools.ietf.org\/html\/rfc2616#section-10",
-                    "title": "An error occurred",
-                    "status": 422,
-                    "detail": "Unprocessable Content"
-                }
-                JSON;
-        }
 
         yield 'empty request mapping non-nullable attribute without default value' => [
             'uri' => '/map-request-to-non-nullable-attribute-without-default-value.json',

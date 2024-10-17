@@ -243,6 +243,7 @@ jobs:
           MESSENGER_AMQP_DSN: amqp://localhost/%2f/messages
           MESSENGER_SQS_DSN: "sqs://localhost:4566/messages?sslmode=disable&poll_timeout=0.01"
           MESSENGER_SQS_FIFO_QUEUE_DSN: "sqs://localhost:4566/messages.fifo?sslmode=disable&poll_timeout=0.01"
+          AWS_ENDPOINT_URL: "http://localhost:4566"
           KAFKA_BROKER: 127.0.0.1:9092
           POSTGRES_HOST: localhost
           PGBOUNCER_HOST: localhost:6432

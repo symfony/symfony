@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Validator\Constraints;
 
+use Symfony\Component\Validator\Attribute\HasNamedArguments;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Exception\InvalidArgumentException;
 use Symfony\Component\Validator\Exception\MissingOptionsException;
@@ -67,6 +68,7 @@ class Length extends Constraint
      * @param string[]|null                         $groups
      * @param array<string,mixed>                   $options
      */
+    #[HasNamedArguments]
     public function __construct(
         int|array|null $exactly = null,
         ?int $min = null,
@@ -80,11 +82,17 @@ class Length extends Constraint
         ?string $charsetMessage = null,
         ?array $groups = null,
         mixed $payload = null,
-        array $options = [],
+        ?array $options = null,
     ) {
         if (\is_array($exactly)) {
-            $options = array_merge($exactly, $options);
+            trigger_deprecation('symfony/validator', '7.2', 'Passing an array of options to configure the "%s" constraint is deprecated, use named arguments instead.', static::class);
+
+            $options = array_merge($exactly, $options ?? []);
             $exactly = $options['value'] ?? null;
+        } elseif (\is_array($options)) {
+            trigger_deprecation('symfony/validator', '7.2', 'Passing an array of options to configure the "%s" constraint is deprecated, use named arguments instead.', static::class);
+        } else {
+            $options = [];
         }
 
         $min ??= $options['min'] ?? null;

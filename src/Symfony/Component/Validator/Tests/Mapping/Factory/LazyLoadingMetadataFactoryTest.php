@@ -38,8 +38,8 @@ class LazyLoadingMetadataFactoryTest extends TestCase
         $metadata = $factory->getMetadataFor(self::PARENT_CLASS);
 
         $constraints = [
-            new ConstraintA(['groups' => ['Default', 'EntityParent']]),
-            new ConstraintA(['groups' => ['Default', 'EntityInterfaceA', 'EntityParent']]),
+            new ConstraintA(groups: ['Default', 'EntityParent']),
+            new ConstraintA(groups: ['Default', 'EntityInterfaceA', 'EntityParent']),
         ];
 
         $this->assertEquals($constraints, $metadata->getConstraints());
@@ -51,31 +51,31 @@ class LazyLoadingMetadataFactoryTest extends TestCase
         $metadata = $factory->getMetadataFor(self::CLASS_NAME);
 
         $constraints = [
-            new ConstraintA(['groups' => [
+            new ConstraintA(groups: [
                 'Default',
                 'Entity',
-            ]]),
-            new ConstraintA(['groups' => [
+            ]),
+            new ConstraintA(groups: [
                 'Default',
                 'EntityParent',
                 'Entity',
-            ]]),
-            new ConstraintA(['groups' => [
+            ]),
+            new ConstraintA(groups: [
                 'Default',
                 'EntityInterfaceA',
                 'EntityParent',
                 'Entity',
-            ]]),
-            new ConstraintA(['groups' => [
+            ]),
+            new ConstraintA(groups: [
                 'Default',
                 'EntityInterfaceB',
                 'Entity',
-            ]]),
-            new ConstraintA(['groups' => [
+            ]),
+            new ConstraintA(groups: [
                 'Default',
                 'EntityParentInterface',
                 'Entity',
-            ]]),
+            ]),
         ];
 
         $this->assertEquals($constraints, $metadata->getConstraints());
@@ -87,8 +87,8 @@ class LazyLoadingMetadataFactoryTest extends TestCase
         $factory = new LazyLoadingMetadataFactory(new TestLoader(), $cache);
 
         $expectedConstraints = [
-            new ConstraintA(['groups' => ['Default', 'EntityParent']]),
-            new ConstraintA(['groups' => ['Default', 'EntityInterfaceA', 'EntityParent']]),
+            new ConstraintA(groups: ['Default', 'EntityParent']),
+            new ConstraintA(groups: ['Default', 'EntityInterfaceA', 'EntityParent']),
         ];
 
         $metadata = $factory->getMetadataFor(self::PARENT_CLASS);

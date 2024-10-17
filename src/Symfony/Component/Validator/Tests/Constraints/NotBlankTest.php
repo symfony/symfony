@@ -24,7 +24,7 @@ class NotBlankTest extends TestCase
 {
     public function testNormalizerCanBeSet()
     {
-        $notBlank = new NotBlank(['normalizer' => 'trim']);
+        $notBlank = new NotBlank(normalizer: 'trim');
 
         $this->assertEquals('trim', $notBlank->normalizer);
     }
@@ -45,6 +45,9 @@ class NotBlankTest extends TestCase
         self::assertSame('myMessage', $bConstraint->message);
     }
 
+    /**
+     * @group legacy
+     */
     public function testInvalidNormalizerThrowsException()
     {
         $this->expectException(InvalidArgumentException::class);
@@ -52,6 +55,9 @@ class NotBlankTest extends TestCase
         new NotBlank(['normalizer' => 'Unknown Callable']);
     }
 
+    /**
+     * @group legacy
+     */
     public function testInvalidNormalizerObjectThrowsException()
     {
         $this->expectException(InvalidArgumentException::class);

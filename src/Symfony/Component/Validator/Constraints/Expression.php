@@ -13,6 +13,7 @@ namespace Symfony\Component\Validator\Constraints;
 
 use Symfony\Component\ExpressionLanguage\Expression as ExpressionObject;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
+use Symfony\Component\Validator\Attribute\HasNamedArguments;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Exception\LogicException;
 
@@ -45,6 +46,7 @@ class Expression extends Constraint
      * @param array<string,mixed>                              $options
      * @param bool|null                                        $negate     Whether to fail if the expression evaluates to true (defaults to false)
      */
+    #[HasNamedArguments]
     public function __construct(
         string|ExpressionObject|array|null $expression,
         ?string $message = null,
@@ -59,6 +61,8 @@ class Expression extends Constraint
         }
 
         if (\is_array($expression)) {
+            trigger_deprecation('symfony/validator', '7.2', 'Passing an array of options to configure the "%s" constraint is deprecated, use named arguments instead.', static::class);
+
             $options = array_merge($expression, $options);
         } else {
             $options['value'] = $expression;

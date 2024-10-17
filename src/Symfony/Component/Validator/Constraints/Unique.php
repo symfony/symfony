@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Validator\Constraints;
 
+use Symfony\Component\Validator\Attribute\HasNamedArguments;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Exception\InvalidArgumentException;
 
@@ -40,6 +41,7 @@ class Unique extends Constraint
      * @param string[]|null            $groups
      * @param string[]|string|null     $fields  Defines the key or keys in the collection that should be checked for uniqueness (defaults to null, which ensure uniqueness for all keys)
      */
+    #[HasNamedArguments]
     public function __construct(
         ?array $options = null,
         ?string $message = null,
@@ -49,6 +51,10 @@ class Unique extends Constraint
         array|string|null $fields = null,
         ?string $errorPath = null,
     ) {
+        if ($options) {
+            trigger_deprecation('symfony/validator', '7.2', 'Passing an array of options to configure the "%s" constraint is deprecated, use named arguments instead.', static::class);
+        }
+
         parent::__construct($options, $groups, $payload);
 
         $this->message = $message ?? $this->message;

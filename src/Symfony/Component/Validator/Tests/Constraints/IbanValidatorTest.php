@@ -488,9 +488,7 @@ class IbanValidatorTest extends ConstraintValidatorTestCase
 
     private function assertViolationRaised($iban, $code)
     {
-        $constraint = new Iban([
-            'message' => 'myMessage',
-        ]);
+        $constraint = new Iban(message: 'myMessage');
 
         $this->validator->validate($iban, $constraint);
 

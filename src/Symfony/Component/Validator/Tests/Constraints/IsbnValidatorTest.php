@@ -150,9 +150,7 @@ class IsbnValidatorTest extends ConstraintValidatorTestCase
      */
     public function testValidIsbn10($isbn)
     {
-        $constraint = new Isbn([
-            'type' => 'isbn10',
-        ]);
+        $constraint = new Isbn(type: 'isbn10');
 
         $this->validator->validate($isbn, $constraint);
 
@@ -160,6 +158,7 @@ class IsbnValidatorTest extends ConstraintValidatorTestCase
     }
 
     /**
+     * @group legacy
      * @dataProvider getInvalidIsbn10
      */
     public function testInvalidIsbn10($isbn, $code)
@@ -195,7 +194,7 @@ class IsbnValidatorTest extends ConstraintValidatorTestCase
      */
     public function testValidIsbn13($isbn)
     {
-        $constraint = new Isbn(['type' => 'isbn13']);
+        $constraint = new Isbn(type: 'isbn13');
 
         $this->validator->validate($isbn, $constraint);
 
@@ -203,6 +202,7 @@ class IsbnValidatorTest extends ConstraintValidatorTestCase
     }
 
     /**
+     * @group legacy
      * @dataProvider getInvalidIsbn13
      */
     public function testInvalidIsbn13($isbn, $code)
@@ -220,16 +220,21 @@ class IsbnValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    public function testInvalidIsbn13Named()
+    /**
+     * @dataProvider getInvalidIsbn13
+     */
+    public function testInvalidIsbn13Named($isbn, $code)
     {
-        $this->validator->validate(
-            '2723442284',
-            new Isbn(type: Isbn::ISBN_13, isbn13Message: 'myMessage')
+        $constraint = new Isbn(
+            type: Isbn::ISBN_13,
+            isbn13Message: 'myMessage',
         );
 
+        $this->validator->validate($isbn, $constraint);
+
         $this->buildViolation('myMessage')
-            ->setParameter('{{ value }}', '"2723442284"')
-            ->setCode(Isbn::TOO_SHORT_ERROR)
+            ->setParameter('{{ value }}', '"'.$isbn.'"')
+            ->setCode($code)
             ->assertRaised();
     }
 
@@ -250,9 +255,7 @@ class IsbnValidatorTest extends ConstraintValidatorTestCase
      */
     public function testInvalidIsbnAnyIsbn10($isbn, $code)
     {
-        $constraint = new Isbn([
-            'bothIsbnMessage' => 'myMessage',
-        ]);
+        $constraint = new Isbn(bothIsbnMessage: 'myMessage');
 
         $this->validator->validate($isbn, $constraint);
 
@@ -272,9 +275,7 @@ class IsbnValidatorTest extends ConstraintValidatorTestCase
      */
     public function testInvalidIsbnAnyIsbn13($isbn, $code)
     {
-        $constraint = new Isbn([
-            'bothIsbnMessage' => 'myMessage',
-        ]);
+        $constraint = new Isbn(bothIsbnMessage: 'myMessage');
 
         $this->validator->validate($isbn, $constraint);
 

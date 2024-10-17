@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Validator\Constraints;
 
+use Symfony\Component\Validator\Attribute\HasNamedArguments;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 
@@ -49,6 +50,7 @@ class Timezone extends Constraint
      *
      * @see \DateTimeZone
      */
+    #[HasNamedArguments]
     public function __construct(
         int|array|null $zone = null,
         ?string $message = null,
@@ -56,11 +58,19 @@ class Timezone extends Constraint
         ?bool $intlCompatible = null,
         ?array $groups = null,
         mixed $payload = null,
-        array $options = [],
+        ?array $options = null,
     ) {
         if (\is_array($zone)) {
-            $options = array_merge($zone, $options);
+            trigger_deprecation('symfony/validator', '7.2', 'Passing an array of options to configure the "%s" constraint is deprecated, use named arguments instead.', static::class);
+
+            $options = array_merge($zone, $options ?? []);
         } elseif (null !== $zone) {
+            if (\is_array($options)) {
+                trigger_deprecation('symfony/validator', '7.2', 'Passing an array of options to configure the "%s" constraint is deprecated, use named arguments instead.', static::class);
+            } else {
+                $options = [];
+            }
+
             $options['value'] = $zone;
         }
 

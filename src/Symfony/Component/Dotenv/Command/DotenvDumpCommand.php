@@ -41,6 +41,7 @@ final class DotenvDumpCommand extends Command
         $this
             ->setDefinition([
                 new InputArgument('env', null === $this->defaultEnv ? InputArgument::REQUIRED : InputArgument::OPTIONAL, 'The application environment to dump .env files for - e.g. "prod".'),
+                new InputOption('override', null, InputOption::VALUE_OPTIONAL, 'Specify whether to override existing .env.local.php, if exists, files or not.', false),
             ])
             ->addOption('empty', null, InputOption::VALUE_NONE, 'Ignore the content of .env files')
             ->setHelp(<<<'EOT'
@@ -73,6 +74,13 @@ EOT
             $env = $vars[$envKey];
         }
 
+        $override = $input->getOption('override');
+
+        if (!$override && is_file($dotenvPath.'.local.php')) {
+            $oldVars = require $dotenvPath.'.local.php';
+            $vars = $oldVars + $vars;
+        }
+
         $vars = var_export($vars, true);
         $vars = <<<EOF
 <?php
@@ -82,6 +90,7 @@ EOT
 return $vars;
 
 EOF;
+
         file_put_contents($dotenvPath.'.local.php', $vars, \LOCK_EX);
 
         $output->writeln(\sprintf('Successfully dumped .env files in <info>.env.local.php</> for the <info>%s</> environment.', $env));

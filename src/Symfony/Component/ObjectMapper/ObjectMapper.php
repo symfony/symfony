@@ -48,12 +48,6 @@ final class ObjectMapper implements ObjectMapperInterface
             $objectMapInitialized = true;
         }
 
-        try {
-            $refl = new \ReflectionClass($source);
-        } catch (\ReflectionException $e) {
-            throw new ReflectionException($e->getMessage(), $e->getCode(), $e);
-        }
-
         $metadata = $this->metadataFactory->create($source);
         $map = $this->getMapTarget($metadata, null, $source);
         $target ??= $map?->target;
@@ -105,6 +99,12 @@ final class ObjectMapper implements ObjectMapperInterface
             $ctorArguments[$parameterName] = $parameter->isDefaultValueAvailable() ? $parameter->getDefaultValue() : null;
         }
 
+        try {
+            $refl = new \ReflectionClass($source);
+        } catch (\ReflectionException $e) {
+            throw new ReflectionException($e->getMessage(), $e->getCode(), $e);
+        }
+
         $mapToProperties = [];
         foreach ($refl->getProperties() as $property) {
             if ($property->isStatic()) {
@@ -114,13 +114,7 @@ final class ObjectMapper implements ObjectMapperInterface
             $propertyName = $property->getName();
             $mappings = $this->metadataFactory->create($source, $propertyName);
             foreach ($mappings as $mapping) {
-                $if = $mapping->if;
-
-                if (false === $if) {
-                    continue;
-                }
-
-                if ($if && ($fn = $this->getCallable($if)) && !$this->call($fn, null, $source)) {
+                if (($fn = $mapping->if) && !$this->call($fn, null, $source)) {
                     continue;
                 }
 
@@ -227,15 +221,6 @@ final class ObjectMapper implements ObjectMapperInterface
         return \call_user_func_array($fn, $withArgs);
     }
 
-    private function getCallable(string|callable|null $fn = null): callable|string|null
-    {
-        if (!$fn || !\is_string($fn)) {
-            return $fn;
-        }
-
-        return $fn;
-    }
-
     /**
      * @param Mapping[] $metadata
      */
@@ -243,7 +228,7 @@ final class ObjectMapper implements ObjectMapperInterface
     {
         $mapTo = null;
         foreach ($metadata as $mapAttribute) {
-            if (($if = $mapAttribute->if) && ($fn = $this->getCallable($if)) && !$this->call($fn, $value, $source)) {
+            if (($fn = $mapAttribute->if) && !$this->call($fn, $value, $source)) {
                 continue;
             }
 
@@ -266,7 +251,6 @@ final class ObjectMapper implements ObjectMapperInterface
         }
 
         foreach ($transforms as $transform) {
-            $transform = $this->getCallable($transform);
             if (\is_callable($transform)) {
                 $value = $this->call($transform, $value, $object);
             }

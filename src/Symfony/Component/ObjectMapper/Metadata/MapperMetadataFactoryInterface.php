@@ -21,7 +21,9 @@ namespace Symfony\Component\ObjectMapper\Metadata;
 interface MapperMetadataFactoryInterface
 {
     /**
-     * @return array<int, Mapping>
+     * @param array<string, mixed> $context
+     *
+     * @return list<Mapping>
      */
     public function create(object $object, ?string $property = null, array $context = []): array;
 }

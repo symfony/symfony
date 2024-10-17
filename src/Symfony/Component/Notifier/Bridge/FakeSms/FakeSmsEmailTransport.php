@@ -60,14 +60,14 @@ final class FakeSmsEmailTransport extends AbstractTransport
      */
     protected function doSend(MessageInterface $message): SentMessage
     {
-        if (!$this->supports($message)) {
+        if (!$message instanceof SmsMessage) {
             throw new UnsupportedMessageTypeException(__CLASS__, SmsMessage::class, $message);
         }
 
         $email = (new Email())
-            ->from($message->getFrom() ?: $this->from)
+            ->from($this->from)
             ->to($this->to)
-            ->subject(sprintf('New SMS on phone number: %s', $message->getPhone()))
+            ->subject('New SMS to phone number ' . $message->getPhone() . ($message->getFrom() ? ' from ' . $message->getFrom() : ''))
             ->html($message->getSubject())
             ->text($message->getSubject());
 

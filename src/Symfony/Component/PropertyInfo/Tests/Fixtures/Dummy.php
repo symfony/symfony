@@ -31,6 +31,14 @@ class Dummy extends ParentDummy
     protected $baz;
 
     /**
+     * #@+
+     * A short description ignoring template.
+     *
+     *
+     * A long description...
+     *
+     * ...over several lines.
+     *
      * @var \DateTimeImmutable
      */
     public $bal;

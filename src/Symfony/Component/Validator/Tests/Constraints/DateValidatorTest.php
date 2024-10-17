@@ -117,47 +117,43 @@ class DateValidatorTest extends ConstraintValidatorTestCase
     }
 
     /**
-     * @dataProvider getInvalidFormats
+     * @dataProvider getNotMatchingDatesAndFormats
      */
-    public function testInvalidFormats($date, $code, $format)
+    public function testInvalidFormats($date, $format, $code)
     {
-        $constraint = new Date([
-            'messageDateFormatNotAccepted' => 'myMessage',
-            'format' => $format,
-        ]);
+        $constraint = new Date(message: 'myMessage', format: $format);
 
         $this->validator->validate($date, $constraint);
 
         $this->buildViolation('myMessage')
-            ->setParameter('{{ value }}', '"'.$format.'"')
-            ->setParameter('{{ formats }}', '"Y[.-/]m[.-/]d", "m[.-/]d[.-/]Y", "d[.-/]m[.-/]Y"')
+            ->setParameter('{{ value }}', '"'.$date.'"')
             ->setCode($code)
             ->assertRaised();
     }
 
-    public static function getInvalidFormats()
+    public static function getNotMatchingDatesAndFormats(): array
     {
         return [
-            ['2010-12-20', Date::NOT_SUPPORTED_DATE_FORMAT_ERROR, 'Y-m-Y'],
-            ['2010-04-30', Date::NOT_SUPPORTED_DATE_FORMAT_ERROR, 'm-m-Y'],
-            ['2010-02-29', Date::NOT_SUPPORTED_DATE_FORMAT_ERROR, 'foo'],
-            ['01.05.2030', Date::NOT_SUPPORTED_DATE_FORMAT_ERROR, 'd.m/Y'],
-            ['01.05.2030', Date::NOT_SUPPORTED_DATE_FORMAT_ERROR, 'd/m-Y'],
-            ['01.05.2030', Date::NOT_SUPPORTED_DATE_FORMAT_ERROR, 'd/m.Y'],
+            ['2010-03-24', 'm-m-Y', Date::INVALID_FORMAT_ERROR],
+            ['2010-02-29', 'foo', Date::INVALID_FORMAT_ERROR],
+            ['bob', 'Y-m-d', Date::INVALID_FORMAT_ERROR],
+            ['01.05.2030', 'd.m/Y', Date::INVALID_FORMAT_ERROR],
+            ['01.05.2030', 'd/m-Y', Date::INVALID_FORMAT_ERROR],
+            ['01.05.2030', 'd/m.Y', Date::INVALID_FORMAT_ERROR],
         ];
     }
 
     /**
-     * @dataProvider getValidFormats
+     * @dataProvider getMatchingDatesAndFormats
      */
     public function testValidFormats($date, $format)
     {
-        $this->validator->validate($date, new Date(['format' => $format]));
+        $this->validator->validate($date, new Date(format: $format));
 
         $this->assertNoViolation();
     }
 
-    public static function getValidFormats()
+    public static function getMatchingDatesAndFormats(): array
     {
         return [
             ['2010-01-01', 'Y-m-d'],
@@ -169,6 +165,8 @@ class DateValidatorTest extends ConstraintValidatorTestCase
             ['2010.01.01', 'Y.m.d'],
             ['12.11.2010', 'm.d.Y'],
             ['01.05.2030', 'd.m.Y'],
+            ['01.05/2030', 'd.m/Y'],
+            ['December 31, 1999', 'F d, Y'],
         ];
     }
 }

@@ -14,6 +14,7 @@ namespace Symfony\Component\Messenger\Bridge\AmazonSqs\Transport;
 use AsyncAws\Core\Exception\Http\HttpException;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\TransportException;
+use Symfony\Component\Messenger\Transport\Receiver\KeepaliveReceiverInterface;
 use Symfony\Component\Messenger\Transport\Receiver\MessageCountAwareInterface;
 use Symfony\Component\Messenger\Transport\Receiver\ReceiverInterface;
 use Symfony\Component\Messenger\Transport\Sender\SenderInterface;
@@ -26,7 +27,7 @@ use Symfony\Contracts\Service\ResetInterface;
 /**
  * @author Jérémy Derussé <jeremy@derusse.com>
  */
-class AmazonSqsTransport implements TransportInterface, SetupableTransportInterface, MessageCountAwareInterface, ResetInterface
+class AmazonSqsTransport implements TransportInterface, KeepaliveReceiverInterface, SetupableTransportInterface, MessageCountAwareInterface, ResetInterface
 {
     private SerializerInterface $serializer;
 
@@ -52,6 +53,14 @@ class AmazonSqsTransport implements TransportInterface, SetupableTransportInterf
     public function reject(Envelope $envelope): void
     {
         $this->getReceiver()->reject($envelope);
+    }
+
+    public function keepalive(Envelope $envelope, ?int $seconds = null): void
+    {
+        $receiver = $this->getReceiver();
+        if ($receiver instanceof KeepaliveReceiverInterface) {
+            $receiver->keepalive($envelope, $seconds);
+        }
     }
 
     public function getMessageCount(): int

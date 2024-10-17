@@ -184,7 +184,7 @@ class AttributeClassLoaderTest extends TestCase
         $this->assertEquals(new Alias('put'), $routes->getAlias('Symfony\Component\Routing\Tests\Fixtures\AttributeFixtures\MethodActionControllers::put'));
     }
 
-    public function testInvokableClassRouteLoadWithMethodAnnotation()
+    public function testInvokableClassRouteLoadWithMethodAttribute()
     {
         $routes = $this->loader->load(LocalizedMethodActionControllers::class);
         $this->assertCount(4, $routes);
@@ -192,7 +192,7 @@ class AttributeClassLoaderTest extends TestCase
         $this->assertEquals('/the/path', $routes->get('post.en')->getPath());
     }
 
-    public function testGlobalDefaultsRoutesLoadWithAnnotation()
+    public function testGlobalDefaultsRoutesLoadWithAttribute()
     {
         $routes = $this->loader->load(GlobalDefaultsClass::class);
         $this->assertCount(4, $routes);
@@ -213,7 +213,7 @@ class AttributeClassLoaderTest extends TestCase
         $this->assertSame(['https'], $routes->get('redundant_scheme')->getSchemes());
     }
 
-    public function testUtf8RoutesLoadWithAnnotation()
+    public function testUtf8RoutesLoadWithAttribute()
     {
         $routes = $this->loader->load(Utf8ActionControllers::class);
         $this->assertSame(['one', 'two'], array_keys($routes->all()));

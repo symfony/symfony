@@ -62,6 +62,14 @@ class MailboxHeaderTest extends TestCase
     {
         $header = new MailboxHeader('Sender', new Address('fabïen@symfony.com'));
         $this->assertSame('fabïen@symfony.com', $header->getBodyAsString());
+
+        // name with single space
+        $header = new MailboxHeader('Sender', new Address('fabïen@symfony.com', 'Fabïen Pötencier'));
+        $this->assertSame('=?utf-8?Q?Fab=C3=AFen_P=C3=B6tencier?= <fabïen@symfony.com>', $header->getBodyAsString());
+
+        // name with double spaces
+        $header = new MailboxHeader('Sender', new Address('fabïen@symfony.com', 'Fabïen  Pötencier'));
+        $this->assertSame('=?utf-8?Q?Fab=C3=AFen__P=C3=B6tencier?= <fabïen@symfony.com>', $header->getBodyAsString());
     }
 
     public function testToString()

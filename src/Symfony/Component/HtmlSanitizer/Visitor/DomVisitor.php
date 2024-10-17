@@ -120,7 +120,7 @@ final class DomVisitor
 
         // Force configured attributes
         foreach ($this->forcedAttributes[$domNodeName] ?? [] as $attribute => $value) {
-            $node->setAttribute($attribute, $value);
+            $node->setAttribute($attribute, $value, true);
         }
 
         $cursor->node->addChild($node);

@@ -2029,7 +2029,7 @@ class FrameworkExtension extends Extension
             $storeDefinitions = [];
             foreach ($resourceStores as $resourceStore) {
                 $storeDsn = $container->resolveEnvPlaceholders($resourceStore, null, $usedEnvs);
-                if (!$usedEnvs && !str_contains($resourceStore, ':') && !\in_array($resourceStore, ['flock', 'semaphore', 'in-memory'], true)) {
+                if (!$usedEnvs && !str_contains($resourceStore, ':') && !\in_array($resourceStore, ['flock', 'semaphore', 'in-memory', 'null'], true)) {
                     $resourceStore = new Reference($resourceStore);
                 }
                 $storeDefinition = new Definition(PersistingStoreInterface::class);

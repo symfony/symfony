@@ -2460,6 +2460,10 @@ abstract class FrameworkExtensionTestCase extends TestCase
         self::assertTrue($container->hasDefinition('lock.grault.factory'));
         $storeDef = $container->getDefinition($container->getDefinition('lock.grault.factory')->getArgument(0));
         self::assertSame('mysql:host=localhost;dbname=test', $storeDef->getArgument(0));
+
+        self::assertTrue($container->hasDefinition('lock.garply.factory'));
+        $storeDef = $container->getDefinition($container->getDefinition('lock.garply.factory')->getArgument(0));
+        self::assertSame('null', $storeDef->getArgument(0));
     }
 
     public function testLockWithService()

@@ -17,7 +17,6 @@ use Symfony\Component\Notifier\Exception\UnsupportedMessageTypeException;
 use Symfony\Component\Notifier\Message\ChatMessage;
 use Symfony\Component\Notifier\Message\MessageInterface;
 use Symfony\Component\Notifier\Message\SentMessage;
-use Symfony\Component\Notifier\Notification\Notification;
 use Symfony\Component\Notifier\Transport\AbstractTransport;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
@@ -44,17 +43,22 @@ final class LineBotTransport extends AbstractTransport
             throw new UnsupportedMessageTypeException(__CLASS__, ChatMessage::class, $message);
         }
 
-        $options = $message->getOptions();
-
-        if (null === $options) {
-            $options = LineBotOptions::fromNotification(
-                $message->getNotification()
-                    ?? new Notification($message->getSubject())
-            );
+        $options = $message->getOptions() ?? new LineBotOptions();
+        if (!($options instanceof LineBotOptions)) {
+            throw new InvalidArgumentException('Invalid message provided.');
         }
 
-        if (!$options instanceof LineBotOptions) {
-            throw new InvalidArgumentException('Invalid message provided.');
+        // If there are no messages in the options (for example, if the options are empty),
+        // we should take the message from the notification or subject.
+        if (0 === $options->getMessagesCount()) {
+            if (null !== ($notification = $message->getNotification())) {
+                $options->addMessageFromNotification($notification);
+            } else {
+                $options->addMessage([
+                    'type' => 'text',
+                    'text' => $message->getSubject(),
+                ]);
+            }
         }
 
         // If the recipient ID is not set, set it to the default receiver in DSN

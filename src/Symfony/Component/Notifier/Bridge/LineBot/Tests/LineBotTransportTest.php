@@ -55,13 +55,13 @@ final class LineBotTransportTest extends TransportTestCase
     {
         return [
             'subject only message' => [
-                LineBotOptions::fromNotification(
+                (new LineBotOptions())->addMessageFromNotification(
                     new Notification('testSubject')
                 )->to('testReceiver'),
                 new ChatMessage('testSubject'),
             ],
             'notification' => [
-                LineBotOptions::fromNotification(
+                (new LineBotOptions())->addMessageFromNotification(
                     new Notification('testSubject')
                 )->to('testReceiver'),
                 ChatMessage::fromNotification(

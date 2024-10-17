@@ -210,7 +210,7 @@ final class LineBotOptionsTest extends TestCase
      */
     public function testNotification(Notification $notification, array $expected)
     {
-        $options = LineBotOptions::fromNotification($notification);
+        $options = (new LineBotOptions())->addMessageFromNotification($notification);
         $this->assertSame($expected, $options->toArray()['messages']);
     }
 

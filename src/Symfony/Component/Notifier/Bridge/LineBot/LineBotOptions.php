@@ -34,25 +34,6 @@ final class LineBotOptions implements MessageOptionsInterface
     ) {
     }
 
-    public static function fromNotification(Notification $notification): static
-    {
-        $message = $notification->getSubject();
-
-        if ($notification->getEmoji()) {
-            $message = $notification->getEmoji().' '.$message;
-        }
-
-        if ($notification->getContent()) {
-            $message .= "\n".$notification->getContent();
-        }
-
-        return (new self())
-            ->addMessage([
-                'type' => 'text',
-                'text' => $message,
-            ]);
-    }
-
     /**
      * @return array{
      *     to: string|null,
@@ -99,13 +80,44 @@ final class LineBotOptions implements MessageOptionsInterface
      */
     public function addMessage(array $message): static
     {
-        if (\count($this->messages) >= 5) {
+        if ($this->getMessagesCount() >= 5) {
             throw new LogicException('You can only add up to 5 messages.');
         }
 
         $this->messages[] = $message;
 
         return $this;
+    }
+
+    /**
+     * Add message from a notification.
+     */
+    public function addMessageFromNotification(Notification $notification): static
+    {
+        $message = $notification->getSubject();
+
+        if ($notification->getEmoji()) {
+            $message = $notification->getEmoji().' '.$message;
+        }
+
+        if ($notification->getContent()) {
+            $message .= "\n".$notification->getContent();
+        }
+
+        return $this->addMessage([
+            'type' => 'text',
+            'text' => $message,
+        ]);
+    }
+
+    /**
+     * Get the number of messages.
+     *
+     * @return int the number of messages
+     */
+    public function getMessagesCount(): int
+    {
+        return \count($this->messages);
     }
 
     /**

@@ -39,6 +39,7 @@ class DebugProcessor implements DebugLoggerInterface, ResetInterface
             'priority' => $record->level->value,
             'priorityName' => $record->level->getName(),
             'context' => $record->context,
+            'extra' => $record->extra,
             'channel' => $record->channel ?? '',
         ];
 

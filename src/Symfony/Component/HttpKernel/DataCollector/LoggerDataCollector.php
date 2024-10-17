@@ -96,6 +96,7 @@ class LoggerDataCollector extends DataCollector implements LateDataCollectorInte
                 'channel' => $rawLogData['channel']->getValue(),
                 'message' => $rawLogData['message'],
                 'context' => $rawLogData['context'],
+                'extra' => $rawLogData['extra'],
             ];
         }
 

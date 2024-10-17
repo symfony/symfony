@@ -73,11 +73,15 @@ class TextDescriptor extends Descriptor
 
         $spacingWidth = $totalWidth - Helper::width($synopsis);
 
-        $this->writeText(\sprintf('  <info>%s</info>  %s%s%s%s',
+        $synopsis = \sprintf('<%1$s>%2$s</%1$s>', $option->isDeprecated() ? 'fg=gray;' : 'info', $synopsis);
+
+        $description = trim(($option->isDeprecated() ? '[deprecated] ' : '').$option->getDescription());
+
+        $this->writeText(\sprintf('  %s  %s%s%s%s',
             $synopsis,
             str_repeat(' ', $spacingWidth),
             // + 4 = 2 spaces before <info>, 2 spaces after </info>
-            preg_replace('/\s*[\r\n]\s*/', "\n".str_repeat(' ', $totalWidth + 4), $option->getDescription()),
+            preg_replace('/\s*[\r\n]\s*/', "\n".str_repeat(' ', $totalWidth + 4), $description),
             $default,
             $option->isArray() ? '<comment> (multiple values allowed)</comment>' : ''
         ), $options);
@@ -85,29 +89,30 @@ class TextDescriptor extends Descriptor
 
     protected function describeInputDefinition(InputDefinition $definition, array $options = []): void
     {
-        $totalWidth = $this->calculateTotalWidthForOptions($definition->getOptions());
-        foreach ($definition->getArguments() as $argument) {
+        $inputArguments = $definition->getArguments();
+        $inputOptions = $this->removeHiddenOptions($definition->getOptions(), $options);
+        $totalWidth = $this->calculateTotalWidthForOptions($inputOptions);
+        foreach ($inputArguments as $argument) {
             $totalWidth = max($totalWidth, Helper::width($argument->getName()));
         }
 
-        if ($definition->getArguments()) {
+        if ($inputArguments) {
             $this->writeText('<comment>Arguments:</comment>', $options);
             $this->writeText("\n");
-            foreach ($definition->getArguments() as $argument) {
+            foreach ($inputArguments as $argument) {
                 $this->describeInputArgument($argument, array_merge($options, ['total_width' => $totalWidth]));
                 $this->writeText("\n");
             }
         }
 
-        if ($definition->getArguments() && $definition->getOptions()) {
-            $this->writeText("\n");
-        }
-
-        if ($definition->getOptions()) {
+        if ($inputOptions) {
+            if ($inputArguments) {
+                $this->writeText("\n");
+            }
             $laterOptions = [];
 
             $this->writeText('<comment>Options:</comment>', $options);
-            foreach ($definition->getOptions() as $option) {
+            foreach ($inputOptions as $option) {
                 if (\strlen($option->getShortcut() ?? '') > 1) {
                     $laterOptions[] = $option;
                     continue;
@@ -141,7 +146,7 @@ class TextDescriptor extends Descriptor
         $this->writeText("\n");
 
         $definition = $command->getDefinition();
-        if ($definition->getOptions() || $definition->getArguments()) {
+        if ($this->removeHiddenOptions($definition->getOptions(), $options) || $definition->getArguments()) {
             $this->writeText("\n");
             $this->describeInputDefinition($definition, $options);
             $this->writeText("\n");

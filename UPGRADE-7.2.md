@@ -46,6 +46,7 @@ Ldap
 ----
 
  * Add methods for `saslBind()` and `whoami()` to `ConnectionInterface` and `LdapInterface`
+ * Deprecate the `sizeLimit` option of `AbstractQuery`
 
 Mailer
 ------

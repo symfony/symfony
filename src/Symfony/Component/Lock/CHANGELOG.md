@@ -6,7 +6,6 @@ CHANGELOG
 
  * RedisStore uses `EVALSHA` over `EVAL` when evaluating LUA scripts
  * Add `NullStore`
- 
 7.0
 ---
 

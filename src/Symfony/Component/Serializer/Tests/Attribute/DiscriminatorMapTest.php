@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Serializer\Tests\Annotation;
+namespace Symfony\Component\Serializer\Tests\Attribute;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Serializer\Attribute\DiscriminatorMap;
@@ -22,16 +22,16 @@ class DiscriminatorMapTest extends TestCase
 {
     public function testGetTypePropertyAndMapping()
     {
-        $annotation = new DiscriminatorMap(typeProperty: 'type', mapping: [
+        $attribute = new DiscriminatorMap(typeProperty: 'type', mapping: [
             'foo' => 'FooClass',
             'bar' => 'BarClass',
         ]);
 
-        $this->assertEquals('type', $annotation->getTypeProperty());
+        $this->assertEquals('type', $attribute->getTypeProperty());
         $this->assertEquals([
             'foo' => 'FooClass',
             'bar' => 'BarClass',
-        ], $annotation->getMapping());
+        ], $attribute->getMapping());
     }
 
     public function testExceptionWithEmptyTypeProperty()

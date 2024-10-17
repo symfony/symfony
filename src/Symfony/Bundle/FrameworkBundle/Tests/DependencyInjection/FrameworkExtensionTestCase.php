@@ -63,6 +63,7 @@ use Symfony\Component\Messenger\Bridge\AmazonSqs\Transport\AmazonSqsTransportFac
 use Symfony\Component\Messenger\Bridge\Amqp\Transport\AmqpTransportFactory;
 use Symfony\Component\Messenger\Bridge\Beanstalkd\Transport\BeanstalkdTransportFactory;
 use Symfony\Component\Messenger\Bridge\Redis\Transport\RedisTransportFactory;
+use Symfony\Component\Messenger\Middleware\LockMiddleware;
 use Symfony\Component\Messenger\Transport\TransportFactory;
 use Symfony\Component\Notifier\ChatterInterface;
 use Symfony\Component\Notifier\TexterInterface;
@@ -1064,25 +1065,54 @@ abstract class FrameworkExtensionTestCase extends TestCase
 
         $this->assertTrue($container->has('messenger.bus.commands'));
         $this->assertSame([], $container->getDefinition('messenger.bus.commands')->getArgument(0));
-        $this->assertEquals([
-            ['id' => 'add_bus_name_stamp_middleware', 'arguments' => ['messenger.bus.commands']],
-            ['id' => 'reject_redelivered_message_middleware'],
-            ['id' => 'dispatch_after_current_bus'],
-            ['id' => 'failed_message_processing_middleware'],
-            ['id' => 'send_message', 'arguments' => [true]],
-            ['id' => 'handle_message', 'arguments' => [false]],
-        ], $container->getParameter('messenger.bus.commands.middleware'));
+
+        if (class_exists(LockMiddleware::class)) {
+            $this->assertEquals([
+                ['id' => 'add_bus_name_stamp_middleware', 'arguments' => ['messenger.bus.commands']],
+                ['id' => 'reject_redelivered_message_middleware'],
+                ['id' => 'dispatch_after_current_bus'],
+                ['id' => 'failed_message_processing_middleware'],
+                ['id' => 'lock_middleware'],
+                ['id' => 'send_message', 'arguments' => [true]],
+                ['id' => 'handle_message', 'arguments' => [false]],
+            ], $container->getParameter('messenger.bus.commands.middleware'));
+        } else {
+            $this->assertEquals([
+                ['id' => 'add_bus_name_stamp_middleware', 'arguments' => ['messenger.bus.commands']],
+                ['id' => 'reject_redelivered_message_middleware'],
+                ['id' => 'dispatch_after_current_bus'],
+                ['id' => 'failed_message_processing_middleware'],
+                ['id' => 'send_message', 'arguments' => [true]],
+                ['id' => 'handle_message', 'arguments' => [false]],
+            ], $container->getParameter('messenger.bus.commands.middleware'));
+        }
+
         $this->assertTrue($container->has('messenger.bus.events'));
         $this->assertSame([], $container->getDefinition('messenger.bus.events')->getArgument(0));
-        $this->assertEquals([
-            ['id' => 'add_bus_name_stamp_middleware', 'arguments' => ['messenger.bus.events']],
-            ['id' => 'reject_redelivered_message_middleware'],
-            ['id' => 'dispatch_after_current_bus'],
-            ['id' => 'failed_message_processing_middleware'],
-            ['id' => 'with_factory', 'arguments' => ['foo', true, ['bar' => 'baz']]],
-            ['id' => 'send_message', 'arguments' => [true]],
-            ['id' => 'handle_message', 'arguments' => [false]],
-        ], $container->getParameter('messenger.bus.events.middleware'));
+
+        if (class_exists(LockMiddleware::class)) {
+            $this->assertEquals([
+                ['id' => 'add_bus_name_stamp_middleware', 'arguments' => ['messenger.bus.events']],
+                ['id' => 'reject_redelivered_message_middleware'],
+                ['id' => 'dispatch_after_current_bus'],
+                ['id' => 'failed_message_processing_middleware'],
+                ['id' => 'lock_middleware'],
+                ['id' => 'with_factory', 'arguments' => ['foo', true, ['bar' => 'baz']]],
+                ['id' => 'send_message', 'arguments' => [true]],
+                ['id' => 'handle_message', 'arguments' => [false]],
+            ], $container->getParameter('messenger.bus.events.middleware'));
+        } else {
+            $this->assertEquals([
+                ['id' => 'add_bus_name_stamp_middleware', 'arguments' => ['messenger.bus.events']],
+                ['id' => 'reject_redelivered_message_middleware'],
+                ['id' => 'dispatch_after_current_bus'],
+                ['id' => 'failed_message_processing_middleware'],
+                ['id' => 'with_factory', 'arguments' => ['foo', true, ['bar' => 'baz']]],
+                ['id' => 'send_message', 'arguments' => [true]],
+                ['id' => 'handle_message', 'arguments' => [false]],
+            ], $container->getParameter('messenger.bus.events.middleware'));
+        }
+
         $this->assertTrue($container->has('messenger.bus.queries'));
         $this->assertSame([], $container->getDefinition('messenger.bus.queries')->getArgument(0));
         $this->assertEquals([

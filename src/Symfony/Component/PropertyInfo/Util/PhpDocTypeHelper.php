@@ -128,7 +128,9 @@ final class PhpDocTypeHelper
                 $nullable = true;
             }
 
-            return $this->createType($varType, $nullable);
+            $type = $this->createType($varType);
+
+            return $nullable ? Type::nullable($type) : $type;
         }
 
         $varTypes = [];
@@ -156,8 +158,7 @@ final class PhpDocTypeHelper
 
         $unionTypes = [];
         foreach ($varTypes as $varType) {
-            $t = $this->createType($varType, $nullable);
-            if (null !== $t) {
+            if (null !== $t = $this->createType($varType)) {
                 $unionTypes[] = $t;
             }
         }
@@ -183,7 +184,7 @@ final class PhpDocTypeHelper
 
             [$phpType, $class] = $this->getPhpTypeAndClass((string) $fqsen);
 
-            $collection = \is_a($class, \Traversable::class, true) || \is_a($class, \ArrayAccess::class, true);
+            $collection = is_a($class, \Traversable::class, true) || is_a($class, \ArrayAccess::class, true);
 
             // it's safer to fall back to other extractors if the generic type is too abstract
             if (!$collection && !class_exists($class)) {
@@ -238,7 +239,7 @@ final class PhpDocTypeHelper
     /**
      * Creates a {@see Type} from a PHPDoc type.
      */
-    private function createType(DocType $docType, bool $nullable): ?Type
+    private function createType(DocType $docType): ?Type
     {
         $docTypeString = (string) $docType;
 
@@ -262,9 +263,8 @@ final class PhpDocTypeHelper
             }
 
             $type = null !== $class ? Type::object($class) : Type::builtin($phpType);
-            $type = Type::collection($type, ...$variableTypes);
 
-            return $nullable ? Type::nullable($type) : $type;
+            return Type::collection($type, ...$variableTypes);
         }
 
         if (!$docTypeString) {
@@ -277,9 +277,8 @@ final class PhpDocTypeHelper
 
         if (str_starts_with($docTypeString, 'list<') && $docType instanceof Array_) {
             $collectionValueType = $this->getType($docType->getValueType());
-            $type = Type::list($collectionValueType);
 
-            return $nullable ? Type::nullable($type) : $type;
+            return Type::list($collectionValueType);
         }
 
         if (str_starts_with($docTypeString, 'array<') && $docType instanceof Array_) {
@@ -288,16 +287,14 @@ final class PhpDocTypeHelper
             $collectionKeyType = $this->getType($docType->getKeyType());
             $collectionValueType = $this->getType($docType->getValueType());
 
-            $type = Type::array($collectionValueType, $collectionKeyType);
-
-            return $nullable ? Type::nullable($type) : $type;
+            return Type::array($collectionValueType, $collectionKeyType);
         }
 
         if ($docType instanceof PseudoType) {
             if ($docType->underlyingType() instanceof Integer) {
-                return $nullable ? Type::nullable(Type::int()) : Type::int();
+                return Type::int();
             } elseif ($docType->underlyingType() instanceof String_) {
-                return $nullable ? Type::nullable(Type::string()) : Type::string();
+                return Type::string();
             }
         }
 
@@ -314,12 +311,10 @@ final class PhpDocTypeHelper
         [$phpType, $class] = $this->getPhpTypeAndClass($docTypeString);
 
         if ('array' === $docTypeString) {
-            return $nullable ? Type::nullable(Type::array()) : Type::array();
+            return Type::array();
         }
 
-        $type = null !== $class ? Type::object($class) : Type::builtin($phpType);
-
-        return $nullable ? Type::nullable($type) : $type;
+        return null !== $class ? Type::object($class) : Type::builtin($phpType);
     }
 
     private function normalizeType(string $docType): string

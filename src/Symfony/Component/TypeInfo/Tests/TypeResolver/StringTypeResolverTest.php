@@ -145,18 +145,18 @@ class StringTypeResolverTest extends TestCase
         yield [Type::nullable(Type::int()), '?int'];
 
         // generic
-        yield [Type::generic(Type::object(), Type::string(), Type::bool()), 'object<string, bool>'];
-        yield [Type::generic(Type::object(), Type::generic(Type::string(), Type::bool())), 'object<string<bool>>'];
+        yield [Type::generic(Type::object(\DateTime::class), Type::string(), Type::bool()), \DateTime::class.'<string, bool>'];
+        yield [Type::generic(Type::object(\DateTime::class), Type::generic(Type::object(\Stringable::class), Type::bool())), \sprintf('%s<%s<bool>>', \DateTime::class, \Stringable::class)];
         yield [Type::int(), 'int<0, 100>'];
 
         // union
         yield [Type::union(Type::int(), Type::string()), 'int|string'];
 
         // intersection
-        yield [Type::intersection(Type::int(), Type::string()), 'int&string'];
+        yield [Type::intersection(Type::object(\DateTime::class), Type::object(\Stringable::class)), \DateTime::class.'&'.\Stringable::class];
 
         // DNF
-        yield [Type::union(Type::int(), Type::intersection(Type::string(), Type::bool())), 'int|(string&bool)'];
+        yield [Type::union(Type::int(), Type::intersection(Type::object(\DateTime::class), Type::object(\Stringable::class))), \sprintf('int|(%s&%s)', \DateTime::class, \Stringable::class)];
 
         // collection objects
         yield [Type::collection(Type::object(\Traversable::class)), \Traversable::class];

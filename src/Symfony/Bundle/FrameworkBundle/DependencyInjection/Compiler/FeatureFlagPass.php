@@ -38,7 +38,7 @@ class FeatureFlagPass implements CompilerPassInterface
             foreach ($tags as $tag) {
                 $featureName = ($tag['feature'] ?? '') ?: $className;
                 if (\array_key_exists($featureName, $features)) {
-                    throw new \RuntimeException(\sprintf('Feature "%s" already defined.', $featureName));
+                    throw new \RuntimeException(\sprintf('Feature "%s" already defined in the "feature_flag.provider.in_memory" provider.', $featureName));
                 }
 
                 $method = $tag['method'] ?? '__invoke';

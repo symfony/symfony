@@ -100,7 +100,7 @@ class Inline
      *
      * @throws DumpException When trying to dump PHP resource
      */
-    public static function dump(mixed $value, int $flags = 0): string
+    public static function dump(mixed $value, int $flags = 0, bool $rootLevel = false): string
     {
         switch (true) {
             case \is_resource($value):
@@ -138,7 +138,7 @@ class Inline
             case \is_array($value):
                 return self::dumpArray($value, $flags);
             case null === $value:
-                return self::dumpNull($flags);
+                return self::dumpNull($flags, $rootLevel);
             case true === $value:
                 return 'true';
             case false === $value:
@@ -253,10 +253,14 @@ class Inline
         return \sprintf('{ %s }', implode(', ', $output));
     }
 
-    private static function dumpNull(int $flags): string
+    private static function dumpNull(int $flags, bool $rootLevel = false): string
     {
         if (Yaml::DUMP_NULL_AS_TILDE & $flags) {
             return '~';
+        }
+
+        if (Yaml::DUMP_NULL_AS_EMPTY & $flags && !$rootLevel) {
+            return '';
         }
 
         return 'null';

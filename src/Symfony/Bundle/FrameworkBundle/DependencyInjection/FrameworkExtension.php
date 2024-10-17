@@ -52,6 +52,7 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\DataCollector\CommandDataCollector;
 use Symfony\Component\Console\Debug\CliRequest;
 use Symfony\Component\Console\Messenger\RunCommandMessageHandler;
+use Symfony\Component\Decorator\DecoratorInterface;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
 use Symfony\Component\DependencyInjection\ChildDefinition;
@@ -223,6 +224,10 @@ class FrameworkExtension extends Extension
         $loader->load('services.php');
         $loader->load('fragment_renderer.php');
         $loader->load('error_renderer.php');
+
+        if (ContainerBuilder::willBeAvailable('symfony/decorator', DecoratorInterface::class, ['symfony/framework-bundle'])) {
+            $loader->load('decorator.php');
+        }
 
         if (!ContainerBuilder::willBeAvailable('symfony/clock', ClockInterface::class, ['symfony/framework-bundle'])) {
             $container->removeDefinition('clock');
@@ -659,6 +664,8 @@ class FrameworkExtension extends Extension
             ->addTag('mime.mime_type_guesser');
         $container->registerForAutoconfiguration(LoggerAwareInterface::class)
             ->addMethodCall('setLogger', [new Reference('logger')]);
+        $container->registerForAutoconfiguration(DecoratorInterface::class)
+            ->addTag('decorator');
 
         $container->registerAttributeForAutoconfiguration(AsEventListener::class, static function (ChildDefinition $definition, AsEventListener $attribute, \ReflectionClass|\ReflectionMethod $reflector) {
             $tagAttributes = get_object_vars($attribute);

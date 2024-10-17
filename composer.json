@@ -66,6 +66,7 @@
         "symfony/config": "self.version",
         "symfony/console": "self.version",
         "symfony/css-selector": "self.version",
+        "symfony/decorator": "self.version",
         "symfony/dependency-injection": "self.version",
         "symfony/debug-bundle": "self.version",
         "symfony/doctrine-bridge": "self.version",

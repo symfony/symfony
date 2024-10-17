@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:noNamespaceSchemaLocation="http://schema.phpunit.de/9.3/phpunit.xsd"
+         xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/11.3/phpunit.xsd"
          backupGlobals="false"
          colors="true"
          bootstrap="vendor/autoload.php"
@@ -46,7 +46,7 @@
         </exclude>
     </groups>
 
-    <coverage>
+    <source ignoreSuppressionOfDeprecations="true">
         <include>
             <directory>./src/Symfony/</directory>
         </include>
@@ -54,7 +54,7 @@
             <directory>./src/Symfony/Bridge/*/Tests</directory>
             <directory>./src/Symfony/Component/*/Tests</directory>
             <directory>./src/Symfony/Component/*/*/Tests</directory>
-            <directory>./src/Symfony/Contract/*/Tests</directory>
+            <directory>./src/Symfony/Contracts/*/Tests</directory>
             <directory>./src/Symfony/Bundle/*/Tests</directory>
             <directory>./src/Symfony/Bundle/*/Resources</directory>
             <directory>./src/Symfony/Component/*/Resources</directory>
@@ -65,28 +65,11 @@
             <directory>./src/Symfony/Component/*/*/vendor</directory>
             <directory>./src/Symfony/Contracts/*/vendor</directory>
         </exclude>
-    </coverage>
+    </source>
 
-    <listeners>
-        <listener class="Symfony\Bridge\PhpUnit\SymfonyTestsListener">
-            <arguments>
-                <array>
-                    <element key="time-sensitive">
-                        <array>
-                            <element key="0"><string>Cache\IntegrationTests</string></element>
-                            <element key="1"><string>Symfony\Bridge\Doctrine\Middleware\Debug</string></element>
-                            <element key="2"><string>Symfony\Bridge\Doctrine\Middleware\IdleConnection</string></element>
-                            <element key="3"><string>Symfony\Component\Cache</string></element>
-                            <element key="4"><string>Symfony\Component\Cache\Tests\Fixtures</string></element>
-                            <element key="5"><string>Symfony\Component\Cache\Tests\Traits</string></element>
-                            <element key="6"><string>Symfony\Component\Cache\Traits</string></element>
-                            <element key="7"><string>Symfony\Component\Console</string></element>
-                            <element key="8"><string>Symfony\Component\HttpFoundation</string></element>
-                            <element key="9"><string>Symfony\Component\Uid</string></element>
-                        </array>
-                    </element>
-                </array>
-            </arguments>
-        </listener>
-    </listeners>
+    <extensions>
+        <bootstrap class="Symfony\Bridge\PhpUnit\SymfonyExtension">
+            <parameter name="clock-mock-namespaces" value="Cache\IntegrationTests,Symfony\Bridge\Doctrine\Middleware\Debug,Symfony\Bridge\Doctrine\Middleware\IdleConnection,Symfony\Component\Cache,Symfony\Component\Cache\Tests\Fixtures,Symfony\Component\Cache\Tests\Traits,Symfony\Component\Cache\Traits,Symfony\Component\Console,Symfony\Component\HttpFoundation,Symfony\Component\Uid" />
+        </bootstrap>
+    </extensions>
 </phpunit>

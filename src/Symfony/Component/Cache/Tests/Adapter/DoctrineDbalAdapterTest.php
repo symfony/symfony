@@ -49,6 +49,10 @@ class DoctrineDbalAdapterTest extends AdapterTestCase
 
     public function testConfigureSchemaDecoratedDbalDriver()
     {
+        if (file_exists(self::$dbFile)) {
+            @unlink(self::$dbFile);
+        }
+
         $connection = DriverManager::getConnection(['driver' => 'pdo_sqlite', 'path' => self::$dbFile], $this->getDbalConfig());
         if (!interface_exists(Middleware::class)) {
             $this->markTestSkipped('doctrine/dbal v2 does not support custom drivers using middleware');
@@ -74,6 +78,10 @@ class DoctrineDbalAdapterTest extends AdapterTestCase
 
     public function testConfigureSchema()
     {
+        if (file_exists(self::$dbFile)) {
+            @unlink(self::$dbFile);
+        }
+
         $connection = DriverManager::getConnection(['driver' => 'pdo_sqlite', 'path' => self::$dbFile], $this->getDbalConfig());
         $schema = new Schema();
 
@@ -84,6 +92,10 @@ class DoctrineDbalAdapterTest extends AdapterTestCase
 
     public function testConfigureSchemaDifferentDbalConnection()
     {
+        if (file_exists(self::$dbFile)) {
+            @unlink(self::$dbFile);
+        }
+
         $otherConnection = $this->createConnectionMock();
         $schema = new Schema();
 
@@ -94,6 +106,10 @@ class DoctrineDbalAdapterTest extends AdapterTestCase
 
     public function testConfigureSchemaTableExists()
     {
+        if (file_exists(self::$dbFile)) {
+            @unlink(self::$dbFile);
+        }
+
         $connection = DriverManager::getConnection(['driver' => 'pdo_sqlite', 'path' => self::$dbFile], $this->getDbalConfig());
         $schema = new Schema();
         $schema->createTable('cache_items');

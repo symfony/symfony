@@ -22,7 +22,7 @@
         "symfony/dependency-injection": "^6.4|^7.0",
         "symfony/twig-bridge": "^6.4|^7.0",
         "symfony/http-foundation": "^6.4|^7.0",
-        "symfony/http-kernel": "^6.4|^7.0",
+        "symfony/http-kernel": "^6.4.13|^7.1.6",
         "twig/twig": "^3.12|^4.0"
     },
     "require-dev": {
@@ -32,9 +32,10 @@
         "symfony/finder": "^6.4|^7.0",
         "symfony/form": "^6.4|^7.0",
         "symfony/routing": "^6.4|^7.0",
+        "symfony/runtime": "^6.4.13|^7.1.6",
         "symfony/translation": "^6.4|^7.0",
         "symfony/yaml": "^6.4|^7.0",
-        "symfony/framework-bundle": "^6.4|^7.0",
+        "symfony/framework-bundle": "^6.4.13|^7.1.6",
         "symfony/web-link": "^6.4|^7.0"
     },
     "conflict": {
@@ -47,5 +48,10 @@
             "/Tests/"
         ]
     },
-    "minimum-stability": "dev"
+    "minimum-stability": "dev",
+    "config": {
+        "allow-plugins": {
+            "symfony/runtime": true
+        }
+    }
 }

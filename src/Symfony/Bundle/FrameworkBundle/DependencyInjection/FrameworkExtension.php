@@ -2881,6 +2881,7 @@ class FrameworkExtension extends Extension
             NotifierBridge\SmsSluzba\SmsSluzbaTransportFactory::class => 'notifier.transport_factory.sms-sluzba',
             NotifierBridge\Smsense\SmsenseTransportFactory::class => 'notifier.transport_factory.smsense',
             NotifierBridge\SpotHit\SpotHitTransportFactory::class => 'notifier.transport_factory.spot-hit',
+            NotifierBridge\Sweego\SweegoTransportFactory::class => 'notifier.transport_factory.sweego',
             NotifierBridge\Telegram\TelegramTransportFactory::class => 'notifier.transport_factory.telegram',
             NotifierBridge\Telnyx\TelnyxTransportFactory::class => 'notifier.transport_factory.telnyx',
             NotifierBridge\Termii\TermiiTransportFactory::class => 'notifier.transport_factory.termii',
@@ -2948,6 +2949,7 @@ class FrameworkExtension extends Extension
             $loader->load('notifier_webhook.php');
 
             $webhookRequestParsers = [
+                NotifierBridge\Sweego\Webhook\SweegoRequestParser::class => 'notifier.webhook.request_parser.sweego',
                 NotifierBridge\Twilio\Webhook\TwilioRequestParser::class => 'notifier.webhook.request_parser.twilio',
                 NotifierBridge\Vonage\Webhook\VonageRequestParser::class => 'notifier.webhook.request_parser.vonage',
             ];

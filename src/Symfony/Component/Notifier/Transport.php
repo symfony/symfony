@@ -96,6 +96,7 @@ final class Transport
         Bridge\Smsmode\SmsmodeTransportFactory::class,
         Bridge\SmsSluzba\SmsSluzbaTransportFactory::class,
         Bridge\SpotHit\SpotHitTransportFactory::class,
+        Bridge\Sweego\SweegoTransportFactory::class,
         Bridge\Telegram\TelegramTransportFactory::class,
         Bridge\Telnyx\TelnyxTransportFactory::class,
         Bridge\Termii\TermiiTransportFactory::class,

@@ -16,6 +16,7 @@ use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\HelperSet;
 use Symfony\Component\Console\Helper\QuestionHelper;
+use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Output\Output;
 use Symfony\Component\Console\Question\ChoiceQuestion;
 use Symfony\Component\Console\Question\Question;
@@ -30,7 +31,7 @@ class CommandTesterTest extends TestCase
     protected function setUp(): void
     {
         $this->command = new Command('foo');
-        $this->command->addArgument('command');
+        $this->command->addArgument('command', InputArgument::REQUIRED, Application::COMMAND_ARGUMENT_DESCRIPTION);
         $this->command->addArgument('foo');
         $this->command->setCode(function ($input, $output) { $output->writeln('foo'); });
 
@@ -231,7 +232,7 @@ class CommandTesterTest extends TestCase
     public function testErrorOutput()
     {
         $command = new Command('foo');
-        $command->addArgument('command');
+        $command->addArgument('command', InputArgument::REQUIRED, Application::COMMAND_ARGUMENT_DESCRIPTION);
         $command->addArgument('foo');
         $command->setCode(function ($input, $output) {
             $output->getErrorOutput()->write('foo');

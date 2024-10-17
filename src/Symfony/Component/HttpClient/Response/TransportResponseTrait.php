@@ -231,7 +231,7 @@ trait TransportResponseTrait
                         } elseif ($chunk instanceof FirstChunk) {
                             if ($response->logger) {
                                 $info = $response->getInfo();
-                                $response->logger->info('Response: "{http_code} {url}" | Time: {total_time} seconds', [
+                                $response->logger->info('Response: "{http_code} {url}" {total_time} seconds', [
                                     'http_code' => $info['http_code'],
                                     'url' => $info['url'],
                                     'total_time' => $info['total_time'],

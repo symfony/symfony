@@ -30,8 +30,9 @@ class RouterContextMiddleware implements MiddlewareInterface
 
     public function handle(Envelope $envelope, StackInterface $stack): Envelope
     {
+        $context = $this->router->getContext();
+
         if (!$envelope->last(ConsumedByWorkerStamp::class) || !$contextStamp = $envelope->last(RouterContextStamp::class)) {
-            $context = $this->router->getContext();
             $envelope = $envelope->with(new RouterContextStamp(
                 $context->getBaseUrl(),
                 $context->getMethod(),
@@ -46,7 +47,6 @@ class RouterContextMiddleware implements MiddlewareInterface
             return $stack->next()->handle($envelope, $stack);
         }
 
-        $context = $this->router->getContext();
         $currentBaseUrl = $context->getBaseUrl();
         $currentMethod = $context->getMethod();
         $currentHost = $context->getHost();

@@ -121,11 +121,11 @@ class DumpDataCollector extends DataCollector implements DataDumperInterface
         ) {
             if ($response->headers->has('Content-Type') && str_contains($response->headers->get('Content-Type') ?? '', 'html')) {
                 $dumper = new HtmlDumper('php://output', $this->charset);
-                $dumper->setDisplayOptions(['fileLinkFormat' => $this->fileLinkFormat]);
             } else {
                 $dumper = new CliDumper('php://output', $this->charset);
-                $dumper->setDisplayOptions(['fileLinkFormat' => $this->fileLinkFormat]);
             }
+
+            $dumper->setDisplayOptions(['fileLinkFormat' => $this->fileLinkFormat]);
 
             foreach ($this->data as $dump) {
                 $this->doDump($dumper, $dump['data'], $dump['name'], $dump['file'], $dump['line'], $dump['label'] ?? '');
@@ -235,11 +235,11 @@ class DumpDataCollector extends DataCollector implements DataDumperInterface
 
             if ($this->webMode) {
                 $dumper = new HtmlDumper('php://output', $this->charset);
-                $dumper->setDisplayOptions(['fileLinkFormat' => $this->fileLinkFormat]);
             } else {
                 $dumper = new CliDumper('php://output', $this->charset);
-                $dumper->setDisplayOptions(['fileLinkFormat' => $this->fileLinkFormat]);
             }
+
+            $dumper->setDisplayOptions(['fileLinkFormat' => $this->fileLinkFormat]);
 
             foreach ($this->data as $i => $dump) {
                 $this->data[$i] = null;

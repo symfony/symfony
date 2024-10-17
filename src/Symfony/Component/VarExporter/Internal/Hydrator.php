@@ -260,9 +260,9 @@ class Hydrator
                 continue;
             }
             $name = $property->name;
+            $readonlyScope = null;
 
             if (\ReflectionProperty::IS_PRIVATE & $flags) {
-                $readonlyScope = null;
                 if ($flags & \ReflectionProperty::IS_READONLY) {
                     $readonlyScope = $class;
                 }
@@ -270,7 +270,6 @@ class Hydrator
 
                 continue;
             }
-            $readonlyScope = null;
             if ($flags & \ReflectionProperty::IS_READONLY) {
                 $readonlyScope = $property->class;
             }

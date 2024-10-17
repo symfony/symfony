@@ -151,11 +151,7 @@ class ConsoleLoggerTest extends TestCase
 
     public function testObjectCastToString()
     {
-        if (method_exists($this, 'createPartialMock')) {
-            $dummy = $this->createPartialMock(DummyTest::class, ['__toString']);
-        } else {
-            $dummy = $this->createPartialMock(DummyTest::class, ['__toString']);
-        }
+        $dummy = $this->createPartialMock(DummyTest::class, ['__toString']);
         $dummy->method('__toString')->willReturn('DUMMY');
 
         $this->getLogger()->warning($dummy);

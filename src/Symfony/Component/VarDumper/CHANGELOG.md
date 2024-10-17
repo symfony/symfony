@@ -6,6 +6,7 @@ CHANGELOG
 
  * Add support for `FORCE_COLOR` environment variable
  * Add support for virtual properties
+ * Only select HtmlDumper if `Accept` header is set with non-CLI SAPI
 
 7.1
 ---

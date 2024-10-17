@@ -21,6 +21,7 @@ use Symfony\Component\VarDumper\Dumper\ContextProvider\CliContextProvider;
 use Symfony\Component\VarDumper\Dumper\ContextProvider\RequestContextProvider;
 use Symfony\Component\VarDumper\Dumper\ContextProvider\SourceContextProvider;
 use Symfony\Component\VarDumper\Dumper\ContextualizedDumper;
+use Symfony\Component\VarDumper\Dumper\DataDumperInterface;
 use Symfony\Component\VarDumper\Dumper\HtmlDumper;
 use Symfony\Component\VarDumper\Dumper\ServerDumper;
 
@@ -76,11 +77,11 @@ class VarDumper
             case 'server' === $format:
             case $format && 'tcp' === parse_url($format, \PHP_URL_SCHEME):
                 $host = 'server' === $format ? $_SERVER['VAR_DUMPER_SERVER'] ?? '127.0.0.1:9912' : $format;
-                $dumper = \in_array(\PHP_SAPI, ['cli', 'phpdbg', 'embed'], true) ? new CliDumper() : new HtmlDumper();
+                $dumper = self::guessMostSuitableDumper();
                 $dumper = new ServerDumper($host, $dumper, self::getDefaultContextProviders());
                 break;
             default:
-                $dumper = \in_array(\PHP_SAPI, ['cli', 'phpdbg', 'embed'], true) ? new CliDumper() : new HtmlDumper();
+                $dumper = self::guessMostSuitableDumper();
         }
 
         if (!$dumper instanceof ServerDumper) {
@@ -114,5 +115,18 @@ class VarDumper
             'cli' => new CliContextProvider(),
             'source' => new SourceContextProvider(null, null, $fileLinkFormatter),
         ];
+    }
+
+    private static function guessMostSuitableDumper(): DataDumperInterface
+    {
+        if (\in_array(\PHP_SAPI, ['cli', 'phpdbg', 'embed'], true)) {
+            return new CliDumper();
+        }
+
+        if (str_contains($_SERVER['HTTP_ACCEPT'] ?? 'html', 'html')) {
+            return new HtmlDumper();
+        }
+
+        return new CliDumper();
     }
 }

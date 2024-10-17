@@ -11,6 +11,9 @@
 
 namespace Symfony\Component\Security\Core\Authorization\Strategy;
 
+use Symfony\Component\Security\Core\Authorization\AccessDecision;
+use Symfony\Component\Security\Core\Authorization\Voter\Vote;
+use Symfony\Component\Security\Core\Authorization\Voter\VoteInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 
 /**
@@ -40,29 +43,38 @@ final class ConsensusStrategy implements AccessDecisionStrategyInterface, \Strin
 
     public function decide(\Traversable $results): bool
     {
+        return $this->getDecision(new \ArrayIterator(array_map(fn ($vote) => new Vote($vote), iterator_to_array($results))))->isGranted();
+    }
+
+    public function getDecision(\Traversable $votes): AccessDecision
+    {
+        $currentVotes = [];
         $grant = 0;
         $deny = 0;
-        foreach ($results as $result) {
-            if (VoterInterface::ACCESS_GRANTED === $result) {
+
+        /** @var VoteInterface $vote */
+        foreach ($votes as $vote) {
+            $currentVotes[] = $vote;
+            if ($vote->isGranted()) {
                 ++$grant;
-            } elseif (VoterInterface::ACCESS_DENIED === $result) {
+            } elseif ($vote->isDenied()) {
                 ++$deny;
             }
         }
 
         if ($grant > $deny) {
-            return true;
+            return new AccessDecision(VoterInterface::ACCESS_GRANTED, $currentVotes);
         }
 
         if ($deny > $grant) {
-            return false;
+            return new AccessDecision(VoterInterface::ACCESS_DENIED, $currentVotes);
         }
 
         if ($grant > 0) {
-            return $this->allowIfEqualGrantedDeniedDecisions;
+            return new AccessDecision($this->allowIfEqualGrantedDeniedDecisions ? VoterInterface::ACCESS_GRANTED : VoterInterface::ACCESS_DENIED, $currentVotes);
         }
 
-        return $this->allowIfAllAbstainDecisions;
+        return new AccessDecision($this->allowIfAllAbstainDecisions ? VoterInterface::ACCESS_GRANTED : VoterInterface::ACCESS_DENIED, $currentVotes);
     }
 
     public function __toString(): string

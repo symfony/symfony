@@ -17,15 +17,14 @@ use Symfony\Component\Security\Core\Authorization\Voter\VoteInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 
 /**
- * Grants access if only grant (or abstain) votes were received.
+ * Grants access if the sum of vote results is greater than 0.
  *
  * If all voters abstained from voting, the decision will be based on the
  * allowIfAllAbstainDecisions property value (defaults to false).
  *
- * @author Fabien Potencier <fabien@symfony.com>
- * @author Alexander M. Turek <me@derrabus.de>
+ * @author Roman JOLY <eltharin18@outlook.fr>
  */
-final class UnanimousStrategy implements AccessDecisionStrategyInterface, \Stringable
+final class ScoringStrategy implements AccessDecisionStrategyInterface, \Stringable
 {
     public function __construct(
         private bool $allowIfAllAbstainDecisions = false,
@@ -40,24 +39,20 @@ final class UnanimousStrategy implements AccessDecisionStrategyInterface, \Strin
     public function getDecision(\Traversable $votes): AccessDecision
     {
         $currentVotes = [];
-        $grant = 0;
+        $score = 0;
 
         /** @var VoteInterface $vote */
         foreach ($votes as $vote) {
             $currentVotes[] = $vote;
-
-            if ($vote->isDenied()) {
-                return new AccessDecision(VoterInterface::ACCESS_DENIED, $currentVotes);
-            }
-
-            if ($vote->isGranted()) {
-                ++$grant;
-            }
+            $score += $vote->getAccess();
         }
 
-        // no deny votes
-        if ($grant > 0) {
-            return new AccessDecision(VoterInterface::ACCESS_GRANTED, $currentVotes);
+        if ($score > 0) {
+            return new AccessDecision(VoterInterface::ACCESS_GRANTED, $currentVotes, 'score = '.$score);
+        }
+
+        if ($score < 0) {
+            return new AccessDecision(VoterInterface::ACCESS_DENIED, $currentVotes, 'score = '.$score);
         }
 
         return new AccessDecision($this->allowIfAllAbstainDecisions ? VoterInterface::ACCESS_GRANTED : VoterInterface::ACCESS_DENIED, $currentVotes);
@@ -65,6 +60,6 @@ final class UnanimousStrategy implements AccessDecisionStrategyInterface, \Strin
 
     public function __toString(): string
     {
-        return 'unanimous';
+        return 'scoring';
     }
 }

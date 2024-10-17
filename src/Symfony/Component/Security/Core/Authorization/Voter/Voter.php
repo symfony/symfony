@@ -24,10 +24,10 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
  */
 abstract class Voter implements VoterInterface, CacheableVoterInterface
 {
-    public function vote(TokenInterface $token, mixed $subject, array $attributes): int
+    public function getVote(TokenInterface $token, mixed $subject, array $attributes): VoteInterface
     {
         // abstain vote by default in case none of the attributes are supported
-        $vote = self::ACCESS_ABSTAIN;
+        $vote = new Vote(VoterInterface::ACCESS_ABSTAIN);
 
         foreach ($attributes as $attribute) {
             try {
@@ -38,20 +38,36 @@ abstract class Voter implements VoterInterface, CacheableVoterInterface
                 if (str_contains($e->getMessage(), 'supports(): Argument #1')) {
                     continue;
                 }
-
                 throw $e;
             }
 
             // as soon as at least one attribute is supported, default is to deny access
-            $vote = self::ACCESS_DENIED;
+            if (!$vote->isDenied()) {
+                $vote = new Vote(VoterInterface::ACCESS_DENIED);
+            }
 
-            if ($this->voteOnAttribute($attribute, $subject, $token)) {
+            $decision = $this->voteOnAttribute($attribute, $subject, $token);
+
+            if (\is_bool($decision)) {
+                $decision = new Vote($decision);
+            }
+
+            if ($decision->isGranted()) {
                 // grant access as soon as at least one attribute returns a positive response
-                return self::ACCESS_GRANTED;
+                return $decision;
+            }
+
+            if ('' !== $decisionMessage = $decision->getMessage()) {
+                $vote->addMessage($decisionMessage);
             }
         }
 
         return $vote;
+    }
+
+    public function vote(TokenInterface $token, mixed $subject, array $attributes): int
+    {
+        return $this->getVote($token, $subject, $attributes)->getAccess();
     }
 
     /**
@@ -91,5 +107,5 @@ abstract class Voter implements VoterInterface, CacheableVoterInterface
      * @param TAttribute $attribute
      * @param TSubject   $subject
      */
-    abstract protected function voteOnAttribute(string $attribute, mixed $subject, TokenInterface $token): bool;
+    abstract protected function voteOnAttribute(string $attribute, mixed $subject, TokenInterface $token): VoteInterface|bool;
 }

@@ -35,7 +35,9 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Symfony\Component\Security\Core\Authorization\AccessDecision;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
+use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Csrf\CsrfToken;
@@ -203,6 +205,20 @@ abstract class AbstractController implements ServiceSubscriberInterface
     }
 
     /**
+     * Checks decision of the attribute against the current authentication token and optionally supplied subject.
+     *
+     * @throws \LogicException
+     */
+    protected function getDecision(mixed $attribute, mixed $subject = null): AccessDecision
+    {
+        if (!$this->container->has('security.authorization_checker')) {
+            throw new \LogicException('The SecurityBundle is not registered in your application. Try running "composer require symfony/security-bundle".');
+        }
+
+        return $this->container->get('security.authorization_checker')->getDecision($attribute, $subject);
+    }
+
+    /**
      * Throws an exception unless the attribute is granted against the current authentication token and optionally
      * supplied subject.
      *
@@ -210,10 +226,22 @@ abstract class AbstractController implements ServiceSubscriberInterface
      */
     protected function denyAccessUnlessGranted(mixed $attribute, mixed $subject = null, string $message = 'Access Denied.'): void
     {
-        if (!$this->isGranted($attribute, $subject)) {
+        if (!$this->container->has('security.authorization_checker')) {
+            throw new \LogicException('The SecurityBundle is not registered in your application. Try running "composer require symfony/security-bundle".');
+        }
+
+        $checker = $this->container->get('security.authorization_checker');
+        if (method_exists($checker, 'getDecision')) {
+            $decision = $checker->getDecision($attribute, $subject);
+        } else {
+            $decision = new AccessDecision($checker->isGranted($attribute, $subject) ? VoterInterface::ACCESS_GRANTED : VoterInterface::ACCESS_DENIED);
+        }
+
+        if (!$decision->isGranted()) {
             $exception = $this->createAccessDeniedException($message);
             $exception->setAttributes([$attribute]);
             $exception->setSubject($subject);
+            $exception->setAccessDecision($decision);
 
             throw $exception;
         }

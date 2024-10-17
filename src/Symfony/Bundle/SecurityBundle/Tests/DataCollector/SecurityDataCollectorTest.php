@@ -464,4 +464,8 @@ final class DummyVoter implements VoterInterface
     public function vote(TokenInterface $token, mixed $subject, array $attributes): int
     {
     }
+
+    public function getVote(TokenInterface $token, mixed $subject, array $attributes): VoterInterface
+    {
+    }
 }

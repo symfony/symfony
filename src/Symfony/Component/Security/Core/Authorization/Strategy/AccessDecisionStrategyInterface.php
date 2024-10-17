@@ -11,10 +11,14 @@
 
 namespace Symfony\Component\Security\Core\Authorization\Strategy;
 
+use Symfony\Component\Security\Core\Authorization\AccessDecision;
+
 /**
  * A strategy for turning a stream of votes into a final decision.
  *
  * @author Alexander M. Turek <me@derrabus.de>
+ *
+ * @method AccessDecision getDecision(\Traversable $votes)
  */
 interface AccessDecisionStrategyInterface
 {

@@ -32,6 +32,16 @@ class ExpressionVoterTest extends TestCase
         $this->assertSame($expected, $voter->vote($this->getTokenWithRoleNames($roles, $tokenExpectsGetRoles), null, $attributes));
     }
 
+    /**
+     * @dataProvider getVoteTests
+     */
+    public function testGetVoteWithTokenThatReturnsRoleNames($roles, $attributes, $expected, $tokenExpectsGetRoles = true, $expressionLanguageExpectsEvaluate = true)
+    {
+        $voter = new ExpressionVoter($this->createExpressionLanguage($expressionLanguageExpectsEvaluate), $this->createTrustResolver(), $this->createAuthorizationChecker());
+
+        $this->assertSame($expected, $voter->getVote($this->getTokenWithRoleNames($roles, $tokenExpectsGetRoles), null, $attributes)->getAccess());
+    }
+
     public static function getVoteTests()
     {
         return [

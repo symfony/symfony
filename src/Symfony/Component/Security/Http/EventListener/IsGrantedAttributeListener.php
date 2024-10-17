@@ -18,7 +18,9 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\ControllerArgumentsEvent;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpKernel\KernelEvents;
+use Symfony\Component\Security\Core\Authorization\AccessDecision;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
+use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\Security\Core\Exception\RuntimeException;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
@@ -59,7 +61,13 @@ class IsGrantedAttributeListener implements EventSubscriberInterface
                 }
             }
 
-            if (!$this->authChecker->isGranted($attribute->attribute, $subject)) {
+            if (method_exists($this->authChecker, 'getDecision')) {
+                $decision = $this->authChecker->getDecision($attribute->attribute, $subject);
+            } else {
+                $decision = new AccessDecision($this->authChecker->isGranted($attribute->attribute, $subject) ? VoterInterface::ACCESS_GRANTED : VoterInterface::ACCESS_DENIED);
+            }
+
+            if (!$decision->isGranted()) {
                 $message = $attribute->message ?: \sprintf('Access Denied by #[IsGranted(%s)] on controller', $this->getIsGrantedString($attribute));
 
                 if ($statusCode = $attribute->statusCode) {
@@ -69,6 +77,7 @@ class IsGrantedAttributeListener implements EventSubscriberInterface
                 $accessDeniedException = new AccessDeniedException($message, code: $attribute->exceptionCode ?? 403);
                 $accessDeniedException->setAttributes($attribute->attribute);
                 $accessDeniedException->setSubject($subject);
+                $accessDeniedException->setAccessDecision($decision);
 
                 throw $accessDeniedException;
             }

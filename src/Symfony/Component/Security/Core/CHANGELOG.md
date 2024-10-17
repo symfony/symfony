@@ -8,6 +8,7 @@ CHANGELOG
  * Add `$token` argument to `UserCheckerInterface::checkPostAuth()`
  * Deprecate argument `$secret` of `RememberMeToken`
  * Deprecate returning an empty string in `UserInterface::getUserIdentifier()`
+ * Add the ability for voter to return decision reason and a score by passing a `Vote` object
 
 7.0
 ---

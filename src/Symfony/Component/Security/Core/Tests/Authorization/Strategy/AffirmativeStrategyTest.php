@@ -13,6 +13,7 @@ namespace Authorization\Strategy;
 
 use Symfony\Component\Security\Core\Authorization\Strategy\AffirmativeStrategy;
 use Symfony\Component\Security\Core\Test\AccessDecisionStrategyTestCase;
+use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 
 class AffirmativeStrategyTest extends AccessDecisionStrategyTestCase
 {
@@ -20,13 +21,26 @@ class AffirmativeStrategyTest extends AccessDecisionStrategyTestCase
     {
         $strategy = new AffirmativeStrategy();
 
-        yield [$strategy, self::getVoters(1, 0, 0), true];
-        yield [$strategy, self::getVoters(1, 2, 0), true];
-        yield [$strategy, self::getVoters(0, 1, 0), false];
-        yield [$strategy, self::getVoters(0, 0, 1), false];
+        yield [$strategy, self::getVoters(1, 0, 0), self::getAccessDecision(true, [
+            VoterInterface::ACCESS_GRANTED,
+        ])];
+        yield [$strategy, self::getVoters(1, 2, 0), self::getAccessDecision(true, [
+            VoterInterface::ACCESS_GRANTED,
+        ])];
+        yield [$strategy, self::getVoters(0, 1, 0), self::getAccessDecision(false, [
+            VoterInterface::ACCESS_DENIED,
+            VoterInterface::ACCESS_DENIED,
+        ])];
+        yield [$strategy, self::getVoters(0, 0, 1), self::getAccessDecision(false, [
+            VoterInterface::ACCESS_ABSTAIN,
+            VoterInterface::ACCESS_ABSTAIN,
+        ])];
 
         $strategy = new AffirmativeStrategy(true);
 
-        yield [$strategy, self::getVoters(0, 0, 1), true];
+        yield [$strategy, self::getVoters(0, 0, 1), self::getAccessDecision(true, [
+            VoterInterface::ACCESS_ABSTAIN,
+            VoterInterface::ACCESS_ABSTAIN,
+        ])];
     }
 }

@@ -143,7 +143,33 @@ class FileValidator extends ConstraintValidator
         $sizeInBytes = filesize($path);
         $basename = $value instanceof UploadedFile ? $value->getClientOriginalName() : basename($path);
 
-        if ($constraint->filenameMaxLength && $constraint->filenameMaxLength < $filenameLength = \strlen($basename)) {
+        try {
+            $invalidFilenameCharset = !@mb_check_encoding($basename, $constraint->filenameCharset);
+        } catch (\ValueError $e) {
+            if (!str_starts_with($e->getMessage(), 'mb_check_encoding(): Argument #2 ($encoding) must be a valid encoding')) {
+                throw $e;
+            }
+
+            $invalidFilenameCharset = true;
+        }
+
+        $filenameLength = $invalidFilenameCharset ? 0 : match ($constraint->filenameCountUnit) {
+            File::FILENAME_COUNT_BYTES => \strlen($basename),
+            File::FILENAME_COUNT_CODEPOINTS => mb_strlen($basename, $constraint->filenameCharset),
+            File::FILENAME_COUNT_GRAPHEMES => grapheme_strlen($basename),
+        };
+
+        if ($invalidFilenameCharset || false === ($filenameLength ?? false)) {
+            $this->context->buildViolation($constraint->filenameCharsetMessage)
+                ->setParameter('{{ name }}', $this->formatValue($basename))
+                ->setParameter('{{ charset }}', $constraint->filenameCharset)
+                ->setCode(File::FILENAME_INVALID_CHARACTERS)
+                ->addViolation();
+
+            return;
+        }
+
+        if ($constraint->filenameMaxLength && $constraint->filenameMaxLength < $filenameLength) {
             $this->context->buildViolation($constraint->filenameTooLongMessage)
                 ->setParameter('{{ filename_max_length }}', $this->formatValue($constraint->filenameMaxLength))
                 ->setCode(File::FILENAME_TOO_LONG)

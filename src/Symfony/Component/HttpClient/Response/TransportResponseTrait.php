@@ -231,7 +231,11 @@ trait TransportResponseTrait
                         } elseif ($chunk instanceof FirstChunk) {
                             if ($response->logger) {
                                 $info = $response->getInfo();
-                                $response->logger->info(\sprintf('Response: "%s %s" | Time: %f seconds', $info['http_code'], $info['url'], $info['total_time']));
+                                $response->logger->info('Response: "{http_code} {url}" | Time: {total_time} seconds', [
+                                    'http_code' => $info['http_code'],
+                                    'url' => $info['url'],
+                                    'total_time' => $info['total_time'],
+                                ]);
                             }
 
                             $response->inflate = \extension_loaded('zlib') && $response->inflate && 'gzip' === ($response->headers['content-encoding'][0] ?? null) ? inflate_init(\ZLIB_ENCODING_GZIP) : null;

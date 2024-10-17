@@ -27,7 +27,7 @@ trait LazyGhostTrait
      * Skipped properties should be indexed by their array-cast identifier, see
      * https://php.net/manual/language.types.array#language.types.array.casting
      *
-     * @param (\Closure(static):void   $initializer       The closure should initialize the object it receives as argument
+     * @param \Closure(static):void    $initializer       The closure should initialize the object it receives as argument
      * @param array<string, true>|null $skippedProperties An array indexed by the properties to skip, a.k.a. the ones
      *                                                    that the initializer doesn't initialize, if any
      * @param static|null              $instance
@@ -74,7 +74,7 @@ trait LazyGhostTrait
     /**
      * Returns whether the object is initialized.
      *
-     * @param $partial Whether partially initialized objects should be considered as initialized
+     * @param bool $partial Whether partially initialized objects should be considered as initialized
      */
     #[Ignore]
     public function isLazyObjectInitialized(bool $partial = false): bool

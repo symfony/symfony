@@ -66,7 +66,7 @@ trait LazyProxyTrait
     /**
      * Returns whether the object is initialized.
      *
-     * @param $partial Whether partially initialized objects should be considered as initialized
+     * @param bool $partial Whether partially initialized objects should be considered as initialized
      */
     #[Ignore]
     public function isLazyObjectInitialized(bool $partial = false): bool

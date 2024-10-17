@@ -31,61 +31,64 @@ trait HttpClientAssertionsTrait
 
         /** @var HttpClientDataCollector $httpClientDataCollector */
         $httpClientDataCollector = $profile->getCollector('http_client');
-        $expectedRequestHasBeenFound = false;
-
+        
+        // Check if the specified HttpClient exists
         if (!\array_key_exists($httpClientId, $httpClientDataCollector->getClients())) {
-            static::fail(\sprintf('HttpClient "%s" is not registered.', $httpClientId));
+            static::fail(sprintf('HttpClient "%s" is not registered.', $httpClientId));
         }
 
+        $expectedRequestHasBeenFound = false;
+
+        // Iterate over each request made by the client
         foreach ($httpClientDataCollector->getClients()[$httpClientId]['traces'] as $trace) {
+            // Check URL and method
             if (($expectedUrl !== $trace['info']['url'] && $expectedUrl !== $trace['url'])
-                || $expectedMethod !== $trace['method']
-            ) {
+                || $expectedMethod !== $trace['method']) {
                 continue;
             }
 
-            if (null !== $expectedBody) {
+            // Check body if expected
+            if ($expectedBody !== null) {
                 $actualBody = null;
 
-                if (null !== $trace['options']['body'] && null === $trace['options']['json']) {
+                // Handle different body formats (string, json)
+                if (isset($trace['options']['body']) && !isset($trace['options']['json'])) {
                     $actualBody = \is_string($trace['options']['body']) ? $trace['options']['body'] : $trace['options']['body']->getValue(true);
+                } elseif (isset($trace['options']['json'])) {
+                    $actualBody = json_encode($trace['options']['json']->getValue(true));  // normalize JSON to string
                 }
 
-                if (null === $trace['options']['body'] && null !== $trace['options']['json']) {
-                    $actualBody = $trace['options']['json']->getValue(true);
-                }
-
-                if (!$actualBody) {
+                // If the body doesn't match, skip this request
+                if ($expectedBody !== $actualBody) {
                     continue;
                 }
+            }
 
-                if ($expectedBody === $actualBody) {
-                    $expectedRequestHasBeenFound = true;
+            // Check headers if expected
+            if ($expectedHeaders) {
+                $actualHeaders = $trace['options']['headers'] ?? [];
+                $headersMatch = true;
 
-                    if (!$expectedHeaders) {
+                foreach ($expectedHeaders as $key => $expectedHeaderValue) {
+                    if (!isset($actualHeaders[$key]) || $actualHeaders[$key]->getValue(true) !== $expectedHeaderValue) {
+                        $headersMatch = false;
                         break;
                     }
                 }
-            }
 
-            if ($expectedHeaders) {
-                $actualHeaders = $trace['options']['headers'] ?? [];
-
-                foreach ($actualHeaders as $headerKey => $actualHeader) {
-                    if (\array_key_exists($headerKey, $expectedHeaders)
-                        && $expectedHeaders[$headerKey] === $actualHeader->getValue(true)
-                    ) {
-                        $expectedRequestHasBeenFound = true;
-                        break 2;
-                    }
+                // If headers don't match, skip this request
+                if (!$headersMatch) {
+                    continue;
                 }
             }
 
+            // All conditions passed, request has been found
             $expectedRequestHasBeenFound = true;
             break;
         }
 
-        self::assertTrue($expectedRequestHasBeenFound, 'The expected request has not been called: "'.$expectedMethod.'" - "'.$expectedUrl.'"');
+        // Assert that the expected request was found
+        self::assertTrue($expectedRequestHasBeenFound, 'The expected request has not been called: "' . $expectedMethod . '" - "' . $expectedUrl . '"');
     }
 
     public function assertNotHttpClientRequest(string $unexpectedUrl, string $expectedMethod = 'GET', string $httpClientId = 'http_client'): void

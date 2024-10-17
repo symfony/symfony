@@ -2506,6 +2506,12 @@ abstract class FrameworkExtensionTestCase extends TestCase
         self::assertEquals(new Reference('my_service'), $storeDef->getArgument(0));
     }
 
+    public function testJsonEncoderEnabled()
+    {
+        $container = $this->createContainerFromFile('json_encoder');
+        $this->assertTrue($container->has('json_encoder.encoder'));
+    }
+
     protected function createContainer(array $data = [])
     {
         return new ContainerBuilder(new EnvPlaceholderParameterBag(array_merge([

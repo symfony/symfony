@@ -47,4 +47,9 @@ abstract class AbstractExtension implements ExtensionInterface
     {
         return [];
     }
+
+    public function getRelativeCombinationTranslators(): array
+    {
+        return [];
+    }
 }

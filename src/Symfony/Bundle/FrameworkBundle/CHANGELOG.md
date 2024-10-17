@@ -20,6 +20,7 @@ CHANGELOG
  * Add the ability to use an existing service as a lock/semaphore resource
  * Add support for configuring multiple serializer instances via the configuration
  * Add support for `SYMFONY_TRUSTED_PROXIES`, `SYMFONY_TRUSTED_HEADERS`, `SYMFONY_TRUST_X_SENDFILE_TYPE_HEADER` and `SYMFONY_TRUSTED_HOSTS` env vars
+ * Add new `framework.property_info.with_constructor_extractor` option to allow enabling or disabling the constructor extractor integration
 
 7.1
 ---

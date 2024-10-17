@@ -18,8 +18,6 @@ use Symfony\Component\TypeInfo\Type;
  * Infers the constructor argument type.
  *
  * @author Dmitrii Poddubnyi <dpoddubny@gmail.com>
- *
- * @internal
  */
 interface ConstructorArgumentTypeExtractorInterface
 {
@@ -27,8 +25,6 @@ interface ConstructorArgumentTypeExtractorInterface
      * Gets types of an argument from constructor.
      *
      * @return LegacyType[]|null
-     *
-     * @internal
      */
     public function getTypesFromConstructor(string $class, string $property): ?array;
 
@@ -36,8 +32,6 @@ interface ConstructorArgumentTypeExtractorInterface
      * Gets type of an argument from constructor.
      *
      * @param class-string $class
-     *
-     * @internal
      */
     public function getTypeFromConstructor(string $class, string $property): ?Type;
 }

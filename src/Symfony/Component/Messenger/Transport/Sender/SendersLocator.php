@@ -80,13 +80,15 @@ class SendersLocator implements SendersLocatorInterface
     private function getTransportNamesFromAttribute(Envelope $envelope): array
     {
         $transports = [];
-        $message = $envelope->getMessage();
+        $messageClass = $envelope->getMessage()::class;
 
-        foreach ((new \ReflectionClass($message))->getAttributes(AsMessage::class, \ReflectionAttribute::IS_INSTANCEOF) as $refAttr) {
-            $asMessage = $refAttr->newInstance();
+        foreach ([$messageClass] + class_parents($messageClass) + class_implements($messageClass) as $class) {
+            foreach ((new \ReflectionClass($class))->getAttributes(AsMessage::class, \ReflectionAttribute::IS_INSTANCEOF) as $refAttr) {
+                $asMessage = $refAttr->newInstance();
 
-            if ($asMessage->transport) {
-                $transports = \array_merge($transports, (array) $asMessage->transport);
+                if ($asMessage->transport) {
+                    $transports = array_merge($transports, (array) $asMessage->transport);
+                }
             }
         }
 

@@ -100,6 +100,8 @@ class Image extends File
         ?bool $binaryFormat = null,
         ?array $mimeTypes = null,
         ?int $filenameMaxLength = null,
+        ?string $filenameCharset = null,
+        ?string $filenameCountUnit = null,
         ?int $minWidth = null,
         ?int $maxWidth = null,
         ?int $maxHeight = null,
@@ -139,6 +141,7 @@ class Image extends File
         ?string $allowLandscapeMessage = null,
         ?string $allowPortraitMessage = null,
         ?string $corruptedMessage = null,
+        ?string $filenameCharsetMessage = null,
         ?array $groups = null,
         mixed $payload = null
     ) {
@@ -148,6 +151,8 @@ class Image extends File
             $binaryFormat,
             $mimeTypes,
             $filenameMaxLength,
+            $filenameCharset,
+            $filenameCountUnit,
             $notFoundMessage,
             $notReadableMessage,
             $maxSizeMessage,
@@ -163,7 +168,8 @@ class Image extends File
             $uploadExtensionErrorMessage,
             $uploadErrorMessage,
             $groups,
-            $payload
+            $payload,
+            $filenameCharsetMessage
         );
 
         $this->minWidth = $minWidth ?? $this->minWidth;

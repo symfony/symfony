@@ -35,6 +35,32 @@ class LexerTest extends TestCase
         $this->assertEquals(new TokenStream($tokens, $expression), $this->lexer->tokenize($expression));
     }
 
+    public function testTokenizeMultilineComment()
+    {
+        $expression = <<<EXPRESSION
+            /**
+             * This is 2^16, even if we could have
+             * used the hexadecimal representation 0x10000. Just a
+             * matter of taste! 🙂
+             */
+            65536 and
+            /*
+             This time, only one star to start the comment and that's it.
+             It is valid too!
+             */
+            65535 /* this is 2^16 - 1 */
+            EXPRESSION;
+
+        $tokens = [
+            new Token('number', 65536, 128),
+            new Token('operator', 'and', 134),
+            new Token('number', 65535, 225),
+            new Token('end of expression', null, \strlen($expression) + 1),
+        ];
+
+        $this->assertEquals(new TokenStream($tokens, str_replace("\n", ' ', $expression)), $this->lexer->tokenize($expression));
+    }
+
     public function testTokenizeThrowsErrorWithMessage()
     {
         $this->expectException(SyntaxError::class);

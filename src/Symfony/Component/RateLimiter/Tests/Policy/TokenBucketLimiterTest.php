@@ -121,11 +121,11 @@ class TokenBucketLimiterTest extends TestCase
         $serverOneClock = microtime(true) - 1;
         $serverTwoClock = microtime(true) + 1;
 
-        $bucket = new TokenBucket('id', 100, new Rate(\DateInterval::createFromDateString('5 minutes'), 10), $serverTwoClock);
+        $bucket = new TokenBucket('id', 100, new Rate(\DateInterval::createFromDateString('5 minutes'), 10), null, $serverTwoClock);
         $this->assertSame(100, $bucket->getAvailableTokens($serverTwoClock));
         $this->assertSame(100, $bucket->getAvailableTokens($serverOneClock));
 
-        $bucket = new TokenBucket('id', 100, new Rate(\DateInterval::createFromDateString('5 minutes'), 10), $serverOneClock);
+        $bucket = new TokenBucket('id', 100, new Rate(\DateInterval::createFromDateString('5 minutes'), 10), null, $serverOneClock);
         $this->assertSame(100, $bucket->getAvailableTokens($serverTwoClock));
         $this->assertSame(100, $bucket->getAvailableTokens($serverOneClock));
     }

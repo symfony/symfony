@@ -45,6 +45,7 @@ class ContainerDebugCommand extends Command
                 new InputArgument('name', InputArgument::OPTIONAL, 'A service name (foo)'),
                 new InputOption('show-arguments', null, InputOption::VALUE_NONE, 'Show arguments in services'),
                 new InputOption('show-hidden', null, InputOption::VALUE_NONE, 'Show hidden (internal) services'),
+                new InputOption('show-locator-services', null, InputOption::VALUE_NONE, 'Show services inject into locator services'),
                 new InputOption('tag', null, InputOption::VALUE_REQUIRED, 'Show all services with a specific tag'),
                 new InputOption('tags', null, InputOption::VALUE_NONE, 'Display tagged services for an application'),
                 new InputOption('parameter', null, InputOption::VALUE_REQUIRED, 'Display a specific parameter for an application'),
@@ -109,6 +110,10 @@ using the <info>--show-hidden</info> flag:
 The <info>--format</info> option specifies the format of the command output:
 
   <info>php %command.full_name% --format=json</info>
+
+To get specific information about a service including all services attached to locator dependencies, use the <info>--show-locator-services</info> option:
+
+  <info>php %command.full_name% name --show-locator-services</info>
 EOF
             )
         ;
@@ -163,6 +168,7 @@ EOF
         $options['format'] = $input->getOption('format');
         $options['show_arguments'] = $input->getOption('show-arguments');
         $options['show_hidden'] = $input->getOption('show-hidden');
+        $options['show_locator_services'] = $input->getOption('show-locator-services');
         $options['raw_text'] = $input->getOption('raw');
         $options['output'] = $io;
         $options['is_debug'] = $kernel->isDebug();

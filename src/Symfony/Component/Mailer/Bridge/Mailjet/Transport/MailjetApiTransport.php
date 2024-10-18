@@ -47,8 +47,8 @@ class MailjetApiTransport extends AbstractApiTransport
         'X-Mailjet-Campaign' => ['CustomCampaign', 'string'],
         'X-Mailjet-DeduplicateCampaign' => ['DeduplicateCampaign', 'bool'],
         'X-Mailjet-Prio' => ['Priority', 'int'],
-        'X-Mailjet-TrackClick' => ['TrackClick', 'string'],
-        'X-Mailjet-TrackOpen' => ['TrackOpen', 'string'],
+        'X-Mailjet-TrackClick' => ['TrackClicks', 'string'],
+        'X-Mailjet-TrackOpen' => ['TrackOpens', 'string'],
     ];
 
     public function __construct(

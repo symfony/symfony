@@ -48,14 +48,16 @@ final class DoctrineTokenProvider implements TokenProviderInterface, TokenVerifi
 
     public function loadTokenBySeries(string $series): PersistentTokenInterface
     {
-        // the alias for lastUsed works around case insensitivity in PostgreSQL
-        $sql = 'SELECT class, username, value, lastUsed AS last_used FROM rememberme_token WHERE series=:series';
+        $sql = 'SELECT class, username, value, lastUsed FROM rememberme_token WHERE series=:series';
         $paramValues = ['series' => $series];
         $paramTypes = ['series' => ParameterType::STRING];
         $stmt = $this->conn->executeQuery($sql, $paramValues, $paramTypes);
-        $row = $stmt->fetchAssociative() ?: throw new TokenNotFoundException('No token found.');
 
-        return new PersistentToken($row['class'], $row['username'], $series, $row['value'], new \DateTimeImmutable($row['last_used']));
+        // fetching numeric because column name casing depends on platform, eg. Oracle converts all not quoted names to uppercase
+        $row = $stmt->fetchNumeric() ?: throw new TokenNotFoundException('No token found.');
+
+        [$class, $username, $value, $last_used] = $row;
+        return new PersistentToken($class, $username, $series, $value, new \DateTimeImmutable($last_used));
     }
 
     public function deleteTokenBySeries(string $series): void

@@ -193,7 +193,7 @@ class MergeExtensionConfigurationContainerBuilder extends ContainerBuilder
         $value = $bag->resolveValue($value);
 
         if (!$bag instanceof EnvPlaceholderParameterBag) {
-            return parent::resolveEnvPlaceholders($value, $format, $usedEnvs);
+            return parent::resolveEnvPlaceholders($value, true, $usedEnvs);
         }
 
         foreach ($bag->getEnvPlaceholders() as $env => $placeholders) {
@@ -207,6 +207,6 @@ class MergeExtensionConfigurationContainerBuilder extends ContainerBuilder
             }
         }
 
-        return parent::resolveEnvPlaceholders($value, $format, $usedEnvs);
+        return parent::resolveEnvPlaceholders($value, true, $usedEnvs);
     }
 }

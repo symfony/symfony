@@ -108,7 +108,6 @@ trait FilesystemCommonTrait
 
             if ('\\' === \DIRECTORY_SEPARATOR) {
                 $success = copy($tmp, $file);
-                $unlink = true;
             } else {
                 $success = rename($tmp, $file);
                 $unlink = !$success;

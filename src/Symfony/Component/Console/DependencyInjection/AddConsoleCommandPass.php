@@ -53,7 +53,7 @@ class AddConsoleCommandPass implements CompilerPassInterface
                 $aliases = str_replace('%', '%%', $class::getDefaultName() ?? '');
             }
 
-            $aliases = explode('|', $aliases ?? '');
+            $aliases = explode('|', $aliases);
             $commandName = array_shift($aliases);
 
             if ($isHidden = '' === $commandName) {

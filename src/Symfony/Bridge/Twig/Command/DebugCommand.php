@@ -412,7 +412,6 @@ EOF
         }
 
         if ($notFoundBundles = array_diff_key($bundleNames, $this->bundlesMetadata)) {
-            $alternatives = [];
             foreach ($notFoundBundles as $notFoundBundle => $path) {
                 $alternatives[$path] = $this->findAlternatives($notFoundBundle, array_keys($this->bundlesMetadata));
             }

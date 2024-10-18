@@ -151,7 +151,7 @@ class SpanishInflectorTest extends TestCase
     public function testUninflected(string $word)
     {
         $this->assertSame(
-            \is_array($word) ? $word : [$word],
+            [$word],
             (new SpanishInflector())->pluralize($word)
         );
     }

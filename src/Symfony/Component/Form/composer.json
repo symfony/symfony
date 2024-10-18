@@ -28,7 +28,7 @@
     },
     "require-dev": {
         "doctrine/collections": "^1.0|^2.0",
-        "symfony/validator": "^6.4|^7.0",
+        "symfony/validator": "^6.4.12|^7.1.5",
         "symfony/dependency-injection": "^6.4|^7.0",
         "symfony/expression-language": "^6.4|^7.0",
         "symfony/config": "^6.4|^7.0",

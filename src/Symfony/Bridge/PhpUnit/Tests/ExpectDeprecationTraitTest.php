@@ -14,6 +14,9 @@ namespace Symfony\Bridge\PhpUnit\Tests;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 
+/**
+ * @requires PHPUnit < 10
+ */
 final class ExpectDeprecationTraitTest extends TestCase
 {
     use ExpectDeprecationTrait;

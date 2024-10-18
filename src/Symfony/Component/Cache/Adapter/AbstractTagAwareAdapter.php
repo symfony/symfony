@@ -35,7 +35,7 @@ abstract class AbstractTagAwareAdapter implements TagAwareAdapterInterface, TagA
     use AbstractAdapterTrait;
     use ContractsTrait;
 
-    private const TAGS_PREFIX = "\1tags\1";
+    protected const TAGS_PREFIX = "\1tags\1";
 
     protected function __construct(string $namespace = '', int $defaultLifetime = 0)
     {
@@ -168,7 +168,7 @@ abstract class AbstractTagAwareAdapter implements TagAwareAdapterInterface, TagA
     public function commit(): bool
     {
         $ok = true;
-        $byLifetime = (self::$mergeByLifetime)($this->deferred, $expiredIds, $this->getId(...), self::TAGS_PREFIX, $this->defaultLifetime);
+        $byLifetime = (self::$mergeByLifetime)($this->deferred, $expiredIds, $this->getId(...), static::TAGS_PREFIX, $this->defaultLifetime);
         $retry = $this->deferred = [];
 
         if ($expiredIds) {
@@ -244,7 +244,7 @@ abstract class AbstractTagAwareAdapter implements TagAwareAdapterInterface, TagA
         try {
             foreach ($this->doDeleteYieldTags(array_values($ids)) as $id => $tags) {
                 foreach ($tags as $tag) {
-                    $tagData[$this->getId(self::TAGS_PREFIX.$tag)][] = $id;
+                    $tagData[$this->getId(static::TAGS_PREFIX.$tag)][] = $id;
                 }
             }
         } catch (\Exception) {
@@ -283,7 +283,7 @@ abstract class AbstractTagAwareAdapter implements TagAwareAdapterInterface, TagA
 
         $tagIds = [];
         foreach (array_unique($tags) as $tag) {
-            $tagIds[] = $this->getId(self::TAGS_PREFIX.$tag);
+            $tagIds[] = $this->getId(static::TAGS_PREFIX.$tag);
         }
 
         try {

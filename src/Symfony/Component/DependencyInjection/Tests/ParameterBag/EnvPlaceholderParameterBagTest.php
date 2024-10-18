@@ -31,7 +31,7 @@ class EnvPlaceholderParameterBagTest extends TestCase
     {
         $bag = new EnvPlaceholderParameterBag();
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('The given env var name "env(%foo%)" contains invalid characters (allowed characters: letters, digits, hyphens, backslashes and colons).');
+        $this->expectExceptionMessage('The given env var name "env(%foo%)" contains invalid characters (allowed characters: letters, digits, underscores, backslashes and colons).');
         $bag->get('env(%foo%)');
     }
 

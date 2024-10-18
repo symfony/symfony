@@ -2,7 +2,7 @@
     {
         "location": "Symfony\\Component\\Messenger\\Bridge\\Doctrine\\Tests\\Transport\\DoctrinePostgreSqlIntegrationTest::setUp",
         "message": "Connection::fetchColumn() is deprecated, use Connection::fetchOne() API instead. (Connection.php:662 called by PostgreSqlSchemaManager.php:63, https://github.com/doctrine/dbal/pull/4019, package doctrine/dbal)",
-        "count": 2
+        "count": 3
     },
     {
         "location": "Symfony\\Component\\Messenger\\Bridge\\Doctrine\\Tests\\Transport\\DoctrinePostgreSqlIntegrationTest::setUp",

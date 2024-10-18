@@ -135,7 +135,7 @@ class PhpDocExtractorTest extends TestCase
                 null,
                 null,
             ],
-            ['bal', [new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, false, 'DateTimeImmutable')], null, null],
+            ['bal', [new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, false, 'DateTimeImmutable')], 'A short description ignoring template.', "A long description...\n\n...over several lines."],
             ['parent', [new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, false, 'Symfony\Component\PropertyInfo\Tests\Fixtures\ParentDummy')], null, null],
             ['collection', [new LegacyType(LegacyType::BUILTIN_TYPE_ARRAY, false, null, true, new LegacyType(LegacyType::BUILTIN_TYPE_INT), new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, false, 'DateTimeImmutable'))], null, null],
             ['nestedCollection', [new LegacyType(LegacyType::BUILTIN_TYPE_ARRAY, false, null, true, new LegacyType(LegacyType::BUILTIN_TYPE_INT), new LegacyType(LegacyType::BUILTIN_TYPE_ARRAY, false, null, true, new LegacyType(LegacyType::BUILTIN_TYPE_INT), new LegacyType(LegacyType::BUILTIN_TYPE_STRING, false)))], null, null],
@@ -544,7 +544,7 @@ class PhpDocExtractorTest extends TestCase
         yield ['foo4', Type::null(), null, null];
         yield ['foo5', Type::mixed(), null, null];
         yield ['files', Type::union(Type::list(Type::object(\SplFileInfo::class)), Type::resource()), null, null];
-        yield ['bal', Type::object(\DateTimeImmutable::class), null, null];
+        yield ['bal', Type::object(\DateTimeImmutable::class), 'A short description ignoring template.', "A long description...\n\n...over several lines."];
         yield ['parent', Type::object(ParentDummy::class), null, null];
         yield ['collection', Type::list(Type::object(\DateTimeImmutable::class)), null, null];
         yield ['nestedCollection', Type::list(Type::list(Type::string())), null, null];

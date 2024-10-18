@@ -133,10 +133,6 @@ final class PropertyInfoLoader implements LoaderInterface
                         $metadata->addPropertyConstraint($property, new Type(['type' => 'scalar']));
                     }
                 }
-
-                if (!$nullable && !$hasNotBlankConstraint && !$hasNotNullConstraint) {
-                    $metadata->addPropertyConstraint($property, new NotNull());
-                }
             } else {
                 if ($hasTypeConstraint) {
                     continue;
@@ -157,10 +153,10 @@ final class PropertyInfoLoader implements LoaderInterface
                 if (null !== $typeConstraint = $this->getTypeConstraint($type)) {
                     $metadata->addPropertyConstraint($property, $typeConstraint);
                 }
+            }
 
-                if (!$nullable && !$hasNotBlankConstraint && !$hasNotNullConstraint) {
-                    $metadata->addPropertyConstraint($property, new NotNull());
-                }
+            if (!$nullable && !$hasNotBlankConstraint && !$hasNotNullConstraint) {
+                $metadata->addPropertyConstraint($property, new NotNull());
             }
         }
 

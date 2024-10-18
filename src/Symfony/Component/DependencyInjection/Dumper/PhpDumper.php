@@ -1139,8 +1139,8 @@ EOTXT
     {
         $tail = $return ? str_repeat(')', substr_count($return, '(') - substr_count($return, ')')).";\n" : '';
 
+        $arguments = [];
         if (BaseServiceLocator::class === $definition->getClass() && $definition->hasTag($this->serviceLocatorTag)) {
-            $arguments = [];
             foreach ($definition->getArgument(0) as $k => $argument) {
                 $arguments[$k] = $argument->getValues()[0];
             }
@@ -1148,7 +1148,6 @@ EOTXT
             return $return.$this->dumpValue(new ServiceLocatorArgument($arguments)).$tail;
         }
 
-        $arguments = [];
         foreach ($definition->getArguments() as $i => $value) {
             $arguments[] = (\is_string($i) ? $i.': ' : '').$this->dumpValue($value);
         }

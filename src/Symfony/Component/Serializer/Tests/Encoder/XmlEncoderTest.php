@@ -1004,4 +1004,17 @@ XML;
 <response><foo dateTime="%s"/></response>
 ', $this->exampleDateTimeString);
     }
+
+    public function testEncodeIgnoringEmptyAttribute()
+    {
+        $expected = <<<'XML'
+<?xml version="1.0"?>
+<response>Test</response>
+
+XML;
+
+        $data = ['#' => 'Test', '@attribute' => '', '@attribute2' => null];
+
+        $this->assertEquals($expected, $this->encoder->encode($data, 'xml', ['ignore_empty_attributes' => true]));
+    }
 }

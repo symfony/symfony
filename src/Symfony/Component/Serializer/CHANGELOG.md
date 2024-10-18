@@ -13,6 +13,7 @@ CHANGELOG
    default contexts, name converters, sets of normalizers and encoders
  * Add support for collection profiles of multiple serializer instances
  * Deprecate `AdvancedNameConverterInterface`, use `NameConverterInterface` instead
+ * Add `XmlEncoder::IGNORE_EMPTY_ATTRIBUTES` context option to ignore empty attributes
 
 7.1
 ---

@@ -19,6 +19,7 @@ use Symfony\Component\Console\Completion\Suggestion;
 use Symfony\Component\Console\Exception\ExceptionInterface;
 use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Symfony\Component\Console\Exception\LogicException;
+use Symfony\Component\Console\Helper\FormatterHelper;
 use Symfony\Component\Console\Helper\HelperInterface;
 use Symfony\Component\Console\Helper\HelperSet;
 use Symfony\Component\Console\Input\InputArgument;
@@ -235,7 +236,8 @@ class Command
 
         // bind the input against the command specific arguments/options
         try {
-            $input->bind($this->getDefinition());
+            $inputDefinition = $this->getDefinition();
+            $input->bind($inputDefinition);
         } catch (ExceptionInterface $e) {
             if (!$this->ignoreValidationErrors) {
                 throw $e;
@@ -272,6 +274,10 @@ class Command
         }
 
         $input->validate();
+
+        if (isset($inputDefinition)) {
+            $this->writeDeprecationMessages($inputDefinition, $input, $output);
+        }
 
         if ($this->code) {
             $statusCode = ($this->code)($input, $output);
@@ -646,6 +652,27 @@ class Command
         }
 
         return $this->helperSet->get($name);
+    }
+
+    private function writeDeprecationMessages(InputDefinition $inputDefinition, InputInterface $input, OutputInterface $output): void
+    {
+        $deprecationMessages = [];
+        foreach ($inputDefinition->getOptions() as $inputOption) {
+            if ($inputOption->isDeprecated()) {
+                $optionNames = ['--'.$inputOption->getName()];
+                if (null !== $inputOption->getShortcut()) {
+                    $optionNames[] = '-'.$inputOption->getShortcut();
+                }
+                if ($input->hasParameterOption($optionNames, true)) {
+                    $deprecationMessages[] = \sprintf('The option "%s" is deprecated.', implode('|', $optionNames));
+                }
+            }
+        }
+        if ($deprecationMessages) {
+            /** @var FormatterHelper $formatter */
+            $formatter = $this->getHelper('formatter');
+            $output->writeln($formatter->formatBlock($deprecationMessages, 'fg=black;bg=yellow', true));
+        }
     }
 
     /**

@@ -12,6 +12,8 @@
 namespace Symfony\Component\HttpKernel\Tests\Controller\ArgumentResolver;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\ExpressionLanguage\Expression;
+use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Attribute\MapQueryString;
 use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
@@ -19,9 +21,11 @@ use Symfony\Component\HttpKernel\Attribute\ValueResolver;
 use Symfony\Component\HttpKernel\Controller\ArgumentResolver\RequestPayloadValueResolver;
 use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
 use Symfony\Component\HttpKernel\Event\ControllerArgumentsEvent;
+use Symfony\Component\HttpKernel\Event\ControllerEvent;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpKernel\Exception\NearMissValueResolverException;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
+use Symfony\Component\HttpKernel\Tests\Fixtures\Controller\BasicTypesController;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Encoder\XmlEncoder;
 use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
@@ -873,6 +877,36 @@ class RequestPayloadValueResolverTest extends TestCase
         $resolver->onKernelControllerArguments($event);
 
         $this->assertTrue($event->getArguments()[0]->value);
+    }
+
+    public function testExpressionAsValidationGroup()
+    {
+        $content = '{"price": 24}';
+
+        $serializer = new Serializer([new ObjectNormalizer()], ['json' => new JsonEncoder()]);
+        $validator = $this->createMock(ValidatorInterface::class);
+        $validator->expects($this->once())
+            ->method('validate')
+            ->with(new RequestPayload(24.0), null, 'foo');
+
+        $resolver = new RequestPayloadValueResolver($serializer, $validator, expressionLanguage: new ExpressionLanguage());
+
+        $argument = new ArgumentMetadata('payload', RequestPayload::class, false, false, null, false, [
+            MapRequestPayload::class => new MapRequestPayload(validationGroups: new Expression('args["foo"]')),
+        ]);
+
+        $request = Request::create('/{foo}/{bar}/{baz}', 'POST', server: ['CONTENT_TYPE' => 'application/json'], content: $content);
+
+        $arguments = (array) $resolver->resolve($request, $argument);
+        array_unshift($arguments, 'foo', 15, 1.23);
+
+        $kernel = $this->createMock(HttpKernelInterface::class);
+
+        $controllerEvent = new ControllerEvent($kernel, [new BasicTypesController(), 'action'], $request, HttpKernelInterface::MAIN_REQUEST);
+
+        $event = new ControllerArgumentsEvent($kernel, $controllerEvent, $arguments, $request, HttpKernelInterface::MAIN_REQUEST);
+
+        $resolver->onKernelControllerArguments($event);
     }
 }
 

@@ -9,6 +9,11 @@ CHANGELOG
  * Deprecate argument `$secret` of `RememberMeToken`
  * Deprecate returning an empty string in `UserInterface::getUserIdentifier()`
 
+7.1
+---
+
+ * Add `getEncompassingRoleNames` method to `RoleHierarchyInterface`
+
 7.0
 ---
 

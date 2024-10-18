@@ -47,6 +47,21 @@ class RoleHierarchy implements RoleHierarchyInterface
         return array_values(array_unique($reachableRoles));
     }
 
+    public function getEncompassingRoleNames(array $roles): array
+    {
+        $encompassingRoles = $roles;
+
+        foreach ($roles as $role) {
+            foreach ($this->map as $parent => $children) {
+                if (\in_array($role, $children, true)) {
+                    $encompassingRoles[] = $parent;
+                }
+            }
+        }
+
+        return array_values(array_unique($encompassingRoles));
+    }
+
     protected function buildRoleMap(): void
     {
         $this->map = [];

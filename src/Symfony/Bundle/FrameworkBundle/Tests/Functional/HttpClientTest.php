@@ -17,7 +17,7 @@ class HttpClientTest extends AbstractWebTestCase
     {
         $client = $this->createClient(['test_case' => 'HttpClient', 'root_config' => 'config.yml', 'debug' => true]);
         $client->enableProfiler();
-        $client->request('GET', '/http_client_call');
+        $client->request('GET', '/http_client_call', ['headers' => ['X-Test-Header' => 'foo']]);
 
         $this->assertHttpClientRequest('https://symfony.com/');
         $this->assertHttpClientRequest('https://symfony.com/', httpClientId: 'symfony.http_client');

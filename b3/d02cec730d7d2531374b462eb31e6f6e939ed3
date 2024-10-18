@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2024-10-15T11:48:03Z
+
+@javiereguiluz should this be emphasized in https://symfony.com/blog/new-in-symfony-7-2-expression-language-improvements? This was my starting point, I wasn't sure this was supported 🙂
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2024-10-15T11:52:23Z
+
+@alexandre-daubois good call! Let's do that. I just updated the blog post with a multi-line comment. Thanks!

@@ -61,6 +61,7 @@ class MainConfiguration implements ConfigurationInterface
                     ->defaultValue(SessionAuthenticationStrategy::MIGRATE)
                 ->end()
                 ->booleanNode('hide_user_not_found')->defaultTrue()->end()
+                ->booleanNode('hide_account_status_exceptions')->defaultTrue()->end()
                 ->booleanNode('erase_credentials')->defaultTrue()->end()
                 ->arrayNode('access_decision_manager')
                     ->addDefaultsIfNotSet()

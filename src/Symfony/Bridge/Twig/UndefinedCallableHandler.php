@@ -60,6 +60,8 @@ class UndefinedCallableHandler
         'field_choices' => 'form',
         'logout_url' => 'security-http',
         'logout_path' => 'security-http',
+        'feature_get_value' => 'feature-flag',
+        'feature_is_enabled' => 'feature-flag',
         'is_granted' => 'security-core',
         'impersonation_path' => 'security-http',
         'impersonation_url' => 'security-http',

@@ -13,93 +13,68 @@ namespace Symfony\Component\TypeInfo\Tests\Type;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\TypeInfo\Exception\InvalidArgumentException;
-use Symfony\Component\TypeInfo\Exception\LogicException;
 use Symfony\Component\TypeInfo\Type;
-use Symfony\Component\TypeInfo\Type\BuiltinType;
 use Symfony\Component\TypeInfo\Type\IntersectionType;
-use Symfony\Component\TypeInfo\TypeIdentifier;
+use Symfony\Component\TypeInfo\Type\ObjectType;
+use Symfony\Component\TypeInfo\Type\UnionType;
 
 class IntersectionTypeTest extends TestCase
 {
     public function testCannotCreateWithOnlyOneType()
     {
         $this->expectException(InvalidArgumentException::class);
-        new IntersectionType(Type::int());
+        new IntersectionType(Type::object(\DateTime::class));
     }
 
-    public function testCannotCreateWithIntersectionTypeParts()
+    public function testCannotCreateWithUnionTypePart()
     {
         $this->expectException(InvalidArgumentException::class);
-        new IntersectionType(Type::int(), new IntersectionType());
+        new IntersectionType(Type::object(\DateTime::class), new UnionType(Type::int(), Type::string()));
+    }
+
+    public function testCannotCreateWithIntersectionTypePart()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        new IntersectionType(Type::object(\DateTime::class), new IntersectionType(Type::object(\DateTime::class), Type::object(\Iterator::class)));
+    }
+
+    public function testCannotCreateWithNonObjectTypePart()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        new IntersectionType(Type::object(\DateTime::class), Type::int());
+    }
+
+    public function testCannotCreateWithNullableTypePart()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        new IntersectionType(Type::object(\DateTime::class), Type::nullable(Type::object(\Stringable::class)));
+    }
+
+    public function testCanCreateWithWrappingTypes()
+    {
+        new IntersectionType(Type::collection(Type::object(\Iterator::class)), Type::generic(Type::object(\Iterator::class)));
+        // no assertion. this method just asserts that no exception is thrown
+        $this->addToAssertionCount(1);
     }
 
     public function testSortTypesOnCreation()
     {
-        $type = new IntersectionType(Type::int(), Type::string(), Type::bool());
-        $this->assertEquals([Type::bool(), Type::int(), Type::string()], $type->getTypes());
+        $type = new IntersectionType(Type::object(\DateTime::class), Type::object(\Iterator::class), Type::object(\Stringable::class));
+        $this->assertEquals([Type::object(\DateTime::class), Type::object(\Iterator::class), Type::object(\Stringable::class)], $type->getTypes());
     }
 
-    public function testAtLeastOneTypeIs()
+    public function testComposedTypesAreSatisfiedBy()
     {
-        $type = new IntersectionType(Type::int(), Type::string(), Type::bool());
+        $type = new IntersectionType(Type::object(\Iterator::class), Type::object(\Stringable::class));
+        $this->assertTrue($type->composedTypesAreSatisfiedBy(static fn (Type $t): bool => $t instanceof ObjectType));
 
-        $this->assertTrue($type->atLeastOneTypeIs(fn (Type $t) => 'int' === (string) $t));
-        $this->assertFalse($type->atLeastOneTypeIs(fn (Type $t) => 'float' === (string) $t));
-    }
-
-    public function testEveryTypeIs()
-    {
-        $type = new IntersectionType(Type::int(), Type::string(), Type::bool());
-        $this->assertTrue($type->everyTypeIs(fn (Type $t) => $t instanceof BuiltinType));
-
-        $type = new IntersectionType(Type::int(), Type::string(), Type::template('T'));
-        $this->assertFalse($type->everyTypeIs(fn (Type $t) => $t instanceof BuiltinType));
-    }
-
-    public function testGetBaseType()
-    {
-        $this->expectException(LogicException::class);
-        (new IntersectionType(Type::string(), Type::int()))->getBaseType();
+        $type = new IntersectionType(Type::object(\Iterator::class), Type::object(\Stringable::class));
+        $this->assertFalse($type->composedTypesAreSatisfiedBy(static fn (ObjectType $t): bool => \Iterator::class === $t->getClassName()));
     }
 
     public function testToString()
     {
-        $type = new IntersectionType(Type::int(), Type::string(), Type::float());
-        $this->assertSame('float&int&string', (string) $type);
-
-        $type = new IntersectionType(Type::int(), Type::string(), Type::union(Type::float(), Type::bool()));
-        $this->assertSame('(bool|float)&int&string', (string) $type);
-    }
-
-    public function testIsNullable()
-    {
-        $this->assertFalse((new IntersectionType(Type::int(), Type::string(), Type::float()))->isNullable());
-        $this->assertTrue((new IntersectionType(Type::null(), Type::union(Type::int(), Type::mixed())))->isNullable());
-    }
-
-    public function testAsNonNullable()
-    {
-        $type = new IntersectionType(Type::int(), Type::string(), Type::float());
-
-        $this->assertSame($type, $type->asNonNullable());
-    }
-
-    public function testCannotTurnNullIntersectionAsNonNullable()
-    {
-        $this->expectException(LogicException::class);
-
-        $type = (new IntersectionType(Type::null(), Type::mixed()))->asNonNullable();
-    }
-
-    public function testIsA()
-    {
-        $type = new IntersectionType(Type::int(), Type::string(), Type::float());
-        $this->assertFalse($type->isA(TypeIdentifier::ARRAY));
-
-        $type = new IntersectionType(Type::int(), Type::string(), Type::union(Type::float(), Type::bool()));
-        $this->assertFalse($type->isA(TypeIdentifier::INT));
-
-        $type = new IntersectionType(Type::int(), Type::union(Type::int(), Type::int()));
-        $this->assertTrue($type->isA(TypeIdentifier::INT));
+        $type = new IntersectionType(Type::object(\DateTime::class), Type::object(\Iterator::class), Type::object(\Stringable::class));
+        $this->assertSame(\sprintf('%s&%s&%s', \DateTime::class, \Iterator::class, \Stringable::class), (string) $type);
     }
 }

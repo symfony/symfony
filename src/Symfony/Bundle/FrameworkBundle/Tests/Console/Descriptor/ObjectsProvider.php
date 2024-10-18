@@ -16,6 +16,10 @@ use Symfony\Bundle\FrameworkBundle\Tests\Fixtures\Suit;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\Argument\AbstractArgument;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
+use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
+use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
+use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
+use Symfony\Component\DependencyInjection\Compiler\ServiceLocatorTagPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
@@ -240,6 +244,87 @@ class ObjectsProvider
                 ->setAbstract(false)
                 ->addTag('tag1', ['priority' => 0]),
         ];
+    }
+
+    public static function getContainerServicesWithLocatorArguments()
+    {
+        $container = new ContainerBuilder(new ParameterBag([
+            'kernel.debug' => true,
+            'kernel.project_dir' => __DIR__,
+            'kernel.container_class' => 'testContainer',
+        ]));
+        $service0 = new Definition('Full\\Qualified\\Class1');
+        $service1 = new Definition('Full\\Qualified\\Class2');
+        $service2 = new Definition('Full\\Qualified\\Class3');
+        $service3 = new Definition('Full\\Qualified\\Class4');
+        $container->addDefinitions([
+            'definition_1' => $service0
+                ->addArgument(new Reference('definition_2'))
+                ->addArgument(new ServiceLocatorArgument(
+                    new TaggedIteratorArgument('app_tag'),
+                ))
+                ->addArgument(new TaggedIteratorArgument('app_tag'))
+                ->addArgument(new ServiceLocatorArgument([
+                    'Full\\Qualified\\Class2' => new Reference('definition_2'),
+                    'Full\\Qualified\\Class3' => new Reference('definition_3'),
+                    'Full\\Qualified\\Class4' => new Reference('definition_4'),
+                    'mainEmail' => 'contact@email.com',
+                ]))
+                ->addArgument(ServiceLocatorTagPass::register($container, [
+                    new Reference('definition_2'),
+                    new Reference('definition_3'),
+                    new Reference('definition_4'),
+                    'mainEmail' => 'contact@email.com',
+                ]))
+                ->addArgument(ServiceLocatorTagPass::register($container, [
+                    1,
+                    true,
+                    'contact@email.com',
+                    new ServiceClosureArgument(new Reference('mailer')),
+                ]))
+                ->addArgument(new AbstractArgument('to complete'))
+                ->addArgument([
+                    new Reference('definition_2'),
+                    new Reference('definition_3'),
+                    new Reference('definition_4'),
+                ])
+                ->addArgument(FooUnitEnum::BAR)
+                ->addArgument(new IteratorArgument([
+                    new Reference('definition_2'),
+                    new Reference('definition_3'),
+                    new Reference('definition_4'),
+                ]))
+                ->addArgument(new ServiceClosureArgument(new Reference('mailer'))),
+            'definition_2' => $service1
+                ->addTag('app_tag'),
+            'definition_3' => $service2
+                ->addTag('app_tag'),
+            'definition_4' => $service3
+                ->addTag('app_tag'),
+        ]);
+
+        return $container;
+    }
+
+    public static function getDefinitionWithLocatorArguments()
+    {
+        $definition0 = new Definition('Full\\Qualified\\Class1');
+
+        return $definition0
+            ->addArgument(new ServiceLocatorArgument(
+                new TaggedIteratorArgument('app_tag'),
+            ))
+            ->addArgument(new TaggedIteratorArgument('app_tag'))
+            ->addArgument(new ServiceLocatorArgument([
+                'Full\\Qualified\\Class2' => new Reference('definition_2'),
+                'Full\\Qualified\\Class3' => new Reference('definition_3'),
+                'Full\\Qualified\\Class4' => new Reference('definition_4'),
+            ]))
+            ->addArgument(new IteratorArgument([
+                new Definition('definition_2'),
+                new Definition('definition_3'),
+                new Definition('definition_4'),
+            ]));
     }
 
     public static function getContainerAliases()

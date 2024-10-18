@@ -15,6 +15,7 @@ use Symfony\Component\Console\Formatter\OutputFormatter;
 use Symfony\Component\Console\Helper\Dumper;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Helper\TableCell;
+use Symfony\Component\Console\Helper\TableSeparator;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\Argument\AbstractArgument;
@@ -351,45 +352,104 @@ class TextDescriptor extends Descriptor
             }
         }
 
-        $showArguments = isset($options['show_arguments']) && $options['show_arguments'];
-        $argumentsInformation = [];
-        if ($showArguments && ($arguments = $definition->getArguments())) {
-            foreach ($arguments as $argument) {
-                if ($argument instanceof ServiceClosureArgument) {
-                    $argument = $argument->getValues()[0];
-                }
-                if ($argument instanceof Reference) {
-                    $argumentsInformation[] = \sprintf('Service(%s)', (string) $argument);
-                } elseif ($argument instanceof IteratorArgument) {
-                    if ($argument instanceof TaggedIteratorArgument) {
-                        $argumentsInformation[] = \sprintf('Tagged Iterator for "%s"%s', $argument->getTag(), $options['is_debug'] ? '' : \sprintf(' (%d element(s))', \count($argument->getValues())));
-                    } else {
-                        $argumentsInformation[] = \sprintf('Iterator (%d element(s))', \count($argument->getValues()));
-                    }
-
-                    foreach ($argument->getValues() as $ref) {
-                        $argumentsInformation[] = \sprintf('- Service(%s)', $ref);
-                    }
-                } elseif ($argument instanceof ServiceLocatorArgument) {
-                    $argumentsInformation[] = \sprintf('Service locator (%d element(s))', \count($argument->getValues()));
-                } elseif ($argument instanceof Definition) {
-                    $argumentsInformation[] = 'Inlined Service';
-                } elseif ($argument instanceof \UnitEnum) {
-                    $argumentsInformation[] = ltrim(var_export($argument, true), '\\');
-                } elseif ($argument instanceof AbstractArgument) {
-                    $argumentsInformation[] = \sprintf('Abstract argument (%s)', $argument->getText());
-                } else {
-                    $argumentsInformation[] = \is_array($argument) ? \sprintf('Array (%d element(s))', \count($argument)) : $argument;
-                }
-            }
-
-            $tableRows[] = ['Arguments', implode("\n", $argumentsInformation)];
-        }
-
         $inEdges = null !== $container && isset($options['id']) ? $this->getServiceEdges($container, $options['id']) : [];
         $tableRows[] = ['Usages', $inEdges ? implode(\PHP_EOL, $inEdges) : 'none'];
 
         $options['output']->table($tableHeaders, $tableRows);
+
+        $showArguments = isset($options['show_arguments']) && $options['show_arguments'];
+
+        if ($showArguments && ($arguments = $definition->getArguments())) {
+            $table = new Table($this->getOutput());
+            $table->setHeaderTitle('Arguments');
+            $table->setHeaders(['#', 'Service', 'Argument(s)']);
+
+            foreach ($arguments as $position => $argument) {
+                if ($argument instanceof Reference) {
+                    if (null === $container
+                        || !($argumentDefinition = $container->getDefinition($argument))->hasTag('container.service_locator')
+                    ) {
+                        $table->addRow([++$position, \sprintf('Service(%s)', $argument), '-']);
+                    } else {
+                        $argumentCollection = $argumentDefinition->getArguments()[0];
+                        $description = \sprintf('Service locator (%d element(s))', \count($argumentCollection));
+
+                        foreach ($argumentCollection as $key => $argumentUnit) {
+                            $argumentValue = $argumentUnit->getValues()[0];
+                            $argumentDescription = !($argumentValue instanceof Reference) ? json_encode($argumentValue) : $argumentValue;
+
+                            if (array_key_first($argumentCollection) === $key) {
+                                $table->addRow([++$position, $description, $argumentDescription]);
+                            } else {
+                                $table->addRow(['', '', $argumentDescription]);
+                            }
+                        }
+                    }
+                } elseif ($argument instanceof IteratorArgument) {
+                    $argumentValues = $argument->getValues();
+
+                    if ($argument instanceof TaggedIteratorArgument) {
+                        if (null === $container) {
+                            $description = \sprintf('Tagged Iterator for "%s"', $argument->getTag());
+
+                            $table->addRow([++$position, $description, '-']);
+                        } else {
+                            $services = array_keys($container->findTaggedServiceIds($argument->getTag()));
+                            $description = \sprintf('Tagged Iterator for "%s"%s', $argument->getTag(), $options['is_debug'] ? '' : \sprintf(' (%d element(s))', \count($services)));
+
+                            foreach ($services as $order => $ref) {
+                                if (array_key_first($services) === $order) {
+                                    $table->addRow([++$position, $description, $ref]);
+                                } else {
+                                    $table->addRow(['', '', $ref]);
+                                }
+                            }
+                        }
+                    } else {
+                        $description = \sprintf('Iterator (%d element(s))', \count($argumentValues));
+                        $table->addRow([++$position, $description, '-']);
+                    }
+                } elseif ($argument instanceof ServiceLocatorArgument) {
+                    if (null === $container) {
+                        $description = 'Service locator';
+
+                        if (null === $argument->getTaggedIteratorArgument()) {
+                            $description = \sprintf('Service locator (%d element(s))', \count($argument->getValues()));
+                        }
+
+                        $table->addRow([++$position, $description, '-']);
+                    } else {
+                        $services = null !== $argument->getTaggedIteratorArgument() ? array_keys($container->findTaggedServiceIds($argument->getTaggedIteratorArgument()->getTag())) : $argument->getValues();
+                        $description = \sprintf('Service locator (%d element(s))', \count($services));
+
+                        foreach ($services as $order => $ref) {
+                            if (array_key_first($services) === $order) {
+                                $table->addRow([++$position, $description, $ref]);
+                            } else {
+                                $table->addRow(['', '', $ref]);
+                            }
+                        }
+                    }
+                } elseif ($argument instanceof Definition) {
+                    $table->addRow([++$position, 'Inlined Service', '-']);
+                } elseif ($argument instanceof \UnitEnum) {
+                    $table->addRow([++$position, ltrim(var_export($argument, true), '\\'), '-']);
+                } elseif ($argument instanceof AbstractArgument) {
+                    $table->addRow([++$position, \sprintf('Abstract argument (%s)', $argument->getText()), '-']);
+                } elseif ($argument instanceof ServiceClosureArgument) {
+                    $table->addRow([++$position, \sprintf('Closure argument (%s)', $argument->getValues()[0]), '-']);
+                } elseif (\is_array($argument)) {
+                    $table->addRow([++$position, \sprintf('Array (%d element(s))', \count($argument)), '-']);
+                } else {
+                    $table->addRow([++$position, $argument, '-']);
+                }
+
+                if (--$position !== array_key_last($arguments)) {
+                    $table->addRow(new TableSeparator());
+                }
+            }
+            $table->render();
+        }
     }
 
     protected function describeContainerDeprecations(ContainerBuilder $container, array $options = []): void

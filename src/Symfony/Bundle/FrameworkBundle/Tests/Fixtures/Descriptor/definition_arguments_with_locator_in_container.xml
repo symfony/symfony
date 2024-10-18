@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definition id="definition_1" class="Full\Qualified\Class1" public="false" synthetic="false" lazy="false" shared="true" abstract="false" autowired="false" autoconfigured="false" deprecated="false" file="">
+  <argument type="service" id="definition_2"/>
+  <argument type="service_locator"/>
+  <argument type="iterator"/>
+  <argument type="service_locator">
+    <argument key="Full\Qualified\Class2" type="service" id="definition_2"/>
+    <argument key="Full\Qualified\Class3" type="service" id="definition_3"/>
+    <argument key="Full\Qualified\Class4" type="service" id="definition_4"/>
+    <argument key="mainEmail">contact@email.com</argument>
+  </argument>
+  <argument type="service" id=".service_locator.kbKXy4g"/>
+  <argument type="service" id=".service_locator.NnLrqC0"/>
+  <argument type="abstract">to complete</argument>
+  <argument type="collection">
+    <argument type="service" id="definition_2"/>
+    <argument type="service" id="definition_3"/>
+    <argument type="service" id="definition_4"/>
+  </argument>
+  <argument type="constant">Symfony\Bundle\FrameworkBundle\Tests\Fixtures\FooUnitEnum::BAR</argument>
+  <argument type="iterator">
+    <argument type="service" id="definition_2"/>
+    <argument type="service" id="definition_3"/>
+    <argument type="service" id="definition_4"/>
+  </argument>
+  <argument type="service" id="mailer"/>
+</definition>

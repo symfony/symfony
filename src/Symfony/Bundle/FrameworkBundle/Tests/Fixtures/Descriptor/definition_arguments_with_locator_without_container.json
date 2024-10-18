@@ -1,0 +1,79 @@
+{
+ "class": "Full\\Qualified\\Class1",
+ "public": false,
+ "synthetic": false,
+ "lazy": false,
+ "shared": true,
+ "abstract": false,
+ "autowire": false,
+ "autoconfigure": false,
+ "deprecated": false,
+ "arguments": [
+  [],
+  [],
+  {
+   "Full\\Qualified\\Class2": {
+    "type": "service",
+    "id": "definition_2"
+   },
+   "Full\\Qualified\\Class3": {
+    "type": "service",
+    "id": "definition_3"
+   },
+   "Full\\Qualified\\Class4": {
+    "type": "service",
+    "id": "definition_4"
+   }
+  },
+  [
+   {
+    "class": "definition_2",
+    "public": false,
+    "synthetic": false,
+    "lazy": false,
+    "shared": true,
+    "abstract": false,
+    "autowire": false,
+    "autoconfigure": false,
+    "deprecated": false,
+    "arguments": [],
+    "file": null,
+    "tags": [],
+    "usages": []
+   },
+   {
+    "class": "definition_3",
+    "public": false,
+    "synthetic": false,
+    "lazy": false,
+    "shared": true,
+    "abstract": false,
+    "autowire": false,
+    "autoconfigure": false,
+    "deprecated": false,
+    "arguments": [],
+    "file": null,
+    "tags": [],
+    "usages": []
+   },
+   {
+    "class": "definition_4",
+    "public": false,
+    "synthetic": false,
+    "lazy": false,
+    "shared": true,
+    "abstract": false,
+    "autowire": false,
+    "autoconfigure": false,
+    "deprecated": false,
+    "arguments": [],
+    "file": null,
+    "tags": [],
+    "usages": []
+   }
+  ]
+ ],
+ "file": null,
+ "tags": [],
+ "usages": []
+}

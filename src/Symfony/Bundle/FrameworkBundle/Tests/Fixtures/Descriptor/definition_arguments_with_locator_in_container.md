@@ -1,0 +1,13 @@
+### definition_1
+
+- Class: `Full\Qualified\Class1`
+- Public: no
+- Synthetic: no
+- Lazy: no
+- Shared: yes
+- Abstract: no
+- Autowired: no
+- Autoconfigured: no
+- Deprecated: no
+- Arguments: yes
+- Usages: none

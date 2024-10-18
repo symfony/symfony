@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definition class="Full\Qualified\Class1" public="false" synthetic="false" lazy="false" shared="true" abstract="false" autowired="false" autoconfigured="false" deprecated="false" file="">
+  <argument type="service_locator"/>
+  <argument type="iterator"/>
+  <argument type="service_locator">
+    <argument key="Full\Qualified\Class2" type="service" id="definition_2"/>
+    <argument key="Full\Qualified\Class3" type="service" id="definition_3"/>
+    <argument key="Full\Qualified\Class4" type="service" id="definition_4"/>
+  </argument>
+  <argument type="iterator">
+    <argument>
+      <definition class="definition_2" public="false" synthetic="false" lazy="false" shared="true" abstract="false" autowired="false" autoconfigured="false" deprecated="false" file=""/>
+    </argument>
+    <argument>
+      <definition class="definition_3" public="false" synthetic="false" lazy="false" shared="true" abstract="false" autowired="false" autoconfigured="false" deprecated="false" file=""/>
+    </argument>
+    <argument>
+      <definition class="definition_4" public="false" synthetic="false" lazy="false" shared="true" abstract="false" autowired="false" autoconfigured="false" deprecated="false" file=""/>
+    </argument>
+  </argument>
+</definition>

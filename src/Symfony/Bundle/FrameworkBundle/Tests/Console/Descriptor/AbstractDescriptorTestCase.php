@@ -268,7 +268,7 @@ abstract class AbstractDescriptorTestCase extends TestCase
 
     abstract protected static function getFormat();
 
-    private function assertDescription($expectedDescription, $describedObject, array $options = [])
+    private function assertDescription($expectedDescription, $describedObject, array $options = []): void
     {
         $options['is_debug'] = false;
         $options['raw_output'] = true;
@@ -360,5 +360,32 @@ abstract class AbstractDescriptorTestCase extends TestCase
         }
 
         return $data;
+    }
+
+    /** @dataProvider getDescribeContainerBuilderWithLocatorAndIteratorTestData */
+    public function testDescribeContainerBuilderWithLocatorAndIterator($object, $expectedDescription, array $options)
+    {
+        $this->assertDescription($expectedDescription, $object, $options);
+    }
+
+    public static function getDescribeContainerBuilderWithLocatorAndIteratorTestData(): \Generator
+    {
+        $file = \sprintf('%s.%s', trim('definition_arguments_with_locator_in_container', '.'), static::getFormat());
+        $description = file_get_contents(__DIR__.'/../../Fixtures/Descriptor/'.$file);
+
+        yield 'Show arguments option used through a container ('.$file.')' => [
+            'object' => ObjectsProvider::getContainerServicesWithLocatorArguments(),
+            'expectedDescription' => $description,
+            'options' => ['show_arguments' => true, 'id' => 'definition_1'],
+        ];
+
+        $file = \sprintf('%s.%s', trim('definition_arguments_with_locator_without_container', '.'), static::getFormat());
+        $description = file_get_contents(__DIR__.'/../../Fixtures/Descriptor/'.$file);
+
+        yield 'Show arguments option used outside of a container ('.$file.')' => [
+            'object' => ObjectsProvider::getDefinitionWithLocatorArguments(),
+            'expectedDescription' => $description,
+            'options' => ['show_arguments' => true],
+        ];
     }
 }

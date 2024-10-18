@@ -7,6 +7,7 @@ CHANGELOG
  * Add support for assets pre-compression
  * Rename `TranslationUpdateCommand` to `TranslationExtractCommand`
  * Add JsonEncoder services and configuration
+ * Add more details for the `--show-arguments` option of the console command `debug:container`
 
 7.2
 ---

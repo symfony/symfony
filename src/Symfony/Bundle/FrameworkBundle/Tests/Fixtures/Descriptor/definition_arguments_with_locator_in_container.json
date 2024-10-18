@@ -1,0 +1,82 @@
+{
+ "class": "Full\\Qualified\\Class1",
+ "public": false,
+ "synthetic": false,
+ "lazy": false,
+ "shared": true,
+ "abstract": false,
+ "autowire": false,
+ "autoconfigure": false,
+ "deprecated": false,
+ "arguments": [
+  {
+   "type": "service",
+   "id": "definition_2"
+  },
+  [],
+  [],
+  {
+   "Full\\Qualified\\Class2": {
+    "type": "service",
+    "id": "definition_2"
+   },
+   "Full\\Qualified\\Class3": {
+    "type": "service",
+    "id": "definition_3"
+   },
+   "Full\\Qualified\\Class4": {
+    "type": "service",
+    "id": "definition_4"
+   },
+   "mainEmail": "contact@email.com"
+  },
+  {
+   "type": "service",
+   "id": ".service_locator.kbKXy4g"
+  },
+  {
+   "type": "service",
+   "id": ".service_locator.NnLrqC0"
+  },
+  {
+   "type": "abstract",
+   "text": "to complete"
+  },
+  [
+   {
+    "type": "service",
+    "id": "definition_2"
+   },
+   {
+    "type": "service",
+    "id": "definition_3"
+   },
+   {
+    "type": "service",
+    "id": "definition_4"
+   }
+  ],
+  "Symfony\\Bundle\\FrameworkBundle\\Tests\\Fixtures\\FooUnitEnum::BAR",
+  [
+   {
+    "type": "service",
+    "id": "definition_2"
+   },
+   {
+    "type": "service",
+    "id": "definition_3"
+   },
+   {
+    "type": "service",
+    "id": "definition_4"
+   }
+  ],
+  {
+   "type": "service",
+   "id": "mailer"
+  }
+ ],
+ "file": null,
+ "tags": [],
+ "usages": []
+}

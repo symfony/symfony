@@ -448,7 +448,7 @@ class YamlFileLoader extends FileLoader
                         throw new InvalidArgumentException(\sprintf('Missing attribute "version" of the "deprecated" option in "%s".', $file));
                     }
 
-                    $alias->setDeprecated($deprecation['package'] ?? '', $deprecation['version'] ?? '', $deprecation['message'] ?? '');
+                    $alias->setDeprecated($deprecation['package'], $deprecation['version'], $deprecation['message'] ?? '');
                 }
             }
 
@@ -520,7 +520,7 @@ class YamlFileLoader extends FileLoader
                 throw new InvalidArgumentException(\sprintf('Missing attribute "version" of the "deprecated" option in "%s".', $file));
             }
 
-            $definition->setDeprecated($deprecation['package'] ?? '', $deprecation['version'] ?? '', $deprecation['message'] ?? '');
+            $definition->setDeprecated($deprecation['package'], $deprecation['version'], $deprecation['message'] ?? '');
         }
 
         if (isset($service['factory'])) {

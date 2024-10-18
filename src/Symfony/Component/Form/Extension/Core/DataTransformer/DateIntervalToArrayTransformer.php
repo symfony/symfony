@@ -139,7 +139,7 @@ class DateIntervalToArrayTransformer implements DataTransformerInterface
                     'P%sY%sM%sWT%sH%sM%sS',
                     empty($value['years']) ? '0' : $value['years'],
                     empty($value['months']) ? '0' : $value['months'],
-                    empty($value['weeks']) ? '0' : $value['weeks'],
+                    $value['weeks'],
                     empty($value['hours']) ? '0' : $value['hours'],
                     empty($value['minutes']) ? '0' : $value['minutes'],
                     empty($value['seconds']) ? '0' : $value['seconds']

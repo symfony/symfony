@@ -207,12 +207,10 @@ class TagAwareAdapter implements TagAwareAdapterInterface, TagAwareCacheInterfac
                     unset($this->deferred[$key]);
                 }
             }
+
+            return $this->pool->clear($prefix);
         } else {
             $this->deferred = [];
-        }
-
-        if ($this->pool instanceof AdapterInterface) {
-            return $this->pool->clear($prefix);
         }
 
         return $this->pool->clear();

@@ -96,7 +96,7 @@ final class ContactEveryoneTransport extends AbstractTransport
         $result = $response->getContent(false);
 
         $sentMessage = new SentMessage($message, (string) $this);
-        $sentMessage->setMessageId($result ?? '');
+        $sentMessage->setMessageId($result);
 
         return $sentMessage;
     }

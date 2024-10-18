@@ -1,0 +1,18 @@
+{
+  "event_type": "sms_sent",
+  "timestamp": "2024-09-02T17:25:43",
+  "swg_uid": "03-f237cd16-a013-4e35-a279-c9eaa994e82b",
+  "event_id": "a5ccc627-6e43-4012-bb29-f1bfe3a3d13e",
+  "channel": "sms",
+  "client_id": "de1bbe6f-4103-47b1-8f69-94856aaba3fc",
+  "country_code": "FR",
+  "phone_number": "0033612345678",
+  "sender_id": "38082",
+  "sms_type": "transactional",
+  "sms_price": 0.04,
+  "campaign_id": null,
+  "test_mode": false,
+  "send_date": "2024-09-02T15:25:40.577165",
+  "mobile_network_code": 1,
+  "mobile_country_code": 208
+}

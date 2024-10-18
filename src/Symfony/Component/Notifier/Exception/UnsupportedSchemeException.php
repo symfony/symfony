@@ -296,6 +296,10 @@ class UnsupportedSchemeException extends LogicException
             'class' => Bridge\SpotHit\SpotHitTransportFactory::class,
             'package' => 'symfony/spot-hit-notifier',
         ],
+        'sweego' => [
+            'class' => Bridge\Sweego\SweegoTransportFactory::class,
+            'package' => 'symfony/sweego-notifier',
+        ],
         'telegram' => [
             'class' => Bridge\Telegram\TelegramTransportFactory::class,
             'package' => 'symfony/telegram-notifier',

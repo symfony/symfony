@@ -14,7 +14,7 @@ namespace Symfony\Component\Routing\Loader;
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\Config\Loader\LoaderResolverInterface;
 use Symfony\Component\Config\Resource\FileResource;
-use Symfony\Component\Routing\Attribute\Route as RouteAnnotation;
+use Symfony\Component\Routing\Attribute\Route as RouteAttribute;
 use Symfony\Component\Routing\Exception\LogicException;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
@@ -53,7 +53,7 @@ use Symfony\Component\Routing\RouteCollection;
  */
 abstract class AttributeClassLoader implements LoaderInterface
 {
-    protected string $routeAnnotationClass = RouteAnnotation::class;
+    protected string $routeAnnotationClass = RouteAttribute::class;
     protected int $defaultRouteIndex = 0;
 
     public function __construct(
@@ -93,7 +93,7 @@ abstract class AttributeClassLoader implements LoaderInterface
         foreach ($class->getMethods() as $method) {
             $this->defaultRouteIndex = 0;
             $routeNamesBefore = array_keys($collection->all());
-            foreach ($this->getAnnotations($method) as $annot) {
+            foreach ($this->getAttributes($method) as $annot) {
                 $this->addRoute($collection, $annot, $globals, $class, $method);
                 if ('__invoke' === $method->name) {
                     $fqcnAlias = true;
@@ -109,7 +109,7 @@ abstract class AttributeClassLoader implements LoaderInterface
         }
         if (0 === $collection->count() && $class->hasMethod('__invoke')) {
             $globals = $this->resetGlobals();
-            foreach ($this->getAnnotations($class) as $annot) {
+            foreach ($this->getAttributes($class) as $annot) {
                 $this->addRoute($collection, $annot, $globals, $class, $class->getMethod('__invoke'));
                 $fqcnAlias = true;
             }
@@ -129,7 +129,7 @@ abstract class AttributeClassLoader implements LoaderInterface
     }
 
     /**
-     * @param RouteAnnotation $annot or an object that exposes a similar interface
+     * @param RouteAttribute $annot or an object that exposes a similar interface
      */
     protected function addRoute(RouteCollection $collection, object $annot, array $globals, \ReflectionClass $class, \ReflectionMethod $method): void
     {
@@ -337,9 +337,9 @@ abstract class AttributeClassLoader implements LoaderInterface
     abstract protected function configureRoute(Route $route, \ReflectionClass $class, \ReflectionMethod $method, object $annot);
 
     /**
-     * @return iterable<int, RouteAnnotation>
+     * @return iterable<int, RouteAttribute>
      */
-    private function getAnnotations(\ReflectionClass|\ReflectionMethod $reflection): iterable
+    private function getAttributes(\ReflectionClass|\ReflectionMethod $reflection): iterable
     {
         foreach ($reflection->getAttributes($this->routeAnnotationClass, \ReflectionAttribute::IS_INSTANCEOF) as $attribute) {
             yield $attribute->newInstance();

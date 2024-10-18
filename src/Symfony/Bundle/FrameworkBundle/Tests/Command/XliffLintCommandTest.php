@@ -64,9 +64,7 @@ EOF;
 
         $command = $application->find('lint:xliff');
 
-        if ($application) {
-            $command->setApplication($application);
-        }
+        $command->setApplication($application);
 
         return new CommandTester($command);
     }

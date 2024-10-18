@@ -112,9 +112,7 @@ EOF;
 
         $command = $application->find('lint:yaml');
 
-        if ($application) {
-            $command->setApplication($application);
-        }
+        $command->setApplication($application);
 
         return new CommandTester($command);
     }

@@ -246,7 +246,6 @@ class CallbackValidatorTest extends ConstraintValidatorTestCase
         $constraint = new Callback(callback: $callback, payload: 'Hello world!');
         $this->validator->validate($object, $constraint);
         $this->assertEquals('Hello world!', $payloadCopy);
-        $payloadCopy = 'Replace me!';
 
         $payloadCopy = 'Replace me!';
         $constraint = new Callback([

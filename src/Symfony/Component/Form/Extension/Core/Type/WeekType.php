@@ -113,10 +113,8 @@ class WeekType extends AbstractType
 
         $choiceTranslationDomainNormalizer = static function (Options $options, $choiceTranslationDomain) {
             if (\is_array($choiceTranslationDomain)) {
-                $default = false;
-
                 return array_replace(
-                    ['year' => $default, 'week' => $default],
+                    ['year' => false, 'week' => false],
                     $choiceTranslationDomain
                 );
             }

@@ -156,7 +156,7 @@ class PrototypedArrayNode extends ArrayNode
     protected function finalizeValue(mixed $value): mixed
     {
         if (false === $value) {
-            throw new UnsetKeyException(\sprintf('Unsetting key for path "%s", value: %s.', $this->getPath(), json_encode($value)));
+            throw new UnsetKeyException(\sprintf('Unsetting key for path "%s", value: false.', $this->getPath()));
         }
 
         foreach ($value as $k => $v) {
@@ -218,7 +218,7 @@ class PrototypedArrayNode extends ArrayNode
                             $valuePrototype->parent = $this;
                             $originalClosures = $this->prototype->normalizationClosures;
                             $valuePrototypeClosures = $valuePrototype->normalizationClosures;
-                            $valuePrototype->normalizationClosures = \is_array($valuePrototypeClosures) ? array_merge($originalClosures, $valuePrototypeClosures) : $originalClosures;
+                            $valuePrototype->normalizationClosures = array_merge($originalClosures, $valuePrototypeClosures);
                             $this->valuePrototypes[$k] = $valuePrototype;
                         }
                     }

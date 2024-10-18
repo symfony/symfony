@@ -134,7 +134,7 @@ class Connection
      *     * flags: Queue flags (Default: AMQP_DURABLE)
      *     * arguments: Extra arguments
      *   * exchange:
-     *     * name: Name of the exchange
+     *     * name: Name of the exchange. An empty string (name: '') can be used to use the default exchange
      *     * type: Type of exchange (Default: fanout)
      *     * default_publish_routing_key: Routing key to use when publishing, if none is specified on the message
      *     * flags: Exchange flags (Default: AMQP_DURABLE)
@@ -454,12 +454,17 @@ class Connection
 
     private function setupExchangeAndQueues(): void
     {
-        $this->exchange()->declareExchange();
+        $exchange = $this->exchange();
+        if ('' !== $this->exchangeOptions['name']) {
+            $exchange->declareExchange();
+        }
 
         foreach ($this->queuesOptions as $queueName => $queueConfig) {
             $this->queue($queueName)->declareQueue();
-            foreach ($queueConfig['binding_keys'] ?? [null] as $bindingKey) {
-                $this->queue($queueName)->bind($this->exchangeOptions['name'], $bindingKey, $queueConfig['binding_arguments'] ?? []);
+            if ('' !== $this->exchangeOptions['name']) {
+                foreach ($queueConfig['binding_keys'] ?? [null] as $bindingKey) {
+                    $this->queue($queueName)->bind($this->exchangeOptions['name'], $bindingKey, $queueConfig['binding_arguments'] ?? []);
+                }
             }
         }
         $this->autoSetupExchange = false;
@@ -533,11 +538,14 @@ class Connection
         if (!isset($this->amqpExchange)) {
             $this->amqpExchange = $this->amqpFactory->createExchange($this->channel());
             $this->amqpExchange->setName($this->exchangeOptions['name']);
-            $this->amqpExchange->setType($this->exchangeOptions['type'] ?? \AMQP_EX_TYPE_FANOUT);
-            $this->amqpExchange->setFlags($this->exchangeOptions['flags'] ?? \AMQP_DURABLE);
+            $defaultExchangeType = '' !== $this->exchangeOptions['name'] ? \AMQP_EX_TYPE_FANOUT : \AMQP_EX_TYPE_DIRECT;
+            $this->amqpExchange->setType($this->exchangeOptions['type'] ?? $defaultExchangeType);
+            if ('' !== $this->exchangeOptions['name']) {
+                $this->amqpExchange->setFlags($this->exchangeOptions['flags'] ?? \AMQP_DURABLE);
 
-            if (isset($this->exchangeOptions['arguments'])) {
-                $this->amqpExchange->setArguments($this->exchangeOptions['arguments']);
+                if (isset($this->exchangeOptions['arguments'])) {
+                    $this->amqpExchange->setArguments($this->exchangeOptions['arguments']);
+                }
             }
         }
 

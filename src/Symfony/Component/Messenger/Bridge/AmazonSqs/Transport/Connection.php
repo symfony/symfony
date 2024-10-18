@@ -304,6 +304,23 @@ class Connection
         ]);
     }
 
+    /**
+     * @param int|null $seconds the minimum duration the message should be kept alive
+     */
+    public function keepalive(string $id, ?int $seconds = null): void
+    {
+        $visibilityTimeout = $this->configuration['visibility_timeout'];
+        if (null !== $visibilityTimeout && null !== $seconds && $visibilityTimeout < $seconds) {
+            throw new TransportException(\sprintf('SQS visibility_timeout (%ds) cannot be smaller than the keepalive interval (%ds).', $visibilityTimeout, $seconds));
+        }
+
+        $this->client->changeMessageVisibility([
+            'QueueUrl' => $this->getQueueUrl(),
+            'ReceiptHandle' => $id,
+            'VisibilityTimeout' => $this->configuration['visibility_timeout'],
+        ]);
+    }
+
     public function getMessageCount(): int
     {
         $response = $this->client->getQueueAttributes([

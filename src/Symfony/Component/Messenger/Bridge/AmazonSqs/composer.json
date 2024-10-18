@@ -19,7 +19,7 @@
         "php": ">=8.2",
         "async-aws/core": "^1.7",
         "async-aws/sqs": "^1.0|^2.0",
-        "symfony/messenger": "^6.4|^7.0",
+        "symfony/messenger": "^7.2",
         "symfony/service-contracts": "^2.5|^3",
         "psr/log": "^1|^2|^3"
     },

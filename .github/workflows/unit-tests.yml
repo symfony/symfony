@@ -78,7 +78,7 @@ jobs:
           # To run a PR with a patched phpunit-bridge, first submit the patch for the
           # phpunit-bridge as a separate PR against the next feature-branch then
           # uncomment and update the following line with that PR number
-          #SYMFONY_PHPUNIT_BRIDGE_PR=32886
+          SYMFONY_PHPUNIT_BRIDGE_PR=58571
 
           if [[ $SYMFONY_PHPUNIT_BRIDGE_PR ]]; then
             git fetch --depth=2 origin refs/pull/$SYMFONY_PHPUNIT_BRIDGE_PR/head
@@ -239,3 +239,11 @@ jobs:
           mkdir -p /opt/php/lib
           echo memory_limit=-1 > /opt/php/lib/php.ini
           ./build/php/bin/php ./phpunit --colors=always src/Symfony/Component/Process
+
+      - name: Run PhpUnitBridge tests with PHPUnit 11
+        if: '! matrix.mode'
+        run: |
+          ./phpunit src/Symfony/Bridge/PhpUnit
+        env:
+          SYMFONY_PHPUNIT_VERSION: '11.3'
+          SYMFONY_DEPRECATIONS_HELPER: 'disabled'

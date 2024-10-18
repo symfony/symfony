@@ -707,7 +707,7 @@ class ConnectionTest extends TestCase
 
         $connection = new Connection(['table_name' => 'messenger_messages'], $driverConnection);
         $connection->configureSchema($schema, $driverConnection, fn () => true);
-        
+
         $expectedSuffix = '_seq';
         $sequences = $schema->getSequences();
         $this->assertCount(1, $sequences);

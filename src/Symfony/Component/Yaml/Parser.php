@@ -874,7 +874,7 @@ class Parser
         if ($notEOF) {
             $blockLines[] = '';
             $this->moveToPreviousLine();
-        } elseif (!$notEOF && !$this->isCurrentLineLastLineInDocument()) {
+        } elseif (!$this->isCurrentLineLastLineInDocument()) {
             $blockLines[] = '';
         }
 

@@ -1,0 +1,46 @@
+---------------------------------------------------------------------------
+
+by Wasta-Geek at 2024-09-20T07:30:37Z
+
+> `from` parameter is handled on Sweego side (AFAIK, it means one `from` per API Key. @pydubreucq can you confirm my words?).
+
+Hi, I'm working on Sweego project, to answer about this, indeed the from is managed on our side but it's not different for each API Key. An optional sender ID (alphanumeric sender) can be configured on Sweego App and when sending an SMS, the sender ID will be taken as sender; if missing, a short number will be used as sender
+
+---------------------------------------------------------------------------
+
+by welcoMattic at 2024-09-25T21:37:08Z
+
+> Hi, I'm working on Sweego project, to answer about this, indeed the from is managed on our side but it's not different for each API Key. An optional sender ID (alphanumeric sender) can be configured on Sweego App and when sending an SMS, the sender ID will be taken as sender; if missing, a short number will be used as sender
+
+Hi @Wasta-Geek! Thanks for your advice about the Sender ID. Can you help me to implement it? I didn't find how/where to set this Sender ID in your [documentation about SMS sending](https://learn.sweego.io/docs/sending/how_to_send_sms_by_api). We are close to finish this PR, let's do it together!
+
+---------------------------------------------------------------------------
+
+by Wasta-Geek at 2024-09-30T13:08:43Z
+
+> > Hi, I'm working on Sweego project, to answer about this, indeed the from is managed on our side but it's not different for each API Key. An optional sender ID (alphanumeric sender) can be configured on Sweego App and when sending an SMS, the sender ID will be taken as sender; if missing, a short number will be used as sender
+>
+> Hi @Wasta-Geek! Thanks for your advice about the Sender ID. Can you help me to implement it? I didn't find how/where to set this Sender ID in your [documentation about SMS sending](https://learn.sweego.io/docs/sending/how_to_send_sms_by_api). We are close to finish this PR, let's do it together!
+
+Oops, I didn't see your question last time I checked the PR.
+I wasn't clear enough maybe, sorry; but a client can create a sender ID on Sweego App page and it will be used for SMS sending **automatically for countries supporting** it but it's not something that can be configured on API side when sending a message so you have nothing to add on your side.
+
+---------------------------------------------------------------------------
+
+by welcoMattic at 2024-10-02T16:42:25Z
+
+`region` and `campaign_type` parameter has been added to the DSN to let users set them.
+
+---------------------------------------------------------------------------
+
+by welcoMattic at 2024-10-17T20:49:02Z
+
+I've been informed that webhook signature is available from Sweego. I'm working on the implementation on both Bridge Mailer and Notifier. For Notifier, would you prefer update this PR or a new one?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2024-10-18T06:29:12Z
+
+> I've been informed that webhook signature is available from Sweego. I'm working on the implementation on both Bridge Mailer and Notifier. For Notifier, would you prefer update this PR or a new one?
+
+Let's do it in a new PR.

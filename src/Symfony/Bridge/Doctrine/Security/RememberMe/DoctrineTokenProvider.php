@@ -55,15 +55,17 @@ class DoctrineTokenProvider implements TokenProviderInterface, TokenVerifierInte
      */
     public function loadTokenBySeries(string $series)
     {
-        // the alias for lastUsed works around case insensitivity in PostgreSQL
-        $sql = 'SELECT class, username, value, lastUsed AS last_used FROM rememberme_token WHERE series=:series';
+        $sql = 'SELECT class, username, value, lastUsed FROM rememberme_token WHERE series=:series';
         $paramValues = ['series' => $series];
         $paramTypes = ['series' => ParameterType::STRING];
         $stmt = $this->conn->executeQuery($sql, $paramValues, $paramTypes);
-        $row = $stmt instanceof Result || $stmt instanceof DriverResult ? $stmt->fetchAssociative() : $stmt->fetch(\PDO::FETCH_ASSOC);
+
+        // fetching numeric because column name casing depends on platform, eg. Oracle converts all not quoted names to uppercase
+        $row = $stmt instanceof Result || $stmt instanceof DriverResult ? $stmt->fetchNumeric() : $stmt->fetch(\PDO::FETCH_NUM);
 
         if ($row) {
-            return new PersistentToken($row['class'], $row['username'], $series, $row['value'], new \DateTime($row['last_used']));
+            [$class, $username, $value, $last_used] = $row;
+            return new PersistentToken($class, $username, $series, $value, new \DateTime($last_used));
         }
 
         throw new TokenNotFoundException('No token found.');

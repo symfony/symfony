@@ -159,7 +159,7 @@ class CachePoolPass implements CompilerPassInterface
                             ->setFactory([ParameterNormalizer::class, 'normalizeDuration']);
                     }
 
-                    $pool->replaceArgument($i++, $argument);
+                    $pool->replaceArgument('$namespace', $argument);
                 }
                 unset($tags[0][$attr]);
             }

@@ -26,6 +26,7 @@ class ExcludeDirectoryFilterIterator extends \FilterIterator implements \Recursi
     private $isRecursive;
     private $excludedDirs = [];
     private $excludedPattern;
+    private $excludedPatternAbsolute;
 
     /**
      * @param \Iterator $iterator    The Iterator to filter
@@ -36,9 +37,16 @@ class ExcludeDirectoryFilterIterator extends \FilterIterator implements \Recursi
         $this->iterator = $iterator;
         $this->isRecursive = $iterator instanceof \RecursiveIterator;
         $patterns = [];
+        $patternsAbsolute = [];
         foreach ($directories as $directory) {
             $directory = rtrim($directory, '/');
-            if (!$this->isRecursive || str_contains($directory, '/')) {
+            $slashPos = strpos($directory, '/');
+            if (false !== $slashPos && \strlen($directory) - 1 !== $slashPos) {
+                if (0 === $slashPos) {
+                    $directory = substr($directory, 1);
+                }
+                $patternsAbsolute[] = preg_quote($directory, '#');
+            } elseif (!$this->isRecursive || str_contains($directory, '/')) {
                 $patterns[] = preg_quote($directory, '#');
             } else {
                 $this->excludedDirs[$directory] = true;
@@ -46,6 +54,10 @@ class ExcludeDirectoryFilterIterator extends \FilterIterator implements \Recursi
         }
         if ($patterns) {
             $this->excludedPattern = '#(?:^|/)(?:'.implode('|', $patterns).')(?:/|$)#';
+        }
+
+        if ($patternsAbsolute) {
+            $this->excludedPatternAbsolute = '#^('.implode('|', $patternsAbsolute).')$#';
         }
 
         parent::__construct($iterator);
@@ -63,11 +75,17 @@ class ExcludeDirectoryFilterIterator extends \FilterIterator implements \Recursi
             return false;
         }
 
-        if ($this->excludedPattern) {
+        if ($this->excludedPattern || $this->excludedPatternAbsolute) {
             $path = $this->isDir() ? $this->current()->getRelativePathname() : $this->current()->getRelativePath();
             $path = str_replace('\\', '/', $path);
+        }
 
-            return !preg_match($this->excludedPattern, $path);
+        if ($this->excludedPattern && preg_match($this->excludedPattern, $path)) {
+            return false;
+        }
+
+        if ($this->excludedPatternAbsolute && preg_match($this->excludedPatternAbsolute, $path)) {
+            return false;
         }
 
         return true;

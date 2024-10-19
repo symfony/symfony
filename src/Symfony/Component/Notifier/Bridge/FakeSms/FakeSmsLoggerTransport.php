@@ -51,11 +51,11 @@ final class FakeSmsLoggerTransport extends AbstractTransport
      */
     protected function doSend(MessageInterface $message): SentMessage
     {
-        if (!$this->supports($message)) {
+        if (!$message instanceof SmsMessage) {
             throw new UnsupportedMessageTypeException(__CLASS__, SmsMessage::class, $message);
         }
 
-        $this->logger->info(sprintf('New SMS on phone number: %s', $message->getPhone()));
+        $this->logger->info('New SMS to phone number ' . $message->getPhone() . ($message->getFrom() ? ' from ' . $message->getFrom() : ''));
 
         return new SentMessage($message, (string) $this);
     }

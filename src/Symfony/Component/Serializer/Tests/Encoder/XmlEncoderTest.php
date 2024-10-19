@@ -704,6 +704,25 @@ XML;
         $this->assertEquals($expected, $this->encoder->decode($source, 'xml', ['as_collection' => true]));
     }
 
+    public function testDecodeGivenAttributeAlwaysAsCollection()
+    {
+        $source = <<<'XML'
+<order_rows>
+    <order_row>
+        <id>1</id>
+        <price>1200</price>
+    </order_row>
+</order_rows>
+XML;
+        $expected = [
+            'order_row' => [
+                ['id' => 1, 'price' => 1200]
+            ],
+        ];
+
+        $this->assertEquals($expected, $this->encoder->decode($source, 'xml', [XmlEncoder::FORCE_COLLECTION => ['order_rows']]));
+    }
+
     public function testDecodeWithoutItemHash()
     {
         $obj = new ScalarDummy();

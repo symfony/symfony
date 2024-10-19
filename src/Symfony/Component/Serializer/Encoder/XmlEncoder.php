@@ -32,6 +32,11 @@ class XmlEncoder implements EncoderInterface, DecoderInterface, NormalizationAwa
     public const AS_COLLECTION = 'as_collection';
 
     /**
+     * An array of XML tags who should always be treated as a collection, even when it has only one child.
+     */
+    public const FORCE_COLLECTION = 'force_collection';
+
+    /**
      * An array of ignored XML node types while decoding, each one of the DOM Predefined XML_* constants.
      */
     public const DECODER_IGNORED_NODE_TYPES = 'decoder_ignored_node_types';
@@ -224,9 +229,19 @@ class XmlEncoder implements EncoderInterface, DecoderInterface, NormalizationAwa
      */
     private function parseXml(\DOMNode $node, array $context = []): array|string
     {
+        $nodeName = $node->nodeName;
+
         $data = $this->parseXmlAttributes($node, $context);
 
         $value = $this->parseXmlValue($node, $context);
+
+        if (\is_array($value)
+            && \count($value) === 1
+            && \in_array($nodeName, $context[self::FORCE_COLLECTION] ?? [], strict: true)
+        ) {
+            $childNodeName = $node->firstChild?->nodeName;
+            return [$childNodeName => [$value[$childNodeName]]];
+        }
 
         if (!\count($data)) {
             return $value;

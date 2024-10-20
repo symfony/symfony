@@ -28,13 +28,16 @@ final class W3CReference
      * A parent element name can be passed as an argument to {@see HtmlSanitizer::sanitizeFor()}.
      * When doing so, depending on the given context, different elements will be allowed.
      */
+    public const CONTEXT_DOCUMENT = 'document';
     public const CONTEXT_HEAD = 'head';
     public const CONTEXT_BODY = 'body';
     public const CONTEXT_TEXT = 'text';
 
     // Which context to apply depending on the passed parent element name
     public const CONTEXTS_MAP = [
+        'document' => self::CONTEXT_DOCUMENT,
         'head' => self::CONTEXT_HEAD,
+        'body' => self::CONTEXT_BODY,
         'textarea' => self::CONTEXT_TEXT,
         'title' => self::CONTEXT_TEXT,
     ];

@@ -13,6 +13,7 @@ namespace Symfony\Component\HtmlSanitizer\Visitor;
 
 use Symfony\Component\HtmlSanitizer\HtmlSanitizerAction;
 use Symfony\Component\HtmlSanitizer\HtmlSanitizerConfig;
+use Symfony\Component\HtmlSanitizer\Reference\W3CReference;
 use Symfony\Component\HtmlSanitizer\TextSanitizer\StringSanitizer;
 use Symfony\Component\HtmlSanitizer\Visitor\AttributeSanitizer\AttributeSanitizerInterface;
 use Symfony\Component\HtmlSanitizer\Visitor\Model\Cursor;
@@ -52,6 +53,13 @@ final class DomVisitor
     private array $attributeSanitizers = [];
 
     /**
+     * Registry of elements configuration for each sanitization context used in the document.
+     *
+     * @var array<string, array<string, HtmlSanitizerAction|array<string, bool>>> $elementsConfigByContext
+     */
+    private array $elementsConfigByContext = [];
+
+    /**
      * @param array<string, HtmlSanitizerAction|array<string, bool>> $elementsConfig Registry of allowed/blocked elements:
      *                                                                               * If an element is present as a key and contains an array, the element should be allowed
      *                                                                               and the array is the list of allowed attributes.
@@ -75,9 +83,9 @@ final class DomVisitor
         $this->defaultAction = $config->getDefaultAction();
     }
 
-    public function visit(\DOMDocumentFragment $domNode): ?NodeInterface
+    public function visit(?string $context, \DOMDocumentFragment $domNode): ?NodeInterface
     {
-        $cursor = new Cursor(new DocumentNode());
+        $cursor = new Cursor([$context], new DocumentNode());
         $this->visitChildren($domNode, $cursor);
 
         return $cursor->node;
@@ -87,24 +95,35 @@ final class DomVisitor
     {
         $nodeName = StringSanitizer::htmlLower($domNode->nodeName);
 
+        if (array_key_exists($nodeName, W3CReference::CONTEXTS_MAP)) {
+            $cursor->contextsPath[] = $nodeName;
+        }
+
         // Visit recursively if the node was not dropped
         if ($this->enterNode($nodeName, $domNode, $cursor)) {
             $this->visitChildren($domNode, $cursor);
             $cursor->node = $cursor->node->getParent();
         }
+
+        if (array_key_exists($nodeName, W3CReference::CONTEXTS_MAP)) {
+            array_pop($cursor->contextsPath);
+        }
     }
 
     private function enterNode(string $domNodeName, \DOMNode $domNode, Cursor $cursor): bool
     {
-        if (!\array_key_exists($domNodeName, $this->elementsConfig)) {
+        $context = array_reverse($cursor->contextsPath)[0] ?? 'body';
+        $this->elementsConfigByContext[$context] ??= $this->createContextElementsConfig($context);
+
+        if (!\array_key_exists($domNodeName, $this->elementsConfigByContext[$context])) {
             $action = $this->defaultAction;
             $allowedAttributes = [];
         } else {
-            if (\is_array($this->elementsConfig[$domNodeName])) {
+            if (\is_array($this->elementsConfigByContext[$context][$domNodeName])) {
                 $action = HtmlSanitizerAction::Allow;
-                $allowedAttributes = $this->elementsConfig[$domNodeName];
+                $allowedAttributes = $this->elementsConfigByContext[$context][$domNodeName];
             } else {
-                $action = $this->elementsConfig[$domNodeName];
+                $action = $this->elementsConfigByContext[$context][$domNodeName];
                 $allowedAttributes = [];
             }
         }
@@ -184,5 +203,54 @@ final class DomVisitor
                 $node->setAttribute($name, $value);
             }
         }
+    }
+
+    private function createContextElementsConfig(string $context): array
+    {
+        $elementsConfig = [];
+
+        // Head: only a few elements are allowed
+        if (W3CReference::CONTEXT_HEAD === $context) {
+            foreach ($this->config->getAllowedElements() as $allowedElement => $allowedAttributes) {
+                if (\array_key_exists($allowedElement, W3CReference::HEAD_ELEMENTS)) {
+                    $elementsConfig[$allowedElement] = $allowedAttributes;
+                }
+            }
+
+            foreach ($this->config->getBlockedElements() as $blockedElement => $v) {
+                if (\array_key_exists($blockedElement, W3CReference::HEAD_ELEMENTS)) {
+                    $elementsConfig[$blockedElement] = HtmlSanitizerAction::Block;
+                }
+            }
+
+            foreach ($this->config->getDroppedElements() as $droppedElement => $v) {
+                if (\array_key_exists($droppedElement, W3CReference::HEAD_ELEMENTS)) {
+                    $elementsConfig[$droppedElement] = HtmlSanitizerAction::Drop;
+                }
+            }
+
+            return $elementsConfig;
+        }
+
+        // Body: allow any configured element that isn't in <head>
+        foreach ($this->config->getAllowedElements() as $allowedElement => $allowedAttributes) {
+            if (!\array_key_exists($allowedElement, W3CReference::HEAD_ELEMENTS)) {
+                $elementsConfig[$allowedElement] = $allowedAttributes;
+            }
+        }
+
+        foreach ($this->config->getBlockedElements() as $blockedElement => $v) {
+            if (!\array_key_exists($blockedElement, W3CReference::HEAD_ELEMENTS)) {
+                $elementsConfig[$blockedElement] = HtmlSanitizerAction::Block;
+            }
+        }
+
+        foreach ($this->config->getDroppedElements() as $droppedElement => $v) {
+            if (!\array_key_exists($droppedElement, W3CReference::HEAD_ELEMENTS)) {
+                $elementsConfig[$droppedElement] = HtmlSanitizerAction::Drop;
+            }
+        }
+
+        return $elementsConfig;
     }
 }

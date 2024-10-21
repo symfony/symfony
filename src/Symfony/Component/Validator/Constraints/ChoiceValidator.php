@@ -26,9 +26,6 @@ use Symfony\Component\Validator\Exception\UnexpectedValueException;
  */
 class ChoiceValidator extends ConstraintValidator
 {
-    /**
-     * {@inheritdoc}
-     */
     public function validate($value, Constraint $constraint)
     {
         if (!$constraint instanceof Choice) {
@@ -58,11 +55,8 @@ class ChoiceValidator extends ConstraintValidator
             if (is_iterable($choices)) {
                 $choices = iterator_to_array($choices, true);
             }
-            if (!is_array($choices)) {
-                throw new ConstraintDefinitionException(sprintf(
-                    'The Choice constraint expects the callback to return an iterable value, got %s.',
-                    get_debug_type($choices),
-                ));
+            if (!\is_array($choices)) {
+                throw new ConstraintDefinitionException(\sprintf('The Choice constraint expects the callback to return an iterable value, got %s.', get_debug_type($choices)));
             }
         } else {
             $choices = $constraint->choices;

@@ -5,12 +5,13 @@
 // For caching to work properly on appveyor, this file
 // must be exactly the same in all maintained branches
 
-if (!file_exists(__DIR__.'/vendor/symfony/phpunit-bridge/bin/simple-phpunit')) {
+if (!file_exists(__DIR__.'/src/Symfony/Bridge/PhpUnit/bin/simple-phpunit')) {
     echo "Unable to find the `simple-phpunit` script in `vendor/symfony/phpunit-bridge/bin/`.\nPlease run `composer update` before running this command.\n";
     exit(1);
 }
 if (!getenv('SYMFONY_PHPUNIT_VERSION')) {
-    putenv('SYMFONY_PHPUNIT_VERSION=9.6');
+    putenv('SYMFONY_PHPUNIT_VERSION=11.3');
+    putenv('SYMFONY_DEPRECATIONS_HELPER=disabled');
 }
 if (!getenv('SYMFONY_PATCH_TYPE_DECLARATIONS')) {
     putenv('SYMFONY_PATCH_TYPE_DECLARATIONS=deprecations=1');
@@ -19,4 +20,4 @@ if (getcwd() === realpath(__DIR__.'/src/Symfony/Bridge/PhpUnit')) {
     putenv('SYMFONY_DEPRECATIONS_HELPER=disabled');
 }
 putenv('SYMFONY_PHPUNIT_DIR='.__DIR__.'/.phpunit');
-require __DIR__.'/vendor/symfony/phpunit-bridge/bin/simple-phpunit';
+require __DIR__.'/src/Symfony/Bridge/PhpUnit/bin/simple-phpunit';

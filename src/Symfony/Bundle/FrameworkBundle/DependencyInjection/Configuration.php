@@ -30,6 +30,7 @@ use Symfony\Component\HtmlSanitizer\HtmlSanitizerInterface;
 use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\IpUtils;
+use Symfony\Component\JsonEncoder\EncoderInterface;
 use Symfony\Component\Lock\Lock;
 use Symfony\Component\Lock\Store\SemaphoreStore;
 use Symfony\Component\Mailer\Mailer;
@@ -180,6 +181,7 @@ class Configuration implements ConfigurationInterface
         $this->addHtmlSanitizerSection($rootNode, $enableIfStandalone);
         $this->addWebhookSection($rootNode, $enableIfStandalone);
         $this->addRemoteEventSection($rootNode, $enableIfStandalone);
+        $this->addJsonEncoderSection($rootNode, $enableIfStandalone);
 
         return $treeBuilder;
     }
@@ -2540,6 +2542,28 @@ class Configuration implements ConfigurationInterface
                                     ->end()
                                 ->end()
                             ->end()
+                        ->end()
+                    ->end()
+                ->end()
+            ->end()
+        ;
+    }
+
+    private function addJsonEncoderSection(ArrayNodeDefinition $rootNode, callable $enableIfStandalone): void
+    {
+        $rootNode
+            ->children()
+                ->arrayNode('json_encoder')
+                    ->info('JSON encoder configuration')
+                    ->{$enableIfStandalone('symfony/json-encoder', EncoderInterface::class)}()
+                    ->fixXmlConfig('path')
+                    ->children()
+                        ->arrayNode('paths')
+                            ->info('Namespaces and paths of encodable/decodable classes.')
+                            ->normalizeKeys(false)
+                            ->useAttributeAsKey('namespace')
+                            ->scalarPrototype()->end()
+                            ->defaultValue([])
                         ->end()
                     ->end()
                 ->end()

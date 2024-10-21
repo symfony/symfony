@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Messenger\Bridge\AmazonSqs\Transport;
 
+use AsyncAws\Core\Sts\StsClient;
 use AsyncAws\Sqs\Enum\MessageSystemAttributeName;
 use AsyncAws\Sqs\Enum\QueueAttributeName;
 use AsyncAws\Sqs\Result\ReceiveMessageResult;
@@ -53,6 +54,7 @@ class Connection
 
     private array $configuration;
     private SqsClient $client;
+    private StsClient $stsClient;
     private ?ReceiveMessageResult $currentResponse = null;
     /** @var array[] */
     private array $buffer = [];
@@ -61,9 +63,11 @@ class Connection
         array $configuration,
         ?SqsClient $client = null,
         private ?string $queueUrl = null,
+        ?StsClient $stsClient = null,
     ) {
         $this->configuration = array_replace_recursive(self::DEFAULT_OPTIONS, $configuration);
         $this->client = $client ?? new SqsClient([]);
+        $this->stsClient = $stsClient ?? new StsClient([]);
     }
 
     public function __sleep(): array
@@ -274,8 +278,11 @@ class Connection
             return;
         }
 
-        if (null !== $this->configuration['account']) {
-            throw new InvalidArgumentException(\sprintf('The Amazon SQS queue "%s" does not exist (or you don\'t have permissions on it), and can\'t be created when an account is provided.', $this->configuration['queue_name']));
+        $accountId = $this->stsClient->getCallerIdentity()->getAccount();
+
+        // If the queue does not exist, we can create it only if the account is the same
+        if (null !== $this->configuration['account'] && $accountId !== $this->configuration['account']) {
+            throw new InvalidArgumentException(\sprintf('The Amazon SQS queue "%s" does not exist (or you don\'t have permissions on it), and can\'t be created when an other account is provided.', $this->configuration['queue_name']));
         }
 
         $parameters = ['QueueName' => $this->configuration['queue_name']];

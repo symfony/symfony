@@ -20,7 +20,7 @@
             </trans-unit>
             <trans-unit id="5">
                 <source>The value you selected is not a valid choice.</source>
-                <target>Seçtiğiniz değer geçerli bir seçenek değil.</target>
+                <target>Seçtiğiniz değer geçerli bir seçenek değildir.</target>
             </trans-unit>
             <trans-unit id="6">
                 <source>You must select at least {{ limit }} choice.|You must select at least {{ limit }} choices.</source>
@@ -40,7 +40,7 @@
             </trans-unit>
             <trans-unit id="10">
                 <source>This field is missing.</source>
-                <target>Bu alan, eksik</target>
+                <target>Bu alan, eksiktir</target>
             </trans-unit>
             <trans-unit id="11">
                 <source>This value is not a valid date.</source>
@@ -60,7 +60,7 @@
             </trans-unit>
             <trans-unit id="15">
                 <source>The file is not readable.</source>
-                <target>Dosya okunabilir değil.</target>
+                <target>Dosya okunabilir değildir.</target>
             </trans-unit>
             <trans-unit id="16">
                 <source>The file is too large ({{ size }} {{ suffix }}). Allowed maximum size is {{ limit }} {{ suffix }}.</source>
@@ -100,15 +100,15 @@
             </trans-unit>
             <trans-unit id="25">
                 <source>This value is not valid.</source>
-                <target>Bu değer geçerli değil.</target>
+                <target>Bu değer geçerli değildir.</target>
             </trans-unit>
             <trans-unit id="26">
                 <source>This value is not a valid time.</source>
-                <target>Bu değer doğru bir saat değil.</target>
+                <target>Bu değer doğru bir saat değildir.</target>
             </trans-unit>
             <trans-unit id="27">
                 <source>This value is not a valid URL.</source>
-                <target>Bu değer doğru bir URL değil.</target>
+                <target>Bu değer doğru bir URL değildir.</target>
             </trans-unit>
             <trans-unit id="31">
                 <source>The two values should be equal.</source>
@@ -136,11 +136,11 @@
             </trans-unit>
             <trans-unit id="37" resname="This is not a valid IP address.">
                 <source>This value is not a valid IP address.</source>
-                <target state="needs-review-translation">Bu değer geçerli bir IP adresi değil.</target>
+                <target>Bu değer geçerli bir IP adresi değildir.</target>
             </trans-unit>
             <trans-unit id="38">
                 <source>This value is not a valid language.</source>
-                <target>Bu değer geçerli bir lisan değil.</target>
+                <target>Bu değer geçerli bir lisan değildir.</target>
             </trans-unit>
             <trans-unit id="39">
                 <source>This value is not a valid locale.</source>
@@ -192,7 +192,7 @@
             </trans-unit>
             <trans-unit id="51" resname="No temporary folder was configured in php.ini.">
                 <source>No temporary folder was configured in php.ini, or the configured folder does not exist.</source>
-                <target state="needs-review-translation">php.ini'de geçici bir klasör yapılandırılmadı, veya yapılandırılan klasör mevcut değil.</target>
+                <target state="needs-review-translation">php.ini'de geçici bir klasör yapılandırılmadı, veya yapılandırılan klasör mevcut değildir.</target>
             </trans-unit>
             <trans-unit id="52">
                 <source>Cannot write temporary file to disk.</source>
@@ -224,7 +224,7 @@
             </trans-unit>
             <trans-unit id="59" resname="This is not a valid International Bank Account Number (IBAN).">
                 <source>This value is not a valid International Bank Account Number (IBAN).</source>
-                <target state="needs-review-translation">Bu değer geçerli bir Uluslararası Banka Hesap Numarası (IBAN) değil.</target>
+                <target >Bu değer geçerli bir Uluslararası Banka Hesap Numarası (IBAN) değildir.</target>
             </trans-unit>
             <trans-unit id="60">
                 <source>This value is not a valid ISBN-10.</source>
@@ -244,7 +244,7 @@
             </trans-unit>
             <trans-unit id="64">
                 <source>This value is not a valid currency.</source>
-                <target>Bu değer geçerli bir para birimi değil.</target>
+                <target>Bu değer geçerli bir para birimi değildir.</target>
             </trans-unit>
             <trans-unit id="65">
                 <source>This value should be equal to {{ compared_value }}.</source>
@@ -312,7 +312,7 @@
             </trans-unit>
             <trans-unit id="81" resname="This is not a valid Business Identifier Code (BIC).">
                 <source>This value is not a valid Business Identifier Code (BIC).</source>
-                <target state="needs-review-translation">Bu değer geçerli bir İşletme Tanımlama Kodu (BIC) değil.</target>
+                <target>Bu değer geçerli bir İşletme Tanımlama Kodu (BIC) değildir.</target>
             </trans-unit>
             <trans-unit id="82">
                 <source>Error</source>
@@ -320,7 +320,7 @@
             </trans-unit>
             <trans-unit id="83" resname="This is not a valid UUID.">
                 <source>This value is not a valid UUID.</source>
-                <target state="needs-review-translation">Bu değer geçerli bir UUID değil.</target>
+                <target>Bu değer geçerli bir UUID değildir.</target>
             </trans-unit>
             <trans-unit id="84">
                 <source>This value should be a multiple of {{ compared_value }}.</source>
@@ -340,7 +340,7 @@
             </trans-unit>
             <trans-unit id="88">
                 <source>This value should be positive.</source>
-                <target>Bu değer pozitif olmalı.</target>
+                <target>Bu değer pozitif olmalıdır.</target>
             </trans-unit>
             <trans-unit id="89">
                 <source>This value should be either positive or zero.</source>
@@ -356,7 +356,7 @@
             </trans-unit>
             <trans-unit id="92">
                 <source>This value is not a valid timezone.</source>
-                <target>Bu değer, geçerli bir saat dilimi değil.</target>
+                <target>Bu değer, geçerli bir saat dilimi değildir.</target>
             </trans-unit>
             <trans-unit id="93">
                 <source>This password has been leaked in a data breach, it must not be used. Please use another password.</source>
@@ -368,7 +368,7 @@
             </trans-unit>
             <trans-unit id="95">
                 <source>This value is not a valid hostname.</source>
-                <target>Bu değer, geçerli bir ana bilgisayar adı değil.</target>
+                <target>Bu değer, geçerli bir ana bilgisayar adı değildir.</target>
             </trans-unit>
             <trans-unit id="96">
                 <source>The number of elements in this collection should be a multiple of {{ compared_value }}.</source>
@@ -384,7 +384,7 @@
             </trans-unit>
             <trans-unit id="99">
                 <source>This value is not a valid International Securities Identification Number (ISIN).</source>
-                <target>Bu değer geçerli bir Uluslararası Menkul Kıymetler Kimlik Numarası değil (ISIN).</target>
+                <target>Bu değer geçerli bir Uluslararası Menkul Kıymetler Kimlik Numarası (ISIN) değildir.</target>
             </trans-unit>
             <trans-unit id="100">
                 <source>This value should be a valid expression.</source>
@@ -392,11 +392,11 @@
             </trans-unit>
             <trans-unit id="101">
                 <source>This value is not a valid CSS color.</source>
-                <target>Bu değer geçerli bir CSS rengi değil.</target>
+                <target>Bu değer geçerli bir CSS rengi değildir.</target>
             </trans-unit>
             <trans-unit id="102">
                 <source>This value is not a valid CIDR notation.</source>
-                <target>Bu değer geçerli bir CIDR yazımı değil.</target>
+                <target>Bu değer geçerli bir CIDR yazımı değildir.</target>
             </trans-unit>
             <trans-unit id="103">
                 <source>The value of the netmask should be between {{ min }} and {{ max }}.</source>
@@ -436,35 +436,35 @@
             </trans-unit>
             <trans-unit id="112">
                 <source>This value is not a valid MAC address.</source>
-                <target state="needs-review-translation">Bu değer geçerli bir MAC adresi değil.</target>
+                <target>Bu değer geçerli bir MAC adresi değildir.</target>
             </trans-unit>
             <trans-unit id="113">
                 <source>This URL is missing a top-level domain.</source>
-                <target state="needs-review-translation">Bu URL bir üst düzey alan adı eksik.</target>
+                <target>Bu URL bir üst seviye alan adı eksik.</target>
             </trans-unit>
             <trans-unit id="114">
                 <source>This value is too short. It should contain at least one word.|This value is too short. It should contain at least {{ min }} words.</source>
-                <target state="needs-translation">This value is too short. It should contain at least one word.|This value is too short. It should contain at least {{ min }} words.</target>
+                <target>Bu değer çok kısa. En az bir kelime içermelidir.|Bu değer çok kısa. En az {{ min }} kelime içermelidir.</target>
             </trans-unit>
             <trans-unit id="115">
                 <source>This value is too long. It should contain one word.|This value is too long. It should contain {{ max }} words or less.</source>
-                <target state="needs-translation">This value is too long. It should contain one word.|This value is too long. It should contain {{ max }} words or less.</target>
+                <target>Bu değer çok uzun. Tek bir kelime içermelidir.|Bu değer çok uzun. {{ max }} veya daha az kelime içermelidir.</target>
             </trans-unit>
             <trans-unit id="116">
                 <source>This value does not represent a valid week in the ISO 8601 format.</source>
-                <target state="needs-translation">This value does not represent a valid week in the ISO 8601 format.</target>
+                <target>Bu değer ISO 8601 formatında geçerli bir haftayı temsil etmezdir.</target>
             </trans-unit>
             <trans-unit id="117">
                 <source>This value is not a valid week.</source>
-                <target state="needs-translation">This value is not a valid week.</target>
+                <target>Bu değer geçerli hafta değildir.</target>
             </trans-unit>
             <trans-unit id="118">
                 <source>This value should not be before week "{{ min }}".</source>
-                <target state="needs-translation">This value should not be before week "{{ min }}".</target>
+                <target>Bu değer “{{ min }}” haftasından önce olmamalıdır.</target>
             </trans-unit>
             <trans-unit id="119">
                 <source>This value should not be after week "{{ max }}".</source>
-                <target state="needs-translation">This value should not be after week "{{ max }}".</target>
+                <target>Bu değer “{{ max }}” haftasından sonra olmamalıdır</target>
             </trans-unit>
         </body>
     </file>

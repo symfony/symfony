@@ -1,0 +1,37 @@
+name: Check subtree split
+
+on:
+  pull_request_target:
+
+jobs:
+  close-pull-request:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Close pull request
+      uses: actions/github-script@v6
+      with:
+        script: |
+          if (context.repo.owner === "symfony") {
+            github.rest.issues.createComment({
+              owner: "symfony",
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: `
+          Thanks for your Pull Request! We love contributions.
+
+          However, you should instead open your PR on the main repository:
+          https://github.com/symfony/symfony
+
+          This repository is what we call a "subtree split": a read-only subset of that main repository.
+          We're looking forward to your PR there!
+          `
+            });
+
+            github.rest.pulls.update({
+              owner: "symfony",
+              repo: context.repo.repo,
+              pull_number: context.issue.number,
+              state: "closed"
+            });
+          }

@@ -14,11 +14,11 @@ namespace Symfony\Component\Messenger\Event;
 use Symfony\Component\Messenger\Worker;
 
 /**
- * Dispatched after the worker processed a message or didn't receive a message at all.
+ * Events that are dispatched after the worker processed a message or didn't receive a message at all.
  *
  * @author Tobias Schultze <http://tobion.de>
  */
-final class WorkerRunningEvent
+class WorkerRunningEvent
 {
     public function __construct(
         private Worker $worker,

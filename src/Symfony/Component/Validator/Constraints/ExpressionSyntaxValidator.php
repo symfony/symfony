@@ -15,6 +15,7 @@ use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use Symfony\Component\ExpressionLanguage\SyntaxError;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
+use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 use Symfony\Component\Validator\Exception\UnexpectedValueException;
 
@@ -28,28 +29,44 @@ class ExpressionSyntaxValidator extends ConstraintValidator
     ) {
     }
 
-    public function validate(mixed $expression, Constraint $constraint): void
+    public function validate(mixed $value, Constraint $constraint): void
     {
         if (!$constraint instanceof ExpressionSyntax) {
             throw new UnexpectedTypeException($constraint, ExpressionSyntax::class);
         }
 
-        if (null === $expression || '' === $expression) {
+        if (\is_array($constraint->allowedVariables) && $constraint->allowedVariablesCallback) {
+            throw new ConstraintDefinitionException('Either "allowedVariables" or "allowedVariablesCallback" must be specified on constraint ExpressionSyntax.');
+        }
+
+        if (null === $value || '' === $value) {
             return;
         }
 
-        if (!\is_string($expression) && !$expression instanceof \Stringable) {
-            throw new UnexpectedValueException($expression, 'string');
+        if (!\is_string($value) && !$value instanceof \Stringable) {
+            throw new UnexpectedValueException($value, 'string');
+        }
+
+        if ($constraint->allowedVariablesCallback) {
+            if (!\is_callable($allowedVariables = [$this->context->getObject(), $constraint->allowedVariablesCallback])
+                && !\is_callable($allowedVariables = [$this->context->getClassName(), $constraint->allowedVariablesCallback])
+                && !\is_callable($allowedVariables = $constraint->allowedVariablesCallback)
+            ) {
+                throw new ConstraintDefinitionException('The ExpressionSyntax constraint expects a valid callback.');
+            }
+            $allowedVariables = $allowedVariables();
+        } else {
+            $allowedVariables = $constraint->allowedVariables;
         }
 
         $this->expressionLanguage ??= new ExpressionLanguage();
 
         try {
-            $this->expressionLanguage->lint($expression, $constraint->allowedVariables);
+            $this->expressionLanguage->lint($value, $allowedVariables);
         } catch (SyntaxError $exception) {
             $this->context->buildViolation($constraint->message)
                 ->setParameter('{{ syntax_error }}', $this->formatValue($exception->getMessage()))
-                ->setInvalidValue((string) $expression)
+                ->setInvalidValue((string) $value)
                 ->setCode(ExpressionSyntax::EXPRESSION_SYNTAX_ERROR)
                 ->addViolation();
         }

@@ -30,6 +30,7 @@ class ExpressionSyntax extends Constraint
     public string $message = 'This value should be a valid expression.';
     public ?string $service = null;
     public ?array $allowedVariables = null;
+    public $allowedVariablesCallback;
 
     /**
      * @param array<string,mixed>|null $options
@@ -37,13 +38,21 @@ class ExpressionSyntax extends Constraint
      * @param string[]|null            $allowedVariables Restrict the available variables in the expression to these values (defaults to null that allows any variable)
      * @param string[]|null            $groups
      */
-    public function __construct(?array $options = null, ?string $message = null, ?string $service = null, ?array $allowedVariables = null, ?array $groups = null, mixed $payload = null)
-    {
+    public function __construct(
+        ?array $options = null,
+        ?string $message = null,
+        ?string $service = null,
+        ?array $allowedVariables = null,
+        ?array $groups = null,
+        mixed $payload = null,
+        callable|string|null $allowedVariablesCallback = null,
+    ) {
         parent::__construct($options, $groups, $payload);
 
         $this->message = $message ?? $this->message;
         $this->service = $service ?? $this->service;
         $this->allowedVariables = $allowedVariables ?? $this->allowedVariables;
+        $this->allowedVariablesCallback = $allowedVariablesCallback ?? $this->allowedVariablesCallback;
     }
 
     public function validatedBy(): string

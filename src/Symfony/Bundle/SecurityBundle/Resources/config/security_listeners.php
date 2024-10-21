@@ -139,6 +139,7 @@ return static function (ContainerConfigurator $container) {
                 service('security.access.denied_handler')->nullOnInvalid(),
                 service('logger')->nullOnInvalid(),
                 false, // Stateless
+                service('security.not.full.fledged_handler')->nullOnInvalid(),
             ])
             ->tag('monolog.logger', ['channel' => 'security'])
 

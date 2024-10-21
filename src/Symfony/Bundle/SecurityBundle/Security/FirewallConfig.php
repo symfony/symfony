@@ -30,6 +30,7 @@ final class FirewallConfig
         private readonly array $authenticators = [],
         private readonly ?array $switchUser = null,
         private readonly ?array $logout = null,
+        private readonly ?string $notFullFledgedHandler = null,
     ) {
     }
 
@@ -103,5 +104,10 @@ final class FirewallConfig
     public function getLogout(): ?array
     {
         return $this->logout;
+    }
+
+    public function getNotFullFledgedHandler(): ?string
+    {
+        return $this->notFullFledgedHandler;
     }
 }

@@ -16,11 +16,13 @@ use Symfony\Component\PropertyInfo\PropertyListExtractorInterface;
 use Symfony\Component\PropertyInfo\PropertyTypeExtractorInterface;
 use Symfony\Component\PropertyInfo\Type as PropertyInfoType;
 use Symfony\Component\TypeInfo\Type as TypeInfoType;
+use Symfony\Component\TypeInfo\Type\BuiltinType;
 use Symfony\Component\TypeInfo\Type\CollectionType;
-use Symfony\Component\TypeInfo\Type\IntersectionType;
+use Symfony\Component\TypeInfo\Type\CompositeTypeInterface;
+use Symfony\Component\TypeInfo\Type\NullableType;
 use Symfony\Component\TypeInfo\Type\ObjectType;
-use Symfony\Component\TypeInfo\Type\UnionType;
 use Symfony\Component\TypeInfo\TypeIdentifier;
+use Symfony\Component\TypeInfo\Type\WrappingTypeInterface;
 use Symfony\Component\Validator\Constraints\All;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\NotNull;
@@ -139,11 +141,10 @@ final class PropertyInfoLoader implements LoaderInterface
                 }
 
                 $type = $types;
-                $nullable = false;
+                $nullable = $type->isNullable();
 
-                if ($type instanceof UnionType && $type->isNullable()) {
-                    $nullable = true;
-                    $type = $type->asNonNullable();
+                if ($type instanceof NullableType) {
+                    $type = $type->getWrappedType();
                 }
 
                 if ($type instanceof CollectionType) {
@@ -193,18 +194,27 @@ final class PropertyInfoLoader implements LoaderInterface
 
     private function getTypeConstraint(TypeInfoType $type): ?Type
     {
-        if ($type instanceof UnionType || $type instanceof IntersectionType) {
-            return ($type->isA(TypeIdentifier::INT) || $type->isA(TypeIdentifier::FLOAT) || $type->isA(TypeIdentifier::STRING) || $type->isA(TypeIdentifier::BOOL)) ? new Type(['type' => 'scalar']) : null;
+        if ($type instanceof CompositeTypeInterface) {
+            return $type->isIdentifiedBy(
+                TypeIdentifier::INT,
+                TypeIdentifier::FLOAT,
+                TypeIdentifier::STRING,
+                TypeIdentifier::BOOL,
+                TypeIdentifier::TRUE,
+                TypeIdentifier::FALSE,
+            ) ? new Type(['type' => 'scalar']) : null;
         }
 
-        $baseType = $type->getBaseType();
-
-        if ($baseType instanceof ObjectType) {
-            return new Type(['type' => $baseType->getClassName()]);
+        while ($type instanceof WrappingTypeInterface) {
+            $type = $type->getWrappedType();
         }
 
-        if (TypeIdentifier::MIXED !== $baseType->getTypeIdentifier()) {
-            return new Type(['type' => $baseType->getTypeIdentifier()->value]);
+        if ($type instanceof ObjectType) {
+            return new Type(['type' => $type->getClassName()]);
+        }
+
+        if ($type instanceof BuiltinType && TypeIdentifier::MIXED !== $type->getTypeIdentifier()) {
+            return new Type(['type' => $type->getTypeIdentifier()->value]);
         }
 
         return null;

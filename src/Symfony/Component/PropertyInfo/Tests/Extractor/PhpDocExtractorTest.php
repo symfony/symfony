@@ -693,7 +693,7 @@ class PhpDocExtractorTest extends TestCase
         yield ['f', Type::list(Type::object(\DateTimeImmutable::class))];
         yield ['g', Type::nullable(Type::array())];
         yield ['h', Type::nullable(Type::string())];
-        yield ['i', Type::union(Type::int(), Type::string(), Type::null())];
+        yield ['i', Type::nullable(Type::union(Type::int(), Type::string()))];
         yield ['j', Type::nullable(Type::object(\DateTimeImmutable::class))];
         yield ['nullableCollectionOfNonNullableElements', Type::nullable(Type::list(Type::int()))];
         yield ['nonNullableCollectionOfNullableElements', Type::list(Type::nullable(Type::int()))];

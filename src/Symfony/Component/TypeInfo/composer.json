@@ -31,12 +31,14 @@
     "require-dev": {
         "phpstan/phpdoc-parser": "^1.0",
         "symfony/dependency-injection": "^6.4|^7.0",
-        "symfony/property-info": "^6.4|^7.0"
+        "symfony/property-info": "^7.2"
     },
     "conflict": {
         "phpstan/phpdoc-parser": "<1.0",
         "symfony/dependency-injection": "<6.4",
-        "symfony/property-info": "<6.4"
+        "symfony/property-info": "<7.2",
+        "symfony/serializer": "<7.2",
+        "symfony/validator": "<7.2"
     },
     "autoload": {
         "psr-4": { "Symfony\\Component\\TypeInfo\\": "" },

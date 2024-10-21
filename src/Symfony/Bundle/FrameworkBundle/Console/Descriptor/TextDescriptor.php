@@ -11,10 +11,12 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Console\Descriptor;
 
+use Psr\Container\ContainerInterface;
 use Symfony\Component\Console\Formatter\OutputFormatter;
 use Symfony\Component\Console\Helper\Dumper;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Helper\TableCell;
+use Symfony\Component\Console\Helper\TableSeparator;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\Argument\AbstractArgument;
@@ -26,10 +28,13 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\ErrorHandler\ErrorRenderer\FileLinkFormatter;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
+use Symfony\Contracts\Service\ServiceProviderInterface;
+use Symfony\Contracts\Service\ServiceSubscriberInterface;
 
 /**
  * @author Jean-François Simon <jeanfrancois.simon@sensiolabs.com>
@@ -387,31 +392,61 @@ class TextDescriptor extends Descriptor
             $tableRows[] = ['Arguments', implode("\n", $argumentsInformation)];
         }
 
-        $showLocatorDependencies = isset($options['show_locator_services']) && $options['show_locator_services'];
-        $locatorsInformation = [];
-        if ($showLocatorDependencies && ($arguments = $definition->getArguments())) {
-            foreach ($arguments as $argument) {
-                if ($argument instanceof Reference && $container->getDefinition($argument)->hasTag('container.service_locator')) {
-                    foreach (array_keys($container->getDefinition($argument)->getArguments()[0]) as $serviceAssociated) {
-                        $locatorsInformation[] = $serviceAssociated;
-                    }
-                    $tableRows[] = [(string) $argument, implode("\n", $locatorsInformation)];
-                } elseif ($argument instanceof IteratorArgument) {
-                    foreach ($argument->getValues() as $ref) {
-                        $argumentsInformation[] = \sprintf('- Service(%s)', $ref);
-                    }
-                    $tableRows[] = [(string) $argument, implode("\n", $locatorsInformation)];
-                } elseif ($argument instanceof ServiceLocatorArgument) {
-                    $argumentsInformation[] = \sprintf('Service locator (%d element(s))', \count($argument->getValues()));
-                    $tableRows[] = [(string) $argument, implode("\n", $locatorsInformation)];
-                }
-            }
-        }
 
         $inEdges = null !== $container && isset($options['id']) ? $this->getServiceEdges($container, $options['id']) : [];
         $tableRows[] = ['Usages', $inEdges ? implode(\PHP_EOL, $inEdges) : 'none'];
 
         $options['output']->table($tableHeaders, $tableRows);
+
+        $showLocatorDependencies = isset($options['show_locator_services']) && $options['show_locator_services'];
+        $tableRows = [];
+
+        if ($showLocatorDependencies && ($arguments = $definition->getArguments())) {
+            foreach ($arguments as $argument) {
+                $locatorsInformation = [];
+                if ($argument instanceof Reference) {
+                    $argumentDefinition = $container->getDefinition($argument);
+
+                    if ($argumentDefinition->hasTag('container.service_locator')
+                   ) {
+                        foreach ($argumentDefinition->getArguments()[0] ?? null as $service) {
+                            $locatorsInformation[] = $service->getValues()[0];
+                        }
+                        $tableRows[] = [\sprintf('Service(%s)', (string)$argument), implode("\n", $locatorsInformation)];
+                    } elseif($container->getReflectionClass($argumentDefinition->getClass())->implementsInterface(ServiceProviderInterface::class)) {
+                        /** @var ServiceProviderInterface $serviceLocator */
+                        $serviceLocator = $container->get($argument);
+                        $tableRows[] = [\sprintf('Service(%s)', (string)$argument), implode("\n", array_keys($serviceLocator->getProvidedServices()))];
+                   }
+                } elseif ($argument instanceof IteratorArgument) {
+                    if ($argument instanceof TaggedIteratorArgument) {
+                        $service = \sprintf('Tagged Iterator for "%s"%s', $argument->getTag(), $options['is_debug'] ? '' : \sprintf(' (%d element(s))', \count($argument->getValues())));
+
+                        foreach (array_keys($container->findTaggedServiceIds($argument->getTag())) as $ref) {
+                            $locatorsInformation[] =  $ref;
+                        }
+                    } else {
+                        $service = \sprintf('Iterator (%d element(s))', \count($argument->getValues()));
+
+                        foreach ($argument->getValues() as $ref) {
+                            $locatorsInformation[] = $ref;
+                        }
+                    }
+
+                    $tableRows[] = [$service, implode("\n", $locatorsInformation)];
+                } elseif ($argument instanceof ServiceLocatorArgument) {
+                    $tableRows[] = [
+                        \sprintf('Service locator (%d element(s))', \count($argument->getValues())),
+                        '-'
+                    ];
+                }
+            }
+
+            $table = new Table($this->getOutput());
+            $table->setHeaders(['Service locator', 'Associated services'])->setRows($tableRows);
+            $table->render();
+        }
+
     }
 
     protected

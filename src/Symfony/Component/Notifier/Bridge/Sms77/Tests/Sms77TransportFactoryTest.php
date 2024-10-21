@@ -15,6 +15,9 @@ use Symfony\Component\Notifier\Bridge\Sms77\Sms77TransportFactory;
 use Symfony\Component\Notifier\Test\AbstractTransportFactoryTestCase;
 use Symfony\Component\Notifier\Test\IncompleteDsnTestTrait;
 
+/**
+ * @group legacy
+ */
 final class Sms77TransportFactoryTest extends AbstractTransportFactoryTestCase
 {
     use IncompleteDsnTestTrait;

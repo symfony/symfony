@@ -96,8 +96,8 @@ class ValidatorTypeGuesserTest extends TestCase
             [new NotNull(), new ValueGuess(true, Guess::HIGH_CONFIDENCE)],
             [new NotBlank(), new ValueGuess(true, Guess::HIGH_CONFIDENCE)],
             [new IsTrue(), new ValueGuess(true, Guess::HIGH_CONFIDENCE)],
-            [new Length(['min' => 10, 'max' => 10]), new ValueGuess(false, Guess::LOW_CONFIDENCE)],
-            [new Range(['min' => 1, 'max' => 20]), new ValueGuess(false, Guess::LOW_CONFIDENCE)],
+            [new Length(min: 10, max: 10), new ValueGuess(false, Guess::LOW_CONFIDENCE)],
+            [new Range(min: 1, max: 20), new ValueGuess(false, Guess::LOW_CONFIDENCE)],
         ];
     }
 
@@ -122,7 +122,7 @@ class ValidatorTypeGuesserTest extends TestCase
 
     public function testGuessMaxLengthForConstraintWithMaxValue()
     {
-        $constraint = new Length(['max' => '2']);
+        $constraint = new Length(max: '2');
 
         $result = $this->guesser->guessMaxLengthForConstraint($constraint);
         $this->assertInstanceOf(ValueGuess::class, $result);
@@ -132,7 +132,7 @@ class ValidatorTypeGuesserTest extends TestCase
 
     public function testGuessMaxLengthForConstraintWithMinValue()
     {
-        $constraint = new Length(['min' => '2']);
+        $constraint = new Length(min: '2');
 
         $result = $this->guesser->guessMaxLengthForConstraint($constraint);
         $this->assertNull($result);
@@ -141,7 +141,7 @@ class ValidatorTypeGuesserTest extends TestCase
     public function testGuessMimeTypesForConstraintWithMimeTypesValue()
     {
         $mimeTypes = ['image/png', 'image/jpeg'];
-        $constraint = new File(['mimeTypes' => $mimeTypes]);
+        $constraint = new File(mimeTypes: $mimeTypes);
         $typeGuess = $this->guesser->guessTypeForConstraint($constraint);
         $this->assertInstanceOf(TypeGuess::class, $typeGuess);
         $this->assertArrayHasKey('attr', $typeGuess->getOptions());
@@ -159,7 +159,7 @@ class ValidatorTypeGuesserTest extends TestCase
 
     public function testGuessMimeTypesForConstraintWithMimeTypesStringValue()
     {
-        $constraint = new File(['mimeTypes' => 'image/*']);
+        $constraint = new File(mimeTypes: 'image/*');
         $typeGuess = $this->guesser->guessTypeForConstraint($constraint);
         $this->assertInstanceOf(TypeGuess::class, $typeGuess);
         $this->assertArrayHasKey('attr', $typeGuess->getOptions());
@@ -169,7 +169,7 @@ class ValidatorTypeGuesserTest extends TestCase
 
     public function testGuessMimeTypesForConstraintWithMimeTypesEmptyStringValue()
     {
-        $constraint = new File(['mimeTypes' => '']);
+        $constraint = new File(mimeTypes: '');
         $typeGuess = $this->guesser->guessTypeForConstraint($constraint);
         $this->assertInstanceOf(TypeGuess::class, $typeGuess);
         $this->assertArrayNotHasKey('attr', $typeGuess->getOptions());

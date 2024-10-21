@@ -66,31 +66,31 @@ class AtLeastOneOfValidatorTest extends ConstraintValidatorTestCase
     {
         return [
             ['symfony', [
-                new Length(['min' => 10]),
-                new EqualTo(['value' => 'symfony']),
+                new Length(min: 10),
+                new EqualTo(value: 'symfony'),
             ]],
             [150, [
-                new Range(['min' => 10, 'max' => 20]),
-                new GreaterThanOrEqual(['value' => 100]),
+                new Range(min: 10, max: 20),
+                new GreaterThanOrEqual(value: 100),
             ]],
             [7, [
-                new LessThan(['value' => 5]),
-                new IdenticalTo(['value' => 7]),
+                new LessThan(value: 5),
+                new IdenticalTo(value: 7),
             ]],
             [-3, [
-                new DivisibleBy(['value' => 4]),
+                new DivisibleBy(value: 4),
                 new Negative(),
             ]],
             ['FOO', [
-                new Choice(['choices' => ['bar', 'BAR']]),
-                new Regex(['pattern' => '/foo/i']),
+                new Choice(choices: ['bar', 'BAR']),
+                new Regex(pattern: '/foo/i'),
             ]],
             ['fr', [
                 new Country(),
                 new Language(),
             ]],
             [[1, 3, 5], [
-                new Count(['min' => 5]),
+                new Count(min: 5),
                 new Unique(),
             ]],
         ];
@@ -101,7 +101,7 @@ class AtLeastOneOfValidatorTest extends ConstraintValidatorTestCase
      */
     public function testInvalidCombinationsWithDefaultMessage($value, $constraints)
     {
-        $atLeastOneOf = new AtLeastOneOf(['constraints' => $constraints]);
+        $atLeastOneOf = new AtLeastOneOf(constraints: $constraints);
         $validator = Validation::createValidator();
 
         $message = [$atLeastOneOf->message];
@@ -123,7 +123,11 @@ class AtLeastOneOfValidatorTest extends ConstraintValidatorTestCase
      */
     public function testInvalidCombinationsWithCustomMessage($value, $constraints)
     {
-        $atLeastOneOf = new AtLeastOneOf(['constraints' => $constraints, 'message' => 'foo', 'includeInternalMessages' => false]);
+        $atLeastOneOf = new AtLeastOneOf(
+            constraints: $constraints,
+            message: 'foo',
+            includeInternalMessages: false,
+        );
 
         $violations = Validation::createValidator()->validate($value, $atLeastOneOf);
 
@@ -135,31 +139,31 @@ class AtLeastOneOfValidatorTest extends ConstraintValidatorTestCase
     {
         return [
             ['symphony', [
-                new Length(['min' => 10]),
-                new EqualTo(['value' => 'symfony']),
+                new Length(min: 10),
+                new EqualTo(value: 'symfony'),
             ]],
             [70, [
-                new Range(['min' => 10, 'max' => 20]),
-                new GreaterThanOrEqual(['value' => 100]),
+                new Range(min: 10, max: 20),
+                new GreaterThanOrEqual(value: 100),
             ]],
             [8, [
-                new LessThan(['value' => 5]),
-                new IdenticalTo(['value' => 7]),
+                new LessThan(value: 5),
+                new IdenticalTo(value: 7),
             ]],
             [3, [
-                new DivisibleBy(['value' => 4]),
+                new DivisibleBy(value: 4),
                 new Negative(),
             ]],
             ['F_O_O', [
-                new Choice(['choices' => ['bar', 'BAR']]),
-                new Regex(['pattern' => '/foo/i']),
+                new Choice(choices: ['bar', 'BAR']),
+                new Regex(pattern: '/foo/i'),
             ]],
             ['f_r', [
                 new Country(),
                 new Language(),
             ]],
             [[1, 3, 3], [
-                new Count(['min' => 5]),
+                new Count(min: 5),
                 new Unique(),
             ]],
         ];
@@ -169,21 +173,21 @@ class AtLeastOneOfValidatorTest extends ConstraintValidatorTestCase
     {
         $validator = Validation::createValidator();
 
-        $violations = $validator->validate(50, new AtLeastOneOf([
-            'constraints' => [
-                new Range([
-                    'groups' => 'non_default_group',
-                    'min' => 10,
-                    'max' => 20,
-                ]),
-                new Range([
-                    'groups' => 'non_default_group',
-                    'min' => 30,
-                    'max' => 40,
-                ]),
+        $violations = $validator->validate(50, new AtLeastOneOf(
+            constraints: [
+                new Range(
+                    groups: ['non_default_group'],
+                    min: 10,
+                    max: 20,
+                ),
+                new Range(
+                    groups: ['non_default_group'],
+                    min: 30,
+                    max: 40,
+                ),
             ],
-            'groups' => 'non_default_group',
-        ]), 'non_default_group');
+            groups: ['non_default_group'],
+        ), ['non_default_group']);
 
         $this->assertCount(1, $violations);
     }
@@ -221,9 +225,9 @@ class AtLeastOneOfValidatorTest extends ConstraintValidatorTestCase
                 public function getMetadataFor($classOrObject): MetadataInterface
                 {
                     return (new ClassMetadata(Data::class))
-                        ->addPropertyConstraint('foo', new NotNull(['message' => 'custom message foo']))
+                        ->addPropertyConstraint('foo', new NotNull(message: 'custom message foo'))
                         ->addPropertyConstraint('bar', new AtLeastOneOf([
-                            new NotNull(['message' => 'custom message bar']),
+                            new NotNull(message: 'custom message bar'),
                         ]))
                     ;
                 }
@@ -247,20 +251,20 @@ class AtLeastOneOfValidatorTest extends ConstraintValidatorTestCase
     {
         $validator = Validation::createValidator();
 
-        $violations = $validator->validate(50, new AtLeastOneOf([
-            'constraints' => [
-                new Range([
-                    'groups' => 'adult',
-                    'min' => 18,
-                    'max' => 55,
-                ]),
-                new GreaterThan([
-                    'groups' => 'senior',
-                    'value' => 55,
-                ]),
+        $violations = $validator->validate(50, new AtLeastOneOf(
+            constraints: [
+                new Range(
+                    groups: ['adult'],
+                    min: 18,
+                    max: 55,
+                ),
+                new GreaterThan(
+                    groups: ['senior'],
+                    value: 55,
+                ),
             ],
-            'groups' => ['adult', 'senior'],
-        ]), 'senior');
+            groups: ['adult', 'senior'],
+        ), 'senior');
 
         $this->assertCount(1, $violations);
     }

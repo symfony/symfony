@@ -25,14 +25,14 @@ class RegexValidatorTest extends ConstraintValidatorTestCase
 
     public function testNullIsValid()
     {
-        $this->validator->validate(null, new Regex(['pattern' => '/^[0-9]+$/']));
+        $this->validator->validate(null, new Regex(pattern: '/^[0-9]+$/'));
 
         $this->assertNoViolation();
     }
 
     public function testEmptyStringIsValid()
     {
-        $this->validator->validate('', new Regex(['pattern' => '/^[0-9]+$/']));
+        $this->validator->validate('', new Regex(pattern: '/^[0-9]+$/'));
 
         $this->assertNoViolation();
     }
@@ -40,7 +40,7 @@ class RegexValidatorTest extends ConstraintValidatorTestCase
     public function testExpectsStringCompatibleType()
     {
         $this->expectException(UnexpectedValueException::class);
-        $this->validator->validate(new \stdClass(), new Regex(['pattern' => '/^[0-9]+$/']));
+        $this->validator->validate(new \stdClass(), new Regex(pattern: '/^[0-9]+$/'));
     }
 
     /**
@@ -48,13 +48,14 @@ class RegexValidatorTest extends ConstraintValidatorTestCase
      */
     public function testValidValues($value)
     {
-        $constraint = new Regex(['pattern' => '/^[0-9]+$/']);
+        $constraint = new Regex(pattern: '/^[0-9]+$/');
         $this->validator->validate($value, $constraint);
 
         $this->assertNoViolation();
     }
 
     /**
+     * @group legacy
      * @dataProvider getValidValuesWithWhitespaces
      */
     public function testValidValuesWithWhitespaces($value)
@@ -105,6 +106,7 @@ class RegexValidatorTest extends ConstraintValidatorTestCase
     }
 
     /**
+     * @group legacy
      * @dataProvider getInvalidValues
      */
     public function testInvalidValues($value)

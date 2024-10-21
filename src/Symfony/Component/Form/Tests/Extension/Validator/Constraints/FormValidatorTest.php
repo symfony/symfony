@@ -70,9 +70,9 @@ class FormValidatorTest extends ConstraintValidatorTestCase
     public function testValidateConstraints()
     {
         $object = new \stdClass();
-        $constraint1 = new NotNull(['groups' => ['group1', 'group2']]);
-        $constraint2 = new NotBlank(['groups' => 'group2']);
-        $constraint3 = new Length(['groups' => 'group2', 'min' => 3]);
+        $constraint1 = new NotNull(groups: ['group1', 'group2']);
+        $constraint2 = new NotBlank(groups: ['group2']);
+        $constraint3 = new Length(groups: ['group2'], min: 3);
 
         $options = [
             'validation_groups' => ['group1', 'group2'],
@@ -156,8 +156,8 @@ class FormValidatorTest extends ConstraintValidatorTestCase
     public function testValidateConstraintsOptionEvenIfNoValidConstraint()
     {
         $object = new \stdClass();
-        $constraint1 = new NotNull(['groups' => ['group1', 'group2']]);
-        $constraint2 = new NotBlank(['groups' => 'group2']);
+        $constraint1 = new NotNull(groups: ['group1', 'group2']);
+        $constraint2 = new NotBlank(groups: ['group2']);
 
         $parent = $this->getBuilder('parent', null)
             ->setCompound(true)
@@ -684,7 +684,7 @@ class FormValidatorTest extends ConstraintValidatorTestCase
     public function testCauseForNotAllowedExtraFieldsIsTheFormConstraint()
     {
         $form = $this
-            ->getBuilder('form', null, ['constraints' => [new NotBlank(['groups' => ['foo']])]])
+            ->getBuilder('form', null, ['constraints' => [new NotBlank(groups: ['foo'])]])
             ->setCompound(true)
             ->setDataMapper(new DataMapper())
             ->getForm();

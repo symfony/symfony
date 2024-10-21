@@ -31,16 +31,18 @@ class Date extends Constraint
         self::INVALID_DATE_ERROR => 'INVALID_DATE_ERROR',
     ];
 
+    public string $format = 'Y-m-d';
     public string $message = 'This value is not a valid date.';
 
     /**
      * @param array<string,mixed>|null $options
      * @param string[]|null            $groups
      */
-    public function __construct(?array $options = null, ?string $message = null, ?array $groups = null, mixed $payload = null)
+    public function __construct(?array $options = null, ?string $message = null, ?array $groups = null, mixed $payload = null, ?string $format = null)
     {
         parent::__construct($options, $groups, $payload);
 
         $this->message = $message ?? $this->message;
+        $this->format = $format ?? $this->format;
     }
 }

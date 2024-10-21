@@ -362,6 +362,9 @@ class InputDefinition
             $elements[] = '[options]';
         } elseif (!$short) {
             foreach ($this->getOptions() as $option) {
+                if ($option->isHidden()) {
+                    continue;
+                }
                 $value = '';
                 if ($option->acceptValue()) {
                     $value = \sprintf(

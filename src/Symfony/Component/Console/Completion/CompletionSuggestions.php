@@ -58,7 +58,9 @@ final class CompletionSuggestions
      */
     public function suggestOption(InputOption $option): static
     {
-        $this->optionSuggestions[] = $option;
+        if (!$option->isHidden()) {
+            $this->optionSuggestions[] = $option;
+        }
 
         return $this;
     }

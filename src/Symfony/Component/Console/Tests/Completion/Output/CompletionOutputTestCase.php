@@ -30,6 +30,7 @@ abstract class CompletionOutputTestCase extends TestCase
     {
         $options = [
             new InputOption('option1', 'o', InputOption::VALUE_NONE, 'First Option'),
+            new InputOption('hidden', 'o', InputOption::HIDDEN, 'Hidden Option'),
             new InputOption('negatable', null, InputOption::VALUE_NEGATABLE, 'Can be negative'),
         ];
         $suggestions = new CompletionSuggestions();

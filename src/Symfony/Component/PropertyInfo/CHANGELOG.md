@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+7.2
+---
+
+ * Add `PropertyDescriptionExtractorInterface` to `PhpStanExtractor`
+
 7.1
 ---
 

@@ -73,6 +73,10 @@ use Symfony\Contracts\Service\ResetInterface;
  */
 class Application implements ResetInterface
 {
+    /**
+     * Description of the command to be executed.
+     */
+    public const COMMAND_ARGUMENT_DESCRIPTION = 'The command to execute';
     private array $commands = [];
     private bool $wantHelps = false;
     private ?Command $runningCommand = null;
@@ -1129,7 +1133,7 @@ class Application implements ResetInterface
     protected function getDefaultInputDefinition(): InputDefinition
     {
         return new InputDefinition([
-            new InputArgument('command', InputArgument::REQUIRED, 'The command to execute'),
+            new InputArgument('command', InputArgument::REQUIRED, self::COMMAND_ARGUMENT_DESCRIPTION),
             new InputOption('--help', '-h', InputOption::VALUE_NONE, 'Display help for the given command. When no command is given display help for the <info>'.$this->defaultCommand.'</info> command'),
             new InputOption('--silent', null, InputOption::VALUE_NONE, 'Do not output any message'),
             new InputOption('--quiet', '-q', InputOption::VALUE_NONE, 'Only errors are displayed. All other output is suppressed'),

@@ -1311,7 +1311,7 @@ class ApplicationTest extends TestCase
     public static function getAddingAlreadySetDefinitionElementData(): array
     {
         return [
-            [new InputArgument('command', InputArgument::REQUIRED)],
+            [new InputArgument('command', InputArgument::REQUIRED, Application::COMMAND_ARGUMENT_DESCRIPTION)],
             [new InputOption('quiet', '', InputOption::VALUE_NONE)],
             [new InputOption('query', 'q', InputOption::VALUE_NONE)],
         ];

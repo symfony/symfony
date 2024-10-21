@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Serializer\Tests\Annotation;
+namespace Symfony\Component\Serializer\Tests\Attribute;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Serializer\Attribute\Context;

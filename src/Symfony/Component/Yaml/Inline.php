@@ -130,6 +130,10 @@ class Inline
                     return self::dumpHashArray($value, $flags);
                 }
 
+                if ($value instanceof \Stringable) {
+                    return self::dump((string) $value);
+                }
+
                 if (Yaml::DUMP_EXCEPTION_ON_INVALID_TYPE & $flags) {
                     throw new DumpException('Object support when dumping a YAML file has been disabled.');
                 }

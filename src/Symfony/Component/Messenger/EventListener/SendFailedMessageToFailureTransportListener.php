@@ -15,7 +15,9 @@ use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Messenger\Event\WorkerMessageFailedEvent;
+use Symfony\Component\Messenger\Retry\RetryStrategyInterface;
 use Symfony\Component\Messenger\Stamp\DelayStamp;
+use Symfony\Component\Messenger\Stamp\ReceivedStamp;
 use Symfony\Component\Messenger\Stamp\RedeliveryStamp;
 use Symfony\Component\Messenger\Stamp\SentToFailureTransportStamp;
 
@@ -28,11 +30,13 @@ class SendFailedMessageToFailureTransportListener implements EventSubscriberInte
 {
     private ContainerInterface $failureSenders;
     private ?LoggerInterface $logger;
+    private ?ContainerInterface $retryStrategyLocator;
 
-    public function __construct(ContainerInterface $failureSenders, ?LoggerInterface $logger = null)
+    public function __construct(ContainerInterface $failureSenders, ?LoggerInterface $logger = null, ?ContainerInterface $retryStrategyLocator = null)
     {
         $this->failureSenders = $failureSenders;
         $this->logger = $logger;
+        $this->retryStrategyLocator = $retryStrategyLocator;
     }
 
     /**
@@ -44,28 +48,30 @@ class SendFailedMessageToFailureTransportListener implements EventSubscriberInte
             return;
         }
 
-        if (!$this->failureSenders->has($event->getReceiverName())) {
+        $originalTransportName = $event->getEnvelope()->last(ReceivedStamp::class)
+            ?->getTransportName() ?? $event->getReceiverName();
+
+        if (!$this->failureSenders->has($originalTransportName)) {
             return;
         }
 
-        $failureSender = $this->failureSenders->get($event->getReceiverName());
+        $failureSender = $this->failureSenders->get($originalTransportName);
 
         $envelope = $event->getEnvelope();
 
-        // avoid re-sending to the failed sender
-        if (null !== $envelope->last(SentToFailureTransportStamp::class)) {
-            return;
-        }
+        $delay = $this->getRetryStrategyForTransport($event->getReceiverName())
+            ?->getWaitingTime($envelope, $event->getThrowable()) ?? 0;
 
         $envelope = $envelope->with(
-            new SentToFailureTransportStamp($event->getReceiverName()),
-            new DelayStamp(0),
+            new SentToFailureTransportStamp($originalTransportName),
+            new DelayStamp($delay),
             new RedeliveryStamp(0)
         );
 
-        $this->logger?->info('Rejected message {class} will be sent to the failure transport {transport}.', [
+        $this->logger?->info('Rejected message {class} will be sent to the failure transport {transport} using {delay} ms delay.', [
             'class' => $envelope->getMessage()::class,
             'transport' => $failureSender::class,
+            'delay' => $delay,
         ]);
 
         $failureSender->send($envelope);
@@ -76,5 +82,14 @@ class SendFailedMessageToFailureTransportListener implements EventSubscriberInte
         return [
             WorkerMessageFailedEvent::class => ['onMessageFailed', -100],
         ];
+    }
+
+    private function getRetryStrategyForTransport(string $transportName): ?RetryStrategyInterface
+    {
+        if (null === $this->retryStrategyLocator || !$this->retryStrategyLocator->has($transportName)) {
+            return null;
+        }
+
+        return $this->retryStrategyLocator->get($transportName);
     }
 }

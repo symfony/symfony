@@ -13,7 +13,6 @@ namespace Symfony\Component\Messenger\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
-use Psr\Log\NullLogger;
 use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Messenger\Envelope;
@@ -115,7 +114,11 @@ class FailureIntegrationTest extends TestCase
         $dispatcher->addSubscriber(new AddErrorDetailsStampListener());
         $dispatcher->addSubscriber(new SendFailedMessageForRetryListener($locator, $retryStrategyLocator));
 
-        $dispatcher->addSubscriber(new SendFailedMessageToFailureTransportListener($sendersLocatorFailureTransport));
+        $dispatcher->addSubscriber(new SendFailedMessageToFailureTransportListener(
+            $sendersLocatorFailureTransport,
+            null,
+            $retryStrategyLocator
+        ));
         $dispatcher->addSubscriber(new StopWorkerOnMessageLimitListener(1));
 
         $runWorker = function (string $transportName) use ($transports, $bus, $dispatcher): ?\Throwable {
@@ -195,14 +198,14 @@ class FailureIntegrationTest extends TestCase
         $this->assertCount(1, $transport2->getMessagesWaitingToBeReceived());
 
         /*
-         * Message is retried on failure transport then discarded
+         * Message is retried on failure transport then re-queued
          */
         $runWorker('the_failure_transport');
         // only the "failed" handler is called a 4th time
         $this->assertSame(4, $transport1HandlerThatFails->getTimesCalled());
         $this->assertSame(1, $allTransportHandlerThatWorks->getTimesCalled());
-        // handling fails again, message is discarded
-        $this->assertCount(0, $failureTransport->getMessagesWaitingToBeReceived());
+        // handling fails again, message is re-queued with a delay
+        $this->assertCount(1, $failureTransport->getMessagesWaitingToBeReceived());
 
         /*
          * Execute handlers on transport2
@@ -214,10 +217,10 @@ class FailureIntegrationTest extends TestCase
         $this->assertSame(2, $allTransportHandlerThatWorks->getTimesCalled());
         // transport1 handler called for the first time
         $this->assertSame(1, $transport2HandlerThatWorks->getTimesCalled());
-        // all transport should be empty
+        // all original transports should be empty - failed queue still holds the message
         $this->assertEmpty($transport1->getMessagesWaitingToBeReceived());
         $this->assertEmpty($transport2->getMessagesWaitingToBeReceived());
-        $this->assertEmpty($failureTransport->getMessagesWaitingToBeReceived());
+        $this->assertCount(1, $failureTransport->getMessagesWaitingToBeReceived());
 
         /*
          * Dispatch the original message again
@@ -226,9 +229,18 @@ class FailureIntegrationTest extends TestCase
         // handle the failing message so it goes into the failure transport
         $runWorker('transport1');
         $runWorker('transport1');
+        $this->assertCount(2, $failureTransport->getMessagesWaitingToBeReceived());
         // now make the handler work!
         $transport1HandlerThatFails->setShouldThrow(false);
         $runWorker('the_failure_transport');
+        $runWorker('the_failure_transport');
+
+        // the message is now handled and the failure transport is empty
+        // transport1Handler is called 4 more times - 2 retries and twice successfully from failure transport
+        $this->assertSame(8, $transport1HandlerThatFails->getTimesCalled());
+        $this->assertSame(3, $allTransportHandlerThatWorks->getTimesCalled());
+        $this->assertSame(1, $transport2HandlerThatWorks->getTimesCalled());
+
         // the failure transport is empty because it worked
         $this->assertEmpty($failureTransport->getMessagesWaitingToBeReceived());
     }
@@ -297,7 +309,8 @@ class FailureIntegrationTest extends TestCase
         $dispatcher->addSubscriber(new SendFailedMessageForRetryListener($locator, $retryStrategyLocator));
         $dispatcher->addSubscriber(new SendFailedMessageToFailureTransportListener(
             $sendersLocatorFailureTransport,
-            new NullLogger()
+            null,
+            $retryStrategyLocator,
         ));
         $dispatcher->addSubscriber(new StopWorkerOnMessageLimitListener(1));
 
@@ -342,7 +355,8 @@ class FailureIntegrationTest extends TestCase
         // "transport1" handler is called again from the "the_failed_transport1" and it fails
         $this->assertSame(2, $transport1HandlerThatFails->getTimesCalled());
         $this->assertSame(0, $transport2HandlerThatFails->getTimesCalled());
-        $this->assertCount(0, $failureTransport1->getMessagesWaitingToBeReceived());
+        // message is not discarded but remains in failed transport
+        $this->assertCount(1, $failureTransport1->getMessagesWaitingToBeReceived());
         $this->assertCount(0, $failureTransport2->getMessagesWaitingToBeReceived());
 
         // Receive the message from "transport2"
@@ -351,7 +365,7 @@ class FailureIntegrationTest extends TestCase
         $this->assertSame(2, $transport1HandlerThatFails->getTimesCalled());
         // handler for "transport2" is called
         $this->assertSame(1, $transport2HandlerThatFails->getTimesCalled());
-        $this->assertCount(0, $failureTransport1->getMessagesWaitingToBeReceived());
+        $this->assertCount(1, $failureTransport1->getMessagesWaitingToBeReceived());
         // the failure transport "the_failure_transport2" has 1 new message failed from "transport2"
         $this->assertCount(1, $failureTransport2->getMessagesWaitingToBeReceived());
 
@@ -360,9 +374,9 @@ class FailureIntegrationTest extends TestCase
         $this->assertSame(2, $transport1HandlerThatFails->getTimesCalled());
         // "transport2" handler is called again from the "the_failed_transport2" and it fails
         $this->assertSame(2, $transport2HandlerThatFails->getTimesCalled());
-        $this->assertCount(0, $failureTransport1->getMessagesWaitingToBeReceived());
-        // After the message fails again, the message is discarded from the "the_failure_transport2"
-        $this->assertCount(0, $failureTransport2->getMessagesWaitingToBeReceived());
+        $this->assertCount(1, $failureTransport1->getMessagesWaitingToBeReceived());
+        // After the message fails again, the message is re-queued to the "the_failure_transport2"
+        $this->assertCount(1, $failureTransport2->getMessagesWaitingToBeReceived());
     }
 
     public function testStampsAddedByMiddlewaresDontDisappearWhenDelayedMessageFails()

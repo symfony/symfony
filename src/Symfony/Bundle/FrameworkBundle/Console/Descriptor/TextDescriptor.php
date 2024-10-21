@@ -352,20 +352,13 @@ class TextDescriptor extends Descriptor
         }
 
         $showArguments = isset($options['show_arguments']) && $options['show_arguments'];
-        $showLocatorDependencies = isset($options['show_locator_services']) && $options['show_locator_services'];
         $argumentsInformation = [];
-        $locatorsInformation = [];
         if ($showArguments && ($arguments = $definition->getArguments())) {
             foreach ($arguments as $argument) {
                 if ($argument instanceof ServiceClosureArgument) {
                     $argument = $argument->getValues()[0];
                 }
                 if ($argument instanceof Reference) {
-                    if ($showLocatorDependencies && $container->getDefinition($argument)->hasTag('container.service_locator')) {
-                        $serviceAssociated = $container->getDefinition($argument)->hasTag('container.service_locator') === false ? '': array_keys($container->getDefinition($argument)->getArguments()[0]);
-                        $locatorsInformation[(string) $argument] = implode(',', $serviceAssociated);
-                    }
-
                     $argumentsInformation[] = \sprintf('Service(%s)', (string) $argument);
                 } elseif ($argument instanceof IteratorArgument) {
                     if ($argument instanceof TaggedIteratorArgument) {
@@ -391,6 +384,17 @@ class TextDescriptor extends Descriptor
             }
 
             $tableRows[] = ['Arguments', implode("\n", $argumentsInformation)];
+        }
+
+        $showLocatorDependencies = isset($options['show_locator_services']) && $options['show_locator_services'];
+        $locatorsInformation = [];
+        if ($showLocatorDependencies && ($arguments = $definition->getArguments())) {
+            foreach ($arguments as $argument) {
+                if ($argument instanceof Reference && $container->getDefinition($argument)->hasTag('container.service_locator')) {
+                    $serviceAssociated = array_keys($container->getDefinition($argument)->getArguments()[0]);
+                    $locatorsInformation[(string)$argument] = implode(',', $serviceAssociated);
+                }
+            }
         }
 
         $inEdges = null !== $container && isset($options['id']) ? $this->getServiceEdges($container, $options['id']) : [];

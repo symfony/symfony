@@ -274,10 +274,8 @@ class TimeType extends AbstractType
 
         $choiceTranslationDomainNormalizer = static function (Options $options, $choiceTranslationDomain) {
             if (\is_array($choiceTranslationDomain)) {
-                $default = false;
-
                 return array_replace(
-                    ['hour' => $default, 'minute' => $default, 'second' => $default],
+                    ['hour' => false, 'minute' => false, 'second' => false],
                     $choiceTranslationDomain
                 );
             }

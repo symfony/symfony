@@ -446,7 +446,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
         if (!$exists) {
             $this->addResource(new FileExistenceResource($path));
 
-            return $exists;
+            return false;
         }
 
         if (is_dir($path)) {
@@ -459,7 +459,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
             $this->addResource(new FileResource($path));
         }
 
-        return $exists;
+        return true;
     }
 
     /**

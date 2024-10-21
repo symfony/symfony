@@ -56,7 +56,7 @@ class KernelBrowser extends HttpKernelBrowser
      */
     public function getProfile(): HttpProfile|false|null
     {
-        if (null === $this->response || !$this->getContainer()->has('profiler')) {
+        if (!isset($this->response) || !$this->getContainer()->has('profiler')) {
             return false;
         }
 

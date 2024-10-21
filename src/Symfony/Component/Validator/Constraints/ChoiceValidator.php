@@ -56,7 +56,7 @@ class ChoiceValidator extends ConstraintValidator
                 $choices = iterator_to_array($choices);
             }
             if (!\is_array($choices)) {
-                throw new ConstraintDefinitionException(\sprintf('The Choice constraint expects the callback %s to return an iterable value, got "%s".', $this->formatValue($constraint->callback), get_debug_type($choices)));
+                throw new ConstraintDefinitionException(\sprintf('The Choice constraint expects the callback "%s" to return an iterable value, got "%s".', trim($this->formatValue($constraint->callback), '"'), get_debug_type($choices)));
             }
         } else {
             $choices = $constraint->choices;

@@ -12,17 +12,19 @@
 namespace Symfony\Component\Cache\Tests\Adapter;
 
 use Psr\Cache\CacheItemPoolInterface;
-use Symfony\Component\Cache\Adapter\PdoAdapter;
+use Symfony\Component\Cache\Adapter\PdoTagAwareAdapter;
 
 /**
  * @requires extension pdo_sqlite
  *
  * @group time-sensitive
  */
-class PdoAdapterTest extends AbstractPdoAdapterTest
+class PdoTagAwareAdapterTest extends AbstractPdoAdapterTest
 {
+    use TagAwareTestTrait;
+
     public function createCachePool(int $defaultLifetime = 0): CacheItemPoolInterface
     {
-        return new PdoAdapter('sqlite:'.self::$dbFile, 'ns', $defaultLifetime);
+        return new PdoTagAwareAdapter('sqlite:'.self::$dbFile, 'ns', $defaultLifetime);
     }
 }

@@ -6,6 +6,7 @@ CHANGELOG
 
  * `igbinary_serialize()` is not used by default when the igbinary extension is installed
  * Add optional `Psr\Clock\ClockInterface` parameter to `ArrayAdapter`
+ * Add `PdoTagAwareAdapter`
 
 7.1
 ---

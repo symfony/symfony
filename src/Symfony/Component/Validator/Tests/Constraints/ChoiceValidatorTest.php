@@ -201,7 +201,7 @@ class ChoiceValidatorTest extends ConstraintValidatorTestCase
     {
         $this->expectException(ConstraintDefinitionException::class);
         $this->expectExceptionMessage('The Choice constraint expects the callback to return an iterable value, got null.');
-        // search $this for "staticCallbackIterable"
+        // search $this for "staticCallbackInvalid"
         $this->setObject($this);
 
         $constraint = new Choice(['callback' => 'staticCallbackInvalid']);

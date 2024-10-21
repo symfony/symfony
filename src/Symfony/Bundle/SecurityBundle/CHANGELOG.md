@@ -6,6 +6,7 @@ CHANGELOG
 
  * Allow configuring the secret used to sign login links
  * Allow passing optional passport attributes to `Security::login()`
+ * Add `hide_account_status_exceptions` config option to display `AccountStatusException`
 
 7.1
 ---

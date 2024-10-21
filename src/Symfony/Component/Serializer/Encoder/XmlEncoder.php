@@ -236,10 +236,10 @@ class XmlEncoder implements EncoderInterface, DecoderInterface, NormalizationAwa
         $value = $this->parseXmlValue($node, $context);
 
         if (\is_array($value)
-            && \count($value) === 1
+            && ($childNodeName = $node->firstChild?->nodeName)
+            && 1 === \count($value)
             && \in_array($nodeName, $context[self::FORCE_COLLECTION] ?? [], strict: true)
         ) {
-            $childNodeName = $node->firstChild?->nodeName;
             return [$childNodeName => [$value[$childNodeName]]];
         }
 

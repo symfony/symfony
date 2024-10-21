@@ -53,6 +53,7 @@ class DateTimeValidatorTest extends ConstraintValidatorTestCase
 
         $this->buildViolation('This value is not a valid datetime.')
             ->setParameter('{{ value }}', '"1995-03-24"')
+            ->setParameter('{{ format }}', '"Y-m-d H:i:s"')
             ->setCode(DateTime::INVALID_FORMAT_ERROR)
             ->assertRaised();
     }
@@ -96,6 +97,7 @@ class DateTimeValidatorTest extends ConstraintValidatorTestCase
 
         $this->buildViolation('myMessage')
             ->setParameter('{{ value }}', '"'.$dateTime.'"')
+            ->setParameter('{{ format }}', '"'.$format.'"')
             ->setCode($code)
             ->assertRaised();
     }
@@ -124,6 +126,7 @@ class DateTimeValidatorTest extends ConstraintValidatorTestCase
 
         $this->buildViolation('myMessage')
             ->setParameter('{{ value }}', '"2010-01-01 00:00:00"')
+            ->setParameter('{{ format }}', '"Y-m-d"')
             ->setCode(DateTime::INVALID_FORMAT_ERROR)
             ->assertRaised();
     }

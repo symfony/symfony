@@ -69,6 +69,22 @@ class DoctrineTransactionMiddlewareTest extends MiddlewareTestCase
         $this->middleware->handle(new Envelope(new \stdClass()), $this->getThrowingStackMock());
     }
 
+    public function testExceptionRollingBackTransactionSwallowed()
+    {
+        $this->connection->expects($this->once())
+            ->method('beginTransaction')
+        ;
+        $this->connection->expects($this->once())
+            ->method('rollBack')
+            ->will($this->throwException(new \Exception('Could not roll back transaction.')))
+        ;
+
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('Thrown from next middleware.');
+
+        $this->middleware->handle(new Envelope(new \stdClass()), $this->getThrowingStackMock());
+    }
+
     public function testInvalidEntityManagerThrowsException()
     {
         $managerRegistry = $this->createMock(ManagerRegistry::class);

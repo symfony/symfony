@@ -8,7 +8,6 @@ $container->loadFromExtension('framework', [
     'html_sanitizer' => [
         'sanitizers' => [
             'custom' => [
-                'default_action' => 'allow',
                 'allow_safe_elements' => true,
                 'allow_static_elements' => true,
                 'allow_elements' => [

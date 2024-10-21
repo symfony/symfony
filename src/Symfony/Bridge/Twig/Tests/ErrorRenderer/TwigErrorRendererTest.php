@@ -13,7 +13,7 @@ namespace Symfony\Bridge\Twig\Tests\ErrorRenderer;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Twig\ErrorRenderer\TwigErrorRenderer;
-use Symfony\Component\ErrorHandler\ErrorRenderer\HtmlErrorRenderer;
+use Symfony\Component\ErrorHandler\ErrorRenderer\CliErrorRenderer;
 use Symfony\Component\ErrorHandler\Exception\FlattenException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Twig\Environment;
@@ -21,36 +21,32 @@ use Twig\Loader\ArrayLoader;
 
 class TwigErrorRendererTest extends TestCase
 {
-    public function testFallbackToNativeRendererIfDebugOn()
+    public function tesFallbackRenderer()
     {
-        $exception = new \Exception();
-
         $twig = $this->createMock(Environment::class);
-        $nativeRenderer = $this->createMock(HtmlErrorRenderer::class);
-        $nativeRenderer
-            ->expects($this->once())
-            ->method('render')
-            ->with($exception)
-        ;
+        $customRenderer = new class implements ErrorRendererInterface {
+            public function render(\Throwable $exception): FlattenException
+            {
+                return 'This is a custom error renderer.';
+            }
+        };
 
-        (new TwigErrorRenderer($twig, $nativeRenderer, true))->render(new \Exception());
+        $this->assertSame('This is a custom error renderer.', (new TwigErrorRenderer($twig, $customRenderer, true))->render(new \Exception()));
     }
 
-    public function testFallbackToNativeRendererIfCustomTemplateNotFound()
+    public function testCliRenderer()
     {
         $exception = new NotFoundHttpException();
-
         $twig = new Environment(new ArrayLoader([]));
 
-        $nativeRenderer = $this->createMock(HtmlErrorRenderer::class);
-        $nativeRenderer
-            ->expects($this->once())
-            ->method('render')
-            ->with($exception)
-            ->willReturn(FlattenException::createFromThrowable($exception))
-        ;
+        $exception = (new TwigErrorRenderer($twig, new CliErrorRenderer(), false))->render($exception);
 
-        (new TwigErrorRenderer($twig, $nativeRenderer, false))->render($exception);
+        $exceptionHeaders = $exception->getHeaders();
+        if (isset($exceptionHeaders['Content-Type'])) {
+            $this->assertSame('text/plain', $exceptionHeaders['Content-Type'], 'The exception does not return HTML contents (to prevent potential XSS vulnerabilities)');
+        }
+
+        $this->assertStringNotContainsString('<!DOCTYPE html>', $exception->getAsString(), 'The exception does not include elements of the HTML exception page');
     }
 
     public function testRenderCustomErrorTemplate()

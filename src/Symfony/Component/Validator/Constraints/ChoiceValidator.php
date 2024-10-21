@@ -55,6 +55,12 @@ class ChoiceValidator extends ConstraintValidator
                 throw new ConstraintDefinitionException('The Choice constraint expects a valid callback.');
             }
             $choices = $choices();
+            if ($choices instanceof \Traversable) {
+                $choices = iterator_to_array($choices);
+            }
+            if (!is_array($choices)) {
+                throw new ConstraintDefinitionException(sprintf('The Choice constraint callback "%s" expects to return an iterable, got "%s".', trim($this->formatValue($constraint->callback), '"'), get_debug_type($choices)));
+            }
         } else {
             $choices = $constraint->choices;
         }

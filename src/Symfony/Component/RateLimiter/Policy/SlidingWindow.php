@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\RateLimiter\Policy;
 
+use Psr\Clock\ClockInterface;
+use Symfony\Component\RateLimiter\ClockTrait;
 use Symfony\Component\RateLimiter\Exception\InvalidIntervalException;
 use Symfony\Component\RateLimiter\LimiterStateInterface;
 
@@ -21,6 +23,8 @@ use Symfony\Component\RateLimiter\LimiterStateInterface;
  */
 final class SlidingWindow implements LimiterStateInterface
 {
+    use ClockTrait;
+
     private int $hitCount = 0;
     private int $hitCountForLastWindow = 0;
     private float $windowEndAt;
@@ -28,19 +32,21 @@ final class SlidingWindow implements LimiterStateInterface
     public function __construct(
         private string $id,
         private int $intervalInSeconds,
+        ?ClockInterface $clock = null,
     ) {
         if ($intervalInSeconds < 1) {
             throw new InvalidIntervalException(\sprintf('The interval must be positive integer, "%d" given.', $intervalInSeconds));
         }
-        $this->windowEndAt = microtime(true) + $intervalInSeconds;
+        $this->setClock($clock);
+        $this->windowEndAt = $this->now() + $intervalInSeconds;
     }
 
-    public static function createFromPreviousWindow(self $window, int $intervalInSeconds): self
+    public static function createFromPreviousWindow(self $window, int $intervalInSeconds, ?ClockInterface $clock = null): self
     {
         $new = new self($window->id, $intervalInSeconds);
         $windowEndAt = $window->windowEndAt + $intervalInSeconds;
 
-        if (microtime(true) < $windowEndAt) {
+        if (($clock?->now()->format('U.u') ?? microtime(true)) < $windowEndAt) {
             $new->hitCountForLastWindow = $window->hitCount;
             $new->windowEndAt = $windowEndAt;
         }
@@ -58,12 +64,12 @@ final class SlidingWindow implements LimiterStateInterface
      */
     public function getExpirationTime(): int
     {
-        return (int) ($this->windowEndAt + $this->intervalInSeconds - microtime(true));
+        return (int) ($this->windowEndAt + $this->intervalInSeconds - $this->now());
     }
 
     public function isExpired(): bool
     {
-        return microtime(true) > $this->windowEndAt;
+        return $this->now() > $this->windowEndAt;
     }
 
     public function add(int $hits = 1): void
@@ -77,7 +83,7 @@ final class SlidingWindow implements LimiterStateInterface
     public function getHitCount(): int
     {
         $startOfWindow = $this->windowEndAt - $this->intervalInSeconds;
-        $percentOfCurrentTimeFrame = min((microtime(true) - $startOfWindow) / $this->intervalInSeconds, 1);
+        $percentOfCurrentTimeFrame = min(($this->now() - $startOfWindow) / $this->intervalInSeconds, 1);
 
         return (int) floor($this->hitCountForLastWindow * (1 - $percentOfCurrentTimeFrame) + $this->hitCount);
     }
@@ -89,7 +95,7 @@ final class SlidingWindow implements LimiterStateInterface
             return 0;
         }
 
-        $time = microtime(true);
+        $time = $this->now();
         $startOfWindow = $this->windowEndAt - $this->intervalInSeconds;
         $timePassed = $time - $startOfWindow;
         $windowPassed = min($timePassed / $this->intervalInSeconds, 1);

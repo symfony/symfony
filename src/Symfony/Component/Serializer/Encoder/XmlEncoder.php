@@ -32,6 +32,11 @@ class XmlEncoder implements EncoderInterface, DecoderInterface, NormalizationAwa
     public const AS_COLLECTION = 'as_collection';
 
     /**
+     * An array of XML tags who should always be treated as a collection, even when it has only one child.
+     */
+    public const FORCE_COLLECTION = 'force_collection';
+
+    /**
      * An array of ignored XML node types while decoding, each one of the DOM Predefined XML_* constants.
      */
     public const DECODER_IGNORED_NODE_TYPES = 'decoder_ignored_node_types';
@@ -224,9 +229,19 @@ class XmlEncoder implements EncoderInterface, DecoderInterface, NormalizationAwa
      */
     private function parseXml(\DOMNode $node, array $context = []): array|string
     {
+        $nodeName = $node->nodeName;
+
         $data = $this->parseXmlAttributes($node, $context);
 
         $value = $this->parseXmlValue($node, $context);
+
+        if (\is_array($value)
+            && ($childNodeName = $node->firstChild?->nodeName)
+            && 1 === \count($value)
+            && \in_array($nodeName, $context[self::FORCE_COLLECTION] ?? [], strict: true)
+        ) {
+            return [$childNodeName => [$value[$childNodeName]]];
+        }
 
         if (!\count($data)) {
             return $value;
@@ -407,7 +422,7 @@ class XmlEncoder implements EncoderInterface, DecoderInterface, NormalizationAwa
             return $this->appendNode($parentNode, $data, $format, $context, 'data');
         }
 
-        throw new NotEncodableValueException('An unexpected value could not be serialized: '.(!\is_resource($data) ? var_export($data, true) : \sprintf('%s resource', get_resource_type($data))));
+        throw new NotEncodableValueException('An unexpected value could not be serialized: '.(!\is_resource($data) ? var_export($data, true) : \sprintf('"%s" resource', get_resource_type($data))));
     }
 
     /**

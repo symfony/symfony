@@ -38,13 +38,8 @@ class Date extends Constraint
      * @param array<string,mixed>|null $options
      * @param string[]|null            $groups
      */
-    public function __construct(
-        ?array $options = null,
-        ?string $message = null,
-        ?array $groups = null,
-        mixed $payload = null,
-        ?string $format = null,
-    ) {
+    public function __construct(?array $options = null, ?string $message = null, ?array $groups = null, mixed $payload = null, ?string $format = null)
+    {
         parent::__construct($options, $groups, $payload);
 
         $this->message = $message ?? $this->message;

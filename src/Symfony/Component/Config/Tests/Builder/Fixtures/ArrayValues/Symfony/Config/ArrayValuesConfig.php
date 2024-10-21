@@ -14,6 +14,7 @@ class ArrayValuesConfig implements \Symfony\Component\Config\Builder\ConfigBuild
 {
     private $transports;
     private $errorPages;
+    private $configOutput = [];
     private $_usedProperties = [];
 
     /**
@@ -56,6 +57,21 @@ class ArrayValuesConfig implements \Symfony\Component\Config\Builder\ConfigBuild
         return $this->errorPages;
     }
 
+    public function configure(
+        /** @var array{
+         *     transports?: array<string, array{
+         *         dsn?: string|int|float|bool,
+         *     }>,
+         *     error_pages?: array{
+         *         enabled?: bool, // Default: false
+         *         with_trace?: bool,
+         *     },
+         * } $config */
+        array $config = []): void
+    {
+        $this->configOutput = $config;
+    }
+
     public function getExtensionAlias(): string
     {
         return 'array_values';
@@ -82,6 +98,10 @@ class ArrayValuesConfig implements \Symfony\Component\Config\Builder\ConfigBuild
 
     public function toArray(): array
     {
+        if ($this->configOutput) {
+            return $this->configOutput;
+        }
+
         $output = [];
         if (isset($this->_usedProperties['transports'])) {
             $output['transports'] = array_map(fn ($v) => $v instanceof \Symfony\Config\ArrayValues\TransportsConfig ? $v->toArray() : $v, $this->transports);

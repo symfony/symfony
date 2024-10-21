@@ -14,6 +14,7 @@ class AddToListConfig implements \Symfony\Component\Config\Builder\ConfigBuilder
 {
     private $translator;
     private $messenger;
+    private $configOutput = [];
     private $_usedProperties = [];
 
     public function translator(array $value = []): \Symfony\Config\AddToList\TranslatorConfig
@@ -38,6 +39,33 @@ class AddToListConfig implements \Symfony\Component\Config\Builder\ConfigBuilder
         }
 
         return $this->messenger;
+    }
+
+    public function configure(
+        /** @var array{
+         *     translator?: array{
+         *         fallbacks?: array<string|int|float|bool>,
+         *         sources?: array<string, string|int|float|bool>,
+         *         books?: array{ // Deprecated: The child node "books" at path "add_to_list.translator.books" is deprecated. looks for translation in old fashion way
+         *             page?: array<array{
+         *                 number?: int<min, max>,
+         *                 content?: string|int|float|bool,
+         *             }>,
+         *         },
+         *     },
+         *     messenger?: array{
+         *         routing?: array<string, array{
+         *             senders?: array<string|int|float|bool>,
+         *         }>,
+         *         receiving?: array<array{
+         *             priority?: int<min, max>,
+         *             color?: string|int|float|bool,
+         *         }>,
+         *     },
+         * } $config */
+        array $config = []): void
+    {
+        $this->configOutput = $config;
     }
 
     public function getExtensionAlias(): string
@@ -66,6 +94,10 @@ class AddToListConfig implements \Symfony\Component\Config\Builder\ConfigBuilder
 
     public function toArray(): array
     {
+        if ($this->configOutput) {
+            return $this->configOutput;
+        }
+
         $output = [];
         if (isset($this->_usedProperties['translator'])) {
             $output['translator'] = $this->translator->toArray();

@@ -18,6 +18,7 @@ class PrimitiveTypesConfig implements \Symfony\Component\Config\Builder\ConfigBu
     private $integerNode;
     private $scalarNode;
     private $scalarNodeWithDefault;
+    private $configOutput = [];
     private $_usedProperties = [];
 
     /**
@@ -124,6 +125,22 @@ class PrimitiveTypesConfig implements \Symfony\Component\Config\Builder\ConfigBu
         return $this;
     }
 
+    public function configure(
+        /** @var array{
+         *     boolean_node?: bool,
+         *     enum_node?: "foo"|"bar"|"baz"|Symfony\Component\Config\Tests\Fixtures\TestEnum::Bar,
+         *     fqcn_enum_node?: foo|bar,
+         *     fqcn_unit_enum_node?: Symfony\Component\Config\Tests\Fixtures\TestEnum::Foo|Symfony\Component\Config\Tests\Fixtures\TestEnum::Bar|Symfony\Component\Config\Tests\Fixtures\TestEnum::Ccc,
+         *     float_node?: float,
+         *     integer_node?: int<min, max>,
+         *     scalar_node?: string|int|float|bool,
+         *     scalar_node_with_default?: string|int|float|bool, // Default: true
+         * } $config */
+        array $config = []): void
+    {
+        $this->configOutput = $config;
+    }
+
     public function getExtensionAlias(): string
     {
         return 'primitive_types';
@@ -186,6 +203,10 @@ class PrimitiveTypesConfig implements \Symfony\Component\Config\Builder\ConfigBu
 
     public function toArray(): array
     {
+        if ($this->configOutput) {
+            return $this->configOutput;
+        }
+
         $output = [];
         if (isset($this->_usedProperties['booleanNode'])) {
             $output['boolean_node'] = $this->booleanNode;

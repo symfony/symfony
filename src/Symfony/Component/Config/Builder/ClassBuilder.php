@@ -31,6 +31,7 @@ class ClassBuilder
     private array $use = [];
     private array $implements = [];
     private bool $allowExtraKeys = false;
+    private array $traits = [];
 
     public function __construct(
         private string $namespace,
@@ -72,6 +73,9 @@ class ClassBuilder
 
         $implements = [] === $this->implements ? '' : 'implements '.implode(', ', $this->implements);
         $body = '';
+        foreach ($this->traits as $trait) {
+            $body .= '    use '.$trait.";\n";
+        }
         foreach ($this->properties as $property) {
             $body .= '    '.$property->getContent()."\n";
         }
@@ -105,6 +109,11 @@ BODY
     public function addUse(string $class): void
     {
         $this->use[$class] = true;
+    }
+
+    public function addTrait(string $trait): void
+    {
+        $this->traits[] = '\\'.ltrim($trait, '\\');
     }
 
     public function addImplements(string $interface): void

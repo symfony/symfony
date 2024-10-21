@@ -21,6 +21,7 @@ class ScalarNormalizedTypesConfig implements \Symfony\Component\Config\Builder\C
     private $listObject;
     private $keyedListObject;
     private $nested;
+    private $configOutput = [];
     private $_usedProperties = [];
 
     /**
@@ -128,6 +129,37 @@ class ScalarNormalizedTypesConfig implements \Symfony\Component\Config\Builder\C
         return $this->nested;
     }
 
+    public function configure(
+        /** @var array{
+         *     simple_array?: array<string|int|float|bool>,
+         *     keyed_array?: array<string, array<string|int|float|bool>>,
+         *     object?: array{
+         *         enabled?: bool, // Default: null
+         *         date_format?: string|int|float|bool,
+         *         remove_used_context_fields?: bool,
+         *     },
+         *     list_object: array<array{
+         *         name: string|int|float|bool,
+         *         data?: array<mixed>,
+         *     }>,
+         *     keyed_list_object?: array<string, array{
+         *         enabled?: bool, // Default: true
+         *         settings?: array<string|int|float|bool>,
+         *     }>,
+         *     nested?: array{
+         *         nested_object?: array{
+         *             enabled?: bool, // Default: null
+         *         },
+         *         nested_list_object?: array<array{
+         *             name: string|int|float|bool,
+         *         }>,
+         *     },
+         * } $config */
+        array $config = []): void
+    {
+        $this->configOutput = $config;
+    }
+
     public function getExtensionAlias(): string
     {
         return 'scalar_normalized_types';
@@ -178,6 +210,10 @@ class ScalarNormalizedTypesConfig implements \Symfony\Component\Config\Builder\C
 
     public function toArray(): array
     {
+        if ($this->configOutput) {
+            return $this->configOutput;
+        }
+
         $output = [];
         if (isset($this->_usedProperties['simpleArray'])) {
             $output['simple_array'] = $this->simpleArray;

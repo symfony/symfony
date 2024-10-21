@@ -14,6 +14,7 @@ namespace Symfony\Bundle\FrameworkBundle\Tests\CacheWarmer;
 use Symfony\Bundle\FrameworkBundle\CacheWarmer\ConfigBuilderCacheWarmer;
 use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
 use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
+use Symfony\Component\Config\Builder\ConfigClassAwareBuilderGeneratorInterface;
 use Symfony\Component\Config\Definition\Builder\NodeDefinition;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
@@ -182,6 +183,11 @@ class ConfigBuilderCacheWarmerTest extends TestCase
         $warmer->warmUp($kernel->getCacheDir(), $kernel->getBuildDir());
 
         self::assertFileExists($kernel->getBuildDir().'/Symfony/Config/FrameworkConfig.php');
+
+        if (interface_exists(ConfigClassAwareBuilderGeneratorInterface::class)) {
+            self::assertFileExists($kernel->getBuildDir().'/Symfony/Config/FrameworkTrait.php');
+            self::assertFileExists($kernel->getBuildDir().'/Symfony/Config/Config.php');
+        }
     }
 
     public function testExtensionAddedInKernel()
@@ -222,6 +228,11 @@ class ConfigBuilderCacheWarmerTest extends TestCase
 
         self::assertFileExists($kernel->getBuildDir().'/Symfony/Config/FrameworkConfig.php');
         self::assertFileExists($kernel->getBuildDir().'/Symfony/Config/AppConfig.php');
+
+        if (interface_exists(ConfigClassAwareBuilderGeneratorInterface::class)) {
+            self::assertFileExists($kernel->getBuildDir().'/Symfony/Config/FrameworkTrait.php');
+            self::assertFileExists($kernel->getBuildDir().'/Symfony/Config/Config.php');
+        }
     }
 
     public function testKernelAsExtension()
@@ -267,6 +278,11 @@ class ConfigBuilderCacheWarmerTest extends TestCase
 
         self::assertFileExists($kernel->getBuildDir().'/Symfony/Config/FrameworkConfig.php');
         self::assertFileExists($kernel->getBuildDir().'/Symfony/Config/KernelConfig.php');
+
+        if (interface_exists(ConfigClassAwareBuilderGeneratorInterface::class)) {
+            self::assertFileExists($kernel->getBuildDir().'/Symfony/Config/FrameworkTrait.php');
+            self::assertFileExists($kernel->getBuildDir().'/Symfony/Config/Config.php');
+        }
     }
 
     public function testExtensionsExtendedInBuildMethods()
@@ -333,6 +349,11 @@ class ConfigBuilderCacheWarmerTest extends TestCase
         self::assertFileExists($kernel->getBuildDir().'/Symfony/Config/Security/FirewallConfig.php');
         self::assertFileExists($kernel->getBuildDir().'/Symfony/Config/Security/FirewallConfig/FormLoginConfig.php');
         self::assertFileExists($kernel->getBuildDir().'/Symfony/Config/Security/FirewallConfig/TokenConfig.php');
+
+        if (interface_exists(ConfigClassAwareBuilderGeneratorInterface::class)) {
+            self::assertFileExists($kernel->getBuildDir().'/Symfony/Config/FrameworkTrait.php');
+            self::assertFileExists($kernel->getBuildDir().'/Symfony/Config/Config.php');
+        }
     }
 }
 

@@ -14,6 +14,7 @@ class NodeInitialValuesConfig implements \Symfony\Component\Config\Builder\Confi
 {
     private $someCleverName;
     private $messenger;
+    private $configOutput = [];
     private $_usedProperties = [];
 
     public function someCleverName(array $value = []): \Symfony\Config\NodeInitialValues\SomeCleverNameConfig
@@ -38,6 +39,26 @@ class NodeInitialValuesConfig implements \Symfony\Component\Config\Builder\Confi
         }
 
         return $this->messenger;
+    }
+
+    public function configure(
+        /** @var array{
+         *     some_clever_name?: array{
+         *         first?: string|int|float|bool,
+         *         second?: string|int|float|bool,
+         *         third?: string|int|float|bool,
+         *     },
+         *     messenger?: array{
+         *         transports?: array<string, array{
+         *             dsn?: string|int|float|bool, // The DSN to use. This is a required option. The info is used to describe the DSN, it can be multi-line.
+         *             serializer?: string|int|float|bool, // Default: null
+         *             options?: array<mixed>,
+         *         }>,
+         *     },
+         * } $config */
+        array $config = []): void
+    {
+        $this->configOutput = $config;
     }
 
     public function getExtensionAlias(): string
@@ -66,6 +87,10 @@ class NodeInitialValuesConfig implements \Symfony\Component\Config\Builder\Confi
 
     public function toArray(): array
     {
+        if ($this->configOutput) {
+            return $this->configOutput;
+        }
+
         $output = [];
         if (isset($this->_usedProperties['someCleverName'])) {
             $output['some_clever_name'] = $this->someCleverName->toArray();

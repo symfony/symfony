@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Config\Builder;
 
+use Symfony\Bundle\FrameworkBundle\DependencyInjection\Configuration;
 use Symfony\Component\Config\Definition\ArrayNode;
 use Symfony\Component\Config\Definition\BaseNode;
 use Symfony\Component\Config\Definition\BooleanNode;
@@ -25,13 +26,17 @@ use Symfony\Component\Config\Definition\PrototypedArrayNode;
 use Symfony\Component\Config\Definition\ScalarNode;
 use Symfony\Component\Config\Definition\VariableNode;
 use Symfony\Component\Config\Loader\ParamConfigurator;
+use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
+use Symfony\Component\DependencyInjection\Resource\ImportsTrait;
+use Symfony\Component\DependencyInjection\Resource\ParametersTrait;
+use Symfony\Component\DependencyInjection\Resource\ServicesTrait;
 
 /**
  * Generate ConfigBuilders to help create valid config.
  *
  * @author Tobias Nyholm <tobias.nyholm@gmail.com>
  */
-class ConfigBuilderGenerator implements ConfigBuilderGeneratorInterface
+class ConfigBuilderGenerator implements ConfigBuilderGeneratorInterface, ConfigClassAwareBuilderGeneratorInterface
 {
     /**
      * @var ClassBuilder[]
@@ -55,9 +60,9 @@ class ConfigBuilderGenerator implements ConfigBuilderGeneratorInterface
 
         $path = $this->getFullPath($rootClass);
         if (!is_file($path)) {
-            // Generate the class if the file not exists
-            $this->classes[] = $rootClass;
+            // Generate the class if the file doesn't exist
             $this->buildNode($rootNode, $rootClass, $this->getSubNamespace($rootClass));
+            $this->buildConfigureOption($rootNode, $rootClass);
             $rootClass->addImplements(ConfigBuilderInterface::class);
             $rootClass->addMethod('getExtensionAlias', '
 public function NAME(): string
@@ -65,6 +70,7 @@ public function NAME(): string
     return \'ALIAS\';
 }', ['ALIAS' => $rootNode->getPath()]);
 
+            $this->writeRootClass($rootClass);
             $this->writeClasses();
         }
 
@@ -76,6 +82,68 @@ public function NAME(): string
         };
     }
 
+    /**
+     * @param array<Configuration> $configurations
+     */
+    public function buildConfigClassAndTraits(array $configurations): \Closure
+    {
+        $traitsClosure = (new ConfigTraitsGenerator($this->outputDir))->build($configurations);
+
+        $class = new ClassBuilder('Symfony\\Config', '');
+        $class->addTrait(ImportsTrait::class);
+        $class->addTrait(ParametersTrait::class);
+        $class->addTrait(ServicesTrait::class);
+        $class->addUse(ContainerConfigurator::class);
+
+        $class->addProperty('builders', 'array');
+
+        foreach ($configurations as $alias => $configuration) {
+            $class->addUse('Symfony\\Config\\'.ucfirst($this->camelCase($alias)).'Config');
+            $class->addTrait('Symfony\\Config\\'.ucfirst($this->camelCase($alias)).'Trait');
+        }
+
+        $configurationKeys = array_keys($configurations);
+
+        foreach ($configurationKeys as $configurationKey) {
+            $camelCaseKey = $this->camelCase($configurationKey);
+
+            $class->addProperty(sprintf('%sConfig', $camelCaseKey), sprintf('%sConfig', ucfirst($camelCaseKey)));
+        }
+
+        $class->addMethod('__construct', <<<'PHP'
+            public function __construct(public readonly ?string $env)
+            {
+            CONFIGS
+                $this->builders = [BUILDERS];
+            }
+            PHP, [
+                'BUILDERS' => implode(", ", array_map(fn ($alias) => sprintf('$this->%sConfig', $this->camelCase($alias)), $configurationKeys)),
+                'CONFIGS' => implode("\n", array_map(fn ($alias) => sprintf('    $this->%sConfig = new %sConfig();', $this->camelCase($alias), ucfirst($this->camelCase($alias))), $configurationKeys)),
+        ]);
+
+        $class->addMethod('getBuilders', <<<'PHP'
+            public function getBuilders(): array
+            {
+                return $this->builders;
+            }
+            PHP);
+
+        $path = $this->getFullPath($class);
+        file_put_contents($path, $class->build());
+
+        return function () use ($path, $traitsClosure) {
+            $traitsClosure();
+            return require_once $path;
+        };
+    }
+
+    private function camelCase(string $input): string
+    {
+        $output = lcfirst(str_replace(' ', '', ucwords(str_replace('_', ' ', $input))));
+
+        return preg_replace('#\W#', '', $output);
+    }
+
     private function getFullPath(ClassBuilder $class): string
     {
         $directory = $this->outputDir.\DIRECTORY_SEPARATOR.$class->getDirectory();
@@ -84,6 +152,18 @@ public function NAME(): string
         }
 
         return $directory.\DIRECTORY_SEPARATOR.$class->getFilename();
+    }
+
+    private function writeRootClass(ClassBuilder $rootClass): void
+    {
+        $this->buildConstructor($rootClass);
+        $this->buildToArray($rootClass, true);
+        if ($rootClass->getProperties()) {
+            $rootClass->addProperty('_usedProperties', null, '[]');
+        }
+        $this->buildSetExtraKey($rootClass);
+
+        file_put_contents($this->getFullPath($rootClass), $rootClass->build());
     }
 
     private function writeClasses(): void
@@ -100,6 +180,24 @@ public function NAME(): string
         }
 
         $this->classes = [];
+    }
+
+    private function buildConfigureOption(ArrayNode $node, ClassBuilder $class): void
+    {
+        $class->addProperty('configOutput', defaultValue: '[]');
+
+        $body = '
+public function NAME(
+    /** @var PHPDOC_ARRAY_SHAPE $config */
+    PARAM_TYPE $config = []): void
+{
+    $this->configOutput = $config;
+}';
+
+        $class->addMethod('configure', $body, [
+            'PARAM_TYPE' => 'array',
+            'PHPDOC_ARRAY_SHAPE' => str_replace("\n", "\n    ", ArrayShapeGenerator::generate($node)),
+        ]);
     }
 
     private function buildNode(NodeInterface $node, ClassBuilder $class, string $namespace): void
@@ -483,10 +581,24 @@ public function NAME($value): static
         return $name;
     }
 
-    private function buildToArray(ClassBuilder $class): void
+    private function buildToArray(ClassBuilder $class, bool $rootClass = false): void
     {
-        $body = '$output = [];';
+        $body = '';
+        if ($rootClass) {
+            $body = 'if ($this->configOutput) {
+        return $this->configOutput;
+    }
+
+    ';
+        }
+
+        $body .= '$output = [];';
+
         foreach ($class->getProperties() as $p) {
+            if ('configOutput' === $p->getName()) {
+                continue;
+            }
+
             $code = '$this->PROPERTY';
             if (null !== $p->getType()) {
                 if ($p->isArray()) {
@@ -523,6 +635,10 @@ public function NAME(): array
     {
         $body = '';
         foreach ($class->getProperties() as $p) {
+            if ('configOutput' === $p->getName()) {
+                continue;
+            }
+
             $code = '$value[\'ORG_NAME\']';
             if (null !== $p->getType()) {
                 if ($p->isArray()) {

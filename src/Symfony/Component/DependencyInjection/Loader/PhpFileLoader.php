@@ -14,6 +14,7 @@ namespace Symfony\Component\DependencyInjection\Loader;
 use Symfony\Component\Config\Builder\ConfigBuilderGenerator;
 use Symfony\Component\Config\Builder\ConfigBuilderGeneratorInterface;
 use Symfony\Component\Config\Builder\ConfigBuilderInterface;
+use Symfony\Component\Config\Builder\ConfigClassAwareBuilderGeneratorInterface;
 use Symfony\Component\Config\FileLocatorInterface;
 use Symfony\Component\DependencyInjection\Attribute\When;
 use Symfony\Component\DependencyInjection\Attribute\WhenNot;
@@ -24,6 +25,7 @@ use Symfony\Component\DependencyInjection\Exception\LogicException;
 use Symfony\Component\DependencyInjection\Extension\ConfigurationExtensionInterface;
 use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
+use Symfony\Config\Config;
 
 /**
  * PhpFileLoader loads service definitions from a PHP file.
@@ -36,6 +38,7 @@ use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigura
 class PhpFileLoader extends FileLoader
 {
     protected bool $autoRegisterAliasesForSinglyImplementedInterfaces = false;
+    private array $configurations = [];
 
     public function __construct(
         ContainerBuilder $container,
@@ -57,16 +60,38 @@ class PhpFileLoader extends FileLoader
         $this->setCurrentDir(\dirname($path));
         $this->container->fileExists($path);
 
+        if ($this->generator instanceof ConfigClassAwareBuilderGeneratorInterface) {
+            foreach ($this->container->getExtensions() as $extension) {
+                if (!$extension instanceof ConfigurationExtensionInterface) {
+                    continue;
+                }
+
+                $this->configurations[$extension->getAlias()] ??= $extension->getConfiguration([], $this->container);
+
+                $this->generator->build($this->configurations[$extension->getAlias()])();
+            }
+
+            if (!class_exists(Config::class)) {
+                $this->generator->buildConfigClassAndTraits($this->configurations)();
+            }
+        }
+
         // the closure forbids access to the private scope in the included file
-        $load = \Closure::bind(function ($path, $env) use ($container, $loader, $resource, $type) {
+        $config = class_exists(Config::class) ? new Config($this->env) : null;
+        $load = \Closure::bind(function ($path, $env) use ($container, $loader, $resource, $type, $config) {
             return include $path;
         }, $this, ProtectedPhpFileLoader::class);
 
         try {
             $callback = $load($path, $this->env);
+            $containerConfigurator = new ContainerConfigurator($this->container, $this, $this->instanceof, $path, $resource, $this->env);
 
             if (\is_object($callback) && \is_callable($callback)) {
-                $this->executeCallback($callback, new ContainerConfigurator($this->container, $this, $this->instanceof, $path, $resource, $this->env), $path);
+                $this->executeCallback($callback, $containerConfigurator, $path);
+            }
+
+            if (null !== $config && $this->generator) {
+                $this->processConfigClass($config, $containerConfigurator);
             }
         } finally {
             $this->instanceof = [];
@@ -180,6 +205,37 @@ class PhpFileLoader extends FileLoader
         $this->loadExtensionConfigs();
     }
 
+    private function processConfigClass(Config $config, ContainerConfigurator $containerConfigurator): void
+    {
+        foreach ($config->getBuilders() as $configBuilder) {
+            $this->configBuilder($configBuilder::class);
+
+            $this->loadExtensionConfig($configBuilder->getExtensionAlias(), ContainerConfigurator::processValue($configBuilder->toArray()));
+        }
+
+        foreach ($config->getImports() as $import) {
+            if (\is_array($import)) {
+                $containerConfigurator->import($import['resource'], $import['type'] ?? null, $import['ignoreErrors'] ?? false);
+            } else {
+                $containerConfigurator->import($import);
+            }
+        }
+
+        $parametersConfigurator = $containerConfigurator->parameters();
+        foreach ($config->getParameters() as $key => $value) {
+            $parametersConfigurator->set($key, $value);
+        }
+
+        $servicesConfigurator = $containerConfigurator->services();
+        foreach ($config->getServices() as $id => $class) {
+            if (\is_array($class)) {
+                $servicesConfigurator->set($class['id'], $class['class'] ?? null);
+            } else {
+                $servicesConfigurator->set($id, $class);
+            }
+        }
+    }
+
     /**
      * @param string $namespace FQCN string for a class implementing ConfigBuilderInterface
      */
@@ -220,7 +276,7 @@ class PhpFileLoader extends FileLoader
             throw new \LogicException(\sprintf('You cannot use the config builder for "%s" because the extension does not implement "%s".', $namespace, ConfigurationExtensionInterface::class));
         }
 
-        $configuration = $extension->getConfiguration([], $this->container);
+        $configuration = $this->configurations[$alias] ?? $extension->getConfiguration([], $this->container);
         $loader = $this->generator->build($configuration);
 
         return $loader();

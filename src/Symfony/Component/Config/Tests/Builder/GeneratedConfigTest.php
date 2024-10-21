@@ -17,6 +17,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\Builder\ClassBuilder;
 use Symfony\Component\Config\Builder\ConfigBuilderGenerator;
 use Symfony\Component\Config\Builder\ConfigBuilderInterface;
+use Symfony\Component\Config\Builder\ConfigTraitsGenerator;
 use Symfony\Component\Config\Builder\Method;
 use Symfony\Component\Config\Builder\Property;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
@@ -35,6 +36,7 @@ use Symfony\Config\AddToListConfig;
  */
 #[CoversClass(ClassBuilder::class)]
 #[CoversClass(ConfigBuilderGenerator::class)]
+#[CoversClass(ConfigTraitsGenerator::class)]
 #[CoversClass(Method::class)]
 #[CoversClass(Property::class)]
 class GeneratedConfigTest extends TestCase
@@ -78,7 +80,7 @@ class GeneratedConfigTest extends TestCase
     }
 
     #[DataProvider('fixtureNames')]
-    public function testConfig(string $name, string $alias)
+    public function testConfigClass(string $name, string $alias)
     {
         $basePath = __DIR__.'/Fixtures/';
         $callback = include $basePath.$name.'.config.php';
@@ -101,7 +103,20 @@ class GeneratedConfigTest extends TestCase
         if (class_exists(AbstractConfigurator::class)) {
             $output = AbstractConfigurator::processValue($output);
         }
+
         $this->assertSame($expectedOutput, $output);
+    }
+
+    #[DataProvider('fixtureNames')]
+    public function testConfigClassAndTraits(string $name, string $alias)
+    {
+        $basePath = __DIR__.'/Fixtures/';
+        $expectedOutput = $basePath.$name.'.config_function_output.php';
+
+        $this->generateConfigClassBuilder($alias, 'Symfony\\Component\\Config\\Tests\\Builder\\Fixtures\\'.$name, $outputDir);
+
+        file_put_contents($expectedOutput, file_get_contents($outputDir.'/Symfony/Config/Config.php'));
+        $this->assertFileEquals($expectedOutput, $outputDir.'/Symfony/Config/Config.php');
     }
 
     /**
@@ -179,6 +194,18 @@ class GeneratedConfigTest extends TestCase
         $loader = (new ConfigBuilderGenerator($outputDir))->build(new $configurationClass());
 
         return $loader();
+    }
+
+    private function generateConfigClassBuilder(string $alias, string $configurationClass, ?string &$outputDir = null)
+    {
+        $outputDir = tempnam(sys_get_temp_dir(), 'sf_config_builder_');
+        unlink($outputDir);
+        mkdir($outputDir);
+        $this->tempDir[] = $outputDir;
+
+        $configurationClass = new $configurationClass();
+
+        (new ConfigBuilderGenerator($outputDir))->buildConfigClassAndTraits([$alias => $configurationClass]);
     }
 
     private function assertDirectorySame($expected, $current)

@@ -13,6 +13,7 @@ class PlaceholdersConfig implements \Symfony\Component\Config\Builder\ConfigBuil
     private $enabled;
     private $favoriteFloat;
     private $goodIntegers;
+    private $configOutput = [];
     private $_usedProperties = [];
 
     /**
@@ -54,6 +55,17 @@ class PlaceholdersConfig implements \Symfony\Component\Config\Builder\ConfigBuil
         return $this;
     }
 
+    public function configure(
+        /** @var array{
+         *     enabled?: bool, // Default: false
+         *     favorite_float?: float,
+         *     good_integers?: array<int<min, max>>,
+         * } $config */
+        array $config = []): void
+    {
+        $this->configOutput = $config;
+    }
+
     public function getExtensionAlias(): string
     {
         return 'placeholders';
@@ -86,6 +98,10 @@ class PlaceholdersConfig implements \Symfony\Component\Config\Builder\ConfigBuil
 
     public function toArray(): array
     {
+        if ($this->configOutput) {
+            return $this->configOutput;
+        }
+
         $output = [];
         if (isset($this->_usedProperties['enabled'])) {
             $output['enabled'] = $this->enabled;

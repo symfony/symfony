@@ -30,4 +30,21 @@ class RoleHierarchyTest extends TestCase
         $this->assertEquals(['ROLE_SUPER_ADMIN', 'ROLE_ADMIN', 'ROLE_FOO', 'ROLE_USER'], $role->getReachableRoleNames(['ROLE_SUPER_ADMIN']));
         $this->assertEquals(['ROLE_SUPER_ADMIN', 'ROLE_ADMIN', 'ROLE_FOO', 'ROLE_USER'], $role->getReachableRoleNames(['ROLE_SUPER_ADMIN', 'ROLE_SUPER_ADMIN']));
     }
+
+    public function testGetEncompassingRoleNames()
+    {
+        $role = new RoleHierarchy([
+            'ROLE_ADMIN' => ['ROLE_USER'],
+            'ROLE_SUPER_ADMIN' => ['ROLE_ADMIN', 'ROLE_FOO'],
+            'ROLE_USER' => ['ROLE_BAR'],
+        ]);
+
+        $this->assertEquals(['ROLE_SUPER_ADMIN'], $role->getEncompassingRoleNames(['ROLE_SUPER_ADMIN']));
+        $this->assertEquals(['ROLE_ADMIN', 'ROLE_SUPER_ADMIN'], $role->getEncompassingRoleNames(['ROLE_ADMIN']));
+        $this->assertEquals(['ROLE_USER', 'ROLE_ADMIN', 'ROLE_SUPER_ADMIN'], $role->getEncompassingRoleNames(['ROLE_USER']));
+        $this->assertEquals(['ROLE_BAR', 'ROLE_ADMIN', 'ROLE_SUPER_ADMIN', 'ROLE_USER'], $role->getEncompassingRoleNames(['ROLE_BAR']));
+        $this->assertEquals(['ROLE_SUPER_ADMIN'], $role->getEncompassingRoleNames(['ROLE_SUPER_ADMIN', 'ROLE_SUPER_ADMIN']));
+        $this->assertEquals(['ROLE_SUPER_ADMIN', 'ROLE_USER', 'ROLE_ADMIN'], $role->getEncompassingRoleNames(['ROLE_SUPER_ADMIN', 'ROLE_USER']));
+        $this->assertEquals(['ROLE_BAR', 'ROLE_FOO', 'ROLE_ADMIN', 'ROLE_SUPER_ADMIN', 'ROLE_USER'], $role->getEncompassingRoleNames(['ROLE_BAR', 'ROLE_FOO']));
+    }
 }

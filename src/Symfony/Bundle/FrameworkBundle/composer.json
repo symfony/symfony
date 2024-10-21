@@ -42,6 +42,7 @@
         "symfony/console": "^6.4|^7.0",
         "symfony/clock": "^6.4|^7.0",
         "symfony/css-selector": "^6.4|^7.0",
+        "symfony/decorator": "^7.2",
         "symfony/dom-crawler": "^6.4|^7.0",
         "symfony/dotenv": "^6.4|^7.0",
         "symfony/polyfill-intl-icu": "~1.0",

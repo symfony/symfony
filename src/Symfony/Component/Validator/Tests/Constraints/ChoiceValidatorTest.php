@@ -34,6 +34,18 @@ class ChoiceValidatorTest extends ConstraintValidatorTestCase
         return ['foo', 'bar'];
     }
 
+    public static function staticCallbackInvalid()
+    {
+        return null;
+    }
+
+    public static function staticCallbackIterable()
+    {
+        yield 1;
+        yield 2;
+        yield 3;
+    }
+
     public function objectMethodCallback()
     {
         return ['foo', 'bar'];
@@ -183,6 +195,30 @@ class ChoiceValidatorTest extends ConstraintValidatorTestCase
             ->setParameter('{{ choices }}', '"foo", "bar"')
             ->setCode(Choice::NO_SUCH_CHOICE_ERROR)
             ->assertRaised();
+    }
+
+    public function testInvalidChoiceCallbackContextMethod()
+    {
+        $this->expectException(ConstraintDefinitionException::class);
+        $this->expectExceptionMessage('The Choice constraint expects the callback to return an iterable value, got null.');
+        // search $this for "staticCallbackIterable"
+        $this->setObject($this);
+
+        $constraint = new Choice(['callback' => 'staticCallbackInvalid']);
+
+        $this->validator->validate('bar', $constraint);
+    }
+
+    public function testValidChoiceCallbackContextMethodIterable()
+    {
+        // search $this for "staticCallbackIterable"
+        $this->setObject($this);
+
+        $constraint = new Choice(['callback' => 'staticCallbackIterable']);
+
+        $this->validator->validate(1, $constraint);
+
+        $this->assertNoViolation();
     }
 
     public static function provideConstraintsWithMessage(): iterable

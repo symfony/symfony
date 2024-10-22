@@ -27,6 +27,7 @@
     "require-dev": {
         "symfony/cache": "^6.4|^7.0",
         "symfony/config": "^6.4|^7.0",
+        "symfony/decorator": "^7.2",
         "symfony/dependency-injection": "^6.4|^7.0",
         "symfony/doctrine-messenger": "^6.4|^7.0",
         "symfony/expression-language": "^6.4|^7.0",

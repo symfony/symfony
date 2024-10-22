@@ -1,0 +1,34 @@
+{
+    "name": "symfony/decorator",
+    "type": "library",
+    "description": "Decorate the functionality of other functions",
+    "keywords": ["decorator", "wrapper"],
+    "homepage": "https://symfony.com",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Yonel Ceruto",
+            "email": "open@yceruto.dev"
+        },
+        {
+            "name": "Symfony Community",
+            "homepage": "https://symfony.com/contributors"
+        }
+    ],
+    "require": {
+        "php": ">=8.2",
+        "psr/container": "^1.1|^2.0",
+        "symfony/service-contracts": "^2.5|^3"
+    },
+    "require-dev": {
+        "psr/log": "^1|^2|^3",
+        "symfony/dependency-injection": "^7.2"
+    },
+    "autoload": {
+        "psr-4": { "Symfony\\Component\\Decorator\\": "" },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
+    },
+    "minimum-stability": "dev"
+}

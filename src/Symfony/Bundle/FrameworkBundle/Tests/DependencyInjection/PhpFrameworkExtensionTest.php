@@ -128,6 +128,53 @@ class PhpFrameworkExtensionTest extends FrameworkExtensionTestCase
         });
     }
 
+    /**
+     * @dataProvider provideWorkflowValidationCustomTests
+     */
+    public function testWorkflowValidationCustomBroken(string $class, string $message)
+    {
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessage($message);
+        $this->createContainerFromClosure(function ($container) use ($class) {
+            $container->loadFromExtension('framework', [
+                'annotations' => false,
+                'http_method_override' => false,
+                'handle_all_throwables' => true,
+                'php_errors' => ['log' => true],
+                'workflows' => [
+                    'article' => [
+                        'type' => 'state_machine',
+                        'supports' => [
+                            __CLASS__,
+                        ],
+                        'places' => [
+                            'a',
+                            'b',
+                        ],
+                        'transitions' => [
+                            'a_to_b' => [
+                                'from' => ['a'],
+                                'to' => ['b'],
+                            ],
+                        ],
+                        'definition_validators' => [
+                            $class,
+                        ],
+                    ],
+                ],
+            ]);
+        });
+    }
+
+    public static function provideWorkflowValidationCustomTests()
+    {
+        yield ['classDoesNotExist', 'Invalid configuration for path "framework.workflows.workflows.article.definition_validators.0": The validation class "classDoesNotExist" does not exist.'];
+
+        yield [\DateTime::class, 'Invalid configuration for path "framework.workflows.workflows.article.definition_validators.0": The validation class "DateTime" is not an instance of Symfony\Component\Workflow\Validator\DefinitionValidatorInterface.'];
+
+        yield [WorkflowValidatorWithConstructor::class, 'Invalid configuration for path "framework.workflows.workflows.article.definition_validators.0": The validation class "Symfony\\\\Bundle\\\\FrameworkBundle\\\\Tests\\\\DependencyInjection\\\\WorkflowValidatorWithConstructor" constructor must not have any arguments.'];
+    }
+
     public function testWorkflowDefaultMarkingStoreDefinition()
     {
         $container = $this->createContainerFromClosure(function ($container) {
@@ -264,5 +311,16 @@ class PhpFrameworkExtensionTest extends FrameworkExtensionTestCase
 
         $this->assertSame('first', $container->getDefinition('limiter.first')->getTag('rate_limiter')[0]['name']);
         $this->assertSame('second', $container->getDefinition('limiter.second')->getTag('rate_limiter')[0]['name']);
+    }
+}
+
+class WorkflowValidatorWithConstructor implements \Symfony\Component\Workflow\Validator\DefinitionValidatorInterface
+{
+    public function __construct(bool $enabled)
+    {
+    }
+
+    public function validate(\Symfony\Component\Workflow\Definition $definition, string $name): void
+    {
     }
 }

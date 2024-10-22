@@ -16,6 +16,7 @@ use Psr\Log\LoggerAwareInterface;
 use Symfony\Bridge\PhpUnit\ExpectUserDeprecationMessageTrait;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\FrameworkExtension;
 use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
+use Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\Fixtures\Workflow\Validator\DefinitionValidator;
 use Symfony\Bundle\FrameworkBundle\Tests\Fixtures\Messenger\DummyMessage;
 use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
 use Symfony\Bundle\FullStack;
@@ -295,6 +296,8 @@ abstract class FrameworkExtensionTestCase extends TestCase
 
     public function testWorkflows()
     {
+        DefinitionValidator::$called = false;
+
         $container = $this->createContainerFromFile('workflows');
 
         $this->assertTrue($container->hasDefinition('workflow.article'), 'Workflow is registered as a service');
@@ -318,6 +321,7 @@ abstract class FrameworkExtensionTestCase extends TestCase
         ], $tags['workflow'][0]['metadata'] ?? null);
 
         $this->assertTrue($container->hasDefinition('workflow.article.definition'), 'Workflow definition is registered as a service');
+        $this->assertTrue(DefinitionValidator::$called, 'DefinitionValidator is called');
 
         $workflowDefinition = $container->getDefinition('workflow.article.definition');
 

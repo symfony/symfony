@@ -55,19 +55,26 @@ class SendersLocatorTest extends TestCase
         $this->assertSame([], iterator_to_array($locator->getSenders(new Envelope(new SecondMessage()))));
     }
 
-    public function testItReturnsTheSenderBasedOnAsMessageAttribute()
+    /**
+     * @testWith ["\\Symfony\\Component\\Messenger\\Tests\\Fixtures\\DummyMessageWithAttribute", ["first_sender", "second_sender"]]
+     *           ["\\Symfony\\Component\\Messenger\\Tests\\Fixtures\\DummyMessageWithParentWithAttribute", ["third_sender", "first_sender", "second_sender"]]
+     *           ["\\Symfony\\Component\\Messenger\\Tests\\Fixtures\\DummyMessageWithInterfaceWithAttribute", ["first_sender", "third_sender", "second_sender"]]
+     */
+    public function testItReturnsTheSenderBasedOnAsMessageAttribute(string $messageClass, array $expectedSenders)
     {
         $firstSender = $this->createMock(SenderInterface::class);
         $secondSender = $this->createMock(SenderInterface::class);
+        $thirdSender = $this->createMock(SenderInterface::class);
         $otherSender = $this->createMock(SenderInterface::class);
         $sendersLocator = $this->createContainer([
             'first_sender' => $firstSender,
             'second_sender' => $secondSender,
+            'third_sender' => $thirdSender,
             'other_sender' => $otherSender,
         ]);
         $locator = new SendersLocator([], $sendersLocator);
 
-        $this->assertSame(['first_sender' => $firstSender, 'second_sender' => $secondSender], iterator_to_array($locator->getSenders(new Envelope(new DummyMessageWithAttribute('a')))));
+        $this->assertSame($expectedSenders, array_keys(iterator_to_array($locator->getSenders(new Envelope(new $messageClass('a'))))));
         $this->assertSame([], iterator_to_array($locator->getSenders(new Envelope(new SecondMessage()))));
     }
 

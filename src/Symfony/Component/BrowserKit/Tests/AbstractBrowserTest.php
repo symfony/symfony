@@ -15,6 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\BrowserKit\CookieJar;
 use Symfony\Component\BrowserKit\Exception\BadMethodCallException;
 use Symfony\Component\BrowserKit\Exception\InvalidArgumentException;
+use Symfony\Component\BrowserKit\Exception\LogicException;
 use Symfony\Component\BrowserKit\History;
 use Symfony\Component\BrowserKit\Request;
 use Symfony\Component\BrowserKit\Response;
@@ -888,5 +889,15 @@ class AbstractBrowserTest extends TestCase
         $this->expectExceptionMessage('The "request()" method must be called before "Symfony\\Component\\BrowserKit\\AbstractBrowser::getInternalRequest()".');
 
         $client->getInternalRequest();
+    }
+
+    public function testFollowRedirectWithoutRequest()
+    {
+        $browser = $this->getBrowser();
+
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('The request was not redirected.');
+
+        $browser->followRedirect();
     }
 }

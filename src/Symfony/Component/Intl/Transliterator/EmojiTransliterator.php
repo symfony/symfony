@@ -72,12 +72,12 @@ if (!class_exists(\Transliterator::class)) {
 
         public function getErrorCode(): int|false
         {
-            return $this->transliterator?->getErrorCode() ?? 0;
+            return isset($this->transliterator) ? $this->transliterator->getErrorCode() : 0;
         }
 
         public function getErrorMessage(): string|false
         {
-            return $this->transliterator?->getErrorMessage() ?? false;
+            return isset($this->transliterator) ? $this->transliterator->getErrorMessage() : false;
         }
 
         public static function listIDs(): array

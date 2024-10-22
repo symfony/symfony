@@ -198,3 +198,18 @@ class AutowireInlineAttributes3
     ) {
     }
 }
+
+class NestedAutowireInlineAttribute
+{
+    public function __construct(
+        #[AutowireInline(
+            AutowireInlineAttributesBar::class,
+            arguments: [
+                new AutowireInline(Foo::class),
+                'testString',
+            ],
+        )]
+        public AutowireInlineAttributesBar $inlined,
+    ) {
+    }
+}

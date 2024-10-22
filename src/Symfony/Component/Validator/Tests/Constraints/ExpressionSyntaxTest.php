@@ -54,15 +54,18 @@ class ExpressionSyntaxTest extends TestCase
         [$aConstraint] = $metadata->properties['a']->getConstraints();
         self::assertNull($aConstraint->service);
         self::assertNull($aConstraint->allowedVariables);
+        self::assertNull($aConstraint->allowedVariablesCallback);
 
         [$bConstraint] = $metadata->properties['b']->getConstraints();
         self::assertSame('my_service', $bConstraint->service);
         self::assertSame('myMessage', $bConstraint->message);
         self::assertSame(['Default', 'ExpressionSyntaxDummy'], $bConstraint->groups);
+        self::assertNull($bConstraint->allowedVariablesCallback);
 
         [$cConstraint] = $metadata->properties['c']->getConstraints();
         self::assertSame(['foo', 'bar'], $cConstraint->allowedVariables);
         self::assertSame(['my_group'], $cConstraint->groups);
+        self::assertNull($cConstraint->allowedVariablesCallback);
     }
 }
 

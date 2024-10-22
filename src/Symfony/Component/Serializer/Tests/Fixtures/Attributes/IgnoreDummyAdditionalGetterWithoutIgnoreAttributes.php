@@ -2,7 +2,7 @@
 
 namespace Symfony\Component\Serializer\Tests\Fixtures\Attributes;
 
-class IgnoreDummyAdditionalGetterWithoutIgnoreAnnotations
+class IgnoreDummyAdditionalGetterWithoutIgnoreAttributes
 {
     private $myValue;
 

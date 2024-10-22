@@ -1,0 +1,7 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2024-10-22T10:02:10Z
+
+> Anyway @xabbuh one more question do I understand it correctly that if one just uses autowiring and the framework.http_client config to create a client, then the loggers will be set by default and nothing has to be done? No need to call setLogger explicitly on the client right?
+
+I didn't check with a real application but as I read the code it should indeed work like this as long as you don't replace Symfony's `http_client.transport` service with a custom implementation.

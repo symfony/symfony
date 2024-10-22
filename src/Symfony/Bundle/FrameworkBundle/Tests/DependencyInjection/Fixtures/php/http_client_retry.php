@@ -22,6 +22,10 @@ $container->loadFromExtension('framework', [
                 'base_uri' => 'http://example.com',
                 'retry_failed' => ['multiplier' => 4],
             ],
+            'bar' => [
+                'base_uri' => ['http://a.example.com', 'http://b.example.com'],
+                'retry_failed' => ['max_retries' => 4],
+            ],
         ],
     ],
 ]);

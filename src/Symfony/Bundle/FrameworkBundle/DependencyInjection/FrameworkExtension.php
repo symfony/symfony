@@ -2558,12 +2558,12 @@ class FrameworkExtension extends Extension
             unset($scopeConfig['retry_failed']);
 
             if (null === $scope) {
-                $baseUri = $scopeConfig['base_uri'];
-                unset($scopeConfig['base_uri']);
+                $baseUri = \is_array($scopeConfig['base_uri']) ? $scopeConfig['base_uri'][0] : $scopeConfig['base_uri'];
+                $config = array_filter($scopeConfig, fn ($k) => 'base_uri' !== $k, \ARRAY_FILTER_USE_KEY);
 
                 $container->register($name, ScopingHttpClient::class)
                     ->setFactory([ScopingHttpClient::class, 'forBaseUri'])
-                    ->setArguments([new Reference('http_client.transport'), $baseUri, $scopeConfig])
+                    ->setArguments([new Reference('http_client.transport'), $baseUri, $config])
                     ->addTag('http_client.client')
                 ;
             } else {
@@ -2574,7 +2574,12 @@ class FrameworkExtension extends Extension
             }
 
             if ($this->readConfigEnabled('http_client.scoped_clients.'.$name.'.retry_failed', $container, $retryOptions)) {
-                $this->registerRetryableHttpClient($retryOptions, $name, $container);
+                $baseUris = [];
+                if (isset($scopeConfig['base_uri']) && \is_array($scopeConfig['base_uri'])) {
+                    $baseUris = $scopeConfig['base_uri'];
+                    unset($scopeConfig['base_uri']);
+                }
+                $this->registerRetryableHttpClient($retryOptions, $name, $container, $baseUris);
             }
 
             $container
@@ -2610,7 +2615,7 @@ class FrameworkExtension extends Extension
         }
     }
 
-    private function registerRetryableHttpClient(array $options, string $name, ContainerBuilder $container): void
+    private function registerRetryableHttpClient(array $options, string $name, ContainerBuilder $container, array $baseUris = []): void
     {
         if (null !== $options['retry_strategy']) {
             $retryStrategy = new Reference($options['retry_strategy']);
@@ -2640,7 +2645,8 @@ class FrameworkExtension extends Extension
             ->register($name.'.retryable', RetryableHttpClient::class)
             ->setDecoratedService($name, null, 10) // higher priority than TraceableHttpClient (5)
             ->setArguments([new Reference($name.'.retryable.inner'), $retryStrategy, $options['max_retries'], new Reference('logger')])
-            ->addTag('monolog.logger', ['channel' => 'http_client']);
+            ->addTag('monolog.logger', ['channel' => 'http_client'])
+            ->addMethodCall('withOptions', [['base_uri' => $baseUris]], true);
     }
 
     private function registerMailerConfiguration(array $config, ContainerBuilder $container, PhpFileLoader $loader, bool $webhookEnabled): void

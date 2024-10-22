@@ -26,6 +26,11 @@
             <framework:scoped-client name="foo" base-uri="http://example.com">
                 <framework:retry-failed multiplier="4"/>
             </framework:scoped-client>
+            <framework:scoped-client name="bar">
+                <framework:base-uri>http://a.example.com</framework:base-uri>
+                <framework:base-uri>http://a.example.com</framework:base-uri>
+                <framework:retry-failed max-retries="3"/>
+            </framework:scoped-client>
         </framework:http-client>
     </framework:config>
 </container>

@@ -265,7 +265,7 @@ final class TelegramTransportTest extends TransportTestCase
 
         $expectedBody = [
             'chat_id' => 'testChannel',
-            'text' => 'I contain special characters \_ \* \[ \] \( \) \~ \` \> \# \+ \- \= \| \{ \} \. \! \\\\ to send\.',
+            'text' => 'I contain special characters _ * [ ] ( ) \~ ` \> \# \+ \- \= \| \{ \} \. \! \ to send\.',
             'parse_mode' => 'MarkdownV2',
         ];
 

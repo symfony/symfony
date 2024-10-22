@@ -89,7 +89,20 @@ final class TelegramTransport extends AbstractTransport
 
         if (!isset($options['parse_mode']) || TelegramOptions::PARSE_MODE_MARKDOWN_V2 === $options['parse_mode']) {
             $options['parse_mode'] = TelegramOptions::PARSE_MODE_MARKDOWN_V2;
-            $text = preg_replace('/([_*\[\]()~`>#+\-=|{}.!\\\\])/', '\\\\$1', $text);
+            /*
+             * Just replace the obvious chars according to Telegram documentation.
+             * Do not try to find pairs or replace chars, that occur in pairs like
+             *  - *bold text*
+             *  - _italic text_
+             *  - __underlined text__
+             *  - various notations of images, f. ex. [title](url)
+             *  - `code samples`.
+             * 
+             * These formats should be taken care of when the message is constructed.
+             *
+             * @see https://core.telegram.org/bots/api#markdownv2-style
+             */
+            $text = preg_replace('/([.!#>+-=|{}~])/', '\\\\$1', $text);
         }
 
         if (isset($options['upload'])) {

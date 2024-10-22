@@ -1015,6 +1015,17 @@ class CheckTypeDeclarationsPassTest extends TestCase
         $this->addToAssertionCount(1);
     }
 
+    public function testStaticCallableClass()
+    {
+        $container = new ContainerBuilder();
+        $container->register('foo', StaticCallableClass::class)
+            ->setFactory([StaticCallableClass::class, 'staticMethodCall']);
+
+        (new CheckTypeDeclarationsPass())->process($container);
+
+        $this->addToAssertionCount(1);
+    }
+
     public function testIgnoreDefinitionFactoryArgument()
     {
         $container = new ContainerBuilder();
@@ -1047,6 +1058,13 @@ class CheckTypeDeclarationsPassTest extends TestCase
 class CallableClass
 {
     public function __call($name, $arguments)
+    {
+    }
+}
+
+class StaticCallableClass
+{
+    public static function __callStatic($name, $arguments)
     {
     }
 }

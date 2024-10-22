@@ -1,11 +1,4 @@
-<!-- START of Symfony Web Debug Toolbar -->
-<div id="sfMiniToolbar-{{ token }}" class="sf-minitoolbar" data-no-turbolink data-turbo="false">
-    <button type="button" title="Show Symfony toolbar" id="sfToolbarMiniToggler-{{ token }}" accesskey="D" aria-expanded="false" aria-controls="sfToolbarMainContent-{{ token }}">
-        {{ source('@WebProfiler/Icon/symfony.svg') }}
-    </button>
-</div>
 <div id="sfToolbarClearer-{{ token }}" class="sf-toolbar-clearer"></div>
-
 <div id="sfToolbarMainContent-{{ token }}" class="sf-toolbarreset notranslate clear-fix" data-no-turbolink data-turbo="false">
     {% for name, template in templates %}
         {% if block('toolbar', template) is defined %}
@@ -39,8 +32,8 @@
         </div>
     {% endif %}
 
-    <button class="hide-button" type="button" id="sfToolbarHideButton-{{ token }}" title="Close Toolbar" accesskey="D" aria-expanded="true" aria-controls="sfToolbarMainContent-{{ token }}">
-        {{ source('@WebProfiler/Icon/close.svg') }}
+    <button class="sf-toolbar-toggle-button" type="button" id="sfToolbarToggleButton-{{ token }}" title="Close Toolbar" accesskey="D" aria-expanded="true" aria-controls="sfToolbarMainContent-{{ token }}">
+        <i class="sf-toolbar-icon-opened">{{ source('@WebProfiler/Icon/close.svg') }}</i>
+        <i class="sf-toolbar-icon-closed">{{ source('@WebProfiler/Icon/symfony.svg') }}</i>
     </button>
 </div>
-<!-- END of Symfony Web Debug Toolbar -->

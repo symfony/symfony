@@ -46,43 +46,9 @@
     --sf-toolbar-green-900: #030404;
 }
 
-.sf-minitoolbar {
-    --sf-toolbar-gray-800: #262626;
-
-    background-color: var(--sf-toolbar-gray-800);
-    border-top-left-radius: 4px;
-    bottom: 0;
-    box-sizing: border-box;
-    display: none;
-    height: 36px;
-    padding: 6px;
-    position: fixed;
-    right: 0;
-    z-index: 99999;
-}
-
-.sf-minitoolbar button {
-    background-color: transparent;
-    padding: 0;
-    border: none;
-}
-.sf-minitoolbar svg,
-.sf-minitoolbar img {
-    --sf-toolbar-gray-200: #e5e5e5;
-
-    color: var(--sf-toolbar-gray-200);
-    max-height: 24px;
-    max-width: 24px;
-    display: inline;
-}
-
 .sf-toolbar-clearer {
     clear: both;
     height: 36px;
-}
-
-.sf-display-none {
-    display: none;
 }
 
 .sf-toolbarreset *:not(svg rect) {
@@ -127,27 +93,52 @@
     color: var(--sf-toolbar-gray-700);
 }
 
-.sf-toolbarreset .hide-button {
+.sf-toolbarreset .sf-toolbar-toggle-button {
     background: var(--sf-toolbar-gray-800);
     color: var(--sf-toolbar-gray-300);
     display: block;
     position: absolute;
-    top: 2px;
+    top: 1px;
     right: 0;
     width: 36px;
-    height: 34px;
+    height: 35px;
     cursor: pointer;
     text-align: center;
     border: none;
     margin: 0;
     padding: 0;
+    outline: none;
 }
-.sf-toolbarreset .hide-button:hover {
+.sf-toolbarreset .sf-toolbar-toggle-button:hover {
     background: var(--sf-toolbar-gray-700);
 }
-.sf-toolbarreset .hide-button svg {
-    max-height: 18px;
-    margin-top: 1px;
+
+.sf-toolbar.sf-toolbar-closed .sf-toolbarreset .sf-toolbar-block {
+    display: none;
+}
+.sf-toolbar.sf-toolbar-closed .sf-toolbarreset .sf-toolbar-toggle-button {
+    top: -37px;
+}
+
+.sf-toolbar .sf-toolbar-toggle-button i {
+    display: block;
+    height: 35px;
+    place-content: center;
+}
+.sf-toolbar.sf-toolbar-opened .sf-toolbar-toggle-button .sf-toolbar-icon-closed {
+    display: none;
+}
+.sf-toolbar.sf-toolbar-opened .sf-toolbar-toggle-button .sf-toolbar-icon-opened {
+    display: block;
+}
+.sf-toolbar.sf-toolbar-closed .sf-toolbar-toggle-button .sf-toolbar-icon-closed {
+    display: block;
+}
+.sf-toolbar.sf-toolbar-closed .sf-toolbar-toggle-button .sf-toolbar-icon-opened {
+    display: none;
+}
+.sf-toolbar.sf-toolbar-closed .sf-toolbarreset .sf-toolbar-toggle-button {
+    border-top: 2px solid var(--sf-toolbar-gray-800);
 }
 
 .sf-toolbar-block {

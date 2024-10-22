@@ -18,6 +18,8 @@ use Symfony\Component\DependencyInjection\Compiler\ResolveAutowireInlineAttribut
 use Symfony\Component\DependencyInjection\Compiler\ResolveChildDefinitionsPass;
 use Symfony\Component\DependencyInjection\Compiler\ResolveNamedArgumentsPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\Reference;
 
 require_once __DIR__.'/../Fixtures/includes/autowiring_classes.php';
 
@@ -65,5 +67,21 @@ class ResolveAutowireInlineAttributesPassTest extends TestCase
         (new ResolveAutowireInlineAttributesPass())->process($container);
 
         $this->assertSame(['$inlined'], array_keys($container->getDefinition('autowire_inline1')->getArguments()));
+    }
+
+    public function testNestedAttribute()
+    {
+        $container = new ContainerBuilder();
+
+        $container->register('nested_autowire_inline', NestedAutowireInlineAttribute::class)
+            ->setAutowired(true);
+
+        (new ResolveAutowireInlineAttributesPass())->process($container);
+
+        $this->assertEquals([new Reference('.autowire_inline.nested_autowire_inline.1')], $container->getDefinition('nested_autowire_inline')->getArguments());
+        $this->assertSame(AutowireInlineAttributesBar::class, $container->getDefinition('.autowire_inline.nested_autowire_inline.1')->getClass());
+
+        $this->assertEquals([new Reference('.autowire_inline.nested_autowire_inline.2'), 'testString'], $container->getDefinition('.autowire_inline.nested_autowire_inline.1')->getArguments());
+        $this->assertSame(Foo::class, $container->getDefinition('.autowire_inline.nested_autowire_inline.2')->getClass());
     }
 }

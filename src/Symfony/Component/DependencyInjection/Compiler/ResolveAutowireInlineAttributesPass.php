@@ -28,12 +28,18 @@ class ResolveAutowireInlineAttributesPass extends AbstractRecursivePass
 {
     protected bool $skipScalars = true;
 
+    private int $counter;
+
     protected function processValue(mixed $value, bool $isRoot = false): mixed
     {
         $value = parent::processValue($value, $isRoot);
 
         if (!$value instanceof Definition || !$value->isAutowired() || !$value->getClass() || $value->hasTag('container.ignore_attributes')) {
             return $value;
+        }
+
+        if ($isRoot) {
+            $this->counter = 0;
         }
 
         $isChildDefinition = $value instanceof ChildDefinition;
@@ -92,10 +98,14 @@ class ResolveAutowireInlineAttributesPass extends AbstractRecursivePass
             }
 
             if (\array_key_exists('$'.$parameter->name, $arguments) || (\array_key_exists($index, $arguments) && '' !== $arguments[$index])) {
+                $attribute = \array_key_exists('$'.$parameter->name, $arguments) ? $arguments['$'.$parameter->name] : $arguments[$index];
+                if (!$attribute instanceof AutowireInline) {
+                    continue;
+                }
+            } elseif (!$attribute = $parameter->getAttributes(AutowireInline::class, \ReflectionAttribute::IS_INSTANCEOF)[0] ?? null) {
                 continue;
-            }
-            if (!$attribute = $parameter->getAttributes(AutowireInline::class, \ReflectionAttribute::IS_INSTANCEOF)[0] ?? null) {
-                continue;
+            } else {
+                $attribute = $attribute->newInstance();
             }
 
             $type = ProxyHelper::exportType($parameter, true);
@@ -104,25 +114,18 @@ class ResolveAutowireInlineAttributesPass extends AbstractRecursivePass
                 continue;
             }
 
-            $attribute = $attribute->newInstance();
             $definition = $attribute->buildDefinition($attribute->value, $type, $parameter);
 
             $paramResolverContainer->setDefinition('.autowire_inline', $definition);
             (new ResolveParameterPlaceHoldersPass(false, false))->process($paramResolverContainer);
 
-            $id = '.autowire_inline.'.ContainerBuilder::hash([$this->currentId, $method->class ?? null, $method->name, (string) $parameter]);
+            $id = '.autowire_inline.'.$this->currentId.'.'.++$this->counter;
 
             $this->container->setDefinition($id, $definition);
             $arguments[$isChildDefinition ? '$'.$parameter->name : $index] = new Reference($id);
 
             if ($definition->isAutowired()) {
-                $currentId = $this->currentId;
-                try {
-                    $this->currentId = $id;
-                    $this->processValue($definition, true);
-                } finally {
-                    $this->currentId = $currentId;
-                }
+                $this->processValue($definition);
             }
         }
 

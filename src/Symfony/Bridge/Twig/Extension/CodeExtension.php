@@ -34,7 +34,7 @@ class CodeExtension extends AbstractExtension
     public function __construct($fileLinkFormat, $rootDir, $charset)
     {
         $this->fileLinkFormat = $fileLinkFormat ?: ini_get('xdebug.file_link_format') ?: get_cfg_var('xdebug.file_link_format');
-        $this->rootDir = str_replace('/', DIRECTORY_SEPARATOR, dirname($rootDir)).DIRECTORY_SEPARATOR;
+        $this->rootDir = str_replace('/', \DIRECTORY_SEPARATOR, \dirname($rootDir)).\DIRECTORY_SEPARATOR;
         $this->charset = $charset;
     }
 
@@ -43,17 +43,17 @@ class CodeExtension extends AbstractExtension
      */
     public function getFilters()
     {
-        return array(
-            new TwigFilter('abbr_class', array($this, 'abbrClass'), array('is_safe' => array('html'))),
-            new TwigFilter('abbr_method', array($this, 'abbrMethod'), array('is_safe' => array('html'))),
-            new TwigFilter('format_args', array($this, 'formatArgs'), array('is_safe' => array('html'))),
-            new TwigFilter('format_args_as_text', array($this, 'formatArgsAsText')),
-            new TwigFilter('file_excerpt', array($this, 'fileExcerpt'), array('is_safe' => array('html'))),
-            new TwigFilter('format_file', array($this, 'formatFile'), array('is_safe' => array('html'))),
-            new TwigFilter('format_file_from_text', array($this, 'formatFileFromText'), array('is_safe' => array('html'))),
-            new TwigFilter('format_log_message', array($this, 'formatLogMessage'), array('is_safe' => array('html'))),
-            new TwigFilter('file_link', array($this, 'getFileLink')),
-        );
+        return [
+            new TwigFilter('abbr_class', [$this, 'abbrClass'], ['is_safe' => ['html'], 'pre_escape' => 'html']),
+            new TwigFilter('abbr_method', [$this, 'abbrMethod'], ['is_safe' => ['html'], 'pre_escape' => 'html']),
+            new TwigFilter('format_args', [$this, 'formatArgs'], ['is_safe' => ['html']]),
+            new TwigFilter('format_args_as_text', [$this, 'formatArgsAsText']),
+            new TwigFilter('file_excerpt', [$this, 'fileExcerpt'], ['is_safe' => ['html']]),
+            new TwigFilter('format_file', [$this, 'formatFile'], ['is_safe' => ['html']]),
+            new TwigFilter('format_file_from_text', [$this, 'formatFileFromText'], ['is_safe' => ['html']]),
+            new TwigFilter('format_log_message', [$this, 'formatLogMessage'], ['is_safe' => ['html']]),
+            new TwigFilter('file_link', [$this, 'getFileLink']),
+        ];
     }
 
     public function abbrClass($class)
@@ -87,25 +87,24 @@ class CodeExtension extends AbstractExtension
      */
     public function formatArgs($args)
     {
-        $result = array();
+        $result = [];
         foreach ($args as $key => $item) {
             if ('object' === $item[0]) {
                 $parts = explode('\\', $item[1]);
                 $short = array_pop($parts);
                 $formattedValue = sprintf('<em>object</em>(<abbr title="%s">%s</abbr>)', $item[1], $short);
             } elseif ('array' === $item[0]) {
-                $formattedValue = sprintf('<em>array</em>(%s)', is_array($item[1]) ? $this->formatArgs($item[1]) : $item[1]);
+                $formattedValue = sprintf('<em>array</em>(%s)', \is_array($item[1]) ? $this->formatArgs($item[1]) : htmlspecialchars(var_export($item[1], true), \ENT_COMPAT | \ENT_SUBSTITUTE, $this->charset));
             } elseif ('null' === $item[0]) {
                 $formattedValue = '<em>null</em>';
             } elseif ('boolean' === $item[0]) {
-                $formattedValue = '<em>'.strtolower(var_export($item[1], true)).'</em>';
+                $formattedValue = '<em>'.strtolower(htmlspecialchars(var_export($item[1], true), \ENT_COMPAT | \ENT_SUBSTITUTE, $this->charset)).'</em>';
             } elseif ('resource' === $item[0]) {
                 $formattedValue = '<em>resource</em>';
             } else {
-                $formattedValue = str_replace("\n", '', htmlspecialchars(var_export($item[1], true), ENT_COMPAT | ENT_SUBSTITUTE, $this->charset));
+                $formattedValue = str_replace("\n", '', htmlspecialchars(var_export($item[1], true), \ENT_COMPAT | \ENT_SUBSTITUTE, $this->charset));
             }
-
-            $result[] = is_int($key) ? $formattedValue : sprintf("'%s' => %s", $key, $formattedValue);
+            $result[] = \is_int($key) ? $formattedValue : sprintf("'%s' => %s", htmlspecialchars($key, \ENT_COMPAT | \ENT_SUBSTITUTE, $this->charset), $formattedValue);
         }
 
         return implode(', ', $result);
@@ -134,9 +133,9 @@ class CodeExtension extends AbstractExtension
      */
     public function fileExcerpt($file, $line, $srcContext = 3)
     {
-        if (is_readable($file)) {
+        if (is_file($file) && is_readable($file)) {
             // highlight_file could throw warnings
-            // see https://bugs.php.net/bug.php?id=25725
+            // see https://bugs.php.net/25725
             $code = @highlight_file($file, true);
             // remove main code/span tags
             $code = preg_replace('#^<code.*?>\s*<span.*?>(.*)</span>\s*</code>#s', '\\1', $code);
@@ -146,17 +145,19 @@ class CodeExtension extends AbstractExtension
             }, $code);
             $content = explode('<br />', $code);
 
-            $lines = array();
+            $lines = [];
             if (0 > $srcContext) {
-                $srcContext = count($content);
+                $srcContext = \count($content);
             }
 
-            for ($i = max($line - $srcContext, 1), $max = min($line + $srcContext, count($content)); $i <= $max; ++$i) {
+            for ($i = max($line - $srcContext, 1), $max = min($line + $srcContext, \count($content)); $i <= $max; ++$i) {
                 $lines[] = '<li'.($i == $line ? ' class="selected"' : '').'><a class="anchor" name="line'.$i.'"></a><code>'.self::fixCodeMarkup($content[$i - 1]).'</code></li>';
             }
 
             return '<ol start="'.max($line - $srcContext, 1).'">'.implode("\n", $lines).'</ol>';
         }
+
+        return null;
     }
 
     /**
@@ -173,21 +174,36 @@ class CodeExtension extends AbstractExtension
         $file = trim($file);
 
         if (null === $text) {
-            $text = str_replace('/', DIRECTORY_SEPARATOR, $file);
-            if (0 === strpos($text, $this->rootDir)) {
-                $text = substr($text, strlen($this->rootDir));
-                $text = explode(DIRECTORY_SEPARATOR, $text, 2);
-                $text = sprintf('<abbr title="%s%2$s">%s</abbr>%s', $this->rootDir, $text[0], isset($text[1]) ? DIRECTORY_SEPARATOR.$text[1] : '');
+            if (null !== $rel = $this->getFileRelative($file)) {
+                $rel = explode('/', htmlspecialchars($rel, \ENT_COMPAT | \ENT_SUBSTITUTE, $this->charset), 2);
+                $text = sprintf('<abbr title="%s%2$s">%s</abbr>%s', htmlspecialchars($this->projectDir, \ENT_COMPAT | \ENT_SUBSTITUTE, $this->charset), $rel[0], '/'.($rel[1] ?? ''));
+            } else {
+                $text = htmlspecialchars($file, \ENT_COMPAT | \ENT_SUBSTITUTE, $this->charset);
             }
+        } else {
+            $text = htmlspecialchars($text, \ENT_COMPAT | \ENT_SUBSTITUTE, $this->charset);
         }
 
-        $text = "$text at line $line";
+        if (0 < $line) {
+            $text .= ' at line '.$line;
+        }
 
         if (false !== $link = $this->getFileLink($file, $line)) {
-            return sprintf('<a href="%s" title="Click to open this file" class="file_link">%s</a>', htmlspecialchars($link, ENT_COMPAT | ENT_SUBSTITUTE, $this->charset), $text);
+            return sprintf('<a href="%s" title="Click to open this file" class="file_link">%s</a>', htmlspecialchars($link, \ENT_COMPAT | \ENT_SUBSTITUTE, $this->charset), $text);
         }
 
         return $text;
+    }
+
+    public function getFileRelative(string $file)
+    {
+        $file = str_replace('\\', '/', $file);
+
+        if (null !== $this->projectDir && str_starts_with($file, $this->projectDir)) {
+            return ltrim(substr($file, \strlen($this->projectDir)), '/');
+        }
+
+        return null;
     }
 
     /**
@@ -201,7 +217,7 @@ class CodeExtension extends AbstractExtension
     public function getFileLink($file, $line)
     {
         if ($fmt = $this->fileLinkFormat) {
-            return is_string($fmt) ? strtr($fmt, array('%f' => $file, '%l' => $line)) : $fmt->format($file, $line);
+            return \is_string($fmt) ? strtr($fmt, ['%f' => $file, '%l' => $line]) : $fmt->format($file, $line);
         }
 
         return false;
@@ -220,7 +236,7 @@ class CodeExtension extends AbstractExtension
     public function formatLogMessage($message, array $context)
     {
         if ($context && false !== strpos($message, '{')) {
-            $replacements = array();
+            $replacements = [];
             foreach ($context as $key => $val) {
                 if (is_scalar($val)) {
                     $replacements['{'.$key.'}'] = $val;
@@ -232,7 +248,7 @@ class CodeExtension extends AbstractExtension
             }
         }
 
-        return htmlspecialchars($message, ENT_COMPAT | ENT_SUBSTITUTE, $this->charset);
+        return htmlspecialchars($message, \ENT_COMPAT | \ENT_SUBSTITUTE, $this->charset);
     }
 
     /**

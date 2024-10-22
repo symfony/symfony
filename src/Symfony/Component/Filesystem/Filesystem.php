@@ -44,7 +44,7 @@ class Filesystem
         $this->mkdir(\dirname($targetFile));
 
         $doCopy = true;
-        if (!$overwriteNewerFiles && null === parse_url($originFile, \PHP_URL_HOST) && is_file($targetFile)) {
+        if (!$overwriteNewerFiles && !parse_url($originFile, \PHP_URL_HOST) && is_file($targetFile)) {
             $doCopy = filemtime($originFile) > filemtime($targetFile);
         }
 

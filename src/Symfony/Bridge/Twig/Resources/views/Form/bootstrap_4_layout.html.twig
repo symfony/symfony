@@ -257,7 +257,8 @@
                 {{- label|trans(label_translation_parameters, translation_domain)|raw -}}
             {%- endif -%}
         {%- endif -%}
-        {% block form_label_errors %}{{- form_errors(form) -}}{% endblock form_label_errors %}</{{ element|default('label') }}>
+        </{{ element|default('label') }}>
+        {% block form_label_errors %}{{- form_errors(form) -}}{% endblock form_label_errors %}
     {%- else -%}
         {%- if errors|length > 0 -%}
         <div id="{{ id }}_errors" class="mb-2">
@@ -315,8 +316,8 @@
                     {%- endif -%}
                 {%- endif -%}
             {%- endif -%}
-            {{- form_errors(form) -}}
         </label>
+        {{- form_errors(form) -}}
     {%- endif -%}
 {%- endblock checkbox_radio_label %}
 
@@ -341,7 +342,7 @@
 
 {% block form_errors -%}
     {%- if errors|length > 0 -%}
-        <span class="{% if form is not rootform %}invalid-feedback{% else %}alert alert-danger{% endif %} d-block">
+        <span class="{% if form is not rootform %}invalid-feedback{% else %}alert alert-danger{% endif %} d-block mb-1">
             {%- for error in errors -%}
                 <span class="d-block">
                     <span class="form-error-icon badge badge-danger text-uppercase">{{ 'Error'|trans({}, 'validators') }}</span> <span class="form-error-message">{{ error.message }}</span>

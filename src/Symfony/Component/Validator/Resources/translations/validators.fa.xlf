@@ -36,11 +36,11 @@
             </trans-unit>
             <trans-unit id="9">
                 <source>This field was not expected.</source>
-                <target state="needs-review-translation">این فیلد انتظار نمی‌رفت.</target>
+                <target>این ورودی مورد انتظار نبود.</target>
             </trans-unit>
             <trans-unit id="10">
                 <source>This field is missing.</source>
-                <target state="needs-review-translation">این فیلد گمشده است.</target>
+                <target>این فیلد وارد نشده است.</target>
             </trans-unit>
             <trans-unit id="11">
                 <source>This value is not a valid date.</source>
@@ -136,7 +136,7 @@
             </trans-unit>
             <trans-unit id="37" resname="This is not a valid IP address.">
                 <source>This value is not a valid IP address.</source>
-                <target state="needs-review-translation">این مقدار آدرس IP معتبری نیست.</target>
+                <target>این مقدار یه آدرس آی‌پی معتبر نمی‌باشد.</target>
             </trans-unit>
             <trans-unit id="38">
                 <source>This value is not a valid language.</source>
@@ -192,7 +192,7 @@
             </trans-unit>
             <trans-unit id="51" resname="No temporary folder was configured in php.ini.">
                 <source>No temporary folder was configured in php.ini, or the configured folder does not exist.</source>
-                <target state="needs-review-translation">هیچ پوشه موقتی در php.ini پیکربندی نشده است، یا پوشه پیکربندی شده وجود ندارد.</target>
+                <target>هیچ پوشه موقتی در php.ini پیکربندی نشده است، یا پوشه پیکربندی شده وجود ندارد.</target>
             </trans-unit>
             <trans-unit id="52">
                 <source>Cannot write temporary file to disk.</source>
@@ -224,7 +224,7 @@
             </trans-unit>
             <trans-unit id="59" resname="This is not a valid International Bank Account Number (IBAN).">
                 <source>This value is not a valid International Bank Account Number (IBAN).</source>
-                <target state="needs-review-translation">این مقدار یک شماره حساب بانکی بین‌المللی (IBAN) معتبر نیست.</target>
+                <target>این مقدار یک شماره شبای معتبر نمی‌باشد.</target>
             </trans-unit>
             <trans-unit id="60">
                 <source>This value is not a valid ISBN-10.</source>
@@ -312,7 +312,7 @@
             </trans-unit>
             <trans-unit id="81" resname="This is not a valid Business Identifier Code (BIC).">
                 <source>This value is not a valid Business Identifier Code (BIC).</source>
-                <target state="needs-review-translation">این مقدار یک کد شناسه کسب‌وکار (BIC) معتبر نیست.</target>
+                <target>این مقدار یک کد شناسه کسب‌وکار (BIC) معتبر نیست.</target>
             </trans-unit>
             <trans-unit id="82">
                 <source>Error</source>
@@ -320,7 +320,7 @@
             </trans-unit>
             <trans-unit id="83" resname="This is not a valid UUID.">
                 <source>This value is not a valid UUID.</source>
-                <target state="needs-review-translation">این مقدار یک UUID معتبر نیست.</target>
+                <target>این مقدار یک UUID معتبر نیست.</target>
             </trans-unit>
             <trans-unit id="84">
                 <source>This value should be a multiple of {{ compared_value }}.</source>
@@ -428,19 +428,19 @@
             </trans-unit>
             <trans-unit id="110">
                 <source>The extension of the file is invalid ({{ extension }}). Allowed extensions are {{ extensions }}.</source>
-                <target state="needs-review-translation">پسوند فایل نامعتبر است ({{ extension }}). پسوندهای مجاز {{ extensions }} هستند.</target>
+                <target>پسوند فایل ({{ extension }}) نامعتبر است. پسوندهای مجاز {{ extensions }} هستند.</target>
             </trans-unit>
             <trans-unit id="111">
                 <source>The detected character encoding is invalid ({{ detected }}). Allowed encodings are {{ encodings }}.</source>
-                <target state="needs-review-translation">رمزگذاری کاراکتر تشخیص داده شده نامعتبر است ({{ detected }}). رمزگذاری‌های مجاز {{ encodings }} هستند.</target>
+                <target>رمزگذاری کاراکتر تشخیص داده شده ({{ detected }}) نامعتبر است. رمزگذاری‌های مجاز {{ encodings }} هستند.</target>
             </trans-unit>
             <trans-unit id="112">
                 <source>This value is not a valid MAC address.</source>
-                <target state="needs-review-translation">این مقدار یک آدرس MAC معتبر نیست.</target>
+                <target>این مقدار یک آدرس MAC معتبر نیست.</target>
             </trans-unit>
             <trans-unit id="113">
                 <source>This URL is missing a top-level domain.</source>
-                <target state="needs-review-translation">این URL فاقد دامنه سطح بالا است.</target>
+                <target>این آدرس دارای دامنه نمی‌باشد.</target>
             </trans-unit>
             <trans-unit id="114">
                 <source>This value is too short. It should contain at least one word.|This value is too short. It should contain at least {{ min }} words.</source>

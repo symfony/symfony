@@ -76,7 +76,7 @@
             </trans-unit>
             <trans-unit id="20">
                 <source>Too many failed login attempts, please try again in %minutes% minutes.</source>
-                <target state="needs-review-translation">تعداد دفعات تلاش برای ورود بیش از حد زیاد است، لطفا پس از %minutes% دقیقه دوباره تلاش کنید.</target>
+                <target>تعداد دفعات تلاش برای ورود بیش از حد زیاد است، لطفا پس از %minutes% دقیقه دوباره تلاش کنید.</target>
             </trans-unit>
         </body>
     </file>

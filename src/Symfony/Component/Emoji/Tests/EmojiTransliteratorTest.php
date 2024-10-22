@@ -194,4 +194,18 @@ class EmojiTransliteratorTest extends TestCase
         $this->expectException(\IntlException::class);
         EmojiTransliterator::create('emoji-en', EmojiTransliterator::REVERSE);
     }
+
+    public function testGetErrorCodeWithUninitializedTransliterator()
+    {
+        $transliterator = EmojiTransliterator::create('emoji-en');
+
+        $this->assertSame(0, $transliterator->getErrorCode());
+    }
+
+    public function testGetErrorMessageWithUninitializedTransliterator()
+    {
+        $transliterator = EmojiTransliterator::create('emoji-en');
+
+        $this->assertFalse($transliterator->getErrorMessage());
+    }
 }

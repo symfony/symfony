@@ -4,6 +4,7 @@ CHANGELOG
 7.2
 ---
 
+ * Add logical failure implementation.
  * Shorten the public digest of mapped assets to 7 characters
 
 7.1

@@ -101,11 +101,11 @@ class ScopingHttpClient implements HttpClientInterface, ResetInterface, LoggerAw
     }
 
     /**
-     * @deprecated since Symfony 7.1, configure the logger on the wrapper HTTP client directly instead
+     * @deprecated since Symfony 7.1, configure the logger on the wrapped HTTP client directly instead
      */
     public function setLogger(LoggerInterface $logger): void
     {
-        trigger_deprecation('symfony/http-client', '7.1', 'Configure the logger on the wrapper HTTP client directly instead.');
+        trigger_deprecation('symfony/http-client', '7.1', 'Configure the logger on the wrapped HTTP client directly instead.');
 
         if ($this->client instanceof LoggerAwareInterface) {
             $this->client->setLogger($logger);

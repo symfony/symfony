@@ -14,7 +14,7 @@ namespace Symfony\Component\Lock\Store;
 use MongoDB\BSON\UTCDateTime;
 use MongoDB\Client;
 use MongoDB\Collection;
-use MongoDB\Driver\Exception\WriteException;
+use MongoDB\Driver\Exception\BulkWriteException;
 use MongoDB\Driver\ReadPreference;
 use MongoDB\Exception\DriverRuntimeException;
 use MongoDB\Exception\InvalidArgumentException as MongoInvalidArgumentException;
@@ -209,7 +209,7 @@ class MongoDbStore implements PersistingStoreInterface
 
         try {
             $this->upsert($key, $this->initialTtl);
-        } catch (WriteException $e) {
+        } catch (BulkWriteException $e) {
             if ($this->isDuplicateKeyException($e)) {
                 throw new LockConflictedException('Lock was acquired by someone else.', 0, $e);
             }
@@ -235,7 +235,7 @@ class MongoDbStore implements PersistingStoreInterface
 
         try {
             $this->upsert($key, $ttl);
-        } catch (WriteException $e) {
+        } catch (BulkWriteException $e) {
             if ($this->isDuplicateKeyException($e)) {
                 throw new LockConflictedException('Failed to put off the expiration of the lock.', 0, $e);
             }
@@ -268,7 +268,7 @@ class MongoDbStore implements PersistingStoreInterface
                 '$gt' => $this->createMongoDateTime(microtime(true)),
             ],
         ], [
-            'readPreference' => new ReadPreference(\defined(ReadPreference::PRIMARY) ? ReadPreference::PRIMARY : ReadPreference::RP_PRIMARY),
+            'readPreference' => new ReadPreference(\defined(ReadPreference::class.'::PRIMARY') ? ReadPreference::PRIMARY : ReadPreference::RP_PRIMARY),
         ]);
     }
 
@@ -309,7 +309,7 @@ class MongoDbStore implements PersistingStoreInterface
         );
     }
 
-    private function isDuplicateKeyException(WriteException $e): bool
+    private function isDuplicateKeyException(BulkWriteException $e): bool
     {
         $code = $e->getCode();
 
@@ -345,7 +345,7 @@ class MongoDbStore implements PersistingStoreInterface
      */
     private function createMongoDateTime(float $seconds): UTCDateTime
     {
-        return new UTCDateTime($seconds * 1000);
+        return new UTCDateTime((int) ($seconds * 1000));
     }
 
     /**

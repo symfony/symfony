@@ -133,6 +133,8 @@ class MongoDbSessionHandlerTest extends TestCase
                 $this->assertInstanceOf(\MongoDB\BSON\UTCDateTime::class, $data[$this->options['time_field']]);
                 $this->assertInstanceOf(\MongoDB\BSON\UTCDateTime::class, $data[$this->options['expiry_field']]);
                 $this->assertGreaterThanOrEqual($expectedExpiry, round((string) $data[$this->options['expiry_field']] / 1000));
+
+                return $this->createMock(\MongoDB\UpdateResult::class);
             });
 
         $this->assertTrue($this->storage->write('foo', 'bar'));
@@ -153,6 +155,8 @@ class MongoDbSessionHandlerTest extends TestCase
             ->method('updateOne')
             ->willReturnCallback(function ($criteria, $updateData, $options) use (&$data) {
                 $data = $updateData;
+
+                return $this->createMock(\MongoDB\UpdateResult::class);
             });
 
         $this->storage->write('foo', 'bar');

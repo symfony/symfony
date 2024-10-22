@@ -109,7 +109,7 @@ class RedirectController
      */
     public function urlRedirectAction(Request $request, string $path, bool $permanent = false, ?string $scheme = null, ?int $httpPort = null, ?int $httpsPort = null, bool $keepRequestMethod = false): Response
     {
-        if ('' == $path) {
+        if ('' === $path) {
             throw new HttpException($permanent ? 410 : 404);
         }
 

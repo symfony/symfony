@@ -1,0 +1,44 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2024-10-08T10:01:41Z
+
+> This misses the equivalent of the `$mockedNamespaces` constructor argument of the SymfonyTestsListener.
+This constructor argument is important because the "hack" used to mock clock and dns functions requires being applied before the first use of those functions in a given namespace (because PHP caches the fact that a function should fallback to the global namespace). So registering the mock only when starting that test can be too late if some other (previous) tests execute code in the same namespace that use those functions.
+
+If I didn't miss anything PHPUnit doesn't allow to pass array parameters to an extension which makes this harder to implement. One possible way to implement this feature that I see is supporting JSON encoded environment variables. What do you think?
+
+---------------------------------------------------------------------------
+
+by stof at 2024-10-08T10:29:09Z
+
+Maybe we can use a comma-separated list of namespaces for the values of parameters (simpler to write than using JSON inside an XML node)
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2024-10-08T11:07:56Z
+
+I have updated the PR to register the namespaced functions as soon as possible, merged the two extensions and made it possible to register comma-separated, custom namespaces when registering the extension
+
+---------------------------------------------------------------------------
+
+by stof at 2024-10-08T12:09:47Z
+
+I just re-discovered that the phpunit-bridge also has a CoverageListener (separate from the SymfonyTestsListener). Should we port it to a separate CoverageExtension ? and is it even possible to port it ?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2024-10-08T12:19:25Z
+
+Looking at the code I guess that it should be possible to port it. Do we have an example test on which we could try such a migrated extension?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2024-10-08T12:21:38Z
+
+Ah I see we have tests for it. I will see if I can find some time to work on it. Will send a different PR then.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2024-10-15T10:51:27Z
+
+@stof I added tests to ensure that the mocked functions from both the `ClockMock` and the `DnsMock` are registered with the extension. I'm gonna check to also add a test covering the triggering of a deprecation by the `DebugClassLoader`.

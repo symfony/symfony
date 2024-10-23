@@ -21,6 +21,7 @@ use Symfony\Component\HttpKernel\Bundle\BundleInterface;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Translation\Extractor\ExtractorInterface;
 use Symfony\Component\Translation\MessageCatalogue;
+use Symfony\Component\Translation\MessageCatalogueInterface;
 use Symfony\Component\Translation\Reader\TranslationReader;
 use Symfony\Component\Translation\Translator;
 use Symfony\Component\Translation\Writer\TranslationWriter;
@@ -174,6 +175,45 @@ class TranslationUpdateCommandTest extends TestCase
         ];
 
         $this->assertEquals($expectedPaths, $filteredTransPaths);
+    }
+
+    /**
+     * @dataProvider removeNoFillProvider
+     */
+    public function testRemoveNoFillTranslationsMethod($noFillCounter, $messages)
+    {
+        // Preparing mock
+        $operation = $this->createMock(MessageCatalogueInterface::class);
+        $operation
+            ->method('all')
+            ->with('messages')
+            ->willReturn($messages);
+        $operation
+            ->expects($this->exactly($noFillCounter))
+            ->method('set');
+
+        // Calling private method
+        $translationUpdate = $this->createMock(TranslationUpdateCommand::class);
+        $reflection = new \ReflectionObject($translationUpdate);
+        $method = $reflection->getMethod('removeNoFillTranslations');
+        $method->invokeArgs($translationUpdate, [$operation]);
+    }
+
+    public function removeNoFillProvider(): array
+    {
+        return [
+            [0, []],
+            [0, ['foo' => 'foo', 'bar' => 'bar', 'baz' => 'baz']],
+            [0, ['foo' => "\0foo"]],
+            [0, ['foo' => "foo\0NoFill\0"]],
+            [0, ['foo' => "f\0NoFill\000"]],
+            [0, ['foo' => 'foo', 'bar' => 'bar']],
+            [1, ['foo' => "\0NoFill\0foo"]],
+            [1, ['foo' => "\0NoFill\0foo", 'bar' => 'bar']],
+            [1, ['foo' => 'foo', 'bar' => "\0NoFill\0bar"]],
+            [2, ['foo' => "\0NoFill\0foo", 'bar' => "\0NoFill\0bar"]],
+            [3, ['foo' => "\0NoFill\0foo", 'bar' => "\0NoFill\0bar", 'baz' => "\0NoFill\0baz"]],
+        ];
     }
 
     protected function setUp(): void

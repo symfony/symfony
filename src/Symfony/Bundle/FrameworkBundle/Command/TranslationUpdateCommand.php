@@ -19,7 +19,6 @@ use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Console\Output\ConsoleOutputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\HttpKernel\KernelInterface;
@@ -49,6 +48,7 @@ class TranslationUpdateCommand extends Command
         'xlf12' => ['xlf', '1.2'],
         'xlf20' => ['xlf', '2.0'],
     ];
+    private const NO_FILL_PREFIX = "\0NoFill\0";
 
     public function __construct(
         private TranslationWriterInterface $writer,
@@ -71,6 +71,7 @@ class TranslationUpdateCommand extends Command
                 new InputArgument('locale', InputArgument::REQUIRED, 'The locale'),
                 new InputArgument('bundle', InputArgument::OPTIONAL, 'The bundle name or directory where to load the messages'),
                 new InputOption('prefix', null, InputOption::VALUE_OPTIONAL, 'Override the default prefix', '__'),
+                new InputOption('no-fill', null, InputOption::VALUE_NONE, 'Extract translation keys without filling in values'),
                 new InputOption('format', null, InputOption::VALUE_OPTIONAL, 'Override the default output format', 'xlf12'),
                 new InputOption('dump-messages', null, InputOption::VALUE_NONE, 'Should the messages be dumped in the console'),
                 new InputOption('force', null, InputOption::VALUE_NONE, 'Should the extract be done'),
@@ -85,7 +86,8 @@ of a given bundle or the default translations directory. It can display them or 
 the new ones into the translation files.
 
 When new translation strings are found it can automatically add a prefix to the translation
-message.
+message. However, if the <comment>--no-fill</comment> option is used, the <comment>--prefix</comment>
+option has no effect, since the translation values are left empty.
 
 Example running against a Bundle (AcmeBundle)
 
@@ -178,7 +180,8 @@ EOF
         $io->comment(\sprintf('Generating "<info>%s</info>" translation files for "<info>%s</info>"', $input->getArgument('locale'), $currentName));
 
         $io->comment('Parsing templates...');
-        $extractedCatalogue = $this->extractMessages($input->getArgument('locale'), $codePaths, $input->getOption('prefix'));
+        $prefix = $input->getOption('no-fill') ? self::NO_FILL_PREFIX : $input->getOption('prefix');
+        $extractedCatalogue = $this->extractMessages($input->getArgument('locale'), $codePaths, $prefix);
 
         $io->comment('Loading translation files...');
         $currentCatalogue = $this->loadCurrentMessages($input->getArgument('locale'), $transPaths);
@@ -266,6 +269,10 @@ EOF
             $operationResult = $operation->getResult();
             if ($sort) {
                 $operationResult = $this->sortCatalogue($operationResult, $sort);
+            }
+
+            if (true === $input->getOption('no-fill')) {
+                $this->removeNoFillTranslations($operationResult);
             }
 
             $this->writer->write($operationResult, $format, ['path' => $bundleTransPath, 'default_locale' => $this->defaultLocale, 'xliff_version' => $xliffVersion, 'as_tree' => $input->getOption('as-tree'), 'inline' => $input->getOption('as-tree') ?? 0]);
@@ -481,5 +488,14 @@ EOF
         }
 
         return $codePaths;
+    }
+
+    private function removeNoFillTranslations(MessageCatalogueInterface $operation): void
+    {
+        foreach ($operation->all('messages') as $key => $message) {
+            if (str_starts_with($message, self::NO_FILL_PREFIX)) {
+                $operation->set($key, '', 'messages');
+            }
+        }
     }
 }

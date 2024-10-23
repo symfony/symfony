@@ -68,6 +68,35 @@ class UploadedFileValueResolverTest extends TestCase
         $attribute = new MapUploadedFile();
         $argument = new ArgumentMetadata(
             'qux',
+            'array',
+            false,
+            false,
+            null,
+            false,
+            [$attribute::class => $attribute]
+        );
+        $event = new ControllerArgumentsEvent(
+            $this->createMock(HttpKernelInterface::class),
+            static function () {},
+            $resolver->resolve($request, $argument),
+            $request,
+            HttpKernelInterface::MAIN_REQUEST
+        );
+
+        $resolver->onKernelControllerArguments($event);
+        $data = $event->getArguments()[0];
+
+        $this->assertEmpty($data);
+    }
+
+    /**
+     * @dataProvider provideContext
+     */
+    public function testNotNullableFile(RequestPayloadValueResolver $resolver, Request $request)
+    {
+        $attribute = new MapUploadedFile();
+        $argument = new ArgumentMetadata(
+            'qux',
             UploadedFile::class,
             false,
             false,
@@ -82,10 +111,39 @@ class UploadedFileValueResolverTest extends TestCase
             $request,
             HttpKernelInterface::MAIN_REQUEST
         );
+
+        $this->expectException(HttpException::class);
+
+        $resolver->onKernelControllerArguments($event);
+    }
+
+    /**
+     * @dataProvider provideContext
+     */
+    public function testNullableFile(RequestPayloadValueResolver $resolver, Request $request)
+    {
+        $attribute = new MapUploadedFile();
+        $argument = new ArgumentMetadata(
+            'qux',
+            UploadedFile::class,
+            false,
+            true,
+            null,
+            true,
+            [$attribute::class => $attribute]
+        );
+        $event = new ControllerArgumentsEvent(
+            $this->createMock(HttpKernelInterface::class),
+            static function () {},
+            $resolver->resolve($request, $argument),
+            $request,
+            HttpKernelInterface::MAIN_REQUEST
+        );
+
         $resolver->onKernelControllerArguments($event);
         $data = $event->getArguments()[0];
 
-        $this->assertEmpty($data);
+        $this->assertNull($data);
     }
 
     /**
@@ -269,7 +327,7 @@ class UploadedFileValueResolverTest extends TestCase
         $resolver->onKernelControllerArguments($event);
 
         /** @var UploadedFile[] $data */
-        $data = $event->getArguments()[0];
+        $data = $event->getArguments();
 
         $this->assertCount(2, $data);
         $this->assertSame('file-small.txt', $data[0]->getFilename());

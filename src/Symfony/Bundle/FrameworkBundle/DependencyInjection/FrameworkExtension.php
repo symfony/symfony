@@ -98,6 +98,11 @@ use Symfony\Component\HttpKernel\Controller\ValueResolverInterface;
 use Symfony\Component\HttpKernel\DataCollector\DataCollectorInterface;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 use Symfony\Component\HttpKernel\Log\DebugLoggerConfigurator;
+use Symfony\Component\JsonEncoder\Decode\Denormalizer\DenormalizerInterface as JsonEncoderDenormalizerInterface;
+use Symfony\Component\JsonEncoder\DecoderInterface as JsonEncoderDecoderInterface;
+use Symfony\Component\JsonEncoder\Encode\Normalizer\NormalizerInterface as JsonEncoderNormalizerInterface;
+use Symfony\Component\JsonEncoder\EncoderInterface as JsonEncoderEncoderInterface;
+use Symfony\Component\JsonEncoder\JsonEncoder;
 use Symfony\Component\Lock\LockFactory;
 use Symfony\Component\Lock\LockInterface;
 use Symfony\Component\Lock\PersistingStoreInterface;
@@ -175,6 +180,7 @@ use Symfony\Component\Translation\Translator;
 use Symfony\Component\TypeInfo\Type;
 use Symfony\Component\TypeInfo\TypeResolver\PhpDocAwareReflectionTypeResolver;
 use Symfony\Component\TypeInfo\TypeResolver\StringTypeResolver;
+use Symfony\Component\TypeInfo\TypeResolver\TypeResolverInterface;
 use Symfony\Component\Uid\Factory\UuidFactory;
 use Symfony\Component\Uid\UuidV4;
 use Symfony\Component\Validator\Constraints\ExpressionLanguageProvider;
@@ -402,12 +408,20 @@ class FrameworkExtension extends Extension
             $container->removeDefinition('console.command.serializer_debug');
         }
 
-        if ($this->readConfigEnabled('type_info', $container, $config['type_info'])) {
+        if ($typeInfoEnabled = $this->readConfigEnabled('type_info', $container, $config['type_info'])) {
             $this->registerTypeInfoConfiguration($container, $loader);
         }
 
         if ($propertyInfoEnabled) {
             $this->registerPropertyInfoConfiguration($container, $loader);
+        }
+
+        if ($this->readConfigEnabled('json_encoder', $container, $config['json_encoder'])) {
+            if (!$typeInfoEnabled) {
+                throw new LogicException('JsonEncoder support cannot be enabled as the TypeInfo component is not '.(interface_exists(TypeResolverInterface::class) ? 'enabled.' : 'installed. Try running "composer require symfony/type-info".'));
+            }
+
+            $this->registerJsonEncoderConfiguration($config['json_encoder'], $container, $loader);
         }
 
         if ($this->readConfigEnabled('lock', $container, $config['lock'])) {
@@ -1958,6 +1972,37 @@ class FrameworkExtension extends Extension
         $container->getDefinition('serializer.normalizer.property')->setArgument(5, $defaultContext);
 
         $container->setParameter('.serializer.named_serializers', $config['named_serializers'] ?? []);
+    }
+
+    private function registerJsonEncoderConfiguration(array $config, ContainerBuilder $container, PhpFileLoader $loader): void
+    {
+        if (!class_exists(JsonEncoder::class)) {
+            throw new LogicException('JsonEncoder support cannot be enabled as the JsonEncoder component is not installed. Try running "composer require symfony/json-encoder".');
+        }
+
+        $container->registerForAutoconfiguration(JsonEncoderNormalizerInterface::class)
+            ->addTag('json_encoder.normalizer');
+        $container->registerForAutoconfiguration(JsonEncoderDenormalizerInterface::class)
+            ->addTag('json_encoder.denormalizer');
+
+        $loader->load('json_encoder.php');
+
+        $container->registerAliasForArgument('json_encoder.encoder', JsonEncoderEncoderInterface::class, 'json.encoder');
+        $container->registerAliasForArgument('json_encoder.decoder', JsonEncoderDecoderInterface::class, 'json.decoder');
+
+        $container->setParameter('json_encoder.encoders_dir', '%kernel.cache_dir%/json_encoder/encoder');
+        $container->setParameter('json_encoder.decoders_dir', '%kernel.cache_dir%/json_encoder/decoder');
+        $container->setParameter('json_encoder.lazy_ghosts_dir', '%kernel.cache_dir%/json_encoder/lazy_ghost');
+        $container->setParameter('json_encoder.force_encode_chunks', false);
+
+        $encodableDefinition = (new Definition())
+            ->setAbstract(true)
+            ->addTag('container.excluded')
+            ->addTag('json_encoder.encodable');
+
+        foreach ($config['paths'] as $namespace => $path) {
+            $loader->registerClasses($encodableDefinition, $namespace, $path);
+        }
     }
 
     private function registerPropertyInfoConfiguration(ContainerBuilder $container, PhpFileLoader $loader): void

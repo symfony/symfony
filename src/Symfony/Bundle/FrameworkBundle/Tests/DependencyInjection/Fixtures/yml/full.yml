@@ -70,3 +70,4 @@ framework:
         formats:
             csv: ['text/csv', 'text/plain']
             pdf: 'application/pdf'
+    json_encoder: ~

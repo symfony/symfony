@@ -1,0 +1,21 @@
+---------------------------------------------------------------------------
+
+by raffaelecarelle at 2024-10-03T10:17:53Z
+
+Hi @stof
+
+added StringNodeDefinition. Thank you.
+
+---------------------------------------------------------------------------
+
+by stof at 2024-10-03T10:24:58Z
+
+@raffaelecarelle you should also add support for it in `NodeBuilder` (and would be good to add the `stringNode` shortcut in `NodeBuilder` and `stringPrototype` in `ArrayNodeDefinition` to have the same level of support than other core node definitions)
+
+---------------------------------------------------------------------------
+
+by raffaelecarelle at 2024-10-03T11:44:54Z
+
+> @raffaelecarelle you should also add support for it in `NodeBuilder` (and would be good to add the `stringNode` shortcut in `NodeBuilder` and `stringPrototype` in `ArrayNodeDefinition` to have the same level of support than other core node definitions)
+
+@stof sorry, here we go

@@ -30,7 +30,6 @@ class Psr16Cache implements CacheInterface, PruneableInterface, ResettableInterf
 
     private ?\Closure $createCacheItem = null;
     private ?CacheItem $cacheItemPrototype = null;
-    private static \Closure $packCacheItem;
 
     public function __construct(CacheItemPoolInterface $pool)
     {
@@ -66,15 +65,6 @@ class Psr16Cache implements CacheInterface, PruneableInterface, ResettableInterf
 
             return $createCacheItem($key, null, $allowInt)->set($value);
         };
-        self::$packCacheItem ??= \Closure::bind(
-            static function (CacheItem $item) {
-                $item->newMetadata = $item->metadata;
-
-                return $item->pack();
-            },
-            null,
-            CacheItem::class
-        );
     }
 
     public function get($key, $default = null): mixed
@@ -156,7 +146,7 @@ class Psr16Cache implements CacheInterface, PruneableInterface, ResettableInterf
         }
 
         foreach ($items as $key => $item) {
-            $values[$key] = $item->isHit() ? (self::$packCacheItem)($item) : $default;
+            $values[$key] = $item->isHit() ? $item->get() : $default;
         }
 
         return $values;

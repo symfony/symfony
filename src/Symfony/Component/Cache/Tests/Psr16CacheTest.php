@@ -14,6 +14,7 @@ namespace Symfony\Component\Cache\Tests;
 use Cache\IntegrationTests\SimpleCacheTest;
 use Psr\SimpleCache\CacheInterface;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
+use Symfony\Component\Cache\Adapter\TagAwareAdapter;
 use Symfony\Component\Cache\PruneableInterface;
 use Symfony\Component\Cache\Psr16Cache;
 
@@ -171,6 +172,22 @@ class Psr16CacheTest extends SimpleCacheTest
         $getFileMethod = (new \ReflectionObject($pool))->getMethod('getFile');
 
         return !file_exists($getFileMethod->invoke($pool, $name));
+    }
+
+    public function testGetMultipleWithTagAwareAdapter()
+    {
+        if (isset($this->skippedTests[__FUNCTION__])) {
+            $this->markTestSkipped($this->skippedTests[__FUNCTION__]);
+        }
+
+        $cache = new Psr16Cache(new TagAwareAdapter(new FilesystemAdapter()));
+
+        $cache->set('foo', 'foo-val');
+        $cache->set('bar', 'bar-val');
+        $cache->set('baz', 'baz-val');
+        $cache->set('qux', 'qux-val');
+
+        $this->assertEquals(['foo' => 'foo-val', 'bar' => 'bar-val', 'baz' => 'baz-val', 'qux' => 'qux-val'], $cache->getMultiple(['foo', 'bar', 'baz', 'qux']));
     }
 }
 

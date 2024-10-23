@@ -105,8 +105,8 @@ class GetSetMethodNormalizer extends AbstractObjectNormalizer
         return !$method->isStatic()
             && !($method->getAttributes(Ignore::class) || $method->getAttributes(LegacyIgnore::class))
             && !$method->getNumberOfRequiredParameters()
-            && ((2 < ($methodLength = \strlen($method->name)) && str_starts_with($method->name, 'is'))
-                || (3 < $methodLength && (str_starts_with($method->name, 'has') || str_starts_with($method->name, 'get')))
+            && ((2 < ($methodLength = \strlen($method->name)) && str_starts_with($method->name, 'is') && !ctype_lower($method->name[2]))
+                || (3 < $methodLength && (str_starts_with($method->name, 'has') || str_starts_with($method->name, 'get')) && !ctype_lower($method->name[3]))
             );
     }
 
@@ -118,7 +118,9 @@ class GetSetMethodNormalizer extends AbstractObjectNormalizer
         return !$method->isStatic()
             && !$method->getAttributes(Ignore::class)
             && 0 < $method->getNumberOfParameters()
-            && str_starts_with($method->name, 'set');
+            && str_starts_with($method->name, 'set')
+            && !ctype_lower($method->name[3])
+            ;
     }
 
     protected function extractAttributes(object $object, ?string $format = null, array $context = []): array

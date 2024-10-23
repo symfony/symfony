@@ -100,7 +100,8 @@ class ObjectNormalizer extends AbstractObjectNormalizer
             $name = $reflMethod->name;
             $attributeName = null;
 
-            if (3 < \strlen($name) && match ($name[0]) {
+            // ctype_lower check to find out if method looks like accessor but actually is not, e.g. hash, cancel
+            if (3 < \strlen($name) && !ctype_lower($name[3]) && match ($name[0]) {
                 'g' => str_starts_with($name, 'get'),
                 'h' => str_starts_with($name, 'has'),
                 'c' => str_starts_with($name, 'can'),
@@ -112,7 +113,7 @@ class ObjectNormalizer extends AbstractObjectNormalizer
                 if (!$reflClass->hasProperty($attributeName)) {
                     $attributeName = lcfirst($attributeName);
                 }
-            } elseif ('is' !== $name && str_starts_with($name, 'is')) {
+            } elseif ('is' !== $name && str_starts_with($name, 'is') && !ctype_lower($name[2])) {
                 // issers
                 $attributeName = substr($name, 2);
 

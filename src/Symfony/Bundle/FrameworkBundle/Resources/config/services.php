@@ -55,6 +55,7 @@ use Symfony\Component\Runtime\SymfonyRuntime;
 use Symfony\Component\String\LazyString;
 use Symfony\Component\String\Slugger\AsciiSlugger;
 use Symfony\Component\String\Slugger\SluggerInterface;
+use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Workflow\WorkflowEvents;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
@@ -242,4 +243,5 @@ return static function (ContainerConfigurator $container) {
         ->set(Response::class)->abstract()->tag('container.excluded')
         ->set(SessionInterface::class)->abstract()->tag('container.excluded')
     ;
+    $container->services()->instanceof(Constraint::class)->tag('container.excluded');
 };

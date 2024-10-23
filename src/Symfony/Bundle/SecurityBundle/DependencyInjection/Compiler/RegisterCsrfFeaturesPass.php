@@ -58,6 +58,7 @@ class RegisterCsrfFeaturesPass implements CompilerPassInterface
 
         $container->register('security.logout.listener.csrf_token_clearing', CsrfTokenClearingLogoutListener::class)
             ->addArgument(new Reference('security.csrf.token_storage'))
+            ->addArgument(new Reference('security.firewall.map'))
             ->addTag('kernel.event_subscriber');
     }
 }

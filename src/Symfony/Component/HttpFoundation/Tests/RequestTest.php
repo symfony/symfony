@@ -250,6 +250,27 @@ class RequestTest extends TestCase
         $this->assertEquals('http://test.com/foo', $request->getUri());
     }
 
+    public function testIndexDotPhpPathInfo()
+    {
+        // assume no rewrite rule: /index.php --> /
+        // assume index.php is a real file.
+        // assume rewrite rule passes all requests not referring directly to
+        // files in the filesystem to index.php.
+        $request = Request::create('http://test.com/index.php.php', 'GET', [], [], [],
+            [
+                'DOCUMENT_ROOT' => '/var/www/www.test.com',
+                'SCRIPT_FILENAME' => '/var/www/www.test.com/index.php',
+                'SCRIPT_NAME' => '/index.php',
+                'PHP_SELF' => '/index.php',
+            ]);
+        $this->assertEquals('http://test.com/index.php/.php', $request->getUri());
+        $this->assertEquals('/.php', $request->getPathInfo());
+        $this->assertEquals('', $request->getQueryString());
+        $this->assertEquals(80, $request->getPort());
+        $this->assertEquals('test.com', $request->getHttpHost());
+        $this->assertFalse($request->isSecure());
+    }
+
     public function testCreateWithRequestUri()
     {
         $request = Request::create('http://test.com:80/foo');

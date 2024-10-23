@@ -657,11 +657,11 @@ abstract class FileValidatorTestCase extends ConstraintValidatorTestCase
     /**
      * @dataProvider provideFilenameMaxLengthIsTooLong
      */
-    public function testFilenameMaxLengthIsTooLong(File $constraintFile, string $messageViolation)
+    public function testFilenameMaxLengthIsTooLong(File $constraintFile, string $filename, string $messageViolation)
     {
         file_put_contents($this->path, '1');
 
-        $file = new UploadedFile($this->path, 'myFileWithATooLongOriginalFileName', null, null, true);
+        $file = new UploadedFile($this->path, $filename, null, null, true);
         $this->validator->validate($file, $constraintFile);
 
         $this->buildViolation($messageViolation)
@@ -675,25 +675,83 @@ abstract class FileValidatorTestCase extends ConstraintValidatorTestCase
 
     public static function provideFilenameMaxLengthIsTooLong(): \Generator
     {
-        yield 'Simple case with only the parameter "filenameMaxLength" ' => [
+
+        yield 'Codepoints and UTF-8 : default' => [
             new File(filenameMaxLength: 30),
+            'myFileWithATooLongOriginalFileName',
             'The filename is too long. It should have {{ filename_max_length }} character or less.|The filename is too long. It should have {{ filename_max_length }} characters or less.',
         ];
 
-        yield 'Case with the parameter "filenameMaxLength" and a custom error message' => [
-            new File(filenameMaxLength: 20, filenameTooLongMessage: 'Your filename is too long. Please use at maximum {{ filename_max_length }} characters'),
-            'Your filename is too long. Please use at maximum {{ filename_max_length }} characters',
+        yield 'Codepoints and UTF-8: custom error message' => [
+            new File(filenameMaxLength: 20, filenameTooLongMessage: 'myMessage'),
+            'myFileWithATooLongOriginalFileName',
+            'myMessage',
+        ];
+
+        yield 'Graphemes' => [
+            new File(filenameMaxLength: 1, filenameCountUnit: File::FILENAME_COUNT_GRAPHEMES, filenameTooLongMessage: 'myMessage'),
+            "A\u{0300}A\u{0300}",
+            'myMessage',
+        ];
+
+        yield 'Bytes' => [
+            new File(filenameMaxLength: 5, filenameCountUnit: File::FILENAME_COUNT_BYTES, filenameTooLongMessage: 'myMessage'),
+            "A\u{0300}A\u{0300}",
+            'myMessage',
         ];
     }
 
-    public function testFilenameMaxLength()
+    /**
+     * @dataProvider provideFilenameCountUnit
+     */
+    public function testValidCountUnitFilenameMaxLength(int $maxLength, string $countUnit)
     {
         file_put_contents($this->path, '1');
 
-        $file = new UploadedFile($this->path, 'tinyOriginalFileName', null, null, true);
-        $this->validator->validate($file, new File(filenameMaxLength: 20));
+        $file = new UploadedFile($this->path, "A\u{0300}", null, null, true);
+        $this->validator->validate($file, new File(filenameMaxLength: $maxLength, filenameCountUnit: $countUnit));
 
         $this->assertNoViolation();
+    }
+
+    /**
+     * @dataProvider provideFilenameCharset
+     */
+    public function testFilenameCharset(string $filename, string $charset, bool $isValid)
+    {
+        file_put_contents($this->path, '1');
+
+        $file = new UploadedFile($this->path, $filename, null, null, true);
+        $this->validator->validate($file, new File(filenameCharset: $charset,filenameCharsetMessage:'myMessage'));
+
+        if ($isValid) {
+            $this->assertNoViolation();
+        } else {
+            $this->buildViolation('myMessage')
+                ->setParameter('{{ name }}', '"'.$filename.'"')
+                ->setParameter('{{ charset }}', $charset)
+                ->setCode(File::FILENAME_INVALID_CHARACTERS)
+                ->assertRaised();
+        }
+    }
+
+    public static function provideFilenameCountUnit(): array
+    {
+        return [
+            'graphemes' => [1, File::FILENAME_COUNT_GRAPHEMES],
+            'codepoints' => [2, File::FILENAME_COUNT_CODEPOINTS],
+            'bytes' => [3, File::FILENAME_COUNT_BYTES],
+        ];
+    }
+
+    public static function provideFilenameCharset(): array
+    {
+        return [
+            ['é', 'utf8', true],
+            ["\xE9", 'CP1252', true],
+            ["\xE9", 'XXX', false],
+            ["\xE9", 'utf8', false],
+        ];
     }
 
     abstract protected function getFile($filename);

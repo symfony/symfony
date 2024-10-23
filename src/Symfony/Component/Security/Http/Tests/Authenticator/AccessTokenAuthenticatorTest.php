@@ -13,6 +13,7 @@ namespace Authenticator;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 use Symfony\Component\Security\Core\User\InMemoryUser;
 use Symfony\Component\Security\Core\User\InMemoryUserProvider;
@@ -22,6 +23,7 @@ use Symfony\Component\Security\Http\AccessToken\HeaderAccessTokenExtractor;
 use Symfony\Component\Security\Http\Authenticator\AccessTokenAuthenticator;
 use Symfony\Component\Security\Http\Authenticator\FallbackUserLoader;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class AccessTokenAuthenticatorTest extends TestCase
 {
@@ -34,6 +36,82 @@ class AccessTokenAuthenticatorTest extends TestCase
         $this->accessTokenHandler = $this->createMock(AccessTokenHandlerInterface::class);
         $this->accessTokenExtractor = $this->createMock(AccessTokenExtractorInterface::class);
         $this->userProvider = new InMemoryUserProvider(['test' => ['password' => 's$cr$t']]);
+    }
+
+    public function testOnAuthenticationFailureWithTranslatorTranslatesErrorMessage()
+    {
+        $request = Request::create('/test');
+
+        $this->accessTokenExtractor
+            ->expects($this->once())
+            ->method('extractAccessToken')
+            ->with($request)
+            ->willReturn(null);
+
+        $authenticator = new AccessTokenAuthenticator(
+            $this->accessTokenHandler,
+            $this->accessTokenExtractor,
+            $this->userProvider,
+        );
+
+        $translator = $this->createMock(TranslatorInterface::class);
+        $translator
+            ->expects($this->once())
+            ->method('trans')
+            ->with('Invalid credentials.')
+            ->willReturn('Credenciales invalidas.');
+
+        $authenticator->setTranslator($translator);
+
+        $response = null;
+        try {
+            $authenticator->authenticate($request);
+        } catch (BadCredentialsException $e) {
+            $response = $authenticator->onAuthenticationFailure($request, $e);
+        }
+        $this->assertInstanceOf(Response::class, $response);
+        $this->assertSame('Bearer error="invalid_token",error_description="Credenciales invalidas."', $response->headers->get('WWW-Authenticate'));
+    }
+
+    /**
+     * @group legacy
+     *
+     * @expectedDeprecation Since symfony/security-http 6.4: Using non-ASCII characters in the error message is deprecated. Use ASCII characters only.
+     */
+    public function testOnAuthenticationFailureWithTranslatorThrowsDeprecationWhenTranslatedMessageContainsNonAscii()
+    {
+        $request = Request::create('/test');
+
+        $this->accessTokenExtractor
+            ->expects($this->once())
+            ->method('extractAccessToken')
+            ->with($request)
+            ->willReturn(null);
+
+        $authenticator = new AccessTokenAuthenticator(
+            $this->accessTokenHandler,
+            $this->accessTokenExtractor,
+            $this->userProvider,
+        );
+
+        $nonAsciiString = 'Credenciales inválidas.';
+        $translator = $this->createMock(TranslatorInterface::class);
+        $translator
+            ->expects($this->once())
+            ->method('trans')
+            ->with('Invalid credentials.')
+            ->willReturn($nonAsciiString);
+
+        $authenticator->setTranslator($translator);
+
+        $response = null;
+        try {
+            $authenticator->authenticate($request);
+        } catch (BadCredentialsException $e) {
+            $response = $authenticator->onAuthenticationFailure($request, $e);
+        }
+        $this->assertInstanceOf(Response::class, $response);
+        $this->assertSame('Bearer error="invalid_token",error_description="Credenciales inválidas."', $response->headers->get('WWW-Authenticate'));
     }
 
     public function testAuthenticateWithoutAccessToken()

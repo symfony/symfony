@@ -596,7 +596,15 @@ class Request
         }
 
         $qs = HeaderUtils::parseQuery($qs);
-        ksort($qs);
+        $recursive_sort = function (&$array) use (&$recursive_sort) {
+            foreach ($array as &$v) {
+                if (is_array($v)) {
+                    $recursive_sort($v);
+                }
+            }
+            ksort($array);
+        };
+        $recursive_sort($qs);
 
         return http_build_query($qs, '', '&', \PHP_QUERY_RFC3986);
     }

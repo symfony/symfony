@@ -12,6 +12,7 @@ CHANGELOG
  * Add `HeaderRequestMatcher`
  * Add support for `\SplTempFileObject` in `BinaryFileResponse`
  * Add `verbose` argument to response test constraints
+ * [BC BREAK] Query string key/value pairs are now recursively sorted in `Request::normalizeQueryString()`.
 
 7.0
 ---

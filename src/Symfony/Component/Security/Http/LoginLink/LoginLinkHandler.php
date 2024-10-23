@@ -54,7 +54,7 @@ final class LoginLinkHandler implements LoginLinkHandlerInterface
             'hash' => $this->signatureHasher->computeSignatureHash($user, $expires),
         ];
 
-        $parameters = array_merge($parameters, $this->options['route_params']);
+        $parameters = $parameters + $this->options['route_params'];
 
         if ($request) {
             $currentRequestContext = $this->urlGenerator->getContext();

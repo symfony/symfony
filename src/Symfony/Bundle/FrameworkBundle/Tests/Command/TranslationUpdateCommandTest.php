@@ -199,7 +199,7 @@ class TranslationUpdateCommandTest extends TestCase
         $method->invokeArgs($translationUpdate, [$operation]);
     }
 
-    public function removeNoFillProvider(): array
+    public static function removeNoFillProvider(): array
     {
         return [
             [0, []],

@@ -56,7 +56,7 @@ class FormValidator extends ConstraintValidator
             // Validate the data against its own constraints
             $validateDataGraph = $form->isRoot()
                 && (\is_object($data) || \is_array($data))
-                && (($groups && \is_array($groups)) || ($groups instanceof GroupSequence && $groups->groups))
+                && (\is_array($groups) || ($groups instanceof GroupSequence && $groups->groups))
             ;
 
             // Validate the data against the constraints defined in the form

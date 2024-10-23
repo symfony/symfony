@@ -293,7 +293,7 @@ class Connection
         }
 
         if (isset($params['host'])) {
-            $options['host'] = $params['host'] ?? $options['host'];
+            $options['host'] = $params['host'];
             $options['port'] = $params['port'] ?? $options['port'];
 
             $pathParts = explode('/', rtrim($params['path'] ?? '', '/'));

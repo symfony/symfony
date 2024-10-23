@@ -172,7 +172,7 @@ class TextDescriptor extends Descriptor
             $options['output']->table(
                 ['Service ID', 'Class'],
                 [
-                    [$options['id'] ?? '-', $service::class],
+                    [$options['id'], $service::class],
                 ]
             );
         }
@@ -333,7 +333,7 @@ class TextDescriptor extends Descriptor
         $tableRows[] = ['Autoconfigured', $definition->isAutoconfigured() ? 'yes' : 'no'];
 
         if ($definition->getFile()) {
-            $tableRows[] = ['Required File', $definition->getFile() ?: '-'];
+            $tableRows[] = ['Required File', $definition->getFile()];
         }
 
         if ($factory = $definition->getFactory()) {

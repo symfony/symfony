@@ -121,7 +121,7 @@ class EntityUserProvider implements UserProviderInterface, PasswordUpgraderInter
         }
 
         $repository = $this->getRepository();
-        if ($user instanceof PasswordAuthenticatedUserInterface && $repository instanceof PasswordUpgraderInterface) {
+        if ($repository instanceof PasswordUpgraderInterface) {
             $repository->upgradePassword($user, $newHashedPassword);
         }
     }

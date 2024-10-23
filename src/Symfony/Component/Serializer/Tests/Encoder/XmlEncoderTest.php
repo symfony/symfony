@@ -897,7 +897,7 @@ XML;
     public function testNotEncodableValueExceptionMessageForAResource()
     {
         $this->expectException(NotEncodableValueException::class);
-        $this->expectExceptionMessage('An unexpected value could not be serialized: "stream" resource');
+        $this->expectExceptionMessage('An unexpected value could not be serialized: stream resource');
 
         (new XmlEncoder())->encode(tmpfile(), 'xml');
     }

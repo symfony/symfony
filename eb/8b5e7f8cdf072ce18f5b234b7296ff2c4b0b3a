@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by OskarStark at 2024-10-09T04:41:21Z
+
+Thanks for your contribution, please add tests for your new feature 🙏
+
+---------------------------------------------------------------------------
+
+by jawira at 2024-10-11T13:12:27Z
+
+I have written some tests for `TranslationUpdateCommand::removeNoFillTranslations`. Please let me know if they are sufficient or if any additional tests are required.

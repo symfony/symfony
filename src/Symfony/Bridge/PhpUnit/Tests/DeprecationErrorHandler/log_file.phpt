@@ -1,5 +1,7 @@
 --TEST--
 Test DeprecationErrorHandler with log file
+--SKIPIF--
+<?php if (!getenv('SYMFONY_PHPUNIT_VERSION') || version_compare(getenv('SYMFONY_PHPUNIT_VERSION'), '10.0', '>=')) die('Skipping on PHPUnit 10+');
 --FILE--
 <?php
 $filename = tempnam(sys_get_temp_dir(), 'sf-');

@@ -19,11 +19,13 @@ use Symfony\Component\Console\Helper\FormatterHelper;
 use Symfony\Component\Console\Helper\HelperSet;
 use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Output\ConsoleSectionOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Output\StreamOutput;
 use Symfony\Component\Console\Question\ChoiceQuestion;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
 use Symfony\Component\Console\Question\Question;
+use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Console\Terminal;
 use Symfony\Component\Console\Tester\ApplicationTester;
 
@@ -32,6 +34,25 @@ use Symfony\Component\Console\Tester\ApplicationTester;
  */
 class QuestionHelperTest extends AbstractQuestionHelperTestCase
 {
+    private const KEY_ALT_B = "\033b";
+    private const KEY_ALT_F = "\033f";
+    private const KEY_ARROW_LEFT = "\033[D";
+    private const KEY_ARROW_RIGHT = "\033[C";
+    private const KEY_BACKSPACE = "\177";
+    private const KEY_CTRL_A = "\001";
+    private const KEY_CTRL_B = "\002";
+    private const KEY_CTRL_E = "\005";
+    private const KEY_CTRL_F = "\006";
+    private const KEY_CTRL_H = "\010";
+    private const KEY_CTRL_ARROW_LEFT = "\033[1;5D";
+    private const KEY_CTRL_ARROW_RIGHT = "\033[1;5C";
+    private const KEY_CTRL_SHIFT_ARROW_LEFT = "\033[1;6D";
+    private const KEY_CTRL_SHIFT_ARROW_RIGHT = "\033[1;6C";
+    private const KEY_DELETE = "\033[3~";
+    private const KEY_END = "\033[F";
+    private const KEY_ENTER = "\n";
+    private const KEY_HOME = "\033[H";
+
     public function testAskChoice()
     {
         $questionHelper = new QuestionHelper();
@@ -170,6 +191,56 @@ class QuestionHelperTest extends AbstractQuestionHelperTestCase
 
         rewind($output->getStream());
         $this->assertEquals('What time is it?', stream_get_contents($output->getStream()));
+    }
+
+    /**
+     * @dataProvider getAskInputWithControlsData
+     */
+    public function testAskInputWithControls(string $input, string $expected)
+    {
+        if (!Terminal::hasSttyAvailable()) {
+            $this->markTestSkipped('`stty` is required to test autocomplete functionality');
+        }
+        $dialog = new QuestionHelper();
+
+        $inputStream = $this->getInputStream($input.self::KEY_ENTER);
+
+        $question = new Question('Question?');
+        $this->assertEquals($expected, $dialog->ask($this->createStreamableInputInterfaceMock($inputStream), $this->createOutputInterface(), $question));
+    }
+
+    public function getAskInputWithControlsData()
+    {
+        return [
+            ['test1234,;.:_-+*\'#\\()/@!äßñ', 'test1234,;.:_-+*\'#\\()/@!äßñ'],
+            ['tet'.self::KEY_ARROW_LEFT.'s', 'test'],
+            ['tesñt'.self::KEY_ARROW_LEFT.self::KEY_BACKSPACE, 'test'],
+            ['tesst'.self::KEY_CTRL_B.self::KEY_CTRL_H, 'test'],
+            ['tes@t'.self::KEY_ARROW_LEFT.self::KEY_ARROW_LEFT.self::KEY_DELETE, 'test'],
+            ['test'.self::KEY_ARROW_LEFT.self::KEY_ARROW_LEFT.'1'.self::KEY_ARROW_RIGHT.'2', 'te1s2t'],
+            ['test'.self::KEY_ARROW_LEFT.self::KEY_ARROW_LEFT.'1'.self::KEY_CTRL_F.'2', 'te1s2t'],
+            ['es'.self::KEY_HOME.'t'.self::KEY_END.'t', 'test'],
+            ['es'.self::KEY_CTRL_A.'t'.self::KEY_CTRL_E.'t', 'test'],
+            ['t e@sñt'.self::KEY_CTRL_ARROW_LEFT.self::KEY_BACKSPACE.self::KEY_CTRL_ARROW_LEFT.self::KEY_BACKSPACE, 'tesñt'],
+            ['t e.sät'.self::KEY_CTRL_ARROW_LEFT.self::KEY_CTRL_ARROW_LEFT.self::KEY_BACKSPACE.self::KEY_CTRL_ARROW_RIGHT.self::KEY_DELETE, 'tesät'],
+            ['t e-sñt'.self::KEY_CTRL_SHIFT_ARROW_LEFT.self::KEY_BACKSPACE.self::KEY_ALT_B.self::KEY_BACKSPACE, 'tesñt'],
+            ['t e?sät'.self::KEY_CTRL_ARROW_LEFT.self::KEY_CTRL_ARROW_LEFT.self::KEY_CTRL_ARROW_LEFT.self::KEY_CTRL_SHIFT_ARROW_RIGHT.self::KEY_DELETE.self::KEY_ALT_F.self::KEY_DELETE, 'tesät'],
+        ];
+    }
+
+    public function testAskInputWithControlsInSection()
+    {
+        if (!Terminal::hasSttyAvailable()) {
+            $this->markTestSkipped('`stty` is required to test autocomplete functionality');
+        }
+
+        $output = $this->createOutputInterface();
+        $sections = [];
+        $section = new ConsoleSectionOutput($output->getStream(), $sections, $output->getVerbosity(), false, new OutputFormatter());
+        $inputStream = $this->getInputStream('es'.self::KEY_HOME.'t'.self::KEY_END.'t'.self::KEY_ENTER);
+        $io = new SymfonyStyle($this->createStreamableInputInterfaceMock($inputStream), $section);
+
+        $this->assertEquals('test', $io->ask('Test the input behavior'));
     }
 
     public function testAskNonTrimmed()

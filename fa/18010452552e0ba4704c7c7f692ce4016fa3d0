@@ -1,0 +1,9 @@
+---------------------------------------------------------------------------
+
+by 0xb4lint at 2024-10-23T10:10:06Z
+
+@nicolas-grekas that was my first intention, but I've realized it would result a really messy code (without doing a significant refactor)
+
+performance-wise, I conducted some benchmarks by calling `(new MailboxHeader(...))->getBodyAsString()`
+1M iteration without the second loop: 26.45s - 26.57s
+1M iteration with the second loop: 25.47s - 26.14s

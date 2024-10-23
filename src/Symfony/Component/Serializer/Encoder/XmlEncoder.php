@@ -77,6 +77,7 @@ class XmlEncoder implements EncoderInterface, DecoderInterface, NormalizationAwa
         self::TYPE_CAST_ATTRIBUTES => true,
         self::CDATA_WRAPPING => true,
         self::CDATA_WRAPPING_PATTERN => '/[<>&]/',
+        self::FORCE_COLLECTION => [],
     ];
 
     public function __construct(array $defaultContext = [])
@@ -238,7 +239,7 @@ class XmlEncoder implements EncoderInterface, DecoderInterface, NormalizationAwa
         if (\is_array($value)
             && ($childNodeName = $node->firstChild?->nodeName)
             && 1 === \count($value)
-            && \in_array($nodeName, $context[self::FORCE_COLLECTION] ?? [], true)
+            && \in_array($nodeName, $context[self::FORCE_COLLECTION] ?? $this->defaultContext[self::FORCE_COLLECTION], true)
         ) {
             return [$childNodeName => [$value[$childNodeName]]];
         }

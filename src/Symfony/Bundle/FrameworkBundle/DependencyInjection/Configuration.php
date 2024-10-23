@@ -632,8 +632,16 @@ class Configuration implements ConfigurationInterface
                             ->info('The default URI used to generate URLs in a non-HTTP context.')
                             ->defaultNull()
                         ->end()
-                        ->scalarNode('http_port')->defaultValue(80)->end()
-                        ->scalarNode('https_port')->defaultValue(443)->end()
+                        ->integerNode('http_port')
+                            ->defaultValue(80)
+                            ->min(1)
+                            ->max(65535)
+                        ->end()
+                        ->integerNode('https_port')
+                            ->defaultValue(443)
+                            ->min(1)
+                            ->max(65535)
+                        ->end()
                         ->scalarNode('strict_requirements')
                             ->info(
                                 "set to true to throw an exception when a parameter does not match the requirements\n".

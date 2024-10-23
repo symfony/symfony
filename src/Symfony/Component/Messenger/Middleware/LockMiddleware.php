@@ -25,7 +25,7 @@ final class LockMiddleware implements MiddlewareInterface
     public function handle(Envelope $envelope, StackInterface $stack): Envelope
     {
         $stamp = $envelope->last(LockStamp::class);
-        if (!$stamp instanceof LockStamp) {
+        if (null === $stamp) {
             return $stack->next()->handle($envelope, $stack);
         }
 

@@ -238,7 +238,7 @@ class XmlEncoder implements EncoderInterface, DecoderInterface, NormalizationAwa
         if (\is_array($value)
             && ($childNodeName = $node->firstChild?->nodeName)
             && 1 === \count($value)
-            && \in_array($nodeName, $context[self::FORCE_COLLECTION] ?? [], strict: true)
+            && \in_array($nodeName, $context[self::FORCE_COLLECTION] ?? [], true)
         ) {
             return [$childNodeName => [$value[$childNodeName]]];
         }

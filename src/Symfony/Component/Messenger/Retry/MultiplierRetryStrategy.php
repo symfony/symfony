@@ -78,7 +78,7 @@ class MultiplierRetryStrategy implements RetryStrategyInterface
      */
     public function getWaitingTime(Envelope $message, ?\Throwable $throwable = null): int
     {
-        $retries = RedeliveryStamp::getRetryCountFromEnvelope($message);
+        $retries = \count($message->all(RedeliveryStamp::class));
 
         $delay = $this->delayMilliseconds * $this->multiplier ** $retries;
 

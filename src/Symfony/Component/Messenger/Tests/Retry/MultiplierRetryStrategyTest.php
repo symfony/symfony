@@ -55,7 +55,10 @@ class MultiplierRetryStrategyTest extends TestCase
     public function testGetWaitTime(int $delay, float $multiplier, int $maxDelay, int $previousRetries, int $expectedDelay)
     {
         $strategy = new MultiplierRetryStrategy(10, $delay, $multiplier, $maxDelay);
-        $envelope = new Envelope(new \stdClass(), [new RedeliveryStamp($previousRetries)]);
+        $envelope = Envelope::wrap(new \stdClass());
+        for ($i = 0; $i < $previousRetries; ++$i) {
+            $envelope = $envelope->with(new RedeliveryStamp($i));
+        }
 
         $this->assertSame($expectedDelay, $strategy->getWaitingTime($envelope));
     }

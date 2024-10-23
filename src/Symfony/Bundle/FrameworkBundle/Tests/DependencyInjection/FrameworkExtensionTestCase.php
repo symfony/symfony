@@ -19,6 +19,8 @@ use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
 use Symfony\Bundle\FrameworkBundle\Tests\Fixtures\Messenger\DummyMessage;
 use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
 use Symfony\Bundle\FullStack;
+use Symfony\Component\AccessToken\AccessTokenFetcher;
+use Symfony\Component\AccessToken\CredentialsInterface;
 use Symfony\Component\Cache\Adapter\AdapterInterface;
 use Symfony\Component\Cache\Adapter\ApcuAdapter;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
@@ -708,6 +710,49 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $container = $this->createContainerFromFile('request');
 
         $this->assertFalse($container->hasDefinition('request.add_request_formats_listener'), '->registerRequestConfiguration() does not load request.xml when no request formats are defined');
+    }
+
+    public function testAccessToken()
+    {
+        if (!interface_exists(CredentialsInterface::class)) {
+            $this->markTestSkipped('AccessToken not available.');
+        }
+
+        $container = $this->createContainerFromFile('access_token');
+
+        $this->assertTrue($container->hasDefinition('access_token.manager'));
+        $this->assertTrue($container->hasDefinition('access_token.manager.lock'));
+
+        $credentialsDef = $container->getDefinition('access_token.fetcher.my_test_provider.credentials');
+        $this->assertSame(CredentialsInterface::class, $credentialsDef->getClass());
+        $this->assertSame('oauth://user123:pass123@example.tld?scope=DoThis', $credentialsDef->getArgument(0));
+
+        $fetcherDef = $container->getDefinition('access_token.fetcher.my_test_provider');
+        $this->assertSame(AccessTokenFetcher::class, $fetcherDef->getClass());
+        $this->assertSame('access_token.fetcher.my_test_provider.credentials', (string) $fetcherDef->getArgument(1));
+    }
+
+    public function testAccessTokenDisabled()
+    {
+        if (!interface_exists(CredentialsInterface::class)) {
+            $this->markTestSkipped('AccessToken not available.');
+        }
+
+        $container = $this->createContainerFromFile('access_token_disabled');
+
+        $this->assertFalse($container->hasDefinition('access_token.manager'));
+    }
+
+    public function testAccessTokenNoLock()
+    {
+        if (!interface_exists(CredentialsInterface::class)) {
+            $this->markTestSkipped('AccessToken not available.');
+        }
+
+        $container = $this->createContainerFromFile('access_token_no_lock');
+
+        $this->assertTrue($container->hasDefinition('access_token.manager'));
+        $this->assertFalse($container->hasDefinition('access_token.manager.lock'));
     }
 
     public function testAssets()

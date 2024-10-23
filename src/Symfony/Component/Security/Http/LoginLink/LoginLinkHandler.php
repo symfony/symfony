@@ -38,6 +38,7 @@ final class LoginLinkHandler implements LoginLinkHandlerInterface
     ) {
         $this->options = array_merge([
             'route_name' => null,
+            'route_params' => [],
             'lifetime' => 600,
         ], $options);
     }
@@ -52,6 +53,8 @@ final class LoginLinkHandler implements LoginLinkHandlerInterface
             'expires' => $expires,
             'hash' => $this->signatureHasher->computeSignatureHash($user, $expires),
         ];
+
+        $parameters = $parameters + $this->options['route_params'];
 
         if ($request) {
             $currentRequestContext = $this->urlGenerator->getContext();

@@ -45,6 +45,7 @@ class Email extends Message
     private $text;
 
     private ?string $textCharset = null;
+    private ?string $textEncoding = null;
 
     /**
      * @var resource|string|null
@@ -52,6 +53,7 @@ class Email extends Message
     private $html;
 
     private ?string $htmlCharset = null;
+    private ?string $htmlEncoding = null;
     private array $attachments = [];
     private ?AbstractPart $cachedBody = null; // Used to avoid wrong body hash in DKIM signatures with multiple parts (e.g. HTML + TEXT) due to multiple boundaries.
 
@@ -267,7 +269,7 @@ class Email extends Message
      *
      * @return $this
      */
-    public function text($body, string $charset = 'utf-8'): static
+    public function text($body, string $charset = 'utf-8', ?string $encoding = null): static
     {
         if (null !== $body && !\is_string($body) && !\is_resource($body)) {
             throw new \TypeError(\sprintf('The body must be a string, a resource or null (got "%s").', get_debug_type($body)));
@@ -276,6 +278,7 @@ class Email extends Message
         $this->cachedBody = null;
         $this->text = $body;
         $this->textCharset = $charset;
+        $this->textEncoding = $encoding ?? $this->textEncoding;
 
         return $this;
     }
@@ -293,12 +296,27 @@ class Email extends Message
         return $this->textCharset;
     }
 
+    public function getTextEncoding(): ?string
+    {
+        return $this->textEncoding;
+    }
+
+    /**
+     * @return $this
+     */
+    public function textEncoding(?string $encoding = null): static
+    {
+        $this->textEncoding = $encoding;
+
+        return $this;
+    }
+
     /**
      * @param resource|string|null $body
      *
      * @return $this
      */
-    public function html($body, string $charset = 'utf-8'): static
+    public function html($body, string $charset = 'utf-8', ?string $encoding = null): static
     {
         if (null !== $body && !\is_string($body) && !\is_resource($body)) {
             throw new \TypeError(\sprintf('The body must be a string, a resource or null (got "%s").', get_debug_type($body)));
@@ -307,6 +325,7 @@ class Email extends Message
         $this->cachedBody = null;
         $this->html = $body;
         $this->htmlCharset = $charset;
+        $this->htmlEncoding = $encoding ?? $this->htmlEncoding;
 
         return $this;
     }
@@ -322,6 +341,21 @@ class Email extends Message
     public function getHtmlCharset(): ?string
     {
         return $this->htmlCharset;
+    }
+
+    public function getHtmlEncoding(): ?string
+    {
+        return $this->htmlEncoding;
+    }
+
+    /**
+     * @return $this
+     */
+    public function htmlEncoding(?string $encoding = null): static
+    {
+        $this->htmlEncoding = $encoding;
+
+        return $this;
     }
 
     /**
@@ -436,7 +470,7 @@ class Email extends Message
 
         [$htmlPart, $otherParts, $relatedParts] = $this->prepareParts();
 
-        $part = null === $this->text ? null : new TextPart($this->text, $this->textCharset);
+        $part = null === $this->text ? null : new TextPart($this->text, $this->textCharset, 'plain', $this->textEncoding);
         if (null !== $htmlPart) {
             if (null !== $part) {
                 $part = new AlternativePart($part, $htmlPart);
@@ -503,7 +537,7 @@ class Email extends Message
             $otherParts[] = $part;
         }
         if (null !== $htmlPart) {
-            $htmlPart = new TextPart($html, $this->htmlCharset, 'html');
+            $htmlPart = new TextPart($html, $this->htmlCharset, 'html', $this->htmlEncoding);
         }
 
         return [$htmlPart, $otherParts, array_values($relatedParts)];
@@ -561,7 +595,7 @@ class Email extends Message
             $this->html = (new TextPart($this->html))->getBody();
         }
 
-        return [$this->text, $this->textCharset, $this->html, $this->htmlCharset, $this->attachments, parent::__serialize()];
+        return [$this->text, $this->textCharset, $this->textEncoding, $this->html, $this->htmlCharset, $this->htmlEncoding, $this->attachments, parent::__serialize()];
     }
 
     /**
@@ -569,7 +603,7 @@ class Email extends Message
      */
     public function __unserialize(array $data): void
     {
-        [$this->text, $this->textCharset, $this->html, $this->htmlCharset, $this->attachments, $parentData] = $data;
+        [$this->text, $this->textCharset, $this->textEncoding, $this->html, $this->htmlCharset, $this->htmlEncoding, $this->attachments, $parentData] = $data;
 
         parent::__unserialize($parentData);
     }

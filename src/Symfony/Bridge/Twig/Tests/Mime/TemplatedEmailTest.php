@@ -75,8 +75,10 @@ class TemplatedEmailTest extends TestCase
     },
     "text": null,
     "textCharset": null,
+    "textEncoding": null,
     "html": null,
     "htmlCharset": null,
+    "htmlEncoding": null,
     "attachments": [
         {%A
             "body": "Some Text file",%A
@@ -123,5 +125,18 @@ EOF;
         $expected->from('fabien@symfony.com');
         $this->assertEquals($expected->getHeaders(), $n->getHeaders());
         $this->assertEquals($expected->getBody(), $n->getBody());
+    }
+
+    public function testHtmlEncoding()
+    {
+        $email = new TemplatedEmail();
+
+        $email
+            ->htmlTemplate('text.html.twig')
+            ->context(['a' => 'b']);
+        $this->assertNull($email->getHtmlEncoding());
+
+        $email->htmlEncoding('base64');
+        $this->assertSame('base64', $email->getHtmlEncoding());
     }
 }

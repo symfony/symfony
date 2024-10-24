@@ -44,4 +44,19 @@ enum TypeIdentifier: string
     {
         return array_column(self::cases(), 'value');
     }
+
+    public function isStandalone(): bool
+    {
+        return \in_array($this, [self::MIXED, self::NEVER, self::VOID], true);
+    }
+
+    public function isScalar(): bool
+    {
+        return \in_array($this, [self::STRING, self::FLOAT, self::INT, self::BOOL, self::FALSE, self::TRUE], true);
+    }
+
+    public function isBool(): bool
+    {
+        return \in_array($this, [self::BOOL, self::FALSE, self::TRUE], true);
+    }
 }

@@ -21,6 +21,7 @@ use Symfony\Component\TypeInfo\Type\CollectionType;
 use Symfony\Component\TypeInfo\Type\EnumType;
 use Symfony\Component\TypeInfo\Type\GenericType;
 use Symfony\Component\TypeInfo\Type\IntersectionType;
+use Symfony\Component\TypeInfo\Type\NullableType;
 use Symfony\Component\TypeInfo\Type\ObjectType;
 use Symfony\Component\TypeInfo\Type\TemplateType;
 use Symfony\Component\TypeInfo\Type\UnionType;
@@ -185,22 +186,22 @@ class TypeFactoryTest extends TestCase
 
     public function testCreateIntersection()
     {
-        $this->assertEquals(new IntersectionType(new BuiltinType(TypeIdentifier::INT), new ObjectType(self::class)), Type::intersection(Type::int(), Type::object(self::class)));
-        $this->assertEquals(new IntersectionType(new BuiltinType(TypeIdentifier::INT), new BuiltinType(TypeIdentifier::STRING)), Type::intersection(Type::int(), Type::string(), Type::int()));
-        $this->assertEquals(new IntersectionType(new BuiltinType(TypeIdentifier::INT), new BuiltinType(TypeIdentifier::STRING)), Type::intersection(Type::int(), Type::intersection(Type::int(), Type::string())));
+        $this->assertEquals(new IntersectionType(new ObjectType(\DateTime::class), new ObjectType(self::class)), Type::intersection(Type::object(\DateTime::class), Type::object(self::class)));
+        $this->assertEquals(new IntersectionType(new ObjectType(\DateTime::class), new ObjectType(self::class)), Type::intersection(Type::object(\DateTime::class), Type::object(self::class), Type::object(self::class)));
+        $this->assertEquals(new IntersectionType(new ObjectType(\DateTime::class), new ObjectType(self::class)), Type::intersection(Type::object(\DateTime::class), Type::intersection(Type::object(\DateTime::class), Type::object(self::class))));
     }
 
     public function testCreateNullable()
     {
-        $this->assertEquals(new UnionType(new BuiltinType(TypeIdentifier::INT), new BuiltinType(TypeIdentifier::NULL)), Type::nullable(Type::int()));
-        $this->assertEquals(new UnionType(new BuiltinType(TypeIdentifier::INT), new BuiltinType(TypeIdentifier::NULL)), Type::nullable(Type::nullable(Type::int())));
+        $this->assertEquals(new NullableType(new BuiltinType(TypeIdentifier::INT)), Type::nullable(Type::int()));
+        $this->assertEquals(new NullableType(new BuiltinType(TypeIdentifier::INT)), Type::nullable(Type::nullable(Type::int())));
 
         $this->assertEquals(
-            new UnionType(new BuiltinType(TypeIdentifier::INT), new BuiltinType(TypeIdentifier::STRING), new BuiltinType(TypeIdentifier::NULL)),
+            new NullableType(new UnionType(new BuiltinType(TypeIdentifier::INT), new BuiltinType(TypeIdentifier::STRING))),
             Type::nullable(Type::union(Type::int(), Type::string())),
         );
         $this->assertEquals(
-            new UnionType(new BuiltinType(TypeIdentifier::INT), new BuiltinType(TypeIdentifier::STRING), new BuiltinType(TypeIdentifier::NULL)),
+            new NullableType(new UnionType(new BuiltinType(TypeIdentifier::INT), new BuiltinType(TypeIdentifier::STRING))),
             Type::nullable(Type::union(Type::int(), Type::string(), Type::null())),
         );
     }

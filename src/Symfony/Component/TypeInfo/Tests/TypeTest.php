@@ -12,23 +12,18 @@
 namespace Symfony\Component\TypeInfo\Tests;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\TypeInfo\Exception\LogicException;
 use Symfony\Component\TypeInfo\Type;
 use Symfony\Component\TypeInfo\TypeIdentifier;
 
 class TypeTest extends TestCase
 {
-    public function testIs()
+    public function testIsIdentifiedBy()
     {
-        $isInt = fn (Type $t) => TypeIdentifier::INT === $t->getBaseType()->getTypeIdentifier();
-
-        $this->assertTrue(Type::int()->is($isInt));
-        $this->assertTrue(Type::union(Type::string(), Type::int())->is($isInt));
-        $this->assertTrue(Type::generic(Type::int(), Type::string())->is($isInt));
-
-        $this->assertFalse(Type::string()->is($isInt));
-        $this->assertFalse(Type::union(Type::string(), Type::float())->is($isInt));
-        $this->assertFalse(Type::generic(Type::string(), Type::int())->is($isInt));
+        $this->assertTrue(Type::intersection(Type::object(\Iterator::class), Type::object(\Stringable::class))->isIdentifiedBy(TypeIdentifier::OBJECT));
+        $this->assertTrue(Type::union(Type::int(), Type::string())->isIdentifiedBy(TypeIdentifier::INT));
+        $this->assertTrue(Type::collection(Type::object(\Iterator::class))->isIdentifiedBy(TypeIdentifier::OBJECT));
+        $this->assertTrue(Type::generic(Type::object(\Iterator::class), Type::string())->isIdentifiedBy(TypeIdentifier::OBJECT));
+        $this->assertTrue(Type::nullable(Type::union(Type::collection(Type::object(\Iterator::class)), Type::string()))->isIdentifiedBy(TypeIdentifier::OBJECT));
     }
 
     public function testIsNullable()
@@ -36,25 +31,7 @@ class TypeTest extends TestCase
         $this->assertTrue(Type::null()->isNullable());
         $this->assertTrue(Type::mixed()->isNullable());
         $this->assertTrue(Type::nullable(Type::int())->isNullable());
-        $this->assertTrue(Type::union(Type::int(), Type::null())->isNullable());
-        $this->assertTrue(Type::union(Type::int(), Type::mixed())->isNullable());
-        $this->assertTrue(Type::generic(Type::null(), Type::string())->isNullable());
 
         $this->assertFalse(Type::int()->isNullable());
-        $this->assertFalse(Type::union(Type::int(), Type::string())->isNullable());
-        $this->assertFalse(Type::generic(Type::int(), Type::nullable(Type::string()))->isNullable());
-        $this->assertFalse(Type::generic(Type::int(), Type::mixed())->isNullable());
-    }
-
-    public function testCannotGetBaseTypeOnCompoundType()
-    {
-        $this->expectException(LogicException::class);
-        Type::union(Type::int(), Type::string())->getBaseType();
-    }
-
-    public function testThrowsOnUnexistingMethod()
-    {
-        $this->expectException(LogicException::class);
-        Type::int()->unexistingMethod();
     }
 }

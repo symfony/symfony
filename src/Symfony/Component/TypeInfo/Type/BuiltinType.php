@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\TypeInfo\Type;
 
-use Symfony\Component\TypeInfo\Exception\LogicException;
 use Symfony\Component\TypeInfo\Type;
 use Symfony\Component\TypeInfo\TypeIdentifier;
 
@@ -33,11 +32,6 @@ final class BuiltinType extends Type
     ) {
     }
 
-    public function getBaseType(): self|ObjectType
-    {
-        return $this;
-    }
-
     /**
      * @return T
      */
@@ -46,43 +40,28 @@ final class BuiltinType extends Type
         return $this->typeIdentifier;
     }
 
-    public function isA(TypeIdentifier|string $subject): bool
+    public function isIdentifiedBy(TypeIdentifier|string ...$identifiers): bool
     {
-        if ($subject instanceof TypeIdentifier) {
-            return $this->getTypeIdentifier() === $subject;
+        foreach ($identifiers as $identifier) {
+            if (\is_string($identifier)) {
+                try {
+                    $identifier = TypeIdentifier::from($identifier);
+                } catch (\ValueError) {
+                    continue;
+                }
+            }
+
+            if ($identifier === $this->typeIdentifier) {
+                return true;
+            }
         }
 
-        try {
-            return TypeIdentifier::from($subject) === $this->getTypeIdentifier();
-        } catch (\ValueError) {
-            return false;
-        }
+        return false;
     }
 
-    /**
-     * @return self|UnionType<BuiltinType<TypeIdentifier::OBJECT>|BuiltinType<TypeIdentifier::RESOURCE>|BuiltinType<TypeIdentifier::ARRAY>|BuiltinType<TypeIdentifier::STRING>|BuiltinType<TypeIdentifier::FLOAT>|BuiltinType<TypeIdentifier::INT>|BuiltinType<TypeIdentifier::BOOL>>
-     */
-    public function asNonNullable(): self|UnionType
+    public function isNullable(): bool
     {
-        if (TypeIdentifier::NULL === $this->typeIdentifier) {
-            throw new LogicException('"null" cannot be turned as non nullable.');
-        }
-
-        // "mixed" is an alias of "object|resource|array|string|float|int|bool|null"
-        // therefore, its non-nullable version is "object|resource|array|string|float|int|bool"
-        if (TypeIdentifier::MIXED === $this->typeIdentifier) {
-            return new UnionType(
-                new self(TypeIdentifier::OBJECT),
-                new self(TypeIdentifier::RESOURCE),
-                new self(TypeIdentifier::ARRAY),
-                new self(TypeIdentifier::STRING),
-                new self(TypeIdentifier::FLOAT),
-                new self(TypeIdentifier::INT),
-                new self(TypeIdentifier::BOOL),
-            );
-        }
-
-        return $this;
+        return \in_array($this->typeIdentifier, [TypeIdentifier::NULL, TypeIdentifier::MIXED]);
     }
 
     public function __toString(): string

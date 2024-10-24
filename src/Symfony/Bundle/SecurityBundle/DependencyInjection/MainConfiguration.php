@@ -17,6 +17,8 @@ use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
+use Symfony\Component\Security\Http\Authorization\NotFullFledgedEqualNormalLoginHandler;
+use Symfony\Component\Security\Http\Authorization\NotFullFledgedRedirectToStartAuthenticationHandler;
 use Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface;
 use Symfony\Component\Security\Http\Session\SessionAuthenticationStrategy;
 
@@ -214,6 +216,17 @@ class MainConfiguration implements ConfigurationInterface
             ->booleanNode('stateless')->defaultFalse()->end()
             ->booleanNode('lazy')->defaultFalse()->end()
             ->scalarNode('context')->cannotBeEmpty()->end()
+            ->scalarNode('not_full_fledged_handler')
+                ->defaultValue(NotFullFledgedRedirectToStartAuthenticationHandler::class)
+                ->beforeNormalization()
+                    ->ifTrue(fn ($v): bool => 'redirect' == $v)
+                        ->then(fn ($v) => NotFullFledgedRedirectToStartAuthenticationHandler::class)
+                ->end()
+                ->beforeNormalization()
+                    ->ifTrue(fn ($v): bool => 'equal' == $v)
+                        ->then(fn ($v) => NotFullFledgedEqualNormalLoginHandler::class)
+                ->end()
+            ->end()
             ->arrayNode('logout')
                 ->treatTrueLike([])
                 ->canBeUnset()

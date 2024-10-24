@@ -35,6 +35,7 @@ use Symfony\Component\Security\Core\User\UserCheckerInterface;
 use Symfony\Component\Security\Http\Authentication\AuthenticatorManager;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\CsrfTokenBadge;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\RememberMeBadge;
+use Symfony\Component\Security\Http\Authorization\NotFullFledgedRedirectToStartAuthenticationHandler;
 
 abstract class CompleteConfigurationTestCase extends TestCase
 {
@@ -149,6 +150,7 @@ abstract class CompleteConfigurationTestCase extends TestCase
                 [],
                 null,
                 null,
+                null,
             ],
             [
                 'secure',
@@ -184,6 +186,7 @@ abstract class CompleteConfigurationTestCase extends TestCase
                     'enable_csrf' => null,
                     'clear_site_data' => [],
                 ],
+                NotFullFledgedRedirectToStartAuthenticationHandler::class,
             ],
             [
                 'host',
@@ -201,6 +204,7 @@ abstract class CompleteConfigurationTestCase extends TestCase
                 ],
                 null,
                 null,
+                NotFullFledgedRedirectToStartAuthenticationHandler::class,
             ],
             [
                 'with_user_checker',
@@ -218,6 +222,7 @@ abstract class CompleteConfigurationTestCase extends TestCase
                 ],
                 null,
                 null,
+                NotFullFledgedRedirectToStartAuthenticationHandler::class,
             ],
         ], $configs);
 

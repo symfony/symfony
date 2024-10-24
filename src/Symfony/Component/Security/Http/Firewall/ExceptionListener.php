@@ -25,10 +25,10 @@ use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInt
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\Security\Core\Exception\AccountStatusException;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
-use Symfony\Component\Security\Core\Exception\InsufficientAuthenticationException;
 use Symfony\Component\Security\Core\Exception\LazyResponseException;
 use Symfony\Component\Security\Core\Exception\LogoutException;
 use Symfony\Component\Security\Http\Authorization\AccessDeniedHandlerInterface;
+use Symfony\Component\Security\Http\Authorization\NotFullFledgedHandlerInterface;
 use Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface;
 use Symfony\Component\Security\Http\EntryPoint\Exception\NotAnEntryPointException;
 use Symfony\Component\Security\Http\HttpUtils;
@@ -57,6 +57,7 @@ class ExceptionListener
         private ?AccessDeniedHandlerInterface $accessDeniedHandler = null,
         private ?LoggerInterface $logger = null,
         private bool $stateless = false,
+        private ?NotFullFledgedHandlerInterface $notFullFledgedHandler = null,
     ) {
     }
 
@@ -124,22 +125,9 @@ class ExceptionListener
     private function handleAccessDeniedException(ExceptionEvent $event, AccessDeniedException $exception): void
     {
         $event->setThrowable(new AccessDeniedHttpException($exception->getMessage(), $exception));
-
         $token = $this->tokenStorage->getToken();
-        if (!$this->authenticationTrustResolver->isFullFledged($token)) {
-            $this->logger?->debug('Access denied, the user is not fully authenticated; redirecting to authentication entry point.', ['exception' => $exception]);
 
-            try {
-                $insufficientAuthenticationException = new InsufficientAuthenticationException('Full authentication is required to access this resource.', 0, $exception);
-                if (null !== $token) {
-                    $insufficientAuthenticationException->setToken($token);
-                }
-
-                $event->setResponse($this->startAuthentication($event->getRequest(), $insufficientAuthenticationException));
-            } catch (\Exception $e) {
-                $event->setThrowable($e);
-            }
-
+        if ($this->notFullFledgedHandler?->handle($event, $exception, $this->authenticationTrustResolver, $token, $this->logger, function ($request, $exception) {return $this->startAuthentication($request, $exception); })) {
             return;
         }
 

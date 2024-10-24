@@ -131,6 +131,7 @@ class DebugClassLoader
     private static array $darwinCache = ['/' => ['/', []]];
     private static array $method = [];
     private static array $returnTypes = [];
+    private static array $returnTypesWillChange = [];
     private static array $methodTraits = [];
     private static array $fileOffsets = [];
 
@@ -384,6 +385,7 @@ class DebugClassLoader
 
         $parent = get_parent_class($class) ?: null;
         self::$returnTypes[$class] = [];
+        self::$returnTypesWillChange[$class] = [];
         $classIsTemplate = false;
 
         // Detect annotations on the class
@@ -569,7 +571,14 @@ class DebugClassLoader
                 ;
             }
 
-            if (null !== ($returnType = self::$returnTypes[$class][$method->name] ?? null) && 'docblock' === $this->patchTypes['force'] && !$method->hasReturnType() && isset(TentativeTypes::RETURN_TYPES[$returnType[2]][$method->name])) {
+            $returnType = self::$returnTypes[$class][$method->name] ?? null;
+            if (null !== $returnType && isset(self::$returnTypesWillChange[$returnType[2]][$method->name]) && !$method->hasReturnType() && !isset($doc['deprecated'])) {
+                [$normalizedType, $returnType, $declaringClass, $declaringFile] = $returnType;
+                $when = \is_bool(self::$returnTypesWillChange[$declaringClass][$method->name]) ? 'in the future' : self::$returnTypesWillChange[$declaringClass][$method->name];
+                $deprecations[] = \sprintf('Method "%s::%s()" will add "%s" as a native return type declaration %s. Do the same in %s "%s" now to avoid errors.', $declaringClass, $method->name, $normalizedType, $when, interface_exists($declaringClass) ? 'implementation' : 'child class', $className);
+            }
+
+            if (null !== ($returnType ??= self::$returnTypes[$class][$method->name] ?? null) && 'docblock' === $this->patchTypes['force'] && !$method->hasReturnType() && isset(TentativeTypes::RETURN_TYPES[$returnType[2]][$method->name])) {
                 $this->patchReturnTypeWillChange($method);
             }
 
@@ -582,7 +591,7 @@ class DebugClassLoader
                 if (!isset($doc['deprecated']) && strncmp($ns, $declaringClass, $len)) {
                     if ('docblock' === $this->patchTypes['force']) {
                         $this->patchMethod($method, $returnType, $declaringFile, $normalizedType);
-                    } elseif ('' !== $declaringClass && $this->patchTypes['deprecations']) {
+                    } elseif ('' !== $declaringClass && $this->patchTypes['deprecations'] && !isset(self::$returnTypesWillChange[$declaringClass][$method->name])) {
                         $deprecations[] = \sprintf('Method "%s::%s()" might add "%s" as a native return type declaration in the future. Do the same in %s "%s" now to avoid errors or add an explicit @return annotation to suppress this message.', $declaringClass, $method->name, $normalizedType, interface_exists($declaringClass) ? 'implementation' : 'child class', $className);
                     }
                 }
@@ -604,6 +613,10 @@ class DebugClassLoader
                 if ($method->isPrivate()) {
                     unset(self::$returnTypes[$class][$method->name]);
                 }
+            }
+
+            if (isset($doc['return-type-will-change'])) {
+                self::$returnTypesWillChange[$class][$method->name] = $doc['return-type-will-change'][0] ?: true;
             }
 
             $this->patchTypes['force'] = $forcePatchTypes;

@@ -2252,7 +2252,7 @@ class FrameworkExtension extends Extension
                 ->setArguments([$transport['dsn'], $transport['options'] + ['transport_name' => $name], new Reference($serializerId)])
                 ->addTag('messenger.receiver', [
                     'alias' => $name,
-                    'is_failure_transport' => \in_array($name, $failureTransports, true),
+                    'is_failure_transport' => \in_array($name, $failureTransports, true) && !isset($transport['failure_transport']),
                 ])
             ;
             $container->setDefinition($transportId = 'messenger.transport.'.$name, $transportDefinition);

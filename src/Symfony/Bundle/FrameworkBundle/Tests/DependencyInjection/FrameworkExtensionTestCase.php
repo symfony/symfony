@@ -904,6 +904,41 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $this->assertEquals($expectedTransportsByFailureTransports, $failureTransportsReferences);
     }
 
+    public function testMessengerFailureTransportChain()
+    {
+        $container = $this->createContainerFromFile('messenger_failure_transport_chain');
+
+        $failureTransport1Definition = $container->getDefinition('messenger.transport.failure_transport_1');
+        $failureTransport1Tags = $failureTransport1Definition->getTag('messenger.receiver')[0];
+
+        $this->assertEquals([
+            'alias' => 'failure_transport_1',
+            'is_failure_transport' => true,
+        ], $failureTransport1Tags);
+
+        $intermediateFailureTransportDefinition = $container->getDefinition('messenger.transport.transport_2');
+        $failureTransport3Tags = $intermediateFailureTransportDefinition->getTag('messenger.receiver')[0];
+
+        $this->assertEquals([
+            'alias' => 'transport_2',
+            'is_failure_transport' => false,
+        ], $failureTransport3Tags);
+
+        $failureTransportsByTransportNameServiceLocator = $container->getDefinition('messenger.failure.send_failed_message_to_failure_transport_listener')->getArgument(0);
+        $failureTransports = $container->getDefinition((string) $failureTransportsByTransportNameServiceLocator)->getArgument(0);
+        $expectedTransportsByFailureTransports = [
+            'transport_1' => new Reference('messenger.transport.transport_2'),
+            'transport_2' => new Reference('messenger.transport.failure_transport_1'),
+        ];
+
+        $failureTransportsReferences = array_map(function (ServiceClosureArgument $serviceClosureArgument) {
+            $values = $serviceClosureArgument->getValues();
+
+            return array_shift($values);
+        }, $failureTransports);
+        $this->assertEquals($expectedTransportsByFailureTransports, $failureTransportsReferences);
+    }
+
     public function testMessengerMultipleFailureTransportsWithGlobalFailureTransport()
     {
         $container = $this->createContainerFromFile('messenger_multiple_failure_transports_global');

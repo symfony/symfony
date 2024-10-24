@@ -35,6 +35,8 @@ final class EntityValueResolver implements ValueResolverInterface
         private ManagerRegistry $registry,
         private ?ExpressionLanguage $expressionLanguage = null,
         private MapEntity $defaults = new MapEntity(),
+        /** @var array<class-string, class-string> */
+        private readonly array $typeAliases = [],
     ) {
     }
 
@@ -50,6 +52,9 @@ final class EntityValueResolver implements ValueResolverInterface
         if (!$options->class || $options->disabled) {
             return [];
         }
+
+        $options->class = $this->typeAliases[$options->class] ?? $options->class;
+
         if (!$manager = $this->getManager($options->objectManager, $options->class)) {
             return [];
         }

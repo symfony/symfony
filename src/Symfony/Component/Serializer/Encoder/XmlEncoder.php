@@ -60,6 +60,7 @@ class XmlEncoder implements EncoderInterface, DecoderInterface, NormalizationAwa
     public const VERSION = 'xml_version';
     public const CDATA_WRAPPING = 'cdata_wrapping';
     public const CDATA_WRAPPING_PATTERN = 'cdata_wrapping_pattern';
+    public const IGNORE_EMPTY_ATTRIBUTES = 'ignore_empty_attributes';
 
     private array $defaultContext = [
         self::AS_COLLECTION => false,
@@ -72,6 +73,7 @@ class XmlEncoder implements EncoderInterface, DecoderInterface, NormalizationAwa
         self::TYPE_CAST_ATTRIBUTES => true,
         self::CDATA_WRAPPING => true,
         self::CDATA_WRAPPING_PATTERN => '/[<>&]/',
+        self::IGNORE_EMPTY_ATTRIBUTES => false,
     ];
 
     public function __construct(array $defaultContext = [])
@@ -355,6 +357,13 @@ class XmlEncoder implements EncoderInterface, DecoderInterface, NormalizationAwa
                     if (\is_bool($data)) {
                         $data = (int) $data;
                     }
+
+                    if ($context[self::IGNORE_EMPTY_ATTRIBUTES] ?? $this->defaultContext[self::IGNORE_EMPTY_ATTRIBUTES]) {
+                        if (null === $data || '' === $data) {
+                            continue;
+                        }
+                    }
+
                     $parentNode->setAttribute($attributeName, $data);
                 } elseif ('#' === $key) {
                     $append = $this->selectNodeType($parentNode, $data, $format, $context);

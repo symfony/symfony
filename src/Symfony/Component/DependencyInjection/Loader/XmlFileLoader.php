@@ -458,6 +458,8 @@ class XmlFileLoader extends FileLoader
         try {
             $dom = XmlUtils::loadFile($file, $this->validateSchema(...));
         } catch (\InvalidArgumentException $e) {
+            // When starting the 8.0 branch, this whole catch block should be replaced by the line below:
+            // throw new InvalidArgumentException(\sprintf('Unable to parse file "%s": ', $file).$e->getMessage(), $e->getCode(), $e);
             $invalidSecurityElements = [];
             $errors = explode("\n", $e->getMessage());
             foreach ($errors as $i => $error) {
@@ -477,6 +479,8 @@ class XmlFileLoader extends FileLoader
                             continue;
                         }
                         if ('provider' === $parent->localName || 'firewall' === $parent->localName) {
+                            trigger_deprecation('symfony/security-bundle', '7.2', 'Custom %s must now be namespaced; please update your security configuration "%s" tag.', 'provider' === $parent->localName ? 'providers' : 'authenticators', $tagName);
+
                             unset($errors[$errorIndex]);
                         }
                     }

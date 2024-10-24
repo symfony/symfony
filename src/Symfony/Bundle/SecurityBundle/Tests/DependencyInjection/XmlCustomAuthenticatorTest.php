@@ -12,6 +12,7 @@
 namespace Symfony\Bundle\SecurityBundle\Tests\DependencyInjection;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\SecurityExtension;
 use Symfony\Bundle\SecurityBundle\Tests\DependencyInjection\Fixtures\Authenticator\CustomAuthenticator;
 use Symfony\Component\Config\FileLocator;
@@ -20,10 +21,12 @@ use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 
 class XmlCustomAuthenticatorTest extends TestCase
 {
+    use ExpectDeprecationTrait;
+
     /**
-     * @dataProvider provideXmlConfigurationFile
+     * @group legacy
      */
-    public function testCustomProviderElement(string $configurationFile)
+    public function testCustomAuthenticatorElementUnderSecurityNamespace()
     {
         $container = new ContainerBuilder();
         $container->setParameter('kernel.debug', false);
@@ -33,18 +36,30 @@ class XmlCustomAuthenticatorTest extends TestCase
         $security->addAuthenticatorFactory(new CustomAuthenticator());
         $container->registerExtension($security);
 
-        (new XmlFileLoader($container, new FileLocator(__DIR__.'/Fixtures/xml')))->load($configurationFile);
+        $this->expectDeprecation('Since symfony/security-bundle 7.2: Custom authenticators must now be namespaced; please update your security configuration "custom" tag.');
+        (new XmlFileLoader($container, new FileLocator(__DIR__.'/Fixtures/xml')))->load('custom_authenticator_under_security_namespace.xml');
+
+        $container->getCompilerPassConfig()->setRemovingPasses([]);
+        $container->getCompilerPassConfig()->setAfterRemovingPasses([]);
+        $container->compile();
+    }
+
+    public function testCustomAuthenticatorElementUnderOwnNamespace()
+    {
+        $container = new ContainerBuilder();
+        $container->setParameter('kernel.debug', false);
+        $container->register('cache.system', \stdClass::class);
+
+        $security = new SecurityExtension();
+        $security->addAuthenticatorFactory(new CustomAuthenticator());
+        $container->registerExtension($security);
+
+        (new XmlFileLoader($container, new FileLocator(__DIR__.'/Fixtures/xml')))->load('custom_authenticator_under_own_namespace.xml');
 
         $container->getCompilerPassConfig()->setRemovingPasses([]);
         $container->getCompilerPassConfig()->setAfterRemovingPasses([]);
         $container->compile();
 
         $this->addToAssertionCount(1);
-    }
-
-    public static function provideXmlConfigurationFile(): iterable
-    {
-        yield 'Custom authenticator element under SecurityBundle’s namespace' => ['custom_authenticator_under_security_namespace.xml'];
-        yield 'Custom authenticator element under its own namespace' => ['custom_authenticator_under_own_namespace.xml'];
     }
 }

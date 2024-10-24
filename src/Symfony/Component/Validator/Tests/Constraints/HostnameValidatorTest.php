@@ -57,7 +57,7 @@ class HostnameValidatorTest extends ConstraintValidatorTestCase
      */
     public function testValidTldDomainsPassValidationIfTldNotRequired($domain)
     {
-        $this->validator->validate($domain, new Hostname(['requireTld' => false]));
+        $this->validator->validate($domain, new Hostname(requireTld: false));
 
         $this->assertNoViolation();
     }
@@ -81,9 +81,7 @@ class HostnameValidatorTest extends ConstraintValidatorTestCase
      */
     public function testInvalidDomainsRaiseViolationIfTldRequired($domain)
     {
-        $this->validator->validate($domain, new Hostname([
-            'message' => 'myMessage',
-        ]));
+        $this->validator->validate($domain, new Hostname(message: 'myMessage'));
 
         $this->buildViolation('myMessage')
             ->setParameter('{{ value }}', '"'.$domain.'"')
@@ -96,10 +94,10 @@ class HostnameValidatorTest extends ConstraintValidatorTestCase
      */
     public function testInvalidDomainsRaiseViolationIfTldNotRequired($domain)
     {
-        $this->validator->validate($domain, new Hostname([
-            'message' => 'myMessage',
-            'requireTld' => false,
-        ]));
+        $this->validator->validate($domain, new Hostname(
+            message: 'myMessage',
+            requireTld: false,
+        ));
 
         $this->buildViolation('myMessage')
             ->setParameter('{{ value }}', '"'.$domain.'"')
@@ -123,7 +121,7 @@ class HostnameValidatorTest extends ConstraintValidatorTestCase
      */
     public function testReservedDomainsPassValidationIfTldNotRequired($domain)
     {
-        $this->validator->validate($domain, new Hostname(['requireTld' => false]));
+        $this->validator->validate($domain, new Hostname(requireTld: false));
 
         $this->assertNoViolation();
     }
@@ -133,10 +131,10 @@ class HostnameValidatorTest extends ConstraintValidatorTestCase
      */
     public function testReservedDomainsRaiseViolationIfTldRequired($domain)
     {
-        $this->validator->validate($domain, new Hostname([
-            'message' => 'myMessage',
-            'requireTld' => true,
-        ]));
+        $this->validator->validate($domain, new Hostname(
+            message: 'myMessage',
+            requireTld: true,
+        ));
 
         $this->buildViolation('myMessage')
             ->setParameter('{{ value }}', '"'.$domain.'"')
@@ -176,7 +174,7 @@ class HostnameValidatorTest extends ConstraintValidatorTestCase
      */
     public function testTopLevelDomainsPassValidationIfTldNotRequired($domain)
     {
-        $this->validator->validate($domain, new Hostname(['requireTld' => false]));
+        $this->validator->validate($domain, new Hostname(requireTld: false));
 
         $this->assertNoViolation();
     }
@@ -186,10 +184,10 @@ class HostnameValidatorTest extends ConstraintValidatorTestCase
      */
     public function testTopLevelDomainsRaiseViolationIfTldRequired($domain)
     {
-        $this->validator->validate($domain, new Hostname([
-            'message' => 'myMessage',
-            'requireTld' => true,
-        ]));
+        $this->validator->validate($domain, new Hostname(
+            message: 'myMessage',
+            requireTld: true,
+        ));
 
         $this->buildViolation('myMessage')
             ->setParameter('{{ value }}', '"'.$domain.'"')

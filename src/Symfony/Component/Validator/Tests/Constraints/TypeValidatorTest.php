@@ -26,7 +26,7 @@ class TypeValidatorTest extends ConstraintValidatorTestCase
 
     public function testNullIsValid()
     {
-        $constraint = new Type(['type' => 'integer']);
+        $constraint = new Type(type: 'integer');
 
         $this->validator->validate(null, $constraint);
 
@@ -35,7 +35,7 @@ class TypeValidatorTest extends ConstraintValidatorTestCase
 
     public function testEmptyIsValidIfString()
     {
-        $constraint = new Type(['type' => 'string']);
+        $constraint = new Type(type: 'string');
 
         $this->validator->validate('', $constraint);
 
@@ -44,10 +44,10 @@ class TypeValidatorTest extends ConstraintValidatorTestCase
 
     public function testEmptyIsInvalidIfNoString()
     {
-        $constraint = new Type([
-            'type' => 'integer',
-            'message' => 'myMessage',
-        ]);
+        $constraint = new Type(
+            type: 'integer',
+            message: 'myMessage',
+        );
 
         $this->validator->validate('', $constraint);
 
@@ -63,7 +63,7 @@ class TypeValidatorTest extends ConstraintValidatorTestCase
      */
     public function testValidValues($value, $type)
     {
-        $constraint = new Type(['type' => $type]);
+        $constraint = new Type(type: $type);
 
         $this->validator->validate($value, $constraint);
 
@@ -123,10 +123,10 @@ class TypeValidatorTest extends ConstraintValidatorTestCase
      */
     public function testInvalidValues($value, $type, $valueAsString)
     {
-        $constraint = new Type([
-            'type' => $type,
-            'message' => 'myMessage',
-        ]);
+        $constraint = new Type(
+            type: $type,
+            message: 'myMessage',
+        );
 
         $this->validator->validate($value, $constraint);
 
@@ -195,7 +195,7 @@ class TypeValidatorTest extends ConstraintValidatorTestCase
      */
     public function testValidValuesMultipleTypes($value, array $types)
     {
-        $constraint = new Type(['type' => $types]);
+        $constraint = new Type(type: $types);
 
         $this->validator->validate($value, $constraint);
 
@@ -210,12 +210,9 @@ class TypeValidatorTest extends ConstraintValidatorTestCase
         ];
     }
 
-    /**
-     * @dataProvider provideConstraintsWithMultipleTypes
-     */
-    public function testInvalidValuesMultipleTypes(Type $constraint)
+    public function testInvalidValuesMultipleTypes()
     {
-        $this->validator->validate('12345', $constraint);
+        $this->validator->validate('12345', new Type(type: ['boolean', 'array'], message: 'myMessage'));
 
         $this->buildViolation('myMessage')
             ->setParameter('{{ value }}', '"12345"')
@@ -224,13 +221,21 @@ class TypeValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    public static function provideConstraintsWithMultipleTypes()
+    /**
+     * @group legacy
+     */
+    public function testInvalidValuesMultipleTypesDoctrineStyle()
     {
-        yield 'Doctrine style' => [new Type([
+        $this->validator->validate('12345', new Type([
             'type' => ['boolean', 'array'],
             'message' => 'myMessage',
-        ])];
-        yield 'named arguments' => [new Type(type: ['boolean', 'array'], message: 'myMessage')];
+        ]));
+
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ value }}', '"12345"')
+            ->setParameter('{{ type }}', implode('|', ['boolean', 'array']))
+            ->setCode(Type::INVALID_TYPE_ERROR)
+            ->assertRaised();
     }
 
     protected static function createFile()

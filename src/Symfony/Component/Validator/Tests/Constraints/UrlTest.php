@@ -24,11 +24,14 @@ class UrlTest extends TestCase
 {
     public function testNormalizerCanBeSet()
     {
-        $url = new Url(['normalizer' => 'trim', 'requireTld' => true]);
+        $url = new Url(normalizer: 'trim', requireTld: true);
 
         $this->assertEquals('trim', $url->normalizer);
     }
 
+    /**
+     * @group legacy
+     */
     public function testInvalidNormalizerThrowsException()
     {
         $this->expectException(InvalidArgumentException::class);
@@ -36,6 +39,9 @@ class UrlTest extends TestCase
         new Url(['normalizer' => 'Unknown Callable', 'requireTld' => true]);
     }
 
+    /**
+     * @group legacy
+     */
     public function testInvalidNormalizerObjectThrowsException()
     {
         $this->expectException(InvalidArgumentException::class);

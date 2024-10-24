@@ -25,12 +25,12 @@ class TimezoneTest extends TestCase
     public function testValidTimezoneConstraints()
     {
         new Timezone();
-        new Timezone(['zone' => \DateTimeZone::ALL]);
+        new Timezone(zone: \DateTimeZone::ALL);
         new Timezone(\DateTimeZone::ALL_WITH_BC);
-        new Timezone([
-            'zone' => \DateTimeZone::PER_COUNTRY,
-            'countryCode' => 'AR',
-        ]);
+        new Timezone(
+            zone: \DateTimeZone::PER_COUNTRY,
+            countryCode: 'AR',
+        );
 
         $this->addToAssertionCount(1);
     }
@@ -38,16 +38,16 @@ class TimezoneTest extends TestCase
     public function testExceptionForGroupedTimezonesByCountryWithWrongZone()
     {
         $this->expectException(ConstraintDefinitionException::class);
-        new Timezone([
-            'zone' => \DateTimeZone::ALL,
-            'countryCode' => 'AR',
-        ]);
+        new Timezone(
+            zone: \DateTimeZone::ALL,
+            countryCode: 'AR',
+        );
     }
 
     public function testExceptionForGroupedTimezonesByCountryWithoutZone()
     {
         $this->expectException(ConstraintDefinitionException::class);
-        new Timezone(['countryCode' => 'AR']);
+        new Timezone(countryCode: 'AR');
     }
 
     /**
@@ -56,7 +56,7 @@ class TimezoneTest extends TestCase
     public function testExceptionForInvalidGroupedTimezones(int $zone)
     {
         $this->expectException(ConstraintDefinitionException::class);
-        new Timezone(['zone' => $zone]);
+        new Timezone(zone: $zone);
     }
 
     public static function provideInvalidZones(): iterable

@@ -61,6 +61,9 @@ class UniqueEntityTest extends TestCase
         self::assertSame(['some_group'], $constraint->groups);
     }
 
+    /**
+     * @group legacy
+     */
     public function testValueOptionConfiguresFields()
     {
         $constraint = new UniqueEntity(['value' => 'email']);

@@ -130,7 +130,7 @@ final class PropertyInfoLoader implements LoaderInterface
 
                         $metadata->addPropertyConstraint($property, $this->getTypeConstraintLegacy($builtinTypes[0], $types[0]));
                     } elseif ($scalar) {
-                        $metadata->addPropertyConstraint($property, new Type(['type' => 'scalar']));
+                        $metadata->addPropertyConstraint($property, new Type(type: 'scalar'));
                     }
                 }
             } else {
@@ -185,26 +185,26 @@ final class PropertyInfoLoader implements LoaderInterface
     private function getTypeConstraintLegacy(string $builtinType, PropertyInfoType $type): Type
     {
         if (PropertyInfoType::BUILTIN_TYPE_OBJECT === $builtinType && null !== $className = $type->getClassName()) {
-            return new Type(['type' => $className]);
+            return new Type(type: $className);
         }
 
-        return new Type(['type' => $builtinType]);
+        return new Type(type: $builtinType);
     }
 
     private function getTypeConstraint(TypeInfoType $type): ?Type
     {
         if ($type instanceof UnionType || $type instanceof IntersectionType) {
-            return ($type->isA(TypeIdentifier::INT) || $type->isA(TypeIdentifier::FLOAT) || $type->isA(TypeIdentifier::STRING) || $type->isA(TypeIdentifier::BOOL)) ? new Type(['type' => 'scalar']) : null;
+            return ($type->isA(TypeIdentifier::INT) || $type->isA(TypeIdentifier::FLOAT) || $type->isA(TypeIdentifier::STRING) || $type->isA(TypeIdentifier::BOOL)) ? new Type(type: 'scalar') : null;
         }
 
         $baseType = $type->getBaseType();
 
         if ($baseType instanceof ObjectType) {
-            return new Type(['type' => $baseType->getClassName()]);
+            return new Type(type: $baseType->getClassName());
         }
 
         if (TypeIdentifier::MIXED !== $baseType->getTypeIdentifier()) {
-            return new Type(['type' => $baseType->getTypeIdentifier()->value]);
+            return new Type(type: $baseType->getTypeIdentifier()->value);
         }
 
         return null;
@@ -238,7 +238,7 @@ final class PropertyInfoLoader implements LoaderInterface
         }
 
         if (null === $allConstraint) {
-            $metadata->addPropertyConstraint($property, new All(['constraints' => $constraints]));
+            $metadata->addPropertyConstraint($property, new All(constraints: $constraints));
         } else {
             $allConstraint->constraints = array_merge($allConstraint->constraints, $constraints);
         }
@@ -272,7 +272,7 @@ final class PropertyInfoLoader implements LoaderInterface
         }
 
         if (null === $allConstraint) {
-            $metadata->addPropertyConstraint($property, new All(['constraints' => $constraints]));
+            $metadata->addPropertyConstraint($property, new All(constraints: $constraints));
         } else {
             $allConstraint->constraints = array_merge($allConstraint->constraints, $constraints);
         }

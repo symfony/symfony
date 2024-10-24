@@ -21,14 +21,14 @@ class EmailTest extends TestCase
 {
     public function testConstructorStrict()
     {
-        $subject = new Email(['mode' => Email::VALIDATION_MODE_STRICT]);
+        $subject = new Email(mode: Email::VALIDATION_MODE_STRICT);
 
         $this->assertEquals(Email::VALIDATION_MODE_STRICT, $subject->mode);
     }
 
     public function testConstructorHtml5AllowNoTld()
     {
-        $subject = new Email(['mode' => Email::VALIDATION_MODE_HTML5_ALLOW_NO_TLD]);
+        $subject = new Email(mode: Email::VALIDATION_MODE_HTML5_ALLOW_NO_TLD);
 
         $this->assertEquals(Email::VALIDATION_MODE_HTML5_ALLOW_NO_TLD, $subject->mode);
     }
@@ -37,7 +37,7 @@ class EmailTest extends TestCase
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('The "mode" parameter value is not valid.');
-        new Email(['mode' => 'Unknown Mode']);
+        new Email(mode: 'Unknown Mode');
     }
 
     public function testUnknownModeArgumentsTriggerException()
@@ -49,11 +49,14 @@ class EmailTest extends TestCase
 
     public function testNormalizerCanBeSet()
     {
-        $email = new Email(['normalizer' => 'trim']);
+        $email = new Email(normalizer: 'trim');
 
         $this->assertEquals('trim', $email->normalizer);
     }
 
+    /**
+     * @group legacy
+     */
     public function testInvalidNormalizerThrowsException()
     {
         $this->expectException(InvalidArgumentException::class);
@@ -61,6 +64,9 @@ class EmailTest extends TestCase
         new Email(['normalizer' => 'Unknown Callable']);
     }
 
+    /**
+     * @group legacy
+     */
     public function testInvalidNormalizerObjectThrowsException()
     {
         $this->expectException(InvalidArgumentException::class);

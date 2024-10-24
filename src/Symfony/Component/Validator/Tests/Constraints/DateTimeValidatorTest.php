@@ -62,9 +62,7 @@ class DateTimeValidatorTest extends ConstraintValidatorTestCase
      */
     public function testValidDateTimes($format, $dateTime)
     {
-        $constraint = new DateTime([
-            'format' => $format,
-        ]);
+        $constraint = new DateTime(format: $format);
 
         $this->validator->validate($dateTime, $constraint);
 
@@ -87,10 +85,10 @@ class DateTimeValidatorTest extends ConstraintValidatorTestCase
      */
     public function testInvalidDateTimes($format, $dateTime, $code)
     {
-        $constraint = new DateTime([
-            'message' => 'myMessage',
-            'format' => $format,
-        ]);
+        $constraint = new DateTime(
+            message: 'myMessage',
+            format: $format,
+        );
 
         $this->validator->validate($dateTime, $constraint);
 
@@ -130,9 +128,7 @@ class DateTimeValidatorTest extends ConstraintValidatorTestCase
 
     public function testDateTimeWithTrailingData()
     {
-        $this->validator->validate('1995-05-10 00:00:00', new DateTime([
-            'format' => 'Y-m-d+',
-        ]));
+        $this->validator->validate('1995-05-10 00:00:00', new DateTime(format: 'Y-m-d+'));
         $this->assertNoViolation();
     }
 }

@@ -24,7 +24,7 @@ class FileTest extends TestCase
      */
     public function testMaxSize($maxSize, $bytes, $binaryFormat)
     {
-        $file = new File(['maxSize' => $maxSize]);
+        $file = new File(maxSize: $maxSize);
 
         $this->assertSame($bytes, $file->maxSize);
         $this->assertSame($binaryFormat, $file->binaryFormat);
@@ -33,7 +33,7 @@ class FileTest extends TestCase
 
     public function testMagicIsset()
     {
-        $file = new File(['maxSize' => 1]);
+        $file = new File(maxSize: 1);
 
         $this->assertTrue($file->__isset('maxSize'));
         $this->assertTrue($file->__isset('groups'));
@@ -57,7 +57,7 @@ class FileTest extends TestCase
      */
     public function testInvalidValueForMaxSizeThrowsExceptionAfterInitialization($maxSize)
     {
-        $file = new File(['maxSize' => 1000]);
+        $file = new File(maxSize: 1000);
 
         $this->expectException(ConstraintDefinitionException::class);
 
@@ -69,7 +69,7 @@ class FileTest extends TestCase
      */
     public function testMaxSizeCannotBeSetToInvalidValueAfterInitialization($maxSize)
     {
-        $file = new File(['maxSize' => 1000]);
+        $file = new File(maxSize: 1000);
 
         try {
             $file->maxSize = $maxSize;
@@ -85,7 +85,7 @@ class FileTest extends TestCase
     public function testInvalidMaxSize($maxSize)
     {
         $this->expectException(ConstraintDefinitionException::class);
-        new File(['maxSize' => $maxSize]);
+        new File(maxSize: $maxSize);
     }
 
     public static function provideValidSizes()
@@ -125,7 +125,7 @@ class FileTest extends TestCase
      */
     public function testBinaryFormat($maxSize, $guessedFormat, $binaryFormat)
     {
-        $file = new File(['maxSize' => $maxSize, 'binaryFormat' => $guessedFormat]);
+        $file = new File(maxSize: $maxSize, binaryFormat: $guessedFormat);
 
         $this->assertSame($binaryFormat, $file->binaryFormat);
     }

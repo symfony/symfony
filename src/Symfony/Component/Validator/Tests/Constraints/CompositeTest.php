@@ -66,8 +66,8 @@ class CompositeTest extends TestCase
     public function testMergeNestedGroupsIfNoExplicitParentGroup()
     {
         $constraint = new ConcreteComposite([
-            new NotNull(['groups' => 'Default']),
-            new NotBlank(['groups' => ['Default', 'Strict']]),
+            new NotNull(groups: ['Default']),
+            new NotBlank(groups: ['Default', 'Strict']),
         ]);
 
         $this->assertEquals(['Default', 'Strict'], $constraint->groups);
@@ -94,8 +94,8 @@ class CompositeTest extends TestCase
     {
         $constraint = new ConcreteComposite([
             'constraints' => [
-                new NotNull(['groups' => 'Default']),
-                new NotBlank(['groups' => 'Strict']),
+                new NotNull(groups: ['Default']),
+                new NotBlank(groups: ['Strict']),
             ],
             'groups' => ['Default', 'Strict'],
         ]);
@@ -110,7 +110,7 @@ class CompositeTest extends TestCase
         $this->expectException(ConstraintDefinitionException::class);
         new ConcreteComposite([
             'constraints' => [
-                new NotNull(['groups' => ['Default', 'Foobar']]),
+                new NotNull(groups: ['Default', 'Foobar']),
             ],
             'groups' => ['Default', 'Strict'],
         ]);
@@ -119,8 +119,8 @@ class CompositeTest extends TestCase
     public function testImplicitGroupNamesAreForwarded()
     {
         $constraint = new ConcreteComposite([
-            new NotNull(['groups' => 'Default']),
-            new NotBlank(['groups' => 'Strict']),
+            new NotNull(groups: ['Default']),
+            new NotBlank(groups: ['Strict']),
         ]);
 
         $constraint->addImplicitGroupName('ImplicitGroup');
@@ -142,7 +142,7 @@ class CompositeTest extends TestCase
     {
         $this->expectException(ConstraintDefinitionException::class);
         new ConcreteComposite([
-            new NotNull(['groups' => 'Default']),
+            new NotNull(groups: ['Default']),
             'NotBlank',
         ]);
     }
@@ -151,7 +151,7 @@ class CompositeTest extends TestCase
     {
         $this->expectException(ConstraintDefinitionException::class);
         new ConcreteComposite([
-            new NotNull(['groups' => 'Default']),
+            new NotNull(groups: ['Default']),
             new \ArrayObject(),
         ]);
     }

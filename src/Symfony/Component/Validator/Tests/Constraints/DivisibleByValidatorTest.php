@@ -32,7 +32,11 @@ class DivisibleByValidatorTest extends AbstractComparisonValidatorTestCase
 
     protected static function createConstraint(?array $options = null): Constraint
     {
-        return new DivisibleBy($options);
+        if (null !== $options) {
+            return new DivisibleBy(...$options);
+        }
+
+        return new DivisibleBy();
     }
 
     protected function getErrorCode(): ?string

@@ -172,6 +172,22 @@ class JavaScriptImportPathCompilerTest extends TestCase
             'expectedJavaScriptImports' => ['/assets/other.js' => ['lazy' => false, 'asset' => 'other.js', 'add' => true]],
         ];
 
+        yield 'static_named_import_with_unicode_character' => [
+            'input' => 'import { ɵmyFunction } from "./other.js";',
+            'expectedJavaScriptImports' => ['/assets/other.js' => ['lazy' => false, 'asset' => 'other.js', 'add' => true]],
+        ];
+
+        yield 'static_multiple_named_imports' => [
+            'input' => <<<EOF
+                import {
+                    myFunction,
+                    helperFunction
+                } from "./other.js";
+                EOF
+            ,
+            'expectedJavaScriptImports' => ['/assets/other.js' => ['lazy' => false, 'asset' => 'other.js', 'add' => true]],
+        ];
+
         yield 'static_import_everything' => [
             'input' => 'import * as myModule from "./other.js";',
             'expectedJavaScriptImports' => ['/assets/other.js' => ['lazy' => false, 'asset' => 'other.js', 'add' => true]],

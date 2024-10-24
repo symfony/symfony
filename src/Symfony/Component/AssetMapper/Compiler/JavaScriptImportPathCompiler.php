@@ -42,7 +42,7 @@ final class JavaScriptImportPathCompiler implements AssetCompilerInterface
             (?:                            # Import statements (script captured)
                 import\s*
                     (?:
-                        (?:\*\s*as\s+\w+|\s+[\w\s{},*]+)
+                        (?:\*\s*as\s+\w+|\s+[\p{L}\w\s{},*]+)
                         \s*from\s*
                     )?
             |

@@ -5,6 +5,7 @@ CHANGELOG
 ---
 
  * Add option `delay[arguments]` in the transport definition
+ * Add default exchange support
 
 6.0
 ---

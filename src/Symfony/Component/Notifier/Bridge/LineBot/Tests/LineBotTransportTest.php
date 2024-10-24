@@ -12,10 +12,14 @@
 namespace Symfony\Component\Notifier\Bridge\LineBot\Tests;
 
 use Symfony\Component\HttpClient\MockHttpClient;
+use Symfony\Component\Notifier\Bridge\LineBot\LineBotOptions;
 use Symfony\Component\Notifier\Bridge\LineBot\LineBotTransport;
+use Symfony\Component\Notifier\Exception\InvalidArgumentException;
 use Symfony\Component\Notifier\Exception\TransportException;
 use Symfony\Component\Notifier\Message\ChatMessage;
+use Symfony\Component\Notifier\Message\MessageOptionsInterface;
 use Symfony\Component\Notifier\Message\SmsMessage;
+use Symfony\Component\Notifier\Notification\Notification;
 use Symfony\Component\Notifier\Test\TransportTestCase;
 use Symfony\Component\Notifier\Tests\Transport\DummyMessage;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
@@ -47,6 +51,53 @@ final class LineBotTransportTest extends TransportTestCase
         yield [new DummyMessage()];
     }
 
+    public static function validMessageProvider(): iterable
+    {
+        return [
+            'subject only message' => [
+                (new LineBotOptions())->addMessageFromNotification(
+                    new Notification('testSubject')
+                )->to('testReceiver'),
+                new ChatMessage('testSubject'),
+            ],
+            'notification' => [
+                (new LineBotOptions())->addMessageFromNotification(
+                    new Notification('testSubject')
+                )->to('testReceiver'),
+                ChatMessage::fromNotification(
+                    new Notification('testSubject')
+                ),
+            ],
+            'notification with options without message' => [
+                (new LineBotOptions())
+                    ->to('testReceiver')
+                    ->addMessage([
+                        'type' => 'text',
+                        'text' => 'testSubject',
+                    ])
+                    ->disableNotification(false),
+                ChatMessage::fromNotification(
+                    new Notification('testSubject')
+                )->options((new LineBotOptions())->disableNotification(false)),
+            ],
+            'notification with options with message' => [
+                (new LineBotOptions())
+                    ->to('testReceiver')
+                    ->addMessage([
+                        'type' => 'text',
+                        'text' => 'Hello',
+                    ])
+                    ->disableNotification(false),
+                ChatMessage::fromNotification(
+                    new Notification('testSubject')
+                )->options((new LineBotOptions())->addMessage([
+                    'type' => 'text',
+                    'text' => 'Hello',
+                ])->disableNotification(false)),
+            ],
+        ];
+    }
+
     public function testSendWithErrorResponseThrows()
     {
         $response = $this->createMock(ResponseInterface::class);
@@ -65,5 +116,42 @@ final class LineBotTransportTest extends TransportTestCase
         $this->expectExceptionMessageMatches('/testMessage.+400: "testDescription"/');
 
         $transport->send(new ChatMessage('testMessage'));
+    }
+
+    /**
+     * @dataProvider validMessageProvider
+     */
+    public function testValidMessage(LineBotOptions $lineBotOptions, ChatMessage $message)
+    {
+        $client = $this->createMock(HttpClientInterface::class);
+
+        $client->expects($this->once())
+            ->method('request')
+            ->willThrowException(new \Exception('The request should not be sent'))
+            ->with(
+                $this->anything(),
+                $this->anything(),
+                $this->equalTo([
+                    'auth_bearer' => 'testToken',
+                    'json' => $lineBotOptions->toArray(),
+                ]),
+            )
+        ;
+
+        $this->expectException(\Exception::class);
+
+        $transport = $this->createTransport($client);
+        $transport->send($message);
+    }
+
+    public function testSendNotificationWithInvalidOptions()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Invalid message provided.');
+
+        $transport = $this->createTransport();
+        $transport->send((new ChatMessage('testSubject'))->options(
+            $this->createMock(MessageOptionsInterface::class)
+        ));
     }
 }

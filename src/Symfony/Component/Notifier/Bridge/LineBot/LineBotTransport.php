@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Notifier\Bridge\LineBot;
 
+use Symfony\Component\Notifier\Exception\InvalidArgumentException;
 use Symfony\Component\Notifier\Exception\TransportException;
 use Symfony\Component\Notifier\Exception\UnsupportedMessageTypeException;
 use Symfony\Component\Notifier\Message\ChatMessage;
@@ -42,20 +43,44 @@ final class LineBotTransport extends AbstractTransport
             throw new UnsupportedMessageTypeException(__CLASS__, ChatMessage::class, $message);
         }
 
+        $options = $message->getOptions() ?? new LineBotOptions();
+        if (!($options instanceof LineBotOptions)) {
+            throw new InvalidArgumentException('Invalid message provided.');
+        }
+
+        // If there are no messages in the options (for example, if the options are empty),
+        // we should take the message from the notification or subject.
+        if (0 === $options->getMessagesCount()) {
+            if (null !== ($notification = $message->getNotification())) {
+                $options->addMessageFromNotification($notification);
+            } else {
+                $options->addMessage([
+                    'type' => 'text',
+                    'text' => $message->getSubject(),
+                ]);
+            }
+        }
+
+        // If the recipient ID is not set, set it to the default receiver in DSN
+        if (null === $options->getRecipientId()) {
+            $options->to($this->receiver);
+        }
+
+        // If the message is not set, set it to the subject of the message
+        $parameters = $options->toArray();
+        if (empty($parameters['messages'])) {
+            $parameters = $options->addMessage([
+                'type' => 'text',
+                'text' => $message->getSubject(),
+            ])->toArray();
+        }
+
         $response = $this->client->request(
             'POST',
             \sprintf('https://%s/v2/bot/message/push', $this->getEndpoint()),
             [
                 'auth_bearer' => $this->accessToken,
-                'json' => [
-                    'to' => $this->receiver,
-                    'messages' => [
-                        [
-                            'type' => 'text',
-                            'text' => $message->getSubject(),
-                        ],
-                    ],
-                ],
+                'json' => $parameters,
             ],
         );
 

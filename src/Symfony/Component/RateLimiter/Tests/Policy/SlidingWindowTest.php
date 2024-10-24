@@ -30,6 +30,7 @@ class SlidingWindowTest extends TestCase
         $data = serialize($window);
         sleep(10);
         $cachedWindow = unserialize($data);
+        $cachedWindow->setClock(null);
         $this->assertSame(10, $cachedWindow->getExpirationTime());
 
         $new = SlidingWindow::createFromPreviousWindow($cachedWindow, 15);

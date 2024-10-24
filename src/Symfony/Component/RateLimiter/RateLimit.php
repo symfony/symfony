@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\RateLimiter;
 
+use Psr\Clock\ClockInterface;
 use Symfony\Component\RateLimiter\Exception\RateLimitExceededException;
 
 /**
@@ -18,12 +19,16 @@ use Symfony\Component\RateLimiter\Exception\RateLimitExceededException;
  */
 class RateLimit
 {
+    use ClockTrait;
+
     public function __construct(
         private int $availableTokens,
         private \DateTimeImmutable $retryAfter,
         private bool $accepted,
         private int $limit,
+        ?ClockInterface $clock = null,
     ) {
+        $this->setClock($clock);
     }
 
     public function isAccepted(): bool
@@ -62,7 +67,7 @@ class RateLimit
 
     public function wait(): void
     {
-        $delta = $this->retryAfter->format('U.u') - microtime(true);
+        $delta = $this->retryAfter->format('U.u') - $this->now();
         if ($delta <= 0) {
             return;
         }

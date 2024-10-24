@@ -58,6 +58,7 @@ class AuthenticatorManager implements AuthenticatorManagerInterface, UserAuthent
         private bool $eraseCredentials = true,
         private bool $hideUserNotFoundExceptions = true,
         private array $requiredBadges = [],
+        private bool $hideAccountStatusExceptions = false,
     ) {
     }
 
@@ -250,7 +251,7 @@ class AuthenticatorManager implements AuthenticatorManagerInterface, UserAuthent
 
         // Avoid leaking error details in case of invalid user (e.g. user not found or invalid account status)
         // to prevent user enumeration via response content comparison
-        if ($this->hideUserNotFoundExceptions && ($authenticationException instanceof UserNotFoundException || ($authenticationException instanceof AccountStatusException && !$authenticationException instanceof CustomUserMessageAccountStatusException))) {
+        if ($this->isSensitiveException($authenticationException)) {
             $authenticationException = new BadCredentialsException('Bad credentials.', 0, $authenticationException);
         }
 
@@ -263,5 +264,18 @@ class AuthenticatorManager implements AuthenticatorManagerInterface, UserAuthent
 
         // returning null is ok, it means they want the request to continue
         return $loginFailureEvent->getResponse();
+    }
+
+    private function isSensitiveException(AuthenticationException $exception): bool
+    {
+        if ($this->hideUserNotFoundExceptions && $exception instanceof UserNotFoundException) {
+            return true;
+        }
+
+        if ($this->hideAccountStatusExceptions && $exception instanceof AccountStatusException && !$exception instanceof CustomUserMessageAccountStatusException) {
+            return true;
+        }
+
+        return false;
     }
 }

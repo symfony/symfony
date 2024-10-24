@@ -155,6 +155,7 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
         }
 
         $container->setParameter('security.authentication.hide_user_not_found', $config['hide_user_not_found']);
+        $container->setParameter('.security.authentication.hide_account_status_exceptions', $config['hide_account_status_exceptions']);
 
         if (class_exists(Application::class)) {
             $loader->load('debug_console.php');

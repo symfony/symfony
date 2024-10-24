@@ -29,12 +29,15 @@ final class LockMiddleware implements MiddlewareInterface
         }
 
         if (!$envelope->last(ReceivedStamp::class)) {
-            $lock = $this->lockFactory->createLockFromKey($stamp->getKey(), $stamp->getTtl(), autoRelease: false);
-
-            $blocking = $stamp->getMode() === LockStamp::MODE_BLOCK;
-            if (!$lock->acquire($blocking)) {
-                return $envelope;
+            if ($stamp->shouldDiscardDuplicate()) {
+                $lock = $this->lockFactory->createLockFromKey($stamp->getKey(), $stamp->getTtl(), autoRelease: false);
+                if (!$lock->acquire()) {
+                    return $envelope;
+                }
             }
+        } elseif ($stamp->shouldBlockDuplicateInProcess()) {
+            $lock = $this->lockFactory->createLockFromKey($stamp->getKey(), $stamp->getTtl(), autoRelease: false);
+            $lock->acquire(true);
         } elseif ($stamp->shouldBeReleasedBeforeHandlerCall()) {
             $this->lockFactory->createLockFromKey($stamp->getKey())->release();
         }

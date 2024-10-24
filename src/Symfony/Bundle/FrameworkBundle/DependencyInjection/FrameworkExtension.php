@@ -2415,8 +2415,10 @@ class FrameworkExtension extends Extension
                 throw new LogicException(\sprintf('Invalid Messenger configuration: the failure transport "%s" is not a valid transport or service id.', $config['failure_transport']));
             }
 
-            $container->setAlias('messenger.failure_transports.default', 'messenger.transport.'.$config['failure_transport']);
-            $failureTransports[] = $config['failure_transport'];
+            if (!isset($config['transports'][$config['failure_transport']]['failure_transport'])) {
+                $container->setAlias('messenger.failure_transports.default', 'messenger.transport.'.$config['failure_transport']);
+                $failureTransports[] = $config['failure_transport'];
+            }
         }
 
         $failureTransportsByName = [];
@@ -2426,6 +2428,12 @@ class FrameworkExtension extends Extension
                 $failureTransportsByName[$name] = $transport['failure_transport'];
             } elseif ($config['failure_transport']) {
                 $failureTransportsByName[$name] = $config['failure_transport'];
+            }
+        }
+
+        foreach ($failureTransports as $key => $failureTransport) {
+            if (isset($config['transports'][$failureTransport]['failure_transport'])) {
+                unset($failureTransports[$key]);
             }
         }
 

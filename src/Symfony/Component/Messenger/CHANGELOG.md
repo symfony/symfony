@@ -10,6 +10,7 @@ CHANGELOG
  * Add `--class-filter` option to the `messenger:failed:remove` command
  * Add `$stamps` parameter to `HandleTrait::handle`
  * Add `Symfony\Component\Messenger\EventListener\ResetMemoryUsageListener` to reset PHP's peak memory usage for each processed message
+ * Add ability to chain failure transports. A failed message will process through the respective failure transports until arriving at the final one.
 
 7.2
 ---

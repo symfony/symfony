@@ -438,6 +438,11 @@ abstract class AbstractString implements \Stringable, \JsonSerializable
         return $this->snake()->replace('_', '-');
     }
 
+    public function pascal(): static
+    {
+        return $this->camel()->title();
+    }
+
     abstract public function splice(string $replacement, int $start = 0, ?int $length = null): static;
 
     /**

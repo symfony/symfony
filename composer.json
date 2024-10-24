@@ -75,6 +75,7 @@
         "symfony/error-handler": "self.version",
         "symfony/event-dispatcher": "self.version",
         "symfony/expression-language": "self.version",
+        "symfony/feature-flag": "self.version",
         "symfony/filesystem": "self.version",
         "symfony/finder": "self.version",
         "symfony/form": "self.version",

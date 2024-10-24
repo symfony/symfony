@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+7.2
+---
+
+ * Add a DSN option/flag to allow disabling of `https` protocol
+
 6.4
 ---
 

@@ -73,29 +73,26 @@ final class NtfyTransport extends AbstractTransport
             $opts = NtfyOptions::fromNotification($notification);
         }
 
-        $options = $opts ? $opts->toArray() : [];
+        $json_options = $opts? $opts->toArray() : [];
 
-        $options['topic'] = $this->getTopic();
+        $json_options['topic'] = $this->getTopic();
 
-        if (!isset($options['title'])) {
-            $options['title'] = $message->getSubject();
+        if (!isset($json_options['title'])) {
+            $json_options['title'] = $message->getSubject();
         }
-        if (!isset($options['message'])) {
-            $options['message'] = $message->getContent();
+        if (!isset($json_options['message'])) {
+            $json_options['message'] = $message->getContent();
         }
 
-        $headers = [];
+        $client_options = ['json' => $json_options];
 
         if (null !== $this->user && null !== $this->password) {
-            $headers['Authorization'] = 'Basic '.rtrim(base64_encode($this->user.':'.$this->password), '=');
+            $client_options['auth_basic'] = [$this->user, $this->password];
         } elseif (null !== $this->password) {
-            $headers['Authorization'] = 'Bearer '.$this->password;
+            $client_options['auth_bearer'] = $this->password;
         }
 
-        $response = $this->client->request('POST', ($this->secureHttp ? 'https' : 'http').'://'.$this->getEndpoint(), [
-            'headers' => $headers,
-            'json' => $options,
-        ]);
+        $response = $this->client->request('POST', ($this->secureHttp? 'https' : 'http') . '://' . $this->getEndpoint(), $client_options);
 
         try {
             $statusCode = $response->getStatusCode();

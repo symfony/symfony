@@ -15,6 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\PropertyInfo\Extractor\SerializerExtractor;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\AdderRemoverDummy;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\Dummy;
+use Symfony\Component\PropertyInfo\Tests\Fixtures\GroupPropertyDummy;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\IgnorePropertyDummy;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactory;
 use Symfony\Component\Serializer\Mapping\Loader\AttributeLoader;
@@ -43,12 +44,90 @@ class SerializerExtractorTest extends TestCase
     public function testGetPropertiesWithIgnoredProperties()
     {
         $this->assertSame(['visibleProperty'], $this->extractor->getProperties(IgnorePropertyDummy::class, ['serializer_groups' => ['a']]));
-        $this->assertSame(['visibleProperty'], $this->extractor->getProperties(IgnorePropertyDummy::class, ['serializer_groups' => ['Default']]));
-        $this->assertSame(['visibleProperty'], $this->extractor->getProperties(IgnorePropertyDummy::class, ['serializer_groups' => ['IgnorePropertyDummy']]));
     }
 
     public function testGetPropertiesWithAnyGroup()
     {
         $this->assertSame(['analyses', 'feet'], $this->extractor->getProperties(AdderRemoverDummy::class, ['serializer_groups' => null]));
+    }
+
+    public function testGetPropertiesWithDefaultGroups()
+    {
+        $this->assertSame(
+            ['noGroup', 'customGroup', 'defaultGroup', 'classGroup'],
+            $this->extractor->getProperties(GroupPropertyDummy::class),
+        );
+
+        $this->assertSame(
+            ['noGroup'],
+            $this->extractor->getProperties(GroupPropertyDummy::class, ['serializer_groups' => []]),
+        );
+
+        $this->assertSame(
+            ['noGroup', 'customGroup', 'defaultGroup', 'classGroup'],
+            $this->extractor->getProperties(GroupPropertyDummy::class, ['serializer_groups' => ['*']]),
+        );
+
+        $this->assertSame(
+            ['customGroup'],
+            $this->extractor->getProperties(GroupPropertyDummy::class, ['serializer_groups' => ['custom']]),
+        );
+
+        $this->assertSame(
+            ['defaultGroup'],
+            $this->extractor->getProperties(GroupPropertyDummy::class, ['serializer_groups' => ['Default']]),
+        );
+
+        $this->assertSame(
+            ['classGroup'],
+            $this->extractor->getProperties(GroupPropertyDummy::class, ['serializer_groups' => ['GroupPropertyDummy']]),
+        );
+
+        $this->assertSame(
+            ['noGroup', 'customGroup', 'defaultGroup', 'classGroup'],
+            $this->extractor->getProperties(GroupPropertyDummy::class, [
+                'enable_default_groups' => true,
+            ]),
+        );
+
+        $this->assertSame(
+            ['noGroup', 'customGroup', 'defaultGroup', 'classGroup'],
+            $this->extractor->getProperties(GroupPropertyDummy::class, [
+                'enable_default_groups' => true,
+                'serializer_groups' => [],
+            ]),
+        );
+
+        $this->assertSame(
+            ['noGroup', 'customGroup', 'defaultGroup', 'classGroup'],
+            $this->extractor->getProperties(GroupPropertyDummy::class, [
+                'enable_default_groups' => true,
+                'serializer_groups' => ['*'],
+            ]),
+        );
+
+        $this->assertSame(
+            ['customGroup'],
+            $this->extractor->getProperties(GroupPropertyDummy::class, [
+                'enable_default_groups' => true,
+                'serializer_groups' => ['custom'],
+            ]),
+        );
+
+        $this->assertSame(
+            ['noGroup', 'defaultGroup', 'classGroup'],
+            $this->extractor->getProperties(GroupPropertyDummy::class, [
+                'enable_default_groups' => true,
+                'serializer_groups' => ['Default'],
+            ]),
+        );
+
+        $this->assertSame(
+            ['noGroup', 'defaultGroup', 'classGroup'],
+            $this->extractor->getProperties(GroupPropertyDummy::class, [
+                'enable_default_groups' => true,
+                'serializer_groups' => ['GroupPropertyDummy'],
+            ]),
+        );
     }
 }

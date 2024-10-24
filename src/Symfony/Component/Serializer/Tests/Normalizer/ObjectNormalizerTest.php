@@ -507,8 +507,6 @@ class ObjectNormalizerTest extends TestCase
                 'bar' => null,
                 'foo_bar' => '@dunglas',
                 'symfony' => '@coopTilleuls',
-                'default' => null,
-                'class_name' => null,
             ],
             $this->normalizer->normalize($obj, null, [ObjectNormalizer::GROUPS => ['name_converter']])
         );

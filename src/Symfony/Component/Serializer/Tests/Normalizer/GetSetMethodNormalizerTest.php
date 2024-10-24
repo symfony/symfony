@@ -302,8 +302,6 @@ class GetSetMethodNormalizerTest extends TestCase
                 'bar' => null,
                 'foo_bar' => '@dunglas',
                 'symfony' => '@coopTilleuls',
-                'default' => null,
-                'class_name' => null,
             ],
             $this->normalizer->normalize($obj, null, [GetSetMethodNormalizer::GROUPS => ['name_converter']])
         );

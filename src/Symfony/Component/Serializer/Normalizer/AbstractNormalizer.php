@@ -129,6 +129,11 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
     public const FILTER_BOOL = 'filter_bool';
 
     /**
+     * Add 'Default' and 'ClassNames' groups when no custom group is specified.
+     */
+    public const ENABLE_DEFAULT_GROUPS = 'enable_default_groups';
+
+    /**
      * @internal
      */
     protected const CIRCULAR_REFERENCE_LIMIT_COUNTERS = 'circular_reference_limit_counters';
@@ -226,9 +231,17 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
         $classMetadata = $this->classMetadataFactory->getMetadataFor($classOrObject);
         $class = $classMetadata->getName();
 
+        $enableDefaultGroups = $context[self::ENABLE_DEFAULT_GROUPS] ?? $this->defaultContext[self::ENABLE_DEFAULT_GROUPS] ?? false;
+
         $groups = $this->getGroups($context);
+        $defaultGroups = ['Default', (false !== $nsSep = strrpos($class, '\\')) ? substr($class, $nsSep + 1) : $class];
+
         $groupsHasBeenDefined = [] !== $groups;
-        $groups = array_merge($groups, ['Default', (false !== $nsSep = strrpos($class, '\\')) ? substr($class, $nsSep + 1) : $class]);
+        $customGroupsHasBeenDefined = (bool) array_diff($groups, $defaultGroups);
+
+        if ($enableDefaultGroups && !$customGroupsHasBeenDefined) {
+            $groups = array_merge($groups, $defaultGroups);
+        }
 
         $allowedAttributes = [];
         $ignoreUsed = false;
@@ -238,12 +251,16 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
                 $ignoreUsed = true;
             }
 
-            // If you update this check, update accordingly the one in Symfony\Component\PropertyInfo\Extractor\SerializerExtractor::getProperties()
-            if (
-                !$ignore
-                && (!$groupsHasBeenDefined || array_intersect(array_merge($attributeMetadata->getGroups(), ['*']), $groups))
-                && $this->isAllowedAttribute($classOrObject, $name = $attributeMetadata->getName(), null, $context)
-            ) {
+            // If you update these checks, update accordingly the one in Symfony\Component\PropertyInfo\Extractor\SerializerExtractor::getProperties()
+            if ($ignore || !$this->isAllowedAttribute($classOrObject, $name = $attributeMetadata->getName(), null, $context)) {
+                continue;
+            }
+
+            if (!($attributeGroups = $attributeMetadata->getGroups()) && $enableDefaultGroups && !$customGroupsHasBeenDefined) {
+                $attributeGroups = $defaultGroups;
+            }
+
+            if (!$groupsHasBeenDefined || array_intersect(array_merge($attributeGroups, ['*']), $groups)) {
                 $allowedAttributes[] = $attributesAsString ? $name : $attributeMetadata;
             }
         }

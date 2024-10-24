@@ -41,8 +41,6 @@ trait GroupsTestTrait
 
         $this->assertEquals([
             'bar' => 'bar',
-            'default' => 'default',
-            'className' => 'className',
         ], $normalizer->normalize($obj, null, ['groups' => ['c']]));
 
         $this->assertEquals([
@@ -52,14 +50,9 @@ trait GroupsTestTrait
             'bar' => 'bar',
             'kevin' => 'kevin',
             'coopTilleuls' => 'coopTilleuls',
-            'default' => 'default',
-            'className' => 'className',
         ], $normalizer->normalize($obj, null, ['groups' => ['a', 'c']]));
 
-        $this->assertEquals([
-            'default' => 'default',
-            'className' => 'className',
-        ], $normalizer->normalize($obj, null, ['groups' => ['unknown']]));
+        $this->assertEquals([], $normalizer->normalize($obj, null, ['groups' => ['unknown']]));
 
         $this->assertEquals([
             'quux' => 'quux',
@@ -79,15 +72,11 @@ trait GroupsTestTrait
         $normalizer = $this->getDenormalizerForGroups();
 
         $obj = new GroupDummy();
-        $obj->setDefault('default');
-        $obj->setClassName('className');
 
         $data = [
             'foo' => 'foo',
             'bar' => 'bar',
             'quux' => 'quux',
-            'default' => 'default',
-            'className' => 'className',
         ];
 
         $denormalized = $normalizer->denormalize(
@@ -124,18 +113,87 @@ trait GroupsTestTrait
         $this->assertEquals($obj, $denormalized);
     }
 
-    public function testNormalizeNoPropertyInGroup()
+    public function testNormalizeWithDefaultGroups()
     {
         $normalizer = $this->getNormalizerForGroups();
 
-        $obj = new GroupDummy();
-        $obj->setFoo('foo');
-        $obj->setDefault('default');
-        $obj->setClassName('className');
+        $assertNormalizedProperties = function (array $expectedProperties, array $normalized): void {
+            $actualProperties = array_keys($normalized);
 
-        $this->assertEquals([
-            'default' => 'default',
-            'className' => 'className',
-        ], $normalizer->normalize($obj, null, ['groups' => ['notExist']]));
+            sort($expectedProperties);
+            sort($actualProperties);
+
+            $this->assertSame($expectedProperties, $actualProperties);
+        };
+
+        $assertNormalizedProperties(
+            ['foo', 'fooBar', 'symfony', 'kevin', 'coopTilleuls'],
+            $normalizer->normalize(new GroupDummy(), context: ['groups' => ['a']]),
+        );
+
+        $assertNormalizedProperties(
+            ['bar', 'foo', 'fooBar', 'symfony', 'quux', 'default', 'className', 'kevin', 'coopTilleuls'],
+            $normalizer->normalize(new GroupDummy()),
+        );
+
+        $assertNormalizedProperties(
+            ['bar', 'foo', 'fooBar', 'symfony', 'quux', 'default', 'className', 'kevin', 'coopTilleuls'],
+            $normalizer->normalize(new GroupDummy(), context: ['groups' => []]),
+        );
+
+        $assertNormalizedProperties(
+            ['foo', 'bar', 'quux', 'fooBar', 'symfony', 'default', 'className', 'kevin', 'coopTilleuls'],
+            $normalizer->normalize(new GroupDummy(), context: ['groups' => ['*']]),
+        );
+
+        $assertNormalizedProperties(
+            ['default'],
+            $normalizer->normalize(new GroupDummy(), context: ['groups' => ['Default']]),
+        );
+
+        $assertNormalizedProperties(
+            ['className'],
+            $normalizer->normalize(new GroupDummy(), context: ['groups' => ['GroupDummy']]),
+        );
+
+        $assertNormalizedProperties(
+            ['foo', 'fooBar', 'symfony', 'kevin', 'coopTilleuls'],
+            $normalizer->normalize(new GroupDummy(), context: [
+                'enable_default_groups' => true,
+                'groups' => ['a'],
+            ]),
+        );
+
+        $assertNormalizedProperties(
+            ['bar', 'foo', 'fooBar', 'symfony', 'quux', 'default', 'className', 'kevin', 'coopTilleuls'],
+            $normalizer->normalize(new GroupDummy(), context: [
+                'enable_default_groups' => true,
+                'groups' => [],
+            ]),
+        );
+
+        $assertNormalizedProperties(
+            ['foo', 'bar', 'quux', 'fooBar', 'symfony', 'default', 'className', 'kevin', 'coopTilleuls'],
+            $normalizer->normalize(new GroupDummy(), context: [
+                'enable_default_groups' => true,
+                'groups' => ['*'],
+            ]),
+        );
+
+        $assertNormalizedProperties(
+            ['default', 'className'],
+            $normalizer->normalize(new GroupDummy(), context: [
+                'enable_default_groups' => true,
+                'groups' => ['Default'],
+            ]),
+        );
+
+        $assertNormalizedProperties(
+            ['default', 'className'],
+            $normalizer->normalize(new GroupDummy(), context: [
+                'enable_default_groups' => true,
+                'groups' => ['GroupDummy'],
+            ]),
+        );
     }
 }

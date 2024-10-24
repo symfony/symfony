@@ -128,4 +128,13 @@ abstract class AbstractObjectNormalizerContextBuilder extends AbstractNormalizer
     {
         return $this->with(AbstractObjectNormalizer::PRESERVE_EMPTY_OBJECTS, $preserveEmptyObjects);
     }
+
+    /**
+     * Configures whether 'Default' and 'ClassNames' groups are added when no
+     * custom group is specified.
+     */
+    public function withEnableDefaultGroups(?bool $enableDefaultGroups): static
+    {
+        return $this->with(AbstractObjectNormalizer::ENABLE_DEFAULT_GROUPS, $enableDefaultGroups);
+    }
 }

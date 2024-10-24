@@ -116,6 +116,7 @@ final class MetadataAwareNameConverterTest extends TestCase
     }
 
     /**
+     * @group wip
      * @dataProvider attributeAndContextProvider
      */
     public function testNormalizeWithGroups(string $propertyName, string $expected, array $context = [])
@@ -128,6 +129,7 @@ final class MetadataAwareNameConverterTest extends TestCase
     }
 
     /**
+     * @group wip
      * @dataProvider attributeAndContextProvider
      */
     public function testDenormalizeWithGroups(string $expected, string $propertyName, array $context = [])
@@ -142,13 +144,62 @@ final class MetadataAwareNameConverterTest extends TestCase
     public static function attributeAndContextProvider(): array
     {
         return [
-            ['buz', 'buz', ['groups' => ['a']]],
             ['buzForExport', 'buz', ['groups' => ['b']]],
             ['buz', 'buz', ['groups' => 'a']],
             ['buzForExport', 'buz', ['groups' => 'b']],
             ['buz', 'buz', ['groups' => ['c']]],
             ['buz', 'buz', []],
             ['buzForExport', 'buz', ['groups' => ['*']]],
+
+            ['defaultGroup', 'defaultGroup', ['groups' => []]],
+            ['classGroup', 'classGroup', ['groups' => []]],
+            ['noGroup', 'renamedNoGroup', ['groups' => []]],
+            ['customGroup', 'customGroup', ['groups' => []]],
+
+            ['defaultGroup', 'renamedDefaultGroup', ['groups' => ['*']]],
+            ['classGroup', 'renamedClassGroup', ['groups' => ['*']]],
+            ['noGroup', 'renamedNoGroup', ['groups' => ['*']]],
+            ['customGroup', 'renamedCustomGroup', ['groups' => ['*']]],
+
+            ['defaultGroup', 'renamedDefaultGroup', ['groups' => ['Default']]],
+            ['classGroup', 'classGroup', ['groups' => ['Default']]],
+            ['noGroup', 'noGroup', ['groups' => ['Default']]],
+            ['customGroup', 'customGroup', ['groups' => ['Default']]],
+
+            ['defaultGroup', 'defaultGroup', ['groups' => ['OtherSerializedNameDummy']]],
+            ['classGroup', 'renamedClassGroup', ['groups' => ['OtherSerializedNameDummy']]],
+            ['noGroup', 'noGroup', ['groups' => ['OtherSerializedNameDummy']]],
+            ['customGroup', 'customGroup', ['groups' => ['OtherSerializedNameDummy']]],
+
+            ['defaultGroup', 'defaultGroup', ['groups' => ['custom']]],
+            ['classGroup', 'classGroup', ['groups' => ['custom']]],
+            ['noGroup', 'noGroup', ['groups' => ['custom']]],
+            ['customGroup', 'renamedCustomGroup', ['groups' => ['custom']]],
+
+            ['defaultGroup', 'renamedDefaultGroup', ['groups' => [], 'enable_default_groups' => true]],
+            ['classGroup', 'renamedClassGroup', ['groups' => [], 'enable_default_groups' => true]],
+            ['noGroup', 'renamedNoGroup', ['groups' => [], 'enable_default_groups' => true]],
+            ['customGroup', 'customGroup', ['groups' => [], 'enable_default_groups' => true]],
+
+            ['defaultGroup', 'renamedDefaultGroup', ['groups' => ['*'], 'enable_default_groups' => true]],
+            ['classGroup', 'renamedClassGroup', ['groups' => ['*'], 'enable_default_groups' => true]],
+            ['noGroup', 'renamedNoGroup', ['groups' => ['*'], 'enable_default_groups' => true]],
+            ['customGroup', 'renamedCustomGroup', ['groups' => ['*'], 'enable_default_groups' => true]],
+
+            ['defaultGroup', 'renamedDefaultGroup', ['groups' => ['Default'], 'enable_default_groups' => true]],
+            ['classGroup', 'renamedClassGroup', ['groups' => ['Default'], 'enable_default_groups' => true]],
+            ['noGroup', 'noGroup', ['groups' => ['Default'], 'enable_default_groups' => true]],
+            ['customGroup', 'customGroup', ['groups' => ['Default'], 'enable_default_groups' => true]],
+
+            ['defaultGroup', 'renamedDefaultGroup', ['groups' => ['OtherSerializedNameDummy'], 'enable_default_groups' => true]],
+            ['classGroup', 'renamedClassGroup', ['groups' => ['OtherSerializedNameDummy'], 'enable_default_groups' => true]],
+            ['noGroup', 'noGroup', ['groups' => ['OtherSerializedNameDummy'], 'enable_default_groups' => true]],
+            ['customGroup', 'customGroup', ['groups' => ['OtherSerializedNameDummy'], 'enable_default_groups' => true]],
+
+            ['defaultGroup', 'defaultGroup', ['groups' => ['custom'], 'enable_default_groups' => true]],
+            ['classGroup', 'classGroup', ['groups' => ['custom'], 'enable_default_groups' => true]],
+            ['noGroup', 'noGroup', ['groups' => ['custom'], 'enable_default_groups' => true]],
+            ['customGroup', 'renamedCustomGroup', ['groups' => ['custom'], 'enable_default_groups' => true]],
         ];
     }
 

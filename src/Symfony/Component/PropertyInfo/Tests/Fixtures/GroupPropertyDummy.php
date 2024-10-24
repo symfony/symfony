@@ -12,16 +12,17 @@
 namespace Symfony\Component\PropertyInfo\Tests\Fixtures;
 
 use Symfony\Component\Serializer\Attribute\Groups;
-use Symfony\Component\Serializer\Attribute\Ignore;
 
-/**
- * @author Vadim Borodavko <vadim.borodavko@gmail.com>
- */
-class IgnorePropertyDummy
+class GroupPropertyDummy
 {
-    #[Groups(['a'])]
-    public $visibleProperty;
+    public bool $noGroup = true;
 
-    #[Groups(['a']), Ignore]
-    private $ignoredProperty;
+    #[Groups('custom')]
+    public bool $customGroup = true;
+
+    #[Groups('Default')]
+    public bool $defaultGroup = true;
+
+    #[Groups('GroupPropertyDummy')]
+    public bool $classGroup = true;
 }

@@ -174,33 +174,29 @@ class MemcachedAdapterTest extends AdapterTestCase
     }
 
     /**
-     * @dataProvider provideDsnWithOptions
+     * @requires extension memcached
      */
-    public function testDsnWithOptions(string $dsn, array $options, array $expectedOptions)
+    public function testOptionsFromDsnWinOverAdditionallyPassedOptions()
     {
-        $client = MemcachedAdapter::createConnection($dsn, $options);
+        $client = MemcachedAdapter::createConnection('memcached://localhost:11222?retry_timeout=10', [
+            \Memcached::OPT_RETRY_TIMEOUT => 8,
+        ]);
 
-        foreach ($expectedOptions as $option => $expect) {
-            $this->assertSame($expect, $client->getOption($option));
-        }
+        $this->assertSame(10, $client->getOption(\Memcached::OPT_RETRY_TIMEOUT));
     }
 
-    public static function provideDsnWithOptions(): iterable
+    /**
+     * @requires extension memcached
+     */
+    public function testOptionsFromDsnAndAdditionallyPassedOptionsAreMerged()
     {
-        if (!class_exists(\Memcached::class)) {
-            self::markTestSkipped('Extension memcached required.');
-        }
+        $client = MemcachedAdapter::createConnection('memcached://localhost:11222?socket_recv_size=1&socket_send_size=2', [
+            \Memcached::OPT_RETRY_TIMEOUT => 8,
+        ]);
 
-        yield [
-            'memcached://localhost:11222?retry_timeout=10',
-            [\Memcached::OPT_RETRY_TIMEOUT => 8],
-            [\Memcached::OPT_RETRY_TIMEOUT => 10],
-        ];
-        yield [
-            'memcached://localhost:11222?socket_recv_size=1&socket_send_size=2',
-            [\Memcached::OPT_RETRY_TIMEOUT => 8],
-            [\Memcached::OPT_SOCKET_RECV_SIZE => 1, \Memcached::OPT_SOCKET_SEND_SIZE => 2, \Memcached::OPT_RETRY_TIMEOUT => 8],
-        ];
+        $this->assertSame(1, $client->getOption(\Memcached::OPT_SOCKET_RECV_SIZE));
+        $this->assertSame(2, $client->getOption(\Memcached::OPT_SOCKET_SEND_SIZE));
+        $this->assertSame(8, $client->getOption(\Memcached::OPT_RETRY_TIMEOUT));
     }
 
     public function testClear()

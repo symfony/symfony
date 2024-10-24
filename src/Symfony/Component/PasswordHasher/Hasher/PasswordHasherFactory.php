@@ -43,6 +43,9 @@ class PasswordHasherFactory implements PasswordHasherFactoryInterface
             $hasherKey = $hasherName;
         } else {
             foreach ($this->passwordHashers as $class => $hasher) {
+                if (!class_exists($class) && !interface_exists($class, false)) {
+                    throw new LogicException(sprintf('Invalid password hashers\' configuration: class or interface "%s" not found.', $class));
+                }
                 if ((\is_object($user) && $user instanceof $class) || (!\is_object($user) && (is_subclass_of($user, $class) || $user == $class))) {
                     $hasherKey = $class;
                     break;

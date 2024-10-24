@@ -30,7 +30,9 @@ final class LockMiddleware implements MiddlewareInterface
 
         if (!$envelope->last(ReceivedStamp::class)) {
             $lock = $this->lockFactory->createLockFromKey($stamp->getKey(), $stamp->getTtl(), autoRelease: false);
-            if (!$lock->acquire()) {
+
+            $blocking = $stamp->getMode() === LockStamp::MODE_BLOCK;
+            if (!$lock->acquire($blocking)) {
                 return $envelope;
             }
         } elseif ($stamp->shouldBeReleasedBeforeHandlerCall()) {

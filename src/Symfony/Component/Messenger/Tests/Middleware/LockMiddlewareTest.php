@@ -39,7 +39,7 @@ final class LockMiddlewareTest extends MiddlewareTestCase
     public function testLockMiddlewareIfMessageHasKey()
     {
         $message = new DummyMessage('Hello');
-        $envelope = new Envelope($message, [new LockStamp('id')]);
+        $envelope = new Envelope($message, [new LockStamp(LockStamp::MODE_DISCARD, 'id')]);
 
         if (SemaphoreStore::isSupported()) {
             $store = new SemaphoreStore();
@@ -53,7 +53,7 @@ final class LockMiddlewareTest extends MiddlewareTestCase
         $this->assertNotNull($envelope->last(LockStamp::class));
 
         $message2 = new DummyMessage('Hello');
-        $envelope2 = new Envelope($message2, [new LockStamp('id')]);
+        $envelope2 = new Envelope($message2, [new LockStamp(LockStamp::MODE_DISCARD, 'id')]);
 
         $decorator->handle($envelope2, $this->getStackMock(false));
 
@@ -62,7 +62,7 @@ final class LockMiddlewareTest extends MiddlewareTestCase
         $decorator->handle($envelope, $this->getStackMock(true));
 
         $message3 = new DummyMessage('Hello');
-        $envelope3 = new Envelope($message3, [new LockStamp('id')]);
+        $envelope3 = new Envelope($message3, [new LockStamp(LockStamp::MODE_DISCARD, 'id')]);
         $decorator->handle($envelope3, $this->getStackMock(true));
     }
 }

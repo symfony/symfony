@@ -21,6 +21,9 @@ final class LockStamp implements StampInterface
 
     private Key $key;
 
+    /**
+     * @param self::MODE_* $mode
+     */
     public function __construct(
         private int $mode,
         string $key,

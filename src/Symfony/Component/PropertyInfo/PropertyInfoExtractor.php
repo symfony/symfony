@@ -20,7 +20,7 @@ use Symfony\Component\TypeInfo\Type;
  *
  * @final
  */
-class PropertyInfoExtractor implements PropertyInfoExtractorInterface, PropertyInitializableExtractorInterface
+class PropertyInfoExtractor implements PropertyInfoExtractorInterface, PropertyInitializableExtractorInterface, PropertyAttributesExtractorInterface
 {
     /**
      * @param iterable<mixed, PropertyListExtractorInterface>          $listExtractors
@@ -28,6 +28,7 @@ class PropertyInfoExtractor implements PropertyInfoExtractorInterface, PropertyI
      * @param iterable<mixed, PropertyDescriptionExtractorInterface>   $descriptionExtractors
      * @param iterable<mixed, PropertyAccessExtractorInterface>        $accessExtractors
      * @param iterable<mixed, PropertyInitializableExtractorInterface> $initializableExtractors
+     * @param iterable<mixed, PropertyAttributesExtractorInterface>    $attributesExtractors
      */
     public function __construct(
         private readonly iterable $listExtractors = [],
@@ -35,6 +36,7 @@ class PropertyInfoExtractor implements PropertyInfoExtractorInterface, PropertyI
         private readonly iterable $descriptionExtractors = [],
         private readonly iterable $accessExtractors = [],
         private readonly iterable $initializableExtractors = [],
+        private readonly iterable $attributesExtractors = [],
     ) {
     }
 
@@ -64,6 +66,11 @@ class PropertyInfoExtractor implements PropertyInfoExtractorInterface, PropertyI
     public function getTypes(string $class, string $property, array $context = []): ?array
     {
         return $this->extract($this->typeExtractors, 'getTypes', [$class, $property, $context]);
+    }
+
+    public function getAttributes(string $class, string $property, array $context = []): ?array
+    {
+        return $this->extract($this->attributesExtractors, 'getAttributes', [$class, $property, $context]);
     }
 
     public function isReadable(string $class, string $property, array $context = []): ?bool

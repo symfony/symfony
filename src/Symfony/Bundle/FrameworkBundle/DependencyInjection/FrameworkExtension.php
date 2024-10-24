@@ -130,6 +130,7 @@ use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor;
 use Symfony\Component\PropertyInfo\Extractor\PhpStanExtractor;
 use Symfony\Component\PropertyInfo\PropertyAccessExtractorInterface;
+use Symfony\Component\PropertyInfo\PropertyAttributesExtractorInterface;
 use Symfony\Component\PropertyInfo\PropertyDescriptionExtractorInterface;
 use Symfony\Component\PropertyInfo\PropertyInfoExtractorInterface;
 use Symfony\Component\PropertyInfo\PropertyInitializableExtractorInterface;
@@ -637,6 +638,8 @@ class FrameworkExtension extends Extension
             ->addTag('property_info.access_extractor');
         $container->registerForAutoconfiguration(PropertyInitializableExtractorInterface::class)
             ->addTag('property_info.initializable_extractor');
+        $container->registerForAutoconfiguration(PropertyAttributesExtractorInterface::class)
+            ->addTag('property_info.attributes_extractor');
         $container->registerForAutoconfiguration(EncoderInterface::class)
             ->addTag('serializer.encoder');
         $container->registerForAutoconfiguration(DecoderInterface::class)

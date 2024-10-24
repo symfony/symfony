@@ -12,6 +12,7 @@
 namespace Symfony\Component\PropertyInfo\Tests\Fixtures;
 
 use Symfony\Component\PropertyInfo\PropertyAccessExtractorInterface;
+use Symfony\Component\PropertyInfo\PropertyAttributesExtractorInterface;
 use Symfony\Component\PropertyInfo\PropertyDescriptionExtractorInterface;
 use Symfony\Component\PropertyInfo\PropertyInitializableExtractorInterface;
 use Symfony\Component\PropertyInfo\PropertyListExtractorInterface;
@@ -23,7 +24,7 @@ use Symfony\Component\TypeInfo\Type;
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class NullExtractor implements PropertyListExtractorInterface, PropertyDescriptionExtractorInterface, PropertyTypeExtractorInterface, PropertyAccessExtractorInterface, PropertyInitializableExtractorInterface
+class NullExtractor implements PropertyListExtractorInterface, PropertyDescriptionExtractorInterface, PropertyTypeExtractorInterface, PropertyAccessExtractorInterface, PropertyInitializableExtractorInterface, PropertyAttributesExtractorInterface
 {
     public function getShortDescription($class, $property, array $context = []): ?string
     {
@@ -50,6 +51,14 @@ class NullExtractor implements PropertyListExtractorInterface, PropertyDescripti
     }
 
     public function getType($class, $property, array $context = []): ?Type
+    {
+        $this->assertIsString($class);
+        $this->assertIsString($property);
+
+        return null;
+    }
+
+    public function getAttributes($class, $property, array $context = []): ?array
     {
         $this->assertIsString($class);
         $this->assertIsString($property);

@@ -12,6 +12,7 @@
 namespace Symfony\Component\PropertyInfo\Extractor;
 
 use Symfony\Component\PropertyInfo\PropertyAccessExtractorInterface;
+use Symfony\Component\PropertyInfo\PropertyAttributesExtractorInterface;
 use Symfony\Component\PropertyInfo\PropertyInitializableExtractorInterface;
 use Symfony\Component\PropertyInfo\PropertyListExtractorInterface;
 use Symfony\Component\PropertyInfo\PropertyReadInfo;
@@ -41,7 +42,7 @@ use Symfony\Component\TypeInfo\TypeResolver\TypeResolverInterface;
  *
  * @final
  */
-class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTypeExtractorInterface, PropertyAccessExtractorInterface, PropertyInitializableExtractorInterface, PropertyReadInfoExtractorInterface, PropertyWriteInfoExtractorInterface, ConstructorArgumentTypeExtractorInterface
+class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTypeExtractorInterface, PropertyAccessExtractorInterface, PropertyInitializableExtractorInterface, PropertyReadInfoExtractorInterface, PropertyWriteInfoExtractorInterface, ConstructorArgumentTypeExtractorInterface, PropertyAttributesExtractorInterface
 {
     /**
      * @internal
@@ -517,6 +518,30 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
         $noneProperty->setErrors(array_merge([], ...$errors));
 
         return $noneProperty;
+    }
+
+    public function getAttributes(string $class, string $property, array $context = []): ?array
+    {
+        try {
+            $reflClass = new \ReflectionClass($class);
+        } catch (\ReflectionException) {
+            return null;
+        }
+
+        if (!$reflClass->hasProperty($property)) {
+            return null;
+        }
+
+        $attributes = [];
+        $reflProperty = $reflClass->getProperty($property);
+        foreach ($reflProperty->getAttributes() as $attribute) {
+            $attributes[] = [
+                'name' => $attribute->getName(),
+                'arguments' => $attribute->getArguments(),
+            ];
+        }
+
+        return $attributes;
     }
 
     /**

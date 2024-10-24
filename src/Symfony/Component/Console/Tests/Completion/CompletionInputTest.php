@@ -28,6 +28,8 @@ class CompletionInputTest extends TestCase
             new InputOption('with-required-value', 'r', InputOption::VALUE_REQUIRED),
             new InputOption('with-optional-value', 'o', InputOption::VALUE_OPTIONAL),
             new InputOption('without-value', 'n', InputOption::VALUE_NONE),
+            new InputOption('deprecated-option', 'y', InputOption::DEPRECATED | InputOption::VALUE_NONE),
+            new InputOption('hidden-option', 'z', InputOption::HIDDEN | InputOption::VALUE_NONE),
             new InputArgument('required-arg', InputArgument::REQUIRED),
             new InputArgument('optional-arg', InputArgument::OPTIONAL),
         ]);
@@ -60,6 +62,14 @@ class CompletionInputTest extends TestCase
         yield 'optval-short-space-optional' => [CompletionInput::fromTokens(['bin/console', '-o'], 2), CompletionInput::TYPE_OPTION_VALUE, 'with-optional-value', ''];
         yield 'optval-long-optional' => [CompletionInput::fromTokens(['bin/console', '--with-optional-value='], 1), CompletionInput::TYPE_OPTION_VALUE, 'with-optional-value', ''];
         yield 'optval-long-space-optional' => [CompletionInput::fromTokens(['bin/console', '--with-optional-value'], 2), CompletionInput::TYPE_OPTION_VALUE, 'with-optional-value', ''];
+
+        // deprecated & hidden options
+        yield 'optval-short-deprecated' => [CompletionInput::fromTokens(['bin/console', '-y'], 2), CompletionInput::TYPE_ARGUMENT_VALUE, 'required-arg', ''];
+        yield 'optval-short-hidden' => [CompletionInput::fromTokens(['bin/console', '-z'], 2), CompletionInput::TYPE_ARGUMENT_VALUE, 'required-arg', ''];
+        yield 'optval-long-deprecated-partial' => [CompletionInput::fromTokens(['bin/console', '--deprecated'], 1), CompletionInput::TYPE_OPTION_NAME, null, '--deprecated'];
+        yield 'optval-long-deprecated' => [CompletionInput::fromTokens(['bin/console', '--deprecated-option'], 2), CompletionInput::TYPE_ARGUMENT_VALUE, 'required-arg', ''];
+        yield 'optval-long-hidden-partial' => [CompletionInput::fromTokens(['bin/console', '--hidden'], 1), CompletionInput::TYPE_OPTION_NAME, null, '--hidden'];
+        yield 'optval-long-hidden' => [CompletionInput::fromTokens(['bin/console', '--hidden-option'], 2), CompletionInput::TYPE_ARGUMENT_VALUE, 'required-arg', ''];
 
         // arguments
         yield 'arg-minimal-input' => [CompletionInput::fromTokens(['bin/console'], 1), CompletionInput::TYPE_ARGUMENT_VALUE, 'required-arg', ''];

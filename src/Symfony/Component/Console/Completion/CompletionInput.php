@@ -198,11 +198,19 @@ final class CompletionInput extends ArgvInput
 
         if ('-' === ($optionToken[1] ?? ' ')) {
             // long option name
-            return $this->definition->hasOption($optionName) ? $this->definition->getOption($optionName) : null;
+            if ($this->definition->hasOption($optionName) && !$this->definition->getOption($optionName)->isHidden()) {
+                return $this->definition->getOption($optionName);
+            }
+
+            return null;
         }
 
         // short option name
-        return $this->definition->hasShortcut($optionName[0]) ? $this->definition->getOptionForShortcut($optionName[0]) : null;
+        if ($this->definition->hasShortcut($optionName[0]) && !$this->definition->getOptionForShortcut($optionName[0])->isHidden()) {
+            return $this->definition->getOptionForShortcut($optionName[0]);
+        }
+
+        return null;
     }
 
     /**

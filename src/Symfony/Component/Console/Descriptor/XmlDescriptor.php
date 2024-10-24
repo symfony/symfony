@@ -26,7 +26,7 @@ use Symfony\Component\Console\Input\InputOption;
  */
 class XmlDescriptor extends Descriptor
 {
-    public function getInputDefinitionDocument(InputDefinition $definition): \DOMDocument
+    public function getInputDefinitionDocument(InputDefinition $definition, array $options = []): \DOMDocument
     {
         $dom = new \DOMDocument('1.0', 'UTF-8');
         $dom->appendChild($definitionXML = $dom->createElement('definition'));
@@ -37,14 +37,14 @@ class XmlDescriptor extends Descriptor
         }
 
         $definitionXML->appendChild($optionsXML = $dom->createElement('options'));
-        foreach ($definition->getOptions() as $option) {
+        foreach ($this->removeHiddenOptions($definition->getOptions(), $options) as $option) {
             $this->appendDocument($optionsXML, $this->getInputOptionDocument($option));
         }
 
         return $dom;
     }
 
-    public function getCommandDocument(Command $command, bool $short = false): \DOMDocument
+    public function getCommandDocument(Command $command, bool $short = false, array $options = []): \DOMDocument
     {
         $dom = new \DOMDocument('1.0', 'UTF-8');
         $dom->appendChild($commandXML = $dom->createElement('command'));
@@ -72,14 +72,14 @@ class XmlDescriptor extends Descriptor
             $commandXML->appendChild($helpXML = $dom->createElement('help'));
             $helpXML->appendChild($dom->createTextNode(str_replace("\n", "\n ", $command->getProcessedHelp())));
 
-            $definitionXML = $this->getInputDefinitionDocument($command->getDefinition());
+            $definitionXML = $this->getInputDefinitionDocument($command->getDefinition(), $options);
             $this->appendDocument($commandXML, $definitionXML->getElementsByTagName('definition')->item(0));
         }
 
         return $dom;
     }
 
-    public function getApplicationDocument(Application $application, ?string $namespace = null, bool $short = false): \DOMDocument
+    public function getApplicationDocument(Application $application, ?string $namespace = null, bool $short = false, array $options = []): \DOMDocument
     {
         $dom = new \DOMDocument('1.0', 'UTF-8');
         $dom->appendChild($rootXml = $dom->createElement('symfony'));
@@ -100,7 +100,7 @@ class XmlDescriptor extends Descriptor
         }
 
         foreach ($description->getCommands() as $command) {
-            $this->appendDocument($commandsXML, $this->getCommandDocument($command, $short));
+            $this->appendDocument($commandsXML, $this->getCommandDocument($command, $short, $options));
         }
 
         if (!$namespace) {
@@ -127,22 +127,25 @@ class XmlDescriptor extends Descriptor
 
     protected function describeInputOption(InputOption $option, array $options = []): void
     {
+        if ($this->skipHiddenOption($option, $options)) {
+            return;
+        }
         $this->writeDocument($this->getInputOptionDocument($option));
     }
 
     protected function describeInputDefinition(InputDefinition $definition, array $options = []): void
     {
-        $this->writeDocument($this->getInputDefinitionDocument($definition));
+        $this->writeDocument($this->getInputDefinitionDocument($definition, $options));
     }
 
     protected function describeCommand(Command $command, array $options = []): void
     {
-        $this->writeDocument($this->getCommandDocument($command, $options['short'] ?? false));
+        $this->writeDocument($this->getCommandDocument($command, $options['short'] ?? false, $options));
     }
 
     protected function describeApplication(Application $application, array $options = []): void
     {
-        $this->writeDocument($this->getApplicationDocument($application, $options['namespace'] ?? null, $options['short'] ?? false));
+        $this->writeDocument($this->getApplicationDocument($application, $options['namespace'] ?? null, $options['short'] ?? false, $options));
     }
 
     /**
@@ -201,6 +204,9 @@ class XmlDescriptor extends Descriptor
         $objectXML->setAttribute('accept_value', $option->acceptValue() ? 1 : 0);
         $objectXML->setAttribute('is_value_required', $option->isValueRequired() ? 1 : 0);
         $objectXML->setAttribute('is_multiple', $option->isArray() ? 1 : 0);
+        if ($option->isDeprecated()) {
+            $objectXML->setAttribute('is_deprecated', 1);
+        }
         $objectXML->appendChild($descriptionXML = $dom->createElement('description'));
         $descriptionXML->appendChild($dom->createTextNode($option->getDescription()));
 
@@ -221,6 +227,9 @@ class XmlDescriptor extends Descriptor
             $objectXML->setAttribute('accept_value', 0);
             $objectXML->setAttribute('is_value_required', 0);
             $objectXML->setAttribute('is_multiple', 0);
+            if ($option->isDeprecated()) {
+                $objectXML->setAttribute('is_deprecated', 1);
+            }
             $objectXML->appendChild($descriptionXML = $dom->createElement('description'));
             $descriptionXML->appendChild($dom->createTextNode('Negate the "--'.$option->getName().'" option'));
         }

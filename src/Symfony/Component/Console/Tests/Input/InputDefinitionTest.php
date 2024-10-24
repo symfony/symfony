@@ -20,11 +20,11 @@ class InputDefinitionTest extends TestCase
 {
     protected static string $fixtures;
 
-    protected $multi;
-    protected $foo;
-    protected $bar;
-    protected $foo1;
-    protected $foo2;
+    protected InputArgument|InputOption|null $multi;
+    protected InputArgument|InputOption|null $foo;
+    protected InputArgument|InputOption|null $bar;
+    protected InputArgument|InputOption|null $foo1;
+    protected InputArgument|InputOption|null $foo2;
 
     public static function setUpBeforeClass(): void
     {
@@ -179,7 +179,7 @@ class InputDefinitionTest extends TestCase
             new InputArgument('foo1', InputArgument::OPTIONAL),
             new InputArgument('foo2', InputArgument::OPTIONAL, '', 'default'),
             new InputArgument('foo3', InputArgument::OPTIONAL | InputArgument::IS_ARRAY),
-            //  new InputArgument('foo4', InputArgument::OPTIONAL | InputArgument::IS_ARRAY, '', [1, 2]),
+        //  new InputArgument('foo4', InputArgument::OPTIONAL | InputArgument::IS_ARRAY, '', [1, 2]),
         ]);
         $this->assertSame(['foo1' => null, 'foo2' => 'default', 'foo3' => []], $definition->getArgumentDefaults(), '->getArgumentDefaults() return the default values for each argument');
 
@@ -362,7 +362,7 @@ class InputDefinitionTest extends TestCase
     /**
      * @dataProvider getGetSynopsisData
      */
-    public function testGetSynopsis(InputDefinition $definition, $expectedSynopsis, $message = null)
+    public function testGetSynopsis(InputDefinition $definition, ?string $expectedSynopsis, ?string $message = null)
     {
         $this->assertSame($expectedSynopsis, $definition->getSynopsis(), $message ? '->getSynopsis() '.$message : '');
     }
@@ -382,6 +382,16 @@ class InputDefinitionTest extends TestCase
             [new InputDefinition([new InputArgument('foo', InputArgument::REQUIRED | InputArgument::IS_ARRAY)]), '<foo>...', 'uses an ellipsis for required array arguments'],
 
             [new InputDefinition([new InputOption('foo'), new InputArgument('foo', InputArgument::REQUIRED)]), '[--foo] [--] <foo>', 'puts [--] between options and arguments'],
+
+            [new InputDefinition([new InputOption('deprecated', null, InputOption::DEPRECATED)]), '[--deprecated]', 'puts deprecated optional options in square brackets'],
+            [
+                new InputDefinition([new InputOption('foo'), new InputOption('deprecated', null, InputOption::DEPRECATED)]),
+                '[--foo] [--deprecated]',
+                'puts deprecated optional options in square brackets',
+            ],
+
+            [new InputDefinition([new InputOption('hidden', null, InputOption::HIDDEN)]), '', 'hidden option is not visible'],
+            [new InputDefinition([new InputOption('foo'), new InputOption('hidden', null, InputOption::HIDDEN)]), '[--foo]', 'hidden option is not visible'],
         ];
     }
 

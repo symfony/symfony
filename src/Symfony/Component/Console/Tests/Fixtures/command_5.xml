@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<command id="descriptor:command5" name="descriptor:command5" hidden="0">
+  <usages>
+    <usage>descriptor:command5 [-y|--deprecated_option]</usage>
+  </usages>
+  <description>command 5 description</description>
+  <help>command 5 help</help>
+  <arguments/>
+  <options>
+    <option name="--deprecated_option" shortcut="-y" accept_value="0" is_value_required="0" is_multiple="0" is_deprecated="1">
+      <description></description>
+    </option>
+  </options>
+</command>

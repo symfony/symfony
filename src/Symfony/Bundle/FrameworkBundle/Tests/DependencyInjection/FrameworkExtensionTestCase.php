@@ -49,6 +49,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Form\Form;
 use Symfony\Component\HtmlSanitizer\HtmlSanitizer;
+use Symfony\Component\HtmlSanitizer\HtmlSanitizerAction;
 use Symfony\Component\HtmlSanitizer\HtmlSanitizerConfig;
 use Symfony\Component\HtmlSanitizer\HtmlSanitizerInterface;
 use Symfony\Component\HttpClient\MockHttpClient;
@@ -2252,9 +2253,13 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $this->assertNotContains('translation.locale_switcher', $localeAwareServices);
     }
 
-    public function testHtmlSanitizer()
+    public function testHtmlSanitizerBefore72()
     {
-        $container = $this->createContainerFromFile('html_sanitizer');
+        if (class_exists(HtmlSanitizerAction::class)) {
+            $this->markTestSkipped('HtmlSanitizer version is <7.2');
+        }
+
+        $container = $this->createContainerFromFile('html_sanitizer_without_default_action');
 
         // html_sanitizer service
         $this->assertSame(HtmlSanitizer::class, $container->getDefinition('html_sanitizer.sanitizer.custom')->getClass());
@@ -2267,6 +2272,69 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $this->assertCount(23, $calls = $container->getDefinition('html_sanitizer.config.custom')->getMethodCalls());
         $this->assertSame(
             [
+                ['allowSafeElements', [], true],
+                ['allowStaticElements', [], true],
+                ['allowElement', ['iframe', 'src'], true],
+                ['allowElement', ['custom-tag', ['data-attr', 'data-attr-1']], true],
+                ['allowElement', ['custom-tag-2', '*'], true],
+                ['blockElement', ['section'], true],
+                ['dropElement', ['video'], true],
+                ['allowAttribute', ['src', $this instanceof XmlFrameworkExtensionTest ? 'iframe' : ['iframe']], true],
+                ['allowAttribute', ['data-attr', '*'], true],
+                ['dropAttribute', ['data-attr', $this instanceof XmlFrameworkExtensionTest ? 'custom-tag' : ['custom-tag']], true],
+                ['dropAttribute', ['data-attr-1', []], true],
+                ['dropAttribute', ['data-attr-2', '*'], true],
+                ['forceAttribute', ['a', 'rel', 'noopener noreferrer'], true],
+                ['forceAttribute', ['h1', 'class', 'bp4-heading'], true],
+                ['forceHttpsUrls', [true], true],
+                ['allowLinkSchemes', [['http', 'https', 'mailto']], true],
+                ['allowLinkHosts', [['symfony.com']], true],
+                ['allowRelativeLinks', [true], true],
+                ['allowMediaSchemes', [['http', 'https', 'data']], true],
+                ['allowMediaHosts', [['symfony.com']], true],
+                ['allowRelativeMedias', [true], true],
+                ['withAttributeSanitizer', ['@App\\Sanitizer\\CustomAttributeSanitizer'], true],
+                ['withoutAttributeSanitizer', ['@App\\Sanitizer\\OtherCustomAttributeSanitizer'], true],
+            ],
+
+            // Convert references to their names for easier assertion
+            array_map(
+                static function ($call) {
+                    foreach ($call[1] as $k => $arg) {
+                        $call[1][$k] = $arg instanceof Reference ? '@'.$arg : $arg;
+                    }
+
+                    return $call;
+                },
+                $calls
+            )
+        );
+
+        // Named alias
+        $this->assertSame('html_sanitizer.sanitizer.all.sanitizer', (string) $container->getAlias(HtmlSanitizerInterface::class.' $allSanitizer'));
+        $this->assertFalse($container->hasAlias(HtmlSanitizerInterface::class.' $default'));
+    }
+
+    public function testHtmlSanitizer()
+    {
+        if (!class_exists(HtmlSanitizerAction::class)) {
+            $this->markTestSkipped('HtmlSanitizer version must be >=7.2');
+        }
+
+        $container = $this->createContainerFromFile('html_sanitizer');
+
+        // html_sanitizer service
+        $this->assertSame(HtmlSanitizer::class, $container->getDefinition('html_sanitizer.sanitizer.custom')->getClass());
+        $this->assertCount(1, $args = $container->getDefinition('html_sanitizer.sanitizer.custom')->getArguments());
+        $this->assertSame('html_sanitizer.config.custom', (string) $args[0]);
+
+        // config
+        $this->assertTrue($container->hasDefinition('html_sanitizer.config.custom'), '->registerHtmlSanitizerConfiguration() loads custom sanitizer');
+        $this->assertSame(HtmlSanitizerConfig::class, $container->getDefinition('html_sanitizer.config.custom')->getClass());
+        $this->assertCount(24, $calls = $container->getDefinition('html_sanitizer.config.custom')->getMethodCalls());
+        $this->assertSame(
+            [
+                ['defaultAction', [HtmlSanitizerAction::Allow], true],
                 ['allowSafeElements', [], true],
                 ['allowStaticElements', [], true],
                 ['allowElement', ['iframe', 'src'], true],

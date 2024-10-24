@@ -13,6 +13,7 @@ namespace Symfony\Component\PropertyInfo\Extractor;
 
 use Symfony\Component\PropertyInfo\PropertyListExtractorInterface;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
+use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 
 /**
  * Lists available properties using Symfony Serializer Component metadata.
@@ -38,15 +39,31 @@ class SerializerExtractor implements PropertyListExtractorInterface
             return null;
         }
 
+        $enableDefaultGroups = $context[AbstractNormalizer::ENABLE_DEFAULT_GROUPS] ?? false;
+
         $groups = $context['serializer_groups'] ?? [];
-        $groupsHasBeenDefined = [] !== $groups;
-        $groups = array_merge($groups, ['Default', (false !== $nsSep = strrpos($class, '\\')) ? substr($class, $nsSep + 1) : $class]);
+        $defaultGroups = ['Default', (false !== $nsSep = strrpos($class, '\\')) ? substr($class, $nsSep + 1) : $class];
+
+        $groupsHasBeenDefined = null !== ($context['serializer_groups'] ?? null);
+        $customGroupsHasBeenDefined = (bool) array_diff($groups, $defaultGroups);
+
+        if ($enableDefaultGroups && !$customGroupsHasBeenDefined) {
+            $groups = array_merge($groups, $defaultGroups);
+        }
 
         $properties = [];
         $serializerClassMetadata = $this->classMetadataFactory->getMetadataFor($class);
 
         foreach ($serializerClassMetadata->getAttributesMetadata() as $serializerAttributeMetadata) {
-            if (!$serializerAttributeMetadata->isIgnored() && (!$groupsHasBeenDefined || array_intersect(array_merge($serializerAttributeMetadata->getGroups(), ['*']), $groups))) {
+            if ($serializerAttributeMetadata->isIgnored()) {
+                continue;
+            }
+
+            if (!($attributeGroups = $serializerAttributeMetadata->getGroups()) && $enableDefaultGroups && !$customGroupsHasBeenDefined) {
+                $attributeGroups = $defaultGroups;
+            }
+
+            if (!$groupsHasBeenDefined || array_intersect(array_merge($attributeGroups, ['*']), $groups)) {
                 $properties[] = $serializerAttributeMetadata->getName();
             }
         }

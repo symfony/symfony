@@ -45,6 +45,7 @@ class AbstractObjectNormalizerContextBuilderTest extends TestCase
             ->withExcludeFromCacheKeys($values[AbstractObjectNormalizer::EXCLUDE_FROM_CACHE_KEY])
             ->withDeepObjectToPopulate($values[AbstractObjectNormalizer::DEEP_OBJECT_TO_POPULATE])
             ->withPreserveEmptyObjects($values[AbstractObjectNormalizer::PRESERVE_EMPTY_OBJECTS])
+            ->withEnableDefaultGroups($values[AbstractObjectNormalizer::ENABLE_DEFAULT_GROUPS])
             ->toArray();
 
         $this->assertSame($values, $context);
@@ -65,6 +66,7 @@ class AbstractObjectNormalizerContextBuilderTest extends TestCase
             AbstractObjectNormalizer::EXCLUDE_FROM_CACHE_KEY => ['key'],
             AbstractObjectNormalizer::DEEP_OBJECT_TO_POPULATE => true,
             AbstractObjectNormalizer::PRESERVE_EMPTY_OBJECTS => false,
+            AbstractObjectNormalizer::ENABLE_DEFAULT_GROUPS => false,
         ]];
 
         yield 'With null values' => [[
@@ -77,6 +79,7 @@ class AbstractObjectNormalizerContextBuilderTest extends TestCase
             AbstractObjectNormalizer::EXCLUDE_FROM_CACHE_KEY => null,
             AbstractObjectNormalizer::DEEP_OBJECT_TO_POPULATE => null,
             AbstractObjectNormalizer::PRESERVE_EMPTY_OBJECTS => null,
+            AbstractObjectNormalizer::ENABLE_DEFAULT_GROUPS => null,
         ]];
     }
 

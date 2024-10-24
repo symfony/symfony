@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\ObjectMapper;
 
+use Psr\Container\ContainerInterface;
 use Symfony\Component\ObjectMapper\Exception\MappingException;
 use Symfony\Component\ObjectMapper\Exception\MappingTransformException;
 use Symfony\Component\ObjectMapper\Exception\ReflectionException;
@@ -32,9 +33,13 @@ use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
  */
 final class ObjectMapper implements ObjectMapperInterface
 {
+    /**
+     * @param ContainerInterface<CallableInterface> $callableLocator
+     */
     public function __construct(
         private readonly MapperMetadataFactoryInterface $metadataFactory = new ReflectionMapperMetadataFactory(),
         private readonly ?PropertyAccessorInterface $propertyAccessor = null,
+        private readonly ?ContainerInterface $callableLocator = null,
     ) {
     }
 
@@ -114,7 +119,7 @@ final class ObjectMapper implements ObjectMapperInterface
             $propertyName = $property->getName();
             $mappings = $this->metadataFactory->create($source, $propertyName);
             foreach ($mappings as $mapping) {
-                if (($fn = $mapping->if) && !$this->call($fn, null, $source)) {
+                if (($if = $mapping->if) && ($fn = $this->getCallable($if)) && !$this->call($fn, null, $source)) {
                     continue;
                 }
 
@@ -228,7 +233,7 @@ final class ObjectMapper implements ObjectMapperInterface
     {
         $mapTo = null;
         foreach ($metadata as $mapAttribute) {
-            if (($fn = $mapAttribute->if) && !$this->call($fn, $value, $source)) {
+            if (($if = $mapAttribute->if) && ($fn = $this->getCallable($if)) && !$this->call($fn, $value, $source)) {
                 continue;
             }
 
@@ -251,11 +256,27 @@ final class ObjectMapper implements ObjectMapperInterface
         }
 
         foreach ($transforms as $transform) {
-            if (\is_callable($transform)) {
-                $value = $this->call($transform, $value, $object);
+            if ($fn = $this->getCallable($transform)) {
+                $value = $this->call($fn, $value, $object);
             }
         }
 
         return $value;
+    }
+
+    /**
+     * @param (CallableInterface|string|callable(mixed $value, object $object): mixed) $fn
+     */
+    private function getCallable(string|callable|CallableInterface $fn): ?callable
+    {
+        if (is_callable($fn)) {
+            return $fn;
+        }
+
+        if ($this->callableLocator?->has($fn)) {
+            return $this->callableLocator->get($fn);
+        }
+
+        return null;
     }
 }

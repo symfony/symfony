@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\ObjectMapper\Attribute;
 
+use Symfony\Component\ObjectMapper\CallableInterface;
+
 /**
  * Configures a class or a property to map to.
  *
@@ -24,10 +26,10 @@ namespace Symfony\Component\ObjectMapper\Attribute;
 readonly class Map
 {
     /**
-     * @param string|class-string|null                                      $source    The property or the class to map from
-     * @param string|class-string|null                                      $target    The property or the class to map to
-     * @param string|bool|callable(mixed $value, object $object): bool|null $if        A boolean, Symfony service name or a callable that instructs whether to map
-     * @param (string|callable(mixed $value, object $object): mixed)|(string|callable(mixed $value, object $object): mixed)[]|null                              $transform A Symfony service name or a callable that transform the value during mapping
+     * @param string|class-string|null                                                                                                                                 $source    The property or the class to map from
+     * @param string|class-string|null                                                                                                                                 $target    The property or the class to map to
+     * @param string|bool|callable(mixed $value, object $object): bool|null                                                                                            $if        A boolean, Symfony service name or a callable that instructs whether to map
+     * @param (CallableInterface|string|callable(mixed $value, object $object): mixed)|(CallableInterface|string|callable(mixed $value, object $object): mixed)[]|null $transform A Symfony service name or a callable that transform the value during mapping
      */
     public function __construct(
         public ?string $target = null,

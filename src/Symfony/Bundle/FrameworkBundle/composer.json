@@ -60,6 +60,7 @@
         "symfony/security-bundle": "^6.4|^7.0",
         "symfony/semaphore": "^6.4|^7.0",
         "symfony/serializer": "^6.4|^7.0",
+        "symfony/object-mapper": "^6.4|^7.0",
         "symfony/stopwatch": "^6.4|^7.0",
         "symfony/string": "^6.4|^7.0",
         "symfony/translation": "^6.4|^7.0",

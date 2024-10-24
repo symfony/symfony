@@ -4,6 +4,7 @@ CHANGELOG
 7.2
 ---
 
+ * Add `Symfony\Component\Messenger\Middleware\LockMiddleware` and `Symfony\Component\Messenger\Stamp\LockStamp`
  * Add `$previous` to the exception output at the `messenger:failed:show` command
  * `WrappedExceptionsInterface` now extends PHP's `Throwable` interface
  * Add `#[AsMessage]` attribute with `$transport` parameter for message routing

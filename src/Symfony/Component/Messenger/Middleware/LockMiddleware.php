@@ -24,12 +24,11 @@ final class LockMiddleware implements MiddlewareInterface
 
     public function handle(Envelope $envelope, StackInterface $stack): Envelope
     {
-        $stamp = $envelope->last(LockStamp::class);
-        if (null === $stamp) {
+        if (!$stamp = $envelope->last(LockStamp::class)) {
             return $stack->next()->handle($envelope, $stack);
         }
 
-        if (null === $envelope->last(ReceivedStamp::class)) {
+        if (!$envelope->last(ReceivedStamp::class)) {
             $lock = $this->lockFactory->createLockFromKey($stamp->getKey(), $stamp->getTtl(), autoRelease: false);
             if (!$lock->acquire()) {
                 return $envelope;
@@ -41,10 +40,7 @@ final class LockMiddleware implements MiddlewareInterface
         try {
             $envelope = $stack->next()->handle($envelope, $stack);
         } finally {
-            if (
-                null !== $envelope->last(ReceivedStamp::class)
-                && !$stamp->shouldBeReleasedBeforeHandlerCall()
-            ) {
+            if ($envelope->last(ReceivedStamp::class) && !$stamp->shouldBeReleasedBeforeHandlerCall()) {
                 $this->lockFactory->createLockFromKey($stamp->getKey())->release();
             }
         }

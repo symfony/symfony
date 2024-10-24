@@ -216,6 +216,63 @@ EOF;
         $this->dumper->dump(['foo' => new A(), 'bar' => 1], 0, 0, Yaml::DUMP_EXCEPTION_ON_INVALID_TYPE);
     }
 
+    public function testDumpWithMultipleNullFlagsFormatsThrows()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('The Yaml::DUMP_NULL_AS_EMPTY and Yaml::DUMP_NULL_AS_TILDE flags cannot be used together.');
+
+        $this->dumper->dump(['foo' => 'bar'], 0, 0, Yaml::DUMP_NULL_AS_EMPTY | Yaml::DUMP_NULL_AS_TILDE);
+    }
+
+    public function testDumpNullAsEmptyInExpandedMapping()
+    {
+        $expected = "qux:\n    foo: bar\n    baz: \n";
+
+        $this->assertSame($expected, $this->dumper->dump(['qux' => ['foo' => 'bar', 'baz' => null]], 2, flags: Yaml::DUMP_NULL_AS_EMPTY));
+    }
+
+    public function testDumpNullAsEmptyWithObject()
+    {
+        $class = new \stdClass();
+        $class->foo = 'bar';
+        $class->baz = null;
+
+        $this->assertSame("foo: bar\nbaz: \n", $this->dumper->dump($class, 2, flags: Yaml::DUMP_NULL_AS_EMPTY | Yaml::DUMP_OBJECT_AS_MAP));
+    }
+
+    public function testDumpNullAsEmptyDumpsWhenInInlineMapping()
+    {
+        $expected = "foo: \nqux: { foo: bar, baz:  }\n";
+
+        $this->assertSame($expected, $this->dumper->dump(['foo' => null, 'qux' => ['foo' => 'bar', 'baz' => null]], 1, flags: Yaml::DUMP_NULL_AS_EMPTY));
+    }
+
+    public function testDumpNullAsEmptyDumpsNestedMaps()
+    {
+        $expected = "foo: \nqux:\n    foo: bar\n    baz: \n";
+
+        $this->assertSame($expected, $this->dumper->dump(['foo' => null, 'qux' => ['foo' => 'bar', 'baz' => null]], 10, flags: Yaml::DUMP_NULL_AS_EMPTY));
+    }
+
+    public function testDumpNullAsEmptyInExpandedSequence()
+    {
+        $expected = "qux:\n    - foo\n    - \n    - bar\n";
+
+        $this->assertSame($expected, $this->dumper->dump(['qux' => ['foo', null, 'bar']], 2, flags: Yaml::DUMP_NULL_AS_EMPTY));
+    }
+
+    public function testDumpNullAsEmptyWhenInInlineSequence()
+    {
+        $expected = "foo: \nqux: [foo, , bar]\n";
+
+        $this->assertSame($expected, $this->dumper->dump(['foo' => null, 'qux' => ['foo', null, 'bar']], 1, flags: Yaml::DUMP_NULL_AS_EMPTY));
+    }
+
+    public function testDumpNullAsEmptyAtRoot()
+    {
+        $this->assertSame('null', $this->dumper->dump(null, 2, flags: Yaml::DUMP_NULL_AS_EMPTY));
+    }
+
     /**
      * @dataProvider getEscapeSequences
      */

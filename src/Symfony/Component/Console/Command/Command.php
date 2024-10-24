@@ -407,7 +407,7 @@ class Command
      *
      * @return $this
      *
-     * @throws InvalidArgumentException When argument mode is not valid
+     * @throws InvalidArgumentException When argument name is "command" or mode is not valid
      */
     public function addArgument(string $name, ?int $mode = null, string $description = '', mixed $default = null, array|\Closure $suggestedValues = []): static
     {

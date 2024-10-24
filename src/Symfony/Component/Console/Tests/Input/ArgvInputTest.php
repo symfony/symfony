@@ -12,6 +12,7 @@
 namespace Symfony\Component\Console\Tests\Input;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputDefinition;
@@ -316,7 +317,7 @@ class ArgvInputTest extends TestCase
             ],
             [
                 ['cli.php', 'acme:foo', 'bar'],
-                new InputDefinition([new InputArgument('command', InputArgument::REQUIRED)]),
+                new InputDefinition([new InputArgument('command', InputArgument::REQUIRED, Application::COMMAND_ARGUMENT_DESCRIPTION)]),
                 'No arguments expected for "acme:foo" command, got "bar"',
             ],
             [

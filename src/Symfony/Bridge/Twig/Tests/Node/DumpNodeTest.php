@@ -17,6 +17,7 @@ use Twig\Compiler;
 use Twig\Environment;
 use Twig\Loader\LoaderInterface;
 use Twig\Node\Expression\NameExpression;
+use Twig\Node\Expression\Variable\ContextVariable;
 use Twig\Node\Node;
 use Twig\Node\Nodes;
 
@@ -74,11 +75,11 @@ EOTXT;
     {
         if (class_exists(Nodes::class)) {
             $vars = new Nodes([
-                new NameExpression('foo', 7),
+                class_exists(ContextVariable::class) ? new ContextVariable('foo', 7) : new NameExpression('foo', 7),
             ]);
         } else {
             $vars = new Node([
-                new NameExpression('foo', 7),
+                class_exists(ContextVariable::class) ? new ContextVariable('foo', 7) : new NameExpression('foo', 7),
             ]);
         }
 
@@ -104,13 +105,13 @@ EOTXT;
     {
         if (class_exists(Nodes::class)) {
             $vars = new Nodes([
-                new NameExpression('foo', 7),
-                new NameExpression('bar', 7),
+                class_exists(ContextVariable::class) ? new ContextVariable('foo', 7) : new NameExpression('foo', 7),
+                class_exists(ContextVariable::class) ? new ContextVariable('bar', 7) : new NameExpression('bar', 7),
             ]);
         } else {
             $vars = new Node([
-                new NameExpression('foo', 7),
-                new NameExpression('bar', 7),
+                class_exists(ContextVariable::class) ? new ContextVariable('foo', 7) : new NameExpression('foo', 7),
+                class_exists(ContextVariable::class) ? new ContextVariable('bar', 7) : new NameExpression('bar', 7),
             ]);
         }
 

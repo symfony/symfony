@@ -231,7 +231,7 @@ jobs:
           git diff --exit-code src/ || (echo '::error::Run "php .github/sync-translations.php" to fix XLIFF files.' && exit 1)
 
       - name: Run tests
-        run: ./phpunit --group integration -v
+        run: ./phpunit --group integration
         env:
           INTEGRATION_FTP_URL: 'ftp://test:test@localhost'
           REDIS_HOST: 'localhost:16379'

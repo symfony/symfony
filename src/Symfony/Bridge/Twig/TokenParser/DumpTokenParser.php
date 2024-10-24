@@ -37,11 +37,16 @@ final class DumpTokenParser extends AbstractTokenParser
         }
         $this->parser->getStream()->expect(Token::BLOCK_END_TYPE);
 
-        return new DumpNode($this->parser->getVarName(), $values, $token->getLine(), $this->getTag());
+        return new DumpNode($this->getVarName(), $values, $token->getLine(), $this->getTag());
     }
 
     public function getTag(): string
     {
         return 'dump';
+    }
+
+    private function getVarName(): string
+    {
+        return sprintf('__internal_%s', hash('sha256', uniqid(mt_rand(), true)));
     }
 }

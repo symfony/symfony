@@ -23,7 +23,7 @@
         "symfony/config": "^6.4|^7.0",
         "symfony/dependency-injection": "^6.4.11|^7.1.4",
         "symfony/event-dispatcher": "^6.4|^7.0",
-        "symfony/http-kernel": "^6.4|^7.0",
+        "symfony/http-kernel": "^6.4.13|^7.1.6",
         "symfony/http-foundation": "^6.4|^7.0",
         "symfony/password-hasher": "^6.4|^7.0",
         "symfony/security-core": "^7.2",
@@ -39,11 +39,12 @@
         "symfony/dom-crawler": "^6.4|^7.0",
         "symfony/expression-language": "^6.4|^7.0",
         "symfony/form": "^6.4|^7.0",
-        "symfony/framework-bundle": "^6.4|^7.0",
+        "symfony/framework-bundle": "^6.4.13|^7.1.6",
         "symfony/http-client": "^6.4|^7.0",
         "symfony/ldap": "^6.4|^7.0",
         "symfony/process": "^6.4|^7.0",
         "symfony/rate-limiter": "^6.4|^7.0",
+        "symfony/runtime": "^6.4.13|^7.1.6",
         "symfony/serializer": "^6.4|^7.0",
         "symfony/translation": "^6.4|^7.0",
         "symfony/twig-bundle": "^6.4|^7.0",
@@ -69,5 +70,10 @@
             "/Tests/"
         ]
     },
-    "minimum-stability": "dev"
+    "minimum-stability": "dev",
+    "config": {
+        "allow-plugins": {
+            "symfony/runtime": true
+        }
+    }
 }

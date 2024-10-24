@@ -224,10 +224,12 @@ class NativeSessionStorageTest extends TestCase
      */
     public function testTransSidTagsOption()
     {
-        $this->expectUserDeprecationMessage('Since symfony/http-foundation 7.2: NativeSessionStorage\'s "trans_sid_tags" option is deprecated and will be ignored in Symfony 8.0.');
+        $deprecations = [];
 
-        $previousErrorHandler = set_error_handler(function ($errno, $errstr) use (&$previousErrorHandler) {
+        $previousErrorHandler = set_error_handler(function ($errno, $errstr) use (&$previousErrorHandler, &$deprecations) {
             if ('ini_set(): Usage of session.trans_sid_tags INI setting is deprecated' !== $errstr) {
+                $deprecations[] = $errstr;
+
                 return $previousErrorHandler ? $previousErrorHandler(...\func_get_args()) : false;
             }
         });
@@ -240,6 +242,8 @@ class NativeSessionStorageTest extends TestCase
             restore_error_handler();
         }
 
+        $this->assertCount(1, $deprecations);
+        $this->assertSame('Since symfony/http-foundation 7.2: NativeSessionStorage\'s "trans_sid_tags" option is deprecated and will be ignored in Symfony 8.0.', $deprecations[0]);
         $this->assertSame('a=href', \ini_get('session.trans_sid_tags'));
     }
 
@@ -370,13 +374,15 @@ class NativeSessionStorageTest extends TestCase
      */
     public function testPassingDeprecatedOptions()
     {
-        $this->expectUserDeprecationMessage('Since symfony/http-foundation 7.2: NativeSessionStorage\'s "sid_length" option is deprecated and will be ignored in Symfony 8.0.');
-        $this->expectUserDeprecationMessage('Since symfony/http-foundation 7.2: NativeSessionStorage\'s "sid_bits_per_character" option is deprecated and will be ignored in Symfony 8.0.');
-        $this->expectUserDeprecationMessage('Since symfony/http-foundation 7.2: NativeSessionStorage\'s "referer_check" option is deprecated and will be ignored in Symfony 8.0.');
-        $this->expectUserDeprecationMessage('Since symfony/http-foundation 7.2: NativeSessionStorage\'s "use_only_cookies" option is deprecated and will be ignored in Symfony 8.0.');
-        $this->expectUserDeprecationMessage('Since symfony/http-foundation 7.2: NativeSessionStorage\'s "use_trans_sid" option is deprecated and will be ignored in Symfony 8.0.');
-        $this->expectUserDeprecationMessage('Since symfony/http-foundation 7.2: NativeSessionStorage\'s "trans_sid_hosts" option is deprecated and will be ignored in Symfony 8.0.');
-        $this->expectUserDeprecationMessage('Since symfony/http-foundation 7.2: NativeSessionStorage\'s "trans_sid_tags" option is deprecated and will be ignored in Symfony 8.0.');
+        $deprecations = [];
+
+        $previousErrorHandler = set_error_handler(function ($errno, $errstr) use (&$previousErrorHandler, &$deprecations) {
+            if (!preg_match('/^ini_set\(\):( Disabling| Usage of)? session\..+ is deprecated$/', $errstr)) {
+                $deprecations[] = $errstr;
+
+                return $previousErrorHandler ? $previousErrorHandler(...\func_get_args()) : false;
+            }
+        });
 
         $this->getStorage([
             'sid_length' => 42,
@@ -387,5 +393,14 @@ class NativeSessionStorageTest extends TestCase
             'trans_sid_hosts' => 'foo',
             'trans_sid_tags' => 'foo',
         ]);
+
+        $this->assertCount(7, $deprecations);
+        $this->assertContains('Since symfony/http-foundation 7.2: NativeSessionStorage\'s "sid_length" option is deprecated and will be ignored in Symfony 8.0.', $deprecations);
+        $this->assertContains('Since symfony/http-foundation 7.2: NativeSessionStorage\'s "sid_bits_per_character" option is deprecated and will be ignored in Symfony 8.0.', $deprecations);
+        $this->assertContains('Since symfony/http-foundation 7.2: NativeSessionStorage\'s "referer_check" option is deprecated and will be ignored in Symfony 8.0.', $deprecations);
+        $this->assertContains('Since symfony/http-foundation 7.2: NativeSessionStorage\'s "use_only_cookies" option is deprecated and will be ignored in Symfony 8.0.', $deprecations);
+        $this->assertContains('Since symfony/http-foundation 7.2: NativeSessionStorage\'s "use_trans_sid" option is deprecated and will be ignored in Symfony 8.0.', $deprecations);
+        $this->assertContains('Since symfony/http-foundation 7.2: NativeSessionStorage\'s "trans_sid_hosts" option is deprecated and will be ignored in Symfony 8.0.', $deprecations);
+        $this->assertContains('Since symfony/http-foundation 7.2: NativeSessionStorage\'s "trans_sid_tags" option is deprecated and will be ignored in Symfony 8.0.', $deprecations);
     }
 }

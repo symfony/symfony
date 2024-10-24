@@ -22,6 +22,7 @@ use Twig\Loader\LoaderInterface;
 use Twig\Node\Expression\ArrayExpression;
 use Twig\Node\Expression\ConstantExpression;
 use Twig\Node\Expression\NameExpression;
+use Twig\Node\Expression\Variable\ContextVariable;
 use Twig\Node\Node;
 use Twig\Node\Nodes;
 
@@ -31,7 +32,7 @@ class FormThemeTest extends TestCase
 
     public function testConstructor()
     {
-        $form = new NameExpression('form', 0);
+        $form = class_exists(ContextVariable::class) ? new ContextVariable('form', 0) : new NameExpression('form', 0);
         if (class_exists(Nodes::class)) {
             $resources = new Nodes([
                 new ConstantExpression('tpl1', 0),
@@ -53,7 +54,7 @@ class FormThemeTest extends TestCase
 
     public function testCompile()
     {
-        $form = new NameExpression('form', 0);
+        $form = class_exists(ContextVariable::class) ? new ContextVariable('form', 0) : new NameExpression('form', 0);
         $resources = new ArrayExpression([
             new ConstantExpression(1, 0),
             new ConstantExpression('tpl1', 0),

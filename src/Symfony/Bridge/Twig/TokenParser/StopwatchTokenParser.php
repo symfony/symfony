@@ -13,6 +13,7 @@ namespace Symfony\Bridge\Twig\TokenParser;
 
 use Symfony\Bridge\Twig\Node\StopwatchNode;
 use Twig\Node\Expression\AssignNameExpression;
+use Twig\Node\Expression\Variable\AssignContextVariable;
 use Twig\Node\Node;
 use Twig\Token;
 use Twig\TokenParser\AbstractTokenParser;
@@ -44,7 +45,7 @@ final class StopwatchTokenParser extends AbstractTokenParser
         $stream->expect(Token::BLOCK_END_TYPE);
 
         if ($this->stopwatchIsAvailable) {
-            return new StopwatchNode($name, $body, new AssignNameExpression($this->parser->getVarName(), $token->getLine()), $lineno, $this->getTag());
+            return new StopwatchNode($name, $body, class_exists(AssignContextVariable::class) ? new AssignContextVariable($this->getVarName(), $token->getLine()) : new AssignNameExpression($this->getVarName(), $token->getLine()), $lineno, $this->getTag());
         }
 
         return $body;
@@ -58,5 +59,10 @@ final class StopwatchTokenParser extends AbstractTokenParser
     public function getTag(): string
     {
         return 'stopwatch';
+    }
+
+    private function getVarName(): string
+    {
+        return sprintf('__internal_%s', hash('sha256', uniqid(mt_rand(), true)));
     }
 }

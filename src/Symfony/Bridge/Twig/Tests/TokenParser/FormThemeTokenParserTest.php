@@ -19,6 +19,7 @@ use Twig\Loader\LoaderInterface;
 use Twig\Node\Expression\ArrayExpression;
 use Twig\Node\Expression\ConstantExpression;
 use Twig\Node\Expression\NameExpression;
+use Twig\Node\Expression\Variable\ContextVariable;
 use Twig\Parser;
 use Twig\Source;
 
@@ -47,7 +48,7 @@ class FormThemeTokenParserTest extends TestCase
             [
                 '{% form_theme form "tpl1" %}',
                 new FormThemeNode(
-                    new NameExpression('form', 1),
+                    class_exists(ContextVariable::class) ? new ContextVariable('form', 1) : new NameExpression('form', 1),
                     new ArrayExpression([
                         new ConstantExpression(0, 1),
                         new ConstantExpression('tpl1', 1),
@@ -58,7 +59,7 @@ class FormThemeTokenParserTest extends TestCase
             [
                 '{% form_theme form "tpl1" "tpl2" %}',
                 new FormThemeNode(
-                    new NameExpression('form', 1),
+                    class_exists(ContextVariable::class) ? new ContextVariable('form', 1) : new NameExpression('form', 1),
                     new ArrayExpression([
                         new ConstantExpression(0, 1),
                         new ConstantExpression('tpl1', 1),
@@ -71,7 +72,7 @@ class FormThemeTokenParserTest extends TestCase
             [
                 '{% form_theme form with "tpl1" %}',
                 new FormThemeNode(
-                    new NameExpression('form', 1),
+                    class_exists(ContextVariable::class) ? new ContextVariable('form', 1) : new NameExpression('form', 1),
                     new ConstantExpression('tpl1', 1),
                     1
                 ),
@@ -79,7 +80,7 @@ class FormThemeTokenParserTest extends TestCase
             [
                 '{% form_theme form with ["tpl1"] %}',
                 new FormThemeNode(
-                    new NameExpression('form', 1),
+                    class_exists(ContextVariable::class) ? new ContextVariable('form', 1) : new NameExpression('form', 1),
                     new ArrayExpression([
                         new ConstantExpression(0, 1),
                         new ConstantExpression('tpl1', 1),
@@ -90,7 +91,7 @@ class FormThemeTokenParserTest extends TestCase
             [
                 '{% form_theme form with ["tpl1", "tpl2"] %}',
                 new FormThemeNode(
-                    new NameExpression('form', 1),
+                    class_exists(ContextVariable::class) ? new ContextVariable('form', 1) : new NameExpression('form', 1),
                     new ArrayExpression([
                         new ConstantExpression(0, 1),
                         new ConstantExpression('tpl1', 1),
@@ -103,7 +104,7 @@ class FormThemeTokenParserTest extends TestCase
             [
                 '{% form_theme form with ["tpl1", "tpl2"] only %}',
                 new FormThemeNode(
-                    new NameExpression('form', 1),
+                    class_exists(ContextVariable::class) ? new ContextVariable('form', 1) : new NameExpression('form', 1),
                     new ArrayExpression([
                         new ConstantExpression(0, 1),
                         new ConstantExpression('tpl1', 1),

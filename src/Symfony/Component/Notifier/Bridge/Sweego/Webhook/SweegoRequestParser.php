@@ -13,6 +13,7 @@ namespace Symfony\Component\Notifier\Bridge\Sweego\Webhook;
 
 use Symfony\Component\HttpFoundation\ChainRequestMatcher;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestMatcher\HeaderRequestMatcher;
 use Symfony\Component\HttpFoundation\RequestMatcher\IsJsonRequestMatcher;
 use Symfony\Component\HttpFoundation\RequestMatcher\MethodRequestMatcher;
 use Symfony\Component\HttpFoundation\RequestMatcherInterface;
@@ -32,6 +33,7 @@ final class SweegoRequestParser extends AbstractRequestParser
         return new ChainRequestMatcher([
             new MethodRequestMatcher('POST'),
             new IsJsonRequestMatcher(),
+            new HeaderRequestMatcher(['webhook-id', 'webhook-timestamp', 'webhook-signature']),
         ]);
     }
 
@@ -43,6 +45,8 @@ final class SweegoRequestParser extends AbstractRequestParser
             throw new RejectWebhookException(406, 'Payload is malformed.');
         }
 
+        $this->validateSignature($request, $secret);
+
         $name = match ($payload['event_type']) {
             'sms_sent' => SmsEvent::DELIVERED,
             default => throw new RejectWebhookException(406, \sprintf('Unsupported event "%s".', $payload['event'])),
@@ -52,5 +56,21 @@ final class SweegoRequestParser extends AbstractRequestParser
         $event->setRecipientPhone($payload['phone_number']);
 
         return $event;
+    }
+
+    private function validateSignature(Request $request, string $secret): void
+    {
+        $contentToSign = \sprintf(
+            '%s.%s.%s',
+            $request->headers->get('webhook-id'),
+            $request->headers->get('webhook-timestamp'),
+            $request->getContent(),
+        );
+
+        $computedSignature = base64_encode(hash_hmac('sha256', $contentToSign, base64_decode($secret), true));
+
+        if (!hash_equals($computedSignature, $request->headers->get('webhook-signature'))) {
+            throw new RejectWebhookException(403, 'Invalid signature.');
+        }
     }
 }

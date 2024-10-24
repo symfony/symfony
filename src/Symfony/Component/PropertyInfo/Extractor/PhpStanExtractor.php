@@ -14,8 +14,10 @@ namespace Symfony\Component\PropertyInfo\Extractor;
 use phpDocumentor\Reflection\Types\ContextFactory;
 use PHPStan\PhpDocParser\Ast\PhpDoc\InvalidTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\ParamTagValueNode;
+use PHPStan\PhpDocParser\Ast\PhpDoc\PhpDocChildNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\PhpDocNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\PhpDocTagNode;
+use PHPStan\PhpDocParser\Ast\PhpDoc\PhpDocTextNode;
 use PHPStan\PhpDocParser\Lexer\Lexer;
 use PHPStan\PhpDocParser\Parser\ConstExprParser;
 use PHPStan\PhpDocParser\Parser\PhpDocParser;
@@ -23,6 +25,7 @@ use PHPStan\PhpDocParser\Parser\TokenIterator;
 use PHPStan\PhpDocParser\Parser\TypeParser;
 use Symfony\Component\PropertyInfo\PhpStan\NameScope;
 use Symfony\Component\PropertyInfo\PhpStan\NameScopeFactory;
+use Symfony\Component\PropertyInfo\PropertyDescriptionExtractorInterface;
 use Symfony\Component\PropertyInfo\PropertyTypeExtractorInterface;
 use Symfony\Component\PropertyInfo\Type as LegacyType;
 use Symfony\Component\PropertyInfo\Util\PhpStanTypeHelper;
@@ -36,7 +39,7 @@ use Symfony\Component\TypeInfo\TypeResolver\StringTypeResolver;
  *
  * @author Baptiste Leduc <baptiste.leduc@gmail.com>
  */
-final class PhpStanExtractor implements PropertyTypeExtractorInterface, ConstructorArgumentTypeExtractorInterface
+final class PhpStanExtractor implements PropertyDescriptionExtractorInterface, PropertyTypeExtractorInterface, ConstructorArgumentTypeExtractorInterface
 {
     private const PROPERTY = 0;
     private const ACCESSOR = 1;
@@ -241,6 +244,94 @@ final class PhpStanExtractor implements PropertyTypeExtractorInterface, Construc
         return $this->stringTypeResolver->resolve((string) $tagDocNode->type, $typeContext);
     }
 
+    public function getShortDescription(string $class, string $property, array $context = []): ?string
+    {
+        /** @var PhpDocNode|null $docNode */
+        [$docNode] = $this->getDocBlockFromProperty($class, $property);
+        if (null === $docNode) {
+            return null;
+        }
+
+        if ($shortDescription = $this->getDescriptionsFromDocNode($docNode)[0]) {
+            return $shortDescription;
+        }
+
+        foreach ($docNode->getVarTagValues() as $var) {
+            if ($var->description) {
+                return $var->description;
+            }
+        }
+
+        return null;
+    }
+
+    public function getLongDescription(string $class, string $property, array $context = []): ?string
+    {
+        /** @var PhpDocNode|null $docNode */
+        [$docNode] = $this->getDocBlockFromProperty($class, $property);
+        if (null === $docNode) {
+            return null;
+        }
+
+        return $this->getDescriptionsFromDocNode($docNode)[1];
+    }
+
+    /**
+     * A docblock is splitted into a template marker, a short description, an optional long description and a tags section.
+     *
+     * - The template marker is either empty, or #@+ or #@-.
+     * - The short description is started from a non-tag character, and until one or multiple newlines.
+     * - The long description (optional), is started from a non-tag character, and until a new line is encountered followed by a tag.
+     * - Tags, and the remaining characters
+     *
+     * This method returns the short and the long descriptions.
+     *
+     * @return array{0: ?string, 1: ?string}
+     */
+    private function getDescriptionsFromDocNode(PhpDocNode $docNode): array
+    {
+        $isNewLine = static fn (PhpDocChildNode $node): bool => $node instanceof PhpDocTextNode && '' === $node->text;
+        $isTemplateMarker = static fn (PhpDocChildNode $node): bool => $node instanceof PhpDocTextNode && ('#@+' === $node->text || '#@-' === $node->text);
+
+        $shortDescription = '';
+        $longDescription = '';
+        $shortDescriptionCompleted = false;
+
+        foreach ($docNode->children as $child) {
+            if (!$child instanceof PhpDocTextNode) {
+                break;
+            }
+
+            if ($isTemplateMarker($child)) {
+                continue;
+            }
+
+            if ($isNewLine($child) && !$shortDescriptionCompleted) {
+                if ($shortDescription) {
+                    $shortDescriptionCompleted = true;
+                }
+
+                continue;
+            }
+
+            if (!$shortDescriptionCompleted) {
+                $shortDescription = sprintf("%s\n%s", $shortDescription, $child->text);
+
+                continue;
+            }
+
+            $longDescription = sprintf("%s\n%s", $longDescription, $child->text);
+        }
+
+        $shortDescription = trim(preg_replace('/^#@[+-]{1}/m', '', $shortDescription), "\n");
+        $longDescription = trim($longDescription, "\n");
+
+        return [
+            $shortDescription ?: null,
+            $longDescription ?: null,
+        ];
+    }
+
     private function getDocBlockFromConstructor(string $class, string $property): ?ParamTagValueNode
     {
         try {
@@ -286,7 +377,11 @@ final class PhpStanExtractor implements PropertyTypeExtractorInterface, Construc
 
         $ucFirstProperty = ucfirst($property);
 
-        if ([$docBlock, $source, $declaringClass] = $this->getDocBlockFromProperty($class, $property)) {
+        if ([$docBlock, $constructorDocBlock, $source, $declaringClass] = $this->getDocBlockFromProperty($class, $property)) {
+            if (!$docBlock?->getTagsByName('@var') && $constructorDocBlock) {
+                $docBlock = $constructorDocBlock;
+            }
+
             $data = [$docBlock, $source, null, $declaringClass];
         } elseif ([$docBlock, $_, $declaringClass] = $this->getDocBlockFromMethod($class, $ucFirstProperty, self::ACCESSOR)) {
             $data = [$docBlock, self::ACCESSOR, null, $declaringClass];
@@ -300,7 +395,7 @@ final class PhpStanExtractor implements PropertyTypeExtractorInterface, Construc
     }
 
     /**
-     * @return array{PhpDocNode, int, string}|null
+     * @return array{?PhpDocNode, ?PhpDocNode, int, string}|null
      */
     private function getDocBlockFromProperty(string $class, string $property): ?array
     {
@@ -323,28 +418,25 @@ final class PhpStanExtractor implements PropertyTypeExtractorInterface, Construc
             }
         }
 
-        // Type can be inside property docblock as `@var`
         $rawDocNode = $reflectionProperty->getDocComment();
         $phpDocNode = $rawDocNode ? $this->getPhpDocNode($rawDocNode) : null;
-        $source = self::PROPERTY;
 
-        if (!$phpDocNode?->getTagsByName('@var')) {
-            $phpDocNode = null;
+        $constructorPhpDocNode = null;
+        if ($reflectionProperty->isPromoted()) {
+            $constructorRawDocNode = (new \ReflectionMethod($class, '__construct'))->getDocComment();
+            $constructorPhpDocNode = $constructorRawDocNode ? $this->getPhpDocNode($constructorRawDocNode) : null;
         }
 
-        // or in the constructor as `@param` for promoted properties
-        if (!$phpDocNode && $reflectionProperty->isPromoted()) {
-            $constructor = new \ReflectionMethod($class, '__construct');
-            $rawDocNode = $constructor->getDocComment();
-            $phpDocNode = $rawDocNode ? $this->getPhpDocNode($rawDocNode) : null;
+        $source = self::PROPERTY;
+        if (!$phpDocNode?->getTagsByName('@var') && $constructorPhpDocNode) {
             $source = self::MUTATOR;
         }
 
-        if (!$phpDocNode) {
+        if (!$phpDocNode && !$constructorPhpDocNode) {
             return null;
         }
 
-        return [$phpDocNode, $source, $reflectionProperty->class];
+        return [$phpDocNode, $constructorPhpDocNode, $source, $reflectionProperty->class];
     }
 
     /**

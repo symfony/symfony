@@ -593,4 +593,14 @@ class MockHttpClientTest extends HttpClientTestCase
         $response = $client->request('GET', 'https://example.com');
         $this->assertSame(1701187598.313123, $response->getInfo('start_time'));
     }
+
+    public function testDoesNotThrowOnDestructIfExceptionCaughtEarlierWithGetStatusCode()
+    {
+        $this->markTestSkipped('Not supported');
+    }
+
+    public function testDoesNotThrowOnDestructIfExceptionCaughtEarlierEvenWithoutGetStatusCode()
+    {
+        $this->markTestSkipped('Not supported');
+    }
 }

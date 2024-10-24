@@ -7,6 +7,7 @@ CHANGELOG
  * Remove `@internal` flag and add `@final` to `ServicesResetter`
  * Add support for `SYMFONY_DISABLE_RESOURCE_TRACKING` env var
  * Add support for configuring trusted proxies/headers/hosts via env vars
+ * Allow using Expression for `validationGroups` in `#[MapRequestPayload]` and `#[MapQueryString]`
 
 7.1
 ---

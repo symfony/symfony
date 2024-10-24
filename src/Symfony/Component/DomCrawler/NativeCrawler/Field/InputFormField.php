@@ -9,7 +9,9 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\DomCrawler\Field;
+namespace Symfony\Component\DomCrawler\NativeCrawler\Field;
+
+use Symfony\Component\DomCrawler\Field\InputFormFieldTrait;
 
 /**
  * InputFormField represents an input form field (an HTML input tag).
@@ -18,6 +20,7 @@ namespace Symfony\Component\DomCrawler\Field;
  * specialized classes (cf. FileFormField and ChoiceFormField).
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ * @author Alexandre Daubois <alex.daubois@gmail.com>
  */
 class InputFormField extends FormField
 {

@@ -69,6 +69,37 @@ final class SlackTransport extends AbstractTransport
         }
 
         $options = $options?->toArray() ?? [];
+
+        if ($options['conversation_ids'] ?? false) {
+            $response = $this->client->request('POST', 'https://'.$this->getEndpoint().'/api/conversations.open', [
+                'json' => ['users' => implode(',', $options['conversation_ids'])],
+                'auth_bearer' => $this->accessToken,
+                'headers' => [
+                    'Content-Type' => 'application/json; charset=utf-8',
+                ],
+            ]);
+            
+            try {
+                $statusCode = $response->getStatusCode();
+            } catch (TransportExceptionInterface $e) {
+                throw new TransportException('Could not reach the remote Slack server.', $response, 0, $e);
+            }
+
+            if (200 !== $statusCode) {
+                throw new TransportException('Unable to post the Slack message: '.$response->getContent(false), $response);
+            }
+
+            $result = $response->toArray(false);
+            if (!$result['ok']) {
+                $errors = isset($result['errors']) ? ' ('.implode('|', $result['errors']).')' : '';
+    
+                throw new TransportException(sprintf('Unable to post the Slack message: "%s"%s.', $result['error'], $errors), $response);
+            }
+    
+            $options['channel'] = $result['channel']['id'] ?? null;
+            unset($options['conversation_ids']);
+        }
+
         $options['channel'] ??= $message->getRecipientId() ?: $this->channel;
         $options['text'] = $message->getSubject();
 

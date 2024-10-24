@@ -44,6 +44,33 @@ $sms->options($options);
 $texter->send($sms);
 ```
 
+Webhook
+-------
+
+Configure the webhook routing:
+
+```yaml
+framework:
+    webhook:
+        routing:
+            sweego_sms:
+                service: notifier.webhook.request_parser.sweego
+                secret: '%env(SWEEGO_WEBHOOK_SECRET)%'
+```
+
+And a consumer:
+
+```php
+#[AsRemoteEventConsumer(name: 'sweego_sms')]
+class SweegoSmsEventConsumer implements ConsumerInterface
+{
+    public function consume(RemoteEvent|SmsEvent $event): void
+    {
+        // your code
+    }
+}
+```
+
 Resources
 ---------
 

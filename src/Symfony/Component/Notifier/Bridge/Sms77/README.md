@@ -1,7 +1,7 @@
 sms77 Notifier
 =================
 
-Provides [sms77](https://www.sms77.io/) integration for Symfony Notifier.
+The sms77 bridge is deprecated, use the Seven.io bridge instead.
 
 DSN example
 -----------

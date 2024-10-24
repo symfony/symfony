@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+7.2
+---
+
+ * Deprecate the bridge
+
 6.2
 ---
 

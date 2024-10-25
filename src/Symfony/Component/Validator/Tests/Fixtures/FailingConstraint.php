@@ -17,7 +17,7 @@ class FailingConstraint extends Constraint
 {
     public $message = 'Failed';
 
-    public function getTargets(): string|array
+    public function getTargets(): array
     {
         return [self::PROPERTY_CONSTRAINT, self::CLASS_CONSTRAINT];
     }

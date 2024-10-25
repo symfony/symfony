@@ -1,0 +1,15 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2024-10-24T11:32:52Z
+
+I updated the `DumpNode` class to also accept a `LocalVariable` instance.
+
+Though I am stuck at how we can deal with a similar case in the `StopwatchNode`. Any idea how to handle it?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2024-10-24T15:50:29Z
+
+I think I got a solution for the `StopwatchNode` as well.
+
+Status: Needs Review

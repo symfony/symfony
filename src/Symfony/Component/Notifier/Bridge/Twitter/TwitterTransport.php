@@ -163,7 +163,7 @@ final class TwitterTransport extends AbstractTransport
             $query = [
                 'command' => 'INIT',
                 'total_bytes' => $file->getSize(),
-                'media_type' => $file->getContentType(),
+                'media_type' => rawurlencode($file->getContentType()),
             ];
 
             if ($category) {
@@ -181,7 +181,7 @@ final class TwitterTransport extends AbstractTransport
 
             if ($subtitles) {
                 $query['total_bytes'] = $subtitles->getSize();
-                $query['media_type'] = $subtitles->getContentType();
+                $query['media_type'] = rawurlencode($subtitles->getContentType());
                 $query['media_category'] = 'subtitles';
 
                 $pool[++$i] = $this->request('POST', '/1.1/media/upload.json', [

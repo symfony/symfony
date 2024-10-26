@@ -52,6 +52,8 @@ class ExtensionPass implements CompilerPassInterface
             // edge case where AssetMapper is installed, but not enabled
             $container->removeDefinition('twig.extension.importmap');
             $container->removeDefinition('twig.runtime.importmap');
+            $container->removeDefinition('twig.extension.asset_mapper');
+            $container->removeDefinition('twig.runtime.asset_mapper');
         }
 
         $viewDir = \dirname((new \ReflectionClass(\Symfony\Bridge\Twig\Extension\FormExtension::class))->getFileName(), 2).'/Resources/views';

@@ -5,6 +5,7 @@ CHANGELOG
 ---
 
  * Deprecate passing a tag to the constructor of `FormThemeNode`
+ * Add `asset_mapper_source()` Twig function
 
 7.1
 ---

@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
+use Symfony\Bridge\Twig\Extension\AssetMapperExtension;
+use Symfony\Bridge\Twig\Extension\AssetMapperRuntime;
 use Symfony\Bridge\Twig\Extension\ImportMapExtension;
 use Symfony\Bridge\Twig\Extension\ImportMapRuntime;
 
@@ -22,6 +24,13 @@ return static function (ContainerConfigurator $container) {
             ->tag('twig.runtime')
 
         ->set('twig.extension.importmap', ImportMapExtension::class)
+            ->tag('twig.extension')
+
+        ->set('twig.runtime.asset_mapper', AssetMapperRuntime::class)
+            ->args([service('asset_mapper')])
+            ->tag('twig.runtime')
+
+        ->set('twig.extension.asset_mapper', AssetMapperExtension::class)
             ->tag('twig.extension')
     ;
 };

@@ -152,6 +152,37 @@ class LoginLinkHandlerTest extends TestCase
         $this->assertSame('https://example.com/login/verify?user=weaverryan&hash=abchash&expires=1654244256', $loginLink->getUrl());
     }
 
+    public function testCreateLoginLinkWithRouteParams()
+    {
+        $extraProperties = ['emailProperty' => 'ryan@symfonycasts.com', 'passwordProperty' => 'pwhash'];
+        $routeParams = ['custom_param' => 'custom_value'];
+
+        $this->router->expects($this->once())
+            ->method('generate')
+            ->with(
+                'app_check_login_link_route',
+                $this->callback(fn($parameters) =>
+                    'weaverryan' === $parameters['user']
+                    && isset($parameters['expires'])
+                    && abs(time() + 600 - $parameters['expires']) <= 1
+                    && isset($parameters['hash'])
+                    && $parameters['custom_param'] === 'custom_value'
+                    && $parameters['hash'] === $this->createSignatureHash('weaverryan', $parameters['expires'], $extraProperties)
+                ),
+                UrlGeneratorInterface::ABSOLUTE_URL
+            )
+            ->willReturn('https://example.com/login/verify?user=weaverryan&hash=abchash&expires=1601235000&custom_param=custom_value');
+
+        $user = new TestLoginLinkHandlerUser('weaverryan', 'ryan@symfonycasts.com', 'pwhash');
+
+        $loginLink = $this->createLinker(['route_params' => $routeParams], array_keys($extraProperties))->createLoginLink($user);
+
+        $this->assertSame(
+            'https://example.com/login/verify?user=weaverryan&hash=abchash&expires=1601235000&custom_param=custom_value',
+            $loginLink->getUrl()
+        );
+    }
+
     public function testConsumeLoginLink()
     {
         $expires = time() + 500;
@@ -253,6 +284,7 @@ class LoginLinkHandlerTest extends TestCase
         $options = array_merge([
             'lifetime' => 600,
             'route_name' => 'app_check_login_link_route',
+            'route_params' => [],
         ], $options);
 
         return new LoginLinkHandler($this->router, $this->userProvider, new SignatureHasher($this->propertyAccessor, $extraProperties, 's3cret', $this->expiredLinkStorage, $options['max_uses'] ?? null), $options);

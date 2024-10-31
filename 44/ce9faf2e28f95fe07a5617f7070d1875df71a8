@@ -1,0 +1,52 @@
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2024-10-30T08:07:09Z
+
+What about:
+
+```diff
+diff --git a/src/Symfony/Component/Process/Tests/ExecutableFinderTest.php b/src/Symfony/Component/Process/Tests/ExecutableFinderTest.php
+index a1b8d6d54b..5052fc0d6b 100644
+--- a/src/Symfony/Component/Process/Tests/ExecutableFinderTest.php
++++ b/src/Symfony/Component/Process/Tests/ExecutableFinderTest.php
+@@ -138,6 +138,21 @@ class ExecutableFinderTest extends TestCase
+         $this->assertSamePath($target.'.BAT', $result);
+     }
+
++    public function testEmptyDirInPath()
++    {
++        putenv(sprintf('PATH=%s:', \dirname(\PHP_BINARY)));
++
++        touch('executable');
++        chmod('executable', 0700);
++
++        $finder = new ExecutableFinder();
++        $result = $finder->find('executable');
++
++        $this->assertSame('./executable', $result);
++
++        unlink('executable');
++    }
++
+     private function assertSamePath($expected, $tested)
+     {
+         if ('\\' === \DIRECTORY_SEPARATOR) {
+```
+
+The result before your fix:
+
+```
+/Users/.../PhpstormProjects/symfony/./executable
+```
+
+After this fix:
+
+```
+./executable
+```
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-10-30T13:23:40Z
+
+Perfect thanks! PR updated.

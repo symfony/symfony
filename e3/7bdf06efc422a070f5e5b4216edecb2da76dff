@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by michalananapps at 2024-10-30T16:27:28Z
+
+@alexandre-daubois maybe same change should be made in Symfony/Bridge/Twig/Command/DebugCommand.php in isAbsolutePath method
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2024-10-31T09:29:12Z
+
+@michalananapps I don't think so, there's no chance to deal with a Phar archive their, isn't it?

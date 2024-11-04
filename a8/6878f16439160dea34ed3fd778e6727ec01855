@@ -1,0 +1,25 @@
+---------------------------------------------------------------------------
+
+by Seldaek at 2024-10-30T12:34:21Z
+
+Also how about patching this on 5.4+ as bugfix?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-10-30T13:28:58Z
+
+> Also how about patching this on 5.4+ as bugfix?
+
+Would work for me, this is welcomed hardening I think for 5.4 also. Any other opinion?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2024-10-30T15:54:10Z
+
+Not sure if shipping this with a patch release is a good idea. This would break application that rely on the current behaviour.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-10-30T22:22:40Z
+
+PR ready, with tests.

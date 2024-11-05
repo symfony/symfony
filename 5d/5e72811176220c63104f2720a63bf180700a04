@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2024-11-05T12:20:32Z
+
+tests in #58721 fail without these changes
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-11-05T13:11:53Z
+
+Looks like we use this regexp in quite a few classes: `grep 'ff.*@anonymous' src/ -r`
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2024-11-05T14:17:18Z
+
+I updated the other places the same way

@@ -1,0 +1,352 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2024-11-04T15:58:29Z
+
+Hey!
+
+I see that this is your first PR. That is great! Welcome!
+
+Symfony has a [contribution guide](https://symfony.com/doc/current/contributing/index.html) which I suggest you to read.
+
+In short:
+- Always add tests
+- Keep backward compatibility (see https://symfony.com/bc).
+- Bug fixes must be submitted against the lowest maintained branch where they apply (see https://symfony.com/releases)
+- Features and deprecations must be submitted against the 7.2 branch.
+
+Review the GitHub status checks of your pull request and try to solve the reported issues. If some tests are failing, try to see if they are failing because of this change.
+
+When two Symfony core team members approve this change, it will be merged and you will become an official Symfony contributor!
+If this PR is merged in a lower version branch, it will be merged up to all maintained branches within a few days.
+
+I am going to sit back now and wait for the reviews.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by danydev at 2024-11-04T17:45:32Z
+
+Let's focus on **Bug 1** by looking at some code
+```
+<?php
+date_default_timezone_set('Europe/Rome');
+
+$now = new \DateTimeImmutable();
+echo 'now: ' . $now->format('Y-m-d H:i:s I') . ' (' . $now->getTimestamp() . ')' . PHP_EOL;
+$nowInUTC = $now->setTimezone(new \DateTimeZone('UTC'));
+echo 'now in UTC: ' . $nowInUTC->format('Y-m-d H:i:s'). PHP_EOL;
+
+$nowPlusOneMinute = new \DateTimeImmutable('+1 minutes');
+echo 'now plus 1 minute: ' . $nowPlusOneMinute->format('Y-m-d H:i:s I') . ' (' . $nowPlusOneMinute->getTimestamp() . ')' . PHP_EOL;
+$nowPlusOneMinuteInUTC = $nowPlusOneMinute->setTimezone(new \DateTimeZone('UTC'));
+echo 'now plus 1 minute in UTC: ' . $nowPlusOneMinuteInUTC->format('Y-m-d H:i:s') . ' (' . $nowPlusOneMinuteInUTC->getTimestamp() . ')' . PHP_EOL;
+
+$interval = $nowPlusOneMinute->diff($now);
+echo 'interval: ' . $interval->format('%h hours, %i minutes') . PHP_EOL;
+```
+
+So the output of this code executed in any time of the year (except for the interval of time I defined above) is:
+```
+// system date: Sat 26 Oct 2024 12:03:25 AM UTC
+now: 2024-10-26 02:03:25 1
+now in UTC: 2024-10-26 00:03:25
+now plus 1 minute: 2024-10-26 02:04:25 1
+now plus 1 minute in UTC: 2024-10-26 00:04:25
+interval: 0 hours, 1 minutes
+```
+That's perfectly right, the output above is the expected one and perfectly as expected since `$now` and `$nowPlusOneMinute` are actually separated just by one minute.
+
+Now let's see the same exact code executed when the time is between `27 October 2024 2:00AM CEST` and `27 October 2024 2:59AM CEST`, to do it, I move the system datetime to ~27 Oct 2:14AM CEST Europe/Rome
+```
+php 5.6
+Sun 27 Oct 2024 12:14:43 AM UTC
+now: 2024-10-27 02:14:43 0 (1729991683)
+now in UTC: 2024-10-27 01:14:43
+now plus 1 minute: 2024-10-27 02:15:43 0 (1729991743)
+now plus 1 minute in UTC: 2024-10-27 01:15:43 (1729991743)
+interval: 0 hours, 1 minutes
+
+php 7.4
+Sun 27 Oct 2024 12:14:43 AM UTC
+now: 2024-10-27 02:14:44 0 (1729991684)
+now in UTC: 2024-10-27 01:14:44
+now plus 1 minute: 2024-10-27 02:15:44 0 (1729991744)
+now plus 1 minute in UTC: 2024-10-27 01:15:44 (1729991744)
+interval: 0 hours, 1 minutes
+
+php 8.0
+Sun 27 Oct 2024 12:14:44 AM UTC
+now: 2024-10-27 02:14:44 0 (1729991684)
+now in UTC: 2024-10-27 01:14:44
+now plus 1 minute: 2024-10-27 02:15:44 0 (1729991744)
+now plus 1 minute in UTC: 2024-10-27 01:15:44 (1729991744)
+interval: 0 hours, 1 minutes
+
+php 8.1
+Sun 27 Oct 2024 12:14:44 AM UTC
+now: 2024-10-27 02:14:44 1 (1729988084)
+now in UTC: 2024-10-27 00:14:44
+now plus 1 minute: 2024-10-27 02:15:44 0 (1729991744)
+now plus 1 minute in UTC: 2024-10-27 01:15:44 (1729991744)
+interval: 1 hours, 1 minutes
+
+php 8.3
+Sun 27 Oct 2024 12:14:44 AM UTC
+now: 2024-10-27 02:14:44 1 (1729988084)
+now in UTC: 2024-10-27 00:14:44
+now plus 1 minute: 2024-10-27 02:15:44 0 (1729991744)
+now plus 1 minute in UTC: 2024-10-27 01:15:44 (1729991744)
+interval: 1 hours, 1 minutes
+```
+A new notes to better grasp the problem:
+- As you see, the behaviour changes in different php versions 😓
+- You may think "well, it's just like the other one, `$now` and `$nowPlusOneMinute` diff by 1 minute", not really, they don't diff by one minute, if you print their difference, is 1 hour and 1 minute in PHP >= 8.1.
+- Look at `now plus 1 minute in UTC`, it's "one hour and one minute" after `now in UTC`. While the expectation is just one minute. This because php when using the modifier in the constructor doesn't pick the "current datetime", it picks the non-DST datetime (aka CET).
+- I laso printed the output of `date` before each script execution to reflect the OS date that I set to reproduce the bug
+- I formatted the date using the `I` letter, so you can observe where the problem is. The `I` shows a 1 if the datetime is DST (aka CEST) and shows a 0 if it isn't. When executing `$nowPlusOneMinute = new \DateTimeImmutable('+1 minute');` at 2:01AM CEST he decided to use as "base", not the real current time (the 2:01AM CEST), but the 2:01AM CET that is one hour after the current datetime. Indeed the "0" in the "now plus 1 minute" shows that PHP picked the non-DST time (aka CET) even though the real current datetime is DST (aka CEST).
+- I formatted the date both in Europe/Rome timezone (the one globally set by default) and also in UTC, the latter is just a way to make it easier to see where is the problem, since by looking at the datetime formatted as Europe/Rome makes harder to see the problem (in this case you need to look the "I" to see the problem, as explained in the previous point).
+
+At this point, I hope you understand what's going on, let's see it the implication with the RateLimiter
+
+For sake of simplicity let's say you have a RateLimiter configured like
+```
+policy: 'fixed_window'
+limit: 30
+interval: '1 minute'
+cache_pool: rate_limiter.cache
+```
+So the main thing here is that interval is "1 minute".
+
+This is the original RateLimiter code pre-fix
+```
+return (new \DateTimeImmutable())->diff(new \DateTimeImmutable('+'.$interval));
+```
+
+If executed when the bug occurs (in the date interval I defined above) the first date would be the "real" current time, at which we `diff` the bugged date (that's "off by one hour" plus one minute)
+If we print the `DateInterval` produced, like this: `echo 'hours ' . $interval->h . ' min ' . $interval->i;` we'll have as output:`hours: 1 min 1` that's unexpected, it should have been just 1 minute.
+
+Now this is going to be used as TTL of the Redis key, (see `Window::getExpirationTime`) and it's going to contain "1 hour" so even after 2 minutes where no-one is going to make requests, the RateLimiter could not help himself but checking against the data that is still there due to the wrong TTL, considering the tokens already consumed, and wrongly preventing the use of the resource protected by the rate limiter.
+
+---------------------------------------------------------------------------
+
+by danydev at 2024-11-04T20:22:37Z
+
+Now let's focus on **Bug 2** by looking at some other code
+```
+<?php
+date_default_timezone_set('Europe/Rome');
+
+$now = new \DateTimeImmutable();
+echo 'now: ' . $now->format('Y-m-d H:i:s I') . ' (' . $now->getTimestamp() . ')' . PHP_EOL;
+$nowInUTC = $now->setTimezone(new \DateTimeZone('UTC'));
+echo 'now in UTC: ' . $nowInUTC->format('Y-m-d H:i:s'). PHP_EOL;
+
+$nowPlus65Minutes = new \DateTimeImmutable('+65 minutes');
+echo 'now plus 65 minutes: ' . $nowPlus65Minutes->format('Y-m-d H:i:s I') . ' (' . $nowPlus65Minutes->getTimestamp() . ')' . PHP_EOL;
+$nowPlus65MinutesInUTC = $nowPlus65Minutes->setTimezone(new \DateTimeZone('UTC'));
+echo 'now plus 65 minutes in UTC: ' . $nowPlus65MinutesInUTC->format('Y-m-d H:i:s') . ' (' . $nowPlus65MinutesInUTC->getTimestamp() . ')' . PHP_EOL;
+
+$interval = $nowPlus65Minutes->diff($now);
+echo 'interval: ' . $interval->format('%h hours, %i minutes') . PHP_EOL;
+```
+
+So the output of this code executed in any time of the year (except for the interval of time I defined above) is:
+```
+Sat 26 Oct 2024 12:29:26 AM UTC
+now: 2024-10-26 02:29:26 1 (1729902566)
+now in UTC: 2024-10-26 00:29:26
+now plus 65 minutes: 2024-10-26 03:34:26 1 (1729906466)
+now plus 65 minutes in UTC: 2024-10-26 01:34:26 (1729906466)
+interval: 1 hours, 5 minutes
+```
+That's perfectly right, the output above is the expected one and perfectly as expected since `$now` and `$nowPlus65MinutesInUTC` are actually separated just by 65 minutes.
+
+Now let's see the same exact code executed when the time is ~27 Oct 2:01AM CEST Europe/Rome, and interval is 65 minutes (so current time + interval > time when DST change)
+```
+php 5.6
+Sun 27 Oct 2024 12:01:05 AM UTC
+now: 2024-10-27 02:01:05 0 (1729990865)
+now in UTC: 2024-10-27 01:01:05
+now plus 65 minutes: 2024-10-27 03:06:05 0 (1729994765)
+now plus 65 minutes in UTC: 2024-10-27 02:06:05 (1729994765)
+interval: 1 hours, 5 minutes
+
+php 7.4
+Sun 27 Oct 2024 12:01:05 AM UTC
+now: 2024-10-27 02:01:05 0 (1729990865)
+now in UTC: 2024-10-27 01:01:05
+now plus 65 minutes: 2024-10-27 03:06:05 0 (1729994765)
+now plus 65 minutes in UTC: 2024-10-27 02:06:05 (1729994765)
+interval: 1 hours, 5 minutes
+
+php 8.0
+Sun 27 Oct 2024 12:01:05 AM UTC
+now: 2024-10-27 02:01:05 0 (1729990865)
+now in UTC: 2024-10-27 01:01:05
+now plus 65 minutes: 2024-10-27 03:06:05 0 (1729994765)
+now plus 65 minutes in UTC: 2024-10-27 02:06:05 (1729994765)
+interval: 1 hours, 5 minutes
+
+php 8.1
+Sun 27 Oct 2024 12:01:05 AM UTC
+now: 2024-10-27 02:01:05 1 (1729987265)
+now in UTC: 2024-10-27 00:01:05
+now plus 65 minutes: 2024-10-27 03:06:05 0 (1729994765)
+now plus 65 minutes in UTC: 2024-10-27 02:06:05 (1729994765)
+interval: 1 hours, 5 minutes
+
+php 8.3
+Sun 27 Oct 2024 12:01:05 AM UTC
+now: 2024-10-27 02:01:05 1 (1729987265)
+now in UTC: 2024-10-27 00:01:05
+now plus 65 minutes: 2024-10-27 03:06:05 0 (1729994765)
+now plus 65 minutes in UTC: 2024-10-27 02:06:05 (1729994765)
+interval: 2 hours, 5 minutes
+```
+
+A new notes to better grasp the problem:
+- As you see, the behaviour changes in different php versions 😓
+- Look at `now plus 65 minutes in UTC`, it's "two hours and five minutes" after `now in UTC` in PHP 8.3. While the expectation is just "1 hour and 5 minutes". This because php when using the modifier in the constructor doesn't pick the "current datetime", it picks the non-DST datetime (aka CET).
+- I laso printed the output of `date` before each script execution to reflect the OS date that I set to reproduce the bug
+- I formatted the date both in Europe/Rome timezone (the one globally set by default) and also in UTC, the latter is just a way to make it easier to see where is the problem, since by looking at the datetime formatted as Europe/Rome makes harder to see the problem
+
+---------------------------------------------------------------------------
+
+by danydev at 2024-11-04T21:16:58Z
+
+This comment analyzes the bugfix for 2 cases above.
+
+Reference code that uses the same approach of the currently pushed fix.
+```
+<?php
+date_default_timezone_set('Europe/Rome');
+
+$now = new \DateTimeImmutable('now', new \DateTimeZone('UTC'));
+echo 'now: ' . $now->format('Y-m-d H:i:s I') . ' (' . $now->getTimestamp() . ')' . PHP_EOL;
+
+$nowPlusOneMinute = $now->modify('+1 minute');
+echo 'now plus 1 minute: ' . $nowPlusOneMinute->format('Y-m-d H:i:s I') . ' (' . $nowPlusOneMinute->getTimestamp() . ')' . PHP_EOL;
+
+$interval = $nowPlusOneMinute->diff($now);
+echo 'interval: ' . $interval->format('%h hours, %i minutes') . PHP_EOL;
+```
+
+output when executing 27 Oct 2024 2:10:02AM DST (so the **Bug 1** explained above)
+```
+php 5.6
+Sun 27 Oct 2024 12:10:02 AM UTC
+now: 2024-10-27 00:10:02 0 (1729987802)
+now plus 1 minute: 2024-10-27 00:11:02 0 (1729987862)
+interval: 0 hours, 1 minutes
+
+php 7.4
+Sun 27 Oct 2024 12:10:02 AM UTC
+now: 2024-10-27 00:10:02 0 (1729987802)
+now plus 1 minute: 2024-10-27 00:11:02 0 (1729987862)
+interval: 0 hours, 1 minutes
+
+php 8.0
+Sun 27 Oct 2024 12:10:02 AM UTC
+now: 2024-10-27 00:10:02 0 (1729987802)
+now plus 1 minute: 2024-10-27 00:11:02 0 (1729987862)
+interval: 0 hours, 1 minutes
+
+php 8.1
+Sun 27 Oct 2024 12:10:02 AM UTC
+now: 2024-10-27 00:10:02 0 (1729987802)
+now plus 1 minute: 2024-10-27 00:11:02 0 (1729987862)
+interval: 0 hours, 1 minutes
+
+php 8.3
+Sun 27 Oct 2024 12:10:03 AM UTC
+now: 2024-10-27 00:10:03 0 (1729987803)
+now plus 1 minute: 2024-10-27 00:11:03 0 (1729987863)
+interval: 0 hours, 1 minutes
+```
+
+**Comment**: all good, all intervals are created correctly and diff by 1 minute in all php versions
+
+Now let's verify **Bug 2**
+Reference code that uses the same approach of the currently pushed fix.
+```
+<?php
+date_default_timezone_set('Europe/Rome');
+
+$now = new \DateTimeImmutable('now', new \DateTimeZone('UTC'));
+echo 'now: ' . $now->format('Y-m-d H:i:s I') . ' (' . $now->getTimestamp() . ')' . PHP_EOL;
+
+$nowPlus65Minutes = $now->modify('+65 minutes');
+echo 'now plus 65 minutes: ' . $nowPlus65Minutes->format('Y-m-d H:i:s I') . ' (' . $nowPlus65Minutes->getTimestamp() . ')' . PHP_EOL;
+
+$interval = $nowPlus65Minutes->diff($now);
+echo 'interval: ' . $interval->format('%h hours, %i minutes') . PHP_EOL;
+```
+
+output when executing 27 Oct 2024 2:12:15AM DST + using interval of 65 minutes that summed up to current time goes to > time when DST changes (so the **Bug 2** explained above)
+```
+php 5.6
+Sun 27 Oct 2024 12:12:15 AM UTC
+now: 2024-10-27 00:12:16 0 (1729987936)
+now plus 65 minutes: 2024-10-27 01:17:16 0 (1729991836)
+interval: 1 hours, 5 minutes
+
+php 7.4
+Sun 27 Oct 2024 12:12:16 AM UTC
+now: 2024-10-27 00:12:16 0 (1729987936)
+now plus 65 minutes: 2024-10-27 01:17:16 0 (1729991836)
+interval: 1 hours, 5 minutes
+
+php 8.0
+Sun 27 Oct 2024 12:12:16 AM UTC
+now: 2024-10-27 00:12:16 0 (1729987936)
+now plus 65 minutes: 2024-10-27 01:17:16 0 (1729991836)
+interval: 1 hours, 5 minutes
+
+php 8.1
+Sun 27 Oct 2024 12:12:16 AM UTC
+now: 2024-10-27 00:12:16 0 (1729987936)
+now plus 65 minutes: 2024-10-27 01:17:16 0 (1729991836)
+interval: 1 hours, 5 minutes
+
+php 8.3
+Sun 27 Oct 2024 12:12:16 AM UTC
+now: 2024-10-27 00:12:16 0 (1729987936)
+now plus 65 minutes: 2024-10-27 01:17:16 0 (1729991836)
+interval: 1 hours, 5 minutes
+```
+
+**Comment**: all good, all intervals are created correctly and diff by 65 minutes in all php versions.
+
+---------------------------------------------------------------------------
+
+by danydev at 2024-11-05T10:17:00Z
+
+I explored several ways to try to create a unit test, but since the current datetime is not easily mockable, I couldn't find a way to create a test that fails on master and passes on this branch.
+
+I could create a unit test that verifies that the expected TTL is created accordingly to the defined rate limiter interval, but that wouldn't validate specifically my case, it would pass on master as well.
+
+---------------------------------------------------------------------------
+
+by danydev at 2024-11-05T11:50:22Z
+
+Thank you for your suggestions, I just did a followup with the unit test fixing the date when the bug occurs.
+
+I think we should be okay now, the funny thing is that by changing the fix to be able to mock it, the bug was still there until I modified also the other point where we create the `$now`.
+I think that's good, since actually it's better to create $now the same way, since we're going to compare them somehow
+
+---------------------------------------------------------------------------
+
+by danydev at 2024-11-05T13:14:45Z
+
+@nicolas-grekas I'm bothering you just one last time.
+
+After looking at the [php doc](https://www.php.net/manual/en/datetimeimmutable.createfromformat.php), I noticed the note
+```
+The timezone parameter and the current timezone are ignored when the datetime parameter either contains a UNIX timestamp (e.g. 946684800) or specifies a timezone (e.g. 2010-01-28T15:00:00+02:00).
+```
+So I think that's just "better" to not specify the timezone, since actually it's superfluous, in case of timestamps, PHP uses by default UTC.
+
+If you agree, could you re-approve? Thank you

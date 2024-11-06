@@ -27,6 +27,12 @@ jobs:
       ANSICON: '121x90 (121x90)'
       SYMFONY_PHPUNIT_DISABLE_RESULT_CACHE: '1'
 
+    strategy:
+      matrix:
+        include:
+          - ini: 'min'
+          - ini: 'max'
+
     steps:
       - name: Setup Git
         run: |
@@ -96,23 +102,9 @@ jobs:
           php phpunit install
 
       - name: Install memurai-developer
+        if: "matrix.ini == 'max'"
         run: |
           choco install --no-progress memurai-developer
-
-      - name: Run tests (minimal extensions)
-        if: always() && steps.setup.outcome == 'success'
-        run: |
-          $env:Path = 'c:\php;' + $env:Path
-          $env:SYMFONY_PHPUNIT_SKIPPED_TESTS = 'phpunit.skipped'
-          $x = 0
-
-          Copy c:\php\php.ini-min c:\php\php.ini
-          Remove-Item -Path src\Symfony\Bridge\PhpUnit -Recurse
-          mv src\Symfony\Component\HttpClient\phpunit.xml.dist src\Symfony\Component\HttpClient\phpunit.xml
-          php phpunit src\Symfony --exclude-group tty,benchmark,intl-data,network,transient-on-windows || ($x = 1)
-          php phpunit src\Symfony\Component\HttpClient || ($x = 1)
-
-          exit $x
 
       - name: Run tests
         if: always() && steps.setup.outcome == 'success'
@@ -121,7 +113,9 @@ jobs:
           $env:SYMFONY_PHPUNIT_SKIPPED_TESTS = 'phpunit.skipped'
           $x = 0
 
-          Copy c:\php\php.ini-max c:\php\php.ini
+          Copy c:\php\php.ini-${{ matrix.ini }} c:\php\php.ini
+          Remove-Item -Path src\Symfony\Bridge\PhpUnit -Recurse
+          mv src\Symfony\Component\HttpClient\phpunit.xml.dist src\Symfony\Component\HttpClient\phpunit.xml
           php phpunit src\Symfony --exclude-group tty,benchmark,intl-data,network,transient-on-windows || ($x = 1)
           php phpunit src\Symfony\Component\HttpClient || ($x = 1)
 

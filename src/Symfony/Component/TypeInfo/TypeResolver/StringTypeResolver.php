@@ -34,6 +34,7 @@ use PHPStan\PhpDocParser\Lexer\Lexer;
 use PHPStan\PhpDocParser\Parser\ConstExprParser;
 use PHPStan\PhpDocParser\Parser\TokenIterator;
 use PHPStan\PhpDocParser\Parser\TypeParser;
+use PHPStan\PhpDocParser\ParserConfig;
 use Symfony\Component\TypeInfo\Exception\InvalidArgumentException;
 use Symfony\Component\TypeInfo\Exception\UnsupportedException;
 use Symfony\Component\TypeInfo\Type;
@@ -58,10 +59,25 @@ final class StringTypeResolver implements TypeResolverInterface
      */
     private static array $classExistCache = [];
 
+    private readonly Lexer $lexer;
+    private readonly TypeParser $parser;
+
     public function __construct(
-        private Lexer $lexer = new Lexer(),
-        private TypeParser $parser = new TypeParser(new ConstExprParser()),
+        ?Lexer $lexer = null,
+        ?TypeParser $typeParser = null,
     ) {
+        if (!$lexer) {
+            $this->lexer = class_exists(ParserConfig::class) ? new Lexer(new ParserConfig([])) : new Lexer();
+        }
+
+        if (!$typeParser) {
+            if (class_exists(ParserConfig::class)) {
+                $config = new ParserConfig([]);
+                $this->parser = new TypeParser($config, new ConstExprParser($config));
+            } else {
+                $this->parser = new TypeParser(new ConstExprParser());
+            }
+        }
     }
 
     public function resolve(mixed $subject, ?TypeContext $typeContext = null): Type

@@ -29,7 +29,7 @@
         "psr/container": "^1.1|^2.0"
     },
     "require-dev": {
-        "phpstan/phpdoc-parser": "^1.0",
+        "phpstan/phpdoc-parser": "^1.0|^2.0",
         "symfony/dependency-injection": "^6.4|^7.0",
         "symfony/property-info": "^6.4|^7.0"
     },

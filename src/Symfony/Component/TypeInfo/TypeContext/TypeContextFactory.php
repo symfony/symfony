@@ -17,6 +17,7 @@ use PHPStan\PhpDocParser\Parser\ConstExprParser;
 use PHPStan\PhpDocParser\Parser\PhpDocParser;
 use PHPStan\PhpDocParser\Parser\TokenIterator;
 use PHPStan\PhpDocParser\Parser\TypeParser;
+use PHPStan\PhpDocParser\ParserConfig;
 use Symfony\Component\TypeInfo\Exception\RuntimeException;
 use Symfony\Component\TypeInfo\Exception\UnsupportedException;
 use Symfony\Component\TypeInfo\Type;
@@ -157,8 +158,14 @@ final class TypeContextFactory
             return [];
         }
 
-        $this->phpstanLexer ??= new Lexer();
-        $this->phpstanParser ??= new PhpDocParser(new TypeParser(new ConstExprParser()), new ConstExprParser());
+        if (class_exists(ParserConfig::class)) {
+            $config = new ParserConfig([]);
+            $this->phpstanLexer ??= new Lexer($config);
+            $this->phpstanParser ??= new PhpDocParser($config, new TypeParser($config, new ConstExprParser($config)), new ConstExprParser($config));
+        } else {
+            $this->phpstanLexer ??= new Lexer();
+            $this->phpstanParser ??= new PhpDocParser(new TypeParser(new ConstExprParser()), new ConstExprParser());
+        }
 
         $tokens = new TokenIterator($this->phpstanLexer->tokenize($rawDocNode));
 

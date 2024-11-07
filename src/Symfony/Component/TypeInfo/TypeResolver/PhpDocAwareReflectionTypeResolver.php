@@ -19,6 +19,7 @@ use PHPStan\PhpDocParser\Parser\ConstExprParser;
 use PHPStan\PhpDocParser\Parser\PhpDocParser;
 use PHPStan\PhpDocParser\Parser\TokenIterator;
 use PHPStan\PhpDocParser\Parser\TypeParser;
+use PHPStan\PhpDocParser\ParserConfig;
 use Symfony\Component\TypeInfo\Exception\UnsupportedException;
 use Symfony\Component\TypeInfo\Type;
 use Symfony\Component\TypeInfo\TypeContext\TypeContext;
@@ -33,13 +34,28 @@ use Symfony\Component\TypeInfo\TypeContext\TypeContextFactory;
  */
 final readonly class PhpDocAwareReflectionTypeResolver implements TypeResolverInterface
 {
+    private PhpDocParser $phpDocParser;
+    private Lexer $lexer;
+
     public function __construct(
         private TypeResolverInterface $reflectionTypeResolver,
         private TypeResolverInterface $stringTypeResolver,
         private TypeContextFactory $typeContextFactory,
-        private PhpDocParser $phpDocParser = new PhpDocParser(new TypeParser(), new ConstExprParser()),
-        private Lexer $lexer = new Lexer(),
+        ?PhpDocParser $phpDocParser = null,
+        ?Lexer $lexer = null,
     ) {
+        if (!$phpDocParser) {
+            if (class_exists(ParserConfig::class)) {
+                $config = new ParserConfig([]);
+                $this->phpDocParser = new PhpDocParser($config, new TypeParser($config, new ConstExprParser($config)), new ConstExprParser($config));
+            } else {
+                $this->phpDocParser = new PhpDocParser(new TypeParser(new ConstExprParser()), new ConstExprParser());
+            }
+        }
+
+        if (!$lexer) {
+            $this->lexer = class_exists(ParserConfig::class) ? new Lexer(new ParserConfig([])) : new Lexer();
+        }
     }
 
     public function resolve(mixed $subject, ?TypeContext $typeContext = null): Type

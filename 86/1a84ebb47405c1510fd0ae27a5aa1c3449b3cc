@@ -1,0 +1,31 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2024-11-05T10:56:03Z
+
+Hey!
+
+To help keep things organized, we don't allow "Draft" pull requests. Could you please click the "ready for review" button or close this PR and open a new one when you are done?
+
+Note that a pull request does not have to be "perfect" or "ready for merge" when you first open it. We just want it to be ready for a first review.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-11-05T13:10:25Z
+
+What about src/Symfony/Component/Mime/MimeTypes.php ?
+
+---------------------------------------------------------------------------
+
+by dunglas at 2024-11-05T16:52:22Z
+
+@nicolas-grekas `MimeTypes.php` is already up to date.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-11-06T07:42:51Z
+
+Let's target 7.2 if we're unsure.

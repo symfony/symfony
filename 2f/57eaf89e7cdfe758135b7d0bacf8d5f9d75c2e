@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-11-06T12:20:18Z
+
+That's not going to happen, even less on PHP 8.2+
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2024-11-06T12:30:51Z
+
+Better safe than sorry, I guess

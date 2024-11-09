@@ -1,0 +1,90 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2024-05-21T19:07:18Z
+
+Hey!
+
+I see that this is your first PR. That is great! Welcome!
+
+Symfony has a [contribution guide](https://symfony.com/doc/current/contributing/index.html) which I suggest you to read.
+
+In short:
+- Always add tests
+- Keep backward compatibility (see https://symfony.com/bc).
+- Bug fixes must be submitted against the lowest maintained branch where they apply (see https://symfony.com/releases)
+- Features and deprecations must be submitted against the 7.2 branch.
+
+Review the GitHub status checks of your pull request and try to solve the reported issues. If some tests are failing, try to see if they are failing because of this change.
+
+When two Symfony core team members approve this change, it will be merged and you will become an official Symfony contributor!
+If this PR is merged in a lower version branch, it will be merged up to all maintained branches within a few days.
+
+I am going to sit back now and wait for the reviews.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by carsonbot at 2024-05-21T19:07:18Z
+
+Hey!
+
+Thanks for your PR. You are targeting branch "6.4" but it seems your PR description refers to branch "6.4,".
+Could you update the PR description or change target branch? This helps core maintainers a lot.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by er1z at 2024-05-21T21:21:37Z
+
+I can see that unit tests failures come from totally different area and the same failures repeat across different PRs. How should we proceed?
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2024-05-22T15:43:29Z
+
+> I can see that unit tests failures come from totally different area and the same failures repeat across different PRs. How should we proceed?
+
+You can ignore them for now
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-09-16T16:16:22Z
+
+Please rebase, and please get rid of the merge commit meanwhile.
+Note that even after rebasing, tests don't pass yet.
+Can you also please add test cases for `get_foo` / `get123` methods?
+
+I also think GetSetMethodNormalizer needs a similar change:
+
+```diff
+--- a/src/Symfony/Component/Serializer/Normalizer/GetSetMethodNormalizer.php
++++ b/src/Symfony/Component/Serializer/Normalizer/GetSetMethodNormalizer.php
+@@ -106,7 +106,7 @@ class GetSetMethodNormalizer extends AbstractObjectNormalizer
+             && !($method->getAttributes(Ignore::class) || $method->getAttributes(LegacyIgnore::class))
+             && !$method->getNumberOfRequiredParameters()
+             && ((2 < ($methodLength = \strlen($method->name)) && str_starts_with($method->name, 'is'))
+-                || (3 < $methodLength && (str_starts_with($method->name, 'has') || str_starts_with($method->name, 'get')))
++                || (3 < $methodLength && (str_starts_with($method->name, 'has') || str_starts_with($method->name, 'get')) && !ctype_lower($method->name[3]))
+             );
+     }
+
+@@ -118,7 +118,8 @@ class GetSetMethodNormalizer extends AbstractObjectNormalizer
+         return !$method->isStatic()
+             && !$method->getAttributes(Ignore::class)
+             && 0 < $method->getNumberOfParameters()
+-            && str_starts_with($method->name, 'set');
++            && str_starts_with($method->name, 'set')
++            && !ctype_lower($method->name[3]);
+```
+
+---------------------------------------------------------------------------
+
+by er1z at 2024-09-21T18:23:15Z
+
+Ok, rebased, caught with mainstream and extended some cases. The only thing I don't fully get is the one with `get_` as it's done with name converter right?

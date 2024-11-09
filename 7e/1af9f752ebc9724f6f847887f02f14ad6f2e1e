@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2024-11-08T16:11:21Z
+
+this will fix our `deps=low` builds as we then make use of the changes done in #57885 and #58169

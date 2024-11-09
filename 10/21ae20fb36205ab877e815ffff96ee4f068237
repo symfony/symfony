@@ -1,0 +1,7 @@
+---------------------------------------------------------------------------
+
+by GromNaN at 2024-11-07T13:10:20Z
+
+Good catch, the parameter is resolved in the [`ContainerBuilder`](https://github.com/symfony/symfony/blob/3ee749073358a2e096193994176dc054806b62f1/src/Symfony/Component/DependencyInjection/ContainerBuilder.php#L1102).
+
+The oldest maintained branch this bug can be fixed is 6.4. Can you change the target branch of your PR please. https://github.com/symfony/symfony/blob/6.4/src/Symfony/Component/DependencyInjection/Definition.php#L184-L186

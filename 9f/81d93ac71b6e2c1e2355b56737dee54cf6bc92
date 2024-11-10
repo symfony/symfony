@@ -1,0 +1,7 @@
+---------------------------------------------------------------------------
+
+by smnandre at 2024-11-09T16:15:40Z
+
+Updated preferences for aac (same thing), mp4 and mpeg4
+
+Yaml has changed due to our preferences (not sure why it did not in first commit, and a small new change for "vor" in the meanwhile)

@@ -130,7 +130,7 @@
         "async-aws/sns": "^1.0",
         "cache/integration-tests": "dev-master",
         "doctrine/collections": "^1.0|^2.0",
-        "doctrine/data-fixtures": "^1.1",
+        "doctrine/data-fixtures": "^1.1|^2.0",
         "doctrine/dbal": "^3.6|^4",
         "doctrine/orm": "^2.15|^3",
         "dragonmantank/cron-expression": "^3.1",
@@ -163,6 +163,7 @@
     "conflict": {
         "ext-psr": "<1.1|>=2",
         "async-aws/core": "<1.5",
+        "doctrine/data-fixtures": ">=3",
         "doctrine/dbal": "<3.6",
         "doctrine/orm": "<2.15",
         "egulias/email-validator": "~3.0.0",

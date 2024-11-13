@@ -1,0 +1,59 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2024-11-13T16:14:35Z
+
+Hey!
+
+I see that this is your first PR. That is great! Welcome!
+
+Symfony has a [contribution guide](https://symfony.com/doc/current/contributing/index.html) which I suggest you to read.
+
+In short:
+- Always add tests
+- Keep backward compatibility (see https://symfony.com/bc).
+- Bug fixes must be submitted against the lowest maintained branch where they apply (see https://symfony.com/releases)
+- Features and deprecations must be submitted against the 7.2 branch.
+
+Review the GitHub status checks of your pull request and try to solve the reported issues. If some tests are failing, try to see if they are failing because of this change.
+
+When two Symfony core team members approve this change, it will be merged and you will become an official Symfony contributor!
+If this PR is merged in a lower version branch, it will be merged up to all maintained branches within a few days.
+
+I am going to sit back now and wait for the reviews.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-11-13T16:34:22Z
+
+(please rebase, not merge)
+
+---------------------------------------------------------------------------
+
+by KurtThiemann at 2024-11-13T17:05:14Z
+
+Sorry, should be fixed
+
+Any idea what's up with the tests? I'd say I'm reasonably confident I'm not responsible for all the failures here...
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-11-13T17:18:24Z
+
+Note that this means the content-length won't be sent anymore and the chunked encoding will be used instead.
+Maybe something that could be fixed by asking the stream its size?
+
+---------------------------------------------------------------------------
+
+by KurtThiemann at 2024-11-13T17:58:28Z
+
+The Content-Length header should now be added if `$stream->getSize()` doesn't return null. This way, the behavior should now be the same as before, except for streams of unknown length, which before had a Content-Length header and now don't.
+
+---------------------------------------------------------------------------
+
+by KurtThiemann at 2024-11-13T18:27:03Z
+
+Not sure if we'd want to do something about the duplicate code in Psr18Client and HttplugClient

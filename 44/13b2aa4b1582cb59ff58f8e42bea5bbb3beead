@@ -1,0 +1,180 @@
+---------------------------------------------------------------------------
+
+by stof at 2024-07-03T07:56:46Z
+
+Using public properties instead of getters makes the maintenance harder in case we need to make the API of the component evolve (as we cannot rely on property hooks yet to implement BC layers)
+
+---------------------------------------------------------------------------
+
+by skalpa at 2024-08-07T04:54:53Z
+
+> It is difficult to know if a type is "just" a nullable type (because we need to check the union content).
+
+I am not sure I understand what problem your are trying to solve. A type is "just" a nullable type if `$type instanceof BuiltinType && TypeIdentifier::NULL === $type->getTypeIdentifier()`.
+
+Nevertheless, the changes feel a lot complex considering nullability is not a generic problem. There are only 3 kinds of nullable types: `null`, `mixed`, and unions that contain `null`.
+
+Therefore, I would only keep the current `isNullable()`, and `asNonNullable()` methods, but refactor them a bit:
+
+* The implementation of `Type::isNullable()` should just return `false`
+* `Type::asNonNullable()` should be implemented and just return `$this`
+* All the unnecessary `asNonNullable()` in children classes can be removed
+* `BuiltinType`/`UnionType` have to override `isNullable()` and return `true` when appropriate
+
+With these little changes I believe nullability would be properly covered.
+
+---------------------------------------------------------------------------
+
+by stof at 2024-08-07T14:41:38Z
+
+@skalpa actually, there are more nullable types:
+
+- an intersection type where all its types are nullable
+- a union type containing a nullable type (which might not be `null`, as you said yourselves that there are more nullable types, for instance `mixed` or other union types)
+
+---------------------------------------------------------------------------
+
+by skalpa at 2024-08-08T10:52:25Z
+
+> @skalpa actually, there are more nullable types:
+> * an intersection type where all its types are nullable
+> * a union type containing a nullable type (which might not be `null`, as you said yourselves that there are more nullable types, for instance `mixed` or other union types)
+
+@stof, intersections cannot contain nullable types, only [class/interface names](https://www.php.net/manual/en/language.types.type-system.php), which is logical (nothing could be both an instance of `Stuff` and `null` at the same time). Currently it is possible to create nonsensical intersections that would be invalid in PHP, but I fixed that in #57943.
+
+For unions, yes, I meant "a union that contains a nullable" and not "a union that contains null", but after seeing your comment and checking, I believe it should be forbidden as well. Trying to add `mixed` to a union gives me `PHP Fatal error:  Type mixed can only be used as a standalone type`.
+
+And a union cannot contain another union: this throws an exception (`Type::union()` lets you pass other unions but it merges them to a new one before calling the constructor).
+
+---------------------------------------------------------------------------
+
+by stof at 2024-08-08T10:59:49Z
+
+@skalpa as said above, `mixed` is nullable. And it could be used in an IntersectionType (unless you canonicalize such intersection `mixed&T` to be `T` during instantiation).
+
+And why the PHP syntax enforces types to be written in disjunctive normal form (meaning no union inside intersection), I'm not sure TypeInfo should have this restriction on the created object graph (or it should have proper types enforcing valid usages).
+And enforcing canonical forms might make `asNonNullable` more complex because of the fact that turning `mixed` into a non-nullable type turns it into a union.
+
+---------------------------------------------------------------------------
+
+by skalpa at 2024-08-08T13:37:03Z
+
+> @skalpa as said above, `mixed` is nullable. And it could be used in an IntersectionType (unless you canonicalize such intersection `mixed&T` to be `T` during instantiation).
+>
+
+@stof, No, an intersection cannot contain `mixed`. I am sorry to insist, but this is absolutely crucial as it completely changes the semantics of the type if not enforced. In PHP, intersections represent objects. If a value satisfies an intersection, then one must be able to assume that `true === is_object($value)`. And PHP forbids using anything else than class names in intersections.
+
+While the normal form is something else, I really believe we should prevent the creation of nonsensical and/or invalid types that would never be satisfied by any value or would only result in PHP fatal errors if used, as they may probably be indicators of a bug in user code.
+
+If this is not enforced by the component, then as a user I will have to anticipate absolutely impossible cases just because the API allows them and I'd have to protect my code against intersections of scalars, or unions of `mixed` and `never`. ☹️
+
+(even though yes, technically you're right, any intersection is always equivalent to itself & mixed)
+
+> And why the PHP syntax enforces types to be written in disjunctive normal form (meaning no union inside intersection), I'm not sure TypeInfo should have this restriction on the created object graph (or it should have proper types enforcing valid usages). And enforcing canonical forms might make `asNonNullable` more complex because of the fact that turning `mixed` into a non-nullable type turns it into a union.
+
+Some restrictions/enforcements are already there: you are not allowed to add a union to a union, or an intersection to another intersection, which is completely arbitrary if you consider that these could be merged later. But in fact I believe that @mtarld's is the right approach here and am just trying to build on top of it:
+
+IMHO, object graphs should be as canonical as possible. For instance, the fact that unions sort their subtypes is brilliant and without it, to compare `Type::union(Type::int(), Type::string())` to `Type::union(Type::string(), Type::int())` would be near impossible.
+
+To make this possible requires enforcing the normal form in the `Type` classes afaik. This is actually partly implemented but incomplete, which is what I tried to improve in my own PR.
+
+In return, `TypeFactoryTrait` methods can be used to add some flexibility to types creation and ensure that `Type::union(Type::int(), Type::union(Type::string(), Type::bool()))` is not only allowed but will create the exact same type as `Type::union(Type::bool(), Type::int(), Type::string())`.
+
+If we consider that we should allow any random combination of types, then the current checks should be removed (but I would consider that a step back).
+
+TL;DR (sorry but I really like this component, I talk too much sometimes): I'd like to be able to assume that `echo $type` will always give me a syntactically valid PHP type. We can already use `Type::union()` and `Type::intersection()` to combine composite types in a more flexible way and could add more if necessary.
+
+---------------------------------------------------------------------------
+
+by mtarld at 2024-08-14T07:40:11Z
+
+Ok, I ended up with the following:
+- I renamed `Type::is` to `Type::satisfy` and `Type::isA` to `Type::isIdentifiedBy` so that it is easier to understand
+- I added the `CompositeTypeInterface::composedTypesSatisfy` and `WrappingTypeInterface::wrappedTypeSatisfy` methods so that it is easier to define whether we want to check the root, the children or the leaves (you can have a look for an example in `Type::isIdentifiedBy`
+
+I'm still not sure if the `Type::asNonNullable` is needed, as we now have that `NullableType`. I mean, does it make sense to make `mixed` or `null` as non-nullable? To me, the main aim for that method me is to recover `int` in `int|null`, which is covered by `NullableType::getWrappedType`.
+
+Plus, I disallowed the creation of an `UnionType` with `null` as part, and enforced the creation of a `NullableType` instead (see `UnionType::__construct`). But I'm not sure if that's a good idea.
+
+WDYT?
+
+---------------------------------------------------------------------------
+
+by mtarld at 2024-08-14T14:28:18Z
+
+Moreover, I pulled some ideas from the great work of @skalpa in https://github.com/symfony/symfony/pull/57943 that make types more consistent and make my work on nullable types more easy and relevant.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2024-09-21T12:38:20Z
+
+Rebase needed.
+Also we need to move forward on this as the 7.2 feature freeze will come fast making TypeInfo's API stable and there are several open PRs that depend on the API updated here. @stof can you please have another look?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2024-09-23T06:21:11Z
+
+The failures look related.
+
+---------------------------------------------------------------------------
+
+by mtarld at 2024-09-24T08:27:47Z
+
+These changes are making types generation stricter, and they allowed us to catch a bug: https://github.com/symfony/symfony/pull/58371
+
+---------------------------------------------------------------------------
+
+by fabpot at 2024-10-18T08:04:00Z
+
+It looks like the tests are still failing.
+
+---------------------------------------------------------------------------
+
+by mtarld at 2024-10-18T10:07:15Z
+
+The high-deps build is failing because this PR purposely contains BC breaks as the component is experimental in 7.2. Failures will go away once this is merged.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2024-10-18T11:59:31Z
+
+Indeed, tests will pass once merged. Then dependant components' tests will start failing on 7.1 as they will install type-info 7.2 so we will have to forbid it by adding conflict rules.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2024-10-18T12:04:57Z
+
+The issue is that the conflict will lead to the fact that Composer may not install the latest 7.1 version of said component because of the conflict when 7.2 of the TypeInfo component is installed as we already have releases claiming to be compatible with TypeInfo 7.2. So the damage is already done. The only solution I see is to make the PropertyInfo component compatible with TypeInfo 7.2 as a bugfix in 7.1.
+
+In the future we need to be careful when adding requirements for experimental components and do not allow to install new minor versions of the from the beginning.
+
+---------------------------------------------------------------------------
+
+by stof at 2024-10-18T12:19:57Z
+
+@xabbuh a way to avoid that breakage is to make type-info conflict with older versions of those components, to workaround the fact that we used semver constraints for an experimental package not guaranteeing semver yet.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2024-10-18T12:30:09Z
+
+Sounds good
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2024-10-18T12:44:23Z
+
+Indeed, @stof's suggestion is a good idea that we can use in this PR.
+
+---------------------------------------------------------------------------
+
+by mtarld at 2024-10-18T12:47:35Z
+
+Yes, that a great idea, I just pushed that fix.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2024-10-22T15:02:03Z
+
+@symfony/mergers Additional review needed to move forward before the component is considered stable.

@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2024-11-12T12:44:16Z
+
+Is Psalm feedback relevant? I'm not sure, is `getName()` available in all supported PHPUnit versions?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2024-11-12T12:56:28Z
+
+That’s not relevant as the listener is not usable with PHPUnit 10+ anyway.
+
+---------------------------------------------------------------------------
+
+by stof at 2024-11-12T14:56:54Z
+
+However, we might need a similar fix in the new implementation supporting PHPUnit 11 in the 7.2 branch (unless that new implementation was not impacted by the bug)
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2024-11-12T14:59:33Z
+
+We in fact need to re-implement this feature for the new event system in PHPUnit 11 (the failures related to this being missing) made me aware of the fact that we didn't port this feature yet.

@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by stof at 2024-11-12T14:45:17Z
+
+how does error handling work for the connection then ? Are we still reporting failures properly ?
+
+---------------------------------------------------------------------------
+
+by chalasr at 2024-11-12T22:02:36Z
+
+> how does error handling work for the connection then ? Are we still reporting failures properly ?
+
+Good point, proper error handling is missing for `connect()`. We need something similar to what the [redis cache adapter does](https://github.com/symfony/symfony/blob/7.2/src/Symfony/Component/Cache/Traits/RedisTrait.php#L292).
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2024-11-12T22:11:42Z
+
+you are right, I have updated the class with the same approach that we use in the Redis adapter as pointed out by @chalasr

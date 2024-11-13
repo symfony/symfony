@@ -51,6 +51,7 @@
         "psr/log": "^1|^2|^3"
     },
     "conflict": {
+        "doctrine/data-fixtures": ">=2",
         "doctrine/dbal": "<2.13.1",
         "doctrine/lexer": "<1.1",
         "doctrine/orm": "<2.7.4",

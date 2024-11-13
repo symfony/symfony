@@ -155,6 +155,7 @@
         "ext-psr": "<1.1|>=2",
         "async-aws/core": "<1.5",
         "doctrine/annotations": "<1.13.1",
+        "doctrine/data-fixtures": ">=2",
         "doctrine/dbal": "<2.13.1",
         "egulias/email-validator": "~3.0.0",
         "masterminds/html5": "<2.6",

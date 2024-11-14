@@ -36,7 +36,7 @@
         "symfony/messenger": "^5.4|^6.0|^7.0",
         "symfony/mime": "^5.4|^6.0|^7.0",
         "symfony/property-access": "^5.4.26|^6.3|^7.0",
-        "symfony/property-info": "^5.4.24|^6.2.11|^7.0",
+        "symfony/property-info": "^5.4.47|^6.4.15|^7.1.8",
         "symfony/translation-contracts": "^2.5|^3",
         "symfony/uid": "^5.4|^6.0|^7.0",
         "symfony/validator": "^6.4|^7.0",
@@ -50,7 +50,7 @@
         "phpdocumentor/type-resolver": "<1.4.0",
         "symfony/dependency-injection": "<5.4",
         "symfony/property-access": "<5.4",
-        "symfony/property-info": "<5.4.24|>=6,<6.2.11",
+        "symfony/property-info": "<5.4.47|>=6,<6.4.15|>=7,<7.1.8|>=7.2",
         "symfony/validator": "<6.4",
         "symfony/uid": "<5.4",
         "symfony/yaml": "<5.4"

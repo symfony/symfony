@@ -12,6 +12,7 @@
 namespace Symfony\Component\HttpClient\Tests;
 
 use PHPUnit\Framework\SkippedTestSuiteError;
+use Symfony\Bridge\PhpUnit\DnsMock;
 use Symfony\Component\HttpClient\Exception\ClientException;
 use Symfony\Component\HttpClient\Exception\InvalidArgumentException;
 use Symfony\Component\HttpClient\Exception\TransportException;
@@ -468,8 +469,22 @@ abstract class HttpClientTestCase extends BaseHttpClientTestCase
         $httpClient->request('GET', 'http:/localhost:8057/');
     }
 
+    /**
+     * @group dns-sensitive
+     */
     public function testNoPrivateNetwork()
     {
+        DnsMock::withMockedHosts([
+            'localhost' => [
+                [
+                    'host' => 'localhost',
+                    'class' => 'IN',
+                    'ttl' => 15,
+                    'type' => 'A',
+                    'ip' => '127.0.0.1',
+                ],
+            ],
+        ]);
         $client = $this->getHttpClient(__FUNCTION__);
         $client = new NoPrivateNetworkHttpClient($client);
 

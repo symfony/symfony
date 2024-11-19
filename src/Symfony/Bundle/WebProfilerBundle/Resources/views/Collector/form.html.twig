@@ -482,7 +482,7 @@
                 </div>
             </div>
 
-            <div class="tab {{ data.view_vars ?? [] is empty ? 'disabled' }}">
+            <div class="tab {{ (data.view_vars ?? []) is empty ? 'disabled' }}">
                 <h3 class="tab-title">View Vars</h3>
 
                 <div class="tab-content">

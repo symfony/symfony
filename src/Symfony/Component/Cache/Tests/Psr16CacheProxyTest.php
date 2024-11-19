@@ -24,15 +24,15 @@ class Psr16CacheProxyTest extends SimpleCacheTest
         try {
             \assert(false === true, new \Exception());
             $this->skippedTests['testGetInvalidKeys'] =
-            $this->skippedTests['testGetMultipleInvalidKeys'] =
-            $this->skippedTests['testGetMultipleNoIterable'] =
-            $this->skippedTests['testSetInvalidKeys'] =
-            $this->skippedTests['testSetMultipleInvalidKeys'] =
-            $this->skippedTests['testSetMultipleNoIterable'] =
-            $this->skippedTests['testHasInvalidKeys'] =
-            $this->skippedTests['testDeleteInvalidKeys'] =
-            $this->skippedTests['testDeleteMultipleInvalidKeys'] =
-            $this->skippedTests['testDeleteMultipleNoIterable'] = 'Keys are checked only when assert() is enabled.';
+                $this->skippedTests['testGetMultipleInvalidKeys'] =
+                $this->skippedTests['testGetMultipleNoIterable'] =
+                $this->skippedTests['testSetInvalidKeys'] =
+                $this->skippedTests['testSetMultipleInvalidKeys'] =
+                $this->skippedTests['testSetMultipleNoIterable'] =
+                $this->skippedTests['testHasInvalidKeys'] =
+                $this->skippedTests['testDeleteInvalidKeys'] =
+                $this->skippedTests['testDeleteMultipleInvalidKeys'] =
+                $this->skippedTests['testDeleteMultipleNoIterable'] = 'Keys are checked only when assert() is enabled.';
         } catch (\Exception $e) {
         }
     }

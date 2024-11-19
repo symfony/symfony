@@ -136,8 +136,8 @@ class DumpExtensionTest extends TestCase
 
         $this->assertEquals(
             '<pre class=sf-dump-test id=sf-dump data-indent-pad="  ">"'.
-            "<span class=sf-dump-str title=\"3 characters\">foo</span>\"\n".
-            "</pre><script>Sfdump(\"sf-dump\")</script>\n",
+                "<span class=sf-dump-str title=\"3 characters\">foo</span>\"\n".
+                "</pre><script>Sfdump(\"sf-dump\")</script>\n",
             $dump,
             'Custom dumper should be used to dump data.'
         );

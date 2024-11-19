@@ -178,7 +178,7 @@ class Exporter
             }
 
             prepare_value:
-            $objectsPool[$value] = [$id = \count($objectsPool)];
+                $objectsPool[$value] = [$id = \count($objectsPool)];
             $properties = self::prepare($properties, $objectsPool, $refsPool, $objectsCount, $valueIsStatic);
             ++$objectsCount;
             $objectsPool[$value] = [$id, $class, $properties, method_exists($class, '__unserialize') ? -$objectsCount : (method_exists($class, '__wakeup') ? $objectsCount : 0)];
@@ -186,11 +186,11 @@ class Exporter
             $value = new Reference($id);
 
             handle_value:
-            if ($isRef) {
-                unset($value); // Break the hard reference created above
-            } elseif (!$valueIsStatic) {
-                $values[$k] = $value;
-            }
+                if ($isRef) {
+                    unset($value); // Break the hard reference created above
+                } elseif (!$valueIsStatic) {
+                    $values[$k] = $value;
+                }
             $valuesAreStatic = $valueIsStatic && $valuesAreStatic;
         }
 

@@ -85,9 +85,9 @@ class PhpArrayAdapter implements AdapterInterface, CacheInterface, PruneableInte
         }
         if (!isset($this->keys[$key])) {
             get_from_pool:
-            if ($this->pool instanceof CacheInterface) {
-                return $this->pool->get($key, $callback, $beta, $metadata);
-            }
+                if ($this->pool instanceof CacheInterface) {
+                    return $this->pool->get($key, $callback, $beta, $metadata);
+                }
 
             return $this->doGet($this->pool, $key, $callback, $beta, $metadata);
         }

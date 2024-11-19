@@ -60,7 +60,7 @@ class UuidV7 extends Uuid implements TimeBasedUidInterface
 
         if ($time > self::$time || (null !== $mtime && $time !== self::$time)) {
             randomize:
-            self::$rand = unpack('n*', isset(self::$seed) ? random_bytes(10) : self::$seed = random_bytes(16));
+                self::$rand = unpack('n*', isset(self::$seed) ? random_bytes(10) : self::$seed = random_bytes(16));
             self::$rand[1] &= 0x03FF;
             self::$time = $time;
         } else {

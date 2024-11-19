@@ -95,10 +95,10 @@ final class HttplugWaitLoop
                 }
 
                 check_duration:
-                if (null !== $maxDuration && $idleTimeout && $idleTimeout > $remainingDuration = max(0.0, $maxDuration - hrtime(true) / 1E9 + $startTime)) {
-                    $idleTimeout = $remainingDuration / 5;
-                    break;
-                }
+                    if (null !== $maxDuration && $idleTimeout && $idleTimeout > $remainingDuration = max(0.0, $maxDuration - hrtime(true) / 1E9 + $startTime)) {
+                        $idleTimeout = $remainingDuration / 5;
+                        break;
+                    }
             }
 
             if (!$count = $this->promisePool->count()) {

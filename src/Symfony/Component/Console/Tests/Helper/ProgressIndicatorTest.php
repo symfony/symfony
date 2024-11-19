@@ -47,19 +47,19 @@ class ProgressIndicatorTest extends TestCase
 
         $this->assertEquals(
             $this->generateOutput(' - Starting...').
-            $this->generateOutput(' \\ Starting...').
-            $this->generateOutput(' | Starting...').
-            $this->generateOutput(' / Starting...').
-            $this->generateOutput(' - Starting...').
-            $this->generateOutput(' \\ Starting...').
-            $this->generateOutput(' \\ Advancing...').
-            $this->generateOutput(' | Advancing...').
-            $this->generateOutput(' ✔ Done...').
-            \PHP_EOL.
-            $this->generateOutput(' - Starting Again...').
-            $this->generateOutput(' \\ Starting Again...').
-            $this->generateOutput(' ✔ Done Again...').
-            \PHP_EOL,
+                $this->generateOutput(' \\ Starting...').
+                $this->generateOutput(' | Starting...').
+                $this->generateOutput(' / Starting...').
+                $this->generateOutput(' - Starting...').
+                $this->generateOutput(' \\ Starting...').
+                $this->generateOutput(' \\ Advancing...').
+                $this->generateOutput(' | Advancing...').
+                $this->generateOutput(' ✔ Done...').
+                \PHP_EOL.
+                $this->generateOutput(' - Starting Again...').
+                $this->generateOutput(' \\ Starting Again...').
+                $this->generateOutput(' ✔ Done Again...').
+                \PHP_EOL,
             stream_get_contents($output->getStream())
         );
     }
@@ -80,8 +80,8 @@ class ProgressIndicatorTest extends TestCase
 
         $this->assertEquals(
             ' Starting...'.\PHP_EOL.
-            ' Midway...'.\PHP_EOL.
-            ' Done...'.\PHP_EOL.\PHP_EOL,
+                ' Midway...'.\PHP_EOL.
+                ' Done...'.\PHP_EOL.\PHP_EOL,
             stream_get_contents($output->getStream())
         );
     }
@@ -102,9 +102,9 @@ class ProgressIndicatorTest extends TestCase
 
         $this->assertEquals(
             $this->generateOutput(' a Starting...').
-            $this->generateOutput(' b Starting...').
-            $this->generateOutput(' c Starting...').
-            $this->generateOutput(' a Starting...'),
+                $this->generateOutput(' b Starting...').
+                $this->generateOutput(' c Starting...').
+                $this->generateOutput(' a Starting...'),
             stream_get_contents($output->getStream())
         );
     }
@@ -121,7 +121,7 @@ class ProgressIndicatorTest extends TestCase
 
         $this->assertSame(
             $this->generateOutput(' a Starting...').
-            $this->generateOutput(' ✅ Done').\PHP_EOL,
+                $this->generateOutput(' ✅ Done').\PHP_EOL,
             stream_get_contents($output->getStream())
         );
     }
@@ -137,7 +137,7 @@ class ProgressIndicatorTest extends TestCase
 
         $this->assertEquals(
             $this->generateOutput(' a Starting...').
-            $this->generateOutput(' ❌ Process failed').\PHP_EOL,
+                $this->generateOutput(' ❌ Process failed').\PHP_EOL,
             stream_get_contents($output->getStream())
         );
     }

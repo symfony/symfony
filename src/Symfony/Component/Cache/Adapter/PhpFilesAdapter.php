@@ -104,7 +104,7 @@ class PhpFilesAdapter extends AbstractAdapter implements PruneableInterface
         $values = [];
 
         begin:
-        $getExpiry = false;
+            $getExpiry = false;
 
         foreach ($ids as $id) {
             if (null === $value = $this->values[$id] ?? null) {

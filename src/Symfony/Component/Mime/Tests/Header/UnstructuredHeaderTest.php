@@ -59,8 +59,8 @@ class UnstructuredHeaderTest extends TestCase
         */
         $this->assertEquals(
             'X-Custom-Header: The quick brown fox jumped over the fence, he was a'.
-            ' very'."\r\n".// Folding
-            ' very scary brown fox with a bushy tail',
+                ' very'."\r\n".// Folding
+                ' very scary brown fox with a bushy tail',
             $header->toString(), '%s: The header should have been folded at 76th char'
         );
     }

@@ -211,7 +211,7 @@ class Configuration implements ConfigurationInterface
                     ->addDefaultsIfNotSet()
                     ->fixXmlConfig('stateless_token_id')
                     ->children()
-                        // defaults to framework.csrf_protection.stateless_token_ids || framework.session.enabled && !class_exists(FullStack::class) && interface_exists(CsrfTokenManagerInterface::class)
+            // defaults to framework.csrf_protection.stateless_token_ids || framework.session.enabled && !class_exists(FullStack::class) && interface_exists(CsrfTokenManagerInterface::class)
                         ->scalarNode('enabled')->defaultNull()->end()
                         ->arrayNode('stateless_token_ids')
                             ->scalarPrototype()->end()
@@ -637,9 +637,9 @@ class Configuration implements ConfigurationInterface
                         ->scalarNode('strict_requirements')
                             ->info(
                                 "set to true to throw an exception when a parameter does not match the requirements\n".
-                                "set to false to disable exceptions when a parameter does not match the requirements (and return null instead)\n".
-                                "set to null to disable parameter checks against requirements\n".
-                                "'true' is the preferred configuration in development mode, while 'false' or 'null' might be preferred in production"
+                                    "set to false to disable exceptions when a parameter does not match the requirements (and return null instead)\n".
+                                    "set to null to disable parameter checks against requirements\n".
+                                    "'true' is the preferred configuration in development mode, while 'false' or 'null' might be preferred in production"
                             )
                             ->defaultTrue()
                         ->end()
@@ -839,7 +839,7 @@ class Configuration implements ConfigurationInterface
                     ->fixXmlConfig('extension')
                     ->fixXmlConfig('importmap_script_attribute')
                     ->children()
-                        // add array node called "paths" that will be an array of strings
+            // add array node called "paths" that will be an array of strings
                         ->arrayNode('paths')
                             ->info('Directories that hold assets that should be in the mapper. Can be a simple array of an array of ["path/to/assets": "namespace"].')
                             ->example(['assets/'])
@@ -876,7 +876,7 @@ class Configuration implements ConfigurationInterface
                             ->prototype('scalar')->end()
                             ->example(['*/assets/build/*', '*/*_.scss'])
                         ->end()
-                        // boolean called defaulting to true
+            // boolean called defaulting to true
                         ->booleanNode('exclude_dotfiles')
                             ->info('If true, any files starting with "." will be excluded from the asset mapper.')
                             ->defaultTrue()

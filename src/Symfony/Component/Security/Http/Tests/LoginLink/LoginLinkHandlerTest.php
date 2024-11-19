@@ -61,7 +61,7 @@ class LoginLinkHandlerTest extends TestCase
                 $this->callback(fn ($parameters) => 'weaverryan' === $parameters['user']
                     && isset($parameters['expires'])
                     && isset($parameters['hash'])
-                     // allow a small expiration offset to avoid time-sensitivity
+                    // allow a small expiration offset to avoid time-sensitivity
                     && abs(time() + 600 - $parameters['expires']) <= 1
                     // make sure hash is what we expect
                     && $parameters['hash'] === $this->createSignatureHash('weaverryan', $parameters['expires'], $extraProperties)
@@ -131,7 +131,7 @@ class LoginLinkHandlerTest extends TestCase
                 'app_check_login_link_route',
                 $this->callback(fn ($parameters) => 'weaverryan' === $parameters['user']
                     && isset($parameters['expires'])
-                     // allow a small expiration offset to avoid time-sensitivity
+                    // allow a small expiration offset to avoid time-sensitivity
                     && abs(time() + 1000 - $parameters['expires']) <= 1
                     && isset($parameters['hash'])
                     // make sure hash is what we expect

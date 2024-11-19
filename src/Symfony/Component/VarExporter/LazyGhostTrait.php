@@ -159,41 +159,41 @@ trait LazyGhostTrait
 
         get_in_scope:
 
-        try {
-            if (null === $scope) {
-                if (null === $readonlyScope) {
-                    return $this->$name;
-                }
-                $value = $this->$name;
-
-                return $value;
-            }
-            $accessor = Registry::$classAccessors[$scope] ??= Registry::getClassAccessors($scope);
-
-            return $accessor['get']($this, $name, null !== $readonlyScope);
-        } catch (\Error $e) {
-            if (\Error::class !== $e::class || !str_starts_with($e->getMessage(), 'Cannot access uninitialized non-nullable property')) {
-                throw $e;
-            }
-
             try {
                 if (null === $scope) {
-                    $this->$name = [];
+                    if (null === $readonlyScope) {
+                        return $this->$name;
+                    }
+                    $value = $this->$name;
 
-                    return $this->$name;
+                    return $value;
                 }
-
-                $accessor['set']($this, $name, []);
+                $accessor = Registry::$classAccessors[$scope] ??= Registry::getClassAccessors($scope);
 
                 return $accessor['get']($this, $name, null !== $readonlyScope);
-            } catch (\Error) {
-                if (preg_match('/^Cannot access uninitialized non-nullable property ([^ ]++) by reference$/', $e->getMessage(), $matches)) {
-                    throw new \Error('Typed property '.$matches[1].' must not be accessed before initialization', $e->getCode(), $e->getPrevious());
+            } catch (\Error $e) {
+                if (\Error::class !== $e::class || !str_starts_with($e->getMessage(), 'Cannot access uninitialized non-nullable property')) {
+                    throw $e;
                 }
 
-                throw $e;
+                try {
+                    if (null === $scope) {
+                        $this->$name = [];
+
+                        return $this->$name;
+                    }
+
+                    $accessor['set']($this, $name, []);
+
+                    return $accessor['get']($this, $name, null !== $readonlyScope);
+                } catch (\Error) {
+                    if (preg_match('/^Cannot access uninitialized non-nullable property ([^ ]++) by reference$/', $e->getMessage(), $matches)) {
+                        throw new \Error('Typed property '.$matches[1].' must not be accessed before initialization', $e->getCode(), $e->getPrevious());
+                    }
+
+                    throw $e;
+                }
             }
-        }
     }
 
     public function __set($name, $value): void
@@ -223,12 +223,12 @@ trait LazyGhostTrait
 
         set_in_scope:
 
-        if (null === $scope) {
-            $this->$name = $value;
-        } else {
-            $accessor = Registry::$classAccessors[$scope] ??= Registry::getClassAccessors($scope);
-            $accessor['set']($this, $name, $value);
-        }
+            if (null === $scope) {
+                $this->$name = $value;
+            } else {
+                $accessor = Registry::$classAccessors[$scope] ??= Registry::getClassAccessors($scope);
+                $accessor['set']($this, $name, $value);
+            }
     }
 
     public function __isset($name): bool
@@ -254,9 +254,9 @@ trait LazyGhostTrait
 
         isset_in_scope:
 
-        if (null === $scope) {
-            return isset($this->$name);
-        }
+            if (null === $scope) {
+                return isset($this->$name);
+            }
         $accessor = Registry::$classAccessors[$scope] ??= Registry::getClassAccessors($scope);
 
         return $accessor['isset']($this, $name);
@@ -289,12 +289,12 @@ trait LazyGhostTrait
 
         unset_in_scope:
 
-        if (null === $scope) {
-            unset($this->$name);
-        } else {
-            $accessor = Registry::$classAccessors[$scope] ??= Registry::getClassAccessors($scope);
-            $accessor['unset']($this, $name);
-        }
+            if (null === $scope) {
+                unset($this->$name);
+            } else {
+                $accessor = Registry::$classAccessors[$scope] ??= Registry::getClassAccessors($scope);
+                $accessor['unset']($this, $name);
+            }
     }
 
     public function __clone(): void

@@ -169,7 +169,7 @@ class Connection implements ResetInterface
         }
 
         get:
-        $this->driverConnection->beginTransaction();
+            $this->driverConnection->beginTransaction();
         try {
             $query = $this->createAvailableMessagesQueryBuilder()
                 ->orderBy('available_at', 'ASC')
@@ -399,8 +399,8 @@ class Connection implements ResetInterface
 
         return $queryBuilder->select(str_replace(', ', ', '.$alias,
             $alias.'id AS "id", body AS "body", headers AS "headers", queue_name AS "queue_name", '.
-            'created_at AS "created_at", available_at AS "available_at", '.
-            'delivered_at AS "delivered_at"'
+                'created_at AS "created_at", available_at AS "available_at", '.
+                'delivered_at AS "delivered_at"'
         ));
     }
 
@@ -443,7 +443,7 @@ class Connection implements ResetInterface
         }
 
         insert:
-        $this->driverConnection->beginTransaction();
+            $this->driverConnection->beginTransaction();
 
         try {
             if ($this->driverConnection->getDatabasePlatform() instanceof PostgreSQLPlatform) {

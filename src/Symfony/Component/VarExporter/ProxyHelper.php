@@ -383,11 +383,11 @@ final class ProxyHelper
                 'parent' => ($parent = $class->getParentClass()) ? '\\'.$parent->name : 'parent',
                 default => self::exportSymbol($m[2], '(' !== $m[3], $namespace),
             }.$m[3]
-            : fn ($m) => $m[1].match ($m[2]) {
-                'new', 'false', 'true', 'null', 'self', 'parent' => $m[2],
-                'NULL' => 'null',
-                default => self::exportSymbol($m[2], '(' !== $m[3], $namespace),
-            }.$m[3];
+                : fn ($m) => $m[1].match ($m[2]) {
+                    'new', 'false', 'true', 'null', 'self', 'parent' => $m[2],
+                    'NULL' => 'null',
+                    default => self::exportSymbol($m[2], '(' !== $m[3], $namespace),
+                }.$m[3];
 
         return implode('', array_map(fn ($part) => match ($part[0]) {
             '"' => $part, // for internal classes only

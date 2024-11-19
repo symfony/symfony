@@ -102,7 +102,7 @@ final class GetSetMethodNormalizer extends AbstractObjectNormalizer
             && 0 < $method->getNumberOfParameters()
             && str_starts_with($method->name, 'set')
             && !ctype_lower($method->name[3])
-            ;
+        ;
     }
 
     protected function extractAttributes(object $object, ?string $format = null, array $context = []): array

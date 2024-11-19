@@ -847,7 +847,7 @@ TABLE
         $table->render();
 
         $expected =
-<<<'TABLE'
+            <<<'TABLE'
 +------+
 | ■■   |
 +------+
@@ -867,7 +867,7 @@ TABLE;
         $table->render();
 
         $expected =
-<<<'TABLE'
+            <<<'TABLE'
 +-------+
 | 12345 |
 +-------+
@@ -885,7 +885,7 @@ TABLE;
         $table->render();
 
         $expected =
-<<<'TABLE'
+            <<<'TABLE'
 +----------+
 | 12345.01 |
 +----------+
@@ -913,7 +913,7 @@ TABLE;
         $table->render();
 
         $expected =
-<<<'TABLE'
+            <<<'TABLE'
 .......
 . Foo .
 .......
@@ -940,7 +940,7 @@ TABLE;
         $table->render();
 
         $expected =
-<<<'TABLE'
+            <<<'TABLE'
 +------+
 | Foo  |
 +------+
@@ -969,7 +969,7 @@ TABLE;
         $table->render();
 
         $expected =
-<<<TABLE
+            <<<TABLE
 +----+---+
 | foo    |
 +----+---+

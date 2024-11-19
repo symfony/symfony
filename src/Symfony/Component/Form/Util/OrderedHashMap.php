@@ -117,10 +117,10 @@ class OrderedHashMap implements \ArrayAccess, \IteratorAggregate, \Countable
             if (null === $key) {
                 $key = [] === $this->orderedKeys
                     // If the array is empty, use 0 as key
-                    ? 0
-                    // Imitate PHP behavior of generating a key that equals
-                    // the highest existing integer key + 1
-                    : 1 + (int) max($this->orderedKeys);
+                        ? 0
+                        // Imitate PHP behavior of generating a key that equals
+                        // the highest existing integer key + 1
+                        : 1 + (int) max($this->orderedKeys);
             }
 
             $this->orderedKeys[] = (string) $key;

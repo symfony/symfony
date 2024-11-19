@@ -447,7 +447,7 @@ XML;
 
         $xml = '<?xml version="1.0"?>'."\n".
             '<response><firstname>'."\n".
-                '<![CDATA[Paul <or Me>]]></firstname></response>'."\n";
+            '<![CDATA[Paul <or Me>]]></firstname></response>'."\n";
 
         $this->assertEquals($expected, $this->encoder->decode($xml, 'xml'));
     }

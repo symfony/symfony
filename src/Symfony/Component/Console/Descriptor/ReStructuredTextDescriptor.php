@@ -80,12 +80,12 @@ class ReStructuredTextDescriptor extends Descriptor
         $optionDescription = (new UnicodeString($optionDescription))->ascii();
         $this->write(
             $name."\n".str_repeat($this->paragraphsChar, Helper::width($name))."\n\n"
-            .$optionDescription
-            .'- **Accept value**: '.($option->acceptValue() ? 'yes' : 'no')."\n"
-            .'- **Is value required**: '.($option->isValueRequired() ? 'yes' : 'no')."\n"
-            .'- **Is multiple**: '.($option->isArray() ? 'yes' : 'no')."\n"
-            .'- **Is negatable**: '.($option->isNegatable() ? 'yes' : 'no')."\n"
-            .'- **Default**: ``'.str_replace("\n", '', var_export($option->getDefault(), true)).'``'."\n"
+                .$optionDescription
+                .'- **Accept value**: '.($option->acceptValue() ? 'yes' : 'no')."\n"
+                .'- **Is value required**: '.($option->isValueRequired() ? 'yes' : 'no')."\n"
+                .'- **Is multiple**: '.($option->isArray() ? 'yes' : 'no')."\n"
+                .'- **Is negatable**: '.($option->isNegatable() ? 'yes' : 'no')."\n"
+                .'- **Default**: ``'.str_replace("\n", '', var_export($option->getDefault(), true)).'``'."\n"
         );
     }
 
@@ -117,10 +117,10 @@ class ReStructuredTextDescriptor extends Descriptor
         if ($options['short'] ?? false) {
             $this->write(
                 '``'.$command->getName()."``\n"
-                .str_repeat($this->subsectionChar, Helper::width($command->getName()))."\n\n"
-                .($command->getDescription() ? $command->getDescription()."\n\n" : '')
-                ."Usage\n".str_repeat($this->paragraphsChar, 5)."\n\n"
-                .array_reduce($command->getAliases(), static fn ($carry, $usage) => $carry.'- ``'.$usage.'``'."\n")
+                    .str_repeat($this->subsectionChar, Helper::width($command->getName()))."\n\n"
+                    .($command->getDescription() ? $command->getDescription()."\n\n" : '')
+                    ."Usage\n".str_repeat($this->paragraphsChar, 5)."\n\n"
+                    .array_reduce($command->getAliases(), static fn ($carry, $usage) => $carry.'- ``'.$usage.'``'."\n")
             );
 
             return;
@@ -133,10 +133,10 @@ class ReStructuredTextDescriptor extends Descriptor
         }
         $this->write(
             $command->getName()."\n"
-            .str_repeat($this->subsectionChar, Helper::width($command->getName()))."\n\n"
-            .($command->getDescription() ? $command->getDescription()."\n\n" : '')
-            ."Usage\n".str_repeat($this->subsubsectionChar, 5)."\n\n"
-            .array_reduce(array_merge([$command->getSynopsis()], $command->getAliases(), $command->getUsages()), static fn ($carry, $usage) => $carry.'- ``'.$usage.'``'."\n")
+                .str_repeat($this->subsectionChar, Helper::width($command->getName()))."\n\n"
+                .($command->getDescription() ? $command->getDescription()."\n\n" : '')
+                ."Usage\n".str_repeat($this->subsubsectionChar, 5)."\n\n"
+                .array_reduce(array_merge([$command->getSynopsis()], $command->getAliases(), $command->getUsages()), static fn ($carry, $usage) => $carry.'- ``'.$usage.'``'."\n")
         );
 
         if ($help = $command->getProcessedHelp()) {

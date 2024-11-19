@@ -1032,7 +1032,7 @@ class Request
         // (see https://tools.ietf.org/html/rfc3986#section-4.2).
         return !isset($path[0]) || '/' === $path[0]
             || false !== ($colonPos = strpos($path, ':')) && ($colonPos < ($slashPos = strpos($path, '/')) || false === $slashPos)
-            ? "./$path" : $path;
+                ? "./$path" : $path;
     }
 
     /**

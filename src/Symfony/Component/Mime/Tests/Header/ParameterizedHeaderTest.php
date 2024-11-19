@@ -106,9 +106,9 @@ class ParameterizedHeaderTest extends TestCase
         $header->setParameters(['filename' => $value]);
         $this->assertEquals(
             'attachment; '.
-            'filename*0*=utf-8\'\''.str_repeat('a', 60).";\r\n ".
-            'filename*1*='.str_repeat('a', 60).";\r\n ".
-            'filename*2*='.str_repeat('a', 60),
+                'filename*0*=utf-8\'\''.str_repeat('a', 60).";\r\n ".
+                'filename*1*='.str_repeat('a', 60).";\r\n ".
+                'filename*2*='.str_repeat('a', 60),
             $header->getBodyAsString()
         );
     }
@@ -146,7 +146,7 @@ class ParameterizedHeaderTest extends TestCase
         $header->setLanguage($this->lang);
         $this->assertEquals(
             'attachment; filename*='.$header->getCharset()."'".$this->lang."'".
-            str_repeat('a', 20).'%8F'.str_repeat('a', 10),
+                str_repeat('a', 20).'%8F'.str_repeat('a', 10),
             $header->getBodyAsString()
         );
     }
@@ -190,8 +190,8 @@ class ParameterizedHeaderTest extends TestCase
         $header->setLanguage($this->lang);
         $this->assertEquals(
             'attachment; filename*0*='.$header->getCharset()."'".$this->lang."'".
-            str_repeat('a', 20).'%8F'.str_repeat('a', 23).";\r\n ".
-            'filename*1*='.str_repeat('a', 37),
+                str_repeat('a', 20).'%8F'.str_repeat('a', 23).";\r\n ".
+                'filename*1*='.str_repeat('a', 37),
             $header->getBodyAsString()
         );
     }

@@ -47,10 +47,10 @@ class AuthenticatedVoter implements CacheableVoterInterface
         $result = VoterInterface::ACCESS_ABSTAIN;
         foreach ($attributes as $attribute) {
             if (null === $attribute || (self::IS_AUTHENTICATED_FULLY !== $attribute
-                    && self::IS_AUTHENTICATED_REMEMBERED !== $attribute
-                    && self::IS_AUTHENTICATED !== $attribute
-                    && self::IS_IMPERSONATOR !== $attribute
-                    && self::IS_REMEMBERED !== $attribute)) {
+                && self::IS_AUTHENTICATED_REMEMBERED !== $attribute
+                && self::IS_AUTHENTICATED !== $attribute
+                && self::IS_IMPERSONATOR !== $attribute
+                && self::IS_REMEMBERED !== $attribute)) {
                 continue;
             }
 

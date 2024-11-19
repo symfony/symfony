@@ -162,7 +162,7 @@ $COMPOSER = ($COMPOSER = getenv('COMPOSER_BINARY'))
     || ($COMPOSER = rtrim((string) ('\\' === \DIRECTORY_SEPARATOR ? preg_replace('/[\r\n].*/', '', shell_exec('where.exe composer.phar 2> NUL')) : shell_exec('which composer.phar 2> /dev/null'))))
     || ($COMPOSER = rtrim((string) ('\\' === \DIRECTORY_SEPARATOR ? preg_replace('/[\r\n].*/', '', shell_exec('where.exe composer 2> NUL')) : shell_exec('which composer 2> /dev/null'))))
     || file_exists($COMPOSER = rtrim((string) ('\\' === \DIRECTORY_SEPARATOR ? shell_exec('git rev-parse --show-toplevel 2> NUL') : shell_exec('git rev-parse --show-toplevel 2> /dev/null'))).\DIRECTORY_SEPARATOR.'composer.phar')
-    ? ('#!/usr/bin/env php' === file_get_contents($COMPOSER, false, null, 0, 18) ? $PHP : '').' '.escapeshellarg($COMPOSER) // detect shell wrappers by looking at the shebang
+        ? ('#!/usr/bin/env php' === file_get_contents($COMPOSER, false, null, 0, 18) ? $PHP : '').' '.escapeshellarg($COMPOSER) // detect shell wrappers by looking at the shebang
     : 'composer';
 
 $prevCacheDir = getenv('COMPOSER_CACHE_DIR');

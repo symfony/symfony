@@ -46,8 +46,8 @@ final class JsDelivrEsmResolver implements PackageResolverInterface
 
         resolve_packages:
 
-        // request the version of each package
-        $requiredPackages = [];
+            // request the version of each package
+            $requiredPackages = [];
         foreach ($packagesToRequire as $options) {
             $packageSpecifier = trim($options->packageModuleSpecifier, '/');
 
@@ -226,7 +226,7 @@ final class JsDelivrEsmResolver implements PackageResolverInterface
 
         $extraFileErrors = [];
         download_extra_files:
-        $packageFileResponses = $extraFileResponses;
+            $packageFileResponses = $extraFileResponses;
         $extraFileResponses = [];
         foreach ($packageFileResponses as $package => $responses) {
             foreach ($responses as [$response, $extraFile, $packageName, $version]) {

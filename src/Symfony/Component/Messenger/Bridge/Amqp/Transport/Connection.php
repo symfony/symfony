@@ -580,16 +580,16 @@ class Connection
         $retries = 0;
 
         retry:
-        try {
-            $callable();
-        } catch (\AMQPConnectionException $e) {
-            if (++$retries <= $maxRetries) {
-                $this->clear();
+            try {
+                $callable();
+            } catch (\AMQPConnectionException $e) {
+                if (++$retries <= $maxRetries) {
+                    $this->clear();
 
-                goto retry;
+                    goto retry;
+                }
+
+                throw $e;
             }
-
-            throw $e;
-        }
     }
 }

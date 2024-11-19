@@ -812,7 +812,7 @@ class CompoundFormTest extends TestCase
 
         $this->assertSame(
             "ERROR: Error 1\n".
-            "ERROR: Error 2\n",
+                "ERROR: Error 2\n",
             (string) $errors
         );
 
@@ -832,8 +832,8 @@ class CompoundFormTest extends TestCase
 
         $this->assertSame(
             "ERROR: Error 1\n".
-            "ERROR: Error 2\n".
-            "ERROR: Nested Error\n",
+                "ERROR: Error 2\n".
+                "ERROR: Nested Error\n",
             (string) $errors
         );
 
@@ -856,9 +856,9 @@ class CompoundFormTest extends TestCase
 
         $this->assertSame(
             "ERROR: Error 1\n".
-            "ERROR: Error 2\n".
-            "Child:\n".
-            "    ERROR: Nested Error\n",
+                "ERROR: Error 2\n".
+                "Child:\n".
+                "    ERROR: Nested Error\n",
             (string) $errors
         );
 

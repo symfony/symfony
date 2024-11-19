@@ -159,7 +159,7 @@ class Ulid extends AbstractUid implements TimeBasedUidInterface
 
         if ($time > self::$time || (null !== $mtime && $time !== self::$time)) {
             randomize:
-            $r = unpack('n*', random_bytes(10));
+                $r = unpack('n*', random_bytes(10));
             $r[1] |= ($r[5] <<= 4) & 0xF0000;
             $r[2] |= ($r[5] <<= 4) & 0xF0000;
             $r[3] |= ($r[5] <<= 4) & 0xF0000;

@@ -38,7 +38,7 @@ class VarCloner extends AbstractCloner
         $cookie = (object) [];          // Unique object used to detect hard references
         $a = null;                      // Array cast for nested structures
         $stub = null;                   // Stub capturing the main properties of an original item value
-                                        // or null if the original value is used directly
+        // or null if the original value is used directly
 
         $arrayStub = new Stub();
         $arrayStub->type = Stub::TYPE_ARRAY;

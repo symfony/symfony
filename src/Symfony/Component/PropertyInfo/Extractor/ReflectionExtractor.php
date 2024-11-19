@@ -500,7 +500,7 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
         if (!$allowAdderRemover && null !== $adderAccessName && null !== $removerAccessName) {
             $errors[] = [\sprintf(
                 'The property "%s" in class "%s" can be defined with the methods "%s()" but '.
-                'the new value must be an array or an instance of \Traversable',
+                    'the new value must be an array or an instance of \Traversable',
                 $property,
                 $reflClass->getName(),
                 implode('()", "', [$adderAccessName, $removerAccessName])

@@ -41,7 +41,7 @@ final class MailchimpRequestParser extends AbstractRequestParser
     {
         $content = $request->toArray();
         if (!isset($content['mandrill_events'][0]['event'])
-           || !isset($content['mandrill_events'][0]['msg'])
+            || !isset($content['mandrill_events'][0]['msg'])
         ) {
             throw new RejectWebhookException(400, 'Payload malformed.');
         }

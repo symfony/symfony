@@ -51,8 +51,8 @@ class LoaderLoadExceptionTest extends TestCase
         $exception = new LoaderLoadException('@resource', 'sourceResource');
         $this->assertEquals(
             'Cannot import resource "@resource" from "sourceResource". '.
-            'Make sure the "resource" bundle is correctly registered and loaded in the application kernel class. '.
-            'If the bundle is registered, make sure the bundle path "@resource" is not empty.',
+                'Make sure the "resource" bundle is correctly registered and loaded in the application kernel class. '.
+                'If the bundle is registered, make sure the bundle path "@resource" is not empty.',
             $exception->getMessage()
         );
     }
@@ -95,9 +95,9 @@ class LoaderLoadExceptionTest extends TestCase
         );
         $this->assertEquals(
             'There was a previous error with an ending dot in @resource '.
-            '(which is loaded in resource "@resource"). '.
-            'Make sure the "resource" bundle is correctly registered and loaded in the application kernel class. '.
-            'If the bundle is registered, make sure the bundle path "@resource" is not empty.',
+                '(which is loaded in resource "@resource"). '.
+                'Make sure the "resource" bundle is correctly registered and loaded in the application kernel class. '.
+                'If the bundle is registered, make sure the bundle path "@resource" is not empty.',
             $exception->getMessage()
         );
     }

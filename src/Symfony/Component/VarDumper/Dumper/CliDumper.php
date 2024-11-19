@@ -491,21 +491,21 @@ class CliDumper extends AbstractDumper
         }
 
         href:
-        if ($this->colors && $this->handlesHrefGracefully) {
-            if (isset($attr['file']) && $href = $this->getSourceLink($attr['file'], $attr['line'] ?? 0)) {
-                if ('note' === $style) {
-                    $value .= "\033]8;;{$href}\033\\^\033]8;;\033\\";
-                } else {
-                    $attr['href'] = $href;
+            if ($this->colors && $this->handlesHrefGracefully) {
+                if (isset($attr['file']) && $href = $this->getSourceLink($attr['file'], $attr['line'] ?? 0)) {
+                    if ('note' === $style) {
+                        $value .= "\033]8;;{$href}\033\\^\033]8;;\033\\";
+                    } else {
+                        $attr['href'] = $href;
+                    }
+                }
+                if (isset($attr['href'])) {
+                    if ('label' === $style) {
+                        $value .= '^';
+                    }
+                    $value = "\033]8;;{$attr['href']}\033\\{$value}\033]8;;\033\\";
                 }
             }
-            if (isset($attr['href'])) {
-                if ('label' === $style) {
-                    $value .= '^';
-                }
-                $value = "\033]8;;{$attr['href']}\033\\{$value}\033]8;;\033\\";
-            }
-        }
 
         if ('label' === $style && '' !== $value) {
             $value .= ' ';

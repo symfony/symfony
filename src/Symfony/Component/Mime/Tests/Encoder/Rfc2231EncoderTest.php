@@ -70,8 +70,8 @@ class Rfc2231EncoderTest extends TestCase
         // 72 here and not 75 as we read 4 chars at a time
         $this->assertEquals(
             str_repeat('a', 72)."\r\n".
-            str_repeat('a', 72)."\r\n".
-            str_repeat('a', 56),
+                str_repeat('a', 72)."\r\n".
+                str_repeat('a', 56),
             $encoded,
             'Lines should be wrapped at each 72 characters'
         );
@@ -89,9 +89,9 @@ class Rfc2231EncoderTest extends TestCase
 
         $this->assertEquals(
             str_repeat('a', 48)."\r\n".
-            str_repeat('a', 72)."\r\n".
-            str_repeat('a', 72)."\r\n".
-            str_repeat('a', 8),
+                str_repeat('a', 72)."\r\n".
+                str_repeat('a', 72)."\r\n".
+                str_repeat('a', 8),
             $encoded,
             'First line should be 24 bytes shorter than the others.'
         );

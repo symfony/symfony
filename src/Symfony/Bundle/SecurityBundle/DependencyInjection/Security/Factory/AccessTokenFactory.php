@@ -76,7 +76,7 @@ final class AccessTokenFactory extends AbstractFactory implements StatelessAuthe
                     ->then(fn () => throw new InvalidConfigurationException('You cannot configure multiple token handlers.'))
                 ->end()
 
-                // "isRequired" must be set otherwise the following custom validation is not called
+            // "isRequired" must be set otherwise the following custom validation is not called
                 ->isRequired()
                 ->beforeNormalization()
                     ->ifTrue(fn ($v) => \is_array($v) && !$v)

@@ -30,10 +30,10 @@ abstract class AdapterTestCase extends CachePoolTest
         try {
             \assert(false === true, new \Exception());
             $this->skippedTests['testGetItemInvalidKeys'] =
-            $this->skippedTests['testGetItemsInvalidKeys'] =
-            $this->skippedTests['testHasItemInvalidKeys'] =
-            $this->skippedTests['testDeleteItemInvalidKeys'] =
-            $this->skippedTests['testDeleteItemsInvalidKeys'] = 'Keys are checked only when assert() is enabled.';
+                $this->skippedTests['testGetItemsInvalidKeys'] =
+                $this->skippedTests['testHasItemInvalidKeys'] =
+                $this->skippedTests['testDeleteItemInvalidKeys'] =
+                $this->skippedTests['testDeleteItemsInvalidKeys'] = 'Keys are checked only when assert() is enabled.';
         } catch (\Exception $e) {
         }
     }

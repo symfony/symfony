@@ -137,37 +137,37 @@ trait LazyProxyTrait
 
         get_in_scope:
 
-        try {
-            if (null === $scope) {
-                if (null === $readonlyScope && 1 !== $parent) {
-                    return $instance->$name;
-                }
-                $value = $instance->$name;
-
-                return $value;
-            }
-            $accessor = Registry::$classAccessors[$scope] ??= Registry::getClassAccessors($scope);
-
-            return $accessor['get']($instance, $name, null !== $readonlyScope || 1 === $parent);
-        } catch (\Error $e) {
-            if (\Error::class !== $e::class || !str_starts_with($e->getMessage(), 'Cannot access uninitialized non-nullable property')) {
-                throw $e;
-            }
-
             try {
                 if (null === $scope) {
-                    $instance->$name = [];
+                    if (null === $readonlyScope && 1 !== $parent) {
+                        return $instance->$name;
+                    }
+                    $value = $instance->$name;
 
-                    return $instance->$name;
+                    return $value;
                 }
-
-                $accessor['set']($instance, $name, []);
+                $accessor = Registry::$classAccessors[$scope] ??= Registry::getClassAccessors($scope);
 
                 return $accessor['get']($instance, $name, null !== $readonlyScope || 1 === $parent);
-            } catch (\Error) {
-                throw $e;
+            } catch (\Error $e) {
+                if (\Error::class !== $e::class || !str_starts_with($e->getMessage(), 'Cannot access uninitialized non-nullable property')) {
+                    throw $e;
+                }
+
+                try {
+                    if (null === $scope) {
+                        $instance->$name = [];
+
+                        return $instance->$name;
+                    }
+
+                    $accessor['set']($instance, $name, []);
+
+                    return $accessor['get']($instance, $name, null !== $readonlyScope || 1 === $parent);
+                } catch (\Error) {
+                    throw $e;
+                }
             }
-        }
     }
 
     public function __set($name, $value): void
@@ -197,12 +197,12 @@ trait LazyProxyTrait
 
         set_in_scope:
 
-        if (null === $scope) {
-            $instance->$name = $value;
-        } else {
-            $accessor = Registry::$classAccessors[$scope] ??= Registry::getClassAccessors($scope);
-            $accessor['set']($instance, $name, $value);
-        }
+            if (null === $scope) {
+                $instance->$name = $value;
+            } else {
+                $accessor = Registry::$classAccessors[$scope] ??= Registry::getClassAccessors($scope);
+                $accessor['set']($instance, $name, $value);
+            }
     }
 
     public function __isset($name): bool
@@ -230,9 +230,9 @@ trait LazyProxyTrait
 
         isset_in_scope:
 
-        if (null === $scope) {
-            return isset($instance->$name);
-        }
+            if (null === $scope) {
+                return isset($instance->$name);
+            }
         $accessor = Registry::$classAccessors[$scope] ??= Registry::getClassAccessors($scope);
 
         return $accessor['isset']($instance, $name);
@@ -265,12 +265,12 @@ trait LazyProxyTrait
 
         unset_in_scope:
 
-        if (null === $scope) {
-            unset($instance->$name);
-        } else {
-            $accessor = Registry::$classAccessors[$scope] ??= Registry::getClassAccessors($scope);
-            $accessor['unset']($instance, $name);
-        }
+            if (null === $scope) {
+                unset($instance->$name);
+            } else {
+                $accessor = Registry::$classAccessors[$scope] ??= Registry::getClassAccessors($scope);
+                $accessor['unset']($instance, $name);
+            }
     }
 
     public function __clone(): void

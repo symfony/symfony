@@ -337,6 +337,6 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
         // (see http://tools.ietf.org/html/rfc3986#section-4.2).
         return '' === $path || '/' === $path[0]
             || false !== ($colonPos = strpos($path, ':')) && ($colonPos < ($slashPos = strpos($path, '/')) || false === $slashPos)
-            ? "./$path" : $path;
+                ? "./$path" : $path;
     }
 }

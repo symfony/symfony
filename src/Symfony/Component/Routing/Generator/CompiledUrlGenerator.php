@@ -37,7 +37,7 @@ class CompiledUrlGenerator extends UrlGenerator
     {
         $locale = $parameters['_locale']
             ?? $this->context->getParameter('_locale')
-            ?: $this->defaultLocale;
+                ?: $this->defaultLocale;
 
         if (null !== $locale) {
             do {

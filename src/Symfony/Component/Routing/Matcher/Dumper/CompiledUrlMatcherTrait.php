@@ -48,7 +48,7 @@ trait CompiledUrlMatcherTrait
             // no-op
         } elseif ($allowSchemes) {
             redirect_scheme:
-            $scheme = $this->context->getScheme();
+                $scheme = $this->context->getScheme();
             $this->context->setScheme(key($allowSchemes));
             try {
                 if ($ret = $this->doMatch($pathinfo)) {

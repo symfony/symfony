@@ -203,11 +203,11 @@ class Parser implements ParserInterface
                     if ('Pseudo[Element[*]:scope]' === $result->__toString()) {
                         $used = \count($stream->getUsed());
                         if (!(2 === $used
-                           || 3 === $used && $stream->getUsed()[0]->isWhiteSpace()
-                           || $used >= 3 && $stream->getUsed()[$used - 3]->isDelimiter([','])
-                           || $used >= 4
-                                && $stream->getUsed()[$used - 3]->isWhiteSpace()
-                                && $stream->getUsed()[$used - 4]->isDelimiter([','])
+                            || 3 === $used && $stream->getUsed()[0]->isWhiteSpace()
+                            || $used >= 3 && $stream->getUsed()[$used - 3]->isDelimiter([','])
+                            || $used >= 4
+                            && $stream->getUsed()[$used - 3]->isWhiteSpace()
+                            && $stream->getUsed()[$used - 4]->isDelimiter([','])
                         )) {
                             throw SyntaxErrorException::notAtTheStartOfASelector('scope');
                         }

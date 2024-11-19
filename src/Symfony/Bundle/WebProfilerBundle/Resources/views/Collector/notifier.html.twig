@@ -138,7 +138,7 @@
                                                             {{- 'Content: ' ~ notification.getContent() }}<br/>
                                                             {{- 'Importance: ' ~ notification.getImportance() }}<br/>
                                                             {{- 'Emoji: ' ~ (notification.getEmoji() is empty ? '(empty)' : notification.getEmoji()) }}<br/>
-                                                            {{- 'Exception: ' ~ notification.getException() ?? '(empty)' }}<br/>
+                                                            {{- 'Exception: ' ~ (notification.getException() ?? '(empty)') }}<br/>
                                                             {{- 'ExceptionAsString: ' ~ (notification.getExceptionAsString() is empty ? '(empty)' : notification.getExceptionAsString()) }}
                                                         </pre>
                                                     </div>

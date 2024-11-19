@@ -3,6 +3,13 @@ Fake SMS Notifier
 
 Provides Fake SMS (as email or log during development) integration for Symfony Notifier.
 
+```
+$ composer require symfony/fake-sms-notifier
+```
+
+IMPORTANT NOTE: Do not install the as a dev requirement as it will not work.  At least, until https://github.com/symfony/symfony/issues/58929 possibly fixes this.
+
+
 #### DSN example for email
 
 ```

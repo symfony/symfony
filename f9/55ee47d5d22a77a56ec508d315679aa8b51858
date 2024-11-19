@@ -1,0 +1,21 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2024-11-19T06:51:09Z
+
+To answer your question, it should be done on 5.4 as it qualifies as a "bug".
+
+---------------------------------------------------------------------------
+
+by mazodude at 2024-11-19T07:22:11Z
+
+@fabpot No worries. How should I target 5.4?
+Do I start a new pull off the correct branch or is there something else I can do?
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2024-11-19T08:48:48Z
+
+> How should I target 5.4?
+Do I start a new pull off the correct branch or is there something else I can do?
+
+Please switch the target branch in this PR and rebase on top of `5.4` if that doesn't work, you can create a new PR. Thanks

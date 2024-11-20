@@ -126,9 +126,13 @@ class MappedAssetFactory implements MappedAssetFactoryInterface
 
     private function isVendor(string $sourcePath): bool
     {
-        $sourcePath = realpath($sourcePath);
-        $vendorDir = realpath($this->vendorDir);
+        $filesystem = new Filesystem();
+        $sourcePath = $filesystem->readlink($sourcePath, true);
+        $vendorDir = $filesystem->readlink($this->vendorDir, true);
 
-        return $sourcePath && $vendorDir && str_starts_with($sourcePath, $vendorDir);
+        return null !== $sourcePath
+            && null !== $vendorDir
+            && str_starts_with($sourcePath, $vendorDir)
+        ;
     }
 }

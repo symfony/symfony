@@ -1,0 +1,108 @@
+---------------------------------------------------------------------------
+
+by greg0ire at 2024-11-13T20:14:41Z
+
+How should I deal with the Psalm failures?
+
+---------------------------------------------------------------------------
+
+by derrabus at 2024-11-13T20:24:15Z
+
+> How should I deal with the Psalm failures?
+
+Ignore them.
+
+---------------------------------------------------------------------------
+
+by greg0ire at 2024-11-13T20:28:59Z
+
+> Ignore them.
+
+I'll assume you mean that literally because I couldn't find a baseline or `psalm-suppress` annotations to ignore them programmatically :laughing:
+
+---------------------------------------------------------------------------
+
+by derrabus at 2024-11-13T21:59:47Z
+
+> > Ignore them.
+>
+> I'll assume you mean that literally
+
+Yes. 😎
+
+---------------------------------------------------------------------------
+
+by chalasr at 2024-11-15T13:17:18Z
+
+Not sure if the failing test is related?
+
+---------------------------------------------------------------------------
+
+by greg0ire at 2024-11-15T13:37:27Z
+
+The Windows test? It's about http-foundation :thinking:
+Also, it fails on other PRs.
+
+If you're talking about Psalm, the failure is definitely related, but I was told above to ignore it.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2024-11-15T14:01:35Z
+
+Sorry, I mean this one on the high-deps build: https://github.com/symfony/symfony/actions/runs/11836984636/job/32983037386?pr=58865.
+That test seems to pass on current 5.4, can you please have a look?
+
+---------------------------------------------------------------------------
+
+by greg0ire at 2024-11-15T14:43:57Z
+
+Oh right, that one does look like it could be related. I'll take a look.
+
+I introduced the failing assert in `doctrine/persistence` 3.3.3: https://github.com/doctrine/persistence/pull/375
+Some passing builds allow a version higher than that though, that means there must be another explanation.
+
+The object that does not pass the instanceof check is instanciated by a container that itself is created in a very fishy way. This line in particular is interesting: https://github.com/symfony/symfony/blob/75da5aaa8254fb9b09cdaaea996d922bd0b89874/src/Symfony/Bridge/Doctrine/Tests/ManagerRegistryTest.php#L30
+
+I suspect the feature it leverages is not implemented when using the deps of the 8.2 job. I don't quite understand why it would break only now though. Maybe allowing `doctrine/data-fixtures` 2 resulted in slightly different deps?
+
+---------------------------------------------------------------------------
+
+by greg0ire at 2024-11-15T15:20:05Z
+
+@MatTheCat maybe you can help with this?
+
+---------------------------------------------------------------------------
+
+by greg0ire at 2024-11-15T15:53:25Z
+
+Just noticed the DI tag present in the line I mentioned is missing on 5.4 and was introduced in https://github.com/symfony/symfony/commit/6a4d229b9fcacbe2df4b8f563ad39b91212d936b , hence my last commit, which sadly doesn't seem very successful.
+
+---------------------------------------------------------------------------
+
+by greg0ire at 2024-11-15T15:58:58Z
+
+Ah this might be what I need to backport: #57489
+
+---------------------------------------------------------------------------
+
+by MatTheCat at 2024-11-15T16:03:52Z
+
+Err I don’t think I can help :sweat_smile: ; I recently committed to the DoctrineBridge but it doesn’t look like it was related.
+
+---------------------------------------------------------------------------
+
+by greg0ire at 2024-11-15T16:05:26Z
+
+Yes, sorry!
+
+---------------------------------------------------------------------------
+
+by greg0ire at 2024-11-15T17:26:46Z
+
+This only happens in `high-deps` mode, which apparently checks out 4.4, that's quite peculiar. At this point I don't really understand what's going on. @xabbuh maybe you would?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2024-11-16T08:44:45Z
+
+@greg0ire you can ignore the high deps failures

@@ -1,0 +1,40 @@
+---------------------------------------------------------------------------
+
+by smnandre at 2024-11-14T18:28:29Z
+
+Arf sorry.... i did not see it :(
+
+https://github.com/symfony/symfony/pull/58880
+
+---------------------------------------------------------------------------
+
+by alexislefebvre at 2024-11-15T15:19:30Z
+
+> Arf sorry.... i did not see it :(
+>
+> #58880
+
+Your PR relies on a simple mock, while my PR changes `$this->createFactory(…);`. Your test looks cleaner, should we use it in this current PR instead of changing `createFactory()`?
+
+---------------------------------------------------------------------------
+
+by smnandre at 2024-11-15T19:16:53Z
+
+> > Arf sorry.... i did not see it :(
+> > #58880
+>
+> Your PR relies on a simple mock, while my PR changes `$this->createFactory(…);`. Your test looks cleaner, should we use it in this current PR instead of changing `createFactory()`?
+
+No idea  🤷
+
+But if you want to take anything from my closed PR you can of course :)
+
+---------------------------------------------------------------------------
+
+by alexislefebvre at 2024-11-18T13:51:01Z
+
+> No idea 🤷
+>
+> But if you want to take anything from my closed PR you can of course :)
+
+Thanks for the feedback, let's see the opinions of the reviewers. :slightly_smiling_face:

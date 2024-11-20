@@ -66,3 +66,22 @@ if (!function_exists('dd')) {
         exit(1);
     }
 }
+
+if(!function_exists('dd_if')) {
+    function dd_if($condition,... $vars): mixed
+    {
+        if(!$condition){
+            return null;
+        }
+        
+        if (array_key_exists(0, $vars) && 1 === count($vars)) {
+            VarDumper::dump($vars[0]);
+        } else {
+            foreach ($vars as $k => $v) {
+                VarDumper::dump($v, is_int($k) ? 1 + $k : $k);
+            }
+        }
+        
+        exit(1);
+    }
+}

@@ -1,0 +1,49 @@
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2024-11-20T15:41:31Z
+
+Sorry I'm only catching up the conversation right now. About what you said in the other PR:
+
+> Ok i'm really questioning what was the original goal here
+
+It's quite well explained [in the original issue](https://github.com/symfony/symfony/issues/54339): the idea is that if `cache.app.taggable` already exists, it will simplify things for the developer to inform of the existence of the taggable cache so that the dev can use it directly, rather than redefining it by hand when the framework offers it. But also, as you mentioned, there's something wrong anyway with the "double taggable cache".
+
+However, I may have underestimated the impact, and judging by the number of thumbs up from the PR, there was a very real use case that was broken by the deprecation! I guess the deprecation could indeed be reverted, and a new issue explaining the original problem you pointed may be opened.
+
+---------------------------------------------------------------------------
+
+by keulinho at 2024-11-20T15:49:18Z
+
+Hey thanks for chiming in 👍
+
+the "problem" is that was deprecated where cases like these:
+```yaml
+       cache.object:
+         default_lifetime: 172800
+         adapter: cache.app
+         tags: cache.tags
+```
+
+But those cases won't make the cache.app adapter/pool taggable, but create a new pool that will be taggable and use cache.app under the hood.
+
+Also it is not supported to use cache.app.taggable in that case as an adapter as https://github.com/symfony/symfony/blob/7.2/src/Symfony/Component/Cache/DependencyInjection/CachePoolPass.php#L114 expects that the adapter accepts namespace and default lifetime as constructor arguments and that is not the case for the `cache.app.taggable` service, leading to errors
+
+---------------------------------------------------------------------------
+
+by keulinho at 2024-11-20T15:50:41Z
+
+Unit test fails seem unrelated to change, any idea what I need to do to fix?
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2024-11-20T15:53:53Z
+
+> Unit test fails seem unrelated to change, any idea what I need to do to fix?
+
+You can ignore them here, these are transient tests that fail from time to time 👍
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-11-20T16:22:26Z
+
+Good catch, this didn't deprecate what was intended to be. Can you figure out how we could deprecate the behavior we wanted to deprecate?

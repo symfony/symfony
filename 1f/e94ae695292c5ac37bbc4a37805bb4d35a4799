@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-11-20T12:10:13Z
+
+I confirm this approach works together with https://github.com/symfony/recipes/pull/1361

@@ -155,6 +155,11 @@ final class JavaScriptImportPathCompiler implements AssetCompilerInterface
             return true;
         }
 
+        // inside a multi-line comment, since javascript can't start with a '* '
+        if ('* ' === $firstTwoChars) {
+            return true;
+        }
+
         if ('/*' === $firstTwoChars) {
             $commentEnd = strpos($fullContent, '*/', $lineStart);
             // if we can't find the end comment, be cautious: assume this is not a comment

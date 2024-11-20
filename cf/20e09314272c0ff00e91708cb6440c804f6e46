@@ -1,0 +1,26 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2024-11-09T22:47:37Z
+
+Hey!
+
+Thanks for your PR. You are targeting branch "7.2" but it seems your PR description refers to branch "5.4 or 7.2, TBD".
+Could you update the PR description or change target branch? This helps core maintainers a lot.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by derrabus at 2024-11-09T22:58:13Z
+
+This looks like a bugfix to me. Please target 5.4.
+
+---------------------------------------------------------------------------
+
+by donquixote at 2024-11-10T01:03:51Z
+
+> This looks like a bugfix to me. Please target 5.4.
+
+Let's see if there is consensus that this is a bug fix.

@@ -28,6 +28,7 @@ use Symfony\Component\PropertyInfo\Tests\Fixtures\Php74Dummy;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\Php7Dummy;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\Php7ParentDummy;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\Php81Dummy;
+use Symfony\Component\PropertyInfo\Tests\Fixtures\VirtualProperties;
 use Symfony\Component\PropertyInfo\Type;
 
 /**
@@ -698,5 +699,18 @@ class ReflectionExtractorTest extends TestCase
         $this->assertFalse($this->extractor->isWritable(AsymmetricVisibility::class, 'publicPrivate'));
         $this->assertFalse($this->extractor->isWritable(AsymmetricVisibility::class, 'publicProtected'));
         $this->assertFalse($this->extractor->isWritable(AsymmetricVisibility::class, 'protectedPrivate'));
+    }
+
+    /**
+     * @requires PHP 8.4
+     */
+    public function testVirtualProperties()
+    {
+        $this->assertTrue($this->extractor->isReadable(VirtualProperties::class, 'virtualNoSetHook'));
+        $this->assertTrue($this->extractor->isReadable(VirtualProperties::class, 'virtualSetHookOnly'));
+        $this->assertTrue($this->extractor->isReadable(VirtualProperties::class, 'virtualHook'));
+        $this->assertFalse($this->extractor->isWritable(VirtualProperties::class, 'virtualNoSetHook'));
+        $this->assertTrue($this->extractor->isWritable(VirtualProperties::class, 'virtualSetHookOnly'));
+        $this->assertTrue($this->extractor->isWritable(VirtualProperties::class, 'virtualHook'));
     }
 }

@@ -625,6 +625,17 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
                 return false;
             }
 
+            if (
+                $writeAccessRequired
+                    && method_exists($reflectionProperty, 'isVirtual')
+                    && method_exists($reflectionProperty, 'hasHook')
+                    && enum_exists('PropertyHookType')
+                    && $reflectionProperty->isVirtual()
+                    && !$reflectionProperty->hasHook(\PropertyHookType::Set)
+            ) {
+                return false;
+            }
+
             return (bool) ($reflectionProperty->getModifiers() & $this->propertyReflectionFlags);
         } catch (\ReflectionException $e) {
             // Return false if the property doesn't exist

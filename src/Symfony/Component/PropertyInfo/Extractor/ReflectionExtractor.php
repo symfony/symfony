@@ -713,6 +713,24 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
                 return false;
             }
 
+            // PHP 8.4: Asymmetric Visibility and Property Hooks
+            $hasAsymmetricVisibilityCapability = method_exists($reflectionProperty, 'isPrivateSet')
+                && method_exists($reflectionProperty, 'isProtectedSet')
+                && method_exists($reflectionProperty, 'isVirtual')
+                && method_exists($reflectionProperty, 'hasHook');
+
+            if ($hasAsymmetricVisibilityCapability) {
+                // If the property is virtual and has no setter, it's not writable.
+                if ($writeAccessRequired && $reflectionProperty->isVirtual() && !$reflectionProperty->hasHook(\PropertyHookType::Set)) {
+                    return false;
+                }
+
+                // If the property has private or protected setter, it's not writable
+                if ($writeAccessRequired && ($reflectionProperty->isPrivateSet() || $reflectionProperty->isProtectedSet())) {
+                    return false;
+                }
+            }
+
             return (bool) ($reflectionProperty->getModifiers() & $this->propertyReflectionFlags);
         } catch (\ReflectionException) {
             // Return false if the property doesn't exist

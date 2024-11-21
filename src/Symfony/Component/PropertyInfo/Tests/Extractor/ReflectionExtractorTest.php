@@ -30,6 +30,7 @@ use Symfony\Component\PropertyInfo\Tests\Fixtures\Php7ParentDummy;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\Php80Dummy;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\Php81Dummy;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\Php82Dummy;
+use Symfony\Component\PropertyInfo\Tests\Fixtures\Php84Dummy;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\SnakeCaseDummy;
 use Symfony\Component\PropertyInfo\Type as LegacyType;
 use Symfony\Component\TypeInfo\Type;
@@ -383,60 +384,75 @@ class ReflectionExtractorTest extends TestCase
     /**
      * @dataProvider getReadableProperties
      */
-    public function testIsReadable($property, $expected)
+    public function testIsReadable($class, $property, $expected)
     {
         $this->assertSame(
             $expected,
-            $this->extractor->isReadable('Symfony\Component\PropertyInfo\Tests\Fixtures\Dummy', $property, [])
+            $this->extractor->isReadable($class, $property, [])
         );
     }
 
     public static function getReadableProperties()
     {
         return [
-            ['bar', false],
-            ['baz', false],
-            ['parent', true],
-            ['a', true],
-            ['b', false],
-            ['c', true],
-            ['d', true],
-            ['e', false],
-            ['f', false],
-            ['Id', true],
-            ['id', true],
-            ['Guid', true],
-            ['guid', false],
-            ['element', false],
+            [Dummy::class, 'bar', false],
+            [Dummy::class, 'baz', false],
+            [Dummy::class, 'parent', true],
+            [Dummy::class, 'a', true],
+            [Dummy::class, 'b', false],
+            [Dummy::class, 'c', true],
+            [Dummy::class, 'd', true],
+            [Dummy::class, 'e', false],
+            [Dummy::class, 'f', false],
+            [Dummy::class, 'Id', true],
+            [Dummy::class, 'id', true],
+            [Dummy::class, 'Guid', true],
+            [Dummy::class, 'guid', false],
+            [Dummy::class, 'element', false],
+            [Php84Dummy::class, 'publicPrivateSet', true],
+            [Php84Dummy::class, 'publicProtectedSet', true],
+            [Php84Dummy::class, 'publicPublicSet', true],
+            [Php84Dummy::class, 'protectedPrivateSet', false],
+            [Php84Dummy::class, 'virtualNoSetHook', true],
+            // Set-only properties can be still read.
+            [Php84Dummy::class, 'virtualSetHookOnly', true],
+            [Php84Dummy::class, 'virtualHook', true],
         ];
     }
 
     /**
      * @dataProvider getWritableProperties
      */
-    public function testIsWritable($property, $expected)
+    public function testIsWritable($class, $property, $expected)
     {
         $this->assertSame(
             $expected,
-            $this->extractor->isWritable(Dummy::class, $property, [])
+            $this->extractor->isWritable($class, $property, [])
         );
     }
 
     public static function getWritableProperties()
     {
         return [
-            ['bar', false],
-            ['baz', false],
-            ['parent', true],
-            ['a', false],
-            ['b', true],
-            ['c', false],
-            ['d', false],
-            ['e', true],
-            ['f', true],
-            ['Id', false],
-            ['Guid', true],
-            ['guid', false],
+            [Dummy::class, 'bar', false],
+            [Dummy::class, 'baz', false],
+            [Dummy::class, 'parent', true],
+            [Dummy::class, 'a', false],
+            [Dummy::class, 'b', true],
+            [Dummy::class, 'c', false],
+            [Dummy::class, 'd', false],
+            [Dummy::class, 'e', true],
+            [Dummy::class, 'f', true],
+            [Dummy::class, 'Id', false],
+            [Dummy::class, 'Guid', true],
+            [Dummy::class, 'guid', false],
+            [Php84Dummy::class, 'publicPrivateSet', false],
+            [Php84Dummy::class, 'publicProtectedSet', false],
+            [Php84Dummy::class, 'publicPublicSet', true],
+            [Php84Dummy::class, 'protectedPrivateSet', false],
+            [Php84Dummy::class, 'virtualNoSetHook', false],
+            [Php84Dummy::class, 'virtualSetHookOnly', true],
+            [Php84Dummy::class, 'virtualHook', true],
         ];
     }
 
@@ -587,6 +603,13 @@ class ReflectionExtractorTest extends TestCase
             [Dummy::class, 'foo', true, PropertyReadInfo::TYPE_PROPERTY, 'foo', PropertyReadInfo::VISIBILITY_PUBLIC, false],
             [Php71Dummy::class, 'foo', true, PropertyReadInfo::TYPE_METHOD, 'getFoo', PropertyReadInfo::VISIBILITY_PUBLIC, false],
             [Php71Dummy::class, 'buz', true, PropertyReadInfo::TYPE_METHOD, 'getBuz', PropertyReadInfo::VISIBILITY_PUBLIC, false],
+            [Php84Dummy::class, 'publicPrivateSet', true, PropertyReadInfo::TYPE_PROPERTY, 'publicPrivateSet', PropertyReadInfo::VISIBILITY_PUBLIC, false],
+            [Php84Dummy::class, 'publicProtectedSet', true, PropertyReadInfo::TYPE_PROPERTY, 'publicProtectedSet', PropertyReadInfo::VISIBILITY_PUBLIC, false],
+            [Php84Dummy::class, 'publicPublicSet', true, PropertyReadInfo::TYPE_PROPERTY, 'publicPublicSet', PropertyReadInfo::VISIBILITY_PUBLIC, false],
+            [Php84Dummy::class, 'protectedPrivateSet', true, PropertyReadInfo::TYPE_PROPERTY, 'protectedPrivateSet', PropertyReadInfo::VISIBILITY_PROTECTED, false],
+            [Php84Dummy::class, 'virtualNoSetHook', true, PropertyReadInfo::TYPE_PROPERTY, 'virtualNoSetHook', PropertyReadInfo::VISIBILITY_PUBLIC, false],
+            [Php84Dummy::class, 'virtualSetHookOnly', true, PropertyReadInfo::TYPE_PROPERTY, 'virtualSetHookOnly', PropertyReadInfo::VISIBILITY_PUBLIC, false],
+            [Php84Dummy::class, 'virtualHook', true, PropertyReadInfo::TYPE_PROPERTY, 'virtualHook', PropertyReadInfo::VISIBILITY_PUBLIC, false],
         ];
     }
 
@@ -655,6 +678,14 @@ class ReflectionExtractorTest extends TestCase
             [Php71DummyExtended2::class, 'string', false, false, '', '', null, null, PropertyWriteInfo::VISIBILITY_PUBLIC, false],
             [Php71DummyExtended2::class, 'string', true, false,  '', '', null, null, PropertyWriteInfo::VISIBILITY_PUBLIC, false],
             [Php71DummyExtended2::class, 'baz', false, true, PropertyWriteInfo::TYPE_ADDER_AND_REMOVER, null, 'addBaz', 'removeBaz', PropertyWriteInfo::VISIBILITY_PUBLIC, false],
+            [Php84Dummy::class, 'publicPrivateSet', false, true, PropertyWriteInfo::TYPE_PROPERTY, 'publicPrivateSet', null, null, PropertyWriteInfo::VISIBILITY_PRIVATE, false],
+            [Php84Dummy::class, 'publicProtectedSet', false, true, PropertyWriteInfo::TYPE_PROPERTY, 'publicProtectedSet', null, null, PropertyWriteInfo::VISIBILITY_PROTECTED, false],
+            [Php84Dummy::class, 'publicPublicSet', false, true, PropertyWriteInfo::TYPE_PROPERTY, 'publicPublicSet', null, null, PropertyWriteInfo::VISIBILITY_PUBLIC, false],
+            [Php84Dummy::class, 'protectedPrivateSet', false, true, PropertyWriteInfo::TYPE_PROPERTY, 'protectedPrivateSet', null, null, PropertyWriteInfo::VISIBILITY_PRIVATE, false],
+            // if there is no setter in virtual property, the setter visibility is considered private
+            [Php84Dummy::class, 'virtualNoSetHook', false, true, PropertyWriteInfo::TYPE_PROPERTY, 'virtualNoSetHook', null, null, PropertyWriteInfo::VISIBILITY_PRIVATE, false],
+            [Php84Dummy::class, 'virtualSetHookOnly', false, true, PropertyWriteInfo::TYPE_PROPERTY, 'virtualSetHookOnly', null, null, PropertyWriteInfo::VISIBILITY_PUBLIC, false],
+            [Php84Dummy::class, 'virtualHook', false, true, PropertyWriteInfo::TYPE_PROPERTY, 'virtualHook', null, null, PropertyWriteInfo::VISIBILITY_PUBLIC, false],
         ];
     }
 

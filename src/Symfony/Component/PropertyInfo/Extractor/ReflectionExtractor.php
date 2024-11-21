@@ -969,6 +969,24 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
 
     private function getWriteVisiblityForProperty(\ReflectionProperty $reflectionProperty): string
     {
+        // PHP 8.4: Property hooks
+        if (method_exists($reflectionProperty, 'isVirtual') && method_exists($reflectionProperty, 'hasHook')) {
+            if ($reflectionProperty->isVirtual() && !$reflectionProperty->hasHook(\PropertyHookType::Set)) {
+                return PropertyWriteInfo::VISIBILITY_PRIVATE;
+            }
+        }
+
+        // PHP 8.4: Asymmetric visibility
+        if (method_exists($reflectionProperty, 'isPrivateSet') && method_exists($reflectionProperty, 'isProtectedSet')) {
+            if ($reflectionProperty->isPrivateSet()) {
+                return PropertyWriteInfo::VISIBILITY_PRIVATE;
+            }
+
+            if ($reflectionProperty->isProtectedSet()) {
+                return PropertyWriteInfo::VISIBILITY_PROTECTED;
+            }
+        }
+
         if ($reflectionProperty->isPrivate()) {
             return PropertyWriteInfo::VISIBILITY_PRIVATE;
         }

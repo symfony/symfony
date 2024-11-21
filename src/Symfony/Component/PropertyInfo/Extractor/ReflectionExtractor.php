@@ -625,11 +625,8 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
                 return false;
             }
 
-            if (
-                $writeAccessRequired
-                    && method_exists($reflectionProperty, 'isVirtual')
-                    && method_exists($reflectionProperty, 'hasHook')
-                    && enum_exists('PropertyHookType')
+            if (\PHP_VERSION_ID >= 80400
+                    && $writeAccessRequired
                     && $reflectionProperty->isVirtual()
                     && !$reflectionProperty->hasHook(\PropertyHookType::Set)
             ) {

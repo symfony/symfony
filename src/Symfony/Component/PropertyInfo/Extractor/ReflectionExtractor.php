@@ -713,13 +713,7 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
                 return false;
             }
 
-            // PHP 8.4: Asymmetric Visibility and Property Hooks
-            $hasAsymmetricVisibilityCapability = method_exists($reflectionProperty, 'isPrivateSet')
-                && method_exists($reflectionProperty, 'isProtectedSet')
-                && method_exists($reflectionProperty, 'isVirtual')
-                && method_exists($reflectionProperty, 'hasHook');
-
-            if ($hasAsymmetricVisibilityCapability) {
+            if (\PHP_VERSION_ID >= 80400) {
                 // If the property is virtual and has no setter, it's not writable.
                 if ($writeAccessRequired && $reflectionProperty->isVirtual() && !$reflectionProperty->hasHook(\PropertyHookType::Set)) {
                     return false;
@@ -969,19 +963,18 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
 
     private function getWriteVisiblityForProperty(\ReflectionProperty $reflectionProperty): string
     {
-        // PHP 8.4: Property hooks
-        if (method_exists($reflectionProperty, 'isVirtual') && method_exists($reflectionProperty, 'hasHook')) {
+        if (\PHP_VERSION_ID >= 80400) {
+            // If the property is virtual and has no setter, it's private
             if ($reflectionProperty->isVirtual() && !$reflectionProperty->hasHook(\PropertyHookType::Set)) {
                 return PropertyWriteInfo::VISIBILITY_PRIVATE;
             }
-        }
 
-        // PHP 8.4: Asymmetric visibility
-        if (method_exists($reflectionProperty, 'isPrivateSet') && method_exists($reflectionProperty, 'isProtectedSet')) {
+            // If the property has private setter, it's not writable
             if ($reflectionProperty->isPrivateSet()) {
                 return PropertyWriteInfo::VISIBILITY_PRIVATE;
             }
 
+            // If the property has protected setter, it's protected
             if ($reflectionProperty->isProtectedSet()) {
                 return PropertyWriteInfo::VISIBILITY_PROTECTED;
             }

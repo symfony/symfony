@@ -28,7 +28,7 @@ use Symfony\Component\PropertyInfo\Tests\Fixtures\Php74Dummy;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\Php7Dummy;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\Php7ParentDummy;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\Php81Dummy;
-use Symfony\Component\PropertyInfo\Tests\Fixtures\VirtualProperties;
+use Symfony\Component\PropertyInfo\Tests\Fixtures\HookedProperties;
 use Symfony\Component\PropertyInfo\Type;
 
 /**
@@ -704,13 +704,20 @@ class ReflectionExtractorTest extends TestCase
     /**
      * @requires PHP 8.4
      */
-    public function testVirtualProperties()
+    public function testHookedProperties()
     {
-        $this->assertTrue($this->extractor->isReadable(VirtualProperties::class, 'virtualNoSetHook'));
-        $this->assertTrue($this->extractor->isReadable(VirtualProperties::class, 'virtualSetHookOnly'));
-        $this->assertTrue($this->extractor->isReadable(VirtualProperties::class, 'virtualHook'));
-        $this->assertFalse($this->extractor->isWritable(VirtualProperties::class, 'virtualNoSetHook'));
-        $this->assertTrue($this->extractor->isWritable(VirtualProperties::class, 'virtualSetHookOnly'));
-        $this->assertTrue($this->extractor->isWritable(VirtualProperties::class, 'virtualHook'));
+        $this->assertTrue($this->extractor->isReadable(HookedProperties::class, 'virtualNoSetHook'));
+        $this->assertTrue($this->extractor->isReadable(HookedProperties::class, 'virtualSetHookOnly'));
+        $this->assertTrue($this->extractor->isReadable(HookedProperties::class, 'virtualHook'));
+        $this->assertFalse($this->extractor->isWritable(HookedProperties::class, 'virtualNoSetHook'));
+        $this->assertTrue($this->extractor->isWritable(HookedProperties::class, 'virtualSetHookOnly'));
+        $this->assertTrue($this->extractor->isWritable(HookedProperties::class, 'virtualHook'));
+
+        $this->assertTrue($this->extractor->isReadable(HookedProperties::class, 'backedNoSetHook'));
+        $this->assertTrue($this->extractor->isReadable(HookedProperties::class, 'backedSetHookOnly'));
+        $this->assertTrue($this->extractor->isReadable(HookedProperties::class, 'backedHook'));
+        $this->assertTrue($this->extractor->isWritable(HookedProperties::class, 'backedNoSetHook'));
+        $this->assertTrue($this->extractor->isWritable(HookedProperties::class, 'backedSetHookOnly'));
+        $this->assertTrue($this->extractor->isWritable(HookedProperties::class, 'backedHook'));
     }
 }

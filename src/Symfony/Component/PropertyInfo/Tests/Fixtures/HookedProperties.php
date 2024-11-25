@@ -11,9 +11,13 @@
 
 namespace Symfony\Component\PropertyInfo\Tests\Fixtures;
 
-class VirtualProperties
+class HookedProperties
 {
     public bool $virtualNoSetHook { get => true; }
     public bool $virtualSetHookOnly { set => $value; }
     public bool $virtualHook { get => true; set => $value; }
+
+    public bool $backedNoSetHook = true { get => !$this->backedNoSetHook; }
+    public bool $backedSetHookOnly = true { set => $this->backedSetHookOnly = $value; }
+    public bool $backedHook = true { get => !$this->backedHook; set => $this->backedHook = $value; }
 }

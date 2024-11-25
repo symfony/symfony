@@ -617,20 +617,20 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
         try {
             $reflectionProperty = new \ReflectionProperty($class, $property);
 
-            if (\PHP_VERSION_ID >= 80100 && $writeAccessRequired && $reflectionProperty->isReadOnly()) {
-                return false;
-            }
+            if ($writeAccessRequired) {
+                if (\PHP_VERSION_ID >= 80100 && $reflectionProperty->isReadOnly()) {
+                    return false;
+                }
 
-            if (\PHP_VERSION_ID >= 80400 && $writeAccessRequired && ($reflectionProperty->isProtectedSet() || $reflectionProperty->isPrivateSet())) {
-                return false;
-            }
+                if (\PHP_VERSION_ID >= 80400) {
+                    if ($reflectionProperty->isProtectedSet() || $reflectionProperty->isPrivateSet()) {
+                        return false;
+                    }
 
-            if (\PHP_VERSION_ID >= 80400
-                    && $writeAccessRequired
-                    && $reflectionProperty->isVirtual()
-                    && !$reflectionProperty->hasHook(\PropertyHookType::Set)
-            ) {
-                return false;
+                    if ($reflectionProperty->isVirtual() && !$reflectionProperty->hasHook(\PropertyHookType::Set)) {
+                        return false;
+                    }
+                }
             }
 
             return (bool) ($reflectionProperty->getModifiers() & $this->propertyReflectionFlags);

@@ -1,0 +1,12 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-11-22T16:10:38Z
+
+Failures on Windows are new to branch 5.4, I don't have them in v5.4.47
+I'm going to have a closer look.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-11-22T16:39:04Z
+
+https://github.com/symfony/symfony/pull/58915 introduced the issue on Windows :mag:

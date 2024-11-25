@@ -977,6 +977,21 @@ CSV;
     }
 
     /**
+     * @testWith  ["true", null]
+     *            ["true", ""]
+     *            ["true", "true"]
+     *            ["false", "false"]
+     */
+    public function testGetWithDefault($expected, $envValue)
+    {
+        $processor = new EnvVarProcessor(new Container());
+
+        $value = $processor->getEnv('default_value', 'true:FOO', fn () => $envValue);
+
+        $this->assertSame($expected, $value);
+    }
+
+    /**
      * @dataProvider provideGetEnvUrlPath
      */
     public function testGetEnvUrlPath(?string $expected, string $url)

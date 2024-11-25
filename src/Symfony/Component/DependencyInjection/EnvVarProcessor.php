@@ -54,6 +54,7 @@ class EnvVarProcessor implements EnvVarProcessorInterface, ResetInterface
             'query_string' => 'array',
             'resolve' => 'string',
             'default' => 'bool|int|float|string|array',
+            'default_value' => 'bool|int|float|string|array',
             'string' => 'string',
             'trim' => 'string',
             'require' => 'bool|int|float|string|array',
@@ -114,6 +115,27 @@ class EnvVarProcessor implements EnvVarProcessorInterface, ResetInterface
             } catch (EnvNotFoundException) {
                 return false;
             }
+        }
+
+        if ('default_value' === $prefix) {
+            if (false === $i) {
+                throw new RuntimeException(sprintf('Invalid env "default_value:%s": a fallback parameter should be provided.', $name));
+            }
+
+            $next = substr($name, $i + 1);
+            $default = substr($name, 0, $i);
+
+            try {
+                $env = $getEnv($next);
+
+                if ('' !== $env && null !== $env) {
+                    return $env;
+                }
+            } catch (EnvNotFoundException) {
+                // no-op
+            }
+
+            return '' === $default ? null : $default;
         }
 
         if ('default' === $prefix) {

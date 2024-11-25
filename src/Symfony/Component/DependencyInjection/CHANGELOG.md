@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+7.3
+---
+
+ * Add support for `default_value` as env var processor
+
 7.2
 ---
 

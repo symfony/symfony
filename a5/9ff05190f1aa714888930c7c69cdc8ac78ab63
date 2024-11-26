@@ -1,0 +1,27 @@
+---------------------------------------------------------------------------
+
+by kbond at 2024-11-25T02:13:55Z
+
+@wouterj, sorry, I'm not familiar at all with psalm. I'm not sure how to fix the errors or what I did wrong.
+
+---------------------------------------------------------------------------
+
+by wouterj at 2024-11-25T16:14:44Z
+
+> @wouterj, sorry, I'm not familiar at all with psalm. I'm not sure how to fix the errors or what I did wrong.
+
+I believe Psalm complains because we don't document anywhere that everything under `$this->stamps[SomeStamp::class]` is instance of `SomeStamp`. I've asked on Slack if someone has a way to do this, but I think we can ignore this error. The user will not receive this error.
+
+---------------------------------------------------------------------------
+
+by kbond at 2024-11-25T16:56:09Z
+
+Ok, how can I suppress the error here?
+
+---------------------------------------------------------------------------
+
+by stof at 2024-11-25T17:03:48Z
+
+@kbond you can ignore it for now.
+
+Our usage of Psalm is a bit special as each PR reports only *new* failure (it generates a baseline for the existing state of the target branch before analyzing the code of the PR)

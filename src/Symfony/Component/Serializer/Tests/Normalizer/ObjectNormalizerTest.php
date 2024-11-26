@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Serializer\Tests\Normalizer;
 
+use Composer\InstalledVersions;
 use Doctrine\Common\Annotations\AnnotationReader;
 use PHPStan\PhpDocParser\Parser\PhpDocParser;
 use PHPUnit\Framework\TestCase;
@@ -751,6 +752,15 @@ class ObjectNormalizerTest extends TestCase
     {
         if (!class_exists(PhpStanExtractor::class) || !class_exists(PhpDocParser::class)) {
             $this->markTestSkipped('phpstan/phpdoc-parser required for this test');
+        }
+
+        $versionRange = InstalledVersions::getVersionRanges('symfony/property-info');
+
+        if (
+            '5.4.x-dev' !== $versionRange && version_compare($versionRange, '5.4.47', '<')
+            || version_compare($versionRange, '6', '>=') && '6.4.x-dev' !== $versionRange && version_compare($versionRange, '6.4.15', '<')
+        ) {
+            $this->markTestSkipped('PropertyInfo >= 5.4.47 or >= 6.4.15 is required for this test');
         }
 
         $extractor = new PropertyInfoExtractor([], [new PhpStanExtractor(), new PhpDocExtractor(), new ReflectionExtractor()]);

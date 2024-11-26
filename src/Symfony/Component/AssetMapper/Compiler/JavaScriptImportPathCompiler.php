@@ -28,8 +28,27 @@ use Symfony\Component\Filesystem\Path;
  */
 final class JavaScriptImportPathCompiler implements AssetCompilerInterface
 {
-
-    private const IMPORT_PATTERN = '/import(?:{[^{}]+}|.*?)\s*(?:from)?\s*[\'"`](.*?)[\'"`]|import\(.*?\)/m';
+    private const IMPORT_PATTERN = '/
+            ^(?:\/\/.*)                     # Lines that start with comments
+        |
+            (?:
+                \'(?:[^\'\\\\\n]|\\\\.)*+\'   # Strings enclosed in single quotes
+            |
+                "(?:[^"\\\\\n]|\\\\.)*+"      # Strings enclosed in double quotes
+            )
+        |
+            (?:                            # Import statements (script captured)
+                import\s*
+                    (?:
+                        (?:\*\s*as\s+\w+|\s+[\w\s{},*]+)
+                        \s*from\s*
+                    )?
+            |
+                \bimport\(
+            )
+            \s*[\'"`](\.\/[^\'"`\n]++|(\.\.\/)*+[^\'"`\n]++)[\'"`]\s*[;\)]
+        ?
+    /mxu';
 
     public function __construct(
         private readonly ImportMapConfigReader $importMapConfigReader,

@@ -103,7 +103,13 @@ trait MicroKernelTrait
      */
     private function getBundlesPath(): string
     {
-        return $this->getConfigDir().'/bundles.php';
+        $configDir = $this->getConfigDir();
+
+        if (is_file($configDir.'/bundles_'.$this->environment.'.php')) {
+            return $configDir.'/bundles_'.$this->environment.'.php';
+        }
+
+        return $configDir.'/bundles.php';
     }
 
     public function getCacheDir(): string

@@ -28,9 +28,6 @@
         "symfony/property-access": "^6.4|^7.0",
         "symfony/serializer": "^6.4|^7.0"
     },
-    "conflict": {
-        "symfony/http-client-contracts": "<2.5"
-    },
     "autoload": {
         "psr-4": { "Symfony\\Component\\Messenger\\Bridge\\AmazonSqs\\": "" },
         "exclude-from-classmap": [

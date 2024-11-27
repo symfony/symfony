@@ -53,18 +53,7 @@
         "doctrine/collections": "<1.8",
         "doctrine/dbal": "<3.6",
         "doctrine/lexer": "<1.1",
-        "doctrine/orm": "<2.15",
-        "symfony/cache": "<6.4",
-        "symfony/dependency-injection": "<6.4",
-        "symfony/form": "<6.4.6|>=7,<7.0.6",
-        "symfony/http-foundation": "<6.4",
-        "symfony/http-kernel": "<6.4",
-        "symfony/lock": "<6.4",
-        "symfony/messenger": "<6.4",
-        "symfony/property-info": "<6.4",
-        "symfony/security-bundle": "<6.4",
-        "symfony/security-core": "<6.4",
-        "symfony/validator": "<6.4"
+        "doctrine/orm": "<2.15"
     },
     "autoload": {
         "psr-4": { "Symfony\\Bridge\\Doctrine\\": "" },

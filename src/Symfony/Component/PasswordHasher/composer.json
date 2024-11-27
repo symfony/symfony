@@ -22,9 +22,6 @@
         "symfony/security-core": "^6.4|^7.0",
         "symfony/console": "^6.4|^7.0"
     },
-    "conflict": {
-        "symfony/security-core": "<6.4"
-    },
     "autoload": {
         "psr-4": { "Symfony\\Component\\PasswordHasher\\": "" },
         "exclude-from-classmap": [

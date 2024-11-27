@@ -37,10 +37,6 @@
         "symfony/framework-bundle": "^6.4|^7.0",
         "symfony/web-link": "^6.4|^7.0"
     },
-    "conflict": {
-        "symfony/framework-bundle": "<6.4",
-        "symfony/translation": "<6.4"
-    },
     "autoload": {
         "psr-4": { "Symfony\\Bundle\\TwigBundle\\": "" },
         "exclude-from-classmap": [

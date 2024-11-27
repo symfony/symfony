@@ -53,22 +53,6 @@
         "psr/log-implementation": "1.0|2.0|3.0"
     },
     "conflict": {
-        "symfony/browser-kit": "<6.4",
-        "symfony/cache": "<6.4",
-        "symfony/config": "<6.4",
-        "symfony/console": "<6.4",
-        "symfony/form": "<6.4",
-        "symfony/dependency-injection": "<6.4",
-        "symfony/doctrine-bridge": "<6.4",
-        "symfony/http-client": "<6.4",
-        "symfony/http-client-contracts": "<2.5",
-        "symfony/mailer": "<6.4",
-        "symfony/messenger": "<6.4",
-        "symfony/translation": "<6.4",
-        "symfony/translation-contracts": "<2.5",
-        "symfony/twig-bridge": "<6.4",
-        "symfony/validator": "<6.4",
-        "symfony/var-dumper": "<6.4",
         "twig/twig": "<3.12"
     },
     "autoload": {

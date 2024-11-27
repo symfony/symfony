@@ -23,9 +23,6 @@
     "require-dev": {
         "symfony/mime": "^6.4|^7.0"
     },
-    "conflict": {
-        "symfony/mime": "<6.4"
-    },
     "autoload": {
         "psr-4": { "Symfony\\Component\\Notifier\\Bridge\\Twitter\\": "" },
         "exclude-from-classmap": [

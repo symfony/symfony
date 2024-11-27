@@ -28,10 +28,6 @@
         "symfony/service-contracts": "^2.5|^3",
         "symfony/yaml": "^6.4|^7.0"
     },
-    "conflict": {
-        "symfony/finder": "<6.4",
-        "symfony/service-contracts": "<2.5"
-    },
     "autoload": {
         "psr-4": { "Symfony\\Component\\Config\\": "" },
         "exclude-from-classmap": [

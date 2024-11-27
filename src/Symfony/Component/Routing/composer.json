@@ -27,11 +27,6 @@
         "symfony/dependency-injection": "^6.4|^7.0",
         "psr/log": "^1|^2|^3"
     },
-    "conflict": {
-        "symfony/config": "<6.4",
-        "symfony/dependency-injection": "<6.4",
-        "symfony/yaml": "<6.4"
-    },
     "autoload": {
         "psr-4": { "Symfony\\Component\\Routing\\": "" },
         "exclude-from-classmap": [

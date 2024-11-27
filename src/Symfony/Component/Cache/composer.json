@@ -43,10 +43,7 @@
         "symfony/var-dumper": "^6.4|^7.0"
     },
     "conflict": {
-        "doctrine/dbal": "<3.6",
-        "symfony/dependency-injection": "<6.4",
-        "symfony/http-kernel": "<6.4",
-        "symfony/var-dumper": "<6.4"
+        "doctrine/dbal": "<3.6"
     },
     "autoload": {
         "psr-4": { "Symfony\\Component\\Cache\\": "" },

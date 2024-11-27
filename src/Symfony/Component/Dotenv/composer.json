@@ -22,10 +22,6 @@
         "symfony/console": "^6.4|^7.0",
         "symfony/process": "^6.4|^7.0"
     },
-    "conflict": {
-        "symfony/console": "<6.4",
-        "symfony/process": "<6.4"
-    },
     "autoload": {
         "psr-4": { "Symfony\\Component\\Dotenv\\": "" },
         "exclude-from-classmap": [

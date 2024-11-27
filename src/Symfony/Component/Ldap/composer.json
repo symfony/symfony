@@ -24,10 +24,6 @@
         "symfony/security-core": "^6.4|^7.0",
         "symfony/security-http": "^6.4|^7.0"
     },
-    "conflict": {
-        "symfony/options-resolver": "<6.4",
-        "symfony/security-core": "<6.4"
-    },
     "autoload": {
         "psr-4": { "Symfony\\Component\\Ldap\\": "" },
         "exclude-from-classmap": [

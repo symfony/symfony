@@ -27,10 +27,6 @@
         "symfony/config": "^6.4|^7.0",
         "symfony/web-profiler-bundle": "^6.4|^7.0"
     },
-    "conflict": {
-        "symfony/config": "<6.4",
-        "symfony/dependency-injection": "<6.4"
-    },
     "autoload": {
         "psr-4": { "Symfony\\Bundle\\DebugBundle\\": "" },
         "exclude-from-classmap": [

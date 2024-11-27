@@ -24,9 +24,6 @@
         "symfony/http-client": "^6.4|^7.0",
         "symfony/webhook": "^7.2"
     },
-    "conflict": {
-        "symfony/webhook": "<7.2"
-    },
     "autoload": {
         "psr-4": { "Symfony\\Component\\Mailer\\Bridge\\Mailtrap\\": "" },
         "exclude-from-classmap": [

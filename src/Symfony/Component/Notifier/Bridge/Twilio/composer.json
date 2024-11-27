@@ -23,9 +23,6 @@
     "require-dev": {
         "symfony/webhook": "^6.4|^7.0"
     },
-    "conflict": {
-        "symfony/http-foundation": "<6.4"
-    },
     "autoload": {
         "psr-4": { "Symfony\\Component\\Notifier\\Bridge\\Twilio\\": "" },
         "exclude-from-classmap": [

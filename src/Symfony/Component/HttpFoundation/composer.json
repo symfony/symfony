@@ -32,8 +32,7 @@
         "symfony/rate-limiter": "^6.4|^7.0"
     },
     "conflict": {
-        "doctrine/dbal": "<3.6",
-        "symfony/cache": "<6.4.12|>=7.0,<7.1.5"
+        "doctrine/dbal": "<3.6"
     },
     "autoload": {
         "psr-4": { "Symfony\\Component\\HttpFoundation\\": "" },

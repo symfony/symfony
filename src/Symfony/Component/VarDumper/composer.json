@@ -27,9 +27,6 @@
         "symfony/uid": "^6.4|^7.0",
         "twig/twig": "^3.12"
     },
-    "conflict": {
-        "symfony/console": "<6.4"
-    },
     "autoload": {
         "files": [ "Resources/functions/dump.php" ],
         "psr-4": { "Symfony\\Component\\VarDumper\\": "" },

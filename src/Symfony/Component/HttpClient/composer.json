@@ -46,8 +46,7 @@
     },
     "conflict": {
         "amphp/amp": "<2.5",
-        "php-http/discovery": "<1.15",
-        "symfony/http-foundation": "<6.4"
+        "php-http/discovery": "<1.15"
     },
     "autoload": {
         "psr-4": { "Symfony\\Component\\HttpClient\\": "" },

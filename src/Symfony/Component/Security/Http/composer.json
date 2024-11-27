@@ -38,13 +38,6 @@
         "psr/log": "^1|^2|^3",
         "web-token/jwt-library": "^3.3.2|^4.0"
     },
-    "conflict": {
-        "symfony/clock": "<6.4",
-        "symfony/event-dispatcher": "<6.4",
-        "symfony/http-client-contracts": "<3.0",
-        "symfony/security-bundle": "<6.4",
-        "symfony/security-csrf": "<6.4"
-    },
     "autoload": {
         "psr-4": { "Symfony\\Component\\Security\\Http\\": "" },
         "exclude-from-classmap": [

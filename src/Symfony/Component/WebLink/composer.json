@@ -25,9 +25,6 @@
     "require-dev": {
         "symfony/http-kernel": "^6.4|^7.0"
     },
-    "conflict": {
-        "symfony/http-kernel": "<6.4"
-    },
     "autoload": {
         "psr-4": { "Symfony\\Component\\WebLink\\": "" },
         "exclude-from-classmap": [

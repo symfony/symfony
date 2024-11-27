@@ -25,12 +25,6 @@
         "symfony/http-foundation": "^6.4|^7.0",
         "symfony/messenger": "^6.4|^7.0"
     },
-    "conflict": {
-        "symfony/event-dispatcher": "<6.4",
-        "symfony/event-dispatcher-contracts": "<2.5",
-        "symfony/http-client-contracts": "<2.5",
-        "symfony/http-kernel": "<6.4"
-    },
     "autoload": {
         "psr-4": { "Symfony\\Component\\Notifier\\": "" },
         "exclude-from-classmap": [

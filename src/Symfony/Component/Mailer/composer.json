@@ -30,13 +30,6 @@
         "symfony/messenger": "^6.4|^7.0",
         "symfony/twig-bridge": "^6.4|^7.0"
     },
-    "conflict": {
-        "symfony/http-client-contracts": "<2.5",
-        "symfony/http-kernel": "<6.4",
-        "symfony/messenger": "<6.4",
-        "symfony/mime": "<6.4",
-        "symfony/twig-bridge": "<6.4"
-    },
     "autoload": {
         "psr-4": { "Symfony\\Component\\Mailer\\": "" },
         "exclude-from-classmap": [

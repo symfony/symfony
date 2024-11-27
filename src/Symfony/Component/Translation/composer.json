@@ -36,16 +36,6 @@
         "symfony/finder": "^6.4|^7.0",
         "psr/log": "^1|^2|^3"
     },
-    "conflict": {
-        "symfony/config": "<6.4",
-        "symfony/dependency-injection": "<6.4",
-        "symfony/http-client-contracts": "<2.5",
-        "symfony/http-kernel": "<6.4",
-        "symfony/service-contracts": "<2.5",
-        "symfony/twig-bundle": "<6.4",
-        "symfony/yaml": "<6.4",
-        "symfony/console": "<6.4"
-    },
     "provide": {
         "symfony/translation-implementation": "2.3|3.0"
     },

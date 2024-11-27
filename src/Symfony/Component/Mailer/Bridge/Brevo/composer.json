@@ -23,9 +23,6 @@
         "symfony/http-client": "^6.3|^7.0",
         "symfony/webhook": "^6.3|^7.0"
     },
-    "conflict": {
-        "symfony/mime": "<6.2"
-    },
     "autoload": {
         "psr-4": { "Symfony\\Component\\Mailer\\Bridge\\Brevo\\": "" },
         "exclude-from-classmap": [

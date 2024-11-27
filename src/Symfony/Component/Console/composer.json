@@ -37,13 +37,6 @@
     "provide": {
         "psr/log-implementation": "1.0|2.0|3.0"
     },
-    "conflict": {
-        "symfony/dependency-injection": "<6.4",
-        "symfony/dotenv": "<6.4",
-        "symfony/event-dispatcher": "<6.4",
-        "symfony/lock": "<6.4",
-        "symfony/process": "<6.4"
-    },
     "autoload": {
         "psr-4": { "Symfony\\Component\\Console\\": "" },
         "exclude-from-classmap": [

@@ -31,8 +31,7 @@
         "psr/log": "^1.1.4|^2|^3"
     },
     "conflict": {
-        "php-http/discovery": "<1.15",
-        "symfony/http-kernel": "<6.4"
+        "php-http/discovery": "<1.15"
     },
     "config": {
         "allow-plugins": {

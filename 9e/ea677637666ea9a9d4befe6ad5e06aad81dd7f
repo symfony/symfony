@@ -1,0 +1,144 @@
+---------------------------------------------------------------------------
+
+by discordier at 2024-10-14T12:15:11Z
+
+I rebased against 5.4, as this seems to be the first affected version.
+
+---------------------------------------------------------------------------
+
+by discordier at 2024-10-14T12:36:09Z
+
+~~Unit tests pass on my machine - unsure how to proceed here.~~ Found the culprit, fixed.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-10-23T12:52:38Z
+
+~This HTTP transaction is not valid per HTTP/1.1~
+
+`Connection: close` is how HTTP/1.0 behaved, but since 1.1, either Content-Length should be sent, or Transfer-Encoding should (to chunked typically).
+
+Are you in control of the server sending these responses?
+
+The change you propose here will accept broken responses that should have sent some bytes but didn't before closing.
+
+This might make the client less robust.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-10-23T14:05:00Z
+
+HTTP/1.1 actually allows the server to close the connection to tell about the end of the response:
+https://www.rfc-editor.org/rfc/rfc2616#section-4.4 (item 5.)
+We now need to be sure the code you proposed is specific enough about the server connection being closed.
+What's surprising is that curl reports this as an SSL error, while it could return CURLE_OK.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-10-23T14:06:04Z
+
+(and yes, a test case would be great, to confirm the behavior of all implementations, not only curl)
+
+---------------------------------------------------------------------------
+
+by discordier at 2024-10-25T16:37:09Z
+
+> Are you in control of the server sending these responses?
+
+Somewhat, it's a standard proxmox server API endpoint (`curl https://pve:8006/api`).
+
+> HTTP/1.1 actually allows the server to close the connection to tell about the end of the response: https://www.rfc-editor.org/rfc/rfc2616#section-4.4 (item 5.) We now need to be sure the code you proposed is specific enough about the server connection being closed. What's surprising is that curl reports this as an SSL error, while it could return CURLE_OK.
+
+I am puzzled as well - furthermore, it works fine on command line (see transcript in OP).
+
+Maybe the "TLSv1.3 (OUT), TLS alert, close notify (256):" hints an exit code of 256 despite the shell exit code is 0?
+I tried again on CLI via `curl -v https://[redacted]/api; echo $?` and got `0`.
+
+I wonder how we can ensure that it is specific enough... I mean it's pretty easy for me to validate that it's working like this but how to determine the side effects are minimized?
+We could add in a check for curl version there but I lack an installation that is older than 7.19.4 (released March 3 2009) to check against - tbh. I strongly doubt that it will compile against current PHP - so I assume the behaviour should be pretty consistent across curl versions here.
+
+Regarding a test, I tried to come up with one but failed except when testing against a real server.
+I wonder if it is possible with the used `php -s` implementation the tests use to replicate the behaviour. Most likely we need SSL + direct socket close, both seem to be not possible using the test implementation if I'm not mistaken.
+
+Any advisory on how to proceed here is greatly appreciated.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-11-05T11:02:31Z
+
+See https://github.com/curl/curl/issues/4624
+
+It looks like curl ignores this error unless it's built with the debug flag.
+But we need to make this specific for the SSL_ERROR_SYSCALL error.
+Not sure if this means parsing the error message or if we could do better.
+Can you have a look?
+
+---------------------------------------------------------------------------
+
+by discordier at 2024-11-06T19:50:42Z
+
+I'm not sure I understand what you mean by making this specific for the SSL_ERROR_SYSCALL.
+Shall we swap the check of `'C' === $waitFor[0]` with `curl_error($ch) === 'OpenSSL SSL_read: SSL_ERROR_SYSCALL, errno 0'` then yey, this works - did so.
+I'd still keep the restriction on `0.0 === curl_getinfo($ch, \CURLINFO_SIZE_DOWNLOAD)` and `-1.0 === curl_getinfo($ch, \CURLINFO_CONTENT_LENGTH_DOWNLOAD)` here (as seen in the PR).
+
+Regarding an unit test, I have written a socket server which gets used in `src/Symfony/Component/HttpClient/Tests/HttpClientTestCase.php`. However, I failed to find a way to "hard-close" the socket as PHP socket handling always seems to gracefully close the socket - therefore it is not a reproducer yet. Maybe you have an idea on how I can force the immediate shutdown that confuses curl in the real server.
+
+By trying to implement a test, I found that the `\Symfony\Component\HttpClient\Tests\NativeHttpClientTest` omits the options `['verify_peer' => false, 'verify_host' => false]` and therefore always fails when connecting to https.
+
+Sidenote: carsonbot tagged this as 7.2 wheras I currently target 5.4 - do I have to rebase against 7.2 now or will you change the milestone?
+
+---------------------------------------------------------------------------
+
+by stof at 2024-11-07T11:13:39Z
+
+carsonbot probably failed to identify the milestone (and so used the default one) because of your answer being `5.4 I guess, please advise`, which is not a valid branch name.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-11-07T13:05:25Z
+
+> curl_error($ch) === 'OpenSSL SSL_read: SSL_ERROR_SYSCALL, errno 0'
+
+yes
+
+> I'd still keep the restriction on 0.0 === curl_getinfo($ch, \CURLINFO_SIZE_DOWNLOAD)
+
+nope, that'd be wrong
+
+> -1.0 === curl_getinfo($ch, \CURLINFO_CONTENT_LENGTH_DOWNLOAD) here (as seen in the PR).
+
+yes
+
+(but as the PR is now, it contains nothing but tentative tests)
+
+Let forget about tests if this cannot be tested without complex setup :shrug:
+
+---------------------------------------------------------------------------
+
+by discordier at 2024-11-12T16:31:51Z
+
+> > curl_error($ch) === 'OpenSSL SSL_read: SSL_ERROR_SYSCALL, errno 0'
+>
+> yes
+
+Changed.
+
+> > I'd still keep the restriction on 0.0 === curl_getinfo($ch, \CURLINFO_SIZE_DOWNLOAD)
+>
+> nope, that'd be wrong
+
+Removed
+
+> > -1.0 === curl_getinfo($ch, \CURLINFO_CONTENT_LENGTH_DOWNLOAD) here (as seen in the PR).
+>
+> yes
+
+Kept
+
+> (but as the PR is now, it contains nothing but tentative tests)
+>
+> Let forget about tests if this cannot be tested without complex setup 🤷
+
+Yes, I tried to put a reproducer here but as I said, I did not succeed for this problem (it is pretty hard to create an "improper" ssl shutdown in PHP).
+
+I now dropped the test stuff and fixed the initial problem - I kept the fix in the `NativeHttpClientTest` though but am happy to make a separate PR out of this if desired.

@@ -316,7 +316,20 @@ final class CurlResponse implements ResponseInterface, StreamableInterface
                 }
 
                 $multi->handlesActivity[$id][] = null;
-                $multi->handlesActivity[$id][] = \in_array($result, [\CURLE_OK, \CURLE_TOO_MANY_REDIRECTS], true) || '_0' === $waitFor || curl_getinfo($ch, \CURLINFO_SIZE_DOWNLOAD) === curl_getinfo($ch, \CURLINFO_CONTENT_LENGTH_DOWNLOAD) || (curl_error($ch) === 'OpenSSL SSL_read: SSL_ERROR_SYSCALL, errno 0' && -1.0 === curl_getinfo($ch, \CURLINFO_CONTENT_LENGTH_DOWNLOAD) && \in_array('close', array_map('strtolower', $responses[$id]->headers['connection']), true)) ? null : new TransportException(ucfirst(curl_error($ch) ?: curl_strerror($result)).\sprintf(' for "%s".', curl_getinfo($ch, \CURLINFO_EFFECTIVE_URL)));
+                $multi->handlesActivity[$id][] =
+                    (
+                        \in_array($result, [\CURLE_OK, \CURLE_TOO_MANY_REDIRECTS], true)
+                        || '_0' === $waitFor
+                        || curl_getinfo($ch, \CURLINFO_SIZE_DOWNLOAD) === curl_getinfo($ch, \CURLINFO_CONTENT_LENGTH_DOWNLOAD)
+                        || (
+                            'OpenSSL SSL_read: SSL_ERROR_SYSCALL, errno 0' === curl_error($ch)
+                            && -1.0 === curl_getinfo($ch, \CURLINFO_CONTENT_LENGTH_DOWNLOAD)
+                            && \array_key_exists('connection', $responses[$id]->headers)
+                            && \in_array('close', array_map('strtolower', $responses[$id]->headers['connection']), true)
+                        )
+                    )
+                    ? null
+                    : new TransportException(ucfirst(curl_error($ch) ?: curl_strerror($result)).\sprintf(' for "%s".', curl_getinfo($ch, \CURLINFO_EFFECTIVE_URL)));
             }
         } finally {
             $multi->performing = false;

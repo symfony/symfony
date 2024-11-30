@@ -192,6 +192,7 @@
             "Symfony\\Runtime\\Symfony\\Component\\": "src/Symfony/Component/Runtime/Internal/"
         },
         "files": [
+            "src/Symfony/Component/DependencyInjection/Loader/Configurator/functions.php",
             "src/Symfony/Component/String/Resources/functions.php"
         ],
         "classmap": [

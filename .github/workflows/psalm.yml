@@ -54,7 +54,16 @@ jobs:
           # @see https://github.com/vimeo/psalm/issues/7520
           sed -i 's/Uuid&/Uuid|/' src/Symfony/Component/Uid/Factory/TimeBasedUuidFactory.php
           sed -i 's/Interface&/Interface|/' src/Symfony/Component/HttpFoundation/Session/Storage/Handler/MigratingSessionHandler.php
+          # TODO: Remove after merge
+          if [ ! -f src/Symfony/Component/DependencyInjection/Loader/Configurator/functions.php ]; then
+              NEED_TO_REMOVE=1
+              echo '<?php' > src/Symfony/Component/DependencyInjection/Loader/Configurator/functions.php
+          fi
           ./vendor/bin/psalm.phar --set-baseline=.github/psalm/psalm.baseline.xml --no-progress
+          # TODO: Remove after merge
+          if [ "$NEED_TO_REMOVE" -eq 1 ]; then
+              rm src/Symfony/Component/DependencyInjection/Loader/Configurator/functions.php
+          fi
           git checkout -m FETCH_HEAD
 
       - name: Psalm

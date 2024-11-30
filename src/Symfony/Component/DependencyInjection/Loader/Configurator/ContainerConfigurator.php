@@ -11,18 +11,11 @@
 
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-use Symfony\Component\Config\Loader\ParamConfigurator;
-use Symfony\Component\DependencyInjection\Argument\AbstractArgument;
-use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
-use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
-use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
 use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
 use Symfony\Component\DependencyInjection\Loader\UndefinedExtensionHandler;
-use Symfony\Component\ExpressionLanguage\Expression;
 
 /**
  * @author Nicolas Grekas <p@tchwork.com>
@@ -93,108 +86,4 @@ class ContainerConfigurator extends AbstractConfigurator
 
         return $clone;
     }
-}
-
-/**
- * Creates a parameter.
- */
-function param(string $name): ParamConfigurator
-{
-    return new ParamConfigurator($name);
-}
-
-/**
- * Creates a reference to a service.
- */
-function service(string $serviceId): ReferenceConfigurator
-{
-    return new ReferenceConfigurator($serviceId);
-}
-
-/**
- * Creates an inline service.
- */
-function inline_service(?string $class = null): InlineServiceConfigurator
-{
-    return new InlineServiceConfigurator(new Definition($class));
-}
-
-/**
- * Creates a service locator.
- *
- * @param array<ReferenceConfigurator|InlineServiceConfigurator> $values
- */
-function service_locator(array $values): ServiceLocatorArgument
-{
-    $values = AbstractConfigurator::processValue($values, true);
-
-    return new ServiceLocatorArgument($values);
-}
-
-/**
- * Creates a lazy iterator.
- *
- * @param ReferenceConfigurator[] $values
- */
-function iterator(array $values): IteratorArgument
-{
-    return new IteratorArgument(AbstractConfigurator::processValue($values, true));
-}
-
-/**
- * Creates a lazy iterator by tag name.
- */
-function tagged_iterator(string $tag, ?string $indexAttribute = null, ?string $defaultIndexMethod = null, ?string $defaultPriorityMethod = null, string|array $exclude = [], bool $excludeSelf = true): TaggedIteratorArgument
-{
-    return new TaggedIteratorArgument($tag, $indexAttribute, $defaultIndexMethod, false, $defaultPriorityMethod, (array) $exclude, $excludeSelf);
-}
-
-/**
- * Creates a service locator by tag name.
- */
-function tagged_locator(string $tag, ?string $indexAttribute = null, ?string $defaultIndexMethod = null, ?string $defaultPriorityMethod = null, string|array $exclude = [], bool $excludeSelf = true): ServiceLocatorArgument
-{
-    return new ServiceLocatorArgument(new TaggedIteratorArgument($tag, $indexAttribute, $defaultIndexMethod, true, $defaultPriorityMethod, (array) $exclude, $excludeSelf));
-}
-
-/**
- * Creates an expression.
- */
-function expr(string $expression): Expression
-{
-    return new Expression($expression);
-}
-
-/**
- * Creates an abstract argument.
- */
-function abstract_arg(string $description): AbstractArgument
-{
-    return new AbstractArgument($description);
-}
-
-/**
- * Creates an environment variable reference.
- */
-function env(string $name): EnvConfigurator
-{
-    return new EnvConfigurator($name);
-}
-
-/**
- * Creates a closure service reference.
- */
-function service_closure(string $serviceId): ClosureReferenceConfigurator
-{
-    return new ClosureReferenceConfigurator($serviceId);
-}
-
-/**
- * Creates a closure.
- */
-function closure(string|array|ReferenceConfigurator|Expression $callable): InlineServiceConfigurator
-{
-    return (new InlineServiceConfigurator(new Definition('Closure')))
-        ->factory(['Closure', 'fromCallable'])
-        ->args([$callable]);
 }

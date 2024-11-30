@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+7.3
+---
+
+* Moved functions in Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator to be bootstrapped by Composer
+
 7.2
 ---
 

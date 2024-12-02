@@ -5,6 +5,8 @@ CHANGELOG
 ---
 
  * Add support for pre-compressing assets with Brotli, Zstandard, Zopfli, and gzip
+ * Make `asset-map:compile` remove assets in debug mode
+ * Add `--force` to the `asset-map:compile` command to make it generate assets in debug mode
 
 7.2
 ---

@@ -49,11 +49,12 @@ final class AssetMapperCompileCommand extends Command
     protected function configure(): void
     {
         $this
+            ->addOption('force', 'f', null, 'Force compiling the assets even in debug mode')
             ->setHelp(<<<'EOT'
 The <info>%command.name%</info> command compiles and dumps all the assets in
 the asset mapper into the final public directory (usually <comment>public/assets</comment>).
 
-This command is meant to be run during deployment.
+When run in debug mode, this command actually removes those assets, unless <info>--force</info> is passed.
 EOT
             );
     }
@@ -61,8 +62,6 @@ EOT
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);
-
-        $this->eventDispatcher?->dispatch(new PreAssetsCompileEvent($io));
 
         // remove existing config files
         $this->compiledConfigReader->removeConfig(AssetMapper::MANIFEST_FILE_NAME);
@@ -73,6 +72,26 @@ EOT
             $this->compiledConfigReader->removeConfig($path);
             $entrypointFiles[$entrypointName] = $path;
         }
+
+        if ($this->isDebug && !$input->getOption('force')) {
+            $didUnlink = false;
+            $publicDir = $this->assetsFilesystem->getDestinationPath();
+
+            foreach ($this->assetMapper->allAssets() as $asset) {
+                if (is_file($publicDir.'/'.$asset->publicPath)) {
+                    unlink($publicDir.'/'.$asset->publicPath);
+                    $didUnlink = true;
+                }
+            }
+
+            if ($didUnlink) {
+                $io->warning('Running in debug mode: removed compiled assets to let them be served dynamically. Use --force to generate them instead.');
+            }
+
+            return 0;
+        }
+
+        $this->eventDispatcher?->dispatch(new PreAssetsCompileEvent($io));
 
         $manifest = $this->createManifestAndWriteFiles($io);
         $manifestPath = $this->compiledConfigReader->saveConfig(AssetMapper::MANIFEST_FILE_NAME, $manifest);
@@ -86,13 +105,6 @@ EOT
         }
         $styledEntrypointNames = array_map(fn (string $entrypointName) => \sprintf('<info>%s</>', $entrypointName), array_keys($entrypointFiles));
         $io->comment(\sprintf('Entrypoint metadata written for <comment>%d</> entrypoints (%s).', \count($entrypointFiles), implode(', ', $styledEntrypointNames)));
-
-        if ($this->isDebug) {
-            $io->warning(\sprintf(
-                'Debug mode is enabled in your project: Symfony will not serve any changed assets until you delete the files in the "%s" directory again.',
-                $this->shortenPath(\dirname($manifestPath))
-            ));
-        }
 
         return 0;
     }

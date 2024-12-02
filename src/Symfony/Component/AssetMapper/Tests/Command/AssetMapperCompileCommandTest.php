@@ -54,7 +54,7 @@ class AssetMapperCompileCommandTest extends TestCase
 
         $command = $application->find('asset-map:compile');
         $tester = new CommandTester($command);
-        $exitCode = $tester->execute([]);
+        $exitCode = $tester->execute(['--force' => true]);
         $this->assertSame(0, $exitCode);
         // match Compiling \d+ assets
         $this->assertMatchesRegularExpression('/Compiled \d+ assets/', $tester->getDisplay());
@@ -106,6 +106,12 @@ class AssetMapperCompileCommandTest extends TestCase
             '/assets/subdir/file5.js',
             '/assets/file4.js',
         ], $entrypointData);
+
+        $tester = new CommandTester($command);
+        $exitCode = $tester->execute(['--force' => false]);
+        $this->assertSame(0, $exitCode);
+
+        $this->assertStringStartsWith('[WARNING] Running in debug mode: removed compiled assets', ltrim($tester->getDisplay()));
     }
 
     public function testEventIsDispatched()
@@ -124,7 +130,7 @@ class AssetMapperCompileCommandTest extends TestCase
 
         $command = $application->find('asset-map:compile');
         $tester = new CommandTester($command);
-        $tester->execute([]);
+        $tester->execute(['--force' => true]);
         $this->assertTrue($listenerCalled);
     }
 }

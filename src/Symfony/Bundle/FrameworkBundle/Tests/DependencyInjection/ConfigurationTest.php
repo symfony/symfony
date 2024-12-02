@@ -15,6 +15,7 @@ use Doctrine\DBAL\Connection;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Configuration;
 use Symfony\Bundle\FullStack;
+use Symfony\Component\AccessToken\CredentialsInterface;
 use Symfony\Component\Cache\Adapter\DoctrineAdapter;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Config\Definition\Processor;
@@ -89,6 +90,29 @@ class ConfigurationTest extends TestCase
             ['a=b'],
             ['a+b'],
         ];
+    }
+
+    public function testAccessTokenLockCanBeDisabled()
+    {
+        $processor = new Processor();
+        $configuration = new Configuration(true);
+        $config = $processor->processConfiguration($configuration, [[
+            'http_method_override' => false,
+            'handle_all_throwables' => true,
+            'php_errors' => ['log' => true],
+            'access_token' => null,
+        ]]);
+
+        $defaultConfig = [
+            'enabled' => true,
+            'lock' => [
+                'enabled' => true,
+                'ttl' => 5,
+            ],
+            'credentials' => [],
+        ];
+
+        $this->assertEquals($defaultConfig, $config['access_token']);
     }
 
     public function testAssetsCanBeEnabled()
@@ -822,6 +846,14 @@ class ConfigurationTest extends TestCase
             'request' => [
                 'enabled' => false,
                 'formats' => [],
+            ],
+            'access_token' => [
+                'enabled' => !class_exists(FullStack::class) && interface_exists(CredentialsInterface::class),
+                'lock' => [
+                    'enabled' => true,
+                    'ttl' => 5,
+                ],
+                'credentials' => [],
             ],
             'assets' => [
                 'enabled' => !class_exists(FullStack::class),

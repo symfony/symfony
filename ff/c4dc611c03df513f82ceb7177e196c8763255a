@@ -1,0 +1,12 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2024-12-02T11:49:56Z
+
+The fix looks good to me. But can we also add a test to prevent regressions?
+
+---------------------------------------------------------------------------
+
+by KurtThiemann at 2024-12-02T12:37:25Z
+
+I added a `X-Request-Vars` response header to the TestHttpServer, since I can't get that info from the response body when using a HEAD request.  This works locally, but seems to fail in GitHub actions.
+Any ideas?

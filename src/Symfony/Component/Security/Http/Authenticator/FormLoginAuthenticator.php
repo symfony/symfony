@@ -151,6 +151,10 @@ class FormLoginAuthenticator extends AbstractLoginFormAuthenticator
 
         $credentials['username'] = trim($credentials['username']);
 
+        if ('' === $credentials['username']) {
+            throw new BadCredentialsException(\sprintf('The key "%s" must be a non-empty string.', $this->options['username_parameter']));
+        }
+
         if (\strlen($credentials['username']) > Security::MAX_USERNAME_LENGTH) {
             throw new BadCredentialsException('Invalid username.');
         }
@@ -159,6 +163,10 @@ class FormLoginAuthenticator extends AbstractLoginFormAuthenticator
 
         if (!\is_string($credentials['password']) && (!\is_object($credentials['password']) || !method_exists($credentials['password'], '__toString'))) {
             throw new BadRequestHttpException(sprintf('The key "%s" must be a string, "%s" given.', $this->options['password_parameter'], \gettype($credentials['password'])));
+        }
+
+        if ('' === $credentials['password']) {
+            throw new BadCredentialsException(\sprintf('The key "%s" must be a non-empty string.', $this->options['password_parameter']));
         }
 
         if (!\is_string($credentials['csrf_token'] ?? '') && (!\is_object($credentials['csrf_token']) || !method_exists($credentials['csrf_token'], '__toString'))) {

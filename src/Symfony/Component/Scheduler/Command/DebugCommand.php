@@ -94,7 +94,7 @@ final class DebugCommand extends Command
                 continue;
             }
             $io->table(
-                ['Trigger', 'Provider', 'Next Run'],
+                ['ID', 'Trigger', 'Provider', 'Next Run'],
                 array_filter(array_map(self::renderRecurringMessage(...), $messages, array_fill(0, \count($messages), $date), array_fill(0, \count($messages), $input->getOption('all')))),
             );
         }
@@ -117,6 +117,6 @@ final class DebugCommand extends Command
         $provider = $recurringMessage->getProvider();
         $description = $provider instanceof \Stringable ? (string) $provider : $provider->getId();
 
-        return [(string) $trigger, $description, $next];
+        return [$recurringMessage->getId(), (string) $trigger, $description, $next];
     }
 }

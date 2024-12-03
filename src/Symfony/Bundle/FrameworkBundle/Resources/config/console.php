@@ -53,6 +53,7 @@ use Symfony\Component\Messenger\Command\SetupTransportsCommand;
 use Symfony\Component\Messenger\Command\StatsCommand;
 use Symfony\Component\Messenger\Command\StopWorkersCommand;
 use Symfony\Component\Scheduler\Command\DebugCommand as SchedulerDebugCommand;
+use Symfony\Component\Scheduler\Command\RunTaskCommand;
 use Symfony\Component\Serializer\Command\DebugCommand as SerializerDebugCommand;
 use Symfony\Component\Translation\Command\TranslationLintCommand;
 use Symfony\Component\Translation\Command\TranslationPullCommand;
@@ -230,6 +231,16 @@ return static function (ContainerConfigurator $container) {
         ->set('console.command.scheduler_debug', SchedulerDebugCommand::class)
             ->args([
                 tagged_locator('scheduler.schedule_provider', 'name'),
+            ])
+            ->tag('console.command')
+
+        ->set('console.command.scheduler_run_task', RunTaskCommand::class)
+            ->args([
+                tagged_locator('scheduler.schedule_provider', 'name'),
+                service('messenger.bus.default'),
+                service('messenger.receiver_locator'),
+                service('event_dispatcher'),
+                service('logger')->nullOnInvalid(),
             ])
             ->tag('console.command')
 

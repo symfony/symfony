@@ -22,11 +22,10 @@ use Symfony\Component\Scheduler\Trigger\TriggerInterface;
 
 final class RecurringMessage implements MessageProviderInterface
 {
-    private string $id;
-
     private function __construct(
         private readonly TriggerInterface $trigger,
         private readonly MessageProviderInterface $provider,
+        private ?string $id = null,
     ) {
     }
 
@@ -45,34 +44,34 @@ final class RecurringMessage implements MessageProviderInterface
      * @see https://en.wikipedia.org/wiki/ISO_8601#Durations
      * @see https://php.net/datetime.formats#datetime.formats.relative
      */
-    public static function every(string|int|\DateInterval $frequency, object $message, string|\DateTimeImmutable|null $from = null, string|\DateTimeImmutable $until = new \DateTimeImmutable('3000-01-01')): self
+    public static function every(string|int|\DateInterval $frequency, object $message, string|\DateTimeImmutable|null $from = null, string|\DateTimeImmutable $until = new \DateTimeImmutable('3000-01-01'), ?string $id = null): self
     {
-        return self::trigger(new PeriodicalTrigger($frequency, $from, $until), $message);
+        return self::trigger(new PeriodicalTrigger($frequency, $from, $until), $message, $id);
     }
 
     /**
      * @param MessageProviderInterface|object $message A message provider that yields messages or a static message that will be dispatched on every trigger
      */
-    public static function cron(string $expression, object $message, \DateTimeZone|string|null $timezone = null): self
+    public static function cron(string $expression, object $message, \DateTimeZone|string|null $timezone = null, ?string $id = null): self
     {
         if (!str_contains($expression, '#')) {
-            return self::trigger(CronExpressionTrigger::fromSpec($expression, null, $timezone), $message);
+            return self::trigger(CronExpressionTrigger::fromSpec($expression, null, $timezone), $message, $id);
         }
 
         if (!$message instanceof \Stringable) {
             throw new InvalidArgumentException('A message must be stringable to use "hashed" cron expressions.');
         }
 
-        return self::trigger(CronExpressionTrigger::fromSpec($expression, (string) $message, $timezone), $message);
+        return self::trigger(CronExpressionTrigger::fromSpec($expression, (string) $message, $timezone), $message, $id);
     }
 
     /**
      * @param MessageProviderInterface|object $message A message provider that yields messages or a static message that will be dispatched on every trigger
      */
-    public static function trigger(TriggerInterface $trigger, object $message): self
+    public static function trigger(TriggerInterface $trigger, object $message, ?string $id = null): self
     {
         if ($message instanceof MessageProviderInterface) {
-            return new self($trigger, $message);
+            return new self($trigger, $message, $id);
         }
 
         $description = $message::class;
@@ -83,12 +82,12 @@ final class RecurringMessage implements MessageProviderInterface
             }
         }
 
-        return new self($trigger, new StaticMessageProvider([$message], strtr(substr(base64_encode(hash('xxh128', serialize($message), true)), 0, 7), '/+', '._'), $description));
+        return new self($trigger, new StaticMessageProvider([$message], strtr(substr(base64_encode(hash('xxh128', serialize($message), true)), 0, 7), '/+', '._'), $description), $id);
     }
 
     public function withJitter(int $maxSeconds = 60): self
     {
-        return new self(new JitterTrigger($this->trigger, $maxSeconds), $this->provider);
+        return new self(new JitterTrigger($this->trigger, $maxSeconds), $this->provider, $this->id);
     }
 
     /**

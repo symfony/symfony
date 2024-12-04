@@ -1372,6 +1372,12 @@ class FrameworkExtension extends Extension
             ->replaceArgument(3, $config['importmap_polyfill'])
             ->replaceArgument(4, $config['importmap_script_attributes'])
         ;
+
+        if ($container->getParameter('kernel.debug')) {
+            $container->removeDefinition('asset_mapper.compile.cache_warmer');
+
+            $loader->load('asset_mapper_debug.php');
+        }
     }
 
     /**

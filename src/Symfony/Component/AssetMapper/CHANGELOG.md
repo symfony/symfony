@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+7.3
+---
+
+ * Add `AssetMapperCacheWarmer` and `DebugAssetMapperCacheWarmer`
+
 7.2
 ---
 

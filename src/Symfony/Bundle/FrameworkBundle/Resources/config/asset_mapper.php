@@ -16,6 +16,7 @@ use Symfony\Component\AssetMapper\AssetMapperCompiler;
 use Symfony\Component\AssetMapper\AssetMapperDevServerSubscriber;
 use Symfony\Component\AssetMapper\AssetMapperInterface;
 use Symfony\Component\AssetMapper\AssetMapperRepository;
+use Symfony\Component\AssetMapper\CacheWarmer\AssetMapperCacheWarmer;
 use Symfony\Component\AssetMapper\Command\AssetMapperCompileCommand;
 use Symfony\Component\AssetMapper\Command\DebugAssetMapperCommand;
 use Symfony\Component\AssetMapper\Command\ImportMapAuditCommand;
@@ -253,6 +254,18 @@ return static function (ContainerConfigurator $container) {
 
         ->set('asset_mapper.importmap.command.outdated', ImportMapOutdatedCommand::class)
             ->args([service('asset_mapper.importmap.update_checker')])
-            ->tag('console.command')
-    ;
+            ->tag('console.command');
+
+    if (class_exists(AssetMapperCacheWarmer::class)) {
+        $container->services()
+            ->set('asset_mapper.compile.cache_warmer', AssetMapperCacheWarmer::class)
+            ->args([
+                service('asset_mapper.compiled_asset_mapper_config_reader'),
+                service('asset_mapper'),
+                service('asset_mapper.importmap.generator'),
+                service('asset_mapper.local_public_assets_filesystem'),
+                service('event_dispatcher')->nullOnInvalid(),
+            ])
+            ->tag('kernel.cache_warmer');
+    }
 };

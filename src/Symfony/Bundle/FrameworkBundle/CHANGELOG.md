@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+7.3
+---
+
+ * Add cache warmer for AssetMapper compilation
+
 7.2
 ---
 

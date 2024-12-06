@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2024-11-28T16:36:49Z
+
+While working on other casters, this is [the solution](https://github.com/alexandre-daubois/symfony/commit/2030b160c52c1ae6c1a8f29708dbd7326f4a9e1c) I came up with `Socket`. Feel free to use any idea (or none 😄) in your PR!
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-11-28T16:46:43Z
+
+I can close here :)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-11-28T16:48:21Z
+
+or we can merge and improve in a follow up
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2024-11-28T17:01:07Z
+
+Let's get this one merged and iterate over it 👍

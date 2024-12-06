@@ -12,6 +12,7 @@ services:
                     protocol_version: 3
                     referrals: false
 security:
+    erase_credentials: false
     providers:
         ldap:
             ldap:

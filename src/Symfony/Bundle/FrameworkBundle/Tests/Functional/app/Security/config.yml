@@ -8,6 +8,7 @@ services:
             - container.service_subscriber
 
 security:
+    erase_credentials: false
     providers:
         main:
             memory:

@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+7.3
+---
+
+ * Deprecate `LdapUser::eraseCredentials()`, use `LdapUser::setPassword(null)` instead
+ * Add `EraseLdapUserCredentialsListener`
+
 7.2
 ---
 

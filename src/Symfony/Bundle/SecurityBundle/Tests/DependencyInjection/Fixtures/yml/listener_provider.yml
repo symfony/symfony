@@ -1,4 +1,5 @@
 security:
+    erase_credentials: false
     providers:
         default:
             memory:

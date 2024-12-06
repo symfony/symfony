@@ -59,6 +59,9 @@ class AuthenticatorManager implements AuthenticatorManagerInterface, UserAuthent
         private bool $hideUserNotFoundExceptions = true,
         private array $requiredBadges = [],
     ) {
+        if ($eraseCredentials) {
+            trigger_deprecation('symfony/security-http', '7.3', sprintf('Passing true as "$eraseCredentials" argument to "%s::__construct()" is deprecated and won\'t have any effect in 8.0, pass "false" instead and use your own erasing logic if needed.', __CLASS__));
+        }
     }
 
     /**
@@ -198,6 +201,7 @@ class AuthenticatorManager implements AuthenticatorManagerInterface, UserAuthent
             // announce the authentication token
             $authenticatedToken = $this->eventDispatcher->dispatch(new AuthenticationTokenCreatedEvent($authenticatedToken, $passport))->getAuthenticatedToken();
 
+            // @deprecated since Symfony 7.3, remove the if statement in 8.0
             if (true === $this->eraseCredentials) {
                 $authenticatedToken->eraseCredentials();
             }

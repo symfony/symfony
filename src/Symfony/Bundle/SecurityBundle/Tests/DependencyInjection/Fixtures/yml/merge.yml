@@ -2,6 +2,7 @@ imports:
     - { resource: merge_import.yml }
 
 security:
+    erase_credentials: false
     providers:
         default: { id: foo }
 

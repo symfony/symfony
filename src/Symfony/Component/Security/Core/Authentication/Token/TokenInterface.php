@@ -56,6 +56,9 @@ interface TokenInterface extends \Stringable
 
     /**
      * Removes sensitive information from the token.
+     *
+     * @deprecated since Symfony 7.3, use a dedicated DTO instead or implement your
+     *             own erasing logic instead
      */
     public function eraseCredentials(): void;
 

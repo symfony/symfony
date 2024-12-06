@@ -3,6 +3,7 @@
 $this->load('merge_import.php');
 
 $container->loadFromExtension('security', [
+    'erase_credentials' => false,
     'providers' => [
         'default' => ['id' => 'foo'],
     ],

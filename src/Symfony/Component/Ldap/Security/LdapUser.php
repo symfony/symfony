@@ -62,6 +62,8 @@ class LdapUser implements UserInterface, PasswordAuthenticatedUserInterface, Equ
 
     public function eraseCredentials(): void
     {
+        trigger_deprecation('symfony/security-core', '7.3', sprintf('The "%s()" method is deprecated and will be removed in 8.0, call "setPassword(null)" instead.', __METHOD__));
+
         $this->password = null;
     }
 
@@ -70,7 +72,7 @@ class LdapUser implements UserInterface, PasswordAuthenticatedUserInterface, Equ
         return $this->extraFields;
     }
 
-    public function setPassword(#[\SensitiveParameter] string $password): void
+    public function setPassword(#[\SensitiveParameter] ?string $password): void
     {
         $this->password = $password;
     }
@@ -94,5 +96,15 @@ class LdapUser implements UserInterface, PasswordAuthenticatedUserInterface, Equ
         }
 
         return true;
+    }
+
+    public function __serialize(): array
+    {
+        return [$this->entry, $this->identifier, null, $this->roles, $this->extraFields];
+    }
+
+    public function __unserialize(array $data): void
+    {
+        [$this->entry, $this->identifier, $this->password, $this->roles, $this->extraFields] = $data;
     }
 }

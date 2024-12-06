@@ -4,6 +4,7 @@ services:
         arguments: ['@kernel']
 
 security:
+    erase_credentials: false
     firewalls:
         default:
             remember_me:

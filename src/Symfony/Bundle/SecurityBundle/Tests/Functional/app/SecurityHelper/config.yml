@@ -25,6 +25,7 @@ services:
     Symfony\Bundle\SecurityBundle\Tests\Functional\Bundle\AuthenticatorBundle\ApiAuthenticator: ~
 
 security:
+    erase_credentials: false
     providers:
         main:
             memory:

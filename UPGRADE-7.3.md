@@ -6,7 +6,23 @@ backward compatibility breaks. Minor backward compatibility breaks are prefixed 
 `[BC BREAK]`, make sure your code is compatible with these entries before upgrading.
 Read more about this in the [Symfony documentation](https://symfony.com/doc/7.3/setup/upgrade_minor.html).
 
-If you're upgrading from a version below 7.1, follow the [7.2 upgrade guide](UPGRADE-7.2.md) first.
+If you're upgrading from a version below 7.2, follow the [7.2 upgrade guide](UPGRADE-7.2.md) first.
+
+Ldap
+----
+
+ * Deprecate `LdapUser::eraseCredentials()`, use `LdapUser::setPassword(null)` instead
+
+Security
+--------
+
+ * Deprecate `UserInterface::eraseCredentials()` and `TokenInterface::eraseCredentials()`,
+   use a dedicated DTO or erase credentials on your own e.g. upon `AuthenticationTokenCreatedEvent` instead
+
+SecurityBundle
+--------------
+
+ * Deprecate the `erase_credentials` config option, erase credentials on your own e.g. upon `AuthenticationTokenCreatedEvent` instead
 
 Console
 -------
@@ -109,3 +125,4 @@ VarDumper
 
  * Deprecate `ResourceCaster::castCurl()`, `ResourceCaster::castGd()` and `ResourceCaster::castOpensslX509()`
  * Mark all casters as `@internal`
+ * Deprecate the `CompiledClassMetadataFactory` and `CompiledClassMetadataCacheWarmer` classes

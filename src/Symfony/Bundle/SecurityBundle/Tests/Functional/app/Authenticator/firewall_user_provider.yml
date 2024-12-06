@@ -3,6 +3,7 @@ imports:
 - { resource: ./security.yml }
 
 security:
+    erase_credentials: false
     firewalls:
         api:
             pattern: /

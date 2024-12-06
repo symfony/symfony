@@ -6,6 +6,7 @@ services:
         - true
 
 security:
+    erase_credentials: false
     firewalls:
         api:
             pattern: /

@@ -1,6 +1,7 @@
 <?php
 
 $container->loadFromExtension('security', [
+    'erase_credentials' => false,
     'providers' => [
         'default' => [
             'memory' => $memory = [

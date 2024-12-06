@@ -16,6 +16,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\Ldap\Security\CheckLdapCredentialsListener;
+use Symfony\Component\Ldap\Security\EraseLdapUserCredentialsListener;
 use Symfony\Component\Ldap\Security\LdapAuthenticator;
 
 /**
@@ -41,6 +42,12 @@ trait LdapFactoryTrait
             ->addTag('kernel.event_subscriber', ['dispatcher' => 'security.event_dispatcher.'.$firewallName])
             ->addArgument(new Reference('security.ldap_locator'))
         ;
+
+        if (class_exists(EraseLdapUserCredentialsListener::class && !$container->getParameter('security.authentication.manager.erase_credentials'))) {
+            $container->setDefinition('security.listener.'.$key.'.'.$firewallName.'erase_ldap_credentials', new Definition(EraseLdapUserCredentialsListener::class))
+                ->addTag('kernel.event_subscriber', ['dispatcher' => 'security.event_dispatcher.'.$firewallName])
+            ;
+        }
 
         $ldapAuthenticatorId = 'security.authenticator.'.$key.'.'.$firewallName;
         $definition = $container->setDefinition($ldapAuthenticatorId, new Definition(LdapAuthenticator::class))

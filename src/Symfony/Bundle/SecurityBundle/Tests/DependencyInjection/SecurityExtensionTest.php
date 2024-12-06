@@ -46,6 +46,7 @@ class SecurityExtensionTest extends TestCase
         $container = $this->getRawContainer();
 
         $container->loadFromExtension('security', [
+            'erase_credentials' => false,
             'providers' => [
                 'default' => ['id' => 'foo'],
             ],
@@ -74,6 +75,7 @@ class SecurityExtensionTest extends TestCase
         $extension->addUserProviderFactory(new DummyProvider());
 
         $container->loadFromExtension('security', [
+            'erase_credentials' => false,
             'providers' => [
                 'my_foo' => ['foo' => []],
             ],
@@ -97,6 +99,7 @@ class SecurityExtensionTest extends TestCase
         $container = $this->getRawContainer();
 
         $container->loadFromExtension('security', [
+            'erase_credentials' => false,
             'providers' => [
                 'default' => ['id' => 'foo'],
             ],
@@ -121,6 +124,7 @@ class SecurityExtensionTest extends TestCase
         $container = $this->getRawContainer();
 
         $container->loadFromExtension('security', [
+            'erase_credentials' => false,
             'providers' => [
                 'default' => ['id' => 'foo'],
             ],
@@ -143,6 +147,7 @@ class SecurityExtensionTest extends TestCase
     {
         $container = $this->getRawContainer();
         $container->loadFromExtension('security', [
+            'erase_credentials' => false,
             'providers' => [
                 'first' => ['id' => 'foo'],
                 'second' => ['id' => 'bar'],
@@ -163,6 +168,7 @@ class SecurityExtensionTest extends TestCase
     {
         $container = $this->getRawContainer();
         $container->loadFromExtension('security', [
+            'erase_credentials' => false,
             'providers' => [
                 'first' => ['id' => 'foo'],
                 'second' => ['id' => 'bar'],
@@ -186,6 +192,7 @@ class SecurityExtensionTest extends TestCase
     {
         $container = $this->getRawContainer();
         $container->loadFromExtension('security', [
+            'erase_credentials' => false,
             'providers' => [
                 'first' => ['id' => 'foo'],
                 'second' => ['id' => 'bar'],
@@ -210,6 +217,7 @@ class SecurityExtensionTest extends TestCase
         $rawExpression = "'foo' == 'bar' or 1 in [1, 3, 3]";
 
         $container->loadFromExtension('security', [
+            'erase_credentials' => false,
             'providers' => [
                 'default' => ['id' => 'foo'],
             ],
@@ -253,6 +261,7 @@ class SecurityExtensionTest extends TestCase
         $container->set($requestMatcherId, $requestMatcher);
 
         $container->loadFromExtension('security', [
+            'erase_credentials' => false,
             'providers' => [
                 'default' => ['id' => 'foo'],
             ],
@@ -287,6 +296,7 @@ class SecurityExtensionTest extends TestCase
         $container->set($requestMatcherId, $requestMatcher);
 
         $container->loadFromExtension('security', [
+            'erase_credentials' => false,
             'providers' => [
                 'default' => ['id' => 'foo'],
             ],
@@ -322,6 +332,7 @@ class SecurityExtensionTest extends TestCase
     {
         $container = $this->getRawContainer();
         $container->loadFromExtension('security', [
+            'erase_credentials' => false,
             'providers' => [
                 'default' => ['id' => 'foo'],
             ],
@@ -357,6 +368,7 @@ class SecurityExtensionTest extends TestCase
     {
         $container = $this->getRawContainer();
         $container->loadFromExtension('security', [
+            'erase_credentials' => false,
             'providers' => [
                 'default' => ['id' => 'foo'],
             ],
@@ -392,6 +404,7 @@ class SecurityExtensionTest extends TestCase
     {
         $container = $this->getRawContainer();
         $container->loadFromExtension('security', [
+            'erase_credentials' => false,
             'providers' => [
                 'default' => ['id' => 'foo'],
             ],
@@ -416,6 +429,7 @@ class SecurityExtensionTest extends TestCase
     {
         $container = $this->getRawContainer();
         $container->loadFromExtension('security', [
+            'erase_credentials' => false,
             'providers' => [
                 'default' => ['id' => 'foo'],
             ],
@@ -436,6 +450,7 @@ class SecurityExtensionTest extends TestCase
         $container = $this->getRawContainer();
 
         $container->loadFromExtension('security', [
+            'erase_credentials' => false,
             'providers' => [
                 'default' => ['id' => 'foo'],
             ],
@@ -458,6 +473,7 @@ class SecurityExtensionTest extends TestCase
         $container = $this->getRawContainer();
 
         $container->loadFromExtension('security', [
+            'erase_credentials' => false,
             'providers' => [
                 'first' => ['id' => 'foo'],
                 'second' => ['id' => 'bar'],
@@ -484,6 +500,7 @@ class SecurityExtensionTest extends TestCase
         $container = $this->getRawContainer();
 
         $container->loadFromExtension('security', [
+            'erase_credentials' => false,
             'providers' => [
                 'default' => ['id' => 'foo'],
             ],
@@ -509,6 +526,7 @@ class SecurityExtensionTest extends TestCase
 
         $container->register('custom_remember_me', \stdClass::class);
         $container->loadFromExtension('security', [
+            'erase_credentials' => false,
             'firewalls' => [
                 'default' => [
                     'remember_me' => ['service' => 'custom_remember_me'],
@@ -529,6 +547,7 @@ class SecurityExtensionTest extends TestCase
 
         $container->register('custom_remember_me', \stdClass::class);
         $container->loadFromExtension('security', [
+            'erase_credentials' => false,
             'firewalls' => [
                 'default' => [
                     'remember_me' => ['secret' => 'very'],
@@ -577,6 +596,7 @@ class SecurityExtensionTest extends TestCase
     {
         $container = $this->getRawContainer();
         $container->loadFromExtension('security', [
+            'erase_credentials' => false,
             'providers' => [
                 'first' => ['id' => 'foo'],
                 'second' => ['id' => 'bar'],
@@ -601,6 +621,7 @@ class SecurityExtensionTest extends TestCase
         $container = $this->getRawContainer();
 
         $container->loadFromExtension('security', [
+            'erase_credentials' => false,
             'providers' => [
                 'default' => ['id' => 'foo'],
             ],
@@ -626,6 +647,7 @@ class SecurityExtensionTest extends TestCase
         $container = $this->getRawContainer();
 
         $container->loadFromExtension('security', [
+            'erase_credentials' => false,
             'providers' => [
                 'default' => ['id' => 'foo'],
             ],
@@ -670,6 +692,7 @@ class SecurityExtensionTest extends TestCase
     {
         $container = $this->getRawContainer();
         $container->loadFromExtension('security', [
+            'erase_credentials' => false,
             'providers' => [
                 'first' => ['id' => 'users'],
             ],
@@ -702,6 +725,7 @@ class SecurityExtensionTest extends TestCase
         $container = $this->getRawContainer();
         $container->register(TestAuthenticator::class);
         $container->loadFromExtension('security', [
+            'erase_credentials' => false,
             'providers' => [
                 'first' => ['id' => 'users'],
             ],
@@ -735,6 +759,7 @@ class SecurityExtensionTest extends TestCase
 
         $firewallId = 'stateless_firewall';
         $container->loadFromExtension('security', [
+            'erase_credentials' => false,
             'firewalls' => [
                 $firewallId => [
                     'pattern' => '/.*',
@@ -755,6 +780,7 @@ class SecurityExtensionTest extends TestCase
 
         $firewallId = 'statefull_firewall';
         $container->loadFromExtension('security', [
+            'erase_credentials' => false,
             'firewalls' => [
                 $firewallId => [
                     'pattern' => '/.*',
@@ -778,6 +804,7 @@ class SecurityExtensionTest extends TestCase
         $container->register(TestUserChecker::class);
 
         $container->loadFromExtension('security', [
+            'erase_credentials' => false,
             'firewalls' => [
                 'main' => array_merge([
                     'pattern' => '/.*',
@@ -807,6 +834,7 @@ class SecurityExtensionTest extends TestCase
         $extension->addAuthenticatorFactory(new TestFirewallListenerFactory());
 
         $container->loadFromExtension('security', [
+            'erase_credentials' => false,
             'firewalls' => [
                 'main' => [
                     'custom_listener' => true,
@@ -828,6 +856,7 @@ class SecurityExtensionTest extends TestCase
 
         $firewallId = 'logout_firewall';
         $container->loadFromExtension('security', [
+            'erase_credentials' => false,
             'firewalls' => [
                 $firewallId => [
                     'logout' => [
@@ -850,6 +879,7 @@ class SecurityExtensionTest extends TestCase
 
         $firewallId = 'logout_firewall';
         $container->loadFromExtension('security', [
+            'erase_credentials' => false,
             'firewalls' => [
                 $firewallId => [
                     'logout' => [
@@ -881,6 +911,7 @@ class SecurityExtensionTest extends TestCase
         $container = $this->getRawContainer();
 
         $container->loadFromExtension('security', [
+            'erase_credentials' => false,
             'password_hashers' => [
                 'legacy' => 'md5',
                 'App\User' => [
@@ -914,6 +945,7 @@ class SecurityExtensionTest extends TestCase
 
         $container->register(TestAuthenticator::class);
         $container->loadFromExtension('security', [
+            'erase_credentials' => false,
             'firewalls' => ['main' => ['custom_authenticator' => TestAuthenticator::class]],
         ]);
         $container->compile();

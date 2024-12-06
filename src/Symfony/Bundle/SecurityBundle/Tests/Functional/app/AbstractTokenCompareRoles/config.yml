@@ -8,6 +8,7 @@ services:
     class: Symfony\Bundle\SecurityBundle\Tests\Functional\Bundle\SecuredPageBundle\Security\Core\User\ArrayUserProvider
 
 security:
+  erase_credentials: false
   password_hashers:
     \Symfony\Component\Security\Core\User\UserInterface: plaintext
 

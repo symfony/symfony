@@ -1,6 +1,7 @@
 <?php
 
 $container->loadFromExtension('security', [
+    'erase_credentials' => false,
     'firewalls' => [
         'main' => [
             'form_login' => [

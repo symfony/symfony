@@ -10,6 +10,7 @@ services:
         public: true
 
 security:
+    erase_credentials: false
     providers:
         main:
             memory:

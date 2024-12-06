@@ -34,6 +34,7 @@ class MakeFirewallsEventDispatcherTraceablePassTest extends TestCase
 
         $this->container->registerExtension(new SecurityExtension());
         $this->container->loadFromExtension('security', [
+            'erase_credentials' => false,
             'firewalls' => ['main' => ['pattern' => '/', 'http_basic' => true]],
         ]);
 

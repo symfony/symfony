@@ -7,6 +7,7 @@ framework:
     rate_limiter: ~
 
 security:
+    erase_credentials: false
     firewalls:
         default:
             login_throttling:

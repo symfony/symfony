@@ -23,6 +23,7 @@ services:
     logger: { class: Psr\Log\NullLogger }
 
 security:
+    erase_credentials: false
     firewalls:
         secure:
             pattern: ^/secure/

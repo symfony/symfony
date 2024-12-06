@@ -2,6 +2,7 @@ imports:
     - { resource: ./base_config.yml }
 
 security:
+    erase_credentials: false
     firewalls:
         default:
             form_login:

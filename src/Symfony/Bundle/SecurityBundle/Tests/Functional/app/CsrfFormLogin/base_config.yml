@@ -15,6 +15,7 @@ services:
             - { name: container.service_subscriber }
 
 security:
+    erase_credentials: false
     password_hashers:
         Symfony\Component\Security\Core\User\InMemoryUser: plaintext
 

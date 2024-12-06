@@ -15,6 +15,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\AbstractLogger;
 use Psr\Log\LoggerInterface;
+use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -38,6 +39,8 @@ use Symfony\Component\Security\Http\Tests\Fixtures\DummySupportsAuthenticator;
 
 class AuthenticatorManagerTest extends TestCase
 {
+    use ExpectDeprecationTrait;
+
     private MockObject&TokenStorageInterface $tokenStorage;
     private EventDispatcher $eventDispatcher;
     private Request $request;
@@ -161,7 +164,7 @@ class AuthenticatorManagerTest extends TestCase
 
         $authenticator->expects($this->once())->method('onAuthenticationFailure')->with($this->anything(), $this->callback(fn ($exception) => 'Authentication failed; Some badges marked as required by the firewall config are not available on the passport: "'.CsrfTokenBadge::class.'".' === $exception->getMessage()));
 
-        $manager = $this->createManager([$authenticator], 'main', true, [CsrfTokenBadge::class]);
+        $manager = $this->createManager([$authenticator], 'main', false, [CsrfTokenBadge::class]);
         $manager->authenticateRequest($this->request);
     }
 
@@ -177,11 +180,12 @@ class AuthenticatorManagerTest extends TestCase
 
         $authenticator->expects($this->once())->method('onAuthenticationSuccess');
 
-        $manager = $this->createManager([$authenticator], 'main', true, [CsrfTokenBadge::class]);
+        $manager = $this->createManager([$authenticator], 'main', false, [CsrfTokenBadge::class]);
         $manager->authenticateRequest($this->request);
     }
 
     /**
+     * @group legacy
      * @dataProvider provideEraseCredentialsData
      */
     public function testEraseCredentials($eraseCredentials)
@@ -194,6 +198,10 @@ class AuthenticatorManagerTest extends TestCase
         $authenticator->expects($this->any())->method('createToken')->willReturn($this->token);
 
         $this->token->expects($eraseCredentials ? $this->once() : $this->never())->method('eraseCredentials');
+
+        if ($eraseCredentials) {
+            $this->expectDeprecation('Since symfony/security-http 7.3: Passing true as "$eraseCredentials" argument to "Symfony\Component\Security\Http\Authentication\AuthenticatorManager::__construct()" is deprecated and won\'t have any effect in 8.0, pass "false" instead and use your own erasing logic if needed.');
+        }
 
         $manager = $this->createManager([$authenticator], 'main', $eraseCredentials);
         $manager->authenticateRequest($this->request);
@@ -365,7 +373,7 @@ class AuthenticatorManagerTest extends TestCase
             }
         };
 
-        $manager = $this->createManager([$authenticator], 'main', true, [], $logger);
+        $manager = $this->createManager([$authenticator], 'main', false, [], $logger);
         $response = $manager->authenticateRequest($this->request);
         $this->assertSame($this->response, $response);
         $this->assertStringContainsString($authenticator::class, $logger->logContexts[0]['authenticator']);
@@ -384,7 +392,7 @@ class AuthenticatorManagerTest extends TestCase
         return new DummySupportsAuthenticator($supports);
     }
 
-    private function createManager($authenticators, $firewallName = 'main', $eraseCredentials = true, array $requiredBadges = [], ?LoggerInterface $logger = null)
+    private function createManager($authenticators, $firewallName = 'main', $eraseCredentials = false, array $requiredBadges = [], ?LoggerInterface $logger = null)
     {
         return new AuthenticatorManager($authenticators, $this->tokenStorage, $this->eventDispatcher, $firewallName, $logger, $eraseCredentials, true, $requiredBadges);
     }

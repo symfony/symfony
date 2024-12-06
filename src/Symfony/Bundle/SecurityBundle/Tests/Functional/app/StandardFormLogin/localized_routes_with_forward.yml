@@ -2,6 +2,7 @@ imports:
     - { resource: ./localized_routes.yml }
 
 security:
+    erase_credentials: false
     firewalls:
         default:
             form_login:

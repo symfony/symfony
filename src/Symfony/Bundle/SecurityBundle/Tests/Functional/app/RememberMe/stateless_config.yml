@@ -9,6 +9,7 @@ framework:
         cookie_samesite: lax
 
 security:
+    erase_credentials: false
     firewalls:
         default:
             stateless: true

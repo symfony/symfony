@@ -43,6 +43,11 @@ class NullToken implements TokenInterface
         return '';
     }
 
+    /**
+     * Removes sensitive information from the token.
+     *
+     * @deprecated since Symfony 7.3
+     */
     public function eraseCredentials(): void
     {
     }

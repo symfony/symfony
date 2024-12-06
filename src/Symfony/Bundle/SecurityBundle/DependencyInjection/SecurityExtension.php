@@ -135,6 +135,9 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
 
         // set some global scalars
         $container->setParameter('security.access.denied_url', $config['access_denied_url']);
+        if (true === $config['erase_credentials']) {
+            trigger_deprecation('symfony/security-bundle', '7.3', 'Setting the "security.erase_credentials" config option to true is deprecated and won\'t have any effect in 8.0, set it to false instead and use your own erasing logic if needed.');
+        }
         $container->setParameter('security.authentication.manager.erase_credentials', $config['erase_credentials']);
         $container->setParameter('security.authentication.session_strategy.strategy', $config['session_fixation_strategy']);
 

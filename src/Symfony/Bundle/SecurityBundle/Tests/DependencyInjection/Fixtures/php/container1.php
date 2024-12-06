@@ -1,6 +1,7 @@
 <?php
 
 $container->loadFromExtension('security', [
+    'erase_credentials' => false,
     'password_hashers' => [
         'JMS\FooBundle\Entity\User1' => 'plaintext',
         'JMS\FooBundle\Entity\User2' => [

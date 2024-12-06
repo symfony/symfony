@@ -1,6 +1,7 @@
 <?php
 
 $container->loadFromExtension('security', [
+    'erase_credentials' => false,
     'access_decision_manager' => [
         'strategy_service' => 'app.custom_access_decision_strategy',
     ],

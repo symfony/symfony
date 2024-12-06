@@ -53,6 +53,9 @@ class InMemoryUserTest extends TestCase
         $this->assertFalse($user->isEnabled());
     }
 
+    /**
+     * @group legacy
+     */
     public function testEraseCredentials()
     {
         $user = new InMemoryUser('fabien', 'superpass');

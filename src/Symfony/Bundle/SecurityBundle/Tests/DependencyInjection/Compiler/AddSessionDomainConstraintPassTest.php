@@ -139,6 +139,7 @@ class AddSessionDomainConstraintPassTest extends TestCase
 
         $config = [
             'security' => [
+                'erase_credentials' => false,
                 'providers' => ['some_provider' => ['id' => 'foo']],
                 'firewalls' => ['some_firewall' => ['security' => false]],
             ],

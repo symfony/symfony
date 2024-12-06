@@ -1,0 +1,33 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2024-11-09T07:10:02Z
+
+@welcoMattic In addition to adding new tests, can you have a look at the existing ones that are broken now.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2024-11-18T13:45:25Z
+
+@welcoMattic Last chance to include this PR in 7.2.
+
+---------------------------------------------------------------------------
+
+by welcoMattic at 2024-11-23T04:59:52Z
+
+I couldn't make it for 7.2, sorry. Let's remove it from FF.
+
+(I'm on my honeymoon trip until 28th nov.)
+
+---------------------------------------------------------------------------
+
+by fabpot at 2024-11-23T09:16:19Z
+
+> (I'm on my honeymoon trip until 28th nov.)
+
+Enjoy!
+
+---------------------------------------------------------------------------
+
+by welcoMattic at 2024-12-05T10:27:15Z
+
+I've added tests and fix existing ones. Failure is related to something on HttpClient itself, not related to this PR.

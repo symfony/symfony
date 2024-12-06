@@ -1,0 +1,29 @@
+---------------------------------------------------------------------------
+
+by dunglas at 2024-11-27T19:50:02Z
+
+The Psalm errors are false positives (the constants are defined if the extensions are installed). Should I ignore them explicitly or let the baseline generator do is job?
+
+---------------------------------------------------------------------------
+
+by smnandre at 2024-11-27T20:56:54Z
+
+Thinking out loud here... I'm wondering if this could/should be in a dedicated package ?
+
+Except the "compress on write", the Compressor is not really linked to the AssetMapper..  and maybe could benefit other components / projects ?
+
+---------------------------------------------------------------------------
+
+by dunglas at 2024-11-27T21:16:26Z
+
+To be honest, I hesitated between putting it in `Assets` (but that's not its responsibility at all), `AssetMapper` or in its own component. But I thought it was too small to be in a stand-alone component.
+
+I've no strong opinion about this. Let's wait for @symfony/mergers opinions.
+
+---------------------------------------------------------------------------
+
+by stof at 2024-11-29T11:31:59Z
+
+> The Psalm errors are false positives (the constants are defined if the extensions are installed). Should I ignore them explicitly or let the baseline generator do is job?
+
+Let the baseline generator do its job for next PRs (ignoring the job failure in this PR). We don't add explicit Psalm ignore rules in the project

@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2024-12-05T09:45:58Z
+
+While working on adding tests for the fix added in #58908 I realised that the issue could actually not really happen with Symfony 6.4 as the feature to be able to validate DTOs (or any other class) was introduced with Symfony 7.1 in #38662.

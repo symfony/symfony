@@ -1,0 +1,152 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2022-11-07T17:53:45Z
+
+Hey!
+
+Thanks for your PR. You are targeting branch "6.2" but it seems your PR description refers to branch "6.2 (will rebased once 6.3 branch is created".
+Could you update the PR description or change target branch? This helps core maintainers a lot.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by VincentLanglet at 2023-01-31T10:49:05Z
+
+This would be a great feature. What is missing to this PR @natewiebe13 @derrabus @stof ?
+
+---------------------------------------------------------------------------
+
+by derrabus at 2023-01-31T11:17:55Z
+
+> What is missing to this PR
+
+Another round of reviews, I suppose. I'd very much like to see this feature shipped as well.
+
+---------------------------------------------------------------------------
+
+by VincentLanglet at 2023-03-07T10:46:05Z
+
+@natewiebe13 There are conflict on the branch. Do you have time to solve them ?
+
+---------------------------------------------------------------------------
+
+by natewiebe13 at 2023-03-08T15:17:26Z
+
+> @natewiebe13 There are conflict on the branch. Do you have time to solve them ?
+
+Resolved!
+
+---------------------------------------------------------------------------
+
+by VincentLanglet at 2023-03-08T15:23:31Z
+
+> > @natewiebe13 There are conflict on the branch. Do you have time to solve them ?
+>
+> Resolved!
+
+Nice, I think it just need a @derrabus review then ! :)
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2023-03-09T08:17:58Z
+
+Can you please open a PR in `symfony/symfony-docs` repository and update the CHANGELOG? Thanks
+
+---------------------------------------------------------------------------
+
+by natewiebe13 at 2023-03-09T14:11:50Z
+
+> Can you please open a PR in `symfony/symfony-docs` repository and update the CHANGELOG? Thanks
+
+Done.
+
+---------------------------------------------------------------------------
+
+by natewiebe13 at 2023-03-20T14:32:59Z
+
+> When reviewing the code, I feel like all this can be reduced to using `$accessDecisionManager->decide(new UserAuthorizationCheckerToken($user), [$attribute], $subject)`.
+>
+> What about removing everything but the token class? (and maybe name it `OfflineToken` and remove the interface also, while making it non-final+non-internal?)
+
+Just so I'm on the same page, you're suggestion to just remove the token interface correct? Or are you suggesting to remove more than that?
+
+---------------------------------------------------------------------------
+
+by VincentLanglet at 2023-03-20T14:34:45Z
+
+> When reviewing the code, I feel like all this can be reduced to using `$accessDecisionManager->decide(new UserAuthorizationCheckerToken($user), [$attribute], $subject)`.
+>
+> What about removing everything but the token class? (and maybe name it `OfflineToken` and remove the interface also, while making it non-final+non-internal?)
+
+Personally I never used a call
+```
+$accessDecisionManager->decide()
+```
+and always used one of
+```
+$security->isGranted()
+$authorizationChecker->isGranted()
+```
+so I would feel more natural having a service with a `isGranted`-like method, rather than having to play with token and access decision manager.
+
+---------------------------------------------------------------------------
+
+by natewiebe13 at 2023-03-20T14:37:59Z
+
+I would tend to agree. Once we have this in 6.3, we plan to use this exclusively and deprecate using `isGranted()` outside of controllers to avoid issues with code expecting a session where there isn't one. Having the interface will allow us to quickly migrate code while not requiring the full security bundle, and the bundle class having the helper function is great when we're already using other helpers.
+
+---------------------------------------------------------------------------
+
+by natewiebe13 at 2023-04-10T18:10:11Z
+
+@derrabus wondering what next steps are here.
+
+---------------------------------------------------------------------------
+
+by natewiebe13 at 2023-06-23T17:03:16Z
+
+Also to add on if this should just be a token or should include the `userIsGranted()` method, I do plan on following this up with a twig function as well, which I feel the twig function shouldn't call the ADM directly. Using the authorization checker instead is a better approach imo
+
+---------------------------------------------------------------------------
+
+by natewiebe13 at 2023-07-04T19:49:44Z
+
+@derrabus rebased and conflicts resolved
+
+---------------------------------------------------------------------------
+
+by VincentLanglet at 2023-11-26T13:02:17Z
+
+What's the status of this ? How to help ?
+There are multiple approval and some unfinished discussions, this is not clear.
+
+Thanks
+
+---------------------------------------------------------------------------
+
+by natewiebe13 at 2023-12-18T21:56:41Z
+
+> What's the status of this ? How to help ? There are multiple approval and some unfinished discussions, this is not clear.
+
+I'm not so sure. I just rebased to 7.1. I'm guessing the team was busy with the 7.0 release. But it would be great to get this merged for 7.1.
+
+---------------------------------------------------------------------------
+
+by VincentLanglet at 2024-04-26T12:49:00Z
+
+Friendly ping @stof is there any blocker ?
+
+---------------------------------------------------------------------------
+
+by ozahorulia at 2024-06-13T15:16:42Z
+
+@stof is there any chance to proceed with this PR?
+
+---------------------------------------------------------------------------
+
+by natewiebe13 at 2024-12-03T20:52:28Z
+
+Rebased for 7.3 :crossed_fingers:

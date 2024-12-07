@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by raphael-geffroy at 2024-12-07T11:18:05Z
+
+Ping @ahmedghanem00 for the DesktopChannel, do you see any possible side-effect ?
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2024-12-07T11:20:38Z
+
+We need to split it up, the push related things needs to go into `6.4`, the browser stuff for `7.2` looks correct

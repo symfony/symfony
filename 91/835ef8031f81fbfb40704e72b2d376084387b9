@@ -1,0 +1,12 @@
+---------------------------------------------------------------------------
+
+by raphael-geffroy at 2024-12-07T11:30:48Z
+
+Splitted from the original : https://github.com/symfony/symfony/pull/59122 as it did not target the right branch for PushChannel fix
+
+---------------------------------------------------------------------------
+
+by raphael-geffroy at 2024-12-07T11:31:59Z
+
+Ping @norkunas  for the PushChannel, do you see any possible side-effect ?
+(Sorry for the double ping I had to split the first PR :pray: )

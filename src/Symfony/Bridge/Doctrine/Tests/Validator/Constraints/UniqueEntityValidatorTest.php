@@ -44,9 +44,12 @@ use Symfony\Bridge\Doctrine\Tests\Fixtures\Type\StringWrapperType;
 use Symfony\Bridge\Doctrine\Tests\Fixtures\UpdateCompositeIntIdEntity;
 use Symfony\Bridge\Doctrine\Tests\Fixtures\UpdateCompositeObjectNoToStringIdEntity;
 use Symfony\Bridge\Doctrine\Tests\Fixtures\UpdateEmployeeProfile;
+use Symfony\Bridge\Doctrine\Tests\Fixtures\UserUuidNameDto;
+use Symfony\Bridge\Doctrine\Tests\Fixtures\UserUuidNameEntity;
 use Symfony\Bridge\Doctrine\Tests\TestRepositoryFactory;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntityValidator;
+use Symfony\Component\Uid\Uuid;
 use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 use Symfony\Component\Validator\Exception\UnexpectedValueException;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
@@ -160,6 +163,7 @@ class UniqueEntityValidatorTest extends ConstraintValidatorTestCase
             $em->getClassMetadata(Employee::class),
             $em->getClassMetadata(CompositeObjectNoToStringIdEntity::class),
             $em->getClassMetadata(SingleIntIdStringWrapperNameEntity::class),
+            $em->getClassMetadata(UserUuidNameEntity::class),
         ]);
     }
 
@@ -1488,5 +1492,27 @@ class UniqueEntityValidatorTest extends ConstraintValidatorTestCase
         $dto = new HireAnEmployee('Foo');
 
         $this->validator->validate($dto, $constraint);
+    }
+
+    public function testUuidIdentifierWithSameValueDifferentInstanceDoesNotCauseViolation()
+    {
+        $uuidString = 'ec562e21-1fc8-4e55-8de7-a42389ac75c5';
+        $existingPerson = new UserUuidNameEntity(Uuid::fromString($uuidString), 'Finnley Benton');
+        $this->em->persist($existingPerson);
+        $this->em->flush();
+
+        $dto = new UserUuidNameDto(Uuid::fromString($uuidString), 'Finnley Benton', '');
+
+        $constraint = new UniqueEntity(
+            fields: ['fullName'],
+            entityClass: UserUuidNameEntity::class,
+            identifierFieldNames: ['id'],
+            em: self::EM_NAME,
+            message: 'myMessage'
+        );
+
+        $this->validator->validate($dto, $constraint);
+
+        $this->assertNoViolation();
     }
 }

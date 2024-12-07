@@ -1,0 +1,26 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2024-12-07T09:22:25Z
+
+Hey!
+
+Thanks for your PR. You are targeting branch "7.3" but it seems your PR description refers to branch "6.4".
+Could you update the PR description or change target branch? This helps core maintainers a lot.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2024-12-07T09:26:45Z
+
+> I'm adding those tests in 6.4 to increase test coverage on all versions, given that the test does not require changes anyway when upmerging.
+
+but the PR is against the `7.3` branch :)
+
+---------------------------------------------------------------------------
+
+by stof at 2024-12-07T09:28:14Z
+
+@xabbuh I fixed this.

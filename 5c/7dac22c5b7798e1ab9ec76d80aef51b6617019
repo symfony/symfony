@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by alexislefebvre at 2024-12-06T17:14:10Z
+
+Should it be added only once the function will actually return something?
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2024-12-06T18:30:53Z
+
+We try to keep the code base 100%, so we may type it with `never`, but I think it's ok to keep the same type as the trait? I'm not sure `never` would be useful as we generally deal with interfaces and not implementations directly

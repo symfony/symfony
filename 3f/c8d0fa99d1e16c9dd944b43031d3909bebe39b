@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by ovidiuenache at 2024-12-07T21:30:18Z
+
+The coding standards check is failing due to existing violations in the files I've updated. It says [here](https://symfony.com/doc/current/contributing/code/pull_requests.html) that I should `Never fix coding standards in some existing code as it makes the code review more difficult;` so I left it as is and will fix the existing flagged issues on request.

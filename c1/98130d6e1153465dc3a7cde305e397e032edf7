@@ -1,0 +1,489 @@
+---------------------------------------------------------------------------
+
+by joelwurtz at 2023-09-22T10:20:54Z
+
+What a job ! thanks for the work on this, the serializer really needs some love.
+
+I look through most of the implementation design it's really well done with nice interface layers.
+
+I think there is too many extension point for a start, maybe some of them are not needed ? But we should provide an integration / extension example with api platform to have feedback on those extensions point.
+
+Are you not afraid about the generated code implementation on maintenance burden, i think there a 2 ways on this, use this implementation or use the php-parser library but i'm not sure which one is better in terms of maintenance ?
+
+Really hope this get accepted into symfony
+
+---------------------------------------------------------------------------
+
+by Hanmac at 2023-09-22T15:34:01Z
+
+is the planned changes also affect the Normalizer / Denormalizer part of the Serializer?
+
+when using Symfony HTTPClient, it already decodes the data for me into Array,
+so the Serializer just need to Denormalize the data.
+
+Or depending on the HTTPClient (like Guzzle?) i could use the Data from a Response Stream?
+
+---------------------------------------------------------------------------
+
+by mtarld at 2023-09-22T16:07:05Z
+
+Many thanks @joelwurtz! I truly think as well that this component deserves more love!
+
+> I think there is too many extension point for a start, maybe some of them are not needed ? But we should provide an integration / extension example with api platform to have feedback on those extensions point.
+
+Yes, I can agree! I began by exposing as many extension points as I could, as it's easier to reduce them instead of adding them. But we need to define which extension point is relevant for a start.
+
+> Are you not afraid about the generated code implementation on maintenance burden, i think there a 2 ways on this, use this implementation or use the php-parser library but i'm not sure which one is better in terms of maintenance ?
+
+Indeed, it'll reduce the added code a lot (and the maintenance burden), but at the same time complicate template generation and PHP AST optimization code as right now nodes are designed for these purposes.
+I don't know about php-parser library BC promise and release process, it seems to be acceptable because it is already "opt-in" used by the translation component. But this time, it unfortunately won't be opt-in.
+
+---------------------------------------------------------------------------
+
+by mtarld at 2023-09-22T16:16:36Z
+
+@Hanmac, yes, it'll affect that part. Indeed, the performance improvement relies on somehow moving the normalization/denormalization step to cache (by the computing data shape only once)
+
+For your specific use case, you can leverage the response's `getContent` method instead to retrieve a string that you can give to the deserializer.
+
+---------------------------------------------------------------------------
+
+by Hanmac at 2023-09-22T16:25:49Z
+
+@mtarld my problem there:
+
+I use the nomalizer part to read from an API
+And my custom normalizer turns references into Models
+
+Like for Products, `getProduct` might return this:
+```
+{
+  "id": "Uuidv4",
+  "Sector": {
+    "id": "Uuidv4"
+  }
+}
+```
+
+My normalizer notices that the Sector part is incomplete, so it automatically calls `getSector` from my API client
+
+To make the normalizer access, the current Client call, I have it access the client via Context
+
+Would that still be possible?
+
+---------------------------------------------------------------------------
+
+by nikophil at 2023-09-22T17:21:51Z
+
+> I don't know about php-parser library BC promise and release process
+
+I think they have a very strong BC policy. Rector, Phpstan, Psalm are built in top of it
+
+---------------------------------------------------------------------------
+
+by mtarld at 2023-09-23T07:48:56Z
+
+@Hanmac, I think that this is the way that denormalizers should not be used.
+
+Indeed, normalizers are meant to turn objects to array and vice versa, nothing more. Here, doing HTTP calls on the fly, or querying a database for example, will imply be a big lack of separation of concerns. The process of retrieving the actual data behind a URL must live in a custom service of yours.
+Therefore, an idea instead could be to have a DTO representing the first HTTP response (with the IRI), and another one that you can fill manually with nested HTTP responses (sectors for instance).
+Anyway, this must not be hidden in the denormalization process IMHO :slightly_smiling_face:
+
+---------------------------------------------------------------------------
+
+by Hanmac at 2023-09-23T13:34:49Z
+
+> @Hanmac, I think that this is the way that denormalizers should not be used.
+>
+> Indeed, normalizers are meant to turn objects to array and vice versa, nothing more. Here, doing HTTP calls on the fly, or querying a database for example, will imply be a big lack of separation of concerns. The process of retrieving the actual data behind a URL must live in a custom service of yours. Therefore, an idea instead could be to have a DTO representing the first HTTP response (with the IRI), and another one that you can fill manually with nested HTTP responses (sectors for instance). Anyway, this must not be hidden in the denormalization process IMHO 🙂
+
+For work, this is one of the APIs i was going to map:
+https://support.korona.de/korona-cloud-api/
+
+when load 100+ of Product with one query, i want them to load the "ModelReference" as well, like for example their sectors or ticketDefinition.
+
+i implemented a logic in the Denormalizer to load as less objects as possible, for example:
+* when multiple products references the same Sector, the Sector is only loaded once (while in the same Serializer call)
+* Having Multiple products reference each other relatedProducts, they notice that when A->B->A that A is already going to be loaded, is then added later to B's property
+
+---------------------------------------------------------------------------
+
+by n-valverde at 2023-09-24T12:12:34Z
+
+Wow that's quite a big work, congrats @mtarld . That being said, for what it worth I have to admit I'm on the edge with this proposal as of now 😅. The perf showcase definitely makes it look awesome, but here's a few user's POV thoughts coming to my mind:
+
+> Plus, this design makes debugging hard, especially using nested normalizers.
+> Core normalizers make use of inheritance which leads to maintenance headaches.
+> Some features should've rather been left to userland and community packages [...] These add unnecessary complexity to the codebase which increases the maintenance burden.
+
+About the why, it seems there are 2 clear intentions: improving performance, and easing design/maintenance/debugging.
+The first point is clearly demonstrated, but the second is not really. My feeling going through the PR is that the proposed implementation - while being well done - is extremely hard to understand (and you seem to agree with that by stating the extension points are hard to use), and so probably to debug.
+On the other hand, the current implementation is quite easy to understand, but can become hard to debug when the stack grows.
+I understand there might be tradeoffs to do about simplicity when it comes to performance, but this should probably not be advertised as simplifying the design/maintenance/debugging here imho.
+
+> because it is intended to work mostly with DTOs
+
+Why? Imho the serializer should not be intended to work with specific objects. Doc states that `The Serializer component is meant to be used to turn objects into a specific format (XML, JSON, YAML, ...) and the other way around.`
+
+> To be able to generate templates that stick as much as possible to the data model, the support of generics has been introduced.
+
+Does that mean that if my app does not use generics, I might end up with bad generated templates? Or is it just better if I use them, i.e. no drawback in not using them compared to the current implementation?
+
+> BC & Upgrade Path
+
+It is missing quite a big BC break here imo, dropping support for normalizers/denormalizers, while it is probably one of the most used extension points of the current implementation. Futhermore, normalizers/denormalizers are also used to be injected on their own, when you don't need to go through the full serialization. What is the suggested replacement? Could you showcase a simple normalizer/denormalizer and what it would become, would be great?
+What about the other features of the current serializer, will they still work? E.g. is there a way to denormalize into an existing object? Name conversion? Etc...
+Dropping some supported formats is obviously a BC break as well, but that can probably be implemented, or should be advertised.
+The serializer has a straight forward and clear process, object -> normalize -> array -> encode -> string, and the other way around, which also makes it clear where are the extension points, could you showcase the workflow of your implementation in the same idea for comparison purpose? The cache miss/hit workflow you wrote is not very clear about where are the extension points, and does not make the distinction between serialization/deserialization.
+
+> Most of the time, it's a bad idea to alter the data structure depending on the
+serialization configuration, it is rather recommended to use an adapted and dedicated DTO
+during serialization.
+
+That's what normalizers/denormalizers are advertised for 😅 ` you may need to create your own normalizer to transform an unsupported data structure. Imagine you want add, modify, or remove some properties during the serialization process. For that you'll have to create your own normalizer. But it's usually preferable to let Symfony normalize the object, then hook into the normalization to customize the normalized data.`
+
+> Extension points (and concepts)
+
+I agree on the general note that there are too many extension points, but on the other hand it is not super clear yet where they all kick in or could be useful. Maybe if you can showcase the workflow as simply as possible with all relevant extension points, could give a better clue.
+Config classes: Do they really need to be immutable? I mean I understand why you want them immutable, but if you expect them to be extended in userland, you can't really guarantuee immutability then.
+PropertyMetadataLoaderInterface: It seems to be the main replacement for normalizers/denormalizers, but relies on a `formatter` concept which is not really advertised in the PR. It feels weird to implement something about metadata to actually deal with the data. But when you think about attaching a formatter then it makes sense, so I think the concept of formatters needs to be clearly advertised. I'm not sure this cover all cases of a normalizer/denormalizer though, does it?
+SplitterInterface: I think the concept needs to be better explained 😄.
+
+Hopefully these are constructive enough questions/thoughts 😇, and congrats again for the huge work! Looking forward to see what this PR becomes!
+Cheers!
+
+---------------------------------------------------------------------------
+
+by jdreesen at 2023-09-24T13:30:08Z
+
+@mtarld just a quick heads-up that the last paragraph (`Thoughts about Type and the PropertyInfo component`) in your description is currently hidden in the last `details` tag (which describes the `InstantiatorInterface` for deserialization) which probably causes it to be easily overlooked.
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2023-09-25T21:43:52Z
+
+Great. Thank you for this. Really impressed with the work you have done.
+
+Can you please give me a simple usage example without the framework? I would like to make sure I set things up properly before I rerun my own performance tests.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2023-09-25T22:22:58Z
+
+To support @n-valverde's point, I wonder if this PR shouldn't be a new component of its own.
+
+This is a better and more powerful alternative to `json_encode/decode`, as the Yaml component is a powerful alternative to the YAML extension. But it's not a full replacement for the current Serializer, and it has a very different design (which is better IMHO).
+
+It could be the `JsonEncoder` or `JsonMarshaller` component (the latter is probably better to prevent confusion with encoders from the Serializer) to use the same naming as Go. Or just the `Json` component to be consistent with `Yaml`.
+
+The current Serializer has a lot of features that will be hard to keep in your implementation (especially with a fully functional BC layer), and supporting as many features and formats as the Serializer will likely "bloat" the new code. Also, there are hundreds of projects that use the Serializer, and forcing all of them to migrate will be hard.
+
+In most (JSON) cases, it will be possible to use the JsonEncoder component instead of the Serializer, and maybe at some point, we'll be able to feature-freeze it, and then deprecate it. But I doubt that we'll manage to do that anytime soon.
+
+Anyway, I can't wait to get this PR merged into Symfony!
+
+---------------------------------------------------------------------------
+
+by mtarld at 2023-09-27T07:04:25Z
+
+Thank you, @Nyholm! :slightly_smiling_face:
+
+Here you go:
+
+## Serialization
+
+Instantiate the serializer:
+```php
+$cacheDir = sprintf('%s/symfony_serializer_bench/template', sys_get_temp_dir());
+
+$typeExtractor = new PhpstanTypeExtractor(new ReflectionTypeExtractor());
+$runtimeServicesLocator = new class([]) implements ContainerInterface {
+    use ServiceLocatorTrait;
+};
+
+return new Serializer(
+    new Template(new TemplateVariationExtractor(), ['json' => new JsonTemplateGenerator()], $cacheDir),
+    new DataModelBuilder(
+        new TypePropertyMetadataLoader(new AttributePropertyMetadataLoader($typeExtractor), $typeExtractor),
+        $runtimeServicesLocator,
+    ),
+    $runtimeServicesLocator,
+    $cacheDir,
+);
+```
+
+Then warm up the cache:
+```php
+$serializer->serialize($data, 'json', new MemoryStream());
+```
+
+Then you can measure:
+```php
+$serializer->serialize($data, 'json');
+```
+
+## Deserialization
+
+Instantiate the deserializer:
+```php
+$templateCacheDir = sprintf('%s/symfony_serializer_bench/template', sys_get_temp_dir());
+
+$typeExtractor = new PhpstanTypeExtractor(new ReflectionTypeExtractor());
+$runtimeServicesLocator = new class([]) implements ContainerInterface {
+    use ServiceLocatorTrait;
+};
+$instantiator = new EagerInstantiator();
+// $instantiator = new LazyInstantiator(sprintf('%s/symfony_serializer_bench/lazy_object', sys_get_temp_dir()));
+
+$deserializer = new Deserializer(
+    new Template(
+        new TemplateVariationExtractor(),
+        ['json' => ['eager' => new EagerTemplateGenerator(JsonDecoder::class), 'lazy' => new LazyTemplateGenerator(JsonDecoder::class, JsonSplitter::class)]],
+        $templateCacheDir,
+        false,
+    ),
+    new DataModelBuilder(
+        new TypePropertyMetadataLoader(new AttributePropertyMetadataLoader($typeExtractor), $typeExtractor),
+        $runtimeServicesLocator,
+    ),
+    $runtimeServicesLocator,
+    $instantiator,
+    $templateCacheDir,
+);
+```
+
+Then warm up the cache before running speed tests:
+```php
+$deserializer->deserialize('', Type::iterableList(Type::class(Element::class)), 'json');
+```
+
+Then you can finally measure the deserialization:
+```php
+$deserializer->deserialize(new Stream($filename, 'rb'), Type::iterableList(Type::class(Element::class)), 'json');
+```
+
+---------------------------------------------------------------------------
+
+by dunglas at 2023-09-27T08:54:07Z
+
+This could be nice to have a factory method to initialize all the needed services when using the standalone component (it may also be reused in FrameworkBundle).
+
+---------------------------------------------------------------------------
+
+by mtarld at 2023-09-27T17:11:57Z
+
+After talking with @dunglas and others, I thought of a new master plan:
+
+1. Reduce the scope of the introduced features, and the number of extension points, to create a new dedicated component such as `JsonMarshaller`.
+1. Then, when needed, we'll be able to create other `xxxMarshaller` components implementing the previous interfaces. The `Yaml` component could for example be adapted to become a "Marshaller" one.
+1. When the first new `xxxMarshaller` component is created, we could create a new `Marshaller` component to factorize common marshaller stuff such as serialized names, formatters, etc
+1. Finally, we can implement a `MarshallerEncoder` in the Serializer component which will allow us to bridge the actual serializer to marshallers (with worse performances than if the marshaller was directly used of course).
+
+By doing that, we'll keep the Serializer component as is, so users still can leverage its flexibility and won't lose any feature.
+And on the other hand, they'll be able to leverage marshallers when performance is important, or when there is no need for such flexibility.
+
+---------------------------------------------------------------------------
+
+by andersonamuller at 2023-09-27T19:40:30Z
+
+> After talking with @dunglas and others, I thought of a new master plan:
+>
+> 1. Reduce the scope of the introduced features, and the number of extension points, to create a new dedicated component such as `JsonMarshaller`.
+> 2. Create interfaces in `Symfony/Contracts/Marshaller` related to data marshaling (something like `marshal(mixed $data, array $config, resource $output): string|void`).
+> 3. Then, when needed, we'll be able to create other `xxxMarshaller` components implementing the previous interfaces. The `Yaml` component could for example be adapted to become a "Marshaller" one.
+> 4. When the first new `xxxMarshaller` component is created, we could create a new `Marshaller` component to factorize common marshaller stuff such as serialized names, formatters, etc
+> 5. Finally, we can implement a `MarshallerEncoder` in the Serializer component which will allow us to bridge the actual serializer to marshallers (with worse performances than if the marshaller was directly used of course).
+>
+> By doing that, we'll keep the Serializer component as is, so users still can leverage its flexibility and won't lose any feature. And on the other hand, they'll be able to leverage marshallers when performance is important, or when there is no need for such flexibility.
+
+Wouldn't it be simpler to just call it `JsonFormat`. `JsonFormat::encode()`/ `JsonFormat::decode()` Then later add the other `xxxFormat` implementations?
+
+---------------------------------------------------------------------------
+
+by chalasr at 2023-10-03T14:50:16Z
+
+> After talking with @dunglas and others, I thought of a new master plan:
+>
+> 1. Reduce the scope of the introduced features, and the number of extension points, to create a new dedicated component such as `JsonMarshaller`.
+> 2. Then, when needed, we'll be able to create other `xxxMarshaller` components implementing the previous interfaces. The `Yaml` component could for example be adapted to become a "Marshaller" one.
+> 3. When the first new `xxxMarshaller` component is created, we could create a new `Marshaller` component to factorize common marshaller stuff such as serialized names, formatters, etc
+> 4. Finally, we can implement a `MarshallerEncoder` in the Serializer component which will allow us to bridge the actual serializer to marshallers (with worse performances than if the marshaller was directly used of course).
+>
+> By doing that, we'll keep the Serializer component as is, so users still can leverage its flexibility and won't lose any feature. And on the other hand, they'll be able to leverage marshallers when performance is important, or when there is no need for such flexibility.
+
+Ok but when should one use Marshaller over Serializer?
+Each component's purpose and use cases must be clearly defined. Here both names look like synonyms. If we put JsonMarshaller and JsonEncoder side by side the target difference is not obvious.
+Basically if we go with a separate component we need to know how to sell it, and I don't see how Serializer and Marshaller can live indefinitely with such a similar scope.
+
+If they have similar scopes, should this rather be a special way of using the Serializer?
+
+---------------------------------------------------------------------------
+
+by dunglas at 2023-10-06T10:05:58Z
+
+# Components Responsibilities
+
+At its core, this new component is a fast and modern JSON parser and encoder. Its responsibility is similar to the responsibility of the existing `Yaml` component but for JSON. It fixes many issues of the native `json_encode` and `json_decode` PHP functions: streaming, on-demand parsing, ability to create strongly typed objects instead of raw associative arrays **in one pass**...
+
+It's why I suggest naming it `Json`, which is consistent with `Yaml`. Both components should also implement the same interfaces, that should be part of Symfony Contracts. In the future, we (or the community) could create new components supporting other formats that implement the same interfaces (TOML, JSON5...).
+
+On the other hand, the `Serializer` component is a very flexible library designed to normalize PHP data structures in raw associative arrays, and then encode them in a large variety of open formats (two passes: normalization then encoding).
+
+Even if there may be some little overlap, the responsibility of both components is very different. Actually, the `Serializer` component could (and should) delegate encoding to the new `Json` component, as it already does to the `Yaml` component for YAML encoding. And for many simple use cases, using the `Json` (or the `Yaml`) component should be enough.
+
+In my opinion, there are only drawbacks to creating a one-size-fits-all component for these different use cases:
+* The `Serializer` component is one of the most popular Symfony components, and forcing the community to migrate to a new design will hurt it for no clear benefits
+* the current design of the Serializer (2 passes) has been proved useful and very flexible
+* keeping `Json` low-level will allow it to focus on what it should do: fast and convenient JSON encoding, without having to introduce too many compromises to make it too generic
+
+In the end, we'll have a set of components, each with a clear responsibility:
+* `Json`, `Yaml`, and the like: low-level parsers and encoders for standard and open formats
+* `Serializer`: high-level, flexible component to transform PHP data structures to standard formats without requiring a 1-to-1 mapping (normalization); can delegate to `Json`, `Yaml`, etc
+* `Mapper` (#51741): copy data from a PHP object of one type to another PHP object of another type
+
+# `Json` Component Design
+
+Just yesterday, @dsnet and the @tailscale team published a design proposal for the future major version of Go's JSON encoder: https://github.com/golang/go/discussions/63397.
+
+Their proposal is of high quality, and what's reassuring is that the design they propose is very close to what we sketched out during the workshops with @mtarld and @soyuka that led to this PR.
+
+Parts of their proposal are better than the current implementation and should be followed:
+
+* Strict compliance with recent JSON-related RFCs ([RFC 4627](https://tools.ietf.org/html/rfc4627), [RFC 7159](https://tools.ietf.org/html/rfc7159), [RFC 7493](https://tools.ietf.org/html/rfc7493), and [RFC 8259](https://tools.ietf.org/html/rfc8259)): in my opinion, compliance with these RFCs is a pre-requisite before the merge
+* Split between a low-level parser/encoder (`encoding/json/jsontext`) and a higher-level (`encoding/json`), more complex, one that deals with high-level language data structures (marshaller): this PR already contains the code for that, but the separation between the low-level and higher-level code should be more distinctly marked (two separate sub-namespaces for instance)
+* Separate methods (and in our case separate interfaces) to deal with streaming and non-streaming: currently we have a single method for both, but the API would be better by being separated
+
+Here is a quick proposal for the public API for the contracts taking that into account:
+
+```php
+namespace Symfony\Contracts\Encoding;
+
+interface MarshalerInterface
+{
+    public Marshal(mixed $in, array $options = []): string;
+}
+
+interface UnmarshalerInterface
+{
+    public Unmarshal(string $in, array $options = []): mixed;
+}
+
+interface StreamingEncoderInterface
+{
+    public Marshal(mixed $in, array $options = []): StreamWriterInterface; // StreamWriterInterface will wrap a PHP resource, but hide it behind an interface because resources are slowly being deprecated in PHP
+}
+
+interface StreamingUnmarshalerInterface
+{
+    public Unmarshal(StreamReaderInterface $in, array $options = []): mixed;
+}
+```
+
+The non-streaming marshaller/unmarshaller will be delegated to the streaming one.
+The `Json` component should also expose a lower-level, JSON-specific API similar to Go's `jsontext`.
+
+---------------------------------------------------------------------------
+
+by stof at 2023-10-06T10:28:51Z
+
+I don't think the existing Yaml component should be forced to become a parser turning yaml into strongly typed objects in a single pass. There are lots of existing use cases (including Symfony configuration files) where we need to parse arbitrary Yaml files.
+the existing Yaml component is this low-level parser which is similar to PHP's `ext-json` and this is something that is worth it. Having a YamlMarshaller would be a separate component IMO.
+
+---------------------------------------------------------------------------
+
+by dkarlovi at 2023-10-06T12:39:43Z
+
+Maybe we see the Yaml component as an equivalent to the `ext-json` and have the Marshaller be a separate component which supports both YAML and JSON.
+
+The suggested Marshaller interface looks quite like the existing
+
+```
+\Symfony\Component\Cache\Marshaller\MarshallerInterface
+```
+
+But then comes the question: what does the Marshaller component do that Serializer doesn't? Can't the marshalling semantics be inlined in a separate dedicated Serializer namespace? Having both the top level Serializer and Marshaller components will get confusing.
+
+Edit: worth checking out an overview of differences between serialization and marshalling: https://stackoverflow.com/a/59559181/672885
+
+> Serialization is a part of Marshalling.
+
+It would make sense to make the new `Marshall` component and move the Serializer into it, but since it came first and it's so widely used, probably the opposite is the more pragmatic choice. :laughing:
+
+---------------------------------------------------------------------------
+
+by chalasr at 2023-10-06T12:48:23Z
+
+The `marshall(er)` vs `serialize(r)` naming conflict as well as the lack of proper distinction between each term's purpose remains though. I guess we can invent that distinction and then it's just a matter of documentation, but it definitely has to be made clear especially if it's part of the components name.
+AFAICT Golang does not suffer from this issue: the docs just use both terms interchangeably and the API uses `marshall` exclusively for both arrays and structs.
+Ambiguous naming causes confusion, hence I insist :)
+
+>  Having a YamlMarshaller would be a separate component IMO.
+
+Do we need such Yaml Marshaller? Real question as it appears to have an impact on the name of the proposed component.
+
+---------------------------------------------------------------------------
+
+by mtarld at 2023-10-06T13:06:53Z
+
+That's why I'd go with "encoder". Indeed, it explicitly says that it does only the encoding part of seriaization (nothing more). Plus, it'll make even more sense when bridging it with the actual serializer.
+
+---------------------------------------------------------------------------
+
+by dsnet at 2023-10-06T17:14:25Z
+
+Sorry for the drive-by comments, but I was tagged on this :)
+
+> Strict compliance with recent JSON-related RFCs
+
+For v2 JSON in Go, we're rejecting invalid UTF-8 and duplicate object names by default. Essentially, we're planning on targeting [RFC 7493](https://www.rfc-editor.org/rfc/rfc7493.html) by default, which is a standard that's fully compliant with [RFC 8259](https://www.rfc-editor.org/rfc/rfc8259.html) that makes strict decisions about undefined behavior.
+
+For UTF-8 validation, this extends beyond just validating that the JSON text is valid UTF-8, but also that any escape sequences containing surrogate halves resolve to valid Unicode codepoints. The latter is something that many parsers fail to get correct.
+
+We're rejecting duplicate names since they can be lead to security flaws ([CVE-2017-12635](https://docs.couchdb.org/en/stable/cve/2017-12635.html)). Technically, RFC 8259 specifies that duplicate names are undefined behavior, so a compliant parser is free to take the first result, the last result, merge all the results, or just report an error. The main detriment of rejecting duplicate names is that it requires O(n) memory (where n is the number of members in a JSON object). Since Go is a strongly-typed language, we assume that JSON object is most often unmarshaled into a Go struct, where we statically know how many fields exist. In that situation, we just use a bit-map of field indexes to track which JSON object names were already seen. Thus, the performance cost is negligible in most cases.
+
+Tim Bray, the author of RFC 8259, even [recommends on his blog](https://www.tbray.org/ongoing/When/201x/2017/12/14/RFC-8259-STD-90) that implementations should target RFC 7493:
+> If you want to use an RFC as foundation for a REST API or some other Internet protocol, I actually don’t recommend 8259, I recommend I-JSON, [RFC 7493](https://tools.ietf.org/html/rfc7493), which describes exactly the same syntax as all the other specs (by referencing 7159), but explicitly rules out some legal-but-dumbass things you could do that might break your protocol, for example using anything but UTF-8 or having duplicate member names in your objects.
+
+> AFAICT Golang does not suffer from this issue: the docs just use both terms interchangeably
+
+Yea, in our documentation, we often use "marshal" and "serialize" interchangeably, but we avoid the term "serialize" throughout the JSON API itself to avoid confusion.
+
+In general, we use:
+* the terms "encode" and "decode" to describe syntactic functionality, which is functionality that only deals with JSON at the grammar
+* the terms "marshal" and "unmarshal" to describe semantic functionality, which is functionality that assigns meaning to JSON data as Go data and vice-versa
+
+Thus, only "marshal", "unmarshal", "encode", and "decode" in our declared functionality.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2023-10-11T12:30:36Z
+
+Looks good at first sight :)
+
+> Introducing the Json encoder component
+
+Should it be called JsonEncoder then?
+
+---------------------------------------------------------------------------
+
+by mtarld at 2023-11-09T12:17:08Z
+
+The part related to types can now be found in this PR: https://github.com/symfony/symfony/pull/52510
+
+---------------------------------------------------------------------------
+
+by yceruto at 2023-12-13T19:50:56Z
+
+@mtarld I like the goal of this new component and all its features, great work!
+
+However, I do believe it's too heavy for reviewers and too easy to overlook any important detail as is. I suggest you first introduce the component without the framework integration, and then iterate over small, mergeable PRs.
+
+Right now, it feels like an all-or-nothing situation. Splitting will also help to discuss different features separately, which might take less time to merge.
+
+Thank you for your great effort 💪
+
+---------------------------------------------------------------------------
+
+by chalasr at 2023-12-14T14:45:03Z
+
+I agree with Yonel. Splitting might also rise new concerns about the standalone usage of the component, as a nice side effect. I'd keep the component part in this PR as there is some useful discussion about its design.

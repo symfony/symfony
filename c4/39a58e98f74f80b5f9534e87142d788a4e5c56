@@ -1,0 +1,55 @@
+---------------------------------------------------------------------------
+
+by janedbal at 2024-11-27T11:30:30Z
+
+Actually, this fix seems to be valid even for 6.4, should I rebase?
+
+---------------------------------------------------------------------------
+
+by janedbal at 2024-11-27T14:48:05Z
+
+> Please submit another PR for 6.4
+
+Will do that once this is approved.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2024-12-03T09:41:38Z
+
+@janedbal Can you open the PR targeting 6.4?
+
+---------------------------------------------------------------------------
+
+by janedbal at 2024-12-03T09:51:57Z
+
+@xabbuh Sure, but it does not affect mergeability here, right?
+
+---------------------------------------------------------------------------
+
+by mtarld at 2024-12-03T11:22:07Z
+
+@janedbal, the 6.4 changes will be upmerged up to 7.3, therefore this 7.1 PR will become useless.
+
+---------------------------------------------------------------------------
+
+by janedbal at 2024-12-03T11:24:51Z
+
+Looks like we misunderstood each other, [so I just rebase it to 6.4](https://github.com/symfony/symfony/pull/59012#issuecomment-2503635525). No need [for another MR](https://github.com/symfony/symfony/pull/59012#pullrequestreview-2464779090), right?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2024-12-03T11:32:33Z
+
+If there is not much difference between the branches, rebasing the PR on 6.4 should be enough. Having a different PR for 7.1 would only be useful if there are conflicts to be expected when merging up which would then serve as a reference for us to ease resolving the conflicts.
+
+---------------------------------------------------------------------------
+
+by janedbal at 2024-12-03T11:58:16Z
+
+Rebased and changed base branch to `6.4`
+
+---------------------------------------------------------------------------
+
+by janedbal at 2024-12-05T11:58:22Z
+
+Is this mergeable now? Or are we waiting for code-owner approve? Or?

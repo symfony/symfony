@@ -1,0 +1,80 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2024-11-20T13:38:02Z
+
+Hey!
+
+I see that this is your first PR. That is great! Welcome!
+
+Symfony has a [contribution guide](https://symfony.com/doc/current/contributing/index.html) which I suggest you to read.
+
+In short:
+- Always add tests
+- Keep backward compatibility (see https://symfony.com/bc).
+- Bug fixes must be submitted against the lowest maintained branch where they apply (see https://symfony.com/releases)
+- Features and deprecations must be submitted against the 7.3 branch.
+
+Review the GitHub status checks of your pull request and try to solve the reported issues. If some tests are failing, try to see if they are failing because of this change.
+
+When two Symfony core team members approve this change, it will be merged and you will become an official Symfony contributor!
+If this PR is merged in a lower version branch, it will be merged up to all maintained branches within a few days.
+
+I am going to sit back now and wait for the reviews.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by fabpot at 2024-11-27T07:32:15Z
+
+While doing this, I would change the other units to be more in line with standard scientific notation: `ms`, `s`, `min`, `h`, and `d`.
+
+---------------------------------------------------------------------------
+
+by SebLevDev at 2024-11-27T10:09:17Z
+
+> While doing this, I would change the other units to be more in line with standard scientific notation: `ms`, `s`, `min`, `h`, and `d`.
+
+Can this change not be considered a BC Break?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2024-11-27T10:37:04Z
+
+> > While doing this, I would change the other units to be more in line with standard scientific notation: `ms`, `s`, `min`, `h`, and `d`.
+>
+> Can this change not be considered a BC Break?
+
+Sure, this is pure display, so no BC promise.
+
+---------------------------------------------------------------------------
+
+by SebLevDev at 2024-12-09T07:47:22Z
+
+Hello everyone,
+
+Thank you for the feedback, especially @fabpot for the suggestion about aligning the units with standard scientific notation (ms, s, min, h, d).
+
+I’m a bit unsure about the next steps here. Should I proceed with the proposed changes for all the units as suggested, or wait for further input from other reviewers to ensure this aligns with everyone’s expectations?
+
+Any additional guidance or confirmation would be greatly appreciated to avoid conflicting directions.
+
+Thanks in advance!
+
+---------------------------------------------------------------------------
+
+by fabpot at 2024-12-09T07:51:41Z
+
+> Hello everyone,
+>
+> Thank you for the feedback, especially @fabpot for the suggestion about aligning the units with standard scientific notation (ms, s, min, h, d).
+>
+> I’m a bit unsure about the next steps here. Should I proceed with the proposed changes for all the units as suggested, or wait for further input from other reviewers to ensure this aligns with everyone’s expectations?
+>
+> Any additional guidance or confirmation would be greatly appreciated to avoid conflicting directions.
+>
+> Thanks in advance!
+
+Please, go ahead and make the suggested changes.

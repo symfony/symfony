@@ -42,7 +42,7 @@ class EncoderDecoderCacheWarmerTest extends TestCase
 
     public function testWarmUp()
     {
-        $this->cacheWarmer([ClassicDummy::class])->warmUp('useless');
+        $this->cacheWarmer()->warmUp('useless');
 
         $this->assertSame([
             \sprintf('%s/d147026bb5d25e5012afcdc1543cf097.json.php', $this->encodersDir),
@@ -54,15 +54,12 @@ class EncoderDecoderCacheWarmerTest extends TestCase
         ], glob($this->decodersDir.'/*'));
     }
 
-    /**
-     * @param list<class-string> $encodable
-     */
-    private function cacheWarmer(array $encodable): EncoderDecoderCacheWarmer
+    private function cacheWarmer(): EncoderDecoderCacheWarmer
     {
         $typeResolver = TypeResolver::create();
 
         return new EncoderDecoderCacheWarmer(
-            $encodable,
+            [ClassicDummy::class],
             new PropertyMetadataLoader($typeResolver),
             new PropertyMetadataLoader($typeResolver),
             $this->encodersDir,

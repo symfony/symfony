@@ -91,9 +91,9 @@ final class PhpAstBuilder
                 ],
                 'returnType' => new Identifier('mixed'),
                 'stmts' => [
-                    ...$this->buildProvidersStatements($dataModel, $decodeFromStream, $context),
+                    ...$this->buildProvidersStatements($dataModel, true, $context),
                     new Return_(
-                        $this->nodeOnlyNeedsDecode($dataModel, $decodeFromStream)
+                        $this->nodeOnlyNeedsDecode($dataModel, true)
                         ? $this->builder->staticCall(new FullyQualified(NativeDecoder::class), 'decodeStream', [
                             $this->builder->var('stream'),
                             $this->builder->val(0),
@@ -119,9 +119,9 @@ final class PhpAstBuilder
             ],
             'returnType' => new Identifier('mixed'),
             'stmts' => [
-                ...$this->buildProvidersStatements($dataModel, $decodeFromStream, $context),
+                ...$this->buildProvidersStatements($dataModel, false, $context),
                 new Return_(
-                    $this->nodeOnlyNeedsDecode($dataModel, $decodeFromStream)
+                    $this->nodeOnlyNeedsDecode($dataModel, false)
                     ? $this->builder->staticCall(new FullyQualified(NativeDecoder::class), 'decodeString', [new StringCast($this->builder->var('string'))])
                     : $this->builder->funcCall(new ArrayDimFetch($this->builder->var('providers'), $this->builder->val($dataModel->getIdentifier())), [
                         $this->builder->staticCall(new FullyQualified(NativeDecoder::class), 'decodeString', [new StringCast($this->builder->var('string'))]),
@@ -315,7 +315,7 @@ final class PhpAstBuilder
     private function buildCollectionNodeStatements(CollectionNode $node, bool $decodeFromStream, array &$context): array
     {
         if ($decodeFromStream) {
-            $itemValueStmt = $this->nodeOnlyNeedsDecode($node->getItemNode(), $decodeFromStream)
+            $itemValueStmt = $this->nodeOnlyNeedsDecode($node->getItemNode(), true)
                 ? $this->buildFormatValueStatement(
                     $node->getItemNode(),
                     $this->builder->staticCall(new FullyQualified(NativeDecoder::class), 'decodeStream', [
@@ -332,7 +332,7 @@ final class PhpAstBuilder
                     ],
                 );
         } else {
-            $itemValueStmt = $this->nodeOnlyNeedsDecode($node->getItemNode(), $decodeFromStream)
+            $itemValueStmt = $this->nodeOnlyNeedsDecode($node->getItemNode(), false)
                 ? $this->builder->var('v')
                 : $this->builder->funcCall(
                     new ArrayDimFetch($this->builder->var('providers'), $this->builder->val($node->getItemNode()->getIdentifier())),
@@ -562,7 +562,7 @@ final class PhpAstBuilder
                 return false;
             }
 
-            return $this->nodeOnlyNeedsDecode($node->getItemNode(), $decodeFromStream);
+            return $this->nodeOnlyNeedsDecode($node->getItemNode(), false);
         }
 
         if ($node instanceof ObjectNode) {

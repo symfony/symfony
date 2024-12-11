@@ -8,6 +8,6 @@ return static function (mixed $data, \Psr\Container\ContainerInterface $normaliz
     yield ',"name":';
     yield \json_encode(strtolower($data->name));
     yield ',"range":';
-    yield \json_encode(Symfony\Component\JsonEncoder\Tests\Fixtures\Model\DummyWithNormalizerAttributes::concatRange($data->range, $options));
+    yield \json_encode(Symfony\Component\JsonEncoder\Tests\Fixtures\Model\DummyWithNormalizerAttributes::concatRange($data->range));
     yield '}';
 };

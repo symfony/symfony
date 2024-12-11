@@ -16,7 +16,7 @@ return static function (mixed $stream, \Psr\Container\ContainerInterface $denorm
                     return strtoupper(\Symfony\Component\JsonEncoder\Decode\NativeDecoder::decodeStream($stream, $v[0], $v[1]));
                 },
                 'range' => $properties['range'] = static function () use ($stream, $v, $options, $denormalizers, $instantiator, &$providers) {
-                    return Symfony\Component\JsonEncoder\Tests\Fixtures\Model\DummyWithNormalizerAttributes::explodeRange(\Symfony\Component\JsonEncoder\Decode\NativeDecoder::decodeStream($stream, $v[0], $v[1]), $options);
+                    return Symfony\Component\JsonEncoder\Tests\Fixtures\Model\DummyWithNormalizerAttributes::explodeRange(\Symfony\Component\JsonEncoder\Decode\NativeDecoder::decodeStream($stream, $v[0], $v[1]));
                 },
                 default => null,
             };

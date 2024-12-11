@@ -107,13 +107,13 @@ class SplitterTest extends TestCase
         yield ['Expected end, but got "100".', '{"a": true} 100'];
     }
 
-    private function assertListBoundaries(?array $expectedBoundaries, string $content, int $offset = 0, ?int $length = null): void
+    private function assertListBoundaries(?array $expectedBoundaries, string $content): void
     {
         $resource = fopen('php://temp', 'w');
         fwrite($resource, $content);
         rewind($resource);
 
-        $boundaries = (new Splitter())->splitList($resource, $offset, $length);
+        $boundaries = (new Splitter())->splitList($resource);
         $boundaries = null !== $boundaries ? iterator_to_array($boundaries) : null;
 
         $this->assertSame($expectedBoundaries, $boundaries);
@@ -122,19 +122,19 @@ class SplitterTest extends TestCase
         fwrite($resource, $content);
         rewind($resource);
 
-        $boundaries = (new Splitter())->splitList($resource, $offset, $length);
+        $boundaries = (new Splitter())->splitList($resource);
         $boundaries = null !== $boundaries ? iterator_to_array($boundaries) : null;
 
         $this->assertSame($expectedBoundaries, $boundaries);
     }
 
-    private function assertDictBoundaries(?array $expectedBoundaries, string $content, int $offset = 0, ?int $length = null): void
+    private function assertDictBoundaries(?array $expectedBoundaries, string $content): void
     {
         $resource = fopen('php://temp', 'w');
         fwrite($resource, $content);
         rewind($resource);
 
-        $boundaries = (new Splitter())->splitDict($resource, $offset, $length);
+        $boundaries = (new Splitter())->splitDict($resource);
         $boundaries = null !== $boundaries ? iterator_to_array($boundaries) : null;
 
         $this->assertSame($expectedBoundaries, $boundaries);
@@ -143,7 +143,7 @@ class SplitterTest extends TestCase
         fwrite($resource, $content);
         rewind($resource);
 
-        $boundaries = (new Splitter())->splitDict($resource, $offset, $length);
+        $boundaries = (new Splitter())->splitDict($resource);
         $boundaries = null !== $boundaries ? iterator_to_array($boundaries) : null;
 
         $this->assertSame($expectedBoundaries, $boundaries);

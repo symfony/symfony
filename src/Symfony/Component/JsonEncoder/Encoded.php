@@ -38,11 +38,6 @@ final class Encoded implements \IteratorAggregate, \Stringable
 
     public function __toString(): string
     {
-        $encoded = '';
-        foreach ($this->chunks as $chunk) {
-            $encoded .= $chunk;
-        }
-
-        return $encoded;
+        return implode('', $this->chunks);
     }
 }

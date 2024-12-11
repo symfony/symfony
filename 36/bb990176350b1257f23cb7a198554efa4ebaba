@@ -1,0 +1,40 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2024-12-02T13:13:43Z
+
+Hey!
+
+Thanks for your PR. You are targeting branch "7.3" but it seems your PR description refers to branch "7.2".
+Could you update the PR description or change target branch? This helps core maintainers a lot.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by DavidBadura at 2024-12-03T15:39:37Z
+
+windows test fail is not related
+
+---------------------------------------------------------------------------
+
+by DavidBadura at 2024-12-09T11:08:42Z
+
+@mtarld I hope it's okay to ping you, I have one question about my fix.
+
+In `ReflectionTypeResolver` it is checked whether the enum is a BackedEnum and it is passed explicitly. But such a check also happens in the `enum()` function. I don't really understand why it is necessary to do this in the resolver as well.
+
+see: https://github.com/symfony/symfony/blob/7.3/src/Symfony/Component/TypeInfo/TypeResolver/ReflectionTypeResolver.php#L87
+
+Is that necessary? I have transferred the relevant tests and they are running.
+
+---------------------------------------------------------------------------
+
+by mtarld at 2024-12-09T14:01:03Z
+
+Hey @DavidBadura, thanks for your PR!
+
+> In ReflectionTypeResolver it is checked whether the enum is a BackedEnum and it is passed explicitly. But such a check also happens in the enum() function. I don't really understand why it is necessary to do this in the resolver as well.
+
+Indeed, there is no reason to keep the `BackedEnum` check in `ReflectionTypeResolver`, I think you can remove it.

@@ -1,0 +1,30 @@
+---------------------------------------------------------------------------
+
+by OskarStark at 2024-12-11T13:31:21Z
+
+Do we need to upgrade fabbot?
+
+---------------------------------------------------------------------------
+
+by keradus at 2024-12-11T18:10:55Z
+
+I explicitly applied subset of rules, as it's still over 100+ files to fix and I find it easier to review and apply step by step, and I do steps as rules and not as files. That's why fabbot can see some potential more changes, that I didn't apply, as they are coming from rules I was not applying in this PR.
+
+---------------------------------------------------------------------------
+
+by keradus at 2024-12-11T18:11:52Z
+
+To answer if it's beneficial to update fabbot, I encourage to start mentioning version of Fixer in fabbot report (cc @fabpot).
+Without that version, I cannot tell if it's important to upgrade the version right away or if it can wait.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2024-12-11T20:59:08Z
+
+FYI, it was v3.64.0, and I've just upgraded it to v3.65.0.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2024-12-11T20:59:42Z
+
+As Symfony 7.2 has been released now, this PR should target 7.3.

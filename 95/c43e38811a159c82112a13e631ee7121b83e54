@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by stof at 2024-12-11T15:53:22Z
+
+Doing that only in a dev requirement does not fully solve the issue though, as it applies only to our CI.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2024-12-12T08:02:18Z
+
+@stof conflict rule added

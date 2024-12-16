@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by Kocal at 2024-12-11T23:16:29Z
+
+Failing checks are unrelated, they should be fixed by https://github.com/symfony/symfony/pull/59182:
+<img width="940" alt="image" src="https://github.com/user-attachments/assets/d45f7940-f280-4ca0-bd8e-807177e75770" />
+
+---------------------------------------------------------------------------
+
+by Kocal at 2024-12-12T12:53:29Z
+
+Went for a more simple solution.
+
+Status: Needs review
+
+Failing checks are unrelated:
+<img width="1268" alt="image" src="https://github.com/user-attachments/assets/b81f1ecd-596b-4425-90c8-37fe9a5047ff" />
+
+---------------------------------------------------------------------------
+
+by Kocal at 2024-12-15T20:32:27Z
+
+Status: Needs review

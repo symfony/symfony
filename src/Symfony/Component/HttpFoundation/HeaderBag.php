@@ -20,6 +20,7 @@ namespace Symfony\Component\HttpFoundation;
  */
 class HeaderBag implements \IteratorAggregate, \Countable, \Stringable
 {
+    public const DEFAULT_CACHE_CONTROL_TARGET = '';
     protected const UPPER = '_ABCDEFGHIJKLMNOPQRSTUVWXYZ';
     protected const LOWER = '-abcdefghijklmnopqrstuvwxyz';
 
@@ -27,7 +28,13 @@ class HeaderBag implements \IteratorAggregate, \Countable, \Stringable
      * @var array<string, list<string|null>>
      */
     protected array $headers = [];
-    protected array $cacheControl = [];
+
+    /**
+     * Map of target to cache control instructions.
+     *
+     * @var array<string, CacheControl>
+     */
+    protected array $cacheControls = [];
 
     public function __construct(array $headers = [])
     {
@@ -68,10 +75,21 @@ class HeaderBag implements \IteratorAggregate, \Countable, \Stringable
     public function all(?string $key = null): array
     {
         if (null !== $key) {
-            return $this->headers[strtr($key, self::UPPER, self::LOWER)] ?? [];
+            $uniqueKey = strtr($key, self::UPPER, self::LOWER);
+            if (str_ends_with($uniqueKey, 'cache-control')) {
+                return [$this->getCacheControl($this->extractCacheControlTarget($key))->getCacheControlHeader()];
+            }
+
+            return $this->headers[$uniqueKey] ?? [];
         }
 
-        return $this->headers;
+        $headers = $this->headers;
+        // edge case: what if extending class directly changed Cache-Control in the $headers array?
+        foreach ($this->cacheControls as $target => $cacheControl) {
+            $headers[self::DEFAULT_CACHE_CONTROL_TARGET === $target ? 'cache-control' : $target.'-cache-control'] = [$cacheControl->getCacheControlHeader()];
+        }
+
+        return $headers;
     }
 
     /**
@@ -89,6 +107,7 @@ class HeaderBag implements \IteratorAggregate, \Countable, \Stringable
      */
     public function replace(array $headers = []): void
     {
+        $this->cacheControls = [];
         $this->headers = [];
         $this->add($headers);
     }
@@ -129,27 +148,43 @@ class HeaderBag implements \IteratorAggregate, \Countable, \Stringable
      */
     public function set(string $key, string|array|null $values, bool $replace = true): void
     {
-        $key = strtr($key, self::UPPER, self::LOWER);
+        $uniqueKey = strtr($key, self::UPPER, self::LOWER);
+
+        if (str_ends_with($uniqueKey, 'cache-control')) {
+            $this->setCacheControlFromHeader($key, $values, $replace);
+
+            return;
+        }
 
         if (\is_array($values)) {
             $values = array_values($values);
 
-            if (true === $replace || !isset($this->headers[$key])) {
-                $this->headers[$key] = $values;
+            if (true === $replace || !isset($this->headers[$uniqueKey])) {
+                $this->headers[$uniqueKey] = $values;
             } else {
-                $this->headers[$key] = array_merge($this->headers[$key], $values);
+                $this->headers[$uniqueKey] = array_merge($this->headers[$uniqueKey], $values);
             }
         } else {
-            if (true === $replace || !isset($this->headers[$key])) {
-                $this->headers[$key] = [$values];
+            if (true === $replace || !isset($this->headers[$uniqueKey])) {
+                $this->headers[$uniqueKey] = [$values];
             } else {
-                $this->headers[$key][] = $values;
+                $this->headers[$uniqueKey][] = $values;
             }
         }
+    }
 
-        if ('cache-control' === $key) {
-            $this->cacheControl = $this->parseCacheControl(implode(', ', $this->headers[$key]));
+    private function setCacheControlFromHeader(string $key, string|array|null $values, bool $replace = true): void
+    {
+        if (\is_array($values)) {
+            $values = implode(', ', $values);
         }
+        $target = $this->extractCacheControlTarget($key);
+        if ($replace) {
+            $this->cacheControls[$target] = CacheControl::fromHeader($values);
+
+            return;
+        }
+        $this->getCacheControl($target)->addCacheControlDirectives(CacheControl::parseCacheControl($values));
     }
 
     /**
@@ -173,12 +208,12 @@ class HeaderBag implements \IteratorAggregate, \Countable, \Stringable
      */
     public function remove(string $key): void
     {
-        $key = strtr($key, self::UPPER, self::LOWER);
+        $uniqueKey = strtr($key, self::UPPER, self::LOWER);
 
-        unset($this->headers[$key]);
+        unset($this->headers[$uniqueKey]);
 
-        if ('cache-control' === $key) {
-            $this->cacheControl = [];
+        if (str_ends_with($uniqueKey, 'cache-control')) {
+            $this->removeCacheControl($this->extractCacheControlTarget($key));
         }
     }
 
@@ -201,29 +236,56 @@ class HeaderBag implements \IteratorAggregate, \Countable, \Stringable
     }
 
     /**
+     * Get the default or a targeted cache control instruction set.
+     *
+     * If the set did not exist yet, it is created.
+     */
+    public function getCacheControl(string $target = self::DEFAULT_CACHE_CONTROL_TARGET): CacheControl
+    {
+        // TODO do we need to lowercase the targets as well, and track the desired case as we do for the headers in ResponseHeaderBag
+        if (!\array_key_exists($target, $this->cacheControls)) {
+            $this->cacheControls[$target] = new CacheControl();
+        }
+
+        return $this->cacheControls[$target];
+    }
+
+    /**
+     * Remove cache control settings.
+     */
+    public function removeCacheControl(string $target = self::DEFAULT_CACHE_CONTROL_TARGET): void
+    {
+        unset($this->cacheControls[$target]);
+    }
+
+    /**
      * Adds a custom Cache-Control directive.
+     *
+     * @deprecated Use getCacheControl()->addCacheControlDirective instead
      */
     public function addCacheControlDirective(string $key, bool|string $value = true): void
     {
-        $this->cacheControl[$key] = $value;
-
-        $this->set('Cache-Control', $this->getCacheControlHeader());
+        $this->getCacheControl()->addCacheControlDirective($key, $value);
     }
 
     /**
      * Returns true if the Cache-Control directive is defined.
+     *
+     * @deprecated Use getCacheControl()->hasCacheControlDirective instead
      */
     public function hasCacheControlDirective(string $key): bool
     {
-        return \array_key_exists($key, $this->cacheControl);
+        return $this->getCacheControl()->hasCacheControlDirective($key);
     }
 
     /**
      * Returns a Cache-Control directive value by name.
+     *
+     * @deprecated Use getCacheControl()->getCacheControlDirective instead
      */
     public function getCacheControlDirective(string $key): bool|string|null
     {
-        return $this->cacheControl[$key] ?? null;
+        return $this->getCacheControl()->getCacheControlDirective($key);
     }
 
     /**
@@ -231,9 +293,7 @@ class HeaderBag implements \IteratorAggregate, \Countable, \Stringable
      */
     public function removeCacheControlDirective(string $key): void
     {
-        unset($this->cacheControl[$key]);
-
-        $this->set('Cache-Control', $this->getCacheControlHeader());
+        $this->getCacheControl()->removeCacheControlDirective($key);
     }
 
     /**
@@ -254,20 +314,35 @@ class HeaderBag implements \IteratorAggregate, \Countable, \Stringable
         return \count($this->headers);
     }
 
+    /**
+     * @deprecated Use getCacheControl()->getCacheControlHeader instead
+     */
     protected function getCacheControlHeader(): string
     {
-        ksort($this->cacheControl);
-
-        return HeaderUtils::toString($this->cacheControl, ',');
+        return $this->getCacheControl()->getCacheControlHeader();
     }
 
     /**
      * Parses a Cache-Control HTTP header.
+     *
+     * @deprecated Use CacheControl::fromHeader instead
      */
     protected function parseCacheControl(string $header): array
     {
         $parts = HeaderUtils::split($header, ',=');
 
         return HeaderUtils::combine($parts);
+    }
+
+    /**
+     * Get the cache-control target from the header name.
+     */
+    private function extractCacheControlTarget(string $headerName): string
+    {
+        if ('cache-control' === strtolower($headerName)) {
+            return self::DEFAULT_CACHE_CONTROL_TARGET;
+        }
+
+        return substr($headerName, 0, -\strlen('-cache-control'));
     }
 }

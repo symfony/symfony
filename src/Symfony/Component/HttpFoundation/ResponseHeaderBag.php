@@ -24,7 +24,6 @@ class ResponseHeaderBag extends HeaderBag
     public const DISPOSITION_ATTACHMENT = 'attachment';
     public const DISPOSITION_INLINE = 'inline';
 
-    protected array $computedCacheControl = [];
     protected array $cookies = [];
     protected array $headerNames = [];
 
@@ -32,9 +31,8 @@ class ResponseHeaderBag extends HeaderBag
     {
         parent::__construct($headers);
 
-        if (!isset($this->headers['cache-control'])) {
-            $this->set('Cache-Control', '');
-        }
+        // ensure that an empty default cache control object is initialized
+        $this->getCacheControl();
 
         /* RFC2616 - 14.18 says all Responses need to have a Date */
         if (!isset($this->headers['date'])) {
@@ -50,6 +48,15 @@ class ResponseHeaderBag extends HeaderBag
         $headers = [];
         foreach ($this->all() as $name => $value) {
             $headers[$this->headerNames[$name] ?? $name] = $value;
+        }
+        foreach ($this->cacheControls as $target => $cacheControl) {
+            if (self::DEFAULT_CACHE_CONTROL_TARGET === $target) {
+                unset($headers['cache-control']);
+                $headers['Cache-Control'] = [$this->computeCacheControl()->getCacheControlHeader()];
+            } else {
+                unset($headers[$target.'-cache-control']);
+                $headers[$target.'-Cache-Control'] = [$cacheControl->getCacheControlHeader()];
+            }
         }
 
         return $headers;
@@ -71,9 +78,8 @@ class ResponseHeaderBag extends HeaderBag
 
         parent::replace($headers);
 
-        if (!isset($this->headers['cache-control'])) {
-            $this->set('Cache-Control', '');
-        }
+        // ensure that an empty default cache control object is initialized
+        $this->getCacheControl();
 
         if (!isset($this->headers['date'])) {
             $this->initDate();
@@ -87,11 +93,18 @@ class ResponseHeaderBag extends HeaderBag
         if (null !== $key) {
             $key = strtr($key, self::UPPER, self::LOWER);
 
-            return 'set-cookie' !== $key ? $headers[$key] ?? [] : array_map('strval', $this->getCookies());
+            return match ($key) {
+                'set-cookie' => array_map('strval', $this->getCookies()),
+                'cache-control' => [$this->computeCacheControl()->getCacheControlHeader()],
+                default => $headers[$key] ?? [],
+            };
         }
 
         foreach ($this->getCookies() as $cookie) {
             $headers['set-cookie'][] = (string) $cookie;
+        }
+        if (\array_key_exists(self::DEFAULT_CACHE_CONTROL_TARGET, $this->cacheControls)) {
+            $headers['cache-control'] = [$this->computeCacheControl()->getCacheControlHeader()];
         }
 
         return $headers;
@@ -116,13 +129,6 @@ class ResponseHeaderBag extends HeaderBag
         $this->headerNames[$uniqueKey] = $key;
 
         parent::set($key, $values, $replace);
-
-        // ensure the cache-control header has sensible defaults
-        if (\in_array($uniqueKey, ['cache-control', 'etag', 'last-modified', 'expires'], true) && '' !== $computed = $this->computeCacheControlValue()) {
-            $this->headers['cache-control'] = [$computed];
-            $this->headerNames['cache-control'] = 'Cache-Control';
-            $this->computedCacheControl = $this->parseCacheControl($computed);
-        }
     }
 
     public function remove(string $key): void
@@ -138,23 +144,25 @@ class ResponseHeaderBag extends HeaderBag
 
         parent::remove($key);
 
-        if ('cache-control' === $uniqueKey) {
-            $this->computedCacheControl = [];
-        }
-
         if ('date' === $uniqueKey) {
             $this->initDate();
         }
     }
 
+    /**
+     * @deprecated use computeCacheControl()->hasCacheControlDirective instead)
+     */
     public function hasCacheControlDirective(string $key): bool
     {
-        return \array_key_exists($key, $this->computedCacheControl);
+        return $this->computeCacheControl()->hasCacheControlDirective($key);
     }
 
+    /**
+     * @deprecated use computeCacheControl()->getCacheControlDirective instead)
+     */
     public function getCacheControlDirective(string $key): bool|string|null
     {
-        return $this->computedCacheControl[$key] ?? null;
+        return $this->computeCacheControl()->getCacheControlDirective($key);
     }
 
     public function setCookie(Cookie $cookie): void
@@ -221,7 +229,7 @@ class ResponseHeaderBag extends HeaderBag
      */
     public function clearCookie(string $name, ?string $path = '/', ?string $domain = null, bool $secure = false, bool $httpOnly = true, ?string $sameSite = null /* , bool $partitioned = false */): void
     {
-        $partitioned = 6 < \func_num_args() ? \func_get_arg(6) : false;
+        $partitioned = 6 < \func_num_args() ? func_get_arg(6) : false;
 
         $this->setCookie(new Cookie($name, null, 1, $path, $domain, $secure, $httpOnly, false, $sameSite, $partitioned));
     }
@@ -240,28 +248,33 @@ class ResponseHeaderBag extends HeaderBag
      * This considers several other headers and calculates or modifies the
      * cache-control header to a sensible, conservative value.
      */
-    protected function computeCacheControlValue(): string
+    protected function computeCacheControl(): CacheControl
     {
-        if (!$this->cacheControl) {
-            if ($this->has('Last-Modified') || $this->has('Expires')) {
-                return 'private, must-revalidate'; // allows for heuristic expiration (RFC 7234 Section 4.2.2) in the case of "Last-Modified"
+        if (!\array_key_exists(self::DEFAULT_CACHE_CONTROL_TARGET, $this->cacheControls)) {
+            // cache control explicitly removed
+            return new CacheControl();
+        }
+        $cacheControl = $this->getCacheControl();
+        if ($cacheControl->empty()) {
+            if (\array_key_exists('last-modified', $this->headers) || \array_key_exists('expires', $this->headers)) {
+                return new CacheControl(['private' => true, 'must-revalidate' => true]); // allows for heuristic expiration (RFC 7234 Section 4.2.2) in the case of "Last-Modified"
             }
 
             // conservative by default
-            return 'no-cache, private';
+            return new CacheControl(['no-cache' => true, 'private' => true]);
         }
 
-        $header = $this->getCacheControlHeader();
-        if (isset($this->cacheControl['public']) || isset($this->cacheControl['private'])) {
-            return $header;
+        if ($cacheControl->hasCacheControlDirective('public') || $cacheControl->hasCacheControlDirective('private')) {
+            return $cacheControl; // do we need to clone? i think not
         }
 
         // public if s-maxage is defined, private otherwise
-        if (!isset($this->cacheControl['s-maxage'])) {
-            return $header.', private';
+        if (!$cacheControl->hasCacheControlDirective('s-maxage')) {
+            $cacheControl = clone $cacheControl;
+            $cacheControl->addCacheControlDirective('private');
         }
 
-        return $header;
+        return $cacheControl;
     }
 
     private function initDate(): void

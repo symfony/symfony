@@ -379,7 +379,7 @@ class ResponseTest extends ResponseTestCase
         $response->setStaleIfError(86400);
 
         $cacheControl = $response->headers->get('Cache-Control');
-        $this->assertEquals('stale-if-error=86400, private', $cacheControl);
+        $this->assertEquals('private, stale-if-error=86400', $cacheControl);
     }
 
     public function testSetStaleWhileRevalidateWithoutSharedMaxAge()
@@ -388,7 +388,7 @@ class ResponseTest extends ResponseTestCase
         $response->setStaleWhileRevalidate(300);
 
         $cacheControl = $response->headers->get('Cache-Control');
-        $this->assertEquals('stale-while-revalidate=300, private', $cacheControl);
+        $this->assertEquals('private, stale-while-revalidate=300', $cacheControl);
     }
 
     public function testIsPrivate()

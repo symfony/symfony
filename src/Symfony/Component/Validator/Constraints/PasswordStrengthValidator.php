@@ -39,7 +39,11 @@ final class PasswordStrengthValidator extends ConstraintValidator
         if (!\is_string($value) && !$value instanceof \Stringable) {
             throw new UnexpectedValueException($value, 'string');
         }
-        $passwordStrengthEstimator = $this->passwordStrengthEstimator ?? self::estimateStrength(...);
+
+        $passwordStrengthEstimator = $this->passwordStrengthEstimator ?
+            ($this->passwordStrengthEstimator)() :
+            self::estimateStrength(...);
+
         $strength = $passwordStrengthEstimator((string) $value);
 
         if ($strength < $constraint->minScore) {

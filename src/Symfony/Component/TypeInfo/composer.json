@@ -31,6 +31,9 @@
     "require-dev": {
         "phpstan/phpdoc-parser": "^1.0|^2.0"
     },
+    "conflict": {
+        "phpstan/phpdoc-parser": "<1.0"
+    },
     "autoload": {
         "psr-4": { "Symfony\\Component\\TypeInfo\\": "" },
         "exclude-from-classmap": [

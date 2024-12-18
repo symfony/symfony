@@ -1,0 +1,21 @@
+---------------------------------------------------------------------------
+
+by valtzu at 2024-11-27T21:04:21Z
+
+1. fabbot failures are not a result of these changes – I can of course fix them here but not sure if I should
+2. Not sure how to fix those tests in other packages as it's only tests that depend on UriSigner from 7.3 :thinking:
+
+---------------------------------------------------------------------------
+
+by stof at 2024-11-28T10:48:17Z
+
+There is 2 errors in fabbot, which need to be treated differently:
+
+- the coding standard failure is related to your change and must be fixed
+- the exception message formatting should be ignored (this check has some false positives as we have special cases)
+
+---------------------------------------------------------------------------
+
+by stof at 2024-11-28T10:54:55Z
+
+Fixing the deps=low tests is probably a matter of bumping the min requirement

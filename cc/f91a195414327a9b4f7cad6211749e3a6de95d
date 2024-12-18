@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2024-12-16T08:28:05Z
+
+I'm going to merge it in 7.3 as this is a new feature.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-12-16T10:01:42Z
+
+@wuchen90 to match @fabpot's comment, could you please rebase on 7.3 and add a line in the changelog of the component in the 7.3 section? (to be created potentially)
+
+---------------------------------------------------------------------------
+
+by derrabus at 2024-12-16T10:45:29Z
+
+Also, please rebase onto 7.3 and resolve the conflicts.

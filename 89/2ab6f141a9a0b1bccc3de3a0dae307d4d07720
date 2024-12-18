@@ -1,0 +1,253 @@
+---------------------------------------------------------------------------
+
+by smnandre at 2024-12-14T18:32:10Z
+
+If packages are passed to the command, what about using "Package XX and YY up to date" ... or find something similar.
+
+As "everything is up to date" would be missleading.
+
+---------------------------------------------------------------------------
+
+by smnandre at 2024-12-14T19:00:22Z
+
+Globally about this PR
+
+composer uses "everything" but just after precising what and this feels  more contextually correct
+
+So  here i'd either
+*  echo nothing (like npm, brew, and other) -- as "outdated" should return a list of outdated... so an empty list when no package is outdated does not feel that bad.
+* add a full sentence on what i did and why there was no result
+
+wdyt  ?
+
+---
+
+### composer
+
+#### Nothing outdated
+
+```console
+composer outdated
+
+Direct dependencies required in composer.json:
+Everything up to date
+
+Transitive dependencies not required in composer.json:
+Everything up to date
+```
+
+#### Something outdated
+
+```console
+composer outdated
+
+Color legend:
+- patch or minor release available - update recommended
+- major release available - update possible
+
+Direct dependencies required in composer.json:
+doctrine/dbal                       3.8.3  4.2.1  Powerful PHP database abstraction layer (DBAL) with many features for database schem...
+doctrine/doctrine-bundle            2.12.0 2.13.1 Sy
+
+(...)
+```
+
+### npm
+
+#### Nothing outdated
+
+```console
+$ npm outdated
+
+```
+
+#### Something outdated
+
+```console
+$ npm outdated
+Package           Current  Wanted  Latest  Location                       Depended by
+date-fns            3.6.0   3.6.0   4.1.0  node_modules/date-fns          simonandre
+lightningcss-cli   1.27.0  1.28.2  1.28.2  node_modules/lightningcss-cli  simonandre
+
+(...)
+```
+
+### brew: no output
+
+#### Nothing outdated
+
+```console
+$ brew outdated
+
+```
+
+Sometimes echo some logs about cask files downloaded... but no message returned
+
+#### Something outdated
+
+```console
+$ brew outdated
+
+You have 70 outdated formulae and 2 outdated casks installed.
+
+act (0.2.68) < 0.2.70
+awscli (2.18.11) < 2.22.17
+blackfireio/blackfire/blackfire (2.28.18) < 2.28.21
+buf (1.45.0) < 1.47.2
+
+(...)
+```
+
+or
+
+```console
+$ brew outdated
+
+brew outdated
+blackfireio/blackfire/blackfire (2.28.18) < 2.28.21
+git (2.47.0) < 2.47.1
+git-lfs (3.5.1) < 3.6.0
+gitlab-runner (17.5.2) < 17.6.0
+libgit2 (1.8.2) < 1.8.4
+
+```
+
+### yarn: no output (?)
+
+Yarn does not  seem to return anything when nothing is outdated.... but not sure the version i have is the most recent 😆
+
+---------------------------------------------------------------------------
+
+by ThomasLandauer at 2024-12-14T19:15:40Z
+
+IMO, a command should *always* give some output - to indicate that it did run.
+I wasn't aware that you can pass a package name. But I don't want to overcomplicate this. So what about just some one-size-fits-all message:
+> No updates found.
+
+?
+
+---------------------------------------------------------------------------
+
+by smnandre at 2024-12-14T19:52:36Z
+
+Yep this would work I guess! Maybe a small test to check json does not output something ?
+
+---------------------------------------------------------------------------
+
+by ThomasLandauer at 2024-12-15T11:37:35Z
+
+Sorry, I'm stuck with the tests :-( Is [ImportMapVersionCheckerTest](https://github.com/symfony/symfony/blob/7.3/src/Symfony/Component/AssetMapper/Tests/ImportMap/ImportMapVersionCheckerTest.php) the right place? But don't understand what's going on in there...
+
+---------------------------------------------------------------------------
+
+by smnandre at 2024-12-15T15:19:56Z
+
+Hop:  🎁
+
+```php
+<?php
+
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+namespace Symfony\Component\AssetMapper\Tests\ImportMap;
+
+use PHPUnit\Framework\TestCase;
+use Symfony\Component\AssetMapper\Command\ImportMapOutdatedCommand;
+use Symfony\Component\AssetMapper\ImportMap\ImportMapUpdateChecker;
+use Symfony\Component\Console\Tester\CommandTester;
+
+class ImportMapOutdatedCommandTest extends TestCase
+{
+    /**
+     * @dataProvider provideNoOutdatedPackageCases
+     */
+    public function testCommandWhenNoOutdatedPackages(string $display, ?string $format = null): void
+    {
+        $updateChecker = $this->createMock(ImportMapUpdateChecker::class);
+        $command = new ImportMapOutdatedCommand($updateChecker);
+
+        $commandTester = new CommandTester($command);
+        $commandTester->execute(is_string($format) ? ['--format' => $format] : []);
+
+        $commandTester->assertCommandIsSuccessful();
+        $this->assertEquals($display, trim($commandTester->getDisplay(true)));
+    }
+
+    /**
+     * @return iterable<array{string, string|null}>
+     */
+    public static function provideNoOutdatedPackageCases(): iterable
+    {
+        yield 'default' => ['[OK] No outdated packages found.', null];
+        yield 'txt' => ['[OK] No outdated packages found.', 'txt'];
+        yield 'json' => ['', 'json'];
+    }
+}
+```
+
+This is almost all you need for this one i suppose (not your fault if there were no tests before 😆 )
+
+---------------------------------------------------------------------------
+
+by ThomasLandauer at 2024-12-15T17:00:40Z
+
+Thanks!
+
+* I just pasted this into a new file.
+* I cannot run the test locally, cause composer gives me:
+    ```
+  Problem 1
+    - symfony/symfony is present at version 5.x-dev and cannot be modified by Composer
+    - Root composer.json requires symfony/runtime 5.x-dev -> satisfiable by symfony/runtime[5.x-dev].
+    - symfony/runtime 5.x-dev conflicts with symfony/dotenv <6.4 (symfony/symfony 5.x-dev replaces symfony/dotenv self.version).
+    ```
+* For JSON, I'm returning `[]` as per @stof's comment above.
+
+---------------------------------------------------------------------------
+
+by smnandre at 2024-12-15T17:44:13Z
+
+Yep perfect!
+
+Test seem to pass no?
+
+Locally you should update your dependencies I suppose :)
+
+AssetMapper & ImportMap commands are only available for Symfony 6.3+ (or 6.4 ?)
+
+---------------------------------------------------------------------------
+
+by ThomasLandauer at 2024-12-15T20:20:42Z
+
+I fixed the coding style. I guess the failure of this 1 test suite is unrelated.
+
+---------------------------------------------------------------------------
+
+by ThomasLandauer at 2024-12-16T11:21:25Z
+
+This is getting released as *feature* in 7.3, right? But where is the changelog for 7.3?
+
+---------------------------------------------------------------------------
+
+by mtarld at 2024-12-16T12:26:00Z
+
+Yes indeed, so you'll have to add it here: https://github.com/symfony/symfony/blob/7.3/src/Symfony/Component/AssetMapper/CHANGELOG.md?plain=1#L4
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2024-12-16T12:27:36Z
+
+We only document new features and BC breaks in the changelog files. So to me there's nothing to document here.
+
+---------------------------------------------------------------------------
+
+by mtarld at 2024-12-16T13:02:13Z
+
+Oh ok, my bad! Everything's fine then

@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2024-12-18T10:18:19Z
+
+The changes done in Doctrine are slightly different, is it on purpose?
+
+---------------------------------------------------------------------------
+
+by nikophil at 2024-12-18T10:43:03Z
+
+@fabpot I've added the `isTransactionActive()`, as stated by @ro0NL
+
+the other difference I can see with the fix in the ORM is that they close the entity manager, but I don't think we want to do this here.

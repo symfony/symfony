@@ -1,0 +1,29 @@
+{
+  "name": "daggermodule/symfony",
+  "description": "",
+  "version": "1.0.0",
+  "minimum-stability": "dev",
+  "license": "proprietary",
+  "authors": [
+  ],
+  "repositories": [
+    {
+      "type": "path",
+      "url": "./sdk"
+    }
+  ],
+  "require": {
+    "php": "^8.1",
+    "dagger/dagger": "*@dev"
+  },
+  "autoload": {
+    "psr-4": {
+      "DaggerModule\\": "src/"
+    }
+  },
+  "config": {
+    "platform": {
+      "php": "8.3.7"
+    }
+  }
+}

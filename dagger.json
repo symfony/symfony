@@ -1,0 +1,18 @@
+{
+  "name": "symfony",
+  "engineVersion": "v0.15.1",
+  "sdk": "php",
+  "dependencies": [
+    {
+      "name": "psalm",
+      "source": "github.com/dragoonis/dagger-psalm",
+      "pin": "f9ace1b28fdec034f19e3fd2c513a3f549298569"
+    },
+    {
+      "name": "phpstan",
+      "source": "github.com/dragoonis/dagger-phpstan",
+      "pin": "f43c6ae678aacbddcc8dfd006b0b5311d69b578e"
+    }
+  ],
+  "source": ".dagger"
+}

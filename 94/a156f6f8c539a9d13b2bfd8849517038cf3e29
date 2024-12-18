@@ -1,0 +1,30 @@
+---------------------------------------------------------------------------
+
+by OskarStark at 2024-12-17T09:57:58Z
+
+Thanks, you need to raise the minimum `symfony/notifier` version to `7.3` for those bridges, using the new exception class
+
+---------------------------------------------------------------------------
+
+by raphael-geffroy at 2024-12-17T10:10:35Z
+
+@OskarStark like this ? 🤔
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2024-12-17T10:22:14Z
+
+maybe we should also add the type that was actually passed as part of the exception message
+
+---------------------------------------------------------------------------
+
+by raphael-geffroy at 2024-12-17T10:44:24Z
+
+I did it at first, inspired by the \Symfony\Component\Notifier\Exception\UnsupportedMessageTypeException and then I saw that all the existing exception had the same format so I reused it.
+But I agree with you, I'll revert to this step then !
+
+---------------------------------------------------------------------------
+
+by raphael-geffroy at 2024-12-17T10:56:27Z
+
+@xabbuh Done ✅ (reused the format of the \Symfony\Component\Notifier\Exception\UnsupportedMessageTypeException)

@@ -25,7 +25,7 @@ interface NormalizerInterface
     /**
      * @param array<string, mixed> $options
      */
-    public function normalize(mixed $denormalized, array $options = []): mixed;
+    public function normalize(mixed $denormalized, object $object, array $options = []): mixed;
 
     public static function getNormalizedType(): Type;
 }

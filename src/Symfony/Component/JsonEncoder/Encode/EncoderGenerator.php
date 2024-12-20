@@ -154,7 +154,7 @@ final class EncoderGenerator
                 foreach ($propertyMetadata->getNormalizers() as $normalizer) {
                     if (\is_string($normalizer)) {
                         $normalizerServiceAccessor = new FunctionDataAccessor('get', [new ScalarDataAccessor($normalizer)], new VariableDataAccessor('normalizers'));
-                        $propertyAccessor = new FunctionDataAccessor('normalize', [$propertyAccessor, new VariableDataAccessor('options')], $normalizerServiceAccessor);
+                        $propertyAccessor = new FunctionDataAccessor('normalize', [$propertyAccessor, $accessor, new VariableDataAccessor('options')], $normalizerServiceAccessor);
 
                         continue;
                     }
@@ -168,7 +168,7 @@ final class EncoderGenerator
                     $functionName = !$functionReflection->getClosureScopeClass()
                         ? $functionReflection->getName()
                         : \sprintf('%s::%s', $functionReflection->getClosureScopeClass()->getName(), $functionReflection->getName());
-                    $arguments = $functionReflection->isUserDefined() ? [$propertyAccessor, new VariableDataAccessor('options')] : [$propertyAccessor];
+                    $arguments = $functionReflection->isUserDefined() ? [$propertyAccessor, $accessor, new VariableDataAccessor('options')] : [$propertyAccessor];
 
                     $propertyAccessor = new FunctionDataAccessor($functionName, $arguments);
                 }

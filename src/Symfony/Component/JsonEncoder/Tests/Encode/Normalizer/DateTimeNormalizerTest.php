@@ -23,12 +23,12 @@ class DateTimeNormalizerTest extends TestCase
 
         $this->assertEquals(
             '2023-07-26T00:00:00+00:00',
-            $normalizer->normalize(new \DateTimeImmutable('2023-07-26', new \DateTimeZone('UTC')), []),
+            $normalizer->normalize(new \DateTimeImmutable('2023-07-26', new \DateTimeZone('UTC')), new \stdClass(), []),
         );
 
         $this->assertEquals(
             '26/07/2023 00:00:00',
-            $normalizer->normalize((new \DateTimeImmutable('2023-07-26', new \DateTimeZone('UTC')))->setTime(0, 0), [DateTimeNormalizer::FORMAT_KEY => 'd/m/Y H:i:s']),
+            $normalizer->normalize((new \DateTimeImmutable('2023-07-26', new \DateTimeZone('UTC')))->setTime(0, 0), new \stdClass(), [DateTimeNormalizer::FORMAT_KEY => 'd/m/Y H:i:s']),
         );
     }
 
@@ -37,6 +37,6 @@ class DateTimeNormalizerTest extends TestCase
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('The denormalized data must implement the "\DateTimeInterface".');
 
-        (new DateTimeNormalizer())->normalize(true, []);
+        (new DateTimeNormalizer())->normalize(true, new \stdClass(), []);
     }
 }

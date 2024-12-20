@@ -21,7 +21,7 @@ use Symfony\Component\TypeInfo\Type\BuiltinType;
  */
 class RangeNormalizer implements NormalizerInterface, DenormalizerInterface
 {
-    public function normalize(mixed $denormalized, array $options = []): string
+    public function normalize(mixed $denormalized, object $object, array $options = []): string
     {
         return $denormalized[0].'..'.$denormalized[1];
     }

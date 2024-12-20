@@ -27,7 +27,7 @@ final class DateTimeNormalizer implements NormalizerInterface
 {
     public const FORMAT_KEY = 'date_time_format';
 
-    public function normalize(mixed $denormalized, array $options = []): string
+    public function normalize(mixed $denormalized, object $object, array $options = []): string
     {
         if (!$denormalized instanceof \DateTimeInterface) {
             throw new InvalidArgumentException('The denormalized data must implement the "\DateTimeInterface".');

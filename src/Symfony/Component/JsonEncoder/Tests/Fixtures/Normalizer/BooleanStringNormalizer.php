@@ -7,7 +7,7 @@ use Symfony\Component\TypeInfo\Type;
 
 final class BooleanStringNormalizer implements NormalizerInterface
 {
-    public function normalize(mixed $data, array $options = []): mixed
+    public function normalize(mixed $data, object $object, array $options = []): mixed
     {
         return $data ? 'true' : 'false';
     }

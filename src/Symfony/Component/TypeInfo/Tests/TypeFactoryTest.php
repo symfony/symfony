@@ -182,6 +182,7 @@ class TypeFactoryTest extends TestCase
         $this->assertEquals(new UnionType(new BuiltinType(TypeIdentifier::INT), new ObjectType(self::class)), Type::union(Type::int(), Type::object(self::class)));
         $this->assertEquals(new UnionType(new BuiltinType(TypeIdentifier::INT), new BuiltinType(TypeIdentifier::STRING)), Type::union(Type::int(), Type::string(), Type::int()));
         $this->assertEquals(new UnionType(new BuiltinType(TypeIdentifier::INT), new BuiltinType(TypeIdentifier::STRING)), Type::union(Type::int(), Type::union(Type::int(), Type::string())));
+        $this->assertEquals(new BuiltinType(TypeIdentifier::MIXED), Type::union(Type::mixed(), Type::int()));
     }
 
     public function testCreateIntersection()

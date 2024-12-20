@@ -255,9 +255,9 @@ trait TypeFactoryTrait
      *
      * @param list<T> $types
      *
-     * @return UnionType<T>|NullableType<T>
+     * @return UnionType<T>|NullableType<T>|BuiltinType<TypeIdentifier::MIXED>
      */
-    public static function union(Type ...$types): UnionType
+    public static function union(Type ...$types): UnionType|BuiltinType
     {
         /** @var list<T> $unionTypes */
         $unionTypes = [];
@@ -266,6 +266,10 @@ trait TypeFactoryTrait
         $isNullable = fn (Type $type): bool => $type instanceof BuiltinType && TypeIdentifier::NULL === $type->getTypeIdentifier();
 
         foreach ($types as $type) {
+            if ($type instanceof BuiltinType && TypeIdentifier::MIXED === $type->getTypeIdentifier()) {
+                return $type;
+            }
+
             if ($type instanceof UnionType) {
                 foreach ($type->getTypes() as $unionType) {
                     if ($isNullable($type)) {

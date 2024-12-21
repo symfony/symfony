@@ -99,10 +99,13 @@ class Symfony
     #[DaggerFunction]
     #[Doc('Run psalm across on a specific Symfony component')]
     // dagger call integration-tests --source=.
-    public function integrationTests(Directory $source): Container
+    public function integrationTests(
+//Directory $source
+): Container
     {
         return dag()->container()
             ->from('php:8.4-alpine')
+            // ->withExec($this->cmd('apk add --update inetutils-telnet'))
             ->withServiceBinding('redis', $this->redis())
             ->withServiceBinding('postgres', $this->postgres())
             ->withServiceBinding('redis-authenticated', $this->redisAuthenticated())
@@ -111,10 +114,11 @@ class Symfony
             ->withServiceBinding('memcached', $this->memcached())
             ->withServiceBinding('rabbitmq', $this->rabbitmq())
             ->withServiceBinding('mongodb', $this->mongodb())
+            ->withServiceBinding('sqs', $this->sqs())
             ->withServiceBinding('couchbase', $this->couchbase())
-            // ->withServiceBinding('sqs', $this->sqs())
             ->withServiceBinding('zookeeper', $this->zookeeper())
             ->withExec(['php', '-v']);
+
     }
 
     private function runIntegrationTests(Container $container): Container
@@ -143,7 +147,7 @@ class Symfony
         return dag()->container()
             ->from("redis:$version")
             ->withExposedPort(6379)
-            ->asService();
+            ->asService(useEntrypoint: true);
     }
 
     private function postgres($version = '16'): Service
@@ -151,7 +155,8 @@ class Symfony
         return dag()->container()
             ->from("postgres:$version-alpine")
             ->withExposedPort(5432)
-            ->asService();
+            ->withEnvVariable('POSTGRES_PASSWORD', 'password')
+            ->asService(useEntrypoint: true);
     }
 
     private function redisAuthenticated($version = '6.2.8'): Service
@@ -160,7 +165,7 @@ class Symfony
             ->from("redis:$version-alpine")
             ->withExposedPort(6379)
             ->withEnvVariable('REDIS_ARGS', '--requirepass p@ssword')
-            ->asService();
+            ->asService(useEntrypoint: true);
     }
 
     private function redisCluster($version = '6.2.8'): Service
@@ -175,7 +180,7 @@ class Symfony
             ->withExposedPort(7005)
             ->withExposedPort(7006)
             ->withEnvVariable('STANDALONE', '1')
-            ->asService();
+            ->asService(useEntrypoint: true);
     }
 
     private function redisSentinel($version = '6.2.8'): Service
@@ -186,7 +191,7 @@ class Symfony
             ->withEnvVariable('REDIS_MASTER_HOST', 'redis')
             ->withEnvVariable('REDIS_MASTER_SET', 'redis_sentinel')
             ->withEnvVariable('REDIS_SENTINEL_QUORUM', '1')
-            ->asService();
+            ->asService(useEntrypoint: true);
     }
 
     private function memcached($version = '1.6.5'): Service
@@ -194,7 +199,7 @@ class Symfony
         return dag()->container()
             ->from("memcached:$version")
             ->withExposedPort(11211)
-            ->asService();
+            ->asService(useEntrypoint: true);
     }
 
     private function rabbitmq($version = '3.8.3'): Service
@@ -202,7 +207,7 @@ class Symfony
         return dag()->container()
             ->from("rabbitmq:$version")
             ->withExposedPort(5672)
-            ->asService();
+            ->asService(useEntrypoint: true);
     }
 
     // @todo - this failed to come up - why ?
@@ -211,19 +216,17 @@ class Symfony
         return dag()->container()
             ->from("mongo")
             ->withExposedPort(27017)
-            ->asService();
+            ->asService(useEntrypoint: true);
     }
 
     private function couchbase($version = '6.5.1'): Service
     {
         return dag()->container()
             ->from("couchbase")
-            ->withExposedPort(8091)
-            ->withExposedPort(8092)
-            ->withExposedPort(8093)
-            ->withExposedPort(8094)
-            ->withExposedPort(11210)
-            ->asService();
+           ->withExposedPort(8091)
+           ->withExposedPort(8092)
+           ->withExposedPort(11210)
+            ->asService(useEntrypoint: true);
     }
 
     private function sqs($version = '3.0.2'): Service
@@ -231,15 +234,42 @@ class Symfony
         return dag()->container()
             ->from("localstack/localstack:$version")
             ->withExposedPort(4566)
-            ->asService();
+            ->asService(useEntrypoint: true);
     }
+
+    private function ldap(): Service
+    {
+        return dag()->container()
+            ->from("bitnami/openldap")
+            ->withExposedPort(3389)
+            ->asService(useEntrypoint: true);
+    }
+
+    private function ftp(): Service
+    {
+        return dag()->container()
+            ->from("onekilo79/ftpd_test")
+            ->withExposedPort(30000)
+            ->withExposedPort(30001)
+            ->withExposedPort(30002)
+            ->withExposedPort(30003)
+            ->withExposedPort(30004)
+            ->withExposedPort(30005)
+            ->withExposedPort(30006)
+            ->withExposedPort(30007)
+            ->withExposedPort(30008)
+            ->withExposedPort(30009)
+            ->asService(useEntrypoint: true);
+    }
+
 
     private function zookeeper(): Service
     {
         return dag()->container()
             ->from("zookeeper")
-            ->asService();
-    }    
+            ->withExposedPort(2181)
+            ->asService(useEntrypoint: true);
+    }
 
     // @todo - kafka how to do "options" YML key
 

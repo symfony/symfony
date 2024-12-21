@@ -106,17 +106,19 @@ class Symfony
         return dag()->container()
             ->from('php:8.4-alpine')
             // ->withExec($this->cmd('apk add --update inetutils-telnet'))
-            ->withServiceBinding('redis', $this->redis())
-            ->withServiceBinding('postgres', $this->postgres())
-            ->withServiceBinding('redis-authenticated', $this->redisAuthenticated())
-            ->withServiceBinding('redis-cluster', $this->redisCluster())
-            ->withServiceBinding('redis-sentinel', $this->redisSentinel())
-            ->withServiceBinding('memcached', $this->memcached())
-            ->withServiceBinding('rabbitmq', $this->rabbitmq())
-            ->withServiceBinding('mongodb', $this->mongodb())
-            ->withServiceBinding('sqs', $this->sqs())
-            ->withServiceBinding('couchbase', $this->couchbase())
-            ->withServiceBinding('zookeeper', $this->zookeeper())
+            // ->withServiceBinding('redis', $this->redis())
+            // ->withServiceBinding('postgres', $this->postgres())
+            // ->withServiceBinding('redis-authenticated', $this->redisAuthenticated())
+            // ->withServiceBinding('redis-cluster', $this->redisCluster())
+            // ->withServiceBinding('redis-sentinel', $this->redisSentinel())
+            // ->withServiceBinding('memcached', $this->memcached())
+            // ->withServiceBinding('rabbitmq', $this->rabbitmq())
+            // ->withServiceBinding('mongodb', $this->mongodb())
+            // ->withServiceBinding('sqs', $this->sqs())
+            // ->withServiceBinding('couchbase', $this->couchbase())
+            // ->withServiceBinding('zookeeper', $this->zookeeper())
+            ->withServiceBinding('zookeeper', $this->ftp())
+            ->withServiceBinding('zookeeper', $this->ldap())
             ->withExec(['php', '-v']);
 
     }
@@ -241,7 +243,24 @@ class Symfony
     {
         return dag()->container()
             ->from("bitnami/openldap")
+
+            // root@3f87793d2fc8:/# netstat -tnlp
+            // Active Internet connections (only servers)
+            // Proto Recv-Q Send-Q Local Address           Foreign Address         State       PID/Program name    
+            // tcp        0      0 0.0.0.0:1389            0.0.0.0:*               LISTEN      -                   
+            // tcp6       0      0 :::1389                 :::*                    LISTEN      - 
+            
+            // The Bitnami Docker OpenLDAP can be easily setup with the following environment variables: L
+            // DAP_PORT_NUMBER : The port OpenLDAP is listening for requests. Priviledged port is supported (e.g. 389 ). 
+            // Default: 1389 (non privileged port).
+
             ->withExposedPort(3389)
+            ->withEnvVariable('LDAP_ADMIN_USERNAME', 'admin')
+            ->withEnvVariable('LDAP_ADMIN_PASSWORD', 'symfony')
+            ->withEnvVariable('LDAP_ROOT', 'dc=symfony,dc=com')
+            ->withEnvVariable('LDAP_PORT_NUMBER', '3389')
+            ->withEnvVariable('LDAP_USERS', 'a')
+            ->withEnvVariable('LDAP_PASSWORDS', 'a')
             ->asService(useEntrypoint: true);
     }
 
@@ -249,6 +268,8 @@ class Symfony
     {
         return dag()->container()
             ->from("onekilo79/ftpd_test")
+            ->withExposedPort(21)
+            // @todo - what ports actually get used? do we need these?
             ->withExposedPort(30000)
             ->withExposedPort(30001)
             ->withExposedPort(30002)

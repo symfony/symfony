@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by chalasr at 2024-12-19T13:09:21Z
+
+Build failures look related, could you check?
+
+---------------------------------------------------------------------------
+
+by mtarld at 2024-12-20T15:05:59Z
+
+Indeed, they're here because of the BC break between FrameworkBundle and JsonEncoder (because of the `$forceEncodeChunks` removal in constructors). It should disappear once merged
+
+---------------------------------------------------------------------------
+
+by stof at 2024-12-20T15:09:12Z
+
+This will not disappear once merged. The CI failure are legitimate, because your PR misses the update of service definitions in FrameworkBundle to use the new signature.
+
+---------------------------------------------------------------------------
+
+by mtarld at 2024-12-20T15:21:42Z
+
+It was missing my last update... Should be good then

@@ -1,0 +1,56 @@
+---------------------------------------------------------------------------
+
+by natewiebe13 at 2024-12-07T14:13:51Z
+
+@derrabus hoping this can get released along with #48142 for 7.3 :)
+
+I'll have PRs for docs ready early next week.
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2024-12-07T15:40:15Z
+
+We also need no raise the dependency to 7.3 in composer.json to make it work
+
+---------------------------------------------------------------------------
+
+by derrabus at 2024-12-07T19:31:07Z
+
+> We also need no raise the dependency to 7.3 in composer.json to make it work
+
+We should not need to do that. The dependency is optional. 🤔
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2024-12-07T23:35:52Z
+
+>> We also need no raise the dependency to 7.3 in composer.json to make it work
+
+>We should not need to do that. The dependency is optional. 🤔
+
+Ok
+
+---------------------------------------------------------------------------
+
+by natewiebe13 at 2024-12-09T13:21:49Z
+
+Fixed BC break.
+
+---------------------------------------------------------------------------
+
+by stof at 2024-12-17T15:30:45Z
+
+I'm still holding on my comment in https://github.com/symfony/symfony/pull/59129#discussion_r1876175119
+I don't think return `false` for all calls to `is_granted_for_user` is the expected behavior if you configure the extension without a UserAuthorizationChecker.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2024-12-17T15:32:27Z
+
+Better DX is desirable here so 👍 for stof's suggestion. It should be a `\LogicException`
+
+---------------------------------------------------------------------------
+
+by natewiebe13 at 2024-12-17T15:38:58Z
+
+Sounds good. Just wanted to make sure there was consensus on that. :+1:

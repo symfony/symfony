@@ -17,8 +17,10 @@ use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerInterface;
 use Symfony\Component\JsonEncoder\Decode\DecoderGenerator;
 use Symfony\Component\JsonEncoder\Encode\EncoderGenerator;
 use Symfony\Component\JsonEncoder\Exception\ExceptionInterface;
+use Symfony\Component\JsonEncoder\Exception\InvalidArgumentException;
 use Symfony\Component\JsonEncoder\Mapping\PropertyMetadataLoaderInterface;
 use Symfony\Component\TypeInfo\Type;
+use Symfony\Component\TypeInfo\TypeResolver\TypeResolverInterface;
 
 /**
  * Generates encoders and decoders PHP files.
@@ -33,10 +35,11 @@ final class EncoderDecoderCacheWarmer implements CacheWarmerInterface
     private DecoderGenerator $decoderGenerator;
 
     /**
-     * @param iterable<class-string> $encodableClassNames
+     * @param iterable<string> $encodableTypes
      */
     public function __construct(
-        private iterable $encodableClassNames,
+        private iterable $encodableTypes,
+        private ?TypeResolverInterface $stringTypeResolver,
         PropertyMetadataLoaderInterface $encodePropertyMetadataLoader,
         PropertyMetadataLoaderInterface $decodePropertyMetadataLoader,
         string $encodersDir,
@@ -49,8 +52,16 @@ final class EncoderDecoderCacheWarmer implements CacheWarmerInterface
 
     public function warmUp(string $cacheDir, ?string $buildDir = null): array
     {
-        foreach ($this->encodableClassNames as $className) {
-            $type = Type::object($className);
+        foreach ($this->encodableTypes as $typeString) {
+            if ($this->stringTypeResolver) {
+                $type = $this->stringTypeResolver->resolve($typeString);
+            } else {
+                if (!class_exists($typeString)) {
+                    throw new InvalidArgumentException(\sprintf('Unable to parse "%s" as string type resolver is not available. Try running "composer require phpstan/phpoc-parser".', $typeString));
+                }
+
+                $type = Type::object($typeString);
+            }
 
             $this->warmUpEncoder($type);
             $this->warmUpDecoders($type);

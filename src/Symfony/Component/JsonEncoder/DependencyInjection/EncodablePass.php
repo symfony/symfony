@@ -15,7 +15,7 @@ use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 /**
- * Sets the encodable classes to the services that need them.
+ * Sets the encodable types to the services that need them.
  *
  * @author Mathias Arlaud <mathias.arlaud@gmail.com>
  */
@@ -38,12 +38,15 @@ class EncodablePass implements CompilerPassInterface
             $container->removeDefinition($id);
         }
 
-        $container->getDefinition('.json_encoder.cache_warmer.encoder_decoder')
-            ->replaceArgument(0, $encodableClassNames);
-
         if ($container->hasDefinition('.json_encoder.cache_warmer.lazy_ghost')) {
             $container->getDefinition('.json_encoder.cache_warmer.lazy_ghost')
                 ->replaceArgument(0, $encodableClassNames);
         }
+
+        $encodableTypes = array_merge($encodableClassNames, $container->getParameter('.json_encoder.encodable_types'));
+        $encodableTypes = array_values(array_unique($encodableTypes));
+
+        $container->getDefinition('.json_encoder.cache_warmer.encoder_decoder')
+            ->replaceArgument(0, $encodableTypes);
     }
 }

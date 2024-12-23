@@ -973,6 +973,7 @@ class ConfigurationTest extends TestCase
             ],
             'json_encoder' => [
                 'enabled' => !class_exists(FullStack::class) && class_exists(JsonEncoder::class),
+                'types' => [],
             ],
         ];
     }

@@ -107,7 +107,8 @@ return static function (ContainerConfigurator $container) {
         // cache
         ->set('.json_encoder.cache_warmer.encoder_decoder', EncoderDecoderCacheWarmer::class)
             ->args([
-                abstract_arg('encodable class names'),
+                abstract_arg('encodable types'),
+                service('type_info.resolver.string')->nullOnInvalid(),
                 service('json_encoder.encode.property_metadata_loader'),
                 service('json_encoder.decode.property_metadata_loader'),
                 param('.json_encoder.encoders_dir'),

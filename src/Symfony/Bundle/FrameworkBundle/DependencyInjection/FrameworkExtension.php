@@ -2028,6 +2028,7 @@ class FrameworkExtension extends Extension
         $container->setParameter('.json_encoder.encoders_dir', '%kernel.cache_dir%/json_encoder/encoder');
         $container->setParameter('.json_encoder.decoders_dir', '%kernel.cache_dir%/json_encoder/decoder');
         $container->setParameter('.json_encoder.lazy_ghosts_dir', '%kernel.cache_dir%/json_encoder/lazy_ghost');
+        $container->setParameter('.json_encoder.encodable_types', $config['types']);
 
         if (\PHP_VERSION_ID >= 80400) {
             $container->removeDefinition('.json_encoder.cache_warmer.lazy_ghost');

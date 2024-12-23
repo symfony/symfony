@@ -1007,6 +1007,9 @@
     </xsd:complexType>
 
     <xsd:complexType name="json-encoder">
+        <xsd:sequence>
+            <xsd:element name="type" type="xsd:string" minOccurs="0" maxOccurs="unbounded" />
+        </xsd:sequence>
         <xsd:attribute name="enabled" type="xsd:boolean" />
     </xsd:complexType>
 

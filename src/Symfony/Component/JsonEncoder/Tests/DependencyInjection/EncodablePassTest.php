@@ -24,6 +24,7 @@ class EncodablePassTest extends TestCase
         $container->register('json_encoder.encoder');
         $container->register('.json_encoder.cache_warmer.encoder_decoder')->setArguments([null]);
         $container->register('.json_encoder.cache_warmer.lazy_ghost')->setArguments([null]);
+        $container->setParameter('.json_encoder.encodable_types', []);
 
         $container->register('encodable')->setClass('Foo')->addTag('json_encoder.encodable');
         $container->register('abstractEncodable')->setClass('Bar')->addTag('json_encoder.encodable')->setAbstract(true);
@@ -39,5 +40,25 @@ class EncodablePassTest extends TestCase
 
         $this->assertSame($expectedEncodableClassNames, $encoderDecoderCacheWarmer->getArgument(0));
         $this->assertSame($expectedEncodableClassNames, $lazyGhostCacheWarmer->getArgument(0));
+    }
+
+    public function testSetEncodableTypes()
+    {
+        $container = new ContainerBuilder();
+
+        $container->register('json_encoder.encoder');
+        $container->register('.json_encoder.cache_warmer.encoder_decoder')->setArguments([null]);
+        $container->register('.json_encoder.cache_warmer.lazy_ghost')->setArguments([null]);
+
+        $container->register('encodable')->setClass('Foo')->addTag('json_encoder.encodable');
+        $container->register('encodable')->setClass('Bar')->addTag('json_encoder.encodable');
+        $container->setParameter('.json_encoder.encodable_types', ['array<string, bool>', 'Foo', 'list<Foo>']);
+
+        $pass = new EncodablePass();
+        $pass->process($container);
+
+        $encoderDecoderCacheWarmer = $container->getDefinition('.json_encoder.cache_warmer.encoder_decoder');
+
+        $this->assertSame(['Bar', 'array<string, bool>', 'Foo', 'list<Foo>'], $encoderDecoderCacheWarmer->getArgument(0));
     }
 }

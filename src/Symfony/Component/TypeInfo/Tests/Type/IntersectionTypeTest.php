@@ -12,6 +12,7 @@
 namespace Symfony\Component\TypeInfo\Tests\Type;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ExpectUserDeprecationMessageTrait;
 use Symfony\Component\TypeInfo\Exception\InvalidArgumentException;
 use Symfony\Component\TypeInfo\Type;
 use Symfony\Component\TypeInfo\Type\IntersectionType;
@@ -20,10 +21,21 @@ use Symfony\Component\TypeInfo\Type\UnionType;
 
 class IntersectionTypeTest extends TestCase
 {
+    use ExpectUserDeprecationMessageTrait;
+
     public function testCannotCreateWithOnlyOneType()
     {
         $this->expectException(InvalidArgumentException::class);
         new IntersectionType(Type::object(\DateTime::class));
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testCannotCreateWithOnlySameTypes()
+    {
+        $this->expectUserDeprecationMessage('Since symfony/type-info 7.3: Creating a "Symfony\Component\TypeInfo\Type\IntersectionType" with only same types is deprecated and will throw a "Symfony\Component\TypeInfo\Exception\InvalidArgumentException" exception in 8.0.');
+        new IntersectionType(Type::object(\DateTime::class), Type::object(\DateTime::class));
     }
 
     public function testCannotCreateWithUnionTypePart()

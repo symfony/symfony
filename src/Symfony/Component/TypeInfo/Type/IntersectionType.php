@@ -54,6 +54,10 @@ final class IntersectionType extends Type implements CompositeTypeInterface
 
         usort($types, fn (Type $a, Type $b): int => (string) $a <=> (string) $b);
         $this->types = array_values(array_unique($types));
+
+        if (\count($this->types) < 2) {
+            trigger_deprecation('symfony/type-info', '7.3', 'Creating a "%s" with only same types is deprecated and will throw a "%s" exception in 8.0.', self::class, InvalidArgumentException::class);
+        }
     }
 
     /**

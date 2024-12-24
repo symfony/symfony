@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+7.3
+---
+
+ * Deprecate creation of `UnionType` and `IntersectionType` with only same types
+
 7.2
 ---
 

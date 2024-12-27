@@ -1213,8 +1213,8 @@ class Parser
                         $value .= $this->lexUnquotedString($cursor);
                 }
 
-                if ($this->consumeWhitespaces($cursor)) {
-                    $value .= ' ';
+                if (0 < $numberOfConsumedWhitespaces = $this->consumeWhitespaces($cursor)) {
+                    $value .= isset($this->currentLine[$cursor]) ? str_repeat(' ', $numberOfConsumedWhitespaces) : ' ';
                 }
             }
 
@@ -1226,7 +1226,7 @@ class Parser
         throw new ParseException('Malformed inline YAML string.');
     }
 
-    private function consumeWhitespaces(int &$cursor): bool
+    private function consumeWhitespaces(int &$cursor): int
     {
         $whitespacesConsumed = 0;
 
@@ -1236,7 +1236,7 @@ class Parser
             $cursor += $whitespaceOnlyTokenLength;
 
             if (isset($this->currentLine[$cursor])) {
-                return 0 < $whitespacesConsumed;
+                return $whitespacesConsumed;
             }
 
             if ($this->hasMoreLines()) {
@@ -1244,6 +1244,6 @@ class Parser
             }
         } while ($this->moveToNextLine());
 
-        return 0 < $whitespacesConsumed;
+        return $whitespacesConsumed;
     }
 }

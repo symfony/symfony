@@ -2212,6 +2212,11 @@ YAML
         ];
     }
 
+    public function testParseSubsequentSpacesInsideUnquotedInlineMappingValueNestedInSequence()
+    {
+        $this->assertSame([['name' => 'A  B']], $this->parser->parse('- {name: A  B}'));
+    }
+
     public function testRootLevelInlineMappingFollowedByMoreContentIsInvalid()
     {
         $this->expectException(ParseException::class);

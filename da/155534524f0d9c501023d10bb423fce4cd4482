@@ -1,0 +1,29 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2024-09-12T14:17:54Z
+
+The name of the constant makes me think that we stills should improve the parser to try to support all possible inline notations. Do you have a list of examples that would currently not be parsed properly?
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2024-09-12T15:43:10Z
+
+@xabbuh by taking into account the cases we don't want to support as listed by @stof in https://github.com/symfony/symfony/pull/58232#issuecomment-2344252559, I would say that the only unsupported feature we may want to add support to is empty values in sequences, i.e. `[foo, , bar]`. Currently, the second value is ignored, where the spec says it should be handled as null.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2024-09-16T14:06:16Z
+
+see #58279
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2024-09-17T10:11:54Z
+
+I just pushed a new approach that takes into account @xabbuh's PR on supporting empty values in sequences.
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2024-09-18T11:56:02Z
+
+Status: Needs review

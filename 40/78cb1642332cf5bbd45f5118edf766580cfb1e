@@ -1,0 +1,44 @@
+---------------------------------------------------------------------------
+
+by stof at 2024-12-23T16:57:46Z
+
+`$type->matches($value)` reads exactly the opposite of what the method does (returning whether the value matches the type), so we might need a better name for this method.
+
+---------------------------------------------------------------------------
+
+by mtarld at 2024-12-23T17:06:02Z
+
+You're effectively right, any ideas for that new name?
+
+---------------------------------------------------------------------------
+
+by chalasr at 2024-12-23T19:06:57Z
+
+`matchesTypeOf($value)`? `satisfiesTypeOf($value)`?
+
+---------------------------------------------------------------------------
+
+by mtarld at 2024-12-23T19:26:00Z
+
+`matchesTypeOf` looks good to me 👍
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2024-12-24T00:30:28Z
+
+```php
+$type->accepts($value)
+```
+This method name exists [in PHPUnit](https://github.com/sebastianbergmann/comparator/blob/b247957a1c8dc81a671770f74b479c0a78a818f1/src/DateTimeComparator.php#L26-L38) to check if values can be compared.
+
+---------------------------------------------------------------------------
+
+by mtarld at 2024-12-24T08:45:45Z
+
+`accept` is even better, yes!
+
+---------------------------------------------------------------------------
+
+by stof at 2024-12-24T09:11:12Z
+
+I would name it `accepts`, so that it reads `$type->accepts($value)`

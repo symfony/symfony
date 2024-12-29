@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+7.3
+--
+
+* Allow `AmphpHttpClient` with amphp/http-client v5 to use unix socket
+
 7.2
 ---
 

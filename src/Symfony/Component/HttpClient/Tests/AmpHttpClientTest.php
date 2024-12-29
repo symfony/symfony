@@ -11,8 +11,14 @@
 
 namespace Symfony\Component\HttpClient\Tests;
 
+use Amp\Http\Client\Connection\DefaultConnectionFactory;
+use Amp\Http\Client\Connection\UnlimitedConnectionPool;
+use Amp\Http\Client\HttpClientBuilder;
+use Amp\Socket\StaticSocketConnector;
 use Symfony\Component\HttpClient\AmpHttpClient;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
+
+use function Amp\Socket\socketConnector;
 
 /**
  * @group dns-sensitive
@@ -22,6 +28,29 @@ class AmpHttpClientTest extends HttpClientTestCase
     protected function getHttpClient(string $testCase): HttpClientInterface
     {
         return new AmpHttpClient(['verify_peer' => false, 'verify_host' => false, 'timeout' => 5]);
+    }
+
+    public function testUnixSocket()
+    {
+        if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+            $this->markTestSkipped('Unix sockets are not supported on Windows.');
+        }
+
+        $client = new AmpHttpClient(clientConfigurator: function() {
+            $connector = new StaticSocketConnector("unix:///var/run/docker.sock", socketConnector());
+
+            return (new HttpClientBuilder)
+                ->usingPool(new UnlimitedConnectionPool(new DefaultConnectionFactory($connector)))
+                ->build();
+        });
+
+        $client = $client->withOptions(['base_uri' => 'http://docker']);
+
+        $response = $client->request('GET', '/info');
+
+        $this->assertSame(200, $response->getStatusCode());
+        $content = json_decode($response->getContent(), true);
+        $this->assertNotEmpty($content['ID']);
     }
 
     public function testProxy()

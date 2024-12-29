@@ -32,17 +32,15 @@ class AmpHttpClientTest extends HttpClientTestCase
 
     public function testUnixSocket()
     {
-        if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+        if (\PHP_VERSION_ID < 80400) {
+            $this->markTestSkipped('Unix sockets only support PHP >= 8.4.');
+        }
+
+        if (strtoupper(substr(\PHP_OS, 0, 3)) === 'WIN') {
             $this->markTestSkipped('Unix sockets are not supported on Windows.');
         }
 
-        $client = new AmpHttpClient(clientConfigurator: function() {
-            $connector = new StaticSocketConnector("unix:///var/run/docker.sock", socketConnector());
-
-            return (new HttpClientBuilder)
-                ->usingPool(new UnlimitedConnectionPool(new DefaultConnectionFactory($connector)))
-                ->build();
-        });
+        $client = new AmpHttpClient(['bindto' => '/var/run/docker.sock']);
 
         $client = $client->withOptions(['base_uri' => 'http://docker']);
 

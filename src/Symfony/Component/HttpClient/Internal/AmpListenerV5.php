@@ -18,8 +18,11 @@ use Amp\Http\Client\EventListener;
 use Amp\Http\Client\NetworkInterceptor;
 use Amp\Http\Client\Request;
 use Amp\Http\Client\Response;
-use Amp\Socket\UnixAddress;
 use Symfony\Component\HttpClient\Exception\TransportException;
+
+if (\PHP_VERSION_ID < 80400 || !class_exists('Amp\Socket\UnixAddress')) {
+    throw new \LogicException('Using "Symfony\Component\HttpClient\AmpHttpClient" with amphp/http-client >= 5 requires PHP >= 8.4.');
+}
 
 /**
  * @author Nicolas Grekas <p@tchwork.com>
@@ -67,7 +70,8 @@ class AmpListenerV5 implements EventListener
 
     public function requestHeaderStart(Request $request, Stream $stream): void
     {
-        if ($stream->getRemoteAddress() instanceof UnixAddress) {
+        $unixSocketClass = 'Amp\Socket\UnixAddress';
+        if ($stream->getRemoteAddress() instanceof $unixSocketClass) {
             $host = $stream->getRemoteAddress()->toString();
         } else {
             $host = $stream->getRemoteAddress()->getAddress();

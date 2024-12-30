@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by MatTheCat at 2024-12-23T16:22:53Z
+
+Hm there shouldn’t be anything unfortunate here; did I miss something? :sweat_smile:
+
+The `AuthenticatorManager` will still receive `TraceableAuthenticator`s, the only difference is that the original authenticators will still exist in the container.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2024-12-24T13:05:11Z
+
+Just the fact we cannot stick with regular service decoration.

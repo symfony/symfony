@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2024-12-29T20:35:16Z
+
+see the [current CI failures](https://github.com/symfony/symfony/actions/runs/12535557837) and the related commit thephpleague/uri-interfaces@b793a8141242f3d69fce535d8ed8916558cbf61c

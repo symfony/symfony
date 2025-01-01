@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by praswicaksono at 2024-12-29T17:50:53Z
+
+@nicolas-grekas psalm check fail because it run using php 8.2 and amphp/httpclient v4, should I surpress undefined method error?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-12-29T17:59:13Z
+
+No need to, just ignore the message.

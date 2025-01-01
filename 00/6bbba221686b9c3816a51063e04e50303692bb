@@ -1,0 +1,27 @@
+---------------------------------------------------------------------------
+
+by OskarStark at 2024-12-31T06:51:35Z
+
+Thank you, can you add some before and after screenshots?
+
+---------------------------------------------------------------------------
+
+by DocFX at 2024-12-31T17:22:28Z
+
+> Thank you, can you add some before and after screenshots?
+
+Sure! Here's a first try!
+
+Before:
+
+<img width="867" alt="{7E624852-1540-4AEB-BDD4-F5125D65D3D0}" src="https://github.com/user-attachments/assets/75f1c639-7a76-4efe-908e-a2f560d56963" />
+
+After [commit](https://github.com/symfony/symfony/pull/59334/commits/fdec3df620cd4c38a315e8d2dc57ee025a235395):
+
+<img width="865" alt="{B536BA5A-47D3-44BC-AB20-DAE1E08518CB}" src="https://github.com/user-attachments/assets/41a45f8a-efc9-4863-8d28-cb204c119a84" />
+
+---------------------------------------------------------------------------
+
+by fabpot at 2025-01-01T08:57:33Z
+
+Definitely a bug fix.

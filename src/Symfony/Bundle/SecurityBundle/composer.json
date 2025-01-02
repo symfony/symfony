@@ -20,7 +20,7 @@
         "composer-runtime-api": ">=2.1",
         "ext-xml": "*",
         "symfony/clock": "^6.4|^7.0",
-        "symfony/config": "^6.4|^7.0",
+        "symfony/config": "^7.3",
         "symfony/dependency-injection": "^6.4.11|^7.1.4",
         "symfony/event-dispatcher": "^6.4|^7.0",
         "symfony/http-kernel": "^6.4|^7.0",

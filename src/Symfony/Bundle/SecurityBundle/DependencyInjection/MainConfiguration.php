@@ -421,7 +421,7 @@ class MainConfiguration implements ConfigurationInterface
                             ->scalarNode('algorithm')
                                 ->cannotBeEmpty()
                                 ->validate()
-                                    ->ifTrue(fn ($v) => !\is_string($v))
+                                    ->ifFalse(fn ($v) => \is_string($v))
                                     ->thenInvalid('You must provide a string value.')
                                 ->end()
                             ->end()

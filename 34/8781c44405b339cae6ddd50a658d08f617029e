@@ -1,0 +1,21 @@
+---------------------------------------------------------------------------
+
+by OskarStark at 2024-12-30T16:15:58Z
+
+> Lil typo in commit message 🫣
+
+Fixed, thanks
+
+---------------------------------------------------------------------------
+
+by fabpot at 2024-12-30T18:32:58Z
+
+Some broken tests looks related (8.2 low-deps for instance).
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2025-01-02T10:07:08Z
+
+> Some broken tests looks related (8.2 low-deps for instance).
+
+Indeed, fixed and rebased, thanks

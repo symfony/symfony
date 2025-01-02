@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by smnandre at 2024-12-29T06:26:02Z
+
+Makes sense!
+
+Could you do the same in the `AssetMapperDevServerSubscriber` constructor?
+
+---------------------------------------------------------------------------
+
+by IndraGunawan at 2025-01-02T06:55:51Z
+
+error on windows CI is not related

@@ -252,12 +252,24 @@ class Request
     public static function createFromGlobals(): static
     {
         $request = self::createRequestFromFactory($_GET, $_POST, [], $_COOKIE, $_FILES, $_SERVER);
+        $contentType = $request->headers->get('CONTENT_TYPE', '');
+        $method = strtoupper($request->server->get('REQUEST_METHOD', 'GET'));
 
-        if (str_starts_with($request->headers->get('CONTENT_TYPE', ''), 'application/x-www-form-urlencoded')
-            && \in_array(strtoupper($request->server->get('REQUEST_METHOD', 'GET')), ['PUT', 'DELETE', 'PATCH'], true)
+        if (
+            in_array($method, ['PUT', 'DELETE', 'PATCH'], true)
+            && (
+                str_starts_with($contentType, 'application/x-www-form-urlencoded')
+                || str_starts_with($contentType, 'multipart/form-data')
+            )
         ) {
-            parse_str($request->getContent(), $data);
-            $request->request = new InputBag($data);
+           if (version_compare(phpversion(), '8.4.0', '>=') && function_exists('request_parse_body')) {
+               [$_POST, $_FILES] = request_parse_body();
+               $request->request = new InputBag($_POST);
+               $request->files = new FileBag($_FILES);
+           } elseif (str_starts_with($contentType, 'application/x-www-form-urlencoded')) {
+               parse_str($request->getContent(), $data);
+               $request->request = new InputBag($data);
+           }
         }
 
         return $request;

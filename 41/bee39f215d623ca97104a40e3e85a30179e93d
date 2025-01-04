@@ -1,0 +1,56 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2024-05-16T12:02:15Z
+
+Hey!
+
+Thanks for your PR. You are targeting branch "7.1" but it seems your PR description refers to branch "7.1 for features / 5.4, 6.4, or 7.0 for bug fixes".
+Could you update the PR description or change target branch? This helps core maintainers a lot.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by sdespont at 2024-06-20T08:15:55Z
+
+Any chance to see this PR merged in 7.2 ?
+
+---------------------------------------------------------------------------
+
+by sdespont at 2024-08-14T07:14:27Z
+
+Is there anything more you'd like to do before reviewing this PR? Let me know what you think.
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2024-08-14T08:19:10Z
+
+It looks like your commiter email is not associated with your GitHub account. You may want to change that
+
+---------------------------------------------------------------------------
+
+by sdespont at 2024-08-14T08:41:41Z
+
+Thanks, but how can you see that? And is it a problem to review the PR?
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2024-08-14T09:35:28Z
+
+![image](https://github.com/user-attachments/assets/47750779-69a3-4ca2-a79b-2facaae39572)
+
+There is this GitHub Pictogramm
+
+---------------------------------------------------------------------------
+
+by sdespont at 2024-08-14T11:13:45Z
+
+OK, I don't know why. Is this blocking the review? I don't really care whether I get credit for this PR or not.
+
+---------------------------------------------------------------------------
+
+by sdespont at 2024-10-09T08:23:19Z
+
+@MrYamous Thanks, that's a good idea. Hope this PR will be accepted one day

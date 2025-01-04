@@ -262,7 +262,7 @@ class Request
                 || str_starts_with($contentType, 'multipart/form-data')
             )
         ) {
-           if (version_compare(phpversion(), '8.4.0', '>=') && function_exists('request_parse_body')) {
+           if (PHP_VERSION_ID >= 80400) {
                [$_POST, $_FILES] = request_parse_body();
                $request->request = new InputBag($_POST);
                $request->files = new FileBag($_FILES);

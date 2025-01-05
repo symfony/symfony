@@ -256,20 +256,20 @@ class Request
         $method = strtoupper($request->server->get('REQUEST_METHOD', 'GET'));
 
         if (
-            in_array($method, ['PUT', 'DELETE', 'PATCH'], true)
+            \in_array($method, ['PUT', 'DELETE', 'PATCH'], true)
             && (
                 str_starts_with($contentType, 'application/x-www-form-urlencoded')
                 || str_starts_with($contentType, 'multipart/form-data')
             )
         ) {
-           if (PHP_VERSION_ID >= 80400) {
-               [$_POST, $_FILES] = request_parse_body();
-               $request->request = new InputBag($_POST);
-               $request->files = new FileBag($_FILES);
-           } elseif (str_starts_with($contentType, 'application/x-www-form-urlencoded')) {
-               parse_str($request->getContent(), $data);
-               $request->request = new InputBag($data);
-           }
+            if (\PHP_VERSION_ID >= 80400) {
+                [$post, $files] = request_parse_body();
+                $request->request = new InputBag($post);
+                $request->files = new FileBag($files);
+            } elseif (str_starts_with($contentType, 'application/x-www-form-urlencoded')) {
+                parse_str($request->getContent(), $data);
+                $request->request = new InputBag($data);
+            }
         }
 
         return $request;

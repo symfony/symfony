@@ -1,0 +1,55 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-10-17T08:17:58Z
+
+How will the app behave of monolog is not used? And how does monolog fail if configurated to write there?
+
+---------------------------------------------------------------------------
+
+by shyim at 2024-10-17T08:38:03Z
+
+> How will the app behave of monolog is not used?
+
+No `var/log` is created
+
+> And how does monolog fail if configurated to write there?
+
+When logging it throws a exception:
+
+```
+In StreamHandler.php line 140:
+
+  The stream or file "<project>/var/log/prod-2024-10-17.log" could not be opened in append mode: Failed to open stream: Permission denied
+  The exception occurred while attempting to log: Error thrown while running command "asdasd". Message: "Command "asdasd" is not defined."
+  Context: {"exception":{},"command":"asdasd","message":"Command \"asdasd\" is not defined."}
+```
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-10-23T08:41:33Z
+
+I think we periodically wonder about this, and the conclusion has also been: a writeable var/log is a feature of the kernel, it doesn't relate to monolog directly.
+I think it's fine for apps with non-conventional needs (readonly fs) to have to do a few more tweaks.
+`APP_LOG_DIR=/tmp/log` is the way to go to me.
+
+---------------------------------------------------------------------------
+
+by shyim at 2024-10-23T08:56:18Z
+
+Maybe deprecate it for Symfony 8.0, remove this method, and rely only on configuration for path /var/log?
+
+`getLogDir` is just passed as a parameter to the DI container.
+
+Sure I can set APP_LOG_DIR to tmpdir, it feels hacky. Symfony Cloud (platform.sh) seems to have a hack that this folder is always writeable, it would also improve the official Symfony product
+
+---------------------------------------------------------------------------
+
+by fabpot at 2024-10-23T14:58:58Z
+
+As mentioned by @nicolas-grekas, we've had this conversation a few times now. I think more and more containers are read-only nowadays. I'm fine with this change, but probably not as a bug fix for 5.4. I would be ok to merge it in 7.2 though.
+
+---------------------------------------------------------------------------
+
+by shyim at 2024-10-23T15:47:41Z
+
+updated the target branch

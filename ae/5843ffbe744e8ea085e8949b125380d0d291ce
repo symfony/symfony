@@ -1,0 +1,24 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2024-11-06T12:49:34Z
+
+Hey!
+
+Thanks for your PR. You are targeting branch "7.2" but it seems your PR description refers to branch ">6.4".
+Could you update the PR description or change target branch? This helps core maintainers a lot.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by stof at 2024-11-06T13:02:29Z
+
+Adding support for new options is a new feature, not a bugfix. So this should go in the next minor version, not in 6.4.
+
+---------------------------------------------------------------------------
+
+by ikerib at 2024-11-06T13:14:27Z
+
+oh! sorry!

@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by wouterj at 2024-12-27T13:55:31Z
+
+I'm also not so sure if we need this shortcut. The `@`, `@?` and `%...%` Yaml conventions were introduced in a time where we didn't have proper tag support for Yaml. The tags are the official Yaml syntax to define custom data types (e.g. type a specific string or object). With good tag support in the Yaml component, we can use the official features instead of using our own conventions now. This remove magic and makes it easier to understand.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-12-27T18:37:29Z
+
+Yet I would not like to have to use `!reference foo` instead of `@foo`, so that these shortcuts are welcome IMHO.

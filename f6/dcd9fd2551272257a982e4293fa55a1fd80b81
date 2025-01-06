@@ -1,0 +1,83 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-12-24T12:30:35Z
+
+I added it because my browser (Firefox) was actually auto filling it, which lead to broken UX. Maybe the conditions weren't exactly the same as I was developing the feature. We should first double confirm this. IIRC, this could matter when refreshing the page.
+
+---------------------------------------------------------------------------
+
+by smnandre at 2024-12-24T14:52:53Z
+
+~Removing this will  indeed lead to unsovable problems with Firefox. Full thread here with some recent updates.~ (updated)
+
+Inputs without `autocomplete=off` attribute _can_ lead to problems with Firefox. Full thread with details and recent updates: https://github.com/rails/rails/issues/42610
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2024-12-24T15:09:41Z
+
+But why was this not an issue on 7.1 and before?
+
+---------------------------------------------------------------------------
+
+by smnandre at 2024-12-25T22:50:56Z
+
+After re-reading both Github thread and the changes from @nicolas-grekas, I’m starting to have doubts.
+
+Hidden fields tend to encounter issues in Firefox under two scenarios.
+
+The first is when their values or adjacent fields are manipulated via JavaScript. However, this doesn’t seem to be the case here, as the token is present in the HTML response.
+
+The second, which I’ve recently encountered on a project and affects all browsers, involves the infamous [back-forward cache](https://web.dev/articles/bfcache) (bfc or bfcache). This browser feature stores entire pages in memory for faster navigation but can cause inconsistencies if JavaScript or state changes aren’t properly handled during navigation. Notably, commonly used cache headers have no effect on its activation—only [no-store](https://web.dev/articles/bfcache#minimize-no-store) can disable it (for now). (This reminds me, I need to open a PR about the cache attribute!)
+
+I’m starting to think the second scenario might be more relevant in this case.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-12-26T06:36:34Z
+
+The issue happens because the JS snippet attached to the new CSRF protection changes the value of the field before submitting the form. But then, the value shouldn't be memoized on page refresh. Still, that's what FF does when the attribute is not here. I guess we can update the snippet to make it set the attribute instead, so that the generated HTML is cleaner. Or we can keep as is: strictly valid HTML isn't a requirement in itself - the web is built on being able to adapt to various levels of undefined things.
+
+---------------------------------------------------------------------------
+
+by smnandre at 2024-12-29T18:41:29Z
+
+But... `autocomplete` attribute is interpreted during page load, no?
+
+Does this trick work everywhere and .. why ?  (genuine question .. i would not be surprise of anything with FF)
+
+---------------------------------------------------------------------------
+
+by MatTheCat at 2024-12-30T10:22:59Z
+
+Just checked, and dynamically adding the `autocomplete` attribute in the `csrf_protection_controller` has no effect on Firefox 133.0.3: if I submit a form and go back, the field keep the previously generated token as its value.
+
+(BTW, it seems that setting a `hidden` `input` `value` property also updates its `value` attribute :dizzy_face:)
+
+---------------------------------------------------------------------------
+
+by MatTheCat at 2024-12-30T10:41:58Z
+
+From https://developer.mozilla.org/en-US/docs/Web/Security/Practical_implementation_guides/Turning_off_form_autocompletion we can read (emphasis mine)
+
+> Setting `autocomplete="off" on fields` […] stops the browser from caching form data in the session history. When form data is cached in session history, the information **filled in by the user** is shown in the case where the user has submitted the form and clicked the Back button to go back to the original form page.
+
+A user input would update the `value` property, but not the `value` attribute. As such I tried to set the attribute instead of the property in the `csrf_protection_controller`, and it seems to work without an `autocomplete` attribute..!
+
+```diff
+- csrfField.value = csrfToken = btoa(String.fromCharCode.apply(null, (window.crypto || window.msCrypto).getRandomValues(new Uint8Array(18))));
++ csrfField.setAttribute('value', csrfToken = btoa(String.fromCharCode.apply(null, (window.crypto || window.msCrypto).getRandomValues(new Uint8Array(18)))));
+```
+
+Note that setting the `value` attribute can be achieved by setting the `defaultValue` property, so this also works:
+
+```diff
+- csrfField.value = csrfToken = btoa(String.fromCharCode.apply(null, (window.crypto || window.msCrypto).getRandomValues(new Uint8Array(18))));
++ csrfField.defaultValue = csrfToken = btoa(String.fromCharCode.apply(null, (window.crypto || window.msCrypto).getRandomValues(new Uint8Array(18))));
+```
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-01-05T21:27:56Z
+
+@MatTheCat thanks for digging this topic. Can you please confirm that https://github.com/symfony/recipes/pull/1371 would fix the issue?

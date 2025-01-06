@@ -1,0 +1,15 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2025-01-06T09:43:11Z
+
+Re-reading this PR, it says "Add missing", but it also removes 2 conflicts, is it on purpose? If yes, why?
+
+---------------------------------------------------------------------------
+
+by mtarld at 2025-01-06T09:55:09Z
+
+Actually, it's a half/half:
+- `symfony/dependency-injection` was duplicated
+- `phpdocumentor/type-resolver` is indeed a mistake of mine
+
+I'm going to fix it!

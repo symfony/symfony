@@ -1,0 +1,48 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2025-01-03T12:11:56Z
+
+Hey!
+
+Thanks for your PR. You are targeting branch "7.3" but it seems your PR description refers to branch "7.3 for features".
+Could you update the PR description or change target branch? This helps core maintainers a lot.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by yceruto at 2025-01-03T16:06:57Z
+
+Also, we could find a regex that matches all possible variants instead of checking them one by one.
+
+---------------------------------------------------------------------------
+
+by VincentLanglet at 2025-01-03T16:08:26Z
+
+> Also, we could find a regex that matches all possible variants instead of checking them one by one.
+
+Didn't find an easy one, but I'm opened to suggestion.
+
+I preferred to add the logic in the existing recursive implementation
+
+---------------------------------------------------------------------------
+
+by VincentLanglet at 2025-01-03T18:00:09Z
+
+I found edge case where my previous implementation remove badly parenthesis, so I now introduce a private method `isEnclosedWithParenthesis` @yceruto
+
+---------------------------------------------------------------------------
+
+by yceruto at 2025-01-03T21:48:57Z
+
+Could you confirm that class Union is also supported with this new syntax? i.e. `(App\FooInterface|App\BarInterface)[]`
+
+---------------------------------------------------------------------------
+
+by VincentLanglet at 2025-01-03T22:19:02Z
+
+> Could you confirm that class Union is also supported with this new syntax? i.e. `(App\FooInterface|App\BarInterface)[]`
+
+I added a test for `\DateTime::class.'|'.\DateTimeImmutable::class`. Is it enough ?

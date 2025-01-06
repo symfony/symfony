@@ -1,0 +1,57 @@
+---------------------------------------------------------------------------
+
+by smnandre at 2024-12-17T00:27:54Z
+
+Question for people having trouble with this page... is the exception panel stylesheet working ?  (it uses the same code as far as  i know)
+
+```
+/_profiler/123456/exception.css
+```
+
+(with a profiler token instead of `123456`)
+
+---------------------------------------------------------------------------
+
+by smnandre at 2024-12-18T01:26:59Z
+
+> According to the thumb-up emoji on the second comment (I don’t have a better measurement of the impact), it affected at least 10 users, with various web servers.
+
+Not sure this represent a large part of the users to be honest.. as it works --afaik-- with standard install methods (symfony cli, classic docker, platform sh, ... )
+
+But even 10 is too much ! So let's see :)
+
+> Proposals:
+>
+>     1. do not use the `.css` file extension so that servers do not try to serve an actual file
+
+I do feel this would be the best / more generic way....
+
+.. but maybe on the opposite some install will refuse to serve a CSS without suffix... ?
+
+>     2. if we consider that the disappearance of the style of the profiler’s toolbar is a breaking change, the `.css` file extension could be added back with Symfony 8.0, with a note to help people upgrade (see the workarounds in the issue)
+
+The disappaerance of the toolbar is a BC break 😆
+
+The "fake .css" file has just been introduced so i don't think there will be any need here to help people "upgrade".
+
+Any opinion on what to do here?
+
+Maybe @tucksaun or @stof that followed the source PR ?
+
+---------------------------------------------------------------------------
+
+by tucksaun at 2024-12-18T13:32:57Z
+
+Thank you @smnandre for following this issue 👍
+
+From I understand this is really specific to webserver configuration and from what I see the recommended default configuration for Nginx, Apache or Caddy should work with this use case and the Symfony Local Web Server works as well.
+
+So this seems mostly limited to configuration. but the fix seems fairly easy to implement and I don't see why we would require the URL to end with the `css` extension so I would just remove the extension
+
+---------------------------------------------------------------------------
+
+by smnandre at 2024-12-19T04:18:06Z
+
+Ok good news! Thx @tucksaun
+
+Then i would use `/_wdt/styles` (and drop the `-css`) .. wdyt @alexislefebvre  ?

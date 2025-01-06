@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by michaljusiega at 2024-02-22T12:31:52Z
+
+What is the status of this PR ? It would be nice to see this in 7.1.
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2024-10-14T10:50:31Z
+
+What about directly deprecating this option, so that it needs to be set on 8.0? Or defaulting it to true in 8.0?
+
+---------------------------------------------------------------------------
+
+by HypeMC at 2024-10-14T15:56:38Z
+
+> What about directly deprecating this option, so that it needs to be set on 8.0? Or defaulting it to true in 8.0?
+
+I'm ok with whatever is decided.

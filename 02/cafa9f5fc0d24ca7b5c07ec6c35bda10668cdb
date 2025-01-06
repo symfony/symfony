@@ -1,0 +1,53 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2024-12-11T16:43:18Z
+
+Hey!
+
+To help keep things organized, we don't allow "Draft" pull requests. Could you please click the "ready for review" button or close this PR and open a new one when you are done?
+
+Note that a pull request does not have to be "perfect" or "ready for merge" when you first open it. We just want it to be ready for a first review.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by stof at 2024-12-11T16:49:48Z
+
+Simply allowing 2.5 is unlikely to report actual breakages: the CI will install the highest compatible version, and so will keep installing version 3
+
+---------------------------------------------------------------------------
+
+by alexander-schranz at 2024-12-11T16:51:50Z
+
+@stof there is `Unit Tests / Unit Tests (8.2, low-deps)` which installs lowest dependency with persistence 2.5.
+
+![Bildschirmfoto 2024-12-11 um 17 56 24](https://github.com/user-attachments/assets/e14bb6ab-57fe-4cf0-b6fa-c7112fd3ec6c)
+
+Without the latest commit you see it did fail as 2.5 was installed: https://github.com/symfony/symfony/actions/runs/12280919774/job/34268515843?pr=59185
+
+With a few line of changes I think may can catch that issue but need to invest.
+
+---------------------------------------------------------------------------
+
+by alexander-schranz at 2024-12-11T17:26:31Z
+
+With some version check in the tests it seems a way we could still support the persistence 2.5 version:
+
+![Bildschirmfoto 2024-12-11 um 18 25 44](https://github.com/user-attachments/assets/604c0290-57b9-42c0-968b-df00d89bd5d3)
+
+Other CI errors seems be unrelated.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2024-12-12T08:56:17Z
+
+ping @nicolas-grekas as you bumped the requirement in 0d4e2b8dad6b526ed91fa17f9932f3c0642603b8
+
+---------------------------------------------------------------------------
+
+by alexander-schranz at 2024-12-13T13:44:18Z
+
+Let me know if there is anything else here I should check.

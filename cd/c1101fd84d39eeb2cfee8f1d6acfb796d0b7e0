@@ -1,0 +1,202 @@
+---------------------------------------------------------------------------
+
+by wouterj at 2024-12-27T10:31:57Z
+
+Any method everywhere might throw some type of `\Exception`. I'm personally not convinced this phpdoc adds any value (and if it does, we should add it everywhere?).
+
+---------------------------------------------------------------------------
+
+by VincentLanglet at 2024-12-27T10:50:14Z
+
+> Any method everywhere might throw.
+
+This is not true. Some methods (a lot) doesn't throws Exception at all, even in the Symfony codebase.
+
+And with well-documented methods, PHPStan helps a lot catching unwanted exceptions
+https://phpstan.org/blog/bring-your-exceptions-under-control
+
+Currently, with code like
+```
+try {
+     $serializer->serialize(...);
+} catch (NotEncodableValueException) {}
+```
+I'm getting
+```
+Dead catch - NotEncodableValueException is never thrown in the try block.
+```
+because the PHPdoc is not describing the exceptions thrown.
+
+> some type of `\Exception`.
+
+Notice I didn't added `\Exception` but used the scoped interface `Symfony\Component\Serializer\Exception\ExceptionInterface` which already provides some value to
+
+> I'm personally not convinced this phpdoc adds any value
+
+It adds value for static analysis tools (like PHPStan) users.
+It also provide such value for IDE (like PHPStorm) users.
+
+> I'm personally not convinced this phpdoc adds any value (and if it does, we should add it everywhere?).
+
+`@throws ExceptionInterface` exists on the NormalizerInterface https://github.com/symfony/symfony/blob/78f4d9a1059725384ce563c4e1696b8e66c6983a/src/Symfony/Component/Serializer/Normalizer/NormalizerInterface.php#L37
+
+And a `@throws` tag exists on the EncoderInterface https://github.com/symfony/symfony/blob/78f4d9a1059725384ce563c4e1696b8e66c6983a/src/Symfony/Component/Serializer/Encoder/EncoderInterface.php#L28
+
+I don't see a reason to add it to SerializerInterface which is a similar interface.
+
+For reference, I already added missing `@throws` tag in some other class/interfaces like https://github.com/symfony/symfony/pull/57519/files or https://github.com/symfony/symfony/pull/52915/files
+
+---------------------------------------------------------------------------
+
+by fabpot at 2024-12-29T13:15:28Z
+
+I agree with @wouterj. If we think it's useful, we should do it consistently across the board, not just on one interface. Maybe it's mostly useful for interfaces? But then, do we want to reference the interface or the concrete exception implementations that can be thrown?
+
+---------------------------------------------------------------------------
+
+by VincentLanglet at 2024-12-29T14:33:33Z
+
+> I agree with @wouterj. If we think it's useful, we should do it consistently across the board, not just on one interface.
+
+There is already a looot of method/class/interface already with `@throws` annotation.
+And every times I find one missing I open (and still will open) a PR to fix it.
+
+> Maybe it's mostly useful for interfaces?
+
+Since people works mainly with interface, it is.
+
+This also explains which exceptions we are supposed to throw when implementing the interface.
+Here custom `SerializerInterface::serialize` implementation should only throw `Symfony\Component\Serializer\Exception\ExceptionInterface`.
+And the Symfony Serializer implementation respects this contract.
+
+It throws:
+- Symfony\Component\Serializer\Exception\UnsupportedFormatException
+- Symfony\Component\Serializer\Exception\RuntimeException
+- Symfony\Component\Serializer\Exception\LogicException
+- Symfony\Component\Serializer\Exception\NotNormalizableValueException
+- All the exceptions thrown by `NormalizerInterface::normalize` (which includes ExceptionInterface)
+https://github.com/symfony/symfony/blob/78f4d9a1059725384ce563c4e1696b8e66c6983a/src/Symfony/Component/Serializer/Normalizer/NormalizerInterface.php#L33-L37
+
+And `SerializerInterface::deserialize` throws
+- Symfony\Component\Serializer\Exception\UnsupportedFormatException
+- Symfony\Component\Serializer\Exception\RuntimeException
+- All the exceptions thrown by `DenormalizerInterface::denormalize` (which includes ExceptionInterface)
+https://github.com/symfony/symfony/blob/78f4d9a1059725384ce563c4e1696b8e66c6983a/src/Symfony/Component/Serializer/Normalizer/DenormalizerInterface.php#L37-L43
+
+> But then, do we want to reference the interface or the concrete exception implementations that can be thrown?
+
+So far, I would say both of the strategy are used. For instance
+https://github.com/symfony/symfony/blob/78f4d9a1059725384ce563c4e1696b8e66c6983a/src/Symfony/Component/Serializer/Normalizer/DenormalizerInterface.php#L37-L43
+
+We can list all the exceptions thrown with the explanation of the reason but we still have to add a
+`@throws ExceptionInterface` "fallback" (like https://github.com/symfony/symfony/blob/78f4d9a1059725384ce563c4e1696b8e66c6983a/src/Symfony/Component/Serializer/Normalizer/DenormalizerInterface.php#L43) since
+- The SerializerInterface use the Normalizer/DenormalizerInterface which can throw any of these exceptions
+- The `@throws` on interfaces should be considered as "contract" about which exceptions are allowed to be thrown by custom implementation. And this interface should IMHO allows every scoped ExceptionInterface.
+
+I considered it was already a good step to add `@throws ExceptionInterface` but do you prefer to be more explicit @fabpot ?
+
+---------------------------------------------------------------------------
+
+by wouterj at 2024-12-29T20:21:41Z
+
+Thinking about this more, I'm actually thinking the `@throw` annotations can be "harmful" (and so is the PHPstan rule imho, if not all vendors use it).
+
+They are documenting a contract ("this method will only throw things that are instance of X") while there is no way to enforce that. Even more, retrospectively adding it to methods creates a new contract for any implementation that they were never aware of.
+In this case, our `Serializer::serialize()` will call normalizers. Maybe Symfony doesn't include any normalizer that throws something other than `ExceptionInterface`, but there is no way in knowing if any third party library and application normalizer conforms to this as well.
+The same also applies to other implementations of the `SerializerInterface` out there. We never told them to only throw `ExceptionInterface` exceptions, so we can't make this contract to our users. That will wrongly inform them that they can completely ignore serializer exceptions by catching `ExceptionInterface`, which will lead to broken applications when an unexpected exception occurs.
+
+I would say this means that adding `@throw` on interfaces might be much more dangerous than adding them on actual implementations.
+
+---------------------------------------------------------------------------
+
+by wouterj at 2024-12-29T20:33:31Z
+
+And this is not a theoretical thing. It took me only a quick look to find Symfony itself does not conform this new contract proposed in the PR:
+
+```php
+use Symfony\Component\Serializer\Encoder\YamlEncoder;
+use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
+use Symfony\Component\Serializer\Serializer;
+
+$encoders = [new YamlEncoder()];
+$normalizers = [new ObjectNormalizer()];
+$serializer = new Serializer($normalizers, $encoders);
+
+$serializer->deserialize('[1', 'stdClass', 'yaml'); // throws Symfony\Component\Yaml\Exception\ParseException
+```
+
+---------------------------------------------------------------------------
+
+by VincentLanglet at 2024-12-29T21:08:31Z
+
+> Thinking about this more, I'm actually thinking the `@throw` annotations can be harmful (and so is the PHPstan rule imho, if not all vendors use it).
+
+PHPStan has two mode about the exceptions (https://phpstan.org/blog/bring-your-exceptions-under-control#what-does-absent-%40throws-above-a-function-mean%3F):
+
+By default PHPStan consider that no `@throws` means it can throws anything, but it provides a stricter option to say that no `@throws` means never throw. It has to consider that it `throws anything` because of the big number of poor documented method/interface, but when using well documented API, it's powerful to report dead-catch which are often code smell or possible bugs. I already solve multiple errors because of it (like the fact of not catching the right exception).
+
+> Even more, retrospectively adding it to methods creates a new contract for any implementation that they were never aware of. [...] We never told them to only throw `ExceptionInterface` exceptions, so we can't make this contract to our users.
+
+Technically, there is already a contract which say "This method is not supposed to throw any exception". And any implementation is breaking this contract. I'm trying to fix/improve the contract.
+
+Symfony already rely on the possible exception thrown since some are caught in the SerializerErrorEncoder, even if **none is documented**
+https://github.com/symfony/symfony/blob/4078cb1642332cf5bbd45f5118edf766580cfb1e/src/Symfony/Component/ErrorHandler/ErrorRenderer/SerializerErrorRenderer.php#L66
+
+A better documentation would lead to a better try/catch.
+
+> That will wrongly inform them that they can completely ignore serializer exceptions by catching `ExceptionInterface`, which will lead to broken applications when an unexpected exception occurs.
+
+Currently the interface is wrongly informing that no exception are thrown.
+Adding a `@throws Throwable` would be the minimum needed changes but so far
+
+---------------------------------------------------------------------------
+
+by VincentLanglet at 2024-12-29T21:27:53Z
+
+> And this is not a theoretical thing. It took me only a quick look to find Symfony itself does not conform this new contract proposed in the PR:
+>
+> ```
+> use Symfony\Component\Serializer\Encoder\YamlEncoder;
+> use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
+> use Symfony\Component\Serializer\Serializer;
+>
+> $encoders = [new YamlEncoder()];
+> $normalizers = [new ObjectNormalizer()];
+> $serializer = new Serializer($normalizers, $encoders);
+>
+> $serializer->deserialize('[1', 'stdClass', 'yaml'); // throws Symfony\Component\Yaml\Exception\ParseException
+> ```
+
+The issue is not about the SerializerInterface contract but about the YamlEncoder which **already does not respect the EncoderInterface** contract.
+https://github.com/symfony/symfony/blob/4078cb1642332cf5bbd45f5118edf766580cfb1e/src/Symfony/Component/Serializer/Encoder/DecoderInterface.php#L33-L35
+
+This YamlEncoder was introduced in Symfony 3 while the `@throws` annotation exists since Symfony 2.
+When looking at other Encoder, a lot of them are throwing `NotEncodableValueException extends UnexpectedValueException` in such situation.
+
+So I would think the YamlEncoder need to be fixed.
+I opened the PR https://github.com/symfony/symfony/pull/59323, and will be happy to add more fix if needed.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-01-06T09:24:44Z
+
+> They are documenting a contract ("this method will only throw things that are instance of X") while there is no way to enforce that
+
+That is certainly not what this annotation is about. Exceptions are for cases where something unexpected happens. In some cases, they're for signaling rare situations that shouldn't happen but can happen (the unhappy path). `@throws` is for those cases: it's augmenting the API with erroneous situations which, from a domain pov, can be caught and deal-with. Any other kind of exceptions can be thrown, but should be unhandled, unless specific reasons. (It should also be fine to leave API-defined exceptions unhandled, unlike what some IDEs think).
+
+So to me: `@throws` should be crystal clear about when catching can make sense, from a domain pov.
+A generic annotation with the interface doesn't fit this requirement to me and feels useless.
+We should do better.
+
+---------------------------------------------------------------------------
+
+by VincentLanglet at 2025-01-06T10:41:52Z
+
+> So to me: `@throws` should be crystal clear about when catching can make sense, from a domain pov. A generic annotation with the interface doesn't fit this requirement to me and feels useless. We should do better.
+
+I tried doing better by adding
+- NotEncodableValueException
+- NotNormalizableValueException
+
+Would it be ok like this or should I be more explicit @nicolas-grekas ?
+Having `0` throws annotation is not ok to me, but I don't think it will be better to list dozen of throw annotation either so I'm trying to find the right number.

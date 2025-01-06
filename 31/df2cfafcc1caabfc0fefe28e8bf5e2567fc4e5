@@ -1,0 +1,24 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2025-01-03T12:26:21Z
+
+Do you have a benchmark which proves that using `spl_object_id()` is indeed more efficient?
+
+---------------------------------------------------------------------------
+
+by rosier at 2025-01-03T12:39:53Z
+
+I used the benchmark from
+* https://github.com/rectorphp/rector-src/pull/4876
+
+---------------------------------------------------------------------------
+
+by jderusse at 2025-01-03T13:26:49Z
+
+`spl_object_id()` reuse identifiers. This is not safe and should be use carefully
+
+---------------------------------------------------------------------------
+
+by antonkomarev at 2025-01-03T13:29:13Z
+
+@jderusse as it stated in official documentation it's working exactly same as hash

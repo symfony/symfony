@@ -1,0 +1,25 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-01-06T09:32:52Z
+
+What about doing as in ~#59352~ #59362 and removing previous stamps?
+
+---------------------------------------------------------------------------
+
+by HypeMC at 2025-01-06T10:22:49Z
+
+@nicolas-grekas I think you linked the wrong PR.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-01-06T10:26:24Z
+
+I meant #59362 sorry
+
+---------------------------------------------------------------------------
+
+by HypeMC at 2025-01-06T16:02:47Z
+
+> What about doing as in ~#59352~ #59362 and removing previous stamps?
+
+@nicolas-grekas Done

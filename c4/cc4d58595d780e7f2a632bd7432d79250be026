@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-01-07T08:05:23Z
+
+Can you run `php .github/sync-translations.php` to add the line to all language files please?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2025-01-07T08:24:19Z
+
+added

@@ -1,0 +1,120 @@
+---------------------------------------------------------------------------
+
+by alexislefebvre at 2024-12-16T18:37:00Z
+
+> Deprecate not passing the `--show-arguments` option when a service name is provided. The next step will be to deprecate `--show-arguments` in `8.0`.
+
+So with Symfony 7.3 and 7.4, I would see a deprecation if I don’t use `--show-arguments`, that would encourage me to use this option.
+
+Then in Symfony 8.0, using the `--show-arguments` option would show a deprecation message?
+
+That sounds counter-intuitive.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2024-12-17T09:07:45Z
+
+Or we could add `--hide-arguments` now in 7.3 and deprecate not setting one or the other. But do we really want to have that `hide-arguments` ultimately? Not sure we need it.
+
+Asking to opt-in the behavior we want to be the only possible one, before making it the default one and removing the capacity to opt-in/out is what we usually do I think.
+So apart from the fact that  the option should be deprecated in 8.1 instead of 8.0, which makes a difference, the proposed plan looks good to me.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2024-12-18T08:42:25Z
+
+I would keep things simple here:
+
+ * Always show arguments
+ * Deprecate `--show-arguments` and make it a noop in 7.3
+ * Remove `--show-arguments` in 8.0
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2024-12-18T09:05:11Z
+
+Indeed, command output is not covered by our BC promise. If someone parses the output, they should opt for `--format=json`.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2024-12-18T09:12:01Z
+
+The `json` output will be impacted by this change but that’s fine for me 🙌
+
+---------------------------------------------------------------------------
+
+by fabpot at 2024-12-18T09:15:59Z
+
+> The `json` output will be impacted by this change but that’s fine for me 🙌
+
+Not really, the only difference is that we'll always have the arguments.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2024-12-18T09:21:08Z
+
+Yes that’s what I mean, the output will now have an `arguments` key by default so a 1:1 assertion won’t pass anymore.
+
+---------------------------------------------------------------------------
+
+by Florian-Merle at 2024-12-18T14:03:39Z
+
+I updated the code to always show arguments.
+Some unit tests are failing but I believe it's not because of my changes.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2024-12-18T16:59:39Z
+
+Please also add a note in the framework-bundle's CHANGELOG and UPGRADE-7.3 about the deprecation.
+
+---------------------------------------------------------------------------
+
+by vudaltsov at 2024-12-18T20:03:01Z
+
+@Florian-Merle , excuse me, why have you started working on this PR? I explicitly mentioned in the issue, that I am going to do it myself, see https://github.com/symfony/symfony/issues/59187#issuecomment-2538374132. I actually planned to work on it with my student to help him start contributing, now this does not make much sense.
+
+---------------------------------------------------------------------------
+
+by vudaltsov at 2024-12-18T20:14:20Z
+
+@Florian-Merle, please check out the ["Proposing a Change" article at Symfony.com](https://symfony.com/doc/current/contributing/code/pull_requests.html#step-1-check-existing-issues-and-pull-requests), it says:
+
+> ### Step 1: Check existing Issues and Pull Requests
+> Before working on a change, check to see if someone else also raised the topic or maybe even started working on a PR by searching on GitHub.
+>
+> If you are unsure or if you have any questions during this entire process, please ask your questions on the #contribs channel on Symfony Slack.
+
+If we all simultaneously work on the same issues, then a lot of effort will be wasted.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2024-12-19T00:24:17Z
+
+@vudaltsov It's my fault. I talked about this to Florian as he was looking for good first contributions, and we just ended up patching the code together without noticing. Apologies for this mistake.
+
+---------------------------------------------------------------------------
+
+by vudaltsov at 2024-12-19T00:27:04Z
+
+@chalasr, ok, then you owe me a good first issue for my student :)
+
+---------------------------------------------------------------------------
+
+by Florian-Merle at 2024-12-19T10:57:32Z
+
+@vudaltsov Sorry about the situation. @chalasr mentioned it was his fault, but I should have also read your issue more thoroughly. I hope you and your student can accept my apologies as well.
+
+---------------------------------------------------------------------------
+
+by vudaltsov at 2024-12-20T01:12:15Z
+
+@Florian-Merle, thank you!
+
+Good luck with this PR, looking forward to better DX with `debug:container` in 7.3!
+
+---------------------------------------------------------------------------
+
+by chalasr at 2024-12-21T16:17:01Z
+
+The PR title doesn't match anymore with what the PR does.

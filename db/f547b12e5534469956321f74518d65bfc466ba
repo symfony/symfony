@@ -1,0 +1,131 @@
+---------------------------------------------------------------------------
+
+by PhilETaylor at 2024-11-29T19:56:10Z
+
+Sorry for the delay, I had placed some debug code into production before this block of code, that would log when SSL_ERROR_SYSCALL was seen again. Below is the traced request debug - redacted - for a failed request.  note that the request goes through our internal proxy, and example.com has a valid SSL installed.
+
+The reason for the SSL_ERROR_SYSCALL is not determined, and happens intermittently for different sites, I suspect the underlying issue here might be i/o locally, but thats only a guess, its not important (for Symfony) what is causing it, only that Symfony httpclient handles it.
+
+As you can see there are no response headers at all, as soon as `OpenSSL SSL_read: SSL_ERROR_SYSCALL, errno 0` happens the connection is terminated.
+
+Dumping of `$responses[$id]->headers` gives a blank array `[]`
+
+```
+ * Hostname PROXYIP was found in DNS cache
+*   Trying PROXYIP:8888...
+* CONNECT tunnel: HTTP/1.1 negotiated
+* allocate connect buffer
+* Establish HTTP proxy tunnel to example.com:443
+> CONNECT example.com:443 HTTP/1.1
+Host: example.com:443
+Proxy-Connection: Keep-Alive
+
+< HTTP/1.1 200 Connection established
+<
+* CONNECT phase completed
+* CONNECT tunnel established, response 200
+* ALPN: curl offers http/1.1
+* SSL connection using TLSv1.3 / TLS_CHACHA20_POLY1305_SHA256 / secp256r1 / RSASSA-PSS
+* ALPN: server accepted http/1.1
+* Server certificate:
+*  subject: CN=example.com
+*  start date: Oct  1 00:13:42 2024 GMT
+*  expire date: Dec 30 00:13:41 2024 GMT
+*  issuer: C=US; O=Let's Encrypt; CN=R10
+*  SSL certificate verify result: unable to get local issuer certificate (20), continuing anyway.
+*   Certificate level 0: Public key type RSA (2048/112 Bits/secBits), signed using sha256WithRSAEncryption
+*   Certificate level 1: Public key type RSA (2048/112 Bits/secBits), signed using sha256WithRSAEncryption
+* Connected to PROXYIP port 8888
+* using HTTP/1.x
+> GET /administrator/ HTTP/1.1
+Host: example.com
+User-Agent: mySites/5.4 (+https://manage.mySites.guru)
+Accept: */*
+Accept-Encoding: gzip
+
+* Request completely sent off
+* OpenSSL SSL_read: SSL_ERROR_SYSCALL, errno 0
+* closing connection #1
+```
+
+I think @nicolas-grekas is right, by the time you have got a `OpenSSL SSL_read: SSL_ERROR_SYSCALL, errno 0` message you might as well just give up and return an exception, as nothing good is going to come after that.
+
+//@discordier
+
+---------------------------------------------------------------------------
+
+by PhilETaylor at 2024-11-29T20:09:22Z
+
+Surely if curl gets a `OpenSSL SSL_read: SSL_ERROR_SYSCALL, errno 0` then we would expect HttpClient to throw a TransportException though right? and no silence that such as the previous PR did? Simply ignoring that error and trying to carry on is just going to carry on the request is going to fail? Im leaning towards a complete revert of the previous PR by @discordier unless there is a genuine reason why we should be ignoring such a fatal issue as `SSL_ERROR_SYSCALL` and not raising an exception?
+
+---------------------------------------------------------------------------
+
+by discordier at 2024-12-02T15:45:31Z
+
+I'm not sure what you mean by silencing as the response is there, at least for me, I get a proper HTTP response status and headers.
+Your response dies before that.
+
+My issue that I wanted to solve was, that I have NO way to determine that there was a problem in my App code due to the fact that it simply threw a plain `\RuntimeException` containing  when processing a successful response.
+This felt entirely wrong.
+
+See stack trace of reverted handling:
+```
+In Stream.php line 266:
+  [RuntimeException]
+  Unable to read stream contents: OpenSSL SSL_read: SSL_ERROR_SYSCALL, errno 0 for "https://srv:8006/api2/json/version".
+
+Exception trace:
+  at /project/vendor/nyholm/psr7/src/Stream.php:266
+ Nyholm\Psr7\Stream::Nyholm\Psr7\{closure}() at n/a:n/a
+ trigger_error() at /project/vendor/symfony/http-client/Response/StreamWrapper.php:129
+ Symfony\Component\HttpClient\Response\StreamWrapper->stream_read() at n/a:n/a
+ stream_get_contents() at /project/vendor/nyholm/psr7/src/Stream.php:270
+ Nyholm\Psr7\Stream->getContents() at /project/vendor/nyholm/psr7/src/StreamTrait.php:23
+ Nyholm\Psr7\Stream->__toString() at /project/src/LogJournal.php:40
+App\LogJournal->addSuccess() at /project/vendor/php-http/client-common/src/Plugin/HistoryPlugin.php:37
+ Http\Client\Common\Plugin\HistoryPlugin->Http\Client\Common\Plugin\{closure}() at /project/vendor/php-http/httplug/src/Promise/HttpFulfilledPromise.php:28
+ Http\Client\Promise\HttpFulfilledPromise->then() at /project/vendor/php-http/client-common/src/Plugin/HistoryPlugin.php:36
+ Http\Client\Common\Plugin\HistoryPlugin->handleRequest() at /project/vendor/php-http/client-common/src/PluginChain.php:44
+[...]
+```
+The log journal simply implements `Http\Client\Common\Plugin\Journal` which then reads `(string) $response->getBody()`.
+
+This then leads to throwing an SSL Error from reading the body of an response, that has proper 4xx response code and headers.
+Reverting to this state is IMO pretty bad as I have really NO way to capture this properly anywhere (given the multitude of http plugins for http-client, each would have to handle this special case of capturing a runtime exception, checking the message etc. to recover from it).
+
+So maybe for you the result is all the same for either because your proxy throws away all the response - for me however, the response is already there but has not been read from the stream yet.
+Then the remote closes the socket and off we go - curl get's a terminated connection somehow instead of "knowing" that the response is 0 bytes - in the end, there is no content-length header but clearly a connection close (which is what the server did - very apruptly).
+
+- I'd be fine with handling this as error somehow if you insist - have no clue how to do so though.
+- I'm not fine with throwing away all response data (which is the complete response and in sync with RFC) because we did not read the full response from the stream before the socket closed.
+
+---------------------------------------------------------------------------
+
+by PhilETaylor at 2024-12-02T16:49:00Z
+
+No idea, all I know is that before your change there was no problem, and after your change I am now repeatedly getting undefined warnings,
+
+![CleanShot 2024-12-02 at 16 46 08@2x](https://github.com/user-attachments/assets/597b02a3-9793-4542-a092-69e094ef6c10)
+
+This PR was just a simple, clean, b/c change to silence those warnings while the discussions on the underlying issue you were trying to resolve can be continued
+
+---------------------------------------------------------------------------
+
+by discordier at 2024-12-02T20:48:44Z
+
+I agree that either solution (removing the check for the header or checking if the key exists) will solve the issue my PR brought in - I'm in no way disputing that the array key issue must get adressed, I just don't want to reintroduce the bug.
+
+I want to add that the default of the connection header (meaning: the value to assume when none has been given) has changed from HTTP 1.0 to HTTP 1.1 - Maybe we should rather check against a proper default instead of removing the connection check?
+This will require us to check the HTTP response version before though... I fear we are opening a whole lot more cans of worms here then.
+Maybe it's better to use and assume HTTP 1.0 by default where it was `close`.
+```php
+&& \in_array('close', array_map('strtolower', $responses[$id]->headers['connection'] ?? ['connection' => 'close']), true)
+```
+In the end having a connection `keep-alive` (default in HTTP 1.1) and getting SSL terminated seems a more obscure use case than the opposite where it is `close`.
+wdyt?
+
+---------------------------------------------------------------------------
+
+by PhilETaylor at 2024-12-08T21:42:41Z
+
+Just to say I leave the country on vacation this week and not back until christmas eve, so if someone wants to take this over feel free :)

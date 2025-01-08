@@ -828,6 +828,18 @@ class OptionsResolverTest extends TestCase
         $this->assertSame(['foo' => [1, true]], $options);
     }
 
+    public function testResolveTypedWithUnionOfArray2()
+    {
+        $this->resolver->setDefined('foo');
+        $this->resolver->setAllowedTypes('foo', 'array<string|int>|array<bool|int>');
+
+        $options = $this->resolver->resolve(['foo' => [1, '1']]);
+        $this->assertSame(['foo' => [1, '1']], $options);
+
+        $options = $this->resolver->resolve(['foo' => [1, true]]);
+        $this->assertSame(['foo' => [1, true]], $options);
+    }
+
     public function testResolveTypedArray()
     {
         $this->resolver->setDefined('foo');
@@ -837,10 +849,46 @@ class OptionsResolverTest extends TestCase
         $this->assertSame(['foo' => ['bar', 'baz']], $options);
     }
 
+    public function testResolveTypedArray2()
+    {
+        $this->resolver->setDefined('foo');
+        $this->resolver->setAllowedTypes('foo', 'array<string>');
+        $options = $this->resolver->resolve(['foo' => ['bar', 'baz']]);
+
+        $this->assertSame(['foo' => ['bar', 'baz']], $options);
+    }
+
+    public function testResolveTypedArrayWithKeys()
+    {
+        $this->resolver->setDefined('foo');
+        $this->resolver->setAllowedTypes('foo', 'array<int, string>');
+        $options = $this->resolver->resolve(['foo' => ['bar', 'baz']]);
+
+        $this->assertSame(['foo' => ['bar', 'baz']], $options);
+    }
+
+    public function testResolveTypedArrayWithInvalidKeys()
+    {
+        $this->resolver->setDefined('foo');
+        $this->resolver->setAllowedTypes('foo', 'array<string, string>');
+
+        $this->expectException(InvalidOptionsException::class);
+        $this->resolver->resolve(['foo' => ['bar', 'baz']]);
+    }
+
     public function testResolveTypedArrayWithUnion()
     {
         $this->resolver->setDefined('foo');
         $this->resolver->setAllowedTypes('foo', '(string|int)[]');
+        $options = $this->resolver->resolve(['foo' => ['bar', 1]]);
+
+        $this->assertSame(['foo' => ['bar', 1]], $options);
+    }
+
+    public function testResolveTypedArrayWithUnion2()
+    {
+        $this->resolver->setDefined('foo');
+        $this->resolver->setAllowedTypes('foo', 'array<string|int>');
         $options = $this->resolver->resolve(['foo' => ['bar', 1]]);
 
         $this->assertSame(['foo' => ['bar', 1]], $options);
@@ -1963,10 +2011,48 @@ class OptionsResolverTest extends TestCase
         ]));
     }
 
+    public function testNestedArrays2()
+    {
+        $this->resolver->setDefined('foo');
+        $this->resolver->setAllowedTypes('foo', 'array<array<int>>');
+
+        $this->assertEquals([
+            'foo' => [
+                [
+                    1, 2,
+                ],
+            ],
+        ], $this->resolver->resolve([
+            'foo' => [
+                [1, 2],
+            ],
+        ]));
+    }
+
     public function testNestedArraysWithUnions()
     {
         $this->resolver->setDefined('foo');
         $this->resolver->setAllowedTypes('foo', '(int|float|(int|float)[])[]');
+
+        $this->assertEquals([
+            'foo' => [
+                1,
+                2.0,
+                [1, 2.0],
+            ],
+        ], $this->resolver->resolve([
+            'foo' => [
+                1,
+                2.0,
+                [1, 2.0],
+            ],
+        ]));
+    }
+
+    public function testNestedArraysWithUnions2()
+    {
+        $this->resolver->setDefined('foo');
+        $this->resolver->setAllowedTypes('foo', 'array<int|float|array<int|float>>');
 
         $this->assertEquals([
             'foo' => [

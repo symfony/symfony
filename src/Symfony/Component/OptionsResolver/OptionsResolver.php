@@ -1142,7 +1142,7 @@ class OptionsResolver implements Options
     private function verifyTypes(string $type, mixed $value, ?array &$invalidTypes = null, int $level = 0): bool
     {
         $type = trim($type);
-        $allowedTypes = $this->splitOutsideParenthesis($type);
+        $allowedTypes = $this->splitTypes($type);
         if (\count($allowedTypes) > 1) {
             foreach ($allowedTypes as $allowedType) {
                 if ($this->verifyTypes($allowedType, $value)) {
@@ -1162,17 +1162,29 @@ class OptionsResolver implements Options
             return $this->verifyTypes(substr($type, 1, -1), $value, $invalidTypes, $level);
         }
 
-        if (\is_array($value) && str_ends_with($type, '[]')) {
-            $type = substr($type, 0, -2);
-            $valid = true;
-
-            foreach ($value as $val) {
-                if (!$this->verifyTypes($type, $val, $invalidTypes, $level + 1)) {
-                    $valid = false;
-                }
+        if (\is_array($value)) {
+            if (str_starts_with($type, 'array<') && str_ends_with($type, '>')) {
+                $types = $this->splitTypes(substr($type, 6, -1), ',');
+                $allowedValueType = $types[1] ?? $types[0];
+                $allowedKeyType = isset($types[1]) ? $types[0] : null;
+            } elseif (str_ends_with($type, '[]')) {
+                $allowedValueType = substr($type, 0, -2);
             }
 
-            return $valid;
+            if (isset($allowedValueType)) {
+                $valid = true;
+                foreach ($value as $key => $val) {
+                    if (isset($allowedKeyType) && !$this->verifyTypes($allowedKeyType, $key, $invalidTypes, $level + 1)) {
+                        $valid = false;
+                    }
+
+                    if (!$this->verifyTypes($allowedValueType, $val, $invalidTypes, $level + 1)) {
+                        $valid = false;
+                    }
+                }
+
+                return $valid;
+            }
         }
 
         if (('null' === $type && null === $value) || (isset(self::VALIDATION_FUNCTIONS[$type]) ? self::VALIDATION_FUNCTIONS[$type]($value) : $value instanceof $type)) {
@@ -1189,27 +1201,31 @@ class OptionsResolver implements Options
     /**
      * @return list<string>
      */
-    private function splitOutsideParenthesis(string $type): array
+    private function splitTypes(string $type, string $separator = '|'): array
     {
         $parts = [];
         $currentPart = '';
         $parenthesisLevel = 0;
+        $arrayLevel = 0;
 
         $typeLength = \strlen($type);
         for ($i = 0; $i < $typeLength; ++$i) {
             $char = $type[$i];
+            if ($separator === $char && 0 === $parenthesisLevel && 0 === $arrayLevel) {
+                $parts[] = $currentPart;
+                $currentPart = '';
+                continue;
+            }
 
+            $currentPart .= $char;
             if ('(' === $char) {
                 ++$parenthesisLevel;
             } elseif (')' === $char) {
                 --$parenthesisLevel;
-            }
-
-            if ('|' === $char && 0 === $parenthesisLevel) {
-                $parts[] = $currentPart;
-                $currentPart = '';
-            } else {
-                $currentPart .= $char;
+            } elseif ('<' === $char) {
+                ++$arrayLevel;
+            } elseif ('>' === $char) {
+                --$arrayLevel;
             }
         }
 

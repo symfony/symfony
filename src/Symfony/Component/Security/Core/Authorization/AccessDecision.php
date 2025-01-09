@@ -23,8 +23,8 @@ use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 final class AccessDecision
 {
     /**
-     * @param int             $access One of the VoterInterface constants (ACCESS_GRANTED, ACCESS_ABSTAIN, ACCESS_DENIED)
-     * @param VoteInterface[] $votes
+     * @param VoterInterface::ACCESS_*|int  $access
+     * @param VoteInterface[]               $votes
      */
     public function __construct(
         private readonly int $access,
@@ -43,7 +43,7 @@ final class AccessDecision
         return VoterInterface::ACCESS_GRANTED === $this->access;
     }
 
-    public function isAbstain(): bool
+    public function isAbstainer(): bool
     {
         return VoterInterface::ACCESS_ABSTAIN === $this->access;
     }
@@ -77,7 +77,7 @@ final class AccessDecision
     /**
      * @return VoteInterface[]
      */
-    public function getAbstainedVotes(): array
+    public function getAbstainerVotes(): array
     {
         return $this->getVotesByAccess(VoterInterface::ACCESS_ABSTAIN);
     }
@@ -95,6 +95,6 @@ final class AccessDecision
      */
     private function getVotesByAccess(int $access): array
     {
-        return array_filter($this->votes, static fn (VoteInterface $vote): bool => $vote->getAccess() === $access);
+        return array_filter($this->votes, static fn ($vote) => $vote->getAccess() === $access);
     }
 }

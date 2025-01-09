@@ -66,16 +66,16 @@ class Security implements AuthorizationCheckerInterface, UserAuthorizationChecke
     }
 
     /**
-     * Get the access decision against the current authentication token and optionally supplied subject.
+     * Gets the access decision against the current authentication token and optionally supplied subject.
      */
     public function getDecision(mixed $attribute, mixed $subject = null): AccessDecision
     {
         $checker = $this->container->get('security.authorization_checker');
-        if (method_exists($checker, 'getDecision')) {
-            return $checker->getDecision($attribute, $subject);
+        if (!method_exists($checker, 'getDecision')) {
+            return new AccessDecision($checker->isGranted($attribute, $subject) ? VoterInterface::ACCESS_GRANTED : VoterInterface::ACCESS_DENIED);
         }
 
-        return new AccessDecision($checker->isGranted($attribute, $subject) ? VoterInterface::ACCESS_GRANTED : VoterInterface::ACCESS_DENIED);
+        return $checker->getDecision($attribute, $subject);
     }
 
     public function getToken(): ?TokenInterface

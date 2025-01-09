@@ -43,19 +43,18 @@ final class AccessDecisionManager implements AccessDecisionManagerInterface
 
     public function getDecision(TokenInterface $token, array $attributes, mixed $object = null, bool $allowMultipleAttributes = false): AccessDecision
     {
-        // Special case for AccessListener, do not remove the right side of the condition before 6.0
         if (\count($attributes) > 1 && !$allowMultipleAttributes) {
             throw new InvalidArgumentException(\sprintf('Passing more than one Security attribute to "%s()" is not supported.', __METHOD__));
         }
 
-        if (method_exists($this->strategy, 'getDecision')) {
-            $decision = $this->strategy->getDecision(
-                $this->collectVotes($token, $attributes, $object)
-            );
-        } else {
+        if (!method_exists($this->strategy, 'getDecision')) {
             $decision = new AccessDecision(
                 $this->strategy->decide($this->collectResults($token, $attributes, $object))
                     ? VoterInterface::ACCESS_GRANTED : VoterInterface::ACCESS_DENIED
+            );
+        } else {
+            $decision = $this->strategy->getDecision(
+                $this->collectVotes($token, $attributes, $object)
             );
         }
 
@@ -67,7 +66,6 @@ final class AccessDecisionManager implements AccessDecisionManagerInterface
      */
     public function decide(TokenInterface $token, array $attributes, mixed $object = null, bool $allowMultipleAttributes = false): bool
     {
-        // Special case for AccessListener, do not remove the right side of the condition before 6.0
         if (\count($attributes) > 1 && !$allowMultipleAttributes) {
             throw new InvalidArgumentException(\sprintf('Passing more than one Security attribute to "%s()" is not supported.', __METHOD__));
         }
@@ -83,10 +81,10 @@ final class AccessDecisionManager implements AccessDecisionManagerInterface
     private function collectVotes(TokenInterface $token, array $attributes, mixed $object): \Traversable
     {
         foreach ($this->getVoters($attributes, $object) as $voter) {
-            if (method_exists($voter, 'getVote')) {
-                yield $voter->getVote($token, $object, $attributes);
-            } else {
+            if (!method_exists($voter, 'getVote')) {
                 yield new Vote($voter->vote($token, $object, $attributes));
+            } else {
+                yield $voter->getVote($token, $object, $attributes);
             }
         }
     }

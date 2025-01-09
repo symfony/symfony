@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Authorization\Strategy;
 
 use PHPUnit\Framework\TestCase;
@@ -20,7 +29,7 @@ class ScoringStrategyTest extends TestCase
      *
      * @param VoterInterface[] $voters
      */
-    final public function testGetDecision(AccessDecisionStrategyInterface $strategy, array $voters, AccessDecision $expected)
+    public function testGetDecision(AccessDecisionStrategyInterface $strategy, array $voters, AccessDecision $expected)
     {
         $token = $this->createMock(TokenInterface::class);
         $manager = new AccessDecisionManager($voters, $strategy);
@@ -89,7 +98,7 @@ class ScoringStrategyTest extends TestCase
     }
 
 
-    final protected static function getVoter(int $vote): VoterInterface
+    protected static function getVoter(int $vote): VoterInterface
     {
         return new class($vote) implements VoterInterface {
             public function __construct(
@@ -109,7 +118,7 @@ class ScoringStrategyTest extends TestCase
         };
     }
 
-    final protected static function getVoterWithVoteObject(int $vote): VoterInterface
+    protected static function getVoterWithVoteObject(int $vote): VoterInterface
     {
         return new class($vote) implements VoterInterface {
             public function __construct(
@@ -129,7 +138,7 @@ class ScoringStrategyTest extends TestCase
         };
     }
 
-    final protected static function getVoterWithVoteObjectAndScoring(int $vote): VoterInterface
+    protected static function getVoterWithVoteObjectAndScoring(int $vote): VoterInterface
     {
         return new class($vote) implements VoterInterface {
             public function __construct(
@@ -149,7 +158,7 @@ class ScoringStrategyTest extends TestCase
         };
     }
 
-    final protected static function getAccessDecision(bool $decision, array $votes, string $message): AccessDecision
+    protected static function getAccessDecision(bool $decision, array $votes, string $message): AccessDecision
     {
         return new AccessDecision($decision ? VoterInterface::ACCESS_GRANTED : VoterInterface::ACCESS_DENIED,
             array_map(fn ($vote) => new Vote($vote[0], scoring: $vote[1]), $votes),

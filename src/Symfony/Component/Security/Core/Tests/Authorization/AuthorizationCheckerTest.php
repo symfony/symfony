@@ -115,7 +115,6 @@ class AuthorizationCheckerTest extends TestCase
         $this->assertTrue($authorizationChecker->isGranted($attribute));
     }
 
-
     public function createAccessDecisionManagerMock(bool $useVoteObject)
     {
         return $useVoteObject ?

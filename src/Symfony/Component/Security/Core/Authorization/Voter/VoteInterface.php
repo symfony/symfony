@@ -24,7 +24,7 @@ interface VoteInterface
 
     public function isGranted(): bool;
 
-    public function isAbstain(): bool;
+    public function isAbstainer(): bool;
 
     public function isDenied(): bool;
 

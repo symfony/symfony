@@ -75,7 +75,7 @@ class AccessDecisionManagerTest extends TestCase
             $this->getUnexpectedVoter(),
         ];
 
-        if($useVoteObject) {
+        if ($useVoteObject) {
             $strategy = new class() implements AccessDecisionStrategyInterface {
                 public function decide(\Traversable $results): bool { throw new LogicException('Method should not be called'); } // never call
                 public function getDecision(\Traversable $votes): AccessDecision

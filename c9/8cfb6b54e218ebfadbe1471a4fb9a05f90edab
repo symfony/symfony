@@ -1,0 +1,25 @@
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2024-11-29T12:41:11Z
+
+Revamped the PR, so most things are still in ResourceCaster now. The regression in PHP has been reported to https://github.com/php/php-src/issues/16990, and most casters now "simply" map infos to `$a`.
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2024-11-29T14:11:40Z
+
+Marked all casters as internal and added `UPGRADE-7.3.md`.
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2024-11-29T15:45:28Z
+
+Solved by silencing `socket_atmark()` in the case it cannot be applied on the given socket.
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2024-12-03T08:42:05Z
+
+The `dba_list()` regression fix will be released in PHP 8.4.2:
+
+- https://github.com/php/php-src/issues/16990

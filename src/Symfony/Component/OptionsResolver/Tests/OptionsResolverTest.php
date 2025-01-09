@@ -2016,7 +2016,7 @@ class OptionsResolverTest extends TestCase
         $this->resolver->setDefined('foo');
         $this->resolver->setAllowedTypes('foo', 'array<array<int>>');
 
-        $this->assertEquals([
+        $this->assertSame([
             'foo' => [
                 [
                     1, 2,

@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-01-07T10:59:03Z
+
+I'm sorry I don't understand the change. What does the message mean in the end, with more words for me?
+
+---------------------------------------------------------------------------
+
+by maxhelias at 2025-01-07T13:55:37Z
+
+The trigger description is confusing. If I configure my scheduler to exclude the period from 10 AM to 7 AM the next day, the description's interpretation appears to indicate the opposite.

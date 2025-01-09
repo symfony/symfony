@@ -867,6 +867,15 @@ class OptionsResolverTest extends TestCase
         $this->assertSame(['foo' => ['bar', 'baz']], $options);
     }
 
+    public function testResolveTypedArrayWithStringKeys()
+    {
+        $this->resolver->setDefined('foo');
+        $this->resolver->setAllowedTypes('foo', 'array<string, string>');
+        $options = $this->resolver->resolve(['foo' => ['bar' => 'bar', 'baz' => 'baz']]);
+
+        $this->assertSame(['foo' => ['bar' => 'bar', 'baz' => 'baz']], $options);
+    }
+
     public function testResolveTypedArrayWithInvalidKeys()
     {
         $this->resolver->setDefined('foo');

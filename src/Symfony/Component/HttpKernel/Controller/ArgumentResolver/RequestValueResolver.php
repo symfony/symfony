@@ -20,6 +20,8 @@ use Symfony\Component\HttpKernel\Exception\NearMissValueResolverException;
  * Yields the same instance as the request object passed along.
  *
  * @author Iltar van der Berg <kjarli@gmail.com>
+ *
+ * @deprecated
  */
 final class RequestValueResolver implements ValueResolverInterface
 {

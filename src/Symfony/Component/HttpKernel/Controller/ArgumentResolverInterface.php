@@ -18,6 +18,8 @@ use Symfony\Component\HttpFoundation\Request;
  * arguments for a specific action.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @deprecated
  */
 interface ArgumentResolverInterface
 {

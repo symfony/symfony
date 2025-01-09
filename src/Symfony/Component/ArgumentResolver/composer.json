@@ -1,0 +1,28 @@
+{
+    "name": "symfony/argument-resolver",
+    "type": "library",
+    "description": "",
+    "keywords": [],
+    "homepage": "https://symfony.com",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Robin Chalas",
+            "email": "robin@baksla.sh"
+        },
+        {
+            "name": "Symfony Community",
+            "homepage": "https://symfony.com/contributors"
+        }
+    ],
+    "require": {
+        "php": ">=8.2"
+    },
+    "autoload": {
+        "psr-4": { "Symfony\\Component\\ArgumentResolver\\": "" },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
+    },
+    "minimum-stability": "dev"
+}

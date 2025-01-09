@@ -37,7 +37,7 @@ return static function (ContainerConfigurator $container) {
             ])
 
         ->set('debug.argument_resolver', TraceableArgumentResolver::class)
-            ->decorate('argument_resolver')
+            ->decorate('controller.argument_resolver')
             ->args([
                 service('debug.argument_resolver.inner'),
                 service('debug.stopwatch'),

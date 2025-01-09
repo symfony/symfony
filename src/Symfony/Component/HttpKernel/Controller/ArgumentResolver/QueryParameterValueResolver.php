@@ -25,6 +25,7 @@ use Symfony\Component\Uid\AbstractUid;
  * @author Nicolas Grekas <p@tchwork.com>
  * @author Mateusz Anders <anders_mateusz@outlook.com>
  * @author Ionut Enache <i.ovidiuenache@yahoo.com>
+ * @deprecated
  */
 final class QueryParameterValueResolver implements ValueResolverInterface
 {

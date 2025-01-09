@@ -16,6 +16,8 @@ use Symfony\Component\Stopwatch\Stopwatch;
 
 /**
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @deprecated
  */
 class TraceableArgumentResolver implements ArgumentResolverInterface
 {

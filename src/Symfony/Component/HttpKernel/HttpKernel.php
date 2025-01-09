@@ -11,13 +11,14 @@
 
 namespace Symfony\Component\HttpKernel;
 
+use Symfony\Component\ArgumentResolver\ArgumentResolverInterface;
 use Symfony\Component\HttpFoundation\Exception\RequestExceptionInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\HttpKernel\Controller\ArgumentResolver;
-use Symfony\Component\HttpKernel\Controller\ArgumentResolverInterface;
+use Symfony\Component\HttpKernel\Controller\ArgumentResolverInterface as LegacyArgumentResolverInterface;
 use Symfony\Component\HttpKernel\Controller\ControllerResolverInterface;
 use Symfony\Component\HttpKernel\Event\ControllerArgumentsEvent;
 use Symfony\Component\HttpKernel\Event\ControllerEvent;
@@ -52,14 +53,14 @@ class_exists(KernelEvents::class);
 class HttpKernel implements HttpKernelInterface, TerminableInterface
 {
     protected RequestStack $requestStack;
-    private ArgumentResolverInterface $argumentResolver;
+    private ArgumentResolverInterface|LegacyArgumentResolverInterface $argumentResolver;
     private bool $terminating = false;
 
     public function __construct(
         protected EventDispatcherInterface $dispatcher,
         protected ControllerResolverInterface $resolver,
         ?RequestStack $requestStack = null,
-        ?ArgumentResolverInterface $argumentResolver = null,
+        ArgumentResolverInterface|LegacyArgumentResolverInterface|null $argumentResolver = null,
         private bool $handleAllThrowables = false,
     ) {
         $this->requestStack = $requestStack ?? new RequestStack();
@@ -172,7 +173,9 @@ class HttpKernel implements HttpKernelInterface, TerminableInterface
         $controller = $event->getController();
 
         // controller arguments
-        $arguments = $this->argumentResolver->getArguments($request, $controller, $event->getControllerReflector());
+        $arguments = $this->argumentResolver instanceof ArgumentResolverInterface
+            ? $this->argumentResolver->getArguments($request, $controller, $event->getControllerReflector())
+            : $this->argumentResolver->getArguments($request, $controller, $event->getControllerReflector());
 
         $event = new ControllerArgumentsEvent($this, $event, $arguments, $request, $type);
         $this->dispatcher->dispatch($event, KernelEvents::CONTROLLER_ARGUMENTS);

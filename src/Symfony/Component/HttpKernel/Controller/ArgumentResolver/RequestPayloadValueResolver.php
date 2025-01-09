@@ -42,6 +42,8 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  * @author Konstantin Myakshin <molodchick@gmail.com>
  *
  * @final
+ *
+ * @deprecated
  */
 class RequestPayloadValueResolver implements ValueResolverInterface, EventSubscriberInterface
 {

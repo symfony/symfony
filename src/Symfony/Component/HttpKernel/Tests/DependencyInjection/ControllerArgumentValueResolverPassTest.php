@@ -16,6 +16,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\HttpKernel\Controller\ArgumentResolver;
+use Symfony\Component\HttpKernel\Controller\ControllerArgumentResolver;
 use Symfony\Component\HttpKernel\DependencyInjection\ControllerArgumentValueResolverPass;
 use Symfony\Component\Stopwatch\Stopwatch;
 
@@ -35,9 +36,9 @@ class ControllerArgumentValueResolverPassTest extends TestCase
             new Reference('n3'),
         ];
 
-        $definition = new Definition(ArgumentResolver::class, [null, []]);
+        $definition = new Definition(ControllerArgumentResolver::class, [null, []]);
         $container = new ContainerBuilder();
-        $container->setDefinition('argument_resolver', $definition);
+        $container->setDefinition('controller.argument_resolver', $definition);
 
         foreach ($services as $id => [$tag]) {
             $container->register($id)->addTag('controller.argument_value_resolver', $tag);
@@ -70,7 +71,7 @@ class ControllerArgumentValueResolverPassTest extends TestCase
         $definition = new Definition(ArgumentResolver::class, [null, []]);
         $container = new ContainerBuilder();
         $container->register('debug.stopwatch', Stopwatch::class);
-        $container->setDefinition('argument_resolver', $definition);
+        $container->setDefinition('controller.argument_resolver', $definition);
 
         foreach ($services as $id => [$tag]) {
             $container->register($id)->addTag('controller.argument_value_resolver', $tag);
@@ -97,7 +98,7 @@ class ControllerArgumentValueResolverPassTest extends TestCase
         $definition = new Definition(ArgumentResolver::class, [null, []]);
         $container = new ContainerBuilder();
         $container->register('n1')->addTag('controller.argument_value_resolver');
-        $container->setDefinition('argument_resolver', $definition);
+        $container->setDefinition('controller.argument_resolver', $definition);
 
         $container->setParameter('kernel.debug', true);
 
@@ -112,7 +113,7 @@ class ControllerArgumentValueResolverPassTest extends TestCase
     {
         $definition = new Definition(ArgumentResolver::class, [null, []]);
         $container = new ContainerBuilder();
-        $container->setDefinition('argument_resolver', $definition);
+        $container->setDefinition('controller.argument_resolver', $definition);
 
         $container->setParameter('kernel.debug', false);
 
@@ -126,6 +127,6 @@ class ControllerArgumentValueResolverPassTest extends TestCase
 
         (new ControllerArgumentValueResolverPass())->process($container);
 
-        $this->assertFalse($container->hasDefinition('argument_resolver'));
+        $this->assertFalse($container->hasDefinition('controller.argument_resolver'));
     }
 }

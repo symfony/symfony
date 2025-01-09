@@ -11,9 +11,9 @@
 
 namespace Symfony\Component\HttpKernel\Attribute;
 
+use Symfony\Component\ArgumentResolver\ArgumentMetadata\ArgumentMetadata;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Controller\ArgumentResolver\RequestPayloadValueResolver;
-use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
 use Symfony\Component\Validator\Constraint;
 
 #[\Attribute(\Attribute::TARGET_PARAMETER)]

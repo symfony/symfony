@@ -11,12 +11,16 @@
 
 namespace Symfony\Component\HttpKernel\ControllerMetadata;
 
+use Symfony\Component\ArgumentResolver\ArgumentMetadata\ArgumentMetadataFactoryInterface as BaseArgumentMetadataFactoryInterface;
+
 /**
  * Builds method argument data.
  *
  * @author Iltar van der Berg <kjarli@gmail.com>
+ *
+ * @deprecated
  */
-interface ArgumentMetadataFactoryInterface
+interface ArgumentMetadataFactoryInterface extends BaseArgumentMetadataFactoryInterface
 {
     /**
      * @return ArgumentMetadata[]

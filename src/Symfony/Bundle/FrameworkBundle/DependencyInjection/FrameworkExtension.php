@@ -101,6 +101,7 @@ use Symfony\Component\HttpKernel\Attribute\AsController;
 use Symfony\Component\HttpKernel\Attribute\AsTargetedValueResolver;
 use Symfony\Component\HttpKernel\CacheClearer\CacheClearerInterface;
 use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerInterface;
+use Symfony\Component\HttpKernel\Controller\ArgumentResolver\ValueResolver\ControllerValueResolverInterface;
 use Symfony\Component\HttpKernel\Controller\ValueResolverInterface;
 use Symfony\Component\HttpKernel\DataCollector\DataCollectorInterface;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
@@ -246,12 +247,14 @@ class FrameworkExtension extends Extension
             $container->setParameter('validator.translation_domain', 'validators');
         }
 
+        $loader->load('argument_resolver.php');
         $loader->load('web.php');
         $loader->load('services.php');
         $loader->load('fragment_renderer.php');
         $loader->load('error_renderer.php');
 
         if (!ContainerBuilder::willBeAvailable('symfony/clock', ClockInterface::class, ['symfony/framework-bundle'])) {
+            $container->removeDefinition('clock');
             $container->removeDefinition('clock');
             $container->removeAlias(ClockInterface::class);
             $container->removeAlias(PsrClockInterface::class);
@@ -425,6 +428,7 @@ class FrameworkExtension extends Extension
 
             $this->registerSerializerConfiguration($config['serializer'], $container, $loader);
         } else {
+            // @deprecated since Symfony 7.3
             $container->getDefinition('argument_resolver.request_payload')
                 ->setArguments([])
                 ->addError('You can neither use "#[MapRequestPayload]" nor "#[MapQueryString]" since the Serializer component is not '
@@ -433,6 +437,14 @@ class FrameworkExtension extends Extension
                 ->addTag('container.error')
                 ->clearTag('kernel.event_subscriber');
 
+            /*$container->getDefinition('argument_resolver.controller.request_payload')
+                ->setArguments([])
+                ->addError('You can neither use "#[MapRequestPayload]" nor "#[MapQueryString]" since the Serializer component is not '
+                    .(class_exists(Serializer::class) ? 'enabled. Try setting "framework.serializer.enabled" to true.' : 'installed. Try running "composer require symfony/serializer-pack".')
+                )
+                ->addTag('container.error')
+                ->clearTag('kernel.event_subscriber');
+            */
             $container->removeDefinition('console.command.serializer_debug');
         }
 
@@ -483,7 +495,8 @@ class FrameworkExtension extends Extension
 
             $this->registerUidConfiguration($config['uid'], $container, $loader);
         } else {
-            $container->removeDefinition('argument_resolver.uid');
+            $container->removeDefinition('argument_resolver.uid'); // @deprecated since Symfony 7.3
+            $container->removeDefinition('argument_resolver.controller.uid');
         }
 
         // register cache before session so both can share the connection services
@@ -644,6 +657,9 @@ class FrameworkExtension extends Extension
             ->addTag('container.service_locator');
         $container->registerForAutoconfiguration(ServiceSubscriberInterface::class)
             ->addTag('container.service_subscriber');
+        $container->registerForAutoconfiguration(ControllerValueResolverInterface::class)
+            ->addTag('controller.argument_value_resolver');
+        // @deprecated since Symfony 7.3
         $container->registerForAutoconfiguration(ValueResolverInterface::class)
             ->addTag('controller.argument_value_resolver');
         $container->registerForAutoconfiguration(AbstractController::class)

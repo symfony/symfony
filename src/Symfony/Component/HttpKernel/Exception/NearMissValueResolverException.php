@@ -15,7 +15,9 @@ namespace Symfony\Component\HttpKernel\Exception;
  * Lets value resolvers tell when an argument could be under their watch but failed to be resolved.
  *
  * Throwing this exception inside `ValueResolverInterface::resolve` does not interrupt the value resolvers chain.
+ *
+ * @deprecated
  */
-class NearMissValueResolverException extends \RuntimeException
+class NearMissValueResolverException extends \Symfony\Component\ArgumentResolver\Exception\NearMissValueResolverException
 {
 }

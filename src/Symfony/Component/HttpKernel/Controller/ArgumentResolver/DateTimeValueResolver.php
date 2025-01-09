@@ -23,6 +23,8 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  *
  * @author Benjamin Eberlei <kontakt@beberlei.de>
  * @author Tim Goudriaan <tim@codedmonkey.com>
+ *
+ * @deprecated
  */
 final class DateTimeValueResolver implements ValueResolverInterface
 {

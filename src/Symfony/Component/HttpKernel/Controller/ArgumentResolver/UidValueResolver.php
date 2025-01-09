@@ -17,6 +17,9 @@ use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Uid\AbstractUid;
 
+/**
+* @deprecated
+*/
 final class UidValueResolver implements ValueResolverInterface
 {
     public function resolve(Request $request, ArgumentMetadata $argument): array

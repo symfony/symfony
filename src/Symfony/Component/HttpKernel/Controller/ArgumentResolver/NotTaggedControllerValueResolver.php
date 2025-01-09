@@ -21,6 +21,8 @@ use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
  * Provides an intuitive error message when controller fails because it is not registered as a service.
  *
  * @author Simeon Kolev <simeon.kolev9@gmail.com>
+ *
+ * @deprecated
  */
 final class NotTaggedControllerValueResolver implements ValueResolverInterface
 {

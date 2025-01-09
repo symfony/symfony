@@ -21,6 +21,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Attribute\WithHttpStatus;
 use Symfony\Component\HttpKernel\Attribute\WithLogLevel;
 use Symfony\Component\HttpKernel\Controller\ArgumentResolver;
+use Symfony\Component\HttpKernel\Controller\ControllerArgumentResolver;
 use Symfony\Component\HttpKernel\Event\ControllerArgumentsEvent;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
@@ -286,7 +287,7 @@ class ErrorListenerTest extends TestCase
         $kernel = $this->createMock(HttpKernelInterface::class);
         $kernel->method('handle')->willReturnCallback(function (Request $request) use ($listener, $controller, $kernel) {
             $this->assertSame($controller, $request->attributes->get('_controller'));
-            $arguments = (new ArgumentResolver())->getArguments($request, $controller);
+            $arguments = (new ControllerArgumentResolver())->getArguments($request, $controller);
             $event = new ControllerArgumentsEvent($kernel, $controller, $arguments, $request, HttpKernelInterface::SUB_REQUEST);
             $listener->onControllerArguments($event);
 

@@ -91,7 +91,7 @@ return static function (ContainerConfigurator $container) {
                 service('event_dispatcher'),
                 service('controller_resolver'),
                 service('request_stack'),
-                service('argument_resolver'),
+                service('controller.argument_resolver'),
                 false,
             ])
             ->tag('container.hot_path')

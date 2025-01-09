@@ -22,6 +22,8 @@ use Symfony\Component\HttpKernel\Exception\NearMissValueResolverException;
  * Yields a service keyed by _controller and argument name.
  *
  * @author Nicolas Grekas <p@tchwork.com>
+ *
+ * @deprecated
  */
 final class ServiceValueResolver implements ValueResolverInterface
 {

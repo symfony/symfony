@@ -29,6 +29,7 @@ use Symfony\Contracts\Service\ServiceProviderInterface;
  * Responsible for resolving the arguments passed to an action.
  *
  * @author Iltar van der Berg <kjarli@gmail.com>
+ * @deprecated
  */
 final class ArgumentResolver implements ArgumentResolverInterface
 {

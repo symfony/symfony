@@ -16,7 +16,7 @@ namespace Symfony\Component\PropertyAccess;
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  *
- * @method bool isWildcard(int $index) Returns whether the element at the given index is wildcard. Not implementing it is deprecated since Symfony 7.1
+ * @method bool isWildcard(int $index) Returns whether the element at the given index is wildcard. Not implementing it is deprecated since Symfony 7.3
  *
  * @extends \Traversable<int, string>
  */

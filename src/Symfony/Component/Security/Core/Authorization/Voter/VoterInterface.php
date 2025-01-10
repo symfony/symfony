@@ -32,11 +32,8 @@ interface VoterInterface
      * This method must return one of the following constants:
      * ACCESS_GRANTED, ACCESS_DENIED, or ACCESS_ABSTAIN.
      *
-     * @param TokenInterface $token
-     * @param mixed $subject The subject to secure
+     * @param mixed $subject    The subject to secure
      * @param array $attributes An array of attributes associated with the method being invoked
-     *
-     * @return int
      */
     public function vote(TokenInterface $token, mixed $subject, array $attributes): int;
 }

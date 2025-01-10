@@ -30,7 +30,7 @@ class Vote implements VoteInterface
 
     /**
      * @param VoterInterface::ACCESS_*|int $access One of the VoterInterface constants (ACCESS_GRANTED, ACCESS_ABSTAIN, ACCESS_DENIED)
-     *                    or an integer when scoring is false
+     *                                             or an integer when scoring is false
      */
     public function __construct(
         private int $access,

@@ -23,8 +23,8 @@ use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 final class AccessDecision
 {
     /**
-     * @param VoterInterface::ACCESS_*|int  $access
-     * @param VoteInterface[]               $votes
+     * @param VoterInterface::ACCESS_*|int $access
+     * @param VoteInterface[]              $votes
      */
     public function __construct(
         private readonly int $access,

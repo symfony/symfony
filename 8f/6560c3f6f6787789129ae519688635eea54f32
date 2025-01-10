@@ -1,0 +1,284 @@
+---------------------------------------------------------------------------
+
+by 94noni at 2025-01-01T17:58:23Z
+
+I like it a lot, it reminds me https://github.com/symfony/symfony/issues/49522
+just a question, does this competes/supersedes https://github.com/symfony/symfony/pull/57225 ?
+Cheers
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2025-01-01T18:19:49Z
+
+cc @kbond as you are the author of
+
+https://github.com/zenstruck/console-extra
+
+---------------------------------------------------------------------------
+
+by yceruto at 2025-01-01T19:09:33Z
+
+>cc @kbond as you are the author of
+>https://github.com/zenstruck/console-extra
+
+We had a chat recently about this topic and that repo was my inspiration actually
+
+---------------------------------------------------------------------------
+
+by yceruto at 2025-01-01T20:41:53Z
+
+I've tested the [Symfony one-file demo](https://github.com/yceruto/symfony-onefile) with this approach for a single-app command, and this is the result:
+```php
+<?php
+
+require_once __DIR__.'/vendor/autoload_runtime.php';
+
+use Symfony\Bundle\FrameworkBundle\Console\Application;
+use Symfony\Bundle\FrameworkBundle\Kernel\MicroKernelTrait;
+use Symfony\Component\Console\Attribute\Argument;
+use Symfony\Component\Console\Attribute\AsCommand;
+use Symfony\Component\Console\Style\SymfonyStyle;
+use Symfony\Component\HttpKernel\Kernel;
+
+#[AsCommand('app:start')]
+class SymfonyOneFileApp extends Kernel
+{
+    use MicroKernelTrait;
+
+    public function __invoke(SymfonyStyle $io, #[Argument] string $name = 'World'): void
+    {
+        $io->success(sprintf('Hello %s!', $name));
+    }
+}
+
+return static function (array $context) {
+    return new Application(new SymfonyOneFileApp($context['APP_ENV'], (bool) $context['APP_DEBUG']));
+};
+```
+It's missing having services autowired on the method, though.
+
+---------------------------------------------------------------------------
+
+by yceruto at 2025-01-01T21:18:32Z
+
+>I like it a lot, it reminds me https://github.com/symfony/symfony/issues/49522
+>just a question, does this competes/supersedes https://github.com/symfony/symfony/pull/57225 ?
+>Cheers
+
+@94noni They are related yes. I'm waiting for a deeper conversation with @chalasr to get more insights about the work he is doing in this regard, but in theory this should close & replace those proposals.
+
+---------------------------------------------------------------------------
+
+by smnandre at 2025-01-01T22:54:09Z
+
+I love it! Really nice DX addition 👏
+
+---------------------------------------------------------------------------
+
+by yceruto at 2025-01-02T04:47:30Z
+
+I’ve concerns about supporting `#[AsCommand]` on public methods and allowing multiple commands on the same class/instance:
+ * when extending from the `Command` class, methods like `isEnabled()`, `interact()`, or `initialize()` will respond to all commands defined in that class, which is undesirable
+ * <s>when not extending from the `Command` class, there is currently no way to inspect methods with the `#[AsCommand]` attribute unless we also repeat `#[AsCommand]` on the class itself (for autoconfiguration/tagging)</s> not true, it's actually supported
+ * last but not least, it won’t align with the SRP
+
+I don't think it's a good idea to support that
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2025-01-02T10:34:04Z
+
+> I’ve concerns about supporting `#[AsCommand]` on public methods and allowing multiple commands on the same class/instance:
+>
+> * when extending from the `Command` class, methods like `isEnabled()`, `interact()`, or `initialize()` will respond to all commands defined in that class, which is undesirable
+
+Let's just say that these functions are rarely used in final projects, and that if you want to use them, it's worth separating the commands into separate classes.
+
+> * when not extending from the `Command` class, there is currently no way to inspect methods with the `#[AsCommand]` attribute unless we also repeat `#[AsCommand]` on the class itself (for autoconfiguration/tagging)
+
+To quote @stof:
+> The `registerAttributeForAutoconfiguration` method inspects the parameter type of the configuration callback to discover which source need to be inspected.
+
+> * last but not least, it won’t align with the SRP
+
+SRP is an implementation principle that can be left up to the developer. I once had 2 commands that were functionally very close to each other, but with different arguments. To share part of the code between the 2, I needed an abstract class. With this new approach, I can create 2 commands in 1 class instead of 3.
+
+What I like about it is the ease with which you can create new commands with just a little code. A little RAD, no doubt, but ultimately very useful.
+
+---------------------------------------------------------------------------
+
+by yceruto at 2025-01-02T14:53:52Z
+
+>>I’ve concerns about supporting #[AsCommand] on public methods and allowing multiple commands on the same class/instance:
+>>
+>>when extending from the Command class, methods like isEnabled(), interact(), or initialize() will respond to all commands defined in that class, which is undesirable
+>
+>Let's just say that these functions are rarely used in final projects, and that if you want to use them, it's worth separating the commands into separate classes.
+
+Yeah, it's an unhappy situation in my opinion. Just imagine you already have two commands in the same class, then you decide to use the `interact()` method (or any of those methods), and the framework tells you to split that class; otherwise, there is an ambiguity.
+
+I'd prefer to guide developers to happy paths where the code can evolve without problems, even if that implies adding one class per command, which is easier than before now.
+
+---------------------------------------------------------------------------
+
+by tacman at 2025-01-03T00:17:03Z
+
+Woo hoo!  I love https://github.com/zenstruck/console-extra, I recently ported some older code and was reminded how verbose `$input->getOption('force')` seems compared to declaring it with an attribute.
+
+I figured it'd be a Symfony 8 thing, but it'd be great if it could arrive earlier, even if experimental.
+
+---------------------------------------------------------------------------
+
+by kaluzki at 2025-01-03T11:15:36Z
+
+> I’ve concerns about supporting `#[AsCommand]` on public methods and allowing multiple commands on the same class/instance:
+>
+> * when extending from the `Command` class, methods like `isEnabled()`, `interact()`, or `initialize()` will respond to all commands defined in that class, which is undesirable
+> * when not extending from the `Command` class, there is currently no way to inspect methods with the `#[AsCommand]` attribute unless we also repeat `#[AsCommand]` on the class itself (for autoconfiguration/tagging)
+> * last but not least, it won’t align with the SRP
+>
+> I don't think it's a good idea to support that
+
+Can't the behavior of the `Command::isEnabled` method be achieved directly using:
+
+```php
+#[When(...)]
+#[AsCommand(...)]
+```
+?
+
+---------------------------------------------------------------------------
+
+by kaluzki at 2025-01-03T11:32:31Z
+
+Thanks, I'm looking forward to this feature!
+
+It would be awesome if the arguments for `AsCommand` could be configured with callables, similar to `Route`, using:
+
+* `Symfony\Component\HttpKernel\Controller\ArgumentResolver`
+* `Symfony\Component\HttpKernel\Attribute\ValueResolver`
+
+---------------------------------------------------------------------------
+
+by 94noni at 2025-01-03T11:43:01Z
+
+@yceruto just a bare question here, as I dont know if it can applied here or not, or even after this PR
+
+on the web entry point for a request, we have stuff like:
+
+```php
+#[MapRequestPayload(
+        acceptFormat: 'json',
+        validationGroups: ['strict', 'read'],
+        constraints: new Assert\Notnull(),
+        validationFailedStatusCode: Response::HTTP_NOT_FOUND
+    )] UserDto $userDto
+```
+
+can we imagine mimicking this for the cli entry point for a command, so we could have:
+
+```php
+#[Argument(
+    constraints: new Assert\Length(['min' => 2]),
+    filter: \FILTER_VALIDATE_EMAIL,
+    validationFailedExitCode: Command::FAILURE,
+)] string $email
+```
+
+(for argument and option)
+
+can leverage the Symfony\Component\Console\Question\Question for example, or symfony validator directly
+
+---------------------------------------------------------------------------
+
+by tacman at 2025-01-03T11:51:27Z
+
+> It would be awesome if the arguments for `AsCommand` could be configured with callables, similar to `Route`, using:
+
+Interesting, great idea.  So with
+
+```bash
+bin/console app:mycommand myProjectCode
+```
+
+ so you could replace
+
+```php
+ #[Argument()] string $projectCode,
+
+$project = $this->projectRepository->findOneBy(['code' => $projectCode]);
+```
+
+with
+
+```php
+ #[Argument(identifiers: ['projectCode' => 'code'])] Project $project,
+
+```
+
+Yes, that'd be very cool.  A lot of boilerplate entity lookups could be replaced.  I wonder if that's something console-extra-bundle could add that as an experimental feature.  I think it'd be mostly having a ValueParamConverter listener.
+
+(Edit: this really belongs in a brainstorming discussion, not comments on this PR.)
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2025-01-03T12:10:07Z
+
+I like the idea, but we should focus on the initial scope, so that `#[AsCommand]`, `#[Argument]` and `#[Option]` can be a thing first. The other things could be added later IMHO
+
+---------------------------------------------------------------------------
+
+by tacman at 2025-01-03T12:27:27Z
+
+comment removed, I thought this was a discussion and not a PR.   Oops.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2025-01-03T15:13:06Z
+
+Happy to see this happening!
+As discussed with Yonel, I was about to submit something quite close to this as I'm working on this topic for some time now notably with @theofidry and @kbond. For the record here are some links to previous discussions/art:
+https://github.com/theofidry/console/discussions/100
+https://speakerdeck.com/chalasr/reinvent-symfony-console
+https://github.com/zenstruck/console-extra
+https://github.com/jolicode/castor
+
+Now sending PRs to Yonel's fork to make this PR as cool/ future-proof as possible for some future plans, one being Value Resolvers for command arguments & options.
+
+---------------------------------------------------------------------------
+
+by alamirault at 2025-01-03T17:09:12Z
+
+Thank you @yceruto to tackle this subject.
+
+Commands need also a great DX !
+
+---------------------------------------------------------------------------
+
+by chalasr at 2025-01-04T19:35:35Z
+
+Some changes have been pushed:
+- The special `invokable: true` attribute initially added to the `console.command` DI tag was removed in favor of relying on method-existence detection in the compiler pass.
+- The `InvokableCommand` internal wrapper is now really callable, which makes `TraceableCommand` work with invokable commands.
+-  Invokable commands can get the `Application` instance as argument if their signature ask for it, instead of the `Command` instance initially proposed.
+- More tests were added.
+
+My thoughts on previous discussions and limitations regarding regular commands:
+- I agree with most concerns shared in https://github.com/symfony/symfony/pull/59340#issuecomment-2567283033 about supporting `AsCommand` on any public method, though part of them could be mitigated with some DX mesures and I think it would be nice to make it work later. Let's keep it simple on this iteration which is a huge game-changer already.
+- I don't mind not having `initialize()` and `interact()` equivalents for invokable commands. Although there are some usages out there, most could work as well without them. Moreover they just don't fit with the invokable command principle conceptually.
+
+The patch is super straightforward, and opens a lot of doors. Also the feature can be adopted by any Console-dependent package with a bit of DI glue since the implementation relies on the existing infrastructure (`setCode()`). I like this a lot.
+
+---------------------------------------------------------------------------
+
+by yceruto at 2025-01-05T14:00:31Z
+
+Minor refactoring following Fabien's review: Moved status code normalization to the `InvokableCommand::__invoke()` method, as it now handles the arbitrary return of the callable function.
+
+---------------------------------------------------------------------------
+
+by yceruto at 2025-01-08T16:35:36Z
+
+Update! Added two deprecations noticies:
+ * untyped parameter bound to the `setCode`'s callable is deprecated and will throw an exception in 8.0
+ * returning a non-integer value from the `setCode`'s callable is deprecated and will throw an exception in 8.0 (it's still possible to return void)

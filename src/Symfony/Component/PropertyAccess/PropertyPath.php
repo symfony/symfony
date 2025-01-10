@@ -223,7 +223,7 @@ class PropertyPath implements \IteratorAggregate, PropertyPathInterface
     public function isWildcard(int $index): bool
     {
         if (!isset($this->isWildcard[$index])) {
-            throw new OutOfBoundsException(sprintf('The index "%s" is not within the property path.', $index));
+            throw new OutOfBoundsException(\sprintf('The index "%s" is not within the property path.', $index));
         }
 
         return $this->isWildcard[$index];

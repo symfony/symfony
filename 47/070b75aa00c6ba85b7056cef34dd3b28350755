@@ -1,0 +1,18 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2025-01-10T14:18:33Z
+
+Hey!
+
+Thanks for your PR. You are targeting branch "7.3" but it seems your PR description refers to branch "7.2".
+Could you update the PR description or change target branch? This helps core maintainers a lot.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by keradus at 2025-01-10T14:23:52Z
+
+Fabbot addressed in https://github.com/symfony/symfony/pull/59467/commits/b401e86bf48954ed094f524e7e367b39c9d3682a

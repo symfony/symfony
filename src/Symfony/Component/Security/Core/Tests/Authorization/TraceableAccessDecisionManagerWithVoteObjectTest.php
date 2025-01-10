@@ -74,8 +74,8 @@ class TraceableAccessDecisionManagerWithVoteObjectTest extends TestCase
             ['ATTRIBUTE_1'],
             null,
             [
-                [$voter1, VoterInterface::ACCESS_GRANTED],
-                [$voter2, VoterInterface::ACCESS_GRANTED],
+                [$voter1, new Vote(VoterInterface::ACCESS_GRANTED)],
+                [$voter2, new Vote(VoterInterface::ACCESS_GRANTED)],
             ],
             $result,
         ];
@@ -85,7 +85,7 @@ class TraceableAccessDecisionManagerWithVoteObjectTest extends TestCase
                 'object' => true,
                 'result' => $result = new AccessDecision(VoterInterface::ACCESS_DENIED),
                 'voterDetails' => [
-                    ['voter' => $voter1, 'attributes' => ['ATTRIBUTE_1', 'ATTRIBUTE_2'], 'vote' => new Vote(VoterInterface::ACCESS_ABSTAIN)],
+                    ['voter' => $voter1, 'attributes' => ['ATTRIBUTE_1', 'ATTRIBUTE_2'], 'vote' => VoterInterface::ACCESS_ABSTAIN],
                     ['voter' => $voter2, 'attributes' => ['ATTRIBUTE_1', 'ATTRIBUTE_2'], 'vote' => new Vote(VoterInterface::ACCESS_GRANTED)],
                 ],
             ]],
@@ -93,7 +93,7 @@ class TraceableAccessDecisionManagerWithVoteObjectTest extends TestCase
             true,
             [
                 [$voter1, VoterInterface::ACCESS_ABSTAIN],
-                [$voter2, VoterInterface::ACCESS_GRANTED],
+                [$voter2, new Vote(VoterInterface::ACCESS_GRANTED)],
             ],
             $result,
         ];
@@ -110,8 +110,8 @@ class TraceableAccessDecisionManagerWithVoteObjectTest extends TestCase
             [null],
             'jolie string',
             [
-                [$voter1, VoterInterface::ACCESS_ABSTAIN],
-                [$voter2, VoterInterface::ACCESS_DENIED],
+                [$voter1, new Vote(VoterInterface::ACCESS_ABSTAIN)],
+                [$voter2, new Vote(VoterInterface::ACCESS_DENIED)],
             ],
             $result,
         ];
@@ -152,8 +152,8 @@ class TraceableAccessDecisionManagerWithVoteObjectTest extends TestCase
             ['ATTRIBUTE_2'],
             $x,
             [
-                [$voter1, VoterInterface::ACCESS_ABSTAIN],
-                [$voter2, VoterInterface::ACCESS_ABSTAIN],
+                [$voter1, new Vote(VoterInterface::ACCESS_ABSTAIN)],
+                [$voter2, new Vote(VoterInterface::ACCESS_ABSTAIN)],
             ],
             $result,
         ];
@@ -170,8 +170,8 @@ class TraceableAccessDecisionManagerWithVoteObjectTest extends TestCase
             [12.13],
             new \stdClass(),
             [
-                [$voter1, VoterInterface::ACCESS_DENIED],
-                [$voter2, VoterInterface::ACCESS_DENIED],
+                [$voter1, new Vote(VoterInterface::ACCESS_DENIED)],
+                [$voter2, new Vote(VoterInterface::ACCESS_DENIED)],
             ],
             $result,
         ];

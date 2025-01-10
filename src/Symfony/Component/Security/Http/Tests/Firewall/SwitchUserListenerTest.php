@@ -220,7 +220,7 @@ class SwitchUserListenerTest extends TestCase
         $this->request->query->set('_switch_user', 'kuba');
 
         $targetsUser = $this->callback(fn ($user) => 'kuba' === $user->getUserIdentifier());
-        $this->accessDecisionManager->expects($this->once())
+        $accessDecisionManager->expects($this->once())
             ->method($decideFunction)->with(self::callback(function (TokenInterface $token) use ($originalToken, $tokenStorage) {
                 // the token storage should also contain the original token for voters depending on it
                 return $token === $originalToken && $tokenStorage->getToken() === $originalToken;

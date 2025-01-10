@@ -93,10 +93,6 @@ class TraceableAccessDecisionManager implements AccessDecisionManagerInterface
      */
     public function addVoterVote(VoterInterface $voter, array $attributes, VoteInterface|int $vote): void
     {
-        if (!$vote instanceof VoteInterface) {
-            $vote = new Vote($vote);
-        }
-
         $currentLogIndex = \count($this->currentLog) - 1;
         $this->currentLog[$currentLogIndex]['voterDetails'][] = [
             'voter' => $voter,

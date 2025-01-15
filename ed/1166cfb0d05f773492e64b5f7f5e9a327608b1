@@ -1,0 +1,80 @@
+---------------------------------------------------------------------------
+
+by chr-hertel at 2024-12-07T11:50:30Z
+
+what about `toolbar_ajax_replace`?
+
+i would at least stick with `replace` since that is the term in the header as well
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2024-12-07T12:03:29Z
+
+Yes, I like `toolbar_ajax_replace`. Thanks!
+
+---------------------------------------------------------------------------
+
+by chr-hertel at 2024-12-07T12:08:06Z
+
+@javiereguiluz reworked it a bit further to have a structured config
+
+---------------------------------------------------------------------------
+
+by alexislefebvre at 2024-12-10T09:07:09Z
+
+Can you please think again about naming the parameter `refresh`, `update` or `reload` instead of `replace`? As a developer and end user of the web profiler, “replace” content sounds strange - replacing with what? -, while refreshing or reloading looks more clear.
+
+---------------------------------------------------------------------------
+
+by chr-hertel at 2024-12-10T13:00:14Z
+
+@alexislefebvre it's just like more confusing to me if header and option don't use the same terminology, is it not?
+
+---------------------------------------------------------------------------
+
+by alexislefebvre at 2024-12-11T14:13:04Z
+
+> @alexislefebvre it's just like more confusing to me if header and option don't use the same terminology, is it not?
+
+I'm sorry but I may miss some context here, what are header and option?
+
+---------------------------------------------------------------------------
+
+by chr-hertel at 2024-12-11T15:00:33Z
+
+> > @alexislefebvre it's just like more confusing to me if header and option don't use the same terminology, is it not?
+>
+> I'm sorry but I may miss some context here, what are header and option?
+
+the underlying feature is already part of Symfony => when setting the response **header** `Symfony-Debug-Toolbar-Replace` the toolbar gets replaced on XHR
+
+and since this config **option** is controlling whether the header is send or not, i would argue to have a similar wording - meaning to use the word "replace" for the option instead of renaming the header -> would be a breaking change without much value IMHO
+
+---------------------------------------------------------------------------
+
+by alexislefebvre at 2024-12-11T16:08:16Z
+
+> > > @alexislefebvre it's just like more confusing to me if header and option don't use the same terminology, is it not?
+> >
+> >
+> > I'm sorry but I may miss some context here, what are header and option?
+>
+> the underlying feature is already part of Symfony => when setting the response **header** `Symfony-Debug-Toolbar-Replace` the toolbar gets replaced on XHR
+>
+> and since this config **option** is controlling whether the header is send or not, i would argue to have a similar wording - meaning to use the word "replace" for the option instead of renaming the header -> would be a breaking change without much value IMHO
+
+Thanks for the explanation. As a dev and end-user of WPB I will probably not know about the `Symfony-Debug-Toolbar-Replace` so I would prefer that the YAML parameter has a clear meaning, even if the name differs from the implementation.
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2024-12-12T19:26:29Z
+
+We can add an info to the option to make the intend more clear, but I would also reuse the wording here.
+
+@symfony/mergers please advice, thanks
+
+---------------------------------------------------------------------------
+
+by chr-hertel at 2024-12-20T21:58:34Z
+
+done from my point of view - also tested the xml config with attribute and element.

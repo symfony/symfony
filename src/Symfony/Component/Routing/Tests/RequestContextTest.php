@@ -91,6 +91,7 @@ class RequestContextTest extends TestCase
      *           ["a\rb"]
      *           ["a\nb"]
      *           ["a\tb"]
+     *           ["a\u000bb"]
      *           ["\u0000foo"]
      *           ["foo\u0000"]
      *           [" foo"]

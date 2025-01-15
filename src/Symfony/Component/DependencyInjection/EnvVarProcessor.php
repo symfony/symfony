@@ -313,7 +313,7 @@ class EnvVarProcessor implements EnvVarProcessorInterface, ResetInterface
             if (('\\' !== \DIRECTORY_SEPARATOR || 'file' !== $params['scheme']) && false !== ($i = strpos($env, '\\')) && $i < strcspn($env, '?#')) {
                 throw new RuntimeException(\sprintf('Invalid URL in env var "%s": backslashes are not allowed.', $name));
             }
-            if (\ord($env[0]) <= 32 || \ord($env[-1]) <= 32 || \strlen($env) !== strcspn($env, "\r\n\t")) {
+            if (\ord($env[0]) <= 32 || \ord($env[-1]) <= 32 || \strlen($env) !== strcspn($env, "\r\n\t\v")) {
                 throw new RuntimeException(\sprintf('Invalid URL in env var "%s": leading/trailing ASCII control characters or whitespaces are not allowed.', $name));
             }
             $params += [

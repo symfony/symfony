@@ -640,7 +640,7 @@ trait HttpClientTrait
         if (false !== ($i = strpos($url, '\\')) && $i < strcspn($url, '?#')) {
             throw new InvalidArgumentException(\sprintf('Malformed URL "%s": backslashes are not allowed.', $url));
         }
-        if (\strlen($url) !== strcspn($url, "\r\n\t")) {
+        if (\strlen($url) !== strcspn($url, "\r\n\t\v")) {
             throw new InvalidArgumentException(\sprintf('Malformed URL "%s": CR/LF/TAB characters are not allowed.', $url));
         }
         if ('' !== $url && (\ord($url[0]) <= 32 || \ord($url[-1]) <= 32)) {

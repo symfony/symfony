@@ -50,7 +50,7 @@ class RequestContext
         if (false !== ($i = strpos($uri, '\\')) && $i < strcspn($uri, '?#')) {
             $uri = '';
         }
-        if ('' !== $uri && (\ord($uri[0]) <= 32 || \ord($uri[-1]) <= 32 || \strlen($uri) !== strcspn($uri, "\r\n\t"))) {
+        if ('' !== $uri && (\ord($uri[0]) <= 32 || \ord($uri[-1]) <= 32 || \strlen($uri) !== strcspn($uri, "\r\n\t\v"))) {
             $uri = '';
         }
 

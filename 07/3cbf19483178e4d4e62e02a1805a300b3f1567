@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-01-06T14:21:50Z
+
+What's the use case? When do we not know the type ahead of time and need a value?
+
+---------------------------------------------------------------------------
+
+by mtarld at 2025-01-06T14:52:50Z
+
+IMO, this could be used within Serializer's normalizers, especially in their `supports` method to introspect the value and know if it could be normalized, WDYT?

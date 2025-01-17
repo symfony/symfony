@@ -1,0 +1,53 @@
+---------------------------------------------------------------------------
+
+by Spomky at 2024-07-13T13:46:03Z
+
+Ping @vincentchalamon
+
+---------------------------------------------------------------------------
+
+by Spomky at 2024-09-01T08:05:35Z
+
+> Is there no XSD to update?
+
+@nicolas-grekas I'm not sure what to change.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2024-12-26T12:07:01Z
+
+@Spomky The new options need to be added to SecurityBundle/Resources/config/schema/security-1.0.xsd
+
+---------------------------------------------------------------------------
+
+by Spomky at 2024-12-26T17:03:02Z
+
+> @Spomky The new options need to be added to SecurityBundle/Resources/config/schema/security-1.0.xsd
+
+Hello @chalasr,
+I modified the schema. Note that I am not sure it is fine of not (I was not aware of it before your comment).
+Regards.
+
+---------------------------------------------------------------------------
+
+by Spomky at 2025-01-05T17:21:07Z
+
+Hi,
+
+I am not sure how to fix the failing tests.
+The annotation `@requires extension openssl` is present, but it looks like the dataProvider is called.
+Should I refactor these tests?
+
+---------------------------------------------------------------------------
+
+by chalasr at 2025-01-05T17:42:22Z
+
+You may need to bump the security-http dependency to ^7.3 in security-bundle
+
+---------------------------------------------------------------------------
+
+by Spomky at 2025-01-05T20:11:03Z
+
+Many thaks.
+Took me a while to understand the problem with the remaining failing tests.😅
+Sorry for the noise. All green now.

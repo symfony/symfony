@@ -82,6 +82,11 @@ class Serializer implements SerializerInterface, ContextAwareNormalizerInterface
     private array $normalizerCache = [];
 
     /**
+     * @var array<string, mixed>
+     */
+    private array $defaultContext = [];
+
+    /**
      * @param array<NormalizerInterface|DenormalizerInterface> $normalizers
      * @param array<EncoderInterface|DecoderInterface>         $encoders
      */
@@ -163,12 +168,12 @@ class Serializer implements SerializerInterface, ContextAwareNormalizerInterface
             return $data;
         }
 
-        if (\is_array($data) && !$data && ($context[self::EMPTY_ARRAY_AS_OBJECT] ?? false)) {
+        if (\is_array($data) && !$data && ($context[self::EMPTY_ARRAY_AS_OBJECT] ?? $this->defaultContext[self::EMPTY_ARRAY_AS_OBJECT] ?? false)) {
             return new \ArrayObject();
         }
 
         if (is_iterable($data)) {
-            if ($data instanceof \Countable && ($context[AbstractObjectNormalizer::PRESERVE_EMPTY_OBJECTS] ?? false) && !\count($data)) {
+            if ($data instanceof \Countable && ($context[AbstractObjectNormalizer::PRESERVE_EMPTY_OBJECTS] ?? $this->defaultContext[AbstractObjectNormalizer::PRESERVE_EMPTY_OBJECTS] ?? false) && !\count($data)) {
                 return new \ArrayObject();
             }
 
@@ -220,7 +225,7 @@ class Serializer implements SerializerInterface, ContextAwareNormalizerInterface
             throw new NotNormalizableValueException(sprintf('Could not denormalize object of type "%s", no supporting normalizer found.', $type));
         }
 
-        if (isset($context[DenormalizerInterface::COLLECT_DENORMALIZATION_ERRORS])) {
+        if (isset($context[DenormalizerInterface::COLLECT_DENORMALIZATION_ERRORS]) || isset($this->defaultContext[DenormalizerInterface::COLLECT_DENORMALIZATION_ERRORS])) {
             unset($context[DenormalizerInterface::COLLECT_DENORMALIZATION_ERRORS]);
             $context['not_normalizable_value_exceptions'] = [];
             $errors = &$context['not_normalizable_value_exceptions'];
@@ -429,5 +434,15 @@ class Serializer implements SerializerInterface, ContextAwareNormalizerInterface
     public function supportsDecoding(string $format, array $context = []): bool
     {
         return $this->decoder->supportsDecoding($format, $context);
+    }
+
+    /**
+     * @internal
+     *
+     * @param array<string, mixed> $defaultContext
+     */
+    public function setDefaultContext(array $defaultContext): void
+    {
+        $this->defaultContext = $defaultContext;
     }
 }

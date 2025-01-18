@@ -55,6 +55,7 @@ class SerializerPass implements CompilerPassInterface
                 $definition->setBindings(['array $defaultContext' => new BoundArgument($defaultContext, false)] + $definition->getBindings());
             }
 
+            $container->getDefinition('serializer')->addMethodCall('setDefaultContext', [$defaultContext]);
             $container->getParameterBag()->remove('serializer.default_context');
         }
 

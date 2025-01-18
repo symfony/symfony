@@ -1652,6 +1652,29 @@ class SerializerTest extends TestCase
             DenormalizerInterface::COLLECT_DENORMALIZATION_ERRORS => true,
         ]);
     }
+
+    public function testEmptyArrayAsObjectDefaultContext()
+    {
+        $serializer = new Serializer();
+        $serializer->setDefaultContext([Serializer::EMPTY_ARRAY_AS_OBJECT => true]);
+        $this->assertEquals(new \ArrayObject(), $serializer->normalize([]));
+    }
+
+    public function testPreserveEmptyObjectsAsDefaultContext()
+    {
+        $serializer = new Serializer();
+        $serializer->setDefaultContext([AbstractObjectNormalizer::PRESERVE_EMPTY_OBJECTS => true]);
+        $this->assertEquals(new \ArrayObject(), $serializer->normalize(new \ArrayIterator()));
+    }
+
+    public function testCollectDenormalizationErrorsDefaultContext()
+    {
+        $data = ['variadic' => ['a random string']];
+        $serializer = new Serializer([new UidNormalizer(), new ObjectNormalizer()], []);
+        $serializer->setDefaultContext([DenormalizerInterface::COLLECT_DENORMALIZATION_ERRORS => true]);
+        $this->expectException(PartialDenormalizationException::class);
+        $serializer->denormalize($data, DummyWithVariadicParameter::class);
+    }
 }
 
 class Model

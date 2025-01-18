@@ -115,4 +115,19 @@ class SerializerPassTest extends TestCase
         $this->assertEquals(new Reference('e'), $traceableEncoderDefinition->getArgument(0));
         $this->assertEquals(new Reference('serializer.data_collector'), $traceableEncoderDefinition->getArgument(1));
     }
+
+    public function testSetDefaultContext()
+    {
+        $container = new ContainerBuilder();
+        $container->setParameter('kernel.debug', false);
+        $container->setParameter('serializer.default_context', ['enable_max_depth' => true]);
+        $container->register('serializer')->setArguments([null, null]);
+        $container->register('n')->addTag('serializer.normalizer');
+        $container->register('e')->addTag('serializer.encoder');
+
+        $serializerPass = new SerializerPass();
+        $serializerPass->process($container);
+
+        $this->assertSame([['setDefaultContext', [['enable_max_depth' => true]]]], $container->getDefinition('serializer')->getMethodCalls());
+    }
 }

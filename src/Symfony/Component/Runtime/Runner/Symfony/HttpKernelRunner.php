@@ -26,7 +26,6 @@ class HttpKernelRunner implements RunnerInterface
     public function __construct(
         private readonly HttpKernelInterface $kernel,
         private readonly Request $request,
-        private readonly bool $debug = false,
     ) {
     }
 
@@ -34,19 +33,16 @@ class HttpKernelRunner implements RunnerInterface
     {
         $response = $this->kernel->handle($this->request);
 
+        $response->send();
         if (Kernel::VERSION_ID >= 60400) {
-            $response->send(false);
-
-            if (\function_exists('fastcgi_finish_request') && !$this->debug) {
+            if (\function_exists('fastcgi_finish_request')) {
                 fastcgi_finish_request();
-            } elseif (\function_exists('litespeed_finish_request') && !$this->debug) {
+            } elseif (\function_exists('litespeed_finish_request')) {
                 litespeed_finish_request();
             } else {
                 Response::closeOutputBuffers(0, true);
                 flush();
             }
-        } else {
-            $response->send();
         }
 
         if ($this->kernel instanceof TerminableInterface) {

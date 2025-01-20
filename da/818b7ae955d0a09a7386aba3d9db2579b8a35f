@@ -1,0 +1,40 @@
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2024-05-02T08:23:49Z
+
+What a PR 👏
+
+Quick question: don't we have deprecations expectations tests? I was not able to find tests where the new deprecations are expected. Did I miss them or is it avoided for some reason?
+
+---------------------------------------------------------------------------
+
+by Tobion at 2024-05-12T18:21:13Z
+
+Good job migrating all the tests. What a tedius work.
+I think in the long term we also want to deprecate and remove the options logic from the Constraint base class, like `\Symfony\Component\Validator\Constraint::getDefaultOption` and `\Symfony\Component\Validator\Constraint::getRequiredOptions`. But probably better to do that in a separate MR.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2024-08-06T14:27:16Z
+
+> The mapping file loaders (XML and Yaml) should also trigger a deprecation when they are asked to load a constraint that does not support named arguments IMO
+
+good point 👍 done
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2024-10-08T08:03:46Z
+
+It would be really nice to have this in the next version. Is some work missing or is it fully ready and just lacks a new review?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2024-10-08T08:05:41Z
+
+@alexandre-daubois ready from my point of view, reviews welcome :)
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2024-10-08T08:06:18Z
+
+Alright, I'll have a full look soon!

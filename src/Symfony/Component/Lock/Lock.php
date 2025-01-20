@@ -39,6 +39,7 @@ final class Lock implements SharedLockInterface, LoggerAwareInterface
         private PersistingStoreInterface $store,
         private ?float $ttl = null,
         private bool $autoRelease = true,
+        private bool $validateOnDelete = false,
     ) {
     }
 
@@ -215,7 +216,11 @@ final class Lock implements SharedLockInterface, LoggerAwareInterface
     {
         try {
             try {
-                $deleted = $this->store->deleteWithConfirmation($this->key);
+                if($this->validateOnDelete) {
+                    $deleted = $this->store->deleteWithConfirmation($this->key);
+                }else{
+                    $this->store->delete($this->key);
+                }
                 $this->dirty = false;
             } catch (LockReleasingException $e) {
                 throw $e;
@@ -223,7 +228,7 @@ final class Lock implements SharedLockInterface, LoggerAwareInterface
                 throw new LockReleasingException(\sprintf('Failed to release the "%s" lock.', $this->key), 0, $e);
             }
 
-            if (!$deleted && $this->store->exists($this->key)) {
+            if (($this->validateOnDelete && !$deleted && $this->store->exists($this->key)) || (!$this->validateOnDelete && $this->store->exists($this->key))) {
                 throw new LockReleasingException(\sprintf('Failed to release the "%s" lock, the resource is still locked.', $this->key));
             }
 

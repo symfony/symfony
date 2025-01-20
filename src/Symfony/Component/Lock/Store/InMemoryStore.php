@@ -114,7 +114,8 @@ class InMemoryStore implements SharedLockStoreInterface
 
     public function deleteWithConfirmation(Key $key): bool
     {
-       $this->delete($key);
-       return true;
+        $this->delete($key);
+
+        return true;
     }
 }

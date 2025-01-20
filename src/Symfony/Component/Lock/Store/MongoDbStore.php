@@ -384,6 +384,6 @@ class MongoDbStore implements PersistingStoreInterface
             ['limit' => 1]
         );
 
-        return $this->getManager()->executeBulkWrite($this->namespace, $write)->getMatchedCount() != null;
+        return null != $this->getManager()->executeBulkWrite($this->namespace, $write)->getMatchedCount();
     }
 }

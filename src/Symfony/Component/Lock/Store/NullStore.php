@@ -43,6 +43,6 @@ class NullStore implements BlockingSharedLockStoreInterface
 
     public function deleteWithConfirmation(Key $key): bool
     {
-       return true;
+        return true;
     }
 }

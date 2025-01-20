@@ -161,6 +161,7 @@ class ZookeeperStore implements PersistingStoreInterface
         $resource = $this->getKeyResource($key);
         try {
             $this->zookeeper->delete($resource);
+
             return true;
         } catch (\ZookeeperException $exception) {
             // For Zookeeper Ephemeral Nodes, the node will be deleted upon session death. But, if we want to unlock

@@ -109,6 +109,7 @@ class SemaphoreStore implements BlockingStoreInterface
         sem_remove($resource);
 
         $key->removeState(__CLASS__);
+
         return true;
     }
 }

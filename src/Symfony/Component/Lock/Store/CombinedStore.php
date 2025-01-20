@@ -206,6 +206,7 @@ class CombinedStore implements SharedLockStoreInterface, LoggerAwareInterface
                 $store->delete($key);
             } catch (\Exception $e) {
                 $this->logger?->notice('One store failed to delete the "{resource}" lock.', ['resource' => $key, 'store' => $store, 'exception' => $e]);
+
                 return false;
             }
         }

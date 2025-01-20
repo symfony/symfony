@@ -495,6 +495,12 @@ class LockTest extends TestCase
                 $key->reduceLifetime($ttl);
                 $this->checkNotExpired($key);
             }
+
+            public function deleteWithConfirmation(Key $key): bool
+            {
+               $this->delete($key);
+               return true;
+            }
         };
         $ttl = 1;
         $lock = new Lock($key, $store, $ttl);

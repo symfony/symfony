@@ -4,6 +4,7 @@ CHANGELOG
 ---
 
 * introduce deleteWithConfirmation method to  `PersistingStoreInterface` used to obtain a return value when deleting a resource to validate its deletion
+* introduce validateOnDelete parameter to `LockFactory` to decide if deleteWithConfirmation will be used in `PersistingStoreInterface`.
 
 7.2
 ---

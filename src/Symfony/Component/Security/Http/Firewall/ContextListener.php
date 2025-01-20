@@ -191,7 +191,9 @@ class ContextListener extends AbstractListener
      */
     protected function refreshUser(TokenInterface $token): ?TokenInterface
     {
-        $user = $token->getUser();
+        if (null === $user = $token->getUser()) {
+            return null;
+        }
 
         $userNotFoundByProvider = false;
         $userDeauthenticated = false;

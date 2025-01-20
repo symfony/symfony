@@ -36,6 +36,7 @@ use Symfony\Component\Security\Core\User\InMemoryUser;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Http\Firewall\ContextListener;
+use Symfony\Component\Security\Http\Tests\Fixtures\NullUserToken;
 use Symfony\Contracts\Service\ServiceLocatorTrait;
 
 class ContextListenerTest extends TestCase
@@ -56,6 +57,28 @@ class ContextListenerTest extends TestCase
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('User provider "stdClass" must implement "Symfony\Component\Security\Core\User\UserProviderInterface');
         $this->handleEventWithPreviousSession([new \stdClass()]);
+    }
+
+    public function testTokenReturnsNullUser()
+    {
+        $tokenStorage = new TokenStorage();
+        $tokenStorage->setToken(new NullUserToken());
+
+        $session = new Session(new MockArraySessionStorage());
+        $session->set('_security_context_key', serialize($tokenStorage->getToken()));
+
+        $request = new Request();
+        $request->setSession($session);
+        $request->cookies->set('MOCKSESSID', true);
+
+        $listener = new ContextListener($tokenStorage, [], 'context_key');
+        $listener->authenticate(new RequestEvent(
+            $this->createMock(HttpKernelInterface::class),
+            $request,
+            HttpKernelInterface::MAIN_REQUEST,
+        ));
+
+        $this->expectNotToPerformAssertions();
     }
 
     public function testOnKernelResponseWillAddSession()

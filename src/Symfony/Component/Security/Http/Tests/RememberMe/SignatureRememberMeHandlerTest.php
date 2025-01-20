@@ -57,7 +57,7 @@ class SignatureRememberMeHandlerTest extends TestCase
 
         /** @var Cookie $cookie */
         $cookie = $this->request->attributes->get(ResponseListener::COOKIE_ATTR_NAME);
-        $this->assertEquals(strtr(InMemoryUser::class, '\\', '.').':d291dGVy:'.$expire.':'.$signature, $cookie->getValue());
+        $this->assertEquals(RememberMeDetails::computeUserFqcnHash(InMemoryUser::class).':d291dGVy:'.$expire.':'.$signature, $cookie->getValue());
     }
 
     public function testClearRememberMeCookie()
@@ -77,21 +77,21 @@ class SignatureRememberMeHandlerTest extends TestCase
         $signature = $this->signatureHasher->computeSignatureHash($user, $expire = time() + 3600);
         $this->userProvider->createUser(new InMemoryUser('wouter', null));
 
-        $rememberMeDetails = new RememberMeDetails(InMemoryUser::class, 'wouter', $expire, $signature);
+        $rememberMeDetails = new RememberMeDetails(RememberMeDetails::computeUserFqcnHash(InMemoryUser::class), 'wouter', $expire, $signature);
         $this->handler->consumeRememberMeCookie($rememberMeDetails);
 
         $this->assertTrue($this->request->attributes->has(ResponseListener::COOKIE_ATTR_NAME));
 
         /** @var Cookie $cookie */
         $cookie = $this->request->attributes->get(ResponseListener::COOKIE_ATTR_NAME);
-        $this->assertNotEquals((new RememberMeDetails(InMemoryUser::class, 'wouter', $expire, $signature))->toString(), $cookie->getValue());
+        $this->assertNotEquals((new RememberMeDetails(RememberMeDetails::computeUserFqcnHash(InMemoryUser::class), 'wouter', $expire, $signature))->toString(), $cookie->getValue());
     }
 
     public function testConsumeRememberMeCookieInvalidHash()
     {
         $this->expectException(AuthenticationException::class);
         $this->expectExceptionMessage('The cookie\'s hash is invalid.');
-        $this->handler->consumeRememberMeCookie(new RememberMeDetails(InMemoryUser::class, 'wouter', time() + 600, 'badsignature'));
+        $this->handler->consumeRememberMeCookie(new RememberMeDetails(RememberMeDetails::computeUserFqcnHash(InMemoryUser::class), 'wouter', time() + 600, 'badsignature'));
     }
 
     public function testConsumeRememberMeCookieExpired()
@@ -101,6 +101,6 @@ class SignatureRememberMeHandlerTest extends TestCase
 
         $this->expectException(AuthenticationException::class);
         $this->expectExceptionMessage('The cookie has expired.');
-        $this->handler->consumeRememberMeCookie(new RememberMeDetails(InMemoryUser::class, 'wouter', 360, $signature));
+        $this->handler->consumeRememberMeCookie(new RememberMeDetails(RememberMeDetails::computeUserFqcnHash(InMemoryUser::class), 'wouter', 360, $signature));
     }
 }

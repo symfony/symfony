@@ -3,7 +3,7 @@ CHANGELOG
 
 7.3
 ---
-
+ * Rename property userFqcn to userFqcnHash, remove method getUserFqcn, add method getUserFqcnHash.
  * Add encryption support to `OidcTokenHandler` (JWE)
 
 7.2

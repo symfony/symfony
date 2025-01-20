@@ -22,7 +22,7 @@ class RememberMeDetails
     public const COOKIE_DELIMITER = ':';
 
     public function __construct(
-        private string $userFqcn,
+        private string $userFqcnHash,
         private string $userIdentifier,
         private int $expires,
         private string $value,
@@ -48,7 +48,12 @@ class RememberMeDetails
 
     public static function fromPersistentToken(PersistentToken $persistentToken, int $expires): self
     {
-        return new static($persistentToken->getClass(), $persistentToken->getUserIdentifier(), $expires, $persistentToken->getSeries().':'.$persistentToken->getTokenValue());
+        return new static(self::computeUserFqcnHash($persistentToken->getClass()), $persistentToken->getUserIdentifier(), $expires, $persistentToken->getSeries().':'.$persistentToken->getTokenValue());
+    }
+
+    public static function computeUserFqcnHash(string $userFqcn): string
+    {
+        return hash('sha256', $userFqcn);
     }
 
     public function withValue(string $value): self
@@ -59,9 +64,9 @@ class RememberMeDetails
         return $details;
     }
 
-    public function getUserFqcn(): string
+    public function getUserFqcnHash(): string
     {
-        return $this->userFqcn;
+        return $this->userFqcnHash;
     }
 
     public function getUserIdentifier(): string
@@ -82,6 +87,6 @@ class RememberMeDetails
     public function toString(): string
     {
         // $userIdentifier is encoded because it might contain COOKIE_DELIMITER, we assume other values don't
-        return implode(self::COOKIE_DELIMITER, [strtr($this->userFqcn, '\\', '.'), strtr(base64_encode($this->userIdentifier), '+/=', '-_~'), $this->expires, $this->value]);
+        return implode(self::COOKIE_DELIMITER, [$this->userFqcnHash, strtr(base64_encode($this->userIdentifier), '+/=', '-_~'), $this->expires, $this->value]);
     }
 }

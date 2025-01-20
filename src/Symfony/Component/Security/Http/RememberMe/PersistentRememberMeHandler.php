@@ -67,7 +67,7 @@ final class PersistentRememberMeHandler extends AbstractRememberMeHandler
         [$series, $tokenValue] = explode(':', $rememberMeDetails->getValue(), 2);
         $persistentToken = $this->tokenProvider->loadTokenBySeries($series);
 
-        if ($persistentToken->getUserIdentifier() !== $rememberMeDetails->getUserIdentifier() || $persistentToken->getClass() !== $rememberMeDetails->getUserFqcn()) {
+        if ($persistentToken->getUserIdentifier() !== $rememberMeDetails->getUserIdentifier() || !hash_equals(RememberMeDetails::computeUserFqcnHash($persistentToken->getClass()), $rememberMeDetails->getUserFqcnHash())) {
             throw new AuthenticationException('The cookie\'s hash is invalid.');
         }
 
@@ -89,7 +89,7 @@ final class PersistentRememberMeHandler extends AbstractRememberMeHandler
         }
 
         return parent::consumeRememberMeCookie(new RememberMeDetails(
-            $persistentToken->getClass(),
+            RememberMeDetails::computeUserFqcnHash($persistentToken->getClass()),
             $persistentToken->getUserIdentifier(),
             $expires,
             $persistentToken->getLastUsed()->getTimestamp().':'.$series.':'.$tokenValue.':'.$persistentToken->getClass()

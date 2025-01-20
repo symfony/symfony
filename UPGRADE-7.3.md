@@ -30,6 +30,9 @@ Console
    });
    ```
 
+ * Static methods `Command::getDefaultName()` and `Command::getDefaultDescription()` are deprecated.
+   Extract the command name and description through class reflection instead
+
 FrameworkBundle
 ---------------
 

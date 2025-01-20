@@ -232,7 +232,7 @@ class ApplicationTest extends TestCase
     public function testAddCommandWithEmptyConstructor()
     {
         $this->expectException(\LogicException::class);
-        $this->expectExceptionMessage('Command class "Foo5Command" is not correctly initialized. You probably forgot to call the parent constructor.');
+        $this->expectExceptionMessage('The command defined in "Foo5Command" cannot have an empty name.');
 
         (new Application())->add(new \Foo5Command());
     }
@@ -2404,7 +2404,9 @@ class ApplicationTest extends TestCase
         if ($dispatcher) {
             $application->setDispatcher($dispatcher);
         }
-        $application->add(new LazyCommand($command::getDefaultName(), [], '', false, fn () => $command, true));
+        /** @var AsCommand $attribute */
+        $attribute = ((new \ReflectionClass($command))->getAttributes(AsCommand::class)[0] ?? null)?->newInstance();
+        $application->add(new LazyCommand($attribute->name, [], '', false, fn () => $command, true));
 
         return $application;
     }

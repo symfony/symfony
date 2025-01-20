@@ -53,9 +53,15 @@ class Command
     private array $synopsis = [];
     private array $usages = [];
     private ?HelperSet $helperSet = null;
+    private bool $initialized = false;
 
+    /**
+     * @deprecated since Symfony 7.3
+     */
     public static function getDefaultName(): ?string
     {
+        trigger_deprecation('symfony/console', '7.3', 'The static method "%s()" is deprecated and will be removed in Symfony 8.0, extract the command name from the "%s" attribute instead.', __METHOD__, AsCommand::class);
+
         if ($attribute = (new \ReflectionClass(static::class))->getAttributes(AsCommand::class)) {
             return $attribute[0]->newInstance()->name;
         }
@@ -63,8 +69,13 @@ class Command
         return null;
     }
 
+    /**
+     * @deprecated since Symfony 7.3
+     */
     public static function getDefaultDescription(): ?string
     {
+        trigger_deprecation('symfony/console', '7.3', 'The static method "%s()" is deprecated and will be removed in Symfony 8.0, extract the command description from the "%s" attribute instead.', __METHOD__, AsCommand::class);
+
         if ($attribute = (new \ReflectionClass(static::class))->getAttributes(AsCommand::class)) {
             return $attribute[0]->newInstance()->description;
         }
@@ -79,36 +90,7 @@ class Command
      */
     public function __construct(?string $name = null)
     {
-        $this->definition = new InputDefinition();
-
-        if (null === $name && null !== $name = static::getDefaultName()) {
-            $aliases = explode('|', $name);
-
-            if ('' === $name = array_shift($aliases)) {
-                $this->setHidden(true);
-                $name = array_shift($aliases);
-            }
-
-            $this->setAliases($aliases);
-        }
-
-        if (null !== $name) {
-            $this->setName($name);
-        }
-
-        if ('' === $this->description) {
-            $this->setDescription(static::getDefaultDescription() ?? '');
-        }
-
-        if ('' === $this->help && $attributes = (new \ReflectionClass(static::class))->getAttributes(AsCommand::class)) {
-            $this->setHelp($attributes[0]->newInstance()->help ?? '');
-        }
-
-        if (\is_callable($this)) {
-            $this->code = new InvokableCommand($this, $this(...));
-        }
-
-        $this->configure();
+        $this->init($name);
     }
 
     /**
@@ -333,6 +315,8 @@ class Command
      */
     public function mergeApplicationDefinition(bool $mergeArgs = true): void
     {
+        $this->init();
+
         if (null === $this->application) {
             return;
         }
@@ -356,6 +340,8 @@ class Command
      */
     public function setDefinition(array|InputDefinition $definition): static
     {
+        $this->init();
+
         if ($definition instanceof InputDefinition) {
             $this->definition = $definition;
         } else {
@@ -385,6 +371,8 @@ class Command
      */
     public function getNativeDefinition(): InputDefinition
     {
+        $this->init();
+
         $definition = $this->definition ?? throw new LogicException(\sprintf('Command class "%s" is not correctly initialized. You probably forgot to call the parent constructor.', static::class));
 
         if ($this->code && !$definition->getArguments() && !$definition->getOptions()) {
@@ -407,6 +395,8 @@ class Command
      */
     public function addArgument(string $name, ?int $mode = null, string $description = '', mixed $default = null, array|\Closure $suggestedValues = []): static
     {
+        $this->init();
+
         $this->definition->addArgument(new InputArgument($name, $mode, $description, $default, $suggestedValues));
         $this->fullDefinition?->addArgument(new InputArgument($name, $mode, $description, $default, $suggestedValues));
 
@@ -427,6 +417,8 @@ class Command
      */
     public function addOption(string $name, string|array|null $shortcut = null, ?int $mode = null, string $description = '', mixed $default = null, array|\Closure $suggestedValues = []): static
     {
+        $this->init();
+
         $this->definition->addOption(new InputOption($name, $shortcut, $mode, $description, $default, $suggestedValues));
         $this->fullDefinition?->addOption(new InputOption($name, $shortcut, $mode, $description, $default, $suggestedValues));
 
@@ -474,6 +466,8 @@ class Command
      */
     public function getName(): ?string
     {
+        $this->init();
+
         return $this->name;
     }
 
@@ -494,6 +488,8 @@ class Command
      */
     public function isHidden(): bool
     {
+        $this->init();
+
         return $this->hidden;
     }
 
@@ -514,6 +510,8 @@ class Command
      */
     public function getDescription(): string
     {
+        $this->init();
+
         return $this->description;
     }
 
@@ -534,6 +532,8 @@ class Command
      */
     public function getHelp(): string
     {
+        $this->init();
+
         return $this->help;
     }
 
@@ -586,6 +586,8 @@ class Command
      */
     public function getAliases(): array
     {
+        $this->init();
+
         return $this->aliases;
     }
 
@@ -596,6 +598,8 @@ class Command
      */
     public function getSynopsis(bool $short = false): string
     {
+        $this->init();
+
         $key = $short ? 'short' : 'long';
 
         if (!isset($this->synopsis[$key])) {
@@ -642,6 +646,48 @@ class Command
         }
 
         return $this->helperSet->get($name);
+    }
+
+    private function init(?string $name = null): void
+    {
+        if ($this->initialized) {
+            return;
+        }
+
+        $this->definition = new InputDefinition();
+
+        $attribute = ((new \ReflectionClass(static::class))->getAttributes(AsCommand::class)[0] ?? null)?->newInstance();
+
+        if (null === $name && null !== $name = $attribute?->name) {
+            $aliases = explode('|', $name);
+
+            if ('' === $name = array_shift($aliases)) {
+                $this->setHidden(true);
+                $name = array_shift($aliases);
+            }
+
+            $this->setAliases($aliases);
+        }
+
+        if (null !== $name) {
+            $this->setName($name);
+        }
+
+        if ('' === $this->description && $attribute?->description) {
+            $this->setDescription($attribute->description);
+        }
+
+        if ('' === $this->help && $attribute?->help) {
+            $this->setHelp($attribute->help);
+        }
+
+        if (\is_callable($this)) {
+            $this->code = new InvokableCommand($this, $this(...));
+        }
+
+        $this->initialized = true;
+
+        $this->configure();
     }
 
     /**

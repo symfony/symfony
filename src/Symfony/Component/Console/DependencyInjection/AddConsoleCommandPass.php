@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Console\DependencyInjection;
 
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Command\LazyCommand;
 use Symfony\Component\Console\CommandLoader\ContainerCommandLoader;
@@ -57,7 +58,10 @@ class AddConsoleCommandPass implements CompilerPassInterface
                 $invokableRef = null;
             }
 
-            $aliases = $tags[0]['command'] ?? str_replace('%', '%%', $class::getDefaultName() ?? '');
+            /** @var AsCommand|null $attribute */
+            $attribute = ($r->getAttributes(AsCommand::class)[0] ?? null)?->newInstance();
+
+            $aliases = str_replace('%', '%%', $tags[0]['command'] ?? $attribute?->name ?? '');
             $aliases = explode('|', $aliases);
             $commandName = array_shift($aliases);
 
@@ -111,10 +115,10 @@ class AddConsoleCommandPass implements CompilerPassInterface
                 $definition->addMethodCall('setHelp', [str_replace('%', '%%', $help)]);
             }
 
-            $description ??= str_replace('%', '%%', $class::getDefaultDescription() ?? '');
+            $description ??= $attribute?->description ?? '';
 
             if ($description) {
-                $definition->addMethodCall('setDescription', [$description]);
+                $definition->addMethodCall('setDescription', [str_replace('%', '%%', $description)]);
 
                 $container->register('.'.$id.'.lazy', LazyCommand::class)
                     ->setArguments([$commandName, $aliases, $description, $isHidden, new ServiceClosureArgument($lazyCommandRefs[$id])]);

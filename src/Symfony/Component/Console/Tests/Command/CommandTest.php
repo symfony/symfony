@@ -427,9 +427,6 @@ class CommandTest extends TestCase
 
     public function testCommandAttribute()
     {
-        $this->assertSame('|foo|f', Php8Command::getDefaultName());
-        $this->assertSame('desc', Php8Command::getDefaultDescription());
-
         $command = new Php8Command();
 
         $this->assertSame('foo', $command->getName());
@@ -439,26 +436,41 @@ class CommandTest extends TestCase
         $this->assertSame(['f'], $command->getAliases());
     }
 
+    /**
+     * @group legacy
+     */
+    public function testCommandAttributeWithDeprecatedMethods()
+    {
+        $this->assertSame('|foo|f', Php8Command::getDefaultName());
+        $this->assertSame('desc', Php8Command::getDefaultDescription());
+    }
+
     public function testAttributeOverridesProperty()
     {
-        $this->assertSame('my:command', MyAnnotatedCommand::getDefaultName());
-        $this->assertSame('This is a command I wrote all by myself', MyAnnotatedCommand::getDefaultDescription());
-
         $command = new MyAnnotatedCommand();
 
         $this->assertSame('my:command', $command->getName());
         $this->assertSame('This is a command I wrote all by myself', $command->getDescription());
     }
 
+    /**
+     * @group legacy
+     */
+    public function testAttributeOverridesPropertyWithDeprecatedMethods()
+    {
+        $this->assertSame('my:command', MyAnnotatedCommand::getDefaultName());
+        $this->assertSame('This is a command I wrote all by myself', MyAnnotatedCommand::getDefaultDescription());
+    }
+
     public function testDefaultCommand()
     {
         $apl = new Application();
-        $apl->setDefaultCommand(Php8Command::getDefaultName());
+        $apl->setDefaultCommand('foo');
         $property = new \ReflectionProperty($apl, 'defaultCommand');
 
         $this->assertEquals('foo', $property->getValue($apl));
 
-        $apl->setDefaultCommand(Php8Command2::getDefaultName());
+        $apl->setDefaultCommand('foo2');
         $property = new \ReflectionProperty($apl, 'defaultCommand');
 
         $this->assertEquals('foo2', $property->getValue($apl));

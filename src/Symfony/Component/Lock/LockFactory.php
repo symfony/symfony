@@ -32,10 +32,10 @@ class LockFactory implements LoggerAwareInterface
     /**
      * Creates a lock for the given resource.
      *
-     * @param string     $resource    The resource to lock
-     * @param float|null $ttl         Maximum expected lock duration in seconds
-     * @param bool       $autoRelease Whether to automatically release the lock or not when the lock instance is destroyed
-     * @param bool $validateOnDelete  Decides if the return value of delete will be checked upon deleting the lock
+     * @param string     $resource         The resource to lock
+     * @param float|null $ttl              Maximum expected lock duration in seconds
+     * @param bool       $autoRelease      Whether to automatically release the lock or not when the lock instance is destroyed
+     * @param bool       $validateOnDelete Decides if the return value of delete will be checked upon deleting the lock
      */
     public function createLock(string $resource, ?float $ttl = 300.0, bool $autoRelease = true, bool $validateOnDelete = false): SharedLockInterface
     {
@@ -45,10 +45,10 @@ class LockFactory implements LoggerAwareInterface
     /**
      * Creates a lock from the given key.
      *
-     * @param Key        $key         The key containing the lock's state
-     * @param float|null $ttl         Maximum expected lock duration in seconds
-     * @param bool       $autoRelease Whether to automatically release the lock or not when the lock instance is destroyed
-     * @param bool $validateOnDelete Decides if the return value of delete will be checked upon deleting the lock
+     * @param Key        $key              The key containing the lock's state
+     * @param float|null $ttl              Maximum expected lock duration in seconds
+     * @param bool       $autoRelease      Whether to automatically release the lock or not when the lock instance is destroyed
+     * @param bool       $validateOnDelete Decides if the return value of delete will be checked upon deleting the lock
      */
     public function createLockFromKey(Key $key, ?float $ttl = 300.0, bool $autoRelease = true, bool $validateOnDelete = false): SharedLockInterface
     {

@@ -216,9 +216,9 @@ final class Lock implements SharedLockInterface, LoggerAwareInterface
     {
         try {
             try {
-                if($this->validateOnDelete) {
+                if ($this->validateOnDelete) {
                     $deleted = $this->store->deleteWithConfirmation($this->key);
-                }else{
+                } else {
                     $this->store->delete($this->key);
                 }
                 $this->dirty = false;

@@ -498,8 +498,9 @@ class LockTest extends TestCase
 
             public function deleteWithConfirmation(Key $key): bool
             {
-               $this->delete($key);
-               return true;
+                $this->delete($key);
+
+                return true;
             }
         };
         $ttl = 1;

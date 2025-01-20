@@ -1,0 +1,18 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2025-01-18T16:26:41Z
+
+Hey!
+
+Thanks for your PR. You are targeting branch "7.3" but it seems your PR description refers to branch "7.2".
+Could you update the PR description or change target branch? This helps core maintainers a lot.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-01-20T07:50:47Z
+
+Note that this is not a bugfix so it's for 7.3

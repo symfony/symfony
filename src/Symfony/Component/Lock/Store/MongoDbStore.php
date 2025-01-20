@@ -372,4 +372,18 @@ class MongoDbStore implements PersistingStoreInterface
 
         return $key->getState(__CLASS__);
     }
+
+    public function deleteWithConfirmation(Key $key): bool
+    {
+        $write = new BulkWrite();
+        $write->delete(
+            [
+                '_id' => (string) $key,
+                'token' => $this->getUniqueToken($key),
+            ],
+            ['limit' => 1]
+        );
+
+        return $this->getManager()->executeBulkWrite($this->namespace, $write)->getMatchedCount() != null;
+    }
 }

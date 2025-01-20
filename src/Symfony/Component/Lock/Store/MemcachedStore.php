@@ -149,4 +149,25 @@ class MemcachedStore implements PersistingStoreInterface
 
         return [$value, $cas];
     }
+
+    public function deleteWithConfirmation(Key $key): bool
+    {
+        $token = $this->getUniqueToken($key);
+
+        [$value, $cas] = $this->getValueAndCas($key);
+
+        if ($value !== $token) {
+            // we are not the owner of the lock. Nothing to do.
+            return true;
+        }
+
+        // To avoid concurrency in deletion, the trick is to extends the TTL then deleting the key
+        if (!$this->memcached->cas($cas, (string) $key, $token, 2)) {
+            // Someone steal our lock. It does not belongs to us anymore. Nothing to do.
+            return true;
+        }
+
+        // Now, we are the owner of the lock for 2 more seconds, we can delete it.
+        return $this->memcached->delete((string) $key);
+    }
 }

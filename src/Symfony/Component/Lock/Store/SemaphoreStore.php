@@ -96,4 +96,19 @@ class SemaphoreStore implements BlockingStoreInterface
     {
         return $key->hasState(__CLASS__);
     }
+
+    public function deleteWithConfirmation(Key $key): bool
+    {
+        // The lock is maybe not acquired.
+        if (!$key->hasState(__CLASS__)) {
+            return false;
+        }
+
+        $resource = $key->getState(__CLASS__);
+
+        sem_remove($resource);
+
+        $key->removeState(__CLASS__);
+        return true;
+    }
 }

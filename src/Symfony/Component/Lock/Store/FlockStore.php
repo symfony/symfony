@@ -144,4 +144,21 @@ class FlockStore implements BlockingStoreInterface, SharedLockStoreInterface
     {
         return $key->hasState(__CLASS__);
     }
+
+    public function deleteWithConfirmation(Key $key): bool
+    {
+        // The lock is maybe not acquired.
+        if (!$key->hasState(__CLASS__)) {
+            return false;
+        }
+
+        $handle = $key->getState(__CLASS__)[1];
+
+        flock($handle, \LOCK_UN | \LOCK_NB);
+        fclose($handle);
+
+        $key->removeState(__CLASS__);
+
+        return true;
+    }
 }

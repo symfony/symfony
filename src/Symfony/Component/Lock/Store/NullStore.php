@@ -40,4 +40,9 @@ class NullStore implements BlockingSharedLockStoreInterface
     public function waitAndSaveRead(Key $key): void
     {
     }
+
+    public function deleteWithConfirmation(Key $key): bool
+    {
+       return true;
+    }
 }

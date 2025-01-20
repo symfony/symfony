@@ -33,6 +33,7 @@ use Symfony\Component\Lock\SharedLockStoreInterface;
 class DoctrineDbalPostgreSqlStore implements BlockingSharedLockStoreInterface, BlockingStoreInterface
 {
     private Connection $conn;
+    private static array $storeRegistry = [];
 
     /**
      * You can either pass an existing database connection a Doctrine DBAL Connection
@@ -277,8 +278,30 @@ class DoctrineDbalPostgreSqlStore implements BlockingSharedLockStoreInterface, B
 
     private function getInternalStore(): SharedLockStoreInterface
     {
-        static $storeRegistry = new \WeakMap();
+        $namespace = spl_object_hash($this->conn);
 
-        return $storeRegistry[$this->conn] ??= new InMemoryStore();
+        return self::$storeRegistry[$namespace] ??= new InMemoryStore();
+    }
+
+    public function deleteWithConfirmation(Key $key): bool
+    {
+        // Prevent deleting locks own by an other key in the same connection
+        if (!$this->exists($key)) {
+            return false;
+        }
+
+        $this->unlock($key);
+
+        // Prevent deleting Readlocks own by current key AND an other key in the same connection
+        $store = $this->getInternalStore();
+        try {
+            // If lock acquired = there is no other ReadLock
+            $store->save($key);
+            $this->unlockShared($key);
+        } catch (LockConflictedException) {
+            // an other key exists in this ReadLock
+        }
+
+        return $store->deleteWithConfirmation($key);
     }
 }

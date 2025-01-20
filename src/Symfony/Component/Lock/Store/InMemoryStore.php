@@ -111,4 +111,10 @@ class InMemoryStore implements SharedLockStoreInterface
 
         return $key->getState(__CLASS__);
     }
+
+    public function deleteWithConfirmation(Key $key): bool
+    {
+       $this->delete($key);
+       return true;
+    }
 }

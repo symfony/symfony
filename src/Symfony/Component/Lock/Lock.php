@@ -215,7 +215,7 @@ final class Lock implements SharedLockInterface, LoggerAwareInterface
     {
         try {
             try {
-                $this->store->delete($this->key);
+                $deleted = $this->store->deleteWithConfirmation($this->key);
                 $this->dirty = false;
             } catch (LockReleasingException $e) {
                 throw $e;
@@ -223,7 +223,7 @@ final class Lock implements SharedLockInterface, LoggerAwareInterface
                 throw new LockReleasingException(\sprintf('Failed to release the "%s" lock.', $this->key), 0, $e);
             }
 
-            if ($this->store->exists($this->key)) {
+            if (!$deleted && $this->store->exists($this->key)) {
                 throw new LockReleasingException(\sprintf('Failed to release the "%s" lock, the resource is still locked.', $this->key));
             }
 

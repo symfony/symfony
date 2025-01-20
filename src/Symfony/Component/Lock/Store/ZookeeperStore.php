@@ -152,4 +152,20 @@ class ZookeeperStore implements PersistingStoreInterface
 
         return $key->getState(self::class);
     }
+
+    public function deleteWithConfirmation(Key $key): bool
+    {
+        if (!$this->exists($key)) {
+            return true;
+        }
+        $resource = $this->getKeyResource($key);
+        try {
+            $this->zookeeper->delete($resource);
+            return true;
+        } catch (\ZookeeperException $exception) {
+            // For Zookeeper Ephemeral Nodes, the node will be deleted upon session death. But, if we want to unlock
+            // the lock before proceeding further in the session, the client should be aware of this
+            throw new LockReleasingException($exception);
+        }
+    }
 }

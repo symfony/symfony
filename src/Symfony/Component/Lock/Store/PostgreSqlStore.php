@@ -287,4 +287,26 @@ class PostgreSqlStore implements BlockingSharedLockStoreInterface, BlockingStore
 
         return self::$storeRegistry[$namespace] ??= new InMemoryStore();
     }
+
+    public function deleteWithConfirmation(Key $key): bool
+    {
+        // Prevent deleting locks own by an other key in the same connection
+        if (!$this->exists($key)) {
+            return true;
+        }
+
+        $this->unlock($key);
+
+        // Prevent deleting Readlocks own by current key AND an other key in the same connection
+        $store = $this->getInternalStore();
+        try {
+            // If lock acquired = there is no other ReadLock
+            $store->save($key);
+            $this->unlockShared($key);
+        } catch (LockConflictedException) {
+            // an other key exists in this ReadLock
+        }
+
+        return $store->deleteWithConfirmation($key);
+    }
 }

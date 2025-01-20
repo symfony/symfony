@@ -243,4 +243,16 @@ class PdoStore implements PersistingStoreInterface
             default => false,
         };
     }
+
+    public function deleteWithConfirmation(Key $key): bool
+    {
+        $sql = "DELETE FROM $this->table WHERE $this->idCol = :id AND $this->tokenCol = :token";
+        $stmt = $this->getConnection()->prepare($sql);
+
+        $stmt->bindValue(':id', $this->getHashedKey($key));
+        $stmt->bindValue(':token', $this->getUniqueToken($key));
+        $stmt->execute();
+
+        return (bool) $stmt->rowCount();
+    }
 }

@@ -258,4 +258,12 @@ class DoctrineDbalStore implements PersistingStoreInterface
             default => false,
         };
     }
+
+    public function deleteWithConfirmation(Key $key): bool
+    {
+       return $this->conn->delete($this->table, [
+            $this->idCol => $this->getHashedKey($key),
+            $this->tokenCol => $this->getUniqueToken($key),
+        ]);
+    }
 }

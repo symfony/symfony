@@ -347,4 +347,34 @@ class RedisStore implements SharedLockStoreInterface
             now = math.floor(now * 1000)
         ';
     }
+
+    public function deleteWithConfirmation(Key $key): bool
+    {
+        $script = '
+            local key = KEYS[1]
+            local uniqueToken = ARGV[1]
+
+            -- asserts the KEY is compatible with current version (old Symfony <5.2 BC)
+            if redis.call("TYPE", key).ok == "string" then
+                return false
+            end
+
+            -- lock not already acquired
+            if not redis.call("ZSCORE", key, uniqueToken) then
+                return false
+            end
+
+            redis.call("ZREM", key, uniqueToken)
+            redis.call("ZREM", key, "__write__")
+
+            local maxExpiration = redis.call("ZREVRANGE", key, 0, 0, "WITHSCORES")[2]
+            if nil ~= maxExpiration then
+                redis.call("PEXPIREAT", key, maxExpiration)
+            end
+
+            return true
+        ';
+
+        return $this->evaluate($script, (string) $key, [$this->getUniqueToken($key)]);
+    }
 }

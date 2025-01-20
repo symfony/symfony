@@ -64,7 +64,7 @@ class MemcachedStore implements PersistingStoreInterface
     public function putOffExpiration(Key $key, float $ttl): void
     {
         if ($ttl < 1) {
-            throw new InvalidTtlException(\sprintf('"%s()" expects a TTL greater or equals to 1 second. Got %s.', __METHOD__, $ttl));
+            throw new InvalidTtlException(\sprintf('"%s()" expects a TTL greater or equals to 1 second. Got "%s".', __METHOD__, $ttl));
         }
 
         // Interface defines a float value but Store required an integer.

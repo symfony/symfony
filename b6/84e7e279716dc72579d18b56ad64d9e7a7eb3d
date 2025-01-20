@@ -1,0 +1,137 @@
+---------------------------------------------------------------------------
+
+by yceruto at 2025-01-13T15:41:10Z
+
+Still analyzing the last two https://github.com/symfony/symfony/pull/59340#discussion_r1913067472 https://github.com/symfony/symfony/pull/59340#discussion_r1913068223
+
+---------------------------------------------------------------------------
+
+by yceruto at 2025-01-13T21:59:58Z
+
+Update after latest changes:
+ * Fixed default `true` value for boolean options
+ * Non-boolean options will always require a value, e.g. `--option=value` (even if they set a default value) so the default value is given only when the option is omitted
+
+I added more tests to cover those scenarios.
+
+---------------------------------------------------------------------------
+
+by yceruto at 2025-01-13T22:11:47Z
+
+I've a question about non-boolean options: when defined without a default, e.g. `#[Option] string $foo`, and the option is omitted during the cmd call (which is acceptable by definition), it results in a `null` value, causing a `TypeError`. I was thinking that instead of a TypeError, we could throw a definition exception that enforces defining a default value for non-boolean options. What do you think?
+
+---------------------------------------------------------------------------
+
+by kbond at 2025-01-13T23:21:12Z
+
+> I was thinking that instead of a TypeError, we could throw a definition exception that enforces defining a default value for non-boolean options.
+
+This makes sense to me. Most important thing is a clear error message.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2025-01-14T04:04:21Z
+
+I was expecting this topic to arise, not trivial :) I wouldn't be happy with invokable commands not supporting `InputOption::VALUE_OPTIONAL` as it's a big limitation compared to regular commands.
+What about requiring to opt-in explicitly by passing the mode to `#[Option]`?
+And/or determine a special value to be set as parameter's default that would indicate that the option was not passed at all?
+
+---------------------------------------------------------------------------
+
+by yceruto at 2025-01-14T06:44:49Z
+
+Let's lay out all the scenarios on the table so everyone can see the alternatives and how to implement them effectively with this new invokable approach.
+
+We can use input options in three different ways:
+ (A) set with value: `cmd --option=value`
+ (B) set without value: `cmd --option`
+ (C) or omit it entirely: `cmd`
+
+If a default value is defined, it will be used as the option's value only in case (C). In case (B), the option value will be `null`. In case (A), the value provided via the CLI will take precedence and become the final option value.
+
+That's how regular commands work currently.
+
+Input options are optional by nature. This means the parameter must either:
+ * declare a default value: `#[Option] string $role = 'ROLE_USER'` In this case, only cases (A) and (C) apply
+ * allow null value: `#[Option] ?string $role` All cases apply
+ * or both: `#[Option] ?string $role = 'ROLE_USER'` All cases apply
+
+However, input options can never be mandatory. This means defining them like `#[Option] string $role` is not allowed and should result in an exception.
+
+The specific mode`InputOption::VALUE_OPTIONAL` applies exclusively to case (B), making it particularly useful for binary (boolean) options. Using "value optional" for non-binary options feels strange, as it results in a `null` value, indicating that the option was used, but no value was supplied. I couldn't find a use case for it but still possible on regular commands.
+
+---------------------------------------------------------------------------
+
+by yceruto at 2025-01-14T06:45:37Z
+
+I've updated the code based on this analysis (it's pending throwing an exception for mandatory option parameters)
+
+---------------------------------------------------------------------------
+
+by kbond at 2025-01-14T11:07:04Z
+
+I think the only mode I don't support here: https://github.com/zenstruck/console-extra?tab=readme-ov-file#invokable-attributes is `InputOption::VALUE_OPTIONAL`. What about `bool|string|null $role = null` (or `bool|string $role = false`)?
+
+---------------------------------------------------------------------------
+
+by kbond at 2025-01-14T11:16:08Z
+
+> However, input options can never be mandatory.
+
+Requiring `isDefaultValueAvailable()` seems best.
+
+---------------------------------------------------------------------------
+
+by yceruto at 2025-01-15T05:24:09Z
+
+>I think the only mode I don't support here: https://github.com/zenstruck/console-extra?tab=readme-ov-file#invokable-attributes is InputOption::VALUE_OPTIONAL. What about bool|string|null $role = null (or bool|string $role = false)?
+
+would making it nullable be sufficient? That's the approach used here, so you can declare an option with an optional value as `#[Option] ?string $foo`. This will allow `cmd --foo` resulting in `null` being received.
+
+But to be honest, I don’t know for which use case it makes sense, because the intention of passing such an option without a value feels more like a boolean option instead.
+
+---------------------------------------------------------------------------
+
+by yceruto at 2025-01-15T05:34:35Z
+
+To distinguish between an option passed without a value and not passed at all, set a default value: `#[Option] ?string $foo = 'bar'`. If the option is passed without a value, you'll get `null`. If not passed at all, you'll get `bar`. If passed with a value, you'll get that `value`.
+
+---------------------------------------------------------------------------
+
+by stof at 2025-01-15T15:57:18Z
+
+The case of `VALUE_OPTIONAL` is a very weird case. In normal commands, using `$input->getOption()` is not sufficient to properly distinguish cases 1 and 2 (not passing the option or passing the option without values).
+In 14 years using the console component, I have **never** had a use case for such option (but I reviewed lots of PRs adding a command using that `VALUE_OPTIONAL` mode by mistake by not understanding, thinking it is needed to make the option optional).
+
+I agree about adding the negatable flag only for boolean options that don't have `false` as default value, to avoid cluttering the command help with negatable options that bring no value (maybe the attribute could have an optional argument to force setting the flag, in case you need to keep it for BC reasons)
+
+---------------------------------------------------------------------------
+
+by yceruto at 2025-01-15T16:13:33Z
+
+That makes sense to me @stof. PR updated! Not entirely sure about the flag though, let’s see what others think
+
+---------------------------------------------------------------------------
+
+by yceruto at 2025-01-15T19:07:25Z
+
+After a deep analysis with Kevin, we decided to simplify the argument/option definition by removing the `default` option from both attributes, so we always rely on the parameter's default value. Additionally, boolean options are now required to declare a default value too.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2025-01-17T10:06:26Z
+
+> The case of VALUE_OPTIONAL is a very weird case. In normal commands, using $input->getOption() is not sufficient to properly distinguish cases 1 and 2 (not passing the option or passing the option without values).
+
+Yea it requires checking both `hasOption()` and `getOption()`.
+
+> In 14 years using the console component, I have never had a use case for such option (but I reviewed lots of PRs adding a command using that VALUE_OPTIONAL mode by mistake by not understanding, thinking it is needed to make the option optional).
+
+It's true there are certainly plenty of misuses, yet there are lots of usages and some are valid. Looking only at public github repos: https://github.com/search?q=InputOption%3A%3AVALUE_OPTIONAL&type=code.
+So unless we want to deprecate the `VALUE_OPTIONAL` mode, I think supporting it is desired for the sake of reducing differences between this new way of registering commands and the regular one.
+
+---------------------------------------------------------------------------
+
+by kbond at 2025-01-17T13:43:38Z
+
+@chalasr after this pr is merged I'm going to open one dedicated to `VALUE_OPTIONAL` to discuss further and finalize.

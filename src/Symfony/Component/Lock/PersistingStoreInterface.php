@@ -52,10 +52,9 @@ interface PersistingStoreInterface
     /**
      * Removes a resource from the storage.
      *
-     * @throws LockReleasingException
-     *
      * @return bool $deleted indicates if the resource was deleted
+     *
+     * @throws LockReleasingException
      */
     public function deleteWithConfirmation(Key $key): bool;
 }
-

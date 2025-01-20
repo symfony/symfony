@@ -1,0 +1,31 @@
+---------------------------------------------------------------------------
+
+by yceruto at 2025-01-10T22:39:31Z
+
+>I'm worried that these texts will be unnecessarily duplicated when the container is compiled.
+
+It's already the same case for `name` and `description` when configured via tag; I don't see a problem here.
+
+---------------------------------------------------------------------------
+
+by yceruto at 2025-01-11T00:49:54Z
+
+Just rebased and conflicts solved.
+
+---------------------------------------------------------------------------
+
+by kbond at 2025-01-11T01:21:28Z
+
+This wasn't on _my_ radar but good call!
+
+---------------------------------------------------------------------------
+
+by yceruto at 2025-01-20T13:14:57Z
+
+rebased and conflicts solved.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2025-01-20T13:22:57Z
+
+PR welcome to solve https://github.com/symfony/symfony/pull/59473#discussion_r1913560705 (deprecations) 🙏

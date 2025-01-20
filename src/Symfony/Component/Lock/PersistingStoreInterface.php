@@ -48,4 +48,14 @@ interface PersistingStoreInterface
      * @throws LockConflictedException
      */
     public function putOffExpiration(Key $key, float $ttl): void;
+
+    /**
+     * Removes a resource from the storage.
+     *
+     * @throws LockReleasingException
+     *
+     * @return bool $deleted indicates if the resource was deleted
+     */
+    public function deleteWithConfirmation(Key $key): bool;
 }
+

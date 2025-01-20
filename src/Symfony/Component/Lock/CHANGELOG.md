@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+7.3
+---
+
+* introduce deleteWithConfirmation method to  `PersistingStoreInterface` used to obtain a return value when deleting a resource to validate its deletion
 
 7.2
 ---

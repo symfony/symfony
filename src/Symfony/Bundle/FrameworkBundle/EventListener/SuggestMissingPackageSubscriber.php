@@ -66,7 +66,7 @@ final class SuggestMissingPackageSubscriber implements EventSubscriberInterface
             return;
         }
 
-        $message = sprintf("%s\n\nYou may be looking for a command provided by the \"%s\" which is currently not installed. Try running \"composer require %s\".", $error->getMessage(), $suggestion[0], $suggestion[1]);
+        $message = \sprintf("%s\n\nYou may be looking for a command provided by the \"%s\" which is currently not installed. Try running \"composer require %s\".", $error->getMessage(), $suggestion[0], $suggestion[1]);
         $event->setError(new CommandNotFoundException($message));
     }
 

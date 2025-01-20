@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\DependencyInjection\Tests\Argument;
 
-use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Argument\LazyClosure;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -23,7 +22,7 @@ class LazyClosureTest extends TestCase
     {
         $closure = new LazyClosure(fn () => null);
 
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Cannot read property "foo" from a lazy closure.');
 
         $closure->foo;
@@ -34,7 +33,7 @@ class LazyClosureTest extends TestCase
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('Cannot create adapter for service "foo" because "Symfony\Component\DependencyInjection\Tests\Argument\LazyClosureTest" is not an interface.');
 
-        LazyClosure::getCode('foo', [new \stdClass(), 'bar'], new Definition(LazyClosureTest::class), new ContainerBuilder(), 'foo');
+        LazyClosure::getCode('foo', [new \stdClass(), 'bar'], new Definition(self::class), new ContainerBuilder(), 'foo');
     }
 
     public function testThrowsOnNonFunctionalInterface()
@@ -62,5 +61,6 @@ interface FunctionalInterface
 interface NonFunctionalInterface
 {
     public function foo();
+
     public function bar();
 }

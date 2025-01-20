@@ -1,7 +1,7 @@
 --TEST--
-Test command that exist
+Test command that exits
 --SKIPIF--
-<?php if (!extension_loaded("pcntl")) die("Skipped: pcntl extension required."); ?>
+<?php if (!extension_loaded("pcntl")) echo "Skipped: pcntl extension required."; ?>
 --FILE--
 <?php
 

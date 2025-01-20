@@ -16,15 +16,15 @@
         }
     ],
     "require": {
-        "php": ">=8.1"
+        "php": ">=8.2"
     },
     "require-dev": {
-        "symfony/http-client": "^5.4|^6.0|^7.0",
-        "symfony/http-foundation": "^5.4|^6.0|^7.0",
-        "symfony/http-kernel": "^5.4|^6.0|^7.0"
+        "symfony/http-client": "^6.4|^7.0",
+        "symfony/http-foundation": "^6.4|^7.0",
+        "symfony/http-kernel": "^6.4|^7.0"
     },
     "conflict": {
-        "symfony/http-foundation": "<5.4"
+        "symfony/http-foundation": "<6.4"
     },
     "autoload": {
         "psr-4": { "Symfony\\Component\\Asset\\": "" },

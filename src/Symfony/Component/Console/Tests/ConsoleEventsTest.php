@@ -39,6 +39,7 @@ class ConsoleEventsTest extends TestCase
             pcntl_signal(\SIGTERM, \SIG_DFL);
             pcntl_signal(\SIGUSR1, \SIG_DFL);
             pcntl_signal(\SIGUSR2, \SIG_DFL);
+            pcntl_signal(\SIGALRM, \SIG_DFL);
         }
     }
 

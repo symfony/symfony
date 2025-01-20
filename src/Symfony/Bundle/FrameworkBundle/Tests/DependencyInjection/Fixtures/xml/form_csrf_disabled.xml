@@ -12,7 +12,7 @@
         <framework:annotations enabled="false"/>
         <framework:php-errors log="true" />
         <framework:csrf-protection enabled="false"/>
-        <framework:form enabled="true">
+        <framework:form>
             <framework:csrf-protection enabled="true"/>
         </framework:form>
     </framework:config>

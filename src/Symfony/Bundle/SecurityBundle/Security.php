@@ -18,31 +18,16 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
+use Symfony\Component\Security\Core\Authorization\UserAuthorizationCheckerInterface;
 use Symfony\Component\Security\Core\Exception\LogicException;
 use Symfony\Component\Security\Core\Exception\LogoutException;
-use Symfony\Component\Security\Core\Security as LegacySecurity;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Csrf\CsrfToken;
 use Symfony\Component\Security\Http\Authenticator\AuthenticatorInterface;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\BadgeInterface;
 use Symfony\Component\Security\Http\Event\LogoutEvent;
 use Symfony\Component\Security\Http\ParameterBagUtils;
-use Symfony\Component\Security\Http\SecurityRequestAttributes;
 use Symfony\Contracts\Service\ServiceProviderInterface;
-
-if (class_exists(InternalSecurity::class, false)) {
-    return;
-}
-if (class_exists(LegacySecurity::class)) {
-    class_alias(LegacySecurity::class, InternalSecurity::class);
-} else {
-    /**
-     * @internal
-     */
-    class InternalSecurity
-    {
-    }
-}
 
 /**
  * Helper class for commonly-needed security tasks.
@@ -53,23 +38,8 @@ if (class_exists(LegacySecurity::class)) {
  *
  * @final
  */
-class Security extends InternalSecurity implements AuthorizationCheckerInterface
+class Security implements AuthorizationCheckerInterface, UserAuthorizationCheckerInterface
 {
-    /**
-     * @deprecated since Symfony 6.4, use SecurityRequestAttributes::ACCESS_DENIED_ERROR instead
-     */
-    public const ACCESS_DENIED_ERROR = SecurityRequestAttributes::ACCESS_DENIED_ERROR;
-
-    /**
-     * @deprecated since Symfony 6.4, use SecurityRequestAttributes::AUTHENTICATION_ERROR instead
-     */
-    public const AUTHENTICATION_ERROR = SecurityRequestAttributes::AUTHENTICATION_ERROR;
-
-    /**
-     * @deprecated since Symfony 6.4, use SecurityRequestAttributes::LAST_USERNAME instead
-     */
-    public const LAST_USERNAME = SecurityRequestAttributes::LAST_USERNAME;
-
     public function __construct(
         private readonly ContainerInterface $container,
         private readonly array $authenticators = [],
@@ -105,14 +75,15 @@ class Security extends InternalSecurity implements AuthorizationCheckerInterface
     }
 
     /**
-     * @param UserInterface    $user              The user to authenticate
-     * @param string|null      $authenticatorName The authenticator name (e.g. "form_login") or service id (e.g. SomeApiKeyAuthenticator::class) - required only if multiple authenticators are configured
-     * @param string|null      $firewallName      The firewall name - required only if multiple firewalls are configured
-     * @param BadgeInterface[] $badges            Badges to add to the user's passport
+     * @param UserInterface        $user              The user to authenticate
+     * @param string|null          $authenticatorName The authenticator name (e.g. "form_login") or service id (e.g. SomeApiKeyAuthenticator::class) - required only if multiple authenticators are configured
+     * @param string|null          $firewallName      The firewall name - required only if multiple firewalls are configured
+     * @param BadgeInterface[]     $badges            Badges to add to the user's passport
+     * @param array<string, mixed> $attributes        Attributes to add to the user's passport
      *
      * @return Response|null The authenticator success response if any
      */
-    public function login(UserInterface $user, ?string $authenticatorName = null, ?string $firewallName = null, array $badges = []): ?Response
+    public function login(UserInterface $user, ?string $authenticatorName = null, ?string $firewallName = null, array $badges = [], array $attributes = []): ?Response
     {
         $request = $this->container->get('request_stack')->getCurrentRequest();
         if (null === $request) {
@@ -130,7 +101,7 @@ class Security extends InternalSecurity implements AuthorizationCheckerInterface
         $userCheckerLocator = $this->container->get('security.user_checker_locator');
         $userCheckerLocator->get($firewallName)->checkPreAuth($user);
 
-        return $this->container->get('security.authenticator.managers_locator')->get($firewallName)->authenticateUser($user, $authenticator, $request, $badges);
+        return $this->container->get('security.authenticator.managers_locator')->get($firewallName)->authenticateUser($user, $authenticator, $request, $badges, $attributes);
     }
 
     /**
@@ -162,7 +133,7 @@ class Security extends InternalSecurity implements AuthorizationCheckerInterface
 
         if ($validateCsrfToken) {
             if (!$this->container->has('security.csrf.token_manager') || !$logoutConfig = $firewallConfig->getLogout()) {
-                throw new LogicException(sprintf('Unable to logout with CSRF token validation. Either make sure that CSRF protection is enabled and "logout" is configured on the "%s" firewall, or bypass CSRF token validation explicitly by passing false to the $validateCsrfToken argument of this method.', $firewallConfig->getName()));
+                throw new LogicException(\sprintf('Unable to logout with CSRF token validation. Either make sure that CSRF protection is enabled and "logout" is configured on the "%s" firewall, or bypass CSRF token validation explicitly by passing false to the $validateCsrfToken argument of this method.', $firewallConfig->getName()));
             }
             $csrfToken = ParameterBagUtils::getRequestParameterValue($request, $logoutConfig['csrf_parameter']);
             if (!\is_string($csrfToken) || !$this->container->get('security.csrf.token_manager')->isTokenValid(new CsrfToken($logoutConfig['csrf_token_id'], $csrfToken))) {
@@ -178,10 +149,21 @@ class Security extends InternalSecurity implements AuthorizationCheckerInterface
         return $logoutEvent->getResponse();
     }
 
+    /**
+     * Checks if the attribute is granted against the user and optionally supplied subject.
+     *
+     * This should be used over isGranted() when checking permissions against a user that is not currently logged in or while in a CLI context.
+     */
+    public function isGrantedForUser(UserInterface $user, mixed $attribute, mixed $subject = null): bool
+    {
+        return $this->container->get('security.user_authorization_checker')
+            ->isGrantedForUser($user, $attribute, $subject);
+    }
+
     private function getAuthenticator(?string $authenticatorName, string $firewallName): AuthenticatorInterface
     {
         if (!isset($this->authenticators[$firewallName])) {
-            throw new LogicException(sprintf('No authenticators found for firewall "%s".', $firewallName));
+            throw new LogicException(\sprintf('No authenticators found for firewall "%s".', $firewallName));
         }
 
         /** @var ServiceProviderInterface $firewallAuthenticatorLocator */
@@ -191,10 +173,10 @@ class Security extends InternalSecurity implements AuthorizationCheckerInterface
             $authenticatorIds = array_keys($firewallAuthenticatorLocator->getProvidedServices());
 
             if (!$authenticatorIds) {
-                throw new LogicException(sprintf('No authenticator was found for the firewall "%s".', $firewallName));
+                throw new LogicException(\sprintf('No authenticator was found for the firewall "%s".', $firewallName));
             }
             if (1 < \count($authenticatorIds)) {
-                throw new LogicException(sprintf('Too many authenticators were found for the current firewall "%s". You must provide an instance of "%s" to login programmatically. The available authenticators for the firewall "%s" are "%s".', $firewallName, AuthenticatorInterface::class, $firewallName, implode('" ,"', $authenticatorIds)));
+                throw new LogicException(\sprintf('Too many authenticators were found for the current firewall "%s". You must provide an instance of "%s" to login programmatically. The available authenticators for the firewall "%s" are "%s".', $firewallName, AuthenticatorInterface::class, $firewallName, implode('" ,"', $authenticatorIds)));
             }
 
             return $firewallAuthenticatorLocator->get($authenticatorIds[0]);
@@ -207,7 +189,7 @@ class Security extends InternalSecurity implements AuthorizationCheckerInterface
         $authenticatorId = 'security.authenticator.'.$authenticatorName.'.'.$firewallName;
 
         if (!$firewallAuthenticatorLocator->has($authenticatorId)) {
-            throw new LogicException(sprintf('Unable to find an authenticator named "%s" for the firewall "%s". Available authenticators: "%s".', $authenticatorName, $firewallName, implode('", "', array_keys($firewallAuthenticatorLocator->getProvidedServices()))));
+            throw new LogicException(\sprintf('Unable to find an authenticator named "%s" for the firewall "%s". Available authenticators: "%s".', $authenticatorName, $firewallName, implode('", "', array_keys($firewallAuthenticatorLocator->getProvidedServices()))));
         }
 
         return $firewallAuthenticatorLocator->get($authenticatorId);

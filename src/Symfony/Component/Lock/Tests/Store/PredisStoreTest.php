@@ -20,7 +20,10 @@ class PredisStoreTest extends AbstractRedisStoreTestCase
 {
     public static function setUpBeforeClass(): void
     {
-        $redis = new \Predis\Client(array_combine(['host', 'port'], explode(':', getenv('REDIS_HOST')) + [1 => null]));
+        $redis = new \Predis\Client(
+            array_combine(['host', 'port'], explode(':', getenv('REDIS_HOST')) + [1 => null]),
+            ['exceptions' => false],
+        );
         try {
             $redis->connect();
         } catch (\Exception $e) {
@@ -30,7 +33,10 @@ class PredisStoreTest extends AbstractRedisStoreTestCase
 
     protected function getRedisConnection(): \Predis\Client
     {
-        $redis = new \Predis\Client(array_combine(['host', 'port'], explode(':', getenv('REDIS_HOST')) + [1 => null]));
+        $redis = new \Predis\Client(
+            array_combine(['host', 'port'], explode(':', getenv('REDIS_HOST')) + [1 => null]),
+            ['exceptions' => false],
+        );
         $redis->connect();
 
         return $redis;

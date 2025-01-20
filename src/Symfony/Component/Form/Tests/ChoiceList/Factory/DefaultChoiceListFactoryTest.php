@@ -159,9 +159,9 @@ class DefaultChoiceListFactoryTest extends TestCase
     {
         $list = $this->factory->createListFromChoices(
             new \ArrayIterator([
-                    'Group 1' => ['A' => $this->obj1, 'B' => $this->obj2],
-                    'Group 2' => ['C' => $this->obj3, 'D' => $this->obj4],
-                ])
+                'Group 1' => ['A' => $this->obj1, 'B' => $this->obj2],
+                'Group 2' => ['C' => $this->obj3, 'D' => $this->obj4],
+            ])
         );
 
         $this->assertObjectListWithGeneratedValues($list);
@@ -728,7 +728,7 @@ class DefaultChoiceListFactoryTest extends TestCase
 
     public function testPassTranslatableInterfaceAsLabelDoesntCastItToString()
     {
-        $message = new class() implements TranslatableInterface {
+        $message = new class implements TranslatableInterface {
             public function trans(TranslatorInterface $translator, ?string $locale = null): string
             {
                 return 'my_message';
@@ -941,7 +941,7 @@ class DefaultChoiceListFactoryTest extends TestCase
                     'C',
                     ['attr2' => 'value2']
                 ),
-                ]
+            ]
         ), $view);
     }
 
@@ -987,7 +987,7 @@ class DefaultChoiceListFactoryTest extends TestCase
                     'Group 2',
                     [2 => new ChoiceView($this->obj3, '2', 'C')]
                 ),
-                ]
+            ]
         ), $view);
     }
 

@@ -11,8 +11,9 @@
 
 namespace Symfony\Component\Form\Tests\Extension\Core\Type;
 
-use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\Form\ChoiceList\View\ChoiceView;
+use Symfony\Component\Form\Exception\LogicException;
+use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Intl\Intl;
@@ -21,9 +22,7 @@ use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
 
 class DateTypeTest extends BaseTypeTestCase
 {
-    use ExpectDeprecationTrait;
-
-    public const TESTED_TYPE = 'Symfony\Component\Form\Extension\Core\Type\DateType';
+    public const TESTED_TYPE = DateType::class;
 
     private string $defaultTimezone;
     private string $defaultLocale;
@@ -1137,33 +1136,63 @@ class DateTypeTest extends BaseTypeTestCase
         $this->assertSame('14/01/2018', $form->getData());
     }
 
-    /**
-     * @group legacy
-     */
     public function testDateTimeInputTimezoneNotMatchingModelTimezone()
     {
-        $this->expectDeprecation('Since symfony/form 6.4: Using a "DateTime" instance with a timezone ("UTC") not matching the configured model timezone "Europe/Berlin" is deprecated.');
-        // $this->expectException(LogicException::class);
-        // $this->expectExceptionMessage('Using a "DateTime" instance with a timezone ("UTC") not matching the configured model timezone "Europe/Berlin" is not supported.');
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('Using a "DateTime" instance with a timezone ("UTC") not matching the configured model timezone "Europe/Berlin" is not supported.');
 
         $this->factory->create(static::TESTED_TYPE, new \DateTime('now', new \DateTimeZone('UTC')), [
             'model_timezone' => 'Europe/Berlin',
         ]);
     }
 
-    /**
-     * @group legacy
-     */
     public function testDateTimeImmutableInputTimezoneNotMatchingModelTimezone()
     {
-        $this->expectDeprecation('Since symfony/form 6.4: Using a "DateTimeImmutable" instance with a timezone ("UTC") not matching the configured model timezone "Europe/Berlin" is deprecated.');
-        // $this->expectException(LogicException::class);
-        // $this->expectExceptionMessage('Using a "DateTimeImmutable" instance with a timezone ("UTC") not matching the configured model timezone "Europe/Berlin" is not supported.');
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('Using a "DateTimeImmutable" instance with a timezone ("UTC") not matching the configured model timezone "Europe/Berlin" is not supported.');
 
         $this->factory->create(static::TESTED_TYPE, new \DateTimeImmutable('now', new \DateTimeZone('UTC')), [
             'input' => 'datetime_immutable',
             'model_timezone' => 'Europe/Berlin',
         ]);
+    }
+
+    public function testSubmitWithCustomCalendarOption()
+    {
+        IntlTestHelper::requireFullIntl($this);
+
+        // Creates a new form using the "roc" (Republic Of China) calendar. This calendar starts in 1912, the year 2024 in
+        // the Gregorian calendar is the year 113 in the "roc" calendar.
+        $form = $this->factory->create(static::TESTED_TYPE, options: [
+            'format' => 'y-MM-dd',
+            'html5' => false,
+            'input' => 'array',
+            'calendar' => \IntlCalendar::createInstance(locale: 'zh_TW@calendar=roc'),
+        ]);
+        $form->submit('113-03-31');
+
+        $this->assertSame('2024', $form->getData()['year'], 'The year should be converted to the default locale (en)');
+        $this->assertSame('31', $form->getData()['day']);
+        $this->assertSame('3', $form->getData()['month']);
+
+        $this->assertSame('113-03-31', $form->getViewData());
+    }
+
+    public function testSetDataWithCustomCalendarOption()
+    {
+        IntlTestHelper::requireFullIntl($this);
+
+        // Creates a new form using the "roc" (Republic Of China) calendar. This calendar starts in 1912, the year 2024 in
+        // the Gregorian calendar is the year 113 in the "roc" calendar.
+        $form = $this->factory->create(static::TESTED_TYPE, options: [
+            'format' => 'y-MM-dd',
+            'html5' => false,
+            'input' => 'array',
+            'calendar' => \IntlCalendar::createInstance(locale: 'zh_TW@calendar=roc'),
+        ]);
+        $form->setData(['year' => '2024', 'month' => '3', 'day' => '31']);
+
+        $this->assertSame('113-03-31', $form->getViewData());
     }
 
     protected function getTestOptions(): array

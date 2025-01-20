@@ -25,6 +25,30 @@ class BooleanNodeDefinitionTest extends TestCase
         $def->cannotBeEmpty();
     }
 
+    public function testBooleanNodeWithDefaultNull()
+    {
+        $def = new BooleanNodeDefinition('foo');
+        $def->defaultNull();
+
+        $node = $def->getNode();
+        $this->assertTrue($node->hasDefaultValue());
+        $this->assertNull($node->getDefaultValue());
+
+        $this->assertNull($node->normalize(null));
+    }
+
+    public function testBooleanNodeWithDefaultValueAtNull()
+    {
+        $def = new BooleanNodeDefinition('foo');
+        $def->defaultValue(null);
+
+        $node = $def->getNode();
+        $this->assertTrue($node->hasDefaultValue());
+        $this->assertNull($node->getDefaultValue());
+
+        $this->assertNull($node->normalize(null));
+    }
+
     public function testSetDeprecated()
     {
         $def = new BooleanNodeDefinition('foo');

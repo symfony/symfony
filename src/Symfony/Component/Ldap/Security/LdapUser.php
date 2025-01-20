@@ -23,23 +23,16 @@ use Symfony\Component\Security\Core\User\UserInterface;
  */
 class LdapUser implements UserInterface, PasswordAuthenticatedUserInterface, EquatableInterface
 {
-    private Entry $entry;
-    private string $identifier;
-    private ?string $password;
-    private array $roles;
-    private array $extraFields;
-
-    public function __construct(Entry $entry, string $identifier, #[\SensitiveParameter] ?string $password, array $roles = [], array $extraFields = [])
-    {
+    public function __construct(
+        private Entry $entry,
+        private string $identifier,
+        #[\SensitiveParameter] private ?string $password,
+        private array $roles = [],
+        private array $extraFields = [],
+    ) {
         if (!$identifier) {
             throw new \InvalidArgumentException('The username cannot be empty.');
         }
-
-        $this->entry = $entry;
-        $this->identifier = $identifier;
-        $this->password = $password;
-        $this->roles = $roles;
-        $this->extraFields = $extraFields;
     }
 
     public function getEntry(): Entry
@@ -60,14 +53,6 @@ class LdapUser implements UserInterface, PasswordAuthenticatedUserInterface, Equ
     public function getSalt(): ?string
     {
         return null;
-    }
-
-    /**
-     * @internal for compatibility with Symfony 5.4
-     */
-    public function getUsername(): string
-    {
-        return $this->getUserIdentifier();
     }
 
     public function getUserIdentifier(): string

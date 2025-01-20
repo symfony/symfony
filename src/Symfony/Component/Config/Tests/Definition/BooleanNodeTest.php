@@ -26,6 +26,33 @@ class BooleanNodeTest extends TestCase
         $this->assertSame($value, $node->normalize($value));
     }
 
+    public function testNullValueOnNullable()
+    {
+        $node = new BooleanNode('test', null, '.', true);
+
+        $this->assertNull($node->normalize(null));
+    }
+
+    public function testNullValueOnNotNullable()
+    {
+        $node = new BooleanNode('test', null, '.', false);
+
+        $this->expectException(InvalidTypeException::class);
+        $this->expectExceptionMessage('Invalid type for path "test". Expected "bool", but got "null".');
+
+        $this->assertNull($node->normalize(null));
+    }
+
+    public function testInvalidValueOnNullable()
+    {
+        $node = new BooleanNode('test', null, '.', true);
+
+        $this->expectException(InvalidTypeException::class);
+        $this->expectExceptionMessage('Invalid type for path "test". Expected "bool" or "null", but got "int".');
+
+        $node->normalize(123);
+    }
+
     /**
      * @dataProvider getValidValues
      */
@@ -50,7 +77,6 @@ class BooleanNodeTest extends TestCase
      */
     public function testNormalizeThrowsExceptionOnInvalidValues($value)
     {
-
         $node = new BooleanNode('test');
 
         $this->expectException(InvalidTypeException::class);
@@ -61,7 +87,6 @@ class BooleanNodeTest extends TestCase
     public static function getInvalidValues(): array
     {
         return [
-            [null],
             [''],
             ['foo'],
             [0],

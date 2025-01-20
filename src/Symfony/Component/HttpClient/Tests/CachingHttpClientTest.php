@@ -87,10 +87,10 @@ class CachingHttpClientTest extends TestCase
     {
         $response = $this->runRequest(new MockResponse(
             'test', [
-            'response_headers' => [
-                'X-Content-Digest' => 'some-hash',
-            ],
-        ]));
+                'response_headers' => [
+                    'X-Content-Digest' => 'some-hash',
+                ],
+            ]));
         $headers = $response->getHeaders();
 
         $this->assertArrayNotHasKey('x-content-digest', $headers);

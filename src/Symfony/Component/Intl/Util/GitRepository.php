@@ -19,12 +19,9 @@ use Symfony\Component\Intl\Exception\RuntimeException;
  */
 final class GitRepository
 {
-    private string $path;
-
-    public function __construct(string $path)
-    {
-        $this->path = $path;
-
+    public function __construct(
+        private string $path,
+    ) {
         $this->getUrl();
     }
 
@@ -38,7 +35,7 @@ final class GitRepository
             $filesystem->remove($targetDir);
             $filesystem->mkdir($targetDir);
 
-            self::exec(sprintf('git clone %s %s', escapeshellarg($remote), escapeshellarg($targetDir)));
+            self::exec(\sprintf('git clone %s %s', escapeshellarg($remote), escapeshellarg($targetDir)));
         }
 
         return new self(realpath($targetDir));
@@ -82,20 +79,20 @@ final class GitRepository
 
     public function checkout(string $branch): void
     {
-        $this->execInPath(sprintf('git checkout %s', escapeshellarg($branch)));
+        $this->execInPath(\sprintf('git checkout %s', escapeshellarg($branch)));
     }
 
     private function execInPath(string $command): array
     {
-        return self::exec(sprintf('cd %s && %s', escapeshellarg($this->path), $command));
+        return self::exec(\sprintf('cd %s && %s', escapeshellarg($this->path), $command));
     }
 
     private static function exec(string $command, ?string $customErrorMessage = null): array
     {
-        exec(sprintf('%s 2>&1', $command), $output, $result);
+        exec(\sprintf('%s 2>&1', $command), $output, $result);
 
         if (0 !== $result) {
-            throw new RuntimeException($customErrorMessage ?? sprintf('The "%s" command failed.', $command));
+            throw new RuntimeException($customErrorMessage ?? \sprintf('The "%s" command failed.', $command));
         }
 
         return $output;

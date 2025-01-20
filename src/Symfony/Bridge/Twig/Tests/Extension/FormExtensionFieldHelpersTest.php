@@ -27,7 +27,7 @@ class FormExtensionFieldHelpersTest extends FormIntegrationTestCase
     private FormExtension $translatorExtension;
     private FormView $view;
 
-    protected function getTypes()
+    protected function getTypes(): array
     {
         return [new TextType(), new ChoiceType()];
     }

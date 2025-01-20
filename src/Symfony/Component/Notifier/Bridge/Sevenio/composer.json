@@ -1,0 +1,30 @@
+{
+    "name": "symfony/sevenio-notifier",
+    "type": "symfony-notifier-bridge",
+    "description": "Symfony Seven.io Notifier Bridge",
+    "keywords": ["sms", "sevenio", "notifier"],
+    "homepage": "https://symfony.com",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Frank Nägler",
+            "email": "frank@naegler.hamburg"
+        },
+        {
+            "name": "Symfony Community",
+            "homepage": "https://symfony.com/contributors"
+        }
+    ],
+    "require": {
+        "php": ">=8.2",
+        "symfony/http-client": "^6.4|^7.0",
+        "symfony/notifier": "^7.2"
+    },
+    "autoload": {
+        "psr-4": { "Symfony\\Component\\Notifier\\Bridge\\Sevenio\\": "" },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
+    },
+    "minimum-stability": "dev"
+}

@@ -20,14 +20,12 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
  */
 trait HttpExceptionTrait
 {
-    private ResponseInterface $response;
-
-    public function __construct(ResponseInterface $response)
-    {
-        $this->response = $response;
+    public function __construct(
+        private ResponseInterface $response,
+    ) {
         $code = $response->getInfo('http_code');
         $url = $response->getInfo('url');
-        $message = sprintf('HTTP %d returned for "%s".', $code, $url);
+        $message = \sprintf('HTTP %d returned for "%s".', $code, $url);
 
         $httpCodeFound = false;
         $isJson = false;
@@ -37,7 +35,7 @@ trait HttpExceptionTrait
                     break;
                 }
 
-                $message = sprintf('%s returned for "%s".', $h, $url);
+                $message = \sprintf('%s returned for "%s".', $h, $url);
                 $httpCodeFound = true;
             }
 

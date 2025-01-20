@@ -19,21 +19,18 @@ use Symfony\Component\Notifier\Message\MessageOptionsInterface;
 final class MercureOptions implements MessageOptionsInterface
 {
     private ?array $topics;
-    private bool $private;
-    private ?string $id;
-    private ?string $type;
-    private ?int $retry;
 
     /**
      * @param string|string[]|null $topics
      */
-    public function __construct(string|array|null $topics = null, bool $private = false, ?string $id = null, ?string $type = null, ?int $retry = null)
-    {
+    public function __construct(
+        string|array|null $topics = null,
+        private bool $private = false,
+        private ?string $id = null,
+        private ?string $type = null,
+        private ?int $retry = null,
+    ) {
         $this->topics = null !== $topics ? (array) $topics : null;
-        $this->private = $private;
-        $this->id = $id;
-        $this->type = $type;
-        $this->retry = $retry;
     }
 
     /**

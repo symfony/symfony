@@ -75,7 +75,7 @@ final class GoIpTransportTest extends TransportTestCase
     public function testSendMessageWithUnsuccessfulReplyFromGoipThrows(string $goipError)
     {
         $this->expectException(TransportException::class);
-        $this->expectExceptionMessage(sprintf('Could not send the message through GoIP. Response: "%s".', $goipError));
+        $this->expectExceptionMessage(\sprintf('Could not send the message through GoIP. Response: "%s".', $goipError));
 
         $mockClient = new MockHttpClient(new MockResponse($goipError));
 
@@ -95,7 +95,7 @@ final class GoIpTransportTest extends TransportTestCase
         $misFormedReply = 'Sending,L5 Send SMS to:0123';
 
         $this->expectException(TransportException::class);
-        $this->expectExceptionMessage(sprintf('Could not extract the message id from the GoIP response: "%s".', $misFormedReply));
+        $this->expectExceptionMessage(\sprintf('Could not extract the message id from the GoIP response: "%s".', $misFormedReply));
 
         $mockClient = new MockHttpClient(new MockResponse($misFormedReply));
 

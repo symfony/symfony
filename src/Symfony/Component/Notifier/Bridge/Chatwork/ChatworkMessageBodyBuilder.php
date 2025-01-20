@@ -49,7 +49,7 @@ class ChatworkMessageBodyBuilder
     {
         $content = '';
         foreach ($this->to as $to) {
-            $content .= sprintf("[To:%s]\n", $to);
+            $content .= \sprintf("[To:%s]\n", $to);
         }
         $content .= $this->body;
 

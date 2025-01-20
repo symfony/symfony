@@ -38,13 +38,11 @@ use Symfony\Component\Form\Guess\ValueGuess;
 
 class DoctrineOrmTypeGuesser implements FormTypeGuesserInterface
 {
-    protected $registry;
-
     private array $cache = [];
 
-    public function __construct(ManagerRegistry $registry)
-    {
-        $this->registry = $registry;
+    public function __construct(
+        protected ManagerRegistry $registry,
+    ) {
     }
 
     public function guessType(string $class, string $property): ?TypeGuess
@@ -163,7 +161,7 @@ class DoctrineOrmTypeGuesser implements FormTypeGuesserInterface
      *
      * @return array{0:ClassMetadata<T>, 1:string}|null
      */
-    protected function getMetadata(string $class)
+    protected function getMetadata(string $class): ?array
     {
         // normalize class name
         $class = self::getRealClass(ltrim($class, '\\'));

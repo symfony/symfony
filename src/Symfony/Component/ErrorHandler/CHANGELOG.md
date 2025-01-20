@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+7.1
+---
+
+ * Increase log level to "error" at least for all PHP errors
+
 6.4
 ---
 

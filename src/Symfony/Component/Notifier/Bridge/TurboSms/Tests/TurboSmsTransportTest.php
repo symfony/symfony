@@ -12,6 +12,7 @@
 namespace Symfony\Component\Notifier\Bridge\TurboSms\Tests;
 
 use Symfony\Component\HttpClient\MockHttpClient;
+use Symfony\Component\HttpClient\Response\JsonMockResponse;
 use Symfony\Component\Notifier\Bridge\TurboSms\TurboSmsTransport;
 use Symfony\Component\Notifier\Exception\LengthException;
 use Symfony\Component\Notifier\Exception\TransportException;
@@ -48,28 +49,18 @@ final class TurboSmsTransportTest extends TransportTestCase
 
     public function testSuccessfulSend()
     {
-        $response = $this->createMock(ResponseInterface::class);
-        $response
-            ->expects(self::exactly(2))
-            ->method('getStatusCode')
-            ->willReturn(200)
-        ;
-        $response
-            ->expects(self::once())
-            ->method('getContent')
-            ->willReturn(json_encode([
-                'response_code' => 0,
-                'response_status' => 'OK',
-                'response_result' => [
-                    [
-                        'phone' => '380931234567',
-                        'response_code' => 0,
-                        'message_id' => 'f83f8868-5e46-c6cf-e4fb-615e5a293754',
-                        'response_status' => 'OK',
-                    ],
+        $response = new JsonMockResponse(body: [
+            'response_code' => 0,
+            'response_status' => 'OK',
+            'response_result' => [
+                [
+                    'phone' => '380931234567',
+                    'response_code' => 0,
+                    'message_id' => 'f83f8868-5e46-c6cf-e4fb-615e5a293754',
+                    'response_status' => 'OK',
                 ],
-            ]))
-        ;
+            ],
+        ], info: ['http_code' => 200]);
 
         $client = new MockHttpClient(static function (string $method, string $url, array $options) use ($response): ResponseInterface {
             $body = json_decode($options['body'], true);
@@ -95,30 +86,20 @@ final class TurboSmsTransportTest extends TransportTestCase
 
     public function testFailedSendWithPartialAccepted()
     {
-        $response = $this->createMock(ResponseInterface::class);
-        $response
-            ->expects(self::exactly(2))
-            ->method('getStatusCode')
-            ->willReturn(200)
-        ;
-        $response
-            ->expects(self::once())
-            ->method('getContent')
-            ->willReturn(json_encode([
-                'response_code' => 0,
-                'response_status' => 'OK',
-                'response_result' => [
-                    [
-                        'phone' => '380931234567',
-                        'response_code' => 406,
-                        'message_id' => null,
-                        'response_status' => 'NOT_ALLOWED_RECIPIENT_COUNTRY',
-                    ],
+        $response = new JsonMockResponse(body: [
+            'response_code' => 0,
+            'response_status' => 'OK',
+            'response_result' => [
+                [
+                    'phone' => '380931234567',
+                    'response_code' => 406,
+                    'message_id' => null,
+                    'response_status' => 'NOT_ALLOWED_RECIPIENT_COUNTRY',
                 ],
-            ]))
-        ;
+            ],
+        ], info: ['http_code' => 200]);
 
-        $client = new MockHttpClient(static fn() => $response);
+        $client = new MockHttpClient(static fn () => $response);
 
         $message = new SmsMessage('380931234567', 'Test');
 
@@ -132,21 +113,11 @@ final class TurboSmsTransportTest extends TransportTestCase
 
     public function testFailedSend()
     {
-        $response = $this->createMock(ResponseInterface::class);
-        $response
-            ->expects(self::exactly(2))
-            ->method('getStatusCode')
-            ->willReturn(400)
-        ;
-        $response
-            ->expects(self::once())
-            ->method('getContent')
-            ->willReturn(json_encode([
-                'response_code' => 103,
-                'response_status' => 'REQUIRED_TOKEN',
-                'response_result' => null,
-            ]))
-        ;
+        $response = new JsonMockResponse(body: [
+            'response_code' => 103,
+            'response_status' => 'REQUIRED_TOKEN',
+            'response_result' => null,
+        ], info: ['http_code' => 400]);
 
         $client = new MockHttpClient(static fn (): ResponseInterface => $response);
 
@@ -165,10 +136,7 @@ final class TurboSmsTransportTest extends TransportTestCase
         $this->expectException(LengthException::class);
         $this->expectExceptionMessage('The sender length of a TurboSMS message must not exceed 20 characters.');
 
-        $message = new SmsMessage('380931234567', 'Hello!');
-        $transport = new TurboSmsTransport('authToken', 'abcdefghijklmnopqrstu', $this->createMock(HttpClientInterface::class));
-
-        $transport->send($message);
+        new TurboSmsTransport('authToken', 'abcdefghijklmnopqrstu', $this->createMock(HttpClientInterface::class));
     }
 
     public function testInvalidSubjectWithLatinSymbols()

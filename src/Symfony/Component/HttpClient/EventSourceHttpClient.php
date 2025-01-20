@@ -32,12 +32,11 @@ final class EventSourceHttpClient implements HttpClientInterface, ResetInterface
         AsyncDecoratorTrait::withOptions insteadof HttpClientTrait;
     }
 
-    private float $reconnectionTime;
-
-    public function __construct(?HttpClientInterface $client = null, float $reconnectionTime = 10.0)
-    {
+    public function __construct(
+        ?HttpClientInterface $client = null,
+        private float $reconnectionTime = 10.0,
+    ) {
         $this->client = $client ?? HttpClient::create();
-        $this->reconnectionTime = $reconnectionTime;
     }
 
     public function connect(string $url, array $options = [], string $method = 'GET'): ResponseInterface
@@ -53,7 +52,7 @@ final class EventSourceHttpClient implements HttpClientInterface, ResetInterface
 
     public function request(string $method, string $url, array $options = []): ResponseInterface
     {
-        $state = new class() {
+        $state = new class {
             public ?string $buffer = null;
             public ?string $lastEventId = null;
             public float $reconnectionTime;
@@ -110,7 +109,7 @@ final class EventSourceHttpClient implements HttpClientInterface, ResetInterface
                 if (preg_match('/^text\/event-stream(;|$)/i', $context->getHeaders()['content-type'][0] ?? '')) {
                     $state->buffer = '';
                 } elseif (null !== $lastError || (null !== $state->buffer && 200 === $context->getStatusCode())) {
-                    throw new EventSourceException(sprintf('Response content-type is "%s" while "text/event-stream" was expected for "%s".', $context->getHeaders()['content-type'][0] ?? '', $context->getInfo('url')));
+                    throw new EventSourceException(\sprintf('Response content-type is "%s" while "text/event-stream" was expected for "%s".', $context->getHeaders()['content-type'][0] ?? '', $context->getInfo('url')));
                 } else {
                     $context->passthru();
                 }

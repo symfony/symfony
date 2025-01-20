@@ -21,13 +21,13 @@ use Twig\Template;
  */
 class TwigRendererEngine extends AbstractRendererEngine
 {
-    private Environment $environment;
     private Template $template;
 
-    public function __construct(array $defaultThemes, Environment $environment)
-    {
+    public function __construct(
+        array $defaultThemes,
+        private Environment $environment,
+    ) {
         parent::__construct($defaultThemes);
-        $this->environment = $environment;
     }
 
     public function renderBlock(FormView $view, mixed $resource, string $blockName, array $variables = []): string
@@ -132,10 +132,8 @@ class TwigRendererEngine extends AbstractRendererEngine
      *                     to initialize the theme first. Any changes made to
      *                     this variable will be kept and be available upon
      *                     further calls to this method using the same theme.
-     *
-     * @return void
      */
-    protected function loadResourcesFromTheme(string $cacheKey, mixed &$theme)
+    protected function loadResourcesFromTheme(string $cacheKey, mixed &$theme): void
     {
         if (!$theme instanceof Template) {
             $theme = $this->environment->load($theme)->unwrap();

@@ -26,10 +26,7 @@ class Ssi extends AbstractSurrogate
         return 'ssi';
     }
 
-    /**
-     * @return void
-     */
-    public function addSurrogateControl(Response $response)
+    public function addSurrogateControl(Response $response): void
     {
         if (str_contains($response->getContent(), '<!--#include')) {
             $response->headers->set('Surrogate-Control', 'content="SSI/1.0"');
@@ -38,18 +35,18 @@ class Ssi extends AbstractSurrogate
 
     public function renderIncludeTag(string $uri, ?string $alt = null, bool $ignoreErrors = true, string $comment = ''): string
     {
-        return sprintf('<!--#include virtual="%s" -->', $uri);
+        return \sprintf('<!--#include virtual="%s" -->', $uri);
     }
 
     public function process(Request $request, Response $response): Response
     {
         $type = $response->headers->get('Content-Type');
-        if (empty($type)) {
+        if (!$type) {
             $type = 'text/html';
         }
 
         $parts = explode(';', $type);
-        if (!\in_array($parts[0], $this->contentTypes)) {
+        if (!\in_array($parts[0], $this->contentTypes, true)) {
             return $response;
         }
 

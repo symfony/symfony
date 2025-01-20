@@ -47,11 +47,9 @@ class JsonDecodeTest extends TestCase
         $stdClass = new \stdClass();
         $stdClass->foo = 'bar';
 
-        $assoc = ['foo' => 'bar'];
-
         return [
             ['{"foo": "bar"}', $stdClass, []],
-            ['{"foo": "bar"}', $assoc, ['json_decode_associative' => true]],
+            ['{"foo": "bar"}', ['foo' => 'bar'], ['json_decode_associative' => true]],
         ];
     }
 

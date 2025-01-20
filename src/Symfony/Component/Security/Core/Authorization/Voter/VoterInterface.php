@@ -33,9 +33,7 @@ interface VoterInterface
      * @param mixed $subject    The subject to secure
      * @param array $attributes An array of attributes associated with the method being invoked
      *
-     * @return int either ACCESS_GRANTED, ACCESS_ABSTAIN, or ACCESS_DENIED
-     *
-     * @psalm-return self::ACCESS_* must be transformed into @return on Symfony 7
+     * @return self::ACCESS_*
      */
-    public function vote(TokenInterface $token, mixed $subject, array $attributes);
+    public function vote(TokenInterface $token, mixed $subject, array $attributes): int;
 }

@@ -39,7 +39,7 @@ class AccessDecisionManagerTest extends TestCase
             $this->getUnexpectedVoter(),
         ];
 
-        $strategy = new class() implements AccessDecisionStrategyInterface {
+        $strategy = new class implements AccessDecisionStrategyInterface {
             public function decide(\Traversable $results): bool
             {
                 $i = 0;

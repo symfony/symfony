@@ -206,7 +206,7 @@ class AddConsoleCommandPassTest extends TestCase
         $container->setDefinition('my-command', $definition);
 
         $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('The service "my-command" tagged "console.command" must be a subclass of "Symfony\Component\Console\Command\Command".');
+        $this->expectExceptionMessage('The service "my-command" tagged "console.command" must either be a subclass of "Symfony\Component\Console\Command\Command" or have an "__invoke()" method');
 
         $container->compile();
     }
@@ -303,6 +303,20 @@ class AddConsoleCommandPassTest extends TestCase
 
         $container->compile();
     }
+
+    public function testProcessInvokableCommand()
+    {
+        $container = new ContainerBuilder();
+        $container->addCompilerPass(new AddConsoleCommandPass(), PassConfig::TYPE_BEFORE_REMOVING);
+
+        $definition = new Definition(InvokableCommand::class);
+        $definition->addTag('console.command', ['command' => 'invokable', 'description' => 'Just testing']);
+        $container->setDefinition('invokable_command', $definition);
+
+        $container->compile();
+
+        self::assertTrue($container->has('invokable_command.command'));
+    }
 }
 
 class MyCommand extends Command
@@ -329,5 +343,13 @@ class DescribedCommand extends Command
         ++self::$initCounter;
 
         parent::__construct();
+    }
+}
+
+#[AsCommand(name: 'invokable', description: 'Just testing')]
+class InvokableCommand
+{
+    public function __invoke(): void
+    {
     }
 }

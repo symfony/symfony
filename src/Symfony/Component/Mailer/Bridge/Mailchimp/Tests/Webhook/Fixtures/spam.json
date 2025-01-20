@@ -1,0 +1,33 @@
+{
+  "mandrill_events": [
+    {
+      "ts": 1365109999,
+      "event": "spam",
+      "msg": {
+        "ts": 1365109999,
+        "subject": "Foo bar",
+        "email": "foo@example.com",
+        "sender": "bar@example.com",
+        "tags": [
+          "my_tag_1",
+          "my_tag_2"
+        ],
+        "smtp_events": null,
+        "opens": null,
+        "clicks": null,
+        "state": "sent",
+        "metadata": {
+          "mandrill-var-1": "foo",
+          "mandrill-var-2": "bar"
+        },
+        "_id": "7761638",
+        "_version": "123",
+        "subaccount": null,
+        "diag": null,
+        "bounce_description": null,
+        "template": null
+      }
+    }
+  ],
+  "X-Mandrill-Signature": "5mOstZe7kgzwJdBbXtlakc4W87w="
+}

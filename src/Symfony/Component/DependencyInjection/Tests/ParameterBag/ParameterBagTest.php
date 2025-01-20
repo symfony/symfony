@@ -12,7 +12,9 @@
 namespace Symfony\Component\DependencyInjection\Tests\ParameterBag;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
+use Symfony\Bridge\PhpUnit\ExpectUserDeprecationMessageTrait;
+use Symfony\Component\DependencyInjection\Exception\EmptyParameterValueException;
+use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Exception\ParameterCircularReferenceException;
 use Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
@@ -20,7 +22,7 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 
 class ParameterBagTest extends TestCase
 {
-    use ExpectDeprecationTrait;
+    use ExpectUserDeprecationMessageTrait;
 
     public function testConstructor()
     {
@@ -82,32 +84,29 @@ class ParameterBagTest extends TestCase
     }
 
     /**
-     * @group legacy
-     * Test it will throw in 7.0
+     * @testWith [1001]
+     *           [10.0]
      */
-    public function testGetSetNumericName()
+    public function testSetNumericName(int|float $name)
     {
-        $bag = new ParameterBag(['foo']);
-        $bag->set(1001, 'foo');
-        $this->assertEquals('foo', $bag->get(1001), '->set() sets the value of a new parameter');
+        $bag = new ParameterBag();
 
-        $bag->set(10.0, 'foo');
-        $this->assertEquals('foo', $bag->get(10), '->set() sets the value of a new parameter');
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage(\sprintf('The parameter name "%s" cannot be numeric.', $name));
 
-        $bag->set(0b0110, 'foo');
-        $this->assertEquals('foo', $bag->get(0b0110), '->set() sets the value of a new parameter');
+        $bag->set($name, 'foo');
+    }
 
-        $bag->set('0', 'baz');
-        $this->assertEquals('baz', $bag->get(0), '->set() overrides previously set parameter');
+    /**
+     * @testWith [1001]
+     *           [10.0]
+     */
+    public function testConstructorNumericName(int|float $name)
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage(\sprintf('The parameter name "%s" cannot be numeric.', $name));
 
-        $this->assertTrue($bag->has(0));
-        $this->assertTrue($bag->has(1001));
-        $this->assertTrue($bag->has(10));
-        $this->assertTrue($bag->has(0b0110));
-
-        foreach (array_keys($bag->all()) as $key) {
-            $this->assertIsInt($key, 'Numeric string keys are cast to integers');
-        }
+        new ParameterBag([$name => 'foo']);
     }
 
     /**
@@ -151,7 +150,7 @@ class ParameterBagTest extends TestCase
 
         $bag->deprecate('foo', 'symfony/test', '6.3');
 
-        $this->expectDeprecation('Since symfony/test 6.3: The parameter "foo" is deprecated.');
+        $this->expectUserDeprecationMessage('Since symfony/test 6.3: The parameter "foo" is deprecated.');
 
         $bag->get('foo');
     }
@@ -167,7 +166,7 @@ class ParameterBagTest extends TestCase
 
         $bag->deprecate('foo', 'symfony/test', '6.3', 'The parameter "%s" is deprecated, use "new_foo" instead.');
 
-        $this->expectDeprecation('Since symfony/test 6.3: The parameter "foo" is deprecated, use "new_foo" instead.');
+        $this->expectUserDeprecationMessage('Since symfony/test 6.3: The parameter "foo" is deprecated, use "new_foo" instead.');
 
         $bag->get('foo');
     }
@@ -183,7 +182,7 @@ class ParameterBagTest extends TestCase
 
         $bag->deprecate('bar', 'symfony/test', '6.3');
 
-        $this->expectDeprecation('Since symfony/test 6.3: The parameter "bar" is deprecated.');
+        $this->expectUserDeprecationMessage('Since symfony/test 6.3: The parameter "bar" is deprecated.');
 
         $bag->resolve();
     }
@@ -196,6 +195,54 @@ class ParameterBagTest extends TestCase
         $this->expectExceptionMessage('You have requested a non-existent parameter "foo".');
 
         $bag->deprecate('foo', 'symfony/test', '6.3');
+    }
+
+    public function testGetMissingRequiredParameter()
+    {
+        $bag = new ParameterBag();
+
+        $bag->cannotBeEmpty('bar', 'Did you forget to configure the "foo.bar" option?');
+
+        $this->expectException(ParameterNotFoundException::class);
+        $this->expectExceptionMessage('You have requested a non-existent parameter "bar". Did you forget to configure the "foo.bar" option?');
+
+        $bag->get('bar');
+    }
+
+    public function testGetNonEmptyParameterThrowsWhenNullValue()
+    {
+        $bag = new ParameterBag();
+        $bag->set('bar', null);
+        $bag->cannotBeEmpty('bar', 'Did you forget to configure the "foo.bar" option?');
+
+        $this->expectException(EmptyParameterValueException::class);
+        $this->expectExceptionMessage('Did you forget to configure the "foo.bar" option?');
+
+        $bag->get('bar');
+    }
+
+    public function testGetNonEmptyParameterThrowsWhenEmptyStringValue()
+    {
+        $bag = new ParameterBag();
+        $bag->set('bar', '');
+        $bag->cannotBeEmpty('bar', 'Did you forget to configure the "foo.bar" option?');
+
+        $this->expectException(EmptyParameterValueException::class);
+        $this->expectExceptionMessage('Did you forget to configure the "foo.bar" option?');
+
+        $bag->get('bar');
+    }
+
+    public function testGetNonEmptyParameterThrowsWhenEmptyArrayValue()
+    {
+        $bag = new ParameterBag();
+        $bag->set('bar', []);
+        $bag->cannotBeEmpty('bar', 'Did you forget to configure the "foo.bar" option?');
+
+        $this->expectException(EmptyParameterValueException::class);
+        $this->expectExceptionMessage('Did you forget to configure the "foo.bar" option?');
+
+        $bag->get('bar');
     }
 
     public function testHas()
@@ -343,7 +390,7 @@ class ParameterBagTest extends TestCase
         try {
             $this->assertEquals($expected, $bag->resolveString($test), $description);
         } catch (ParameterNotFoundException $e) {
-            $this->fail(sprintf('%s - "%s"', $description, $expected));
+            $this->fail(\sprintf('%s - "%s"', $description, $expected));
         }
     }
 

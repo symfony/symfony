@@ -62,7 +62,7 @@ abstract class Descriptor implements DescriptorInterface
             $object instanceof Alias => $this->describeContainerAlias($object, $options),
             $object instanceof EventDispatcherInterface => $this->describeEventDispatcherListeners($object, $options),
             \is_callable($object) => $this->describeCallable($object, $options),
-            default => throw new \InvalidArgumentException(sprintf('Object of type "%s" is not describable.', get_debug_type($object))),
+            default => throw new \InvalidArgumentException(\sprintf('Object of type "%s" is not describable.', get_debug_type($object))),
         };
 
         if ($object instanceof ContainerBuilder) {
@@ -133,7 +133,7 @@ abstract class Descriptor implements DescriptorInterface
         }
 
         if (\is_object($value)) {
-            return sprintf('object(%s)', $value::class);
+            return \sprintf('object(%s)', $value::class);
         }
 
         if (\is_string($value)) {

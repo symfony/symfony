@@ -89,7 +89,7 @@ class StateMachineGraphvizDumper extends GraphvizDumper
 
         foreach ($edges as $id => $edges) {
             foreach ($edges as $edge) {
-                $code .= sprintf(
+                $code .= \sprintf(
                     "  place_%s -> place_%s [label=\"%s\" style=\"%s\"%s];\n",
                     $this->dotize($id),
                     $this->dotize($edge['to']),

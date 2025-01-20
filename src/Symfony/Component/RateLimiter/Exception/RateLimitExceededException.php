@@ -18,13 +18,12 @@ use Symfony\Component\RateLimiter\RateLimit;
  */
 class RateLimitExceededException extends \RuntimeException
 {
-    private RateLimit $rateLimit;
-
-    public function __construct(RateLimit $rateLimit, int $code = 0, ?\Throwable $previous = null)
-    {
+    public function __construct(
+        private RateLimit $rateLimit,
+        int $code = 0,
+        ?\Throwable $previous = null,
+    ) {
         parent::__construct('Rate Limit Exceeded', $code, $previous);
-
-        $this->rateLimit = $rateLimit;
     }
 
     public function getRateLimit(): RateLimit

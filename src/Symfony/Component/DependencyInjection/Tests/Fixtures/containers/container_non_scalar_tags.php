@@ -14,7 +14,7 @@ $container
         'foo' => 'bar',
         'bar' => [
             'foo' => 'bar',
-            'bar' => 'foo'
+            'bar' => 'foo',
         ]])
 ;
 

@@ -1,6 +1,41 @@
 CHANGELOG
 =========
 
+7.2
+---
+
+ * Add `$previous` to the exception output at the `messenger:failed:show` command
+ * `WrappedExceptionsInterface` now extends PHP's `Throwable` interface
+ * Add `#[AsMessage]` attribute with `$transport` parameter for message routing
+ * Add `--format` option to the `messenger:stats` command
+ * Add `getRetryDelay()` method to `RecoverableExceptionInterface`
+ * Add `skip` option to `messenger:failed:retry` command when run interactively to skip message and requeue it
+ * Add the ability to asynchronously notify transports about which messages are still being processed by the worker, using `pcntl_alarm()`
+
+7.1
+---
+
+ * `InMemoryTransportFactory` creates the `InMemoryTransport` with a clock (if configured in the factory)
+ * Add option `redis_sentinel` as an alias for `sentinel_master`
+ * Add `--all` option to the `messenger:consume` command
+ * Add parameter `$jitter` to `MultiplierRetryStrategy` in order to randomize delay and prevent the thundering herd effect
+ * Add `SIGQUIT` signal among list of signals that gracefully shut down `messenger:consume` and `messenger:failed:retry` commands
+ * Add `EnvelopeAwareExceptionInterface` for exceptions thrown from middlewares to prevent stamps added by previous middlewares being dropped
+
+7.0
+---
+
+ * Add parameter `$isSameDatabase` to `DoctrineTransport::configureSchema()`
+ * Remove `MessageHandlerInterface` and `MessageSubscriberInterface`, use `#[AsMessageHandler]` instead
+ * Remove `StopWorkerOnSigtermSignalListener` in favor of using the `SignalableCommandInterface`
+ * Remove `StopWorkerOnSignalsListener` in favor of using the `SignalableCommandInterface`
+ * Remove `Symfony\Component\Messenger\Transport\InMemoryTransport` and
+   `Symfony\Component\Messenger\Transport\InMemoryTransportFactory` in favor of
+   `Symfony\Component\Messenger\Transport\InMemory\InMemoryTransport` and
+   `Symfony\Component\Messenger\Transport\InMemory\InMemoryTransportFactory`
+ * Remove `HandlerFailedException::getNestedExceptions()`, `HandlerFailedException::getNestedExceptionsOfClass()`
+   and `DelayedMessageHandlingException::getExceptions()` which are replaced by a new `getWrappedExceptions()` method
+
 6.4
 ---
 

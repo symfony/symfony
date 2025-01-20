@@ -23,7 +23,7 @@ final class GmailTransportFactory extends AbstractTransportFactory
 {
     public function create(Dsn $dsn): TransportInterface
     {
-        if (\in_array($dsn->getScheme(), $this->getSupportedSchemes())) {
+        if (\in_array($dsn->getScheme(), $this->getSupportedSchemes(), true)) {
             return new GmailSmtpTransport($this->getUser($dsn), $this->getPassword($dsn), $this->dispatcher, $this->logger);
         }
 

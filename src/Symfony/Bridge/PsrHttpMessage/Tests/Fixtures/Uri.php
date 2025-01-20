@@ -47,13 +47,13 @@ class Uri implements UriInterface
 
     public function getAuthority(): string
     {
-        if (empty($this->host)) {
+        if (!$this->host) {
             return '';
         }
 
         $authority = $this->host;
 
-        if (!empty($this->userInfo)) {
+        if ($this->userInfo) {
             $authority = $this->userInfo.'@'.$authority;
         }
 

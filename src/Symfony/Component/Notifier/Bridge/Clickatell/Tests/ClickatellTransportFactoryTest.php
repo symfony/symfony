@@ -12,10 +12,13 @@
 namespace Symfony\Component\Notifier\Bridge\Clickatell\Tests;
 
 use Symfony\Component\Notifier\Bridge\Clickatell\ClickatellTransportFactory;
-use Symfony\Component\Notifier\Test\TransportFactoryTestCase;
+use Symfony\Component\Notifier\Test\AbstractTransportFactoryTestCase;
+use Symfony\Component\Notifier\Test\IncompleteDsnTestTrait;
 
-class ClickatellTransportFactoryTest extends TransportFactoryTestCase
+class ClickatellTransportFactoryTest extends AbstractTransportFactoryTestCase
 {
+    use IncompleteDsnTestTrait;
+
     public function createFactory(): ClickatellTransportFactory
     {
         return new ClickatellTransportFactory();

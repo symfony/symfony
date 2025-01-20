@@ -24,9 +24,6 @@ class MessageDigestPasswordHasher implements LegacyPasswordHasherInterface
 {
     use CheckPasswordLengthTrait;
 
-    private string $algorithm;
-    private bool $encodeHashAsBase64;
-    private int $iterations = 1;
     private int $hashLength = -1;
 
     /**
@@ -34,18 +31,16 @@ class MessageDigestPasswordHasher implements LegacyPasswordHasherInterface
      * @param bool   $encodeHashAsBase64 Whether to base64 encode the password hash
      * @param int    $iterations         The number of iterations to use to stretch the password hash
      */
-    public function __construct(string $algorithm = 'sha512', bool $encodeHashAsBase64 = true, int $iterations = 5000)
-    {
-        $this->algorithm = $algorithm;
-        $this->encodeHashAsBase64 = $encodeHashAsBase64;
-
+    public function __construct(
+        private string $algorithm = 'sha512',
+        private bool $encodeHashAsBase64 = true,
+        private int $iterations = 5000,
+    ) {
         try {
             $this->hashLength = \strlen($this->hash('', 'salt'));
         } catch (\LogicException) {
             // ignore algorithm not supported
         }
-
-        $this->iterations = $iterations;
     }
 
     public function hash(#[\SensitiveParameter] string $plainPassword, ?string $salt = null): string
@@ -55,7 +50,7 @@ class MessageDigestPasswordHasher implements LegacyPasswordHasherInterface
         }
 
         if (!\in_array($this->algorithm, hash_algos(), true)) {
-            throw new LogicException(sprintf('The algorithm "%s" is not supported.', $this->algorithm));
+            throw new LogicException(\sprintf('The algorithm "%s" is not supported.', $this->algorithm));
         }
 
         $salted = $this->mergePasswordAndSalt($plainPassword, $salt);

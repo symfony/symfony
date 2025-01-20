@@ -100,7 +100,7 @@ class ErrorListenerTest extends TestCase
         }
 
         $this->assertEquals(3, $logger->countErrors());
-        $logs = $logger->getLogs('critical');
+        $logs = $logger->getLogsForLevel('critical');
         $this->assertCount(3, $logs);
         $this->assertStringStartsWith('Uncaught PHP Exception Exception: "foo" at ErrorListenerTest.php line', $logs[0]);
         $this->assertStringStartsWith('Uncaught PHP Exception Exception: "foo" at ErrorListenerTest.php line', $logs[1]);
@@ -124,8 +124,8 @@ class ErrorListenerTest extends TestCase
         $this->assertEquals(new Response('foo', 401), $event->getResponse());
 
         $this->assertEquals(0, $logger->countErrors());
-        $this->assertCount(0, $logger->getLogs('critical'));
-        $this->assertCount(1, $logger->getLogs('warning'));
+        $this->assertCount(0, $logger->getLogsForLevel('critical'));
+        $this->assertCount(1, $logger->getLogsForLevel('warning'));
     }
 
     public function testHandleWithLogLevelAttribute()
@@ -139,8 +139,23 @@ class ErrorListenerTest extends TestCase
         $l->onKernelException($event);
 
         $this->assertEquals(0, $logger->countErrors());
-        $this->assertCount(0, $logger->getLogs('critical'));
-        $this->assertCount(1, $logger->getLogs('warning'));
+        $this->assertCount(0, $logger->getLogsForLevel('critical'));
+        $this->assertCount(1, $logger->getLogsForLevel('warning'));
+    }
+
+    public function testHandleClassImplementingInterfaceWithLogLevelAttribute()
+    {
+        $request = new Request();
+        $event = new ExceptionEvent(new TestKernel(), $request, HttpKernelInterface::MAIN_REQUEST, new ImplementingInterfaceWithLogLevelAttribute());
+        $logger = new TestLogger();
+        $l = new ErrorListener('not used', $logger);
+
+        $l->logKernelException($event);
+        $l->onKernelException($event);
+
+        $this->assertEquals(0, $logger->countErrors());
+        $this->assertCount(0, $logger->getLogsForLevel('critical'));
+        $this->assertCount(1, $logger->getLogsForLevel('warning'));
     }
 
     public function testHandleWithLogLevelAttributeAndCustomConfiguration()
@@ -158,8 +173,8 @@ class ErrorListenerTest extends TestCase
         $l->onKernelException($event);
 
         $this->assertEquals(0, $logger->countErrors());
-        $this->assertCount(0, $logger->getLogs('warning'));
-        $this->assertCount(1, $logger->getLogs('info'));
+        $this->assertCount(0, $logger->getLogsForLevel('warning'));
+        $this->assertCount(1, $logger->getLogsForLevel('info'));
     }
 
     /**
@@ -248,6 +263,19 @@ class ErrorListenerTest extends TestCase
         $this->assertFalse($response->headers->has('content-security-policy'), 'CSP header has been removed');
     }
 
+    public function testTerminating()
+    {
+        $listener = new ErrorListener('foo', $this->createMock(LoggerInterface::class));
+
+        $kernel = $this->createMock(HttpKernelInterface::class);
+        $kernel->expects($this->never())->method('handle');
+
+        $request = Request::create('/');
+
+        $event = new ExceptionEvent($kernel, $request, HttpKernelInterface::MAIN_REQUEST, new \Exception('foo'), true);
+        $listener->onKernelException($event);
+    }
+
     /**
      * @dataProvider controllerProvider
      */
@@ -289,6 +317,7 @@ class ErrorListenerTest extends TestCase
         yield [new WithCustomUserProvidedAttribute(), 208, ['name' => 'value']];
         yield [new WithGeneralAttribute(), 412, ['some' => 'thing']];
         yield [new ChildOfWithGeneralAttribute(), 412, ['some' => 'thing']];
+        yield [new ImplementingInterfaceWithGeneralAttribute(), 412, ['some' => 'thing']];
     }
 }
 
@@ -297,6 +326,11 @@ class TestLogger extends Logger implements DebugLoggerInterface
     public function countErrors(?Request $request = null): int
     {
         return \count($this->logs['critical']);
+    }
+
+    public function getLogs(?Request $request = null): array
+    {
+        return [];
     }
 }
 
@@ -350,6 +384,20 @@ class WithGeneralAttribute extends \Exception
 {
 }
 
+#[WithHttpStatus(
+    statusCode: Response::HTTP_PRECONDITION_FAILED,
+    headers: [
+        'some' => 'thing',
+    ]
+)]
+interface InterfaceWithGeneralAttribute
+{
+}
+
+class ImplementingInterfaceWithGeneralAttribute extends \Exception implements InterfaceWithGeneralAttribute
+{
+}
+
 class ChildOfWithGeneralAttribute extends WithGeneralAttribute
 {
 }
@@ -360,5 +408,14 @@ class WarningWithLogLevelAttribute extends \Exception
 }
 
 class ChildOfWarningWithLogLevelAttribute extends WarningWithLogLevelAttribute
+{
+}
+
+#[WithLogLevel(LogLevel::WARNING)]
+interface InterfaceWithLogLevelAttribute
+{
+}
+
+class ImplementingInterfaceWithLogLevelAttribute extends \Exception implements InterfaceWithLogLevelAttribute
 {
 }

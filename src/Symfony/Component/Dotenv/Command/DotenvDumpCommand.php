@@ -29,14 +29,10 @@ use Symfony\Component\Dotenv\Dotenv;
 #[AsCommand(name: 'dotenv:dump', description: 'Compile .env files to .env.local.php')]
 final class DotenvDumpCommand extends Command
 {
-    private string $projectDir;
-    private ?string $defaultEnv;
-
-    public function __construct(string $projectDir, ?string $defaultEnv = null)
-    {
-        $this->projectDir = $projectDir;
-        $this->defaultEnv = $defaultEnv;
-
+    public function __construct(
+        private string $projectDir,
+        private ?string $defaultEnv = null,
+    ) {
         parent::__construct();
     }
 
@@ -88,7 +84,7 @@ return $vars;
 EOF;
         file_put_contents($dotenvPath.'.local.php', $vars, \LOCK_EX);
 
-        $output->writeln(sprintf('Successfully dumped .env files in <info>.env.local.php</> for the <info>%s</> environment.', $env));
+        $output->writeln(\sprintf('Successfully dumped .env files in <info>.env.local.php</> for the <info>%s</> environment.', $env));
 
         return 0;
     }
@@ -108,6 +104,7 @@ EOF;
         try {
             $dotenv->loadEnv($dotenvPath, null, 'dev', $testEnvs);
             unset($_ENV['SYMFONY_DOTENV_VARS']);
+            unset($_ENV['SYMFONY_DOTENV_PATH']);
 
             return $_ENV;
         } finally {

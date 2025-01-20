@@ -18,8 +18,7 @@ use Symfony\Component\Validator\Exception\LogicException;
 use Symfony\Component\Validator\Exception\MissingOptionsException;
 
 /**
- * @Annotation
- * @Target({"PROPERTY", "METHOD", "ANNOTATION"})
+ * Validates that a given number or DateTime object is between some minimum and maximum.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
@@ -38,21 +37,26 @@ class Range extends Constraint
         self::TOO_LOW_ERROR => 'TOO_LOW_ERROR',
     ];
 
+    public string $notInRangeMessage = 'This value should be between {{ min }} and {{ max }}.';
+    public string $minMessage = 'This value should be {{ limit }} or more.';
+    public string $maxMessage = 'This value should be {{ limit }} or less.';
+    public string $invalidMessage = 'This value should be a valid number.';
+    public string $invalidDateTimeMessage = 'This value should be a valid datetime.';
+    public mixed $min = null;
+    public ?string $minPropertyPath = null;
+    public mixed $max = null;
+    public ?string $maxPropertyPath = null;
+
     /**
-     * @deprecated since Symfony 6.1, use const ERROR_NAMES instead
+     * @param array<string,mixed>|null        $options
+     * @param string|null                     $invalidMessage         The message if min and max values are numeric but the given value is not
+     * @param string|null                     $invalidDateTimeMessage The message if min and max values are PHP datetimes but the given value is not
+     * @param int|float|non-empty-string|null $min                    The minimum value, either numeric or a datetime string representation
+     * @param non-empty-string|null           $minPropertyPath        Property path to the min value
+     * @param int|float|non-empty-string|null $max                    The maximum value, either numeric or a datetime string representation
+     * @param non-empty-string|null           $maxPropertyPath        Property path to the max value
+     * @param string[]|null                   $groups
      */
-    protected static $errorNames = self::ERROR_NAMES;
-
-    public $notInRangeMessage = 'This value should be between {{ min }} and {{ max }}.';
-    public $minMessage = 'This value should be {{ limit }} or more.';
-    public $maxMessage = 'This value should be {{ limit }} or less.';
-    public $invalidMessage = 'This value should be a valid number.';
-    public $invalidDateTimeMessage = 'This value should be a valid datetime.';
-    public $min;
-    public $minPropertyPath;
-    public $max;
-    public $maxPropertyPath;
-
     public function __construct(
         ?array $options = null,
         ?string $notInRangeMessage = null,
@@ -65,7 +69,7 @@ class Range extends Constraint
         mixed $max = null,
         ?string $maxPropertyPath = null,
         ?array $groups = null,
-        mixed $payload = null
+        mixed $payload = null,
     ) {
         parent::__construct($options, $groups, $payload);
 
@@ -80,23 +84,23 @@ class Range extends Constraint
         $this->maxPropertyPath = $maxPropertyPath ?? $this->maxPropertyPath;
 
         if (null === $this->min && null === $this->minPropertyPath && null === $this->max && null === $this->maxPropertyPath) {
-            throw new MissingOptionsException(sprintf('Either option "min", "minPropertyPath", "max" or "maxPropertyPath" must be given for constraint "%s".', __CLASS__), ['min', 'minPropertyPath', 'max', 'maxPropertyPath']);
+            throw new MissingOptionsException(\sprintf('Either option "min", "minPropertyPath", "max" or "maxPropertyPath" must be given for constraint "%s".', __CLASS__), ['min', 'minPropertyPath', 'max', 'maxPropertyPath']);
         }
 
         if (null !== $this->min && null !== $this->minPropertyPath) {
-            throw new ConstraintDefinitionException(sprintf('The "%s" constraint requires only one of the "min" or "minPropertyPath" options to be set, not both.', static::class));
+            throw new ConstraintDefinitionException(\sprintf('The "%s" constraint requires only one of the "min" or "minPropertyPath" options to be set, not both.', static::class));
         }
 
         if (null !== $this->max && null !== $this->maxPropertyPath) {
-            throw new ConstraintDefinitionException(sprintf('The "%s" constraint requires only one of the "max" or "maxPropertyPath" options to be set, not both.', static::class));
+            throw new ConstraintDefinitionException(\sprintf('The "%s" constraint requires only one of the "max" or "maxPropertyPath" options to be set, not both.', static::class));
         }
 
         if ((null !== $this->minPropertyPath || null !== $this->maxPropertyPath) && !class_exists(PropertyAccess::class)) {
-            throw new LogicException(sprintf('The "%s" constraint requires the Symfony PropertyAccess component to use the "minPropertyPath" or "maxPropertyPath" option. Try running "composer require symfony/property-access".', static::class));
+            throw new LogicException(\sprintf('The "%s" constraint requires the Symfony PropertyAccess component to use the "minPropertyPath" or "maxPropertyPath" option. Try running "composer require symfony/property-access".', static::class));
         }
 
         if (null !== $this->min && null !== $this->max && ($minMessage || $maxMessage || isset($options['minMessage']) || isset($options['maxMessage']))) {
-            throw new ConstraintDefinitionException(sprintf('The "%s" constraint can not use "minMessage" and "maxMessage" when the "min" and "max" options are both set. Use "notInRangeMessage" instead.', static::class));
+            throw new ConstraintDefinitionException(\sprintf('The "%s" constraint can not use "minMessage" and "maxMessage" when the "min" and "max" options are both set. Use "notInRangeMessage" instead.', static::class));
         }
     }
 }

@@ -28,11 +28,9 @@ use Symfony\Component\CssSelector\Parser\TokenStream;
  */
 class NumberHandler implements HandlerInterface
 {
-    private TokenizerPatterns $patterns;
-
-    public function __construct(TokenizerPatterns $patterns)
-    {
-        $this->patterns = $patterns;
+    public function __construct(
+        private TokenizerPatterns $patterns,
+    ) {
     }
 
     public function handle(Reader $reader, TokenStream $stream): bool

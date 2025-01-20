@@ -32,12 +32,12 @@ class EntryManager implements EntryManagerInterface
     /**
      * @return $this
      */
-    public function add(Entry $entry)
+    public function add(Entry $entry): static
     {
         $con = $this->getConnectionResource();
 
         if (!@ldap_add($con, $entry->getDn(), $entry->getAttributes())) {
-            throw new LdapException(sprintf('Could not add entry "%s": ', $entry->getDn()).ldap_error($con), ldap_errno($con));
+            throw new LdapException(\sprintf('Could not add entry "%s": ', $entry->getDn()).ldap_error($con), ldap_errno($con));
         }
 
         return $this;
@@ -46,12 +46,12 @@ class EntryManager implements EntryManagerInterface
     /**
      * @return $this
      */
-    public function update(Entry $entry)
+    public function update(Entry $entry): static
     {
         $con = $this->getConnectionResource();
 
         if (!@ldap_modify($con, $entry->getDn(), $entry->getAttributes())) {
-            throw new LdapException(sprintf('Could not update entry "%s": ', $entry->getDn()).ldap_error($con), ldap_errno($con));
+            throw new LdapException(\sprintf('Could not update entry "%s": ', $entry->getDn()).ldap_error($con), ldap_errno($con));
         }
 
         return $this;
@@ -60,12 +60,12 @@ class EntryManager implements EntryManagerInterface
     /**
      * @return $this
      */
-    public function remove(Entry $entry)
+    public function remove(Entry $entry): static
     {
         $con = $this->getConnectionResource();
 
         if (!@ldap_delete($con, $entry->getDn())) {
-            throw new LdapException(sprintf('Could not remove entry "%s": ', $entry->getDn()).ldap_error($con), ldap_errno($con));
+            throw new LdapException(\sprintf('Could not remove entry "%s": ', $entry->getDn()).ldap_error($con), ldap_errno($con));
         }
 
         return $this;
@@ -79,12 +79,12 @@ class EntryManager implements EntryManagerInterface
      * @throws NotBoundException
      * @throws LdapException
      */
-    public function addAttributeValues(Entry $entry, string $attribute, array $values)
+    public function addAttributeValues(Entry $entry, string $attribute, array $values): static
     {
         $con = $this->getConnectionResource();
 
         if (!@ldap_mod_add($con, $entry->getDn(), [$attribute => $values])) {
-            throw new LdapException(sprintf('Could not add values to entry "%s", attribute "%s": ', $entry->getDn(), $attribute).ldap_error($con), ldap_errno($con));
+            throw new LdapException(\sprintf('Could not add values to entry "%s", attribute "%s": ', $entry->getDn(), $attribute).ldap_error($con), ldap_errno($con));
         }
 
         return $this;
@@ -98,12 +98,12 @@ class EntryManager implements EntryManagerInterface
      * @throws NotBoundException
      * @throws LdapException
      */
-    public function removeAttributeValues(Entry $entry, string $attribute, array $values)
+    public function removeAttributeValues(Entry $entry, string $attribute, array $values): static
     {
         $con = $this->getConnectionResource();
 
         if (!@ldap_mod_del($con, $entry->getDn(), [$attribute => $values])) {
-            throw new LdapException(sprintf('Could not remove values from entry "%s", attribute "%s": ', $entry->getDn(), $attribute).ldap_error($con), ldap_errno($con));
+            throw new LdapException(\sprintf('Could not remove values from entry "%s", attribute "%s": ', $entry->getDn(), $attribute).ldap_error($con), ldap_errno($con));
         }
 
         return $this;
@@ -112,12 +112,12 @@ class EntryManager implements EntryManagerInterface
     /**
      * @return $this
      */
-    public function rename(Entry $entry, string $newRdn, bool $removeOldRdn = true)
+    public function rename(Entry $entry, string $newRdn, bool $removeOldRdn = true): static
     {
         $con = $this->getConnectionResource();
 
         if (!@ldap_rename($con, $entry->getDn(), $newRdn, '', $removeOldRdn)) {
-            throw new LdapException(sprintf('Could not rename entry "%s" to "%s": ', $entry->getDn(), $newRdn).ldap_error($con), ldap_errno($con));
+            throw new LdapException(\sprintf('Could not rename entry "%s" to "%s": ', $entry->getDn(), $newRdn).ldap_error($con), ldap_errno($con));
         }
 
         return $this;
@@ -131,13 +131,13 @@ class EntryManager implements EntryManagerInterface
      * @throws NotBoundException if the connection has not been previously bound
      * @throws LdapException     if an error is thrown during the rename operation
      */
-    public function move(Entry $entry, string $newParent)
+    public function move(Entry $entry, string $newParent): static
     {
         $rdn = $this->parseRdnFromEntry($entry);
         $con = $this->getConnectionResource();
         // deleteOldRdn does not matter here, since the Rdn will not be changing in the move.
         if (!@ldap_rename($con, $entry->getDn(), $rdn, $newParent, true)) {
-            throw new LdapException(sprintf('Could not move entry "%s" to "%s": ', $entry->getDn(), $newParent).ldap_error($con), ldap_errno($con));
+            throw new LdapException(\sprintf('Could not move entry "%s" to "%s": ', $entry->getDn(), $newParent).ldap_error($con), ldap_errno($con));
         }
 
         return $this;
@@ -163,7 +163,7 @@ class EntryManager implements EntryManagerInterface
      *
      * @throws UpdateOperationException in case of an error
      */
-    public function applyOperations(string $dn, iterable $operations)
+    public function applyOperations(string $dn, iterable $operations): static
     {
         $operationsMapped = [];
         foreach ($operations as $modification) {
@@ -172,7 +172,7 @@ class EntryManager implements EntryManagerInterface
 
         $con = $this->getConnectionResource();
         if (!@ldap_modify_batch($con, $dn, $operationsMapped)) {
-            throw new UpdateOperationException(sprintf('Error executing UpdateOperation on "%s": ', $dn).ldap_error($con), ldap_errno($con));
+            throw new UpdateOperationException(\sprintf('Error executing UpdateOperation on "%s": ', $dn).ldap_error($con), ldap_errno($con));
         }
 
         return $this;
@@ -181,7 +181,7 @@ class EntryManager implements EntryManagerInterface
     private function parseRdnFromEntry(Entry $entry): string
     {
         if (!preg_match('/(^[^,\\\\]*(?:\\\\.[^,\\\\]*)*),/', $entry->getDn(), $matches)) {
-            throw new LdapException(sprintf('Entry "%s" malformed, could not parse RDN.', $entry->getDn()));
+            throw new LdapException(\sprintf('Entry "%s" malformed, could not parse RDN.', $entry->getDn()));
         }
 
         return $matches[1];

@@ -1,6 +1,21 @@
 CHANGELOG
 =========
 
+7.3
+---
+
+ * Add support for pre-compressing assets with Brotli, Zstandard, Zopfli, and gzip
+
+7.2
+---
+
+ * Shorten the public digest of mapped assets to 7 characters
+
+7.1
+---
+
+ * Deprecate `ImportMapConfigReader::splitPackageNameAndFilePath()`, use `ImportMapEntry::splitPackageNameAndFilePath()` instead
+
 6.4
 ---
 

@@ -20,15 +20,11 @@ class IntlTest extends TestCase
 
     protected function setUp(): void
     {
-        parent::setUp();
-
         $this->defaultLocale = \Locale::getDefault();
     }
 
     protected function tearDown(): void
     {
-        parent::tearDown();
-
         \Locale::setDefault($this->defaultLocale);
     }
 

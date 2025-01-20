@@ -29,47 +29,38 @@ class FrozenParameterBag extends ParameterBag
     public function __construct(
         array $parameters = [],
         protected array $deprecatedParameters = [],
+        protected array $nonEmptyParameters = [],
     ) {
         $this->parameters = $parameters;
         $this->resolved = true;
     }
 
-    /**
-     * @return never
-     */
-    public function clear()
+    public function clear(): never
     {
         throw new LogicException('Impossible to call clear() on a frozen ParameterBag.');
     }
 
-    /**
-     * @return never
-     */
-    public function add(array $parameters)
+    public function add(array $parameters): never
     {
         throw new LogicException('Impossible to call add() on a frozen ParameterBag.');
     }
 
-    /**
-     * @return never
-     */
-    public function set(string $name, array|bool|string|int|float|\UnitEnum|null $value)
+    public function set(string $name, array|bool|string|int|float|\UnitEnum|null $value): never
     {
         throw new LogicException('Impossible to call set() on a frozen ParameterBag.');
     }
 
-    /**
-     * @return never
-     */
-    public function deprecate(string $name, string $package, string $version, string $message = 'The parameter "%s" is deprecated.')
+    public function deprecate(string $name, string $package, string $version, string $message = 'The parameter "%s" is deprecated.'): never
     {
         throw new LogicException('Impossible to call deprecate() on a frozen ParameterBag.');
     }
 
-    /**
-     * @return never
-     */
-    public function remove(string $name)
+    public function cannotBeEmpty(string $name, string $message = 'A non-empty parameter "%s" is required.'): never
+    {
+        throw new LogicException('Impossible to call cannotBeEmpty() on a frozen ParameterBag.');
+    }
+
+    public function remove(string $name): never
     {
         throw new LogicException('Impossible to call remove() on a frozen ParameterBag.');
     }

@@ -25,11 +25,9 @@ use Symfony\Component\Messenger\Transport\TransportInterface;
  */
 class DoctrineTransportFactory implements TransportFactoryInterface
 {
-    private ConnectionRegistry $registry;
-
-    public function __construct(ConnectionRegistry $registry)
-    {
-        $this->registry = $registry;
+    public function __construct(
+        private ConnectionRegistry $registry,
+    ) {
     }
 
     /**

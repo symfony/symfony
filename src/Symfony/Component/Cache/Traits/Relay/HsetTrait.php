@@ -19,7 +19,7 @@ if (version_compare(phpversion('relay'), '0.9.0', '>=')) {
     {
         public function hset($key, ...$keys_and_vals): \Relay\Relay|false|int
         {
-            return ($this->lazyObjectState->realInstance ??= ($this->lazyObjectState->initializer)())->hset(...\func_get_args());
+            return $this->initializeLazyObject()->hset(...\func_get_args());
         }
     }
 } else {
@@ -30,7 +30,7 @@ if (version_compare(phpversion('relay'), '0.9.0', '>=')) {
     {
         public function hset($key, $mem, $val, ...$kvals): \Relay\Relay|false|int
         {
-            return ($this->lazyObjectState->realInstance ??= ($this->lazyObjectState->initializer)())->hset(...\func_get_args());
+            return $this->initializeLazyObject()->hset(...\func_get_args());
         }
     }
 }

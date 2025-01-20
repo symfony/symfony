@@ -39,7 +39,7 @@ class ContainerTest extends TestCase
      */
     public function testCamelize($id, $expected)
     {
-        $this->assertEquals($expected, Container::camelize($id), sprintf('Container::camelize("%s")', $id));
+        $this->assertEquals($expected, Container::camelize($id), \sprintf('Container::camelize("%s")', $id));
     }
 
     public static function dataForTestCamelize()
@@ -63,7 +63,7 @@ class ContainerTest extends TestCase
      */
     public function testUnderscore($id, $expected)
     {
-        $this->assertEquals($expected, Container::underscore($id), sprintf('Container::underscore("%s")', $id));
+        $this->assertEquals($expected, Container::underscore($id), \sprintf('Container::underscore("%s")', $id));
     }
 
     public static function dataForTestUnderscore()
@@ -223,8 +223,8 @@ class ContainerTest extends TestCase
         $sc->set('Foo', $foo2 = new \stdClass());
 
         $this->assertSame(['service_container', 'foo', 'Foo'], $sc->getServiceIds());
-        $this->assertSame($foo1, $sc->get('foo'), '->get() returns the service for the given id, case sensitively');
-        $this->assertSame($foo2, $sc->get('Foo'), '->get() returns the service for the given id, case sensitively');
+        $this->assertSame($foo1, $sc->get('foo'), '->get() returns the service for the given id, case-sensitively');
+        $this->assertSame($foo2, $sc->get('Foo'), '->get() returns the service for the given id, case-sensitively');
     }
 
     public function testGetThrowServiceNotFoundException()
@@ -320,7 +320,7 @@ class ContainerTest extends TestCase
     public function testReset()
     {
         $c = new Container();
-        $c->set('bar', $bar = new class() implements ResetInterface {
+        $c->set('bar', $bar = new class implements ResetInterface {
             public int $resetCounter = 0;
 
             public function reset(): void
@@ -420,7 +420,6 @@ class ContainerTest extends TestCase
         $container->compile();
 
         $r = new \ReflectionMethod($container, 'getEnv');
-        $r->setAccessible(true);
         $this->assertNull($r->invoke($container, 'FOO'));
     }
 
@@ -436,7 +435,6 @@ class ContainerTest extends TestCase
         $container->compile();
 
         $r = new \ReflectionMethod($container, 'getEnv');
-        $r->setAccessible(true);
         $this->assertNull($r->invoke($container, 'FOO'));
     }
 }

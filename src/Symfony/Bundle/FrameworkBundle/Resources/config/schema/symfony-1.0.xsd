@@ -27,12 +27,12 @@
             <xsd:element name="property-access" type="property_access" minOccurs="0" maxOccurs="1" />
             <xsd:element name="scheduler" type="scheduler" minOccurs="0" maxOccurs="1" />
             <xsd:element name="serializer" type="serializer" minOccurs="0" maxOccurs="1" />
+            <xsd:element name="type-info" type="type_info" minOccurs="0" maxOccurs="1" />
             <xsd:element name="property-info" type="property_info" minOccurs="0" maxOccurs="1" />
             <xsd:element name="cache" type="cache" minOccurs="0" maxOccurs="1" />
             <xsd:element name="workflow" type="workflow" minOccurs="0" maxOccurs="unbounded" />
             <xsd:element name="php-errors" type="php-errors" minOccurs="0" maxOccurs="1" />
-            <xsd:element name="exceptions" type="exceptions" minOccurs="0" maxOccurs="1" />
-            <xsd:element name="exception" type="new-exception" minOccurs="0" maxOccurs="unbounded" />
+            <xsd:element name="exception" type="exception" minOccurs="0" maxOccurs="unbounded" />
             <xsd:element name="lock" type="lock" minOccurs="0" maxOccurs="1" />
             <xsd:element name="semaphore" type="semaphore" minOccurs="0" maxOccurs="1" />
             <xsd:element name="messenger" type="messenger" minOccurs="0" maxOccurs="1" />
@@ -46,6 +46,7 @@
             <xsd:element name="enabled-locale" type="xsd:string" minOccurs="0" maxOccurs="unbounded" />
             <xsd:element name="webhook" type="webhook" minOccurs="0" maxOccurs="1" />
             <xsd:element name="remote-event" type="remote-event" minOccurs="0" maxOccurs="1" />
+            <xsd:element name="json-encoder" type="json-encoder" minOccurs="0" maxOccurs="1" />
         </xsd:choice>
 
         <xsd:attribute name="http-method-override" type="xsd:boolean" />
@@ -68,16 +69,28 @@
             <xsd:element name="csrf-protection" type="form_csrf_protection" minOccurs="0" maxOccurs="1" />
         </xsd:all>
         <xsd:attribute name="enabled" type="xsd:boolean" />
-        <xsd:attribute name="legacy-error-messages" type="xsd:boolean" />
     </xsd:complexType>
 
     <xsd:complexType name="form_csrf_protection">
+        <xsd:sequence>
+            <xsd:element name="field-attr" type="field_attr" minOccurs="0" maxOccurs="unbounded" />
+        </xsd:sequence>
         <xsd:attribute name="enabled" type="xsd:boolean" />
+        <xsd:attribute name="token-id" type="xsd:string" />
         <xsd:attribute name="field-name" type="xsd:string" />
     </xsd:complexType>
 
+    <xsd:complexType name="field_attr">
+        <xsd:attribute name="name" type="xsd:string" use="required"/>
+    </xsd:complexType>
+
     <xsd:complexType name="csrf_protection">
+        <xsd:sequence>
+            <xsd:element name="stateless-token-id" type="xsd:string" minOccurs="0" maxOccurs="unbounded" />
+        </xsd:sequence>
         <xsd:attribute name="enabled" type="xsd:boolean" />
+        <xsd:attribute name="check-header" type="xsd:string" />
+        <xsd:attribute name="cookie-name" type="xsd:string" />
     </xsd:complexType>
 
     <xsd:complexType name="esi">
@@ -194,6 +207,7 @@
             <xsd:element name="excluded-pattern" type="xsd:string" minOccurs="0" maxOccurs="unbounded" />
             <xsd:element name="extension" type="asset_mapper_extension" minOccurs="0" maxOccurs="unbounded" />
             <xsd:element name="importmap-script-attribute" type="asset_mapper_attribute" minOccurs="0" maxOccurs="unbounded" />
+            <xsd:element name="precompress" type="asset_mapper_precompress" minOccurs="0" maxOccurs="1" />
         </xsd:sequence>
         <xsd:attribute name="enabled" type="xsd:boolean" />
         <xsd:attribute name="exclude-dotfiles" type="xsd:boolean" />
@@ -217,6 +231,16 @@
     <xsd:complexType name="asset_mapper_attribute" mixed="true">
         <xsd:attribute name="key" type="xsd:string" use="required" />
     </xsd:complexType>
+
+    <xsd:complexType name="asset_mapper_precompress">
+        <xsd:sequence>
+            <xsd:element name="format" type="xsd:string" minOccurs="0" maxOccurs="unbounded" />
+            <xsd:element name="extension" type="xsd:string" minOccurs="0" maxOccurs="unbounded" />
+        </xsd:sequence>
+
+        <xsd:attribute name="enabled" type="xsd:boolean" />
+    </xsd:complexType>
+
 
     <xsd:simpleType name="missing-import-mode">
         <xsd:restriction base="xsd:string">
@@ -270,7 +294,6 @@
 
         <xsd:attribute name="enabled" type="xsd:boolean" />
         <xsd:attribute name="cache" type="xsd:string" />
-        <xsd:attribute name="enable-annotations" type="xsd:boolean" />
         <xsd:attribute name="enable-attributes" type="xsd:boolean" />
         <xsd:attribute name="static-method" type="xsd:boolean" />
         <xsd:attribute name="translation-domain" type="xsd:string" />
@@ -322,17 +345,32 @@
         <xsd:choice minOccurs="0" maxOccurs="unbounded">
             <xsd:element name="mapping" type="file_mapping" />
             <xsd:element name="default-context" type="metadata" minOccurs="0" maxOccurs="1" />
+            <xsd:element name="named-serializer" type="named_serializer_options" />
         </xsd:choice>
         <xsd:attribute name="enabled" type="xsd:boolean" />
-        <xsd:attribute name="enable-annotations" type="xsd:boolean" />
         <xsd:attribute name="enable-attributes" type="xsd:boolean" />
         <xsd:attribute name="name-converter" type="xsd:string" />
         <xsd:attribute name="circular-reference-handler" type="xsd:string" />
         <xsd:attribute name="max-depth-handler" type="xsd:string" />
     </xsd:complexType>
 
+    <xsd:complexType name="type_info">
+        <xsd:attribute name="enabled" type="xsd:boolean" />
+    </xsd:complexType>
+
+    <xsd:complexType name="named_serializer_options">
+        <xsd:sequence>
+            <xsd:element name="default-context" type="metadata" minOccurs="0" maxOccurs="1" />
+        </xsd:sequence>
+        <xsd:attribute name="name" type="xsd:string" />
+        <xsd:attribute name="name-converter" type="xsd:string" />
+        <xsd:attribute name="include-built-in-normalizers" type="xsd:boolean" />
+        <xsd:attribute name="include-built-in-encoders" type="xsd:boolean" />
+    </xsd:complexType>
+
     <xsd:complexType name="property_info">
         <xsd:attribute name="enabled" type="xsd:boolean" />
+        <xsd:attribute name="with-constructor-extractor" type="xsd:boolean" />
     </xsd:complexType>
 
     <xsd:complexType name="cache">
@@ -415,31 +453,10 @@
         <xsd:attribute name="enabled" type="xsd:boolean" />
     </xsd:complexType>
 
-    <xsd:complexType name="exceptions">
-        <xsd:sequence>
-            <xsd:element name="exception" type="old-exception" minOccurs="0" maxOccurs="unbounded" />
-        </xsd:sequence>
-    </xsd:complexType>
-
-    <xsd:complexType name="exception" abstract="true">
+    <xsd:complexType name="exception">
         <xsd:attribute name="log-level" type="xsd:string" />
         <xsd:attribute name="status-code" type="xsd:integer" />
-    </xsd:complexType>
-
-    <xsd:complexType name="old-exception">
-        <xsd:complexContent>
-            <xsd:extension base="exception">
-                <xsd:attribute name="name" type="xsd:string" use="required" />
-            </xsd:extension>
-        </xsd:complexContent>
-    </xsd:complexType>
-
-    <xsd:complexType name="new-exception">
-        <xsd:complexContent>
-            <xsd:extension base="exception">
-                <xsd:attribute name="class" type="xsd:string" use="required" />
-            </xsd:extension>
-        </xsd:complexContent>
+        <xsd:attribute name="class" type="xsd:string" use="required" />
     </xsd:complexType>
 
     <xsd:complexType name="marking_store">
@@ -589,7 +606,6 @@
         <xsd:attribute name="default-bus" type="xsd:string" />
         <xsd:attribute name="enabled" type="xsd:boolean" />
         <xsd:attribute name="failure-transport" type="xsd:string" />
-        <xsd:attribute name="reset-on-message" type="xsd:boolean" />
     </xsd:complexType>
 
     <xsd:complexType name="messenger_serializer">
@@ -635,6 +651,7 @@
         <xsd:attribute name="delay" type="xsd:integer" />
         <xsd:attribute name="multiplier" type="xsd:float" />
         <xsd:attribute name="max-delay" type="xsd:float" />
+        <xsd:attribute name="jitter" type="xsd:float" />
     </xsd:complexType>
 
     <xsd:complexType name="messenger_bus">
@@ -686,6 +703,7 @@
         <xsd:attribute name="local-pk" type="xsd:string" />
         <xsd:attribute name="passphrase" type="xsd:string" />
         <xsd:attribute name="ciphers" type="xsd:string" />
+        <xsd:attribute name="rate-limiter" type="xsd:string" />
     </xsd:complexType>
 
     <xsd:complexType name="http_client_scope_options" mixed="true">
@@ -716,6 +734,7 @@
         <xsd:attribute name="local-pk" type="xsd:string" />
         <xsd:attribute name="passphrase" type="xsd:string" />
         <xsd:attribute name="ciphers" type="xsd:string" />
+        <xsd:attribute name="rate-limiter" type="xsd:string" />
     </xsd:complexType>
 
     <xsd:complexType name="fingerprint">
@@ -782,6 +801,7 @@
         <xsd:sequence>
             <xsd:element name="sender" type="xsd:string" minOccurs="0" maxOccurs="1" />
             <xsd:element name="recipient" type="xsd:string" minOccurs="0" maxOccurs="unbounded" />
+            <xsd:element name="allowed-recipient" type="xsd:string" minOccurs="0" maxOccurs="unbounded" />
         </xsd:sequence>
     </xsd:complexType>
 
@@ -985,4 +1005,9 @@
     <xsd:complexType name="remote-event">
         <xsd:attribute name="enabled" type="xsd:boolean" />
     </xsd:complexType>
+
+    <xsd:complexType name="json-encoder">
+        <xsd:attribute name="enabled" type="xsd:boolean" />
+    </xsd:complexType>
+
 </xsd:schema>

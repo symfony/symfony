@@ -1,6 +1,28 @@
 CHANGELOG
 =========
 
+7.3
+---
+
+ * Add `UserAuthorizationChecker::isGrantedForUser()` to test user authorization without relying on the session.
+   For example, users not currently logged in, or while processing a message from a message queue.
+ * Add `OfflineTokenInterface` to mark tokens that do not represent the currently logged-in user
+
+7.2
+---
+
+ * Make `AccessDecisionStrategyTestCase` compatible with PHPUnit 10+
+ * Add `$token` argument to `UserCheckerInterface::checkPostAuth()`
+ * Deprecate argument `$secret` of `RememberMeToken`
+ * Deprecate returning an empty string in `UserInterface::getUserIdentifier()`
+
+7.0
+---
+
+ * Remove the `Security` class, use `Symfony\Bundle\SecurityBundle\Security` instead
+ * Require explicit argument when calling `TokenStorage::setToken()`
+ * Change argument `$lastUsed` of `TokenProviderInterface::updateToken()` to accept `DateTimeInterface`
+
 6.4
 ---
 

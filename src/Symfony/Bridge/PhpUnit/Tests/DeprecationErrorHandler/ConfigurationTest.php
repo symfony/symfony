@@ -463,6 +463,9 @@ class ConfigurationTest extends TestCase
         $this->assertEquals(json_encode($expected, \JSON_PRETTY_PRINT | \JSON_UNESCAPED_SLASHES), file_get_contents($filename));
     }
 
+    /**
+     * @requires PHPUnit < 10
+     */
     public function testBaselineGenerationWithDeprecationTriggeredByDebugClassLoader()
     {
         $filename = $this->createFile();
@@ -474,7 +477,7 @@ class ConfigurationTest extends TestCase
         $trace[2] = [
             'class' => DebugClassLoader::class,
             'function' => 'testBaselineGenerationWithDeprecationTriggeredByDebugClassLoader',
-            'args' => [self::class]
+            'args' => [self::class],
         ];
 
         $deprecation = new Deprecation('Deprecation by debug class loader', $trace, '');

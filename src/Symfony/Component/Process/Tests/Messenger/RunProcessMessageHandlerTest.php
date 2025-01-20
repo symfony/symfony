@@ -33,7 +33,11 @@ class RunProcessMessageHandlerTest extends TestCase
             (new RunProcessMessageHandler())(new RunProcessMessage(['invalid']));
         } catch (RunProcessFailedException $e) {
             $this->assertSame(['invalid'], $e->context->message->command);
-            $this->assertSame('\\' === \DIRECTORY_SEPARATOR ? 1 : 127, $e->context->exitCode);
+            $this->assertContains(
+                $e->context->exitCode,
+                [null, '\\' === \DIRECTORY_SEPARATOR ? 1 : 127],
+                'Exit code should be 1 on Windows, 127 on other systems, or null',
+            );
 
             return;
         }

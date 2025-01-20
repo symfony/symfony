@@ -23,13 +23,10 @@ use Twig\Environment;
  */
 final class WrappedTemplatedEmail
 {
-    private Environment $twig;
-    private TemplatedEmail $message;
-
-    public function __construct(Environment $twig, TemplatedEmail $message)
-    {
-        $this->twig = $twig;
-        $this->message = $message;
+    public function __construct(
+        private Environment $twig,
+        private TemplatedEmail $message,
+    ) {
     }
 
     public function toName(): string

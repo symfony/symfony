@@ -19,13 +19,10 @@ use Symfony\Component\Stopwatch\Stopwatch;
  */
 class TraceableControllerResolver implements ControllerResolverInterface
 {
-    private ControllerResolverInterface $resolver;
-    private Stopwatch $stopwatch;
-
-    public function __construct(ControllerResolverInterface $resolver, Stopwatch $stopwatch)
-    {
-        $this->resolver = $resolver;
-        $this->stopwatch = $stopwatch;
+    public function __construct(
+        private ControllerResolverInterface $resolver,
+        private Stopwatch $stopwatch,
+    ) {
     }
 
     public function getController(Request $request): callable|false

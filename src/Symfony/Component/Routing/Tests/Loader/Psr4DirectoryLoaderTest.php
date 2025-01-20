@@ -15,6 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Config\Loader\DelegatingLoader;
 use Symfony\Component\Config\Loader\LoaderResolver;
+use Symfony\Component\Routing\Exception\InvalidArgumentException;
 use Symfony\Component\Routing\Loader\AttributeClassLoader;
 use Symfony\Component\Routing\Loader\Psr4DirectoryLoader;
 use Symfony\Component\Routing\Route;
@@ -90,6 +91,34 @@ class Psr4DirectoryLoaderTest extends TestCase
         ];
     }
 
+    /**
+     * @dataProvider provideInvalidPsr4Namespaces
+     */
+    public function testInvalidPsr4Namespace(string $namespace, string $expectedExceptionMessage)
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage($expectedExceptionMessage);
+
+        $this->getLoader()->load(
+            ['path' => 'Psr4Controllers', 'namespace' => $namespace],
+            'attribute'
+        );
+    }
+
+    public static function provideInvalidPsr4Namespaces(): array
+    {
+        return [
+            'slash instead of back-slash' => [
+                'namespace' => 'App\Application/Controllers',
+                'expectedExceptionMessage' => 'Namespace "App\Application/Controllers" is not a valid PSR-4 prefix.',
+            ],
+            'invalid namespace' => [
+                'namespace' => 'App\Contro llers',
+                'expectedExceptionMessage' => 'Namespace "App\Contro llers" is not a valid PSR-4 prefix.',
+            ],
+        ];
+    }
+
     private function loadPsr4Controllers(): RouteCollection
     {
         return $this->getLoader()->load(
@@ -105,8 +134,8 @@ class Psr4DirectoryLoaderTest extends TestCase
         return new DelegatingLoader(
             new LoaderResolver([
                 new Psr4DirectoryLoader($locator),
-                new class() extends AttributeClassLoader {
-                    protected function configureRoute(Route $route, \ReflectionClass $class, \ReflectionMethod $method, object $annot): void
+                new class extends AttributeClassLoader {
+                    protected function configureRoute(Route $route, \ReflectionClass $class, \ReflectionMethod $method, object $attr): void
                     {
                         $route->setDefault('_controller', $class->getName().'::'.$method->getName());
                     }

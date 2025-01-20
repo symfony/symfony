@@ -12,6 +12,7 @@
 namespace Symfony\Component\Messenger\Bridge\Redis\Transport;
 
 use Symfony\Component\Messenger\Envelope;
+use Symfony\Component\Messenger\Transport\Receiver\KeepaliveReceiverInterface;
 use Symfony\Component\Messenger\Transport\Receiver\MessageCountAwareInterface;
 use Symfony\Component\Messenger\Transport\Serialization\PhpSerializer;
 use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
@@ -22,16 +23,16 @@ use Symfony\Component\Messenger\Transport\TransportInterface;
  * @author Alexander Schranz <alexander@sulu.io>
  * @author Antoine Bluchet <soyuka@gmail.com>
  */
-class RedisTransport implements TransportInterface, SetupableTransportInterface, MessageCountAwareInterface
+class RedisTransport implements TransportInterface, KeepaliveReceiverInterface, SetupableTransportInterface, MessageCountAwareInterface
 {
     private SerializerInterface $serializer;
-    private Connection $connection;
     private RedisReceiver $receiver;
     private RedisSender $sender;
 
-    public function __construct(Connection $connection, ?SerializerInterface $serializer = null)
-    {
-        $this->connection = $connection;
+    public function __construct(
+        private Connection $connection,
+        ?SerializerInterface $serializer = null,
+    ) {
         $this->serializer = $serializer ?? new PhpSerializer();
     }
 
@@ -48,6 +49,11 @@ class RedisTransport implements TransportInterface, SetupableTransportInterface,
     public function reject(Envelope $envelope): void
     {
         $this->getReceiver()->reject($envelope);
+    }
+
+    public function keepalive(Envelope $envelope, ?int $seconds = null): void
+    {
+        $this->getReceiver()->keepalive($envelope, $seconds);
     }
 
     public function send(Envelope $envelope): Envelope

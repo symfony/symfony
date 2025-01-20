@@ -38,14 +38,10 @@ use Symfony\Component\PasswordHasher\LegacyPasswordHasherInterface;
 #[AsCommand(name: 'security:hash-password', description: 'Hash a user password')]
 class UserPasswordHashCommand extends Command
 {
-    private PasswordHasherFactoryInterface $hasherFactory;
-    private array $userClasses;
-
-    public function __construct(PasswordHasherFactoryInterface $hasherFactory, array $userClasses = [])
-    {
-        $this->hasherFactory = $hasherFactory;
-        $this->userClasses = $userClasses;
-
+    public function __construct(
+        private PasswordHasherFactoryInterface $hasherFactory,
+        private array $userClasses = [],
+    ) {
         parent::__construct();
     }
 
@@ -152,7 +148,7 @@ EOF
         $io->table(['Key', 'Value'], $rows);
 
         if (!$emptySalt) {
-            $errorIo->note(sprintf('Make sure that your salt storage field fits the salt length: %s chars', \strlen($salt)));
+            $errorIo->note(\sprintf('Make sure that your salt storage field fits the salt length: %s chars', \strlen($salt)));
         } elseif ($saltlessWithoutEmptySalt) {
             $errorIo->note('Self-salting hasher used: the hasher generated its own built-in salt.');
         }
@@ -166,8 +162,6 @@ EOF
     {
         if ($input->mustSuggestArgumentValuesFor('user-class')) {
             $suggestions->suggestValues($this->userClasses);
-
-            return;
         }
     }
 

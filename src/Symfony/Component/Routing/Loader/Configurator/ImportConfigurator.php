@@ -22,11 +22,10 @@ class ImportConfigurator
     use Traits\PrefixTrait;
     use Traits\RouteTrait;
 
-    private RouteCollection $parent;
-
-    public function __construct(RouteCollection $parent, RouteCollection $route)
-    {
-        $this->parent = $parent;
+    public function __construct(
+        private RouteCollection $parent,
+        RouteCollection $route,
+    ) {
         $this->route = $route;
     }
 
@@ -35,10 +34,7 @@ class ImportConfigurator
         throw new \BadMethodCallException('Cannot serialize '.__CLASS__);
     }
 
-    /**
-     * @return void
-     */
-    public function __wakeup()
+    public function __wakeup(): void
     {
         throw new \BadMethodCallException('Cannot unserialize '.__CLASS__);
     }

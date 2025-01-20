@@ -297,6 +297,41 @@ final class ConnectionTest extends TestCase
         $this->assertSame($id, (int) $returnedId);
     }
 
+    public function testSendWithPriority()
+    {
+        $tube = 'xyz';
+
+        $body = 'foo';
+        $headers = ['test' => 'bar'];
+        $delay = 1000;
+        $priority = 2;
+        $expectedDelay = $delay / 1000;
+
+        $id = 110;
+
+        $client = $this->createMock(PheanstalkInterface::class);
+        $client->expects($this->once())->method('useTube')->with($tube)->willReturn($client);
+        $client->expects($this->once())->method('put')->with(
+            $this->callback(function (string $data) use ($body, $headers): bool {
+                $expectedMessage = json_encode([
+                    'body' => $body,
+                    'headers' => $headers,
+                ]);
+
+                return $expectedMessage === $data;
+            }),
+            $priority,
+            $expectedDelay,
+            90
+        )->willReturn(new Job($id, 'foobar'));
+
+        $connection = new Connection(['tube_name' => $tube], $client);
+
+        $returnedId = $connection->send($body, $headers, $delay, $priority);
+
+        $this->assertSame($id, (int) $returnedId);
+    }
+
     public function testSendWhenABeanstalkdExceptionOccurs()
     {
         $tube = 'xyz';
@@ -329,6 +364,39 @@ final class ConnectionTest extends TestCase
         $this->expectExceptionObject(new TransportException($exception->getMessage(), 0, $exception));
 
         $connection->send($body, $headers, $delay);
+    }
+
+    public function testKeepalive()
+    {
+        $id = 123456;
+
+        $tube = 'baz';
+
+        $client = $this->createMock(PheanstalkInterface::class);
+        $client->expects($this->once())->method('useTube')->with($tube)->willReturn($client);
+        $client->expects($this->once())->method('touch')->with($this->callback(fn (JobId $jobId): bool => $jobId->getId() === $id));
+
+        $connection = new Connection(['tube_name' => $tube], $client);
+
+        $connection->keepalive((string) $id);
+    }
+
+    public function testKeepaliveWhenABeanstalkdExceptionOccurs()
+    {
+        $id = 123456;
+
+        $tube = 'baz123';
+
+        $exception = new ServerException('baz error');
+
+        $client = $this->createMock(PheanstalkInterface::class);
+        $client->expects($this->once())->method('useTube')->with($tube)->willReturn($client);
+        $client->expects($this->once())->method('touch')->with($this->callback(fn (JobId $jobId): bool => $jobId->getId() === $id))->willThrowException($exception);
+
+        $connection = new Connection(['tube_name' => $tube], $client);
+
+        $this->expectExceptionObject(new TransportException($exception->getMessage(), 0, $exception));
+        $connection->keepalive((string) $id);
     }
 
     public function testSendWithRoundedDelay()

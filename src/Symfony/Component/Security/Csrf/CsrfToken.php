@@ -18,12 +18,12 @@ namespace Symfony\Component\Security\Csrf;
  */
 class CsrfToken
 {
-    private string $id;
     private string $value;
 
-    public function __construct(string $id, #[\SensitiveParameter] ?string $value)
-    {
-        $this->id = $id;
+    public function __construct(
+        private string $id,
+        #[\SensitiveParameter] ?string $value,
+    ) {
         $this->value = $value ?? '';
     }
 

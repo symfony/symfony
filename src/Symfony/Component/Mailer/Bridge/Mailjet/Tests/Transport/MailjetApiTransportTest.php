@@ -257,7 +257,7 @@ class MailjetApiTransportTest extends TestCase
             ->text('foobar');
 
         $this->expectExceptionObject(
-            new HttpTransportException(sprintf('Unable to send an email: "%s" malformed api response.', $json), $response)
+            new HttpTransportException(\sprintf('Unable to send an email: "%s" malformed api response.', $json), $response)
         );
 
         $transport->send($email);

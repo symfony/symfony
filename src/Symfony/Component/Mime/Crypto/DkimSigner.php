@@ -31,23 +31,23 @@ final class DkimSigner
     public const ALGO_ED25519 = 'ed25519-sha256'; // RFC 8463
 
     private \OpenSSLAsymmetricKey $key;
-    private string $domainName;
-    private string $selector;
-    private array $defaultOptions;
 
     /**
      * @param string $pk         The private key as a string or the path to the file containing the private key, should be prefixed with file:// (in PEM format)
      * @param string $passphrase A passphrase of the private key (if any)
      */
-    public function __construct(string $pk, string $domainName, string $selector, array $defaultOptions = [], string $passphrase = '')
-    {
+    public function __construct(
+        string $pk,
+        private string $domainName,
+        private string $selector,
+        private array $defaultOptions = [],
+        string $passphrase = '',
+    ) {
         if (!\extension_loaded('openssl')) {
             throw new \LogicException('PHP extension "openssl" is required to use DKIM.');
         }
         $this->key = openssl_pkey_get_private($pk, $passphrase) ?: throw new InvalidArgumentException('Unable to load DKIM private key: '.openssl_error_string());
-        $this->domainName = $domainName;
-        $this->selector = $selector;
-        $this->defaultOptions = $defaultOptions + [
+        $this->defaultOptions += [
             'algorithm' => self::ALGO_SHA256,
             'signature_expiration_delay' => 0,
             'body_max_length' => \PHP_INT_MAX,
@@ -62,7 +62,7 @@ final class DkimSigner
     {
         $options += $this->defaultOptions;
         if (!\in_array($options['algorithm'], [self::ALGO_SHA256, self::ALGO_ED25519], true)) {
-            throw new InvalidArgumentException(sprintf('Invalid DKIM signing algorithm "%s".', $options['algorithm']));
+            throw new InvalidArgumentException(\sprintf('Invalid DKIM signing algorithm "%s".', $options['algorithm']));
         }
         $headersToIgnore['return-path'] = true;
         $headersToIgnore['x-transport'] = true;
@@ -119,7 +119,7 @@ final class DkimSigner
                 throw new RuntimeException('Unable to sign DKIM hash: '.openssl_error_string());
             }
         } else {
-            throw new \RuntimeException(sprintf('The "%s" DKIM signing algorithm is not supported yet.', self::ALGO_ED25519));
+            throw new \RuntimeException(\sprintf('The "%s" DKIM signing algorithm is not supported yet.', self::ALGO_ED25519));
         }
         $header->setValue($value.' b='.trim(chunk_split(base64_encode($signature), 73, ' ')));
         $headers->add($header);

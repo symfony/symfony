@@ -17,7 +17,7 @@ use Symfony\Component\HttpFoundation\Session\Storage\Handler\IdentityMarshaller;
 /**
  * @author Ahmed TAILOULOUTE <ahmed.tailouloute@gmail.com>
  */
-class IdentityMarshallerTest extends Testcase
+class IdentityMarshallerTest extends TestCase
 {
     public function testMarshall()
     {

@@ -19,17 +19,17 @@ if (version_compare(phpversion('redis'), '6.1.0-dev', '>')) {
     {
         public function getex($key, $options = []): \RedisCluster|string|false
         {
-            return ($this->lazyObjectState->realInstance ??= ($this->lazyObjectState->initializer)())->getex(...\func_get_args());
+            return $this->initializeLazyObject()->getex(...\func_get_args());
         }
 
         public function publish($channel, $message): \RedisCluster|bool|int
         {
-            return ($this->lazyObjectState->realInstance ??= ($this->lazyObjectState->initializer)())->publish(...\func_get_args());
+            return $this->initializeLazyObject()->publish(...\func_get_args());
         }
 
         public function waitaof($key_or_address, $numlocal, $numreplicas, $timeout): \RedisCluster|array|false
         {
-            return ($this->lazyObjectState->realInstance ??= ($this->lazyObjectState->initializer)())->waitaof(...\func_get_args());
+            return $this->initializeLazyObject()->waitaof(...\func_get_args());
         }
     }
 } else {
@@ -40,7 +40,7 @@ if (version_compare(phpversion('redis'), '6.1.0-dev', '>')) {
     {
         public function publish($channel, $message): \RedisCluster|bool
         {
-            return ($this->lazyObjectState->realInstance ??= ($this->lazyObjectState->initializer)())->publish(...\func_get_args());
+            return $this->initializeLazyObject()->publish(...\func_get_args());
         }
     }
 }

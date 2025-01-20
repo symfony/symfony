@@ -24,10 +24,7 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 class LdapFactory implements UserProviderFactoryInterface
 {
-    /**
-     * @return void
-     */
-    public function create(ContainerBuilder $container, string $id, array $config)
+    public function create(ContainerBuilder $container, string $id, array $config): void
     {
         $container
             ->setDefinition($id, new ChildDefinition('security.user.provider.ldap'))
@@ -43,18 +40,12 @@ class LdapFactory implements UserProviderFactoryInterface
         ;
     }
 
-    /**
-     * @return string
-     */
-    public function getKey()
+    public function getKey(): string
     {
         return 'ldap';
     }
 
-    /**
-     * @return void
-     */
-    public function addConfiguration(NodeDefinition $node)
+    public function addConfiguration(NodeDefinition $node): void
     {
         $node
             ->fixXmlConfig('extra_field')
@@ -73,7 +64,7 @@ class LdapFactory implements UserProviderFactoryInterface
                     ->prototype('scalar')->end()
                 ->end()
                 ->scalarNode('uid_key')->defaultValue('sAMAccountName')->end()
-                ->scalarNode('filter')->defaultValue('({uid_key}={username})')->end()
+                ->scalarNode('filter')->defaultValue('({uid_key}={user_identifier})')->end()
                 ->scalarNode('password_attribute')->defaultNull()->end()
             ->end()
         ;

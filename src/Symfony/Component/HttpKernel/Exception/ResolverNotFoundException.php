@@ -18,7 +18,7 @@ class ResolverNotFoundException extends \RuntimeException
      */
     public function __construct(string $name, array $alternatives = [])
     {
-        $msg = sprintf('You have requested a non-existent resolver "%s".', $name);
+        $msg = \sprintf('You have requested a non-existent resolver "%s".', $name);
         if ($alternatives) {
             if (1 === \count($alternatives)) {
                 $msg .= ' Did you mean this: "';

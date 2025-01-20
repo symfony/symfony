@@ -20,7 +20,7 @@ use Symfony\Component\Validator\Validation;
  */
 class FormValidatorPerformanceTest extends FormPerformanceTestCase
 {
-    protected function getExtensions()
+    protected function getExtensions(): array
     {
         return [
             new ValidatorExtension(Validation::createValidator(), false),

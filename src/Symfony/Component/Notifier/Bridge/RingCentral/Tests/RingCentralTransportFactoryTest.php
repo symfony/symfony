@@ -12,10 +12,15 @@
 namespace Symfony\Component\Notifier\Bridge\RingCentral\Tests;
 
 use Symfony\Component\Notifier\Bridge\RingCentral\RingCentralTransportFactory;
-use Symfony\Component\Notifier\Test\TransportFactoryTestCase;
+use Symfony\Component\Notifier\Test\AbstractTransportFactoryTestCase;
+use Symfony\Component\Notifier\Test\IncompleteDsnTestTrait;
+use Symfony\Component\Notifier\Test\MissingRequiredOptionTestTrait;
 
-final class RingCentralTransportFactoryTest extends TransportFactoryTestCase
+final class RingCentralTransportFactoryTest extends AbstractTransportFactoryTestCase
 {
+    use IncompleteDsnTestTrait;
+    use MissingRequiredOptionTestTrait;
+
     public function createFactory(): RingCentralTransportFactory
     {
         return new RingCentralTransportFactory();

@@ -50,7 +50,7 @@ class ValidatorTypeGuesserTest extends TestCase
     /**
      * @var MetadataFactoryInterface
      */
-    private \Symfony\Component\Validator\Tests\Fixtures\FakeMetadataFactory $metadataFactory;
+    private FakeMetadataFactory $metadataFactory;
 
     protected function setUp(): void
     {

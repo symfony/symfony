@@ -32,8 +32,6 @@ final class CurlResponse implements ResponseInterface, StreamableInterface
     }
     use TransportResponseTrait;
 
-    private CurlClientState $multi;
-
     /**
      * @var resource
      */
@@ -42,10 +40,16 @@ final class CurlResponse implements ResponseInterface, StreamableInterface
     /**
      * @internal
      */
-    public function __construct(CurlClientState $multi, \CurlHandle|string $ch, ?array $options = null, ?LoggerInterface $logger = null, string $method = 'GET', ?callable $resolveRedirect = null, ?int $curlVersion = null, ?string $originalUrl = null)
-    {
-        $this->multi = $multi;
-
+    public function __construct(
+        private CurlClientState $multi,
+        \CurlHandle|string $ch,
+        ?array $options = null,
+        ?LoggerInterface $logger = null,
+        string $method = 'GET',
+        ?callable $resolveRedirect = null,
+        ?int $curlVersion = null,
+        ?string $originalUrl = null,
+    ) {
         if ($ch instanceof \CurlHandle) {
             $this->handle = $ch;
             $this->debugBuffer = fopen('php://temp', 'w+');
@@ -139,7 +143,7 @@ final class CurlResponse implements ResponseInterface, StreamableInterface
         curl_setopt($ch, \CURLOPT_WRITEFUNCTION, static function ($ch, string $data) use ($multi, $id): int {
             if ('H' === (curl_getinfo($ch, \CURLINFO_PRIVATE)[0] ?? null)) {
                 $multi->handlesActivity[$id][] = null;
-                $multi->handlesActivity[$id][] = new TransportException(sprintf('Unsupported protocol for "%s"', curl_getinfo($ch, \CURLINFO_EFFECTIVE_URL)));
+                $multi->handlesActivity[$id][] = new TransportException(\sprintf('Unsupported protocol for "%s"', curl_getinfo($ch, \CURLINFO_EFFECTIVE_URL)));
 
                 return 0;
             }
@@ -271,7 +275,7 @@ final class CurlResponse implements ResponseInterface, StreamableInterface
             if ($responses) {
                 $response = current($responses);
                 $multi->handlesActivity[(int) $response->handle][] = null;
-                $multi->handlesActivity[(int) $response->handle][] = new TransportException(sprintf('Userland callback cannot use the client nor the response while processing "%s".', curl_getinfo($response->handle, \CURLINFO_EFFECTIVE_URL)));
+                $multi->handlesActivity[(int) $response->handle][] = new TransportException(\sprintf('Userland callback cannot use the client nor the response while processing "%s".', curl_getinfo($response->handle, \CURLINFO_EFFECTIVE_URL)));
             }
 
             return;
@@ -447,7 +451,7 @@ final class CurlResponse implements ResponseInterface, StreamableInterface
 
             curl_setopt($ch, \CURLOPT_PRIVATE, $waitFor);
         } elseif (null !== $info['redirect_url'] && $logger) {
-            $logger->info(sprintf('Redirecting: "%s %s"', $info['http_code'], $info['redirect_url']));
+            $logger->info(\sprintf('Redirecting: "%s %s"', $info['http_code'], $info['redirect_url']));
         }
 
         $location = null;

@@ -18,17 +18,15 @@ namespace Symfony\Component\Security\Core\Role;
  */
 class RoleHierarchy implements RoleHierarchyInterface
 {
-    private array $hierarchy;
     /** @var array<string, list<string>> */
-    protected $map;
+    protected array $map;
 
     /**
      * @param array<string, list<string>> $hierarchy
      */
-    public function __construct(array $hierarchy)
-    {
-        $this->hierarchy = $hierarchy;
-
+    public function __construct(
+        private array $hierarchy,
+    ) {
         $this->buildRoleMap();
     }
 
@@ -49,10 +47,7 @@ class RoleHierarchy implements RoleHierarchyInterface
         return array_values(array_unique($reachableRoles));
     }
 
-    /**
-     * @return void
-     */
-    protected function buildRoleMap()
+    protected function buildRoleMap(): void
     {
         $this->map = [];
         foreach ($this->hierarchy as $main => $roles) {

@@ -49,7 +49,7 @@ class ImportMapRenderer
         $importMap = [];
         $modulePreloads = [];
         $cssLinks = [];
-        $polyFillPath = null;
+        $polyfillPath = null;
         foreach ($importMapData as $importName => $data) {
             $path = $data['path'];
 
@@ -60,7 +60,7 @@ class ImportMapRenderer
 
             // if this represents the polyfill, hide it from the import map
             if ($importName === $this->polyfillImportName) {
-                $polyFillPath = $path;
+                $polyfillPath = $path;
                 continue;
             }
 
@@ -80,7 +80,7 @@ class ImportMapRenderer
                 // importmap entry is a noop
                 $importMap[$importName] = 'data:application/javascript,';
             } else {
-                $importMap[$importName] = 'data:application/javascript,'.rawurlencode(sprintf('document.head.appendChild(Object.assign(document.createElement("link"),{rel:"stylesheet",href:"%s"}))', addslashes($path)));
+                $importMap[$importName] = 'data:application/javascript,'.rawurlencode(\sprintf('document.head.appendChild(Object.assign(document.createElement("link"),{rel:"stylesheet",href:"%s"}))', addslashes($path)));
             }
         }
 
@@ -95,7 +95,7 @@ class ImportMapRenderer
             $this->addWebLinkPreloads($request, $cssLinks);
         }
 
-        $scriptAttributes = $this->createAttributesString($attributes);
+        $scriptAttributes = $attributes || $this->scriptAttributes ? ' '.$this->createAttributesString($attributes) : '';
         $importMapJson = json_encode(['imports' => $importMap], \JSON_THROW_ON_ERROR | \JSON_PRETTY_PRINT | \JSON_UNESCAPED_SLASHES | \JSON_HEX_TAG);
         $output .= <<<HTML
 
@@ -104,22 +104,36 @@ class ImportMapRenderer
             </script>
             HTML;
 
-        if (false !== $this->polyfillImportName && null === $polyFillPath) {
+        if (false !== $this->polyfillImportName && null === $polyfillPath) {
             if ('es-module-shims' !== $this->polyfillImportName) {
-                throw new \InvalidArgumentException(sprintf('The JavaScript module polyfill was not found in your import map. Either disable the polyfill or run "php bin/console importmap:require "%s"" to install it.', $this->polyfillImportName));
+                throw new \InvalidArgumentException(\sprintf('The JavaScript module polyfill was not found in your import map. Either disable the polyfill or run "php bin/console importmap:require "%s"" to install it.', $this->polyfillImportName));
             }
 
             // a fallback for the default polyfill in case it's not in the importmap
-            $polyFillPath = self::DEFAULT_ES_MODULE_SHIMS_POLYFILL_URL;
+            $polyfillPath = self::DEFAULT_ES_MODULE_SHIMS_POLYFILL_URL;
         }
 
-        if ($polyFillPath) {
-            $url = $this->escapeAttributeValue($polyFillPath);
+        if ($polyfillPath) {
+            $polyfillAttributes = $attributes + $this->scriptAttributes;
+
+            // Add security attributes for the default polyfill hosted on jspm.io
+            if (self::DEFAULT_ES_MODULE_SHIMS_POLYFILL_URL === $polyfillPath) {
+                $polyfillAttributes = [
+                    'crossorigin' => 'anonymous',
+                    'integrity' => self::DEFAULT_ES_MODULE_SHIMS_POLYFILL_INTEGRITY,
+                ] + $polyfillAttributes;
+            }
 
             $output .= <<<HTML
-
-                <!-- ES Module Shims: Import maps polyfill for modules browsers without import maps support -->
-                <script async src="$url"$scriptAttributes></script>
+                <script async$scriptAttributes>
+                if (!HTMLScriptElement.supports || !HTMLScriptElement.supports('importmap')) (function () {
+                    const script = document.createElement('script');
+                    script.src = '{$this->escapeAttributeValue($polyfillPath, \ENT_NOQUOTES)}';
+                    script.setAttribute('async', 'async');
+                    {$this->createAttributesString($polyfillAttributes, "script.setAttribute('%s', '%s');", "\n    ", \ENT_NOQUOTES)}
+                    document.head.appendChild(script);
+                })();
+                </script>
                 HTML;
         }
 
@@ -142,29 +156,33 @@ class ImportMapRenderer
         return $output;
     }
 
-    private function escapeAttributeValue(string $value): string
+    private function escapeAttributeValue(string $value, int $flags = \ENT_COMPAT | \ENT_SUBSTITUTE): string
     {
-        return htmlspecialchars($value, \ENT_COMPAT | \ENT_SUBSTITUTE, $this->charset);
+        $value = htmlspecialchars($value, $flags, $this->charset);
+
+        return \ENT_NOQUOTES & $flags ? addslashes($value) : $value;
     }
 
-    private function createAttributesString(array $attributes): string
+    private function createAttributesString(array $attributes, string $pattern = '%s="%s"', string $glue = ' ', int $flags = \ENT_COMPAT | \ENT_SUBSTITUTE): string
     {
         $attributeString = '';
 
         $attributes += $this->scriptAttributes;
         if (isset($attributes['src']) || isset($attributes['type'])) {
-            throw new \InvalidArgumentException(sprintf('The "src" and "type" attributes are not allowed on the <script> tag rendered by "%s".', self::class));
+            throw new \InvalidArgumentException(\sprintf('The "src" and "type" attributes are not allowed on the <script> tag rendered by "%s".', self::class));
         }
 
         foreach ($attributes as $name => $value) {
-            $attributeString .= ' ';
-            if (true === $value) {
-                $attributeString .= $name;
-
-                continue;
+            if ('' !== $attributeString) {
+                $attributeString .= $glue;
             }
-            $attributeString .= sprintf('%s="%s"', $name, $this->escapeAttributeValue($value));
+            if (true === $value) {
+                $value = $name;
+            }
+            $attributeString .= \sprintf($pattern, $this->escapeAttributeValue($name, $flags), $this->escapeAttributeValue($value, $flags));
         }
+
+        $attributeString = preg_replace('/\b([^ =]++)="\1"/', '\1', $attributeString);
 
         return $attributeString;
     }

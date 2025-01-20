@@ -19,7 +19,7 @@ if (version_compare(phpversion('relay'), '0.9.0', '>=')) {
     {
         public function geosearch($key, $position, $shape, $unit, $options = []): \Relay\Relay|array|false
         {
-            return ($this->lazyObjectState->realInstance ??= ($this->lazyObjectState->initializer)())->geosearch(...\func_get_args());
+            return $this->initializeLazyObject()->geosearch(...\func_get_args());
         }
     }
 } else {
@@ -30,7 +30,7 @@ if (version_compare(phpversion('relay'), '0.9.0', '>=')) {
     {
         public function geosearch($key, $position, $shape, $unit, $options = []): \Relay\Relay|array
         {
-            return ($this->lazyObjectState->realInstance ??= ($this->lazyObjectState->initializer)())->geosearch(...\func_get_args());
+            return $this->initializeLazyObject()->geosearch(...\func_get_args());
         }
     }
 }

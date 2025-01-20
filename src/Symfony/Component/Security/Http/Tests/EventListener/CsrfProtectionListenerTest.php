@@ -58,15 +58,16 @@ class CsrfProtectionListenerTest extends TestCase
 
     public function testInvalidCsrfToken()
     {
-        $this->expectException(InvalidCsrfTokenException::class);
-        $this->expectExceptionMessage('Invalid CSRF token.');
-
         $this->csrfTokenManager->expects($this->any())
             ->method('isTokenValid')
             ->with(new CsrfToken('authenticator_token_id', 'abc123'))
             ->willReturn(false);
 
         $event = $this->createEvent($this->createPassport(new CsrfTokenBadge('authenticator_token_id', 'abc123')));
+
+        $this->expectException(InvalidCsrfTokenException::class);
+        $this->expectExceptionMessage('Invalid CSRF token.');
+
         $this->listener->checkPassport($event);
     }
 

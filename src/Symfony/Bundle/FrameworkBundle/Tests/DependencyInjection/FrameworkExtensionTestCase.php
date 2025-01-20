@@ -13,8 +13,6 @@ namespace Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection;
 
 use Psr\Cache\CacheItemPoolInterface;
 use Psr\Log\LoggerAwareInterface;
-use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
-use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\AddAnnotationsCachedReaderPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\FrameworkExtension;
 use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
 use Symfony\Bundle\FrameworkBundle\Tests\Fixtures\Messenger\DummyMessage;
@@ -35,7 +33,7 @@ use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
 use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
 use Symfony\Component\DependencyInjection\ChildDefinition;
-use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
+use Symfony\Component\DependencyInjection\Compiler\ResolveChildDefinitionsPass;
 use Symfony\Component\DependencyInjection\Compiler\ResolveInstanceofConditionalsPass;
 use Symfony\Component\DependencyInjection\Compiler\ResolveTaggedIteratorArgumentPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -55,6 +53,8 @@ use Symfony\Component\HtmlSanitizer\HtmlSanitizerInterface;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\RetryableHttpClient;
 use Symfony\Component\HttpClient\ScopingHttpClient;
+use Symfony\Component\HttpClient\ThrottlingHttpClient;
+use Symfony\Component\HttpFoundation\IpUtils;
 use Symfony\Component\HttpKernel\DependencyInjection\LoggerPass;
 use Symfony\Component\HttpKernel\Fragment\FragmentUriGeneratorInterface;
 use Symfony\Component\Lock\Store\SemaphoreStore;
@@ -85,10 +85,8 @@ use Symfony\Component\Translation\LocaleSwitcher;
 use Symfony\Component\Validator\DependencyInjection\AddConstraintValidatorsPass;
 use Symfony\Component\Validator\Validation;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
-use Symfony\Component\Validator\ValidatorBuilder;
 use Symfony\Component\Webhook\Client\RequestParser;
 use Symfony\Component\Webhook\Controller\WebhookController;
-use Symfony\Component\Workflow;
 use Symfony\Component\Workflow\Exception\InvalidDefinitionException;
 use Symfony\Component\Workflow\Metadata\InMemoryMetadataStore;
 use Symfony\Component\Workflow\WorkflowEvents;
@@ -97,8 +95,6 @@ use Symfony\Contracts\Cache\TagAwareCacheInterface;
 
 abstract class FrameworkExtensionTestCase extends TestCase
 {
-    use ExpectDeprecationTrait;
-
     private static array $containerCache = [];
 
     abstract protected function loadFromFile(ContainerBuilder $container, $file);
@@ -308,7 +304,15 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $this->assertArrayHasKey('index_4', $args);
         $this->assertNull($args['index_4'], 'Workflows has eventsToDispatch=null');
 
-        $this->assertSame(['workflow' => [['name' => 'article']], 'workflow.workflow' => [['name' => 'article']]], $container->getDefinition('workflow.article')->getTags());
+        $tags = $container->getDefinition('workflow.article')->getTags();
+        $this->assertArrayHasKey('workflow', $tags);
+        $this->assertArrayHasKey('workflow.workflow', $tags);
+        $this->assertSame([['name' => 'article']], $tags['workflow.workflow']);
+        $this->assertSame('article', $tags['workflow'][0]['name'] ?? null);
+        $this->assertSame([
+            'title' => 'article workflow',
+            'description' => 'workflow for articles',
+        ], $tags['workflow'][0]['metadata'] ?? null);
 
         $this->assertTrue($container->hasDefinition('workflow.article.definition'), 'Workflow definition is registered as a service');
 
@@ -339,7 +343,14 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $this->assertSame('state_machine.abstract', $container->getDefinition('state_machine.pull_request')->getParent());
         $this->assertTrue($container->hasDefinition('state_machine.pull_request.definition'), 'State machine definition is registered as a service');
 
-        $this->assertSame(['workflow' => [['name' => 'pull_request']], 'workflow.state_machine' => [['name' => 'pull_request']]], $container->getDefinition('state_machine.pull_request')->getTags());
+        $tags = $container->getDefinition('state_machine.pull_request')->getTags();
+        $this->assertArrayHasKey('workflow', $tags);
+        $this->assertArrayHasKey('workflow.state_machine', $tags);
+        $this->assertSame([['name' => 'pull_request']], $tags['workflow.state_machine']);
+        $this->assertSame('pull_request', $tags['workflow'][0]['name'] ?? null);
+        $this->assertSame([
+            'title' => 'workflow title',
+        ], $tags['workflow'][0]['metadata'] ?? null);
 
         $stateMachineDefinition = $container->getDefinition('state_machine.pull_request.definition');
 
@@ -511,7 +522,7 @@ abstract class FrameworkExtensionTestCase extends TestCase
     {
         $container = $this->createContainerFromFile('workflows_enabled');
 
-        $this->assertTrue($container->has(Workflow\Registry::class));
+        $this->assertTrue($container->hasDefinition('workflow.registry'));
         $this->assertTrue($container->hasDefinition('console.command.workflow_dump'));
     }
 
@@ -664,8 +675,6 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $this->assertEquals(108, $options['gc_divisor']);
         $this->assertEquals(1, $options['gc_probability']);
         $this->assertEquals(90000, $options['gc_maxlifetime']);
-        $this->assertEquals(22, $options['sid_length']);
-        $this->assertEquals(4, $options['sid_bits_per_character']);
 
         $this->assertEquals('/path/to/sessions', $container->getParameter('session.save_path'));
     }
@@ -795,26 +804,6 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $this->assertFalse($container->hasDefinition('console.command.messenger_failed_messages_show'));
         $this->assertFalse($container->hasDefinition('console.command.messenger_failed_messages_remove'));
         $this->assertFalse($container->hasDefinition('cache.messenger.restart_workers_signal'));
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testMessengerWithExplictResetOnMessageLegacy()
-    {
-        $this->expectDeprecation('Since symfony/framework-bundle 6.1: Option "reset_on_message" at "framework.messenger" is deprecated. It does nothing and will be removed in version 7.0.');
-
-        $container = $this->createContainerFromFile('messenger_with_explict_reset_on_message_legacy');
-
-        $this->assertTrue($container->hasDefinition('console.command.messenger_consume_messages'));
-        $this->assertTrue($container->hasAlias('messenger.default_bus'));
-        $this->assertTrue($container->getAlias('messenger.default_bus')->isPublic());
-        $this->assertTrue($container->hasDefinition('messenger.transport.amqp.factory'));
-        $this->assertTrue($container->hasDefinition('messenger.transport.redis.factory'));
-        $this->assertTrue($container->hasDefinition('messenger.transport_factory'));
-        $this->assertSame(TransportFactory::class, $container->getDefinition('messenger.transport_factory')->getClass());
-        $this->assertTrue($container->hasDefinition('messenger.listener.reset_services'));
-        $this->assertSame('messenger.listener.reset_services', (string) $container->getDefinition('console.command.messenger_consume_messages')->getArgument(5));
     }
 
     public function testMessenger()
@@ -1123,17 +1112,6 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $this->createContainerFromFile('messenger_routing_invalid_transport');
     }
 
-    /**
-     * @group legacy
-     */
-    public function testMessengerWithDisabledResetOnMessage()
-    {
-        $this->expectException(InvalidConfigurationException::class);
-        $this->expectExceptionMessage('The "framework.messenger.reset_on_message" configuration option can be set to "true" only. To prevent services resetting after each message you can set the "--no-reset" option in "messenger:consume" command.');
-
-        $this->createContainerFromFile('messenger_with_disabled_reset_on_message');
-    }
-
     public function testTranslator()
     {
         $container = $this->createContainerFromFile('full');
@@ -1263,19 +1241,16 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $this->assertInstanceOf(ValidatorInterface::class, $container->get('validator.alias'));
     }
 
-    /**
-     * @group legacy
-     */
     public function testAnnotations()
     {
-        $this->expectDeprecation('Since symfony/framework-bundle 6.4: Enabling the integration of Doctrine annotations is deprecated. Set the "framework.annotations.enabled" config option to false.');
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessage('Invalid configuration for path "framework.annotations": Enabling the doctrine/annotations integration is not supported anymore.');
 
-        $container = $this->createContainerFromFile('legacy_annotations', [], true, false);
-        $container->addCompilerPass(new TestAnnotationsPass());
-        $container->compile();
-
-        $this->assertEquals($container->getParameter('kernel.cache_dir').'/annotations', $container->getDefinition('annotations.filesystem_cache_adapter')->getArgument(2));
-        $this->assertSame('annotations.filesystem_cache_adapter', (string) $container->getDefinition('annotation_reader')->getArgument(1));
+        $this->createContainerFromClosure(function (ContainerBuilder $container) {
+            $container->loadFromExtension('framework', [
+                'annotations' => true,
+            ]);
+        });
     }
 
     public function testFileLinkFormat()
@@ -1301,33 +1276,6 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $this->assertSame(['loadValidatorMetadata'], $calls[6][1]);
         $this->assertSame('setMappingCache', $calls[7][0]);
         $this->assertEquals([new Reference('validator.mapping.cache.adapter')], $calls[7][1]);
-        // no cache this time
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testValidationLegacyAnnotations()
-    {
-        $this->expectDeprecation('Since symfony/framework-bundle 6.4: Enabling the integration of Doctrine annotations is deprecated. Set the "framework.annotations.enabled" config option to false.');
-
-        $container = $this->createContainerFromFile('validation_legacy_annotations');
-
-        $calls = $container->getDefinition('validator.builder')->getMethodCalls();
-
-        $this->assertCount(9, $calls);
-        $this->assertSame('enableAttributeMapping', $calls[5][0]);
-        if (method_exists(ValidatorBuilder::class, 'setDoctrineAnnotationReader')) {
-            $this->assertSame('setDoctrineAnnotationReader', $calls[6][0]);
-            $this->assertEquals([new Reference('annotation_reader')], $calls[6][1]);
-            $i = 7;
-        } else {
-            $i = 6;
-        }
-        $this->assertSame('addMethodMapping', $calls[$i][0]);
-        $this->assertSame(['loadValidatorMetadata'], $calls[$i][1]);
-        $this->assertSame('setMappingCache', $calls[++$i][0]);
-        $this->assertEquals([new Reference('validator.mapping.cache.adapter')], $calls[$i][1]);
         // no cache this time
     }
 
@@ -1508,6 +1456,26 @@ abstract class FrameworkExtensionTestCase extends TestCase
     {
         $container = $this->createContainerFromFile('serializer_without_translator');
         $this->assertFalse($container->hasDefinition('serializer.normalizer.translatable'));
+    }
+
+    public function testSerializerDefaultParameters()
+    {
+        $container = $this->createContainerFromFile('serializer_enabled');
+        $this->assertFalse($container->hasParameter('.serializer.name_converter'));
+        $this->assertFalse($container->hasParameter('serializer.default_context'));
+        $this->assertTrue($container->hasParameter('.serializer.named_serializers'));
+        $this->assertSame([], $container->getParameter('.serializer.named_serializers'));
+    }
+
+    public function testSerializerParametersAreSet()
+    {
+        $container = $this->createContainerFromFile('full');
+        $this->assertTrue($container->hasParameter('.serializer.name_converter'));
+        $this->assertSame('serializer.name_converter.camel_case_to_snake_case', $container->getParameter('.serializer.name_converter'));
+        $this->assertTrue($container->hasParameter('serializer.default_context'));
+        $this->assertSame(['enable_max_depth' => true], $container->getParameter('serializer.default_context'));
+        $this->assertTrue($container->hasParameter('.serializer.named_serializers'));
+        $this->assertSame(['api' => ['include_built_in_normalizers' => true, 'include_built_in_encoders' => true, 'default_context' => ['enable_max_depth' => false]]], $container->getParameter('.serializer.named_serializers'));
     }
 
     public function testRegisterSerializerExtractor()
@@ -1698,10 +1666,24 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $this->assertFalse($container->hasDefinition('serializer'));
     }
 
+    public function testTypeInfoEnabled()
+    {
+        $container = $this->createContainerFromFile('type_info');
+        $this->assertTrue($container->has('type_info.resolver'));
+    }
+
     public function testPropertyInfoEnabled()
     {
         $container = $this->createContainerFromFile('property_info');
         $this->assertTrue($container->has('property_info'));
+        $this->assertFalse($container->has('property_info.constructor_extractor'));
+    }
+
+    public function testPropertyInfoWithConstructorExtractorEnabled()
+    {
+        $container = $this->createContainerFromFile('property_info_with_constructor_extractor');
+        $this->assertTrue($container->has('property_info'));
+        $this->assertTrue($container->has('property_info.constructor_extractor'));
     }
 
     public function testPropertyInfoCacheActivated()
@@ -1812,24 +1794,24 @@ abstract class FrameworkExtensionTestCase extends TestCase
             'cacheRedisTagAwareBaz2',
         ];
         foreach ($argNames as $argumentName) {
-            $aliasesForArguments[] = sprintf('%s $%s', TagAwareCacheInterface::class, $argumentName);
-            $aliasesForArguments[] = sprintf('%s $%s', CacheInterface::class, $argumentName);
-            $aliasesForArguments[] = sprintf('%s $%s', CacheItemPoolInterface::class, $argumentName);
+            $aliasesForArguments[] = \sprintf('%s $%s', TagAwareCacheInterface::class, $argumentName);
+            $aliasesForArguments[] = \sprintf('%s $%s', CacheInterface::class, $argumentName);
+            $aliasesForArguments[] = \sprintf('%s $%s', CacheItemPoolInterface::class, $argumentName);
         }
 
         foreach ($aliasesForArguments as $aliasForArgumentStr) {
             $aliasForArgument = $container->getAlias($aliasForArgumentStr);
-            $this->assertNotNull($aliasForArgument, sprintf("No alias found for '%s'", $aliasForArgumentStr));
+            $this->assertNotNull($aliasForArgument, \sprintf("No alias found for '%s'", $aliasForArgumentStr));
 
             $def = $container->getDefinition((string) $aliasForArgument);
-            $this->assertInstanceOf(ChildDefinition::class, $def, sprintf("No definition found for '%s'", $aliasForArgumentStr));
+            $this->assertInstanceOf(ChildDefinition::class, $def, \sprintf("No definition found for '%s'", $aliasForArgumentStr));
 
             $defParent = $container->getDefinition($def->getParent());
             if ($defParent instanceof ChildDefinition) {
                 $defParent = $container->getDefinition($defParent->getParent());
             }
 
-            $this->assertSame(RedisTagAwareAdapter::class, $defParent->getClass(), sprintf("'%s' is not %s", $aliasForArgumentStr, RedisTagAwareAdapter::class));
+            $this->assertSame(RedisTagAwareAdapter::class, $defParent->getClass(), \sprintf("'%s' is not %s", $aliasForArgumentStr, RedisTagAwareAdapter::class));
         }
     }
 
@@ -2016,9 +1998,6 @@ abstract class FrameworkExtensionTestCase extends TestCase
 
     public function testHttpClientRetry()
     {
-        if (!class_exists(RetryableHttpClient::class)) {
-            $this->expectException(LogicException::class);
-        }
         $container = $this->createContainerFromFile('http_client_retry');
 
         $this->assertSame([429, 500 => ['GET', 'HEAD']], $container->getDefinition('http_client.retry_strategy')->getArgument(0));
@@ -2076,12 +2055,42 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $this->assertSame(['foo' => ['bar' => 'baz']], $defaultOptions['extra']);
     }
 
+    public function testHttpClientRateLimiter()
+    {
+        if (!class_exists(ThrottlingHttpClient::class)) {
+            $this->expectException(LogicException::class);
+        }
+
+        $container = $this->createContainerFromFile('http_client_rate_limiter');
+
+        $this->assertTrue($container->hasDefinition('http_client.throttling'));
+        $definition = $container->getDefinition('http_client.throttling');
+        $this->assertSame(ThrottlingHttpClient::class, $definition->getClass());
+        $this->assertSame('http_client', $definition->getDecoratedService()[0]);
+        $this->assertCount(2, $arguments = $definition->getArguments());
+        $this->assertInstanceOf(Reference::class, $arguments[0]);
+        $this->assertSame('http_client.throttling.inner', (string) $arguments[0]);
+        $this->assertInstanceOf(Reference::class, $arguments[1]);
+        $this->assertSame('http_client.throttling.limiter', (string) $arguments[1]);
+
+        $this->assertTrue($container->hasDefinition('foo.throttling'));
+        $definition = $container->getDefinition('foo.throttling');
+        $this->assertSame(ThrottlingHttpClient::class, $definition->getClass());
+        $this->assertSame('foo', $definition->getDecoratedService()[0]);
+        $this->assertCount(2, $arguments = $definition->getArguments());
+        $this->assertInstanceOf(Reference::class, $arguments[0]);
+        $this->assertSame('foo.throttling.inner', (string) $arguments[0]);
+        $this->assertInstanceOf(Reference::class, $arguments[1]);
+        $this->assertSame('foo.throttling.limiter', (string) $arguments[1]);
+    }
+
     public static function provideMailer(): iterable
     {
         yield [
             'mailer_with_dsn',
             ['main' => 'smtp://example.com'],
             ['redirected@example.org'],
+            ['foobar@example\.org'],
         ];
         yield [
             'mailer_with_transports',
@@ -2090,13 +2099,14 @@ abstract class FrameworkExtensionTestCase extends TestCase
                 'transport2' => 'smtp://example2.com',
             ],
             ['redirected@example.org', 'redirected1@example.org'],
+            ['foobar@example\.org', '.*@example\.com'],
         ];
     }
 
     /**
      * @dataProvider provideMailer
      */
-    public function testMailer(string $configFile, array $expectedTransports, array $expectedRecipients)
+    public function testMailer(string $configFile, array $expectedTransports, array $expectedRecipients, array $expectedAllowedRecipients)
     {
         $container = $this->createContainerFromFile($configFile);
 
@@ -2109,6 +2119,7 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $l = $container->getDefinition('mailer.envelope_listener');
         $this->assertSame('sender@example.org', $l->getArgument(0));
         $this->assertSame($expectedRecipients, $l->getArgument(1));
+        $this->assertSame($expectedAllowedRecipients, $l->getArgument(2));
         $this->assertEquals(new Reference('messenger.default_bus', ContainerInterface::NULL_ON_INVALID_REFERENCE), $container->getDefinition('mailer.mailer')->getArgument(1));
 
         $this->assertTrue($container->hasDefinition('mailer.message_listener'));
@@ -2153,7 +2164,6 @@ abstract class FrameworkExtensionTestCase extends TestCase
 
         $this->assertTrue($container->hasParameter('container.behavior_describing_tags'));
         $this->assertEquals([
-            'annotations.cached_reader',
             'container.do_not_inline',
             'container.service_locator',
             'container.service_subscriber',
@@ -2213,7 +2223,7 @@ abstract class FrameworkExtensionTestCase extends TestCase
 
         foreach ((new Finder())->in(\dirname(__DIR__, 4).'/Component/Notifier/Bridge')->directories()->depth(0)->exclude('Mercure') as $bridgeDirectory) {
             $transportFactoryName = strtolower(preg_replace('/(.)([A-Z])/', '$1-$2', $bridgeDirectory->getFilename()));
-            $this->assertTrue($container->hasDefinition('notifier.transport_factory.'.$transportFactoryName), sprintf('Did you forget to add the "%s" TransportFactory to the $classToServices array in FrameworkExtension?', $bridgeDirectory->getFilename()));
+            $this->assertTrue($container->hasDefinition('notifier.transport_factory.'.$transportFactoryName), \sprintf('Did you forget to add the "%s" TransportFactory to the $classToServices array in FrameworkExtension?', $bridgeDirectory->getFilename()));
         }
     }
 
@@ -2359,6 +2369,13 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $this->assertEquals(new Reference('app.another_bus'), $container->getDefinition('notifier.channel.sms')->getArgument(1));
     }
 
+    public function testTrustedProxiesWithPrivateRanges()
+    {
+        $container = $this->createContainerFromFile('trusted_proxies_private_ranges');
+
+        $this->assertSame(IpUtils::PRIVATE_SUBNETS, $container->getParameter('kernel.trusted_proxies'));
+    }
+
     public function testWebhook()
     {
         if (!class_exists(WebhookController::class)) {
@@ -2372,7 +2389,7 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $this->assertSame(RequestParser::class, $container->getDefinition('webhook.request_parser')->getClass());
 
         $this->assertFalse($container->getDefinition('webhook.transport')->hasErrors());
-        $this->assertFalse($container->getDefinition('webhook.body_configurator.json')->hasErrors());
+        $this->assertEquals('webhook.payload_serializer.serializer', $container->getDefinition('webhook.body_configurator.json')->getArgument(0));
     }
 
     public function testWebhookWithoutSerializer()
@@ -2384,11 +2401,7 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $container = $this->createContainerFromFile('webhook_without_serializer');
 
         $this->assertFalse($container->getDefinition('webhook.transport')->hasErrors());
-        $this->assertTrue($container->getDefinition('webhook.body_configurator.json')->hasErrors());
-        $this->assertSame(
-            ['You cannot use the "webhook transport" service since the Serializer component is not enabled. Try setting "framework.serializer.enabled" to true.'],
-            $container->getDefinition('webhook.body_configurator.json')->getErrors()
-        );
+        $this->assertEquals('webhook.payload_serializer.json', $container->getDefinition('webhook.body_configurator.json')->getArgument(0));
     }
 
     public function testAssetMapperWithoutAssets()
@@ -2409,9 +2422,9 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $storeDef = $container->getDefinition($container->getDefinition('lock.default.factory')->getArgument(0));
 
         if (class_exists(SemaphoreStore::class) && SemaphoreStore::isSupported()) {
-            self::assertEquals(new Reference('semaphore'), $storeDef->getArgument(0));
+            self::assertSame('semaphore', $storeDef->getArgument(0));
         } else {
-            self::assertEquals(new Reference('flock'), $storeDef->getArgument(0));
+            self::assertSame('flock', $storeDef->getArgument(0));
         }
     }
 
@@ -2421,23 +2434,46 @@ abstract class FrameworkExtensionTestCase extends TestCase
 
         self::assertTrue($container->hasDefinition('lock.foo.factory'));
         $storeDef = $container->getDefinition($container->getDefinition('lock.foo.factory')->getArgument(0));
-        self::assertEquals(new Reference('semaphore'), $storeDef->getArgument(0));
+        self::assertSame('semaphore', $storeDef->getArgument(0));
 
         self::assertTrue($container->hasDefinition('lock.bar.factory'));
         $storeDef = $container->getDefinition($container->getDefinition('lock.bar.factory')->getArgument(0));
-        self::assertEquals(new Reference('flock'), $storeDef->getArgument(0));
+        self::assertSame('flock', $storeDef->getArgument(0));
 
         self::assertTrue($container->hasDefinition('lock.baz.factory'));
         $storeDef = $container->getDefinition($container->getDefinition('lock.baz.factory')->getArgument(0));
         self::assertIsArray($storeDefArg = $storeDef->getArgument(0));
         $storeDef1 = $container->getDefinition($storeDefArg[0]);
         $storeDef2 = $container->getDefinition($storeDefArg[1]);
-        self::assertEquals(new Reference('semaphore'), $storeDef1->getArgument(0));
-        self::assertEquals(new Reference('flock'), $storeDef2->getArgument(0));
+        self::assertSame('semaphore', $storeDef1->getArgument(0));
+        self::assertSame('flock', $storeDef2->getArgument(0));
 
         self::assertTrue($container->hasDefinition('lock.qux.factory'));
         $storeDef = $container->getDefinition($container->getDefinition('lock.qux.factory')->getArgument(0));
         self::assertStringContainsString('REDIS_DSN', $storeDef->getArgument(0));
+
+        self::assertTrue($container->hasDefinition('lock.corge.factory'));
+        $storeDef = $container->getDefinition($container->getDefinition('lock.corge.factory')->getArgument(0));
+        self::assertSame('in-memory', $storeDef->getArgument(0));
+
+        self::assertTrue($container->hasDefinition('lock.grault.factory'));
+        $storeDef = $container->getDefinition($container->getDefinition('lock.grault.factory')->getArgument(0));
+        self::assertSame('mysql:host=localhost;dbname=test', $storeDef->getArgument(0));
+
+        self::assertTrue($container->hasDefinition('lock.garply.factory'));
+        $storeDef = $container->getDefinition($container->getDefinition('lock.garply.factory')->getArgument(0));
+        self::assertSame('null', $storeDef->getArgument(0));
+    }
+
+    public function testLockWithService()
+    {
+        $container = $this->createContainerFromFile('lock_service', [], true, false);
+        $container->getCompilerPassConfig()->setOptimizationPasses([new ResolveChildDefinitionsPass()]);
+        $container->compile();
+
+        self::assertTrue($container->hasDefinition('lock.default.factory'));
+        $storeDef = $container->getDefinition($container->getDefinition('lock.default.factory')->getArgument(0));
+        self::assertEquals(new Reference('my_service'), $storeDef->getArgument(0));
     }
 
     public function testDefaultSemaphore()
@@ -2462,6 +2498,23 @@ abstract class FrameworkExtensionTestCase extends TestCase
         self::assertStringContainsString('REDIS_DSN', $storeDef->getArgument(0));
     }
 
+    public function testSemaphoreWithService()
+    {
+        $container = $this->createContainerFromFile('semaphore_service', [], true, false);
+        $container->getCompilerPassConfig()->setOptimizationPasses([new ResolveChildDefinitionsPass()]);
+        $container->compile();
+
+        self::assertTrue($container->hasDefinition('semaphore.default.factory'));
+        $storeDef = $container->getDefinition($container->getDefinition('semaphore.default.factory')->getArgument(0));
+        self::assertEquals(new Reference('my_service'), $storeDef->getArgument(0));
+    }
+
+    public function testJsonEncoderEnabled()
+    {
+        $container = $this->createContainerFromFile('json_encoder');
+        $this->assertTrue($container->has('json_encoder.encoder'));
+    }
+
     protected function createContainer(array $data = [])
     {
         return new ContainerBuilder(new EnvPlaceholderParameterBag(array_merge([
@@ -2481,7 +2534,7 @@ abstract class FrameworkExtensionTestCase extends TestCase
         ], $data)));
     }
 
-    protected function createContainerFromFile(string $file, array $data = [], bool $resetCompilerPasses = true, bool $compile = true, ?FrameworkExtension $extension = null)
+    protected function createContainerFromFile(string $file, array $data = [], bool $resetCompilerPasses = true, bool $compile = true, ?FrameworkExtension $extension = null): ContainerBuilder
     {
         $cacheKey = md5(static::class.$file.serialize($data));
         if ($compile && isset(self::$containerCache[$cacheKey])) {
@@ -2498,7 +2551,6 @@ abstract class FrameworkExtensionTestCase extends TestCase
         }
         $container->getCompilerPassConfig()->setBeforeOptimizationPasses([new LoggerPass()]);
         $container->getCompilerPassConfig()->setBeforeRemovingPasses([new AddConstraintValidatorsPass(), new TranslatorPass()]);
-        $container->getCompilerPassConfig()->setAfterRemovingPasses([new AddAnnotationsCachedReaderPass()]);
 
         if (!$compile) {
             return $container;
@@ -2508,7 +2560,7 @@ abstract class FrameworkExtensionTestCase extends TestCase
         return self::$containerCache[$cacheKey] = $container;
     }
 
-    protected function createContainerFromClosure($closure, $data = [])
+    protected function createContainerFromClosure($closure, $data = []): ContainerBuilder
     {
         $container = $this->createContainer($data);
         $container->registerExtension(new FrameworkExtension());
@@ -2551,14 +2603,14 @@ abstract class FrameworkExtensionTestCase extends TestCase
 
     private function assertCachePoolServiceDefinitionIsCreated(ContainerBuilder $container, $id, $adapter, $defaultLifetime)
     {
-        $this->assertTrue($container->has($id), sprintf('Service definition "%s" for cache pool of type "%s" is registered', $id, $adapter));
+        $this->assertTrue($container->has($id), \sprintf('Service definition "%s" for cache pool of type "%s" is registered', $id, $adapter));
 
         $poolDefinition = $container->getDefinition($id);
 
-        $this->assertInstanceOf(ChildDefinition::class, $poolDefinition, sprintf('Cache pool "%s" is based on an abstract cache pool.', $id));
+        $this->assertInstanceOf(ChildDefinition::class, $poolDefinition, \sprintf('Cache pool "%s" is based on an abstract cache pool.', $id));
 
-        $this->assertTrue($poolDefinition->hasTag('cache.pool'), sprintf('Service definition "%s" is tagged with the "cache.pool" tag.', $id));
-        $this->assertFalse($poolDefinition->isAbstract(), sprintf('Service definition "%s" is not abstract.', $id));
+        $this->assertTrue($poolDefinition->hasTag('cache.pool'), \sprintf('Service definition "%s" is tagged with the "cache.pool" tag.', $id));
+        $this->assertFalse($poolDefinition->isAbstract(), \sprintf('Service definition "%s" is not abstract.', $id));
 
         $tag = $poolDefinition->getTag('cache.pool');
         $this->assertArrayHasKey('default_lifetime', $tag[0], 'The default lifetime is stored as an attribute of the "cache.pool" tag.');
@@ -2578,17 +2630,5 @@ abstract class FrameworkExtensionTestCase extends TestCase
             'cache.adapter.array' => $this->assertSame(ArrayAdapter::class, $parentDefinition->getClass()),
             default => $this->fail('Unresolved adapter: '.$adapter),
         };
-    }
-}
-
-/**
- * Simulates ReplaceAliasByActualDefinitionPass.
- */
-class TestAnnotationsPass implements CompilerPassInterface
-{
-    public function process(ContainerBuilder $container): void
-    {
-        $container->setDefinition('annotation_reader', $container->getDefinition('annotations.cached_reader'));
-        $container->removeDefinition('annotations.cached_reader');
     }
 }

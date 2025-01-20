@@ -20,15 +20,11 @@ interface PropertyAccessExtractorInterface
 {
     /**
      * Is the property readable?
-     *
-     * @return bool|null
      */
-    public function isReadable(string $class, string $property, array $context = []);
+    public function isReadable(string $class, string $property, array $context = []): ?bool;
 
     /**
      * Is the property writable?
-     *
-     * @return bool|null
      */
-    public function isWritable(string $class, string $property, array $context = []);
+    public function isWritable(string $class, string $property, array $context = []): ?bool;
 }

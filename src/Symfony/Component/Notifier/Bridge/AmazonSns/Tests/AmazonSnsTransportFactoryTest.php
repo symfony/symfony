@@ -12,9 +12,9 @@
 namespace Symfony\Component\Notifier\Bridge\AmazonSns\Tests;
 
 use Symfony\Component\Notifier\Bridge\AmazonSns\AmazonSnsTransportFactory;
-use Symfony\Component\Notifier\Test\TransportFactoryTestCase;
+use Symfony\Component\Notifier\Test\AbstractTransportFactoryTestCase;
 
-class AmazonSnsTransportFactoryTest extends TransportFactoryTestCase
+class AmazonSnsTransportFactoryTest extends AbstractTransportFactoryTestCase
 {
     public function createFactory(): AmazonSnsTransportFactory
     {

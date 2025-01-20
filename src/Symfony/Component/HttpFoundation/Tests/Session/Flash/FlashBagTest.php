@@ -27,7 +27,6 @@ class FlashBagTest extends TestCase
 
     protected function setUp(): void
     {
-        parent::setUp();
         $this->bag = new FlashBag();
         $this->array = ['notice' => ['A previous flash message']];
         $this->bag->initialize($this->array);
@@ -36,7 +35,6 @@ class FlashBagTest extends TestCase
     protected function tearDown(): void
     {
         unset($this->bag);
-        parent::tearDown();
     }
 
     public function testInitialize()
@@ -141,14 +139,14 @@ class FlashBagTest extends TestCase
         $this->assertEquals([
             'notice' => ['Foo'],
             'error' => ['Bar'],
-            ], $this->bag->peekAll()
+        ], $this->bag->peekAll()
         );
         $this->assertTrue($this->bag->has('notice'));
         $this->assertTrue($this->bag->has('error'));
         $this->assertEquals([
             'notice' => ['Foo'],
             'error' => ['Bar'],
-            ], $this->bag->peekAll()
+        ], $this->bag->peekAll()
         );
     }
 }

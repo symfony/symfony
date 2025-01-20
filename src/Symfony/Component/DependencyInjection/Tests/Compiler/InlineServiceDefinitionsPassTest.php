@@ -223,9 +223,9 @@ class InlineServiceDefinitionsPassTest extends TestCase
             ->register('foo')
             ->setPublic(true)
             ->setArguments([
-                    $ref1 = new Reference('b'),
-                    $ref2 = new Reference('b'),
-                ])
+                $ref1 = new Reference('b'),
+                $ref2 = new Reference('b'),
+            ])
         ;
         $this->process($container);
 
@@ -252,9 +252,9 @@ class InlineServiceDefinitionsPassTest extends TestCase
             ->register('foo')
             ->setPublic(true)
             ->setArguments([
-                    $ref = new Reference('b'),
-                    $inlineFactory,
-                ])
+                $ref = new Reference('b'),
+                $inlineFactory,
+            ])
         ;
         $this->process($container);
 

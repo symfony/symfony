@@ -27,18 +27,17 @@ use Symfony\Contracts\Service\ResetInterface;
  */
 class TraceableAdapter implements AdapterInterface, CacheInterface, PruneableInterface, ResettableInterface
 {
-    protected $pool;
     private array $calls = [];
 
-    public function __construct(AdapterInterface $pool)
-    {
-        $this->pool = $pool;
+    public function __construct(
+        protected AdapterInterface $pool,
+    ) {
     }
 
     public function get(string $key, callable $callback, ?float $beta = null, ?array &$metadata = null): mixed
     {
         if (!$this->pool instanceof CacheInterface) {
-            throw new \BadMethodCallException(sprintf('Cannot call "%s::get()": this class doesn\'t implement "%s".', get_debug_type($this->pool), CacheInterface::class));
+            throw new \BadMethodCallException(\sprintf('Cannot call "%s::get()": this class doesn\'t implement "%s".', get_debug_type($this->pool), CacheInterface::class));
         }
 
         $isHit = true;
@@ -192,10 +191,7 @@ class TraceableAdapter implements AdapterInterface, CacheInterface, PruneableInt
         }
     }
 
-    /**
-     * @return void
-     */
-    public function reset()
+    public function reset(): void
     {
         if ($this->pool instanceof ResetInterface) {
             $this->pool->reset();
@@ -214,18 +210,12 @@ class TraceableAdapter implements AdapterInterface, CacheInterface, PruneableInt
         }
     }
 
-    /**
-     * @return array
-     */
-    public function getCalls()
+    public function getCalls(): array
     {
         return $this->calls;
     }
 
-    /**
-     * @return void
-     */
-    public function clearCalls()
+    public function clearCalls(): void
     {
         $this->calls = [];
     }
@@ -235,10 +225,7 @@ class TraceableAdapter implements AdapterInterface, CacheInterface, PruneableInt
         return $this->pool;
     }
 
-    /**
-     * @return TraceableAdapterEvent
-     */
-    protected function start(string $name)
+    protected function start(string $name): TraceableAdapterEvent
     {
         $this->calls[] = $event = new TraceableAdapterEvent();
         $event->name = $name;

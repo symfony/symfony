@@ -52,12 +52,8 @@ class DefaultChoiceListFactory implements ChoiceListFactoryInterface
         return new LazyChoiceList($loader, $value);
     }
 
-    /**
-     * @param bool $duplicatePreferredChoices
-     */
-    public function createView(ChoiceListInterface $list, array|callable|null $preferredChoices = null, callable|false|null $label = null, ?callable $index = null, ?callable $groupBy = null, array|callable|null $attr = null, array|callable $labelTranslationParameters = []/* , bool $duplicatePreferredChoices = true */): ChoiceListView
+    public function createView(ChoiceListInterface $list, array|callable|null $preferredChoices = null, callable|false|null $label = null, ?callable $index = null, ?callable $groupBy = null, array|callable|null $attr = null, array|callable $labelTranslationParameters = [], bool $duplicatePreferredChoices = true): ChoiceListView
     {
-        $duplicatePreferredChoices = \func_num_args() > 7 ? func_get_arg(7) : true;
         $preferredViews = [];
         $preferredViewsOrder = [];
         $otherViews = [];

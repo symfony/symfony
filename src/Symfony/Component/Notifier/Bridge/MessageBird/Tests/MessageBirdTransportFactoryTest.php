@@ -12,10 +12,15 @@
 namespace Symfony\Component\Notifier\Bridge\MessageBird\Tests;
 
 use Symfony\Component\Notifier\Bridge\MessageBird\MessageBirdTransportFactory;
-use Symfony\Component\Notifier\Test\TransportFactoryTestCase;
+use Symfony\Component\Notifier\Test\AbstractTransportFactoryTestCase;
+use Symfony\Component\Notifier\Test\IncompleteDsnTestTrait;
+use Symfony\Component\Notifier\Test\MissingRequiredOptionTestTrait;
 
-final class MessageBirdTransportFactoryTest extends TransportFactoryTestCase
+final class MessageBirdTransportFactoryTest extends AbstractTransportFactoryTestCase
 {
+    use IncompleteDsnTestTrait;
+    use MissingRequiredOptionTestTrait;
+
     public function createFactory(): MessageBirdTransportFactory
     {
         return new MessageBirdTransportFactory();
@@ -44,5 +49,10 @@ final class MessageBirdTransportFactoryTest extends TransportFactoryTestCase
     {
         yield ['somethingElse://token@default?from=0611223344'];
         yield ['somethingElse://token@default']; // missing "from" option
+    }
+
+    public static function incompleteDsnProvider(): iterable
+    {
+        yield ['messagebird://default?from=0611223344'];
     }
 }

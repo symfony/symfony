@@ -22,26 +22,18 @@ use Symfony\Component\Security\Http\Firewall\LogoutListener;
  */
 class FirewallContext
 {
-    private iterable $listeners;
-    private ?ExceptionListener $exceptionListener;
-    private ?LogoutListener $logoutListener;
-    private ?FirewallConfig $config;
-
     /**
      * @param iterable<mixed, callable> $listeners
      */
-    public function __construct(iterable $listeners, ?ExceptionListener $exceptionListener = null, ?LogoutListener $logoutListener = null, ?FirewallConfig $config = null)
-    {
-        $this->listeners = $listeners;
-        $this->exceptionListener = $exceptionListener;
-        $this->logoutListener = $logoutListener;
-        $this->config = $config;
+    public function __construct(
+        private iterable $listeners,
+        private ?ExceptionListener $exceptionListener = null,
+        private ?LogoutListener $logoutListener = null,
+        private ?FirewallConfig $config = null,
+    ) {
     }
 
-    /**
-     * @return FirewallConfig|null
-     */
-    public function getConfig()
+    public function getConfig(): ?FirewallConfig
     {
         return $this->config;
     }
@@ -54,18 +46,12 @@ class FirewallContext
         return $this->listeners;
     }
 
-    /**
-     * @return ExceptionListener|null
-     */
-    public function getExceptionListener()
+    public function getExceptionListener(): ?ExceptionListener
     {
         return $this->exceptionListener;
     }
 
-    /**
-     * @return LogoutListener|null
-     */
-    public function getLogoutListener()
+    public function getLogoutListener(): ?LogoutListener
     {
         return $this->logoutListener;
     }

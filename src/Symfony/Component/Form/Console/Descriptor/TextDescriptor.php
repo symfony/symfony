@@ -15,7 +15,6 @@ use Symfony\Component\Console\Helper\Dumper;
 use Symfony\Component\Console\Helper\TableSeparator;
 use Symfony\Component\ErrorHandler\ErrorRenderer\FileLinkFormatter;
 use Symfony\Component\Form\ResolvedFormTypeInterface;
-use Symfony\Component\HttpKernel\Debug\FileLinkFormatter as LegacyFileLinkFormatter;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
@@ -25,11 +24,9 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class TextDescriptor extends Descriptor
 {
-    private FileLinkFormatter|LegacyFileLinkFormatter|null $fileLinkFormatter;
-
-    public function __construct(FileLinkFormatter|LegacyFileLinkFormatter|null $fileLinkFormatter = null)
-    {
-        $this->fileLinkFormatter = $fileLinkFormatter;
+    public function __construct(
+        private readonly ?FileLinkFormatter $fileLinkFormatter = null,
+    ) {
     }
 
     protected function describeDefaults(array $options): void
@@ -83,7 +80,7 @@ class TextDescriptor extends Descriptor
             'extension' => 'Extension options',
         ], $formOptions);
 
-        $this->output->title(sprintf('%s (Block prefix: "%s")', $resolvedFormType->getInnerType()::class, $resolvedFormType->getInnerType()->getBlockPrefix()));
+        $this->output->title(\sprintf('%s (Block prefix: "%s")', $resolvedFormType->getInnerType()::class, $resolvedFormType->getInnerType()->getBlockPrefix()));
 
         if ($formOptions) {
             $this->output->table($tableHeaders, $this->buildTableRows($tableHeaders, $formOptions));
@@ -134,7 +131,7 @@ class TextDescriptor extends Descriptor
         }
         array_pop($rows);
 
-        $this->output->title(sprintf('%s (%s)', $options['type']::class, $options['option']));
+        $this->output->title(\sprintf('%s (%s)', $options['type']::class, $options['option']));
         $this->output->table([], $rows);
     }
 
@@ -175,7 +172,7 @@ class TextDescriptor extends Descriptor
                 } else {
                     $options[$group][] = null;
                 }
-                $options[$group][] = sprintf('<info>%s</info>', (new \ReflectionClass($class))->getShortName());
+                $options[$group][] = \sprintf('<info>%s</info>', (new \ReflectionClass($class))->getShortName());
                 $options[$group][] = new TableSeparator();
 
                 sort($opt);
@@ -199,7 +196,7 @@ class TextDescriptor extends Descriptor
             return $text;
         }
 
-        return sprintf('<href=%s>%s</>', $fileLink, $text);
+        return \sprintf('<href=%s>%s</>', $fileLink, $text);
     }
 
     private function getFileLink(string $class): string

@@ -48,7 +48,7 @@ class ImportMapVersionCheckerTest extends TestCase
             }))
             ->willReturnCallback(function ($importName) use ($dependencies) {
                 if (!isset($dependencies[$importName])) {
-                    throw new \InvalidArgumentException(sprintf('Missing dependencies in test for "%s"', $importName));
+                    throw new \InvalidArgumentException(\sprintf('Missing dependencies in test for "%s"', $importName));
                 }
 
                 return $dependencies[$importName];

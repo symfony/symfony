@@ -199,21 +199,25 @@ class UrlMatcherTest extends TestCase
 
     public function testShortPathDoesNotMatchImportantVariable()
     {
-        $this->expectException(ResourceNotFoundException::class);
-
         $collection = new RouteCollection();
         $collection->add('index', new Route('/index.{!_format}', ['_format' => 'xml']));
 
-        $this->getUrlMatcher($collection)->match('/index');
+        $matcher = $this->getUrlMatcher($collection);
+
+        $this->expectException(ResourceNotFoundException::class);
+
+        $matcher->match('/index');
     }
 
     public function testTrailingEncodedNewlineIsNotOverlooked()
     {
-        $this->expectException(ResourceNotFoundException::class);
         $collection = new RouteCollection();
         $collection->add('foo', new Route('/foo'));
 
         $matcher = $this->getUrlMatcher($collection);
+
+        $this->expectException(ResourceNotFoundException::class);
+
         $matcher->match('/foo%0a');
     }
 
@@ -358,37 +362,41 @@ class UrlMatcherTest extends TestCase
 
     public function testDefaultRequirementOfVariableDisallowsSlash()
     {
-        $this->expectException(ResourceNotFoundException::class);
         $coll = new RouteCollection();
         $coll->add('test', new Route('/{page}.{_format}'));
         $matcher = $this->getUrlMatcher($coll);
+
+        $this->expectException(ResourceNotFoundException::class);
 
         $matcher->match('/index.sl/ash');
     }
 
     public function testDefaultRequirementOfVariableDisallowsNextSeparator()
     {
-        $this->expectException(ResourceNotFoundException::class);
         $coll = new RouteCollection();
         $coll->add('test', new Route('/{page}.{_format}', [], ['_format' => 'html|xml']));
         $matcher = $this->getUrlMatcher($coll);
+
+        $this->expectException(ResourceNotFoundException::class);
 
         $matcher->match('/do.t.html');
     }
 
     public function testMissingTrailingSlash()
     {
-        $this->expectException(ResourceNotFoundException::class);
         $coll = new RouteCollection();
         $coll->add('foo', new Route('/foo/'));
 
         $matcher = $this->getUrlMatcher($coll);
+
+        $this->expectException(ResourceNotFoundException::class);
+
         $matcher->match('/foo');
     }
 
     public function testExtraTrailingSlash()
     {
-        $this->getExpectedException() ?: $this->expectException(ResourceNotFoundException::class);
+        $this->expectException(ResourceNotFoundException::class);
         $coll = new RouteCollection();
         $coll->add('foo', new Route('/foo'));
 
@@ -398,7 +406,7 @@ class UrlMatcherTest extends TestCase
 
     public function testMissingTrailingSlashForNonSafeMethod()
     {
-        $this->getExpectedException() ?: $this->expectException(ResourceNotFoundException::class);
+        $this->expectException(ResourceNotFoundException::class);
         $coll = new RouteCollection();
         $coll->add('foo', new Route('/foo/'));
 
@@ -410,7 +418,7 @@ class UrlMatcherTest extends TestCase
 
     public function testExtraTrailingSlashForNonSafeMethod()
     {
-        $this->getExpectedException() ?: $this->expectException(ResourceNotFoundException::class);
+        $this->expectException(ResourceNotFoundException::class);
         $coll = new RouteCollection();
         $coll->add('foo', new Route('/foo'));
 
@@ -422,7 +430,7 @@ class UrlMatcherTest extends TestCase
 
     public function testSchemeRequirement()
     {
-        $this->getExpectedException() ?: $this->expectException(ResourceNotFoundException::class);
+        $this->expectException(ResourceNotFoundException::class);
         $coll = new RouteCollection();
         $coll->add('foo', new Route('/foo', [], [], [], '', ['https']));
         $matcher = $this->getUrlMatcher($coll);
@@ -431,7 +439,7 @@ class UrlMatcherTest extends TestCase
 
     public function testSchemeRequirementForNonSafeMethod()
     {
-        $this->getExpectedException() ?: $this->expectException(ResourceNotFoundException::class);
+        $this->expectException(ResourceNotFoundException::class);
         $coll = new RouteCollection();
         $coll->add('foo', new Route('/foo', [], [], [], '', ['https']));
 
@@ -452,12 +460,14 @@ class UrlMatcherTest extends TestCase
 
     public function testCondition()
     {
-        $this->expectException(ResourceNotFoundException::class);
         $coll = new RouteCollection();
         $route = new Route('/foo');
         $route->setCondition('context.getMethod() == "POST"');
         $coll->add('foo', $route);
         $matcher = $this->getUrlMatcher($coll);
+
+        $this->expectException(ResourceNotFoundException::class);
+
         $matcher->match('/foo');
     }
 
@@ -690,21 +700,25 @@ class UrlMatcherTest extends TestCase
 
     public function testWithOutHostHostDoesNotMatch()
     {
-        $this->expectException(ResourceNotFoundException::class);
         $coll = new RouteCollection();
         $coll->add('foo', new Route('/foo/{foo}', [], [], [], '{locale}.example.com'));
 
         $matcher = $this->getUrlMatcher($coll, new RequestContext('', 'GET', 'example.com'));
+
+        $this->expectException(ResourceNotFoundException::class);
+
         $matcher->match('/foo/bar');
     }
 
     public function testPathIsCaseSensitive()
     {
-        $this->expectException(ResourceNotFoundException::class);
         $coll = new RouteCollection();
         $coll->add('foo', new Route('/locale', [], ['locale' => 'EN|FR|DE']));
 
         $matcher = $this->getUrlMatcher($coll);
+
+        $this->expectException(ResourceNotFoundException::class);
+
         $matcher->match('/en');
     }
 
@@ -719,10 +733,12 @@ class UrlMatcherTest extends TestCase
 
     public function testNoConfiguration()
     {
-        $this->expectException(NoConfigurationException::class);
         $coll = new RouteCollection();
 
         $matcher = $this->getUrlMatcher($coll);
+
+        $this->expectException(NoConfigurationException::class);
+
         $matcher->match('/');
     }
 
@@ -752,12 +768,14 @@ class UrlMatcherTest extends TestCase
 
     public function testSchemeAndMethodMismatch()
     {
-        $this->expectException(ResourceNotFoundException::class);
-        $this->expectExceptionMessage('No routes found for "/".');
         $coll = new RouteCollection();
         $coll->add('foo', new Route('/', [], [], [], null, ['https'], ['POST']));
 
         $matcher = $this->getUrlMatcher($coll);
+
+        $this->expectException(ResourceNotFoundException::class);
+        $this->expectExceptionMessage('No routes found for "/".');
+
         $matcher->match('/');
     }
 
@@ -980,6 +998,23 @@ class UrlMatcherTest extends TestCase
         $matcher = $this->getUrlMatcher($collection);
 
         $this->assertEquals(['_route' => 'foo', 'bär' => 'baz', 'bäz' => 'foo'], $matcher->match('/foo/baz'));
+    }
+
+    public function testMapping()
+    {
+        $collection = new RouteCollection();
+        $collection->add('a', new Route('/conference/{slug:conference}'));
+
+        $matcher = $this->getUrlMatcher($collection);
+
+        $expected = [
+            '_route' => 'a',
+            'slug' => 'vienna-2024',
+            '_route_mapping' => [
+                'slug' => 'conference',
+            ],
+        ];
+        $this->assertEquals($expected, $matcher->match('/conference/vienna-2024'));
     }
 
     protected function getUrlMatcher(RouteCollection $routes, ?RequestContext $context = null)

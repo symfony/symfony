@@ -98,7 +98,7 @@ class EnvelopeTest extends TestCase
         $this->assertEquals($from, $e->getSender());
     }
 
-    public function testSenderFromHeadersWithMulitpleHeaders()
+    public function testSenderFromHeadersWithMultipleHeaders()
     {
         $headers = new Headers();
         $headers->addMailboxListHeader('From', [new Address('from@symfony.com', 'from'), 'some@symfony.com']);
@@ -125,6 +125,19 @@ class EnvelopeTest extends TestCase
         $headers->addMailboxListHeader('Bcc', [new Address('bcc@symfony.com')]);
         $e = Envelope::create(new Message($headers));
         $this->assertEquals([new Address('to@symfony.com'), new Address('cc@symfony.com'), new Address('bcc@symfony.com')], $e->getRecipients());
+    }
+
+    public function testUnicodeLocalparts()
+    {
+        /* dømi means example and is reserved by the .fo registry */
+        $i = new Address('info@dømi.fo');
+        $d = new Address('dømi@dømi.fo');
+        $e = new Envelope($i, [$i]);
+        $this->assertFalse($e->anyAddressHasUnicodeLocalpart());
+        $e = new Envelope($i, [$d]);
+        $this->assertTrue($e->anyAddressHasUnicodeLocalpart());
+        $e = new Envelope($i, [$i, $d]);
+        $this->assertTrue($e->anyAddressHasUnicodeLocalpart());
     }
 
     public function testRecipientsFromHeadersWithNames()

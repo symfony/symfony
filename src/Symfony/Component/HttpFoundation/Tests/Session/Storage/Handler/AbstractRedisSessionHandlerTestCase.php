@@ -16,8 +16,6 @@ use Relay\Relay;
 use Symfony\Component\HttpFoundation\Session\Storage\Handler\RedisSessionHandler;
 
 /**
- * @requires extension redis
- *
  * @group time-sensitive
  */
 abstract class AbstractRedisSessionHandlerTestCase extends TestCase
@@ -31,8 +29,6 @@ abstract class AbstractRedisSessionHandlerTestCase extends TestCase
 
     protected function setUp(): void
     {
-        parent::setUp();
-
         if (!\extension_loaded('redis')) {
             self::markTestSkipped('Extension redis required.');
         }

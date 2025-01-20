@@ -15,13 +15,13 @@ use Symfony\Component\Mercure\HubInterface;
 use Symfony\Component\Mercure\HubRegistry;
 use Symfony\Component\Notifier\Bridge\Mercure\MercureTransportFactory;
 use Symfony\Component\Notifier\Exception\IncompleteDsnException;
-use Symfony\Component\Notifier\Test\TransportFactoryTestCase;
+use Symfony\Component\Notifier\Test\AbstractTransportFactoryTestCase;
 use Symfony\Component\Notifier\Transport\Dsn;
 
 /**
  * @author Mathias Arlaud <mathias.arlaud@gmail.com>
  */
-final class MercureTransportFactoryTest extends TransportFactoryTestCase
+final class MercureTransportFactoryTest extends AbstractTransportFactoryTestCase
 {
     public function createFactory(): MercureTransportFactory
     {

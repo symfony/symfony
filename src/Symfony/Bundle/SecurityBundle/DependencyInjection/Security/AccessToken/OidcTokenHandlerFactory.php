@@ -13,10 +13,10 @@ namespace Symfony\Bundle\SecurityBundle\DependencyInjection\Security\AccessToken
 
 use Jose\Component\Core\Algorithm;
 use Symfony\Component\Config\Definition\Builder\NodeBuilder;
+use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Exception\LogicException;
-use Symfony\Component\DependencyInjection\Reference;
 
 /**
  * Configures a token handler for decoding and validating an OIDC token.
@@ -31,23 +31,32 @@ class OidcTokenHandlerFactory implements TokenHandlerFactoryInterface
             ->replaceArgument(4, $config['claim'])
         );
 
-        if (!ContainerBuilder::willBeAvailable('web-token/jwt-core', Algorithm::class, ['symfony/security-bundle'])) {
-            throw new LogicException('You cannot use the "oidc" token handler since "web-token/jwt-core" is not installed. Try running "composer require web-token/jwt-core".');
+        if (!ContainerBuilder::willBeAvailable('web-token/jwt-library', Algorithm::class, ['symfony/security-bundle'])) {
+            throw new LogicException('You cannot use the "oidc" token handler since "web-token/jwt-library" is not installed. Try running "composer require web-token/jwt-library".');
         }
 
-        // @see Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\SignatureAlgorithmFactory
-        // for supported algorithms
-        if (\in_array($config['algorithm'], ['ES256', 'ES384', 'ES512'], true)) {
-            $tokenHandlerDefinition->replaceArgument(0, new Reference('security.access_token_handler.oidc.signature.'.$config['algorithm']));
-        } else {
-            $tokenHandlerDefinition->replaceArgument(0, (new ChildDefinition('security.access_token_handler.oidc.signature'))
-                ->replaceArgument(0, $config['algorithm'])
+        $tokenHandlerDefinition->replaceArgument(0, (new ChildDefinition('security.access_token_handler.oidc.signature'))
+            ->replaceArgument(0, $config['algorithms']));
+
+        $tokenHandlerDefinition->replaceArgument(1, (new ChildDefinition('security.access_token_handler.oidc.jwkset'))
+            ->replaceArgument(0, $config['keyset'])
+        );
+
+        if ($config['encryption']['enabled']) {
+            $algorithmManager = (new ChildDefinition('security.access_token_handler.oidc.encryption'))
+                ->replaceArgument(0, $config['encryption']['algorithms']);
+            $keyset = (new ChildDefinition('security.access_token_handler.oidc.jwkset'))
+                ->replaceArgument(0, $config['encryption']['keyset']);
+
+            $tokenHandlerDefinition->addMethodCall(
+                'enabledJweSupport',
+                [
+                    $keyset,
+                    $algorithmManager,
+                    $config['encryption']['enforce'],
+                ]
             );
         }
-
-        $tokenHandlerDefinition->replaceArgument(1, (new ChildDefinition('security.access_token_handler.oidc.jwk'))
-            ->replaceArgument(0, $config['key'])
-        );
     }
 
     public function getKey(): string
@@ -60,6 +69,37 @@ class OidcTokenHandlerFactory implements TokenHandlerFactoryInterface
         $node
             ->arrayNode($this->getKey())
                 ->fixXmlConfig($this->getKey())
+                ->validate()
+                    ->ifTrue(static fn ($v) => !isset($v['algorithm']) && !isset($v['algorithms']))
+                    ->thenInvalid('You must set either "algorithm" or "algorithms".')
+                ->end()
+                ->validate()
+                    ->ifTrue(static fn ($v) => !isset($v['key']) && !isset($v['keyset']))
+                    ->thenInvalid('You must set either "key" or "keyset".')
+                ->end()
+                ->beforeNormalization()
+                    ->ifTrue(static fn ($v) => isset($v['algorithm']) && \is_string($v['algorithm']))
+                    ->then(static function ($v) {
+                        if (isset($v['algorithms'])) {
+                            throw new InvalidConfigurationException('You cannot use both "algorithm" and "algorithms" at the same time.');
+                        }
+                        $v['algorithms'] = [$v['algorithm']];
+                        unset($v['algorithm']);
+
+                        return $v;
+                    })
+                ->end()
+                ->beforeNormalization()
+                    ->ifTrue(static fn ($v) => isset($v['key']) && \is_string($v['key']))
+                    ->then(static function ($v) {
+                        if (isset($v['keyset'])) {
+                            throw new InvalidConfigurationException('You cannot use both "key" and "keyset" at the same time.');
+                        }
+                        $v['keyset'] = \sprintf('{"keys":[%s]}', $v['key']);
+
+                        return $v;
+                    })
+                ->end()
                 ->children()
                     ->scalarNode('claim')
                         ->info('Claim which contains the user identifier (e.g.: sub, email..).')
@@ -72,15 +112,43 @@ class OidcTokenHandlerFactory implements TokenHandlerFactoryInterface
                     ->arrayNode('issuers')
                         ->info('Issuers allowed to generate the token, for validation purpose.')
                         ->isRequired()
-                        ->prototype('scalar')->end()
+                        ->scalarPrototype()->end()
                     ->end()
-                    ->scalarNode('algorithm')
+                    ->arrayNode('algorithm')
                         ->info('Algorithm used to sign the token.')
+                        ->setDeprecated('symfony/security-bundle', '7.1', 'The "%node%" option is deprecated and will be removed in 8.0. Use the "algorithms" option instead.')
+                    ->end()
+                    ->arrayNode('algorithms')
+                        ->info('Algorithms used to sign the token.')
                         ->isRequired()
+                        ->scalarPrototype()->end()
                     ->end()
                     ->scalarNode('key')
                         ->info('JSON-encoded JWK used to sign the token (must contain a "kty" key).')
+                        ->setDeprecated('symfony/security-bundle', '7.1', 'The "%node%" option is deprecated and will be removed in 8.0. Use the "keyset" option instead.')
+                    ->end()
+                    ->scalarNode('keyset')
+                        ->info('JSON-encoded JWKSet used to sign the token (must contain a list of valid public keys).')
                         ->isRequired()
+                    ->end()
+                    ->arrayNode('encryption')
+                        ->canBeEnabled()
+                        ->children()
+                            ->booleanNode('enforce')
+                                ->info('When enabled, the token shall be encrypted.')
+                                ->defaultFalse()
+                            ->end()
+                            ->arrayNode('algorithms')
+                                ->info('Algorithms used to decrypt the token.')
+                                ->isRequired()
+                                ->requiresAtLeastOneElement()
+                                ->scalarPrototype()->end()
+                            ->end()
+                            ->scalarNode('keyset')
+                                ->info('JSON-encoded JWKSet used to decrypt the token (must contain a list of valid private keys).')
+                                ->isRequired()
+                            ->end()
+                        ->end()
                     ->end()
                 ->end()
             ->end()

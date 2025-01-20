@@ -41,7 +41,7 @@ class FunctionNodeTest extends AbstractNodeTestCase
     protected static function getCallables(): array
     {
         return [
-            'compiler' => fn ($arg) => sprintf('foo(%s)', $arg),
+            'compiler' => fn ($arg) => \sprintf('foo(%s)', $arg),
             'evaluator' => fn ($variables, $arg) => $arg,
         ];
     }

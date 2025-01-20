@@ -52,7 +52,7 @@ class ContainerDebugCommand extends Command
                 new InputOption('types', null, InputOption::VALUE_NONE, 'Display types (classes/interfaces) available in the container'),
                 new InputOption('env-var', null, InputOption::VALUE_REQUIRED, 'Display a specific environment variable used in the container'),
                 new InputOption('env-vars', null, InputOption::VALUE_NONE, 'Display environment variables used in the container'),
-                new InputOption('format', null, InputOption::VALUE_REQUIRED, sprintf('The output format ("%s")', implode('", "', $this->getAvailableFormatOptions())), 'txt'),
+                new InputOption('format', null, InputOption::VALUE_REQUIRED, \sprintf('The output format ("%s")', implode('", "', $this->getAvailableFormatOptions())), 'txt'),
                 new InputOption('raw', null, InputOption::VALUE_NONE, 'To output raw description'),
                 new InputOption('deprecations', null, InputOption::VALUE_NONE, 'Display deprecations generated when compiling and warming up the container'),
             ])
@@ -106,6 +106,9 @@ using the <info>--show-hidden</info> flag:
 
   <info>php %command.full_name% --show-hidden</info>
 
+The <info>--format</info> option specifies the format of the command output:
+
+  <info>php %command.full_name% --format=json</info>
 EOF
             )
         ;
@@ -148,6 +151,10 @@ EOF
             $tag = $this->findProperTagName($input, $errorIo, $object, $tag);
             $options = ['tag' => $tag];
         } elseif ($name = $input->getArgument('name')) {
+            if ($input->getOption('show-arguments')) {
+                $errorIo->warning('The "--show-arguments" option is deprecated.');
+            }
+
             $name = $this->findProperServiceName($input, $errorIo, $object, $name, $input->getOption('show-hidden'));
             $options = ['id' => $name];
         } elseif ($input->getOption('deprecations')) {
@@ -158,7 +165,6 @@ EOF
 
         $helper = new DescriptorHelper();
         $options['format'] = $input->getOption('format');
-        $options['show_arguments'] = $input->getOption('show-arguments');
         $options['show_hidden'] = $input->getOption('show-hidden');
         $options['raw_text'] = $input->getOption('raw');
         $options['output'] = $io;
@@ -171,19 +177,19 @@ EOF
                 if ($object->hasDefinition($options['id'])) {
                     $definition = $object->getDefinition($options['id']);
                     if ($definition->isDeprecated()) {
-                        $errorIo->warning($definition->getDeprecation($options['id'])['message'] ?? sprintf('The "%s" service is deprecated.', $options['id']));
+                        $errorIo->warning($definition->getDeprecation($options['id'])['message'] ?? \sprintf('The "%s" service is deprecated.', $options['id']));
                     }
                 }
                 if ($object->hasAlias($options['id'])) {
                     $alias = $object->getAlias($options['id']);
                     if ($alias->isDeprecated()) {
-                        $errorIo->warning($alias->getDeprecation($options['id'])['message'] ?? sprintf('The "%s" alias is deprecated.', $options['id']));
+                        $errorIo->warning($alias->getDeprecation($options['id'])['message'] ?? \sprintf('The "%s" alias is deprecated.', $options['id']));
                     }
                 }
             }
 
             if (isset($options['id']) && isset($kernel->getContainer()->getRemovedIds()[$options['id']])) {
-                $errorIo->note(sprintf('The "%s" service or alias has been removed or inlined when the container was compiled.', $options['id']));
+                $errorIo->note(\sprintf('The "%s" service or alias has been removed or inlined when the container was compiled.', $options['id']));
             }
         } catch (ServiceNotFoundException $e) {
             if ('' !== $e->getId() && '@' === $e->getId()[0]) {
@@ -277,7 +283,7 @@ EOF
 
         $matchingServices = $this->findServiceIdsContaining($container, $name, $showHidden);
         if (!$matchingServices) {
-            throw new InvalidArgumentException(sprintf('No services found that match "%s".', $name));
+            throw new InvalidArgumentException(\sprintf('No services found that match "%s".', $name));
         }
 
         if (1 === \count($matchingServices)) {
@@ -297,7 +303,7 @@ EOF
 
         $matchingTags = $this->findTagsContaining($container, $tagName);
         if (!$matchingTags) {
-            throw new InvalidArgumentException(sprintf('No tags found that match "%s".', $tagName));
+            throw new InvalidArgumentException(\sprintf('No tags found that match "%s".', $tagName));
         }
 
         if (1 === \count($matchingTags)) {
@@ -362,6 +368,7 @@ EOF
         return class_exists($serviceId) || interface_exists($serviceId, false);
     }
 
+    /** @return string[] */
     private function getAvailableFormatOptions(): array
     {
         return (new DescriptorHelper())->getFormats();

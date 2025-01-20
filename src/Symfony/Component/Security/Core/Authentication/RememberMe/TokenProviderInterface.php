@@ -39,13 +39,11 @@ interface TokenProviderInterface
     /**
      * Updates the token according to this data.
      *
-     * @param \DateTimeInterface $lastUsed Accepting only DateTime is deprecated since Symfony 6.4
-     *
      * @return void
      *
      * @throws TokenNotFoundException if the token is not found
      */
-    public function updateToken(string $series, #[\SensitiveParameter] string $tokenValue, \DateTime $lastUsed);
+    public function updateToken(string $series, #[\SensitiveParameter] string $tokenValue, \DateTimeInterface $lastUsed);
 
     /**
      * Creates a new token.

@@ -68,14 +68,14 @@ class ProjectServiceContainer extends Container
         $container->factories['service_container']['foo'] ??= self::getFooService(...);
 
         if (true === $lazyLoad) {
-            return $container->createProxy('stdClassGhost2fc7938', static fn () => \stdClassGhost2fc7938::createLazyGhost(static fn ($proxy) => self::getFooService($container, $proxy)));
+            return $container->createProxy('stdClassGhostAa01f12', static fn () => \stdClassGhostAa01f12::createLazyGhost(static fn ($proxy) => self::getFooService($container, $proxy)));
         }
 
         return $lazyLoad;
     }
 }
 
-class stdClassGhost2fc7938 extends \stdClass implements \Symfony\Component\VarExporter\LazyObjectInterface
+class stdClassGhostAa01f12 extends \stdClass implements \Symfony\Component\VarExporter\LazyObjectInterface
 {
     use \Symfony\Component\VarExporter\LazyGhostTrait;
 

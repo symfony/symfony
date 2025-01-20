@@ -14,8 +14,7 @@ namespace Symfony\Component\Validator\Constraints;
 use Symfony\Component\Validator\Constraint;
 
 /**
- * @Annotation
- * @Target({"PROPERTY", "METHOD", "ANNOTATION"})
+ * Validates that a value is not strictly equal to null.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
@@ -28,13 +27,12 @@ class NotNull extends Constraint
         self::IS_NULL_ERROR => 'IS_NULL_ERROR',
     ];
 
+    public string $message = 'This value should not be null.';
+
     /**
-     * @deprecated since Symfony 6.1, use const ERROR_NAMES instead
+     * @param array<string,mixed>|null $options
+     * @param string[]|null            $groups
      */
-    protected static $errorNames = self::ERROR_NAMES;
-
-    public $message = 'This value should not be null.';
-
     public function __construct(?array $options = null, ?string $message = null, ?array $groups = null, mixed $payload = null)
     {
         parent::__construct($options ?? [], $groups, $payload);

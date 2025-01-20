@@ -76,7 +76,7 @@ class FormFieldRegistry
         while ($segments) {
             $path = array_shift($segments);
             if (!\is_array($target) || !\array_key_exists($path, $target)) {
-                throw new \InvalidArgumentException(sprintf('Unreachable field "%s".', $path));
+                throw new \InvalidArgumentException(\sprintf('Unreachable field "%s".', $path));
             }
             $target = &$target[$path];
         }
@@ -106,7 +106,7 @@ class FormFieldRegistry
     public function set(string $name, mixed $value): void
     {
         $target = &$this->get($name);
-        if ((!\is_array($value) && $target instanceof Field\FormField) || $target instanceof Field\ChoiceFormField) {
+        if ((!\is_array($value) && $target instanceof FormField) || $target instanceof Field\ChoiceFormField) {
             $target->setValue($value);
         } elseif (\is_array($value)) {
             $registry = new static();
@@ -116,7 +116,7 @@ class FormFieldRegistry
                 $this->set($k, $v);
             }
         } else {
-            throw new \InvalidArgumentException(sprintf('Cannot set value on a compound field "%s".', $name));
+            throw new \InvalidArgumentException(\sprintf('Cannot set value on a compound field "%s".', $name));
         }
     }
 
@@ -136,7 +136,7 @@ class FormFieldRegistry
     private function walk(array $array, ?string $base = '', array &$output = []): array
     {
         foreach ($array as $k => $v) {
-            $path = empty($base) ? $k : sprintf('%s[%s]', $base, $k);
+            $path = $base ? \sprintf('%s[%s]', $base, $k) : $k;
             if (\is_array($v)) {
                 $this->walk($v, $path, $output);
             } else {

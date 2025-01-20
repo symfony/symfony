@@ -24,9 +24,9 @@ class ArrayInputTest extends TestCase
         $input = new ArrayInput([]);
         $this->assertNull($input->getFirstArgument(), '->getFirstArgument() returns null if no argument were passed');
         $input = new ArrayInput(['name' => 'Fabien']);
-        $this->assertEquals('Fabien', $input->getFirstArgument(), '->getFirstArgument() returns the first passed argument');
+        $this->assertSame('Fabien', $input->getFirstArgument(), '->getFirstArgument() returns the first passed argument');
         $input = new ArrayInput(['--foo' => 'bar', 'name' => 'Fabien']);
-        $this->assertEquals('Fabien', $input->getFirstArgument(), '->getFirstArgument() returns the first passed argument');
+        $this->assertSame('Fabien', $input->getFirstArgument(), '->getFirstArgument() returns the first passed argument');
     }
 
     public function testHasParameterOption()
@@ -46,22 +46,22 @@ class ArrayInputTest extends TestCase
     public function testGetParameterOption()
     {
         $input = new ArrayInput(['name' => 'Fabien', '--foo' => 'bar']);
-        $this->assertEquals('bar', $input->getParameterOption('--foo'), '->getParameterOption() returns the option of specified name');
-        $this->assertEquals('default', $input->getParameterOption('--bar', 'default'), '->getParameterOption() returns the default value if an option is not present in the passed parameters');
+        $this->assertSame('bar', $input->getParameterOption('--foo'), '->getParameterOption() returns the option of specified name');
+        $this->assertSame('default', $input->getParameterOption('--bar', 'default'), '->getParameterOption() returns the default value if an option is not present in the passed parameters');
 
         $input = new ArrayInput(['Fabien', '--foo' => 'bar']);
-        $this->assertEquals('bar', $input->getParameterOption('--foo'), '->getParameterOption() returns the option of specified name');
+        $this->assertSame('bar', $input->getParameterOption('--foo'), '->getParameterOption() returns the option of specified name');
 
         $input = new ArrayInput(['--foo', '--', '--bar' => 'woop']);
-        $this->assertEquals('woop', $input->getParameterOption('--bar'), '->getParameterOption() returns the correct value if an option is present in the passed parameters');
-        $this->assertEquals('default', $input->getParameterOption('--bar', 'default', true), '->getParameterOption() returns the default value if an option is present in the passed parameters after an end of options signal');
+        $this->assertSame('woop', $input->getParameterOption('--bar'), '->getParameterOption() returns the correct value if an option is present in the passed parameters');
+        $this->assertSame('default', $input->getParameterOption('--bar', 'default', true), '->getParameterOption() returns the default value if an option is present in the passed parameters after an end of options signal');
     }
 
     public function testParseArguments()
     {
         $input = new ArrayInput(['name' => 'foo'], new InputDefinition([new InputArgument('name')]));
 
-        $this->assertEquals(['name' => 'foo'], $input->getArguments(), '->parse() parses required arguments');
+        $this->assertSame(['name' => 'foo'], $input->getArguments(), '->parse() parses required arguments');
     }
 
     /**
@@ -71,7 +71,7 @@ class ArrayInputTest extends TestCase
     {
         $input = new ArrayInput($input, new InputDefinition($options));
 
-        $this->assertEquals($expectedOptions, $input->getOptions(), $message);
+        $this->assertSame($expectedOptions, $input->getOptions(), $message);
     }
 
     public static function provideOptions(): array
@@ -162,7 +162,7 @@ class ArrayInputTest extends TestCase
     public function testToString()
     {
         $input = new ArrayInput(['-f' => null, '-b' => 'bar', '--foo' => 'b a z', '--lala' => null, 'test' => 'Foo', 'test2' => "A\nB'C"]);
-        $this->assertEquals('-f -b bar --foo='.escapeshellarg('b a z').' --lala Foo '.escapeshellarg("A\nB'C"), (string) $input);
+        $this->assertSame('-f -b bar --foo='.escapeshellarg('b a z').' --lala Foo '.escapeshellarg("A\nB'C"), (string) $input);
 
         $input = new ArrayInput(['-b' => ['bval_1', 'bval_2'], '--f' => ['fval_1', 'fval_2']]);
         $this->assertSame('-b bval_1 -b bval_2 --f=fval_1 --f=fval_2', (string) $input);

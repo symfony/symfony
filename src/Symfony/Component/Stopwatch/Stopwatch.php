@@ -23,7 +23,7 @@ class_exists(Section::class);
  */
 class Stopwatch implements ResetInterface
 {
-    private bool $morePrecision;
+    public const ROOT = '__root__';
 
     /**
      * @var Section[]
@@ -38,9 +38,9 @@ class Stopwatch implements ResetInterface
     /**
      * @param bool $morePrecision If true, time is stored as float to keep the original microsecond precision
      */
-    public function __construct(bool $morePrecision = false)
-    {
-        $this->morePrecision = $morePrecision;
+    public function __construct(
+        private bool $morePrecision = false,
+    ) {
         $this->reset();
     }
 
@@ -57,16 +57,14 @@ class Stopwatch implements ResetInterface
      *
      * @param string|null $id The id of the session to re-open, null to create a new one
      *
-     * @return void
-     *
      * @throws \LogicException When the section to re-open is not reachable
      */
-    public function openSection(?string $id = null)
+    public function openSection(?string $id = null): void
     {
         $current = end($this->activeSections);
 
         if (null !== $id && null === $current->get($id)) {
-            throw new \LogicException(sprintf('The section "%s" has been started at an other level and cannot be opened.', $id));
+            throw new \LogicException(\sprintf('The section "%s" has been started at an other level and cannot be opened.', $id));
         }
 
         $this->start('__section__.child', 'section');
@@ -81,11 +79,9 @@ class Stopwatch implements ResetInterface
      *
      * @see getSectionEvents()
      *
-     * @return void
-     *
      * @throws \LogicException When there's no started section to be stopped
      */
-    public function stopSection(string $id)
+    public function stopSection(string $id): void
     {
         $this->stop('__section__');
 
@@ -148,12 +144,20 @@ class Stopwatch implements ResetInterface
     }
 
     /**
-     * Resets the stopwatch to its original state.
+     * Gets all events for the root section.
      *
-     * @return void
+     * @return StopwatchEvent[]
      */
-    public function reset()
+    public function getRootSectionEvents(): array
     {
-        $this->sections = $this->activeSections = ['__root__' => new Section(null, $this->morePrecision)];
+        return $this->sections[self::ROOT]->getEvents() ?? [];
+    }
+
+    /**
+     * Resets the stopwatch to its original state.
+     */
+    public function reset(): void
+    {
+        $this->sections = $this->activeSections = [self::ROOT => new Section(null, $this->morePrecision)];
     }
 }

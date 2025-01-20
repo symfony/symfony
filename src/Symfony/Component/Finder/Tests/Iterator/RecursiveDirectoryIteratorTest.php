@@ -70,7 +70,7 @@ class RecursiveDirectoryIteratorTest extends IteratorTestCase
 
     public function testTrailingDirectorySeparatorIsStripped()
     {
-        $fixturesDirectory = __DIR__ . '/../Fixtures/';
+        $fixturesDirectory = __DIR__.'/../Fixtures/';
         $actual = [];
 
         foreach (new RecursiveDirectoryIterator($fixturesDirectory, RecursiveDirectoryIterator::SKIP_DOTS) as $file) {

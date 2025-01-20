@@ -1,6 +1,26 @@
 CHANGELOG
 =========
 
+7.3
+---
+
+ * Add `is_granted_for_user()` Twig function
+
+7.2
+---
+
+ * Deprecate passing a tag to the constructor of `FormThemeNode`
+
+7.1
+---
+
+ * Add `emojify` Twig filter
+
+7.0
+---
+
+ * Drop support for Twig 2
+
 6.4
 ---
 

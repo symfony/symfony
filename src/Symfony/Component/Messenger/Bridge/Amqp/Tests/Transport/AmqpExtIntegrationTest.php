@@ -40,8 +40,6 @@ class AmqpExtIntegrationTest extends TestCase
 {
     protected function setUp(): void
     {
-        parent::setUp();
-
         if (!getenv('MESSENGER_AMQP_DSN')) {
             $this->markTestSkipped('The "MESSENGER_AMQP_DSN" environment variable is required.');
         }

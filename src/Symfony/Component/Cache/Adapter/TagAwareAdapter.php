@@ -44,18 +44,19 @@ class TagAwareAdapter implements TagAwareAdapterInterface, TagAwareCacheInterfac
     private AdapterInterface $pool;
     private AdapterInterface $tags;
     private array $knownTagVersions = [];
-    private float $knownTagVersionsTtl;
 
     private static \Closure $setCacheItemTags;
     private static \Closure $setTagVersions;
     private static \Closure $getTagsByKey;
     private static \Closure $saveTags;
 
-    public function __construct(AdapterInterface $itemsPool, ?AdapterInterface $tagsPool = null, float $knownTagVersionsTtl = 0.15)
-    {
+    public function __construct(
+        AdapterInterface $itemsPool,
+        ?AdapterInterface $tagsPool = null,
+        private float $knownTagVersionsTtl = 0.15,
+    ) {
         $this->pool = $itemsPool;
         $this->tags = $tagsPool ?? $itemsPool;
-        $this->knownTagVersionsTtl = $knownTagVersionsTtl;
         self::$setCacheItemTags ??= \Closure::bind(
             static function (array $items, array $itemTags) {
                 foreach ($items as $key => $item) {
@@ -206,12 +207,10 @@ class TagAwareAdapter implements TagAwareAdapterInterface, TagAwareCacheInterfac
                     unset($this->deferred[$key]);
                 }
             }
+
+            return $this->pool->clear($prefix);
         } else {
             $this->deferred = [];
-        }
-
-        if ($this->pool instanceof AdapterInterface) {
-            return $this->pool->clear($prefix);
         }
 
         return $this->pool->clear();
@@ -283,10 +282,7 @@ class TagAwareAdapter implements TagAwareAdapterInterface, TagAwareCacheInterfac
         return $this->pool instanceof PruneableInterface && $this->pool->prune();
     }
 
-    /**
-     * @return void
-     */
-    public function reset()
+    public function reset(): void
     {
         $this->commit();
         $this->knownTagVersions = [];
@@ -299,10 +295,7 @@ class TagAwareAdapter implements TagAwareAdapterInterface, TagAwareCacheInterfac
         throw new \BadMethodCallException('Cannot serialize '.__CLASS__);
     }
 
-    /**
-     * @return void
-     */
-    public function __wakeup()
+    public function __wakeup(): void
     {
         throw new \BadMethodCallException('Cannot unserialize '.__CLASS__);
     }

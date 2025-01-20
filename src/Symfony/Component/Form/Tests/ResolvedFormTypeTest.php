@@ -100,7 +100,7 @@ class ResolvedFormTypeTest extends TestCase
     public function testFailsCreateBuilderOnInvalidFormOptionsResolution()
     {
         $this->expectException(MissingOptionsException::class);
-        $this->expectExceptionMessage(sprintf('An error has occurred resolving the options of the form "%s": The required option "foo" is missing.', UsageTrackingFormType::class));
+        $this->expectExceptionMessage(\sprintf('An error has occurred resolving the options of the form "%s": The required option "foo" is missing.', UsageTrackingFormType::class));
 
         $this->resolvedType->createBuilder($this->formFactory, 'name');
     }

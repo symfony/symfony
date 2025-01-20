@@ -19,6 +19,10 @@ namespace Symfony\Component\DependencyInjection\Attribute;
 #[\Attribute(\Attribute::TARGET_CLASS | \Attribute::IS_REPEATABLE)]
 final class AsAlias
 {
+    /**
+     * @param string|null $id     The id of the alias
+     * @param bool        $public Whether to declare the alias public
+     */
     public function __construct(
         public ?string $id = null,
         public bool $public = false,

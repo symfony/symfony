@@ -110,7 +110,7 @@ abstract class AbstractDescriptorTestCase extends TestCase
     /** @dataProvider getDescribeContainerDefinitionWithArgumentsShownTestData */
     public function testDescribeContainerDefinitionWithArgumentsShown(Definition $definition, $expectedDescription)
     {
-        $this->assertDescription($expectedDescription, $definition, ['show_arguments' => true]);
+        $this->assertDescription($expectedDescription, $definition, []);
     }
 
     public static function getDescribeContainerDefinitionWithArgumentsShownTestData(): array
@@ -292,7 +292,7 @@ abstract class AbstractDescriptorTestCase extends TestCase
     {
         $data = [];
         foreach ($objects as $name => $object) {
-            $file = sprintf('%s.%s', trim($name, '.'), static::getFormat());
+            $file = \sprintf('%s.%s', trim($name, '.'), static::getFormat());
             $description = file_get_contents(__DIR__.'/../../Fixtures/Descriptor/'.$file);
             $data[] = [$object, $description, $file];
         }
@@ -307,13 +307,13 @@ abstract class AbstractDescriptorTestCase extends TestCase
             'public' => ['show_hidden' => false],
             'tag1' => ['show_hidden' => true, 'tag' => 'tag1'],
             'tags' => ['group_by' => 'tags', 'show_hidden' => true],
-            'arguments' => ['show_hidden' => false, 'show_arguments' => true],
+            'arguments' => ['show_hidden' => false],
         ];
 
         $data = [];
         foreach ($objects as $name => $object) {
             foreach ($variations as $suffix => $options) {
-                $file = sprintf('%s_%s.%s', trim($name, '.'), $suffix, static::getFormat());
+                $file = \sprintf('%s_%s.%s', trim($name, '.'), $suffix, static::getFormat());
                 $description = file_get_contents(__DIR__.'/../../Fixtures/Descriptor/'.$file);
                 $data[] = [$object, $description, $options, $file];
             }
@@ -332,7 +332,7 @@ abstract class AbstractDescriptorTestCase extends TestCase
         $data = [];
         foreach ($objects as $name => $object) {
             foreach ($variations as $suffix => $options) {
-                $file = sprintf('%s_%s.%s', trim($name, '.'), $suffix, static::getFormat());
+                $file = \sprintf('%s_%s.%s', trim($name, '.'), $suffix, static::getFormat());
                 $description = file_get_contents(__DIR__.'/../../Fixtures/Descriptor/'.$file);
                 $data[] = [$object, $description, $options, $file];
             }
@@ -353,7 +353,7 @@ abstract class AbstractDescriptorTestCase extends TestCase
         $data = [];
         foreach (ObjectsProvider::getContainerBuildersWithPriorityTags() as $name => $object) {
             foreach ($variations as $suffix => $options) {
-                $file = sprintf('%s_%s.%s', trim($name, '.'), $suffix, static::getFormat());
+                $file = \sprintf('%s_%s.%s', trim($name, '.'), $suffix, static::getFormat());
                 $description = file_get_contents(__DIR__.'/../../Fixtures/Descriptor/'.$file);
                 $data[] = [$object, $description, $options];
             }

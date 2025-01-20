@@ -29,7 +29,7 @@ final class FirewallConfig
         private readonly ?string $accessDeniedUrl = null,
         private readonly array $authenticators = [],
         private readonly ?array $switchUser = null,
-        private readonly ?array $logout = null
+        private readonly ?array $logout = null,
     ) {
     }
 

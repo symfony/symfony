@@ -25,9 +25,7 @@ final class FakeSmsLoggerTransportTest extends TransportTestCase
 {
     public static function createTransport(?HttpClientInterface $client = null, ?LoggerInterface $logger = null): FakeSmsLoggerTransport
     {
-        $transport = (new FakeSmsLoggerTransport($logger ?? new NullLogger(), $client ?? new MockHttpClient()));
-
-        return $transport;
+        return new FakeSmsLoggerTransport($logger ?? new NullLogger(), $client ?? new MockHttpClient());
     }
 
     public static function toStringProvider(): iterable
@@ -61,7 +59,7 @@ final class FakeSmsLoggerTransportTest extends TransportTestCase
         $this->assertNotEmpty($logs);
 
         $log = $logs[0];
-        $this->assertSame(sprintf('New SMS on phone number: %s', $phone), $log['message']);
+        $this->assertSame(\sprintf('New SMS on phone number: %s', $phone), $log['message']);
         $this->assertSame('info', $log['level']);
     }
 }

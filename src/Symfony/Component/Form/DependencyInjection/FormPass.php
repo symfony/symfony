@@ -30,10 +30,7 @@ class FormPass implements CompilerPassInterface
 {
     use PriorityTaggedServiceTrait;
 
-    /**
-     * @return void
-     */
-    public function process(ContainerBuilder $container)
+    public function process(ContainerBuilder $container): void
     {
         if (!$container->hasDefinition('form.extension')) {
             return;
@@ -92,7 +89,7 @@ class FormPass implements CompilerPassInterface
                 }
 
                 if (!$extendsTypes) {
-                    throw new InvalidArgumentException(sprintf('The getExtendedTypes() method for service "%s" does not return any extended types.', $serviceId));
+                    throw new InvalidArgumentException(\sprintf('The getExtendedTypes() method for service "%s" does not return any extended types.', $serviceId));
                 }
             }
         }

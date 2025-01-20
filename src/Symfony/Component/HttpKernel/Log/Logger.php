@@ -74,13 +74,13 @@ class Logger extends AbstractLogger implements DebugLoggerInterface
         }
 
         if (!isset(self::LEVELS[$minLevel])) {
-            throw new InvalidArgumentException(sprintf('The log level "%s" does not exist.', $minLevel));
+            throw new InvalidArgumentException(\sprintf('The log level "%s" does not exist.', $minLevel));
         }
 
         $this->minLevelIndex = self::LEVELS[$minLevel];
         $this->formatter = null !== $formatter ? $formatter(...) : $this->format(...);
         if ($output && false === $this->handle = \is_string($output) ? @fopen($output, 'a') : $output) {
-            throw new InvalidArgumentException(sprintf('Unable to open "%s".', $output));
+            throw new InvalidArgumentException(\sprintf('Unable to open "%s".', $output));
         }
         $this->debug = $debug;
     }
@@ -93,7 +93,7 @@ class Logger extends AbstractLogger implements DebugLoggerInterface
     public function log($level, $message, array $context = []): void
     {
         if (!isset(self::LEVELS[$level])) {
-            throw new InvalidArgumentException(sprintf('The log level "%s" does not exist.', $level));
+            throw new InvalidArgumentException(\sprintf('The log level "%s" does not exist.', $level));
         }
 
         if (self::LEVELS[$level] < $this->minLevelIndex) {
@@ -155,7 +155,7 @@ class Logger extends AbstractLogger implements DebugLoggerInterface
             $message = strtr($message, $replacements);
         }
 
-        $log = sprintf('[%s] %s', $level, $message);
+        $log = \sprintf('[%s] %s', $level, $message);
         if ($prefixDate) {
             $log = date(\DateTimeInterface::RFC3339).' '.$log;
         }

@@ -16,10 +16,9 @@ namespace Symfony\Bundle\FrameworkBundle\Secrets;
  */
 class DotenvVault extends AbstractVault
 {
-    private string $dotenvFile;
-
-    public function __construct(string $dotenvFile)
-    {
+    public function __construct(
+        private string $dotenvFile,
+    ) {
         $this->dotenvFile = strtr($dotenvFile, '/', \DIRECTORY_SEPARATOR);
     }
 
@@ -45,7 +44,7 @@ class DotenvVault extends AbstractVault
 
         file_put_contents($this->dotenvFile, $content);
 
-        $this->lastMessage = sprintf('Secret "%s" %s in "%s".', $name, $count ? 'added' : 'updated', $this->getPrettyPath($this->dotenvFile));
+        $this->lastMessage = \sprintf('Secret "%s" %s in "%s".', $name, $count ? 'added' : 'updated', $this->getPrettyPath($this->dotenvFile));
     }
 
     public function reveal(string $name): ?string
@@ -55,7 +54,7 @@ class DotenvVault extends AbstractVault
         $v = $_ENV[$name] ?? (str_starts_with($name, 'HTTP_') ? null : ($_SERVER[$name] ?? null));
 
         if ('' === ($v ?? '')) {
-            $this->lastMessage = sprintf('Secret "%s" not found in "%s".', $name, $this->getPrettyPath($this->dotenvFile));
+            $this->lastMessage = \sprintf('Secret "%s" not found in "%s".', $name, $this->getPrettyPath($this->dotenvFile));
 
             return null;
         }
@@ -73,12 +72,12 @@ class DotenvVault extends AbstractVault
 
         if ($count) {
             file_put_contents($this->dotenvFile, $content);
-            $this->lastMessage = sprintf('Secret "%s" removed from file "%s".', $name, $this->getPrettyPath($this->dotenvFile));
+            $this->lastMessage = \sprintf('Secret "%s" removed from file "%s".', $name, $this->getPrettyPath($this->dotenvFile));
 
             return true;
         }
 
-        $this->lastMessage = sprintf('Secret "%s" not found in "%s".', $name, $this->getPrettyPath($this->dotenvFile));
+        $this->lastMessage = \sprintf('Secret "%s" not found in "%s".', $name, $this->getPrettyPath($this->dotenvFile));
 
         return false;
     }

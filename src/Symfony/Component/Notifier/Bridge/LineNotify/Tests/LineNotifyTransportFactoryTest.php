@@ -12,13 +12,16 @@
 namespace Symfony\Component\Notifier\Bridge\LineNotify\Tests;
 
 use Symfony\Component\Notifier\Bridge\LineNotify\LineNotifyTransportFactory;
-use Symfony\Component\Notifier\Test\TransportFactoryTestCase;
+use Symfony\Component\Notifier\Test\AbstractTransportFactoryTestCase;
+use Symfony\Component\Notifier\Test\IncompleteDsnTestTrait;
 
 /**
  * @author Akira Kurozumi <info@a-zumi.net>
  */
-final class LineNotifyTransportFactoryTest extends TransportFactoryTestCase
+final class LineNotifyTransportFactoryTest extends AbstractTransportFactoryTestCase
 {
+    use IncompleteDsnTestTrait;
+
     public function createFactory(): LineNotifyTransportFactory
     {
         return new LineNotifyTransportFactory();

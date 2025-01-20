@@ -49,7 +49,7 @@ class ServerDumperTest extends TestCase
         $cloner = new VarCloner();
         $data = $cloner->cloneVar('foo');
         $dumper = new ServerDumper(self::VAR_DUMPER_SERVER, $wrappedDumper, [
-            'foo_provider' => new class() implements ContextProviderInterface {
+            'foo_provider' => new class implements ContextProviderInterface {
                 public function getContext(): ?array
                 {
                     return ['foo'];

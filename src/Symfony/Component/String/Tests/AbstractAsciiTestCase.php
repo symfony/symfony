@@ -16,6 +16,7 @@ use Symfony\Component\String\AbstractString;
 use Symfony\Component\String\ByteString;
 use Symfony\Component\String\CodePointString;
 use Symfony\Component\String\Exception\InvalidArgumentException;
+use Symfony\Component\String\TruncateMode;
 use Symfony\Component\String\UnicodeString;
 
 abstract class AbstractAsciiTestCase extends TestCase
@@ -1089,6 +1090,62 @@ abstract class AbstractAsciiTestCase extends TestCase
     }
 
     /**
+     * @dataProvider provideKebab
+     */
+    public function testKebab(string $expectedString, string $origin)
+    {
+        $instance = static::createFromString($origin)->kebab();
+
+        $this->assertEquals(static::createFromString($expectedString), $instance);
+        $this->assertNotSame($origin, $instance, 'Strings should be immutable');
+    }
+
+    public static function provideKebab(): array
+    {
+        return [
+            ['', ''],
+            ['x-y', 'x_y'],
+            ['x-y', 'X_Y'],
+            ['xu-yo', 'xu_yo'],
+            ['symfony-is-great', 'symfonyIsGreat'],
+            ['symfony123-is-great', 'symfony123IsGreat'],
+            ['symfony123is-great', 'symfony123isGreat'],
+            ['symfony-is-great', 'Symfony is great'],
+            ['symfony-is-a-great-framework', 'symfonyIsAGreatFramework'],
+            ['symfony-is-great', 'symfonyIsGREAT'],
+            ['symfony-is-really-great', 'symfonyIsREALLYGreat'],
+            ['symfony', 'SYMFONY'],
+        ];
+    }
+
+    /**
+     * @dataProvider providePascal
+     */
+    public function testPascal(string $expectedString, string $origin)
+    {
+        $instance = static::createFromString($origin)->pascal();
+
+        $this->assertEquals(static::createFromString($expectedString), $instance);
+        $this->assertNotSame($origin, $instance, 'Strings should be immutable');
+    }
+
+    public static function providePascal(): array
+    {
+        return [
+            ['', ''],
+            ['XY', 'x_y'],
+            ['XuYo', 'xu_yo'],
+            ['SymfonyIsGreat', 'symfony_is_great'],
+            ['Symfony5IsGreat', 'symfony_5_is_great'],
+            ['SymfonyIsGreat', 'Symfony is great'],
+            ['SYMFONYISGREAT', 'SYMFONY_IS_GREAT'],
+            ['SymfonyIsAGreatFramework', 'Symfony is a great framework'],
+            ['SymfonyIsGREAT', '*Symfony* is GREAT!!'],
+            ['SYMFONY', 'SYMFONY'],
+        ];
+    }
+
+    /**
      * @dataProvider provideStartsWith
      */
     public function testStartsWith(bool $expected, string $origin, $prefix, ?int $form = null)
@@ -1508,22 +1565,24 @@ abstract class AbstractAsciiTestCase extends TestCase
     /**
      * @dataProvider provideTruncate
      */
-    public function testTruncate(string $expected, string $origin, int $length, string $ellipsis, bool $cut = true)
+    public function testTruncate(string $expected, string $origin, int $length, string $ellipsis, bool|TruncateMode $cut = TruncateMode::Char)
     {
         $instance = static::createFromString($origin)->truncate($length, $ellipsis, $cut);
 
         $this->assertEquals(static::createFromString($expected), $instance);
     }
 
-    public static function provideTruncate()
+    public static function provideTruncate(): array
     {
         return [
             ['', '', 3, ''],
             ['', 'foo', 0, '...'],
             ['foo', 'foo', 0, '...', false],
+            ['foo', 'foo', 0, '...', TruncateMode::WordAfter],
             ['fo', 'foobar', 2, ''],
             ['foobar', 'foobar', 10, ''],
             ['foobar', 'foobar', 10, '...', false],
+            ['foobar', 'foobar', 10, '...', TruncateMode::WordAfter],
             ['foo', 'foo', 3, '...'],
             ['fo', 'foobar', 2, '...'],
             ['...', 'foobar', 3, '...'],
@@ -1532,6 +1591,42 @@ abstract class AbstractAsciiTestCase extends TestCase
             ['foobar...', 'foobar foo', 7, '...', false],
             ['foobar foo...', 'foobar foo a', 10, '...', false],
             ['foobar foo aar', 'foobar foo aar', 12, '...', false],
+            ['foobar', 'foobar foo', 6, '', TruncateMode::Char],
+            ['foobar', 'foobar foo', 6, '', TruncateMode::WordAfter],
+            ['foobar', 'foobar foo', 6, '', TruncateMode::WordBefore],
+            ['foo...', 'foobar foo', 6, '...', TruncateMode::Char],
+            ['foobar...', 'foobar foo', 6, '...', TruncateMode::WordAfter],
+            ['foobar...', 'foobar foo', 6, '...', TruncateMode::WordBefore],
+            ['foobar ', 'foobar foo', 7, '', TruncateMode::Char],
+            ['foobar', 'foobar foo', 7, '', TruncateMode::WordAfter],
+            ['foobar', 'foobar foo', 7, '', TruncateMode::WordBefore],
+            ['foob...', 'foobar foo', 7, '...', TruncateMode::Char],
+            ['foobar...', 'foobar foo', 7, '...', TruncateMode::WordAfter],
+            ['foobar...', 'foobar foo', 7, '...', TruncateMode::WordBefore],
+            ['foobar foo', 'foobar foo a', 10, '', TruncateMode::Char],
+            ['foobar foo', 'foobar foo a', 10, '', TruncateMode::WordAfter],
+            ['foobar foo', 'foobar foo a', 10, '', TruncateMode::WordBefore],
+            ['foobar...', 'foobar foo a', 10, '...', TruncateMode::Char],
+            ['foobar foo...', 'foobar foo a', 10, '...', TruncateMode::WordAfter],
+            ['foobar...', 'foobar foo a', 10, '...', TruncateMode::WordBefore],
+            ['foobar foo a', 'foobar foo aar', 12, '', TruncateMode::Char],
+            ['foobar foo aar', 'foobar foo aar', 12, '', TruncateMode::WordAfter],
+            ['foobar foo', 'foobar foo aar', 12, '', TruncateMode::WordBefore],
+            ['foobar fo...', 'foobar foo aar', 12, '...', TruncateMode::Char],
+            ['foobar foo aar', 'foobar foo aar', 12, '...', TruncateMode::WordAfter],
+            ['foobar...', 'foobar foo aar', 12, '...', TruncateMode::WordBefore],
+            ['foobar foo', 'foobar foo aar', 10, '', TruncateMode::Char],
+            ['foobar foo', 'foobar foo aar', 10, '', TruncateMode::WordBefore],
+            ['foobar foo', 'foobar foo aar', 10, '', TruncateMode::WordAfter],
+            ['foobar...', 'foobar foo aar', 10, '...', TruncateMode::Char],
+            ['foobar...', 'foobar foo aar', 10, '...', TruncateMode::WordBefore],
+            ['foobar foo...', 'foobar foo aar', 10, '...', TruncateMode::WordAfter],
+            ['Lorem ipsum do', 'Lorem ipsum dolor sit amet', 14, '', TruncateMode::Char],
+            ['Lorem ipsum', 'Lorem ipsum dolor sit amet', 14, '', TruncateMode::WordBefore],
+            ['Lorem ipsum dolor', 'Lorem ipsum dolor sit amet', 14, '', TruncateMode::WordAfter],
+            ['Lorem i...', 'Lorem ipsum dolor sit amet', 10, '...', TruncateMode::Char],
+            ['Lorem...', 'Lorem ipsum dolor sit amet', 10, '...', TruncateMode::WordBefore],
+            ['Lorem ipsum...', 'Lorem ipsum dolor sit amet', 10, '...', TruncateMode::WordAfter],
         ];
     }
 

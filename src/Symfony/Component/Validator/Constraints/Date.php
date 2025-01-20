@@ -14,8 +14,9 @@ namespace Symfony\Component\Validator\Constraints;
 use Symfony\Component\Validator\Constraint;
 
 /**
- * @Annotation
- * @Target({"PROPERTY", "METHOD", "ANNOTATION"})
+ * Validates that a value is a valid date, i.e. its string representation follows the Y-m-d format.
+ *
+ * @see https://www.php.net/manual/en/datetime.format.php
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
@@ -30,13 +31,12 @@ class Date extends Constraint
         self::INVALID_DATE_ERROR => 'INVALID_DATE_ERROR',
     ];
 
+    public string $message = 'This value is not a valid date.';
+
     /**
-     * @deprecated since Symfony 6.1, use const ERROR_NAMES instead
+     * @param array<string,mixed>|null $options
+     * @param string[]|null            $groups
      */
-    protected static $errorNames = self::ERROR_NAMES;
-
-    public $message = 'This value is not a valid date.';
-
     public function __construct(?array $options = null, ?string $message = null, ?array $groups = null, mixed $payload = null)
     {
         parent::__construct($options, $groups, $payload);

@@ -26,11 +26,11 @@ class CacheDataCollectorTest extends TestCase
     {
         $statistics = $this->getCacheDataCollectorStatisticsFromEvents([]);
 
-        $this->assertEquals($statistics[self::INSTANCE_NAME]['calls'], 0, 'calls');
-        $this->assertEquals($statistics[self::INSTANCE_NAME]['reads'], 0, 'reads');
-        $this->assertEquals($statistics[self::INSTANCE_NAME]['hits'], 0, 'hits');
-        $this->assertEquals($statistics[self::INSTANCE_NAME]['misses'], 0, 'misses');
-        $this->assertEquals($statistics[self::INSTANCE_NAME]['writes'], 0, 'writes');
+        $this->assertSame(0, $statistics[self::INSTANCE_NAME]['calls'], 'calls');
+        $this->assertSame(0, $statistics[self::INSTANCE_NAME]['reads'], 'reads');
+        $this->assertSame(0, $statistics[self::INSTANCE_NAME]['hits'], 'hits');
+        $this->assertSame(0, $statistics[self::INSTANCE_NAME]['misses'], 'misses');
+        $this->assertSame(0, $statistics[self::INSTANCE_NAME]['writes'], 'writes');
     }
 
     public function testOneEventDataCollector()
@@ -43,11 +43,11 @@ class CacheDataCollectorTest extends TestCase
 
         $statistics = $this->getCacheDataCollectorStatisticsFromEvents([$traceableAdapterEvent]);
 
-        $this->assertEquals($statistics[self::INSTANCE_NAME]['calls'], 1, 'calls');
-        $this->assertEquals($statistics[self::INSTANCE_NAME]['reads'], 1, 'reads');
-        $this->assertEquals($statistics[self::INSTANCE_NAME]['hits'], 0, 'hits');
-        $this->assertEquals($statistics[self::INSTANCE_NAME]['misses'], 1, 'misses');
-        $this->assertEquals($statistics[self::INSTANCE_NAME]['writes'], 0, 'writes');
+        $this->assertSame(1, $statistics[self::INSTANCE_NAME]['calls'], 'calls');
+        $this->assertSame(1, $statistics[self::INSTANCE_NAME]['reads'], 'reads');
+        $this->assertSame(0, $statistics[self::INSTANCE_NAME]['hits'], 'hits');
+        $this->assertSame(1, $statistics[self::INSTANCE_NAME]['misses'], 'misses');
+        $this->assertSame(0, $statistics[self::INSTANCE_NAME]['writes'], 'writes');
     }
 
     public function testHitedEventDataCollector()
@@ -62,11 +62,11 @@ class CacheDataCollectorTest extends TestCase
 
         $statistics = $this->getCacheDataCollectorStatisticsFromEvents([$traceableAdapterEvent]);
 
-        $this->assertEquals($statistics[self::INSTANCE_NAME]['calls'], 1, 'calls');
-        $this->assertEquals($statistics[self::INSTANCE_NAME]['reads'], 1, 'reads');
-        $this->assertEquals($statistics[self::INSTANCE_NAME]['hits'], 0, 'hits');
-        $this->assertEquals($statistics[self::INSTANCE_NAME]['misses'], 1, 'misses');
-        $this->assertEquals($statistics[self::INSTANCE_NAME]['writes'], 0, 'writes');
+        $this->assertSame(1, $statistics[self::INSTANCE_NAME]['calls'], 'calls');
+        $this->assertSame(1, $statistics[self::INSTANCE_NAME]['reads'], 'reads');
+        $this->assertSame(0, $statistics[self::INSTANCE_NAME]['hits'], 'hits');
+        $this->assertSame(1, $statistics[self::INSTANCE_NAME]['misses'], 'misses');
+        $this->assertSame(0, $statistics[self::INSTANCE_NAME]['writes'], 'writes');
     }
 
     public function testSavedEventDataCollector()
@@ -78,11 +78,11 @@ class CacheDataCollectorTest extends TestCase
 
         $statistics = $this->getCacheDataCollectorStatisticsFromEvents([$traceableAdapterEvent]);
 
-        $this->assertEquals($statistics[self::INSTANCE_NAME]['calls'], 1, 'calls');
-        $this->assertEquals($statistics[self::INSTANCE_NAME]['reads'], 0, 'reads');
-        $this->assertEquals($statistics[self::INSTANCE_NAME]['hits'], 0, 'hits');
-        $this->assertEquals($statistics[self::INSTANCE_NAME]['misses'], 0, 'misses');
-        $this->assertEquals($statistics[self::INSTANCE_NAME]['writes'], 1, 'writes');
+        $this->assertSame(1, $statistics[self::INSTANCE_NAME]['calls'], 'calls');
+        $this->assertSame(0, $statistics[self::INSTANCE_NAME]['reads'], 'reads');
+        $this->assertSame(0, $statistics[self::INSTANCE_NAME]['hits'], 'hits');
+        $this->assertSame(0, $statistics[self::INSTANCE_NAME]['misses'], 'misses');
+        $this->assertSame(1, $statistics[self::INSTANCE_NAME]['writes'], 'writes');
     }
 
     public function testCollectBeforeEnd()
@@ -100,8 +100,8 @@ class CacheDataCollectorTest extends TestCase
 
         $stats = $collector->getStatistics();
         $this->assertGreaterThan(0, $stats[self::INSTANCE_NAME]['time']);
-        $this->assertEquals($stats[self::INSTANCE_NAME]['hits'], 0, 'hits');
-        $this->assertEquals($stats[self::INSTANCE_NAME]['misses'], 1, 'misses');
+        $this->assertSame(0, $stats[self::INSTANCE_NAME]['hits'], 'hits');
+        $this->assertSame(1, $stats[self::INSTANCE_NAME]['misses'], 'misses');
     }
 
     private function getCacheDataCollectorStatisticsFromEvents(array $traceableAdapterEvents)

@@ -14,6 +14,7 @@ namespace Symfony\Bundle\FrameworkBundle\Tests\Secrets;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\FrameworkBundle\Secrets\SodiumVault;
 use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\String\LazyString;
 
 /**
  * @requires extension sodium
@@ -21,16 +22,18 @@ use Symfony\Component\Filesystem\Filesystem;
 class SodiumVaultTest extends TestCase
 {
     private string $secretsDir;
+    private Filesystem $filesystem;
 
     protected function setUp(): void
     {
+        $this->filesystem = new Filesystem();
         $this->secretsDir = sys_get_temp_dir().'/sf_secrets/test/';
-        (new Filesystem())->remove($this->secretsDir);
+        $this->filesystem->remove($this->secretsDir);
     }
 
     protected function tearDown(): void
     {
-        (new Filesystem())->remove($this->secretsDir);
+        $this->filesystem->remove($this->secretsDir);
     }
 
     public function testGenerateKeys()
@@ -41,8 +44,8 @@ class SodiumVaultTest extends TestCase
         $this->assertFileExists($this->secretsDir.'/test.encrypt.public.php');
         $this->assertFileExists($this->secretsDir.'/test.decrypt.private.php');
 
-        $encKey = file_get_contents($this->secretsDir.'/test.encrypt.public.php');
-        $decKey = file_get_contents($this->secretsDir.'/test.decrypt.private.php');
+        $encKey = $this->filesystem->readFile($this->secretsDir.'/test.encrypt.public.php');
+        $decKey = $this->filesystem->readFile($this->secretsDir.'/test.decrypt.private.php');
 
         $this->assertFalse($vault->generateKeys());
         $this->assertStringEqualsFile($this->secretsDir.'/test.encrypt.public.php', $encKey);
@@ -72,5 +75,27 @@ class SodiumVaultTest extends TestCase
         $this->assertFalse($vault->remove('foo'));
 
         $this->assertSame([], $vault->list());
+    }
+
+    public function testDerivedSecretEnvVar()
+    {
+        $vault = new SodiumVault($this->secretsDir, null, 'MY_SECRET');
+        $vault->generateKeys();
+        $vault->seal('FOO', 'bar');
+
+        $this->assertSame(['FOO', 'MY_SECRET'], array_keys($vault->loadEnvVars()));
+    }
+
+    public function testEmptySecretEnvVar()
+    {
+        $vault = new SodiumVault($this->secretsDir, '', 'MY_SECRET');
+        $envVars = $vault->loadEnvVars();
+        $envVars['MY_SECRET'] = (string) $envVars['MY_SECRET'];
+        $this->assertSame(['MY_SECRET' => ''], $envVars);
+
+        $vault = new SodiumVault($this->secretsDir, LazyString::fromCallable(fn () => ''), 'MY_SECRET');
+        $envVars = $vault->loadEnvVars();
+        $envVars['MY_SECRET'] = (string) $envVars['MY_SECRET'];
+        $this->assertSame(['MY_SECRET' => ''], $envVars);
     }
 }

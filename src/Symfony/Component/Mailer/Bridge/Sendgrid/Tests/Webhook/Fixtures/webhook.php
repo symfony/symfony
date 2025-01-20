@@ -9,4 +9,4 @@ $wh->setMetadata([]);
 $wh->setReason('Bounced Address');
 $wh->setDate(\DateTimeImmutable::createFromFormat('U', 1600112492));
 
-return $wh;
+return [$wh];

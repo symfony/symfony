@@ -43,13 +43,13 @@ jobs:
         run: |
           $env:Path = 'c:\php;' + $env:Path
           mkdir c:\php && cd c:\php
-          iwr -outf php-8.1.0-Win32-vs16-x86.zip https://github.com/symfony/binary-utils/releases/download/v0.1/php-8.1.0-Win32-vs16-x86.zip
-          7z x php-8.1.0-Win32-vs16-x86.zip -y >nul
+          iwr -outf php-8.2.0-Win32-vs16-x86.zip https://github.com/symfony/binary-utils/releases/download/v0.1/php-8.2.0-Win32-vs16-x86.zip
+          7z x php-8.2.0-Win32-vs16-x86.zip -y >nul
           cd ext
-          iwr -outf php_apcu-5.1.21-8.1-ts-vs16-x86.zip https://github.com/symfony/binary-utils/releases/download/v0.1/php_apcu-5.1.21-8.1-ts-vs16-x86.zip
-          7z x php_apcu-5.1.21-8.1-ts-vs16-x86.zip -y >nul
-          iwr -outf php_redis-5.3.7-8.1-ts-vs16-x86.zip https://github.com/symfony/binary-utils/releases/download/v0.1/php_redis-5.3.7-8.1-ts-vs16-x86.zip
-          7z x php_redis-5.3.7-8.1-ts-vs16-x86.zip -y >nul
+          iwr -outf php_apcu-5.1.22-8.2-ts-vs16-x86.zip https://github.com/symfony/binary-utils/releases/download/v0.1/php_apcu-5.1.22-8.2-ts-vs16-x86.zip
+          7z x php_apcu-5.1.22-8.2-ts-vs16-x86.zip -y >nul
+          iwr -outf php_redis-6.0.0-dev-8.2-ts-vs16-x86.zip https://github.com/symfony/binary-utils/releases/download/v0.1/php_redis-6.0.0-dev-8.2-ts-vs16-x86.zip
+          7z x php_redis-6.0.0-dev-8.2-ts-vs16-x86.zip -y >nul
           cd ..
           Copy php.ini-development php.ini-min
           "memory_limit=-1" >> php.ini-min
@@ -66,6 +66,7 @@ jobs:
           "opcache.enable_cli=1" >> php.ini-max
           "extension=php_openssl.dll" >> php.ini-max
           "extension=php_apcu.dll" >> php.ini-max
+          "extension=php_igbinary.dll" >> php.ini-max
           "extension=php_redis.dll" >> php.ini-max
           "apc.enable_cli=1" >> php.ini-max
           "extension=php_intl.dll" >> php.ini-max

@@ -18,7 +18,6 @@ use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeImmutableToDat
 use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeToArrayTransformer;
 use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeToStringTransformer;
 use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeToTimestampTransformer;
-use Symfony\Component\Form\Event\PreSubmitEvent;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
@@ -35,10 +34,7 @@ class TimeType extends AbstractType
         'choice' => ChoiceType::class,
     ];
 
-    /**
-     * @return void
-     */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $parts = ['hour'];
         $format = 'H';
@@ -48,7 +44,7 @@ class TimeType extends AbstractType
         }
 
         if (null !== $options['reference_date'] && $options['reference_date']->getTimezone()->getName() !== $options['model_timezone']) {
-            throw new InvalidConfigurationException(sprintf('The configured "model_timezone" (%s) must match the timezone of the "reference_date" (%s).', $options['model_timezone'], $options['reference_date']->getTimezone()->getName()));
+            throw new InvalidConfigurationException(\sprintf('The configured "model_timezone" (%s) must match the timezone of the "reference_date" (%s).', $options['model_timezone'], $options['reference_date']->getTimezone()->getName()));
         }
 
         if ($options['with_minutes']) {
@@ -63,15 +59,14 @@ class TimeType extends AbstractType
 
         if ('single_text' === $options['widget']) {
             $builder->addEventListener(FormEvents::PRE_SUBMIT, static function (FormEvent $e) use ($options) {
-                /** @var PreSubmitEvent $event */
                 $data = $e->getData();
                 if ($data && preg_match('/^(?P<hours>\d{2}):(?P<minutes>\d{2})(?::(?P<seconds>\d{2})(?:\.\d+)?)?$/', $data, $matches)) {
                     if ($options['with_seconds']) {
                         // handle seconds ignored by user's browser when with_seconds enabled
                         // https://codereview.chromium.org/450533009/
-                        $e->setData(sprintf('%s:%s:%s', $matches['hours'], $matches['minutes'], $matches['seconds'] ?? '00'));
+                        $e->setData(\sprintf('%s:%s:%s', $matches['hours'], $matches['minutes'], $matches['seconds'] ?? '00'));
                     } else {
-                        $e->setData(sprintf('%s:%s', $matches['hours'], $matches['minutes']));
+                        $e->setData(\sprintf('%s:%s', $matches['hours'], $matches['minutes']));
                     }
                 }
             });
@@ -220,17 +215,13 @@ class TimeType extends AbstractType
                 }
 
                 if ($date->getTimezone()->getName() !== $options['model_timezone']) {
-                    trigger_deprecation('symfony/form', '6.4', sprintf('Using a "%s" instance with a timezone ("%s") not matching the configured model timezone "%s" is deprecated.', $date::class, $date->getTimezone()->getName(), $options['model_timezone']));
-                    // throw new LogicException(sprintf('Using a "%s" instance with a timezone ("%s") not matching the configured model timezone "%s" is not supported.', $date::class, $date->getTimezone()->getName(), $options['model_timezone']));
+                    throw new LogicException(\sprintf('Using a "%s" instance with a timezone ("%s") not matching the configured model timezone "%s" is not supported.', get_debug_type($date), $date->getTimezone()->getName(), $options['model_timezone']));
                 }
             });
         }
     }
 
-    /**
-     * @return void
-     */
-    public function buildView(FormView $view, FormInterface $form, array $options)
+    public function buildView(FormView $view, FormInterface $form, array $options): void
     {
         $view->vars = array_replace($view->vars, [
             'widget' => $options['widget'],
@@ -258,10 +249,7 @@ class TimeType extends AbstractType
         }
     }
 
-    /**
-     * @return void
-     */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $compound = static fn (Options $options) => 'single_text' !== $options['widget'];
 
@@ -286,10 +274,8 @@ class TimeType extends AbstractType
 
         $choiceTranslationDomainNormalizer = static function (Options $options, $choiceTranslationDomain) {
             if (\is_array($choiceTranslationDomain)) {
-                $default = false;
-
                 return array_replace(
-                    ['hour' => $default, 'minute' => $default, 'second' => $default],
+                    ['hour' => false, 'minute' => false, 'second' => false],
                     $choiceTranslationDomain
                 );
             }
@@ -329,11 +315,7 @@ class TimeType extends AbstractType
             'hours' => range(0, 23),
             'minutes' => range(0, 59),
             'seconds' => range(0, 59),
-            'widget' => static function (Options $options) {
-                trigger_deprecation('symfony/form', '6.3', 'Not configuring the "widget" option of form type "time" is deprecated. It will default to "single_text" in Symfony 7.0.');
-
-                return 'choice';
-            },
+            'widget' => 'single_text',
             'input' => 'datetime',
             'input_format' => 'H:i:s',
             'with_minutes' => true,

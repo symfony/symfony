@@ -43,9 +43,9 @@ trait AbstractAdapterTrait
     private array $ids = [];
 
     /**
-     * @var int|null The maximum length to enforce for identifiers or null when no limit applies
+     * The maximum length to enforce for identifiers or null when no limit applies.
      */
-    protected $maxIdLength;
+    protected ?int $maxIdLength = null;
 
     /**
      * Fetches several cache items.
@@ -281,10 +281,7 @@ trait AbstractAdapterTrait
         throw new \BadMethodCallException('Cannot serialize '.__CLASS__);
     }
 
-    /**
-     * @return void
-     */
-    public function __wakeup()
+    public function __wakeup(): void
     {
         throw new \BadMethodCallException('Cannot unserialize '.__CLASS__);
     }
@@ -303,7 +300,7 @@ trait AbstractAdapterTrait
         try {
             foreach ($items as $id => $value) {
                 if (!isset($keys[$id])) {
-                    throw new InvalidArgumentException(sprintf('Could not match value id "%s" to keys "%s".', $id, implode('", "', $keys)));
+                    throw new InvalidArgumentException(\sprintf('Could not match value id "%s" to keys "%s".', $id, implode('", "', $keys)));
                 }
                 $key = $keys[$id];
                 unset($keys[$id]);

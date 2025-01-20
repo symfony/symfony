@@ -29,7 +29,9 @@ class DoctrineCasterTest extends TestCase
     {
         $classMetadata = new ClassMetadata(__CLASS__);
 
-        $collection = new PersistentCollection($this->createMock(EntityManagerInterface::class), $classMetadata, new ArrayCollection(['test']));
+        $entityManager = $this->createMock(EntityManagerInterface::class);
+        $entityManagerClass = $entityManager::class;
+        $collection = new PersistentCollection($entityManager, $classMetadata, new ArrayCollection(['test']));
 
         if (property_exists(PersistentCollection::class, 'isDirty')) {
             // Collections >= 2
@@ -38,7 +40,7 @@ class DoctrineCasterTest extends TestCase
                 %A
                   -backRefFieldName: null
                   -isDirty: false
-                  -em: Mock_EntityManagerInterface_%s { …3}
+                  -em: $entityManagerClass { …3}
                   -typeClass: Doctrine\ORM\Mapping\ClassMetadata { …}
                 %A
                 EODUMP;
@@ -47,7 +49,7 @@ class DoctrineCasterTest extends TestCase
             $expected = <<<EODUMP
                 Doctrine\ORM\PersistentCollection {
                 %A
-                  -em: Mock_EntityManagerInterface_%s { …3}
+                  -em: $entityManagerClass { …3}
                   -backRefFieldName: null
                   -typeClass: Doctrine\ORM\Mapping\ClassMetadata { …}
                 %A

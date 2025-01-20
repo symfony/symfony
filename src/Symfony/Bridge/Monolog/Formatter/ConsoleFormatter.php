@@ -12,7 +12,7 @@
 namespace Symfony\Bridge\Monolog\Formatter;
 
 use Monolog\Formatter\FormatterInterface;
-use Monolog\Logger;
+use Monolog\Level;
 use Monolog\LogRecord;
 use Symfony\Component\Console\Formatter\OutputFormatter;
 use Symfony\Component\VarDumper\Cloner\Data;
@@ -25,25 +25,21 @@ use Symfony\Component\VarDumper\Dumper\CliDumper;
  *
  * @author Tobias Schultze <http://tobion.de>
  * @author Grégoire Pineau <lyrixx@lyrixx.info>
- *
- * @final since Symfony 6.1
  */
-class ConsoleFormatter implements FormatterInterface
+final class ConsoleFormatter implements FormatterInterface
 {
-    use CompatibilityFormatter;
-
     public const SIMPLE_FORMAT = "%datetime% %start_tag%%level_name%%end_tag% <comment>[%channel%]</> %message%%context%%extra%\n";
     public const SIMPLE_DATE = 'H:i:s';
 
     private const LEVEL_COLOR_MAP = [
-        Logger::DEBUG => 'fg=white',
-        Logger::INFO => 'fg=green',
-        Logger::NOTICE => 'fg=blue',
-        Logger::WARNING => 'fg=cyan',
-        Logger::ERROR => 'fg=yellow',
-        Logger::CRITICAL => 'fg=red',
-        Logger::ALERT => 'fg=red',
-        Logger::EMERGENCY => 'fg=white;bg=red',
+        Level::Debug->value => 'fg=white',
+        Level::Info->value => 'fg=green',
+        Level::Notice->value => 'fg=blue',
+        Level::Warning->value => 'fg=cyan',
+        Level::Error->value => 'fg=yellow',
+        Level::Critical->value => 'fg=red',
+        Level::Alert->value => 'fg=red',
+        Level::Emergency->value => 'fg=white;bg=red',
     ];
 
     private array $options;
@@ -100,39 +96,34 @@ class ConsoleFormatter implements FormatterInterface
         return $records;
     }
 
-    private function doFormat(array|LogRecord $record): mixed
+    public function format(LogRecord $record): mixed
     {
-        if ($record instanceof LogRecord) {
-            $record = $record->toArray();
-        }
         $record = $this->replacePlaceHolder($record);
 
-        if (!$this->options['ignore_empty_context_and_extra'] || !empty($record['context'])) {
-            $context = ($this->options['multiline'] ? "\n" : ' ').$this->dumpData($record['context']);
+        if (!$this->options['ignore_empty_context_and_extra'] || $record->context) {
+            $context = $record->context;
+            $context = ($this->options['multiline'] ? "\n" : ' ').$this->dumpData($context);
         } else {
             $context = '';
         }
 
-        if (!$this->options['ignore_empty_context_and_extra'] || !empty($record['extra'])) {
-            $extra = ($this->options['multiline'] ? "\n" : ' ').$this->dumpData($record['extra']);
+        if (!$this->options['ignore_empty_context_and_extra'] || $record->extra) {
+            $extra = $record->extra;
+            $extra = ($this->options['multiline'] ? "\n" : ' ').$this->dumpData($extra);
         } else {
             $extra = '';
         }
 
-        $formatted = strtr($this->options['format'], [
-            '%datetime%' => $record['datetime'] instanceof \DateTimeInterface
-                ? $record['datetime']->format($this->options['date_format'])
-                : $record['datetime'],
-            '%start_tag%' => sprintf('<%s>', self::LEVEL_COLOR_MAP[$record['level']]),
-            '%level_name%' => sprintf($this->options['level_name_format'], $record['level_name']),
+        return strtr($this->options['format'], [
+            '%datetime%' => $record->datetime->format($this->options['date_format']),
+            '%start_tag%' => \sprintf('<%s>', self::LEVEL_COLOR_MAP[$record->level->value]),
+            '%level_name%' => \sprintf($this->options['level_name_format'], $record->level->getName()),
             '%end_tag%' => '</>',
-            '%channel%' => $record['channel'],
-            '%message%' => $this->replacePlaceHolder($record)['message'],
+            '%channel%' => $record->channel,
+            '%message%' => $this->replacePlaceHolder($record)->message,
             '%context%' => $context,
             '%extra%' => $extra,
         ]);
-
-        return $formatted;
     }
 
     /**
@@ -162,27 +153,25 @@ class ConsoleFormatter implements FormatterInterface
         return $a;
     }
 
-    private function replacePlaceHolder(array $record): array
+    private function replacePlaceHolder(LogRecord $record): LogRecord
     {
-        $message = $record['message'];
+        $message = $record->message;
 
         if (!str_contains($message, '{')) {
             return $record;
         }
 
-        $context = $record['context'];
+        $context = $record->context;
 
         $replacements = [];
         foreach ($context as $k => $v) {
             // Remove quotes added by the dumper around string.
             $v = trim($this->dumpData($v, false), '"');
             $v = OutputFormatter::escape($v);
-            $replacements['{'.$k.'}'] = sprintf('<comment>%s</>', $v);
+            $replacements['{'.$k.'}'] = \sprintf('<comment>%s</>', $v);
         }
 
-        $record['message'] = strtr($message, $replacements);
-
-        return $record;
+        return $record->with(message: strtr($message, $replacements));
     }
 
     private function dumpData(mixed $data, ?bool $colors = null): string
@@ -197,7 +186,9 @@ class ConsoleFormatter implements FormatterInterface
             $this->dumper->setColors($colors);
         }
 
-        if (!$data instanceof Data) {
+        if (\is_array($data) && ($data['data'] ?? null) instanceof Data) {
+            $data = $data['data'];
+        } elseif (!$data instanceof Data) {
             $data = $this->cloner->cloneVar($data);
         }
         $data = $data->withRefHandles(false);

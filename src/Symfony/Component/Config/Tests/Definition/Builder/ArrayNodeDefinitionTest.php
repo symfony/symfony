@@ -239,7 +239,7 @@ class ArrayNodeDefinitionTest extends TestCase
             ->children()
                 ->scalarNode('value')
                     ->beforeNormalization()
-                        ->ifTrue(fn ($value) => empty($value))
+                        ->ifTrue(fn ($value) => !$value)
                         ->thenUnset()
                     ->end()
                 ->end()
@@ -265,6 +265,12 @@ class ArrayNodeDefinitionTest extends TestCase
     {
         $node = new ArrayNodeDefinition('root');
         $this->assertEquals($node->prototype('boolean'), $node->booleanPrototype());
+    }
+
+    public function testPrototypeString()
+    {
+        $node = new ArrayNodeDefinition('root');
+        $this->assertEquals($node->prototype('string'), $node->stringPrototype());
     }
 
     public function testPrototypeInteger()

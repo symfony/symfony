@@ -33,8 +33,7 @@ class FormRegistry implements FormRegistryInterface
      */
     private array $types = [];
 
-    private FormTypeGuesserInterface|null|false $guesser = false;
-    private ResolvedFormTypeFactoryInterface $resolvedTypeFactory;
+    private FormTypeGuesserInterface|false|null $guesser = false;
     private array $checkedTypes = [];
 
     /**
@@ -42,8 +41,10 @@ class FormRegistry implements FormRegistryInterface
      *
      * @throws UnexpectedTypeException if any extension does not implement FormExtensionInterface
      */
-    public function __construct(array $extensions, ResolvedFormTypeFactoryInterface $resolvedTypeFactory)
-    {
+    public function __construct(
+        array $extensions,
+        private ResolvedFormTypeFactoryInterface $resolvedTypeFactory,
+    ) {
         foreach ($extensions as $extension) {
             if (!$extension instanceof FormExtensionInterface) {
                 throw new UnexpectedTypeException($extension, FormExtensionInterface::class);
@@ -51,7 +52,6 @@ class FormRegistry implements FormRegistryInterface
         }
 
         $this->extensions = $extensions;
-        $this->resolvedTypeFactory = $resolvedTypeFactory;
     }
 
     public function getType(string $name): ResolvedFormTypeInterface
@@ -69,10 +69,10 @@ class FormRegistry implements FormRegistryInterface
             if (!$type) {
                 // Support fully-qualified class names
                 if (!class_exists($name)) {
-                    throw new InvalidArgumentException(sprintf('Could not load type "%s": class does not exist.', $name));
+                    throw new InvalidArgumentException(\sprintf('Could not load type "%s": class does not exist.', $name));
                 }
                 if (!is_subclass_of($name, FormTypeInterface::class)) {
-                    throw new InvalidArgumentException(sprintf('Could not load type "%s": class does not implement "Symfony\Component\Form\FormTypeInterface".', $name));
+                    throw new InvalidArgumentException(\sprintf('Could not load type "%s": class does not implement "Symfony\Component\Form\FormTypeInterface".', $name));
                 }
 
                 $type = new $name();
@@ -94,7 +94,7 @@ class FormRegistry implements FormRegistryInterface
 
         if (isset($this->checkedTypes[$fqcn])) {
             $types = implode(' > ', array_merge(array_keys($this->checkedTypes), [$fqcn]));
-            throw new LogicException(sprintf('Circular reference detected for form type "%s" (%s).', $fqcn, $types));
+            throw new LogicException(\sprintf('Circular reference detected for form type "%s" (%s).', $fqcn, $types));
         }
 
         $this->checkedTypes[$fqcn] = true;

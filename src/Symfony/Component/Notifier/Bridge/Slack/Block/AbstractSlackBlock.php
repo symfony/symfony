@@ -16,7 +16,7 @@ namespace Symfony\Component\Notifier\Bridge\Slack\Block;
  */
 abstract class AbstractSlackBlock implements SlackBlockInterface
 {
-    protected $options = [];
+    protected array $options = [];
 
     public function toArray(): array
     {

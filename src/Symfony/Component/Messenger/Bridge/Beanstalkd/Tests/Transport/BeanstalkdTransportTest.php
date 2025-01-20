@@ -13,6 +13,7 @@ namespace Symfony\Component\Messenger\Bridge\Beanstalkd\Tests\Transport;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Messenger\Bridge\Beanstalkd\Tests\Fixtures\DummyMessage;
+use Symfony\Component\Messenger\Bridge\Beanstalkd\Transport\BeanstalkdReceivedStamp;
 use Symfony\Component\Messenger\Bridge\Beanstalkd\Transport\BeanstalkdTransport;
 use Symfony\Component\Messenger\Bridge\Beanstalkd\Transport\Connection;
 use Symfony\Component\Messenger\Envelope;
@@ -48,6 +49,18 @@ final class BeanstalkdTransportTest extends TestCase
 
         $envelopes = $transport->get();
         $this->assertSame($decodedMessage, $envelopes[0]->getMessage());
+    }
+
+    public function testKeepalive()
+    {
+        $transport = $this->getTransport(
+            null,
+            $connection = $this->createMock(Connection::class),
+        );
+
+        $connection->expects($this->once())->method('keepalive')->with(1);
+
+        $transport->keepalive(new Envelope(new DummyMessage('foo'), [new BeanstalkdReceivedStamp(1, 'bar')]));
     }
 
     private function getTransport(?SerializerInterface $serializer = null, ?Connection $connection = null): BeanstalkdTransport

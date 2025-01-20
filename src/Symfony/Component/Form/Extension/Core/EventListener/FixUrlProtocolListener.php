@@ -22,20 +22,15 @@ use Symfony\Component\Form\FormEvents;
  */
 class FixUrlProtocolListener implements EventSubscriberInterface
 {
-    private ?string $defaultProtocol;
-
     /**
      * @param string|null $defaultProtocol The URL scheme to add when there is none or null to not modify the data
      */
-    public function __construct(?string $defaultProtocol = 'http')
-    {
-        $this->defaultProtocol = $defaultProtocol;
+    public function __construct(
+        private ?string $defaultProtocol = 'http',
+    ) {
     }
 
-    /**
-     * @return void
-     */
-    public function onSubmit(FormEvent $event)
+    public function onSubmit(FormEvent $event): void
     {
         $data = $event->getData();
 

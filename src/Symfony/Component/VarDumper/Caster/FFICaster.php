@@ -41,7 +41,7 @@ final class FFICaster
             $type = \FFI::typeof($data);
         }
 
-        $stub->class = sprintf('%s<%s> size %d align %d', ($data ?? $type)::class, $type->getName(), $type->getSize(), $type->getAlignment());
+        $stub->class = \sprintf('%s<%s> size %d align %d', ($data ?? $type)::class, $type->getName(), $type->getSize(), $type->getAlignment());
 
         return match ($type->getKind()) {
             CType::TYPE_FLOAT,
@@ -86,7 +86,7 @@ final class FFICaster
             CType::ABI_MS => '[ms]',
             CType::ABI_SYSV => '[sysv]',
             CType::ABI_VECTORCALL => '[vectorcall]',
-            default => '[unknown abi]'
+            default => '[unknown abi]',
         };
 
         $returnType = $type->getFuncReturnType();

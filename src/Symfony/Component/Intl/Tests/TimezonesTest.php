@@ -618,7 +618,7 @@ class TimezonesTest extends ResourceBundleTestCase
         try {
             new \DateTimeZone($timezone);
         } catch (\Exception $e) {
-           $this->markTestSkipped(sprintf('The timezone "%s" is not available.', $timezone));
+            $this->markTestSkipped(\sprintf('The timezone "%s" is not available.', $timezone));
         }
 
         // ensure each timezone identifier has a corresponding GMT offset

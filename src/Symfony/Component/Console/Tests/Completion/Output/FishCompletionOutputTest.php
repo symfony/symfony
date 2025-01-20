@@ -23,11 +23,11 @@ class FishCompletionOutputTest extends CompletionOutputTestCase
 
     public function getExpectedOptionsOutput(): string
     {
-        return "--option1\n--negatable\n--no-negatable";
+        return "--option1\tFirst Option\n--negatable\tCan be negative\n--no-negatable\tCan be negative";
     }
 
     public function getExpectedValuesOutput(): string
     {
-        return "Green\nRed\nYellow";
+        return "Green\tBeans are green\nRed\tRose are red\nYellow\tCanaries are yellow";
     }
 }

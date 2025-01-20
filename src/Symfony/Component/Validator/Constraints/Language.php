@@ -16,8 +16,9 @@ use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Exception\LogicException;
 
 /**
- * @Annotation
- * @Target({"PROPERTY", "METHOD", "ANNOTATION"})
+ * Validates that a value is a valid language Unicode language identifier.
+ *
+ * @see https://unicode.org/reports/tr35/#Unicode_language_identifier
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
@@ -30,20 +31,20 @@ class Language extends Constraint
         self::NO_SUCH_LANGUAGE_ERROR => 'NO_SUCH_LANGUAGE_ERROR',
     ];
 
+    public string $message = 'This value is not a valid language.';
+    public bool $alpha3 = false;
+
     /**
-     * @deprecated since Symfony 6.1, use const ERROR_NAMES instead
+     * @param array<string,mixed>|null $options
+     * @param bool|null                $alpha3  Pass true to validate the language with three-letter code (ISO 639-2 (2T)) or false with two-letter code (ISO 639-1) (defaults to false)
+     * @param string[]|null            $groups
      */
-    protected static $errorNames = self::ERROR_NAMES;
-
-    public $message = 'This value is not a valid language.';
-    public $alpha3 = false;
-
     public function __construct(
         ?array $options = null,
         ?string $message = null,
         ?bool $alpha3 = null,
         ?array $groups = null,
-        mixed $payload = null
+        mixed $payload = null,
     ) {
         if (!class_exists(Languages::class)) {
             throw new LogicException('The Intl component is required to use the Language constraint. Try running "composer require symfony/intl".');

@@ -1,3 +1,8 @@
+/Resources/bin/autoload.php export-ignore
+/Resources/bin/common.php export-ignore
+/Resources/bin/compile export-ignore
+/Resources/bin/update-data.php export-ignore
+/Resources/emoji export-ignore
 /Tests export-ignore
 /phpunit.xml.dist export-ignore
 /Resources/emoji export-ignore

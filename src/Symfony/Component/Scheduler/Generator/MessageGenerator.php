@@ -74,7 +74,15 @@ final class MessageGenerator implements MessageGeneratorInterface
                 $yield = false;
             }
 
-            if ($nextTime = $trigger->getNextRunDate($time)) {
+            $nextTime = $trigger->getNextRunDate($time);
+
+            if ($this->schedule->shouldProcessOnlyLastMissedRun()) {
+                while ($nextTime < $this->clock->now()) {
+                    $nextTime = $trigger->getNextRunDate($nextTime);
+                }
+            }
+
+            if ($nextTime) {
                 $heap->insert([$nextTime, $index, $recurringMessage]);
             }
 

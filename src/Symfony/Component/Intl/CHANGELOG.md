@@ -1,10 +1,16 @@
 CHANGELOG
 =========
 
+7.1
+---
+
+ * Move all emoji code & data to a new `symfony/emoji` component
+ * Deprecate `EmojiTransliterator` in favor of `Symfony\Component\Emoji\EmojiTransliterator`
+
 6.4
 ---
 
- * Add support for ISO-3166-1 numeric codes with `Countries::getNumericCode()`, `Countries::getNumericCodes()`, 
+ * Add support for ISO-3166-1 numeric codes with `Countries::getNumericCode()`, `Countries::getNumericCodes()`,
    `Countries::numericCodeExists()` and `Countries::getAlpha2FromNumeric()`
 
 6.3

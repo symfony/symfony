@@ -20,7 +20,6 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\Session;
-use Symfony\Component\HttpFoundation\Session\SessionBagInterface;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\HttpFoundation\Session\Storage\MetadataBag;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
@@ -89,7 +88,7 @@ class RequestDataCollectorTest extends TestCase
         $c->collect($request, $response);
         $c->lateCollect();
 
-        $this->assertSame($expected, $c->getController()->getValue(true), sprintf('Testing: %s', $name));
+        $this->assertSame($expected, $c->getController()->getValue(true), \sprintf('Testing: %s', $name));
     }
 
     public static function provideControllerCallables(): array
@@ -118,7 +117,7 @@ class RequestDataCollectorTest extends TestCase
                 'Closure',
                 fn () => 'foo',
                 [
-                    'class' => \PHP_VERSION_ID >= 80400 ? sprintf('{closure:%s():%d}', __METHOD__, __LINE__ - 2) : __NAMESPACE__.'\{closure}',
+                    'class' => \PHP_VERSION_ID >= 80400 ? \sprintf('{closure:%s():%d}', __METHOD__, __LINE__ - 2) : __NAMESPACE__.'\{closure}',
                     'method' => null,
                     'file' => __FILE__,
                     'line' => __LINE__ - 5,
@@ -301,7 +300,7 @@ class RequestDataCollectorTest extends TestCase
         $this->assertSame('getMetadataBag', $trace[0]['function']);
         $this->assertSame(self::class, $class = $trace[1]['class']);
 
-        $this->assertSame(sprintf('%s:%s', $class, $line), $usages[0]['name']);
+        $this->assertSame(\sprintf('%s:%s', $class, $line), $usages[0]['name']);
     }
 
     public function testStatelessCheck()
@@ -412,7 +411,7 @@ class RequestDataCollectorTest extends TestCase
             }
         }
 
-        throw new \InvalidArgumentException(sprintf('Cookie named "%s" is not in response', $name));
+        throw new \InvalidArgumentException(\sprintf('Cookie named "%s" is not in response', $name));
     }
 
     /**

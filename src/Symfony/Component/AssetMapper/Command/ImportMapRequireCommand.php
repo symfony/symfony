@@ -96,7 +96,7 @@ EOT
         foreach ($packageList as $packageName) {
             $parts = ImportMapManager::parsePackageName($packageName);
             if (null === $parts) {
-                $io->error(sprintf('Package "%s" is not a valid package name format. Use the format PACKAGE@VERSION - e.g. "lodash" or "lodash@^4"', $packageName));
+                $io->error(\sprintf('Package "%s" is not a valid package name format. Use the format PACKAGE@VERSION - e.g. "lodash" or "lodash@^4"', $packageName));
 
                 return Command::FAILURE;
             }
@@ -116,18 +116,18 @@ EOT
 
         if (1 === \count($newPackages)) {
             $newPackage = $newPackages[0];
-            $message = sprintf('Package "%s" added to importmap.php', $newPackage->importName);
+            $message = \sprintf('Package "%s" added to importmap.php', $newPackage->importName);
 
             $message .= '.';
         } else {
             $names = array_map(fn (ImportMapEntry $package) => $package->importName, $newPackages);
-            $message = sprintf('%d new items (%s) added to the importmap.php!', \count($newPackages), implode(', ', $names));
+            $message = \sprintf('%d new items (%s) added to the importmap.php!', \count($newPackages), implode(', ', $names));
         }
 
         $messages = [$message];
 
         if (1 === \count($newPackages)) {
-            $messages[] = sprintf('Use the new package normally by importing "%s".', $newPackages[0]->importName);
+            $messages[] = \sprintf('Use the new package normally by importing "%s".', $newPackages[0]->importName);
         }
 
         $io->success($messages);

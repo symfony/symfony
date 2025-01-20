@@ -24,12 +24,7 @@ use Symfony\Component\Yaml\Yaml;
  */
 class YamlFileLoader extends FileLoader
 {
-    /**
-     * An array of YAML class descriptions.
-     *
-     * @var array
-     */
-    protected $classes;
+    protected array $classes;
 
     public function __construct(string $file)
     {
@@ -121,7 +116,7 @@ class YamlFileLoader extends FileLoader
         try {
             $classes = $this->yamlParser->parseFile($path, Yaml::PARSE_CONSTANT);
         } catch (ParseException $e) {
-            throw new \InvalidArgumentException(sprintf('The file "%s" does not contain valid YAML: ', $path).$e->getMessage(), 0, $e);
+            throw new \InvalidArgumentException(\sprintf('The file "%s" does not contain valid YAML: ', $path).$e->getMessage(), 0, $e);
         }
 
         // empty file
@@ -131,7 +126,7 @@ class YamlFileLoader extends FileLoader
 
         // not an array
         if (!\is_array($classes)) {
-            throw new \InvalidArgumentException(sprintf('The file "%s" must contain a YAML array.', $this->file));
+            throw new \InvalidArgumentException(\sprintf('The file "%s" must contain a YAML array.', $this->file));
         }
 
         return $classes;

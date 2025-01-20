@@ -14,7 +14,6 @@ namespace Symfony\Bridge\Monolog\Command;
 use Monolog\Formatter\FormatterInterface;
 use Monolog\Handler\HandlerInterface;
 use Monolog\Level;
-use Monolog\Logger;
 use Monolog\LogRecord;
 use Symfony\Bridge\Monolog\Formatter\ConsoleFormatter;
 use Symfony\Bridge\Monolog\Handler\ConsoleHandler;
@@ -52,10 +51,7 @@ class ServerLogCommand extends Command
         return parent::isEnabled();
     }
 
-    /**
-     * @return void
-     */
-    protected function configure()
+    protected function configure(): void
     {
         if (!class_exists(ConsoleFormatter::class)) {
             return;
@@ -91,7 +87,7 @@ EOF
         }
 
         $this->handler = new ConsoleHandler($output, true, [
-            OutputInterface::VERBOSITY_NORMAL => Logger::DEBUG,
+            OutputInterface::VERBOSITY_NORMAL => Level::Debug,
         ]);
 
         $this->handler->setFormatter(new ConsoleFormatter([
@@ -106,7 +102,7 @@ EOF
         }
 
         if (!$socket = stream_socket_server($host, $errno, $errstr)) {
-            throw new RuntimeException(sprintf('Server start failed on "%s": ', $host).$errstr.' '.$errno);
+            throw new RuntimeException(\sprintf('Server start failed on "%s": ', $host).$errstr.' '.$errno);
         }
 
         foreach ($this->getLogs($socket) as $clientId => $message) {
@@ -155,19 +151,20 @@ EOF
         if (isset($record['log_id'])) {
             $clientId = unpack('H*', $record['log_id'])[1];
         }
-        $logBlock = sprintf('<bg=%s> </>', self::BG_COLOR[$clientId % 8]);
+        $logBlock = \sprintf('<bg=%s> </>', self::BG_COLOR[$clientId % 8]);
         $output->write($logBlock);
 
-        if (Logger::API >= 3) {
-            $record = new LogRecord(
-                $record['datetime'],
-                $record['channel'],
-                Level::fromValue($record['level']),
-                $record['message'],
-                $record['context']->getValue(true),
-                $record['extra']->getValue(true),
-            );
-        }
+        $record = new LogRecord(
+            $record['datetime'],
+            $record['channel'],
+            Level::fromValue($record['level']),
+            $record['message'],
+            // We wrap context and extra, because they have been already dumped.
+            // So they are instance of Symfony\Component\VarDumper\Cloner\Data
+            // But LogRecord expects array
+            ['data' => $record['context']],
+            ['data' => $record['extra']],
+        );
 
         $this->handler->handle($record);
     }

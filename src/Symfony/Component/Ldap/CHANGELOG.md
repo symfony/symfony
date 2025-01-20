@@ -1,6 +1,22 @@
 CHANGELOG
 =========
 
+7.2
+---
+
+ * Add methods for `saslBind()` and `whoami()` to `ConnectionInterface` and `LdapInterface`
+ * Deprecate the `sizeLimit` option of `AbstractQuery`, the option is unused
+
+7.1
+---
+
+ * Improve error reporting during LDAP bind
+
+7.0
+---
+
+ * Remove `{username}` parameter, use `{user_identifier}` instead
+
 6.2
 ---
 

@@ -166,7 +166,7 @@ class FilesystemTest extends FilesystemTestCase
 
     public function testCopyForOriginUrlsAndExistingLocalFileDefaultsToCopy()
     {
-        if (!\in_array('http', stream_get_wrappers())) {
+        if (!\in_array('http', stream_get_wrappers(), true)) {
             $this->markTestSkipped('"http" stream wrapper is not enabled.');
         }
 
@@ -863,7 +863,7 @@ class FilesystemTest extends FilesystemTestCase
     public function testRenameThrowsExceptionOnError()
     {
         $this->expectException(IOException::class);
-        $file = $this->workspace.\DIRECTORY_SEPARATOR.uniqid('fs_test_', true);
+        $file = $this->workspace.\DIRECTORY_SEPARATOR.'does-not-exist';
         $newPath = $this->workspace.\DIRECTORY_SEPARATOR.'new_file';
 
         $this->filesystem->rename($file, $newPath);
@@ -1827,6 +1827,43 @@ class FilesystemTest extends FilesystemTestCase
         }
 
         $this->assertSame([$targetFile], glob($this->workspace.'/*'));
+    }
+
+    public function testReadFile()
+    {
+        $licenseFile = \dirname(__DIR__).'/LICENSE';
+
+        $this->assertStringEqualsFile($licenseFile, $this->filesystem->readFile($licenseFile));
+    }
+
+    public function testReadNonExistentFile()
+    {
+        $this->expectException(IOException::class);
+        $this->expectExceptionMessageMatches(\sprintf('#^Failed to read file ".+%1$sTests/invalid"\\: file_get_contents\\(.+%1$sTests/invalid\\)\\: Failed to open stream\\: No such file or directory$#', preg_quote(\DIRECTORY_SEPARATOR)));
+
+        $this->filesystem->readFile(__DIR__.'/invalid');
+    }
+
+    public function testReadDirectory()
+    {
+        $this->expectException(IOException::class);
+        $this->expectExceptionMessageMatches(\sprintf('#^Failed to read file ".+%sTests"\\: File is a directory\\.$#', preg_quote(\DIRECTORY_SEPARATOR)));
+
+        $this->filesystem->readFile(__DIR__);
+    }
+
+    public function testReadUnreadableFile()
+    {
+        $this->markAsSkippedIfChmodIsMissing();
+
+        $filename = $this->workspace.'/unreadable.txt';
+        file_put_contents($filename, 'Hello World');
+        chmod($filename, 0o000);
+
+        $this->expectException(IOException::class);
+        $this->expectExceptionMessageMatches('#^Failed to read file ".+/unreadable.txt"\\: file_get_contents\\(.+/unreadable.txt\\)\\: Failed to open stream\\: Permission denied$#');
+
+        $this->filesystem->readFile($filename);
     }
 
     public function testCopyShouldKeepExecutionPermission()

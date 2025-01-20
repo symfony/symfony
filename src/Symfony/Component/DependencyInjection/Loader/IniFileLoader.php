@@ -30,7 +30,7 @@ class IniFileLoader extends FileLoader
         // first pass to catch parsing errors
         $result = parse_ini_file($path, true);
         if (false === $result || [] === $result) {
-            throw new InvalidArgumentException(sprintf('The "%s" file is not valid.', $resource));
+            throw new InvalidArgumentException(\sprintf('The "%s" file is not valid.', $resource));
         }
 
         // real raw parsing

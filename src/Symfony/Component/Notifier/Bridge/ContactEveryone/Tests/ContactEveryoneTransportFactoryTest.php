@@ -12,10 +12,13 @@
 namespace Symfony\Component\Notifier\Bridge\ContactEveryone\Tests;
 
 use Symfony\Component\Notifier\Bridge\ContactEveryone\ContactEveryoneTransportFactory;
-use Symfony\Component\Notifier\Test\TransportFactoryTestCase;
+use Symfony\Component\Notifier\Test\AbstractTransportFactoryTestCase;
+use Symfony\Component\Notifier\Test\IncompleteDsnTestTrait;
 
-final class ContactEveryoneTransportFactoryTest extends TransportFactoryTestCase
+final class ContactEveryoneTransportFactoryTest extends AbstractTransportFactoryTestCase
 {
+    use IncompleteDsnTestTrait;
+
     public function createFactory(): ContactEveryoneTransportFactory
     {
         return new ContactEveryoneTransportFactory();

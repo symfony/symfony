@@ -19,13 +19,11 @@ use Symfony\Component\PropertyAccess\PropertyPath;
  */
 class RelativePath extends PropertyPath
 {
-    private FormInterface $root;
-
-    public function __construct(FormInterface $root, string $propertyPath)
-    {
+    public function __construct(
+        private FormInterface $root,
+        string $propertyPath,
+    ) {
         parent::__construct($propertyPath);
-
-        $this->root = $root;
     }
 
     public function getRoot(): FormInterface

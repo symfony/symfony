@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+7.2
+---
+
+* Add support of trackClicks, trackOpens and trackingUrl payload properties
+
 6.3
 ---
 

@@ -29,19 +29,13 @@ use Symfony\Component\Routing\RequestContextAwareInterface;
  */
 class LocaleListener implements EventSubscriberInterface
 {
-    private ?RequestContextAwareInterface $router;
-    private string $defaultLocale;
-    private RequestStack $requestStack;
-    private bool $useAcceptLanguageHeader;
-    private array $enabledLocales;
-
-    public function __construct(RequestStack $requestStack, string $defaultLocale = 'en', ?RequestContextAwareInterface $router = null, bool $useAcceptLanguageHeader = false, array $enabledLocales = [])
-    {
-        $this->defaultLocale = $defaultLocale;
-        $this->requestStack = $requestStack;
-        $this->router = $router;
-        $this->useAcceptLanguageHeader = $useAcceptLanguageHeader;
-        $this->enabledLocales = $enabledLocales;
+    public function __construct(
+        private RequestStack $requestStack,
+        private string $defaultLocale = 'en',
+        private ?RequestContextAwareInterface $router = null,
+        private bool $useAcceptLanguageHeader = false,
+        private array $enabledLocales = [],
+    ) {
     }
 
     public function setDefaultLocale(KernelEvent $event): void

@@ -68,6 +68,7 @@ class NoPrivateNetworkHttpClientTest extends TestCase
 
     /**
      * @dataProvider getExcludeIpData
+     *
      * @group dns-sensitive
      */
     public function testExcludeByIp(string $ipAddr, $subnets, bool $mustThrow)
@@ -105,6 +106,7 @@ class NoPrivateNetworkHttpClientTest extends TestCase
 
     /**
      * @dataProvider getExcludeHostData
+     *
      * @group dns-sensitive
      */
     public function testExcludeByHost(string $ipAddr, $subnets, bool $mustThrow)
@@ -143,7 +145,7 @@ class NoPrivateNetworkHttpClientTest extends TestCase
     public function testCustomOnProgressCallback()
     {
         $ipAddr = '104.26.14.6';
-        $url = sprintf('http://%s/', $ipAddr);
+        $url = \sprintf('http://%s/', $ipAddr);
         $content = 'foo';
 
         $executionCount = 0;
@@ -163,8 +165,8 @@ class NoPrivateNetworkHttpClientTest extends TestCase
     public function testNonCallableOnProgressCallback()
     {
         $ipAddr = '104.26.14.6';
-        $url = sprintf('http://%s/', $ipAddr);
-        $customCallback = sprintf('cb_%s', microtime(true));
+        $url = \sprintf('http://%s/', $ipAddr);
+        $customCallback = \sprintf('cb_%s', microtime(true));
 
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Option "on_progress" must be callable, "string" given.');
@@ -176,13 +178,14 @@ class NoPrivateNetworkHttpClientTest extends TestCase
     public function testHeadersArePassedOnRedirect()
     {
         $ipAddr = '104.26.14.6';
-        $url = sprintf('http://%s/', $ipAddr);
+        $url = \sprintf('http://%s/', $ipAddr);
         $content = 'foo';
 
         $callback = function ($method, $url, $options) use ($content): MockResponse {
             $this->assertArrayHasKey('headers', $options);
             $this->assertNotContains('content-type: application/json', $options['headers']);
             $this->assertContains('foo: bar', $options['headers']);
+
             return new MockResponse($content);
         };
         $responses = [

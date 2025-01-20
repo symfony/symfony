@@ -20,11 +20,9 @@ use Symfony\Component\Notifier\Message\MessageOptionsInterface;
  */
 final class DiscordOptions implements MessageOptionsInterface
 {
-    private array $options = [];
-
-    public function __construct(array $options = [])
-    {
-        $this->options = $options;
+    public function __construct(
+        private array $options = [],
+    ) {
     }
 
     public function toArray(): array
@@ -77,7 +75,7 @@ final class DiscordOptions implements MessageOptionsInterface
         }
 
         if (\count($this->options['embeds']) >= 10) {
-            throw new LogicException(sprintf('The "%s" only supports max 10 embeds.', __CLASS__));
+            throw new LogicException(\sprintf('The "%s" only supports max 10 embeds.', __CLASS__));
         }
 
         $this->options['embeds'][] = $embed->toArray();

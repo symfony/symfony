@@ -19,7 +19,7 @@ if (\in_array('-h', $argv) || \in_array('--help', $argv)) {
         ' Patches type declarations based on "@return" PHPDoc and triggers deprecations for',
         ' incompatible method declarations.',
         '',
-        ' This assists you to make your package compatible with Symfony 6, but it can be used',
+        ' This assists you to make your package compatible with Symfony 7, but it can be used',
         ' for any class/package.',
         '',
         ' Available configuration via environment variables:',

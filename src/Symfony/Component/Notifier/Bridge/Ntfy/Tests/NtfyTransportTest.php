@@ -50,7 +50,7 @@ final class NtfyTransportTest extends TransportTestCase
     {
         $transport = $this->createTransport();
         $transport->setHost($customHost = self::CUSTOM_HOST);
-        $this->assertSame(sprintf('ntfy://%s/test', $customHost), (string) $transport);
+        $this->assertSame(\sprintf('ntfy://%s/test', $customHost), (string) $transport);
     }
 
     public function testCanSetCustomHostAndPort()
@@ -58,7 +58,7 @@ final class NtfyTransportTest extends TransportTestCase
         $transport = $this->createTransport();
         $transport->setHost($customHost = self::CUSTOM_HOST);
         $transport->setPort($customPort = self::CUSTOM_PORT);
-        $this->assertSame(sprintf('ntfy://%s:%s/test', $customHost, $customPort), (string) $transport);
+        $this->assertSame(\sprintf('ntfy://%s:%s/test', $customHost, $customPort), (string) $transport);
     }
 
     public function testSend()
@@ -125,7 +125,7 @@ final class NtfyTransportTest extends TransportTestCase
             $expectedBody = json_encode(['topic' => 'test', 'title' => 'Hello', 'message' => 'World']);
             $expectedAuthorization = 'Authorization: Basic dGVzdF91c2VyOnRlc3RfcGFzc3dvcmQ';
             $this->assertJsonStringEqualsJsonString($expectedBody, $options['body']);
-            $this->assertTrue(\in_array($expectedAuthorization, $options['headers']));
+            $this->assertTrue(\in_array($expectedAuthorization, $options['headers'], true));
 
             return $response;
         });

@@ -69,8 +69,8 @@ class CallbackChoiceLoaderTest extends TestCase
     public function testLoadValuesForChoicesCastsCallbackItemsToString()
     {
         $choices = [
-           (object) ['id' => 2],
-           (object) ['id' => 3],
+            (object) ['id' => 2],
+            (object) ['id' => 3],
         ];
 
         $value = fn ($item) => $item->id;

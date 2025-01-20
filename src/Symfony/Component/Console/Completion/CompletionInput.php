@@ -123,13 +123,13 @@ final class CompletionInput extends ArgvInput
         if ($this->currentIndex >= \count($this->tokens)) {
             if (!isset($this->arguments[$argumentName]) || $this->definition->getArgument($argumentName)->isArray()) {
                 $this->completionName = $argumentName;
-                $this->completionValue = '';
             } else {
                 // we've reached the end
                 $this->completionType = self::TYPE_NONE;
                 $this->completionName = null;
-                $this->completionValue = '';
             }
+
+            $this->completionValue = '';
         }
     }
 
@@ -226,7 +226,7 @@ final class CompletionInput extends ArgvInput
         return $this->currentIndex >= $nrOfTokens;
     }
 
-    public function __toString()
+    public function __toString(): string
     {
         $str = '';
         foreach ($this->tokens as $i => $token) {

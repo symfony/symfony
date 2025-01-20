@@ -16,12 +16,15 @@ use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\Mailer\Bridge\Sendgrid\Transport\SendgridApiTransport;
 use Symfony\Component\Mailer\Bridge\Sendgrid\Transport\SendgridSmtpTransport;
 use Symfony\Component\Mailer\Bridge\Sendgrid\Transport\SendgridTransportFactory;
-use Symfony\Component\Mailer\Test\TransportFactoryTestCase;
+use Symfony\Component\Mailer\Test\AbstractTransportFactoryTestCase;
+use Symfony\Component\Mailer\Test\IncompleteDsnTestTrait;
 use Symfony\Component\Mailer\Transport\Dsn;
 use Symfony\Component\Mailer\Transport\TransportFactoryInterface;
 
-class SendgridTransportFactoryTest extends TransportFactoryTestCase
+class SendgridTransportFactoryTest extends AbstractTransportFactoryTestCase
 {
+    use IncompleteDsnTestTrait;
+
     public function getFactory(): TransportFactoryInterface
     {
         return new SendgridTransportFactory(null, new MockHttpClient(), new NullLogger());
@@ -57,16 +60,22 @@ class SendgridTransportFactoryTest extends TransportFactoryTestCase
 
     public static function createProvider(): iterable
     {
+        $client = new MockHttpClient();
         $logger = new NullLogger();
 
         yield [
             new Dsn('sendgrid+api', 'default', self::USER),
-            new SendgridApiTransport(self::USER, new MockHttpClient(), null, $logger),
+            new SendgridApiTransport(self::USER, $client, null, $logger),
+        ];
+
+        yield [
+            new Dsn('sendgrid+api', 'default', self::USER, '', null, ['region' => 'eu']),
+            new SendgridApiTransport(self::USER, $client, null, $logger, 'eu'),
         ];
 
         yield [
             new Dsn('sendgrid+api', 'example.com', self::USER, '', 8080),
-            (new SendgridApiTransport(self::USER, new MockHttpClient(), null, $logger))->setHost('example.com')->setPort(8080),
+            (new SendgridApiTransport(self::USER, $client, null, $logger))->setHost('example.com')->setPort(8080),
         ];
 
         yield [

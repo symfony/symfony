@@ -69,6 +69,7 @@ $data = $pre;
 // reverse map
 // we prefill the extensions with some preferences for content-types
 $exts = [
+    'aac' => ['audio/aac'],
     'asice' => ['application/vnd.etsi.asic-e+zip'],
     'bz2' => ['application/x-bz2'],
     'csv' => ['text/csv'],
@@ -90,6 +91,8 @@ $exts = [
     'mid' => ['audio/midi'],
     'mov' => ['video/quicktime'],
     'mp3' => ['audio/mpeg'],
+    'mp4' => ['video/mp4'],
+    'mpg4' => ['video/mpg4'],
     'ogg' => ['audio/ogg'],
     'pdf' => ['application/pdf'],
     'php' => ['application/x-php'],
@@ -107,8 +110,8 @@ $exts = [
     'wma' => ['audio/x-ms-wma'],
     'wmv' => ['audio/x-ms-wmv'],
     'xls' => ['application/vnd.ms-excel'],
-    'yaml' => ['application/yaml'],
     'yml' => ['application/yaml'],
+    'yaml' => ['application/yaml'], // Yaml must be set after to be first on application/yaml
     'zip' => ['application/zip'],
 ];
 

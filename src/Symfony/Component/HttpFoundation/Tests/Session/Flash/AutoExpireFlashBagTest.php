@@ -27,7 +27,6 @@ class AutoExpireFlashBagTest extends TestCase
 
     protected function setUp(): void
     {
-        parent::setUp();
         $this->bag = new FlashBag();
         $this->array = ['new' => ['notice' => ['A previous flash message']]];
         $this->bag->initialize($this->array);
@@ -36,7 +35,6 @@ class AutoExpireFlashBagTest extends TestCase
     protected function tearDown(): void
     {
         unset($this->bag);
-        parent::tearDown();
     }
 
     public function testInitialize()
@@ -46,9 +44,9 @@ class AutoExpireFlashBagTest extends TestCase
         $bag->initialize($array);
         $this->assertEquals(['A previous flash message'], $bag->peek('notice'));
         $array = ['new' => [
-                'notice' => ['Something else'],
-                'error' => ['a'],
-            ]];
+            'notice' => ['Something else'],
+            'error' => ['a'],
+        ]];
         $bag->initialize($array);
         $this->assertEquals(['Something else'], $bag->peek('notice'));
         $this->assertEquals(['a'], $bag->peek('error'));
@@ -106,13 +104,13 @@ class AutoExpireFlashBagTest extends TestCase
         $this->assertEquals([
             'notice' => 'Foo',
             'error' => 'Bar',
-            ], $this->bag->peekAll()
+        ], $this->bag->peekAll()
         );
 
         $this->assertEquals([
             'notice' => 'Foo',
             'error' => 'Bar',
-            ], $this->bag->peekAll()
+        ], $this->bag->peekAll()
         );
     }
 
@@ -137,7 +135,7 @@ class AutoExpireFlashBagTest extends TestCase
         $this->bag->set('error', 'Bar');
         $this->assertEquals([
             'notice' => ['A previous flash message'],
-            ], $this->bag->all()
+        ], $this->bag->all()
         );
 
         $this->assertEquals([], $this->bag->all());

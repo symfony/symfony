@@ -349,20 +349,6 @@ class FormExtensionDivLayoutTest extends AbstractDivLayoutTestCase
         $this->renderer->setTheme($view, $themes, $useDefaultThemes);
     }
 
-    public static function themeBlockInheritanceProvider(): array
-    {
-        return [
-            [['theme.html.twig']],
-        ];
-    }
-
-    public static function themeInheritanceProvider(): array
-    {
-        return [
-            [['parent_label.html.twig'], ['child_label.html.twig']],
-        ];
-    }
-
     protected function getTemplatePaths(): array
     {
         return [

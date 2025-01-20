@@ -41,7 +41,10 @@ final class SendgridRequestParser extends AbstractRequestParser
         ]);
     }
 
-    protected function doParse(Request $request, string $secret): ?AbstractMailerEvent
+    /**
+     * @return AbstractMailerEvent[]
+     */
+    protected function doParse(Request $request, string $secret): array
     {
         $content = $request->toArray();
         if (
@@ -69,7 +72,7 @@ final class SendgridRequestParser extends AbstractRequestParser
         }
 
         try {
-            return $this->converter->convert($content[0]);
+            return array_map($this->converter->convert(...), $content);
         } catch (ParseException $e) {
             throw new RejectWebhookException(406, $e->getMessage(), $e);
         }

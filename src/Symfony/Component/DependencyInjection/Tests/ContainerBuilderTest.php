@@ -16,7 +16,7 @@ require_once __DIR__.'/Fixtures/includes/classes.php';
 require_once __DIR__.'/Fixtures/includes/ProjectExtension.php';
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
+use Symfony\Bridge\PhpUnit\ExpectUserDeprecationMessageTrait;
 use Symfony\Component\Config\Resource\DirectoryResource;
 use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\Config\Resource\ResourceInterface;
@@ -48,7 +48,6 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\DependencyInjection\Tests\Compiler\Foo;
-use Symfony\Component\DependencyInjection\Tests\Compiler\FooAnnotation;
 use Symfony\Component\DependencyInjection\Tests\Compiler\SingleMethodInterface;
 use Symfony\Component\DependencyInjection\Tests\Compiler\Wither;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\CaseSensitiveClass;
@@ -57,14 +56,13 @@ use Symfony\Component\DependencyInjection\Tests\Fixtures\FooWithAbstractArgument
 use Symfony\Component\DependencyInjection\Tests\Fixtures\ScalarFactory;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\SimilarArgumentsDummy;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\StringBackedEnum;
-use Symfony\Component\DependencyInjection\Tests\Fixtures\WitherAnnotationStaticReturnType;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\WitherStaticReturnType;
 use Symfony\Component\DependencyInjection\TypedReference;
 use Symfony\Component\ExpressionLanguage\Expression;
 
 class ContainerBuilderTest extends TestCase
 {
-    use ExpectDeprecationTrait;
+    use ExpectUserDeprecationMessageTrait;
 
     public function testDefaultRegisteredDefinitions()
     {
@@ -118,7 +116,7 @@ class ContainerBuilderTest extends TestCase
 
         $builder->deprecateParameter('foo', 'symfony/test', '6.3');
 
-        $this->expectDeprecation('Since symfony/test 6.3: The parameter "foo" is deprecated.');
+        $this->expectUserDeprecationMessage('Since symfony/test 6.3: The parameter "foo" is deprecated.');
 
         $builder->getParameter('foo');
     }
@@ -136,7 +134,7 @@ class ContainerBuilderTest extends TestCase
 
         $builder->deprecateParameter('bar', 'symfony/test', '6.3');
 
-        $this->expectDeprecation('Since symfony/test 6.3: The parameter "bar" is deprecated.');
+        $this->expectUserDeprecationMessage('Since symfony/test 6.3: The parameter "bar" is deprecated.');
 
         $builder->compile();
     }
@@ -153,7 +151,7 @@ class ContainerBuilderTest extends TestCase
 
     public function testDeprecateParameterThrowsWhenParameterBagIsNotInternal()
     {
-        $builder = new ContainerBuilder(new class() implements ParameterBagInterface {
+        $builder = new ContainerBuilder(new class implements ParameterBagInterface {
             public function clear(): void
             {
             }
@@ -214,8 +212,18 @@ class ContainerBuilderTest extends TestCase
     {
         $builder = new ContainerBuilder();
         $builder->register('foo', 'Bar\FooClass');
-        $this->assertTrue($builder->hasDefinition('foo'), '->register() registers a new service definition');
-        $this->assertInstanceOf(Definition::class, $builder->getDefinition('foo'), '->register() returns the newly created Definition instance');
+        $this->assertTrue($builder->hasDefinition('foo'), '->hasDefinition() returns true if a service definition exists');
+        $this->assertInstanceOf(Definition::class, $builder->getDefinition('foo'), '->getDefinition() returns an instance of Definition');
+    }
+
+    public function testRegisterChild()
+    {
+        $builder = new ContainerBuilder();
+        $builder->register('foo', 'Bar\FooClass');
+        $builder->registerChild('bar', 'foo');
+        $this->assertTrue($builder->hasDefinition('bar'), '->hasDefinition() returns true if a service definition exists');
+        $this->assertInstanceOf(ChildDefinition::class, $definition = $builder->getDefinition('bar'), '->getDefinition() returns an instance of Definition');
+        $this->assertSame('foo', $definition->getParent(), '->getParent() returns the id of the parent service');
     }
 
     public function testAutowire()
@@ -1114,7 +1122,7 @@ class ContainerBuilderTest extends TestCase
 
         $this->assertCount(1, $resources);
 
-        /* @var $resource \Symfony\Component\Config\Resource\FileResource */
+        /* @var FileResource $resource */
         $resource = end($resources);
 
         $this->assertInstanceOf(FileResource::class, $resource);
@@ -1701,8 +1709,8 @@ class ContainerBuilderTest extends TestCase
 
         $container->compile();
 
-        $this->assertNotSame($container->get('foo'), $container->get('fOO'), '->get() returns the service for the given id, case sensitively');
-        $this->assertSame($container->get('fOO')->Foo->foo, $container->get('foo'), '->get() returns the service for the given id, case sensitively');
+        $this->assertNotSame($container->get('foo'), $container->get('fOO'), '->get() returns the service for the given id, case-sensitively');
+        $this->assertSame($container->get('fOO')->Foo->foo, $container->get('foo'), '->get() returns the service for the given id, case-sensitively');
     }
 
     public function testParameterWithMixedCase()
@@ -1879,28 +1887,6 @@ class ContainerBuilderTest extends TestCase
         $this->assertInstanceOf(Wither::class, $wither->withFoo1($wither->foo));
     }
 
-    /**
-     * @group legacy
-     */
-    public function testWitherAnnotationWithStaticReturnType()
-    {
-        $this->expectDeprecation('Since symfony/dependency-injection 6.3: Relying on the "@required" annotation on method "Symfony\Component\DependencyInjection\Tests\Fixtures\WitherAnnotationStaticReturnType::withFoo()" is deprecated, use the "Symfony\Contracts\Service\Attribute\Required" attribute instead.');
-        $this->expectDeprecation('Since symfony/dependency-injection 6.3: Relying on the "@required" annotation on method "Symfony\Component\DependencyInjection\Tests\Fixtures\WitherAnnotationStaticReturnType::setFoo()" is deprecated, use the "Symfony\Contracts\Service\Attribute\Required" attribute instead.');
-
-        $container = new ContainerBuilder();
-        $container->register(FooAnnotation::class);
-
-        $container
-            ->register('wither', WitherAnnotationStaticReturnType::class)
-            ->setPublic(true)
-            ->setAutowired(true);
-
-        $container->compile();
-
-        $wither = $container->get('wither');
-        $this->assertInstanceOf(FooAnnotation::class, $wither->foo);
-    }
-
     public function testWitherWithStaticReturnType()
     {
         $container = new ContainerBuilder();
@@ -1936,11 +1922,13 @@ class ContainerBuilderTest extends TestCase
     }
 
     /**
+     * The test should be kept in the group as it always expects a deprecation.
+     *
      * @group legacy
      */
     public function testDirectlyAccessingDeprecatedPublicService()
     {
-        $this->expectDeprecation('Since foo/bar 3.8: Accessing the "Symfony\Component\DependencyInjection\Tests\A" service directly from the container is deprecated, use dependency injection instead.');
+        $this->expectUserDeprecationMessage('Since foo/bar 3.8: Accessing the "Symfony\Component\DependencyInjection\Tests\A" service directly from the container is deprecated, use dependency injection instead.');
 
         $container = new ContainerBuilder();
         $container

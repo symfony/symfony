@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+7.2
+---
+
+ * Add label option to `GatewayApiOptions` class
+
 6.3
 ---
 

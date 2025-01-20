@@ -12,10 +12,13 @@
 namespace Symfony\Component\Notifier\Bridge\SimpleTextin\Tests;
 
 use Symfony\Component\Notifier\Bridge\SimpleTextin\SimpleTextinTransportFactory;
-use Symfony\Component\Notifier\Test\TransportFactoryTestCase;
+use Symfony\Component\Notifier\Test\AbstractTransportFactoryTestCase;
+use Symfony\Component\Notifier\Test\IncompleteDsnTestTrait;
 
-final class SimpleTextinTransportFactoryTest extends TransportFactoryTestCase
+final class SimpleTextinTransportFactoryTest extends AbstractTransportFactoryTestCase
 {
+    use IncompleteDsnTestTrait;
+
     public function createFactory(): SimpleTextinTransportFactory
     {
         return new SimpleTextinTransportFactory();

@@ -13,14 +13,14 @@ namespace Symfony\Component\Mailer\Tests\Transport\Smtp;
 
 use Psr\Log\NullLogger;
 use Symfony\Component\HttpClient\MockHttpClient;
-use Symfony\Component\Mailer\Test\TransportFactoryTestCase;
+use Symfony\Component\Mailer\Test\AbstractTransportFactoryTestCase;
 use Symfony\Component\Mailer\Transport\Dsn;
 use Symfony\Component\Mailer\Transport\Smtp\EsmtpTransport;
 use Symfony\Component\Mailer\Transport\Smtp\EsmtpTransportFactory;
 use Symfony\Component\Mailer\Transport\Smtp\Stream\SocketStream;
 use Symfony\Component\Mailer\Transport\TransportFactoryInterface;
 
-class EsmtpTransportFactoryTest extends TransportFactoryTestCase
+class EsmtpTransportFactoryTest extends AbstractTransportFactoryTestCase
 {
     public function getFactory(): TransportFactoryInterface
     {
@@ -157,5 +157,47 @@ class EsmtpTransportFactoryTest extends TransportFactoryTestCase
             new Dsn('smtps', 'example.com', '', '', 465, ['ping_threshold' => '10']),
             $transport,
         ];
+
+        $transport = new EsmtpTransport('example.com', 25, false, null, $logger);
+        $transport->setAutoTls(false);
+
+        yield [
+            new Dsn('smtp', 'example.com', '', '', 25, ['auto_tls' => false]),
+            $transport,
+        ];
+        yield [
+            new Dsn('smtp', 'example.com', '', '', 0, ['auto_tls' => false]),
+            $transport,
+        ];
+        yield [
+            Dsn::fromString('smtp://:@example.com?auto_tls=false'),
+            $transport,
+        ];
+
+        $transport = new EsmtpTransport('example.com', 465, false, null, $logger);
+        $transport->setAutoTls(false);
+        yield [
+            Dsn::fromString('smtp://:@example.com:465?auto_tls=false'),
+            $transport,
+        ];
+
+        $transport = new EsmtpTransport('example.com', 465, true, null, $logger);
+        $transport->getStream()->setSourceIp('0.0.0.0');
+        yield [
+            Dsn::fromString('smtps://:@example.com:465?source_ip=0.0.0.0'),
+            $transport,
+        ];
+
+        $transport = new EsmtpTransport('example.com', 465, true, null, $logger);
+        $transport->getStream()->setSourceIp('[2606:4700:20::681a:5fb]');
+        yield [
+            Dsn::fromString('smtps://:@example.com:465?source_ip=[2606:4700:20::681a:5fb]'),
+            $transport,
+        ];
+    }
+
+    public static function unsupportedSchemeProvider(): iterable
+    {
+        yield [new Dsn('null', '')];
     }
 }

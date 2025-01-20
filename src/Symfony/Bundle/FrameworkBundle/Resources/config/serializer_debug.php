@@ -21,6 +21,7 @@ return static function (ContainerConfigurator $container) {
             ->args([
                 service('debug.serializer.inner'),
                 service('serializer.data_collector'),
+                'default',
             ])
 
         ->set('serializer.data_collector', SerializerDataCollector::class)

@@ -15,7 +15,7 @@ use Symfony\Component\Validator\Exception\NoSuchMetadataException;
 use Symfony\Component\Validator\Mapping\MetadataInterface;
 
 /**
- * Returns {@link \Symfony\Component\Validator\Mapping\MetadataInterface} instances for values.
+ * Returns {@link MetadataInterface} instances for values.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */

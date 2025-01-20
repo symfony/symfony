@@ -23,7 +23,6 @@ use Symfony\Component\Messenger\EventListener\SendFailedMessageForRetryListener;
 use Symfony\Component\Messenger\EventListener\SendFailedMessageToFailureTransportListener;
 use Symfony\Component\Messenger\EventListener\StopWorkerOnCustomStopExceptionListener;
 use Symfony\Component\Messenger\EventListener\StopWorkerOnRestartSignalListener;
-use Symfony\Component\Messenger\EventListener\StopWorkerOnSignalsListener;
 use Symfony\Component\Messenger\Handler\RedispatchMessageHandler;
 use Symfony\Component\Messenger\Middleware\AddBusNameStampMiddleware;
 use Symfony\Component\Messenger\Middleware\DispatchAfterCurrentBusMiddleware;
@@ -73,7 +72,7 @@ return static function (ContainerConfigurator $container) {
             ])
 
         ->set('serializer.normalizer.flatten_exception', FlattenExceptionNormalizer::class)
-            ->tag('serializer.normalizer', ['priority' => -880])
+            ->tag('serializer.normalizer', ['built_in' => true, 'priority' => -880])
 
         ->set('messenger.transport.native_php_serializer', PhpSerializer::class)
         ->alias('messenger.default_serializer', 'messenger.transport.native_php_serializer')
@@ -136,6 +135,9 @@ return static function (ContainerConfigurator $container) {
             ->tag('messenger.transport_factory')
 
         ->set('messenger.transport.in_memory.factory', InMemoryTransportFactory::class)
+            ->args([
+                service('clock')->nullOnInvalid(),
+            ])
             ->tag('messenger.transport_factory')
             ->tag('kernel.reset', ['method' => 'reset'])
 
@@ -161,6 +163,7 @@ return static function (ContainerConfigurator $container) {
                 abstract_arg('delay ms'),
                 abstract_arg('multiplier'),
                 abstract_arg('max delay ms'),
+                abstract_arg('jitter'),
             ])
 
         // rate limiter
@@ -200,18 +203,6 @@ return static function (ContainerConfigurator $container) {
             ])
             ->tag('kernel.event_subscriber')
             ->tag('monolog.logger', ['channel' => 'messenger'])
-
-        ->set('messenger.listener.stop_worker_signals_listener', StopWorkerOnSignalsListener::class)
-            ->deprecate('6.4', 'symfony/messenger', 'The "%service_id%" service is deprecated, use the "Symfony\Component\Console\Command\SignalableCommandInterface" instead.')
-            ->args([
-                null,
-                service('logger')->ignoreOnInvalid(),
-            ])
-            ->tag('kernel.event_subscriber')
-            ->tag('monolog.logger', ['channel' => 'messenger'])
-
-        ->alias('messenger.listener.stop_worker_on_sigterm_signal_listener', 'messenger.listener.stop_worker_signals_listener')
-            ->deprecate('6.3', 'symfony/messenger', 'The "%alias_id%" service is deprecated, use the "Symfony\Component\Console\Command\SignalableCommandInterface" instead.')
 
         ->set('messenger.listener.stop_worker_on_stop_exception_listener', StopWorkerOnCustomStopExceptionListener::class)
             ->tag('kernel.event_subscriber')

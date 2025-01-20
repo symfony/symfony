@@ -1,0 +1,37 @@
+{
+    "name": "symfony/resend-mailer",
+    "type": "symfony-mailer-bridge",
+    "description": "Symfony Resend Mailer Bridge",
+    "keywords": [],
+    "homepage": "https://symfony.com",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Mathieu Santostefano",
+            "homepage": "https://github.com/welcoMattic"
+        },
+        {
+            "name": "Symfony Community",
+            "homepage": "https://symfony.com/contributors"
+        }
+    ],
+    "require": {
+        "php": ">=8.1",
+        "symfony/mailer": "^7.2"
+    },
+    "require-dev": {
+        "symfony/http-client": "^6.4|^7.0",
+        "symfony/http-foundation": "^7.1",
+        "symfony/webhook": "^6.4|^7.0"
+    },
+    "conflict": {
+        "symfony/http-foundation": "<7.1"
+    },
+    "autoload": {
+        "psr-4": { "Symfony\\Component\\Mailer\\Bridge\\Resend\\": "" },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
+    },
+    "minimum-stability": "dev"
+}

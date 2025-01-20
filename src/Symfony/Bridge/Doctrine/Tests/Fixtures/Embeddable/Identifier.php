@@ -11,7 +11,6 @@
 
 namespace Symfony\Bridge\Doctrine\Tests\Fixtures\Embeddable;
 
-use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Embeddable]

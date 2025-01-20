@@ -30,10 +30,7 @@ use Symfony\Component\Validator\Exception\UnexpectedValueException;
  */
 class LuhnValidator extends ConstraintValidator
 {
-    /**
-     * @return void
-     */
-    public function validate(mixed $value, Constraint $constraint)
+    public function validate(mixed $value, Constraint $constraint): void
     {
         if (!$constraint instanceof Luhn) {
             throw new UnexpectedTypeException($constraint, Luhn::class);

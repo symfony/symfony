@@ -269,7 +269,7 @@ class HtmlSanitizerConfigTest extends TestCase
     {
         $config = new HtmlSanitizerConfig();
 
-        $sanitizer = new class() implements AttributeSanitizerInterface {
+        $sanitizer = new class implements AttributeSanitizerInterface {
             public function getSupportedElements(): ?array
             {
                 return null;

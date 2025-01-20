@@ -36,12 +36,6 @@ class GenericRetryStrategy implements RetryStrategyInterface
         510 => self::IDEMPOTENT_METHODS,
     ];
 
-    private array $statusCodes;
-    private int $delayMs;
-    private float $multiplier;
-    private int $maxDelayMs;
-    private float $jitter;
-
     /**
      * @param array $statusCodes List of HTTP status codes that trigger a retry
      * @param int   $delayMs     Amount of time to delay (or the initial value when multiplier is used)
@@ -49,29 +43,28 @@ class GenericRetryStrategy implements RetryStrategyInterface
      * @param int   $maxDelayMs  Maximum delay to allow (0 means no maximum)
      * @param float $jitter      Probability of randomness int delay (0 = none, 1 = 100% random)
      */
-    public function __construct(array $statusCodes = self::DEFAULT_RETRY_STATUS_CODES, int $delayMs = 1000, float $multiplier = 2.0, int $maxDelayMs = 0, float $jitter = 0.1)
-    {
-        $this->statusCodes = $statusCodes;
-
+    public function __construct(
+        private array $statusCodes = self::DEFAULT_RETRY_STATUS_CODES,
+        private int $delayMs = 1000,
+        private float $multiplier = 2.0,
+        private int $maxDelayMs = 0,
+        private float $jitter = 0.1,
+    ) {
         if ($delayMs < 0) {
-            throw new InvalidArgumentException(sprintf('Delay must be greater than or equal to zero: "%s" given.', $delayMs));
+            throw new InvalidArgumentException(\sprintf('Delay must be greater than or equal to zero: "%s" given.', $delayMs));
         }
-        $this->delayMs = $delayMs;
 
         if ($multiplier < 1) {
-            throw new InvalidArgumentException(sprintf('Multiplier must be greater than or equal to one: "%s" given.', $multiplier));
+            throw new InvalidArgumentException(\sprintf('Multiplier must be greater than or equal to one: "%s" given.', $multiplier));
         }
-        $this->multiplier = $multiplier;
 
         if ($maxDelayMs < 0) {
-            throw new InvalidArgumentException(sprintf('Max delay must be greater than or equal to zero: "%s" given.', $maxDelayMs));
+            throw new InvalidArgumentException(\sprintf('Max delay must be greater than or equal to zero: "%s" given.', $maxDelayMs));
         }
-        $this->maxDelayMs = $maxDelayMs;
 
         if ($jitter < 0 || $jitter > 1) {
-            throw new InvalidArgumentException(sprintf('Jitter must be between 0 and 1: "%s" given.', $jitter));
+            throw new InvalidArgumentException(\sprintf('Jitter must be between 0 and 1: "%s" given.', $jitter));
         }
-        $this->jitter = $jitter;
     }
 
     public function shouldRetry(AsyncContext $context, ?string $responseContent, ?TransportExceptionInterface $exception): ?bool

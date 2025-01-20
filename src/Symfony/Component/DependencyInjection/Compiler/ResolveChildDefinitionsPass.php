@@ -65,7 +65,7 @@ class ResolveChildDefinitionsPass extends AbstractRecursivePass
             throw $e;
         } catch (ExceptionInterface $e) {
             $r = new \ReflectionProperty($e, 'message');
-            $r->setValue($e, sprintf('Service "%s": %s', $this->currentId, $e->getMessage()));
+            $r->setValue($e, \sprintf('Service "%s": %s', $this->currentId, $e->getMessage()));
 
             throw $e;
         }
@@ -74,7 +74,7 @@ class ResolveChildDefinitionsPass extends AbstractRecursivePass
     private function doResolveDefinition(ChildDefinition $definition): Definition
     {
         if (!$this->container->has($parent = $definition->getParent())) {
-            throw new RuntimeException(sprintf('Parent definition "%s" does not exist.', $parent));
+            throw new RuntimeException(\sprintf('Parent definition "%s" does not exist.', $parent));
         }
 
         $searchKey = array_search($parent, $this->currentPath);
@@ -93,7 +93,7 @@ class ResolveChildDefinitionsPass extends AbstractRecursivePass
             $this->currentId = $id;
         }
 
-        $this->container->log($this, sprintf('Resolving inheritance for "%s" (parent: %s).', $this->currentId, $parent));
+        $this->container->log($this, \sprintf('Resolving inheritance for "%s" (parent: %s).', $this->currentId, $parent));
         $def = new Definition();
 
         // merge in parent definition

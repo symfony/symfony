@@ -35,7 +35,9 @@ class RouterTest extends TestCase
         $this->loader = $this->createMock(LoaderInterface::class);
         $this->router = new Router($this->loader, 'routing.yml');
 
-        $this->cacheDir = sys_get_temp_dir().\DIRECTORY_SEPARATOR.uniqid('router_', true);
+        $this->cacheDir = tempnam(sys_get_temp_dir(), 'sf_router_');
+        unlink($this->cacheDir);
+        mkdir($this->cacheDir);
     }
 
     protected function tearDown(): void
@@ -89,7 +91,7 @@ class RouterTest extends TestCase
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('The Router does not support the "option_foo" option');
-        $this->router->getOption('option_foo', true);
+        $this->router->getOption('option_foo');
     }
 
     public function testThatRouteCollectionIsLoaded()

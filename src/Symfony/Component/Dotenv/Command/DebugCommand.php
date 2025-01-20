@@ -40,14 +40,10 @@ final class DebugCommand extends Command
      */
     protected static $defaultDescription = 'List all dotenv files with variables and values';
 
-    private string $kernelEnvironment;
-    private string $projectDirectory;
-
-    public function __construct(string $kernelEnvironment, string $projectDirectory)
-    {
-        $this->kernelEnvironment = $kernelEnvironment;
-        $this->projectDirectory = $projectDirectory;
-
+    public function __construct(
+        private string $kernelEnvironment,
+        private string $projectDirectory,
+    ) {
         parent::__construct();
     }
 
@@ -98,18 +94,18 @@ EOT
         $envFiles = $this->getEnvFiles($filePath);
         $availableFiles = array_filter($envFiles, 'is_file');
 
-        if (\in_array(sprintf('%s.local.php', $filePath), $availableFiles, true)) {
-            $io->warning(sprintf('Due to existing dump file (%s.local.php) all other dotenv files are skipped.', $this->getRelativeName($filePath)));
+        if (\in_array(\sprintf('%s.local.php', $filePath), $availableFiles, true)) {
+            $io->warning(\sprintf('Due to existing dump file (%s.local.php) all other dotenv files are skipped.', $this->getRelativeName($filePath)));
         }
 
-        if (is_file($filePath) && is_file(sprintf('%s.dist', $filePath))) {
-            $io->warning(sprintf('The file %s.dist gets skipped due to the existence of %1$s.', $this->getRelativeName($filePath)));
+        if (is_file($filePath) && is_file(\sprintf('%s.dist', $filePath))) {
+            $io->warning(\sprintf('The file %s.dist gets skipped due to the existence of %1$s.', $this->getRelativeName($filePath)));
         }
 
         $io->section('Scanned Files (in descending priority)');
         $io->listing(array_map(fn (string $envFile) => \in_array($envFile, $availableFiles, true)
-            ? sprintf('<fg=green>✓</> %s', $this->getRelativeName($envFile))
-            : sprintf('<fg=red>⨯</> %s', $this->getRelativeName($envFile)), $envFiles));
+            ? \sprintf('<fg=green>✓</> %s', $this->getRelativeName($envFile))
+            : \sprintf('<fg=red>⨯</> %s', $this->getRelativeName($envFile)), $envFiles));
 
         $nameFilter = $input->getArgument('filter');
         $variables = $this->getVariables($availableFiles, $nameFilter);
@@ -124,7 +120,7 @@ EOT
 
             $io->comment('Note that values might be different between web and CLI.');
         } else {
-            $io->warning(sprintf('No variables match the given filter "%s".', $nameFilter));
+            $io->warning(\sprintf('No variables match the given filter "%s".', $nameFilter));
         }
 
         return 0;
@@ -188,17 +184,17 @@ EOT
     private function getEnvFiles(string $filePath): array
     {
         $files = [
-            sprintf('%s.local.php', $filePath),
-            sprintf('%s.%s.local', $filePath, $this->kernelEnvironment),
-            sprintf('%s.%s', $filePath, $this->kernelEnvironment),
+            \sprintf('%s.local.php', $filePath),
+            \sprintf('%s.%s.local', $filePath, $this->kernelEnvironment),
+            \sprintf('%s.%s', $filePath, $this->kernelEnvironment),
         ];
 
         if ('test' !== $this->kernelEnvironment) {
-            $files[] = sprintf('%s.local', $filePath);
+            $files[] = \sprintf('%s.local', $filePath);
         }
 
-        if (!is_file($filePath) && is_file(sprintf('%s.dist', $filePath))) {
-            $files[] = sprintf('%s.dist', $filePath);
+        if (!is_file($filePath) && is_file(\sprintf('%s.dist', $filePath))) {
+            $files[] = \sprintf('%s.dist', $filePath);
         } else {
             $files[] = $filePath;
         }

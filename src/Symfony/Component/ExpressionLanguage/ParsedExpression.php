@@ -20,19 +20,14 @@ use Symfony\Component\ExpressionLanguage\Node\Node;
  */
 class ParsedExpression extends Expression
 {
-    private Node $nodes;
-
-    public function __construct(string $expression, Node $nodes)
-    {
+    public function __construct(
+        string $expression,
+        private Node $nodes,
+    ) {
         parent::__construct($expression);
-
-        $this->nodes = $nodes;
     }
 
-    /**
-     * @return Node
-     */
-    public function getNodes()
+    public function getNodes(): Node
     {
         return $this->nodes;
     }

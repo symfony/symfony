@@ -13,7 +13,6 @@ namespace Symfony\Component\DomCrawler\Tests\Test\Constraint;
 
 use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Framework\TestCase;
-use PHPUnit\Framework\TestFailure;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\DomCrawler\Test\Constraint\CrawlerSelectorExists;
 
@@ -26,14 +25,9 @@ class CrawlerSelectorExistsTest extends TestCase
         $constraint = new CrawlerSelectorExists('h1');
         $this->assertFalse($constraint->evaluate(new Crawler('<html><head><title>'), '', true));
 
-        try {
-            $constraint->evaluate(new Crawler('<html><head><title>'));
-        } catch (ExpectationFailedException $e) {
-            $this->assertEquals("Failed asserting that the Crawler matches selector \"h1\".\n", TestFailure::exceptionToString($e));
+        $this->expectException(ExpectationFailedException::class);
+        $this->expectExceptionMessage('Failed asserting that the Crawler matches selector "h1".');
 
-            return;
-        }
-
-        $this->fail();
+        $constraint->evaluate(new Crawler('<html><head><title>'));
     }
 }

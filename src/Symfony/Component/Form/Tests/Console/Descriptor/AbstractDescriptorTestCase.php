@@ -153,7 +153,7 @@ abstract class AbstractDescriptorTestCase extends TestCase
 
     private function getFixtureFilename($name)
     {
-        return sprintf('%s/../../Fixtures/Descriptor/%s.%s', __DIR__, $name, $this->getFormat());
+        return \sprintf('%s/../../Fixtures/Descriptor/%s.%s', __DIR__, $name, $this->getFormat());
     }
 }
 

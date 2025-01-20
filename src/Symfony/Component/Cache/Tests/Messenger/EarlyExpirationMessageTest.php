@@ -27,7 +27,7 @@ class EarlyExpirationMessageTest extends TestCase
         $item = $pool->getItem('foo');
         $item->set(234);
 
-        $computationService = new class() {
+        $computationService = new class {
             public function __invoke(CacheItem $item)
             {
                 return 123;

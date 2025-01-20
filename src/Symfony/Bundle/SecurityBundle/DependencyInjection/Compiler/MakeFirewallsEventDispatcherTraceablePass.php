@@ -22,10 +22,7 @@ use Symfony\Component\EventDispatcher\Debug\TraceableEventDispatcher;
  */
 class MakeFirewallsEventDispatcherTraceablePass implements CompilerPassInterface
 {
-    /**
-     * @return void
-     */
-    public function process(ContainerBuilder $container)
+    public function process(ContainerBuilder $container): void
     {
         if (!$container->has('event_dispatcher') || !$container->hasParameter('security.firewalls')) {
             return;
@@ -53,7 +50,9 @@ class MakeFirewallsEventDispatcherTraceablePass implements CompilerPassInterface
                     new Reference('debug.stopwatch'),
                     new Reference('logger', ContainerInterface::NULL_ON_INVALID_REFERENCE),
                     new Reference('request_stack', ContainerInterface::NULL_ON_INVALID_REFERENCE),
-                ]);
+                ])
+                ->addTag('monolog.logger', ['channel' => 'event'])
+                ->addTag('kernel.reset', ['method' => 'reset']);
         }
 
         foreach (['kernel.event_subscriber', 'kernel.event_listener'] as $tagName) {

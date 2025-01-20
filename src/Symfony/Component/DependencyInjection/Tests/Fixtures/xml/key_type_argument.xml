@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<container xmlns="http://symfony.com/schema/dic/services" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://symfony.com/schema/dic/services https://symfony.com/schema/dic/services/services-1.0.xsd">
+  <services>
+    <service id="foo" class="Symfony\Component\DependencyInjection\Tests\Fixtures\Bar">
+      <argument type="collection">
+        <argument key-type="constant" key="PHP_INT_MAX">Value 1</argument>
+        <argument key="PHP_INT_MAX">Value 2</argument>
+        <argument key-type="binary" key="AQID">Value 3</argument>
+      </argument>
+    </service>
+  </services>
+</container>

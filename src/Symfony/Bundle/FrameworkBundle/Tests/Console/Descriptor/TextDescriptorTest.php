@@ -35,7 +35,7 @@ class TextDescriptorTest extends AbstractDescriptorTestCase
 
         foreach ($getDescribeData as $key => &$data) {
             $routeStub = $data[0];
-            $routeStub->setDefault('_controller', sprintf('%s::%s', MyController::class, '__invoke'));
+            $routeStub->setDefault('_controller', \sprintf('%s::%s', MyController::class, '__invoke'));
             $file = $data[2];
             $file = preg_replace('#(\..*?)$#', '_link$1', $file);
             $data = file_get_contents(__DIR__.'/../../Fixtures/Descriptor/'.$file);

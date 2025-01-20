@@ -19,6 +19,8 @@ use PHPUnit\Framework\TestCase;
  * @group legacy
  *
  * @runTestsInSeparateProcesses
+ *
+ * @requires PHPUnit < 10
  */
 class ProcessIsolationTest extends TestCase
 {

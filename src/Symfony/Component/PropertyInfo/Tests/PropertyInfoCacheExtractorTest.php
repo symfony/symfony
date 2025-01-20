@@ -38,6 +38,15 @@ class PropertyInfoCacheExtractorTest extends AbstractPropertyInfoExtractorTest
         parent::testGetLongDescription();
     }
 
+    public function testGetType()
+    {
+        parent::testGetType();
+        parent::testGetType();
+    }
+
+    /**
+     * @group legacy
+     */
     public function testGetTypes()
     {
         parent::testGetTypes();

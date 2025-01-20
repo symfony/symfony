@@ -37,9 +37,6 @@ final class ReplaceDecoratedRememberMeHandlerPass implements CompilerPassInterfa
 
             // get the actual custom remember me handler definition (passed to the decorator)
             $realRememberMeHandler = $container->findDefinition((string) $definition->getArgument(0));
-            if (null === $realRememberMeHandler) {
-                throw new \LogicException(sprintf('Invalid service definition for custom remember me handler; no service found with ID "%s".', (string) $definition->getArgument(0)));
-            }
 
             foreach ($rememberMeHandlerTags as $rememberMeHandlerTag) {
                 // some custom handlers may be used on multiple firewalls in the same application

@@ -175,10 +175,6 @@ class DummyTestPasswordAuthenticatedUser extends TestPasswordAuthenticatedUser
     {
     }
 
-    public function getUsername(): string
-    {
-    }
-
     public function getUserIdentifier(): string
     {
     }

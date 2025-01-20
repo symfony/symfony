@@ -9,6 +9,6 @@ $container->loadFromExtension('framework', [
         'enabled' => true,
     ],
     'serializer' => [
-        'enabled' => true
+        'enabled' => true,
     ],
 ]);

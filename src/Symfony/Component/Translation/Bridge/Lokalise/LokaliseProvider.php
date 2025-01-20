@@ -32,24 +32,18 @@ final class LokaliseProvider implements ProviderInterface
 {
     private const LOKALISE_GET_KEYS_LIMIT = 5000;
 
-    private HttpClientInterface $client;
-    private LoaderInterface $loader;
-    private LoggerInterface $logger;
-    private string $defaultLocale;
-    private string $endpoint;
-
-    public function __construct(HttpClientInterface $client, LoaderInterface $loader, LoggerInterface $logger, string $defaultLocale, string $endpoint)
-    {
-        $this->client = $client;
-        $this->loader = $loader;
-        $this->logger = $logger;
-        $this->defaultLocale = $defaultLocale;
-        $this->endpoint = $endpoint;
+    public function __construct(
+        private HttpClientInterface $client,
+        private LoaderInterface $loader,
+        private LoggerInterface $logger,
+        private string $defaultLocale,
+        private string $endpoint,
+    ) {
     }
 
     public function __toString(): string
     {
-        return sprintf('lokalise://%s', $this->endpoint);
+        return \sprintf('lokalise://%s', $this->endpoint);
     }
 
     /**
@@ -60,10 +54,6 @@ final class LokaliseProvider implements ProviderInterface
     public function write(TranslatorBagInterface $translatorBag): void
     {
         $defaultCatalogue = $translatorBag->getCatalogue($this->defaultLocale);
-
-        if (!$defaultCatalogue) {
-            $defaultCatalogue = $translatorBag->getCatalogues()[0];
-        }
 
         $this->ensureAllLocalesAreCreated($translatorBag);
         $existingKeysByDomain = [];
@@ -111,10 +101,6 @@ final class LokaliseProvider implements ProviderInterface
     {
         $catalogue = $translatorBag->getCatalogue($this->defaultLocale);
 
-        if (!$catalogue) {
-            $catalogue = $translatorBag->getCatalogues()[0];
-        }
-
         $keysIds = [];
 
         foreach ($catalogue->getDomains() as $domain) {
@@ -136,7 +122,7 @@ final class LokaliseProvider implements ProviderInterface
         ]);
 
         if (200 !== $response->getStatusCode()) {
-            throw new ProviderException(sprintf('Unable to delete keys from Lokalise: "%s".', $response->getContent(false)), $response);
+            throw new ProviderException(\sprintf('Unable to delete keys from Lokalise: "%s".', $response->getContent(false)), $response);
         }
     }
 
@@ -165,7 +151,7 @@ final class LokaliseProvider implements ProviderInterface
         }
 
         if (200 !== $response->getStatusCode()) {
-            throw new ProviderException(sprintf('Unable to export translations from Lokalise: "%s".', $response->getContent(false)), $response);
+            throw new ProviderException(\sprintf('Unable to export translations from Lokalise: "%s".', $response->getContent(false)), $response);
         }
 
         // Lokalise returns languages with "-" separator, we need to reformat them to "_" separator.
@@ -208,7 +194,7 @@ final class LokaliseProvider implements ProviderInterface
 
         foreach ($responses as $response) {
             if (200 !== $statusCode = $response->getStatusCode()) {
-                $this->logger->error(sprintf('Unable to create keys to Lokalise: "%s".', $response->getContent(false)));
+                $this->logger->error(\sprintf('Unable to create keys to Lokalise: "%s".', $response->getContent(false)));
 
                 if (500 <= $statusCode) {
                     throw new ProviderException('Unable to create keys to Lokalise.', $response);
@@ -272,7 +258,7 @@ final class LokaliseProvider implements ProviderInterface
         ]);
 
         if (200 !== $statusCode = $response->getStatusCode()) {
-            $this->logger->error(sprintf('Unable to create/update translations to Lokalise: "%s".', $response->getContent(false)));
+            $this->logger->error(\sprintf('Unable to create/update translations to Lokalise: "%s".', $response->getContent(false)));
 
             if (500 <= $statusCode) {
                 throw new ProviderException('Unable to create/update translations to Lokalise.', $response);
@@ -292,7 +278,7 @@ final class LokaliseProvider implements ProviderInterface
         ]);
 
         if (200 !== $statusCode = $response->getStatusCode()) {
-            $this->logger->error(sprintf('Unable to get keys ids from Lokalise: "%s".', $response->getContent(false)));
+            $this->logger->error(\sprintf('Unable to get keys ids from Lokalise: "%s".', $response->getContent(false)));
 
             if (500 <= $statusCode) {
                 throw new ProviderException('Unable to get keys ids from Lokalise.', $response);
@@ -346,7 +332,7 @@ final class LokaliseProvider implements ProviderInterface
         $response = $this->client->request('GET', 'languages');
 
         if (200 !== $statusCode = $response->getStatusCode()) {
-            $this->logger->error(sprintf('Unable to get languages from Lokalise: "%s".', $response->getContent(false)));
+            $this->logger->error(\sprintf('Unable to get languages from Lokalise: "%s".', $response->getContent(false)));
 
             if (500 <= $statusCode) {
                 throw new ProviderException('Unable to get languages from Lokalise.', $response);
@@ -373,7 +359,7 @@ final class LokaliseProvider implements ProviderInterface
         ]);
 
         if (200 !== $statusCode = $response->getStatusCode()) {
-            $this->logger->error(sprintf('Unable to create languages on Lokalise: "%s".', $response->getContent(false)));
+            $this->logger->error(\sprintf('Unable to create languages on Lokalise: "%s".', $response->getContent(false)));
 
             if (500 <= $statusCode) {
                 throw new ProviderException('Unable to create languages on Lokalise.', $response);
@@ -383,6 +369,6 @@ final class LokaliseProvider implements ProviderInterface
 
     private function getLokaliseFilenameFromDomain(string $domain): string
     {
-        return sprintf('%s.xliff', $domain);
+        return \sprintf('%s.xliff', $domain);
     }
 }

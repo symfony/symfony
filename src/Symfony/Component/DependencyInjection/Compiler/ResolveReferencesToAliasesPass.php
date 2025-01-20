@@ -24,10 +24,7 @@ class ResolveReferencesToAliasesPass extends AbstractRecursivePass
 {
     protected bool $skipScalars = true;
 
-    /**
-     * @return void
-     */
-    public function process(ContainerBuilder $container)
+    public function process(ContainerBuilder $container): void
     {
         parent::process($container);
 

@@ -56,28 +56,22 @@ interface ResolvedFormTypeInterface
 
     /**
      * Configures a form builder for the type hierarchy.
-     *
-     * @return void
      */
-    public function buildForm(FormBuilderInterface $builder, array $options);
+    public function buildForm(FormBuilderInterface $builder, array $options): void;
 
     /**
      * Configures a form view for the type hierarchy.
      *
      * It is called before the children of the view are built.
-     *
-     * @return void
      */
-    public function buildView(FormView $view, FormInterface $form, array $options);
+    public function buildView(FormView $view, FormInterface $form, array $options): void;
 
     /**
      * Finishes a form view for the type hierarchy.
      *
      * It is called after the children of the view have been built.
-     *
-     * @return void
      */
-    public function finishView(FormView $view, FormInterface $form, array $options);
+    public function finishView(FormView $view, FormInterface $form, array $options): void;
 
     /**
      * Returns the configured options resolver used for this type.

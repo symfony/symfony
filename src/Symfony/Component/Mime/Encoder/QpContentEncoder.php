@@ -19,7 +19,7 @@ final class QpContentEncoder implements ContentEncoderInterface
     public function encodeByteStream($stream, int $maxLineLength = 0): iterable
     {
         if (!\is_resource($stream)) {
-            throw new \TypeError(sprintf('Method "%s" takes a stream as a first argument.', __METHOD__));
+            throw new \TypeError(\sprintf('Method "%s" takes a stream as a first argument.', __METHOD__));
         }
 
         // we don't use PHP stream filters here as the content should be small enough

@@ -21,19 +21,17 @@ use Symfony\Component\RateLimiter\LimiterStateInterface;
  */
 final class SlidingWindow implements LimiterStateInterface
 {
-    private string $id;
     private int $hitCount = 0;
     private int $hitCountForLastWindow = 0;
-    private int $intervalInSeconds;
     private float $windowEndAt;
 
-    public function __construct(string $id, int $intervalInSeconds)
-    {
+    public function __construct(
+        private string $id,
+        private int $intervalInSeconds,
+    ) {
         if ($intervalInSeconds < 1) {
-            throw new InvalidIntervalException(sprintf('The interval must be positive integer, "%d" given.', $intervalInSeconds));
+            throw new InvalidIntervalException(\sprintf('The interval must be positive integer, "%d" given.', $intervalInSeconds));
         }
-        $this->id = $id;
-        $this->intervalInSeconds = $intervalInSeconds;
         $this->windowEndAt = microtime(true) + $intervalInSeconds;
     }
 
@@ -82,16 +80,6 @@ final class SlidingWindow implements LimiterStateInterface
         $percentOfCurrentTimeFrame = min((microtime(true) - $startOfWindow) / $this->intervalInSeconds, 1);
 
         return (int) floor($this->hitCountForLastWindow * (1 - $percentOfCurrentTimeFrame) + $this->hitCount);
-    }
-
-    /**
-     * @deprecated since Symfony 6.4, use {@see self::calculateTimeForTokens} instead
-     */
-    public function getRetryAfter(): \DateTimeImmutable
-    {
-        trigger_deprecation('symfony/ratelimiter', '6.4', 'The "%s()" method is deprecated, use "%s::calculateTimeForTokens" instead.', __METHOD__, self::class);
-
-        return \DateTimeImmutable::createFromFormat('U.u', sprintf('%.6F', microtime(true) + $this->calculateTimeForTokens(max(1, $this->getHitCount()), 1)));
     }
 
     public function calculateTimeForTokens(int $maxSize, int $tokens): float

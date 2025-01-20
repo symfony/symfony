@@ -21,9 +21,6 @@ class RequestParserTest extends TestCase
     public function testParseDoesNotMatch()
     {
         $this->expectException(RejectWebhookException::class);
-
-        $request = new Request();
-        $parser = new RequestParser();
-        $parser->parse($request, '$ecret');
+        (new RequestParser())->parse(new Request(), '$ecret');
     }
 }

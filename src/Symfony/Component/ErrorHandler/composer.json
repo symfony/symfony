@@ -16,13 +16,13 @@
         }
     ],
     "require": {
-        "php": ">=8.1",
+        "php": ">=8.2",
         "psr/log": "^1|^2|^3",
-        "symfony/var-dumper": "^5.4|^6.0|^7.0"
+        "symfony/var-dumper": "^6.4|^7.0"
     },
     "require-dev": {
         "symfony/http-kernel": "^6.4|^7.0",
-        "symfony/serializer": "^5.4|^6.0|^7.0",
+        "symfony/serializer": "^6.4|^7.0",
         "symfony/deprecation-contracts": "^2.5|^3"
     },
     "conflict": {

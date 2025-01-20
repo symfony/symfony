@@ -72,7 +72,7 @@ class HostnameValidatorTest extends ConstraintValidatorTestCase
             ['xn--diseolatinoamericano-66b.com'],
             ['xn--ggle-0nda.com'],
             ['www.xn--simulateur-prt-2kb.fr'],
-            [sprintf('%s.com', str_repeat('a', 20))],
+            [\sprintf('%s.com', str_repeat('a', 20))],
         ];
     }
 
@@ -114,7 +114,7 @@ class HostnameValidatorTest extends ConstraintValidatorTestCase
             ['qq--.com'],
             ['-example.com'],
             ['example-.com'],
-            [sprintf('%s.com', str_repeat('a', 300))],
+            [\sprintf('%s.com', str_repeat('a', 300))],
         ];
     }
 

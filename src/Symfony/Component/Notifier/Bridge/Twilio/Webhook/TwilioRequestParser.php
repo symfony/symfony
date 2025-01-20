@@ -50,7 +50,7 @@ final class TwilioRequestParser extends AbstractRequestParser
             'receiving' => null,
             'received' => null,
             'scheduled' => null,
-            default => throw new RejectWebhookException(406, sprintf('Unsupported event "%s".', $payload['event'])),
+            default => throw new RejectWebhookException(406, \sprintf('Unsupported event "%s".', $payload['event'])),
         };
         if (!$name) {
             return null;

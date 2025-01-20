@@ -18,17 +18,15 @@ use Symfony\Component\Notifier\Exception\InvalidArgumentException;
  */
 final class ChannelPolicy implements ChannelPolicyInterface
 {
-    private array $policy;
-
-    public function __construct(array $policy)
-    {
-        $this->policy = $policy;
+    public function __construct(
+        private array $policy,
+    ) {
     }
 
     public function getChannels(string $importance): array
     {
         if (!isset($this->policy[$importance])) {
-            throw new InvalidArgumentException(sprintf('Importance "%s" is not defined in the Policy.', $importance));
+            throw new InvalidArgumentException(\sprintf('Importance "%s" is not defined in the Policy.', $importance));
         }
 
         return $this->policy[$importance];

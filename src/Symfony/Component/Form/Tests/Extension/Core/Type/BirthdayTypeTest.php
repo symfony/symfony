@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Form\Tests\Extension\Core\Type;
 
+use Symfony\Component\Form\Extension\Core\Type\BirthdayType;
 use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
 
 /**
@@ -18,7 +19,7 @@ use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
  */
 class BirthdayTypeTest extends DateTypeTest
 {
-    public const TESTED_TYPE = 'Symfony\Component\Form\Extension\Core\Type\BirthdayType';
+    public const TESTED_TYPE = BirthdayType::class;
 
     public function testSetInvalidYearsOption()
     {

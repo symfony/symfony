@@ -12,12 +12,12 @@
 namespace Symfony\Component\Notifier\Bridge\Expo\Tests;
 
 use Symfony\Component\Notifier\Bridge\Expo\ExpoTransportFactory;
-use Symfony\Component\Notifier\Test\TransportFactoryTestCase;
+use Symfony\Component\Notifier\Test\AbstractTransportFactoryTestCase;
 
 /**
  * @author Imad ZAIRIG <https://github.com/zairigimad>
  */
-final class ExpoTransportFactoryTest extends TransportFactoryTestCase
+final class ExpoTransportFactoryTest extends AbstractTransportFactoryTestCase
 {
     public function createFactory(): ExpoTransportFactory
     {

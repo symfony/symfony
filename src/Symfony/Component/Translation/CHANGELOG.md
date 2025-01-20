@@ -1,6 +1,31 @@
 CHANGELOG
 =========
 
+7.2
+---
+
+ * Deprecate `ProviderFactoryTestCase`, extend `AbstractProviderFactoryTestCase` instead
+
+   The `testIncompleteDsnException()` test is no longer provided by default. If you make use of it by implementing the `incompleteDsnProvider()` data providers,
+   you now need to use the `IncompleteDsnTestTrait`.
+
+ * Make `ProviderFactoryTestCase` and `ProviderTestCase` compatible with PHPUnit 10+
+ * Add `lint:translations` command
+ * Deprecate passing an escape character to `CsvFileLoader::setCsvControl()`
+ * Make Xliff 2.0 attributes in segment element available as `segment-attributes`
+   metadata returned by `XliffFileLoader` and make `XliffFileDumper` write them to the file
+
+7.1
+---
+
+ * Mark class `DataCollectorTranslator` as `final`
+
+7.0
+---
+
+ * Remove `PhpStringTokenParser`
+ * Remove `PhpExtractor` in favor of `PhpAstExtractor`
+
 6.4
 ---
 

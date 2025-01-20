@@ -12,11 +12,12 @@
 namespace Symfony\Component\Form\Tests\Extension\Core\Type;
 
 use Symfony\Component\Form\ChoiceList\View\ChoiceView;
+use Symfony\Component\Form\Extension\Core\Type\CountryType;
 use Symfony\Component\Intl\Util\IntlTestHelper;
 
 class CountryTypeTest extends BaseTypeTestCase
 {
-    public const TESTED_TYPE = 'Symfony\Component\Form\Extension\Core\Type\CountryType';
+    public const TESTED_TYPE = CountryType::class;
 
     protected function setUp(): void
     {

@@ -18,11 +18,9 @@ namespace Symfony\Component\EventDispatcher;
  */
 class ImmutableEventDispatcher implements EventDispatcherInterface
 {
-    private EventDispatcherInterface $dispatcher;
-
-    public function __construct(EventDispatcherInterface $dispatcher)
-    {
-        $this->dispatcher = $dispatcher;
+    public function __construct(
+        private EventDispatcherInterface $dispatcher,
+    ) {
     }
 
     public function dispatch(object $event, ?string $eventName = null): object
@@ -30,34 +28,22 @@ class ImmutableEventDispatcher implements EventDispatcherInterface
         return $this->dispatcher->dispatch($event, $eventName);
     }
 
-    /**
-     * @return never
-     */
-    public function addListener(string $eventName, callable|array $listener, int $priority = 0)
+    public function addListener(string $eventName, callable|array $listener, int $priority = 0): never
     {
         throw new \BadMethodCallException('Unmodifiable event dispatchers must not be modified.');
     }
 
-    /**
-     * @return never
-     */
-    public function addSubscriber(EventSubscriberInterface $subscriber)
+    public function addSubscriber(EventSubscriberInterface $subscriber): never
     {
         throw new \BadMethodCallException('Unmodifiable event dispatchers must not be modified.');
     }
 
-    /**
-     * @return never
-     */
-    public function removeListener(string $eventName, callable|array $listener)
+    public function removeListener(string $eventName, callable|array $listener): never
     {
         throw new \BadMethodCallException('Unmodifiable event dispatchers must not be modified.');
     }
 
-    /**
-     * @return never
-     */
-    public function removeSubscriber(EventSubscriberInterface $subscriber)
+    public function removeSubscriber(EventSubscriberInterface $subscriber): never
     {
         throw new \BadMethodCallException('Unmodifiable event dispatchers must not be modified.');
     }

@@ -341,7 +341,7 @@ EODUMP;
 
     public function testAnonymous()
     {
-        $e = new \Exception(sprintf('Boo "%s" ba.', (new class('Foo') extends \Exception {
+        $e = new \Exception(\sprintf('Boo "%s" ba.', (new class('Foo') extends \Exception {
         })::class));
 
         $expectedDump = <<<'EODUMP'

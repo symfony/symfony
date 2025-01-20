@@ -55,9 +55,9 @@ EOT
         $this->importMapManager->remove($packageList);
 
         if (1 === \count($packageList)) {
-            $io->success(sprintf('Removed "%s" from importmap.php.', $packageList[0]));
+            $io->success(\sprintf('Removed "%s" from importmap.php.', $packageList[0]));
         } else {
-            $io->success(sprintf('Removed %d items from importmap.php.', \count($packageList)));
+            $io->success(\sprintf('Removed %d items from importmap.php.', \count($packageList)));
         }
 
         return Command::SUCCESS;

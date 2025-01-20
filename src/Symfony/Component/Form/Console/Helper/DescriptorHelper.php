@@ -15,7 +15,6 @@ use Symfony\Component\Console\Helper\DescriptorHelper as BaseDescriptorHelper;
 use Symfony\Component\ErrorHandler\ErrorRenderer\FileLinkFormatter;
 use Symfony\Component\Form\Console\Descriptor\JsonDescriptor;
 use Symfony\Component\Form\Console\Descriptor\TextDescriptor;
-use Symfony\Component\HttpKernel\Debug\FileLinkFormatter as LegacyFileLinkFormatter;
 
 /**
  * @author Yonel Ceruto <yonelceruto@gmail.com>
@@ -24,7 +23,7 @@ use Symfony\Component\HttpKernel\Debug\FileLinkFormatter as LegacyFileLinkFormat
  */
 class DescriptorHelper extends BaseDescriptorHelper
 {
-    public function __construct(FileLinkFormatter|LegacyFileLinkFormatter|null $fileLinkFormatter = null)
+    public function __construct(?FileLinkFormatter $fileLinkFormatter = null)
     {
         $this
             ->register('txt', new TextDescriptor($fileLinkFormatter))

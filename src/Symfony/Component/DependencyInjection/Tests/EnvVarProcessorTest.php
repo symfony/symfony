@@ -136,6 +136,68 @@ class EnvVarProcessorTest extends TestCase
         $this->assertSame($processed, $result);
     }
 
+    public function testGetEnvCachesEnv()
+    {
+        $_ENV['FOO'] = '';
+
+        $GLOBALS['ENV_FOO'] = 'value';
+
+        $loaders = function () {
+            yield new class implements EnvVarLoaderInterface {
+                public function loadEnvVars(): array
+                {
+                    return ['FOO' => $GLOBALS['ENV_FOO']];
+                }
+            };
+        };
+
+        $processor = new EnvVarProcessor(new Container(), new RewindableGenerator($loaders, 1));
+
+        $noop = function () {};
+
+        $result = $processor->getEnv('string', 'FOO', $noop);
+        $this->assertSame('value', $result);
+
+        $GLOBALS['ENV_FOO'] = 'new value';
+
+        $result = $processor->getEnv('string', 'FOO', $noop);
+        $this->assertSame('value', $result);
+
+        unset($_ENV['FOO'], $GLOBALS['ENV_FOO']);
+    }
+
+    public function testReset()
+    {
+        $_ENV['FOO'] = '';
+
+        $GLOBALS['ENV_FOO'] = 'value';
+
+        $loaders = function () {
+            yield new class implements EnvVarLoaderInterface {
+                public function loadEnvVars(): array
+                {
+                    return ['FOO' => $GLOBALS['ENV_FOO']];
+                }
+            };
+        };
+
+        $processor = new EnvVarProcessor(new Container(), new RewindableGenerator($loaders, 1));
+
+        $noop = function () {};
+
+        $result = $processor->getEnv('string', 'FOO', $noop);
+        $this->assertSame('value', $result);
+
+        $GLOBALS['ENV_FOO'] = 'new value';
+
+        $processor->reset();
+
+        $result = $processor->getEnv('string', 'FOO', $noop);
+        $this->assertSame('new value', $result);
+
+        unset($_ENV['FOO'], $GLOBALS['ENV_FOO']);
+    }
+
     /**
      * @dataProvider validBools
      */
@@ -625,7 +687,7 @@ class EnvVarProcessorTest extends TestCase
             ['null', 'null'],
             ['Null', 'Null'],
             ['NULL', 'NULL'],
-         ];
+        ];
     }
 
     public function testRequireMissingFile()
@@ -802,14 +864,14 @@ CSV;
         $_ENV['BUZ_ENV_LOADER'] = '';
 
         $loaders = function () {
-            yield new class() implements EnvVarLoaderInterface {
+            yield new class implements EnvVarLoaderInterface {
                 public function loadEnvVars(): array
                 {
                     return [
                         'FOO_ENV_LOADER' => '123',
                         'BAZ_ENV_LOADER' => '',
-                        'LAZY_ENV_LOADER' => new class() {
-                            public function __toString()
+                        'LAZY_ENV_LOADER' => new class {
+                            public function __toString(): string
                             {
                                 return '';
                             }
@@ -818,15 +880,15 @@ CSV;
                 }
             };
 
-            yield new class() implements EnvVarLoaderInterface {
+            yield new class implements EnvVarLoaderInterface {
                 public function loadEnvVars(): array
                 {
                     return [
                         'FOO_ENV_LOADER' => '234',
                         'BAR_ENV_LOADER' => '456',
                         'BAZ_ENV_LOADER' => '567',
-                        'LAZY_ENV_LOADER' => new class() {
-                            public function __toString()
+                        'LAZY_ENV_LOADER' => new class {
+                            public function __toString(): string
                             {
                                 return '678';
                             }
@@ -872,7 +934,7 @@ CSV;
                 throw new ParameterCircularReferenceException(['FOO_CONTAINER']);
             }
 
-            yield new class() implements EnvVarLoaderInterface {
+            yield new class implements EnvVarLoaderInterface {
                 public function loadEnvVars(): array
                 {
                     return [
@@ -935,6 +997,27 @@ CSV;
     }
 
     /**
+     * @testWith ["http://foo.com\\bar"]
+     *           ["\\\\foo.com/bar"]
+     *           ["a\rb"]
+     *           ["a\nb"]
+     *           ["a\tb"]
+     *           ["\u0000foo"]
+     *           ["foo\u0000"]
+     *           [" foo"]
+     *           ["foo "]
+     *           [":"]
+     */
+    public function testGetEnvBadUrl(string $url)
+    {
+        $this->expectException(RuntimeException::class);
+
+        (new EnvVarProcessor(new Container()))->getEnv('url', 'foo', static function () use ($url): string {
+            return $url;
+        });
+    }
+
+    /**
      * @testWith    ["", "string"]
      *              [null, ""]
      *              [false, "bool"]
@@ -972,6 +1055,17 @@ CSV;
     public function testGetEnvDefined(bool $expected, callable $callback)
     {
         $this->assertSame($expected, (new EnvVarProcessor(new Container()))->getEnv('defined', 'NO_SOMETHING', $callback));
+    }
+
+    public function testGetEnvUrlencode()
+    {
+        $processor = new EnvVarProcessor(new Container());
+
+        $result = $processor->getEnv('urlencode', 'URLENCODETEST', function () {
+            return 'foo: Data123!@-_ + bar: Not the same content as Data123!@-_ +';
+        });
+
+        $this->assertSame('foo%3A%20Data123%21%40-_%20%2B%20bar%3A%20Not%20the%20same%20content%20as%20Data123%21%40-_%20%2B', $result);
     }
 
     public static function provideGetEnvDefined(): iterable

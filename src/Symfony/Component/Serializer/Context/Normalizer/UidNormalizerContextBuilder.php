@@ -33,7 +33,7 @@ final class UidNormalizerContextBuilder implements ContextBuilderInterface
     public function withNormalizationFormat(?string $normalizationFormat): static
     {
         if (null !== $normalizationFormat && !\in_array($normalizationFormat, UidNormalizer::NORMALIZATION_FORMATS, true)) {
-            throw new InvalidArgumentException(sprintf('The "%s" normalization format is not valid.', $normalizationFormat));
+            throw new InvalidArgumentException(\sprintf('The "%s" normalization format is not valid.', $normalizationFormat));
         }
 
         return $this->with(UidNormalizer::NORMALIZATION_FORMAT_KEY, $normalizationFormat);

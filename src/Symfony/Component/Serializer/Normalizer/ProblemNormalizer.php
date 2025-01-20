@@ -29,7 +29,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  * @author Kévin Dunglas <dunglas@gmail.com>
  * @author Yonel Ceruto <yonelceruto@gmail.com>
  */
-class ProblemNormalizer implements NormalizerInterface, SerializerAwareInterface, CacheableSupportsMethodInterface
+class ProblemNormalizer implements NormalizerInterface, SerializerAwareInterface
 {
     use SerializerAwareTrait;
 
@@ -47,14 +47,14 @@ class ProblemNormalizer implements NormalizerInterface, SerializerAwareInterface
     public function getSupportedTypes(?string $format): array
     {
         return [
-            FlattenException::class => __CLASS__ === self::class || $this->hasCacheableSupportsMethod(),
+            FlattenException::class => __CLASS__ === self::class,
         ];
     }
 
     public function normalize(mixed $object, ?string $format = null, array $context = []): array
     {
         if (!$object instanceof FlattenException) {
-            throw new InvalidArgumentException(sprintf('The object must implement "%s".', FlattenException::class));
+            throw new InvalidArgumentException(\sprintf('The object must implement "%s".', FlattenException::class));
         }
 
         $data = [];
@@ -107,21 +107,8 @@ class ProblemNormalizer implements NormalizerInterface, SerializerAwareInterface
         return $data;
     }
 
-    /**
-     * @param array $context
-     */
-    public function supportsNormalization(mixed $data, ?string $format = null /* , array $context = [] */): bool
+    public function supportsNormalization(mixed $data, ?string $format = null, array $context = []): bool
     {
         return $data instanceof FlattenException;
-    }
-
-    /**
-     * @deprecated since Symfony 6.3, use "getSupportedTypes()" instead
-     */
-    public function hasCacheableSupportsMethod(): bool
-    {
-        trigger_deprecation('symfony/serializer', '6.3', 'The "%s()" method is deprecated, implement "%s::getSupportedTypes()" instead.', __METHOD__, get_debug_type($this));
-
-        return true;
     }
 }

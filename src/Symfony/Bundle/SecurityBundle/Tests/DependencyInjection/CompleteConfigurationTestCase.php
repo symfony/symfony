@@ -129,7 +129,7 @@ abstract class CompleteConfigurationTestCase extends TestCase
             $configs[] = array_values($configDef->getArguments());
         }
 
-        // the IDs of the services are case sensitive or insensitive depending on
+        // the IDs of the services are case-sensitive or insensitive depending on
         // the Symfony version. Transform them to lowercase to simplify tests.
         $configs[0][2] = strtolower($configs[0][2]);
         $configs[2][2] = strtolower($configs[2][2]);

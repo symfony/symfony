@@ -26,17 +26,12 @@ use Symfony\Component\Security\Core\Role\RoleHierarchyInterface;
  */
 class ExpressionVoter implements CacheableVoterInterface
 {
-    private ExpressionLanguage $expressionLanguage;
-    private AuthenticationTrustResolverInterface $trustResolver;
-    private AuthorizationCheckerInterface $authChecker;
-    private ?RoleHierarchyInterface $roleHierarchy;
-
-    public function __construct(ExpressionLanguage $expressionLanguage, AuthenticationTrustResolverInterface $trustResolver, AuthorizationCheckerInterface $authChecker, ?RoleHierarchyInterface $roleHierarchy = null)
-    {
-        $this->expressionLanguage = $expressionLanguage;
-        $this->trustResolver = $trustResolver;
-        $this->authChecker = $authChecker;
-        $this->roleHierarchy = $roleHierarchy;
+    public function __construct(
+        private ExpressionLanguage $expressionLanguage,
+        private AuthenticationTrustResolverInterface $trustResolver,
+        private AuthorizationCheckerInterface $authChecker,
+        private ?RoleHierarchyInterface $roleHierarchy = null,
+    ) {
     }
 
     public function supportsAttribute(string $attribute): bool

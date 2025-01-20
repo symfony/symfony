@@ -40,8 +40,6 @@ class GeneratedConfigTest extends TestCase
 
     protected function setup(): void
     {
-        parent::setup();
-
         $this->tempDir = [];
     }
 
@@ -49,8 +47,6 @@ class GeneratedConfigTest extends TestCase
     {
         (new Filesystem())->remove($this->tempDir);
         $this->tempDir = [];
-
-        parent::tearDown();
     }
 
     public static function fixtureNames()
@@ -92,7 +88,6 @@ class GeneratedConfigTest extends TestCase
         // $this->generateConfigBuilder('Symfony\\Component\\Config\\Tests\\Builder\\Fixtures\\'.$name, $expectedCode);
         // $this->markTestIncomplete('Re-comment the line above and relaunch the tests');
 
-        $outputDir = sys_get_temp_dir().\DIRECTORY_SEPARATOR.uniqid('sf_config_builder', true);
         $configBuilder = $this->generateConfigBuilder('Symfony\\Component\\Config\\Tests\\Builder\\Fixtures\\'.$name, $outputDir);
         $callback($configBuilder);
 
@@ -162,12 +157,12 @@ class GeneratedConfigTest extends TestCase
     /**
      * Generate the ConfigBuilder or return an already generated instance.
      */
-    private function generateConfigBuilder(string $configurationClass, ?string $outputDir = null)
+    private function generateConfigBuilder(string $configurationClass, ?string &$outputDir = null)
     {
-        $outputDir ??= sys_get_temp_dir().\DIRECTORY_SEPARATOR.uniqid('sf_config_builder', true);
-        if (!str_contains($outputDir, __DIR__)) {
-            $this->tempDir[] = $outputDir;
-        }
+        $outputDir = tempnam(sys_get_temp_dir(), 'sf_config_builder_');
+        unlink($outputDir);
+        mkdir($outputDir);
+        $this->tempDir[] = $outputDir;
 
         $configuration = new $configurationClass();
         $rootNode = $configuration->getConfigTreeBuilder()->buildTree();

@@ -16,15 +16,15 @@
         }
     ],
     "require": {
-        "php": ">=8.1",
-        "symfony/mailer": "^5.4.21|^6.2.7|^7.0"
+        "php": ">=8.2",
+        "symfony/mailer": "^7.2"
     },
     "require-dev": {
-        "symfony/http-client": "^6.3|^7.0",
-        "symfony/webhook": "^6.3|^7.0"
+        "symfony/http-client": "^6.4|^7.0",
+        "symfony/webhook": "^6.4|^7.0"
     },
     "conflict": {
-        "symfony/http-foundation": "<6.2"
+        "symfony/http-foundation": "<6.4"
     },
     "autoload": {
         "psr-4": { "Symfony\\Component\\Mailer\\Bridge\\Mailgun\\": "" },

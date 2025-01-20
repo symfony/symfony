@@ -35,15 +35,10 @@ class Cookie
         'D M d H:i:s Y T',
     ];
 
-    protected $name;
-    protected $value;
-    protected $expires;
-    protected $path;
-    protected $domain;
-    protected $secure;
-    protected $httponly;
-    protected $rawValue;
-    private ?string $samesite;
+    protected string $value;
+    protected ?string $expires = null;
+    protected string $path;
+    protected string $rawValue;
 
     /**
      * Sets a cookie.
@@ -58,8 +53,17 @@ class Cookie
      * @param bool        $encodedValue Whether the value is encoded or not
      * @param string|null $samesite     The cookie samesite attribute
      */
-    public function __construct(string $name, ?string $value, ?string $expires = null, ?string $path = null, string $domain = '', bool $secure = false, bool $httponly = true, bool $encodedValue = false, ?string $samesite = null)
-    {
+    public function __construct(
+        private string $name,
+        ?string $value,
+        ?string $expires = null,
+        ?string $path = null,
+        private string $domain = '',
+        private bool $secure = false,
+        private bool $httponly = true,
+        bool $encodedValue = false,
+        private ?string $samesite = null,
+    ) {
         if ($encodedValue) {
             $this->rawValue = $value ?? '';
             $this->value = urldecode($this->rawValue);
@@ -67,17 +71,12 @@ class Cookie
             $this->value = $value ?? '';
             $this->rawValue = rawurlencode($this->value);
         }
-        $this->name = $name;
-        $this->path = empty($path) ? '/' : $path;
-        $this->domain = $domain;
-        $this->secure = $secure;
-        $this->httponly = $httponly;
-        $this->samesite = $samesite;
+        $this->path = $path ?: '/';
 
         if (null !== $expires) {
             $timestampAsDateTime = \DateTimeImmutable::createFromFormat('U', $expires);
             if (false === $timestampAsDateTime) {
-                throw new UnexpectedValueException(sprintf('The cookie expiration time "%s" is not valid.', $expires));
+                throw new UnexpectedValueException(\sprintf('The cookie expiration time "%s" is not valid.', $expires));
             }
 
             $this->expires = $timestampAsDateTime->format('U');
@@ -89,7 +88,7 @@ class Cookie
      */
     public function __toString(): string
     {
-        $cookie = sprintf('%s=%s', $this->name, $this->rawValue);
+        $cookie = \sprintf('%s=%s', $this->name, $this->rawValue);
 
         if (null !== $this->expires) {
             $dateTime = \DateTimeImmutable::createFromFormat('U', $this->expires, new \DateTimeZone('GMT'));
@@ -129,7 +128,7 @@ class Cookie
         $parts = explode(';', $cookie);
 
         if (!str_contains($parts[0], '=')) {
-            throw new InvalidArgumentException(sprintf('The cookie string "%s" is not valid.', $parts[0]));
+            throw new InvalidArgumentException(\sprintf('The cookie string "%s" is not valid.', $parts[0]));
         }
 
         [$name, $value] = explode('=', array_shift($parts), 2);
@@ -148,7 +147,7 @@ class Cookie
 
         if (null !== $url) {
             if (false === ($urlParts = parse_url($url)) || !isset($urlParts['host'])) {
-                throw new InvalidArgumentException(sprintf('The URL "%s" is not valid.', $url));
+                throw new InvalidArgumentException(\sprintf('The URL "%s" is not valid.', $url));
             }
 
             $values['domain'] = $urlParts['host'];

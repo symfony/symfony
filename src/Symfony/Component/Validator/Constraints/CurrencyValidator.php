@@ -25,10 +25,7 @@ use Symfony\Component\Validator\Exception\UnexpectedValueException;
  */
 class CurrencyValidator extends ConstraintValidator
 {
-    /**
-     * @return void
-     */
-    public function validate(mixed $value, Constraint $constraint)
+    public function validate(mixed $value, Constraint $constraint): void
     {
         if (!$constraint instanceof Currency) {
             throw new UnexpectedTypeException($constraint, Currency::class);

@@ -13,8 +13,10 @@ namespace Symfony\Component\Messenger\Bridge\AmazonSqs\Tests\Transport;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Messenger\Bridge\AmazonSqs\Tests\Fixtures\DummyMessage;
+use Symfony\Component\Messenger\Bridge\AmazonSqs\Transport\AmazonSqsReceivedStamp;
 use Symfony\Component\Messenger\Bridge\AmazonSqs\Transport\AmazonSqsReceiver;
 use Symfony\Component\Messenger\Bridge\AmazonSqs\Transport\Connection;
+use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\MessageDecodingFailedException;
 use Symfony\Component\Messenger\Transport\Serialization\PhpSerializer;
 use Symfony\Component\Messenger\Transport\Serialization\Serializer;
@@ -54,6 +56,17 @@ class AmazonSqsReceiverTest extends TestCase
         iterator_to_array($receiver->get());
     }
 
+    public function testKeepalive()
+    {
+        $serializer = $this->createSerializer();
+
+        $connection = $this->createMock(Connection::class);
+        $connection->expects($this->once())->method('keepalive')->with('123', 10);
+
+        $receiver = new AmazonSqsReceiver($connection, $serializer);
+        $receiver->keepalive(new Envelope(new DummyMessage('foo'), [new AmazonSqsReceivedStamp('123')]), 10);
+    }
+
     private function createSqsEnvelope()
     {
         return [
@@ -67,10 +80,8 @@ class AmazonSqsReceiverTest extends TestCase
 
     private function createSerializer(): Serializer
     {
-        $serializer = new Serializer(
+        return new Serializer(
             new SerializerComponent\Serializer([new ObjectNormalizer()], ['json' => new JsonEncoder()])
         );
-
-        return $serializer;
     }
 }

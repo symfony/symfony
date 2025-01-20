@@ -15,8 +15,7 @@ use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Exception\InvalidArgumentException;
 
 /**
- * @Annotation
- * @Target({"PROPERTY", "METHOD", "ANNOTATION"})
+ * Validates that a value matches a regular expression.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
@@ -29,18 +28,20 @@ class Regex extends Constraint
         self::REGEX_FAILED_ERROR => 'REGEX_FAILED_ERROR',
     ];
 
-    /**
-     * @deprecated since Symfony 6.1, use const ERROR_NAMES instead
-     */
-    protected static $errorNames = self::ERROR_NAMES;
-
-    public $message = 'This value is not valid.';
-    public $pattern;
-    public $htmlPattern;
-    public $match = true;
+    public string $message = 'This value is not valid.';
+    public ?string $pattern = null;
+    public ?string $htmlPattern = null;
+    public bool $match = true;
     /** @var callable|null */
     public $normalizer;
 
+    /**
+     * @param string|array<string,mixed>|null $pattern     The regular expression to match
+     * @param string|null                     $htmlPattern The pattern to use in the HTML5 pattern attribute
+     * @param bool|null                       $match       Whether to validate the value matches the configured pattern or not (defaults to false)
+     * @param string[]|null                   $groups
+     * @param array<string,mixed>             $options
+     */
     public function __construct(
         string|array|null $pattern,
         ?string $message = null,
@@ -49,7 +50,7 @@ class Regex extends Constraint
         ?callable $normalizer = null,
         ?array $groups = null,
         mixed $payload = null,
-        array $options = []
+        array $options = [],
     ) {
         if (\is_array($pattern)) {
             $options = array_merge($pattern, $options);
@@ -65,7 +66,7 @@ class Regex extends Constraint
         $this->normalizer = $normalizer ?? $this->normalizer;
 
         if (null !== $this->normalizer && !\is_callable($this->normalizer)) {
-            throw new InvalidArgumentException(sprintf('The "normalizer" option must be a valid callable ("%s" given).', get_debug_type($this->normalizer)));
+            throw new InvalidArgumentException(\sprintf('The "normalizer" option must be a valid callable ("%s" given).', get_debug_type($this->normalizer)));
         }
     }
 
@@ -90,9 +91,7 @@ class Regex extends Constraint
     {
         // If htmlPattern is specified, use it
         if (null !== $this->htmlPattern) {
-            return empty($this->htmlPattern)
-                ? null
-                : $this->htmlPattern;
+            return $this->htmlPattern ?: null;
         }
 
         // Quit if delimiters not at very beginning/end (e.g. when options are passed)
@@ -121,8 +120,6 @@ class Regex extends Constraint
         $pattern = '^' === $pattern[0] ? substr($pattern, 1) : '.*'.$pattern;
 
         // Trim trailing $, otherwise append .*
-        $pattern = '$' === $pattern[\strlen($pattern) - 1] ? substr($pattern, 0, -1) : $pattern.'.*';
-
-        return $pattern;
+        return '$' === $pattern[\strlen($pattern) - 1] ? substr($pattern, 0, -1) : $pattern.'.*';
     }
 }

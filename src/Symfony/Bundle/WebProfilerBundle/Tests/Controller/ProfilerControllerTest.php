@@ -137,6 +137,33 @@ class ProfilerControllerTest extends WebTestCase
         $this->assertEquals(200, $response->getStatusCode());
     }
 
+    public function testToolbarStylesheetActionWithProfilerDisabled()
+    {
+        $urlGenerator = $this->createMock(UrlGeneratorInterface::class);
+        $twig = $this->createMock(Environment::class);
+
+        $controller = new ProfilerController($urlGenerator, null, $twig, []);
+
+        $this->expectException(NotFoundHttpException::class);
+        $this->expectExceptionMessage('The profiler must be enabled.');
+
+        $controller->toolbarStylesheetAction();
+    }
+
+    public function testToolbarStylesheetAction()
+    {
+        $kernel = new WebProfilerBundleKernel();
+        $client = new KernelBrowser($kernel);
+
+        $client->request('GET', '/_wdt/styles');
+
+        $response = $client->getResponse();
+
+        $this->assertSame(200, $response->getStatusCode());
+        $this->assertSame('text/css; charset=UTF-8', $response->headers->get('Content-Type'));
+        $this->assertSame('max-age=600, private', $response->headers->get('Cache-Control'));
+    }
+
     public static function getEmptyTokenCases()
     {
         return [
@@ -225,7 +252,7 @@ class ProfilerControllerTest extends WebTestCase
         $this->assertSame(200, $client->getResponse()->getStatusCode());
 
         foreach (['ip', 'status_code', 'url', 'token', 'start', 'end'] as $searchCriteria) {
-            $this->assertSame('', $crawler->filter(sprintf('form input[name="%s"]', $searchCriteria))->text());
+            $this->assertSame('', $crawler->filter(\sprintf('form input[name="%s"]', $searchCriteria))->text());
         }
     }
 
@@ -334,7 +361,7 @@ class ProfilerControllerTest extends WebTestCase
         $client->request('GET', '/_profiler/search?ip=&method=GET&status_code=&url=&token=&start=&end=&limit=10');
 
         $this->assertStringContainsString('results found', $client->getResponse()->getContent());
-        $this->assertStringContainsString(sprintf('<a href="/_profiler/%s">%s</a>', $token, $token), $client->getResponse()->getContent());
+        $this->assertStringContainsString(\sprintf('<a href="/_profiler/%s">%s</a>', $token, $token), $client->getResponse()->getContent());
     }
 
     public function testPhpinfoActionWithProfilerDisabled()

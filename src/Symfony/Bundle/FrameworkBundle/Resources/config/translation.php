@@ -27,7 +27,6 @@ use Symfony\Component\Translation\Dumper\YamlFileDumper;
 use Symfony\Component\Translation\Extractor\ChainExtractor;
 use Symfony\Component\Translation\Extractor\ExtractorInterface;
 use Symfony\Component\Translation\Extractor\PhpAstExtractor;
-use Symfony\Component\Translation\Extractor\PhpExtractor;
 use Symfony\Component\Translation\Extractor\Visitor\ConstraintVisitor;
 use Symfony\Component\Translation\Extractor\Visitor\TranslatableMessageVisitor;
 use Symfony\Component\Translation\Extractor\Visitor\TransMethodVisitor;
@@ -151,10 +150,6 @@ return static function (ContainerConfigurator $container) {
 
         ->set('translation.dumper.res', IcuResFileDumper::class)
             ->tag('translation.dumper', ['alias' => 'res'])
-
-        ->set('translation.extractor.php', PhpExtractor::class)
-            ->deprecate('symfony/framework-bundle', '6.2', 'The "%service_id%" service is deprecated, use "translation.extractor.php_ast" instead.')
-            ->tag('translation.extractor', ['alias' => 'php'])
 
         ->set('translation.extractor.php_ast', PhpAstExtractor::class)
             ->args([tagged_iterator('translation.extractor.visitor')])

@@ -16,16 +16,13 @@ namespace Symfony\Component\RateLimiter;
  */
 final class Reservation
 {
-    private float $timeToAct;
-    private RateLimit $rateLimit;
-
     /**
      * @param float $timeToAct Unix timestamp in seconds when this reservation should act
      */
-    public function __construct(float $timeToAct, RateLimit $rateLimit)
-    {
-        $this->timeToAct = $timeToAct;
-        $this->rateLimit = $rateLimit;
+    public function __construct(
+        private float $timeToAct,
+        private RateLimit $rateLimit,
+    ) {
     }
 
     public function getTimeToAct(): float

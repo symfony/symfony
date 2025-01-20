@@ -270,6 +270,7 @@
       <xsd:element name="property" type="property" maxOccurs="unbounded" />
       <xsd:element name="service" type="service" />
     </xsd:choice>
+    <xsd:attribute name="key-type" type="key_type" />
     <xsd:attribute name="type" type="argument_type" />
     <xsd:attribute name="id" type="xsd:string" />
     <xsd:attribute name="key" type="xsd:string" />
@@ -315,6 +316,7 @@
       <xsd:element name="service" type="service" />
       <xsd:element name="exclude" type="xsd:string" maxOccurs="unbounded" />
     </xsd:choice>
+    <xsd:attribute name="key-type" type="key_type" />
     <xsd:attribute name="type" type="argument_type" />
     <xsd:attribute name="id" type="xsd:string" />
     <xsd:attribute name="key" type="xsd:string" />
@@ -362,6 +364,13 @@
       <xsd:enumeration value="tagged" />
       <xsd:enumeration value="tagged_iterator" />
       <xsd:enumeration value="tagged_locator" />
+    </xsd:restriction>
+  </xsd:simpleType>
+
+  <xsd:simpleType name="key_type">
+    <xsd:restriction base="xsd:string">
+      <xsd:enumeration value="binary" />
+      <xsd:enumeration value="constant" />
     </xsd:restriction>
   </xsd:simpleType>
 

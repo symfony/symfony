@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Form\Tests\Extension\Core\Type;
 
+use Symfony\Component\Form\Extension\Core\Type\RepeatedType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\Tests\Fixtures\NotMappedType;
@@ -18,7 +19,7 @@ use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
 
 class RepeatedTypeTest extends BaseTypeTestCase
 {
-    public const TESTED_TYPE = 'Symfony\Component\Form\Extension\Core\Type\RepeatedType';
+    public const TESTED_TYPE = RepeatedType::class;
 
     protected Form $form;
 
@@ -198,7 +199,7 @@ class RepeatedTypeTest extends BaseTypeTestCase
             'type' => TextType::class,
             'options' => [
                 'empty_data' => $emptyData,
-            ]
+            ],
         ]);
         $form->submit($submittedData);
 

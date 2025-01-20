@@ -531,11 +531,12 @@ class RecursiveValidatorTest extends TestCase
 
     public function testFailOnScalarReferences()
     {
-        $this->expectException(NoSuchMetadataException::class);
         $entity = new Entity();
         $entity->reference = 'string';
 
         $this->metadata->addPropertyConstraint('reference', new Valid());
+
+        $this->expectException(NoSuchMetadataException::class);
 
         $this->validate($entity);
     }
@@ -786,13 +787,14 @@ class RecursiveValidatorTest extends TestCase
 
     public function testMetadataMustExistIfTraversalIsDisabled()
     {
-        $this->expectException(NoSuchMetadataException::class);
         $entity = new Entity();
         $entity->reference = new \ArrayIterator();
 
         $this->metadata->addPropertyConstraint('reference', new Valid([
             'traverse' => false,
         ]));
+
+        $this->expectException(NoSuchMetadataException::class);
 
         $this->validate($entity);
     }
@@ -1670,12 +1672,11 @@ class RecursiveValidatorTest extends TestCase
 
     public function testExpectTraversableIfTraversalEnabledOnClass()
     {
-        $this->expectException(ConstraintDefinitionException::class);
-        $entity = new Entity();
-
         $this->metadata->addConstraint(new Traverse(true));
 
-        $this->validator->validate($entity);
+        $this->expectException(ConstraintDefinitionException::class);
+
+        $this->validator->validate(new Entity());
     }
 
     public function testReferenceTraversalDisabledOnClass()

@@ -1,0 +1,41 @@
+imports:
+  - { resource: ./../config/framework.yml }
+
+framework:
+  http_method_override: false
+  serializer: ~
+
+security:
+  password_hashers:
+    Symfony\Component\Security\Core\User\InMemoryUser: plaintext
+
+  providers:
+    in_memory:
+      memory:
+        users:
+          dunglas: { password: foo, roles: [ROLE_USER] }
+
+  firewalls:
+    main:
+      pattern: ^/
+      access_token:
+        token_handler:
+          cas:
+            validation_url: 'https://www.example.com/cas/serviceValidate'
+            http_client: 'Symfony\Contracts\HttpClient\HttpClientInterface'
+        token_extractors:
+          - security.access_token_extractor.cas
+
+  access_control:
+    - { path: ^/foo, roles: ROLE_USER }
+
+services:
+  _defaults:
+    public: true
+
+  security.access_token_extractor.cas:
+    class: Symfony\Component\Security\Http\AccessToken\QueryAccessTokenExtractor
+    arguments:
+      - 'ticket'
+
+  Symfony\Contracts\HttpClient\HttpClientInterface: ~

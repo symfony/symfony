@@ -34,7 +34,7 @@ class ChainEncoder implements ContextAwareEncoderInterface
      * @param array<EncoderInterface> $encoders
      */
     public function __construct(
-        private readonly array $encoders = []
+        private readonly array $encoders = [],
     ) {
     }
 
@@ -101,6 +101,6 @@ class ChainEncoder implements ContextAwareEncoderInterface
             }
         }
 
-        throw new RuntimeException(sprintf('No encoder found for format "%s".', $format));
+        throw new RuntimeException(\sprintf('No encoder found for format "%s".', $format));
     }
 }

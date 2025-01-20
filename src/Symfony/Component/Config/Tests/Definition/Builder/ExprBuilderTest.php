@@ -49,6 +49,27 @@ class ExprBuilderTest extends TestCase
         $this->assertFinalizedValueIs('value', $test);
     }
 
+    public function testIfFalseExpression()
+    {
+        $test = $this->getTestBuilder()
+            ->ifFalse()
+            ->then($this->returnClosure('new_value'))
+        ->end();
+        $this->assertFinalizedValueIs('new_value', $test, ['key' => false]);
+
+        $test = $this->getTestBuilder()
+            ->ifFalse(fn () => true)
+            ->then($this->returnClosure('new_value'))
+        ->end();
+        $this->assertFinalizedValueIs('new_value', $test);
+
+        $test = $this->getTestBuilder()
+            ->ifFalse(fn () => false)
+            ->then($this->returnClosure('new_value'))
+        ->end();
+        $this->assertFinalizedValueIs('value', $test);
+    }
+
     public function testIfStringExpression()
     {
         $test = $this->getTestBuilder()

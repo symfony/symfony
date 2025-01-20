@@ -32,7 +32,7 @@ trait FilesystemCommonTrait
         }
         if (isset($namespace[0])) {
             if (preg_match('#[^-+_.A-Za-z0-9]#', $namespace, $match)) {
-                throw new InvalidArgumentException(sprintf('Namespace contains "%s" but only characters in [-+_.A-Za-z0-9] are allowed.', $match[0]));
+                throw new InvalidArgumentException(\sprintf('Namespace contains "%s" but only characters in [-+_.A-Za-z0-9] are allowed.', $match[0]));
             }
             $directory .= \DIRECTORY_SEPARATOR.$namespace;
         } else {
@@ -44,7 +44,7 @@ trait FilesystemCommonTrait
         $directory .= \DIRECTORY_SEPARATOR;
         // On Windows the whole path is limited to 258 chars
         if ('\\' === \DIRECTORY_SEPARATOR && \strlen($directory) > 234) {
-            throw new InvalidArgumentException(sprintf('Cache directory too long (%s).', $directory));
+            throw new InvalidArgumentException(\sprintf('Cache directory too long (%s).', $directory));
         }
 
         $this->directory = $directory;
@@ -77,10 +77,7 @@ trait FilesystemCommonTrait
         return $ok;
     }
 
-    /**
-     * @return bool
-     */
-    protected function doUnlink(string $file)
+    protected function doUnlink(string $file): bool
     {
         return @unlink($file);
     }
@@ -111,7 +108,6 @@ trait FilesystemCommonTrait
 
             if ('\\' === \DIRECTORY_SEPARATOR) {
                 $success = copy($tmp, $file);
-                $unlink = true;
             } else {
                 $success = rename($tmp, $file);
                 $unlink = !$success;
@@ -177,10 +173,7 @@ trait FilesystemCommonTrait
         throw new \BadMethodCallException('Cannot serialize '.__CLASS__);
     }
 
-    /**
-     * @return void
-     */
-    public function __wakeup()
+    public function __wakeup(): void
     {
         throw new \BadMethodCallException('Cannot unserialize '.__CLASS__);
     }

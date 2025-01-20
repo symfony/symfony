@@ -36,15 +36,15 @@ class XliffFileLoader implements LoaderInterface
 
         if (!$this->isXmlString($resource)) {
             if (!stream_is_local($resource)) {
-                throw new InvalidResourceException(sprintf('This is not a local file "%s".', $resource));
+                throw new InvalidResourceException(\sprintf('This is not a local file "%s".', $resource));
             }
 
             if (!file_exists($resource)) {
-                throw new NotFoundResourceException(sprintf('File "%s" not found.', $resource));
+                throw new NotFoundResourceException(\sprintf('File "%s" not found.', $resource));
             }
 
             if (!is_file($resource)) {
-                throw new InvalidResourceException(sprintf('This is neither a file nor an XLIFF string "%s".', $resource));
+                throw new InvalidResourceException(\sprintf('This is neither a file nor an XLIFF string "%s".', $resource));
             }
         }
 
@@ -55,11 +55,11 @@ class XliffFileLoader implements LoaderInterface
                 $dom = XmlUtils::loadFile($resource);
             }
         } catch (\InvalidArgumentException|XmlParsingException|InvalidXmlException $e) {
-            throw new InvalidResourceException(sprintf('Unable to load "%s": ', $resource).$e->getMessage(), $e->getCode(), $e);
+            throw new InvalidResourceException(\sprintf('Unable to load "%s": ', $resource).$e->getMessage(), $e->getCode(), $e);
         }
 
         if ($errors = XliffUtils::validateSchema($dom)) {
-            throw new InvalidResourceException(sprintf('Invalid resource provided: "%s"; Errors: ', $resource).XliffUtils::getErrorsAsString($errors));
+            throw new InvalidResourceException(\sprintf('Invalid resource provided: "%s"; Errors: ', $resource).XliffUtils::getErrorsAsString($errors));
         }
 
         $catalogue = new MessageCatalogue($locale);
@@ -172,6 +172,13 @@ class XliffFileLoader implements LoaderInterface
                 $catalogue->set((string) $source, $target, $domain);
 
                 $metadata = [];
+                if ($segment->attributes()) {
+                    $metadata['segment-attributes'] = [];
+                    foreach ($segment->attributes() as $key => $value) {
+                        $metadata['segment-attributes'][$key] = (string) $value;
+                    }
+                }
+
                 if (isset($segment->target) && $segment->target->attributes()) {
                     $metadata['target-attributes'] = [];
                     foreach ($segment->target->attributes() as $key => $value) {
@@ -201,7 +208,7 @@ class XliffFileLoader implements LoaderInterface
      */
     private function utf8ToCharset(string $content, ?string $encoding = null): string
     {
-        if ('UTF-8' !== $encoding && !empty($encoding)) {
+        if ('UTF-8' !== $encoding && $encoding) {
             return mb_convert_encoding($content, $encoding, 'UTF-8');
         }
 

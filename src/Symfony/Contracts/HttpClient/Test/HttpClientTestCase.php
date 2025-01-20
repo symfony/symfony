@@ -11,6 +11,7 @@
 
 namespace Symfony\Contracts\HttpClient\Test;
 
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\RedirectionExceptionInterface;
@@ -25,7 +26,7 @@ abstract class HttpClientTestCase extends TestCase
 {
     public static function setUpBeforeClass(): void
     {
-        if (!function_exists('ob_gzhandler')) {
+        if (!\function_exists('ob_gzhandler')) {
             static::markTestSkipped('The "ob_gzhandler" function is not available.');
         }
 
@@ -1025,6 +1026,7 @@ abstract class HttpClientTestCase extends TestCase
     /**
      * @requires extension zlib
      */
+    #[RequiresPhpExtension('zlib')]
     public function testAutoEncodingRequest()
     {
         $client = $this->getHttpClient(__FUNCTION__);
@@ -1098,6 +1100,7 @@ abstract class HttpClientTestCase extends TestCase
     /**
      * @requires extension zlib
      */
+    #[RequiresPhpExtension('zlib')]
     public function testUserlandEncodingRequest()
     {
         $client = $this->getHttpClient(__FUNCTION__);
@@ -1120,6 +1123,7 @@ abstract class HttpClientTestCase extends TestCase
     /**
      * @requires extension zlib
      */
+    #[RequiresPhpExtension('zlib')]
     public function testGzipBroken()
     {
         $client = $this->getHttpClient(__FUNCTION__);

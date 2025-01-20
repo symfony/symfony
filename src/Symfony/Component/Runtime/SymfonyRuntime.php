@@ -93,6 +93,12 @@ class SymfonyRuntime extends GenericRuntime
         $envKey = $options['env_var_name'] ??= 'APP_ENV';
         $debugKey = $options['debug_var_name'] ??= 'APP_DEBUG';
 
+        if (isset($_SERVER['argv']) && !empty($_GET)) {
+            // register_argc_argv=On is too risky in web servers
+            $_SERVER['argv'] = [];
+            $_SERVER['argc'] = 0;
+        }
+
         if (isset($options['env'])) {
             $_SERVER[$envKey] = $options['env'];
         } elseif (empty($_GET) && isset($_SERVER['argv']) && class_exists(ArgvInput::class)) {
@@ -108,7 +114,7 @@ class SymfonyRuntime extends GenericRuntime
 
             if (isset($this->input) && ($options['dotenv_overload'] ?? false)) {
                 if ($this->input->getParameterOption(['--env', '-e'], $_SERVER[$envKey], true) !== $_SERVER[$envKey]) {
-                    throw new \LogicException(sprintf('Cannot use "--env" or "-e" when the "%s" file defines "%s" and the "dotenv_overload" runtime option is true.', $options['dotenv_path'] ?? '.env', $envKey));
+                    throw new \LogicException(\sprintf('Cannot use "--env" or "-e" when the "%s" file defines "%s" and the "dotenv_overload" runtime option is true.', $options['dotenv_path'] ?? '.env', $envKey));
                 }
 
                 if ($_SERVER[$debugKey] && $this->input->hasParameterOption('--no-debug', true)) {
@@ -154,10 +160,6 @@ class SymfonyRuntime extends GenericRuntime
         }
 
         if ($application instanceof Application) {
-            if (!\in_array(\PHP_SAPI, ['cli', 'phpdbg', 'embed'], true)) {
-                echo 'Warning: The console should be invoked via the CLI version of PHP, not the '.\PHP_SAPI.' SAPI'.\PHP_EOL;
-            }
-
             set_time_limit(0);
             $defaultEnv = !isset($this->options['env']) ? ($_SERVER[$this->options['env_var_name']] ?? 'dev') : null;
             $output = $this->output ??= new ConsoleOutput();
@@ -203,10 +205,6 @@ class SymfonyRuntime extends GenericRuntime
 
     private function getInput(): ArgvInput
     {
-        if (!empty($_GET) && filter_var(ini_get('register_argc_argv'), \FILTER_VALIDATE_BOOL)) {
-            throw new \Exception('CLI applications cannot be run safely on non-CLI SAPIs with register_argc_argv=On.');
-        }
-
         if (isset($this->input)) {
             return $this->input;
         }

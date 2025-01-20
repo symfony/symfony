@@ -17,10 +17,12 @@ use Symfony\Bridge\Twig\EventListener\TemplateAttributeListener;
 use Symfony\Bridge\Twig\Tests\Fixtures\TemplateAttributeController;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\HttpKernel\Event\ControllerArgumentsEvent;
 use Symfony\Component\HttpKernel\Event\ViewEvent;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Twig\Environment;
+use Twig\Loader\ArrayLoader;
 
 class TemplateAttributeListenerTest extends TestCase
 {
@@ -63,6 +65,33 @@ class TemplateAttributeListenerTest extends TestCase
         $event = new ViewEvent($kernel, $request, HttpKernelInterface::MAIN_REQUEST, []);
         $listener->onKernelView($event);
         $this->assertSame('Bar', $event->getResponse()->getContent());
+    }
+
+    public function testAttributeWithBlock()
+    {
+        $twig = new Environment(new ArrayLoader([
+            'foo.html.twig' => 'ERROR {% block bar %}FOOBAR{% endblock %}',
+        ]));
+
+        $request = new Request();
+        $kernel = $this->createMock(HttpKernelInterface::class);
+        $controllerArgumentsEvent = new ControllerArgumentsEvent($kernel, [new TemplateAttributeController(), 'foo'], ['Bar'], $request, null);
+        $listener = new TemplateAttributeListener($twig);
+
+        $request->attributes->set('_template', new Template('foo.html.twig', [], false, 'bar'));
+        $event = new ViewEvent($kernel, $request, HttpKernelInterface::MAIN_REQUEST, ['foo' => 'bar'], $controllerArgumentsEvent);
+        $listener->onKernelView($event);
+        $this->assertSame('FOOBAR', $event->getResponse()->getContent());
+
+        $request->attributes->set('_template', new Template('foo.html.twig', [], true, 'bar'));
+        $event = new ViewEvent($kernel, $request, HttpKernelInterface::MAIN_REQUEST, ['foo' => 'bar'], $controllerArgumentsEvent);
+        $listener->onKernelView($event);
+        $this->assertInstanceOf(StreamedResponse::class, $event->getResponse());
+
+        $request->attributes->set('_template', new Template('foo.html.twig', [], false, 'not_a_block'));
+        $event = new ViewEvent($kernel, $request, HttpKernelInterface::MAIN_REQUEST, ['foo' => 'bar'], $controllerArgumentsEvent);
+        $this->expectExceptionMessage('Block "not_a_block" on template "foo.html.twig" does not exist in "foo.html.twig".');
+        $listener->onKernelView($event);
     }
 
     public function testForm()

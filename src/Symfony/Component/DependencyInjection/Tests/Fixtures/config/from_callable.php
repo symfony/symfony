@@ -2,7 +2,7 @@
 
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-return new class() {
+return new class {
     public function __invoke(ContainerConfigurator $c)
     {
         $c->services()

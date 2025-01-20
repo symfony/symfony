@@ -208,8 +208,8 @@ class ServiceLocatorTagPassTest extends TestCase
         $container->register('service-2');
 
         $locator = ServiceLocatorTagPass::register($container, [
-            'service-2' => new Reference('service-2'),
-            'service-1' => new Reference('service-1'),
+            new Reference('service-2'),
+            new Reference('service-1'),
         ]);
         $locator = $container->getDefinition($locator);
         $factories = $locator->getArguments()[0];

@@ -54,4 +54,12 @@ final class SignalRegistry
             $signalHandler($signal, $hasNext);
         }
     }
+
+    /**
+     * @internal
+     */
+    public function scheduleAlarm(int $seconds): void
+    {
+        pcntl_alarm($seconds);
+    }
 }

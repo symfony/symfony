@@ -55,10 +55,7 @@ use Twig\Environment;
  */
 abstract class AbstractController implements ServiceSubscriberInterface
 {
-    /**
-     * @var ContainerInterface
-     */
-    protected $container;
+    protected ContainerInterface $container;
 
     #[Required]
     public function setContainer(ContainerInterface $container): ?ContainerInterface
@@ -75,7 +72,7 @@ abstract class AbstractController implements ServiceSubscriberInterface
     protected function getParameter(string $name): array|bool|string|int|float|\UnitEnum|null
     {
         if (!$this->container->has('parameter_bag')) {
-            throw new ServiceNotFoundException('parameter_bag.', null, null, [], sprintf('The "%s::getParameter()" method is missing a parameter bag to work properly. Did you forget to register your controller as a service subscriber? This can be fixed either by using autoconfiguration or by manually wiring a "parameter_bag" in the service locator passed to the controller.', static::class));
+            throw new ServiceNotFoundException('parameter_bag.', null, null, [], \sprintf('The "%s::getParameter()" method is missing a parameter bag to work properly. Did you forget to register your controller as a service subscriber? This can be fixed either by using autoconfiguration or by manually wiring a "parameter_bag" in the service locator passed to the controller.', static::class));
         }
 
         return $this->container->get('parameter_bag')->get($name);
@@ -185,7 +182,7 @@ abstract class AbstractController implements ServiceSubscriberInterface
         }
 
         if (!$session instanceof FlashBagAwareSessionInterface) {
-            trigger_deprecation('symfony/framework-bundle', '6.2', 'Calling "addFlash()" method when the session does not implement %s is deprecated.', FlashBagAwareSessionInterface::class);
+            throw new \LogicException(\sprintf('You cannot use the addFlash method because class "%s" doesn\'t implement "%s".', get_debug_type($session), FlashBagAwareSessionInterface::class));
         }
 
         $session->getFlashBag()->add($type, $message);
@@ -262,20 +259,6 @@ abstract class AbstractController implements ServiceSubscriberInterface
     protected function renderBlock(string $view, string $block, array $parameters = [], ?Response $response = null): Response
     {
         return $this->doRender($view, $block, $parameters, $response, __FUNCTION__);
-    }
-
-    /**
-     * Renders a view and sets the appropriate status code when a form is listed in parameters.
-     *
-     * If an invalid form is found in the list of parameters, a 422 status code is returned.
-     *
-     * @deprecated since Symfony 6.2, use render() instead
-     */
-    protected function renderForm(string $view, array $parameters = [], ?Response $response = null): Response
-    {
-        trigger_deprecation('symfony/framework-bundle', '6.2', 'The "%s::renderForm()" method is deprecated, use "render()" instead.', get_debug_type($this));
-
-        return $this->render($view, $parameters, $response);
     }
 
     /**
@@ -432,7 +415,7 @@ abstract class AbstractController implements ServiceSubscriberInterface
     private function doRenderView(string $view, ?string $block, array $parameters, string $method): string
     {
         if (!$this->container->has('twig')) {
-            throw new \LogicException(sprintf('You cannot use the "%s" method if the Twig Bundle is not available. Try running "composer require symfony/twig-bundle".', $method));
+            throw new \LogicException(\sprintf('You cannot use the "%s" method if the Twig Bundle is not available. Try running "composer require symfony/twig-bundle".', $method));
         }
 
         foreach ($parameters as $k => $v) {

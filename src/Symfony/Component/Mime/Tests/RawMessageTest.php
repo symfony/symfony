@@ -12,13 +12,11 @@
 namespace Symfony\Component\Mime\Tests;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
+use Symfony\Component\Mime\Exception\LogicException;
 use Symfony\Component\Mime\RawMessage;
 
 class RawMessageTest extends TestCase
 {
-    use ExpectDeprecationTrait;
-
     /**
      * @dataProvider provideMessages
      */
@@ -65,8 +63,6 @@ class RawMessageTest extends TestCase
 
     /**
      * @dataProvider provideMessages
-     *
-     * @group legacy
      */
     public function testToIterableLegacy(mixed $messageParameter, bool $supportReuse)
     {
@@ -74,16 +70,15 @@ class RawMessageTest extends TestCase
         $this->assertEquals('some string', implode('', iterator_to_array($message->toIterable())));
 
         if (!$supportReuse) {
-            // in 7.0, the test with a generator will throw an exception
-            $this->expectDeprecation('Since symfony/mime 6.4: Sending an email with a closed generator is deprecated and will throw in 7.0.');
-            $this->assertEquals('some string', implode('', iterator_to_array($message->toIterable())));
+            $this->expectException(LogicException::class);
+            iterator_to_array($message->toIterable());
         }
     }
 
     public function testToIterableOnResourceRewindsAndYieldsLines()
     {
-        $handle = \fopen('php://memory', 'r+');
-        \fwrite($handle, "line1\nline2\nline3\n");
+        $handle = fopen('php://memory', 'r+');
+        fwrite($handle, "line1\nline2\nline3\n");
 
         $message = new RawMessage($handle);
         $this->assertSame("line1\nline2\nline3\n", implode('', iterator_to_array($message->toIterable())));
@@ -105,7 +100,11 @@ class RawMessageTest extends TestCase
             'string' => ['some string', true],
             'traversable' => [new \ArrayObject(['some', ' ', 'string']), true],
             'array' => [['some', ' ', 'string'], true],
-            'generator' => [(function () { yield 'some'; yield ' '; yield 'string'; })(), false],
+            'generator' => [(function () {
+                yield 'some';
+                yield ' ';
+                yield 'string';
+            })(), false],
         ];
     }
 }

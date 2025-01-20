@@ -85,7 +85,7 @@ class DateTimeToHtml5LocalDateTimeTransformer extends BaseDateTimeTransformer
         // to maintain backwards compatibility we do not strictly validate the submitted date
         // see https://github.com/symfony/symfony/issues/28699
         if (!preg_match('/^(\d{4})-(\d{2})-(\d{2})[T ]\d{2}:\d{2}(?::\d{2})?/', $dateTimeLocal, $matches)) {
-            throw new TransformationFailedException(sprintf('The date "%s" is not a valid date.', $dateTimeLocal));
+            throw new TransformationFailedException(\sprintf('The date "%s" is not a valid date.', $dateTimeLocal));
         }
 
         try {
@@ -99,7 +99,7 @@ class DateTimeToHtml5LocalDateTimeTransformer extends BaseDateTimeTransformer
         }
 
         if (!checkdate($matches[2], $matches[3], $matches[1])) {
-            throw new TransformationFailedException(sprintf('The date "%s-%s-%s" is not a valid date.', $matches[1], $matches[2], $matches[3]));
+            throw new TransformationFailedException(\sprintf('The date "%s-%s-%s" is not a valid date.', $matches[1], $matches[2], $matches[3]));
         }
 
         return $dateTime;

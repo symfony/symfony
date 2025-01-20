@@ -12,11 +12,15 @@
 namespace Symfony\Component\Messenger\Middleware;
 
 use Symfony\Component\Messenger\Envelope;
+use Symfony\Component\Messenger\Exception\ExceptionInterface;
 
 /**
  * @author Samuel Roze <samuel.roze@gmail.com>
  */
 interface MiddlewareInterface
 {
+    /**
+     * @throws ExceptionInterface
+     */
     public function handle(Envelope $envelope, StackInterface $stack): Envelope;
 }

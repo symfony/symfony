@@ -12,9 +12,9 @@
 namespace Symfony\Component\Notifier\Bridge\GoogleChat;
 
 use Symfony\Component\HttpClient\Exception\JsonException;
-use Symfony\Component\Notifier\Exception\LogicException;
 use Symfony\Component\Notifier\Exception\TransportException;
 use Symfony\Component\Notifier\Exception\UnsupportedMessageTypeException;
+use Symfony\Component\Notifier\Exception\UnsupportedOptionsException;
 use Symfony\Component\Notifier\Message\ChatMessage;
 use Symfony\Component\Notifier\Message\MessageInterface;
 use Symfony\Component\Notifier\Message\SentMessage;
@@ -30,11 +30,6 @@ final class GoogleChatTransport extends AbstractTransport
 {
     protected const HOST = 'chat.googleapis.com';
 
-    private string $space;
-    private string $accessKey;
-    private string $accessToken;
-    private ?string $threadKey;
-
     /**
      * @param string      $space       The space name of the webhook url "/v1/spaces/<space>/messages"
      * @param string      $accessKey   The "key" parameter of the webhook url
@@ -44,19 +39,20 @@ final class GoogleChatTransport extends AbstractTransport
      *                                 Subsequent messages with the same thread identifier will be posted into the same thread.
      *                                 {@see https://developers.google.com/hangouts/chat/reference/rest/v1/spaces.messages/create#query-parameters}
      */
-    public function __construct(string $space, string $accessKey, #[\SensitiveParameter] string $accessToken, ?string $threadKey = null, ?HttpClientInterface $client = null, ?EventDispatcherInterface $dispatcher = null)
-    {
-        $this->space = $space;
-        $this->accessKey = $accessKey;
-        $this->accessToken = $accessToken;
-        $this->threadKey = $threadKey;
-
+    public function __construct(
+        private string $space,
+        #[\SensitiveParameter] private string $accessKey,
+        #[\SensitiveParameter] private string $accessToken,
+        private ?string $threadKey = null,
+        ?HttpClientInterface $client = null,
+        ?EventDispatcherInterface $dispatcher = null,
+    ) {
         parent::__construct($client, $dispatcher);
     }
 
     public function __toString(): string
     {
-        return sprintf('googlechat://%s/%s%s',
+        return \sprintf('googlechat://%s/%s%s',
             $this->getEndpoint(),
             $this->space,
             $this->threadKey ? '?thread_key='.urlencode($this->threadKey) : ''
@@ -78,7 +74,7 @@ final class GoogleChatTransport extends AbstractTransport
         }
 
         if (($options = $message->getOptions()) && !$options instanceof GoogleChatOptions) {
-            throw new LogicException(sprintf('The "%s" transport only supports instances of "%s" for options.', __CLASS__, GoogleChatOptions::class));
+            throw new UnsupportedOptionsException(__CLASS__, GoogleChatOptions::class, $options);
         }
 
         if (!$options) {
@@ -91,9 +87,7 @@ final class GoogleChatTransport extends AbstractTransport
 
         $threadKey = $options->getThreadKey() ?: $this->threadKey;
 
-        $threadKey = $options->getThreadKey() ?: $this->threadKey;
-
-        $url = sprintf('https://%s/v1/spaces/%s/messages?key=%s&token=%s%s',
+        $url = \sprintf('https://%s/v1/spaces/%s/messages?key=%s&token=%s%s',
             $this->getEndpoint(),
             $this->space,
             urlencode($this->accessKey),
@@ -124,11 +118,11 @@ final class GoogleChatTransport extends AbstractTransport
         }
 
         if (200 !== $statusCode) {
-            throw new TransportException(sprintf('Unable to post the Google Chat message: "%s".', $result['error']['message'] ?? $response->getContent(false)), $response, $result['error']['code'] ?? $statusCode);
+            throw new TransportException(\sprintf('Unable to post the Google Chat message: "%s".', $result['error']['message'] ?? $response->getContent(false)), $response, $result['error']['code'] ?? $statusCode);
         }
 
         if (!\array_key_exists('name', $result)) {
-            throw new TransportException(sprintf('Unable to post the Google Chat message: "%s".', $response->getContent(false)), $response);
+            throw new TransportException(\sprintf('Unable to post the Google Chat message: "%s".', $response->getContent(false)), $response);
         }
 
         $sentMessage = new SentMessage($message, (string) $this);

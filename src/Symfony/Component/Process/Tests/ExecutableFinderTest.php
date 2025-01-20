@@ -85,6 +85,31 @@ class ExecutableFinderTest extends TestCase
         $this->assertSamePath(\PHP_BINARY, $result);
     }
 
+    public function testFindWithoutSuffix()
+    {
+        $fixturesDir = __DIR__.\DIRECTORY_SEPARATOR.'Fixtures';
+        $name = 'executable_without_suffix';
+
+        $finder = new ExecutableFinder();
+        $result = $finder->find($name, null, [$fixturesDir]);
+
+        $this->assertSamePath($fixturesDir.\DIRECTORY_SEPARATOR.$name, $result);
+    }
+
+    public function testFindWithAddedSuffixes()
+    {
+        $fixturesDir = __DIR__.\DIRECTORY_SEPARATOR.'Fixtures';
+        $name = 'executable_with_added_suffix';
+        $suffix = '.foo';
+
+        $finder = new ExecutableFinder();
+        $finder->addSuffix($suffix);
+
+        $result = $finder->find($name, null, [$fixturesDir]);
+
+        $this->assertSamePath($fixturesDir.\DIRECTORY_SEPARATOR.$name.$suffix, $result);
+    }
+
     /**
      * @runInSeparateProcess
      */
@@ -149,7 +174,7 @@ class ExecutableFinderTest extends TestCase
      */
     public function testEmptyDirInPath()
     {
-        putenv(sprintf('PATH=%s%s', \dirname(\PHP_BINARY), \PATH_SEPARATOR));
+        putenv(\sprintf('PATH=%s%s', \dirname(\PHP_BINARY), \PATH_SEPARATOR));
 
         try {
             touch('executable');
@@ -158,7 +183,7 @@ class ExecutableFinderTest extends TestCase
             $finder = new ExecutableFinder();
             $result = $finder->find('executable');
 
-            $this->assertSame(sprintf('.%sexecutable', \DIRECTORY_SEPARATOR), $result);
+            $this->assertSame(\sprintf('.%sexecutable', \DIRECTORY_SEPARATOR), $result);
         } finally {
             unlink('executable');
         }

@@ -17,8 +17,9 @@ use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Exception\LogicException;
 
 /**
- * @Annotation
- * @Target({"CLASS", "PROPERTY", "METHOD", "ANNOTATION"})
+ * Validates a value using an expression from the Expression Language component.
+ *
+ * @see https://symfony.com/doc/current/components/expression_language.html
  *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Bernhard Schussek <bschussek@gmail.com>
@@ -32,16 +33,18 @@ class Expression extends Constraint
         self::EXPRESSION_FAILED_ERROR => 'EXPRESSION_FAILED_ERROR',
     ];
 
-    /**
-     * @deprecated since Symfony 6.1, use const ERROR_NAMES instead
-     */
-    protected static $errorNames = self::ERROR_NAMES;
-
-    public $message = 'This value is not valid.';
-    public $expression;
-    public $values = [];
+    public string $message = 'This value is not valid.';
+    public string|ExpressionObject|null $expression = null;
+    public array $values = [];
     public bool $negate = true;
 
+    /**
+     * @param string|ExpressionObject|array<string,mixed>|null $expression The expression to evaluate
+     * @param array<string,mixed>|null                         $values     The values of the custom variables used in the expression (defaults to an empty array)
+     * @param string[]|null                                    $groups
+     * @param array<string,mixed>                              $options
+     * @param bool|null                                        $negate     Whether to fail if the expression evaluates to true (defaults to false)
+     */
     public function __construct(
         string|ExpressionObject|array|null $expression,
         ?string $message = null,
@@ -52,7 +55,7 @@ class Expression extends Constraint
         ?bool $negate = null,
     ) {
         if (!class_exists(ExpressionLanguage::class)) {
-            throw new LogicException(sprintf('The "symfony/expression-language" component is required to use the "%s" constraint. Try running "composer require symfony/expression-language".', __CLASS__));
+            throw new LogicException(\sprintf('The "symfony/expression-language" component is required to use the "%s" constraint. Try running "composer require symfony/expression-language".', __CLASS__));
         }
 
         if (\is_array($expression)) {

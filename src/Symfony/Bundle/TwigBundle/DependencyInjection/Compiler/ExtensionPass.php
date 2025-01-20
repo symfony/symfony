@@ -15,6 +15,7 @@ use Symfony\Component\Asset\Packages;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\Emoji\EmojiTransliterator;
 use Symfony\Component\ExpressionLanguage\Expression;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Workflow\Workflow;
@@ -25,13 +26,14 @@ use Symfony\Component\Yaml\Yaml;
  */
 class ExtensionPass implements CompilerPassInterface
 {
-    /**
-     * @return void
-     */
-    public function process(ContainerBuilder $container)
+    public function process(ContainerBuilder $container): void
     {
         if (!class_exists(Packages::class)) {
             $container->removeDefinition('twig.extension.assets');
+        }
+
+        if (!class_exists(\Transliterator::class) || !class_exists(EmojiTransliterator::class)) {
+            $container->removeDefinition('twig.extension.emoji');
         }
 
         if (!class_exists(Expression::class)) {
@@ -126,6 +128,10 @@ class ExtensionPass implements CompilerPassInterface
 
         if ($container->hasDefinition('twig.extension.expression')) {
             $container->getDefinition('twig.extension.expression')->addTag('twig.extension');
+        }
+
+        if ($container->hasDefinition('twig.extension.emoji')) {
+            $container->getDefinition('twig.extension.emoji')->addTag('twig.extension');
         }
 
         if (!class_exists(Workflow::class) || !$container->has('workflow.registry')) {

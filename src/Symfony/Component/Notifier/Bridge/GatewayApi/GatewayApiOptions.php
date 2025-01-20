@@ -18,11 +18,9 @@ use Symfony\Component\Notifier\Message\MessageOptionsInterface;
  */
 final class GatewayApiOptions implements MessageOptionsInterface
 {
-    private array $options;
-
-    public function __construct(array $options = [])
-    {
-        $this->options = $options;
+    public function __construct(
+        private array $options = [],
+    ) {
     }
 
     public function getRecipientId(): ?string
@@ -56,6 +54,16 @@ final class GatewayApiOptions implements MessageOptionsInterface
     public function callbackUrl(string $callbackUrl): static
     {
         $this->options['callback_url'] = $callbackUrl;
+
+        return $this;
+    }
+
+    /**
+     * @return $this
+     */
+    public function label(string $label): static
+    {
+        $this->options['label'] = $label;
 
         return $this;
     }

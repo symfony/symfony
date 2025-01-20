@@ -30,10 +30,6 @@ namespace Symfony\Component\Validator;
  * element is still the person, but the property path is "address.street".
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
- *
- * @method Constraint|null getConstraint() Returns the constraint whose validation caused the violation. Not implementing it is deprecated since Symfony 6.3.
- * @method mixed           getCause()      Returns the cause of the violation. Not implementing it is deprecated since Symfony 6.2.
- * @method string          __toString()    Converts the violation into a string for debugging purposes. Not implementing it is deprecated since Symfony 6.1.
  */
 interface ConstraintViolationInterface
 {
@@ -113,4 +109,19 @@ interface ConstraintViolationInterface
      * Returns a machine-digestible error code for the violation.
      */
     public function getCode(): ?string;
+
+    /**
+     * Returns the constraint whose validation caused the violation.
+     */
+    public function getConstraint(): ?Constraint;
+
+    /**
+     * Returns the cause of the violation.
+     */
+    public function getCause(): mixed;
+
+    /**
+     * Converts the violation into a string for debugging purposes.
+     */
+    public function __toString(): string;
 }

@@ -15,8 +15,11 @@ use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 
 /**
- * @Annotation
- * @Target({"PROPERTY", "METHOD", "ANNOTATION"})
+ * Validates that a value is a valid "file".
+ *
+ * A file can be one of the following:
+ *   - A string (or object with a __toString() method) path to an existing file;
+ *   - A valid {@see \Symfony\Component\HttpFoundation\File\File File} object (including objects of {@see \Symfony\Component\HttpFoundation\File\UploadedFile UploadedFile} class).
  *
  * @property int $maxSize
  *
@@ -45,36 +48,46 @@ class File extends Constraint
         self::FILENAME_TOO_LONG => 'FILENAME_TOO_LONG',
     ];
 
-    /**
-     * @deprecated since Symfony 6.1, use const ERROR_NAMES instead
-     */
-    protected static $errorNames = self::ERROR_NAMES;
-
-    public $binaryFormat;
-    public $mimeTypes = [];
+    public ?bool $binaryFormat = null;
+    public array|string $mimeTypes = [];
     public ?int $filenameMaxLength = null;
-    public array|string|null $extensions = [];
-    public $notFoundMessage = 'The file could not be found.';
-    public $notReadableMessage = 'The file is not readable.';
-    public $maxSizeMessage = 'The file is too large ({{ size }} {{ suffix }}). Allowed maximum size is {{ limit }} {{ suffix }}.';
-    public $mimeTypesMessage = 'The mime type of the file is invalid ({{ type }}). Allowed mime types are {{ types }}.';
+    public array|string $extensions = [];
+    public string $notFoundMessage = 'The file could not be found.';
+    public string $notReadableMessage = 'The file is not readable.';
+    public string $maxSizeMessage = 'The file is too large ({{ size }} {{ suffix }}). Allowed maximum size is {{ limit }} {{ suffix }}.';
+    public string $mimeTypesMessage = 'The mime type of the file is invalid ({{ type }}). Allowed mime types are {{ types }}.';
     public string $extensionsMessage = 'The extension of the file is invalid ({{ extension }}). Allowed extensions are {{ extensions }}.';
-    public $disallowEmptyMessage = 'An empty file is not allowed.';
-    public $filenameTooLongMessage = 'The filename is too long. It should have {{ filename_max_length }} character or less.|The filename is too long. It should have {{ filename_max_length }} characters or less.';
+    public string $disallowEmptyMessage = 'An empty file is not allowed.';
+    public string $filenameTooLongMessage = 'The filename is too long. It should have {{ filename_max_length }} character or less.|The filename is too long. It should have {{ filename_max_length }} characters or less.';
 
-    public $uploadIniSizeErrorMessage = 'The file is too large. Allowed maximum size is {{ limit }} {{ suffix }}.';
-    public $uploadFormSizeErrorMessage = 'The file is too large.';
-    public $uploadPartialErrorMessage = 'The file was only partially uploaded.';
-    public $uploadNoFileErrorMessage = 'No file was uploaded.';
-    public $uploadNoTmpDirErrorMessage = 'No temporary folder was configured in php.ini.';
-    public $uploadCantWriteErrorMessage = 'Cannot write temporary file to disk.';
-    public $uploadExtensionErrorMessage = 'A PHP extension caused the upload to fail.';
-    public $uploadErrorMessage = 'The file could not be uploaded.';
+    public string $uploadIniSizeErrorMessage = 'The file is too large. Allowed maximum size is {{ limit }} {{ suffix }}.';
+    public string $uploadFormSizeErrorMessage = 'The file is too large.';
+    public string $uploadPartialErrorMessage = 'The file was only partially uploaded.';
+    public string $uploadNoFileErrorMessage = 'No file was uploaded.';
+    public string $uploadNoTmpDirErrorMessage = 'No temporary folder was configured in php.ini.';
+    public string $uploadCantWriteErrorMessage = 'Cannot write temporary file to disk.';
+    public string $uploadExtensionErrorMessage = 'A PHP extension caused the upload to fail.';
+    public string $uploadErrorMessage = 'The file could not be uploaded.';
 
-    protected $maxSize;
+    protected int|string|null $maxSize = null;
 
     /**
-     * @param array<string|string[]>|string $extensions
+     * @param array<string,mixed>|null           $options
+     * @param positive-int|string|null           $maxSize                     The max size of the underlying file
+     * @param bool|null                          $binaryFormat                Pass true to use binary-prefixed units (KiB, MiB, etc.) or false to use SI-prefixed units (kB, MB) in displayed messages. Pass null to guess the format from the maxSize option. (defaults to null)
+     * @param string[]|string|null               $mimeTypes                   Acceptable media type(s). Prefer the extensions option that also enforce the file's extension consistency.
+     * @param positive-int|null                  $filenameMaxLength           Maximum length of the file name
+     * @param string|null                        $disallowEmptyMessage        Enable empty upload validation with this message in case of error
+     * @param string|null                        $uploadIniSizeErrorMessage   Message if the file size exceeds the max size configured in php.ini
+     * @param string|null                        $uploadFormSizeErrorMessage  Message if the file size exceeds the max size configured in the HTML input field
+     * @param string|null                        $uploadPartialErrorMessage   Message if the file is only partially uploaded
+     * @param string|null                        $uploadNoTmpDirErrorMessage  Message if there is no upload_tmp_dir in php.ini
+     * @param string|null                        $uploadCantWriteErrorMessage Message if the uploaded file can not be stored in the temporary directory
+     * @param string|null                        $uploadErrorMessage          Message if an unknown error occurred on upload
+     * @param string[]|null                      $groups
+     * @param array<string|string[]>|string|null $extensions                  A list of valid extensions to check. Related media types are also enforced ({@see https://symfony.com/doc/current/reference/constraints/File.html#extensions})
+     *
+     * @see https://www.iana.org/assignments/media-types/media-types.xhtml Existing media types
      */
     public function __construct(
         ?array $options = null,
@@ -131,10 +144,7 @@ class File extends Constraint
         }
     }
 
-    /**
-     * @return void
-     */
-    public function __set(string $option, mixed $value)
+    public function __set(string $option, mixed $value): void
     {
         if ('maxSize' === $option) {
             $this->normalizeBinaryFormat($value);
@@ -180,7 +190,7 @@ class File extends Constraint
             $this->maxSize = $matches[1] * $factors[$unit = strtolower($matches[2])];
             $this->binaryFormat ??= 2 === \strlen($unit);
         } else {
-            throw new ConstraintDefinitionException(sprintf('"%s" is not a valid maximum size.', $maxSize));
+            throw new ConstraintDefinitionException(\sprintf('"%s" is not a valid maximum size.', $maxSize));
         }
     }
 }

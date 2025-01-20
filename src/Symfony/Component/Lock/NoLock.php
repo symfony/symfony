@@ -19,8 +19,13 @@ namespace Symfony\Component\Lock;
  *
  * @author Wouter de Jong <wouter@wouterj.nl>
  */
-final class NoLock implements LockInterface
+final class NoLock implements SharedLockInterface
 {
+    public function acquireRead(bool $blocking = false): bool
+    {
+        return true;
+    }
+
     public function acquire(bool $blocking = false): bool
     {
         return true;

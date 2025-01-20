@@ -69,6 +69,23 @@ class StatsCommandTest extends TestCase
         $this->assertStringContainsString('! [NOTE] Unable to get message count for the following transports: "simple".', $display);
     }
 
+    public function testWithoutArgumentJsonFormat()
+    {
+        $tester = new CommandTester($this->command);
+        $tester->execute(['--format' => 'json']);
+        $display = $tester->getDisplay();
+
+        $this->assertJsonStringEqualsJsonString('{
+    "transports": {
+        "message_countable": {"count": 6},
+        "another_message_countable": {"count": 6}
+    },
+    "uncountable_transports": [
+        "simple"
+    ]
+}', $display);
+    }
+
     public function testWithOneExistingMessageCountableTransport()
     {
         $tester = new CommandTester($this->command);
@@ -81,6 +98,19 @@ class StatsCommandTest extends TestCase
         $this->assertStringNotContainsString(' ! [NOTE] Unable to get message count for the following transports: "simple".', $display);
     }
 
+    public function testWithOneExistingMessageCountableTransportJsonFormat()
+    {
+        $tester = new CommandTester($this->command);
+        $tester->execute(['transport_names' => ['message_countable'], '--format' => 'json']);
+        $display = $tester->getDisplay();
+
+        $this->assertJsonStringEqualsJsonString('{
+    "transports": {
+        "message_countable": {"count": 6}
+    }
+}', $display);
+    }
+
     public function testWithMultipleExistingMessageCountableTransport()
     {
         $tester = new CommandTester($this->command);
@@ -91,6 +121,20 @@ class StatsCommandTest extends TestCase
         $this->assertStringContainsString('message_countable           6', $display);
         $this->assertStringContainsString('another_message_countable   6', $display);
         $this->assertStringNotContainsString('! [NOTE] Unable to get message count for the following transports: "simple".', $display);
+    }
+
+    public function testWithMultipleExistingMessageCountableTransportJsonFormat()
+    {
+        $tester = new CommandTester($this->command);
+        $tester->execute(['transport_names' => ['message_countable', 'another_message_countable'], '--format' => 'json']);
+        $display = $tester->getDisplay();
+
+        $this->assertJsonStringEqualsJsonString('{
+    "transports": {
+        "message_countable": {"count": 6},
+        "another_message_countable": {"count": 6}
+    }
+}', $display);
     }
 
     public function testWithNotMessageCountableTransport()

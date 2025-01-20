@@ -32,7 +32,7 @@ class_exists(SessionBagProxy::class);
  */
 class Session implements FlashBagAwareSessionInterface, \IteratorAggregate, \Countable
 {
-    protected $storage;
+    protected SessionStorageInterface $storage;
 
     private string $flashName;
     private string $attributeName;
@@ -69,10 +69,7 @@ class Session implements FlashBagAwareSessionInterface, \IteratorAggregate, \Cou
         return $this->getAttributeBag()->get($name, $default);
     }
 
-    /**
-     * @return void
-     */
-    public function set(string $name, mixed $value)
+    public function set(string $name, mixed $value): void
     {
         $this->getAttributeBag()->set($name, $value);
     }
@@ -82,10 +79,7 @@ class Session implements FlashBagAwareSessionInterface, \IteratorAggregate, \Cou
         return $this->getAttributeBag()->all();
     }
 
-    /**
-     * @return void
-     */
-    public function replace(array $attributes)
+    public function replace(array $attributes): void
     {
         $this->getAttributeBag()->replace($attributes);
     }
@@ -95,10 +89,7 @@ class Session implements FlashBagAwareSessionInterface, \IteratorAggregate, \Cou
         return $this->getAttributeBag()->remove($name);
     }
 
-    /**
-     * @return void
-     */
-    public function clear()
+    public function clear(): void
     {
         $this->getAttributeBag()->clear();
     }
@@ -143,7 +134,7 @@ class Session implements FlashBagAwareSessionInterface, \IteratorAggregate, \Cou
             }
         }
         foreach ($this->data as &$data) {
-            if (!empty($data)) {
+            if ($data) {
                 return false;
             }
         }
@@ -163,10 +154,7 @@ class Session implements FlashBagAwareSessionInterface, \IteratorAggregate, \Cou
         return $this->storage->regenerate($destroy, $lifetime);
     }
 
-    /**
-     * @return void
-     */
-    public function save()
+    public function save(): void
     {
         $this->storage->save();
     }
@@ -176,10 +164,7 @@ class Session implements FlashBagAwareSessionInterface, \IteratorAggregate, \Cou
         return $this->storage->getId();
     }
 
-    /**
-     * @return void
-     */
-    public function setId(string $id)
+    public function setId(string $id): void
     {
         if ($this->storage->getId() !== $id) {
             $this->storage->setId($id);
@@ -191,10 +176,7 @@ class Session implements FlashBagAwareSessionInterface, \IteratorAggregate, \Cou
         return $this->storage->getName();
     }
 
-    /**
-     * @return void
-     */
-    public function setName(string $name)
+    public function setName(string $name): void
     {
         $this->storage->setName($name);
     }
@@ -209,10 +191,7 @@ class Session implements FlashBagAwareSessionInterface, \IteratorAggregate, \Cou
         return $this->storage->getMetadataBag();
     }
 
-    /**
-     * @return void
-     */
-    public function registerBag(SessionBagInterface $bag)
+    public function registerBag(SessionBagInterface $bag): void
     {
         $this->storage->registerBag(new SessionBagProxy($bag, $this->data, $this->usageIndex, $this->usageReporter));
     }

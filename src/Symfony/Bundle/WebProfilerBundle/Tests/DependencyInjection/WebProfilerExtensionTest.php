@@ -57,8 +57,6 @@ class WebProfilerExtensionTest extends TestCase
 
     protected function setUp(): void
     {
-        parent::setUp();
-
         $this->kernel = $this->createMock(KernelInterface::class);
 
         $this->container = new ContainerBuilder();
@@ -87,8 +85,6 @@ class WebProfilerExtensionTest extends TestCase
 
     protected function tearDown(): void
     {
-        parent::tearDown();
-
         $this->container = null;
     }
 
@@ -157,7 +153,7 @@ class WebProfilerExtensionTest extends TestCase
         bool $toolbarEnabled,
         bool $interceptRedirects,
         bool $listenerInjected,
-        bool $listenerEnabled
+        bool $listenerEnabled,
     ) {
         $extension = new WebProfilerExtension();
         $extension->load(
@@ -178,11 +174,11 @@ class WebProfilerExtensionTest extends TestCase
     public static function getInterceptRedirectsToolbarConfig()
     {
         return [
-             [
-                 'toolbarEnabled' => false,
-                 'interceptRedirects' => true,
-                 'listenerInjected' => true,
-                 'listenerEnabled' => false,
+            [
+                'toolbarEnabled' => false,
+                'interceptRedirects' => true,
+                'listenerInjected' => true,
+                'listenerEnabled' => false,
             ],
             [
                 'toolbarEnabled' => false,

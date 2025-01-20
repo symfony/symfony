@@ -434,4 +434,49 @@ class BinaryFileResponseTest extends ResponseTestCase
             @unlink($path);
         }
     }
+
+    public function testCreateFromTemporaryFile()
+    {
+        $file = new \SplTempFileObject();
+        $file->fwrite('foo,bar');
+
+        $response = new BinaryFileResponse($file, 201, [
+            'Content-Type' => 'text/csv',
+        ]);
+
+        $response->setContentDisposition(ResponseHeaderBag::DISPOSITION_ATTACHMENT);
+
+        $this->assertSame(201, $response->getStatusCode());
+        $this->assertSame('text/csv', $response->headers->get('Content-Type'));
+        $this->assertEquals('attachment; filename=temp', $response->headers->get('Content-Disposition'));
+
+        ob_start();
+        $response->setAutoLastModified();
+        $response->prepare(new Request());
+        $this->assertSame('7', $response->headers->get('Content-Length'));
+        $response->sendContent();
+        $string = ob_get_clean();
+        $this->assertSame('foo,bar', $string);
+    }
+
+    public function testSetChunkSizeTooSmall()
+    {
+        $response = new BinaryFileResponse(__DIR__.'/File/Fixtures/test.gif');
+
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('The chunk size of a BinaryFileResponse cannot be less than 1.');
+
+        $response->setChunkSize(0);
+    }
+
+    public function testCreateFromTemporaryFileWithoutMimeType()
+    {
+        $file = new \SplTempFileObject();
+        $file->fwrite('foo,bar');
+
+        $response = new BinaryFileResponse($file);
+        $response->prepare(new Request());
+
+        $this->assertSame('application/octet-stream', $response->headers->get('Content-Type'));
+    }
 }

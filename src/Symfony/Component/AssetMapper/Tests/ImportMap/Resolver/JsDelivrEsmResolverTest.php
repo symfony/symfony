@@ -443,7 +443,7 @@ class JsDelivrEsmResolverTest extends TestCase
                     'body' => <<<'EOF'
 const je="\n//# sourceURL=",Ue="\n//# sourceMappingURL=",Me=/^(text|application)\/(x-)?javascript(;|$)/,_e=/^(application)\/wasm(;|$)/,Ie=/^(text|application)\/json(;|$)/,Re=/^(text|application)\/css(;|$)/,Te=/url\(\s*(?:(["'])((?:\\.|[^\n\\"'])+)\1|((?:\\.|[^\s,"'()\\])+))\s*\)/g;
 //# sourceMappingURL=/sm/ef3916de598f421a779ba0e69af94655b2043095cde2410cc01893452d893338.map
-EOF
+EOF,
                 ],
             ],
             [

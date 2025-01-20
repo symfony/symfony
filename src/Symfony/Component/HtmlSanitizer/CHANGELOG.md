@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+7.2
+---
+
+ * Add support for configuring the default action to block or allow unconfigured elements instead of dropping them
+
 6.4
 ---
 

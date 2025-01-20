@@ -23,11 +23,9 @@ use Symfony\Component\Security\Http\SecurityRequestAttributes;
  */
 class AuthenticationUtils
 {
-    private RequestStack $requestStack;
-
-    public function __construct(RequestStack $requestStack)
-    {
-        $this->requestStack = $requestStack;
+    public function __construct(
+        private RequestStack $requestStack,
+    ) {
     }
 
     public function getLastAuthenticationError(bool $clearSession = true): ?AuthenticationException

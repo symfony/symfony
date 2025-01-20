@@ -1,6 +1,33 @@
 CHANGELOG
 =========
 
+7.3
+---
+
+ * Add encryption support to `OidcTokenHandler` (JWE)
+
+7.2
+---
+
+ * Pass the current token to the `checkPostAuth()` method of user checkers
+ * Deprecate argument `$secret` of `RememberMeAuthenticator`
+ * Deprecate passing an empty string as `$userIdentifier` argument to `UserBadge` constructor
+ * Allow passing passport attributes to the `UserAuthenticatorInterface::authenticateUser()` method
+
+7.1
+---
+
+ * Add `#[IsCsrfTokenValid]` attribute
+ * Add CAS 2.0 access token handler
+ * Make empty username or empty password on form login attempts throw `BadCredentialsException`
+
+7.0
+---
+
+ * Add argument `$badgeFqcn` to `Passport::addBadge()`
+ * Add argument `$lifetime` to `LoginLinkHandlerInterface::createLoginLink()`
+ * Throw when calling the constructor of `DefaultLoginRateLimiter` with an empty secret
+
 6.4
 ---
 

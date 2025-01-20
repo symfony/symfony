@@ -30,20 +30,20 @@ final class NotFoundActivationStrategy implements ActivationStrategyInterface
     public function __construct(
         private RequestStack $requestStack,
         array $excludedUrls,
-        private ActivationStrategyInterface $inner
+        private ActivationStrategyInterface $inner,
     ) {
         $this->exclude = '{('.implode('|', $excludedUrls).')}i';
     }
 
-    public function isHandlerActivated(array|LogRecord $record): bool
+    public function isHandlerActivated(LogRecord $record): bool
     {
         $isActivated = $this->inner->isHandlerActivated($record);
 
         if (
             $isActivated
-            && isset($record['context']['exception'])
-            && $record['context']['exception'] instanceof HttpException
-            && 404 == $record['context']['exception']->getStatusCode()
+            && isset($record->context['exception'])
+            && $record->context['exception'] instanceof HttpException
+            && 404 == $record->context['exception']->getStatusCode()
             && ($request = $this->requestStack->getMainRequest())
         ) {
             return !preg_match($this->exclude, $request->getPathInfo());

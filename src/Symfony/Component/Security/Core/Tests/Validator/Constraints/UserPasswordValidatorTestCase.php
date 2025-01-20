@@ -113,12 +113,13 @@ abstract class UserPasswordValidatorTestCase extends ConstraintValidatorTestCase
 
     public function testUserIsNotValid()
     {
-        $this->expectException(ConstraintDefinitionException::class);
         $user = new \stdClass();
 
         $this->tokenStorage = $this->createTokenStorage($user);
         $this->validator = $this->createValidator();
         $this->validator->initialize($this->context);
+
+        $this->expectException(ConstraintDefinitionException::class);
 
         $this->validator->validate('secret', new UserPassword());
     }

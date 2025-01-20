@@ -22,6 +22,9 @@ class CsvFileLoader extends FileLoader
 {
     private string $delimiter = ';';
     private string $enclosure = '"';
+    /**
+     * @deprecated since Symfony 7.2, to be removed in 8.0
+     */
     private string $escape = '';
 
     protected function loadResource(string $resource): array
@@ -31,7 +34,7 @@ class CsvFileLoader extends FileLoader
         try {
             $file = new \SplFileObject($resource, 'rb');
         } catch (\RuntimeException $e) {
-            throw new NotFoundResourceException(sprintf('Error opening file "%s".', $resource), 0, $e);
+            throw new NotFoundResourceException(\sprintf('Error opening file "%s".', $resource), 0, $e);
         }
 
         $file->setFlags(\SplFileObject::READ_CSV | \SplFileObject::SKIP_EMPTY);
@@ -52,13 +55,15 @@ class CsvFileLoader extends FileLoader
 
     /**
      * Sets the delimiter, enclosure, and escape character for CSV.
-     *
-     * @return void
      */
-    public function setCsvControl(string $delimiter = ';', string $enclosure = '"', string $escape = '')
+    public function setCsvControl(string $delimiter = ';', string $enclosure = '"', string $escape = ''): void
     {
         $this->delimiter = $delimiter;
         $this->enclosure = $enclosure;
+        if ('' !== $escape) {
+            trigger_deprecation('symfony/translation', '7.2', 'The "escape" parameter of the "%s" method is deprecated. It will be removed in 8.0.', __METHOD__);
+        }
+
         $this->escape = $escape;
     }
 }

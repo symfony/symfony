@@ -12,10 +12,15 @@
 namespace Symfony\Component\Notifier\Bridge\Discord\Tests;
 
 use Symfony\Component\Notifier\Bridge\Discord\DiscordTransportFactory;
-use Symfony\Component\Notifier\Test\TransportFactoryTestCase;
+use Symfony\Component\Notifier\Test\AbstractTransportFactoryTestCase;
+use Symfony\Component\Notifier\Test\IncompleteDsnTestTrait;
+use Symfony\Component\Notifier\Test\MissingRequiredOptionTestTrait;
 
-final class DiscordTransportFactoryTest extends TransportFactoryTestCase
+final class DiscordTransportFactoryTest extends AbstractTransportFactoryTestCase
 {
+    use IncompleteDsnTestTrait;
+    use MissingRequiredOptionTestTrait;
+
     public function createFactory(): DiscordTransportFactory
     {
         return new DiscordTransportFactory();

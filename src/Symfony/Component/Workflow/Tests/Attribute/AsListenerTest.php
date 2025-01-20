@@ -64,7 +64,7 @@ class AsListenerTest extends TestCase
     public function testTransitionThrowException(string $class)
     {
         $this->expectException(LogicException::class);
-        $this->expectExceptionMessage(sprintf('The "transition" argument of "%s" cannot be used without a "workflow" argument.', $class));
+        $this->expectExceptionMessage(\sprintf('The "transition" argument of "%s" cannot be used without a "workflow" argument.', $class));
 
         new $class(transition: 'some');
     }
@@ -83,7 +83,7 @@ class AsListenerTest extends TestCase
     public function testPlaceThrowException(string $class)
     {
         $this->expectException(LogicException::class);
-        $this->expectExceptionMessage(sprintf('The "place" argument of "%s" cannot be used without a "workflow" argument.', $class));
+        $this->expectExceptionMessage(\sprintf('The "place" argument of "%s" cannot be used without a "workflow" argument.', $class));
 
         new $class(place: 'some');
     }

@@ -24,27 +24,18 @@ namespace Symfony\Component\Form\ChoiceList;
  */
 class ArrayChoiceList implements ChoiceListInterface
 {
-    /**
-     * The choices in the list.
-     *
-     * @var array
-     */
-    protected $choices;
+    protected array $choices;
 
     /**
      * The values indexed by the original keys.
-     *
-     * @var array
      */
-    protected $structuredValues;
+    protected array $structuredValues;
 
     /**
      * The original keys of the choices array.
-     *
-     * @var int[]|string[]
      */
-    protected $originalKeys;
-    protected $valueCallback;
+    protected array $originalKeys;
+    protected ?\Closure $valueCallback = null;
 
     /**
      * Creates a list with the given choices and values.

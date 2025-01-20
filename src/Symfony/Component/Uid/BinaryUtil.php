@@ -118,8 +118,10 @@ class BinaryUtil
 
     /**
      * @param string $time Count of 100-nanosecond intervals since the UUID epoch 1582-10-15 00:00:00 in hexadecimal
+     *
+     * @return string Count of 100-nanosecond intervals since the UUID epoch 1582-10-15 00:00:00 as a numeric string
      */
-    public static function hexToDateTime(string $time): \DateTimeImmutable
+    public static function hexToNumericString(string $time): string
     {
         if (\PHP_INT_SIZE >= 8) {
             $time = (string) (hexdec($time) - self::TIME_OFFSET_INT);
@@ -140,7 +142,17 @@ class BinaryUtil
             $time = '-' === $time[0] ? '-'.str_pad(substr($time, 1), 8, '0', \STR_PAD_LEFT) : str_pad($time, 8, '0', \STR_PAD_LEFT);
         }
 
-        return \DateTimeImmutable::createFromFormat('U.u?', substr_replace($time, '.', -7, 0));
+        return $time;
+    }
+
+    /**
+     * Sub-microseconds are lost since they are not handled by \DateTimeImmutable.
+     *
+     * @param string $time Count of 100-nanosecond intervals since the UUID epoch 1582-10-15 00:00:00 in hexadecimal
+     */
+    public static function hexToDateTime(string $time): \DateTimeImmutable
+    {
+        return \DateTimeImmutable::createFromFormat('U.u?', substr_replace(self::hexToNumericString($time), '.', -7, 0));
     }
 
     /**

@@ -107,19 +107,6 @@ class ErrorListenerTest extends TestCase
         $listener->onConsoleTerminate($this->getConsoleTerminateEvent(new StringInput('test:run --foo=bar'), 255));
     }
 
-    public function testCommandNameIsDisplayedForNonStringableInput()
-    {
-        $logger = $this->createMock(LoggerInterface::class);
-        $logger
-            ->expects($this->once())
-            ->method('debug')
-            ->with('Command "{command}" exited with code "{code}"', ['command' => 'test:run', 'code' => 255])
-        ;
-
-        $listener = new ErrorListener($logger);
-        $listener->onConsoleTerminate($this->getConsoleTerminateEvent($this->createMock(InputInterface::class), 255));
-    }
-
     private function getConsoleTerminateEvent(InputInterface $input, $exitCode)
     {
         return new ConsoleTerminateEvent(new Command('test:run'), $input, $this->createMock(OutputInterface::class), $exitCode);

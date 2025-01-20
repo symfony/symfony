@@ -27,15 +27,11 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
  */
 class RedirectController
 {
-    private ?UrlGeneratorInterface $router;
-    private ?int $httpPort;
-    private ?int $httpsPort;
-
-    public function __construct(?UrlGeneratorInterface $router = null, ?int $httpPort = null, ?int $httpsPort = null)
-    {
-        $this->router = $router;
-        $this->httpPort = $httpPort;
-        $this->httpsPort = $httpsPort;
+    public function __construct(
+        private ?UrlGeneratorInterface $router = null,
+        private ?int $httpPort = null,
+        private ?int $httpsPort = null,
+    ) {
     }
 
     /**
@@ -176,7 +172,7 @@ class RedirectController
 
         if (\array_key_exists('route', $p)) {
             if (\array_key_exists('path', $p)) {
-                throw new \RuntimeException(sprintf('Ambiguous redirection settings, use the "path" or "route" parameter, not both: "%s" and "%s" found respectively in "%s" routing configuration.', $p['path'], $p['route'], $request->attributes->get('_route')));
+                throw new \RuntimeException(\sprintf('Ambiguous redirection settings, use the "path" or "route" parameter, not both: "%s" and "%s" found respectively in "%s" routing configuration.', $p['path'], $p['route'], $request->attributes->get('_route')));
             }
 
             return $this->redirectAction($request, $p['route'], $p['permanent'] ?? false, $p['ignoreAttributes'] ?? false, $p['keepRequestMethod'] ?? false, $p['keepQueryParams'] ?? false);
@@ -186,6 +182,6 @@ class RedirectController
             return $this->urlRedirectAction($request, $p['path'], $p['permanent'] ?? false, $p['scheme'] ?? null, $p['httpPort'] ?? null, $p['httpsPort'] ?? null, $p['keepRequestMethod'] ?? false);
         }
 
-        throw new \RuntimeException(sprintf('The parameter "path" or "route" is required to configure the redirect action in "%s" routing configuration.', $request->attributes->get('_route')));
+        throw new \RuntimeException(\sprintf('The parameter "path" or "route" is required to configure the redirect action in "%s" routing configuration.', $request->attributes->get('_route')));
     }
 }

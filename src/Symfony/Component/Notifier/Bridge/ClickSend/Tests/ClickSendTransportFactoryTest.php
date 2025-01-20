@@ -12,10 +12,13 @@
 namespace Symfony\Component\Notifier\Bridge\ClickSend\Tests;
 
 use Symfony\Component\Notifier\Bridge\ClickSend\ClickSendTransportFactory;
-use Symfony\Component\Notifier\Test\TransportFactoryTestCase;
+use Symfony\Component\Notifier\Test\AbstractTransportFactoryTestCase;
+use Symfony\Component\Notifier\Test\IncompleteDsnTestTrait;
 
-final class ClickSendTransportFactoryTest extends TransportFactoryTestCase
+final class ClickSendTransportFactoryTest extends AbstractTransportFactoryTestCase
 {
+    use IncompleteDsnTestTrait;
+
     public function createFactory(): ClickSendTransportFactory
     {
         return new ClickSendTransportFactory();

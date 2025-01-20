@@ -13,7 +13,7 @@ namespace Symfony\Component\DependencyInjection\Tests\Dumper;
 
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
-use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
+use Symfony\Bridge\PhpUnit\ExpectUserDeprecationMessageTrait;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\Argument\AbstractArgument;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
@@ -24,6 +24,7 @@ use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
 use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\DependencyInjection\Attribute\AutowireCallable;
+use Symfony\Component\DependencyInjection\Attribute\AutowireInline;
 use Symfony\Component\DependencyInjection\Attribute\AutowireServiceClosure;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
@@ -47,13 +48,13 @@ use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\DependencyInjection\Tests\Compiler\AAndIInterfaceConsumer;
 use Symfony\Component\DependencyInjection\Tests\Compiler\AInterface;
 use Symfony\Component\DependencyInjection\Tests\Compiler\Foo;
-use Symfony\Component\DependencyInjection\Tests\Compiler\FooAnnotation;
 use Symfony\Component\DependencyInjection\Tests\Compiler\FooVoid;
 use Symfony\Component\DependencyInjection\Tests\Compiler\IInterface;
 use Symfony\Component\DependencyInjection\Tests\Compiler\MyCallable;
+use Symfony\Component\DependencyInjection\Tests\Compiler\MyFactory;
+use Symfony\Component\DependencyInjection\Tests\Compiler\MyInlineService;
 use Symfony\Component\DependencyInjection\Tests\Compiler\SingleMethodInterface;
 use Symfony\Component\DependencyInjection\Tests\Compiler\Wither;
-use Symfony\Component\DependencyInjection\Tests\Compiler\WitherAnnotation;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\CustomDefinition;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\FooClassWithEnumAttribute;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\FooUnitEnum;
@@ -75,7 +76,7 @@ require_once __DIR__.'/../Fixtures/includes/foo_lazy.php';
 
 class PhpDumperTest extends TestCase
 {
-    use ExpectDeprecationTrait;
+    use ExpectUserDeprecationMessageTrait;
 
     protected static string $fixturesPath;
 
@@ -484,7 +485,7 @@ class PhpDumperTest extends TestCase
     {
         $container = include self::$fixturesPath.'/containers/container_deprecated_parameters.php';
 
-        $this->expectDeprecation('Since symfony/test 6.3: The parameter "foo_class" is deprecated.');
+        $this->expectUserDeprecationMessage('Since symfony/test 6.3: The parameter "foo_class" is deprecated.');
         $container->compile();
 
         $dumper = new PhpDumper($container);
@@ -501,13 +502,34 @@ class PhpDumperTest extends TestCase
     {
         $container = include self::$fixturesPath.'/containers/container_deprecated_parameters.php';
 
-        $this->expectDeprecation('Since symfony/test 6.3: The parameter "foo_class" is deprecated.');
+        $this->expectUserDeprecationMessage('Since symfony/test 6.3: The parameter "foo_class" is deprecated.');
         $container->compile();
 
         $dumper = new PhpDumper($container);
         $dump = print_r($dumper->dump(['as_files' => true, 'file' => __DIR__, 'inline_factories_parameter' => false, 'inline_class_loader_parameter' => false]), true);
 
         $this->assertStringMatchesFormatFile(self::$fixturesPath.'/php/services_deprecated_parameters_as_files.txt', $dump);
+    }
+
+    public function testNonEmptyParameters()
+    {
+        $container = include self::$fixturesPath.'/containers/container_nonempty_parameters.php';
+        $container->compile();
+
+        $dumper = new PhpDumper($container);
+
+        $this->assertStringEqualsFile(self::$fixturesPath.'/php/services_nonempty_parameters.php', $dumper->dump());
+    }
+
+    public function testNonEmptyParametersAsFiles()
+    {
+        $container = include self::$fixturesPath.'/containers/container_nonempty_parameters.php';
+        $container->compile();
+
+        $dumper = new PhpDumper($container);
+        $dump = print_r($dumper->dump(['as_files' => true, 'file' => __DIR__, 'inline_factories_parameter' => false, 'inline_class_loader_parameter' => false]), true);
+
+        $this->assertStringMatchesFormatFile(self::$fixturesPath.'/php/services_nonempty_parameters_as_files.txt', $dump);
     }
 
     public function testEnvInId()
@@ -1060,7 +1082,7 @@ class PhpDumperTest extends TestCase
 
         $container->register(TestDefinition1::class, TestDefinition1::class)->setPublic(true);
 
-        $container->addCompilerPass(new class() implements CompilerPassInterface {
+        $container->addCompilerPass(new class implements CompilerPassInterface {
             public function process(ContainerBuilder $container): void
             {
                 $container->setDefinition('late_alias', new Definition(TestDefinition1::class))->setPublic(true);
@@ -1546,37 +1568,6 @@ PHP
         $this->assertContains('bar', $service_ids);
     }
 
-    /**
-     * @group legacy
-     */
-    public function testWitherAnnotation()
-    {
-        $this->expectDeprecation('Since symfony/dependency-injection 6.3: Relying on the "@required" annotation on method "Symfony\Component\DependencyInjection\Tests\Compiler\FooAnnotation::cloneFoo()" is deprecated, use the "Symfony\Contracts\Service\Attribute\Required" attribute instead.');
-        $this->expectDeprecation('Since symfony/dependency-injection 6.3: Relying on the "@required" annotation on method "Symfony\Component\DependencyInjection\Tests\Compiler\WitherAnnotation::setFoo()" is deprecated, use the "Symfony\Contracts\Service\Attribute\Required" attribute instead.');
-        $this->expectDeprecation('Since symfony/dependency-injection 6.3: Relying on the "@required" annotation on method "Symfony\Component\DependencyInjection\Tests\Compiler\WitherAnnotation::withFoo1()" is deprecated, use the "Symfony\Contracts\Service\Attribute\Required" attribute instead.');
-        $this->expectDeprecation('Since symfony/dependency-injection 6.3: Relying on the "@required" annotation on method "Symfony\Component\DependencyInjection\Tests\Compiler\WitherAnnotation::withFoo2()" is deprecated, use the "Symfony\Contracts\Service\Attribute\Required" attribute instead.');
-
-        $container = new ContainerBuilder();
-        $container->register(FooAnnotation::class)
-            ->setAutowired(true);
-
-        $container
-            ->register('wither', WitherAnnotation::class)
-            ->setPublic(true)
-            ->setAutowired(true);
-
-        $container->compile();
-        $dumper = new PhpDumper($container);
-        $dump = $dumper->dump(['class' => 'Symfony_DI_PhpDumper_Service_Wither_Annotation']);
-        $this->assertStringEqualsFile(self::$fixturesPath.'/php/services_wither_annotation.php', $dump);
-        eval('?>'.$dump);
-
-        $container = new \Symfony_DI_PhpDumper_Service_Wither_Annotation();
-
-        $wither = $container->get('wither');
-        $this->assertInstanceOf(FooAnnotation::class, $wither->foo);
-    }
-
     public function testWitherAttribute()
     {
         $container = new ContainerBuilder();
@@ -1726,11 +1717,13 @@ PHP
     }
 
     /**
+     * The test should be kept in the group as it always expects a deprecation.
+     *
      * @group legacy
      */
     public function testDirectlyAccessingDeprecatedPublicService()
     {
-        $this->expectDeprecation('Since foo/bar 3.8: Accessing the "bar" service directly from the container is deprecated, use dependency injection instead.');
+        $this->expectUserDeprecationMessage('Since foo/bar 3.8: Accessing the "bar" service directly from the container is deprecated, use dependency injection instead.');
 
         $container = new ContainerBuilder();
         $container
@@ -1977,6 +1970,56 @@ PHP
         $this->assertInstanceOf(Foo::class, $container->get('bar')->foo->theMethod());
     }
 
+    public function testInlineAdapterConsumer()
+    {
+        $container = new ContainerBuilder();
+        $container->setParameter('someParam', 123);
+        $container->register('factory', MyFactory::class)
+            ->setAutowired(true);
+        $container->register('inlineService', MyInlineService::class)
+            ->setAutowired(true);
+        $container->register(InlineAdapterConsumer::class)
+            ->setPublic(true)
+            ->setAutowired(true);
+        $container->register('foo', InlineAdapterConsumer::class)
+            ->setPublic(true)
+            ->setAutowired(true);
+        $container->register('bar', InlineAdapterConsumer::class)
+            ->setPublic(true)
+            ->setAutowired(true);
+        $container->compile();
+        $dumper = new PhpDumper($container);
+
+        $this->assertStringEqualsFile(self::$fixturesPath.'/php/inline_adapter_consumer.php', $dumper->dump(['class' => 'Symfony_DI_PhpDumper_Test_Inline_Adapter_Consumer']));
+
+        require self::$fixturesPath.'/php/inline_adapter_consumer.php';
+
+        $container = new \Symfony_DI_PhpDumper_Test_Inline_Adapter_Consumer();
+
+        $this->assertInstanceOf(InlineAdapterConsumer::class, $container->get(InlineAdapterConsumer::class));
+        $fooService = $container->get('foo');
+        $barService = $container->get('bar');
+        $this->assertInstanceOf(InlineAdapterConsumer::class, $fooService);
+        $this->assertInstanceOf(InlineAdapterConsumer::class, $barService);
+        $this->assertNotSame($fooService, $barService);
+        foreach ([$fooService, $barService] as $service) {
+            $this->assertNotSame($service->inlined, $service->inlinedWithParams);
+            $this->assertNotSame($service->inlinedWithParams, $service->factoredFromClass);
+            $this->assertNotSame($service->factoredFromClass, $service->factoredFromClassWithParams);
+            $this->assertNotSame($service->factoredFromClassWithParams, $service->factoredFromService);
+            $this->assertNotSame($service->factoredFromService, $service->factoredFromClass);
+            $this->assertNotSame($service->factoredFromService, $service->factoredFromServiceWithParam);
+            $this->assertNotSame($service->factoredFromServiceWithParam, $service->inlined);
+        }
+        $this->assertNotSame($fooService->inlined, $barService->inlined);
+        $this->assertNotSame($fooService->inlinedWithParams, $barService->inlinedWithParams);
+        $this->assertNotSame($fooService->factoredFromClass, $barService->factoredFromClass);
+        $this->assertNotSame($fooService->factoredFromClassWithParams, $barService->factoredFromClassWithParams);
+        $this->assertNotSame($fooService->factoredFromService, $barService->factoredFromService);
+        $this->assertNotSame($fooService->factoredFromService, $barService->factoredFromService);
+        $this->assertNotSame($fooService->factoredFromServiceWithParam, $barService->factoredFromServiceWithParam);
+    }
+
     /**
      * @dataProvider getStripCommentsCodes
      */
@@ -2135,6 +2178,51 @@ class CallableAdapterConsumer
     public function __construct(
         #[AutowireCallable(service: 'foo', method: 'cloneFoo')]
         public SingleMethodInterface $foo,
+    ) {
+    }
+}
+
+class InlineAdapterConsumer
+{
+    public function __construct(
+        #[AutowireInline(MyInlineService::class)]
+        public MyInlineService $inlined,
+
+        #[AutowireInline(MyInlineService::class, ['bar'])]
+        public MyInlineService $inlinedWithParams,
+
+        #[AutowireInline([MyFactory::class, 'staticCreateFoo'])]
+        public MyInlineService $factoredFromClass,
+
+        #[AutowireInline([MyFactory::class, 'staticCreateFooWithParam'], ['someParam'])]
+        public MyInlineService $factoredFromClassWithParams,
+
+        #[AutowireInline([new Reference('factory'), 'createFoo'])]
+        public MyInlineService $factoredFromService,
+
+        #[AutowireInline([new Reference('factory'), 'createFooWithParam'], ['someParam'])]
+        public MyInlineService $factoredFromServiceWithParam,
+
+        #[AutowireInline([new Reference('factory')])]
+        public MyInlineService $factoredFromClassWithoutMethod,
+
+        #[AutowireInline([new Reference('factory')], ['someParam'])]
+        public MyInlineService $factoredFromClassWithoutMethodWithParams,
+
+        #[AutowireInline(MyInlineService::class, calls: [['someMethod', []]])]
+        public MyInlineService $inlinedWithCall,
+
+        #[AutowireInline(MyInlineService::class, calls: [['someMethod1', []], ['someMethod2', []]])]
+        public MyInlineService $inlinedWithCalls,
+
+        #[AutowireInline(MyInlineService::class, calls: [['someMethod1', ['someArg']], ['someMethod2', []]])]
+        public MyInlineService $inlinedWithCallsWithArgument,
+
+        #[AutowireInline(MyInlineService::class, calls: [['someMethod1', [new Reference('factory')]], ['someMethod2', []]])]
+        public MyInlineService $inlinedWithCallsWithReferenceArgument,
+
+        #[AutowireInline(MyInlineService::class, calls: [['someMethod1', ['%someParam%']], ['someMethod2', []]])]
+        public MyInlineService $inlinedWithCallsWithParamArgument,
     ) {
     }
 }

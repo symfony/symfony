@@ -32,11 +32,6 @@ use Symfony\Contracts\Service\ResetInterface;
 abstract class DoctrineType extends AbstractType implements ResetInterface
 {
     /**
-     * @var ManagerRegistry
-     */
-    protected $registry;
-
-    /**
      * @var IdReader[]
      */
     private array $idReaders = [];
@@ -92,15 +87,12 @@ abstract class DoctrineType extends AbstractType implements ResetInterface
         return null;
     }
 
-    public function __construct(ManagerRegistry $registry)
-    {
-        $this->registry = $registry;
+    public function __construct(
+        protected ManagerRegistry $registry,
+    ) {
     }
 
-    /**
-     * @return void
-     */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         if ($options['multiple'] && interface_exists(Collection::class)) {
             $builder
@@ -110,10 +102,7 @@ abstract class DoctrineType extends AbstractType implements ResetInterface
         }
     }
 
-    /**
-     * @return void
-     */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $choiceLoader = function (Options $options) {
             // Unless the choices are given explicitly, load them on demand
@@ -181,7 +170,7 @@ abstract class DoctrineType extends AbstractType implements ResetInterface
             $em = $this->registry->getManagerForClass($options['class']);
 
             if (null === $em) {
-                throw new RuntimeException(sprintf('Class "%s" seems not to be a managed Doctrine entity. Did you forget to map it?', $options['class']));
+                throw new RuntimeException(\sprintf('Class "%s" seems not to be a managed Doctrine entity. Did you forget to map it?', $options['class']));
             }
 
             return $em;
@@ -238,10 +227,7 @@ abstract class DoctrineType extends AbstractType implements ResetInterface
         return ChoiceType::class;
     }
 
-    /**
-     * @return void
-     */
-    public function reset()
+    public function reset(): void
     {
         $this->idReaders = [];
         $this->entityLoaders = [];

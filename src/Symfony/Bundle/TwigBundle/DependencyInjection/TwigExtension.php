@@ -38,10 +38,7 @@ use Twig\Loader\LoaderInterface;
  */
 class TwigExtension extends Extension
 {
-    /**
-     * @return void
-     */
-    public function load(array $configs, ContainerBuilder $container)
+    public function load(array $configs, ContainerBuilder $container): void
     {
         $loader = new PhpFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
         $loader->load('twig.php');
@@ -163,6 +160,8 @@ class TwigExtension extends Extension
 
         if (isset($config['autoescape_service'])) {
             $config['autoescape'] = [new Reference($config['autoescape_service']), $config['autoescape_service_method'] ?? '__invoke'];
+        } else {
+            $config['autoescape'] = 'name';
         }
 
         $container->getDefinition('twig')->replaceArgument(1, array_intersect_key($config, [
@@ -176,8 +175,6 @@ class TwigExtension extends Extension
             'optimizations' => true,
         ]));
 
-        $container->registerForAutoconfiguration(\Twig_ExtensionInterface::class)->addTag('twig.extension');
-        $container->registerForAutoconfiguration(\Twig_LoaderInterface::class)->addTag('twig.loader');
         $container->registerForAutoconfiguration(ExtensionInterface::class)->addTag('twig.extension');
         $container->registerForAutoconfiguration(LoaderInterface::class)->addTag('twig.loader');
         $container->registerForAutoconfiguration(RuntimeExtensionInterface::class)->addTag('twig.runtime');

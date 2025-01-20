@@ -27,10 +27,8 @@ interface TokenStorageInterface
 
     /**
      * Stores a CSRF token.
-     *
-     * @return void
      */
-    public function setToken(string $tokenId, #[\SensitiveParameter] string $token);
+    public function setToken(string $tokenId, #[\SensitiveParameter] string $token): void;
 
     /**
      * Removes a CSRF token.

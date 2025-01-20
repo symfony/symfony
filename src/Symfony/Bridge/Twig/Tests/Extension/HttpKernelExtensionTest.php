@@ -48,8 +48,7 @@ class HttpKernelExtensionTest extends TestCase
 
     public function testUnknownFragmentRenderer()
     {
-        $context = $this->createMock(RequestStack::class);
-        $renderer = new FragmentHandler($context);
+        $renderer = new FragmentHandler(new RequestStack());
 
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('The "inline" renderer does not exist.');
@@ -68,7 +67,7 @@ class HttpKernelExtensionTest extends TestCase
         $kernelRuntime = new HttpKernelRuntime($fragmentHandler, $fragmentUriGenerator);
 
         $loader = new ArrayLoader([
-            'index' => sprintf(<<<TWIG
+            'index' => \sprintf(<<<TWIG
 {{ fragment_uri(controller("%s::templateAction", {template: "foo.html.twig"})) }}
 TWIG
                 , str_replace('\\', '\\\\', TemplateController::class)), ]);
@@ -96,9 +95,9 @@ TWIG
             $mocker->willReturn($returnOrException);
         }
 
-        $context = $this->createMock(RequestStack::class);
+        $context = new RequestStack();
 
-        $context->expects($this->any())->method('getCurrentRequest')->willReturn(Request::create('/'));
+        $context->push(Request::create('/'));
 
         return new FragmentHandler($context, [$strategy], false);
     }

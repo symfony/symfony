@@ -16,32 +16,33 @@
         }
     ],
     "require": {
-        "php": ">=8.1",
+        "php": ">=8.2",
         "symfony/deprecation-contracts": "^2.5|^3",
         "symfony/event-dispatcher-contracts": "^2.5|^3",
         "symfony/service-contracts": "^2.5|^3",
-        "symfony/password-hasher": "^5.4|^6.0|^7.0"
+        "symfony/password-hasher": "^6.4|^7.0"
     },
     "require-dev": {
         "psr/container": "^1.1|^2.0",
         "psr/cache": "^1.0|^2.0|^3.0",
-        "symfony/cache": "^5.4|^6.0|^7.0",
-        "symfony/event-dispatcher": "^5.4|^6.0|^7.0",
-        "symfony/expression-language": "^5.4|^6.0|^7.0",
-        "symfony/http-foundation": "^5.4|^6.0|^7.0",
-        "symfony/ldap": "^5.4|^6.0|^7.0",
-        "symfony/string": "^5.4|^6.0|^7.0",
-        "symfony/translation": "^5.4.35|~6.3.12|^6.4.3|^7.0.3",
+        "symfony/cache": "^6.4|^7.0",
+        "symfony/dependency-injection": "^6.4|^7.0",
+        "symfony/event-dispatcher": "^6.4|^7.0",
+        "symfony/expression-language": "^6.4|^7.0",
+        "symfony/http-foundation": "^6.4|^7.0",
+        "symfony/ldap": "^6.4|^7.0",
+        "symfony/string": "^6.4|^7.0",
+        "symfony/translation": "^6.4.3|^7.0.3",
         "symfony/validator": "^6.4|^7.0",
         "psr/log": "^1|^2|^3"
     },
     "conflict": {
-        "symfony/event-dispatcher": "<5.4",
-        "symfony/http-foundation": "<5.4",
-        "symfony/security-guard": "<5.4",
-        "symfony/ldap": "<5.4",
-        "symfony/translation": "<5.4.35|>=6.0,<6.3.12|>=6.4,<6.4.3|>=7.0,<7.0.3",
-        "symfony/validator": "<5.4"
+        "symfony/dependency-injection": "<6.4",
+        "symfony/event-dispatcher": "<6.4",
+        "symfony/http-foundation": "<6.4",
+        "symfony/ldap": "<6.4",
+        "symfony/translation": "<6.4.3|>=7.0,<7.0.3",
+        "symfony/validator": "<6.4"
     },
     "autoload": {
         "psr-4": { "Symfony\\Component\\Security\\Core\\": "" },

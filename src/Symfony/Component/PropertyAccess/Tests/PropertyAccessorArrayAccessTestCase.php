@@ -53,12 +53,13 @@ abstract class PropertyAccessorArrayAccessTestCase extends TestCase
 
     public function testGetValueFailsIfNoSuchIndex()
     {
-        $this->expectException(NoSuchIndexException::class);
         $this->propertyAccessor = PropertyAccess::createPropertyAccessorBuilder()
             ->enableExceptionOnInvalidIndex()
             ->getPropertyAccessor();
 
         $object = static::getContainer(['firstName' => 'Bernhard']);
+
+        $this->expectException(NoSuchIndexException::class);
 
         $this->propertyAccessor->getValue($object, '[lastName]');
     }

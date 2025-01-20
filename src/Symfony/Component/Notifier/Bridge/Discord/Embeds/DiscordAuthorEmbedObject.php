@@ -26,7 +26,7 @@ final class DiscordAuthorEmbedObject extends AbstractDiscordEmbedObject
     public function name(string $name): static
     {
         if (\strlen($name) > self::NAME_LIMIT) {
-            throw new LengthException(sprintf('Maximum length for the name is %d characters.', self::NAME_LIMIT));
+            throw new LengthException(\sprintf('Maximum length for the name is %d characters.', self::NAME_LIMIT));
         }
 
         $this->options['name'] = $name;

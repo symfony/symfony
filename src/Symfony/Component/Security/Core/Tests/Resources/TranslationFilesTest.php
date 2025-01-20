@@ -26,7 +26,7 @@ class TranslationFilesTest extends TestCase
 
         $errors = XliffUtils::validateSchema($document);
 
-        $this->assertCount(0, $errors, sprintf('"%s" is invalid:%s', $filePath, \PHP_EOL.implode(\PHP_EOL, array_column($errors, 'message'))));
+        $this->assertCount(0, $errors, \sprintf('"%s" is invalid:%s', $filePath, \PHP_EOL.implode(\PHP_EOL, array_column($errors, 'message'))));
     }
 
     /**
@@ -39,7 +39,7 @@ class TranslationFilesTest extends TestCase
 
         $errors = XliffUtils::validateSchema($document);
 
-        $this->assertCount(0, $errors, sprintf('"%s" is invalid:%s', $filePath, \PHP_EOL.implode(\PHP_EOL, array_column($errors, 'message'))));
+        $this->assertCount(0, $errors, \sprintf('"%s" is invalid:%s', $filePath, \PHP_EOL.implode(\PHP_EOL, array_column($errors, 'message'))));
     }
 
     public static function provideTranslationFiles()

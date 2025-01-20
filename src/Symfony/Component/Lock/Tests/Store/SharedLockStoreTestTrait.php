@@ -29,10 +29,9 @@ trait SharedLockStoreTestTrait
     {
         $store = $this->getStore();
 
-        $resource = uniqid(__METHOD__, true);
-        $key1 = new Key($resource);
-        $key2 = new Key($resource);
-        $key3 = new Key($resource);
+        $key1 = new Key(__METHOD__);
+        $key2 = new Key(__METHOD__);
+        $key3 = new Key(__METHOD__);
 
         $store->saveRead($key1);
         $this->assertTrue($store->exists($key1));
@@ -80,10 +79,8 @@ trait SharedLockStoreTestTrait
     public function testSharedLockWriteFirst()
     {
         $store = $this->getStore();
-
-        $resource = uniqid(__METHOD__, true);
-        $key1 = new Key($resource);
-        $key2 = new Key($resource);
+        $key1 = new Key(__METHOD__);
+        $key2 = new Key(__METHOD__);
 
         $store->save($key1);
         $this->assertTrue($store->exists($key1));
@@ -116,9 +113,8 @@ trait SharedLockStoreTestTrait
     {
         $store = $this->getStore();
 
-        $resource = uniqid(__METHOD__, true);
-        $key1 = new Key($resource);
-        $key2 = new Key($resource);
+        $key1 = new Key(__METHOD__);
+        $key2 = new Key(__METHOD__);
 
         $store->saveRead($key1);
         $store->saveRead($key2);
@@ -136,9 +132,8 @@ trait SharedLockStoreTestTrait
     {
         $store = $this->getStore();
 
-        $resource = uniqid(__METHOD__, true);
-        $key1 = new Key($resource);
-        $key2 = new Key($resource);
+        $key1 = new Key(static::class.__METHOD__);
+        $key2 = new Key(static::class.__METHOD__);
 
         $store->saveRead($key1);
         $store->save($key1);
@@ -161,9 +156,8 @@ trait SharedLockStoreTestTrait
     {
         $store = $this->getStore();
 
-        $resource = uniqid(__METHOD__, true);
-        $key1 = new Key($resource);
-        $key2 = new Key($resource);
+        $key1 = new Key(static::class.__METHOD__);
+        $key2 = new Key(static::class.__METHOD__);
 
         $store->save($key1);
         $store->saveRead($key1);

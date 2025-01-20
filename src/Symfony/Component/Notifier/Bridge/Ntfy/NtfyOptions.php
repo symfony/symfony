@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Notifier\Bridge\Ntfy;
 
+use Symfony\Component\Clock\Clock;
+use Symfony\Component\Clock\ClockInterface;
 use Symfony\Component\Notifier\Exception\LogicException;
 use Symfony\Component\Notifier\Message\MessageOptionsInterface;
 use Symfony\Component\Notifier\Notification\Notification;
@@ -26,8 +28,13 @@ final class NtfyOptions implements MessageOptionsInterface
     public const PRIORITY_LOW = 2;
     public const PRIORITY_MIN = 1;
 
-    public function __construct(private array $options = [])
-    {
+    private ClockInterface $clock;
+
+    public function __construct(
+        private array $options = [],
+        ?ClockInterface $clock = null,
+    ) {
+        $this->clock = $clock ?? Clock::get();
     }
 
     public static function fromNotification(Notification $notification): self
@@ -67,16 +74,12 @@ final class NtfyOptions implements MessageOptionsInterface
 
     public function setStringPriority(string $priority): self
     {
-        switch ($priority) {
-            case Notification::IMPORTANCE_URGENT:
-                return $this->setPriority(self::PRIORITY_URGENT);
-            case Notification::IMPORTANCE_HIGH:
-                return $this->setPriority(self::PRIORITY_HIGH);
-            case Notification::IMPORTANCE_LOW:
-                return $this->setPriority(self::PRIORITY_LOW);
-            default:
-                return $this->setPriority(self::PRIORITY_DEFAULT);
-        }
+        return match ($priority) {
+            Notification::IMPORTANCE_URGENT => $this->setPriority(self::PRIORITY_URGENT),
+            Notification::IMPORTANCE_HIGH => $this->setPriority(self::PRIORITY_HIGH),
+            Notification::IMPORTANCE_LOW => $this->setPriority(self::PRIORITY_LOW),
+            default => $this->setPriority(self::PRIORITY_DEFAULT),
+        };
     }
 
     public function setPriority(int $priority): self
@@ -106,7 +109,7 @@ final class NtfyOptions implements MessageOptionsInterface
 
     public function setDelay(\DateTimeInterface $dateTime): self
     {
-        if ($dateTime > (new \DateTime())) {
+        if ($dateTime > $this->clock->now()) {
             $this->options['delay'] = (string) $dateTime->getTimestamp();
         } else {
             throw new LogicException('Delayed date must be defined in the future.');

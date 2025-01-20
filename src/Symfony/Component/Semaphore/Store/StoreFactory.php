@@ -34,7 +34,7 @@ class StoreFactory
                 return new RedisStore($connection);
 
             case !\is_string($connection):
-                throw new InvalidArgumentException(sprintf('Unsupported Connection: "%s".', $connection::class));
+                throw new InvalidArgumentException(\sprintf('Unsupported Connection: "%s".', $connection::class));
             case str_starts_with($connection, 'redis://'):
             case str_starts_with($connection, 'rediss://'):
                 if (!class_exists(AbstractAdapter::class)) {
@@ -45,6 +45,6 @@ class StoreFactory
                 return new RedisStore($connection);
         }
 
-        throw new InvalidArgumentException(sprintf('Unsupported Connection: "%s".', $connection));
+        throw new InvalidArgumentException(\sprintf('Unsupported Connection: "%s".', $connection));
     }
 }

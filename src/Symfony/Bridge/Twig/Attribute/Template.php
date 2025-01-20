@@ -11,24 +11,23 @@
 
 namespace Symfony\Bridge\Twig\Attribute;
 
+/**
+ * Define the template to render in the controller.
+ */
 #[\Attribute(\Attribute::TARGET_CLASS | \Attribute::TARGET_METHOD | \Attribute::TARGET_FUNCTION)]
 class Template
 {
+    /**
+     * @param string        $template The name of the template to render
+     * @param string[]|null $vars     The controller method arguments to pass to the template
+     * @param bool          $stream   Enables streaming the template
+     * @param string|null   $block    The name of the block to use in the template
+     */
     public function __construct(
-        /**
-         * The name of the template to render.
-         */
         public string $template,
-
-        /**
-         * The controller method arguments to pass to the template.
-         */
         public ?array $vars = null,
-
-        /**
-         * Enables streaming the template.
-         */
         public bool $stream = false,
+        public ?string $block = null,
     ) {
     }
 }

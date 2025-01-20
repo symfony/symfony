@@ -16,12 +16,15 @@ use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\Mailer\Bridge\Infobip\Transport\InfobipApiTransport;
 use Symfony\Component\Mailer\Bridge\Infobip\Transport\InfobipSmtpTransport;
 use Symfony\Component\Mailer\Bridge\Infobip\Transport\InfobipTransportFactory;
-use Symfony\Component\Mailer\Test\TransportFactoryTestCase;
+use Symfony\Component\Mailer\Test\AbstractTransportFactoryTestCase;
+use Symfony\Component\Mailer\Test\IncompleteDsnTestTrait;
 use Symfony\Component\Mailer\Transport\Dsn;
 use Symfony\Component\Mailer\Transport\TransportFactoryInterface;
 
-class InfobipApiTransportFactoryTest extends TransportFactoryTestCase
+class InfobipApiTransportFactoryTest extends AbstractTransportFactoryTestCase
 {
+    use IncompleteDsnTestTrait;
+
     public function getFactory(): TransportFactoryInterface
     {
         return new InfobipTransportFactory(null, new MockHttpClient(), new NullLogger());

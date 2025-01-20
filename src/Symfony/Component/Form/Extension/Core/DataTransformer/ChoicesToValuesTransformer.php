@@ -22,11 +22,9 @@ use Symfony\Component\Form\Exception\TransformationFailedException;
  */
 class ChoicesToValuesTransformer implements DataTransformerInterface
 {
-    private ChoiceListInterface $choiceList;
-
-    public function __construct(ChoiceListInterface $choiceList)
-    {
-        $this->choiceList = $choiceList;
+    public function __construct(
+        private ChoiceListInterface $choiceList,
+    ) {
     }
 
     /**

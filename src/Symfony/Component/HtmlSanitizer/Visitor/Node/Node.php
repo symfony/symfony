@@ -37,15 +37,13 @@ final class Node implements NodeInterface
         'wbr' => true,
     ];
 
-    private NodeInterface $parent;
-    private string $tagName;
     private array $attributes = [];
     private array $children = [];
 
-    public function __construct(NodeInterface $parent, string $tagName)
-    {
-        $this->parent = $parent;
-        $this->tagName = $tagName;
+    public function __construct(
+        private NodeInterface $parent,
+        private string $tagName,
+    ) {
     }
 
     public function getParent(): ?NodeInterface

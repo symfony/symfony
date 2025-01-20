@@ -11,7 +11,8 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Tests\Functional;
 
-use Symfony\Component\PropertyInfo\Type;
+use Symfony\Component\PropertyInfo\Type as LegacyType;
+use Symfony\Component\TypeInfo\Type;
 
 class PropertyInfoTest extends AbstractWebTestCase
 {
@@ -19,7 +20,29 @@ class PropertyInfoTest extends AbstractWebTestCase
     {
         static::bootKernel(['test_case' => 'Serializer']);
 
-        $this->assertEquals([new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, new Type(Type::BUILTIN_TYPE_INT), new Type(Type::BUILTIN_TYPE_INT))], static::getContainer()->get('property_info')->getTypes('Symfony\Bundle\FrameworkBundle\Tests\Functional\Dummy', 'codes'));
+        $propertyInfo = static::getContainer()->get('property_info');
+
+        if (!method_exists($propertyInfo, 'getType')) {
+            $this->markTestSkipped();
+        }
+
+        $this->assertEquals(Type::list(Type::int()), $propertyInfo->getType(Dummy::class, 'codes'));
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testPhpDocPriorityLegacy()
+    {
+        static::bootKernel(['test_case' => 'Serializer']);
+
+        $propertyInfo = static::getContainer()->get('property_info');
+
+        if (!method_exists($propertyInfo, 'getTypes')) {
+            $this->markTestSkipped();
+        }
+
+        $this->assertEquals([new LegacyType('array', false, null, true, new LegacyType('int'), new LegacyType('int'))], $propertyInfo->getTypes(Dummy::class, 'codes'));
     }
 }
 

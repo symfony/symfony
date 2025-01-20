@@ -23,7 +23,7 @@ class HandlerFailedExceptionTest extends TestCase
     public function testThatStringErrorCodeConvertsToInteger()
     {
         $envelope = new Envelope(new \stdClass());
-        $exception = new class() extends \RuntimeException {
+        $exception = new class extends \RuntimeException {
             public function __construct()
             {
                 $this->code = 'HY000';

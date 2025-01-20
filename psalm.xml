@@ -17,7 +17,8 @@
             <directory name="src/Symfony/*/*/Tests" />
             <directory name="src/Symfony/*/*/*/Tests" />
             <directory name="src/Symfony/*/*/*/*/Tests" />
-            <directory name="src/Symfony/Component/Intl/Resources/emoji/" />
+            <directory name="src/Symfony/Component/Intl/Resources/data/" />
+            <directory name="src/Symfony/Component/Emoji/Resources/data/" />
             <directory name="vendor" />
         </ignoreFiles>
     </projectFiles>

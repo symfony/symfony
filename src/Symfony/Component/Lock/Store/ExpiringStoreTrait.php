@@ -24,7 +24,7 @@ trait ExpiringStoreTrait
             } catch (\Exception) {
                 // swallow exception to not hide the original issue
             }
-            throw new LockExpiredException(sprintf('Failed to store the "%s" lock.', $key));
+            throw new LockExpiredException(\sprintf('Failed to store the "%s" lock.', $key));
         }
     }
 }

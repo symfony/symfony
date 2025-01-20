@@ -11,8 +11,6 @@
 
 namespace Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory;
 
-use Symfony\Component\Config\Definition\Builder\NodeDefinition;
-use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
@@ -50,23 +48,8 @@ class FormLoginFactory extends AbstractFactory
         return 'form-login';
     }
 
-    public function addConfiguration(NodeDefinition $node): void
-    {
-        parent::addConfiguration($node);
-
-        $node
-            ->children()
-                ->scalarNode('csrf_token_generator')->cannotBeEmpty()->end()
-            ->end()
-        ;
-    }
-
     public function createAuthenticator(ContainerBuilder $container, string $firewallName, array $config, string $userProviderId): string
     {
-        if (isset($config['csrf_token_generator'])) {
-            throw new InvalidConfigurationException('The "csrf_token_generator" on "form_login" does not exist, use "enable_csrf" instead.');
-        }
-
         $authenticatorId = 'security.authenticator.form_login.'.$firewallName;
         $options = array_intersect_key($config, $this->options);
         $authenticator = $container

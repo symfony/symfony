@@ -41,43 +41,31 @@ class FlockStore implements BlockingStoreInterface, SharedLockStoreInterface
     {
         if (!is_dir($lockPath ??= sys_get_temp_dir())) {
             if (false === @mkdir($lockPath, 0777, true) && !is_dir($lockPath)) {
-                throw new InvalidArgumentException(sprintf('The FlockStore directory "%s" does not exists and cannot be created.', $lockPath));
+                throw new InvalidArgumentException(\sprintf('The FlockStore directory "%s" does not exists and cannot be created.', $lockPath));
             }
         } elseif (!is_writable($lockPath)) {
-            throw new InvalidArgumentException(sprintf('The FlockStore directory "%s" is not writable.', $lockPath));
+            throw new InvalidArgumentException(\sprintf('The FlockStore directory "%s" is not writable.', $lockPath));
         }
 
         $this->lockPath = $lockPath;
     }
 
-    /**
-     * @return void
-     */
-    public function save(Key $key)
+    public function save(Key $key): void
     {
         $this->lock($key, false, false);
     }
 
-    /**
-     * @return void
-     */
-    public function saveRead(Key $key)
+    public function saveRead(Key $key): void
     {
         $this->lock($key, true, false);
     }
 
-    /**
-     * @return void
-     */
-    public function waitAndSave(Key $key)
+    public function waitAndSave(Key $key): void
     {
         $this->lock($key, false, true);
     }
 
-    /**
-     * @return void
-     */
-    public function waitAndSaveRead(Key $key)
+    public function waitAndSaveRead(Key $key): void
     {
         $this->lock($key, true, true);
     }
@@ -95,7 +83,7 @@ class FlockStore implements BlockingStoreInterface, SharedLockStoreInterface
         }
 
         if (!$handle) {
-            $fileName = sprintf('%s/sf.%s.%s.lock',
+            $fileName = \sprintf('%s/sf.%s.%s.lock',
                 $this->lockPath,
                 substr(preg_replace('/[^a-z0-9\._-]+/i', '-', $key), 0, 50),
                 strtr(substr(base64_encode(hash('sha256', $key, true)), 0, 7), '/', '_')
@@ -132,18 +120,12 @@ class FlockStore implements BlockingStoreInterface, SharedLockStoreInterface
         $key->markUnserializable();
     }
 
-    /**
-     * @return void
-     */
-    public function putOffExpiration(Key $key, float $ttl)
+    public function putOffExpiration(Key $key, float $ttl): void
     {
         // do nothing, the flock locks forever.
     }
 
-    /**
-     * @return void
-     */
-    public function delete(Key $key)
+    public function delete(Key $key): void
     {
         // The lock is maybe not acquired.
         if (!$key->hasState(__CLASS__)) {
@@ -161,5 +143,22 @@ class FlockStore implements BlockingStoreInterface, SharedLockStoreInterface
     public function exists(Key $key): bool
     {
         return $key->hasState(__CLASS__);
+    }
+
+    public function deleteWithConfirmation(Key $key): bool
+    {
+        // The lock is maybe not acquired.
+        if (!$key->hasState(__CLASS__)) {
+            return false;
+        }
+
+        $handle = $key->getState(__CLASS__)[1];
+
+        flock($handle, \LOCK_UN | \LOCK_NB);
+        fclose($handle);
+
+        $key->removeState(__CLASS__);
+
+        return true;
     }
 }

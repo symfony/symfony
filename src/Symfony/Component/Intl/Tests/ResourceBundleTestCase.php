@@ -806,8 +806,8 @@ abstract class ResourceBundleTestCase extends TestCase
     protected static function getRootLocales()
     {
         if (null === self::$rootLocales) {
-            self::$rootLocales = array_filter(static::getLocales(), fn ($locale) => // no locales for which fallback is possible (e.g "en_GB")
-!str_contains($locale, '_'));
+            // no locales for which fallback is possible (e.g "en_GB")
+            self::$rootLocales = array_filter(static::getLocales(), fn ($locale) => !str_contains($locale, '_'));
         }
 
         return self::$rootLocales;

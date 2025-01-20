@@ -32,55 +32,19 @@ use Symfony\Component\Security\Core\User\UserProviderInterface;
  */
 final class PersistentRememberMeHandler extends AbstractRememberMeHandler
 {
-    private TokenProviderInterface $tokenProvider;
-    private ?TokenVerifierInterface $tokenVerifier;
-
-    /**
-     * @param UserProviderInterface       $userProvider
-     * @param RequestStack                $requestStack
-     * @param array                       $options
-     * @param LoggerInterface|null        $logger
-     * @param TokenVerifierInterface|null $tokenVerifier
-     */
-    public function __construct(TokenProviderInterface $tokenProvider, #[\SensitiveParameter] $userProvider, $requestStack, $options, $logger = null, $tokenVerifier = null)
-    {
-        if (\is_string($userProvider)) {
-            trigger_deprecation('symfony/security-http', '6.3', 'Calling "%s()" with the secret as the second argument is deprecated. The argument will be dropped in 7.0.', __CLASS__);
-
-            $userProvider = $requestStack;
-            $requestStack = $options;
-            $options = $logger;
-            $logger = $tokenVerifier;
-            $tokenVerifier = \func_num_args() > 6 ? func_get_arg(6) : null;
-        }
-
-        if (!$userProvider instanceof UserProviderInterface) {
-            throw new \TypeError(sprintf('Argument 2 passed to "%s()" must be an instance of "%s", "%s" given.', __CLASS__, UserProviderInterface::class, get_debug_type($userProvider)));
-        }
-
-        if (!$requestStack instanceof RequestStack) {
-            throw new \TypeError(sprintf('Argument 3 passed to "%s()" must be an instance of "%s", "%s" given.', __CLASS__, RequestStack::class, get_debug_type($userProvider)));
-        }
-
-        if (!\is_array($options)) {
-            throw new \TypeError(sprintf('Argument 4 passed to "%s()" must be an array, "%s" given.', __CLASS__, get_debug_type($userProvider)));
-        }
-
-        if (null !== $logger && !$logger instanceof LoggerInterface) {
-            throw new \TypeError(sprintf('Argument 5 passed to "%s()" must be an instance of "%s", "%s" given.', __CLASS__, LoggerInterface::class, get_debug_type($userProvider)));
-        }
-
-        if (null !== $tokenVerifier && !$tokenVerifier instanceof TokenVerifierInterface) {
-            throw new \TypeError(sprintf('Argument 6 passed to "%s()" must be an instance of "%s", "%s" given.', __CLASS__, TokenVerifierInterface::class, get_debug_type($userProvider)));
-        }
-
+    public function __construct(
+        private TokenProviderInterface $tokenProvider,
+        UserProviderInterface $userProvider,
+        RequestStack $requestStack,
+        array $options,
+        ?LoggerInterface $logger = null,
+        private ?TokenVerifierInterface $tokenVerifier = null,
+    ) {
         parent::__construct($userProvider, $requestStack, $options, $logger);
 
         if (!$tokenVerifier && $tokenProvider instanceof TokenVerifierInterface) {
-            $tokenVerifier = $tokenProvider;
+            $this->tokenVerifier = $tokenProvider;
         }
-        $this->tokenProvider = $tokenProvider;
-        $this->tokenVerifier = $tokenVerifier;
     }
 
     public function createRememberMeCookie(UserInterface $user): void

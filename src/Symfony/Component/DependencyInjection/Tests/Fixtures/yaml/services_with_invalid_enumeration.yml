@@ -7,4 +7,4 @@ services:
     Symfony\Component\DependencyInjection\Tests\Fixtures\FooClassWithEnumAttribute:
         class: Symfony\Component\DependencyInjection\Tests\Fixtures\FooClassWithEnumAttribute
         public: true
-        arguments: [!php/const 'Symfony\Component\DependencyInjection\Tests\Fixtures\FooUnitEnum::BAZ']
+        arguments: [!php/enum 'Symfony\Component\DependencyInjection\Tests\Fixtures\FooUnitEnum::BAZ']

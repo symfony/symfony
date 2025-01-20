@@ -32,5 +32,5 @@ interface FileLocatorInterface
      *
      * @psalm-return ($first is true ? string : string[])
      */
-    public function locate(string $name, ?string $currentPath = null, bool $first = true);
+    public function locate(string $name, ?string $currentPath = null, bool $first = true): string|array;
 }

@@ -21,13 +21,11 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
  */
 final class WcswidthDataGenerator
 {
-    private string $outDir;
     private HttpClientInterface $client;
 
-    public function __construct(string $outDir)
-    {
-        $this->outDir = $outDir;
-
+    public function __construct(
+        private string $outDir,
+    ) {
         $this->client = HttpClient::createForBaseUri('https://www.unicode.org/Public/UNIDATA/');
     }
 
@@ -73,7 +71,7 @@ final class WcswidthDataGenerator
         $content = $this->getHeader($version).'return '.VarExporter::export($this->format($rawData)).";\n";
 
         if (!file_put_contents($this->outDir.'/'.$fileName, $content)) {
-            throw new RuntimeException(sprintf('The "%s" file could not be written.', $fileName));
+            throw new RuntimeException(\sprintf('The "%s" file could not be written.', $fileName));
         }
     }
 

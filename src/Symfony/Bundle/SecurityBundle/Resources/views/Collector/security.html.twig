@@ -29,23 +29,56 @@
             padding: 0 0 8px 0;
         }
 
+        #collector-content .authenticator-name {
+            align-items: center;
+            display: flex;
+            gap: 16px;
+        }
+
+        #collector-content .authenticators .toggle-button {
+            margin-left: auto;
+        }
+        #collector-content .authenticators .sf-toggle-on .toggle-button {
+            transform: rotate(180deg);
+        }
+        #collector-content .authenticators .toggle-button svg {
+            display: block;
+        }
+
+        #collector-content .authenticators th,
+        #collector-content .authenticators td {
+            vertical-align: baseline;
+        }
+        #collector-content .authenticators th,
+        #collector-content .authenticators td {
+            vertical-align: baseline;
+        }
+
+        #collector-content .authenticators .label {
+            display: block;
+            text-align: center;
+        }
+
+        #collector-content .authenticator-data {
+            box-shadow: none;
+            margin: 0;
+        }
+
+        #collector-content .authenticator-data tr:first-child th,
+        #collector-content .authenticator-data tr:first-child td {
+            border-top: 0;
+        }
+
         #collector-content .authenticators .badge {
             color: var(--white);
             display: inline-block;
-            text-align: center;
+            margin: 4px 0;
         }
         #collector-content .authenticators .badge.badge-resolved {
             background-color: var(--green-500);
         }
         #collector-content .authenticators .badge.badge-not_resolved {
             background-color: var(--yellow-500);
-        }
-
-        #collector-content .authenticators svg[data-icon-name="icon-tabler-check"] {
-            color: var(--green-500);
-        }
-        #collector-content .authenticators svg[data-icon-name="icon-tabler-x"] {
-            color: var(--red-500);
         }
     </style>
 {% endblock %}
@@ -181,6 +214,17 @@
                                 <span class="value">{{ source('@WebProfiler/Icon/' ~ (collector.authenticated ? 'yes' : 'no') ~ '.svg') }}</span>
                                 <span class="label">Authenticated</span>
                             </div>
+
+                            {% if collector.authProfileToken %}
+                                <div class="metric">
+                                    <span class="value">
+                                        <a href="{{ path('_profiler', {token: collector.authProfileToken, panel: 'security'}) }}">
+                                            {{- collector.authProfileToken -}}
+                                        </a>
+                                    </span>
+                                    <span class="label">From</span>
+                                </div>
+                            {% endif %}
                         </div>
 
                         <table>
@@ -219,7 +263,15 @@
                         </table>
                     {% elseif collector.enabled %}
                         <div class="empty">
-                            <p>There is no security token.</p>
+                            <p>
+                                There is no security token.
+                                {% if collector.deauthProfileToken %}
+                                    It was removed in
+                                    <a href="{{ path('_profiler', {token: collector.deauthProfileToken, panel: 'security'}) }}">
+                                        {{- collector.deauthProfileToken -}}
+                                    </a>.
+                                {% endif %}
+                            </p>
                         </div>
                     {% endif %}
                 </div>
@@ -318,7 +370,7 @@
 
                                 <tr>
                                     <td class="font-normal">{{ profiler_dump(listener.stub) }}</td>
-                                    <td class="no-wrap">{{ '%0.2f'|format(listener.time * 1000) }} ms</td>
+                                    <td class="no-wrap">{{ listener.time is null ? '(none)' : '%0.2f ms'|format(listener.time * 1000) }}</td>
                                     <td class="font-normal">{{ listener.response ? profiler_dump(listener.response) : '(none)' }}</td>
                                 </tr>
 
@@ -336,48 +388,90 @@
                 <div class="tab-content">
                     {% if collector.authenticators|default([]) is not empty %}
                         <table class="authenticators">
+                            <colgroup>
+                                <col>
+                                <col style="width: 100%">
+                            </colgroup>
                             <thead>
                             <tr>
-                                <th>Authenticator</th>
-                                <th>Supports</th>
-                                <th>Authenticated</th>
-                                <th>Duration</th>
-                                <th>Passport</th>
-                                <th>Badges</th>
+                                <th scope="col">Status</th>
+                                <th scope="col">Authenticator</th>
                             </tr>
                             </thead>
-
-                            {% set previous_event = (collector.listeners|first) %}
-                            {% for authenticator in collector.authenticators %}
-                                {% if loop.first or authenticator != previous_event %}
-                                    {% if not loop.first %}
-                                        </tbody>
-                                    {% endif %}
-
-                                    <tbody>
-                                    {% set previous_event = authenticator %}
-                                {% endif %}
-
-                                <tr>
-                                    <td class="font-normal">{{ profiler_dump(authenticator.stub) }}</td>
-                                    <td class="no-wrap">{{ source('@WebProfiler/Icon/' ~ (authenticator.supports ? 'yes' : 'no') ~ '.svg') }}</td>
-                                    <td class="no-wrap">{{ authenticator.authenticated is not null ? source('@WebProfiler/Icon/' ~ (authenticator.authenticated ? 'yes' : 'no') ~ '.svg') : '' }}</td>
-                                    <td class="no-wrap">{{ '%0.2f'|format(authenticator.duration * 1000) }} ms</td>
-                                    <td class="font-normal">{{ authenticator.passport ? profiler_dump(authenticator.passport) : '(none)' }}</td>
-                                    <td class="font-normal">
-                                        {% for badge in authenticator.badges ?? [] %}
-                                            <span class="badge badge-{{ badge.resolved ? 'resolved' : 'not_resolved' }}">
-                                            {{ badge.stub|abbr_class }}
-                                            </span>
+                            {% for i, authenticator in collector.authenticators %}
+                                <tr class="sf-toggle"
+                                    data-toggle-selector="#authenticator-{{ i }}"
+                                    data-toggle-initial="{{ authenticator.authenticated is not null ? 'display' }}"
+                                >
+                                    <td class="font-normal text-small">
+                                        {% if authenticator.authenticated %}
+                                            {% set status_text, label_status = 'success', 'success' %}
+                                        {% elseif authenticator.authenticated is null %}
+                                            {% set status_text, label_status = 'skipped', false %}
                                         {% else %}
-                                            (none)
-                                        {% endfor %}
+                                            {% set status_text, label_status = 'failure', 'error' %}
+                                        {% endif %}
+                                        <span class="label {{ label_status ? 'status-' ~ label_status }}">{{ status_text }}</span>
+                                    </td>
+                                    <td>
+                                        <span class="authenticator-name">
+                                            {{ profiler_dump(authenticator.stub) }}
+                                            <button class="btn btn-link toggle-button" type="button">
+                                                {{ source('@WebProfiler/Icon/chevron-down.svg') }}
+                                            </button>
+                                        </span>
+                                        <div id="authenticator-{{ i }}" class="font-normal">
+                                            {% if authenticator.supports is same as(false) %}
+                                                <div class="empty">
+                                                    <p>This authenticator did not support the request.</p>
+                                                </div>
+                                            {% elseif authenticator.authenticated is null %}
+                                                <div class="empty">
+                                                    <p>An authenticator ran before this one.</p>
+                                                </div>
+                                            {% else %}
+                                                <table class="authenticator-data">
+                                                    <colgroup>
+                                                        <col>
+                                                        <col style="width: 100%">
+                                                    </colgroup>
+                                                    <tr>
+                                                        <th scope="row">Lazy</th>
+                                                        <td>{{ authenticator.supports is null ? 'yes' : 'no' }}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th scope="row">Duration</th>
+                                                        <td>{{ '%0.2f ms'|format(authenticator.duration * 1000) }}</td>
+                                                    </tr>
+                                                    {% if authenticator.passport %}
+                                                        <tr>
+                                                            <th scope="row">Passport</th>
+                                                            <td>{{ profiler_dump(authenticator.passport) }}</td>
+                                                        </tr>
+                                                    {% endif %}
+                                                    {% if authenticator.badges %}
+                                                        <tr>
+                                                            <th scope="row">Badges</th>
+                                                            <td>
+                                                                {% for badge in authenticator.badges %}
+                                                                    <span class="badge badge-{{ badge.resolved ? 'resolved' : 'not_resolved' }}">
+                                                                        {{ badge.stub|abbr_class }}
+                                                                    </span>
+                                                                {% endfor %}
+                                                            </td>
+                                                        </tr>
+                                                    {% endif %}
+                                                    {% if authenticator.exception %}
+                                                        <tr>
+                                                            <th scope="row">Exception</th>
+                                                            <td>{{ profiler_dump(authenticator.exception) }}</td>
+                                                        </tr>
+                                                    {% endif %}
+                                                </table>
+                                            {% endif %}
+                                        </div>
                                     </td>
                                 </tr>
-
-                                {% if loop.last %}
-                                    </tbody>
-                                {% endif %}
                             {% endfor %}
                         </table>
                     {% else %}

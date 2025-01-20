@@ -21,7 +21,6 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\ConsoleOutputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
-use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 use Symfony\Component\HttpKernel\Kernel;
 use Symfony\Component\HttpKernel\KernelInterface;
@@ -31,14 +30,12 @@ use Symfony\Component\HttpKernel\KernelInterface;
  */
 class Application extends BaseApplication
 {
-    private KernelInterface $kernel;
     private bool $commandsRegistered = false;
     private array $registrationErrors = [];
 
-    public function __construct(KernelInterface $kernel)
-    {
-        $this->kernel = $kernel;
-
+    public function __construct(
+        private KernelInterface $kernel,
+    ) {
         parent::__construct('Symfony', Kernel::VERSION);
 
         $inputDefinition = $this->getDefinition();
@@ -147,14 +144,7 @@ class Application extends BaseApplication
     {
         $this->registerCommands();
 
-        $command = parent::get($name);
-
-        if ($command instanceof ContainerAwareInterface) {
-            trigger_deprecation('symfony/dependency-injection', '6.4', 'Relying on "%s" to get the container in "%s" is deprecated, register the command as a service and use dependency injection instead.', ContainerAwareInterface::class, get_debug_type($command));
-            $command->setContainer($this->kernel->getContainer());
-        }
-
-        return $command;
+        return parent::get($name);
     }
 
     public function all(?string $namespace = null): array
@@ -166,7 +156,7 @@ class Application extends BaseApplication
 
     public function getLongVersion(): string
     {
-        return parent::getLongVersion().sprintf(' (env: <comment>%s</>, debug: <comment>%s</>)', $this->kernel->getEnvironment(), $this->kernel->isDebug() ? 'true' : 'false');
+        return parent::getLongVersion().\sprintf(' (env: <comment>%s</>, debug: <comment>%s</>)', $this->kernel->getEnvironment(), $this->kernel->isDebug() ? 'true' : 'false');
     }
 
     public function add(Command $command): ?Command
@@ -176,10 +166,7 @@ class Application extends BaseApplication
         return parent::add($command);
     }
 
-    /**
-     * @return void
-     */
-    protected function registerCommands()
+    protected function registerCommands(): void
     {
         if ($this->commandsRegistered) {
             return;

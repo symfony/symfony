@@ -14,28 +14,12 @@ namespace Symfony\Component\HttpKernel\Tests\Controller\ArgumentResolver;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Controller\ArgumentResolver\TraceableValueResolver;
-use Symfony\Component\HttpKernel\Controller\ArgumentValueResolverInterface;
+use Symfony\Component\HttpKernel\Controller\ValueResolverInterface;
 use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
 use Symfony\Component\Stopwatch\Stopwatch;
 
 class TraceableValueResolverTest extends TestCase
 {
-    /**
-     * @group legacy
-     */
-    public function testTimingsInSupports()
-    {
-        $stopwatch = new Stopwatch();
-        $resolver = new TraceableValueResolver(new ResolverStub(), $stopwatch);
-        $argument = new ArgumentMetadata('dummy', 'string', false, false, null);
-        $request = new Request();
-
-        $this->assertTrue($resolver->supports($request, $argument));
-
-        $event = $stopwatch->getEvent(ResolverStub::class.'::supports');
-        $this->assertCount(1, $event->getPeriods());
-    }
-
     public function testTimingsInResolve()
     {
         $stopwatch = new Stopwatch();
@@ -64,13 +48,8 @@ class TraceableValueResolverTest extends TestCase
     }
 }
 
-class ResolverStub implements ArgumentValueResolverInterface
+class ResolverStub implements ValueResolverInterface
 {
-    public function supports(Request $request, ArgumentMetadata $argument): bool
-    {
-        return true;
-    }
-
     public function resolve(Request $request, ArgumentMetadata $argument): iterable
     {
         yield 'first';

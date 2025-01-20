@@ -26,8 +26,6 @@ class DirectoryLoaderTest extends TestCase
 
     protected function setUp(): void
     {
-        parent::setUp();
-
         $locator = new FileLocator();
         $this->loader = new DirectoryLoader($locator);
         $resolver = new LoaderResolver([

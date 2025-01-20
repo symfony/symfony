@@ -91,7 +91,7 @@ class HtmlDescriptorTest extends TestCase
         [DUMPED]
     </section>
 </article>
-TXT
+TXT,
         ];
 
         yield 'source full' => [
@@ -127,7 +127,7 @@ TXT
         [DUMPED]
     </section>
 </article>
-TXT
+TXT,
         ];
 
         yield 'cli' => [
@@ -155,7 +155,7 @@ TXT
         [DUMPED]
     </section>
 </article>
-TXT
+TXT,
         ];
 
         yield 'request' => [
@@ -189,7 +189,7 @@ TXT
         [DUMPED]
     </section>
 </article>
-TXT
+TXT,
         ];
     }
 }

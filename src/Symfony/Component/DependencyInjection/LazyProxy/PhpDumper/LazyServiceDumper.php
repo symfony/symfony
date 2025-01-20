@@ -32,7 +32,7 @@ final class LazyServiceDumper implements DumperInterface
 
         if ($definition->hasTag('proxy')) {
             if (!$definition->isLazy()) {
-                throw new InvalidArgumentException(sprintf('Invalid definition for service "%s": setting the "proxy" tag on a service requires it to be "lazy".', $id ?? $definition->getClass()));
+                throw new InvalidArgumentException(\sprintf('Invalid definition for service "%s": setting the "proxy" tag on a service requires it to be "lazy".', $id ?? $definition->getClass()));
             }
 
             return true;
@@ -69,7 +69,7 @@ final class LazyServiceDumper implements DumperInterface
         $instantiation = 'return';
 
         if ($definition->isShared()) {
-            $instantiation .= sprintf(' $container->%s[%s] =', $definition->isPublic() && !$definition->isPrivate() ? 'services' : 'privates', var_export($id, true));
+            $instantiation .= \sprintf(' $container->%s[%s] =', $definition->isPublic() && !$definition->isPrivate() ? 'services' : 'privates', var_export($id, true));
         }
 
         $asGhostObject = str_contains($factoryCode, '$proxy');
@@ -85,7 +85,7 @@ final class LazyServiceDumper implements DumperInterface
             EOF;
         }
 
-        $factoryCode = sprintf('static fn ($proxy) => %s', $factoryCode);
+        $factoryCode = \sprintf('static fn ($proxy) => %s', $factoryCode);
 
         return <<<EOF
                 if (true === \$lazyLoad) {
@@ -99,15 +99,15 @@ final class LazyServiceDumper implements DumperInterface
     public function getProxyCode(Definition $definition, ?string $id = null): string
     {
         if (!$this->isProxyCandidate($definition, $asGhostObject, $id)) {
-            throw new InvalidArgumentException(sprintf('Cannot instantiate lazy proxy for service "%s".', $id ?? $definition->getClass()));
+            throw new InvalidArgumentException(\sprintf('Cannot instantiate lazy proxy for service "%s".', $id ?? $definition->getClass()));
         }
         $proxyClass = $this->getProxyClass($definition, $asGhostObject, $class);
 
         if ($asGhostObject) {
             try {
-                return (\PHP_VERSION_ID >= 80200 && $class?->isReadOnly() ? 'readonly ' : '').'class '.$proxyClass.ProxyHelper::generateLazyGhost($class);
+                return ($class?->isReadOnly() ? 'readonly ' : '').'class '.$proxyClass.ProxyHelper::generateLazyGhost($class);
             } catch (LogicException $e) {
-                throw new InvalidArgumentException(sprintf('Cannot generate lazy ghost for service "%s".', $id ?? $definition->getClass()), 0, $e);
+                throw new InvalidArgumentException(\sprintf('Cannot generate lazy ghost for service "%s".', $id ?? $definition->getClass()), 0, $e);
             }
         }
         $interfaces = [];
@@ -115,13 +115,13 @@ final class LazyServiceDumper implements DumperInterface
         if ($definition->hasTag('proxy')) {
             foreach ($definition->getTag('proxy') as $tag) {
                 if (!isset($tag['interface'])) {
-                    throw new InvalidArgumentException(sprintf('Invalid definition for service "%s": the "interface" attribute is missing on a "proxy" tag.', $id ?? $definition->getClass()));
+                    throw new InvalidArgumentException(\sprintf('Invalid definition for service "%s": the "interface" attribute is missing on a "proxy" tag.', $id ?? $definition->getClass()));
                 }
                 if (!interface_exists($tag['interface']) && !class_exists($tag['interface'], false)) {
-                    throw new InvalidArgumentException(sprintf('Invalid definition for service "%s": several "proxy" tags found but "%s" is not an interface.', $id ?? $definition->getClass(), $tag['interface']));
+                    throw new InvalidArgumentException(\sprintf('Invalid definition for service "%s": several "proxy" tags found but "%s" is not an interface.', $id ?? $definition->getClass(), $tag['interface']));
                 }
                 if ('object' !== $definition->getClass() && !is_a($class->name, $tag['interface'], true)) {
-                    throw new InvalidArgumentException(sprintf('Invalid "proxy" tag for service "%s": class "%s" doesn\'t implement "%s".', $id ?? $definition->getClass(), $definition->getClass(), $tag['interface']));
+                    throw new InvalidArgumentException(\sprintf('Invalid "proxy" tag for service "%s": class "%s" doesn\'t implement "%s".', $id ?? $definition->getClass(), $definition->getClass(), $tag['interface']));
                 }
                 $interfaces[] = new \ReflectionClass($tag['interface']);
             }
@@ -133,9 +133,9 @@ final class LazyServiceDumper implements DumperInterface
         }
 
         try {
-            return (\PHP_VERSION_ID >= 80200 && $class?->isReadOnly() ? 'readonly ' : '').'class '.$proxyClass.ProxyHelper::generateLazyProxy($class, $interfaces);
+            return ($class?->isReadOnly() ? 'readonly ' : '').'class '.$proxyClass.ProxyHelper::generateLazyProxy($class, $interfaces);
         } catch (LogicException $e) {
-            throw new InvalidArgumentException(sprintf('Cannot generate lazy proxy for service "%s".', $id ?? $definition->getClass()), 0, $e);
+            throw new InvalidArgumentException(\sprintf('Cannot generate lazy proxy for service "%s".', $id ?? $definition->getClass()), 0, $e);
         }
     }
 
@@ -146,6 +146,6 @@ final class LazyServiceDumper implements DumperInterface
 
         return preg_replace('/^.*\\\\/', '', $definition->getClass())
             .($asGhostObject ? 'Ghost' : 'Proxy')
-            .ucfirst(substr(hash('sha256', $this->salt.'+'.$class->name.'+'.serialize($definition->getTag('proxy'))), -7));
+            .ucfirst(substr(hash('xxh128', $this->salt.'+'.$class->name.'+'.serialize($definition->getTag('proxy'))), -7));
     }
 }

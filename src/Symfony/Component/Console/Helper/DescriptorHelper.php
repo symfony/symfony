@@ -50,11 +50,9 @@ class DescriptorHelper extends Helper
      * * format: string, the output format name
      * * raw_text: boolean, sets output type as raw
      *
-     * @return void
-     *
      * @throws InvalidArgumentException when the given format is not supported
      */
-    public function describe(OutputInterface $output, ?object $object, array $options = [])
+    public function describe(OutputInterface $output, ?object $object, array $options = []): void
     {
         $options = array_merge([
             'raw_text' => false,
@@ -62,7 +60,7 @@ class DescriptorHelper extends Helper
         ], $options);
 
         if (!isset($this->descriptors[$options['format']])) {
-            throw new InvalidArgumentException(sprintf('Unsupported format "%s".', $options['format']));
+            throw new InvalidArgumentException(\sprintf('Unsupported format "%s".', $options['format']));
         }
 
         $descriptor = $this->descriptors[$options['format']];

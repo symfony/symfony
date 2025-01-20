@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+7.2
+---
+
+ * Add capability to skip missed periodic tasks, only the last schedule will be called
+
 6.4
 ---
 

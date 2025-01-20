@@ -20,7 +20,7 @@ class UrlTypeValidatorExtensionTest extends BaseValidatorExtensionTestCase
 
     protected function createForm(array $options = [])
     {
-        return $this->factory->create(UrlType::class, null, $options);
+        return $this->factory->create(UrlType::class, null, $options + ['default_protocol' => 'http']);
     }
 
     public function testInvalidMessage()

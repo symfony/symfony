@@ -67,7 +67,7 @@ final class MicrosoftTeamsOptionsTest extends TestCase
         $recipient = 'foo';
 
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage(sprintf('"%s" require recipient id format to be "/webhookb2/{uuid}@{uuid}/IncomingWebhook/{id}/{uuid}", "%s" given.', MicrosoftTeamsOptions::class, $recipient));
+        $this->expectExceptionMessage(\sprintf('"%s" require recipient id format to be "/webhookb2/{uuid}@{uuid}/IncomingWebhook/{id}/{uuid}", "%s" given.', MicrosoftTeamsOptions::class, $recipient));
 
         $options->recipient($recipient);
     }

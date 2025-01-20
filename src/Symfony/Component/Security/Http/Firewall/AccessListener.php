@@ -30,19 +30,15 @@ use Symfony\Component\Security\Http\Event\LazyResponseEvent;
  */
 class AccessListener extends AbstractListener
 {
-    private TokenStorageInterface $tokenStorage;
-    private AccessDecisionManagerInterface $accessDecisionManager;
-    private AccessMapInterface $map;
-
-    public function __construct(TokenStorageInterface $tokenStorage, AccessDecisionManagerInterface $accessDecisionManager, AccessMapInterface $map, bool $exceptionOnNoToken = false)
-    {
+    public function __construct(
+        private TokenStorageInterface $tokenStorage,
+        private AccessDecisionManagerInterface $accessDecisionManager,
+        private AccessMapInterface $map,
+        bool $exceptionOnNoToken = false,
+    ) {
         if (false !== $exceptionOnNoToken) {
-            throw new \LogicException(sprintf('Argument $exceptionOnNoToken of "%s()" must be set to "false".', __METHOD__));
+            throw new \LogicException(\sprintf('Argument $exceptionOnNoToken of "%s()" must be set to "false".', __METHOD__));
         }
-
-        $this->tokenStorage = $tokenStorage;
-        $this->accessDecisionManager = $accessDecisionManager;
-        $this->map = $map;
     }
 
     public function supports(Request $request): ?bool

@@ -62,7 +62,7 @@ class CacheClearCommandTest extends TestCase
             $configCacheFactory->cache(
                 substr($file, 0, -5),
                 function () use ($file) {
-                    $this->fail(sprintf('Meta file "%s" is not fresh', (string) $file));
+                    $this->fail(\sprintf('Meta file "%s" is not fresh', (string) $file));
                 }
             );
         }
@@ -75,7 +75,7 @@ class CacheClearCommandTest extends TestCase
         $kernelRef = new \ReflectionObject($this->kernel);
         $kernelFile = $kernelRef->getFileName();
         /** @var ResourceInterface[] $meta */
-        $meta = unserialize(file_get_contents($containerMetaFile));
+        $meta = unserialize($this->fs->readFile($containerMetaFile));
         $found = false;
         foreach ($meta as $resource) {
             if ((string) $resource === $kernelFile) {
@@ -92,8 +92,8 @@ class CacheClearCommandTest extends TestCase
             $containerRef->getFileName()
         );
         $this->assertMatchesRegularExpression(
-            sprintf('/\'kernel.container_class\'\s*=>\s*\'%s\'/', $containerClass),
-            file_get_contents($containerFile),
+            \sprintf('/\'kernel.container_class\'\s*=>\s*\'%s\'/', $containerClass),
+            $this->fs->readFile($containerFile),
             'kernel.container_class is properly set on the dumped container'
         );
     }

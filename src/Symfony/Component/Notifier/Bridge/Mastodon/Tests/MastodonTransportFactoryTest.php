@@ -12,13 +12,16 @@
 namespace Symfony\Component\Notifier\Bridge\Mastodon\Tests;
 
 use Symfony\Component\Notifier\Bridge\Mastodon\MastodonTransportFactory;
-use Symfony\Component\Notifier\Test\TransportFactoryTestCase;
+use Symfony\Component\Notifier\Test\AbstractTransportFactoryTestCase;
+use Symfony\Component\Notifier\Test\IncompleteDsnTestTrait;
 
 /**
  * @author Quentin Dequippe <quentin@dequippe.tech>
  */
-class MastodonTransportFactoryTest extends TransportFactoryTestCase
+class MastodonTransportFactoryTest extends AbstractTransportFactoryTestCase
 {
+    use IncompleteDsnTestTrait;
+
     public function createFactory(): MastodonTransportFactory
     {
         return new MastodonTransportFactory();

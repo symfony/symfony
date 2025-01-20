@@ -7,7 +7,7 @@ use Symfony\Component\Routing\Tests\Fixtures\Attributes\FooAttributes;
 #[FooAttributes(
     foo: [
         'bar' => ['foo','bar'],
-        'foo'
+        'foo',
     ],
     class: \stdClass::class
 )]

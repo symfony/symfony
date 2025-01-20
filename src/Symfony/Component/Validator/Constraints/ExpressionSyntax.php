@@ -14,8 +14,7 @@ namespace Symfony\Component\Validator\Constraints;
 use Symfony\Component\Validator\Constraint;
 
 /**
- * @Annotation
- * @Target({"PROPERTY", "METHOD", "ANNOTATION"})
+ * Validates that a value is valid as an ExpressionLanguage expression.
  *
  * @author Andrey Sevastianov <mrpkmail@gmail.com>
  */
@@ -28,10 +27,16 @@ class ExpressionSyntax extends Constraint
         self::EXPRESSION_SYNTAX_ERROR => 'EXPRESSION_SYNTAX_ERROR',
     ];
 
-    public $message = 'This value should be a valid expression.';
-    public $service;
-    public $allowedVariables;
+    public string $message = 'This value should be a valid expression.';
+    public ?string $service = null;
+    public ?array $allowedVariables = null;
 
+    /**
+     * @param array<string,mixed>|null $options
+     * @param non-empty-string|null    $service          The service used to validate the constraint instead of the default one
+     * @param string[]|null            $allowedVariables Restrict the available variables in the expression to these values (defaults to null that allows any variable)
+     * @param string[]|null            $groups
+     */
     public function __construct(?array $options = null, ?string $message = null, ?string $service = null, ?array $allowedVariables = null, ?array $groups = null, mixed $payload = null)
     {
         parent::__construct($options, $groups, $payload);

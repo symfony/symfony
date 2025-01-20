@@ -13,7 +13,6 @@ namespace Symfony\Component\HttpFoundation\Tests\Test\Constraint;
 
 use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Framework\TestCase;
-use PHPUnit\Framework\TestFailure;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Test\Constraint\ResponseHasHeader;
 
@@ -26,14 +25,9 @@ class ResponseHasHeaderTest extends TestCase
         $constraint = new ResponseHasHeader('X-Date');
         $this->assertFalse($constraint->evaluate(new Response(), '', true));
 
-        try {
-            $constraint->evaluate(new Response());
-        } catch (ExpectationFailedException $e) {
-            $this->assertEquals("Failed asserting that the Response has header \"X-Date\".\n", TestFailure::exceptionToString($e));
+        $this->expectException(ExpectationFailedException::class);
+        $this->expectExceptionMessage('Failed asserting that the Response has header "X-Date".');
 
-            return;
-        }
-
-        $this->fail();
+        $constraint->evaluate(new Response());
     }
 }

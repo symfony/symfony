@@ -18,6 +18,6 @@ class FooController
 {
     public function __invoke(UserInterface $user): JsonResponse
     {
-        return new JsonResponse(['message' => sprintf('Welcome @%s!', $user->getUserIdentifier())]);
+        return new JsonResponse(['message' => \sprintf('Welcome @%s!', $user->getUserIdentifier())]);
     }
 }

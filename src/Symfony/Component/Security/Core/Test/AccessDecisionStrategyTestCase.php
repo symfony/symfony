@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Security\Core\Test;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\AccessDecisionManager;
@@ -29,6 +30,7 @@ abstract class AccessDecisionStrategyTestCase extends TestCase
      *
      * @param VoterInterface[] $voters
      */
+    #[DataProvider('provideStrategyTests')]
     final public function testDecide(AccessDecisionStrategyInterface $strategy, array $voters, bool $expected)
     {
         $token = $this->createMock(TokenInterface::class);
@@ -64,11 +66,9 @@ abstract class AccessDecisionStrategyTestCase extends TestCase
     final protected static function getVoter(int $vote): VoterInterface
     {
         return new class($vote) implements VoterInterface {
-            private int $vote;
-
-            public function __construct(int $vote)
-            {
-                $this->vote = $vote;
+            public function __construct(
+                private int $vote,
+            ) {
             }
 
             public function vote(TokenInterface $token, $subject, array $attributes): int

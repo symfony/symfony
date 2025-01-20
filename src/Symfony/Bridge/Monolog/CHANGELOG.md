@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+7.0
+---
+
+ * Drop support for monolog < 3.0
+ * Remove class `Logger`, use HttpKernel's `DebugLoggerConfigurator` instead
+
 6.4
 ---
 

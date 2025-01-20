@@ -24,7 +24,27 @@ class DefaultMarshallerTest extends TestCase
             'b' => function () {},
         ];
 
-        $expected = ['a' => \extension_loaded('igbinary') && (version_compare('3.1.6', phpversion('igbinary'), '<=')) ? igbinary_serialize(123) : serialize(123)];
+        $expected = ['a' => serialize(123)];
+        $this->assertSame($expected, $marshaller->marshall($values, $failed));
+        $this->assertSame(['b'], $failed);
+    }
+
+    /**
+     * @requires extension igbinary
+     */
+    public function testIgbinarySerialize()
+    {
+        if (version_compare('3.1.6', phpversion('igbinary'), '>')) {
+            $this->markTestSkipped('igbinary needs to be v3.1.6 or higher.');
+        }
+
+        $marshaller = new DefaultMarshaller(true);
+        $values = [
+            'a' => 123,
+            'b' => function () {},
+        ];
+
+        $expected = ['a' => igbinary_serialize(123)];
         $this->assertSame($expected, $marshaller->marshall($values, $failed));
         $this->assertSame(['b'], $failed);
     }

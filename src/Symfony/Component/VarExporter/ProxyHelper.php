@@ -27,20 +27,20 @@ final class ProxyHelper
      */
     public static function generateLazyGhost(\ReflectionClass $class): string
     {
-        if (\PHP_VERSION_ID >= 80200 && \PHP_VERSION_ID < 80300 && $class->isReadOnly()) {
-            throw new LogicException(sprintf('Cannot generate lazy ghost with PHP < 8.3: class "%s" is readonly.', $class->name));
+        if (\PHP_VERSION_ID < 80300 && $class->isReadOnly()) {
+            throw new LogicException(\sprintf('Cannot generate lazy ghost with PHP < 8.3: class "%s" is readonly.', $class->name));
         }
         if ($class->isFinal()) {
-            throw new LogicException(sprintf('Cannot generate lazy ghost: class "%s" is final.', $class->name));
+            throw new LogicException(\sprintf('Cannot generate lazy ghost: class "%s" is final.', $class->name));
         }
         if ($class->isInterface() || $class->isAbstract()) {
-            throw new LogicException(sprintf('Cannot generate lazy ghost: "%s" is not a concrete class.', $class->name));
+            throw new LogicException(\sprintf('Cannot generate lazy ghost: "%s" is not a concrete class.', $class->name));
         }
         if (\stdClass::class !== $class->name && $class->isInternal()) {
-            throw new LogicException(sprintf('Cannot generate lazy ghost: class "%s" is internal.', $class->name));
+            throw new LogicException(\sprintf('Cannot generate lazy ghost: class "%s" is internal.', $class->name));
         }
         if ($class->hasMethod('__get') && 'mixed' !== (self::exportType($class->getMethod('__get')) ?? 'mixed')) {
-            throw new LogicException(sprintf('Cannot generate lazy ghost: return type of method "%s::__get()" should be "mixed".', $class->name));
+            throw new LogicException(\sprintf('Cannot generate lazy ghost: return type of method "%s::__get()" should be "mixed".', $class->name));
         }
 
         static $traitMethods;
@@ -48,14 +48,14 @@ final class ProxyHelper
 
         foreach ($traitMethods as $method) {
             if ($class->hasMethod($method->name) && $class->getMethod($method->name)->isFinal()) {
-                throw new LogicException(sprintf('Cannot generate lazy ghost: method "%s::%s()" is final.', $class->name, $method->name));
+                throw new LogicException(\sprintf('Cannot generate lazy ghost: method "%s::%s()" is final.', $class->name, $method->name));
             }
         }
 
         $parent = $class;
         while ($parent = $parent->getParentClass()) {
             if (\stdClass::class !== $parent->name && $parent->isInternal()) {
-                throw new LogicException(sprintf('Cannot generate lazy ghost: class "%s" extends "%s" which is internal.', $class->name, $parent->name));
+                throw new LogicException(\sprintf('Cannot generate lazy ghost: class "%s" extends "%s" which is internal.', $class->name, $parent->name));
             }
         }
         $propertyScopes = self::exportPropertyScopes($class->name);
@@ -86,19 +86,19 @@ final class ProxyHelper
     public static function generateLazyProxy(?\ReflectionClass $class, array $interfaces = []): string
     {
         if (!class_exists($class?->name ?? \stdClass::class, false)) {
-            throw new LogicException(sprintf('Cannot generate lazy proxy: "%s" is not a class.', $class->name));
+            throw new LogicException(\sprintf('Cannot generate lazy proxy: "%s" is not a class.', $class->name));
         }
         if ($class?->isFinal()) {
-            throw new LogicException(sprintf('Cannot generate lazy proxy: class "%s" is final.', $class->name));
+            throw new LogicException(\sprintf('Cannot generate lazy proxy: class "%s" is final.', $class->name));
         }
-        if (\PHP_VERSION_ID >= 80200 && \PHP_VERSION_ID < 80300 && $class?->isReadOnly()) {
-            throw new LogicException(sprintf('Cannot generate lazy proxy with PHP < 8.3: class "%s" is readonly.', $class->name));
+        if (\PHP_VERSION_ID < 80300 && $class?->isReadOnly()) {
+            throw new LogicException(\sprintf('Cannot generate lazy proxy with PHP < 8.3: class "%s" is readonly.', $class->name));
         }
 
         $methodReflectors = [$class?->getMethods(\ReflectionMethod::IS_PUBLIC | \ReflectionMethod::IS_PROTECTED) ?? []];
         foreach ($interfaces as $interface) {
             if (!$interface->isInterface()) {
-                throw new LogicException(sprintf('Cannot generate lazy proxy: "%s" is not an interface.', $interface->name));
+                throw new LogicException(\sprintf('Cannot generate lazy proxy: "%s" is not an interface.', $interface->name));
             }
             $methodReflectors[] = $interface->getMethods();
         }
@@ -134,7 +134,7 @@ final class ProxyHelper
             }
             if ($method->isFinal()) {
                 if ($extendsInternalClass || $methodsHaveToBeProxied || method_exists(LazyProxyTrait::class, $method->name)) {
-                    throw new LogicException(sprintf('Cannot generate lazy proxy: method "%s::%s()" is final.', $class->name, $method->name));
+                    throw new LogicException(\sprintf('Cannot generate lazy proxy: method "%s::%s()" is final.', $class->name, $method->name));
                 }
                 continue;
             }
@@ -264,7 +264,7 @@ final class ProxyHelper
             $args = substr($args, 0, -2);
         } else {
             $args = explode(', ', $args, 1 + $byRefIndex);
-            $args[$byRefIndex] = sprintf('...\array_slice(\func_get_args(), %d)', $byRefIndex);
+            $args[$byRefIndex] = \sprintf('...\array_slice(\func_get_args(), %d)', $byRefIndex);
             $args = implode(', ', $args);
         }
 
@@ -355,9 +355,8 @@ final class ProxyHelper
         $propertyScopes = VarExporter::export($propertyScopes);
         $propertyScopes = str_replace(VarExporter::export($parent), 'parent::class', $propertyScopes);
         $propertyScopes = preg_replace("/(?|(,)\n( )       |\n        |,\n    (\]))/", '$1$2', $propertyScopes);
-        $propertyScopes = str_replace("\n", "\n    ", $propertyScopes);
 
-        return $propertyScopes;
+        return str_replace("\n", "\n    ", $propertyScopes);
     }
 
     private static function exportDefault(\ReflectionParameter $param, $namespace): string

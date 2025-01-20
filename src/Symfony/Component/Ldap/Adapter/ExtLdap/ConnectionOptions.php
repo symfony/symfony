@@ -65,7 +65,7 @@ final class ConnectionOptions
 
     public static function getOptionName(string $name): string
     {
-        return sprintf('%s::%s', self::class, strtoupper($name));
+        return \sprintf('%s::%s', self::class, strtoupper($name));
     }
 
     /**
@@ -80,7 +80,7 @@ final class ConnectionOptions
         $constantName = self::getOptionName($name);
 
         if (!\defined($constantName)) {
-            throw new LdapException(sprintf('Unknown option "%s".', $name));
+            throw new LdapException(\sprintf('Unknown option "%s".', $name));
         }
 
         return \constant($constantName);

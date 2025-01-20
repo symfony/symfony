@@ -88,6 +88,7 @@ class SesHttpAsyncAwsTransportTest extends TestCase
             $this->assertSame('aws-configuration-set-name', $body['ConfigurationSetName']);
             $this->assertSame('aws-source-arn', $body['FromEmailAddressIdentityArn']);
             $this->assertSame([['Name' => 'tagName1', 'Value' => 'tag Value1'], ['Name' => 'tagName2', 'Value' => 'tag Value2']], $body['EmailTags']);
+            $this->assertSame(['ContactListName' => 'TestContactList', 'TopicName' => 'TestNewsletter'], $body['ListManagementOptions']);
 
             $json = '{"MessageId": "foobar"}';
 
@@ -106,6 +107,7 @@ class SesHttpAsyncAwsTransportTest extends TestCase
 
         $mail->getHeaders()->addTextHeader('X-SES-CONFIGURATION-SET', 'aws-configuration-set-name');
         $mail->getHeaders()->addTextHeader('X-SES-SOURCE-ARN', 'aws-source-arn');
+        $mail->getHeaders()->addTextHeader('X-SES-LIST-MANAGEMENT-OPTIONS', 'contactListName=TestContactList;topicName=TestNewsletter');
         $mail->getHeaders()->add(new MetadataHeader('tagName1', 'tag Value1'));
         $mail->getHeaders()->add(new MetadataHeader('tagName2', 'tag Value2'));
 

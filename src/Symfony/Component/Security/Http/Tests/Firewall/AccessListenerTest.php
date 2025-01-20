@@ -32,7 +32,6 @@ class AccessListenerTest extends TestCase
 {
     public function testHandleWhenTheAccessDecisionManagerDecidesToRefuseAccess()
     {
-        $this->expectException(AccessDeniedException::class);
         $request = new Request();
 
         $accessMap = $this->createMock(AccessMapInterface::class);
@@ -43,7 +42,7 @@ class AccessListenerTest extends TestCase
             ->willReturn([['foo' => 'bar'], null])
         ;
 
-        $token = new class() extends AbstractToken {
+        $token = new class extends AbstractToken {
             public function getCredentials(): mixed
             {
             }
@@ -69,6 +68,8 @@ class AccessListenerTest extends TestCase
             $accessDecisionManager,
             $accessMap
         );
+
+        $this->expectException(AccessDeniedException::class);
 
         $listener(new RequestEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST));
     }
@@ -131,7 +132,6 @@ class AccessListenerTest extends TestCase
 
     public function testHandleWhenTheSecurityTokenStorageHasNoToken()
     {
-        $this->expectException(AccessDeniedException::class);
         $tokenStorage = new TokenStorage();
         $request = new Request();
 
@@ -154,6 +154,8 @@ class AccessListenerTest extends TestCase
             $accessMap,
             false
         );
+
+        $this->expectException(AccessDeniedException::class);
 
         $listener(new RequestEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST));
     }

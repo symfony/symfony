@@ -46,8 +46,4 @@ class DummyAuthenticator implements AuthenticatorInterface
     {
         return null;
     }
-
-    public function createAuthenticatedToken(PassportInterface $passport, string $firewallName): TokenInterface
-    {
-    }
 }

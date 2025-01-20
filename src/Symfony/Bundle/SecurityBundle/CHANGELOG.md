@@ -1,6 +1,33 @@
 CHANGELOG
 =========
 
+7.3
+---
+
+ * Add `Security::isGrantedForUser()` to test user authorization without relying on the session. For example, users not currently logged in, or while processing a message from a message queue
+ * Add encryption support to `OidcTokenHandler` (JWE)
+
+7.2
+---
+
+ * Allow configuring the secret used to sign login links
+ * Allow passing optional passport attributes to `Security::login()`
+
+7.1
+---
+
+ * Mark class `ExpressionCacheWarmer` as `final`
+ * Support multiple signature algorithms for OIDC Token
+ * Support JWK or JWKSet for OIDC Token
+
+7.0
+---
+
+ * Enabling SecurityBundle and not configuring it is not allowed
+ * Remove the `enable_authenticator_manager` config option
+ * Remove the `security.firewalls.logout.csrf_token_generator` config option, use `security.firewalls.logout.csrf_token_manager` instead
+ * Remove the `require_previous_session` config option from authenticators
+
 6.4
 ---
 

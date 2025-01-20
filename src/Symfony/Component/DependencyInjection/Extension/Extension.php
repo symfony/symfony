@@ -92,7 +92,7 @@ abstract class Extension implements ExtensionInterface, ConfigurationExtensionIn
         }
 
         if (!$class->implementsInterface(ConfigurationInterface::class)) {
-            throw new LogicException(sprintf('The extension configuration class "%s" must implement "%s".', $class->getName(), ConfigurationInterface::class));
+            throw new LogicException(\sprintf('The extension configuration class "%s" must implement "%s".', $class->getName(), ConfigurationInterface::class));
         }
 
         if (!($constructor = $class->getConstructor()) || !$constructor->getNumberOfRequiredParameters()) {

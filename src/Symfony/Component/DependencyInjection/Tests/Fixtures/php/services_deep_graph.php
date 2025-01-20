@@ -37,12 +37,6 @@ class Symfony_DI_PhpDumper_Test_Deep_Graph extends Container
         return true;
     }
 
-    public function getRemovedIds(): array
-    {
-        return [
-        ];
-    }
-
     /**
      * Gets the public 'bar' shared service.
      *

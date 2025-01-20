@@ -1,10 +1,15 @@
 CHANGELOG
 =========
 
+7.3
+---
+
+ * Support union type in `OptionResolver::setAllowedTypes()` method
+
 6.4
 ---
 
-* Improve message with full path on invalid type in nested option
+ * Improve message with full path on invalid type in nested option
 
 6.3
 ---

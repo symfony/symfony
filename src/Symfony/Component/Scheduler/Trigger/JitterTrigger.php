@@ -26,7 +26,7 @@ final class JitterTrigger extends AbstractDecoratedTrigger
 
     public function __toString(): string
     {
-        return sprintf('%s with 0-%d second jitter', $this->trigger, $this->maxSeconds);
+        return \sprintf('%s with 0-%d second jitter', $this->trigger, $this->maxSeconds);
     }
 
     public function getNextRunDate(\DateTimeImmutable $run): ?\DateTimeImmutable
@@ -35,6 +35,6 @@ final class JitterTrigger extends AbstractDecoratedTrigger
             return null;
         }
 
-        return $nextRun->add(new \DateInterval(sprintf('PT%sS', random_int(0, $this->maxSeconds))));
+        return $nextRun->add(new \DateInterval(\sprintf('PT%sS', random_int(0, $this->maxSeconds))));
     }
 }

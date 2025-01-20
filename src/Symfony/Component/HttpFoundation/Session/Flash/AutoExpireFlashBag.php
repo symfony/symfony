@@ -20,14 +20,13 @@ class AutoExpireFlashBag implements FlashBagInterface
 {
     private string $name = 'flashes';
     private array $flashes = ['display' => [], 'new' => []];
-    private string $storageKey;
 
     /**
      * @param string $storageKey The key used to store flashes in the session
      */
-    public function __construct(string $storageKey = '_symfony_flashes')
-    {
-        $this->storageKey = $storageKey;
+    public function __construct(
+        private string $storageKey = '_symfony_flashes',
+    ) {
     }
 
     public function getName(): string
@@ -35,18 +34,12 @@ class AutoExpireFlashBag implements FlashBagInterface
         return $this->name;
     }
 
-    /**
-     * @return void
-     */
-    public function setName(string $name)
+    public function setName(string $name): void
     {
         $this->name = $name;
     }
 
-    /**
-     * @return void
-     */
-    public function initialize(array &$flashes)
+    public function initialize(array &$flashes): void
     {
         $this->flashes = &$flashes;
 
@@ -57,10 +50,7 @@ class AutoExpireFlashBag implements FlashBagInterface
         $this->flashes['new'] = [];
     }
 
-    /**
-     * @return void
-     */
-    public function add(string $type, mixed $message)
+    public function add(string $type, mixed $message): void
     {
         $this->flashes['new'][$type][] = $message;
     }
@@ -99,18 +89,12 @@ class AutoExpireFlashBag implements FlashBagInterface
         return $return;
     }
 
-    /**
-     * @return void
-     */
-    public function setAll(array $messages)
+    public function setAll(array $messages): void
     {
         $this->flashes['new'] = $messages;
     }
 
-    /**
-     * @return void
-     */
-    public function set(string $type, string|array $messages)
+    public function set(string $type, string|array $messages): void
     {
         $this->flashes['new'][$type] = (array) $messages;
     }

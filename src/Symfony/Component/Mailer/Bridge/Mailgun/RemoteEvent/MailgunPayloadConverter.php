@@ -46,12 +46,12 @@ final class MailgunPayloadConverter implements PayloadConverterInterface
                 'unsubscribed' => MailerEngagementEvent::UNSUBSCRIBE,
                 'opened' => MailerEngagementEvent::OPEN,
                 'complained' => MailerEngagementEvent::SPAM,
-                default => throw new ParseException(sprintf('Unsupported event "%s".', $payload['event'])),
+                default => throw new ParseException(\sprintf('Unsupported event "%s".', $payload['event'])),
             };
             $event = new MailerEngagementEvent($name, $payload['id'], $payload);
         }
-        if (!$date = \DateTimeImmutable::createFromFormat('U.u', sprintf('%.6F', $payload['timestamp']))) {
-            throw new ParseException(sprintf('Invalid date "%s".', sprintf('%.6F', $payload['timestamp'])));
+        if (!$date = \DateTimeImmutable::createFromFormat('U.u', \sprintf('%.6F', $payload['timestamp']))) {
+            throw new ParseException(\sprintf('Invalid date "%s".', \sprintf('%.6F', $payload['timestamp'])));
         }
         $event->setDate($date);
         $event->setRecipientEmail($payload['recipient']);

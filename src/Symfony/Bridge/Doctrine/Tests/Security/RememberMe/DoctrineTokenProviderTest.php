@@ -120,13 +120,9 @@ class DoctrineTokenProviderTest extends TestCase
     protected function bootstrapProvider(): DoctrineTokenProvider
     {
         $config = ORMSetup::createConfiguration(true);
-        if (class_exists(DefaultSchemaManagerFactory::class)) {
-            $config->setSchemaManagerFactory(new DefaultSchemaManagerFactory());
-        }
+        $config->setSchemaManagerFactory(new DefaultSchemaManagerFactory());
 
-        if (!class_exists(\Doctrine\Persistence\Mapping\Driver\AnnotationDriver::class)) { // doctrine/persistence >= 3.0
-            $config->setLazyGhostObjectEnabled(true);
-        }
+        $config->setLazyGhostObjectEnabled(true);
 
         $connection = DriverManager::getConnection([
             'driver' => 'pdo_sqlite',
@@ -140,7 +136,7 @@ class DoctrineTokenProviderTest extends TestCase
                 class    varchar(100) NOT NULL,
                 username varchar(200) NOT NULL
             );
-SQL
+            SQL
         );
 
         return new DoctrineTokenProvider($connection);

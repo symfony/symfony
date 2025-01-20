@@ -25,19 +25,16 @@ use Symfony\Contracts\EventDispatcher\Event;
  */
 class GenericEvent extends Event implements \ArrayAccess, \IteratorAggregate
 {
-    protected $subject;
-    protected $arguments;
-
     /**
      * Encapsulate an event with $subject and $arguments.
      *
      * @param mixed $subject   The subject of the event, usually an object or a callable
      * @param array $arguments Arguments to store in the event
      */
-    public function __construct(mixed $subject = null, array $arguments = [])
-    {
-        $this->subject = $subject;
-        $this->arguments = $arguments;
+    public function __construct(
+        protected mixed $subject = null,
+        protected array $arguments = [],
+    ) {
     }
 
     /**
@@ -59,7 +56,7 @@ class GenericEvent extends Event implements \ArrayAccess, \IteratorAggregate
             return $this->arguments[$key];
         }
 
-        throw new \InvalidArgumentException(sprintf('Argument "%s" not found.', $key));
+        throw new \InvalidArgumentException(\sprintf('Argument "%s" not found.', $key));
     }
 
     /**

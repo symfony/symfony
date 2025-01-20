@@ -16,8 +16,12 @@ use Symfony\Component\Serializer\Mapping\ClassDiscriminatorMapping;
 use Symfony\Component\Serializer\Mapping\ClassMetadata;
 use Symfony\Component\Serializer\Mapping\ClassMetadataInterface;
 
+trigger_deprecation('symfony/serializer', '7.3', 'The "%s" class is deprecated.', CompiledClassMetadataFactory::class);
+
 /**
  * @author Fabien Bourigault <bourigaultfabien@gmail.com>
+ *
+ * @deprecated since Symfony 7.3
  */
 final class CompiledClassMetadataFactory implements ClassMetadataFactoryInterface
 {
@@ -35,7 +39,7 @@ final class CompiledClassMetadataFactory implements ClassMetadataFactoryInterfac
 
         $compiledClassMetadata = require $compiledClassMetadataFile;
         if (!\is_array($compiledClassMetadata)) {
-            throw new \RuntimeException(sprintf('Compiled metadata must be of the type array, %s given.', \gettype($compiledClassMetadata)));
+            throw new \RuntimeException(\sprintf('Compiled metadata must be of the type array, %s given.', \gettype($compiledClassMetadata)));
         }
 
         $this->compiledClassMetadata = $compiledClassMetadata;

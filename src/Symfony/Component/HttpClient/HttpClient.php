@@ -11,8 +11,8 @@
 
 namespace Symfony\Component\HttpClient;
 
-use Amp\Http\Client\Connection\ConnectionLimitingPool;
-use Amp\Promise;
+use Amp\Http\Client\Request as AmpRequest;
+use Amp\Http\HttpMessage;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
@@ -31,7 +31,7 @@ final class HttpClient
      */
     public static function create(array $defaultOptions = [], int $maxHostConnections = 6, int $maxPendingPushes = 50): HttpClientInterface
     {
-        if ($amp = class_exists(ConnectionLimitingPool::class) && interface_exists(Promise::class)) {
+        if ($amp = class_exists(AmpRequest::class) && (\PHP_VERSION_ID >= 80400 || !is_subclass_of(AmpRequest::class, HttpMessage::class))) {
             if (!\extension_loaded('curl')) {
                 return new AmpHttpClient($defaultOptions, null, $maxHostConnections, $maxPendingPushes);
             }

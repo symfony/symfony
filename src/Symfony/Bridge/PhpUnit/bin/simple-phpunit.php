@@ -99,16 +99,19 @@ $passthruOrFail = function ($command) {
 
 if (\PHP_VERSION_ID >= 80000) {
     $PHPUNIT_VERSION = $getEnvVar('SYMFONY_PHPUNIT_VERSION', '9.6') ?: '9.6';
-} elseif (\PHP_VERSION_ID >= 70200) {
-    $PHPUNIT_VERSION = $getEnvVar('SYMFONY_PHPUNIT_VERSION', '8.5') ?: '8.5';
 } else {
-    $PHPUNIT_VERSION = $getEnvVar('SYMFONY_PHPUNIT_VERSION', '7.5') ?: '7.5';
+    $PHPUNIT_VERSION = $getEnvVar('SYMFONY_PHPUNIT_VERSION', '8.5') ?: '8.5';
 }
 
 $MAX_PHPUNIT_VERSION = $getEnvVar('SYMFONY_MAX_PHPUNIT_VERSION', false);
 
 if ($MAX_PHPUNIT_VERSION && version_compare($MAX_PHPUNIT_VERSION, $PHPUNIT_VERSION, '<')) {
     $PHPUNIT_VERSION = $MAX_PHPUNIT_VERSION;
+}
+
+if (version_compare($PHPUNIT_VERSION, '10.0', '>=') && version_compare($PHPUNIT_VERSION, '11.0', '<')) {
+    fwrite(\STDERR, 'This script does not work with PHPUnit 10.'.\PHP_EOL);
+    exit(1);
 }
 
 $PHPUNIT_REMOVE_RETURN_TYPEHINT = filter_var($getEnvVar('SYMFONY_PHPUNIT_REMOVE_RETURN_TYPEHINT', '0'), \FILTER_VALIDATE_BOOLEAN);
@@ -145,7 +148,7 @@ foreach ($defaultEnvs as $envName => $envValue) {
     }
 }
 
-if ('disabled' === $getEnvVar('SYMFONY_DEPRECATIONS_HELPER')) {
+if ('disabled' === $getEnvVar('SYMFONY_DEPRECATIONS_HELPER') || version_compare($PHPUNIT_VERSION, '11.0', '>=')) {
     putenv('SYMFONY_DEPRECATIONS_HELPER=disabled');
 }
 
@@ -275,19 +278,20 @@ if (!file_exists("$PHPUNIT_DIR/$PHPUNIT_VERSION_DIR/phpunit") || $configurationH
     }
 
     // Mutate TestCase code
-    $alteredCode = file_get_contents($alteredFile = './src/Framework/TestCase.php');
-    if ($PHPUNIT_REMOVE_RETURN_TYPEHINT) {
-        $alteredCode = preg_replace('/^    ((?:protected|public)(?: static)? function \w+\(\)): void/m', '    $1', $alteredCode);
-    }
-    $alteredCode = preg_replace('/abstract class TestCase[^\{]+\{/', '$0 '.\PHP_EOL."    use \Symfony\Bridge\PhpUnit\Legacy\PolyfillTestCaseTrait;", $alteredCode, 1);
-    file_put_contents($alteredFile, $alteredCode);
+    if (version_compare($PHPUNIT_VERSION, '11.0', '<')) {
+        $alteredCode = file_get_contents($alteredFile = './src/Framework/TestCase.php');
+        if ($PHPUNIT_REMOVE_RETURN_TYPEHINT) {
+            $alteredCode = preg_replace('/^    ((?:protected|public)(?: static)? function \w+\(\)): void/m', '    $1', $alteredCode);
+        }
+        $alteredCode = preg_replace('/abstract class TestCase[^\{]+\{/', '$0 '.\PHP_EOL."    use \Symfony\Bridge\PhpUnit\Legacy\PolyfillTestCaseTrait;", $alteredCode, 1);
+        file_put_contents($alteredFile, $alteredCode);
 
-    // Mutate Assert code
-    $alteredCode = file_get_contents($alteredFile = './src/Framework/Assert.php');
-    $alteredCode = preg_replace('/abstract class Assert[^\{]+\{/', '$0 '.\PHP_EOL."    use \Symfony\Bridge\PhpUnit\Legacy\PolyfillAssertTrait;", $alteredCode, 1);
-    file_put_contents($alteredFile, $alteredCode);
+        // Mutate Assert code
+        $alteredCode = file_get_contents($alteredFile = './src/Framework/Assert.php');
+        $alteredCode = preg_replace('/abstract class Assert[^\{]+\{/', '$0 '.\PHP_EOL."    use \Symfony\Bridge\PhpUnit\Legacy\PolyfillAssertTrait;", $alteredCode, 1);
+        file_put_contents($alteredFile, $alteredCode);
 
-    file_put_contents('phpunit', <<<'EOPHP'
+        file_put_contents('phpunit', <<<'EOPHP'
 <?php
 
 define('PHPUNIT_COMPOSER_INSTALL', __DIR__.'/vendor/autoload.php');
@@ -312,7 +316,9 @@ if (method_exists(\PHPUnit\Util\ExcludeList::class, 'addDirectory')) {
 Symfony\Bridge\PhpUnit\TextUI\Command::main();
 
 EOPHP
-    );
+        );
+    }
+
     chdir('..');
     file_put_contents(".$PHPUNIT_VERSION_DIR.md5", $configurationHash);
     chdir($oldPwd);

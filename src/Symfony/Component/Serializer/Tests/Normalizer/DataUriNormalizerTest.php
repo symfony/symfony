@@ -121,7 +121,7 @@ class DataUriNormalizerTest extends TestCase
     /**
      * @dataProvider invalidUriProvider
      */
-    public function testInvalidData($uri)
+    public function testInvalidData(?string $uri)
     {
         $this->expectException(UnexpectedValueException::class);
         $this->normalizer->denormalize($uri, 'SplFileObject');
@@ -148,7 +148,7 @@ class DataUriNormalizerTest extends TestCase
     /**
      * @dataProvider validUriProvider
      */
-    public function testValidData($uri)
+    public function testValidData(string $uri)
     {
         $this->assertInstanceOf(\SplFileObject::class, $this->normalizer->denormalize($uri, 'SplFileObject'));
     }

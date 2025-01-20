@@ -29,7 +29,7 @@ class PhpBundleReader implements BundleReaderInterface
 
         // prevent directory traversal attacks
         if (\dirname($fileName) !== $path) {
-            throw new ResourceBundleNotFoundException(sprintf('The resource bundle "%s" does not exist.', $fileName));
+            throw new ResourceBundleNotFoundException(\sprintf('The resource bundle "%s" does not exist.', $fileName));
         }
 
         if (is_file($fileName.'.gz')) {
@@ -37,7 +37,7 @@ class PhpBundleReader implements BundleReaderInterface
         }
 
         if (!is_file($fileName)) {
-            throw new ResourceBundleNotFoundException(sprintf('The resource bundle "%s" does not exist.', $fileName));
+            throw new ResourceBundleNotFoundException(\sprintf('The resource bundle "%s" does not exist.', $fileName));
         }
 
         return include $fileName;

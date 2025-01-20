@@ -14,6 +14,7 @@ namespace Symfony\Component\Validator\Tests\Constraints;
 use Symfony\Component\Validator\Constraints\Bic;
 use Symfony\Component\Validator\Constraints\BicValidator;
 use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
+use Symfony\Component\Validator\Exception\InvalidArgumentException;
 use Symfony\Component\Validator\Exception\UnexpectedValueException;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Mapping\Loader\AttributeLoader;
@@ -173,7 +174,7 @@ class BicValidatorTest extends ConstraintValidatorTestCase
         $constraint = new Bic(['ibanPropertyPath' => 'foo']);
 
         $this->expectException(ConstraintDefinitionException::class);
-        $this->expectExceptionMessage(sprintf('Invalid property path "foo" provided to "%s" constraint', $constraint::class));
+        $this->expectExceptionMessage(\sprintf('Invalid property path "foo" provided to "%s" constraint', $constraint::class));
 
         $object = new BicComparisonTestClass(5);
 
@@ -310,6 +311,36 @@ class BicValidatorTest extends ConstraintValidatorTestCase
         // ES related special cases
         yield ['CAIXICBBXXX', 'ES79 2100 0813 6101 2345 6789'];
         yield ['CAIXEABBXXX', 'ES79 2100 0813 6101 2345 6789'];
+    }
+
+    /**
+     * @dataProvider getValidBicsWithNormalizerToUpper
+     */
+    public function testValidBicsWithNormalizerToUpper($bic)
+    {
+        $this->validator->validate($bic, new Bic(mode: Bic::VALIDATION_MODE_CASE_INSENSITIVE));
+
+        $this->assertNoViolation();
+    }
+
+    public static function getValidBicsWithNormalizerToUpper()
+    {
+        return [
+            ['ASPKAT2LXXX'],
+            ['ASPKat2LXXX'],
+            ['ASPKaT2LXXX'],
+            ['ASPKAt2LXXX'],
+            ['aspkat2lxxx'],
+        ];
+    }
+
+    public function testFailOnInvalidMode()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->validator->validate('ASPKAT2LXXX', new Bic(mode: 'invalid'));
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->validator->validate('ASPKAT2LXXX', new Bic(options: ['mode' => 'invalid']));
     }
 }
 

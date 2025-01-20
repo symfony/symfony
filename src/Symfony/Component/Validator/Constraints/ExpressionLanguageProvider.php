@@ -20,7 +20,7 @@ class ExpressionLanguageProvider implements ExpressionFunctionProviderInterface
     {
         return [
             new ExpressionFunction('is_valid', function (...$arguments) {
-                return sprintf(
+                return \sprintf(
                     '0 === $context->getValidator()->inContext($context)->validate(%s)->getViolations()->count()',
                     implode(', ', $arguments)
                 );

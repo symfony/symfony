@@ -16,8 +16,9 @@ use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Exception\LogicException;
 
 /**
- * @Annotation
- * @Target({"PROPERTY", "METHOD", "ANNOTATION"})
+ * Validates that a value is a valid 3-letter ISO 4217 currency name.
+ *
+ * @see https://en.wikipedia.org/wiki/ISO_4217
  *
  * @author Miha Vrhovnik <miha.vrhovnik@pagein.si>
  * @author Bernhard Schussek <bschussek@gmail.com>
@@ -31,13 +32,12 @@ class Currency extends Constraint
         self::NO_SUCH_CURRENCY_ERROR => 'NO_SUCH_CURRENCY_ERROR',
     ];
 
+    public string $message = 'This value is not a valid currency.';
+
     /**
-     * @deprecated since Symfony 6.1, use const ERROR_NAMES instead
+     * @param array<string,mixed>|null $options
+     * @param string[]|null            $groups
      */
-    protected static $errorNames = self::ERROR_NAMES;
-
-    public $message = 'This value is not a valid currency.';
-
     public function __construct(?array $options = null, ?string $message = null, ?array $groups = null, mixed $payload = null)
     {
         if (!class_exists(Currencies::class)) {

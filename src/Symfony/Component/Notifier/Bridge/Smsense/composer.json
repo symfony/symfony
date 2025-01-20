@@ -1,0 +1,30 @@
+{
+    "name": "symfony/smsense-notifier",
+    "type": "symfony-notifier-bridge",
+    "description": "Symfony SMSense Notifier Bridge",
+    "keywords": ["sms", "smsense", "global-voice", "notifier"],
+    "homepage": "https://symfony.com",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Valentin Barbu",
+            "email": "jimiero@gmail.com"
+        },
+        {
+            "name": "Symfony Community",
+            "homepage": "https://symfony.com/contributors"
+        }
+    ],
+    "require": {
+        "php": ">=8.2",
+        "symfony/http-client": "^6.4|^7.0",
+        "symfony/notifier": "^7.2"
+    },
+    "autoload": {
+        "psr-4": { "Symfony\\Component\\Notifier\\Bridge\\Smsense\\": "" },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
+    },
+    "minimum-stability": "dev"
+}

@@ -24,11 +24,9 @@ use Twig\TwigFunction;
  */
 final class WebLinkExtension extends AbstractExtension
 {
-    private RequestStack $requestStack;
-
-    public function __construct(RequestStack $requestStack)
-    {
-        $this->requestStack = $requestStack;
+    public function __construct(
+        private RequestStack $requestStack,
+    ) {
     }
 
     public function getFunctions(): array

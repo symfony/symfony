@@ -32,23 +32,15 @@ use Symfony\Contracts\EventDispatcher\Event;
  */
 class LoginSuccessEvent extends Event
 {
-    private AuthenticatorInterface $authenticator;
-    private Passport $passport;
-    private TokenInterface $authenticatedToken;
-    private ?TokenInterface $previousToken;
-    private Request $request;
-    private ?Response $response;
-    private string $firewallName;
-
-    public function __construct(AuthenticatorInterface $authenticator, Passport $passport, TokenInterface $authenticatedToken, Request $request, ?Response $response, string $firewallName, ?TokenInterface $previousToken = null)
-    {
-        $this->authenticator = $authenticator;
-        $this->passport = $passport;
-        $this->authenticatedToken = $authenticatedToken;
-        $this->previousToken = $previousToken;
-        $this->request = $request;
-        $this->response = $response;
-        $this->firewallName = $firewallName;
+    public function __construct(
+        private AuthenticatorInterface $authenticator,
+        private Passport $passport,
+        private TokenInterface $authenticatedToken,
+        private Request $request,
+        private ?Response $response,
+        private string $firewallName,
+        private ?TokenInterface $previousToken = null,
+    ) {
     }
 
     public function getAuthenticator(): AuthenticatorInterface

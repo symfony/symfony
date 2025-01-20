@@ -29,10 +29,7 @@ trait ClockAwareTrait
         $this->clock = $clock;
     }
 
-    /**
-     * @return DatePoint
-     */
-    protected function now(): \DateTimeImmutable
+    protected function now(): DatePoint
     {
         $now = ($this->clock ??= new Clock())->now();
 

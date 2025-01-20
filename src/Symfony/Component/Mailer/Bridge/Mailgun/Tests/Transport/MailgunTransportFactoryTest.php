@@ -17,12 +17,15 @@ use Symfony\Component\Mailer\Bridge\Mailgun\Transport\MailgunApiTransport;
 use Symfony\Component\Mailer\Bridge\Mailgun\Transport\MailgunHttpTransport;
 use Symfony\Component\Mailer\Bridge\Mailgun\Transport\MailgunSmtpTransport;
 use Symfony\Component\Mailer\Bridge\Mailgun\Transport\MailgunTransportFactory;
-use Symfony\Component\Mailer\Test\TransportFactoryTestCase;
+use Symfony\Component\Mailer\Test\AbstractTransportFactoryTestCase;
+use Symfony\Component\Mailer\Test\IncompleteDsnTestTrait;
 use Symfony\Component\Mailer\Transport\Dsn;
 use Symfony\Component\Mailer\Transport\TransportFactoryInterface;
 
-class MailgunTransportFactoryTest extends TransportFactoryTestCase
+class MailgunTransportFactoryTest extends AbstractTransportFactoryTestCase
 {
+    use IncompleteDsnTestTrait;
+
     public function getFactory(): TransportFactoryInterface
     {
         return new MailgunTransportFactory(null, new MockHttpClient(), new NullLogger());

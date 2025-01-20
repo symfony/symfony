@@ -1,0 +1,70 @@
+{
+  "mandrill_events": [
+    {
+      "ts": 1365109999,
+      "event": "click",
+      "msg": {
+        "ts": 1365109999,
+        "subject": "Foo bar",
+        "email": "foo@example.com",
+        "sender": "bar@example.com",
+        "tags": [
+          "my_tag_1",
+          "my_tag_2"
+        ],
+        "smtp_events": null,
+        "opens": [
+          {
+            "ts": 1365110000
+          }
+        ],
+        "clicks": [
+          {
+            "ts": 1365110000,
+            "url": "https://www.example.com"
+          }
+        ],
+        "state": "sent",
+        "metadata": {
+          "mandrill-var-1": "foo",
+          "mandrill-var-2": "bar"
+        },
+        "_id": "7761630",
+        "_version": "123",
+        "subaccount": null,
+        "diag": null,
+        "bounce_description": null,
+        "template": null
+      }
+    },
+    {
+      "ts": 1365109999,
+      "event": "deferral",
+      "msg": {
+        "ts": 1365109999,
+        "subject": "Foo bar",
+        "email": "foo@example.com",
+        "sender": "bar@example.com",
+        "tags": [
+          "my_tag_1",
+          "my_tag_2"
+        ],
+        "smtp_events": null,
+        "opens": null,
+        "clicks": null,
+        "state": "sent",
+        "metadata": {
+          "mandrill-var-1": "foo",
+          "mandrill-var-2": "bar"
+        },
+        "_id": "7761631",
+        "_version": "123",
+        "subaccount": null,
+        "diag": null,
+        "bounce_description": null,
+        "template": null
+      }
+    }
+  ],
+  "X-Mandrill-Signature": "Mjask0i0giC/nEAYZrt6sX6JF2M="
+}

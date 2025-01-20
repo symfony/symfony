@@ -28,7 +28,7 @@ class StopWorkerOnCustomStopExceptionListenerTest extends TestCase
         yield 'it should not stop (1)' => [new \Exception(), false];
         yield 'it should not stop (2)' => [new HandlerFailedException(new Envelope(new \stdClass()), [new \Exception()]), false];
 
-        $t = new class() extends \Exception implements StopWorkerExceptionInterface {};
+        $t = new class extends \Exception implements StopWorkerExceptionInterface {};
         yield 'it should stop with custom exception' => [$t, true];
         yield 'it should stop with core exception' => [new StopWorkerException(), true];
 

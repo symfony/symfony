@@ -17,6 +17,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
  * @requires extension curl
+ *
  * @group dns-sensitive
  */
 class CurlHttpClientTest extends HttpClientTestCase

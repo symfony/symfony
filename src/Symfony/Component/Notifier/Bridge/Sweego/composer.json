@@ -1,0 +1,36 @@
+{
+    "name": "symfony/sweego-notifier",
+    "type": "symfony-notifier-bridge",
+    "description": "Symfony Sweego Notifier Bridge",
+    "keywords": ["sms", "sweego", "notifier"],
+    "homepage": "https://symfony.com",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Fabien Potencier",
+            "email": "fabien@symfony.com"
+        },
+        {
+            "name": "Symfony Community",
+            "homepage": "https://symfony.com/contributors"
+        }
+    ],
+    "require": {
+        "php": ">=8.2",
+        "symfony/http-client": "^6.4|^7.0",
+        "symfony/notifier": "^7.2"
+    },
+    "require-dev": {
+        "symfony/webhook": "^6.4|^7.0"
+    },
+    "conflict": {
+        "symfony/http-foundation": "<7.1"
+    },
+    "autoload": {
+        "psr-4": { "Symfony\\Component\\Notifier\\Bridge\\Sweego\\": "" },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
+    },
+    "minimum-stability": "dev"
+}

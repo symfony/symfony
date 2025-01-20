@@ -23,6 +23,7 @@ use Psr\Log\NullLogger;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\Response\MockResponse;
 use Symfony\Component\Messenger\Bridge\AmazonSqs\Transport\Connection;
+use Symfony\Component\Messenger\Exception\TransportException;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 class ConnectionTest extends TestCase
@@ -355,6 +356,33 @@ class ConnectionTest extends TestCase
         $logger->expects($this->exactly(4))->method('debug');
         $connection = Connection::fromDsn('sqs://default?debug=true', ['access_key' => 'foo', 'secret_key' => 'bar', 'auto_setup' => false], $client, $logger);
         $connection->get();
+    }
+
+    public function testKeepalive()
+    {
+        $expectedParams = [
+            'QueueUrl' => $queueUrl = 'https://sqs.us-east-2.amazonaws.com/123456789012/MyQueue',
+            'ReceiptHandle' => $id = 'abc',
+            'VisibilityTimeout' => $visibilityTimeout = 30,
+        ];
+
+        $client = $this->createMock(SqsClient::class);
+        $client->expects($this->once())->method('changeMessageVisibility')->with($expectedParams);
+
+        $connection = new Connection(['visibility_timeout' => $visibilityTimeout], $client, $queueUrl);
+        $connection->keepalive($id);
+    }
+
+    public function testKeepaliveWithTooSmallTtl()
+    {
+        $client = $this->createMock(SqsClient::class);
+        $client->expects($this->never())->method($this->anything());
+
+        $connection = new Connection(['visibility_timeout' => 1], $client, 'https://sqs.us-east-2.amazonaws.com/123456789012/MyQueue');
+
+        $this->expectException(TransportException::class);
+        $this->expectExceptionMessage('SQS visibility_timeout (1s) cannot be smaller than the keepalive interval (2s).');
+        $connection->keepalive('123', 2);
     }
 
     private function getMockedQueueUrlResponse(): MockResponse

@@ -31,7 +31,7 @@ class SesSmtpTransport extends EsmtpTransport
     public function __construct(string $username, #[\SensitiveParameter] string $password, ?string $region = null, ?EventDispatcherInterface $dispatcher = null, ?LoggerInterface $logger = null, string $host = 'default')
     {
         if ('default' === $host) {
-            $host = sprintf('email-smtp.%s.amazonaws.com', $region ?: 'eu-west-1');
+            $host = \sprintf('email-smtp.%s.amazonaws.com', $region ?: 'eu-west-1');
         }
 
         parent::__construct($host, 465, true, $dispatcher, $logger);

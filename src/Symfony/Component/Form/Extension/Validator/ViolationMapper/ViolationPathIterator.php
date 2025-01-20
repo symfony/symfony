@@ -23,10 +23,7 @@ class ViolationPathIterator extends PropertyPathIterator
         parent::__construct($violationPath);
     }
 
-    /**
-     * @return bool
-     */
-    public function mapsForm()
+    public function mapsForm(): bool
     {
         return $this->path->mapsForm($this->key());
     }

@@ -29,13 +29,10 @@ use Symfony\Component\CssSelector\Parser\TokenStream;
  */
 class IdentifierHandler implements HandlerInterface
 {
-    private TokenizerPatterns $patterns;
-    private TokenizerEscaping $escaping;
-
-    public function __construct(TokenizerPatterns $patterns, TokenizerEscaping $escaping)
-    {
-        $this->patterns = $patterns;
-        $this->escaping = $escaping;
+    public function __construct(
+        private TokenizerPatterns $patterns,
+        private TokenizerEscaping $escaping,
+    ) {
     }
 
     public function handle(Reader $reader, TokenStream $stream): bool

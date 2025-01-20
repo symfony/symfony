@@ -8,11 +8,15 @@ DSN example
 
 ```
 // .env file
-LOCO_DSN=loco://API_KEY@default
+LOCO_DSN=loco://API_KEY@default?status=translated,blank-translation
 ```
 
 where:
  - `API_KEY` is your Loco project API key
+
+ **DSN query parameters**
+
+ - `status`: translations status, default to `translated,blank-translation`
 
 [more information on Loco website](https://localise.biz/help/developers/api-keys)
 

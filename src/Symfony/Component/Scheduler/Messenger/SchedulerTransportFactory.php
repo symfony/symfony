@@ -37,10 +37,10 @@ class SchedulerTransportFactory implements TransportFactoryInterface
             throw new InvalidArgumentException('The Schedule DSN must contains a name, e.g. "schedule://default".');
         }
         if (false === $scheduleName = parse_url($dsn, \PHP_URL_HOST)) {
-            throw new InvalidArgumentException(sprintf('The given Schedule DSN "%s" is invalid.', $dsn));
+            throw new InvalidArgumentException(\sprintf('The given Schedule DSN "%s" is invalid.', $dsn));
         }
         if (!$this->scheduleProviders->has($scheduleName)) {
-            throw new InvalidArgumentException(sprintf('The schedule "%s" is not found.', $scheduleName));
+            throw new InvalidArgumentException(\sprintf('The schedule "%s" is not found.', $scheduleName));
         }
 
         /** @var ScheduleProviderInterface $scheduleProvider */

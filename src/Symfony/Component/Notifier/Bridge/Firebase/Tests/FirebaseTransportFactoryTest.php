@@ -12,13 +12,16 @@
 namespace Symfony\Component\Notifier\Bridge\Firebase\Tests;
 
 use Symfony\Component\Notifier\Bridge\Firebase\FirebaseTransportFactory;
-use Symfony\Component\Notifier\Test\TransportFactoryTestCase;
+use Symfony\Component\Notifier\Test\AbstractTransportFactoryTestCase;
+use Symfony\Component\Notifier\Test\IncompleteDsnTestTrait;
 
 /**
  * @author Oskar Stark <oskarstark@googlemail.com>
  */
-final class FirebaseTransportFactoryTest extends TransportFactoryTestCase
+final class FirebaseTransportFactoryTest extends AbstractTransportFactoryTestCase
 {
+    use IncompleteDsnTestTrait;
+
     public function createFactory(): FirebaseTransportFactory
     {
         return new FirebaseTransportFactory();
@@ -41,5 +44,11 @@ final class FirebaseTransportFactoryTest extends TransportFactoryTestCase
     public static function unsupportedSchemeProvider(): iterable
     {
         yield ['somethingElse://username:password@default'];
+    }
+
+    public static function incompleteDsnProvider(): iterable
+    {
+        yield ['firebase://:password@default'];
+        yield ['firebase://username@default'];
     }
 }

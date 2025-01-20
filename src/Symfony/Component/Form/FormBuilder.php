@@ -14,7 +14,6 @@ namespace Symfony\Component\Form;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\Exception\BadMethodCallException;
 use Symfony\Component\Form\Exception\InvalidArgumentException;
-use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 
 /**
@@ -60,10 +59,6 @@ class FormBuilder extends FormConfigBuilder implements \IteratorAggregate, FormB
             return $this;
         }
 
-        if (!\is_string($child) && !\is_int($child)) {
-            throw new UnexpectedTypeException($child, 'string or Symfony\Component\Form\FormBuilderInterface');
-        }
-
         // Add to "children" to maintain order
         $this->children[$child] = null;
         $this->unresolvedChildren[$child] = [$type, $options];
@@ -102,7 +97,7 @@ class FormBuilder extends FormConfigBuilder implements \IteratorAggregate, FormB
             return $this->children[$name];
         }
 
-        throw new InvalidArgumentException(sprintf('The child with the name "%s" does not exist.', $name));
+        throw new InvalidArgumentException(\sprintf('The child with the name "%s" does not exist.', $name));
     }
 
     public function remove(string $name): static
@@ -147,7 +142,7 @@ class FormBuilder extends FormConfigBuilder implements \IteratorAggregate, FormB
 
     public function getFormConfig(): FormConfigInterface
     {
-        /** @var $config self */
+        /** @var self $config */
         $config = parent::getFormConfig();
 
         $config->children = [];

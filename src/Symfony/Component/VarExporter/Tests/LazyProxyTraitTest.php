@@ -18,6 +18,7 @@ use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\VarExporter\Exception\LogicException;
 use Symfony\Component\VarExporter\LazyProxyTrait;
 use Symfony\Component\VarExporter\ProxyHelper;
+use Symfony\Component\VarExporter\Tests\Fixtures\LazyGhost\RegularClass;
 use Symfony\Component\VarExporter\Tests\Fixtures\LazyProxy\FinalPublicClass;
 use Symfony\Component\VarExporter\Tests\Fixtures\LazyProxy\ReadOnlyClass;
 use Symfony\Component\VarExporter\Tests\Fixtures\LazyProxy\StringMagicGetClass;
@@ -205,7 +206,7 @@ class LazyProxyTraitTest extends TestCase
 
     public function testWither()
     {
-        $obj = new class() {
+        $obj = new class {
             public $foo = 123;
 
             public function withFoo($foo): static
@@ -226,7 +227,7 @@ class LazyProxyTraitTest extends TestCase
 
     public function testFluent()
     {
-        $obj = new class() {
+        $obj = new class {
             public $foo = 123;
 
             public function setFoo($foo): static
@@ -244,7 +245,7 @@ class LazyProxyTraitTest extends TestCase
 
     public function testIndirectModification()
     {
-        $obj = new class() {
+        $obj = new class {
             public array $foo;
         };
         $proxy = $this->createLazyProxy($obj::class, fn () => $obj);
@@ -254,9 +255,6 @@ class LazyProxyTraitTest extends TestCase
         $this->assertSame([123], $proxy->foo);
     }
 
-    /**
-     * @requires PHP 8.2
-     */
     public function testReadOnlyClass()
     {
         if (\PHP_VERSION_ID < 80300) {
@@ -271,7 +269,7 @@ class LazyProxyTraitTest extends TestCase
 
     public function testLazyDecoratorClass()
     {
-        $obj = new class() extends TestClass {
+        $obj = new class extends TestClass {
             use LazyProxyTrait {
                 createLazyProxy as private;
             }
@@ -298,6 +296,31 @@ class LazyProxyTraitTest extends TestCase
         $this->assertSame(['property' => 'property', 'method' => 'method'], $output);
     }
 
+    public function testReinitRegularLazyProxy()
+    {
+        $object = $this->createLazyProxy(RegularClass::class, fn () => new RegularClass(123));
+
+        $this->assertSame(123, $object->foo);
+
+        $object::createLazyProxy(fn () => new RegularClass(234), $object);
+
+        $this->assertSame(234, $object->foo);
+    }
+
+    /**
+     * @requires PHP 8.3
+     */
+    public function testReinitReadonlyLazyProxy()
+    {
+        $object = $this->createLazyProxy(ReadOnlyClass::class, fn () => new ReadOnlyClass(123));
+
+        $this->assertSame(123, $object->foo);
+
+        $object::createLazyProxy(fn () => new ReadOnlyClass(234), $object);
+
+        $this->assertSame(234, $object->foo);
+    }
+
     /**
      * @template T
      *
@@ -317,7 +340,7 @@ class LazyProxyTraitTest extends TestCase
         $class = str_replace('\\', '_', $class).'_'.md5($proxy);
 
         if (!class_exists($class, false)) {
-            eval((\PHP_VERSION_ID >= 80200 && $r->isReadOnly() ? 'readonly ' : '').'class '.$class.' '.$proxy);
+            eval(($r->isReadOnly() ? 'readonly ' : '').'class '.$class.' '.$proxy);
         }
 
         return $class::createLazyProxy($initializer);

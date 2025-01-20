@@ -77,14 +77,14 @@ class ImportMapManagerTest extends TestCase
                     return '/path/to/assets/some_file.js';
                 }
 
-                throw new \Exception(sprintf('Unexpected path "%s"', $path));
+                throw new \Exception(\sprintf('Unexpected path "%s"', $path));
             });
         $this->configReader->expects($this->any())
             ->method('convertFilesystemPathToPath')
             ->willReturnCallback(function ($path) {
                 return match ($path) {
                     '/path/to/assets/some_file.js' => './assets/some_file.js',
-                    default => throw new \Exception(sprintf('Unexpected path "%s"', $path)),
+                    default => throw new \Exception(\sprintf('Unexpected path "%s"', $path)),
                 };
             });
         $this->configReader->expects($this->once())
@@ -409,11 +409,7 @@ class ImportMapManagerTest extends TestCase
 
     private function writeFile(string $filename, string $content): void
     {
-        $path = \dirname(self::$writableRoot.'/'.$filename);
-        if (!is_dir($path)) {
-            mkdir($path, 0777, true);
-        }
-        file_put_contents(self::$writableRoot.'/'.$filename, $content);
+        $this->filesystem->dumpFile(self::$writableRoot.'/'.$filename, $content);
     }
 
     private static function createLocalEntry(string $importName, string $path, ImportMapType $type = ImportMapType::JS, bool $isEntrypoint = false): ImportMapEntry

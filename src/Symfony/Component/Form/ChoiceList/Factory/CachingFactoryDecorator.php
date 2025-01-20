@@ -27,8 +27,6 @@ use Symfony\Contracts\Service\ResetInterface;
  */
 class CachingFactoryDecorator implements ChoiceListFactoryInterface, ResetInterface
 {
-    private ChoiceListFactoryInterface $decoratedFactory;
-
     /**
      * @var ChoiceListInterface[]
      */
@@ -64,9 +62,9 @@ class CachingFactoryDecorator implements ChoiceListFactoryInterface, ResetInterf
         return hash('sha256', $namespace.':'.serialize($value));
     }
 
-    public function __construct(ChoiceListFactoryInterface $decoratedFactory)
-    {
-        $this->decoratedFactory = $decoratedFactory;
+    public function __construct(
+        private ChoiceListFactoryInterface $decoratedFactory,
+    ) {
     }
 
     /**
@@ -145,12 +143,8 @@ class CachingFactoryDecorator implements ChoiceListFactoryInterface, ResetInterf
         return $this->lists[$hash];
     }
 
-    /**
-     * @param bool $duplicatePreferredChoices
-     */
-    public function createView(ChoiceListInterface $list, mixed $preferredChoices = null, mixed $label = null, mixed $index = null, mixed $groupBy = null, mixed $attr = null, mixed $labelTranslationParameters = []/* , bool $duplicatePreferredChoices = true */): ChoiceListView
+    public function createView(ChoiceListInterface $list, mixed $preferredChoices = null, mixed $label = null, mixed $index = null, mixed $groupBy = null, mixed $attr = null, mixed $labelTranslationParameters = [], bool $duplicatePreferredChoices = true): ChoiceListView
     {
-        $duplicatePreferredChoices = \func_num_args() > 7 ? func_get_arg(7) : true;
         $cache = true;
 
         if ($preferredChoices instanceof Cache\PreferredChoice) {
@@ -220,10 +214,7 @@ class CachingFactoryDecorator implements ChoiceListFactoryInterface, ResetInterf
         return $this->views[$hash];
     }
 
-    /**
-     * @return void
-     */
-    public function reset()
+    public function reset(): void
     {
         $this->lists = [];
         $this->views = [];

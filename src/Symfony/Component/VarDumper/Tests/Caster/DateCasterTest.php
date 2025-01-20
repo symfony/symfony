@@ -29,15 +29,11 @@ class DateCasterTest extends TestCase
 
     protected function setUp(): void
     {
-        parent::setUp();
-
         $this->previousTimezone = date_default_timezone_get();
     }
 
     protected function tearDown(): void
     {
-        parent::tearDown();
-
         date_default_timezone_set($this->previousTimezone);
     }
 

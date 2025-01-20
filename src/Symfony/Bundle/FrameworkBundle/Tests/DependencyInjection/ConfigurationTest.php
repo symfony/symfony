@@ -13,23 +13,27 @@ namespace Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection;
 
 use Doctrine\DBAL\Connection;
 use PHPUnit\Framework\TestCase;
-use Seld\JsonLint\JsonParser;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Configuration;
 use Symfony\Bundle\FullStack;
+use Symfony\Component\AssetMapper\Compressor\CompressorInterface;
 use Symfony\Component\Cache\Adapter\DoctrineAdapter;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Config\Definition\Processor;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HtmlSanitizer\HtmlSanitizer;
 use Symfony\Component\HttpClient\HttpClient;
+use Symfony\Component\JsonEncoder\JsonEncoder;
 use Symfony\Component\Lock\Store\SemaphoreStore;
 use Symfony\Component\Mailer\Mailer;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Notifier\Notifier;
 use Symfony\Component\RateLimiter\Policy\TokenBucketLimiter;
+use Symfony\Component\RemoteEvent\RemoteEvent;
 use Symfony\Component\Scheduler\Messenger\SchedulerTransportFactory;
 use Symfony\Component\Serializer\Encoder\JsonDecode;
+use Symfony\Component\TypeInfo\Type;
 use Symfony\Component\Uid\Factory\UuidFactory;
+use Symfony\Component\Webhook\Controller\WebhookController;
 
 class ConfigurationTest extends TestCase
 {
@@ -139,6 +143,11 @@ class ConfigurationTest extends TestCase
             'vendor_dir' => '%kernel.project_dir%/assets/vendor',
             'importmap_script_attributes' => [],
             'exclude_dotfiles' => true,
+            'precompress' => [
+                'enabled' => false,
+                'formats' => [],
+                'extensions' => interface_exists(CompressorInterface::class) ? CompressorInterface::DEFAULT_EXTENSIONS : [],
+            ],
         ];
 
         $this->assertEquals($defaultConfig, $config['asset_mapper']);
@@ -224,13 +233,13 @@ class ConfigurationTest extends TestCase
         $this->expectExceptionMessage($expectedMessage);
 
         $processor->processConfiguration($configuration, [
-                [
-                    'http_method_override' => false,
-                    'handle_all_throwables' => true,
-                    'php_errors' => ['log' => true],
-                    'assets' => $assetConfig,
-                ],
-            ]);
+            [
+                'http_method_override' => false,
+                'handle_all_throwables' => true,
+                'php_errors' => ['log' => true],
+                'assets' => $assetConfig,
+            ],
+        ]);
     }
 
     public static function provideInvalidAssetConfigurationTests(): iterable
@@ -633,32 +642,98 @@ class ConfigurationTest extends TestCase
         $this->assertSame(['foo' => 'bar', JsonDecode::DETAILED_ERROR_MESSAGES => false, 'foobar' => 'baz'], $config['serializer']['default_context'] ?? []);
     }
 
+    public function testScopedHttpClientsInheritRateLimiterAndRetryFailedConfiguration()
+    {
+        $processor = new Processor();
+        $configuration = new Configuration(true);
+
+        $config = $processor->processConfiguration($configuration, [[
+            'http_client' => [
+                'default_options' => ['rate_limiter' => 'default_limiter', 'retry_failed' => ['max_retries' => 77]],
+                'scoped_clients' => [
+                    'foo' => ['base_uri' => 'http://example.com'],
+                    'bar' => ['base_uri' => 'http://example.com', 'rate_limiter' => true, 'retry_failed' => true],
+                    'baz' => ['base_uri' => 'http://example.com', 'rate_limiter' => false, 'retry_failed' => false],
+                    'qux' => ['base_uri' => 'http://example.com', 'rate_limiter' => 'foo_limiter', 'retry_failed' => ['max_retries' => 88, 'delay' => 999]],
+                ],
+            ],
+        ]]);
+
+        $scopedClients = $config['http_client']['scoped_clients'];
+
+        $this->assertSame('default_limiter', $scopedClients['foo']['rate_limiter']);
+        $this->assertTrue($scopedClients['foo']['retry_failed']['enabled']);
+        $this->assertSame(77, $scopedClients['foo']['retry_failed']['max_retries']);
+        $this->assertSame(1000, $scopedClients['foo']['retry_failed']['delay']);
+
+        $this->assertSame('default_limiter', $scopedClients['bar']['rate_limiter']);
+        $this->assertTrue($scopedClients['bar']['retry_failed']['enabled']);
+        $this->assertSame(77, $scopedClients['bar']['retry_failed']['max_retries']);
+        $this->assertSame(1000, $scopedClients['bar']['retry_failed']['delay']);
+
+        $this->assertNull($scopedClients['baz']['rate_limiter']);
+        $this->assertFalse($scopedClients['baz']['retry_failed']['enabled']);
+        $this->assertSame(3, $scopedClients['baz']['retry_failed']['max_retries']);
+        $this->assertSame(1000, $scopedClients['baz']['retry_failed']['delay']);
+
+        $this->assertSame('foo_limiter', $scopedClients['qux']['rate_limiter']);
+        $this->assertTrue($scopedClients['qux']['retry_failed']['enabled']);
+        $this->assertSame(88, $scopedClients['qux']['retry_failed']['max_retries']);
+        $this->assertSame(999, $scopedClients['qux']['retry_failed']['delay']);
+    }
+
+    public function testSerializerJsonDetailedErrorMessagesEnabledByDefaultWithDebugEnabled()
+    {
+        $processor = new Processor();
+        $config = $processor->processConfiguration(new Configuration(true), [
+            [
+                'serializer' => null,
+            ],
+        ]);
+
+        $this->assertSame([JsonDecode::DETAILED_ERROR_MESSAGES => true], $config['serializer']['default_context'] ?? []);
+    }
+
+    public function testSerializerJsonDetailedErrorMessagesNotSetByDefaultWithDebugDisabled()
+    {
+        $processor = new Processor();
+        $config = $processor->processConfiguration(new Configuration(false), [
+            [
+                'serializer' => null,
+            ],
+        ]);
+
+        $this->assertSame([], $config['serializer']['default_context'] ?? []);
+    }
+
     protected static function getBundleDefaultConfig()
     {
         return [
             'http_method_override' => false,
             'handle_all_throwables' => true,
-            'trust_x_sendfile_type_header' => false,
+            'trust_x_sendfile_type_header' => '%env(bool:default::SYMFONY_TRUST_X_SENDFILE_TYPE_HEADER)%',
             'ide' => '%env(default::SYMFONY_IDE)%',
             'default_locale' => 'en',
             'enabled_locales' => [],
             'set_locale_from_accept_language' => false,
             'set_content_language_from_locale' => false,
             'secret' => 's3cr3t',
-            'trusted_hosts' => [],
-            'trusted_headers' => [
-                'x-forwarded-for',
-                'x-forwarded-port',
-                'x-forwarded-proto',
-            ],
+            'trusted_hosts' => ['%env(default::SYMFONY_TRUSTED_HOSTS)%'],
+            'trusted_proxies' => ['%env(default::SYMFONY_TRUSTED_PROXIES)%'],
+            'trusted_headers' => ['%env(default::SYMFONY_TRUSTED_HEADERS)%'],
             'csrf_protection' => [
-                'enabled' => false,
+                'enabled' => null,
+                'cookie_name' => 'csrf-token',
+                'check_header' => false,
+                'stateless_token_ids' => [],
             ],
             'form' => [
                 'enabled' => !class_exists(FullStack::class),
                 'csrf_protection' => [
                     'enabled' => null, // defaults to csrf_protection.enabled
                     'field_name' => '_token',
+                    'field_attr' => ['data-controller' => 'csrf-protection'],
+                    'token_id' => null,
                 ],
             ],
             'esi' => ['enabled' => false],
@@ -708,18 +783,17 @@ class ConfigurationTest extends TestCase
                     'enabled' => true,
                     'endpoint' => null,
                 ],
+                'email_validation_mode' => 'html5',
             ],
             'annotations' => [
-                'cache' => 'php_array',
-                'file_cache_dir' => '%kernel.cache_dir%/annotations',
-                'debug' => true,
-                'enabled' => true,
+                'enabled' => false,
             ],
             'serializer' => [
                 'default_context' => ['foo' => 'bar', JsonDecode::DETAILED_ERROR_MESSAGES => true],
                 'enabled' => true,
                 'enable_attributes' => !class_exists(FullStack::class),
                 'mapping' => ['paths' => []],
+                'named_serializers' => [],
             ],
             'property_access' => [
                 'enabled' => true,
@@ -729,9 +803,12 @@ class ConfigurationTest extends TestCase
                 'throw_exception_on_invalid_index' => false,
                 'throw_exception_on_invalid_property_path' => true,
             ],
+            'type_info' => [
+                'enabled' => !class_exists(FullStack::class) && class_exists(Type::class),
+            ],
             'property_info' => [
                 'enabled' => !class_exists(FullStack::class),
-            ],
+            ] + (!class_exists(FullStack::class) ? ['with_constructor_extractor' => false] : []),
             'router' => [
                 'enabled' => false,
                 'default_uri' => null,
@@ -739,16 +816,14 @@ class ConfigurationTest extends TestCase
                 'https_port' => 443,
                 'strict_requirements' => true,
                 'utf8' => true,
-                'cache_dir' => '%kernel.cache_dir%',
+                'cache_dir' => '%kernel.build_dir%',
             ],
             'session' => [
                 'enabled' => false,
                 'storage_factory_id' => 'session.storage.factory.native',
-                'handler_id' => 'session.handler.native_file',
                 'cookie_httponly' => true,
-                'cookie_samesite' => null,
-                'gc_probability' => 1,
-                'save_path' => '%kernel.cache_dir%/sessions',
+                'cookie_samesite' => 'lax',
+                'cookie_secure' => 'auto',
                 'metadata_update_threshold' => 0,
             ],
             'request' => [
@@ -779,6 +854,11 @@ class ConfigurationTest extends TestCase
                 'vendor_dir' => '%kernel.project_dir%/assets/vendor',
                 'importmap_script_attributes' => [],
                 'exclude_dotfiles' => true,
+                'precompress' => [
+                    'enabled' => false,
+                    'formats' => [],
+                    'extensions' => interface_exists(CompressorInterface::class) ? CompressorInterface::DEFAULT_EXTENSIONS : [],
+                ],
             ],
             'cache' => [
                 'pools' => [],
@@ -829,7 +909,6 @@ class ConfigurationTest extends TestCase
                 ],
                 'default_bus' => null,
                 'buses' => ['messenger.bus.default' => ['default_middleware' => ['enabled' => true, 'allow_no_handlers' => false, 'allow_no_senders' => true], 'middleware' => []]],
-                'reset_on_message' => true,
                 'stop_worker_on_signals' => [],
             ],
             'disallow_search_engine_index' => true,
@@ -872,9 +951,9 @@ class ConfigurationTest extends TestCase
             ],
             'uid' => [
                 'enabled' => !class_exists(FullStack::class) && class_exists(UuidFactory::class),
-                'default_uuid_version' => 6,
+                'default_uuid_version' => 7,
                 'name_based_uuid_version' => 5,
-                'time_based_uuid_version' => 6,
+                'time_based_uuid_version' => 7,
             ],
             'html_sanitizer' => [
                 'enabled' => !class_exists(FullStack::class) && class_exists(HtmlSanitizer::class),
@@ -885,13 +964,33 @@ class ConfigurationTest extends TestCase
             ],
             'exceptions' => [],
             'webhook' => [
-                'enabled' => false,
+                'enabled' => !class_exists(FullStack::class) && class_exists(WebhookController::class),
                 'routing' => [],
                 'message_bus' => 'messenger.default_bus',
             ],
             'remote-event' => [
-                'enabled' => false,
+                'enabled' => !class_exists(FullStack::class) && class_exists(RemoteEvent::class),
+            ],
+            'json_encoder' => [
+                'enabled' => !class_exists(FullStack::class) && class_exists(JsonEncoder::class),
             ],
         ];
+    }
+
+    public function testNamedSerializersReservedName()
+    {
+        $processor = new Processor();
+        $configuration = new Configuration(true);
+
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessage('Invalid configuration for path "framework.serializer.named_serializers": "default" is a reserved name.');
+
+        $processor->processConfiguration($configuration, [[
+            'serializer' => [
+                'named_serializers' => [
+                    'default' => ['include_built_in_normalizers' => false],
+                ],
+            ],
+        ]]);
     }
 }

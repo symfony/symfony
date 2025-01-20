@@ -12,8 +12,10 @@
 namespace Symfony\Component\Security\Core\Authorization\Voter;
 
 use Symfony\Component\Security\Core\Authentication\AuthenticationTrustResolverInterface;
+use Symfony\Component\Security\Core\Authentication\Token\OfflineTokenInterface;
 use Symfony\Component\Security\Core\Authentication\Token\SwitchUserToken;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Core\Exception\InvalidArgumentException;
 
 /**
  * AuthenticatedVoter votes if an attribute like IS_AUTHENTICATED_FULLY,
@@ -33,11 +35,9 @@ class AuthenticatedVoter implements CacheableVoterInterface
     public const IS_REMEMBERED = 'IS_REMEMBERED';
     public const PUBLIC_ACCESS = 'PUBLIC_ACCESS';
 
-    private AuthenticationTrustResolverInterface $authenticationTrustResolver;
-
-    public function __construct(AuthenticationTrustResolverInterface $authenticationTrustResolver)
-    {
-        $this->authenticationTrustResolver = $authenticationTrustResolver;
+    public function __construct(
+        private AuthenticationTrustResolverInterface $authenticationTrustResolver,
+    ) {
     }
 
     public function vote(TokenInterface $token, mixed $subject, array $attributes): int
@@ -54,6 +54,10 @@ class AuthenticatedVoter implements CacheableVoterInterface
                     && self::IS_IMPERSONATOR !== $attribute
                     && self::IS_REMEMBERED !== $attribute)) {
                 continue;
+            }
+
+            if ($token instanceof OfflineTokenInterface) {
+                throw new InvalidArgumentException('Cannot decide on authentication attributes when an offline token is used.');
             }
 
             $result = VoterInterface::ACCESS_DENIED;

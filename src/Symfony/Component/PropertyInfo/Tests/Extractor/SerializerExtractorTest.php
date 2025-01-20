@@ -11,14 +11,12 @@
 
 namespace Symfony\Component\PropertyInfo\Tests\Extractor;
 
-use Doctrine\Common\Annotations\AnnotationReader;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\PropertyInfo\Extractor\SerializerExtractor;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\AdderRemoverDummy;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\Dummy;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\IgnorePropertyDummy;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactory;
-use Symfony\Component\Serializer\Mapping\Loader\AnnotationLoader;
 use Symfony\Component\Serializer\Mapping\Loader\AttributeLoader;
 
 /**
@@ -30,11 +28,7 @@ class SerializerExtractorTest extends TestCase
 
     protected function setUp(): void
     {
-        if (class_exists(AttributeLoader::class)) {
-            $classMetadataFactory = new ClassMetadataFactory(new AttributeLoader());
-        } else {
-            $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
-        }
+        $classMetadataFactory = new ClassMetadataFactory(new AttributeLoader());
         $this->extractor = new SerializerExtractor($classMetadataFactory);
     }
 
@@ -58,6 +52,6 @@ class SerializerExtractorTest extends TestCase
 
     public function testGetPropertiesWithNonExistentClassReturnsNull()
     {
-        $this->assertSame(null, $this->extractor->getProperties('NonExistent'));
+        $this->assertNull($this->extractor->getProperties('NonExistent'));
     }
 }

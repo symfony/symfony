@@ -35,10 +35,8 @@ class ResolveInvalidReferencesPass implements CompilerPassInterface
 
     /**
      * Process the ContainerBuilder to resolve invalid references.
-     *
-     * @return void
      */
-    public function process(ContainerBuilder $container)
+    public function process(ContainerBuilder $container): void
     {
         $this->container = $container;
         $this->signalingException = new RuntimeException('Invalid reference.');
@@ -114,7 +112,7 @@ class ResolveInvalidReferencesPass implements CompilerPassInterface
                 $e = new ServiceNotFoundException($id, $this->currentId);
 
                 // since the error message varies by $id and $this->currentId, so should the id of the dummy errored definition
-                $this->container->register($id = sprintf('.errored.%s.%s', $this->currentId, $id), $value->getType())
+                $this->container->register($id = \sprintf('.errored.%s.%s', $this->currentId, $id), $value->getType())
                     ->addError($e->getMessage());
 
                 return new TypedReference($id, $value->getType(), $value->getInvalidBehavior());

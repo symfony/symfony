@@ -87,7 +87,7 @@ abstract class AbstractDescriptorTestCase extends TestCase
     {
         $data = [];
         foreach ($objects as $name => $object) {
-            $description = file_get_contents(sprintf('%s/../Fixtures/%s.%s', __DIR__, $name, static::getFormat()));
+            $description = file_get_contents(\sprintf('%s/../Fixtures/%s.%s', __DIR__, $name, static::getFormat()));
             $data[] = [$object, $description];
         }
 

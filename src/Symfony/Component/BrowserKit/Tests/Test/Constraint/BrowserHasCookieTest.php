@@ -13,7 +13,6 @@ namespace Symfony\Component\BrowserKit\Tests\Test\Constraint;
 
 use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Framework\TestCase;
-use PHPUnit\Framework\TestFailure;
 use Symfony\Component\BrowserKit\AbstractBrowser;
 use Symfony\Component\BrowserKit\Cookie;
 use Symfony\Component\BrowserKit\CookieJar;
@@ -31,45 +30,32 @@ class BrowserHasCookieTest extends TestCase
         $constraint = new BrowserHasCookie('bar');
         $this->assertFalse($constraint->evaluate($browser, '', true));
 
-        try {
-            $constraint->evaluate($browser);
-        } catch (ExpectationFailedException $e) {
-            $this->assertEquals("Failed asserting that the Browser has cookie \"bar\".\n", TestFailure::exceptionToString($e));
+        $this->expectException(ExpectationFailedException::class);
+        $this->expectExceptionMessage('Failed asserting that the Browser has cookie "bar".');
 
-            return;
-        }
-
-        $this->fail();
+        $constraint->evaluate($browser);
     }
 
     public function testConstraintWithWrongPath()
     {
         $browser = $this->getBrowser();
         $constraint = new BrowserHasCookie('foo', '/other');
-        try {
-            $constraint->evaluate($browser);
-        } catch (ExpectationFailedException $e) {
-            $this->assertEquals("Failed asserting that the Browser has cookie \"foo\" with path \"/other\".\n", TestFailure::exceptionToString($e));
 
-            return;
-        }
+        $this->expectException(ExpectationFailedException::class);
+        $this->expectExceptionMessage('Failed asserting that the Browser has cookie "foo" with path "/other".');
 
-        $this->fail();
+        $constraint->evaluate($browser);
     }
 
     public function testConstraintWithWrongDomain()
     {
         $browser = $this->getBrowser();
         $constraint = new BrowserHasCookie('foo', '/path', 'example.org');
-        try {
-            $constraint->evaluate($browser);
-        } catch (ExpectationFailedException $e) {
-            $this->assertEquals("Failed asserting that the Browser has cookie \"foo\" with path \"/path\" for domain \"example.org\".\n", TestFailure::exceptionToString($e));
 
-            return;
-        }
+        $this->expectException(ExpectationFailedException::class);
+        $this->expectExceptionMessage('Failed asserting that the Browser has cookie "foo" with path "/path" for domain "example.org".');
 
-        $this->fail();
+        $constraint->evaluate($browser);
     }
 
     private function getBrowser(): AbstractBrowser

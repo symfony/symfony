@@ -39,9 +39,8 @@ abstract class AbstractRedisStoreTestCase extends AbstractStoreTestCase
 
     public function testBackwardCompatibility()
     {
-        $resource = uniqid(__METHOD__, true);
-        $key1 = new Key($resource);
-        $key2 = new Key($resource);
+        $key1 = new Key(static::class.__METHOD__);
+        $key2 = new Key(static::class.__METHOD__);
 
         $oldStore = new Symfony51Store($this->getRedisConnection());
         $newStore = $this->getStore();
@@ -98,7 +97,7 @@ class Symfony51Store
             return $this->redis->eval(...array_merge([$script, 1, $resource], $args));
         }
 
-        throw new InvalidArgumentException(sprintf('"%s()" expects being initialized with a Redis, Relay, RedisArray, RedisCluster or Predis\ClientInterface, "%s" given.', __METHOD__, get_debug_type($this->redis)));
+        throw new InvalidArgumentException(\sprintf('"%s()" expects being initialized with a Redis, Relay, RedisArray, RedisCluster or Predis\ClientInterface, "%s" given.', __METHOD__, get_debug_type($this->redis)));
     }
 
     private function getUniqueToken(Key $key): string

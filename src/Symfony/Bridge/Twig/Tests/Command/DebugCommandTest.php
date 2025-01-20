@@ -314,7 +314,7 @@ TXT
     public static function provideCompletionSuggestions(): iterable
     {
         yield 'name' => [['email'], []];
-        yield 'option --format' => [['--format', ''], ['text', 'json']];
+        yield 'option --format' => [['--format', ''], ['txt', 'json']];
     }
 
     private function createCommandTester(array $paths = [], array $bundleMetadata = [], ?string $defaultPath = null, bool $useChainLoader = false, array $globals = []): CommandTester

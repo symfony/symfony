@@ -5,18 +5,18 @@
       <tool tool-id="symfony" tool-name="Symfony"/>
     </header>
     <body>
-      <trans-unit id="LCa0a2j" resname="foo">
+      <trans-unit id="ea75LoN" resname="foo">
         <source>foo</source>
         <target>bar</target>
         <note priority="1" from="bar">baz</note>
       </trans-unit>
-      <trans-unit id="LHDhK3o" resname="key">
+      <trans-unit id="pL305WR" resname="key">
         <source>key</source>
         <target></target>
         <note>baz</note>
         <note>qux</note>
       </trans-unit>
-      <trans-unit id="2DA_bnh" resname="key.with.cdata">
+      <trans-unit id="FrtCNPU" resname="key.with.cdata">
         <source>key.with.cdata</source>
         <target><![CDATA[<source> & <target>]]></target>
       </trans-unit>

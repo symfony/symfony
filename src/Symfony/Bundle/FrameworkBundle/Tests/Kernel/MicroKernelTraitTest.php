@@ -13,7 +13,6 @@ namespace Symfony\Bundle\FrameworkBundle\Tests\Kernel;
 
 use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
-use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
 use Symfony\Bundle\FrameworkBundle\Kernel\MicroKernelTrait;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
@@ -26,6 +25,7 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\Kernel;
 use Symfony\Component\Routing\Loader\Configurator\RoutingConfigurator;
 
+require_once __DIR__.'/default/src/DefaultKernel.php';
 require_once __DIR__.'/flex-style/src/FlexStyleMicroKernel.php';
 
 class MicroKernelTraitTest extends TestCase
@@ -140,6 +140,30 @@ class MicroKernelTraitTest extends TestCase
 
         $this->assertSame('Hello World!', $response->getContent());
     }
+
+    public function testSimpleKernel()
+    {
+        $kernel = $this->kernel = new SimpleKernel('simple_kernel');
+        $kernel->boot();
+
+        $request = Request::create('/');
+        $response = $kernel->handle($request, HttpKernelInterface::MAIN_REQUEST, false);
+
+        $this->assertSame('Hello World!', $response->getContent());
+    }
+
+    public function testDefaultKernel()
+    {
+        $kernel = $this->kernel = new DefaultKernel('test', false);
+        $kernel->boot();
+
+        $this->assertTrue($kernel->getContainer()->has('foo_service'));
+
+        $request = Request::create('/');
+        $response = $kernel->handle($request, HttpKernelInterface::MAIN_REQUEST, false);
+
+        $this->assertSame('OK', $response->getContent());
+    }
 }
 
 abstract class MinimalKernel extends Kernel
@@ -153,11 +177,6 @@ abstract class MinimalKernel extends Kernel
         parent::__construct('test', false);
 
         $this->cacheDir = sys_get_temp_dir().'/'.$cacheDir;
-    }
-
-    public function registerBundles(): iterable
-    {
-        yield new FrameworkBundle();
     }
 
     public function getCacheDir(): string

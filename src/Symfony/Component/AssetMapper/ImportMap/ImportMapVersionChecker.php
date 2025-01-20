@@ -106,7 +106,7 @@ class ImportMapVersionChecker
             $response = $e->getResponse();
             $packageNames = implode('", "', array_column($errors, 0));
 
-            throw new RuntimeException(sprintf('Error %d finding metadata for package "%s". Response: ', $response->getStatusCode(), $packageNames).$response->getContent(false), 0, $e);
+            throw new RuntimeException(\sprintf('Error %d finding metadata for package "%s". Response: ', $response->getStatusCode(), $packageNames).$response->getContent(false), 0, $e);
         }
 
         return $problems;

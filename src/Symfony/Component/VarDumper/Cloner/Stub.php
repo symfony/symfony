@@ -33,14 +33,14 @@ class Stub
     public const ARRAY_ASSOC = 1;
     public const ARRAY_INDEXED = 2;
 
-    public $type = self::TYPE_REF;
-    public $class = '';
-    public $value;
-    public $cut = 0;
-    public $handle = 0;
-    public $refCount = 0;
-    public $position = 0;
-    public $attr = [];
+    public int $type = self::TYPE_REF;
+    public string|int|null $class = '';
+    public mixed $value = null;
+    public int $cut = 0;
+    public int $handle = 0;
+    public int $refCount = 0;
+    public int $position = 0;
+    public array $attr = [];
 
     private static array $defaultProperties = [];
 

@@ -12,6 +12,7 @@
 namespace Symfony\Component\Cache\Adapter;
 
 use Psr\Cache\CacheItemInterface;
+use Psr\Clock\ClockInterface;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 use Symfony\Component\Cache\CacheItem;
@@ -30,33 +31,30 @@ class ArrayAdapter implements AdapterInterface, CacheInterface, LoggerAwareInter
 {
     use LoggerAwareTrait;
 
-    private bool $storeSerialized;
     private array $values = [];
     private array $tags = [];
     private array $expiries = [];
-    private int $defaultLifetime;
-    private float $maxLifetime;
-    private int $maxItems;
 
     private static \Closure $createCacheItem;
 
     /**
      * @param bool $storeSerialized Disabling serialization can lead to cache corruptions when storing mutable values but increases performance otherwise
      */
-    public function __construct(int $defaultLifetime = 0, bool $storeSerialized = true, float $maxLifetime = 0, int $maxItems = 0)
-    {
+    public function __construct(
+        private int $defaultLifetime = 0,
+        private bool $storeSerialized = true,
+        private float $maxLifetime = 0,
+        private int $maxItems = 0,
+        private ?ClockInterface $clock = null,
+    ) {
         if (0 > $maxLifetime) {
-            throw new InvalidArgumentException(sprintf('Argument $maxLifetime must be positive, %F passed.', $maxLifetime));
+            throw new InvalidArgumentException(\sprintf('Argument $maxLifetime must be positive, %F passed.', $maxLifetime));
         }
 
         if (0 > $maxItems) {
-            throw new InvalidArgumentException(sprintf('Argument $maxItems must be a positive integer, %d passed.', $maxItems));
+            throw new InvalidArgumentException(\sprintf('Argument $maxItems must be a positive integer, %d passed.', $maxItems));
         }
 
-        $this->defaultLifetime = $defaultLifetime;
-        $this->storeSerialized = $storeSerialized;
-        $this->maxLifetime = $maxLifetime;
-        $this->maxItems = $maxItems;
         self::$createCacheItem ??= \Closure::bind(
             static function ($key, $value, $isHit, $tags) {
                 $item = new CacheItem();
@@ -98,7 +96,7 @@ class ArrayAdapter implements AdapterInterface, CacheInterface, LoggerAwareInter
 
     public function hasItem(mixed $key): bool
     {
-        if (\is_string($key) && isset($this->expiries[$key]) && $this->expiries[$key] > microtime(true)) {
+        if (\is_string($key) && isset($this->expiries[$key]) && $this->expiries[$key] > $this->getCurrentTime()) {
             if ($this->maxItems) {
                 // Move the item last in the storage
                 $value = $this->values[$key];
@@ -133,7 +131,7 @@ class ArrayAdapter implements AdapterInterface, CacheInterface, LoggerAwareInter
     {
         \assert(self::validateKeys($keys));
 
-        return $this->generateItems($keys, microtime(true), self::$createCacheItem);
+        return $this->generateItems($keys, $this->getCurrentTime(), self::$createCacheItem);
     }
 
     public function deleteItem(mixed $key): bool
@@ -163,7 +161,7 @@ class ArrayAdapter implements AdapterInterface, CacheInterface, LoggerAwareInter
         $value = $item["\0*\0value"];
         $expiry = $item["\0*\0expiry"];
 
-        $now = microtime(true);
+        $now = $this->getCurrentTime();
 
         if (null !== $expiry) {
             if (!$expiry) {
@@ -220,7 +218,7 @@ class ArrayAdapter implements AdapterInterface, CacheInterface, LoggerAwareInter
     public function clear(string $prefix = ''): bool
     {
         if ('' !== $prefix) {
-            $now = microtime(true);
+            $now = $this->getCurrentTime();
 
             foreach ($this->values as $key => $value) {
                 if (!isset($this->expiries[$key]) || $this->expiries[$key] <= $now || str_starts_with($key, $prefix)) {
@@ -260,10 +258,7 @@ class ArrayAdapter implements AdapterInterface, CacheInterface, LoggerAwareInter
         return $values;
     }
 
-    /**
-     * @return void
-     */
-    public function reset()
+    public function reset(): void
     {
         $this->clear();
     }
@@ -314,7 +309,7 @@ class ArrayAdapter implements AdapterInterface, CacheInterface, LoggerAwareInter
             } catch (\Exception $e) {
                 unset($this->values[$key], $this->tags[$key]);
                 $type = get_debug_type($value);
-                $message = sprintf('Failed to save key "{key}" of type %s: %s', $type, $e->getMessage());
+                $message = \sprintf('Failed to save key "{key}" of type %s: %s', $type, $e->getMessage());
                 CacheItem::log($this->logger, $message, ['key' => $key, 'exception' => $e, 'cache-adapter' => get_debug_type($this)]);
 
                 return null;
@@ -362,5 +357,10 @@ class ArrayAdapter implements AdapterInterface, CacheInterface, LoggerAwareInter
         }
 
         return true;
+    }
+
+    private function getCurrentTime(): float
+    {
+        return $this->clock?->now()->format('U.u') ?? microtime(true);
     }
 }

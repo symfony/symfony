@@ -58,7 +58,6 @@ class MongoDbStore implements PersistingStoreInterface
     private string $namespace;
     private string $uri;
     private array $options;
-    private float $initialTtl;
 
     /**
      * @param Collection|Client|Manager|string $mongo      An instance of a Collection or Client or URI @see https://docs.mongodb.com/manual/reference/connection-string/
@@ -93,15 +92,11 @@ class MongoDbStore implements PersistingStoreInterface
      * readPreference is primary for all queries.
      * @see https://docs.mongodb.com/manual/applications/replication/
      */
-    public function __construct(Collection|Database|Client|Manager|string $mongo, array $options = [], float $initialTtl = 300.0)
-    {
-        if (isset($options['gcProbablity'])) {
-            trigger_deprecation('symfony/lock', '6.3', 'The "gcProbablity" option (notice the typo in its name) is deprecated in "%s"; use the "gcProbability" option instead.', __CLASS__);
-
-            $options['gcProbability'] = $options['gcProbablity'];
-            unset($options['gcProbablity']);
-        }
-
+    public function __construct(
+        Collection|Database|Client|Manager|string $mongo,
+        array $options = [],
+        private float $initialTtl = 300.0,
+    ) {
         $this->options = array_merge([
             'gcProbability' => 0.001,
             'database' => null,
@@ -109,8 +104,6 @@ class MongoDbStore implements PersistingStoreInterface
             'uriOptions' => [],
             'driverOptions' => [],
         ], $options);
-
-        $this->initialTtl = $initialTtl;
 
         if ($mongo instanceof Collection) {
             $this->options['database'] ??= $mongo->getDatabaseName();
@@ -128,19 +121,19 @@ class MongoDbStore implements PersistingStoreInterface
         }
 
         if (null === $this->options['database']) {
-            throw new InvalidArgumentException(sprintf('"%s()" requires the "database" in the URI path or option.', __METHOD__));
+            throw new InvalidArgumentException(\sprintf('"%s()" requires the "database" in the URI path or option.', __METHOD__));
         }
         if (null === $this->options['collection']) {
-            throw new InvalidArgumentException(sprintf('"%s()" requires the "collection" in the URI querystring or option.', __METHOD__));
+            throw new InvalidArgumentException(\sprintf('"%s()" requires the "collection" in the URI querystring or option.', __METHOD__));
         }
         $this->namespace = $this->options['database'].'.'.$this->options['collection'];
 
         if ($this->options['gcProbability'] < 0.0 || $this->options['gcProbability'] > 1.0) {
-            throw new InvalidArgumentException(sprintf('"%s()" gcProbability must be a float from 0.0 to 1.0, "%f" given.', __METHOD__, $this->options['gcProbability']));
+            throw new InvalidArgumentException(\sprintf('"%s()" gcProbability must be a float from 0.0 to 1.0, "%f" given.', __METHOD__, $this->options['gcProbability']));
         }
 
         if ($this->initialTtl <= 0) {
-            throw new InvalidTtlException(sprintf('"%s()" expects a strictly positive TTL, got "%d".', __METHOD__, $this->initialTtl));
+            throw new InvalidTtlException(\sprintf('"%s()" expects a strictly positive TTL, got "%d".', __METHOD__, $this->initialTtl));
         }
     }
 
@@ -154,11 +147,11 @@ class MongoDbStore implements PersistingStoreInterface
     private function skimUri(string $uri): string
     {
         if (!str_starts_with($uri, 'mongodb://') && !str_starts_with($uri, 'mongodb+srv://')) {
-            throw new InvalidArgumentException(sprintf('The given MongoDB Connection URI "%s" is invalid. Expecting "mongodb://" or "mongodb+srv://".', $uri));
+            throw new InvalidArgumentException(\sprintf('The given MongoDB Connection URI "%s" is invalid. Expecting "mongodb://" or "mongodb+srv://".', $uri));
         }
 
         if (false === $params = parse_url($uri)) {
-            throw new InvalidArgumentException(sprintf('The given MongoDB Connection URI "%s" is invalid.', $uri));
+            throw new InvalidArgumentException(\sprintf('The given MongoDB Connection URI "%s" is invalid.', $uri));
         }
         $pathDb = ltrim($params['path'] ?? '', '/') ?: null;
         if (null !== $pathDb) {
@@ -202,13 +195,11 @@ class MongoDbStore implements PersistingStoreInterface
      *
      * @see http://docs.mongodb.org/manual/tutorial/expire-data/
      *
-     * @return void
-     *
      * @throws UnsupportedException          if options are not supported by the selected server
      * @throws MongoInvalidArgumentException for parameter/option parsing errors
      * @throws DriverRuntimeException        for other driver errors (e.g. connection errors)
      */
-    public function createTtlIndex(int $expireAfterSeconds = 0)
+    public function createTtlIndex(int $expireAfterSeconds = 0): void
     {
         $server = $this->getManager()->selectServer();
         $server->executeCommand($this->options['database'], new Command([
@@ -226,11 +217,9 @@ class MongoDbStore implements PersistingStoreInterface
     }
 
     /**
-     * @return void
-     *
      * @throws LockExpiredException when save is called on an expired lock
      */
-    public function save(Key $key)
+    public function save(Key $key): void
     {
         $key->reduceLifetime($this->initialTtl);
 
@@ -251,12 +240,10 @@ class MongoDbStore implements PersistingStoreInterface
     }
 
     /**
-     * @return void
-     *
      * @throws LockStorageException
      * @throws LockExpiredException
      */
-    public function putOffExpiration(Key $key, float $ttl)
+    public function putOffExpiration(Key $key, float $ttl): void
     {
         $key->reduceLifetime($ttl);
 
@@ -272,10 +259,7 @@ class MongoDbStore implements PersistingStoreInterface
         $this->checkNotExpired($key);
     }
 
-    /**
-     * @return void
-     */
-    public function delete(Key $key)
+    public function delete(Key $key): void
     {
         $write = new BulkWrite();
         $write->delete(
@@ -387,5 +371,19 @@ class MongoDbStore implements PersistingStoreInterface
         }
 
         return $key->getState(__CLASS__);
+    }
+
+    public function deleteWithConfirmation(Key $key): bool
+    {
+        $write = new BulkWrite();
+        $write->delete(
+            [
+                '_id' => (string) $key,
+                'token' => $this->getUniqueToken($key),
+            ],
+            ['limit' => 1]
+        );
+
+        return $this->getManager()->executeBulkWrite($this->namespace, $write)->getMatchedCount() != null;
     }
 }

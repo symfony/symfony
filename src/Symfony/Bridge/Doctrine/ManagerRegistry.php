@@ -24,10 +24,7 @@ use Symfony\Component\VarExporter\LazyObjectInterface;
  */
 abstract class ManagerRegistry extends AbstractManagerRegistry
 {
-    /**
-     * @var Container
-     */
-    protected $container;
+    protected Container $container;
 
     protected function getService($name): object
     {
@@ -43,13 +40,13 @@ abstract class ManagerRegistry extends AbstractManagerRegistry
 
         if ($manager instanceof LazyObjectInterface) {
             if (!$manager->resetLazyObject()) {
-                throw new \LogicException(sprintf('Resetting a non-lazy manager service is not supported. Declare the "%s" service as lazy.', $name));
+                throw new \LogicException(\sprintf('Resetting a non-lazy manager service is not supported. Declare the "%s" service as lazy.', $name));
             }
 
             return;
         }
         if (!$manager instanceof LazyLoadingInterface) {
-            throw new \LogicException(sprintf('Resetting a non-lazy manager service is not supported. Declare the "%s" service as lazy.', $name));
+            throw new \LogicException(\sprintf('Resetting a non-lazy manager service is not supported. Declare the "%s" service as lazy.', $name));
         }
         if ($manager instanceof GhostObjectInterface) {
             throw new \LogicException('Resetting a lazy-ghost-object manager service is not supported.');

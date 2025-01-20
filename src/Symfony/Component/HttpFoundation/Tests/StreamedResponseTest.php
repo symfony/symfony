@@ -25,6 +25,17 @@ class StreamedResponseTest extends TestCase
         $this->assertEquals('text/plain', $response->headers->get('Content-Type'));
     }
 
+    public function testConstructorWithChunks()
+    {
+        $chunks = ['foo', 'bar', 'baz'];
+        $callback = (new StreamedResponse($chunks))->getCallback();
+
+        ob_start();
+        $callback();
+
+        $this->assertSame('foobarbaz', ob_get_clean());
+    }
+
     public function testPrepareWith11Protocol()
     {
         $response = new StreamedResponse(function () { echo 'foo'; });

@@ -122,7 +122,7 @@ class HttpClientTraitTest extends TestCase
     public function testNormalizeBodyMultipartForwardStream($stream)
     {
         $body = [
-            'logo' => $stream,
+            'logo' => $stream(),
         ];
 
         $headers = [];
@@ -153,12 +153,8 @@ class HttpClientTraitTest extends TestCase
 
     public static function provideNormalizeBodyMultipartForwardStream()
     {
-        if (!\extension_loaded('openssl')) {
-            throw self::markTestSkipped('Extension openssl required.');
-        }
-
-        yield 'native' => [fopen('https://github.githubassets.com/images/icons/emoji/unicode/1f44d.png', 'r')];
-        yield 'symfony' => [HttpClient::create()->request('GET', 'https://github.githubassets.com/images/icons/emoji/unicode/1f44d.png')->toStream()];
+        yield 'native' => [static fn () => fopen('https://github.githubassets.com/images/icons/emoji/unicode/1f44d.png', 'r')];
+        yield 'symfony' => [static fn () => HttpClient::create()->request('GET', 'https://github.githubassets.com/images/icons/emoji/unicode/1f44d.png')->toStream()];
     }
 
     /**
@@ -249,6 +245,25 @@ class HttpClientTraitTest extends TestCase
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Unsupported scheme in "localhost:8081": "http" or "https" expected.');
         self::resolveUrl(self::parseUrl('/foo'), self::parseUrl('localhost:8081'));
+    }
+
+    /**
+     * @testWith ["http://foo.com\\bar"]
+     *           ["\\\\foo.com/bar"]
+     *           ["a\rb"]
+     *           ["a\nb"]
+     *           ["a\tb"]
+     *           ["\u0000foo"]
+     *           ["foo\u0000"]
+     *           [" foo"]
+     *           ["foo "]
+     *           ["//"]
+     */
+    public function testParseMalformedUrl(string $url)
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Malformed URL');
+        self::parseUrl($url);
     }
 
     /**

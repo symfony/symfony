@@ -40,7 +40,7 @@ final class Transports implements TransportInterface
         }
 
         if (!$this->transports) {
-            throw new LogicException(sprintf('"%s" must have at least one transport configured.', __CLASS__));
+            throw new LogicException(\sprintf('"%s" must have at least one transport configured.', __CLASS__));
         }
     }
 
@@ -56,7 +56,7 @@ final class Transports implements TransportInterface
         $headers->remove('X-Transport');
 
         if (!isset($this->transports[$transport])) {
-            throw new InvalidArgumentException(sprintf('The "%s" transport does not exist (available transports: "%s").', $transport, implode('", "', array_keys($this->transports))));
+            throw new InvalidArgumentException(\sprintf('The "%s" transport does not exist (available transports: "%s").', $transport, implode('", "', array_keys($this->transports))));
         }
 
         try {

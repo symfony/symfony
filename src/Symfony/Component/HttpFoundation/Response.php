@@ -105,35 +105,13 @@ class Response
         'etag' => true,
     ];
 
-    /**
-     * @var ResponseHeaderBag
-     */
-    public $headers;
+    public ResponseHeaderBag $headers;
 
-    /**
-     * @var string
-     */
-    protected $content;
-
-    /**
-     * @var string
-     */
-    protected $version;
-
-    /**
-     * @var int
-     */
-    protected $statusCode;
-
-    /**
-     * @var string
-     */
-    protected $statusText;
-
-    /**
-     * @var string
-     */
-    protected $charset;
+    protected string $content;
+    protected string $version;
+    protected int $statusCode;
+    protected string $statusText;
+    protected ?string $charset = null;
 
     /**
      * Status codes translation table.
@@ -144,9 +122,9 @@ class Response
      *
      * Unless otherwise noted, the status code is defined in RFC2616.
      *
-     * @var array
+     * @var array<int, string>
      */
-    public static $statusTexts = [
+    public static array $statusTexts = [
         100 => 'Continue',
         101 => 'Switching Protocols',
         102 => 'Processing',            // RFC2518
@@ -241,7 +219,7 @@ class Response
     public function __toString(): string
     {
         return
-            sprintf('HTTP/%s %s %s', $this->version, $this->statusCode, $this->statusText)."\r\n".
+            \sprintf('HTTP/%s %s %s', $this->version, $this->statusCode, $this->statusText)."\r\n".
             $this->headers."\r\n".
             $this->getContent();
     }
@@ -335,14 +313,13 @@ class Response
      *
      * @return $this
      */
-    public function sendHeaders(/* int $statusCode = null */): static
+    public function sendHeaders(?int $statusCode = null): static
     {
         // headers have already been sent by the developer
         if (headers_sent()) {
             return $this;
         }
 
-        $statusCode = \func_num_args() > 0 ? func_get_arg(0) : null;
         $informationalResponse = $statusCode >= 100 && $statusCode < 200;
         if ($informationalResponse && !\function_exists('headers_send')) {
             // skip informational responses if not supported by the SAPI
@@ -351,9 +328,6 @@ class Response
 
         // headers
         foreach ($this->headers->allPreserveCaseWithoutCookies() as $name => $values) {
-            $newValues = $values;
-            $replace = false;
-
             // As recommended by RFC 8297, PHP automatically copies headers from previous 103 responses, we need to deal with that if headers changed
             $previousValues = $this->sentHeaders[$name] ?? null;
             if ($previousValues === $values) {
@@ -393,7 +367,7 @@ class Response
         $statusCode ??= $this->statusCode;
 
         // status
-        header(sprintf('HTTP/%s %s %s', $this->version, $statusCode, $this->statusText), true, $statusCode);
+        header(\sprintf('HTTP/%s %s %s', $this->version, $statusCode, $this->statusText), true, $statusCode);
 
         return $this;
     }
@@ -417,12 +391,11 @@ class Response
      *
      * @return $this
      */
-    public function send(/* bool $flush = true */): static
+    public function send(bool $flush = true): static
     {
         $this->sendHeaders();
         $this->sendContent();
 
-        $flush = 1 <= \func_num_args() ? func_get_arg(0) : true;
         if (!$flush) {
             return $this;
         }
@@ -499,7 +472,7 @@ class Response
     {
         $this->statusCode = $code;
         if ($this->isInvalid()) {
-            throw new \InvalidArgumentException(sprintf('The HTTP status code "%s" is not valid.', $code));
+            throw new \InvalidArgumentException(\sprintf('The HTTP status code "%s" is not valid.', $code));
         }
 
         if (null === $text) {
@@ -760,11 +733,8 @@ class Response
      *
      * @final
      */
-    public function setExpires(?\DateTimeInterface $date = null): static
+    public function setExpires(?\DateTimeInterface $date): static
     {
-        if (1 > \func_num_args()) {
-            trigger_deprecation('symfony/http-foundation', '6.2', 'Calling "%s()" without any arguments is deprecated, pass null explicitly instead.', __METHOD__);
-        }
         if (null === $date) {
             $this->headers->remove('Expires');
 
@@ -809,7 +779,7 @@ class Response
     /**
      * Sets the number of seconds after which the response should no longer be considered fresh.
      *
-     * This methods sets the Cache-Control max-age directive.
+     * This method sets the Cache-Control max-age directive.
      *
      * @return $this
      *
@@ -857,7 +827,7 @@ class Response
     /**
      * Sets the number of seconds after which the response should no longer be considered fresh by shared caches.
      *
-     * This methods sets the Cache-Control s-maxage directive.
+     * This method sets the Cache-Control s-maxage directive.
      *
      * @return $this
      *
@@ -941,11 +911,8 @@ class Response
      *
      * @final
      */
-    public function setLastModified(?\DateTimeInterface $date = null): static
+    public function setLastModified(?\DateTimeInterface $date): static
     {
-        if (1 > \func_num_args()) {
-            trigger_deprecation('symfony/http-foundation', '6.2', 'Calling "%s()" without any arguments is deprecated, pass null explicitly instead.', __METHOD__);
-        }
         if (null === $date) {
             $this->headers->remove('Last-Modified');
 
@@ -979,11 +946,8 @@ class Response
      *
      * @final
      */
-    public function setEtag(?string $etag = null, bool $weak = false): static
+    public function setEtag(?string $etag, bool $weak = false): static
     {
-        if (1 > \func_num_args()) {
-            trigger_deprecation('symfony/http-foundation', '6.2', 'Calling "%s()" without any arguments is deprecated, pass null explicitly instead.', __METHOD__);
-        }
         if (null === $etag) {
             $this->headers->remove('Etag');
         } else {
@@ -1011,7 +975,7 @@ class Response
     public function setCache(array $options): static
     {
         if ($diff = array_diff(array_keys($options), array_keys(self::HTTP_RESPONSE_CACHE_CONTROL_DIRECTIVES))) {
-            throw new \InvalidArgumentException(sprintf('Response does not support the following options: "%s".', implode('", "', $diff)));
+            throw new \InvalidArgumentException(\sprintf('Response does not support the following options: "%s".', implode('", "', $diff)));
         }
 
         if (isset($options['etag'])) {

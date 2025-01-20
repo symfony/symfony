@@ -87,6 +87,17 @@ final class BeanstalkdReceiverTest extends TestCase
         $receiver->get();
     }
 
+    public function testKeepalive()
+    {
+        $serializer = $this->createSerializer();
+
+        $connection = $this->createMock(Connection::class);
+        $connection->expects($this->once())->method('keepalive')->with(1);
+
+        $receiver = new BeanstalkdReceiver($connection, $serializer);
+        $receiver->keepalive(new Envelope(new DummyMessage('foo'), [new BeanstalkdReceivedStamp(1, 'bar')]));
+    }
+
     private function createBeanstalkdEnvelope(): array
     {
         return [
@@ -100,10 +111,8 @@ final class BeanstalkdReceiverTest extends TestCase
 
     private function createSerializer(): Serializer
     {
-        $serializer = new Serializer(
+        return new Serializer(
             new SerializerComponent\Serializer([new ObjectNormalizer()], ['json' => new JsonEncoder()])
         );
-
-        return $serializer;
     }
 }

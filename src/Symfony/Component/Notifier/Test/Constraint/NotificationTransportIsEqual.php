@@ -19,16 +19,14 @@ use Symfony\Component\Notifier\Message\MessageInterface;
  */
 final class NotificationTransportIsEqual extends Constraint
 {
-    private ?string $expectedText;
-
-    public function __construct(?string $expectedText)
-    {
-        $this->expectedText = $expectedText;
+    public function __construct(
+        private ?string $expectedText,
+    ) {
     }
 
     public function toString(): string
     {
-        return sprintf('is "%s"', $this->expectedText);
+        return \sprintf('is "%s"', $this->expectedText);
     }
 
     /**

@@ -14,6 +14,7 @@ namespace Symfony\Component\Validator\Tests\Constraints;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Constraints\IdenticalTo;
 use Symfony\Component\Validator\Constraints\IdenticalToValidator;
+use Symfony\Component\Validator\Tests\Constraints\Fixtures\TypedDummy;
 use Symfony\Component\Validator\Tests\IcuCompatibilityTrait;
 
 /**
@@ -22,6 +23,9 @@ use Symfony\Component\Validator\Tests\IcuCompatibilityTrait;
 class IdenticalToValidatorTest extends AbstractComparisonValidatorTestCase
 {
     use IcuCompatibilityTrait;
+    use InvalidComparisonToValueTestTrait;
+    use ThrowsOnInvalidStringDatesTestTrait;
+    use ValidComparisonToValueTrait;
 
     protected function createValidator(): IdenticalToValidator
     {
@@ -90,10 +94,40 @@ class IdenticalToValidatorTest extends AbstractComparisonValidatorTestCase
         ];
     }
 
-    public static function provideComparisonsToNullValueAtPropertyPath(): array
+    public function testCompareWithNullValueAtPropertyAt()
     {
-        return [
-            [5, '5', false],
-        ];
+        $constraint = $this->createConstraint(['propertyPath' => 'value']);
+        $constraint->message = 'Constraint Message';
+
+        $object = new ComparisonTest_Class(null);
+        $this->setObject($object);
+
+        $this->validator->validate(5, $constraint);
+
+        $this->buildViolation('Constraint Message')
+            ->setParameter('{{ value }}', '5')
+            ->setParameter('{{ compared_value }}', 'null')
+            ->setParameter('{{ compared_value_type }}', 'null')
+            ->setParameter('{{ compared_value_path }}', 'value')
+            ->setCode($this->getErrorCode())
+            ->assertRaised();
+    }
+
+    public function testCompareWithUninitializedPropertyAtPropertyPath()
+    {
+        $this->setObject(new TypedDummy());
+
+        $this->validator->validate(5, $this->createConstraint([
+            'message' => 'Constraint Message',
+            'propertyPath' => 'value',
+        ]));
+
+        $this->buildViolation('Constraint Message')
+            ->setParameter('{{ value }}', '5')
+            ->setParameter('{{ compared_value }}', 'null')
+            ->setParameter('{{ compared_value_type }}', 'null')
+            ->setParameter('{{ compared_value_path }}', 'value')
+            ->setCode($this->getErrorCode())
+            ->assertRaised();
     }
 }

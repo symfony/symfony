@@ -15,6 +15,8 @@ framework:
     translator: true
     validation: true
     serializer: true
-    property_info: true
+    property_info:
+        enabled: true
+        with_constructor_extractor: true
     csrf_protection: true
     form: true

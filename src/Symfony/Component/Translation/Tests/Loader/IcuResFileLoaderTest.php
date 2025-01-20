@@ -36,14 +36,14 @@ class IcuResFileLoaderTest extends LocalizedTestCase
     public function testLoadNonExistingResource()
     {
         $this->expectException(NotFoundResourceException::class);
-        $loader = new IcuResFileLoader();
-        $loader->load(__DIR__.'/../Fixtures/non-existing.txt', 'en', 'domain1');
+
+        (new IcuResFileLoader())->load(__DIR__.'/../Fixtures/non-existing.txt', 'en', 'domain1');
     }
 
     public function testLoadInvalidResource()
     {
         $this->expectException(InvalidResourceException::class);
-        $loader = new IcuResFileLoader();
-        $loader->load(__DIR__.'/../Fixtures/resourcebundle/corrupted', 'en', 'domain1');
+
+        (new IcuResFileLoader())->load(__DIR__.'/../Fixtures/resourcebundle/corrupted', 'en', 'domain1');
     }
 }

@@ -127,8 +127,6 @@ class ScalarNodeTest extends TestCase
 
     /**
      * @dataProvider getValidNonEmptyValues
-     *
-     * @param mixed $value
      */
     public function testValidNonEmptyValues($value)
     {

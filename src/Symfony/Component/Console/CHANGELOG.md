@@ -1,6 +1,35 @@
 CHANGELOG
 =========
 
+7.3
+---
+
+ * Add support for invokable commands and add `#[Argument]` and `#[Option]` attributes to define input arguments and options
+ * Deprecate not declaring the parameter type in callable commands defined through `setCode` method
+
+7.2
+---
+
+ * Add support for `FORCE_COLOR` environment variable
+ * Add `verbosity` argument to `mustRun` process helper method
+ * [BC BREAK] Add silent verbosity (`--silent`/`SHELL_VERBOSITY=-2`) to suppress all output, including errors
+ * Add `OutputInterface::isSilent()`, `Output::isSilent()`, `OutputStyle::isSilent()` methods
+ * Add a configurable finished indicator to the progress indicator to show that the progress is finished
+ * Add ability to schedule alarm signals and a `ConsoleAlarmEvent`
+
+7.1
+---
+
+ * Add `ArgvInput::getRawTokens()`
+
+7.0
+---
+
+ * Add method `__toString()` to `InputInterface`
+ * Remove `Command::$defaultName` and `Command::$defaultDescription`, use the `AsCommand` attribute instead
+ * Require explicit argument when calling `*Command::setApplication()`, `*FormatterStyle::setForeground/setBackground()`, `Helper::setHelpSet()`, `Input*::setDefault()` and `Question::setAutocompleterCallback/setValidator()`
+ * Remove `StringInput::REGEX_STRING`
+
 6.4
 ---
 

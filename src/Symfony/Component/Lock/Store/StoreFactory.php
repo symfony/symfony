@@ -50,7 +50,7 @@ class StoreFactory
                 return new ZookeeperStore($connection);
 
             case !\is_string($connection):
-                throw new InvalidArgumentException(sprintf('Unsupported Connection: "%s".', get_debug_type($connection)));
+                throw new InvalidArgumentException(\sprintf('Unsupported Connection: "%s".', get_debug_type($connection)));
             case 'flock' === $connection:
                 return new FlockStore();
 
@@ -106,8 +106,11 @@ class StoreFactory
 
             case 'in-memory' === $connection:
                 return new InMemoryStore();
+
+            case 'null' === $connection:
+                return new NullStore();
         }
 
-        throw new InvalidArgumentException(sprintf('Unsupported Connection: "%s".', $connection));
+        throw new InvalidArgumentException(\sprintf('Unsupported Connection: "%s".', $connection));
     }
 }

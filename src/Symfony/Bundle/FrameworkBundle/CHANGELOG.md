@@ -1,6 +1,84 @@
 CHANGELOG
 =========
 
+7.3
+---
+
+ * Add support for assets pre-compression
+ * Rename `TranslationUpdateCommand` to `TranslationExtractCommand`
+ * Add JsonEncoder services and configuration
+ * Add new `framework.property_info.with_constructor_extractor` option to allow enabling or disabling the constructor extractor integration
+ * Deprecate the `--show-arguments` option of the `container:debug` command, as arguments are now always shown
+
+7.2
+---
+
+ * Add support for `--sort` option when extracting translations with `translation:extract` command and `--force` option
+ * Add support for setting `headers` with `Symfony\Bundle\FrameworkBundle\Controller\TemplateController`
+ * Add `--resolve-env-vars` option to `lint:container` command
+ * Derivate `kernel.secret` from the decryption secret when its env var is not defined
+ * Make the `config/` directory optional in `MicroKernelTrait`, add support for service arguments in the
+   invokable Kernel class, and register `FrameworkBundle` by default when the `bundles.php` file is missing
+ * [BC BREAK] The `secrets:decrypt-to-local` command terminates with a non-zero exit code when a secret could not be read
+ * Deprecate making `cache.app` adapter taggable, use the `cache.app.taggable` adapter instead
+ * Enable `json_decode_detailed_errors` in the default serializer context in debug mode by default when `seld/jsonlint` is installed
+ * Register `Symfony\Component\Serializer\NameConverter\SnakeCaseToCamelCaseNameConverter` as a service named `serializer.name_converter.snake_case_to_camel_case` if available
+ * Add `framework.csrf_protection.stateless_token_ids`, `.cookie_name`, and `.check_header` options to use stateless headers/cookies-based CSRF protection
+ * Add `framework.form.csrf_protection.field_attr` option
+ * Deprecate `session.sid_length` and `session.sid_bits_per_character` config options
+ * Add the ability to use an existing service as a lock/semaphore resource
+ * Add support for configuring multiple serializer instances via the configuration
+ * Add support for `SYMFONY_TRUSTED_PROXIES`, `SYMFONY_TRUSTED_HEADERS`, `SYMFONY_TRUST_X_SENDFILE_TYPE_HEADER` and `SYMFONY_TRUSTED_HOSTS` env vars
+ * Add `--no-fill` option to `translation:extract` command
+
+7.1
+---
+
+ * Add `CheckAliasValidityPass` to `lint:container` command
+ * Add `private_ranges` as a shortcut for private IP address ranges to the `trusted_proxies` option
+ * Mark classes `ConfigBuilderCacheWarmer`, `Router`, `SerializerCacheWarmer`, `TranslationsCacheWarmer`, `Translator` and `ValidatorCacheWarmer` as `final`
+ * Move the Router `cache_dir` to `kernel.build_dir`
+ * Deprecate the `router.cache_dir` config option
+ * Add `rate_limiter` tags to rate limiter services
+ * Add `secrets:reveal` command
+ * Add `rate_limiter` option to `http_client.default_options` and `http_client.scoped_clients`
+ * Attach the workflow's configuration to the `workflow` tag
+ * Add the `allowed_recipients` option for mailer to allow some users to receive
+   emails even if `recipients` is defined.
+ * Reset env vars when resetting the container
+
+7.0
+---
+
+ * Remove command `translation:update`, use `translation:extract` instead
+ * Make the `http_method_override` config option default to `false`
+ * Remove `AbstractController::renderForm()`, use `render()` instead
+ * Remove the `Symfony\Component\Serializer\Normalizer\ObjectNormalizer` and
+   `Symfony\Component\Serializer\Normalizer\PropertyNormalizer` autowiring aliases, type-hint against
+   `Symfony\Component\Serializer\Normalizer\NormalizerInterface` or implement `NormalizerAwareInterface` instead
+ * Remove the `Http\Client\HttpClient` service, use `Psr\Http\Client\ClientInterface` instead
+ * Remove the integration of Doctrine annotations, use native attributes instead
+ * Remove `EnableLoggerDebugModePass`, use argument `$debug` of HttpKernel's `Logger` instead
+ * Remove `AddDebugLogProcessorPass::configureLogger()`, use HttpKernel's `DebugLoggerConfigurator` instead
+ * Make the `framework.handle_all_throwables` config option default to `true`
+ * Make the `framework.php_errors.log` config option default to `true`
+ * Make the `framework.session.cookie_secure` config option default to `auto`
+ * Make the `framework.session.cookie_samesite` config option default to `lax`
+ * Make the `framework.session.handler_id` default to null if `save_path` is not set and to `session.handler.native_file` otherwise
+ * Make the `framework.uid.default_uuid_version` config option default to `7`
+ * Make the `framework.uid.time_based_uuid_version` config option default to `7`
+ * Make the `framework.validation.email_validation_mode` config option default to `html5`
+ * Remove the `framework.validation.enable_annotations` config option, use `framework.validation.enable_attributes` instead
+ * Remove the `framework.serializer.enable_annotations` config option, use `framework.serializer.enable_attributes` instead
+ * Remove the `routing.loader.annotation` service, use the `routing.loader.attribute` service instead
+ * Remove the `routing.loader.annotation.directory` service, use the `routing.loader.attribute.directory` service instead
+ * Remove the `routing.loader.annotation.file` service, use the `routing.loader.attribute.file` service instead
+ * Remove `AnnotatedRouteControllerLoader`, use `AttributeRouteControllerLoader` instead
+ * Remove `AddExpressionLanguageProvidersPass`, use `Symfony\Component\Routing\DependencyInjection\AddExpressionLanguageProvidersPass` instead
+ * Remove `DataCollectorTranslatorPass`, use `Symfony\Component\Translation\DependencyInjection\DataCollectorTranslatorPass` instead
+ * Remove `LoggingTranslatorPass`, use `Symfony\Component\Translation\DependencyInjection\LoggingTranslatorPass` instead
+ * Remove `WorkflowGuardListenerPass`, use `Symfony\Component\Workflow\DependencyInjection\WorkflowGuardListenerPass` instead
+
 6.4
 ---
 

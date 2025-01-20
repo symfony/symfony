@@ -1,6 +1,17 @@
 CHANGELOG
 =========
 
+3.6
+---
+
+ * Make `HttpClientTestCase` and `TranslatorTest` compatible with PHPUnit 10+
+
+3.5
+---
+
+ * Add `ServiceCollectionInterface`
+ * Deprecate `ServiceSubscriberTrait`, use `ServiceMethodsSubscriberTrait` instead
+
 3.4
 ---
 

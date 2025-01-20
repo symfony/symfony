@@ -38,19 +38,13 @@ use Symfony\Component\Validator\Mapping\TraversalStrategy;
 #[AsCommand(name: 'debug:validator', description: 'Display validation constraints for classes')]
 class DebugCommand extends Command
 {
-    private MetadataFactoryInterface $validator;
-
-    public function __construct(MetadataFactoryInterface $validator)
-    {
+    public function __construct(
+        private MetadataFactoryInterface $validator,
+    ) {
         parent::__construct();
-
-        $this->validator = $validator;
     }
 
-    /**
-     * @return void
-     */
-    protected function configure()
+    protected function configure(): void
     {
         $this
             ->addArgument('class', InputArgument::REQUIRED, 'A fully qualified class name or a path')
@@ -80,7 +74,7 @@ EOF
             }
         } catch (DirectoryNotFoundException) {
             $io = new SymfonyStyle($input, $output);
-            $io->error(sprintf('Neither class nor path were found with "%s" argument.', $input->getArgument('class')));
+            $io->error(\sprintf('Neither class nor path were found with "%s" argument.', $input->getArgument('class')));
 
             return 1;
         }
@@ -91,7 +85,7 @@ EOF
     private function dumpValidatorsForClass(InputInterface $input, OutputInterface $output, string $class): void
     {
         $io = new SymfonyStyle($input, $output);
-        $title = sprintf('<info>%s</info>', $class);
+        $title = \sprintf('<info>%s</info>', $class);
         $rows = [];
         $dump = new Dumper($output);
 

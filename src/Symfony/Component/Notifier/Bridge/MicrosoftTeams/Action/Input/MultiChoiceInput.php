@@ -53,8 +53,8 @@ final class MultiChoiceInput extends AbstractInput
      */
     public function style(string $style): static
     {
-        if (!\in_array($style, self::STYLES)) {
-            throw new InvalidArgumentException(sprintf('Supported styles for "%s" method are: "%s".', __METHOD__, implode('", "', self::STYLES)));
+        if (!\in_array($style, self::STYLES, true)) {
+            throw new InvalidArgumentException(\sprintf('Supported styles for "%s" method are: "%s".', __METHOD__, implode('", "', self::STYLES)));
         }
 
         $this->options['style'] = $style;

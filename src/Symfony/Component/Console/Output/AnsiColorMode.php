@@ -51,7 +51,7 @@ enum AnsiColorMode
         }
 
         if (6 !== \strlen($hexColor)) {
-            throw new InvalidArgumentException(sprintf('Invalid "#%s" color.', $hexColor));
+            throw new InvalidArgumentException(\sprintf('Invalid "#%s" color.', $hexColor));
         }
 
         $color = hexdec($hexColor);
@@ -62,8 +62,8 @@ enum AnsiColorMode
 
         return match ($this) {
             self::Ansi4 => (string) $this->convertFromRGB($r, $g, $b),
-            self::Ansi8 => '8;5;'.((string) $this->convertFromRGB($r, $g, $b)),
-            self::Ansi24 => sprintf('8;2;%d;%d;%d', $r, $g, $b)
+            self::Ansi8 => '8;5;'.$this->convertFromRGB($r, $g, $b),
+            self::Ansi24 => \sprintf('8;2;%d;%d;%d', $r, $g, $b),
         };
     }
 
@@ -72,7 +72,7 @@ enum AnsiColorMode
         return match ($this) {
             self::Ansi4 => $this->degradeHexColorToAnsi4($r, $g, $b),
             self::Ansi8 => $this->degradeHexColorToAnsi8($r, $g, $b),
-            default => throw new InvalidArgumentException("RGB cannot be converted to {$this->name}.")
+            default => throw new InvalidArgumentException("RGB cannot be converted to {$this->name}."),
         };
     }
 
@@ -96,11 +96,11 @@ enum AnsiColorMode
             }
 
             return (int) round(($r - 8) / 247 * 24) + 232;
-        } else {
-            return 16 +
-                    (36 * (int) round($r / 255 * 5)) +
-                    (6 * (int) round($g / 255 * 5)) +
-                    (int) round($b / 255 * 5);
         }
+
+        return 16 +
+            (36 * (int) round($r / 255 * 5)) +
+            (6 * (int) round($g / 255 * 5)) +
+            (int) round($b / 255 * 5);
     }
 }

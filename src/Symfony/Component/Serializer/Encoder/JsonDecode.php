@@ -23,11 +23,6 @@ use Symfony\Component\Serializer\Exception\UnsupportedException;
 class JsonDecode implements DecoderInterface
 {
     /**
-     * @deprecated since Symfony 6.4, to be removed in 7.0
-     */
-    protected $serializer;
-
-    /**
      * True to return the result as an associative array, false for a nested stdClass hierarchy.
      */
     public const ASSOCIATIVE = 'json_decode_associative';
@@ -111,7 +106,7 @@ class JsonDecode implements DecoderInterface
         }
 
         if (!class_exists(JsonParser::class)) {
-            throw new UnsupportedException(sprintf('Enabling "%s" serializer option requires seld/jsonlint. Try running "composer require seld/jsonlint".', self::DETAILED_ERROR_MESSAGES));
+            throw new UnsupportedException(\sprintf('Enabling "%s" serializer option requires seld/jsonlint. Try running "composer require seld/jsonlint".', self::DETAILED_ERROR_MESSAGES));
         }
 
         throw new NotEncodableValueException((new JsonParser())->lint($data)?->getMessage() ?: $errorMessage);

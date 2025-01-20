@@ -23,8 +23,6 @@ abstract class AdapterTestCase extends CachePoolTest
 {
     protected function setUp(): void
     {
-        parent::setUp();
-
         if (!\array_key_exists('testPrune', $this->skippedTests) && !$this->createCachePool() instanceof PruneableInterface) {
             $this->skippedTests['testPrune'] = 'Not a pruneable cache pool.';
         }
@@ -356,7 +354,7 @@ abstract class AdapterTestCase extends CachePoolTest
 
 class NotUnserializable
 {
-    public function __wakeup()
+    public function __wakeup(): void
     {
         throw new \Exception(__CLASS__);
     }

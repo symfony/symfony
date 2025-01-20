@@ -12,7 +12,6 @@
 namespace Symfony\Component\Security\Http\Firewall;
 
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Exception\LogoutException;
@@ -32,26 +31,23 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
  */
 class LogoutListener extends AbstractListener
 {
-    private TokenStorageInterface $tokenStorage;
     private array $options;
-    private HttpUtils $httpUtils;
-    private ?CsrfTokenManagerInterface $csrfTokenManager;
-    private EventDispatcherInterface $eventDispatcher;
 
     /**
      * @param array $options An array of options to process a logout attempt
      */
-    public function __construct(TokenStorageInterface $tokenStorage, HttpUtils $httpUtils, EventDispatcherInterface $eventDispatcher, array $options = [], ?CsrfTokenManagerInterface $csrfTokenManager = null)
-    {
-        $this->tokenStorage = $tokenStorage;
-        $this->httpUtils = $httpUtils;
+    public function __construct(
+        private TokenStorageInterface $tokenStorage,
+        private HttpUtils $httpUtils,
+        private EventDispatcherInterface $eventDispatcher,
+        array $options = [],
+        private ?CsrfTokenManagerInterface $csrfTokenManager = null,
+    ) {
         $this->options = array_merge([
             'csrf_parameter' => '_csrf_token',
             'csrf_token_id' => 'logout',
             'logout_path' => '/logout',
         ], $options);
-        $this->csrfTokenManager = $csrfTokenManager;
-        $this->eventDispatcher = $eventDispatcher;
     }
 
     public function supports(Request $request): ?bool

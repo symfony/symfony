@@ -38,10 +38,8 @@ class MiddlewareTest extends TestCase
 
     protected function setUp(): void
     {
-        parent::setUp();
-
         if (!interface_exists(MiddlewareInterface::class)) {
-            $this->markTestSkipped(sprintf('%s needed to run this test', MiddlewareInterface::class));
+            $this->markTestSkipped(\sprintf('%s needed to run this test', MiddlewareInterface::class));
         }
 
         ClockMock::withClockMock(false);
@@ -52,12 +50,8 @@ class MiddlewareTest extends TestCase
         $this->stopwatch = $withStopwatch ? new Stopwatch() : null;
 
         $config = ORMSetup::createConfiguration(true);
-        if (class_exists(DefaultSchemaManagerFactory::class)) {
-            $config->setSchemaManagerFactory(new DefaultSchemaManagerFactory());
-        }
-        if (!class_exists(\Doctrine\Persistence\Mapping\Driver\AnnotationDriver::class)) { // doctrine/persistence >= 3.0
-            $config->setLazyGhostObjectEnabled(true);
-        }
+        $config->setSchemaManagerFactory(new DefaultSchemaManagerFactory());
+        $config->setLazyGhostObjectEnabled(true);
         $this->debugDataHolder = new DebugDataHolder();
         $config->setMiddlewares([new Middleware($this->debugDataHolder, $this->stopwatch)]);
 

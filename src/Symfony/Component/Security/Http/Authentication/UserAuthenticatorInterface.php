@@ -26,7 +26,8 @@ interface UserAuthenticatorInterface
      * Convenience method to programmatically login a user and return a
      * Response *if any* for success.
      *
-     * @param BadgeInterface[] $badges Optionally, pass some Passport badges to use for the manual login
+     * @param BadgeInterface[]     $badges     Optionally, pass some Passport badges to use for the manual login
+     * @param array<string, mixed> $attributes Optionally, pass some Passport attributes to use for the manual login
      */
-    public function authenticateUser(UserInterface $user, AuthenticatorInterface $authenticator, Request $request, array $badges = []): ?Response;
+    public function authenticateUser(UserInterface $user, AuthenticatorInterface $authenticator, Request $request, array $badges = [] /* , array $attributes = [] */): ?Response;
 }

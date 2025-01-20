@@ -12,10 +12,13 @@
 namespace Symfony\Component\Notifier\Bridge\Isendpro\Tests;
 
 use Symfony\Component\Notifier\Bridge\Isendpro\IsendproTransportFactory;
-use Symfony\Component\Notifier\Test\TransportFactoryTestCase;
+use Symfony\Component\Notifier\Test\AbstractTransportFactoryTestCase;
+use Symfony\Component\Notifier\Test\IncompleteDsnTestTrait;
 
-final class IsendproTransportFactoryTest extends TransportFactoryTestCase
+final class IsendproTransportFactoryTest extends AbstractTransportFactoryTestCase
 {
+    use IncompleteDsnTestTrait;
+
     public function createFactory(): IsendproTransportFactory
     {
         return new IsendproTransportFactory();
@@ -73,13 +76,5 @@ final class IsendproTransportFactoryTest extends TransportFactoryTestCase
     public static function unsupportedSchemeProvider(): iterable
     {
         yield ['somethingElse://account_key_id@default'];
-    }
-
-    /**
-     * @dataProvider missingRequiredOptionProvider
-     */
-    public function testMissingRequiredOptionException(string $dsn, ?string $message = null)
-    {
-        $this->markTestIncomplete('The only required option is account key id, matched by incompleteDsnProvider');
     }
 }

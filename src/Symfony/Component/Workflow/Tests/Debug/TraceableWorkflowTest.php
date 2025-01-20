@@ -21,9 +21,9 @@ use Symfony\Component\Workflow\Workflow;
 
 class TraceableWorkflowTest extends TestCase
 {
-    private MockObject|Workflow $innerWorkflow;
+    private MockObject&Workflow $innerWorkflow;
 
-    private StopWatch $stopwatch;
+    private Stopwatch $stopwatch;
 
     private TraceableWorkflow $traceableWorkflow;
 

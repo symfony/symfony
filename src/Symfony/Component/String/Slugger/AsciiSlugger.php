@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\String\Slugger;
 
-use Symfony\Component\Intl\Transliterator\EmojiTransliterator;
+use Symfony\Component\Emoji\EmojiTransliterator;
 use Symfony\Component\String\AbstractUnicodeString;
 use Symfony\Component\String\UnicodeString;
 use Symfony\Contracts\Translation\LocaleAwareInterface;
@@ -55,7 +55,6 @@ class AsciiSlugger implements SluggerInterface, LocaleAwareInterface
         'zh' => 'Han-Latin',
     ];
 
-    private ?string $defaultLocale;
     private \Closure|array $symbolsMap = [
         'en' => ['@' => 'at', '&' => 'and'],
     ];
@@ -68,16 +67,14 @@ class AsciiSlugger implements SluggerInterface, LocaleAwareInterface
      */
     private array $transliterators = [];
 
-    public function __construct(?string $defaultLocale = null, array|\Closure|null $symbolsMap = null)
-    {
-        $this->defaultLocale = $defaultLocale;
+    public function __construct(
+        private ?string $defaultLocale = null,
+        array|\Closure|null $symbolsMap = null,
+    ) {
         $this->symbolsMap = $symbolsMap ?? $this->symbolsMap;
     }
 
-    /**
-     * @return void
-     */
-    public function setLocale(string $locale)
+    public function setLocale(string $locale): void
     {
         $this->defaultLocale = $locale;
     }
@@ -95,7 +92,7 @@ class AsciiSlugger implements SluggerInterface, LocaleAwareInterface
     public function withEmoji(bool|string $emoji = true): static
     {
         if (false !== $emoji && !class_exists(EmojiTransliterator::class)) {
-            throw new \LogicException(sprintf('You cannot use the "%s()" method as the "symfony/intl" package is not installed. Try running "composer require symfony/intl".', __METHOD__));
+            throw new \LogicException(\sprintf('You cannot use the "%s()" method as the "symfony/emoji" package is not installed. Try running "composer require symfony/emoji".', __METHOD__));
         }
 
         $new = clone $this;

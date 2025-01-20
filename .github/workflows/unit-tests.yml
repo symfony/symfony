@@ -26,13 +26,16 @@ jobs:
     strategy:
       matrix:
         include:
-          - php: '8.1'
+          - php: '8.2'
           - php: '8.2'
             mode: high-deps
           - php: '8.2'
             mode: low-deps
           - php: '8.3'
           - php: '8.4'
+            # brotli and zstd extensions are optional, when not present the commands will be used instead,
+            # we must test both scenarios
+            extensions: amqp,apcu,brotli,igbinary,intl,mbstring,memcached,redis,relay,zstd
           - php: '8.5'
             #mode: experimental
       fail-fast: false
@@ -53,6 +56,12 @@ jobs:
           php-version: "${{ matrix.php }}"
           extensions: "${{ matrix.extensions || env.extensions }}"
           tools: flex
+
+      - name: Install optional commands
+        if: matrix.php == '8.4'
+        run: |
+          sudo apt-get update
+          sudo apt-get install zopfli
 
       - name: Configure environment
         run: |
@@ -97,7 +106,7 @@ jobs:
             echo SYMFONY_DEPRECATIONS_HELPER=weak >> $GITHUB_ENV
             cp composer.json composer.json.orig
             echo -e '{\n"require":{'"$(grep phpunit-bridge composer.json)"'"php":"*"},"minimum-stability":"dev"}' > composer.json
-            php .github/build-packages.php HEAD^ $SYMFONY_VERSION $(find src/Symfony -mindepth 2 -type f -name composer.json -printf '%h\n' | grep -v src/Symfony/Component/Intl/Resources/emoji)
+            php .github/build-packages.php HEAD^ $SYMFONY_VERSION $(find src/Symfony -mindepth 2 -type f -name composer.json -printf '%h\n' | grep -v src/Symfony/Component/Emoji/Resources/bin)
             mv composer.json composer.json.phpunit
             mv composer.json.orig composer.json
           fi
@@ -145,19 +154,19 @@ jobs:
           echo "::endgroup::"
 
       - name: Patch return types
-        if: "matrix.php == '8.1' && ! matrix.mode"
+        if: "matrix.php == '8.2' && ! matrix.mode"
         run: |
           patch -sp1 < .github/expected-missing-return-types.diff
           git add .
           composer install -q --optimize-autoloader || composer install --optimize-autoloader
-          SYMFONY_PATCH_TYPE_DECLARATIONS='force=2&php=8.1' php .github/patch-types.php
+          SYMFONY_PATCH_TYPE_DECLARATIONS='force=2&php=8.2' php .github/patch-types.php
           git checkout src/Symfony/Contracts/Service/ResetInterface.php
-          SYMFONY_PATCH_TYPE_DECLARATIONS='force=2&php=8.1' php .github/patch-types.php # ensure the script is idempotent
+          SYMFONY_PATCH_TYPE_DECLARATIONS='force=2&php=8.2' php .github/patch-types.php # ensure the script is idempotent
           git checkout src/Symfony/Contracts/Service/ResetInterface.php
           git diff --exit-code
 
       - name: Check return types
-        if: "matrix.php == '8.1' && ! matrix.mode"
+        if: "matrix.php == '8.2' && ! matrix.mode"
         run: |
           php .github/patch-types.php lint
 
@@ -229,14 +238,22 @@ jobs:
             script -e -c './phpunit --group tty' /dev/null
 
       - name: Run tests with SIGCHLD enabled PHP
-        if: "matrix.php == '8.1' && ! matrix.mode"
+        if: "matrix.php == '8.2' && ! matrix.mode"
         run: |
           mkdir build
           cd build
-          wget -q https://github.com/symfony/binary-utils/releases/download/v0.1/php-8.1.2-pcntl-sigchild.tar.bz2
-          tar -xjf php-8.1.2-pcntl-sigchild.tar.bz2
+          wget -q https://github.com/symfony/binary-utils/releases/download/v0.1/php-8.2.0-pcntl-sigchild.tar.bz2
+          tar -xjf php-8.2.0-pcntl-sigchild.tar.bz2
           cd ..
 
           mkdir -p /opt/php/lib
           echo memory_limit=-1 > /opt/php/lib/php.ini
           ./build/php/bin/php ./phpunit --colors=always src/Symfony/Component/Process
+
+      - name: Run PhpUnitBridge tests with PHPUnit 11
+        if: '! matrix.mode'
+        run: |
+          ./phpunit src/Symfony/Bridge/PhpUnit
+        env:
+          SYMFONY_PHPUNIT_VERSION: '11.3'
+          SYMFONY_DEPRECATIONS_HELPER: 'disabled'

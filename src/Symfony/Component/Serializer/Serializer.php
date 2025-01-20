@@ -23,9 +23,6 @@ use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
 use Symfony\Component\Serializer\Exception\PartialDenormalizationException;
 use Symfony\Component\Serializer\Exception\UnsupportedFormatException;
 use Symfony\Component\Serializer\Normalizer\AbstractObjectNormalizer;
-use Symfony\Component\Serializer\Normalizer\CacheableSupportsMethodInterface;
-use Symfony\Component\Serializer\Normalizer\ContextAwareDenormalizerInterface;
-use Symfony\Component\Serializer\Normalizer\ContextAwareNormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\DenormalizerAwareInterface;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerAwareInterface;
@@ -46,7 +43,7 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
  * @author Lukas Kahwe Smith <smith@pooteeweet.org>
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class Serializer implements SerializerInterface, ContextAwareNormalizerInterface, ContextAwareDenormalizerInterface, ContextAwareEncoderInterface, ContextAwareDecoderInterface
+class Serializer implements SerializerInterface, NormalizerInterface, DenormalizerInterface, ContextAwareEncoderInterface, ContextAwareDecoderInterface
 {
     /**
      * Flag to control whether an empty array should be transformed to an
@@ -61,15 +58,9 @@ class Serializer implements SerializerInterface, ContextAwareNormalizerInterface
         'string' => true,
     ];
 
-    /**
-     * @var ChainEncoder
-     */
-    protected $encoder;
+    protected ChainEncoder $encoder;
 
-    /**
-     * @var ChainDecoder
-     */
-    protected $decoder;
+    protected ChainDecoder $decoder;
 
     /**
      * @var array<string, array<string, array<bool>>>
@@ -103,7 +94,7 @@ class Serializer implements SerializerInterface, ContextAwareNormalizerInterface
             }
 
             if (!($normalizer instanceof NormalizerInterface || $normalizer instanceof DenormalizerInterface)) {
-                throw new InvalidArgumentException(sprintf('The class "%s" neither implements "%s" nor "%s".', get_debug_type($normalizer), NormalizerInterface::class, DenormalizerInterface::class));
+                throw new InvalidArgumentException(\sprintf('The class "%s" neither implements "%s" nor "%s".', get_debug_type($normalizer), NormalizerInterface::class, DenormalizerInterface::class));
             }
         }
 
@@ -121,7 +112,7 @@ class Serializer implements SerializerInterface, ContextAwareNormalizerInterface
             }
 
             if (!($encoder instanceof EncoderInterface || $encoder instanceof DecoderInterface)) {
-                throw new InvalidArgumentException(sprintf('The class "%s" neither implements "%s" nor "%s".', get_debug_type($encoder), EncoderInterface::class, DecoderInterface::class));
+                throw new InvalidArgumentException(\sprintf('The class "%s" neither implements "%s" nor "%s".', get_debug_type($encoder), EncoderInterface::class, DecoderInterface::class));
             }
         }
         $this->encoder = new ChainEncoder($realEncoders);
@@ -131,7 +122,7 @@ class Serializer implements SerializerInterface, ContextAwareNormalizerInterface
     final public function serialize(mixed $data, string $format, array $context = []): string
     {
         if (!$this->supportsEncoding($format, $context)) {
-            throw new UnsupportedFormatException(sprintf('Serialization for the format "%s" is not supported.', $format));
+            throw new UnsupportedFormatException(\sprintf('Serialization for the format "%s" is not supported.', $format));
         }
 
         if ($this->encoder->needsNormalization($format, $context)) {
@@ -144,7 +135,7 @@ class Serializer implements SerializerInterface, ContextAwareNormalizerInterface
     final public function deserialize(mixed $data, string $type, string $format, array $context = []): mixed
     {
         if (!$this->supportsDecoding($format, $context)) {
-            throw new UnsupportedFormatException(sprintf('Deserialization for the format "%s" is not supported.', $format));
+            throw new UnsupportedFormatException(\sprintf('Deserialization for the format "%s" is not supported.', $format));
         }
 
         $data = $this->decode($data, $format, $context);
@@ -185,10 +176,10 @@ class Serializer implements SerializerInterface, ContextAwareNormalizerInterface
                 throw new LogicException('You must register at least one normalizer to be able to normalize objects.');
             }
 
-            throw new NotNormalizableValueException(sprintf('Could not normalize object of type "%s", no supporting normalizer found.', get_debug_type($data)));
+            throw new NotNormalizableValueException(\sprintf('Could not normalize object of type "%s", no supporting normalizer found.', get_debug_type($data)));
         }
 
-        throw new NotNormalizableValueException('An unexpected value could not be normalized: '.(!\is_resource($data) ? var_export($data, true) : sprintf('"%s" resource', get_resource_type($data))));
+        throw new NotNormalizableValueException('An unexpected value could not be normalized: '.(!\is_resource($data) ? var_export($data, true) : \sprintf('"%s" resource', get_resource_type($data))));
     }
 
     /**
@@ -206,7 +197,7 @@ class Serializer implements SerializerInterface, ContextAwareNormalizerInterface
         // Check for a denormalizer first, e.g. the data is wrapped
         if (!$normalizer && isset(self::SCALAR_TYPES[$type])) {
             if (!('is_'.$type)($data)) {
-                throw NotNormalizableValueException::createForUnexpectedDataType(sprintf('Data expected to be of type "%s" ("%s" given).', $type, get_debug_type($data)), $data, [$type], $context['deserialization_path'] ?? null, true);
+                throw NotNormalizableValueException::createForUnexpectedDataType(\sprintf('Data expected to be of type "%s" ("%s" given).', $type, get_debug_type($data)), $data, [$type], $context['deserialization_path'] ?? null, true);
             }
 
             return $data;
@@ -217,7 +208,7 @@ class Serializer implements SerializerInterface, ContextAwareNormalizerInterface
         }
 
         if (!$normalizer) {
-            throw new NotNormalizableValueException(sprintf('Could not denormalize object of type "%s", no supporting normalizer found.', $type));
+            throw new NotNormalizableValueException(\sprintf('Could not denormalize object of type "%s", no supporting normalizer found.', $type));
         }
 
         if (isset($context[DenormalizerInterface::COLLECT_DENORMALIZATION_ERRORS])) {
@@ -287,19 +278,6 @@ class Serializer implements SerializerInterface, ContextAwareNormalizerInterface
                     continue;
                 }
 
-                if (!method_exists($normalizer, 'getSupportedTypes')) {
-                    trigger_deprecation('symfony/serializer', '6.3', '"%s" should implement "NormalizerInterface::getSupportedTypes(?string $format): array".', $normalizer::class);
-
-                    if (!$normalizer instanceof CacheableSupportsMethodInterface || !$normalizer->hasCacheableSupportsMethod()) {
-                        $this->normalizerCache[$format][$type][$k] = false;
-                    } elseif ($normalizer->supportsNormalization($data, $format, $context)) {
-                        $this->normalizerCache[$format][$type][$k] = true;
-                        break;
-                    }
-
-                    continue;
-                }
-
                 $supportedTypes = $normalizer->getSupportedTypes($format);
 
                 foreach ($supportedTypes as $supportedType => $isCacheable) {
@@ -354,19 +332,6 @@ class Serializer implements SerializerInterface, ContextAwareNormalizerInterface
 
             foreach ($this->normalizers as $k => $normalizer) {
                 if (!$normalizer instanceof DenormalizerInterface) {
-                    continue;
-                }
-
-                if (!method_exists($normalizer, 'getSupportedTypes')) {
-                    trigger_deprecation('symfony/serializer', '6.3', '"%s" should implement "DenormalizerInterface::getSupportedTypes(?string $format): array".', $normalizer::class);
-
-                    if (!$normalizer instanceof CacheableSupportsMethodInterface || !$normalizer->hasCacheableSupportsMethod()) {
-                        $this->denormalizerCache[$format][$class][$k] = false;
-                    } elseif ($normalizer->supportsDenormalization(null, $class, $format, $context)) {
-                        $this->denormalizerCache[$format][$class][$k] = true;
-                        break;
-                    }
-
                     continue;
                 }
 

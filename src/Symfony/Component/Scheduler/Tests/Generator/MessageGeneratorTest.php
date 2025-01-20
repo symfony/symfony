@@ -204,6 +204,67 @@ class MessageGeneratorTest extends TestCase
         $this->assertEquals(self::makeDateTime('22:13:00'), $checkpoint->time());
     }
 
+    public function testCheckpointSavedInBigBrokenLoop()
+    {
+        $clock = new MockClock(self::makeDateTime('22:15:00'));
+
+        $message = RecurringMessage::every('1 minute', (object) ['id' => 'message']);
+        $schedule = (new Schedule())->add($message);
+
+        $cache = new ArrayAdapter();
+        $schedule->stateful($cache);
+        $checkpoint = new Checkpoint('dummy', cache: $cache);
+
+        $scheduler = new MessageGenerator($schedule, 'dummy', clock: $clock, checkpoint: $checkpoint);
+
+        // Warmup. The first run is always returns nothing.
+        $this->assertSame([], iterator_to_array($scheduler->getMessages(), false));
+        $this->assertEquals(self::makeDateTime('22:15:00'), $checkpoint->time());
+
+        $clock->sleep(60 + 10); // 22:16:10
+
+        $this->assertCount(1, iterator_to_array($scheduler->getMessages(), false));
+
+        $clock->sleep(2 * 60); // 22:18:10
+
+        $this->assertCount(2, iterator_to_array($scheduler->getMessages(), false));
+
+        $clock->sleep(5 * 60); // 22:23:10
+
+        $this->assertCount(5, iterator_to_array($scheduler->getMessages(), false));
+
+        $this->assertEquals(self::makeDateTime('22:23:00'), $checkpoint->time());
+    }
+
+    public function testCheckpointSavedInBigBrokenLoopWithOnlyLastMissed()
+    {
+        $clock = new MockClock(self::makeDateTime('22:15:00'));
+
+        $message = RecurringMessage::every('1 minute', (object) ['id' => 'message']);
+        $schedule = (new Schedule())->add($message);
+
+        $cache = new ArrayAdapter();
+        $schedule->stateful($cache)->processOnlyLastMissedRun(true);
+        $checkpoint = new Checkpoint('dummy', cache: $cache);
+
+        $scheduler = new MessageGenerator($schedule, 'dummy', clock: $clock, checkpoint: $checkpoint);
+
+        // Warmup. The first run is always returns nothing.
+        $this->assertSame([], iterator_to_array($scheduler->getMessages(), false));
+        $this->assertEquals(self::makeDateTime('22:15:00'), $clock->now());
+
+        $clock->sleep(60 + 10); // 22:16:10
+        $this->assertCount(1, iterator_to_array($scheduler->getMessages(), false));
+
+        $clock->sleep(2 * 60); // 22:18:10
+        $this->assertCount(1, iterator_to_array($scheduler->getMessages(), false));
+
+        $clock->sleep(5 * 60); // 22:23:10
+        $this->assertCount(1, iterator_to_array($scheduler->getMessages(), false));
+
+        $this->assertEquals(self::makeDateTime('22:23:10'), $clock->now());
+    }
+
     public static function messagesProvider(): \Generator
     {
         $first = (object) ['id' => 'first'];
@@ -287,7 +348,7 @@ class MessageGeneratorTest extends TestCase
                 '22:12:01' => [],
             ],
             'schedule' => [
-                RecurringMessage::trigger(new class() implements TriggerInterface {
+                RecurringMessage::trigger(new class implements TriggerInterface {
                     public function __toString(): string
                     {
                         return 'foo';
@@ -318,7 +379,7 @@ class MessageGeneratorTest extends TestCase
                 } elseif ($lastTick == $tick && $count < 2) {
                     $ticks = [$lastTick, ++$count];
                 } else {
-                    $this->fail(sprintf('Invalid tick %s', $lastTick->format(\DateTimeImmutable::RFC3339_EXTENDED)));
+                    $this->fail(\sprintf('Invalid tick %s', $lastTick->format(\DateTimeImmutable::RFC3339_EXTENDED)));
                 }
 
                 foreach ($runs as $run) {
@@ -327,7 +388,7 @@ class MessageGeneratorTest extends TestCase
                     }
                 }
 
-                $this->fail(sprintf('There is no next run for tick %s', $lastTick->format(\DateTimeImmutable::RFC3339_EXTENDED)));
+                $this->fail(\sprintf('There is no next run for tick %s', $lastTick->format(\DateTimeImmutable::RFC3339_EXTENDED)));
             });
 
         return RecurringMessage::trigger($trigger, $message);

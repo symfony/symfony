@@ -28,7 +28,7 @@ final class FirebaseTransportFactory extends AbstractTransportFactory
             throw new UnsupportedSchemeException($dsn, 'firebase', $this->getSupportedSchemes());
         }
 
-        $token = sprintf('%s:%s', $this->getUser($dsn), $this->getPassword($dsn));
+        $token = \sprintf('%s:%s', $this->getUser($dsn), $this->getPassword($dsn));
         $host = 'default' === $dsn->getHost() ? null : $dsn->getHost();
         $port = $dsn->getPort();
 

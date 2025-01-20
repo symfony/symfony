@@ -202,14 +202,14 @@ class RegisterListenersPassTest extends TestCase
         $container = new ContainerBuilder();
         $container->setParameter('event_dispatcher.event_aliases', [AliasedEvent::class => 'aliased_event']);
 
-        $container->register('foo', \get_class(new class() {
+        $container->register('foo', \get_class(new class {
             public function onFooBar()
             {
             }
         }))->addTag('kernel.event_listener', ['event' => 'foo.bar']);
         $container->register('bar', InvokableListenerService::class)->addTag('kernel.event_listener', ['event' => 'foo.bar']);
         $container->register('baz', InvokableListenerService::class)->addTag('kernel.event_listener', ['event' => 'event']);
-        $container->register('zar', \get_class(new class() {
+        $container->register('zar', \get_class(new class {
             public function onFooBarZar()
             {
             }

@@ -20,6 +20,10 @@ use Symfony\Component\Security\Http\Controller\UserValueResolver;
 #[\Attribute(\Attribute::TARGET_PARAMETER)]
 class CurrentUser extends ValueResolver
 {
+    /**
+     * @param bool   $disabled Whether this value resolver is disabled, which allows to enable a value resolver globally while disabling it in specific cases
+     * @param string $resolver The class name of the resolver to use
+     */
     public function __construct(bool $disabled = false, string $resolver = UserValueResolver::class)
     {
         parent::__construct($resolver, $disabled);

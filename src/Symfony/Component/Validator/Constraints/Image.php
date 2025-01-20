@@ -12,8 +12,7 @@
 namespace Symfony\Component\Validator\Constraints;
 
 /**
- * @Annotation
- * @Target({"PROPERTY", "METHOD", "ANNOTATION"})
+ * Validates that a file (or a path to a file) is a valid image.
  *
  * @author Benjamin Dulau <benjamin.dulau@gmail.com>
  * @author Bernhard Schussek <bschussek@gmail.com>
@@ -59,41 +58,66 @@ class Image extends File
         self::CORRUPTED_IMAGE_ERROR => 'CORRUPTED_IMAGE_ERROR',
     ];
 
-    /**
-     * @deprecated since Symfony 6.1, use const ERROR_NAMES instead
-     */
-    protected static $errorNames = self::ERROR_NAMES;
-
-    public $mimeTypes = 'image/*';
-    public $minWidth;
-    public $maxWidth;
-    public $maxHeight;
-    public $minHeight;
-    public $maxRatio;
-    public $minRatio;
-    public $minPixels;
-    public $maxPixels;
-    public $allowSquare = true;
-    public $allowLandscape = true;
-    public $allowPortrait = true;
-    public $detectCorrupted = false;
+    public array|string $mimeTypes = 'image/*';
+    public ?int $minWidth = null;
+    public ?int $maxWidth = null;
+    public ?int $maxHeight = null;
+    public ?int $minHeight = null;
+    public int|float|null $maxRatio = null;
+    public int|float|null $minRatio = null;
+    public int|float|null $minPixels = null;
+    public int|float|null $maxPixels = null;
+    public bool $allowSquare = true;
+    public bool $allowLandscape = true;
+    public bool $allowPortrait = true;
+    public bool $detectCorrupted = false;
 
     // The constant for a wrong MIME type is taken from the parent class.
-    public $mimeTypesMessage = 'This file is not a valid image.';
-    public $sizeNotDetectedMessage = 'The size of the image could not be detected.';
-    public $maxWidthMessage = 'The image width is too big ({{ width }}px). Allowed maximum width is {{ max_width }}px.';
-    public $minWidthMessage = 'The image width is too small ({{ width }}px). Minimum width expected is {{ min_width }}px.';
-    public $maxHeightMessage = 'The image height is too big ({{ height }}px). Allowed maximum height is {{ max_height }}px.';
-    public $minHeightMessage = 'The image height is too small ({{ height }}px). Minimum height expected is {{ min_height }}px.';
-    public $minPixelsMessage = 'The image has too few pixels ({{ pixels }} pixels). Minimum amount expected is {{ min_pixels }} pixels.';
-    public $maxPixelsMessage = 'The image has too many pixels ({{ pixels }} pixels). Maximum amount expected is {{ max_pixels }} pixels.';
-    public $maxRatioMessage = 'The image ratio is too big ({{ ratio }}). Allowed maximum ratio is {{ max_ratio }}.';
-    public $minRatioMessage = 'The image ratio is too small ({{ ratio }}). Minimum ratio expected is {{ min_ratio }}.';
-    public $allowSquareMessage = 'The image is square ({{ width }}x{{ height }}px). Square images are not allowed.';
-    public $allowLandscapeMessage = 'The image is landscape oriented ({{ width }}x{{ height }}px). Landscape oriented images are not allowed.';
-    public $allowPortraitMessage = 'The image is portrait oriented ({{ width }}x{{ height }}px). Portrait oriented images are not allowed.';
-    public $corruptedMessage = 'The image file is corrupted.';
+    public string $mimeTypesMessage = 'This file is not a valid image.';
+    public string $sizeNotDetectedMessage = 'The size of the image could not be detected.';
+    public string $maxWidthMessage = 'The image width is too big ({{ width }}px). Allowed maximum width is {{ max_width }}px.';
+    public string $minWidthMessage = 'The image width is too small ({{ width }}px). Minimum width expected is {{ min_width }}px.';
+    public string $maxHeightMessage = 'The image height is too big ({{ height }}px). Allowed maximum height is {{ max_height }}px.';
+    public string $minHeightMessage = 'The image height is too small ({{ height }}px). Minimum height expected is {{ min_height }}px.';
+    public string $minPixelsMessage = 'The image has too few pixels ({{ pixels }} pixels). Minimum amount expected is {{ min_pixels }} pixels.';
+    public string $maxPixelsMessage = 'The image has too many pixels ({{ pixels }} pixels). Maximum amount expected is {{ max_pixels }} pixels.';
+    public string $maxRatioMessage = 'The image ratio is too big ({{ ratio }}). Allowed maximum ratio is {{ max_ratio }}.';
+    public string $minRatioMessage = 'The image ratio is too small ({{ ratio }}). Minimum ratio expected is {{ min_ratio }}.';
+    public string $allowSquareMessage = 'The image is square ({{ width }}x{{ height }}px). Square images are not allowed.';
+    public string $allowLandscapeMessage = 'The image is landscape oriented ({{ width }}x{{ height }}px). Landscape oriented images are not allowed.';
+    public string $allowPortraitMessage = 'The image is portrait oriented ({{ width }}x{{ height }}px). Portrait oriented images are not allowed.';
+    public string $corruptedMessage = 'The image file is corrupted.';
 
+    /**
+     * @param array<string,mixed>|null $options
+     * @param positive-int|string|null $maxSize                     The max size of the underlying file
+     * @param bool|null                $binaryFormat                Pass true to use binary-prefixed units (KiB, MiB, etc.) or false to use SI-prefixed units (kB, MB) in displayed messages. Pass null to guess the format from the maxSize option. (defaults to null)
+     * @param non-empty-string[]|null  $mimeTypes                   Acceptable media types
+     * @param positive-int|null        $filenameMaxLength           Maximum length of the file name
+     * @param string|null              $disallowEmptyMessage        Enable empty upload validation with this message in case of error
+     * @param string|null              $uploadIniSizeErrorMessage   Message if the file size exceeds the max size configured in php.ini
+     * @param string|null              $uploadFormSizeErrorMessage  Message if the file size exceeds the max size configured in the HTML input field
+     * @param string|null              $uploadPartialErrorMessage   Message if the file is only partially uploaded
+     * @param string|null              $uploadNoTmpDirErrorMessage  Message if there is no upload_tmp_dir in php.ini
+     * @param string|null              $uploadCantWriteErrorMessage Message if the uploaded file can not be stored in the temporary directory
+     * @param string|null              $uploadErrorMessage          Message if an unknown error occurred on upload
+     * @param string[]|null            $groups
+     * @param int<0, int>|null         $minWidth                    Minimum image width
+     * @param positive-int|null        $maxWidth                    Maximum image width
+     * @param positive-int|null        $maxHeight                   Maximum image height
+     * @param int<0, int>|null         $minHeight                   Minimum image weight
+     * @param positive-int|float|null  $maxRatio                    Maximum image ratio
+     * @param int<0, max>|float|null   $minRatio                    Minimum image ratio
+     * @param int<0, max>|float|null   $minPixels                   Minimum amount of pixels
+     * @param positive-int|float|null  $maxPixels                   Maximum amount of pixels
+     * @param bool|null                $allowSquare                 Whether to allow a square image (defaults to true)
+     * @param bool|null                $allowLandscape              Whether to allow a landscape image (defaults to true)
+     * @param bool|null                $allowPortrait               Whether to allow a portrait image (defaults to true)
+     * @param bool|null                $detectCorrupted             Whether to validate the image is not corrupted (defaults to false)
+     * @param string|null              $sizeNotDetectedMessage      Message if the system can not determine image size and there is a size constraint to validate
+     *
+     * @see https://www.iana.org/assignments/media-types/media-types.xhtml Existing media types
+     */
     public function __construct(
         ?array $options = null,
         int|string|null $maxSize = null,
@@ -140,7 +164,7 @@ class Image extends File
         ?string $allowPortraitMessage = null,
         ?string $corruptedMessage = null,
         ?array $groups = null,
-        mixed $payload = null
+        mixed $payload = null,
     ) {
         parent::__construct(
             $options,

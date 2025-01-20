@@ -18,29 +18,21 @@ interface FormTypeGuesserInterface
 {
     /**
      * Returns a field guess for a property name of a class.
-     *
-     * @return Guess\TypeGuess|null
      */
-    public function guessType(string $class, string $property);
+    public function guessType(string $class, string $property): ?Guess\TypeGuess;
 
     /**
      * Returns a guess whether a property of a class is required.
-     *
-     * @return Guess\ValueGuess|null
      */
-    public function guessRequired(string $class, string $property);
+    public function guessRequired(string $class, string $property): ?Guess\ValueGuess;
 
     /**
      * Returns a guess about the field's maximum length.
-     *
-     * @return Guess\ValueGuess|null
      */
-    public function guessMaxLength(string $class, string $property);
+    public function guessMaxLength(string $class, string $property): ?Guess\ValueGuess;
 
     /**
      * Returns a guess about the field's pattern.
-     *
-     * @return Guess\ValueGuess|null
      */
-    public function guessPattern(string $class, string $property);
+    public function guessPattern(string $class, string $property): ?Guess\ValueGuess;
 }

@@ -171,7 +171,7 @@ class JsonResponseTest extends TestCase
 
     public function testConstructorWithObjectWithToStringMethod()
     {
-        $class = new class() {
+        $class = new class {
             public function __toString(): string
             {
                 return '{}';

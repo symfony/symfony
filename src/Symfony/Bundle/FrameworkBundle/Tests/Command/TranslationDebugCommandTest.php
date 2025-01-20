@@ -82,7 +82,8 @@ class TranslationDebugCommandTest extends TestCase
     {
         $this->fs->remove($this->translationDir);
         $this->fs = new Filesystem();
-        $this->translationDir = sys_get_temp_dir().'/'.uniqid('sf_translation', true);
+        $this->translationDir = tempnam(sys_get_temp_dir(), 'sf_translation_');
+        $this->fs->remove($this->translationDir);
         $this->fs->mkdir($this->translationDir.'/translations');
         $this->fs->mkdir($this->translationDir.'/templates');
 
@@ -150,7 +151,8 @@ class TranslationDebugCommandTest extends TestCase
     protected function setUp(): void
     {
         $this->fs = new Filesystem();
-        $this->translationDir = sys_get_temp_dir().'/'.uniqid('sf_translation', true);
+        $this->translationDir = tempnam(sys_get_temp_dir(), 'sf_translation_');
+        $this->fs->remove($this->translationDir);
         $this->fs->mkdir($this->translationDir.'/translations');
         $this->fs->mkdir($this->translationDir.'/templates');
     }

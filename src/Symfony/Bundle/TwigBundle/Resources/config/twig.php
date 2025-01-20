@@ -17,7 +17,7 @@ use Symfony\Bridge\Twig\DataCollector\TwigDataCollector;
 use Symfony\Bridge\Twig\ErrorRenderer\TwigErrorRenderer;
 use Symfony\Bridge\Twig\EventListener\TemplateAttributeListener;
 use Symfony\Bridge\Twig\Extension\AssetExtension;
-use Symfony\Bridge\Twig\Extension\CodeExtension;
+use Symfony\Bridge\Twig\Extension\EmojiExtension;
 use Symfony\Bridge\Twig\Extension\ExpressionExtension;
 use Symfony\Bridge\Twig\Extension\HtmlSanitizerExtension;
 use Symfony\Bridge\Twig\Extension\HttpFoundationExtension;
@@ -66,9 +66,6 @@ return static function (ContainerConfigurator $container) {
             ->tag('container.preload', ['class' => ExtensionSet::class])
             ->tag('container.preload', ['class' => Template::class])
             ->tag('container.preload', ['class' => TemplateWrapper::class])
-
-        ->alias('Twig_Environment', 'twig')
-            ->deprecate('symfony/twig-bundle', '6.3', 'The "%alias_id%" service alias is deprecated, use "'.Environment::class.'" or "twig" instead.')
         ->alias(Environment::class, 'twig')
 
         ->set('twig.app_variable', AppVariable::class)
@@ -109,10 +106,6 @@ return static function (ContainerConfigurator $container) {
         ->set('twig.extension.assets', AssetExtension::class)
             ->args([service('assets.packages')])
 
-        ->set('twig.extension.code', CodeExtension::class)
-            ->args([service('debug.file_link_formatter')->ignoreOnInvalid(), param('kernel.project_dir'), param('kernel.charset')])
-            ->tag('twig.extension')
-
         ->set('twig.extension.routing', RoutingExtension::class)
             ->args([service('router')])
 
@@ -122,6 +115,8 @@ return static function (ContainerConfigurator $container) {
             ->args([service('debug.stopwatch')->ignoreOnInvalid(), param('kernel.debug')])
 
         ->set('twig.extension.expression', ExpressionExtension::class)
+
+        ->set('twig.extension.emoji', EmojiExtension::class)
 
         ->set('twig.extension.htmlsanitizer', HtmlSanitizerExtension::class)
             ->args([tagged_locator('html_sanitizer', 'sanitizer')])

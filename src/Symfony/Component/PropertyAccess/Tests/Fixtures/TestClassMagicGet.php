@@ -22,7 +22,7 @@ class TestClassMagicGet
         $this->magicProperty = $value;
     }
 
-    public function __set(string $property, $value)
+    public function __set(string $property, $value): void
     {
         if ('magicProperty' === $property) {
             $this->magicProperty = $value;

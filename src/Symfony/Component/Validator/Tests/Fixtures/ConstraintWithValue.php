@@ -13,7 +13,6 @@ namespace Symfony\Component\Validator\Tests\Fixtures;
 
 use Symfony\Component\Validator\Constraint;
 
-/** @Annotation */
 class ConstraintWithValue extends Constraint
 {
     public $property;

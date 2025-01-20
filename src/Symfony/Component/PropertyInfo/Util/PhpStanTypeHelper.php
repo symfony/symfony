@@ -125,7 +125,7 @@ final class PhpStanTypeHelper
                 return [$mainType];
             }
 
-            $collection = $mainType->isCollection() || \is_a($mainType->getClassName(), \Traversable::class, true) || \is_a($mainType->getClassName(), \ArrayAccess::class, true);
+            $collection = $mainType->isCollection() || is_a($mainType->getClassName(), \Traversable::class, true) || is_a($mainType->getClassName(), \ArrayAccess::class, true);
 
             // it's safer to fall back to other extractors if the generic type is too abstract
             if (!$collection && !class_exists($mainType->getClassName()) && !interface_exists($mainType->getClassName(), false)) {
@@ -172,14 +172,17 @@ final class PhpStanTypeHelper
             return [new Type(Type::BUILTIN_TYPE_OBJECT, false, $nameScope->resolveRootClass())];
         }
         if ($node instanceof IdentifierTypeNode) {
-            if (\in_array($node->name, Type::$builtinTypes)) {
-                return [new Type($node->name, false, null, \in_array($node->name, Type::$builtinCollectionTypes))];
+            if (\in_array($node->name, Type::$builtinTypes, true)) {
+                return [new Type($node->name, false, null, \in_array($node->name, Type::$builtinCollectionTypes, true))];
             }
 
             return match ($node->name) {
                 'integer',
                 'positive-int',
-                'negative-int' => [new Type(Type::BUILTIN_TYPE_INT)],
+                'negative-int',
+                'non-positive-int',
+                'non-negative-int',
+                'non-zero-int' => [new Type(Type::BUILTIN_TYPE_INT)],
                 'double' => [new Type(Type::BUILTIN_TYPE_FLOAT)],
                 'list',
                 'non-empty-list' => [new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, new Type(Type::BUILTIN_TYPE_INT))],

@@ -28,7 +28,7 @@ class UndefinedFunctionErrorEnhancerTest extends TestCase
         $error = $enhancer->enhance(new \Error($originalMessage));
 
         $this->assertInstanceOf(UndefinedFunctionError::class, $error);
-        // class names are case insensitive and PHP do not return the same
+        // class names are case-insensitive and PHP do not return the same
         $this->assertSame(strtolower($enhancedMessage), strtolower($error->getMessage()));
         $this->assertSame(realpath(__FILE__), $error->getFile());
         $this->assertSame($expectedLine, $error->getLine());

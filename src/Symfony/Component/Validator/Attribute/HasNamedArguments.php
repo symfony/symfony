@@ -11,6 +11,11 @@
 
 namespace Symfony\Component\Validator\Attribute;
 
+/**
+ * Hints the loader that some constraint options are required.
+ *
+ * @see https://symfony.com/doc/current/validation/custom_constraint.html
+ */
 #[\Attribute(\Attribute::TARGET_METHOD)]
 final class HasNamedArguments
 {

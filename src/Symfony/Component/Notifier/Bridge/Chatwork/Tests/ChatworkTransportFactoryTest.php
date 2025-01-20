@@ -12,11 +12,16 @@
 namespace Symfony\Component\Notifier\Bridge\Chatwork\Tests;
 
 use Symfony\Component\Notifier\Bridge\Chatwork\ChatworkTransportFactory;
-use Symfony\Component\Notifier\Test\TransportFactoryTestCase;
+use Symfony\Component\Notifier\Test\AbstractTransportFactoryTestCase;
+use Symfony\Component\Notifier\Test\IncompleteDsnTestTrait;
+use Symfony\Component\Notifier\Test\MissingRequiredOptionTestTrait;
 use Symfony\Component\Notifier\Transport\TransportFactoryInterface;
 
-class ChatworkTransportFactoryTest extends TransportFactoryTestCase
+class ChatworkTransportFactoryTest extends AbstractTransportFactoryTestCase
 {
+    use IncompleteDsnTestTrait;
+    use MissingRequiredOptionTestTrait;
+
     public function createFactory(): TransportFactoryInterface
     {
         return new ChatworkTransportFactory();

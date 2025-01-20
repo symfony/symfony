@@ -32,20 +32,21 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
  */
 class SendgridApiTransport extends AbstractApiTransport
 {
-    private const HOST = 'api.sendgrid.com';
+    private const HOST = 'api.%region_dot%sendgrid.com';
 
-    private string $key;
-
-    public function __construct(string $key, ?HttpClientInterface $client = null, ?EventDispatcherInterface $dispatcher = null, ?LoggerInterface $logger = null)
-    {
-        $this->key = $key;
-
+    public function __construct(
+        #[\SensitiveParameter] private string $key,
+        ?HttpClientInterface $client = null,
+        ?EventDispatcherInterface $dispatcher = null,
+        ?LoggerInterface $logger = null,
+        private ?string $region = null,
+    ) {
         parent::__construct($client, $dispatcher, $logger);
     }
 
     public function __toString(): string
     {
-        return sprintf('sendgrid+api://%s', $this->getEndpoint());
+        return \sprintf('sendgrid+api://%s', $this->getEndpoint());
     }
 
     protected function doSendApi(SentMessage $sentMessage, Email $email, Envelope $envelope): ResponseInterface
@@ -65,9 +66,9 @@ class SendgridApiTransport extends AbstractApiTransport
             try {
                 $result = $response->toArray(false);
 
-                throw new HttpTransportException('Unable to send an email: '.implode('; ', array_column($result['errors'], 'message')).sprintf(' (code %d).', $statusCode), $response);
+                throw new HttpTransportException('Unable to send an email: '.implode('; ', array_column($result['errors'], 'message')).\sprintf(' (code %d).', $statusCode), $response);
             } catch (DecodingExceptionInterface $e) {
-                throw new HttpTransportException('Unable to send an email: '.$response->getContent(false).sprintf(' (code %d).', $statusCode), $response, 0, $e);
+                throw new HttpTransportException('Unable to send an email: '.$response->getContent(false).\sprintf(' (code %d).', $statusCode), $response, 0, $e);
             }
         }
 
@@ -127,7 +128,7 @@ class SendgridApiTransport extends AbstractApiTransport
 
             if ($header instanceof TagHeader) {
                 if (10 === \count($categories)) {
-                    throw new TransportException(sprintf('Too many "%s" instances present in the email headers. Sendgrid does not accept more than 10 categories on an email.', TagHeader::class));
+                    throw new TransportException(\sprintf('Too many "%s" instances present in the email headers. Sendgrid does not accept more than 10 categories on an email.', TagHeader::class));
                 }
                 $categories[] = mb_substr($header->getValue(), 0, 255);
             } elseif ($header instanceof MetadataHeader) {
@@ -190,6 +191,11 @@ class SendgridApiTransport extends AbstractApiTransport
 
     private function getEndpoint(): ?string
     {
-        return ($this->host ?: self::HOST).($this->port ? ':'.$this->port : '');
+        $host = $this->host ?: str_replace('%region_dot%', '', self::HOST);
+        if (null !== $this->region && null === $this->host) {
+            $host = str_replace('%region_dot%', $this->region.'.', self::HOST);
+        }
+
+        return $host.($this->port ? ':'.$this->port : '');
     }
 }

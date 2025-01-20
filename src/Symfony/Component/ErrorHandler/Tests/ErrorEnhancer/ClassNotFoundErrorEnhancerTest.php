@@ -156,7 +156,7 @@ class ClassNotFoundErrorEnhancerTest extends TestCase
     public function testCannotRedeclareClass()
     {
         if (!file_exists(__DIR__.'/../FIXTURES2/REQUIREDTWICE.PHP')) {
-            $this->markTestSkipped('Can only be run on case insensitive filesystems');
+            $this->markTestSkipped('Can only be run on case-insensitive filesystems');
         }
 
         require_once __DIR__.'/../FIXTURES2/REQUIREDTWICE.PHP';

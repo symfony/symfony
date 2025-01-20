@@ -12,10 +12,13 @@
 namespace Symfony\Component\Notifier\Bridge\AllMySms\Tests;
 
 use Symfony\Component\Notifier\Bridge\AllMySms\AllMySmsTransportFactory;
-use Symfony\Component\Notifier\Test\TransportFactoryTestCase;
+use Symfony\Component\Notifier\Test\AbstractTransportFactoryTestCase;
+use Symfony\Component\Notifier\Test\IncompleteDsnTestTrait;
 
-final class AllMySmsTransportFactoryTest extends TransportFactoryTestCase
+final class AllMySmsTransportFactoryTest extends AbstractTransportFactoryTestCase
 {
+    use IncompleteDsnTestTrait;
+
     public function createFactory(): AllMySmsTransportFactory
     {
         return new AllMySmsTransportFactory();
@@ -43,5 +46,11 @@ final class AllMySmsTransportFactoryTest extends TransportFactoryTestCase
     public static function unsupportedSchemeProvider(): iterable
     {
         yield ['somethingElse://login:apiKey@default'];
+    }
+
+    public static function incompleteDsnProvider(): iterable
+    {
+        yield ['allmysms://login@default'];
+        yield ['allmysms://:apiKey@default'];
     }
 }

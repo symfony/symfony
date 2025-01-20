@@ -38,14 +38,17 @@ class PrototypeConfigurator extends AbstractServiceConfigurator
 
     public const FACTORY = 'load';
 
-    private PhpFileLoader $loader;
-    private string $resource;
     private ?array $excludes = null;
-    private bool $allowParent;
-    private ?string $path;
 
-    public function __construct(ServicesConfigurator $parent, PhpFileLoader $loader, Definition $defaults, string $namespace, string $resource, bool $allowParent, ?string $path = null)
-    {
+    public function __construct(
+        ServicesConfigurator $parent,
+        private PhpFileLoader $loader,
+        Definition $defaults,
+        string $namespace,
+        private string $resource,
+        private bool $allowParent,
+        private ?string $path = null,
+    ) {
         $definition = new Definition();
         if (!$defaults->isPublic() || !$defaults->isPrivate()) {
             $definition->setPublic($defaults->isPublic());
@@ -55,11 +58,6 @@ class PrototypeConfigurator extends AbstractServiceConfigurator
         // deep clone, to avoid multiple process of the same instance in the passes
         $definition->setBindings(unserialize(serialize($defaults->getBindings())));
         $definition->setChanges([]);
-
-        $this->loader = $loader;
-        $this->resource = $resource;
-        $this->allowParent = $allowParent;
-        $this->path = $path;
 
         parent::__construct($parent, $definition, $namespace, $defaults->getTags());
     }

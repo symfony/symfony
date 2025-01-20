@@ -12,6 +12,7 @@
 namespace Symfony\Component\Form\Tests\Extension\Core\Type;
 
 use Symfony\Component\Form\Extension\Core\CoreExtension;
+use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\HttpFoundation\HttpFoundationRequestHandler;
 use Symfony\Component\Form\NativeRequestHandler;
 use Symfony\Component\Form\RequestHandlerInterface;
@@ -21,9 +22,9 @@ use Symfony\Component\Translation\IdentityTranslator;
 
 class FileTypeTest extends BaseTypeTestCase
 {
-    public const TESTED_TYPE = 'Symfony\Component\Form\Extension\Core\Type\FileType';
+    public const TESTED_TYPE = FileType::class;
 
-    protected function getExtensions()
+    protected function getExtensions(): array
     {
         return array_merge(parent::getExtensions(), [new CoreExtension(null, null, new IdentityTranslator())]);
     }

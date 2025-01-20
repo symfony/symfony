@@ -17,8 +17,10 @@ use Symfony\Component\Security\Core\Authentication\Token\AbstractToken;
 use Symfony\Component\Security\Core\Authentication\Token\NullToken;
 use Symfony\Component\Security\Core\Authentication\Token\RememberMeToken;
 use Symfony\Component\Security\Core\Authentication\Token\SwitchUserToken;
+use Symfony\Component\Security\Core\Authentication\Token\UserAuthorizationCheckerToken;
 use Symfony\Component\Security\Core\Authorization\Voter\AuthenticatedVoter;
 use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
+use Symfony\Component\Security\Core\Exception\InvalidArgumentException;
 use Symfony\Component\Security\Core\User\InMemoryUser;
 
 class AuthenticatedVoterTest extends TestCase
@@ -85,12 +87,49 @@ class AuthenticatedVoterTest extends TestCase
         $this->assertTrue($voter->supportsType(get_debug_type(new \stdClass())));
     }
 
+    /**
+     * @dataProvider provideOfflineAttributes
+     */
+    public function testOfflineToken($attributes, $expected)
+    {
+        $voter = new AuthenticatedVoter(new AuthenticationTrustResolver());
+
+        $this->assertSame($expected, $voter->vote($this->getToken('offline'), null, $attributes));
+    }
+
+    public static function provideOfflineAttributes()
+    {
+        yield [[AuthenticatedVoter::PUBLIC_ACCESS], VoterInterface::ACCESS_GRANTED];
+        yield [['ROLE_FOO'], VoterInterface::ACCESS_ABSTAIN];
+    }
+
+    /**
+     * @dataProvider provideUnsupportedOfflineAttributes
+     */
+    public function testUnsupportedOfflineToken(string $attribute)
+    {
+        $voter = new AuthenticatedVoter(new AuthenticationTrustResolver());
+
+        $this->expectException(InvalidArgumentException::class);
+
+        $voter->vote($this->getToken('offline'), null, [$attribute]);
+    }
+
+    public static function provideUnsupportedOfflineAttributes()
+    {
+        yield [AuthenticatedVoter::IS_AUTHENTICATED_FULLY];
+        yield [AuthenticatedVoter::IS_AUTHENTICATED_REMEMBERED];
+        yield [AuthenticatedVoter::IS_AUTHENTICATED];
+        yield [AuthenticatedVoter::IS_IMPERSONATOR];
+        yield [AuthenticatedVoter::IS_REMEMBERED];
+    }
+
     protected function getToken($authenticated)
     {
         $user = new InMemoryUser('wouter', '', ['ROLE_USER']);
 
         if ('fully' === $authenticated) {
-            $token = new class() extends AbstractToken {
+            $token = new class extends AbstractToken {
                 public function getCredentials()
                 {
                 }
@@ -101,11 +140,15 @@ class AuthenticatedVoterTest extends TestCase
         }
 
         if ('remembered' === $authenticated) {
-            return new RememberMeToken($user, 'foo', 'bar');
+            return new RememberMeToken($user, 'foo');
         }
 
         if ('impersonated' === $authenticated) {
             return $this->getMockBuilder(SwitchUserToken::class)->disableOriginalConstructor()->getMock();
+        }
+
+        if ('offline' === $authenticated) {
+            return new UserAuthorizationCheckerToken($user);
         }
 
         return new NullToken();

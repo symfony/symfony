@@ -1,0 +1,26 @@
+imports:
+    - { resource: ../config/default.yml }
+
+framework:
+    http_method_override: false
+    type_info: ~
+    json_encoder: ~
+
+services:
+    _defaults:
+        autoconfigure: true
+
+    json_encoder.encoder.alias:
+        alias: json_encoder.encoder
+        public: true
+
+    json_encoder.decoder.alias:
+        alias: json_encoder.decoder
+        public: true
+
+    json_encoder.cache_warmer.encoder_decoder.alias:
+        alias: .json_encoder.cache_warmer.encoder_decoder
+        public: true
+
+    Symfony\Bundle\FrameworkBundle\Tests\Functional\app\JsonEncoder\Dto\Dummy: ~
+    Symfony\Bundle\FrameworkBundle\Tests\Functional\app\JsonEncoder\RangeNormalizer: ~

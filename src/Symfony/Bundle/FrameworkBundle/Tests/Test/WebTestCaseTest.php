@@ -23,7 +23,6 @@ use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\Cookie as HttpFoundationCookie;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\Test\Constraint\ResponseHeaderLocationSame;
 
 class WebTestCaseTest extends TestCase
 {
@@ -62,10 +61,6 @@ class WebTestCaseTest extends TestCase
 
     public function testAssertResponseRedirectsWithLocationWithoutHost()
     {
-        if (!class_exists(ResponseHeaderLocationSame::class)) {
-            $this->markTestSkipped('Requires symfony/http-foundation 6.3 or higher.');
-        }
-
         $this->getResponseTester(new Response('', 301, ['Location' => 'https://example.com/']))->assertResponseRedirects('/');
         $this->expectException(AssertionFailedError::class);
         $this->expectExceptionMessage('is redirected and has header "Location" matching "/".');
@@ -74,10 +69,6 @@ class WebTestCaseTest extends TestCase
 
     public function testAssertResponseRedirectsWithLocationWithoutScheme()
     {
-        if (!class_exists(ResponseHeaderLocationSame::class)) {
-            $this->markTestSkipped('Requires symfony/http-foundation 6.3 or higher.');
-        }
-
         $this->getResponseTester(new Response('', 301, ['Location' => 'https://example.com/']))->assertResponseRedirects('//example.com/');
         $this->expectException(AssertionFailedError::class);
         $this->expectExceptionMessage('is redirected and has header "Location" matching "//example.com/".');

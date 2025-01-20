@@ -21,7 +21,7 @@ class SingleCommandApplicationTest extends TestCase
 {
     public function testRun()
     {
-        $command = new class() extends SingleCommandApplication {
+        $command = new class extends SingleCommandApplication {
             protected function execute(InputInterface $input, OutputInterface $output): int
             {
                 return 0;

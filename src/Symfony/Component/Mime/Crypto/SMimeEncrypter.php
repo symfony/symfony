@@ -49,7 +49,7 @@ final class SMimeEncrypter extends SMime
         $this->iteratorToFile($message->toIterable(), $bufferFile);
 
         if (!@openssl_pkcs7_encrypt(stream_get_meta_data($bufferFile)['uri'], stream_get_meta_data($outputFile)['uri'], $this->certs, [], 0, $this->cipher)) {
-            throw new RuntimeException(sprintf('Failed to encrypt S/Mime message. Error: "%s".', openssl_error_string()));
+            throw new RuntimeException(\sprintf('Failed to encrypt S/Mime message. Error: "%s".', openssl_error_string()));
         }
 
         $mimePart = $this->convertMessageToSMimePart($outputFile, 'application', 'pkcs7-mime');

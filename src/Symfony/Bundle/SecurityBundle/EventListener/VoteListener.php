@@ -24,11 +24,9 @@ use Symfony\Component\Security\Core\Event\VoteEvent;
  */
 class VoteListener implements EventSubscriberInterface
 {
-    private TraceableAccessDecisionManager $traceableAccessDecisionManager;
-
-    public function __construct(TraceableAccessDecisionManager $traceableAccessDecisionManager)
-    {
-        $this->traceableAccessDecisionManager = $traceableAccessDecisionManager;
+    public function __construct(
+        private TraceableAccessDecisionManager $traceableAccessDecisionManager,
+    ) {
     }
 
     public function onVoterVote(VoteEvent $event): void

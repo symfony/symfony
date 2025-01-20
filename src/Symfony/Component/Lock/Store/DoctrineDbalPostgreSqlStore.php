@@ -45,42 +45,33 @@ class DoctrineDbalPostgreSqlStore implements BlockingSharedLockStoreInterface, B
     {
         if ($connOrUrl instanceof Connection) {
             if (!$connOrUrl->getDatabasePlatform() instanceof PostgreSQLPlatform) {
-                throw new InvalidArgumentException(sprintf('The adapter "%s" does not support the "%s" platform.', __CLASS__, $connOrUrl->getDatabasePlatform()::class));
+                throw new InvalidArgumentException(\sprintf('The adapter "%s" does not support the "%s" platform.', __CLASS__, $connOrUrl->getDatabasePlatform()::class));
             }
             $this->conn = $connOrUrl;
         } else {
             if (!class_exists(DriverManager::class)) {
                 throw new InvalidArgumentException('Failed to parse DSN. Try running "composer require doctrine/dbal".');
             }
-            if (class_exists(DsnParser::class)) {
-                $params = (new DsnParser([
-                    'db2' => 'ibm_db2',
-                    'mssql' => 'pdo_sqlsrv',
-                    'mysql' => 'pdo_mysql',
-                    'mysql2' => 'pdo_mysql',
-                    'postgres' => 'pdo_pgsql',
-                    'postgresql' => 'pdo_pgsql',
-                    'pgsql' => 'pdo_pgsql',
-                    'sqlite' => 'pdo_sqlite',
-                    'sqlite3' => 'pdo_sqlite',
-                ]))->parse($this->filterDsn($connOrUrl));
-            } else {
-                $params = ['url' => $this->filterDsn($connOrUrl)];
-            }
+            $params = (new DsnParser([
+                'db2' => 'ibm_db2',
+                'mssql' => 'pdo_sqlsrv',
+                'mysql' => 'pdo_mysql',
+                'mysql2' => 'pdo_mysql',
+                'postgres' => 'pdo_pgsql',
+                'postgresql' => 'pdo_pgsql',
+                'pgsql' => 'pdo_pgsql',
+                'sqlite' => 'pdo_sqlite',
+                'sqlite3' => 'pdo_sqlite',
+            ]))->parse($this->filterDsn($connOrUrl));
 
             $config = new Configuration();
-            if (class_exists(DefaultSchemaManagerFactory::class)) {
-                $config->setSchemaManagerFactory(new DefaultSchemaManagerFactory());
-            }
+            $config->setSchemaManagerFactory(new DefaultSchemaManagerFactory());
 
             $this->conn = DriverManager::getConnection($params, $config);
         }
     }
 
-    /**
-     * @return void
-     */
-    public function save(Key $key)
+    public function save(Key $key): void
     {
         // prevent concurrency within the same connection
         $this->getInternalStore()->save($key);
@@ -112,10 +103,7 @@ class DoctrineDbalPostgreSqlStore implements BlockingSharedLockStoreInterface, B
         throw new LockConflictedException();
     }
 
-    /**
-     * @return void
-     */
-    public function saveRead(Key $key)
+    public function saveRead(Key $key): void
     {
         // prevent concurrency within the same connection
         $this->getInternalStore()->saveRead($key);
@@ -147,10 +135,7 @@ class DoctrineDbalPostgreSqlStore implements BlockingSharedLockStoreInterface, B
         throw new LockConflictedException();
     }
 
-    /**
-     * @return void
-     */
-    public function putOffExpiration(Key $key, float $ttl)
+    public function putOffExpiration(Key $key, float $ttl): void
     {
         // postgresql locks forever.
         // check if lock still exists
@@ -159,10 +144,7 @@ class DoctrineDbalPostgreSqlStore implements BlockingSharedLockStoreInterface, B
         }
     }
 
-    /**
-     * @return void
-     */
-    public function delete(Key $key)
+    public function delete(Key $key): void
     {
         // Prevent deleting locks own by an other key in the same connection
         if (!$this->exists($key)) {
@@ -199,10 +181,7 @@ class DoctrineDbalPostgreSqlStore implements BlockingSharedLockStoreInterface, B
         return false;
     }
 
-    /**
-     * @return void
-     */
-    public function waitAndSave(Key $key)
+    public function waitAndSave(Key $key): void
     {
         // prevent concurrency within the same connection
         // Internal store does not allow blocking mode, because there is no way to acquire one in a single process
@@ -225,10 +204,7 @@ class DoctrineDbalPostgreSqlStore implements BlockingSharedLockStoreInterface, B
         $this->unlockShared($key);
     }
 
-    /**
-     * @return void
-     */
-    public function waitAndSaveRead(Key $key)
+    public function waitAndSaveRead(Key $key): void
     {
         // prevent concurrency within the same connection
         // Internal store does not allow blocking mode, because there is no way to acquire one in a single process
@@ -292,12 +268,12 @@ class DoctrineDbalPostgreSqlStore implements BlockingSharedLockStoreInterface, B
         }
 
         [$scheme, $rest] = explode(':', $dsn, 2);
-        $driver = strtok($scheme, '+');
+        $driver = substr($scheme, 0, strpos($scheme, '+') ?: null);
         if (!\in_array($driver, ['pgsql', 'postgres', 'postgresql'])) {
-            throw new InvalidArgumentException(sprintf('The adapter "%s" does not support the "%s" driver.', __CLASS__, $driver));
+            throw new InvalidArgumentException(\sprintf('The adapter "%s" does not support the "%s" driver.', __CLASS__, $driver));
         }
 
-        return sprintf('%s:%s', $driver, $rest);
+        return \sprintf('%s:%s', $driver, $rest);
     }
 
     private function getInternalStore(): SharedLockStoreInterface
@@ -305,5 +281,27 @@ class DoctrineDbalPostgreSqlStore implements BlockingSharedLockStoreInterface, B
         $namespace = spl_object_hash($this->conn);
 
         return self::$storeRegistry[$namespace] ??= new InMemoryStore();
+    }
+
+    public function deleteWithConfirmation(Key $key): bool
+    {
+        // Prevent deleting locks own by an other key in the same connection
+        if (!$this->exists($key)) {
+            return false;
+        }
+
+        $this->unlock($key);
+
+        // Prevent deleting Readlocks own by current key AND an other key in the same connection
+        $store = $this->getInternalStore();
+        try {
+            // If lock acquired = there is no other ReadLock
+            $store->save($key);
+            $this->unlockShared($key);
+        } catch (LockConflictedException) {
+            // an other key exists in this ReadLock
+        }
+
+        return $store->deleteWithConfirmation($key);
     }
 }

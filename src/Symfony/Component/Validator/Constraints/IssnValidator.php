@@ -26,10 +26,7 @@ use Symfony\Component\Validator\Exception\UnexpectedValueException;
  */
 class IssnValidator extends ConstraintValidator
 {
-    /**
-     * @return void
-     */
-    public function validate(mixed $value, Constraint $constraint)
+    public function validate(mixed $value, Constraint $constraint): void
     {
         if (!$constraint instanceof Issn) {
             throw new UnexpectedTypeException($constraint, Issn::class);

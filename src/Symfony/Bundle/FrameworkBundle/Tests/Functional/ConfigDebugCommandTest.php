@@ -155,7 +155,7 @@ class ConfigDebugCommandTest extends AbstractWebTestCase
 
         $this->assertSame(0, $ret, 'Returns 0 in case of success');
         $kernelCacheDir = self::$kernel->getContainer()->getParameter('kernel.cache_dir');
-        $this->assertStringContainsString(sprintf("dsn: 'file:%s/profiler'", $kernelCacheDir), $tester->getDisplay());
+        $this->assertStringContainsString(\sprintf("dsn: 'file:%s/profiler'", $kernelCacheDir), $tester->getDisplay());
     }
 
     /**

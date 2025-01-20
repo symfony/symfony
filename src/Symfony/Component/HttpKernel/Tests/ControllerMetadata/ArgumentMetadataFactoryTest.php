@@ -32,12 +32,12 @@ class ArgumentMetadataFactoryTest extends TestCase
 
     public function testSignature1()
     {
-        $arguments = $this->factory->createArgumentMetadata($this->signature1(...));
+        $arguments = $this->factory->createArgumentMetadata([$this, 'signature1']);
 
         $this->assertEquals([
-            new ArgumentMetadata('foo', self::class, false, false, null),
-            new ArgumentMetadata('bar', 'array', false, false, null),
-            new ArgumentMetadata('baz', 'callable', false, false, null),
+            new ArgumentMetadata('foo', self::class, false, false, null, controllerName: $this::class.'::signature1'),
+            new ArgumentMetadata('bar', 'array', false, false, null, controllerName: $this::class.'::signature1'),
+            new ArgumentMetadata('baz', 'callable', false, false, null, controllerName: $this::class.'::signature1'),
         ], $arguments);
     }
 
@@ -46,9 +46,9 @@ class ArgumentMetadataFactoryTest extends TestCase
         $arguments = $this->factory->createArgumentMetadata($this->signature2(...));
 
         $this->assertEquals([
-            new ArgumentMetadata('foo', self::class, false, true, null, true),
-            new ArgumentMetadata('bar', FakeClassThatDoesNotExist::class, false, true, null, true),
-            new ArgumentMetadata('baz', 'Fake\ImportedAndFake', false, true, null, true),
+            new ArgumentMetadata('foo', self::class, false, true, null, true, controllerName: $this::class.'::signature2'),
+            new ArgumentMetadata('bar', FakeClassThatDoesNotExist::class, false, true, null, true, controllerName: $this::class.'::signature2'),
+            new ArgumentMetadata('baz', 'Fake\ImportedAndFake', false, true, null, true, controllerName: $this::class.'::signature2'),
         ], $arguments);
     }
 
@@ -57,8 +57,8 @@ class ArgumentMetadataFactoryTest extends TestCase
         $arguments = $this->factory->createArgumentMetadata($this->signature3(...));
 
         $this->assertEquals([
-            new ArgumentMetadata('bar', FakeClassThatDoesNotExist::class, false, false, null),
-            new ArgumentMetadata('baz', 'Fake\ImportedAndFake', false, false, null),
+            new ArgumentMetadata('bar', FakeClassThatDoesNotExist::class, false, false, null, controllerName: $this::class.'::signature3'),
+            new ArgumentMetadata('baz', 'Fake\ImportedAndFake', false, false, null, controllerName: $this::class.'::signature3'),
         ], $arguments);
     }
 
@@ -67,9 +67,9 @@ class ArgumentMetadataFactoryTest extends TestCase
         $arguments = $this->factory->createArgumentMetadata($this->signature4(...));
 
         $this->assertEquals([
-            new ArgumentMetadata('foo', null, false, true, 'default'),
-            new ArgumentMetadata('bar', null, false, true, 500),
-            new ArgumentMetadata('baz', null, false, true, []),
+            new ArgumentMetadata('foo', null, false, true, 'default', controllerName: $this::class.'::signature4'),
+            new ArgumentMetadata('bar', null, false, true, 500, controllerName: $this::class.'::signature4'),
+            new ArgumentMetadata('baz', null, false, true, [], controllerName: $this::class.'::signature4'),
         ], $arguments);
     }
 
@@ -78,8 +78,8 @@ class ArgumentMetadataFactoryTest extends TestCase
         $arguments = $this->factory->createArgumentMetadata($this->signature5(...));
 
         $this->assertEquals([
-            new ArgumentMetadata('foo', 'array', false, true, null, true),
-            new ArgumentMetadata('bar', null, false, true, null, true),
+            new ArgumentMetadata('foo', 'array', false, true, null, true, controllerName: $this::class.'::signature5'),
+            new ArgumentMetadata('bar', null, false, true, null, true, controllerName: $this::class.'::signature5'),
         ], $arguments);
     }
 
@@ -88,8 +88,8 @@ class ArgumentMetadataFactoryTest extends TestCase
         $arguments = $this->factory->createArgumentMetadata([new VariadicController(), 'action']);
 
         $this->assertEquals([
-            new ArgumentMetadata('foo', null, false, false, null),
-            new ArgumentMetadata('bar', null, true, false, null),
+            new ArgumentMetadata('foo', null, false, false, null, controllerName: VariadicController::class.'::action'),
+            new ArgumentMetadata('bar', null, true, false, null, controllerName: VariadicController::class.'::action'),
         ], $arguments);
     }
 
@@ -98,9 +98,9 @@ class ArgumentMetadataFactoryTest extends TestCase
         $arguments = $this->factory->createArgumentMetadata([new BasicTypesController(), 'action']);
 
         $this->assertEquals([
-            new ArgumentMetadata('foo', 'string', false, false, null),
-            new ArgumentMetadata('bar', 'int', false, false, null),
-            new ArgumentMetadata('baz', 'float', false, false, null),
+            new ArgumentMetadata('foo', 'string', false, false, null, controllerName: BasicTypesController::class.'::action'),
+            new ArgumentMetadata('bar', 'int', false, false, null, controllerName: BasicTypesController::class.'::action'),
+            new ArgumentMetadata('baz', 'float', false, false, null, controllerName: BasicTypesController::class.'::action'),
         ], $arguments);
     }
 
@@ -109,9 +109,9 @@ class ArgumentMetadataFactoryTest extends TestCase
         $arguments = $this->factory->createArgumentMetadata($this->signature1(...));
 
         $this->assertEquals([
-            new ArgumentMetadata('foo', self::class, false, false, null),
-            new ArgumentMetadata('bar', 'array', false, false, null),
-            new ArgumentMetadata('baz', 'callable', false, false, null),
+            new ArgumentMetadata('foo', self::class, false, false, null, controllerName: $this::class.'::signature1'),
+            new ArgumentMetadata('bar', 'array', false, false, null, controllerName: $this::class.'::signature1'),
+            new ArgumentMetadata('baz', 'callable', false, false, null, controllerName: $this::class.'::signature1'),
         ], $arguments);
     }
 
@@ -120,10 +120,10 @@ class ArgumentMetadataFactoryTest extends TestCase
         $arguments = $this->factory->createArgumentMetadata([new NullableController(), 'action']);
 
         $this->assertEquals([
-            new ArgumentMetadata('foo', 'string', false, false, null, true),
-            new ArgumentMetadata('bar', \stdClass::class, false, false, null, true),
-            new ArgumentMetadata('baz', 'string', false, true, 'value', true),
-            new ArgumentMetadata('last', 'string', false, true, '', false),
+            new ArgumentMetadata('foo', 'string', false, false, null, true, controllerName: NullableController::class.'::action'),
+            new ArgumentMetadata('bar', \stdClass::class, false, false, null, true, controllerName: NullableController::class.'::action'),
+            new ArgumentMetadata('baz', 'string', false, true, 'value', true, controllerName: NullableController::class.'::action'),
+            new ArgumentMetadata('last', 'string', false, true, '', false, controllerName: NullableController::class.'::action'),
         ], $arguments);
     }
 
@@ -132,7 +132,7 @@ class ArgumentMetadataFactoryTest extends TestCase
         $arguments = $this->factory->createArgumentMetadata([new AttributeController(), 'action']);
 
         $this->assertEquals([
-            new ArgumentMetadata('baz', 'string', false, false, null, false, [new Foo('bar')]),
+            new ArgumentMetadata('baz', 'string', false, false, null, false, [new Foo('bar')], controllerName: AttributeController::class.'::action'),
         ], $arguments);
     }
 
@@ -146,8 +146,8 @@ class ArgumentMetadataFactoryTest extends TestCase
     {
         $arguments = $this->factory->createArgumentMetadata([new AttributeController(), 'issue41478']);
         $this->assertEquals([
-            new ArgumentMetadata('baz', 'string', false, false, null, false, [new Foo('bar')]),
-            new ArgumentMetadata('bat', 'string', false, false, null, false, []),
+            new ArgumentMetadata('baz', 'string', false, false, null, false, [new Foo('bar')], controllerName: AttributeController::class.'::issue41478'),
+            new ArgumentMetadata('bat', 'string', false, false, null, false, [], controllerName: AttributeController::class.'::issue41478'),
         ], $arguments);
     }
 

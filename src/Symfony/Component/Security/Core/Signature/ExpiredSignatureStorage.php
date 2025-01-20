@@ -18,13 +18,10 @@ use Psr\Cache\CacheItemPoolInterface;
  */
 final class ExpiredSignatureStorage
 {
-    private CacheItemPoolInterface $cache;
-    private int $lifetime;
-
-    public function __construct(CacheItemPoolInterface $cache, int $lifetime)
-    {
-        $this->cache = $cache;
-        $this->lifetime = $lifetime;
+    public function __construct(
+        private CacheItemPoolInterface $cache,
+        private int $lifetime,
+    ) {
     }
 
     public function countUsages(string $hash): int

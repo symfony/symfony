@@ -1,6 +1,19 @@
 CHANGELOG
 =========
 
+7.3
+---
+
+ * Enable configuring clock and DNS mock namespaces with attributes
+ * Add support for CAA record type in DnsMock for improved DNS mocking capabilities
+
+7.2
+---
+
+ * Add a PHPUnit extension that registers the clock mock and DNS mock and the `DebugClassLoader` from the ErrorHandler component if present
+ * Add `ExpectUserDeprecationMessageTrait` with a polyfill of PHPUnit's `expectUserDeprecationMessage()`
+ * Use `total` for asserting deprecation count when a group is not defined
+
 6.4
 ---
 

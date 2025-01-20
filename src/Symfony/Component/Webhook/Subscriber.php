@@ -17,8 +17,7 @@ class Subscriber
 {
     public function __construct(
         private readonly string $url,
-        #[\SensitiveParameter]
-        private readonly string $secret,
+        #[\SensitiveParameter] private readonly string $secret,
     ) {
         if (!$secret) {
             throw new InvalidArgumentException('A non-empty secret is required.');

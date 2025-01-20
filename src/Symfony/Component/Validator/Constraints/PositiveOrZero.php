@@ -12,8 +12,7 @@
 namespace Symfony\Component\Validator\Constraints;
 
 /**
- * @Annotation
- * @Target({"PROPERTY", "METHOD", "ANNOTATION"})
+ * Validates that a value is a positive number or equal to zero.
  *
  * @author Jan Schädlich <jan.schaedlich@sensiolabs.de>
  */
@@ -22,5 +21,5 @@ class PositiveOrZero extends GreaterThanOrEqual
 {
     use ZeroComparisonConstraintTrait;
 
-    public $message = 'This value should be either positive or zero.';
+    public string $message = 'This value should be either positive or zero.';
 }

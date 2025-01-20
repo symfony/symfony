@@ -29,21 +29,14 @@ use Symfony\Contracts\EventDispatcher\Event;
  */
 class LoginFailureEvent extends Event
 {
-    private AuthenticationException $exception;
-    private AuthenticatorInterface $authenticator;
-    private Request $request;
-    private ?Response $response;
-    private string $firewallName;
-    private ?Passport $passport;
-
-    public function __construct(AuthenticationException $exception, AuthenticatorInterface $authenticator, Request $request, ?Response $response, string $firewallName, ?Passport $passport = null)
-    {
-        $this->exception = $exception;
-        $this->authenticator = $authenticator;
-        $this->request = $request;
-        $this->response = $response;
-        $this->firewallName = $firewallName;
-        $this->passport = $passport;
+    public function __construct(
+        private AuthenticationException $exception,
+        private AuthenticatorInterface $authenticator,
+        private Request $request,
+        private ?Response $response,
+        private string $firewallName,
+        private ?Passport $passport = null,
+    ) {
     }
 
     public function getException(): AuthenticationException
@@ -66,10 +59,7 @@ class LoginFailureEvent extends Event
         return $this->request;
     }
 
-    /**
-     * @return void
-     */
-    public function setResponse(?Response $response)
+    public function setResponse(?Response $response): void
     {
         $this->response = $response;
     }

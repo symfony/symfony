@@ -21,21 +21,21 @@ final class HandlerDescriptor
     private \Closure $handler;
     private string $name;
     private ?BatchHandlerInterface $batchHandler = null;
-    private array $options;
 
-    public function __construct(callable $handler, array $options = [])
-    {
+    public function __construct(
+        callable $handler,
+        private array $options = [],
+    ) {
         $handler = $handler(...);
 
         $this->handler = $handler;
-        $this->options = $options;
 
         $r = new \ReflectionFunction($handler);
 
-        if (str_contains($r->name, '{closure')) {
+        if ($r->isAnonymous()) {
             $this->name = 'Closure';
         } elseif (!$handler = $r->getClosureThis()) {
-            $class = \PHP_VERSION_ID >= 80111 ? $r->getClosureCalledClass() : $r->getClosureScopeClass();
+            $class = $r->getClosureCalledClass();
 
             $this->name = ($class ? $class->name.'::' : '').$r->name;
         } else {

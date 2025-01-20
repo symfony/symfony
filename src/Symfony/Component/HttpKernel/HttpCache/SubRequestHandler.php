@@ -51,16 +51,16 @@ class SubRequestHandler
         $trustedValues = [];
         foreach (array_reverse($request->getClientIps()) as $ip) {
             $trustedIps[] = $ip;
-            $trustedValues[] = sprintf('for="%s"', $ip);
+            $trustedValues[] = \sprintf('for="%s"', $ip);
         }
         if ($ip !== $remoteAddr) {
             $trustedIps[] = $remoteAddr;
-            $trustedValues[] = sprintf('for="%s"', $remoteAddr);
+            $trustedValues[] = \sprintf('for="%s"', $remoteAddr);
         }
 
         // set trusted values, reusing as much as possible the global trusted settings
         if (Request::HEADER_FORWARDED & $trustedHeaderSet) {
-            $trustedValues[0] .= sprintf(';host="%s";proto=%s', $request->getHttpHost(), $request->getScheme());
+            $trustedValues[0] .= \sprintf(';host="%s";proto=%s', $request->getHttpHost(), $request->getScheme());
             $request->headers->set('Forwarded', $v = implode(', ', $trustedValues));
             $request->server->set('HTTP_FORWARDED', $v);
         }

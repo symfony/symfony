@@ -22,8 +22,9 @@ use Symfony\Component\Console\Output\BufferedOutput;
  */
 final class RunCommandMessageHandler
 {
-    public function __construct(private readonly Application $application)
-    {
+    public function __construct(
+        private readonly Application $application,
+    ) {
     }
 
     public function __invoke(RunCommandMessage $message): RunCommandContext
@@ -40,7 +41,7 @@ final class RunCommandMessageHandler
         }
 
         if ($message->throwOnFailure && Command::SUCCESS !== $exitCode) {
-            throw new RunCommandFailedException(sprintf('Command "%s" exited with code "%s".', $message->input, $exitCode), new RunCommandContext($message, $exitCode, $output->fetch()));
+            throw new RunCommandFailedException(\sprintf('Command "%s" exited with code "%s".', $message->input, $exitCode), new RunCommandContext($message, $exitCode, $output->fetch()));
         }
 
         return new RunCommandContext($message, $exitCode, $output->fetch());

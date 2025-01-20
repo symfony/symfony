@@ -35,28 +35,29 @@ class FinderOpenBasedirTest extends Iterator\RealIteratorTestCase
                 ->ignoreVCSIgnored(true)
         );
 
-        $this->iniSet('open_basedir', \dirname(__DIR__, 5).\PATH_SEPARATOR.self::toAbsolute('gitignore/search_root'));
+        $openBaseDir = \dirname(__DIR__, 5).\PATH_SEPARATOR.self::toAbsolute('gitignore/search_root');
 
-        $this->assertIterator(self::toAbsolute([
-            'gitignore/search_root/b.txt',
-            'gitignore/search_root/c.txt',
-            'gitignore/search_root/dir',
-            'gitignore/search_root/dir/a.txt',
-            'gitignore/search_root/dir/c.txt',
-        ]), $finder->in(self::toAbsolute('gitignore/search_root'))->getIterator());
+        if ($deprecationsFile = getenv('SYMFONY_DEPRECATIONS_SERIALIZE')) {
+            $openBaseDir .= \PATH_SEPARATOR.$deprecationsFile;
+        }
+
+        $oldOpenBaseDir = ini_set('open_basedir', $openBaseDir);
+
+        try {
+            $this->assertIterator(self::toAbsolute([
+                'gitignore/search_root/b.txt',
+                'gitignore/search_root/c.txt',
+                'gitignore/search_root/dir',
+                'gitignore/search_root/dir/a.txt',
+                'gitignore/search_root/dir/c.txt',
+            ]), $finder->in(self::toAbsolute('gitignore/search_root'))->getIterator());
+        } finally {
+            ini_set('open_basedir', $oldOpenBaseDir);
+        }
     }
 
     protected function buildFinder()
     {
         return Finder::create()->exclude('gitignore');
-    }
-
-    protected function iniSet(string $varName, string $newValue): void
-    {
-        if ('open_basedir' === $varName && $deprecationsFile = getenv('SYMFONY_DEPRECATIONS_SERIALIZE')) {
-            $newValue .= \PATH_SEPARATOR.$deprecationsFile;
-        }
-
-        parent::iniSet($varName, $newValue);
     }
 }

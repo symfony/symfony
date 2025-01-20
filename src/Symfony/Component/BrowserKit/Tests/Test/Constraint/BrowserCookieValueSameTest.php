@@ -13,7 +13,6 @@ namespace Symfony\Component\BrowserKit\Tests\Test\Constraint;
 
 use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Framework\TestCase;
-use PHPUnit\Framework\TestFailure;
 use Symfony\Component\BrowserKit\AbstractBrowser;
 use Symfony\Component\BrowserKit\Cookie;
 use Symfony\Component\BrowserKit\CookieJar;
@@ -31,15 +30,10 @@ class BrowserCookieValueSameTest extends TestCase
         $constraint = new BrowserCookieValueSame('foo', 'babar', false, '/path');
         $this->assertFalse($constraint->evaluate($browser, '', true));
 
-        try {
-            $constraint->evaluate($browser);
-        } catch (ExpectationFailedException $e) {
-            $this->assertEquals("Failed asserting that the Browser has cookie \"foo\" with path \"/path\" with value \"babar\".\n", TestFailure::exceptionToString($e));
+        $this->expectException(ExpectationFailedException::class);
+        $this->expectExceptionMessage('Failed asserting that the Browser has cookie "foo" with path "/path" with value "babar".');
 
-            return;
-        }
-
-        $this->fail();
+        $constraint->evaluate($browser);
     }
 
     private function getBrowser(): AbstractBrowser

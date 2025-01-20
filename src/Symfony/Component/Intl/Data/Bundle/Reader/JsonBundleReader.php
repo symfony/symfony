@@ -29,17 +29,17 @@ class JsonBundleReader implements BundleReaderInterface
 
         // prevent directory traversal attacks
         if (\dirname($fileName) !== $path) {
-            throw new ResourceBundleNotFoundException(sprintf('The resource bundle "%s" does not exist.', $fileName));
+            throw new ResourceBundleNotFoundException(\sprintf('The resource bundle "%s" does not exist.', $fileName));
         }
 
         if (!is_file($fileName)) {
-            throw new ResourceBundleNotFoundException(sprintf('The resource bundle "%s" does not exist.', $fileName));
+            throw new ResourceBundleNotFoundException(\sprintf('The resource bundle "%s" does not exist.', $fileName));
         }
 
         $data = json_decode(file_get_contents($fileName), true);
 
         if (null === $data) {
-            throw new RuntimeException(sprintf('The resource bundle "%s" contains invalid JSON: ', $fileName).json_last_error_msg());
+            throw new RuntimeException(\sprintf('The resource bundle "%s" contains invalid JSON: ', $fileName).json_last_error_msg());
         }
 
         return $data;

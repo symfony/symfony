@@ -66,7 +66,7 @@ class FlockStoreTest extends AbstractStoreTestCase
 
         $key = new Key('<?php echo "% hello word ! %" ?>');
 
-        $file = sprintf(
+        $file = \sprintf(
             '%s/sf.-php-echo-hello-word-.%s.lock',
             sys_get_temp_dir(),
             strtr(substr(base64_encode(hash('sha256', $key, true)), 0, 7), '/', '_')
@@ -87,7 +87,7 @@ class FlockStoreTest extends AbstractStoreTestCase
 
         $key = new Key(str_repeat(__CLASS__, 100));
 
-        $file = sprintf(
+        $file = \sprintf(
             '%s/sf.Symfony-Component-Lock-Tests-Store-FlockStoreTestS.%s.lock',
             sys_get_temp_dir(),
             strtr(substr(base64_encode(hash('sha256', $key, true)), 0, 7), '/', '_')

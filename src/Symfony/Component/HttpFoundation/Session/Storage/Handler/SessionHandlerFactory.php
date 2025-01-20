@@ -49,7 +49,7 @@ class SessionHandlerFactory
                 return new PdoSessionHandler($connection);
 
             case !\is_string($connection):
-                throw new \InvalidArgumentException(sprintf('Unsupported Connection: "%s".', get_debug_type($connection)));
+                throw new \InvalidArgumentException(\sprintf('Unsupported Connection: "%s".', get_debug_type($connection)));
             case str_starts_with($connection, 'file://'):
                 $savePath = substr($connection, 7);
 
@@ -71,15 +71,11 @@ class SessionHandlerFactory
                     throw new \InvalidArgumentException('Unsupported PDO OCI DSN. Try running "composer require doctrine/dbal".');
                 }
                 $connection[3] = '-';
-                $params = class_exists(DsnParser::class) ? (new DsnParser())->parse($connection) : ['url' => $connection];
+                $params = (new DsnParser())->parse($connection);
                 $config = new Configuration();
-                if (class_exists(DefaultSchemaManagerFactory::class)) {
-                    $config->setSchemaManagerFactory(new DefaultSchemaManagerFactory());
-                }
+                $config->setSchemaManagerFactory(new DefaultSchemaManagerFactory());
 
-                $connection = DriverManager::getConnection($params, $config);
-                // The condition should be removed once support for DBAL <3.3 is dropped
-                $connection = method_exists($connection, 'getNativeConnection') ? $connection->getNativeConnection() : $connection->getWrappedConnection();
+                $connection = DriverManager::getConnection($params, $config)->getNativeConnection();
                 // no break;
 
             case str_starts_with($connection, 'mssql://'):
@@ -94,6 +90,6 @@ class SessionHandlerFactory
                 return new PdoSessionHandler($connection, $options);
         }
 
-        throw new \InvalidArgumentException(sprintf('Unsupported Connection: "%s".', $connection));
+        throw new \InvalidArgumentException(\sprintf('Unsupported Connection: "%s".', $connection));
     }
 }

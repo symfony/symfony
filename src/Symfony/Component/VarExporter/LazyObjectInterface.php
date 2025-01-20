@@ -16,7 +16,7 @@ interface LazyObjectInterface
     /**
      * Returns whether the object is initialized.
      *
-     * @param $partial Whether partially initialized objects should be considered as initialized
+     * @param bool $partial Whether partially initialized objects should be considered as initialized
      */
     public function isLazyObjectInitialized(bool $partial = false): bool;
 

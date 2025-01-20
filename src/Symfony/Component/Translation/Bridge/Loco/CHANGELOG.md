@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+7.2
+---
+
+ * Add support for the `status` query parameter of Loco translation API
+
 6.1
 ---
 

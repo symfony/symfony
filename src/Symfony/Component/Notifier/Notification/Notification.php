@@ -141,7 +141,7 @@ class Notification
     {
         $parts = explode('\\', $exception::class);
 
-        $this->subject = sprintf('%s: %s', array_pop($parts), $exception->getMessage());
+        $this->subject = \sprintf('%s: %s', array_pop($parts), $exception->getMessage());
         if (class_exists(FlattenException::class)) {
             $this->exception = $exception instanceof FlattenException ? $exception : FlattenException::createFromThrowable($exception);
         }

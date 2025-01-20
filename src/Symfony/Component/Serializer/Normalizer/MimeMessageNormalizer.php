@@ -30,7 +30,7 @@ use Symfony\Component\Serializer\SerializerInterface;
  *
  * Emails using resources for any parts are not serializable.
  */
-final class MimeMessageNormalizer implements NormalizerInterface, DenormalizerInterface, SerializerAwareInterface, CacheableSupportsMethodInterface
+final class MimeMessageNormalizer implements NormalizerInterface, DenormalizerInterface, SerializerAwareInterface
 {
     private NormalizerInterface&DenormalizerInterface $serializer;
     private array $headerClassMap;
@@ -44,21 +44,19 @@ final class MimeMessageNormalizer implements NormalizerInterface, DenormalizerIn
 
     public function getSupportedTypes(?string $format): array
     {
-        $isCacheable = __CLASS__ === static::class || $this->hasCacheableSupportsMethod();
-
         return [
-            Message::class => $isCacheable,
-            Headers::class => $isCacheable,
-            HeaderInterface::class => $isCacheable,
-            Address::class => $isCacheable,
-            AbstractPart::class => $isCacheable,
+            Message::class => true,
+            Headers::class => true,
+            HeaderInterface::class => true,
+            Address::class => true,
+            AbstractPart::class => true,
         ];
     }
 
     public function setSerializer(SerializerInterface $serializer): void
     {
         if (!$serializer instanceof NormalizerInterface || !$serializer instanceof DenormalizerInterface) {
-            throw new LogicException(sprintf('The passed serializer should implement both NormalizerInterface and DenormalizerInterface, "%s" given.', get_debug_type($serializer)));
+            throw new LogicException(\sprintf('The passed serializer should implement both NormalizerInterface and DenormalizerInterface, "%s" given.', get_debug_type($serializer)));
         }
         $this->serializer = $serializer;
         $this->normalizer->setSerializer($serializer);
@@ -119,15 +117,5 @@ final class MimeMessageNormalizer implements NormalizerInterface, DenormalizerIn
     public function supportsDenormalization(mixed $data, string $type, ?string $format = null, array $context = []): bool
     {
         return is_a($type, Message::class, true) || Headers::class === $type || AbstractPart::class === $type;
-    }
-
-    /**
-     * @deprecated since Symfony 6.3, use "getSupportedTypes()" instead
-     */
-    public function hasCacheableSupportsMethod(): bool
-    {
-        trigger_deprecation('symfony/serializer', '6.3', 'The "%s()" method is deprecated, implement "%s::getSupportedTypes()" instead.', __METHOD__, get_debug_type($this));
-
-        return true;
     }
 }

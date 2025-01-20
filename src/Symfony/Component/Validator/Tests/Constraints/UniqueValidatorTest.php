@@ -229,7 +229,7 @@ class UniqueValidatorTest extends ConstraintValidatorTestCase
     public function testCollectionFieldNamesMustBeString(string $type, mixed $field)
     {
         $this->expectException(UnexpectedTypeException::class);
-        $this->expectExceptionMessage(sprintf('Expected argument of type "string", "%s" given', $type));
+        $this->expectExceptionMessage(\sprintf('Expected argument of type "string", "%s" given', $type));
 
         $this->validator->validate([['value' => 5], ['id' => 1, 'value' => 6]], new Unique(fields: [$field]));
     }
@@ -308,6 +308,90 @@ class UniqueValidatorTest extends ConstraintValidatorTestCase
         );
 
         $this->assertNoViolation();
+    }
+
+    public function testErrorPath()
+    {
+        $array = [
+            new DummyClassOne(),
+            new DummyClassOne(),
+            new DummyClassOne(),
+        ];
+
+        $array[0]->code = 'a1';
+        $array[1]->code = 'a2';
+        $array[2]->code = 'a1';
+
+        $this->validator->validate(
+            $array,
+            new Unique(
+                normalizer: [self::class, 'normalizeDummyClassOne'],
+                fields: 'code',
+                errorPath: 'code',
+            )
+        );
+
+        $this->buildViolation('This collection should contain only unique elements.')
+            ->setParameter('{{ value }}', 'array')
+            ->setCode(Unique::IS_NOT_UNIQUE)
+            ->atPath('property.path[2].code')
+            ->assertRaised();
+    }
+
+    public function testErrorPathWithIteratorAggregate()
+    {
+        $array = new \ArrayObject([
+            new DummyClassOne(),
+            new DummyClassOne(),
+            new DummyClassOne(),
+        ]);
+
+        $array[0]->code = 'a1';
+        $array[1]->code = 'a2';
+        $array[2]->code = 'a1';
+
+        $this->validator->validate(
+            $array,
+            new Unique(
+                normalizer: [self::class, 'normalizeDummyClassOne'],
+                fields: 'code',
+                errorPath: 'code',
+            )
+        );
+
+        $this->buildViolation('This collection should contain only unique elements.')
+            ->setParameter('{{ value }}', 'array')
+            ->setCode(Unique::IS_NOT_UNIQUE)
+            ->atPath('property.path[2].code')
+            ->assertRaised();
+    }
+
+    public function testErrorPathWithNonList()
+    {
+        $array = [
+            'a' => new DummyClassOne(),
+            'b' => new DummyClassOne(),
+            'c' => new DummyClassOne(),
+        ];
+
+        $array['a']->code = 'a1';
+        $array['b']->code = 'a2';
+        $array['c']->code = 'a1';
+
+        $this->validator->validate(
+            $array,
+            new Unique(
+                normalizer: [self::class, 'normalizeDummyClassOne'],
+                fields: 'code',
+                errorPath: 'code',
+            )
+        );
+
+        $this->buildViolation('This collection should contain only unique elements.')
+            ->setParameter('{{ value }}', 'array')
+            ->setCode(Unique::IS_NOT_UNIQUE)
+            ->atPath('property.path[c].code')
+            ->assertRaised();
     }
 
     public static function normalizeDummyClassOne(DummyClassOne $obj): array

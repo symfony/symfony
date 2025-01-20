@@ -23,24 +23,23 @@
         }
     ],
     "require": {
-        "php": ">=8.1",
-        "symfony/string": "^5.4|^6.0|^7.0"
+        "php": ">=8.2",
+        "symfony/string": "^6.4|^7.0",
+        "symfony/type-info": "~7.1.9|^7.2.2"
     },
     "require-dev": {
-        "doctrine/annotations": "^1.12|^2",
-        "symfony/serializer": "^5.4|^6.4|^7.0",
-        "symfony/cache": "^5.4|^6.0|^7.0",
-        "symfony/dependency-injection": "^5.4|^6.0|^7.0",
+        "symfony/serializer": "^6.4|^7.0",
+        "symfony/cache": "^6.4|^7.0",
+        "symfony/dependency-injection": "^6.4|^7.0",
         "phpdocumentor/reflection-docblock": "^5.2",
         "phpstan/phpdoc-parser": "^1.0|^2.0"
     },
     "conflict": {
-        "doctrine/annotations": "<1.12",
         "phpdocumentor/reflection-docblock": "<5.2",
         "phpdocumentor/type-resolver": "<1.5.1",
-        "symfony/dependency-injection": "<5.4|>=6.0,<6.4",
-        "symfony/cache": "<5.4",
-        "symfony/serializer": "<5.4"
+        "symfony/dependency-injection": "<6.4",
+        "symfony/cache": "<6.4",
+        "symfony/serializer": "<6.4"
     },
     "autoload": {
         "psr-4": { "Symfony\\Component\\PropertyInfo\\": "" },

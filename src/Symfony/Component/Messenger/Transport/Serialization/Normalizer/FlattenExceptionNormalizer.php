@@ -28,7 +28,7 @@ final class FlattenExceptionNormalizer implements DenormalizerInterface, Normali
 
     public function normalize(mixed $object, ?string $format = null, array $context = []): array
     {
-        $normalized = [
+        return [
             'message' => $object->getMessage(),
             'code' => $object->getCode(),
             'headers' => $object->getHeaders(),
@@ -41,8 +41,6 @@ final class FlattenExceptionNormalizer implements DenormalizerInterface, Normali
             'trace' => $object->getTrace(),
             'trace_as_string' => $object->getTraceAsString(),
         ];
-
-        return $normalized;
     }
 
     public function getSupportedTypes(?string $format): array

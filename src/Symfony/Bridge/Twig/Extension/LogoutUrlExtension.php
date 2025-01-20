@@ -22,11 +22,9 @@ use Twig\TwigFunction;
  */
 final class LogoutUrlExtension extends AbstractExtension
 {
-    private LogoutUrlGenerator $generator;
-
-    public function __construct(LogoutUrlGenerator $generator)
-    {
-        $this->generator = $generator;
+    public function __construct(
+        private LogoutUrlGenerator $generator,
+    ) {
     }
 
     public function getFunctions(): array

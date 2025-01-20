@@ -52,6 +52,6 @@ final class TelegramTransportFactory extends AbstractTransportFactory
             throw new IncompleteDsnException('Malformed token.', 'telegram://'.$dsn->getHost());
         }
 
-        return sprintf('%s:%s', $dsn->getUser(), $dsn->getPassword());
+        return \sprintf('%s:%s', $dsn->getUser(), $dsn->getPassword());
     }
 }

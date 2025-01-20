@@ -36,13 +36,13 @@ final class MailjetPayloadConverter implements PayloadConverterInterface
                 'open' => MailerEngagementEvent::OPEN,
                 'spam' => MailerEngagementEvent::SPAM,
                 'unsub' => MailerEngagementEvent::UNSUBSCRIBE,
-                default => throw new ParseException(sprintf('Unsupported event "%s".', $payload['event'])),
+                default => throw new ParseException(\sprintf('Unsupported event "%s".', $payload['event'])),
             };
             $event = new MailerEngagementEvent($name, $payload['MessageID'], $payload);
         }
 
         if (!$date = \DateTimeImmutable::createFromFormat('U', $payload['time'])) {
-            throw new ParseException(sprintf('Invalid date "%s".', $payload['time']));
+            throw new ParseException(\sprintf('Invalid date "%s".', $payload['time']));
         }
 
         $event->setDate($date);

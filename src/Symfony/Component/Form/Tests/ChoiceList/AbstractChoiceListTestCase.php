@@ -39,8 +39,6 @@ abstract class AbstractChoiceListTestCase extends TestCase
 
     protected function setUp(): void
     {
-        parent::setUp();
-
         $this->list = $this->createChoiceList();
 
         $choices = $this->getChoices();

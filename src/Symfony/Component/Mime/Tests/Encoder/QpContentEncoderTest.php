@@ -20,7 +20,7 @@ class QpContentEncoderTest extends TestCase
     {
         $encoder = new QpContentEncoder();
 
-        $this->assertSame('message=09', $encoder->encodeString('message'.chr(0x09)));
-        $this->assertSame('message=20', $encoder->encodeString('message'.chr(0x20)));
+        $this->assertSame('message=09', $encoder->encodeString('message'.\chr(0x09)));
+        $this->assertSame('message=20', $encoder->encodeString('message'.\chr(0x20)));
     }
 }

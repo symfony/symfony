@@ -39,7 +39,7 @@ abstract class AbstractRequestHandlerTestCase extends TestCase
 
     protected function setUp(): void
     {
-        $this->serverParams = new class() extends ServerParams {
+        $this->serverParams = new class extends ServerParams {
             public ?int $contentLength = null;
             public string $postMaxSize = '';
 

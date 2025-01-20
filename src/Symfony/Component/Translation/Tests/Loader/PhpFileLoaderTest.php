@@ -33,16 +33,14 @@ class PhpFileLoaderTest extends TestCase
     public function testLoadNonExistingResource()
     {
         $this->expectException(NotFoundResourceException::class);
-        $loader = new PhpFileLoader();
-        $resource = __DIR__.'/../Fixtures/non-existing.php';
-        $loader->load($resource, 'en', 'domain1');
+
+        (new PhpFileLoader())->load(__DIR__.'/../Fixtures/non-existing.php', 'en', 'domain1');
     }
 
     public function testLoadThrowsAnExceptionIfFileNotLocal()
     {
         $this->expectException(InvalidResourceException::class);
-        $loader = new PhpFileLoader();
-        $resource = 'http://example.com/resources.php';
-        $loader->load($resource, 'en', 'domain1');
+
+        (new PhpFileLoader())->load('http://example.com/resources.php', 'en', 'domain1');
     }
 }

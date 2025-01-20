@@ -74,7 +74,7 @@ final class TransTokenParser extends AbstractTokenParser
 
         $stream->expect(Token::BLOCK_END_TYPE);
 
-        return new TransNode($body, $domain, $count, $vars, $locale, $lineno, $this->getTag());
+        return new TransNode($body, $domain, $count, $vars, $locale, $lineno);
     }
 
     public function decideTransFork(Token $token): bool

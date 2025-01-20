@@ -28,7 +28,7 @@ use Symfony\Component\HttpFoundation\Request;
 final class FormEncodedBodyExtractor implements AccessTokenExtractorInterface
 {
     public function __construct(
-        private readonly string $parameter = 'access_token'
+        private readonly string $parameter = 'access_token',
     ) {
     }
 

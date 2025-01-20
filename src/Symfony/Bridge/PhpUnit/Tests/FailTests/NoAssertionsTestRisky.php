@@ -17,6 +17,8 @@ use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 /**
  * This class is deliberately suffixed with *TestRisky.php so that it is ignored
  * by PHPUnit. This test is designed to fail. See ../expectrisky.phpt.
+ *
+ * @requires PHPUnit < 10
  */
 final class NoAssertionsTestRisky extends TestCase
 {

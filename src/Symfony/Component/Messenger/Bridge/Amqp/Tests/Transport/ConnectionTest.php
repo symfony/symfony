@@ -185,6 +185,12 @@ class ConnectionTest extends TestCase
                     ],
                 ],
             ],
+            'delay' => [
+                'arguments' => [
+                    'x-queue-type' => 'classic',
+                    'x-message-deduplication' => true,
+                ],
+            ],
             'exchange' => [
                 'arguments' => [
                     'alternate-exchange' => 'alternate',
@@ -873,17 +879,12 @@ class ConnectionTest extends TestCase
 
 class TestAmqpFactory extends AmqpFactory
 {
-    private \AMQPConnection $connection;
-    private \AMQPChannel $channel;
-    private \AMQPQueue $queue;
-    private \AMQPExchange $exchange;
-
-    public function __construct(\AMQPConnection $connection, \AMQPChannel $channel, \AMQPQueue $queue, \AMQPExchange $exchange)
-    {
-        $this->connection = $connection;
-        $this->channel = $channel;
-        $this->queue = $queue;
-        $this->exchange = $exchange;
+    public function __construct(
+        private \AMQPConnection $connection,
+        private \AMQPChannel $channel,
+        private \AMQPQueue $queue,
+        private \AMQPExchange $exchange,
+    ) {
     }
 
     public function createConnection(array $credentials): \AMQPConnection

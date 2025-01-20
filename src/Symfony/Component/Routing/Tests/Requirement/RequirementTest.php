@@ -224,10 +224,7 @@ class RequirementTest extends TestCase
     }
 
     /**
-     * @testWith    ["00000000-0000-0000-0000-000000000000"]
-     *              ["ffffffff-ffff-ffff-ffff-ffffffffffff"]
-     *              ["01802c4e-c409-9f07-863c-f025ca7766a0"]
-     *              ["056654ca-0699-4e16-9895-e60afca090d7"]
+     * @dataProvider provideUidRfc4122
      */
     public function testUidRfc4122OK(string $uid)
     {
@@ -238,11 +235,7 @@ class RequirementTest extends TestCase
     }
 
     /**
-     * @testWith    [""]
-     *              ["foo"]
-     *              ["01802c4e-c409-9f07-863c-f025ca7766a"]
-     *              ["01802c4e-c409-9f07-863c-f025ca7766ag"]
-     *              ["01802c4ec4099f07863cf025ca7766a0"]
+     * @dataProvider provideUidRfc4122KO
      */
     public function testUidRfc4122KO(string $uid)
     {
@@ -250,6 +243,45 @@ class RequirementTest extends TestCase
             (new Route('/{uid}', [], ['uid' => Requirement::UID_RFC4122]))->compile()->getRegex(),
             '/'.$uid,
         );
+    }
+
+    /**
+     * @dataProvider provideUidRfc4122
+     */
+    public function testUidRfc9562OK(string $uid)
+    {
+        $this->assertMatchesRegularExpression(
+            (new Route('/{uid}', [], ['uid' => Requirement::UID_RFC9562]))->compile()->getRegex(),
+            '/'.$uid,
+        );
+    }
+
+    /**
+     * @dataProvider provideUidRfc4122KO
+     */
+    public function testUidRfc9562KO(string $uid)
+    {
+        $this->assertDoesNotMatchRegularExpression(
+            (new Route('/{uid}', [], ['uid' => Requirement::UID_RFC9562]))->compile()->getRegex(),
+            '/'.$uid,
+        );
+    }
+
+    public static function provideUidRfc4122(): iterable
+    {
+        yield ['00000000-0000-0000-0000-000000000000'];
+        yield ['ffffffff-ffff-ffff-ffff-ffffffffffff'];
+        yield ['01802c4e-c409-9f07-863c-f025ca7766a0'];
+        yield ['056654ca-0699-4e16-9895-e60afca090d7'];
+    }
+
+    public static function provideUidRfc4122KO(): iterable
+    {
+        yield [''];
+        yield ['foo'];
+        yield ['01802c4e-c409-9f07-863c-f025ca7766a'];
+        yield ['01802c4e-c409-9f07-863c-f025ca7766ag'];
+        yield ['01802c4ec4099f07863cf025ca7766a0'];
     }
 
     /**
@@ -461,6 +493,64 @@ class RequirementTest extends TestCase
     {
         $this->assertDoesNotMatchRegularExpression(
             (new Route('/{uuid}', [], ['uuid' => Requirement::UUID_V6]))->compile()->getRegex(),
+            '/'.$uuid,
+        );
+    }
+
+    /**
+     * @testWith    ["00000000-0000-7000-8000-000000000000"]
+     *              ["ffffffff-ffff-7fff-bfff-ffffffffffff"]
+     *              ["01910577-4898-7c47-966e-68d127dde2ac"]
+     */
+    public function testUuidV7OK(string $uuid)
+    {
+        $this->assertMatchesRegularExpression(
+            (new Route('/{uuid}', [], ['uuid' => Requirement::UUID_V7]))->compile()->getRegex(),
+            '/'.$uuid,
+        );
+    }
+
+    /**
+     * @testWith    [""]
+     *              ["foo"]
+     *              ["15baaab2-f310-11d2-9ecf-53afc49918d1"]
+     *              ["acd44dc8-d2cc-326c-9e3a-80a3305a25e8"]
+     *              ["7fc2705f-a8a4-5b31-99a8-890686d64189"]
+     *              ["1ecbc991-3552-6920-998e-efad54178a98"]
+     */
+    public function testUuidV7KO(string $uuid)
+    {
+        $this->assertDoesNotMatchRegularExpression(
+            (new Route('/{uuid}', [], ['uuid' => Requirement::UUID_V7]))->compile()->getRegex(),
+            '/'.$uuid,
+        );
+    }
+
+    /**
+     * @testWith    ["00000000-0000-8000-8000-000000000000"]
+     *              ["ffffffff-ffff-8fff-bfff-ffffffffffff"]
+     *              ["01910577-4898-8c47-966e-68d127dde2ac"]
+     */
+    public function testUuidV8OK(string $uuid)
+    {
+        $this->assertMatchesRegularExpression(
+            (new Route('/{uuid}', [], ['uuid' => Requirement::UUID_V8]))->compile()->getRegex(),
+            '/'.$uuid,
+        );
+    }
+
+    /**
+     * @testWith    [""]
+     *              ["foo"]
+     *              ["15baaab2-f310-11d2-9ecf-53afc49918d1"]
+     *              ["acd44dc8-d2cc-326c-9e3a-80a3305a25e8"]
+     *              ["7fc2705f-a8a4-5b31-99a8-890686d64189"]
+     *              ["1ecbc991-3552-6920-998e-efad54178a98"]
+     */
+    public function testUuidV8KO(string $uuid)
+    {
+        $this->assertDoesNotMatchRegularExpression(
+            (new Route('/{uuid}', [], ['uuid' => Requirement::UUID_V8]))->compile()->getRegex(),
             '/'.$uuid,
         );
     }

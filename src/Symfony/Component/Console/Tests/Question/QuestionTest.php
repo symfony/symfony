@@ -20,7 +20,6 @@ class QuestionTest extends TestCase
 
     protected function setUp(): void
     {
-        parent::setUp();
         $this->question = new Question('Test question');
     }
 

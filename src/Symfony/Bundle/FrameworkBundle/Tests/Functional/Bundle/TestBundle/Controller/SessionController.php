@@ -35,13 +35,13 @@ class SessionController
             // remember name
             $session->set('name', $name);
 
-            return new Response(sprintf('<html><body>Hello %s, nice to meet you.</body></html>', $name));
+            return new Response(\sprintf('<html><body>Hello %s, nice to meet you.</body></html>', $name));
         }
 
         // existing session
         $name = $session->get('name');
 
-        return new Response(sprintf('<html><body>Welcome back %s, nice to meet you.</body></html>', $name));
+        return new Response(\sprintf('<html><body>Welcome back %s, nice to meet you.</body></html>', $name));
     }
 
     public function cacheableAction()

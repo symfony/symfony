@@ -16,6 +16,13 @@ use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 use Symfony\Component\Validator\Exception\UnexpectedValueException;
 
+/**
+ * Validates whether a value is a CIDR notation.
+ *
+ * @author Sorin Pop <popsorin15@gmail.com>
+ * @author Calin Bolea <calin.bolea@gmail.com>
+ * @author Ninos Ego <me@ninosego.de>
+ */
 class CidrValidator extends ConstraintValidator
 {
     public function validate($value, Constraint $constraint): void
@@ -28,8 +35,14 @@ class CidrValidator extends ConstraintValidator
             return;
         }
 
-        if (!\is_string($value)) {
+        if (!\is_string($value) && !$value instanceof \Stringable) {
             throw new UnexpectedValueException($value, 'string');
+        }
+
+        $value = (string) $value;
+
+        if (null !== $constraint->normalizer) {
+            $value = ($constraint->normalizer)($value);
         }
 
         $cidrParts = explode('/', $value, 2);
@@ -49,14 +62,7 @@ class CidrValidator extends ConstraintValidator
         $ipAddress = $cidrParts[0];
         $netmask = (int) $cidrParts[1];
 
-        $validV4 = Ip::V6 !== $constraint->version
-            && filter_var($ipAddress, \FILTER_VALIDATE_IP, \FILTER_FLAG_IPV4)
-            && $netmask <= 32;
-
-        $validV6 = Ip::V4 !== $constraint->version
-            && filter_var($ipAddress, \FILTER_VALIDATE_IP, \FILTER_FLAG_IPV6);
-
-        if (!$validV4 && !$validV6) {
+        if (!IpValidator::checkIP($ipAddress, $constraint->version)) {
             $this->context
                 ->buildViolation($constraint->message)
                 ->setCode(Cidr::INVALID_CIDR_ERROR)
@@ -65,11 +71,17 @@ class CidrValidator extends ConstraintValidator
             return;
         }
 
-        if ($netmask < $constraint->netmaskMin || $netmask > $constraint->netmaskMax) {
+        $netmaskMax = $constraint->netmaskMax;
+
+        if (filter_var($ipAddress, \FILTER_VALIDATE_IP, \FILTER_FLAG_IPV4) && $netmaskMax > 32) {
+            $netmaskMax = 32;
+        }
+
+        if ($netmask < $constraint->netmaskMin || $netmask > $netmaskMax) {
             $this->context
                 ->buildViolation($constraint->netmaskRangeViolationMessage)
                 ->setParameter('{{ min }}', $constraint->netmaskMin)
-                ->setParameter('{{ max }}', $constraint->netmaskMax)
+                ->setParameter('{{ max }}', $netmaskMax)
                 ->setCode(Cidr::OUT_OF_RANGE_ERROR)
                 ->addViolation();
         }

@@ -28,22 +28,21 @@ class ExpressionLanguageProvider implements ExpressionFunctionProviderInterface
 {
     private ?\Closure $serviceCompiler;
 
-    private ?\Closure $getEnv;
-
-    public function __construct(?callable $serviceCompiler = null, ?\Closure $getEnv = null)
-    {
+    public function __construct(
+        ?callable $serviceCompiler = null,
+        private ?\Closure $getEnv = null,
+    ) {
         $this->serviceCompiler = null === $serviceCompiler ? null : $serviceCompiler(...);
-        $this->getEnv = $getEnv;
     }
 
     public function getFunctions(): array
     {
         return [
-            new ExpressionFunction('service', $this->serviceCompiler ?? fn ($arg) => sprintf('$container->get(%s)', $arg), fn (array $variables, $value) => $variables['container']->get($value)),
+            new ExpressionFunction('service', $this->serviceCompiler ?? fn ($arg) => \sprintf('$container->get(%s)', $arg), fn (array $variables, $value) => $variables['container']->get($value)),
 
-            new ExpressionFunction('parameter', fn ($arg) => sprintf('$container->getParameter(%s)', $arg), fn (array $variables, $value) => $variables['container']->getParameter($value)),
+            new ExpressionFunction('parameter', fn ($arg) => \sprintf('$container->getParameter(%s)', $arg), fn (array $variables, $value) => $variables['container']->getParameter($value)),
 
-            new ExpressionFunction('env', fn ($arg) => sprintf('$container->getEnv(%s)', $arg), function (array $variables, $value) {
+            new ExpressionFunction('env', fn ($arg) => \sprintf('$container->getEnv(%s)', $arg), function (array $variables, $value) {
                 if (!$this->getEnv) {
                     throw new LogicException('You need to pass a getEnv closure to the expression language provider to use the "env" function.');
                 }
@@ -51,7 +50,7 @@ class ExpressionLanguageProvider implements ExpressionFunctionProviderInterface
                 return ($this->getEnv)($value);
             }),
 
-            new ExpressionFunction('arg', fn ($arg) => sprintf('$args?->get(%s)', $arg), fn (array $variables, $value) => $variables['args']?->get($value)),
+            new ExpressionFunction('arg', fn ($arg) => \sprintf('$args?->get(%s)', $arg), fn (array $variables, $value) => $variables['args']?->get($value)),
         ];
     }
 }

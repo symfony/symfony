@@ -28,7 +28,7 @@ class ExpressionLanguageProvider implements ExpressionFunctionProviderInterface
 
             new ExpressionFunction('is_fully_authenticated', fn () => '$token && $auth_checker->isGranted("IS_AUTHENTICATED_FULLY")', fn (array $variables) => $variables['token'] && $variables['auth_checker']->isGranted('IS_AUTHENTICATED_FULLY')),
 
-            new ExpressionFunction('is_granted', fn ($attributes, $object = 'null') => sprintf('$auth_checker->isGranted(%s, %s)', $attributes, $object), fn (array $variables, $attributes, $object = null) => $variables['auth_checker']->isGranted($attributes, $object)),
+            new ExpressionFunction('is_granted', fn ($attributes, $object = 'null') => \sprintf('$auth_checker->isGranted(%s, %s)', $attributes, $object), fn (array $variables, $attributes, $object = null) => $variables['auth_checker']->isGranted($attributes, $object)),
 
             new ExpressionFunction('is_remember_me', fn () => '$token && $auth_checker->isGranted("IS_REMEMBERED")', fn (array $variables) => $variables['token'] && $variables['auth_checker']->isGranted('IS_REMEMBERED')),
         ];

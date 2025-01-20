@@ -20,12 +20,12 @@ use Symfony\Component\Messenger\Envelope;
  */
 class ActivationMiddleware implements MiddlewareInterface
 {
-    private MiddlewareInterface $inner;
     private \Closure|bool $activated;
 
-    public function __construct(MiddlewareInterface $inner, bool|callable $activated)
-    {
-        $this->inner = $inner;
+    public function __construct(
+        private MiddlewareInterface $inner,
+        bool|callable $activated,
+    ) {
         $this->activated = \is_bool($activated) ? $activated : $activated(...);
     }
 

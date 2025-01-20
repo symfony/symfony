@@ -24,8 +24,8 @@ class IcuDatFileLoaderTest extends LocalizedTestCase
     public function testLoadInvalidResource()
     {
         $this->expectException(InvalidResourceException::class);
-        $loader = new IcuDatFileLoader();
-        $loader->load(__DIR__.'/../Fixtures/resourcebundle/corrupted/resources', 'es', 'domain2');
+
+        (new IcuDatFileLoader())->load(__DIR__.'/../Fixtures/resourcebundle/corrupted/resources', 'es', 'domain2');
     }
 
     public function testDatEnglishLoad()
@@ -56,7 +56,7 @@ class IcuDatFileLoaderTest extends LocalizedTestCase
     public function testLoadNonExistingResource()
     {
         $this->expectException(NotFoundResourceException::class);
-        $loader = new IcuDatFileLoader();
-        $loader->load(__DIR__.'/../Fixtures/non-existing.txt', 'en', 'domain1');
+
+        (new IcuDatFileLoader())->load(__DIR__.'/../Fixtures/non-existing.txt', 'en', 'domain1');
     }
 }

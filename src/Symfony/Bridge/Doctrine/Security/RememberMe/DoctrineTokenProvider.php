@@ -12,9 +12,7 @@
 namespace Symfony\Bridge\Doctrine\Security\RememberMe;
 
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Driver\Result as DriverResult;
 use Doctrine\DBAL\ParameterType;
-use Doctrine\DBAL\Result;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Types\Types;
 use Symfony\Component\Security\Core\Authentication\RememberMe\PersistentToken;
@@ -40,10 +38,8 @@ use Symfony\Component\Security\Core\Exception\TokenNotFoundException;
  *         `class`    varchar(100) NOT NULL,
  *         `username` varchar(200) NOT NULL
  *     );
- *
- * @final since Symfony 6.4
  */
-class DoctrineTokenProvider implements TokenProviderInterface, TokenVerifierInterface
+final class DoctrineTokenProvider implements TokenProviderInterface, TokenVerifierInterface
 {
     public function __construct(
         private readonly Connection $conn,
@@ -58,20 +54,14 @@ class DoctrineTokenProvider implements TokenProviderInterface, TokenVerifierInte
         $stmt = $this->conn->executeQuery($sql, $paramValues, $paramTypes);
 
         // fetching numeric because column name casing depends on platform, eg. Oracle converts all not quoted names to uppercase
-        $row = $stmt instanceof Result || $stmt instanceof DriverResult ? $stmt->fetchNumeric() : $stmt->fetch(\PDO::FETCH_NUM);
+        $row = $stmt->fetchNumeric() ?: throw new TokenNotFoundException('No token found.');
 
-        if ($row) {
-            [$class, $username, $value, $last_used] = $row;
-            return new PersistentToken($class, $username, $series, $value, new \DateTimeImmutable($last_used));
-        }
+        [$class, $username, $value, $last_used] = $row;
 
-        throw new TokenNotFoundException('No token found.');
+        return new PersistentToken($class, $username, $series, $value, new \DateTimeImmutable($last_used));
     }
 
-    /**
-     * @return void
-     */
-    public function deleteTokenBySeries(string $series)
+    public function deleteTokenBySeries(string $series): void
     {
         $sql = 'DELETE FROM rememberme_token WHERE series=:series';
         $paramValues = ['series' => $series];
@@ -98,10 +88,7 @@ class DoctrineTokenProvider implements TokenProviderInterface, TokenVerifierInte
         }
     }
 
-    /**
-     * @return void
-     */
-    public function createNewToken(PersistentTokenInterface $token)
+    public function createNewToken(PersistentTokenInterface $token): void
     {
         $sql = 'INSERT INTO rememberme_token (class, username, series, value, lastUsed) VALUES (:class, :username, :series, :value, :lastUsed)';
         $paramValues = [
@@ -185,16 +172,12 @@ class DoctrineTokenProvider implements TokenProviderInterface, TokenVerifierInte
 
     /**
      * Adds the Table to the Schema if "remember me" uses this Connection.
-     *
-     * @param \Closure $isSameDatabase
      */
-    public function configureSchema(Schema $schema, Connection $forConnection/* , \Closure $isSameDatabase */): void
+    public function configureSchema(Schema $schema, Connection $forConnection, \Closure $isSameDatabase): void
     {
         if ($schema->hasTable('rememberme_token')) {
             return;
         }
-
-        $isSameDatabase = 2 < \func_num_args() ? func_get_arg(2) : static fn () => false;
 
         if ($forConnection !== $this->conn && !$isSameDatabase($this->conn->executeStatement(...))) {
             return;

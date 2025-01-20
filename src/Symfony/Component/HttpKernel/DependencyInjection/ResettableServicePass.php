@@ -23,10 +23,7 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 class ResettableServicePass implements CompilerPassInterface
 {
-    /**
-     * @return void
-     */
-    public function process(ContainerBuilder $container)
+    public function process(ContainerBuilder $container): void
     {
         if (!$container->has('services_resetter')) {
             return;
@@ -39,7 +36,7 @@ class ResettableServicePass implements CompilerPassInterface
 
             foreach ($tags as $attributes) {
                 if (!isset($attributes['method'])) {
-                    throw new RuntimeException(sprintf('Tag "kernel.reset" requires the "method" attribute to be set on service "%s".', $id));
+                    throw new RuntimeException(\sprintf('Tag "kernel.reset" requires the "method" attribute to be set on service "%s".', $id));
                 }
 
                 if (!isset($methods[$id])) {

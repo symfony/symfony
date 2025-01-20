@@ -18,10 +18,8 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
  *
  * @author Dany Maillard <danymaillard93b@gmail.com>
  * @author Igor Timoshenko <igor.timoshenko@i.ua>
- *
- * @final since Symfony 6.1
  */
-class TokenProcessor extends AbstractTokenProcessor
+final class TokenProcessor extends AbstractTokenProcessor
 {
     protected function getKey(): string
     {

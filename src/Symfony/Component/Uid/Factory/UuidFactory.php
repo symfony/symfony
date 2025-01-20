@@ -72,7 +72,7 @@ class UuidFactory
         $namespace ??= $this->nameBasedNamespace;
 
         if (null === $namespace) {
-            throw new \LogicException(sprintf('A namespace should be defined when using "%s()".', __METHOD__));
+            throw new \LogicException(\sprintf('A namespace should be defined when using "%s()".', __METHOD__));
         }
 
         return new NameBasedUuidFactory($this->nameBasedClass, $this->getNamespace($namespace));

@@ -34,7 +34,10 @@ class XmlReaderCasterTest extends TestCase
         $this->reader->close();
     }
 
-    public function testParserProperty()
+    /**
+     * @requires PHP < 8.4
+     */
+    public function testParserPropertyPriorToPhp84()
     {
         $this->reader->setParserProperty(\XMLReader::SUBST_ENTITIES, true);
 
@@ -53,6 +56,33 @@ EODUMP;
     }
 
     /**
+     * @requires PHP 8.4
+     */
+    public function testParserProperty()
+    {
+        $this->reader->setParserProperty(\XMLReader::SUBST_ENTITIES, true);
+
+        $expectedDump = <<<'EODUMP'
+XMLReader {%A
+  +nodeType: ~ int
+%A
+  parserProperties: {
+    SUBST_ENTITIES: true
+     …3
+  }
+   …12
+}
+EODUMP;
+
+        $this->assertDumpMatchesFormat($expectedDump, $this->reader);
+    }
+
+    /**
+     * This test only work before PHP 8.4. In PHP 8.4, XMLReader properties are virtual
+     * and their values are not dumped.
+     *
+     * @requires PHP < 8.4
+     *
      * @dataProvider provideNodes
      */
     public function testNodes($seek, $expectedDump)
@@ -245,13 +275,34 @@ EODUMP
         ];
     }
 
-    public function testWithUninitializedXMLReader()
+    /**
+     * @requires PHP < 8.4
+     */
+    public function testWithUninitializedXMLReaderPriorToPhp84()
     {
         $this->reader = new \XMLReader();
 
         $expectedDump = <<<'EODUMP'
 XMLReader {
   +nodeType: NONE
+   …13
+}
+EODUMP;
+
+        $this->assertDumpMatchesFormat($expectedDump, $this->reader);
+    }
+
+    /**
+     * @requires PHP 8.4
+     */
+    public function testWithUninitializedXMLReader()
+    {
+        $this->reader = new \XMLReader();
+
+        $expectedDump = <<<'EODUMP'
+XMLReader {%A
+  +nodeType: ~ int
+%A
    …13
 }
 EODUMP;

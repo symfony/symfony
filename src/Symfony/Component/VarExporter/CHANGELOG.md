@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+7.2
+---
+
+ * Allow reinitializing lazy objects with a new initializer
+
 6.4
 ---
 

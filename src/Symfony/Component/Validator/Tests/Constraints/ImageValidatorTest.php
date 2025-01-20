@@ -13,7 +13,6 @@ namespace Symfony\Component\Validator\Tests\Constraints;
 
 use Symfony\Component\Validator\Constraints\Image;
 use Symfony\Component\Validator\Constraints\ImageValidator;
-use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
 /**
@@ -264,66 +263,6 @@ class ImageValidatorTest extends ConstraintValidatorTestCase
         ];
     }
 
-    public function testInvalidMinWidth()
-    {
-        $this->expectException(ConstraintDefinitionException::class);
-        $constraint = new Image([
-            'minWidth' => '1abc',
-        ]);
-
-        $this->validator->validate($this->image, $constraint);
-    }
-
-    public function testInvalidMaxWidth()
-    {
-        $this->expectException(ConstraintDefinitionException::class);
-        $constraint = new Image([
-            'maxWidth' => '1abc',
-        ]);
-
-        $this->validator->validate($this->image, $constraint);
-    }
-
-    public function testInvalidMinHeight()
-    {
-        $this->expectException(ConstraintDefinitionException::class);
-        $constraint = new Image([
-            'minHeight' => '1abc',
-        ]);
-
-        $this->validator->validate($this->image, $constraint);
-    }
-
-    public function testInvalidMaxHeight()
-    {
-        $this->expectException(ConstraintDefinitionException::class);
-        $constraint = new Image([
-            'maxHeight' => '1abc',
-        ]);
-
-        $this->validator->validate($this->image, $constraint);
-    }
-
-    public function testInvalidMinPixels()
-    {
-        $this->expectException(ConstraintDefinitionException::class);
-        $constraint = new Image([
-            'minPixels' => '1abc',
-        ]);
-
-        $this->validator->validate($this->image, $constraint);
-    }
-
-    public function testInvalidMaxPixels()
-    {
-        $this->expectException(ConstraintDefinitionException::class);
-        $constraint = new Image([
-            'maxPixels' => '1abc',
-        ]);
-
-        $this->validator->validate($this->image, $constraint);
-    }
-
     /**
      * @dataProvider provideMinRatioConstraints
      */
@@ -405,26 +344,6 @@ class ImageValidatorTest extends ConstraintValidatorTestCase
         $this->validator->validate($this->image16By9, $constraint);
 
         $this->assertNoViolation();
-    }
-
-    public function testInvalidMinRatio()
-    {
-        $this->expectException(ConstraintDefinitionException::class);
-        $constraint = new Image([
-            'minRatio' => '1abc',
-        ]);
-
-        $this->validator->validate($this->image, $constraint);
-    }
-
-    public function testInvalidMaxRatio()
-    {
-        $this->expectException(ConstraintDefinitionException::class);
-        $constraint = new Image([
-            'maxRatio' => '1abc',
-        ]);
-
-        $this->validator->validate($this->image, $constraint);
     }
 
     /**
@@ -529,7 +448,7 @@ class ImageValidatorTest extends ConstraintValidatorTestCase
         $this->assertSame('image/*', $constraint->mimeTypes);
 
         $this->buildViolation('This file is not a valid image.')
-            ->setParameter('{{ file }}', sprintf('"%s"', $this->notAnImage))
+            ->setParameter('{{ file }}', \sprintf('"%s"', $this->notAnImage))
             ->setParameter('{{ type }}', '"text/plain"')
             ->setParameter('{{ types }}', '"image/*"')
             ->setParameter('{{ name }}', '"ccc.txt"')
@@ -556,7 +475,7 @@ class ImageValidatorTest extends ConstraintValidatorTestCase
         $this->validator->validate($this->image, $constraint);
 
         $this->buildViolation('The mime type of the file is invalid ({{ type }}). Allowed mime types are {{ types }}.')
-            ->setParameter('{{ file }}', sprintf('"%s"', $this->image))
+            ->setParameter('{{ file }}', \sprintf('"%s"', $this->image))
             ->setParameter('{{ type }}', '"image/gif"')
             ->setParameter('{{ types }}', '"image/jpeg", "image/png"')
             ->setParameter('{{ name }}', '"test.gif"')
@@ -577,6 +496,142 @@ class ImageValidatorTest extends ConstraintValidatorTestCase
                 'image/jpeg',
                 'image/png',
             ]),
+        ];
+    }
+
+    /** @dataProvider provideSvgWithViolation */
+    public function testSvgWithViolation(string $image, Image $constraint, string $violation, array $parameters = [])
+    {
+        $this->validator->validate($image, $constraint);
+
+        $this->buildViolation('myMessage')
+            ->setCode($violation)
+            ->setParameters($parameters)
+            ->assertRaised();
+    }
+
+    public static function provideSvgWithViolation(): iterable
+    {
+        yield 'No size svg' => [
+            __DIR__.'/Fixtures/test_no_size.svg',
+            new Image(allowLandscape: false, sizeNotDetectedMessage: 'myMessage'),
+            Image::SIZE_NOT_DETECTED_ERROR,
+        ];
+
+        yield 'Landscape SVG not allowed' => [
+            __DIR__.'/Fixtures/test_landscape.svg',
+            new Image(allowLandscape: false, allowLandscapeMessage: 'myMessage'),
+            Image::LANDSCAPE_NOT_ALLOWED_ERROR,
+            [
+                '{{ width }}' => 500,
+                '{{ height }}' => 200,
+            ],
+        ];
+
+        yield 'Portrait SVG not allowed' => [
+            __DIR__.'/Fixtures/test_portrait.svg',
+            new Image(allowPortrait: false, allowPortraitMessage: 'myMessage'),
+            Image::PORTRAIT_NOT_ALLOWED_ERROR,
+            [
+                '{{ width }}' => 200,
+                '{{ height }}' => 500,
+            ],
+        ];
+
+        yield 'Square SVG not allowed' => [
+            __DIR__.'/Fixtures/test_square.svg',
+            new Image(allowSquare: false, allowSquareMessage: 'myMessage'),
+            Image::SQUARE_NOT_ALLOWED_ERROR,
+            [
+                '{{ width }}' => 500,
+                '{{ height }}' => 500,
+            ],
+        ];
+
+        yield 'Landscape with width attribute SVG allowed' => [
+            __DIR__.'/Fixtures/test_landscape_width.svg',
+            new Image(allowLandscape: false, allowLandscapeMessage: 'myMessage'),
+            Image::LANDSCAPE_NOT_ALLOWED_ERROR,
+            [
+                '{{ width }}' => 600,
+                '{{ height }}' => 200,
+            ],
+        ];
+
+        yield 'Landscape with height attribute SVG not allowed' => [
+            __DIR__.'/Fixtures/test_landscape_height.svg',
+            new Image(allowLandscape: false, allowLandscapeMessage: 'myMessage'),
+            Image::LANDSCAPE_NOT_ALLOWED_ERROR,
+            [
+                '{{ width }}' => 500,
+                '{{ height }}' => 300,
+            ],
+        ];
+
+        yield 'Landscape with width and height attribute SVG not allowed' => [
+            __DIR__.'/Fixtures/test_landscape_width_height.svg',
+            new Image(allowLandscape: false, allowLandscapeMessage: 'myMessage'),
+            Image::LANDSCAPE_NOT_ALLOWED_ERROR,
+            [
+                '{{ width }}' => 600,
+                '{{ height }}' => 300,
+            ],
+        ];
+
+        yield 'SVG Min ratio 2' => [
+            __DIR__.'/Fixtures/test_square.svg',
+            new Image(minRatio: 2, minRatioMessage: 'myMessage'),
+            Image::RATIO_TOO_SMALL_ERROR,
+            [
+                '{{ ratio }}' => '1',
+                '{{ min_ratio }}' => '2',
+            ],
+        ];
+
+        yield 'SVG Min ratio 0.5' => [
+            __DIR__.'/Fixtures/test_square.svg',
+            new Image(maxRatio: 0.5, maxRatioMessage: 'myMessage'),
+            Image::RATIO_TOO_BIG_ERROR,
+            [
+                '{{ ratio }}' => '1',
+                '{{ max_ratio }}' => '0.5',
+            ],
+        ];
+    }
+
+    /** @dataProvider provideSvgWithoutViolation */
+    public function testSvgWithoutViolation(string $image, Image $constraint)
+    {
+        $this->validator->validate($image, $constraint);
+
+        $this->assertNoViolation();
+    }
+
+    public static function provideSvgWithoutViolation(): iterable
+    {
+        yield 'Landscape SVG allowed' => [
+            __DIR__.'/Fixtures/test_landscape.svg',
+            new Image(allowLandscape: true, allowLandscapeMessage: 'myMessage'),
+        ];
+
+        yield 'Portrait SVG allowed' => [
+            __DIR__.'/Fixtures/test_portrait.svg',
+            new Image(allowPortrait: true, allowPortraitMessage: 'myMessage'),
+        ];
+
+        yield 'Square SVG allowed' => [
+            __DIR__.'/Fixtures/test_square.svg',
+            new Image(allowSquare: true, allowSquareMessage: 'myMessage'),
+        ];
+
+        yield 'SVG Min ratio 1' => [
+            __DIR__.'/Fixtures/test_square.svg',
+            new Image(minRatio: 1, minRatioMessage: 'myMessage'),
+        ];
+
+        yield 'SVG Max ratio 1' => [
+            __DIR__.'/Fixtures/test_square.svg',
+            new Image(maxRatio: 1, maxRatioMessage: 'myMessage'),
         ];
     }
 }

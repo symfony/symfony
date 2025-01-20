@@ -19,7 +19,7 @@ if (version_compare(phpversion('relay'), '0.9.0', '>=')) {
     {
         public function getrange($key, $start, $end): mixed
         {
-            return ($this->lazyObjectState->realInstance ??= ($this->lazyObjectState->initializer)())->getrange(...\func_get_args());
+            return $this->initializeLazyObject()->getrange(...\func_get_args());
         }
     }
 } else {
@@ -30,7 +30,7 @@ if (version_compare(phpversion('relay'), '0.9.0', '>=')) {
     {
         public function getrange($key, $start, $end): \Relay\Relay|false|string
         {
-            return ($this->lazyObjectState->realInstance ??= ($this->lazyObjectState->initializer)())->getrange(...\func_get_args());
+            return $this->initializeLazyObject()->getrange(...\func_get_args());
         }
     }
 }

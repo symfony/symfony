@@ -72,6 +72,14 @@
     {% endset %}
 
     {% set text %}
+        {% if symfony_version_status %}
+            <div class="sf-toolbar-info-group">
+                <div class="sf-toolbar-info-piece">
+                    <span>{{ symfony_version_status }}</span>
+                </div>
+            </div>
+        {% endif %}
+
         <div class="sf-toolbar-info-group">
             <div class="sf-toolbar-info-piece">
                 <b>Profiler token</b>
@@ -149,7 +157,7 @@
         </div>
     {% endset %}
 
-    {{ include('@WebProfiler/Profiler/toolbar_item.html.twig', { link: true, name: 'config', status: block_status, additional_classes: 'sf-toolbar-block-right', block_attrs: 'title="' ~ symfony_version_status ~ '"' }) }}
+    {{ include('@WebProfiler/Profiler/toolbar_item.html.twig', { link: true, name: 'config', status: block_status, additional_classes: 'sf-toolbar-block-right' }) }}
 {% endblock %}
 
 {% block menu %}
@@ -250,17 +258,17 @@
     <div class="metrics">
         <div class="metric-group">
             <div class="metric">
-                <span class="value value-is-icon {{ not collector.haszendopcache ? 'value-shows-no-color' }}">{{ source('@WebProfiler/Icon/' ~ (collector.haszendopcache ? 'yes' : 'no') ~ '.svg') }}</span>
+                <span class="value value-is-icon {{ not collector.haszendopcache ? 'value-shows-no-color' }}" title="{{ collector.zendopcachestatus|default('') }}">{{ source('@WebProfiler/Icon/' ~ (collector.haszendopcache ? 'yes' : 'no') ~ '.svg') }}</span>
                 <span class="label">OPcache</span>
             </div>
 
             <div class="metric">
-                <span class="value value-is-icon {{ not collector.hasapcu ? 'value-shows-no-color' }}">{{ source('@WebProfiler/Icon/' ~ (collector.hasapcu ? 'yes' : 'no') ~ '.svg') }}</span>
+                <span class="value value-is-icon {{ not collector.hasapcu ? 'value-shows-no-color' }}" title="{{ collector.apcustatus|default('') }}">{{ source('@WebProfiler/Icon/' ~ (collector.hasapcu ? 'yes' : 'no') ~ '.svg') }}</span>
                 <span class="label">APCu</span>
             </div>
 
             <div class="metric">
-                <span class="value value-is-icon {{ not collector.hasxdebug ? 'value-shows-no-color' }}">{{ source('@WebProfiler/Icon/' ~ (collector.hasxdebug ? 'yes' : 'no') ~ '.svg') }}</span>
+                <span class="value value-is-icon {{ not collector.hasxdebug ? 'value-shows-no-color' }}" title="{{ collector.xdebugstatus|default('') }}">{{ source('@WebProfiler/Icon/' ~ (collector.hasxdebug ? 'yes' : 'no') ~ '.svg') }}</span>
                 <span class="label">Xdebug</span>
             </div>
         </div>

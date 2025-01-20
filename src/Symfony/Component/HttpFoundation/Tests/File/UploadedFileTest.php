@@ -322,4 +322,26 @@ class UploadedFileTest extends TestCase
             $this->assertSame(\PHP_INT_MAX, $size);
         }
     }
+
+    public function testgetClientOriginalPath()
+    {
+        $file = new UploadedFile(
+            __DIR__.'/Fixtures/test.gif',
+            'test.gif',
+            'image/gif'
+        );
+
+        $this->assertEquals('test.gif', $file->getClientOriginalPath());
+    }
+
+    public function testgetClientOriginalPathWebkitDirectory()
+    {
+        $file = new UploadedFile(
+            __DIR__.'/Fixtures/webkitdirectory/test.txt',
+            'webkitdirectory/test.txt',
+            'text/plain',
+        );
+
+        $this->assertEquals('webkitdirectory/test.txt', $file->getClientOriginalPath());
+    }
 }

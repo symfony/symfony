@@ -94,7 +94,7 @@ class ImportMapManager
 
         foreach ($packagesToRemove as $packageName) {
             if (!$currentEntries->has($packageName)) {
-                throw new \InvalidArgumentException(sprintf('Package "%s" listed for removal was not found in "importmap.php".', $packageName));
+                throw new \InvalidArgumentException(\sprintf('Package "%s" listed for removal was not found in "importmap.php".', $packageName));
             }
 
             $this->cleanupPackageFiles($currentEntries->get($packageName));
@@ -149,7 +149,7 @@ class ImportMapManager
 
             $path = $requireOptions->path;
             if (!$asset = $this->findAsset($path)) {
-                throw new \LogicException(sprintf('The path "%s" of the package "%s" cannot be found: either pass the logical name of the asset or a relative path starting with "./".', $requireOptions->path, $requireOptions->importName));
+                throw new \LogicException(\sprintf('The path "%s" of the package "%s" cannot be found: either pass the logical name of the asset or a relative path starting with "./".', $requireOptions->path, $requireOptions->importName));
             }
 
             // convert to a relative path (or fallback to the logical path)

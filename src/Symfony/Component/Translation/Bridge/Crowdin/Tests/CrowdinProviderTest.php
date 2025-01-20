@@ -401,7 +401,7 @@ XLIFF;
             },
             'UploadTranslations' => function (string $method, string $url, array $options = []): ResponseInterface {
                 $this->assertSame('POST', $method);
-                $this->assertSame(sprintf('https://api.crowdin.com/api/v2/projects/1/translations/%s', 'fr'), $url);
+                $this->assertSame(\sprintf('https://api.crowdin.com/api/v2/projects/1/translations/%s', 'fr'), $url);
                 $this->assertSame('{"storageId":19,"fileId":12}', $options['body']);
 
                 return new MockResponse('', ['http_code' => 500]);
@@ -584,7 +584,7 @@ XLIFF;
             },
             'uploadTranslations' => function (string $method, string $url, array $options = []) use ($expectedLocale): ResponseInterface {
                 $this->assertSame('POST', $method);
-                $this->assertSame(sprintf('https://api.crowdin.com/api/v2/projects/1/translations/%s', $expectedLocale), $url);
+                $this->assertSame(\sprintf('https://api.crowdin.com/api/v2/projects/1/translations/%s', $expectedLocale), $url);
                 $this->assertSame('{"storageId":19,"fileId":12}', $options['body']);
 
                 return new MockResponse();
@@ -600,7 +600,7 @@ XLIFF;
             },
             'uploadTranslations2' => function (string $method, string $url, array $options = []) use ($expectedLocale): ResponseInterface {
                 $this->assertSame('POST', $method);
-                $this->assertSame(sprintf('https://api.crowdin.com/api/v2/projects/1/translations/%s', $expectedLocale), $url);
+                $this->assertSame(\sprintf('https://api.crowdin.com/api/v2/projects/1/translations/%s', $expectedLocale), $url);
                 $this->assertSame('{"storageId":19,"fileId":12}', $options['body']);
 
                 return new MockResponse();
@@ -737,7 +737,7 @@ XLIFF
             'exportProjectTranslations' => function (string $method, string $url, array $options = []) use ($expectedTargetLanguageId): ResponseInterface {
                 $this->assertSame('POST', $method);
                 $this->assertSame('https://api.crowdin.com/api/v2/projects/1/translations/exports', $url);
-                $this->assertSame(sprintf('{"targetLanguageId":"%s","fileIds":[12]}', $expectedTargetLanguageId), $options['body']);
+                $this->assertSame(\sprintf('{"targetLanguageId":"%s","fileIds":[12]}', $expectedTargetLanguageId), $options['body']);
 
                 return new JsonMockResponse(['data' => ['url' => 'https://file.url']]);
             },

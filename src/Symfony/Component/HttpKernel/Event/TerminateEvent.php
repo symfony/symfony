@@ -25,13 +25,12 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
  */
 final class TerminateEvent extends KernelEvent
 {
-    private Response $response;
-
-    public function __construct(HttpKernelInterface $kernel, Request $request, Response $response)
-    {
+    public function __construct(
+        HttpKernelInterface $kernel,
+        Request $request,
+        private Response $response,
+    ) {
         parent::__construct($kernel, $request, HttpKernelInterface::MAIN_REQUEST);
-
-        $this->response = $response;
     }
 
     public function getResponse(): Response

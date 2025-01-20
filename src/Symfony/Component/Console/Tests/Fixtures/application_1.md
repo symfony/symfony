@@ -48,9 +48,19 @@ Display help for the given command. When no command is given display help for th
 * Is negatable: no
 * Default: `false`
 
-#### `--quiet|-q`
+#### `--silent`
 
 Do not output any message
+
+* Accept value: no
+* Is value required: no
+* Is multiple: no
+* Is negatable: no
+* Default: `false`
+
+#### `--quiet|-q`
+
+Only errors are displayed. All other output is suppressed
 
 * Accept value: no
 * Is value required: no
@@ -159,9 +169,19 @@ Display help for the given command. When no command is given display help for th
 * Is negatable: no
 * Default: `false`
 
-#### `--quiet|-q`
+#### `--silent`
 
 Do not output any message
+
+* Accept value: no
+* Is value required: no
+* Is multiple: no
+* Is negatable: no
+* Default: `false`
+
+#### `--quiet|-q`
+
+Only errors are displayed. All other output is suppressed
 
 * Accept value: no
 * Is value required: no
@@ -286,9 +306,19 @@ Display help for the given command. When no command is given display help for th
 * Is negatable: no
 * Default: `false`
 
-#### `--quiet|-q`
+#### `--silent`
 
 Do not output any message
+
+* Accept value: no
+* Is value required: no
+* Is multiple: no
+* Is negatable: no
+* Default: `false`
+
+#### `--quiet|-q`
+
+Only errors are displayed. All other output is suppressed
 
 * Accept value: no
 * Is value required: no

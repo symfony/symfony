@@ -15,9 +15,9 @@ class SyntaxError extends \LogicException
 {
     public function __construct(string $message, int $cursor = 0, string $expression = '', ?string $subject = null, ?array $proposals = null)
     {
-        $message = sprintf('%s around position %d', rtrim($message, '.'), $cursor);
+        $message = \sprintf('%s around position %d', rtrim($message, '.'), $cursor);
         if ($expression) {
-            $message = sprintf('%s for expression `%s`', $message, $expression);
+            $message = \sprintf('%s for expression `%s`', $message, $expression);
         }
         $message .= '.';
 
@@ -32,7 +32,7 @@ class SyntaxError extends \LogicException
             }
 
             if (isset($guess) && $minScore < 3) {
-                $message .= sprintf(' Did you mean "%s"?', $guess);
+                $message .= \sprintf(' Did you mean "%s"?', $guess);
             }
         }
 

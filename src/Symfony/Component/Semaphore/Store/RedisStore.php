@@ -31,10 +31,7 @@ class RedisStore implements PersistingStoreInterface
     ) {
     }
 
-    /**
-     * @return void
-     */
-    public function save(Key $key, float $ttlInSecond)
+    public function save(Key $key, float $ttlInSecond): void
     {
         if (0 > $ttlInSecond) {
             throw new InvalidArgumentException("The TTL should be greater than 0, '$ttlInSecond' given.");
@@ -92,15 +89,12 @@ class RedisStore implements PersistingStoreInterface
             $key->getWeight(),
         ];
 
-        if (!$this->evaluate($script, sprintf('{%s}', $key), $args)) {
+        if (!$this->evaluate($script, \sprintf('{%s}', $key), $args)) {
             throw new SemaphoreAcquiringException($key, 'the script return false');
         }
     }
 
-    /**
-     * @return void
-     */
-    public function putOffExpiration(Key $key, float $ttlInSecond)
+    public function putOffExpiration(Key $key, float $ttlInSecond): void
     {
         if (0 > $ttlInSecond) {
             throw new InvalidArgumentException("The TTL should be greater than 0, '$ttlInSecond' given.");
@@ -129,7 +123,7 @@ class RedisStore implements PersistingStoreInterface
             return added
         ';
 
-        $ret = $this->evaluate($script, sprintf('{%s}', $key), [time() + $ttlInSecond, $this->getUniqueToken($key)]);
+        $ret = $this->evaluate($script, \sprintf('{%s}', $key), [time() + $ttlInSecond, $this->getUniqueToken($key)]);
 
         // Occurs when redis has been reset
         if (false === $ret) {
@@ -142,10 +136,7 @@ class RedisStore implements PersistingStoreInterface
         }
     }
 
-    /**
-     * @return void
-     */
-    public function delete(Key $key)
+    public function delete(Key $key): void
     {
         $script = '
             local key = KEYS[1]
@@ -157,12 +148,12 @@ class RedisStore implements PersistingStoreInterface
             return redis.call("ZREM", weightKey, identifier)
         ';
 
-        $this->evaluate($script, sprintf('{%s}', $key), [$this->getUniqueToken($key)]);
+        $this->evaluate($script, \sprintf('{%s}', $key), [$this->getUniqueToken($key)]);
     }
 
     public function exists(Key $key): bool
     {
-        return (bool) $this->redis->zScore(sprintf('{%s}:weight', $key), $this->getUniqueToken($key));
+        return (bool) $this->redis->zScore(\sprintf('{%s}:weight', $key), $this->getUniqueToken($key));
     }
 
     private function evaluate(string $script, string $resource, array $args): mixed
@@ -179,7 +170,7 @@ class RedisStore implements PersistingStoreInterface
             return $this->redis->eval(...array_merge([$script, 1, $resource], $args));
         }
 
-        throw new InvalidArgumentException(sprintf('"%s()" expects being initialized with a Redis, RedisArray, RedisCluster or Predis\ClientInterface, "%s" given.', __METHOD__, get_debug_type($this->redis)));
+        throw new InvalidArgumentException(\sprintf('"%s()" expects being initialized with a Redis, RedisArray, RedisCluster or Predis\ClientInterface, "%s" given.', __METHOD__, get_debug_type($this->redis)));
     }
 
     private function getUniqueToken(Key $key): string

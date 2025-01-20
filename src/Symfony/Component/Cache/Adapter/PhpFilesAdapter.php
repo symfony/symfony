@@ -30,7 +30,6 @@ class PhpFilesAdapter extends AbstractAdapter implements PruneableInterface
     }
 
     private \Closure $includeHandler;
-    private bool $appendOnly;
     private array $values = [];
     private array $files = [];
 
@@ -38,14 +37,17 @@ class PhpFilesAdapter extends AbstractAdapter implements PruneableInterface
     private static array $valuesCache = [];
 
     /**
-     * @param $appendOnly Set to `true` to gain extra performance when the items stored in this pool never expire.
-     *                    Doing so is encouraged because it fits perfectly OPcache's memory model.
+     * @param bool $appendOnly Set to `true` to gain extra performance when the items stored in this pool never expire.
+     *                         Doing so is encouraged because it fits perfectly OPcache's memory model.
      *
      * @throws CacheException if OPcache is not enabled
      */
-    public function __construct(string $namespace = '', int $defaultLifetime = 0, ?string $directory = null, bool $appendOnly = false)
-    {
-        $this->appendOnly = $appendOnly;
+    public function __construct(
+        string $namespace = '',
+        int $defaultLifetime = 0,
+        ?string $directory = null,
+        private bool $appendOnly = false,
+    ) {
         self::$startTime ??= $_SERVER['REQUEST_TIME'] ?? time();
         parent::__construct('', $defaultLifetime);
         $this->init($namespace, $directory);
@@ -54,10 +56,7 @@ class PhpFilesAdapter extends AbstractAdapter implements PruneableInterface
         };
     }
 
-    /**
-     * @return bool
-     */
-    public static function isSupported()
+    public static function isSupported(): bool
     {
         self::$startTime ??= $_SERVER['REQUEST_TIME'] ?? time();
 
@@ -104,65 +103,65 @@ class PhpFilesAdapter extends AbstractAdapter implements PruneableInterface
         }
         $values = [];
 
-        begin:
-        $getExpiry = false;
+        while (true) {
+            $getExpiry = false;
 
-        foreach ($ids as $id) {
-            if (null === $value = $this->values[$id] ?? null) {
-                $missingIds[] = $id;
-            } elseif ('N;' === $value) {
-                $values[$id] = null;
-            } elseif (!\is_object($value)) {
-                $values[$id] = $value;
-            } elseif (!$value instanceof LazyValue) {
-                $values[$id] = $value();
-            } elseif (false === $values[$id] = include $value->file) {
-                unset($values[$id], $this->values[$id]);
-                $missingIds[] = $id;
-            }
-            if (!$this->appendOnly) {
-                unset($this->values[$id]);
-            }
-        }
-
-        if (!$missingIds) {
-            return $values;
-        }
-
-        set_error_handler($this->includeHandler);
-        try {
-            $getExpiry = true;
-
-            foreach ($missingIds as $k => $id) {
-                try {
-                    $file = $this->files[$id] ??= $this->getFile($id);
-
-                    if (isset(self::$valuesCache[$file])) {
-                        [$expiresAt, $this->values[$id]] = self::$valuesCache[$file];
-                    } elseif (\is_array($expiresAt = include $file)) {
-                        if ($this->appendOnly) {
-                            self::$valuesCache[$file] = $expiresAt;
-                        }
-
-                        [$expiresAt, $this->values[$id]] = $expiresAt;
-                    } elseif ($now < $expiresAt) {
-                        $this->values[$id] = new LazyValue($file);
-                    }
-
-                    if ($now >= $expiresAt) {
-                        unset($this->values[$id], $missingIds[$k], self::$valuesCache[$file]);
-                    }
-                } catch (\ErrorException $e) {
-                    unset($missingIds[$k]);
+            foreach ($ids as $id) {
+                if (null === $value = $this->values[$id] ?? null) {
+                    $missingIds[] = $id;
+                } elseif ('N;' === $value) {
+                    $values[$id] = null;
+                } elseif (!\is_object($value)) {
+                    $values[$id] = $value;
+                } elseif (!$value instanceof LazyValue) {
+                    $values[$id] = $value();
+                } elseif (false === $values[$id] = include $value->file) {
+                    unset($values[$id], $this->values[$id]);
+                    $missingIds[] = $id;
+                }
+                if (!$this->appendOnly) {
+                    unset($this->values[$id]);
                 }
             }
-        } finally {
-            restore_error_handler();
-        }
 
-        $ids = $missingIds;
-        $missingIds = [];
-        goto begin;
+            if (!$missingIds) {
+                return $values;
+            }
+
+            set_error_handler($this->includeHandler);
+            try {
+                $getExpiry = true;
+
+                foreach ($missingIds as $k => $id) {
+                    try {
+                        $file = $this->files[$id] ??= $this->getFile($id);
+
+                        if (isset(self::$valuesCache[$file])) {
+                            [$expiresAt, $this->values[$id]] = self::$valuesCache[$file];
+                        } elseif (\is_array($expiresAt = include $file)) {
+                            if ($this->appendOnly) {
+                                self::$valuesCache[$file] = $expiresAt;
+                            }
+
+                            [$expiresAt, $this->values[$id]] = $expiresAt;
+                        } elseif ($now < $expiresAt) {
+                            $this->values[$id] = new LazyValue($file);
+                        }
+
+                        if ($now >= $expiresAt) {
+                            unset($this->values[$id], $missingIds[$k], self::$valuesCache[$file]);
+                        }
+                    } catch (\ErrorException $e) {
+                        unset($missingIds[$k]);
+                    }
+                }
+            } finally {
+                restore_error_handler();
+            }
+
+            $ids = $missingIds;
+            $missingIds = [];
+        }
     }
 
     protected function doHave(string $id): bool
@@ -217,7 +216,7 @@ class PhpFilesAdapter extends AbstractAdapter implements PruneableInterface
                 try {
                     $value = VarExporter::export($value, $isStaticValue);
                 } catch (\Exception $e) {
-                    throw new InvalidArgumentException(sprintf('Cache key "%s" has non-serializable "%s" value.', $key, get_debug_type($value)), 0, $e);
+                    throw new InvalidArgumentException(\sprintf('Cache key "%s" has non-serializable "%s" value.', $key, get_debug_type($value)), 0, $e);
                 }
             } elseif (\is_string($value)) {
                 // Wrap "N;" in a closure to not confuse it with an encoded `null`
@@ -226,7 +225,7 @@ class PhpFilesAdapter extends AbstractAdapter implements PruneableInterface
                 }
                 $value = var_export($value, true);
             } elseif (!\is_scalar($value)) {
-                throw new InvalidArgumentException(sprintf('Cache key "%s" has non-serializable "%s" value.', $key, get_debug_type($value)));
+                throw new InvalidArgumentException(\sprintf('Cache key "%s" has non-serializable "%s" value.', $key, get_debug_type($value)));
             } else {
                 $value = var_export($value, true);
             }
@@ -255,7 +254,7 @@ class PhpFilesAdapter extends AbstractAdapter implements PruneableInterface
         }
 
         if (!$ok && !is_writable($this->directory)) {
-            throw new CacheException(sprintf('Cache directory is not writable (%s).', $this->directory));
+            throw new CacheException(\sprintf('Cache directory is not writable (%s).', $this->directory));
         }
 
         return $ok;
@@ -277,10 +276,7 @@ class PhpFilesAdapter extends AbstractAdapter implements PruneableInterface
         return $this->doCommonDelete($ids);
     }
 
-    /**
-     * @return bool
-     */
-    protected function doUnlink(string $file)
+    protected function doUnlink(string $file): bool
     {
         unset(self::$valuesCache[$file]);
 
@@ -309,10 +305,8 @@ class PhpFilesAdapter extends AbstractAdapter implements PruneableInterface
  */
 class LazyValue
 {
-    public string $file;
-
-    public function __construct(string $file)
-    {
-        $this->file = $file;
+    public function __construct(
+        public string $file,
+    ) {
     }
 }

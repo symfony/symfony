@@ -84,7 +84,7 @@ class MongoDbStoreTest extends AbstractStoreTestCase
      */
     public function testConstructionMethods($mongo, array $options)
     {
-        $key = new Key(uniqid(__METHOD__, true));
+        $key = new Key(__METHOD__);
 
         $store = new MongoDbStore($mongo, $options);
 

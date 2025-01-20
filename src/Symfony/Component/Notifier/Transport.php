@@ -31,6 +31,7 @@ final class Transport
         Bridge\AllMySms\AllMySmsTransportFactory::class,
         Bridge\AmazonSns\AmazonSnsTransportFactory::class,
         Bridge\Bandwidth\BandwidthTransportFactory::class,
+        Bridge\Bluesky\BlueskyTransportFactory::class,
         Bridge\Brevo\BrevoTransportFactory::class,
         Bridge\Chatwork\ChatworkTransportFactory::class,
         Bridge\Clickatell\ClickatellTransportFactory::class,
@@ -46,16 +47,17 @@ final class Transport
         Bridge\FortySixElks\FortySixElksTransportFactory::class,
         Bridge\FreeMobile\FreeMobileTransportFactory::class,
         Bridge\GatewayApi\GatewayApiTransportFactory::class,
-        Bridge\Gitter\GitterTransportFactory::class,
         Bridge\GoIp\GoIpTransportFactory::class,
         Bridge\GoogleChat\GoogleChatTransportFactory::class,
         Bridge\Infobip\InfobipTransportFactory::class,
         Bridge\Iqsms\IqsmsTransportFactory::class,
         Bridge\Isendpro\IsendproTransportFactory::class,
+        Bridge\JoliNotif\JoliNotifTransportFactory::class,
         Bridge\KazInfoTeh\KazInfoTehTransportFactory::class,
         Bridge\LightSms\LightSmsTransportFactory::class,
         Bridge\LineNotify\LineNotifyTransportFactory::class,
         Bridge\LinkedIn\LinkedInTransportFactory::class,
+        Bridge\Lox24\Lox24TransportFactory::class,
         Bridge\Mailjet\MailjetTransportFactory::class,
         Bridge\Mastodon\MastodonTransportFactory::class,
         Bridge\Mattermost\MattermostTransportFactory::class,
@@ -72,35 +74,41 @@ final class Transport
         Bridge\OvhCloud\OvhCloudTransportFactory::class,
         Bridge\PagerDuty\PagerDutyTransportFactory::class,
         Bridge\Plivo\PlivoTransportFactory::class,
+        Bridge\Primotexto\PrimotextoTransportFactory::class,
         Bridge\Pushover\PushoverTransportFactory::class,
+        Bridge\Pushy\PushyTransportFactory::class,
         Bridge\Redlink\RedlinkTransportFactory::class,
         Bridge\RingCentral\RingCentralTransportFactory::class,
         Bridge\RocketChat\RocketChatTransportFactory::class,
         Bridge\Sendberry\SendberryTransportFactory::class,
-        Bridge\Sendinblue\SendinblueTransportFactory::class,
+        Bridge\Sevenio\SevenIoTransportFactory::class,
+        Bridge\Sipgate\SipgateTransportFactory::class,
         Bridge\SimpleTextin\SimpleTextinTransportFactory::class,
         Bridge\Sinch\SinchTransportFactory::class,
         Bridge\Slack\SlackTransportFactory::class,
         Bridge\Sms77\Sms77TransportFactory::class,
         Bridge\Smsapi\SmsapiTransportFactory::class,
         Bridge\SmsBiuras\SmsBiurasTransportFactory::class,
+        Bridge\Smsbox\SmsboxTransportFactory::class,
         Bridge\Smsc\SmscTransportFactory::class,
+        Bridge\Smsense\SmsenseTransportFactory::class,
         Bridge\SmsFactor\SmsFactorTransportFactory::class,
         Bridge\Smsmode\SmsmodeTransportFactory::class,
+        Bridge\SmsSluzba\SmsSluzbaTransportFactory::class,
         Bridge\SpotHit\SpotHitTransportFactory::class,
+        Bridge\Sweego\SweegoTransportFactory::class,
         Bridge\Telegram\TelegramTransportFactory::class,
         Bridge\Telnyx\TelnyxTransportFactory::class,
         Bridge\Termii\TermiiTransportFactory::class,
         Bridge\TurboSms\TurboSmsTransportFactory::class,
         Bridge\Twilio\TwilioTransportFactory::class,
         Bridge\Twitter\TwitterTransportFactory::class,
+        Bridge\Unifonic\UnifonicTransportFactory::class,
         Bridge\Vonage\VonageTransportFactory::class,
         Bridge\Yunpian\YunpianTransportFactory::class,
         Bridge\Zendesk\ZendeskTransportFactory::class,
         Bridge\Zulip\ZulipTransportFactory::class,
     ];
-
-    private iterable $factories;
 
     public static function fromDsn(#[\SensitiveParameter] string $dsn, ?EventDispatcherInterface $dispatcher = null, ?HttpClientInterface $client = null): TransportInterface
     {
@@ -119,9 +127,9 @@ final class Transport
     /**
      * @param iterable<mixed, TransportFactoryInterface> $factories
      */
-    public function __construct(iterable $factories)
-    {
-        $this->factories = $factories;
+    public function __construct(
+        private iterable $factories,
+    ) {
     }
 
     public function fromStrings(#[\SensitiveParameter] array $dsns): Transports

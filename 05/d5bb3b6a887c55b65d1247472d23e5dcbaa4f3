@@ -1,0 +1,35 @@
+---------------------------------------------------------------------------
+
+by GromNaN at 2025-01-20T16:17:30Z
+
+Is it something we should merge into 6.4 to be able to run newer versions on PHPUnit required for newer versions on PHP? We merged https://github.com/symfony/symfony/pull/48668 on the oldest maintained branch at its time.
+
+---------------------------------------------------------------------------
+
+by stof at 2025-01-20T16:20:15Z
+
+@GromNaN there is no newer version of PHPUnit being required. PHPUnit 9.6 is on life support, so it gets patched for compatibility with newer versions (it won't receive support for mocking classes that use new language features unsupported in PHP versions from the time it was active, but code in the 6.4 branch won't be allowed to use such features anyway)
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2025-01-21T07:58:26Z
+
+> Is it something we should merge into 6.4
+
+The related test was introduced in the beginning of this month anyway 🙂
+
+---------------------------------------------------------------------------
+
+by derrabus at 2025-01-21T08:42:18Z
+
+> Is it something we should merge into 6.4
+
+If that data provider exists on a lower branch, we can do that in order to keep things consistent.
+
+> to be able to run newer versions on PHPUnit
+
+We won't do that. We work towards compatibility with PHPUnit 11, but on the highest branch only.
+
+> required for newer versions on PHP?
+
+PHPUnit 9 will receive compatibility patches for newer PHP versions. We don't have to use a newer PHPUnit version just for PHP compatibility.

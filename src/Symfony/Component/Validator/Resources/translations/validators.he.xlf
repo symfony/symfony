@@ -16,7 +16,7 @@
             </trans-unit>
             <trans-unit id="4">
                 <source>This value should be blank.</source>
-                <target>הערך צריך להיות ריק.</target>
+                <target>הערך צריך להיות ריק</target>
             </trans-unit>
             <trans-unit id="5">
                 <source>The value you selected is not a valid choice.</source>

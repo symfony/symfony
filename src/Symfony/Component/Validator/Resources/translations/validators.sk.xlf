@@ -336,7 +336,7 @@
             </trans-unit>
             <trans-unit id="87">
                 <source>This collection should contain only unique elements.</source>
-                <target>Táto kolekcia by mala obsahovať len unikátne prkvy.</target>
+                <target>Táto kolekcia by mala obsahovať len unikátne prvky.</target>
             </trans-unit>
             <trans-unit id="88">
                 <source>This value should be positive.</source>

@@ -4,7 +4,7 @@
         <body>
             <trans-unit id="1">
                 <source>This value should be false.</source>
-                <target>הערך צריך להיות שקר.</target>
+                <target>הערך צריך להיות שגוי.</target>
             </trans-unit>
             <trans-unit id="2">
                 <source>This value should be true.</source>
@@ -68,7 +68,7 @@
             </trans-unit>
             <trans-unit id="17">
                 <source>The mime type of the file is invalid ({{ type }}). Allowed mime types are {{ types }}.</source>
-                <target>סוג MIME של הקובץ אינו חוקי ({{ type }}). מותרים סוגי MIME {{ types }}.</target>
+                <target>סוג הקובץ אינו חוקי ({{ type }}). הסוגים המותרים הם {{ types }}.</target>
             </trans-unit>
             <trans-unit id="18">
                 <source>This value should be {{ limit }} or less.</source>
@@ -136,7 +136,7 @@
             </trans-unit>
             <trans-unit id="37" resname="This is not a valid IP address.">
                 <source>This value is not a valid IP address.</source>
-                <target>ערך זה אינו כתובת IP תקינה.</target>
+                <target>ערך זה אינו כתובת איי-פי תקינה.</target>
             </trans-unit>
             <trans-unit id="38">
                 <source>This value is not a valid language.</source>
@@ -224,23 +224,23 @@
             </trans-unit>
             <trans-unit id="59" resname="This is not a valid International Bank Account Number (IBAN).">
                 <source>This value is not a valid International Bank Account Number (IBAN).</source>
-                <target>ערך זה אינו מספר חשבון בנק בינלאומי (IBAN) חוקי.</target>
+                <target>ערך זה אינו מספר חשבון בנק בינלאומי חוקי.</target>
             </trans-unit>
             <trans-unit id="60">
                 <source>This value is not a valid ISBN-10.</source>
-                <target>הערך אינו ערך ISBN-10 חוקי.</target>
+                <target>הערך אינו חוקי.</target>
             </trans-unit>
             <trans-unit id="61">
                 <source>This value is not a valid ISBN-13.</source>
-                <target>הערך אינו ערך ISBN-13 חוקי.</target>
+                <target>הערך אינו חוקי.</target>
             </trans-unit>
             <trans-unit id="62">
                 <source>This value is neither a valid ISBN-10 nor a valid ISBN-13.</source>
-                <target>הערך אינו ערך ISBN-10 חוקי או ערך ISBN-13 חוקי.</target>
+                <target>הערך אינו חוקי.</target>
             </trans-unit>
             <trans-unit id="63">
                 <source>This value is not a valid ISSN.</source>
-                <target>הערך אינו ערך ISSN חוקי.</target>
+                <target>הערך אינו חוקי.</target>
             </trans-unit>
             <trans-unit id="64">
                 <source>This value is not a valid currency.</source>
@@ -311,8 +311,8 @@
                 <target>הערך אינו תואם למערך התווים {{ charset }} הצפוי.</target>
             </trans-unit>
             <trans-unit id="81" resname="This is not a valid Business Identifier Code (BIC).">
-                <source>This value is not a valid Business Identifier Code (BIC).</source>
-                <target>ערך זה אינו קוד מזהה עסקי (BIC) חוקי.</target>
+                <source>This value is not a valid Business Identifier Code</source>
+                <target>ערך זה אינו קוד מזהה עסקי חוקי.</target>
             </trans-unit>
             <trans-unit id="82">
                 <source>Error</source>
@@ -320,7 +320,7 @@
             </trans-unit>
             <trans-unit id="83" resname="This is not a valid UUID.">
                 <source>This value is not a valid UUID.</source>
-                <target>ערך זה אינו מזהה ייחודי אוניברסלי (UUID) חוקי.</target>
+                <target>ערך זה אינו מזהה ייחודי אוניברסלי חוקי.</target>
             </trans-unit>
             <trans-unit id="84">
                 <source>This value should be a multiple of {{ compared_value }}.</source>
@@ -328,11 +328,11 @@
             </trans-unit>
             <trans-unit id="85">
                 <source>This Business Identifier Code (BIC) is not associated with IBAN {{ iban }}.</source>
-                <target>הקוד זיהוי עסקי (BIC) אינו משוייך ל IBAN {{ iban }}.</target>
+                <target>הקוד זיהוי עסקי אינו משוייך ל{{ iban }}.</target>
             </trans-unit>
             <trans-unit id="86">
                 <source>This value should be valid JSON.</source>
-                <target>הערך אינו ערך JSON תקין.</target>
+                <target>הערך אינו תקין.</target>
             </trans-unit>
             <trans-unit id="87">
                 <source>This collection should contain only unique elements.</source>
@@ -436,7 +436,7 @@
             </trans-unit>
             <trans-unit id="112">
                 <source>This value is not a valid MAC address.</source>
-                <target>ערך זה אינו כתובת MAC חוקית.</target>
+                <target>ערך זה אינו כתובת מאק חוקית.</target>
             </trans-unit>
             <trans-unit id="113">
                 <source>This URL is missing a top-level domain.</source>
@@ -468,7 +468,7 @@
             </trans-unit>
             <trans-unit id="120">
                 <source>This value is not a valid slug.</source>
-                <target>ערך זה אינו מזהה ייחודי תקין (Slug).</target>
+                <target>ערך זה אינו מזהה ייחודי תקין.</target>
             </trans-unit>
         </body>
     </file>

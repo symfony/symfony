@@ -1,0 +1,37 @@
+---------------------------------------------------------------------------
+
+by mRoca at 2025-01-13T09:55:43Z
+
+@nicolas-grekas indeed, I only saw scalar data in `ResponseInterface`'s `getInfo` result. If a callable can be returned too, that can lead to unwanted behavior.
+
+WDYT would be the best ? Totally removing the `setHttpResponseInfo` shortcut, or keeping it and only extract raw scalar data (status code / headers / body as array) ?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-01-13T09:56:22Z
+
+> I'd expect the transport to know which items are useful, and where they come from. No generic solution but adhoc ones: one for ovh, another for allmysms, etc.
+
+---------------------------------------------------------------------------
+
+by mRoca at 2025-01-13T10:04:28Z
+
+@nicolas-grekas method `setHttpResponseInfo` removed 👍🏻
+
+_for easier PR history, the method was:_
+```php
+    /**
+     * As many of the Transports are using HTTP requests,
+     * this shortcut attaches an HTTP response to the message in a standardised way.
+     */
+    public function setHttpResponseInfo(ResponseInterface $response): void
+    {
+        $this->setInfo('http_response', $response->getInfo() + ['body' => $response->toArray(false)]);
+    }
+```
+
+---------------------------------------------------------------------------
+
+by mRoca at 2025-01-13T12:21:23Z
+
+I've added implementation for both OvhCloud & allmysms (@Vincentig's [issue](https://github.com/symfony/symfony/issues/49793)) transports

@@ -1,0 +1,266 @@
+---------------------------------------------------------------------------
+
+by smnandre at 2024-11-09T23:32:27Z
+
+Genuine curiosity questions here:
+
+* How would this work with aliases on the controller class attribute and others on the method attribute ?
+* Same question if aliases are defined on the groupe (in yaml for instance) and then on the controller ?
+
+Are they all combined ?
+
+---------------------------------------------------------------------------
+
+by damienfern at 2024-11-12T14:06:58Z
+
+> Genuine curiosity questions here:
+>
+>     * How would this work with aliases on the controller class attribute and others on the method attribute ?
+>
+>     * Same question if aliases are defined on the groupe (in yaml for instance) and then on the controller ?
+>
+>
+> Are they all combined ?
+
+For now, setting aliases on non invokable controller class does nothing with it. The reason is that aliases from the attribute are added when creating the route (handled by the `AttributeClassLoader::addRoute`) and it needs either the __invoke method or the method where the attribute is used.
+
+IMO, aliases should not be used on class (unless it is invokable). Setting an alias adds another name to a route and if we use alias on a class, it means that all routes declared in this class will have the same alias. But how the router will know which route should be called when we use features like `$this->redirectToRoute('my_alias')` ? It might be good to trigger an error if devs tries to set aliases on a class instead of on a method. What do you think ?
+
+---------------------------------------------------------------------------
+
+by smnandre at 2024-11-12T14:31:59Z
+
+> IMO, aliases should not be used on class (unless it is invokable). Setting an alias adds another name to a route and if we use alias on a class, it means that all routes declared in this class will have the same alias.
+
+So no "combined aliases" (invoyable alias + name of the action route), ok!
+
+> But how the router will know which route should be called when we use features like `$this->redirectToRoute('my_alias')` ? It might be good to trigger an error if devs tries to set aliases on a class instead of on a method. What do you think ?
+
+I guess it would be a better DX than not indeed :)
+
+---------------------------------------------------------------------------
+
+by damienfern at 2024-11-13T09:39:54Z
+
+> > IMO, aliases should not be used on class (unless it is invokable). Setting an alias adds another name to a route and if we use alias on a class, it means that all routes declared in this class will have the same alias.
+>
+> So no "combined aliases" (invoyable alias + name of the action route), ok!
+>
+> > But how the router will know which route should be called when we use features like `$this->redirectToRoute('my_alias')` ? It might be good to trigger an error if devs tries to set aliases on a class instead of on a method. What do you think ?
+>
+> I guess it would be a better DX than not indeed :)
+
+Done :)
+
+---------------------------------------------------------------------------
+
+by damienfern at 2024-11-19T16:30:44Z
+
+Status : Needs Review
+
+---------------------------------------------------------------------------
+
+by damienfern at 2024-11-21T09:55:30Z
+
+Thx for your review 🙏
+
+> Until now, you couldn't add an alias to a route configuration. Aliases are defined independently of the route. This is an inversion of the current configuration logic.
+>
+> Adding `aliases` parameter to the `#[Route]` attribute is equivalent to adding it to the Yaml configuration:
+>
+> ```diff
+> - blog_index:
+> -    alias: blog_list
+>
+>   blog_list:
+>       path: /blog
+>       # the controller value has the format 'controller_class::method_name'
+>       controller: App\Controller\BlogController::list
+> +     aliases: [blog_index]
+> ```
+
+IMO, there are 2 options :
+- Switch the way we configure aliases in YAML config as you mentioned
+- Keep aliases as they are in YAML and create a new PHP Attribute called `#RouteAlias` using the same logic as in YAML (with deprecations as well).
+
+> Features like [deprecating a route alias](https://symfony.com/doc/current/routing.html#deprecating-route-aliases) are not supported with this configuration way.
+
+Indeed, deprecations are not supported ATM.
+
+What are your thoughts about all this ?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2024-11-27T07:37:59Z
+
+I would add support for a new `#[RouteAlias]` attribute that would not be supported on a class.
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2024-11-27T08:37:33Z
+
+> I would add support for a new `#[RouteAlias]` attribute that would not be supported on a class.
+
+It would have to be attached to a controller method?
+
+```php
+#[Route('/path', name: 'action_with_alias')]
+#[RouteAlias(route: 'action_with_alias', alias: 'alias')]
+#[RouteAlias(route: 'action_with_alias', alias: 'completely_different_name')]
+public function action()
+{
+}
+```
+
+The route name is required as a method can have multiple routes. So technically the alias could be anywhere as it is not related to the class/method it is attached.
+
+---------------------------------------------------------------------------
+
+by damienfern at 2024-11-29T14:21:49Z
+
+> ```
+> #[Route('/path', name: 'action_with_alias')]
+> #[RouteAlias(route: 'action_with_alias', alias: 'alias')]
+> #[RouteAlias(route: 'action_with_alias', alias: 'completely_different_name')]
+> ```
+
+We could enforce the use of RouteAlias with a Route on the same target (I don't know if it's possible), as doing the opposite could (IMO) lead to long time debugging and weaken DX.
+
+I will put some effort on this PR once we have established what we do about it.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-01-07T13:59:56Z
+
+I'm not sure about RouteAlias: it would make an attribute that's totally unrelated to the controller/method it's attached to, and thus could configure a totally random alias for an unrelated route.
+
+The current proposal makes sense to me, I'm just wondering if we need another argument, when we could reuse the name property, passing it an array?
+
+> Until now, you couldn't add an alias to a route configuration
+
+maybe it's a good idea to do this?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-01-07T14:02:41Z
+
+Mmm, I've been confused by the example, which is what would allow unrelated aliases.
+Instead, RouteAlias should accept only one single argument - the name of the alias, and the Route attribute would be required and the only possible target of aliases.
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2025-01-07T14:12:27Z
+
+> RouteAlias should accept only one single argument - the name of the alias, and the Route attribute would be required and the only possible target of aliases.
+
+This doesn't work if the method has more than 1 route as we can't tell which route to alias.
+
+I think the initial proposition of adding an `alias` parameter to the `Route` attribute is better. And add this feature to the Yaml, XML and PHP configurations.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-01-07T14:13:58Z
+
+> I think the initial proposition of adding an alias parameter to the Route attribute is better. And add this feature to the Yaml, XML and PHP configurations.
+
+I agree now that we have discussed the alternative.
+
+---------------------------------------------------------------------------
+
+by stof at 2025-01-13T16:47:08Z
+
+This proposal does not allow configuring the alias as deprecated (once it is a common use case for aliases)
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2025-01-13T17:01:43Z
+
+> This proposal does not allow configuring the alias as deprecated (once it is a common use case for aliases)
+
+The attribute could accept an instance of `Symfony\Component\Routing\Alias`, or maybe a subclass `DeprecatedAlias` with the deprecation properties set in the constructor.
+
+---------------------------------------------------------------------------
+
+by damienfern at 2025-01-14T13:11:21Z
+
+> > This proposal does not allow configuring the alias as deprecated (once it is a common use case for aliases)
+>
+> The attribute could accept an instance of `Symfony\Component\Routing\Alias`, or maybe a subclass `DeprecatedAlias` with the deprecation properties set in the constructor.
+
+Is `Symfony\Component\Routing\Alias`really needed ? According to the [doc](https://symfony.com/doc/current/routing.html#deprecating-route-aliases), aliases can be set by string or deprecated record. So this is what I suggest :
+
+```php
+class DeprecatedAlias {
+    private string $deprecationMessage;
+
+    public function __construct(
+        private string $aliasName,
+        private string $package,
+        private string $version,
+        string $message = 'Since %package% %version%: The "%aliasName%" route alias is deprecated. You should stop using it, as it will be removed in the future',
+    ){
+    }
+}
+```
+
+And in Route Attribute :
+
+```php
+/**
+* @param string|string[]|DeprecatedAlias|DeprecatedAlias[]    $alias        The list of aliases for this route
+*/
+```
+
+What do you think ?
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2025-01-14T13:27:57Z
+
+I realize my solution suggestion was incorrect as the [`Alias` class](https://github.com/symfony/symfony/blob/7.3/src/Symfony/Component/Routing/Alias.php) hold the name of the route to alias, not the name of the alias itself.
+
+<details>
+
+<summary>Incorrect solution</summary>
+
+The [class `Alias` already exists](https://github.com/symfony/symfony/blob/7.3/src/Symfony/Component/Routing/Alias.php) and is used by the `RouteCollection`.
+
+```php
+namespace Symfony\Component\Routing;
+
+use Symfony\Component\Routing\Alias;
+
+class DeprecatedAlias extends Alias
+{
+    public function __construct(string $id, string $package, string $version, string $message)
+    {
+        parent::__construct($id);
+
+        $this->setDeprecated($package, $version, $message);
+    }
+}
+```
+
+And to use:
+
+```php
+#[Route('/path', name: 'route_name', alias: new DeprecatedAlias('legacy_alias', 'acme/package', '10.9', 'Deprecation message'))]
+public function action()
+{
+}
+```
+</details>
+
+I agree agree with the class you suggest, in the `Symfony\Component\Routing\Attribute` namespace (even if it's not an attribute class).
+
+---------------------------------------------------------------------------
+
+by stof at 2025-01-14T13:41:42Z
+
+The class used in the attribute should not extend the Alias class IMO (just like our Route attribute does not reuse the Route class used in the RouteCollection, allowing us to adapt the attribute API separately from the low-level API of the component)
+
+---------------------------------------------------------------------------
+
+by damienfern at 2025-01-20T14:46:57Z
+
+Status: Needs Review

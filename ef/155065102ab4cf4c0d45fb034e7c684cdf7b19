@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by greg0ire at 2025-01-21T21:44:48Z
+
+Let me know if this is the wrong branch, I'm never quite sure for this kind of case with Symfony, but in the past, I think I've been asked to contribute this kind of branch as a patch.
+
+---------------------------------------------------------------------------
+
+by greg0ire at 2025-01-22T19:50:01Z
+
+@stof I've addressed your review.
+
+Also, I forgot to mention it, but `doctrine/persistence` 4 is now indeed installed in at least [this job](https://github.com/symfony/symfony/actions/runs/12914277977/job/36013506034?pr=59575#step:5:60)

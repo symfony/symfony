@@ -1,0 +1,44 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2024-11-27T07:46:56Z
+
+Hey!
+
+Thanks for your PR. You are targeting branch "7.3" but it seems your PR description refers to branch "7.3 for features".
+Could you update the PR description or change target branch? This helps core maintainers a lot.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by smnandre at 2024-11-27T07:48:45Z
+
+Dear Carson....  you're doing a bad ChatGpt impression right now 😅
+
+---------------------------------------------------------------------------
+
+by smnandre at 2025-01-19T17:22:56Z
+
+> Thank you for working on this. This looks good to me overall, but my review was very very quick and I didn't compared with mainstream JS parsers so I may have missed things.
+
+No worry.. and thank you for taking the time :)
+
+My main question is currently: how internal can/should we make this ?  Maintaining for AssetMapper is already something, but probably not something we want to publish with BC promise, documentation, etc?
+
+(will address your feedback later tonight!)
+
+---------------------------------------------------------------------------
+
+by dunglas at 2025-01-19T18:02:20Z
+
+I would make it entirely internal
+
+---------------------------------------------------------------------------
+
+by smnandre at 2025-01-19T20:25:56Z
+
+@dunglas @OskarStark if we use it only in this specific use case, we don't need the value object, because we don't need to keep the previously matched sequences.
+
+That's why i simplified the code here to focus only on the current sequence.

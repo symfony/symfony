@@ -1,0 +1,52 @@
+---------------------------------------------------------------------------
+
+by dbannik at 2025-01-21T14:15:56Z
+
+Please check the **testCase**
+
+File `images/foo.png` should not be contain in `expectedDependencies`
+because  `url("images/foo.png");` contain in comment block
+```php
+yield 'ignore_comment_block' => [
+    'input' => <<<CSS
+        body {
+            /* background: url("images/foo.png"); */
+        }
+        CSS
+    ,
+    'expectedOutput' => <<<CSS
+        body {
+            /* background: url("images/foo.png"); */
+        }
+        CSS
+    ,
+    'expectedDependencies' => [],
+];
+```
+related https://github.com/symfony/symfony/issues/59512#issuecomment-2602147771
+
+---------------------------------------------------------------------------
+
+by smnandre at 2025-01-21T16:30:42Z
+
+```php
+yield 'ignore_comment_block_ffs' => [
+    'input' => <<<CSS
+        body {
+            /* background: url("images/need-ignore.png"); */
+        }
+        CSS
+    ,
+    'expectedOutput' => <<<CSS
+        body {
+            /* background: url("images/need-ignore.png"); */
+        }
+        CSS
+    ,
+    'expectedDependencies' => [],
+];
+```
+
+This test is **passing**.
+
+You cannot use `images/foo.png` and expect it to not be mapped (see `testCompile` build).

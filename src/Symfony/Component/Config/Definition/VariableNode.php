@@ -55,6 +55,14 @@ class VariableNode extends BaseNode implements PrototypeNodeInterface
         $this->allowEmptyValue = $boolean;
     }
 
+    /**
+     * @internal
+     */
+    public function getAllowEmptyValue(): bool
+    {
+        return $this->allowEmptyValue;
+    }
+
     public function setName(string $name): void
     {
         $this->name = $name;

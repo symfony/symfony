@@ -14,6 +14,7 @@ namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 use Psr\Clock\ClockInterface as PsrClockInterface;
 use Psr\EventDispatcher\EventDispatcherInterface as PsrEventDispatcherInterface;
 use Symfony\Bundle\FrameworkBundle\CacheWarmer\ConfigBuilderCacheWarmer;
+use Symfony\Bundle\FrameworkBundle\CacheWarmer\ConfigSchemaCacheWarmer;
 use Symfony\Bundle\FrameworkBundle\HttpCache\HttpCache;
 use Symfony\Component\Clock\Clock;
 use Symfony\Component\Clock\ClockInterface;
@@ -235,6 +236,10 @@ return static function (ContainerConfigurator $container) {
                 service('container.getenv'),
             ])
         ->set('config_builder.warmer', ConfigBuilderCacheWarmer::class)
+            ->args([service(KernelInterface::class), service('logger')->nullOnInvalid()])
+            ->tag('kernel.cache_warmer')
+
+        ->set('config_schema.warmer', ConfigSchemaCacheWarmer::class)
             ->args([service(KernelInterface::class), service('logger')->nullOnInvalid()])
             ->tag('kernel.cache_warmer')
 

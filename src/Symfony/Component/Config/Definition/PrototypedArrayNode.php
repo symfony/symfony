@@ -46,6 +46,14 @@ class PrototypedArrayNode extends ArrayNode
     }
 
     /**
+     * @internal
+     */
+    public function getMinNumberOfElements(): int
+    {
+        return $this->minNumberOfElements;
+    }
+
+    /**
      * Sets the attribute which value is to be used as key.
      *
      * This is useful when you have an indexed array that should be an

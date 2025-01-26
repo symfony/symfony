@@ -1,0 +1,604 @@
+{
+    "$schema": "http://json-schema.org/draft-06/schema#",
+    "$ref": "#/definitions/",
+    "definitions": {
+        "7e9272c1a47137c4": {
+            "anyOf": [
+                {
+                    "type": "boolean"
+                },
+                {
+                    "$ref": "#/definitions/param"
+                }
+            ],
+            "default": true
+        },
+        "10b40a06ad0d1ec2": {
+            "type": [
+                "boolean",
+                "number",
+                "string"
+            ]
+        },
+        "ac3318c4415dfb1e": {
+            "type": [
+                "boolean",
+                "number",
+                "string",
+                "null"
+            ],
+            "default": null
+        },
+        "cdeee702d36f9e3c": {
+            "type": [
+                "boolean",
+                "number",
+                "string"
+            ],
+            "default": true
+        },
+        "12fbc9023cab7dd5": {
+            "type": [
+                "boolean",
+                "number",
+                "string"
+            ],
+            "default": false
+        },
+        "2a4e9ebdea3312c9": {
+            "type": [
+                "boolean",
+                "number",
+                "string"
+            ],
+            "default": "default"
+        },
+        "f62d46268f02deb9": {
+            "anyOf": [
+                {
+                    "const": []
+                },
+                {
+                    "type": [
+                        "boolean",
+                        "number",
+                        "string"
+                    ]
+                }
+            ],
+            "default": []
+        },
+        "7cbe815900004450": {
+            "anyOf": [
+                {
+                    "const": [
+                        "elem1",
+                        "elem2"
+                    ]
+                },
+                {
+                    "type": [
+                        "boolean",
+                        "number",
+                        "string"
+                    ]
+                }
+            ],
+            "default": [
+                "elem1",
+                "elem2"
+            ]
+        },
+        "3e43ead3d5f69efe": {
+            "type": [
+                "boolean",
+                "number",
+                "string"
+            ],
+            "deprecated": true,
+            "deprecationMessage": "Since vendor/package 1.1: The child node \"scalar_deprecated\" at path \"acme_root.scalar_deprecated\" is deprecated."
+        },
+        "186834a53bfd6ad3": {
+            "type": [
+                "boolean",
+                "number",
+                "string"
+            ],
+            "deprecated": true,
+            "deprecationMessage": "Since vendor/package 1.1: Deprecation custom message for \"scalar_deprecated_with_message\" at \"acme_root.scalar_deprecated_with_message\""
+        },
+        "d5d8f6dd360b816e": {
+            "anyOf": [
+                {
+                    "enum": [
+                        "this",
+                        "that"
+                    ]
+                },
+                {
+                    "$ref": "#/definitions/param"
+                }
+            ],
+            "default": "this"
+        },
+        "134ebd09c31f5a84": {
+            "anyOf": [
+                {
+                    "enum": [
+                        "this",
+                        "that",
+                        "!php/enum Symfony\\Component\\Config\\Tests\\Fixtures\\TestEnum::Ccc"
+                    ]
+                },
+                {
+                    "$ref": "#/definitions/param"
+                }
+            ]
+        },
+        "1454b7339d0adf11": {
+            "anyOf": [
+                {
+                    "enum": [
+                        "!php/enum Symfony\\Component\\Config\\Tests\\Fixtures\\StringBackedTestEnum::Foo",
+                        "!php/enum Symfony\\Component\\Config\\Tests\\Fixtures\\StringBackedTestEnum::Bar"
+                    ]
+                },
+                {
+                    "$ref": "#/definitions/param"
+                }
+            ]
+        },
+        "59c3318633430a9e": {
+            "anyOf": [
+                {
+                    "enum": [
+                        "!php/enum Symfony\\Component\\Config\\Tests\\Fixtures\\TestEnum::Foo",
+                        "!php/enum Symfony\\Component\\Config\\Tests\\Fixtures\\TestEnum::Bar",
+                        "!php/enum Symfony\\Component\\Config\\Tests\\Fixtures\\TestEnum::Ccc"
+                    ]
+                },
+                {
+                    "$ref": "#/definitions/param"
+                }
+            ]
+        },
+        "d1ca11b513832c81": {
+            "type": [
+                "boolean",
+                "number",
+                "string"
+            ],
+            "description": "this is a long\nmulti-line info text\nwhich should be indented"
+        },
+        "8f5cbc4716c25a8a": {
+            "anyOf": [
+                {
+                    "type": "object",
+                    "properties": {
+                        "child1": {
+                            "$ref": "#/definitions/10b40a06ad0d1ec2"
+                        },
+                        "child2": {
+                            "$ref": "#/definitions/10b40a06ad0d1ec2"
+                        },
+                        "child3": {
+                            "$ref": "#/definitions/d1ca11b513832c81"
+                        }
+                    }
+                },
+                {
+                    "$ref": "#/definitions/param"
+                }
+            ],
+            "description": "some info"
+        },
+        "98f6c37b28a94f0b": {
+            "$ref": "#/definitions/10b40a06ad0d1ec2"
+        },
+        "06e7e49a279c4e95": {
+            "anyOf": [
+                {
+                    "const": []
+                },
+                {
+                    "type": [
+                        "array",
+                        "object"
+                    ],
+                    "items": {
+                        "$ref": "#/definitions/98f6c37b28a94f0b"
+                    },
+                    "additionalProperties": {
+                        "$ref": "#/definitions/98f6c37b28a94f0b"
+                    }
+                },
+                {
+                    "$ref": "#/definitions/param"
+                }
+            ],
+            "default": []
+        },
+        "04e12a2ab958e1d2": {
+            "type": "string"
+        },
+        "7e28bcfce621d5a6": {
+            "$ref": "#/definitions/04e12a2ab958e1d2"
+        },
+        "c22a41f53ff4799f": {
+            "anyOf": [
+                {
+                    "type": [
+                        "array",
+                        "object",
+                        "null"
+                    ],
+                    "items": {
+                        "$ref": "#/definitions/7e28bcfce621d5a6"
+                    },
+                    "additionalProperties": {
+                        "$ref": "#/definitions/7e28bcfce621d5a6"
+                    }
+                },
+                {
+                    "$ref": "#/definitions/param"
+                }
+            ],
+            "default": null
+        },
+        "15aa10f64e9783ee": {
+            "anyOf": [
+                {},
+                {
+                    "$ref": "#/definitions/param"
+                }
+            ]
+        },
+        "ebe6fbbc9144c534": {
+            "type": [
+                "boolean",
+                "number",
+                "string"
+            ],
+            "description": "Parameter name"
+        },
+        "ceafdf76f079dcad": {
+            "$ref": "#/definitions/ebe6fbbc9144c534"
+        },
+        "aed611cfe0427f98": {
+            "anyOf": [
+                {
+                    "const": []
+                },
+                {
+                    "type": [
+                        "array",
+                        "object"
+                    ],
+                    "items": {
+                        "$ref": "#/definitions/ceafdf76f079dcad"
+                    },
+                    "additionalProperties": {
+                        "$ref": "#/definitions/ceafdf76f079dcad"
+                    }
+                },
+                {
+                    "$ref": "#/definitions/param"
+                }
+            ],
+            "default": []
+        },
+        "90e3d83fd5168a0c": {
+            "anyOf": [
+                {
+                    "type": "object",
+                    "properties": {
+                        "user": {
+                            "$ref": "#/definitions/10b40a06ad0d1ec2"
+                        },
+                        "pass": {
+                            "$ref": "#/definitions/10b40a06ad0d1ec2"
+                        }
+                    }
+                },
+                {
+                    "$ref": "#/definitions/param"
+                }
+            ]
+        },
+        "7fc27558c4207e63": {
+            "$ref": "#/definitions/90e3d83fd5168a0c"
+        },
+        "e240c194c1f625a3": {
+            "anyOf": [
+                {
+                    "const": []
+                },
+                {
+                    "type": [
+                        "array",
+                        "object"
+                    ],
+                    "items": {
+                        "$ref": "#/definitions/7fc27558c4207e63"
+                    },
+                    "additionalProperties": {
+                        "$ref": "#/definitions/7fc27558c4207e63"
+                    }
+                },
+                {
+                    "$ref": "#/definitions/param"
+                }
+            ],
+            "default": []
+        },
+        "80710161d0b1ffe2": {
+            "anyOf": [
+                {
+                    "type": "object",
+                    "properties": {
+                        "title": {
+                            "$ref": "#/definitions/10b40a06ad0d1ec2"
+                        },
+                        "path": {
+                            "$ref": "#/definitions/10b40a06ad0d1ec2"
+                        }
+                    }
+                },
+                {
+                    "$ref": "#/definitions/param"
+                }
+            ]
+        },
+        "1fe19a5fe501bd3c": {
+            "$ref": "#/definitions/80710161d0b1ffe2"
+        },
+        "201416b4f65e3e65": {
+            "anyOf": [
+                {
+                    "const": []
+                },
+                {
+                    "type": [
+                        "array",
+                        "object"
+                    ],
+                    "items": {
+                        "$ref": "#/definitions/1fe19a5fe501bd3c"
+                    },
+                    "additionalProperties": {
+                        "$ref": "#/definitions/1fe19a5fe501bd3c"
+                    }
+                },
+                {
+                    "$ref": "#/definitions/param"
+                }
+            ],
+            "default": []
+        },
+        "bab751c93618d777": {
+            "$ref": "#/definitions/201416b4f65e3e65"
+        },
+        "df037e0f40a5be1e": {
+            "anyOf": [
+                {
+                    "const": []
+                },
+                {
+                    "type": [
+                        "array",
+                        "object"
+                    ],
+                    "items": {
+                        "$ref": "#/definitions/bab751c93618d777"
+                    },
+                    "additionalProperties": {
+                        "$ref": "#/definitions/bab751c93618d777"
+                    }
+                },
+                {
+                    "$ref": "#/definitions/param"
+                }
+            ],
+            "default": []
+        },
+        "ebd0a644d2f3e997": {
+            "anyOf": [
+                {
+                    "type": "object",
+                    "properties": {
+                        "didou": {
+                            "$ref": "#/definitions/10b40a06ad0d1ec2"
+                        }
+                    }
+                },
+                {
+                    "$ref": "#/definitions/param"
+                }
+            ]
+        },
+        "99d36cdc6404a29a": {
+            "$ref": "#/definitions/ebd0a644d2f3e997"
+        },
+        "9054d5546beaa213": {
+            "anyOf": [
+                {
+                    "const": []
+                },
+                {
+                    "type": [
+                        "array",
+                        "object"
+                    ],
+                    "items": {
+                        "$ref": "#/definitions/99d36cdc6404a29a"
+                    },
+                    "additionalProperties": {
+                        "$ref": "#/definitions/99d36cdc6404a29a"
+                    }
+                },
+                {
+                    "$ref": "#/definitions/param"
+                }
+            ],
+            "default": []
+        },
+        "860a0e18744eedfd": {
+            "$ref": "#/definitions/9054d5546beaa213"
+        },
+        "74df63e8948e01fe": {
+            "anyOf": [
+                {
+                    "const": []
+                },
+                {
+                    "type": [
+                        "array",
+                        "object"
+                    ],
+                    "items": {
+                        "$ref": "#/definitions/860a0e18744eedfd"
+                    },
+                    "additionalProperties": {
+                        "$ref": "#/definitions/860a0e18744eedfd"
+                    }
+                },
+                {
+                    "$ref": "#/definitions/param"
+                }
+            ],
+            "default": []
+        },
+        "f6f6b8a89b9de154": {
+            "anyOf": [
+                {
+                    "type": "object"
+                },
+                {
+                    "$ref": "#/definitions/param"
+                }
+            ]
+        },
+        "8596700018243360": {
+            "anyOf": [
+                {},
+                {
+                    "$ref": "#/definitions/param"
+                }
+            ],
+            "default": true
+        },
+        "91b6599a07770898": {
+            "anyOf": [
+                {
+                    "type": "array"
+                },
+                {
+                    "type": [
+                        "object",
+                        "boolean",
+                        "null"
+                    ],
+                    "properties": {
+                        "boolean": {
+                            "$ref": "#/definitions/7e9272c1a47137c4"
+                        },
+                        "scalar_empty": {
+                            "$ref": "#/definitions/10b40a06ad0d1ec2"
+                        },
+                        "scalar_null": {
+                            "$ref": "#/definitions/ac3318c4415dfb1e"
+                        },
+                        "scalar_true": {
+                            "$ref": "#/definitions/cdeee702d36f9e3c"
+                        },
+                        "scalar_false": {
+                            "$ref": "#/definitions/12fbc9023cab7dd5"
+                        },
+                        "scalar_default": {
+                            "$ref": "#/definitions/2a4e9ebdea3312c9"
+                        },
+                        "scalar_array_empty": {
+                            "$ref": "#/definitions/f62d46268f02deb9"
+                        },
+                        "scalar_array_defaults": {
+                            "$ref": "#/definitions/7cbe815900004450"
+                        },
+                        "scalar_required": {
+                            "$ref": "#/definitions/10b40a06ad0d1ec2"
+                        },
+                        "scalar_deprecated": {
+                            "$ref": "#/definitions/3e43ead3d5f69efe"
+                        },
+                        "scalar_deprecated_with_message": {
+                            "$ref": "#/definitions/186834a53bfd6ad3"
+                        },
+                        "node_with_a_looong_name": {
+                            "$ref": "#/definitions/10b40a06ad0d1ec2"
+                        },
+                        "enum_with_default": {
+                            "$ref": "#/definitions/d5d8f6dd360b816e"
+                        },
+                        "enum": {
+                            "$ref": "#/definitions/134ebd09c31f5a84"
+                        },
+                        "enum_with_class": {
+                            "$ref": "#/definitions/1454b7339d0adf11"
+                        },
+                        "unit_enum_with_class": {
+                            "$ref": "#/definitions/59c3318633430a9e"
+                        },
+                        "array": {
+                            "$ref": "#/definitions/8f5cbc4716c25a8a"
+                        },
+                        "scalar_prototyped": {
+                            "$ref": "#/definitions/06e7e49a279c4e95"
+                        },
+                        "string_list_default_null": {
+                            "$ref": "#/definitions/c22a41f53ff4799f"
+                        },
+                        "variable": {
+                            "$ref": "#/definitions/15aa10f64e9783ee"
+                        },
+                        "parameters": {
+                            "$ref": "#/definitions/aed611cfe0427f98"
+                        },
+                        "connections": {
+                            "$ref": "#/definitions/e240c194c1f625a3"
+                        },
+                        "cms_pages": {
+                            "$ref": "#/definitions/df037e0f40a5be1e"
+                        },
+                        "pipou": {
+                            "$ref": "#/definitions/74df63e8948e01fe"
+                        },
+                        "array_with_array_example_and_no_default_value": {
+                            "$ref": "#/definitions/f6f6b8a89b9de154"
+                        },
+                        "custom_node": {
+                            "$ref": "#/definitions/8596700018243360"
+                        }
+                    }
+                },
+                {
+                    "$ref": "#/definitions/param"
+                }
+            ]
+        },
+        "38064c3c5331b296": {
+            "type": "object",
+            "properties": {
+                "acme_root": {
+                    "$ref": "#/definitions/91b6599a07770898"
+                }
+            }
+        },
+        "": {
+            "$ref": "#/definitions/38064c3c5331b296"
+        },
+        "param": {
+            "$comment": "Container parameter",
+            "type": "string",
+            "pattern": "^%[^%]+%$"
+        }
+    }
+}

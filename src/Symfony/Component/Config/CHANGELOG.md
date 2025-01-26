@@ -12,6 +12,7 @@ CHANGELOG
  * Deprecate accessing the internal scope of the loader in PHP config files, use only its public API instead
  * Deprecate setting a default value to a node that is required, and vice versa
  * Deprecate generating fluent methods in config builders
+ * Add `JsonSchemaGenerator` to generate JSON Schema from configuration definitions
 
 7.3
 ---

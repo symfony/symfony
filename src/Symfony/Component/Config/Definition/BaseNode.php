@@ -170,6 +170,14 @@ abstract class BaseNode implements NodeInterface
     }
 
     /**
+     * @internal
+     */
+    public function getEquivalentValues(): array
+    {
+        return $this->equivalentValues;
+    }
+
+    /**
      * Set this node as required.
      */
     public function setRequired(bool $boolean): void

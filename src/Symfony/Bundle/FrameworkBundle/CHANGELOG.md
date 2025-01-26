@@ -17,6 +17,7 @@ CHANGELOG
  * Add support for union types with `Symfony\Component\EventDispatcher\Attribute\AsEventListener`
  * Add `framework.allowed_http_method_override` option
  * Initialize `router.request_context`'s `_locale` parameter to `%kernel.default_locale%`
+ * Generate JSON schema for YAML configuration of bundles
 
 7.3
 ---

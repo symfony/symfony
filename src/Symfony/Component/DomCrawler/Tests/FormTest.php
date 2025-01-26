@@ -472,16 +472,23 @@ class FormTest extends TestCase
         $this->assertEquals([], $form->getFiles(), '->getFiles() returns an empty array if method is get');
 
         $form = $this->createForm('<form method="post"><input type="file" name="foo[bar]" /><input type="text" name="bar" value="bar" /><input type="submit" /></form>');
-        $this->assertEquals(['foo[bar]' => ['name' => '', 'type' => '', 'tmp_name' => '', 'error' => 4, 'size' => 0]], $form->getFiles(), '->getFiles() only returns file fields for POST');
+        $this->assertEquals([], $form->getFiles(), '->getFiles() does not return empty fields');
+
+        $form = $this->createForm('<form method="post"><input type="file" name="foo[bar]" /><input type="text" name="bar" value="bar" /><input type="submit" /></form>');
+        $form->get('foo[bar]')->setValue(__DIR__ . '/Fixtures/upload.txt');
+        $this->assertEquals(['foo[bar]'], array_keys($form->getFiles()), '->getFiles() only returns file fields for POST');
 
         $form = $this->createForm('<form method="post"><input type="file" name="foo[bar]" /><input type="text" name="bar" value="bar" /><input type="submit" /></form>', 'put');
-        $this->assertEquals(['foo[bar]' => ['name' => '', 'type' => '', 'tmp_name' => '', 'error' => 4, 'size' => 0]], $form->getFiles(), '->getFiles() only returns file fields for PUT');
+        $form->get('foo[bar]')->setValue(__DIR__ . '/Fixtures/upload.txt');
+        $this->assertEquals(['foo[bar]'], array_keys($form->getFiles()), '->getFiles() only returns file fields for PUT');
 
         $form = $this->createForm('<form method="post"><input type="file" name="foo[bar]" /><input type="text" name="bar" value="bar" /><input type="submit" /></form>', 'delete');
-        $this->assertEquals(['foo[bar]' => ['name' => '', 'type' => '', 'tmp_name' => '', 'error' => 4, 'size' => 0]], $form->getFiles(), '->getFiles() only returns file fields for DELETE');
+        $form->get('foo[bar]')->setValue(__DIR__ . '/Fixtures/upload.txt');
+        $this->assertEquals(['foo[bar]'], array_keys($form->getFiles()), '->getFiles() only returns file fields for DELETE');
 
         $form = $this->createForm('<form method="post"><input type="file" name="foo[bar]" /><input type="text" name="bar" value="bar" /><input type="submit" /></form>', 'patch');
-        $this->assertEquals(['foo[bar]' => ['name' => '', 'type' => '', 'tmp_name' => '', 'error' => 4, 'size' => 0]], $form->getFiles(), '->getFiles() only returns file fields for PATCH');
+        $form->get('foo[bar]')->setValue(__DIR__ . '/Fixtures/upload.txt');
+        $this->assertEquals(['foo[bar]'], array_keys($form->getFiles()), '->getFiles() only returns file fields for PATCH');
 
         $form = $this->createForm('<form method="post"><input type="file" name="foo[bar]" disabled="disabled" /><input type="submit" /></form>');
         $this->assertEquals([], $form->getFiles(), '->getFiles() does not include disabled file fields');

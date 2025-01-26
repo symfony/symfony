@@ -104,9 +104,16 @@ class Form extends Link implements \ArrayAccess
                 continue;
             }
 
-            if ($field instanceof Field\FileFormField) {
-                $files[$name] = $field->getValue();
+            if (!$field instanceof Field\FileFormField) {
+                continue;
             }
+
+            $value = $field->getValue();
+            if (empty($value['tmp_name'])) {
+                continue;
+            }
+
+            $files[$name] = $value;
         }
 
         return $files;

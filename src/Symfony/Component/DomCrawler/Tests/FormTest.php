@@ -475,19 +475,19 @@ class FormTest extends TestCase
         $this->assertEquals([], $form->getFiles(), '->getFiles() does not return empty fields');
 
         $form = $this->createForm('<form method="post"><input type="file" name="foo[bar]" /><input type="text" name="bar" value="bar" /><input type="submit" /></form>');
-        $form->get('foo[bar]')->setValue(__DIR__ . '/Fixtures/upload.txt');
+        $form->get('foo[bar]')->setValue(__DIR__.'/Fixtures/upload.txt');
         $this->assertEquals(['foo[bar]'], array_keys($form->getFiles()), '->getFiles() only returns file fields for POST');
 
         $form = $this->createForm('<form method="post"><input type="file" name="foo[bar]" /><input type="text" name="bar" value="bar" /><input type="submit" /></form>', 'put');
-        $form->get('foo[bar]')->setValue(__DIR__ . '/Fixtures/upload.txt');
+        $form->get('foo[bar]')->setValue(__DIR__.'/Fixtures/upload.txt');
         $this->assertEquals(['foo[bar]'], array_keys($form->getFiles()), '->getFiles() only returns file fields for PUT');
 
         $form = $this->createForm('<form method="post"><input type="file" name="foo[bar]" /><input type="text" name="bar" value="bar" /><input type="submit" /></form>', 'delete');
-        $form->get('foo[bar]')->setValue(__DIR__ . '/Fixtures/upload.txt');
+        $form->get('foo[bar]')->setValue(__DIR__.'/Fixtures/upload.txt');
         $this->assertEquals(['foo[bar]'], array_keys($form->getFiles()), '->getFiles() only returns file fields for DELETE');
 
         $form = $this->createForm('<form method="post"><input type="file" name="foo[bar]" /><input type="text" name="bar" value="bar" /><input type="submit" /></form>', 'patch');
-        $form->get('foo[bar]')->setValue(__DIR__ . '/Fixtures/upload.txt');
+        $form->get('foo[bar]')->setValue(__DIR__.'/Fixtures/upload.txt');
         $this->assertEquals(['foo[bar]'], array_keys($form->getFiles()), '->getFiles() only returns file fields for PATCH');
 
         $form = $this->createForm('<form method="post"><input type="file" name="foo[bar]" disabled="disabled" /><input type="submit" /></form>');

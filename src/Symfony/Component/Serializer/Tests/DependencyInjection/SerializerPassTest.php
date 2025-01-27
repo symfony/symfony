@@ -637,4 +637,34 @@ class SerializerPassTest extends TestCase
         $this->assertEquals(new Reference('serializer.data_collector'), $traceableEncoderDefinition->getArgument(1));
         $this->assertSame('api', $traceableEncoderDefinition->getArgument(2));
     }
+
+    public function testPropertyNormalizerIsCorrectInstanceWhenUsingNamedSerializer()
+    {
+        $container = new ContainerBuilder();
+
+        $container->setParameter('kernel.debug', false);
+        $container->setParameter('.serializer.named_serializers', [
+            'api' => [],
+        ]);
+
+        $container->register('serializer')->setArguments([null, null]);
+        $container->register('n0')
+            ->setArguments([
+                new Reference('serializer.normalizer.property'),
+            ])
+            ->addTag('serializer.normalizer', ['serializer' => 'default']);
+        $container->register('n1')
+            ->setArguments([
+                new Reference('serializer.normalizer.property'),
+            ])
+            ->addTag('serializer.normalizer', ['serializer' => 'api']);
+
+        $container->register('e1')->addTag('serializer.encoder', ['serializer' => ['*']]);
+
+        $serializerPass = new SerializerPass();
+        $serializerPass->process($container);
+
+        $this->assertEquals(new Reference('serializer.normalizer.property'), $container->getDefinition('n0')->getArgument(0));
+        $this->assertEquals(new Reference('serializer.normalizer.property.api'), $container->getDefinition('n1.api')->getArgument(0));
+    }
 }

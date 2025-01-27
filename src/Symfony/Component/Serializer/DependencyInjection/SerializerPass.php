@@ -185,24 +185,17 @@ class SerializerPass implements CompilerPassInterface
 
             $definition = $container->registerChild($childId, (string) $id);
 
-            if (null !== $nameConverterIndex = $this->findNameConverterIndex($container, (string) $id)) {
-                $definition->replaceArgument($nameConverterIndex, new Reference($config['name_converter']));
+            foreach ($container->getDefinition($id)->getArguments() as $index => $argument) {
+                if ($argument instanceof Reference && self::NAME_CONVERTER_METADATA_AWARE_ID === (string) $argument) {
+                    $definition->replaceArgument($index, new Reference($config['name_converter']));
+                } elseif ($argument instanceof Reference && str_starts_with((string) $argument, 'serializer.normalizer.')) {
+                    $definition->replaceArgument($index, new Reference((string) $argument.'.'.$serializerName));
+                }
             }
 
             $id = new Reference($childId);
         }
 
         return $services;
-    }
-
-    private function findNameConverterIndex(ContainerBuilder $container, string $id): int|string|null
-    {
-        foreach ($container->getDefinition($id)->getArguments() as $index => $argument) {
-            if ($argument instanceof Reference && self::NAME_CONVERTER_METADATA_AWARE_ID === (string) $argument) {
-                return $index;
-            }
-        }
-
-        return null;
     }
 }

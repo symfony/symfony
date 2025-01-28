@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by chalasr at 2025-01-24T13:24:09Z
+
+Could we act earlier and prevent user-less token creation instead?
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2025-01-24T14:24:38Z
+
+Moved the condition as early as possible, when we know we deal with a `TokenInterface`

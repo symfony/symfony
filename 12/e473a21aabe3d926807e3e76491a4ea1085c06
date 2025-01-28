@@ -1,0 +1,21 @@
+---------------------------------------------------------------------------
+
+by Valmonzo at 2025-01-15T02:47:44Z
+
+Thanks @chalasr and @mtarld for your help 👍🏽
+
+---------------------------------------------------------------------------
+
+by mtarld at 2025-01-17T16:25:53Z
+
+Handling that as a feature won't fix the bug for the older branches.
+
+Maybe we can create a new PR aiming to fix the bug that:
+- Add an internal setter on the `Serializer` class to set the default context
+- Call that setter from the `SerializerPass`
+
+---------------------------------------------------------------------------
+
+by chalasr at 2025-01-28T15:47:37Z
+
+rebase+retarget on 6.4 needed also

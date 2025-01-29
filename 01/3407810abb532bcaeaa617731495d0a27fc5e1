@@ -1,0 +1,32 @@
+---------------------------------------------------------------------------
+
+by stof at 2025-01-17T16:45:25Z
+
+what is the use case for having a PasswordAuthenticatedUserInterface if you don't store the password hash in the DB ? This prevents you from authenticating as you cannot verify the password hash
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-01-17T17:21:05Z
+
+This PR is about not having the hashed password in the *session* storage ;)
+(PR description updated @stof, I made a mistake that was leading to this confusing)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-01-20T11:45:25Z
+
+Sidenote: instead of putting the hashed password in the DB to invalidate sessions on password changes, we could store a hash of the hashed password, eg a truncated xxh128 would be fine. This can be implemented in userland with the EquatableInterface. Should we consider making this more "core" somehow?
+
+---------------------------------------------------------------------------
+
+by chalasr at 2025-01-20T12:07:34Z
+
+Is it worth it given the hash has to be stored in the DB anyway in order to be able to authenticate?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-01-20T13:48:03Z
+
+DB storage and session storage have different security features, so definitely worth it to me yes.
+
+I had a look at other frameworks, and django, spring, Express.js, RoR, ASP.net all have something for that in the mean of a password_changed timestamp or similar token that triggers the invalidation. Notably neither Laravel nor Symfony have anything out of the box on the topic (Symfony stores the hashed password, Laravel doesn't, which mean it doesn't invalidate on password changes either IIUC.)

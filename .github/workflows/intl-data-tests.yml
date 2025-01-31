@@ -31,7 +31,7 @@ permissions:
 jobs:
   tests:
     name: Intl data
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
 
     steps:
       - name: Checkout

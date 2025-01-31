@@ -38,7 +38,7 @@ jobs:
             #mode: experimental
       fail-fast: false
 
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
 
     steps:
       - name: Checkout

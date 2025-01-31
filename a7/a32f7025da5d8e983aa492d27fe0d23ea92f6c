@@ -1,0 +1,160 @@
+---------------------------------------------------------------------------
+
+by chalasr at 2024-09-18T08:50:14Z
+
+From https://github.com/symfony/symfony/pull/56830#pullrequestreview-2309647166
+
+> This should target 7.2 as this is a new feature.
+@chalasr can you please have another look?
+I don't like adding new options so if there's a way without, suggestions welcome :)
+
+@nicolas-grekas unless we decide to revert a security fix we cannot avoid the option I think
+
+---------------------------------------------------------------------------
+
+by wouterj at 2024-09-18T11:25:08Z
+
+>  I don't like adding new options so if there's a way without, suggestions welcome :)
+
+Maybe an unpopular opinion: I'm not sure if I would implement this feature in Symfony at all.
+
+This is part of code that was released with the [user enumeration CVE](https://symfony.com/blog/cve-2021-21424-prevent-user-enumeration-in-authentication-mechanisms). With the new option set to true, you'll reintroduce the possibility of user enumeration based on error messages as you now get "Invalid credentials" (user does not exists) or "This account is locked" (account status error).
+
+The `hide_user_not_found` option name might be a bit of a vague name, but it determines whether you want some default user enumeration prevention or not. If a business decides it wants partial user enumeration (by hiding only user not found exceptions), you can already achieve this by setting `hide_user_not_found: false` and implementing your own authentication failure handler that hides only `UserNotFoundException`.
+
+I'm not convinced we need to provide an extra option to achieve this (especially because we consider the new feature less secure).
+
+---------------------------------------------------------------------------
+
+by core23 at 2024-09-18T14:57:47Z
+
+> This is part of code that was released with the [user enumeration CVE](https://symfony.com/blog/cve-2021-21424-prevent-user-enumeration-in-authentication-mechanisms). With the new option set to true, you'll reintroduce the possibility of user enumeration based on error messages as you now get "Invalid credentials" (user does not exists) or "This account is locked" (account status error).
+
+I agree, in theory you could use this to enumerate all users that have an *account status* error, but *user does not exist* errors are still silenced with solution. But you may also enumerate users by the time it takes to generate the response at all, if you want to use all possible ways ;)
+
+The current solution looks broken to me. You either expose ALL user information or no user feedback at all. There is no way to inform the user, that it is currently not possible to login with the user. The current solution resulted in several service desk tickets that I need to check every time.
+
+What about creating a new enum config key with three different states like: `expose_security_errors: none|account|all`?
+
+---------------------------------------------------------------------------
+
+by chalasr at 2024-09-18T15:34:54Z
+
+Renaming/changing the existing option looks sensible to me as account status errors means that a user is actually found.
+
+---------------------------------------------------------------------------
+
+by core23 at 2024-09-20T19:19:26Z
+
+Changed the config key to `hide_account_status_exceptions` and applied the proposed changes.
+
+---------------------------------------------------------------------------
+
+by core23 at 2024-10-08T11:15:53Z
+
+Anything left to do @chalasr ?
+
+---------------------------------------------------------------------------
+
+by chalasr at 2024-10-22T15:52:15Z
+
+Sorry for the back and forths but I think there is confusion about my last comment:
+
+> Renaming/changing the existing option looks sensible to me as account status errors means that a user is actually found.
+
+I agree with Wouter this is not worth a dedicated option, but I do think it's worth renaming the existing `hide_user_not_found_exceptions` option for clarity to make it take an enum as you proposed in https://github.com/symfony/symfony/pull/58300#issuecomment-2358711714. It should still handle true/false and behave the same as today for BC until 8.0.
+
+---------------------------------------------------------------------------
+
+by core23 at 2024-10-24T18:12:29Z
+
+So you're fine with deprecating the existing `hide_user_not_found_exceptions` option in favor of something like `expose_security_errors` with the states `none`, `account `, `all`?
+
+And if you are using the new `option`, it should override the `hide_user_not_found_exceptions` setting?
+
+---------------------------------------------------------------------------
+
+by chalasr at 2024-10-25T11:22:25Z
+
+Yes. The new option should win over the to-be-deprecated one when it's explicitly set (to not change the behavior of apps explicitly setting the old option to false). The new option should default to `all` to keep the same default behavior as today.
+
+@wouterj are you ok with the proposed plan?
+
+---------------------------------------------------------------------------
+
+by wouterj at 2024-10-25T14:03:47Z
+
+Ok, let's go with an enum option with these conditions (maybe worth calling the middle one `account_status` to be super clear on what errors are exposed).
+
+I guess the easiest BC way would be removing the default value from the current option adding adding the new option with an `'all'` default value. Then, in the extension use the old option if it's defined (which means the user has configured it explicitly) + a deprecation notice. Otherwise - if the old option was not configured - use the new option.
+When the old option is used, the extension can then transform true to `'all'` and false to `'none'`.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2024-10-26T13:44:38Z
+
+Sounds good 👍
+
+---------------------------------------------------------------------------
+
+by core23 at 2024-10-29T17:11:01Z
+
+Done with the renaming, please recheck :)
+
+Not sure about the `Unit Tests (8.2, low-deps)` error, because the config uses the constants. Should I remove the constant usage and replace it with strings or should I bump the dependency?
+
+---------------------------------------------------------------------------
+
+by core23 at 2024-11-12T07:14:15Z
+
+Friendly ping @chalasr
+
+---------------------------------------------------------------------------
+
+by core23 at 2024-11-27T11:45:19Z
+
+@wouterj Maybe you can answer the open question regarding the constant usage?
+
+---------------------------------------------------------------------------
+
+by stof at 2024-11-27T12:51:05Z
+
+@core23 you need to bump the min version of the component supported by security-bundle in the security-bundle composer.json to be `7.3`, so that the new constants are available.
+
+---------------------------------------------------------------------------
+
+by core23 at 2024-11-30T18:53:18Z
+
+Not sure how to fix the deprecation warnings :/
+
+---------------------------------------------------------------------------
+
+by core23 at 2024-12-15T14:28:01Z
+
+Thanks for the review @stof :)
+
+Applied your suggestions and the build is passing
+
+---------------------------------------------------------------------------
+
+by chalasr at 2025-01-05T15:08:28Z
+
+@core23 Can you please update the UPGRADE-7.3 file about the deprecated option? And add a line about that deprecation in the already updated CHANGELOG file also?
+
+---------------------------------------------------------------------------
+
+by core23 at 2025-01-06T16:59:29Z
+
+Done :)
+
+---------------------------------------------------------------------------
+
+by core23 at 2025-01-30T20:06:25Z
+
+Any chance to get this merge soon-ish? @chalasr
+
+---------------------------------------------------------------------------
+
+by core23 at 2025-01-31T13:07:06Z
+
+Done. The failing tests look unrelated to the changes

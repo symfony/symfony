@@ -15,7 +15,7 @@ use Symfony\Component\Validator\Constraint;
 
 /**
  * Ensures that the value is a valid Base64-encoded.
- * 
+ *
  * @author Refat Alsakka <refatalsakka@gmail.com>
  */
 #[\Attribute(\Attribute::TARGET_PROPERTY | \Attribute::TARGET_METHOD | \Attribute::IS_REPEATABLE)]

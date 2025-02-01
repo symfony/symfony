@@ -1,0 +1,46 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2025-01-31T14:31:15Z
+
+Hey!
+
+I see that this is your first PR. That is great! Welcome!
+
+Symfony has a [contribution guide](https://symfony.com/doc/current/contributing/index.html) which I suggest you to read.
+
+In short:
+- Always add tests
+- Keep backward compatibility (see https://symfony.com/bc).
+- Bug fixes must be submitted against the lowest maintained branch where they apply (see https://symfony.com/releases)
+- Features and deprecations must be submitted against the 7.3 branch.
+
+Review the GitHub status checks of your pull request and try to solve the reported issues. If some tests are failing, try to see if they are failing because of this change.
+
+When two Symfony core team members approve this change, it will be merged and you will become an official Symfony contributor!
+If this PR is merged in a lower version branch, it will be merged up to all maintained branches within a few days.
+
+I am going to sit back now and wait for the reviews.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by ppoulpe at 2025-01-31T17:16:19Z
+
+> Wow, what a great feature. Thank you
+>
+> I think it looks good, did you test run this to confirm we understood the protocol correctly?
+
+Hello and thanks for your positive feedback :)
+
+I actually tested the code to make sure it was OK on the Bluesky side, and the screenshot in the commentary is from the test in question.
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2025-01-31T17:28:44Z
+
+Thank you.
+
+Let's wait for another maintainer to give their review. If they also like it they will merge it.

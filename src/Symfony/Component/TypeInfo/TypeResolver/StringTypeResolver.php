@@ -135,9 +135,14 @@ final class StringTypeResolver implements TypeResolverInterface
                 'bool', 'boolean' => Type::bool(),
                 'true' => Type::true(),
                 'false' => Type::false(),
-                'int', 'integer', 'positive-int', 'negative-int', 'non-positive-int', 'non-negative-int', 'non-zero-int' => Type::int(),
+                'int', 'integer' => Type::int(),
+                'positive-int' => Type::intRange(1, \PHP_INT_MAX),
+                'negative-int' => Type::intRange(\PHP_INT_MIN, -1),
+                'non-positive-int' => Type::intRange(\PHP_INT_MIN, 0),
+                'non-negative-int' => Type::intRange(0, \PHP_INT_MAX),
+                'non-zero-int' => Type::intRange(\PHP_INT_MIN, \PHP_INT_MAX, false),
                 'float', 'double' => Type::float(),
-                'string',
+                'string' => Type::string(),
                 'class-string',
                 'trait-string',
                 'interface-string',
@@ -149,7 +154,7 @@ final class StringTypeResolver implements TypeResolverInterface
                 'non-falsy-string',
                 'truthy-string',
                 'literal-string',
-                'html-escaped-string' => Type::string(),
+                'html-escaped-string' => Type::explicitString($node->name),
                 'resource' => Type::resource(),
                 'object' => Type::object(),
                 'callable' => Type::callable(),
@@ -184,9 +189,27 @@ final class StringTypeResolver implements TypeResolverInterface
         if ($node instanceof GenericTypeNode) {
             $type = $this->getTypeFromNode($node->type, $typeContext);
 
-            // handle integer ranges as simple integers
+            // handle integer ranges
             if ($type->isIdentifiedBy(TypeIdentifier::INT)) {
-                return $type;
+                $getValueFromNode = function (TypeNode $node) {
+                    if ($node instanceof IdentifierTypeNode) {
+                        return match ($node->name) {
+                            'min' => \PHP_INT_MIN,
+                            'max' => \PHP_INT_MAX,
+                            default => throw new \DomainException(\sprintf('Invalid int range value "%s".', $node->name)),
+                        };
+                    }
+
+                    if ($node->constExpr instanceof ConstExprIntegerNode) {
+                        return (int) $node->constExpr->value;
+                    }
+
+                    throw new \DomainException(\sprintf('Invalid int range expression "%s".', \get_class($node->constExpr)));
+                };
+
+                $range = array_map(fn (TypeNode $t): int => $getValueFromNode($t), $node->genericTypes);
+
+                return Type::intRange(...$range);
             }
 
             $variableTypes = array_map(fn (TypeNode $t): Type => $this->getTypeFromNode($t, $typeContext), $node->genericTypes);

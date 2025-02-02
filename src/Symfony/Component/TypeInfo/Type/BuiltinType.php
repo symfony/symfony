@@ -20,7 +20,7 @@ use Symfony\Component\TypeInfo\TypeIdentifier;
  *
  * @template T of TypeIdentifier
  */
-final class BuiltinType extends Type
+class BuiltinType extends Type
 {
     /**
      * @param T $typeIdentifier

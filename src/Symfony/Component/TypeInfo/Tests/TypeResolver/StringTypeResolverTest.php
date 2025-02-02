@@ -98,26 +98,17 @@ class StringTypeResolverTest extends TestCase
         yield [Type::false(), 'false'];
         yield [Type::int(), 'int'];
         yield [Type::int(), 'integer'];
-        yield [Type::int(), 'positive-int'];
-        yield [Type::int(), 'negative-int'];
-        yield [Type::int(), 'non-positive-int'];
-        yield [Type::int(), 'non-negative-int'];
-        yield [Type::int(), 'non-zero-int'];
+        yield [Type::intRange(1, \PHP_INT_MAX), 'positive-int'];
+        yield [Type::intRange(\PHP_INT_MIN, -1), 'negative-int'];
+        yield [Type::intRange(\PHP_INT_MIN, 0), 'non-positive-int'];
+        yield [Type::intRange(0, \PHP_INT_MAX), 'non-negative-int'];
+        yield [Type::intRange(\PHP_INT_MIN, \PHP_INT_MAX, false), 'non-zero-int'];
         yield [Type::float(), 'float'];
         yield [Type::float(), 'double'];
         yield [Type::string(), 'string'];
-        yield [Type::string(), 'class-string'];
-        yield [Type::string(), 'trait-string'];
-        yield [Type::string(), 'interface-string'];
-        yield [Type::string(), 'callable-string'];
-        yield [Type::string(), 'numeric-string'];
-        yield [Type::string(), 'lowercase-string'];
-        yield [Type::string(), 'non-empty-lowercase-string'];
-        yield [Type::string(), 'non-empty-string'];
-        yield [Type::string(), 'non-falsy-string'];
-        yield [Type::string(), 'truthy-string'];
-        yield [Type::string(), 'literal-string'];
-        yield [Type::string(), 'html-escaped-string'];
+        yield [Type::explicitString('class-string'), 'class-string'];
+        yield [Type::explicitString('literal-string'), 'literal-string'];
+        yield [Type::explicitString('html-escaped-string'), 'html-escaped-string'];
         yield [Type::resource(), 'resource'];
         yield [Type::object(), 'object'];
         yield [Type::callable(), 'callable'];
@@ -152,7 +143,8 @@ class StringTypeResolverTest extends TestCase
         // generic
         yield [Type::generic(Type::object(\DateTime::class), Type::string(), Type::bool()), \DateTime::class.'<string, bool>'];
         yield [Type::generic(Type::object(\DateTime::class), Type::generic(Type::object(\Stringable::class), Type::bool())), \sprintf('%s<%s<bool>>', \DateTime::class, \Stringable::class)];
-        yield [Type::int(), 'int<0, 100>'];
+        yield [Type::intRange(0, 100), 'int<0, 100>'];
+        yield [Type::intRange(\PHP_INT_MIN, \PHP_INT_MAX), 'int<min, max>'];
 
         // union
         yield [Type::union(Type::int(), Type::string()), 'int|string'];

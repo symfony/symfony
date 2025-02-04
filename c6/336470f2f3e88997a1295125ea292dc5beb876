@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by andrew-demb at 2025-01-31T09:42:18Z
+
+We have the same problem as described in the description. We're using for `symfony/lock` different Redis connection than for `symfony/cache`.
+
+Thanks for the PR
+
+---------------------------------------------------------------------------
+
+by andrew-demb at 2025-01-31T09:45:58Z
+
+CI failure seems unrelated (failed tests are from `symfony/process` test suite)

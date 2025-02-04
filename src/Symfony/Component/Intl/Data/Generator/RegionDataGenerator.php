@@ -56,9 +56,12 @@ class RegionDataGenerator extends AbstractDataGenerator
         'QO' => true, // Outlying Oceania
         'XA' => true, // Pseudo-Accents
         'XB' => true, // Pseudo-Bidi
-        'XK' => true, // Kosovo
         // Misc
         'ZZ' => true, // Unknown Region
+    ];
+
+    private const OPTIONAL_USER_ASSIGNED = [
+        'XK' => true, // Kosovo
     ];
 
     // @see https://en.wikipedia.org/wiki/ISO_3166-1_numeric#Withdrawn_codes
@@ -98,6 +101,13 @@ class RegionDataGenerator extends AbstractDataGenerator
     public static function isValidCountryCode(int|string|null $region): bool
     {
         if (isset(self::DENYLIST[$region])) {
+            return false;
+        }
+
+        if (
+            isset(self::OPTIONAL_USER_ASSIGNED[$region])
+            && !filter_var(getenv('ALLOW_OPTIONAL_USER_ASSIGNED'), FILTER_VALIDATE_BOOLEAN)
+        ) {
             return false;
         }
 

@@ -1,0 +1,51 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-01-28T16:25:50Z
+
+Would there be a way to test this?
+
+---------------------------------------------------------------------------
+
+by walva at 2025-01-28T21:08:55Z
+
+@nicolas-grekas I need to take a closer look to it.
+
+---------------------------------------------------------------------------
+
+by walva at 2025-01-30T09:27:10Z
+
+Hey 👋
+
+I reviewed the existing tests and found that the `testRenderedOnce` test already covers the core logic behind this fix. However, I added some additional checks to verify that the `isRendered` method behaves as expected.
+
+Since the test below is very similar to `testRenderedOnce`, I feel like adding it might be redundant. However, I can still submit it if you think it adds value. Let me know what you prefer!
+
+```php
+public function testEmailIsNotRenderedTwice()
+{
+    $twig = new Environment(new ArrayLoader([
+        'text' => 'Initial Text',
+        'html' => '<b>Initial HTML</b>',
+    ]));
+    $renderer = new BodyRenderer($twig);
+
+    $email = new TemplatedEmail();
+    $email->textTemplate('text');
+    $email->htmlTemplate('html');
+
+    // First render
+    $renderer->render($email);
+    $this->assertTrue($email->isRendered());
+    $this->assertEquals('Initial Text', $email->getTextBody());
+    $this->assertEquals('<b>Initial HTML</b>', $email->getHtmlBody());
+
+    // Manually setting the text and HTML content to simulate a previous render
+    $email->text('Manually Set Text');
+    $email->html('Manually Set HTML');
+
+    // Second render should not override manually set values
+    $renderer->render($email);
+
+    $this->assertEquals('Manually Set Text', $email->getTextBody());
+    $this->assertEquals('Manually Set HTML', $email->getHtmlBody());
+}

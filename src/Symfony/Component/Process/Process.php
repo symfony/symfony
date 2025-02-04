@@ -1307,7 +1307,7 @@ class Process implements \IteratorAggregate
 
         $this->readPipes($running && $blocking, '\\' !== \DIRECTORY_SEPARATOR || !$running);
 
-        if ($this->fallbackStatus && $this->isSigchildEnabled()) {
+        if ($this->fallbackStatus) {
             $this->processInformation = $this->fallbackStatus + $this->processInformation;
         }
 

@@ -1,0 +1,7 @@
+---------------------------------------------------------------------------
+
+by phasdev at 2025-01-28T19:55:16Z
+
+@nicolas-grekas, @xabbuh
+
+Apologies; I ran into some trouble rebasing the commit for a test case from my [previous PR](https://github.com/symfony/symfony/pull/59586) so I created a new branch/PR to be safe.

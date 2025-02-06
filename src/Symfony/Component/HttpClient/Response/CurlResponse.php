@@ -354,7 +354,7 @@ final class CurlResponse implements ResponseInterface, StreamableInterface
             }
         }
 
-        if (0 !== $selected = curl_multi_select($multi->handle, $timeout < 0 ? $timeout : 1.1)) {
+        if (0 !== $selected = curl_multi_select($multi->handle, 0 < $timeout ? $timeout : 1.0)) {
             return $selected;
         }
 

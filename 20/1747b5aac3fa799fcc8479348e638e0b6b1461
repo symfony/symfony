@@ -1,0 +1,78 @@
+---------------------------------------------------------------------------
+
+by slutsky at 2024-10-11T20:21:09Z
+
+How does it work if the handler result type is "never"?
+
+I think It's better to use a message to transfer result. Possible to use a setter to add a result to the message inside a handler.
+
+---------------------------------------------------------------------------
+
+by bartholdbos at 2024-10-18T09:37:34Z
+
+> How does it work if the handler result type is "never"?
+>
+> I think It's better to use a message to transfer result. Possible to use a setter to add a result to the message inside a handler.
+
+If the MessageHandler does never return the $result value will be null. If the messagehandler is not in your own control(for instance RunCommandMessageHandler) it is not possible to use a setter to set the result to the message from the handler. The HandledStamp already collects the result of the message handler. This change will only allow you to use this result in the scheduler component as well.
+
+---------------------------------------------------------------------------
+
+by bartholdbos at 2024-10-25T10:52:25Z
+
+@kbond Could you take a look at this maybe?
+
+---------------------------------------------------------------------------
+
+by bartholdbos at 2024-10-25T13:44:16Z
+
+Thanks for the reply. I have also changed the `ServiceCallMessageHandler` to return it's result. This way the `PostRunEvent` result would also be available for `AsPeriodicTask` and `AsCronTask`. Also when using `RedispatchMessage` with a `sync://` transport configured while developing I noticed the result didn't come through so I also returned the result in the `RedispatchMessageHandler`. Let me know what you think of these latest changes.
+
+---------------------------------------------------------------------------
+
+by bartholdbos at 2024-10-29T17:47:12Z
+
+@alli83 or @kbond could you review this maybe?
+
+---------------------------------------------------------------------------
+
+by alli83 at 2024-10-29T21:57:07Z
+
+Retrieving the result could indeed be interesting e.g depending on the outcome, we might decide whether to continue or stop.
+However, regarding the logging example, imho, I wonder if it’s really necessary to handle it in the listener rather than directly within the handler.
+
+---------------------------------------------------------------------------
+
+by bartholdbos at 2024-12-13T10:20:10Z
+
+@kbond I have rebased the branch on 7.3
+
+---------------------------------------------------------------------------
+
+by bartholdbos at 2024-12-20T15:59:32Z
+
+@kbond Sure, I have updated the test to use the event object instead of the booleans. It can now assert on properties that are in the event, is this what you meant?
+
+---------------------------------------------------------------------------
+
+by bartholdbos at 2024-12-20T17:14:48Z
+
+Thanks for the review @kbond! I think it's ready on my side, is another review required or is it ready for merging by you/somebody else?
+
+---------------------------------------------------------------------------
+
+by kbond at 2024-12-20T17:32:11Z
+
+Just need to wait for another core team member approval.
+
+---------------------------------------------------------------------------
+
+by bartholdbos at 2025-01-30T15:22:52Z
+
+@fabpot Could you maybe take a look at this?
+
+---------------------------------------------------------------------------
+
+by kbond at 2025-02-05T12:45:11Z
+
+@bartholdbos, since this has been approved, it'll likely get approved by another core member and merged closer to the 7.3 feature freeze.

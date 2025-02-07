@@ -1,0 +1,65 @@
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2024-10-30T15:31:02Z
+
+I guess unit tests covering this new feature will be required for it to be accepted.
+
+---------------------------------------------------------------------------
+
+by seb-jean at 2024-10-30T19:33:14Z
+
+> I guess unit tests covering this new feature will be required for it to be accepted.
+
+Ok, but I don't know how to do it :/.
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2024-10-31T05:20:01Z
+
+Maybe take a look at the current tests? Mostly it's a good starting point
+
+---------------------------------------------------------------------------
+
+by seb-jean at 2024-11-01T13:29:06Z
+
+The test I wrote failed because `assertSame` is used. It should be `assertEquals`. Do I replace `assertSame` with `assertEquals` on [this line](https://github.com/symfony/symfony/pull/58717/files#diff-5d9e04bef0c45b26ceaa17c52bb53bfaa196e19ad42c1a781d123cb1ac6179d8R48)?
+
+---------------------------------------------------------------------------
+
+by seb-jean at 2024-11-06T09:23:02Z
+
+I changed it to `assertEquals` and it works now.
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2025-01-05T23:17:11Z
+
+Please add a changelog entry
+
+---------------------------------------------------------------------------
+
+by seb-jean at 2025-01-06T05:59:07Z
+
+> Please add a changelog entry
+
+It's done !
+
+---------------------------------------------------------------------------
+
+by fabpot at 2025-01-06T07:09:52Z
+
+@seb-jean You need to rebase as we don't merge PRs with a merge commit.
+
+---------------------------------------------------------------------------
+
+by seb-jean at 2025-01-18T09:07:31Z
+
+> @seb-jean You need to rebase as we don't merge PRs with a merge commit.
+
+I just rebased.
+
+---------------------------------------------------------------------------
+
+by seb-jean at 2025-01-31T20:08:40Z
+
+Hello, are there any changes I still need to make?

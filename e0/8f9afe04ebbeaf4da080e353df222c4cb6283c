@@ -1,0 +1,64 @@
+---------------------------------------------------------------------------
+
+by faizanakram99 at 2025-02-03T09:10:29Z
+
+@valtzu Thank you for the PR.
+
+I agree that the purpose of using BcMath\Number is precision. However, the input could very well be a float considering it can come from any source (api response, db result, etc), and while operating on floats directly is risky due to precision loss, converting them into a numeric string (or a Number object) preserves accuracy. This aligns with the goal of using BCMath in the first place.
+
+As far normalizing into int or string, I think normalizing into string seems a sensible default but maybe we can optionally have a flag (which can be provided via context) to output as int. I am fine with numeric-string though.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2025-02-03T09:55:29Z
+
+> However, the input could very well be a float considering it can come from any source (api response, db result, etc)
+
+Regarding API responses: Unfortunately, it's a limitation of the two-step process of decoding and denormalization that we convert a JSON number to a PHP float first. If we're dealing with JSON numbers, this normalizer is probably not what we want.
+
+Regarding DB results: In SQL, you would represent a number as `DECIMAL` and most database drivers would return decimal values as strings in order to maintain precision. SQLite is the sad exception here.
+
+> while operating on floats directly is risky due to precision loss, converting them into a numeric string (or a Number object) preserves accuracy.
+
+No. The moment you cast a value to a float, you risk losing precision. Converting them to a string won't recover the precsion you lost.
+
+I'm fine with the normalizer in its current state.
+
+---------------------------------------------------------------------------
+
+by faizanakram99 at 2025-02-03T10:02:13Z
+
+> Regarding API responses: Unfortunately, it's a limitation of the two-step process of decoding and denormalization that we convert a JSON number to a PHP float first. If we're dealing with JSON numbers, this normalizer is probably not what we want.
+
+It is quite normal to use symfony serializer to convert incoming api requests into dtos, numbers are often represented using floats in api requests. Things like MapRequestPayload, etc will work ootb.
+
+> Regarding DB results: In SQL, you would represent a number as `DECIMAL` and most database drivers would return decimal values as strings in order to maintain precision. SQLite is the sad exception here.
+
+Yes, pdo does it alright, so probably not an issue.
+
+> No. The moment you cast a value to a float, you risk losing precision. Converting them to a string won't recover the precsion you lost.
+
+Well, nobody is casting a number into a float, the numbers can be float initially (say from an api request), float needs to be converted into a string or BcMath\Number to ensure that operations are done with precision, if the denormalizer can accept float too it will save the additional cast.
+
+---------------------------------------------------------------------------
+
+by valtzu at 2025-02-03T17:18:01Z
+
+Thank you for quick reviews @derrabus & @mtarld.
+
+I rewrote the test case and exception messages based on your comments + fixed the `null` case.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-02-05T16:44:02Z
+
+What about supporting GMP numbers also? Could be done in the same PR, even maybe same class?
+To me either we handle both extensions in one class named "Number", or we go with two classes and the current name needs to change.
+
+---------------------------------------------------------------------------
+
+by valtzu at 2025-02-05T18:39:58Z
+
+> maybe same class
+
+Ok, done.

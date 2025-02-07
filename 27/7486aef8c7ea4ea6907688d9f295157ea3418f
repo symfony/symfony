@@ -1,0 +1,21 @@
+---------------------------------------------------------------------------
+
+by valtzu at 2025-02-04T17:20:00Z
+
+> No opinion on the patch itself. From afar, adding a new class + service looks like a new feature to me but I'm not much into the topic.
+
+Thanks for the review @nicolas-grekas, I have applied all suggestions. Let's wait for @kbond's take on the patch then. I would hope this makes it to 6.4, but since the issue _(not being able to use Messenger transports using Symfony Serializer with Scheduler)_ has existed already over a year, waiting a little bit more (for 7.3) doesn't make a huge difference for me.
+
+---------------------------------------------------------------------------
+
+by kbond at 2025-02-05T12:44:14Z
+
+> Adding new classes or non private methods
+
+From the [maintenance doc](https://symfony.com/doc/current/contributing/code/maintenance.html). Strictly following this means this is a feature.
+
+---------------------------------------------------------------------------
+
+by valtzu at 2025-02-05T18:47:36Z
+
+Ok, thanks, rebased on `7.3` as a new feature.

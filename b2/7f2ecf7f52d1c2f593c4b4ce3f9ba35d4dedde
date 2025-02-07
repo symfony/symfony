@@ -1,0 +1,180 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-11-05T08:50:19Z
+
+From an infrastructure PoV, this doesn't make sense to me: doing it like that, each stream connection consumes way to much memory to make anything useful. This can scale up to maybe hundreds of connections (maybe tenth) and then you hit a dead-end.
+
+---------------------------------------------------------------------------
+
+by yceruto at 2024-11-05T13:52:27Z
+
+@nicolas-grekas If we do it with the Symfony stack for sure, I agree with you, but we can still use the HttpFoundation component with ReactPHP and the proper infrastructure, right?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-11-06T14:00:13Z
+
+Sure, but is that a real use case? How would such an app look like?
+
+---------------------------------------------------------------------------
+
+by yceruto at 2024-11-07T15:46:15Z
+
+I don't have a real use case with ReactPHP, just with Symfony itself and an app within a private network. My infra is very small and I don't have the connections/memory problems in this case, just a few users.
+
+My intention here is to simplify things for these straightforward cases; otherwise I'd recommend using Mercure of course.
+
+---------------------------------------------------------------------------
+
+by yceruto at 2024-12-19T23:08:30Z
+
+I still think these improvements can significantly enhance the developer experience for small applications with a limited number of connections or where memory consumption is manageable.
+
+Friendly ping @symfony/mergers is this something unconventional?
+
+---------------------------------------------------------------------------
+
+by faizanakram99 at 2024-12-20T13:24:45Z
+
+Fwiw, I think it's useful too. We also have something similar in house mainly for live feedback, for interoperability with cli (symfony commands), it extends Output class (not ideal I know but fulfills the needs).
+
+So yes, we would benefit from this change.
+
+```php
+<?php
+
+declare(strict_types=1);
+
+namespace Zzz\Common;
+
+use Psr\Log\LoggerInterface;
+use Symfony\Component\Console\Output\Output;
+use Symfony\Contracts\Service\Attribute\Required;
+
+class EventSourceOutput extends Output
+{
+    #[Required]
+    public LoggerInterface $logger;
+
+    private bool $streamStarted = false;
+
+    public function writeln(string|iterable $messages, int $options = self::OUTPUT_RAW): void
+    {
+        parent::writeln($messages, $options);
+    }
+
+    public function write(string|iterable $messages, bool $newline = false, int $options = self::OUTPUT_RAW): void
+    {
+        parent::write($messages, $newline, $options);
+    }
+
+    protected function doWrite(string $message, bool $newline): void
+    {
+        echo "{$this->stream($message)}\n\n";
+    }
+
+    private function stream(string $message): string
+    {
+        if (!$this->streamStarted) {
+            $this->startStream();
+        }
+
+        if ((bool) \preg_match('|^<(\w+)>(.+)</(\w+)>$|', $message, $matches)) {
+            return 'close' === $matches[1]
+                ? "data: {$matches[2]}"
+                : $this->prepareStream($matches[1], $matches[2]);
+        }
+
+        return $this->prepareStream('info', (string) \preg_replace('/\s+/', ' ', \strip_tags($message)));
+    }
+
+    private function prepareStream(string $type, string $text): string
+    {
+        if (!(bool) \preg_match('!!u', $text)) {
+            // Not UTF-8
+            $text = '...';
+        }
+
+        try {
+            return \sprintf('data: %s', \json_encode(['type' => $type, 'text' => $text], \JSON_THROW_ON_ERROR));
+        } catch (\JsonException $e) {
+            $this->logger->critical($e->getMessage(), ['exception' => $e]);
+
+            return 'data: END_SSE';
+        }
+    }
+
+    private function startStream(): void
+    {
+        \ini_set('output_buffering', 'off');
+        \ini_set('zlib.output_compression', '0');
+        \ob_implicit_flush();
+
+        while (\ob_get_level() > 0) {
+            \ob_end_clean();
+        }
+
+        if (\function_exists('apache_setenv')) {
+            apache_setenv('no-gzip', '1');
+            apache_setenv('dont-vary', '1');
+        }
+
+        \header('Content-Type: text/event-stream');
+        \header('Cache-Control: no-cache');
+        \header('Connection: keep-alive');
+        \header('X-Accel-Buffering: no');
+
+        echo \str_pad('', 10000);
+        echo "\n";
+
+        $this->streamStarted = true;
+    }
+
+    public function hasStreamStarted(): bool
+    {
+        return $this->streamStarted;
+    }
+
+    public function endStream(): void
+    {
+        $this->writeln('<close>END_SSE</close>');
+    }
+}
+```
+
+Do note that `X-Accel-Buffering: no` header is needed for ngjnx, otherwise it buffers output
+
+---------------------------------------------------------------------------
+
+by welcoMattic at 2025-02-03T10:09:02Z
+
+I like this, as it allows developers of small/private projects with small traffic to leverage SSE without supporting a Mercure instance.
+
+But, I also agree with Nicolas, this can quickly leads to high memory consumption and this should be well documented as a warning.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2025-02-03T10:17:33Z
+
+I'm in favor of this feature too.
+
+Mercure focus is event broadcasting, which cannot be (easily) achieved using this patch. But SSE is also useful for other use cases than broadcasting.
+
+For instance, this feature could be useful for hinting the client about the progress of a synchronous job.
+
+Regarding the memory/performance concerns, mentioning in the documentation that for broadcasting but also for high-traffic sites using Mercure would be more straightforward should be good enough.
+
+---------------------------------------------------------------------------
+
+by yceruto at 2025-02-03T13:55:04Z
+
+Happy to read your positive comments! I'll be addressing them soon, thanks!
+
+---------------------------------------------------------------------------
+
+by yceruto at 2025-02-06T05:55:18Z
+
+I’ve addressed all the comments. hopefully, I understood them all correctly.
+I also updated the PR description with a more specific use case.
+
+it's ready for review again 🤞

@@ -1,0 +1,117 @@
+---------------------------------------------------------------------------
+
+by VincentLanglet at 2024-05-30T07:08:57Z
+
+Friendly ping @jderusse @ro0NL do you have time for new look ?
+
+---------------------------------------------------------------------------
+
+by VincentLanglet at 2024-06-11T10:37:15Z
+
+Hi, maybe would you have time to give me a feedback on this @nicolas-grekas ?
+
+---------------------------------------------------------------------------
+
+by echantigny at 2024-06-13T15:52:15Z
+
+I was looking for a way to avoid having duplicate messages in my queue and stumbled on this.  I really wish this feature can be implemented soon.
+
+---------------------------------------------------------------------------
+
+by VincentLanglet at 2024-06-13T16:50:06Z
+
+> I was looking for a way to avoid having duplicate messages in my queue and stumbled on this. I really wish this feature can be implemented soon.
+
+I personnally use this implementation on my project and it works fine. You can duplicate it on your projet if needed until the merge.
+
+---------------------------------------------------------------------------
+
+by echantigny at 2024-06-13T16:53:49Z
+
+> > I was looking for a way to avoid having duplicate messages in my queue and stumbled on this. I really wish this feature can be implemented soon.
+>
+> I personnally use this implementation on my project and it works fine. You can duplicate it on your projet if needed until the merge.
+
+I might give that a try if nothing moves here.  Thanks
+
+---------------------------------------------------------------------------
+
+by maidmaid at 2024-10-15T09:09:01Z
+
+I personally use a very similar implementation, except for the lock mechanism. When you deploy a new application version, you may want to flush the messages queue. In that case, you don't have any out-of-the-box solution to release also the associated locks, so new dispatched messages can be aborted by mistake because the locks are still here.
+
+So, I personally moved from locks to cache (if the key cache is hit, the message isn't dispatched). Thus, I can use `cache:pool:clear` command to also flush the message locks while a deploy.
+
+---------------------------------------------------------------------------
+
+by VincentLanglet at 2024-10-15T09:27:44Z
+
+> I personally use a very similar implementation, except for the lock mechanism. When you deploy a new application version, you may want to flush the messages queue. In that case, you don't have any out-of-the-box solution to release also the associated locks, so new dispatched messages can be aborted by mistake because the locks are still here.
+>
+> So, I personally moved from locks to cache (if the key cache is hit, the message isn't dispatched). Thus, I can use `cache:pool:clear` command to also flush the message locks while a deploy.
+
+Lock can be implemented different way, and I think there is lock relying on cache ; so it could still be used with lock and you reset your redis or similar cache used.
+
+---------------------------------------------------------------------------
+
+by VincentLanglet at 2024-10-15T09:29:42Z
+
+Hi @OskarStark (@jderusse @welcoMattic @xabbuh), any help to move this forward ?
+
+I personally use this implementation and it works fine.
+I also got an approval.
+
+---------------------------------------------------------------------------
+
+by maidmaid at 2024-10-15T09:31:56Z
+
+> I think there is lock relying on cache
+
+That's right but you'll have to handle flushing on the redis side. Perhaps, `messenger:prune` could be introduced in a next PR to solve this. It would handle flushing messages queue and releasing locks by iterating on each message for looking after a lock stamp.
+
+---------------------------------------------------------------------------
+
+by VincentLanglet at 2024-10-24T13:41:46Z
+
+Hi @nicolas-grekas I'm unsure to know what is blocking in the Review process of this PR and don't know how to help moving it forward. What's missing ? Thanks
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-10-24T13:59:29Z
+
+Oh, and a line is missing in the changelog
+
+---------------------------------------------------------------------------
+
+by pounard at 2024-10-25T10:07:01Z
+
+@VincentLanglet I want to apologize for having misunderstood the original issue. Please ignore all my comments.
+
+May I suggest renaming the whole to something much more specific and explicit about what it does and why, such as @jderusse suggested in one the first comments?
+
+Some suggestions about how I would name those classes:
+- `LockMiddleware` -> `DeduplicateMiddleware`
+- `LockStamp` -> `DeduplicateStamp`
+
+Because the "Lock" term may mislead to "contention" or "conflict" problem resolution, such as deadlocks or transaction failures in database for example, but in my opinion doesn't ring any bell about deduplication.
+
+Once the deduplication thing rang a bell in my mind, it completely wiped out the idea of using it for delaying messages or avoiding parallel processing: it is indeed a very different use case, but one that would also be resolved using a lock/mutex. Hence the wrong naming that could mean very different things.
+
+Any opinion about this @nicolas-grekas?
+
+---------------------------------------------------------------------------
+
+by VincentLanglet at 2025-01-24T11:17:25Z
+
+Hi @nicolas-grekas @jderusse @welcoMattic @xabbuh
+
+It's unclear to me how to move this forward.
+The PR seems ready to me, without existing request change, so I assume it just require some. of your review ?
+
+---------------------------------------------------------------------------
+
+by VincentLanglet at 2025-02-03T10:17:40Z
+
+> It look good to me. If possible to rebase the branch and squash commits @VincentLanglet, it will make the merge easier. Thanks for your contribution!
+
+Rebased and squashed

@@ -1,0 +1,81 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-01-28T16:05:11Z
+
+I'm not sure this is what the issue is about. From what I can read, they need a ternary style instead:
+
+when foo ? then-this : else-that.
+
+`#[When('expression', otherwise: new Bar)]` would be closer to what's described in the issue.
+
+(please take time to give example in PR descriptions for new feature so that it's easy to bootstrap the doc / write a blog post.)
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2025-01-28T16:16:23Z
+
+> I'm not sure this is what the issue is about. From what I can read, they need a ternary style instead
+
+I did so to be consistent with the Expression constraint, taking the last issue comment example as reference which seemed more in line with what already exists. But if we don't care about this point, let's do as you say, works for me as well 👍
+
+> (please take time to give example in PR descriptions for new feature so that it's easy to bootstrap the doc / write a blog post.)
+
+My bad indeed, will do!
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-01-28T16:59:54Z
+
+I don't see the point of a negate option here sorry.
+
+---------------------------------------------------------------------------
+
+by Kocal at 2025-01-28T18:00:03Z
+
+Hey!
+
+Given your proposal, the example from #57370 will become:
+```php
+#[Assert\When('this.getProduct()?.getNature()?.value === "SESSION"', new Assert\IsNull())]
+#[Assert\When('this.getProduct()?.getNature()?.value === "SESSION"', new Assert\NotNull(), negate: true)]
+```
+right?
+
+What about this syntax suggested in the issue and by Nicolas above?
+```php
+#[Assert\When(
+    'this.getProduct()?.getNature()?.value === "SESSION"',
+    new Assert\IsNull(),
+    otherwise: new Assert\NotNull()
+)]
+```
+
+or maybe a `WhenNot` assertion?
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2025-01-28T18:24:45Z
+
+`otherwise` solution is nice, lets implement this one! I've got one last thing to figure with parent groups propagation in nested constraints and it should be good 👍
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2025-01-28T19:31:14Z
+
+It's been more complicated than expected because of how composite constraints work. Their internals has to be updated to accept multiple fields that contains nested constraints (and propagate groups). For this, `Composer::getCompositeOption()` return type has to be widen to `array|string`. If I'm right, this does not break BC as child classes are allowed to narrow the return type.
+
+So here's a new implementation, tell me what you think 👍
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2025-02-05T13:57:24Z
+
+All comments addressed, thanks!
+
+Should a PR be sent to update to `get_debug_type($this)` all calls to `static::class`? There are a lot to them after the deprecation of constraints arguments as array (73 occurrences it seems in Validator)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-02-05T14:24:03Z
+
+get_debug_type is to be used in exception messages. that's better, but not critical either.

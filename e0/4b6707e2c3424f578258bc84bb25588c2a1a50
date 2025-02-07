@@ -1,0 +1,151 @@
+---------------------------------------------------------------------------
+
+by Spomky at 2023-11-02T16:27:21Z
+
+Rebased to target Symfony 7.1
+
+---------------------------------------------------------------------------
+
+by Spomky at 2023-12-09T12:00:26Z
+
+Comments addressed, PR rebased and squashed.
+Ready for the next step
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-12-09T12:27:23Z
+
+>  When enable, please note that the user provider or the user repository should be adapt:
+
+do we have any advice on the topic? Or any things we can anticipate that could be part of the same PR?
+
+---------------------------------------------------------------------------
+
+by Spomky at 2023-12-10T10:10:23Z
+
+> do we have any advice on the topic? Or any things we can anticipate that could be part of the same PR?
+
+I checked how the built-in user providers could handle this, but I'm not sure if any of them can be changed as well.
+How the user ID is stored or retrieved is highly dependent on the developer's implementation.
+To me, the most important now seems to propagate this into the documentation.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-01-01T17:44:03Z
+
+What's the next step here? How do we make it easy to opt-in for the OWASP-recommended normalization?
+
+---------------------------------------------------------------------------
+
+by Spomky at 2025-01-05T14:09:54Z
+
+> What's the next step here? How do we make it easy to opt-in for the OWASP-recommended normalization?
+
+Hello @nicolas-grekas,
+
+This PR is now up to date, rebased against the 7.3 branch, and squashed. It’s ready for review.
+
+The next step is to finalize the documentation. It should demonstrate how to inject a normalizer to ensure that different variations (e.g., `JOHN.DOE`, `john.doe`, `John.DOe`) are treated as equivalent.
+
+BR.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-01-06T13:56:03Z
+
+Can you give us a hint about how this can be used? : )
+
+---------------------------------------------------------------------------
+
+by Spomky at 2025-01-06T22:54:49Z
+
+This feature will most likely be used by the firewall Authenticator service that creates the UserBadge, but it could also be used by the `TokenHandler::getUserBadge` when handling access tokens.
+
+Below is a simple example of how to implement a `NormalizedUserBadge`.
+In this example, it ensures that any variations in the username—such as uppercase, lowercase, or accented characters—are normalized to a consistent format.
+
+```php
+namespace App\Security;
+
+use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
+use Symfony\Component\String\UnicodeString;
+use function Symfony\Component\String\u;
+
+final class NormalizedUserBadge extends UserBadge
+{
+    public function __construct(string $identifier)
+    {
+        $callback = static fn (string $identifier) => u($identifier)->normalize(UnicodeString::NFKC)->ascii()->lower()->toString();
+
+        parent::__construct($identifier, identifierNormalizer: $callback);
+    }
+}
+```
+
+From the Authenticator:
+
+```php
+<?php
+
+namespace App\Security;
+
+final class PasswordAuthenticator extends AbstractLoginFormAuthenticator
+{
+    // Simplified for brievety
+    public function authenticate(Request $request): Passport
+    {
+        $username = (string) $request->request->get('username', '');
+        $password = (string) $request->request->get('password', '');
+
+        $request->getSession()
+            ->set(SecurityRequestAttributes::LAST_USERNAME, $username);
+
+        return new Passport(
+            new NormalizedUserBadge($username),
+            new PasswordCredentials($password),
+            [
+                //All other useful badges
+            ]
+        );
+    }
+```
+
+When a user attempts to log in with “John.Doe” or “JOhn.doe,” both will be treated as “john.doe.”
+Keep in mind that any existing usernames in the database should also be normalized accordingly.
+
+Another potential use case involves scenarios where users can log in with various forms of the same identifier: `john.doe@acme.com`, `acme.com\jdoe`, `https://amce.com/+jdoe` or `acct:jdoe@acme.com`.
+By using this feature, you can unify all these variants into a single, standardized format (e.g., “domain\nickname”) without having to create custom queries on the repository side.
+In this case, the callback could be as follows (not tested):
+
+```php
+        $callback = static function (string $identifier) {
+            $normalized = u($identifier)->normalize(UnicodeString::NFKC)->ascii()->lower()->toString();
+
+            $username = '';
+            $domain = '';
+
+            match (true) {
+                str_contains($normalized, '@') => [
+                    $localPart, $domain = explode('@', $normalized, 2),
+                    $username = str_contains($localPart, '.')
+                        ? substr(explode('.', $localPart, 2)[0], 0, 1) . explode('.', $localPart, 2)[1]
+                        : $localPart,
+                ],
+                str_contains($normalized, '\\') => [
+                    $domain, $username = explode('\\', $normalized, 2)
+                ],
+                str_contains($normalized, '://') => [
+                    $parts = parse_url($normalized),
+                    isset($parts['host'], $parts['path']) && [
+                        $domain = $parts['host'],
+                        $username = ltrim($parts['path'], '/')
+                    ]
+                ],
+                default => $username = $normalized
+            };
+
+            $username = preg_replace('/[^a-z0-9]/', '', $username);
+
+            return $domain . '\\' . $username;
+        };
+```

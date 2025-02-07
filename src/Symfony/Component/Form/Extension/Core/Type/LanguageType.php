@@ -30,11 +30,13 @@ class LanguageType extends AbstractType
                 if (!class_exists(Intl::class)) {
                     throw new LogicException(\sprintf('The "symfony/intl" component is required to use "%s". Try running "composer require symfony/intl".', static::class));
                 }
+                $filterLocales = $options['filter_locales'];
+                $needsFiltering = \count($filterLocales) > 0;
                 $choiceTranslationLocale = $options['choice_translation_locale'];
                 $useAlpha3Codes = $options['alpha3'];
                 $choiceSelfTranslation = $options['choice_self_translation'];
 
-                return ChoiceList::loader($this, new IntlCallbackChoiceLoader(static function () use ($choiceTranslationLocale, $useAlpha3Codes, $choiceSelfTranslation) {
+                return ChoiceList::loader($this, new IntlCallbackChoiceLoader(static function () use ($choiceTranslationLocale, $useAlpha3Codes, $choiceSelfTranslation, $filterLocales, $needsFiltering) {
                     if (true === $choiceSelfTranslation) {
                         foreach (Languages::getLanguageCodes() as $alpha2Code) {
                             try {
@@ -48,9 +50,14 @@ class LanguageType extends AbstractType
                         $languagesList = $useAlpha3Codes ? Languages::getAlpha3Names($choiceTranslationLocale) : Languages::getNames($choiceTranslationLocale);
                     }
 
+                    if ($needsFiltering) {
+                        $languagesList = array_filter($languagesList, static fn ($languageKey) => in_array($languageKey, $filterLocales, true), ARRAY_FILTER_USE_KEY);
+                    }
+
                     return array_flip($languagesList);
                 }), [$choiceTranslationLocale, $useAlpha3Codes, $choiceSelfTranslation]);
             },
+            'filter_locales' => [],
             'choice_translation_domain' => false,
             'choice_translation_locale' => null,
             'alpha3' => false,
@@ -58,6 +65,7 @@ class LanguageType extends AbstractType
             'invalid_message' => 'Please select a valid language.',
         ]);
 
+        $resolver->setAllowedTypes('filter_locales', ['array']);
         $resolver->setAllowedTypes('choice_self_translation', ['bool']);
         $resolver->setAllowedTypes('choice_translation_locale', ['null', 'string']);
         $resolver->setAllowedTypes('alpha3', 'bool');

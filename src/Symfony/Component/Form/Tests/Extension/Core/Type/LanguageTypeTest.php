@@ -54,6 +54,41 @@ class LanguageTypeTest extends BaseTypeTestCase
         $this->assertContainsEquals(new ChoiceView('my', 'my', 'бірманська'), $choices);
     }
 
+    /**
+     * @requires extension intl
+     */
+    public function testFilterLocalesOption()
+    {
+        $choices = $this->factory
+            ->create(static::TESTED_TYPE, null, [
+                'filter_locales' => ['fr', 'en'],
+            ])
+            ->createView()->vars['choices'];
+
+        // Don't check objects for identity
+        $this->assertContainsEquals(new ChoiceView('en', 'en', 'English'), $choices);
+        $this->assertContainsEquals(new ChoiceView('fr', 'fr', 'French'), $choices);
+        $this->assertCount(2, $choices);
+    }
+
+    /**
+     * @requires extension intl
+     */
+    public function testFilterLocalesOptionWithAlpha3()
+    {
+        $choices = $this->factory
+            ->create(static::TESTED_TYPE, null, [
+                'filter_locales' => ['fra', 'eng'],
+                'alpha3' => true,
+            ])
+            ->createView()->vars['choices'];
+
+        // Don't check objects for identity
+        $this->assertContainsEquals(new ChoiceView('eng', 'eng', 'English'), $choices);
+        $this->assertContainsEquals(new ChoiceView('fra', 'fra', 'French'), $choices);
+        $this->assertCount(2, $choices);
+    }
+
     public function testAlpha3Option()
     {
         $choices = $this->factory

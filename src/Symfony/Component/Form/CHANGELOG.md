@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+7.3
+---
+
+* Add the `filter_locales` option to `LanguageType`
+
 7.2
 ---
 

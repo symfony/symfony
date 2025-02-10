@@ -1,0 +1,20 @@
+---------------------------------------------------------------------------
+
+by pvandommelen at 2025-02-07T15:16:38Z
+
+Updated. I don't think the failing tests are related.
+
+---------------------------------------------------------------------------
+
+by pvandommelen at 2025-02-07T16:24:23Z
+
+Resolved style comments
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-02-10T08:03:29Z
+
+Note that when using native proxies, cloning will trigger initialization.
+You should not rely on the current behavior when cloning.
+
+(The patch is still fixing a valid concern since we're not coupled to one implementation)

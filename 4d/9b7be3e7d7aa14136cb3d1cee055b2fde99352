@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by stof at 2025-02-06T16:37:22Z
+
+Do we still have a compiler pass validating that services are either instantiable classes or have a factory configured, so that we get a clean error at build time for services that miss this configuration ? And if yes, do we need to update its error message to mention the possibility to use `#[Autoconfigure(constructor: ...)]` for autoconfigured definitions ?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-02-07T08:30:35Z
+
+We do have a compiler pass but it didn't tell about the attribute. PR updated:
+
+> Invalid service "App\Foo": its constructor must be public. Did you miss configuring a factory or a static constructor? Try using the "#[Autoconfigure(constructor: ...)]" attribute for the latter.

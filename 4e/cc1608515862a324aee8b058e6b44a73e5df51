@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by OskarStark at 2023-10-20T08:46:38Z
+
+> Please note that it is based on SF6.4, but may be changed to 7.1 if already in feature freeze period.
+
+Yes it will be for 7.1, but you can already rebase on and target 7.0 if you like
+
+---------------------------------------------------------------------------
+
+by Spomky at 2024-05-31T07:11:13Z
+
+> What would be the typical implementation for a role fetcher? Can we provide one that e.g. reads some conventional entries from the `Entry`?
+
+Hello @nicolas-grekas,
+I added a the classes [AssignDefaultRoles](https://github.com/symfony/symfony/pull/52181/files#diff-6a35d6457b8fa6e2ea7fa4b90285289999e4b0922d0b7c1e88b3f4ea223888d0) and [MemberOfRoles](https://github.com/symfony/symfony/pull/52181/files#diff-e1ad6f8ddf99db72e72a19f588506a70d020e2e19e9bb28b7375705a28420b33). The latter uses the `ismemberof` attribute that seems to be widely used. Note that there is no specification for such group attribute; the [RFC4519](https://datatracker.ietf.org/doc/html/rfc4519) only describes static groups.
+
+---------------------------------------------------------------------------
+
+by MDeveloping at 2024-08-23T00:15:20Z
+
+Did I understand this correct, that there will be an easy way, to read the memberOf of a LDAP User if logging in and than set a role?
+Did I also understand it correct, that this will be available at Symphony 7.2 ad that a documentation is missing for now on Symfony Docs?

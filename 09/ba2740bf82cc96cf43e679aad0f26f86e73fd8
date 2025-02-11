@@ -1,0 +1,118 @@
+---------------------------------------------------------------------------
+
+by GromNaN at 2025-02-05T17:59:14Z
+
+I added the method, that's a lot better and it allows to add the additional feature of automatically set the `container.excluded` tag. But isn't it late in the CompilerPass workflow?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-02-06T09:51:54Z
+
+> But isn't it late in the CompilerPass workflow?
+
+I think I've got your point. A complimentary idea might be to add `Definition::tagAsValueObject()`, to be used in `registerAttributeForAutoconfiguration()`.
+
+Tentatively:
+```php
+/**
+ * @return $this
+ */
+public function tagAsValueObject(string $name, array $attributes = []): static
+{
+    return $this->addTag($name, $attributes)->addTag('container.excluded', ['source' => \sprintf('by tag "%s"', $name));
+}
+```
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2025-02-06T10:37:00Z
+
+Perfect, we have the full feature like this:
+- `Definition::tagAsValueObject()` called inside a `registerAttributeForAutoconfiguration`
+- `ContainerBuilder::findTaggedValueObjects()` called inside a compiler pass
+
+Now I wonder if we could skip de tag and delay the `registerAttributeForAutoconfiguration` callback to any of the compile time. With something like `registerAttributeForValueObject()`
+
+```php
+function registerAttributeForValueObject(Entity::class, static function (ContainerBuilder $container, array $classes) {
+    $container->setParameter('doctrine.entity_classes', $classes);
+});
+```
+
+---------------------------------------------------------------------------
+
+by chalasr at 2025-02-07T04:07:49Z
+
+I get and support the use case this tries to solve, but I don't like the fact we are adding the concept of value objects to the DIC. Services vs non-services is all the container knows so far which makes sense.
+
+Also good part of the objects mentioned in the linked use cases do not match the  definition of a value object actually: neither entity/models nor API resources are VO, both have identifiers.
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2025-02-07T08:36:28Z
+
+That's class definitions that contribute to the build of the DIC; even if this classes are not used for services.
+
+What do you think if we rename `addValueObjectTag` to `addClassTag`, and `findTaggedValueObjects` to `findTaggedClasses`? Or maybe `addExcludedClassTag` to be explicit that we also exclude the class from the DIC.
+
+Then we could have a `!tagged_classes` in Yaml to automatically inject class names into a service, in the same format as `findTaggedClasses`.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-02-07T08:54:16Z
+
+I don't like addClassTag / findTaggedClasses - it doesn't tell anything about those not being services. Also this returns identifiers, not classes (even if most of the time we equal both).
+
+If VO doesn't match, then what remains is that we want to exclude those definitions. What about:
+
+`addExcludingTag(string $name, array $attributes = [])`
+
+`findExcludedServiceIds(string $name)` (and we remove the autoexclude argument now that the name contains the term "exclude" - or keep it, and throw an exception when its false and a matching definition doesn't have the container.excluded tag?)
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2025-02-07T09:00:31Z
+
+Since it's the class names we're interested in here, we can group the result tags by class name and not by serviceId. This way, there's no need to call `$containerBuilder->getDefinition($serviceId)->getClass()` in the loop in the compiler pass.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-02-07T09:07:01Z
+
+Class names are only one possible use case. Maybe the main one, but I don't see why we should optimize the design for this use case.
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2025-02-07T11:53:17Z
+
+We are creating a way to read attributes on classes and make this metadata available to inject in services. There is no point in having multiple definitions for the same class as attributes are defined on the class itself (we can merge them).
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-02-07T11:55:25Z
+
+Unless there is one. My point is that the design and the code are perfectly able to handle more than just lists of classes, and I don't see any reasons (but our current narrow vision) to restrict the capabilities of what we already have...
+
+---------------------------------------------------------------------------
+
+by chalasr at 2025-02-07T18:13:27Z
+
+> That's class definitions that contribute to the build of the DIC; even if this classes are not used for services.
+
+A DIC is all about services. The concept of excluded services has been added to Symfony's DIC mostly for DX purpose following the introduction of autowiring/autodiscovery, and it is still mostly hidden today if we look at the component's public API.
+
+> We are creating a way to read attributes on classes
+
+Fact is that DI's low-level API is decoupled from classes through supporting any string as service identifier everywhere and allowing callables/factories for service construction, which is nice and fits PSR-11 perfectly also.
+
+> If VO doesn't match, then what remains is that we want to exclude those definitions
+
+I agree. Trying to find a generic term for grouping _some_ classes through the container then making them excluded looks like a dead end as there are many possible reasons for a class not to be registered as service and certainly ones we don't even imagine. Excluded services however is a concept we already have so let's build on it. Then Nicolas' proposal looks sensible.
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2025-02-11T10:51:37Z
+
+I updated the methods with more generic names: `Definition::addExcludeTag()` and `ContainerBuilder::findExcludedServiceIds($tagName)`.
+
+`findExcludedServiceIds` throws an exception when a service as the searched tag but not `container.excluded`.

@@ -17,8 +17,6 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
  * AccessDecisionManagerInterface makes authorization decisions.
  *
  * @author Fabien Potencier <fabien@symfony.com>
- *
- * @method AccessDecision getDecision(TokenInterface $token, array $attributes, mixed $object = null)
  */
 interface AccessDecisionManagerInterface
 {
@@ -28,5 +26,5 @@ interface AccessDecisionManagerInterface
      * @param array $attributes An array of attributes associated with the method being invoked
      * @param mixed $object     The object to secure
      */
-    public function decide(TokenInterface $token, array $attributes, mixed $object = null): bool;
+    public function decide(TokenInterface $token, array $attributes, mixed $object = null/* , bool $allowMultipleAttributes = false, ?AccessDecision &$accessDecision = null */): bool;
 }

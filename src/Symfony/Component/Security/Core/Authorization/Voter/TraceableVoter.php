@@ -30,22 +30,13 @@ class TraceableVoter implements CacheableVoterInterface
     ) {
     }
 
-    public function vote(TokenInterface $token, mixed $subject, array $attributes): int
+    public function vote(TokenInterface $token, mixed $subject, array $attributes, ?VoteInterface &$vote = null): int
     {
-        return $this->getVote($token, $subject, $attributes)->getAccess();
-    }
+        $result = $this->voter->vote($token, $subject, $attributes, $vote);
 
-    public function getVote(TokenInterface $token, mixed $subject, array $attributes): VoteInterface
-    {
-        if (method_exists($this->voter, 'getVote')) {
-            $vote = $this->voter->getVote($token, $subject, $attributes);
-        } else {
-            $vote = new Vote($this->voter->vote($token, $subject, $attributes));
-        }
+        $this->eventDispatcher->dispatch(new VoteEvent($this->voter, $subject, $attributes, $vote ?? $result), 'debug.security.authorization.vote');
 
-        $this->eventDispatcher->dispatch(new VoteEvent($this->voter, $subject, $attributes, $vote), 'debug.security.authorization.vote');
-
-        return $vote;
+        return $result;
     }
 
     public function getDecoratedVoter(): VoterInterface

@@ -13,7 +13,6 @@ namespace Symfony\Component\Security\Core\Authorization;
 
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\Strategy\AccessDecisionStrategyInterface;
-use Symfony\Component\Security\Core\Authorization\Voter\Vote;
 use Symfony\Component\Security\Core\Authorization\Voter\VoteInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 
@@ -47,7 +46,7 @@ class TraceableAccessDecisionManager implements AccessDecisionManagerInterface
         }
     }
 
-    public function getDecision(TokenInterface $token, array $attributes, mixed $object = null, bool $allowMultipleAttributes = false): AccessDecision
+    public function decide(TokenInterface $token, array $attributes, mixed $object = null, bool $allowMultipleAttributes = false, ?AccessDecision &$accessDecision = null): bool
     {
         $currentDecisionLog = [
             'attributes' => $attributes,
@@ -57,26 +56,7 @@ class TraceableAccessDecisionManager implements AccessDecisionManagerInterface
 
         $this->currentLog[] = &$currentDecisionLog;
 
-        $result = $this->manager->getDecision($token, $attributes, $object, $allowMultipleAttributes);
-
-        $currentDecisionLog['result'] = $result;
-
-        $this->decisionLog[] = array_pop($this->currentLog); // Using a stack since getDecision can be called by voters
-
-        return $result;
-    }
-
-    public function decide(TokenInterface $token, array $attributes, mixed $object = null, bool $allowMultipleAttributes = false): bool
-    {
-        $currentDecisionLog = [
-            'attributes' => $attributes,
-            'object' => $object,
-            'voterDetails' => [],
-        ];
-
-        $this->currentLog[] = &$currentDecisionLog;
-
-        $result = $this->manager->decide($token, $attributes, $object, $allowMultipleAttributes);
+        $result = $this->manager->decide($token, $attributes, $object, $allowMultipleAttributes, $accessDecision);
 
         $currentDecisionLog['result'] = $result;
 
@@ -88,8 +68,8 @@ class TraceableAccessDecisionManager implements AccessDecisionManagerInterface
     /**
      * Adds voter vote and class to the voter details.
      *
-     * @param array             $attributes attributes used for the vote
-     * @param VoteInterface|int $vote       vote of the voter
+     * @param array $attributes attributes used for the vote
+     * @param int   $vote       vote of the voter
      */
     public function addVoterVote(VoterInterface $voter, array $attributes, VoteInterface|int $vote): void
     {

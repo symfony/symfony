@@ -17,8 +17,6 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
  * VoterInterface is the interface implemented by all voters.
  *
  * @author Fabien Potencier <fabien@symfony.com>
- *
- * @method VoteInterface getVote(TokenInterface $token, mixed $subject, array $attributes)
  */
 interface VoterInterface
 {
@@ -34,6 +32,8 @@ interface VoterInterface
      *
      * @param mixed $subject    The subject to secure
      * @param array $attributes An array of attributes associated with the method being invoked
+     *
+     * @return self::ACCESS_*
      */
-    public function vote(TokenInterface $token, mixed $subject, array $attributes): int;
+    public function vote(TokenInterface $token, mixed $subject, array $attributes/* , ?VoteInterface &$vote = null */): int;
 }

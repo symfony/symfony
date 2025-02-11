@@ -19,11 +19,11 @@ use Symfony\Component\Security\Core\Authentication\Token\AbstractToken;
 use Symfony\Component\Security\Core\Authentication\Token\NullToken;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Core\Authorization\AccessDecision;
 use Symfony\Component\Security\Core\Authorization\AccessDecisionManagerInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\AuthenticatedVoter;
-use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\Security\Core\User\InMemoryUser;
 use Symfony\Component\Security\Http\AccessMapInterface;
@@ -32,10 +32,7 @@ use Symfony\Component\Security\Http\Firewall\AccessListener;
 
 class AccessListenerTest extends TestCase
 {
-    /**
-     * @dataProvider provideDataWithAndWithoutVoteObject
-     */
-    public function testHandleWhenTheAccessDecisionManagerDecidesToRefuseAccess(string $decideFunction, bool $useVoteObject)
+    public function testHandleWhenTheAccessDecisionManagerDecidesToRefuseAccess()
     {
         $request = new Request();
 
@@ -56,12 +53,12 @@ class AccessListenerTest extends TestCase
             ->willReturn($token)
         ;
 
-        $accessDecisionManager = $this->getAccessManager($useVoteObject);
+        $accessDecisionManager = $this->createMock(AccessDecisionManagerInterface::class);
         $accessDecisionManager
             ->expects($this->once())
-            ->method($decideFunction)
+            ->method('decide')
             ->with($this->equalTo($token), $this->equalTo(['foo' => 'bar']), $this->equalTo($request))
-            ->willReturn($useVoteObject ? new AccessDecision(VoterInterface::ACCESS_DENIED) : false)
+            ->willReturn(false)
         ;
 
         $listener = new AccessListener(
@@ -131,10 +128,7 @@ class AccessListenerTest extends TestCase
         $listener(new LazyResponseEvent($event));
     }
 
-    /**
-     * @dataProvider provideDataWithAndWithoutVoteObject
-     */
-    public function testHandleWhenTheSecurityTokenStorageHasNoToken(string $decideFunction, bool $useVoteObject)
+    public function testHandleWhenTheSecurityTokenStorageHasNoToken()
     {
         $tokenStorage = new TokenStorage();
         $request = new Request();
@@ -146,11 +140,11 @@ class AccessListenerTest extends TestCase
             ->willReturn([['foo' => 'bar'], null])
         ;
 
-        $accessDecisionManager = $this->getAccessManager($useVoteObject);
+        $accessDecisionManager = $this->createMock(AccessDecisionManagerInterface::class);
         $accessDecisionManager->expects($this->once())
-            ->method($decideFunction)
+            ->method('decide')
             ->with($this->isInstanceOf(NullToken::class))
-            ->willReturn($useVoteObject ? new AccessDecision(VoterInterface::ACCESS_DENIED) : false);
+            ->willReturn(false);
 
         $listener = new AccessListener(
             $tokenStorage,
@@ -164,10 +158,7 @@ class AccessListenerTest extends TestCase
         $listener(new RequestEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST));
     }
 
-    /**
-     * @dataProvider provideDataWithAndWithoutVoteObject
-     */
-    public function testHandleWhenPublicAccessIsAllowed(string $decideFunction, bool $useVoteObject)
+    public function testHandleWhenPublicAccessIsAllowed()
     {
         $tokenStorage = new TokenStorage();
         $request = new Request();
@@ -179,11 +170,11 @@ class AccessListenerTest extends TestCase
             ->willReturn([[AuthenticatedVoter::PUBLIC_ACCESS], null])
         ;
 
-        $accessDecisionManager = $this->getAccessManager($useVoteObject);
+        $accessDecisionManager = $this->createMock(AccessDecisionManagerInterface::class);
         $accessDecisionManager->expects($this->once())
-            ->method($decideFunction)
+            ->method('decide')
             ->with($this->isInstanceOf(NullToken::class), [AuthenticatedVoter::PUBLIC_ACCESS])
-            ->willReturn($useVoteObject ? new AccessDecision(VoterInterface::ACCESS_GRANTED) : true);
+            ->willReturn(true);
 
         $listener = new AccessListener(
             $tokenStorage,
@@ -195,10 +186,7 @@ class AccessListenerTest extends TestCase
         $listener(new RequestEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST));
     }
 
-    /**
-     * @dataProvider provideDataWithAndWithoutVoteObject
-     */
-    public function testHandleWhenPublicAccessWhileAuthenticated(string $decideFunction, bool $useVoteObject)
+    public function testHandleWhenPublicAccessWhileAuthenticated()
     {
         $token = new UsernamePasswordToken(new InMemoryUser('Wouter', null, ['ROLE_USER']), 'main', ['ROLE_USER']);
         $tokenStorage = new TokenStorage();
@@ -212,11 +200,11 @@ class AccessListenerTest extends TestCase
             ->willReturn([[AuthenticatedVoter::PUBLIC_ACCESS], null])
         ;
 
-        $accessDecisionManager = $this->getAccessManager($useVoteObject);
+        $accessDecisionManager = $this->createMock(AccessDecisionManagerInterface::class);
         $accessDecisionManager->expects($this->once())
-            ->method($decideFunction)
+            ->method('decide')
             ->with($this->equalTo($token), [AuthenticatedVoter::PUBLIC_ACCESS])
-            ->willReturn($useVoteObject ? new AccessDecision(VoterInterface::ACCESS_GRANTED) : true);
+            ->willReturn(true);
 
         $listener = new AccessListener(
             $tokenStorage,
@@ -228,10 +216,7 @@ class AccessListenerTest extends TestCase
         $listener(new RequestEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST));
     }
 
-    /**
-     * @dataProvider provideDataWithAndWithoutVoteObject
-     */
-    public function testHandleMWithultipleAttributesShouldBeHandledAsAnd(string $decideFunction, bool $useVoteObject)
+    public function testHandleMWithultipleAttributesShouldBeHandledAsAnd()
     {
         $request = new Request();
 
@@ -248,12 +233,12 @@ class AccessListenerTest extends TestCase
         $tokenStorage = new TokenStorage();
         $tokenStorage->setToken($authenticatedToken);
 
-        $accessDecisionManager = $this->getAccessManager($useVoteObject);
+        $accessDecisionManager = $this->createMock(AccessDecisionManagerInterface::class);
         $accessDecisionManager
             ->expects($this->once())
-            ->method($decideFunction)
+            ->method('decide')
             ->with($this->equalTo($authenticatedToken), $this->equalTo(['foo' => 'bar', 'bar' => 'baz']), $this->equalTo($request), true)
-            ->willReturn($useVoteObject ? new AccessDecision(VoterInterface::ACCESS_GRANTED) : true)
+            ->willReturn(true)
         ;
 
         $listener = new AccessListener(
@@ -296,27 +281,54 @@ class AccessListenerTest extends TestCase
         new AccessListener($tokenStorage, $this->createMock(AccessDecisionManagerInterface::class), $accessMap, true);
     }
 
-    public function provideDataWithAndWithoutVoteObject()
+    public function testHandleWhenTheAccessDecisionManagerDecidesToRefuseAccessWithAccessDecisionObject()
     {
-        yield [
-            'decideFunction' => 'decide',
-            'useVoteObject' => false,
-        ];
+        $request = new Request();
 
-        yield [
-            'decideFunction' => 'getDecision',
-            'useVoteObject' => true,
-        ];
-    }
+        $accessMap = $this->createMock(AccessMapInterface::class);
+        $accessMap
+            ->expects($this->any())
+            ->method('getPatterns')
+            ->with($this->equalTo($request))
+            ->willReturn([['foo' => 'bar'], null])
+        ;
 
-    public function getAccessManager(bool $withObject)
-    {
-        return $withObject ?
-            $this
-                ->getMockBuilder(AccessDecisionManagerInterface::class)
-                ->onlyMethods(['decide'])
-                ->addMethods(['getDecision'])
-                ->getMock() :
-            $this->createMock(AccessDecisionManagerInterface::class);
+        $token = new class extends AbstractToken {
+            public function getCredentials(): mixed
+            {
+            }
+        };
+
+        $tokenStorage = $this->createMock(TokenStorageInterface::class);
+        $tokenStorage
+            ->expects($this->any())
+            ->method('getToken')
+            ->willReturn($token)
+        ;
+
+        $accessDecisionManager = new class implements AccessDecisionManagerInterface {
+            function decide(TokenInterface $token, array $attributes, mixed $object = null, bool $allowMultipleAttributes = false, ?AccessDecision &$accessDecision = null): bool
+            {
+                $accessDecision = new AccessDecision(false,[], 'not allowed');
+                return $accessDecision->getAccess();
+            }
+        };
+
+        $listener = new AccessListener(
+            $tokenStorage,
+            $accessDecisionManager,
+            $accessMap
+        );
+
+        $this->expectException(AccessDeniedException::class);
+
+        try {
+            $listener(new RequestEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST));
+        } catch (AccessDeniedException $exception) {
+            $this->assertFalse($exception->getAccessDecision()->getAccess());
+            $this->assertSame('not allowed', $exception->getAccessDecision()->getMessage());
+            throw $exception;
+        }
+
     }
 }

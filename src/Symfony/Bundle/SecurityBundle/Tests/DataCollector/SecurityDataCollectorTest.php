@@ -26,8 +26,11 @@ use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
 use Symfony\Component\Security\Core\Authentication\Token\SwitchUserToken;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
+use Symfony\Component\Security\Core\Authorization\AccessDecision;
 use Symfony\Component\Security\Core\Authorization\TraceableAccessDecisionManager;
 use Symfony\Component\Security\Core\Authorization\Voter\TraceableVoter;
+use Symfony\Component\Security\Core\Authorization\Voter\Vote;
+use Symfony\Component\Security\Core\Authorization\Voter\VoteInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 use Symfony\Component\Security\Core\Role\RoleHierarchy;
 use Symfony\Component\Security\Core\User\InMemoryUser;
@@ -225,13 +228,18 @@ class SecurityDataCollectorTest extends TestCase
     {
         $voter1 = new DummyVoter();
         $voter2 = new DummyVoter();
+        $voter3 = new DummyVoterWithObject();
 
-        $decoratedVoter1 = new TraceableVoter($voter1, new class implements EventDispatcherInterface {
-            public function dispatch(object $event, ?string $eventName = null): object
-            {
-                return new \stdClass();
-            }
-        });
+        $decoratedVoter = function (VoterInterface $voter) {
+            return new TraceableVoter(
+                $voter, new class implements EventDispatcherInterface {
+                    public function dispatch(object $event, ?string $eventName = null): object
+                    {
+                        return new \stdClass();
+                    }
+                }
+            );
+        };
 
         $strategy = MainConfiguration::STRATEGY_AFFIRMATIVE;
 
@@ -244,8 +252,9 @@ class SecurityDataCollectorTest extends TestCase
         $accessDecisionManager
             ->method('getVoters')
             ->willReturn([
-                $decoratedVoter1,
-                $decoratedVoter1,
+                $decoratedVoter($voter1),
+                $decoratedVoter($voter2),
+                $decoratedVoter($voter3),
             ]);
 
         $accessDecisionManager
@@ -253,10 +262,11 @@ class SecurityDataCollectorTest extends TestCase
             ->willReturn([[
                 'attributes' => ['view'],
                 'object' => new \stdClass(),
-                'result' => true,
+                'result' => new AccessDecision(true),
                 'voterDetails' => [
                     ['voter' => $voter1, 'attributes' => ['view'], 'vote' => VoterInterface::ACCESS_ABSTAIN],
                     ['voter' => $voter2, 'attributes' => ['view'], 'vote' => VoterInterface::ACCESS_ABSTAIN],
+                    ['voter' => $voter3, 'attributes' => ['view'], 'vote' => new Vote(VoterInterface::ACCESS_ABSTAIN)],
                 ],
             ]]);
 
@@ -269,10 +279,11 @@ class SecurityDataCollectorTest extends TestCase
         $expectedDecisionLog = [[
             'attributes' => ['view'],
             'object' => new \stdClass(),
-            'result' => true,
+            'result' => new AccessDecision(true),
             'voter_details' => [
-                ['class' => $voter1::class, 'attributes' => ['view'], 'vote' => VoterInterface::ACCESS_ABSTAIN],
-                ['class' => $voter2::class, 'attributes' => ['view'], 'vote' => VoterInterface::ACCESS_ABSTAIN],
+                ['class' => $voter1::class, 'attributes' => ['view'], 'vote' => new Vote(VoterInterface::ACCESS_ABSTAIN)],
+                ['class' => $voter2::class, 'attributes' => ['view'], 'vote' => new Vote(VoterInterface::ACCESS_ABSTAIN)],
+                ['class' => $voter3::class, 'attributes' => ['view'], 'vote' => new Vote(VoterInterface::ACCESS_ABSTAIN)],
             ],
         ]];
 
@@ -285,6 +296,91 @@ class SecurityDataCollectorTest extends TestCase
         $expectedVoterClasses = [
             $voter1::class,
             $voter2::class,
+            $voter3::class,
+        ];
+
+        $this->assertSame(
+            $actualVoterClasses,
+            $expectedVoterClasses,
+            'Wrong value returned by getVoters'
+        );
+
+        $this->assertSame($dataCollector->getVoterStrategy(), $strategy, 'Wrong value returned by getVoterStrategy');
+    }
+
+    public function testCollectCollectsDecisionLogWhenStrategyIsAffirmativeWithVoterMessage()
+    {
+        $voter1 = new DummyVoter();
+        $voter2 = new DummyVoter();
+        $voter3 = new DummyVoterWithObject();
+
+        $decoratedVoter = function (VoterInterface $voter) {
+            return new TraceableVoter(
+                $voter, new class implements EventDispatcherInterface {
+                    public function dispatch(object $event, ?string $eventName = null): object
+                    {
+                        return new \stdClass();
+                    }
+                }
+            );
+        };
+
+        $strategy = MainConfiguration::STRATEGY_AFFIRMATIVE;
+
+        $accessDecisionManager = $this->createMock(TraceableAccessDecisionManager::class);
+
+        $accessDecisionManager
+            ->method('getStrategy')
+            ->willReturn($strategy);
+
+        $accessDecisionManager
+            ->method('getVoters')
+            ->willReturn([
+                $decoratedVoter($voter1),
+                $decoratedVoter($voter2),
+                $decoratedVoter($voter3),
+            ]);
+
+        $accessDecisionManager
+            ->method('getDecisionLog')
+            ->willReturn([[
+                'attributes' => ['view'],
+                'object' => new \stdClass(),
+                'result' => true,
+                'voterDetails' => [
+                    ['voter' => $voter1, 'attributes' => ['view'], 'vote' => VoterInterface::ACCESS_ABSTAIN],
+                    ['voter' => $voter2, 'attributes' => ['view'], 'vote' => VoterInterface::ACCESS_ABSTAIN],
+                    ['voter' => $voter3, 'attributes' => ['view'], 'vote' => new Vote(VoterInterface::ACCESS_ABSTAIN, ['voter message'])],
+                ],
+            ]]);
+
+        $dataCollector = new SecurityDataCollector(null, null, null, $accessDecisionManager, null, null, true);
+
+        $dataCollector->collect(new Request(), new Response());
+
+        $actualDecisionLog = $dataCollector->getAccessDecisionLog();
+
+        $expectedDecisionLog = [[
+            'attributes' => ['view'],
+            'object' => new \stdClass(),
+            'result' => new AccessDecision(true),
+            'voter_details' => [
+                ['class' => $voter1::class, 'attributes' => ['view'], 'vote' => new Vote(VoterInterface::ACCESS_ABSTAIN)],
+                ['class' => $voter2::class, 'attributes' => ['view'], 'vote' => new Vote(VoterInterface::ACCESS_ABSTAIN)],
+                ['class' => $voter3::class, 'attributes' => ['view'], 'vote' => new Vote(VoterInterface::ACCESS_ABSTAIN, ['voter message'])],
+            ],
+        ]];
+
+        $this->assertEquals($actualDecisionLog, $expectedDecisionLog, 'Wrong value returned by getAccessDecisionLog');
+
+        $actualVoterClasses = array_map(static function (ClassStub $classStub): string {
+            return (string) $classStub;
+        }, $dataCollector->getVoters());
+
+        $expectedVoterClasses = [
+            $voter1::class,
+            $voter2::class,
+            $voter3::class,
         ];
 
         $this->assertSame(
@@ -300,13 +396,18 @@ class SecurityDataCollectorTest extends TestCase
     {
         $voter1 = new DummyVoter();
         $voter2 = new DummyVoter();
+        $voter3 = new DummyVoterWithObject();
 
-        $decoratedVoter1 = new TraceableVoter($voter1, new class implements EventDispatcherInterface {
-            public function dispatch(object $event, ?string $eventName = null): object
-            {
-                return new \stdClass();
-            }
-        });
+        $decoratedVoter = function (VoterInterface $voter) {
+            return new TraceableVoter(
+                $voter, new class implements EventDispatcherInterface {
+                    public function dispatch(object $event, ?string $eventName = null): object
+                    {
+                        return new \stdClass();
+                    }
+                }
+            );
+        };
 
         $strategy = MainConfiguration::STRATEGY_UNANIMOUS;
 
@@ -319,8 +420,9 @@ class SecurityDataCollectorTest extends TestCase
         $accessDecisionManager
             ->method('getVoters')
             ->willReturn([
-                $decoratedVoter1,
-                $decoratedVoter1,
+                $decoratedVoter($voter1),
+                $decoratedVoter($voter2),
+                $decoratedVoter($voter3),
             ]);
 
         $accessDecisionManager
@@ -335,6 +437,8 @@ class SecurityDataCollectorTest extends TestCase
                         ['voter' => $voter1, 'attributes' => ['edit'], 'vote' => VoterInterface::ACCESS_DENIED],
                         ['voter' => $voter2, 'attributes' => ['view'], 'vote' => VoterInterface::ACCESS_GRANTED],
                         ['voter' => $voter2, 'attributes' => ['edit'], 'vote' => VoterInterface::ACCESS_GRANTED],
+                        ['voter' => $voter3, 'attributes' => ['edit'], 'vote' => new Vote(VoterInterface::ACCESS_DENIED)],
+                        ['voter' => $voter3, 'attributes' => ['edit'], 'vote' => new Vote(VoterInterface::ACCESS_GRANTED)],
                     ],
                 ],
                 [
@@ -358,21 +462,23 @@ class SecurityDataCollectorTest extends TestCase
             [
                 'attributes' => ['view', 'edit'],
                 'object' => new \stdClass(),
-                'result' => false,
+                'result' => new AccessDecision(false),
                 'voter_details' => [
-                    ['class' => $voter1::class, 'attributes' => ['view'], 'vote' => VoterInterface::ACCESS_DENIED],
-                    ['class' => $voter1::class, 'attributes' => ['edit'], 'vote' => VoterInterface::ACCESS_DENIED],
-                    ['class' => $voter2::class, 'attributes' => ['view'], 'vote' => VoterInterface::ACCESS_GRANTED],
-                    ['class' => $voter2::class, 'attributes' => ['edit'], 'vote' => VoterInterface::ACCESS_GRANTED],
+                    ['class' => $voter1::class, 'attributes' => ['view'], 'vote' => new Vote(VoterInterface::ACCESS_DENIED)],
+                    ['class' => $voter1::class, 'attributes' => ['edit'], 'vote' => new Vote(VoterInterface::ACCESS_DENIED)],
+                    ['class' => $voter2::class, 'attributes' => ['view'], 'vote' => new Vote(VoterInterface::ACCESS_GRANTED)],
+                    ['class' => $voter2::class, 'attributes' => ['edit'], 'vote' => new Vote(VoterInterface::ACCESS_GRANTED)],
+                    ['class' => $voter3::class, 'attributes' => ['edit'], 'vote' => new Vote(VoterInterface::ACCESS_DENIED)],
+                    ['class' => $voter3::class, 'attributes' => ['edit'], 'vote' => new Vote(VoterInterface::ACCESS_GRANTED)],
                 ],
             ],
             [
                 'attributes' => ['update'],
                 'object' => new \stdClass(),
-                'result' => true,
+                'result' => new AccessDecision(true),
                 'voter_details' => [
-                    ['class' => $voter1::class, 'attributes' => ['update'], 'vote' => VoterInterface::ACCESS_GRANTED],
-                    ['class' => $voter2::class, 'attributes' => ['update'], 'vote' => VoterInterface::ACCESS_GRANTED],
+                    ['class' => $voter1::class, 'attributes' => ['update'], 'vote' => new Vote(VoterInterface::ACCESS_GRANTED)],
+                    ['class' => $voter2::class, 'attributes' => ['update'], 'vote' => new Vote(VoterInterface::ACCESS_GRANTED)],
                 ],
             ],
         ];
@@ -386,6 +492,7 @@ class SecurityDataCollectorTest extends TestCase
         $expectedVoterClasses = [
             $voter1::class,
             $voter2::class,
+            $voter3::class,
         ];
 
         $this->assertSame(
@@ -464,8 +571,11 @@ final class DummyVoter implements VoterInterface
     public function vote(TokenInterface $token, mixed $subject, array $attributes): int
     {
     }
+}
 
-    public function getVote(TokenInterface $token, mixed $subject, array $attributes): VoterInterface
+final class DummyVoterWithObject implements VoterInterface
+{
+    public function vote(TokenInterface $token, mixed $subject, array $attributes, ?VoteInterface $vote = null): int
     {
     }
 }

@@ -20,7 +20,6 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\AccessDecision;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Security\Core\Authorization\UserAuthorizationCheckerInterface;
-use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 use Symfony\Component\Security\Core\Exception\LogicException;
 use Symfony\Component\Security\Core\Exception\LogoutException;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -60,22 +59,10 @@ class Security implements AuthorizationCheckerInterface, UserAuthorizationChecke
     /**
      * Checks if the attributes are granted against the current authentication token and optionally supplied subject.
      */
-    public function isGranted(mixed $attributes, mixed $subject = null): bool
+    public function isGranted(mixed $attributes, mixed $subject = null, ?AccessDecision $accessDecision = null): bool
     {
-        return $this->getDecision($attributes, $subject)->isGranted();
-    }
-
-    /**
-     * Gets the access decision against the current authentication token and optionally supplied subject.
-     */
-    public function getDecision(mixed $attribute, mixed $subject = null): AccessDecision
-    {
-        $checker = $this->container->get('security.authorization_checker');
-        if (!method_exists($checker, 'getDecision')) {
-            return new AccessDecision($checker->isGranted($attribute, $subject) ? VoterInterface::ACCESS_GRANTED : VoterInterface::ACCESS_DENIED);
-        }
-
-        return $checker->getDecision($attribute, $subject);
+        return $this->container->get('security.authorization_checker')
+            ->isGranted($attributes, $subject, $accessDecision);
     }
 
     public function getToken(): ?TokenInterface

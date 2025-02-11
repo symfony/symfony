@@ -12,7 +12,6 @@
 namespace Symfony\Component\Security\Core\Authorization\Strategy;
 
 use Symfony\Component\Security\Core\Authorization\AccessDecision;
-use Symfony\Component\Security\Core\Authorization\Voter\Vote;
 use Symfony\Component\Security\Core\Authorization\Voter\VoteInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 
@@ -25,42 +24,45 @@ use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Alexander M. Turek <me@derrabus.de>
  */
-final class UnanimousStrategy implements AccessDecisionStrategyInterface, \Stringable
+final class UnanimousStrategy implements AccessDecisionVoteObjectStrategyInterface, \Stringable
 {
     public function __construct(
         private bool $allowIfAllAbstainDecisions = false,
     ) {
     }
 
-    public function decide(\Traversable $results): bool
+    public function decide(\Traversable $results, ?AccessDecision &$accessDecision = null): bool
     {
-        return $this->getDecision(new \ArrayIterator(array_map(fn ($vote) => new Vote($vote), iterator_to_array($results))))->isGranted();
-    }
-
-    public function getDecision(\Traversable $votes): AccessDecision
-    {
-        $currentVotes = [];
         $grant = 0;
+        $allVotes = [];
 
-        /** @var VoteInterface $vote */
-        foreach ($votes as $vote) {
-            $currentVotes[] = $vote;
-
-            if ($vote->isDenied()) {
-                return new AccessDecision(VoterInterface::ACCESS_DENIED, $currentVotes);
+        foreach ($results as $result) {
+            $allVotes[] = $result;
+            if ($result instanceof VoteInterface) {
+                $result = $result->getAccess();
             }
 
-            if ($vote->isGranted()) {
+            if (VoterInterface::ACCESS_DENIED === $result) {
+                $accessDecision = new AccessDecision(false, $allVotes);
+
+                return $accessDecision->getAccess();
+            }
+
+            if (VoterInterface::ACCESS_GRANTED === $result) {
                 ++$grant;
             }
         }
 
         // no deny votes
         if ($grant > 0) {
-            return new AccessDecision(VoterInterface::ACCESS_GRANTED, $currentVotes);
+            $accessDecision = new AccessDecision(true, $allVotes);
+
+            return $accessDecision->getAccess();
         }
 
-        return new AccessDecision($this->allowIfAllAbstainDecisions ? VoterInterface::ACCESS_GRANTED : VoterInterface::ACCESS_DENIED, $currentVotes);
+        $accessDecision = new AccessDecision($this->allowIfAllAbstainDecisions, $allVotes);
+
+        return $accessDecision->getAccess();
     }
 
     public function __toString(): string

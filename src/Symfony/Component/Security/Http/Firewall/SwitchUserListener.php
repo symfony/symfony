@@ -21,7 +21,6 @@ use Symfony\Component\Security\Core\Authentication\Token\SwitchUserToken;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\AccessDecision;
 use Symfony\Component\Security\Core\Authorization\AccessDecisionManagerInterface;
-use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\Security\Core\Exception\AuthenticationCredentialsNotFoundException;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
@@ -156,19 +155,17 @@ class SwitchUserListener extends AbstractListener
             throw $e;
         }
 
-        if (method_exists($this->accessDecisionManager, 'getDecision')) {
-            $decision = $this->accessDecisionManager->getDecision($token, [$this->role], $user);
-        } else {
-            $decision = new AccessDecision(
-                $this->accessDecisionManager->decide($token, [$this->role], $user)
-                    ? VoterInterface::ACCESS_GRANTED : VoterInterface::ACCESS_DENIED
-            );
+        $accessDecision = null;
+        $decision = $this->accessDecisionManager->decide($token, [$this->role], $user, false, $accessDecision);
+        if(! $accessDecision instanceof AccessDecision) {
+            $accessDecision = new AccessDecision($decision);
         }
 
-        if ($decision->isDenied()) {
+
+        if (!$decision) {
             $exception = new AccessDeniedException();
             $exception->setAttributes($this->role);
-            $exception->setAccessDecision($decision);
+            $exception->setAccessDecision($accessDecision);
             throw $exception;
         }
 

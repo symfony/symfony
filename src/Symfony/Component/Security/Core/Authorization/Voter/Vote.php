@@ -11,84 +11,32 @@
 
 namespace Symfony\Component\Security\Core\Authorization\Voter;
 
-use Symfony\Component\Security\Core\Exception\InvalidArgumentException;
-
 /**
- * A Vote is returned by a Voter and contains the access result (granted, abstain or denied).
- * It can also contain one or multiple messages explaining the vote decision.
+ * A Vote is returned by a Voter and contains the access and some messages.
  *
- * @author Dany Maillard <danymaillard93b@gmail.com>
- * @author Antoine Lamirault <lamiraultantoine@gmail.com>
  * @author Roman JOLY <eltharin18@outlook.fr>
  */
 class Vote implements VoteInterface
 {
-    /**
-     * @var string[]
-     */
-    private array $messages;
+    private const VALID_VOTES = [
+        VoterInterface::ACCESS_GRANTED => true,
+        VoterInterface::ACCESS_DENIED => true,
+        VoterInterface::ACCESS_ABSTAIN => true,
+    ];
 
-    /**
-     * @param VoterInterface::ACCESS_*|int $access One of the VoterInterface constants (ACCESS_GRANTED, ACCESS_ABSTAIN, ACCESS_DENIED)
-     *                                             or an integer when scoring is false
-     */
     public function __construct(
         private int $access,
-        string|array $messages = [],
-        private array $context = [],
-        private bool $scoring = false,
+        private string|array $messages = [],
     ) {
-        if (!$scoring && !\in_array($access, [VoterInterface::ACCESS_GRANTED, VoterInterface::ACCESS_ABSTAIN, VoterInterface::ACCESS_DENIED], true)) {
-            throw new \LogicException(\sprintf('"$access" must return one of "%s" constants ("ACCESS_GRANTED", "ACCESS_DENIED" or "ACCESS_ABSTAIN") when "$scoring" is false, "%s" returned.', VoterInterface::class, $access));
+        if (!\in_array($access, [VoterInterface::ACCESS_GRANTED, VoterInterface::ACCESS_ABSTAIN, VoterInterface::ACCESS_DENIED], true)) {
+            throw new \LogicException(\sprintf('"$access" must return one of "%s" constants ("ACCESS_GRANTED", "ACCESS_DENIED" or "ACCESS_ABSTAIN"), "%s" returned.', VoterInterface::class, $access));
         }
         $this->setMessages($messages);
-    }
-
-    public function __debugInfo(): array
-    {
-        return [
-            'message' => $this->getMessage(),
-            'context' => $this->context,
-            'voteResultMessage' => $this->getVoteResultMessage(),
-        ];
     }
 
     public function getAccess(): int
     {
         return $this->access;
-    }
-
-    public function isGranted(): bool
-    {
-        return $this->access > 0;
-    }
-
-    public function isAbstainer(): bool
-    {
-        return VoterInterface::ACCESS_ABSTAIN === $this->access;
-    }
-
-    public function isDenied(): bool
-    {
-        return $this->access < 0;
-    }
-
-    /**
-     * @param string|string[] $messages
-     */
-    public function setMessages(string|array $messages): void
-    {
-        $this->messages = (array) $messages;
-        foreach ($this->messages as $message) {
-            if (!\is_string($message)) {
-                throw new InvalidArgumentException(\sprintf('Message must be string, "%s" given.', get_debug_type($message)));
-            }
-        }
-    }
-
-    public function addMessage(string $message): void
-    {
-        $this->messages[] = $message;
     }
 
     /**
@@ -99,23 +47,16 @@ class Vote implements VoteInterface
         return $this->messages;
     }
 
-    public function getMessage(): string
+    /**
+     * @throws \InvalidArgumentException
+     */
+    public function setMessages(string|array $messages): void
     {
-        return implode(', ', $this->messages);
-    }
-
-    public function getVoteResultMessage(): string
-    {
-        return $this->scoring ? 'SCORE : '.$this->access : match ($this->access) {
-            VoterInterface::ACCESS_GRANTED => 'ACCESS GRANTED',
-            VoterInterface::ACCESS_DENIED => 'ACCESS DENIED',
-            VoterInterface::ACCESS_ABSTAIN => 'ACCESS ABSTAIN',
-            default => 'UNKNOWN ACCESS TYPE',
-        };
-    }
-
-    public function getContext(): array
-    {
-        return $this->context;
+        $this->messages = (array) $messages;
+        foreach ($this->messages as $message) {
+            if (!\is_string($message)) {
+                throw new \InvalidArgumentException(\sprintf('Message must be string, "%s" given.', get_debug_type($message)));
+            }
+        }
     }
 }

@@ -18,7 +18,6 @@ use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInt
 use Symfony\Component\Security\Core\Authorization\AccessDecision;
 use Symfony\Component\Security\Core\Authorization\AccessDecisionManagerInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\AuthenticatedVoter;
-use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\Security\Http\AccessMapInterface;
 use Symfony\Component\Security\Http\Event\LazyResponseEvent;
@@ -75,17 +74,15 @@ class AccessListener extends AbstractListener
 
         $token = $this->tokenStorage->getToken() ?? new NullToken();
 
-        if (method_exists($this->accessDecisionManager, 'getDecision')) {
-            $decision = $this->accessDecisionManager->getDecision($token, $attributes, $request, true);
-        } else {
-            $decision = new AccessDecision(
-                $this->accessDecisionManager->decide($token, $attributes, $request, true)
-                    ? VoterInterface::ACCESS_GRANTED : VoterInterface::ACCESS_DENIED
-            );
+        $accessDecision = null;
+        $decision = $this->accessDecisionManager->decide($token, $attributes, $request, true, $accessDecision);
+
+        if(! $accessDecision instanceof AccessDecision) {
+            $accessDecision = new AccessDecision($decision);
         }
 
-        if ($decision->isDenied()) {
-            throw $this->createAccessDeniedException($request, $attributes, $decision);
+        if ($accessDecision->isDenied()) {
+            throw $this->createAccessDeniedException($request, $attributes, $accessDecision);
         }
     }
 

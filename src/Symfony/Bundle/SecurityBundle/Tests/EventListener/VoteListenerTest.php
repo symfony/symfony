@@ -33,7 +33,7 @@ class VoteListenerTest extends TestCase
         $traceableAccessDecisionManager
             ->expects($this->once())
             ->method('addVoterVote')
-            ->with($voter, ['myattr1', 'myattr2'], new Vote(VoterInterface::ACCESS_GRANTED));
+            ->with($voter, ['myattr1', 'myattr2'], VoterInterface::ACCESS_GRANTED);
 
         $sut = new VoteListener($traceableAccessDecisionManager);
         $sut->onVoterVote(new VoteEvent($voter, 'mysubject', ['myattr1', 'myattr2'], VoterInterface::ACCESS_GRANTED));
@@ -49,13 +49,12 @@ class VoteListenerTest extends TestCase
             ->onlyMethods(['addVoterVote'])
             ->getMock();
 
-        $vote = new Vote(VoterInterface::ACCESS_GRANTED);
         $traceableAccessDecisionManager
             ->expects($this->once())
             ->method('addVoterVote')
-            ->with($voter, ['myattr1', 'myattr2'], $vote);
+            ->with($voter, ['myattr1', 'myattr2'], new Vote(VoterInterface::ACCESS_GRANTED));
 
         $sut = new VoteListener($traceableAccessDecisionManager);
-        $sut->onVoterVote(new VoteEvent($voter, 'mysubject', ['myattr1', 'myattr2'], $vote));
+        $sut->onVoterVote(new VoteEvent($voter, 'mysubject', ['myattr1', 'myattr2'], new Vote(VoterInterface::ACCESS_GRANTED)));
     }
 }

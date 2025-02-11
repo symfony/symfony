@@ -9,7 +9,7 @@ CHANGELOG
  * Add `OfflineTokenInterface` to mark tokens that do not represent the currently logged-in user
  * Deprecate `UserInterface::eraseCredentials()` and `TokenInterface::eraseCredentials()`,
    erase credentials e.g. using `__serialize()` instead
- * Add the ability for voter to return decision reason and a score by passing a `Vote` object
+ * Add the ability for voter to return decision reason by passing a `Vote` object
 
 7.2
 ---

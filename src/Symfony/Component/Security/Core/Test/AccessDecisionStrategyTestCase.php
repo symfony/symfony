@@ -18,8 +18,8 @@ use Symfony\Component\Security\Core\Authorization\AccessDecision;
 use Symfony\Component\Security\Core\Authorization\AccessDecisionManager;
 use Symfony\Component\Security\Core\Authorization\Strategy\AccessDecisionStrategyInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\Vote;
+use Symfony\Component\Security\Core\Authorization\Voter\VoteInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
-use Symfony\Component\Security\Core\Exception\LogicException;
 
 /**
  * Abstract test case for access decision strategies.
@@ -34,25 +34,19 @@ abstract class AccessDecisionStrategyTestCase extends TestCase
      * @param VoterInterface[] $voters
      */
     #[DataProvider('provideStrategyTests')]
-    final public function testDecide(AccessDecisionStrategyInterface $strategy, array $voters, AccessDecision $expected)
+    final public function testDecide(AccessDecisionStrategyInterface $strategy, array $voters, bool $expected, array $votesExpected)
     {
         $token = $this->createMock(TokenInterface::class);
         $manager = new AccessDecisionManager($voters, $strategy);
 
-        $this->assertSame($expected->isGranted(), $manager->decide($token, ['ROLE_FOO']));
-    }
+        $accessDecision = null;
+        $decision = $manager->decide($token, ['ROLE_FOO'], null, false, $accessDecision);
 
-    /**
-     * @dataProvider provideStrategyTests
-     *
-     * @param VoterInterface[] $voters
-     */
-    final public function testGetDecision(AccessDecisionStrategyInterface $strategy, array $voters, AccessDecision $expected)
-    {
-        $token = $this->createMock(TokenInterface::class);
-        $manager = new AccessDecisionManager($voters, $strategy);
+        $this->assertSame($expected, $decision);
 
-        $this->assertEquals($expected, $manager->getDecision($token, ['ROLE_FOO']));
+        $this->assertInstanceOf(AccessDecision::class, $accessDecision);
+        $this->assertSame($expected, $accessDecision->getAccess());
+        $this->assertEquals($votesExpected, $accessDecision->getVotes());
     }
 
     /**
@@ -68,15 +62,12 @@ abstract class AccessDecisionStrategyTestCase extends TestCase
         $voters = [];
         for ($i = 0; $i < $grants; ++$i) {
             $voters[] = static::getVoter(VoterInterface::ACCESS_GRANTED);
-            $voters[] = static::getVoterWithVoteObject(VoterInterface::ACCESS_GRANTED);
         }
         for ($i = 0; $i < $denies; ++$i) {
             $voters[] = static::getVoter(VoterInterface::ACCESS_DENIED);
-            $voters[] = static::getVoterWithVoteObject(VoterInterface::ACCESS_DENIED);
         }
         for ($i = 0; $i < $abstains; ++$i) {
             $voters[] = static::getVoter(VoterInterface::ACCESS_ABSTAIN);
-            $voters[] = static::getVoterWithVoteObject(VoterInterface::ACCESS_ABSTAIN);
         }
 
         return $voters;
@@ -94,11 +85,6 @@ abstract class AccessDecisionStrategyTestCase extends TestCase
             {
                 return $this->vote;
             }
-
-            public function __call($function, $args)
-            {
-                throw new LogicException('This function must not be acceded.');
-            }
         };
     }
 
@@ -110,21 +96,12 @@ abstract class AccessDecisionStrategyTestCase extends TestCase
             ) {
             }
 
-            public function vote(TokenInterface $token, $subject, array $attributes): int
+            public function vote(TokenInterface $token, $subject, array $attributes, ?VoteInterface &$vote = null): int
             {
+                $vote = new Vote($this->vote);
+
                 return $this->vote;
             }
-
-            public function getVote(TokenInterface $token, mixed $subject, array $attributes): Vote
-            {
-                return new Vote($this->vote);
-            }
         };
-    }
-
-    final protected static function getAccessDecision(bool $decision, array $votes): AccessDecision
-    {
-        return new AccessDecision($decision ? VoterInterface::ACCESS_GRANTED : VoterInterface::ACCESS_DENIED,
-            array_map(fn ($v) => new Vote($v), $votes));
     }
 }

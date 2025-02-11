@@ -27,12 +27,7 @@ class RoleVoter implements CacheableVoterInterface
 
     public function vote(TokenInterface $token, mixed $subject, array $attributes): int
     {
-        return $this->getVote($token, $subject, $attributes)->getAccess();
-    }
-
-    public function getVote(TokenInterface $token, mixed $subject, array $attributes): VoteInterface
-    {
-        $result = new Vote(VoterInterface::ACCESS_ABSTAIN);
+        $result = VoterInterface::ACCESS_ABSTAIN;
         $roles = $this->extractRoles($token);
 
         foreach ($attributes as $attribute) {
@@ -40,9 +35,9 @@ class RoleVoter implements CacheableVoterInterface
                 continue;
             }
 
-            $result = new Vote(VoterInterface::ACCESS_DENIED);
+            $result = VoterInterface::ACCESS_DENIED;
             if (\in_array($attribute, $roles, true)) {
-                return new Vote(VoterInterface::ACCESS_GRANTED);
+                return VoterInterface::ACCESS_GRANTED;
             }
         }
 

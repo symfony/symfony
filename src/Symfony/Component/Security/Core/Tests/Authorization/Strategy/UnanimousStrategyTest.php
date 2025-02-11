@@ -12,7 +12,7 @@
 namespace Authorization\Strategy;
 
 use Symfony\Component\Security\Core\Authorization\Strategy\UnanimousStrategy;
-use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
+use Symfony\Component\Security\Core\Authorization\Voter\Vote;
 use Symfony\Component\Security\Core\Test\AccessDecisionStrategyTestCase;
 
 class UnanimousStrategyTest extends AccessDecisionStrategyTestCase
@@ -21,36 +21,40 @@ class UnanimousStrategyTest extends AccessDecisionStrategyTestCase
     {
         $strategy = new UnanimousStrategy();
 
-        yield [$strategy, self::getVoters(1, 0, 0), self::getAccessDecision(true, [
-            VoterInterface::ACCESS_GRANTED,
-            VoterInterface::ACCESS_GRANTED,
-        ])];
-        yield [$strategy, self::getVoters(1, 0, 1), self::getAccessDecision(true, [
-            VoterInterface::ACCESS_GRANTED,
-            VoterInterface::ACCESS_GRANTED,
-            VoterInterface::ACCESS_ABSTAIN,
-            VoterInterface::ACCESS_ABSTAIN,
-        ])];
-        yield [$strategy, self::getVoters(1, 1, 0), self::getAccessDecision(false, [
-            VoterInterface::ACCESS_GRANTED,
-            VoterInterface::ACCESS_GRANTED,
-            VoterInterface::ACCESS_DENIED,
-        ])];
+        yield [$strategy, self::getVoters(1, 0, 0), true, [1]];
+        yield [$strategy, self::getVoters(1, 0, 1), true, [1, 0]];
+        yield [$strategy, self::getVoters(1, 1, 0), false, [1, -1]];
 
-        yield [$strategy, self::getVoters(0, 0, 2), self::getAccessDecision(false, [
-            VoterInterface::ACCESS_ABSTAIN,
-            VoterInterface::ACCESS_ABSTAIN,
-            VoterInterface::ACCESS_ABSTAIN,
-            VoterInterface::ACCESS_ABSTAIN,
-        ])];
+        yield [$strategy, self::getVoters(0, 0, 2), false, [0, 0]];
 
-        $strategy = new UnanimousStrategy(true);
+        $strategy = new UnanimousStrategy(true, []);
 
-        yield [$strategy, self::getVoters(0, 0, 2), self::getAccessDecision(true, [
-            VoterInterface::ACCESS_ABSTAIN,
-            VoterInterface::ACCESS_ABSTAIN,
-            VoterInterface::ACCESS_ABSTAIN,
-            VoterInterface::ACCESS_ABSTAIN,
-        ])];
+        yield [$strategy, self::getVoters(0, 0, 2), true, [0, 0]];
+
+        yield [$strategy, [
+            self::getVoterWithVoteObject(1),
+            self::getVoter(-1),
+            self::getVoter(0),
+            self::getVoterWithVoteObject(1),
+        ], false, [new Vote(1), -1]];
+
+        yield [$strategy, [
+            self::getVoterWithVoteObject(-1),
+            self::getVoter(1),
+            self::getVoter(0),
+            self::getVoterWithVoteObject(1),
+        ], false, [new Vote(-1)]];
+
+        yield [$strategy, [
+            self::getVoterWithVoteObject(0),
+            self::getVoter(0),
+            self::getVoter(0),
+            self::getVoterWithVoteObject(1),
+        ], true, [
+            new Vote(0),
+            0,
+            0,
+            new Vote(1)
+        ]];
     }
 }

@@ -19,10 +19,10 @@ use Symfony\Component\Security\Core\Authorization\Voter\VoteInterface;
  *
  * @author Alexander M. Turek <me@derrabus.de>
  */
-interface AccessDecisionStrategyInterface
+interface AccessDecisionVoteObjectStrategyInterface extends AccessDecisionStrategyInterface
 {
     /**
      * @param \Traversable<int|VoteInterface> $results
      */
-    public function decide(\Traversable $results/* , ?AccessDecision &$accessDecision */): bool;
+    public function decide(\Traversable $results, ?AccessDecision &$accessDecision = null): bool;
 }

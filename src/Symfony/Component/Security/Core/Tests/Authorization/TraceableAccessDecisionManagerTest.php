@@ -19,6 +19,7 @@ use Symfony\Component\Security\Core\Authorization\TraceableAccessDecisionManager
 use Symfony\Component\Security\Core\Authorization\Voter\Vote;
 use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 use Symfony\Component\Security\Core\Tests\Fixtures\DummyVoter;
+use Symfony\Component\Security\Core\Tests\Fixtures\DummyVoterWithObject;
 
 class TraceableAccessDecisionManagerTest extends TestCase
 {
@@ -55,17 +56,18 @@ class TraceableAccessDecisionManagerTest extends TestCase
     {
         $voter1 = new DummyVoter();
         $voter2 = new DummyVoter();
+        $voter3 = new DummyVoterWithObject();
 
         yield [
             [[
-                 'attributes' => ['ATTRIBUTE_1'],
-                 'object' => null,
-                 'result' => true,
-                 'voterDetails' => [
-                     ['voter' => $voter1, 'attributes' => ['ATTRIBUTE_1'], 'vote' => VoterInterface::ACCESS_GRANTED],
-                     ['voter' => $voter2, 'attributes' => ['ATTRIBUTE_1'], 'vote' => VoterInterface::ACCESS_GRANTED],
-                 ],
-             ]],
+                'attributes' => ['ATTRIBUTE_1'],
+                'object' => null,
+                'result' => true,
+                'voterDetails' => [
+                    ['voter' => $voter1, 'attributes' => ['ATTRIBUTE_1'], 'vote' => VoterInterface::ACCESS_GRANTED],
+                    ['voter' => $voter2, 'attributes' => ['ATTRIBUTE_1'], 'vote' => VoterInterface::ACCESS_GRANTED],
+                ],
+            ]],
             ['ATTRIBUTE_1'],
             null,
             [
@@ -76,32 +78,14 @@ class TraceableAccessDecisionManagerTest extends TestCase
         ];
         yield [
             [[
-                 'attributes' => ['ATTRIBUTE_1'],
-                 'object' => null,
-                 'result' => true,
-                 'voterDetails' => [
-                     ['voter' => $voter1, 'attributes' => ['ATTRIBUTE_1'], 'vote' => VoterInterface::ACCESS_GRANTED],
-                     ['voter' => $voter2, 'attributes' => ['ATTRIBUTE_1'], 'vote' => new Vote(VoterInterface::ACCESS_GRANTED)],
-                 ],
-             ]],
-            ['ATTRIBUTE_1'],
-            null,
-            [
-                [$voter1, VoterInterface::ACCESS_GRANTED],
-                [$voter2, new Vote(VoterInterface::ACCESS_GRANTED)],
-            ],
-            true,
-        ];
-        yield [
-            [[
-                 'attributes' => ['ATTRIBUTE_1', 'ATTRIBUTE_2'],
-                 'object' => true,
-                 'result' => false,
-                 'voterDetails' => [
-                     ['voter' => $voter1, 'attributes' => ['ATTRIBUTE_1', 'ATTRIBUTE_2'], 'vote' => VoterInterface::ACCESS_ABSTAIN],
-                     ['voter' => $voter2, 'attributes' => ['ATTRIBUTE_1', 'ATTRIBUTE_2'], 'vote' => VoterInterface::ACCESS_GRANTED],
-                 ],
-             ]],
+                'attributes' => ['ATTRIBUTE_1', 'ATTRIBUTE_2'],
+                'object' => true,
+                'result' => false,
+                'voterDetails' => [
+                    ['voter' => $voter1, 'attributes' => ['ATTRIBUTE_1', 'ATTRIBUTE_2'], 'vote' => VoterInterface::ACCESS_ABSTAIN],
+                    ['voter' => $voter2, 'attributes' => ['ATTRIBUTE_1', 'ATTRIBUTE_2'], 'vote' => VoterInterface::ACCESS_GRANTED],
+                ],
+            ]],
             ['ATTRIBUTE_1', 'ATTRIBUTE_2'],
             true,
             [
@@ -112,55 +96,19 @@ class TraceableAccessDecisionManagerTest extends TestCase
         ];
         yield [
             [[
-                 'attributes' => ['ATTRIBUTE_1', 'ATTRIBUTE_2'],
-                 'object' => true,
-                 'result' => false,
-                 'voterDetails' => [
-                     ['voter' => $voter1, 'attributes' => ['ATTRIBUTE_1', 'ATTRIBUTE_2'], 'vote' => new Vote(VoterInterface::ACCESS_ABSTAIN)],
-                     ['voter' => $voter2, 'attributes' => ['ATTRIBUTE_1', 'ATTRIBUTE_2'], 'vote' => new Vote(VoterInterface::ACCESS_GRANTED)],
-                 ],
-             ]],
-            ['ATTRIBUTE_1', 'ATTRIBUTE_2'],
-            true,
-            [
-                [$voter1, new Vote(VoterInterface::ACCESS_ABSTAIN)],
-                [$voter2, new Vote(VoterInterface::ACCESS_GRANTED)],
-            ],
-            false,
-        ];
-        yield [
-            [[
-                 'attributes' => [null],
-                 'object' => 'jolie string',
-                 'result' => false,
-                 'voterDetails' => [
-                     ['voter' => $voter1, 'attributes' => [null], 'vote' => VoterInterface::ACCESS_ABSTAIN],
-                     ['voter' => $voter2, 'attributes' => [null], 'vote' => VoterInterface::ACCESS_DENIED],
-                 ],
-             ]],
+                'attributes' => [null],
+                'object' => 'jolie string',
+                'result' => false,
+                'voterDetails' => [
+                    ['voter' => $voter1, 'attributes' => [null], 'vote' => VoterInterface::ACCESS_ABSTAIN],
+                    ['voter' => $voter2, 'attributes' => [null], 'vote' => VoterInterface::ACCESS_DENIED],
+                ],
+            ]],
             [null],
             'jolie string',
             [
                 [$voter1, VoterInterface::ACCESS_ABSTAIN],
                 [$voter2, VoterInterface::ACCESS_DENIED],
-            ],
-            false,
-        ];
-        yield [
-            [[
-                 'attributes' => [null],
-                 'object' => 'jolie string',
-                 'result' => false,
-                 'voterDetails' => [
-                     ['voter' => $voter1, 'attributes' => [null], 'vote' => new Vote(VoterInterface::ACCESS_ABSTAIN)],
-                     ['voter' => $voter2, 'attributes' => [null], 'vote' => new Vote(VoterInterface::ACCESS_DENIED)],
-                 ],
-             ]],
-            [null],
-            'jolie string',
-            [
-                [$voter1, new Vote(VoterInterface::ACCESS_ABSTAIN)],
-                [$voter2, new Vote(VoterInterface::ACCESS_DENIED)],
             ],
             false,
         ];
@@ -223,6 +171,27 @@ class TraceableAccessDecisionManagerTest extends TestCase
                 [$voter2, VoterInterface::ACCESS_DENIED],
             ],
             false,
+        ];
+
+        yield [
+            [[
+                 'attributes' => ['ATTRIBUTE_1'],
+                 'object' => null,
+                 'result' => true,
+                 'voterDetails' => [
+                     ['voter' => $voter1, 'attributes' => ['ATTRIBUTE_1'], 'vote' => VoterInterface::ACCESS_GRANTED],
+                     ['voter' => $voter2, 'attributes' => ['ATTRIBUTE_1'], 'vote' => VoterInterface::ACCESS_GRANTED],
+                     ['voter' => $voter3, 'attributes' => ['ATTRIBUTE_1'], 'vote' => new Vote(VoterInterface::ACCESS_GRANTED)],
+                 ],
+             ]],
+            ['ATTRIBUTE_1'],
+            null,
+            [
+                [$voter1, VoterInterface::ACCESS_GRANTED],
+                [$voter2, VoterInterface::ACCESS_GRANTED],
+                [$voter3, new Vote(VoterInterface::ACCESS_GRANTED)],
+            ],
+            true,
         ];
     }
 
@@ -298,8 +267,6 @@ class TraceableAccessDecisionManagerTest extends TestCase
                 'object' => null,
                 'voterDetails' => [
                     ['voter' => $voter1, 'attributes' => ['attr1'], 'vote' => VoterInterface::ACCESS_GRANTED],
-                    ['voter' => $voter2, 'attributes' => ['attr1'], 'vote' => VoterInterface::ACCESS_ABSTAIN],
-                    ['voter' => $voter3, 'attributes' => ['attr1'], 'vote' => VoterInterface::ACCESS_ABSTAIN],
                 ],
                 'result' => true,
             ],
@@ -309,7 +276,6 @@ class TraceableAccessDecisionManagerTest extends TestCase
                 'voterDetails' => [
                     ['voter' => $voter1, 'attributes' => ['attr2'], 'vote' => VoterInterface::ACCESS_ABSTAIN],
                     ['voter' => $voter2, 'attributes' => ['attr2'], 'vote' => VoterInterface::ACCESS_GRANTED],
-                    ['voter' => $voter3, 'attributes' => ['attr2'], 'vote' => VoterInterface::ACCESS_ABSTAIN],
                 ],
                 'result' => true,
             ],

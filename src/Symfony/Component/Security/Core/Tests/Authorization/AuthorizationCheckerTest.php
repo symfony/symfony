@@ -15,58 +15,49 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\Authentication\Token\NullToken;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
+use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Core\Authorization\AccessDecision;
 use Symfony\Component\Security\Core\Authorization\AccessDecisionManagerInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationChecker;
-use Symfony\Component\Security\Core\Authorization\Voter\CacheableVoterInterface;
-use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 use Symfony\Component\Security\Core\User\InMemoryUser;
 
 class AuthorizationCheckerTest extends TestCase
 {
+    private MockObject&AccessDecisionManagerInterface $accessDecisionManager;
+    private AuthorizationChecker $authorizationChecker;
     private TokenStorage $tokenStorage;
 
     protected function setUp(): void
     {
+        $this->accessDecisionManager = $this->createMock(AccessDecisionManagerInterface::class);
         $this->tokenStorage = new TokenStorage();
+
+        $this->authorizationChecker = new AuthorizationChecker($this->tokenStorage, $this->accessDecisionManager);
     }
 
-    /**
-     * @dataProvider provideDataWithAndWithoutVoteObject
-     */
-    public function testVoteWithoutAuthenticationToken($useVoteObject, $decideFunction, $voteFunction, $excpectedCallback)
+    public function testVoteWithoutAuthenticationToken()
     {
-        $accessDecisionManager = $this->createAccessDecisionManagerMock($useVoteObject);
+        $authorizationChecker = new AuthorizationChecker($this->tokenStorage, $this->accessDecisionManager);
 
-        $authorizationChecker = new AuthorizationChecker($this->tokenStorage, $accessDecisionManager);
-
-        $accessDecisionManager->expects($this->once())
-            ->method($decideFunction)
-            ->with($this->isInstanceOf(NullToken::class))
-            ->willReturn($useVoteObject ? new AccessDecision(VoterInterface::ACCESS_DENIED) : false);
+        $this->accessDecisionManager->expects($this->once())->method('decide')->with($this->isInstanceOf(NullToken::class))->willReturn(false);
 
         $authorizationChecker->isGranted('ROLE_FOO');
     }
 
     /**
-     * @dataProvider provideDataWithAndWithoutVoteObject
+     * @dataProvider isGrantedProvider
      */
-    public function testIsGranted($useVoteObject = null, $decideFunction = null, $voteFunction = null, $excpectedCallback=null)
+    public function testIsGranted($decide)
     {
-        foreach([true, false] as $decision) {
-            $accessDecisionManager = $this->createAccessDecisionManagerMock($useVoteObject);
-            $authorizationChecker = new AuthorizationChecker($this->tokenStorage, $accessDecisionManager);
+        $token = new UsernamePasswordToken(new InMemoryUser('username', 'password', ['ROLE_USER']), 'provider', ['ROLE_USER']);
 
-            $token = new UsernamePasswordToken(new InMemoryUser('username', 'password', ['ROLE_USER']), 'provider', ['ROLE_USER']);
-
-            $accessDecisionManager
-                ->expects($this->once())
-                ->method($decideFunction)
-                ->willReturn($useVoteObject ? new AccessDecision($decision ? VoterInterface::ACCESS_GRANTED : VoterInterface::ACCESS_DENIED) : $decision);
-            $this->tokenStorage->setToken($token);
-            $this->assertSame($decision, $authorizationChecker->isGranted('ROLE_FOO'));
-        }
+        $this->accessDecisionManager
+            ->expects($this->once())
+            ->method('decide')
+            ->willReturn($decide);
+        $this->tokenStorage->setToken($token);
+        $this->assertSame($decide, $this->authorizationChecker->isGranted('ROLE_FOO'));
     }
 
     public static function isGrantedProvider()
@@ -74,54 +65,93 @@ class AuthorizationCheckerTest extends TestCase
         return [[true], [false]];
     }
 
-    public function provideDataWithAndWithoutVoteObject()
+    public function testIsGrantedWithObjectAttribute()
     {
-        yield [
-            'useVoteObject' => false,
-            'decideFunction' => 'decide',
-            'voteFunction' => 'vote',
-            'excpectedCallback' => fn ($a) => $a,
-        ];
-
-        yield [
-            'useVoteObject' => true,
-            'decideFunction' => 'getDecision',
-            'voteFunction' => 'getVote',
-            'excpectedCallback' => fn ($access, $votes = []) => new AccessDecision(
-                $access ? VoterInterface::ACCESS_GRANTED : VoterInterface::ACCESS_DENIED,
-                $votes
-            ),
-        ];
-    }
-
-    /**
-     * @dataProvider provideDataWithAndWithoutVoteObject
-     */
-    public function testIsGrantedWithObjectAttribute($useVoteObject, $decideFunction, $voteFunction, $excpectedCallback)
-    {
-        $accessDecisionManager = $this->createAccessDecisionManagerMock($useVoteObject);
-        $authorizationChecker = new AuthorizationChecker($this->tokenStorage, $accessDecisionManager);
-
         $attribute = new \stdClass();
 
         $token = new UsernamePasswordToken(new InMemoryUser('username', 'password', ['ROLE_USER']), 'provider', ['ROLE_USER']);
 
-        $accessDecisionManager
+        $this->accessDecisionManager
             ->expects($this->once())
-            ->method($decideFunction)
+            ->method('decide')
             ->with($this->identicalTo($token), $this->identicalTo([$attribute]))
-            ->willReturn($useVoteObject ? new AccessDecision(VoterInterface::ACCESS_GRANTED) : true);
+            ->willReturn(true);
         $this->tokenStorage->setToken($token);
-        $this->assertTrue($authorizationChecker->isGranted($attribute));
+        $this->assertTrue($this->authorizationChecker->isGranted($attribute));
     }
 
-    public function createAccessDecisionManagerMock(bool $useVoteObject)
+    public function testIsGrantedWithAccessDecisionObject()
     {
-        return $useVoteObject ?
-            $this->getMockBuilder(AccessDecisionManagerInterface::class)
-                ->onlyMethods(['decide'])
-                ->addMethods(['getDecision'])
-                ->getMock():
-            $this->createMock(AccessDecisionManagerInterface::class);
+        $attribute = new \stdClass();
+
+        $token = new UsernamePasswordToken(new InMemoryUser('username', 'password', ['ROLE_USER']), 'provider', ['ROLE_USER']);
+
+        $accessDecisionManager = new class implements AccessDecisionManagerInterface {
+            public function decide(TokenInterface $token, array $attributes, mixed $object = null, bool $allowMultipleAttributes = false, ?AccessDecision &$accessDecision = null): bool
+            {
+                $accessDecision = new AccessDecision(true);
+
+                return $accessDecision->getAccess();
+            }
+        };
+
+        $authorizationChecker = new AuthorizationChecker($this->tokenStorage, $accessDecisionManager);
+
+        $this->tokenStorage->setToken($token);
+
+        $accessDecision = null;
+        $decision = $authorizationChecker->isGranted($attribute, $token, $accessDecision);
+        $this->assertInstanceOf(AccessDecision::class, $accessDecision);
+        $this->assertTrue($decision);
+        $this->assertTrue($accessDecision->getAccess());
+        $this->assertEmpty($accessDecision->getMessage());
+    }
+
+    public function testIsGrantedWithoutAccessDecisionObject()
+    {
+        $attribute = new \stdClass();
+
+        $token = new UsernamePasswordToken(new InMemoryUser('username', 'password', ['ROLE_USER']), 'provider', ['ROLE_USER']);
+
+        $accessDecisionManager = new class implements AccessDecisionManagerInterface {
+            public function decide(TokenInterface $token, array $attributes, mixed $object = null): bool
+            {
+                return true;
+            }
+        };
+
+        $authorizationChecker = new AuthorizationChecker($this->tokenStorage, $accessDecisionManager);
+
+        $this->tokenStorage->setToken($token);
+
+        $accessDecision = null;
+        $decision = $authorizationChecker->isGranted($attribute, $token, $accessDecision);
+        $this->assertNull($accessDecision);
+        $this->assertTrue($decision);
+    }
+
+    public function testIsGrantedWithAccessDecisionObjectFromADM()
+    {
+        $attribute = new \stdClass();
+
+        $token = new UsernamePasswordToken(new InMemoryUser('username', 'password', ['ROLE_USER']), 'provider', ['ROLE_USER']);
+
+        $accessDecisionManager = new class implements AccessDecisionManagerInterface {
+            public function decide(TokenInterface $token, array $attributes, mixed $object = null, bool $allowMultipleAttributes = false, ?AccessDecision &$accessDecision = null): bool
+            {
+                $accessDecision = new AccessDecision(true, [], 'from accessDecisionManager');
+
+                return $accessDecision->getAccess();
+            }
+        };
+
+        $authorizationChecker = new AuthorizationChecker($this->tokenStorage, $accessDecisionManager);
+        $this->tokenStorage->setToken($token);
+
+        $accessDecision = null;
+        $decision = $authorizationChecker->isGranted($attribute, $token, $accessDecision);
+        $this->assertTrue($decision);
+        $this->assertTrue($accessDecision->getAccess());
+        $this->assertSame('from accessDecisionManager', $accessDecision->getMessage());
     }
 }

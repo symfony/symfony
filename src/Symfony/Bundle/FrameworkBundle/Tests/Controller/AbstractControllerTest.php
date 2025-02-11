@@ -40,7 +40,9 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
+use Symfony\Component\Security\Core\Authorization\AccessDecision;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
+use Symfony\Component\Security\Core\Authorization\Voter\Vote;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\Security\Core\User\InMemoryUser;
 use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
@@ -362,7 +364,14 @@ class AbstractControllerTest extends TestCase
 
         $this->expectException(AccessDeniedException::class);
 
-        $controller->denyAccessUnlessGranted('foo');
+        try {
+            $controller->denyAccessUnlessGranted('foo');
+        } catch (AccessDeniedException $exception) {
+            $this->assertFalse($exception->getAccessDecision()->getAccess());
+            $this->assertEmpty($exception->getAccessDecision()->getVotes());
+            $this->assertEmpty($exception->getAccessDecision()->getMessage());
+            throw $exception;
+        }
     }
 
     /**
@@ -643,5 +652,34 @@ class AbstractControllerTest extends TestCase
         ]);
 
         $this->assertSame('</style.css>; rel="preload"; as="stylesheet",</script.js>; rel="preload"; as="script"', $response->headers->get('Link'));
+    }
+
+    public function testdenyAccessUnlessGrantedWithAccessDecisionObject()
+    {
+        $authorizationChecker = new class implements AuthorizationCheckerInterface {
+            public function isGranted(mixed $attribute, mixed $subject = null, ?AccessDecision &$accessDecision = null): bool
+            {
+                $accessDecision = new AccessDecision(false, [new Vote(-1)], 'access denied');
+
+                return $accessDecision->getAccess();
+            }
+        };
+
+        $container = new Container();
+        $container->set('security.authorization_checker', $authorizationChecker);
+
+        $controller = $this->createController();
+        $controller->setContainer($container);
+
+        $this->expectException(AccessDeniedException::class);
+
+        try {
+            $controller->denyAccessUnlessGranted('foo');
+        } catch (AccessDeniedException $exception) {
+            $this->assertFalse($exception->getAccessDecision()->getAccess());
+            $this->assertCount(1, $exception->getAccessDecision()->getVotes());
+            $this->assertSame('access denied', $exception->getAccessDecision()->getMessage());
+            throw $exception;
+        }
     }
 }

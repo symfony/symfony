@@ -42,16 +42,11 @@ class AuthenticatedVoter implements CacheableVoterInterface
 
     public function vote(TokenInterface $token, mixed $subject, array $attributes): int
     {
-        return $this->getVote($token, $subject, $attributes)->getAccess();
-    }
-
-    public function getVote(TokenInterface $token, mixed $subject, array $attributes): VoteInterface
-    {
         if ($attributes === [self::PUBLIC_ACCESS]) {
-            return new Vote(VoterInterface::ACCESS_GRANTED);
+            return VoterInterface::ACCESS_GRANTED;
         }
 
-        $result = new Vote(VoterInterface::ACCESS_ABSTAIN);
+        $result = VoterInterface::ACCESS_ABSTAIN;
         foreach ($attributes as $attribute) {
             if (null === $attribute || (self::IS_AUTHENTICATED_FULLY !== $attribute
                     && self::IS_AUTHENTICATED_REMEMBERED !== $attribute
@@ -65,29 +60,29 @@ class AuthenticatedVoter implements CacheableVoterInterface
                 throw new InvalidArgumentException('Cannot decide on authentication attributes when an offline token is used.');
             }
 
-            $result = new Vote(VoterInterface::ACCESS_DENIED);
+            $result = VoterInterface::ACCESS_DENIED;
 
             if (self::IS_AUTHENTICATED_FULLY === $attribute
                 && $this->authenticationTrustResolver->isFullFledged($token)) {
-                return new Vote(VoterInterface::ACCESS_GRANTED);
+                return VoterInterface::ACCESS_GRANTED;
             }
 
             if (self::IS_AUTHENTICATED_REMEMBERED === $attribute
                 && ($this->authenticationTrustResolver->isRememberMe($token)
                     || $this->authenticationTrustResolver->isFullFledged($token))) {
-                return new Vote(VoterInterface::ACCESS_GRANTED);
+                return VoterInterface::ACCESS_GRANTED;
             }
 
             if (self::IS_AUTHENTICATED === $attribute && $this->authenticationTrustResolver->isAuthenticated($token)) {
-                return new Vote(VoterInterface::ACCESS_GRANTED);
+                return VoterInterface::ACCESS_GRANTED;
             }
 
             if (self::IS_REMEMBERED === $attribute && $this->authenticationTrustResolver->isRememberMe($token)) {
-                return new Vote(VoterInterface::ACCESS_GRANTED);
+                return VoterInterface::ACCESS_GRANTED;
             }
 
             if (self::IS_IMPERSONATOR === $attribute && $token instanceof SwitchUserToken) {
-                return new Vote(VoterInterface::ACCESS_GRANTED);
+                return VoterInterface::ACCESS_GRANTED;
             }
         }
 

@@ -15,8 +15,10 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\CacheableVoterInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\TraceableVoter;
+use Symfony\Component\Security\Core\Authorization\Voter\Vote;
 use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 use Symfony\Component\Security\Core\Event\VoteEvent;
+use Symfony\Component\Security\Core\Tests\Fixtures\DummyVoterWithObject;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 class TraceableVoterTest extends TestCase
@@ -53,28 +55,26 @@ class TraceableVoterTest extends TestCase
         $this->assertSame(VoterInterface::ACCESS_DENIED, $result);
     }
 
-    public function testGetVote()
+    public function testVoteWithObject()
     {
         $voter = $this->createMock(VoterInterface::class);
 
         $eventDispatcher = $this->createMock(EventDispatcherInterface::class);
         $token = $this->createStub(TokenInterface::class);
 
-        $voter
-            ->expects($this->once())
-            ->method('vote')
-            ->with($token, 'anysubject', ['attr1'])
-            ->willReturn(VoterInterface::ACCESS_DENIED);
+        $voter = new DummyVoterWithObject(new Vote(VoterInterface::ACCESS_DENIED));
 
         $eventDispatcher
             ->expects($this->once())
             ->method('dispatch')
-            ->with(new VoteEvent($voter, 'anysubject', ['attr1'], VoterInterface::ACCESS_DENIED), 'debug.security.authorization.vote');
+            ->with(new VoteEvent($voter, 'anysubject', ['attr1'], new Vote(VoterInterface::ACCESS_DENIED)), 'debug.security.authorization.vote');
 
         $sut = new TraceableVoter($voter, $eventDispatcher);
-        $result = $sut->getVote($token, 'anysubject', ['attr1']);
+        $vote = null;
+        $result = $sut->vote($token, 'anysubject', ['attr1'], $vote);
 
-        $this->assertSame(VoterInterface::ACCESS_DENIED, $result->getAccess());
+        $this->assertSame(VoterInterface::ACCESS_DENIED, $result);
+        $this->assertSame(VoterInterface::ACCESS_DENIED, $vote->getAccess());
     }
 
     public function testSupportsAttributeOnCacheable()

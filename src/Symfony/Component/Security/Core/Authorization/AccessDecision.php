@@ -12,7 +12,6 @@
 namespace Symfony\Component\Security\Core\Authorization;
 
 use Symfony\Component\Security\Core\Authorization\Voter\VoteInterface;
-use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 
 /**
  * An AccessDecision is returned by an AccessDecisionManager and contains the access verdict and all the related votes.
@@ -23,34 +22,28 @@ use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 final class AccessDecision
 {
     /**
-     * @param VoterInterface::ACCESS_*|int $access
-     * @param VoteInterface[]              $votes
+     * @param VoteInterface[]|int[] $votes
      */
     public function __construct(
-        private readonly int $access,
+        private readonly bool $access,
         private readonly array $votes = [],
         private readonly string $message = '',
     ) {
     }
 
-    public function getAccess(): int
+    public function getAccess(): bool
     {
         return $this->access;
     }
 
     public function isGranted(): bool
     {
-        return VoterInterface::ACCESS_GRANTED === $this->access;
-    }
-
-    public function isAbstainer(): bool
-    {
-        return VoterInterface::ACCESS_ABSTAIN === $this->access;
+        return true === $this->access;
     }
 
     public function isDenied(): bool
     {
-        return VoterInterface::ACCESS_DENIED === $this->access;
+        return false === $this->access;
     }
 
     public function getMessage(): string
@@ -59,42 +52,10 @@ final class AccessDecision
     }
 
     /**
-     * @return VoteInterface[]
+     * @return VoteInterface[]|int[]
      */
     public function getVotes(): array
     {
         return $this->votes;
-    }
-
-    /**
-     * @return VoteInterface[]
-     */
-    public function getGrantedVotes(): array
-    {
-        return $this->getVotesByAccess(VoterInterface::ACCESS_GRANTED);
-    }
-
-    /**
-     * @return VoteInterface[]
-     */
-    public function getAbstainerVotes(): array
-    {
-        return $this->getVotesByAccess(VoterInterface::ACCESS_ABSTAIN);
-    }
-
-    /**
-     * @return VoteInterface[]
-     */
-    public function getDeniedVotes(): array
-    {
-        return $this->getVotesByAccess(VoterInterface::ACCESS_DENIED);
-    }
-
-    /**
-     * @return VoteInterface[]
-     */
-    private function getVotesByAccess(int $access): array
-    {
-        return array_filter($this->votes, static fn ($vote) => $vote->getAccess() === $access);
     }
 }

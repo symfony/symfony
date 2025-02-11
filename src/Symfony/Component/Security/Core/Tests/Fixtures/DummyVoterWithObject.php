@@ -12,11 +12,18 @@
 namespace Symfony\Component\Security\Core\Tests\Fixtures;
 
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Core\Authorization\Voter\VoteInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 
-final class DummyVoter implements VoterInterface
+final class DummyVoterWithObject implements VoterInterface
 {
-    public function vote(TokenInterface $token, $subject, array $attributes): int
+    public function __construct(private ?VoteInterface $vote = null)
     {
+    }
+
+    public function vote(TokenInterface $token, $subject, array $attributes, ?VoteInterface &$vote = null): int
+    {
+        $vote = $this->vote;
+        return $vote->getAccess();
     }
 }

@@ -1,0 +1,30 @@
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2025-02-10T14:34:50Z
+
+This snippet can be added to `BlueSkyTransportTest` to validate the fix:
+
+```php
+public function testUriIsSetAsMessageId()
+{
+    $client = new MockHttpClient(function () {
+        return new JsonMockResponse([
+            'uri' => 'https://example.com',
+            'cid' => 'my_cid',
+        ]);
+    });
+
+    $transport = self::createTransport($client);
+    $message = $transport->send(new ChatMessage('Hello!'));
+
+    $this->assertSame('https://example.com', $message->getMessageId());
+}
+```
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2025-02-10T14:55:24Z
+
+Alex, thanks a lot for creating the test for this 🙏
+
+I only changed the values of the uri/cid to make them a bit more realistic because the BlueSky URI uses an uncommon format and it's better to test that too. Thanks.

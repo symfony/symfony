@@ -47,12 +47,10 @@ final class VoteEvent extends Event
         return $this->attributes;
     }
 
-    public function getVote($asObject = false): VoteInterface|int
+    public function getVote(?VoteInterface &$vote = null): int
     {
-        if ($this->vote instanceof VoteInterface && !$asObject) {
-            return $this->vote->getAccess();
-        }
+        $vote = $this->vote;
 
-        return $this->vote;
+        return $this->vote instanceof VoteInterface ? $this->vote->getAccess() : $this->vote;
     }
 }

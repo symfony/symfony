@@ -17,6 +17,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\DataCollector\DataCollectorInterface;
 use Symfony\Component\HttpKernel\DataCollector\LateDataCollectorInterface;
+use Symfony\Component\HttpKernel\Exception\InvalidArgumentException;
 use Symfony\Contracts\Service\ResetInterface;
 
 /**
@@ -216,12 +217,12 @@ class Profiler implements ResetInterface
      *
      * @param string $name A collector name
      *
-     * @throws \InvalidArgumentException if the collector does not exist
+     * @throws InvalidArgumentException if the collector does not exist
      */
     public function get(string $name): DataCollectorInterface
     {
         if (!isset($this->collectors[$name])) {
-            throw new \InvalidArgumentException(\sprintf('Collector "%s" does not exist.', $name));
+            throw new InvalidArgumentException(\sprintf('Collector "%s" does not exist.', $name));
         }
 
         return $this->collectors[$name];

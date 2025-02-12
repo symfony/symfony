@@ -13,6 +13,7 @@ namespace Symfony\Component\HttpKernel\Tests\CacheWarmer;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmer;
+use Symfony\Component\HttpKernel\Exception\RuntimeException;
 
 class CacheWarmerTest extends TestCase
 {
@@ -38,7 +39,7 @@ class CacheWarmerTest extends TestCase
 
     public function testWriteNonWritableCacheFileThrowsARuntimeException()
     {
-        $this->expectException(\RuntimeException::class);
+        $this->expectException(RuntimeException::class);
         $nonWritableFile = '/this/file/is/very/probably/not/writable';
         $warmer = new TestCacheWarmer($nonWritableFile);
         $warmer->warmUp(\dirname($nonWritableFile));

@@ -15,6 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Controller\ArgumentResolver\BackedEnumValueResolver;
 use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
+use Symfony\Component\HttpKernel\Exception\LogicException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\Tests\Fixtures\IntEnum;
 use Symfony\Component\HttpKernel\Tests\Fixtures\Suit;
@@ -122,7 +123,7 @@ class BackedEnumValueResolverTest extends TestCase
         $request = self::createRequest(['suit' => false]);
         $metadata = self::createArgumentMetadata('suit', Suit::class);
 
-        $this->expectException(\LogicException::class);
+        $this->expectException(LogicException::class);
         $this->expectExceptionMessage('Could not resolve the "Symfony\Component\HttpKernel\Tests\Fixtures\Suit $suit" controller argument: expecting an int or string, got "bool".');
 
         $resolver->resolve($request, $metadata);

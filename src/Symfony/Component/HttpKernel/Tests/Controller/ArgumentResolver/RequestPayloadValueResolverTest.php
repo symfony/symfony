@@ -20,6 +20,7 @@ use Symfony\Component\HttpKernel\Controller\ArgumentResolver\RequestPayloadValue
 use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
 use Symfony\Component\HttpKernel\Event\ControllerArgumentsEvent;
 use Symfony\Component\HttpKernel\Exception\HttpException;
+use Symfony\Component\HttpKernel\Exception\LogicException;
 use Symfony\Component\HttpKernel\Exception\NearMissValueResolverException;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor;
@@ -57,7 +58,7 @@ class RequestPayloadValueResolverTest extends TestCase
         $arguments = $resolver->resolve($request, $argument);
         $event = new ControllerArgumentsEvent($kernel, function () {}, $arguments, $request, HttpKernelInterface::MAIN_REQUEST);
 
-        $this->expectException(\LogicException::class);
+        $this->expectException(LogicException::class);
         $this->expectExceptionMessage('Could not resolve the "$notTyped" controller argument: argument should be typed.');
 
         $resolver->onKernelControllerArguments($event);
@@ -567,7 +568,7 @@ class RequestPayloadValueResolverTest extends TestCase
         ]);
         $request = Request::create('/', 'POST');
 
-        $this->expectException(\LogicException::class);
+        $this->expectException(LogicException::class);
         $this->expectExceptionMessage('Mapping variadic argument "$variadic" is not supported.');
         $resolver->resolve($request, $argument);
     }

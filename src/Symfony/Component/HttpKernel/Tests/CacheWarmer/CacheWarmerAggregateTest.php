@@ -15,6 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerAggregate;
 use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerInterface;
+use Symfony\Component\HttpKernel\Exception\LogicException;
 
 class CacheWarmerAggregateTest extends TestCase
 {
@@ -89,7 +90,7 @@ class CacheWarmerAggregateTest extends TestCase
         $aggregate = new CacheWarmerAggregate([$warmer]);
         $aggregate->enableOptionalWarmers();
 
-        $this->expectException(\LogicException::class);
+        $this->expectException(LogicException::class);
         $aggregate->warmUp(__DIR__);
     }
 

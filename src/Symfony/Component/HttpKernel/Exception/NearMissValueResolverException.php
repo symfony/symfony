@@ -16,6 +16,6 @@ namespace Symfony\Component\HttpKernel\Exception;
  *
  * Throwing this exception inside `ValueResolverInterface::resolve` does not interrupt the value resolvers chain.
  */
-class NearMissValueResolverException extends \RuntimeException
+class NearMissValueResolverException extends RuntimeException
 {
 }

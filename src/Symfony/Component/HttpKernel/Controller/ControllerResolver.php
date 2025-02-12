@@ -15,6 +15,7 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Exception\BadRequestException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Attribute\AsController;
+use Symfony\Component\HttpKernel\Exception\InvalidArgumentException;
 
 /**
  * This implementation uses the '_controller' request attribute to determine
@@ -73,7 +74,7 @@ class ControllerResolver implements ControllerResolverInterface
             }
 
             if (!\is_callable($controller)) {
-                throw new \InvalidArgumentException(\sprintf('The controller for URI "%s" is not callable: ', $request->getPathInfo()).$this->getControllerError($controller));
+                throw new InvalidArgumentException(\sprintf('The controller for URI "%s" is not callable: ', $request->getPathInfo()).$this->getControllerError($controller));
             }
 
             return $this->checkController($request, $controller);
@@ -81,7 +82,7 @@ class ControllerResolver implements ControllerResolverInterface
 
         if (\is_object($controller)) {
             if (!\is_callable($controller)) {
-                throw new \InvalidArgumentException(\sprintf('The controller for URI "%s" is not callable: ', $request->getPathInfo()).$this->getControllerError($controller));
+                throw new InvalidArgumentException(\sprintf('The controller for URI "%s" is not callable: ', $request->getPathInfo()).$this->getControllerError($controller));
             }
 
             return $this->checkController($request, $controller);
@@ -93,12 +94,12 @@ class ControllerResolver implements ControllerResolverInterface
 
         try {
             $callable = $this->createController($controller);
-        } catch (\InvalidArgumentException $e) {
-            throw new \InvalidArgumentException(\sprintf('The controller for URI "%s" is not callable: ', $request->getPathInfo()).$e->getMessage(), 0, $e);
+        } catch (InvalidArgumentException $e) {
+            throw new InvalidArgumentException(\sprintf('The controller for URI "%s" is not callable: ', $request->getPathInfo()).$e->getMessage(), 0, $e);
         }
 
         if (!\is_callable($callable)) {
-            throw new \InvalidArgumentException(\sprintf('The controller for URI "%s" is not callable: ', $request->getPathInfo()).$this->getControllerError($callable));
+            throw new InvalidArgumentException(\sprintf('The controller for URI "%s" is not callable: ', $request->getPathInfo()).$this->getControllerError($callable));
         }
 
         return $this->checkController($request, $callable);
@@ -107,7 +108,7 @@ class ControllerResolver implements ControllerResolverInterface
     /**
      * Returns a callable for the given controller.
      *
-     * @throws \InvalidArgumentException When the controller cannot be created
+     * @throws InvalidArgumentException When the controller cannot be created
      */
     protected function createController(string $controller): callable
     {
@@ -115,7 +116,7 @@ class ControllerResolver implements ControllerResolverInterface
             $controller = $this->instantiateController($controller);
 
             if (!\is_callable($controller)) {
-                throw new \InvalidArgumentException($this->getControllerError($controller));
+                throw new InvalidArgumentException($this->getControllerError($controller));
             }
 
             return $controller;
@@ -138,7 +139,7 @@ class ControllerResolver implements ControllerResolverInterface
         }
 
         if (!\is_callable($controller)) {
-            throw new \InvalidArgumentException($this->getControllerError($controller));
+            throw new InvalidArgumentException($this->getControllerError($controller));
         }
 
         return $controller;

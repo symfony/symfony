@@ -12,6 +12,7 @@
 namespace Symfony\Component\HttpKernel\Attribute;
 
 use Psr\Log\LogLevel;
+use Symfony\Component\HttpKernel\Exception\InvalidArgumentException;
 
 /**
  * Defines the log level applied to an exception.
@@ -27,7 +28,7 @@ final class WithLogLevel
     public function __construct(public readonly string $level)
     {
         if (!\defined('Psr\Log\LogLevel::'.strtoupper($this->level))) {
-            throw new \InvalidArgumentException(\sprintf('Invalid log level "%s".', $this->level));
+            throw new InvalidArgumentException(\sprintf('Invalid log level "%s".', $this->level));
         }
     }
 }

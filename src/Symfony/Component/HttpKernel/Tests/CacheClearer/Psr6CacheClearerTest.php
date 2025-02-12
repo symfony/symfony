@@ -14,6 +14,7 @@ namespace Symfony\Component\HttpKernel\Tests\CacheClearer;
 use PHPUnit\Framework\TestCase;
 use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\HttpKernel\CacheClearer\Psr6CacheClearer;
+use Symfony\Component\HttpKernel\Exception\InvalidArgumentException;
 
 class Psr6CacheClearerTest extends TestCase
 {
@@ -41,7 +42,7 @@ class Psr6CacheClearerTest extends TestCase
 
     public function testClearPoolThrowsExceptionOnUnreferencedPool()
     {
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Cache pool not found: "unknown"');
         (new Psr6CacheClearer())->clearPool('unknown');
     }

@@ -14,6 +14,7 @@ namespace Symfony\Component\HttpKernel\Tests\Attribute;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LogLevel;
 use Symfony\Component\HttpKernel\Attribute\WithLogLevel;
+use Symfony\Component\HttpKernel\Exception\InvalidArgumentException;
 
 /**
  * @author Dejan Angelov <angelovdejan@protonmail.com>
@@ -31,7 +32,7 @@ class WithLogLevelTest extends TestCase
 
     public function testWithInvalidLogLevel()
     {
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Invalid log level "invalid".');
 
         new WithLogLevel('invalid');

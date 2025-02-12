@@ -24,8 +24,11 @@ use Symfony\Component\HttpKernel\Controller\ArgumentResolver\RequestAttributeVal
 use Symfony\Component\HttpKernel\Controller\ValueResolverInterface;
 use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
 use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadataFactory;
+use Symfony\Component\HttpKernel\Exception\InvalidArgumentException;
+use Symfony\Component\HttpKernel\Exception\LogicException;
 use Symfony\Component\HttpKernel\Exception\NearMissValueResolverException;
 use Symfony\Component\HttpKernel\Exception\ResolverNotFoundException;
+use Symfony\Component\HttpKernel\Exception\RuntimeException;
 use Symfony\Component\HttpKernel\Tests\Fixtures\Controller\ExtendingRequest;
 use Symfony\Component\HttpKernel\Tests\Fixtures\Controller\ExtendingSession;
 use Symfony\Component\HttpKernel\Tests\Fixtures\Controller\NullableController;
@@ -135,9 +138,9 @@ class ArgumentResolverTest extends TestCase
 
         try {
             self::getResolver()->getArguments($request, $controller);
-            $this->fail('->getArguments() throws a \RuntimeException exception if it cannot determine the argument value');
+            $this->fail('->getArguments() throws a RuntimeException exception if it cannot determine the argument value');
         } catch (\Exception $e) {
-            $this->assertInstanceOf(\RuntimeException::class, $e, '->getArguments() throws a \RuntimeException exception if it cannot determine the argument value');
+            $this->assertInstanceOf(RuntimeException::class, $e, '->getArguments() throws a RuntimeException exception if it cannot determine the argument value');
         }
     }
 
@@ -169,7 +172,7 @@ class ArgumentResolverTest extends TestCase
 
     public function testGetVariadicArgumentsWithoutArrayInRequest()
     {
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $request = Request::create('/');
         $request->attributes->set('foo', 'foo');
         $request->attributes->set('bar', 'foo');
@@ -183,7 +186,7 @@ class ArgumentResolverTest extends TestCase
         $request = Request::create('/');
         $controller = (new ArgumentResolverTestController())->controllerWithFoo(...);
 
-        $this->expectException(\RuntimeException::class);
+        $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('Controller "'.ArgumentResolverTestController::class.'::controllerWithFoo" requires the "$foo" argument that could not be resolved. Either the argument is nullable and no null value has been provided, no default value has been provided or there is a non-optional argument after this one.');
         self::getResolver()->getArguments($request, $controller);
     }
@@ -240,7 +243,7 @@ class ArgumentResolverTest extends TestCase
 
     public function testGetSessionMissMatchWithInterface()
     {
-        $this->expectException(\RuntimeException::class);
+        $this->expectException(RuntimeException::class);
         $session = $this->createMock(SessionInterface::class);
         $request = Request::create('/');
         $request->setSession($session);
@@ -251,7 +254,7 @@ class ArgumentResolverTest extends TestCase
 
     public function testGetSessionMissMatchWithImplementation()
     {
-        $this->expectException(\RuntimeException::class);
+        $this->expectException(RuntimeException::class);
         $session = new Session(new MockArraySessionStorage());
         $request = Request::create('/');
         $request->setSession($session);
@@ -262,7 +265,7 @@ class ArgumentResolverTest extends TestCase
 
     public function testGetSessionMissMatchOnNull()
     {
-        $this->expectException(\RuntimeException::class);
+        $this->expectException(RuntimeException::class);
         $request = Request::create('/');
         $controller = (new ArgumentResolverTestController())->controllerWithExtendingSession(...);
 
@@ -333,7 +336,7 @@ class ArgumentResolverTest extends TestCase
         $request = Request::create('/');
         $controller = (new ArgumentResolverTestController())->controllerTargetingManyResolvers(...);
 
-        $this->expectException(\LogicException::class);
+        $this->expectException(LogicException::class);
         $resolver->getArguments($request, $controller);
     }
 
@@ -381,7 +384,7 @@ class ArgumentResolverTest extends TestCase
         $request = Request::create('/');
         $controller = [new ArgumentResolverTestController(), 'controllerWithFoo'];
 
-        $this->expectException(\RuntimeException::class);
+        $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('Controller "Symfony\Component\HttpKernel\Tests\Controller\ArgumentResolverTestController::controllerWithFoo" requires the "$foo" argument that could not be resolved. Some reason why value could not be resolved.');
         $resolver->getArguments($request, $controller);
     }
@@ -405,7 +408,7 @@ class ArgumentResolverTest extends TestCase
         $request = Request::create('/');
         $controller = [new ArgumentResolverTestController(), 'controllerWithFoo'];
 
-        $this->expectException(\RuntimeException::class);
+        $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('Controller "Symfony\Component\HttpKernel\Tests\Controller\ArgumentResolverTestController::controllerWithFoo" requires the "$foo" argument that could not be resolved. Possible reasons: 1) Some reason why value could not be resolved. 2) Another reason why value could not be resolved.');
         $resolver->getArguments($request, $controller);
     }

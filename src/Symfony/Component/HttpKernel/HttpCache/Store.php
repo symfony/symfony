@@ -16,6 +16,7 @@ namespace Symfony\Component\HttpKernel\HttpCache;
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\RuntimeException;
 
 /**
  * Store implements all the logic for storing cache metadata (Request and Response headers).
@@ -37,14 +38,14 @@ class Store implements StoreInterface
      *   * private_headers  Set of response headers that should not be stored
      *                      when a response is cached. (default: Set-Cookie)
      *
-     * @throws \RuntimeException
+     * @throws RuntimeException
      */
     public function __construct(
         protected string $root,
         private array $options = [],
     ) {
         if (!is_dir($this->root) && !@mkdir($this->root, 0777, true) && !is_dir($this->root)) {
-            throw new \RuntimeException(\sprintf('Unable to create the store directory (%s).', $this->root));
+            throw new RuntimeException(\sprintf('Unable to create the store directory (%s).', $this->root));
         }
         $this->keyCache = new \SplObjectStorage();
         $this->options['private_headers'] ??= ['Set-Cookie'];
@@ -173,7 +174,7 @@ class Store implements StoreInterface
      * Existing entries are read and any that match the response are removed. This
      * method calls write with the new list of cache entries.
      *
-     * @throws \RuntimeException
+     * @throws RuntimeException
      */
     public function write(Request $request, Response $response): string
     {
@@ -183,12 +184,12 @@ class Store implements StoreInterface
         if ($response->headers->has('X-Body-File')) {
             // Assume the response came from disk, but at least perform some safeguard checks
             if (!$response->headers->has('X-Content-Digest')) {
-                throw new \RuntimeException('A restored response must have the X-Content-Digest header.');
+                throw new RuntimeException('A restored response must have the X-Content-Digest header.');
             }
 
             $digest = $response->headers->get('X-Content-Digest');
             if ($this->getPath($digest) !== $response->headers->get('X-Body-File')) {
-                throw new \RuntimeException('X-Body-File and X-Content-Digest do not match.');
+                throw new RuntimeException('X-Body-File and X-Content-Digest do not match.');
             }
         // Everything seems ok, omit writing content to disk
         } else {
@@ -196,7 +197,7 @@ class Store implements StoreInterface
             $response->headers->set('X-Content-Digest', $digest);
 
             if (!$this->save($digest, $response->getContent(), false)) {
-                throw new \RuntimeException('Unable to store the entity.');
+                throw new RuntimeException('Unable to store the entity.');
             }
 
             if (!$response->headers->has('Transfer-Encoding')) {
@@ -227,7 +228,7 @@ class Store implements StoreInterface
         array_unshift($entries, [$storedEnv, $headers]);
 
         if (!$this->save($key, serialize($entries))) {
-            throw new \RuntimeException('Unable to store the metadata.');
+            throw new RuntimeException('Unable to store the metadata.');
         }
 
         return $key;
@@ -244,7 +245,7 @@ class Store implements StoreInterface
     /**
      * Invalidates all cache entries that match the request.
      *
-     * @throws \RuntimeException
+     * @throws RuntimeException
      */
     public function invalidate(Request $request): void
     {
@@ -264,7 +265,7 @@ class Store implements StoreInterface
         }
 
         if ($modified && !$this->save($key, serialize($entries))) {
-            throw new \RuntimeException('Unable to store the metadata.');
+            throw new RuntimeException('Unable to store the metadata.');
         }
     }
 

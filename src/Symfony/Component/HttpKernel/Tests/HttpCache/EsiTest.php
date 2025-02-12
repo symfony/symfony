@@ -14,6 +14,7 @@ namespace Symfony\Component\HttpKernel\Tests\HttpCache;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\RuntimeException;
 use Symfony\Component\HttpKernel\HttpCache\Esi;
 use Symfony\Component\HttpKernel\HttpCache\HttpCache;
 
@@ -161,7 +162,7 @@ class EsiTest extends TestCase
 
     public function testProcessWhenNoSrcInAnEsi()
     {
-        $this->expectException(\RuntimeException::class);
+        $this->expectException(RuntimeException::class);
         $esi = new Esi();
 
         $request = Request::create('/');
@@ -199,7 +200,7 @@ class EsiTest extends TestCase
 
     public function testHandleWhenResponseIsNot200()
     {
-        $this->expectException(\RuntimeException::class);
+        $this->expectException(RuntimeException::class);
         $esi = new Esi();
         $response = new Response('foo');
         $response->setStatusCode(404);

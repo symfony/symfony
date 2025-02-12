@@ -13,6 +13,7 @@ namespace Symfony\Component\HttpKernel\HttpCache;
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\RuntimeException;
 
 /**
  * Esi implements the ESI capabilities to Request and Response instances.
@@ -83,7 +84,7 @@ class Esi extends AbstractSurrogate
             }
 
             if (!isset($options['src'])) {
-                throw new \RuntimeException('Unable to process an ESI tag without a "src" attribute.');
+                throw new RuntimeException('Unable to process an ESI tag without a "src" attribute.');
             }
 
             $chunks[$i] = $boundary.$options['src']."\n".($options['alt'] ?? '')."\n".('continue' === ($options['onerror'] ?? ''))."\n";

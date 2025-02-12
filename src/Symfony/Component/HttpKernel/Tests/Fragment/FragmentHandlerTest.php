@@ -16,6 +16,8 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\HttpException;
+use Symfony\Component\HttpKernel\Exception\InvalidArgumentException;
+use Symfony\Component\HttpKernel\Exception\RuntimeException;
 use Symfony\Component\HttpKernel\Fragment\FragmentHandler;
 use Symfony\Component\HttpKernel\Fragment\FragmentRendererInterface;
 
@@ -31,14 +33,14 @@ class FragmentHandlerTest extends TestCase
 
     public function testRenderWhenRendererDoesNotExist()
     {
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $handler = new FragmentHandler($this->requestStack);
         $handler->render('/', 'foo');
     }
 
     public function testRenderWithUnknownRenderer()
     {
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $handler = $this->getHandler(new Response('foo'));
 
         $handler->render('/', 'bar');
@@ -49,9 +51,9 @@ class FragmentHandlerTest extends TestCase
         $handler = $this->getHandler(new Response('foo', 404));
         try {
             $handler->render('/', 'foo');
-            $this->fail('->render() throws a \RuntimeException exception if response is not successful');
+            $this->fail('->render() throws a RuntimeException exception if response is not successful');
         } catch (\Exception $e) {
-            $this->assertInstanceOf(\RuntimeException::class, $e);
+            $this->assertInstanceOf(RuntimeException::class, $e);
             $this->assertEquals(0, $e->getCode());
             $this->assertEquals('Error when rendering "http://localhost/" (Status code is 404).', $e->getMessage());
 

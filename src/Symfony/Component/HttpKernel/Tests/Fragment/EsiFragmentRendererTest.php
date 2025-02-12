@@ -15,6 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\UriSigner;
 use Symfony\Component\HttpKernel\Controller\ControllerReference;
+use Symfony\Component\HttpKernel\Exception\LogicException;
 use Symfony\Component\HttpKernel\Fragment\EsiFragmentRenderer;
 use Symfony\Component\HttpKernel\Fragment\InlineFragmentRenderer;
 use Symfony\Component\HttpKernel\HttpCache\Esi;
@@ -86,7 +87,7 @@ class EsiFragmentRendererTest extends TestCase
 
     public function testRenderControllerReferenceWithoutSignerThrowsException()
     {
-        $this->expectException(\LogicException::class);
+        $this->expectException(LogicException::class);
         $strategy = new EsiFragmentRenderer(new Esi(), $this->getInlineStrategy());
 
         $request = Request::create('/');
@@ -98,7 +99,7 @@ class EsiFragmentRendererTest extends TestCase
 
     public function testRenderAltControllerReferenceWithoutSignerThrowsException()
     {
-        $this->expectException(\LogicException::class);
+        $this->expectException(LogicException::class);
         $strategy = new EsiFragmentRenderer(new Esi(), $this->getInlineStrategy());
 
         $request = Request::create('/');

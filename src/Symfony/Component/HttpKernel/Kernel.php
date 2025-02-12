@@ -38,6 +38,10 @@ use Symfony\Component\HttpKernel\Bundle\BundleInterface;
 use Symfony\Component\HttpKernel\CacheWarmer\WarmableInterface;
 use Symfony\Component\HttpKernel\Config\FileLocator;
 use Symfony\Component\HttpKernel\DependencyInjection\MergeExtensionConfigurationPass;
+use Symfony\Component\HttpKernel\Exception\BadMethodCallException;
+use Symfony\Component\HttpKernel\Exception\InvalidArgumentException;
+use Symfony\Component\HttpKernel\Exception\LogicException;
+use Symfony\Component\HttpKernel\Exception\RuntimeException;
 
 // Help opcache.preload discover always-needed symbols
 class_exists(ConfigCache::class);
@@ -88,7 +92,7 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
         protected bool $debug,
     ) {
         if (!$environment) {
-            throw new \InvalidArgumentException(\sprintf('Invalid environment provided to "%s": the environment cannot be empty.', get_debug_type($this)));
+            throw new InvalidArgumentException(\sprintf('Invalid environment provided to "%s": the environment cannot be empty.', get_debug_type($this)));
         }
     }
 
@@ -201,7 +205,7 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
     public function getBundle(string $name): BundleInterface
     {
         if (!isset($this->bundles[$name])) {
-            throw new \InvalidArgumentException(\sprintf('Bundle "%s" does not exist or it is not enabled. Maybe you forgot to add it in the "registerBundles()" method of your "%s.php" file?', $name, get_debug_type($this)));
+            throw new InvalidArgumentException(\sprintf('Bundle "%s" does not exist or it is not enabled. Maybe you forgot to add it in the "registerBundles()" method of your "%s.php" file?', $name, get_debug_type($this)));
         }
 
         return $this->bundles[$name];
@@ -210,11 +214,11 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
     public function locateResource(string $name): string
     {
         if ('@' !== $name[0]) {
-            throw new \InvalidArgumentException(\sprintf('A resource name must start with @ ("%s" given).', $name));
+            throw new InvalidArgumentException(\sprintf('A resource name must start with @ ("%s" given).', $name));
         }
 
         if (str_contains($name, '..')) {
-            throw new \RuntimeException(\sprintf('File name "%s" contains invalid characters (..).', $name));
+            throw new RuntimeException(\sprintf('File name "%s" contains invalid characters (..).', $name));
         }
 
         $bundleName = substr($name, 1);
@@ -228,7 +232,7 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
             return $file;
         }
 
-        throw new \InvalidArgumentException(\sprintf('Unable to find file "%s".', $name));
+        throw new InvalidArgumentException(\sprintf('Unable to find file "%s".', $name));
     }
 
     public function getEnvironment(): string
@@ -250,7 +254,7 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
             $r = new \ReflectionObject($this);
 
             if (!is_file($dir = $r->getFileName())) {
-                throw new \LogicException(\sprintf('Cannot auto-detect project dir for kernel of class "%s".', $r->name));
+                throw new LogicException(\sprintf('Cannot auto-detect project dir for kernel of class "%s".', $r->name));
             }
 
             $dir = $rootDir = \dirname($dir);
@@ -269,7 +273,7 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
     public function getContainer(): ContainerInterface
     {
         if (!$this->container) {
-            throw new \LogicException('Cannot retrieve the container from a non-booted kernel.');
+            throw new LogicException('Cannot retrieve the container from a non-booted kernel.');
         }
 
         return $this->container;
@@ -330,7 +334,7 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
     /**
      * Initializes bundles.
      *
-     * @throws \LogicException if two bundles share a common name
+     * @throws LogicException if two bundles share a common name
      */
     protected function initializeBundles(): void
     {
@@ -339,7 +343,7 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
         foreach ($this->registerBundles() as $bundle) {
             $name = $bundle->getName();
             if (isset($this->bundles[$name])) {
-                throw new \LogicException(\sprintf('Trying to register two bundles with the same name "%s".', $name));
+                throw new LogicException(\sprintf('Trying to register two bundles with the same name "%s".', $name));
             }
             $this->bundles[$name] = $bundle;
         }
@@ -357,7 +361,7 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
     /**
      * Gets the container class.
      *
-     * @throws \InvalidArgumentException If the generated classname is invalid
+     * @throws InvalidArgumentException If the generated classname is invalid
      */
     protected function getContainerClass(): string
     {
@@ -366,7 +370,7 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
         $class = str_replace('\\', '_', $class).ucfirst($this->environment).($this->debug ? 'Debug' : '').'Container';
 
         if (!preg_match('/^[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*$/', $class)) {
-            throw new \InvalidArgumentException(\sprintf('The environment "%s" contains invalid characters, it can only contain characters allowed in PHP class names.', $this->environment));
+            throw new InvalidArgumentException(\sprintf('The environment "%s" contains invalid characters, it can only contain characters allowed in PHP class names.', $this->environment));
         }
 
         return $class;
@@ -590,17 +594,17 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
     /**
      * Builds the service container.
      *
-     * @throws \RuntimeException
+     * @throws RuntimeException
      */
     protected function buildContainer(): ContainerBuilder
     {
         foreach (['cache' => $this->getCacheDir(), 'build' => $this->warmupDir ?: $this->getBuildDir()] as $name => $dir) {
             if (!is_dir($dir)) {
                 if (false === @mkdir($dir, 0777, true) && !is_dir($dir)) {
-                    throw new \RuntimeException(\sprintf('Unable to create the "%s" directory (%s).', $name, $dir));
+                    throw new RuntimeException(\sprintf('Unable to create the "%s" directory (%s).', $name, $dir));
                 }
             } elseif (!is_writable($dir)) {
-                throw new \RuntimeException(\sprintf('Unable to write in the "%s" directory (%s).', $name, $dir));
+                throw new RuntimeException(\sprintf('Unable to write in the "%s" directory (%s).', $name, $dir));
             }
         }
 
@@ -760,7 +764,7 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
 
                 foreach ($trustedHeaders as $header) {
                     if (!\defined($const = Request::class.'::HEADER_'.strtr(strtoupper($header), '-', '_'))) {
-                        throw new \InvalidArgumentException(\sprintf('The trusted header "%s" is not supported.', $header));
+                        throw new InvalidArgumentException(\sprintf('The trusted header "%s" is not supported.', $header));
                     }
                     $trustedHeaderSet |= \constant($const);
                 }
@@ -782,7 +786,7 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
     public function __wakeup(): void
     {
         if (\is_object($this->environment) || \is_object($this->debug)) {
-            throw new \BadMethodCallException('Cannot unserialize '.__CLASS__);
+            throw new BadMethodCallException('Cannot unserialize '.__CLASS__);
         }
 
         $this->__construct($this->environment, $this->debug);

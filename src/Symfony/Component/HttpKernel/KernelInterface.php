@@ -14,6 +14,8 @@ namespace Symfony\Component\HttpKernel;
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpKernel\Bundle\BundleInterface;
+use Symfony\Component\HttpKernel\Exception\InvalidArgumentException;
+use Symfony\Component\HttpKernel\Exception\RuntimeException;
 
 /**
  * The Kernel is the heart of the Symfony system.
@@ -64,7 +66,7 @@ interface KernelInterface extends HttpKernelInterface
     /**
      * Returns a bundle.
      *
-     * @throws \InvalidArgumentException when the bundle is not enabled
+     * @throws InvalidArgumentException when the bundle is not enabled
      */
     public function getBundle(string $name): BundleInterface;
 
@@ -80,8 +82,8 @@ interface KernelInterface extends HttpKernelInterface
      * where BundleName is the name of the bundle
      * and the remaining part is the relative path in the bundle.
      *
-     * @throws \InvalidArgumentException if the file cannot be found or the name is not valid
-     * @throws \RuntimeException         if the name contains invalid/unsafe characters
+     * @throws InvalidArgumentException if the file cannot be found or the name is not valid
+     * @throws RuntimeException         if the name contains invalid/unsafe characters
      */
     public function locateResource(string $name): string;
 

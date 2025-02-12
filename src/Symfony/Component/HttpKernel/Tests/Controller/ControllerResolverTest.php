@@ -17,6 +17,7 @@ use Symfony\Component\HttpFoundation\Exception\BadRequestException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Attribute\AsController;
 use Symfony\Component\HttpKernel\Controller\ControllerResolver;
+use Symfony\Component\HttpKernel\Exception\InvalidArgumentException;
 
 class ControllerResolverTest extends TestCase
 {
@@ -96,7 +97,7 @@ class ControllerResolverTest extends TestCase
 
     public function testGetControllerOnObjectWithoutInvokeMethod()
     {
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $resolver = $this->createControllerResolver();
 
         $request = Request::create('/');

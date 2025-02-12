@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\HttpKernel\Profiler;
 
+use Symfony\Component\HttpKernel\Exception\RuntimeException;
+
 /**
  * Storage for profiler using files.
  *
@@ -28,17 +30,17 @@ class FileProfilerStorage implements ProfilerStorageInterface
      *
      * Example : "file:/path/to/the/storage/folder"
      *
-     * @throws \RuntimeException
+     * @throws RuntimeException
      */
     public function __construct(string $dsn)
     {
         if (!str_starts_with($dsn, 'file:')) {
-            throw new \RuntimeException(\sprintf('Please check your configuration. You are trying to use FileStorage with an invalid dsn "%s". The expected format is "file:/path/to/the/storage/folder".', $dsn));
+            throw new RuntimeException(\sprintf('Please check your configuration. You are trying to use FileStorage with an invalid dsn "%s". The expected format is "file:/path/to/the/storage/folder".', $dsn));
         }
         $this->folder = substr($dsn, 5);
 
         if (!is_dir($this->folder) && false === @mkdir($this->folder, 0777, true) && !is_dir($this->folder)) {
-            throw new \RuntimeException(\sprintf('Unable to create the storage directory (%s).', $this->folder));
+            throw new RuntimeException(\sprintf('Unable to create the storage directory (%s).', $this->folder));
         }
     }
 
@@ -126,7 +128,7 @@ class FileProfilerStorage implements ProfilerStorageInterface
     }
 
     /**
-     * @throws \RuntimeException
+     * @throws RuntimeException
      */
     public function write(Profile $profile): bool
     {
@@ -137,7 +139,7 @@ class FileProfilerStorage implements ProfilerStorageInterface
             // Create directory
             $dir = \dirname($file);
             if (!is_dir($dir) && false === @mkdir($dir, 0777, true) && !is_dir($dir)) {
-                throw new \RuntimeException(\sprintf('Unable to create the storage directory (%s).', $dir));
+                throw new RuntimeException(\sprintf('Unable to create the storage directory (%s).', $dir));
             }
         }
 

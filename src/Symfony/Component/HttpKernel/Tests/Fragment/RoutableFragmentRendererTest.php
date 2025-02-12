@@ -14,6 +14,7 @@ namespace Symfony\Component\HttpKernel\Tests\Fragment;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Controller\ControllerReference;
+use Symfony\Component\HttpKernel\Exception\LogicException;
 use Symfony\Component\HttpKernel\Fragment\RoutableFragmentRenderer;
 
 class RoutableFragmentRendererTest extends TestCase
@@ -61,7 +62,7 @@ class RoutableFragmentRendererTest extends TestCase
      */
     public function testGenerateFragmentUriWithNonScalar($controller)
     {
-        $this->expectException(\LogicException::class);
+        $this->expectException(LogicException::class);
         $this->callGenerateFragmentUriMethod($controller, Request::create('/'));
     }
 

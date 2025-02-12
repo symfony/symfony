@@ -13,6 +13,7 @@ namespace Symfony\Component\HttpKernel\Debug;
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpKernel\Exception\LogicException;
 
 /**
  * A stack able to deal with virtual requests.
@@ -32,7 +33,7 @@ final class VirtualRequestStack extends RequestStack
     {
         if ($request->attributes->has('_virtual_type')) {
             if ($this->decorated->getCurrentRequest()) {
-                throw new \LogicException('Cannot mix virtual and HTTP requests.');
+                throw new LogicException('Cannot mix virtual and HTTP requests.');
             }
 
             parent::push($request);

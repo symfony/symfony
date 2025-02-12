@@ -21,8 +21,11 @@ use Symfony\Component\HttpKernel\Controller\ArgumentResolver\SessionValueResolve
 use Symfony\Component\HttpKernel\Controller\ArgumentResolver\VariadicValueResolver;
 use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadataFactory;
 use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadataFactoryInterface;
+use Symfony\Component\HttpKernel\Exception\InvalidArgumentException;
+use Symfony\Component\HttpKernel\Exception\LogicException;
 use Symfony\Component\HttpKernel\Exception\NearMissValueResolverException;
 use Symfony\Component\HttpKernel\Exception\ResolverNotFoundException;
+use Symfony\Component\HttpKernel\Exception\RuntimeException;
 use Symfony\Contracts\Service\ServiceProviderInterface;
 
 /**
@@ -61,7 +64,7 @@ final class ArgumentResolver implements ArgumentResolverInterface
                     if ($attribute->disabled) {
                         $disabledResolvers[$attribute->resolver] = true;
                     } elseif ($resolverName) {
-                        throw new \LogicException(\sprintf('You can only pin one resolver per argument, but argument "$%s" of "%s()" has more.', $metadata->getName(), $metadata->getControllerName()));
+                        throw new LogicException(\sprintf('You can only pin one resolver per argument, but argument "$%s" of "%s()" has more.', $metadata->getName(), $metadata->getControllerName()));
                     } else {
                         $resolverName = $attribute->resolver;
                     }
@@ -97,7 +100,7 @@ final class ArgumentResolver implements ArgumentResolverInterface
                 }
 
                 if (1 < $count && !$metadata->isVariadic()) {
-                    throw new \InvalidArgumentException(\sprintf('"%s::resolve()" must yield at most one value for non-variadic arguments.', get_debug_type($resolver)));
+                    throw new InvalidArgumentException(\sprintf('"%s::resolve()" must yield at most one value for non-variadic arguments.', get_debug_type($resolver)));
                 }
 
                 if ($count) {
@@ -119,7 +122,7 @@ final class ArgumentResolver implements ArgumentResolverInterface
                 }
             }
 
-            throw new \RuntimeException(\sprintf('Controller "%s" requires the "$%s" argument that could not be resolved. '.($reasonCounter > 1 ? 'Possible reasons: ' : '').'%s', $metadata->getControllerName(), $metadata->getName(), implode(' ', $reasons)));
+            throw new RuntimeException(\sprintf('Controller "%s" requires the "$%s" argument that could not be resolved. '.($reasonCounter > 1 ? 'Possible reasons: ' : '').'%s', $metadata->getControllerName(), $metadata->getName(), implode(' ', $reasons)));
         }
 
         return $arguments;

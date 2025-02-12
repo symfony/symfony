@@ -15,6 +15,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\UriSigner;
 use Symfony\Component\HttpKernel\Controller\ControllerReference;
+use Symfony\Component\HttpKernel\Exception\InvalidArgumentException;
 use Symfony\Component\HttpKernel\HttpCache\SurrogateInterface;
 
 /**
@@ -58,7 +59,7 @@ abstract class AbstractSurrogateFragmentRenderer extends RoutableFragmentRendere
             $request->attributes->set('_check_controller_is_allowed', true);
 
             if ($uri instanceof ControllerReference && $this->containsNonScalars($uri->attributes)) {
-                throw new \InvalidArgumentException('Passing non-scalar values as part of URI attributes to the ESI and SSI rendering strategies is not supported. Use a different rendering strategy or pass scalar values.');
+                throw new InvalidArgumentException('Passing non-scalar values as part of URI attributes to the ESI and SSI rendering strategies is not supported. Use a different rendering strategy or pass scalar values.');
             }
 
             return $this->inlineStrategy->render($uri, $request, $options);

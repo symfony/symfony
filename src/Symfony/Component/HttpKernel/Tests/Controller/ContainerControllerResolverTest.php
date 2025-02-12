@@ -16,6 +16,7 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Controller\ContainerControllerResolver;
+use Symfony\Component\HttpKernel\Exception\InvalidArgumentException;
 
 class ContainerControllerResolverTest extends ControllerResolverTest
 {
@@ -98,7 +99,7 @@ class ContainerControllerResolverTest extends ControllerResolverTest
 
     public function testExceptionWhenUsingRemovedControllerServiceWithClassNameAsName()
     {
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Controller "Symfony\Component\HttpKernel\Tests\Controller\ControllerTestService" cannot be fetched from the container because it is private. Did you forget to tag the service with "controller.service_arguments"?');
         $container = $this->createMock(Container::class);
         $container->expects($this->once())
@@ -122,7 +123,7 @@ class ContainerControllerResolverTest extends ControllerResolverTest
 
     public function testExceptionWhenUsingRemovedControllerService()
     {
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Controller "app.my_controller" cannot be fetched from the container because it is private. Did you forget to tag the service with "controller.service_arguments"?');
         $container = $this->createMock(Container::class);
         $container->expects($this->once())

@@ -14,6 +14,7 @@ namespace Symfony\Component\HttpKernel\Tests\HttpCache;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\RuntimeException;
 use Symfony\Component\HttpKernel\HttpCache\HttpCache;
 use Symfony\Component\HttpKernel\HttpCache\Ssi;
 
@@ -126,7 +127,7 @@ class SsiTest extends TestCase
 
     public function testProcessWhenNoSrcInAnSsi()
     {
-        $this->expectException(\RuntimeException::class);
+        $this->expectException(RuntimeException::class);
         $ssi = new Ssi();
 
         $request = Request::create('/');
@@ -164,7 +165,7 @@ class SsiTest extends TestCase
 
     public function testHandleWhenResponseIsNot200()
     {
-        $this->expectException(\RuntimeException::class);
+        $this->expectException(RuntimeException::class);
         $ssi = new Ssi();
         $response = new Response('foo');
         $response->setStatusCode(404);

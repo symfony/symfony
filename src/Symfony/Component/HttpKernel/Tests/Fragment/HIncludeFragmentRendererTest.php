@@ -15,6 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\UriSigner;
 use Symfony\Component\HttpKernel\Controller\ControllerReference;
+use Symfony\Component\HttpKernel\Exception\LogicException;
 use Symfony\Component\HttpKernel\Fragment\HIncludeFragmentRenderer;
 use Twig\Environment;
 use Twig\Loader\ArrayLoader;
@@ -23,7 +24,7 @@ class HIncludeFragmentRendererTest extends TestCase
 {
     public function testRenderExceptionWhenControllerAndNoSigner()
     {
-        $this->expectException(\LogicException::class);
+        $this->expectException(LogicException::class);
         $strategy = new HIncludeFragmentRenderer();
         $strategy->render(new ControllerReference('main_controller', [], []), Request::create('/'));
     }

@@ -13,6 +13,7 @@ namespace Symfony\Component\HttpKernel\HttpCache;
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\RuntimeException;
 
 /**
  * Ssi implements the SSI capabilities to Request and Response instances.
@@ -64,7 +65,7 @@ class Ssi extends AbstractSurrogate
             }
 
             if (!isset($options['virtual'])) {
-                throw new \RuntimeException('Unable to process an SSI tag without a "virtual" attribute.');
+                throw new RuntimeException('Unable to process an SSI tag without a "virtual" attribute.');
             }
 
             $chunks[$i] = $boundary.$options['virtual']."\n\n\n";

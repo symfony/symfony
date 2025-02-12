@@ -14,6 +14,7 @@ namespace Symfony\Component\HttpKernel\Controller\ArgumentResolver;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Controller\ValueResolverInterface;
 use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
+use Symfony\Component\HttpKernel\Exception\InvalidArgumentException;
 
 /**
  * Yields a variadic argument's values from the request attributes.
@@ -31,7 +32,7 @@ final class VariadicValueResolver implements ValueResolverInterface
         $values = $request->attributes->get($argument->getName());
 
         if (!\is_array($values)) {
-            throw new \InvalidArgumentException(\sprintf('The action argument "...$%1$s" is required to be an array, the request attribute "%1$s" contains a type of "%2$s" instead.', $argument->getName(), get_debug_type($values)));
+            throw new InvalidArgumentException(\sprintf('The action argument "...$%1$s" is required to be an array, the request attribute "%1$s" contains a type of "%2$s" instead.', $argument->getName(), get_debug_type($values)));
         }
 
         return $values;

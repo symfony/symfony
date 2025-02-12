@@ -13,6 +13,7 @@ namespace Symfony\Component\HttpKernel\Tests\ControllerMetadata;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
+use Symfony\Component\HttpKernel\Exception\LogicException;
 use Symfony\Component\HttpKernel\Tests\Fixtures\Attribute\Foo;
 
 class ArgumentMetadataTest extends TestCase
@@ -35,7 +36,7 @@ class ArgumentMetadataTest extends TestCase
 
     public function testDefaultValueUnavailable()
     {
-        $this->expectException(\LogicException::class);
+        $this->expectException(LogicException::class);
         $argument = new ArgumentMetadata('foo', 'string', false, false, null, false);
 
         $this->assertFalse($argument->isNullable());

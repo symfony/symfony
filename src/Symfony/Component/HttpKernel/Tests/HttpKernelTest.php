@@ -42,7 +42,7 @@ class HttpKernelTest extends TestCase
     public function testHandleWhenControllerThrowsAnExceptionAndCatchIsTrue()
     {
         $this->expectException(RuntimeException::class);
-        $kernel = $this->getHttpKernel(new EventDispatcher(), static fn () => throw new \RuntimeException());
+        $kernel = $this->getHttpKernel(new EventDispatcher(), static fn () => throw new RuntimeException());
 
         $kernel->handle(new Request(), HttpKernelInterface::MAIN_REQUEST, true);
     }

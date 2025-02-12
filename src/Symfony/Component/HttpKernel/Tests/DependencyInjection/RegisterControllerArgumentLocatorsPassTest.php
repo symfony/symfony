@@ -232,7 +232,7 @@ class RegisterControllerArgumentLocatorsPassTest extends TestCase
 
     public function testExceptionOnNonExistentTypeHintDifferentNamespace()
     {
-        $this->expectException(RuntimeException::class);
+        $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('Cannot determine controller argument for "Symfony\Component\HttpKernel\Tests\DependencyInjection\NonExistentClassDifferentNamespaceController::fooAction()": the $nonExistent argument is type-hinted with the non-existent class or interface: "Acme\NonExistentClass".');
         $container = new ContainerBuilder();
         $container->register('argument_resolver.service')->addArgument([]);

@@ -54,7 +54,7 @@ class QueryParameterValueResolverTest extends TestCase
      */
     public function testResolvingWithInvalidArgumentType(Request $request, ArgumentMetadata $metadata, string $exceptionMessage)
     {
-        $this->expectException(LogicException::class);
+        $this->expectException(\LogicException::class);
         $this->expectExceptionMessage($exceptionMessage);
 
         $this->resolver->resolve($request, $metadata);

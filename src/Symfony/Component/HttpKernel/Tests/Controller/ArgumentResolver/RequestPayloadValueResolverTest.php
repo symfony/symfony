@@ -58,7 +58,7 @@ class RequestPayloadValueResolverTest extends TestCase
         $arguments = $resolver->resolve($request, $argument);
         $event = new ControllerArgumentsEvent($kernel, function () {}, $arguments, $request, HttpKernelInterface::MAIN_REQUEST);
 
-        $this->expectException(LogicException::class);
+        $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('Could not resolve the "$notTyped" controller argument: argument should be typed.');
 
         $resolver->onKernelControllerArguments($event);

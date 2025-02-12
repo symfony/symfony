@@ -94,7 +94,7 @@ class HttpKernelTest extends TestCase
     public function testHandleWhenControllerThrowsAnExceptionAndCatchIsFalseAndNoListenerIsRegistered()
     {
         $this->expectException(RuntimeException::class);
-        $kernel = $this->getHttpKernel(new EventDispatcher(), static fn () => throw new \RuntimeException());
+        $kernel = $this->getHttpKernel(new EventDispatcher(), static fn () => throw new RuntimeException());
 
         $kernel->handle(new Request(), HttpKernelInterface::MAIN_REQUEST, false);
     }
@@ -111,7 +111,7 @@ class HttpKernelTest extends TestCase
             $event->setResponse(new Response($event->getThrowable()->getMessage()));
         });
 
-        $kernel = $this->getHttpKernel($dispatcher, static fn () => throw new \RuntimeException('foo'));
+        $kernel = $this->getHttpKernel($dispatcher, static fn () => throw new RuntimeException('foo'));
         $response = $kernel->handle(new Request(), HttpKernelInterface::MAIN_REQUEST, true);
 
         $this->assertEquals('500', $response->getStatusCode());

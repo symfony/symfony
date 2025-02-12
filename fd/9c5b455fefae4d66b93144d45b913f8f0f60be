@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by Jean-Beru at 2024-12-23T09:49:34Z
+
+> > Sometimes it could be useful to assert that every elements of a collection is not duplicated.
+>
+> Is there a situation where it's better to have only the first error?
+>
+> > This PR adds a `multipleErrors` option to the Unique constraint to avoid stopping at the first violation.
+>
+> I think we can avoid adding a new option and simply modify the behavior in version 7.3.
+
+That was my first idea but it will lead to a BC break like mentioned in #59037.

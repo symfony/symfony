@@ -20,6 +20,8 @@ namespace Symfony\Component\Validator\Violation;
  * execution context.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @method $this setOrDisableTranslationDomain(string|false|null $translationDomain)
  */
 interface ConstraintViolationBuilderInterface
 {

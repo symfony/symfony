@@ -31,6 +31,9 @@ class NotBlank extends Constraint
     ];
 
     public string $message = 'This value should not be blank.';
+
+    public string|false|null $translationDomain = null;
+
     public bool $allowNull = false;
     /** @var callable|null */
     public $normalizer;
@@ -41,7 +44,7 @@ class NotBlank extends Constraint
      * @param string[]|null            $groups
      */
     #[HasNamedArguments]
-    public function __construct(?array $options = null, ?string $message = null, ?bool $allowNull = null, ?callable $normalizer = null, ?array $groups = null, mixed $payload = null)
+    public function __construct(?array $options = null, ?string $message = null, ?bool $allowNull = null, ?callable $normalizer = null, ?array $groups = null, mixed $payload = null, string|false|null $translationDomain = null)
     {
         if (\is_array($options)) {
             trigger_deprecation('symfony/validator', '7.3', 'Passing an array of options to configure the "%s" constraint is deprecated, use named arguments instead.', static::class);
@@ -50,6 +53,7 @@ class NotBlank extends Constraint
         parent::__construct($options ?? [], $groups, $payload);
 
         $this->message = $message ?? $this->message;
+        $this->translationDomain = $translationDomain ?? $this->translationDomain;
         $this->allowNull = $allowNull ?? $this->allowNull;
         $this->normalizer = $normalizer ?? $this->normalizer;
 

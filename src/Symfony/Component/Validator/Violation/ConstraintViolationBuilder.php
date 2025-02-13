@@ -83,6 +83,16 @@ class ConstraintViolationBuilder implements ConstraintViolationBuilderInterface
         return $this;
     }
 
+    /**
+     * @return $this
+     */
+    public function setOrDisableTranslationDomain(string|false|null $translationDomain): static
+    {
+        $this->translationDomain = $translationDomain;
+
+        return $this;
+    }
+
     public function setInvalidValue(mixed $invalidValue): static
     {
         $this->invalidValue = $invalidValue;

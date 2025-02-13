@@ -39,6 +39,7 @@ class NotBlankValidator extends ConstraintValidator
             $this->context->buildViolation($constraint->message)
                 ->setParameter('{{ value }}', $this->formatValue($value))
                 ->setCode(NotBlank::IS_BLANK_ERROR)
+                ->setOrDisableTranslationDomain($constraint->translationDomain)
                 ->addViolation();
         }
     }

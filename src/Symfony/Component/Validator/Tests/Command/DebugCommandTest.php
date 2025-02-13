@@ -55,7 +55,8 @@ Symfony\Component\Validator\Tests\Dummy\DummyClassOne
 |               |                                                    |                        |   "allowNull" => false,                                    |
 |               |                                                    |                        |   "message" => "This value should not be blank.",          |
 |               |                                                    |                        |   "normalizer" => null,                                    |
-|               |                                                    |                        |   "payload" => null                                        |
+|               |                                                    |                        |   "payload" => null,                                       |
+|               |                                                    |                        |   "translationDomain" => null                              |
 |               |                                                    |                        | ]                                                          |
 | email         | property options                                   |                        | [                                                          |
 |               |                                                    |                        |   "cascadeStrategy" => "None",                             |
@@ -111,7 +112,8 @@ Symfony\Component\Validator\Tests\Dummy\DummyClassOne
 |               |                                                    |                        |   "allowNull" => false,                                    |
 |               |                                                    |                        |   "message" => "This value should not be blank.",          |
 |               |                                                    |                        |   "normalizer" => null,                                    |
-|               |                                                    |                        |   "payload" => null                                        |
+|               |                                                    |                        |   "payload" => null,                                       |
+|               |                                                    |                        |   "translationDomain" => null                              |
 |               |                                                    |                        | ]                                                          |
 | email         | property options                                   |                        | [                                                          |
 |               |                                                    |                        |   "cascadeStrategy" => "None",                             |
@@ -153,7 +155,8 @@ Symfony\Component\Validator\Tests\Dummy\DummyClassTwo
 |               |                                                    |                        |   "allowNull" => false,                                    |
 |               |                                                    |                        |   "message" => "This value should not be blank.",          |
 |               |                                                    |                        |   "normalizer" => null,                                    |
-|               |                                                    |                        |   "payload" => null                                        |
+|               |                                                    |                        |   "payload" => null,                                       |
+|               |                                                    |                        |   "translationDomain" => null                              |
 |               |                                                    |                        | ]                                                          |
 | email         | property options                                   |                        | [                                                          |
 |               |                                                    |                        |   "cascadeStrategy" => "None",                             |

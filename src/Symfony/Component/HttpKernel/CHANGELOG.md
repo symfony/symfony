@@ -8,6 +8,8 @@ CHANGELOG
  * Deprecate implementing `__sleep/wakeup()` on kernels; use `__(un)serialize()` instead
  * Deprecate implementing `__sleep/wakeup()` on data collectors; use `__(un)serialize()` instead
  * Make `Profile` final and `Profiler::__sleep()` internal
+ * Add `StaticPageGenerator` to generate static page content
+ * Add `StaticPageDumperInterface` to dump a static page content into a storage
 
 7.3
 ---

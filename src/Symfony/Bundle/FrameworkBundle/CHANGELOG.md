@@ -10,6 +10,7 @@ CHANGELOG
  * Deprecate `Symfony\Bundle\FrameworkBundle\Console\Application::add()` in favor of `Symfony\Bundle\FrameworkBundle\Console\Application::addCommand()`
  * Add `assertEmailAddressNotContains()` to the `MailerAssertionsTrait`
  * Add `framework.type_info.aliases` option
+ * Add `static-site-generation:generate` command
 
 7.3
 ---

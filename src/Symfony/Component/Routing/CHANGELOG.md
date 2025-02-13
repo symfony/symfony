@@ -10,6 +10,8 @@ CHANGELOG
  * Add argument `$parameters` to `RequestContext`'s constructor
  * Deprecate class aliases in the `Annotation` namespace, use attributes instead
  * Deprecate getters and setters in attribute classes in favor of public properties
+ * Add `static_generation` to `Route` defaults
+ * Add `StaticPageUrisProviderInterface` to list URIs considered as static pages
 
 7.3
 ---

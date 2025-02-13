@@ -7,5 +7,6 @@
     <import resource="imported-with-defaults.xml" prefix="/defaults"
             locale="g_locale"
             format="g_format"
-            stateless="true" />
+            stateless="true"
+            static-generation="true" />
 </routes>

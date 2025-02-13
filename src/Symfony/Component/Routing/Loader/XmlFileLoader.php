@@ -321,6 +321,15 @@ class XmlFileLoader extends FileLoader
 
             $defaults['_stateless'] = XmlUtils::phpize($stateless);
         }
+        if ($staticGeneration = $node->getAttribute('static-generation')) {
+            if (isset($defaults['_static_generation'])) {
+                $name = $node->hasAttribute('id') ? \sprintf('"%s".', $node->getAttribute('id')) : \sprintf('the "%s" tag.', $node->tagName);
+
+                throw new \InvalidArgumentException(\sprintf('The routing file "%s" must not specify both the "static-generation" attribute and the defaults key "_static_generation" for ', $path).$name);
+            }
+
+            $defaults['_static_generation'] = XmlUtils::phpize($staticGeneration);
+        }
 
         if (!$hosts) {
             $hosts = $node->hasAttribute('host') ? $node->getAttribute('host') : null;

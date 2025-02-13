@@ -29,6 +29,7 @@ use Psr\Http\Client\ClientInterface;
 use Psr\Log\LoggerAwareInterface;
 use Symfony\Bridge\Monolog\Processor\DebugProcessor;
 use Symfony\Bridge\Twig\Extension\CsrfExtension;
+use Symfony\Bundle\FrameworkBundle\Command\StaticSiteGenerationGenerateCommand;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Bundle\FrameworkBundle\Routing\RouteLoaderInterface;
 use Symfony\Bundle\FullStack;
@@ -173,6 +174,7 @@ use Symfony\Component\RemoteEvent\Attribute\AsRemoteEventConsumer;
 use Symfony\Component\RemoteEvent\RemoteEvent;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Routing\Loader\AttributeServicesLoader;
+use Symfony\Component\Routing\StaticSiteGeneration\ParamsProviderInterface;
 use Symfony\Component\Scheduler\Attribute\AsCronTask;
 use Symfony\Component\Scheduler\Attribute\AsPeriodicTask;
 use Symfony\Component\Scheduler\Attribute\AsSchedule;
@@ -435,6 +437,8 @@ class FrameworkExtension extends Extension
         $this->registerRouterConfiguration($config['router'], $container, $loader, $config['enabled_locales']);
         $this->registerPropertyAccessConfiguration($config['property_access'], $container, $loader);
         $this->registerSecretsConfiguration($config['secrets'], $container, $loader, $config['secret'] ?? null);
+
+        $loader->load('http_kernel.php');
 
         $exceptionListener = $container->getDefinition('exception_listener');
 
@@ -1341,6 +1345,19 @@ class FrameworkExtension extends Extension
         if (null !== $config['default_uri']) {
             $container->getDefinition('router.request_context')
                 ->replaceArgument(0, $config['default_uri']);
+        }
+
+        $container->registerForAutoconfiguration(ParamsProviderInterface::class)
+            ->addTag('routing.static_site.params_provider');
+
+        if ($this->hasConsole()) {
+            $container->register('console.command.static_site_generation_generate', StaticSiteGenerationGenerateCommand::class)
+                ->setArguments([
+                    new Reference('http_kernel.static_site.pages_generator'),
+                    new Reference('http_kernel.static_site.page_dumper'),
+                    new Reference('routing.static_site.pages_uri_provider'),
+                ])
+                ->addTag('console.command');
         }
     }
 

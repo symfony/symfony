@@ -169,4 +169,14 @@ trait RouteTrait
 
         return $this;
     }
+
+    /**
+     * @param bool|array{params?: string|iterable<array<mixed>>} $staticGeneration
+     */
+    final public function staticGeneration(bool|array $staticGeneration = true): static
+    {
+        $this->route->addDefaults(['_static_generation' => $staticGeneration]);
+
+        return $this;
+    }
 }

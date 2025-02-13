@@ -3,3 +3,4 @@ defaults:
   locale: en
   format: html
   stateless: true
+  static_generation: true

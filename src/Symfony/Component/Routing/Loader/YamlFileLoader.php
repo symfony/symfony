@@ -34,7 +34,7 @@ class YamlFileLoader extends FileLoader
     use PrefixTrait;
 
     private const AVAILABLE_KEYS = [
-        'resource', 'type', 'prefix', 'path', 'host', 'schemes', 'methods', 'defaults', 'requirements', 'options', 'condition', 'controller', 'name_prefix', 'trailing_slash_on_root', 'locale', 'format', 'utf8', 'exclude', 'stateless',
+        'resource', 'type', 'prefix', 'path', 'host', 'schemes', 'methods', 'defaults', 'requirements', 'options', 'condition', 'controller', 'name_prefix', 'trailing_slash_on_root', 'locale', 'format', 'utf8', 'exclude', 'stateless', 'static_generation',
     ];
     private YamlParser $yamlParser;
 
@@ -154,6 +154,9 @@ class YamlFileLoader extends FileLoader
         if (isset($config['stateless'])) {
             $defaults['_stateless'] = $config['stateless'];
         }
+        if (isset($config['static_generation'])) {
+            $defaults['_static_generation'] = $config['static_generation'];
+        }
 
         $routes = $this->createLocalizedRoute(new RouteCollection(), $name, $config['path']);
         $routes->addDefaults($defaults);
@@ -202,6 +205,9 @@ class YamlFileLoader extends FileLoader
         }
         if (isset($config['stateless'])) {
             $defaults['_stateless'] = $config['stateless'];
+        }
+        if (isset($config['static_generation'])) {
+            $defaults['_static_generation'] = $config['static_generation'];
         }
 
         $this->setCurrentDir(\dirname($path));
@@ -270,6 +276,9 @@ class YamlFileLoader extends FileLoader
         }
         if (isset($config['stateless']) && isset($config['defaults']['_stateless'])) {
             throw new \InvalidArgumentException(\sprintf('The routing file "%s" must not specify both the "stateless" key and the defaults key "_stateless" for "%s".', $path, $name));
+        }
+        if (isset($config['static_generation']) && isset($config['defaults']['_static_generation'])) {
+            throw new \InvalidArgumentException(\sprintf('The routing file "%s" must not specify both the "static_generation" key and the defaults key "_static_generation" for "%s".', $path, $name));
         }
     }
 

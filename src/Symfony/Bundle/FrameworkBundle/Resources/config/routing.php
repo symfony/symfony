@@ -40,6 +40,8 @@ use Symfony\Component\Routing\Matcher\UrlMatcherInterface;
 use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\Routing\RequestContextAwareInterface;
 use Symfony\Component\Routing\RouterInterface;
+use Symfony\Component\Routing\StaticSiteGeneration\StaticPageUrisProvider;
+use Symfony\Component\Routing\StaticSiteGeneration\StaticPageUrisProviderInterface;
 
 return static function (ContainerConfigurator $container) {
     $container->parameters()
@@ -215,5 +217,12 @@ return static function (ContainerConfigurator $container) {
                 service('twig')->ignoreOnInvalid(),
             ])
             ->public()
+
+        ->set('routing.static_site.pages_uri_provider', StaticPageUrisProvider::class)
+            ->args([
+                service('router'),
+                tagged_locator('routing.static_site.params_provider'),
+            ])
+        ->alias(StaticPageUrisProviderInterface::class, 'routing.static_site.pages_uri_provider')
     ;
 };

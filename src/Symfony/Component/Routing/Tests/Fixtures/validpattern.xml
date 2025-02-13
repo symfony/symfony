@@ -9,6 +9,9 @@
         <default key="_stateless">
             <bool>true</bool>
         </default>
+        <default key="_static_generation">
+            <bool>true</bool>
+        </default>
         <requirement key="locale">\w+</requirement>
         <option key="compiler_class">RouteCompiler</option>
         <condition>context.getMethod() == "GET"</condition>

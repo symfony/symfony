@@ -21,6 +21,7 @@
         "symfony/error-handler": "^6.4|^7.0|^8.0",
         "symfony/event-dispatcher": "^7.3|^8.0",
         "symfony/http-foundation": "^7.4|^8.0",
+        "symfony/filesystem": "^7.4",
         "symfony/polyfill-ctype": "^1.8",
         "psr/log": "^1|^2|^3"
     },

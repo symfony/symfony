@@ -13,6 +13,7 @@ CHANGELOG
  * Add support for multiple fields containing nested constraints in `Composite` constraints
  * Add the `stopOnFirstError` option to the `Unique` constraint to validate all elements
  * Add support for closures in the `When` constraint
+ * Add `translationDomain` to all constraints; setting it to `false` disables translations for the particular constraint
 
 7.2
 ---

@@ -27,6 +27,25 @@ jobs:
       fail-fast: false
 
     services:
+      frankenphp:
+        image: dunglas/frankenphp:1.1.0
+        ports:
+          - 80:80
+          - 8681:81
+          - 8682:82
+          - 8683:83
+          - 8684:84
+        volumes:
+          - ${{ github.workspace }}:/symfony
+        env:
+          SERVER_NAME: 'http://localhost http://localhost:81 http://localhost:82 http://localhost:83 http://localhost:84'
+          CADDY_SERVER_EXTRA_DIRECTIVES: |
+            route /http-client* {
+              root * /symfony/src/Symfony/Component/HttpClient/Tests/Fixtures/response-functional/
+              php_server
+            }
+
+            root * /symfony/src/Symfony/Component/HttpFoundation/Tests/Fixtures/response-functional/
       postgres:
         image: postgres:10.6-alpine
         ports:
@@ -83,15 +102,17 @@ jobs:
           REDIS_SENTINEL_QUORUM: 1
       redis-primary:
         image: redis:latest
-        hostname: redis-primary
         ports:
           - 16381:6379
-
       redis-replica:
-        image: redis:latest
+        image: bitnami/redis:latest
         ports:
           - 16382:6379
-        command: redis-server --slaveof redis-primary 6379
+        env:
+          ALLOW_EMPTY_PASSWORD: "yes"
+          REDIS_REPLICATION_MODE: "slave"
+          REDIS_MASTER_HOST: redis-primary
+          REDIS_MASTER_PORT_NUMBER: "6379"
       memcached:
         image: memcached:1.6.5
         ports:
@@ -129,25 +150,6 @@ jobs:
           KAFKA_CFG_LISTENERS: 'PLAINTEXT://:9092'
           KAFKA_CFG_ZOOKEEPER_CONNECT: 'zookeeper:2181'
         options: --name=kafka
-      frankenphp:
-        image: dunglas/frankenphp:1.1.0
-        ports:
-          - 80:80
-          - 8681:81
-          - 8682:82
-          - 8683:83
-          - 8684:84
-        volumes:
-          - ${{ github.workspace }}:/symfony
-        env:
-          SERVER_NAME: 'http://localhost http://localhost:81 http://localhost:82 http://localhost:83 http://localhost:84'
-          CADDY_SERVER_EXTRA_DIRECTIVES: |
-            route /http-client* {
-              root * /symfony/src/Symfony/Component/HttpClient/Tests/Fixtures/response-functional/
-              php_server
-            }
-
-            root * /symfony/src/Symfony/Component/HttpFoundation/Tests/Fixtures/response-functional/
 
     steps:
       - name: Checkout

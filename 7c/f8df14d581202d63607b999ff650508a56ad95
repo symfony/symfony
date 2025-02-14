@@ -1,0 +1,76 @@
+---------------------------------------------------------------------------
+
+by Hanmac at 2024-10-25T11:14:17Z
+
+@dunglas can someone take a look at this?
+
+---------------------------------------------------------------------------
+
+by Hanmac at 2024-12-09T16:23:55Z
+
+@dunglas what should be done about that AppVeyor?
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2024-12-09T19:45:09Z
+
+You can rebase, AppVeyor is gone, we moved to GithubActions even for windows tests
+
+---------------------------------------------------------------------------
+
+by Hanmac at 2024-12-09T20:01:32Z
+
+Ugh wrong button 😑
+
+Need to rebase manually tomorrow
+
+---------------------------------------------------------------------------
+
+by Hanmac at 2024-12-10T08:59:42Z
+
+Some HttpClient problems, but that shouldn't be related to my PR?
+
+---------------------------------------------------------------------------
+
+by Hanmac at 2024-12-10T10:03:40Z
+
+@OskarStark what should I do about the failed Unit Tests? These look unrelated?
+
+---------------------------------------------------------------------------
+
+by Hanmac at 2025-02-13T09:11:49Z
+
+Can someone check the failed tests?
+
+`XliffFileDumperTest::testEmptyMetadataNotes` should be unrelated to this MR
+it was #59747 that was faulty
+
+tried to rebase on a previous commit
+Rebase worked locally, but i can't trick the Unit Tests there
+
+---------------------------------------------------------------------------
+
+by Hanmac at 2025-02-13T10:36:01Z
+
+@nicolas-grekas there all tests are green too (except the Semaphore)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-02-13T10:59:33Z
+
+Thanks for the ping. Looking at the code, I'm wondering if what you want isn't mean to be achieve by using the TYPE_CAST_ATTRIBUTES context option instead of changing anything in the code.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-02-13T11:35:19Z
+
+Given the discussion in #58479, I think this should be considered as an improvement, so for 7.3
+About the implementation, the logic should be moved to the main foreach loop just above, where all similar concerns are located.
+
+---------------------------------------------------------------------------
+
+by Hanmac at 2025-02-13T12:31:04Z
+
+@nicolas-grekas there are some unrelated problems with `testCreateTypeContextOrUseProvided`
+
+but only for PHP 8.5, i try to pinpoint when it broke

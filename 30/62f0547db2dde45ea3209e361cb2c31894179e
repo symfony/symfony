@@ -1,0 +1,40 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2025-02-13T13:55:26Z
+
+Hey!
+
+Thanks for your PR. You are targeting branch "7.3" but it seems your PR description refers to branch "7.2".
+Could you update the PR description or change target branch? This helps core maintainers a lot.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by stof at 2025-02-13T14:01:03Z
+
+this needs a regression tests (which would also help understand which issue is being fixed)
+
+---------------------------------------------------------------------------
+
+by raffaelecarelle at 2025-02-13T14:05:37Z
+
+> this needs a regression tests (which would also help understand which issue is being fixed)
+
+test added
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2025-02-13T16:44:26Z
+
+Will be cast to int 0? Or do you mean cast to int 10 in the pr description?
+
+---------------------------------------------------------------------------
+
+by raffaelecarelle at 2025-02-13T17:11:35Z
+
+> Will be cast to int 0? Or do you mean cast to int 10 in the pr description?
+
+10, sorry.

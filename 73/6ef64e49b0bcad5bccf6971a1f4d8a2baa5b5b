@@ -1,0 +1,31 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2025-01-30T15:57:52Z
+
+It looks like you unchecked the "Allow edits from maintainer" box. That is fine, but please note that if you have multiple commits, you'll need to squash your commits into one before this can be merged. Or, you can check the "Allow edits from maintainers" box and the maintainer can squash for you.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by amenk at 2025-01-30T16:23:53Z
+
+Are the failing tests related to my commit?
+
+---------------------------------------------------------------------------
+
+by amenk at 2025-02-05T19:06:00Z
+
+@nicolas-grekas naming is probably not so good, thanks for the suggestion.
+
+It's simply for omitting the first and the last line (------) of the table to be able to render proper markdown (see the test case)
+
+---------------------------------------------------------------------------
+
+by amenk at 2025-02-06T08:27:05Z
+
+I changed the naming.
+
+Remark: fabbot.io is suggesting this patch https://fabbot.io/report/symfony/symfony/59657/20ecdd1a0473ceaa5fb792b900ab41877da35a53 but I did not change those lines (and changing them would break the PHPunit tests)

@@ -1,0 +1,99 @@
+---------------------------------------------------------------------------
+
+by ro0NL at 2025-02-13T15:38:17Z
+
+What about `array|string $command` instead?
+
+---------------------------------------------------------------------------
+
+by stof at 2025-02-13T15:52:03Z
+
+the Process component has explicitly rejected the usage of `array|string` (we deprecated passing a string to the constructor when introducing the distinction) because the security considerations are totally different between the array of arguments (where escaping is handled internally) and the command line (where the code building the command line is responsible for all required escaping).
+So I would vote against an API using `array|string` for the `RunProcessMessage`.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2025-02-13T15:57:12Z
+
+i mean if it's a string use `Process` static constructor, otherwise its regular constructor
+
+having both $command and $commandLine in a regular constructor here, bugs me more :)
+
+---------------------------------------------------------------------------
+
+by Staormin at 2025-02-13T15:57:47Z
+
+> What about `array|string $command` instead?
+
+> the Process component has explicitly rejected the usage of `array|string` (we deprecated passing a string to the constructor when introducing the distinction) because the security considerations are totally different between the array of arguments (where escaping is handled internally) and the command line (where the code building the command line is responsible for all required escaping). So I would vote against an API using `array|string` for the `RunProcessMessage`.
+
+Also I find the dedicated method approach more explicit for developper, parameters with multiple type aren't as clear for me.
+
+---------------------------------------------------------------------------
+
+by Staormin at 2025-02-13T16:00:26Z
+
+> i mean if it's a string use `Process` static constructor, otherwise its regular constructor
+>
+> having both $command and $commandLine in a regular constructor here, bugs me more :)
+
+Yeah that's a good point, maybe a whole other message (`RunProcessMessageFromCommandLine` ?) would be cleaner ?
+Then we could make an abstract that'll be used by both RunProcessMessage and this new message.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2025-02-13T16:02:01Z
+
+personally `new RunProcessMessage('ls -a')` vs `new RunProcessMessage(['ls', '-a'])` conveys fine to me.
+
+Otheriwse i'd prefer the current approach yes over a new class.
+
+---------------------------------------------------------------------------
+
+by stof at 2025-02-13T16:24:42Z
+
+@ro0NL The case of static command is not the one having security issues.
+
+```php
+
+new RunProcessMessage(['ls', $folder]); // Secure
+
+new RunProcessMessage(\sprintf('ls %s', $folder)); // Insecure
+
+new RunProcessMessage(\sprintf('ls %s', escapeshellarg($folder))); // Secure on Unix system (and partially secure on Windows)
+```
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2025-02-13T16:48:34Z
+
+```
+new RunProcessMessage(\sprintf('ls %s', $folder)); // Insecure
+```
+
+It would be passed to `Process::fromShellCommandline`
+
+---------------------------------------------------------------------------
+
+by Staormin at 2025-02-13T17:00:12Z
+
+> ```
+> new RunProcessMessage(\sprintf('ls %s', $folder)); // Insecure
+> ```
+>
+> It would be passed to `Process::fromShellCommandline`
+
+Yes but the point here is that the user won't know that the call is inherently unsecure, having a dedicated method that is documented as such is better imp
+
+---------------------------------------------------------------------------
+
+by Staormin at 2025-02-14T16:28:27Z
+
+BTW @nicolas-grekas I bisected the php-src to find out why the unit tests fails with php 8.5 and i narrowed it down to those change to reflection: https://github.com/php/php-src/pull/17755
+Should I open an issue or should we wait for 8.5 to stabilise before adressing broken components?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-02-14T22:59:58Z
+
+Ah nice! Please report to php-src. The earlier the better.

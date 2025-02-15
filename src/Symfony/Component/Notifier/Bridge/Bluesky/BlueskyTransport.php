@@ -21,8 +21,6 @@ use Symfony\Component\Notifier\Message\ChatMessage;
 use Symfony\Component\Notifier\Message\MessageInterface;
 use Symfony\Component\Notifier\Message\SentMessage;
 use Symfony\Component\Notifier\Transport\AbstractTransport;
-use Symfony\Component\String\AbstractString;
-use Symfony\Component\String\ByteString;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\HttpClient\Exception\DecodingExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
@@ -33,6 +31,9 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
  */
 final class BlueskyTransport extends AbstractTransport
 {
+    private const TAG_MAX_BYTES = 640;
+    private const TAG_MAX_GRAPHEMES = 64;
+
     private array $authSession = [];
     private ClockInterface $clock;
 
@@ -172,11 +173,10 @@ final class BlueskyTransport extends AbstractTransport
     private function parseFacets(string $input): array
     {
         $facets = [];
-        $text = new ByteString($input);
 
         // regex based on: https://bluesky.com/specs/handle#handle-identifier-syntax
         $regex = '#[$|\W](@([a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)#';
-        foreach ($this->getMatchAndPosition($text, $regex) as $match) {
+        foreach ($this->getMatchAndPosition($input, $regex) as $match) {
             $response = $this->client->request('GET', \sprintf('https://%s/xrpc/com.atproto.identity.resolveHandle', $this->getEndpoint()), [
                 'query' => [
                     'handle' => ltrim($match['match'], '@'),
@@ -214,7 +214,7 @@ final class BlueskyTransport extends AbstractTransport
         // partial/naive URL regex based on: https://stackoverflow.com/a/3809435
         // tweaked to disallow some trailing punctuation
         $regex = ';[$|\W](https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*[-a-zA-Z0-9@%_\+~#//=])?);';
-        foreach ($this->getMatchAndPosition($text, $regex) as $match) {
+        foreach ($this->getMatchAndPosition($input, $regex) as $match) {
             $facets[] = [
                 'index' => [
                     'byteStart' => $match['start'],
@@ -229,32 +229,54 @@ final class BlueskyTransport extends AbstractTransport
             ];
         }
 
+        // tag regex based on: https://github.com/bluesky-social/atproto/blob/main/packages/api/src/rich-text/detection.ts
+        // a tag needs at least one character that is neither a digit nor punctuation, and trailing punctuation is left out
+        $regex = '/(?:^|\s)([#＃][^\s]*[^\s\d\p{P}][^\s\p{P}]*)/u';
+        foreach ($this->getMatchAndPosition($input, $regex) as $match) {
+            // the marker is "#" or the fullwidth "＃", which is 3 bytes
+            $tag = preg_replace('/^[#＃]/u', '', $match['match']);
+
+            // the lexicon caps the tag at 640 bytes and 64 graphemes; emitting a longer one makes the whole post fail
+            if (self::TAG_MAX_BYTES < \strlen($tag) || self::TAG_MAX_GRAPHEMES < preg_match_all('/\X/u', $tag)) {
+                continue;
+            }
+
+            $facets[] = [
+                'index' => [
+                    'byteStart' => $match['start'],
+                    'byteEnd' => $match['end'],
+                ],
+                'features' => [
+                    [
+                        '$type' => 'app.bsky.richtext.facet#tag',
+                        'tag' => $tag,
+                    ],
+                ],
+            ];
+        }
+
+        usort($facets, static fn (array $a, array $b) => $a['index']['byteStart'] <=> $b['index']['byteStart']);
+
         return $facets;
     }
 
-    private function getMatchAndPosition(AbstractString $text, string $regex): array
+    /**
+     * @return list<array{start: int, end: int, match: string}>
+     */
+    private function getMatchAndPosition(string $text, string $regex): array
     {
-        $output = [];
-        $handled = [];
-        $matches = $text->match($regex, \PREG_PATTERN_ORDER);
-        if ([] === $matches) {
-            return $output;
+        // preg_* work on bytes, so the captured offsets already are the byte offsets facets are indexed by
+        if (!preg_match_all($regex, $text, $matches, \PREG_OFFSET_CAPTURE)) {
+            return [];
         }
 
-        $length = $text->length();
-        foreach ($matches[1] as $match) {
-            if (isset($handled[$match])) {
-                continue;
-            }
-            $handled[$match] = true;
-            $end = -1;
-            while (null !== $start = $text->indexOf($match, min($length, $end + 1))) {
-                $output[] = [
-                    'start' => $start,
-                    'end' => $end = $start + (new ByteString($match))->length(),
-                    'match' => $match,
-                ];
-            }
+        $output = [];
+        foreach ($matches[1] as [$match, $start]) {
+            $output[] = [
+                'start' => $start,
+                'end' => $start + \strlen($match),
+                'match' => $match,
+            ];
         }
 
         return $output;

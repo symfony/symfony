@@ -1,0 +1,25 @@
+---------------------------------------------------------------------------
+
+by AurelienPillevesse at 2025-01-16T22:00:19Z
+
+Errors are not related to this PR
+
+---------------------------------------------------------------------------
+
+by AurelienPillevesse at 2025-01-17T10:41:59Z
+
+I choose 7.3 but I don't know if it's a new feature or not (because already present in other transports).
+If you want to merge it to 7.2, it's OK for me.
+@nicolas-grekas
+
+---------------------------------------------------------------------------
+
+by AurelienPillevesse at 2025-01-29T07:38:05Z
+
+Does someone know when this PR will be merged?
+
+---------------------------------------------------------------------------
+
+by AurelienPillevesse at 2025-02-15T21:16:42Z
+
+@fabpot any idea why not merged?

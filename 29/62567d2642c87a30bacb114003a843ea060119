@@ -1,0 +1,21 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-02-14T08:02:22Z
+
+@alexandre-daubois making the properties readonly would break the FC layer: setting the results multiple times is how an updated implementation can still give proper feedback when given a non-updated one (voters/access decision managers/strategies.)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-02-14T15:46:21Z
+
+This PR should be ready for review.
+I fixed tests, so that it's green, but I'll add more.
+
+Status: needs review
+
+---------------------------------------------------------------------------
+
+by 94noni at 2025-02-16T17:23:18Z
+
+What a ride for those PRs :)
+Bravo to all devs includes in the process 👏

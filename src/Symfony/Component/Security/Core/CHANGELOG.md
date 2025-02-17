@@ -4,8 +4,7 @@ CHANGELOG
 7.3
 ---
 
- * Add `UserAuthorizationChecker::isGrantedForUser()` to test user authorization without relying on the session.
-   For example, users not currently logged in, or while processing a message from a message queue.
+ * Add `AuthorizationCheckerInterface::isGrantedForUser()` to test user authorization without relying on the session
  * Add `OfflineTokenInterface` to mark tokens that do not represent the currently logged-in user
  * Deprecate `UserInterface::eraseCredentials()` and `TokenInterface::eraseCredentials()`,
    erase credentials e.g. using `__serialize()` instead

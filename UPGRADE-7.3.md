@@ -16,6 +16,7 @@ Ldap
 Security
 --------
 
+ * Add `AuthorizationCheckerInterface::isGrantedForUser()` to test user authorization without relying on the session
  * Deprecate `UserInterface::eraseCredentials()` and `TokenInterface::eraseCredentials()`;
    erase credentials e.g. using `__serialize()` instead
 

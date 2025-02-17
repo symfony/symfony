@@ -26,7 +26,6 @@ return static function (ContainerConfigurator $container) {
             ->args([
                 service('security.authorization_checker')->ignoreOnInvalid(),
                 service('security.impersonate_url_generator')->ignoreOnInvalid(),
-                service('security.user_authorization_checker')->ignoreOnInvalid(),
             ])
             ->tag('twig.extension')
     ;

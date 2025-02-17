@@ -11,8 +11,11 @@
 
 namespace Symfony\Component\Security\Core\Authorization;
 
+use Symfony\Component\Security\Core\Authentication\Token\AbstractToken;
 use Symfony\Component\Security\Core\Authentication\Token\NullToken;
+use Symfony\Component\Security\Core\Authentication\Token\OfflineTokenInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
  * AuthorizationChecker is the main authorization point of the Security component.
@@ -39,6 +42,21 @@ class AuthorizationChecker implements AuthorizationCheckerInterface
         if (!$token || !$token->getUser()) {
             $token = new NullToken();
         }
+        $accessDecision ??= end($this->accessDecisionStack) ?: new AccessDecision();
+        $this->accessDecisionStack[] = $accessDecision;
+
+        try {
+            return $accessDecision->isGranted = $this->accessDecisionManager->decide($token, [$attribute], $subject, $accessDecision);
+        } finally {
+            array_pop($this->accessDecisionStack);
+        }
+    }
+
+    final public function isGrantedForUser(UserInterface $user, mixed $attribute, mixed $subject = null, ?AccessDecision $accessDecision = null): bool
+    {
+        $token = new class($user->getRoles()) extends AbstractToken implements OfflineTokenInterface {};
+        $token->setUser($user);
+
         $accessDecision ??= end($this->accessDecisionStack) ?: new AccessDecision();
         $this->accessDecisionStack[] = $accessDecision;
 

@@ -15,12 +15,23 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\PhpUnit\ClassExistsMock;
 use Symfony\Bridge\Twig\Extension\SecurityExtension;
 use Symfony\Component\Security\Acl\Voter\FieldVote;
+use Symfony\Component\Security\Core\Authorization\AccessDecision;
+use Symfony\Component\Security\Core\Authorization\AuthorizationChecker;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
-use Symfony\Component\Security\Core\Authorization\UserAuthorizationCheckerInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 class SecurityExtensionTest extends TestCase
 {
+    public static function setUpBeforeClass(): void
+    {
+        ClassExistsMock::register(SecurityExtension::class);
+    }
+
+    protected function tearDown(): void
+    {
+        ClassExistsMock::withMockedClasses([FieldVote::class => true]);
+    }
+
     /**
      * @dataProvider provideObjectFieldAclCases
      */
@@ -39,17 +50,16 @@ class SecurityExtensionTest extends TestCase
 
     public function testIsGrantedThrowsWhenFieldNotNullAndFieldVoteClassDoesNotExist()
     {
-        if (!class_exists(UserAuthorizationCheckerInterface::class)) {
+        if (!method_exists(AuthorizationChecker::class, 'isGrantedForUser')) {
             $this->markTestSkipped('This test requires symfony/security-core 7.3 or superior.');
         }
 
         $securityChecker = $this->createMock(AuthorizationCheckerInterface::class);
 
-        ClassExistsMock::register(SecurityExtension::class);
         ClassExistsMock::withMockedClasses([FieldVote::class => false]);
 
         $this->expectException(\LogicException::class);
-        $this->expectExceptionMessageMatches('Passing a $field to the "is_granted()" function requires symfony/acl.');
+        $this->expectExceptionMessage('Passing a $field to the "is_granted()" function requires symfony/acl.');
 
         $securityExtension = new SecurityExtension($securityChecker);
         $securityExtension->isGranted('ROLE', 'object', 'bar');
@@ -60,38 +70,41 @@ class SecurityExtensionTest extends TestCase
      */
     public function testIsGrantedForUserCreatesFieldVoteObjectWhenFieldNotNull($object, $field, $expectedSubject)
     {
-        if (!class_exists(UserAuthorizationCheckerInterface::class)) {
+        if (!method_exists(AuthorizationChecker::class, 'isGrantedForUser')) {
             $this->markTestSkipped('This test requires symfony/security-core 7.3 or superior.');
         }
 
         $user = $this->createMock(UserInterface::class);
-        $userSecurityChecker = $this->createMock(UserAuthorizationCheckerInterface::class);
-        $userSecurityChecker
-            ->expects($this->once())
-            ->method('isGrantedForUser')
-            ->with($user, 'ROLE', $expectedSubject)
-            ->willReturn(true);
+        $securityChecker = new class implements AuthorizationCheckerInterface {
+            public UserInterface $user;
+            public mixed $attribute;
+            public mixed $subject;
 
-        $securityExtension = new SecurityExtension(null, null, $userSecurityChecker);
+            public function isGranted(mixed $attribute, mixed $subject = null, ?AccessDecision $accessDecision = null): bool
+            {
+                throw new \BadMethodCallException('This method should not be called.');
+            }
+
+            public function isGrantedForUser(UserInterface $user, mixed $attribute, mixed $subject = null, ?AccessDecision $accessDecision = null): bool
+            {
+                $this->user = $user;
+                $this->attribute = $attribute;
+                $this->subject = $subject;
+
+                return true;
+            }
+        };
+
+        $securityExtension = new SecurityExtension($securityChecker);
         $this->assertTrue($securityExtension->isGrantedForUser($user, 'ROLE', $object, $field));
-    }
+        $this->assertSame($user, $securityChecker->user);
+        $this->assertSame('ROLE', $securityChecker->attribute);
 
-    public function testIsGrantedForUserThrowsWhenFieldNotNullAndFieldVoteClassDoesNotExist()
-    {
-        if (!class_exists(UserAuthorizationCheckerInterface::class)) {
-            $this->markTestSkipped('This test requires symfony/security-core 7.3 or superior.');
+        if (null === $field) {
+            $this->assertSame($object, $securityChecker->subject);
+        } else {
+            $this->assertEquals($expectedSubject, $securityChecker->subject);
         }
-
-        $securityChecker = $this->createMock(UserAuthorizationCheckerInterface::class);
-
-        ClassExistsMock::register(SecurityExtension::class);
-        ClassExistsMock::withMockedClasses([FieldVote::class => false]);
-
-        $this->expectException(\LogicException::class);
-        $this->expectExceptionMessageMatches('Passing a $field to the "is_granted_for_user()" function requires symfony/acl.');
-
-        $securityExtension = new SecurityExtension(null, null, $securityChecker);
-        $securityExtension->isGrantedForUser($this->createMock(UserInterface::class), 'object', 'bar');
     }
 
     public static function provideObjectFieldAclCases()
@@ -104,5 +117,22 @@ class SecurityExtensionTest extends TestCase
             ['object', '', new FieldVote('object', '')],
             ['object', 'field', new FieldVote('object', 'field')],
         ];
+    }
+
+    public function testIsGrantedForUserThrowsWhenFieldNotNullAndFieldVoteClassDoesNotExist()
+    {
+        if (!method_exists(AuthorizationChecker::class, 'isGrantedForUser')) {
+            $this->markTestSkipped('This test requires symfony/security-core 7.3 or superior.');
+        }
+
+        $securityChecker = $this->createMock(AuthorizationCheckerInterface::class);
+
+        ClassExistsMock::withMockedClasses([FieldVote::class => false]);
+
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('Passing a $field to the "is_granted_for_user()" function requires symfony/acl.');
+
+        $securityExtension = new SecurityExtension($securityChecker);
+        $securityExtension->isGrantedForUser($this->createMock(UserInterface::class), 'ROLE', 'object', 'bar');
     }
 }

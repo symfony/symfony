@@ -125,7 +125,7 @@ class ImportMapRenderer
             }
 
             $output .= <<<HTML
-                <script async$scriptAttributes>
+                <script$scriptAttributes>
                 if (!HTMLScriptElement.supports || !HTMLScriptElement.supports('importmap')) (function () {
                     const script = document.createElement('script');
                     script.src = '{$this->escapeAttributeValue($polyfillPath, \ENT_NOQUOTES)}';

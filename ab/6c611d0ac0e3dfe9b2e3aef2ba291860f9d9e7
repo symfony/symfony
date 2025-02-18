@@ -1,0 +1,43 @@
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2024-12-11T12:08:32Z
+
+The WIP fix on `php-src` works well. I updated the code ([diff](https://github.com/symfony/symfony/compare/d1cd7c32e65f377a349552a9206b46e5d924bf99..6eedfaa4df8ae6ce3e8bb5f7f435ea310abbac18)), it works nicely now 🙂
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2024-12-18T09:43:34Z
+
+Thank you for your feedbacks. I updated the PR. `IsGrantedPayload` was removed as well as role names. Arguments are now passed individually to the closure.
+
+Also, I'm now using `instance Closure` instead of `is_callable()` to avoid callable strings that may be used.
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2024-12-18T10:47:02Z
+
+Status: Needs Review
+
+---------------------------------------------------------------------------
+
+by chalasr at 2024-12-18T11:00:32Z
+
+I think the Attribute phpdoc and future docs should mention that only static closures are supported (for now).
+
+---------------------------------------------------------------------------
+
+by stof at 2024-12-18T11:21:43Z
+
+@chalasr supporting static closures only is not a limitation of our code. It is a limitation of PHP attributes. If PHP supports more closures (quite unlikely though, as I don't see how they would work), the code in Symfony would not require any change to support them.
+
+---------------------------------------------------------------------------
+
+by stof at 2024-12-18T11:25:03Z
+
+@alexandre-daubois don't forget to update the PR description, because it does not describe the current state of the PR anymore.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-02-12T10:30:26Z
+
+There's one failure to check (at least on the windows build)

@@ -1,0 +1,21 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2025-02-17T09:00:08Z
+
+This should maybe be done in 7.2 as well (so that people that were using it already can still access it?).
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-02-17T15:49:04Z
+
+> This should maybe be done in 7.2 as well (so that people that were using it already can still access it?).
+
+@fabpot the info array is supported since 7.3
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-02-17T15:49:51Z
+
+> the info array is supported since 7.3
+
+low-deps failure highlight a missing bump in the deps of the bridge ;)

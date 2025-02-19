@@ -1,0 +1,21 @@
+---------------------------------------------------------------------------
+
+by OskarStark at 2025-02-18T20:58:31Z
+
+Sounds like a new feature to me
+
+---------------------------------------------------------------------------
+
+by smoench at 2025-02-19T07:45:36Z
+
+> Sounds like a new feature to me
+
+It sounds like but it isn't. This PR unlocks functionality that's already there.
+
+Here a list where other Symfony Components already check only for `redis:`/`rediss:`:
+
+- https://github.com/symfony/symfony/blob/6.4/src/Symfony/Component/Cache/Adapter/AbstractAdapter.php#L114
+- https://github.com/symfony/symfony/blob/6.4/src/Symfony/Component/Cache/Traits/RedisTrait.php#L90
+- https://github.com/symfony/symfony/blob/6.4/src/Symfony/Component/HttpFoundation/Session/Storage/Handler/SessionHandlerFactory.php#L58
+- https://github.com/symfony/symfony/blob/6.4/src/Symfony/Component/Messenger/Bridge/Redis/Transport/RedisTransportFactory.php#L35
+- https://github.com/symfony/symfony/blob/6.4/src/Symfony/Component/Lock/Store/StoreFactory.php#L63

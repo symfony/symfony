@@ -1,0 +1,42 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-02-19T08:42:27Z
+
+Note that the portable syntax (= understood by phpstan & psalm & phpstorm) is this one:
+`@phpstan-type TypeAlias = array<string, list<bool>>`
+
+---------------------------------------------------------------------------
+
+by Neirda24 at 2025-02-19T08:46:44Z
+
+> Note that the portable syntax (= understood by phpstan & psalm & phpstorm) is this one: `@phpstan-type TypeAlias = array<string, list<bool>>`
+
+But it is not how people usually write it I think. is it ?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-02-19T08:48:35Z
+
+They have to if they want support from their tools...
+
+---------------------------------------------------------------------------
+
+by Neirda24 at 2025-02-19T08:54:02Z
+
+> They have to if they want support from their tools...
+
+hmmm IMO when this PR is merged it must not enforce one specific way of writing things with these tools. It should support both with and without `=`. Current projects / libraries that uses these kind of features don't always use the `=`. Requiring it would restrict people from using the TypeInfo on tools that did not follow the symfony requirements.
+
+---------------------------------------------------------------------------
+
+by Neirda24 at 2025-02-19T08:57:50Z
+
+> They have to if they want support from their tools...
+
+More on this. The documentation https://phpstan.org/writing-php-code/phpdoc-types#local-type-aliases doesn't even mention this. I asked Ondrej a while back on symfony's slack about this but he didn't tought it was worth adding it to documentation.
+
+---------------------------------------------------------------------------
+
+by mtarld at 2025-02-19T08:57:57Z
+
+@Neirda24, @nicolas-grekas, I updated the code/tests to make it work for `@psalm-*`, `@phpstan-*`, with and without the `=` so that it matches most of the use cases.

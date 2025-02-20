@@ -98,17 +98,9 @@ class StringTypeResolverTest extends TestCase
         yield [Type::false(), 'false'];
         yield [Type::int(), 'int'];
         yield [Type::int(), 'integer'];
-        yield [Type::intRange(1, \PHP_INT_MAX), 'positive-int'];
-        yield [Type::intRange(\PHP_INT_MIN, -1), 'negative-int'];
-        yield [Type::intRange(\PHP_INT_MIN, 0), 'non-positive-int'];
-        yield [Type::intRange(0, \PHP_INT_MAX), 'non-negative-int'];
-        yield [Type::intRange(\PHP_INT_MIN, \PHP_INT_MAX, false), 'non-zero-int'];
         yield [Type::float(), 'float'];
         yield [Type::float(), 'double'];
         yield [Type::string(), 'string'];
-        yield [Type::explicitString('class-string'), 'class-string'];
-        yield [Type::explicitString('literal-string'), 'literal-string'];
-        yield [Type::explicitString('html-escaped-string'), 'html-escaped-string'];
         yield [Type::resource(), 'resource'];
         yield [Type::object(), 'object'];
         yield [Type::callable(), 'callable'];
@@ -137,14 +129,26 @@ class StringTypeResolverTest extends TestCase
         yield [Type::template('T', Type::union(Type::int(), Type::string())), 'T', $typeContextFactory->createFromClassName(DummyWithTemplates::class)];
         yield [Type::template('V'), 'V', $typeContextFactory->createFromReflection(new \ReflectionMethod(DummyWithTemplates::class, 'getPrice'))];
 
+        // int range
+        yield [Type::intRange(from: 1), 'positive-int'];
+        yield [Type::intRange(from: 0), 'non-negative-int'];
+        yield [Type::intRange(to: -1), 'negative-int'];
+        yield [Type::intRange(to: 0), 'non-positive-int'];
+        yield [Type::union(Type::intRange(to: -1), Type::intRange(from: 1)), 'non-zero-int'];
+        yield [Type::intRange(0, 100), 'int<0, 100>'];
+        yield [Type::intRange(), 'int<min, max>'];
+
+        // explicit string
+        yield [Type::explicitString('class-string'), 'class-string'];
+        yield [Type::explicitString('literal-string'), 'literal-string'];
+        yield [Type::explicitString('html-escaped-string'), 'html-escaped-string'];
+
         // nullable
         yield [Type::nullable(Type::int()), '?int'];
 
         // generic
         yield [Type::generic(Type::object(\DateTime::class), Type::string(), Type::bool()), \DateTime::class.'<string, bool>'];
         yield [Type::generic(Type::object(\DateTime::class), Type::generic(Type::object(\Stringable::class), Type::bool())), \sprintf('%s<%s<bool>>', \DateTime::class, \Stringable::class)];
-        yield [Type::intRange(0, 100), 'int<0, 100>'];
-        yield [Type::intRange(\PHP_INT_MIN, \PHP_INT_MAX), 'int<min, max>'];
 
         // union
         yield [Type::union(Type::int(), Type::string()), 'int|string'];

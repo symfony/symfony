@@ -56,9 +56,9 @@ trait TypeFactoryTrait
         return self::builtin(TypeIdentifier::INT);
     }
 
-    public static function intRange(int $from, int $to, bool $zeroIncluded = true): IntRangeType
+    public static function intRange(int $from = \PHP_INT_MIN, int $to = \PHP_INT_MAX): IntRangeType
     {
-        return new IntRangeType($from, $to, $zeroIncluded);
+        return new IntRangeType($from, $to);
     }
 
     /**

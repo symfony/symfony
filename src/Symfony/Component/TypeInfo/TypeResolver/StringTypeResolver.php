@@ -136,11 +136,11 @@ final class StringTypeResolver implements TypeResolverInterface
                 'true' => Type::true(),
                 'false' => Type::false(),
                 'int', 'integer' => Type::int(),
-                'positive-int' => Type::intRange(1, \PHP_INT_MAX),
-                'negative-int' => Type::intRange(\PHP_INT_MIN, -1),
-                'non-positive-int' => Type::intRange(\PHP_INT_MIN, 0),
-                'non-negative-int' => Type::intRange(0, \PHP_INT_MAX),
-                'non-zero-int' => Type::intRange(\PHP_INT_MIN, \PHP_INT_MAX, false),
+                'positive-int' => Type::intRange(from: 1),
+                'negative-int' => Type::intRange(to: -1),
+                'non-positive-int' => Type::intRange(to: 0),
+                'non-negative-int' => Type::intRange(from: 0),
+                'non-zero-int' => Type::union(Type::intRange(to: -1), Type::intRange(from: 1)),
                 'float', 'double' => Type::float(),
                 'string' => Type::string(),
                 'class-string',
@@ -191,7 +191,7 @@ final class StringTypeResolver implements TypeResolverInterface
 
             // handle integer ranges
             if ($type->isIdentifiedBy(TypeIdentifier::INT)) {
-                $getValueFromNode = function (TypeNode $node) {
+                $getBoundaryFromNode = function (TypeNode $node) {
                     if ($node instanceof IdentifierTypeNode) {
                         return match ($node->name) {
                             'min' => \PHP_INT_MIN,
@@ -207,9 +207,9 @@ final class StringTypeResolver implements TypeResolverInterface
                     throw new \DomainException(\sprintf('Invalid int range expression "%s".', \get_class($node->constExpr)));
                 };
 
-                $range = array_map(fn (TypeNode $t): int => $getValueFromNode($t), $node->genericTypes);
+                $boundaries = array_map(static fn (TypeNode $t): int => $getBoundaryFromNode($t), $node->genericTypes);
 
-                return Type::intRange(...$range);
+                return Type::intRange($boundaries[0], $boundaries[1]);
             }
 
             $variableTypes = array_map(fn (TypeNode $t): Type => $this->getTypeFromNode($t, $typeContext), $node->genericTypes);

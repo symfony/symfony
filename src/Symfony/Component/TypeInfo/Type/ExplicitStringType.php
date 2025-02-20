@@ -20,7 +20,7 @@ use Symfony\Component\TypeInfo\TypeIdentifier;
  *
  * @extends BuiltinType<TypeIdentifier::STRING>
  */
-class ExplicitStringType extends BuiltinType
+final class ExplicitStringType extends BuiltinType
 {
     public function __construct(private string $explicitType)
     {

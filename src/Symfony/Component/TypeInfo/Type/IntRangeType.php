@@ -20,12 +20,11 @@ use Symfony\Component\TypeInfo\TypeIdentifier;
  *
  * @extends BuiltinType<TypeIdentifier::INT>
  */
-class IntRangeType extends BuiltinType
+final class IntRangeType extends BuiltinType
 {
     public function __construct(
         private int $from = \PHP_INT_MIN,
         private int $to = \PHP_INT_MAX,
-        private bool $zeroIncluded = true,
     ) {
         parent::__construct(TypeIdentifier::INT);
     }
@@ -40,16 +39,9 @@ class IntRangeType extends BuiltinType
         return $this->to;
     }
 
-    public function isZeroIncluded(): bool
-    {
-        return $this->zeroIncluded;
-    }
-
     public function accepts(mixed $value): bool
     {
-        return \is_int($value)
-            && $this->from <= $value && $value <= $this->to
-            && (0 !== $value || $this->zeroIncluded);
+        return parent::accepts($value) && $this->from <= $value && $value <= $this->to;
     }
 
     public function __toString(): string
@@ -58,8 +50,9 @@ class IntRangeType extends BuiltinType
         $max = \PHP_INT_MAX === $this->to ? 'max' : $this->to;
 
         $template = 'int<%s, %s>';
+
         if (\is_string($min) && \is_string($max)) {
-            return $this->zeroIncluded ? \sprintf($template, $min, $max) : 'non-zero-int';
+            return \sprintf($template, $min, $max);
         }
 
         if (\in_array($min, [0, 1], true) && 'max' === $max) {

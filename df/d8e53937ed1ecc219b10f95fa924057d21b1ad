@@ -1,0 +1,68 @@
+---------------------------------------------------------------------------
+
+by stof at 2025-02-19T10:29:25Z
+
+Wouldn't this break when caching the constraint metadata as the closure is not serializable ?
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2025-02-19T12:42:32Z
+
+I'm not familiar with validator cache at all, where could this possibly be a problem? I couldn't break the current code when using the `framework.validation.cache` option
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-02-19T16:30:11Z
+
+Looks like this option is a no-op @alexandre-daubois - it's of no use since Symfony 4 apparently.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-02-19T16:34:08Z
+
+That being said, it shouldn't break anything because `$cache->save()` will fail silently by design.
+We might still want to provide a way to skip even trying to save - at least to remove some would-be-noisy logs.
+@alexandre-daubois can you confirm?
+
+---------------------------------------------------------------------------
+
+by stof at 2025-02-19T16:38:02Z
+
+Failing silently might still be an issue, in case the following requests consider that there is no constraints for that property (due to the failed save of the cache) instead of considering they must reload metadata without cache.
+
+And not having a metadata cache in prod will be bad for performance.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-02-19T16:39:40Z
+
+> And not having a metadata cache in prod will be bad for performance.
+
+Reflection is fast nowadays, I'm not sure a cache is going to be faster than reading attributes.
+A bench would be nice :)
+
+---------------------------------------------------------------------------
+
+by stof at 2025-02-19T16:43:14Z
+
+@nicolas-grekas validator metadata is not only coming from attributes. We still have loaders for XML and Yaml config files (and maybe also others).
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2025-02-20T10:16:33Z
+
+> That being said, it shouldn't break anything because `$cache->save()` will fail silently by design. We might still want to provide a way to skip even trying to save - at least to remove some would-be-noisy logs.
+
+Yes, Cache's `AbstractAdapter` silences any exception happening in `AbstractAdapterTrait::doSave()`, which happens when trying to export the constraint with the closure. There should be no logs because of this.
+
+I'm not sure how we could skip trying to save. It seems very specific to this constraint (and Callback which should already supports closures-in-attribute I think) and it does not look like it worths it in the end?
+
+> Failing silently might still be an issue, in case the following requests consider that there is no constraints for that property (due to the failed save of the cache) instead of considering they must reload metadata without cache.
+
+Seems that `LazyLoadingMetadataFactory` always tries to read metadata from the value when there's a cache miss.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-02-20T10:41:29Z
+
+Great, so good to merge!

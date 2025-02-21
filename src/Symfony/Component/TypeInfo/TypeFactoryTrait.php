@@ -15,6 +15,7 @@ use Symfony\Component\TypeInfo\Type\BackedEnumType;
 use Symfony\Component\TypeInfo\Type\BuiltinType;
 use Symfony\Component\TypeInfo\Type\CollectionType;
 use Symfony\Component\TypeInfo\Type\EnumType;
+use Symfony\Component\TypeInfo\Type\ExplicitStringType;
 use Symfony\Component\TypeInfo\Type\GenericType;
 use Symfony\Component\TypeInfo\Type\IntersectionType;
 use Symfony\Component\TypeInfo\Type\NullableType;
@@ -68,6 +69,11 @@ trait TypeFactoryTrait
     public static function string(): BuiltinType
     {
         return self::builtin(TypeIdentifier::STRING);
+    }
+
+    public static function explicitString(string $explicitType): ExplicitStringType
+    {
+        return new ExplicitStringType($explicitType);
     }
 
     /**

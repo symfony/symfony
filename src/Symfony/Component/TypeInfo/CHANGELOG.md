@@ -4,6 +4,7 @@ CHANGELOG
 7.3
 ---
 
+ * Add `ExplicitStringType` classes to hold specific type details for `string` builtin types
  * Add `Type::accepts()` method
  * Add `TypeFactoryTrait::fromValue()` method
  * Deprecate constructing a `CollectionType` instance as a list that is not an array

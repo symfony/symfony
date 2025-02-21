@@ -106,18 +106,6 @@ class StringTypeResolverTest extends TestCase
         yield [Type::float(), 'float'];
         yield [Type::float(), 'double'];
         yield [Type::string(), 'string'];
-        yield [Type::string(), 'class-string'];
-        yield [Type::string(), 'trait-string'];
-        yield [Type::string(), 'interface-string'];
-        yield [Type::string(), 'callable-string'];
-        yield [Type::string(), 'numeric-string'];
-        yield [Type::string(), 'lowercase-string'];
-        yield [Type::string(), 'non-empty-lowercase-string'];
-        yield [Type::string(), 'non-empty-string'];
-        yield [Type::string(), 'non-falsy-string'];
-        yield [Type::string(), 'truthy-string'];
-        yield [Type::string(), 'literal-string'];
-        yield [Type::string(), 'html-escaped-string'];
         yield [Type::resource(), 'resource'];
         yield [Type::object(), 'object'];
         yield [Type::callable(), 'callable'];
@@ -145,6 +133,21 @@ class StringTypeResolverTest extends TestCase
         yield [Type::enum(DummyBackedEnum::class), 'DummyBackedEnum', $typeContextFactory->createFromClassName(DummyBackedEnum::class)];
         yield [Type::template('T', Type::union(Type::int(), Type::string())), 'T', $typeContextFactory->createFromClassName(DummyWithTemplates::class)];
         yield [Type::template('V'), 'V', $typeContextFactory->createFromReflection(new \ReflectionMethod(DummyWithTemplates::class, 'getPrice'))];
+
+        // explicit string
+        yield [Type::explicitString('callable-string'), 'callable-string'];
+        yield [Type::explicitString('numeric-string'), 'numeric-string'];
+        yield [Type::explicitString('lowercase-string'), 'lowercase-string'];
+        yield [Type::explicitString('non-empty-lowercase-string'), 'non-empty-lowercase-string'];
+        yield [Type::explicitString('non-empty-string'), 'non-empty-string'];
+        yield [Type::explicitString('non-falsy-string'), 'non-falsy-string'];
+        yield [Type::explicitString('truthy-string'), 'truthy-string'];
+        yield [Type::explicitString('literal-string'), 'literal-string'];
+        yield [Type::explicitString('html-escaped-string'), 'html-escaped-string'];
+
+        yield [Type::explicitString('class-string'), 'class-string'];
+        yield [Type::explicitString('trait-string'), 'trait-string'];
+        yield [Type::explicitString('interface-string'), 'interface-string'];
 
         // nullable
         yield [Type::nullable(Type::int()), '?int'];

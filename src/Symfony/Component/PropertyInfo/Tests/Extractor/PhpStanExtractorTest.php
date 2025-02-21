@@ -946,23 +946,24 @@ class PhpStanExtractorTest extends TestCase
      */
     public static function pseudoTypesProvider(): iterable
     {
-        yield ['classString', Type::string()];
+        yield ['classString', Type::explicitString('class-string')];
 
         // BC layer for type-info < 7.2
         if (!interface_exists(WrappingTypeInterface::class)) {
             yield ['classStringGeneric', Type::generic(Type::string(), Type::object(\stdClass::class))];
         } else {
-            yield ['classStringGeneric', Type::string()];
+            yield ['classStringGeneric', Type::explicitString('class-string')];
         }
 
-        yield ['htmlEscapedString', Type::string()];
-        yield ['lowercaseString', Type::string()];
-        yield ['nonEmptyLowercaseString', Type::string()];
-        yield ['nonEmptyString', Type::string()];
-        yield ['numericString', Type::string()];
-        yield ['traitString', Type::string()];
-        yield ['interfaceString', Type::string()];
-        yield ['literalString', Type::string()];
+        yield ['htmlEscapedString', Type::explicitString('html-escaped-string')];
+        yield ['lowercaseString', Type::explicitString('lowercase-string')];
+        yield ['nonEmptyLowercaseString', Type::explicitString('non-empty-lowercase-string')];
+        yield ['nonEmptyString', Type::explicitString('non-empty-string')];
+        yield ['numericString', Type::explicitString('numeric-string')];
+        yield ['traitString', Type::explicitString('trait-string')];
+        yield ['interfaceString', Type::explicitString('interface-string')];
+        yield ['literalString', Type::explicitString('literal-string')];
+
         yield ['positiveInt', Type::int()];
         yield ['negativeInt', Type::int()];
         yield ['nonEmptyArray', Type::array()];

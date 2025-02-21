@@ -1,0 +1,25 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-02-19T12:38:01Z
+
+Thanks for the reviews, comments addressed.
+
+Status: needs review
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-02-20T10:11:21Z
+
+I just removed the `IsGranted::IS_*` consts in favor of corresponding `IsGrantedContext::is*()` methods.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2025-02-20T12:14:00Z
+
+isn't fabbot's patch legit?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-02-21T07:41:45Z
+
+I think this alignment rule doesn't work when the type description is too long, so I ignored fabbot on purpose...

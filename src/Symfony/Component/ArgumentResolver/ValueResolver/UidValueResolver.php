@@ -9,22 +9,24 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\ArgumentResolver\ValueResolver\Traits;
+namespace Symfony\Component\ArgumentResolver\ValueResolver;
 
 use Symfony\Component\ArgumentResolver\ArgumentMetadata\ArgumentMetadata;
-use Symfony\Component\ArgumentResolver\Exception\InvalidRawValueException;
+use Symfony\Component\ArgumentResolver\Exception\InvalidSourceValueException;
+use Symfony\Component\ArgumentResolver\SourceValue;
 use Symfony\Component\Uid\AbstractUid;
 
 /**
  * @author Robin Chalas <robin@baksla.sh>
  */
-trait UidValueResolverTrait
+final readonly class UidValueResolver implements ValueResolverInterface
 {
-    private function doResolve(ArgumentMetadata $argument, array $rawValues): iterable
+    public function resolveArgument(ArgumentMetadata $argument, SourceValue $value): iterable
     {
-        $value = $rawValues[0] ?? null;
+        $value = $value->get();
 
         if ($argument->isVariadic()
+            || SourceValue::NOT_FOUND === $value
             || !\is_string($value)
             || null === ($uidClass = $argument->getType())
             || !is_subclass_of($uidClass, AbstractUid::class, true)
@@ -35,7 +37,7 @@ trait UidValueResolverTrait
         try {
             return [$uidClass::fromString($value)];
         } catch (\InvalidArgumentException $e) {
-            throw new InvalidRawValueException(\sprintf('The uid for the "%s" parameter is invalid.', $argument->getName()), $e);
+            throw new InvalidSourceValueException(\sprintf('The uid for the "%s" parameter is invalid.', $argument->getName()), $e->getCode(), $e);
         }
     }
 }

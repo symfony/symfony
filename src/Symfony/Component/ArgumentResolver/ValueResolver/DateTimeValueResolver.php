@@ -9,12 +9,13 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\ArgumentResolver\ValueResolver\Traits;
+namespace Symfony\Component\ArgumentResolver\ValueResolver;
 
 use Psr\Clock\ClockInterface;
 use Symfony\Component\ArgumentResolver\ArgumentMetadata\ArgumentMetadata;
-use Symfony\Component\ArgumentResolver\Exception\InvalidRawValueException;
-use Symfony\Component\HttpKernel\Attribute\MapDateTime;
+use Symfony\Component\ArgumentResolver\Attribute\MapDateTime;
+use Symfony\Component\ArgumentResolver\Exception\InvalidSourceValueException;
+use Symfony\Component\ArgumentResolver\SourceValue;
 
 /**
  * Convert DateTime instances from request attribute variable.
@@ -23,20 +24,25 @@ use Symfony\Component\HttpKernel\Attribute\MapDateTime;
  * @author Tim Goudriaan <tim@codedmonkey.com>
  * @author Robin Chalas <robin@baksla.sh>
  */
-trait DateTimeValueResolverTrait
+final readonly class DateTimeValueResolver implements ValueResolverInterface
 {
     public function __construct(
         private readonly ?ClockInterface $clock = null,
     ) {
     }
 
-    private function doResolve(ArgumentMetadata $argument, array $rawValues): iterable
+    public function resolveArgument(ArgumentMetadata $argument, SourceValue $value): iterable
     {
         if (!is_a($argument->getType(), \DateTimeInterface::class, true)) {
             return [];
         }
 
-        $value = $rawValues[0] ?? null;
+        $value = $value->get();
+
+        if (SourceValue::NOT_FOUND === $value) {
+            return [];
+        }
+
         $class = \DateTimeInterface::class === $argument->getType() ? \DateTimeImmutable::class : $argument->getType();
 
         if (!$value) {
@@ -78,7 +84,7 @@ trait DateTimeValueResolverTrait
         }
 
         if (!$date) {
-            throw new InvalidRawValueException(\sprintf('Invalid date given for parameter "%s".', $argument->getName()));
+            throw new InvalidSourceValueException(\sprintf('Invalid date given for parameter "%s".', $argument->getName()));
         }
 
         return [$date];

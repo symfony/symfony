@@ -9,10 +9,11 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\ArgumentResolver\ValueResolver\Traits;
+namespace Symfony\Component\ArgumentResolver\ValueResolver;
 
 use Symfony\Component\ArgumentResolver\ArgumentMetadata\ArgumentMetadata;
-use Symfony\Component\ArgumentResolver\Exception\InvalidRawValueException;
+use Symfony\Component\ArgumentResolver\Exception\InvalidSourceValueException;
+use Symfony\Component\ArgumentResolver\SourceValue;
 use Symfony\Component\ArgumentResolver\ValueAccessor\RawValueAccessorInterface;
 
 /**
@@ -22,20 +23,20 @@ use Symfony\Component\ArgumentResolver\ValueAccessor\RawValueAccessorInterface;
  * @author Maxime Steinhausser <maxime.steinhausser@gmail.com>
  * @author Robin Chalas <robin@baksla.sh>
  */
-trait BackedEnumValueResolverTrait
+final readonly class BackedEnumValueResolver implements ValueResolverInterface
 {
-    private function doResolve(ArgumentMetadata $argument, array $rawValues): iterable
+    public function resolveArgument(ArgumentMetadata $argument, SourceValue $value): iterable
     {
         if (!is_subclass_of($argument->getType(), \BackedEnum::class)) {
             return [];
         }
 
-        if ($argument->isVariadic()) {
+        $value = $value->get();
+
+        if ($argument->isVariadic() || SourceValue::NOT_FOUND === $value) {
             // not supported
             return [];
         }
-
-        $value = $rawValues[0] ?? null;
 
         if (null === $value) {
             return [null];
@@ -46,7 +47,7 @@ trait BackedEnumValueResolverTrait
         }
 
         if (!\is_int($value) && !\is_string($value)) {
-            throw new \LogicException(\sprintf('Could not resolve the "%s $%s" controller argument: expecting an int or string, got "%s".', $argument->getType(), $argument->getName(), get_debug_type($value)));
+            throw new \LogicException(\sprintf('Could not resolve the "%s $%s" argument: expecting an int or string, got "%s".', $argument->getType(), $argument->getName(), get_debug_type($value)));
         }
 
         /** @var class-string<\BackedEnum> $enumType */
@@ -55,7 +56,7 @@ trait BackedEnumValueResolverTrait
         try {
             return [$enumType::from($value)];
         } catch (\ValueError|\TypeError $e) {
-            throw new InvalidRawValueException(\sprintf('Could not resolve the "%s $%s" controller argument: ', $argument->getType(), $argument->getName()).$e->getMessage(), $e->getCode(), $e);
+            throw new InvalidSourceValueException(\sprintf('Could not resolve the "%s $%s" argument: ', $argument->getType(), $argument->getName()).$e->getMessage(), $e->getCode(), $e);
         }
     }
 }

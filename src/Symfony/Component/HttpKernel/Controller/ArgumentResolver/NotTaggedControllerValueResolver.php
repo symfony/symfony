@@ -12,52 +12,58 @@
 namespace Symfony\Component\HttpKernel\Controller\ArgumentResolver;
 
 use Psr\Container\ContainerInterface;
+use Symfony\Component\ArgumentResolver\ArgumentMetadata\ArgumentMetadata;
+use Symfony\Component\ArgumentResolver\Exception\InvalidSourceValueException;
+use Symfony\Component\ArgumentResolver\SourceValue;
+use Symfony\Component\ArgumentResolver\ValueResolver\NotTaggedCallableValueResolver;
+use Symfony\Component\ArgumentResolver\ValueResolver\ValueResolverInterface;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\Controller\ValueResolverInterface;
-use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
+use Symfony\Component\HttpKernel\Controller\ValueResolverInterface as LegacyValueResolverInterface;
+use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata as LegacyArgumentMetadata;
 
 /**
  * Provides an intuitive error message when controller fails because it is not registered as a service.
  *
  * @author Simeon Kolev <simeon.kolev9@gmail.com>
- *
- * @deprecated
  */
-final class NotTaggedControllerValueResolver implements ValueResolverInterface
+final class NotTaggedControllerValueResolver implements ControllerValueResolverInterface, LegacyValueResolverInterface
 {
+    private ValueResolverInterface $inner;
+
     public function __construct(
-        private ContainerInterface $container,
+        ValueResolverInterface|ContainerInterface $inner,
     ) {
+        if ($inner instanceof ContainerInterface) {
+            trigger_deprecation('symfony/http-kernel', '7.3', sprintf('The "$container" argument of "%s::__construct()" is deprecated, pass a "%s" instance as "$inner" instead.', __CLASS__, NotTaggedCallableValueResolver::class));
+            $this->inner = new NotTaggedCallableValueResolver($inner);
+            return;
+        }
+        $this->inner = new NotTaggedCallableValueResolver($inner);
     }
 
-    public function resolve(Request $request, ArgumentMetadata $argument): array
+    public function resolveArgument(ArgumentMetadata $argument, SourceValue $value): iterable
     {
-        $controller = $request->attributes->get('_controller');
-
-        if (\is_array($controller) && \is_callable($controller, true) && \is_string($controller[0])) {
-            $controller = $controller[0].'::'.$controller[1];
-        } elseif (!\is_string($controller) || '' === $controller) {
-            return [];
+        try {
+            return $this->inner->resolveArgument($argument, $value);
+        } catch (RuntimeException $e) {
+            throw new RuntimeException(str_replace('?', ' or missed tagging it with the "controller.service_arguments"?', $e->getMessage()));
         }
+    }
 
-        if ('\\' === $controller[0]) {
-            $controller = ltrim($controller, '\\');
-        }
+    public function extractSourceValue(ArgumentMetadata $argument, Request $request): SourceValue
+    {
+        return new SourceValue($request->attributes->get('_controller'));
 
-        if (!$this->container->has($controller)) {
-            $controller = (false !== $i = strrpos($controller, ':'))
-                ? substr($controller, 0, $i).strtolower(substr($controller, $i))
-                : $controller.'::__invoke';
-        }
+    }
 
-        if ($this->container->has($controller)) {
-            return [];
-        }
+    /**
+     * @deprecated since Symfony 7.3, use resolveArgument() instead
+     */
+    public function resolve(Request $request, LegacyArgumentMetadata $argument): iterable
+    {
+        trigger_deprecation('symfony/http-kernel', '7.3', \sprintf('The "%s()" method is deprecated, use "resolveArgument()" instead.', __METHOD__));
 
-        $what = \sprintf('argument $%s of "%s()"', $argument->getName(), $controller);
-        $message = \sprintf('Could not resolve %s, maybe you forgot to register the controller as a service or missed tagging it with the "controller.service_arguments"?', $what);
-
-        throw new RuntimeException($message);
+        return $this->resolveArgument($argument, $this->extractSourceValue($argument, $request));
     }
 }

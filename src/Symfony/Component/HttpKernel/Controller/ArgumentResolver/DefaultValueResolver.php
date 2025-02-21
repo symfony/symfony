@@ -11,28 +11,44 @@
 
 namespace Symfony\Component\HttpKernel\Controller\ArgumentResolver;
 
+trigger_deprecation('symfony/http-kernel', '7.3', 'The "%s" class is deprecated, use "%s" instead.', DefaultValueResolver::class, BaseDefaultValueResolver::class);
+
+use Symfony\Component\ArgumentResolver\ArgumentMetadata\ArgumentMetadata;
+use Symfony\Component\ArgumentResolver\SourceValue;
+use Symfony\Component\ArgumentResolver\ValueResolver\DefaultValueResolver as BaseDefaultValueResolver;
+use Symfony\Component\ArgumentResolver\ValueResolver\ValueResolverInterface;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\Controller\ValueResolverInterface;
-use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
+use Symfony\Component\HttpKernel\Controller\ValueResolverInterface as LegacyValueResolverInterface;
+use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata as LegacyArgumentMetadata;
 
 /**
  * Yields the default value defined in the action signature when no value has been given.
  *
  * @author Iltar van der Berg <kjarli@gmail.com>
- * @deprecated
+ *
+ * @deprecated since Symfony 7.3, use {@see BaseDefaultValueResolver} instead
  */
-final class DefaultValueResolver implements ValueResolverInterface
+final class DefaultValueResolver implements LegacyValueResolverInterface, ControllerValueResolverInterface
 {
-    public function resolve(Request $request, ArgumentMetadata $argument): array
+    private ValueResolverInterface $inner;
+
+    public function __construct()
     {
-        if ($argument->hasDefaultValue()) {
-            return [$argument->getDefaultValue()];
-        }
+        $this->inner = new BaseDefaultValueResolver();
+    }
 
-        if (null !== $argument->getType() && $argument->isNullable() && !$argument->isVariadic()) {
-            return [null];
-        }
+    public function resolveArgument(ArgumentMetadata $argument, SourceValue $value): iterable
+    {
+        return $this->inner->resolveArgument($argument, $value);
+    }
 
-        return [];
+    public function extractSourceValue(ArgumentMetadata $argument, Request $request): SourceValue
+    {
+        return new SourceValue(null);
+    }
+
+    public function resolve(Request $request, LegacyArgumentMetadata $argument): iterable
+    {
+        return $this->resolveArgument($argument, new SourceValue(null));
     }
 }

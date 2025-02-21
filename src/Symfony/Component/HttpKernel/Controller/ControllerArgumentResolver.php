@@ -12,16 +12,18 @@
 namespace Symfony\Component\HttpKernel\Controller;
 
 use Symfony\Component\ArgumentResolver\ArgumentMetadata\ArgumentMetadata;
-use Symfony\Component\ArgumentResolver\ValueResolver\DefaultValueResolver;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata as LegacyArgumentMetadata;
-use Symfony\Component\HttpKernel\Controller\ArgumentResolver\ValueResolver\ControllerValueResolverInterface;
-use Symfony\Component\HttpKernel\Controller\ValueResolverInterface as LegacyValueResolverInterface;
-use Symfony\Component\HttpKernel\Controller\ArgumentResolver\ValueResolver\RequestAttributeValueResolver;
-use Symfony\Component\HttpKernel\Controller\ArgumentResolver\ValueResolver\RequestValueResolver;
-use Symfony\Component\HttpKernel\Controller\ArgumentResolver\ValueResolver\SessionValueResolver;
-use Symfony\Component\HttpKernel\Controller\ArgumentResolver\ValueResolver\VariadicValueResolver;
 use Symfony\Component\ArgumentResolver\ArgumentResolver;
+use Symfony\Component\ArgumentResolver\SourceValue;
+use Symfony\Component\ArgumentResolver\ValueResolver\DefaultValueResolver;
+use Symfony\Component\ArgumentResolver\ValueResolver\ValueResolverInterface;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\Controller\ArgumentResolver\ControllerValueResolverInterface;
+use Symfony\Component\HttpKernel\Controller\ArgumentResolver\RequestAttributeValueResolver;
+use Symfony\Component\HttpKernel\Controller\ArgumentResolver\RequestValueResolver;
+use Symfony\Component\HttpKernel\Controller\ArgumentResolver\SessionValueResolver;
+use Symfony\Component\HttpKernel\Controller\ArgumentResolver\VariadicValueResolver;
+use Symfony\Component\HttpKernel\Controller\ValueResolverInterface as LegacyValueResolverInterface;
+use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata as LegacyArgumentMetadata;
 
 /**
  * Responsible for resolving the arguments passed to an action.
@@ -29,15 +31,15 @@ use Symfony\Component\ArgumentResolver\ArgumentResolver;
 final class ControllerArgumentResolver extends ArgumentResolver
 {
     /**
-     * @param Request $request
+     * @param Request $input
      */
-    public function getArguments(mixed $request, callable $callable, ?\ReflectionFunctionAbstract $reflector = null): array
+    public function getArguments(mixed $input, callable $callable, ?\ReflectionFunctionAbstract $reflector = null): array
     {
-        if (!$request instanceof Request) {
+        if (!$input instanceof Request) {
             throw new \InvalidArgumentException(sprintf('The "$request" argument must be an instance of %s, got "%s".', Request::class, get_debug_type($request)));
         }
 
-        return parent::getArguments($request, $callable, $reflector);
+        return parent::getArguments($input, $callable, $reflector);
     }
 
     public static function getDefaultValueResolvers(): iterable
@@ -65,11 +67,12 @@ final class ControllerArgumentResolver extends ArgumentResolver
      */
     protected function callResolver($resolver, ArgumentMetadata $metadata, mixed $input): iterable
     {
-        if ($resolver instanceof LegacyValueResolverInterface) {
-            trigger_deprecation('symfony/http-kernel', '7.3', sprintf('The "%s" interface is deprecated, implement "%s" instead.', LegacyValueResolverInterface::class, ControllerValueResolverInterface::class));
-            return $resolver->resolve($input, LegacyArgumentMetadata::fromBaseArgumentMetadata($metadata));
+        if ($resolver instanceof ValueResolverInterface) {
+            return $resolver->resolveArgument($metadata, $resolver instanceof ControllerValueResolverInterface ? $resolver->extractSourceValue($metadata, $input) : new SourceValue(null));
         } else {
-            return $resolver->resolve($metadata, $input);
+            trigger_deprecation('symfony/http-kernel', '7.3', \sprintf('The "%s" interface is deprecated, implement "%s" in "%s" instead.', LegacyValueResolverInterface::class, ControllerValueResolverInterface::class, $resolver::class));
+
+            return $resolver->resolve($input, LegacyArgumentMetadata::fromBaseArgumentMetadata($metadata));
         }
     }
 }

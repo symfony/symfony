@@ -12,6 +12,7 @@
 namespace Symfony\Component\ArgumentResolver\ValueResolver;
 
 use Symfony\Component\ArgumentResolver\ArgumentMetadata\ArgumentMetadata;
+use Symfony\Component\ArgumentResolver\SourceValue;
 
 /**
  * Yields the default value defined in the action signature when no value has been given.
@@ -20,7 +21,7 @@ use Symfony\Component\ArgumentResolver\ArgumentMetadata\ArgumentMetadata;
  */
 final class DefaultValueResolver implements ValueResolverInterface
 {
-    public function resolve(ArgumentMetadata $argument): iterable
+    public function resolveArgument(ArgumentMetadata $argument, SourceValue $value): iterable
     {
         if ($argument->hasDefaultValue()) {
             return [$argument->getDefaultValue()];

@@ -123,7 +123,7 @@ class BackedEnumValueResolverTest extends TestCase
         $metadata = self::createArgumentMetadata('suit', Suit::class);
 
         $this->expectException(\LogicException::class);
-        $this->expectExceptionMessage('Could not resolve the "Symfony\Component\HttpKernel\Tests\Fixtures\Suit $suit" controller argument: expecting an int or string, got "bool".');
+        $this->expectExceptionMessage('Could not resolve the "Symfony\Component\HttpKernel\Tests\Fixtures\Suit $suit" argument: expecting an int or string, got "bool".');
 
         $resolver->resolve($request, $metadata);
     }

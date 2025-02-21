@@ -9,11 +9,12 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\ArgumentResolver\ValueResolver\Traits;
+namespace Symfony\Component\ArgumentResolver\ValueResolver;
 
 use Psr\Container\ContainerInterface;
 use Symfony\Component\ArgumentResolver\ArgumentMetadata\ArgumentMetadata;
 use Symfony\Component\ArgumentResolver\Exception\NearMissValueResolverException;
+use Symfony\Component\ArgumentResolver\SourceValue;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 
 /**
@@ -22,16 +23,26 @@ use Symfony\Component\DependencyInjection\Exception\RuntimeException;
  * @author Nicolas Grekas <p@tchwork.com>
  * @author Robin Chalas <robin@baksla.sh>
  */
-trait ServiceValueResolverTrait
+final readonly class ServiceValueResolver implements ValueResolverInterface
 {
     public function __construct(
         private ContainerInterface $container,
     ) {
     }
 
-    private function doResolve(ArgumentMetadata $argument, array $rawValues): iterable
+    public function resolveArgument(ArgumentMetadata $argument, SourceValue $value): iterable
     {
-        $callable = $rawValues[0];
+        $callable = $value->get();
+
+        if (SourceValue::NOT_FOUND === $callable) {
+            return [];
+        }
+
+        if (\is_array($callable) && \is_callable($callable, true) && \is_string($callable[0])) {
+            $callable = $callable[0].'::'.$callable[1];
+        } elseif (!\is_string($callable) || '' === $callable) {
+            return [];
+        }
 
         if ('\\' === $callable[0]) {
             $callable = ltrim($callable, '\\');

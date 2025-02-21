@@ -11,18 +11,20 @@
 
 namespace Symfony\Component\HttpKernel\Controller\ArgumentResolver;
 
+use Symfony\Component\ArgumentResolver\ArgumentMetadata\ArgumentMetadata;
+use Symfony\Component\ArgumentResolver\Exception\NearMissValueResolverException;
+use Symfony\Component\ArgumentResolver\SourceValue;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Attribute\MapQueryString;
 use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
 use Symfony\Component\HttpKernel\Attribute\MapUploadedFile;
-use Symfony\Component\HttpKernel\Controller\ValueResolverInterface;
-use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
+use Symfony\Component\HttpKernel\Controller\ValueResolverInterface as LegacyValueResolverInterface;
+use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata as LegacyArgumentMetadata;
 use Symfony\Component\HttpKernel\Event\ControllerArgumentsEvent;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\HttpException;
-use Symfony\Component\HttpKernel\Exception\NearMissValueResolverException;
 use Symfony\Component\HttpKernel\Exception\UnsupportedMediaTypeHttpException;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Serializer\Exception\NotEncodableValueException;
@@ -42,10 +44,8 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  * @author Konstantin Myakshin <molodchick@gmail.com>
  *
  * @final
- *
- * @deprecated
  */
-class RequestPayloadValueResolver implements ValueResolverInterface, EventSubscriberInterface
+class RequestPayloadValueResolver implements ControllerValueResolverInterface, LegacyValueResolverInterface, EventSubscriberInterface
 {
     /**
      * @see DenormalizerInterface::COLLECT_DENORMALIZATION_ERRORS
@@ -69,7 +69,7 @@ class RequestPayloadValueResolver implements ValueResolverInterface, EventSubscr
     ) {
     }
 
-    public function resolve(Request $request, ArgumentMetadata $argument): iterable
+    public function resolveArgument(ArgumentMetadata $argument, SourceValue $value): iterable
     {
         $attribute = $argument->getAttributesOfType(MapQueryString::class, ArgumentMetadata::IS_INSTANCEOF)[0]
             ?? $argument->getAttributesOfType(MapRequestPayload::class, ArgumentMetadata::IS_INSTANCEOF)[0]
@@ -97,6 +97,11 @@ class RequestPayloadValueResolver implements ValueResolverInterface, EventSubscr
         $attribute->metadata = $argument;
 
         return [$attribute];
+    }
+
+    public function extractSourceValue(ArgumentMetadata $argument, Request $request): SourceValue
+    {
+        return new SourceValue(null);
     }
 
     public function onKernelControllerArguments(ControllerArgumentsEvent $event): void
@@ -182,6 +187,16 @@ class RequestPayloadValueResolver implements ValueResolverInterface, EventSubscr
         return [
             KernelEvents::CONTROLLER_ARGUMENTS => 'onKernelControllerArguments',
         ];
+    }
+
+    /**
+     * @deprecated since Symfony 7.3, use resolveArgument() instead
+     */
+    public function resolve(Request $request, LegacyArgumentMetadata $argument): iterable
+    {
+        trigger_deprecation('symfony/http-kernel', '7.3', \sprintf('The "%s()" method is deprecated, use "resolveArgument()" instead.', __METHOD__));
+
+        return $this->resolveArgument($argument, $this->extractSourceValue($argument, $request));
     }
 
     private function mapQueryString(Request $request, ArgumentMetadata $argument, MapQueryString $attribute): ?object

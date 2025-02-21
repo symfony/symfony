@@ -22,7 +22,7 @@ use Symfony\Component\Validator\Constraints\GroupSequence;
  * @author Konstantin Myakshin <molodchick@gmail.com>
  */
 #[\Attribute(\Attribute::TARGET_PARAMETER)]
-class MapRequestPayload extends ValueResolver
+class MapRequestPayload extends \Symfony\Component\ArgumentResolver\Attribute\ValueResolver
 {
     public ArgumentMetadata $metadata;
 

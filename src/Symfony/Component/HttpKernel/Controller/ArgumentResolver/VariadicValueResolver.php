@@ -11,31 +11,45 @@
 
 namespace Symfony\Component\HttpKernel\Controller\ArgumentResolver;
 
+use Doctrine\Common\Collections\Expr\Value;
+use Symfony\Component\ArgumentResolver\ArgumentMetadata\ArgumentMetadata;
+use Symfony\Component\ArgumentResolver\SourceValue;
+use Symfony\Component\ArgumentResolver\ValueResolver\ValueResolverInterface;
+use Symfony\Component\ArgumentResolver\ValueResolver\VariadicValueResolver as BaseVariadicValueResolver;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\Controller\ValueResolverInterface;
-use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
+use Symfony\Component\HttpKernel\Controller\ValueResolverInterface as LegacyValueResolverInterface;
+use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata as LegacyArgumentMetadata;
 
 /**
  * Yields a variadic argument's values from the request attributes.
  *
  * @author Iltar van der Berg <kjarli@gmail.com>
- *
- * @deprecated
  */
-final class VariadicValueResolver implements ValueResolverInterface
+final class VariadicValueResolver implements ControllerValueResolverInterface, LegacyValueResolverInterface
 {
-    public function resolve(Request $request, ArgumentMetadata $argument): array
+    public function __construct(private readonly ValueResolverInterface $inner = new BaseVariadicValueResolver())
     {
-        if (!$argument->isVariadic() || !$request->attributes->has($argument->getName())) {
-            return [];
-        }
+    }
 
-        $values = $request->attributes->get($argument->getName());
+    public function resolveArgument(ArgumentMetadata $argument, SourceValue $value): iterable
+    {
+        return $this->inner->resolveArgument($argument, $value);
+    }
 
-        if (!\is_array($values)) {
-            throw new \InvalidArgumentException(\sprintf('The action argument "...$%1$s" is required to be an array, the request attribute "%1$s" contains a type of "%2$s" instead.', $argument->getName(), get_debug_type($values)));
-        }
+    public function extractSourceValue(ArgumentMetadata $argument, Request $request): SourceValue
+    {
+        return $request->attributes->has($argument->getName())
+            ? new SourceValue($request->attributes->get($argument->getName()))
+            : SourceValue::notFound();
+    }
 
-        return $values;
+    /**
+     * @deprecated since Symfony 7.3, use resolveArgument() instead
+     */
+    public function resolve(Request $request, LegacyArgumentMetadata $argument): iterable
+    {
+        trigger_deprecation('symfony/http-kernel', '7.3', \sprintf('The "%s()" method is deprecated, use "resolveArgument()" instead.', __METHOD__));
+
+        return $this->resolveArgument($argument, $this->extractSourceValue($argument, $request));
     }
 }

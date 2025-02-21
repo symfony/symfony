@@ -11,21 +11,14 @@
 
 namespace Symfony\Component\HttpKernel\Attribute;
 
-use Symfony\Component\HttpKernel\Controller\ValueResolverInterface;
+use Symfony\Component\ArgumentResolver\Attribute\ValueResolver as BaseValueResolver;
 
 /**
  * Defines which value resolver should be used for a given parameter.
+ *
+ * @deprecated since Symfony 7.3, use {@see BaseValueResolver} instead
  */
 #[\Attribute(\Attribute::TARGET_PARAMETER | \Attribute::IS_REPEATABLE)]
-class ValueResolver
+class ValueResolver extends BaseValueResolver
 {
-    /**
-     * @param class-string<ValueResolverInterface>|string $resolver The class name of the resolver to use
-     * @param bool                                        $disabled Whether this value resolver is disabled; this allows to enable a value resolver globally while disabling it in specific cases
-     */
-    public function __construct(
-        public string $resolver,
-        public bool $disabled = false,
-    ) {
-    }
 }

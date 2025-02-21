@@ -12,61 +12,52 @@
 namespace Symfony\Component\HttpKernel\Controller\ArgumentResolver;
 
 use Psr\Container\ContainerInterface;
-use Symfony\Component\DependencyInjection\Exception\RuntimeException;
+use Symfony\Component\ArgumentResolver\ArgumentMetadata\ArgumentMetadata;
+use Symfony\Component\ArgumentResolver\SourceValue;
+use Symfony\Component\ArgumentResolver\ValueResolver\ServiceValueResolver as BaseServiceValueResolver;
+use Symfony\Component\ArgumentResolver\ValueResolver\ValueResolverInterface;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\Controller\ValueResolverInterface;
-use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
-use Symfony\Component\HttpKernel\Exception\NearMissValueResolverException;
+use Symfony\Component\HttpKernel\Controller\ValueResolverInterface as LegacyValueResolverInterface;
+use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata as LegacyArgumentMetadata;
 
 /**
  * Yields a service keyed by _controller and argument name.
  *
  * @author Nicolas Grekas <p@tchwork.com>
- *
- * @deprecated
  */
-final class ServiceValueResolver implements ValueResolverInterface
+final class ServiceValueResolver implements ControllerValueResolverInterface, LegacyValueResolverInterface
 {
+    private ValueResolverInterface $inner;
+
     public function __construct(
-        private ContainerInterface $container,
+        ValueResolverInterface|ContainerInterface $inner,
     ) {
+        if ($inner instanceof ContainerInterface) {
+            trigger_deprecation('symfony/http-kernel', '7.3', sprintf('The "$container" argument of "%s::__construct()" is deprecated, pass a "%s" instance as "$inner" instead.', __CLASS__, BaseServiceValueResolver::class));
+            $this->inner = new BaseServiceValueResolver($inner);
+            return;
+        }
+        $this->inner = $inner;
     }
 
-    public function resolve(Request $request, ArgumentMetadata $argument): array
+    public function resolveArgument(ArgumentMetadata $argument, SourceValue $value): iterable
     {
-        $controller = $request->attributes->get('_controller');
+        return $this->inner->resolveArgument($argument, $value);
+    }
 
-        if (\is_array($controller) && \is_callable($controller, true) && \is_string($controller[0])) {
-            $controller = $controller[0].'::'.$controller[1];
-        } elseif (!\is_string($controller) || '' === $controller) {
-            return [];
-        }
+    public function extractSourceValue(ArgumentMetadata $argument, Request $request): SourceValue
+    {
+        return new SourceValue($request->attributes->get('_controller'));
 
-        if ('\\' === $controller[0]) {
-            $controller = ltrim($controller, '\\');
-        }
+    }
 
-        if (!$this->container->has($controller) && false !== $i = strrpos($controller, ':')) {
-            $controller = substr($controller, 0, $i).strtolower(substr($controller, $i));
-        }
+    /**
+     * @deprecated since Symfony 7.3, use resolveArgument() instead
+     */
+    public function resolve(Request $request, LegacyArgumentMetadata $argument): iterable
+    {
+        trigger_deprecation('symfony/http-kernel', '7.3', \sprintf('The "%s()" method is deprecated, use "resolveArgument()" instead.', __METHOD__));
 
-        if (!$this->container->has($controller) || !$this->container->get($controller)->has($argument->getName())) {
-            return [];
-        }
-
-        try {
-            return [$this->container->get($controller)->get($argument->getName())];
-        } catch (RuntimeException $e) {
-            $what = 'argument $'.$argument->getName();
-            $message = str_replace(\sprintf('service "%s"', $argument->getName()), $what, $e->getMessage());
-            $what .= \sprintf(' of "%s()"', $controller);
-            $message = preg_replace('/service "\.service_locator\.[^"]++"/', $what, $message);
-
-            if ($e->getMessage() === $message) {
-                $message = \sprintf('Cannot resolve %s: %s', $what, $message);
-            }
-
-            throw new NearMissValueResolverException($message, $e->getCode(), $e);
-        }
+        return $this->resolveArgument($argument, $this->extractSourceValue($argument, $request));
     }
 }

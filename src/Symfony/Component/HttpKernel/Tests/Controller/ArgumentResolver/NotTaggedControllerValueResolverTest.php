@@ -43,7 +43,7 @@ class NotTaggedControllerValueResolverTest extends TestCase
     public function testController()
     {
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Could not resolve argument $dummy of "App\Controller\Mine::method()", maybe you forgot to register the controller as a service or missed tagging it with the "controller.service_arguments"?');
+        $this->expectExceptionMessage('Could not resolve argument $dummy of "App\Controller\Mine::method()", maybe you forgot to register it as a service or missed tagging it with the "controller.service_arguments"?');
         $resolver = new NotTaggedControllerValueResolver(new ServiceLocator([]));
         $argument = new ArgumentMetadata('dummy', \stdClass::class, false, false, null);
         $request = $this->requestWithAttributes(['_controller' => 'App\\Controller\\Mine::method']);
@@ -53,7 +53,7 @@ class NotTaggedControllerValueResolverTest extends TestCase
     public function testControllerWithATrailingBackSlash()
     {
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Could not resolve argument $dummy of "App\Controller\Mine::method()", maybe you forgot to register the controller as a service or missed tagging it with the "controller.service_arguments"?');
+        $this->expectExceptionMessage('Could not resolve argument $dummy of "App\Controller\Mine::method()", maybe you forgot to register it as a service or missed tagging it with the "controller.service_arguments"?');
         $resolver = new NotTaggedControllerValueResolver(new ServiceLocator([]));
         $argument = new ArgumentMetadata('dummy', \stdClass::class, false, false, null);
         $request = $this->requestWithAttributes(['_controller' => '\\App\\Controller\\Mine::method']);
@@ -63,7 +63,7 @@ class NotTaggedControllerValueResolverTest extends TestCase
     public function testControllerWithMethodNameStartUppercase()
     {
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Could not resolve argument $dummy of "App\Controller\Mine::method()", maybe you forgot to register the controller as a service or missed tagging it with the "controller.service_arguments"?');
+        $this->expectExceptionMessage('Could not resolve argument $dummy of "App\Controller\Mine::method()", maybe you forgot to register it as a service or missed tagging it with the "controller.service_arguments"?');
         $resolver = new NotTaggedControllerValueResolver(new ServiceLocator([]));
         $argument = new ArgumentMetadata('dummy', \stdClass::class, false, false, null);
         $request = $this->requestWithAttributes(['_controller' => 'App\\Controller\\Mine::Method']);
@@ -73,7 +73,7 @@ class NotTaggedControllerValueResolverTest extends TestCase
     public function testControllerNameIsAnArray()
     {
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Could not resolve argument $dummy of "App\Controller\Mine::method()", maybe you forgot to register the controller as a service or missed tagging it with the "controller.service_arguments"?');
+        $this->expectExceptionMessage('Could not resolve argument $dummy of "App\Controller\Mine::method()", maybe you forgot to register it as a service or missed tagging it with the "controller.service_arguments"?');
         $resolver = new NotTaggedControllerValueResolver(new ServiceLocator([]));
         $argument = new ArgumentMetadata('dummy', \stdClass::class, false, false, null);
         $request = $this->requestWithAttributes(['_controller' => ['App\\Controller\\Mine', 'method']]);
@@ -83,7 +83,7 @@ class NotTaggedControllerValueResolverTest extends TestCase
     public function testInvokableController()
     {
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Could not resolve argument $dummy of "App\Controller\Mine::__invoke()", maybe you forgot to register the controller as a service or missed tagging it with the "controller.service_arguments"?');
+        $this->expectExceptionMessage('Could not resolve argument $dummy of "App\Controller\Mine::__invoke()", maybe you forgot to register it as a service or missed tagging it with the "controller.service_arguments"?');
         $resolver = new NotTaggedControllerValueResolver(new ServiceLocator([]));
         $argument = new ArgumentMetadata('dummy', \stdClass::class, false, false, null);
         $request = $this->requestWithAttributes(['_controller' => 'App\Controller\Mine']);

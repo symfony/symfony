@@ -11,11 +11,14 @@
 
 namespace Symfony\Component\HttpKernel\Controller\ArgumentResolver;
 
-use Symfony\Component\ArgumentResolver\Exception\InvalidRawValueException;
-use Symfony\Component\ArgumentResolver\ValueResolver\Traits\BackedEnumValueResolverTrait;
+use Symfony\Component\ArgumentResolver\ArgumentMetadata\ArgumentMetadata;
+use Symfony\Component\ArgumentResolver\Exception\InvalidSourceValueException;
+use Symfony\Component\ArgumentResolver\SourceValue;
+use Symfony\Component\ArgumentResolver\ValueResolver\BackedEnumValueResolver as BaseBackedEnumValueResolver;
+use Symfony\Component\ArgumentResolver\ValueResolver\ValueResolverInterface;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\Controller\ValueResolverInterface;
-use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
+use Symfony\Component\HttpKernel\Controller\ValueResolverInterface as LegacyValueResolverInterface;
+use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata as LegacyArgumentMetadata;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
@@ -23,28 +26,44 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  * leading to a 404 Not Found if the attribute value isn't a valid backing value for the enum type.
  *
  * @author Maxime Steinhausser <maxime.steinhausser@gmail.com>
- *
- * @deprecated
  */
-final class BackedEnumValueResolver implements ValueResolverInterface
+final class BackedEnumValueResolver implements ControllerValueResolverInterface, LegacyValueResolverInterface
 {
-    use BackedEnumValueResolverTrait;
+    public function __construct(private ValueResolverInterface $inner = new BaseBackedEnumValueResolver())
+    {
+        if (!$inner instanceof ValueResolverInterface) {
+            trigger_deprecation('symfony/http-kernel', '7.3', \sprintf('Not passing an instance of "%" as $inner is deprecated.', ValueResolverInterface::class));
+            $this->inner = new BaseBackedEnumValueResolver();
+        }
+    }
 
-    public function resolve(Request $request, ArgumentMetadata $argument): iterable
+    public function resolveArgument(ArgumentMetadata $argument, SourceValue $value): iterable
+    {
+        try {
+            return $this->inner->resolveArgument($argument, $value);
+        } catch (InvalidSourceValueException $e) {
+            throw new NotFoundHttpException(\sprintf('Could not resolve the "%s $%s" controller argument: ', $argument->getType(), $argument->getName()).$e->getPrevious()->getMessage(), $e);
+        }
+    }
+
+    public function extractSourceValue(ArgumentMetadata $argument, Request $request): SourceValue
     {
         // do not support if no value can be resolved at all
         // letting the \Symfony\Component\HttpKernel\Controller\ArgumentResolver\DefaultValueResolver be used
         // or \Symfony\Component\HttpKernel\Controller\ArgumentResolver fail with a meaningful error.
         if (!$request->attributes->has($argument->getName())) {
-            return [];
+            return SourceValue::notFound();
         }
 
-        $value = $request->attributes->get($argument->getName());
+        return new SourceValue($request->attributes->get($argument->getName()));
+    }
 
-        try {
-            return $this->doResolve($argument, [$value]);
-        } catch (InvalidRawValueException $e) {
-            throw new NotFoundHttpException(\sprintf('Could not resolve the "%s $%s" controller argument: ', $argument->getType(), $argument->getName()).$e->getMessage(), $e);
-        }
+    /**
+     * @deprecated since Symfony 7.3, use `resolveArgument()` instead
+     */
+    public function resolve(Request $request, LegacyArgumentMetadata $argument): iterable
+    {
+        // trigger_deprecation
+        return $this->resolveArgument($argument, $this->extractSourceValue($argument, $request));
     }
 }

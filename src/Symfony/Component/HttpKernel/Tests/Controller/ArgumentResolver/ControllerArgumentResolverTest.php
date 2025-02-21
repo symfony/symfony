@@ -17,6 +17,7 @@ use Symfony\Component\ArgumentResolver\ArgumentMetadata\ArgumentMetadataFactory;
 use Symfony\Component\ArgumentResolver\Attribute\ValueResolver;
 use Symfony\Component\ArgumentResolver\Exception\NearMissValueResolverException;
 use Symfony\Component\ArgumentResolver\Exception\ResolverNotFoundException;
+use Symfony\Component\ArgumentResolver\SourceValue;
 use Symfony\Component\ArgumentResolver\ValueResolver\DefaultValueResolver;
 use Symfony\Component\ArgumentResolver\ValueResolver\ValueResolverInterface;
 use Symfony\Component\DependencyInjection\ServiceLocator;
@@ -24,8 +25,8 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
-use Symfony\Component\HttpKernel\Controller\ArgumentResolver\ValueResolver\ControllerValueResolverInterface;
-use Symfony\Component\HttpKernel\Controller\ArgumentResolver\ValueResolver\RequestAttributeValueResolver;
+use Symfony\Component\HttpKernel\Controller\ArgumentResolver\ControllerValueResolverInterface;
+use Symfony\Component\HttpKernel\Controller\ArgumentResolver\RequestAttributeValueResolver;
 use Symfony\Component\HttpKernel\Controller\ControllerArgumentResolver;
 use Symfony\Component\HttpKernel\Tests\Fixtures\Controller\ExtendingRequest;
 use Symfony\Component\HttpKernel\Tests\Fixtures\Controller\ExtendingSession;
@@ -354,15 +355,20 @@ class ControllerArgumentResolverTest extends TestCase
     public function testResolversChainCompletionWhenResolverThrowsSpecialException()
     {
         $failingValueResolver = new class implements ControllerValueResolverInterface {
-            public function resolve(ArgumentMetadata $argument, ?Request $request = null): iterable
+            public function resolveArgument(ArgumentMetadata $argument, SourceValue $value): iterable
             {
                 throw new NearMissValueResolverException('This resolver throws an exception');
+            }
+
+            public function extractSourceValue(ArgumentMetadata $argument, Request $request): SourceValue
+            {
+                return new SourceValue(123);
             }
         };
 
         // Put failing value resolver in the beginning
         $expectedToCallValueResolver = $this->createMock(ValueResolverInterface::class);
-        $expectedToCallValueResolver->expects($this->once())->method('resolve')->willReturn([123]);
+        $expectedToCallValueResolver->expects($this->once())->method('resolveArgument')->willReturn([123]);
 
         $resolver = self::getResolver([$failingValueResolver, ...ControllerArgumentResolver::getDefaultValueResolvers(), $expectedToCallValueResolver]);
         $request = Request::create('/');
@@ -375,9 +381,14 @@ class ControllerArgumentResolverTest extends TestCase
     public function testExceptionListSingle()
     {
         $failingValueResolverOne = new class implements ControllerValueResolverInterface {
-            public function resolve(ArgumentMetadata $argument, ?Request $request = null): iterable
+            public function resolveArgument(ArgumentMetadata $argument, SourceValue $value): iterable
             {
                 throw new NearMissValueResolverException('Some reason why value could not be resolved.');
+            }
+
+            public function extractSourceValue(ArgumentMetadata $argument, Request $request): SourceValue
+            {
+                return new SourceValue(123);
             }
         };
 
@@ -393,15 +404,25 @@ class ControllerArgumentResolverTest extends TestCase
     public function testExceptionListMultiple()
     {
         $failingValueResolverOne = new class implements ControllerValueResolverInterface {
-            public function resolve(ArgumentMetadata $argument, ?Request $request = null): iterable
+            public function resolveArgument(ArgumentMetadata $argument, SourceValue $value): iterable
             {
                 throw new NearMissValueResolverException('Some reason why value could not be resolved.');
             }
+
+            public function extractSourceValue(ArgumentMetadata $argument, Request $request): SourceValue
+            {
+                return new SourceValue(123);
+            }
         };
         $failingValueResolverTwo = new class implements ControllerValueResolverInterface {
-            public function resolve(ArgumentMetadata $argument, ?Request $request = null): iterable
+            public function resolveArgument(ArgumentMetadata $argument, SourceValue $value): iterable
             {
                 throw new NearMissValueResolverException('Another reason why value could not be resolved.');
+            }
+
+            public function extractSourceValue(ArgumentMetadata $argument, Request $request): SourceValue
+            {
+                return new SourceValue(123);
             }
         };
 
@@ -497,11 +518,20 @@ function controller_function($foo, $foobar)
 
 class TestEntityValueResolver implements ControllerValueResolverInterface
 {
-    public function resolve(ArgumentMetadata $argument, ?Request $request = null): iterable
+    public function resolveArgument(ArgumentMetadata $argument, SourceValue $value): iterable
     {
-        return Post::class === $argument->getType() && $request->request->has('title')
-            ? [new Post($request->request->get('title'))]
+        $title = $value->get();
+
+        return Post::class === $argument->getType() && SourceValue::NOT_FOUND !== $title
+            ? [new Post($title)]
             : [];
+    }
+
+    public function extractSourceValue(ArgumentMetadata $argument, Request $request): SourceValue
+    {
+        return $request->request->has('title')
+            ? new SourceValue($request->request->get('title'))
+            : SourceValue::notFound();
     }
 }
 

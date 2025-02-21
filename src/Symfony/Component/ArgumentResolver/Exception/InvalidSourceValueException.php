@@ -14,6 +14,6 @@ namespace Symfony\Component\ArgumentResolver\Exception;
 /**
  * @author Robin Chalas <robin@baksla.sh>
  */
-class InvalidRawValueException extends RuntimeException implements ExceptionInterface
+class InvalidSourceValueException extends RuntimeException implements ExceptionInterface
 {
 }

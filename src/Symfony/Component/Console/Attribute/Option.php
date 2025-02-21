@@ -112,7 +112,7 @@ class Option
     /**
      * @internal
      */
-    public function resolveValue(InputInterface $input): mixed
+    public function resolveArgument(InputInterface $input): mixed
     {
         $value = $input->getOption($this->name);
 

@@ -12,10 +12,14 @@
 namespace Symfony\Component\HttpKernel\Controller\ArgumentResolver;
 
 use Psr\Clock\ClockInterface;
+use Symfony\Component\ArgumentResolver\ArgumentMetadata\ArgumentMetadata;
+use Symfony\Component\ArgumentResolver\Exception\InvalidSourceValueException;
+use Symfony\Component\ArgumentResolver\SourceValue;
+use Symfony\Component\ArgumentResolver\ValueResolver\DateTimeValueResolver as BaseDateTimeValueResolver;
+use Symfony\Component\ArgumentResolver\ValueResolver\ValueResolverInterface;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\Attribute\MapDateTime;
-use Symfony\Component\HttpKernel\Controller\ValueResolverInterface;
-use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
+use Symfony\Component\HttpKernel\Controller\ValueResolverInterface as LegacyValueResolverInterface;
+use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata as LegacyArgumentMetadata;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
@@ -23,67 +27,48 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  *
  * @author Benjamin Eberlei <kontakt@beberlei.de>
  * @author Tim Goudriaan <tim@codedmonkey.com>
- *
- * @deprecated
  */
-final class DateTimeValueResolver implements ValueResolverInterface
+final class DateTimeValueResolver implements ControllerValueResolverInterface, LegacyValueResolverInterface
 {
+    private ValueResolverInterface $inner;
+
     public function __construct(
-        private readonly ?ClockInterface $clock = null,
+        ClockInterface|BaseDateTimeValueResolver|null $inner = null,
     ) {
+        if ($inner instanceof ClockInterface) {
+            trigger_deprecation('symfony/http-kernel', '7.3', sprintf('Passing a "%s" instance to "%s::__construct() is deprecated, pass a "%s" instance as "$inner" instead.', __CLASS__, ClockInterface::class, BaseDateTimeValueResolver::class));
+            $this->inner = new BaseDateTimeValueResolver($inner);
+            return;
+        }
+
+        $this->inner = $inner ?? new BaseDateTimeValueResolver();
     }
 
-    public function resolve(Request $request, ArgumentMetadata $argument): array
+    public function resolveArgument(ArgumentMetadata $argument, SourceValue $value): iterable
     {
-        if (!is_a($argument->getType(), \DateTimeInterface::class, true) || !$request->attributes->has($argument->getName())) {
-            return [];
+        try {
+            return $this->inner->resolveArgument($argument, $value);
+        } catch(InvalidSourceValueException $e) {
+            throw new NotFoundHttpException($e->getMessage(), $e);
+        }
+    }
+
+    public function extractSourceValue(ArgumentMetadata $argument, Request $request): SourceValue
+    {
+        if (!$request->attributes->has($argument->getName())) {
+            return new SourceValue([]);
         }
 
-        $value = $request->attributes->get($argument->getName());
-        $class = \DateTimeInterface::class === $argument->getType() ? \DateTimeImmutable::class : $argument->getType();
+        return new SourceValue($request->attributes->get($argument->getName()));
+    }
 
-        if (!$value) {
-            if ($argument->isNullable()) {
-                return [null];
-            }
-            if (!$this->clock) {
-                return [new $class()];
-            }
-            $value = $this->clock->now();
-        }
+    /**
+     * @deprecated since Symfony 7.3, use resolveArgument() instead
+     */
+    public function resolve(Request $request, LegacyArgumentMetadata $argument): iterable
+    {
+        trigger_deprecation('symfony/http-kernel', '7.3', \sprintf('The "%s()" method is deprecated, use "resolveArgument()" instead.', __METHOD__));
 
-        if ($value instanceof \DateTimeInterface) {
-            return [$value instanceof $class ? $value : $class::createFromInterface($value)];
-        }
-
-        $format = null;
-
-        if ($attributes = $argument->getAttributes(MapDateTime::class, ArgumentMetadata::IS_INSTANCEOF)) {
-            $attribute = $attributes[0];
-            $format = $attribute->format;
-        }
-
-        if (null !== $format) {
-            $date = $class::createFromFormat($format, $value, $this->clock?->now()->getTimeZone());
-
-            if (($class::getLastErrors() ?: ['warning_count' => 0])['warning_count']) {
-                $date = false;
-            }
-        } else {
-            if (false !== filter_var($value, \FILTER_VALIDATE_INT, ['options' => ['min_range' => 0]])) {
-                $value = '@'.$value;
-            }
-            try {
-                $date = new $class($value, $this->clock?->now()->getTimeZone());
-            } catch (\Exception) {
-                $date = false;
-            }
-        }
-
-        if (!$date) {
-            throw new NotFoundHttpException(\sprintf('Invalid date given for parameter "%s".', $argument->getName()));
-        }
-
-        return [$date];
+        return $this->resolveArgument($argument, $this->extractSourceValue($argument, $request));
     }
 }

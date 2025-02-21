@@ -11,10 +11,13 @@
 
 namespace Symfony\Component\HttpKernel\Controller\ArgumentResolver;
 
+use Symfony\Component\ArgumentResolver\ArgumentMetadata\ArgumentMetadata;
+use Symfony\Component\ArgumentResolver\SourceValue;
+use Symfony\Component\HttpFoundation\InputBag;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Attribute\MapQueryParameter;
-use Symfony\Component\HttpKernel\Controller\ValueResolverInterface;
-use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
+use Symfony\Component\HttpKernel\Controller\ValueResolverInterface as LegacyValueResolverInterface;
+use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata as LegacyArgumentMetadata;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\Uid\AbstractUid;
 
@@ -25,11 +28,10 @@ use Symfony\Component\Uid\AbstractUid;
  * @author Nicolas Grekas <p@tchwork.com>
  * @author Mateusz Anders <anders_mateusz@outlook.com>
  * @author Ionut Enache <i.ovidiuenache@yahoo.com>
- * @deprecated
  */
-final class QueryParameterValueResolver implements ValueResolverInterface
+final class QueryParameterValueResolver implements ControllerValueResolverInterface, LegacyValueResolverInterface
 {
-    public function resolve(Request $request, ArgumentMetadata $argument): array
+    public function resolveArgument(ArgumentMetadata $argument, SourceValue $value): iterable
     {
         if (!$attribute = $argument->getAttributesOfType(MapQueryParameter::class)[0] ?? null) {
             return [];
@@ -38,7 +40,10 @@ final class QueryParameterValueResolver implements ValueResolverInterface
         $name = $attribute->name ?? $argument->getName();
         $validationFailedCode = $attribute->validationFailedStatusCode;
 
-        if (!$request->query->has($name)) {
+        /** @var InputBag $query */
+        $query = $value->get();
+
+        if (!$query->has($name)) {
             if ($argument->isNullable() || $argument->hasDefaultValue()) {
                 return [];
             }
@@ -46,7 +51,7 @@ final class QueryParameterValueResolver implements ValueResolverInterface
             throw HttpException::fromStatusCode($validationFailedCode, \sprintf('Missing query parameter "%s".', $name));
         }
 
-        $value = $request->query->all()[$name];
+        $value = $query->all()[$name];
         $type = $argument->getType();
 
         if (null === $attribute->filter && 'array' === $type) {
@@ -57,7 +62,7 @@ final class QueryParameterValueResolver implements ValueResolverInterface
             $filtered = array_values(array_filter((array) $value, \is_array(...)));
 
             if ($filtered !== $value && !($attribute->flags & \FILTER_NULL_ON_FAILURE)) {
-                throw HttpException::fromStatusCode($validationFailedCode, \sprintf('Invalid query parameter "%s".', $name));
+                throw HttpException::fromStatusCode($attribute->validationFailedStatusCode, \sprintf('Invalid query parameter "%s".', $name));
             }
 
             return $filtered;
@@ -137,5 +142,20 @@ final class QueryParameterValueResolver implements ValueResolverInterface
         }
 
         return $argument->isVariadic() ? $filtered : [$filtered];
+    }
+
+    public function extractSourceValue(ArgumentMetadata $argument, Request $request): SourceValue
+    {
+        return new SourceValue($request->query);
+    }
+
+    /**
+     * @deprecated since Symfony 7.3, use resolveArgument() instead
+     */
+    public function resolve(Request $request, LegacyArgumentMetadata $argument): iterable
+    {
+        trigger_deprecation('symfony/http-kernel', '7.3', \sprintf('The "%s()" method is deprecated, use "resolveArgument()" instead.', __METHOD__));
+
+        return $this->resolveArgument($argument, $this->extractSourceValue($argument, $request));
     }
 }

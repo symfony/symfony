@@ -11,24 +11,25 @@
 
 namespace Symfony\Component\HttpKernel\Controller\ArgumentResolver;
 
+use Symfony\Component\ArgumentResolver\ArgumentMetadata\ArgumentMetadata;
+use Symfony\Component\ArgumentResolver\Exception\NearMissValueResolverException;
+use Symfony\Component\ArgumentResolver\SourceValue;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\Controller\ValueResolverInterface;
-use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
-use Symfony\Component\HttpKernel\Exception\NearMissValueResolverException;
+use Symfony\Component\HttpKernel\Exception\NearMissValueResolverException as LegacyNearMissValueResolverException;
+use Symfony\Component\HttpKernel\Controller\ValueResolverInterface as LegacyValueResolverInterface;
+use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata as LegacyArgumentMetadata;
 
 /**
  * Yields the same instance as the request object passed along.
  *
  * @author Iltar van der Berg <kjarli@gmail.com>
- *
- * @deprecated
  */
-final class RequestValueResolver implements ValueResolverInterface
+final class RequestValueResolver implements ControllerValueResolverInterface, LegacyValueResolverInterface
 {
-    public function resolve(Request $request, ArgumentMetadata $argument): array
+    public function resolveArgument(ArgumentMetadata $argument, SourceValue $value): iterable
     {
         if (Request::class === $argument->getType() || is_subclass_of($argument->getType(), Request::class)) {
-            return [$request];
+            return [$value->get()];
         }
 
         if (str_ends_with($argument->getType() ?? '', '\\Request')) {
@@ -36,5 +37,24 @@ final class RequestValueResolver implements ValueResolverInterface
         }
 
         return [];
+    }
+
+    public function extractSourceValue(ArgumentMetadata $argument, Request $request): SourceValue
+    {
+        return new SourceValue($request);
+    }
+
+    /**
+     * @deprecated since Symfony 7.3, use resolveArgument() instead
+     */
+    public function resolve(Request $request, LegacyArgumentMetadata $argument): iterable
+    {
+        trigger_deprecation('symfony/http-kernel', '7.3', \sprintf('The "%s()" method is deprecated, use "resolveArgument()" instead.', __METHOD__));
+
+        try {
+            return $this->resolveArgument($argument, $this->extractSourceValue($argument, $request));
+        } catch (NearMissValueResolverException $e) {
+            throw new LegacyNearMissValueResolverException($e->getMessage(), $e->getCode(), $e);
+        }
     }
 }

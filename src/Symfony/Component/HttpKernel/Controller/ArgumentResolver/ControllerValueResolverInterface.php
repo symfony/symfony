@@ -9,13 +9,14 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\HttpKernel\Controller\ArgumentResolver\ValueResolver;
+namespace Symfony\Component\HttpKernel\Controller\ArgumentResolver;
 
 use Symfony\Component\ArgumentResolver\ArgumentMetadata\ArgumentMetadata;
+use Symfony\Component\ArgumentResolver\SourceValue;
 use Symfony\Component\ArgumentResolver\ValueResolver\ValueResolverInterface;
 use Symfony\Component\HttpFoundation\Request;
 
 interface ControllerValueResolverInterface extends ValueResolverInterface
 {
-    public function resolve(ArgumentMetadata $argument, ?Request $request = null): iterable;
+    public function extractSourceValue(ArgumentMetadata $argument, Request $request): SourceValue;
 }

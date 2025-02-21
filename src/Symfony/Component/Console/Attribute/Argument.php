@@ -95,7 +95,7 @@ class Argument
     /**
      * @internal
      */
-    public function resolveValue(InputInterface $input): mixed
+    public function resolveArgument(InputInterface $input): mixed
     {
         return $input->getArgument($this->name);
     }

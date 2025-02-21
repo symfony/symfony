@@ -18,7 +18,7 @@ use Symfony\Component\ArgumentResolver\ValueResolver\ValueResolverInterface;
  * Controller parameter tag to configure DateTime arguments.
  */
 #[\Attribute(\Attribute::TARGET_PARAMETER)]
-final class MapDateTime extends ValueResolver
+class MapDateTime extends ValueResolver
 {
     /**
      * @param string|null                                 $format   The DateTime format to use, @see https://php.net/datetime.format
@@ -26,7 +26,7 @@ final class MapDateTime extends ValueResolver
      * @param class-string<ValueResolverInterface>|string $resolver The name of the resolver to use
      */
     public function __construct(
-        public readonly ?string $format = null,
+        public ?string $format = null,
         bool $disabled = false,
         string $resolver = DateTimeValueResolver::class,
     ) {

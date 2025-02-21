@@ -11,27 +11,42 @@
 
 namespace Symfony\Component\HttpKernel\Controller\ArgumentResolver;
 
+use Symfony\Component\ArgumentResolver\ArgumentMetadata\ArgumentMetadata;
+use Symfony\Component\ArgumentResolver\SourceValue;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\Controller\ValueResolverInterface;
-use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
+use Symfony\Component\HttpKernel\Controller\ValueResolverInterface as LegacyValueResolverInterface;
+use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata as LegacyArgumentMetadata;
 use Symfony\Component\Stopwatch\Stopwatch;
 
 /**
  * Provides timing information via the stopwatch.
  *
  * @author Iltar van der Berg <kjarli@gmail.com>
- *
- * @deprecated
  */
-final class TraceableValueResolver implements ValueResolverInterface
+final class TraceableValueResolver implements ControllerValueResolverInterface, LegacyValueResolverInterface
 {
     public function __construct(
-        private ValueResolverInterface $inner,
+        private LegacyValueResolverInterface|ControllerValueResolverInterface $inner,
         private Stopwatch $stopwatch,
     ) {
     }
 
-    public function resolve(Request $request, ArgumentMetadata $argument): iterable
+    public function resolveArgument(ArgumentMetadata $argument, SourceValue $value): iterable
+    {
+        $method = $this->inner::class.'::'.__FUNCTION__;
+        $this->stopwatch->start($method, 'controller.argument_value_resolver');
+
+        yield from $this->inner->resolveArgument($argument, $value);
+
+        $this->stopwatch->stop($method);
+    }
+
+    public function extractSourceValue(ArgumentMetadata $argument, Request $request): SourceValue
+    {
+        return $this->inner->extractSourceValue($argument, $request);
+    }
+
+    public function resolve(Request $request, LegacyArgumentMetadata $argument): iterable
     {
         $method = $this->inner::class.'::'.__FUNCTION__;
         $this->stopwatch->start($method, 'controller.argument_value_resolver');

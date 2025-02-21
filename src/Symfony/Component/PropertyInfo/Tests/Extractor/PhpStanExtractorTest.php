@@ -946,24 +946,23 @@ class PhpStanExtractorTest extends TestCase
      */
     public static function pseudoTypesProvider(): iterable
     {
-        yield ['classString', Type::explicitString('class-string')];
+        yield ['classString', Type::string()];
 
         // BC layer for type-info < 7.2
         if (!interface_exists(WrappingTypeInterface::class)) {
             yield ['classStringGeneric', Type::generic(Type::string(), Type::object(\stdClass::class))];
         } else {
-            yield ['classStringGeneric', Type::explicitString('class-string')];
+            yield ['classStringGeneric', Type::string()];
         }
 
-        yield ['htmlEscapedString', Type::explicitString('html-escaped-string')];
-        yield ['lowercaseString', Type::explicitString('lowercase-string')];
-        yield ['nonEmptyLowercaseString', Type::explicitString('non-empty-lowercase-string')];
-        yield ['nonEmptyString', Type::explicitString('non-empty-string')];
-        yield ['numericString', Type::explicitString('numeric-string')];
-        yield ['traitString', Type::explicitString('trait-string')];
-        yield ['interfaceString', Type::explicitString('interface-string')];
-        yield ['positiveInt', Type::intRange(1, \PHP_INT_MAX)];
-        yield ['negativeInt', Type::intRange(\PHP_INT_MIN, -1)];
+        yield ['htmlEscapedString', Type::string()];
+        yield ['lowercaseString', Type::string()];
+        yield ['nonEmptyLowercaseString', Type::string()];
+        yield ['nonEmptyString', Type::string()];
+        yield ['numericString', Type::string()];
+        yield ['traitString', Type::string()];
+        yield ['interfaceString', Type::string()];
+        yield ['literalString', Type::string()];
         yield ['nonEmptyArray', Type::array()];
         yield ['nonEmptyList', Type::list()];
         yield ['scalar', Type::union(Type::int(), Type::float(), Type::string(), Type::bool())];
@@ -971,6 +970,9 @@ class PhpStanExtractorTest extends TestCase
         yield ['numeric', Type::union(Type::int(), Type::float(), Type::string())];
         yield ['arrayKey', Type::union(Type::int(), Type::string())];
         yield ['double', Type::float()];
+
+        yield ['positiveInt', Type::intRange(1)];
+        yield ['negativeInt', Type::intRange(\PHP_INT_MIN, -1)];
     }
 
     public function testDummyNamespace()

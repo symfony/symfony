@@ -4,7 +4,7 @@ CHANGELOG
 7.3
 ---
 
- * Add `IntRangeType` and `ExplicitStringType` classes to hold specific type details for `int` and `string` builtin types
+ * Add `IntRangeType` class to hold specific type details for `int` builtin types
  * Add `Type::accepts()` method
  * Add `TypeFactoryTrait::fromValue()` method
  * Deprecate constructing a `CollectionType` instance as a list that is not an array

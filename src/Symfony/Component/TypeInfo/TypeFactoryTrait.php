@@ -77,11 +77,6 @@ trait TypeFactoryTrait
         return self::builtin(TypeIdentifier::STRING);
     }
 
-    public static function explicitString(string $explicitType): ExplicitStringType
-    {
-        return new ExplicitStringType($explicitType);
-    }
-
     /**
      * @return BuiltinType<TypeIdentifier::BOOL>
      */

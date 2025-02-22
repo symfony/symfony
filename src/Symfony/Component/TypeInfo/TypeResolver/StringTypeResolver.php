@@ -40,6 +40,7 @@ use Symfony\Component\TypeInfo\Exception\UnsupportedException;
 use Symfony\Component\TypeInfo\Type;
 use Symfony\Component\TypeInfo\Type\BuiltinType;
 use Symfony\Component\TypeInfo\Type\CollectionType;
+use Symfony\Component\TypeInfo\Type\ExplicitStringType;
 use Symfony\Component\TypeInfo\Type\GenericType;
 use Symfony\Component\TypeInfo\TypeContext\TypeContext;
 use Symfony\Component\TypeInfo\TypeIdentifier;
@@ -213,6 +214,12 @@ final class StringTypeResolver implements TypeResolverInterface
                     2 => Type::collection($type, $variableTypes[1], $variableTypes[0]),
                     default => Type::collection($type),
                 };
+            }
+
+            if ($type instanceof ExplicitStringType
+                && in_array($type->getExplicitType(), ['class-string', 'interface-string', 'trait-string'], true)
+                && 1 === \count($variableTypes) && $variableTypes[0] instanceof Type\ObjectType) {
+                return Type::classLikeString($type->getExplicitType(), $variableTypes[0]);
             }
 
             if ($type instanceof BuiltinType && TypeIdentifier::ARRAY !== $type->getTypeIdentifier() && TypeIdentifier::ITERABLE !== $type->getTypeIdentifier()) {

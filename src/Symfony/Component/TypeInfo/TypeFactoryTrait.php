@@ -13,6 +13,7 @@ namespace Symfony\Component\TypeInfo;
 
 use Symfony\Component\TypeInfo\Type\BackedEnumType;
 use Symfony\Component\TypeInfo\Type\BuiltinType;
+use Symfony\Component\TypeInfo\Type\ClassLikeStringType;
 use Symfony\Component\TypeInfo\Type\CollectionType;
 use Symfony\Component\TypeInfo\Type\EnumType;
 use Symfony\Component\TypeInfo\Type\ExplicitStringType;
@@ -74,6 +75,11 @@ trait TypeFactoryTrait
     public static function explicitString(string $explicitType): ExplicitStringType
     {
         return new ExplicitStringType($explicitType);
+    }
+
+    public static function classLikeString(string $explicitType, ObjectType $objectType): ClassLikeStringType
+    {
+        return new ClassLikeStringType($explicitType, $objectType);
     }
 
     /**

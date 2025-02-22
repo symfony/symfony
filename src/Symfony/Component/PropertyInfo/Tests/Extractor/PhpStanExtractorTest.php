@@ -952,7 +952,7 @@ class PhpStanExtractorTest extends TestCase
         if (!interface_exists(WrappingTypeInterface::class)) {
             yield ['classStringGeneric', Type::generic(Type::string(), Type::object(\stdClass::class))];
         } else {
-            yield ['classStringGeneric', Type::explicitString('class-string')];
+            yield ['classStringGeneric', Type::classLikeString('class-string', Type::object(\stdClass::class))];
         }
 
         yield ['htmlEscapedString', Type::explicitString('html-escaped-string')];

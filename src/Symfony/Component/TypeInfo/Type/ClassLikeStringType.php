@@ -20,20 +20,20 @@ use Symfony\Component\TypeInfo\TypeIdentifier;
  *
  * @extends BuiltinType<TypeIdentifier::STRING>
  */
-class ExplicitStringType extends BuiltinType
+final class ClassLikeStringType extends ExplicitStringType
 {
-    public function __construct(private string $explicitType)
+    public function __construct(string $explicitType, private ObjectType $objectType)
     {
-        parent::__construct(TypeIdentifier::STRING);
+        parent::__construct($explicitType);
     }
 
-    public function getExplicitType(): string
+    public function getObjectType(): ObjectType
     {
-        return $this->explicitType;
+        return $this->objectType;
     }
 
     public function __toString(): string
     {
-        return $this->explicitType;
+        return sprintf('%s<%s>', $this->getExplicitType(), $this->objectType);
     }
 }

@@ -4,12 +4,12 @@ CHANGELOG
 7.3
 ---
 
- * Add `IntRangeType` class to hold specific type details for `int` builtin types
  * Add `Type::accepts()` method
  * Add `TypeFactoryTrait::fromValue()` method
  * Deprecate constructing a `CollectionType` instance as a list that is not an array
  * Deprecate the third `$asList` argument of `TypeFactoryTrait::iterable()`, use `TypeFactoryTrait::list()` instead
  * Add type alias support in `TypeContext` and `StringTypeResolver`
+ * Add `IntRangeType` class to hold specific type details for `int` builtin types
 
 7.2
 ---

@@ -148,11 +148,11 @@ class StringTypeResolverTest extends TestCase
         yield [Type::explicitString('html-escaped-string'), 'html-escaped-string'];
 
         yield [Type::explicitString('class-string'), 'class-string'];
-        yield [Type::classLikeString('class-string', Type::object(Dummy::class)), sprintf('class-string<%s>', Dummy::class)];
+        yield [Type::classLikeString('class-string', Type::object(Dummy::class)), \sprintf('class-string<%s>', Dummy::class)];
         yield [Type::explicitString('trait-string'), 'trait-string'];
-        yield [Type::classLikeString('trait-string', Type::object(DummyTrait::class)), sprintf('trait-string<%s>', DummyTrait::class)];
+        yield [Type::classLikeString('trait-string', Type::object(DummyTrait::class)), \sprintf('trait-string<%s>', DummyTrait::class)];
         yield [Type::explicitString('interface-string'), 'interface-string'];
-        yield [Type::classLikeString('interface-string', Type::object(DummyInterface::class)), sprintf('interface-string<%s>', DummyInterface::class)];
+        yield [Type::classLikeString('interface-string', Type::object(DummyInterface::class)), \sprintf('interface-string<%s>', DummyInterface::class)];
 
         // nullable
         yield [Type::nullable(Type::int()), '?int'];

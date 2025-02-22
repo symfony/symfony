@@ -217,7 +217,7 @@ final class StringTypeResolver implements TypeResolverInterface
             }
 
             if ($type instanceof ExplicitStringType
-                && in_array($type->getExplicitType(), ['class-string', 'interface-string', 'trait-string'], true)
+                && \in_array($type->getExplicitType(), ['class-string', 'interface-string', 'trait-string'], true)
                 && 1 === \count($variableTypes) && $variableTypes[0] instanceof Type\ObjectType) {
                 return Type::classLikeString($type->getExplicitType(), $variableTypes[0]);
             }

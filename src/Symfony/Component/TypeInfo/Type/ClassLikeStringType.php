@@ -34,6 +34,6 @@ final class ClassLikeStringType extends ExplicitStringType
 
     public function __toString(): string
     {
-        return sprintf('%s<%s>', $this->getExplicitType(), $this->objectType);
+        return \sprintf('%s<%s>', $this->getExplicitType(), $this->objectType);
     }
 }

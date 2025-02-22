@@ -971,8 +971,10 @@ class PhpStanExtractorTest extends TestCase
         yield ['arrayKey', Type::union(Type::int(), Type::string())];
         yield ['double', Type::float()];
 
-        yield ['positiveInt', Type::intRange(1)];
-        yield ['negativeInt', Type::intRange(\PHP_INT_MIN, -1)];
+        if (method_exists(Type::class, 'intRange')) {
+            yield ['positiveInt', Type::intRange(1)];
+            yield ['negativeInt', Type::intRange(\PHP_INT_MIN, -1)];
+        }
     }
 
     public function testDummyNamespace()
@@ -1002,9 +1004,15 @@ class PhpStanExtractorTest extends TestCase
      */
     public static function intRangeTypeProvider(): iterable
     {
-        yield ['a', Type::intRange(0, 100)];
-        yield ['b', Type::nullable(Type::intRange(\PHP_INT_MIN, 100))];
-        yield ['c', Type::intRange(50, \PHP_INT_MAX)];
+        if (method_exists(Type::class, 'intRange')) {
+            yield ['a', Type::intRange(0, 100)];
+            yield ['b', Type::nullable(Type::intRange(\PHP_INT_MIN, 100))];
+            yield ['c', Type::intRange(50, \PHP_INT_MAX)];
+        } else {
+            yield ['a', Type::int()];
+            yield ['b', Type::nullable(Type::int())];
+            yield ['c', Type::int()];
+        }
     }
 
     /**

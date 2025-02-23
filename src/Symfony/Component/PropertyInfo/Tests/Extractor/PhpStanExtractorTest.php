@@ -971,9 +971,13 @@ class PhpStanExtractorTest extends TestCase
         yield ['arrayKey', Type::union(Type::int(), Type::string())];
         yield ['double', Type::float()];
 
+        // BC layer for symfony/type-info < 7.3
         if (method_exists(Type::class, 'intRange')) {
             yield ['positiveInt', Type::intRange(1)];
             yield ['negativeInt', Type::intRange(\PHP_INT_MIN, -1)];
+        } else {
+            yield ['positiveInt', Type::int()];
+            yield ['negativeInt', Type::int()];
         }
     }
 
@@ -1004,6 +1008,7 @@ class PhpStanExtractorTest extends TestCase
      */
     public static function intRangeTypeProvider(): iterable
     {
+        // BC layer for symfony/type-info < 7.3
         if (method_exists(Type::class, 'intRange')) {
             yield ['a', Type::intRange(0, 100)];
             yield ['b', Type::nullable(Type::intRange(\PHP_INT_MIN, 100))];

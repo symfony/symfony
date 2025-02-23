@@ -49,18 +49,6 @@ final class IntRangeType extends BuiltinType
         $min = \PHP_INT_MIN === $this->from ? 'min' : $this->from;
         $max = \PHP_INT_MAX === $this->to ? 'max' : $this->to;
 
-        $template = 'int<%s, %s>';
-
-        if (\is_string($min) && \is_string($max)) {
-            return \sprintf($template, $min, $max);
-        }
-
-        if (\in_array($min, [0, 1], true) && 'max' === $max) {
-            return 0 === $min ? 'non-negative-int' : 'positive-int';
-        } elseif ('min' === $min && \in_array($max, [-1, 0])) {
-            return 0 === $max ? 'non-positive-int' : 'negative-int';
-        }
-
-        return \sprintf($template, $min, $max);
+        return \sprintf('int<%s, %s>', $min, $max);
     }
 }

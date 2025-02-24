@@ -14,6 +14,7 @@ namespace Symfony\Component\Translation\Tests\Extractor;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Translation\Extractor\PhpAstExtractor;
 use Symfony\Component\Translation\Extractor\Visitor\ConstraintVisitor;
+use Symfony\Component\Translation\Extractor\Visitor\FormTypeVisitor;
 use Symfony\Component\Translation\Extractor\Visitor\TranslatableMessageVisitor;
 use Symfony\Component\Translation\Extractor\Visitor\TransMethodVisitor;
 use Symfony\Component\Translation\MessageCatalogue;
@@ -34,7 +35,10 @@ final class PhpAstExtractorTest extends TestCase
                 'NotBlank',
                 'Isbn',
                 'Length',
-            ], new TranslatableMessageVisitor()),
+            ]),
+            new FormTypeVisitor([
+                'ExplicitLabelType',
+            ]),
         ]);
         $extractor->setPrefix('prefix');
         $catalogue = new MessageCatalogue('en');
@@ -107,6 +111,16 @@ EOF;
                 'mix-named-arguments' => 'prefixmix-named-arguments',
                 'mix-named-arguments-locale' => 'prefixmix-named-arguments-locale',
                 'mix-named-arguments-without-domain' => 'prefixmix-named-arguments-without-domain',
+                'label.foo1' => 'prefixlabel.foo1',
+                'label.find1' => 'prefixlabel.find1',
+                'find2' => 'prefixfind2',
+                'FOUND3' => 'prefixFOUND3',
+                'label.find4' => 'prefixlabel.find4',
+                'label.find5' => 'prefixlabel.find5',
+                'find6' => 'prefixfind6',
+                'bigger_find7' => 'prefixbigger_find7',
+                'camelFind8' => 'prefixcamelFind8',
+                'label.find9' => 'prefixlabel.find9',
             ],
             'not_messages' => [
                 'translatable other-domain-test-no-params-short-array' => 'prefixtranslatable other-domain-test-no-params-short-array',
@@ -195,7 +209,10 @@ EOF;
                 'NotBlank',
                 'Isbn',
                 'Length',
-            ], new TranslatableMessageVisitor()),
+            ]),
+            new FormTypeVisitor([
+                'ExplicitLabelType',
+            ]),
         ]);
         $extractor->setPrefix('prefix');
         $extractor->extract(__DIR__.'/../Fixtures/extractor-7.3/translation.html.php', $catalogue);
@@ -210,8 +227,18 @@ EOF;
         $this->assertEquals($expectedCatalogue, $catalogue->all());
     }
 
-    public static function resourcesProvider(): array
+    public static function resourcesProvider(): \Generator
     {
+        $fixtureFiles = [
+            'translatable.html.php',
+            'translatable-fqn.html.php',
+            'translatable-short.html.php',
+            'translatable-short-fqn.html.php',
+            'translation.html.php',
+            'validator-constraints.php',
+            'form-types.php',
+        ];
+
         $directory = __DIR__.'/../Fixtures/extractor-ast/';
         $phpFiles = [];
         $splFiles = [];
@@ -219,19 +246,17 @@ EOF;
             if ($fileInfo->isDot()) {
                 continue;
             }
-            if (\in_array($fileInfo->getBasename(), ['translatable.html.php', 'translatable-fqn.html.php', 'translatable-short.html.php', 'translatable-short-fqn.html.php', 'translation.html.php', 'validator-constraints.php'], true)) {
+            if (\in_array($fileInfo->getBasename(), $fixtureFiles, true)) {
                 $phpFiles[] = $fileInfo->getPathname();
             }
             $splFiles[] = $fileInfo->getFileInfo();
         }
 
-        return [
-            [$directory],
-            [$phpFiles],
-            [glob($directory.'*')],
-            [$splFiles],
-            [new \ArrayObject(glob($directory.'*'))],
-            [new \ArrayObject($splFiles)],
-        ];
+        yield 'directory' => [$directory];
+        yield 'phpFiles' => [$phpFiles];
+        yield 'glob' => [glob($directory.'*')];
+        yield 'splFiles' => [$splFiles];
+        yield 'ArrayObject_glob' => [new \ArrayObject(glob($directory.'*'))];
+        yield 'ArrayObject_splFiles' => [new \ArrayObject($splFiles)];
     }
 }

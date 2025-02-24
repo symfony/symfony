@@ -81,7 +81,7 @@ abstract class AbstractVisitor
         return \PHP_INT_MAX;
     }
 
-    private function getStringNamedArguments(Node\Expr\CallLike|Node\Attribute $node, ?string $argumentName = null, bool $isArgumentNamePattern = false): array
+    protected function getStringNamedArguments(Node\Expr\CallLike|Node\Attribute $node, ?string $argumentName = null, bool $isArgumentNamePattern = false): array
     {
         $args = $node instanceof Node\Expr\CallLike ? $node->getArgs() : $node->args;
         $argumentValues = [];
@@ -97,22 +97,14 @@ abstract class AbstractVisitor
         return array_filter($argumentValues);
     }
 
-    private function getStringValue(Node $node): ?string
+    protected function getStringValue(Node $node): ?string
     {
         if ($node instanceof Node\Scalar\String_) {
             return $node->value;
         }
 
         if ($node instanceof Node\Expr\BinaryOp\Concat) {
-            if (null === $left = $this->getStringValue($node->left)) {
-                return null;
-            }
-
-            if (null === $right = $this->getStringValue($node->right)) {
-                return null;
-            }
-
-            return $left.$right;
+            return $this->getStringValueFromConcatNode($node);
         }
 
         if ($node instanceof Node\Expr\Assign && $node->expr instanceof Node\Scalar\String_) {
@@ -131,5 +123,18 @@ abstract class AbstractVisitor
         }
 
         return null;
+    }
+
+    private function getStringValueFromConcatNode(Node\Expr\BinaryOp\Concat $node): ?string
+    {
+        if (null === $left = $this->getStringValue($node->left)) {
+            return null;
+        }
+
+        if (null === $right = $this->getStringValue($node->right)) {
+            return null;
+        }
+
+        return $left.$right;
     }
 }

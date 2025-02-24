@@ -16,8 +16,10 @@ use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Translation\DependencyInjection\TranslatorPass;
 use Symfony\Component\Translation\Extractor\Visitor\ConstraintVisitor;
+use Symfony\Component\Translation\Extractor\Visitor\FormTypeVisitor;
 use Symfony\Component\Validator\Constraints\IsbnValidator;
 use Symfony\Component\Validator\Constraints\LengthValidator;
 use Symfony\Component\Validator\Constraints\NotBlankValidator;
@@ -146,5 +148,20 @@ class TranslatorPassTest extends TestCase
         $pass->process($container);
 
         $this->assertSame(['NotBlank', 'Isbn', 'Length', 'Time'], $constraintVisitor->getArgument(0));
+    }
+
+    public function testValidPhpAstExtractorFormTypeVisitorArguments()
+    {
+        $container = new ContainerBuilder();
+        $container->register('translator.default')
+            ->setArguments([null, null, null, null]);
+        $formTypeVisitor = $container->register('translation.extractor.visitor.form_type', FormTypeVisitor::class);
+        $container->register('form.type.text', TextType::class)
+            ->addTag('form.type');
+
+        $pass = new TranslatorPass();
+        $pass->process($container);
+
+        $this->assertSame(['Text'], $formTypeVisitor->getArgument(0));
     }
 }

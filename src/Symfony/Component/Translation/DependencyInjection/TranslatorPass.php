@@ -24,6 +24,14 @@ class TranslatorPass implements CompilerPassInterface
             return;
         }
 
+        $this->processLoadersAndReaders($container);
+        $this->processExtractorFormTypeVisitor($container);
+        $this->processExtractorConstraintVisitor($container);
+        $this->processTwigPaths($container);
+    }
+
+    private function processLoadersAndReaders(ContainerBuilder $container): void
+    {
         $loaders = [];
         $loaderRefs = [];
         foreach ($container->findTaggedServiceIds('translation.loader', true) as $id => $attributes) {
@@ -48,29 +56,62 @@ class TranslatorPass implements CompilerPassInterface
             ->replaceArgument(0, ServiceLocatorTagPass::register($container, $loaderRefs))
             ->replaceArgument(3, $loaders)
         ;
+    }
 
-        if ($container->hasDefinition('validator') && $container->hasDefinition('translation.extractor.visitor.constraint')) {
-            $constraintVisitorDefinition = $container->getDefinition('translation.extractor.visitor.constraint');
-            $constraintClassNames = [];
-
-            foreach ($container->getDefinitions() as $definition) {
-                if (!$definition->hasTag('validator.constraint_validator')) {
-                    continue;
-                }
-                // Resolve constraint validator FQCN even if defined as %foo.validator.class% parameter
-                $className = $container->getParameterBag()->resolveValue($definition->getClass());
-                // Extraction of the constraint class name from the Constraint Validator FQCN
-                $constraintClassNames[] = str_replace('Validator', '', substr(strrchr($className, '\\'), 1));
-            }
-
-            $constraintVisitorDefinition->setArgument(0, $constraintClassNames);
+    // TO BE DELETED
+    private function processExtractorFormTypeVisitor(ContainerBuilder $container): void
+    {
+        if (!$container->hasDefinition('translation.extractor.visitor.form_type')) {
+            return;
         }
 
+        $formTypeVisitorDefinition = $container->getDefinition('translation.extractor.visitor.form_type');
+        $formTypeClassNames = [];
+
+        foreach ($container->getDefinitions() as $definition) {
+            if (!$definition->hasTag('form.type')) {
+                continue;
+            }
+
+            // Resolve constraint validator FQCN even if defined as %foo.validator.class% parameter
+            $className = $container->getParameterBag()->resolveValue($definition->getClass());
+            // Extraction of the constraint class name from the Constraint Validator FQCN
+            $formTypeClassNames[] = str_replace('Type', '', substr(strrchr($className, '\\'), 1));
+        }
+
+        $formTypeVisitorDefinition->setArgument(0, $formTypeClassNames);
+    }
+
+    private function processExtractorConstraintVisitor(ContainerBuilder $container): void
+    {
+        if (!$container->hasDefinition('validator') || !$container->hasDefinition('translation.extractor.visitor.constraint')) {
+            return;
+        }
+
+        $constraintVisitorDefinition = $container->getDefinition('translation.extractor.visitor.constraint');
+        $constraintClassNames = [];
+
+        foreach ($container->getDefinitions() as $definition) {
+            if (!$definition->hasTag('validator.constraint_validator')) {
+                continue;
+            }
+            // Resolve constraint validator FQCN even if defined as %foo.validator.class% parameter
+            $className = $container->getParameterBag()->resolveValue($definition->getClass());
+            // Extraction of the constraint class name from the Constraint Validator FQCN
+            $constraintClassNames[] = str_replace('Validator', '', substr(strrchr($className, '\\'), 1));
+        }
+
+        $constraintVisitorDefinition->setArgument(0, $constraintClassNames);
+    }
+
+    private function processTwigPaths(ContainerBuilder $container): void
+    {
         if (!$container->hasParameter('twig.default_path')) {
             return;
         }
 
         $paths = array_keys($container->getDefinition('twig.template_iterator')->getArgument(1));
+
         if ($container->hasDefinition('console.command.translation_debug')) {
             $definition = $container->getDefinition('console.command.translation_debug');
             $definition->replaceArgument(4, $container->getParameter('twig.default_path'));
@@ -79,6 +120,7 @@ class TranslatorPass implements CompilerPassInterface
                 $definition->replaceArgument(6, $paths);
             }
         }
+
         if ($container->hasDefinition('console.command.translation_extract')) {
             $definition = $container->getDefinition('console.command.translation_extract');
             $definition->replaceArgument(5, $container->getParameter('twig.default_path'));

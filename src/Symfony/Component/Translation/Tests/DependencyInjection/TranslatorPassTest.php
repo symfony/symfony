@@ -149,19 +149,4 @@ class TranslatorPassTest extends TestCase
 
         $this->assertSame(['NotBlank', 'Isbn', 'Length', 'Time'], $constraintVisitor->getArgument(0));
     }
-
-    public function testValidPhpAstExtractorFormTypeVisitorArguments()
-    {
-        $container = new ContainerBuilder();
-        $container->register('translator.default')
-            ->setArguments([null, null, null, null]);
-        $formTypeVisitor = $container->register('translation.extractor.visitor.form_type', FormTypeVisitor::class);
-        $container->register('form.type.text', TextType::class)
-            ->addTag('form.type');
-
-        $pass = new TranslatorPass();
-        $pass->process($container);
-
-        $this->assertSame(['Text'], $formTypeVisitor->getArgument(0));
-    }
 }

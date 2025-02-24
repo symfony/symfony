@@ -14,7 +14,7 @@ namespace Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
-class TranslationUpdateCommandPass implements CompilerPassInterface
+class TranslationExtractCommandPass implements CompilerPassInterface
 {
     public function process(ContainerBuilder $container): void
     {

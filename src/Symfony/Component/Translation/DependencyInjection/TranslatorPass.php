@@ -25,7 +25,6 @@ class TranslatorPass implements CompilerPassInterface
         }
 
         $this->processLoadersAndReaders($container);
-        $this->processExtractorFormTypeVisitor($container);
         $this->processExtractorConstraintVisitor($container);
         $this->processTwigPaths($container);
     }
@@ -56,30 +55,6 @@ class TranslatorPass implements CompilerPassInterface
             ->replaceArgument(0, ServiceLocatorTagPass::register($container, $loaderRefs))
             ->replaceArgument(3, $loaders)
         ;
-    }
-
-    // TO BE DELETED
-    private function processExtractorFormTypeVisitor(ContainerBuilder $container): void
-    {
-        if (!$container->hasDefinition('translation.extractor.visitor.form_type')) {
-            return;
-        }
-
-        $formTypeVisitorDefinition = $container->getDefinition('translation.extractor.visitor.form_type');
-        $formTypeClassNames = [];
-
-        foreach ($container->getDefinitions() as $definition) {
-            if (!$definition->hasTag('form.type')) {
-                continue;
-            }
-
-            // Resolve constraint validator FQCN even if defined as %foo.validator.class% parameter
-            $className = $container->getParameterBag()->resolveValue($definition->getClass());
-            // Extraction of the constraint class name from the Constraint Validator FQCN
-            $formTypeClassNames[] = str_replace('Type', '', substr(strrchr($className, '\\'), 1));
-        }
-
-        $formTypeVisitorDefinition->setArgument(0, $formTypeClassNames);
     }
 
     private function processExtractorConstraintVisitor(ContainerBuilder $container): void

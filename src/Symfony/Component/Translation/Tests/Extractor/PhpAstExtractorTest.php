@@ -36,9 +36,7 @@ final class PhpAstExtractorTest extends TestCase
                 'Isbn',
                 'Length',
             ]),
-            new FormTypeVisitor([
-                'ExplicitLabelType',
-            ]),
+            new FormTypeVisitor(),
         ]);
         $extractor->setPrefix('prefix');
         $catalogue = new MessageCatalogue('en');
@@ -210,9 +208,7 @@ EOF;
                 'Isbn',
                 'Length',
             ]),
-            new FormTypeVisitor([
-                'ExplicitLabelType',
-            ]),
+            new FormTypeVisitor(),
         ]);
         $extractor->setPrefix('prefix');
         $extractor->extract(__DIR__.'/../Fixtures/extractor-7.3/translation.html.php', $catalogue);

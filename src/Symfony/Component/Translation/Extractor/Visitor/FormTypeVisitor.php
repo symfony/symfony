@@ -13,6 +13,7 @@ namespace Symfony\Component\Translation\Extractor\Visitor;
 
 use PhpParser\Node;
 use PhpParser\NodeVisitor;
+use Symfony\Component\Form\AbstractType;
 
 /**
  * @author Mathieu Santostefano <msantostefano@protonmail.com>
@@ -21,13 +22,10 @@ use PhpParser\NodeVisitor;
  */
 final class FormTypeVisitor extends AbstractVisitor implements NodeVisitor
 {
-    use FormTrait;
-
-    public function __construct(
-        // to be deleted
-        private readonly array $formTypeClassNames = [],
-    ) {
-    }
+    /**
+     * Stores whether the current class is a form type across visits of all children nodes.
+     */
+    private bool $isFormType = false;
 
     public function beforeTraverse(array $nodes): ?Node
     {
@@ -45,6 +43,11 @@ final class FormTypeVisitor extends AbstractVisitor implements NodeVisitor
             $this->visitArray($node);
         }
 
+        // Visit all "add()" method calls to look for implicit labels
+        if ($node instanceof Node\Expr\MethodCall) {
+            $this->visitMethodCall($node);
+        }
+
         return null;
     }
 
@@ -58,6 +61,21 @@ final class FormTypeVisitor extends AbstractVisitor implements NodeVisitor
         return null;
     }
 
+    private function visitMethodCall(Node\Expr\MethodCall $node): void
+    {
+        if ('add' !== $node->name->name) {
+            return;
+        }
+
+        if (!$node->args[0]->value instanceof Node\Scalar\String_) {
+            return;
+        }
+
+        if (\count($node->args) === 1) {
+            $this->addMessageToCatalogue($this->getStringValue($node->args[0]->value), 'messages', $node->args[0]->value->getStartLine());
+        }
+    }
+
     private function visitArray(Node\Expr\Array_ $node): void
     {
         foreach ($node->items as $item) {
@@ -69,5 +87,20 @@ final class FormTypeVisitor extends AbstractVisitor implements NodeVisitor
                 }
             }
         }
+    }
+
+    private function isFormType(Node $node): bool
+    {
+        if ($node instanceof Node\Stmt\Class_) {
+            if ($node->extends !== null) {
+                if ($node->extends->isFullyQualified()) {
+                    if ($node->extends->name === AbstractType::class) {
+                        $this->isFormType = true;
+                    }
+                }
+            }
+        }
+
+        return $this->isFormType;
     }
 }

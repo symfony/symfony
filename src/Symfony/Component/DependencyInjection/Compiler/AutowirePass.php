@@ -458,46 +458,49 @@ class AutowirePass extends AbstractRecursivePass
 
         $name = $target = (array_filter($reference->getAttributes(), static fn ($a) => $a instanceof Target)[0] ?? null)?->name;
 
-        if (null !== $name ??= $reference->getName()) {
-            if ($this->container->has($alias = $type.' $'.$name) && !$this->container->findDefinition($alias)->isAbstract()) {
-                return new TypedReference($alias, $type, $reference->getInvalidBehavior());
-            }
+        foreach ($this->container->getContainers() as $container) {
 
-            if (null !== ($alias = $this->getCombinedAlias($type, $name)) && !$this->container->findDefinition($alias)->isAbstract()) {
-                return new TypedReference($alias, $type, $reference->getInvalidBehavior());
-            }
+            if (null !== $name ??= $reference->getName()) {
+                if ($container->has($alias = $type.' $'.$name) && !$container->findDefinition($alias)->isAbstract()) {
+                    return new TypedReference($alias, $type, $reference->getInvalidBehavior());
+                }
 
-            $parsedName = (new Target($name))->getParsedName();
+                if (null !== ($alias = $this->getCombinedAlias($type, $name)) && !$container->findDefinition($alias)->isAbstract()) {
+                    return new TypedReference($alias, $type, $reference->getInvalidBehavior());
+                }
 
-            if ($this->container->has($alias = $type.' $'.$parsedName) && !$this->container->findDefinition($alias)->isAbstract()) {
-                return new TypedReference($alias, $type, $reference->getInvalidBehavior());
-            }
+                $parsedName = (new Target($name))->getParsedName();
 
-            if (null !== ($alias = $this->getCombinedAlias($type, $parsedName)) && !$this->container->findDefinition($alias)->isAbstract()) {
-                return new TypedReference($alias, $type, $reference->getInvalidBehavior());
-            }
+                if ($container->has($alias = $type.' $'.$parsedName) && !$container->findDefinition($alias)->isAbstract()) {
+                    return new TypedReference($alias, $type, $reference->getInvalidBehavior());
+                }
 
-            if (($this->container->has($n = $name) && !$this->container->findDefinition($n)->isAbstract())
-                || ($this->container->has($n = $parsedName) && !$this->container->findDefinition($n)->isAbstract())
-            ) {
-                foreach ($this->container->getAliases() as $id => $alias) {
-                    if ($n === (string) $alias && str_starts_with($id, $type.' $')) {
-                        return new TypedReference($n, $type, $reference->getInvalidBehavior());
+                if (null !== ($alias = $this->getCombinedAlias($type, $parsedName)) && !$container->findDefinition($alias)->isAbstract()) {
+                    return new TypedReference($alias, $type, $reference->getInvalidBehavior());
+                }
+
+                if (($container->has($n = $name) && !$container->findDefinition($n)->isAbstract())
+                    || ($container->has($n = $parsedName) && !$container->findDefinition($n)->isAbstract())
+                ) {
+                    foreach ($container->getAliases() as $id => $alias) {
+                        if ($n === (string) $alias && str_starts_with($id, $type.' $')) {
+                            return new TypedReference($n, $type, $reference->getInvalidBehavior());
+                        }
                     }
+                }
+
+                if (null !== $target) {
+                    return null;
                 }
             }
 
-            if (null !== $target) {
-                return null;
+            if ($container->has($type) && !$container->findDefinition($type)->isAbstract()) {
+                return new TypedReference($type, $type, $reference->getInvalidBehavior());
             }
-        }
 
-        if ($this->container->has($type) && !$this->container->findDefinition($type)->isAbstract()) {
-            return new TypedReference($type, $type, $reference->getInvalidBehavior());
-        }
-
-        if (null !== ($alias = $this->getCombinedAlias($type)) && !$this->container->findDefinition($alias)->isAbstract()) {
-            return new TypedReference($alias, $type, $reference->getInvalidBehavior());
+            if (null !== ($alias = $this->getCombinedAlias($type)) && !$container->findDefinition($alias)->isAbstract()) {
+                return new TypedReference($alias, $type, $reference->getInvalidBehavior());
+            }
         }
 
         return null;
@@ -747,4 +750,5 @@ class AutowirePass extends AbstractRecursivePass
 
         return $alias;
     }
+
 }

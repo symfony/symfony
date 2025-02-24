@@ -56,7 +56,7 @@ use Symfony\Component\ExpressionLanguage\ExpressionFunctionProviderInterface;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class ContainerBuilder extends Container implements TaggedContainerInterface
+class ContainerBuilder extends Container implements TaggedContainerInterface, DefinitionFinderContainerInterface
 {
     /**
      * @var array<string, ExtensionInterface>
@@ -157,12 +157,18 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
         'mixed' => true,
     ];
 
+    /**
+     * @var \Symfony\Component\DependencyInjection\DefinitionFinderContainerInterface[]
+     */
+    private array $containers;
+
     public function __construct(?ParameterBagInterface $parameterBag = null)
     {
         parent::__construct($parameterBag);
 
         $this->trackResources = interface_exists(ResourceInterface::class);
         $this->setDefinition('service_container', (new Definition(ContainerInterface::class))->setSynthetic(true)->setPublic(true));
+        $this->containers = [$this];
     }
 
     /**
@@ -1806,5 +1812,39 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
         }
 
         return $this->pathsInVendor[$path] = false;
+    }
+
+    /**
+     * Adds a container
+     *
+     * @param DefinitionFinderContainerInterface $container
+     *
+     * @return $this
+     */
+    public function addContainer(DefinitionFinderContainerInterface $container): static
+    {
+        $this->containers[] = $container;
+        return $this;
+    }
+
+    /**
+     * Resets the list of containers.
+     *
+     * @return $this
+     */
+    public function resetContainers(): static
+    {
+        $this->containers = [$this];
+        return $this;
+    }
+
+    /**
+     * Returns an array of containers.
+     *
+     * @return array<int, DefinitionFinderContainerInterface>
+     */
+    public function getContainers(): array
+    {
+        return $this->containers;
     }
 }

@@ -1,0 +1,24 @@
+---------------------------------------------------------------------------
+
+by keradus at 2025-02-24T08:57:15Z
+
+fabbot requires upgrade of Fixer
+no clue why utests failing now, is it anyhow related to PR?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2025-02-24T09:58:07Z
+
+@keradus you can ignore the test failures
+
+---------------------------------------------------------------------------
+
+by fabpot at 2025-02-24T12:01:19Z
+
+@keradus fabbot updated to use the latest PHP CS Fixer version.
+
+---------------------------------------------------------------------------
+
+by keradus at 2025-02-24T12:10:33Z
+
+I think all ready to merge then ? ;)

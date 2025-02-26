@@ -74,9 +74,9 @@ class LazyObjectRegistry
 
         $resetters = [];
         foreach ($classProperties as $scope => $properties) {
-            $resetters[] = \Closure::bind(static function ($instance, $skippedProperties) use ($properties) {
+            $resetters[] = \Closure::bind(static function ($instance, $skippedProperties) use ($properties, $hookedProperties) {
                 foreach ($properties as $name => $key) {
-                    if (!\array_key_exists($key, $skippedProperties)) {
+                    if (!\array_key_exists($key, $skippedProperties) && !isset($hookedProperties[$name])) {
                         unset($instance->$name);
                     }
                 }

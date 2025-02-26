@@ -1,0 +1,139 @@
+---------------------------------------------------------------------------
+
+by wouterj at 2023-04-16T11:52:51Z
+
+Thanks for yet another security feature proposal!
+First a practical thing: We're entering feature freeze very shortly, meaning that we don't merge newly opened feature PRs for 6.3 anymore (unless really needed or very small). So we have some more time to polish this PR for 6.4 :)
+
+I want to discuss a general remark that I don't think I've shared publicly yet. _(disclaimer: I know literally nothing about OAuth 2.0 and OIDC, except that it consists of a ton of different standards, so I can't determine if this applies to this PR)_
+
+My vision for Symfony Security is to provide a minimal implementation following industry best practices based on standards and let community libraries/bundle add all "bonus features". We don't have the man power nor knowledge to maintain let's say all OAuth, SAML, Webauthn and MFA standards.
+
+When adding new features, I think we must always test it to those 3 conditions:
+* Is the feature based on a standard? (which is clearly yes for this one)
+* Is this feature required to have a working authentication/authorization system, within reason (i.e. if 90% of the apps use it when using OIDC)? (this is what I'm a bit unsure about for this specific PR)
+* Is this feature following industry best practices? (e.g. this is why I pushed a bit to add a JWT implementation in the OIDC PR, given that the user info handler is generally not recommended for production)
+
+cc @chalasr
+
+---------------------------------------------------------------------------
+
+by chalasr at 2023-04-16T14:18:40Z
+
+I agree with Wouter.
+Implementing all OAuth2/OIDC features in core is a non-goal for now. Better improve community packages that are already supporting them or are meant to do so.
+
+---------------------------------------------------------------------------
+
+by Spomky at 2023-04-17T08:01:52Z
+
+Hi @wouterj and @chalasr,
+
+Many thanks for your feedback and advices. Hereafter my thoughts on this
+
+> First a practical thing: We're entering feature freeze very shortly, meaning that we don't merge newly opened feature PRs for 6.3 anymore (unless really needed or very small). So we have some more time to polish this PR for 6.4 :)
+
+No problem. I based it on the branch 6.3, but it does not matter to rebase to another branch.
+
+> We don't have the man power nor knowledge to maintain let's say all OAuth, SAML, Webauthn and MFA standards.
+
+Even if the community is large enough, I understand there is a risk to include specific authentication means that could be a problem in the future.
+
+> When adding new features, I think we must always test it to those 3 conditions
+
+I was not aware of those, but seem to be fair enough.
+
+> Implementing all OAuth2/OIDC features in core is a non-goal for now. Better improve community packages that are already supporting them or are meant to do so.
+
+Noted. Thanks. In this case, there is no need to go further here. I will continue that work in a side project. 👍
+
+---------------------------------------------------------------------------
+
+by Spomky at 2023-05-15T16:02:16Z
+
+Hi,
+
+I revised my mind and I would like to reopen this PR. I think this should be challenged a bit more.
+Hereafter a (simplified) diagram showing where this new feature will be useful.
+
+```mermaid
+sequenceDiagram
+    participant Client
+    participant Authorization Server
+    participant Resource Server
+    Authorization Server->>Client: IDToken+Access Token (after consent+authentication)
+    loop PR 48272 acts here
+        Client->>Client: IDToken
+        Client->>Authorization Server: Access Token (UserInfo Endpoint)
+    end
+    Client->>Resource Server: Access Token
+    loop This PR acts here
+        Resource Server->>Resource Server: Access Token (e.g. JWT, PASETO...)
+        Resource Server->>Authorization Server: Access Token (Introspection Endpoint)
+    end
+```
+
+As you can see, the features introduced with #48272 allow a Client application to authenticate end-users (by end-user, the OAuth spec means a person). The Client app can either use the IDToken (JWT) or the Access Token+UserInfo Endpoint to retreive the end-user details.
+```mermaid
+sequenceDiagram
+    participant Client
+    participant Authorization Server
+    loop PR 48272 acts here
+        Client->>Client: IDToken
+        Client->>Authorization Server: Access Token (UserInfo Endpoint)
+    end
+```
+
+This PR acts in a very similar way. The main differences are as follows:
+* It is s not meant to be used by the Client, but the Resource Server
+* The Resource Server is not supposed to receive the ID Token (unless Client + Resource Server = the same application)
+* The Resource Server can directly use the Access Token if it can be verified (e.g. JWT)
+* The "user" (consumer of the Resource Server) can be a end-user or an application (e.g. API to API communication)
+
+```mermaid
+sequenceDiagram
+    participant Resource Server
+    participant Authorization Server
+    loop This PR acts here
+        Resource Server->>Resource Server: Access Token (e.g. JWT, PASETO...)
+        Resource Server->>Authorization Server: Access Token (Introspection Endpoint)
+    end
+```
+
+The reason why I think this PR deserves more attention is that is cover the missing piece for covering most of the OAuth2 use cases.
+
+I understand the point of view you say we could rely community on community works. And that's true that several solutions exist. But here, no third party library with exotic dependencies is needed<sup>1</sup>. We can directly use it with few configuration lines on e.g. ApiPlatform-based resource servers.
+
+Also, I understand that Symfony does not aim at implementing all industry/web standards (even if all the Notifier channels make me think the opposite). However, OAuth2 is so widely used by the industry that it would be a shame not to support it, in particular after the works on the previous PRs. It is not a trendy technology, but a standard widely used for more than 10 years (and in continuous evolution).
+
+At last but not least, the item Support for third-party authentication services (e.g. Auth0: https://auth0.com/) in [[RFC] Symfony Security rework tracking issue](https://github.com/symfony/symfony/issues/30914) proposed by @curry684 could be marked as checked as this feature will allow communication with [auth0/Okta](https://developer.okta.com/docs/reference/api/oidc/#introspect), [OneLogin](https://developers.onelogin.com/openid-connect/api/validate-token) and many more.
+
+---
+
+<sup>1</sup>: this does not mean community works are useless. They all have great features, but having too much external dependencies is something we all try to avoid.
+
+---------------------------------------------------------------------------
+
+by carsonbot at 2023-05-17T13:44:44Z
+
+Hey!
+
+Thanks for your PR. You are targeting branch "6.3" but it seems your PR description refers to branch "6.4".
+Could you update the PR description or change target branch? This helps core maintainers a lot.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by Spomky at 2023-11-02T16:25:42Z
+
+Rebased for targeting Symfony 7.1
+
+---------------------------------------------------------------------------
+
+by Spomky at 2024-07-14T09:03:29Z
+
+That's good news!
+The PR is now rebased and I addressed the remarks raised earlier.

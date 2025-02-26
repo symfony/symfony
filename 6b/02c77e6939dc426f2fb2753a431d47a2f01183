@@ -1,0 +1,77 @@
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2024-07-09T14:37:11Z
+
+Thanks for the review! I didn't answer to each message individually to avoid spamming your notifications but I addressed everything
+
+---------------------------------------------------------------------------
+
+by Seldaek at 2024-07-10T11:47:51Z
+
+Great stuff overall, thanks for picking this up! :)
+
+---------------------------------------------------------------------------
+
+by Seldaek at 2024-07-10T14:43:33Z
+
+Ah an interesting problem came up here https://github.com/symfony/symfony/pull/57653/files#r1671760696 - what if the enum class is not defined? Should it make an empty value set then? Or error loudly but in a nicer way than just calling `::cases()` would?
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2024-07-10T14:49:02Z
+
+In the constructor, I check the existence of the enum. If it doesn't exist, it will treat it as a simple string. I think it is enough, otherwise I'm affraid it will complexify the whole thing a lot.
+
+Additionally, `EnumNodeDefinition` (roughly, when using `->enumNode(...)->enumFqcn(...)`) will throw if the enum doesn't exist. Seems safe to me :thinking:
+
+I also think that people will use it with the `::class` syntax rather than a raw string, which will make PHP complain if the enum doesn't exist as well
+
+---------------------------------------------------------------------------
+
+by Seldaek at 2024-07-10T14:52:53Z
+
+Yes it seems safe, but it doesn't solve the problem in the other PR :)
+
+> I also think that people will use it with the `::class` syntax rather than a raw string, which will make PHP complain if the enum doesn't exist as well
+
+That is not true unfortunately https://3v4l.org/ibsvJ
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2024-07-10T15:00:18Z
+
+Ah yes indeed... In fact, making an assertion that a string looks like an FQCN seems a bit brittle to me.
+
+Another solution that could be considered is that, if only one value is passed to `$values` and it's a string, then we consider that it must always be the FQCN of an enum. Why not, although I feel like it's a bit of a hack when I write it.
+
+---------------------------------------------------------------------------
+
+by Seldaek at 2024-07-10T15:12:16Z
+
+Sorry you lost me there. You already have `->enumFqcn()`  so it is clear that what is passed in there must be a valid enum class name, and enum_exists will ensure that passing `RandomNonExistantEnum::class` will fail at runtime at least. I think let's leave this PR as is for now.
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2024-07-10T15:17:19Z
+
+Ah yes I forgot a bit of context, sorry. Actually I was talking about the standalone use of `EnumNode`, without `EnumNodeDefinition::enumFqcn()`.
+
+But anyway, let's see what others think of the current state yes! :+1:
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2024-07-11T12:03:27Z
+
+@stof I addressed all your comments. Also I realized that there's no reason to not support Unit enums, so I added support and test as well for them.
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2024-08-22T08:58:10Z
+
+Status: Needs Review
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2025-02-11T12:30:17Z
+
+Thank you for the review. I updated to have as many early return/throw as possible as well as improved the exception messages.

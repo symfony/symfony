@@ -1,0 +1,83 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2025-01-23T00:41:28Z
+
+Hey!
+
+Thanks for your PR. You are targeting branch "7.3" but it seems your PR description refers to branch "7.3 for features".
+Could you update the PR description or change target branch? This helps core maintainers a lot.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by smnandre at 2025-01-25T02:02:47Z
+
+> I like it! Memory consumption should be considered as this deals with potentially large directories, ideally nodes should be yielded as they come.
+
+Yep! I'll make the changes depending on the following questions.
+
+> Regarding the public API, we should remove or internalize any getter/setter for which we don't have a strong use case.
+
+Do you have some examples in mind  ?
+
+Do we need both `createTree` and `tree` in SymfonyStyle (i used Table as base/inspiration)...
+Not sure there is a real need for the ->tree() method..
+
+---------------------------------------------------------------------------
+
+by chalasr at 2025-01-25T18:54:44Z
+
+> Do you have some examples in mind ?
+
+I was refering to `Tree::getStyle()/setStyle()` and `TreeStyle::getPrefix*()`
+
+---------------------------------------------------------------------------
+
+by smnandre at 2025-01-26T04:55:18Z
+
+I've removed the getters and added a "appy" method on TreeStyle  (we can consider `RecursiveTreeIterator` is part of the contract?)
+
+```php
+public function applyPrefixes(RecursiveTreeIterator $iterator): void
+{
+    $iterator->setPrefixPart(RecursiveTreeIterator::PREFIX_LEFT, $this->prefixLeft);
+    $iterator->setPrefixPart(RecursiveTreeIterator::PREFIX_MID_HAS_NEXT, $this->prefixMidHasNext);
+    $iterator->setPrefixPart(RecursiveTreeIterator::PREFIX_MID_LAST, $this->prefixMidLast);
+    $iterator->setPrefixPart(RecursiveTreeIterator::PREFIX_END_HAS_NEXT, $this->prefixEndHasNext);
+    $iterator->setPrefixPart(RecursiveTreeIterator::PREFIX_END_LAST, $this->prefixEndLast);
+    $iterator->setPrefixPart(RecursiveTreeIterator::PREFIX_RIGHT, $this->prefixRight);
+}
+```
+
+Also removed getStyle / setStyle
+
+Will refactor as lazy iterator but i'm not sure how to handle the cycles yet
+
+---------------------------------------------------------------------------
+
+by chadyred at 2025-01-27T15:16:47Z
+
+@smnandre It will be really useful :pray: great job
+
+---------------------------------------------------------------------------
+
+by smnandre at 2025-02-09T00:40:58Z
+
+I've fusioned `Tree` and `TreeBuilder` into `TreeHelper`, keeping in line with existing ones.
+
+Removed the Finder integration for now (i'd rather have separated PR as it will require some discussion)
+
+---------------------------------------------------------------------------
+
+by smnandre at 2025-02-09T03:06:38Z
+
+Open to review :)
+
+---------------------------------------------------------------------------
+
+by chadyred at 2025-02-12T14:07:01Z
+
+Last comments are none blocking suggestion

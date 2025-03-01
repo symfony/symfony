@@ -1,0 +1,55 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-10-08T07:16:46Z
+
+I'm :-1: here: the length in bytes is what matters. Eg a storage can have a 255-max string field counted in bytes, and this validator guards against longer filenames. Validating in code points makes it really hard to validate any predictable maxlength.
+
+Also, nothing tells this accepts only UTF-8 (it doesn't, bytes are bytes, no encoding expected here).
+
+---------------------------------------------------------------------------
+
+by IssamRaouf at 2024-10-08T19:13:47Z
+
+Hello @nicolas-grekas
+
+For the context of the **filenameMaxLength** constraint option, from its name alone, it clearly suggests a validation on **the string's length**.
+
+### let's take this example  :
+
+>  **file-to-upload.pdf** (Latin characters)
+
+- character count = 14
+- mb_strlen($basename) = 14
+- strlen($basename) = 14
+
+>  **файл-завантаження.pdf** (non-Latin characters) each character can require 1 to 4 bytes
+
+- character count = 17
+- mb_strlen($basename) = 17
+- strlen($basename) = 33;
+
+#[Assert\File(
+ maxSize: '10M',
+ mimeTypes: ['application/pdf'],
+ filenameMaxLength: 20,
+)]
+
+Result:
+Latin characters: passes
+Non-Latin characters: fails validation
+
+I find this contradictory 😅.
+
+---------------------------------------------------------------------------
+
+by IssamRaouf at 2024-10-08T20:51:05Z
+
+Hello @OskarStark
+
+ok, I'm waiting for the issue to be validated
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-10-09T14:02:01Z
+
+We could make this opt-in, eg with a countUnit and a charset option (names taken from the Length constraint)

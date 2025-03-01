@@ -1,0 +1,22 @@
+---------------------------------------------------------------------------
+
+by stof at 2025-02-21T14:37:20Z
+
+IIRC, a Yaml comment starts with a `#` that is either at the beginning of the line or is following a whitespace, but `url: http://example.com/#about` would not treat `about` as a comment.
+Can you add more tests covering such cases ?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2025-02-21T14:40:06Z
+
+hm indeed
+
+Status: Needs work
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2025-02-27T08:08:59Z
+
+should be good now
+
+Status: Needs Review

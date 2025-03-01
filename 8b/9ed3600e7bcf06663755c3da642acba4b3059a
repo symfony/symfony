@@ -1,0 +1,65 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2024-05-15T10:00:20Z
+
+Hey!
+
+Thanks for your PR. You are targeting branch "7.1" but it seems your PR description refers to branch "7.2".
+Could you update the PR description or change target branch? This helps core maintainers a lot.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by vincentchalamon at 2024-05-15T10:17:52Z
+
+@Spomky You might be interested by this PR
+
+---------------------------------------------------------------------------
+
+by Spomky at 2024-07-10T07:20:44Z
+
+Hi @vincentchalamon,
+
+Please note that I recently released the Web Token suite 4.0 and proposed https://github.com/symfony/symfony/pull/57694.
+The migration is normally simple, but it impacts the claims/header checking classes of `iat`, `nbf`, `exp`. And may therefore have an impact on this PR (to be confirmed).
+
+---------------------------------------------------------------------------
+
+by vincentchalamon at 2024-07-10T07:26:09Z
+
+Hi @Spomky,
+
+Yep I just saw that and fixed the conflicts on OidcTokenHandler and services declarations.
+
+Do you think it's a good thing to inject a JWSLoader and check the token through it, instead of creating multiple objects (checkers, managers, etc.) and checking the token with ClaimCheckerManager?
+
+---------------------------------------------------------------------------
+
+by Spomky at 2024-07-13T07:33:52Z
+
+> Do you think it's a good thing to inject a JWSLoader and check the token through it, instead of creating multiple objects (checkers, managers, etc.) and checking the token with ClaimCheckerManager?
+
+I am not sure. To me, the way the tokens are loaded and their content depends on the context of their use i.e. the algorithms, the keys and the verified headers/claims should not be centralized. The JWSLoader service will then only be used by one token handler and have no advantages.
+
+---------------------------------------------------------------------------
+
+by wgorczyca at 2024-11-04T14:02:37Z
+
+any update about this feature?
+
+---------------------------------------------------------------------------
+
+by vincentchalamon at 2024-11-04T14:32:18Z
+
+> any update about this feature?
+
+Still waiting for a review
+
+---------------------------------------------------------------------------
+
+by chalasr at 2024-11-04T18:53:49Z
+
+It is too late for 7.2 but I'd like this PR to make it into the next development phase, so expect some review from me asap.

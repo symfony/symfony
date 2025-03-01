@@ -1,0 +1,151 @@
+---------------------------------------------------------------------------
+
+by pyrech at 2024-11-12T21:27:46Z
+
+I have just moved the command in the Twig bundle, applied most of the review suggestions (and mark them as resolved) and answered to the remaining ones.
+
+I don't understand the psalm failure as the arrayNode method of the configuration is used elsewhere without issue. Did I miss something?
+
+---------------------------------------------------------------------------
+
+by smnandre at 2024-11-12T22:17:54Z
+
+> I don't understand the psalm failure as the arrayNode method of the configuration is used elsewhere without issue. Did I miss something?
+
+I guess it can be ignored, Psalm does not know the exact type of the "rootNode" here..  and so type it as ParentNode|ArrayDefinition 🤷‍♂️
+
+---------------------------------------------------------------------------
+
+by pyrech at 2024-12-03T20:46:22Z
+
+> I guess it can be ignored, Psalm does not know the exact type of the "rootNode" here.. and so type it as ParentNode|ArrayDefinition 🤷‍♂️
+
+The Psalm baseline seems to be build automatically so not sure if I have something to do on my side to "ignore" this error?
+
+--
+
+Meanwhile I fixed latest review comments. Is there anything I can do to move forward with PR? :slightly_smiling_face:
+
+Thanks
+
+---------------------------------------------------------------------------
+
+by Jean-Beru at 2025-01-06T16:35:36Z
+
+> Meanwhile I fixed latest review comments. Is there anything I can do to move forward with PR? 🙂
+
+If we use semantic configuration to configure this command, we have to add a test in https://github.com/symfony/symfony/blob/7.3/src/Symfony/Bundle/TwigBundle/Tests/DependencyInjection/ConfigurationTest.php
+
+FYI, we'll also have to update https://github.com/symfony/symfony/blob/7.3/src/Symfony/Bundle/TwigBundle/Resources/config/schema/twig-1.0.xsd.
+
+---------------------------------------------------------------------------
+
+by Jean-Beru at 2025-01-07T08:59:33Z
+
+> The Psalm baseline seems to be build automatically so not sure if I have something to do on my side to "ignore" this error?
+
+Is it linked to a missing `->end()` after `->prototype('integer')`?
+
+The configuration will be:
+```php
+    private function addErrorDumperSection(ArrayNodeDefinition $rootNode): void
+    {
+        $rootNode
+            ->children()
+                ->arrayNode('error_dumper')
+                    ->addDefaultsIfNotSet()
+                    ->children()
+                        ->scalarNode('path')
+                            ->info('The directory where error pages will be dumped.')
+                            ->defaultValue('%kernel.build_dir%/error_pages')
+                        ->end()
+                        ->arrayNode('status_codes')
+                            ->info('The error status codes to dump. By default, all 4xx and 5xx status codes will be dumped.')
+                            ->defaultValue([])
+                            ->integerPrototype()->end()
+                        ->end()
+                    ->end()
+                ->end()
+            ->end()
+        ;
+    }
+```
+
+---------------------------------------------------------------------------
+
+by pyrech at 2025-01-31T16:11:13Z
+
+@Jean-Beru Thanks for your comments/suggestions, i applied them all (Process tests are broken on 7.3, so failures are unrelated).
+
+Sadly, for psalm, it didn't change anything, I still get the `UndefinedInterfaceMethod: Method Symfony\Component\Config\Definition\Builder\NodeParentInterface::arrayNode does not exist` error :cry:
+
+---------------------------------------------------------------------------
+
+by yceruto at 2025-01-31T16:12:14Z
+
+I like the command goal, just a quick question: is a new config really needed for this command? wondering if we can just default to these values using the command arguments/options instead?
+
+For example:
+```bash
+bin/console error:dump 404 500 --path=var/foo/bar
+```
+
+---------------------------------------------------------------------------
+
+by pyrech at 2025-01-31T16:15:55Z
+
+> I like the command goal, just a quick question: is a new config really needed for this command? wondering if we can just default to these values using the command arguments/options instead?
+
+The initial implementation of this PR was doing that but the new config was suggested in a previous review :sweat_smile:
+
+---------------------------------------------------------------------------
+
+by stof at 2025-01-31T16:20:08Z
+
+@pyrech I don't think our current Psalm config can analyze those properly for existing code either.
+Our Psalm job is not one where we require it to be green for each PR. We review what Psalm finds. That's also why each job puts the existing issues of the base branch in a baseline before analyzing the PR (running Psalm without baseline on the whole codebase probably yields thousands of errors)
+
+---------------------------------------------------------------------------
+
+by pyrech at 2025-02-02T11:05:55Z
+
+Before moving again the command, can we agree whether we want to make it configurable in the dic or not?
+
+---------------------------------------------------------------------------
+
+by Jean-Beru at 2025-02-04T13:34:16Z
+
+> Before moving again the command, can we agree whether we want to make it configurable in the dic or not?
+
+Indeed, the configuration part may be removed to make this command simpler (even if I tried to fix it, sorry for the misunderstanding).
+
+---------------------------------------------------------------------------
+
+by pyrech at 2025-02-12T23:26:33Z
+
+The command was moved to the ErrorHandler component, and registered by the FrameworkBundle. Also, the removal of the directory also ask for confirmation (unless the `--clear` option is given). PR description have been updated.
+
+Hoping it's all good now :)
+
+---------------------------------------------------------------------------
+
+by pyrech at 2025-02-13T08:52:49Z
+
+Thanks again for review, suggestions applied
+
+---------------------------------------------------------------------------
+
+by pyrech at 2025-02-28T10:03:14Z
+
+Applied suggestions from @fabpot & @mtarld  :+1:
+
+However, tests are now failling on `Symfony\Bridge\Twig\Tests\NodeVisitor\TranslationDefaultDomainNodeVisitorTest` , but I fail to see how this is related to this PR.
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2025-02-28T10:32:17Z
+
+> However, tests are now failling on Symfony\Bridge\Twig\Tests\NodeVisitor\TranslationDefaultDomainNodeVisitorTest , but I fail to see how this is related to this PR.
+
+You can ignore it then.
+Checking the 7.3 branch if it is failing there too, is a good double check and if not, a rebase should help 😃

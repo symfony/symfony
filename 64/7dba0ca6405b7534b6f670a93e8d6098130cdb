@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by joelwurtz at 2025-02-27T14:43:15Z
+
+Thanks for the insight @cedric-anne i added a test and changed the fix to make it work in both cases
+
+---------------------------------------------------------------------------
+
+by cedric-anne at 2025-02-27T15:07:23Z
+
+I still have the issue if I use the following format: `'[%bar%] %percent:3s%%' . PHP_EOL . '<comment>%message%</comment>'`. I guess it is because it produces `PHP_EOL . <comment></comment>` that is not detected as an ending new line but is acting the same when rendered int he terminal.
+
+---------------------------------------------------------------------------
+
+by joelwurtz at 2025-02-27T17:37:40Z
+
+> I still have the issue if I use the following format:
+
+Should be good, it now checks if last line is an empty message without formatting, also added a test case for your use case

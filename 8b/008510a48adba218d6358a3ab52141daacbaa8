@@ -1,0 +1,33 @@
+---------------------------------------------------------------------------
+
+by OskarStark at 2025-03-03T09:57:48Z
+
+As a bugfix?
+
+---------------------------------------------------------------------------
+
+by mtarld at 2025-03-03T10:04:13Z
+
+IMO, it should be a feature, if it's merged as a bug, people doing `expectErrorMessage` in their tests will have broken tests when upgrading.
+
+---------------------------------------------------------------------------
+
+by mtarld at 2025-03-03T10:06:05Z
+
+Failures look related btw :slightly_smiling_face:
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2025-03-03T10:09:11Z
+
+> IMO, it should be a feature, if it's merged as a bug, people doing expectErrorMessage in their tests will have broken tests when upgrading.
+
+AFAIK we don't give BC promise for exception messages
+
+---------------------------------------------------------------------------
+
+by mtarld at 2025-03-03T10:12:26Z
+
+> AFAIK we don't give BC promise for exception messages
+
+Noted, thanks!

@@ -1,0 +1,45 @@
+---------------------------------------------------------------------------
+
+by dorrogeray at 2025-02-25T23:57:49Z
+
+I am not sure what to make of this error:
+
+![image](https://github.com/user-attachments/assets/a57ce3de-4659-4220-b149-0d729b14fc00)
+
+Also not sure how to fix the psalm complaining about the the missing classes.
+
+---------------------------------------------------------------------------
+
+by tillkruss at 2025-02-26T02:28:00Z
+
+Nice work!
+
+Did you see https://github.com/symfony/symfony/pull/59846?
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2025-02-26T10:42:33Z
+
+@dorrogeray You can rebase your PR, the test failure you're facing is unrelated to your PR and has been fixed in https://github.com/symfony/symfony/pull/59861.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-02-26T16:49:30Z
+
+Actually, can you do the same in the Lock and Semaphore components please?
+
+---------------------------------------------------------------------------
+
+by dorrogeray at 2025-02-26T17:25:29Z
+
+> Actually, can you do the same in the Lock and Semaphore components please?
+
+I will take a look 👍
+
+---------------------------------------------------------------------------
+
+by dorrogeray at 2025-02-27T00:05:32Z
+
+Errors in `Windows / x86 / minimal-exts / lowest-php (pull_request)` don't seem to be related to this PR, PHP 8.5 is crashing on `zend_mm_heap corrupted` and it looks like there is nothing I can do about the psalm not recognizing the `Relay\Relay` and `Relay\Cluster` classes..
+
+@stof @jderusse I think its ready for review.

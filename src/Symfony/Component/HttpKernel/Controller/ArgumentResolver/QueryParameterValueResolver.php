@@ -44,7 +44,7 @@ final class QueryParameterValueResolver implements ValueResolverInterface
             throw HttpException::fromStatusCode($validationFailedCode, \sprintf('Missing query parameter "%s".', $name));
         }
 
-        $value = $request->query->all()[$name];
+        $value = $request->query->all($name);
         $type = $argument->getType();
 
         if (null === $attribute->filter && 'array' === $type) {

@@ -660,11 +660,11 @@ class Request
         }
 
         if ($this->query->has($key)) {
-            return $this->query->all()[$key];
+            return $this->query->all($key);
         }
 
         if ($this->request->has($key)) {
-            return $this->request->all()[$key];
+            return $this->request->all($key);
         }
 
         return $default;

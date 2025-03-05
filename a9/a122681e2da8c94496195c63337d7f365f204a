@@ -1,0 +1,27 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2025-03-03T08:21:23Z
+
+👍 As we avoid using `empty()` in the code base, it makes a lot of sense to me.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2025-03-05T08:15:49Z
+
+please do not merge yet, I haven't updated all places
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2025-03-05T10:30:00Z
+
+ready
+
+Status: Needs review
+
+---------------------------------------------------------------------------
+
+by fabpot at 2025-03-05T10:49:56Z
+
+> @fabpot shall we teach fabbot to report such things in future?
+
+I suppose this should be part of PHP-CS-Fixer?

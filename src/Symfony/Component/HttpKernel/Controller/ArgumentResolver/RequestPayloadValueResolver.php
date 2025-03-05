@@ -12,8 +12,8 @@
 namespace Symfony\Component\HttpKernel\Controller\ArgumentResolver;
 
 use Symfony\Component\ArgumentResolver\ArgumentMetadata\ArgumentMetadata;
+use Symfony\Component\ArgumentResolver\ArgumentValueSource\SourceValue;
 use Symfony\Component\ArgumentResolver\Exception\NearMissValueResolverException;
-use Symfony\Component\ArgumentResolver\SourceValue;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;

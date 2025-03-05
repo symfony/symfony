@@ -12,8 +12,8 @@
 namespace Symfony\Component\ArgumentResolver\ValueResolver;
 
 use Symfony\Component\ArgumentResolver\ArgumentMetadata\ArgumentMetadata;
+use Symfony\Component\ArgumentResolver\ArgumentValueSource\SourceValue;
 use Symfony\Component\ArgumentResolver\Exception\InvalidSourceValueException;
-use Symfony\Component\ArgumentResolver\SourceValue;
 use Symfony\Component\Uid\AbstractUid;
 
 /**

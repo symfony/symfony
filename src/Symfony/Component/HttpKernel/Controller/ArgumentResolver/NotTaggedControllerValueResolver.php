@@ -13,9 +13,8 @@ namespace Symfony\Component\HttpKernel\Controller\ArgumentResolver;
 
 use Psr\Container\ContainerInterface;
 use Symfony\Component\ArgumentResolver\ArgumentMetadata\ArgumentMetadata;
-use Symfony\Component\ArgumentResolver\Exception\InvalidSourceValueException;
-use Symfony\Component\ArgumentResolver\SourceValue;
-use Symfony\Component\ArgumentResolver\ValueResolver\NotTaggedCallableValueResolver;
+use Symfony\Component\ArgumentResolver\ArgumentValueSource\SourceValue;
+use Symfony\Component\ArgumentResolver\ValueResolver\NotTaggedServiceValueResolver;
 use Symfony\Component\ArgumentResolver\ValueResolver\ValueResolverInterface;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\HttpFoundation\Request;
@@ -35,11 +34,11 @@ final class NotTaggedControllerValueResolver implements ControllerValueResolverI
         ValueResolverInterface|ContainerInterface $inner,
     ) {
         if ($inner instanceof ContainerInterface) {
-            trigger_deprecation('symfony/http-kernel', '7.3', sprintf('The "$container" argument of "%s::__construct()" is deprecated, pass a "%s" instance as "$inner" instead.', __CLASS__, NotTaggedCallableValueResolver::class));
-            $this->inner = new NotTaggedCallableValueResolver($inner);
+            trigger_deprecation('symfony/http-kernel', '7.3', sprintf('The "$container" argument of "%s::__construct()" is deprecated, pass a "%s" instance as "$inner" instead.', __CLASS__, NotTaggedServiceValueResolver::class));
+            $this->inner = new NotTaggedServiceValueResolver($inner);
             return;
         }
-        $this->inner = new NotTaggedCallableValueResolver($inner);
+        $this->inner = new NotTaggedServiceValueResolver($inner);
     }
 
     public function resolveArgument(ArgumentMetadata $argument, SourceValue $value): iterable

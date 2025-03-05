@@ -11,9 +11,8 @@
 
 namespace Symfony\Component\HttpKernel\Controller\ArgumentResolver;
 
-use Doctrine\Common\Collections\Expr\Value;
 use Symfony\Component\ArgumentResolver\ArgumentMetadata\ArgumentMetadata;
-use Symfony\Component\ArgumentResolver\SourceValue;
+use Symfony\Component\ArgumentResolver\ArgumentValueSource\SourceValue;
 use Symfony\Component\ArgumentResolver\ValueResolver\ValueResolverInterface;
 use Symfony\Component\ArgumentResolver\ValueResolver\VariadicValueResolver as BaseVariadicValueResolver;
 use Symfony\Component\HttpFoundation\Request;

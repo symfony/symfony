@@ -13,7 +13,7 @@ namespace Symfony\Component\ArgumentResolver\ValueResolver;
 
 use Psr\Container\ContainerInterface;
 use Symfony\Component\ArgumentResolver\ArgumentMetadata\ArgumentMetadata;
-use Symfony\Component\ArgumentResolver\SourceValue;
+use Symfony\Component\ArgumentResolver\ArgumentValueSource\SourceValue;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 
 /**
@@ -21,7 +21,7 @@ use Symfony\Component\DependencyInjection\Exception\RuntimeException;
  *
  * @author Simeon Kolev <simeon.kolev9@gmail.com>
  */
-final readonly class NotTaggedCallableValueResolver implements ValueResolverInterface
+final readonly class NotTaggedServiceValueResolver implements ValueResolverInterface
 {
     public function __construct(
         private ContainerInterface $container,

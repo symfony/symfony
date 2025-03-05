@@ -14,7 +14,7 @@ namespace Symfony\Component\HttpKernel\Controller\ArgumentResolver;
 trigger_deprecation('symfony/http-kernel', '7.3', 'The "%s" class is deprecated, use "%s" instead.', DefaultValueResolver::class, BaseDefaultValueResolver::class);
 
 use Symfony\Component\ArgumentResolver\ArgumentMetadata\ArgumentMetadata;
-use Symfony\Component\ArgumentResolver\SourceValue;
+use Symfony\Component\ArgumentResolver\ArgumentValueSource\SourceValue;
 use Symfony\Component\ArgumentResolver\ValueResolver\DefaultValueResolver as BaseDefaultValueResolver;
 use Symfony\Component\ArgumentResolver\ValueResolver\ValueResolverInterface;
 use Symfony\Component\HttpFoundation\Request;

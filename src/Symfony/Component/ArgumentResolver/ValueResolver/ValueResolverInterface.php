@@ -11,9 +11,10 @@
 
 namespace Symfony\Component\ArgumentResolver\ValueResolver;
 
-use Symfony\Component\ArgumentResolver\Exception\InvalidSourceValueException;
 use Symfony\Component\ArgumentResolver\ArgumentMetadata\ArgumentMetadata;
-use Symfony\Component\ArgumentResolver\SourceValue;
+use Symfony\Component\ArgumentResolver\ArgumentValueSource\SourceValue;
+use Symfony\Component\ArgumentResolver\Exception\InvalidSourceValueException;
+use Symfony\Component\ArgumentResolver\Exception\NearMissValueResolverException;
 
 /**
  * Responsible for resolving the value of an argument based on its metadata and its source value.
@@ -25,6 +26,9 @@ interface ValueResolverInterface
 {
     /**
      * Returns the resolved argument value(s).
+     *
+     * @throws InvalidSourceValueException
+     * @throws NearMissValueResolverException
      */
     public function resolveArgument(ArgumentMetadata $argument, SourceValue $value): iterable;
 }

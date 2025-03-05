@@ -12,12 +12,12 @@
 namespace Symfony\Component\ArgumentResolver\ValueResolver;
 
 use Symfony\Component\ArgumentResolver\ArgumentMetadata\ArgumentMetadata;
+use Symfony\Component\ArgumentResolver\ArgumentValueSource\SourceValue;
 use Symfony\Component\ArgumentResolver\Exception\InvalidSourceValueException;
-use Symfony\Component\ArgumentResolver\SourceValue;
 use Symfony\Component\ArgumentResolver\ValueAccessor\RawValueAccessorInterface;
 
 /**
- * Attempt to resolve backed enum cases from request attributes, for a route path parameter,
+ * Attempts to resolve backed enum cases from request attributes, for a route path parameter,
  * leading to a 404 Not Found if the attribute value isn't a valid backing value for the enum type.
  *
  * @author Maxime Steinhausser <maxime.steinhausser@gmail.com>

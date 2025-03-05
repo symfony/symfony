@@ -12,12 +12,12 @@
 namespace Symfony\Component\HttpKernel\Controller\ArgumentResolver;
 
 use Symfony\Component\ArgumentResolver\ArgumentMetadata\ArgumentMetadata;
+use Symfony\Component\ArgumentResolver\ArgumentValueSource\SourceValue;
 use Symfony\Component\ArgumentResolver\Exception\NearMissValueResolverException;
-use Symfony\Component\ArgumentResolver\SourceValue;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\Exception\NearMissValueResolverException as LegacyNearMissValueResolverException;
 use Symfony\Component\HttpKernel\Controller\ValueResolverInterface as LegacyValueResolverInterface;
 use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata as LegacyArgumentMetadata;
+use Symfony\Component\HttpKernel\Exception\NearMissValueResolverException as LegacyNearMissValueResolverException;
 
 /**
  * Yields the same instance as the request object passed along.

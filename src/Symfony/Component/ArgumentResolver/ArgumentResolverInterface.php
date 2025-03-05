@@ -11,6 +11,9 @@
 
 namespace Symfony\Component\ArgumentResolver;
 
+
+use Symfony\Component\ArgumentResolver\ArgumentValueSource\ValueSourceInterface;
+
 /**
  * An ArgumentResolverInterface instance knows how to determine the
  * arguments for a specific function.
@@ -27,5 +30,5 @@ interface ArgumentResolverInterface
      *
      * @throws \RuntimeException When no value could be provided for a required argument
      */
-    public function getArguments(mixed $input, callable $callable, ?\ReflectionFunctionAbstract $reflector = null): array;
+    public function getArguments(ValueSourceInterface $source, callable $callable, ?\ReflectionFunctionAbstract $reflector = null): array;
 }

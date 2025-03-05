@@ -1,7 +1,12 @@
 <?php
 
-namespace Symfony\Component\ArgumentResolver;
+namespace Symfony\Component\ArgumentResolver\ArgumentValueSource;
 
+/**
+ * Holds a source value to be resolved to an argument.
+ *
+ * @author Robin Chalas <robin@baksla.sh>
+ */
 final readonly class SourceValue
 {
     const NOT_FOUND = 'notfound';

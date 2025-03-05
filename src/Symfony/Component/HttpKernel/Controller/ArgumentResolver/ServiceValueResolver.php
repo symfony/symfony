@@ -13,7 +13,7 @@ namespace Symfony\Component\HttpKernel\Controller\ArgumentResolver;
 
 use Psr\Container\ContainerInterface;
 use Symfony\Component\ArgumentResolver\ArgumentMetadata\ArgumentMetadata;
-use Symfony\Component\ArgumentResolver\SourceValue;
+use Symfony\Component\ArgumentResolver\ArgumentValueSource\SourceValue;
 use Symfony\Component\ArgumentResolver\ValueResolver\ServiceValueResolver as BaseServiceValueResolver;
 use Symfony\Component\ArgumentResolver\ValueResolver\ValueResolverInterface;
 use Symfony\Component\HttpFoundation\Request;

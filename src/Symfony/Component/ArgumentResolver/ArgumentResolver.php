@@ -26,7 +26,7 @@ use Symfony\Contracts\Service\ServiceProviderInterface;
 use Symfony\Component\ArgumentResolver\ValueResolver\ValueResolverInterface;
 
 /**
- * Responsible for resolving the arguments passed to an action.
+ * Responsible for resolving the arguments passed to a callable.
  *
  * @author Iltar van der Berg <kjarli@gmail.com>
  * @author Robin Chalas <robin@baksla.sh>
@@ -140,6 +140,6 @@ class ArgumentResolver implements ArgumentResolverInterface
      */
     protected function callResolver($resolver, ArgumentMetadata $metadata, mixed $input): iterable
     {
-        return $resolver->resolve($metadata, $input);
+        return $resolver->resolveArgument($metadata, $input);
     }
 }

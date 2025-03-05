@@ -4,6 +4,7 @@ CHANGELOG
 7.3
 ---
 
+ * Add `rate_limiter` controller attribute
  * Add support for assets pre-compression
  * Rename `TranslationUpdateCommand` to `TranslationExtractCommand`
  * Add JsonStreamer services and configuration

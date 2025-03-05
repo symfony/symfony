@@ -1,0 +1,32 @@
+---------------------------------------------------------------------------
+
+by chalasr at 2025-02-23T18:48:05Z
+
+Please add a proper title to your PR also
+
+---------------------------------------------------------------------------
+
+by Legendary4226 at 2025-02-24T21:23:26Z
+
+I have a question relating to this PR: the FormView objects and the underlying data. Why aren't they available in the Twig context ?
+
+For example, on a project for my company Onyl Rocks, I declared a form type based on a ViewModel that contains some entities like Organizations (as an array).
+Users can belong to multiple organizations, so I have a form to handle the switch between them.
+My Organizations have an image, so I wan't to display their image, assuming it's a base64 string for simplicity.
+But I cannot access the underlying data on what the FormView objects are based on.
+
+Do you think it's possible to add such a feature ? In another PR of course ^^
+In my opinion, it is one of the most blocking elements when working with Twig forms to easily design great UI. Because you don't have the corresponding data close at hand. The only way is to use the "form.child.vars.value" and pass to the Twig and array of the data mapped by value used to construct the form. In twig it ends up to have some code like this:
+```
+{% for child in form.field.vars %}
+    {% set myFormData = myArrayMapped[child.vars.value] %}
+    ...
+{% endfor %}
+```
+Without talking about the code structure, for example a global form you pass to every page like my previous example. Not hard or impossible but not pleasant for everyday use.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2025-03-05T19:59:07Z
+
+Please consider opening a new issue or PR for the feature your suggest.

@@ -1,0 +1,80 @@
+---------------------------------------------------------------------------
+
+by andrew-demb at 2025-02-26T14:55:14Z
+
+> Error: src/Symfony/Component/Messenger/Bridge/Redis/Transport/Connection.php:59:13: UndefinedClass: Class, interface or enum named Relay\Relay does not exist (see https://psalm.dev/019)
+> Error: src/Symfony/Component/Messenger/Bridge/Redis/Transport/Connection.php:740:34: UndefinedClass: Class, interface or enum named Relay\Relay does not exist (see https://psalm.dev/019)
+
+I don't know how to handle this error. I didn't add Relay in the PR - probably an issue introduced by the Psalm update or existed before.
+
+---------------------------------------------------------------------------
+
+by andrew-demb at 2025-02-26T15:01:01Z
+
+> .................................zend_mm_heap corrupted
+> Job exited with: 134
+> Error: KO src/Symfony/Component/Validator
+
+This CI failure for PHP 8.5 seems unrelated to PR
+
+---------------------------------------------------------------------------
+
+by HypeMC at 2025-02-26T15:08:59Z
+
+At first glance, this looks like something that should be handled via a middleware, something like [`DoctrineCloseConnectionMiddleware`](https://github.com/symfony/symfony/blob/7.3/src/Symfony/Bridge/Doctrine/Messenger/DoctrineCloseConnectionMiddleware.php).
+
+---------------------------------------------------------------------------
+
+by andrew-demb at 2025-02-26T15:12:07Z
+
+@HypeMC my use-case - a long-running webserver. Some of the requests trigger `symfony/messenger`-related code.
+
+If such a request is handled - Redis connection is not closed until the webserver worker will be restarted.
+
+---------------------------------------------------------------------------
+
+by stof at 2025-02-26T15:26:00Z
+
+is it an issue that the Redis connection is not closed ? When using a long-running webserver instead of PHP-FPM, isn't one of the goals being able to keep such connections instead of reconnecting all the time ?
+
+---------------------------------------------------------------------------
+
+by andrew-demb at 2025-02-26T17:01:39Z
+
+@stof As we're used (in our project) Redis for queues not so often, we're trying to avoid additional connections being opened to Redis with no reason (and other "cold" storages).
+
+Just checked how Symfony behaves with Doctrine DBAL connections - they are not closed between requests either.
+
+I'm OK with changing the PR implementation just to open the way to close connection (add method "close" to the Redis transport) - to allow close connection from the application code (using the event system).
+
+What do you think about this? @stof @HypeMC
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2025-02-26T18:35:52Z
+
+doctrine can be optionally closed at the middelware layer: https://github.com/symfony/symfony/blob/7.3/src/Symfony/Bridge/Doctrine/Messenger/DoctrineCloseConnectionMiddleware.php
+
+im wondering if redis should follow a similar approach
+
+---------------------------------------------------------------------------
+
+by andrew-demb at 2025-02-27T10:01:16Z
+
+I can introduce the interface "CloseableTransportInterface" that will allow closing used transport connections from the userland (in my case - from "kernel.terminate" event listener).
+
+I can see, that this can be implemented by most transports (AMQP, Redis, Doctrine DBAL, etc)
+
+---------------------------------------------------------------------------
+
+by andrew-demb at 2025-02-27T17:58:19Z
+
+According to the feedback, I changed the implementation to another one to help with our use case.
+
+Implemented a way to close messenger transport from the application, to allow free resources for long-running processes (like a long-running webserver)
+
+---------------------------------------------------------------------------
+
+by andrew-demb at 2025-03-04T14:34:44Z
+
+status:needs review

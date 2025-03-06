@@ -12,7 +12,6 @@
 namespace Symfony\Component\JsonStreamer\Tests\ValueTransformer;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\JsonStreamer\Exception\InvalidArgumentException;
 use Symfony\Component\JsonStreamer\ValueTransformer\DateTimeToStringValueTransformer;
 
 class DateTimeToStringValueTransformerTest extends TestCase
@@ -23,7 +22,7 @@ class DateTimeToStringValueTransformerTest extends TestCase
 
         $this->assertSame(
             '2023-07-26T00:00:00+00:00',
-            $valueTransformer->transform(new \DateTimeImmutable('2023-07-26', new \DateTimeZone('UTC')), []),
+            $valueTransformer->transform(new \DateTimeImmutable('2023-07-26', new \DateTimeZone('UTC'))),
         );
 
         $this->assertSame(
@@ -32,11 +31,8 @@ class DateTimeToStringValueTransformerTest extends TestCase
         );
     }
 
-    public function testTransformThrowWhenInvalidNativeValue()
+    public function testTransformNoOpWhenInvalidNativeValueType()
     {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('The native value must implement the "\DateTimeInterface".');
-
-        (new DateTimeToStringValueTransformer())->transform(true, []);
+        $this->assertTrue((new DateTimeToStringValueTransformer())->transform(true));
     }
 }

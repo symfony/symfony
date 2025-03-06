@@ -17,10 +17,12 @@ use Symfony\Component\JsonStreamer\Mapping\GenericTypePropertyMetadataLoader;
 use Symfony\Component\JsonStreamer\Mapping\PropertyMetadataLoader;
 use Symfony\Component\JsonStreamer\Mapping\PropertyMetadataLoaderInterface;
 use Symfony\Component\JsonStreamer\Mapping\Read\AttributePropertyMetadataLoader;
-use Symfony\Component\JsonStreamer\Mapping\Read\DateTimeTypePropertyMetadataLoader;
+use Symfony\Component\JsonStreamer\Mapping\Read\ValueObjectTypePropertyMetadataLoader;
 use Symfony\Component\JsonStreamer\Read\Instantiator;
 use Symfony\Component\JsonStreamer\Read\LazyInstantiator;
 use Symfony\Component\JsonStreamer\Read\StreamReaderGenerator;
+use Symfony\Component\JsonStreamer\ValueTransformer\IntStringToBcMathNumberValueTransformer;
+use Symfony\Component\JsonStreamer\ValueTransformer\IntStringToGmpNumberValueTransformer;
 use Symfony\Component\JsonStreamer\ValueTransformer\StringToDateTimeValueTransformer;
 use Symfony\Component\JsonStreamer\ValueTransformer\ValueTransformerInterface;
 use Symfony\Component\TypeInfo\Type;
@@ -69,6 +71,8 @@ final class JsonStreamReader implements StreamReaderInterface
         $lazyGhostsDir ??= sys_get_temp_dir().'/json_streamer/lazy_ghost';
         $valueTransformers += [
             'json_streamer.value_transformer.string_to_date_time' => new StringToDateTimeValueTransformer(),
+            'json_streamer.value_transformer.int_string_to_bc_math_number' => new IntStringToBcMathNumberValueTransformer(),
+            'json_streamer.value_transformer.int_string_to_gmp_number' => new IntStringToGmpNumberValueTransformer(),
         ];
 
         $valueTransformersContainer = new class($valueTransformers) implements ContainerInterface {
@@ -90,15 +94,15 @@ final class JsonStreamReader implements StreamReaderInterface
 
         $typeContextFactory = new TypeContextFactory(class_exists(PhpDocParser::class) ? new StringTypeResolver() : null);
 
-        $propertyMetadataLoader = new GenericTypePropertyMetadataLoader(
-            new DateTimeTypePropertyMetadataLoader(
+        $propertyMetadataLoader = new ValueObjectTypePropertyMetadataLoader(
+            new GenericTypePropertyMetadataLoader(
                 new AttributePropertyMetadataLoader(
                     new PropertyMetadataLoader(TypeResolver::create()),
                     $valueTransformersContainer,
                     TypeResolver::create(),
                 ),
+                $typeContextFactory,
             ),
-            $typeContextFactory,
         );
 
         return new self($valueTransformersContainer, $propertyMetadataLoader, $streamReadersDir, $lazyGhostsDir);

@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\JsonStreamer\Tests;
 
+use BcMath\Number;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\JsonStreamer\JsonStreamReader;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Enum\DummyBackedEnum;
@@ -18,7 +19,9 @@ use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\ClassicDummy;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithDateTimes;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithNameAttributes;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithNullableProperties;
+use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithNumbers;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithPhpDoc;
+use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithValueObjectAndUnion;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithValueTransformerAttributes;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\ValueTransformer\DivideStringAndCastToIntValueTransformer;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\ValueTransformer\StringToBooleanValueTransformer;
@@ -162,6 +165,37 @@ class JsonStreamReaderTest extends TestCase
             $this->assertEquals(new \DateTimeImmutable('2024-11-20'), $read->interface);
             $this->assertEquals(new \DateTimeImmutable('2025-11-20'), $read->immutable);
         }, '{"interface":"2024-11-20","immutable":"2025-11-20"}', Type::object(DummyWithDateTimes::class));
+    }
+
+    /**
+     * @requires PHP 8.4
+     * @requires extension bcmath
+     * @requires extension gmp
+     */
+    public function testReadObjectWithNumbers()
+    {
+        $reader = JsonStreamReader::create(streamReadersDir: $this->streamReadersDir, lazyGhostsDir: $this->lazyGhostsDir);
+
+        $this->assertRead($reader, function (mixed $read) {
+            $this->assertInstanceOf(DummyWithNumbers::class, $read);
+            $this->assertEquals(new Number(10), $read->bcMathNumber);
+            $this->assertEquals(new \GMP(10), $read->gmpNumber);
+        }, '{"gmpNumber":"10","bcMathNumber":10}', Type::object(DummyWithNumbers::class));
+    }
+
+    public function testReadObjectWithValueObjectAndUnion()
+    {
+        $reader = JsonStreamReader::create(streamReadersDir: $this->streamReadersDir, lazyGhostsDir: $this->lazyGhostsDir);
+
+        $this->assertRead($reader, function (mixed $read) {
+            $this->assertInstanceOf(DummyWithValueObjectAndUnion::class, $read);
+            $this->assertSame('2024-11-20', $read->valueObjectOrBool->format('Y-m-d'));
+        }, '{"valueObjectOrBool":"2024-11-20T00:00:00+00:00"}', Type::object(DummyWithValueObjectAndUnion::class));
+
+        $this->assertRead($reader, function (mixed $read) {
+            $this->assertInstanceOf(DummyWithValueObjectAndUnion::class, $read);
+            $this->assertFalse($read->valueObjectOrBool);
+        }, '{"valueObjectOrBool":false}', Type::object(DummyWithValueObjectAndUnion::class));
     }
 
     public function testCreateStreamReaderFile()

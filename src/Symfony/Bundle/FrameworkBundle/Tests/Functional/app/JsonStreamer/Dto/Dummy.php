@@ -35,4 +35,6 @@ class Dummy
         streamToNative: StringToRangeValueTransformer::class,
     )]
     public array $range = [10, 20];
+
+    public \DateTimeInterface|bool $dateTime = false;
 }

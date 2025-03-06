@@ -18,10 +18,14 @@ use Symfony\Component\JsonStreamer\JsonStreamWriter;
 use Symfony\Component\JsonStreamer\Mapping\GenericTypePropertyMetadataLoader;
 use Symfony\Component\JsonStreamer\Mapping\PropertyMetadataLoader;
 use Symfony\Component\JsonStreamer\Mapping\Read\AttributePropertyMetadataLoader as ReadAttributePropertyMetadataLoader;
-use Symfony\Component\JsonStreamer\Mapping\Read\DateTimeTypePropertyMetadataLoader as ReadDateTimeTypePropertyMetadataLoader;
+use Symfony\Component\JsonStreamer\Mapping\Read\ValueObjectTypePropertyMetadataLoader as ReadValueObjectTypePropertyMetadataLoader;
 use Symfony\Component\JsonStreamer\Mapping\Write\AttributePropertyMetadataLoader as WriteAttributePropertyMetadataLoader;
-use Symfony\Component\JsonStreamer\Mapping\Write\DateTimeTypePropertyMetadataLoader as WriteDateTimeTypePropertyMetadataLoader;
+use Symfony\Component\JsonStreamer\Mapping\Write\ValueObjectTypePropertyMetadataLoader as WriteValueObjectTypePropertyMetadataLoader;
+use Symfony\Component\JsonStreamer\ValueTransformer\BcMathNumberToStringValueTransformer;
 use Symfony\Component\JsonStreamer\ValueTransformer\DateTimeToStringValueTransformer;
+use Symfony\Component\JsonStreamer\ValueTransformer\GmpNumberToStringValueTransformer;
+use Symfony\Component\JsonStreamer\ValueTransformer\IntStringToBcMathNumberValueTransformer;
+use Symfony\Component\JsonStreamer\ValueTransformer\IntStringToGmpNumberValueTransformer;
 use Symfony\Component\JsonStreamer\ValueTransformer\StringToDateTimeValueTransformer;
 
 return static function (ContainerConfigurator $container) {
@@ -48,53 +52,65 @@ return static function (ContainerConfigurator $container) {
             ->args([
                 service('type_info.resolver'),
             ])
-        ->set('.json_streamer.write.property_metadata_loader.generic', GenericTypePropertyMetadataLoader::class)
-            ->decorate('json_streamer.write.property_metadata_loader')
-            ->args([
-                service('.inner'),
-                service('type_info.type_context_factory'),
-            ])
-        ->set('.json_streamer.write.property_metadata_loader.date_time', WriteDateTimeTypePropertyMetadataLoader::class)
-            ->decorate('json_streamer.write.property_metadata_loader')
-            ->args([
-                service('.inner'),
-            ])
         ->set('.json_streamer.write.property_metadata_loader.attribute', WriteAttributePropertyMetadataLoader::class)
-            ->decorate('json_streamer.write.property_metadata_loader')
+            ->decorate('json_streamer.write.property_metadata_loader', null, 512)
             ->args([
                 service('.inner'),
                 tagged_locator('json_streamer.value_transformer'),
                 service('type_info.resolver'),
+            ])
+        ->set('.json_streamer.write.property_metadata_loader.generic', GenericTypePropertyMetadataLoader::class)
+            ->decorate('json_streamer.write.property_metadata_loader', null, 256)
+            ->args([
+                service('.inner'),
+                service('type_info.type_context_factory'),
+            ])
+        ->set('.json_streamer.write.property_metadata_loader.value_object', WriteValueObjectTypePropertyMetadataLoader::class)
+            ->decorate('json_streamer.write.property_metadata_loader', null, 128)
+            ->args([
+                service('.inner'),
             ])
 
         ->set('json_streamer.read.property_metadata_loader', PropertyMetadataLoader::class)
             ->args([
                 service('type_info.resolver'),
             ])
-        ->set('.json_streamer.read.property_metadata_loader.generic', GenericTypePropertyMetadataLoader::class)
-            ->decorate('json_streamer.read.property_metadata_loader')
-            ->args([
-                service('.inner'),
-                service('type_info.type_context_factory'),
-            ])
-        ->set('.json_streamer.read.property_metadata_loader.date_time', ReadDateTimeTypePropertyMetadataLoader::class)
-            ->decorate('json_streamer.read.property_metadata_loader')
-            ->args([
-                service('.inner'),
-            ])
         ->set('.json_streamer.read.property_metadata_loader.attribute', ReadAttributePropertyMetadataLoader::class)
-            ->decorate('json_streamer.read.property_metadata_loader')
+            ->decorate('json_streamer.read.property_metadata_loader', null, 512)
             ->args([
                 service('.inner'),
                 tagged_locator('json_streamer.value_transformer'),
                 service('type_info.resolver'),
+            ])
+        ->set('.json_streamer.read.property_metadata_loader.generic', GenericTypePropertyMetadataLoader::class)
+            ->decorate('json_streamer.read.property_metadata_loader', null, 256)
+            ->args([
+                service('.inner'),
+                service('type_info.type_context_factory'),
+            ])
+        ->set('.json_streamer.read.property_metadata_loader.value_object', ReadValueObjectTypePropertyMetadataLoader::class)
+            ->decorate('json_streamer.read.property_metadata_loader', null, 128)
+            ->args([
+                service('.inner'),
             ])
 
         // value transformers
         ->set('json_streamer.value_transformer.date_time_to_string', DateTimeToStringValueTransformer::class)
             ->tag('json_streamer.value_transformer')
 
+        ->set('json_streamer.value_transformer.bc_math_number_to_string', BcMathNumberToStringValueTransformer::class)
+            ->tag('json_streamer.value_transformer')
+
+        ->set('json_streamer.value_transformer.gmp_number_to_string', GmpNumberToStringValueTransformer::class)
+            ->tag('json_streamer.value_transformer')
+
         ->set('json_streamer.value_transformer.string_to_date_time', StringToDateTimeValueTransformer::class)
+            ->tag('json_streamer.value_transformer')
+
+        ->set('json_streamer.value_transformer.int_string_to_bc_math_number', IntStringToBcMathNumberValueTransformer::class)
+            ->tag('json_streamer.value_transformer')
+
+        ->set('json_streamer.value_transformer.int_string_to_gmp_number', IntStringToGmpNumberValueTransformer::class)
             ->tag('json_streamer.value_transformer')
 
         // cache

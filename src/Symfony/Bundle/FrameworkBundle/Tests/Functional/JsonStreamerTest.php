@@ -29,10 +29,16 @@ class JsonStreamerTest extends AbstractWebTestCase
 
     public function testWrite()
     {
+        $dummy = new Dummy();
+        $dummy->dateTime = new \DateTimeImmutable('2025-11-20', new \DateTimeZone('UTC'));
+
         /** @var StreamWriterInterface $writer */
         $writer = static::getContainer()->get('json_streamer.stream_writer.alias');
 
-        $this->assertSame('{"@name":"DUMMY","range":"10..20"}', (string) $writer->write(new Dummy(), Type::object(Dummy::class)));
+        $this->assertSame(
+            '{"@name":"DUMMY","range":"10..20","dateTime":"2025-11-20T00:00:00+00:00"}',
+            (string) $writer->write($dummy, Type::object(Dummy::class)),
+        );
     }
 
     public function testRead()
@@ -43,8 +49,14 @@ class JsonStreamerTest extends AbstractWebTestCase
         $expected = new Dummy();
         $expected->name = 'dummy';
         $expected->range = [0, 1];
+        $expected->dateTime = new \DateTimeImmutable('2025-11-20');
 
-        $this->assertEquals($expected, $reader->read('{"@name": "DUMMY", "range": "0..1"}', Type::object(Dummy::class)));
+        $actual = $reader->read('{"@name": "DUMMY", "range": "0..1","dateTime":"2025-11-20"}', Type::object(Dummy::class));
+
+        $this->assertInstanceOf(Dummy::class, $actual);
+        $this->assertSame('dummy', $actual->name);
+        $this->assertSame([0, 1], $actual->range);
+        $this->assertSame('2025-11-20', $actual->dateTime->format('Y-m-d'));
     }
 
     public function testWarmupStreamableClasses()

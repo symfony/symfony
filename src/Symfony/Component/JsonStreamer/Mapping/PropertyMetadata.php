@@ -73,9 +73,7 @@ final class PropertyMetadata
     public function withAdditionalNativeToStreamValueTransformer(string|\Closure $nativeToStreamValueTransformer): self
     {
         $nativeToStreamValueTransformers = $this->nativeToStreamValueTransformers;
-
         $nativeToStreamValueTransformers[] = $nativeToStreamValueTransformer;
-        $nativeToStreamValueTransformers = array_values(array_unique($nativeToStreamValueTransformers));
 
         return $this->withNativeToStreamValueTransformers($nativeToStreamValueTransformers);
     }
@@ -99,9 +97,7 @@ final class PropertyMetadata
     public function withAdditionalStreamToNativeValueTransformer(string|\Closure $streamToNativeValueTransformer): self
     {
         $streamToNativeValueTransformers = $this->streamToNativeValueTransformers;
-
         $streamToNativeValueTransformers[] = $streamToNativeValueTransformer;
-        $streamToNativeValueTransformers = array_values(array_unique($streamToNativeValueTransformers));
 
         return $this->withStreamToNativeValueTransformers($streamToNativeValueTransformers);
     }

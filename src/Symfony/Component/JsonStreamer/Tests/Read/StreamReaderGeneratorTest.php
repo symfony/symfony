@@ -17,7 +17,7 @@ use Symfony\Component\JsonStreamer\Mapping\GenericTypePropertyMetadataLoader;
 use Symfony\Component\JsonStreamer\Mapping\PropertyMetadataLoader;
 use Symfony\Component\JsonStreamer\Mapping\PropertyMetadataLoaderInterface;
 use Symfony\Component\JsonStreamer\Mapping\Read\AttributePropertyMetadataLoader;
-use Symfony\Component\JsonStreamer\Mapping\Read\DateTimeTypePropertyMetadataLoader;
+use Symfony\Component\JsonStreamer\Mapping\Read\ValueObjectTypePropertyMetadataLoader;
 use Symfony\Component\JsonStreamer\Read\StreamReaderGenerator;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Enum\DummyBackedEnum;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Enum\DummyEnum;
@@ -56,16 +56,18 @@ class StreamReaderGeneratorTest extends TestCase
      */
     public function testGeneratedStreamReader(string $fixture, Type $type)
     {
-        $propertyMetadataLoader = new GenericTypePropertyMetadataLoader(
-            new DateTimeTypePropertyMetadataLoader(new AttributePropertyMetadataLoader(
-                new PropertyMetadataLoader(TypeResolver::create()),
-                new ServiceContainer([
-                    DivideStringAndCastToIntValueTransformer::class => new DivideStringAndCastToIntValueTransformer(),
-                    StringToBooleanValueTransformer::class => new StringToBooleanValueTransformer(),
-                ]),
-                TypeResolver::create(),
-            )),
-            new TypeContextFactory(new StringTypeResolver()),
+        $propertyMetadataLoader = new ValueObjectTypePropertyMetadataLoader(
+            new GenericTypePropertyMetadataLoader(
+                new AttributePropertyMetadataLoader(
+                    new PropertyMetadataLoader(TypeResolver::create()),
+                    new ServiceContainer([
+                        DivideStringAndCastToIntValueTransformer::class => new DivideStringAndCastToIntValueTransformer(),
+                        StringToBooleanValueTransformer::class => new StringToBooleanValueTransformer(),
+                    ]),
+                    TypeResolver::create(),
+                ),
+                new TypeContextFactory(new StringTypeResolver()),
+            ),
         );
 
         $generator = new StreamReaderGenerator($propertyMetadataLoader, $this->streamReadersDir);

@@ -14,25 +14,23 @@ namespace Symfony\Component\JsonStreamer\ValueTransformer;
 use Symfony\Component\TypeInfo\Type;
 
 /**
- * Transforms DateTimeInterface to string during stream writing.
+ * Transforms GMP number to string during stream writing.
  *
  * Does nothing if the native value is not a valid object.
  *
  * @author Mathias Arlaud <mathias.arlaud@gmail.com>
  *
- * @experimental
+ * @internal
  */
-final class DateTimeToStringValueTransformer implements ValueTransformerInterface
+final class GmpNumberToStringValueTransformer implements ValueTransformerInterface
 {
-    public const FORMAT_KEY = 'date_time_format';
-
     public function transform(mixed $value, array $options = []): mixed
     {
-        if (!$value instanceof \DateTimeInterface) {
+        if (!$value instanceof \GMP) {
             return $value;
         }
 
-        return $value->format($options[self::FORMAT_KEY] ?? \DateTimeInterface::RFC3339);
+        return gmp_strval($value);
     }
 
     public static function getStreamValueType(): Type

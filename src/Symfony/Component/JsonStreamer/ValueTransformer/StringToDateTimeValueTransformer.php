@@ -13,11 +13,11 @@ namespace Symfony\Component\JsonStreamer\ValueTransformer;
 
 use Symfony\Component\JsonStreamer\Exception\InvalidArgumentException;
 use Symfony\Component\TypeInfo\Type;
-use Symfony\Component\TypeInfo\Type\BuiltinType;
-use Symfony\Component\TypeInfo\TypeIdentifier;
 
 /**
  * Transforms string to DateTimeImmutable during stream reading.
+ *
+ * Does nothing if the stream value type is not valid.
  *
  * @author Mathias Arlaud <mathias.arlaud@gmail.com>
  *
@@ -27,10 +27,10 @@ final class StringToDateTimeValueTransformer implements ValueTransformerInterfac
 {
     public const FORMAT_KEY = 'date_time_format';
 
-    public function transform(mixed $value, array $options = []): \DateTimeImmutable
+    public function transform(mixed $value, array $options = []): mixed
     {
-        if (!\is_string($value) || '' === trim($value)) {
-            throw new InvalidArgumentException('The JSON value is either not an string, or an empty string, or null; you should pass a string that can be parsed with the passed format or a valid DateTime string.');
+        if (!\is_string($value)) {
+            return $value;
         }
 
         $dateTimeFormat = $options[self::FORMAT_KEY] ?? null;
@@ -54,10 +54,7 @@ final class StringToDateTimeValueTransformer implements ValueTransformerInterfac
         }
     }
 
-    /**
-     * @return BuiltinType<TypeIdentifier::STRING>
-     */
-    public static function getStreamValueType(): BuiltinType
+    public static function getStreamValueType(): Type
     {
         return Type::string();
     }

@@ -12,6 +12,7 @@
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
 use Psr\Cache\CacheItemPoolInterface;
+use Psr\SimpleCache\CacheInterface as SimpleCacheInterface;
 use Symfony\Component\Cache\Adapter\AbstractAdapter;
 use Symfony\Component\Cache\Adapter\AdapterInterface;
 use Symfony\Component\Cache\Adapter\ApcuAdapter;
@@ -26,6 +27,7 @@ use Symfony\Component\Cache\Adapter\RedisTagAwareAdapter;
 use Symfony\Component\Cache\Adapter\TagAwareAdapter;
 use Symfony\Component\Cache\Marshaller\DefaultMarshaller;
 use Symfony\Component\Cache\Messenger\EarlyExpirationHandler;
+use Symfony\Component\Cache\Psr16Cache;
 use Symfony\Component\HttpKernel\CacheClearer\Psr6CacheClearer;
 use Symfony\Contracts\Cache\CacheInterface;
 use Symfony\Contracts\Cache\TagAwareCacheInterface;
@@ -40,6 +42,9 @@ return static function (ContainerConfigurator $container) {
         ->set('cache.app.taggable', TagAwareAdapter::class)
             ->args([service('cache.app')])
             ->tag('cache.taggable', ['pool' => 'cache.app'])
+
+        ->set('cache.app.psr16', Psr16Cache::class)
+            ->args([service('cache.app')])
 
         ->set('cache.system')
             ->parent('cache.adapter.system')
@@ -247,6 +252,8 @@ return static function (ContainerConfigurator $container) {
             ->public()
 
         ->alias(CacheItemPoolInterface::class, 'cache.app')
+
+        ->alias(SimpleCacheInterface::class, 'cache.app.psr16')
 
         ->alias(CacheInterface::class, 'cache.app')
 

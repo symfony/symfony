@@ -13,6 +13,7 @@ CHANGELOG
  * Add `framework.validation.disable_translation` option
  * Add support for signal plain name in the `messenger.stop_worker_on_signals` configuration
  * Deprecate the `framework.validation.cache` option
+ * Add a service implementing `Psr\SimpleCache\CacheInterface` to allow autowiring the interface.
 
 7.2
 ---

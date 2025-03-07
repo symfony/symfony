@@ -1,0 +1,48 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2025-03-06T13:17:38Z
+
+Hey!
+
+I see that this is your first PR. That is great! Welcome!
+
+Symfony has a [contribution guide](https://symfony.com/doc/current/contributing/index.html) which I suggest you to read.
+
+In short:
+- Always add tests
+- Keep backward compatibility (see https://symfony.com/bc).
+- Bug fixes must be submitted against the lowest maintained branch where they apply (see https://symfony.com/releases)
+- Features and deprecations must be submitted against the 7.3 branch.
+
+Review the GitHub status checks of your pull request and try to solve the reported issues. If some tests are failing, try to see if they are failing because of this change.
+
+When two Symfony core team members approve this change, it will be merged and you will become an official Symfony contributor!
+If this PR is merged in a lower version branch, it will be merged up to all maintained branches within a few days.
+
+I am going to sit back now and wait for the reviews.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by mtarld at 2025-03-06T13:40:55Z
+
+Hey @thomasdubuffet, thanks for taking care of this! The issue seems to be there as well in 6.4, could you instead target the 6.4 branch please?
+
+---------------------------------------------------------------------------
+
+by thomasdubuffet at 2025-03-06T15:24:39Z
+
+@mtarld
+
+> Hey @thomasdubuffet, thanks for taking care of this! The issue seems to be there as well in 6.4, could you instead target the 6.4 branch please?
+
+Unless I am mistaken, there is no `getType` method on this extractor in symfony 6.4. And, the `getTypes` method of this extractor uses the `getTypes` method of the helper `PhpStanTypeHelper`which checks the node (`ParamTagValueNode|ReturnTagValueNode|VarTagValueNode`).
+
+---------------------------------------------------------------------------
+
+by mtarld at 2025-03-06T15:34:13Z
+
+My bad, didn't notice that `if` in `PhpStanTypeHelper` the first time.

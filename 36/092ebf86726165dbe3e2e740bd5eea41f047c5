@@ -1,0 +1,83 @@
+---------------------------------------------------------------------------
+
+by Jean-Beru at 2024-01-04T16:13:04Z
+
+Friendly ping @94noni :wink:
+
+---------------------------------------------------------------------------
+
+by Jean-Beru at 2024-01-12T22:04:35Z
+
+Could it be considered as a BC break since we can use a public method from the `Translator` service (from implemented interfaces or not) but not present in this decorator?
+
+---------------------------------------------------------------------------
+
+by luxferre at 2024-03-02T11:22:16Z
+
+Can a global parameter value reference translation key?
+
+---------------------------------------------------------------------------
+
+by Jean-Beru at 2024-03-02T19:53:12Z
+
+> Can a global parameter value reference translation key?
+
+For now, in this PR, a global parameter can be used with a fixed value, a parameter or an environment variable.
+
+---------------------------------------------------------------------------
+
+by 94noni at 2024-11-07T10:47:19Z
+
+[I totally agree](https://github.com/symfony/symfony/pull/53425#discussion_r1442025289)
+would love to have it on main service :)
+
+---------------------------------------------------------------------------
+
+by Jean-Beru at 2024-11-08T17:26:29Z
+
+@nicolas-grekas @94noni Indeed, much simpler like that :+1:
+
+I added the global parameters list to the profiler to make debugging easier. A screenshot is available in the description of this PR.
+
+---------------------------------------------------------------------------
+
+by Jean-Beru at 2025-01-06T16:01:21Z
+
+I had some difficulties with infinite loops but `TranslatableMessage` can be used as globals now. :tada:
+
+---------------------------------------------------------------------------
+
+by Jean-Beru at 2025-01-28T10:58:34Z
+
+> Minor comments, otherwise it's ✅ for me! @Jean-Beru could you squash your commits please?
+
+Thanks @welcoMattic !
+
+PR is fixed, squashed and rebased.
+
+---------------------------------------------------------------------------
+
+by Jean-Beru at 2025-03-05T17:21:28Z
+
+> Here is my review as a patch.
+> The TL;DR is that I don't think that we need nor should have two methods for this. Also, the PR is missing some cross-components checks I think (fwb / profiler are using feats that might not be available depending on the version of translator that's installed.)
+
+Thanks for the review :heart:
+
+> the PR is missing some cross-components checks
+
+I updated the profiler part view but what about the bundle? Should we use `InstalledVersions::satisfies` to check component version, use a dedicated interface or just check the method existence?
+
+---------------------------------------------------------------------------
+
+by stof at 2025-03-05T17:25:02Z
+
+The cleanest solution for FrameworkBundle is to bump the min supported version of `symfony/translation` (note that the `conflict` rule is the most important one here, as `require-dev` only impacts our CI)
+
+---------------------------------------------------------------------------
+
+by Jean-Beru at 2025-03-06T06:20:45Z
+
+> The cleanest solution for FrameworkBundle is to bump the min supported version of `symfony/translation` (note that the `conflict` rule is the most important one here, as `require-dev` only impacts our CI)
+
+Thanks for the tip!

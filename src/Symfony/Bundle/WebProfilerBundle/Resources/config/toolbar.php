@@ -11,21 +11,29 @@
 
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
+use Symfony\Bundle\WebProfilerBundle\EventListener\TurboDriveCspListener;
 use Symfony\Bundle\WebProfilerBundle\EventListener\WebDebugToolbarListener;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 
-return static function (ContainerConfigurator $container) {
-    $container->services()
+return static function (ContainerConfigurator $container, ContainerBuilder $containerBuilder) {
+    $services = $container->services();
 
-        ->set('web_profiler.debug_toolbar', WebDebugToolbarListener::class)
-            ->args([
-                service('twig'),
-                param('web_profiler.debug_toolbar.intercept_redirects'),
-                param('web_profiler.debug_toolbar.mode'),
-                service('router')->ignoreOnInvalid(),
-                abstract_arg('paths that should be excluded from the AJAX requests shown in the toolbar'),
-                service('web_profiler.csp.handler'),
-                service('data_collector.dump')->ignoreOnInvalid(),
-            ])
-            ->tag('kernel.event_subscriber')
-    ;
+    $services->set('web_profiler.debug_toolbar', WebDebugToolbarListener::class)
+        ->args([
+            service('twig'),
+            param('web_profiler.debug_toolbar.intercept_redirects'),
+            param('web_profiler.debug_toolbar.mode'),
+            service('router')->ignoreOnInvalid(),
+            abstract_arg('paths that should be excluded from the AJAX requests shown in the toolbar'),
+            service('web_profiler.csp.handler'),
+            service('data_collector.dump')->ignoreOnInvalid(),
+        ])
+        ->tag('kernel.event_subscriber');
+    
+    $bundles = $containerBuilder->getParameter('kernel.bundles');
+    if (\is_array($bundles) || isset($bundles['TurboBundle'])) 
+    {
+        $services->set('web_profiler.turbo_drive_csp', TurboDriveCspListener::class)
+            ->tag('kernel.event_subscriber');
+    }
 };

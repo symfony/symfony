@@ -47,14 +47,12 @@ class TurboDriveCspListener implements EventSubscriberInterface
         if ('_wdt' === $routeName) {
             return;
         }
-        
+
         if ($request->headers->has('X-Turbo-Request-Id')) {
             return;
-        }
-        else if ($request->headers->has('Turbo-Frame')) {
+        } elseif ($request->headers->has('Turbo-Frame')) {
             return;
-        }
-        else if ('turbo_stream' === $request->getPreferredFormat()) {
+        } elseif ('turbo_stream' === $request->getPreferredFormat()) {
             return;
         }
 

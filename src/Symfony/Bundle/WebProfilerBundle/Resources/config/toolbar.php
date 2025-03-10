@@ -34,8 +34,8 @@ return static function (ContainerConfigurator $container, ContainerBuilder $cont
     if (\is_array($bundles) && isset($bundles['TurboBundle'])) {
         $services->set('web_profiler.turbo_drive_csp', TurboDriveCspListener::class)
             ->args([
-                service('kernel')
-            ])    
+                service('kernel'),
+            ])
             ->tag('kernel.event_subscriber');
     }
 };

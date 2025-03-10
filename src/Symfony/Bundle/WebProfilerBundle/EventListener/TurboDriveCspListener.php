@@ -21,7 +21,7 @@ use Symfony\Component\HttpKernel\KernelInterface;
  * Show the Web Debug Toolbar (WDT) when navigating via Turbo Drive and when a strict Content-Security-Policy is set.
  * This is done by reusing WDT's nonces.
  * This service is registered only when TurboBundle is installed.
- * 
+ *
  * @author David Petrásek <davidpetrasek@hotmail.cz>
  */
 #[When(env: 'dev')]
@@ -60,7 +60,7 @@ class TurboDriveCspListener implements EventSubscriberInterface
         $response = $event->getResponse();
 
         $csp = $response->headers->get('Content-Security-Policy');
-        if (!$csp){
+        if (!$csp) {
             return;
         }
 
@@ -82,7 +82,7 @@ class TurboDriveCspListener implements EventSubscriberInterface
 
         $hash = base64_encode(hash('sha256', $scriptContent, true));
         $hashString = "'sha256-".$hash."'";
-        
+
         if (preg_match('/script-src\s+([^;]+)/', $csp, $matches)) {
             $scriptSrc = $matches[1];
 

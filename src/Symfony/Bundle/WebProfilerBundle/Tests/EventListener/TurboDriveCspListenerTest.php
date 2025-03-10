@@ -1,4 +1,14 @@
 <?php
+
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Symfony\Bundle\WebProfilerBundle\Tests\EventListener;
 
 use PHPUnit\Framework\TestCase;
@@ -59,7 +69,7 @@ class TurboDriveCspListenerTest extends TestCase
         });
     EOD;
 
-        $expectedHash = "'sha256-" . base64_encode(hash('sha256', $scriptContent, true)) . "'";
+        $expectedHash = "'sha256-".base64_encode(hash('sha256', $scriptContent, true))."'";
         // Assert that the updated CSP header contains the expected hash
         $this->assertStringContainsString($expectedHash, $modifiedCsp);
     }
@@ -86,7 +96,7 @@ class TurboDriveCspListenerTest extends TestCase
     }
 }
 
-class DummyKernel implements HttpKernelInterface 
+class DummyKernel implements HttpKernelInterface
 {
     public function handle(Request $request, int $type = self::MAIN_REQUEST, bool $catch = true): Response
     {

@@ -90,6 +90,37 @@ class OptionsResolverIntrospectorTest extends TestCase
         $debug->getLazyClosures('foo');
     }
 
+    public function testGetNestedClosures()
+    {
+        $resolver = new OptionsResolver();
+        $closures = [];
+        $resolver->setOptions($option = 'foo', $closures[] = function (OptionsResolver $nestedResolver) {});
+
+        $debug = new OptionsResolverIntrospector($resolver);
+        $this->assertSame($closures, $debug->getNestedClosures($option));
+    }
+
+    public function testGetNestedClosuresThrowsOnNoConfiguredValue()
+    {
+        $this->expectException(NoConfigurationException::class);
+        $this->expectExceptionMessage('No lazy closures were set for the "foo" option.');
+        $resolver = new OptionsResolver();
+        $resolver->setDefined($option = 'foo');
+
+        $debug = new OptionsResolverIntrospector($resolver);
+        $debug->getNestedClosures($option);
+    }
+
+    public function testGetNestedClosuresThrowsOnNotDefinedOption()
+    {
+        $this->expectException(UndefinedOptionsException::class);
+        $this->expectExceptionMessage('The option "foo" does not exist.');
+        $resolver = new OptionsResolver();
+
+        $debug = new OptionsResolverIntrospector($resolver);
+        $debug->getNestedClosures('foo');
+    }
+
     public function testGetAllowedTypes()
     {
         $resolver = new OptionsResolver();

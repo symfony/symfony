@@ -7,6 +7,7 @@ CHANGELOG
  * Support union type in `OptionResolver::setAllowedTypes()` method
  * Add `OptionsResolver::setOptions()` and `OptionConfigurator::options()` methods
  * Deprecate defining nested options via `setDefault()`, use `setOptions()` instead
+ * Add `OptionsResolverIntrospector::getNestedClosures()` method
 
 6.4
 ---

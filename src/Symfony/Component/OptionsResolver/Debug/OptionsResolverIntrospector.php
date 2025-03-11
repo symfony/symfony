@@ -59,6 +59,16 @@ class OptionsResolverIntrospector
     }
 
     /**
+     * @return \Closure[]
+     *
+     * @throws NoConfigurationException on no configured closures
+     */
+    public function getNestedClosures(string $option): array
+    {
+        return ($this->get)('nested', $option, \sprintf('No lazy closures were set for the "%s" option.', $option));
+    }
+
+    /**
      * @return string[]
      *
      * @throws NoConfigurationException on no configured types

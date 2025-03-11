@@ -17,6 +17,7 @@ use PHPUnit\Framework\Constraint\IsInstanceOf;
 use PHPUnit\Framework\Constraint\IsNull;
 use PHPUnit\Framework\Constraint\LogicalOr;
 use PHPUnit\Framework\ExpectationFailedException;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Constraints\GroupSequence;
@@ -60,6 +61,8 @@ abstract class ConstraintValidatorTestCase extends TestCase
     protected string $propertyPath;
     protected Constraint $constraint;
     protected ?string $defaultTimezone = null;
+
+    private TranslatorInterface&MockObject $translator;
 
     private string $defaultLocale;
     private array $expectedViolations;
@@ -122,14 +125,14 @@ abstract class ConstraintValidatorTestCase extends TestCase
 
     protected function createContext()
     {
-        $translator = $this->createMock(TranslatorInterface::class);
-        $translator->expects($this->any())->method('trans')->willReturnArgument(0);
+        $this->translator = $this->createMock(TranslatorInterface::class);
+        $this->translator->expects($this->any())->method('trans')->willReturnArgument(0);
         $validator = $this->createMock(ValidatorInterface::class);
         $validator->expects($this->any())
             ->method('validate')
             ->willReturnCallback(fn () => $this->expectedViolations[$this->call++] ?? new ConstraintViolationList());
 
-        $context = new ExecutionContext($validator, $this->root, $translator);
+        $context = new ExecutionContext($validator, $this->root, $this->translator);
         $context->setGroup($this->group);
         $context->setNode($this->value, $this->object, $this->metadata, $this->propertyPath);
         $context->setConstraint($this->constraint);
@@ -275,6 +278,14 @@ abstract class ConstraintValidatorTestCase extends TestCase
         $this->expectedViolations[] = $context->getViolations();
 
         return $context->getViolations();
+    }
+
+    protected function expectTranslationDomain(string $translationDomain)
+    {
+        $this->translator
+            ->expects($this->atLeastOnce())
+            ->method('trans')
+            ->with($this->anything(), $this->anything(), $translationDomain, $this->anything());
     }
 
     protected function assertNoViolation()

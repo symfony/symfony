@@ -55,6 +55,15 @@ class NotBlankValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
+    public function testTranslationDomain()
+    {
+        $constraint = new NotBlank(translationDomain: 'my_domain');
+
+        $this->expectTranslationDomain('my_domain');
+
+        $this->validator->validate(null, $constraint);
+    }
+
     public function testBlankIsInvalid()
     {
         $constraint = new NotBlank(message: 'myMessage');

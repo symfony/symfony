@@ -95,7 +95,7 @@ class ComposerPlugin implements PluginInterface, EventSubscriberInterface
         $code = strtr(file_get_contents($autoloadTemplate), [
             '%project_dir%' => $projectDir,
             '%runtime_class%' => var_export($runtimeClass, true),
-            '%runtime_options%' => '['.substr(var_export($extra, true), 7, -1)."  'project_dir' => {$projectDir},\n]",
+            '%runtime_options%' => '['. substr(var_export(array_merge(['project_dir' => $projectDir], $extra), true), 7, -1)."]",
         ]);
 
         // could use Composer\Util\Filesystem::filePutContentsIfModified once Composer 1.x support is dropped for this plugin

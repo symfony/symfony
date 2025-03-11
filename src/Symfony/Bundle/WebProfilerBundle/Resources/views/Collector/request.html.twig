@@ -411,7 +411,7 @@
     </div>
 {% endblock %}
 
-{% macro set_handler(controller, route, method) %}
+{% macro set_handler(controller, route = false, method = false) %}
     {% if controller.class is defined -%}
         {%- if method|default(false) %}<span class="sf-toolbar-status sf-toolbar-redirection-method">{{ method }}</span>{% endif -%}
         {%- set link = controller.file|file_link(controller.line) %}

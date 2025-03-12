@@ -11,7 +11,7 @@ class TranslatableMessageVisitorTest extends AbstractVisitorTest
 {
     private const FIXTURES_FOLDER = __DIR__ . '/../../Fixtures/extractor-php-ast/translatable-message-visitor/';
 
-    public function getVisitors(): NodeVisitor
+    public function getVisitor(): NodeVisitor
     {
         return new TranslatableMessageVisitor();
     }

@@ -11,7 +11,7 @@ class TransMethodVisitorTest extends AbstractVisitorTest
     private const FIXTURES_FOLDER = __DIR__ . '/../../Fixtures/extractor-php-ast/trans-method-visitor/';
     public const OTHER_DOMAIN = 'not_messages';
 
-    public function getVisitors(): NodeVisitor
+    public function getVisitor(): NodeVisitor
     {
         return new TransMethodVisitor();
     }

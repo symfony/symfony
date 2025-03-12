@@ -11,7 +11,7 @@ class FormTypeVisitorTest extends AbstractVisitorTest
 {
     private const FIXTURES_FOLDER = __DIR__ . '/../../Fixtures/extractor-php-ast/form-type-visitor/';
 
-    public function getVisitors(): FormTypeVisitor
+    public function getVisitor(): FormTypeVisitor
     {
         return new FormTypeVisitor();
     }

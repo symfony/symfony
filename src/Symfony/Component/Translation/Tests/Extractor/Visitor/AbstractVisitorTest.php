@@ -9,13 +9,13 @@ use Symfony\Component\Translation\MessageCatalogue;
 
 abstract class AbstractVisitorTest extends TestCase
 {
-    abstract public function getVisitors(): NodeVisitor;
+    abstract public function getVisitor(): NodeVisitor;
     abstract public function getResource(): iterable|string;
     abstract public function assertCatalogue(MessageCatalogue $catalogue): void;
 
     public function testVisitor()
     {
-        $extractor = new PhpAstExtractor([$this->getVisitors()]);
+        $extractor = new PhpAstExtractor([$this->getVisitor()]);
         $extractor->setPrefix('prefix');
         $catalogue = new MessageCatalogue('en');
 

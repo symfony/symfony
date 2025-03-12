@@ -10,7 +10,7 @@ class ConstraintVisitorTest extends AbstractVisitorTest
 {
     private const FIXTURES_FOLDER = __DIR__ . '/../../Fixtures/extractor-php-ast/constraint-visitor/';
 
-    public function getVisitors(): NodeVisitor
+    public function getVisitor(): NodeVisitor
     {
         return new ConstraintVisitor(['NotBlank', 'Isbn', 'Length']);
     }

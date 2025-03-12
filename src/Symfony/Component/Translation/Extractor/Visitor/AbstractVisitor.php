@@ -35,8 +35,7 @@ abstract class AbstractVisitor
         $domain ??= 'messages';
         $this->catalogue->set($message, $this->messagePrefix.$message, $domain);
         $metadata = $this->catalogue->getMetadata($message, $domain) ?? [];
-        $normalizedFilename = preg_replace('{[\\\\/]+}', '/', $this->file);
-        $metadata['sources'][] = $normalizedFilename.':'.$line;
+        $metadata['sources'][] = $this->file->getPathname().':'.$line;
         $this->catalogue->setMetadata($message, $metadata, $domain);
     }
 

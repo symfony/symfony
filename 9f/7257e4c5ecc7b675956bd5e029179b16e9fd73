@@ -1,0 +1,12 @@
+---------------------------------------------------------------------------
+
+by mtarld at 2025-03-13T07:56:33Z
+
+@alexandre-daubois, the `@return` is already implemented and tested. There is a bit of refactoring but nothing has really changed.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2025-03-13T12:14:19Z
+
+Is there any reference about using `@var` for constructor property promotion?
+Mixing both `@var` and `@param` looks horrific to me. I'd think this is one of the use cases where one hits the limits of promoted properties and should just separate the property declaration from the constructor parameter. Am I wrong?

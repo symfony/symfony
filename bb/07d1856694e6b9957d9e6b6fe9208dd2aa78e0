@@ -1,0 +1,54 @@
+---------------------------------------------------------------------------
+
+by joelwurtz at 2025-03-10T16:50:05Z
+
+Like i said, test is hard to achieve it happens randomly our reproducer for this is the current script :
+
+```php
+<?php
+
+require 'vendor/autoload.php';
+
+use Symfony\Component\Process\Process;
+
+$reference = run_process();
+
+echo "Output Reference:\n";
+echo $reference;
+echo "\n";
+
+for ($i=0; $i < 100_000; $i++) {
+    if ($i > 0 && $i % 80 === 0) {
+        echo "\n";
+    }
+    echo '.';
+    $output = run_process();
+    if ($output !== $reference) {
+        echo "\n!!Output changed!!\n";
+        echo "New output:\n";
+        echo "$output\n";
+        exit(1);
+    }
+}
+
+function run_process(){
+    $process = new Process(['cat', __FILE__]);
+    // If you comment the following line, the test become stable
+    $process->setPty(true);
+    $process->mustRun();
+
+    return $process->getOutput();
+}
+```
+
+---------------------------------------------------------------------------
+
+by joelwurtz at 2025-03-10T16:58:02Z
+
+I spoke to soon, i added a test, before this change everything was in the `getOutput`
+
+---------------------------------------------------------------------------
+
+by joelwurtz at 2025-03-12T13:25:39Z
+
+Failed test seems to not be related, so ready for review i guess

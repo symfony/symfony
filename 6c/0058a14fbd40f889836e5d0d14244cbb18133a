@@ -1,0 +1,42 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2025-03-04T18:28:39Z
+
+Hey!
+
+I see that this is your first PR. That is great! Welcome!
+
+Symfony has a [contribution guide](https://symfony.com/doc/current/contributing/index.html) which I suggest you to read.
+
+In short:
+- Always add tests
+- Keep backward compatibility (see https://symfony.com/bc).
+- Bug fixes must be submitted against the lowest maintained branch where they apply (see https://symfony.com/releases)
+- Features and deprecations must be submitted against the 7.3 branch.
+
+Review the GitHub status checks of your pull request and try to solve the reported issues. If some tests are failing, try to see if they are failing because of this change.
+
+When two Symfony core team members approve this change, it will be merged and you will become an official Symfony contributor!
+If this PR is merged in a lower version branch, it will be merged up to all maintained branches within a few days.
+
+I am going to sit back now and wait for the reviews.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by santysisi at 2025-03-11T01:51:20Z
+
+Hi 😃, I hope you're doing well!
+I wanted to check if any further changes are needed in the PR, or if it's good to go for merging 🎉🎉🎉
+Thanks a lot in advance, and I look forward to your response!
+
+---------------------------------------------------------------------------
+
+by santysisi at 2025-03-12T21:31:55Z
+
+> Congrats on your great first PR to Symfony.
+
+Thank you very much, I'm very excited :smile:

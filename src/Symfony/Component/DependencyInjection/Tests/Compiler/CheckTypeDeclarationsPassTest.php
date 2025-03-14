@@ -20,6 +20,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Exception\InvalidParameterTypeException;
+use Symfony\Component\DependencyInjection\Parameter;
 use Symfony\Component\DependencyInjection\ParameterBag\EnvPlaceholderParameterBag;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\CheckTypeDeclarationsPass\Bar;
@@ -28,6 +29,8 @@ use Symfony\Component\DependencyInjection\Tests\Fixtures\CheckTypeDeclarationsPa
 use Symfony\Component\DependencyInjection\Tests\Fixtures\CheckTypeDeclarationsPass\BarOptionalArgument;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\CheckTypeDeclarationsPass\BarOptionalArgumentNotNull;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\CheckTypeDeclarationsPass\Deprecated;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\CheckTypeDeclarationsPass\ExpectsIntegerArgument;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\CheckTypeDeclarationsPass\ExpectsIntegerArgumentWrapper;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\CheckTypeDeclarationsPass\Foo;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\CheckTypeDeclarationsPass\FooObject;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\CheckTypeDeclarationsPass\IntersectionConstructor;
@@ -636,6 +639,27 @@ class CheckTypeDeclarationsPassTest extends TestCase
         $container
             ->register('wobble', Wobble::class)
             ->setArguments([new Expression("service('waldo')")]);
+
+        (new CheckTypeDeclarationsPass(true))->process($container);
+
+        $this->addToAssertionCount(1);
+    }
+
+    public function testErrorOnEvaluatingExpressionDoesNotStopTheProcess()
+    {
+        $container = new ContainerBuilder(new EnvPlaceholderParameterBag([
+            'some_int' => '%env(SOME_INT)%',
+        ]));
+
+        $container
+            ->register('eia', ExpectsIntegerArgument::class)
+            ->setPublic(true)
+            ->setShared(false)
+            ->setFactory([ExpectsIntegerArgument::class, 'create'])
+            ->addArgument(new Parameter('some_int'));
+        $container
+            ->register('eia_wrapper', ExpectsIntegerArgumentWrapper::class)
+            ->addArgument(new Expression('service("eia").instance()'));
 
         (new CheckTypeDeclarationsPass(true))->process($container);
 

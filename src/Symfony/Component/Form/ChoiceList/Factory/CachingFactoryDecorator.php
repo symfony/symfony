@@ -143,7 +143,7 @@ class CachingFactoryDecorator implements ChoiceListFactoryInterface, ResetInterf
         return $this->lists[$hash];
     }
 
-    public function createView(ChoiceListInterface $list, mixed $preferredChoices = null, mixed $label = null, mixed $index = null, mixed $groupBy = null, mixed $attr = null, mixed $labelTranslationParameters = [], bool $duplicatePreferredChoices = true): ChoiceListView
+    public function createView(ChoiceListInterface $list, mixed $preferredChoices = null, mixed $label = null, mixed $index = null, mixed $groupBy = null, mixed $attr = null, mixed $labelTranslationParameters = [], bool $duplicatePreferredChoices = true, mixed $help = null): ChoiceListView
     {
         $cache = true;
 
@@ -177,6 +177,12 @@ class CachingFactoryDecorator implements ChoiceListFactoryInterface, ResetInterf
             $cache = false;
         }
 
+        if ($help instanceof Cache\ChoiceHelp) {
+            $help = $help->getOption();
+        } elseif ($help) {
+            $cache = false;
+        }
+
         if ($labelTranslationParameters instanceof Cache\ChoiceTranslationParameters) {
             $labelTranslationParameters = $labelTranslationParameters->getOption();
         } elseif ([] !== $labelTranslationParameters) {
@@ -193,10 +199,11 @@ class CachingFactoryDecorator implements ChoiceListFactoryInterface, ResetInterf
                 $attr,
                 $labelTranslationParameters,
                 $duplicatePreferredChoices,
+                $help,
             );
         }
 
-        $hash = self::generateHash([$list, $preferredChoices, $label, $index, $groupBy, $attr, $labelTranslationParameters, $duplicatePreferredChoices]);
+        $hash = self::generateHash([$list, $preferredChoices, $label, $index, $groupBy, $attr, $labelTranslationParameters, $duplicatePreferredChoices, $help]);
 
         if (!isset($this->views[$hash])) {
             $this->views[$hash] = $this->decoratedFactory->createView(
@@ -208,6 +215,7 @@ class CachingFactoryDecorator implements ChoiceListFactoryInterface, ResetInterf
                 $attr,
                 $labelTranslationParameters,
                 $duplicatePreferredChoices,
+                $help
             );
         }
 

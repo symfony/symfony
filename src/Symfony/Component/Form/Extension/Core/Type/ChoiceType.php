@@ -16,6 +16,7 @@ use Symfony\Component\Form\ChoiceList\ChoiceListInterface;
 use Symfony\Component\Form\ChoiceList\Factory\Cache\ChoiceAttr;
 use Symfony\Component\Form\ChoiceList\Factory\Cache\ChoiceFieldName;
 use Symfony\Component\Form\ChoiceList\Factory\Cache\ChoiceFilter;
+use Symfony\Component\Form\ChoiceList\Factory\Cache\ChoiceHelp;
 use Symfony\Component\Form\ChoiceList\Factory\Cache\ChoiceLabel;
 use Symfony\Component\Form\ChoiceList\Factory\Cache\ChoiceLoader;
 use Symfony\Component\Form\ChoiceList\Factory\Cache\ChoiceTranslationParameters;
@@ -358,6 +359,7 @@ class ChoiceType extends AbstractType
             'choice_name' => null,
             'choice_value' => null,
             'choice_attr' => null,
+            'choice_help' => null,
             'choice_translation_parameters' => [],
             'preferred_choices' => [],
             'separator' => '-------------------',
@@ -391,6 +393,7 @@ class ChoiceType extends AbstractType
         $resolver->setAllowedTypes('choice_name', ['null', 'callable', 'string', PropertyPath::class, ChoiceFieldName::class]);
         $resolver->setAllowedTypes('choice_value', ['null', 'callable', 'string', PropertyPath::class, ChoiceValue::class]);
         $resolver->setAllowedTypes('choice_attr', ['null', 'array', 'callable', 'string', PropertyPath::class, ChoiceAttr::class]);
+        $resolver->setAllowedTypes('choice_help', ['null', 'array', \Traversable::class, 'callable', 'string', PropertyPath::class, ChoiceHelp::class]);
         $resolver->setAllowedTypes('choice_translation_parameters', ['null', 'array', 'callable', ChoiceTranslationParameters::class]);
         $resolver->setAllowedTypes('placeholder_attr', ['array']);
         $resolver->setAllowedTypes('preferred_choices', ['array', \Traversable::class, 'callable', 'string', PropertyPath::class, PreferredChoice::class]);
@@ -483,6 +486,7 @@ class ChoiceType extends AbstractType
             $options['choice_attr'],
             $options['choice_translation_parameters'],
             $options['duplicate_preferred_choices'],
+            $options['choice_help'],
         );
     }
 }

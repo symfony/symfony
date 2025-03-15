@@ -5,6 +5,7 @@ CHANGELOG
 ---
 
  * Add support for displaying nested options in DebugCommand
+ * Add a `choice_help` option to `ChoiceType`
 
 7.2
 ---

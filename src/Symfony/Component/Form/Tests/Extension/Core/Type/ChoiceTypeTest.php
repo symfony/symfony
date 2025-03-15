@@ -1837,6 +1837,12 @@ class ChoiceTypeTest extends BaseTypeTestCase
                 ['attr3' => 'value3'],
                 ['attr4' => 'value4'],
             ],
+            'choice_help' => [
+                'help1',
+                'help2',
+                'help3',
+                'help4',
+            ],
             'choice_translation_parameters' => [
                 ['%placeholder1%' => 'value1'],
                 ['%placeholder2%' => 'value2'],
@@ -1847,10 +1853,10 @@ class ChoiceTypeTest extends BaseTypeTestCase
             ->createView();
 
         $this->assertEquals([
-            new ChoiceView($obj1, 'a', 'A', ['attr1' => 'value1'], ['%placeholder1%' => 'value1']),
-            new ChoiceView($obj2, 'b', 'B', ['attr2' => 'value2'], ['%placeholder2%' => 'value2']),
-            new ChoiceView($obj3, 'c', 'C', ['attr3' => 'value3'], ['%placeholder3%' => 'value3']),
-            new ChoiceView($obj4, 'd', 'D', ['attr4' => 'value4'], ['%placeholder4%' => 'value4']),
+            new ChoiceView($obj1, 'a', 'A', ['attr1' => 'value1'], ['%placeholder1%' => 'value1'], 'help1'),
+            new ChoiceView($obj2, 'b', 'B', ['attr2' => 'value2'], ['%placeholder2%' => 'value2'], 'help2'),
+            new ChoiceView($obj3, 'c', 'C', ['attr3' => 'value3'], ['%placeholder3%' => 'value3'], 'help3'),
+            new ChoiceView($obj4, 'd', 'D', ['attr4' => 'value4'], ['%placeholder4%' => 'value4'], 'help4'),
         ], $view->vars['choices']);
     }
 

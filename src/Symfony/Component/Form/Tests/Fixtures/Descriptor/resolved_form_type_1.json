@@ -5,6 +5,7 @@
         "own": [
             "choice_attr",
             "choice_filter",
+            "choice_help",
             "choice_label",
             "choice_lazy",
             "choice_loader",

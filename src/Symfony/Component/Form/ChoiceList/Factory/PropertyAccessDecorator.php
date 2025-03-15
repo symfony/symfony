@@ -109,7 +109,7 @@ class PropertyAccessDecorator implements ChoiceListFactoryInterface
         return $this->decoratedFactory->createListFromLoader($loader, $value, $filter);
     }
 
-    public function createView(ChoiceListInterface $list, mixed $preferredChoices = null, mixed $label = null, mixed $index = null, mixed $groupBy = null, mixed $attr = null, mixed $labelTranslationParameters = [], bool $duplicatePreferredChoices = true): ChoiceListView
+    public function createView(ChoiceListInterface $list, mixed $preferredChoices = null, mixed $label = null, mixed $index = null, mixed $groupBy = null, mixed $attr = null, mixed $labelTranslationParameters = [], bool $duplicatePreferredChoices = true, mixed $help = null): ChoiceListView
     {
         $accessor = $this->propertyAccessor;
 
@@ -167,6 +167,14 @@ class PropertyAccessDecorator implements ChoiceListFactoryInterface
             $attr = static fn ($choice) => $accessor->getValue($choice, $attr);
         }
 
+        if (\is_string($help)) {
+            $help = new PropertyPath($help);
+        }
+
+        if ($help instanceof PropertyPathInterface) {
+            $help = static fn ($choice) => $accessor->getValue($choice, $help);
+        }
+
         if (\is_string($labelTranslationParameters)) {
             $labelTranslationParameters = new PropertyPath($labelTranslationParameters);
         }
@@ -184,6 +192,7 @@ class PropertyAccessDecorator implements ChoiceListFactoryInterface
             $attr,
             $labelTranslationParameters,
             $duplicatePreferredChoices,
+            $help
         );
     }
 }

@@ -52,6 +52,22 @@ class ProgressBarTest extends TestCase
         );
     }
 
+    public function testMultipleStartWithHiddenProgressBar()
+    {
+        $output = $this->getOutputStream();
+        $output->setProgressBarVisibility(false);
+        $bar = new ProgressBar($output, 0, 0);
+        $bar->start();
+        $bar->advance();
+        $bar->start();
+
+        rewind($output->getStream());
+        $this->assertEquals(
+            '',
+            stream_get_contents($output->getStream())
+        );
+    }
+
     public function testAdvance()
     {
         $bar = new ProgressBar($output = $this->getOutputStream(), 0, 0);
@@ -62,6 +78,21 @@ class ProgressBarTest extends TestCase
         $this->assertEquals(
             '    0 [>---------------------------]'.
             $this->generateOutput('    1 [->--------------------------]'),
+            stream_get_contents($output->getStream())
+        );
+    }
+
+    public function testAdvanceWithHiddenProgressBar()
+    {
+        $output = $this->getOutputStream();
+        $output->setProgressBarVisibility(false);
+        $bar = new ProgressBar($output, 0, 0);
+        $bar->start();
+        $bar->advance();
+
+        rewind($output->getStream());
+        $this->assertEquals(
+            '',
             stream_get_contents($output->getStream())
         );
     }
@@ -1338,6 +1369,34 @@ And, as in uffish thought he stood, The Jabberwock, with eyes of flame, Came whi
             $this->generateOutput("1/3\nABC\nFoo").
             $this->generateOutput("2/3\nA\nFoo").
             $this->generateOutput("3/3\nA\nFoo"),
+            stream_get_contents($output->getStream())
+        );
+    }
+
+    public function testMultiLineFormatIsFullyClearedWithHiddenProgressBar()
+    {
+        $output = $this->getOutputStream();
+        $output->setProgressBarVisibility(false);
+        $bar = new ProgressBar($output, 3);
+        $bar->setFormat("%current%/%max%\n%message%\nFoo");
+
+        $bar->setMessage('1234567890');
+        $bar->start();
+        $bar->display();
+
+        $bar->setMessage('ABC');
+        $bar->advance();
+        $bar->display();
+
+        $bar->setMessage('A');
+        $bar->advance();
+        $bar->display();
+
+        $bar->finish();
+
+        rewind($output->getStream());
+        $this->assertEquals(
+            '',
             stream_get_contents($output->getStream())
         );
     }

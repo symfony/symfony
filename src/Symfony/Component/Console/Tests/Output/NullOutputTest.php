@@ -99,4 +99,34 @@ class NullOutputTest extends TestCase
         $output = new NullOutput();
         $this->assertFalse($output->isDebug());
     }
+
+    public function testSetHiddenOptions()
+    {
+        $output = new NullOutput();
+        $output->setHiddenOptions([
+            OutputInterface::HIDDEN_PROGRESS_BAR => false,
+        ]);
+        $this->assertIsArray($output->getHiddenOptions());
+        $this->assertCount(0, $output->getHiddenOptions());
+    }
+
+    public function testGetHiddenOptions()
+    {
+        $output = new NullOutput();
+        $this->assertIsArray($output->getHiddenOptions());
+        $this->assertCount(0, $output->getHiddenOptions());
+    }
+
+    public function testSetProgressBarVisibility()
+    {
+        $output = new NullOutput();
+        $output->setProgressBarVisibility(true);
+        $this->assertFalse($output->isHiddenProgressBar());
+    }
+
+    public function testIsHiddenProgressBar()
+    {
+        $output = new NullOutput();
+        $this->assertFalse($output->isHiddenProgressBar());
+    }
 }

@@ -32,6 +32,9 @@ abstract class Output implements OutputInterface
 {
     private int $verbosity;
     private OutputFormatterInterface $formatter;
+    private array $hiddenOptions = [
+        self::HIDDEN_PROGRESS_BAR => false,
+    ];
 
     /**
      * @param int|null                      $verbosity The verbosity level (one of the VERBOSITY constants in OutputInterface)
@@ -98,6 +101,26 @@ abstract class Output implements OutputInterface
     public function isDebug(): bool
     {
         return self::VERBOSITY_DEBUG <= $this->verbosity;
+    }
+
+    public function setHiddenOptions(array $hiddenOptions): void
+    {
+        $this->hiddenOptions = $hiddenOptions;
+    }
+
+    public function getHiddenOptions(): array
+    {
+        return $this->hiddenOptions;
+    }
+
+    public function setProgressBarVisibility(bool $visible): void
+    {
+        $this->hiddenOptions[self::HIDDEN_PROGRESS_BAR] = !$visible;
+    }
+
+    public function isHiddenProgressBar(): bool
+    {
+        return $this->hiddenOptions[self::HIDDEN_PROGRESS_BAR] ?? false;
     }
 
     public function writeln(string|iterable $messages, int $options = self::OUTPUT_NORMAL): void

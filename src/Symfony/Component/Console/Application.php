@@ -978,6 +978,8 @@ class Application implements ResetInterface
             }
         }
 
+        $output->setProgressBarVisibility(!$input->hasParameterOption('--no-progress', true));
+
         if (0 > $shellVerbosity) {
             $input->setInteractive(false);
         }
@@ -1137,6 +1139,7 @@ class Application implements ResetInterface
             new InputOption('--version', '-V', InputOption::VALUE_NONE, 'Display this application version'),
             new InputOption('--ansi', '', InputOption::VALUE_NEGATABLE, 'Force (or disable --no-ansi) ANSI output', null),
             new InputOption('--no-interaction', '-n', InputOption::VALUE_NONE, 'Do not ask any interactive question'),
+            new InputOption('--no-progress', null, InputOption::VALUE_NONE, 'Disable the progress bar output during the execution of the command'),
         ]);
     }
 

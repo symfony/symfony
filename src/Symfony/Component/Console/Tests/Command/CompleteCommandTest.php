@@ -119,9 +119,9 @@ class CompleteCommandTest extends TestCase
 
     public static function provideCompleteCommandInputDefinitionInputs()
     {
-        yield 'definition' => [['bin/console', 'hello', '-'], ['--help', '--silent', '--quiet', '--verbose', '--version', '--ansi', '--no-ansi', '--no-interaction']];
+        yield 'definition' => [['bin/console', 'hello', '-'], ['--help', '--silent', '--quiet', '--verbose', '--version', '--ansi', '--no-ansi', '--no-interaction', '--no-progress']];
         yield 'custom' => [['bin/console', 'hello'], ['Fabien', 'Robin', 'Wouter']];
-        yield 'definition-aliased' => [['bin/console', 'ahoy', '-'], ['--help', '--silent', '--quiet', '--verbose', '--version', '--ansi', '--no-ansi', '--no-interaction']];
+        yield 'definition-aliased' => [['bin/console', 'ahoy', '-'], ['--help', '--silent', '--quiet', '--verbose', '--version', '--ansi', '--no-ansi', '--no-interaction', '--no-progress']];
         yield 'custom-aliased' => [['bin/console', 'ahoy'], ['Fabien', 'Robin', 'Wouter']];
     }
 

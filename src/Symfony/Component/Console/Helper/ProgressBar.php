@@ -502,6 +502,9 @@ final class ProgressBar
      */
     private function overwrite(string $message): void
     {
+        if ($this->output->isHiddenProgressBar()) {
+            return;
+        }
         if ($this->previousMessage === $message) {
             return;
         }

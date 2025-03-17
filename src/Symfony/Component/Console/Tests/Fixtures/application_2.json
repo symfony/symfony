@@ -131,6 +131,15 @@
                         "is_multiple": false,
                         "description": "The API version of the completion script",
                         "default": null
+                    },
+                    "no-progress": {
+                        "name": "--no-progress",
+                        "shortcut": "",
+                        "accept_value": false,
+                        "is_value_required": false,
+                        "is_multiple": false,
+                        "description": "Disable the progress bar output during the execution of the command",
+                        "default": false
                     }
                 }
             }
@@ -233,6 +242,15 @@
                         "is_value_required": false,
                         "is_multiple": false,
                         "description": "Tail the completion debug log",
+                        "default": false
+                    },
+                    "no-progress": {
+                        "name": "--no-progress",
+                        "shortcut": "",
+                        "accept_value": false,
+                        "is_value_required": false,
+                        "is_multiple": false,
+                        "description": "Disable the progress bar output during the execution of the command",
                         "default": false
                     }
                 }
@@ -345,6 +363,15 @@
                         "is_value_required": false,
                         "is_multiple": false,
                         "description": "Do not ask any interactive question",
+                        "default": false
+                    },
+                    "no-progress": {
+                        "name": "--no-progress",
+                        "shortcut": "",
+                        "accept_value": false,
+                        "is_value_required": false,
+                        "is_multiple": false,
+                        "description": "Disable the progress bar output during the execution of the command",
                         "default": false
                     }
                 }
@@ -467,6 +494,15 @@
                         "is_multiple": false,
                         "description": "To skip describing commands' arguments",
                         "default": false
+                    },
+                    "no-progress": {
+                        "name": "--no-progress",
+                        "shortcut": "",
+                        "accept_value": false,
+                        "is_value_required": false,
+                        "is_multiple": false,
+                        "description": "Disable the progress bar output during the execution of the command",
+                        "default": false
                     }
                 }
             }
@@ -554,6 +590,15 @@
                         "is_value_required": false,
                         "is_multiple": false,
                         "description": "Do not ask any interactive question",
+                        "default": false
+                    },
+                    "no-progress": {
+                        "name": "--no-progress",
+                        "shortcut": "",
+                        "accept_value": false,
+                        "is_value_required": false,
+                        "is_multiple": false,
+                        "description": "Disable the progress bar output during the execution of the command",
                         "default": false
                     }
                 }
@@ -660,6 +705,15 @@
                         "is_multiple": false,
                         "description": "Do not ask any interactive question",
                         "default": false
+                    },
+                    "no-progress": {
+                        "name": "--no-progress",
+                        "shortcut": "",
+                        "accept_value": false,
+                        "is_value_required": false,
+                        "is_multiple": false,
+                        "description": "Disable the progress bar output during the execution of the command",
+                        "default": false
                     }
                 }
             }
@@ -745,6 +799,15 @@
                         "is_value_required": false,
                         "is_multiple": false,
                         "description": "Do not ask any interactive question",
+                        "default": false
+                    },
+                    "no-progress": {
+                        "name": "--no-progress",
+                        "shortcut": "",
+                        "accept_value": false,
+                        "is_value_required": false,
+                        "is_multiple": false,
+                        "description": "Disable the progress bar output during the execution of the command",
                         "default": false
                     }
                 }
@@ -833,6 +896,15 @@
                         "is_value_required": false,
                         "is_multiple": false,
                         "description": "Do not ask any interactive question",
+                        "default": false
+                    },
+                    "no-progress": {
+                        "name": "--no-progress",
+                        "shortcut": "",
+                        "accept_value": false,
+                        "is_value_required": false,
+                        "is_multiple": false,
+                        "description": "Disable the progress bar output during the execution of the command",
                         "default": false
                     }
                 }

@@ -223,6 +223,7 @@ class ReStructuredTextDescriptor extends Descriptor
             'version',
             'ansi',
             'no-interaction',
+            'no-progress',
         ];
         $nonDefaultOptions = [];
         foreach ($definition->getOptions() as $option) {

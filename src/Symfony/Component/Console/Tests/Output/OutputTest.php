@@ -14,6 +14,7 @@ namespace Symfony\Component\Console\Tests\Output;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Formatter\OutputFormatterStyle;
 use Symfony\Component\Console\Output\Output;
+use Symfony\Component\Console\Output\OutputInterface;
 
 class OutputTest extends TestCase
 {
@@ -72,6 +73,35 @@ class OutputTest extends TestCase
         $output = new TestOutput(Output::VERBOSITY_QUIET);
         $output->writeln('foo');
         $this->assertEquals('', $output->output, '->writeln() outputs nothing if verbosity is set to VERBOSITY_QUIET');
+    }
+
+    public function testSetGetHiddenOptions()
+    {
+        $output = new TestOutput();
+        $hiddenOptions = [
+            OutputInterface::HIDDEN_PROGRESS_BAR => false,
+        ];
+
+        $this->assertSame($hiddenOptions, $output->getHiddenOptions());
+
+        $hiddenOptions = [
+            OutputInterface::HIDDEN_PROGRESS_BAR => true,
+        ];
+
+        $output->setHiddenOptions($hiddenOptions);
+
+        $this->assertSame($hiddenOptions, $output->getHiddenOptions());
+    }
+
+    public function testIsHiddenProgressBar()
+    {
+        $output = new TestOutput();
+
+        $this->assertFalse($output->isHiddenProgressBar());
+
+        $output->setProgressBarVisibility(false);
+
+        $this->assertTrue($output->isHiddenProgressBar());
     }
 
     public function testWriteAnArrayOfMessages()

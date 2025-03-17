@@ -15,6 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Formatter\OutputFormatter;
 use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\Console\Output\Output;
+use Symfony\Component\Console\Output\OutputInterface;
 
 class ConsoleOutputTest extends TestCase
 {
@@ -47,5 +48,21 @@ class ConsoleOutputTest extends TestCase
         $output = new ConsoleOutput();
         $output->setVerbosity(Output::VERBOSITY_VERBOSE);
         $this->assertSame(Output::VERBOSITY_VERBOSE, $output->getVerbosity());
+    }
+
+    public function testSetHiddenOptions()
+    {
+        $output = new ConsoleOutput();
+        $output->setHiddenOptions([
+            OutputInterface::HIDDEN_PROGRESS_BAR => true,
+        ]);
+        $this->assertSame([OutputInterface::HIDDEN_PROGRESS_BAR => true], $output->getHiddenOptions());
+    }
+
+    public function testSetProgressBarVisibility()
+    {
+        $output = new ConsoleOutput();
+        $output->setProgressBarVisibility(false);
+        $this->assertTrue($output->isHiddenProgressBar());
     }
 }

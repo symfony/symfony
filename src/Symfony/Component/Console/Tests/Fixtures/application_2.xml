@@ -53,6 +53,9 @@
         <option name="--no-interaction" shortcut="-n" accept_value="0" is_value_required="0" is_multiple="0">
           <description>Do not ask any interactive question</description>
         </option>
+        <option name="--no-progress" shortcut="" accept_value="0" is_value_required="0" is_multiple="0">
+          <description>Disable the progress bar output during the execution of the command</description>
+        </option>
       </options>
     </command>
     <command id="completion" name="completion" hidden="0">
@@ -94,6 +97,9 @@
         </option>
         <option name="--no-interaction" shortcut="-n" accept_value="0" is_value_required="0" is_multiple="0">
           <description>Do not ask any interactive question</description>
+        </option>
+        <option name="--no-progress" shortcut="" accept_value="0" is_value_required="0" is_multiple="0">
+          <description>Disable the progress bar output during the execution of the command</description>
         </option>
       </options>
     </command>
@@ -152,6 +158,9 @@
         </option>
         <option name="--no-interaction" shortcut="-n" accept_value="0" is_value_required="0" is_multiple="0">
           <description>Do not ask any interactive question</description>
+        </option>
+        <option name="--no-progress" shortcut="" accept_value="0" is_value_required="0" is_multiple="0">
+          <description>Disable the progress bar output during the execution of the command</description>
         </option>
       </options>
     </command>
@@ -218,6 +227,9 @@
         <option name="--no-interaction" shortcut="-n" accept_value="0" is_value_required="0" is_multiple="0">
           <description>Do not ask any interactive question</description>
         </option>
+        <option name="--no-progress" shortcut="" accept_value="0" is_value_required="0" is_multiple="0">
+          <description>Disable the progress bar output during the execution of the command</description>
+        </option>
       </options>
     </command>
     <command id="descriptor:command1" name="descriptor:command1" hidden="0">
@@ -253,6 +265,9 @@
         </option>
         <option name="--no-interaction" shortcut="-n" accept_value="0" is_value_required="0" is_multiple="0">
           <description>Do not ask any interactive question</description>
+        </option>
+        <option name="--no-progress" shortcut="" accept_value="0" is_value_required="0" is_multiple="0">
+          <description>Disable the progress bar output during the execution of the command</description>
         </option>
       </options>
     </command>
@@ -298,6 +313,9 @@
         <option name="--no-interaction" shortcut="-n" accept_value="0" is_value_required="0" is_multiple="0">
           <description>Do not ask any interactive question</description>
         </option>
+        <option name="--no-progress" shortcut="" accept_value="0" is_value_required="0" is_multiple="0">
+          <description>Disable the progress bar output during the execution of the command</description>
+        </option>
       </options>
     </command>
     <command id="descriptor:command3" name="descriptor:command3" hidden="1">
@@ -331,6 +349,9 @@
         </option>
         <option name="--no-interaction" shortcut="-n" accept_value="0" is_value_required="0" is_multiple="0">
           <description>Do not ask any interactive question</description>
+        </option>
+        <option name="--no-progress" shortcut="" accept_value="0" is_value_required="0" is_multiple="0">
+          <description>Disable the progress bar output during the execution of the command</description>
         </option>
       </options>
     </command>
@@ -367,6 +388,9 @@
         </option>
         <option name="--no-interaction" shortcut="-n" accept_value="0" is_value_required="0" is_multiple="0">
           <description>Do not ask any interactive question</description>
+        </option>
+        <option name="--no-progress" shortcut="" accept_value="0" is_value_required="0" is_multiple="0">
+          <description>Disable the progress bar output during the execution of the command</description>
         </option>
       </options>
     </command>

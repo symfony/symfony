@@ -1113,6 +1113,9 @@ class ApplicationTest extends TestCase
         $tester->run(['command' => 'help', '-h' => true], ['decorated' => false]);
         $this->assertStringEqualsFile(self::$fixturesPath.'/application_run5.txt', $tester->getDisplay(true), '->run() displays the help if -h is passed');
 
+        $tester->run(['--no-progress' => true]);
+        $this->assertFalse($tester->getOutput()->isDecorated(), '->run() Disable the progress bar output during the execution of the command');
+
         $application = new Application();
         $application->setAutoExit(false);
         $application->setCatchExceptions(false);

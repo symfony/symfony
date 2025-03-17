@@ -82,6 +82,18 @@ class ConsoleOutput extends StreamOutput implements ConsoleOutputInterface
         $this->stderr->setVerbosity($level);
     }
 
+    public function setHiddenOptions(array $hiddenOptions): void
+    {
+        parent::setHiddenOptions($hiddenOptions);
+        $this->stderr->setHiddenOptions($hiddenOptions);
+    }
+
+    public function setProgressBarVisibility(bool $visible): void
+    {
+        parent::setProgressBarVisibility($visible);
+        $this->stderr->setProgressBarVisibility($visible);
+    }
+
     public function getErrorOutput(): OutputInterface
     {
         return $this->stderr;

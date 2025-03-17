@@ -121,6 +121,16 @@ Do not ask any interactive question
 * Is negatable: no
 * Default: `false`
 
+#### `--no-progress`
+
+Disable the progress bar output during the execution of the command
+
+* Accept value: no
+* Is value required: no
+* Is multiple: no
+* Is negatable: no
+* Default: `false`
+
 `help`
 ------
 
@@ -235,6 +245,16 @@ Force (or disable --no-ansi) ANSI output
 #### `--no-interaction|-n`
 
 Do not ask any interactive question
+
+* Accept value: no
+* Is value required: no
+* Is multiple: no
+* Is negatable: no
+* Default: `false`
+
+#### `--no-progress`
+
+Disable the progress bar output during the execution of the command
 
 * Accept value: no
 * Is value required: no
@@ -379,6 +399,16 @@ Do not ask any interactive question
 * Is negatable: no
 * Default: `false`
 
+#### `--no-progress`
+
+Disable the progress bar output during the execution of the command
+
+* Accept value: no
+* Is value required: no
+* Is multiple: no
+* Is negatable: no
+* Default: `false`
+
 `descriptor:command1`
 ---------------------
 
@@ -457,6 +487,16 @@ Force (or disable --no-ansi) ANSI output
 #### `--no-interaction|-n`
 
 Do not ask any interactive question
+
+* Accept value: no
+* Is value required: no
+* Is multiple: no
+* Is negatable: no
+* Default: `false`
+
+#### `--no-progress`
+
+Disable the progress bar output during the execution of the command
 
 * Accept value: no
 * Is value required: no
@@ -565,6 +605,16 @@ Do not ask any interactive question
 * Is negatable: no
 * Default: `false`
 
+#### `--no-progress`
+
+Disable the progress bar output during the execution of the command
+
+* Accept value: no
+* Is value required: no
+* Is multiple: no
+* Is negatable: no
+* Default: `false`
+
 `descriptor:command4`
 ---------------------
 
@@ -640,6 +690,16 @@ Force (or disable --no-ansi) ANSI output
 #### `--no-interaction|-n`
 
 Do not ask any interactive question
+
+* Accept value: no
+* Is value required: no
+* Is multiple: no
+* Is negatable: no
+* Default: `false`
+
+#### `--no-progress`
+
+Disable the progress bar output during the execution of the command
 
 * Accept value: no
 * Is value required: no

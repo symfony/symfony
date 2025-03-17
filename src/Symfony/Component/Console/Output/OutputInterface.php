@@ -33,6 +33,8 @@ interface OutputInterface
     public const OUTPUT_RAW = 2;
     public const OUTPUT_PLAIN = 4;
 
+    public const HIDDEN_PROGRESS_BAR = 'progress_bar';
+
     /**
      * Writes a message to the output.
      *
@@ -100,4 +102,24 @@ interface OutputInterface
      * Returns current output formatter instance.
      */
     public function getFormatter(): OutputFormatterInterface;
+
+    /**
+     * Sets the hiddenOptions of the output.
+     */
+    public function setHiddenOptions(array $hiddenOptions): void;
+
+    /**
+     * Gets the current hiddenOptions of the output.
+     */
+    public function getHiddenOptions(): array;
+
+    /**
+     * Sets the visibility of the progress bar.
+     */
+    public function setProgressBarVisibility(bool $visible): void;
+
+    /**
+     * Checks if the progress bar is hidden.
+     */
+    public function isHiddenProgressBar(): bool;
 }

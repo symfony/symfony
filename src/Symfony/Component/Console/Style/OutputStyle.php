@@ -104,6 +104,26 @@ abstract class OutputStyle implements OutputInterface, StyleInterface
         return $this->output->isDebug();
     }
 
+    public function setHiddenOptions(array $hiddenOptions): void
+    {
+        $this->output->setHiddenOptions($hiddenOptions);
+    }
+
+    public function getHiddenOptions(): array
+    {
+        return $this->output->getHiddenOptions();
+    }
+
+    public function setProgressBarVisibility(bool $visible): void
+    {
+        $this->output->setProgressBarVisibility($visible);
+    }
+
+    public function isHiddenProgressBar(): bool
+    {
+        return $this->output->isHiddenProgressBar();
+    }
+
     protected function getErrorOutput(): OutputInterface
     {
         if (!$this->output instanceof ConsoleOutputInterface) {

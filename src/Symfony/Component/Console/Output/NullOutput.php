@@ -82,6 +82,26 @@ class NullOutput implements OutputInterface
         return false;
     }
 
+    public function setHiddenOptions(array $hiddenOptions): void
+    {
+        // do nothing
+    }
+
+    public function getHiddenOptions(): array
+    {
+        return [];
+    }
+
+    public function setProgressBarVisibility(bool $visible): void
+    {
+        // do nothing
+    }
+
+    public function isHiddenProgressBar(): bool
+    {
+        return false;
+    }
+
     public function writeln(string|iterable $messages, int $options = self::OUTPUT_NORMAL): void
     {
         // do nothing

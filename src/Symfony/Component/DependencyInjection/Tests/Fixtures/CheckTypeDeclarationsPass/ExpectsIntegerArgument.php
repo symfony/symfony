@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Symfony\Component\DependencyInjection\Tests\Fixtures\CheckTypeDeclarationsPass;
 
-final readonly class ExpectsIntegerArgument
+final class ExpectsIntegerArgument
 {
-    public function __construct(public int $foo) {}
+    public function __construct(public readonly int $foo) {}
 
     public static function create(int $foo): self
     {

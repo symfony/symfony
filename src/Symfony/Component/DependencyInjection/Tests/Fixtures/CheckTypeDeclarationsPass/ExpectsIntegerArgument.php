@@ -13,7 +13,8 @@ final readonly class ExpectsIntegerArgument
         return new self($foo);
     }
 
-    public function instance(): self {
+    public function instance(): self
+    {
         return $this;
     }
 }

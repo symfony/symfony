@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-03-16T15:15:55Z
+
+I need to figure out why tests fail
+
+Status: needs work
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-03-17T17:31:53Z
+
+I removed the rule for the kernel: its not needed, we already override the auto-discovered `App\Kernel` class by an alias to `kernel`.

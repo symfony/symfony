@@ -25,13 +25,17 @@ final class Cas2HandlerTest extends TestCase
     public function testWithValidTicket()
     {
         $response = new MockResponse(<<<BODY
-                <cas:serviceResponse xmlns:cas='http://www.yale.edu/tp/cas'>
-                    <cas:authenticationSuccess>
-                        <cas:user>lobster</cas:user>
-                        <cas:proxyGrantingTicket>PGTIOU-84678-8a9d</cas:proxyGrantingTicket>
-                    </cas:authenticationSuccess>
-                </cas:serviceResponse>
-            BODY
+            <cas:serviceResponse xmlns:cas='http://www.yale.edu/tp/cas'>
+                <cas:authenticationSuccess>
+                    <cas:user>lobster</cas:user>
+                    <cas:proxyGrantingTicket>PGTIOU-84678-8a9d</cas:proxyGrantingTicket>
+                    <cas:attributes>
+                        <cas:email>lobster@example.com</cas:email>
+                        <cas:role>ROLE_USER</cas:role>
+                    </cas:attributes>
+                </cas:authenticationSuccess>
+            </cas:serviceResponse>
+        BODY
         );
 
         $httpClient = new MockHttpClient([$response]);
@@ -40,7 +44,64 @@ final class Cas2HandlerTest extends TestCase
 
         $cas2Handler = new Cas2Handler(requestStack: $requestStack, validationUrl: 'https://www.example.com/cas', client: $httpClient);
         $userbadge = $cas2Handler->getUserBadgeFrom('PGTIOU-84678-8a9d');
-        $this->assertEquals(new UserBadge('lobster'), $userbadge);
+        $this->assertEquals(new UserBadge('lobster', null, [
+            'email' => 'lobster@example.com',
+            'role' => 'ROLE_USER',
+        ]), $userbadge);        
+    }
+
+    public function testWithNoAttributes()
+    {
+        $response = new MockResponse(<<<BODY
+            <cas:serviceResponse xmlns:cas='http://www.yale.edu/tp/cas'>
+                <cas:authenticationSuccess>
+                    <cas:user>lobster</cas:user>
+                    <cas:proxyGrantingTicket>PGTIOU-84678-8a9d</cas:proxyGrantingTicket>
+                </cas:authenticationSuccess>
+            </cas:serviceResponse>
+        BODY
+        );
+
+        $httpClient = new MockHttpClient([$response]);
+        $requestStack = new RequestStack();
+        $requestStack->push(new Request(['ticket' => 'PGTIOU-84678-8a9d']));
+
+        $cas2Handler = new Cas2Handler(requestStack: $requestStack, validationUrl: 'https://www.example.com/cas', client: $httpClient);
+        $userbadge = $cas2Handler->getUserBadgeFrom('PGTIOU-84678-8a9d');
+        $this->assertEquals(new UserBadge('lobster', null, []), $userbadge);
+    }
+
+    public function testWithMultipleAffiliations()
+    {
+        $response = new MockResponse(<<<BODY
+            <cas:serviceResponse xmlns:cas='http://www.yale.edu/tp/cas'>
+                <cas:authenticationSuccess>
+                    <cas:user>lobster</cas:user>
+                    <cas:proxyGrantingTicket>PGTIOU-84678-8a9d</cas:proxyGrantingTicket>
+                    <cas:attributes>
+                        <cas:firstname>John</cas:firstname>
+                        <cas:lastname>Doe</cas:lastname>
+                        <cas:email>jdoe@example.org</cas:email>
+                        <cas:affiliation>staff</cas:affiliation>
+                        <cas:affiliation>faculty</cas:affiliation>
+                    </cas:attributes>
+                </cas:authenticationSuccess>
+            </cas:serviceResponse>
+        BODY
+        );
+
+        $httpClient = new MockHttpClient([$response]);
+        $requestStack = new RequestStack();
+        $requestStack->push(new Request(['ticket' => 'PGTIOU-84678-8a9d']));
+
+        $cas2Handler = new Cas2Handler(requestStack: $requestStack, validationUrl: 'https://www.example.com/cas', client: $httpClient);
+        $userbadge = $cas2Handler->getUserBadgeFrom('PGTIOU-84678-8a9d');
+        $this->assertEquals(new UserBadge('lobster', null, [
+            'firstname' => 'John',
+            'lastname' => 'Doe',
+            'email' => 'jdoe@example.org',
+            'affiliation' => ['staff', 'faculty'],
+        ]), $userbadge);
     }
 
     public function testWithInvalidTicket()

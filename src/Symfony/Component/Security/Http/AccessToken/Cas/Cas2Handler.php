@@ -50,7 +50,23 @@ final class Cas2Handler implements AccessTokenHandlerInterface
         $xml = new \SimpleXMLElement($response->getContent(), 0, false, $this->prefix, true);
 
         if (isset($xml->authenticationSuccess)) {
-            return new UserBadge((string) $xml->authenticationSuccess->user);
+            $userIdentifier = (string) $xml->authenticationSuccess->user;
+            $attributes = [];
+            if (isset($xml->authenticationSuccess->attributes)) {
+                // Extract all attributes without using namespace
+                foreach ($xml->authenticationSuccess->attributes->children($this->prefix, true) as $child) {
+                    $key = $child->getName();
+                    if (isset($attributes[$key])) {
+                        if (!\is_array($attributes[$key])) {
+                            $attributes[$key] = [$attributes[$key]];
+                        }
+                        $attributes[$key][] = (string) $child;
+                    } else {
+                        $attributes[$key] = (string) $child;
+                    }
+                }
+            }        
+            return new UserBadge($userIdentifier, null, $attributes);
         }
 
         if (isset($xml->authenticationFailure)) {

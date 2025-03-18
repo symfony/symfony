@@ -771,15 +771,19 @@ class FrameworkExtension extends Extension
         $container->registerAttributeForAutoconfiguration(AsMessage::class, static function (ChildDefinition $definition) {
             $definition->addExcludeTag('container.excluded.messenger.message');
         });
-        $container->registerAttributeForAutoconfiguration(Entity::class, static function (ChildDefinition $definition) {
-            $definition->addExcludeTag('container.excluded.doctrine.entity');
-        });
-        $container->registerAttributeForAutoconfiguration(Embeddable::class, static function (ChildDefinition $definition) {
-            $definition->addExcludeTag('container.excluded.doctrine.embeddable');
-        });
-        $container->registerAttributeForAutoconfiguration(MappedSuperclass::class, static function (ChildDefinition $definition) {
-            $definition->addExcludeTag('container.excluded.doctrine.mapped_superclass');
-        });
+
+        // DoctrineBundle autoconfigures attributes since version 2.14.0
+        if (!array_key_exists(Entity::class, $container->getAutoconfiguredAttributes())) {
+            $container->registerAttributeForAutoconfiguration(Entity::class, static function (ChildDefinition $definition) {
+                $definition->addExcludeTag('container.excluded.doctrine.entity');
+            });
+            $container->registerAttributeForAutoconfiguration(Embeddable::class, static function (ChildDefinition $definition) {
+                $definition->addExcludeTag('container.excluded.doctrine.embeddable');
+            });
+            $container->registerAttributeForAutoconfiguration(MappedSuperclass::class, static function (ChildDefinition $definition) {
+                $definition->addExcludeTag('container.excluded.doctrine.mapped_superclass');
+            });
+        }
 
         $container->registerAttributeForAutoconfiguration(JsonStreamable::class, static function (ChildDefinition $definition, JsonStreamable $attribute) {
             $definition->addExcludeTag('json_streamer.streamable', [

@@ -1,0 +1,73 @@
+---------------------------------------------------------------------------
+
+by kbond at 2025-03-19T14:27:56Z
+
+> Isn't there a risk of confusion?
+
+Yeah, that is unfortunate... "resource" also makes me think it could be non-classes (js,md,jpg files).
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2025-03-19T14:50:05Z
+
+### Naming (data model?)
+
+We shouldn't bike shed too much (I'm already ok with this PR and "resource"), but I'd also suggest:
+
+```php
+$definition->addDataModelTag('entity', ['connection' => 'default']);
+```
+
+What we know is that the class is not a service: it's a class that holds data: a "data model" class. Maybe it's an entity, maybe a DTO made by the user, or an `ApiResource`. This "data model" idea seems to cover these cases.
+
+### The Container's new Superpower
+
+More generically, it seems like we're adding a new superpower to the container:
+
+1) it can instantiate services
+2) it can return a list of "data model" classes of some type (e.g. entity)
+
+Is that correct?
+
+---------------------------------------------------------------------------
+
+by kbond at 2025-03-19T14:51:17Z
+
+`addDataClassTag()`?
+
+---------------------------------------------------------------------------
+
+by chalasr at 2025-03-19T15:00:34Z
+
+The word `Resource` is really clever in this context, I think we should not exclude it from the discussion :)
+But the fact this removes the explicit `exclude` from the method name + the possible confusion with resource tracking this would introduce as-is makes me hesitant too.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2025-03-19T15:09:06Z
+
+Not blocking, but I still have the same feeling as in #59704:
+
+> Trying to find a generic term for grouping some classes through the container then making them excluded looks like a dead end as there are many possible reasons for a class not to be registered as service and certainly ones we don't even imagine. Excluded services however is a concept we already have
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-03-19T15:47:36Z
+
+I'm for "resource", this is the most generic term. The confusion about config's resources isn't one I would care much about: both things we're talking about are quite advanced concepts that need teaching anyway.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2025-03-19T15:55:07Z
+
+For the remaining point about the excluding behavior being no longer obvious, what about
+- `$container->addExcludedResourceTag()`
+- Or `->excludeResource($tag)`
+- Or `->excludeTaggedResource()`?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-03-19T15:58:30Z
+
+It's excluded from being a service, but still managed as a resource for invalidating the container.
+I think we're safe not having "excluded": this is a service container, not a resource registry, so making something a resource already excludes it from the DIC IMHO, conceptually.

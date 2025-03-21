@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by GromNaN at 2025-03-18T17:09:56Z
+
+Increasing the minimum version would be fine and avoid this compatibility code that we will have to remove later. https://github.com/symfony/symfony/pull/60001/commits/32c994c81e2bfd4c9a05fc40bb76d5752cdc5ff7
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2025-03-20T09:07:56Z
+
+Status: Needs Review

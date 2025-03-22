@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2025-03-03T13:10:01Z
+
+I think your tests should expect deprecations as well by using the `ExpectDeprecationTrait`, additionally to the `legacy` group. It also helps to show explicitly why the legacy group is used and speed up cleaning on next major 🙂
+
+---------------------------------------------------------------------------
+
+by mtarld at 2025-03-03T13:52:47Z
+
+Indeed, that'll be great! Updated.

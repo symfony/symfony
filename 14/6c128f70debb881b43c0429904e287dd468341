@@ -1,0 +1,43 @@
+---------------------------------------------------------------------------
+
+by NanoSector at 2024-04-11T13:07:23Z
+
+@nicolas-grekas Thanks for your review, I’ll try to open the corresponding Doctrine bundle PR later today or this week; it’s mostly extension configuration and injecting the right config into the added array here. Depending on the feedback here I can expand either PR.
+
+---------------------------------------------------------------------------
+
+by stof at 2024-09-20T12:23:16Z
+
+I don't think repurposing the target_entities configuration is a good thing. In the ORM, target entities work **only** in the mapping configuration for the `targetEntity` setting of relations. It does not work **anywhere else**. You **cannot** do `$em->find(MyInterface::class, $id)` and expect the interface to be resolved.
+This PR is about emulating such `find` usage though.
+
+Making the EntityValueResolver diverge from the behavior of the ORM while reusing the ORM configuration setting for that is likely to become a maintenance nightmare (as it ties this feature to the ORM feature, which could break it if the ORM changes things in its own feature)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-10-18T08:04:25Z
+
+I still think this makes sense. The diff is small enough and the linked issue explains the benefits quite well.
+Attributes are about allowing more descriptive code, improving the DX, and here, I can see where the DX is improved.
+
+>  You cannot do $em->find(MyInterface::class, $id)
+
+Well, maybe that could be a feature request to the ORM?
+
+As far as this PR is concerned, this is still very much decoupled from the ORM, so I don't think there is any risk (not to say the ORM won't remove a feature without extensive warnings / deprecations so again, no risk here).
+
+Still :+1: to me.
+
+---------------------------------------------------------------------------
+
+by aleho at 2025-01-14T08:33:29Z
+
+@nicolas-grekas I agree! In my opinion `resolve_target_entities` and support for interfaces is not complete in Doctrine. We can define interfaces in relations, but we cannot use them in perfectly valid scenarios like `MapEntity` or `AsEntityListener`.
+
+@stof Do you have any ideas or preferences on how to make entity interfaces in Doctrine and DoctrineBridge easier to work with?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-02-12T15:31:41Z
+
+Friendly ping @symfony/mergers

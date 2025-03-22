@@ -1,0 +1,37 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-03-14T16:47:59Z
+
+PR updated.
+
+I need to fix a few tests but overall this is ready for review.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-03-15T13:28:50Z
+
+Self-review:
+
+- [x] https://github.com/doctrine/orm/pull/11853 is needed to fix the deprecation on doctrine-bridge
+- [x] using native lazy objects is incompatible with decorating internal classes - this should be changed
+- [x] the code is too complex: it handles cases that are better dealt with using native lazy proxies
+
+Status: needs work
+
+---------------------------------------------------------------------------
+
+by stof at 2025-03-17T09:32:04Z
+
+Be careful. Doctrine ORM 2.x is not EOL yet and it already supports using var-exporter (but will probably not receive a backport of the support for native lazy objects). This might impact the deprecation plan.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-03-21T15:57:40Z
+
+> Doctrine ORM 2.x is not EOL yet and it already supports using var-exporter (but will probably not receive a backport of the support for native lazy objects). This might impact the deprecation plan.
+
+I don't think this should impact us: ppl have a way to fix the deprecation: upgrade. The day where 2.x will be EOLed is close anyway.
+
+After many error-n-trial, I just pushed what I think is the implementation that works. First I thought we could use hooks to proxy all properties, but it happens those are not really compatible with references, so that we have to keep using magic accessors to proxy them.
+
+Status: needs review

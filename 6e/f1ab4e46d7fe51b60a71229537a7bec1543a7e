@@ -1,0 +1,29 @@
+---------------------------------------------------------------------------
+
+by stof at 2025-02-19T17:38:35Z
+
+If `pushNamespace` returns a new adapter, what is the use case for `popNamespace` (which also returns a new adapter, and so won't return the "parent" ArrayAdapter for instance) ?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-02-20T09:33:20Z
+
+@stof you're totally right! I removed `popNamespace` and renamed the `pushNamespace` method to `withSubNamespace`.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-02-20T09:58:59Z
+
+Ready. Tests should be green after merge.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-03-13T15:33:51Z
+
+PR ready (failures will be fixed by merging)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-03-21T16:47:43Z
+
+Any comment @symfony/mergers ?

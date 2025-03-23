@@ -61,18 +61,19 @@ class XliffUtils
     {
         $xliffVersion = static::getVersionNumber($dom);
         $internalErrors = libxml_use_internal_errors(true);
-        if ($shouldEnable = self::shouldEnableEntityLoader()) {
+        /*if ($shouldEnable = self::shouldEnableEntityLoader()) {
             $disableEntities = libxml_disable_entity_loader(false);
-        }
-        try {
-            $isValid = @$dom->schemaValidateSource(self::getSchema($xliffVersion));
-            if (!$isValid) {
-                return self::getXmlErrors($internalErrors);
-            }
+        }*/
+        /*try {
+
         } finally {
             if ($shouldEnable) {
                 libxml_disable_entity_loader($disableEntities);
             }
+        }*/
+        $isValid = @$dom->schemaValidateSource(self::getSchema($xliffVersion));
+        if (!$isValid) {
+            return self::getXmlErrors($internalErrors);
         }
 
         $dom->normalizeDocument();
@@ -83,7 +84,7 @@ class XliffUtils
         return [];
     }
 
-    private static function shouldEnableEntityLoader(): bool
+    /*private static function shouldEnableEntityLoader(): bool
     {
         static $dom, $schema;
         if (null === $dom) {
@@ -106,7 +107,7 @@ class XliffUtils
         }
 
         return !@$dom->schemaValidateSource($schema);
-    }
+    }*/
 
     public static function getErrorsAsString(array $xmlErrors): string
     {

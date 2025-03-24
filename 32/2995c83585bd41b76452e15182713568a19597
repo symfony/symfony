@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by OskarStark at 2025-03-23T23:04:44Z
+
+class-filter sounds to much technical to me. What about message-filter ?
+
+---------------------------------------------------------------------------
+
+by chalasr at 2025-03-24T00:10:52Z
+
+@OskarStark `message-filter` seems too broad to me. Also `class-filter` is inline with what exists in `FailedMessagesShowCommand`

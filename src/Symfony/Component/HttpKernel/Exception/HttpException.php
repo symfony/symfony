@@ -32,6 +32,7 @@ class HttpException extends \RuntimeException implements HttpExceptionInterface
     {
         return match ($statusCode) {
             400 => new BadRequestHttpException($message, $previous, $code, $headers),
+            401 => new UnauthorizedHttpException($message, $previous, $code, $headers),
             403 => new AccessDeniedHttpException($message, $previous, $code, $headers),
             404 => new NotFoundHttpException($message, $previous, $code, $headers),
             406 => new NotAcceptableHttpException($message, $previous, $code, $headers),

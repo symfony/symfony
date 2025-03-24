@@ -1,0 +1,79 @@
+---------------------------------------------------------------------------
+
+by Spomky at 2025-03-20T08:32:24Z
+
+Hi @Oviglo,
+
+I believe the best approach would be to separate the logic into two distinct methods: one for `GET` and another for `DELETE`.
+This would not only solve your issue but also improve the clarity and maintainability of your code.
+
+---------------------------------------------------------------------------
+
+by Oviglo at 2025-03-20T09:26:46Z
+
+> Hi @Oviglo,
+>
+> I believe the best approach would be to separate the logic into two distinct methods: one for `GET` and another for `DELETE`. This would not only solve your issue but also improve the clarity and maintainability of your code.
+
+Yes, but it will make my controller heavier. Another solution is to create an empty form for using native csrf validation.
+
+Is it an official recommendation to use only one method per action ?
+
+---------------------------------------------------------------------------
+
+by Spomky at 2025-03-20T09:35:32Z
+
+I’m not sure what you mean by "heavier" in this context.
+
+There is no official recommendation to use only one method per action, it is more about the single-responsibility principle.
+
+Here’s an example that should work as expected:
+
+```php
+#[Route('/delete/{id}', name: 'get', methods: ['GET'], requirements: ['id' => Requirement::UUID])]
+public function get(User $user): Response
+{
+    return $this->render('/admin/user/delete.html.twig', ['entity' => $user]);
+}
+
+#[Route('/delete/{id}', name: 'delete', methods: ['DELETE'], requirements: ['id' => Requirement::UUID])]
+#[IsCsrfTokenValid(new Expression('"delete" ~ args["user"].getId()'))]
+public function delete(User $user, UserManager $userManager): Response
+{
+    $userManager->remove($user);
+
+    return $this->redirectToRoute('admin_user_index');
+}
+```
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-03-21T17:42:37Z
+
+So, better close?
+
+---------------------------------------------------------------------------
+
+by Oviglo at 2025-03-21T18:16:30Z
+
+If you don’t find any utility, yes 😥
+
+Merci à vous.
+
+---------------------------------------------------------------------------
+
+by Spomky at 2025-03-22T12:10:45Z
+
+Instead of a list of methods, what about checking if it is a non-safe method?
+
+---------------------------------------------------------------------------
+
+by Oviglo at 2025-03-22T15:08:14Z
+
+Yes you are right, a csrf token is only used for POST PUT DELETE and PATCH is’nt ?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-03-22T15:57:38Z
+
+CSRF tokens can also be used for GET requests, eg for logout links (that's a common practice, even if not recommended).

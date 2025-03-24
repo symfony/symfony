@@ -1,0 +1,78 @@
+---------------------------------------------------------------------------
+
+by eltharin at 2025-03-04T09:52:21Z
+
+Is it a choice to not use named capture in Route.php ?
+Or I can do it for better read ?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-03-04T10:27:42Z
+
+I'm sorry I don't get this feature, can you expand on what this provides?
+Currently, you can have a route with with both `{id:foo}` and `{slug:foo}`.
+What else do you need?
+
+---------------------------------------------------------------------------
+
+by eltharin at 2025-03-04T10:29:41Z
+
+I need a route with {id:foo} and {id:bar}
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-03-04T10:46:00Z
+
+Why? From a routing PoV, that's undefined: how would you generate just a route for example?
+
+---------------------------------------------------------------------------
+
+by eltharin at 2025-03-04T10:51:28Z
+
+that's my proposal, instead of {id:foo} and {id:bar} witch can be impossible, I can have {fooId:foo.id} and {barId:bar.id}.
+my route function can have function myRoute( Foo $foo, Bar $bar) and autogenerate them,
+and I can generate a route with ['fooId' => 2, 'barId' => 5]
+
+---------------------------------------------------------------------------
+
+by welcoMattic at 2025-03-04T11:05:28Z
+
+IIUC, this use case can me handled by: `{fooId:foo}` and `{barId:bar}`
+`function myRoute(Foo $foo, Bar $bar)`
+`{{ path('my_route', { fooId: 1, barId: 1 })` => `my_route/1/1`
+
+You do not need to alias anything, just use the proper name for ids.
+
+---------------------------------------------------------------------------
+
+by eltharin at 2025-03-04T11:07:19Z
+
+it's just a shortcut to not write Many Map Entity to map alias with field name
+
+---------------------------------------------------------------------------
+
+by eltharin at 2025-03-04T11:10:16Z
+
+> IIUC, this use case can me handled by: `{fooId:foo}` and `{barId:bar}` `function myRoute(Foo $foo, Bar $bar)` `{{ path('my_route', { fooId: 1, barId: 1 })` => `my_route/1/1`
+>
+> You do not need to alias anything, just use the proper name for ids.
+
+If your field is id in both classes you must add a mapentity for each arguments.
+
+I just found it quicker to write, and not have to put an attribute to each argument witch is less readable IMO
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-03-17T20:01:26Z
+
+The description of the PR should be improved IMHO.
+I updated it a bit to use slugs instead of random foo/bar; This should help but it's not enough.
+Using the example of "id" in the comments doesn't help either: id is already a special field so you don't need to name it.
+It'd suggest providing a before/after example with something more concrete to make it more obvious what this is about.
+Before: with MapEntity mapping, After: the new shorter way that's being proposed.
+
+---------------------------------------------------------------------------
+
+by eltharin at 2025-03-18T10:37:27Z
+
+Do you prefer this new description ?

@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by stof at 2025-02-24T10:50:44Z
+
+a collection of object is **not** satisfying the `object` type. An array is **not** an object. This PR is the one introducing an unexpected behavior while the current code works fine.
+
+-1 for this PR.
+
+---------------------------------------------------------------------------
+
+by mtarld at 2025-02-24T10:59:09Z
+
+Sorry, the example was not clear enough, `Type::collection(Type::object(Foo::class))` means that `Foo` **is the collection**. I should have written the following:
+```php
+Type::collection(type: Type::object(\Iterator::class), value: Type::int())->isSatisfiedBy($specification);
+```
+Which will check the whole type, and the `Iterator` type, but not the `int` type.

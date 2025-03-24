@@ -1,0 +1,27 @@
+---------------------------------------------------------------------------
+
+by garak at 2025-03-03T09:57:25Z
+
+I can't understand the psalm failures, any help will be appreciated.
+Moreover, I see that fabbot complains because I added some tests with return type, does it make sense?
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2025-03-03T09:58:21Z
+
+> Moreover, I see that fabbot complains because I added some tests with return type, does it make sense?
+
+Yes, we avoid the `void` return type in the Symfony codebase
+
+---------------------------------------------------------------------------
+
+by garak at 2025-03-03T10:37:44Z
+
+I fixed the return types. The unit test failures seem unrelated.
+I still need a hint about fixing the psalm inspection, thanks.
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2025-03-15T16:28:56Z
+
+Note for the DoctrineBundle integration: in addition to adding the type to the DBAL Types registry, this new type should be associated to the `DatePoint` property type in the [typed field mapper](https://www.doctrine-project.org/projects/doctrine-orm/en/3.3/reference/typedfieldmapper.html#defaulttypedfieldmapper).

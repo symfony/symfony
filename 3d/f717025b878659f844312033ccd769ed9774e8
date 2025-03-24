@@ -1,0 +1,139 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2025-02-26T00:28:32Z
+
+Hey!
+
+Thanks for your PR. You are targeting branch "7.3" but it seems your PR description refers to branch "6.4".
+Could you update the PR description or change target branch? This helps core maintainers a lot.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by smnandre at 2025-02-26T11:25:26Z
+
+Hi @natepage, **thank you** for taking the time to work on this!
+
+I'm gonna try it this afternoon on a real project to check if this change
+* is "enough" to support dynamic alias on the whole asset "pipeline"
+* has any side effect on importmap
+* is compatible with importmap polyfill
+
+PS: I'm not sure this should be considered a bug fix to be honest.
+
+---------------------------------------------------------------------------
+
+by stof at 2025-02-26T12:17:20Z
+
+Is this adding the dynamically imported module in the list of dependencies of that module in the AssetMapper representation ? this would be wrong as it would break any lazy-loading done through dynamic imports.
+
+---------------------------------------------------------------------------
+
+by smnandre at 2025-02-26T14:27:58Z
+
+I tested with mermaid.
+
+<details>
+<summary>115 new entries in importmap.php</summary>
+
+```php
+ 115 new items (mermaid, dayjs, khroma, dompurify, @iconify/utils, @braintree/sanitize-url, d3,
+      lodash-es/memoize.js, lodash-es/merge.js, marked, ts-dedent, roughjs, stylis, lodash-es/isEmpty.js, katex,
+      mermaid/dist/chunks/mermaid.core/dagre-4EVJKHTY.mjs, mermaid/dist/chunks/mermaid.core/c4Diagram-6F5ED5ID.mjs,
+      mermaid/dist/chunks/mermaid.core/flowDiagram-7ASYPVHJ.mjs,
+      mermaid/dist/chunks/mermaid.core/erDiagram-6RL3IURR.mjs,
+      mermaid/dist/chunks/mermaid.core/gitGraphDiagram-NRZ2UAAF.mjs,
+      mermaid/dist/chunks/mermaid.core/ganttDiagram-NTVNEXSI.mjs,
+      mermaid/dist/chunks/mermaid.core/infoDiagram-A4XQUW5V.mjs,
+      mermaid/dist/chunks/mermaid.core/pieDiagram-YF2LJOPJ.mjs,
+      mermaid/dist/chunks/mermaid.core/quadrantDiagram-OS5C2QUG.mjs,
+      mermaid/dist/chunks/mermaid.core/xychartDiagram-6QU3TZC5.mjs,
+      mermaid/dist/chunks/mermaid.core/requirementDiagram-MIRIMTAZ.mjs,
+      mermaid/dist/chunks/mermaid.core/sequenceDiagram-G6AWOVSC.mjs,
+      mermaid/dist/chunks/mermaid.core/classDiagram-LNE6IOMH.mjs,
+      mermaid/dist/chunks/mermaid.core/classDiagram-v2-MQ7JQ4JX.mjs,
+      mermaid/dist/chunks/mermaid.core/stateDiagram-MAYHULR4.mjs,
+      mermaid/dist/chunks/mermaid.core/stateDiagram-v2-4JROLMXI.mjs,
+      mermaid/dist/chunks/mermaid.core/journeyDiagram-G5WM74LC.mjs,
+      mermaid/dist/chunks/mermaid.core/timeline-definition-U7ZMHBDA.mjs,
+      mermaid/dist/chunks/mermaid.core/mindmap-definition-GWI6TPTV.mjs,
+      mermaid/dist/chunks/mermaid.core/kanban-definition-QRCXZQQD.mjs,
+      mermaid/dist/chunks/mermaid.core/sankeyDiagram-Y46BX6SQ.mjs,
+      mermaid/dist/chunks/mermaid.core/diagram-QW4FP2JN.mjs, mermaid/dist/chunks/mermaid.core/blockDiagram-ZHA2E4KO.mjs,
+      mermaid/dist/chunks/mermaid.core/architectureDiagram-UYN6MBPD.mjs, debug, d3-array, d3-axis, d3-brush, d3-chord,
+      d3-color, d3-contour, d3-delaunay, d3-dispatch, d3-drag, d3-dsv, d3-ease, d3-fetch, d3-force, d3-format, d3-geo,
+      d3-hierarchy, d3-interpolate, d3-path, d3-polygon, d3-quadtree, d3-random, d3-scale, d3-scale-chromatic,
+      d3-selection, d3-shape, d3-time, d3-time-format, d3-timer, d3-transition, d3-zoom, dagre-d3-es/src/dagre/index.js,
+      dagre-d3-es/src/graphlib/json.js, dagre-d3-es/src/graphlib/index.js, uuid, @mermaid-js/parser,
+      dayjs/plugin/isoWeek.js, dayjs/plugin/customParseFormat.js, dayjs/plugin/advancedFormat.js, cytoscape,
+      cytoscape-cose-bilkent, d3-sankey, lodash-es/clone.js, cytoscape-fcose, ms, internmap, delaunator, lodash-es,
+      langium, @mermaid-js/parser/dist/chunks/mermaid-parser.core/info-46DW6VJ7.mjs,
+      @mermaid-js/parser/dist/chunks/mermaid-parser.core/packet-W2GHVCYJ.mjs,
+      @mermaid-js/parser/dist/chunks/mermaid-parser.core/pie-BEWT4RHE.mjs,
+      @mermaid-js/parser/dist/chunks/mermaid-parser.core/architecture-I3QFYML2.mjs,
+      @mermaid-js/parser/dist/chunks/mermaid-parser.core/gitGraph-YCYPL57B.mjs, cose-base, robust-predicates,
+      @chevrotain/regexp-to-ast, chevrotain, chevrotain-allstar, vscode-languageserver-types,
+      vscode-jsonrpc/lib/common/cancellation.js, vscode-languageserver-textdocument, vscode-uri,
+      vscode-jsonrpc/lib/common/events.js, layout-base, @chevrotain/utils, @chevrotain/gast, @chevrotain/cst-dts-gen,
+      lodash-es/map.js, lodash-es/filter.js, lodash-es/min.js, lodash-es/flatMap.js, lodash-es/uniqBy.js,
+      lodash-es/flatten.js, lodash-es/forEach.js, lodash-es/reduce.js) added to the importmap.php!
+```
+
+</details>
+
+It also doubled the generated `<script tpye=importmap>` size in the HTML
+
+But... it worked perfectly, and i can use mermaid with no problem.
+
+---------------------------------------------------------------------------
+
+by smnandre at 2025-02-26T14:30:04Z
+
+If i add a `stimulusFetch: lazy` to the Stimulus controller, the lazyness is respected, only the scripts required for the diagram type are loaded.
+
+```js
+import { Controller } from '@hotwired/stimulus';
+import mermaid from 'mermaid';
+
+/* stimulusFetch: 'lazy' */
+export default class extends Controller {
+    async connect() {
+        mermaid.initialize({
+            startOnLoad: false,
+            securityLevel: 'loose',
+            theme: 'forest',
+            themeVariables: {
+                primaryColor: '#ffc107',
+            }
+        });
+
+        await mermaid.run({
+            querySelector: '.mermaid',
+        });
+    }
+}
+```
+
+(code taken from the original issue #53145 - added the lazy part )
+
+---------------------------------------------------------------------------
+
+by natepage at 2025-03-06T21:48:19Z
+
+Hi @smnandre and @stof, I hope you're doing well,
+
+Thank you for taking the time to look at this and experiment with it!
+
+What are we thinking about this change?
+Would you need anything from me at this stage?
+
+I'm just trying to organise my coming weeks 😄
+
+---------------------------------------------------------------------------
+
+by smnandre at 2025-03-08T02:08:22Z
+
+Looks fine to me!

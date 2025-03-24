@@ -1,0 +1,944 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2023-09-25T10:06:19Z
+
+Hey!
+
+To help keep things organized, we don't allow "Draft" pull requests. Could you please click the "ready for review" button or close this PR and open a new one when you are done?
+
+Note that a pull request does not have to be "perfect" or "ready for merge" when you first open it. We just want it to be ready for a first review.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by Tiriel at 2023-09-26T12:40:10Z
+
+Sorry guys, noob question here, but I was not at the conf so I didn't get the rationale.
+Il love the syntax, but I fail to see the point of this _in the general Symfony components_.
+
+I see the point for APIP or such solutions, but I can't see why it should be a Symfony component, as I don't see the value it can provide compared to a basic custom mapper. And I don't see why we would want to get rid of custom mappers in generic projects if there's no gain except "one less class in `src`, 5 more in `vendor`". Especially since performance was not the primary issue in mind here. Ok, coding mappers is boring, but in that case, shouldn't the replacement be as simple (or even simpler) AND as fast AND as secure?
+
+Other than that, once again, the DX is awesome, maybe except one or two small details.
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2023-09-26T13:20:56Z
+
+> I see the point for APIP or such solutions, but I can't see why it should be a Symfony component, as I don't see the value it can provide compared to a basic custom mapper. And I don't see why we would want to get rid of custom mappers in generic projects if there's no gain
+
+That's a fair question. In practice, in a rich DTO system, when I have objects with relationships, things often get more complex than one class for the mapping. For example, I'm mapping `Product` -> `ProductDto` and there is a `Product.category` that should be mapped to a `ProductDto`... and so from my mapper code from `Product` -> `ProductDto`, I also want to call the mapping code from `Category` -> `CategoryDto`. Or are other people not running into this?
+
+Also, even if the solution is simple, there is some advantage to having a core interface & system for mapping. For API Platform, it opens up the possibility of mapping a DTO with `#[ApiResource]` and saying "get fetch the data from the `Product`" entity. Because there is a central mapping system, it can use that to convert between the `Product` and `ProductDto`. If we don't have a central system (even if the problem is not that complex), we can't introduce features like that into API Platform's core. We could also document using DTO's in other places (like the form system) more readily due to there being a central way of handling that mapping part.
+
+---------------------------------------------------------------------------
+
+by soyuka at 2023-09-26T13:24:13Z
+
+@weaverryan I also really liked your examples with the User DTOs (mapping password etc.) which are quite out of the scope of API Platform but are really useful within Symfony or with custom controllers altogether. Maybe we can share these?
+
+Actually it's been quite some time that many Symfony users think that an AutoMapper component inside Symfony would be quite useful. I started a prototype after discussing with Ryan and therefore wanted to propose this as a component to help our community members.
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2023-09-26T13:42:00Z
+
+> @weaverryan I also really liked your examples with the User DTOs (mapping password etc.) which are quite out of the scope of API Platform but are really useful within Symfony or with custom controllers altogether. Maybe we can share these?
+
+Sure :). Whether it's API Platform or using DTOs with forms, here are some requirements I had for a mapper:
+
+A) `User.plainPassword` -> maps to -> `User.password` but we need to go through the password hasher
+B) Same as above, but only map if `User.plainPassword` is not `null` (don’t try to hash an empty string and override the existing hashed password)
+C) Mapping A -> B, but B has some extra property on it that depends on, let’s say… 3 different properties on A and needs a service to calculate the final value.
+D) Mapping from `UserDto` -> `User` and because this is a PATCH operation / edit page, `UserDto.id=5` and so we should actually query the database for `User` where `id=5` instead of creating a new instance.
+E) Same as above, but with a relation: `ProductDto.category` is a `CategoryDto` and `ProductDto.category.id=9`. So when mapping `ProductDto.category` -> `Product.category`, the `Category` entity will be loaded from somewhere else (e..g database) but not instantiated.
+
+---------------------------------------------------------------------------
+
+by Tiriel at 2023-09-26T13:47:42Z
+
+First, thanks for your time!
+
+> That's a fair question. In practice, in a rich DTO system, when I have objects with relationships, things often get more complex than one class for the mapping. For example, I'm mapping `Product` -> `ProductDto` and there is a `Product.category` that should be mapped to a `ProductDto`... and so from my mapper code from `Product` -> `ProductDto`, I also want to call the mapping code from `Category` -> `CategoryDto`. Or are other people not running into this?
+
+I do have the same "problem" on a regular basis. In fact, pretty much every time I give a Symfony training (like twice a month at least), since it's pretty much part of the application we build as an exercice for the trainings at SL.
+
+And again, I don't deny the DX gain on this, maybe it needs a bit more work (like, does it work when mapping collections, or nested collections?). But maybe I'm wrong, but I can't see something relying this much on Reflection being as effective as the boring solution, even with Mappers for nested properties. If you tell me the accepted tradeof is perf vs DX, why not, but I'm not sure it'll be used that much then, and so I'm back to my first question.
+
+> Also, even if the solution is simple, there is some advantage to having a core interface & system for mapping. For API Platform, it opens up the possibility of mapping a DTO with `#[ApiResource]` and saying "get fetch the data from the `Product`" entity. Because there is a central mapping system, it can use that to convert between the `Product` and `ProductDto`. If we don't have a central system (even if the problem is not that complex), we can't introduce features like that into API Platform's core. We could also document using DTO's in other places (like the form system) more readily due to there being a central way of handling that mapping part.
+
+Again, no question how it could be useful for APIP. But in that case IMHO it should stay in APIP.
+Your examples seem typical to me of the common problems we have indeed by the way, but maybe I'm just not on point, but I still don't see the benefit of centralized Mapper for these either in its current design, except for DX (which is already great, but not enough IMHO).
+
+Basically, if the perf question is resolved, and the gain is substantial not only for DX, I'm all for it. Otherwise, I'm not sure.
+
+---------------------------------------------------------------------------
+
+by Korbeil at 2023-09-26T14:02:26Z
+
+AutoMapper is a subject we hold close to heart here at JoliCode :heart: (remember https://github.com/symfony/symfony/pull/30248? 4 years old already) and I would like to highlight another approach to the one exposed here.
+
+I worked on bringing [AutoMapper, previously in the JanePHP organization, now in JoliCode's](https://github.com/jolicode/automapper) in Symfony as a standalone component: https://github.com/Korbeil/symfony/pull/1
+
+It has not been opened on the Symfony repository yet as an excess of precaution and a will to bring something pre-approved (#30248 was a ton of work and never got merged so we were careful not to make the same mistake). It has been discussed on Symfony's Slack with some core maintainers but that didn't bring real feedback nor reviews.
+
+If we step back for a sec, we all know that the Serializer revamp will not be merged before 7.1 at best. Beside, the current AutoMapper implementation looks quick and simple as it allows to map only DTO together. Meanwhile, we could take more time to consider my PR and deliver a complete and performant AutoMapper with the new Serializer implementation where the normalization part could leverage this AutoMapper and bring even more speed to the new Serializer #51718.
+
+Performance should always be taken into account as a primary feature - we use Symfony on huge and heavy workload applications and it's not ok to have some features doing runtime Reflection with no cache. Code using such components would need to be hardly challenged from code reviews. And that’s why we do think AST is a very powerful way to get this performance.
+
+> Current implementations (automapper-plus, janephp/automapper) are good but feel to complicated when you want something accessible.
+
+Could you elaborate on this statement? While your implementation is really nice and easy to read / maintain, from an user perspective, jolicode/automapper is as simple and accessible:
+
+```php
+$automapper->map(source, target);
+```
+
+We all must keep in mind the benefit for Symfony's users, no matter what is our company, or the code ownership. Currently, we have 2 different suggestions for a new AutoMapper component, let's work together to leverage the best of both and bring something useful to the users.
+
+---------------------------------------------------------------------------
+
+by joelwurtz at 2023-09-26T14:29:52Z
+
+Hello, nice there is some interest into an automapper component, i also think this is something that should be added to symfony.
+
+However, there is some points that i don't understand in this proposal :
+
+> Current implementations (automapper-plus, janephp/automapper) are good but feel to complicated when you want something accessible
+
+What do you think is too complicated about them ?:
+
+ * If you talk about implementation, then yes, they are more complex / larger than this proposal but since they handle a lot more features and try to have good performance this is "normal" and overall those libraries intend to be well decoupled to reduce this complexity and allow a lot of extensions points (but it sure can be reduced for a first start). Also i don't remember implementation complexity being an argument, sure it's important for maintenance burden and other reasons, but as long this complexity is justified (like the VarDumper component as an example) i don't think it matters.
+
+ * If you talk about client usage (DX / UX) they are the same as this proposal (an unique function that map a source to a target) so i don't think we can say this proposal is "simpler" in term of DX.
+
+ > Here we're not trying to have exceptional performance, we just want an accessible API with few mandatory features
+
+ I really think performance should be a mandatory feature for such a component, we use automapper a lot, and often it can be on a lot of data, as an example we have used it for migrating an existing app (with a lot of data) to a new model (it's a perfect use case for this component), and when you can have a 10 to 1000 factor performance depending on the implementation it cannot be an "detail" in my view.
+
+[Personal Note](https://github.com/symfony/symfony/pull/30248#issuecomment-1735733456)
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2023-09-26T14:35:08Z
+
+> Current implementations (automapper-plus, janephp/automapper) are good but feel to complicated when you want something accessible.
+> Could you elaborate on this statement? While your implementation is really nice and easy to read / maintain, from an user perspective, jolicode/automapper is as simple and accessible:
+
+I tried using the janephp/automapper (maybe the jolicode one has improved?) but I had a very hard time with A, B, D & E from this list - https://github.com/symfony/symfony/pull/51741#issuecomment-1735569580
+
+So yes, the interface is simple. I found customizing my mapping to be really hard / impossible in some cases. But these are things that can be improved :). I am more interested that there IS a solution that exists, not which one... though I'd love to collaborate on the DX for whatever is decided.
+
+---------------------------------------------------------------------------
+
+by smnandre at 2023-09-26T16:26:03Z
+
+Probably a minor point, but i'd suggest to drop the "Auto" part of the component, and maybe keep it for the implementation.
+
+> The AutoMapper component allows you to map an object to another object,
+
+For me if Symfony provide such component, i expect it to have a basic interface, hiding all the complexity / configuration behind.... including the possibility to use plain manual PHP / service code in implementations.
+
+So maybe just name it `Mapper` ?  WDTY ?
+
+```php
+namespace Symfony/Component/Mapper;
+
+class Automapper implements MapperInterface
+```
+
+(ObectMapper does not provide much more, and impede potential evolutions)
+
+---------------------------------------------------------------------------
+
+by soyuka at 2023-09-27T09:54:48Z
+
+After some discussions I:
+- renamed the component to `Mapper`
+- introduced recursivity support (no need to control maxDepth here this is not a serializer)
+- I want to change attributes to simplify even more the developer experience and try to cover a few cases people brought to me (thanks !!)
+
+I've kept my old implementation here in case we want to track evolution. The description and title will be updated shortly.
+
+<details>
+<summary>Old implementation</summary>
+```
+<?php
+
+use Symfony\Component\AutoMapper\AutoMapper;
+use Symfony\Component\AutoMapper\Attributes\MapIf;
+use Symfony\Component\AutoMapper\Attributes\MapTo;
+use Symfony\Component\AutoMapper\Attributes\MapWith;
+
+// This maps class `A` to class `B`.
+#[MapTo(B::class)]
+class A
+{
+    // This maps A::foo to B::bar.
+    #[MapTo('bar')]
+    public string $foo;
+
+    // This calls strtoupper on A::transform
+    #[MapWith('ucfirst')]
+    public string $name;
+
+    // This doesn't map A::bar if it's value is falsy.
+    #[MapIf('boolval')]
+    public bool $bar = false;
+}
+
+$mapper = new AutoMapper();
+$mapper->map(new A);
+```
+</details>
+
+---------------------------------------------------------------------------
+
+by sazzabi-fcms at 2023-09-27T10:05:11Z
+
+Hi, I have some suggestions. I think that in the attributes, the use of "Map" is redundant (MapTo, MapWith, MapIf, etc..). I think you can drop the "Map" prefix
+
+Also, I suggest to drop the MapWith, and change the "To" attribute to be able to "transform" a value before applying it :
+`#[To(property: '...', classes: {B::class, C::class}, transform: {'ucfirst', ...})]
+`
+In this case, all parameters are not required :
+- if you don't specify 'property', Automapper will find property with similar name
+- if you don't specify 'classes', mapping will be valid for all #[Map()] attributes in the class
+- if you don't specify 'transform', value will be ported as is
+
+---------------------------------------------------------------------------
+
+by dbu at 2023-09-27T11:31:21Z
+
+cool idea!
+some thoughts:
+
+* this does have some overlap with (de) serializer. could we see the serializer as a special case of the Mapper? serializer maps object to array, this mapper maps object to object...
+* it could be interesting to have an interface for the metadata loader. annotations in the code is one way to define this, but metadata could also be written in an xml or yaml format. even if initially only annotations are supported, isolating the metadata loading behind an interface would allow to add other loaders.
+* how about supporting accessor / setter methods and "virtual properties" that only exist as method but have no explicit field on a class? accessors methods could also be an alternative to the transformer callbacks
+
+---------------------------------------------------------------------------
+
+by pounard at 2023-09-27T11:41:54Z
+
+> Hi, I have some suggestions. I think that in the attributes, the use of "Map" is redundant (MapTo, MapWith, MapIf, etc..). I think you can drop the "Map" prefix
+
+`To`, `With` and `If` are too common words, they could be used as attribute names by any other kind of API for different needs. I think the `Map` prefix probably should be kept, in case people start using attributes from other namespace along. Or they simply could be more specific ?
+
+---------------------------------------------------------------------------
+
+by pounard at 2023-09-27T11:43:39Z
+
+If I understood it well, by design, a class can be mapped only to one another class ? Isn't it a very drastic limitation ? I could want to map an entity to more than one kind of DTO, for example:
+
+- some custom action form,
+- another custom action form,
+- various API endpoints with different schemas,
+- ...
+
+Is this achievable with the code in its current state ?
+
+---------------------------------------------------------------------------
+
+by dbu at 2023-09-27T11:45:19Z
+
+> > Hi, I have some suggestions. I think that in the attributes, the use of "Map" is redundant (MapTo, MapWith, MapIf, etc..). I think you can drop the "Map" prefix
+>
+> `To`, `With` and `If` are too common words, they could be used as attribute names by any other kind of API for different needs. I think the `Map` prefix probably should be kept, in case people start using attributes from other namespace along. Or they simply could be more specific ?
+
+also, `if` is a reserved keyword and can not be the name of a class afaik.
+
+---------------------------------------------------------------------------
+
+by sazzabi-fcms at 2023-09-27T11:54:22Z
+
+> * this does have some overlap with (de) serializer. could we see the serializer as a special case of the Mapper? serializer maps object to array, this mapper maps object to object...
+
+It's true, I even used (de)serializer once to map and thanks to the component good performances it got the job done
+
+> * how about supporting accessor / setter methods and "virtual properties" that only exist as method but have no explicit field on a class? accessors methods could also be an alternative to the transformer callbacks
+
+Good point here, it could also solve and edge case where you would use more than one prop to map in destination object
+
+> If I understood it well, by design, a class can be mapped only to one another class ? Isn't it a very drastic limitation ?
+
+That's why I suggested the `...classes: {B::class, C::class}`. This way, you could map an object to multiple objects at the same time, and even have different mapping per object
+
+---------------------------------------------------------------------------
+
+by pounard at 2023-09-27T12:20:01Z
+
+> That's why I suggested the `...classes: {B::class, C::class}`. This way, you could map an object to multiple objects at the same time, and even have different mapping per object
+
+It's going to be hardly readable considering that each property will define many mappings. I think that for advanced use cases, YAML or XML mappings aside could be a nice to have.
+
+---------------------------------------------------------------------------
+
+by soyuka at 2023-09-27T12:56:08Z
+
+I've updated the implementation and reduced the attributes to just a single one (see updated description).
+
+@dbu
+
+- this does have some overlap with (de) serializer. could we see the serializer as a special case of the Mapper? serializer maps object to array, this mapper maps object to object...
+
+It's not the same thing, the Serializer is used to transform an object to some representation of this object in a specific format (json etc.). Also we don't do `array` to `object` this is not comparable in my opinion as these are two distinct components. Also we want this to be more straightforward (no groups, no max depth etc.)
+
+- it could be interesting to have an interface for the metadata loader. annotations in the code is one way to define this, but metadata could also be written in an xml or yaml format. even if initially only annotations are supported, isolating the metadata loading behind an interface would allow to add other loaders.
+
+I'm not against that although I've a strong opinion about configuration in other formats then attributes. To keep this feature proposal simple I'd like to reserve that to future improvements and would not include it right now.
+
+- how about supporting accessor / setter methods and "virtual properties" that only exist as method but have no explicit field on a class? accessors methods could also be an alternative to the transformer callbacks
+
+This implementation already support that when using the property accessor.
+
+@pounard
+
+ I have an issue with the `Map` prefix for attributes that is it's currently reserved for controller usage, not sure what to do right now.
+ To answer your second question, I've implemented the following proposal:
+
+ ```php
+ #[Map(to: Foo::class, if: 'someconditionistrue')]
+ #[Map(to: Baz::class, if: 'someconditionistrue')]
+ class Bar {}
+ ```
+
+Therefore this issue is solved. By the way this is a follow up on @sazzabi-fcms comment, instead of 3 attributes I refactored the code to use only one with optional properties. Description got updated, I'm adding a few test cases.
+
+---------------------------------------------------------------------------
+
+by pounard at 2023-09-27T13:00:03Z
+
+> To answer your second question, I've implemented the following proposal:
+>
+> ```
+> #[Map(to: Foo::class, if: 'someconditionistrue')]
+> #[Map(to: Baz::class, if: 'someconditionistrue')]
+> class Bar {}
+> ```
+>
+> Therefore this issue is solved. By the way this is a follow up on @sazzabi-fcms comment, instead of 3 attributes I refactored the code to use only one with optional properties. Description got updated, I'm adding a few test cases.
+
+I'm not sure it's 100% solved, how do you specify per-property `to` ?
+
+---------------------------------------------------------------------------
+
+by soyuka at 2023-09-27T13:12:08Z
+
+@pounard the exact same way on properties:
+
+```php
+#[Map(to: Dto::class)]
+class Foo {
+   #[Map(to: Baz::class, if: 'someconditionistrue')]
+    public Bar $bar;
+}
+```
+
+---------------------------------------------------------------------------
+
+by pounard at 2023-09-27T13:15:27Z
+
+> @pounard the exact same way on properties:
+
+OK, it will probably work fine, but as soon as you'll have many target classes, it's going to make it difficult to read, nevertheless I don't think there's any magic wand to solve this aside an external configuration (xml or yaml or anything else) or custom mapping implementation via an interface registered by some compiler pass.
+
+---------------------------------------------------------------------------
+
+by Pierstoval at 2023-09-28T08:23:43Z
+
+> this does have some overlap with (de) serializer. could we see the serializer as a special case of the Mapper? serializer maps object to array, this mapper maps object to object...
+
+It goes way farther in abstraction than that.
+
+The Serializer is a data mapper where one of the mapping direction is a completely different format, but the in-between format (the "normalized" one) is a PHP array.
+
+However, we might identify other cases:
+
+* An API Platform resource can also be a data-mapped object, thanks to the ApiResource <-> Doctrine Entity relation
+* An HTML form can also be a data-mapped object: as there is the `data_class` object, you come from a normalized (array) format to a PHP one
+* A CRUD-admin-generator is also a data mapper, most of them would use forms anyway
+* A queue system can also be a data mapper, since you have the storage's data format (rabbitmq, redis, etc.) and your PHP object. One could use serialization, or could just map the native data to an SDK-like library object.
+* You could need a data mapper to map your own domain-objects into an API/SDK/other resource object
+* And other cases I'm sure I'm not aware of
+
+We use data mappers every day in our apps and sometimes without realizing how abstract we could bring this.
+
+As a side-note, I think it's really cool that the Mapper thing we were numerous to talk about last week at API Platform Con became a PR this fast, and whether or not it becomes a Symfony component, I'll be really glad to use it anyway, just like I used jane's automapper in some projects 👌 I think this part is going the right way 🚀 Thanks for everyone's work and comment here!
+
+---------------------------------------------------------------------------
+
+by simondaigre at 2023-09-28T10:41:02Z
+
+Would it be better if we could put all the attributes (MapIf, MapTo, etc.) on the destination object rather than the source object?
+Would that avoid overloading the source object (which would often be a Doctrine entity) with attributes and methods that don't really concern it?
+I may use this component to map APIP DTOs and forms, but I am afraid that my entities will be overloaded with code :(
+
+---------------------------------------------------------------------------
+
+by rogeriolino at 2023-09-28T11:40:36Z
+
+What do you think about following the same approach as Mapstruct?
+https://mapstruct.org/
+
+Decoupling the mapping logic from DTO to a specific mapper class/interface:
+
+```php
+namespace App\Entity;
+
+class Car
+{
+    private string $make;
+    private int $numberOfSeats;
+    private CarType $type;
+}
+
+namespace App\Dto;
+
+class CarDto
+{
+    public function __construct(
+        private readonly string $make,
+        private readonly int $seatCount,
+        private readonly string $type,
+    ) {
+    };
+}
+
+namespace App\Mapper;
+
+#[Mapper]
+interface CarMapperInterface
+{
+    #[Mapping(source: "numberOfSeats", target: "seatCount")]
+    public function carToCarDto(Car car): CarDto;
+}
+```
+
+Then leveraging on generated-cached-code as @Korbeil said, getting rid of `Reflection`.
+
+ps: Congrats for this PR
+
+---------------------------------------------------------------------------
+
+by jamesisaac at 2023-09-28T21:37:36Z
+
+> Would it be better if we could put all the attributes (MapIf, MapTo, etc.) on the destination object rather than the source object? Would that avoid overloading the source object (which would often be a Doctrine entity) with attributes and methods that don't really concern it? I may use this component to map APIP DTOs and forms, but I am afraid that my entities will be overloaded with code :(
+
+I think it would be useful to have the option for both?  Assuming you have both Input and Output DTOs, then keeping the mapping configurations neatly colocated within the relevant DTO wouldn't be possible if you can only specify a `to` configuration -- the Doctrine entity would get more bloated the more Output DTOs are added.
+
+---------------------------------------------------------------------------
+
+by soyuka at 2023-09-28T21:53:16Z
+
+If we introduced a `source` / `target` (or `from` / `to`) we could implement it the other way and also use that as [rogeriolino](https://github.com/rogeriolino) suggested. I'm not a huge fan as the design looks more complicated to me but I could implement it. Probably still waiting for more opinions on the subject.
+
+On a side note most of the tests are green, high-deps and integration fail on what looks like unrelated issues.
+
+---------------------------------------------------------------------------
+
+by walva at 2023-09-29T01:52:51Z
+
+I'm genuinely excited about this new component and the performance improvements it promises. Performance is undoubtedly crucial in any application.
+
+However, I'd like to express a primary concern regarding the strict usage of attributes in this component. As it stands, my entities are already verbose, and over time, they become harder to maintain. When considering the separation of concerns and the hexagonal architecture perspective, it seems like we might be mixing layers.
+
+My question is how entities and their attributes will look when dealing with multiple consumers. For instance, I might need different DTOs for forms (e.g., one for users, another for administrators), different DTOs for various integrations (Consumer A or B, Twitter or Adyen, etc.), and possibly one or several for our APIs (mobile app, SPA, etc.).
+
+Is there a plan to make this solution usable without relying heavily on attributes?
+
+I've implemented a similar component in the past, and I'd like to share some details with you. Below is an example of how it works in my use case, particularly for translating entities into SOAP Request Objects for API integrations:
+
+```php
+class Mapper
+{
+    public static function mapObjectToObject($source, $dist, $mapping)
+    {
+        $propertyAccessor = PropertyAccess::createPropertyAccessor();
+        foreach ($mapping as $attributeName => $value) {
+            // if the value is null, take the value within the object. Easier to write the mapping array this way.
+
+            if ($value instanceof PropertyPath) {
+                $value = $propertyAccessor->getValue($source, $value->getPath());
+            } elseif (null === $value && is_array($source) && (isset($source[$attributeName]))) {
+                $value = $source[$attributeName];
+            } elseif (is_callable($value)) {
+                $value = $value();
+            } elseif (null === $value and ($propertyAccessor->isReadable($source, $attributeName))) {
+                $value = $propertyAccessor->getValue($source, $attributeName);
+            } elseif (is_callable($value) and $propertyAccessor->isReadable($source, $attributeName)) {
+                $value = $value($propertyAccessor->getValue($source, $attributeName));
+            } elseif (is_callable($value) and !$propertyAccessor->isReadable($source, $attributeName)) {
+                $value = $value();
+            }
+            $propertyAccessor->setValue($dist, $attributeName, $value);
+        }
+    }
+
+    public static function mapObjectToArray($source, $dist, $mapping)
+    {
+        $propertyAccessor = PropertyAccess::createPropertyAccessor();
+        foreach ($mapping as $attributeName => $value) {
+            switch (true) {
+                case $value instanceof PropertyPath:
+                    if ($value->failSilently()) {
+                        try {
+                            $path  = $value->getPath() ?: $attributeName;
+                            $value = $propertyAccessor->getValue($source, $path);
+                        } catch (Exception $e) {
+                            $value = $value->failValue();
+                        }
+                    } else {
+                        $path  = $value->getPath() ?: $attributeName;
+                        $value = $propertyAccessor->getValue($source, $path);
+                    }
+
+                    break;
+                case $value === null:
+                    $value = $propertyAccessor->getValue($source, $attributeName);
+                    break;
+                case $value instanceof Value:
+                    $value = $value->getValue();
+                    break;
+                case is_callable($value):
+                    $value = $value();
+                    break;
+            }
+            $dist[$attributeName] = $value;
+        }
+        return $dist;
+    }
+
+```
+
+```php
+
+        $request = new RegisterRequest();
+
+        $mappings = [
+            'source'    => sourceValue::FORM,
+            'givenName' => new PropertyPath('firstName'),
+            'name'      => new PropertyPath('lastName'),
+            'alias'     => new PropertyPath('username'),
+            'birthday'  => function (User $user) {
+                return $user->getBirthdate()->format('Y-m-d');
+            },
+            'profession'   => new PropertyPath('occupation'),
+            'nationality'  => new PropertyPath('nationality'),
+            'natRegNumber' => new PropertyPath('nationalRegistrationNumber'),
+            'passportId'   => new PropertyPath('passportNumber'),
+            'country'      => new PropertyPath('address.country'),
+            'address'      => function (User $user) {
+                $street     = $user->getAddress()->getStreet();
+                $number     = $user->getAddress()->getNumber();
+                $secondLine = $user->getAddress()->getSecondLine();
+
+                $address = sprintf('%s %s, ', $number, $street);
+                if (0 != strlen($secondLine)) {
+                    $address = PHP_EOL.$secondLine;
+                }
+
+                return $address;
+            },
+            'town'       => new PropertyPath('address.city'),
+            'postalCode' => new PropertyPath('address.zipCode'),
+            'email'      => new PropertyPath('email'),
+            'ipAddress'  => fn () => $options['userIpAddress'],
+        ];
+
+        Mapper::mapObjectToObject($user, $request, $mappings);
+
+```
+
+For my specific requirements, I need to define a mapping for each supported country. It would be beneficial if this component could support multiple mapping sources right from the beginning, such as YAML, PHP objects, arrays, Annotations, etc.
+
+Thank you for considering these points. I believe this discussion will lead to a more robust and versatile component.
+
+Best regards,
+
+Benjamin
+
+---------------------------------------------------------------------------
+
+by pounard at 2023-09-29T07:16:31Z
+
+I would add that what bothers me most is that there is no component for defining mappings between mapping and actual mapper. The attribute reading is hardcoded into the `AutoMapper` class: this will make implementing other source of mapping definition very hard.
+
+A better design would be:
+
+ - expose a `MapperRegistry { get(string $from, string $to): callable /* (TypeOfFrom $from): TypeOfTo */ }` interface,
+ - implement a `MapperRegistryChain` which will decorate concrete implementations and iterate over the find the right one (cache be placed here, instead inside the Mapper).
+
+This way:
+ - it's easy to provide user custom callables, which are not based upon definition, simply add a custom registry that does this and inject it in the chain,
+ - it's easy to add as many implementations as required.
+
+In order to share code between let's say an `AttributeMapperRegistry`, `YamlMapperRegistry` or `XmlMapperRegistry`, you need an intermediate representation, that could simply be an interface or concrete class (it's internal, no need for an interface): `MappingDefinition { getProperties(): PropertyDefinition[] }`. Which return an iterable of `PropertyDefinition { public string $from; public string $to; public iterable /* callable[] */ $transforms; }`
+
+This way, intermediate representation implementation is shared between all definition sources, and their concrete implementations will remain minimal.
+
+Only pieces that lack here is the implementation which from a `PropertyDefinition` will be able to fetch data from a certain class, then rename properties, apply transformations, and hydrate using the new class. For extraction and hydration, components do exist, such as `ocramius/generated-hydrators` for example, but writing its own is easy using the magic scope stealing closure trick.
+
+By writing such design, the `AutoMapper` doesn't need to implement a `MapperInterface` interface anymore, you can simply get a `Mapper` class, which is the actual entry point of the API, whose only dependency is a `MapperRegistry` (whose concrete injected implementation will be chain) and the only piece of code inside is fetching a callable, and run it.
+
+Benefits from this design is:
+
+- no harcoded dependency of concrete implementations,
+- replaceable engine,
+- user-driven arbitrary callables are possible,
+- any kind of definition source is possible, including user-driven arbitrary ones,
+- code is easier to test,
+- no reflection in primary design anywhere,
+- cache is hidden at the right place.
+
+EDIT: moreover, which such design, adding a code generator for dumping automatic and very fast object mappers would be an implementation detail, hidden away behind the `MapperRegistry` interface, and can be added later. You can get the benefit from other more complex pull request attempts, while keeping the core component very simple.
+
+---------------------------------------------------------------------------
+
+by pounard at 2023-09-29T07:45:16Z
+
+Something such as:
+
+```php
+<?php
+
+interface MapperException extends \Throwable {};
+
+class MapperDoesNotExistException extends \InvalidArgumentException implements MapperException {}
+
+class Mapper
+{
+    public function __construct(
+        private MapperRegistry $mapperRegistry,
+    ) {}
+
+    public function map(object $object, string $toClassName): object
+    {
+        return (
+            $this->mapperRegistry->get(
+                \get_class($object),
+                $toClassName
+            )
+        )($object);
+    }
+}
+
+interface MapperRegistry
+{
+    public function get(string $fromClassName, string $toClassName): callable;
+}
+
+class ChainMapperRegistry implements MapperRegistry
+{
+    public function __construct(
+        /** @var MapperRegistry[] */
+        private iterable $instances,
+    ) {}
+
+    /**
+     * {@inheritdoc}
+     */
+    public function get(string $fromClassName, string $toClassName): callable
+    {
+        // @todo place here cache
+        foreach ($this->instances as $instance) {
+            try {
+                return $instance->get($fromClassName, $toClassName);
+            } catch (MapperDoesNotExistException) {}
+        }
+        throw new MapperDoesNotExistException();
+    }
+}
+
+readonly class PropertyDefinition
+{
+    public function __construct(
+        public string $from,
+        public string $to,
+        /** @var callable[] */
+        public iterable $transforms,
+    ) {}
+}
+
+interface MapperInstanciator
+{
+    public function create(string $className, array $data): object;
+
+    public function needsHydrator(): bool;
+}
+
+class ReflectionMapperInstanciator implements MapperInstanciator
+{
+    /**
+     * {@inheritdoc}
+     */
+    public function create(string $className, array $data): object
+    {
+        return (new \ReflectionClass($toClassName))->newInstanceWithoutConstructor();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function needsHydrator(): bool
+    {
+        return true;
+    }
+}
+
+abstract class AbstractDefinitionMapperRegistry implements MapperRegistry
+{
+    private ?MapperInstanciator $instanciator = null;
+
+    public function getInstanciator(): MapperInstanciator
+    {
+        return $this->instanciator ?? ($this->instanciator = new ReflectionMapperInstanciator());
+    }
+
+    public function setInstanciator(MapperInstanciator $instanciator): void
+    {
+        $this->instanciator = $instanciator;
+    }
+
+    /** @return PropertyDefinition[] */
+    protected abstract function getPropertiesFor(string $fromClassName, string $toClassName): iterable;
+
+    /**
+     * {@inheritdoc}
+     */
+    public function get(string $fromClassName, string $toClassName): callable
+    {
+        $properties = $this->getPropertiesFor($fromClassName, $toClassName);
+
+        return static function (object $object) use ($toClassName, $properties) {
+            // @todo here apply an EXTRACTOR using stealing closure trick or another
+            //   this could even be something from the serializer component
+            $input = extract($object);
+
+            $output = [];
+            foreach ($properties as $property) {
+                if (\array_key_exists($property->from, $input)) {
+                    $value = $input[$property->from];
+                    foreach ($property->transform as $callable) {
+                        $value = $callable($value);
+                    }
+                    $output[$property->to] = $value;
+                }
+            }
+
+            $instanciator = $this->getInstanciator();
+            $ret = $instanciator->create($object, $output);
+
+            if ($instanciator->needsHydrator()) {
+                // @todo here apply an HYDRATOR using stealing closure trick or another
+                //   this could even be something from the serializer component
+                hydrate($ret, $output);
+            }
+
+            return $ret;
+        };
+    }
+}
+
+class AttributeDefinitionMapperRegistry extends AbstractDefinitionMapperRegistry
+{
+    /**
+     * {@inheritdoc}
+     */
+    protected function getPropertiesFor(string $fromClassName, string $toClassName): iterable
+    {
+        // @todo create properties from attributes using reflection...
+    }
+}
+
+class YamlDefinitionMapperRegistry extends AbstractDefinitionMapperRegistry
+{
+    // ....
+}
+
+class XmlDefinitionMapperRegistry extends AbstractDefinitionMapperRegistry
+{
+    // ....
+}
+```
+
+Wrote in more or less 10 minutes, so please be kind, it's full of typos and namings are probably wrong, but it's just to illustrate my previous statement.
+
+In this design, `hydrate()` and `extract()` fonctions can be either:
+
+- a custom pair of interfaces within this component,
+- (de)normalizers from the serializer component.
+
+Which allows code factorization. But the nice idea behind this is that it could then be implemented using anything.
+
+Instanciator is a nice idea as well, using some powerful hydrator could directly use the instanciatior interface and create and populate the object at the same time. But I think it's a good idea to separate at least in this component factory and hydration process of the target object.
+
+---------------------------------------------------------------------------
+
+by soyuka at 2023-09-29T08:26:53Z
+
+> Is there a plan to make this solution usable without relying heavily on attributes?
+
+Why not, and  this was already answered. The idea could be to introduce some Metadata factories that define how to map things. Also if you need array to object you would rather use Normalizers instead of this. Last but not least I won't implement the Metadata Factory right now as we don't even know if the Symfony core team wants such a component. If we want to merge something, then we will discuss further what interface to introduce (or not).
+
+@pounard this is getting a bit far out of the idea of having a mapper in a a hundred lines of code, introducing as many classes as you did brings way more maintenance work and I'm not sure of the benefits. As it has been said earlier there are many AutoMapper implementations that may work better then this one for complex use cases. What I try to provide here is a mapper that works for 90% of use cases with an accessible configuration. Side note, with the Metadata factories, you could handle your "what maps to what" programmatically.
+
+I'd like for this feature proposal, that we try not to digress too much from the initial idea, and that we see what the core team thinks and where they want to go from this current state.
+
+---------------------------------------------------------------------------
+
+by pounard at 2023-09-29T08:43:14Z
+
+> this is getting a bit far out of the idea of having a mapper in a a hundred lines of code, introducing as many classes as you did brings way more maintenance work and I'm not sure of the benefits
+
+My opinion is actually quite the opposite: if the component gets released as stable without having an extensible design (that's the whole point of SOLID actually), it will be much harder to add new features or allow user extensions to be plugged in.
+
+Most of the code I gave you are a few interface at some key extension points that are obvious we'll need in the short or medium term. It doesn't mean what you've done is wrong, it simply means that we could actually take your code, and split it into a few smaller classes with single responsibility, hidden behind key interfaces, which will make the whole:
+
+- extensible,
+- easier to test,
+- much more resilient to change.
+
+It might look more complex to understand at first glance, I won't deny that, but it will make it easier to work with once understood for people that need to extend it or alter its behavior.
+
+> As it has been said earlier there are many AutoMapper implementations that may work better then this one for complex use cases.
+
+And I would greatly love to have a single one, yours propose a nice DX, and is simple, I like it, I simply think that with a few interfaces and splitting into a few components, without adding tons of code, it'll make it a good candidate to succeed where others don't.
+
+It would even make it possible to use other implementations as extension of this one if it's well designed.
+
+EDIT: As I oftenly see, once a component gets adopted, and people start using it, any design change that is susceptible to break its public API is de facto impossible. This often ends up with most people using broken software that cannot be improved. Having an extensible design right from the start mitigate this a lot, and allows incremental improvements without breaking anything.
+
+---------------------------------------------------------------------------
+
+by soyuka at 2023-09-29T12:14:49Z
+
+Indeed, the messenger work is a good proof that any included interfaces should be experimental for quite some time until the component gets used and we see where it needs improvements! Let's wait and see.
+
+---------------------------------------------------------------------------
+
+by pounard at 2023-09-29T12:29:45Z
+
+> Indeed, the messenger work is a good proof that any included interfaces should be experimental for quite some time until the component gets used and we see where it needs improvements! Let's wait and see.
+
+But if you don't think the design before it is released, even in experimental state every later major design change will be a huge burden. PS: I really don't like the way messenger ended up inside, for many reasons, subjective ones but I don't find it easy to work with. For once it wasn't even possible to change or decorate its internal serializer for a few years, it was hardcoded: that made me change and write my own bus component I'm now using since 2019. Considering that, messenger initial releases where a huge fail. IMHO initial releases of messenger were terrible and it took many years for it to become usable.
+
+What I mean is that if the implementation is dead simple and incomplete, you probably should provide replaceable components at key points in order to allow people extending it and experimenting with it. Those people later feedback will be the most valuable intel on how to improve it. If you don't, people with advanced use cases won't use it, and those improving it won't do it accordingly to those real complex use cases they could have experienced with it.
+
+---------------------------------------------------------------------------
+
+by faizanakram99 at 2024-02-26T18:25:14Z
+
+Not directly related to mapper but somewhat related:
+
+I see one of the arugments about mapper component is "forms".
+
+I think the main problem with forms is that it binds ui elements one to one with properties or getters/setters (dto or entity). It is quite common for certain fields in ui belong to a single object in backend like quantity + unit, invoiced quantity + unit + available credit limit, etc.
+
+Mapper alone won't help there, what we need is an easy way to have accessors for multiple properties, something similar to callback accessor but for multiple properties.
+
+---------------------------------------------------------------------------
+
+by soyuka at 2024-03-06T09:59:43Z
+
+@fabpot could you take a look at this feature?
+@priyadi probably a bit late but I hosted a split of this component at https://github.com/soyuka/mapper
+
+```json
+    "require": {
+            "symfony/mapper": "@dev",
+     },
+    "repositories": [
+      {"url": "https://github.com/soyuka/mapper", "type": "vcs"}
+    ]
+```
+
+@weaverryan I hosted an example API at https://github.com/soyuka/api-platform-doctrine-mapper where I use the mapper and update the correct doctrine entity. The trick is to keep the doctrine object and reverse-map to the entity. Let me know your thoughts on this!
+
+---------------------------------------------------------------------------
+
+by priyadi at 2024-03-06T11:45:49Z
+
+@soyuka and others, I spent the entire January to create my own automapper: [rekalogika/mapper](https://github.com/rekalogika/mapper). Right now it does everything I need from a mapper and probably will satisfy many of the objections above. Maybe you can take a look at it and incorporate some of the ideas to your mapper. Complete manual is here: [rekalogika.dev/mapper](https://rekalogika.dev/mapper)
+
+With regard to API Platform, this is how we utilize the mapper in our projects: [rekalogika.dev/api-lite](https://rekalogika.dev/api-lite)
+
+---------------------------------------------------------------------------
+
+by soyuka at 2024-04-30T13:33:43Z
+
+> IIRC with this approach you always add the annotations to the source entity.
+
+@maxbeckers  not really if you decide otherwise you implement the MapperMetadataFactoryInterface then you can do like you want, the implementation is a base implementation that works for simple objects and doctrine entities. I'd love for you to provide with a specific use case I think that this component offers lots of flexibility.
+
+---------------------------------------------------------------------------
+
+by soyuka at 2024-04-30T13:47:09Z
+
+I went through the latest comments
+
+---------------------------------------------------------------------------
+
+by soyuka at 2024-05-03T09:04:17Z
+
+@maxbeckers I added an example on how to flatten
+
+---------------------------------------------------------------------------
+
+by maxbeckers at 2024-05-03T09:20:07Z
+
+Hi @soyuka,
+
+thanks for the example ... so yes it works in general, but only with using the transform and implementing the methods:
+```
+    public static function getFirstName($v, $object)
+    {
+        return $v->firstName;
+    }
+
+    public static function getLastName($v, $object)
+    {
+        return $v->lastName;
+    }
+```
+so fine for the moment, but in future we should find a way to improve.
+My idea would be like these examples:
+```
+#[Map(source: 'profile.firstName', target: 'firstName')]
+// or
+#[Map(source: 'profile->getFirstName', target: 'firstName')]
+```
+
+---------------------------------------------------------------------------
+
+by soyuka at 2024-05-03T09:33:10Z
+
+@maxbeckers a generated mapper could easily implement those as part of the metadata (generate mapping transform closures), at least we see that it's possible with the current state of this feature.
+
+---------------------------------------------------------------------------
+
+by joelwurtz at 2024-05-03T12:52:34Z
+
+> @maxbeckers a generated mapper could easily implement those as part of the metadata (generate mapping transform closures), at least we see that it's possible with the current state of this feature.
+
+This would also be possible if we propose expression language for transformation and providing the source as a variable in it
+
+---------------------------------------------------------------------------
+
+by soyuka at 2024-07-19T20:21:37Z
+
+@nicolas-grekas is there something else I can do for this? we'd like to start experimenting this inside API Platform.
+
+---------------------------------------------------------------------------
+
+by soyuka at 2024-10-07T10:12:45Z
+
+Thanks @OskarStark
+
+---------------------------------------------------------------------------
+
+by soyuka at 2025-03-13T15:24:46Z
+
+@nicolas-grekas rebased

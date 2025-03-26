@@ -1,0 +1,35 @@
+---------------------------------------------------------------------------
+
+by kbond at 2025-03-26T16:22:15Z
+
+Sorry about that @norkunas. Could https://github.com/symfony/symfony/pull/59967#issuecomment-2754563499 be a solution? If so, we can document this.
+
+---------------------------------------------------------------------------
+
+by stof at 2025-03-26T16:24:20Z
+
+As we were already introduce a `getTranslatableSubject` getter, we might introduce a corresponding new setter (and we should actually support TranslatableInterface)
+
+---------------------------------------------------------------------------
+
+by kbond at 2025-03-26T16:33:29Z
+
+> As we were already introduce a getTranslatableSubject getter, we might introduce a corresponding new setter
+
+I'm not really a fan of this for the [reason](https://github.com/symfony/symfony/pull/59967#pullrequestreview-2691812975) @nicolas-grekas mentioned in #59967
+
+---------------------------------------------------------------------------
+
+by stof at 2025-03-26T16:50:13Z
+
+I have no idea what his suggestion is about. It makes no sense for Email to implement TranslatableInterface.
+
+On the other hand, supporting translatable subjects is probably a use case for any localized project (and would allow avoiding to inject the translator in each place creating an Email object to translate it before calling `subject`, just like TemplatedEmail is about avoiding to render the Twig template explicitly).
+
+---------------------------------------------------------------------------
+
+by kbond at 2025-03-26T16:56:37Z
+
+> adds cross-cutting concerns to the base class (= combinatory explosion)
+
+This was the specific reason I was referring to. I'm thinking to document https://github.com/symfony/symfony/pull/59967#issuecomment-2755011336 as the best way to translate the subject. I get that it doesn't work if not using Twig, but in this case, you'd have to have an alternate system to translate the body/html - so why not translate subject within the same system.

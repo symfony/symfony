@@ -1,0 +1,29 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2025-03-24T16:31:29Z
+
+Status: Needs work
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2025-03-24T17:09:42Z
+
+Status: Needs review
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2025-03-24T19:04:01Z
+
+I think you missed `EntityTypeTest` and `UniqueEntityValidatorTest`? The deprecation is still raised in these cases
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2025-03-24T20:25:24Z
+
+@alexandre-daubois The remaining deprecations triggered by the DoctrineBridge tests should be solved with doctrine/orm#11882.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2025-03-25T16:04:19Z
+
+everything is green again \o/

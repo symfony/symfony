@@ -88,7 +88,13 @@ abstract class AbstractStream
                 throw new TransportException(\sprintf('Connection to "%s" has been closed unexpectedly.', $this->getReadConnectionDescription()));
             }
             if (false === $line) {
-                throw new TransportException(\sprintf('Unable to read from connection to "%s": ', $this->getReadConnectionDescription()).error_get_last()['message']);
+                if ($this->getReadConnectionDescription() && error_get_last()){
+                    $error = $this->getReadConnectionDescription().error_get_last()['message'];
+                }
+                else{
+                    $error = $this->getReadConnectionDescription().error_get_last();
+                }
+                throw new TransportException(sprintf('Unable to read from connection to "%s": ', $error));
             }
         }
 

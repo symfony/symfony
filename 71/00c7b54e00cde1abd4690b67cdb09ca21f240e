@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by Spomky at 2025-02-22T09:17:38Z
+
+It is important to mention in the documentation that caution should be exercised when sending encrypted emails to multiple recipients. And indeed, all recipients are used here and therefore the main recipients as well as those in BCC. It is therefore possible to know these recipients depending on the encryption method used.
